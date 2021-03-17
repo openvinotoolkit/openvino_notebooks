@@ -11,18 +11,18 @@ All Python notebooks are available in the `notebooks` directory. Detailed descri
 * `005-hello-APIs` 
 
 ### tool-usage:
-* `006-tensorflow-to-openvino`
-* `007-pytorch-onnx-to-openvino`
-* `008-quantization`
+* `100-tensorflow-to-openvino`
+* `101-pytorch-onnx-to-openvino`
+* `102-quantization`
 
 ### demos:
-* `009-vision-super-resolution`
-* `010-vision-monocular-depth-estimation`
-* `011-vision-object-detection-zoo`
-* `012-vision-worker-safety`
-* `013-vision-hand-pose-estimation` 
-* `014-language-bert-question-answering` 
-* `015-audio-speech-to-text` 
-* `016-vision-language-OCR-pipeline`
-* `017-audio-sound-classification`
-* `018-vision-surgery-segmentation`
+* `200-vision-super-resolution`
+* `201-vision-monocular-depth-estimation`
+* `202-vision-object-detection-zoo`
+* `203-vision-worker-safety`
+* `204-vision-hand-pose-estimation` 
+* `205-language-bert-question-answering` 
+* `206-audio-speech-to-text` 
+* `207-vision-language-OCR-pipeline`
+* `208-audio-sound-classification`
+* `209-vision-surgery-segmentation`
