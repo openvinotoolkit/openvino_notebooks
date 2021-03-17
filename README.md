@@ -3,26 +3,26 @@
 ## List of Notebooks
 All Python notebooks are available in the `notebooks` directory. Detailed descriptions below: 
 
-### 01-hello-world:
-* `01-hello-world` 
-* `02-hello-classification` 
-* `03-hello-object-detection` 
-* `04-hello-segmentation` 
-* `05-hello-APIs` 
+### hello-world:
+* `001-hello-world` 
+* `002-hello-classification` 
+* `003-hello-object-detection` 
+* `004-hello-segmentation` 
+* `005-hello-APIs` 
 
-### 02-tool-usage:
-* `01-tensorflow-to-openvino`
-* `02-pytorch-onnx-to-openvino`
-* `03-quantization`
+### tool-usage:
+* `006-tensorflow-to-openvino`
+* `007-pytorch-onnx-to-openvino`
+* `008-quantization`
 
-### 03-demos:
-* `01-vision-super-resolution`
-* `02-vision-monocular-depth-estimation`
-* `03-vision-object-detection-zoo`
-* `04-vision-worker-safety`
-* `05-vision-hand-pose-estimation` 
-* `06-language-bert-question-answering` 
-* `07-audio-speech-to-text` 
-* `08-vision-language-OCR-pipeline`
-* `09-audio-sound-classification`
-* `10-vision-surgery-segmentation`
+### demos:
+* `009-vision-super-resolution`
+* `010-vision-monocular-depth-estimation`
+* `011-vision-object-detection-zoo`
+* `012-vision-worker-safety`
+* `013-vision-hand-pose-estimation` 
+* `014-language-bert-question-answering` 
+* `015-audio-speech-to-text` 
+* `016-vision-language-OCR-pipeline`
+* `017-audio-sound-classification`
+* `018-vision-surgery-segmentation`
