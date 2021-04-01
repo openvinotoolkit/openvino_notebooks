@@ -1,4 +1,4 @@
-# OpenVINO Notebooks
+# 📚 OpenVINO Notebooks
 
 > **NOTE**: The notebooks are currently in **beta**. We plan to publish a stable release this summer. In the meantime, please try the beta notebooks and provide feedback. You can submit [issues](https://github.com/openvinotoolkit/openvino_notebooks/issues) on GitHub and join our [developer Discord\*](https://discord.com/invite/pWGcWpyx7x) to get updates. We look forward to hearing from you!
 
@@ -32,7 +32,14 @@ The table below lists the supported operating systems and Python\* versions requ
 
 ## Installation Guide
 
-### Step 1: Create a Virtual Environment
+### Step 1: Clone this Repository
+
+```
+git clone https://github.com/openvinotoolkit/openvino_notebooks.git
+cd openvino_notebooks
+```
+
+### Step 2: Create a Virtual Environment
 
 > **NOTE FOR WINDOWS:** if you have installed multiple versions of Python, use `py -3.7` to specify a supported version (in this case 3.7)
 
@@ -42,7 +49,7 @@ The table below lists the supported operating systems and Python\* versions requ
 python -m venv openvino_env
 ```
 
-### Step 2: Activate the Environment
+### Step 3: Activate the Environment
 
 #### For Linux and macOS:
 
@@ -56,7 +63,7 @@ source openvino_env/bin/activate
 openvino_env\Scripts\activate
 ```
 
-### Step 3: Install the Packages
+### Step 4: Install the Packages
 
 > **NOTE:** Please install pip with this specific version to ensure compatibility with OpenVINO versions and all dependencies.
 
@@ -65,13 +72,13 @@ python -m pip install --upgrade pip==20.1.1
 pip install jupyterlab openvino-dev
 ```
 
-### Step 4: Install the virtualenv Kernel in Jupyter
+### Step 5: Install the virtualenv Kernel in Jupyter
 
 ```
 python -m ipykernel install --user --name openvino_env
 ```
 
-## 5. Start the Notebook(s)!
+## Step 6: Launch the Notebooks!
 
 #### To launch a single notebook:
 
