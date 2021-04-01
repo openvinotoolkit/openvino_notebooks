@@ -38,6 +38,8 @@ The table below lists the supported operating systems and Python versions requir
 git clone https://github.com/openvinotoolkit/openvino_notebooks.git
 ```
 
+> **NOTE:** On Windows it is recommended to open a _Command Prompt_, not _PowerShell_.
+
 ### Step 2: Create a Virtual Environment
 
 ```bash
@@ -101,4 +103,5 @@ In Jupyter Lab, select a notebook from the file browser using the left sidebar. 
 - On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7)
 
 ---
+
 \* Other names and brands may be claimed as the property of others.
