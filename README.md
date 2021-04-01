@@ -63,8 +63,8 @@ openvino_env\Scripts\activate
 ### Step 4: Install the Packages
 
 ```bash
-# Install pip version 20.1.1 to ensure compatibility with all dependencies
-python -m pip install --upgrade pip==20.1.1
+# Always upgrade pip to the latest version
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
