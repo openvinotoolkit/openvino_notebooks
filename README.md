@@ -32,15 +32,13 @@ The table below lists the supported operating systems and Python versions requir
 
 ## 📝 Installation Guide
 
-> **NOTE:** If OpenVINO is installed globally, please do not run any of these commands in a terminal where setupvars.bat or setupvars.sh are sourced.
+> **NOTE:** If OpenVINO is installed globally, please do not run any of these commands in a terminal where setupvars.bat or setupvars.sh are sourced. For Windows, we recommended using _Command Prompt (cmd.exe)_, not _PowerShell_.
 
 ### Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/openvinotoolkit/openvino_notebooks.git
 ```
-
-> **NOTE:** On Windows we recommended opening a _Command Prompt_, not _PowerShell_.
 
 ### Step 2: Create a Virtual Environment
 
