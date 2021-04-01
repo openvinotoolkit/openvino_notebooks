@@ -10,7 +10,7 @@ The notebooks are designed to run almost anywhere &mdash; on your laptop, a clou
 
 - CPU (64-bit)
 - Windows\*, Linux\* or macOS\*
-- Python\*
+- Python\* 3.6-3.7
 
 Before you proceed to the Installation Guide, please check the detailed System Requirements below.
 
