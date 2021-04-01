@@ -16,7 +16,7 @@ Before you proceed to the Installation Guide, please check the detailed System R
 
 ## System Requirements
 
-> **NOTE: Python 3.8 with Linux is not supported yet.** If you wish to run the notebooks on Ubuntu 20.04, please see our [guide](wiki_url) for installing Python 3.7 on Ubuntu 20.04.
+> **NOTE: Python 3.8 is not supported yet.** If you wish to run the notebooks on Ubuntu 20.04, please see our [guide](wiki_url) for installing Python 3.7 on Ubuntu 20.04.
 
 The table below lists the supported operating systems and Python versions required to run the OpenVINO notebooks.
 
@@ -26,9 +26,9 @@ The table below lists the supported operating systems and Python versions requir
 | Ubuntu\* 20.04 LTS, 64-bit                                 | 3.6, 3.7                                             |
 | Red Hat* Enterprise Linux* 8.2, 64-bit                     | 3.6, 3.7                                             |
 | CentOS\* 7.4, 64-bit                                       | 3.6, 3.7                                             |
-| macOS\* 10.15.x versions                                   | 3.6, 3.7, 3.8                                        |
-| Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8                                        |
-| Windows Server\* 2016 or higher                            | 3.6, 3.7, 3.8                                        |
+| macOS\* 10.15.x versions                                   | 3.6, 3.7                                             |
+| Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7                                             |
+| Windows Server\* 2016 or higher                            | 3.6, 3.7                                             |
 
 ## Installation Guide
 
