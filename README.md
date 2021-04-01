@@ -78,7 +78,7 @@ pip install jupyterlab openvino-dev
 python -m ipykernel install --user --name openvino_env
 ```
 
-## Step 6: Launch the Notebooks!
+### Step 6: Launch the Notebooks!
 
 #### To launch a single notebook:
 
