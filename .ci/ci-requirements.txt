@@ -1,4 +1,4 @@
--r requirements.txt
+-r ../requirements.txt
 
 # Packages for testing/validating notebooks
 nbval
