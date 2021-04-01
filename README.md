@@ -34,31 +34,29 @@ The table below lists the supported operating systems and Python\* versions requ
 
 ### Step 1: Clone this Repository
 
-```
+```bash
 git clone https://github.com/openvinotoolkit/openvino_notebooks.git
 cd openvino_notebooks
 ```
 
 ### Step 2: Create a Virtual Environment
 
-```
+```bash
+# For Linux and macOS you may need to use python3 instead of python
 python -m venv openvino_env
 ```
-
-> **FOR WINDOWS:** if you have installed multiple versions of Python, use `py -3.7` to specify a supported version (in this case 3.7)
-> **FOR LINUX/MAC:** you may need to type `python3` instead of `python` and you may also need to install [pip](https://pip.pypa.io/en/stable/installing/) and/or python-venv (depending on your Linux distribution).
 
 ### Step 3: Activate the Environment
 
 #### For Linux and macOS:
 
-```
+```bash
 source openvino_env/bin/activate
 ```
 
 #### For Windows:
 
-```
+```bash
 openvino_env\Scripts\activate
 ```
 
@@ -72,7 +70,7 @@ pip install jupyterlab openvino-dev
 
 ### Step 5: Install the virtualenv Kernel in Jupyter
 
-```
+```bash
 python -m ipykernel install --user --name openvino_env
 ```
 
@@ -93,3 +91,9 @@ In Jupyter Lab, select a notebook from the file browser using the left sidebar. 
 - On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install the required package with `sudo apt install libpython3.7-dev`
 
 - If you get an `ImportError`, doublecheck that you installed the kernel in Step 4. If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu)
+
+- On Linux and macOS you may need to type `python3` instead of `python` when creating your virtual environment
+
+- You may also need to install [pip](https://pip.pypa.io/en/stable/installing/) and/or python-venv (depending on your Linux distribution)
+
+- On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7)
