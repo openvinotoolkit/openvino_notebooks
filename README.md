@@ -32,7 +32,7 @@ The table below lists the supported operating systems and Python\* versions requ
 
 ## Installation Guide
 
-### Step 1: Clone this Repository
+### Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/openvinotoolkit/openvino_notebooks.git
@@ -63,7 +63,7 @@ openvino_env\Scripts\activate
 ### Step 4: Install the Packages
 
 ```bash
-# Install pip with this version to ensure compatibility with all dependencies
+# Install pip version 20.1.1 to ensure compatibility with all dependencies
 python -m pip install --upgrade pip==20.1.1
 pip install jupyterlab openvino-dev
 ```
@@ -84,7 +84,7 @@ jupyter notebook <notebook_filename>
 jupyter lab
 ```
 
-In Jupyter Lab, select a notebook from the file browser using the left sidebar. Notebooks are located in their own subdirectories inside the `notebooks` directory. Double click on `notebooks` folder to see what is available.
+In Jupyter Lab, select a notebook from the file browser using the left sidebar. Each notebook is located in a subdirectory within the `notebooks` directory.
 
 ## Troubleshooting
 
