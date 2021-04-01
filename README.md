@@ -6,13 +6,13 @@ A collection of ready-to-run Python\* notebooks for learning and experimenting w
 
 ## Getting Started
 
-The notebooks are designed to run almost anywhere -- on your laptop, in a cloud VM, or in a Docker container. Here's what you need to get started:
+The notebooks are designed to run almost anywhere &mdash; on your laptop, a cloud VM, or a Docker container. Here's what you need to get started:
 
 - CPU (64-bit)
 - Windows\*, Linux\* or macOS\*
 - Python\*
 
-Before you proceed to the Installation Guide, check the detailed System Requirements below.
+Before you proceed to the Installation Guide, please check the detailed System Requirements below.
 
 ## System Requirements
 
