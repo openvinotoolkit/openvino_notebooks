@@ -8,8 +8,8 @@ Each notebook is located in a directory. Please follow the instructions in the R
 
 ### tool-usage:
 
-- `100-tensorflow-to-openvino`
-- `101-pytorch-onnx-to-openvino`
+- `101-tensorflow-to-openvino`
+- `102-pytorch-onnx-to-openvino`
 
 ### demos:
 
