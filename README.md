@@ -99,3 +99,6 @@ In Jupyter Lab, select a notebook from the file browser using the left sidebar. 
 - You may also need to install [pip](https://pip.pypa.io/en/stable/installing/) and/or python-venv (depending on your Linux distribution)
 
 - On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7)
+
+---
+\* Other names and brands may be claimed as the property of others.
