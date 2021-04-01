@@ -1,28 +1,17 @@
 # openvino_notebooks
 
-## List of Notebooks
-All Python notebooks are available in the `notebooks` directory. Detailed descriptions below: 
+> **NOTE**: Python 3.8 on Linux operating systems is not supported yet. If you wish to run the notebooks on Ubuntu 20.04, please see our [guide](wiki_url) for installing Python 3.7 on Ubuntu 20.04.
 
-### hello-world:
-* `001-hello-world` 
-* `002-hello-classification` 
-* `003-hello-object-detection` 
-* `004-hello-segmentation` 
-* `005-hello-APIs` 
+## System Requirements
 
-### tool-usage:
-* `100-tensorflow-to-openvino`
-* `101-pytorch-onnx-to-openvino`
-* `102-quantization`
+The table below lists the supported operating systems and Python\* versions required to run the OpenVINO notebooks.
 
-### demos:
-* `200-vision-super-resolution`
-* `201-vision-monocular-depth-estimation`
-* `202-vision-object-detection-zoo`
-* `203-vision-worker-safety`
-* `204-vision-hand-pose-estimation` 
-* `205-language-bert-question-answering` 
-* `206-audio-speech-to-text` 
-* `207-vision-language-OCR-pipeline`
-* `208-audio-sound-classification`
-* `209-vision-surgery-segmentation`
+| Supported Operating System                                                                                  | [Python\* Version (64-bit)](https://www.python.org/) |
+| :---------------------------------------------------------------------------------------------------------- | :--------------------------------------------------- |
+| Ubuntu\* 18.04 long-term support (LTS), 64-bit                                                              | 3.6, 3.7                                             |
+| Ubuntu\* 20.04 long-term support (LTS), 64-bit                                                              | 3.6, 3.7                                             |
+| Red Hat* Enterprise Linux* 8.2, 64-bit                                                                      | 3.6, 3.7                                             |
+| CentOS\* 7.4, 64-bit                                                                                        | 3.6, 3.7                                             |
+| macOS\* 10.15.x versions                                                                                    | 3.6, 3.7, 3.8                                        |
+| Windows 10\*, 64-bit Pro, Enterprise or Education (1607 Anniversary Update, Build 14393 or higher) editions | 3.6, 3.7, 3.8                                        |
+| Windows Server\* 2016 or higher                                                                             | 3.6, 3.7, 3.8                                        |
