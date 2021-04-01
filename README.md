@@ -1,22 +1,22 @@
 # 📚 OpenVINO Notebooks
 
-> **NOTE**: The notebooks are currently in **beta**. We plan to publish a stable release this summer. You can submit [issues](https://github.com/openvinotoolkit/openvino_notebooks/issues) on GitHub and join our [developer Discord\*](https://discord.com/invite/pWGcWpyx7x) to get updates. We look forward to hearing from you!
+> 🚧 Notebooks are currently in **beta**. We plan to publish a stable release this summer. Please submit [issues](https://github.com/openvinotoolkit/openvino_notebooks/issues) on GitHub and join our [developer Discord\*](https://discord.com/invite/pWGcWpyx7x) to get updates.
 
 A collection of ready-to-run Python\* notebooks for learning and experimenting with OpenVINO developer tools. The notebooks are meant to provide an introduction to OpenVINO basics and teach developers how to leverage our APIs for optimized deep learning inference in their applications.
 
-## Getting Started
+## ☑️ Getting Started
 
-The notebooks are designed to run almost anywhere &mdash; on your laptop, a cloud VM, or a Docker container. Here's what you need to get started:
+The notebooks are designed to run almost anywhere &mdash; on your laptop, on a cloud VM, or in a Docker container. Here's what you need to get started:
 
 - CPU (64-bit)
 - Windows\*, Linux\* or macOS\*
 - Python\* 3.6-3.7
 
-Before you proceed to the Installation Guide, please check the detailed System Requirements below.
+Before you proceed to the Installation Guide, please review the detailed System Requirements below.
 
-## System Requirements
+## ⚙️ System Requirements
 
-> **NOTE: Python 3.8 is not supported yet.** If you wish to run the notebooks on Ubuntu 20.04, please see our [guide](wiki_url) for installing Python 3.7 on Ubuntu 20.04.
+> **NOTE: Python 3.8 is not supported yet.** If you wish to run the notebooks on Ubuntu 20.04, please install Python 3.7 on Ubuntu 20.04 until Python 3.8 is supported.
 
 The table below lists the supported operating systems and Python versions required to run the OpenVINO notebooks.
 
@@ -30,7 +30,7 @@ The table below lists the supported operating systems and Python versions requir
 | Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7                                             |
 | Windows Server\* 2016 or higher                            | 3.6, 3.7                                             |
 
-## Installation Guide
+## 📝 Installation Guide
 
 ### Step 1: Clone the Repository
 
@@ -38,12 +38,12 @@ The table below lists the supported operating systems and Python versions requir
 git clone https://github.com/openvinotoolkit/openvino_notebooks.git
 ```
 
-> **NOTE:** On Windows it is recommended to open a _Command Prompt_, not _PowerShell_.
+> **NOTE:** On Windows we recommended opening a _Command Prompt_, not _PowerShell_.
 
 ### Step 2: Create a Virtual Environment
 
 ```bash
-# NOTE: On Linux and macOS you may need to use python3 instead of python
+# Linux and macOS may require typing python3 instead of python
 cd openvino_notebooks
 python -m venv openvino_env
 ```
@@ -90,7 +90,7 @@ jupyter lab
 
 In Jupyter Lab, select a notebook from the file browser using the left sidebar. Each notebook is located in a subdirectory within the `notebooks` directory.
 
-## Troubleshooting
+## ⚠️ Troubleshooting
 
 - On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install the required package with `sudo apt install libpython3.7-dev`
 
