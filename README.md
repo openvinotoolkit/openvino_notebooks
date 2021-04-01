@@ -96,6 +96,6 @@ In Jupyter Lab, select a notebook from the file browser using the left sidebar.
 
 ## Troubleshooting
 
-On Linux, if you get the error "libpython3.7m.so.1.0: cannot open shared object file: No such object or directory" install the required package with `sudo apt install libpython3.7-dev`
+- On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install the required package with `sudo apt install libpython3.7-dev`
 
-If you get an `ImportError`, doublecheck that you installed the kernel in step 4. If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu)
+- If you get an `ImportError`, doublecheck that you installed the kernel in Step 4. If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu)
