@@ -2,7 +2,7 @@
 
 > **NOTE**: The notebooks are currently in **beta**. We plan to publish a stable release this summer. In the meantime, please try the beta notebooks and provide feedback. You can submit [issues](https://github.com/openvinotoolkit/openvino_notebooks/issues) on GitHub and join our [developer Discord\*](https://discord.com/invite/pWGcWpyx7x) to get updates. We look forward to hearing from you!
 
-A collection of ready-to-run Python\* notebooks for learning and experimenting with the OpenVINO Developer Tools. The notebooks are meant to provide an introduction to OpenVINO basics and teach developers how to leverage our APIs for optimized deep learning inference in your application.
+A collection of ready-to-run Python\* notebooks for learning and experimenting with OpenVINO developer tools. The notebooks are meant to provide an introduction to OpenVINO basics and teach developers how to leverage our APIs for optimized deep learning inference in their applications.
 
 ## Getting Started
 
