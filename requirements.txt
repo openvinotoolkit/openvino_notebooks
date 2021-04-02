@@ -1,0 +1,29 @@
+openvino-dev
+matplotlib
+
+# ONNX notebook requirements
+geffnet==0.9.8
+fastseg
+onnx
+ipywidgets
+
+torch==1.5.1; sys_platform == 'darwin'
+torchvision==0.6.1; sys_platform == 'darwin'
+--find-links https://download.pytorch.org/whl/torch_stable.html
+torch==1.5.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
+torchvision==0.6.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
+
+# Tensorflow notebook requirements
+networkx>=1.11
+defusedxml>=0.5.0
+tensorflow>=2.2
+
+# Jupyter requirements
+jupyterlab
+ipython==7.10  # pin version to prevent async warnings
+
+# Pin versions to prevent known dependency issues
+importlib-metadata==3.7.3
+numpy==1.18.5
+ipykernel==5.5.0
+
