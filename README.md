@@ -6,13 +6,13 @@ A collection of ready-to-run Python\* notebooks for learning and experimenting w
 
 ## 💻 Getting Started
 
-The notebooks are designed to run almost anywhere &mdash; on your laptop, on a cloud VM, or in a Docker container. Here's what you need to get started:
+The notebooks are designed to run almost anywhere &mdash; your laptop, a cloud VM, or even a Docker container. Here's what you need to get started:
 
 - CPU (64-bit)
 - Windows\*, Linux\* or macOS\*
 - Python\* 3.6-3.7
 
-Before you proceed to the Installation Guide, please review the detailed System Requirements below.
+Before you proceed to the [Installation Guide](#installation-guide), please review the detailed [System Requirements](#system-requirements) below.
 
 ## ⚙️ System Requirements
 
@@ -100,7 +100,7 @@ To end your Jupyter session, press `Ctrl-c`. This will prompt you to `Shutdown t
 
 To deactivate your virtualenv, simply run `deactivate` from the terminal window where you activated `openvino_env`. This will deactivate your environment.
 
-To reactivate your environment, simply repeat Step 3 from the Install Guide.
+To reactivate your environment, simply repeat [Step 3](#step-3-activate-the-environmentenvinotoolkit/openvino_notebooks/tree/develop#step-5-install-the-virtualenv-kernel-in-jupyter) from the Install Guide.
 
 ### Delete Virtual Environment _(Optional)_
 
@@ -122,7 +122,7 @@ rmdir /s openvino_env
 
 - On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install the required package with `sudo apt install libpython3.7-dev`
 
-- If you get an `ImportError`, doublecheck that you installed the kernel in Step 4. If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu)
+- If you get an `ImportError`, doublecheck that you installed the kernel in [Step 5](#step-5-install-the-virtualenv-kernel-in-jupyter). If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu)
 
 - On Linux and macOS you may need to type `python3` instead of `python` when creating your virtual environment
 
