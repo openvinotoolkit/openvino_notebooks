@@ -130,4 +130,6 @@ rmdir /s openvino_env
 
 - On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7)
 
+---
+
 \* Other names and brands may be claimed as the property of others.
