@@ -100,7 +100,7 @@ To end your Jupyter session, press `Ctrl-c`. This will prompt you to `Shutdown t
 
 To deactivate your virtualenv, simply run `deactivate` from the terminal window where you activated `openvino_env`. This will deactivate your environment.
 
-To reactivate your environment, simply repeat [Step 3](#step-3-activate-the-environmentenvinotoolkit/openvino_notebooks/tree/develop#step-5-install-the-virtualenv-kernel-in-jupyter) from the Install Guide.
+To reactivate your environment, simply repeat [Step 3](#step-3-activate-the-environment) from the Install Guide.
 
 ### Delete Virtual Environment _(Optional)_
 
