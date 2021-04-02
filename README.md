@@ -104,7 +104,7 @@ To reactivate your environment, simply repeat Step 3 from the Install Guide.
 
 ### Delete Virtual Environment _(Optional)_
 
-To delete a virtual environment, simply remove the `openvino_env` directory:
+To remove your virtual environment, simply delete the `openvino_env` directory:
 
 #### On Linux and macOS:
 
