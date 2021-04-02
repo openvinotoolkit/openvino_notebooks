@@ -67,8 +67,8 @@ openvino_env\Scripts\activate
 #### Installs OpenVINO tools and dependencies like Jupyter Lab:
 
 ```bash
-# Always upgrade pip to the latest version
-python -m pip install --upgrade pip
+# Upgrade pip to the 20.2.* version to avoid dependency issues
+python -m pip install --upgrade pip==20.2.4
 pip install -r requirements.txt
 ```
 
