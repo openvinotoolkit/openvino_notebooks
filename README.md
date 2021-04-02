@@ -12,7 +12,7 @@ The notebooks are designed to run almost anywhere &mdash; your laptop, a cloud V
 - Windows\*, Linux\* or macOS\*
 - Python\* 3.6-3.7
 
-Before you proceed to the [Installation Guide](#installation-guide), please review the detailed [System Requirements](#system-requirements) below.
+Before you proceed to the [Installation Guide](#-installation-guide), please review the detailed [System Requirements](#%EF%B8%8F-system-requirements) below.
 
 ## ⚙️ System Requirements
 
