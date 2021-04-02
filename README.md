@@ -90,6 +90,34 @@ jupyter lab
 
 In Jupyter Lab, select a notebook from the file browser using the left sidebar. Each notebook is located in a subdirectory within the `notebooks` directory.
 
+## 🧹 Cleaning Up
+
+### Shut Down Jupyter Kernel
+
+To end your Jupyter session, press `Ctrl-c`. This will prompt you to `Shutdown this Jupyter server (y/[n])?` enter `y` and hit `Enter`.
+
+### Deativate Virtual Environment
+
+To deactivate your virtualenv, simply run `deactivate` from the terminal window where you activated `openvino_env`. This will deactivate your environment.
+
+To reactivate your environment, simply repeat Step 3 from the Install Guide.
+
+### Delete Virtual Environment _(Optional)_
+
+To delete a virtual environment, simply remove the `openvino_env` directory:
+
+#### On Linux and macOS:
+
+```bash
+rm -rf openvino_env
+```
+
+#### On Windows:
+
+```bash
+rmdir /s openvino_env
+```
+
 ## ⚠️ Troubleshooting
 
 - On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install the required package with `sudo apt install libpython3.7-dev`
