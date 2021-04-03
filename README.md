@@ -120,6 +120,12 @@ rm -rf openvino_env
 rmdir /s openvino_env
 ```
 
+### Remove `openvino_env` Kernel from Jupyter
+
+```bash
+jupyter kernelspec remove openvino_env
+```
+
 ## ⚠️ Troubleshooting
 
 - On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install the required package with `sudo apt install libpython3.7-dev`
