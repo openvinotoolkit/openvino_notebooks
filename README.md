@@ -1,6 +1,6 @@
 # 📚 OpenVINO Notebooks
 
-> 🚧 Notebooks are currently in **beta**. We plan to publish a stable release this summer. Please submit [issues](https://github.com/openvinotoolkit/openvino_notebooks/issues) on GitHub and join our [developer Discord\*](https://discord.gg/Bn9E33xe) to stay in touch.
+> 🚧 Notebooks are currently in **beta**. We plan to publish a stable release this summer. Please submit [issues](https://github.com/openvinotoolkit/openvino_notebooks/issues) on GitHub and join our [developer Discord\*](http://discord.gg/xJK7SEC54c) to stay in touch.
 
 A collection of ready-to-run Python\* notebooks for learning and experimenting with OpenVINO developer tools. The notebooks are meant to provide an introduction to OpenVINO basics and teach developers how to leverage our APIs for optimized deep learning inference in their applications.
 
@@ -16,7 +16,7 @@ Before you proceed to the [Installation Guide](#-installation-guide), please rev
 
 ## ⚙️ System Requirements
 
-> **NOTE: Python 3.8 is not supported yet.** If you wish to run the notebooks on Ubuntu 20.04, please install Python 3.7 on Ubuntu 20.04 until Python 3.8 is supported.  
+> **NOTE: Python 3.8 is not supported yet.** If you wish to run the notebooks on Ubuntu 20.04, please install Python 3.7 on Ubuntu 20.04 until Python 3.8 is supported.
 
 The table below lists the supported operating systems and Python versions required to run the OpenVINO notebooks.
 
@@ -32,8 +32,7 @@ The table below lists the supported operating systems and Python versions requir
 
 ## 📝 Installation Guide
 
-> **NOTE:** If OpenVINO is installed globally, please do not run any of these commands in a terminal where setupvars.bat or setupvars.sh are sourced. For Windows, we recommended using _Command Prompt (cmd.exe)_, not _PowerShell_.
-
+> **NOTE:** If OpenVINO is installed globally, please do not run any of these commands in a terminal where setupvars.bat or setupvars.sh are sourced. For Windows, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
 
 ### Step 1: Clone the Repository
 
@@ -91,6 +90,7 @@ jupyter lab
 
 In Jupyter Lab, select a notebook from the file browser using the left sidebar. Each notebook is located in a subdirectory within the `notebooks` directory.
 
+<img src="notebooks/jupyterlab.gif" width="400">
 
 ## 🧹 Cleaning Up
 
@@ -120,6 +120,12 @@ rm -rf openvino_env
 rmdir /s openvino_env
 ```
 
+### Remove `openvino_env` Kernel from Jupyter
+
+```bash
+jupyter kernelspec remove openvino_env
+```
+
 ## ⚠️ Troubleshooting
 
 - On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install the required package with `sudo apt install libpython3.7-dev`
@@ -132,8 +138,6 @@ rmdir /s openvino_env
 
 - On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7)
 
-
 ---
 
 \* Other names and brands may be claimed as the property of others.
-
