@@ -90,7 +90,7 @@ jupyter lab
 
 In Jupyter Lab, select a notebook from the file browser using the left sidebar. Each notebook is located in a subdirectory within the `notebooks` directory.
 
-<img src="notebooks/jupyterlab.gif" width="400">
+<img src="notebooks/jupyterlab.gif" width="700">
 
 ## 🧹 Cleaning Up
 
