@@ -16,7 +16,9 @@ Before you proceed to the [Installation Guide](#-installation-guide), please rev
 
 ## ⚙️ System Requirements
 
-> **NOTE: Python 3.8 is not supported yet.** If you wish to run the notebooks on Ubuntu 20.04, please install Python 3.7 on Ubuntu 20.04 until Python 3.8 is supported.
+
+> **NOTE: Python 3.8 is not supported yet.** If you wish to run the notebooks on Ubuntu 20.04, please install Python 3.7 on Ubuntu 20.04 until Python 3.8 is supported.  
+
 
 The table below lists the supported operating systems and Python versions required to run the OpenVINO notebooks.
 
@@ -30,9 +32,11 @@ The table below lists the supported operating systems and Python versions requir
 | Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7                                             |
 | Windows Server\* 2016 or higher                            | 3.6, 3.7                                             |
 
+
 ## 📝 Installation Guide
 
-> **NOTE:** If OpenVINO is installed globally, please do not run any of these commands in a terminal where setupvars.bat or setupvars.sh are sourced. For Windows, we recommended using _Command Prompt (cmd.exe)_, not _PowerShell_.
+> **NOTE:** If OpenVINO is installed globally, please do not run any of these commands in a terminal where setupvars.bat or setupvars.sh are sourced. For Windows, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
+
 
 ### Step 1: Clone the Repository
 
@@ -90,7 +94,9 @@ jupyter lab notebooks
 
 In Jupyter Lab, select a notebook from the file browser using the left sidebar. Each notebook is located in a subdirectory within the `notebooks` directory.
 
+
 <img src="notebooks/jupyterlab.gif">
+
 
 ## 🧹 Cleaning Up
 
@@ -137,6 +143,7 @@ jupyter kernelspec remove openvino_env
 - You may also need to install [pip](https://pip.pypa.io/en/stable/installing/) and/or python-venv (depending on your Linux distribution)
 
 - On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7)
+
 
 ---
 
