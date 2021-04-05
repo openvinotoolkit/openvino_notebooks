@@ -85,7 +85,7 @@ python -m ipykernel install --user --name openvino_env
 jupyter notebook <notebook_filename>
 
 # To launch all notebooks in Jupyter Lab
-jupyter lab
+jupyter lab notebooks
 ```
 
 In Jupyter Lab, select a notebook from the file browser using the left sidebar. Each notebook is located in a subdirectory within the `notebooks` directory.
