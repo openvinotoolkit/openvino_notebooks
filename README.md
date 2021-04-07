@@ -1,6 +1,6 @@
 # 📚 OpenVINO Notebooks
 
-> 🚧 Notebooks are currently in **beta**. We plan to publish a stable release this summer. Please submit [issues](https://github.com/openvinotoolkit/openvino_notebooks/issues) on GitHub and join our [developer Discord\*](https://discord.gg/Bn9E33xe) to stay in touch.
+> 🚧 Notebooks are currently in **beta**. We plan to publish a stable release this summer. Please submit [issues](https://github.com/openvinotoolkit/openvino_notebooks/issues) on GitHub, start a [discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions) or join our [developer Discord\*](https://discord.gg/Bn9E33xe) to stay in touch.
 
 A collection of ready-to-run Python\* notebooks for learning and experimenting with OpenVINO developer tools. The notebooks are meant to provide an introduction to OpenVINO basics and teach developers how to leverage our APIs for optimized deep learning inference in their applications.
 
@@ -10,33 +10,27 @@ The notebooks are designed to run almost anywhere &mdash; your laptop, a cloud V
 
 - CPU (64-bit)
 - Windows\*, Linux\* or macOS\*
-- Python\* 3.6-3.7
+- Python\* 3.6-3.8
 
 Before you proceed to the [Installation Guide](#-installation-guide), please review the detailed [System Requirements](#%EF%B8%8F-system-requirements) below.
 
 ## ⚙️ System Requirements
 
-
-> **NOTE: Python 3.8 is not supported yet.** If you wish to run the notebooks on Ubuntu 20.04, please install Python 3.7 on Ubuntu 20.04 until Python 3.8 is supported.  
-
-
 The table below lists the supported operating systems and Python versions required to run the OpenVINO notebooks.
 
 | Supported Operating System                                 | [Python\* Version (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- | :--------------------------------------------------- |
-| Ubuntu\* 18.04 LTS, 64-bit                                 | 3.6, 3.7                                             |
-| Ubuntu\* 20.04 LTS, 64-bit                                 | 3.6, 3.7                                             |
-| Red Hat* Enterprise Linux* 8.2, 64-bit                     | 3.6, 3.7                                             |
-| CentOS\* 7.4, 64-bit                                       | 3.6, 3.7                                             |
+| Ubuntu\* 18.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8                                        |
+| Ubuntu\* 20.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8                                        |
+| Red Hat* Enterprise Linux* 8, 64-bit                       | 3.6, 3.8                                             |
+| CentOS\* 7, 64-bit                                         | 3.6, 3.7, 3.8                                        |
 | macOS\* 10.15.x versions                                   | 3.6, 3.7                                             |
 | Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7                                             |
 | Windows Server\* 2016 or higher                            | 3.6, 3.7                                             |
 
-
 ## 📝 Installation Guide
 
 > **NOTE:** If OpenVINO is installed globally, please do not run any of these commands in a terminal where setupvars.bat or setupvars.sh are sourced. For Windows, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
-
 
 ### Step 1: Clone the Repository
 
@@ -94,9 +88,7 @@ jupyter lab notebooks
 
 In Jupyter Lab, select a notebook from the file browser using the left sidebar. Each notebook is located in a subdirectory within the `notebooks` directory.
 
-
 <img src="notebooks/jupyterlab.gif">
-
 
 ## 🧹 Cleaning Up
 
@@ -143,7 +135,6 @@ jupyter kernelspec remove openvino_env
 - You may also need to install [pip](https://pip.pypa.io/en/stable/installing/) and/or python-venv (depending on your Linux distribution)
 
 - On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7)
-
 
 ---
 
