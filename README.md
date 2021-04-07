@@ -16,9 +16,7 @@ Before you proceed to the [Installation Guide](#-installation-guide), please rev
 
 ## ⚙️ System Requirements
 
-
-> **NOTE: Python 3.8 is not supported yet.** If you wish to run the notebooks on Ubuntu 20.04, please install Python 3.7 on Ubuntu 20.04 until Python 3.8 is supported.  
-
+> **NOTE: Python 3.8 is not supported yet.** If you wish to run the notebooks on Ubuntu 20.04, please install Python 3.7 on Ubuntu 20.04 until Python 3.8 is supported.
 
 The table below lists the supported operating systems and Python versions required to run the OpenVINO notebooks.
 
@@ -32,11 +30,9 @@ The table below lists the supported operating systems and Python versions requir
 | Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7                                             |
 | Windows Server\* 2016 or higher                            | 3.6, 3.7                                             |
 
-
 ## 📝 Installation Guide
 
 > **NOTE:** If OpenVINO is installed globally, please do not run any of these commands in a terminal where setupvars.bat or setupvars.sh are sourced. For Windows, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
-
 
 ### Step 1: Clone the Repository
 
@@ -94,9 +90,7 @@ jupyter lab notebooks
 
 In Jupyter Lab, select a notebook from the file browser using the left sidebar. Each notebook is located in a subdirectory within the `notebooks` directory.
 
-
 <img src="notebooks/jupyterlab.gif">
-
 
 ## 🧹 Cleaning Up
 
@@ -134,16 +128,19 @@ jupyter kernelspec remove openvino_env
 
 ## ⚠️ Troubleshooting
 
-- On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install the required package with `sudo apt install libpython3.7-dev`
+- On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install the required package using `apt install libpython3.7-dev`
 
 - If you get an `ImportError`, doublecheck that you installed the kernel in [Step 5](#step-5-install-the-virtualenv-kernel-in-jupyter). If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu)
 
 - On Linux and macOS you may need to type `python3` instead of `python` when creating your virtual environment
 
-- You may also need to install [pip](https://pip.pypa.io/en/stable/installing/) and/or python-venv (depending on your Linux distribution)
+- On Linux and macOS you may need to install [pip](https://pip.pypa.io/en/stable/installing/) and/or python-venv (depending on your Linux distribution)
 
 - On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7)
 
+- On Fedora*, Red Hat and Amazon* Linux you may need to install the OpenGL (Open Graphics Library) to use OpenCV. Please run `yum install mesa-libGL` before launching the notebooks.
+
+- For macOS systems with Apple* M1, please see [community discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions/10) about using Rosetta* 2.  
 
 ---
 
