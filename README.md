@@ -126,15 +126,19 @@ jupyter kernelspec remove openvino_env
 
 ## ⚠️ Troubleshooting
 
-- On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install the required package with `sudo apt install libpython3.7-dev`
+- On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install the required package using `apt install libpython3.7-dev`
 
 - If you get an `ImportError`, doublecheck that you installed the kernel in [Step 5](#step-5-install-the-virtualenv-kernel-in-jupyter). If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu)
 
 - On Linux and macOS you may need to type `python3` instead of `python` when creating your virtual environment
 
-- You may also need to install [pip](https://pip.pypa.io/en/stable/installing/) and/or python-venv (depending on your Linux distribution)
+- On Linux and macOS you may need to install [pip](https://pip.pypa.io/en/stable/installing/) and/or python-venv (depending on your Linux distribution)
 
 - On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7)
+
+- On Fedora*, Red Hat and Amazon* Linux you may need to install the OpenGL (Open Graphics Library) to use OpenCV. Please run `yum install mesa-libGL` before launching the notebooks.
+
+- For macOS systems with Apple* M1, please see [community discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions/10) about using Rosetta* 2.  
 
 ---
 
