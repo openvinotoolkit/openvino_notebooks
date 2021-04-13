@@ -1,6 +1,6 @@
 # 📚 OpenVINO Notebooks
 
-> 🚧 Notebooks are currently in **beta**. We plan to publish a stable release this summer. Please submit [issues](https://github.com/openvinotoolkit/openvino_notebooks/issues) on GitHub, start a [discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions) or join our [developer Discord\*](https://discord.gg/Bn9E33xe) to stay in touch.
+> 🚧 Notebooks are currently in **beta**. We plan to publish a stable release this summer. Please submit [issues](https://github.com/openvinotoolkit/openvino_notebooks/issues) on GitHub, start a [discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions) or join our [Unofficial Developer Discord Server\*](https://discord.gg/xJK7SEC54c) to stay in touch.
 
 A collection of ready-to-run Python\* notebooks for learning and experimenting with OpenVINO developer tools. The notebooks are meant to provide an introduction to OpenVINO basics and teach developers how to leverage our APIs for optimized deep learning inference in their applications.
 
@@ -138,7 +138,7 @@ jupyter kernelspec remove openvino_env
 
 - On Fedora*, Red Hat and Amazon* Linux you may need to install the OpenGL (Open Graphics Library) to use OpenCV. Please run `yum install mesa-libGL` before launching the notebooks.
 
-- For macOS systems with Apple* M1, please see [community discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions/10) about using Rosetta* 2.  
+- For macOS systems with Apple* M1, please see [community discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions/10) about using Rosetta* 2.
 
 ---
 
