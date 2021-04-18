@@ -27,7 +27,6 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip==20.2.*
-        python -m pip install wheel
         python -m pip install -r .ci/ci-requirements.txt
         python -m ipykernel install --user --name openvino_env
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
@@ -38,5 +37,6 @@ jobs:
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Analysing with nbval
       run: |
+        jupyter lab notebooks --help
         python -m pytest --nbval .
 
