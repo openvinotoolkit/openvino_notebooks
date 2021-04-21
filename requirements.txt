@@ -7,16 +7,16 @@ fastseg
 onnx
 ipywidgets
 
-torch==1.5.1; sys_platform == 'darwin'
-torchvision==0.6.1; sys_platform == 'darwin'
+torch>=1.5.1,<=1.7.1; sys_platform == 'darwin'
+torchvision>=0.6.1,<=0.8.2; sys_platform == 'darwin'
 --find-links https://download.pytorch.org/whl/torch_stable.html
-torch==1.5.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
-torchvision==0.6.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
+torch>=1.5.1+cpu,<=1.7.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
+torchvision>=0.6.1+cpu,<=0.8.2+cpu; sys_platform =='linux' or platform_system == 'Windows'
 
 # Tensorflow notebook requirements
 networkx>=1.11
 defusedxml>=0.5.0
-tensorflow>=2.2
+tensorflow>=2.2,<2.4
 
 # Jupyter requirements
 jupyterlab
