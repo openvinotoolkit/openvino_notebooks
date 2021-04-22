@@ -1,9 +1,6 @@
 name: nbval
 
 on: 
-  push:
-    paths-ignore:
-    - '**.md'
   pull_request:
     paths-ignore:
     - '**.md'
@@ -39,4 +36,3 @@ jobs:
       run: |
         jupyter lab notebooks --help
         python -m pytest --nbval .
-
