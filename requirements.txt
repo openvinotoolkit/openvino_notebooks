@@ -1,5 +1,6 @@
 openvino-dev
 matplotlib<3.4
+gdown
 
 # ONNX notebook requirements
 geffnet==0.9.8
