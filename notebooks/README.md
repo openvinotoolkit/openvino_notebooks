@@ -10,7 +10,9 @@ Each notebook is located in a directory. Please follow the instructions in the R
 
 - `101-tensorflow-to-openvino`
 - `102-pytorch-onnx-to-openvino`
+- `103-tensorflow-training-openvino`
 
 ### demos:
 
 - `201-vision-monodepth`
+- `205-vision-background-removal` 
