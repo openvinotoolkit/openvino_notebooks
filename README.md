@@ -24,9 +24,9 @@ The table below lists the supported operating systems and Python versions requir
 | Ubuntu\* 20.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8                                        |
 | Red Hat* Enterprise Linux* 8, 64-bit                       | 3.6, 3.8                                             |
 | CentOS\* 7, 64-bit                                         | 3.6, 3.7, 3.8                                        |
-| macOS\* 10.15.x versions                                   | 3.6, 3.7                                             |
-| Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7                                             |
-| Windows Server\* 2016 or higher                            | 3.6, 3.7                                             |
+| macOS\* 10.15.x versions                                   | 3.6, 3.7, 3.8                                        |
+| Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8                                        |
+| Windows Server\* 2016 or higher                            | 3.6, 3.7, 3.8                                        |
 
 ## 📝 Installation Guide
 
@@ -138,7 +138,7 @@ jupyter kernelspec remove openvino_env
 
 - On Fedora*, Red Hat and Amazon* Linux you may need to install the OpenGL (Open Graphics Library) to use OpenCV. Please run `yum install mesa-libGL` before launching the notebooks.
 
-- For macOS systems with Apple* M1, please see [community discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions/10) about using Rosetta* 2.  
+- For macOS systems with Apple* M1, please see [community discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions/10) about using Rosetta* 2.
 
 ---
 
