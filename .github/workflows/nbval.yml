@@ -1,10 +1,21 @@
 name: nbval
 
-on: 
+on:
   pull_request:
+    branches:
+    - 'develop'
+    - 'main'
     paths-ignore:
     - '**.md'
-
+  push:
+    branches-ignore:
+      - 'develop'
+      - 'main'
+    paths-ignore:
+    - '**.md'
+  schedule:
+    - cron:  '30 8 * * *'
+    
 jobs:
   build:
     strategy:
