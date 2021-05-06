@@ -65,9 +65,10 @@ openvino_env\Scripts\activate
 #### Installs OpenVINO tools and dependencies like Jupyter Lab:
 
 ```bash
-# Upgrade pip to the 20.2.* version to avoid dependency issues
-python -m pip install --upgrade pip==20.2.4
-pip install -r requirements.txt
+# Upgrade pip to the latest version.
+# Use pip's legacy dependency resolver to avoid dependency conflicts
+python -m pip install --upgrade pip
+pip install -r requirements.txt --use-deprecated=legacy-resolver
 ```
 
 ### Step 5: Install the virtualenv Kernel in Jupyter
