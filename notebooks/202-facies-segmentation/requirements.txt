@@ -10,3 +10,4 @@ itk-segmentation==5.1.2
 itkwidgets==0.23.1
 imageio==2.9.0
 ipympl==0.5.1
+openvino-extensions==0.0.2
