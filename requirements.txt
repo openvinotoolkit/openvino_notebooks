@@ -28,3 +28,4 @@ importlib-metadata==3.7.3
 ipython==7.10.*
 numpy==1.18.*
 setuptools>=56.0.0
+jupyter-server<1.7
