@@ -30,7 +30,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -r .ci/ci-requirements.txt --use-depcrecated=legacy-resolver
+        python -m pip install -r .ci/ci-requirements.txt --use-deprecated=legacy-resolver
         python -m ipykernel install --user --name openvino_env
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
