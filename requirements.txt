@@ -1,7 +1,7 @@
 openvino-dev
 matplotlib<3.4
 gdown
-pytube
+pytube>=10.7
 
 # ONNX notebook requirements
 geffnet==0.9.8
