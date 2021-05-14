@@ -35,7 +35,8 @@ The table below lists the supported operating systems and Python versions requir
 > **NOTE:** If OpenVINO is installed globally, please do not run any of these commands in a terminal where setupvars.bat or setupvars.sh are sourced. For Windows, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
 
 The [wiki](https://github.com/openvinotoolkit/openvino_notebooks/wiki#guides-per-operating-system) has more
-detailed information about required packages, and links to installers for Git and supported versions of Python.
+detailed information about required packages, and links to installers for Git and Python. 
+There is also a guide for [running the notebooks in Azure ML Studio](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML).
 
 ### Step 1: Clone the Repository
 
