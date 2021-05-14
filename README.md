@@ -48,11 +48,13 @@ git clone https://github.com/openvinotoolkit/openvino_notebooks.git
 #### For Linux and macOS:
 
 ```bash
+cd openvino_notebooks
 python3 -m venv openvino_env
 ```
 
 #### For Windows:
 ```bash
+cd openvino_notebooks
 python -m venv openvino_env
 ```
 
