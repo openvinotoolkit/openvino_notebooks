@@ -25,10 +25,10 @@ The table below lists the supported operating systems and Python versions requir
 | Red Hat* Enterprise Linux* 8, 64-bit                       | 3.6, 3.8                                             |
 | CentOS\* 7, 64-bit                                         | 3.6, 3.7, 3.8                                        |
 | macOS\* 10.15.x versions                                   | 3.6, 3.7, 3.8                                        |
-| Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8*                                        |
-| Windows Server\* 2016 or higher                            | 3.6, 3.7, 3.8*                                        |
+| Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8**                                        |
+| Windows Server\* 2016 or higher                            | 3.6, 3.7, 3.8**                                        |
 
-> \*_At the moment, For Python 3.8 on Windows, OpenVINO requires installation of [Microsoft Visual C++ Redistributable](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019). This is not  required for Python 3.6 and 3.7, and will not be required for Python 3.8 in the next OpenVINO release._ 
+> \**_At the moment, For Python 3.8 on Windows, OpenVINO requires installation of [Microsoft Visual C++ Redistributable](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019). This is not  required for Python 3.6 and 3.7, and will not be required for Python 3.8 in the next OpenVINO release._ 
 
 ## 📝 Installation Guide
 
