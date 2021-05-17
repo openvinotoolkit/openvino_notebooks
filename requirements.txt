@@ -2,6 +2,7 @@ openvino-dev==2021.4
 matplotlib<3.4
 gdown
 pytube
+tqdm
 
 # ONNX notebook requirements
 geffnet==0.9.8
@@ -27,3 +28,10 @@ jupyterlab
 ipython==7.10.*
 jedi==0.17.2
 setuptools>=56.0.0
+
+# 3D visualization
+itk==5.1.2
+itkwidgets==0.23.1
+
+# openvino extensions
+openvino-extensions==0.0.2
