@@ -41,4 +41,4 @@ jobs:
     - name: Analysing with nbval
       run: |
         jupyter lab notebooks --help
-        python -m pytest --nbval . --ignore notebooks/301-tensorflow-training-openvino
+        python -m pytest --nbval . --ignore notebooks/301-tensorflow-training-openvino --ignore notebooks/202-vision-superresolution/202-vision-superresolution-video.ipynb
