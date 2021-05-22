@@ -25,12 +25,18 @@ The table below lists the supported operating systems and Python versions requir
 | Red Hat* Enterprise Linux* 8, 64-bit                       | 3.6, 3.8                                             |
 | CentOS\* 7, 64-bit                                         | 3.6, 3.7, 3.8                                        |
 | macOS\* 10.15.x versions                                   | 3.6, 3.7, 3.8                                        |
-| Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8                                        |
-| Windows Server\* 2016 or higher                            | 3.6, 3.7, 3.8                                        |
+| Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8**                                        |
+| Windows Server\* 2016 or higher                            | 3.6, 3.7, 3.8**                                        |
+
+> \**_At the moment, For Python 3.8 on Windows, OpenVINO requires installation of [Microsoft Visual C++ Redistributable](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019). This is not  required for Python 3.6 and 3.7, and will not be required for Python 3.8 in the next OpenVINO release._ 
 
 ## 📝 Installation Guide
 
 > **NOTE:** If OpenVINO is installed globally, please do not run any of these commands in a terminal where setupvars.bat or setupvars.sh are sourced. For Windows, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
+
+The [wiki](https://github.com/openvinotoolkit/openvino_notebooks/wiki#guides-per-operating-system) has more
+detailed information about required packages, and links to installers for Git and Python. 
+There is also a guide for [running the notebooks in Azure ML Studio](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML).
 
 ### Step 1: Clone the Repository
 
@@ -40,8 +46,15 @@ git clone https://github.com/openvinotoolkit/openvino_notebooks.git
 
 ### Step 2: Create a Virtual Environment
 
+#### For Linux and macOS:
+
 ```bash
-# Linux and macOS may require typing python3 instead of python
+cd openvino_notebooks
+python3 -m venv openvino_env
+```
+
+#### For Windows:
+```bash
 cd openvino_notebooks
 python -m venv openvino_env
 ```
@@ -80,8 +93,8 @@ python -m ipykernel install --user --name openvino_env
 ### Step 6: Launch the Notebooks!
 
 ```bash
-# To launch a single notebook
-jupyter notebook <notebook_filename>
+# To launch a single notebook, like the Monodepth notebook
+jupyter notebook notebooks/201-vision-monodepth/201-vision-monodepth.ipynb
 
 # To launch all notebooks in Jupyter Lab
 jupyter lab notebooks
@@ -97,11 +110,12 @@ In Jupyter Lab, select a notebook from the file browser using the left sidebar. 
 
 To end your Jupyter session, press `Ctrl-c`. This will prompt you to `Shutdown this Jupyter server (y/[n])?` enter `y` and hit `Enter`.
 
-### Deativate Virtual Environment
+### Deactivate Virtual Environment
 
 To deactivate your virtualenv, simply run `deactivate` from the terminal window where you activated `openvino_env`. This will deactivate your environment.
 
-To reactivate your environment, simply repeat [Step 3](#step-3-activate-the-environment) from the Install Guide.
+To reactivate your environment, simply repeat [Step 3](#step-3-activate-the-environment) from the Install Guide. 
+To start the notebooks again, type `jupyter lab` or `jupyter notebook` after activating the environment.
 
 ### Delete Virtual Environment _(Optional)_
 
@@ -127,18 +141,30 @@ jupyter kernelspec remove openvino_env
 
 ## ⚠️ Troubleshooting
 
-- On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install the required package using `apt install libpython3.7-dev`
+If these tips do not solve your problem, please open a [discussion topic](https://github.com/openvinotoolkit/openvino_notebooks/discussions) 
+or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issues)!
 
-- If you get an `ImportError`, doublecheck that you installed the kernel in [Step 5](#step-5-install-the-virtualenv-kernel-in-jupyter). If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu)
+- To check some common installation problems, run `python launch_notebooks.py`. This script is located in the openvino_notebooks directory. 
+  Please run it after activating the `openvino_env` virtual environment.
+- If you get an `ImportError`, doublecheck that you installed the Jupyter kernel in [Step 5](#step-5-install-the-virtualenv-kernel-in-jupyter). 
+  If necessary, choose the openvino_env kernel from the _Kernel->Change Kernel_ menu) in Jupyter Lab or Jupyter Notebook
 
-- On Linux and macOS you may need to type `python3` instead of `python` when creating your virtual environment
+### Windows
 
-- On Linux and macOS you may need to install [pip](https://pip.pypa.io/en/stable/installing/) and/or python-venv (depending on your Linux distribution)
+- On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7).
+- Please see the [wiki/Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) page for information on how to install Python or Git.
+- If you use Anaconda, you may need to add OpenVINO to your Windows PATH. See the [wiki/Conda](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Conda) page.
+- If you see an error about needing to install C++, please either install
+  [Microsoft Visual C++ Redistributable](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019) 
+  or use Python 3.7, which does not have this requirement.
 
-- On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7)
+### Linux and macOS
 
-- On Fedora*, Red Hat and Amazon* Linux you may need to install the OpenGL (Open Graphics Library) to use OpenCV. Please run `yum install mesa-libGL` before launching the notebooks.
-
+- On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install 
+  the required package using `apt install libpython3.7-dev`.
+- See the [wiki/Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) for all required Ubuntu packages.
+- On Fedora*, Red Hat and Amazon* Linux you may need to install the OpenGL (Open Graphics Library) to use OpenCV. Please run `yum install mesa-libGL` 
+  before launching the notebooks.
 - For macOS systems with Apple* M1, please see [community discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions/10) about using Rosetta* 2.
 
 ---
