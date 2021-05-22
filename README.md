@@ -152,7 +152,7 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 ### Windows
 
 - On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7).
-- Please see the [wiki/Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) page for information on how to install Python or Git.
+- The Microsoft Store version of Python is not recommended. Please see the [wiki/Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) page for information on how to install Python or Git.
 - If you use Anaconda, you may need to add OpenVINO to your Windows PATH. See the [wiki/Conda](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Conda) page.
 - If you see an error about needing to install C++, please either install
   [Microsoft Visual C++ Redistributable](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019) 
