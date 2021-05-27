@@ -26,7 +26,7 @@ USER 1001
 RUN /tmp/scripts/assemble
 RUN pip install openvino-dev
 RUN pip install --upgrade jupyterlab ipympl
-RUN pip install git+https://github.com/maartenbreddels/ipyvolume.git
+#RUN pip install git+https://github.com/maartenbreddels/ipyvolume.git
 RUN git clone https://github.com/openvinotoolkit/openvino_notebooks.git
 COPY testing_notebooks openvino_notebooks/testing_notebooks
 USER root
