@@ -24,13 +24,18 @@ COPY . /tmp/src
 RUN chown -R 1001:0 /tmp/scripts /tmp/src
 USER 1001
 RUN /tmp/scripts/assemble
+
+# These manual pip installs will be removed before final release and added to the Piplock file
 RUN pip install openvino-dev
 RUN pip install --upgrade jupyterlab ipympl
 RUN pip install git+https://github.com/maartenbreddels/ipyvolume.git
-RUN git clone https://github.com/openvinotoolkit/openvino_notebooks.git
-COPY testing_notebooks openvino_notebooks/testing_notebooks
+
+COPY notebooks notebooks
+
+# These testing notebooks will be part of the notebooks repository before release
+COPY testing_notebooks testing_notebooks
 USER root
-RUN chown -R 1001:0 openvino_notebooks
+RUN chown -R 1001:0 .
 USER 1001
 RUN jupyter lab build
 CMD /tmp/scripts/run
