@@ -1,0 +1,9 @@
+check:
+  - thoth-build
+build:
+  base-image: "quay.io/thoth-station/s2i-thoth-ubi8-py38:v0.20.1"
+  build-stratergy: "Source"
+  registry: "quay.io"
+  registry-org: "thoth-station"
+  registry-project: "s2i-minimal-py38-notebook"
+  registry-secret: "thoth-station-thoth-pusher-secret"

@@ -1,0 +1,14 @@
+{
+  "name": "proxy",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "4.16.4",
+    "http-proxy-middleware": "0.19.1",
+    "morgan": "1.9.1",
+    "winston": "3.2.0"
+  }
+}
