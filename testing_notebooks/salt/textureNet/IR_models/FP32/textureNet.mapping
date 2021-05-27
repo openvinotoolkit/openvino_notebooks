@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<mapping>
+	<map>
+		<framework name="Relu_9" out_port_id="0"/>
+		<IR id="25" name="Relu_9" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="64" out_port_id="0"/>
+		<IR id="21" name="64/Output_0/Data__const" out_port_id="0"/>
+	</map>
+	<map>
+		<framework name="Conv_4" out_port_id="0"/>
+		<IR id="14" name="Conv_4" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="Conv_10" out_port_id="0"/>
+		<IR id="29" name="Conv_10" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="Relu_7" out_port_id="0"/>
+		<IR id="20" name="Relu_7" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="61" out_port_id="0"/>
+		<IR id="16" name="61/Output_0/Data__const" out_port_id="0"/>
+	</map>
+	<map>
+		<framework name="0" out_port_id="0"/>
+		<IR id="0" name="0" out_port_id="0"/>
+	</map>
+	<map>
+		<framework name="Relu_11" out_port_id="0"/>
+		<IR id="30" name="50" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="Conv_8" out_port_id="0"/>
+		<IR id="24" name="Conv_8" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="Relu_3" out_port_id="0"/>
+		<IR id="10" name="Relu_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="Conv_0" out_port_id="0"/>
+		<IR id="4" name="Conv_0" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="58" out_port_id="0"/>
+		<IR id="11" name="58/Output_0/Data__const" out_port_id="0"/>
+	</map>
+	<map>
+		<framework name="Conv_6" out_port_id="0"/>
+		<IR id="19" name="Conv_6" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="Relu_5" out_port_id="0"/>
+		<IR id="15" name="Relu_5" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="net.15.weight" out_port_id="0"/>
+		<IR id="26" name="net.15.weight/Output_0/Data__const" out_port_id="0"/>
+	</map>
+	<map>
+		<framework name="Conv_2" out_port_id="0"/>
+		<IR id="9" name="Conv_2" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="52" out_port_id="0"/>
+		<IR id="1" name="52/Output_0/Data__const" out_port_id="0"/>
+	</map>
+	<map>
+		<framework name="55" out_port_id="0"/>
+		<IR id="6" name="55/Output_0/Data__const" out_port_id="0"/>
+	</map>
+	<map>
+		<framework name="Relu_1" out_port_id="0"/>
+		<IR id="5" name="Relu_1" out_port_id="1"/>
+	</map>
+</mapping>

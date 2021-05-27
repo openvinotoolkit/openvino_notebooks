@@ -1,0 +1,689 @@
+<?xml version="1.0" ?>
+<net name="textureNet" version="10">
+	<layers>
+		<layer id="0" name="0" type="Parameter" version="opset1">
+			<data element_type="f32" shape="1,1,65,65,65"/>
+			<output>
+				<port id="0" names="0" precision="FP32">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>65</dim>
+					<dim>65</dim>
+					<dim>65</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="1" name="52/Output_0/Data__const" type="Const" version="opset1">
+			<data element_type="f32" offset="0" shape="50,1,5,5,5" size="25000"/>
+			<output>
+				<port id="0" names="52" precision="FP32">
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="2" name="Conv_0/WithoutBiases" type="Convolution" version="opset1">
+			<data auto_pad="explicit" dilations="1,1,1" pads_begin="2,2,2" pads_end="2,2,2" strides="4,4,4"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>65</dim>
+					<dim>65</dim>
+					<dim>65</dim>
+				</port>
+				<port id="1">
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>17</dim>
+					<dim>17</dim>
+					<dim>17</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="3" name="Conv_0/Dims239398/EltwiseUnsqueeze413_const" type="Const" version="opset1">
+			<data element_type="f32" offset="25000" shape="1,50,1,1,1" size="200"/>
+			<output>
+				<port id="0" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="4" name="Conv_0" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>17</dim>
+					<dim>17</dim>
+					<dim>17</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="51" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>17</dim>
+					<dim>17</dim>
+					<dim>17</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="5" name="Relu_1" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>17</dim>
+					<dim>17</dim>
+					<dim>17</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="36" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>17</dim>
+					<dim>17</dim>
+					<dim>17</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="6" name="55/Output_0/Data__const" type="Const" version="opset1">
+			<data element_type="f32" offset="25200" shape="50,50,3,3,3" size="270000"/>
+			<output>
+				<port id="0" names="55" precision="FP32">
+					<dim>50</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="7" name="Conv_2/WithoutBiases" type="Convolution" version="opset1">
+			<data auto_pad="explicit" dilations="1,1,1" pads_begin="1,1,1" pads_end="1,1,1" strides="2,2,2"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>17</dim>
+					<dim>17</dim>
+					<dim>17</dim>
+				</port>
+				<port id="1">
+					<dim>50</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>9</dim>
+					<dim>9</dim>
+					<dim>9</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="8" name="Conv_2/Dims245399/EltwiseUnsqueeze417_const" type="Const" version="opset1">
+			<data element_type="f32" offset="295200" shape="1,50,1,1,1" size="200"/>
+			<output>
+				<port id="0" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="9" name="Conv_2" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>9</dim>
+					<dim>9</dim>
+					<dim>9</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="54" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>9</dim>
+					<dim>9</dim>
+					<dim>9</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="10" name="Relu_3" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>9</dim>
+					<dim>9</dim>
+					<dim>9</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="39" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>9</dim>
+					<dim>9</dim>
+					<dim>9</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="11" name="58/Output_0/Data__const" type="Const" version="opset1">
+			<data element_type="f32" offset="295400" shape="50,50,3,3,3" size="270000"/>
+			<output>
+				<port id="0" names="58" precision="FP32">
+					<dim>50</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="12" name="Conv_4/WithoutBiases" type="Convolution" version="opset1">
+			<data auto_pad="explicit" dilations="1,1,1" pads_begin="1,1,1" pads_end="1,1,1" strides="2,2,2"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>9</dim>
+					<dim>9</dim>
+					<dim>9</dim>
+				</port>
+				<port id="1">
+					<dim>50</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="13" name="Conv_4/Dims227396/EltwiseUnsqueeze405_const" type="Const" version="opset1">
+			<data element_type="f32" offset="565400" shape="1,50,1,1,1" size="200"/>
+			<output>
+				<port id="0" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="14" name="Conv_4" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="57" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="15" name="Relu_5" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="42" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="16" name="61/Output_0/Data__const" type="Const" version="opset1">
+			<data element_type="f32" offset="565600" shape="50,50,3,3,3" size="270000"/>
+			<output>
+				<port id="0" names="61" precision="FP32">
+					<dim>50</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="17" name="Conv_6/WithoutBiases" type="Convolution" version="opset1">
+			<data auto_pad="explicit" dilations="1,1,1" pads_begin="1,1,1" pads_end="1,1,1" strides="2,2,2"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+				<port id="1">
+					<dim>50</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="18" name="Conv_6/Dims257401/EltwiseUnsqueeze425_const" type="Const" version="opset1">
+			<data element_type="f32" offset="835600" shape="1,50,1,1,1" size="200"/>
+			<output>
+				<port id="0" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="19" name="Conv_6" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="60" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="20" name="Relu_7" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="45" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="21" name="64/Output_0/Data__const" type="Const" version="opset1">
+			<data element_type="f32" offset="835800" shape="50,50,3,3,3" size="270000"/>
+			<output>
+				<port id="0" names="64" precision="FP32">
+					<dim>50</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="22" name="Conv_8/WithoutBiases" type="Convolution" version="opset1">
+			<data auto_pad="explicit" dilations="1,1,1" pads_begin="1,1,1" pads_end="1,1,1" strides="3,3,3"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+				<port id="1">
+					<dim>50</dim>
+					<dim>50</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="23" name="Conv_8/Dims251400/EltwiseUnsqueeze421_const" type="Const" version="opset1">
+			<data element_type="f32" offset="1105800" shape="1,50,1,1,1" size="200"/>
+			<output>
+				<port id="0" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="24" name="Conv_8" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="63" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="25" name="Relu_9" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="48" precision="FP32">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="26" name="net.15.weight/Output_0/Data__const" type="Const" version="opset1">
+			<data element_type="f32" offset="1106000" shape="2,50,1,1,1" size="400"/>
+			<output>
+				<port id="0" names="net.15.weight" precision="FP32">
+					<dim>2</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="27" name="Conv_10/WithoutBiases" type="Convolution" version="opset1">
+			<data auto_pad="explicit" dilations="1,1,1" pads_begin="0,0,0" pads_end="0,0,0" strides="1,1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>2</dim>
+					<dim>50</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP32">
+					<dim>1</dim>
+					<dim>2</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="28" name="Conv_10/Dims233397/EltwiseUnsqueeze409_const" type="Const" version="opset1">
+			<data element_type="f32" offset="1106400" shape="1,2,1,1,1" size="8"/>
+			<output>
+				<port id="0" precision="FP32">
+					<dim>1</dim>
+					<dim>2</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="29" name="Conv_10" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>2</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>2</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="49" precision="FP32">
+					<dim>1</dim>
+					<dim>2</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="30" name="50" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>2</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="50" precision="FP32">
+					<dim>1</dim>
+					<dim>2</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="31" name="50/sink_port_0" type="Result" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>2</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+		</layer>
+	</layers>
+	<edges>
+		<edge from-layer="0" from-port="0" to-layer="2" to-port="0"/>
+		<edge from-layer="1" from-port="0" to-layer="2" to-port="1"/>
+		<edge from-layer="2" from-port="2" to-layer="4" to-port="0"/>
+		<edge from-layer="3" from-port="0" to-layer="4" to-port="1"/>
+		<edge from-layer="4" from-port="2" to-layer="5" to-port="0"/>
+		<edge from-layer="5" from-port="1" to-layer="7" to-port="0"/>
+		<edge from-layer="6" from-port="0" to-layer="7" to-port="1"/>
+		<edge from-layer="7" from-port="2" to-layer="9" to-port="0"/>
+		<edge from-layer="8" from-port="0" to-layer="9" to-port="1"/>
+		<edge from-layer="9" from-port="2" to-layer="10" to-port="0"/>
+		<edge from-layer="10" from-port="1" to-layer="12" to-port="0"/>
+		<edge from-layer="11" from-port="0" to-layer="12" to-port="1"/>
+		<edge from-layer="12" from-port="2" to-layer="14" to-port="0"/>
+		<edge from-layer="13" from-port="0" to-layer="14" to-port="1"/>
+		<edge from-layer="14" from-port="2" to-layer="15" to-port="0"/>
+		<edge from-layer="15" from-port="1" to-layer="17" to-port="0"/>
+		<edge from-layer="16" from-port="0" to-layer="17" to-port="1"/>
+		<edge from-layer="17" from-port="2" to-layer="19" to-port="0"/>
+		<edge from-layer="18" from-port="0" to-layer="19" to-port="1"/>
+		<edge from-layer="19" from-port="2" to-layer="20" to-port="0"/>
+		<edge from-layer="20" from-port="1" to-layer="22" to-port="0"/>
+		<edge from-layer="21" from-port="0" to-layer="22" to-port="1"/>
+		<edge from-layer="22" from-port="2" to-layer="24" to-port="0"/>
+		<edge from-layer="23" from-port="0" to-layer="24" to-port="1"/>
+		<edge from-layer="24" from-port="2" to-layer="25" to-port="0"/>
+		<edge from-layer="25" from-port="1" to-layer="27" to-port="0"/>
+		<edge from-layer="26" from-port="0" to-layer="27" to-port="1"/>
+		<edge from-layer="27" from-port="2" to-layer="29" to-port="0"/>
+		<edge from-layer="28" from-port="0" to-layer="29" to-port="1"/>
+		<edge from-layer="29" from-port="2" to-layer="30" to-port="0"/>
+		<edge from-layer="30" from-port="1" to-layer="31" to-port="0"/>
+	</edges>
+	<meta_data>
+		<MO_version value="custom_master_71b1bb0cde273578a675c27775fa6729e10b1fe2"/>
+		<cli_parameters>
+			<data_type value="FP32"/>
+			<disable_resnet_optimization value="False"/>
+			<disable_weights_compression value="False"/>
+			<enable_concat_optimization value="False"/>
+			<extensions value="DIR"/>
+			<framework value="onnx"/>
+			<freeze_placeholder_with_value value="{}"/>
+			<generate_deprecated_IR_V7 value="False"/>
+			<input_model value="DIR\textureNet.onnx"/>
+			<keep_shape_ops value="True"/>
+			<log_level value="ERROR"/>
+			<mean_scale_values value="{}"/>
+			<mean_values value="()"/>
+			<model_name value="DIR"/>
+			<output_dir value="DIR"/>
+			<placeholder_data_types value="{}"/>
+			<progress value="False"/>
+			<reverse_input_channels value="False"/>
+			<scale_values value="()"/>
+			<silent value="False"/>
+			<static_shape value="False"/>
+			<stream_output value="False"/>
+			<unset unset_cli_parameters="batch, disable_fusing, disable_gfusing, finegrain_fusing, input, input_shape, move_to_preprocess, output, placeholder_shapes, scale, transformations_config"/>
+		</cli_parameters>
+	</meta_data>
+</net>
