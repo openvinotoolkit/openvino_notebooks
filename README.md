@@ -38,28 +38,23 @@ The [wiki](https://github.com/openvinotoolkit/openvino_notebooks/wiki#guides-per
 detailed information about required packages, and links to installers for Git and Python. 
 There is also a guide for [running the notebooks in Azure ML Studio](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML).
 
-### Step 1: Clone the Repository
+### Step 1: Create a Virtual Environment
 
-```bash
-git clone https://github.com/openvinotoolkit/openvino_notebooks.git
-```
-
-### Step 2: Create a Virtual Environment
+> **NOTE:** If you already installed openvino-dev and activated the openvino_env environment, you can skip to step 3.
 
 #### For Linux and macOS:
 
 ```bash
-cd openvino_notebooks
 python3 -m venv openvino_env
 ```
 
 #### For Windows:
+
 ```bash
-cd openvino_notebooks
 python -m venv openvino_env
 ```
 
-### Step 3: Activate the Environment
+### Step 2: Activate the Environment
 
 #### For Linux and macOS:
 
@@ -73,13 +68,20 @@ source openvino_env/bin/activate
 openvino_env\Scripts\activate
 ```
 
+### Step 3: Clone the Repository
+
+```bash
+git clone https://github.com/openvinotoolkit/openvino_notebooks.git
+cd openvino_notebooks
+```
+
 ### Step 4: Install the Packages
 
 #### Installs OpenVINO tools and dependencies like Jupyter Lab:
 
+Upgrade pip to the latest version. Use pip's legacy dependency resolver to avoid dependency conflicts
+
 ```bash
-# Upgrade pip to the latest version.
-# Use pip's legacy dependency resolver to avoid dependency conflicts
 python -m pip install --upgrade pip
 pip install -r requirements.txt --use-deprecated=legacy-resolver
 ```
@@ -92,17 +94,20 @@ python -m ipykernel install --user --name openvino_env
 
 ### Step 6: Launch the Notebooks!
 
-```bash
-# To launch a single notebook, like the Monodepth notebook
-jupyter notebook notebooks/201-vision-monodepth/201-vision-monodepth.ipynb
+To launch a single notebook, like the Monodepth notebook
 
-# To launch all notebooks in Jupyter Lab
+```bash
+jupyter notebook notebooks/201-vision-monodepth/201-vision-monodepth.ipynb
+```
+To launch all notebooks in Jupyter Lab
+
+```
 jupyter lab notebooks
 ```
-
 In Jupyter Lab, select a notebook from the file browser using the left sidebar. Each notebook is located in a subdirectory within the `notebooks` directory.
 
 <img src="notebooks/jupyterlab.gif">
+
 
 ## 🧹 Cleaning Up
 
