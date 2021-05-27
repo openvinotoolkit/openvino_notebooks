@@ -39,9 +39,7 @@ The table below lists the supported operating systems and Python versions requir
 
 > **NOTE:** If OpenVINO is installed globally, please do not run any of these commands in a terminal where setupvars.bat or setupvars.sh are sourced.
 
-### Step 0: Open a Terminal
-
-For Linux and macOS, open a Terminal. For Windows, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
+Run each step below on a command-line interface. For Linux and macOS, use a Terminal. For Windows, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
 
 ### Step 1: Create a Virtual Environment
 
