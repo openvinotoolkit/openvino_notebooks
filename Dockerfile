@@ -6,7 +6,7 @@ LABEL name="OpenVINO(TM) Notebooks" \
       version="0.1.0" \
       release="2021.3" \
       summary="OpenVINO(TM) Developer Tools and Jupyter Notebooks" \
-      description="OpenVINO(TM) Notebooks Container" \
+      description="OpenVINO(TM) Notebooks Container"
       
 COPY LICENSE LICENSE
 
