@@ -68,7 +68,7 @@ rm -rf openvino_env
 rmdir /s openvino_env
 ```
 
-### Remove `openvino_env` Kernel from Jupyter
+### Remove openvino_env Kernel from Jupyter
 
 ```bash
 jupyter kernelspec remove openvino_env
