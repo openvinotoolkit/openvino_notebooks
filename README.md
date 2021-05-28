@@ -13,13 +13,12 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 
 Before you proceed to the [Installation Guide](#-installation-guide), please review the detailed [System Requirements](#%EF%B8%8F-system-requirements) below. The [Notebooks Wiki](https://github.com/openvinotoolkit/openvino_notebooks/wiki#guides-per-operating-system) has additional
 details about required packages and links to the installers for Git and Python.
-There is also a guide for running the notebooks in [Azure\* ML Studio](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML).
 
 ## ⚙️ System Requirements
 
 > **NOTE:** Python 3.9 is not supported yet, but it will be very soon.
 
-The table below lists the supported operating systems and Python versions required to run the OpenVINO notebooks.
+The table below lists the supported operating systems and Python versions.
 
 | Supported Operating System                                 | [Python Version (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- | :------------------------------------------------- |
@@ -35,8 +34,8 @@ The table below lists the supported operating systems and Python versions requir
 
 ## 📝 Installation Guides
 
-| [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [AzureML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) |
-| ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) |
+| ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 
 > **NOTE:** If OpenVINO is installed globally, please do not run any of these commands in a terminal where setupvars.bat or setupvars.sh are sourced.
 
