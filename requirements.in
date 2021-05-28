@@ -3,7 +3,7 @@
 #
 notebook>=6.0.2
 jupyterhub==1.1.0
-jupyterlab==2.2.4
+jupyterlab==3.0.16
 jupyter_kernel_gateway==2.4.0
 jupyter-nbrequirements
 supervisor==4.1.0
