@@ -81,26 +81,7 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 
 - To check some common installation problems, run `python launch_notebooks.py`. This script is located in the openvino_notebooks directory.
   Please run it after activating the `openvino_env` virtual environment.
-- If you get an `ImportError`, doublecheck that you installed the Jupyter kernel in [Step 5](#step-5-install-the-virtualenv-kernel-in-jupyter).
-  If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu) in Jupyter Lab or Jupyter Notebook
-
-### Windows
-
-- On Windows, if you have installed multiple versions of Python, use `py -3.7` when creating your virtual environment to specify a supported version (in this case 3.7).
-- Please see the [wiki/Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) page for information on how to install Python or Git.
-- If you use Anaconda, you may need to add OpenVINO to your Windows PATH. See the [wiki/Conda](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Conda) page.
-- If you see an error about needing to install C++, please either install
-  [Microsoft Visual C++ Redistributable](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019)
-  or use Python 3.7, which does not have this requirement.
-
-### Linux and macOS
-
-- On Ubuntu, if you see the error **"libpython3.7m.so.1.0: cannot open shared object file: No such object or directory"** please install
-  the required package using `apt install libpython3.7-dev`.
-- See the [wiki/Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) for all required Ubuntu packages.
-- On Fedora*, Red Hat and Amazon* Linux you may need to install the OpenGL (Open Graphics Library) to use OpenCV. Please run `yum install mesa-libGL`
-  before launching the notebooks.
-- For macOS systems with Apple* M1, please see [community discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions/10) about using Rosetta* 2.
+- If you get an `ImportError`, doublecheck that you installed the Jupyter kernel. If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu) in Jupyter Lab or Jupyter Notebook
 
 ---
 
