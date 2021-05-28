@@ -11,8 +11,7 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 - Python\* 3.6-3.8
 - Git\*
 
-Before you proceed to the [Installation Guide](#-installation-guide), please review the detailed [System Requirements](#%EF%B8%8F-system-requirements) below. The [Notebooks Wiki](https://github.com/openvinotoolkit/openvino_notebooks/wiki#guides-per-operating-system) has additional
-details about required packages and links to the installers for Git and Python.
+Before you proceed to the [Installation Guide](#-installation-guide), please review the detailed [System Requirements](#%EF%B8%8F-system-requirements) below. 
 
 ## ⚙️ System Requirements
 
