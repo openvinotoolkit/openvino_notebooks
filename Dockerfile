@@ -33,6 +33,5 @@ COPY notebooks .
 USER root
 RUN chown -R 1001:0 .
 USER 1001
-RUN jupyter lab build
 CMD /tmp/scripts/run
 
