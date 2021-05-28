@@ -35,9 +35,9 @@ Please select one of the following:
 
 ## 📘 Run the Notebooks
 
-After completing installation, select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory. See below:
+After completing installation, select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
 
-<img src="notebooks/jupyterlab.gif">
+<img src="notebooks/notebooks.gif">
 
 ## 🧹 Cleaning Up
 
