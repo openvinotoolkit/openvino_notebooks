@@ -11,8 +11,6 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 - Python\* 3.6-3.8
 - Git\*
 
-Before you proceed to the [Installation Guide](#-installation-guide), please review the detailed [System Requirements](#%EF%B8%8F-system-requirements) below. 
-
 ## ⚙️ System Requirements
 
 > **NOTE:** Python 3.9 is not supported yet, but it will be very soon.
