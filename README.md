@@ -31,44 +31,30 @@ For detailed instructions, incluidng how to install Python on your system, pleas
 
 If you already have Python and Git set up, simply follow the steps below. If you already installed openvino-dev and activated the openvino_env environment, you may skip to [Step 3](#step-3-clone-the-repository).
 
-#### Step 1: Create a Virtual Environment
-
-**NOTE:**
+#### Step 1: Create and Activate an `openvino_env` [Environment](https://docs.python.org/3.8/library/venv.html)
 
 ##### For Linux and macOS:
 
 ```bash
 python3 -m venv openvino_env
-```
-
-##### For Windows:
-
-```bash
-python -m venv openvino_env
-```
-
-#### Step 2: Activate the Environment
-
-##### For Linux and macOS:
-
-```bash
 source openvino_env/bin/activate
 ```
 
 ##### For Windows:
 
 ```bash
+python -m venv openvino_env
 openvino_env\Scripts\activate
 ```
 
-#### Step 3: Clone the Repository
+#### Step 2: Clone the Repository
 
 ```bash
 git clone https://github.com/openvinotoolkit/openvino_notebooks.git
 cd openvino_notebooks
 ```
 
-#### Step 4: Install and Launch the Notebooks
+#### Step 3: Install and Launch the Notebooks
 
 Upgrade pip to the latest version. Use pip's legacy dependency resolver to avoid dependency conflicts
 
