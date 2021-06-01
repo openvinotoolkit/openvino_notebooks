@@ -64,7 +64,7 @@ pip install -r requirements.txt --use-deprecated=legacy-resolver
 python -m ipykernel install --user --name openvino_env
 ```
 
-## 📘 Run the Notebooks
+## 💻 Run the Notebooks
 
 ### Launch All Notebooks
 
