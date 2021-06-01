@@ -2,18 +2,9 @@
 
 A collection of ready-to-run Jupyter\* notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
 
-## 💻 Getting Started
-
-The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Docker container. Here's what you need to get started:
-
-- CPU (64-bit)
-- Windows\*, Linux\* or macOS\*
-- Python\* 3.6-3.8
-- Git\*
-
 ## ⚙️ System Requirements
 
-The table below lists the supported operating systems and Python versions. **Note:** Python 3.9 is not supported yet, but it will be soon.
+The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Docker container. The table below lists the supported operating systems and Python versions. **Note:** Python 3.9 is not supported yet, but it will be soon.
 
 | Supported Operating System                                 | [Python Version (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- | :------------------------------------------------- |
