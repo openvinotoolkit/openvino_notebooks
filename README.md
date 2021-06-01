@@ -20,16 +20,20 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 
 ## 📝 Installation Guides
 
-### For detailed instructions, incluidng how to install Python, please select an installtion guide:
+### Option 1: Detailed Installation Guides
+
+For detailed instructions, incluidng how to install Python on your system, please select a guide below.
 
 | [Windows 10](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) |
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 
-### If you already have Python and Git set up, simply follow the steps below:
+### Option 2: Universal Installation Guide
+
+If you already have Python and Git set up, simply follow the steps below.
 
 #### Step 1: Create a Virtual Environment
 
-> **NOTE:** If you already installed openvino-dev and activated the openvino_env environment, you can skip to step 3.
+**NOTE:** If you already installed openvino-dev and activated the openvino_env environment, you can skip to step 3.
 
 ##### For Linux and macOS:
 
