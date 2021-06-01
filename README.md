@@ -31,16 +31,15 @@ For detailed instructions, incluidng how to install Python on your system, pleas
 
 If you already have Python and Git set up, simply follow the steps below. If you already installed openvino-dev and activated the `openvino_env` [environment](https://docs.python.org/3.8/library/venv.html), you may skip to [Step 3](#step-3-clone-the-repository).
 
-#### Step 1: Create and Activate `openvino_env` Environment
-
-##### For Linux and macOS:
+#### Step 1: Create and Activate `openvino_env` Environment  
+##### Linux and macOS Commands:  
 
 ```bash
 python3 -m venv openvino_env
 source openvino_env/bin/activate
 ```
 
-##### For Windows:
+##### Windows Commands:
 
 ```bash
 python -m venv openvino_env
