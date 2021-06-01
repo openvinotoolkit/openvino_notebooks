@@ -29,11 +29,11 @@ For detailed instructions, incluidng how to install Python on your system, pleas
 
 ### Option 2: Universal Installation Guide
 
-If you already have Python and Git set up, simply follow the steps below.
+If you already have Python and Git set up, simply follow the steps below. If you already installed openvino-dev and activated the openvino_env environment, you may skip to [Step 3](#step-3-clone-the-repository).
 
 #### Step 1: Create a Virtual Environment
 
-**NOTE:** If you already installed openvino-dev and activated the openvino_env environment, you can skip to step 3.
+**NOTE:**
 
 ##### For Linux and macOS:
 
