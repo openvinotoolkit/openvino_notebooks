@@ -20,51 +20,51 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 
 ## 📝 Installation Guides
 
-For detailed instructions, incluidng how to install Python, please select an installtion guide:
+### For detailed instructions, incluidng how to install Python, please select an installtion guide:
 
 | [Windows 10](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) |
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 
-If you already have Python and Git set up, simply follow the steps below:
+### If you already have Python and Git set up, simply follow the steps below:
 
-### Step 1: Create a Virtual Environment
+#### Step 1: Create a Virtual Environment
 
 > **NOTE:** If you already installed openvino-dev and activated the openvino_env environment, you can skip to step 3.
 
-#### For Linux and macOS:
+##### For Linux and macOS:
 
 ```bash
 python3 -m venv openvino_env
 ```
 
-#### For Windows:
+##### For Windows:
 
 ```bash
 python -m venv openvino_env
 ```
 
-### Step 2: Activate the Environment
+#### Step 2: Activate the Environment
 
-#### For Linux and macOS:
+##### For Linux and macOS:
 
 ```bash
 source openvino_env/bin/activate
 ```
 
-#### For Windows:
+##### For Windows:
 
 ```bash
 openvino_env\Scripts\activate
 ```
 
-### Step 3: Clone the Repository
+#### Step 3: Clone the Repository
 
 ```bash
 git clone https://github.com/openvinotoolkit/openvino_notebooks.git
 cd openvino_notebooks
 ```
 
-### Step 4: Install and Launch the Notebooks
+#### Step 4: Install and Launch the Notebooks
 
 Upgrade pip to the latest version. Use pip's legacy dependency resolver to avoid dependency conflicts
 
