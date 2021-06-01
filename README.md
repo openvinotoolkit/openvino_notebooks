@@ -20,13 +20,70 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 
 ## 📝 Installation Guides
 
-Please select one of the following:  
-| [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) |
-| ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+For detailed instructions, incluidng how to install Python, please select an installtion guide:
+
+| [Windows 10](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+
+If you already have Python and Git set up, simply follow the steps below:
+
+### Step 1: Create a Virtual Environment
+
+> **NOTE:** If you already installed openvino-dev and activated the openvino_env environment, you can skip to step 3.
+
+#### For Linux and macOS:
+
+```bash
+python3 -m venv openvino_env
+```
+
+#### For Windows:
+
+```bash
+python -m venv openvino_env
+```
+
+### Step 2: Activate the Environment
+
+#### For Linux and macOS:
+
+```bash
+source openvino_env/bin/activate
+```
+
+#### For Windows:
+
+```bash
+openvino_env\Scripts\activate
+```
+
+### Step 3: Clone the Repository
+
+```bash
+git clone https://github.com/openvinotoolkit/openvino_notebooks.git
+cd openvino_notebooks
+```
+
+### Step 4: Install and Launch the Notebooks
+
+Upgrade pip to the latest version. Use pip's legacy dependency resolver to avoid dependency conflicts
+
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt --use-deprecated=legacy-resolver
+python -m ipykernel install --user --name openvino_env
+jupyter lab notebooks
+```
 
 ## 📘 Run the Notebooks
 
 After completing installation, select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
+
+### Optional: To launch a single notebook, like the Monodepth notebook
+
+```bash
+jupyter notebook notebooks/201-vision-monodepth/201-vision-monodepth.ipynb
+```
 
 <img src="notebooks/notebooks.gif">
 
