@@ -29,7 +29,7 @@ For detailed instructions, incluidng how to install Python on your system, pleas
 
 ### Option 2: Universal Installation Guide
 
-If you already have Python and Git set up, simply follow the steps below. If you already installed openvino-dev and activated the openvino_env environment, you may skip to [Step 3](#step-3-clone-the-repository).
+If you already have Python and Git set up, simply follow the steps below. If you already installed openvino-dev and activated the `openvino_env` environment, you may skip to [Step 3](#step-3-clone-the-repository).
 
 #### Step 1: Create and Activate an `openvino_env` [Environment](https://docs.python.org/3.8/library/venv.html)
 
@@ -62,14 +62,21 @@ Upgrade pip to the latest version. Use pip's legacy dependency resolver to avoid
 python -m pip install --upgrade pip
 pip install -r requirements.txt --use-deprecated=legacy-resolver
 python -m ipykernel install --user --name openvino_env
-jupyter lab notebooks
 ```
 
 ## 📘 Run the Notebooks
 
-After completing installation, select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
+### Launch All Notebooks
 
-### Optional: To launch a single notebook, like the Monodepth notebook
+```bash
+jupyter lab notebooks
+```
+
+In your browser, select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
+
+### To Launch a Single Notebook
+
+If you wish to launch only one notebook, like the Monodepth notebook, run the command below.
 
 ```bash
 jupyter notebook notebooks/201-vision-monodepth/201-vision-monodepth.ipynb
