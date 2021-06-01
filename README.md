@@ -66,14 +66,6 @@ python -m ipykernel install --user --name openvino_env
 
 ## 💻 Run the Notebooks
 
-### Launch All Notebooks
-
-```bash
-jupyter lab notebooks
-```
-
-In your browser, select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
-
 ### To Launch a Single Notebook
 
 If you wish to launch only one notebook, like the Monodepth notebook, run the command below.
@@ -82,7 +74,15 @@ If you wish to launch only one notebook, like the Monodepth notebook, run the co
 jupyter notebook notebooks/201-vision-monodepth/201-vision-monodepth.ipynb
 ```
 
-<img src="notebooks/notebooks.gif">
+### To Launch all Notebooks
+
+```bash
+jupyter lab notebooks
+```
+
+In your browser, select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
+
+<img src="https://user-images.githubusercontent.com/15709723/120401904-cef6f800-c2f5-11eb-8cf1-4ef6aff204a7.gif">
 
 ## 🧹 Cleaning Up
 
