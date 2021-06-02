@@ -16,18 +16,14 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 | Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8\*\*                                  |
 | Windows Server\* 2016 or higher                            | 3.6, 3.7, 3.8\*\*                                  |
 
-## 📝 Installation Guides
+## 📝 Installation Guide
 
-### Option 1: Detailed Installation Guides
-
-For detailed instructions, incluidng how to install Python on your system, please select a guide below.
+If you need help installing Python and Git on your system, please select a guide below.
 
 | [Windows 10](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) |
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 
-### Option 2: Universal Installation Guide
-
-If you already have Python and Git set up, simply follow the steps below. If you already installed openvino-dev and activated the `openvino_env` [environment](https://docs.python.org/3.8/library/venv.html), you may skip to [Step 3](#step-2-clone-the-repository).
+If you already installed Python and Git, follow the steps below. If you already installed openvino-dev and activated the `openvino_env` [environment](https://docs.python.org/3.8/library/venv.html), skip to [Step 2](#step-2-clone-the-repository).
 
 #### Step 1: Create and Activate `openvino_env` Environment
 
