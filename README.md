@@ -18,12 +18,12 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 
 ## 📝 Installation Guide
 
-If you need help installing Python and Git on your system, please select a guide below.
+OpenVINO Notebooks require Python and Git. See instructions below for your operating system.
 
 | [Windows 10](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) |
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 
-If you already installed Python and Git, follow the steps below. If you already installed openvino-dev and activated the `openvino_env` [environment](https://docs.python.org/3.8/library/venv.html), skip to [Step 2](#step-2-clone-the-repository).
+Once you have installed Python and Git, follow the steps below. If you already installed openvino-dev and activated the `openvino_env` [environment](https://docs.python.org/3.8/library/venv.html), you can skip to [Step 2](#step-2-clone-the-repository).
 
 #### Step 1: Create and Activate `openvino_env` Environment
 
