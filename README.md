@@ -76,7 +76,7 @@ jupyter lab notebooks
 
 In your browser, select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
 
-<img src="https://user-images.githubusercontent.com/15709723/120404605-92c69600-c2fb-11eb-99be-5c6153da42b3.gif">
+<img src="https://user-images.githubusercontent.com/15709723/120527271-006fd200-c38f-11eb-9935-2d36d50bab9f.gif">
 
 ## 🧹 Cleaning Up
 
