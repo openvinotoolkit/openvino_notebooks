@@ -16,8 +16,6 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 | Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8\*\*                                  |
 | Windows Server\* 2016 or higher                            | 3.6, 3.7, 3.8\*\*                                  |
 
-> \*\*_At the moment, For Python 3.8 on Windows, OpenVINO requires installation of [Microsoft Visual C++ Redistributable](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019). This is not required for Python 3.6 and 3.7, and will not be required for Python 3.8 in the next OpenVINO release._
-
 ## 📝 Installation Guides
 
 ### Option 1: Detailed Installation Guides
@@ -82,7 +80,7 @@ jupyter lab notebooks
 
 In your browser, select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
 
-<img src="https://user-images.githubusercontent.com/15709723/120401904-cef6f800-c2f5-11eb-8cf1-4ef6aff204a7.gif">
+<img src="https://user-images.githubusercontent.com/15709723/120404605-92c69600-c2fb-11eb-99be-5c6153da42b3.gif">
 
 ## 🧹 Cleaning Up
 
