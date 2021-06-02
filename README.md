@@ -13,8 +13,8 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 | Red Hat* Enterprise Linux* 8, 64-bit                       | 3.6, 3.8                                           |
 | CentOS\* 7, 64-bit                                         | 3.6, 3.7, 3.8                                      |
 | macOS\* 10.15.x versions                                   | 3.6, 3.7, 3.8                                      |
-| Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8\*\*                                  |
-| Windows Server\* 2016 or higher                            | 3.6, 3.7, 3.8\*\*                                  |
+| Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8                                      |
+| Windows Server\* 2016 or higher                            | 3.6, 3.7, 3.8                                      |
 
 ## 📝 Installation Guide
 
