@@ -118,7 +118,7 @@ jupyter kernelspec remove openvino_env
 If these tips do not solve your problem, please open a [discussion topic](https://github.com/openvinotoolkit/openvino_notebooks/discussions)
 or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issues)!
 
-- To check some common installation problems, run `python launch_notebooks.py`. This script is located in the openvino_notebooks directory.
+- To check some common installation problems, run `python check_install.py`. This script is located in the openvino_notebooks directory.
   Please run it after activating the `openvino_env` virtual environment.
 - If you get an `ImportError`, doublecheck that you installed the Jupyter kernel. If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu) in Jupyter Lab or Jupyter Notebook
 
