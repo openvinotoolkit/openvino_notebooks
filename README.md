@@ -120,6 +120,8 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 - To check some common installation problems, run `python check_install.py`. This script is located in the openvino_notebooks directory.
   Please run it after activating the `openvino_env` virtual environment.
 - If you get an `ImportError`, doublecheck that you installed the Jupyter kernel. If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu) in Jupyter Lab or Jupyter Notebook
+- If OpenVINO is installed globally, do not run installation commands in a terminal where setupvars.bat or setupvars.sh are sourced. 
+- For Windows installation, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
 
 ---
 
