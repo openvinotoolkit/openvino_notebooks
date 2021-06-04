@@ -8,7 +8,7 @@ LABEL name="OpenVINO(TM) Notebooks" \
       summary="OpenVINO(TM) Developer Tools and Jupyter Notebooks" \
       description="OpenVINO(TM) Notebooks Container"
       
-COPY LICENSE LICENSE
+COPY licenses /licenses
 
 ENV JUPYTER_ENABLE_LAB="true" \
     ENABLE_MICROPIPENV="1" \
