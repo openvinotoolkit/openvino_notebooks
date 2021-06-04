@@ -26,5 +26,6 @@ jupyterlab
 # Pin versions to prevent known dependency issues
 importlib-metadata==3.7.3
 ipython==7.10.*
+jedi==0.17.2
 numpy==1.18.*
 setuptools>=56.0.0
