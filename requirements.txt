@@ -34,4 +34,4 @@ itk==5.1.2
 itkwidgets==0.23.1
 
 # openvino extensions
-openvino-extensions==0.0.4
+openvino-extensions
