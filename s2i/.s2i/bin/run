@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -eo pipefail
+
+# Execute the run script from the customised builder.
+
+exec /opt/app-root/builder/run
