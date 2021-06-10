@@ -28,7 +28,7 @@ RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical
 
 # Copying in override assemble/run scripts
-COPY s2i/.s2i/bin /tmp/scripts
+COPY .s2i/bin /tmp/scripts
 # Copying in source code
 COPY . /tmp/src
 # Change file ownership to the assemble user. Builder image must support chown command.
