@@ -1,0 +1,6140 @@
+<?xml version="1.0" ?>
+<net name="v3-small_224_1.0_float" version="10">
+	<layers>
+		<layer id="0" name="input" type="Parameter" version="opset1">
+			<data element_type="f16" shape="1,3,224,224"/>
+			<output>
+				<port id="0" names="input:0" precision="FP16">
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>224</dim>
+					<dim>224</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="1" name="data_mul_8963_const" type="Const" version="opset1">
+			<data element_type="f16" offset="0" shape="1,1,1,1" size="2"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="2" name="input/scale/Fused_Mul_" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>224</dim>
+					<dim>224</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>224</dim>
+					<dim>224</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="3" name="data_add_8965_const" type="Const" version="opset1">
+			<data element_type="f16" offset="2" shape="1,3,1,1" size="6"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="4" name="input/mean/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>224</dim>
+					<dim>224</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/input:0,batch_processing/Reshape:0" precision="FP16">
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>224</dim>
+					<dim>224</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="5" name="MobilenetV3/Conv/Conv2D/Transpose11822_const" type="Const" version="opset1">
+			<data element_type="f16" offset="8" shape="16,3,3,3" size="864"/>
+			<output>
+				<port id="0" names="MobilenetV3/Conv/weights/read:0" precision="FP16">
+					<dim>16</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="6" name="MobilenetV3/Conv/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="2,2"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>224</dim>
+					<dim>224</dim>
+				</port>
+				<port id="1">
+					<dim>16</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>112</dim>
+					<dim>112</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="7" name="data_add_896889739372/EltwiseUnsqueeze9535_const" type="Const" version="opset1">
+			<data element_type="f16" offset="872" shape="1,16,1,1" size="32"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="8" name="MobilenetV3/Conv/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>112</dim>
+					<dim>112</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/Conv/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>112</dim>
+					<dim>112</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="9" name="MobilenetV3/Conv/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>112</dim>
+					<dim>112</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv/input:0,MobilenetV3/Conv/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>112</dim>
+					<dim>112</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="10" name="1576715770_const" type="Const" version="opset1">
+			<data element_type="f16" offset="904" shape="16,1,1,3,3" size="288"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv/depthwise/depthwise_weights/read:0" precision="FP16">
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="11" name="MobilenetV3/expanded_conv/depthwise/depthwise" type="GroupConvolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="2,2"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>112</dim>
+					<dim>112</dim>
+				</port>
+				<port id="1">
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="12" name="data_add_897689819374/EltwiseUnsqueeze9543_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1192" shape="1,16,1,1" size="32"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="13" name="MobilenetV3/expanded_conv/depthwise/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv/depthwise/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="14" name="MobilenetV3/expanded_conv/depthwise/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv/depthwise_output:0,MobilenetV3/expanded_conv/depthwise/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="15" name="MobilenetV3/expanded_conv/squeeze_excite/AvgPool" type="AvgPool" version="opset1">
+			<data auto_pad="valid" exclude-pad="true" kernel="56,56" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv/squeeze_excite/AvgPool:0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="16" name="MobilenetV3/expanded_conv/squeeze_excite/Conv/Conv2D/Transpose11830_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1224" shape="8,16,1,1" size="256"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv/squeeze_excite/Conv/weights/read:0" precision="FP16">
+					<dim>8</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="17" name="MobilenetV3/expanded_conv/squeeze_excite/Conv/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>8</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv/squeeze_excite/Conv/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>8</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="18" name="MobilenetV3/expanded_conv/squeeze_excite/Conv/biases/read/EltwiseUnsqueeze9511_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1480" shape="1,8,1,1" size="16"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv/squeeze_excite/Conv/biases/read:0" precision="FP16">
+					<dim>1</dim>
+					<dim>8</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="19" name="MobilenetV3/expanded_conv/squeeze_excite/Conv/BiasAdd/Add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>8</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>8</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv/squeeze_excite/Conv/BiasAdd:0" precision="FP16">
+					<dim>1</dim>
+					<dim>8</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="20" name="MobilenetV3/expanded_conv/squeeze_excite/Conv/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>8</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv/squeeze_excite/Conv/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>8</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="21" name="MobilenetV3/expanded_conv/squeeze_excite/Conv_1/Conv2D/Transpose11834_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1496" shape="16,8,1,1" size="256"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv/squeeze_excite/Conv_1/weights/read:0" precision="FP16">
+					<dim>16</dim>
+					<dim>8</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="22" name="MobilenetV3/expanded_conv/squeeze_excite/Conv_1/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>8</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>16</dim>
+					<dim>8</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv/squeeze_excite/Conv_1/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="23" name="data_add_898389859375/EltwiseUnsqueeze9547_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1752" shape="1,16,1,1" size="32"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="24" name="MobilenetV3/expanded_conv/squeeze_excite/Conv_1/BiasAdd/Add/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv/squeeze_excite/Conv_1/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="25" name="MobilenetV3/expanded_conv/squeeze_excite/Conv_1/Relu6" type="Clamp" version="opset1">
+			<data max="6.0" min="0.0"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv/squeeze_excite/Conv_1/Relu6:0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="26" name="MobilenetV3/expanded_conv/squeeze_excite/Conv_1/mul/y/EltwiseUnsqueeze9451_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1784" shape="1,1,1,1" size="2"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv/squeeze_excite/Conv_1/mul/y:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="27" name="MobilenetV3/expanded_conv/squeeze_excite/Conv_1/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv/squeeze_excite/excite:0,MobilenetV3/expanded_conv/squeeze_excite/Conv_1/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="28" name="MobilenetV3/expanded_conv/squeeze_excite/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv/squeeze_excite/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="29" name="MobilenetV3/expanded_conv/project/Conv2D/Transpose11838_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1786" shape="16,16,1,1" size="512"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv/project/weights/read:0" precision="FP16">
+					<dim>16</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="30" name="MobilenetV3/expanded_conv/project/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+				<port id="1">
+					<dim>16</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="31" name="data_add_898889939377/EltwiseUnsqueeze9555_const" type="Const" version="opset1">
+			<data element_type="f16" offset="2298" shape="1,16,1,1" size="32"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="32" name="MobilenetV3/expanded_conv/project/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_1/input:0,MobilenetV3/expanded_conv/output:0,MobilenetV3/expanded_conv/project/Identity:0,MobilenetV3/expanded_conv/project/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="33" name="MobilenetV3/expanded_conv_1/expand/Conv2D/Transpose11842_const" type="Const" version="opset1">
+			<data element_type="f16" offset="2330" shape="72,16,1,1" size="2304"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_1/expand/weights/read:0" precision="FP16">
+					<dim>72</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="34" name="MobilenetV3/expanded_conv_1/expand/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>16</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+				<port id="1">
+					<dim>72</dim>
+					<dim>16</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="35" name="data_add_899690019379/EltwiseUnsqueeze9563_const" type="Const" version="opset1">
+			<data element_type="f16" offset="4634" shape="1,72,1,1" size="144"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="36" name="MobilenetV3/expanded_conv_1/expand/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_1/expand/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="37" name="MobilenetV3/expanded_conv_1/expand/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_1/expansion_output:0,MobilenetV3/expanded_conv_1/expand/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="38" name="1578715790_const" type="Const" version="opset1">
+			<data element_type="f16" offset="4778" shape="72,1,1,3,3" size="1296"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_1/depthwise/depthwise_weights/read:0" precision="FP16">
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="39" name="MobilenetV3/expanded_conv_1/depthwise/depthwise" type="GroupConvolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="2,2"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>56</dim>
+					<dim>56</dim>
+				</port>
+				<port id="1">
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="40" name="data_add_900490099381/EltwiseUnsqueeze9571_const" type="Const" version="opset1">
+			<data element_type="f16" offset="6074" shape="1,72,1,1" size="144"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="41" name="MobilenetV3/expanded_conv_1/depthwise/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_1/depthwise/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="42" name="MobilenetV3/expanded_conv_1/depthwise/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_1/depthwise_output:0,MobilenetV3/expanded_conv_1/depthwise/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="43" name="MobilenetV3/expanded_conv_1/project/Conv2D/Transpose11850_const" type="Const" version="opset1">
+			<data element_type="f16" offset="6218" shape="24,72,1,1" size="3456"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_1/project/weights/read:0" precision="FP16">
+					<dim>24</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="44" name="MobilenetV3/expanded_conv_1/project/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>24</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="45" name="data_add_901290179383/EltwiseUnsqueeze9579_const" type="Const" version="opset1">
+			<data element_type="f16" offset="9674" shape="1,24,1,1" size="48"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="46" name="MobilenetV3/expanded_conv_1/project/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_2/input:0,MobilenetV3/expanded_conv_1/output:0,MobilenetV3/expanded_conv_1/project/Identity:0,MobilenetV3/expanded_conv_1/project/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="47" name="MobilenetV3/expanded_conv_2/expand/Conv2D/Transpose11854_const" type="Const" version="opset1">
+			<data element_type="f16" offset="9722" shape="88,24,1,1" size="4224"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_2/expand/weights/read:0" precision="FP16">
+					<dim>88</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="48" name="MobilenetV3/expanded_conv_2/expand/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>88</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="49" name="data_add_902090259385/EltwiseUnsqueeze9587_const" type="Const" version="opset1">
+			<data element_type="f16" offset="13946" shape="1,88,1,1" size="176"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="50" name="MobilenetV3/expanded_conv_2/expand/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_2/expand/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="51" name="MobilenetV3/expanded_conv_2/expand/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_2/expansion_output:0,MobilenetV3/expanded_conv_2/expand/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="52" name="1577915782_const" type="Const" version="opset1">
+			<data element_type="f16" offset="14122" shape="88,1,1,3,3" size="1584"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_2/depthwise/depthwise_weights/read:0" precision="FP16">
+					<dim>88</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="53" name="MobilenetV3/expanded_conv_2/depthwise/depthwise" type="GroupConvolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>88</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>3</dim>
+					<dim>3</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="54" name="data_add_902890339387/EltwiseUnsqueeze9595_const" type="Const" version="opset1">
+			<data element_type="f16" offset="15706" shape="1,88,1,1" size="176"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="55" name="MobilenetV3/expanded_conv_2/depthwise/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_2/depthwise/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="56" name="MobilenetV3/expanded_conv_2/depthwise/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_2/depthwise_output:0,MobilenetV3/expanded_conv_2/depthwise/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="57" name="MobilenetV3/expanded_conv_2/project/Conv2D/Transpose11862_const" type="Const" version="opset1">
+			<data element_type="f16" offset="15882" shape="24,88,1,1" size="4224"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_2/project/weights/read:0" precision="FP16">
+					<dim>24</dim>
+					<dim>88</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="58" name="MobilenetV3/expanded_conv_2/project/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>88</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>24</dim>
+					<dim>88</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="59" name="data_add_903690419389/EltwiseUnsqueeze9603_const" type="Const" version="opset1">
+			<data element_type="f16" offset="20106" shape="1,24,1,1" size="48"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="60" name="MobilenetV3/expanded_conv_2/project/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_2/project/Identity:0,MobilenetV3/expanded_conv_2/project/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="61" name="MobilenetV3/expanded_conv_2/add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_3/input:0,MobilenetV3/expanded_conv_2/output:0,MobilenetV3/expanded_conv_2/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="62" name="MobilenetV3/expanded_conv_3/expand/Conv2D/Transpose11866_const" type="Const" version="opset1">
+			<data element_type="f16" offset="20154" shape="96,24,1,1" size="4608"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_3/expand/weights/read:0" precision="FP16">
+					<dim>96</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="63" name="MobilenetV3/expanded_conv_3/expand/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>96</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="64" name="data_add_904490499391/EltwiseUnsqueeze9611_const" type="Const" version="opset1">
+			<data element_type="f16" offset="24762" shape="1,96,1,1" size="192"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="65" name="MobilenetV3/expanded_conv_3/expand/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_3/expand/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="66" name="MobilenetV3/expanded_conv_3/expand/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_3/expansion_output:0,MobilenetV3/expanded_conv_3/expand/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="67" name="1575915762_const" type="Const" version="opset1">
+			<data element_type="f16" offset="24954" shape="96,1,1,5,5" size="4800"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_3/depthwise/depthwise_weights/read:0" precision="FP16">
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="68" name="MobilenetV3/expanded_conv_3/depthwise/depthwise" type="GroupConvolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="2,2"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>28</dim>
+					<dim>28</dim>
+				</port>
+				<port id="1">
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="69" name="data_add_905290579393/EltwiseUnsqueeze9619_const" type="Const" version="opset1">
+			<data element_type="f16" offset="29754" shape="1,96,1,1" size="192"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="70" name="MobilenetV3/expanded_conv_3/depthwise/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_3/depthwise/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="71" name="MobilenetV3/expanded_conv_3/depthwise/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_3/depthwise_output:0,MobilenetV3/expanded_conv_3/depthwise/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="72" name="MobilenetV3/expanded_conv_3/squeeze_excite/AvgPool" type="AvgPool" version="opset1">
+			<data auto_pad="valid" exclude-pad="true" kernel="14,14" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_3/squeeze_excite/AvgPool:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="73" name="MobilenetV3/expanded_conv_3/squeeze_excite/Conv/Conv2D/Transpose11874_const" type="Const" version="opset1">
+			<data element_type="f16" offset="29946" shape="24,96,1,1" size="4608"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_3/squeeze_excite/Conv/weights/read:0" precision="FP16">
+					<dim>24</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="74" name="MobilenetV3/expanded_conv_3/squeeze_excite/Conv/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>24</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_3/squeeze_excite/Conv/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="75" name="MobilenetV3/expanded_conv_3/squeeze_excite/Conv/biases/read/EltwiseUnsqueeze9499_const" type="Const" version="opset1">
+			<data element_type="f16" offset="34554" shape="1,24,1,1" size="48"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_3/squeeze_excite/Conv/biases/read:0" precision="FP16">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="76" name="MobilenetV3/expanded_conv_3/squeeze_excite/Conv/BiasAdd/Add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_3/squeeze_excite/Conv/BiasAdd:0" precision="FP16">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="77" name="MobilenetV3/expanded_conv_3/squeeze_excite/Conv/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_3/squeeze_excite/Conv/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="78" name="MobilenetV3/expanded_conv_3/squeeze_excite/Conv_1/Conv2D/Transpose11878_const" type="Const" version="opset1">
+			<data element_type="f16" offset="34602" shape="96,24,1,1" size="4608"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_3/squeeze_excite/Conv_1/weights/read:0" precision="FP16">
+					<dim>96</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="79" name="MobilenetV3/expanded_conv_3/squeeze_excite/Conv_1/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>96</dim>
+					<dim>24</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_3/squeeze_excite/Conv_1/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="80" name="data_add_905990619394/EltwiseUnsqueeze9623_const" type="Const" version="opset1">
+			<data element_type="f16" offset="39210" shape="1,96,1,1" size="192"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="81" name="MobilenetV3/expanded_conv_3/squeeze_excite/Conv_1/BiasAdd/Add/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_3/squeeze_excite/Conv_1/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="82" name="MobilenetV3/expanded_conv_3/squeeze_excite/Conv_1/Relu6" type="Clamp" version="opset1">
+			<data max="6.0" min="0.0"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_3/squeeze_excite/Conv_1/Relu6:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="83" name="MobilenetV3/expanded_conv_3/squeeze_excite/Conv_1/mul/y/EltwiseUnsqueeze9455_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1784" shape="1,1,1,1" size="2"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_3/squeeze_excite/Conv_1/mul/y:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="84" name="MobilenetV3/expanded_conv_3/squeeze_excite/Conv_1/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_3/squeeze_excite/excite:0,MobilenetV3/expanded_conv_3/squeeze_excite/Conv_1/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="85" name="MobilenetV3/expanded_conv_3/squeeze_excite/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_3/squeeze_excite/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="86" name="MobilenetV3/expanded_conv_3/project/Conv2D/Transpose11882_const" type="Const" version="opset1">
+			<data element_type="f16" offset="39402" shape="40,96,1,1" size="7680"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_3/project/weights/read:0" precision="FP16">
+					<dim>40</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="87" name="MobilenetV3/expanded_conv_3/project/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>40</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="88" name="data_add_906490699396/EltwiseUnsqueeze9631_const" type="Const" version="opset1">
+			<data element_type="f16" offset="47082" shape="1,40,1,1" size="80"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="89" name="MobilenetV3/expanded_conv_3/project/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_4/input:0,MobilenetV3/expanded_conv_3/output:0,MobilenetV3/expanded_conv_3/project/Identity:0,MobilenetV3/expanded_conv_3/project/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="90" name="MobilenetV3/expanded_conv_4/expand/Conv2D/Transpose11886_const" type="Const" version="opset1">
+			<data element_type="f16" offset="47162" shape="240,40,1,1" size="19200"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_4/expand/weights/read:0" precision="FP16">
+					<dim>240</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="91" name="MobilenetV3/expanded_conv_4/expand/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>240</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="92" name="data_add_907290779398/EltwiseUnsqueeze9639_const" type="Const" version="opset1">
+			<data element_type="f16" offset="66362" shape="1,240,1,1" size="480"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="93" name="MobilenetV3/expanded_conv_4/expand/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_4/expand/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="94" name="MobilenetV3/expanded_conv_4/expand/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_4/expansion_output:0,MobilenetV3/expanded_conv_4/expand/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="95" name="1574715750_const" type="Const" version="opset1">
+			<data element_type="f16" offset="66842" shape="240,1,1,5,5" size="12000"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_4/depthwise/depthwise_weights/read:0" precision="FP16">
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="96" name="MobilenetV3/expanded_conv_4/depthwise/depthwise" type="GroupConvolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="97" name="data_add_908090859400/EltwiseUnsqueeze9647_const" type="Const" version="opset1">
+			<data element_type="f16" offset="78842" shape="1,240,1,1" size="480"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="98" name="MobilenetV3/expanded_conv_4/depthwise/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_4/depthwise/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="99" name="MobilenetV3/expanded_conv_4/depthwise/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_4/depthwise_output:0,MobilenetV3/expanded_conv_4/depthwise/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="100" name="MobilenetV3/expanded_conv_4/squeeze_excite/AvgPool" type="AvgPool" version="opset1">
+			<data auto_pad="valid" exclude-pad="true" kernel="14,14" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_4/squeeze_excite/AvgPool:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="101" name="MobilenetV3/expanded_conv_4/squeeze_excite/Conv/Conv2D/Transpose11894_const" type="Const" version="opset1">
+			<data element_type="f16" offset="79322" shape="64,240,1,1" size="30720"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_4/squeeze_excite/Conv/weights/read:0" precision="FP16">
+					<dim>64</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="102" name="MobilenetV3/expanded_conv_4/squeeze_excite/Conv/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>64</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_4/squeeze_excite/Conv/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="103" name="MobilenetV3/expanded_conv_4/squeeze_excite/Conv/biases/read/EltwiseUnsqueeze9523_const" type="Const" version="opset1">
+			<data element_type="f16" offset="110042" shape="1,64,1,1" size="128"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_4/squeeze_excite/Conv/biases/read:0" precision="FP16">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="104" name="MobilenetV3/expanded_conv_4/squeeze_excite/Conv/BiasAdd/Add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_4/squeeze_excite/Conv/BiasAdd:0" precision="FP16">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="105" name="MobilenetV3/expanded_conv_4/squeeze_excite/Conv/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_4/squeeze_excite/Conv/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="106" name="MobilenetV3/expanded_conv_4/squeeze_excite/Conv_1/Conv2D/Transpose11898_const" type="Const" version="opset1">
+			<data element_type="f16" offset="110170" shape="240,64,1,1" size="30720"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_4/squeeze_excite/Conv_1/weights/read:0" precision="FP16">
+					<dim>240</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="107" name="MobilenetV3/expanded_conv_4/squeeze_excite/Conv_1/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>240</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_4/squeeze_excite/Conv_1/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="108" name="data_add_908790899401/EltwiseUnsqueeze9651_const" type="Const" version="opset1">
+			<data element_type="f16" offset="140890" shape="1,240,1,1" size="480"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="109" name="MobilenetV3/expanded_conv_4/squeeze_excite/Conv_1/BiasAdd/Add/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_4/squeeze_excite/Conv_1/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="110" name="MobilenetV3/expanded_conv_4/squeeze_excite/Conv_1/Relu6" type="Clamp" version="opset1">
+			<data max="6.0" min="0.0"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_4/squeeze_excite/Conv_1/Relu6:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="111" name="MobilenetV3/expanded_conv_4/squeeze_excite/Conv_1/mul/y/EltwiseUnsqueeze9459_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1784" shape="1,1,1,1" size="2"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_4/squeeze_excite/Conv_1/mul/y:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="112" name="MobilenetV3/expanded_conv_4/squeeze_excite/Conv_1/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_4/squeeze_excite/excite:0,MobilenetV3/expanded_conv_4/squeeze_excite/Conv_1/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="113" name="MobilenetV3/expanded_conv_4/squeeze_excite/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_4/squeeze_excite/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="114" name="MobilenetV3/expanded_conv_4/project/Conv2D/Transpose11902_const" type="Const" version="opset1">
+			<data element_type="f16" offset="141370" shape="40,240,1,1" size="19200"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_4/project/weights/read:0" precision="FP16">
+					<dim>40</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="115" name="MobilenetV3/expanded_conv_4/project/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>40</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="116" name="data_add_909290979403/EltwiseUnsqueeze9659_const" type="Const" version="opset1">
+			<data element_type="f16" offset="160570" shape="1,40,1,1" size="80"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="117" name="MobilenetV3/expanded_conv_4/project/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_4/project/Identity:0,MobilenetV3/expanded_conv_4/project/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="118" name="MobilenetV3/expanded_conv_4/add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_5/input:0,MobilenetV3/expanded_conv_4/output:0,MobilenetV3/expanded_conv_4/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="119" name="MobilenetV3/expanded_conv_5/expand/Conv2D/Transpose11906_const" type="Const" version="opset1">
+			<data element_type="f16" offset="160650" shape="240,40,1,1" size="19200"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_5/expand/weights/read:0" precision="FP16">
+					<dim>240</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="120" name="MobilenetV3/expanded_conv_5/expand/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>240</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="121" name="data_add_910091059405/EltwiseUnsqueeze9667_const" type="Const" version="opset1">
+			<data element_type="f16" offset="179850" shape="1,240,1,1" size="480"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="122" name="MobilenetV3/expanded_conv_5/expand/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_5/expand/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="123" name="MobilenetV3/expanded_conv_5/expand/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_5/expansion_output:0,MobilenetV3/expanded_conv_5/expand/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="124" name="1576315766_const" type="Const" version="opset1">
+			<data element_type="f16" offset="180330" shape="240,1,1,5,5" size="12000"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_5/depthwise/depthwise_weights/read:0" precision="FP16">
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="125" name="MobilenetV3/expanded_conv_5/depthwise/depthwise" type="GroupConvolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="126" name="data_add_910891139407/EltwiseUnsqueeze9675_const" type="Const" version="opset1">
+			<data element_type="f16" offset="192330" shape="1,240,1,1" size="480"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="127" name="MobilenetV3/expanded_conv_5/depthwise/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_5/depthwise/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="128" name="MobilenetV3/expanded_conv_5/depthwise/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_5/depthwise_output:0,MobilenetV3/expanded_conv_5/depthwise/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="129" name="MobilenetV3/expanded_conv_5/squeeze_excite/AvgPool" type="AvgPool" version="opset1">
+			<data auto_pad="valid" exclude-pad="true" kernel="14,14" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_5/squeeze_excite/AvgPool:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="130" name="MobilenetV3/expanded_conv_5/squeeze_excite/Conv/Conv2D/Transpose11914_const" type="Const" version="opset1">
+			<data element_type="f16" offset="192810" shape="64,240,1,1" size="30720"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_5/squeeze_excite/Conv/weights/read:0" precision="FP16">
+					<dim>64</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="131" name="MobilenetV3/expanded_conv_5/squeeze_excite/Conv/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>64</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_5/squeeze_excite/Conv/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="132" name="MobilenetV3/expanded_conv_5/squeeze_excite/Conv/biases/read/EltwiseUnsqueeze9503_const" type="Const" version="opset1">
+			<data element_type="f16" offset="223530" shape="1,64,1,1" size="128"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_5/squeeze_excite/Conv/biases/read:0" precision="FP16">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="133" name="MobilenetV3/expanded_conv_5/squeeze_excite/Conv/BiasAdd/Add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_5/squeeze_excite/Conv/BiasAdd:0" precision="FP16">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="134" name="MobilenetV3/expanded_conv_5/squeeze_excite/Conv/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_5/squeeze_excite/Conv/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="135" name="MobilenetV3/expanded_conv_5/squeeze_excite/Conv_1/Conv2D/Transpose11918_const" type="Const" version="opset1">
+			<data element_type="f16" offset="223658" shape="240,64,1,1" size="30720"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_5/squeeze_excite/Conv_1/weights/read:0" precision="FP16">
+					<dim>240</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="136" name="MobilenetV3/expanded_conv_5/squeeze_excite/Conv_1/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>240</dim>
+					<dim>64</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_5/squeeze_excite/Conv_1/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="137" name="data_add_911591179408/EltwiseUnsqueeze9679_const" type="Const" version="opset1">
+			<data element_type="f16" offset="254378" shape="1,240,1,1" size="480"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="138" name="MobilenetV3/expanded_conv_5/squeeze_excite/Conv_1/BiasAdd/Add/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_5/squeeze_excite/Conv_1/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="139" name="MobilenetV3/expanded_conv_5/squeeze_excite/Conv_1/Relu6" type="Clamp" version="opset1">
+			<data max="6.0" min="0.0"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_5/squeeze_excite/Conv_1/Relu6:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="140" name="MobilenetV3/expanded_conv_5/squeeze_excite/Conv_1/mul/y/EltwiseUnsqueeze9463_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1784" shape="1,1,1,1" size="2"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_5/squeeze_excite/Conv_1/mul/y:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="141" name="MobilenetV3/expanded_conv_5/squeeze_excite/Conv_1/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_5/squeeze_excite/excite:0,MobilenetV3/expanded_conv_5/squeeze_excite/Conv_1/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="142" name="MobilenetV3/expanded_conv_5/squeeze_excite/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_5/squeeze_excite/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="143" name="MobilenetV3/expanded_conv_5/project/Conv2D/Transpose11922_const" type="Const" version="opset1">
+			<data element_type="f16" offset="254858" shape="40,240,1,1" size="19200"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_5/project/weights/read:0" precision="FP16">
+					<dim>40</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="144" name="MobilenetV3/expanded_conv_5/project/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>240</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>40</dim>
+					<dim>240</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="145" name="data_add_912091259410/EltwiseUnsqueeze9687_const" type="Const" version="opset1">
+			<data element_type="f16" offset="274058" shape="1,40,1,1" size="80"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="146" name="MobilenetV3/expanded_conv_5/project/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_5/project/Identity:0,MobilenetV3/expanded_conv_5/project/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="147" name="MobilenetV3/expanded_conv_5/add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_6/input:0,MobilenetV3/expanded_conv_5/output:0,MobilenetV3/expanded_conv_5/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="148" name="MobilenetV3/expanded_conv_6/expand/Conv2D/Transpose11926_const" type="Const" version="opset1">
+			<data element_type="f16" offset="274138" shape="120,40,1,1" size="9600"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_6/expand/weights/read:0" precision="FP16">
+					<dim>120</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="149" name="MobilenetV3/expanded_conv_6/expand/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>120</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="150" name="data_add_912891339412/EltwiseUnsqueeze9695_const" type="Const" version="opset1">
+			<data element_type="f16" offset="283738" shape="1,120,1,1" size="240"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="151" name="MobilenetV3/expanded_conv_6/expand/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_6/expand/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="152" name="MobilenetV3/expanded_conv_6/expand/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_6/expansion_output:0,MobilenetV3/expanded_conv_6/expand/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="153" name="1577115774_const" type="Const" version="opset1">
+			<data element_type="f16" offset="283978" shape="120,1,1,5,5" size="6000"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_6/depthwise/depthwise_weights/read:0" precision="FP16">
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="154" name="MobilenetV3/expanded_conv_6/depthwise/depthwise" type="GroupConvolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="155" name="data_add_913691419414/EltwiseUnsqueeze9703_const" type="Const" version="opset1">
+			<data element_type="f16" offset="289978" shape="1,120,1,1" size="240"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="156" name="MobilenetV3/expanded_conv_6/depthwise/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_6/depthwise/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="157" name="MobilenetV3/expanded_conv_6/depthwise/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_6/depthwise_output:0,MobilenetV3/expanded_conv_6/depthwise/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="158" name="MobilenetV3/expanded_conv_6/squeeze_excite/AvgPool" type="AvgPool" version="opset1">
+			<data auto_pad="valid" exclude-pad="true" kernel="14,14" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_6/squeeze_excite/AvgPool:0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="159" name="MobilenetV3/expanded_conv_6/squeeze_excite/Conv/Conv2D/Transpose11934_const" type="Const" version="opset1">
+			<data element_type="f16" offset="290218" shape="32,120,1,1" size="7680"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_6/squeeze_excite/Conv/weights/read:0" precision="FP16">
+					<dim>32</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="160" name="MobilenetV3/expanded_conv_6/squeeze_excite/Conv/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>32</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_6/squeeze_excite/Conv/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>32</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="161" name="MobilenetV3/expanded_conv_6/squeeze_excite/Conv/biases/read/EltwiseUnsqueeze9491_const" type="Const" version="opset1">
+			<data element_type="f16" offset="297898" shape="1,32,1,1" size="64"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_6/squeeze_excite/Conv/biases/read:0" precision="FP16">
+					<dim>1</dim>
+					<dim>32</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="162" name="MobilenetV3/expanded_conv_6/squeeze_excite/Conv/BiasAdd/Add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>32</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>32</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_6/squeeze_excite/Conv/BiasAdd:0" precision="FP16">
+					<dim>1</dim>
+					<dim>32</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="163" name="MobilenetV3/expanded_conv_6/squeeze_excite/Conv/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>32</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_6/squeeze_excite/Conv/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>32</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="164" name="MobilenetV3/expanded_conv_6/squeeze_excite/Conv_1/Conv2D/Transpose11938_const" type="Const" version="opset1">
+			<data element_type="f16" offset="297962" shape="120,32,1,1" size="7680"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_6/squeeze_excite/Conv_1/weights/read:0" precision="FP16">
+					<dim>120</dim>
+					<dim>32</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="165" name="MobilenetV3/expanded_conv_6/squeeze_excite/Conv_1/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>32</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>120</dim>
+					<dim>32</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_6/squeeze_excite/Conv_1/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="166" name="data_add_914391459415/EltwiseUnsqueeze9707_const" type="Const" version="opset1">
+			<data element_type="f16" offset="305642" shape="1,120,1,1" size="240"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="167" name="MobilenetV3/expanded_conv_6/squeeze_excite/Conv_1/BiasAdd/Add/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_6/squeeze_excite/Conv_1/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="168" name="MobilenetV3/expanded_conv_6/squeeze_excite/Conv_1/Relu6" type="Clamp" version="opset1">
+			<data max="6.0" min="0.0"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_6/squeeze_excite/Conv_1/Relu6:0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="169" name="MobilenetV3/expanded_conv_6/squeeze_excite/Conv_1/mul/y/EltwiseUnsqueeze9467_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1784" shape="1,1,1,1" size="2"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_6/squeeze_excite/Conv_1/mul/y:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="170" name="MobilenetV3/expanded_conv_6/squeeze_excite/Conv_1/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_6/squeeze_excite/excite:0,MobilenetV3/expanded_conv_6/squeeze_excite/Conv_1/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="171" name="MobilenetV3/expanded_conv_6/squeeze_excite/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_6/squeeze_excite/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="172" name="MobilenetV3/expanded_conv_6/project/Conv2D/Transpose11942_const" type="Const" version="opset1">
+			<data element_type="f16" offset="305882" shape="48,120,1,1" size="11520"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_6/project/weights/read:0" precision="FP16">
+					<dim>48</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="173" name="MobilenetV3/expanded_conv_6/project/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>120</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>48</dim>
+					<dim>120</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="174" name="data_add_914891539417/EltwiseUnsqueeze9715_const" type="Const" version="opset1">
+			<data element_type="f16" offset="317402" shape="1,48,1,1" size="96"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="175" name="MobilenetV3/expanded_conv_6/project/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_7/input:0,MobilenetV3/expanded_conv_6/output:0,MobilenetV3/expanded_conv_6/project/Identity:0,MobilenetV3/expanded_conv_6/project/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="176" name="MobilenetV3/expanded_conv_7/expand/Conv2D/Transpose11946_const" type="Const" version="opset1">
+			<data element_type="f16" offset="317498" shape="144,48,1,1" size="13824"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_7/expand/weights/read:0" precision="FP16">
+					<dim>144</dim>
+					<dim>48</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="177" name="MobilenetV3/expanded_conv_7/expand/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>144</dim>
+					<dim>48</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="178" name="data_add_915691619419/EltwiseUnsqueeze9723_const" type="Const" version="opset1">
+			<data element_type="f16" offset="331322" shape="1,144,1,1" size="288"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="179" name="MobilenetV3/expanded_conv_7/expand/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_7/expand/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="180" name="MobilenetV3/expanded_conv_7/expand/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_7/expansion_output:0,MobilenetV3/expanded_conv_7/expand/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="181" name="1575515758_const" type="Const" version="opset1">
+			<data element_type="f16" offset="331610" shape="144,1,1,5,5" size="7200"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_7/depthwise/depthwise_weights/read:0" precision="FP16">
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="182" name="MobilenetV3/expanded_conv_7/depthwise/depthwise" type="GroupConvolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="183" name="data_add_916491699421/EltwiseUnsqueeze9731_const" type="Const" version="opset1">
+			<data element_type="f16" offset="338810" shape="1,144,1,1" size="288"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="184" name="MobilenetV3/expanded_conv_7/depthwise/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_7/depthwise/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="185" name="MobilenetV3/expanded_conv_7/depthwise/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_7/depthwise_output:0,MobilenetV3/expanded_conv_7/depthwise/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="186" name="MobilenetV3/expanded_conv_7/squeeze_excite/AvgPool" type="AvgPool" version="opset1">
+			<data auto_pad="valid" exclude-pad="true" kernel="14,14" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_7/squeeze_excite/AvgPool:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="187" name="MobilenetV3/expanded_conv_7/squeeze_excite/Conv/Conv2D/Transpose11954_const" type="Const" version="opset1">
+			<data element_type="f16" offset="339098" shape="40,144,1,1" size="11520"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_7/squeeze_excite/Conv/weights/read:0" precision="FP16">
+					<dim>40</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="188" name="MobilenetV3/expanded_conv_7/squeeze_excite/Conv/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>40</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_7/squeeze_excite/Conv/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="189" name="MobilenetV3/expanded_conv_7/squeeze_excite/Conv/biases/read/EltwiseUnsqueeze9527_const" type="Const" version="opset1">
+			<data element_type="f16" offset="350618" shape="1,40,1,1" size="80"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_7/squeeze_excite/Conv/biases/read:0" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="190" name="MobilenetV3/expanded_conv_7/squeeze_excite/Conv/BiasAdd/Add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_7/squeeze_excite/Conv/BiasAdd:0" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="191" name="MobilenetV3/expanded_conv_7/squeeze_excite/Conv/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_7/squeeze_excite/Conv/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="192" name="MobilenetV3/expanded_conv_7/squeeze_excite/Conv_1/Conv2D/Transpose11958_const" type="Const" version="opset1">
+			<data element_type="f16" offset="350698" shape="144,40,1,1" size="11520"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_7/squeeze_excite/Conv_1/weights/read:0" precision="FP16">
+					<dim>144</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="193" name="MobilenetV3/expanded_conv_7/squeeze_excite/Conv_1/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>144</dim>
+					<dim>40</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_7/squeeze_excite/Conv_1/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="194" name="data_add_917191739422/EltwiseUnsqueeze9735_const" type="Const" version="opset1">
+			<data element_type="f16" offset="362218" shape="1,144,1,1" size="288"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="195" name="MobilenetV3/expanded_conv_7/squeeze_excite/Conv_1/BiasAdd/Add/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_7/squeeze_excite/Conv_1/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="196" name="MobilenetV3/expanded_conv_7/squeeze_excite/Conv_1/Relu6" type="Clamp" version="opset1">
+			<data max="6.0" min="0.0"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_7/squeeze_excite/Conv_1/Relu6:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="197" name="MobilenetV3/expanded_conv_7/squeeze_excite/Conv_1/mul/y/EltwiseUnsqueeze9471_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1784" shape="1,1,1,1" size="2"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_7/squeeze_excite/Conv_1/mul/y:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="198" name="MobilenetV3/expanded_conv_7/squeeze_excite/Conv_1/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_7/squeeze_excite/excite:0,MobilenetV3/expanded_conv_7/squeeze_excite/Conv_1/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="199" name="MobilenetV3/expanded_conv_7/squeeze_excite/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_7/squeeze_excite/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="200" name="MobilenetV3/expanded_conv_7/project/Conv2D/Transpose11962_const" type="Const" version="opset1">
+			<data element_type="f16" offset="362506" shape="48,144,1,1" size="13824"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_7/project/weights/read:0" precision="FP16">
+					<dim>48</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="201" name="MobilenetV3/expanded_conv_7/project/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>48</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="202" name="data_add_917691819424/EltwiseUnsqueeze9743_const" type="Const" version="opset1">
+			<data element_type="f16" offset="376330" shape="1,48,1,1" size="96"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="203" name="MobilenetV3/expanded_conv_7/project/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_7/project/Identity:0,MobilenetV3/expanded_conv_7/project/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="204" name="MobilenetV3/expanded_conv_7/add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_8/input:0,MobilenetV3/expanded_conv_7/output:0,MobilenetV3/expanded_conv_7/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="205" name="MobilenetV3/expanded_conv_8/expand/Conv2D/Transpose11966_const" type="Const" version="opset1">
+			<data element_type="f16" offset="376426" shape="288,48,1,1" size="27648"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_8/expand/weights/read:0" precision="FP16">
+					<dim>288</dim>
+					<dim>48</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="206" name="MobilenetV3/expanded_conv_8/expand/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>48</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>288</dim>
+					<dim>48</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="207" name="data_add_918491899426/EltwiseUnsqueeze9751_const" type="Const" version="opset1">
+			<data element_type="f16" offset="404074" shape="1,288,1,1" size="576"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="208" name="MobilenetV3/expanded_conv_8/expand/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_8/expand/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="209" name="MobilenetV3/expanded_conv_8/expand/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_8/expansion_output:0,MobilenetV3/expanded_conv_8/expand/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="210" name="1575115754_const" type="Const" version="opset1">
+			<data element_type="f16" offset="404650" shape="288,1,1,5,5" size="14400"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_8/depthwise/depthwise_weights/read:0" precision="FP16">
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="211" name="MobilenetV3/expanded_conv_8/depthwise/depthwise" type="GroupConvolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="2,2"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>14</dim>
+					<dim>14</dim>
+				</port>
+				<port id="1">
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="212" name="data_add_919291979428/EltwiseUnsqueeze9759_const" type="Const" version="opset1">
+			<data element_type="f16" offset="419050" shape="1,288,1,1" size="576"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="213" name="MobilenetV3/expanded_conv_8/depthwise/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_8/depthwise/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="214" name="MobilenetV3/expanded_conv_8/depthwise/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_8/depthwise_output:0,MobilenetV3/expanded_conv_8/depthwise/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="215" name="MobilenetV3/expanded_conv_8/squeeze_excite/AvgPool" type="AvgPool" version="opset1">
+			<data auto_pad="valid" exclude-pad="true" kernel="7,7" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_8/squeeze_excite/AvgPool:0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="216" name="MobilenetV3/expanded_conv_8/squeeze_excite/Conv/Conv2D/Transpose11974_const" type="Const" version="opset1">
+			<data element_type="f16" offset="419626" shape="72,288,1,1" size="41472"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_8/squeeze_excite/Conv/weights/read:0" precision="FP16">
+					<dim>72</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="217" name="MobilenetV3/expanded_conv_8/squeeze_excite/Conv/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>72</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_8/squeeze_excite/Conv/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="218" name="MobilenetV3/expanded_conv_8/squeeze_excite/Conv/biases/read/EltwiseUnsqueeze9487_const" type="Const" version="opset1">
+			<data element_type="f16" offset="461098" shape="1,72,1,1" size="144"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_8/squeeze_excite/Conv/biases/read:0" precision="FP16">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="219" name="MobilenetV3/expanded_conv_8/squeeze_excite/Conv/BiasAdd/Add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_8/squeeze_excite/Conv/BiasAdd:0" precision="FP16">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="220" name="MobilenetV3/expanded_conv_8/squeeze_excite/Conv/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_8/squeeze_excite/Conv/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="221" name="MobilenetV3/expanded_conv_8/squeeze_excite/Conv_1/Conv2D/Transpose11978_const" type="Const" version="opset1">
+			<data element_type="f16" offset="461242" shape="288,72,1,1" size="41472"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_8/squeeze_excite/Conv_1/weights/read:0" precision="FP16">
+					<dim>288</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="222" name="MobilenetV3/expanded_conv_8/squeeze_excite/Conv_1/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>288</dim>
+					<dim>72</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_8/squeeze_excite/Conv_1/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="223" name="data_add_919992019429/EltwiseUnsqueeze9763_const" type="Const" version="opset1">
+			<data element_type="f16" offset="502714" shape="1,288,1,1" size="576"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="224" name="MobilenetV3/expanded_conv_8/squeeze_excite/Conv_1/BiasAdd/Add/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_8/squeeze_excite/Conv_1/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="225" name="MobilenetV3/expanded_conv_8/squeeze_excite/Conv_1/Relu6" type="Clamp" version="opset1">
+			<data max="6.0" min="0.0"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_8/squeeze_excite/Conv_1/Relu6:0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="226" name="MobilenetV3/expanded_conv_8/squeeze_excite/Conv_1/mul/y/EltwiseUnsqueeze9475_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1784" shape="1,1,1,1" size="2"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_8/squeeze_excite/Conv_1/mul/y:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="227" name="MobilenetV3/expanded_conv_8/squeeze_excite/Conv_1/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_8/squeeze_excite/excite:0,MobilenetV3/expanded_conv_8/squeeze_excite/Conv_1/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="228" name="MobilenetV3/expanded_conv_8/squeeze_excite/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_8/squeeze_excite/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="229" name="MobilenetV3/expanded_conv_8/project/Conv2D/Transpose11982_const" type="Const" version="opset1">
+			<data element_type="f16" offset="503290" shape="96,288,1,1" size="55296"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_8/project/weights/read:0" precision="FP16">
+					<dim>96</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="230" name="MobilenetV3/expanded_conv_8/project/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>288</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>96</dim>
+					<dim>288</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="231" name="data_add_920492099431/EltwiseUnsqueeze9771_const" type="Const" version="opset1">
+			<data element_type="f16" offset="558586" shape="1,96,1,1" size="192"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="232" name="MobilenetV3/expanded_conv_8/project/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_9/input:0,MobilenetV3/expanded_conv_8/output:0,MobilenetV3/expanded_conv_8/project/Identity:0,MobilenetV3/expanded_conv_8/project/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="233" name="MobilenetV3/expanded_conv_9/expand/Conv2D/Transpose11986_const" type="Const" version="opset1">
+			<data element_type="f16" offset="558778" shape="576,96,1,1" size="110592"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_9/expand/weights/read:0" precision="FP16">
+					<dim>576</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="234" name="MobilenetV3/expanded_conv_9/expand/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>576</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="235" name="data_add_921292179433/EltwiseUnsqueeze9779_const" type="Const" version="opset1">
+			<data element_type="f16" offset="669370" shape="1,576,1,1" size="1152"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="236" name="MobilenetV3/expanded_conv_9/expand/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_9/expand/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="237" name="MobilenetV3/expanded_conv_9/expand/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_9/expansion_output:0,MobilenetV3/expanded_conv_9/expand/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="238" name="1578315786_const" type="Const" version="opset1">
+			<data element_type="f16" offset="670522" shape="576,1,1,5,5" size="28800"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_9/depthwise/depthwise_weights/read:0" precision="FP16">
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="239" name="MobilenetV3/expanded_conv_9/depthwise/depthwise" type="GroupConvolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="240" name="data_add_922092259435/EltwiseUnsqueeze9787_const" type="Const" version="opset1">
+			<data element_type="f16" offset="699322" shape="1,576,1,1" size="1152"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="241" name="MobilenetV3/expanded_conv_9/depthwise/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_9/depthwise/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="242" name="MobilenetV3/expanded_conv_9/depthwise/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_9/depthwise_output:0,MobilenetV3/expanded_conv_9/depthwise/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="243" name="MobilenetV3/expanded_conv_9/squeeze_excite/AvgPool" type="AvgPool" version="opset1">
+			<data auto_pad="valid" exclude-pad="true" kernel="7,7" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_9/squeeze_excite/AvgPool:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="244" name="MobilenetV3/expanded_conv_9/squeeze_excite/Conv/Conv2D/Transpose11994_const" type="Const" version="opset1">
+			<data element_type="f16" offset="700474" shape="144,576,1,1" size="165888"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_9/squeeze_excite/Conv/weights/read:0" precision="FP16">
+					<dim>144</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="245" name="MobilenetV3/expanded_conv_9/squeeze_excite/Conv/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>144</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_9/squeeze_excite/Conv/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="246" name="MobilenetV3/expanded_conv_9/squeeze_excite/Conv/biases/read/EltwiseUnsqueeze9519_const" type="Const" version="opset1">
+			<data element_type="f16" offset="866362" shape="1,144,1,1" size="288"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_9/squeeze_excite/Conv/biases/read:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="247" name="MobilenetV3/expanded_conv_9/squeeze_excite/Conv/BiasAdd/Add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_9/squeeze_excite/Conv/BiasAdd:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="248" name="MobilenetV3/expanded_conv_9/squeeze_excite/Conv/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_9/squeeze_excite/Conv/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="249" name="MobilenetV3/expanded_conv_9/squeeze_excite/Conv_1/Conv2D/Transpose11998_const" type="Const" version="opset1">
+			<data element_type="f16" offset="866650" shape="576,144,1,1" size="165888"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_9/squeeze_excite/Conv_1/weights/read:0" precision="FP16">
+					<dim>576</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="250" name="MobilenetV3/expanded_conv_9/squeeze_excite/Conv_1/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>576</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_9/squeeze_excite/Conv_1/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="251" name="data_add_922792299436/EltwiseUnsqueeze9791_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1032538" shape="1,576,1,1" size="1152"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="252" name="MobilenetV3/expanded_conv_9/squeeze_excite/Conv_1/BiasAdd/Add/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_9/squeeze_excite/Conv_1/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="253" name="MobilenetV3/expanded_conv_9/squeeze_excite/Conv_1/Relu6" type="Clamp" version="opset1">
+			<data max="6.0" min="0.0"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_9/squeeze_excite/Conv_1/Relu6:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="254" name="MobilenetV3/expanded_conv_9/squeeze_excite/Conv_1/mul/y/EltwiseUnsqueeze9479_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1784" shape="1,1,1,1" size="2"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_9/squeeze_excite/Conv_1/mul/y:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="255" name="MobilenetV3/expanded_conv_9/squeeze_excite/Conv_1/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_9/squeeze_excite/excite:0,MobilenetV3/expanded_conv_9/squeeze_excite/Conv_1/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="256" name="MobilenetV3/expanded_conv_9/squeeze_excite/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_9/squeeze_excite/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="257" name="MobilenetV3/expanded_conv_9/project/Conv2D/Transpose12002_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1033690" shape="96,576,1,1" size="110592"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_9/project/weights/read:0" precision="FP16">
+					<dim>96</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="258" name="MobilenetV3/expanded_conv_9/project/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>96</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="259" name="data_add_923292379438/EltwiseUnsqueeze9799_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1144282" shape="1,96,1,1" size="192"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="260" name="MobilenetV3/expanded_conv_9/project/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_9/project/Identity:0,MobilenetV3/expanded_conv_9/project/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="261" name="MobilenetV3/expanded_conv_9/add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_10/input:0,MobilenetV3/expanded_conv_9/output:0,MobilenetV3/expanded_conv_9/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="262" name="MobilenetV3/expanded_conv_10/expand/Conv2D/Transpose12006_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1144474" shape="576,96,1,1" size="110592"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_10/expand/weights/read:0" precision="FP16">
+					<dim>576</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="263" name="MobilenetV3/expanded_conv_10/expand/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>576</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="264" name="data_add_924092459440/EltwiseUnsqueeze9807_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1255066" shape="1,576,1,1" size="1152"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="265" name="MobilenetV3/expanded_conv_10/expand/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_10/expand/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="266" name="MobilenetV3/expanded_conv_10/expand/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_10/expansion_output:0,MobilenetV3/expanded_conv_10/expand/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="267" name="1577515778_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1256218" shape="576,1,1,5,5" size="28800"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_10/depthwise/depthwise_weights/read:0" precision="FP16">
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="268" name="MobilenetV3/expanded_conv_10/depthwise/depthwise" type="GroupConvolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>5</dim>
+					<dim>5</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="269" name="data_add_924892539442/EltwiseUnsqueeze9815_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1285018" shape="1,576,1,1" size="1152"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="270" name="MobilenetV3/expanded_conv_10/depthwise/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_10/depthwise/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="271" name="MobilenetV3/expanded_conv_10/depthwise/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_10/depthwise_output:0,MobilenetV3/expanded_conv_10/depthwise/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="272" name="MobilenetV3/expanded_conv_10/squeeze_excite/AvgPool" type="AvgPool" version="opset1">
+			<data auto_pad="valid" exclude-pad="true" kernel="7,7" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_10/squeeze_excite/AvgPool:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="273" name="MobilenetV3/expanded_conv_10/squeeze_excite/Conv/Conv2D/Transpose12014_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1286170" shape="144,576,1,1" size="165888"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_10/squeeze_excite/Conv/weights/read:0" precision="FP16">
+					<dim>144</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="274" name="MobilenetV3/expanded_conv_10/squeeze_excite/Conv/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>144</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_10/squeeze_excite/Conv/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="275" name="MobilenetV3/expanded_conv_10/squeeze_excite/Conv/biases/read/EltwiseUnsqueeze9507_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1452058" shape="1,144,1,1" size="288"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_10/squeeze_excite/Conv/biases/read:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="276" name="MobilenetV3/expanded_conv_10/squeeze_excite/Conv/BiasAdd/Add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_10/squeeze_excite/Conv/BiasAdd:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="277" name="MobilenetV3/expanded_conv_10/squeeze_excite/Conv/Relu" type="ReLU" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_10/squeeze_excite/Conv/Relu:0" precision="FP16">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="278" name="MobilenetV3/expanded_conv_10/squeeze_excite/Conv_1/Conv2D/Transpose12018_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1452346" shape="576,144,1,1" size="165888"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_10/squeeze_excite/Conv_1/weights/read:0" precision="FP16">
+					<dim>576</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="279" name="MobilenetV3/expanded_conv_10/squeeze_excite/Conv_1/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>576</dim>
+					<dim>144</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_10/squeeze_excite/Conv_1/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="280" name="data_add_925592579443/EltwiseUnsqueeze9819_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1618234" shape="1,576,1,1" size="1152"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="281" name="MobilenetV3/expanded_conv_10/squeeze_excite/Conv_1/BiasAdd/Add/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_10/squeeze_excite/Conv_1/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="282" name="MobilenetV3/expanded_conv_10/squeeze_excite/Conv_1/Relu6" type="Clamp" version="opset1">
+			<data max="6.0" min="0.0"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/expanded_conv_10/squeeze_excite/Conv_1/Relu6:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="283" name="MobilenetV3/expanded_conv_10/squeeze_excite/Conv_1/mul/y/EltwiseUnsqueeze9483_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1784" shape="1,1,1,1" size="2"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_10/squeeze_excite/Conv_1/mul/y:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="284" name="MobilenetV3/expanded_conv_10/squeeze_excite/Conv_1/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_10/squeeze_excite/excite:0,MobilenetV3/expanded_conv_10/squeeze_excite/Conv_1/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="285" name="MobilenetV3/expanded_conv_10/squeeze_excite/mul" type="Multiply" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_10/squeeze_excite/mul:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="286" name="MobilenetV3/expanded_conv_10/project/Conv2D/Transpose12022_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1619386" shape="96,576,1,1" size="110592"/>
+			<output>
+				<port id="0" names="MobilenetV3/expanded_conv_10/project/weights/read:0" precision="FP16">
+					<dim>96</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="287" name="MobilenetV3/expanded_conv_10/project/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>96</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="288" name="data_add_926092659445/EltwiseUnsqueeze9827_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1729978" shape="1,96,1,1" size="192"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="289" name="MobilenetV3/expanded_conv_10/project/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_10/project/Identity:0,MobilenetV3/expanded_conv_10/project/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="290" name="MobilenetV3/expanded_conv_10/add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/expanded_conv_10/output:0,MobilenetV3/expanded_conv_10/add:0" precision="FP16">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="291" name="MobilenetV3/Conv_1/Conv2D/Transpose12026_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1730170" shape="576,96,1,1" size="110592"/>
+			<output>
+				<port id="0" names="MobilenetV3/Conv_1/weights/read:0" precision="FP16">
+					<dim>576</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="292" name="MobilenetV3/Conv_1/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>96</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>576</dim>
+					<dim>96</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="293" name="data_add_926892739447/EltwiseUnsqueeze9835_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1840762" shape="1,576,1,1" size="1152"/>
+			<output>
+				<port id="0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="294" name="MobilenetV3/Conv_1/BatchNorm/FusedBatchNorm/variance/Fused_Add_" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/Conv_1/BatchNorm/FusedBatchNorm:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="295" name="MobilenetV3/Conv_1/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/Conv_1/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="296" name="MobilenetV3/AvgPool2D/AvgPool" type="AvgPool" version="opset1">
+			<data auto_pad="valid" exclude-pad="true" kernel="7,7" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>7</dim>
+					<dim>7</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/AvgPool2D/AvgPool:0" precision="FP16">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="297" name="MobilenetV3/Conv_2/Conv2D/Transpose12030_const" type="Const" version="opset1">
+			<data element_type="f16" offset="1841914" shape="1024,576,1,1" size="1179648"/>
+			<output>
+				<port id="0" names="MobilenetV3/Conv_2/weights/read:0" precision="FP16">
+					<dim>1024</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="298" name="MobilenetV3/Conv_2/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1024</dim>
+					<dim>576</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/Conv_2/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1024</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="299" name="MobilenetV3/Conv_2/biases/read/EltwiseUnsqueeze9495_const" type="Const" version="opset1">
+			<data element_type="f16" offset="3021562" shape="1,1024,1,1" size="2048"/>
+			<output>
+				<port id="0" names="MobilenetV3/Conv_2/biases/read:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1024</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="300" name="MobilenetV3/Conv_2/BiasAdd/Add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1024</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1024</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/Conv_2/BiasAdd:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1024</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="301" name="MobilenetV3/Conv_2/hard_swish/mul_1" type="HSwish" version="opset4">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1024</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/Conv_2/hard_swish/mul_1:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1024</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="302" name="MobilenetV3/Logits/AvgPool" type="AvgPool" version="opset1">
+			<data auto_pad="valid" exclude-pad="true" kernel="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1024</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" names="MobilenetV3/Logits/Dropout_1b/Identity:0,MobilenetV3/Logits/AvgPool:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1024</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="303" name="MobilenetV3/Logits/Conv2d_1c_1x1/Conv2D/Transpose12034_const" type="Const" version="opset1">
+			<data element_type="f16" offset="3023610" shape="1001,1024,1,1" size="2050048"/>
+			<output>
+				<port id="0" names="MobilenetV3/Logits/Conv2d_1c_1x1/weights/read:0" precision="FP16">
+					<dim>1001</dim>
+					<dim>1024</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="304" name="MobilenetV3/Logits/Conv2d_1c_1x1/Conv2D" type="Convolution" version="opset1">
+			<data auto_pad="same_upper" dilations="1,1" pads_begin="0,0" pads_end="0,0" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1024</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1001</dim>
+					<dim>1024</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/Logits/Conv2d_1c_1x1/Conv2D:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1001</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="305" name="MobilenetV3/Logits/Conv2d_1c_1x1/biases/read/EltwiseUnsqueeze9515_const" type="Const" version="opset1">
+			<data element_type="f16" offset="5073658" shape="1,1001,1,1" size="2002"/>
+			<output>
+				<port id="0" names="MobilenetV3/Logits/Conv2d_1c_1x1/biases/read:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1001</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="306" name="MobilenetV3/Logits/Conv2d_1c_1x1/BiasAdd/Add" type="Add" version="opset1">
+			<data auto_broadcast="numpy"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1001</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1001</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="FP16">
+					<dim>1</dim>
+					<dim>1001</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="307" name="MobilenetV3/Logits/Conv2d_1c_1x1/BiasAdd/Add/Transpose/Cast_116036_const" type="Const" version="opset1">
+			<data element_type="i64" offset="5075660" shape="4" size="32"/>
+			<output>
+				<port id="0" precision="I64">
+					<dim>4</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="308" name="MobilenetV3/Logits/Conv2d_1c_1x1/BiasAdd/Add/Transpose" type="Transpose" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1001</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>4</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/Logits/Conv2d_1c_1x1/BiasAdd:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1001</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="309" name="MobilenetV3/Logits/SpatialSqueeze/Dims/Output_0/Data__const" type="Const" version="opset1">
+			<data element_type="i64" offset="5075692" shape="2" size="16"/>
+			<output>
+				<port id="0" precision="I64">
+					<dim>2</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="310" name="MobilenetV3/Logits/SpatialSqueeze" type="Squeeze" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1001</dim>
+				</port>
+				<port id="1">
+					<dim>2</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/Logits/result:0,MobilenetV3/Logits/SpatialSqueeze:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1001</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="311" name="MobilenetV3/Predictions/Reshape/Cast_116038_const" type="Const" version="opset1">
+			<data element_type="i64" offset="5075708" shape="2" size="16"/>
+			<output>
+				<port id="0" names="MobilenetV3/Predictions/Reshape/shape:0" precision="I64">
+					<dim>2</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="312" name="MobilenetV3/Predictions/Reshape" type="Reshape" version="opset1">
+			<data special_zero="false"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1001</dim>
+				</port>
+				<port id="1">
+					<dim>2</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" names="MobilenetV3/Predictions/Reshape:0" precision="FP16">
+					<dim>1</dim>
+					<dim>1001</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="313" name="MobilenetV3/Predictions/Softmax" type="SoftMax" version="opset1">
+			<data axis="1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1001</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" precision="FP16">
+					<dim>1</dim>
+					<dim>1001</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="314" name="MobilenetV3/Predictions/Softmax/sink_port_0" type="Result" version="opset1">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1001</dim>
+				</port>
+			</input>
+		</layer>
+	</layers>
+	<edges>
+		<edge from-layer="0" from-port="0" to-layer="2" to-port="0"/>
+		<edge from-layer="1" from-port="0" to-layer="2" to-port="1"/>
+		<edge from-layer="2" from-port="2" to-layer="4" to-port="0"/>
+		<edge from-layer="3" from-port="0" to-layer="4" to-port="1"/>
+		<edge from-layer="4" from-port="2" to-layer="6" to-port="0"/>
+		<edge from-layer="5" from-port="0" to-layer="6" to-port="1"/>
+		<edge from-layer="6" from-port="2" to-layer="8" to-port="0"/>
+		<edge from-layer="7" from-port="0" to-layer="8" to-port="1"/>
+		<edge from-layer="8" from-port="2" to-layer="9" to-port="0"/>
+		<edge from-layer="9" from-port="1" to-layer="11" to-port="0"/>
+		<edge from-layer="10" from-port="0" to-layer="11" to-port="1"/>
+		<edge from-layer="11" from-port="2" to-layer="13" to-port="0"/>
+		<edge from-layer="12" from-port="0" to-layer="13" to-port="1"/>
+		<edge from-layer="13" from-port="2" to-layer="14" to-port="0"/>
+		<edge from-layer="14" from-port="1" to-layer="15" to-port="0"/>
+		<edge from-layer="15" from-port="1" to-layer="17" to-port="0"/>
+		<edge from-layer="16" from-port="0" to-layer="17" to-port="1"/>
+		<edge from-layer="17" from-port="2" to-layer="19" to-port="0"/>
+		<edge from-layer="18" from-port="0" to-layer="19" to-port="1"/>
+		<edge from-layer="19" from-port="2" to-layer="20" to-port="0"/>
+		<edge from-layer="20" from-port="1" to-layer="22" to-port="0"/>
+		<edge from-layer="21" from-port="0" to-layer="22" to-port="1"/>
+		<edge from-layer="22" from-port="2" to-layer="24" to-port="0"/>
+		<edge from-layer="23" from-port="0" to-layer="24" to-port="1"/>
+		<edge from-layer="24" from-port="2" to-layer="25" to-port="0"/>
+		<edge from-layer="25" from-port="1" to-layer="27" to-port="0"/>
+		<edge from-layer="26" from-port="0" to-layer="27" to-port="1"/>
+		<edge from-layer="14" from-port="1" to-layer="28" to-port="0"/>
+		<edge from-layer="27" from-port="2" to-layer="28" to-port="1"/>
+		<edge from-layer="28" from-port="2" to-layer="30" to-port="0"/>
+		<edge from-layer="29" from-port="0" to-layer="30" to-port="1"/>
+		<edge from-layer="30" from-port="2" to-layer="32" to-port="0"/>
+		<edge from-layer="31" from-port="0" to-layer="32" to-port="1"/>
+		<edge from-layer="32" from-port="2" to-layer="34" to-port="0"/>
+		<edge from-layer="33" from-port="0" to-layer="34" to-port="1"/>
+		<edge from-layer="34" from-port="2" to-layer="36" to-port="0"/>
+		<edge from-layer="35" from-port="0" to-layer="36" to-port="1"/>
+		<edge from-layer="36" from-port="2" to-layer="37" to-port="0"/>
+		<edge from-layer="37" from-port="1" to-layer="39" to-port="0"/>
+		<edge from-layer="38" from-port="0" to-layer="39" to-port="1"/>
+		<edge from-layer="39" from-port="2" to-layer="41" to-port="0"/>
+		<edge from-layer="40" from-port="0" to-layer="41" to-port="1"/>
+		<edge from-layer="41" from-port="2" to-layer="42" to-port="0"/>
+		<edge from-layer="42" from-port="1" to-layer="44" to-port="0"/>
+		<edge from-layer="43" from-port="0" to-layer="44" to-port="1"/>
+		<edge from-layer="44" from-port="2" to-layer="46" to-port="0"/>
+		<edge from-layer="45" from-port="0" to-layer="46" to-port="1"/>
+		<edge from-layer="46" from-port="2" to-layer="48" to-port="0"/>
+		<edge from-layer="47" from-port="0" to-layer="48" to-port="1"/>
+		<edge from-layer="48" from-port="2" to-layer="50" to-port="0"/>
+		<edge from-layer="49" from-port="0" to-layer="50" to-port="1"/>
+		<edge from-layer="50" from-port="2" to-layer="51" to-port="0"/>
+		<edge from-layer="51" from-port="1" to-layer="53" to-port="0"/>
+		<edge from-layer="52" from-port="0" to-layer="53" to-port="1"/>
+		<edge from-layer="53" from-port="2" to-layer="55" to-port="0"/>
+		<edge from-layer="54" from-port="0" to-layer="55" to-port="1"/>
+		<edge from-layer="55" from-port="2" to-layer="56" to-port="0"/>
+		<edge from-layer="56" from-port="1" to-layer="58" to-port="0"/>
+		<edge from-layer="57" from-port="0" to-layer="58" to-port="1"/>
+		<edge from-layer="58" from-port="2" to-layer="60" to-port="0"/>
+		<edge from-layer="59" from-port="0" to-layer="60" to-port="1"/>
+		<edge from-layer="60" from-port="2" to-layer="61" to-port="0"/>
+		<edge from-layer="46" from-port="2" to-layer="61" to-port="1"/>
+		<edge from-layer="61" from-port="2" to-layer="63" to-port="0"/>
+		<edge from-layer="62" from-port="0" to-layer="63" to-port="1"/>
+		<edge from-layer="63" from-port="2" to-layer="65" to-port="0"/>
+		<edge from-layer="64" from-port="0" to-layer="65" to-port="1"/>
+		<edge from-layer="65" from-port="2" to-layer="66" to-port="0"/>
+		<edge from-layer="66" from-port="1" to-layer="68" to-port="0"/>
+		<edge from-layer="67" from-port="0" to-layer="68" to-port="1"/>
+		<edge from-layer="68" from-port="2" to-layer="70" to-port="0"/>
+		<edge from-layer="69" from-port="0" to-layer="70" to-port="1"/>
+		<edge from-layer="70" from-port="2" to-layer="71" to-port="0"/>
+		<edge from-layer="71" from-port="1" to-layer="72" to-port="0"/>
+		<edge from-layer="72" from-port="1" to-layer="74" to-port="0"/>
+		<edge from-layer="73" from-port="0" to-layer="74" to-port="1"/>
+		<edge from-layer="74" from-port="2" to-layer="76" to-port="0"/>
+		<edge from-layer="75" from-port="0" to-layer="76" to-port="1"/>
+		<edge from-layer="76" from-port="2" to-layer="77" to-port="0"/>
+		<edge from-layer="77" from-port="1" to-layer="79" to-port="0"/>
+		<edge from-layer="78" from-port="0" to-layer="79" to-port="1"/>
+		<edge from-layer="79" from-port="2" to-layer="81" to-port="0"/>
+		<edge from-layer="80" from-port="0" to-layer="81" to-port="1"/>
+		<edge from-layer="81" from-port="2" to-layer="82" to-port="0"/>
+		<edge from-layer="82" from-port="1" to-layer="84" to-port="0"/>
+		<edge from-layer="83" from-port="0" to-layer="84" to-port="1"/>
+		<edge from-layer="71" from-port="1" to-layer="85" to-port="0"/>
+		<edge from-layer="84" from-port="2" to-layer="85" to-port="1"/>
+		<edge from-layer="85" from-port="2" to-layer="87" to-port="0"/>
+		<edge from-layer="86" from-port="0" to-layer="87" to-port="1"/>
+		<edge from-layer="87" from-port="2" to-layer="89" to-port="0"/>
+		<edge from-layer="88" from-port="0" to-layer="89" to-port="1"/>
+		<edge from-layer="89" from-port="2" to-layer="91" to-port="0"/>
+		<edge from-layer="90" from-port="0" to-layer="91" to-port="1"/>
+		<edge from-layer="91" from-port="2" to-layer="93" to-port="0"/>
+		<edge from-layer="92" from-port="0" to-layer="93" to-port="1"/>
+		<edge from-layer="93" from-port="2" to-layer="94" to-port="0"/>
+		<edge from-layer="94" from-port="1" to-layer="96" to-port="0"/>
+		<edge from-layer="95" from-port="0" to-layer="96" to-port="1"/>
+		<edge from-layer="96" from-port="2" to-layer="98" to-port="0"/>
+		<edge from-layer="97" from-port="0" to-layer="98" to-port="1"/>
+		<edge from-layer="98" from-port="2" to-layer="99" to-port="0"/>
+		<edge from-layer="99" from-port="1" to-layer="100" to-port="0"/>
+		<edge from-layer="100" from-port="1" to-layer="102" to-port="0"/>
+		<edge from-layer="101" from-port="0" to-layer="102" to-port="1"/>
+		<edge from-layer="102" from-port="2" to-layer="104" to-port="0"/>
+		<edge from-layer="103" from-port="0" to-layer="104" to-port="1"/>
+		<edge from-layer="104" from-port="2" to-layer="105" to-port="0"/>
+		<edge from-layer="105" from-port="1" to-layer="107" to-port="0"/>
+		<edge from-layer="106" from-port="0" to-layer="107" to-port="1"/>
+		<edge from-layer="107" from-port="2" to-layer="109" to-port="0"/>
+		<edge from-layer="108" from-port="0" to-layer="109" to-port="1"/>
+		<edge from-layer="109" from-port="2" to-layer="110" to-port="0"/>
+		<edge from-layer="110" from-port="1" to-layer="112" to-port="0"/>
+		<edge from-layer="111" from-port="0" to-layer="112" to-port="1"/>
+		<edge from-layer="99" from-port="1" to-layer="113" to-port="0"/>
+		<edge from-layer="112" from-port="2" to-layer="113" to-port="1"/>
+		<edge from-layer="113" from-port="2" to-layer="115" to-port="0"/>
+		<edge from-layer="114" from-port="0" to-layer="115" to-port="1"/>
+		<edge from-layer="115" from-port="2" to-layer="117" to-port="0"/>
+		<edge from-layer="116" from-port="0" to-layer="117" to-port="1"/>
+		<edge from-layer="117" from-port="2" to-layer="118" to-port="0"/>
+		<edge from-layer="89" from-port="2" to-layer="118" to-port="1"/>
+		<edge from-layer="118" from-port="2" to-layer="120" to-port="0"/>
+		<edge from-layer="119" from-port="0" to-layer="120" to-port="1"/>
+		<edge from-layer="120" from-port="2" to-layer="122" to-port="0"/>
+		<edge from-layer="121" from-port="0" to-layer="122" to-port="1"/>
+		<edge from-layer="122" from-port="2" to-layer="123" to-port="0"/>
+		<edge from-layer="123" from-port="1" to-layer="125" to-port="0"/>
+		<edge from-layer="124" from-port="0" to-layer="125" to-port="1"/>
+		<edge from-layer="125" from-port="2" to-layer="127" to-port="0"/>
+		<edge from-layer="126" from-port="0" to-layer="127" to-port="1"/>
+		<edge from-layer="127" from-port="2" to-layer="128" to-port="0"/>
+		<edge from-layer="128" from-port="1" to-layer="129" to-port="0"/>
+		<edge from-layer="129" from-port="1" to-layer="131" to-port="0"/>
+		<edge from-layer="130" from-port="0" to-layer="131" to-port="1"/>
+		<edge from-layer="131" from-port="2" to-layer="133" to-port="0"/>
+		<edge from-layer="132" from-port="0" to-layer="133" to-port="1"/>
+		<edge from-layer="133" from-port="2" to-layer="134" to-port="0"/>
+		<edge from-layer="134" from-port="1" to-layer="136" to-port="0"/>
+		<edge from-layer="135" from-port="0" to-layer="136" to-port="1"/>
+		<edge from-layer="136" from-port="2" to-layer="138" to-port="0"/>
+		<edge from-layer="137" from-port="0" to-layer="138" to-port="1"/>
+		<edge from-layer="138" from-port="2" to-layer="139" to-port="0"/>
+		<edge from-layer="139" from-port="1" to-layer="141" to-port="0"/>
+		<edge from-layer="140" from-port="0" to-layer="141" to-port="1"/>
+		<edge from-layer="128" from-port="1" to-layer="142" to-port="0"/>
+		<edge from-layer="141" from-port="2" to-layer="142" to-port="1"/>
+		<edge from-layer="142" from-port="2" to-layer="144" to-port="0"/>
+		<edge from-layer="143" from-port="0" to-layer="144" to-port="1"/>
+		<edge from-layer="144" from-port="2" to-layer="146" to-port="0"/>
+		<edge from-layer="145" from-port="0" to-layer="146" to-port="1"/>
+		<edge from-layer="146" from-port="2" to-layer="147" to-port="0"/>
+		<edge from-layer="118" from-port="2" to-layer="147" to-port="1"/>
+		<edge from-layer="147" from-port="2" to-layer="149" to-port="0"/>
+		<edge from-layer="148" from-port="0" to-layer="149" to-port="1"/>
+		<edge from-layer="149" from-port="2" to-layer="151" to-port="0"/>
+		<edge from-layer="150" from-port="0" to-layer="151" to-port="1"/>
+		<edge from-layer="151" from-port="2" to-layer="152" to-port="0"/>
+		<edge from-layer="152" from-port="1" to-layer="154" to-port="0"/>
+		<edge from-layer="153" from-port="0" to-layer="154" to-port="1"/>
+		<edge from-layer="154" from-port="2" to-layer="156" to-port="0"/>
+		<edge from-layer="155" from-port="0" to-layer="156" to-port="1"/>
+		<edge from-layer="156" from-port="2" to-layer="157" to-port="0"/>
+		<edge from-layer="157" from-port="1" to-layer="158" to-port="0"/>
+		<edge from-layer="158" from-port="1" to-layer="160" to-port="0"/>
+		<edge from-layer="159" from-port="0" to-layer="160" to-port="1"/>
+		<edge from-layer="160" from-port="2" to-layer="162" to-port="0"/>
+		<edge from-layer="161" from-port="0" to-layer="162" to-port="1"/>
+		<edge from-layer="162" from-port="2" to-layer="163" to-port="0"/>
+		<edge from-layer="163" from-port="1" to-layer="165" to-port="0"/>
+		<edge from-layer="164" from-port="0" to-layer="165" to-port="1"/>
+		<edge from-layer="165" from-port="2" to-layer="167" to-port="0"/>
+		<edge from-layer="166" from-port="0" to-layer="167" to-port="1"/>
+		<edge from-layer="167" from-port="2" to-layer="168" to-port="0"/>
+		<edge from-layer="168" from-port="1" to-layer="170" to-port="0"/>
+		<edge from-layer="169" from-port="0" to-layer="170" to-port="1"/>
+		<edge from-layer="157" from-port="1" to-layer="171" to-port="0"/>
+		<edge from-layer="170" from-port="2" to-layer="171" to-port="1"/>
+		<edge from-layer="171" from-port="2" to-layer="173" to-port="0"/>
+		<edge from-layer="172" from-port="0" to-layer="173" to-port="1"/>
+		<edge from-layer="173" from-port="2" to-layer="175" to-port="0"/>
+		<edge from-layer="174" from-port="0" to-layer="175" to-port="1"/>
+		<edge from-layer="175" from-port="2" to-layer="177" to-port="0"/>
+		<edge from-layer="176" from-port="0" to-layer="177" to-port="1"/>
+		<edge from-layer="177" from-port="2" to-layer="179" to-port="0"/>
+		<edge from-layer="178" from-port="0" to-layer="179" to-port="1"/>
+		<edge from-layer="179" from-port="2" to-layer="180" to-port="0"/>
+		<edge from-layer="180" from-port="1" to-layer="182" to-port="0"/>
+		<edge from-layer="181" from-port="0" to-layer="182" to-port="1"/>
+		<edge from-layer="182" from-port="2" to-layer="184" to-port="0"/>
+		<edge from-layer="183" from-port="0" to-layer="184" to-port="1"/>
+		<edge from-layer="184" from-port="2" to-layer="185" to-port="0"/>
+		<edge from-layer="185" from-port="1" to-layer="186" to-port="0"/>
+		<edge from-layer="186" from-port="1" to-layer="188" to-port="0"/>
+		<edge from-layer="187" from-port="0" to-layer="188" to-port="1"/>
+		<edge from-layer="188" from-port="2" to-layer="190" to-port="0"/>
+		<edge from-layer="189" from-port="0" to-layer="190" to-port="1"/>
+		<edge from-layer="190" from-port="2" to-layer="191" to-port="0"/>
+		<edge from-layer="191" from-port="1" to-layer="193" to-port="0"/>
+		<edge from-layer="192" from-port="0" to-layer="193" to-port="1"/>
+		<edge from-layer="193" from-port="2" to-layer="195" to-port="0"/>
+		<edge from-layer="194" from-port="0" to-layer="195" to-port="1"/>
+		<edge from-layer="195" from-port="2" to-layer="196" to-port="0"/>
+		<edge from-layer="196" from-port="1" to-layer="198" to-port="0"/>
+		<edge from-layer="197" from-port="0" to-layer="198" to-port="1"/>
+		<edge from-layer="185" from-port="1" to-layer="199" to-port="0"/>
+		<edge from-layer="198" from-port="2" to-layer="199" to-port="1"/>
+		<edge from-layer="199" from-port="2" to-layer="201" to-port="0"/>
+		<edge from-layer="200" from-port="0" to-layer="201" to-port="1"/>
+		<edge from-layer="201" from-port="2" to-layer="203" to-port="0"/>
+		<edge from-layer="202" from-port="0" to-layer="203" to-port="1"/>
+		<edge from-layer="203" from-port="2" to-layer="204" to-port="0"/>
+		<edge from-layer="175" from-port="2" to-layer="204" to-port="1"/>
+		<edge from-layer="204" from-port="2" to-layer="206" to-port="0"/>
+		<edge from-layer="205" from-port="0" to-layer="206" to-port="1"/>
+		<edge from-layer="206" from-port="2" to-layer="208" to-port="0"/>
+		<edge from-layer="207" from-port="0" to-layer="208" to-port="1"/>
+		<edge from-layer="208" from-port="2" to-layer="209" to-port="0"/>
+		<edge from-layer="209" from-port="1" to-layer="211" to-port="0"/>
+		<edge from-layer="210" from-port="0" to-layer="211" to-port="1"/>
+		<edge from-layer="211" from-port="2" to-layer="213" to-port="0"/>
+		<edge from-layer="212" from-port="0" to-layer="213" to-port="1"/>
+		<edge from-layer="213" from-port="2" to-layer="214" to-port="0"/>
+		<edge from-layer="214" from-port="1" to-layer="215" to-port="0"/>
+		<edge from-layer="215" from-port="1" to-layer="217" to-port="0"/>
+		<edge from-layer="216" from-port="0" to-layer="217" to-port="1"/>
+		<edge from-layer="217" from-port="2" to-layer="219" to-port="0"/>
+		<edge from-layer="218" from-port="0" to-layer="219" to-port="1"/>
+		<edge from-layer="219" from-port="2" to-layer="220" to-port="0"/>
+		<edge from-layer="220" from-port="1" to-layer="222" to-port="0"/>
+		<edge from-layer="221" from-port="0" to-layer="222" to-port="1"/>
+		<edge from-layer="222" from-port="2" to-layer="224" to-port="0"/>
+		<edge from-layer="223" from-port="0" to-layer="224" to-port="1"/>
+		<edge from-layer="224" from-port="2" to-layer="225" to-port="0"/>
+		<edge from-layer="225" from-port="1" to-layer="227" to-port="0"/>
+		<edge from-layer="226" from-port="0" to-layer="227" to-port="1"/>
+		<edge from-layer="214" from-port="1" to-layer="228" to-port="0"/>
+		<edge from-layer="227" from-port="2" to-layer="228" to-port="1"/>
+		<edge from-layer="228" from-port="2" to-layer="230" to-port="0"/>
+		<edge from-layer="229" from-port="0" to-layer="230" to-port="1"/>
+		<edge from-layer="230" from-port="2" to-layer="232" to-port="0"/>
+		<edge from-layer="231" from-port="0" to-layer="232" to-port="1"/>
+		<edge from-layer="232" from-port="2" to-layer="234" to-port="0"/>
+		<edge from-layer="233" from-port="0" to-layer="234" to-port="1"/>
+		<edge from-layer="234" from-port="2" to-layer="236" to-port="0"/>
+		<edge from-layer="235" from-port="0" to-layer="236" to-port="1"/>
+		<edge from-layer="236" from-port="2" to-layer="237" to-port="0"/>
+		<edge from-layer="237" from-port="1" to-layer="239" to-port="0"/>
+		<edge from-layer="238" from-port="0" to-layer="239" to-port="1"/>
+		<edge from-layer="239" from-port="2" to-layer="241" to-port="0"/>
+		<edge from-layer="240" from-port="0" to-layer="241" to-port="1"/>
+		<edge from-layer="241" from-port="2" to-layer="242" to-port="0"/>
+		<edge from-layer="242" from-port="1" to-layer="243" to-port="0"/>
+		<edge from-layer="243" from-port="1" to-layer="245" to-port="0"/>
+		<edge from-layer="244" from-port="0" to-layer="245" to-port="1"/>
+		<edge from-layer="245" from-port="2" to-layer="247" to-port="0"/>
+		<edge from-layer="246" from-port="0" to-layer="247" to-port="1"/>
+		<edge from-layer="247" from-port="2" to-layer="248" to-port="0"/>
+		<edge from-layer="248" from-port="1" to-layer="250" to-port="0"/>
+		<edge from-layer="249" from-port="0" to-layer="250" to-port="1"/>
+		<edge from-layer="250" from-port="2" to-layer="252" to-port="0"/>
+		<edge from-layer="251" from-port="0" to-layer="252" to-port="1"/>
+		<edge from-layer="252" from-port="2" to-layer="253" to-port="0"/>
+		<edge from-layer="253" from-port="1" to-layer="255" to-port="0"/>
+		<edge from-layer="254" from-port="0" to-layer="255" to-port="1"/>
+		<edge from-layer="242" from-port="1" to-layer="256" to-port="0"/>
+		<edge from-layer="255" from-port="2" to-layer="256" to-port="1"/>
+		<edge from-layer="256" from-port="2" to-layer="258" to-port="0"/>
+		<edge from-layer="257" from-port="0" to-layer="258" to-port="1"/>
+		<edge from-layer="258" from-port="2" to-layer="260" to-port="0"/>
+		<edge from-layer="259" from-port="0" to-layer="260" to-port="1"/>
+		<edge from-layer="260" from-port="2" to-layer="261" to-port="0"/>
+		<edge from-layer="232" from-port="2" to-layer="261" to-port="1"/>
+		<edge from-layer="261" from-port="2" to-layer="263" to-port="0"/>
+		<edge from-layer="262" from-port="0" to-layer="263" to-port="1"/>
+		<edge from-layer="263" from-port="2" to-layer="265" to-port="0"/>
+		<edge from-layer="264" from-port="0" to-layer="265" to-port="1"/>
+		<edge from-layer="265" from-port="2" to-layer="266" to-port="0"/>
+		<edge from-layer="266" from-port="1" to-layer="268" to-port="0"/>
+		<edge from-layer="267" from-port="0" to-layer="268" to-port="1"/>
+		<edge from-layer="268" from-port="2" to-layer="270" to-port="0"/>
+		<edge from-layer="269" from-port="0" to-layer="270" to-port="1"/>
+		<edge from-layer="270" from-port="2" to-layer="271" to-port="0"/>
+		<edge from-layer="271" from-port="1" to-layer="272" to-port="0"/>
+		<edge from-layer="272" from-port="1" to-layer="274" to-port="0"/>
+		<edge from-layer="273" from-port="0" to-layer="274" to-port="1"/>
+		<edge from-layer="274" from-port="2" to-layer="276" to-port="0"/>
+		<edge from-layer="275" from-port="0" to-layer="276" to-port="1"/>
+		<edge from-layer="276" from-port="2" to-layer="277" to-port="0"/>
+		<edge from-layer="277" from-port="1" to-layer="279" to-port="0"/>
+		<edge from-layer="278" from-port="0" to-layer="279" to-port="1"/>
+		<edge from-layer="279" from-port="2" to-layer="281" to-port="0"/>
+		<edge from-layer="280" from-port="0" to-layer="281" to-port="1"/>
+		<edge from-layer="281" from-port="2" to-layer="282" to-port="0"/>
+		<edge from-layer="282" from-port="1" to-layer="284" to-port="0"/>
+		<edge from-layer="283" from-port="0" to-layer="284" to-port="1"/>
+		<edge from-layer="271" from-port="1" to-layer="285" to-port="0"/>
+		<edge from-layer="284" from-port="2" to-layer="285" to-port="1"/>
+		<edge from-layer="285" from-port="2" to-layer="287" to-port="0"/>
+		<edge from-layer="286" from-port="0" to-layer="287" to-port="1"/>
+		<edge from-layer="287" from-port="2" to-layer="289" to-port="0"/>
+		<edge from-layer="288" from-port="0" to-layer="289" to-port="1"/>
+		<edge from-layer="289" from-port="2" to-layer="290" to-port="0"/>
+		<edge from-layer="261" from-port="2" to-layer="290" to-port="1"/>
+		<edge from-layer="290" from-port="2" to-layer="292" to-port="0"/>
+		<edge from-layer="291" from-port="0" to-layer="292" to-port="1"/>
+		<edge from-layer="292" from-port="2" to-layer="294" to-port="0"/>
+		<edge from-layer="293" from-port="0" to-layer="294" to-port="1"/>
+		<edge from-layer="294" from-port="2" to-layer="295" to-port="0"/>
+		<edge from-layer="295" from-port="1" to-layer="296" to-port="0"/>
+		<edge from-layer="296" from-port="1" to-layer="298" to-port="0"/>
+		<edge from-layer="297" from-port="0" to-layer="298" to-port="1"/>
+		<edge from-layer="298" from-port="2" to-layer="300" to-port="0"/>
+		<edge from-layer="299" from-port="0" to-layer="300" to-port="1"/>
+		<edge from-layer="300" from-port="2" to-layer="301" to-port="0"/>
+		<edge from-layer="301" from-port="1" to-layer="302" to-port="0"/>
+		<edge from-layer="302" from-port="1" to-layer="304" to-port="0"/>
+		<edge from-layer="303" from-port="0" to-layer="304" to-port="1"/>
+		<edge from-layer="304" from-port="2" to-layer="306" to-port="0"/>
+		<edge from-layer="305" from-port="0" to-layer="306" to-port="1"/>
+		<edge from-layer="306" from-port="2" to-layer="308" to-port="0"/>
+		<edge from-layer="307" from-port="0" to-layer="308" to-port="1"/>
+		<edge from-layer="308" from-port="2" to-layer="310" to-port="0"/>
+		<edge from-layer="309" from-port="0" to-layer="310" to-port="1"/>
+		<edge from-layer="310" from-port="2" to-layer="312" to-port="0"/>
+		<edge from-layer="311" from-port="0" to-layer="312" to-port="1"/>
+		<edge from-layer="312" from-port="2" to-layer="313" to-port="0"/>
+		<edge from-layer="313" from-port="1" to-layer="314" to-port="0"/>
+	</edges>
+	<meta_data>
+		<MO_version value="custom_develop_0f5b27869017345bd5fc1ccd9e3e77f732a3d48b"/>
+		<cli_parameters>
+			<data_type value="FP16"/>
+			<disable_nhwc_to_nchw value="False"/>
+			<disable_resnet_optimization value="False"/>
+			<disable_weights_compression value="False"/>
+			<enable_concat_optimization value="False"/>
+			<extensions value="DIR"/>
+			<framework value="tf"/>
+			<freeze_placeholder_with_value value="{}"/>
+			<generate_deprecated_IR_V7 value="False"/>
+			<input_model value="DIR\v3-small_224_1.0_float.pb"/>
+			<input_model_is_text value="False"/>
+			<input_shape value="[1,224,224,3]"/>
+			<keep_shape_ops value="True"/>
+			<log_level value="ERROR"/>
+			<mean_scale_values value="[(array([127.5, 127.5, 127.5]), array([127.5]))]"/>
+			<mean_values value="[127.5,127.5,127.5]"/>
+			<model_name value="v3-small_224_1.0_float"/>
+			<move_to_preprocess value="True"/>
+			<output_dir value="DIR"/>
+			<placeholder_data_types value="{}"/>
+			<placeholder_shapes value="[  1 224 224   3]"/>
+			<progress value="False"/>
+			<reverse_input_channels value="False"/>
+			<scale_values value="[127.5]"/>
+			<silent value="False"/>
+			<static_shape value="False"/>
+			<stream_output value="False"/>
+			<unset unset_cli_parameters="batch, disable_fusing, disable_gfusing, finegrain_fusing, input, input_checkpoint, input_meta_graph, output, saved_model_dir, saved_model_tags, scale, tensorboard_logdir, tensorflow_custom_layer_libraries, tensorflow_custom_operations_config_update, tensorflow_object_detection_api_pipeline_config, tensorflow_use_custom_operations_config, transformations_config"/>
+		</cli_parameters>
+	</meta_data>
+</net>
