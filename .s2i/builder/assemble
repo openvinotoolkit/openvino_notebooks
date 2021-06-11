@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -x
+
+set -eo pipefail
+
+APP_ROOT=${APP_ROOT:-/opt/app-root}
+
+
+# Run the original Python S2I assemble script to install packages.
+
+/usr/libexec/s2i/assemble
+
+# Enable required extensions
+
+if [ -f "$APP_ROOT/src/extensions.in" ]; then
+    while IFS= read -r extension; do
+        jupyter nbextension enable --sys-prefix $extension
+    done < "$APP_ROOT/src/extensions.in"
+fi
+
+# Apply custom notebook configuration
+
+if [ -d "$APP_ROOT/src/.jupyter/" ]; then
+    rsync \
+        --link-dest="$APP_ROOT/src/.jupyter/" \
+        --recursive \
+        --verbose \
+        "$APP_ROOT/src/.jupyter/" ${APP_ROOT}/etc/jupyter
+fi
+
+# Move files from application source directory to master files directory
+# if directory has been specified. This is to facilitate later copying
+# of files into a persistent volume on startup of instance.
+
+if [ x"$JUPYTER_MASTER_FILES" != x"" ]; then
+    mkdir -p $JUPYTER_MASTER_FILES
+    shopt -s dotglob
+    mv $APP_ROOT/src/* $JUPYTER_MASTER_FILES
+fi
