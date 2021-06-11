@@ -1,0 +1,7 @@
+# Recommended packages for notebook developers
+-r ci-requirements.txt      # packages for validation of notebooks
+black                       # format Python code
+isort                       # sort imports
+jupyterlab-code-formatter   # format code in notebooks in Jupyter Lab
+jupyterlab-git              # checkout and commit code in Jupyter Lab
+
