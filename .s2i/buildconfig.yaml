@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: ImageStream
+metadata:
+  name: s2i-openvino-notebook
+  labels:
+    application: s2i-openvino-notebook
+    opendatahub.io/notebook-image: "true"
+  annotations:
+    opendatahub.io/notebook-image-url: "quay.io/modh/s2i-openvino-notebook"
+    opendatahub.io/notebook-image-name: "Notebook Image with OpenVINO components"
+    opendatahub.io/notebook-image-desc: "Jupyter notebook image with minimal dependency set to start experimenting with OpenVINO in a Jupyter environment."
+---
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  labels:
+    build: s2i-openvino-notebook
+  name: s2i-openvino-notebook
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: s2i-openvino-notebook:local-build
+  source:
+    git:
+      uri: https://github.com/mmgaggle/s2i-openvino-notebook
+      ref: wip-python38
+    type: Git
+  strategy:
+    dockerStrategy:
+      from:
+        kind: DockerImage
+        name: 'quay.io/thoth-station/s2i-thoth-ubi8-py38:v0.26.0'
+      noCache: true
+      dockerfilePath: Dockerfile
+      env:
+        PIPFILE: pipfiles/openvino
+    type: Docker
+  triggers:
+  - type: ConfigChange
