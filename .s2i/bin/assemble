@@ -1,0 +1,131 @@
+#!/bin/bash
+
+set -x
+
+set -eo pipefail
+
+APP_ROOT=${APP_ROOT:-/opt/app-root/src}
+
+
+# Run the original Python S2I assemble script to install packages.
+
+/usr/libexec/s2i/assemble
+
+# Remove the cached package dependencies files generated from s2i assemble script. 
+rm -rf /tmp/Pipfile.lock
+rm -rf /tmp/requirements.txt
+
+########################################################################
+# INFO: Install everything that's required for Jupyter notebooks here.
+########################################################################
+
+# Install pipenv for jupyter-nbrequirements to use
+# TODO: This should be removed once nbrequirements can use Thoth + micropipenv only
+pip install pipenv==2020.11.15
+
+# Install mod_wsgi for use in optional webdav support.
+
+pip install 'mod_wsgi==4.6.8'
+
+# Install base packages needed for running Jupyter Notebooks.
+
+npm cache clean --force
+
+rm -rf $HOME/.cache/yarn
+rm -rf $HOME/.node-gyp
+
+# Copy into place default config files for Jupyter and Apache webdav.
+
+cp ${APP_ROOT}/src/jupyter_notebook_config.py /opt/app-root/etc/
+cp ${APP_ROOT}/src/jupyter_kernel_gateway_config.py /opt/app-root/etc/
+cp ${APP_ROOT}/src/httpd-webdav.conf /opt/app-root/etc/
+
+# This S2I assemble script is only used when creating the custom image.
+# For when running the image, or using it as a S2I builder, we use a second
+# set of custom S2I scripts. We now need to move these into the correct
+# location and have the custom image use those by dropping in an image
+# metadata file which overrides the labels of the base image.
+
+mkdir -p ${APP_ROOT}/.s2i
+
+mv ${APP_ROOT}/src/builder/image_metadata.json ${APP_ROOT}/.s2i/image_metadata.json
+
+mv ${APP_ROOT}/src/builder /opt/app-root/builder
+
+mv ${APP_ROOT}/src/supervisor /opt/app-root/etc/supervisor
+
+mv ${APP_ROOT}/src/gateway /opt/app-root/gateway
+
+mv ${APP_ROOT}/src/*.sh /opt/app-root/bin
+
+# Install oc command line client for OpenShift cluster.
+
+curl -s -o ${APP_ROOT}/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.153/linux/oc.tar.gz && \
+    tar -C /opt/app-root/bin -zxf ${APP_ROOT}/oc.tar.gz oc && \
+    mv /opt/app-root/bin/oc /opt/app-root/bin/oc-3.11 && \
+    rm ${APP_ROOT}/oc.tar.gz
+
+curl -s -o ${APP_ROOT}/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz&& \
+    tar -C /opt/app-root/bin -zxf ${APP_ROOT}/oc.tar.gz oc && \
+    mv /opt/app-root/bin/oc /opt/app-root/bin/oc-4 && \
+    rm ${APP_ROOT}/oc.tar.gz
+
+ln -s /opt/app-root/bin/oc-wrapper.sh /opt/app-root/bin/oc
+
+# Ensure passwd/group file intercept happens for any shell environment.
+
+echo "source /opt/app-root/etc/generate_container_user" >> /opt/app-root/etc/scl_enable
+
+# Install packages required by the proxy process.
+
+(cd /opt/app-root/gateway && npm install --production)
+
+# Create additional directories.
+
+echo " -----> Creating additional directories."
+
+mkdir -p /opt/app-root/data
+
+# Generate default supervisord.conf file.
+
+echo_supervisord_conf | \
+    sed -e 's%^logfile=/tmp/supervisord.log%logfile=/dev/fd/1%' \
+        -e 's%^logfile_maxbytes=50MB%logfile_maxbytes=0%' > \
+        /opt/app-root/etc/supervisord.conf
+
+cat >> /opt/app-root/etc/supervisord.conf << EOF
+[include]
+files = /opt/app-root/etc/supervisor/*.conf
+EOF
+
+# Install and enable default nbextensions
+
+jupyter contrib nbextension install --sys-prefix
+
+jupyter nbextension install --sys-prefix https://raw.githubusercontent.com/vpavlin/jupyter-publish-extension/master/publish.js
+jupyter nbextension enable  --sys-prefix publish
+
+# Enable the extensions configurator
+
+pip install -U jupyter_nbextensions_configurator
+
+jupyter nbextensions_configurator enable --sys-prefix
+
+# Apply custom notebook configuration
+
+if [ -d "$APP_ROOT/src/.jupyter/" ]; then
+    rsync \
+        --link-dest="$APP_ROOT/src/.jupyter/" \
+        --recursive \
+        --verbose \
+        "$APP_ROOT/src/.jupyter/" ${APP_ROOT}/etc/jupyter
+fi
+
+# Make sure the S2I source directory is empty as we will use the image
+# produced to run further S2I builds
+
+(shopt -s dotglob ; rm -rf ${APP_ROOT}/src/*)
+
+# Fixup permissions on directories and files.
+
+fix-permissions /opt/app-root
