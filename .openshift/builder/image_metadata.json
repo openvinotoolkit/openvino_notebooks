@@ -1,0 +1,9 @@
+{
+  "labels": [
+    {"io.k8s.display-name":"Jupyter Notebook"},
+    {"io.k8s.description":"Minimal Thoth S2I Jupyter Notebook."},
+    {"io.openshift.s2i.scripts-url":"image:///opt/app-root/builder"},
+    {"io.s2i.scripts-url":"image:///opt/app-root/builder"},
+    {"io.openshift.tags":"aicoe,builder,minimal,notebook,jupyter,python"}
+  ]
+}

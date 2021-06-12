@@ -1,0 +1,30 @@
+{
+  "load_extensions": {
+    "nbextensions_configurator/config_menu/main": true,
+    "codefolding/main": true,
+    "collapsible_headings/main": true,
+    "contrib_nbextensions_help_item/main": true,
+    "execute_time/ExecuteTime": true,
+    "hinterland/hinterland": false,
+    "init_cell/main": true,
+    "python-markdown/main": true,
+    "publish": true,
+    "ruler/main": true,
+    "toc2/main": true,
+    "toggle_all_line_numbers/main": true
+  },
+  "ruler_column": [
+    "110"
+  ],
+  "toc2": {
+    "skip_h1_title": true,
+    "toc_cell": true
+  },
+  "init_cell": {
+    "run_on_kernel_ready": false
+  },
+  "Notebook": {
+    "Header": true
+  },
+  "scrollDownIsEnabled": true
+}
