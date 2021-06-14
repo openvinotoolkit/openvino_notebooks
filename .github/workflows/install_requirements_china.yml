@@ -1,4 +1,4 @@
-name: install_requirements
+name: install_requirements_china
 
 on:
   workflow_dispatch:
