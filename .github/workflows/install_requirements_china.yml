@@ -1,0 +1,38 @@
+name: install_requirements_china
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '30 18 * * *'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
+        python: [3.6, 3.7, 3.8]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r requirements.txt --use-deprecated=legacy-resolver -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+        python -m ipykernel install --user --name openvino_env
+        python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+    - name: Archive pip freeze
+      uses: actions/upload-artifact@v2
+      with:
+        name: pip-freeze
+        path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+    - name: Test that `jupyter lab` works
+      run: |
+        jupyter lab notebooks --help
