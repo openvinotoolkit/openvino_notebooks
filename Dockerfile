@@ -37,7 +37,7 @@ USER 1001
 RUN /tmp/scripts/assemble
 
 # These manual pip installs will be removed before final release and added to the Piplock file
-RUN pip install openvino-dev tensorflow~=2.4.1 tensorflow-serving-api --use-deprecated=legacy-resolver
+RUN pip install openvino-dev tensorflow~=2.3.3 tensorflow-serving-api --use-deprecated=legacy-resolver
 
 COPY notebooks .
 
