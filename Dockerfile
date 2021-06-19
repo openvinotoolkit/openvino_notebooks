@@ -25,7 +25,7 @@ USER root
 RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum remove -y nodejs && \
   yum install -y nodejs mesa-libGL && \
-  yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical
+  yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
 
 # Copying in override assemble/run scripts
 COPY .openshift/.s2i/bin /tmp/scripts
@@ -37,7 +37,7 @@ USER 1001
 RUN /tmp/scripts/assemble
 
 # These manual pip installs will be removed before final release and added to the Piplock file
-RUN pip install openvino-dev tensorflow~=2.3.3 tensorflow-serving-api --use-deprecated=legacy-resolver
+RUN pip install openvino-dev tensorflow~=2.3.3 tensorflow-serving-api aiohttp>=3.7.4 --use-deprecated=legacy-resolver
 
 COPY notebooks .
 
