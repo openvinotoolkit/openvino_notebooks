@@ -25,8 +25,8 @@ torchvision>=0.6.1+cpu,<=0.8.2+cpu
 # Tensorflow notebook requirements
 networkx>=1.11
 defusedxml>=0.5.0
-tensorflow>=2.3
-tensorflow-serving-api
+#tensorflow>=2.3
+#tensorflow-serving-api
 
 # Jupyter requirements
 ipython==7.10  # pin version to prevent async warnings

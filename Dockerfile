@@ -1,4 +1,4 @@
-FROM quay.io/thoth-station/s2i-thoth-ubi8-py38:v0.26.0
+FROM quay.io/thoth-station/s2i-thoth-ubi8-py38:v0.29.0
 
 LABEL name="OpenVINO(TM) Notebooks" \
   maintainer="helena.kloosterman@intel.com" \
@@ -28,7 +28,7 @@ RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical
 
 # Copying in override assemble/run scripts
-COPY .s2i/bin /tmp/scripts
+COPY .openshift/.s2i/bin /tmp/scripts
 # Copying in source code
 COPY .openshift /tmp/src
 # Change file ownership to the assemble user. Builder image must support chown command.
@@ -37,7 +37,7 @@ USER 1001
 RUN /tmp/scripts/assemble
 
 # These manual pip installs will be removed before final release and added to the Piplock file
-RUN pip install openvino-dev
+RUN pip install openvino-dev tensorflow~=2.3.3 tensorflow-serving-api --use-deprecated=legacy-resolver
 
 COPY notebooks .
 
