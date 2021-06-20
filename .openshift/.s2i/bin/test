@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -eo pipefail
+
+sed -i 's/NUM_FRAMES = 100/NUM_FRAMES = 5/g' 202-vision-superresolution/202-vision-superresolution-video.ipynb
+sed -i 's/epochs = 15/epochs = 1/g' 301-tensorflow-training-openvino/301-tensorflow-training-openvino.ipynb
+
+exec /opt/app-root/bin/pytest --durations=10 --nbval --current-env .
