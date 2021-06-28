@@ -37,9 +37,13 @@ USER 1001
 RUN /tmp/scripts/assemble
 
 # These manual pip installs will be removed before final release and added to the Piplock file
-RUN pip install openvino-dev tensorflow-serving-api nbval --use-deprecated=legacy-resolver
 
 COPY notebooks .
+COPY openvino-2021.4.0-3810-cp38-cp38-manylinux2014_x86_64.whl .
+COPY openvino_dev-2021.4.0-3810-py3-none-any.whl .
+
+
+RUN pip install openvino-2021.4.0-3810-cp38-cp38-manylinux2014_x86_64.whl openvino_dev-2021.4.0-3810-py3-none-any.whl tensorflow-serving-api nbval --use-deprecated=legacy-resolver
 
 USER root
 RUN chown -R 1001:0 .
