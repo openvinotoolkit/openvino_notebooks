@@ -1,4 +1,4 @@
-openvino-dev
+openvino-dev==2021.4
 matplotlib<3.4
 gdown
 pytube
@@ -16,16 +16,14 @@ torch>=1.5.1+cpu,<=1.7.1+cpu; sys_platform =='linux' or platform_system == 'Wind
 torchvision>=0.6.1+cpu,<=0.8.2+cpu; sys_platform =='linux' or platform_system == 'Windows'
 
 # Tensorflow notebook requirements
+tensorflow==2.5.*
 networkx>=1.11
 defusedxml>=0.5.0
-tensorflow>=2.2,<2.4
 
 # Jupyter requirements
 jupyterlab
 
 # Pin versions to prevent known dependency issues
-importlib-metadata==3.7.3
 ipython==7.10.*
 jedi==0.17.2
-numpy==1.18.*
 setuptools>=56.0.0

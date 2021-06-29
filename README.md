@@ -54,7 +54,7 @@ Upgrade pip to the latest version. Use pip's legacy dependency resolver to avoid
 
 ```bash
 python -m pip install --upgrade pip
-pip install -r requirements.txt --use-deprecated=legacy-resolver
+pip install -r requirements.txt
 python -m ipykernel install --user --name openvino_env
 ```
 
