@@ -37,10 +37,9 @@ RUN chown -R 1001:0 /tmp/scripts /tmp/src
 USER 1001
 RUN /tmp/scripts/assemble
 
-# These manual pip installs will be removed before final release and added to the Piplock file
-RUN pip install openvino-dev grpcio tensorflow-serving-api --use-deprecated=legacy-resolver
-
 COPY notebooks .
+
+RUN pip install openvino-dev tensorflow-serving-api nbval grpcio
 
 USER root
 RUN chown -R 1001:0 .
