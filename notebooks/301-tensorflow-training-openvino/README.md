@@ -26,7 +26,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-```
+
 ```
 @ONLINE {tfflowers,
 author = "The TensorFlow Team",
@@ -35,6 +35,7 @@ month = "jan",
 year = "2019",
 url = "http://download.tensorflow.org/example_images/flower_photos.tgz" }
 ```
+
 ---
 
 \* Other names and brands may be claimed as the property of others.
