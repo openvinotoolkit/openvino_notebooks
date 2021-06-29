@@ -1,23 +1,24 @@
-name: docker_build
+name: docker_nbval
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
       - "Dockerfile"
-      - ".openshift/*"
+      - ".openshift/**"
 
 jobs:
   build:
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-18.04, ubuntu-20.04]
-
-    runs-on: ${{ matrix.os }}
+  
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v2
     - name: Build Docker image
       run: |
-        docker build .
+        docker build . -t openvino_notebooks
+    - name: Test notebooks in Docker image
+      run: |
+        docker run --entrypoint /tmp/scripts/test openvino_notebooks
