@@ -3,8 +3,8 @@ FROM quay.io/thoth-station/s2i-thoth-ubi8-py38:v0.29.0
 LABEL name="OpenVINO(TM) Notebooks" \
   maintainer="helena.kloosterman@intel.com" \
   vendor="Intel Corporation" \
-  version="0.1.0" \
-  release="2021.3" \
+  version="0.2.0" \
+  release="2021.4" \
   summary="OpenVINO(TM) Developer Tools and Jupyter Notebooks" \
   description="OpenVINO(TM) Notebooks Container"
 
@@ -17,7 +17,8 @@ ENV JUPYTER_ENABLE_LAB="true" \
   THOTH_DRY_RUN="1" \
   THAMOS_DEBUG="0" \
   THAMOS_VERBOSE="1" \
-  THOTH_PROVENANCE_CHECK="0"
+  THOTH_PROVENANCE_CHECK="0" \
+  JUPYTER_PRELOAD_REPOS="https://github.com/openvinotoolkit/openvino_notebooks"
 
 USER root
 
@@ -36,14 +37,12 @@ RUN chown -R 1001:0 /tmp/scripts /tmp/src
 USER 1001
 RUN /tmp/scripts/assemble
 
-# These manual pip installs will be removed before final release and added to the Piplock file
-
 COPY notebooks .
 COPY openvino-2021.4.0-3810-cp38-cp38-manylinux2014_x86_64.whl .
 COPY openvino_dev-2021.4.0-3810-py3-none-any.whl .
 
 
-RUN pip install openvino-2021.4.0-3810-cp38-cp38-manylinux2014_x86_64.whl openvino_dev-2021.4.0-3810-py3-none-any.whl tensorflow-serving-api nbval --use-deprecated=legacy-resolver
+RUN pip install openvino-dev tensorflow-serving-api nbval grpcio
 
 USER root
 RUN chown -R 1001:0 .
