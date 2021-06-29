@@ -38,9 +38,6 @@ USER 1001
 RUN /tmp/scripts/assemble
 
 COPY notebooks .
-COPY openvino-2021.4.0-3810-cp38-cp38-manylinux2014_x86_64.whl .
-COPY openvino_dev-2021.4.0-3810-py3-none-any.whl .
-
 
 RUN pip install openvino-dev tensorflow-serving-api nbval grpcio
 
