@@ -37,9 +37,7 @@ RUN chown -R 1001:0 /tmp/scripts /tmp/src
 USER 1001
 RUN /tmp/scripts/assemble
 
-COPY notebooks .
-
-RUN pip install openvino-dev tensorflow-serving-api nbval grpcio
+RUN pip install tensorflow-serving-api
 
 USER root
 RUN chown -R 1001:0 .
