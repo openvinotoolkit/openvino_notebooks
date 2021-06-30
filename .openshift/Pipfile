@@ -4,12 +4,14 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+aiohttp = ">=3.7.4"
 notebook = ">=6.0.2"
 jupyterhub = "==1.1.0"
 jupyterlab = "==3.0.16"
 jupyter-kernel-gateway = "==2.4.0"
 jupyter-nbrequirements = "*"
 supervisor = "==4.1.0"
+openvino-dev = "==2021.4"
 matplotlib = "<3.4"
 geffnet = "==0.9.8"
 fastseg = "*"
@@ -19,15 +21,16 @@ torch = "<=1.7.1+cpu,>=1.5.1+cpu"
 torchvision = "<=0.8.2+cpu,>=0.6.1+cpu"
 networkx = ">=1.11"
 defusedxml = ">=0.5.0"
+tensorflow = "==2.4.2"
 ipython = "==7.10"
 importlib-metadata = "==3.7.3"
 ipykernel = "==5.5.0"
 pyvista = "*"
 gdown = "*"
 pytube = "*"
+nbval = "*"
+grpcio = "*"
 PVGeo = "*"
-aiohttp = ">=3.7.4"
-tensorflow = "==2.3.3"
 
 [dev-packages]
 
