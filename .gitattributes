@@ -1,2 +1,0 @@
-# Docker script on Windows requires LF
-.openshift/.s2i/bin/* eol=lf
