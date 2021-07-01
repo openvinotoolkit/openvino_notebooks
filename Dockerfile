@@ -44,6 +44,7 @@ RUN dos2unix /tmp/src/builder/*
 RUN chown -R 1001:0 /tmp/scripts /tmp/src
 USER 1001
 RUN /tmp/scripts/assemble
+RUN pip install tensorflow-serving-api
 
 USER root
 RUN dos2unix /opt/app-root/bin/*sh
