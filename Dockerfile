@@ -23,23 +23,31 @@ ENV JUPYTER_ENABLE_LAB="true" \
 USER root
 
 # Upgrade NodeJS > 12.0
+# Install dos2unix for line end conversion on Windows
 RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum remove -y nodejs && \
-  yum install -y nodejs mesa-libGL && \
+  yum install -y nodejs mesa-libGL dos2unix && \
   yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
+
 
 # Copying in override assemble/run scripts
 COPY .openshift/.s2i/bin /tmp/scripts
 # Copying in source code
 COPY .openshift /tmp/src
+
+# Git on Windows may convert line endings. Run dos2unix to enable
+# building the image when the scripts have CRLF line endings.
+RUN dos2unix /tmp/scripts/*
+RUN dos2unix /tmp/src/builder/*
+
 # Change file ownership to the assemble user. Builder image must support chown command.
 RUN chown -R 1001:0 /tmp/scripts /tmp/src
 USER 1001
 RUN /tmp/scripts/assemble
 
-RUN pip install tensorflow-serving-api
-
 USER root
+RUN dos2unix /opt/app-root/bin/*sh
+RUN yum remove -y dos2unix
 RUN chown -R 1001:0 .
 USER 1001
 # RUN jupyter lab build
