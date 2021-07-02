@@ -2,7 +2,29 @@
 
 set -eo pipefail
 
-sed -i 's/NUM_FRAMES = 100/NUM_FRAMES = 5/g' 202-vision-superresolution/202-vision-superresolution-video.ipynb
-sed -i 's/epochs = 15/epochs = 1/g' 301-tensorflow-training-openvino/301-tensorflow-training-openvino.ipynb
 
-exec /opt/app-root/bin/pytest --durations=10 --nbval --current-env .
+# Pre-clone repositories defined in JUPYTER_PRELOAD_REPOS
+if [ -n "${JUPYTER_PRELOAD_REPOS}" ]; then
+    for repo in `echo ${JUPYTER_PRELOAD_REPOS} | tr ',' ' '`; do
+        # Check for the presence of "@branch" in the repo string
+        REPO_BRANCH=$(echo ${repo} | cut -s -d'@' -f2)
+        if [[ -n ${REPO_BRANCH} ]]; then
+          # Remove the branch from the repo string and convert REPO_BRANCH to git clone arg
+          repo=$(echo ${repo} | cut -d'@' -f1)
+          REPO_BRANCH="-b ${REPO_BRANCH}"
+        fi
+        echo "Checking if repository $repo exists locally"
+        REPO_DIR=$(basename ${repo})
+        if [ -d "${REPO_DIR}" ]; then
+            pushd ${REPO_DIR}
+            GIT_SSL_NO_VERIFY=true git pull --ff-only
+            popd
+        else
+            GIT_SSL_NO_VERIFY=true git clone ${repo} ${REPO_DIR} ${REPO_BRANCH}
+        fi
+    done
+fi
+
+sed -i 's/NUM_FRAMES = 100/NUM_FRAMES = 5/g' openvino_notebooks/notebooks/202-vision-superresolution/202-vision-superresolution-video.ipynb
+sed -i 's/epochs = 15/epochs = 1/g' openvino_notebooks/notebooks/301-tensorflow-training-openvino/301-tensorflow-training-openvino.ipynb
+exec /opt/app-root/bin/pytest --durations=10 --nbval --current-env openvino_notebooks/notebooks --ignore openvino_notebooks/notebooks/301-tensorflow-training-openvino/301-tensorflow-training-openvino.ipynb
