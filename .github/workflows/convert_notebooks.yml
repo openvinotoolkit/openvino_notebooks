@@ -6,7 +6,7 @@ on:
   push:
     branches:
     - 'main'
-  paths:
+    paths:
     - "**.ipynb"
 jobs:
   build:
