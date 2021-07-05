@@ -3,6 +3,11 @@
 name: Convert Notebooks
 on:
   workflow_dispatch:
+  push:
+    branches:
+    - 'main'
+  paths:
+    - "**.ipynb"
 jobs:
   build:
     strategy:
