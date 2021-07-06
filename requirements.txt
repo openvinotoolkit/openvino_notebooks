@@ -30,7 +30,6 @@ jedi==0.17.2
 setuptools>=56.0.0
 
 # 3D visualization
-itk==5.1.2
 itkwidgets==0.23.1
 
 # openvino extensions
