@@ -8,6 +8,8 @@ on:
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
+    - 'requirements.txt'
+    - '.ci/*requirements.txt'
   schedule:
     - cron:  '30 8 * * *'
 
