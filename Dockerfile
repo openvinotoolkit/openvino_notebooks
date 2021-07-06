@@ -31,9 +31,9 @@ RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
 
 
 # Copying in override assemble/run scripts
-COPY .openshift/.s2i/bin /tmp/scripts
+COPY .docker/.s2i/bin /tmp/scripts
 # Copying in source code
-COPY .openshift /tmp/src
+COPY .docker /tmp/src
 
 # Git on Windows may convert line endings. Run dos2unix to enable
 # building the image when the scripts have CRLF line endings.
@@ -44,8 +44,7 @@ RUN dos2unix /tmp/src/builder/*
 RUN chown -R 1001:0 /tmp/scripts /tmp/src
 USER 1001
 RUN /tmp/scripts/assemble
-RUN pip install tensorflow-serving-api
-
+RUN pip check
 USER root
 RUN dos2unix /opt/app-root/bin/*sh
 RUN yum remove -y dos2unix
