@@ -1,0 +1,47 @@
+name: install_launch
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/install_launch.yml"
+      - "install_notebooks.py"
+      - "launch_notebooks.py"
+      - ".ci/utils.py"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
+        python: [3.7,]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install notebooks
+      run: |
+        python install_notebooks.py -y
+    - name: Launch notebooks (Unix)
+      run: |
+        pip install psutil nbval
+        nohup python launch_notebooks.py --no-browser &
+      if: matrix.os != 'windows-latest'
+    - name: Launch notebooks (Windows)
+      run: |
+        pip install psutil nbval
+        pythonw launch_notebooks.py --no-browser 
+      if: matrix.os == 'windows-latest'
+    - name: Check jupyter running
+      run: |
+        python -c "import sys,time;sys.path.append('.ci');time.sleep(5);import utils;utils.check_jupyter_running()"
+      if: matrix.os != 'windows-latest'
+    - name: Test Hello World
+      run: |
+        python -m pytest --nbval notebooks/001-hello-world/001-hello-world.ipynb
