@@ -1,3 +1,5 @@
+English | [简体中文](README_ch.md)
+
 # 📚 OpenVINO Notebooks
 
 A collection of ready-to-run Jupyter\* notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
