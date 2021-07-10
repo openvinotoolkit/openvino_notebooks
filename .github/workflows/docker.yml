@@ -5,7 +5,7 @@ on:
   pull_request:
     paths:
       - "Dockerfile"
-      - ".openshift/**"
+      - ".docker/**"
 
 jobs:
   build:
