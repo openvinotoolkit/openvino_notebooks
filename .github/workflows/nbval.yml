@@ -10,6 +10,7 @@ on:
     - 'notebooks/**.py'
     - 'requirements.txt'
     - '.ci/*requirements.txt'
+    - '.github/workflows/nbval.yml'
   schedule:
     - cron:  '30 8 * * *'
 

@@ -6,6 +6,7 @@ on:
     paths:
       - "Dockerfile"
       - ".docker/**"
+      - ".github/workflows/docker.yml'
 
 jobs:
   build:
