@@ -55,7 +55,7 @@ cd openvino_notebooks
 将pip升级到最新版本。
 
 ```bash
-python -m pip install --upgrade pip
+python -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 python -m ipykernel install --user --name openvino_env
 ```
