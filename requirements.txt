@@ -22,3 +22,4 @@ ipython==7.10.*
 jedi==0.17.2
 setuptools>=56.0.0
 Pillow==8.2.*
+ipykernel==5.*
