@@ -5,7 +5,8 @@ on:
   pull_request:
     paths:
       - "Dockerfile"
-      - ".openshift/**"
+      - ".docker/**"
+      - ".github/workflows/docker.yml"
 
 jobs:
   build:
