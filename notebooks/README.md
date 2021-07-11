@@ -11,10 +11,10 @@ Each notebook is located in a directory. Please follow the instructions in the [
 | [102-pytorch-onnx-to-openvino](102-pytorch-onnx-to-openvino/102-pytorch-onnx-to-openvino.ipynb) | <ul><li>Demonstrates how to convert [PyTorch](https://pytorch.org/) models to OpenVINO IR</li><li>Uses Model Optimizer to convert the open source [fastseg](https://docs.openvinotoolkit.org/latest/omz_models_model_mobilenet_v3_small_1_0_224_tf.html) semantic segmentation model</li></ul> | <img src="https://user-images.githubusercontent.com/15709723/125182687-fda1a180-e1c4-11eb-90cf-36a50e5ad1c3.png" width=300>  |
 | [103-paddle-onnx-to-openvino](103-paddle-onnx-to-openvino/103-paddle-onnx-to-openvino.ipynb) | <ul><li>Demonstrates how to convert [PaddlePaddle](https://github.com/PaddlePaddle/Paddle) models to OpenVINO IR</li><li>Uses Model Optimizer to convert the open source [mobilenet_v3_large_imagenet_ssld](https://www.paddlepaddle.org.cn/hubdetail?name=mobilenet_v3_large_imagenet_ssld&en_category=ImageClassification) image classification model</li></ul> | <img src="103-paddle-onnx-to-openvino/coco_close.jpg" width=300><br>`[{'Labrador retriever': 0.600349485874176}]`  |
 | [104-model-tools](104-model-tools/104-model-tools.ipynb) |  |  |
-| [201-vision-monodepth](201-vision-monodepth/201-vision-monodepth.ipynb) |  |  |
+| [201-vision-monodepth](201-vision-monodepth/201-vision-monodepth.ipynb) |  | <img src="201-vision-monodepth/monodepth.gif"> |
 | [202-vision-superresolution-image](202-vision-superresolution/202-vision-superresolution-image.ipynb) |  |  |
 | [202-vision-superresolution-video](202-vision-superresolution/202-vision-superresolution-video.ipynb) |  |  |
 | [205-vision-background-removal](205-vision-background-removal/205-vision-background-removal.ipynb) |  | <img src="https://user-images.githubusercontent.com/15709723/125184237-f4b6cd00-e1d0-11eb-8e3b-d92c9a728372.png"> |
-| [206-vision-paddlegan-anime](206-vision-paddlegan-anime/206-vision-paddlegan-anime.ipynb) |  |  |
+| [206-vision-paddlegan-anime](206-vision-paddlegan-anime/206-vision-paddlegan-anime.ipynb) |  | <img src="https://user-images.githubusercontent.com/15709723/125184441-b4584e80-e1d2-11eb-8964-d8131cd97409.png"> |
 | [301-tensorflow-training-openvino](301-tensorflow-training-openvino/301-tensorflow-training-openvino.ipynb) |  |  |
 | [301-tensorflow-training-openvino-pot](301-tensorflow-training-openvino/301-tensorflow-training-openvino-pot.ipynb) |  |  |
