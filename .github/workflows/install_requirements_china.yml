@@ -23,8 +23,8 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install -r requirements.txt --use-deprecated=legacy-resolver -i https://pypi.tuna.tsinghua.edu.cn/simple
+        python -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+        python -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
         python -m ipykernel install --user --name openvino_env
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
