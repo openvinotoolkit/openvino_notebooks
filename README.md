@@ -1,8 +1,8 @@
 English | [简体中文](README_cn.md)
 
-# 📚 OpenVINO Notebooks
+# 📚 OpenVINO™ Notebooks
 
-A collection of ready-to-run Jupyter\* notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
+A collection of ready-to-run Jupyter\* notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference. Currently we have an API reference, guides for converting/optimizing PyTorch/TensorFlow/PaddlePaddle models, and model demos. [Click here](notebooks/README.md) to see the list of included notebooks.
 
 ## ⚙️ System Requirements
 
