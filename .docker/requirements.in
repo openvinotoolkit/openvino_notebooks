@@ -21,7 +21,7 @@ ipywidgets
 torch>=1.5.1+cpu,<=1.7.1+cpu
 torchvision>=0.6.1+cpu,<=0.8.2+cpu
 
-# Tensorflow notebook requirements
+# TensorFlow notebook requirements
 networkx>=1.11
 defusedxml>=0.5.0
 tensorflow==2.4.2
