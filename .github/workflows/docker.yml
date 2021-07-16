@@ -7,6 +7,10 @@ on:
       - "Dockerfile"
       - ".docker/**"
       - ".github/workflows/docker.yml"
+      - 'notebooks/**.ipynb'
+      - 'notebooks/**.py'
+      - 'requirements.txt'
+      - '.ci/*requirements.txt'
 
 jobs:
   build:
