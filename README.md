@@ -1,6 +1,8 @@
-# 📚 OpenVINO Notebooks
+English | [简体中文](README_cn.md)
 
-A collection of ready-to-run Jupyter\* notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
+# 📚 OpenVINO™ Notebooks
+
+A collection of ready-to-run Jupyter\* notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference. Currently we have an API reference, guides for converting/optimizing PyTorch/TensorFlow/PaddlePaddle models, and model demos. [Click here](notebooks/README.md) to see the list of included notebooks.
 
 ## ⚙️ System Requirements
 
@@ -18,12 +20,12 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 
 ## 📝 Installation Guide
 
-OpenVINO Notebooks require Python and Git. See instructions below for your operating system:
+OpenVINO Notebooks require Python and Git. For Python 3.8, C++ is also required. See instructions below for your operating system:
 
 | [Windows 10](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) |
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 
-Once you have installed Python and Git, follow the steps below.
+Once you have installed Python, Git and C++, follow the steps below.
 
 ### Step 1: Create and Activate `openvino_env` Environment
 

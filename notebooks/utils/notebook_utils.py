@@ -12,7 +12,9 @@ from typing import List, NamedTuple, Optional, Tuple
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+from IPython.display import HTML, display
 from matplotlib.lines import Line2D
+from openvino.inference_engine import IECore
 
 
 class Label(NamedTuple):
@@ -85,7 +87,9 @@ def to_bgr(image_data) -> np.ndarray:
     return cv2.cvtColor(image_data, cv2.COLOR_RGB2BGR)
 
 
-def segmentation_map_to_image(result: np.ndarray, colormap: np.ndarray, remove_holes=False):
+def segmentation_map_to_image(
+    result: np.ndarray, colormap: np.ndarray, remove_holes=False
+):
     """
     Convert network result of floating point numbers to an RGB image with
     integer values from 0-255 by applying a colormap.
@@ -179,3 +183,37 @@ def get_cpu_info():
 
         cpu = platform.processor()
     return cpu
+
+
+class NotebookAlert(Exception):
+    def __init__(self, message, alert_class):
+        self.message = message
+        self.alert_class = alert_class
+        self.show_message()
+
+    def show_message(self):
+        display(HTML(f"""<div class="alert alert-{self.alert_class}">{self.message}"""))
+
+
+class GPUNotFoundAlert(NotebookAlert):
+    def __init__(self):
+        ie = IECore()
+        supported_devices = ie.available_devices
+        self.message = (
+            "Running this cell requires an integrated GPU, "
+            "which is not available on this system. "
+        )
+        self.alert_class = "warning"
+        if len(supported_devices) == 1:
+            self.message += (
+                f"The following device is available: {ie.available_devices[0]}"
+            )
+        else:
+            self.message += (
+                "The following devices are available: "
+                f"{', '.join(ie.available_devices)}"
+            )
+        self.show_message()
+
+    def show_message(self):
+        display(HTML(f"""<div class="alert alert-{self.alert_class}">{self.message}"""))
