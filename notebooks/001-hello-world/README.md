@@ -1,6 +1,9 @@
 # Introduction to OpenVINO
 
-<img src="classification.jpg">
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F001-hello-world%2F001-hello-world.ipynb)
+
+<img src="images/classification.jpg">
+
 
 
 Basic introduction that shows basic operations using OpenVINO, including inference on a given IR model.

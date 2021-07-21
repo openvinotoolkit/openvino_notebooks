@@ -1,6 +1,7 @@
 # OpenVINO API tutorial
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F002-openvino-api%2F002-openvino-api.ipynb)
 
-<img src="classification.jpg">
+<img src="images/classification.jpg">
 
 This notebook explains the basics of the OpenVINO Inference Engine API.
 It provides segmentation and classification IR model and a segmentation ONNX model as an example, you can replace these model files with own models.
