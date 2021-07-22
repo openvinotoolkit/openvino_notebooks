@@ -2,6 +2,7 @@ openvino-dev[onnx,tensorflow2]==2021.4.*
 matplotlib<3.4
 gdown
 pytube
+tqdm
 
 # ONNX notebook requirements
 geffnet==0.9.8
@@ -21,6 +22,10 @@ jupyterlab
 ipython==7.10.*
 jedi==0.17.2
 setuptools>=56.0.0
+
+# openvino extensions
+openvino-extensions
+
 Pillow==8.2.*
 ipykernel==5.*
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
