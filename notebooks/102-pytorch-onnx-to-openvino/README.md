@@ -4,7 +4,11 @@
 
 ![coco image](data/segmentation.jpg)
 
-This notebook demonstrates how to perform inference on a PyTorch semantic segmentation model using [OpenVINO](https://github.com/openvinotoolkit/openvino). [Model](https://github.com/ekzhang/fastseg) used in this tutorial is pretrained on [CityScapes](https://www.cityscapes-dataset.com).
+This notebook demonstrates how to perform inference on a PyTorch semantic segmentation model using [OpenVINO](https://github.com/openvinotoolkit/openvino).
+
+## Content table
+
+Notebook uses Model Optimizer to convert open source [fastseg](https://github.com/ekzhang/fastseg/) semantic segmentation model, trained on [CityScapes](https://www.cityscapes-dataset.com).
 
 ## Installation Instructions
 

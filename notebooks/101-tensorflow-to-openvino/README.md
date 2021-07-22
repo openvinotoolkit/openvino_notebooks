@@ -4,7 +4,11 @@
 
 ![coco image](../002-openvino-api/data/classification.jpg)
 
-This notebook explains how to convert [TensorFlow](www.tensorflow.org) model to OpenVINO IR with FP16 precision. It will be explained on converting [TensorFlow MobilenetV3 model](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet).
+This tutorial explains how to convert [TensorFlow](www.tensorflow.org) model to OpenVINO IR with FP16 precision. It will be explained on converting [TensorFlow MobilenetV3 model](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet).
+
+## Content table
+
+Notebook uses model optimizer to convert same [MobilenetV3](https://docs.openvinotoolkit.org/latest/omz_models_model_mobilenet_v3_small_1_0_224_tf.html) used in [001-hello-world notebook](../001-hello-world/001-hello-world.ipynb).
 
 ## Installation Instructions
 
