@@ -23,11 +23,9 @@ ipython==7.10.*
 jedi==0.17.2
 setuptools>=56.0.0
 
-# 3D visualization
-itkwidgets==0.23.1
-
 # openvino extensions
 openvino-extensions
+
 Pillow==8.2.*
 ipykernel==5.*
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
