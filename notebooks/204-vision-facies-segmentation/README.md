@@ -1,6 +1,6 @@
-# Facies segmentation Python Demo
+# Facies Segmentation
 
-This demo demonstrate how to run facies classification using OpenVINO&trade;
+This demo demonstrates how to run facies classification using OpenVINO&trade;
 
 See the source repository to learn more about the model architecture and training method - https://github.com/yalaudah/facies_classification_benchmark
 
@@ -13,4 +13,4 @@ For now the 3D visialization does not yet work in `Jupyter Lab`, please use `jup
 
 ![img](demo.png)
 
-See details in `facies_demo.ipynb` 
+See details in [204-vision-facies-segmentation.ipynb](204-vision-facies-segmentation.ipynb)
