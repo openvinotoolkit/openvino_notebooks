@@ -99,3 +99,6 @@ dmypy.json
 
 # vim backup files
 *~
+
+# Notebook temporal files
+notebooks/*/output/**

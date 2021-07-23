@@ -6,6 +6,8 @@
     - [Implementation choices](#implementation-choices)
     - [Other things to keep in mind](#other-things-to-keep-in-mind)
     - [Notebook naming](#notebook-naming)
+    - [Writing Readme](#writing-readme)
+    - [File structure](#file-structure)
   - [Validation](#validation)
     - [Automated tests](#automated-tests)
     - [Manual test and code quality tools](#manual-test-and-code-quality-tools)
@@ -97,7 +99,6 @@ To do this, there are a few requirements that all notebooks need to pass.
 7. The notebooks should provide an easy way to clean up the downloaded data, for example with a
    commented-out cell at the end of the notebook.
 
-
 ### Other things to keep in mind
 
 1. Always provide links to sources. If your notebook implements a model, link to the research paper
@@ -112,6 +113,38 @@ Names should be descriptive but not too long. We use the following numbering sch
 - `100-` OpenVINO tool tutorials: explain how to optimize and quantize notebooks.
 - `200-` OpenVINO model demos: demonstrate inference on a particular model.
 - `300-` Training notebooks: notebooks that include code to train neural networks.
+
+### Writing Readme
+
+Every notebook must have readme file briefly describing content of related tutorial. To keep it simple structure is described below:
+
+``` markdown
+# Title of tutorial
+[brief intro, basic information about what will be described]
+
+## Content table
+[more details, possibly information about papers or used models, data]
+Here will be placed other subsections, e.g license information.
+
+
+## Installation Instructions
+[link to installation guide, other important information for install process]
+```
+
+### File structure
+
+To keep form similar for each and every notebook please use form as described
+
+```markdown
+<three-digit-number>-<title>/
+├── README.md
+├── <three-digit-number>-<title>.ipynb
+├── utils/
+├── model/
+└── data/
+```
+
+In case of output provided by Notebook please create folder output on the same level as readme file.
 
 ## Validation
 
@@ -182,7 +215,7 @@ Once your notebook passes in the CI and you have verified that everything looks 
 4. On making or updating a Pull Request, the tests in the CI will run again. Please keep an
    eye on them. If the tests fail and you think the issue is not related to your PR, please make a comment on your PR.
 
-## Help!
+## Help
 
 If you need help at any time, please open a
 [discussion](https://github.com/openvinotoolkit/openvino_notebooks/issues)! If you think one of the
