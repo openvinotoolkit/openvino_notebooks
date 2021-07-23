@@ -1,3 +1,4 @@
+
 name: docker_nbval
 
 on:
@@ -16,13 +17,18 @@ jobs:
   build:
     strategy:
       fail-fast: false
-  
+
     runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v2
     - name: Build Docker image
       run: |
+      
+        if [ -n "$GITHUB_HEAD_REF" ]; then sed -i "s|openvinotoolkit/openvino_notebooks|$GITHUB_REPOSITORY@$GITHUB_HEAD_REF|g" Dockerfile; fi
+        echo "GITHUB_REPOSITORY" $GITHUB_REPOSITORY
+        echo "GITHUB_HEAD_REF" $GITHUB_HEAD_REF
+        echo "GITHUB_REF" $GITHUB_REF
         docker build . -t openvino_notebooks
     - name: Test notebooks in Docker image
       run: |
