@@ -45,7 +45,6 @@ htmlcov/
 .coverage.*
 .cache
 .idea
-.gitignore
 nosetests.xml
 coverage.xml
 *.cover
