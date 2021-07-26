@@ -7,6 +7,7 @@
 # This file contains utility functions for use with OpenVINO Notebooks
 # https://github.com/openvinotoolkit/openvino_notebooks
 
+import os
 from typing import List, NamedTuple, Optional, Tuple
 
 import cv2
@@ -183,6 +184,17 @@ def get_cpu_info():
 
         cpu = platform.processor()
     return cpu
+
+
+def create_local_folder(directory_name: str='local') -> bool:
+    path_to_dir = os.getcwd() + '/' + directory_name
+    try:
+        os.mkdir(path_to_dir)
+    except OSError:
+        print(f"Unable to create directory {path_to_dir}")
+        return False
+    print(f"Directory {directory_name} created!")
+    return True
 
 
 class NotebookAlert(Exception):
