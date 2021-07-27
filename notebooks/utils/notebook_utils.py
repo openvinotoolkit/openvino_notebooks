@@ -7,7 +7,6 @@
 # This file contains utility functions for use with OpenVINO Notebooks
 # https://github.com/openvinotoolkit/openvino_notebooks
 
-import os
 from typing import List, NamedTuple, Optional, Tuple
 
 import cv2
