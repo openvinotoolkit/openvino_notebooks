@@ -30,7 +30,7 @@ jobs:
       run: |
         jupyter nbconvert notebooks/utils/notebook_utils.ipynb --TagRemovePreprocessor.remove_cell_tags='{"hide"}' --to script
     - name: Create PR
-      uses: technote-space/create-pr-action@v2
+      uses: peter-evans/create-pull-request@v3
       with:
         commit-message: 'CI: Generate notebook_utils.py'
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
