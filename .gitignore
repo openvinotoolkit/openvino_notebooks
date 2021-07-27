@@ -100,4 +100,4 @@ dmypy.json
 *~
 
 # Notebook temporal files
-notebooks/*/local/**
+notebooks/*/output/**

@@ -144,7 +144,7 @@ To keep form similar for each and every notebook please use form as described
 └── data/
 ```
 
-In case of output provided by Notebook please create folder ```local``` on the same level as readme file.
+In case of output provided by Notebook please create folder ```output``` on the same level as readme file.
 
 ## Validation
 

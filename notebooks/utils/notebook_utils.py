@@ -186,17 +186,6 @@ def get_cpu_info():
     return cpu
 
 
-def create_local_folder(directory_name: str='local') -> bool:
-    path_to_dir = os.getcwd() + '/' + directory_name
-    try:
-        os.mkdir(path_to_dir)
-    except OSError:
-        print(f"Unable to create directory {path_to_dir}")
-        return False
-    print(f"Directory {directory_name} created!")
-    return True
-
-
 class NotebookAlert(Exception):
     def __init__(self, message, alert_class):
         self.message = message
