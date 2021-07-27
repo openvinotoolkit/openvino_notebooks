@@ -7,11 +7,11 @@
 This notebook explains the basics of the OpenVINO Inference Engine API.
 It provides segmentation and classification IR model and a segmentation ONNX model as an example, you can replace these model files with own models.
 
-Despite exact output being different, process remains the same.
+Despite the exact output being different,  the process remains the same.
 
-## Content table
+## Notebook Contents
 
-OpenVINO API tutorial that covers the following:
+An OpenVINO API tutorial that covers the following:
 
 * Load Inference Engine and Show Info
 * Loading a Model

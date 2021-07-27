@@ -1,4 +1,4 @@
-# Photo to Anime with PaddleGAN tutorial
+# Photo to Anime with PaddleGAN Tutorial
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F206-vision-paddlegan-anime%2F206-vision-paddlegan-anime.ipynb)
 
@@ -6,9 +6,9 @@
 
 This notebook demonstrates converting a [PaddlePaddle/PaddleGAN](https://github.com/PaddlePaddle/PaddleGAN) AnimeGAN model to OpenVINO's Intermediate Representation (IR) format, and shows inference results on the PaddleGAN and IR models.
 
-## Content table
+## Notebook Contents
 
-In this example AnimeGAN model will be used. For further details see [PaddleGAN's AnimeGAN documentation](https://github.com/PaddlePaddle/PaddleGAN/blob/develop/docs/en_US/tutorials/animegan.md)
+This notebook uses the AnimeGAN model provided by [PaddlePaddle](https://www.paddlepaddle.org.cn/). For more details see [PaddleGAN's AnimeGAN documentation](https://github.com/PaddlePaddle/PaddleGAN/blob/develop/docs/en_US/tutorials/animegan.md)
 
 ## Installation Instructions
 

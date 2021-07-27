@@ -114,17 +114,17 @@ Names should be descriptive but not too long. We use the following numbering sch
 - `200-` OpenVINO model demos: demonstrate inference on a particular model.
 - `300-` Training notebooks: notebooks that include code to train neural networks.
 
-### Writing Readme
+### Writing README
 
 Every notebook must have readme file briefly describing content of related tutorial. To keep it simple structure is described below:
 
 ``` markdown
-# Title of tutorial
+# Title of Tutorial
 [brief intro, basic information about what will be described]
 
-## Content table
-[more details, possibly information about papers or used models, data]
-Here will be placed other subsections, e.g license information.
+## Notebook Contents
+[more details, possibly information about research papers, the model(s) used and/or data]
+Additional subsections, e.g license information.
 
 
 ## Installation Instructions
@@ -133,7 +133,7 @@ Here will be placed other subsections, e.g license information.
 
 ### File structure
 
-To keep form similar for each and every notebook please use form as described
+To maintain consistency between notebooks, please follow the directory structure outlined below.
 
 ```markdown
 <three-digit-number>-<title>/
@@ -148,7 +148,7 @@ In case of output provided by Notebook please create folder ```output``` on the 
 
 ## Validation
 
-### Automated tests
+### Automated Tests
 
 We use Github Actions to automatically validate that all notebooks work. The automated tests
 currently test that the notebooks execute without problems on all supported platform. More granular
