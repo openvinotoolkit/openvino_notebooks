@@ -30,18 +30,17 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
-  
     - name: Create venv
       run: python -m venv openvino_env
-      if: ${{ matrix.os != 'windows-latest' }}
     - name: Install dependencies and check environment
       run: |
-        openvino_env/bin/python -m pip install --upgrade pip
-        openvino_env/bin/python -m pip install -r .ci/dev-requirements.txt
-        openvino_env/bin/python -m ipykernel install --user --name openvino_env
-        openvino_env/bin/python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
-        openvino_env/bin/python -m pip check
-        openvino_env/bin/python check_install.py
+        source openvino_env/bin/activate
+        python -m pip install --upgrade pip
+        python -m pip install -r .ci/dev-requirements.txt
+        python -m ipykernel install --user --name openvino_env
+        python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+        python -m pip check
+        python check_install.py
     - name: Archive pip freeze
       uses: actions/upload-artifact@v2
       with:
@@ -55,5 +54,6 @@ jobs:
         python check_install.py
     - name: Analysing with nbval
       run: |
-        openvino_env/bin/jupyter lab notebooks --help
-        openvino_env/bin/python -m pytest --nbval . --ignore notebooks/301-tensorflow-training-openvino
+        source openvino_env/bin/activate
+        jupyter lab notebooks --help
+        python -m pytest --nbval . --ignore notebooks/301-tensorflow-training-openvino
