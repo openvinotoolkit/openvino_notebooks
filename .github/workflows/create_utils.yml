@@ -26,14 +26,16 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install openvino-dev jupyterlab nbval
         python -m ipykernel install --user --name openvino_env
-    - name: Create  utils
+    - name: Create notebook_utils.py
+      run: |
+        jupyter nbconvert notebooks/utils/notebook_utils.ipynb --TagRemovePreprocessor.remove_cell_tags='{"hide"}' --to script
+    - name: Create PR
       uses: technote-space/create-pr-action@v2
       with:
-        EXECUTE_COMMANDS: |
-          jupyter nbconvert notebooks/utils/notebook_utils.ipynb --TagRemovePreprocessor.remove_cell_tags='{"hide"}' --to script
-        COMMIT_MESSAGE: 'CI: Generate notebook_utils.py'
-        COMMIT_NAME: 'Helena Kloosterman'
-        COMMIT_EMAIL: 'helena.kloosterman@intel.com'
-        PR_BRANCH_NAME: 'notebook-utils-${PR_ID}'
-        PR_TITLE: 'CI: Create notebook_utils.py'
+        commit-message: 'CI: Generate notebook_utils.py'
+        author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+        signoff: false
+        branch: ci-create-utils
+        delete-branch: true
+        title: 'CI: Create notebook_utils.py'
 
