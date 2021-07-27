@@ -43,12 +43,12 @@ jobs:
       if: ${{ matrix.os != 'windows-latest' }}
     - name: Install dependencies and check environment
       run: |
-        $env.PYTHON -m pip install --upgrade pip
-        $env.PYTHON -m pip install -r .ci/dev-requirements.txt
-        $env.PYTHON -m ipykernel install --user --name openvino_env
-        $env.PYTHON -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
-        $env.PYTHON -m pip check
-        $env.PYTHON check_install.py
+        $PYTHON -m pip install --upgrade pip
+        $PYTHON -m pip install -r .ci/dev-requirements.txt
+        $PYTHON -m ipykernel install --user --name openvino_env
+        $PYTHON -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+        $PYTHON -m pip check
+        $PYTHON check_install.py
     - name: Archive pip freeze
       uses: actions/upload-artifact@v2
       with:
