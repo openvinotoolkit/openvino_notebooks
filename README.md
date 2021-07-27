@@ -2,6 +2,11 @@ English | [简体中文](README_cn.md)
 
 # 📚 OpenVINO™ Notebooks
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/openvinotoolkit/openvino_notebooks)
+[![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](LICENSE)
+![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml/badge.svg)
+![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg)
+
 A collection of ready-to-run Jupyter\* notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference. Currently we have an API reference, guides for converting/optimizing PyTorch/TensorFlow/PaddlePaddle models, and model demos. [Click here](notebooks/README.md) to see the list of included notebooks.
 
 ## ⚙️ System Requirements
