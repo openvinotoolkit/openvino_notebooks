@@ -30,6 +30,17 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
+  
+    - name: Create venv
+      run: python -m venv openvino_env
+    - name: Activate venv (Windows)
+      run: |
+        openvino_env\Scripts\activate
+      if: ${{ matrix.os == 'windows-latest' }}
+    - name: Activate venv (Unix)
+      run: |
+        source openvino_env/bin/activate
+      if: ${{ matrix.os != 'windows-latest' }}
     - name: Install dependencies
       run: |
         pip install --upgrade pip
