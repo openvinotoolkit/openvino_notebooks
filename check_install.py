@@ -34,11 +34,11 @@ def show_supported(supported):
 
 
 def pip_check():
-    result = subprocess.run(["pip", "check"], capture_output=True, universal_newlines=True)
-    if "No broken requirements found" in result.stdout:
+    result = subprocess.check_output(["pip", "check"], universal_newlines=True)
+    if "No broken requirements found" in result:
         return True, ""
     else:
-        return False, result.stdout
+        return False, result
 
 
 def kernel_check():
