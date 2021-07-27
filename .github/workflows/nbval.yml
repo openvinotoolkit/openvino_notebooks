@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
+        os: [ubuntu-18.04, ubuntu-20.04, macos-latest]
         python: [3.6, 3.7, 3.8]
 
     runs-on: ${{ matrix.os }}
@@ -33,22 +33,15 @@ jobs:
   
     - name: Create venv
       run: python -m venv openvino_env
-    - name: Activate venv (Windows)
-      run: |
-        echo "PYTHON=openvino_env\Scripts\python.exe" >> "$GITHUB_ENV"
-      if: ${{ matrix.os == 'windows-latest' }}
-    - name: Activate venv (Unix)
-      run: |
-        echo "PYTHON=openvino_env/bin/python" >> "$GITHUB_ENV"
       if: ${{ matrix.os != 'windows-latest' }}
     - name: Install dependencies and check environment
       run: |
-        $PYTHON -m pip install --upgrade pip
-        $PYTHON -m pip install -r .ci/dev-requirements.txt
-        $PYTHON -m ipykernel install --user --name openvino_env
-        $PYTHON -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
-        $PYTHON -m pip check
-        $PYTHON check_install.py
+        openvino_env/bin/python -m pip install --upgrade pip
+        openvino_env/bin/python -m pip install -r .ci/dev-requirements.txt
+        openvino_env/bin/python -m ipykernel install --user --name openvino_env
+        openvino_env/bin/python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+        openvino_env/bin/python -m pip check
+        openvino_env/bin/python check_install.py
     - name: Archive pip freeze
       uses: actions/upload-artifact@v2
       with:
