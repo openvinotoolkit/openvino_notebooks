@@ -2,7 +2,6 @@ English | [简体中文](README_cn.md)
 
 # 📚 OpenVINO™ Notebooks
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/openvinotoolkit/openvino_notebooks)
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](LICENSE)
 ![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml/badge.svg)
 ![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg)
