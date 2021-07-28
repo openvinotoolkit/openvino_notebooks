@@ -5,7 +5,7 @@
 ![coco image](https://user-images.githubusercontent.com/15709723/127032784-8846df6f-0bfb-44ce-8920-76bcc0b5199e.jpg)
 
 This notebook explains the basics of the OpenVINO Inference Engine API.
-It provides segmentation and classification IR model and a segmentation ONNX model as an example, you can replace these model files with own models.
+It provides a segmentation and classification IR model and a segmentation ONNX model. You can replace these model files with own models.
 
 Despite the exact output being different,  the process remains the same.
 

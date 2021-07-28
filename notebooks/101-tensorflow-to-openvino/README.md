@@ -4,7 +4,7 @@
 
 ![coco image](https://user-images.githubusercontent.com/15709723/127032784-8846df6f-0bfb-44ce-8920-76bcc0b5199e.jpg)
 
-This tutorial explains how to convert [TensorFlow](www.tensorflow.org) models to OpenVINO IR with FP16 precision. Inside the notebook we show how to convert the [TensorFlow MobilenetV3 model](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet) and then classify an image with OpenVINO's Inference Engine.
+This tutorial explains how to convert [TensorFlow](www.tensorflow.org) models to OpenVINO IR. Inside the notebook we show how to convert the [TensorFlow MobilenetV3 model](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet) and then classify an image with OpenVINO's Inference Engine.
 
 ## Notebook Contents
 

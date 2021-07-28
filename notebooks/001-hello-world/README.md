@@ -4,7 +4,7 @@
 
 ![classification](https://user-images.githubusercontent.com/36741649/127172572-1cdab941-df5f-42e2-a367-2b334a3db6d8.jpg)
 
-Basic introduction that shows basic operations using OpenVINO, including inference on a given IR model.
+This notebook shows how to do inference on an OpenVINO IR model.
 
 ## Notebook Contents
 
