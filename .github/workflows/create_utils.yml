@@ -36,6 +36,6 @@ jobs:
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
         signoff: false
         branch: ci-create-utils
-        delete-branch: true
+        base: main
         title: 'CI: Create notebook_utils.py'
 
