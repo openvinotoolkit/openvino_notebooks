@@ -38,4 +38,4 @@ jobs:
         branch: ci-create-utils
         base: main
         title: 'CI: Create notebook_utils.py'
-
+        token: ${{ secrets.PAT }}
