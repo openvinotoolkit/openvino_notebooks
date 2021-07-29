@@ -2,7 +2,7 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F101-tensorflow-to-openvino%2F101-tensorflow-to-openvino.ipynb)
 
-![coco image](https://user-images.githubusercontent.com/15709723/127032784-8846df6f-0bfb-44ce-8920-76bcc0b5199e.jpg)
+<img src="https://user-images.githubusercontent.com/36741649/127170593-86976dc3-e5e4-40be-b0a6-206379cd7df5.jpg" width=300>
 
 This tutorial explains how to convert [TensorFlow](www.tensorflow.org) models to OpenVINO IR. Inside the notebook we show how to convert the [TensorFlow MobilenetV3 model](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet) and then classify an image with OpenVINO's Inference Engine.
 
