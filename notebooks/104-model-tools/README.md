@@ -2,8 +2,6 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb)
 
-![performance](https://user-images.githubusercontent.com/36741649/127172929-3ce2e2aa-4030-4692-89ac-753fcdf7e1b3.jpg)
-
 This notebook shows how to download a model from Open Model Zoo, convert it to OpenVINO's IR format, show information about the model, and benchmark the model.
 
 | Tool             | Command           | Description                                                                       |
