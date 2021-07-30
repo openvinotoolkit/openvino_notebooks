@@ -2,6 +2,10 @@
  
 # 📚 OpenVINO Notebooks
 
+[![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](LICENSE)
+![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml/badge.svg)
+![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg)
+
 一些可以运行的Jupyter\* notebooks，用于学习和试验OpenVINO™开发套件。这些notebooks旨在提供OpenVINO基础知识的介绍，并教开发人员如何利用我们的API在应用程序中优化深度学习推理。
 
 ## ⚙️ 系统需求

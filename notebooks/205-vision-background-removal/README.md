@@ -2,13 +2,12 @@
 
 This demo notebook shows image segmentation and removing/adding background with [U^2-Net](https://github.com/xuebinqin/U-2-Net) and OpenVINO.
 
-
 ![Image segmentation with U^2-Net and OpenVINO](https://user-images.githubusercontent.com/77325899/116818525-1ca00980-ab6c-11eb-83b4-d42fa7d6d94a.png)
 ![Background removal with U^2-Net and OpenVINO](https://user-images.githubusercontent.com/77325899/116818585-74d70b80-ab6c-11eb-9bad-1ddf1b5ea5fe.png)
 
-
 ## U^2-Net source
-```
+
+``` markdown
 @InProceedings{Qin_2020_PR,
 title = {U2-Net: Going Deeper with Nested U-Structure for Salient Object Detection},
 author = {Qin, Xuebin and Zhang, Zichen and Huang, Chenyang and Dehghan, Masood and Zaiane, Osmar and Jagersand, Martin},
@@ -19,6 +18,6 @@ year = {2020}
 }
 ```
 
-# Installation Instructions
+## Installation Instructions
 
-If you have not done so already, please follow the [Installation Guide](../../README.md) to install all required dependencies. 
+If you have not done so already, please follow the [Installation Guide](../../README.md) to install all required dependencies.

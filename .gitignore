@@ -44,6 +44,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.idea
 nosetests.xml
 coverage.xml
 *.cover
@@ -97,3 +98,6 @@ dmypy.json
 
 # vim backup files
 *~
+
+# Notebook temporal files
+notebooks/*/output/**
