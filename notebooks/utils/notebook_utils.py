@@ -16,6 +16,7 @@ import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import openvino.inference_engine
 from IPython.display import HTML, ProgressBar, clear_output, display
 from matplotlib.lines import Line2D
 from openvino.inference_engine import IECore
@@ -452,4 +453,37 @@ def check_device(device: str) -> bool:
         return False
     else:
         return True
+
+
+def check_openvino_version(version: str)-> bool:
+    """
+    Check if the specified OpenVINO version is installed.
+
+    :param version: the OpenVINO version to check. Example: 2021.4
+    :return: True if the version is installed, False if not. If the version is not installed,
+             an alert message will be shown.
+    """
+    installed_version = openvino.inference_engine.get_version()
+    if version not in installed_version:
+        NotebookAlert(f"This notebook requires OpenVINO {version}. "
+                      f"The version on your system is: <i>{installed_version}</i>.<br>"
+                      "Please run <span style='font-family:monospace'>pip install --upgrade -r requirements.txt</span> " 
+                      "in the openvino_env environment to install this version. "
+                      "See the <a href='https://github.com/openvinotoolkit/openvino_notebooks'>"
+                      "OpenVINO Notebooks README</a> for detailed instructions", alert_class="danger")
+        return False
+    else:
+        return True
+
+
+# In[ ]:
+
+
+assert check_openvino_version("2021.4")
+
+
+# In[ ]:
+
+
+check_openvino_version("2022.1");
 
