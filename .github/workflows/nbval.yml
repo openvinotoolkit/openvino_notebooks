@@ -9,7 +9,7 @@ on:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
     - 'requirements.txt'
-    - '.ci/*requirements.txt'
+    - '.ci/*'
     - '.github/workflows/nbval.yml'
   schedule:
     - cron:  '30 8 * * *'
