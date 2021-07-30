@@ -475,15 +475,3 @@ def check_openvino_version(version: str)-> bool:
     else:
         return True
 
-
-# In[ ]:
-
-
-assert check_openvino_version("2021.4")
-
-
-# In[ ]:
-
-
-check_openvino_version("2022.1");
-
