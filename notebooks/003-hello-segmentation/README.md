@@ -2,6 +2,8 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F003-hello-segmentation%2F003-hello-segmentation.ipynb)
 
+<img src="https://user-images.githubusercontent.com/36741649/127666031-78e61a99-5b4f-4620-a285-949cf12e64cc.png" height=300> <img src="https://user-images.githubusercontent.com/36741649/127666421-4dd24ac2-2573-418f-a0dc-4754ce75d1ba.png" height=300>
+
 This notebook demonstrates how to do inference with segmentation model.
 
 ## Notebook Contents
