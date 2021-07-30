@@ -474,4 +474,3 @@ def check_openvino_version(version: str)-> bool:
         return False
     else:
         return True
-
