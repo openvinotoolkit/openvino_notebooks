@@ -10,7 +10,7 @@ A collection of ready-to-run Jupyter\* notebooks for learning and experimenting 
 
 ## 📖 What's Inside
 
-### `000` - Hello World API Tutorials
+### Getting Started
 
 Brief _hello world_ tutorials that show how to use Inference Engine API
 | <!-- --> | <!-- --> | <!-- --> |
@@ -18,7 +18,7 @@ Brief _hello world_ tutorials that show how to use Inference Engine API
 | [001-hello-world](001-hello-world/001-hello-world.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F001-hello-world%2F001-hello-world.ipynb) | Classify an image with OpenVINO | <img src="https://user-images.githubusercontent.com/36741649/127170593-86976dc3-e5e4-40be-b0a6-206379cd7df5.jpg" width=115> |
 | [002-openvino-api](002-openvino-api/002-openvino-api.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F002-openvino-api%2F002-openvino-api.ipynb) | Learn the Inference Engine Python API | |
 
-### `100` - Developer Tool Tutorials
+### Convert & Optimize
 
 Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | <!-- --> | <!-- --> | <!-- --> |
@@ -28,7 +28,7 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | [103-paddle-onnx-to-openvino](103-paddle-onnx-to-openvino/103-paddle-onnx-to-openvino-classification.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-onnx-to-openvino%2F103-paddle-onnx-to-openvino-classification.ipynb) | Convert PaddlePaddle models to OpenVINO IR | <img src="https://user-images.githubusercontent.com/15709723/127779326-dc14653f-a960-4877-b529-86908a6f2a61.png" width=300> |
 | [104-model-tools](104-model-tools/104-model-tools.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | Download, convert and benchmark models from Open Model Zoo | |
 
-### `200` - Model Demos
+### Model Demos
 
 Demos that demonstrate inference on a particular model.
 | <!-- --> | <!-- --> | <!-- --> |
@@ -39,7 +39,7 @@ Demos that demonstrate inference on a particular model.
 | [205-vision-background-removal](205-vision-background-removal/205-vision-background-removal.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F205-vision-background-removal%2F205-vision-background-removal.ipynb) | Remove and replace the background in an image using salient object detection | <img src="https://user-images.githubusercontent.com/15709723/125184237-f4b6cd00-e1d0-11eb-8e3b-d92c9a728372.png" width=250> |
 | [206-vision-paddlegan-anime](206-vision-paddlegan-anime/206-vision-paddlegan-anime.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F206-vision-paddlegan-anime%2F206-vision-paddlegan-anime.ipynb) | Turn an image into anime using a GAN | <img src="https://user-images.githubusercontent.com/15709723/125184441-b4584e80-e1d2-11eb-8964-d8131cd97409.png" width=120> |
 
-### `300` - Model Training
+### Model Training
 
 Tutorials that include code to train neural networks.
 | <!-- --> | <!-- --> | <!-- --> |
