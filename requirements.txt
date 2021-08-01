@@ -33,3 +33,6 @@ setuptools>=56.0.0
 Pillow==8.2.*
 ipykernel==5.*
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
+
+transformers
+sklearn
