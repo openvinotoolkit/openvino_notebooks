@@ -200,7 +200,6 @@ if (
 ):
     if NO_BROKEN_REQUIREMENTS:
         print("Everything looks good!")
-        sys.exit(0)
     else:
         print("Summary: The installation looks good, but there are conflicting requirements.")
 else:
@@ -208,6 +207,5 @@ else:
         "The README.md file is located in the openvino_notebooks directory \n"
         "and at https://github.com/openvinotoolkit/openvino_notebooks"
     )
-    sys.exit(1)
 if not NO_BROKEN_REQUIREMENTS:
     print("Broken requirements are often harmless, but could cause issues.")
