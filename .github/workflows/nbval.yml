@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, macos-latest]
+        os: [ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
         python: [3.6, 3.7, 3.8]
 
     runs-on: ${{ matrix.os }}
@@ -30,30 +30,24 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
-    - name: Create venv
-      run: python -m venv openvino_env
-    - name: Install dependencies and check environment
+    - name: Install dependencies
       run: |
-        source openvino_env/bin/activate
         python -m pip install --upgrade pip
         python -m pip install -r .ci/dev-requirements.txt
         python -m ipykernel install --user --name openvino_env
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
-        python -m pip check
-        python check_install.py
     - name: Archive pip freeze
       uses: actions/upload-artifact@v2
       with:
         name: pip-freeze
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
-    - name: Check READMEs
-      run: |
-        python -m pytest .ci/test_notebooks.py
     - name: Check install
       run: |
         python check_install.py
+    - name: Check READMEs
+      run: |
+        python -m pytest .ci/test_notebooks.py
     - name: Analysing with nbval
       run: |
-        source openvino_env/bin/activate
         jupyter lab notebooks --help
         python -m pytest --nbval . --ignore notebooks/301-tensorflow-training-openvino
