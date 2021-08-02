@@ -10,7 +10,7 @@ A collection of ready-to-run Jupyter\* notebooks for learning and experimenting 
 
 ## 📖 What's Inside
 
-All notebooks are in the [notebooks](notebooks) directory. Any notebook with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](#-installation-guide).
+Notebooks with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](#-installation-guide) and run the notebooks locally.
 
 ### Getting Started
 
