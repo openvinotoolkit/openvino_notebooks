@@ -1,12 +1,11 @@
 from pathlib import Path
-import os
 
 def test_readme():
     """
     Test that all notebooks have a README file and exist in the Notebooks README
     """
     notebooks_readme = Path("notebooks/README.md").read_text()
-    for item in Path("./notebooks").iterdir():
+    for item in Path("notebooks").iterdir():
         if item.is_dir():
         # item is a notebook directory
             notebook_dir = item.relative_to("notebooks")
