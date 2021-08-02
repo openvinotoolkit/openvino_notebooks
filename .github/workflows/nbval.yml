@@ -9,7 +9,7 @@ on:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
     - 'requirements.txt'
-    - '.ci/*requirements.txt'
+    - '.ci/*'
     - '.github/workflows/nbval.yml'
   schedule:
     - cron:  '30 8 * * *'
@@ -41,6 +41,9 @@ jobs:
       with:
         name: pip-freeze
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+    - name: Check READMEs
+      run: |
+        python -m pytest .ci/test_notebooks.py
     - name: Analysing with nbval
       run: |
         jupyter lab notebooks --help
