@@ -1,6 +1,6 @@
 # List of Notebooks
 
-Each notebook is located in a directory. Any notebook with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/readme.md#-installation-guide) before launching Jupyter Lab or
+Each notebook is located in a directory. Any notebook with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md#-installation-guide) before launching Jupyter Lab or
 Jupyter Notebook.
 
 ## Getting Started
