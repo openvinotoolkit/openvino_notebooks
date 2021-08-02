@@ -10,7 +10,7 @@ A collection of ready-to-run Jupyter\* notebooks for learning and experimenting 
 
 ## 📖 What's Inside
 
-Each notebook is located in a subdirectory inside the [notebooks](notebooks) directory. Please follow the [Installation Guide](#-installation-guide) before launching Jupyter Lab or Jupyter Notebook. Notebooks with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be launched without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, we recommend installing the notebooks locally.
+All notebooks are in the [notebooks](notebooks) directory. Any notebook with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](#-installation-guide).
 
 ### Getting Started
 
