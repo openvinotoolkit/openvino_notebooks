@@ -23,6 +23,10 @@ paddlehub
 paddle2onnx>=0.6
 ppgan>=2.0.0
 
+# BERT quantization notebook requirements
+transformers
+sklearn
+
 # Jupyter requirements
 jupyterlab
 
