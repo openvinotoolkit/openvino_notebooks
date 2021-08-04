@@ -41,6 +41,9 @@ jobs:
       with:
         name: pip-freeze
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+    - name: Check install
+      run: |
+        python check_install.py
     - name: Check READMEs
       run: |
         python -m pytest .ci/test_notebooks.py
