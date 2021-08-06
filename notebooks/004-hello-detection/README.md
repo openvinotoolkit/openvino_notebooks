@@ -4,7 +4,7 @@
 
 |                                                                                                                             |                                                                                                                             |
 | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| <img src="https://user-images.githubusercontent.com/36741649/128347115-bcc1a181-fedb-42b1-95db-d3ae374720ef.jpg" width=300> | <img src="https://user-images.githubusercontent.com/36741649/128348095-67f67cd1-560f-45f8-a919-8471abda2ada.jpg" width=300> |
+| <img src="https://user-images.githubusercontent.com/36741649/128489910-316aec49-4892-46f1-9e3c-b9d3646ef278.jpg" width=300> | <img src="https://user-images.githubusercontent.com/36741649/128489933-bf215a3f-06fa-4918-8833-cb0bf9fb1cc7.jpg" width=300> |
 
 This notebook demonstrates how to do inference with detection model.
 
