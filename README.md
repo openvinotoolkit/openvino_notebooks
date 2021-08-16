@@ -56,6 +56,7 @@ Tutorials that include code to train neural networks.
 | [301-tensorflow-training-openvino](notebooks/301-tensorflow-training-openvino/) | Train a flower classification model from TensorFlow, then convert to OpenVINO IR | <img src="https://user-images.githubusercontent.com/15709723/127779607-8fa34947-1c35-4260-8d04-981c41a2a2cc.png" width=390> |
 | [301-tensorflow-training-openvino-pot](notebooks/301-tensorflow-training-openvino/) | Use Post-training Optimization Tool (POT) to quantize the flowers model | |
 | [302-pytorch-quantization-aware-training](notebooks/302-pytorch-quantization-aware-training) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model | |
+| [303-pytorch-int8-semseg-with-nncf-pot-openvino](notebooks/303-pytorch-int8-semseg-with-nncf-pot-openvino) | Use Neural Network Compression Framework (NNCF) to quantize a UNet for the semantic segmentation task on CamVid and compare with POT results| |
 | [305-tensorflow-quantization-aware-training](notebooks/305-tensorflow-quantization-aware-training) | Use Neural Network Compression Framework (NNCF) to quantize TensorFlow model | |
 
 ### Live Demos

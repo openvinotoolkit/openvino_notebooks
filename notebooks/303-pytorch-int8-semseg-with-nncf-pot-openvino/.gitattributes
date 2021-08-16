@@ -1,0 +1,1 @@
+unet_camvid.pth filter=lfs diff=lfs merge=lfs -text
