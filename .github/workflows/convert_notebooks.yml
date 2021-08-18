@@ -46,3 +46,8 @@ jobs:
       with:
         name: markdown_files
         path: markdown_files
+    - name: Save reStructuredText files
+      uses: actions/upload-artifact@v2
+      with:
+        name: rst_files
+        path: rst_files
