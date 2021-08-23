@@ -2,6 +2,7 @@ openvino-dev[onnx,tensorflow2]==2021.4.*
 matplotlib<3.4
 gdown
 pytube
+requests
 tqdm
 openvino-extensions
 
