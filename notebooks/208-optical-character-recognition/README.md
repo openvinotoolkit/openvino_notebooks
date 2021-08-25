@@ -1,6 +1,6 @@
 # Optical character recognition notebook
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%5C208-optical-character-recognition%5C208-optical-character-recognition.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F208-optical-character-recognition%2F208-optical-character-recognition.ipynb)
 
 | | |
 |---|---|
