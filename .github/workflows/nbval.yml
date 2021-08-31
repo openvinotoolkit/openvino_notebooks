@@ -11,6 +11,15 @@ on:
     - 'requirements.txt'
     - '.ci/*'
     - '.github/workflows/nbval.yml'
+  push:
+    branches:
+    - 'main'
+    paths:
+    - 'notebooks/**.ipynb'
+    - 'notebooks/**.py'
+    - 'requirements.txt'
+    - '.ci/*'
+    - '.github/workflows/nbval.yml'
   schedule:
     - cron:  '30 8 * * *'
 
@@ -50,4 +59,5 @@ jobs:
     - name: Analysing with nbval
       run: |
         jupyter lab notebooks --help
-        python -m pytest --nbval . --ignore notebooks/103-paddle-onnx-to-openvino --ignore notebooks/301-tensorflow-training-openvino 
+        python -m pytest --nbval . --ignore notebooks/301-tensorflow-training-openvino
+
