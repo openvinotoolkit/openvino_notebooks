@@ -70,8 +70,8 @@ class DownloadProgressBar:
 
             downloaded = block_num * block_size
             if downloaded < total_size:
-                if block_num % 10 == 0:
-                    # Update progress bar after 10 blocks have been received
+                if block_num % 20 == 0:
+                    # Update progress bar after 20 blocks have been received
                     self.progress_bar.progress = downloaded
                     self.progress_bar.update()
             else:
@@ -139,7 +139,7 @@ def download_ir_model(model_xml_url: str, destination_folder: str = None):
                                files are saved to the current directory
     """
     model_bin_url = model_xml_url[:-4] + ".bin"
-    model_xml_path = download_file(model_xml_url, directory=destination_folder)
+    model_xml_path = download_file(model_xml_url, directory=destination_folder, show_progress=False)
     download_file(model_bin_url, directory=destination_folder)
     return model_xml_path
 
