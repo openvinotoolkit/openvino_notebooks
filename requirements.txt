@@ -30,7 +30,6 @@ sklearn
 
 # Jupyter requirements
 jupyterlab
-pandoc
 
 # Pin versions to prevent known dependency issues
 ipython==7.10.*
