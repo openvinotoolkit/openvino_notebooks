@@ -59,10 +59,8 @@ class DownloadProgressBar(tqdm_notebook):
     """
 
     def update_to(self, block_num: int, block_size: int, total_size: int):
-        if total_size is not None:
-            self.total = total_size
         downloaded = block_num * block_size
-        if downloaded < total_size:
+        if downloaded <= total_size:
             self.update(downloaded - self.n)
     
 
@@ -107,7 +105,7 @@ def download_file(
     # download the file if it does not exist, or if it exists with an incorrect file size
     urlobject_size = int(urlobject.info().get("Content-Length", 0))
     if not filename.exists() or (os.stat(filename).st_size != urlobject_size):
-        progress_callback = DownloadProgressBar(unit = 'B', unit_scale = True, unit_divisor = 1024, desc=str(filename), disable=not show_progress)
+        progress_callback = DownloadProgressBar(total=urlobject_size, unit = 'B', unit_scale = True, unit_divisor = 1024, desc=str(filename), disable=not show_progress)
         urllib.request.urlretrieve(url, filename,reporthook = progress_callback.update_to)
     else:
         print(f"'{filename}' already exists.")
