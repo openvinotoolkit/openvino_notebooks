@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import openvino.inference_engine
 from IPython.display import HTML, ProgressBar, clear_output, display
+from tqdm.notebook import tqdm_notebook
 from matplotlib.lines import Line2D
 from openvino.inference_engine import IECore
 
@@ -50,36 +51,20 @@ def load_image(path: str):
     return image
 
 
-class DownloadProgressBar:
+class DownloadProgressBar(tqdm_notebook):
     """
     IPython Progress bar for downloading files with urllib.request.urlretrieve
 
     :param filename: Filename of the file that is being downloaded. Used for displaying only.
     """
 
-    def __init__(self, filename: str):
-        self.progress_bar = None
-        self.filename = filename
-
-    def __call__(self, block_num, block_size, total_size):
-        try:
-            if not self.progress_bar and block_num == 0:
-                print(f"Downloading {self.filename}...")
-                self.progress_bar = ProgressBar(total=total_size)
-                self.progress_bar.display()
-
-            downloaded = block_num * block_size
-            if downloaded < total_size:
-                if block_num % 20 == 0:
-                    # Update progress bar after 20 blocks have been received
-                    self.progress_bar.progress = downloaded
-                    self.progress_bar.update()
-            else:
-                clear_output()
-                print(f"Downloaded {self.filename}")
-        except Exception:
-            # Do not fail the download just because the progress bar does not work
-            pass
+    def update_to(self, block_num: int, block_size: int, total_size: int):
+        if total_size is not None:
+            self.total = total_size
+        downloaded = block_num * block_size
+        if downloaded < total_size:
+            self.update(downloaded - self.n)
+    
 
 
 def download_file(
@@ -97,15 +82,15 @@ def download_file(
                       If None the file will be saved to the current working directory
     :param show_progress: If True, show an IPython ProgressBar.
     """
-    if filename is None:
-        try:
-            opener = urllib.request.build_opener()
-            opener.addheaders = [("User-agent", "Mozilla/5.0")]
-            urllib.request.install_opener(opener)
-            urlobject = urllib.request.urlopen(url)
-            filename = urlobject.info().get_filename() or Path(urllib.parse.urlparse(url).path).name
-        except urllib.error.HTTPError as e:
-            raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
+    filename = filename if filename is not None else url.split('/')[-1]
+    try:
+        opener = urllib.request.build_opener()
+        opener.addheaders = [("User-agent", "Mozilla/5.0")]
+        urllib.request.install_opener(opener)
+        urlobject = urllib.request.urlopen(url)
+        filename = urlobject.info().get_filename() or Path(urllib.parse.urlparse(url).path).name
+    except urllib.error.HTTPError as e:
+        raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
     filename = Path(filename)
     if filename is not None and len(filename.parts) > 1:
         raise ValueError(
@@ -120,10 +105,10 @@ def download_file(
         filename = directory / Path(filename)
 
     # download the file if it does not exist, or if it exists with an incorrect file size
-    urlobject_size = urlobject_size = int(urlobject.info().get("Content-Length", 0))
+    urlobject_size = int(urlobject.info().get("Content-Length", 0))
     if not filename.exists() or (os.stat(filename).st_size != urlobject_size):
-        progress_callback = DownloadProgressBar(filename) if show_progress else None
-        urllib.request.urlretrieve(url, filename, progress_callback)
+        progress_callback = DownloadProgressBar(unit = 'B', unit_scale = True, unit_divisor = 1024, desc=str(filename), disable=not show_progress)
+        urllib.request.urlretrieve(url, filename,reporthook = progress_callback.update_to)
     else:
         print(f"'{filename}' already exists.")
     return filename.resolve()
