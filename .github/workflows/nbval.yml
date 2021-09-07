@@ -41,7 +41,6 @@ jobs:
       with:
         path: |
           ~/.paddlehub
-          ~/notebooks/208-optical-character-recognition/output/public/text-recognition-resnet-fc
         key: cache-files
     - name: Set up Python 
       uses: actions/setup-python@v1
