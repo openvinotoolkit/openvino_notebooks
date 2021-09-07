@@ -35,6 +35,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Cache Files
+      id: cache-files
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.paddlehub
+          ~/notebooks/208-optical-character-recognition/output/public/text-recognition-resnet-fc
+        key: cache-files
     - name: Set up Python 
       uses: actions/setup-python@v1
       with:
