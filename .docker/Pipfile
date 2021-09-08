@@ -17,12 +17,13 @@ jupyterhub = "==1.1.0"
 jupyterlab = "*"
 matplotlib = "<3.4"
 nbval = "*"
-openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2021.4"}
+nncf = {extras = ["torch"], version = "*"}
+openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2021.4.*"}
 openvino-extensions="*"
 paddle2onnx = ">=0.6"
 paddlehub = "*"
 paddlepaddle = "~=2.1.1"
-Pillow = "==8.2.*"
+Pillow = ">=8.3.2"
 ppgan = ">=2.0.0"
 PVGeo = "*"
 pytube = "*"
@@ -40,4 +41,3 @@ tqdm = "*"
 
 [requires]
 python_version = "3.8"
-
