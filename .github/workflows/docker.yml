@@ -11,7 +11,13 @@ on:
       - 'notebooks/**.py'
       - 'requirements.txt'
       - '.ci/*requirements.txt'
-
+  pull_request:
+    branches:
+    - 'main'
+    paths:
+      - "Dockerfile"
+      - ".docker/**"
+      - ".github/workflows/docker.yml"
 jobs:
   build:
     strategy:
