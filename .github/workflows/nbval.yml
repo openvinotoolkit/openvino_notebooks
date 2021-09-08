@@ -35,6 +35,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Cache Files
+      id: cache-files
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.paddlehub
+        key: cache-files
     - name: Set up Python 
       uses: actions/setup-python@v1
       with:
@@ -60,5 +67,5 @@ jobs:
     - name: Analysing with nbval
       run: |
         jupyter lab notebooks --help
-        python -m pytest -x --nbval --durations 10 --reruns 5 --reruns-delay 20 --ignore notebooks/208-optical-character-recognition --ignore notebooks/301-tensorflow-training-openvino .
+        python -m pytest -x --nbval --durations 10 --reruns 5 --reruns-delay 70 --ignore notebooks/208-optical-character-recognition --ignore notebooks/301-tensorflow-training-openvino .
 
