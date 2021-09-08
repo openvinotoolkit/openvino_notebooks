@@ -64,8 +64,11 @@ jobs:
     - name: Check READMEs
       run: |
         python -m pytest .ci/test_notebooks.py
+    - name: Patch notebooks
+      run: |
+        python .ci/patch_notebooks.py
     - name: Analysing with nbval
       run: |
         jupyter lab notebooks --help
-        python -m pytest -x --nbval --durations 10 --reruns 5 --reruns-delay 70 --ignore notebooks/208-optical-character-recognition --ignore notebooks/301-tensorflow-training-openvino .
+        python -m pytest --nbval -x -k test_ --durations 10 --reruns 5 --reruns-delay 70 --ignore notebooks/208-optical-character-recognition .
 

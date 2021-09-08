@@ -13,3 +13,4 @@ def test_readme():
                 assert "README.md" in [filename.name for filename in item.iterdir()], \
                        f"README not found in {item}"
                 assert str(notebook_dir) in notebooks_readme, f"{item} not found in notebooks README"
+
