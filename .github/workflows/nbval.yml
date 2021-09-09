@@ -70,5 +70,5 @@ jobs:
     - name: Analysing with nbval
       run: |
         jupyter lab notebooks --help
-        python -m pytest --nbval -x -k test_ --durations 10 --reruns 5 --reruns-delay 70 --ignore notebooks/208-optical-character-recognition .
+        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10 --reruns 5 --reruns-delay 70 --ignore notebooks/208-optical-character-recognition .
 
