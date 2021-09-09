@@ -2,7 +2,11 @@ name: docker_nbval
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron:  '30 3 * * *'
   push:
+    branches:
+    - 'main'
     paths:
       - "Dockerfile"
       - ".docker/**"
@@ -11,7 +15,13 @@ on:
       - 'notebooks/**.py'
       - 'requirements.txt'
       - '.ci/*requirements.txt'
-
+  pull_request:
+    branches:
+    - 'main'
+    paths:
+      - "Dockerfile"
+      - ".docker/**"
+      - ".github/workflows/docker.yml"
 jobs:
   build:
     strategy:
