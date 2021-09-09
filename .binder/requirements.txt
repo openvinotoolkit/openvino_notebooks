@@ -27,6 +27,9 @@ ppgan>=2.0.0
 ipython==7.10.*
 jedi==0.17.2
 setuptools>=56.0.0
-Pillow==8.2.*
 ipykernel==5.*
+Pillow>=8.3.2 # not directly required, pinned to avoid a vulnerability
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
+nltk>=3.6 # not directly required, pinned by Snyk to avoid a vulnerability
+rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
+scikit-learn>=0.24.2 # not directly required, pinned by Snyk to avoid a vulnerability
