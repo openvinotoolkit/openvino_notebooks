@@ -25,6 +25,5 @@ if [ -n "${JUPYTER_PRELOAD_REPOS}" ]; then
     done
 fi
 
-sed -i 's/NUM_FRAMES = 100/NUM_FRAMES = 5/g' openvino_notebooks/notebooks/202-vision-superresolution/202-vision-superresolution-video.ipynb
-sed -i 's/epochs = 15/epochs = 1/g' openvino_notebooks/notebooks/301-tensorflow-training-openvino/301-tensorflow-training-openvino.ipynb
-exec /opt/app-root/bin/pytest --durations=10 --nbval --current-env openvino_notebooks/notebooks --ignore openvino_notebooks/notebooks/301-tensorflow-training-openvino/301-tensorflow-training-openvino.ipynb
+python /tmp/scripts/patch_notebooks.py 
+exec /opt/app-root/bin/pytest --durations=10 --nbval --current-env -k "test_ or notebook_utils" openvino_notebooks/notebooks

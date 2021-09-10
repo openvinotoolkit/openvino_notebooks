@@ -13,7 +13,7 @@ def patch_notebooks():
     {"test_replace": {"epochs = 15": "epochs = 1"} to the cell
     metadata of the cell that contains `epochs = 15`
     """
-    for notebookfile in Path("notebooks").glob("**/[0-9]*.ipynb"):
+    for notebookfile in Path(".").glob("**/[0-9]*.ipynb"):
         nb = nbformat.read(notebookfile, as_version=nbformat.NO_CONVERT)
         found = False
         for cell in nb["cells"]:
