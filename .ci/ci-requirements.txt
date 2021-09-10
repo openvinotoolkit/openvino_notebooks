@@ -3,5 +3,6 @@
 # Packages for testing/validating notebooks
 nbval
 nbqa[toolchain]
+pandoc
 pre-commit
 
