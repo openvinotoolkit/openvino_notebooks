@@ -34,6 +34,7 @@ RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
 COPY .docker/.s2i/bin /tmp/scripts
 # Copying in source code
 COPY .docker /tmp/src
+COPY .ci/patch_notebooks.py /tmp/scripts
 
 # Git on Windows may convert line endings. Run dos2unix to enable
 # building the image when the scripts have CRLF line endings.
