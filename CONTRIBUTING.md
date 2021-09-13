@@ -6,7 +6,7 @@
     - [Implementation choices](#implementation-choices)
     - [Other things to keep in mind](#other-things-to-keep-in-mind)
     - [Notebook naming](#notebook-naming)
-    - [Writing Readme](#writing-readme)
+    - [Readmes](#readmes)
     - [File structure](#file-structure)
   - [Validation](#validation)
     - [Automated tests](#automated-tests)
@@ -89,13 +89,15 @@ To do this, there are a few requirements that all notebooks need to pass.
    001-hello-world.ipynb notebook can be found in the 001-hello-world directory.
    - See the [Notebook naming](#notebook-naming) section below, for the
      numbering of the notebooks.
-   - Add a README to the notebook subdirectory. Add a screenshoft that gives an indication of what
+   - Add a README to the notebook subdirectory. Add a screenshot that gives an indication of what
      the notebook does if applicable.
    - Add any supporting files to this subdirectory too. Supporting files should
      be small (generally less than 5MB). Larger images, datasets and model
      files should be downloaded from within the notebook.
-6. All related files should be saved to the notebook subdirectory, even if that means that there is
-   a small amount of duplication.
+6. All related files, with the exception of Open Model Zoo models, should be saved to the notebook subdirectory, 
+   even if that means that there is a small amount of duplication. For Open Model Zoo models, see the directory
+   structure in the [104 Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/main/notebooks/104-model-tools) 
+   notebook.
 7. The notebooks should provide an easy way to clean up the downloaded data, for example with a
    commented-out cell at the end of the notebook.
 
@@ -114,9 +116,9 @@ Names should be descriptive but not too long. We use the following numbering sch
 - `200-` OpenVINO model demos: demonstrate inference on a particular model.
 - `300-` Training notebooks: notebooks that include code to train neural networks.
 
-### Writing README
+### READMEs
 
-Every notebook must have readme file briefly describing content of related tutorial. To keep it simple structure is described below:
+Every notebook must have a README file that briefly describes the content of the notebook. A simple structure for the README file is described below:
 
 ``` markdown
 # Title of Tutorial
@@ -130,6 +132,12 @@ Additional subsections, e.g license information.
 ## Installation Instructions
 [link to installation guide, other important information for install process]
 ```
+
+Every notebook is also added to the notebooks overview table in the main
+[README](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md) and the 
+[README](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/README.md) in the notebooks directory
+Notebooks that work in Binder have a _Launch Binder_ badge in the README files.
+
 
 ### File structure
 
@@ -203,14 +211,16 @@ button to Jupyter Lab to automatically format the code in notebooks with black a
    - Go to the GitHub page of your fork, click on _Actions_, select _nbval_ on the left. There will
      be a message _This workflow has a workflow_dispatch event trigger._ and a _Run workflow_ button.
      Click on the button and select the branch that you want to test.
+6. Test if the notebook works in [https://mybinder.org/](Binder) and if so, add _Launch Binder_ badges 
+   to the README files.
 
 Once your notebook passes in the CI and you have verified that everything looks good, make a Pull Request!
 
 ### Pull Requests (PRs)
 
 1. If some time has passed since you made the fork, rebase or merge your fork to the
-   openvino_notebooks develop branch first.
-2. Create your PR against the openvino_notebooks develop branch, not the main branch.
+   openvino_notebooks main branch first.
+2. Create your PR against the openvino_notebooks main branch.
 3. Please create a description of what the notebook does with your PR. Screenshots are appreciated!
 4. On making or updating a Pull Request, the tests in the CI will run again. Please keep an
    eye on them. If the tests fail and you think the issue is not related to your PR, please make a comment on your PR.
