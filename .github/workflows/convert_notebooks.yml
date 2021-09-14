@@ -7,7 +7,14 @@ on:
     branches:
     - 'main'
     paths:
-    - "**.ipynb"
+    - 'notebooks/**.ipynb'
+    - 'notebooks/**.py'
+    - 'requirements.txt'
+    - '.ci/*'
+    - '.github/workflows/convert_notebooks.yml'
+  pull_request:
+    paths:
+    - '.github/workflows/convert_notebooks.yml'    
 jobs:
   build:
     strategy:
@@ -20,7 +27,7 @@ jobs:
       with:
         python-version: 3.7
     - name: Install required packages
-      run: sudo apt-get install texlive texlive-latex-extra pandoc
+      run: sudo apt-get update && sudo apt-get install texlive texlive-latex-extra pandoc
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
