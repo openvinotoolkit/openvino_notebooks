@@ -5,6 +5,7 @@
 
 
 import os
+import shutil
 import urllib
 import urllib.parse
 import urllib.request
@@ -29,7 +30,7 @@ from openvino.inference_engine import IECore
 # In[ ]:
 
 
-def load_image(path: str):
+def load_image(path: str) -> np.ndarray:
     """
     Loads an image from `path` and returns it as BGR numpy array. `path`
     should point to an image file, either a local filename or a url. The image is
@@ -37,6 +38,7 @@ def load_image(path: str):
     store an image.
 
     :param path: Local path name or URL to image.
+    :return: image as BGR numpy array
     """
     if path.startswith("http"):
         # Set User-Agent to Mozilla because some websites block
@@ -83,8 +85,12 @@ class DownloadProgressBar:
 
 
 def download_file(
-    url: PathLike, filename: PathLike = None, directory: PathLike = None, show_progress: bool = True
-):
+    url: PathLike,
+    filename: PathLike = None,
+    directory: PathLike = None,
+    show_progress: bool = True,
+    silent: bool = False,
+) -> str:
     """
     Download a file from a url and save it to the local filesystem. The file is saved to the
     current directory by default, or to `directory` if specified. If a filename is not given,
@@ -95,19 +101,21 @@ def download_file(
                      not the full path. If None the filename from the url will be used
     :param directory: Directory to save the file to. Will be created if it doesn't exist
                       If None the file will be saved to the current working directory
-    :param show_progress: If True, show an IPython ProgressBar.
+    :param show_progress: If True, show an IPython ProgressBar
+    :param silent: If True, do not print a message if the file already exists
+    :return: path to downloaded file
     """
-    if filename is None:
-        try:
-            opener = urllib.request.build_opener()
-            opener.addheaders = [("User-agent", "Mozilla/5.0")]
-            urllib.request.install_opener(opener)
-            urlobject = urllib.request.urlopen(url)
+    try:
+        opener = urllib.request.build_opener()
+        opener.addheaders = [("User-agent", "Mozilla/5.0")]
+        urllib.request.install_opener(opener)
+        urlobject = urllib.request.urlopen(url)
+        if filename is None:
             filename = urlobject.info().get_filename() or Path(urllib.parse.urlparse(url).path).name
-        except urllib.error.HTTPError as e:
-            raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
+    except urllib.error.HTTPError as e:
+        raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
     filename = Path(filename)
-    if filename is not None and len(filename.parts) > 1:
+    if len(filename.parts) > 1:
         raise ValueError(
             "`filename` should refer to the name of the file, excluding the directory. "
             "Use the `directory` parameter to specify a target directory for the downloaded file."
@@ -125,11 +133,12 @@ def download_file(
         progress_callback = DownloadProgressBar(filename) if show_progress else None
         urllib.request.urlretrieve(url, filename, progress_callback)
     else:
-        print(f"'{filename}' already exists.")
+        if not silent:
+            print(f"'{filename}' already exists.")
     return filename.resolve()
 
 
-def download_ir_model(model_xml_url: str, destination_folder: str = None):
+def download_ir_model(model_xml_url: str, destination_folder: str = None) -> str:
     """
     Download IR model from `model_xml_url`. Downloads model xml and bin file; the weights file is
     assumed to exist at the same location and name as model_xml_url with a ".bin" extension.
@@ -137,6 +146,7 @@ def download_ir_model(model_xml_url: str, destination_folder: str = None):
     :param model_xml_url: URL to model xml file to download
     :param destination_folder: Directory where downloaded model xml and bin are saved. If None, model
                                files are saved to the current directory
+    :return: path to downloaded xml model file
     """
     model_bin_url = model_xml_url[:-4] + ".bin"
     model_xml_path = download_file(model_xml_url, directory=destination_folder, show_progress=False)
@@ -347,6 +357,7 @@ def viz_result_image(
     :param bgr_to_rgb: If true, convert the source image from BGR to RGB. Use this option if
                        source_image is a BGR image.
     :param hide_axes: If true, do not show matplotlib axes.
+    :return: Matplotlib figure with result image
     """
     if bgr_to_rgb:
         source_image = to_rgb(source_image)
@@ -455,7 +466,7 @@ def check_device(device: str) -> bool:
         return True
 
 
-def check_openvino_version(version: str)-> bool:
+def check_openvino_version(version: str) -> bool:
     """
     Check if the specified OpenVINO version is installed.
 
@@ -465,12 +476,15 @@ def check_openvino_version(version: str)-> bool:
     """
     installed_version = openvino.inference_engine.get_version()
     if version not in installed_version:
-        NotebookAlert(f"This notebook requires OpenVINO {version}. "
-                      f"The version on your system is: <i>{installed_version}</i>.<br>"
-                      "Please run <span style='font-family:monospace'>pip install --upgrade -r requirements.txt</span> " 
-                      "in the openvino_env environment to install this version. "
-                      "See the <a href='https://github.com/openvinotoolkit/openvino_notebooks'>"
-                      "OpenVINO Notebooks README</a> for detailed instructions", alert_class="danger")
+        NotebookAlert(
+            f"This notebook requires OpenVINO {version}. "
+            f"The version on your system is: <i>{installed_version}</i>.<br>"
+            "Please run <span style='font-family:monospace'>pip install --upgrade -r requirements.txt</span> "
+            "in the openvino_env environment to install this version. "
+            "See the <a href='https://github.com/openvinotoolkit/openvino_notebooks'>"
+            "OpenVINO Notebooks README</a> for detailed instructions",
+            alert_class="danger",
+        )
         return False
     else:
         return True
