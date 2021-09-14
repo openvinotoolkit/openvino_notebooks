@@ -54,6 +54,14 @@ Tutorials that include code to train neural networks.
 | [301-tensorflow-training-openvino](notebooks/301-tensorflow-training-openvino/) | Train a flower classification model from TensorFlow, then convert to OpenVINO IR | <img src="https://user-images.githubusercontent.com/15709723/127779607-8fa34947-1c35-4260-8d04-981c41a2a2cc.png" width=390> |
 | [301-tensorflow-training-openvino-pot](notebooks/301-tensorflow-training-openvino/) | Use Post-training Optimization Tool (POT) to quantize the flowers model | |
 
+### Live Demos
+
+Demos working with a webcam.
+| Notebook | Description | Preview |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [402-pose-etimation-webcam](notebooks/402-pose-estimation-webcam/) | Estimate position and orientation of each person | <img src="notebooks/402-pose-estimation-webcam/data/gangnamstyle.jpg" width=390> |
+
+
 ## ⚙️ System Requirements
 
 The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Docker container. The table below lists the supported operating systems and Python versions. **Note:** Python 3.9 is not supported yet, but it will be soon.
