@@ -5,6 +5,7 @@ pytube
 requests
 tqdm
 openvino-extensions
+yaspin
 
 # ONNX notebook requirements
 geffnet==0.9.8
