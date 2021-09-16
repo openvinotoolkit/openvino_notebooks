@@ -119,6 +119,9 @@ def download_file(
         urllib.request.urlretrieve(
             url, filename, reporthook=progress_callback.update_to
         )
+        if os.stat(filename).st_size >= urlobject_size:
+            progress_callback.update(urlobject_size - progress_callback.n)
+            progress_callback.refresh()
     else:
         if not silent:
             print(f"'{filename}' already exists.")
