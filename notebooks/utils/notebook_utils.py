@@ -5,6 +5,7 @@
 
 
 import os
+import shutil
 import urllib
 import urllib.parse
 import urllib.request
@@ -30,7 +31,7 @@ from openvino.inference_engine import IECore
 # In[ ]:
 
 
-def load_image(path: str):
+def load_image(path: str) -> np.ndarray:
     """
     Loads an image from `path` and returns it as BGR numpy array. `path`
     should point to an image file, either a local filename or a url. The image is
@@ -38,6 +39,7 @@ def load_image(path: str):
     store an image.
 
     :param path: Local path name or URL to image.
+    :return: image as BGR numpy array
     """
     if path.startswith("http"):
         # Set User-Agent to Mozilla because some websites block
@@ -65,7 +67,8 @@ def download_file(
     filename: PathLike = None,
     directory: PathLike = None,
     show_progress: bool = True,
-):
+    silent: bool = False,
+) -> str:
     """
     Download a file from a url and save it to the local filesystem. The file is saved to the
     current directory by default, or to `directory` if specified. If a filename is not given,
@@ -76,24 +79,21 @@ def download_file(
                      not the full path. If None the filename from the url will be used
     :param directory: Directory to save the file to. Will be created if it doesn't exist
                       If None the file will be saved to the current working directory
-    :param show_progress: If True, show an TQDM ProgressBar.
+    :param show_progress: If True, show an TQDM ProgressBar
+    :param silent: If True, do not print a message if the file already exists
+    :return: path to downloaded file
     """
-    filename = filename if filename is not None else url.split("/")[-1]
     try:
         opener = urllib.request.build_opener()
         opener.addheaders = [("User-agent", "Mozilla/5.0")]
         urllib.request.install_opener(opener)
         urlobject = urllib.request.urlopen(url)
-        filename = (
-            urlobject.info().get_filename()
-            or Path(urllib.parse.urlparse(url).path).name
-        )
+        if filename is None:
+            filename = urlobject.info().get_filename() or Path(urllib.parse.urlparse(url).path).name
     except urllib.error.HTTPError as e:
-        raise Exception(
-            f"File downloading failed with error: {e.code} {e.msg}"
-        ) from None
+        raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
     filename = Path(filename)
-    if filename is not None and len(filename.parts) > 1:
+    if len(filename.parts) > 1:
         raise ValueError(
             "`filename` should refer to the name of the file, excluding the directory. "
             "Use the `directory` parameter to specify a target directory for the downloaded file."
@@ -120,11 +120,12 @@ def download_file(
             url, filename, reporthook=progress_callback.update_to
         )
     else:
-        print(f"'{filename}' already exists.")
+        if not silent:
+            print(f"'{filename}' already exists.")
     return filename.resolve()
 
 
-def download_ir_model(model_xml_url: str, destination_folder: str = None):
+def download_ir_model(model_xml_url: str, destination_folder: str = None) -> str:
     """
     Download IR model from `model_xml_url`. Downloads model xml and bin file; the weights file is
     assumed to exist at the same location and name as model_xml_url with a ".bin" extension.
@@ -132,6 +133,7 @@ def download_ir_model(model_xml_url: str, destination_folder: str = None):
     :param model_xml_url: URL to model xml file to download
     :param destination_folder: Directory where downloaded model xml and bin are saved. If None, model
                                files are saved to the current directory
+    :return: path to downloaded xml model file
     """
     model_bin_url = model_xml_url[:-4] + ".bin"
     model_xml_path = download_file(
@@ -346,6 +348,7 @@ def viz_result_image(
     :param bgr_to_rgb: If true, convert the source image from BGR to RGB. Use this option if
                        source_image is a BGR image.
     :param hide_axes: If true, do not show matplotlib axes.
+    :return: Matplotlib figure with result image
     """
     if bgr_to_rgb:
         source_image = to_rgb(source_image)
