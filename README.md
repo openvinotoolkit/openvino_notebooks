@@ -60,7 +60,7 @@ Tutorials that include code to train neural networks.
 Demos working with a webcam.
 | Notebook | Description | Preview |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [402-pose-etimation-webcam](notebooks/402-pose-estimation-webcam/) | Estimate position and orientation of each person | <img src="https://user-images.githubusercontent.com/4547501/133430954-1116aad1-57ae-466b-b289-ac227234b334.jpg" width=225> |
+| [402-pose-etimation-webcam](notebooks/402-pose-estimation-webcam/) | Estimate position and orientation of each person | <img src="https://user-images.githubusercontent.com/4547501/133812445-ac131787-dd6c-481b-85d4-2426868616e1.png" width=225> |
 
 
 ## ⚙️ System Requirements
