@@ -11,6 +11,7 @@ import urllib.parse
 import urllib.request
 from os import PathLike
 from pathlib import Path
+from tqdm.notebook import tqdm_notebook
 from typing import List, NamedTuple, Optional, Tuple
 
 import cv2
@@ -18,13 +19,13 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import openvino.inference_engine
-from IPython.display import HTML, ProgressBar, clear_output, display
+from IPython.display import HTML, display
 from matplotlib.lines import Line2D
 from openvino.inference_engine import IECore
 
 
 # ## Files
-# 
+#
 # Load an image, download a file, download an IR model, and create a progress bar to show download progress.
 
 # In[ ]:
@@ -52,36 +53,15 @@ def load_image(path: str) -> np.ndarray:
     return image
 
 
-class DownloadProgressBar:
+class DownloadProgressBar(tqdm_notebook):
     """
-    IPython Progress bar for downloading files with urllib.request.urlretrieve
-
-    :param filename: Filename of the file that is being downloaded. Used for displaying only.
+    TQDM Progress bar for downloading files with urllib.request.urlretrieve
     """
 
-    def __init__(self, filename: str):
-        self.progress_bar = None
-        self.filename = filename
-
-    def __call__(self, block_num, block_size, total_size):
-        try:
-            if not self.progress_bar and block_num == 0:
-                print(f"Downloading {self.filename}...")
-                self.progress_bar = ProgressBar(total=total_size)
-                self.progress_bar.display()
-
-            downloaded = block_num * block_size
-            if downloaded < total_size:
-                if block_num % 20 == 0:
-                    # Update progress bar after 20 blocks have been received
-                    self.progress_bar.progress = downloaded
-                    self.progress_bar.update()
-            else:
-                clear_output()
-                print(f"Downloaded {self.filename}")
-        except Exception:
-            # Do not fail the download just because the progress bar does not work
-            pass
+    def update_to(self, block_num: int, block_size: int, total_size: int):
+        downloaded = block_num * block_size
+        if downloaded <= total_size:
+            self.update(downloaded - self.n)
 
 
 def download_file(
@@ -101,7 +81,7 @@ def download_file(
                      not the full path. If None the filename from the url will be used
     :param directory: Directory to save the file to. Will be created if it doesn't exist
                       If None the file will be saved to the current working directory
-    :param show_progress: If True, show an IPython ProgressBar
+    :param show_progress: If True, show an TQDM ProgressBar
     :param silent: If True, do not print a message if the file already exists
     :return: path to downloaded file
     """
@@ -111,9 +91,14 @@ def download_file(
         urllib.request.install_opener(opener)
         urlobject = urllib.request.urlopen(url)
         if filename is None:
-            filename = urlobject.info().get_filename() or Path(urllib.parse.urlparse(url).path).name
+            filename = (
+                urlobject.info().get_filename()
+                or Path(urllib.parse.urlparse(url).path).name
+            )
     except urllib.error.HTTPError as e:
-        raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
+        raise Exception(
+            f"File downloading failed with error: {e.code} {e.msg}"
+        ) from None
     filename = Path(filename)
     if len(filename.parts) > 1:
         raise ValueError(
@@ -128,10 +113,22 @@ def download_file(
         filename = directory / Path(filename)
 
     # download the file if it does not exist, or if it exists with an incorrect file size
-    urlobject_size = urlobject_size = int(urlobject.info().get("Content-Length", 0))
+    urlobject_size = int(urlobject.info().get("Content-Length", 0))
     if not filename.exists() or (os.stat(filename).st_size != urlobject_size):
-        progress_callback = DownloadProgressBar(filename) if show_progress else None
-        urllib.request.urlretrieve(url, filename, progress_callback)
+        progress_callback = DownloadProgressBar(
+            total=urlobject_size,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            desc=str(filename),
+            disable=not show_progress,
+        )
+        urllib.request.urlretrieve(
+            url, filename, reporthook=progress_callback.update_to
+        )
+        if os.stat(filename).st_size >= urlobject_size:
+            progress_callback.update(urlobject_size - progress_callback.n)
+            progress_callback.refresh()
     else:
         if not silent:
             print(f"'{filename}' already exists.")
@@ -149,7 +146,9 @@ def download_ir_model(model_xml_url: str, destination_folder: str = None) -> str
     :return: path to downloaded xml model file
     """
     model_bin_url = model_xml_url[:-4] + ".bin"
-    model_xml_path = download_file(model_xml_url, directory=destination_folder, show_progress=False)
+    model_xml_path = download_file(
+        model_xml_url, directory=destination_folder, show_progress=False
+    )
     download_file(model_bin_url, directory=destination_folder)
     return model_xml_path
 
@@ -157,7 +156,7 @@ def download_ir_model(model_xml_url: str, destination_folder: str = None) -> str
 # ## Images
 
 # ### Convert Pixel Data
-# 
+#
 # Normalize image pixel values between 0 and 1, and convert images to RGB and BGR.
 
 # In[ ]:
@@ -192,7 +191,7 @@ def to_bgr(image_data) -> np.ndarray:
 # ## Visualization
 
 # ### Segmentation
-# 
+#
 # Define a SegmentationMap NamedTuple that keeps the labels and colormap for a segmentation project/dataset. Create CityScapesSegmentation and BinarySegmentation SegmentationMaps. Create a function to convert a segmentation map to an RGB image with a colormap, and to show the segmentation result as an overlay over the original image.
 
 # In[ ]:
@@ -307,7 +306,9 @@ def segmentation_map_to_image(
     return mask
 
 
-def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=False) -> np.ndarray:
+def segmentation_map_to_overlay(
+    image, result, alpha, colormap, remove_holes=False
+) -> np.ndarray:
     """
     Returns a new image where a segmentation mask (created with colormap) is overlayed on
     the source image.
@@ -327,7 +328,7 @@ def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=Fal
 
 
 # ### Network Results
-# 
+#
 # Show network result image, optionally together with the source image and a legend with labels.
 
 # In[ ]:
@@ -362,7 +363,9 @@ def viz_result_image(
     if bgr_to_rgb:
         source_image = to_rgb(source_image)
     if resize:
-        result_image = cv2.resize(result_image, (source_image.shape[1], source_image.shape[0]))
+        result_image = cv2.resize(
+            result_image, (source_image.shape[1], source_image.shape[0])
+        )
 
     num_images = 1 if source_image is None else 2
 
@@ -401,7 +404,7 @@ def viz_result_image(
 
 
 # ## Checks and Alerts
-# 
+#
 # Create an alert class to show stylized info/error/warning messages and a `check_device` function that checks whether a given device is available.
 
 # In[ ]:
@@ -442,10 +445,13 @@ class DeviceNotFoundAlert(NotebookAlert):
         )
         self.alert_class = "warning"
         if len(supported_devices) == 1:
-            self.message += f"The following device is available: {ie.available_devices[0]}"
+            self.message += (
+                f"The following device is available: {ie.available_devices[0]}"
+            )
         else:
             self.message += (
-                "The following devices are available: " f"{', '.join(ie.available_devices)}"
+                "The following devices are available: "
+                f"{', '.join(ie.available_devices)}"
             )
         super().__init__(self.message, self.alert_class)
 
@@ -488,4 +494,3 @@ def check_openvino_version(version: str) -> bool:
         return False
     else:
         return True
-
