@@ -11,6 +11,7 @@ import urllib.parse
 import urllib.request
 from os import PathLike
 from pathlib import Path
+from tqdm.notebook import tqdm_notebook
 from typing import List, NamedTuple, Optional, Tuple
 
 import cv2
@@ -19,7 +20,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import openvino.inference_engine
 from IPython.display import HTML, display
-from tqdm.notebook import tqdm_notebook
 from matplotlib.lines import Line2D
 from openvino.inference_engine import IECore
 
@@ -54,7 +54,9 @@ def load_image(path: str) -> np.ndarray:
 
 
 class DownloadProgressBar(tqdm_notebook):
-    """TQDM Progress bar for downloading files with urllib.request.urlretrieve"""
+    """
+    TQDM Progress bar for downloading files with urllib.request.urlretrieve
+    """
 
     def update_to(self, block_num: int, block_size: int, total_size: int):
         downloaded = block_num * block_size
@@ -89,9 +91,14 @@ def download_file(
         urllib.request.install_opener(opener)
         urlobject = urllib.request.urlopen(url)
         if filename is None:
-            filename = urlobject.info().get_filename() or Path(urllib.parse.urlparse(url).path).name
+            filename = (
+                urlobject.info().get_filename()
+                or Path(urllib.parse.urlparse(url).path).name
+            )
     except urllib.error.HTTPError as e:
-        raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
+        raise Exception(
+            f"File downloading failed with error: {e.code} {e.msg}"
+        ) from None
     filename = Path(filename)
     if len(filename.parts) > 1:
         raise ValueError(
