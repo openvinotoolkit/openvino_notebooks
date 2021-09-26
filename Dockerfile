@@ -29,6 +29,29 @@ RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum install -y nodejs mesa-libGL dos2unix && \
   yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
 
+ARG GPU
+
+# install iGPU dependencies
+RUN if [ "$GPU" = "True" ]; then \
+    set -e ; \
+    set -x ; \
+    mkdir /tmp/gpu_deps ; \
+    curl -L --output /tmp/gpu_deps/intel-opencl-20.35.17767-1.el7.x86_64.rpm https://sourceforge.net/projects/intel-compute-runtime/files/20.35.17767/centos-7/intel-opencl-20.35.17767-1.el7.x86_64.rpm/download ; \
+    curl -L --output /tmp/gpu_deps/level-zero-1.0.0-1.el7.x86_64.rpm https://sourceforge.net/projects/intel-compute-runtime/files/20.35.17767/centos-7/level-zero-1.0.0-1.el7.x86_64.rpm/download ; \
+    curl -L --output /tmp/gpu_deps/level-zero-devel-1.0.0-1.el7.x86_64.rpm https://sourceforge.net/projects/intel-compute-runtime/files/20.35.17767/centos-7/level-zero-devel-1.0.0-1.el7.x86_64.rpm/download ; \
+    curl -L --output /tmp/gpu_deps/intel-igc-opencl-1.0.4756-1.el7.x86_64.rpm https://sourceforge.net/projects/intel-compute-runtime/files/20.35.17767/centos-7/intel-igc-opencl-1.0.4756-1.el7.x86_64.rpm/download ; \
+    curl -L --output /tmp/gpu_deps/intel-igc-opencl-devel-1.0.4756-1.el7.x86_64.rpm https://sourceforge.net/projects/intel-compute-runtime/files/20.35.17767/centos-7/intel-igc-opencl-devel-1.0.4756-1.el7.x86_64.rpm/download ; \
+    curl -L --output /tmp/gpu_deps/intel-igc-core-1.0.4756-1.el7.x86_64.rpm https://sourceforge.net/projects/intel-compute-runtime/files/20.35.17767/centos-7/intel-igc-core-1.0.4756-1.el7.x86_64.rpm/download ; \
+    curl -L --output /tmp/gpu_deps/intel-gmmlib-20.2.4-1.el7.x86_64.rpm https://sourceforge.net/projects/intel-compute-runtime/files/20.35.17767/centos-7/intel-gmmlib-20.2.4-1.el7.x86_64.rpm/download ; \
+    curl -L --output /tmp/gpu_deps/intel-gmmlib-devel-20.2.4-1.el7.x86_64.rpm https://sourceforge.net/projects/intel-compute-runtime/files/20.35.17767/centos-7/intel-gmmlib-devel-20.2.4-1.el7.x86_64.rpm/download ; \
+    rpm -ivh http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/numactl-libs-2.0.12-11.el8.x86_64.rpm; \
+    rpm -ivh http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/numactl-2.0.12-11.el8.x86_64.rpm; \
+    rpm -ivh http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/ocl-icd-2.2.12-1.el8.x86_64.rpm; \
+    dnf install shadow-utils; \
+    cd /tmp/gpu_deps && rpm -iv *.rpm && rm -Rf /tmp/gpu_deps ; \
+  else \
+    echo "Skipping GPU dependencies" ; \
+  fi
 
 # Copying in override assemble/run scripts
 COPY .docker/.s2i/bin /tmp/scripts
