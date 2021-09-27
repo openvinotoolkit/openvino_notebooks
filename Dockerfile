@@ -29,9 +29,8 @@ RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum install -y nodejs mesa-libGL dos2unix && \
   yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
 
-ARG GPU
-
 # install iGPU dependencies
+ARG GPU=False
 RUN if [ "$GPU" = "True" ]; then \
     set -e ; \
     set -x ; \
