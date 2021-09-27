@@ -15,6 +15,7 @@ jedi = "==0.17.2"
 jupyter-nbrequirements = "*"
 jupyterhub = "==1.1.0"
 jupyterlab = "*"
+jupyterlab-git = "==0.30"
 matplotlib = "<3.4"
 nbval = "*"
 nncf = {extras = ["torch"], version = "*"}
