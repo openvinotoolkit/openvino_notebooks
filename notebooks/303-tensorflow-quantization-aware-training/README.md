@@ -4,11 +4,11 @@ This tutorial demonstrates how to use [NNCF](https://github.com/openvinotoolkit/
 [TensorFlow](https://www.tensorflow.org) model for inference with [OpenVINO Toolkit](https://docs.openvinotoolkit.org/). 
 For more advanced usage refer to these [examples](https://github.com/openvinotoolkit/nncf/tree/develop/examples).
 
-To make downloading and training fast, we use a [MobileNetV3Small](https://arxiv.org/pdf/1905.02244.pdf) model with the 
-[Imagenette](http://cs231n.stanford.edu/reports/2015/pdfs/leonyao_final.pdf) dataset. Imagenette is a subset of 10 easily classified classes from the Imagenet dataset.
+To make downloading and training fast, we use a [ResNet-50](https://arxiv.org/abs/1512.03385) model with the 
+[Imagenette](http://cs231n.stanford.edu/reports/2015/pdfs/leonyao_final.pdf) dataset. Imagenette is a subset of 10 easily classified classes from the ImageNet dataset.
 
 This tutorial consists of the following steps:
-- Training of FP32 model
+- Fine-tuning of FP32 model
 - Transform the original FP32 model to INT8
 - Use fine-tuning to restore the accuracy
 - Export optimized and original models to Frozen Graph and then to OpenVINO
