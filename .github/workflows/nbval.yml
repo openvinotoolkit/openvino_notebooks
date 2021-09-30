@@ -50,7 +50,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install -r .ci/dev-requirements.txt
-        python -m pip install pytest-rerunfailures
         python -m ipykernel install --user --name openvino_env
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
@@ -67,4 +66,7 @@ jobs:
     - name: Analysing with nbval
       run: |
         jupyter lab notebooks --help
-        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10 --reruns 5 --reruns-delay 70 --ignore notebooks/208-optical-character-recognition .
+        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10 --ignore notebooks/208-optical-character-recognition .
+    - name: Check READMEs
+      run: |
+        python -m pytest .ci/test_notebooks.py
