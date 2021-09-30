@@ -63,10 +63,9 @@ jobs:
     - name: Patch notebooks
       run: |
         python .ci/patch_notebooks.py
-    - name: Analysing with nbval
+    - name: Test Jupyterlab
       run: |
         jupyter lab notebooks --help
-        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10 --ignore notebooks/208-optical-character-recognition .
-    - name: Check READMEs
+    - name: Analysing with nbval
       run: |
-        python -m pytest .ci/test_notebooks.py
+        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10 --ignore notebooks/208-optical-character-recognition .
