@@ -25,23 +25,35 @@ on:
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
         python: [3.6, 3.7, 3.8]
-
-    runs-on: ${{ matrix.os }}
-
+        include:
+        - os: ubuntu-18.04
+          pip_cache_path: ~/.cache/pip
+        - os: ubuntu-20.04
+          pip_cache_path: ~/.cache/pip
+        - os: macos-latest
+          pip_cache_path: ~/Library/Caches/pip
+        - os: windows-latest
+          pip_cache_path: ~\AppData\Local\pip\Cache
     steps:
-    - uses: actions/checkout@v2
+    - name: Cache Pip
+      uses: actions/cache@v2
+      with:
+        path: ${{ matrix.pip_cache_path }}
+        key: ${{ runner.os }}-${{ matrix.python }}-cache
     - name: Cache Files
-      id: cache-files
       uses: actions/cache@v2
       with:
         path: |
           ~/.paddlehub
         key: cache-files
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Set up Python 
       uses: actions/setup-python@v1
       with:
@@ -69,3 +81,7 @@ jobs:
     - name: Analysing with nbval
       run: |
         python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10 --ignore notebooks/208-optical-character-recognition .
+    - name: Cache openvino pip files
+      run: |
+        pip cache purge # Cache only openvino files, not other dependencies
+        pip download openvino==2021.4.1 openvino-dev==2021.4.1 openvino-extensions==2021.4.1 --no-deps
