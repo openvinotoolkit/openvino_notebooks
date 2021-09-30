@@ -17,8 +17,7 @@ ENV JUPYTER_ENABLE_LAB="true" \
   THOTH_DRY_RUN="1" \
   THAMOS_DEBUG="0" \
   THAMOS_VERBOSE="1" \
-  THOTH_PROVENANCE_CHECK="0" \
-  JUPYTER_PRELOAD_REPOS="https://github.com/openvinotoolkit/openvino_notebooks"
+  THOTH_PROVENANCE_CHECK="0"
 
 USER root
 
@@ -44,6 +43,8 @@ RUN dos2unix /tmp/src/builder/*
 # Change file ownership to the assemble user. Builder image must support chown command.
 RUN chown -R 1001:0 /tmp/scripts /tmp/src
 USER 1001
+RUN mkdir /opt/app-root/notebooks
+COPY notebooks/ /opt/app-root/notebooks
 RUN /tmp/scripts/assemble
 RUN pip check
 USER root
