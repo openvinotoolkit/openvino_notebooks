@@ -51,6 +51,7 @@ USER root
 RUN dos2unix /opt/app-root/bin/*sh
 RUN yum remove -y dos2unix
 RUN chown -R 1001:0 .
+RUN chown -R 1001:0 /opt/app-root/notebooks
 USER 1001
 # RUN jupyter lab build
 CMD /tmp/scripts/run
