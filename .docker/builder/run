@@ -44,14 +44,15 @@ if [ -n "${JUPYTER_PRELOAD_REPOS}" ]; then
         fi
         echo "Checking if repository $repo exists locally"
         REPO_DIR=$(basename ${repo})
-        if [ -d "${REPO_DIR}" ]; then
-            pushd ${REPO_DIR}
-            GIT_SSL_NO_VERIFY=true git pull --ff-only
-            popd
-        else
+        if ! [ -d "${REPO_DIR}" ]; then
             GIT_SSL_NO_VERIFY=true git clone ${repo} ${REPO_DIR} ${REPO_BRANCH}
         fi
     done
+fi
+
+# Copy notebooks onto the user volume if they don't exist
+if [ -d /opt/app-root/notebooks ] && ! [ -d /opt/app-root/src/openvino_notebooks ]; then
+  cp -r /opt/app-root/notebooks /opt/app-root/src/openvino_notebooks
 fi
 
 # Start the Jupyter notebook instance. Run using supervisord if enabled,
