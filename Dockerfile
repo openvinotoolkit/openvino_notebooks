@@ -45,6 +45,7 @@ RUN chown -R 1001:0 /tmp/scripts /tmp/src
 USER 1001
 RUN mkdir /opt/app-root/notebooks
 COPY notebooks/ /opt/app-root/notebooks
+RUN chown -R 1001:0 /opt/app-root/notebooks
 RUN /tmp/scripts/assemble
 RUN pip check
 USER root
