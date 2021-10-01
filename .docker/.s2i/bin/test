@@ -25,5 +25,5 @@ if [ -n "${JUPYTER_PRELOAD_REPOS}" ]; then
     done
 fi
 
-python /tmp/scripts/patch_notebooks.py 
-exec /opt/app-root/bin/pytest --durations=10 --nbval --current-env -k "test_ or notebook_utils" openvino_notebooks/notebooks
+python /tmp/scripts/patch_notebooks.py /opt/app-root/notebooks
+exec /opt/app-root/bin/pytest --durations=10 --nbval --current-env -k "test_ or notebook_utils" /opt/app-root/notebooks
