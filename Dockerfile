@@ -45,13 +45,13 @@ RUN chown -R 1001:0 /tmp/scripts /tmp/src
 USER 1001
 RUN mkdir /opt/app-root/notebooks
 COPY notebooks/ /opt/app-root/notebooks
-RUN chown -R 1001:0 /opt/app-root/notebooks
 RUN /tmp/scripts/assemble
 RUN pip check
 USER root
 RUN dos2unix /opt/app-root/bin/*sh
 RUN yum remove -y dos2unix
 RUN chown -R 1001:0 .
+RUN chown -R 1001:0 /opt/app-root/notebooks
 USER 1001
 # RUN jupyter lab build
 CMD /tmp/scripts/run
