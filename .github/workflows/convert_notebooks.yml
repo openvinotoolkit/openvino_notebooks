@@ -10,6 +10,7 @@ on:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
     - 'requirements.txt'
+    - 'README.md'
     - '.ci/*'
     - '.github/workflows/convert_notebooks.yml'
   pull_request:
