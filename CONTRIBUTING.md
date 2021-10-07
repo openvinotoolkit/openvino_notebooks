@@ -115,6 +115,7 @@ Names should be descriptive but not too long. We use the following numbering sch
 - `100-` OpenVINO tool tutorials: explain how to optimize and quantize notebooks.
 - `200-` OpenVINO model demos: demonstrate inference on a particular model.
 - `300-` Training notebooks: notebooks that include code to train neural networks.
+- `400-` Live demo notebooks: demonstrate inference on a live webcam.
 
 ### READMEs
 
