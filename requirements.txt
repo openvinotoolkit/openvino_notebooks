@@ -3,6 +3,7 @@ matplotlib<3.4
 gdown
 pytube
 openvino-extensions
+yaspin
 
 # ONNX notebook requirements
 geffnet==0.9.8

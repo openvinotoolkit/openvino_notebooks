@@ -51,6 +51,7 @@ jobs:
       with:
         path: |
           ~/.paddlehub
+          ~/open_model_zoo_cache
         key: cache-files
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -80,7 +81,7 @@ jobs:
         jupyter lab notebooks --help
     - name: Analysing with nbval
       run: |
-        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10 --ignore notebooks/208-optical-character-recognition .
+        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
     - name: Cache openvino pip files
       run: |
         pip cache purge # Cache only openvino files, not other dependencies
