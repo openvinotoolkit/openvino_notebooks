@@ -22,6 +22,8 @@ on:
       - "Dockerfile"
       - ".docker/**"
       - ".github/workflows/docker.yml"
+      - 'notebooks/**.ipynb'
+      - 'notebooks/**.py'
 jobs:
   build:
     strategy:
