@@ -8,6 +8,7 @@ mkdir -p $rstdir
 mkdir -p $htmldir
 mkdir -p $markdowndir
 
+# List all notebooks that contain binder buttons based on readme
 cat README.md | grep mybinder.org | awk -e '/[0-9]{3}/' | cut -f1 -d] | cut -f2 -d[ > $binderlist
 
 git ls-files "*.ipynb" | while read notebook; do
