@@ -22,7 +22,6 @@ matplotlib = "<3.4"
 nbval = "*"
 nltk = ">=3.6.4"
 nncf = {extras = ["torch", "tf"], version = "*"}
-numpy = ">=1.19.2"
 openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2021.4.*"}
 paddle2onnx = ">=0.6"
 paddlehub = "*"
