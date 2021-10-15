@@ -2,7 +2,6 @@ openvino-dev[onnx,tensorflow2]==2021.4.*
 matplotlib<3.4
 gdown
 pytube
-openvino-extensions
 yaspin
 
 # ONNX notebook requirements

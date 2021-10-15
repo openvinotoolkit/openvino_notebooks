@@ -23,7 +23,6 @@ nbval = "*"
 nltk = ">=3.6.4"
 nncf = {extras = ["torch"], version = "*"}
 openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2021.4.*"}
-openvino-extensions="*"
 paddle2onnx = ">=0.6"
 paddlehub = "*"
 paddlenlp = "==2.0.8"  # pin to avoid conflict with requests
