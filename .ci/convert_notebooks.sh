@@ -19,3 +19,9 @@ git ls-files "*.ipynb" | while read notebook; do
     jupyter nbconvert --to html $executed_notebook --output-dir $htmldir
     jupyter nbconvert --to rst $executed_notebook --output-dir $rstdir
 done
+
+# f=rst_files207-vision-paddlegan-superresolution-with-output.rst
+ 
+for f in "$rstdir"/*.rst; do
+    sed -i "s/<a href=[\'\"][^%].*download>\(.*\)<\/a>/\1/" "$f"
+done
