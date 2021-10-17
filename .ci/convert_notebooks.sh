@@ -24,4 +24,5 @@ done
  
 for f in "$rstdir"/*.rst; do
     sed -i "s/<a href=[\'\"][^%].*download>\(.*\)<\/a>/\1/" "$f"
+    sed -r -i "s/(<)\.\.\/(.*)\/.*ipynb(>)/\1\2-with-output.html\3/" "$f"
 done
