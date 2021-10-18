@@ -1,6 +1,6 @@
 # Object detection demo
 
-![object detection](https://user-images.githubusercontent.com/4547501/134550328-a5c99d22-ae60-4281-8120-a8f06as17b96a.png)
+![object detection](https://user-images.githubusercontent.com/4547501/137755014-6f174efb-f378-4fe2-9edd-cab7aab0df5f.jpg)
 
 Object detection allows finding predefined objects on the image. Every returned object has features such: label, probability and box relative to image boundaries. 
 
