@@ -6,6 +6,7 @@
 
 import os
 import threading
+import shutil
 import time
 import urllib
 import urllib.parse
@@ -19,7 +20,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import openvino.inference_engine
-from IPython.display import HTML, display
+from IPython.display import HTML, display, Image, clear_output
 from matplotlib.lines import Line2D
 from openvino.inference_engine import IECore
 from tqdm.notebook import tqdm_notebook
