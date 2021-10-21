@@ -8,6 +8,7 @@
     - [Notebook naming](#notebook-naming)
     - [Readmes](#readmes)
     - [File structure](#file-structure)
+    - [Notebook utils](#notebook-utils)
   - [Validation](#validation)
     - [Automated tests](#automated-tests)
     - [Manual test and code quality tools](#manual-test-and-code-quality-tools)
@@ -45,9 +46,9 @@ To do this, there are a few requirements that all notebooks need to pass.
 1. The notebooks work on Windows, macOS and Linux (see [supported operating
    systems](https://github.com/openvinotoolkit/openvino_notebooks#%EF%B8%8F-system-requirements))
    with Python 3.6, 3.7 and 3.8.
-2. The notebooks do not require installation of additional software that is not installable by
+2. As a rule, the notebooks do not require installation of additional software that is not installable by
    `pip`. We do not assume that users have installed XCode Dev Tools, Visual C++ redistributable,
-   cmake, etc.
+   cmake, etc. Please discuss if your notebook does need C++ - there are exceptions to this rule.
 3. The notebooks should work on all computers, and  in container images. We cannot assume that a
    user will have an iGPU or a webcam, so using these should be optional. For example, In the case
    of webcam inference, provide the option to use a video.
@@ -140,7 +141,7 @@ Every notebook is also added to the notebooks overview table in the main
 Notebooks that work in Binder have a _Launch Binder_ badge in the README files.
 
 
-### File structure
+### File Structure
 
 To maintain consistency between notebooks, please follow the directory structure outlined below.
 
@@ -155,14 +156,29 @@ To maintain consistency between notebooks, please follow the directory structure
 
 In case of output provided by Notebook please create folder ```output``` on the same level as readme file.
 
+### Notebook utils
+
+The _notebook_utils.py_ file in the _notebooks/utils_ directory contains utility functions and classes that can be reused across
+notebooks. It contains a `download_file()` function that optionally shows a progress bar, and a standard way to convert
+segmentation maps to images and display them. The Python file is generated from _notebook_utils.ipynb_ notebook in the same directory.
+If you want to add a function or class to _notebook_utils.py_, please add it to the notebook, and generate the
+Python file with `jupyter nbconvert notebook_utils.ipynb --TagRemovePreprocessor.remove_cell_tags=hide --to script`
+Add a "hide" tag to any demo cells (from the right side gear sidebar) to prevent these cells from being added to the script.
+
+
 ## Validation
 
-### Automated Tests
+### Automated tests
 
 We use Github Actions to automatically validate that all notebooks work. The automated tests
-currently test that the notebooks execute without problems on all supported platform. More granular
+currently test that the notebooks execute without problems on all supported platforms. More granular
 tests are planned. In the rest of this guide, the automated tests in Github Actions will be
 referred to as CI (for Continuous Integration).
+
+If your notebook takes longer than a few minutes to execute, it may be possible to patch it in the CI, to make 
+it execute faster. As an example, if your notebook trains for 20 epochs, you can set it to train for
+1 epoch in the CI. If you do inference on 100 frames of a video, you can set it to do inference on only 1. See 
+[this Wiki page](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Notebooks-Development---CI-Test-Speedup) for more information.
 
 ### Manual test and code quality tools
 
@@ -196,7 +212,8 @@ standard `diff` tool for `git`, with much more useful output than the regular `g
 #### JupyterLab Code Formatter
 
 [JupyterLab Code Formatter](https://jupyterlab-code-formatter.readthedocs.io/en/latest/) adds a
-button to Jupyter Lab to automatically format the code in notebooks with black and isort.
+button to Jupyter Lab to automatically format the code in notebooks with black and isort. Please
+use either this extension or a different way to automatically format your notebook.
 
 ## Getting started
 
