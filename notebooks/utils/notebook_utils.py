@@ -26,7 +26,7 @@ from tqdm.notebook import tqdm_notebook
 
 
 # ## Files
-#
+# 
 # Load an image, download a file, download an IR model, and create a progress bar to show download progress.
 
 # In[ ]:
@@ -92,14 +92,9 @@ def download_file(
         urllib.request.install_opener(opener)
         urlobject = urllib.request.urlopen(url)
         if filename is None:
-            filename = (
-                urlobject.info().get_filename()
-                or Path(urllib.parse.urlparse(url).path).name
-            )
+            filename = urlobject.info().get_filename() or Path(urllib.parse.urlparse(url).path).name
     except urllib.error.HTTPError as e:
-        raise Exception(
-            f"File downloading failed with error: {e.code} {e.msg}"
-        ) from None
+        raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
     filename = Path(filename)
     if len(filename.parts) > 1:
         raise ValueError(
@@ -147,9 +142,7 @@ def download_ir_model(model_xml_url: str, destination_folder: str = None) -> str
     :return: path to downloaded xml model file
     """
     model_bin_url = model_xml_url[:-4] + ".bin"
-    model_xml_path = download_file(
-        model_xml_url, directory=destination_folder, show_progress=False
-    )
+    model_xml_path = download_file(model_xml_url, directory=destination_folder, show_progress=False)
     download_file(model_bin_url, directory=destination_folder)
     return model_xml_path
 
@@ -157,7 +150,7 @@ def download_ir_model(model_xml_url: str, destination_folder: str = None) -> str
 # ## Images
 
 # ### Convert Pixel Data
-#
+# 
 # Normalize image pixel values between 0 and 1, and convert images to RGB and BGR.
 
 # In[ ]:
@@ -189,10 +182,107 @@ def to_bgr(image_data) -> np.ndarray:
     return cv2.cvtColor(image_data, cv2.COLOR_RGB2BGR)
 
 
+# ## Videos
+
+# ### Video Player
+# 
+# Custom video player to fulfill FPS requirements. You can set target FPS and output size, flip the video horizontally or skip first N frames.
+
+# In[ ]:
+
+
+class VideoPlayer:
+    """
+    Custom video player to fulfill FPS requirements. You can set target FPS and output size,
+    flip the video horizontally or skip first N frames.
+
+    :param source: Video source. It could be either camera device or video file.
+    :param size: Output frame size.
+    :param flip: Flip source horizontally.
+    :param fps: Target FPS.
+    :param skip_first_frames: Skip first N frames.
+    """
+    def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
+        self.__cap = cv2.VideoCapture(source)
+        if not self.__cap.isOpened():
+            print(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
+        # skip first N frames
+        self.__cap.set(cv2.CAP_PROP_POS_FRAMES, skip_first_frames)
+        # fps of input file
+        self.__input_fps = self.__cap.get(cv2.CAP_PROP_FPS)
+        # target fps given by user
+        self.__output_fps = fps if fps is not None else self.__input_fps
+        self.__flip = flip
+        self.__size = None
+        self.__interpolation = None
+        if size is not None:
+            self.__size = size
+            # AREA better for shrinking, LINEAR better for enlarging
+            self.__interpolation =                 cv2.INTER_AREA if size[0] < self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)                 else cv2.INTER_LINEAR
+        # first black frame
+        self.__frame = np.zeros(
+            (int(self.__cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)), 3),
+            dtype=np.uint8
+        )
+        self.__lock = threading.Lock()
+        self.__stop = False
+
+    """
+    Start playing.
+    """
+    def start(self):
+        self.__stop = False
+        threading.Thread(target=self.__run, daemon=True).start()
+
+    """
+    Stop playing and release resources.
+    """
+    def stop(self):
+        self.__stop = True
+        self.__cap.release()
+
+    def __run(self):
+        prev_time = 0
+        while not self.__stop:
+            t1 = time.time()
+            ret, frame = self.__cap.read()
+            if not ret:
+                self.__frame = None
+                break
+
+            # fulfill target fps
+            if 1 / self.__output_fps < time.time() - prev_time:
+                prev_time = time.time()
+                # replace by current frame
+                with self.__lock:
+                    self.__frame = frame
+
+            t2 = time.time()
+            # time to wait [s] to fulfill input fps
+            wait_time = 1 / self.__input_fps - (t2 - t1)
+            # wait until
+            time.sleep(max(0, wait_time))
+
+    """
+    Get current frame.
+    """
+    def next(self):
+        with self.__lock:
+            if self.__frame is None:
+                return None
+            # need to copy frame, because can be cached and reused if fps is low
+            frame = self.__frame.copy()
+        if self.__size is not None:
+            frame = cv2.resize(frame, self.__size, interpolation=self.__interpolation)
+        if self.__flip:
+            frame = cv2.flip(frame, 1)
+        return frame
+
+
 # ## Visualization
 
 # ### Segmentation
-#
+# 
 # Define a SegmentationMap NamedTuple that keeps the labels and colormap for a segmentation project/dataset. Create CityScapesSegmentation and BinarySegmentation SegmentationMaps. Create a function to convert a segmentation map to an RGB image with a colormap, and to show the segmentation result as an overlay over the original image.
 
 # In[ ]:
@@ -307,9 +397,7 @@ def segmentation_map_to_image(
     return mask
 
 
-def segmentation_map_to_overlay(
-    image, result, alpha, colormap, remove_holes=False
-) -> np.ndarray:
+def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=False) -> np.ndarray:
     """
     Returns a new image where a segmentation mask (created with colormap) is overlayed on
     the source image.
@@ -329,7 +417,7 @@ def segmentation_map_to_overlay(
 
 
 # ### Network Results
-#
+# 
 # Show network result image, optionally together with the source image and a legend with labels.
 
 # In[ ]:
@@ -364,9 +452,7 @@ def viz_result_image(
     if bgr_to_rgb:
         source_image = to_rgb(source_image)
     if resize:
-        result_image = cv2.resize(
-            result_image, (source_image.shape[1], source_image.shape[0])
-        )
+        result_image = cv2.resize(result_image, (source_image.shape[1], source_image.shape[0]))
 
     num_images = 1 if source_image is None else 2
 
@@ -403,101 +489,9 @@ def viz_result_image(
     plt.close(fig)
     return fig
 
-# ## Videos
-
-
-class VideoPlayer:
-    """
-    Custom video player to fulfill FPS requirements. You can set target FPS and output size,
-    flip the video horizontally or skip first N frames.
-
-    :param source: Video source. It could be either camera device or video file.
-    :param size: Output frame size.
-    :param flip: Flip source horizontally.
-    :param fps: Target FPS.
-    :param skip_first_frames: Skip first N frames.
-    """
-    def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
-        self.__cap = cv2.VideoCapture(source)
-        if not self.__cap.isOpened():
-            print(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
-        # skip first N frames
-        self.__cap.set(cv2.CAP_PROP_POS_FRAMES, skip_first_frames)
-        # fps of input file
-        self.__input_fps = self.__cap.get(cv2.CAP_PROP_FPS)
-        # target fps given by user
-        self.__output_fps = fps if fps is not None else self.__input_fps
-        self.__flip = flip
-        self.__size = None
-        self.__interpolation = None
-        if size is not None:
-            self.__size = size
-            # AREA better for shrinking, LINEAR better for enlarging
-            self.__interpolation = \
-                cv2.INTER_AREA if size[0] < self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH) \
-                else cv2.INTER_LINEAR
-        # first black frame
-        self.__frame = np.zeros(
-            (int(self.__cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)), 3),
-            dtype=np.uint8
-        )
-        self.__lock = threading.Lock()
-        self.__stop = False
-
-    """
-    Start playing.
-    """
-    def start(self):
-        self.__stop = False
-        threading.Thread(target=self.__run, daemon=True).start()
-
-    """
-    Stop playing and release resources.
-    """
-    def stop(self):
-        self.__stop = True
-        self.__cap.release()
-
-    def __run(self):
-        prev_time = 0
-        while not self.__stop:
-            t1 = time.time()
-            ret, frame = self.__cap.read()
-            if not ret:
-                self.__frame = None
-                break
-
-            # fulfill target fps
-            if 1 / self.__output_fps < time.time() - prev_time:
-                prev_time = time.time()
-                # replace by current frame
-                with self.__lock:
-                    self.__frame = frame
-
-            t2 = time.time()
-            # time to wait [s] to fulfill input fps
-            wait_time = 1 / self.__input_fps - (t2 - t1)
-            # wait until
-            time.sleep(max(0, wait_time))
-
-    """
-    Get current frame.
-    """
-    def next(self):
-        with self.__lock:
-            if self.__frame is None:
-                return None
-            # need to copy frame, because can be cached and reused if fps is low
-            frame = self.__frame.copy()
-        if self.__size is not None:
-            frame = cv2.resize(frame, self.__size, interpolation=self.__interpolation)
-        if self.__flip:
-            frame = cv2.flip(frame, 1)
-        return frame
-
 
 # ## Checks and Alerts
-#
+# 
 # Create an alert class to show stylized info/error/warning messages and a `check_device` function that checks whether a given device is available.
 
 # In[ ]:
@@ -538,13 +532,10 @@ class DeviceNotFoundAlert(NotebookAlert):
         )
         self.alert_class = "warning"
         if len(supported_devices) == 1:
-            self.message += (
-                f"The following device is available: {ie.available_devices[0]}"
-            )
+            self.message += f"The following device is available: {ie.available_devices[0]}"
         else:
             self.message += (
-                "The following devices are available: "
-                f"{', '.join(ie.available_devices)}"
+                "The following devices are available: " f"{', '.join(ie.available_devices)}"
             )
         super().__init__(self.message, self.alert_class)
 
@@ -587,3 +578,4 @@ def check_openvino_version(version: str) -> bool:
         return False
     else:
         return True
+
