@@ -1,6 +1,6 @@
 # Pose estimation demo
 
-![pose estimation](https://user-images.githubusercontent.com/4547501/134550328-a5c99d22-ae60-4281-8120-a8f06a17b96a.png)
+![pose estimation](https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif)
 
 Pose estimation predicts the 2D position and orientation of each person in an image or video. Skeletons consisting of 18 predefined keypoints (joints) and 19 connections between them (limbs) are visualized as an overlay on the images or video.
 
