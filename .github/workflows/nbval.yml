@@ -11,21 +11,50 @@ on:
     - 'requirements.txt'
     - '.ci/*'
     - '.github/workflows/nbval.yml'
+  push:
+    branches:
+    - 'main'
+    paths:
+    - 'notebooks/**.ipynb'
+    - 'notebooks/**.py'
+    - 'requirements.txt'
+    - '.ci/*'
+    - '.github/workflows/nbval.yml'
   schedule:
     - cron:  '30 8 * * *'
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
         python: [3.6, 3.7, 3.8]
-
-    runs-on: ${{ matrix.os }}
-
+        include:
+        - os: ubuntu-18.04
+          pip_cache_path: ~/.cache/pip
+        - os: ubuntu-20.04
+          pip_cache_path: ~/.cache/pip
+        - os: macos-latest
+          pip_cache_path: ~/Library/Caches/pip
+        - os: windows-latest
+          pip_cache_path: ~\AppData\Local\pip\Cache
     steps:
-    - uses: actions/checkout@v2
+    - name: Cache Pip
+      uses: actions/cache@v2
+      with:
+        path: ${{ matrix.pip_cache_path }}
+        key: ${{ runner.os }}-${{ matrix.python }}-cache
+    - name: Cache Files
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.paddlehub
+          ~/open_model_zoo_cache
+        key: cache-files
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Set up Python 
       uses: actions/setup-python@v1
       with:
@@ -35,6 +64,9 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install -r .ci/dev-requirements.txt
         python -m ipykernel install --user --name openvino_env
+    - name: Pip freeze
+      run: |
+        python -m pip freeze
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
       uses: actions/upload-artifact@v2
@@ -44,10 +76,16 @@ jobs:
     - name: Check install
       run: |
         python check_install.py
-    - name: Check READMEs
+    - name: Patch notebooks
       run: |
-        python -m pytest .ci/test_notebooks.py
-    - name: Analysing with nbval
+        python .ci/patch_notebooks.py
+    - name: Test Jupyterlab
       run: |
         jupyter lab notebooks --help
-        python -m pytest --nbval . --ignore notebooks/103-paddle-onnx-to-openvino --ignore notebooks/301-tensorflow-training-openvino 
+    - name: Analysing with nbval
+      run: |
+        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
+    - name: Cache openvino pip files
+      run: |
+        pip cache purge # Cache only openvino files, not other dependencies
+        pip download openvino==2021.4.1 openvino-dev==2021.4.1 openvino-extensions==2021.4.1 --no-deps

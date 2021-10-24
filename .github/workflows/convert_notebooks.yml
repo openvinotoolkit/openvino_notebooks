@@ -7,18 +7,39 @@ on:
     branches:
     - 'main'
     paths:
-    - "**.ipynb"
+    - 'notebooks/**.ipynb'
+    - 'notebooks/**.py'
+    - 'requirements.txt'
+    - 'README.md'
+    - '.ci/*'
+    - '.github/workflows/convert_notebooks.yml'
+  pull_request:
+    paths:
+    - '.github/workflows/convert_notebooks.yml'    
 jobs:
   build:
     strategy:
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
+    - name: Cache Pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: Linux-3.7-cache
+    - name: Cache Files
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.paddlehub
+        key: cache-files
     - uses: actions/checkout@v2
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
         python-version: 3.7
+    - name: Install required packages
+      run: sudo apt-get update && sudo apt-get install texlive texlive-latex-extra pandoc
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -29,11 +50,6 @@ jobs:
       with:
         name: pip-freeze
         path: pip-freeze.txt
-    - name: Modify Notebooks
-      # Change settings in slower notebooks to speed up notebook execution
-      run: |
-        sed -i 's/NUM_FRAMES = 100/NUM_FRAMES = 5/g' notebooks/202-vision-superresolution/202-vision-superresolution-video.ipynb
-        sed -i 's/epochs = 15/epochs = 2/g' notebooks/301-tensorflow-training-openvino/301-tensorflow-training-openvino.ipynb
     - name: convert_notebooks
       run: bash .ci/convert_notebooks.sh
     - name: Save HTML files
@@ -46,3 +62,13 @@ jobs:
       with:
         name: markdown_files
         path: markdown_files
+    - name: Save reStructuredText files
+      uses: actions/upload-artifact@v2
+      with:
+        name: rst_files
+        path: rst_files
+    - name: Cache openvino pip files
+      run: |
+        pip cache purge # Cache only openvino files, not other dependencies
+        pip download openvino==2021.4.1 openvino-dev==2021.4.1 openvino-extensions==2021.4.1 --no-deps
+

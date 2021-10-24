@@ -1,7 +1,3 @@
--r ../requirements.txt
+-r dev-requirements.txt
 
-# Packages for testing/validating notebooks
-nbval
-nbqa[toolchain]
-pre-commit
-
+pandoc

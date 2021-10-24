@@ -65,4 +65,4 @@ if [ -f /opt/app-root/src/.jupyter/jupyter_notebook_config.sh ]; then
     . /opt/app-root/src/.jupyter/jupyter_notebook_config.sh
 fi
 
-exec /opt/app-root/bin/start.sh $JUPYTER_PROGRAM $JUPYTER_PROGRAM_ARGS openvino_notebooks/notebooks "$@"
+exec /opt/app-root/bin/start.sh $JUPYTER_PROGRAM $JUPYTER_PROGRAM_ARGS "$@"

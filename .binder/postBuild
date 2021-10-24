@@ -1,4 +1,0 @@
-rm -rf notebooks/102-pytorch-onnx-to-openvino
-rm -rf notebooks/301-tensorflow-training-openvino
-
-sed -i 's/"PADDLEGAN_INFERENCE = True/"PADDLEGAN_INFERENCE = False/' notebooks/206-vision-paddlegan-anime/206-vision-paddlegan-anime.ipynb
