@@ -1,0 +1,6 @@
+openvino
+numpy
+opencv-python
+matplotlib
+jupyterlab
+scipy

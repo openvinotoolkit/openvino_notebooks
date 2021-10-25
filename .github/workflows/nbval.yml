@@ -62,7 +62,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -r .ci/dev-requirements.txt
+        python -m pip install -r notebooks/210-ct-scan-live-inference/requirements.txt
+        python -m pip install nbval
         python -m ipykernel install --user --name openvino_env
     - name: Pip freeze
       run: |
@@ -73,19 +74,13 @@ jobs:
       with:
         name: pip-freeze
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
-    - name: Check install
-      run: |
-        python check_install.py
-    - name: Patch notebooks
-      run: |
-        python .ci/patch_notebooks.py
     - name: Test Jupyterlab
       run: |
         jupyter lab notebooks --help
     - name: Analysing with nbval
       run: |
-        python -m pytest --nbval -x -k "test_210" --durations 10
+        python -m pytest --nbval -x -k "210" --durations 10
     - name: Cache openvino pip files
       run: |
         pip cache purge # Cache only openvino files, not other dependencies
-        pip download openvino==2021.4.1 openvino-dev==2021.4.1 openvino-extensions==2021.4.1 --no-deps
+        pip download openvino==2021.4.1 --no-deps
