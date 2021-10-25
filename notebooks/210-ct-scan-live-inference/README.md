@@ -15,7 +15,7 @@ We provide a pre-trained and quantized model, so is not required to run the prev
 For a minimum installation:
 
 * Create a virtual environment, with `python -m venv openvino_env` (on Linux you may need to type `python3`) and activate it with `openvino_env\Scripts\activate` on Windows or `source openvino_env/bin/activate` on macOS or Linux.
-* Clone the openvino_notebooks repository: `git clone --depth 1 https://github.com/openvinotoolkit/openvino_notebooks/`
+* Clone the openvino_notebooks repository: `git clone https://github.com/openvinotoolkit/openvino_notebooks/`
 * Change to the directory: `cd openvino_notebooks`
 * Check out the live_inference branch `git checkout live_inference`
 * Change to the notebook directory: `cd notebooks/210-ct-scan-live-inference`
