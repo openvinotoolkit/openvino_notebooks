@@ -1,4 +1,4 @@
-openvino
+openvino-dev
 numpy
 opencv-python
 matplotlib
