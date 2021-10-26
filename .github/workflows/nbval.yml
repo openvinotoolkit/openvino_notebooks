@@ -80,6 +80,7 @@ jobs:
     - name: Analysing with nbval
       run: |
         python -m pytest --nbval -x -k "210" --durations 10
+        python -m pytest --nbval -x -k "110" --durations 10
     - name: Cache openvino pip files
       run: |
         pip cache purge # Cache only openvino files, not other dependencies
