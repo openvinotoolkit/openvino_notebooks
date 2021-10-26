@@ -4,3 +4,4 @@ opencv-python
 matplotlib
 jupyterlab
 scipy
+ipywidgets
