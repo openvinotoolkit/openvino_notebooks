@@ -6,3 +6,4 @@ jupyterlab
 scipy
 ipywidgets
 yaspin
+onnx
