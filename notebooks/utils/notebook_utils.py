@@ -5,8 +5,8 @@
 
 
 import os
-import threading
 import shutil
+import threading
 import time
 import urllib
 import urllib.parse
@@ -20,7 +20,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import openvino.inference_engine
-from IPython.display import HTML, display, Image, clear_output
+from IPython.display import HTML, Image, Markdown, clear_output, display
 from matplotlib.lines import Line2D
 from openvino.inference_engine import IECore
 from tqdm.notebook import tqdm_notebook
@@ -120,9 +120,7 @@ def download_file(
             desc=str(filename),
             disable=not show_progress,
         )
-        urllib.request.urlretrieve(
-            url, filename, reporthook=progress_callback.update_to
-        )
+        urllib.request.urlretrieve(url, filename, reporthook=progress_callback.update_to)
         if os.stat(filename).st_size >= urlobject_size:
             progress_callback.update(urlobject_size - progress_callback.n)
             progress_callback.refresh()
@@ -203,6 +201,7 @@ class VideoPlayer:
     :param fps: Target FPS.
     :param skip_first_frames: Skip first N frames.
     """
+
     def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
@@ -219,11 +218,19 @@ class VideoPlayer:
         if size is not None:
             self.__size = size
             # AREA better for shrinking, LINEAR better for enlarging
-            self.__interpolation =                 cv2.INTER_AREA if size[0] < self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)                 else cv2.INTER_LINEAR
+            self.__interpolation = (
+                cv2.INTER_AREA
+                if size[0] < self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+                else cv2.INTER_LINEAR
+            )
         # first black frame
         self.__frame = np.zeros(
-            (int(self.__cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)), 3),
-            dtype=np.uint8
+            (
+                int(self.__cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+                int(self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                3,
+            ),
+            dtype=np.uint8,
         )
         self.__lock = threading.Lock()
         self.__stop = False
@@ -231,6 +238,7 @@ class VideoPlayer:
     """
     Start playing.
     """
+
     def start(self):
         self.__stop = False
         threading.Thread(target=self.__run, daemon=True).start()
@@ -238,6 +246,7 @@ class VideoPlayer:
     """
     Stop playing and release resources.
     """
+
     def stop(self):
         self.__stop = True
         self.__cap.release()
@@ -267,6 +276,7 @@ class VideoPlayer:
     """
     Get current frame.
     """
+
     def next(self):
         with self.__lock:
             if self.__frame is None:
@@ -489,6 +499,49 @@ def viz_result_image(
         )
     plt.close(fig)
     return fig
+
+
+# ## OpenVINO Tools
+
+# In[ ]:
+
+
+def benchmark_model(model_path: os.PathLike,
+                    device: str = "CPU",
+                    seconds: int = 60, api: str = "async",
+                    batch: int = 1, 
+                    cache_dir="model_cache"):
+    """
+    Benchmark model `model_path` with `benchmark_app`. Returns the output of `benchmark_app`
+    without logging info, and information about the device
+
+    :param model_path: path to IR model xml file, or ONNX model
+    :param device: device to benchmark on. For example, "CPU" or "MULTI:CPU,GPU"
+    :param seconds: number of seconds to run benchmark_app
+    :param api: API. Possible options: sync or async
+    :param batch: Batch size
+    :param cache_dir: Directory that contains model/kernel cache files
+    """
+    ie = IECore()
+    model_path = Path(model_path)
+    if ("GPU" in device) and ("GPU" not in ie.available_devices):
+        raise ValueError(f"A GPU device is not available. Available devices are: {ie.available_devices}")
+    else:
+        benchmark_command = f"benchmark_app -m {model_path} -d {device} -t {seconds} -api {api} -b {batch} -cdir {cache_dir}"
+        display(Markdown(f"**Benchmark {model_path.name} with {device} for {seconds} seconds with {api} inference**"));
+        display(Markdown(f"Benchmark command: `{benchmark_command}`"));
+
+        benchmark_output = get_ipython().run_line_magic('sx', '$benchmark_command')
+        benchmark_result = [line for line in benchmark_output
+                            if not (line.startswith(r"[") or line.startswith("  ") or line == "")]
+        print("\n".join(benchmark_result))
+        print()
+        if "MULTI" in device:
+            devices = device.replace("MULTI:","").split(",")
+            for single_device in devices:
+                print(f"{single_device} device: {ie.get_metric(device_name=single_device, metric_name='FULL_DEVICE_NAME')}")
+        else:
+            print(f"Device: {ie.get_metric(device_name=device, metric_name='FULL_DEVICE_NAME')}")
 
 
 # ## Checks and Alerts
