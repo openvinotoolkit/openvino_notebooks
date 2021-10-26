@@ -32,6 +32,7 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | [103-paddle-onnx-to-openvino](notebooks/103-paddle-onnx-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-onnx-to-openvino%2F103-paddle-onnx-to-openvino-classification.ipynb) | Convert PaddlePaddle models to OpenVINO IR | <img src="https://user-images.githubusercontent.com/15709723/127779326-dc14653f-a960-4877-b529-86908a6f2a61.png" width=300> |
 | [104-model-tools](notebooks/104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | Download, convert and benchmark models from Open Model Zoo | |
 | [105-language-quantize-bert](notebooks/105-language-quantize-bert/) | Optimize and quantize a pre-trained BERT model ||
+| [108-quantize-omz-model-yolo-v4-tf](notebooks/108-quantize-omz-model-yolo-v4-tf/) | Optimize and quantize the Open Model Zoo yolo-v4-tf model ||
 
 ### Model Demos
 
