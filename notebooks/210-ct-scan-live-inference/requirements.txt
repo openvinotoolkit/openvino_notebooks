@@ -5,3 +5,4 @@ matplotlib
 jupyterlab
 scipy
 ipywidgets
+yaspin
