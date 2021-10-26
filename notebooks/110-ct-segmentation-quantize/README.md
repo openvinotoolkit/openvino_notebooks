@@ -1,6 +1,6 @@
-# Live Inference and Benchmark CT-scan Data with OpenVINO
+# Quantize a Segmentation Model and Show Live Inference
 
-## Kidney Segmentation with PyTorch Lightning and OpenVINO™ - Part 3
+## Kidney Segmentation with PyTorch Lightning and OpenVINO™ - Part 2
 
 ![kidney segmentation](https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif)
 
@@ -9,14 +9,6 @@
 This Jupyter notebook tutorial is part of a series that shows how to train,
 optimize, quantize and show live inference on a segmentation model with PyTorch
 Lightning and OpenVINO.
-
-This is the final part that shows benchmarking results and live inference on
-the quantized segmentation model. You will see real-time segmentation of kidney
-CT scans running on a CPU, iGPU, or combining both devices for higher
-throughput. The processed frames are 3D scans that are shown as individual
-slices. The visualization slides through the slices with detected kidneys
-overlayed in red.  We provide a pre-trained and quantized model, so running the
-previous tutorials in the series is not required.
 
 ## Installation Instructions
 
