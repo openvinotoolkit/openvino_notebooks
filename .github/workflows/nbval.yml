@@ -29,15 +29,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
+        os: [ubuntu-18.04, ubuntu-20.04, windows-latest]
         python: [3.6, 3.7, 3.8]
         include:
         - os: ubuntu-18.04
           pip_cache_path: ~/.cache/pip
         - os: ubuntu-20.04
           pip_cache_path: ~/.cache/pip
-        - os: macos-latest
-          pip_cache_path: ~/Library/Caches/pip
         - os: windows-latest
           pip_cache_path: ~\AppData\Local\pip\Cache
     steps:
