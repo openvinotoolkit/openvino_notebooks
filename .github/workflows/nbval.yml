@@ -84,7 +84,7 @@ jobs:
         jupyter lab notebooks --help
     - name: Analysing with nbval
       run: |
-        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
+        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10 --ignore 401-object-detection-webcam
     - name: Cache openvino pip files
       run: |
         pip cache purge # Cache only openvino files, not other dependencies
