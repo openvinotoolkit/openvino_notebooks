@@ -1,6 +1,6 @@
 # Live Inference and Benchmark CT-scan Data with OpenVINO
 
-## Kidney Segmentation with PyTorch Lightning and OpenVINO™ - Part 3
+## Kidney Segmentation with PyTorch Lightning and OpenVINO™ - Part 4
 
 ![kidney segmentation](https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif)
 
@@ -38,10 +38,9 @@ For a minimum installation:
 
 > NOTE: To use the other notebooks in the openvino_notebooks repository, please follow the instructions in the main README at https://github.com/openvinotoolkit/openvino_notebooks/
 
-## Other Tutorials in this series 
+## All notebooks in this series:
 
-> NOTE: Links to these notebooks will be published soon
-
-* Data preparation: Demonstrates how to convert 3D medical data in Nifty format to 2D images for 2D inference and visualization
-* Training: Demonstrates how to train a kidney segmentation model with annotated slices of CT scans using PyTorch Lightning and export as ONNX
-* Optimization and Quantization: Demonstrates how to optimize and quantize the model that was created by the previous notebook and deploy on CPU, iGPU or combination of both devices
+- [Data Preparation for 2D Segmentation of 3D Medical Data](../110-ct-segmentation-quantize/data-preparation-ct-scan.ipynb)
+- [Train a 2D-UNet Medical Imaging Model with PyTorch Lightning](/..) 
+- [Convert and Quantize a UNet Model and Show Live Inference](../110-ct-segmentation-quantize/110-ct-segmentation-quantize.ipynb)
+- Live Inference and Benchmark CT-scan data (this notebook)
