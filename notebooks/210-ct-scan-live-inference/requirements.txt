@@ -1,0 +1,9 @@
+openvino-dev
+numpy
+opencv-python
+matplotlib
+jupyterlab
+scipy
+ipywidgets
+yaspin
+onnx
