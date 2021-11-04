@@ -15,7 +15,7 @@ on:
     - '.github/workflows/convert_notebooks.yml'
   pull_request:
     paths:
-    - '.github/workflows/convert_notebooks.yml'    
+    - '.github/workflows/convert_notebooks.yml'
 jobs:
   build:
     strategy:
@@ -70,5 +70,5 @@ jobs:
     - name: Cache openvino pip files
       run: |
         pip cache purge # Cache only openvino files, not other dependencies
-        pip download openvino==2021.4.1 openvino-dev==2021.4.1 openvino-extensions==2021.4.1 --no-deps
+        pip download openvino==2021.4.1 openvino-dev==2021.4.1 nncf --no-deps
 

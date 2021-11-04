@@ -54,7 +54,7 @@ jobs:
         key: cache-files
     - name: Checkout repository
       uses: actions/checkout@v2
-    - name: Set up Python 
+    - name: Set up Python
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
@@ -87,4 +87,4 @@ jobs:
     - name: Cache openvino pip files
       run: |
         pip cache purge # Cache only openvino files, not other dependencies
-        pip download openvino==2021.4.1 openvino-dev==2021.4.1 openvino-extensions==2021.4.1 nncf --no-deps
+        pip download openvino==2021.4.1 openvino-dev==2021.4.1 nncf --no-deps
