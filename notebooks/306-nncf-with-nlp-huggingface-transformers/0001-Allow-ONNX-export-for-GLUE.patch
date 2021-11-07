@@ -1,0 +1,44 @@
+From e42125944d2fa995fb571b994c563ec981c44f2b Mon Sep 17 00:00:00 2001
+From: Vasily Shamporov <vasily.shamporov@intel.com>
+Date: Sat, 6 Nov 2021 19:53:36 +0300
+Subject: [PATCH 1/2] Allow ONNX export for GLUE
+
+---
+ examples/pytorch/text-classification/run_glue.py | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/examples/pytorch/text-classification/run_glue.py b/examples/pytorch/text-classification/run_glue.py
+index f0aa0b645..addb0145b 100755
+--- a/examples/pytorch/text-classification/run_glue.py
++++ b/examples/pytorch/text-classification/run_glue.py
+@@ -184,6 +184,12 @@ class ModelArguments:
+             "with private models)."
+         },
+     )
++    to_onnx: str = field(
++        default=None,
++        metadata={
++            "help": "The path to export the ONNX version of the model to."
++        }
++    )
+ 
+ 
+ def main():
+@@ -546,6 +552,14 @@ def main():
+                             item = label_list[item]
+                             writer.write(f"{index}\t{item}\n")
+ 
++    if model_args.to_onnx:
++        import torch
++        torch.onnx.export(model.cpu(), (torch.ones([1, 128], dtype=torch.long),
++                                        torch.ones([1, 128], dtype=torch.long),
++                                        torch.ones([1, 128], dtype=torch.long)),
++                          model_args.to_onnx,
++                          opset_version=10)
++
+     kwargs = {"finetuned_from": model_args.model_name_or_path, "tasks": "text-classification"}
+     if data_args.task_name is not None:
+         kwargs["language"] = "en"
+-- 
+2.17.1
+

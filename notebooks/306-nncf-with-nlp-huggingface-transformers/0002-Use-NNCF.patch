@@ -1,0 +1,171 @@
+From 8201a64576fe4ac7faa6b99601941b7b86e88422 Mon Sep 17 00:00:00 2001
+From: Vasily Shamporov <vasily.shamporov@intel.com>
+Date: Sat, 6 Nov 2021 19:55:22 +0300
+Subject: [PATCH 2/2] Use NNCF
+
+---
+ .../pytorch/text-classification/run_glue.py   | 52 ++++++++++++++++---
+ nncf_bert_config_mrpc.json                    | 42 +++++++++++++++
+ src/transformers/trainer.py                   |  6 ++-
+ 3 files changed, 93 insertions(+), 7 deletions(-)
+ create mode 100644 nncf_bert_config_mrpc.json
+
+diff --git a/examples/pytorch/text-classification/run_glue.py b/examples/pytorch/text-classification/run_glue.py
+index addb0145b..236ee8cdf 100755
+--- a/examples/pytorch/text-classification/run_glue.py
++++ b/examples/pytorch/text-classification/run_glue.py
+@@ -46,6 +46,12 @@ from transformers.utils import check_min_version
+ from transformers.utils.versions import require_version
+ 
+ 
++from nncf import NNCFConfig
++from nncf.torch import create_compressed_model
++from nncf.torch import register_default_init_args
++from nncf.torch.initialization import PTInitializingDataLoader
++from torch.utils.data import DataLoader
++
+ # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
+ check_min_version("4.12.0")
+ 
+@@ -190,6 +196,12 @@ class ModelArguments:
+             "help": "The path to export the ONNX version of the model to."
+         }
+     )
++    nncf_config: str = field(
++        default=None,
++        metadata={
++            "help": "The path to the NNCF config specifying desired model compression."
++        }
++    )
+ 
+ 
+ def main():
+@@ -471,6 +483,31 @@ def main():
+     else:
+         data_collator = None
+ 
++    if model_args.nncf_config is not None:
++        nncf_config = NNCFConfig.from_json(model_args.nncf_config)
++
++        train_loader_for_init = DataLoader(
++            train_dataset,
++            batch_size=training_args.per_device_train_batch_size,
++            collate_fn=data_collator
++        )
++
++        # Register a dataloader to be used for NNCF quantizer range initialization prior to training
++        # for best results.
++        # The dataset is complex and there
++        class MRPCInitializingDataLoader(PTInitializingDataLoader):
++            def get_inputs(self, dataloader_output):
++                return (), {
++                    "labels": dataloader_output["labels"],
++                    "attention_mask": dataloader_output["attention_mask"],
++                    "input_ids": dataloader_output["input_ids"],
++                    "token_type_ids": dataloader_output["token_type_ids"]
++                }
++        nncf_config = register_default_init_args(nncf_config,
++                                                 MRPCInitializingDataLoader(train_loader_for_init))
++
++        compression_ctrl, model = create_compressed_model(model, nncf_config)
++
+     # Initialize our Trainer
+     trainer = Trainer(
+         model=model,
+@@ -553,12 +590,15 @@ def main():
+                             writer.write(f"{index}\t{item}\n")
+ 
+     if model_args.to_onnx:
+-        import torch
+-        torch.onnx.export(model.cpu(), (torch.ones([1, 128], dtype=torch.long),
+-                                        torch.ones([1, 128], dtype=torch.long),
+-                                        torch.ones([1, 128], dtype=torch.long)),
+-                          model_args.to_onnx,
+-                          opset_version=10)
++        if model_args.nncf_config is not None:
++            compression_ctrl.export_model(model_args.to_onnx)
++        else:
++            import torch
++            torch.onnx.export(model.cpu(), (torch.ones([1, 128], dtype=torch.long),
++                                            torch.ones([1, 128], dtype=torch.long),
++                                            torch.ones([1, 128], dtype=torch.long)),
++                              model_args.to_onnx,
++                              opset_version=10)
+ 
+     kwargs = {"finetuned_from": model_args.model_name_or_path, "tasks": "text-classification"}
+     if data_args.task_name is not None:
+diff --git a/nncf_bert_config_mrpc.json b/nncf_bert_config_mrpc.json
+new file mode 100644
+index 000000000..f4ecbeeed
+--- /dev/null
++++ b/nncf_bert_config_mrpc.json
+@@ -0,0 +1,42 @@
++{
++    "input_info": [
++        {
++            "sample_size": [1, 128],
++            "type": "long"
++        },
++        {
++            "sample_size": [1, 128],
++            "type": "long"
++        },
++        {
++            "sample_size": [1, 128],
++            "type": "long"
++        }
++    ],
++    "compression": {
++        "algorithm": "quantization",
++        "initializer": {
++            "range": {
++                "num_init_samples": 64,
++                "type": "percentile",
++                "params":
++                {
++                    "min_percentile": 0.01,
++                    "max_percentile": 99.99
++                }
++            },
++            "batchnorm_adaptation": {
++                "num_bn_adaptation_samples": 200
++            }
++        },
++        "activations":
++        {
++            "mode": "symmetric"
++        },
++        "weights":
++        {
++            "mode": "symmetric",
++            "per_channel": false
++        }
++    }
++}
+diff --git a/src/transformers/trainer.py b/src/transformers/trainer.py
+index 154632636..19f0b4fa7 100755
+--- a/src/transformers/trainer.py
++++ b/src/transformers/trainer.py
+@@ -29,6 +29,7 @@ import warnings
+ from pathlib import Path
+ from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union
+ 
++from nncf.torch.nncf_network import NNCFNetwork
+ from tqdm.auto import tqdm
+ 
+ 
+@@ -529,7 +530,10 @@ class Trainer:
+             return dataset
+         if self._signature_columns is None:
+             # Inspect model forward signature to keep only the arguments it accepts.
+-            signature = inspect.signature(self.model.forward)
++            if isinstance(self.model, NNCFNetwork):
++                signature = inspect.signature(self.model.get_nncf_wrapped_model().forward)
++            else:
++                signature = inspect.signature(self.model.forward)
+             self._signature_columns = list(signature.parameters.keys())
+             # Labels may be named label or label_ids, the default data collator handles that.
+             self._signature_columns += ["label", "label_ids"]
+-- 
+2.17.1
+

@@ -49,6 +49,7 @@ Tutorials that include code to train neural networks.
 | [301-tensorflow-training-openvino-pot](301-tensorflow-training-openvino/) | Use Post-training Optimization Tool (POT) to quantize the flowers model | |
 | [302-pytorch-quantization-aware-training](302-pytorch-quantization-aware-training) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model | |
 | [305-tensorflow-quantization-aware-training](305-tensorflow-quantization-aware-training) | Use Neural Network Compression Framework (NNCF) to quantize TensorFlow model | |
+| [306-nncf-with-nlp-huggingface-transformers](306-nncf-with-nlp-huggingface-transformers) | Use Neural Network Compression Framework (NNCF) to integrate into the HuggingFace transformers repository and obtain a quantized model for an NLP use case (BERT-base with MRPC) | |
 
 ## Live Demos
 
