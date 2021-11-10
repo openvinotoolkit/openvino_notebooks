@@ -18,3 +18,14 @@ While performing the steps above, the following [OpenVINO tools](https://pypi.or
 - `omz_quantizer` - Quantize an Open Model Zoo model
 - `accuracy_check` - Check the accuracy of models using a validation dataset
 - `benchmark_app` - Benchmark models
+
+# About the model
+This notebook uses the ssd_mobilenet_v1_coco model which is a [Single-Shot multi-box Detection (SSD) network](https://arxiv.org/abs/1801.04381) that has been trained on the COCO dataset to perform object detection.  
+The input to the converted model is a 300x300 BGR image.  The output of the model is an array of detection information for up to 100 objects giving the:
+- image_id: image identifier of the image within the batch
+- label: class identifier in the range of 1-91 for each class, plus one for background
+- confidence: the prediction probability in the range of 0.0-1.0 for label
+- (x_min, y_min): coordinates in normalized format (range 0.0-1.0) of the top-left of the bounding box
+- (x_max, y_max): coordinates in normalized format (range 0.0-1.0) of the bottom-right of the bounding box
+
+For details more details on the ssd_mobilenet_v1_coco model, see the Open Model Zoo [model](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/ssd_mobilenet_v1_coco)  and the [paper](https://arxiv.org/abs/1801.04381).
