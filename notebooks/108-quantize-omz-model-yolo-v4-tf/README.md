@@ -18,3 +18,17 @@ While performing the steps above, the following [OpenVINO tools](https://pypi.or
 - `omz_quantizer` - Quantize an Open Model Zoo model
 - `accuracy_check` - Check the accuracy of models using a validation dataset
 - `benchmark_app` - Benchmark models
+
+# About the model
+This notebook uses the yolo-v4-tf model, a YOLO v4 real-time object detection model that was implemented in a Keras* framework and converted to a TensorFlow* framework.  The model was trained on the [Common Objects in Context (COCO)](https://cocodataset.org/#home) dataset with 80 classes.  The input to the converted model is a 608x608 BGR image.  The output of the model are arrays of detection boxes contained in the three output layers:
+- StatefulPartitionedCall/model/conv2d_93/BiasAdd/Add: 76x76 
+- StatefulPartitionedCall/model/conv2d_101/BiasAdd/Add: 38x38
+- StatefulPartitionedCall/model/conv2d_109/BiasAdd/Add: 19x19
+
+Each output layer contains an NxN array of detection boxes with the following information:
+- (`x`, `y`) - raw coordinates of box center, must apply [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function) to get relative to the cell coordinates
+- `h`, `w` - raw height and width of box, must apply [exponential function](https://en.wikipedia.org/wiki/Exponential_function) and multiply by corresponding anchors to get absolute height and width values
+- `box_score` - confidence of detection box, must apply [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function) to get confidence in 0.0-1.0 range
+- class_no[80] - array of probability distribution over the 80 classes in logits format, must apply [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function) and multiply by obtained confidence value to get confidence for each class
+
+For details more details on the yolo-v4-tf model, see the Open Model Zoo [model](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/yolo-v4-tf), the paper ["YOLOv4: Optimal Speed and Accuracy of Object Detection"](https://arxiv.org/abs/2004.10934), and the [repository](https://github.com/david8862/keras-YOLOv3-model-set).
