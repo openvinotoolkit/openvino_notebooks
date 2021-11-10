@@ -18,3 +18,8 @@ While performing the steps above, the following [OpenVINO tools](https://pypi.or
 - `omz_quantizer` - Quantize an Open Model Zoo model
 - `accuracy_check` - Check the accuracy of models using a validation dataset
 - `benchmark_app` - Benchmark models
+
+# About the model
+This notebook uses the 'resnet-50-tf' which is a TensorFlow* implementation of ResNet-50, an image classification model that has been trained on the ImageNet dataset. The input to the converted model is a 224x224 BGR image.  The output of the model is 1001 prediction probabilities in the range of 0.0-1.0 for each of the 1000 classes, plus one for background.
+
+For details more details on the model, see the Open Model Zoo [model](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/resnet-50-tf), the [paper](https://arxiv.org/abs/1512.03385) and the [repository](https://github.com/tensorflow/models/tree/v2.2.0/official/r1/resnet).
