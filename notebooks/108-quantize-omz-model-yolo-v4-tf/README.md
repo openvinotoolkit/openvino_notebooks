@@ -25,10 +25,12 @@ This notebook uses the yolo-v4-tf model, a YOLO v4 real-time object detection mo
 - StatefulPartitionedCall/model/conv2d_101/BiasAdd/Add: 38x38
 - StatefulPartitionedCall/model/conv2d_109/BiasAdd/Add: 19x19
 
-Each output layer contains an NxN array of detection boxes with the following information:
-- (`x`, `y`) - raw coordinates of box center, must apply [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function) to get relative to the cell coordinates
-- `h`, `w` - raw height and width of box, must apply [exponential function](https://en.wikipedia.org/wiki/Exponential_function) and multiply by corresponding anchors to get absolute height and width values
-- `box_score` - confidence of detection box, must apply [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function) to get confidence in 0.0-1.0 range
+Each output layer contains an NxN array for different sized detection boxes within the original image.  Each detection box contains the following information:
+- (x, y) - raw coordinates of box center, must apply [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function) to get relative to the cell coordinates
+- h, w - raw height and width of box, must apply [exponential function](https://en.wikipedia.org/wiki/Exponential_function) and multiply by corresponding anchors to get absolute height and width values
+- box_score - confidence of detection box, must apply [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function) to get confidence in 0.0-1.0 range
 - class_no[80] - array of probability distribution over the 80 classes in logits format, must apply [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function) and multiply by obtained confidence value to get confidence for each class
+
+To reduce the results from the three output layers into distinct objects within the original image, the "intersection over union" (also known as the [Jaccard index](https://en.wikipedia.org/wiki/Jaccard_index)) algorithm is typically used to combine overlapping detection boxes with the same class into a single box containing the detected object.
 
 For details more details on the yolo-v4-tf model, see the Open Model Zoo [model](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/yolo-v4-tf), the paper ["YOLOv4: Optimal Speed and Accuracy of Object Detection"](https://arxiv.org/abs/2004.10934), and the [repository](https://github.com/david8862/keras-YOLOv3-model-set).
