@@ -20,7 +20,7 @@ While performing the steps above, the following [OpenVINO tools](../104-model-to
 - `benchmark_app` - Benchmark models
 
 ## About the models
-This notebook is configurable to work with either of the two Open Model Zoo object detection models: ssd_mobilenet_v1_coco or yolo-v4-tf (the default).
+This notebook is configurable to work with either of the two Open Model Zoo object detection models: ssd_mobilenet_v1_coco (the default) or yolo-v4-tf.
 
 ### About the ssd_mobilenet_v1_coco model
 The ssd_mobilenet_v1_coco model is a [Single-Shot multi-box Detection (SSD) network](https://arxiv.org/abs/1801.04381) that has been trained on the COCO dataset to perform object detection.  
