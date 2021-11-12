@@ -63,7 +63,7 @@ Tutorials that include code to train neural networks.
 Live inference demos that run on a webcam or video files.
 | Notebook | Description | Preview |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [401-object-detection-webcam](notebooks/401-object-detection-webcam/) | Object detection with a webcam or video file | <img src="https://user-images.githubusercontent.com/4547501/137755014-6f174efb-f378-4fe2-9edd-cab7aab0df5f.jpg" width=225> |
+| [401-object-detection-webcam](notebooks/401-object-detection-webcam/) | Object detection with a webcam or video file | <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> |
 | [402-pose-etimation-webcam](notebooks/402-pose-estimation-webcam/) | Human pose estimation with a webcam or video file | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225> |
 
 

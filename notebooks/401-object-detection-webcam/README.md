@@ -1,6 +1,6 @@
 # Live Object Detection with OpenVINO
 
-![object detection](https://user-images.githubusercontent.com/4547501/137755014-6f174efb-f378-4fe2-9edd-cab7aab0df5f.jpg)
+![object detection](https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif)
 
 Object detection finds predefined objects in an image or video. Each returned object includes features such as label, probability and bounding box coordinates relative to image boundaries. 
 
