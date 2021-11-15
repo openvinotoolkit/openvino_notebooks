@@ -1,8 +1,6 @@
 openvino-dev[onnx,tensorflow2]==2021.4.2
 gdown
 pytube
-librosa
-SoundFile
 yaspin
 
 # PyTorch/ONNX notebook requirements

@@ -48,7 +48,3 @@ nbval
 
 # openshift
 grpcio
-
-# audio processing notebook
-librosa
-SoundFile
