@@ -1,4 +1,4 @@
-# Speech to text notebook
+# Speech to Text Notebook
 
 ![output](https://user-images.githubusercontent.com/36741649/140987347-279de058-55d7-4772-b013-0f2b12deaa61.png)
 
