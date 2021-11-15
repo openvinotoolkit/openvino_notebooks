@@ -27,7 +27,7 @@ RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum remove -y nodejs && \
   yum install -y nodejs mesa-libGL dos2unix && \
   yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
-
+RUN apt-get install libsndfile1 -y
 
 # Copying in override assemble/run scripts
 COPY .docker/.s2i/bin /tmp/scripts
