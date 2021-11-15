@@ -1,12 +1,12 @@
-# Quantize Open Model Zoo object detection models
-Quantizing a model accelerates a trained model by reducing the precision necessary for its calculations.  Acceleration comes from lower-precision calculations being faster as well as less memory needed and less data to transfer since the data type itself is smaller along with the model weights data.  Though lower-precision may reduce model accuracy, typically a model using 32-bit floating-point precision (FP32) can be quantized to use lower-precision 8-bit integers (INT8) giving good results that are worth the trade off between accuracy and speed.  To see how quantization can accelerate models, see [INT8 vs FP32 Comparison on Select Networks and Platforms](https://docs.openvino.ai/latest/openvino_docs_performance_int8_vs_fp32.html#doxid-openvino-docs-performance-int8-vs-fp32) for some benchmarking results.
+# Quantize Object Detection Models from Open Model
+Quantizing a model accelerates a trained model by reducing the precision necessary for its calculations.  Acceleration comes from lower-precision calculations being faster as well as less memory needed and less data to transfer since the data type itself is smaller along with the model weights.  To see how quantization can accelerate models, see [INT8 vs FP32 Comparison on Select Networks and Platforms](https://docs.openvino.ai/latest/openvino_docs_performance_int8_vs_fp32.html#doxid-openvino-docs-performance-int8-vs-fp32) for some benchmarking results.
 
-[Intel Distribution of OpenVINO toolkit](https://software.intel.com/openvino-toolkit) includes the [Post-Training Optimization Tool (POT)](https://docs.openvino.ai/latest/pot_README.html) to automate quantization.  For models available from the [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo), the [`omz_quantizer`](../104-model-tools/104-model-tools.ipynb) tool is available to automate running POT using its [DefaultQuantization](https://docs.openvino.ai/latest/pot_compression_algorithms_quantization_default_README.html#doxid-pot-compression-algorithms-quantization-default-r-e-a-d-m-e) 8-bit quantization algorithm to quantize models down to INT8 precision.
+OpenVINO includes the [Post-Training Optimization Tool (POT)](https://docs.openvino.ai/latest/pot_README.html) for post-training quantization.  For models in the [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo), the [`omz_quantizer`](../104-model-tools/104-model-tools.ipynb) tool is available to automate running POT using the [DefaultQuantization](https://docs.openvino.ai/latest/pot_compression_algorithms_quantization_default_README.html#doxid-pot-compression-algorithms-quantization-default-r-e-a-d-m-e) 8-bit quantization algorithm to quantize models down to INT8 precision.
 
-This Jupyter* Notebook will go step-by-step through the workflow of downloading either the [ssd_mobilenet_v1_coco](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/ssd_mobilenet_v1_coco) or the [yolo-v4-tf](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/yolo-v4-tf) model from the Open Model Zoo through quantization and then checking and benchmarking the results.  The workflow consists of following these steps:
+This Jupyter Notebook will go step-by-step through the workflow of downloading either the [ssd_mobilenet_v1_coco](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/ssd_mobilenet_v1_coco) or the [yolo-v4-tf](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/yolo-v4-tf) model from the Open Model Zoo through quantization and then checking results and running a performance benchmark.  The workflow consists of following the steps:
 1. Download and set up the the [Common Objects in Context (COCO)](https://cocodataset.org/) validation dataset to be used by omz_quantize
 2. Download model from the Open Model Zoo
-3. Convert model to FP32 IR files
+3. Convert model to OpenVINO IR format
 4. Quantize FP32 model to create INT8 IR files
 5. Run inference on original and quantized model
 6. Check accuracy before and after quantization
@@ -19,10 +19,10 @@ While performing the steps above, the following [OpenVINO tools](../104-model-to
 - `accuracy_check` - Check the accuracy of models using a validation dataset
 - `benchmark_app` - Benchmark models
 
-## About the models
+## About the Models
 This notebook is configurable to work with either of the two Open Model Zoo object detection models: ssd_mobilenet_v1_coco (the default) or yolo-v4-tf.
 
-### About the ssd_mobilenet_v1_coco model
+### About the ssd_mobilenet_v1_coco Model
 The ssd_mobilenet_v1_coco model is a [Single-Shot multi-box Detection (SSD) network](https://arxiv.org/abs/1801.04381) that has been trained on the COCO dataset to perform object detection.  
 The input to the converted model is a 300x300 BGR image.  The output of the model is an array of detection information for up to 100 objects giving the:
 - image_id: image identifier of the image within the batch
@@ -33,7 +33,7 @@ The input to the converted model is a 300x300 BGR image.  The output of the mode
 
 For details more details on the ssd_mobilenet_v1_coco model, see the Open Model Zoo [model](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/ssd_mobilenet_v1_coco)  and the [paper](https://arxiv.org/abs/1801.04381).
 
-### About the yolo-v4-tf model
+### About the yolo-v4-tf Model
 The yolo-v4-tf model is a YOLO v4 real-time object detection model that was implemented in a Keras* framework and converted to a TensorFlow* framework.  The model was trained on the [Common Objects in Context (COCO)](https://cocodataset.org/#home) dataset with 80 classes.  The input to the converted model is a 608x608 BGR image.  The output of the model are arrays of detection boxes contained in the three output layers:
 - StatefulPartitionedCall/model/conv2d_93/BiasAdd/Add: 76x76 
 - StatefulPartitionedCall/model/conv2d_101/BiasAdd/Add: 38x38
