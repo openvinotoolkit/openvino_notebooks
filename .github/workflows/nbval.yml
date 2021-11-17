@@ -38,12 +38,14 @@ jobs:
           pip_cache_path: ~/.cache/pip
         - os: windows-latest
           pip_cache_path: ~\AppData\Local\pip\Cache
+        - os: macos-latest
+          pip_cache_path: ~/Library/Caches/pip
     steps:
     - name: Cache Pip
       uses: actions/cache@v2
       with:
         path: ${{ matrix.pip_cache_path }}
-        key: ${{ runner.os }}-${{ matrix.python }}-cache
+        key: ${{ runner.os }}-${{ matrix.python }}-cache-2021.4.2
     - name: Cache Files
       uses: actions/cache@v2
       with:

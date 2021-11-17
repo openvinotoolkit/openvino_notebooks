@@ -26,7 +26,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.cache/pip
-        key: Linux-3.7-cache
+        key: Linux-3.7-cache-2021.4.2
     - name: Cache Files
       uses: actions/cache@v2
       with:

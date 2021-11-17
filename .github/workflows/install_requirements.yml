@@ -31,7 +31,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ matrix.pip_cache_path }}
-        key: ${{ runner.os }}-${{ matrix.python }}-cache
+        key: ${{ runner.os }}-${{ matrix.python }}-cache-2021.4.2
 
     - name: Checkout
       uses: actions/checkout@v2
