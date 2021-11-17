@@ -27,12 +27,12 @@ jobs:
     strategy:
       fail-fast: false
     runs-on: ubuntu-20.04
+    steps:
     - name: Cache Pip
       uses: actions/cache@v2
       with:
         path: ~/.cache/pip
         key: Linux-3.7-cache-2021.4.2
-    steps:
     - uses: actions/checkout@v2
     - name: Set up Python 
       uses: actions/setup-python@v1
