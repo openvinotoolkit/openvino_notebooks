@@ -24,26 +24,27 @@ on:
     - cron:  '30 8 * * *'
 
 jobs:
-  build:
+  build_nbval:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04, ubuntu-20.04, windows-latest]
         python: [3.6, 3.7, 3.8]
-        include:
-        - os: ubuntu-18.04
-          pip_cache_path: ~/.cache/pip
-        - os: ubuntu-20.04
-          pip_cache_path: ~/.cache/pip
-        - os: windows-latest
-          pip_cache_path: ~\AppData\Local\pip\Cache
     steps:
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Get pip cache dir
+      id: pip-cache
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
     - name: Cache Pip
       uses: actions/cache@v2
       with:
-        path: ${{ matrix.pip_cache_path }}
-        key: ${{ runner.os }}-${{ matrix.python }}-cache
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: ${{ runner.os }}-${{ matrix.python }}-cache-2021.4.2
     - name: Cache Files
       uses: actions/cache@v2
       with:
@@ -54,10 +55,6 @@ jobs:
         key: cache-files
     - name: Checkout repository
       uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -88,3 +85,4 @@ jobs:
       run: |
         # Uninstall all files except openvino files to limit cache size
         pip freeze | grep -v openvino | grep -v nncf | xargs pip uninstall -y
+
