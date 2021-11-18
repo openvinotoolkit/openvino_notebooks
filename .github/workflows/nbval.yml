@@ -24,7 +24,7 @@ on:
     - cron:  '30 8 * * *'
 
 jobs:
-  build:
+  build_nbval:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -85,3 +85,4 @@ jobs:
       run: |
         # Uninstall all files except openvino files to limit cache size
         pip freeze | grep -v openvino | grep -v nncf | xargs pip uninstall -y
+
