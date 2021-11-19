@@ -32,34 +32,47 @@ jobs:
         os: [ubuntu-18.04, ubuntu-20.04, windows-latest]
         python: [3.6, 3.7, 3.8]
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
-    - name: Get pip cache dir
-      id: pip-cache
-      run: |
-        echo "::set-output name=dir::$(pip cache dir)"
     - name: Cache Pip
-      uses: actions/cache@v2
-      with:
-        path: ${{ steps.pip-cache.outputs.dir }}
-        key: ${{ runner.os }}-${{ matrix.python }}-cache-2021.4.2
-    - name: Cache Files
+      id: cachepip
       uses: actions/cache@v2
       with:
         path: |
-          ~/.paddlehub
-          ~/open_model_zoo_cache
-          ~/**/kits19_frames_1
-        key: cache-files
-    - name: Checkout repository
-      uses: actions/checkout@v2
+          pipcache
+        key: cache-pip-2021.4.2-1119-${{ matrix.os }}-${{ matrix.python }}
+    - name: Cache Files
+      id: cachefiles
+      uses: actions/cache@v2
+      with:
+        path: |
+          /tmp/paddlehub
+          notebooks/208-optical-character-recognition/open_model_zoo_cache
+          notebooks/110-ct-segmentation-quantize/kits19_frames_1
+        key: cache-files-2021.4.2-1119
+    - name: Cache openvino packages
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        python -m pip install --upgrade pip
+        mkdir pipcache
+        python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
+        cp -r pipcache pipcache_openvino
+        python -m pip uninstall -y openvino openvino-dev nncf
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -r .ci/dev-requirements.txt
+        python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
         python -m ipykernel install --user --name openvino_env
+    - name: Make pipcache directory with OpenVINO packages
+      # Only cache OpenVINO packages. mv works cross-platform
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        mv pipcache pipcache_full
+        mv pipcache_openvino pipcache
     - name: Pip freeze
       run: |
         python -m pip freeze
@@ -73,6 +86,7 @@ jobs:
       run: |
         python check_install.py
     - name: Patch notebooks
+      # The patch_notebooks script patches long running cells to run faster
       run: |
         python .ci/patch_notebooks.py
     - name: Test Jupyterlab
@@ -81,8 +95,6 @@ jobs:
     - name: Analysing with nbval
       run: |
         python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
-    - name: Cache openvino pip files
-      run: |
-        # Uninstall all files except openvino files to limit cache size
-        pip freeze | grep -v openvino | grep -v nncf | xargs pip uninstall -y
+      env:
+        HUB_HOME: /tmp/paddlehub  # for caching the PaddleHub models in CI
 
