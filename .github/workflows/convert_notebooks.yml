@@ -16,40 +16,69 @@ on:
   pull_request:
     paths:
     - '.github/workflows/convert_notebooks.yml'
+
 jobs:
   build:
     strategy:
       fail-fast: false
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-    - name: Cache Pip
-      uses: actions/cache@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Dotenv Action
+      id: dotenv
+      uses: xom9ikk/dotenv@v1.0.2
       with:
-        path: ~/.cache/pip
-        key: Linux-3.7-cache-2021.4.2
-    - name: Cache Files
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.paddlehub
-        key: cache-files
-    - uses: actions/checkout@v2
+        path: ./.github/workflows
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
-        python-version: 3.7
+        python-version: 3.8
+    - name: Cache OpenVINO Pip Packages
+      id: cachepip
+      uses: actions/cache@v2
+      with:
+        path: |
+          pipcache
+        key: ${{ env.PIP_CACHE_KEY }}-ubuntu-20.04-3.8
+    - name: Cache Files
+      id: cachefiles
+      uses: actions/cache@v2
+      with:
+        path: |
+          # NOTE: when modifying cache paths, update FILES_CACHE_KEY in ../variables/env.txt
+          # and change cache paths in nbval.yml as well
+          ${{ env.HUB_HOME }}
+          notebooks/208-optical-character-recognition/open_model_zoo_cache
+          notebooks/110-ct-segmentation-quantize/kits19_frames_1
+        key: ${{ env.FILES_CACHE_KEY }}
+    - name: Cache openvino packages
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        python -m pip install --upgrade pip
+        mkdir pipcache
+        python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
+        cp -r pipcache pipcache_openvino
+        python -m pip uninstall -y openvino openvino-dev nncf
     - name: Install required packages
       run: sudo apt-get update && sudo apt-get install texlive texlive-latex-extra pandoc
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -r .ci/ci-requirements.txt
-        python -m pip freeze > pip-freeze.txt
-    - name: Archive pip freeze
-      uses: actions/upload-artifact@v2
-      with:
-        name: pip-freeze
-        path: pip-freeze.txt
+        python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
+        python -m ipykernel install --user --name openvino_env
+    - name: Make pipcache directory with OpenVINO packages
+      # Only cache OpenVINO packages. mv works cross-platform
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        mv pipcache pipcache_full
+        mv pipcache_openvino pipcache
+    - name: Pip freeze
+      run: |
+        python -m pip freeze
+    - name: Check install
+      run: |
+        python check_install.py
     - name: convert_notebooks
       run: bash .ci/convert_notebooks.sh
     - name: Save HTML files
@@ -67,7 +96,4 @@ jobs:
       with:
         name: rst_files
         path: rst_files
-    - name: Cache openvino pip files
-      run: |
-        # Uninstall all files except openvino files to limit cache size
-        pip freeze | grep -v openvino | grep -v nncf | xargs pip uninstall -y
+
