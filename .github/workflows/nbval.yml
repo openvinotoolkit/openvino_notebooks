@@ -34,26 +34,33 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+    - name: Dotenv Action
+      id: dotenv
+      uses: xom9ikk/dotenv@v1.0.2
+      with:
+        path: ./.github/workflows
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
-    - name: Cache Pip
+    - name: Cache OpenVINO Pip Packages
       id: cachepip
       uses: actions/cache@v2
       with:
         path: |
           pipcache
-        key: cache-pip-2021.4.2-1119-${{ matrix.os }}-${{ matrix.python }}
+        key: ${{ env.PIP_CACHE_KEY }}-${{ matrix.os }}-${{ matrix.python }}
     - name: Cache Files
       id: cachefiles
       uses: actions/cache@v2
       with:
         path: |
-          /tmp/paddlehub
+          # NOTE: when modifying cache paths, update FILES_CACHE_KEY in ../variables/env.txt
+          # and change cache paths in convert_notebooks.yml as well
+          ${{ env.HUB_HOME }}
           notebooks/208-optical-character-recognition/open_model_zoo_cache
           notebooks/110-ct-segmentation-quantize/kits19_frames_1
-        key: cache-files-2021.4.2-1119
+        key: ${{ env.FILES_CACHE_KEY }}
     - name: Cache openvino packages
       if: steps.cachepip.outputs.cache-hit != 'true'
       run: |
@@ -95,6 +102,4 @@ jobs:
     - name: Analysing with nbval
       run: |
         python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
-      env:
-        HUB_HOME: /tmp/paddlehub  # for caching the PaddleHub models in CI
 
