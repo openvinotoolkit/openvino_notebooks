@@ -1,11 +1,9 @@
-openvino-dev[onnx,tensorflow2]==2021.4.*
-matplotlib<3.4
+openvino-dev[onnx,tensorflow2]==2021.4.2
 gdown
 pytube
 yaspin
 
 # ONNX notebook requirements
-geffnet==0.9.8
 fastseg
 ipywidgets
 
@@ -24,12 +22,19 @@ ppgan>=2.0.0
 
 # BERT quantization notebook requirements
 transformers
-sklearn
+
+# NNCF notebook requirements
+nncf[tf, torch]
+tensorflow_datasets==4.2.0
 
 # Jupyter requirements
 jupyterlab
 
-# Pin versions to prevent known dependency issues
+# The packages below are not directly required. They are dependencies of 
+# other dependencies that are pinned to a specific version to avoid
+# compatibility issues or vulnerabilities
+geffnet==0.9.8
+matplotlib<3.4
 ipython==7.10.*
 jedi==0.17.2
 setuptools>=56.0.0
@@ -40,7 +45,3 @@ nltk>=3.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
 scikit-learn>=0.24.2 # not directly required, pinned by Snyk to avoid a vulnerability
 
-# NNCF notebook requirements
-nncf[torch]
-nncf[tf]
-tensorflow_datasets==4.2.0
