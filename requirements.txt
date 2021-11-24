@@ -3,7 +3,7 @@ gdown
 pytube
 yaspin
 
-# ONNX notebook requirements
+# PyTorch/ONNX notebook requirements
 fastseg
 ipywidgets
 
