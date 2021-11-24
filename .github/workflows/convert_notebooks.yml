@@ -46,11 +46,12 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          # NOTE: when modifying cache paths, update FILES_CACHE_KEY in ../variables/env.txt
+          # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
           # and change cache paths in nbval.yml as well
           ${{ env.HUB_HOME }}
           notebooks/208-optical-character-recognition/open_model_zoo_cache
           notebooks/110-ct-segmentation-quantize/kits19_frames_1
+          notebooks/210-ct-scan-live-inference/kits19_frames_1
         key: ${{ env.FILES_CACHE_KEY }}
     - name: Cache openvino packages
       if: steps.cachepip.outputs.cache-hit != 'true'

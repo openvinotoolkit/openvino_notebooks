@@ -23,10 +23,10 @@ on:
     
 
 jobs:
-  build:
+  build_codecheck:
     strategy:
       fail-fast: false
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-20.04  # change cachepip step when changing this
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -38,7 +38,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
-        python-version: 3.8
+        python-version: 3.8  # change cachepip step when changing this
     - name: Cache OpenVINO Pip Packages
       id: cachepip
       uses: actions/cache@v2
