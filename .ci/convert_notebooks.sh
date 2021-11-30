@@ -1,4 +1,5 @@
 # Execute notebooks and convert them to Markdown and HTML
+# Output from notebook cells with tag "hide_output" will be hidden in converted notebooks
 
 rstdir=$PWD"/rst_files"
 binderlist=$rstdir"/notebooks_with_buttons.txt"
@@ -14,12 +15,14 @@ cat README.md | grep mybinder.org | awk -e '/[0-9]{3}/' | cut -f1 -d] | cut -f2 
 git ls-files "*.ipynb" | while read notebook; do
     executed_notebook=${notebook/.ipynb/-with-output.ipynb}
     echo $executed_notebook
-    jupyter nbconvert --execute --to notebook --output $executed_notebook --output-dir . --ExecutePreprocessor.kernel_name="python3" $notebook 
-    jupyter nbconvert --to markdown $executed_notebook --output-dir $markdowndir
-    jupyter nbconvert --to html $executed_notebook --output-dir $htmldir
-    jupyter nbconvert --to rst $executed_notebook --output-dir $rstdir
+    jupyter nbconvert --log-level=INFO --execute --to notebook --output $executed_notebook --output-dir . --ExecutePreprocessor.kernel_name="python3" $notebook
+    jupyter nbconvert --to markdown $executed_notebook --output-dir $markdowndir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
+    jupyter nbconvert --to html $executed_notebook --output-dir $htmldir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
+    jupyter nbconvert --to rst $executed_notebook --output-dir $rstdir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
 done
 
+# Remove download links to local files. They only work after executing the notebook
+# Replace relative links to other notebooks with relative links to documentation HTML pages
 for f in "$rstdir"/*.rst; do
     sed -i "s/<a href=[\'\"][^%].*download>\(.*\)<\/a>/\1/" "$f"
     sed -r -i "s/(<)\.\.\/(.*)\/.*ipynb(>)/\1\2-with-output.html\3/g" "$f"
