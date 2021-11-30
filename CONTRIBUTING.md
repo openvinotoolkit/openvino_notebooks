@@ -107,7 +107,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 1. Always provide links to sources. If your notebook implements a model, link to the research paper
    and the source Github (if available).
-2. Only use data and models that have a license that permits usage for commercial purposes, and make sure to
+2. Use only data and models with permissive licenses that allow for commercial use, and make sure to
    adhere to the terms of the license.
 3. If you include code from external sources in your notebook, or in files supporting your notebook, add the
    name, URL and license of the third party code to the licensing/third-party-programs.txt file
