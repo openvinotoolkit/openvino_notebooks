@@ -6,7 +6,7 @@ English | [简体中文](README_cn.md)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml/badge.svg)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml?query=branch%3Amain+event%3Apush)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml?query=branch%3Amain+event%3Apush)
 
-A collection of ready-to-run Jupyter\* notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
+A collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
 
 ## 📖 What's Inside
 
@@ -73,13 +73,13 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 
 | Supported Operating System                                 | [Python Version (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- | :------------------------------------------------- |
-| Ubuntu\* 18.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8                                      |
-| Ubuntu\* 20.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8                                      |
-| Red Hat* Enterprise Linux* 8, 64-bit                       | 3.6, 3.8                                           |
-| CentOS\* 7, 64-bit                                         | 3.6, 3.7, 3.8                                      |
-| macOS\* 10.15.x versions                                   | 3.6, 3.7, 3.8                                      |
-| Windows 10\*, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8                                      |
-| Windows Server\* 2016 or higher                            | 3.6, 3.7, 3.8                                      |
+| Ubuntu 18.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8                                      |
+| Ubuntu 20.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8                                      |
+| Red Hat Enterprise Linux 8, 64-bit                       | 3.6, 3.8                                           |
+| CentOS 7, 64-bit                                         | 3.6, 3.7, 3.8                                      |
+| macOS 10.15.x versions                                   | 3.6, 3.7, 3.8                                      |
+| Windows 10, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8                                      |
+| Windows Server 2016 or higher                            | 3.6, 3.7, 3.8                                      |
 
 ## 📝 Installation Guide
 
@@ -184,7 +184,7 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 
 - To check some common installation problems, run `python check_install.py`. This script is located in the openvino_notebooks directory.
   Please run it after activating the `openvino_env` virtual environment.
-- If you get an `ImportError`, doublecheck that you installed the Jupyter kernel. If necessary, choose the openvino*env kernel from the \_Kernel->Change Kernel* menu) in Jupyter Lab or Jupyter Notebook
+- If you get an `ImportError`, doublecheck that you installed the Jupyter kernel. If necessary, choose the openvino\_env kernel from the _Kernel->Change Kernel_ menu) in Jupyter Lab or Jupyter Notebook
 - If OpenVINO is installed globally, do not run installation commands in a terminal where setupvars.bat or setupvars.sh are sourced.
 - For Windows installation, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
 
