@@ -26,7 +26,7 @@ def test_readme():
     """
     Test that all notebooks have a README file and exist in the Notebooks README
     """
-    notebooks_readme = Path("notebooks/README.md").read_text()
+    notebooks_readme = Path("notebooks/README.md").read_text(encoding='utf-8')
     for item in Path("notebooks").iterdir():
         if item.is_dir():
             # item is a notebook directory
