@@ -9,6 +9,7 @@
     - [Readmes](#readmes)
     - [File structure](#file-structure)
     - [Notebook utils](#notebook-utils)
+  - [Requirements](#requirements)
   - [Validation](#validation)
     - [Automated tests](#automated-tests)
     - [Manual test and code quality tools](#manual-test-and-code-quality-tools)
@@ -106,7 +107,10 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 1. Always provide links to sources. If your notebook implements a model, link to the research paper
    and the source Github (if available).
-2. Only use data and models that have a license that permits usage for commercial purposes.
+2. Use only data and models with permissive licenses that allow for commercial use, and make sure to
+   adhere to the terms of the license.
+3. If you include code from external sources in your notebook, or in files supporting your notebook, add the
+   name, URL and license of the third party code to the licensing/third-party-programs.txt file
 
 ### Notebook naming
 
@@ -166,14 +170,32 @@ Python file with `jupyter nbconvert notebook_utils.ipynb --TagRemovePreprocessor
 Add a "hide" tag to any demo cells (from the right side gear sidebar) to prevent these cells from being added to the script.
 
 
+## Requirements
+
+If you need to add a requirement, add it to requirements.txt and .docker/Pipfile. Use Python 3.8 to install 
+[pipenv](https://pypi.org/project/pipenv/), and run `pipenv lock` in the .docker directory to create Pipfile.lock. 
+Add all three files to the repository. 
+
 ## Validation
 
 ### Automated tests
 
-We use Github Actions to automatically validate that all notebooks work. The automated tests
-currently test that the notebooks execute without problems on all supported platforms. More granular
-tests are planned. In the rest of this guide, the automated tests in Github Actions will be
-referred to as CI (for Continuous Integration).
+We use Github Actions to automatically validate that all notebooks work. The following tests run automatically on a new notebook PR:
+
+- nbval: tests that the notebooks execute without problems on all supported platforms. 
+- codecheck: 
+  - Uses [flake8](https://github.com/pycqa/flake8) to check for unnecessary imports and variables 
+and some style issues
+  - Verifies that the notebook is included in the main README and the README in the notebooks directory. 
+  - Runs the check_install script to test for installation issues
+- docker_nbval: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
+  To manually run this test, build the Docker image with `docker build -t openvino_notebooks .` and run the tests with
+  `docker run -it  --entrypoint /tmp/scripts/test openvino_notebooks`. It is recommended to build the image on a clean 
+  repo because the full notebooks folder will be copied to the image.
+- [CodeQL](https://codeql.github.com/)
+
+  - In the rest of this guide, the automated tests in Github
+Actions will be referred to as CI (for Continuous Integration).
 
 If your notebook takes longer than a few minutes to execute, it may be possible to patch it in the CI, to make 
 it execute faster. As an example, if your notebook trains for 20 epochs, you can set it to train for
