@@ -6,11 +6,11 @@
 
 的人不一了是他有为在责新中任自之我们
 
-In this tutorial optical character recognition for handwritten Chinese (simplified) and Japanese is presented. Roman alphabet OCR can be find in [optical character recognition 208-notebook](../208-optical-character-recognition)
+In this tutorial we demonstrate optical character recognition for handwritten Chinese (simplified) and Japanese. An OCR tutorial for the Latin alphabet is available here: [optical character recognition 208-notebook](../208-optical-character-recognition)
 
 ## Notebook Contents
 
-This notebook provides tutorial on how to use OCR for handwritten Japanese and simplified Chinese. Models used for this notebooks are [handwritten-japanese-recognition](https://docs.openvinotoolkit.org/latest/omz_models_model_handwritten_japanese_recognition_0001.html) and [handwritten-simplified-chinese](https://docs.openvinotoolkit.org/latest/omz_models_model_handwritten_simplified_chinese_recognition_0001.html). To decode models output to readable text [kondate_nakayosi](https://github.com/openvinotoolkit/open_model_zoo/blob/master/data/dataset_classes/kondate_nakayosi.txt) and [scut_ept](https://github.com/openvinotoolkit/open_model_zoo/blob/master/data/dataset_classes/scut_ept.txt) charlists are used. Both model are from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/).
+This notebook provides tutorial on how to use OCR for handwritten Japanese and simplified Chinese. Models used for this notebook are [handwritten-japanese-recognition](https://docs.openvinotoolkit.org/latest/omz_models_model_handwritten_japanese_recognition_0001.html) and [handwritten-simplified-chinese](https://docs.openvinotoolkit.org/latest/omz_models_model_handwritten_simplified_chinese_recognition_0001.html). To decode model output to readable text [kondate_nakayosi](https://github.com/openvinotoolkit/open_model_zoo/blob/master/data/dataset_classes/kondate_nakayosi.txt) and [scut_ept](https://github.com/openvinotoolkit/open_model_zoo/blob/master/data/dataset_classes/scut_ept.txt) charlists are used. Both models are available from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/).
 
 ## Installation Instructions
 
