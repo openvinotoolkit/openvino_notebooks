@@ -32,7 +32,8 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | [103-paddle-onnx-to-openvino](notebooks/103-paddle-onnx-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-onnx-to-openvino%2F103-paddle-onnx-to-openvino-classification.ipynb) | Convert PaddlePaddle models to OpenVINO IR | <img src="https://user-images.githubusercontent.com/15709723/127779326-dc14653f-a960-4877-b529-86908a6f2a61.png" width=300> |
 | [104-model-tools](notebooks/104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | Download, convert and benchmark models from Open Model Zoo | |
 | [105-language-quantize-bert](notebooks/105-language-quantize-bert/) | Optimize and quantize a pre-trained BERT model ||
-| [110-ct-segmentation-quantize](notebooks/110-ct-segmentation-quantize/110-ct-segmentation-quantize.ipynb)<br> | Quantize a kidney segmentation model and show live inference | |
+| [110-ct-segmentation-quantize](notebooks/110-ct-segmentation-quantize/)<br> | Quantize a kidney segmentation model and show live inference | |
+| [111-detection-quantization](notebooks/111-detection-quantization/)<br> | Quantize an object detection model | |
 
 
 ### Model Demos
@@ -111,8 +112,10 @@ openvino_env\Scripts\activate
 
 ### Step 2: Clone the Repository
 
+> Note: We are currently experiencing an issue with the repository. Please use `git clone --depth=1` while we are looking into this.
+
 ```bash
-git clone https://github.com/openvinotoolkit/openvino_notebooks.git
+git clone --depth=1 https://github.com/openvinotoolkit/openvino_notebooks.git
 cd openvino_notebooks
 ```
 
