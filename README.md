@@ -112,16 +112,16 @@ openvino_env\Scripts\activate
 
 ### Step 2: Clone the Repository
 
-> Note: We are currently experiencing an issue with the repository. Please use `git clone --depth=1` while we are looking into this.
+> Note: Using the `--depth=1` option for `git clone` reduces download size.
 
 ```bash
 git clone --depth=1 https://github.com/openvinotoolkit/openvino_notebooks.git
 cd openvino_notebooks
 ```
 
-### Step 3: Install and Launch the Notebooks
+### Step 3: Install the Notebooks Requirements
 
-Upgrade pip to the latest version. Use pip's legacy dependency resolver to avoid dependency conflicts
+Upgrade pip to the latest version and install the requirements. Install the openvino_env kernel to create a Jupyter kernel for this virtual environment.
 
 ```bash
 python -m pip install --upgrade pip
