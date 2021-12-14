@@ -32,7 +32,8 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | [103-paddle-onnx-to-openvino](notebooks/103-paddle-onnx-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-onnx-to-openvino%2F103-paddle-onnx-to-openvino-classification.ipynb) | Convert PaddlePaddle models to OpenVINO IR | <img src="https://user-images.githubusercontent.com/15709723/127779326-dc14653f-a960-4877-b529-86908a6f2a61.png" width=300> |
 | [104-model-tools](notebooks/104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | Download, convert and benchmark models from Open Model Zoo | |
 | [105-language-quantize-bert](notebooks/105-language-quantize-bert/) | Optimize and quantize a pre-trained BERT model ||
-| [110-ct-segmentation-quantize](notebooks/110-ct-segmentation-quantize/110-ct-segmentation-quantize.ipynb)<br> | Quantize a kidney segmentation model and show live inference | |
+| [110-ct-segmentation-quantize](notebooks/110-ct-segmentation-quantize/)<br> | Quantize a kidney segmentation model and show live inference | |
+| [111-detection-quantization](notebooks/111-detection-quantization/)<br> | Quantize an object detection model | |
 
 
 ### Model Demos
@@ -49,6 +50,7 @@ Demos that demonstrate inference on a particular model.
 | [208-optical-character-recognition](notebooks/208-optical-character-recognition/)<br> | Annotate text on images using text recognition resnet | <img src="https://user-images.githubusercontent.com/36741649/129315292-a37266dc-dfb2-4749-bca5-2ac9c1e93d64.jpg" width=225> |
 | [209-handwritten-ocr](notebooks/209-handwritten-ocr/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F209-handwritten-ocr%2F209-handwritten-ocr.ipynb) | OCR for handwritten simplified Chinese and Japanese | <img width="425" alt="handwritten_simplified_chinese_test" src="https://user-images.githubusercontent.com/36741649/132660640-da2211ec-c389-450e-8980-32a75ed14abb.png"> <br> 的人不一了是他有为在责新中任自之我们 |
 | [210-ct-scan-live-inference](notebooks/210-ct-scan-live-inference/210-ct-scan-live-inference.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F210-ct-scan-live-inference%2F210-ct-scan-live-inference.ipynb)| Show live inference on segmentation of CT-scan data |<img src="https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif" width=225>|
+| [211-speech-to-text](notebooks/211-speech-to-text/211-speech-to-text.ipynb)<br> | Run inference on speech-to-text recognition model | <img src="https://user-images.githubusercontent.com/36741649/140987347-279de058-55d7-4772-b013-0f2b12deaa61.png" width=225>|
 
 ### Model Training
 
@@ -110,8 +112,10 @@ openvino_env\Scripts\activate
 
 ### Step 2: Clone the Repository
 
+> Note: We are currently experiencing an issue with the repository. Please use `git clone --depth=1` while we are looking into this.
+
 ```bash
-git clone https://github.com/openvinotoolkit/openvino_notebooks.git
+git clone --depth=1 https://github.com/openvinotoolkit/openvino_notebooks.git
 cd openvino_notebooks
 ```
 
