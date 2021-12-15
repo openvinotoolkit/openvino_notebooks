@@ -7,13 +7,15 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+    paths-ignore:
+      - '**.md'
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ main ]
+    paths-ignore:
+      - '**.md'
   schedule:
     - cron: '28 23 * * 0'
-
-
 
 jobs:
   CodeQL:
