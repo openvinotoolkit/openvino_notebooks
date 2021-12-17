@@ -14,15 +14,17 @@ import urllib.parse
 import urllib.request
 from os import PathLike
 from pathlib import Path
-from typing import List, NamedTuple, Optional, Tuple
+from typing import List, NamedTuple, Optional, Sequence, Tuple
 
 import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import openvino.inference_engine
+from async_pipeline import AsyncPipeline
 from IPython.display import HTML, Image, Markdown, clear_output, display
 from matplotlib.lines import Line2D
+from models import model
 from openvino.inference_engine import IECore
 from tqdm.notebook import tqdm_notebook
 
@@ -523,6 +525,94 @@ def viz_result_image(
         )
     plt.close(fig)
     return fig
+
+
+# ### Live Inference
+
+# In[ ]:
+
+
+def showarray(frame: np.ndarray, display_handle=None):
+    """
+    Display array `frame`. Replace information at `display_handle` with `frame`
+    encoded as jpeg image
+
+    Create a display_handle with: `display_handle = display(display_id=True)`
+    """
+    _, frame = cv2.imencode(ext=".jpeg", img=frame)
+    if display_handle is None:
+        display_handle = display(Image(data=frame.tobytes()), display_id=True)
+    else:
+        display_handle.update(Image(data=frame.tobytes()))
+    return display_handle
+
+
+def show_live_inference(ie, images: Sequence, model: model.Model, device: str):
+    """
+    Do inference of images in `imagelist` on `model` on the given `device` and show
+    the results in real time in a Jupyter Notebook
+
+    :param imagelist: list of images/frames to do inference on
+    :param model: Model instance for inference
+    :param device: Name of device to perform inference on. For example: "CPU"
+    """
+    display_handle = None
+    next_frame_id = 0
+    next_frame_id_to_show = 0
+
+    input_layer = next(iter(model.net.input_info))
+
+    # Create asynchronous pipeline and print time it takes to load the model
+    load_start_time = time.perf_counter()
+    pipeline = AsyncPipeline(
+        ie=ie, model=model, plugin_config={}, device=device, max_num_requests=0
+    )
+    load_end_time = time.perf_counter()
+
+    # Perform asynchronous inference
+    start_time = time.perf_counter()
+
+    imagelist = list(images)
+    while next_frame_id < len(imagelist) - 1:
+        results = pipeline.get_result(next_frame_id_to_show)
+
+        if results:
+            # Show next result from async pipeline
+            result, meta = results
+            display_handle = showarray(result, display_handle)
+
+            next_frame_id_to_show += 1
+
+        if pipeline.is_ready():
+            # Submit new image to async pipeline
+            image = imagelist[next_frame_id]
+            pipeline.submit_data(
+                inputs={input_layer: image}, id=next_frame_id, meta={"frame": image}
+            )
+            next_frame_id += 1
+        else:
+            # If the pipeline is not ready yet and there are no results: wait
+            pipeline.await_any()
+
+    pipeline.await_all()
+
+    # Show all frames that are in the pipeline after all images have been submitted
+    while pipeline.has_completed_request():
+        results = pipeline.get_result(next_frame_id_to_show)
+        if results:
+            result, meta = results
+            display_handle = showarray(result, display_handle)
+            next_frame_id_to_show += 1
+
+    end_time = time.perf_counter()
+    duration = end_time - start_time
+    fps = len(imagelist) / duration
+    print(f"Loaded model to {device} in {load_end_time-load_start_time:.2f} seconds.")
+    print(f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}")
+
+    del imagelist
+    del pipeline.exec_net
+    del pipeline
 
 
 # ## OpenVINO Tools

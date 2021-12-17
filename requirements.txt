@@ -31,6 +31,14 @@ tensorflow_datasets==4.2.0
 # Jupyter requirements
 jupyterlab
 
+# NNCF notebook requirements
+nncf[tf, torch]
+tensorflow_datasets==4.2.0
+
+# CT scan training/inference requirements
+monai
+pytorch_lightning
+
 # The packages below are not directly required. They are dependencies of 
 # other dependencies that are pinned to a specific version to avoid
 # compatibility issues or vulnerabilities
@@ -46,3 +54,4 @@ nltk>=3.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
 scikit-learn>=0.24.2 # not directly required, pinned by Snyk to avoid a vulnerability
 paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
+
