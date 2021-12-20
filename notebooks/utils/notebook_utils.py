@@ -14,19 +14,20 @@ import urllib.parse
 import urllib.request
 from os import PathLike
 from pathlib import Path
-from typing import List, NamedTuple, Optional, Sequence, Tuple
+from typing import List, NamedTuple, Optional, Tuple
 
 import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import openvino.inference_engine
-from async_pipeline import AsyncPipeline
 from IPython.display import HTML, Image, Markdown, clear_output, display
 from matplotlib.lines import Line2D
-from models import model
 from openvino.inference_engine import IECore
 from tqdm.notebook import tqdm_notebook
+
+from async_pipeline import AsyncPipeline
+from models import model
 
 
 # ## Files
@@ -113,7 +114,6 @@ def download_file(
         raise Exception(
             f"File downloading failed with error: {e.code} {e.msg}"
         ) from None
-
     filename = Path(filename)
     if len(filename.parts) > 1:
         raise ValueError(
@@ -446,8 +446,9 @@ def segmentation_map_to_overlay(
     """
     if len(image.shape) == 2:
         image = np.repeat(np.expand_dims(image, -1), 3, 2)
-
     mask = segmentation_map_to_image(result, colormap, remove_holes)
+    image_height, image_width = image.shape[:2]
+    mask = cv2.resize(src=mask, dsize=(image_width, image_height))
     return cv2.addWeighted(mask, alpha, image, 1 - alpha, 0)
 
 
@@ -547,12 +548,12 @@ def showarray(frame: np.ndarray, display_handle=None):
     return display_handle
 
 
-def show_live_inference(ie, images: Sequence, model: model.Model, device: str):
+def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
     """
-    Do inference of images in `imagelist` on `model` on the given `device` and show
+    Do inference of images listed in `image_paths` on `model` on the given `device` and show
     the results in real time in a Jupyter Notebook
 
-    :param imagelist: list of images/frames to do inference on
+    :param image_paths: List of image filenames to load
     :param model: Model instance for inference
     :param device: Name of device to perform inference on. For example: "CPU"
     """
@@ -572,23 +573,22 @@ def show_live_inference(ie, images: Sequence, model: model.Model, device: str):
     # Perform asynchronous inference
     start_time = time.perf_counter()
 
-    imagelist = list(images)
-    while next_frame_id < len(imagelist) - 1:
+    while next_frame_id < len(image_paths) - 1:
         results = pipeline.get_result(next_frame_id_to_show)
 
         if results:
             # Show next result from async pipeline
             result, meta = results
             display_handle = showarray(result, display_handle)
-
             next_frame_id_to_show += 1
-
         if pipeline.is_ready():
             # Submit new image to async pipeline
-            image = imagelist[next_frame_id]
+            image_path = image_paths[next_frame_id]
+            image = cv2.imread(filename=str(image_path), flags=cv2.IMREAD_UNCHANGED)
             pipeline.submit_data(
                 inputs={input_layer: image}, id=next_frame_id, meta={"frame": image}
             )
+            del image
             next_frame_id += 1
         else:
             # If the pipeline is not ready yet and there are no results: wait
@@ -606,11 +606,12 @@ def show_live_inference(ie, images: Sequence, model: model.Model, device: str):
 
     end_time = time.perf_counter()
     duration = end_time - start_time
-    fps = len(imagelist) / duration
+    fps = len(image_paths) / duration
     print(f"Loaded model to {device} in {load_end_time-load_start_time:.2f} seconds.")
-    print(f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}")
+    print(
+        f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}"
+    )
 
-    del imagelist
     del pipeline.exec_net
     del pipeline
 

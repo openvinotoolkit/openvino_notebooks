@@ -64,7 +64,6 @@ jobs:
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
           # and change cache paths in convert_notebooks.yml as well
           ${{ env.HUB_HOME }}
-          /tmp/paddlehub
           case_00030.zip
           notebooks/208-optical-character-recognition/open_model_zoo_cache
           notebooks/110-ct-segmentation-quantize/kits19_frames_1

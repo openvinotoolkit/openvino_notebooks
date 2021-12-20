@@ -28,16 +28,12 @@ transformers
 nncf[tf, torch]
 tensorflow_datasets==4.2.0
 
-# Jupyter requirements
-jupyterlab
-
-# NNCF notebook requirements
-nncf[tf, torch]
-tensorflow_datasets==4.2.0
-
 # CT scan training/inference requirements
 monai
 pytorch_lightning
+
+# Jupyter requirements
+jupyterlab
 
 # The packages below are not directly required. They are dependencies of 
 # other dependencies that are pinned to a specific version to avoid
