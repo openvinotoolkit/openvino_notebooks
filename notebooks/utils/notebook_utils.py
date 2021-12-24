@@ -6,6 +6,7 @@
 
 import os
 import shutil
+import socket
 import threading
 import time
 import urllib
@@ -72,6 +73,7 @@ def download_file(
     directory: PathLike = None,
     show_progress: bool = True,
     silent: bool = False,
+    timeout: int = 5,
 ) -> str:
     """
     Download a file from a url and save it to the local filesystem. The file is saved to the
@@ -91,11 +93,25 @@ def download_file(
         opener = urllib.request.build_opener()
         opener.addheaders = [("User-agent", "Mozilla/5.0")]
         urllib.request.install_opener(opener)
-        urlobject = urllib.request.urlopen(url)
+        urlobject = urllib.request.urlopen(url, timeout=timeout)
         if filename is None:
-            filename = urlobject.info().get_filename() or Path(urllib.parse.urlparse(url).path).name
+            filename = (
+                urlobject.info().get_filename()
+                or Path(urllib.parse.urlparse(url).path).name
+            )
+    except urllib.error.URLError as error:
+        if isinstance(error.reason, socket.timeout):
+            raise Exception(
+                "Connection timed out. If you access the internet through a proxy server, please "
+                "make sure the proxy is set in the shell from where you launched Jupyter. If your "
+                "internet connection is slow, you can call `download_file(url, timeout=30)` to "
+                "wait for 30 seconds before raising this error."
+            ) from None
     except urllib.error.HTTPError as e:
-        raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
+        raise Exception(
+            f"File downloading failed with error: {e.code} {e.msg}"
+        ) from None
+
     filename = Path(filename)
     if len(filename.parts) > 1:
         raise ValueError(
@@ -120,7 +136,9 @@ def download_file(
             desc=str(filename),
             disable=not show_progress,
         )
-        urllib.request.urlretrieve(url, filename, reporthook=progress_callback.update_to)
+        urllib.request.urlretrieve(
+            url, filename, reporthook=progress_callback.update_to
+        )
         if os.stat(filename).st_size >= urlobject_size:
             progress_callback.update(urlobject_size - progress_callback.n)
             progress_callback.refresh()
@@ -141,7 +159,9 @@ def download_ir_model(model_xml_url: str, destination_folder: str = None) -> str
     :return: path to downloaded xml model file
     """
     model_bin_url = model_xml_url[:-4] + ".bin"
-    model_xml_path = download_file(model_xml_url, directory=destination_folder, show_progress=False)
+    model_xml_path = download_file(
+        model_xml_url, directory=destination_folder, show_progress=False
+    )
     download_file(model_bin_url, directory=destination_folder)
     return model_xml_path
 
@@ -408,7 +428,9 @@ def segmentation_map_to_image(
     return mask
 
 
-def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=False) -> np.ndarray:
+def segmentation_map_to_overlay(
+    image, result, alpha, colormap, remove_holes=False
+) -> np.ndarray:
     """
     Returns a new image where a segmentation mask (created with colormap) is overlayed on
     the source image.
@@ -463,7 +485,9 @@ def viz_result_image(
     if bgr_to_rgb:
         source_image = to_rgb(source_image)
     if resize:
-        result_image = cv2.resize(result_image, (source_image.shape[1], source_image.shape[0]))
+        result_image = cv2.resize(
+            result_image, (source_image.shape[1], source_image.shape[0])
+        )
 
     num_images = 1 if source_image is None else 2
 
@@ -586,10 +610,13 @@ class DeviceNotFoundAlert(NotebookAlert):
         )
         self.alert_class = "warning"
         if len(supported_devices) == 1:
-            self.message += f"The following device is available: {ie.available_devices[0]}"
+            self.message += (
+                f"The following device is available: {ie.available_devices[0]}"
+            )
         else:
             self.message += (
-                "The following devices are available: " f"{', '.join(ie.available_devices)}"
+                "The following devices are available: "
+                f"{', '.join(ie.available_devices)}"
             )
         super().__init__(self.message, self.alert_class)
 
