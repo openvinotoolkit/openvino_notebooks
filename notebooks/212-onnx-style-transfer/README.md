@@ -5,9 +5,10 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F212-onnx-style-transfer%2F212-onnx-style-transfer.ipynb)
 
-This notebook demonstrates [Fast Neural Style Transfer](https://github.com/onnx/models/tree/master/vision/style_transfer/fast_neural_style) with ONNX models and OpenVINO. Neural style transfer networks take two images as input during training: a source image, and a style reference image. The network transforms the source image and returns an image with the style of the reference image applied to the source image.
+This notebook demonstrates [Fast Neural Style Transfer](https://github.com/onnx/models/tree/master/vision/style_transfer/fast_neural_style) on ONNX models with OpenVINO. Style Transfer models mix the content of an image with the style of another image.
 
-For this notebook, we use five pretrained models, for the following styles: Mosaic, Candy, Rain Princess, Udnie and Pointilism. The models are from the [ONNX Model Repository](https://github.com/onnx/models). The model is based on the research paper [Perceptual Losses for Real-Time Style Transfer and Super-Resolution](https://arxiv.org/abs/1603.08155) by Justin Johnson, Alexandre Alahi and Li Fei-Fei.
+For this notebook, we use five pretrained models, for the following styles: Mosaic, Rain Princess, Candy, Udnie and Pointilism. The models are from the [ONNX Model Repository](https://github.com/onnx/models) and are based on the research paper [Perceptual Losses for Real-Time Style Transfer and Super-Resolution](https://arxiv.org/abs/1603.08155) by Justin Johnson, Alexandre Alahi and Li Fei-Fei.
+
 
 ## Notebook Contents
 
