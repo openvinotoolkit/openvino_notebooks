@@ -14,6 +14,6 @@ In the bottom part of the notebook, you can find the result of running `"action-
 
 ## See Also
 
-* [Open Model Zoo Demos](../../README.md)
+* [OpenVINO notebooks](../../README.md)
 * [Model Optimizer](https://docs.openvinotoolkit.org/latest/_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html)
-* [Model Downloader](../../../tools/model_tools/README.md)
+* [Fix Link - Model Downloader](../../../tools/model_tools/README.md)
