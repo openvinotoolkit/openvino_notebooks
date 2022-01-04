@@ -1,6 +1,6 @@
 # Human Action Recognition OpenVINO
 
-![](./action_recognition.gif)
+![GIF ANIMATION HERE](./action_recognition.gif)
 
 In this notebook you will find a simple way to detect human activities in a video coming from your camera or loaded video.
 
