@@ -14,6 +14,6 @@ In the bottom part of the notebook, you can find the result of running `"action-
 
 ## See Also
 
-* [OpenVINO notebooks](../../README.md)
+* [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
 * [Model Optimizer](https://docs.openvinotoolkit.org/latest/_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html)
-* [Fix Link - Model Downloader](../../../tools/model_tools/README.md)
+* [Action Recognition Demo (OpenVINO - No notebooks)](https://docs.openvino.ai/latest/omz_demos_action_recognition_demo_python.html)
