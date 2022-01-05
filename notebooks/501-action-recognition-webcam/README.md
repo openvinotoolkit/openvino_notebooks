@@ -19,7 +19,7 @@ NOTE: _To use the webcam, you must run this Jupyter notebook on a computer with 
 
 For more information about the pre-trained models, refer to the [Intel](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel) and [public](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public) models documentation. All included in the [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo)
 
-## Demo Output
+## Demo Result
 
 In the bottom part of the notebook, you can find the result of running `"action-recognition-model"` using your webcam and a loaded video.
 
