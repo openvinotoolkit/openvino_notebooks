@@ -2,9 +2,20 @@
 
 ![GIF ANIMATION HERE](./action_recognition.gif)
 
-In this notebook, you will find a simple way to detect human activities in a video coming from your camera or loaded video.
+This notebook demonstrates live human action recognition with OpenVINO. We use the [Action Recognition Models](https://docs.openvino.ai/2020.2/usergroup13.html) from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo), specifically the [Encoder](https://docs.openvino.ai/2020.2/_models_intel_action_recognition_0001_encoder_description_action_recognition_0001_encoder.html) and [Decoder](https://docs.openvino.ai/2020.2/_models_intel_action_recognition_0001_decoder_description_action_recognition_0001_decoder.html). Both models create a sequence to sequence (`"seq2seq"`)<sup id="a1">[1](#f1)</sup> system to identify the  human activities for [Kinetics-400 dataset](https://deepmind.com/research/open-source/kinetics). The models use the Video Transformer approach with ResNet34 encoder<sup id="a2">[2](#f2)</sup>. We will see in this notebook how to create the following pipeline:
 
-We will use a general-purpose action recognition (400 actions) model for Kinetics-400 dataset. `action-recognition-0001-encoder` + `action-recognition-0001-decoder`. But also you can use the notebook to run models as `driver-action-recognition-adas-0002-encoder` + `driver-action-recognition-adas-0002-decoder` for driver monitoring scenario. 
+<img align='center' src="action_recognition_pipeline.jpeg" alt="drawing" width="1000"/>
+
+
+At the bottom of this notebook, you will see live inference results from your webcam. You can also upload a video file.
+
+NOTE: _To use the webcam, you must run this Jupyter notebook on a computer with a webcam. If you run on a server, the webcam will not work. However, you can still do inference on a video in the final step._
+
+<b id="f1">1</b> seq2seq: Deep learning models that take a sequence of items to the input and output. In this case, input: video frames, output: actions sequence. This `"seq2seq"` is composed of an encoder and a decoder. The encoder captures the `"context"` of the inputs to be analyzed by the decoder, and finally gets the human action and confidence.[$\hookleftarrow$](#a1)
+
+<b id="f2">2</b>  [Video Transformer](https://en.wikipedia.org/wiki/Transformer_(machine_learning_model)#:~:text=A%20transformer%20is%20a%20deep,in%20computer%20vision%20(CV).), and [ResNet34](https://www.kaggle.com/pytorch/resnet34). [$\hookleftarrow$](#a2)
+
+
 
 For more information about the pre-trained models, refer to the [Intel](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel) and [public](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public) models documentation. All included in the [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo)
 
