@@ -1,11 +1,14 @@
-# Human Action Recognition OpenVINO
+# Live Human Action Recognition with OpenVINO
 
-![GIF ANIMATION HERE](./action_recognition.gif)
+![Action Recognition](https://user-images.githubusercontent.com/10940214/148401074-6f642c53-419d-43a1-8f19-b8bdc7e3a65c.gif)
+
+
+
+## Notebook Contents
 
 This notebook demonstrates live human action recognition with OpenVINO. We use the [Action Recognition Models](https://docs.openvino.ai/2020.2/usergroup13.html) from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo), specifically the [Encoder](https://docs.openvino.ai/2020.2/_models_intel_action_recognition_0001_encoder_description_action_recognition_0001_encoder.html) and [Decoder](https://docs.openvino.ai/2020.2/_models_intel_action_recognition_0001_decoder_description_action_recognition_0001_decoder.html). Both models create a sequence to sequence (`"seq2seq"`)<sup id="a1">[1](#f1)</sup> system to identify the  human activities for [Kinetics-400 dataset](https://deepmind.com/research/open-source/kinetics). The models use the Video Transformer approach with ResNet34 encoder<sup id="a2">[2](#f2)</sup>. We will see in this notebook how to create the following pipeline:
 
-<img align='center' src="action_recognition_pipeline.jpeg" alt="drawing" width="1000"/>
-
+<img align='center' src="https://user-images.githubusercontent.com/10940214/148401661-477aebcd-f2d0-4771-b107-4b37f94d0b1e.jpeg" alt="drawing" width="1000"/>
 
 At the bottom of this notebook, you will see live inference results from your webcam. You can also upload a video file.
 
@@ -19,9 +22,9 @@ NOTE: _To use the webcam, you must run this Jupyter notebook on a computer with 
 
 For more information about the pre-trained models, refer to the [Intel](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel) and [public](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public) models documentation. All included in the [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo)
 
-## Demo Result
+## Installation Instructions
 
-In the bottom part of the notebook, you can find the result of running `"action-recognition-model"` using your webcam and a loaded video.
+If you have not done so already, please follow the [Installation Guide](../../README.md) to install all required dependencies.
 
 ## See Also
 
