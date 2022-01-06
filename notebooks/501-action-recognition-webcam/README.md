@@ -1,6 +1,6 @@
 # Live Human Action Recognition with OpenVINO
 
-<img align='centerme' src="https://user-images.githubusercontent.com/10940214/148401074-6f642c53-419d-43a1-8f19-b8bdc7e3a65c.gif" alt="drawing" width="500"/>
+<img align="center" src="https://user-images.githubusercontent.com/10940214/148401074-6f642c53-419d-43a1-8f19-b8bdc7e3a65c.gif" alt="drawing" width="500"/>
 
 Human action recognition finds actions over a video. List of actions is extensive (400 in total), and cover *Person Actions*, (e.g. drawing, drinking, laughing), *Person-Person Actions* (e.g. hugging, shaking hands), and *Person-Object Actions* (opening present, mowing lawn, playing "instrument"). You could find several parent-child groupings on the label's list, for instance, braiding hair and brushing hair, salsa dacing and robot dancing, or playing violin and playing guitar. For more information about labels and dataset see ["The Kinetics Human Action Video Dataset"](https://arxiv.org/pdf/1705.06950.pdf)
 
@@ -9,7 +9,7 @@ Human action recognition finds actions over a video. List of actions is extensiv
 
 This notebook demonstrates live human action recognition with OpenVINO. We use the [Action Recognition Models](https://docs.openvino.ai/2020.2/usergroup13.html) from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo), specifically the [Encoder](https://docs.openvino.ai/2020.2/_models_intel_action_recognition_0001_encoder_description_action_recognition_0001_encoder.html) and [Decoder](https://docs.openvino.ai/2020.2/_models_intel_action_recognition_0001_decoder_description_action_recognition_0001_decoder.html). Both models create a sequence to sequence (`"seq2seq"`)<sup id="a1">[1](#f1)</sup> system to identify the  human activities for [Kinetics-400 dataset](https://deepmind.com/research/open-source/kinetics). The models use the Video Transformer approach with ResNet34 encoder<sup id="a2">[2](#f2)</sup>. We will see in this notebook how to create the following pipeline:
 
-<img align='center' src="https://user-images.githubusercontent.com/10940214/148401661-477aebcd-f2d0-4771-b107-4b37f94d0b1e.jpeg" alt="drawing" width="1000"/>
+<img align="center" src="https://user-images.githubusercontent.com/10940214/148401661-477aebcd-f2d0-4771-b107-4b37f94d0b1e.jpeg" alt="drawing" width="1000"/>
 
 At the bottom of this notebook, you will see live inference results from your webcam. You can also upload a video file.
 
