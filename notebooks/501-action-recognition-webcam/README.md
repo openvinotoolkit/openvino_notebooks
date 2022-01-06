@@ -1,6 +1,6 @@
 # Live Human Action Recognition with OpenVINO
 
-![Action Recognition](https://user-images.githubusercontent.com/10940214/148401074-6f642c53-419d-43a1-8f19-b8bdc7e3a65c.gif)
+![Action Recognition](https://user-images.githubusercontent.com/10940214/148401074-6f642c53-419d-43a1-8f19-b8bdc7e3a65c.gif?style=centerme)
 
 Human action recognition finds actions over a video. List of actions is extensive (400 in total), and cover *Person Actions*, (e.g. drawing, drinking, laughing), *Person-Person Actions* (e.g. hugging, shaking hands), and *Person-Object Actions* (opening present, mowing lawn, playing "instrument"). You could find several parent-child groupings on the label's list, for instance, braiding hair and brushing hair, salsa dacing and robot dancing, or playing violin and playing guitar. For more information about labels and dataset see ["The Kinetics Human Action Video Dataset"](https://arxiv.org/pdf/1705.06950.pdf)
 
