@@ -16,7 +16,7 @@ This notebook demonstrates live human action recognition with OpenVINO. We use t
     <img width="80%" src="https://user-images.githubusercontent.com/10940214/148401661-477aebcd-f2d0-4771-b107-4b37f94d0b1e.jpeg"> 
 </p>
 
-At the bottom of this notebook, you will see live inference results from your webcam. You can also upload a video file.
+At the end of this notebook, you will see live inference results from your webcam. You can also upload a video file.
 
 NOTE: _To use the webcam, you must run this Jupyter notebook on a computer with a webcam. If you run on a server, the webcam will not work. However, you can still do inference on a video in the final step._
 
