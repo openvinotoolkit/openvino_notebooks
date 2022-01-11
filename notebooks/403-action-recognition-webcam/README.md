@@ -32,7 +32,7 @@ For more information about the pre-trained models, refer to the [Intel](https://
 
 If you have not done so already, please follow the [Installation Guide](../../README.md) to install all required dependencies.
 
-## See Also
+### See Also
 
 * [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
 * [Model Optimizer](https://docs.openvinotoolkit.org/latest/_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html)
