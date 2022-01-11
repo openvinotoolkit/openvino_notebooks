@@ -1,4 +1,4 @@
-# Live Human Action Recognition with OpenVINO
+# Live Action Recognition with OpenVINO
 
 <p align="center" width="100%">
     <img width="50%" src="https://user-images.githubusercontent.com/10940214/148401074-6f642c53-419d-43a1-8f19-b8bdc7e3a65c.gif"> 
