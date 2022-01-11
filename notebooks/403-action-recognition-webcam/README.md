@@ -4,7 +4,7 @@
     <img width="50%" src="https://user-images.githubusercontent.com/10940214/148401074-6f642c53-419d-43a1-8f19-b8bdc7e3a65c.gif"> 
 </p>
 
-Human action recognition finds actions over a video. The list of actions is extensive (400 in total) and cover *Person Actions*, (e.g., drawing, drinking, laughing), *Person-Person Actions* (e.g., hugging, shaking hands), and *Person-Object Actions* (opening present, mowing the lawn, playing "instrument"). You could find several parent-child groupings on the label's list, such as braiding hair and brushing hair, salsa dancing, robot dancing, or playing violin and playing guitar. For more information about labels and dataset, see ["The Kinetics Human Action Video Dataset"](https://arxiv.org/pdf/1705.06950.pdf)
+Human action recognition finds actions over time in a video. The list of actions in this notebook is extensive (400 in total) and covers *Person Actions*, (e.g., drawing, drinking, laughing), *Person-Person Actions* (e.g., hugging, shaking hands), and *Person-Object Actions* (opening present, mowing the lawn, playing "instrument"). You could find several parent-child groupings on the label's list, such as braiding hair and brushing hair, salsa dancing, robot dancing, or playing violin and playing guitar. For more information about the labels and dataset, see ["The Kinetics Human Action Video Dataset"](https://arxiv.org/pdf/1705.06950.pdf) research paper.
 
 
 ## Notebook Contents
