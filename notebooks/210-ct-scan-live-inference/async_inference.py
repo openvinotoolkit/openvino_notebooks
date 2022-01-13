@@ -23,7 +23,7 @@ class CTAsyncPipeline:
 
         self.model = model
         self.exec_net = ie.compile_model(
-            network=self.model.net,
+            model=self.model.net,
             device_name=device,
             config=plugin_config,
             num_requests=max_num_requests,
@@ -95,12 +95,12 @@ class SegModel(omz_model.Model):
         """
         super().__init__(ie, model_path)
 
-        self.net = ie.read_network(model_path, model_path.with_suffix(".bin"))
+        self.net = ie.read_model(model_path, model_path.with_suffix(".bin"))
         self.output_layer = next(iter(self.net.outputs))
         self.input_layer = next(iter(self.net.inputs))
         if resize_shape is not None:
             self.net.reshape({self.input_layer: resize_shape})
-        self.image_height, self.image_width = self.input_layer.shape[2:]
+        self.image_height, self.image_width = list(self.input_layer.shape)[2:]
         self.lut = None
         if colormap is not None:
             colormap = colormap.astype(np.uint8).reshape(20, 1, 3)

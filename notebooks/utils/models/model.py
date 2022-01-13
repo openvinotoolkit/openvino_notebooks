@@ -34,7 +34,7 @@ class Model:
 
     def set_batch_size(self, batch):
         shapes = {}
-        for input_layer in self.net.input_info:
-            new_shape = [batch] + self.net.input_info[input_layer].input_data.shape[1:]
+        for input_layer in self.net.inputs:
+            new_shape = [batch] + input_layer.shape[1:]
             shapes.update({input_layer: new_shape})
         self.net.reshape(shapes)
