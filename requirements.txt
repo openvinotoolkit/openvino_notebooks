@@ -1,4 +1,6 @@
-openvino-dev[onnx,tensorflow2]==2021.4.2
+-i https://test.pypi.org/simple/ 
+--extra-index-url  https://pypi.org/simple/
+openvino-dev==2022.1.0.dev20220114
 gdown
 pytube
 yaspin
