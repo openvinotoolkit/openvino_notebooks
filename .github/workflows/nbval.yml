@@ -183,7 +183,7 @@ jobs:
     # Main notebooks test. Verifies that all notebooks run without errors
     - name: Analysing with nbval
       run: |
-        python -m pytest --nbval -x -k "test_3" --durations 10
+        python -m pytest --nbval -x -k "test_3" --durations 10 --ignore "301-tensorflow-training-openvino-pot.ipynb 301-tensorflow-training-openvino.ipynb"
 
     # Show the cache after running the notebooks
     - name: Show cache
