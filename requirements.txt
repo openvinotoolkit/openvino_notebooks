@@ -1,6 +1,6 @@
 -i https://test.pypi.org/simple/ 
 --extra-index-url  https://pypi.org/simple/
-openvino-dev==2022.1.0.dev20220114
+openvino-dev==2022.1.0.dev20220117
 gdown
 pytube
 yaspin
@@ -28,6 +28,7 @@ transformers
 
 # NNCF notebook requirements
 nncf[tf, torch]
+tensorflow==2.5.*
 tensorflow_datasets==4.2.0
 
 # CT scan training/inference requirements
