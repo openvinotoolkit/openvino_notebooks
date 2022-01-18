@@ -27,7 +27,6 @@ ppgan==2.1.*
 transformers
 
 # NNCF notebook requirements
-nncf[tf, torch]
 nncf==2.1.*
 tensorflow==2.5.*
 tensorflow_datasets==4.2.0
