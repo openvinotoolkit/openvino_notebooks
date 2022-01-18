@@ -4,6 +4,7 @@ openvino-dev==2022.1.0.dev20220117
 gdown
 pytube
 yaspin
+ipykernel==5.*
 
 # PyTorch/ONNX notebook requirements
 fastseg
