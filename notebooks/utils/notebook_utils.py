@@ -623,9 +623,9 @@ def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
 
 def benchmark_model(model_path: os.PathLike,
                     device: str = "CPU",
-                    seconds: int = 60, api: str = "async",
+                    seconds: int = 60, api: str = "sync",
                     batch: int = 1, 
-                    cache_dir="model_cache"):
+                    cache_dir: str = None):
     """
     Benchmark model `model_path` with `benchmark_app`. Returns the output of `benchmark_app`
     without logging info, and information about the device
@@ -642,7 +642,7 @@ def benchmark_model(model_path: os.PathLike,
     if ("GPU" in device) and ("GPU" not in ie.available_devices):
         raise ValueError(f"A GPU device is not available. Available devices are: {ie.available_devices}")
     else:
-        benchmark_command = f"benchmark_app -m {model_path} -d {device} -t {seconds} -api {api} -b {batch} -cdir {cache_dir}"
+        benchmark_command = f"benchmark_app -m {model_path} -d {device} -t {seconds} -api {api} -b {batch}"
         display(Markdown(f"**Benchmark {model_path.name} with {device} for {seconds} seconds with {api} inference**"));
         display(Markdown(f"Benchmark command: `{benchmark_command}`"));
 
