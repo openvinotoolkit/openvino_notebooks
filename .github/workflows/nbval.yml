@@ -64,6 +64,7 @@ jobs:
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
           # and change cache paths in convert_notebooks.yml as well
           ${{ env.HUB_HOME }}
+          case_00030.zip
           notebooks/208-optical-character-recognition/open_model_zoo_cache
           notebooks/110-ct-segmentation-quantize/kits19_frames_1
           notebooks/210-ct-scan-live-inference/kits19_frames_1
@@ -77,6 +78,18 @@ jobs:
         python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
         cp -r pipcache pipcache_openvino
         python -m pip uninstall -y openvino openvino-dev nncf
+    - name: Download CT files
+      if: steps.cachefiles.outputs.cache-hit != 'true'
+      run: |
+        curl -O https://s3.us-west-1.amazonaws.com/openvino.notebooks/case_00030.zip
+    - name: Copy CT files
+      run: |
+        mkdir notebooks/110-ct-segmentation-quantize/kits19
+        mkdir notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+        unzip case_00030.zip
+        cp -r case_00030 case_00001
+        mv case_00030 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+        mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
