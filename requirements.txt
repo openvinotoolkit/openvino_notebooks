@@ -40,7 +40,7 @@ jupyterlab
 # compatibility issues or vulnerabilities
 geffnet==0.9.8
 matplotlib<3.4
-ipython==7.10.*
+ipython==7.16.3*
 jedi==0.17.2
 setuptools>=56.0.0
 Pillow>=8.3.2
@@ -51,3 +51,4 @@ rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
 scikit-learn>=0.24.2 # not directly required, pinned by Snyk to avoid a vulnerability
 paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
 
+numpy>=1.22.0 # not directly required, pinned by Snyk to avoid a vulnerability
