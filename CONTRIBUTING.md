@@ -105,15 +105,17 @@ To do this, there are a few requirements that all notebooks need to pass.
    See [Tools](#manual-test-and-code-quality-tools).
 3. Imports are at the top of the notebook. Sort and group imports according to [PEP 8](https://pep8.org/#imports).
 4. Use f-strings for string formatting: https://www.python.org/dev/peps/pep-0498/
-5. Use `from pathlib import Path` for path manipulation instead of `os.path`
-6. Add type hints to functions: https://www.python.org/dev/peps/pep-0484/
-7. Add ReST style docstrings (see[110](https://docs.openvino.ai/latest/notebooks/210-ct-scan-live-inference-with-output.html))
+5. Use keyword/named arguments when calling a function with more than one parameter:
+   `function(a=1, b=2)` instead of `function(1, 2)`
+6. Use `from pathlib import Path` for path manipulation instead of `os.path`
+7. Add type hints to functions: https://www.python.org/dev/peps/pep-0484/
+8. Add ReST style docstrings (see[110](https://docs.openvino.ai/latest/notebooks/210-ct-scan-live-inference-with-output.html))
    for an example). It is not necessary to specify the parameter type in the docstring, since
    type hints are already added to the function definition.
-8. Do not use global variables in functions: a function should not depend on values that are
+9. Do not use global variables in functions: a function should not depend on values that are
    defined outside of it.
-9. Use ALL_CAPS for constants.
-10. Prefer consistency. Example: if other notebooks use `import numpy as np` do not use
+10. Use ALL_CAPS for constants.
+11. Prefer consistency. Example: if other notebooks use `import numpy as np` do not use
    `import numpy` in yours.
 
 ### Other things to keep in mind
