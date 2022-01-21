@@ -4,6 +4,7 @@
 # In[ ]:
 
 
+import sys
 import os
 import shutil
 import socket
@@ -227,7 +228,10 @@ class VideoPlayer:
     def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
-            print(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
+            raise RuntimeError(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
+        self.__frame_count = int(self.__cap.get(cv2.CAP_PROP_FRAME_COUNT) - skip_first_frames)
+        if self.__frame_count < 0:
+            self.__frame_count = sys.maxsize
         # skip first N frames
         self.__cap.set(cv2.CAP_PROP_POS_FRAMES, skip_first_frames)
         # fps of input file
@@ -255,6 +259,7 @@ class VideoPlayer:
             dtype=np.uint8,
         )
         self.__lock = threading.Lock()
+        self.__thread = None
         self.__stop = False
 
     """
@@ -263,7 +268,8 @@ class VideoPlayer:
 
     def start(self):
         self.__stop = False
-        threading.Thread(target=self.__run, daemon=True).start()
+        self.__thread = threading.Thread(target=self.__run, daemon=True)
+        self.__thread.start()
 
     """
     Stop playing and release resources.
@@ -271,16 +277,19 @@ class VideoPlayer:
 
     def stop(self):
         self.__stop = True
+        if self.__thread is not None:
+            self.__thread.join()
         self.__cap.release()
 
     def __run(self):
         prev_time = 0
-        while not self.__stop:
+        frame_counter = 0
+        while frame_counter < self.__frame_count and not self.__stop:
             t1 = time.time()
             ret, frame = self.__cap.read()
+            frame_counter += 1
             if not ret:
-                self.__frame = None
-                break
+                continue
 
             # fulfill target fps
             if 1 / self.__output_fps < time.time() - prev_time:
@@ -294,6 +303,8 @@ class VideoPlayer:
             wait_time = 1 / self.__input_fps - (t2 - t1)
             # wait until
             time.sleep(max(0, wait_time))
+
+        self.__frame = None
 
     """
     Get current frame.
