@@ -4,7 +4,7 @@ This tutorial demostrates how to apply INT8 quantization to the
 Image classification model mobilenet-v2, using the [Post-Training Optimization
 Tool
 API](https://docs.openvinotoolkit.org/latest/pot_compression_api_README.html)
-(part of [OpenVINO](https://docs.openvinotoolkit.org/)). We will use [mobilenet-v2](https://pytorch.org/vision/stable/_modules/torchvision/models/mobilenetv2.html) and ImageNet-tiny dataset.
+(part of [OpenVINO](https://docs.openvinotoolkit.org/)). We will use [mobilenet-v2](https://pytorch.org/vision/stable/_modules/torchvision/models/mobilenetv2.html) and Cifar10 dataset.
 The code of the tutorial is designed to be extendable to custom models and
 datasets. It consists of the following steps:
 
