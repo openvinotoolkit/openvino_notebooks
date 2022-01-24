@@ -12,7 +12,7 @@ torchvision>=0.6.1,<=0.8.2; sys_platform == 'darwin'
 --find-links https://download.pytorch.org/whl/torch_stable.html
 torch>=1.5.1+cpu,<=1.7.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchvision>=0.6.1+cpu,<=0.8.2+cpu; sys_platform =='linux' or platform_system == 'Windows'
-torchmetrics
+torchmetrics==0.6.2
 
 # PaddlePaddle notebook requirements
 # For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
@@ -27,6 +27,10 @@ transformers
 # NNCF notebook requirements
 nncf[tf, torch]
 tensorflow_datasets==4.2.0
+
+# CT scan training/inference requirements
+monai
+pytorch_lightning
 
 # Jupyter requirements
 jupyterlab
@@ -46,3 +50,4 @@ nltk>=3.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
 scikit-learn>=0.24.2 # not directly required, pinned by Snyk to avoid a vulnerability
 paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
+
