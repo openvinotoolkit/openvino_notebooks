@@ -4,7 +4,6 @@
 # In[ ]:
 
 
-import sys
 import os
 import shutil
 import socket
@@ -27,9 +26,6 @@ from matplotlib.lines import Line2D
 from openvino.inference_engine import IECore
 from tqdm.notebook import tqdm_notebook
 
-from async_pipeline import AsyncPipeline
-from models import model
-
 
 # ## Files
 # 
@@ -44,6 +40,7 @@ def load_image(path: str) -> np.ndarray:
     should point to an image file, either a local filename or a url. The image is
     not stored to the filesystem. Use the `download_file` function to download and
     store an image.
+
     :param path: Local path name or URL to image.
     :return: image as BGR numpy array
     """
@@ -82,6 +79,7 @@ def download_file(
     Download a file from a url and save it to the local filesystem. The file is saved to the
     current directory by default, or to `directory` if specified. If a filename is not given,
     the filename of the URL will be used.
+
     :param url: URL that points to the file to download
     :param filename: Name of the local file to save. Should point to the name of the file only,
                      not the full path. If None the filename from the url will be used
@@ -113,6 +111,7 @@ def download_file(
         raise Exception(
             f"File downloading failed with error: {e.code} {e.msg}"
         ) from None
+
     filename = Path(filename)
     if len(filename.parts) > 1:
         raise ValueError(
@@ -153,6 +152,7 @@ def download_ir_model(model_xml_url: str, destination_folder: str = None) -> str
     """
     Download IR model from `model_xml_url`. Downloads model xml and bin file; the weights file is
     assumed to exist at the same location and name as model_xml_url with a ".bin" extension.
+
     :param model_xml_url: URL to model xml file to download
     :param destination_folder: Directory where downloaded model xml and bin are saved. If None, model
                                files are saved to the current directory
@@ -214,6 +214,7 @@ class VideoPlayer:
     """
     Custom video player to fulfill FPS requirements. You can set target FPS and output size,
     flip the video horizontally or skip first N frames.
+
     :param source: Video source. It could be either camera device or video file.
     :param size: Output frame size.
     :param flip: Flip source horizontally.
@@ -225,9 +226,6 @@ class VideoPlayer:
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
             print(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
-        self.__frame_count = int(self.__cap.get(cv2.CAP_PROP_FRAME_COUNT) - skip_first_frames)
-        if self.__frame_count < 0:
-            self.__frame_count = sys.maxsize
         # skip first N frames
         self.__cap.set(cv2.CAP_PROP_POS_FRAMES, skip_first_frames)
         # fps of input file
@@ -255,7 +253,6 @@ class VideoPlayer:
             dtype=np.uint8,
         )
         self.__lock = threading.Lock()
-        self.__thread = None
         self.__stop = False
 
     """
@@ -264,8 +261,7 @@ class VideoPlayer:
 
     def start(self):
         self.__stop = False
-        self.__thread = threading.Thread(target=self.__run, daemon=True)
-        self.__thread.start()
+        threading.Thread(target=self.__run, daemon=True).start()
 
     """
     Stop playing and release resources.
@@ -273,19 +269,16 @@ class VideoPlayer:
 
     def stop(self):
         self.__stop = True
-        if self.__thread is not None:
-            self.__thread.join()
         self.__cap.release()
 
     def __run(self):
         prev_time = 0
-        frame_counter = 0
-        while frame_counter < self.__frame_count and not self.__stop:
+        while not self.__stop:
             t1 = time.time()
             ret, frame = self.__cap.read()
-            frame_counter += 1
             if not ret:
-                continue
+                self.__frame = None
+                break
 
             # fulfill target fps
             if 1 / self.__output_fps < time.time() - prev_time:
@@ -299,8 +292,6 @@ class VideoPlayer:
             wait_time = 1 / self.__input_fps - (t2 - t1)
             # wait until
             time.sleep(max(0, wait_time))
-
-        self.__frame = None
 
     """
     Get current frame.
@@ -396,6 +387,7 @@ def segmentation_map_to_image(
     """
     Convert network result of floating point numbers to an RGB image with
     integer values from 0-255 by applying a colormap.
+
     :param result: A single network result after converting to pixel values in H,W or 1,H,W shape.
     :param colormap: A numpy array of shape (num_classes, 3) with an RGB value per class.
     :param remove_holes: If True, remove holes in the segmentation result.
@@ -442,6 +434,7 @@ def segmentation_map_to_overlay(
     """
     Returns a new image where a segmentation mask (created with colormap) is overlayed on
     the source image.
+
     :param image: Source image.
     :param result: A single network result after converting to pixel values in H,W or 1,H,W shape.
     :param alpha: Alpha transparency value for the overlay image.
@@ -451,9 +444,8 @@ def segmentation_map_to_overlay(
     """
     if len(image.shape) == 2:
         image = np.repeat(np.expand_dims(image, -1), 3, 2)
+
     mask = segmentation_map_to_image(result, colormap, remove_holes)
-    image_height, image_width = image.shape[:2]
-    mask = cv2.resize(src=mask, dsize=(image_width, image_height))
     return cv2.addWeighted(mask, alpha, image, 1 - alpha, 0)
 
 
@@ -476,6 +468,7 @@ def viz_result_image(
 ) -> matplotlib.figure.Figure:
     """
     Show result image, optionally together with source images, and a legend with labels.
+
     :param result_image: Numpy array of RGB result image.
     :param source_image: Numpy array of source image. If provided this image will be shown
                          next to the result image. source_image is expected to be in RGB format.
@@ -532,92 +525,6 @@ def viz_result_image(
     return fig
 
 
-# ### Live Inference
-
-# In[ ]:
-
-
-def showarray(frame: np.ndarray, display_handle=None):
-    """
-    Display array `frame`. Replace information at `display_handle` with `frame`
-    encoded as jpeg image
-    Create a display_handle with: `display_handle = display(display_id=True)`
-    """
-    _, frame = cv2.imencode(ext=".jpeg", img=frame)
-    if display_handle is None:
-        display_handle = display(Image(data=frame.tobytes()), display_id=True)
-    else:
-        display_handle.update(Image(data=frame.tobytes()))
-    return display_handle
-
-
-def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
-    """
-    Do inference of images listed in `image_paths` on `model` on the given `device` and show
-    the results in real time in a Jupyter Notebook
-    :param image_paths: List of image filenames to load
-    :param model: Model instance for inference
-    :param device: Name of device to perform inference on. For example: "CPU"
-    """
-    display_handle = None
-    next_frame_id = 0
-    next_frame_id_to_show = 0
-
-    input_layer = next(iter(model.net.input_info))
-
-    # Create asynchronous pipeline and print time it takes to load the model
-    load_start_time = time.perf_counter()
-    pipeline = AsyncPipeline(
-        ie=ie, model=model, plugin_config={}, device=device, max_num_requests=0
-    )
-    load_end_time = time.perf_counter()
-
-    # Perform asynchronous inference
-    start_time = time.perf_counter()
-
-    while next_frame_id < len(image_paths) - 1:
-        results = pipeline.get_result(next_frame_id_to_show)
-
-        if results:
-            # Show next result from async pipeline
-            result, meta = results
-            display_handle = showarray(result, display_handle)
-            next_frame_id_to_show += 1
-        if pipeline.is_ready():
-            # Submit new image to async pipeline
-            image_path = image_paths[next_frame_id]
-            image = cv2.imread(filename=str(image_path), flags=cv2.IMREAD_UNCHANGED)
-            pipeline.submit_data(
-                inputs={input_layer: image}, id=next_frame_id, meta={"frame": image}
-            )
-            del image
-            next_frame_id += 1
-        else:
-            # If the pipeline is not ready yet and there are no results: wait
-            pipeline.await_any()
-
-    pipeline.await_all()
-
-    # Show all frames that are in the pipeline after all images have been submitted
-    while pipeline.has_completed_request():
-        results = pipeline.get_result(next_frame_id_to_show)
-        if results:
-            result, meta = results
-            display_handle = showarray(result, display_handle)
-            next_frame_id_to_show += 1
-
-    end_time = time.perf_counter()
-    duration = end_time - start_time
-    fps = len(image_paths) / duration
-    print(f"Loaded model to {device} in {load_end_time-load_start_time:.2f} seconds.")
-    print(
-        f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}"
-    )
-
-    del pipeline.exec_net
-    del pipeline
-
-
 # ## OpenVINO Tools
 
 # In[ ]:
@@ -631,6 +538,7 @@ def benchmark_model(model_path: os.PathLike,
     """
     Benchmark model `model_path` with `benchmark_app`. Returns the output of `benchmark_app`
     without logging info, and information about the device
+
     :param model_path: path to IR model xml file, or ONNX model
     :param device: device to benchmark on. For example, "CPU" or "MULTI:CPU,GPU"
     :param seconds: number of seconds to run benchmark_app
@@ -671,6 +579,7 @@ class NotebookAlert(Exception):
     def __init__(self, message: str, alert_class: str):
         """
         Show an alert box with the given message.
+
         :param message: The message to display.
         :param alert_class: The class for styling the message. Options: info, warning, success, danger.
         """
@@ -688,6 +597,7 @@ class DeviceNotFoundAlert(NotebookAlert):
         Show a warning message about an unavailable device. This class does not check whether or
         not the device is available, use the `check_device` function to check this. `check_device`
         also shows the warning if the device is not found.
+
         :param device: The unavailable device.
         :return: A formatted alert box with the message that `device` is not available, and a list
                  of devices that are available.
@@ -714,6 +624,7 @@ class DeviceNotFoundAlert(NotebookAlert):
 def check_device(device: str) -> bool:
     """
     Check if the specified device is available on the system.
+
     :param device: Device to check. e.g. CPU, GPU
     :return: True if the device is available, False if not. If the device is not available,
              a DeviceNotFoundAlert will be shown.
@@ -729,6 +640,7 @@ def check_device(device: str) -> bool:
 def check_openvino_version(version: str) -> bool:
     """
     Check if the specified OpenVINO version is installed.
+
     :param version: the OpenVINO version to check. Example: 2021.4
     :return: True if the version is installed, False if not. If the version is not installed,
              an alert message will be shown.
@@ -747,3 +659,4 @@ def check_openvino_version(version: str) -> bool:
         return False
     else:
         return True
+
