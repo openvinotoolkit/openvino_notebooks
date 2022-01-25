@@ -10,7 +10,7 @@ gdown = "*"
 geffnet = "==0.9.8"
 grpcio = "*"
 ipykernel = "==5.*"
-ipython = "==7.10.*"
+ipython = "==7.16.3"  # pin to avoid vulnerability
 ipywidgets = "*"
 itkwidgets = "==0.23.1"
 jedi = "==0.17.2"
