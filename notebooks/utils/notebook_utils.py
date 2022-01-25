@@ -228,7 +228,7 @@ class VideoPlayer:
     def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
-            print(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
+            raise RuntimeError(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
         self.__frame_count = int(self.__cap.get(cv2.CAP_PROP_FRAME_COUNT) - skip_first_frames)
         if self.__frame_count < 0:
             self.__frame_count = sys.maxsize
