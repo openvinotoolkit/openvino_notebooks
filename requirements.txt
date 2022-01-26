@@ -40,11 +40,11 @@ jupyterlab
 # compatibility issues or vulnerabilities
 geffnet==0.9.8
 matplotlib<3.4
-ipython==7.10.*
 jedi==0.17.2
 setuptools>=56.0.0
 Pillow>=8.3.2
 ipykernel==5.*
+ipython==7.16.3 # not directly required, pinned to avoid a vulnerability
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
 nltk>=3.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
