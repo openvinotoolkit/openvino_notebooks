@@ -188,6 +188,8 @@ jobs:
         else
           python -m pytest --nbval -k "test_3" --durations 10
         fi
+      shell: bash
+
 
     # Show the cache after running the notebooks
     - name: Show cache
