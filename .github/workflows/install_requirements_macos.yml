@@ -1,20 +1,28 @@
-name: install_requirements
+# Test that requirements install on macOS 10.15
+# Unlike install_requirements.yml this workflow runs daily
+# to verify that installation on macOS still works.
+# This workflow can be deleted when macos is added to nbval.yml
+
+name: install_requirements_macos
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron:  '30 12 * * *'
   pull_request:
     branches:
     - 'main'
     paths:
-    - '.github/workflows/install_requirements.yml'
+    - 'requirements.txt'
+    - '.github/workflows/install_requirements_macos.yml'
 
 jobs:
-  build_nbval:
+  build_install_macos:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, windows-2019, macos-10.15]
+        os: [macos-10.15]
         python: [3.6, 3.7, 3.8]
     steps:
     - name: Checkout repository
