@@ -183,8 +183,7 @@ jobs:
     # Main notebooks test. Verifies that all notebooks run without errors
     - name: Analysing with nbval
       run: |
-<<<<<<< HEAD
-        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
+        python -m pytest --nbval -k "test_ or notebook_utils" --durations 10
 
     # Show the cache after running the notebooks
     - name: Show cache
@@ -192,7 +191,3 @@ jobs:
         ls -laR ${{ env.CACHE_DIR }}
         du -sh ${{ env.CACHE_DIR }}
       if: runner.os != 'Windows'
-=======
-        python -m pytest --nbval -x -k "test_2" --durations 10
->>>>>>> fa7fdc3 (Modify nbval, remove windows, add python 3.9)
-
