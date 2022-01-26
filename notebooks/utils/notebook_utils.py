@@ -4,7 +4,6 @@
 # In[ ]:
 
 
-import sys
 import os
 import shutil
 import socket
@@ -229,9 +228,6 @@ class VideoPlayer:
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
             raise RuntimeError(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
-        self.__frame_count = int(self.__cap.get(cv2.CAP_PROP_FRAME_COUNT) - skip_first_frames)
-        if self.__frame_count < 0:
-            self.__frame_count = sys.maxsize
         # skip first N frames
         self.__cap.set(cv2.CAP_PROP_POS_FRAMES, skip_first_frames)
         # fps of input file
@@ -249,15 +245,8 @@ class VideoPlayer:
                 if size[0] < self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)
                 else cv2.INTER_LINEAR
             )
-        # first black frame
-        self.__frame = np.zeros(
-            (
-                int(self.__cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
-                int(self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                3,
-            ),
-            dtype=np.uint8,
-        )
+        # first frame
+        _, self.__frame = self.__cap.read()
         self.__lock = threading.Lock()
         self.__thread = None
         self.__stop = False
@@ -283,13 +272,11 @@ class VideoPlayer:
 
     def __run(self):
         prev_time = 0
-        frame_counter = 0
-        while frame_counter < self.__frame_count and not self.__stop:
+        while not self.__stop:
             t1 = time.time()
             ret, frame = self.__cap.read()
-            frame_counter += 1
             if not ret:
-                continue
+                break
 
             # fulfill target fps
             if 1 / self.__output_fps < time.time() - prev_time:
