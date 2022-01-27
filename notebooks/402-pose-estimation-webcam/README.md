@@ -1,4 +1,4 @@
-# Pose estimation demo
+# Live Human Pose Estimation with OpenVINO
 
 ![pose estimation](https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif)
 
