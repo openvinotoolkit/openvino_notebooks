@@ -1,11 +1,11 @@
 # Recommended packages for notebook developers
 
--r ci-requirements.txt      # packages for validation of notebooks
-
 # black==21.8 requires typing-extensions>3.10 which is incompatible
 # with other packages
+-r ../requirements.txt
 black==21.7b0               # format Python code
 isort                       # sort imports
 jupyterlab-code-formatter   # format code in notebooks in Jupyter Lab
 jupyterlab-git              # checkout and commit code in Jupyter Lab
-
+nbqa[toolchain]             # automatic code quality checking
+nbval                       # pytest plugin for automatic notebook testing

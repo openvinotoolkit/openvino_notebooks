@@ -4,10 +4,13 @@
   - [Design Decisions](#design-decisions)
     - [General design considerations](#general-design-considerations)
     - [Implementation choices](#implementation-choices)
+    - [Coding guidelines](#coding-guidelines)
     - [Other things to keep in mind](#other-things-to-keep-in-mind)
     - [Notebook naming](#notebook-naming)
     - [Readmes](#readmes)
     - [File structure](#file-structure)
+    - [Notebook utils](#notebook-utils)
+  - [Requirements](#requirements)
   - [Validation](#validation)
     - [Automated tests](#automated-tests)
     - [Manual test and code quality tools](#manual-test-and-code-quality-tools)
@@ -45,9 +48,9 @@ To do this, there are a few requirements that all notebooks need to pass.
 1. The notebooks work on Windows, macOS and Linux (see [supported operating
    systems](https://github.com/openvinotoolkit/openvino_notebooks#%EF%B8%8F-system-requirements))
    with Python 3.6, 3.7 and 3.8.
-2. The notebooks do not require installation of additional software that is not installable by
+2. As a rule, the notebooks do not require installation of additional software that is not installable by
    `pip`. We do not assume that users have installed XCode Dev Tools, Visual C++ redistributable,
-   cmake, etc.
+   cmake, etc. Please discuss if your notebook does need C++ - there are exceptions to this rule.
 3. The notebooks should work on all computers, and  in container images. We cannot assume that a
    user will have an iGPU or a webcam, so using these should be optional. For example, In the case
    of webcam inference, provide the option to use a video.
@@ -78,13 +81,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    notebooks too, we are open to adding it.
 2. All notebooks are saved with the `openvino_env` kernel. This ensures that there is never a
    conflict between a user's other Python installations and the notebook installation.
-3. Notebook code is automatically formatted with [Black](https://github.com/psf/black), with a line
-   width of 100. We did not choose `black` because black offers the best or nicest formatting, but
-   because consistency is more important than preferences, and that time spent on prettifying code
-   is time not spent on other useful things.
-4. Imports are at the top of the notebooks file, sorted alphabetically with `isort`, grouped
-   according to [PEP 8](https://pep8.org/#imports)
-5. The notebooks are located in the "notebooks" subdirectory. There is a subdirectory for every
+3. The notebooks are located in the "notebooks" subdirectory. There is a subdirectory for every
    notebook, with generally the same base name as the notebook.  For example, the
    001-hello-world.ipynb notebook can be found in the 001-hello-world directory.
    - See the [Notebook naming](#notebook-naming) section below, for the
@@ -94,18 +91,41 @@ To do this, there are a few requirements that all notebooks need to pass.
    - Add any supporting files to this subdirectory too. Supporting files should
      be small (generally less than 5MB). Larger images, datasets and model
      files should be downloaded from within the notebook.
-6. All related files, with the exception of Open Model Zoo models, should be saved to the notebook subdirectory, 
+4. All related files, with the exception of Open Model Zoo models, should be saved to the notebook subdirectory,
    even if that means that there is a small amount of duplication. For Open Model Zoo models, see the directory
-   structure in the [104 Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/main/notebooks/104-model-tools) 
+   structure in the [104 Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/main/notebooks/104-model-tools)
    notebook.
-7. The notebooks should provide an easy way to clean up the downloaded data, for example with a
+5. The notebooks should provide an easy way to clean up the downloaded data, for example with a
    commented-out cell at the end of the notebook.
+
+### Coding Guidelines
+
+1. See https://www.python.org/dev/peps/pep-0020/
+2. Format notebook code with [Black](https://github.com/psf/black), with a line width of 100. 
+   See [Tools](#manual-test-and-code-quality-tools).
+3. Imports are at the top of the notebook. Sort and group imports according to [PEP 8](https://pep8.org/#imports).
+4. Use f-strings for string formatting: https://www.python.org/dev/peps/pep-0498/
+5. Use keyword/named arguments when calling a function with more than one parameter:
+   `function(a=1, b=2)` instead of `function(1, 2)`
+6. Use `from pathlib import Path` for path manipulation instead of `os.path`
+7. Add type hints to functions: https://www.python.org/dev/peps/pep-0484/
+8. Add ReST style docstrings (see[110](https://docs.openvino.ai/latest/notebooks/210-ct-scan-live-inference-with-output.html))
+   for an example). It is not necessary to specify the parameter type in the docstring, since
+   type hints are already added to the function definition.
+9. Do not use global variables in functions: a function should not depend on values that are
+   defined outside of it.
+10. Use ALL_CAPS for constants.
+11. Prefer consistency. Example: if other notebooks use `import numpy as np` do not use
+   `import numpy` in yours.
 
 ### Other things to keep in mind
 
 1. Always provide links to sources. If your notebook implements a model, link to the research paper
    and the source Github (if available).
-2. Only use data and models that have a license that permits usage for commercial purposes.
+2. Use only data and models with permissive licenses that allow for commercial use, and make sure to
+   adhere to the terms of the license.
+3. If you include code from external sources in your notebook, or in files supporting your notebook, add the
+   name, URL and license of the third party code to the licensing/third-party-programs.txt file
 
 ### Notebook naming
 
@@ -115,6 +135,7 @@ Names should be descriptive but not too long. We use the following numbering sch
 - `100-` OpenVINO tool tutorials: explain how to optimize and quantize notebooks.
 - `200-` OpenVINO model demos: demonstrate inference on a particular model.
 - `300-` Training notebooks: notebooks that include code to train neural networks.
+- `400-` Live demo notebooks: demonstrate inference on a live webcam.
 
 ### READMEs
 
@@ -139,7 +160,7 @@ Every notebook is also added to the notebooks overview table in the main
 Notebooks that work in Binder have a _Launch Binder_ badge in the README files.
 
 
-### File structure
+### File Structure
 
 To maintain consistency between notebooks, please follow the directory structure outlined below.
 
@@ -154,14 +175,47 @@ To maintain consistency between notebooks, please follow the directory structure
 
 In case of output provided by Notebook please create folder ```output``` on the same level as readme file.
 
+### Notebook utils
+
+The _notebook_utils.py_ file in the _notebooks/utils_ directory contains utility functions and classes that can be reused across
+notebooks. It contains a `download_file()` function that optionally shows a progress bar, and a standard way to convert
+segmentation maps to images and display them. The Python file is generated from _notebook_utils.ipynb_ notebook in the same directory.
+If you want to add a function or class to _notebook_utils.py_, please add it to the notebook, and generate the
+Python file with `jupyter nbconvert notebook_utils.ipynb --TagRemovePreprocessor.remove_cell_tags=hide --to script`
+Add a "hide" tag to any demo cells (from the right side gear sidebar) to prevent these cells from being added to the script.
+
+
+## Requirements
+
+If you need to add a requirement, add it to requirements.txt and .docker/Pipfile. Use Python 3.8 to install 
+[pipenv](https://pypi.org/project/pipenv/), and run `pipenv lock` in the .docker directory to create Pipfile.lock. 
+Add all three files to the repository. 
+
 ## Validation
 
-### Automated Tests
+### Automated tests
 
-We use Github Actions to automatically validate that all notebooks work. The automated tests
-currently test that the notebooks execute without problems on all supported platform. More granular
-tests are planned. In the rest of this guide, the automated tests in Github Actions will be
-referred to as CI (for Continuous Integration).
+We use Github Actions to automatically validate that all notebooks work. The following tests run automatically on a new notebook PR:
+
+- nbval: tests that the notebooks execute without problems on all supported platforms. 
+- codecheck: 
+  - Uses [flake8](https://github.com/pycqa/flake8) to check for unnecessary imports and variables 
+and some style issues
+  - Verifies that the notebook is included in the main README and the README in the notebooks directory. 
+  - Runs the check_install script to test for installation issues
+- docker_nbval: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
+  To manually run this test, build the Docker image with `docker build -t openvino_notebooks .` and run the tests with
+  `docker run -it  --entrypoint /tmp/scripts/test openvino_notebooks`. It is recommended to build the image on a clean 
+  repo because the full notebooks folder will be copied to the image.
+- [CodeQL](https://codeql.github.com/)
+
+  - In the rest of this guide, the automated tests in Github
+Actions will be referred to as CI (for Continuous Integration).
+
+If your notebook takes longer than a few minutes to execute, it may be possible to patch it in the CI, to make 
+it execute faster. As an example, if your notebook trains for 20 epochs, you can set it to train for
+1 epoch in the CI. If you do inference on 100 frames of a video, you can set it to do inference on only 1. See 
+[this Wiki page](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Notebooks-Development---CI-Test-Speedup) for more information.
 
 ### Manual test and code quality tools
 
@@ -195,7 +249,8 @@ standard `diff` tool for `git`, with much more useful output than the regular `g
 #### JupyterLab Code Formatter
 
 [JupyterLab Code Formatter](https://jupyterlab-code-formatter.readthedocs.io/en/latest/) adds a
-button to Jupyter Lab to automatically format the code in notebooks with black and isort.
+button to Jupyter Lab to automatically format the code in notebooks with black and isort. Please
+use either this extension or a different way to automatically format your notebook.
 
 ## Getting started
 

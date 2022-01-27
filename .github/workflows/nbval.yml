@@ -23,35 +23,91 @@ on:
   schedule:
     - cron:  '30 8 * * *'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  build_nbval:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
+        os: [ubuntu-18.04, ubuntu-20.04, windows-latest]
         python: [3.6, 3.7, 3.8]
-
-    runs-on: ${{ matrix.os }}
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Cache Files
-      id: cache-files
-      uses: actions/cache@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Dotenv Action
+      id: dotenv
+      uses: xom9ikk/dotenv@v1.0.2
       with:
-        path: |
-          ~/.paddlehub
-        key: cache-files
-    - name: Set up Python 
+        path: ./.github/workflows
+    - name: Set up Python
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
+    - name: Install required packages
+      run:  |
+            if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt-get install libsndfile1 -y
+            fi
+      shell: bash
+    - name: Cache OpenVINO Pip Packages
+      id: cachepip
+      uses: actions/cache@v2
+      with:
+        path: |
+          pipcache
+        key: ${{ env.PIP_CACHE_KEY }}-${{ matrix.os }}-${{ matrix.python }}
+    - name: Cache Files
+      id: cachefiles
+      uses: actions/cache@v2
+      with:
+        path: |
+          # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
+          # and change cache paths in convert_notebooks.yml as well
+          ${{ env.HUB_HOME }}
+          case_00030.zip
+          notebooks/208-optical-character-recognition/open_model_zoo_cache
+          notebooks/110-ct-segmentation-quantize/kits19_frames_1
+          notebooks/210-ct-scan-live-inference/kits19_frames_1
+          notebooks/212-onnx-style-transfer/model
+        key: ${{ env.FILES_CACHE_KEY }}
+    - name: Cache openvino packages
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        python -m pip install --upgrade pip
+        mkdir pipcache
+        python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
+        cp -r pipcache pipcache_openvino
+        python -m pip uninstall -y openvino openvino-dev nncf
+    - name: Download CT files
+      if: steps.cachefiles.outputs.cache-hit != 'true'
+      run: |
+        curl -O https://s3.us-west-1.amazonaws.com/openvino.notebooks/case_00030.zip
+    - name: Copy CT files
+      run: |
+        mkdir notebooks/110-ct-segmentation-quantize/kits19
+        mkdir notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+        unzip case_00030.zip
+        cp -r case_00030 case_00001
+        mv case_00030 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+        mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -r .ci/dev-requirements.txt
-        python -m pip install pytest-rerunfailures
+        python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
         python -m ipykernel install --user --name openvino_env
+    - name: Make pipcache directory with OpenVINO packages
+      # Only cache OpenVINO packages. mv works cross-platform
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        mv pipcache pipcache_full
+        mv pipcache_openvino pipcache
+    - name: Pip freeze
+      run: |
+        python -m pip freeze
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
       uses: actions/upload-artifact@v2
@@ -62,12 +118,13 @@ jobs:
       run: |
         python check_install.py
     - name: Patch notebooks
+      # The patch_notebooks script patches long running cells to run faster
       run: |
         python .ci/patch_notebooks.py
-    - name: Analysing with nbval
+    - name: Test Jupyterlab
       run: |
         jupyter lab notebooks --help
-        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10 --reruns 5 --reruns-delay 70 --ignore notebooks/208-optical-character-recognition .
-    - name: Check READMEs
+    - name: Analysing with nbval
       run: |
-        python -m pytest .ci/test_notebooks.py
+        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
+

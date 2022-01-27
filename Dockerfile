@@ -17,8 +17,7 @@ ENV JUPYTER_ENABLE_LAB="true" \
   THOTH_DRY_RUN="1" \
   THAMOS_DEBUG="0" \
   THAMOS_VERBOSE="1" \
-  THOTH_PROVENANCE_CHECK="0" \
-  JUPYTER_PRELOAD_REPOS="https://github.com/openvinotoolkit/openvino_notebooks"
+  THOTH_PROVENANCE_CHECK="0"
 
 USER root
 
@@ -26,9 +25,8 @@ USER root
 # Install dos2unix for line end conversion on Windows
 RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum remove -y nodejs && \
-  yum install -y nodejs mesa-libGL dos2unix && \
+  yum install -y nodejs mesa-libGL dos2unix libsndfile && \
   yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
-
 
 # Copying in override assemble/run scripts
 COPY .docker/.s2i/bin /tmp/scripts
@@ -44,12 +42,15 @@ RUN dos2unix /tmp/src/builder/*
 # Change file ownership to the assemble user. Builder image must support chown command.
 RUN chown -R 1001:0 /tmp/scripts /tmp/src
 USER 1001
+RUN mkdir /opt/app-root/notebooks
+COPY notebooks/ /opt/app-root/notebooks
 RUN /tmp/scripts/assemble
 RUN pip check
 USER root
 RUN dos2unix /opt/app-root/bin/*sh
 RUN yum remove -y dos2unix
 RUN chown -R 1001:0 .
+RUN chown -R 1001:0 /opt/app-root/notebooks
 USER 1001
 # RUN jupyter lab build
 CMD /tmp/scripts/run

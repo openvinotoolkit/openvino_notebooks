@@ -10,39 +10,82 @@ on:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
     - 'requirements.txt'
+    - 'README.md'
     - '.ci/*'
     - '.github/workflows/convert_notebooks.yml'
   pull_request:
     paths:
-    - '.github/workflows/convert_notebooks.yml'    
+    - '.github/workflows/convert_notebooks.yml'
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
       fail-fast: false
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Dotenv Action
+      id: dotenv
+      uses: xom9ikk/dotenv@v1.0.2
+      with:
+        path: ./.github/workflows
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
-        python-version: 3.7
+        python-version: 3.8
+    - name: Cache OpenVINO Pip Packages
+      id: cachepip
+      uses: actions/cache@v2
+      with:
+        path: |
+          pipcache
+        key: ${{ env.PIP_CACHE_KEY }}-ubuntu-20.04-3.8
+    - name: Cache Files
+      id: cachefiles
+      uses: actions/cache@v2
+      with:
+        path: |
+          # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
+          # and change cache paths in nbval.yml as well
+          ${{ env.HUB_HOME }}
+          notebooks/208-optical-character-recognition/open_model_zoo_cache
+          notebooks/110-ct-segmentation-quantize/kits19_frames_1
+          notebooks/210-ct-scan-live-inference/kits19_frames_1
+          notebooks/212-onnx-style-transfer/model
+        key: ${{ env.FILES_CACHE_KEY }}
+    - name: Cache openvino packages
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        python -m pip install --upgrade pip
+        mkdir pipcache
+        python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
+        cp -r pipcache pipcache_openvino
+        python -m pip uninstall -y openvino openvino-dev nncf
     - name: Install required packages
       run: sudo apt-get update && sudo apt-get install texlive texlive-latex-extra pandoc
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -r .ci/ci-requirements.txt
-        python -m pip freeze > pip-freeze.txt
-    - name: Archive pip freeze
-      uses: actions/upload-artifact@v2
-      with:
-        name: pip-freeze
-        path: pip-freeze.txt
-    - name: Modify Notebooks
-      # Change settings in slower notebooks to speed up notebook execution
+        python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
+        python -m ipykernel install --user --name openvino_env
+    - name: Make pipcache directory with OpenVINO packages
+      # Only cache OpenVINO packages. mv works cross-platform
+      if: steps.cachepip.outputs.cache-hit != 'true'
       run: |
-        sed -i 's/NUM_FRAMES = 100/NUM_FRAMES = 5/g' notebooks/202-vision-superresolution/202-vision-superresolution-video.ipynb
-        sed -i 's/epochs = 15/epochs = 2/g' notebooks/301-tensorflow-training-openvino/301-tensorflow-training-openvino.ipynb
+        mv pipcache pipcache_full
+        mv pipcache_openvino pipcache
+    - name: Pip freeze
+      run: |
+        python -m pip freeze
+    - name: Check install
+      run: |
+        python check_install.py
     - name: convert_notebooks
       run: bash .ci/convert_notebooks.sh
     - name: Save HTML files
@@ -60,3 +103,4 @@ jobs:
       with:
         name: rst_files
         path: rst_files
+

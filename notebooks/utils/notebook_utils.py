@@ -6,6 +6,9 @@
 
 import os
 import shutil
+import socket
+import threading
+import time
 import urllib
 import urllib.parse
 import urllib.request
@@ -18,9 +21,13 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import openvino.inference_engine
-from IPython.display import HTML, ProgressBar, clear_output, display
+from IPython.display import HTML, Image, Markdown, clear_output, display
 from matplotlib.lines import Line2D
 from openvino.inference_engine import IECore
+from tqdm.notebook import tqdm_notebook
+
+from async_pipeline import AsyncPipeline
+from models import model
 
 
 # ## Files
@@ -52,36 +59,15 @@ def load_image(path: str) -> np.ndarray:
     return image
 
 
-class DownloadProgressBar:
+class DownloadProgressBar(tqdm_notebook):
     """
-    IPython Progress bar for downloading files with urllib.request.urlretrieve
-
-    :param filename: Filename of the file that is being downloaded. Used for displaying only.
+    TQDM Progress bar for downloading files with urllib.request.urlretrieve
     """
 
-    def __init__(self, filename: str):
-        self.progress_bar = None
-        self.filename = filename
-
-    def __call__(self, block_num, block_size, total_size):
-        try:
-            if not self.progress_bar and block_num == 0:
-                print(f"Downloading {self.filename}...")
-                self.progress_bar = ProgressBar(total=total_size)
-                self.progress_bar.display()
-
-            downloaded = block_num * block_size
-            if downloaded < total_size:
-                if block_num % 20 == 0:
-                    # Update progress bar after 20 blocks have been received
-                    self.progress_bar.progress = downloaded
-                    self.progress_bar.update()
-            else:
-                clear_output()
-                print(f"Downloaded {self.filename}")
-        except Exception:
-            # Do not fail the download just because the progress bar does not work
-            pass
+    def update_to(self, block_num: int, block_size: int, total_size: int):
+        downloaded = block_num * block_size
+        if downloaded <= total_size:
+            self.update(downloaded - self.n)
 
 
 def download_file(
@@ -90,6 +76,7 @@ def download_file(
     directory: PathLike = None,
     show_progress: bool = True,
     silent: bool = False,
+    timeout: int = 5,
 ) -> str:
     """
     Download a file from a url and save it to the local filesystem. The file is saved to the
@@ -101,7 +88,7 @@ def download_file(
                      not the full path. If None the filename from the url will be used
     :param directory: Directory to save the file to. Will be created if it doesn't exist
                       If None the file will be saved to the current working directory
-    :param show_progress: If True, show an IPython ProgressBar
+    :param show_progress: If True, show an TQDM ProgressBar
     :param silent: If True, do not print a message if the file already exists
     :return: path to downloaded file
     """
@@ -109,11 +96,24 @@ def download_file(
         opener = urllib.request.build_opener()
         opener.addheaders = [("User-agent", "Mozilla/5.0")]
         urllib.request.install_opener(opener)
-        urlobject = urllib.request.urlopen(url)
+        urlobject = urllib.request.urlopen(url, timeout=timeout)
         if filename is None:
-            filename = urlobject.info().get_filename() or Path(urllib.parse.urlparse(url).path).name
+            filename = (
+                urlobject.info().get_filename()
+                or Path(urllib.parse.urlparse(url).path).name
+            )
+    except urllib.error.URLError as error:
+        if isinstance(error.reason, socket.timeout):
+            raise Exception(
+                "Connection timed out. If you access the internet through a proxy server, please "
+                "make sure the proxy is set in the shell from where you launched Jupyter. If your "
+                "internet connection is slow, you can call `download_file(url, timeout=30)` to "
+                "wait for 30 seconds before raising this error."
+            ) from None
     except urllib.error.HTTPError as e:
-        raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
+        raise Exception(
+            f"File downloading failed with error: {e.code} {e.msg}"
+        ) from None
     filename = Path(filename)
     if len(filename.parts) > 1:
         raise ValueError(
@@ -128,10 +128,22 @@ def download_file(
         filename = directory / Path(filename)
 
     # download the file if it does not exist, or if it exists with an incorrect file size
-    urlobject_size = urlobject_size = int(urlobject.info().get("Content-Length", 0))
+    urlobject_size = int(urlobject.info().get("Content-Length", 0))
     if not filename.exists() or (os.stat(filename).st_size != urlobject_size):
-        progress_callback = DownloadProgressBar(filename) if show_progress else None
-        urllib.request.urlretrieve(url, filename, progress_callback)
+        progress_callback = DownloadProgressBar(
+            total=urlobject_size,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            desc=str(filename),
+            disable=not show_progress,
+        )
+        urllib.request.urlretrieve(
+            url, filename, reporthook=progress_callback.update_to
+        )
+        if os.stat(filename).st_size >= urlobject_size:
+            progress_callback.update(urlobject_size - progress_callback.n)
+            progress_callback.refresh()
     else:
         if not silent:
             print(f"'{filename}' already exists.")
@@ -149,7 +161,9 @@ def download_ir_model(model_xml_url: str, destination_folder: str = None) -> str
     :return: path to downloaded xml model file
     """
     model_bin_url = model_xml_url[:-4] + ".bin"
-    model_xml_path = download_file(model_xml_url, directory=destination_folder, show_progress=False)
+    model_xml_path = download_file(
+        model_xml_url, directory=destination_folder, show_progress=False
+    )
     download_file(model_bin_url, directory=destination_folder)
     return model_xml_path
 
@@ -187,6 +201,115 @@ def to_bgr(image_data) -> np.ndarray:
     Convert image_data from RGB to BGR
     """
     return cv2.cvtColor(image_data, cv2.COLOR_RGB2BGR)
+
+
+# ## Videos
+
+# ### Video Player
+# 
+# Custom video player to fulfill FPS requirements. You can set target FPS and output size, flip the video horizontally or skip first N frames.
+
+# In[ ]:
+
+
+class VideoPlayer:
+    """
+    Custom video player to fulfill FPS requirements. You can set target FPS and output size,
+    flip the video horizontally or skip first N frames.
+
+    :param source: Video source. It could be either camera device or video file.
+    :param size: Output frame size.
+    :param flip: Flip source horizontally.
+    :param fps: Target FPS.
+    :param skip_first_frames: Skip first N frames.
+    """
+
+    def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
+        self.__cap = cv2.VideoCapture(source)
+        if not self.__cap.isOpened():
+            print(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
+        # skip first N frames
+        self.__cap.set(cv2.CAP_PROP_POS_FRAMES, skip_first_frames)
+        # fps of input file
+        self.__input_fps = self.__cap.get(cv2.CAP_PROP_FPS)
+        # target fps given by user
+        self.__output_fps = fps if fps is not None else self.__input_fps
+        self.__flip = flip
+        self.__size = None
+        self.__interpolation = None
+        if size is not None:
+            self.__size = size
+            # AREA better for shrinking, LINEAR better for enlarging
+            self.__interpolation = (
+                cv2.INTER_AREA
+                if size[0] < self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+                else cv2.INTER_LINEAR
+            )
+        # first black frame
+        self.__frame = np.zeros(
+            (
+                int(self.__cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+                int(self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                3,
+            ),
+            dtype=np.uint8,
+        )
+        self.__lock = threading.Lock()
+        self.__stop = False
+
+    """
+    Start playing.
+    """
+
+    def start(self):
+        self.__stop = False
+        threading.Thread(target=self.__run, daemon=True).start()
+
+    """
+    Stop playing and release resources.
+    """
+
+    def stop(self):
+        self.__stop = True
+        self.__cap.release()
+
+    def __run(self):
+        prev_time = 0
+        while not self.__stop:
+            t1 = time.time()
+            ret, frame = self.__cap.read()
+            if not ret:
+                self.__frame = None
+                break
+
+            # fulfill target fps
+            if 1 / self.__output_fps < time.time() - prev_time:
+                prev_time = time.time()
+                # replace by current frame
+                with self.__lock:
+                    self.__frame = frame
+
+            t2 = time.time()
+            # time to wait [s] to fulfill input fps
+            wait_time = 1 / self.__input_fps - (t2 - t1)
+            # wait until
+            time.sleep(max(0, wait_time))
+
+    """
+    Get current frame.
+    """
+
+    def next(self):
+        with self.__lock:
+            if self.__frame is None:
+                return None
+            # need to copy frame, because can be cached and reused if fps is low
+            frame = self.__frame.copy()
+        if self.__size is not None:
+            frame = cv2.resize(frame, self.__size, interpolation=self.__interpolation)
+        if self.__flip:
+            frame = cv2.flip(frame, 1)
+        return frame
 
 
 # ## Visualization
@@ -307,7 +430,9 @@ def segmentation_map_to_image(
     return mask
 
 
-def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=False) -> np.ndarray:
+def segmentation_map_to_overlay(
+    image, result, alpha, colormap, remove_holes=False
+) -> np.ndarray:
     """
     Returns a new image where a segmentation mask (created with colormap) is overlayed on
     the source image.
@@ -321,8 +446,9 @@ def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=Fal
     """
     if len(image.shape) == 2:
         image = np.repeat(np.expand_dims(image, -1), 3, 2)
-
     mask = segmentation_map_to_image(result, colormap, remove_holes)
+    image_height, image_width = image.shape[:2]
+    mask = cv2.resize(src=mask, dsize=(image_width, image_height))
     return cv2.addWeighted(mask, alpha, image, 1 - alpha, 0)
 
 
@@ -362,7 +488,9 @@ def viz_result_image(
     if bgr_to_rgb:
         source_image = to_rgb(source_image)
     if resize:
-        result_image = cv2.resize(result_image, (source_image.shape[1], source_image.shape[0]))
+        result_image = cv2.resize(
+            result_image, (source_image.shape[1], source_image.shape[0])
+        )
 
     num_images = 1 if source_image is None else 2
 
@@ -398,6 +526,137 @@ def viz_result_image(
         )
     plt.close(fig)
     return fig
+
+
+# ### Live Inference
+
+# In[ ]:
+
+
+def showarray(frame: np.ndarray, display_handle=None):
+    """
+    Display array `frame`. Replace information at `display_handle` with `frame`
+    encoded as jpeg image
+
+    Create a display_handle with: `display_handle = display(display_id=True)`
+    """
+    _, frame = cv2.imencode(ext=".jpeg", img=frame)
+    if display_handle is None:
+        display_handle = display(Image(data=frame.tobytes()), display_id=True)
+    else:
+        display_handle.update(Image(data=frame.tobytes()))
+    return display_handle
+
+
+def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
+    """
+    Do inference of images listed in `image_paths` on `model` on the given `device` and show
+    the results in real time in a Jupyter Notebook
+
+    :param image_paths: List of image filenames to load
+    :param model: Model instance for inference
+    :param device: Name of device to perform inference on. For example: "CPU"
+    """
+    display_handle = None
+    next_frame_id = 0
+    next_frame_id_to_show = 0
+
+    input_layer = next(iter(model.net.input_info))
+
+    # Create asynchronous pipeline and print time it takes to load the model
+    load_start_time = time.perf_counter()
+    pipeline = AsyncPipeline(
+        ie=ie, model=model, plugin_config={}, device=device, max_num_requests=0
+    )
+    load_end_time = time.perf_counter()
+
+    # Perform asynchronous inference
+    start_time = time.perf_counter()
+
+    while next_frame_id < len(image_paths) - 1:
+        results = pipeline.get_result(next_frame_id_to_show)
+
+        if results:
+            # Show next result from async pipeline
+            result, meta = results
+            display_handle = showarray(result, display_handle)
+            next_frame_id_to_show += 1
+        if pipeline.is_ready():
+            # Submit new image to async pipeline
+            image_path = image_paths[next_frame_id]
+            image = cv2.imread(filename=str(image_path), flags=cv2.IMREAD_UNCHANGED)
+            pipeline.submit_data(
+                inputs={input_layer: image}, id=next_frame_id, meta={"frame": image}
+            )
+            del image
+            next_frame_id += 1
+        else:
+            # If the pipeline is not ready yet and there are no results: wait
+            pipeline.await_any()
+
+    pipeline.await_all()
+
+    # Show all frames that are in the pipeline after all images have been submitted
+    while pipeline.has_completed_request():
+        results = pipeline.get_result(next_frame_id_to_show)
+        if results:
+            result, meta = results
+            display_handle = showarray(result, display_handle)
+            next_frame_id_to_show += 1
+
+    end_time = time.perf_counter()
+    duration = end_time - start_time
+    fps = len(image_paths) / duration
+    print(f"Loaded model to {device} in {load_end_time-load_start_time:.2f} seconds.")
+    print(
+        f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}"
+    )
+
+    del pipeline.exec_net
+    del pipeline
+
+
+# ## OpenVINO Tools
+
+# In[ ]:
+
+
+def benchmark_model(model_path: os.PathLike,
+                    device: str = "CPU",
+                    seconds: int = 60, api: str = "async",
+                    batch: int = 1, 
+                    cache_dir="model_cache"):
+    """
+    Benchmark model `model_path` with `benchmark_app`. Returns the output of `benchmark_app`
+    without logging info, and information about the device
+
+    :param model_path: path to IR model xml file, or ONNX model
+    :param device: device to benchmark on. For example, "CPU" or "MULTI:CPU,GPU"
+    :param seconds: number of seconds to run benchmark_app
+    :param api: API. Possible options: sync or async
+    :param batch: Batch size
+    :param cache_dir: Directory that contains model/kernel cache files
+    """
+    ie = IECore()
+    model_path = Path(model_path)
+    if ("GPU" in device) and ("GPU" not in ie.available_devices):
+        raise ValueError(f"A GPU device is not available. Available devices are: {ie.available_devices}")
+    else:
+        benchmark_command = f"benchmark_app -m {model_path} -d {device} -t {seconds} -api {api} -b {batch} -cdir {cache_dir}"
+        display(Markdown(f"**Benchmark {model_path.name} with {device} for {seconds} seconds with {api} inference**"));
+        display(Markdown(f"Benchmark command: `{benchmark_command}`"));
+
+        benchmark_output = get_ipython().run_line_magic('sx', '$benchmark_command')
+        benchmark_result = [line for line in benchmark_output
+                            if not (line.startswith(r"[") or line.startswith("  ") or line == "")]
+        print("\n".join(benchmark_result))
+        print()
+        if "MULTI" in device:
+            devices = device.replace("MULTI:","").split(",")
+            for single_device in devices:
+                print(f"{single_device} device: {ie.get_metric(device_name=single_device, metric_name='FULL_DEVICE_NAME')}")
+        else:
+            print(f"Device: {ie.get_metric(device_name=device, metric_name='FULL_DEVICE_NAME')}")
 
 
 # ## Checks and Alerts
@@ -442,10 +701,13 @@ class DeviceNotFoundAlert(NotebookAlert):
         )
         self.alert_class = "warning"
         if len(supported_devices) == 1:
-            self.message += f"The following device is available: {ie.available_devices[0]}"
+            self.message += (
+                f"The following device is available: {ie.available_devices[0]}"
+            )
         else:
             self.message += (
-                "The following devices are available: " f"{', '.join(ie.available_devices)}"
+                "The following devices are available: "
+                f"{', '.join(ie.available_devices)}"
             )
         super().__init__(self.message, self.alert_class)
 
