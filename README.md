@@ -71,7 +71,7 @@ Live inference demos that run on a webcam or video files.
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | [401-object-detection-webcam](notebooks/401-object-detection-webcam/) | Object detection with a webcam or video file | <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> |
 | [402-pose-estimation-webcam](notebooks/402-pose-estimation-webcam/) | Human pose estimation with a webcam or video file | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225> |
-| [403-action-recognition-webcam](notebooks/403-action-recognition-webcam/) | Human action recognition with a webcam or video file | <img src="https://user-images.githubusercontent.com/10940214/151370258-c1ced8db-77fa-4bb5-baeb-b1a77ceb237c.gif" width=225> |
+| [403-action-recognition-webcam](notebooks/403-action-recognition-webcam/) | Human action recognition with a webcam or video file | <img src="https://user-images.githubusercontent.com/10940214/151523392-856543cb-9bd6-4955-9b88-c7a7793a16a3.gif" width=225> |
 
 
 ## ⚙️ System Requirements
