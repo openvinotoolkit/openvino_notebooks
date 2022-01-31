@@ -125,10 +125,10 @@ cd openvino_notebooks
 
 ### Step 3: Install the Notebooks Requirements
 
-Upgrade pip to the latest version and install the requirements. Install the openvino_env kernel to create a Jupyter kernel for this virtual environment.
+Upgrade pip to version 21.3 and install the requirements. Install the openvino_env kernel to create a Jupyter kernel for this virtual environment.
 
 ```bash
-python -m pip install --upgrade pip
+python -m pip install --upgrade pip==21.3.*
 pip install -r requirements.txt
 python -m ipykernel install --user --name openvino_env
 ```
