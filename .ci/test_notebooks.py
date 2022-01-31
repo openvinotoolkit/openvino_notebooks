@@ -1,3 +1,5 @@
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Set
 
@@ -26,7 +28,7 @@ def test_readme():
     """
     Test that all notebooks have a README file and exist in the Notebooks README
     """
-    notebooks_readme = Path("notebooks/README.md").read_text(encoding='utf-8')
+    notebooks_readme = Path("notebooks/README.md").read_text(encoding="utf-8")
     for item in Path("notebooks").iterdir():
         if item.is_dir():
             # item is a notebook directory
@@ -65,3 +67,23 @@ def test_requirements_binder():
     assert pip_requirements.issubset(
         binder_requirements
     ), f"Binder requirements misses: {pip_requirements.difference(binder_requirements)}"
+
+
+def test_urls_exist():
+    """
+    Test that urls that may be cached still exist on the server
+    """
+    urls = [
+        "http://cs231n.stanford.edu/tiny-imagenet-200.zip",
+        "https://github.com/onnx/models/raw/master/vision/style_transfer/fast_neural_style/model/pointilism-9.onnx",
+    ]
+    opener = urllib.request.build_opener()
+    opener.addheaders = [("User-agent", "Mozilla/5.0")]
+    urllib.request.install_opener(opener)
+    for url in urls:
+        try:
+            urlobject = urllib.request.urlopen(url, timeout=10)
+            assert urlobject.status == 200
+        except urllib.error.HTTPError:
+            print(f"Downloading {url} failed")
+            raise
