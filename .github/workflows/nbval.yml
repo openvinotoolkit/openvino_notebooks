@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, windows-latest]
+        os: [ubuntu-18.04, ubuntu-20.04, windows-2019]
         python: [3.6, 3.7, 3.8]
     steps:
     - name: Checkout repository
@@ -126,5 +126,5 @@ jobs:
         jupyter lab notebooks --help
     - name: Analysing with nbval
       run: |
-        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
+        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10 --ignore=notebooks/302-pytorch-quantization-aware-training --ignore=notebooks/112-pytorch-post-training-quantization-nncf
 
