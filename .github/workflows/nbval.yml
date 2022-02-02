@@ -85,7 +85,7 @@ jobs:
     - name: Download CT files
       if: steps.cachefiles.outputs.cache-hit != 'true'
       run: |
-        curl -O https://s3.us-west-1.amazonaws.com/openvino.notebooks/case_00030.zip
+        curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
     - name: Copy CT files
       run: |
         mkdir notebooks/110-ct-segmentation-quantize/kits19
