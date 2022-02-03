@@ -76,6 +76,7 @@ def test_urls_exist():
     urls = [
         "http://cs231n.stanford.edu/tiny-imagenet-200.zip",
         "https://github.com/onnx/models/raw/master/vision/style_transfer/fast_neural_style/model/pointilism-9.onnx",
+        "https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip"
     ]
     opener = urllib.request.build_opener()
     opener.addheaders = [("User-agent", "Mozilla/5.0")]
@@ -87,3 +88,4 @@ def test_urls_exist():
         except urllib.error.HTTPError:
             print(f"Downloading {url} failed")
             raise
+
