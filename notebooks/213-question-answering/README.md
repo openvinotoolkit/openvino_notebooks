@@ -1,5 +1,7 @@
 # Interactive Question Answering with OpenVINO
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F213-question-answering%2F213-question-answering.ipynb)
+
 Question answering is a part of information retrieval and natural language processing (NLP), which is able to answer questions posed by humans in a natural language. Question answering systems can pull answers from an unstructured collection of natural language documents called, in that case, knowledge base.
 
 ## Notebook Contents
