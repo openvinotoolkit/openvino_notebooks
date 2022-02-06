@@ -72,10 +72,13 @@ jobs:
           # and change cache paths in convert_notebooks.yml as well
           ${{ env.HUB_HOME }}
           case_00030.zip
-          notebooks/208-optical-character-recognition/open_model_zoo_cache
           notebooks/110-ct-segmentation-quantize/kits19_frames_1
+          notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
+          # 208 omz cache location is set to this with test_replace
+          notebooks/208-optical-character-recognition/open_model_zoo_cache
           notebooks/210-ct-scan-live-inference/kits19_frames_1
           notebooks/212-onnx-style-transfer/model
+          notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
         key: ${{ env.FILES_CACHE_KEY }}
     - name: Cache openvino packages
       if: steps.cachepip.outputs.cache-hit != 'true'
@@ -88,7 +91,7 @@ jobs:
     - name: Download CT files
       if: steps.cachefiles.outputs.cache-hit != 'true'
       run: |
-        curl -O https://s3.us-west-1.amazonaws.com/openvino.notebooks/case_00030.zip
+        curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
     - name: Copy CT files
       run: |
         mkdir notebooks/110-ct-segmentation-quantize/kits19
@@ -129,5 +132,5 @@ jobs:
         jupyter lab notebooks --help
     - name: Analysing with nbval
       run: |
-        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10 --ignore=notebooks/302-pytorch-quantization-aware-training --ignore=notebooks/112-pytorch-post-training-quantization-nncf
+        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
 
