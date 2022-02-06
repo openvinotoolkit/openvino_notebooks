@@ -34,7 +34,7 @@ def show_supported(supported):
 
 
 def pip_check():
-    result = subprocess.run(["pip", "check"], universal_newlines=True, capture_output=True)
+    result = subprocess.run(["pip", "check"], universal_newlines=True, stdout=subprocess.PIPE)
     if "No broken requirements found" in result.stdout:
         return True, ""
     else:
