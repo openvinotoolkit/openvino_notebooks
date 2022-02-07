@@ -1,7 +1,9 @@
-openvino-dev[onnx,tensorflow2]==2021.4.2
+openvino-dev[onnx]==2021.4.2
 gdown
 pytube
 yaspin
+
+tensorflow==2.5.*
 
 # PyTorch/ONNX notebook requirements
 fastseg
@@ -25,8 +27,8 @@ ppgan>=2.0.0
 transformers
 
 # NNCF notebook requirements
-nncf[tf, torch]
-tensorflow_datasets==4.2.0
+# nncf[tf, torch]
+# tensorflow_datasets==4.2.0
 
 # CT scan training/inference requirements
 monai
