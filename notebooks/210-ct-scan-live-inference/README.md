@@ -2,7 +2,7 @@
 
 ## Kidney Segmentation with PyTorch Lightning and OpenVINO™ - Part 4
 
-![kidney segmentation](https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif)
+![kidney segmentation](https://user-images.githubusercontent.com/77325899/146994250-321fe29f-5829-491b-83a2-b8be73684c6b.gif)
 
 ## What's Inside
 
