@@ -132,5 +132,5 @@ jobs:
         jupyter lab notebooks --help
     - name: Analysing with nbval
       run: |
-        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10 --ignore=notebooks/112-pytorch-post-training-quantization-nncf --ignore=notebooks/302-pytorch-quantization-aware-training --ignore=notebooks/305-tensorflow-quantization-aware-training
+        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
 

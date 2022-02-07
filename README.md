@@ -2,6 +2,8 @@ English | [简体中文](README_cn.md)
 
 # 📚 OpenVINO™ Notebooks
 
+> **NOTE: This is an experimental Python 3.9 branch of OpenVINO notebooks. Python 3.9 is not currently offically supported by OpenVINO, and notebooks that use NNCF (112, 302, 305) will not work. Please use the [main branch](https://github.com/openvinotoolkit/openvino_notebooks) with Python 3.6-3.8 to be able to run all notebooks. The README and installation guide below have not been adjusted for Python 3.9 yet.**
+
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](LICENSE)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml/badge.svg)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml?query=branch%3Amain)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml?query=branch%3Amain)
