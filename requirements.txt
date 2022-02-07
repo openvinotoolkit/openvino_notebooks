@@ -16,10 +16,10 @@ torchmetrics==0.6.2
 
 # PaddlePaddle notebook requirements
 # For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
-paddlepaddle==2.1.*
+paddlepaddle==2.2.*
 paddlehub
 paddle2onnx>=0.6
-ppgan>=2.0.0
+ppgan==2.1.*
 
 # BERT quantization notebook requirements
 transformers
