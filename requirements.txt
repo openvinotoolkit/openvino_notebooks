@@ -1,6 +1,6 @@
 -i https://test.pypi.org/simple/ 
 --extra-index-url  https://pypi.org/simple/
-openvino-dev==2022.1.0.dev20220131
+openvino-dev==2022.1.0.dev20220207
 gdown
 pytube
 yaspin
@@ -33,7 +33,7 @@ tensorflow_datasets==4.2.0
 
 # CT scan training/inference requirements
 monai
-pytorch_lightning
+pytorch_lightning==20211126
 
 # Jupyter requirements
 jupyterlab
