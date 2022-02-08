@@ -10,7 +10,7 @@ on:
     - 'check_install.py'
 
 jobs:
-  build_nbval:
+  build_install_requirements:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
