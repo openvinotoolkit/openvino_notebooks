@@ -7,7 +7,7 @@
 
 Human action recognition finds actions over time in a video. The list of actions in this notebook is extensive (400 in total) and covers *Person Actions*, (e.g., drawing, drinking, laughing), *Person-Person Actions* (e.g., hugging, shaking hands), and *Person-Object Actions* (opening present, mowing the lawn, playing "instrument"). You could find several parent-child groupings on the label's list, such as braiding hair and brushing hair, salsa dancing, robot dancing, or playing violin and playing guitar. For more information about the labels and dataset, see ["The Kinetics Human Action Video Dataset"](https://arxiv.org/pdf/1705.06950.pdf) research paper.
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb) Binder is a free service where the webcam will not work, and performance on the video will not be good. For best performance, we recommend installing the notebooks locally.
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb)<br> *Binder is a free service where the webcam will not work, and performance on the video will not be good. For best performance, we recommend installing the notebooks locally.*
 
 ## Notebook Contents
 
