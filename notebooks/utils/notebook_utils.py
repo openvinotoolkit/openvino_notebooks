@@ -232,6 +232,8 @@ class VideoPlayer:
         self.__cap.set(cv2.CAP_PROP_POS_FRAMES, skip_first_frames)
         # fps of input file
         self.__input_fps = self.__cap.get(cv2.CAP_PROP_FPS)
+        if self.__input_fps <= 0:
+            self.__input_fps = 60
         # target fps given by user
         self.__output_fps = fps if fps is not None else self.__input_fps
         self.__flip = flip

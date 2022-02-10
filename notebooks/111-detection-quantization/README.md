@@ -1,5 +1,7 @@
 # Object Detection Quantization
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F111-detection-quantization%2F111-detection-quantization.ipynb)
+
 This tutorial shows how to quantize an object detection model, using OpenVINO's
 [Post-Training Optimization Tool
 API](https://docs.openvino.ai/2021.4/pot_compression_api_README.html).
