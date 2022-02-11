@@ -2,6 +2,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Set
+import pytest
 
 import toml
 from pip._internal.req import parse_requirements
@@ -69,14 +70,15 @@ def test_requirements_binder():
     ), f"Binder requirements misses: {pip_requirements.difference(binder_requirements)}"
 
 
+@pytest.mark.skip(reason="URL existence is tested in docker_nbval")
 def test_urls_exist():
     """
     Test that urls that may be cached still exist on the server
     """
     urls = [
         "http://cs231n.stanford.edu/tiny-imagenet-200.zip",
-        "https://github.com/onnx/models/raw/master/vision/style_transfer/fast_neural_style/model/pointilism-9.onnx",
-        "https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip"
+        "https://github.com/onnx/models/raw/main/vision/style_transfer/fast_neural_style/model/pointilism-9.onnx",
+        "https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip",
     ]
     opener = urllib.request.build_opener()
     opener.addheaders = [("User-agent", "Mozilla/5.0")]
@@ -88,4 +90,3 @@ def test_urls_exist():
         except urllib.error.HTTPError:
             print(f"Downloading {url} failed")
             raise
-
