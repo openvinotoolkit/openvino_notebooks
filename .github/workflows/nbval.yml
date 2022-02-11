@@ -34,10 +34,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04, ubuntu-20.04, windows-2019, macos-10.15, macos-11]
-        python: [3.6, 3.7, 3.8]
-        exclude:
-         - os: macos-11
-           python: 3.6
+        python: [3.8]
+        # exclude:
+        # - os: macos-11
+        #  python: 3.6
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -70,7 +70,8 @@ jobs:
         path: |
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
           # and change cache paths in convert_notebooks.yml as well
-          ${{ env.HUB_HOME }}
+          /tmp/paddlehub
+          /tmp/paddlegan
           case_00030.zip
           notebooks/110-ct-segmentation-quantize/kits19_frames_1
           notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
@@ -79,7 +80,7 @@ jobs:
           notebooks/210-ct-scan-live-inference/kits19_frames_1
           notebooks/212-onnx-style-transfer/model
           notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
-        key: ${{ env.FILES_CACHE_KEY }}
+        key: ${{ env.FILES_CACHE_KEY }}-${{ matrix.os }}
     - name: Cache openvino packages
       if: steps.cachepip.outputs.cache-hit != 'true'
       run: |
