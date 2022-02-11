@@ -17,6 +17,11 @@ on:
     paths:
     - '.github/workflows/convert_notebooks.yml'
 
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
@@ -49,14 +54,18 @@ jobs:
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
           # and change cache paths in nbval.yml as well
           ${{ env.HUB_HOME }}
-          notebooks/208-optical-character-recognition/open_model_zoo_cache
           notebooks/110-ct-segmentation-quantize/kits19_frames_1
+          notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
+          # 208 omz cache location is set to this with test_replace
+          notebooks/208-optical-character-recognition/open_model_zoo_cache
           notebooks/210-ct-scan-live-inference/kits19_frames_1
+          notebooks/212-onnx-style-transfer/model
+          notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
         key: ${{ env.FILES_CACHE_KEY }}
     - name: Cache openvino packages
       if: steps.cachepip.outputs.cache-hit != 'true'
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip==21.3.*
         mkdir pipcache
         python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
         cp -r pipcache pipcache_openvino
@@ -65,7 +74,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install texlive texlive-latex-extra pandoc
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip==21.3.*
         python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
         python -m ipykernel install --user --name openvino_env
     - name: Make pipcache directory with OpenVINO packages

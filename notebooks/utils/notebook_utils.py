@@ -26,6 +26,9 @@ from matplotlib.lines import Line2D
 from openvino.inference_engine import IECore
 from tqdm.notebook import tqdm_notebook
 
+from async_pipeline import AsyncPipeline
+from models import model
+
 
 # ## Files
 # 
@@ -111,7 +114,6 @@ def download_file(
         raise Exception(
             f"File downloading failed with error: {e.code} {e.msg}"
         ) from None
-
     filename = Path(filename)
     if len(filename.parts) > 1:
         raise ValueError(
@@ -225,11 +227,13 @@ class VideoPlayer:
     def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
-            print(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
+            raise RuntimeError(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
         # skip first N frames
         self.__cap.set(cv2.CAP_PROP_POS_FRAMES, skip_first_frames)
         # fps of input file
         self.__input_fps = self.__cap.get(cv2.CAP_PROP_FPS)
+        if self.__input_fps <= 0:
+            self.__input_fps = 60
         # target fps given by user
         self.__output_fps = fps if fps is not None else self.__input_fps
         self.__flip = flip
@@ -243,16 +247,10 @@ class VideoPlayer:
                 if size[0] < self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)
                 else cv2.INTER_LINEAR
             )
-        # first black frame
-        self.__frame = np.zeros(
-            (
-                int(self.__cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
-                int(self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                3,
-            ),
-            dtype=np.uint8,
-        )
+        # first frame
+        _, self.__frame = self.__cap.read()
         self.__lock = threading.Lock()
+        self.__thread = None
         self.__stop = False
 
     """
@@ -261,7 +259,8 @@ class VideoPlayer:
 
     def start(self):
         self.__stop = False
-        threading.Thread(target=self.__run, daemon=True).start()
+        self.__thread = threading.Thread(target=self.__run, daemon=True)
+        self.__thread.start()
 
     """
     Stop playing and release resources.
@@ -269,6 +268,8 @@ class VideoPlayer:
 
     def stop(self):
         self.__stop = True
+        if self.__thread is not None:
+            self.__thread.join()
         self.__cap.release()
 
     def __run(self):
@@ -277,7 +278,6 @@ class VideoPlayer:
             t1 = time.time()
             ret, frame = self.__cap.read()
             if not ret:
-                self.__frame = None
                 break
 
             # fulfill target fps
@@ -292,6 +292,8 @@ class VideoPlayer:
             wait_time = 1 / self.__input_fps - (t2 - t1)
             # wait until
             time.sleep(max(0, wait_time))
+
+        self.__frame = None
 
     """
     Get current frame.
@@ -444,8 +446,9 @@ def segmentation_map_to_overlay(
     """
     if len(image.shape) == 2:
         image = np.repeat(np.expand_dims(image, -1), 3, 2)
-
     mask = segmentation_map_to_image(result, colormap, remove_holes)
+    image_height, image_width = image.shape[:2]
+    mask = cv2.resize(src=mask, dsize=(image_width, image_height))
     return cv2.addWeighted(mask, alpha, image, 1 - alpha, 0)
 
 
@@ -523,6 +526,94 @@ def viz_result_image(
         )
     plt.close(fig)
     return fig
+
+
+# ### Live Inference
+
+# In[ ]:
+
+
+def showarray(frame: np.ndarray, display_handle=None):
+    """
+    Display array `frame`. Replace information at `display_handle` with `frame`
+    encoded as jpeg image
+
+    Create a display_handle with: `display_handle = display(display_id=True)`
+    """
+    _, frame = cv2.imencode(ext=".jpeg", img=frame)
+    if display_handle is None:
+        display_handle = display(Image(data=frame.tobytes()), display_id=True)
+    else:
+        display_handle.update(Image(data=frame.tobytes()))
+    return display_handle
+
+
+def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
+    """
+    Do inference of images listed in `image_paths` on `model` on the given `device` and show
+    the results in real time in a Jupyter Notebook
+
+    :param image_paths: List of image filenames to load
+    :param model: Model instance for inference
+    :param device: Name of device to perform inference on. For example: "CPU"
+    """
+    display_handle = None
+    next_frame_id = 0
+    next_frame_id_to_show = 0
+
+    input_layer = next(iter(model.net.input_info))
+
+    # Create asynchronous pipeline and print time it takes to load the model
+    load_start_time = time.perf_counter()
+    pipeline = AsyncPipeline(
+        ie=ie, model=model, plugin_config={}, device=device, max_num_requests=0
+    )
+    load_end_time = time.perf_counter()
+
+    # Perform asynchronous inference
+    start_time = time.perf_counter()
+
+    while next_frame_id < len(image_paths) - 1:
+        results = pipeline.get_result(next_frame_id_to_show)
+
+        if results:
+            # Show next result from async pipeline
+            result, meta = results
+            display_handle = showarray(result, display_handle)
+            next_frame_id_to_show += 1
+        if pipeline.is_ready():
+            # Submit new image to async pipeline
+            image_path = image_paths[next_frame_id]
+            image = cv2.imread(filename=str(image_path), flags=cv2.IMREAD_UNCHANGED)
+            pipeline.submit_data(
+                inputs={input_layer: image}, id=next_frame_id, meta={"frame": image}
+            )
+            del image
+            next_frame_id += 1
+        else:
+            # If the pipeline is not ready yet and there are no results: wait
+            pipeline.await_any()
+
+    pipeline.await_all()
+
+    # Show all frames that are in the pipeline after all images have been submitted
+    while pipeline.has_completed_request():
+        results = pipeline.get_result(next_frame_id_to_show)
+        if results:
+            result, meta = results
+            display_handle = showarray(result, display_handle)
+            next_frame_id_to_show += 1
+
+    end_time = time.perf_counter()
+    duration = end_time - start_time
+    fps = len(image_paths) / duration
+    print(f"Loaded model to {device} in {load_end_time-load_start_time:.2f} seconds.")
+    print(
+        f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}"
+    )
+
+    del pipeline.exec_net
+    del pipeline
 
 
 # ## OpenVINO Tools

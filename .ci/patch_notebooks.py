@@ -2,6 +2,9 @@ import nbformat
 import sys
 from pathlib import Path
 
+# Notebooks that are excluded from the CI tests
+EXCLUDED_NOTEBOOKS = ["data-preparation-ct-scan.ipynb"]
+
 
 def patch_notebooks(notebooks_dir):
     """
@@ -18,28 +21,36 @@ def patch_notebooks(notebooks_dir):
     :param notebooks_dir: Directory that contains the notebook subdirectories.
                           For example: openvino_notebooks/notebooks
     """
-    for notebookfile in Path(notebooks_dir).glob("**/[0-9]*.ipynb"):
-        nb = nbformat.read(notebookfile, as_version=nbformat.NO_CONVERT)
-        found = False
-        for cell in nb["cells"]:
-            replace_dict = cell.get("metadata", {}).get("test_replace")
-            if replace_dict is not None:
-                found = True
-                for source_value, target_value in replace_dict.items():
-                    if source_value not in cell["source"]:
-                        raise ValueError(
-                            f"Processing {notebookfile} failed: {source_value} does not exist in cell"
+    for notebookfile in Path(notebooks_dir).glob("**/*.ipynb"):
+        if (
+            not str(notebookfile.name).startswith("test_")
+            and notebookfile.name not in EXCLUDED_NOTEBOOKS
+        ):
+            nb = nbformat.read(notebookfile, as_version=nbformat.NO_CONVERT)
+            found = False
+            for cell in nb["cells"]:
+                replace_dict = cell.get("metadata", {}).get("test_replace")
+                if replace_dict is not None:
+                    found = True
+                    for source_value, target_value in replace_dict.items():
+                        if source_value not in cell["source"]:
+                            raise ValueError(
+                                f"Processing {notebookfile} failed: {source_value} does not exist in cell"
+                            )
+                        cell["source"] = cell["source"].replace(
+                            source_value, target_value
                         )
-                    cell["source"] = cell["source"].replace(source_value, target_value)
-                    cell["source"] = "# Modified for testing\n" + cell["source"]
-                    print(f"Processed {notebookfile}: {source_value} -> {target_value}")
-        if not found:
-            print(f"No replacements found for {notebookfile}")
-        nbformat.write(
-            nb,
-            notebookfile.with_name(f"test_{notebookfile.name}"),
-            version=nbformat.NO_CONVERT,
-        )
+                        cell["source"] = "# Modified for testing\n" + cell["source"]
+                        print(
+                            f"Processed {notebookfile}: {source_value} -> {target_value}"
+                        )
+            if not found:
+                print(f"No replacements found for {notebookfile}")
+            nbformat.write(
+                nb,
+                notebookfile.with_name(f"test_{notebookfile.name}"),
+                version=nbformat.NO_CONVERT,
+            )
 
 
 if __name__ == "__main__":

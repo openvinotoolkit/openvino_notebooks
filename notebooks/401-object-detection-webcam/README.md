@@ -1,5 +1,9 @@
 # Live Object Detection with OpenVINO
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F401-object-detection-webcam%2F401-object-detection.ipynb)
+
+*Binder is a free service where the webcam will not work, and performance on the video will not be good. For best performance, we recommend installing the notebooks locally.*
+
 ![object detection](https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif)
 
 Object detection finds predefined objects in an image or video. Each returned object includes features such as label, probability and bounding box coordinates relative to image boundaries. 
