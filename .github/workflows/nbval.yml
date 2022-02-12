@@ -33,8 +33,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, windows-2019, macos-10.15, macos-11]
-        python: [3.6, 3.7, 3.8]
+        os: [ubuntu-20.04, windows-2019, macos-11]
+        python: [3.8]
         exclude:
         - os: macos-11
           python: 3.6
@@ -70,8 +70,6 @@ jobs:
         path: |
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
           # and change cache paths in convert_notebooks.yml as well
-          /tmp/paddlehub
-          /tmp/paddlegan
           case_00030.zip
           notebooks/110-ct-segmentation-quantize/kits19_frames_1
           notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
@@ -80,7 +78,33 @@ jobs:
           notebooks/210-ct-scan-live-inference/kits19_frames_1
           notebooks/212-onnx-style-transfer/model
           notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
-        key: ${{ env.FILES_CACHE_KEY }}-${{ matrix.os }}
+        key: ${{ env.FILES_CACHE_KEY }}
+    - name: Set CACHE_DIR
+      shell: bash
+      run: |
+        python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
+        python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+    - name: Set HUB_HOME
+      shell: bash
+      run: |
+        echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
+    - name: Create HUB_HOME
+      shell: python
+      run: |
+        from pathlib import Path
+        import os
+        hub_home = os.environ['HUB_HOME']
+        print(hub_home)
+        Path(hub_home).mkdir(exist_ok=True, parents=True)
+    - name: Cache user cache and HUB_HOME directory (per OS)  # includes PaddlePaddle and PaddleGAN caches
+      id: cacheusercache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ${{ env.CACHE_DIR }}/.paddlehub
+          ${{ env.CACHE_DIR }}/paddle
+          ${{ env.CACHE_DIR }}/ppgan
+        key: ${{ env.USER_CACHE_KEY }}-${{ runner.os }}
     - name: Cache openvino packages
       if: steps.cachepip.outputs.cache-hit != 'true'
       run: |
@@ -133,5 +157,12 @@ jobs:
         jupyter lab notebooks --help
     - name: Analysing with nbval
       run: |
-        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
+        python -m pytest --nbval -x -k "test_103 or test_206 or test_207 " --durations 10
+      env:
+        HUB_HOME: ${{ env.HUB_HOME}}
+    - name: Show cache
+      run: |
+        ls -laR ${{ env.CACHE_DIR }}
+        du -sh ${{ env.CACHE_DIR }}
+      if: runner.os != 'Windows'
 
