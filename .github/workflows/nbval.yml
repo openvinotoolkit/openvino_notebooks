@@ -96,7 +96,7 @@ jobs:
         hub_home = os.environ['HUB_HOME']
         print(hub_home)
         Path(hub_home).mkdir(exist_ok=True, parents=True)
-    - name: Cache user cache and HUB_HOME directory (per OS)  # includes PaddlePaddle and PaddleGAN caches
+    - name: Cache PaddlePaddle cache directories (per OS)  # includes PaddlePaddle and PaddleGAN caches
       id: cacheusercache
       uses: actions/cache@v2
       with:
@@ -158,8 +158,6 @@ jobs:
     - name: Analysing with nbval
       run: |
         python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
-      env:
-        HUB_HOME: ${{ env.HUB_HOME}}
     - name: Show cache
       run: |
         ls -laR ${{ env.CACHE_DIR }}
