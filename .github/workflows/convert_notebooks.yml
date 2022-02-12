@@ -53,7 +53,9 @@ jobs:
         path: |
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
           # and change cache paths in nbval.yml as well
-          ${{ env.HUB_HOME }}
+          /tmp/paddlehub
+          /tmp/paddlegan
+          case_00030.zip
           notebooks/110-ct-segmentation-quantize/kits19_frames_1
           notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
           # 208 omz cache location is set to this with test_replace
@@ -61,7 +63,7 @@ jobs:
           notebooks/210-ct-scan-live-inference/kits19_frames_1
           notebooks/212-onnx-style-transfer/model
           notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
-        key: ${{ env.FILES_CACHE_KEY }}
+        key: ${{ env.FILES_CACHE_KEY }}-ubuntu-20.04
     - name: Cache openvino packages
       if: steps.cachepip.outputs.cache-hit != 'true'
       run: |
