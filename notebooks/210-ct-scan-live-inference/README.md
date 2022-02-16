@@ -4,7 +4,7 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F210-ct-scan-live-inference%2F210-ct-scan-live-inference.ipynb)
 
-![kidney segmentation](https://user-images.githubusercontent.com/77325899/146994250-321fe29f-5829-491b-83a2-b8be73684c6b.gif)
+![kidney segmentation animation](https://user-images.githubusercontent.com/77325899/154279555-aaa47111-c976-4e77-8d23-aac96f45872f.gif)
 
 ## What's Inside
 
@@ -46,3 +46,4 @@ For a minimum installation:
 - [Train a 2D-UNet Medical Imaging Model with PyTorch Lightning](/..) 
 - [Convert and Quantize a UNet Model and Show Live Inference](../110-ct-segmentation-quantize/110-ct-segmentation-quantize.ipynb)
 - Live Inference and Benchmark CT-scan data (this notebook)
+
