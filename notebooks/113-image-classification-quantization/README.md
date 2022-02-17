@@ -8,7 +8,7 @@ API](https://docs.openvinotoolkit.org/latest/pot_compression_api_README.html)
 The code of the tutorial is designed to be extendable to custom models and
 datasets. It consists of the following steps:
 
-- Download and prepare the MRPC model and dataset
+- Download and prepare the Mobilenet-v2 model and dataset
 - Define data loading and accuracy validation functionality
 - Prepare the model for quantization
 - Run optimization pipeline
