@@ -1,4 +1,4 @@
-# Accelerate Inference of NLP models with OpenVINO Post-Training Optimization Tool 
+# Accelerate Inference of Mobilenet V2 Image Classification Model with OpenVINO Post-Training Optimization Tool 
 
 This tutorial demostrates how to apply INT8 quantization to the
 Image classification model mobilenet-v2, using the [Post-Training Optimization
