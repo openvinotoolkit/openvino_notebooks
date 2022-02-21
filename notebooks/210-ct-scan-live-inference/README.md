@@ -2,6 +2,8 @@
 
 ## Kidney Segmentation with PyTorch Lightning and OpenVINO™ - Part 4
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F210-ct-scan-live-inference%2F210-ct-scan-live-inference.ipynb)
+
 ![kidney segmentation](https://user-images.githubusercontent.com/77325899/146994250-321fe29f-5829-491b-83a2-b8be73684c6b.gif)
 
 ## What's Inside
