@@ -28,6 +28,10 @@ class HTMLDataExtractor(HTMLParser):
 
 # read html urls and list of all paragraphs data
 def get_paragraphs(url_list):
+    opener = urllib.request.build_opener()
+    opener.addheaders = [("User-agent", "Mozilla/5.0")]
+    urllib.request.install_opener(opener)
+
     paragraphs_all = []
     for url in url_list:
         log.info("Get paragraphs from {}".format(url))

@@ -26,8 +26,23 @@ jobs:
   build:
     strategy:
       fail-fast: false
-    runs-on: ubuntu-20.04
+
+      # Matrix is unnecessary here, but this allows easy copying of steps from nbval.yml
+      matrix:
+        os: [ubuntu-20.04]
+        python: [3.8]
+
+    runs-on: ${{ matrix.os }}
+    
     steps:
+    - name: Install required packages for rst converstion
+      run: sudo apt-get update && sudo apt-get install texlive texlive-latex-extra pandoc -y
+
+    #### Installation/preparation ####
+    #
+    # These steps are copied from convert_notebooks.yml
+    # This should ideally be a reusable workflow
+
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Dotenv Action
@@ -38,22 +53,31 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
-        python-version: 3.8
+        python-version: ${{ matrix.python }}
+    - name: Install required packages
+      run:  |
+            if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt-get install libsndfile1 -y
+            fi
+      shell: bash
+
     - name: Cache OpenVINO Pip Packages
       id: cachepip
       uses: actions/cache@v2
       with:
         path: |
           pipcache
-        key: ${{ env.PIP_CACHE_KEY }}-ubuntu-20.04-3.8
+        key: ${{ env.PIP_CACHE_KEY }}-${{ matrix.os }}-${{ matrix.python }}
+
+    # Cache specific files to reduce downloads or prevent network issues
     - name: Cache Files
       id: cachefiles
       uses: actions/cache@v2
       with:
         path: |
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
-          # and change cache paths in nbval.yml as well
-          ${{ env.HUB_HOME }}
+          # and change cache paths in both nbval.yml and convert_notebooks.yml
+          case_00030.zip
           notebooks/110-ct-segmentation-quantize/kits19_frames_1
           notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
           # 208 omz cache location is set to this with test_replace
@@ -62,6 +86,31 @@ jobs:
           notebooks/212-onnx-style-transfer/model
           notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
         key: ${{ env.FILES_CACHE_KEY }}
+
+    # PaddleGAN stores cache in ppgan directory in CACHE_DIR
+    - name: Set CACHE_DIR
+      shell: bash
+      run: |
+        python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
+        # replace backslashes with forward slashes for Windows paths
+        python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+
+    # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
+    - name: Set HUB_HOME
+      shell: bash
+      run: |
+        echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
+
+    # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
+    - name: Cache PaddlePaddle cache directories (per OS)
+      id: cacheusercache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ${{ env.HUB_HOME }}
+          ${{ env.CACHE_DIR }}/paddle
+          ${{ env.CACHE_DIR }}/ppgan
+        key: ${{ env.USER_CACHE_KEY }}-${{ runner.os }}
     - name: Cache openvino packages
       if: steps.cachepip.outputs.cache-hit != 'true'
       run: |
@@ -70,25 +119,48 @@ jobs:
         python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
         cp -r pipcache pipcache_openvino
         python -m pip uninstall -y openvino openvino-dev nncf
-    - name: Install required packages
-      run: sudo apt-get update && sudo apt-get install texlive texlive-latex-extra pandoc
+
+    # Download a small dataset to use for testing purposes in monai-kidney training notebook
+    - name: Download CT files
+      if: steps.cachefiles.outputs.cache-hit != 'true'
+      run: |
+        curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
+    - name: Copy CT files
+      run: |
+        mkdir notebooks/110-ct-segmentation-quantize/kits19
+        mkdir notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+        unzip case_00030.zip
+        cp -r case_00030 case_00001
+        mv case_00030 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+        mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip==21.3.*
         python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
         python -m ipykernel install --user --name openvino_env
+
+      # Cache OpenVINO packages. mv works cross-platform
     - name: Make pipcache directory with OpenVINO packages
-      # Only cache OpenVINO packages. mv works cross-platform
       if: steps.cachepip.outputs.cache-hit != 'true'
       run: |
         mv pipcache pipcache_full
         mv pipcache_openvino pipcache
+
+    # Create list of installed pip packages that can be downloaded as artifacts
+    # to verify the exact environment of a specific test run
     - name: Pip freeze
       run: |
         python -m pip freeze
-    - name: Check install
-      run: |
-        python check_install.py
+        python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+    - name: Archive pip freeze
+      uses: actions/upload-artifact@v2
+      with:
+        name: pip-freeze
+        path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+
+    #### End installation/preparation
+
     - name: convert_notebooks
       run: bash .ci/convert_notebooks.sh
     - name: Save HTML files

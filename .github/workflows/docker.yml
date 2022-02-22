@@ -1,3 +1,8 @@
+# Build Docker image and test notebooks in Docker image
+# NOTE: 208 is currently disabled in Docker tests because of model 
+# download instability. It should be enabled again in 2022.1
+# Test script location: .docker/.s2i/bin/test
+
 name: docker_nbval
 
 on:
@@ -30,7 +35,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build_docker:
     strategy:
       fail-fast: false
   
@@ -43,4 +48,5 @@ jobs:
         docker build . -t openvino_notebooks
     - name: Test notebooks in Docker image
       run: |
+        # Test script location: .docker/.s2i/bin/test
         docker run --entrypoint /tmp/scripts/test openvino_notebooks
