@@ -1,11 +1,9 @@
-openvino-dev[onnx,tensorflow2]==2021.4.*
-matplotlib<3.4
+openvino-dev[onnx,tensorflow2]==2021.4.2
 gdown
 pytube
 yaspin
 
-# ONNX notebook requirements
-geffnet==0.9.8
+# PyTorch/ONNX notebook requirements
 fastseg
 ipywidgets
 
@@ -14,33 +12,42 @@ torchvision>=0.6.1,<=0.8.2; sys_platform == 'darwin'
 --find-links https://download.pytorch.org/whl/torch_stable.html
 torch>=1.5.1+cpu,<=1.7.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchvision>=0.6.1+cpu,<=0.8.2+cpu; sys_platform =='linux' or platform_system == 'Windows'
+torchmetrics==0.6.2
 
 # PaddlePaddle notebook requirements
 # For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
-paddlepaddle==2.1.*
+paddlepaddle==2.2.*
 paddlehub
 paddle2onnx>=0.6
-ppgan>=2.0.0
+ppgan==2.1.*
 
 # BERT quantization notebook requirements
 transformers
-sklearn
+
+# NNCF notebook requirements
+nncf[tf, torch]
+tensorflow_datasets==4.2.0
+
+# CT scan training/inference requirements
+monai
+pytorch_lightning
 
 # Jupyter requirements
 jupyterlab
 
-# Pin versions to prevent known dependency issues
-ipython==7.10.*
+# The packages below are not directly required. They are dependencies of 
+# other dependencies that are pinned to a specific version to avoid
+# compatibility issues or vulnerabilities
+geffnet==0.9.8
+matplotlib<3.4
 jedi==0.17.2
 setuptools>=56.0.0
 Pillow>=8.3.2
 ipykernel==5.*
+ipython==7.16.3 # not directly required, pinned to avoid a vulnerability
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
 nltk>=3.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
 scikit-learn>=0.24.2 # not directly required, pinned by Snyk to avoid a vulnerability
+paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
 
-# NNCF notebook requirements
-nncf[torch]
-nncf[tf]
-tensorflow_datasets==4.2.0

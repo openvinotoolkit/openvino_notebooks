@@ -6,7 +6,11 @@
 ![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml/badge.svg)
 ![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg)
 
-一些可以运行的Jupyter\* notebooks，用于学习和试验OpenVINO™开发套件。这些notebooks旨在提供OpenVINO基础知识的介绍，并教开发人员如何利用我们的API在应用程序中优化深度学习推理。
+在这里，我们提供了一些可以运行的Jupyter\* notebooks，用于学习和尝试使用OpenVINO™开发套件。这些notebooks旨在向各位开发者提供OpenVINO基础知识的介绍，并教会大家如何利用我们的API来优化深度学习推理。
+
+## 📖 所包含的内容
+
+带有![binder logo](https://mybinder.org/badge_logo.svg)标志的notebooks可以无需安装，直接运行。[Binder](https://mybinder.org/)是一个资源有限的在线服务。为了获得最好的性能，我们建议还是按照我们以下的安装指南[Installation Guide](#-installation-guide)，安装完成后，在本地运行notebooks。
 
 ### 让我们开始吧
 
@@ -18,7 +22,7 @@
 | [003-hello-segmentation](notebooks/003-hello-segmentation/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F003-hello-segmentation%2F003-hello-segmentation.ipynb) | 基于Openvino的视觉语义分割应用 | <img src="https://user-images.githubusercontent.com/15709723/128290691-e2eb875c-775e-4f4d-a2f4-15134044b4bb.png" width=150> |
 | [004-hello-detection](notebooks/004-hello-detection/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F004-hello-detection%2F004-hello-detection.ipynb) | 基于Openvino的文字识别应用 | <img src="https://user-images.githubusercontent.com/36741649/128489933-bf215a3f-06fa-4918-8833-cb0bf9fb1cc7.jpg" width=150> |
 
-### Convert & Optimize
+### 转换 & 优化
 
 这个教程将说明如何利用Openvino工具来量化和优化一个深度学习模型
 | Notebook | 说明 | 预览 |
@@ -28,8 +32,12 @@
 | [103-paddle-onnx-to-openvino](notebooks/103-paddle-onnx-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-onnx-to-openvino%2F103-paddle-onnx-to-openvino-classification.ipynb) | 基于PadlePadle预训练模型，实现分类检测部署 | <img src="https://user-images.githubusercontent.com/15709723/127779326-dc14653f-a960-4877-b529-86908a6f2a61.png" width=300> |
 | [104-model-tools](notebooks/104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | Openvino模型的下载与评估 | |
 | [105-language-quantize-bert](notebooks/105-language-quantize-bert/) | BERT预训练模型的优化与量化 ||
+| [110-ct-segmentation-quantize](notebooks/110-ct-segmentation-quantize/) | 量化肾脏分割模型并进行实时推理展示 ||
+| [111-detection-quantization](notebooks/111-detection-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F111-detection-quantization%2F111-detection-quantization.ipynb) | 量化一个目标检测模型 | |
+| [112-pytorch-post-training-quantization-nncf](notebooks/112-pytorch-post-training-quantization-nncf/) | 利用神经网络压缩框架（NNCF）在后训练模式下来量化PyTorch模型（无模型微调） ||
 
-### Model Demos
+
+### 模型演示
 
 特定模型的推理示例
 | Notebook | 说明 | 预览 |
@@ -41,8 +49,13 @@
 | [206-vision-paddlegan-anime](notebooks/206-vision-paddlegan-anime/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F206-vision-paddlegan-anime%2F206-vision-paddlegan-anime.ipynb) | 基于GAN的图片风格转换的应用实现 | <img src="https://user-images.githubusercontent.com/15709723/127788059-1f069ae1-8705-4972-b50e-6314a6f36632.jpeg" width=100>→<img src="https://user-images.githubusercontent.com/15709723/125184441-b4584e80-e1d2-11eb-8964-d8131cd97409.png" width=100> |
 | [207-vision-paddlegan-superresolution](notebooks/207-vision-paddlegan-superresolution/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F207-vision-paddlegan-superresolution%2F207-vision-paddlegan-superresolution.ipynb)| 基于GAN的图像超分辨率应用实现 | |
 | [208-optical-character-recognition](notebooks/208-optical-character-recognition/)<br> | 文字识别应用实现 | <img src="https://user-images.githubusercontent.com/36741649/129315292-a37266dc-dfb2-4749-bca5-2ac9c1e93d64.jpg" width=225> |
+| [209-handwritten-ocr](notebooks/209-handwritten-ocr/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F209-handwritten-ocr%2F209-handwritten-ocr.ipynb) | 手写简体中文及日文文字识别 | <img width="425" alt="handwritten_simplified_chinese_test" src="https://user-images.githubusercontent.com/36741649/132660640-da2211ec-c389-450e-8980-32a75ed14abb.png"> <br> 的人不一了是他有为在责新中任自之我们 |
+| [210-ct-scan-live-inference](notebooks/210-ct-scan-live-inference/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F210-ct-scan-live-inference%2F210-ct-scan-live-inference.ipynb)| CT扫描数据分割的实时推理展示 |<img src="https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif" width=225>|
+| [211-speech-to-text](notebooks/211-speech-to-text/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F211-speech-to-text%2F211-speech-to-text.ipynb) | 声音到文字的识别模型推理 | <img src="https://user-images.githubusercontent.com/36741649/140987347-279de058-55d7-4772-b013-0f2b12deaa61.png" width=225>|
+| [212-onnx-style-transfer](notebooks/212-onnx-style-transfer/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F212-onnx-style-transfer%2F212-onnx-style-transfer.ipynb) | 通过神经风格转换将图像转换为五种不同的风格 | <img src="https://user-images.githubusercontent.com/77325899/147358090-ff5b21f5-0efb-4aff-8444-9d07add49b92.png" width=100>→<img src="https://user-images.githubusercontent.com/77325899/147358009-0cf10d51-3150-40cb-a776-074558b98da5.png" width=100>|
+| [213-question-answering](notebooks/213-question-answering/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F213-question-answering%2F213-question-answering.ipynb) | 根据语境回答问题 |  |
 
-### Model Training
+### 模型训练
 
 这个教程将说明如何训练一个网络
 | Notebook | 说明 | 预览 |
@@ -50,13 +63,16 @@
 | [301-tensorflow-training-openvino](notebooks/301-tensorflow-training-openvino/) | 基于Tensorflow 的模型训练及优化部署 | <img src="https://user-images.githubusercontent.com/15709723/127779607-8fa34947-1c35-4260-8d04-981c41a2a2cc.png" width=390> |
 | [301-tensorflow-training-openvino-pot](notebooks/301-tensorflow-training-openvino/) | 基于POT工具的模型量化 | |
 | [302-pytorch-quantization-aware-training](notebooks/302-pytorch-quantization-aware-training) | 基于NNCF工具的模型压缩 | |
+| [305-tensorflow-quantization-aware-training](notebooks/305-tensorflow-quantization-aware-training) | 利用神经网络压缩框架（NNCF）来量化tensorflow模型 | |
 
-### Live Demos
+### 实时推理
 
 基于网络摄像头的实时推理示例
 | Notebook | 说明 | 预览 |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [401-object-detection-webcam](notebooks/401-object-detection-webcam/) | 针对网络摄像头或视频的目标检测 | <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> |
 | [402-pose-etimation-webcam](notebooks/402-pose-estimation-webcam/) | 基于openvino人体姿态评估 | <img src="https://user-images.githubusercontent.com/4547501/134550328-a5c99d22-ae60-4281-8120-a8f06a17b96a.png" width=225> |
+| [403-action-recognition-webcam](notebooks/403-action-recognition-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb) | 通过摄像头或基于视频文件的人体动作识别 | <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=225> |
 
 ## ⚙️ 系统需求
 
