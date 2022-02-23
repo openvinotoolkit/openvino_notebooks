@@ -10,8 +10,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
-        python: [3.6, 3.7, 3.8]
+        os: [ubuntu-20.04]
+        python: [3.8]
 
     runs-on: ${{ matrix.os }}
 
@@ -23,7 +23,7 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+        python -m pip install --upgrade pip==21.3.* -i https://pypi.tuna.tsinghua.edu.cn/simple
         python -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
         python -m ipykernel install --user --name openvino_env
@@ -36,3 +36,7 @@ jobs:
     - name: Test that `jupyter lab` works
       run: |
         jupyter lab notebooks --help
+    - name: Check install
+      run: |
+        python check_install.py
+

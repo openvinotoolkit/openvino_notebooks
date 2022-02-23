@@ -7,54 +7,67 @@ on:
     - 'main'
     paths:
     - '.github/workflows/install_requirements.yml'
+    - 'check_install.py'
 
 jobs:
-  build:
+  build_nbval:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
+        os: [ubuntu-18.04, ubuntu-20.04, windows-2019, macos-10.15, macos-11]
         python: [3.6, 3.7, 3.8]
-        include:
-        - os: ubuntu-18.04
-          pip_cache_path: ~/.cache/pip
-        - os: ubuntu-20.04
-          pip_cache_path: ~/.cache/pip
-        - os: macos-latest
-          pip_cache_path: ~/Library/Caches/pip
-        - os: windows-latest
-          pip_cache_path: ~\AppData\Local\pip\Cache
-
+        exclude:
+         - os: macos-11
+           python: 3.6
     steps:
-    - name: Cache Files
-      uses: actions/cache@v2
-      with:
-        path: ${{ matrix.pip_cache_path }}
-        key: ${{ runner.os }}-${{ matrix.python }}-cache
-
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v2
-
+    - name: Dotenv Action
+      id: dotenv
+      uses: xom9ikk/dotenv@v1.0.2
+      with:
+        path: ./.github/workflows
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
+    - name: Cache OpenVINO Pip Packages
+      id: cachepip
+      uses: actions/cache@v2
+      with:
+        path: |
+          pipcache
+        key: ${{ env.PIP_CACHE_KEY }}-${{ matrix.os }}-${{ matrix.python }}
+    - name: Cache openvino packages
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        python -m pip install --upgrade pip
+        mkdir pipcache
+        python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
+        cp -r pipcache pipcache_openvino
+        python -m pip uninstall -y openvino openvino-dev nncf
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -r .ci/dev-requirements.txt
+        python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
         python -m ipykernel install --user --name openvino_env
+    - name: Make pipcache directory with OpenVINO packages
+      # Only cache OpenVINO packages. mv works cross-platform
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        mv pipcache pipcache_full
+        mv pipcache_openvino pipcache
+    - name: Pip freeze
+      run: |
+        python -m pip freeze
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
       uses: actions/upload-artifact@v2
       with:
         name: pip-freeze
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
-    - name: Test that `jupyter lab` works
+    - name: Check install
       run: |
-        jupyter lab notebooks --help
-    - name: Cache openvino pip files
-      run: |
-        # Uninstall all files except openvino files to limit cache size
-        pip freeze | grep -v openvino | grep -v nncf | xargs pip uninstall -y
+        python check_install.py
+

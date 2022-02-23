@@ -5,7 +5,7 @@
 | ![f](https://www.tensorflow.org/tutorials/images/classification_files/output_N1loMlbYHeiJ_0.png) | ![f](https://www.tensorflow.org/tutorials/images/classification_files/output_RQbZBOTLHiUP_0.png) |
 | ![f](https://www.gstatic.com/knowyourdata/20210519-a7914a/tf_flowers/media/dHJhaW5bMCU6MiVdXzE3.jpeg) | ![f](https://www.tensorflow.org/tutorials/images/classification_files/output_HyQkfPGdHilw_0.png) |
 
-In this directory, you will find two Jupyter\* notebooks. The first is an end-to-end deep learning training tutorial which borrows the open source code from the TensorFlow\* [image classification tutorial](https://www.tensorflow.org/tutorials/images/classification), demonstrating how to train the model and then convert to OpenVINO™ Intermediate Representation (IR). It leverages the [tf_flowers](https://www.tensorflow.org/datasets/catalog/tf_flowers) dataset which includes about 3,700 photos of flowers.
+In this directory, you will find two Jupyter notebooks. The first is an end-to-end deep learning training tutorial which borrows the open source code from the TensorFlow [image classification tutorial](https://www.tensorflow.org/tutorials/images/classification), demonstrating how to train the model and then convert to OpenVINO™ Intermediate Representation (IR). It leverages the [tf_flowers](https://www.tensorflow.org/datasets/catalog/tf_flowers) dataset which includes about 3,700 photos of flowers.
 
 The second notebook demonstrates how to quantize the OpenVINO IR model that was created in the first notebook. Post-training quantization speeds up inference on the trained model. The quantization is performed with the [Post Training Optimization Tool (POT)](https://docs.openvinotoolkit.org/latest/pot_README.html) from OpenVINO Toolkit. A custom dataloader and metric will be defined, and accuracy and performance will be computed for the original IR model and the quantized model on CPU and iGPU (if available).
 
@@ -40,6 +40,3 @@ year = "2019",
 url = "http://download.tensorflow.org/example_images/flower_photos.tgz" }
 ```
 
----
-
-\* Other names and brands may be claimed as the property of others.

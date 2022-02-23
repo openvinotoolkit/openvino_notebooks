@@ -23,25 +23,62 @@ on:
     
 
 jobs:
-  build:
+  build_codecheck:
     strategy:
       fail-fast: false
-    runs-on: ubuntu-20.04
-
+    runs-on: ubuntu-20.04  # change cachepip step when changing this
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Dotenv Action
+      id: dotenv
+      uses: xom9ikk/dotenv@v1.0.2
+      with:
+        path: ./.github/workflows
+    - name: Set up Python
       uses: actions/setup-python@v1
       with:
-        python-version: 3.8
+        python-version: 3.8  # change cachepip step when changing this
+    - name: Cache OpenVINO Pip Packages
+      id: cachepip
+      uses: actions/cache@v2
+      with:
+        path: |
+          pipcache
+        key: ${{ env.PIP_CACHE_KEY }}-ubuntu-20.04-3.8
+    - name: Cache openvino packages
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        python -m pip install --upgrade pip
+        mkdir pipcache
+        python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
+        cp -r pipcache pipcache_openvino
+        python -m pip uninstall -y openvino openvino-dev nncf
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -r .ci/dev-requirements.txt
+        python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
         python -m ipykernel install --user --name openvino_env
+    - name: Make pipcache directory with OpenVINO packages
+      # Only cache OpenVINO packages. mv works cross-platform
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        mv pipcache pipcache_full
+        mv pipcache_openvino pipcache
+    - name: Pip freeze
+      run: |
+        python -m pip freeze
+    - name: Check install
+      run: |
+        python check_install.py
+    - name: Test Jupyterlab
+      run: |
+        jupyter lab notebooks --help
     - name: Flake8
       run: |
         nbqa flake8 --ignore=E124,E203,E231,E266,E402,E501,E703,F821,W503,W291,W293 --nbqa-exclude="(301.*)|(302.*)" notebooks
     - name: Test READMEs and requirements
       run: |
         python -m pytest .ci/test_notebooks.py
+
+
