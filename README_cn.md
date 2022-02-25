@@ -35,7 +35,7 @@
 | [110-ct-segmentation-quantize](notebooks/110-ct-segmentation-quantize/) | 量化肾脏分割模型并进行实时推理展示 ||
 | [111-detection-quantization](notebooks/111-detection-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F111-detection-quantization%2F111-detection-quantization.ipynb) | 量化一个目标检测模型 | |
 | [112-pytorch-post-training-quantization-nncf](notebooks/112-pytorch-post-training-quantization-nncf/) | 利用神经网络压缩框架（NNCF）在后训练模式下来量化PyTorch模型（无模型微调） ||
-| [113-image-classification-quantization](notebooks/113-image-classification-quantization/) | Quantize mobilenet image classification | |
+| [113-image-classification-quantization](notebooks/113-image-classification-quantization/) |  量化mobilenet图像分类 | |
 
 
 ### 模型演示
