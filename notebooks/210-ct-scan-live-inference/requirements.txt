@@ -1,9 +1,18 @@
 openvino-dev
-numpy
 opencv-python
 matplotlib
 jupyterlab
-scipy
 ipywidgets
 yaspin
 onnx
+
+# The packages below are not directly required. They are dependencies of 
+# other dependencies that are pinned to a specific version to avoid
+# compatibility issues or vulnerabilities
+
+numpy<1.20
+scipy~=1.5.4
+imageio<=2.15.0
+ipython>=7.16.3 # not directly required, pinned by Snyk to avoid a vulnerability
+notebook>=6.1.5 # not directly required, pinned by Snyk to avoid a vulnerability
+pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
