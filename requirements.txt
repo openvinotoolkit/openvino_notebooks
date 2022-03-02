@@ -33,7 +33,7 @@ tensorflow_datasets==4.2.0
 
 # CT scan training/inference requirements
 monai
-pytorch_lightning
+pytorch_lightning==20211126
 
 # Jupyter requirements
 jupyterlab
