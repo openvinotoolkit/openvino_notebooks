@@ -183,7 +183,9 @@ jobs:
     # Main notebooks test. Verifies that all notebooks run without errors
     - name: Analysing with nbval
       run: |
+        release/4_series_update
         python -m pytest --nbval -x -k "test_4" --durations 10
+        2022.1
 
     # Show the cache after running the notebooks
     - name: Show cache
@@ -191,4 +193,3 @@ jobs:
         ls -laR ${{ env.CACHE_DIR }}
         du -sh ${{ env.CACHE_DIR }}
       if: runner.os != 'Windows'
-

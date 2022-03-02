@@ -623,9 +623,9 @@ def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
 
 def benchmark_model(model_path: os.PathLike,
                     device: str = "CPU",
-                    seconds: int = 60, api: str = "async",
+                    seconds: int = 60, api: str = "sync",
                     batch: int = 1, 
-                    cache_dir="model_cache"):
+                    cache_dir: str = "model_cache"):
     """
     Benchmark model `model_path` with `benchmark_app`. Returns the output of `benchmark_app`
     without logging info, and information about the device
