@@ -15,9 +15,8 @@ torchvision>=0.6.1,<=0.8.2; sys_platform == 'darwin'
 torch>=1.5.1+cpu,<=1.7.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchvision>=0.6.1+cpu,<=0.8.2+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchmetrics==0.6.2
-release/3_series_update
-tensorflow==2.4.*; python_version <= '3.8'
-tensorflow==2.5.*; python_version == '3.9'
+release/4_series_update
+tensorflow==2.5.*
 2022.1
 
 # PaddlePaddle notebook requirements

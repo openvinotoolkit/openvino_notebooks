@@ -183,13 +183,9 @@ jobs:
     # Main notebooks test. Verifies that all notebooks run without errors
     - name: Analysing with nbval
       run: |
-        release/3_series_update
-        if [ ${{ matrix.python }} == "3.9" ]; then
-          python -m pytest --nbval -k "test_3" --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10
-        else
-          python -m pytest --nbval -k "test_3" --durations 10
-        fi
-      shell: bash
+        release/4_series_update
+        python -m pytest --nbval -x -k "test_4" --durations 10
+        2022.1
 
     # Show the cache after running the notebooks
     - name: Show cache
