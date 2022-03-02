@@ -1,4 +1,6 @@
-openvino-dev[onnx,tensorflow2]==2021.4.2
+-i https://test.pypi.org/simple/ 
+--extra-index-url  https://pypi.org/simple/
+openvino-dev==2022.1.0.dev20220215
 gdown
 pytube
 yaspin
@@ -13,6 +15,7 @@ torchvision>=0.6.1,<=0.8.2; sys_platform == 'darwin'
 torch>=1.5.1+cpu,<=1.7.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchvision>=0.6.1+cpu,<=0.8.2+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchmetrics==0.6.2
+tensorflow==2.5.*
 
 # PaddlePaddle notebook requirements
 # For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
@@ -25,7 +28,7 @@ ppgan==2.1.*
 transformers
 
 # NNCF notebook requirements
-nncf[tf, torch]
+nncf==2.1.*
 tensorflow_datasets==4.2.0
 
 # CT scan training/inference requirements
