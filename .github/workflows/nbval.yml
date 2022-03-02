@@ -183,7 +183,11 @@ jobs:
     # Main notebooks test. Verifies that all notebooks run without errors
     - name: Analysing with nbval
       run: |
+        release/1_series_update
         python -m pytest --nbval -k "test_1" --durations 10
+
+        python -m pytest --nbval -x -k "test_0" --durations 10
+        2022.1
 
     # Show the cache after running the notebooks
     - name: Show cache
