@@ -16,3 +16,4 @@ imageio<=2.15.0
 ipython>=7.16.3 # not directly required, pinned by Snyk to avoid a vulnerability
 notebook>=6.1.5 # not directly required, pinned by Snyk to avoid a vulnerability
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
+mistune>=2.0.1 # not directly required, pinned by Snyk to avoid a vulnerability
