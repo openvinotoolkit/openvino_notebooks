@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04, ubuntu-20.04, windows-2019, macos-10.15, macos-11]
-        python: [3.6, 3.7, 3.8]
+        python: [3.6, 3.7, 3.8, 3.9]
         exclude:
         - os: macos-11
           python: 3.6
@@ -183,7 +183,9 @@ jobs:
     # Main notebooks test. Verifies that all notebooks run without errors
     - name: Analysing with nbval
       run: |
-        python -m pytest --nbval -x -k "test_ or notebook_utils" --durations 10
+        release/4_series_update
+        python -m pytest --nbval -x -k "test_4" --durations 10
+        2022.1
 
     # Show the cache after running the notebooks
     - name: Show cache
@@ -191,4 +193,3 @@ jobs:
         ls -laR ${{ env.CACHE_DIR }}
         du -sh ${{ env.CACHE_DIR }}
       if: runner.os != 'Windows'
-
