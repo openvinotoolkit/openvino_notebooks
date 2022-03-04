@@ -44,6 +44,8 @@ jobs:
           python: 3.7
         - os: macos-10.15
           python: 3.8
+        - os: windows-2019
+          python: 3.6
     steps:
 
     #### Installation/preparation ####
@@ -183,13 +185,16 @@ jobs:
         jupyter lab notebooks --help
 
     # Main notebooks test. Verifies that all notebooks run without errors
+    # Temporary workaround while NNCF is not updated to TF 2.5
     - name: Analysing with nbval
+      if: ${{ matrix.python }} == '3.9' }}
       run: |
-        if [ ${{ matrix.python }} == "3.9" ]; then
           python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10
-        else
+
+    - name: Analysing with nbval
+      if: ${{ matrix.python }} != '3.9' }}
+      run: |
           python -m pytest --nbval -k "test_ or notebook_utils" --durations 10
-        fi
 
     # Show the cache after running the notebooks
     - name: Show cache
