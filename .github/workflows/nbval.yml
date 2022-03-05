@@ -185,14 +185,13 @@ jobs:
         jupyter lab notebooks --help
 
     # Main notebooks test. Verifies that all notebooks run without errors
-    # Temporary workaround while NNCF is not updated to TF 2.5
+    # Temporary workaround for Python 3.9 while NNCF is not updated to TF 2.5
     - name: Analysing with nbval
-      if: ${{ matrix.python }} == '3.9' }}
+      if: matrix.python == '3.9'
       run: |
           python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10
-
     - name: Analysing with nbval
-      if: ${{ matrix.python }} != '3.9' }}
+      if: matrix.python != '3.9'
       run: |
           python -m pytest --nbval -k "test_ or notebook_utils" --durations 10
 
