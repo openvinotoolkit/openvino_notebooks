@@ -16,7 +16,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 
 ## ➤ Table of Contents
 
-* ➤ 📝 [Installation Guide](#id-installation)
+* ➤ 📝 [Installation Guide](#installation)
 	* [Windows 10](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows)
 	* [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu)
 	* [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS)
@@ -24,7 +24,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 	* [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
 	* [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML)
 	* [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker)
-* [➤ 🚀 Getting Started](#-getting-started)
+* [➤ 🚀 Getting Started](#getting-started)
 	* [First steps with OpenVINO](#-first-steps)
 	* [Convert & Optimize](#-converte-and-optimize)
 	* [Model Demos](#-model-demos)
@@ -39,7 +39,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 </details>
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
-<div id='id-installation'/>
+<div id='installation'/>
 
 ## ➤ 📝 Installation Guide
 
@@ -89,7 +89,8 @@ python -m ipykernel install --user --name openvino_env
 </details>
 </p>
 	
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#getting-started)
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+<div id='getting-started'/>
 
 ## ➤ 🚀 Getting Started
 
@@ -192,7 +193,8 @@ You will have a lot of fun with this section:
 | <img src="https://user-images.githubusercontent.com/15709723/127752390-f6aa371f-31b5-4846-84b9-18dd4f662406.gif" width=250> | <img src="https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif" width=225> | <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225>  | <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=225> | 
 
 
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#system-requirements)
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+<div id='system-requirements'/>
 
 ## ➤ ⚙️ System Requirements
 
@@ -208,7 +210,8 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 | Windows 10, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8                                      |
 | Windows Server 2016 or higher                            | 3.6, 3.7, 3.8                                      |
 
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#run-the-notebooks)
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)
+<div id='run-the-notebooks'/>
 
 ## ➤ 💻 Run the Notebooks
 
@@ -230,7 +233,8 @@ In your browser, select a notebook from the file browser in Jupyter Lab using th
 
 <img src="https://user-images.githubusercontent.com/15709723/120527271-006fd200-c38f-11eb-9935-2d36d50bab9f.gif">
 
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#cleaning-up)
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+<div id='cleaning-up'/>
 
 ## ➤ 🧹 Cleaning Up
 
@@ -265,7 +269,8 @@ rmdir /s openvino_env
 ```bash
 jupyter kernelspec remove openvino_env
 ```
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#troubleshooting)
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+<div id='troubleshooting'/>
 
 ## ⚠️ Troubleshooting
 
@@ -279,6 +284,7 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 - For Windows installation, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#contributors)
+<div id='contributors'/>
 
 ## ➤ 🧑‍💻 Contributors
 
@@ -288,7 +294,8 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 
 Made with [contributors-img](https://contrib.rocks).
 
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#faq)
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+<div id='faq'/>
 
 ## ➤ ❓ FAQ
 
