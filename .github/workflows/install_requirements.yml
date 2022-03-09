@@ -20,6 +20,8 @@ jobs:
         exclude:
          - os: macos-11
            python: 3.6
+         - os: windows-2019
+           python: 3.6
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
