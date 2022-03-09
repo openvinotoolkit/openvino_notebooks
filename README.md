@@ -25,15 +25,16 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 	* [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML)
 	* [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker)
 * [➤ 🚀 Getting Started](#getting-started)
-	* [First steps with OpenVINO](#-first-steps)
-	* [Convert & Optimize](#-converte-and-optimize)
-	* [Model Demos](#-model-demos)
-	* [Live Demos](#-live-demos)
-* [➤ ⚙️ System Requirements](#-system-requirements)
-* [➤ 💻 Run the Notebooks](#-run-the-notebooks)
-* [➤ 🧹 Cleaning Up](#-cleaning-up)
-* [➤ ⚠️ Troubleshooting](#-troubleshooting)
-* [➤ 🧑‍💻 Contributors](#-contributors)
+	* [First steps with OpenVINO](#first-steps)
+	* [Convert & Optimize](#converte-and-optimize)
+	* [Model Demos](#model-demos)
+	* [Model Training](#model-training)
+	* [Live Demos](#live-demos)
+* [➤ ⚙️ System Requirements](#system-requirements)
+* [➤ 💻 Run the Notebooks](#run-the-notebooks)
+* [➤ 🧹 Cleaning Up](#cleaning-up)
+* [➤ ⚠️ Troubleshooting](#troubleshooting)
+* [➤ 🧑‍💻 Contributors](#contributors)
 * [➤ ❓ FAQ](#-faq)
 * [➤ Feedback](#-feedback)
 </details>
@@ -96,6 +97,8 @@ python -m ipykernel install --user --name openvino_env
 
 Here you will fine a collection of notebooks categorized into four classes, select the one is more related with your need or test all if you want. Good Luck! 
 
+<div id='first-steps'/>
+
 <p>
 <details>
 <summary> 💻 First steps </summary>
@@ -111,7 +114,7 @@ Brief tutorials that demonstrate how to use OpenVINO's Python API for inference.
 </details>
 </p>
 
-
+<div id='converte-and-optimize'/>
 
 <p>
 <details>
@@ -131,6 +134,8 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | [113-image-classification-quantization](notebooks/113-image-classification-quantization/) | Quantize mobilenet image classification | |
 </details>
 </p>
+
+<div id='model-demos'/>
 
 <p>
 <details>
@@ -154,6 +159,8 @@ Demos that demonstrate inference on a particular model.
 </details>
 </p>
 
+<div id='model-training'/>
+
 <p>
 <details>
 <summary> 🏃 Model Training</summary>
@@ -167,6 +174,8 @@ Tutorials that include code to train neural networks.
 | [305-tensorflow-quantization-aware-training](notebooks/305-tensorflow-quantization-aware-training) | Use Neural Network Compression Framework (NNCF) to quantize TensorFlow model | |
 </details>
 </p>
+
+<div id='live-demos'/>
 
 <p>
 <details>
