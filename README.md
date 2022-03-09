@@ -12,7 +12,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 <summary>📖 Table of Contents</summary>
 <br />
 
-[(https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#table-of-contents)
 
 ## ➤ Table of Contents
 
@@ -38,7 +38,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 * [➤ Feedback](#-feedback)
 </details>
 
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#installation-guide)
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#-installation-guide)
 
 ## ➤ 📝 Installation Guide
 
