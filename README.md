@@ -247,37 +247,62 @@ In your browser, select a notebook from the file browser in Jupyter Lab using th
 
 ## ➤ 🧹 Cleaning Up
 
-### Shut Down Jupyter Kernel
+<p>
+<details>
+<summary>Shut Down Jupyter Kernel</summary>
 
 To end your Jupyter session, press `Ctrl-c`. This will prompt you to `Shutdown this Jupyter server (y/[n])?` enter `y` and hit `Enter`.
-
-### Deactivate Virtual Environment
+</details>
+</p>	
+	
+<p>
+<details>
+<summary>Deactivate Virtual Environment</summary>
 
 To deactivate your virtualenv, simply run `deactivate` from the terminal window where you activated `openvino_env`. This will deactivate your environment.
 
 To reactivate your environment, run `source openvino_env/bin/activate` on Linux or `openvino_env\Scripts\activate` on Windows, then type `jupyter lab` or `jupyter notebook` to launch the notebooks again.
-
-### Delete Virtual Environment _(Optional)_
+</details>
+</p>	
+	
+<p>
+<details>
+<summary>Delete Virtual Environment _(Optional)_</summary>
 
 To remove your virtual environment, simply delete the `openvino_env` directory:
-
-#### On Linux and macOS:
+</details>
+</p>	
+	
+<p>
+<details>
+<summary>On Linux and macOS:</summary>
 
 ```bash
 rm -rf openvino_env
 ```
+</details>
+</p>
 
-#### On Windows:
+<p>
+<details>
+<summary>On Windows:</summary>
 
 ```bash
 rmdir /s openvino_env
 ```
+</details>
+</p>
 
-### Remove openvino_env Kernel from Jupyter
+<p>
+<details>
+<summary>Remove openvino_env Kernel from Jupyter</summary>
 
 ```bash
 jupyter kernelspec remove openvino_env
 ```
+</details>
+</p>
+
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='troubleshooting'/>
 
