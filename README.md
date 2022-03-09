@@ -16,7 +16,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 
 ## ➤ Table of Contents
 
-* ➤ 📝 [Installation Guide](#Installation-guide)
+* ➤ 📝 [Installation Guide](#id-installation)
 	* [Windows 10](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows)
 	* [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu)
 	* [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS)
@@ -39,7 +39,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 </details>
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
-
+<div id='id-installation'/>
 ## ➤ 📝 Installation Guide
 
 OpenVINO Notebooks require Python and Git. For Python 3.8, C++ is also required. Select a guide for your operating system or environment:
