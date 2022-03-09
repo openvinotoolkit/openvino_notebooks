@@ -48,47 +48,6 @@ OpenVINO Notebooks require Python and Git. For Python 3.8, C++ is also required.
 
 | [Windows 10](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) | [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker) |
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-<p>
-<details>
-<summary>If you have already installed Python, Git and C++, click here.</summary>
-
-### Step 1: Create and Activate `openvino_env` Environment
-
-#### Linux and macOS Commands:
-
-```bash
-python3 -m venv openvino_env
-source openvino_env/bin/activate
-```
-
-#### Windows Commands:
-
-```bash
-python -m venv openvino_env
-openvino_env\Scripts\activate
-```
-
-### Step 2: Clone the Repository
-
-> Note: Using the `--depth=1` option for `git clone` reduces download size.
-
-```bash
-git clone --depth=1 https://github.com/openvinotoolkit/openvino_notebooks.git
-cd openvino_notebooks
-```
-
-### Step 3: Install the Notebooks Requirements
-
-Upgrade pip to version 21.3 and install the requirements. Install the openvino_env kernel to create a Jupyter kernel for this virtual environment.
-
-```bash
-python -m pip install --upgrade pip==21.3.*
-pip install -r requirements.txt
-python -m ipykernel install --user --name openvino_env
-```
-
-</details>
-</p>
 	
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='getting-started'/>
@@ -191,9 +150,9 @@ Live inference demos that run on a webcam or video files.
 </p>
 
 
-If you have some problems please check the [troubleshooting section](#-troubleshooting) or the [FAQ section](#-faq)
+If you have some problems please check the [troubleshooting section](#troubleshooting) or the [FAQ section](#faq)
 
-Notebooks with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](#-installation-guide) and run the notebooks locally.
+Notebooks with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](#installation) and run the notebooks locally.
 
 You will have a lot of fun with this section:
 
