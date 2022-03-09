@@ -85,6 +85,8 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |  
 | Convert TensorFlow models to OpenVINO IR | Convert PyTorch models to OpenVINO IR | Convert PaddlePaddle models to OpenVINO IR | Download, convert and benchmark models from Open Model Zoo  | 
 | <img src="https://user-images.githubusercontent.com/15709723/127779167-9d33dcc6-9001-4d74-a089-8248310092fe.png" width=250> | <img src="https://user-images.githubusercontent.com/15709723/127779246-32e7392b-2d72-4a7d-b871-e79e7bfdd2e9.png" width=300 > | <img src="https://user-images.githubusercontent.com/15709723/127779326-dc14653f-a960-4877-b529-86908a6f2a61.png" width=300>  | <img src="https://user-images.githubusercontent.com/10940214/157541917-c5455105-b0d9-4adf-91a7-fbc142918015.png" width=150>  |
+	
+More amazing notebooks here! Please take a look of those.
 
 | Notebook | Description | 
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | 
