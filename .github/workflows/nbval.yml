@@ -42,6 +42,8 @@ jobs:
           python: 3.7
         - os: macos-10.15
           python: 3.8
+        - os: windows-2019
+          python: 3.6
     steps:
 
     #### Installation/preparation ####
