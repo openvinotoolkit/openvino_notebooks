@@ -1,0 +1,39 @@
+models:
+  - name: bert-mrpc
+    launchers:
+      - framework: dlsdk
+        device: CPU
+        adapter:
+            type: classification
+            num_classes: 2
+        inputs:
+          - name: "result.1"
+            type: INPUT
+            value: "input_ids"
+          - name: "result.3"
+            type: INPUT
+            value: 'input_mask'
+          - name: 'result.5'
+            type: INPUT
+            value: 'segment_ids'
+        model: bert_mrpc_int8.xml
+        weights: bert_mrpc_int8.bin
+
+    datasets:
+      - name: mrpc
+        data_source: ./MRPC
+        annotation_conversion:
+            converter: mrpc
+            annotation_file: ./MRPC/dev.tsv
+            vocab_file: ../vocab.txt
+            max_seq_length: 128
+
+        reader:
+            type: annotation_features_extractor
+            features:
+                - input_ids
+                - input_mask
+                - segment_ids
+
+        metrics:
+            - type: 'accuracy'
