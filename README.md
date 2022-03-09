@@ -68,6 +68,9 @@ Brief tutorials that demonstrate how to use OpenVINO's Python API for inference.
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |  
 | Classify an image with OpenVINO | Learn the OpenVINO Python API | Semantic segmentation with OpenVINO | Text detection with OpenVINO  | 
 | <img src="https://user-images.githubusercontent.com/36741649/127170593-86976dc3-e5e4-40be-b0a6-206379cd7df5.jpg" width=140> | <img src="https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png" width=250> | <img src="https://user-images.githubusercontent.com/15709723/128290691-e2eb875c-775e-4f4d-a2f4-15134044b4bb.png" width=150> | <img src="https://user-images.githubusercontent.com/36741649/128489933-bf215a3f-06fa-4918-8833-cb0bf9fb1cc7.jpg" width=150>  | 
+</details>
+</p>
+
 
 
 <div id='converte-and-optimize'/>
