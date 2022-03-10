@@ -3,12 +3,13 @@
 Each notebook is located in a directory. Any notebook with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](https://github.com/paularamo/openvino_notebooks/blob/main/README.md#installation) before launching Jupyter Lab or
 Jupyter Notebook.
 
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
 <div id='getting-started'/>
 
 ## 🚀 Getting Started
 
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+
 
 Here you will fine a collection of notebooks categorized into four classes, select the one is more related with your need or test all if you want. Good Luck! 
 
