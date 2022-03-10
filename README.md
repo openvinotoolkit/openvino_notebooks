@@ -17,7 +17,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 ## ➤ Table of Contents
 
 * [➤ 📝 Installation Guide](#installation)
-	* [Windows 10](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows)
+	* [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows)
 	* [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu)
 	* [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS)
 	* [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
