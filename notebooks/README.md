@@ -3,16 +3,17 @@
 Each notebook is located in a directory. Any notebook with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](https://github.com/paularamo/openvino_notebooks/blob/main/README.md#installation) before launching Jupyter Lab or
 Jupyter Notebook.
 
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+
 <div id='getting-started'/>
 
 ## 🚀 Getting Started
+
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
 Here you will fine a collection of notebooks categorized into four classes, select the one is more related with your need or test all if you want. Good Luck! 
 
 <div id='first-steps'/>
 
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <p>
 <details>
 <summary> 💻 First steps </summary>
@@ -25,8 +26,6 @@ Brief tutorials that demonstrate how to use OpenVINO's Python API for inference.
 | <img src="https://user-images.githubusercontent.com/36741649/127170593-86976dc3-e5e4-40be-b0a6-206379cd7df5.jpg" width=140> | <img src="https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png" width=250> | <img src="https://user-images.githubusercontent.com/15709723/128290691-e2eb875c-775e-4f4d-a2f4-15134044b4bb.png" width=150> | <img src="https://user-images.githubusercontent.com/36741649/128489933-bf215a3f-06fa-4918-8833-cb0bf9fb1cc7.jpg" width=150>  | 
 </details>
 </p>
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
-
 
 <div id='converte-and-optimize'/>
 
@@ -53,7 +52,6 @@ More amazing notebooks here! Please take a look of those.
 </details>
 </p>
 
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
 <div id='model-demos'/>
 
@@ -83,7 +81,6 @@ More amazing notebooks here! Please take a look of those.
 </details>
 </p>
 
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
 <div id='model-training'/>
 
@@ -101,7 +98,6 @@ Tutorials that include code to train neural networks.
 </details>
 </p>
 
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
 <div id='live-demos'/>
 
