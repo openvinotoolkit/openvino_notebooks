@@ -1,8 +1,9 @@
 # List of Notebooks
 
-Each notebook is located in a directory. Any notebook with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](https://github.com/openvino_toolkit/openvino_notebooks/blob/main/README.md#installation) before launching Jupyter Lab or
+Each notebook is located in a directory. Any notebook with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](https://github.com/paularamo/openvino_notebooks/blob/main/README.md#installation) before launching Jupyter Lab or
 Jupyter Notebook.
 
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='getting-started'/>
 
 ## 🚀 Getting Started
@@ -11,6 +12,7 @@ Here you will fine a collection of notebooks categorized into four classes, sele
 
 <div id='first-steps'/>
 
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <p>
 <details>
 <summary> 💻 First steps </summary>
@@ -23,7 +25,7 @@ Brief tutorials that demonstrate how to use OpenVINO's Python API for inference.
 | <img src="https://user-images.githubusercontent.com/36741649/127170593-86976dc3-e5e4-40be-b0a6-206379cd7df5.jpg" width=140> | <img src="https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png" width=250> | <img src="https://user-images.githubusercontent.com/15709723/128290691-e2eb875c-775e-4f4d-a2f4-15134044b4bb.png" width=150> | <img src="https://user-images.githubusercontent.com/36741649/128489933-bf215a3f-06fa-4918-8833-cb0bf9fb1cc7.jpg" width=150>  | 
 </details>
 </p>
-
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
 
 <div id='converte-and-optimize'/>
@@ -50,6 +52,8 @@ More amazing notebooks here! Please take a look of those.
 | [113-image-classification-quantization](notebooks/113-image-classification-quantization/) | Quantize mobilenet image classification | 
 </details>
 </p>
+
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
 <div id='model-demos'/>
 
@@ -79,6 +83,8 @@ More amazing notebooks here! Please take a look of those.
 </details>
 </p>
 
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+
 <div id='model-training'/>
 
 <p>
@@ -94,6 +100,8 @@ Tutorials that include code to train neural networks.
 | [305-tensorflow-quantization-aware-training](notebooks/305-tensorflow-quantization-aware-training) | Use Neural Network Compression Framework (NNCF) to quantize TensorFlow model | |
 </details>
 </p>
+
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
 <div id='live-demos'/>
 
@@ -111,3 +119,17 @@ Live inference demos that run on a webcam or video files.
 
 </details>
 </p>
+
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+
+If you have some problems please check the [troubleshooting section](https://github.com/paularamo/openvino_notebooks/blob/main/README.md#troubleshooting) or the [FAQ section](https://github.com/paularamo/openvino_notebooks/blob/main/README.md#faq)
+
+Notebooks with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](#installation) and run the notebooks locally.
+
+You will have a lot of fun with this section:
+
+| [Vision-monodepth](notebooks/201-vision-monodepth/) | [CT-scan-live-inference](notebooks/210-ct-scan-live-inference/) | [Object-detection-webcam](notebooks/401-object-detection-webcam/) | [Pose-estimation-webcam](notebooks/402-pose-estimation-webcam/) | [Action-recognition-webcam](notebooks/403-action-recognition-webcam/) | 
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | 
+| <img src="https://user-images.githubusercontent.com/15709723/127752390-f6aa371f-31b5-4846-84b9-18dd4f662406.gif" width=250> | <img src="https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif" width=225> | <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225>  | <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=225> | 
+
+
