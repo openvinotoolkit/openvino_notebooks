@@ -16,7 +16,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 
 ## ➤ Table of Contents
 
-* [➤ 📝 [Installation Guide](#installation)
+* [➤ 📝 Installation Guide](#installation)
 	* [Windows 10](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows)
 	* [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu)
 	* [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS)
@@ -42,7 +42,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='installation'/>
 
-## ➤ 📝 Installation Guide
+## 📝 Installation Guide
 
 OpenVINO Notebooks require Python and Git. For Python 3.8, C++ is also required. Select a guide for your operating system or environment:
 
@@ -52,7 +52,7 @@ OpenVINO Notebooks require Python and Git. For Python 3.8, C++ is also required.
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='getting-started'/>
 
-## ➤ 🚀 Getting Started
+## 🚀 Getting Started
 
 Here you will fine a collection of notebooks categorized into four classes, select the one is more related with your need or test all if you want. Good Luck! 
 
@@ -174,7 +174,7 @@ You will have a lot of fun with this section:
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='system-requirements'/>
 
-## ➤ ⚙️ System Requirements
+## ⚙️ System Requirements
 
 The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Docker container. The table below lists the supported operating systems and Python versions. **Note:** Python 3.9 is not supported yet, but it will be soon.
 
@@ -191,7 +191,7 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)
 <div id='run-the-notebooks'/>
 
-## ➤ 💻 Run the Notebooks
+## 💻 Run the Notebooks
 
 ### To Launch a Single Notebook
 
@@ -214,7 +214,7 @@ In your browser, select a notebook from the file browser in Jupyter Lab using th
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='cleaning-up'/>
 
-## ➤ 🧹 Cleaning Up
+## 🧹 Cleaning Up
 
 <p>
 <details>
@@ -289,7 +289,7 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#contributors)
 <div id='contributors'/>
 
-## ➤ 🧑‍💻 Contributors
+## 🧑‍💻 Contributors
 
 <a href="https://github.com/openvinotoolkit/openvino_notebooks/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=openvinotoolkit/openvino_notebooks" />
@@ -300,7 +300,7 @@ Made with [contributors-img](https://contrib.rocks).
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='faq'/>
 
-## ➤ ❓ FAQ
+## ❓ FAQ
 
 * [Which devices does OpenVINO support?](https://docs.openvinotoolkit.org/latest/openvino_docs_IE_DG_supported_plugins_Supported_Devices.html)
 * [What is the first CPU generation you support with OpenVINO?](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/system-requirements.html)
