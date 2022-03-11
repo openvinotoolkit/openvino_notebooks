@@ -8,7 +8,7 @@ English | [简体中文](README_cn.md)
 
 A collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
 
-### Important Note: The main branch of this repository was updated to the new OpenVINO Runtime API v2.0 (2022.1) by March 11th 2022. If you want to use the previous version OpenVINO 2021.4, please select the 2021.4 branch in this repo.
+### Important Note: The main branch of this repository was updated to the latest pre-release of 2022.1, for stable LTS go to 2021.4 branch
 
 <details>
 <summary>📖 Table of Contents</summary>
