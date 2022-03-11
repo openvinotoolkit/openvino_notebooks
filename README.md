@@ -8,7 +8,7 @@ English | [简体中文](README_cn.md)
 
 A collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
 
-### Important Note: The main branch of this repository was updated to the latest pre-release of 2022.1, for stable LTS go to 2021.4 branch
+**Important Note:** The main branch of this repository was updated to the latest pre-release of 2022.1, for stable LTS go to [2021.4 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4)
 
 <details>
 <summary>📖 Table of Contents</summary>
@@ -46,7 +46,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 
 ## 📝 Installation Guide
 
-OpenVINO Notebooks require Python and Git. For Python 3.9, C++ is also required. Select a guide for your operating system or environment:
+OpenVINO Notebooks require Python and Git. Select a guide for your operating system or environment:
 
 | [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) | [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker) |
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
@@ -187,7 +187,7 @@ You will have a lot of fun with this section:
 
 ## ⚙️ System Requirements
 
-The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Docker container. The table below lists the supported operating systems and Python versions. **Note:** Python 3.10 is not supported yet, but it will be soon.
+The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Docker container. The table below lists the supported operating systems and Python versions. **Note:** Python 3.10 is not supported yet.
 
 | Supported Operating System                                 | [Python Version (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- | :------------------------------------------------- |
