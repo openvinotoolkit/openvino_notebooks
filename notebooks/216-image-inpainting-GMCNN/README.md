@@ -1,6 +1,6 @@
 # Image Inpainting with OpenVINO
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%5C216-image-inpainting-GMCNN%5C216-image-inpainting-GMCNN.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Chamodya-ka/openvino_notebooks/main?labpath=%2Fnotebooks%2F216-image-inpainting-GMCNN%2F216-image-inpainting-GMCNN.ipynb)
 
 <img align='center' src="data/results_expected.png" alt="drawing" width="800"/>
 
