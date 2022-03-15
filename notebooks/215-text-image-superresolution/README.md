@@ -1,7 +1,5 @@
 # Text Image Super Resolution with OpenVINO tutorial
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F215-text-superresolution%2F215-text-superresolution.ipynb)
-
 ![text](data/text.png)
 
 Super Resolution is the process of enhancing the quality of an image by increasing the pixel count using deep learning.  
