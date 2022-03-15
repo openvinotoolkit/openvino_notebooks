@@ -15,7 +15,7 @@ Kupyn, O., Martyniuk, T., Wu, J., & Wang, Z. (2019). [Deblurgan-v2: Deblurring (
 ### Data
 The image above is a sample of the test subset of the [GOPRO](https://seungjunnah.github.io/Datasets/gopro) dataset. This dataset is one of the three the were used to train DeblurGAN-v2, and contains pairs of blurred and sharp images.
 
-The dataset is available under the [CC BY 4.0 license](https://creativecommons.org/licenses/by/4.0/).
+The authors release the dataset under the [CC BY 4.0 license](https://creativecommons.org/licenses/by/4.0/).
 
 
 ## Installation Instructions
