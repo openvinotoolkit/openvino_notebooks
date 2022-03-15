@@ -1,5 +1,5 @@
 # Deblur Images with DeblurGAN-v2 and OpenVINO tutorial
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ThanosM97/openvino_notebooks/230003d1096240b25de78b302b35a69ace7ee261?urlpath=lab%2Ftree%2Fnotebooks%2F217-vision-deblur%2F217-vision-deblur.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ThanosM97/openvino_notebooks/217-vision-deblur?labpath=notebooks%2F217-vision-deblur%2F217-vision-deblur.ipynb)
 
 ![result](https://user-images.githubusercontent.com/41332813/158425051-3d4d442c-7eca-4f5c-97c8-de27e0ea8093.png)
 
