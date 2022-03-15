@@ -621,7 +621,7 @@ def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
 # In[ ]:
 
 
-def benchmark_model(model_path: os.PathLike,
+def benchmark_model(model_path: PathLike,
                     device: str = "CPU",
                     seconds: int = 60, api: str = "async",
                     batch: int = 1, 
