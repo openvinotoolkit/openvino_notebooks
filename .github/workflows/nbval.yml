@@ -5,7 +5,7 @@ on:
   pull_request:
     branches:
     - 'main'
-    - '2022.1'
+    - '2021.4'
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
@@ -15,7 +15,7 @@ on:
   push:
     branches:
     - 'main'
-    - '2022.1'
+    - '2021.4'
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
