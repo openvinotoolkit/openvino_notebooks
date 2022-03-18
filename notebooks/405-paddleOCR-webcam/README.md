@@ -5,12 +5,12 @@
 </p>
 
 
-!PaddleOCR performs the Optical Character Recognition (OCR) function from a video, an image, or a scanned document.  It is mainly composed of three parts: DB text detection, detection frame correction and CRNN text recognition. For more details, please refer to the PaddleOCR technical article (https://arxiv.org/abs/2009.09941).
+PaddleOCR performs the Optical Character Recognition (OCR) function from a video, an image, or a scanned document.  It is mainly composed of three parts: DB text detection, detection frame correction and CRNN text recognition. For more details, please refer to the PaddleOCR technical article (https://arxiv.org/abs/2009.09941).
 
 
 ## Notebook Contents
 
-This notebook demonstrates live paddleOCR inference with OpenVINO. We use the ["Chinese and English ultra-lightweight PP-OCR model (9.4M)"](https://github.com/PaddlePaddle/PaddleOCR) from [PaddleOCR Github](https://github.com/openvinotoolkit/open_model_zoo), specifically the Encoder and Decoder from [action-recognition-0001](https://docs.openvino.ai/latest/omz_models_model_action_recognition_0001.html) or [PaddleOCR Gitee](https://gitee.com/paddlepaddle/PaddleOCR). Both text detection and recognition results are visualized in a window, and text recognition results provided include both recognized text and its corresponding confidence level. In the notebook we show how to create the following pipeline:
+This notebook demonstrates live paddleOCR inference with OpenVINO. We use the ["Chinese and English ultra-lightweight PP-OCR model (9.4M)"](https://github.com/PaddlePaddle/PaddleOCR) from [PaddleOCR Github](https://github.com/PaddlePaddle/PaddleOCR) or [PaddleOCR Gitee](https://gitee.com/paddlepaddle/PaddleOCR). Both text detection and recognition results are visualized in a window, and text recognition results provided include both recognized text and its corresponding confidence level. In the notebook we show how to create the following pipeline:
 
 
 <p align="center" width="100%">
