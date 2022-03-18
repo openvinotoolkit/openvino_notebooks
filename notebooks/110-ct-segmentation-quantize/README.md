@@ -1,6 +1,6 @@
 # Quantize a Segmentation Model and Show Live Inference
 
-![kidney segmentation](https://user-images.githubusercontent.com/77325899/146994250-321fe29f-5829-491b-83a2-b8be73684c6b.gif)
+![kidney segmentation animation](https://user-images.githubusercontent.com/77325899/154279555-aaa47111-c976-4e77-8d23-aac96f45872f.gif)
 
 ## What's Inside
 

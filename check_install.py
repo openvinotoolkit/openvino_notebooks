@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+from pathlib import Path
 from pprint import pprint
 
 import pip
@@ -14,7 +15,6 @@ except:
         "at https://github.com/openvinotoolkit/openvino_notebooks."
     )
     sys.exit()
-
 
 
 def show_supported(supported):
@@ -34,7 +34,9 @@ def show_supported(supported):
 
 
 def pip_check():
-    result = subprocess.run(["pip", "check"], universal_newlines=True, stdout=subprocess.PIPE)
+    result = subprocess.run(
+        ["pip", "check"], universal_newlines=True, stdout=subprocess.PIPE
+    )
     if "No broken requirements found" in result.stdout:
         return True, ""
     else:
@@ -61,11 +63,11 @@ CORRECT_KERNEL_PYTHON = PYTHON_EXECUTABLE == KERNEL_PYTHON
 
 IN_OPENVINO_ENV = "openvino_env" in sys.executable
 SUPPORTED_PYTHON_VERSION = PYTHON_VERSION.major == 3 and (
-    PYTHON_VERSION.minor >= 6 and PYTHON_VERSION.minor <= 8
+    PYTHON_VERSION.minor >= 6 and PYTHON_VERSION.minor <= 9
 )
-GLOBAL_OPENVINO_INSTALLED = "openvino_202" in os.environ.get("LD_LIBRARY_PATH", "") + ":".join(
-    sys.path
-)
+GLOBAL_OPENVINO_INSTALLED = "openvino_202" in os.environ.get(
+    "LD_LIBRARY_PATH", ""
+) + ":".join(sys.path)
 
 
 try:
@@ -76,24 +78,32 @@ except ImportError:
     PIP_OPENVINO_INSTALLED = False
 
 try:
-    from openvino.inference_engine import IECore
+    import openvino
+    from openvino.runtime import Core
 
+    OPENVINO_IE_VERSION = openvino.runtime.get_version()
+    OPENVINO_SOURCE_ROOT = str(Path(openvino.__file__).parent)
     OPENVINO_IMPORT = True
 except ImportError:
     OPENVINO_IMPORT = False
 
+
+DEVTOOLS_INSTALLED = True
 try:
-    import mo_onnx
+    import mo_onnx  # OpenVINO 2021.4
 except ImportError:
-    DEVTOOLS_INSTALLED = False
-else:
-    DEVTOOLS_INSTALLED = True
+    try:
+        from openvino.tools.mo import mo  # OpenVINO 2022.1
+    except ImportError:
+        DEVTOOLS_INSTALLED = False
 
 
 print("System information:")
 print(f"Python executable: {PYTHON_EXECUTABLE}")
-
 print(f"Pip version: {PIP_VERSION}")
+if OPENVINO_IMPORT:
+    print(f"OpenVINO source: {OPENVINO_SOURCE_ROOT}")
+    print(f"OpenVINO IE version: {OPENVINO_IE_VERSION}")
 print(f"OpenVINO environment activated: {show_supported(IN_OPENVINO_ENV)}")
 print(f"Jupyter kernel installed for openvino_env: {show_supported(KERNEL_INSTALLED)}")
 if KERNEL_INSTALLED:
@@ -109,7 +119,9 @@ print(
 print(f"OpenVINO pip package installed: {show_supported(PIP_OPENVINO_INSTALLED)}")
 print(f"OpenVINO import succeeds: {show_supported(OPENVINO_IMPORT)}")
 print(f"OpenVINO development tools installed: {show_supported(DEVTOOLS_INSTALLED)}")
-print(f"OpenVINO not installed globally: {show_supported(not GLOBAL_OPENVINO_INSTALLED)}")
+print(
+    f"OpenVINO not installed globally: {show_supported(not GLOBAL_OPENVINO_INSTALLED)}"
+)
 
 print(f"No broken requirements: {show_supported(NO_BROKEN_REQUIREMENTS)}")
 print()
@@ -148,9 +160,11 @@ if not IN_OPENVINO_ENV:
     )
 
 if not CORRECT_KERNEL_PYTHON:
-    print("The Python version in openvino_env does not match the openvino_env "
-          "Jupyter kernel. This may not be an issue. If you experience issues, please "
-          "follow the instructions in the README to reinstall the kernel.")
+    print(
+        "The Python version in openvino_env does not match the openvino_env Jupyter kernel.\n"
+        "This may not be an issue. If you experience issues, please follow the instructions\n"
+        "in the README to reinstall the kernel."
+    )
 if GLOBAL_OPENVINO_INSTALLED:
     print(
         "It appears that you installed OpenVINO globally (for example with \n"
@@ -176,7 +190,24 @@ if GLOBAL_OPENVINO_INSTALLED:
             "`export LD_LIBRARY_PATH=` in your current terminal.\n"
         )
 
+if (not OPENVINO_IMPORT) and (OS == "win32" and PIP_OPENVINO_INSTALLED):
+    print()
+    print("Importing OpenVINO failed. ")
+    if os.environ.get("CONDA_PREFIX") is not None:
+        print(
+            "To use openvino in a conda environment, you may need to "
+            "adjust your PATH. See step 6 in \n"
+            "https://github.com/openvinotoolkit/openvino_notebooks/wiki/Conda "
+        )
+    else:
+        print(
+            "Importing OpenVINO failed. If you installed Python from the \n"
+            "Windows Store, please try with the Python installer from python.org.\n"
+            "See https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows"
+        )
+
 if not DEVTOOLS_INSTALLED:
+    print()
     print(
         "OpenVINO development tools are not installed in this Python environment. \n"
         "Please follow the instructions in the README to install `openvino-dev`\n"
@@ -201,7 +232,9 @@ if (
     if NO_BROKEN_REQUIREMENTS:
         print("Everything looks good!")
     else:
-        print("Summary: The installation looks good, but there are conflicting requirements.")
+        print(
+            "Summary: The installation looks good, but there are conflicting requirements."
+        )
 else:
     print(
         "The README.md file is located in the openvino_notebooks directory \n"
