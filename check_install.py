@@ -63,7 +63,7 @@ CORRECT_KERNEL_PYTHON = PYTHON_EXECUTABLE == KERNEL_PYTHON
 
 IN_OPENVINO_ENV = "openvino_env" in sys.executable
 SUPPORTED_PYTHON_VERSION = PYTHON_VERSION.major == 3 and (
-    PYTHON_VERSION.minor >= 6 and PYTHON_VERSION.minor <= 8
+    PYTHON_VERSION.minor >= 6 and PYTHON_VERSION.minor <= 9
 )
 GLOBAL_OPENVINO_INSTALLED = "openvino_202" in os.environ.get(
     "LD_LIBRARY_PATH", ""
@@ -79,9 +79,9 @@ except ImportError:
 
 try:
     import openvino
-    from openvino.inference_engine import IECore
+    from openvino.runtime import Core
 
-    OPENVINO_IE_VERSION = openvino.inference_engine.get_version()
+    OPENVINO_IE_VERSION = openvino.runtime.get_version()
     OPENVINO_SOURCE_ROOT = str(Path(openvino.__file__).parent)
     OPENVINO_IMPORT = True
 except ImportError:
