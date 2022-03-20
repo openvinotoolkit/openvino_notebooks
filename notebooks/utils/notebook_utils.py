@@ -150,7 +150,7 @@ def download_file(
     return filename.resolve()
 
 
-def download_ir_model(model_xml_url: str, destination_folder: str = None) -> str:
+def download_ir_model(model_xml_url: str, destination_folder: PathLike = None) -> PathLike:
     """
     Download IR model from `model_xml_url`. Downloads model xml and bin file; the weights file is
     assumed to exist at the same location and name as model_xml_url with a ".bin" extension.
@@ -189,14 +189,14 @@ def normalize_minmax(data):
     return (data - data.min()) / (data.max() - data.min())
 
 
-def to_rgb(image_data) -> np.ndarray:
+def to_rgb(image_data: np.ndarray) -> np.ndarray:
     """
     Convert image_data from BGR to RGB
     """
     return cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
 
 
-def to_bgr(image_data) -> np.ndarray:
+def to_bgr(image_data: np.ndarray) -> np.ndarray:
     """
     Convert image_data from RGB to BGR
     """
@@ -384,7 +384,7 @@ BinarySegmentation = SegmentationMap(binary_labels)
 
 
 def segmentation_map_to_image(
-    result: np.ndarray, colormap: np.ndarray, remove_holes=False
+    result: np.ndarray, colormap: np.ndarray, remove_holes: bool = False
 ) -> np.ndarray:
     """
     Convert network result of floating point numbers to an RGB image with
@@ -621,11 +621,11 @@ def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
 # In[ ]:
 
 
-def benchmark_model(model_path: os.PathLike,
+def benchmark_model(model_path: PathLike,
                     device: str = "CPU",
-                    seconds: int = 60, api: str = "sync",
+                    seconds: int = 60, api: str = "async",
                     batch: int = 1, 
-                    cache_dir: str = "model_cache"):
+                    cache_dir: PathLike = "model_cache"):
     """
     Benchmark model `model_path` with `benchmark_app`. Returns the output of `benchmark_app`
     without logging info, and information about the device
