@@ -37,22 +37,6 @@ Brief tutorials that demonstrate how to use OpenVINO's Python API for inference.
 <summary> ⌚ Convert & Optimize</summary>
 
 Tutorials that explain how to optimize and quantize models with OpenVINO tools.
-<<<<<<< HEAD
-| Notebook | Description | Preview |
-| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [101-tensorflow-to-openvino](101-tensorflow-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F101-tensorflow-to-openvino%2F101-tensorflow-to-openvino.ipynb) | Convert TensorFlow models to OpenVINO IR | <img src="https://user-images.githubusercontent.com/15709723/127779167-9d33dcc6-9001-4d74-a089-8248310092fe.png" width=250> |
-| [102-pytorch-onnx-to-openvino](102-pytorch-onnx-to-openvino/) | Convert PyTorch models to OpenVINO IR | <img src="https://user-images.githubusercontent.com/15709723/127779246-32e7392b-2d72-4a7d-b871-e79e7bfdd2e9.png" width=300 > |
-| [103-paddle-onnx-to-openvino](103-paddle-onnx-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-onnx-to-openvino%2F103-paddle-onnx-to-openvino-classification.ipynb) | Convert PaddlePaddle models to OpenVINO IR | <img src="https://user-images.githubusercontent.com/15709723/127779326-dc14653f-a960-4877-b529-86908a6f2a61.png" width=300> |
-| [104-model-tools](104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | Download, convert and benchmark models from Open Model Zoo | |
-| [105-language-quantize-bert](105-language-quantize-bert/) | Optimize and quantize a pre-trained BERT model ||
-| [110-ct-segmentation-quantize](110-ct-segmentation-quantize/)<br> | Quantize a kidney segmentation model and show live inference | |
-| [111-detection-quantization](111-detection-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F111-detection-quantization%2F111-detection-quantization.ipynb) | Quantize an object detection model | |
-| [112-pytorch-post-training-quantization-nncf](112-pytorch-post-training-quantization-nncf) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model in post-training mode (without model fine-tuning)| |
-| [113-image-classification-quantization](113-image-classification-quantization/) | Quantize mobilenet image classification | |
-| [114-simplified-mode](notebooks/114-simplified-mode/) | Quantize ResNet20 image classification using Simplified Mode| |
-
-## Model Demos
-=======
 	
 | [101-tensorflow-to-openvino](notebooks/101-tensorflow-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F101-tensorflow-to-openvino%2F101-tensorflow-to-openvino.ipynb) |  [102-pytorch-onnx-to-openvino](notebooks/102-pytorch-onnx-to-openvino/) | [103-paddle-onnx-to-openvino](notebooks/103-paddle-onnx-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-onnx-to-openvino%2F103-paddle-onnx-to-openvino-classification.ipynb) | [104-model-tools](notebooks/104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | 
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |  
@@ -74,7 +58,6 @@ More amazing notebooks here! Please take a look of the complete list.
 | [113-image-classification-quantization](notebooks/113-image-classification-quantization/) | Quantize mobilenet image classification | 
 </details>
 </p>
->>>>>>> Update System Requirements OpenVINO 2022.1 (Readme File) (#462)
 
 <div id='model-demos'/>
 
