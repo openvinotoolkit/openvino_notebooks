@@ -1,16 +1,14 @@
 # Vehicle Detection And Recognition with OpenVINO
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/IRONICBo/openvino_notebooks/HEAD?labpath=notebooks%2F214-vehicle-detection-and-recognition%2F214-vehicle-detection-and-recognition.ipynb)
-
-<div  align='center' ><img src="data/vehicle-result.png" alt="drawing"/></div>
+![result](data/vehicle-result.png)
 
 Thousands of vehicles are running in road.We can detect a single vehicle from a raw image and recognize attributes of vehicles.In this notebook,we use detection model and recognition model to realize the target.
 
 
 ## Notebook Contents
 
-In this notebook, we will use both detection model and classification model with OpenVINO.We use [Object Detection Models](https://docs.openvino.ai/2020.2/usergroup3.html) and [Object Recognition Models](https://docs.openvino.ai/2020.2/usergroup4.html) from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo).Detection model is used to detect vehicle position.Besides, we crop single vehicle and infer with classification model to recognize attributes of single vehicle.The pipline is here： 
-<div  align='center' ><img src="data/vehicle-inference-flow.png" alt="drawing" width="1000"/></div>
+In this notebook, we will use both detection model and classification model with OpenVINO.We use [Object Detection Models](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/vehicle-detection-0200) and [Object Recognition Models](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/vehicle-attributes-recognition-barrier-0039) from [Intel Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/blob/master/models/intel/index.md).Detection model is used to detect vehicle position.Besides, we crop single vehicle and infer with classification model to recognize attributes of single vehicle.The pipline is here： 
+![flowchart](data/vehicle-inference-flow.png)
 
 For more information about the pre-trained models, refer to the [Intel](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel) and [public](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public) models documentation. All included in the [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo)
 
