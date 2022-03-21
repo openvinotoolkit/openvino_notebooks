@@ -1,4 +1,4 @@
-openvino-dev==2022.1.0.dev20220302
+openvino-dev==2022.1.0.dev20220316
 gdown
 pytube
 yaspin

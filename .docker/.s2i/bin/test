@@ -14,4 +14,4 @@ cp -r kits19_frames/case_00030 kits19_frames/case_00001
 
 python /tmp/scripts/patch_notebooks.py /opt/app-root/notebooks
 # Temporarily ignore 208 because of model download instability in 2021.4.2
-exec /opt/app-root/bin/pytest --durations=10 --nbval --current-env -k "test_" /opt/app-root/notebooks --ignore=/opt/app-root/notebooks/208-optical-character-recognition
+exec /opt/app-root/bin/pytest --durations=10 --nbval --current-env -k "test_" /opt/app-root/notebooks
