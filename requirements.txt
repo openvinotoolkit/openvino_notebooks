@@ -58,7 +58,3 @@ paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddl
 
 # openvino extensions
 openvino-extensions
-
-Pillow==8.2.*
-ipykernel==5.*
-pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
