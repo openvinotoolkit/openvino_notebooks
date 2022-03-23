@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "99339991d55b97e9f2df970529db4efbdf685b7f2c455ad3d54433a06d1911a8"
+            "sha256": "07f181b33649c21df58d53d3dc51e3d897fa81c74cdaceb7ace57bd99b7622c3"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -2040,7 +2040,7 @@
                 "sha256:dbd18bcf4889b720ba13a27ec2f2aac1981bd41203b3a3b27ba7a33f88ae4827",
                 "sha256:df609c82f18c5b9f6cb97271f03315ff0dbe481a2a02e56aeb1b1a985ce38e60"
             ],
-            "markers": "python_version >= '3.7'",
+            "markers": "python_version >= '3.6'",
             "version": "==1.19.5"
         },
         "oauthlib": {
@@ -2098,30 +2098,30 @@
         },
         "openvino": {
             "hashes": [
-                "sha256:00f4905552dbead43a4d7af1ea1a838164253e8de6c8adb5ef13cb575d06bc85",
-                "sha256:0c3f5ff176d25fcfdd5dbd03e2742b8ba2a326c709b535a7c22de88e034f973a",
-                "sha256:10465302432d71ac980d41238e33e15537935988f146443fb14b5a9cecfd227e",
-                "sha256:1b49f66c98856285bbfcf48d920f754a5c72be78e22ce08264ed860e2d449bf3",
-                "sha256:1e0933ece7c1b88b4bd3d03e77d732be8c1200a640d3b8fdd9c0dee05583c095",
-                "sha256:23dd47b9e2a1a197d66762fbc0eb0c5bf0bfaa01cb41c2a893891183a50eccc6",
-                "sha256:59f2edc3a34c8166a819a6a665eb9c83af8f5f7f801c85ccf4cc0e5080e12a56",
-                "sha256:6ee56cd471dbae83c5499718297d7d72abf4446475651a11b8d72019dc8f8700",
-                "sha256:a7d3434216250dd87db95bb95f6bba9033ebbde5b04c6607c8a6e9b72350f5e7",
-                "sha256:bac830d1cbbc6c55122eef8db6a3632367e11c3243d6ea5716bdd7aac8196f65",
-                "sha256:d605a5b32ff47914f7463a694f24d1e29e5be77afc62ab640bb594b73303f247",
-                "sha256:fda026eb36ca0fe64149c3752b19bfec1abe16b1d24221496b069d69119b9814"
+                "sha256:0ed9842e833dc731b207be21f6f272995e461c1406b1227c4efdfb8cb8e723cc",
+                "sha256:156faf8c793200bc40c906a19a045865dbf966f026152d2bed2d3aaf14d8c80a",
+                "sha256:2346fa33410b51a594a5d1ea58824a4ecd54873a569333fdbd171c0537193ef2",
+                "sha256:33f1fd08232ca35e84b45807a1bbffd169c3ab25b23b28f3e75b7363b54f3ffc",
+                "sha256:36736a9dcd4dfcffa0628cff153c05f81748110575aa5eb560584e3dc4514f68",
+                "sha256:8166617a41247f308be3d7b7f974c39e9c5db4db06c2904c87124579e08b646a",
+                "sha256:b3b48d783af05132852cf7e4933ed0e1718c892cdab5338213c96b421e13e9de",
+                "sha256:b419593984286a746cf72b33c23de03a52d746c3c9008f2155f3fccbb4858524",
+                "sha256:bafc58f802dddd47752e9beb8fe36d1f88493f48b647c57bb811f43e92c807c3",
+                "sha256:bfcc9655560ecaf898db869462e9e91eddbcb3dbcd7f6bc186ad98b8fea632dd",
+                "sha256:c4326526607be65a46dceaac28ae1db5bc4ebb1be0ce72b0648bd0af68e6fef6",
+                "sha256:d99fd6c70cd826af03e76fc5059d07008067d7e5aab0688b3307af51d26a56cf"
             ],
-            "version": "==2022.1.0.dev20220316"
+            "version": "==2022.1.0"
         },
         "openvino-dev": {
             "extras": [
                 "onnx"
             ],
             "hashes": [
-                "sha256:bf5422cd21a756830dc6618ad58c3e2ba8e54288b285c2aa4b2185f23c4b6ceb"
+                "sha256:3d911b31a89e92dcb92a29026cfb396920211aca9525ea50032419f10169098d"
             ],
             "index": "pypi",
-            "version": "==2022.1.0.dev20220316"
+            "version": "==2022.1.0"
         },
         "openvino-telemetry": {
             "hashes": [
@@ -2155,11 +2155,11 @@
         },
         "paddle2onnx": {
             "hashes": [
-                "sha256:5d7d577a2df72d2ed106ebd53a2620fb87b0d1894f179b59ef00326b40b0aca6",
-                "sha256:bfc3f293c22dd7d27048095a9206f03a7f81dcb6616c91efb239ad7d7c00a718"
+                "sha256:a9cfec6e083740c3da2776952e3f33dd324f6fbc220663d21f4f702c1c7daf45",
+                "sha256:f3b314f87c2b31914e10e50e1518e6e0a24ce6d24a23cd9ae4677ab2cf75d5f7"
             ],
             "index": "pypi",
-            "version": "==0.9.1"
+            "version": "==0.9.2"
         },
         "paddlehub": {
             "hashes": [
@@ -3031,11 +3031,11 @@
         },
         "rich": {
             "hashes": [
-                "sha256:14bfd0507edc633e021b02c45cbf7ca22e33b513817627b8de3412f047a3e798",
-                "sha256:fdcd2f8d416e152bcf35c659987038d1ae5a7bd336e821ca7551858a4c7e38a9"
+                "sha256:3fba9dd15ebe048e2795a02ac19baee79dc12cc50b074ef70f2958cd651b59a9",
+                "sha256:ce5c714e984a2d185399e4e1dd1f8b2feacb7cecfc576f1522425643a36a57ea"
             ],
             "markers": "python_full_version >= '3.6.2' and python_full_version < '4.0.0'",
-            "version": "==12.0.0"
+            "version": "==12.0.1"
         },
         "rich-click": {
             "hashes": [
