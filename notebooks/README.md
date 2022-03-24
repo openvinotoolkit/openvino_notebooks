@@ -56,7 +56,7 @@ More amazing notebooks here! Please take a look of the complete list.
 | [111-detection-quantization](111-detection-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F111-detection-quantization%2F111-detection-quantization.ipynb) | Quantize an object detection model | 
 | [112-pytorch-post-training-quantization-nncf](112-pytorch-post-training-quantization-nncf/) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model in post-training mode (without model fine-tuning)| 
 | [113-image-classification-quantization](113-image-classification-quantization/) | Quantize mobilenet image classification |
-| [114-simplified-mode](notebooks/114-quantization-simplified-mode/) | Quantize ResNet20 image classification using Simplified Mode| |
+| [114-quantization-simplified-mode](notebooks/114-quantization-simplified-mode/) | Quantize ResNet20 image classification using Simplified Mode| |
 </details>
 </p>
 
