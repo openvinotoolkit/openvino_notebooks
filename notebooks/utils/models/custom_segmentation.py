@@ -22,9 +22,10 @@ class SegmentationModel(model.Model):
         sigmoid=False,
         argmax=False,
         rgb=False,
+        rotate_and_flip=False
     ):
         """
-        Segmentation Model for use with Async Pipeline
+        Segmentation Model for use with Async Pipeline.
 
         :param model_path: path to IR model .xml file
         :param colormap: array of shape (num_classes, 3) where colormap[i] contains the RGB color
@@ -39,6 +40,7 @@ class SegmentationModel(model.Model):
         self.sigmoid = sigmoid
         self.argmax = argmax
         self.rgb = rgb
+        self.rotate_and_flip = rotate_and_flip
 
         self.net = ie.read_network(model_path, model_path.with_suffix(".bin"))
         self.output_layer = next(iter(self.net.outputs))
@@ -60,6 +62,8 @@ class SegmentationModel(model.Model):
         """
         Resize the image to network input dimensions and transpose to
         network input shape with N,C,H,W layout.
+
+        Images are expected to have dtype np.uint8 and shape (H,W,3) or (H,W)
         """
         meta = {}
         image = inputs[self.input_layer]
@@ -72,20 +76,21 @@ class SegmentationModel(model.Model):
             input_image = np.expand_dims(np.expand_dims(image, 0), 0)
         return {self.input_layer: input_image}, meta
 
-    def postprocess(self, outputs, preprocess_meta):
+    def postprocess(self, outputs, preprocess_meta, to_rgb=False):
         """
-        Convert raw network results into an RGB segmentation map with overlay
+        Convert raw network results into a segmentation map with overlay. Returns
+        a BGR image for further processing with OpenCV. 
         """
         alpha = 0.4
 
         if preprocess_meta["frame"].shape[-1] == 3:
-            rgb_frame = preprocess_meta["frame"]
+            bgr_frame = preprocess_meta["frame"]
             if self.rgb:
                 # reverse color channels to convert to BGR
-                rgb_frame = rgb_frame[:, :, (2, 1, 0)]
+                bgr_frame = bgr_frame[:, :, (2, 1, 0)]
         else:
-            # Create RGB image by repeating channels in one-channel image
-            rgb_frame = np.repeat(np.expand_dims(preprocess_meta["frame"], -1), 3, 2)
+            # Create BGR image by repeating channels in one-channel image
+            bgr_frame = np.repeat(np.expand_dims(preprocess_meta["frame"], -1), 3, 2)
         res = outputs[self.output_layer].squeeze()
 
         result_mask_ir = sigmoid(res) if self.sigmoid else res
@@ -95,7 +100,8 @@ class SegmentationModel(model.Model):
         else:
             result_mask_ir = result_mask_ir.round().astype(np.uint8)
         overlay = segmentation_map_to_overlay(
-            rgb_frame, result_mask_ir, alpha, colormap=self.colormap
+            bgr_frame, result_mask_ir, alpha, colormap=self.colormap
         )
-
+        if self.rotate_and_flip:
+            overlay = cv2.flip(cv2.rotate(overlay, rotateCode=cv2.ROTATE_90_CLOCKWISE), flipCode=1)
         return overlay
