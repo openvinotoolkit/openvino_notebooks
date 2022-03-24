@@ -1,15 +1,60 @@
-# List of Notebooks
+English | [简体中文](README_cn.md)
 
-Each notebook is located in a directory. Any notebook with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md#installation) before launching Jupyter Lab or
-Jupyter Notebook.
+<h1 align="center">📚 OpenVINO™ Notebooks</h1>
+
+[![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](LICENSE)
+[![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml/badge.svg)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml?query=branch%3Amain)
+[![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml?query=branch%3Amain)
+
+A collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
+
+**NOTE: The main branch of this repository was updated to the latest pre-release of OpenVINO (2022.1).** To use the pre-release version please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. To install for the first time, see the [Installation Guide](#-installation-guide) below. To use the stable LTS version check out the [2021.4 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4).  
+
+<details>
+<summary>📖 Table of Contents</summary>
+<br />
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
+## Table of Contents
+
+* [➤ 📝 Installation Guide](#installation)
+	* [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows)
+	* [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu)
+	* [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS)
+	* [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
+	* [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
+	* [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML)
+	* [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker)
+* [➤ 🚀 Getting Started](#getting-started)
+	* [First steps with OpenVINO](#first-steps)
+	* [Convert & Optimize](#converte-and-optimize)
+	* [Model Demos](#model-demos)
+	* [Model Training](#model-training)
+	* [Live Demos](#live-demos)
+* [➤ ⚙️ System Requirements](#system-requirements)
+* [➤ 💻 Run the Notebooks](#run-the-notebooks)
+* [➤ 🧹 Cleaning Up](#cleaning-up)
+* [➤ ⚠️ Troubleshooting](#troubleshooting)
+* [➤ 🧑‍💻 Contributors](#contributors)
+* [➤ ❓ FAQ](#-faq)
+* [➤ Feedback](#-feedback)
+</details>
+
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+<div id='installation'/>
+
+## 📝 Installation Guide
+
+OpenVINO Notebooks require Python and Git. Select a guide for your operating system or environment:
+
+| [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) | [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker) |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+	
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='getting-started'/>
 
 ## 🚀 Getting Started
-
-
 
 Here you will fine a collection of notebooks categorized into four classes, select the one is more related with your need or test all if you want. Good Luck! 
 
@@ -77,7 +122,7 @@ More amazing notebooks here! Please take a look of the complete list.
 | Notebook | Description | Preview |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | [201-vision-monodepth](notebooks/201-vision-monodepth/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F201-vision-monodepth%2F201-vision-monodepth.ipynb) | Monocular depth estimation with images and video | <img src="https://user-images.githubusercontent.com/15709723/127752390-f6aa371f-31b5-4846-84b9-18dd4f662406.gif" width=250> |
-| [202-vision-superresolution-image](notebooks/202-vision-superresolution/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F202-vision-superresolution%2F202-vision-superresolution-image.ipynb) | Upscale raw images with a super resolution model | <img src="202-vision-superresolution/data/tower.jpg" width="70">→<img src="202-vision-superresolution/data/tower.jpg" width="130"> |
+| [202-vision-superresolution-image](notebooks/202-vision-superresolution/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F202-vision-superresolution%2F202-vision-superresolution-image.ipynb) | Upscale raw images with a super resolution model | <img src="notebooks/202-vision-superresolution/data/tower.jpg" width="70">→<img src="notebooks/202-vision-superresolution/data/tower.jpg" width="130"> |
 | [202-vision-superresolution-video](notebooks/202-vision-superresolution/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F202-vision-superresolution%2F202-vision-superresolution-video.ipynb) | Turn 360p into 1080p video using a super resolution model | <img src="https://user-images.githubusercontent.com/15709723/127269258-a8e2c03e-731e-4317-b5b2-ed2ee767ff5e.gif" width=80>→<img src="https://user-images.githubusercontent.com/15709723/127269258-a8e2c03e-731e-4317-b5b2-ed2ee767ff5e.gif" width="125"> |
 | [205-vision-background-removal](notebooks/205-vision-background-removal/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F205-vision-background-removal%2F205-vision-background-removal.ipynb) | Remove and replace the background in an image using salient object detection | <img src="https://user-images.githubusercontent.com/15709723/125184237-f4b6cd00-e1d0-11eb-8e3b-d92c9a728372.png" width=455> |
 | [206-vision-paddlegan-anime](notebooks/206-vision-paddlegan-anime/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F206-vision-paddlegan-anime%2F206-vision-paddlegan-anime.ipynb) | Turn an image into anime using a GAN | <img src="https://user-images.githubusercontent.com/15709723/127788059-1f069ae1-8705-4972-b50e-6314a6f36632.jpeg" width=100>→<img src="https://user-images.githubusercontent.com/15709723/125184441-b4584e80-e1d2-11eb-8964-d8131cd97409.png" width=100> |
@@ -126,11 +171,10 @@ Live inference demos that run on a webcam or video files.
 </details>
 </p>
 
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
-If you have some problems please check the [troubleshooting section](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md#troubleshooting) or the [FAQ section](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md#faq)
+If you have some problems please check the [troubleshooting section](#troubleshooting) or the [FAQ section](#faq)
 
-Notebooks with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](ttps://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md#installation) and run the notebooks locally.
+Notebooks with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](#installation) and run the notebooks locally.
 
 You will have a lot of fun with this section:
 
@@ -139,3 +183,142 @@ You will have a lot of fun with this section:
 | <img src="https://user-images.githubusercontent.com/15709723/127752390-f6aa371f-31b5-4846-84b9-18dd4f662406.gif" width=250> | <img src="https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif" width=225> | <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225>  | <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=225> | 
 
 
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+<div id='system-requirements'/>
+
+## ⚙️ System Requirements
+
+The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Docker container. The table below lists the supported operating systems and Python versions. **Note:** Python 3.10 is not supported yet.
+
+| Supported Operating System                                 | [Python Version (64-bit)](https://www.python.org/) |
+| :--------------------------------------------------------- | :------------------------------------------------- |
+| Ubuntu 18.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8, 3.9                                      |
+| Ubuntu 20.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8, 3.9                                      |
+| Red Hat Enterprise Linux 8, 64-bit                       | 3.6, 3.8, 3.9                                           |
+| CentOS 7, 64-bit                                         | 3.6, 3.7, 3.8, 3.9                                      |
+| macOS 10.15.x versions                                   | 3.6, 3.7, 3.8, 3.9                                      |
+| Windows 10, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8, 3.9                                      |
+| Windows Server 2016 or higher                            | 3.6, 3.7, 3.8, 3.9                                      |
+
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)
+<div id='run-the-notebooks'/>
+
+## 💻 Run the Notebooks
+
+### To Launch a Single Notebook
+
+If you wish to launch only one notebook, like the Monodepth notebook, run the command below.
+
+```bash
+jupyter notebook notebooks/201-vision-monodepth/201-vision-monodepth.ipynb
+```
+
+### To Launch all Notebooks
+
+```bash
+jupyter lab notebooks
+```
+
+In your browser, select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
+
+<img src="https://user-images.githubusercontent.com/15709723/120527271-006fd200-c38f-11eb-9935-2d36d50bab9f.gif">
+
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+<div id='cleaning-up'/>
+
+## 🧹 Cleaning Up
+
+<p>
+<details>
+<summary>Shut Down Jupyter Kernel</summary>
+
+To end your Jupyter session, press `Ctrl-c`. This will prompt you to `Shutdown this Jupyter server (y/[n])?` enter `y` and hit `Enter`.
+</details>
+</p>	
+	
+<p>
+<details>
+<summary>Deactivate Virtual Environment</summary>
+
+To deactivate your virtualenv, simply run `deactivate` from the terminal window where you activated `openvino_env`. This will deactivate your environment.
+
+To reactivate your environment, run `source openvino_env/bin/activate` on Linux or `openvino_env\Scripts\activate` on Windows, then type `jupyter lab` or `jupyter notebook` to launch the notebooks again.
+</details>
+</p>	
+	
+<p>
+<details>
+<summary>Delete Virtual Environment _(Optional)_</summary>
+
+To remove your virtual environment, simply delete the `openvino_env` directory:
+</details>
+</p>	
+	
+<p>
+<details>
+<summary>On Linux and macOS:</summary>
+
+```bash
+rm -rf openvino_env
+```
+</details>
+</p>
+
+<p>
+<details>
+<summary>On Windows:</summary>
+
+```bash
+rmdir /s openvino_env
+```
+</details>
+</p>
+
+<p>
+<details>
+<summary>Remove openvino_env Kernel from Jupyter</summary>
+
+```bash
+jupyter kernelspec remove openvino_env
+```
+</details>
+</p>
+
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+<div id='troubleshooting'/>
+
+## ⚠️ Troubleshooting
+
+If these tips do not solve your problem, please open a [discussion topic](https://github.com/openvinotoolkit/openvino_notebooks/discussions)
+or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issues)!
+
+- To check some common installation problems, run `python check_install.py`. This script is located in the openvino_notebooks directory.
+  Please run it after activating the `openvino_env` virtual environment.
+- If you get an `ImportError`, doublecheck that you installed the Jupyter kernel. If necessary, choose the openvino\_env kernel from the _Kernel->Change Kernel_ menu) in Jupyter Lab or Jupyter Notebook
+- If OpenVINO is installed globally, do not run installation commands in a terminal where setupvars.bat or setupvars.sh are sourced.
+- For Windows installation, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
+
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#contributors)
+<div id='contributors'/>
+
+## 🧑‍💻 Contributors
+
+<a href="https://github.com/openvinotoolkit/openvino_notebooks/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=openvinotoolkit/openvino_notebooks" />
+</a>
+
+Made with [contributors-img](https://contrib.rocks).
+
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+<div id='faq'/>
+
+## ❓ FAQ
+
+* [Which devices does OpenVINO support?](https://docs.openvinotoolkit.org/latest/openvino_docs_IE_DG_supported_plugins_Supported_Devices.html)
+* [What is the first CPU generation you support with OpenVINO?](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/system-requirements.html)
+* [Are there any success stories about deploying real-world solutions with OpenVINO?](https://www.intel.com/content/www/us/en/internet-of-things/ai-in-production/success-stories.html)
+
+
+---
+
+\* Other names and brands may be claimed as the property of others.
