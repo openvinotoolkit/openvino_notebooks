@@ -23,7 +23,7 @@ monai = "*"
 nbval = "*"
 nltk = ">=3.6.4"
 nncf = {extras = ["torch", "tf"], version = ">=2.1.0"}
-openvino-dev = {extras = ["onnx"], version = "==2022.1.0.dev20220302"}
+openvino-dev = {extras = ["onnx"], version = "==2022.1.0"}
 ovmsclient = "*"
 paddle2onnx = ">=0.6"
 paddlehub = "*"
