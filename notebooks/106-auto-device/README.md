@@ -8,7 +8,7 @@ This notebook demonstrates how to do inference with Automatic Device Selection. 
 
 A basic introduction to do Auto Device Selection with OpenVINO. 
 
-This notebook uses the [resnet-50-tf](https://docs.openvino.ai/latest/omz_models_model_resnet_50_tf.html) model from the [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/). resnet-50-tf is a TensorFlow* implementation of ResNet-50 - an image classification model pre-trained on the ImageNet dataset. Originally redistributed in Saved model format, converted to frozen graph using tf.graph_util module. For details see [paper](https://arxiv.org/abs/1512.03385), [repository](https://github.com/tensorflow/models/tree/v2.2.0/official/r1/resnet).
+This notebook demostrate how to compile_model with AUTO device, compare the first inference latency (model compilation time + 1st inference time) between GPU device and AUTO device, show the difference performance hints (THROUGHPUT and LATENCY) with significant performance results towards the desired metric.
 
 ## Installation Instructions
 
