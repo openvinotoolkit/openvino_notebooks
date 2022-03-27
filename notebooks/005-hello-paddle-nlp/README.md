@@ -2,11 +2,13 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F005-hello-paddle-nlp%2F005-hello-paddle-nlp.ipynb)
 
-```text
 Data: OpenVINO accelerates applications with high-performance, AI and deep learning inference deployed from edge to cloud 
+
+```text
  Label: positive 
  Negative prob: 0.0014771847054362297 
- Positive prob: 0.9985228776931763 
+ Positive prob: 0.9985228776931763
+ ```
 
 This notebook shows how to do NLP inference on an PaddlePaddle model. The input data of model is in dynamic shape.
 
