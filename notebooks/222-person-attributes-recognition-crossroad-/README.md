@@ -1,5 +1,9 @@
 # Title of Tutorial
 
+|image|video|
+|--|--|
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/spencergotowork/openvino_notebooks/57d34e787760d30e5c19b9f85fd6ba39e9226159?urlpath=lab%2Ftree%2Fnotebooks%2F222-person-attributes-recognition-crossroad-%2F222-person-attributes-recognition-crossroad-image.ipynb) | [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/spencergotowork/openvino_notebooks/57d34e787760d30e5c19b9f85fd6ba39e9226159?urlpath=lab%2Ftree%2Fnotebooks%2F222-person-attributes-recognition-crossroad-%2F222-person-attributes-recognition-crossroad-video.ipynb)
+
 Person attributes recognition crossroad-0230. This model presents a person attributes classification algorithm analysis scenario. It produces probability of person attributions existing on the sample and a position of two point on sample, whiches can be used for color prob (like, color picker in graphical editors).
 
 ## Notebook Contents
