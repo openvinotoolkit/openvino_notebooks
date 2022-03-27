@@ -12,6 +12,7 @@ on:
     - 'requirements.txt'
     - '.ci/*'
     - '.github/workflows/nbval.yml'
+    - '.github/workflows/.env'
   push:
     branches:
     - 'main'
@@ -22,11 +23,12 @@ on:
     - 'requirements.txt'
     - '.ci/*'
     - '.github/workflows/nbval.yml'
+    - '.github/workflows/.env'
   schedule:
     - cron:  '30 8 * * *'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -35,15 +37,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, windows-2019, macos-10.15, macos-11]
+        os: [ubuntu-18.04, ubuntu-20.04, windows-2019]
         python: [3.6, 3.7, 3.8, 3.9]
         exclude:
-        - os: macos-11
-          python: 3.6
-        - os: macos-10.15
-          python: 3.7
-        - os: macos-10.15
-          python: 3.8
         - os: windows-2019
           python: 3.6
     steps:
@@ -201,3 +197,4 @@ jobs:
         ls -laR ${{ env.CACHE_DIR }}
         du -sh ${{ env.CACHE_DIR }}
       if: runner.os != 'Windows'
+
