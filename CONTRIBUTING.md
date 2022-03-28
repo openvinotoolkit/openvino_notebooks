@@ -71,7 +71,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    not just to show the output of a model, but to teach how OpenVINO works, by interacting with it.
    Not all notebooks need to be full-fledged tutorials, but it is always good to explain steps and
    add comments.
-8. Based on AI Ethics please avoid contributions that analyze demographics, detect gender, age or faces.
+8. Based on [Intel's AI Ethics](https://www.intel.com/content/www/us/en/policy/policy-human-rights.html) please avoid contributions that analyze demographics, detect gender, age or faces.
 
 ### Implementation choices
 
