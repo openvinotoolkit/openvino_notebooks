@@ -1,6 +1,6 @@
 # PaddlePaddle Sentiment Classification with OpenVINO
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F005-hello-paddle-nlp%2F005-hello-paddle-nlp.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F005-hello-paddle-nlp%2F005-hello-paddle-nlp.ipynb)
 
 ```text
  Data: OpenVINO accelerates applications with high-performance, AI and deep learning inference deployed from edge to cloud 

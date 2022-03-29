@@ -19,12 +19,11 @@ tensorflow==2.4.*; python_version <= '3.8'
 tensorflow==2.5.*; python_version == '3.9'
 
 # PaddlePaddle notebook requirements
-# For 005 Paddle NLP, 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
+# For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
 paddlepaddle==2.2.*
 paddlehub
 paddle2onnx>=0.6
 ppgan==2.1.*
-paddlenlp>=2.0.0rc
 
 # BERT quantization notebook requirements
 transformers
