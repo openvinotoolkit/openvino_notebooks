@@ -47,7 +47,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 1. The notebooks work on Windows, macOS and Linux (see [supported operating
    systems](https://github.com/openvinotoolkit/openvino_notebooks#%EF%B8%8F-system-requirements))
-   with Python 3.6, 3.7 and 3.8.
+   with Python 3.6, 3.7, 3.8 and 3.9.
 2. As a rule, the notebooks do not require installation of additional software that is not installable by
    `pip`. We do not assume that users have installed XCode Dev Tools, Visual C++ redistributable,
    cmake, etc. Please discuss if your notebook does need C++ - there are exceptions to this rule.
@@ -71,6 +71,9 @@ To do this, there are a few requirements that all notebooks need to pass.
    not just to show the output of a model, but to teach how OpenVINO works, by interacting with it.
    Not all notebooks need to be full-fledged tutorials, but it is always good to explain steps and
    add comments.
+8. Respect for human rights is rooted in our [values at Intel](https://www.intel.com/content/www/us/en/policy/policy-human-rights.html). 
+   We will not accept contributions that perform facial recognition or analyze demographics like age
+   and gender. 
 
 ### Implementation choices
 
