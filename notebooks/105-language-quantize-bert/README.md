@@ -3,8 +3,8 @@
 This tutorial demostrates how to apply INT8 quantization to the Natural
 Language Processing model BERT, using the [Post-Training Optimization
 Tool
-API](https://docs.openvinotoolkit.org/latest/pot_compression_api_README.html)
-(part of [OpenVINO](https://docs.openvinotoolkit.org/)). We will use [HuggingFace
+API](https://docs.openvino.ai/latest/pot_compression_api_README.html)
+(part of [OpenVINO](https://docs.openvino.ai/)). We will use [HuggingFace
 BERT](https://huggingface.co/transformers/model_doc/bert.html)
 [PyTorch](https://pytorch.org/) model fine-tuned for [Microsoft Research
 Paraphrase Corpus

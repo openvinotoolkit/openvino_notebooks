@@ -1,7 +1,7 @@
 # Optimizing TensorFlow models with Neural Network Compression Framework of OpenVINO by 8-bit quantization.
 
 This tutorial demonstrates how to use [NNCF](https://github.com/openvinotoolkit/nncf) 8-bit quantization to optimize the 
-[TensorFlow](https://www.tensorflow.org) model for inference with [OpenVINO Toolkit](https://docs.openvinotoolkit.org/). 
+[TensorFlow](https://www.tensorflow.org) model for inference with [OpenVINO Toolkit](https://docs.openvino.ai/). 
 For more advanced usage refer to these [examples](https://github.com/openvinotoolkit/nncf/tree/develop/examples).
 
 To make downloading and training fast, we use a [ResNet-18](https://arxiv.org/abs/1512.03385) model with the 
