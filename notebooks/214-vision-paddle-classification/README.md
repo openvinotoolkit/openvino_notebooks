@@ -1,6 +1,6 @@
 # PaddlePaddle Image Classification with OpenVINO
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F214-vision-paddle-classification%2F214-vision-paddle-classification.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/OpenVINO-dev-contest/openvino_notebooks/HEAD?labpath=notebooks%2F214-vision-paddle-classification%2F214-vision-paddle-classification.ipynb)
 
 
 This demo shows how to run a MobileNetV3 Large PaddePaddle model using OpenVINO Runtime. Instead of exporting the PaddlePaddle model to ONNX and converting to Intermediate Representation (IR) format using Model Optimizer, we can now read the Paddle model directly without conversion. It also covers new features in OpenVINO 2022.1, including:
