@@ -75,7 +75,7 @@ def download_file(
     directory: PathLike = None,
     show_progress: bool = True,
     silent: bool = False,
-    timeout: int = 5,
+    timeout: int = 10,
 ) -> str:
     """
     Download a file from a url and save it to the local filesystem. The file is saved to the
@@ -89,6 +89,7 @@ def download_file(
                       If None the file will be saved to the current working directory
     :param show_progress: If True, show an TQDM ProgressBar
     :param silent: If True, do not print a message if the file already exists
+    :param timeout: Number of seconds before cancelling the connection attempt
     :return: path to downloaded file
     """
     try:
