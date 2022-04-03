@@ -1,1 +1,0 @@
-Folder to place the network model files.
