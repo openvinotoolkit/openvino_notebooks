@@ -193,7 +193,7 @@ jobs:
     - name: Analysing with nbval
       if: runner.os == 'Windows'
       run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --ignore=notebooks/301-tensorflow-training-openvino --ignore=notebooks/403-action-recognition-webcam --durations 10
+            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --ignore=notebooks/301-tensorflow-training-openvino --ignore=notebooks/403-action-recognition-webcam --ignore=notebooks/utils --durations 10
       
 
 
