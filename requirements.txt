@@ -36,6 +36,10 @@ tensorflow_datasets==4.2.0
 monai
 pytorch_lightning
 
+# Document entity extraction inference requirements
+pdfplumber
+pytesseract
+
 # Jupyter requirements
 jupyterlab
 
