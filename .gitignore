@@ -79,7 +79,8 @@ env.bak/
 venv.bak/
 openvino_env/
 openvino_env*/
-
+Pipfile
+Pipfile.lock
 
 # Spyder project settings
 .spyderproject
