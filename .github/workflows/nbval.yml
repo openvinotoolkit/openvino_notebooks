@@ -48,6 +48,10 @@ jobs:
           python: 3.8
         - os: windows-2019
           python: 3.6
+        - os: windows-2019
+          python: 3.8
+        - os: windows-2019
+          python: 3.9
     steps:
 
     #### Installation/preparation ####
