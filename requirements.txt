@@ -57,3 +57,4 @@ paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddl
 asynctest==0.13.0
 networkx<=2.6.3
 zipp<=3.7.0
+nest-asyncio<=1.5.4
