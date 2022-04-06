@@ -58,4 +58,4 @@ asynctest==0.13.0
 networkx<=2.6.3
 zipp<=3.7.0
 nest-asyncio<=1.5.4
-jupyter-client==7.2.0
+jupyter-client<=7.2.0
