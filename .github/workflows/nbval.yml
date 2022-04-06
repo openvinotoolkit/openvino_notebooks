@@ -183,18 +183,13 @@ jobs:
     # Main notebooks test. Verifies that all notebooks run without errors
     # Temporary workaround for Python 3.9 while NNCF is not updated to TF 2.5
     - name: Analysing with nbval
-      if: matrix.python == '3.9' && runner.os != 'Windows'
+      if: matrix.python == '3.9'
       run: |
             python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10
     - name: Analysing with nbval
-      if: matrix.python != '3.9' && runner.os != 'Windows'
+      if: matrix.python != '3.9'
       run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --durations 10
-    - name: Analysing with nbval
-      if: runner.os == 'Windows'
-      run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --ignore=notebooks/301-tensorflow-training-openvino --ignore=notebooks/403-action-recognition-webcam --ignore=notebooks/utils --durations 10
-      
+            python -m pytest --nbval -k "test_ or notebook_utils" --durations 10  
 
 
     # Show the cache after running the notebooks
