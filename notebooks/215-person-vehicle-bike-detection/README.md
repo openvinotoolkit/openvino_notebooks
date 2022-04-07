@@ -4,7 +4,8 @@
 
 
 This demo shows how to run a Person Vehicle Bike Detection-2003 model using OpenVINO Runtime. 
-![text](data/person-vehicle-bike-detection-2003.png?raw=true "Title")
+![object_detection](https://user-images.githubusercontent.com/54709992/162164657-8410d4d3-1686-4496-9a65-44b1ee1ee47b.gif)
+
   
 ## Installation Instructions
 
