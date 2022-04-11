@@ -8,7 +8,7 @@ This notebook shows how to convert [PaddlePaddle](https://www.paddlepaddle.org.c
 
 ## Notebook Contents
 
-The notebook uses [Paddle2ONNX](https://github.com/PaddlePaddle/paddle2onnx) and OpenVINO [Model Optimizer](https://docs.openvinotoolkit.org/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) to convert a MobileNet V3 [PaddleHub](https://github.com/PaddlePaddle/PaddleHub) model, pretrained on the [ImageNet](https://www.image-net.org) dataset, to OpenVINO IR. It also shows how to perform classification inference on an image using OpenVINO [Inference Engine](https://docs.openvinotoolkit.org/latest/openvino_docs_IE_DG_Deep_Learning_Inference_Engine_DevGuide.html) and compares the results of the PaddlePaddle model with the IR model. 
+The notebook uses [Paddle2ONNX](https://github.com/PaddlePaddle/paddle2onnx) and OpenVINO [Model Optimizer](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) to convert a MobileNet V3 [PaddleHub](https://github.com/PaddlePaddle/PaddleHub) model, pretrained on the [ImageNet](https://www.image-net.org) dataset, to OpenVINO IR. It also shows how to perform classification inference on an image using OpenVINO [Inference Engine](https://docs.openvino.ai/latest/openvino_docs_IE_DG_Deep_Learning_Inference_Engine_DevGuide.html) and compares the results of the PaddlePaddle model with the IR model. 
 
 ## Installation Instructions
 

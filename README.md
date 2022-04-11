@@ -104,6 +104,7 @@ More amazing notebooks here! Please take a look at the complete list.
 | [111-detection-quantization](notebooks/111-detection-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F111-detection-quantization%2F111-detection-quantization.ipynb) | Quantize an object detection model | 
 | [112-pytorch-post-training-quantization-nncf](notebooks/112-pytorch-post-training-quantization-nncf/) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model in post-training mode (without model fine-tuning)| 
 | [113-image-classification-quantization](notebooks/113-image-classification-quantization/) | Quantize mobilenet image classification | 
+| [114-quantization-simplified-mode](notebooks/114-quantization-simplified-mode/) | Quantize Image Classification Models with POT in Simplified Mode| |
 </details>
 </p>
 
@@ -317,7 +318,7 @@ Made with [contributors-img](https://contrib.rocks).
 
 ## ❓ FAQ
 
-* [Which devices does OpenVINO support?](https://docs.openvinotoolkit.org/latest/openvino_docs_IE_DG_supported_plugins_Supported_Devices.html)
+* [Which devices does OpenVINO support?](https://docs.openvino.ai/2022.1/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html)
 * [What is the first CPU generation you support with OpenVINO?](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/system-requirements.html)
 * [Are there any success stories about deploying real-world solutions with OpenVINO?](https://www.intel.com/content/www/us/en/internet-of-things/ai-in-production/success-stories.html)
 
