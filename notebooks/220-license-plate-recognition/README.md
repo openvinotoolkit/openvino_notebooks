@@ -8,7 +8,7 @@ License plate recognition model helps you get the chinese license plate number p
 
 And the result is:
 
-![text](./result.png)
+![text](https://user-images.githubusercontent.com/70456146/162758855-2a9ee4b4-f901-47c0-abb1-6ecb7d4b89cd.png)
 
 ## Notebook Contents
 
