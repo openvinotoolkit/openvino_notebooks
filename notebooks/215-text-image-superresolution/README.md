@@ -9,7 +9,7 @@ The text image super resolution model is a tiny model to upscale scanned images 
 
 ## Notebook Contents
 
-This notebook demonstrates text super resolution with the [text-image-super-resolution-0001](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/text-image-super-resolution-0001) model, which is available from the Open Model Zoo.  
+This notebook demonstrates text super resolution with the [text-image-super-resolution-0001](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/text-image-super-resolution-0001) model, which is available from the [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo).  
 Here is the [Jupyter notebook](215-text-image-superresolution.ipynb)
 
 ## Installation Instructions
