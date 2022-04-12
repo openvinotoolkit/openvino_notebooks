@@ -17,8 +17,8 @@ We provided a pretrained model and a subset of the dataset for the quantization 
 
 The quantization tutorial shows how to:
 
-- Convert an ONNX model to OpenVINO IR with [Model Optimizer](https://docs.openvinotoolkit.org/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html)
-- Quantize a model with OpenVINO's [Post-Training Optimization Tool](https://docs.openvinotoolkit.org/latest/pot_compression_api_README.html) API
+- Convert an ONNX model to OpenVINO IR with [Model Optimizer](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html)
+- Quantize a model with OpenVINO's [Post-Training Optimization Tool](https://docs.openvino.ai/latest/pot_compression_api_README.html) API
 - Evaluate the F1 score metric of the original model and the quantized model
 - Benchmark performance of the original model and the quantized model
 - Show live inference with OpenVINO's async API and MULTI plugin
