@@ -1,7 +1,6 @@
 # Interactive Machine Translation with OpenVino
 
 Machine translation is a form of natural language processing that translates sentences from one language to another.
-translating sentences from one language to another.
 
 ## Notebook Contents
 
