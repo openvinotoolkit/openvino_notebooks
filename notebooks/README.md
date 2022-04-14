@@ -52,10 +52,13 @@ More amazing notebooks here! Please take a look of the complete list.
 | [103-paddle-onnx-to-openvino](103-paddle-onnx-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-onnx-to-openvino%2F103-paddle-onnx-to-openvino-classification.ipynb) | Convert PaddlePaddle models to OpenVINO IR | 
 | [104-model-tools](104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | Download, convert and benchmark models from Open Model Zoo | 
 | [105-language-quantize-bert](105-language-quantize-bert/) | Optimize and quantize a pre-trained BERT model |
+| [106-auto-device](106-auto-device/) | Demonstrate how to use AUTO Device |
+| [107-speech-recognition-quantization](notebooks/107-speech-recognition-quantization/) | Optimize and quantize a pre-trained Wav2Vec2 speech model |
 | [110-ct-segmentation-quantize](110-ct-segmentation-quantize/)<br> | Quantize a kidney segmentation model and show live inference | 
 | [111-detection-quantization](111-detection-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F111-detection-quantization%2F111-detection-quantization.ipynb) | Quantize an object detection model | 
 | [112-pytorch-post-training-quantization-nncf](112-pytorch-post-training-quantization-nncf/) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model in post-training mode (without model fine-tuning)| 
-| [113-image-classification-quantization](113-image-classification-quantization/) | Quantize mobilenet image classification | 
+| [113-image-classification-quantization](113-image-classification-quantization/) | Image Classification Models with POT |
+| [114-quantization-simplified-mode](114-quantization-simplified-mode/) | Quantize Image Classification Models with POT in Simplified Mode| |
 </details>
 </p>
 
@@ -90,6 +93,7 @@ More amazing notebooks here! Please take a look of the complete list.
 | [213-question-answering](213-question-answering/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F213-question-answering%2F213-question-answering.ipynb) | Answer your questions basing on a context | <img src="https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif" width=225> |
 | [214-vision-paddle-classification](214-vision-paddle-classification/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F214-vision-paddle-classification%2F214-vision-paddle-classification.ipynb) | PaddlePaddle Image Classification with OpenVINO| |
 | [218-vehicle-detection-and-recognition](218-vehicle-detection-and-recognition/)<br> | Detect and recognize car's attribute | <img src = "https://user-images.githubusercontent.com/47499836/157867020-99738b30-62ca-44e2-8d9e-caf13fb724ed.png" width=225> |
+
 
 
 </details>
