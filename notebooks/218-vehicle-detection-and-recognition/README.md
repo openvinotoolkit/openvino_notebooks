@@ -1,6 +1,6 @@
 # Vehicle Detection And Recognition with OpenVINO
 
-![result](https://user-images.githubusercontent.com/47499836/157867020-99738b30-62ca-44e2-8d9e-caf13fb724ed.png)
+![result](https://user-images.githubusercontent.com/47499836/163544861-fa2ad64b-77df-4c16-b065-79183e8ed964.png)
 
 Thousands of vehicles are running in road. We can detect a single vehicle from a raw image and recognize attributes of vehicles. In this notebook, we use detection model and recognition model to realize the target.
 
