@@ -14,7 +14,7 @@ This notebook demonstrates live paddleOCR inference with OpenVINO. We use the ["
 
 
 <p align="center" width="100%">
-    <img width="80%" src="https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleOCR_pipeline.png"> 
+    <img width="80%" src="https://raw.githubusercontent.com/yoyowz/classification/master/images/pipeline.png">
 </p>
 
 At the end of this notebook, you will see live inference results from your webcam. You can also upload a video file.
