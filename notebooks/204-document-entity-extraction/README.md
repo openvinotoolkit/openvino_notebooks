@@ -1,6 +1,6 @@
 # Document Entity Extraction with OpenVINO
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F214-entity-extraction%2F214-entity-extraction.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F204-document-entity-extraction%2F204-document-entity-extraction.ipynb)
 
 Simple Text            | Image File          |  PDF File
 :-------------------------:|:-------------------------:|:-------------------------:
