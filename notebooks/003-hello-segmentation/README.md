@@ -10,7 +10,7 @@ This notebook demonstrates how to do inference with segmentation model.
 
 ## Notebook Contents
 
-A very basic introduction to segmentation with OpenVINO. This notebook uses the [road-segmentation-adas-0001](https://docs.openvinotoolkit.org/latest/omz_models_model_road_segmentation_adas_0001.html) model from the [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/) and an input image dowloaded from [Mapillary Vistas](https://www.mapillary.com/dataset/vistas). ADAS stands for Advanced Driver Assistance Services. The model recognizes four classes: background, road, curb and mark.
+A very basic introduction to segmentation with OpenVINO. This notebook uses the [road-segmentation-adas-0001](https://docs.openvino.ai/latest/omz_models_model_road_segmentation_adas_0001.html) model from the [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/) and an input image dowloaded from [Mapillary Vistas](https://www.mapillary.com/dataset/vistas). ADAS stands for Advanced Driver Assistance Services. The model recognizes four classes: background, road, curb and mark.
 
 ## Installation Instructions
 

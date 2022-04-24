@@ -52,11 +52,13 @@ More amazing notebooks here! Please take a look of the complete list.
 | [103-paddle-onnx-to-openvino](103-paddle-onnx-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-onnx-to-openvino%2F103-paddle-onnx-to-openvino-classification.ipynb) | Convert PaddlePaddle models to OpenVINO IR | 
 | [104-model-tools](104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | Download, convert and benchmark models from Open Model Zoo | 
 | [105-language-quantize-bert](105-language-quantize-bert/) | Optimize and quantize a pre-trained BERT model |
+| [106-auto-device](106-auto-device/) | Demonstrate how to use AUTO Device |
 | [107-speech-recognition-quantization](notebooks/107-speech-recognition-quantization/) | Optimize and quantize a pre-trained Wav2Vec2 speech model |
 | [110-ct-segmentation-quantize](110-ct-segmentation-quantize/)<br> | Quantize a kidney segmentation model and show live inference | 
 | [111-detection-quantization](111-detection-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F111-detection-quantization%2F111-detection-quantization.ipynb) | Quantize an object detection model | 
 | [112-pytorch-post-training-quantization-nncf](112-pytorch-post-training-quantization-nncf/) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model in post-training mode (without model fine-tuning)| 
-| [113-image-classification-quantization](113-image-classification-quantization/) | Quantize mobilenet image classification | 
+| [113-image-classification-quantization](113-image-classification-quantization/) | Image Classification Models with POT |
+| [114-quantization-simplified-mode](114-quantization-simplified-mode/) | Quantize Image Classification Models with POT in Simplified Mode| |
 </details>
 </p>
 

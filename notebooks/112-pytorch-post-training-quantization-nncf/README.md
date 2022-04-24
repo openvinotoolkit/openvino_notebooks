@@ -2,7 +2,7 @@
 
 This tutorial demonstrates how to use [NNCF](https://github.com/openvinotoolkit/nncf) 8-bit quantization in
 post-training mode (without the fine-tuning pipeline) to optimize a [PyTorch](https://pytorch.org/) model
-for high-speed inference via [OpenVINO Toolkit](https://docs.openvinotoolkit.org/). For more advanced NNCF
+for high-speed inference via [OpenVINO Toolkit](https://docs.openvino.ai/). For more advanced NNCF
 usage refer to these [examples](https://github.com/openvinotoolkit/nncf/tree/develop/examples).
 
 To make downloading and validating fast, we use an already pretrained [ResNet-50](https://arxiv.org/abs/1512.03385)
