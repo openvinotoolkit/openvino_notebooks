@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 aiohttp = ">=3.7.4"
+boto3 = "*"
 fastseg = "*"
 gdown = "*"
 geffnet = "==0.9.8"
@@ -14,6 +15,7 @@ ipython = "==7.16.3"  # pin to avoid vulnerability
 ipywidgets = "*"
 itkwidgets = "==0.23.1"
 jedi = "==0.17.2"
+jupyter-client = "<=7.2.0"
 jupyter-nbrequirements = "*"
 jupyterhub = ">=1.5.0"
 jupyterlab = "*"
@@ -21,9 +23,10 @@ jupyterlab-git = "==0.30"
 matplotlib = "<3.4"
 monai = "*"
 nbval = "*"
+nest-asyncio = "<=1.5.4"
 nltk = ">=3.6.4"
 nncf = {extras = ["torch", "tf"], version = ">=2.1.0"}
-openvino-dev = {extras = ["onnx"], version = "==2022.1.0.dev20220302"}
+openvino-dev = {extras = ["onnx"], version = "==2022.1.0"}
 ovmsclient = "*"
 paddle2onnx = ">=0.6"
 paddlehub = "*"

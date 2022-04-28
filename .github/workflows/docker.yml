@@ -1,6 +1,4 @@
 # Build Docker image and test notebooks in Docker image
-# NOTE: 208 is currently disabled in Docker tests because of model 
-# download instability. It should be enabled again in 2022.1
 # Test script location: .docker/.s2i/bin/test
 
 name: docker_nbval

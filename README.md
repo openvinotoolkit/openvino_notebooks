@@ -8,7 +8,9 @@ English | [简体中文](README_cn.md)
 
 A collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
 
-**Important Note: The main branch of this repository was updated to the latest pre-release of 2022.1, for stable LTS go to [2021.4 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4)**
+**NOTE: The main branch of this repository was updated to support the new OpenVINO 2022.1 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2021.4 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4). 
+
+If you need help, please start a GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions).  
 
 <details>
 <summary>📖 Table of Contents</summary>
@@ -46,7 +48,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 
 ## 📝 Installation Guide
 
-OpenVINO Notebooks require Python and Git. Select a guide for your operating system or environment:
+OpenVINO Notebooks require Python and Git. To get started, select the guide for your operating system or environment:
 
 | [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) | [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker) |
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
@@ -56,7 +58,7 @@ OpenVINO Notebooks require Python and Git. Select a guide for your operating sys
 
 ## 🚀 Getting Started
 
-Here you will fine a collection of notebooks categorized into four classes, select the one is more related with your need or test all if you want. Good Luck! 
+The Jupyter notebooks are categorized into four classes, select one related to your needs or give them all a try. Good Luck! 
 
 <div id='first-steps'/>
 
@@ -88,7 +90,7 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | Convert TensorFlow models to OpenVINO IR | Convert PyTorch models to OpenVINO IR | Convert PaddlePaddle models to OpenVINO IR | Download, convert and benchmark models from Open Model Zoo  | 
 | <img src="https://user-images.githubusercontent.com/15709723/127779167-9d33dcc6-9001-4d74-a089-8248310092fe.png" width=250> | <img src="https://user-images.githubusercontent.com/15709723/127779246-32e7392b-2d72-4a7d-b871-e79e7bfdd2e9.png" width=300 > | <img src="https://user-images.githubusercontent.com/15709723/127779326-dc14653f-a960-4877-b529-86908a6f2a61.png" width=300>  | <img src="https://user-images.githubusercontent.com/10940214/157541917-c5455105-b0d9-4adf-91a7-fbc142918015.png" width=150>  |
 	
-More amazing notebooks here! Please take a look of the complete list.
+More amazing notebooks here! Please take a look at the complete list.
 
 | Notebook | Description | 
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | 
@@ -97,10 +99,13 @@ More amazing notebooks here! Please take a look of the complete list.
 | [103-paddle-onnx-to-openvino](notebooks/103-paddle-onnx-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-onnx-to-openvino%2F103-paddle-onnx-to-openvino-classification.ipynb) | Convert PaddlePaddle models to OpenVINO IR | 
 | [104-model-tools](notebooks/104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | Download, convert and benchmark models from Open Model Zoo | 
 | [105-language-quantize-bert](notebooks/105-language-quantize-bert/) | Optimize and quantize a pre-trained BERT model |
+| [106-auto-device](notebooks/106-auto-device/) | Demonstrate how to use AUTO Device |
+| [107-speech-recognition-quantization](notebooks/107-speech-recognition-quantization/) | Optimize and quantize a pre-trained Wav2Vec2 speech model |
 | [110-ct-segmentation-quantize](notebooks/110-ct-segmentation-quantize/)<br> | Quantize a kidney segmentation model and show live inference | 
 | [111-detection-quantization](notebooks/111-detection-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F111-detection-quantization%2F111-detection-quantization.ipynb) | Quantize an object detection model | 
 | [112-pytorch-post-training-quantization-nncf](notebooks/112-pytorch-post-training-quantization-nncf/) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model in post-training mode (without model fine-tuning)| 
 | [113-image-classification-quantization](notebooks/113-image-classification-quantization/) | Quantize mobilenet image classification | 
+| [114-quantization-simplified-mode](notebooks/114-quantization-simplified-mode/) | Quantize Image Classification Models with POT in Simplified Mode| |
 </details>
 </p>
 
@@ -117,7 +122,7 @@ Demos that demonstrate inference on a particular model.
 | Show live inference on segmentation of CT-scan data | Run inference on speech-to-text recognition model | Answer your questions basing on a context | Annotate text on images using text recognition resnet | OCR for handwritten simplified Chinese and Japanese |
 |<img src="https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif" width=225>| <img src="https://user-images.githubusercontent.com/36741649/140987347-279de058-55d7-4772-b013-0f2b12deaa61.png" width=225> | <img src="https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif" width=225> | <img src="https://user-images.githubusercontent.com/36741649/129315292-a37266dc-dfb2-4749-bca5-2ac9c1e93d64.jpg" width=225> | <img width="425" alt="handwritten_simplified_chinese_test" src="https://user-images.githubusercontent.com/36741649/132660640-da2211ec-c389-450e-8980-32a75ed14abb.png"> <br> 的人不一了是他有为在责新中任自之我们 |
 	
-More amazing notebooks here! Please take a look of the complete list.
+More amazing notebooks here! Please take a look at the complete list.
 	
 | Notebook | Description | Preview |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
@@ -133,6 +138,10 @@ More amazing notebooks here! Please take a look of the complete list.
 | [211-speech-to-text](notebooks/211-speech-to-text/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F211-speech-to-text%2F211-speech-to-text.ipynb) | Run inference on speech-to-text recognition model | <img src="https://user-images.githubusercontent.com/36741649/140987347-279de058-55d7-4772-b013-0f2b12deaa61.png" width=225>|
 | [212-onnx-style-transfer](notebooks/212-onnx-style-transfer/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F212-onnx-style-transfer%2F212-onnx-style-transfer.ipynb) | Transform images to five different styles with neural style transfer | <img src="https://user-images.githubusercontent.com/77325899/147358090-ff5b21f5-0efb-4aff-8444-9d07add49b92.png" width=100>→<img src="https://user-images.githubusercontent.com/77325899/147358009-0cf10d51-3150-40cb-a776-074558b98da5.png" width=100>|
 | [213-question-answering](notebooks/213-question-answering/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F213-question-answering%2F213-question-answering.ipynb) | Answer your questions basing on a context | <img src="https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif" width=225> |
+| [214-vision-paddle-classification](notebooks/214-vision-paddle-classification/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F214-vision-paddle-classification%2F214-vision-paddle-classification.ipynb) | PaddlePaddle Image Classification with OpenVINO| |
+| [218-vehicle-detection-and-recognition](notebooks/218-vehicle-detection-and-recognition/)<br> | Use pre-trained models to detect and recognize vehicles and their attributes with OpenVINO | <img src = "https://user-images.githubusercontent.com/47499836/163544861-fa2ad64b-77df-4c16-b065-79183e8ed964.png" width=225> |
+
+
 
 </details>
 </p>
@@ -171,7 +180,7 @@ Live inference demos that run on a webcam or video files.
 </p>
 
 
-If you have some problems please check the [troubleshooting section](#troubleshooting) or the [FAQ section](#faq)
+If you run into issues, please check the [troubleshooting section](#troubleshooting), [FAQs](#faq) or start a GitHub [discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions). 
 
 Notebooks with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](#installation) and run the notebooks locally.
 
@@ -313,7 +322,7 @@ Made with [contributors-img](https://contrib.rocks).
 
 ## ❓ FAQ
 
-* [Which devices does OpenVINO support?](https://docs.openvinotoolkit.org/latest/openvino_docs_IE_DG_supported_plugins_Supported_Devices.html)
+* [Which devices does OpenVINO support?](https://docs.openvino.ai/2022.1/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html)
 * [What is the first CPU generation you support with OpenVINO?](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/system-requirements.html)
 * [Are there any success stories about deploying real-world solutions with OpenVINO?](https://www.intel.com/content/www/us/en/internet-of-things/ai-in-production/success-stories.html)
 

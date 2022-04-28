@@ -1,4 +1,4 @@
-openvino-dev==2022.1.0.dev20220302
+openvino-dev==2022.1.0
 gdown
 pytube
 yaspin
@@ -54,3 +54,5 @@ nltk>=3.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
 scikit-learn>=0.24.2 # not directly required, pinned by Snyk to avoid a vulnerability
 paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
+nest-asyncio<=1.5.4
+jupyter-client<=7.2.0
