@@ -1,15 +1,13 @@
-# Image Inpainting with OpenVINO
+# Image In-painting with OpenVINO
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Chamodya-ka/openvino_notebooks/main?labpath=%2Fnotebooks%2F216-image-inpainting-GMCNN%2F216-image-inpainting-GMCNN.ipynb)
+![object detection](https://user-images.githubusercontent.com/4547501/165950859-a77cfb4a-bfaa-4ea7-8cef-84c29901976c.png)
 
-<img align='center' src="data/results_expected.png" alt="drawing" width="800"/>
-
-Image inpainting is the task of filling missing pixels of an image.
-Here we use a generative multi column convolution neural network model for this purpose.
+Image in-painting is the task of filling missing pixels of an image.
+Here we use a generative multi-column convolution neural network (GMCNN) model for this purpose.
 
 ## Notebook Contents
 
-This notebook provides a tutorial on how to use image inpainting with OpenVINO. Model used in this notebook is [GMCNN-places2-tf](https://docs.openvino.ai/latest/omz_models_model_gmcnn_places2_tf.html)
+This notebook provides a tutorial on how to use image in-painting with OpenVINO. Model used in this notebook is [GMCNN-places2-tf](https://docs.openvino.ai/latest/omz_models_model_gmcnn_places2_tf.html)
 
 ## Installation Instructions
 
