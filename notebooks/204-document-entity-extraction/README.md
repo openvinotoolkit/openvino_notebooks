@@ -13,7 +13,7 @@ NER systems can pull entities from an unstructured collection of natural languag
 This notebook demonstrates entity extraction from either a simple text, an image or a PDF file, with OpenVINO using the [Squad-tuned BERT](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/bert-small-uncased-whole-word-masking-squad-int8-0002) model from Open Model Zoo. In the notebook we show how to create the following pipeline:
 
 <p align="center" width="100%">
-    <img width="80%" src="https://user-images.githubusercontent.com/33627846/166121871-12bff9f7-c5e7-43fd-b370-cd0af05c24ba.png"> 
+    <img width="80%" src="https://user-images.githubusercontent.com/33627846/166122112-d5c45a4c-892e-438c-aff2-003368bdcad5.png"> 
 </p>
 
 
