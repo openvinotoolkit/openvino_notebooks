@@ -8,7 +8,7 @@ This tutorial explains how to convert [TensorFlow](www.tensorflow.org) models to
 
 ## Notebook Contents
 
-The notebook uses OpenVINO [Model Optimizer](https://docs.openvinotoolkit.org/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) to convert the same [MobilenetV3](https://docs.openvinotoolkit.org/latest/omz_models_model_mobilenet_v3_small_1_0_224_tf.html) used in the [001-hello-world notebook](../001-hello-world/001-hello-world.ipynb).
+The notebook uses OpenVINO [Model Optimizer](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) to convert the same [MobilenetV3](https://docs.openvino.ai/latest/omz_models_model_mobilenet_v3_small_1_0_224_tf.html) used in the [001-hello-world notebook](../001-hello-world/001-hello-world.ipynb).
 
 ## Installation Instructions
 
