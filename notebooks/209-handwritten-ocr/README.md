@@ -10,7 +10,7 @@ In this tutorial we demonstrate optical character recognition for handwritten Ch
 
 ## Notebook Contents
 
-This notebook provides a tutorial on how to use OCR for handwritten Japanese and simplified Chinese. Models used for this notebook are [handwritten-japanese-recognition](https://docs.openvinotoolkit.org/latest/omz_models_model_handwritten_japanese_recognition_0001.html) and [handwritten-simplified-chinese](https://docs.openvinotoolkit.org/latest/omz_models_model_handwritten_simplified_chinese_recognition_0001.html). To decode model output to readable text [kondate_nakayosi](https://github.com/openvinotoolkit/open_model_zoo/blob/master/data/dataset_classes/kondate_nakayosi.txt) and [scut_ept](https://github.com/openvinotoolkit/open_model_zoo/blob/master/data/dataset_classes/scut_ept.txt) charlists are used. Both models are available from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/).
+This notebook provides a tutorial on how to use OCR for handwritten Japanese and simplified Chinese. Models used for this notebook are [handwritten-japanese-recognition](https://docs.openvino.ai/latest/omz_models_model_handwritten_japanese_recognition_0001.html) and [handwritten-simplified-chinese](https://docs.openvino.ai/latest/omz_models_model_handwritten_simplified_chinese_recognition_0001.html). To decode model output to readable text [kondate_nakayosi](https://github.com/openvinotoolkit/open_model_zoo/blob/master/data/dataset_classes/kondate_nakayosi.txt) and [scut_ept](https://github.com/openvinotoolkit/open_model_zoo/blob/master/data/dataset_classes/scut_ept.txt) charlists are used. Both models are available from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/).
 
 ## Installation Instructions
 
