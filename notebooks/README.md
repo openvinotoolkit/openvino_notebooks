@@ -93,7 +93,7 @@ More amazing notebooks here! Please take a look of the complete list.
 | [213-question-answering](213-question-answering/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F213-question-answering%2F213-question-answering.ipynb) | Answer your questions basing on a context | <img src="https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif" width=225> |
 | [214-vision-paddle-classification](214-vision-paddle-classification/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F214-vision-paddle-classification%2F214-vision-paddle-classification.ipynb) | PaddlePaddle Image Classification with OpenVINO| |
 | [218-vehicle-detection-and-recognition](218-vehicle-detection-and-recognition/)<br> | Use pre-trained models to detect and recognize vehicles and their attributes with OpenVINO | <img src = "https://user-images.githubusercontent.com/47499836/163544861-fa2ad64b-77df-4c16-b065-79183e8ed964.png" width=225> |
-
+| [224-vision-image-colorization](notebooks/224-vision-image-colorization/)<br> | Use pre-trained models to colorize black \& white images using OpenVINO | <img src = "https://user-images.githubusercontent.com/18904157/166343139-c6568e50-b856-4066-baef-5cdbd4e8bc18.png" width=225> |
 
 
 </details>
