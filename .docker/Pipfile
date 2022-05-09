@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 aiohttp = ">=3.7.4"
+boto3 = "*"
 fastseg = "*"
 gdown = "*"
 geffnet = "==0.9.8"
