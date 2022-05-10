@@ -1,9 +1,9 @@
 {
     "tags": {
-        "GPU": ["device_name = \"GPU\""],
-        "Auto device": ["device_name=\"AUTO\""],
+        "GPU": ["device_name = \"GPU\", "device_name=\"GPU\""],
+        "Auto device": ["device_name=\"AUTO\", "device_name = \"AUTO\""],
 
-        "Dynamic Shape": ["] = -1\n"],
+        "Dynamic Shape": [".partial_shape", "Dimension("],
         "Reshape Model": ["model.reshape("],
         "Async Inference": [".start_async("],
 
