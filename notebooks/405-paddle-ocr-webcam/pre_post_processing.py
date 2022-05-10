@@ -52,6 +52,7 @@ def DetResizeForTest(data):
     data['shape'] = np.array([src_h, src_w, ratio_h, ratio_w])
     return data
 
+
 def NormalizeImage(data):
     """ normalize image such as substract mean, divide std
     """
@@ -73,6 +74,7 @@ def NormalizeImage(data):
     data['image'] = (img.astype('float32') * scale - mean) / std
     return data
 
+
 def unclip(box):
     unclip_ratio = 2.0
     poly = Polygon(box)
@@ -81,6 +83,7 @@ def unclip(box):
     offset.AddPath(box, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
     expanded = np.array(offset.Execute(distance))
     return expanded
+
 
 def get_mini_boxes(contour):
     bounding_box = cv2.minAreaRect(contour)
@@ -105,6 +108,7 @@ def get_mini_boxes(contour):
     ]
     return box, min(bounding_box[1])
 
+
 def box_score_fast(bitmap, _box):
     '''
     box_score_fast: use bbox mean score as the mean score
@@ -121,6 +125,7 @@ def box_score_fast(bitmap, _box):
     box[:, 1] = box[:, 1] - ymin
     cv2.fillPoly(mask, box.reshape(1, -1, 2).astype(np.int32), 1)
     return cv2.mean(bitmap[ymin:ymax + 1, xmin:xmax + 1], mask)[0]
+
 
 def boxes_from_bitmap(pred, _bitmap, dest_width, dest_height):
     '''
@@ -169,6 +174,7 @@ def boxes_from_bitmap(pred, _bitmap, dest_width, dest_height):
         scores.append(score)
     return np.array(boxes, dtype=np.int16), scores
 
+
 def filter_tag_det_res(dt_boxes, image_shape):
     img_height, img_width = image_shape[0:2]
     dt_boxes_new = []
@@ -182,6 +188,7 @@ def filter_tag_det_res(dt_boxes, image_shape):
         dt_boxes_new.append(box)
     dt_boxes = np.array(dt_boxes_new)
     return dt_boxes
+
 
 def order_points_clockwise(pts):
     """
@@ -207,11 +214,13 @@ def order_points_clockwise(pts):
     rect = np.array([tl, tr, br, bl], dtype="float32")
     return rect
 
+
 def clip_det_res(points, img_height, img_width):
     for pno in range(points.shape[0]):
         points[pno, 0] = int(min(max(points[pno, 0], 0), img_width - 1))
         points[pno, 1] = int(min(max(points[pno, 1], 0), img_height - 1))
     return points
+
 
 def draw_text_det_res(dt_boxes, img_file):
     src_im = img_file
@@ -219,6 +228,7 @@ def draw_text_det_res(dt_boxes, img_file):
         box = np.array(box).astype(np.int32).reshape(-1, 2)
         cv2.polylines(src_im, [box], True, color=(255, 255, 0), thickness=2)
     return src_im
+
 
 def sorted_boxes(dt_boxes):
     """
@@ -239,6 +249,7 @@ def sorted_boxes(dt_boxes):
             _boxes[i] = _boxes[i + 1]
             _boxes[i + 1] = tmp
     return _boxes
+
 
 def get_rotate_crop_image(img, points):
     '''
@@ -274,6 +285,7 @@ def get_rotate_crop_image(img, points):
         dst_img = np.rot90(dst_img)
     return dst_img
 
+
 ## Postprocessing for recognition
 postprocess_params = {
             'name': 'CTCLabelDecode',
@@ -281,6 +293,7 @@ postprocess_params = {
             "character_dict_path": "./data/ppocr_keys_v1.txt",
             "use_space_char": True
         }
+
 
 class BaseRecLabelDecode(object):
     """ Convert between text-label and text-index """
@@ -329,9 +342,11 @@ class BaseRecLabelDecode(object):
             self.dict[char] = i
         self.character = dict_character
 
+        
     def add_special_char(self, dict_character):
         return dict_character
 
+    
     def decode(self, text_index, text_prob=None, is_remove_duplicate=False):
         """ convert text-index into text-label. """
         result_list = []
@@ -358,9 +373,11 @@ class BaseRecLabelDecode(object):
             result_list.append((text, np.mean(conf_list)))
         return result_list
 
+    
     def get_ignored_tokens(self):
         return [0]  # for ctc blank
 
+    
 class CTCLabelDecode(BaseRecLabelDecode):
     """ Convert between text-label and text-index """
 
@@ -372,6 +389,7 @@ class CTCLabelDecode(BaseRecLabelDecode):
         super(CTCLabelDecode, self).__init__(character_dict_path,
                                              character_type, use_space_char)
 
+        
     def __call__(self, preds, label=None, *args, **kwargs):
         if isinstance(preds, paddle.Tensor):
             preds = preds.numpy()
@@ -383,15 +401,18 @@ class CTCLabelDecode(BaseRecLabelDecode):
         label = self.decode(label)
         return text, label
 
+    
     def add_special_char(self, dict_character):
         dict_character = ['blank'] + dict_character
         return dict_character
 
+    
 def build_post_process(config):
     config = copy.deepcopy(config)
     module_name = config.pop('name')
     module_class = eval(module_name)(**config)
     return module_class
+
 
 def draw_ocr_box_txt(image,
                      boxes,
