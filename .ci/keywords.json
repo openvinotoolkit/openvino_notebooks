@@ -1,0 +1,27 @@
+{
+    "tags": {
+        "GPU": ["device_name = \"GPU\"", "device_name=\"GPU\""],
+        "Auto device": ["device_name=\"AUTO\"", "device_name = \"AUTO\""],
+
+        "Dynamic Shape": [".partial_shape", "Dimension("],
+        "Reshape Model": ["model.reshape("],
+        "Async Inference": [".start_async("],
+
+        "Download Model": ["omz_downloader"],
+        "Convert Model": ["omz_converter"],
+        "Optimize Model": ["import openvino.tools.mo", "from openvino.tools.mo", "!mo "],
+        "Benchmark Model": ["benchmark_app"],
+        "OMZ Info Dumper": ["omz_info_dumper"],
+
+        "Paddle": ["import paddle", "from paddle"],
+        "Torchvision": ["import torchvision", "from torchvision"],
+        "Compression": ["import compression", "from compression"],
+        "Pytorch": ["import torch", "from torch"],
+        "NNCF": ["import nncf", "from nncf"],
+        "Transformers": ["import transformers", "from transformers"],
+        "Tensorflow": ["import tensorflow", "from tensorflow"],
+
+        "ONNX": [".onnx"],
+        "Train Model": ["model.fit(", "model.train()"]
+    } 
+}
