@@ -1,0 +1,35 @@
+models:
+  - name: unet_camvid
+
+    launchers:
+      - framework: dlsdk
+        device: CPU
+        adapter: segmentation
+
+    datasets:
+      - name: CamVid
+        reader: pillow_imread
+        data_source: data/CamVid
+        annotation_conversion:
+          converter: camvid
+          annotation_file: data/CamVid/val.txt
+        annotation: camvid.pickle
+        dataset_meta: camvid.json
+        preprocessing:
+          - type: resize
+            dst_height: 368
+            dst_width: 480
+            use_pillow: True
+            interpolation: BILINEAR
+          - type: rgb_to_bgr
+
+        postprocessing:
+          - type: resize_segmentation_mask
+            apply_to: annotation
+            dst_height: 368
+            dst_width: 480
+
+        metrics:
+          - type: mean_iou
+            use_argmax: True
+            ignore_label: 11
