@@ -20,12 +20,12 @@ import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import openvino.inference_engine
+import openvino.runtime
 from async_pipeline import AsyncPipeline
 from IPython.display import HTML, Image, Markdown, clear_output, display
 from matplotlib.lines import Line2D
 from models import model
-from openvino.inference_engine import IECore
+from openvino.runtime import Core
 from tqdm.notebook import tqdm_notebook
 
 
@@ -637,7 +637,7 @@ def benchmark_model(
     :param batch: Batch size
     :param cache_dir: Directory that contains model/kernel cache files
     """
-    ie = IECore()
+    ie = Core()
     model_path = Path(model_path)
     if ("GPU" in device) and ("GPU" not in ie.available_devices):
         raise ValueError(
@@ -705,7 +705,7 @@ class DeviceNotFoundAlert(NotebookAlert):
         :return: A formatted alert box with the message that `device` is not available, and a list
                  of devices that are available.
         """
-        ie = IECore()
+        ie = Core()
         supported_devices = ie.available_devices
         self.message = (
             f"Running this cell requires a {device} device, "
@@ -729,7 +729,7 @@ def check_device(device: str) -> bool:
     :return: True if the device is available, False if not. If the device is not available,
              a DeviceNotFoundAlert will be shown.
     """
-    ie = IECore()
+    ie = Core()
     if device not in ie.available_devices:
         DeviceNotFoundAlert(device)
         return False
@@ -745,7 +745,7 @@ def check_openvino_version(version: str) -> bool:
     :return: True if the version is installed, False if not. If the version is not installed,
              an alert message will be shown.
     """
-    installed_version = openvino.inference_engine.get_version()
+    installed_version = openvino.runtime.get_version()
     if version not in installed_version:
         NotebookAlert(
             f"This notebook requires OpenVINO {version}. "
