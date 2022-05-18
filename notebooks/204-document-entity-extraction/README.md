@@ -1,6 +1,6 @@
 # Document Entity Extraction with OpenVINO
 
-![](https://user-images.githubusercontent.com/33627846/168828598-5349f532-fdc6-4a11-9ad5-da8ea51b5ef9.gif)
+![](https://user-images.githubusercontent.com/33627846/169033561-2b10abc0-abb6-4d10-afbe-da921ed77432.gif)
 
 Document Entity extraction is a part of information retrieval and natural language processing (NLP), which is able to extract entities. Given a group of text or documents of any format, recognizing and extracting specific types of entities is called Named Entity Extraction (NER). It's used across industries in use cases related to data enrichment, content recommendation, customer support, advanced search algorithms etc.
 
