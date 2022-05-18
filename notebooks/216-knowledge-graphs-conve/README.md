@@ -1,2 +1,3 @@
 ## Knowledge graphs model optimization using the Intel OpenVINO toolkit
-Knowledge graphs provide an efficient way to encode domain information and are used in a number of real-world applications. This notebook showcases optimizations that can be obtained using the Intel OpenVINO toolkit on a neural networks based Knowledge Graph embeddings model (ConvE). The ConvE model we use is an implementation of the paper Convolutional 2D Knowledge Graph Embeddings by Tim Dettmers et al. (https://arxiv.org/abs/1707.01476).
+Knowledge graphs provide an efficient way to encode domain information and are used in a number of real-world applications. <br>
+This notebook showcases optimizations that can be obtained using the Intel OpenVINO toolkit on a neural networks based Knowledge Graph embeddings model (ConvE). The ConvE model we use is an implementation of the paper Convolutional 2D Knowledge Graph Embeddings by Tim Dettmers et al. (https://arxiv.org/abs/1707.01476).
