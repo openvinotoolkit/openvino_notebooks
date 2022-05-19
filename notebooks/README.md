@@ -93,6 +93,7 @@ More amazing notebooks here! Please take a look of the complete list.
 | [213-question-answering](213-question-answering/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F213-question-answering%2F213-question-answering.ipynb) | Answer your questions basing on a context | <img src="https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif" width=225> |
 | [214-vision-paddle-classification](214-vision-paddle-classification/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F214-vision-paddle-classification%2F214-vision-paddle-classification.ipynb) | PaddlePaddle Image Classification with OpenVINO| |
 | [215-image-inpainting](215-image-inpainting/)<br> | Fill missing pixels with image in-painting | <img src="https://user-images.githubusercontent.com/4547501/167121084-ec58fbdb-b269-4de2-9d4c-253c5b95de1e.png" width=225> |
+| [216-knowledge-graphs-conve](216-knowledge-graphs-conve/)<br> | Optimize the knowledge graph embeddings model (ConvE) with OpenVINO ||
 | [218-vehicle-detection-and-recognition](218-vehicle-detection-and-recognition/)<br> | Use pre-trained models to detect and recognize vehicles and their attributes with OpenVINO | <img src = "https://user-images.githubusercontent.com/47499836/163544861-fa2ad64b-77df-4c16-b065-79183e8ed964.png" width=225> |
 
 
