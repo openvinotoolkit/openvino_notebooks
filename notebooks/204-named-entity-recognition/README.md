@@ -1,12 +1,12 @@
 # Named Entity Recognition with OpenVINO
 
-![](https://user-images.githubusercontent.com/33627846/169033561-2b10abc0-abb6-4d10-afbe-da921ed77432.gif)
+![](https://user-images.githubusercontent.com/33627846/169470030-0370963e-6ad8-49e3-be7a-f02a2c677733.gif)
 
 Named Entity Recognition (NER) is a part of information retrieval and natural language processing (NLP), which is able to extract entities. Given a group of sentences in form of text, recognizing and extracting specific types of entities is called Named Entity Extraction. It's used across industries in use cases related to data enrichment, content recommendation, customer support, text summarization, advanced search algorithms etc.
 
 NER systems can pull entities from an unstructured collection of natural language documents called, in that case, knowledge base. In scope of this notebook, we demonstrate entity recognition from unstructured data using simple text, but this can be extended to images or even a PDF file. NER from an image or PDF file would also include an optical character recognition (OCR) preprocessing step before launching entity extraction. This notebook is continuation of [213-question-answering](https://github.com/openvinotoolkit/openvino_notebooks/tree/204-nlp-document-inference/notebooks/213-question-answering) notebook.
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F204-document-entity-extraction%2F204-document-entity-extraction.ipynb)<br> *Binder is a free service where the webcam will not work, and performance on the video will not be good. For best performance, we recommend installing the notebooks locally.*
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F204-named-entity-recognition%2F204-named-entity-recognition.ipynb)<br> *Binder is a free service where the webcam will not work, and performance on the video will not be good. For best performance, we recommend installing the notebooks locally.*
 
 ## Notebook Contents
 
