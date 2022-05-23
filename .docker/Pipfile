@@ -26,7 +26,7 @@ nbval = "*"
 nest-asyncio = "<=1.5.4"
 nltk = ">=3.6.4"
 nncf = {extras = ["torch", "tf"]}
-openvino-dev = {extras = ["nncf", "onnx"]}
+openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.1.0"}
 ovmsclient = "*"
 paddle2onnx = ">=0.6"
 paddlehub = "*"

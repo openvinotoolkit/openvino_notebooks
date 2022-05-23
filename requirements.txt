@@ -14,9 +14,6 @@ torch>=1.5.1+cpu,<=1.7.1+cpu; sys_platform =='linux' or platform_system == 'Wind
 torchvision>=0.6.1+cpu,<=0.8.2+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchmetrics==0.6.2
 
-# Replace by adding tf as a dependency for nncf when merging to main branch
-tensorflow==2.5.*
-
 # PaddlePaddle notebook requirements
 # For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
 paddlepaddle==2.2.*
@@ -28,7 +25,7 @@ ppgan==2.1.*
 transformers
 
 # NNCF notebook requirements
-nncf
+nncf[tf, torch]
 tensorflow_datasets==4.2.0
 
 # CT scan training/inference requirements
