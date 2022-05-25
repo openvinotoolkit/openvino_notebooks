@@ -25,8 +25,8 @@ monai = "*"
 nbval = "*"
 nest-asyncio = "<=1.5.4"
 nltk = ">=3.6.4"
-nncf = {extras = ["torch", "tf"], version = ">=2.1.0"}
-openvino-dev = {extras = ["onnx"], version = "==2022.1.0"}
+nncf = {extras = ["torch", "tf"]}
+openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.1.0"}
 ovmsclient = "*"
 paddle2onnx = ">=0.6"
 paddlehub = "*"
@@ -45,7 +45,7 @@ setuptools = ">56.0.0"
 sklearn = "*"
 supervisor = "==4.1.0"
 tensorflow_datasets = "*"
-tensorflow = ">=2.4.*" # pin before nncf update
+tensorflow = "*"
 torch = "<=1.7.1+cpu,>=1.5.1+cpu"
 torchmetrics = "==0.6.2"
 torchvision = "<=0.8.2+cpu,>=0.6.1+cpu"
