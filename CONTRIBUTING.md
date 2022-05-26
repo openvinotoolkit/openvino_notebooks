@@ -82,9 +82,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    dependencies and will only add them if they add real value. Do not let this discourage you if
    you do want to include a certain package! If it is necessary, or can be useful for other
    notebooks too, we are open to adding it.
-2. All notebooks are saved with the `openvino_env` kernel. This ensures that there is never a
-   conflict between a user's other Python installations and the notebook installation.
-3. The notebooks are located in the "notebooks" subdirectory. There is a subdirectory for every
+2. The notebooks are located in the "notebooks" subdirectory. There is a subdirectory for every
    notebook, with generally the same base name as the notebook.  For example, the
    001-hello-world.ipynb notebook can be found in the 001-hello-world directory.
    - See the [Notebook naming](#notebook-naming) section below, for the
@@ -94,11 +92,11 @@ To do this, there are a few requirements that all notebooks need to pass.
    - Add any supporting files to this subdirectory too. Supporting files should
      be small (generally less than 5MB). Larger images, datasets and model
      files should be downloaded from within the notebook.
-4. All related files, with the exception of Open Model Zoo models, should be saved to the notebook subdirectory,
+3. All related files, with the exception of Open Model Zoo models, should be saved to the notebook subdirectory,
    even if that means that there is a small amount of duplication. For Open Model Zoo models, see the directory
    structure in the [104 Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/main/notebooks/104-model-tools)
    notebook.
-5. The notebooks should provide an easy way to clean up the downloaded data, for example with a
+4. The notebooks should provide an easy way to clean up the downloaded data, for example with a
    commented-out cell at the end of the notebook.
 
 ### Coding Guidelines

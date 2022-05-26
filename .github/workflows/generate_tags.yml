@@ -1,0 +1,38 @@
+# Generate tags for each notebook
+
+name: Generate tags
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+    - 'main'
+    paths:
+    - 'notebooks/**.ipynb'
+    - '.ci/keywords.json'
+    - '.ci/tagger.py'
+
+jobs:
+  build_codecheck:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-20.04  # change cachepip step when changing this
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Dotenv Action
+      id: dotenv
+      uses: xom9ikk/dotenv@v1.0.2
+      with:
+        path: ./.github/workflows
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+    - name: Run tagger and store results in file
+      run: |
+        python .ci/tagger.py > notebook-tags-${{ github.sha }}.json
+    - name: Archive notebook tags
+      uses: actions/upload-artifact@v2
+      with:
+        name: notebook-tags
+        path: notebook-tags-${{ github.sha }}.json

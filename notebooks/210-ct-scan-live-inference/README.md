@@ -43,7 +43,7 @@ For a minimum installation:
 ## All notebooks in this series:
 
 - [Data Preparation for 2D Segmentation of 3D Medical Data](../110-ct-segmentation-quantize/data-preparation-ct-scan.ipynb)
-- [Train a 2D-UNet Medical Imaging Model with PyTorch Lightning](/..) 
+- [Train a 2D-UNet Medical Imaging Model with PyTorch Lightning](../110-ct-segmentation-quantize/pytorch-monai-training.ipynb) 
 - [Convert and Quantize a UNet Model and Show Live Inference](../110-ct-segmentation-quantize/110-ct-segmentation-quantize.ipynb)
 - Live Inference and Benchmark CT-scan data (this notebook)
 
