@@ -5,28 +5,30 @@ on:
   pull_request:
     branches:
     - 'main'
-    - '2022.1'
+    - '2021.4'
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
     - 'requirements.txt'
     - '.ci/*'
     - '.github/workflows/nbval.yml'
+    - '.github/workflows/.env'
   push:
     branches:
     - 'main'
-    - '2022.1'
+    - '2021.4'
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
     - 'requirements.txt'
     - '.ci/*'
     - '.github/workflows/nbval.yml'
+    - '.github/workflows/.env'
   schedule:
     - cron:  '30 8 * * *'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -123,9 +125,9 @@ jobs:
     - name: Cache openvino packages
       if: steps.cachepip.outputs.cache-hit != 'true'
       run: |
-        python -m pip install --upgrade pip==21.3.*
+        python -m pip install --upgrade pip
         mkdir pipcache
-        python -m pip install --cache-dir pipcache --no-deps openvino==2022.1.0.dev20220302 openvino-dev==2022.1.0.dev20220302 nncf
+        python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
         cp -r pipcache pipcache_openvino
         python -m pip uninstall -y openvino openvino-dev nncf
 
@@ -145,7 +147,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip==21.3.*
+        python -m pip install --upgrade pip
         python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
         python -m ipykernel install --user --name openvino_env
 
@@ -186,14 +188,24 @@ jobs:
 
     # Main notebooks test. Verifies that all notebooks run without errors
     # Temporary workaround for Python 3.9 while NNCF is not updated to TF 2.5
+    # Temporary excluding 107 and 114 from MacOS due to performance issues
     - name: Analysing with nbval
-      if: matrix.python == '3.9'
+      if: matrix.python == '3.9' && runner.os == 'MacOS'
       run: |
-          python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10
+            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/114-quantization-simplified-mode --durations 10
     - name: Analysing with nbval
-      if: matrix.python != '3.9'
+      if: matrix.python != '3.9' && runner.os == 'MacOS'
       run: |
-          python -m pytest --nbval -k "test_ or notebook_utils" --durations 10
+            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/114-quantization-simplified-mode --durations 10
+    - name: Analysing with nbval
+      if: matrix.python == '3.9' && runner.os != 'MacOS'
+      run: |
+            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10
+    - name: Analysing with nbval
+      if: matrix.python != '3.9' && runner.os != 'MacOS'
+      run: |
+            python -m pytest --nbval -k "test_ or notebook_utils" --durations 10  
+
 
     # Show the cache after running the notebooks
     - name: Show cache
@@ -201,3 +213,4 @@ jobs:
         ls -laR ${{ env.CACHE_DIR }}
         du -sh ${{ env.CACHE_DIR }}
       if: runner.os != 'Windows'
+

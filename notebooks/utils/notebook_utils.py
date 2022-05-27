@@ -14,20 +14,19 @@ import urllib.parse
 import urllib.request
 from os import PathLike
 from pathlib import Path
-from typing import List, NamedTuple, Optional, Tuple
+from typing import Callable, List, NamedTuple, Optional, Tuple
 
 import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import openvino.inference_engine
+from async_pipeline import AsyncPipeline
 from IPython.display import HTML, Image, Markdown, clear_output, display
 from matplotlib.lines import Line2D
+from models import model
 from openvino.inference_engine import IECore
 from tqdm.notebook import tqdm_notebook
-
-from async_pipeline import AsyncPipeline
-from models import model
 
 
 # ## Files
@@ -76,7 +75,7 @@ def download_file(
     directory: PathLike = None,
     show_progress: bool = True,
     silent: bool = False,
-    timeout: int = 5,
+    timeout: int = 10,
 ) -> str:
     """
     Download a file from a url and save it to the local filesystem. The file is saved to the
@@ -90,6 +89,7 @@ def download_file(
                       If None the file will be saved to the current working directory
     :param show_progress: If True, show an TQDM ProgressBar
     :param silent: If True, do not print a message if the file already exists
+    :param timeout: Number of seconds before cancelling the connection attempt
     :return: path to downloaded file
     """
     try:
@@ -98,10 +98,9 @@ def download_file(
         urllib.request.install_opener(opener)
         urlobject = urllib.request.urlopen(url, timeout=timeout)
         if filename is None:
-            filename = (
-                urlobject.info().get_filename()
-                or Path(urllib.parse.urlparse(url).path).name
-            )
+            filename = urlobject.info().get_filename() or Path(urllib.parse.urlparse(url).path).name
+    except urllib.error.HTTPError as e:
+        raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
     except urllib.error.URLError as error:
         if isinstance(error.reason, socket.timeout):
             raise Exception(
@@ -110,10 +109,9 @@ def download_file(
                 "internet connection is slow, you can call `download_file(url, timeout=30)` to "
                 "wait for 30 seconds before raising this error."
             ) from None
-    except urllib.error.HTTPError as e:
-        raise Exception(
-            f"File downloading failed with error: {e.code} {e.msg}"
-        ) from None
+        else:
+            raise
+
     filename = Path(filename)
     if len(filename.parts) > 1:
         raise ValueError(
@@ -138,9 +136,7 @@ def download_file(
             desc=str(filename),
             disable=not show_progress,
         )
-        urllib.request.urlretrieve(
-            url, filename, reporthook=progress_callback.update_to
-        )
+        urllib.request.urlretrieve(url, filename, reporthook=progress_callback.update_to)
         if os.stat(filename).st_size >= urlobject_size:
             progress_callback.update(urlobject_size - progress_callback.n)
             progress_callback.refresh()
@@ -150,7 +146,7 @@ def download_file(
     return filename.resolve()
 
 
-def download_ir_model(model_xml_url: str, destination_folder: str = None) -> str:
+def download_ir_model(model_xml_url: str, destination_folder: PathLike = None) -> PathLike:
     """
     Download IR model from `model_xml_url`. Downloads model xml and bin file; the weights file is
     assumed to exist at the same location and name as model_xml_url with a ".bin" extension.
@@ -161,9 +157,7 @@ def download_ir_model(model_xml_url: str, destination_folder: str = None) -> str
     :return: path to downloaded xml model file
     """
     model_bin_url = model_xml_url[:-4] + ".bin"
-    model_xml_path = download_file(
-        model_xml_url, directory=destination_folder, show_progress=False
-    )
+    model_xml_path = download_file(model_xml_url, directory=destination_folder, show_progress=False)
     download_file(model_bin_url, directory=destination_folder)
     return model_xml_path
 
@@ -189,14 +183,14 @@ def normalize_minmax(data):
     return (data - data.min()) / (data.max() - data.min())
 
 
-def to_rgb(image_data) -> np.ndarray:
+def to_rgb(image_data: np.ndarray) -> np.ndarray:
     """
     Convert image_data from BGR to RGB
     """
     return cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
 
 
-def to_bgr(image_data) -> np.ndarray:
+def to_bgr(image_data: np.ndarray) -> np.ndarray:
     """
     Convert image_data from RGB to BGR
     """
@@ -227,7 +221,9 @@ class VideoPlayer:
     def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
-            raise RuntimeError(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
+            raise RuntimeError(
+                f"Cannot open {'camera' if isinstance(source, int) else ''} {source}"
+            )
         # skip first N frames
         self.__cap.set(cv2.CAP_PROP_POS_FRAMES, skip_first_frames)
         # fps of input file
@@ -384,7 +380,7 @@ BinarySegmentation = SegmentationMap(binary_labels)
 
 
 def segmentation_map_to_image(
-    result: np.ndarray, colormap: np.ndarray, remove_holes=False
+    result: np.ndarray, colormap: np.ndarray, remove_holes: bool = False
 ) -> np.ndarray:
     """
     Convert network result of floating point numbers to an RGB image with
@@ -430,9 +426,7 @@ def segmentation_map_to_image(
     return mask
 
 
-def segmentation_map_to_overlay(
-    image, result, alpha, colormap, remove_holes=False
-) -> np.ndarray:
+def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=False) -> np.ndarray:
     """
     Returns a new image where a segmentation mask (created with colormap) is overlayed on
     the source image.
@@ -488,9 +482,7 @@ def viz_result_image(
     if bgr_to_rgb:
         source_image = to_rgb(source_image)
     if resize:
-        result_image = cv2.resize(
-            result_image, (source_image.shape[1], source_image.shape[0])
-        )
+        result_image = cv2.resize(result_image, (source_image.shape[1], source_image.shape[0]))
 
     num_images = 1 if source_image is None else 2
 
@@ -536,7 +528,7 @@ def viz_result_image(
 def showarray(frame: np.ndarray, display_handle=None):
     """
     Display array `frame`. Replace information at `display_handle` with `frame`
-    encoded as jpeg image
+    encoded as jpeg image. `frame` is expected to have data in BGR order.
 
     Create a display_handle with: `display_handle = display(display_id=True)`
     """
@@ -548,7 +540,9 @@ def showarray(frame: np.ndarray, display_handle=None):
     return display_handle
 
 
-def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
+def show_live_inference(
+    ie, image_paths: List, model: model.Model, device: str, reader: Optional[Callable] = None
+):
     """
     Do inference of images listed in `image_paths` on `model` on the given `device` and show
     the results in real time in a Jupyter Notebook
@@ -556,6 +550,8 @@ def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
     :param image_paths: List of image filenames to load
     :param model: Model instance for inference
     :param device: Name of device to perform inference on. For example: "CPU"
+    :param reader: Image reader. Should return a numpy array with image data.
+                   If None, cv2.imread will be used, with the cv2.IMREAD_UNCHANGED flag
     """
     display_handle = None
     next_frame_id = 0
@@ -584,7 +580,10 @@ def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
         if pipeline.is_ready():
             # Submit new image to async pipeline
             image_path = image_paths[next_frame_id]
-            image = cv2.imread(filename=str(image_path), flags=cv2.IMREAD_UNCHANGED)
+            if reader is None:
+                image = cv2.imread(filename=str(image_path), flags=cv2.IMREAD_UNCHANGED)
+            else:
+                image = reader(str(image_path))
             pipeline.submit_data(
                 inputs={input_layer: image}, id=next_frame_id, meta={"frame": image}
             )
@@ -608,9 +607,7 @@ def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
     duration = end_time - start_time
     fps = len(image_paths) / duration
     print(f"Loaded model to {device} in {load_end_time-load_start_time:.2f} seconds.")
-    print(
-        f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}"
-    )
+    print(f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}")
 
     del pipeline.exec_net
     del pipeline
@@ -621,11 +618,14 @@ def show_live_inference(ie, image_paths: List, model: model.Model, device: str):
 # In[ ]:
 
 
-def benchmark_model(model_path: os.PathLike,
-                    device: str = "CPU",
-                    seconds: int = 60, api: str = "sync",
-                    batch: int = 1, 
-                    cache_dir: str = "model_cache"):
+def benchmark_model(
+    model_path: PathLike,
+    device: str = "CPU",
+    seconds: int = 60,
+    api: str = "async",
+    batch: int = 1,
+    cache_dir: PathLike = "model_cache",
+):
     """
     Benchmark model `model_path` with `benchmark_app`. Returns the output of `benchmark_app`
     without logging info, and information about the device
@@ -640,21 +640,33 @@ def benchmark_model(model_path: os.PathLike,
     ie = IECore()
     model_path = Path(model_path)
     if ("GPU" in device) and ("GPU" not in ie.available_devices):
-        raise ValueError(f"A GPU device is not available. Available devices are: {ie.available_devices}")
+        raise ValueError(
+            f"A GPU device is not available. Available devices are: {ie.available_devices}"
+        )
     else:
         benchmark_command = f"benchmark_app -m {model_path} -d {device} -t {seconds} -api {api} -b {batch} -cdir {cache_dir}"
-        display(Markdown(f"**Benchmark {model_path.name} with {device} for {seconds} seconds with {api} inference**"));
-        display(Markdown(f"Benchmark command: `{benchmark_command}`"));
+        display(
+            Markdown(
+                f"**Benchmark {model_path.name} with {device} for {seconds} seconds with {api} inference**"
+            )
+        )
+        display(Markdown(f"Benchmark command: `{benchmark_command}`"))
 
-        benchmark_output = get_ipython().run_line_magic('sx', '$benchmark_command')
-        benchmark_result = [line for line in benchmark_output
-                            if not (line.startswith(r"[") or line.startswith("  ") or line == "")]
+        benchmark_output = get_ipython().run_line_magic("sx", "$benchmark_command")
+        benchmark_result = [
+            line
+            for line in benchmark_output
+            if not (line.startswith(r"[") or line.startswith("  ") or line == "")
+        ]
         print("\n".join(benchmark_result))
         print()
         if "MULTI" in device:
-            devices = device.replace("MULTI:","").split(",")
+            devices = device.replace("MULTI:", "").split(",")
             for single_device in devices:
-                print(f"{single_device} device: {ie.get_metric(device_name=single_device, metric_name='FULL_DEVICE_NAME')}")
+                device_name = ie.get_metric(
+                    device_name=single_device, metric_name="FULL_DEVICE_NAME"
+                )
+                print(f"{single_device} device: {device_name}")
         else:
             print(f"Device: {ie.get_metric(device_name=device, metric_name='FULL_DEVICE_NAME')}")
 
@@ -701,13 +713,10 @@ class DeviceNotFoundAlert(NotebookAlert):
         )
         self.alert_class = "warning"
         if len(supported_devices) == 1:
-            self.message += (
-                f"The following device is available: {ie.available_devices[0]}"
-            )
+            self.message += f"The following device is available: {ie.available_devices[0]}"
         else:
             self.message += (
-                "The following devices are available: "
-                f"{', '.join(ie.available_devices)}"
+                "The following devices are available: " f"{', '.join(ie.available_devices)}"
             )
         super().__init__(self.message, self.alert_class)
 
