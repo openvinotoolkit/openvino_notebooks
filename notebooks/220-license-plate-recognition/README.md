@@ -10,7 +10,7 @@ And the result is:
 
 ## Notebook Contents
 
-This notebook demonstrates license plate recognition with OpenVINO. We use the [License Plate Recognition Model](https://docs.openvino.ai/2020.2/_models_intel_license_plate_recognition_barrier_0001_description_license_plate_recognition_barrier_0001.html) from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/). This model uses a small-footprint network trained end-to-end to recognize Chinese license plates in traffic.
+This notebook demonstrates license plate recognition with OpenVINO. We use the [License Plate Recognition Model](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/license-plate-recognition-barrier-0001) from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/). This model uses a small-footprint network trained end-to-end to recognize Chinese license plates in traffic.
 
 Here is the [Jupyter notebook](220-license-plate-recognition.ipynb)
 
