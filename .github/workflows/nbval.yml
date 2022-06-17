@@ -56,6 +56,7 @@ jobs:
 
     - name: Checkout repository
       uses: actions/checkout@v2
+    - uses: ilammy/msvc-dev-cmd@v1
     - name: Dotenv Action
       id: dotenv
       uses: xom9ikk/dotenv@v1.0.2
