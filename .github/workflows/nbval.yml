@@ -196,7 +196,7 @@ jobs:
     - name: Analysing with nbval
       if: matrix.python != '3.9' && runner.os == 'MacOS'
       run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/114-quantization-simplified-mode --durations 10
+            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/204-named-entity-recognition --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/114-quantization-simplified-mode --durations 10
     - name: Analysing with nbval
       if: matrix.python == '3.9' && runner.os != 'MacOS'
       run: |
@@ -204,7 +204,7 @@ jobs:
     - name: Analysing with nbval
       if: matrix.python != '3.9' && runner.os != 'MacOS'
       run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --durations 10  
+            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/204-named-entity-recognition --durations 10  
 
 
     # Show the cache after running the notebooks

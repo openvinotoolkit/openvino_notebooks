@@ -656,7 +656,7 @@ def benchmark_model(
         benchmark_result = [
             line
             for line in benchmark_output
-            if not (line.startswith(r"[") or line.startswith("  ") or line == "")
+            if not (line.startswith(r"[") or line.startswith("      ") or line == "")
         ]
         print("\n".join(benchmark_result))
         print()
