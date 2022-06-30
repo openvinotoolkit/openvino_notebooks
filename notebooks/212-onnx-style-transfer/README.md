@@ -14,7 +14,7 @@ This notebook uses five pre-trained models, for the following styles: Mosaic, Ra
 
 This tutorial consists of the following steps:
 
-- Loading an ONNX model in Inference Engine and doing inference on this model.
+- Loading an ONNX model in OpenVINO Runtime and doing inference on this model.
 - Showing inference results on five neural style transfer models.
 - Saving the transformed images and providing a download link.
 
