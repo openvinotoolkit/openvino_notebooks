@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c272e313050c7df7c2605363badca0361e82bcbc743b1a0772e9ffa3e53272f9"
+            "sha256": "615e54331d05e359caa16dc991d42566950e8245613c1ddfac01da331c45fe00"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1559,7 +1559,7 @@
                 "sha256:dbd18bcf4889b720ba13a27ec2f2aac1981bd41203b3a3b27ba7a33f88ae4827",
                 "sha256:df609c82f18c5b9f6cb97271f03315ff0dbe481a2a02e56aeb1b1a985ce38e60"
             ],
-            "markers": "python_version >= '3.6'",
+            "markers": "python_version >= '3.7'",
             "version": "==1.19.5"
         },
         "oauthlib": {
@@ -2705,6 +2705,14 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==2.3.2.post1"
+        },
+        "supervisor": {
+            "hashes": [
+                "sha256:2dc86fe0476e945e61483d614ceb2cf4f93b95282eb243bdf792621994360383",
+                "sha256:a76b2f77a560f2dc411c0254a4eb15f555e99faac48621b0f1fc9ab013944f47"
+            ],
+            "index": "pypi",
+            "version": "==4.1.0"
         },
         "tensorboard": {
             "hashes": [
