@@ -23,7 +23,7 @@ nest-asyncio = "<=1.5.4"
 nltk = ">=3.6.4"
 nncf = {extras = ["torch", "tf"]}
 openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.1.0"}
-paddle2onnx = ">=0.6"
+paddle2onnx = ">=0.6,<=0.9.6"
 paddlehub = "*"
 paddlenlp = "==2.0.8"  # pin to avoid conflict with requests
 paddlepaddle = "==2.2.*"
