@@ -1,6 +1,4 @@
-# PyTorch to ONNX and OpenVINO IR Tutorial
-
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F306-pytorch-object-detection-accuracy-check-and-quantization%2F306-pytorch-object-detection-accuracy-check-and-quantization.ipynb)
+# Quantize the Ultralytics Yolov5 model and check accuracy drop by OpenVINO POT API
 
 ![Ultralytics Yolov5 results](https://user-images.githubusercontent.com/44352144/177097174-cfe78939-e946-445e-9fce-d8897417ef8e.png)
 

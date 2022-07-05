@@ -67,6 +67,7 @@
 | [301-tensorflow-training-openvino-pot](notebooks/301-tensorflow-training-openvino/) | 基于POT工具的模型量化 | |
 | [302-pytorch-quantization-aware-training](notebooks/302-pytorch-quantization-aware-training) | 基于NNCF工具的模型压缩 | |
 | [305-tensorflow-quantization-aware-training](notebooks/305-tensorflow-quantization-aware-training) | 利用神经网络压缩框架（NNCF）来量化tensorflow模型 | |
+| [306-pytorch-object-detection-accuracy-check-and-quantization](notebooks/306-pytorch-object-detection-accuracy-check-and-quantization) | 基于POT工具量化Ultralytics Yolov5模型并分析精度 | |
 
 ### 实时推理
 
