@@ -11,6 +11,7 @@ supervisor==4.1.0
 jupyterlab-git==0.30
 
 openvino-dev==2021.4
+seaborn>=0.11.0
 matplotlib<3.4
 
 # ONNX notebook requirements
