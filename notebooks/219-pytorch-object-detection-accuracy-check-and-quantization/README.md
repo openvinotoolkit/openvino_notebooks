@@ -3,7 +3,7 @@
 ![Ultralytics Yolov5 results](https://user-images.githubusercontent.com/44352144/177097174-cfe78939-e946-445e-9fce-d8897417ef8e.png)
 
 
-This tutorial demonstrates step-by-step instructions to perform the model quantization by OpenVINO [Post-Training Optimization Tool (POT)](https://docs.openvino.ai/latest/pot_introduction.html), and to compare model accuracy between FP32 precision and quantized INT8 precision and to show a demo of running model inference based[Ultralytics Yolov5](https://github.com/ultralytics/yolov5) sample with OpenVINO 2022.1 backend.
+This tutorial demonstrates step-by-step instructions to perform the model quantization by OpenVINO [Post-Training Optimization Tool (POT)](https://docs.openvino.ai/latest/pot_introduction.html), and to compare model accuracy between FP32 precision and quantized INT8 precision and to show a demo of running model inference based [Ultralytics Yolov5](https://github.com/ultralytics/yolov5) sample with OpenVINO 2022.1 backend.
 
 ## Notebook Contents
 
