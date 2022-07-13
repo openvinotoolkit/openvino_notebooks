@@ -1,4 +1,4 @@
-# Quantize the Ultralytics Yolov5 model and check accuracy drop by OpenVINO POT API
+# Quantize the Ultralytics YOLOv5 model and check accuracy using the OpenVINO POT API
 
 ![Ultralytics Yolov5 results](https://user-images.githubusercontent.com/44352144/177097174-cfe78939-e946-445e-9fce-d8897417ef8e.png)
 
