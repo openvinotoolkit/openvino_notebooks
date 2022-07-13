@@ -97,7 +97,7 @@ More amazing notebooks here! Please take a look of the complete list.
 | [216-license-plate-recognition](216-license-plate-recognition/)<br> | Recognize Chinese license plates in traffic | <img src="https://user-images.githubusercontent.com/70456146/162759539-4a0a996f-dabe-40ea-98d6-85b4dce8511d.png" width=225> |
 | [217-vision-deblur](notebooks/217-vision-deblur/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ThanosM97/openvino_notebooks/217-vision-deblur?labpath=notebooks%2F217-vision-deblur%2F217-vision-deblur.ipynb)| Deblur Images with DeblurGAN-v2 | <img src="https://user-images.githubusercontent.com/41332813/158430181-05d07f42-cdb8-4b7a-b7dc-e7f7d9391877.png" width=225> |
 | [218-vehicle-detection-and-recognition](218-vehicle-detection-and-recognition/)<br> | Use pre-trained models to detect and recognize vehicles and their attributes with OpenVINO | <img src = "https://user-images.githubusercontent.com/47499836/163544861-fa2ad64b-77df-4c16-b065-79183e8ed964.png" width=225> |
-| [219-pytorch-object-detection-accuracy-check-and-quantization](219-pytorch-object-detection-accuracy-check-and-quantization/)<br> | Quantize the Ultralytics Yolov5 model and check accuracy drop by OpenVINO POT API | <img src = "https://user-images.githubusercontent.com/44352144/177097174-cfe78939-e946-445e-9fce-d8897417ef8e.png" width=225> |
+| [219-pytorch-object-detection-accuracy-check-and-quantization](219-pytorch-object-detection-accuracy-check-and-quantization/)<br> | Quantize the Ultralytics YOLOv5 model and check accuracy using the OpenVINO POT API | <img src = "https://user-images.githubusercontent.com/44352144/177097174-cfe78939-e946-445e-9fce-d8897417ef8e.png" width=225> |
 
 </details>
 </p>
