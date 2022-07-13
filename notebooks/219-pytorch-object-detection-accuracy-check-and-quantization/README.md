@@ -7,7 +7,7 @@ This tutorial demonstrates step-by-step how to perform model quantization using 
 
 ## Notebook Contents
 
-The notebook follow [Ultralytics Yolov5](https://github.com/ultralytics/yolov5) project to get Yolov5-m model with OpenVINO Intermediate Representation (IR) formats. Then use OpenVINO [Post-Training Optimization Tool (POT)](https://docs.openvino.ai/latest/pot_introduction.html) API to quantize model based on Ultralytics provided Non-Max Suppression (NMS) processing. And also compare accuracy drop between FP32 model and POT quantized INT8 by "DefaultQuantization" algorithm. Finally, refer Ultralytics provided Yolov5 sample "detect.py" to inference the INT8 model and check performance of model inference with OpenVINO sync API enabled.
+The notebook uses [Ultralytics Yolov5](https://github.com/ultralytics/yolov5) to obtain the YOLOv5-m model in OpenVINO Intermediate Representation (IR) format. Then, the OpenVINO [Post-Training Optimization Tool (POT)](https://docs.openvino.ai/latest/pot_introduction.html) API is used to quantize the model based on Non-Max Suppression (NMS) processing provided by Ultralytics. To ensure minimal accuracy loss, the accuracy is compared between the FP32 model and the INT8 model quantized by POT using "DefaultQuantization" algorithm. Finally, the code sample [detect.py](https://github.com/ultralytics/yolov5/blob/master/detect.py) from Ultralytics is used to perform inference the INT8 model and check performance using OpenVINO with sync API enabled.
 
 ## Installation Instructions
 
