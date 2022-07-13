@@ -1,7 +1,7 @@
 import json
 import glob
 import mmap
-
+import sys
 
 def get_notebooks(path: str):
     return glob.glob(f"{path}/*/[0-9]*.ipynb")
@@ -28,8 +28,12 @@ def find_tags_for_all_notebooks(notebooks: list, tags: dict):
             notebooks_tags[notebook.split('/')[-1].split('.')[0]] = nb_tags
     return notebooks_tags
 
-notebooks_paths = sorted(get_notebooks("notebooks"))
-tags = get_tags(".ci/keywords.json")['tags']
-all_notebooks_tags = find_tags_for_all_notebooks(notebooks_paths, tags)
-
-print(json.dumps(all_notebooks_tags, indent=4))
+if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        notebooks_paths = sorted(get_notebooks("notebooks"))
+        tags = get_tags(".ci/keywords.json")['tags']
+    else:
+        notebooks_paths = sorted(get_notebooks('/'.join(sys.argv[1].split('/')[:-2])))
+        tags = get_tags(sys.argv[2])['tags']
+    all_notebooks_tags = find_tags_for_all_notebooks(notebooks_paths, tags)
+    print(json.dumps(all_notebooks_tags, indent=4))
