@@ -8,7 +8,7 @@ Monocular Depth Estimation is the task of estimating scene depth using a single 
 
 ## Notebook Contents
 
-This notebook demonstrates Monocular Depth Estimation with the [MidasNet model](https://github.com/openvinotoolkit/open_model_zoo/blob/master/models/public/midasnet/midasnet.md) in OpenVINO.
+This notebook demonstrates Monocular Depth Estimation with the [MidasNet model](https://github.com/openvinotoolkit/open_model_zoo/blob/master/models/public/midasnet/README.md) in OpenVINO.
 
 ## Installation Instructions
 
