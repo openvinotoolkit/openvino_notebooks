@@ -1,14 +1,14 @@
-# Live Inference and Benchmark CT-scan Data with OpenVINO
+# Live Inference and Benchmark CT-scan Data with OpenVINO™
 
-## Kidney Segmentation with PyTorch Lightning and OpenVINO™ - Part 4
+## Kidney Segmentation with PyTorch Lightning and OpenVINO - Part 4
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F210-ct-scan-live-inference%2F210-ct-scan-live-inference.ipynb)
 
 ![kidney segmentation animation](https://user-images.githubusercontent.com/77325899/154279555-aaa47111-c976-4e77-8d23-aac96f45872f.gif)
 
-## What's Inside
+## Notebook Contents
 
-This Jupyter notebook tutorial is part of a series that shows how to train,
+This tutorial is a part of the series that shows how to train,
 optimize, quantize and show live inference on a segmentation model with PyTorch
 Lightning and OpenVINO.
 
@@ -17,7 +17,7 @@ the quantized segmentation model. You will see real-time segmentation of kidney
 CT scans running on a CPU, iGPU, or combining both devices for higher
 throughput. The processed frames are 3D scans that are shown as individual
 slices. The visualization slides through the slices with detected kidneys
-overlayed in red.  We provide a pre-trained and quantized model, so running the
+overlayed in red.  A pre-trained and quantized model is provided, so running the
 previous tutorials in the series is not required.
 
 ## Installation Instructions
@@ -26,8 +26,7 @@ For a minimum installation:
 
 * Create a virtual environment, with `python -m venv openvino_env` (on Linux
   you may need to type `python3`) and activate it with
-  `openvino_env\Scripts\activate` on Windows or `source
-  openvino_env/bin/activate` on macOS or Linux.
+  `openvino_env\Scripts\activate` on Windows or `source openvino_env/bin/activate` on macOS or Linux.
 * Clone the openvino_notebooks repository: `git clone
   https://github.com/openvinotoolkit/openvino_notebooks/`
 * Change to the directory: `cd openvino_notebooks`
@@ -36,9 +35,9 @@ For a minimum installation:
 * Install the requirements with `pip install --upgrade pip && pip install -r requirements.txt`.
 * Run the notebook by typing `jupyter lab` and doubleclicking on the notebook from the left sidebar.
 
-> NOTE: This notebook needs an internet connection to download data. If you use a proxy server, please enable the proxy server in the terminal before typing `jupyter lab`.
+> NOTE: This notebook needs an Internet connection to download data. If you use a proxy server, enable the proxy server in the terminal before typing `jupyter lab`.
 
-> NOTE: To use the other notebooks in the openvino_notebooks repository, please follow the instructions in the main README at https://github.com/openvinotoolkit/openvino_notebooks/
+> NOTE: To use other notebooks in the *openvino_notebooks* repository, follow the instructions in the [Installation Guide](../../README.md)
 
 ## All notebooks in this series:
 
