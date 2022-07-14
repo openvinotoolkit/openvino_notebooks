@@ -19,6 +19,8 @@ At the end of this notebook, you will see live inference results from your webca
 
 NOTE: _To use the webcam, you must run this Jupyter notebook on a computer with a webcam. If you run on a server, the webcam will not work. However, you can still do inference on a video in the final step._
 
+NOTE: _If you would like to use iGPU as your device to run the inference for PaddleOCR, please note that the text recognition model within PaddleOCR is a deep learning model with dynamic input shape. Since our current release of OpenVINO 2022.1 doesn't support dynamic shape on iGPU, you cannot switch inference device to "GPU" for this demo. If you still want to try running inference on iGPU for PaddleOCR, it's recommended to resize the input images, i.e. the bounding box images from text detection, into a fixed size to remove the dynamic input shape effect, for which some performance loss may be expected._
+
 
 
 For more information about the other PaddleOCR pre-trained models, refer to the [PaddleOCR Github](https://github.com/PaddlePaddle/PaddleOCR)  or [PaddleOCR Gitee](https://gitee.com/paddlepaddle/PaddleOCR).
