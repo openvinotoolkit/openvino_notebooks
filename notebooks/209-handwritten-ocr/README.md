@@ -1,4 +1,4 @@
-# Handwritten OCR
+# Handwritten OCR with OpenVINO™
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%5C209-handwritten-ocr%5C209-handwritten-ocr.ipynb)
 
@@ -6,7 +6,7 @@
 
 的人不一了是他有为在责新中任自之我们
 
-In this tutorial we demonstrate optical character recognition for handwritten Chinese (simplified) and Japanese. An OCR tutorial for the Latin alphabet is available here: [optical character recognition 208-notebook](../208-optical-character-recognition)
+This tutorial demonstrates optical character recognition for handwritten Chinese (simplified) and Japanese. An OCR tutorial for the Latin alphabet is available in the [optical character recognition 208-notebook](../208-optical-character-recognition)
 
 ## Notebook Contents
 
@@ -14,4 +14,4 @@ This notebook provides a tutorial on how to use OCR for handwritten Japanese and
 
 ## Installation Instructions
 
-If you have not done so already, please follow the [Installation Guide](../../README.md) to install all required dependencies.
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
