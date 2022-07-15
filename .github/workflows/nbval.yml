@@ -198,19 +198,19 @@ jobs:
       run: |
             python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/204-named-entity-recognition --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/114-quantization-simplified-mode --durations 10
     - name: Analysing with nbval
-      if: matrix.python == '3.9' && runner.os == 'Ubuntu'
+      if: matrix.python == '3.9' && runner.os == 'Linux'
       run: |
             python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10
     - name: Analysing with nbval
-      if: matrix.python != '3.9' && runner.os == 'Ubuntu'
+      if: matrix.python != '3.9' && runner.os == 'Linux'
       run: |
             python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/204-named-entity-recognition --ignore=notebooks/107-speech-recognition-quantization --durations 10  
     - name: Analysing with nbval
-      if: matrix.python == '3.9' && runner.os == 'Microsoft Windows Server 2019'
+      if: matrix.python == '3.9' && runner.os == 'Windows'
       run: |
             python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10
     - name: Analysing with nbval
-      if: matrix.python != '3.9' && runner.os == 'Microsoft Windows Server 2019'
+      if: matrix.python != '3.9' && runner.os == 'Windows'
       run: |
             python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/204-named-entity-recognition --durations 10  
 
