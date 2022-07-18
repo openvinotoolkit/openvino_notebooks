@@ -1,4 +1,4 @@
-# Introduction to OpenVINO
+# Introduction to OpenVINO™
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F001-hello-world%2F001-hello-world.ipynb)
 
@@ -12,4 +12,4 @@ This notebook demonstrates usage of [MobileNet V3](https://github.com/openvinoto
 
 ## Installation Instructions
 
-If you have not done so already, please follow the [Installation Guide](../../README.md) to install all required dependencies.
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).

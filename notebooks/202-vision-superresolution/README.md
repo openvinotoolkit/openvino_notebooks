@@ -1,4 +1,4 @@
-# Super Resolution with OpenVINO tutorial
+# Super Resolution with OpenVINO™
 
 image | video |
 |---|---|
@@ -10,11 +10,11 @@ Super Resolution is the process of enhancing the quality of an image by increasi
 
 ## Notebook Contents
 
-This tutorial is comprised of two notebooks. Both follow a similar concept of using a model called [Single Image Super Resolution (SISR)](https://github.com/openvinotoolkit/open_model_zoo/tree/develop/models/intel/single-image-super-resolution-1032) which is available from the Open Model Zoo. It is based on this [research paper]((https://arxiv.org/abs/1807.06779)).
+This tutorial is comprised of two notebooks. Both follow a similar concept of using a model called [Single Image Super Resolution (SISR)](https://github.com/openvinotoolkit/open_model_zoo/tree/develop/models/intel/single-image-super-resolution-1032) which is available from Open Model Zoo. It is based on this [research paper]((https://arxiv.org/abs/1807.06779)).
 
 * [Video Notebook](202-vision-superresolution-video.ipynb)
 * [Image Notebook](202-vision-superresolution-image.ipynb)
 
 ## Installation Instructions
 
-If you have not done so already, please follow the [Installation Guide](../../README.md) to install all required dependencies.
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
