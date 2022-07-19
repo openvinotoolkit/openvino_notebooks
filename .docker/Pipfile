@@ -14,6 +14,7 @@ ipywidgets = "*"
 jedi = "==0.17.2"
 jupyter-client = "<=7.2.0"
 jupyter-nbrequirements = "*"
+jupyterhub = "==2.2.*"
 jupyterlab = "*"
 jupyterlab-git = "==0.30"
 matplotlib = "<3.4"
@@ -23,6 +24,7 @@ nest-asyncio = "<=1.5.4"
 nltk = ">=3.6.4"
 nncf = {extras = ["torch", "tf"]}
 openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.1.0"}
+ovmsclient = "*"
 paddle2onnx = ">=0.6,<=0.9.6"
 paddlehub = "*"
 paddlenlp = "==2.0.8"  # pin to avoid conflict with requests
