@@ -14,6 +14,9 @@ torch>=1.5.1+cpu,<=1.7.1+cpu; sys_platform =='linux' or platform_system == 'Wind
 torchvision>=0.6.1+cpu,<=0.8.2+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchmetrics==0.6.2
 
+# Upgrade onnx version to avoid 220 YOLOV5 pytorch to onnx model export issue on Windows
+onnx==1.11.0
+
 # PaddlePaddle notebook requirements
 # For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
 paddlepaddle==2.2.*
