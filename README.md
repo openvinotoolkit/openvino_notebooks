@@ -137,7 +137,8 @@ More amazing notebooks here!
 | [216-license-plate-recognition](notebooks/216-license-plate-recognition/)<br> | Recognize Chinese license plates in traffic | <img src="https://user-images.githubusercontent.com/70456146/162759539-4a0a996f-dabe-40ea-98d6-85b4dce8511d.png" width=225> |
 | [217-vision-deblur](notebooks/217-vision-deblur/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/217-vision-deblur?labpath=notebooks%2F217-vision-deblur%2F217-vision-deblur.ipynb)| Deblur Images with DeblurGAN-v2 | <img src="https://user-images.githubusercontent.com/41332813/158430181-05d07f42-cdb8-4b7a-b7dc-e7f7d9391877.png" width=225> |
 | [218-vehicle-detection-and-recognition](notebooks/218-vehicle-detection-and-recognition/)<br> | Use pre-trained models to detect and recognize vehicles and their attributes with OpenVINO | <img src = "https://user-images.githubusercontent.com/47499836/163544861-fa2ad64b-77df-4c16-b065-79183e8ed964.png" width=225> |
-| [219-knowledge-graphs-conve](219-knowledge-graphs-conve/)<br> | Optimize the knowledge graph embeddings model (ConvE) with OpenVINO ||
+| [219-knowledge-graphs-conve](notebooks/219-knowledge-graphs-conve/)<br> | Optimize the knowledge graph embeddings model (ConvE) with OpenVINO ||
+| [221-machine-translation](notebooks/221-machine-translation)<br> | Real-time translation from English to German |  |
 
 
 
