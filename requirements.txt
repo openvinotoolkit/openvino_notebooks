@@ -1,4 +1,4 @@
-openvino-dev==2022.1.0
+openvino-dev[onnx,tensorflow2]==2022.1.0
 gdown
 pytube
 yaspin
@@ -14,22 +14,19 @@ torch>=1.5.1+cpu,<=1.7.1+cpu; sys_platform =='linux' or platform_system == 'Wind
 torchvision>=0.6.1+cpu,<=0.8.2+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchmetrics==0.6.2
 
-# Replace by adding tf as a dependency for nncf when merging to main branch
-tensorflow==2.4.*; python_version <= '3.8'
-tensorflow==2.5.*; python_version == '3.9'
-
 # PaddlePaddle notebook requirements
 # For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
 paddlepaddle==2.2.*
 paddlehub
-paddle2onnx>=0.6
+# paddle2onnx 0.9.7 fails export in 206 and 207
+paddle2onnx>=0.6, <=0.9.6
 ppgan==2.1.*
 
 # BERT quantization notebook requirements
 transformers
 
 # NNCF notebook requirements
-nncf==2.1.*
+nncf[tf, torch]
 tensorflow_datasets==4.2.0
 
 # CT scan training/inference requirements
@@ -54,3 +51,5 @@ nltk>=3.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
 scikit-learn>=0.24.2 # not directly required, pinned by Snyk to avoid a vulnerability
 paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
+nest-asyncio<=1.5.4
+jupyter-client<=7.2.0

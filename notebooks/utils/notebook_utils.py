@@ -75,7 +75,7 @@ def download_file(
     directory: PathLike = None,
     show_progress: bool = True,
     silent: bool = False,
-    timeout: int = 5,
+    timeout: int = 10,
 ) -> str:
     """
     Download a file from a url and save it to the local filesystem. The file is saved to the
@@ -89,6 +89,7 @@ def download_file(
                       If None the file will be saved to the current working directory
     :param show_progress: If True, show an TQDM ProgressBar
     :param silent: If True, do not print a message if the file already exists
+    :param timeout: Number of seconds before cancelling the connection attempt
     :return: path to downloaded file
     """
     try:
@@ -98,6 +99,8 @@ def download_file(
         urlobject = urllib.request.urlopen(url, timeout=timeout)
         if filename is None:
             filename = urlobject.info().get_filename() or Path(urllib.parse.urlparse(url).path).name
+    except urllib.error.HTTPError as e:
+        raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
     except urllib.error.URLError as error:
         if isinstance(error.reason, socket.timeout):
             raise Exception(
@@ -106,8 +109,9 @@ def download_file(
                 "internet connection is slow, you can call `download_file(url, timeout=30)` to "
                 "wait for 30 seconds before raising this error."
             ) from None
-    except urllib.error.HTTPError as e:
-        raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
+        else:
+            raise
+
     filename = Path(filename)
     if len(filename.parts) > 1:
         raise ValueError(
@@ -614,11 +618,14 @@ def show_live_inference(
 # In[ ]:
 
 
-def benchmark_model(model_path: PathLike,
-                    device: str = "CPU",
-                    seconds: int = 60, api: str = "async",
-                    batch: int = 1, 
-                    cache_dir: PathLike = "model_cache"):
+def benchmark_model(
+    model_path: PathLike,
+    device: str = "CPU",
+    seconds: int = 60,
+    api: str = "async",
+    batch: int = 1,
+    cache_dir: PathLike = "model_cache",
+):
     """
     Benchmark model `model_path` with `benchmark_app`. Returns the output of `benchmark_app`
     without logging info, and information about the device
@@ -633,21 +640,32 @@ def benchmark_model(model_path: PathLike,
     ie = IECore()
     model_path = Path(model_path)
     if ("GPU" in device) and ("GPU" not in ie.available_devices):
-        raise ValueError(f"A GPU device is not available. Available devices are: {ie.available_devices}")
+        raise ValueError(
+            f"A GPU device is not available. Available devices are: {ie.available_devices}"
+        )
     else:
         benchmark_command = f"benchmark_app -m {model_path} -d {device} -t {seconds} -api {api} -b {batch} -cdir {cache_dir}"
-        display(Markdown(f"**Benchmark {model_path.name} with {device} for {seconds} seconds with {api} inference**"));
-        display(Markdown(f"Benchmark command: `{benchmark_command}`"));
+        display(
+            Markdown(
+                f"**Benchmark {model_path.name} with {device} for {seconds} seconds with {api} inference**"
+            )
+        )
+        display(Markdown(f"Benchmark command: `{benchmark_command}`"))
 
-        benchmark_output = get_ipython().run_line_magic('sx', '$benchmark_command')
-        benchmark_result = [line for line in benchmark_output
-                            if not (line.startswith(r"[") or line.startswith("  ") or line == "")]
+        benchmark_output = get_ipython().run_line_magic("sx", "$benchmark_command")
+        benchmark_result = [
+            line
+            for line in benchmark_output
+            if not (line.startswith(r"[") or line.startswith("      ") or line == "")
+        ]
         print("\n".join(benchmark_result))
         print()
         if "MULTI" in device:
             devices = device.replace("MULTI:", "").split(",")
             for single_device in devices:
-                device_name = ie.get_metric(device_name=single_device, metric_name='FULL_DEVICE_NAME')
+                device_name = ie.get_metric(
+                    device_name=single_device, metric_name="FULL_DEVICE_NAME"
+                )
                 print(f"{single_device} device: {device_name}")
         else:
             print(f"Device: {ie.get_metric(device_name=device, metric_name='FULL_DEVICE_NAME')}")
