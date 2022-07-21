@@ -7,6 +7,9 @@ yaspin
 fastseg
 ipywidgets
 
+# Upgrade onnx version to avoid 220 YOLOV5 pytorch to onnx model export issue on Windows
+onnx>=1.11.0,<1.12.0
+
 torch>=1.5.1,<=1.7.1; sys_platform == 'darwin'
 torchvision>=0.6.1,<=0.8.2; sys_platform == 'darwin'
 --find-links https://download.pytorch.org/whl/torch_stable.html
