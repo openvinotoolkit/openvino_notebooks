@@ -96,7 +96,7 @@ More amazing notebooks here!
 | [112-pytorch-post-training-quantization-nncf](notebooks/112-pytorch-post-training-quantization-nncf/) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model in post-training mode (without model fine-tuning)| 
 | [113-image-classification-quantization](notebooks/113-image-classification-quantization/) | Quantize mobilenet image classification | 
 | [114-quantization-simplified-mode](notebooks/114-quantization-simplified-mode/) | Quantize Image Classification Models with POT in Simplified Mode|
-| [115-async-api](115-async-api/) | Use Asynchronous Execution to Improve Data Pipelining| |
+| [115-async-api](notebooks/115-async-api/) | Use Asynchronous Execution to Improve Data Pipelining| |
 </details>
 </p>
 
