@@ -1,6 +1,6 @@
 # Image Colorization with OpenVINO Tutorial
 
-![Let there be color](data/banner.png)
+![Let there be color](https://user-images.githubusercontent.com/18904157/180923280-9caefaf1-742b-4d2f-8943-5d4a6126e2fc.png)
 
 The idea of colorization is given a grayscale image as input, the model hallucinates a plausible, vibrant & realistic colorized version of the image.
 
