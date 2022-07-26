@@ -33,7 +33,7 @@ nncf[tf, torch]
 tensorflow_datasets==4.2.0
 
 # CT scan training/inference requirements
-monai==0.9.0
+monai<=0.9.0
 pytorch_lightning
 
 # Jupyter requirements
