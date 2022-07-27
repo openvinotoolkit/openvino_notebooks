@@ -1,0 +1,1 @@
+{"do_lower_case": true, "vocab_file": "/root/.paddlenlp/models/bert-base-uncased/bert-base-uncased-vocab.txt", "init_class": "BertTokenizer"}
