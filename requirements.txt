@@ -25,9 +25,6 @@ paddlehub
 paddle2onnx>=0.6, <=0.9.6
 ppgan==2.1.*
 
-# Audio analysis requirements
-librosa>=0.8.1
-
 # BERT quantization notebook requirements
 transformers
 
