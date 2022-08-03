@@ -4,7 +4,7 @@
 
 ![meter](https://user-images.githubusercontent.com/91237924/166135627-194405b0-6c25-4fd8-9ad1-83fb3a00a081.jpg)
 
-This notebook shows how to create a industrial meter reader with OpenVINO Runtime.
+This notebook shows how to create an industrial meter reader with OpenVINO Runtime.
 
 ## Notebook Contents
 
