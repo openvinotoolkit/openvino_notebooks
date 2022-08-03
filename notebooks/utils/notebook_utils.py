@@ -236,6 +236,8 @@ class VideoPlayer:
         self.__size = None
         self.__interpolation = None
         if size is not None:
+            self.__cap.set(cv2.CAP_PROP_FRAME_WIDTH, size[0])
+            self.__cap.set(cv2.CAP_PROP_FRAME_HEIGHT, size[1])
             self.__size = size
             # AREA better for shrinking, LINEAR better for enlarging
             self.__interpolation = (
