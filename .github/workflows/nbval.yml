@@ -193,6 +193,7 @@ jobs:
       run: |
             chmod +x .ci/validate_notebooks.sh
             .ci/validate_notebooks.sh notebooks/107-speech-recognition-quantization notebooks/114-quantization-simplified-mode notebooks/204-named-entity-recognition notebooks/301-tensorflow-training-openvino notebooks/302-pytorch-quantization-aware-training notebooks/305-tensorflow-quantization-aware-training --durations 10
+      shell: bash
 
     # Show the cache after running the notebooks
     - name: Show cache
