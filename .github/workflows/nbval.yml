@@ -191,6 +191,7 @@ jobs:
       run: |
             chmod +x .ci/validate_notebooks.sh
             .ci/validate_notebooks.sh 107-speech-recognition-quantization 114-quantization-simplified-mode 204-named-entity-recognition --durations 10
+            exit $?
       shell: bash
 
     # Show the cache after running the notebooks

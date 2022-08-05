@@ -13,7 +13,7 @@ git ls-files "*.ipynb" | while read notebook; do
     if [[ $? -eq 0 ]]; then
         continue
     fi
-    python -m pytest --nbval $notebook $ignorelist --durations 10
+    python -m pytest --nbval $notebook --durations 10
     failed=$(( $failed | $? ))
     if [ "$earlystop" = true ] && [ $failed -ge 1 ]; then
         break
