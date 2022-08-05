@@ -37,15 +37,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, windows-2019, macos-10.15, macos-11]
+        os: [ubuntu-18.04, ubuntu-20.04, windows-2019, macos-11, macos-12]
         python: [3.6, 3.7, 3.8, 3.9]
         exclude:
         - os: macos-11
           python: 3.6
-        - os: macos-10.15
-          python: 3.7
-        - os: macos-10.15
-          python: 3.8
+        - os: macos-12
+          python: 3.6
         - os: windows-2019
           python: 3.6
     steps:
@@ -190,29 +188,8 @@ jobs:
     # Temporary workaround for Python 3.9 while NNCF is not updated to TF 2.5
     # Temporary excluding 107 and 114 from MacOS due to performance issues
     - name: Analysing with nbval
-      if: matrix.python == '3.9' && runner.os == 'MacOS'
       run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/114-quantization-simplified-mode --durations 10
-    - name: Analysing with nbval
-      if: matrix.python != '3.9' && runner.os == 'MacOS'
-      run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/204-named-entity-recognition --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/114-quantization-simplified-mode --durations 10
-    - name: Analysing with nbval
-      if: matrix.python == '3.9' && runner.os == 'Linux'
-      run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10
-    - name: Analysing with nbval
-      if: matrix.python != '3.9' && runner.os == 'Linux'
-      run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/204-named-entity-recognition --ignore=notebooks/107-speech-recognition-quantization --durations 10  
-    - name: Analysing with nbval
-      if: matrix.python == '3.9' && runner.os == 'Windows'
-      run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10
-    - name: Analysing with nbval
-      if: matrix.python != '3.9' && runner.os == 'Windows'
-      run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/204-named-entity-recognition --durations 10  
+            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/114-quantization-simplified-mode --ignore=notebooks/204-named-entity-recognition --ignore=notebooks/301-tensorflow-training-openvino --ignore=notebooks/302-pytorch-quantization-aware-training --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10  
 
 
     # Show the cache after running the notebooks
