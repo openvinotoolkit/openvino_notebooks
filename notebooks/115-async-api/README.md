@@ -5,7 +5,7 @@
 
 This notebook demonstrates how to use the [Async API](https://docs.openvino.ai/nightly/openvino_docs_deployment_optimization_guide_common.html) for asynchronous execution with OpenVINO. 
 
-OpenVINO™ Runtime supports inference in either synchronous or asynchronous mode. Using the Async API can improve application’s overall frame-rate, because thie function can keep the hardware busy by sending inference requests continuously. In other words, if you can afford sending a new request without waiting for the previous one to finish. 
+OpenVINO Runtime supports inference in either synchronous or asynchronous mode. The key advantage of the Async API is that when a device is busy with inference, the application can perform other tasks in parallel (e.g. populating inputs or scheduling other requests) rather than wait for the current inference to complete first. 
 
 With synchronous mode, we wait for the result of the first inference before sending the next request. While the request is being sent, the hardware is idle. When we use the async API, the transfer of the second request is overlapped with the execution of the first inference, and that prevents any hardware idle time. ​
 
