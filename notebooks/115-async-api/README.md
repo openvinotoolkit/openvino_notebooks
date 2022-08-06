@@ -1,4 +1,4 @@
-# Runtime Inference Optimization with Async API
+# Asynchronous Inference with OpenVINO™
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F115-async-api%2F115-async-api.ipynb)
 
