@@ -3,7 +3,7 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F115-async-api%2F115-async-api.ipynb)
 
 
-This notebook demostrate how to use [asynchronous execution](https://docs.openvino.ai/latest/openvino_docs_deployment_optimization_guide_common.html) to improve data pipelining. 
+This notebook demonstrates how to use the [Async API](https://docs.openvino.ai/nightly/openvino_docs_deployment_optimization_guide_common.html) for asynchronous execution with OpenVINO. 
 
 OpenVINO™ Runtime supports inference in either synchronous or asynchronous mode. Using the Async API can improve application’s overall frame-rate, because thie function can keep the hardware busy by sending inference requests continuously. In other words, if you can afford sending a new request without waiting for the previous one to finish. 
 
