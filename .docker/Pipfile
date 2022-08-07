@@ -51,3 +51,5 @@ yaspin = "*"
 
 [requires]
 python_version = "3.8"
+pythreejs
+ipywidgets
