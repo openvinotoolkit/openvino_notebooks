@@ -185,13 +185,11 @@ jobs:
         jupyter lab notebooks --help
 
     # Main notebooks test. Verifies that all notebooks run without errors
-    # Temporary workaround for Python 3.9 while NNCF is not updated to TF 2.5
-    # Temporary excluding 107 and 114 from MacOS due to performance issues
+    # Temporary excluding 107 and 114 due to performance issues
     - name: Analysing with nbval
       run: |
             chmod +x .ci/validate_notebooks.sh
-            .ci/validate_notebooks.sh 107-speech-recognition-quantization 114-quantization-simplified-mode 204-named-entity-recognition --durations 10
-            exit $?
+            .ci/validate_notebooks.sh 107-speech-recognition-quantization 114-quantization-simplified-mode
       shell: bash
 
     # Show the cache after running the notebooks
