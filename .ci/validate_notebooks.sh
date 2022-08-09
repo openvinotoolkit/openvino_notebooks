@@ -9,7 +9,7 @@ do
     notebook_name=$(echo "$notebook" | cut -d'/' -f2)
     # if notebook not ignored
     if ! echo "$ignore_list" | grep -w -q "$notebook_name"; then
-        python -m pytest --nbval -k "test_ or notebook_utils" --durations 10
+        python -m pytest --nbval -k "test_" --durations 10
         failed=$((failed | $?))
         comm -23 <(find . | sort) <(echo "$existing_files") | xargs rm -rf
     fi

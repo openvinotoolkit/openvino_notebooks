@@ -185,11 +185,10 @@ jobs:
         jupyter lab notebooks --help
 
     # Main notebooks test. Verifies that all notebooks run without errors
-    # Temporary excluding 107 and 114 due to performance issues
     - name: Analysing with nbval
       run: |
             chmod +x .ci/validate_notebooks.sh
-            .ci/validate_notebooks.sh 107-speech-recognition-quantization 114-quantization-simplified-mode
+            .ci/validate_notebooks.sh
       shell: bash
 
     # Show the cache after running the notebooks
