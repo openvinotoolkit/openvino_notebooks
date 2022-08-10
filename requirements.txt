@@ -1,7 +1,9 @@
 openvino-dev[onnx,tensorflow2]==2022.1.0
 gdown
-pytube
 yaspin
+
+# Superresolution notebook requirements
+pytube>=12.1.0
 
 # PyTorch/ONNX notebook requirements
 fastseg
