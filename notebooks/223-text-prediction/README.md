@@ -11,7 +11,9 @@ This is an interactive demonstration in which the user can type text into the in
 </br>
 </br>
 
-![image3](https://user-images.githubusercontent.com/91228207/164004101-ba491f97-1bd6-4b75-88cd-c0d66e5ea12b.jpeg)
+The following image show an example of the input sequence and corresponding predicted sequence.
+
+![image](https://user-images.githubusercontent.com/91228207/185103977-54b1671a-f02c-4f4b-9722-5c4e8b119fc7.png)
 
 
 
