@@ -11,9 +11,6 @@ This is an interactive demonstration in which the user can type text into the in
 The following image show an example of the input sequence and corresponding predicted sequence.
 
 ![image](https://user-images.githubusercontent.com/91228207/185103977-54b1671a-f02c-4f4b-9722-5c4e8b119fc7.png)
-
-
-
 ## Notebook Contents
 
 This notebook demonstrates text prediction with OpenVINO using the [gpt-2](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/gpt-2) model from Open Model Zoo.
