@@ -6,10 +6,7 @@ The complete pipeline of this demo's notebook is shown below.
 
 ![image2](https://user-images.githubusercontent.com/91228207/163990722-d2713ede-921e-4594-8b00-8b5c1a4d73b5.jpeg)
 
-</br>
 This is an interactive demonstration in which the user can type text into the input bar and generate predicted text. This procedure can be repeated as many times as the user desires.
-</br>
-</br>
 
 The following image show an example of the input sequence and corresponding predicted sequence.
 
