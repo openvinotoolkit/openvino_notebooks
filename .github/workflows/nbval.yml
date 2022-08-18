@@ -11,7 +11,7 @@ on:
     - 'notebooks/**.py'
     - 'requirements.txt'
     - '.ci/*'
-    - '.github/workflows/nbval.yml'
+    - '.github/workflows/*.yml'
     - '.github/workflows/.env'
   push:
     branches:
@@ -22,7 +22,7 @@ on:
     - 'notebooks/**.py'
     - 'requirements.txt'
     - '.ci/*'
-    - '.github/workflows/nbval.yml'
+    - '.github/workflows/*.yml'
     - '.github/workflows/.env'
   schedule:
     - cron:  '30 8 * * *'
