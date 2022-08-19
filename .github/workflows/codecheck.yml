@@ -10,7 +10,8 @@ on:
     - 'notebooks/**.py'
     - 'requirements.txt'
     - '.ci/*'
-    - '.github/workflows/codequality.yml'
+    - '.github/workflows/*.yml'
+    - '.github/workflows/.env'
   push:
     branches:
     - 'main'
@@ -19,7 +20,8 @@ on:
     - 'notebooks/**.py'
     - 'requirements.txt'
     - '.ci/*'
-    - '.github/workflows/codequality.yml'
+    - '.github/workflows/*.yml'
+    - '.github/workflows/.env'
     
 
 jobs:
