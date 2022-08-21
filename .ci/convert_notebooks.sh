@@ -21,8 +21,8 @@ git ls-files "*.ipynb" | while read notebook; do
     executed_notebook=${notebook/.ipynb/-with-output.ipynb}
     echo $executed_notebook
     jupyter nbconvert --log-level=INFO --execute --to notebook --output $executed_notebook --output-dir . --ExecutePreprocessor.kernel_name="python3" $notebook
-    # jupyter nbconvert --to markdown $executed_notebook --output-dir $markdowndir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
-    # jupyter nbconvert --to html $executed_notebook --output-dir $htmldir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
+    jupyter nbconvert --to markdown $executed_notebook --output-dir $markdowndir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
+    jupyter nbconvert --to html $executed_notebook --output-dir $htmldir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
     jupyter nbconvert --to rst $executed_notebook --output-dir $rstdir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
 done
 
