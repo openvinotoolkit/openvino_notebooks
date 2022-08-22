@@ -11,7 +11,7 @@ on:
     - 'notebooks/**.py'
     - 'requirements.txt'
     - '.ci/*'
-    - '.github/workflows/nbval.yml'
+    - '.github/workflows/*.yml'
     - '.github/workflows/.env'
   push:
     branches:
@@ -22,7 +22,7 @@ on:
     - 'notebooks/**.py'
     - 'requirements.txt'
     - '.ci/*'
-    - '.github/workflows/nbval.yml'
+    - '.github/workflows/*.yml'
     - '.github/workflows/.env'
   schedule:
     - cron:  '30 8 * * *'
@@ -195,7 +195,7 @@ jobs:
       if: runner.os == 'MacOS'
       run: |
         chmod +x .ci/validate_notebooks.sh
-        .ci/validate_notebooks.sh 107-speech-recognition-quantization
+        .ci/validate_notebooks.sh 107-speech-recognition-quantization 115-async-api
       shell: bash
 
     # Show the cache after running the notebooks
