@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, windows-2019, macos-11, macos-12]
+        os: [ubuntu-20.04, ubuntu-22.04, windows-2019, macos-11, macos-12]
         python: [3.6, 3.7, 3.8, 3.9]
         exclude:
         - os: macos-11
@@ -45,6 +45,8 @@ jobs:
         - os: macos-12
           python: 3.6
         - os: windows-2019
+          python: 3.6
+        - os: ubuntu-22.04
           python: 3.6
     steps:
 
