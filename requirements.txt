@@ -7,6 +7,9 @@ yaspin
 fastseg
 ipywidgets
 
+# Upgrade onnx version to avoid 220 YOLOV5 pytorch to onnx model export issue on Windows
+onnx>=1.11.0,<1.12.0
+
 torch>=1.5.1,<=1.7.1; sys_platform == 'darwin'
 torchvision>=0.6.1,<=0.8.2; sys_platform == 'darwin'
 --find-links https://download.pytorch.org/whl/torch_stable.html
@@ -30,7 +33,7 @@ nncf[tf, torch]
 tensorflow_datasets==4.2.0
 
 # CT scan training/inference requirements
-monai
+monai<=0.9.0
 pytorch_lightning
 
 # Jupyter requirements
@@ -39,6 +42,7 @@ jupyterlab
 # The packages below are not directly required. They are dependencies of 
 # other dependencies that are pinned to a specific version to avoid
 # compatibility issues or vulnerabilities
+seaborn>=0.11.0
 geffnet==0.9.8
 matplotlib<3.4
 jedi==0.17.2

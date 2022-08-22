@@ -13,7 +13,8 @@ on:
     paths:
       - "Dockerfile"
       - ".docker/**"
-      - ".github/workflows/docker.yml"
+      - ".github/workflows/*.yml"
+      - '.github/workflows/.env'
       - 'notebooks/**.ipynb'
       - 'notebooks/**.py'
       - 'requirements.txt'
@@ -24,7 +25,8 @@ on:
     paths:
       - "Dockerfile"
       - ".docker/**"
-      - ".github/workflows/docker.yml"
+      - ".github/workflows/*.yml"
+      - '.github/workflows/.env'
       - 'notebooks/**.ipynb'
       - 'notebooks/**.py'
 

@@ -1,20 +1,20 @@
-# OpenVINO API tutorial
+# OpenVINO™ API tutorial
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F002-openvino-api%2F002-openvino-api.ipynb)
 
 
-This notebook explains the basics of the OpenVINO Inference Engine API.
-It provides a segmentation and classification IR model and a segmentation ONNX model. You can replace these model files with own models.
+This notebook explains the basics of the OpenVINO Runtime API.
+It provides a segmentation and classification IR model and a segmentation ONNX model. The model files can be replaced with your own models.
 
-Despite the exact output being different,  the process remains the same.
+Despite the exact output being different, the process remains the same.
 
 ## Notebook Contents
 
-An OpenVINO API tutorial that covers the following:
+The OpenVINO API tutorial consists of the following steps:
 
-* Load Inference Engine and Show Info
+* Loading OpenVINO Runtime and Showing Info
 * Loading a Model
-  * IR Model
+  * OpenVINO IR Model
   * ONNX Model
 * Getting Information about a Model
   * Model Inputs
@@ -26,4 +26,4 @@ An OpenVINO API tutorial that covers the following:
   
 ## Installation Instructions
 
-If you have not done so already, please follow the [Installation Guide](../../README.md) to install all required dependencies.
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).

@@ -57,6 +57,8 @@
 | [213-question-answering](notebooks/213-question-answering/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F213-question-answering%2F213-question-answering.ipynb) | 根据语境回答问题 | <img src="https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif" width=225> |
 | [216-license-plate-recognition](notebooks/216-license-plate-recognition/)<br> | 在交通中识别中国车牌 | <img src="https://user-images.githubusercontent.com/70456146/162759539-4a0a996f-dabe-40ea-98d6-85b4dce8511d.png" width=225> |
 | [218-vehicle-detection-and-recognition](notebooks/218-vehicle-detection-and-recognition/)<br> | 车辆检测与识别 | <img src = "https://user-images.githubusercontent.com/47499836/163544861-fa2ad64b-77df-4c16-b065-79183e8ed964.png" width=225> |
+| [220-yolov5-accuracy-check-and-quantization](notebooks/220-yolov5-accuracy-check-and-quantization) | 基于POT工具量化Ultralytics Yolov5模型并分析精度 | <img src = "https://user-images.githubusercontent.com/44352144/177097174-cfe78939-e946-445e-9fce-d8897417ef8e.png"  width=225> |
+| [222-vision-image-colorization](notebooks/222-vision-image-colorization/)<br> | 黑白图像着色 | <img src = "https://user-images.githubusercontent.com/18904157/166343139-c6568e50-b856-4066-baef-5cdbd4e8bc18.png" width=225> |
 
 ### 模型训练
 

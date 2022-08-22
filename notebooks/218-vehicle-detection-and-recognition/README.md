@@ -1,13 +1,13 @@
-# Vehicle Detection And Recognition with OpenVINO
+# Vehicle Detection And Recognition with OpenVINO™
 
 ![result](https://user-images.githubusercontent.com/47499836/163544861-fa2ad64b-77df-4c16-b065-79183e8ed964.png)
 
-This tutorial demonstrates how to use two pre-trained models from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo): [vehicle-detection-0200](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/vehicle-detection-0200) for object detection and [vehicle-attributes-recognition-barrier-0039](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/vehicle-attributes-recognition-barrier-0039) for image classification. Using these models, we will detect vehicles from raw images and recognize attributes of detected vehicles. 
+This tutorial demonstrates how to use two pre-trained models from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo): [vehicle-detection-0200](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/vehicle-detection-0200) for object detection and [vehicle-attributes-recognition-barrier-0039](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/vehicle-attributes-recognition-barrier-0039) for image classification. Using these models, you will detect vehicles from raw images and recognize attributes of detected vehicles. 
 
 
 ## Notebook Contents
 
-In this notebook, we will use both a detection model and classification model with OpenVINO. The number and location of vehicles in an image can be analyzed by using vehicle detection. Vehicle attribute recognition can assist in the statistics of vehicle characteristics in traffic analysis scenario. We use [Object Detection Models](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/vehicle-detection-0200) and [Object Recognition Models](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/vehicle-attributes-recognition-barrier-0039) from [Intel Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/blob/master/models/intel/index.md). The detection model is used to detect vehicle position, which is then cropped to a single vehicle before it is sent to a classification model to recognize attributes of the vehicle. 
+This notebook uses both a detection model and a classification model from Open Model Zoo. The number and location of vehicles in an image can be analyzed by using vehicle detection. Vehicle attribute recognition can assist in the statistics of vehicle characteristics in traffic analysis scenario. The detection model is used to detect vehicle position, which is then cropped to a single vehicle before it is sent to a classification model to recognize attributes of the vehicle. 
 
 Overview of the pipeline: 
 ![flowchart](https://user-images.githubusercontent.com/47499836/157867076-9e997781-f9ef-45f6-9a51-b515bbf41048.png)
@@ -16,4 +16,4 @@ For more information about the pre-trained models, refer to the [Intel](https://
 
 ## Installation Instructions
 
-If you have not done so already, please follow the [Installation Guide](../../README.md) to install all required dependencies.
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).

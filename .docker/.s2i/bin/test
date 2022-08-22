@@ -1,6 +1,12 @@
 #!/bin/bash
 
 set -eo pipefail
+
+# Test that jupyterhub and ovmsclient imports work (required for image to work in RedHat cluster)
+python -c "from jupyterhub.singleuser import SingleUserNotebookApp as SingleUserServerApp"
+python -c "import ovmsclient"
+
+# Required for PaddlePaddle
 export HUB_HOME=/tmp
 
 # Download CT scan image for 110 training notebook
@@ -12,6 +18,8 @@ mkdir kits19_frames
 mv case_00030 kits19_frames
 cp -r kits19_frames/case_00030 kits19_frames/case_00001
 
+# Patch notebooks to speed up test execution
 python /tmp/scripts/patch_notebooks.py /opt/app-root/notebooks
-# Temporarily ignore 208 because of model download instability in 2021.4.2
+
+# Test notebooks
 exec /opt/app-root/bin/pytest --durations=10 --nbval --current-env --ignore=/opt/app-root/notebooks/107-speech-recognition-quantization -k "test_" /opt/app-root/notebooks
