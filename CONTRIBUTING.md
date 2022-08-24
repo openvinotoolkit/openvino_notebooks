@@ -176,6 +176,26 @@ To maintain consistency between notebooks, please follow the directory structure
 
 In case of output provided by Notebook please create folder ```output``` on the same level as readme file.
 
+#### Recommendations for File Structure
+
+- Model
+
+We recommend to load the model using url otherwise we can accept the model placed in the model folder which will be evaluated further for storage constraints.
+
+- Data
+
+We recommend to use embedded URL for image/video data since GitHub limits the size of files allowed in repositories.
+Follow the below instructions to create embedded URL in GitHub:
+  - Go to any issue on GitHub.
+  - In the comment section, you can attach files. Just drag/drop, select or paste your image.
+  - Copy the code/link displayed in the text area
+
+- License
+
+If you download or include a model, it must be licensed under an open source license like Apache 2.0 which allows for redistribution, modification and commercial use. 
+
+Any datasets, images or videos used for fine-tuning, quantization or inference inside a notebook must be licensed under Creative Commons 4.0 (CC 4.0) with permission for commercial use. If commercial use is not allowed, but the data is under CC 4.0, special approval will be required. Please let us know in your pull request if your data has any restrictions on use.
+
 ### Notebook utils
 
 The _notebook_utils.py_ file in the _notebooks/utils_ directory contains utility functions and classes that can be reused across
