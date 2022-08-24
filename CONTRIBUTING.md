@@ -192,7 +192,9 @@ Follow the below instructions to create embedded URL in GitHub:
 
 - License
 
-For any model/data used, ensure to have proper license to be used in this repository.
+If you download or include a model, it must be licensed under an open source license like Apache 2.0 which allows for redistribution, modification and commercial use. 
+
+Any datasets, images or videos used for fine-tuning, quantization or inference inside a notebook must be licensed under Creative Commons 4.0 (CC 4.0) with permission for commercial use. If commercial use is not allowed, but the data is under CC 4.0, special approval will be required. Please let us know in your pull request if your data has any restrictions on use.
 
 ### Notebook utils
 
