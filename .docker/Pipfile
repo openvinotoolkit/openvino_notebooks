@@ -3,6 +3,11 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[[source]]
+url = "https://download.pytorch.org/whl/"
+verify_ssl = true
+name = "pytorch-wheels"
+
 [packages]
 boto3 = "*"
 fastseg = "*"
@@ -44,9 +49,9 @@ setuptools = ">56.0.0"
 supervisor = "==4.1.0"
 tensorflow = "==2.5.3"
 tensorflow_datasets = "*"
-torch = "==1.8.1"
+torch = {index = "pytorch-wheels", version = "==1.8.1+cpu"}
 torchmetrics = "==0.6.2"
-torchvision = "==0.9.1"
+torchvision = {index = "pytorch-wheels", version = "==0.9.1+cpu"}
 transformers = "*"
 yaspin = "*"
 
