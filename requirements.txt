@@ -1,62 +1,66 @@
+--find-links https://download.pytorch.org/whl/torch_stable.html
+
+# openvino
 openvino-dev[onnx,tensorflow2]==2022.1.0
-gdown
-pytube>=12.1.0
-yaspin
-librosa==0.8.1
+nncf[tf,torch]==2.3.0
 
-# PyTorch/ONNX notebook requirements
-fastseg
-ipywidgets
-
-# Upgrade onnx version to avoid 220 YOLOV5 pytorch to onnx model export issue on Windows
-onnx>=1.11.0,<1.12.0
-
+# deep learning frameworks
+onnx==1.11.0
 torch==1.8.1; sys_platform == 'darwin'
 torchvision==0.9.1; sys_platform == 'darwin'
---find-links https://download.pytorch.org/whl/torch_stable.html
 torch==1.8.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchvision==0.9.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchmetrics==0.6.2
-
-# PaddlePaddle notebook requirements
-# For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
-paddlepaddle==2.2.*
-paddlehub<=2.2.0
-# paddle2onnx 0.9.7 fails export in 206 and 207
-paddle2onnx>=0.6,<=0.9.6
-ppgan==2.1.*
-
-# BERT quantization notebook requirements
-transformers
-
-# NNCF notebook requirements
-nncf[tf,torch]==2.3.0
+pytorch-lightning==1.5.10
 tensorflow==2.5.3
-tensorflow_datasets==4.2.0
-
-# CT scan training/inference requirements
+tensorflow-datasets==4.2.0
+paddlepaddle==2.2.2
+paddlehub==2.2.0
+paddle2onnx==0.8.1
+ppgan==2.1.0
+transformers==4.16.2
 monai==0.9.1
-pytorch_lightning
 
-# Jupyter requirements
-jupyterlab
+# jupyter
+jupyterlab==3.4.5
+ipython==7.16.3
+ipywidgets==8.0.1
+jupyter-client==7.2.0
+ipykernel==5.5.6
 
-# The packages below are not directly required. They are dependencies of 
+# others
+opencv-python==4.5.5.64
+matplotlib==3.3.4
+numpy==1.19.3
+fastseg==0.1.2
+Pillow==9.2.0
+scipy==1.5.4
+scikit-learn==0.24.2
+SoundFile==0.10.3.post1
+tqdm==4.64.0
+nibabel==4.0.1
+pytube==12.1.0
+librosa==0.8.1
+tokenizers==0.10.3
+gdown==4.5.1
+
+# weak dependencies (possibly to be removed)
+addict==2.4.0
+yaspin==2.2.0
+scikit-image==0.19.3
+Shapely==1.8.4
+pyclipper==1.3.0.post3
+seaborn==0.11.2
+
+# The packages below are not directly required. They are dependencies of
 # other dependencies that are pinned to a specific version to avoid
 # compatibility issues or vulnerabilities
-seaborn>=0.11.0
-geffnet==0.9.8
-matplotlib<3.4
-jedi==0.17.2
-setuptools>=56.0.0
-Pillow>=8.3.2
-ipykernel==5.*
-ipython==7.16.3 # not directly required, pinned to avoid a vulnerability
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
 nltk>=3.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
-scikit-learn>=0.24.2 # not directly required, pinned by Snyk to avoid a vulnerability
 paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
-parasail<=1.2.4 # higher version causes paddle issues
+geffnet==0.9.8
+jedi==0.17.2
+parasail<=1.2.4
+setuptools>=56.0.0
 nest-asyncio<=1.5.4
-jupyter-client<=7.2.0

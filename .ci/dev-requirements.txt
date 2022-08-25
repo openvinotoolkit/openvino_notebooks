@@ -3,10 +3,10 @@
 # black==21.8 requires typing-extensions>3.10 which is incompatible
 # with other packages
 -r ../requirements.txt
-black==21.7b0               # format Python code
-isort                       # sort imports
-jupyterlab-code-formatter   # format code in notebooks in Jupyter Lab
-jupyterlab-git              # checkout and commit code in Jupyter Lab
-nbqa[toolchain]             # automatic code quality checking
-nbval                       # pytest plugin for automatic notebook testing
-toml                        # used for validating docker requirements
+black==21.7b0                     # format Python code
+isort==5.10.1                     # sort imports
+jupyterlab-code-formatter==1.5.3  # format code in notebooks in Jupyter Lab
+jupyterlab-git==0.39.0            # checkout and commit code in Jupyter Lab
+nbqa[toolchain]==1.4.0            # automatic code quality checking
+nbval==0.9.6                      # pytest plugin for automatic notebook testing
+toml==0.10.2                      # used for validating docker requirements
