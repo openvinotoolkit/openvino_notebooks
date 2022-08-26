@@ -16,26 +16,22 @@ If you need help, please start a GitHub [Discussion](https://github.com/openvino
 
 ## Table of Contents
 
-* [➤ 📝 Installation Guide](#-installation-guide)
-	* [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows)
-	* [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu)
-	* [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS)
-	* [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
-	* [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
-	* [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML)
-	* [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker)
-* [➤ 🚀 Getting Started](#-getting-started)
-	* [First steps with OpenVINO](#-first-steps)
-	* [Convert & Optimize](#-convert--optimize)
-	* [Model Demos](#-model-demos)
-	* [Model Training](#-model-training)
-	* [Live Demos](#-live-demos)
-* [➤ ⚙️ System Requirements](#-system-requirements)
-* [➤ 💻 Run the Notebooks](#-run-the-notebooks)
-* [➤ 🧹 Cleaning Up](#-cleaning-up)
-* [➤ ⚠️ Troubleshooting](#-troubleshooting)
-* [➤ 🧑‍💻 Contributors](#-contributors)
-* [➤ ❓ FAQ](#-faq)
+- [Table of Contents](#table-of-contents)
+- [📝 Installation Guide](#-installation-guide)
+- [🚀 Getting Started](#-getting-started)
+	- [💻 First steps](#-first-steps)
+	- [⌚ Convert & Optimize](#-convert--optimize)
+	- [🎯 Model Demos](#-model-demos)
+	- [🏃 Model Training](#-model-training)
+	- [📺 Live Demos](#-live-demos)
+- [⚙️ System Requirements](#️-system-requirements)
+- [💻 Run the Notebooks](#-run-the-notebooks)
+	- [To Launch a Single Notebook](#to-launch-a-single-notebook)
+	- [To Launch all Notebooks](#to-launch-all-notebooks)
+- [🧹 Cleaning Up](#-cleaning-up)
+- [⚠️ Troubleshooting](#️-troubleshooting)
+- [🧑‍💻 Contributors](#-contributors)
+- [❓ FAQ](#-faq)
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='-installation-guide'/>
@@ -143,7 +139,7 @@ More amazing notebooks here!
 | [220-yolov5-accuracy-check-and-quantization](notebooks/220-yolov5-accuracy-check-and-quantization)<br> | Quantize the Ultralytics YOLOv5 model and check accuracy using the OpenVINO POT API | <img src = "https://user-images.githubusercontent.com/44352144/177097174-cfe78939-e946-445e-9fce-d8897417ef8e.png"  width=225> |
 | [221-machine-translation](notebooks/221-machine-translation)<br> | Real-time translation from English to German |  |
 | [222-vision-image-colorization](notebooks/222-vision-image-colorization/)<br> | Use pre-trained models to colorize black \& white images using OpenVINO | <img src = "https://user-images.githubusercontent.com/18904157/166343139-c6568e50-b856-4066-baef-5cdbd4e8bc18.png" width=225> |
-| [224-3D-segmentation](224-3D-segmentation/)<br> | Process point cloud data and run 3D Part Segmentation with OpenVINO | <img src = "https://user-images.githubusercontent.com/91237924/185752178-3882902c-907b-4614-b0e6-ea1de08bf3ef.png" width=225> |
+| [223-3D-segmentation-point-clouds](notebooks/223-3D-segmentation-point-clouds/)<br> | Process point cloud data and run 3D Part Segmentation with OpenVINO | <img src = "https://user-images.githubusercontent.com/91237924/185752178-3882902c-907b-4614-b0e6-ea1de08bf3ef.png" width=225> |
 
 
 </details>
