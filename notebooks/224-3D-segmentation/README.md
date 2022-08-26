@@ -8,7 +8,7 @@ Point clouds are an important type of geometric data structure. OpenVINO can dir
 
 ## Notebook Contents
 
-This notebook demonstrates how to process the point clould data and run 3D part segmentation with OpenVINO. The inputs of this task is a collection of individual data points in a three-dimensional plane with each point having a set coordinate on the X, Y, and Z axis.
+This notebook demonstrates how to process [point cloud](https://en.wikipedia.org/wiki/Point_cloud) data and run 3D Part Segmentation with OpenVINO. The inputs of this task are a collection of individual data points in a three-dimensional plane with each point having a set coordinates on the X, Y, and Z axes.
 
 In this notebook, we use the [PointNet](https://arxiv.org/abs/1612.00593) pre-trained model to detect each part of a chair and return its category.
 
