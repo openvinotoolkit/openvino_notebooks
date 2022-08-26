@@ -1,4 +1,4 @@
-# 3D part segmentation
+# Part Segmentation of 3D Point Clouds with OpenVINO™ 
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F224-3D-segmentation%2F224-3D-segmentation.ipynb)
 
