@@ -35,7 +35,7 @@ tensorflow==2.5.3
 tensorflow_datasets==4.2.0
 
 # CT scan training/inference requirements
-monai<=0.9.0
+monai==0.9.1
 pytorch_lightning
 
 # Jupyter requirements
