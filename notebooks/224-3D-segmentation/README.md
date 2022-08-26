@@ -4,7 +4,7 @@
 
 ![3D chair](https://user-images.githubusercontent.com/91237924/185752178-3882902c-907b-4614-b0e6-ea1de08bf3ef.png)
 
-Point cloud is an important type of geometric data structure. Right now OpenVINO can directly consume point cloud and run inference with it.
+Point clouds are an important type of geometric data structure. OpenVINO can directly consume point cloud data and perform inference with it.
 
 ## Notebook Contents
 
