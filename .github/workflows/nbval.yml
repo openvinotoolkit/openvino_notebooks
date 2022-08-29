@@ -37,15 +37,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, windows-2019, macos-11, macos-12]
-        python: [3.6, 3.7, 3.8, 3.9]
-        exclude:
-        - os: macos-11
-          python: 3.6
-        - os: macos-12
-          python: 3.6
-        - os: windows-2019
-          python: 3.6
+        os: [ubuntu-20.04, windows-2019, macos-11, macos-12]
+        python: [3.7, 3.8, 3.9]
     steps:
 
     #### Installation/preparation ####
@@ -195,7 +188,7 @@ jobs:
       if: runner.os == 'MacOS'
       run: |
         chmod +x .ci/validate_notebooks.sh
-        .ci/validate_notebooks.sh 107-speech-recognition-quantization 115-async-api
+        .ci/validate_notebooks.sh 107-speech-recognition-quantization 114-quantization-simplified-mode 115-async-api
       shell: bash
 
     # Show the cache after running the notebooks
