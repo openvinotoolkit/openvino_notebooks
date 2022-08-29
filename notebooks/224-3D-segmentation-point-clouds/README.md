@@ -1,6 +1,6 @@
 # Part Segmentation of 3D Point Clouds with OpenVINO™ 
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F224-3D-segmentation%2F224-3D-segmentation.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F224-3D-segmentation-point-clouds%2F224-3D-segmentation-point-clouds.ipynb)
 
 ![3D chair](https://user-images.githubusercontent.com/91237924/185752178-3882902c-907b-4614-b0e6-ea1de08bf3ef.png)
 
