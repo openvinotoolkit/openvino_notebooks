@@ -1,4 +1,4 @@
-# Interactive Text Prediction with OpenVINO
+# GPT-2 Text Prediction with OpenVINO
 Text generation is an area of natural language processing. It uses computational linguistics and artificial intelligence to automatically produce natural language texts that can meet specific communicative needs.
 In this demo we use the **Generative Pre-trained Transformer 2 ([GPT-2](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/gpt-2))** model for text prediction.
 
