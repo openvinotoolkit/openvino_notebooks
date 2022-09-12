@@ -58,6 +58,3 @@ paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddl
 nest-asyncio<=1.5.4
 jupyter-client<=7.2.0
 
-# 3-D support
-pythreejs # not directly required, pinned to avoid a vulnerability
-ipywidgets # not directly required, pinned to avoid a vulnerability

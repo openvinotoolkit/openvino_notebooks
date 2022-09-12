@@ -1,0 +1,3 @@
+# 3-D support
+pythreejs # not directly required, pinned to avoid a vulnerability
+ipywidgets # not directly required, pinned to avoid a vulnerability
