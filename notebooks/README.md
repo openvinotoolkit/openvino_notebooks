@@ -3,8 +3,8 @@ English | [简体中文](https://github.com/openvinotoolkit/openvino_notebooks/b
 <h1 align="center">📚 OpenVINO™ Notebooks</h1>
 
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/LICENSE)
-[![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml/badge.svg)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml?query=branch%3Amain)
-[![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml?query=branch%3Amain)
+[![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml?query=event%3Apush)
+[![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml?query=event%3Apush)
 
 A collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
 
@@ -94,8 +94,9 @@ More amazing notebooks here!
 | [110-ct-segmentation-quantize](110-ct-segmentation-quantize/)<br> | Quantize a kidney segmentation model and show live inference | 
 | [111-detection-quantization](111-detection-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F111-detection-quantization%2F111-detection-quantization.ipynb) | Quantize an object detection model | 
 | [112-pytorch-post-training-quantization-nncf](112-pytorch-post-training-quantization-nncf/) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model in post-training mode (without model fine-tuning)| 
-| [113-image-classification-quantization](113-image-classification-quantization/) | Quantize mobilenet image classification | 
-| [114-quantization-simplified-mode](114-quantization-simplified-mode/) | Quantize Image Classification Models with POT in Simplified Mode| |
+| [113-image-classification-quantization](113-image-classification-quantization/) | Image Classification Models with POT |
+| [114-quantization-simplified-mode](114-quantization-simplified-mode/) | Quantize Image Classification Models with POT in Simplified Mode|
+| [115-async-api](115-async-api/) | Use Asynchronous Execution to Improve Data Pipelining| |
 </details>
 </p>
 
@@ -141,7 +142,9 @@ More amazing notebooks here!
 | [219-knowledge-graphs-conve](219-knowledge-graphs-conve/)<br> | Optimize the knowledge graph embeddings model (ConvE) with OpenVINO ||
 | [220-yolov5-accuracy-check-and-quantization](220-yolov5-accuracy-check-and-quantization/)<br> | Quantize the Ultralytics YOLOv5 model and check accuracy using the OpenVINO POT API | <img src = "https://user-images.githubusercontent.com/44352144/177097174-cfe78939-e946-445e-9fce-d8897417ef8e.png" width=225> |
 | [221-machine-translation](221-machine-translation)<br> | Real-time translation from English to German |  |
-| [222-vision-image-colorization](222-vision-image-colorization/)<br> | Use pre-trained models to colorize black \& white images using OpenVINO | <img src = "https://user-images.githubusercontent.com/18904157/166343139-c6568e50-b856-4066-baef-5cdbd4e8bc18.png" width=225> 
+| [222-vision-image-colorization](222-vision-image-colorization/)<br> | Use pre-trained models to colorize black \& white images using OpenVINO | <img src = "https://user-images.githubusercontent.com/18904157/166343139-c6568e50-b856-4066-baef-5cdbd4e8bc18.png" width=225>  |
+| [223-gpt2-text-prediction](223-gpt2-text-prediction/)<br> | Use GPT-2 to perform text prediction on an input sequence | <img src=https://user-images.githubusercontent.com/91228207/185105225-0f996b0b-0a3b-4486-872d-364ac6fab68b.png  width=225> |
+
 
 
 </details>

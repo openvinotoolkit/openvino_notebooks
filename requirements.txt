@@ -1,7 +1,8 @@
 openvino-dev[onnx,tensorflow2]==2022.1.0
 gdown
-pytube
+pytube>=12.1.0
 yaspin
+librosa==0.8.1
 
 # PyTorch/ONNX notebook requirements
 fastseg
@@ -10,30 +11,31 @@ ipywidgets
 # Upgrade onnx version to avoid 220 YOLOV5 pytorch to onnx model export issue on Windows
 onnx>=1.11.0,<1.12.0
 
-torch>=1.5.1,<=1.7.1; sys_platform == 'darwin'
-torchvision>=0.6.1,<=0.8.2; sys_platform == 'darwin'
+torch==1.8.1; sys_platform == 'darwin'
+torchvision==0.9.1; sys_platform == 'darwin'
 --find-links https://download.pytorch.org/whl/torch_stable.html
-torch>=1.5.1+cpu,<=1.7.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
-torchvision>=0.6.1+cpu,<=0.8.2+cpu; sys_platform =='linux' or platform_system == 'Windows'
+torch==1.8.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
+torchvision==0.9.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchmetrics==0.6.2
 
 # PaddlePaddle notebook requirements
 # For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
 paddlepaddle==2.2.*
-paddlehub
+paddlehub<=2.2.0
 # paddle2onnx 0.9.7 fails export in 206 and 207
-paddle2onnx>=0.6, <=0.9.6
+paddle2onnx>=0.6,<=0.9.6
 ppgan==2.1.*
 
 # BERT quantization notebook requirements
 transformers
 
 # NNCF notebook requirements
-nncf[tf, torch]
+nncf[tf,torch]==2.3.0
+tensorflow==2.5.3
 tensorflow_datasets==4.2.0
 
 # CT scan training/inference requirements
-monai<=0.9.0
+monai==0.9.1
 pytorch_lightning
 
 # Jupyter requirements
@@ -55,6 +57,7 @@ nltk>=3.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
 scikit-learn>=0.24.2 # not directly required, pinned by Snyk to avoid a vulnerability
 paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
+parasail<=1.2.4 # higher version causes paddle issues
 nest-asyncio<=1.5.4
 jupyter-client<=7.2.0
 

@@ -11,7 +11,7 @@ on:
     - 'notebooks/**.py'
     - 'requirements.txt'
     - '.ci/*'
-    - '.github/workflows/nbval.yml'
+    - '.github/workflows/*.yml'
     - '.github/workflows/.env'
   push:
     branches:
@@ -22,7 +22,7 @@ on:
     - 'notebooks/**.py'
     - 'requirements.txt'
     - '.ci/*'
-    - '.github/workflows/nbval.yml'
+    - '.github/workflows/*.yml'
     - '.github/workflows/.env'
   schedule:
     - cron:  '30 8 * * *'
@@ -37,15 +37,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, windows-2019, macos-11, macos-12]
-        python: [3.6, 3.7, 3.8, 3.9]
-        exclude:
-        - os: macos-11
-          python: 3.6
-        - os: macos-12
-          python: 3.6
-        - os: windows-2019
-          python: 3.6
+        os: [ubuntu-20.04, windows-2019, macos-11, macos-12]
+        python: [3.7, 3.8, 3.9]
     steps:
 
     #### Installation/preparation ####
@@ -185,12 +178,18 @@ jobs:
         jupyter lab notebooks --help
 
     # Main notebooks test. Verifies that all notebooks run without errors
-    # Temporary workaround for Python 3.9 while NNCF is not updated to TF 2.5
-    # Temporary excluding 107 and 114 from MacOS due to performance issues
     - name: Analysing with nbval
+      if: runner.os != 'MacOS'
       run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/114-quantization-simplified-mode --ignore=notebooks/204-named-entity-recognition --ignore=notebooks/301-tensorflow-training-openvino --ignore=notebooks/302-pytorch-quantization-aware-training --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10  
-
+            chmod +x .ci/validate_notebooks.sh
+            .ci/validate_notebooks.sh
+      shell: bash
+    - name: Analysing with nbval
+      if: runner.os == 'MacOS'
+      run: |
+        chmod +x .ci/validate_notebooks.sh
+        .ci/validate_notebooks.sh 107-speech-recognition-quantization 114-quantization-simplified-mode 115-async-api
+      shell: bash
 
     # Show the cache after running the notebooks
     - name: Show cache
