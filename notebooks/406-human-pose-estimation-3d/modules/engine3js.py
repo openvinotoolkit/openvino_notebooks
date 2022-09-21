@@ -83,6 +83,12 @@ class Engine3js:
     def plot(self):
         self.renderer.render(self.scene, self.cam)
 
+    def scene_add(self, object):
+        self.scene.add(object)
+
+    def scene_remove(self, object):
+        self.scene.remove(object)
+
 
 class Geometry:
     """
@@ -157,7 +163,7 @@ class Geometry:
 #             #     # It defines limbs' color
 #             #     "color": self.colorSet,
 #             # }
-            
+
 
 #             pose = LineSegments(self.geometry, self.material)
 #             poses.append(pose)
@@ -165,6 +171,7 @@ class Geometry:
 
 #     def plot(self, pose_points=None):
 #         return self.__call__(pose_points)
+
 
 class Skeleton(Geometry):
     """
@@ -221,10 +228,11 @@ class Skeleton(Geometry):
 
             self.geometry = BufferGeometry(
                 attributes={
-                "position": BufferAttribute(bones, normalized=False),
-                # It defines limbs' color
-                "color": self.colorSet,
-            })                
+                    "position": BufferAttribute(bones, normalized=False),
+                    # It defines limbs' color
+                    "color": self.colorSet,
+                }
+            )
 
             pose = LineSegments(self.geometry, self.material)
             poses.append(pose)
@@ -289,7 +297,7 @@ class Cloudpoint(Geometry):
                 attributes={
                     "position": BufferAttribute(line, normalized=False),
                     # It defines limbs' color
-                    "color": BufferAttribute( 
+                    "color": BufferAttribute(
                         # Here you can set vertex colors, if you set the 'color' option = vertexes
                         np.array(
                             [
