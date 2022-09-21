@@ -90,7 +90,7 @@ class Geometry:
     """
 
     def __init__(self, name="geometry"):
-        self.geometry = BufferGeometry()
+        self.geometry = None
         self.material = None
         self.name = name
 
@@ -208,7 +208,6 @@ class Skeleton(Geometry):
 
     def __call__(self, poses_3d):
         poses = []
-        self.geometry = BufferGeometry()
         for pose_position_tmp in poses_3d:
             bones = []
             for edge in self.body_edges:
@@ -220,11 +219,12 @@ class Skeleton(Geometry):
 
             # You can find the api in https://github.com/jupyter-widgets/pythreejs
 
-            self.geometry.attributes = {
+            self.geometry = BufferGeometry(
+                attributes={
                 "position": BufferAttribute(bones, normalized=False),
                 # It defines limbs' color
                 "color": self.colorSet,
-            }
+            })                
 
             pose = LineSegments(self.geometry, self.material)
             poses.append(pose)
