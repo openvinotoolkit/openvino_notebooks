@@ -188,19 +188,7 @@ jobs:
       if: runner.os == 'MacOS'
       run: |
         chmod +x .ci/validate_notebooks.sh
-        .ci/validate_notebooks.sh 107-speech-recognition-quantization 114-quantization-simplified-mode 115-async-api 203-meter-reader 219-knowledge-graphs-conve
-      shell: bash
-    - name: Analysing with nbval
-      if: runner.os == 'Windows'
-      run: |
-        chmod +x .ci/validate_notebooks.sh
-        .ci/validate_notebooks.sh 203-meter-reader 219-knowledge-graphs-conve
-      shell: bash
-    - name: Analysing with nbval
-      if: runner.os == 'Ubuntu'
-      run: |
-        chmod +x .ci/validate_notebooks.sh
-        .ci/validate_notebooks.sh 203-meter-reader
+        .ci/validate_notebooks.sh 107-speech-recognition-quantization 114-quantization-simplified-mode 115-async-api
       shell: bash
 
     # Show the cache after running the notebooks
