@@ -29,6 +29,9 @@ ppgan==2.1.*
 # BERT quantization notebook requirements
 transformers
 
+# Stable diffusion notebook requirements
+diffusers>=0.2.4
+
 # NNCF notebook requirements
 git+https://github.com/openvinotoolkit/nncf.git#egg=nncf[tf,torch]
 tensorflow>=2.5,<=2.9.1
