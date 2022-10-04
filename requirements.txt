@@ -38,6 +38,9 @@ tensorflow_datasets==4.2.0
 monai==0.9.1
 pytorch_lightning
 
+# 3D visualization
+pythreejs
+
 # Jupyter requirements
 jupyterlab
 
@@ -60,4 +63,5 @@ paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddl
 parasail<=1.2.4 # higher version causes paddle issues
 nest-asyncio<=1.5.4
 jupyter-client<=7.2.0
+
 
