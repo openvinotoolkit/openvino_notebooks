@@ -15,12 +15,13 @@ class Engine3D:
         width, height:   Size of the view window.
     """
     
-    def __init__(self, width=500, height=450):
+    def __init__(self, width=500, height=450, cam=[3, 2, -6]):
         # screen init
         self.WIDTH, self.HEIGHT = width, height
         self.H_WIDTH, self.H_HEIGHT = self.WIDTH // 2, self.HEIGHT // 2
         self.FPS = 60
         self.screen = np.zeros((self.HEIGHT, self.WIDTH, 3), dtype=np.int8)
+        self.Cam = cam
         self.create_objects()
         
         # set color
@@ -39,7 +40,6 @@ class Engine3D:
         # self.screen.fill(pg.Color('lightgoldenrod4'))
         self.world_axes.draw()
         # self.axes.draw()
-        # self.tetrahedron.draw()
 
         # draw grid
         self.grid.draw()
@@ -51,8 +51,8 @@ class Engine3D:
         """
         In this function we create and initialize the coordinates and grid and the objects we need.
         """
-        self.camera = Camera(self, [2, 3, -6])
-        # self.camera = Camera(self, [5, 2, -3])
+        # self.camera = Camera(self, [7, 2, -2])
+        self.camera = Camera(self, self.Cam)
         self.projection = Projection(self)
         # self.tetrahedron = Object3D(self)
         # self.tetrahedron.translate([0.2, 0.4, 0.2])
@@ -68,7 +68,7 @@ class Engine3D:
         # add grid
         self.grid = Grid(self, 1, 20)
         self.grid.Move_flag = False
-        self.grid.scale(10)
+        self.grid.scale(15)
         self.grid.translate([0.0001, 0.0001, 0.0001])
         
         # add skeleton
