@@ -65,9 +65,7 @@ class Engine3js:
         if axis:
             self.scene.add(self.axis)
 
-        # scene = draw_skeleton(scene, tmp_poses_3d)
         # render the objects in scene
-
         self.renderer = Renderer(
             camera=self.cam,
             scene=self.scene,
@@ -102,75 +100,6 @@ class Geometry:
 
     def get_Name():
         return self.name
-
-
-# class Skeleton(Geometry):
-#     """
-#     This is the class for drawing human body poses.
-#     """
-
-#     def __init__(self, name="skeleton", lineWidth=3, body_edges=[]):
-#         super(Skeleton, self).__init__(name)
-#         self.material = LineBasicMaterial(
-#             vertexColors="VertexColors", linewidth=lineWidth
-#         )
-#         self.colorSet = BufferAttribute(
-#             np.array(
-#                 [
-#                     [1, 0, 0],
-#                     [1, 0, 0],
-#                     [0, 1, 0],
-#                     [0, 0, 1],
-#                     [1, 0, 0],
-#                     [1, 0, 0],
-#                     [0, 1, 0],
-#                     [0, 0, 1],
-#                     [1, 0, 0],
-#                     [1, 0, 0],
-#                     [0, 1, 0],
-#                     [0, 0, 1],
-#                     [1, 0, 0],
-#                     [1, 0, 0],
-#                     [0, 1, 0],
-#                     [0, 0, 1],
-#                     [1, 0, 0],
-#                     [1, 0, 0],
-#                     [0, 1, 0],
-#                 ],
-#                 dtype=np.float32,
-#             ),
-#             normalized=False,
-#         )
-#         self.geometry.attributes["color"] = self.colorSet
-#         self.body_edges = body_edges
-
-#     def __call__(self, poses_3d):
-#         poses = []
-#         # self.geometry = BufferGeometry()
-#         for pose_position_tmp in poses_3d:
-#             bones = []
-#             for edge in self.body_edges:
-#                 # put pair of points as limbs
-#                 bones.append(pose_position_tmp[edge[0]])
-#                 bones.append(pose_position_tmp[edge[1]])
-
-#             bones = np.asarray(bones, dtype=np.float32)
-
-#             # You can find the api in https://github.com/jupyter-widgets/pythreejs
-
-#             # self.geometry.attributes = {
-#             #     "position": BufferAttribute(bones, normalized=False),
-#             #     # It defines limbs' color
-#             #     "color": self.colorSet,
-#             # }
-
-
-#             pose = LineSegments(self.geometry, self.material)
-#             poses.append(pose)
-#         return poses
-
-#     def plot(self, pose_points=None):
-#         return self.__call__(pose_points)
 
 
 class Skeleton(Geometry):

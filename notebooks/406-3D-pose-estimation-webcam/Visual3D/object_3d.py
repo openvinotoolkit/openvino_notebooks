@@ -5,41 +5,38 @@ import numpy as np
 
 class Object3D:
     def __init__(self, render):
+        
+        """
+        This class is the base class of all 3D objects. It defines the functions of 3D geometric objects. 
+        Here, it uses the method of recording the vertices of objects to define the vertices in 3D space, 
+        and connect them to show the geometry.
+        
+        Box
+        np.array([
+            (0, 0, 0, 1),
+            (0, 1, 0, 1),
+            (1, 1, 0, 1),
+            (1, 0, 0, 1),
+            (0, 0, 1, 1),
+            (0, 1, 1, 1),
+            (1, 1, 1, 1),
+            (1, 0, 1, 1)]
+
+        tetrahedron 
+        np.array([
+            (0, 0, 0, 1),
+            (0, 1, 0, 1),
+            (1, 1, 0, 1),
+            (1, 0, 1, 1)
+            ])
+
+        """
         self.render = render
 
         self.vertexes = np.array([])
 
-        # np.array([
-        # box
-        # (0, 0, 0, 1),
-        # (0, 1, 0, 1),
-        # (1, 1, 0, 1),
-        # (1, 0, 0, 1),
-        # (0, 0, 1, 1),
-        # (0, 1, 1, 1),
-        # (1, 1, 1, 1),
-        # (1, 0, 1, 1)
-
-        # tetrahedron
-        # (0, 0, 0, 1),
-        # (0, 1, 0, 1),
-        # (1, 1, 0, 1),
-        # (1, 0, 1, 1)
-
-        # ])
-
         self.faces = np.array(
             [
-                # (0, 1, 2, 3),   # like these vertexes
-                #                 # (0, 0, 0, 1),
-                #                 # (0, 1, 0, 1),
-                #                 # (1, 1, 0, 1),
-                #                 # (1, 0, 0, 1),
-                # (4, 5, 6, 7),
-                # (0, 4, 5, 1),
-                # (2, 3, 7, 6),
-                # (1, 2, 6, 5),
-                # (0, 3, 7, 4)]
                 (0, 1, 2),
                 (0, 2, 3),
                 (1, 2, 3),
@@ -47,8 +44,7 @@ class Object3D:
             ]
         )
 
-        # self.font = pg.font.SysFont('Arial', 30, bold=True)
-        # self.color_faces = [(pg.Color('orange'), face) for face in self.faces]
+
         self.color_faces = [((255, 255, 255), face) for face in self.faces]
         self.Move_flag, self.draw_vertexes = True, True
         self.label = ""
@@ -111,6 +107,9 @@ class Object3D:
         self.screen_projection()
         # self.Move()
 
+    # This defines code for moving objects over time, which means 
+    # changing different views over time, rather than constantly fetching data from input
+    
     # def Move(self):
     #     if self.Move_flag:
     #         # self.rotate_x(pg.time.get_ticks() % 0.005)
@@ -139,23 +138,15 @@ class Grid(Object3D):
         grid_array = []
         step = grid_size / dimension
         dimension = dimension // 2
-        for step_id in range(dimension + 1):  # add grid
-            # grid_array.append(np.array([[-grid_size / 2, -grid_size / 2 + step_id * step, 0, 1],
-            #                             [grid_size / 2, -grid_size / 2 + step_id * step, 0, 1]], dtype=np.float32))
-            # grid_array.append(np.array([[-grid_size / 2 + step_id * step, -grid_size / 2, 0, 1],
-            #                             [-grid_size / 2 + step_id * step, grid_size / 2, 0, 1]], dtype=np.float32))
-            # grid_array.append(np.array([[-grid_size / 2, 0, -grid_size / 2 + step_id * step, 1],
-            #                             [grid_size / 2, 0, -grid_size / 2 + step_id * step, 1]], dtype=np.float32))
-            # grid_array.append(np.array([[-grid_size / 2 + step_id * step, 0, -grid_size / 2, 1],
-            #                             [-grid_size / 2 + step_id * step, 0, grid_size / 2, 1]], dtype=np.float32))
-
-            # divide into 4 blocks
-
+        for step_id in range(dimension + 1):  
+        # add grid
+        # divide into 4 blocks
             # grid_array.append(np.array([-grid_size / 2, 0, -grid_size / 2 + step_id * step, 1], dtype=np.float32))
             # grid_array.append(np.array([grid_size / 2, 0, -grid_size / 2 + step_id * step, 1], dtype=np.float32))
             # grid_array.append(np.array([-grid_size / 2 + step_id * step, 0, -grid_size / 2, 1], dtype=np.float32))
             # grid_array.append(np.array([-grid_size / 2 + step_id * step, 0, grid_size / 2, 1], dtype=np.float32))
-
+            
+        # only one of these blocks is used, [0:1, 0:1].
             grid_array.append(np.array([0, 0, 0 + step_id * step, 1], dtype=np.float32))
             grid_array.append(
                 np.array([grid_size / 2, 0, 0 + step_id * step, 1], dtype=np.float32)
@@ -166,25 +157,25 @@ class Grid(Object3D):
             )
 
         self.vertexes = np.array(grid_array)
-        # print(self.vertexes)
+        
 
     def screen_projection(self):
         vertexes = self.vertexes @ self.render.camera.camera_matrix()
         vertexes = vertexes @ self.render.projection.projection_matrix
         vertexes /= vertexes[:, -1].reshape(-1, 1)
+        # remove some extra points
         # vertexes[(vertexes > 2) | (vertexes < -2)] = 0
         vertexes = vertexes @ self.render.projection.to_screen_matrix
         vertexes = vertexes[:, :2]
 
         vertexes = vertexes.astype(int)
         vertexes = vertexes.reshape(-1, 2, 2)
-        # print(f'vertexes is {vertexes}')
+        
         
         for grid_line in vertexes:
             if not np.any(
                 (grid_line == self.render.H_WIDTH) | (grid_line == self.render.H_HEIGHT)
             ):
-                # print(grid_line[0], grid_line[1])
                 cv2.line(
                     self.render.screen,
                     tuple(grid_line[0]),
@@ -198,8 +189,6 @@ class Grid(Object3D):
 class Skeleton(Object3D):
     def __init__(self, render):
         super().__init__(render)
-        # self.vertexes = []
-        # self.body_edge = []
 
     def set_body(self, joints, body_edge, size=1.5):
         self.vertexes = joints
@@ -219,15 +208,12 @@ class Skeleton(Object3D):
             vertexes = vertexes[:, :2]
 
             vertexes = vertexes.astype(int)
-            # vertexes = vertexes.reshape(-1, 2, 2)
-            # print(f'vertexes is {vertexes[:2]}')
 
             for edge in self.body_edge:
                 if not np.any(
                     (vertexes[edge[0]] == self.render.H_WIDTH)
                     | (vertexes[edge[1]] == self.render.H_HEIGHT)
                 ):
-                    # print(grid_line[0], grid_line[1])
                     cv2.line(
                         self.render.screen,
                         tuple(vertexes[edge[0]]),

@@ -9,17 +9,15 @@ import cv2
 
 class engine3D:
     def __init__(self):
-        # pg.init()
+    
         self.RES = self.WIDTH, self.HEIGHT = 600, 900
         self.H_WIDTH, self.H_HEIGHT = self.WIDTH // 2, self.HEIGHT // 2
         self.FPS = 60
         self.screen = np.zeros((self.HEIGHT, self.WIDTH, 3), dtype=np.int8)
-        # self.screen = pg.display.set_mode(self.RES)
-        # self.clock = pg.time.Clock()
+
         self.create_objects()
 
     def draw(self):
-        # self.screen.fill(pg.Color('lightgoldenrod4'))
         self.world_axes.draw()
         self.axes.draw()
         self.object.draw()
@@ -50,13 +48,7 @@ class engine3D:
 
     def run(self):
         while True:
-
             self.draw()
-            # self.camera.control()
-            # [exit() for i in pg.event.get() if i.type == pg.QUIT]
-            # pg.display.set_caption(str(self.clock.get_fps()))
-            # pg.display.flip()
-            # self.clock.tick(self.FPS)
 
             cv2.imshow("image", self.screen)
             key = cv2.waitKey(20)

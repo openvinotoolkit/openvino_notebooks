@@ -13,6 +13,7 @@ class Engine3D:
     
     Attributes:
         width, height:   Size of the view window.
+        cam:   the position of camera.
     """
     
     def __init__(self, width=500, height=450, cam=[3, 2, -6]):
@@ -27,19 +28,12 @@ class Engine3D:
         # set color
         self.Color = {'red' : (255, 0, 0), 
                       'green' : (0, 255, 0),
-                      'blue' : (0, 0, 255)}
-        
-        # object
-        # self.world_axes = world_axes
-        
-        # pop_up controls
-        # self.key_callback = Camera.control();
-        
+                      'blue' : (0, 0, 255)}        
 
     def draw(self):
-        # self.screen.fill(pg.Color('lightgoldenrod4'))
+        # Change the background color like this:
+        # self.screen.fill(<Your defined color>))
         self.world_axes.draw()
-        # self.axes.draw()
 
         # draw grid
         self.grid.draw()
@@ -50,14 +44,14 @@ class Engine3D:
     def create_objects(self):
         """
         In this function we create and initialize the coordinates and grid and the objects we need.
+        So you can add your objects here, and draw them by adding code in draw() function.
         """
-        # self.camera = Camera(self, [7, 2, -2])
+        # set the camera position.
         self.camera = Camera(self, self.Cam)
         self.projection = Projection(self)
-        # self.tetrahedron = Object3D(self)
-        # self.tetrahedron.translate([0.2, 0.4, 0.2])
-        # self.object.rotate_y(math.pi / 6)
 
+    # add axes
+    # this maybe unused if you do not want see the axes of object
         self.axes = Axes(self)
         self.axes.translate([0.7, 0.9, 0.7])
         self.world_axes = Axes(self)
@@ -77,10 +71,9 @@ class Engine3D:
     def image(self):
         self.screen.fill(0)
         self.draw()
-        # _, encoded_img = cv2.imencode(".jpg", self.screen, params=[cv2.IMWRITE_JPEG_QUALITY, 90])
-        # return Image(data=encoded_img)
+        
+        # return not encoded image data.
         return self.screen
-        # display(Image(data=encoded_img))
                 
         
     def run(self):
@@ -97,7 +90,3 @@ class Engine3D:
 
 
 
-# if __name__ == '__main__':
-#     newEngine = engine3D()
-#     # newEngine.run()
-#     newEngine.image()

@@ -59,7 +59,7 @@
 | [218-vehicle-detection-and-recognition](notebooks/218-vehicle-detection-and-recognition/)<br> | 车辆检测与识别 | <img src = "https://user-images.githubusercontent.com/47499836/163544861-fa2ad64b-77df-4c16-b065-79183e8ed964.png" width=225> |
 | [220-yolov5-accuracy-check-and-quantization](notebooks/220-yolov5-accuracy-check-and-quantization) | 基于POT工具量化Ultralytics Yolov5模型并分析精度 | <img src = "https://user-images.githubusercontent.com/44352144/177097174-cfe78939-e946-445e-9fce-d8897417ef8e.png"  width=225> |
 | [222-vision-image-colorization](notebooks/222-vision-image-colorization/)<br> | 黑白图像着色 | <img src = "https://user-images.githubusercontent.com/18904157/166343139-c6568e50-b856-4066-baef-5cdbd4e8bc18.png" width=225> |
-| [224-human-pose-estimation-3d](notebooks/224-human-pose-estimation-3d/)<br> | 三为人体姿态估计 | <img src = "https://user-images.githubusercontent.com/42672437/183292131-576cc05a-a724-472c-8dc9-f6bc092190bf.gif" width=225> |
+| [224-human-pose-estimation-3d](notebooks/224-human-pose-estimation-3d/)<br> | 三维人体姿态估计 | <img src = "https://user-images.githubusercontent.com/42672437/183292131-576cc05a-a724-472c-8dc9-f6bc092190bf.gif" width=225> |
 ### 模型训练
 
 这个教程将说明如何训练一个网络
