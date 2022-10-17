@@ -24,6 +24,7 @@ If you need help, please start a GitHub [Discussion](https://github.com/openvino
 	* [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
 	* [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML)
 	* [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker)
+	* [AWS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AWS)
 * [➤ 🚀 Getting Started](#-getting-started)
 	* [First steps with OpenVINO](#-first-steps)
 	* [Convert & Optimize](#-convert--optimize)
