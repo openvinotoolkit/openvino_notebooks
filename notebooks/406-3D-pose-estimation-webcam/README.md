@@ -12,7 +12,9 @@ This demo contains 3D multi-person pose estimation demo. Intel OpenVINO™ backe
 
 This notebook uses the model to estimate 3D human pose and draw them in 2D screen. The input source can be video files or webcam.
 
-This folder has 2 notebooks, the [406-3D-pose-estimation notebook](https://github.com/spencergotowork/openvino_notebooks/blob/master/notebooks/406-3D-pose-estimation-webcam/406-3D-pose-estimation.ipynb) displays 3D results to the browser using [Three.js python api](https://pythreejs.readthedocs.io/en/stable/installing.html). The [406-opencv-3D-pose-estimation notebook](https://github.com/spencergotowork/openvino_notebooks/blob/master/notebooks/406-3D-pose-estimation-webcam/406-opencv-3D-pose-estimation.ipynb) uses the OpenCV toolkit to map and save the 3D result into a 2D image and display it in the notebook
+This notebook has 2 examples: 
+- the [406-3D-pose-estimation notebook](https://github.com/spencergotowork/openvino_notebooks/blob/master/notebooks/406-3D-pose-estimation-webcam/406-3D-pose-estimation.ipynb) displays 3D results to the browser using [Three.js python api](https://pythreejs.readthedocs.io/en/stable/installing.html). 
+- The [406-opencv-3D-pose-estimation notebook](https://github.com/spencergotowork/openvino_notebooks/blob/master/notebooks/406-3D-pose-estimation-webcam/406-opencv-3D-pose-estimation.ipynb) uses the OpenCV toolkit to map and save the 3D result into a 2D image and display it in the notebook
 
 You can find an introduction to the model [here](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/human-pose-estimation-3d-0001).
 
