@@ -94,7 +94,7 @@ More amazing notebooks here!
 | [110-ct-segmentation-quantize](110-ct-segmentation-quantize/)<br> | Quantize a kidney segmentation model and show live inference | 
 | [111-detection-quantization](111-detection-quantization/)<br> | Quantize an object detection model | 
 | [112-pytorch-post-training-quantization-nncf](112-pytorch-post-training-quantization-nncf/) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model in post-training mode (without model fine-tuning)| 
-| [113-image-classification-quantization](113-image-classification-quantization/) | Image Classification Models with POT |
+| [113-image-classification-quantization](113-image-classification-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F113-image-classification-quantization%2F113-image-classification-quantization.ipynb) | Image Classification Models with POT |
 | [114-quantization-simplified-mode](114-quantization-simplified-mode/) | Quantize Image Classification Models with POT in Simplified Mode|
 | [115-async-api](115-async-api/) | Use Asynchronous Execution to Improve Data Pipelining| |
 </details>
