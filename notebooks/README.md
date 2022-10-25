@@ -89,7 +89,7 @@ More amazing notebooks here!
 | [103-paddle-onnx-to-openvino](103-paddle-onnx-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-onnx-to-openvino%2F103-paddle-onnx-to-openvino-classification.ipynb) | Convert PaddlePaddle models to OpenVINO IR | 
 | [104-model-tools](104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | Download, convert and benchmark models from Open Model Zoo | 
 | [105-language-quantize-bert](105-language-quantize-bert/) | Optimize and quantize a pre-trained BERT model |
-| [106-auto-device](106-auto-device/) | Demonstrate how to use AUTO Device |
+| [106-auto-device](106-auto-device/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F106-auto-device%2F106-auto-device.ipynb) | Demonstrate how to use AUTO Device |
 | [107-speech-recognition-quantization](107-speech-recognition-quantization/) | Optimize and quantize a pre-trained Wav2Vec2 speech model |
 | [110-ct-segmentation-quantize](110-ct-segmentation-quantize/)<br> | Quantize a kidney segmentation model and show live inference | 
 | [111-detection-quantization](111-detection-quantization/)<br> | Quantize an object detection model | 
