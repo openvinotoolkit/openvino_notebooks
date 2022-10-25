@@ -96,7 +96,7 @@ More amazing notebooks here!
 | [112-pytorch-post-training-quantization-nncf](112-pytorch-post-training-quantization-nncf/) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model in post-training mode (without model fine-tuning)| 
 | [113-image-classification-quantization](113-image-classification-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F113-image-classification-quantization%2F113-image-classification-quantization.ipynb) | Image Classification Models with POT |
 | [114-quantization-simplified-mode](114-quantization-simplified-mode/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F114-quantization-simplified-mode%2F114-quantization-simplified-mode.ipynb) | Quantize Image Classification Models with POT in Simplified Mode|
-| [115-async-api](115-async-api/) | Use Asynchronous Execution to Improve Data Pipelining| |
+| [115-async-api](115-async-api/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F115-async-api%2F115-async-api.ipynb) | Use Asynchronous Execution to Improve Data Pipelining| |
 </details>
 </p>
 
