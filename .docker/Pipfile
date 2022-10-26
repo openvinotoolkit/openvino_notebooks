@@ -54,10 +54,10 @@ torchmetrics = "==0.6.2"
 torchvision = {index = "pytorch-wheels", version = "==0.9.1+cpu"}
 transformers = "*"
 yaspin = "*"
+pythreejs = "*"
+ipywidgets = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.8"
-pythreejs = "2.4.1"
-ipywidgets = "8.0.2"
