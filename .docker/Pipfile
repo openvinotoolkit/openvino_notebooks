@@ -55,7 +55,6 @@ torchvision = {index = "pytorch-wheels", version = "==0.9.1+cpu"}
 transformers = "*"
 yaspin = "*"
 pythreejs = "*"
-ipywidgets = "*"
 
 [dev-packages]
 
