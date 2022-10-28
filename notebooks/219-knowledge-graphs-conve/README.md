@@ -1,4 +1,6 @@
 # Knowledge graphs model optimization using the Intel OpenVINO toolkit
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F219-knowledge-graphs-conve%2F219-knowledge-graphs-conve.ipynb)
+
 [Knowledge graphs](https://arxiv.org/pdf/2002.00388.pdf) provide an efficient way to represent domain information and are used in a number of real-world applications. <br><br>
 Commonly, knowledge graphs are used to encode domain information by representing them as factual triples of source, relation and target entities.
 For ex. For the countries domain, the domain knowledge can be encoded by representing the countries as entities (for ex. Germany, Poland) and relation between them (Neighbor) as factual triples (Poland, Neighbor, Germany) as well as other information as follows:
