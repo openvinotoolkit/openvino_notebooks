@@ -63,5 +63,3 @@ paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddl
 parasail<=1.2.4 # higher version causes paddle issues
 nest-asyncio<=1.5.4
 jupyter-client<=7.2.0
-
-
