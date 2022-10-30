@@ -1,4 +1,4 @@
-English | [简体中文](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README_cn.md)
+[English](README.md) | 简体中文
 
 <h1 align="center">📚 OpenVINO™ Notebooks</h1>
 
