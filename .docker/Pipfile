@@ -28,7 +28,7 @@ monai = "*"
 nbval = "*"
 nest-asyncio = "<=1.5.4"
 nltk = ">=3.6.4"
-git+https://github.com/openvinotoolkit/nncf.git#egg=nncf[tf,torch] {extras = ["torch","tf"]}
+nncf = {extras = ["torch","tf"], version = "==2.3.0"}
 onnx = ">=1.11.0,<1.12.0"
 openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.2.0"}
 ovmsclient = "*"
