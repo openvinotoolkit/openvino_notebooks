@@ -1,9 +1,18 @@
+<<<<<<< HEAD
 name: nbval (develop)
+=======
+name: nbval
+
+>>>>>>> test notebooks
 on:
   workflow_dispatch:
   pull_request:
     branches:
+<<<<<<< HEAD
     - 'develop'
+=======
+    - 'test'
+>>>>>>> test notebooks
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
@@ -13,7 +22,11 @@ on:
     - '.github/workflows/.env'
   push:
     branches:
+<<<<<<< HEAD
     - 'develop'
+=======
+    - 'test'
+>>>>>>> test notebooks
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
@@ -35,7 +48,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04]
+<<<<<<< HEAD
         python: [3.8]
+=======
+        python: [3.7]
+>>>>>>> test notebooks
     steps:
 
     #### Installation/preparation ####
@@ -93,11 +110,19 @@ jobs:
         python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
         # replace backslashes with forward slashes for Windows paths
         python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+<<<<<<< HEAD
+=======
+
+>>>>>>> test notebooks
     # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
     - name: Set HUB_HOME
       shell: bash
       run: |
         echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
+<<<<<<< HEAD
+=======
+
+>>>>>>> test notebooks
     # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
     - name: Cache PaddlePaddle cache directories
       id: cacheusercache
