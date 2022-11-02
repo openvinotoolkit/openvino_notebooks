@@ -1,18 +1,9 @@
-<<<<<<< HEAD
 name: nbval (develop)
-=======
-name: nbval
-
->>>>>>> test notebooks
 on:
   workflow_dispatch:
   pull_request:
     branches:
-<<<<<<< HEAD
     - 'develop'
-=======
-    - 'test'
->>>>>>> test notebooks
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
@@ -22,11 +13,7 @@ on:
     - '.github/workflows/.env'
   push:
     branches:
-<<<<<<< HEAD
     - 'develop'
-=======
-    - 'test'
->>>>>>> test notebooks
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
@@ -48,11 +35,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04]
-<<<<<<< HEAD
         python: [3.8]
-=======
-        python: [3.7]
->>>>>>> test notebooks
     steps:
 
     #### Installation/preparation ####
@@ -110,19 +93,11 @@ jobs:
         python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
         # replace backslashes with forward slashes for Windows paths
         python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
-<<<<<<< HEAD
-=======
-
->>>>>>> test notebooks
     # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
     - name: Set HUB_HOME
       shell: bash
       run: |
         echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
-<<<<<<< HEAD
-=======
-
->>>>>>> test notebooks
     # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
     - name: Cache PaddlePaddle cache directories
       id: cacheusercache
@@ -162,15 +137,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
-<<<<<<< HEAD
         wget -O openvino-2022.3.0-cp38-cp38-manylinux_2_31_x86_64.whl 'https://onedrive.live.com/download?cid=614D2D07C188F961&resid=614D2D07C188F961%21129&authkey=AFkkYTmOKlvx25c'
         wget -O openvino_dev-2022.3.0-py3-none-any.whl 'https://onedrive.live.com/download?cid=614D2D07C188F961&resid=614D2D07C188F961%21128&authkey=AFmkb1ah3tsXC-I'
         python -m pip install --cache-dir pipcache --no-deps openvino-2022.3.0-cp38-cp38-manylinux_2_31_x86_64.whl openvino_dev-2022.3.0-py3-none-any.whl
-=======
-        wget --no-check-certificate ${{ env.OV_PACKAGE }} -O openvino-2022.3.0-cp37-cp37m-manylinux_2_31_x86_64.whl
-        wget --no-check-certificate ${{ env.OV_DEV_PACKAGE }} -O openvino_dev-2022.3.0-py3-none-any.whl
-        python -m pip install --cache-dir pipcache --no-deps openvino-2022.3.0-cp37-cp37m-manylinux_2_31_x86_64.whl openvino_dev-2022.3.0-py3-none-any.whl nncf
->>>>>>> move install
         python -m ipykernel install --user --name openvino_env
       # Cache OpenVINO packages. mv works cross-platform
     - name: Make pipcache directory with OpenVINO packages
@@ -199,15 +168,6 @@ jobs:
     - name: Patch notebooks
       run: |
         python .ci/patch_notebooks.py
-<<<<<<< HEAD
-=======
-
-    - name: Login on HF hub
-      env: 
-        HF_TOKEN: ${{ secrets.HF_TOKEN }}
-      run: |
-        python .ci/login_hf.py --token ${{ env.HF_TOKEN }}
->>>>>>> add hf token
     # Test that JupyterLab runs without errors
     - name: Test Jupyterlab
       run: |
