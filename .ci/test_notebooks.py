@@ -18,6 +18,8 @@ def get_parsed_requirements(requirements_file: str) -> Set:
     separators = ("=", "<", ">", "[")
     for req in parsed_requirements:
         requirement = req.requirement
+        if requirement.startswith('git+'):
+            requirement = requirement.split('#egg=')[-1]
         for separator in separators:
             requirement = requirement.replace(separator, "|")
 
