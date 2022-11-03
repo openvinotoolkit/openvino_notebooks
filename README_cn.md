@@ -59,7 +59,7 @@
 | [218-vehicle-detection-and-recognition](notebooks/218-vehicle-detection-and-recognition/)<br> | 车辆检测与识别 | <img src = "https://user-images.githubusercontent.com/47499836/163544861-fa2ad64b-77df-4c16-b065-79183e8ed964.png" width=225> |
 | [220-yolov5-accuracy-check-and-quantization](notebooks/220-yolov5-accuracy-check-and-quantization) | 基于POT工具量化Ultralytics Yolov5模型并分析精度 | <img src = "https://user-images.githubusercontent.com/44352144/177097174-cfe78939-e946-445e-9fce-d8897417ef8e.png"  width=225> |
 | [222-vision-image-colorization](notebooks/222-vision-image-colorization/)<br> | 黑白图像着色 | <img src = "https://user-images.githubusercontent.com/18904157/166343139-c6568e50-b856-4066-baef-5cdbd4e8bc18.png" width=225> |
-| [224-human-pose-estimation-3d](notebooks/224-human-pose-estimation-3d/)<br> | 三维人体姿态估计 | <img src = "https://user-images.githubusercontent.com/42672437/183292131-576cc05a-a724-472c-8dc9-f6bc092190bf.gif" width=225> |
+
 ### 模型训练
 
 这个教程将说明如何训练一个网络
@@ -78,7 +78,7 @@
 | [401-object-detection-webcam](notebooks/401-object-detection-webcam/) | 针对网络摄像头或视频的目标检测 | <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> |
 | [402-pose-etimation-webcam](notebooks/402-pose-estimation-webcam/) | 基于openvino人体姿态评估 | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225>  |
 | [403-action-recognition-webcam](notebooks/403-action-recognition-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb) | 通过摄像头或基于视频文件的人体动作识别 | <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=225> |
-
+| [406-3D-pose-estimation-webcam](notebooks/224-human-pose-estimation-3d/)<br> [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/spencergotowork/openvino_notebooks.git/master?labpath=notebooks%2F224-human-pose-estimation-3d%2F) | 三维人体姿态估计 | <img src = "https://user-images.githubusercontent.com/42672437/183292131-576cc05a-a724-472c-8dc9-f6bc092190bf.gif" width=225> |
 ## ⚙️ 系统需求
 
 这些notebooks几乎可以在任何地方运行—你的笔记本电脑，一个云虚拟机，甚至一个Docker容器。下表是目前支持的操作系统及Python版本。**注**：Python3.9目前还不支持，不过即将支持。

@@ -57,7 +57,7 @@ class Camera:
             self.camera_pitch(self.rotation_speed)
         
         if key == 27:
-            sys.exit()
+            return 27
 
     # translate
     def translate_matrix(self):
