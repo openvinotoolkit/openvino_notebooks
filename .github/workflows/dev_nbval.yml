@@ -1,4 +1,5 @@
 name: nbval (develop)
+
 on:
   workflow_dispatch:
   pull_request:
@@ -93,11 +94,13 @@ jobs:
         python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
         # replace backslashes with forward slashes for Windows paths
         python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+
     # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
     - name: Set HUB_HOME
       shell: bash
       run: |
         echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
+
     # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
     - name: Cache PaddlePaddle cache directories
       id: cacheusercache
@@ -117,6 +120,7 @@ jobs:
         python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
         cp -r pipcache pipcache_openvino
         python -m pip uninstall -y openvino openvino-dev nncf
+
     # Download a small dataset to use for testing purposes in monai-kidney training notebook
     - name: Download CT files
       if: steps.cachefiles.outputs.cache-hit != 'true'
@@ -146,12 +150,14 @@ jobs:
         wget -O openvino_dev-2022.3.0-py3-none-any.whl 'https://onedrive.live.com/download?cid=614D2D07C188F961&resid=614D2D07C188F961%21128&authkey=AFmkb1ah3tsXC-I'
         python -m pip install --cache-dir pipcache --no-deps openvino-2022.3.0-cp38-cp38-manylinux_2_31_x86_64.whl openvino_dev-2022.3.0-py3-none-any.whl
         python -m ipykernel install --user --name openvino_env
+
       # Cache OpenVINO packages. mv works cross-platform
     - name: Make pipcache directory with OpenVINO packages
       if: steps.cachepip.outputs.cache-hit != 'true'
       run: |
         mv pipcache pipcache_full
         mv pipcache_openvino pipcache
+
     # Create list of installed pip packages that can be downloaded as artifacts
     # to verify the exact environment of a specific test run
     - name: Pip freeze
@@ -169,14 +175,17 @@ jobs:
     - name: Check install
       run: |
         python check_install.py
+
     # Patch long running cells to run faster
     - name: Patch notebooks
       run: |
         python .ci/patch_notebooks.py
+
     # Test that JupyterLab runs without errors
     - name: Test Jupyterlab
       run: |
         jupyter lab notebooks --help
+
     # Main notebooks test. Verifies that all notebooks run without errors
     - name: Analysing with nbval
       if: runner.os == 'Windows'
