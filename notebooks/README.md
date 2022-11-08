@@ -16,27 +16,22 @@ If you need help, please start a GitHub [Discussion](https://github.com/openvino
 
 ## Table of Contents
 
-* [➤ 📝 Installation Guide](#-installation-guide)
-	* [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows)
-	* [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu)
-	* [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS)
-	* [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
-	* [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
-	* [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML)
-	* [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker)
-	* [Amazon SageMaker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/SageMaker)
-* [➤ 🚀 Getting Started](#-getting-started)
-	* [First steps with OpenVINO](#-first-steps)
-	* [Convert & Optimize](#-convert--optimize)
-	* [Model Demos](#-model-demos)
-	* [Model Training](#-model-training)
-	* [Live Demos](#-live-demos)
-* [➤ ⚙️ System Requirements](#-system-requirements)
-* [➤ 💻 Run the Notebooks](#-run-the-notebooks)
-* [➤ 🧹 Cleaning Up](#-cleaning-up)
-* [➤ ⚠️ Troubleshooting](#-troubleshooting)
-* [➤ 🧑‍💻 Contributors](#-contributors)
-* [➤ ❓ FAQ](#-faq)
+- [Table of Contents](#table-of-contents)
+- [📝 Installation Guide](#-installation-guide)
+- [🚀 Getting Started](#-getting-started)
+	- [💻 First steps](#-first-steps)
+	- [⌚ Convert & Optimize](#-convert--optimize)
+	- [🎯 Model Demos](#-model-demos)
+	- [🏃 Model Training](#-model-training)
+	- [📺 Live Demos](#-live-demos)
+- [⚙️ System Requirements](#️-system-requirements)
+- [💻 Run the Notebooks](#-run-the-notebooks)
+	- [To Launch a Single Notebook](#to-launch-a-single-notebook)
+	- [To Launch all Notebooks](#to-launch-all-notebooks)
+- [🧹 Cleaning Up](#-cleaning-up)
+- [⚠️ Troubleshooting](#️-troubleshooting)
+- [🧑‍💻 Contributors](#-contributors)
+- [❓ FAQ](#-faq)
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='-installation-guide'/>
@@ -169,10 +164,10 @@ Tutorials that include code to train neural networks.
 Live inference demos that run on a webcam or video files.
 	
 
-| [401-object-detection-webcam](401-object-detection-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F401-object-detection-webcam%2F401-object-detection.ipynb) | [402-pose-estimation-webcam](402-pose-estimation-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F402-pose-estimation-webcam%2F402-pose-estimation.ipynb) | [403-action-recognition-webcam](403-action-recognition-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb) | [405-paddle-ocr-webcam](405-paddle-ocr-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F405-paddle-ocr-webcam%2F405-paddle-ocr-webcam.ipynb) |
-| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- | 
-|Object detection with a webcam or video file | Human pose estimation with a webcam or video file |  Human action recognition with a webcam or video file |  OCR with a webcam or video file |
-| <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225> |  <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=225> |   <img src="https://raw.githubusercontent.com/yoyowz/classification/master/images/ezgif.com-gif-maker.gif" width=225> |
+| [401-object-detection-webcam](401-object-detection-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F401-object-detection-webcam%2F401-object-detection.ipynb) | [402-pose-estimation-webcam](402-pose-estimation-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F402-pose-estimation-webcam%2F402-pose-estimation.ipynb) | [403-action-recognition-webcam](403-action-recognition-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb) | [405-paddle-ocr-webcam](405-paddle-ocr-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F405-paddle-ocr-webcam%2F405-paddle-ocr-webcam.ipynb) | [406-3D-pose-estimation-webcam](406-3D-pose-estimation-webcam/)<br> [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/spencergotowork/openvino_notebooks.git/master?labpath=notebooks%2F224-human-pose-estimation-3d%2F) |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+|Object detection with a webcam or video file | Human pose estimation with a webcam or video file |  Human action recognition with a webcam or video file |  OCR with a webcam or video file | 3D display of human pose estimation with a webcam or video file |
+| <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225> |  <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=225> |   <img src="https://raw.githubusercontent.com/yoyowz/classification/master/images/ezgif.com-gif-maker.gif" width=225> | <img src="https://user-images.githubusercontent.com/42672437/183292131-576cc05a-a724-472c-8dc9-f6bc092190bf.gif" width=225> |
 
 
 
