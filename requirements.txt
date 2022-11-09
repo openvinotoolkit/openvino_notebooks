@@ -30,7 +30,7 @@ ppgan==2.1.*
 transformers
 
 # NNCF notebook requirements
-git+https://github.com/openvinotoolkit/nncf.git#egg=nncf[tf,torch]
+git+https://github.com/eaidova/nncf.git#egg=nncf[tf,torch]
 tensorflow>=2.5,<=2.9.1
 tensorflow_datasets==4.2.0
 
