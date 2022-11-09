@@ -138,9 +138,6 @@ jobs:
 
 
     - name: Install dependencies
-      env: 
-        OV_PACKAGE: ${{ secrets.OV_PACKAGE }}
-        OV_DEV_PACKAGE:  ${{ secrets.OV_DEV_PACKAGE }}
       run: |
         python -m pip install --upgrade pip
         python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
