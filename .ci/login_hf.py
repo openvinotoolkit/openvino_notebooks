@@ -7,6 +7,7 @@ def main():
     parser.add_argument("--token", required=True)
     args = parser.parse_args()
     _login(hf_api=HfApi(), token=args.token)
+    print('Successfully login on HF hub')
 
 if __name__ == "__main__":
     main()
