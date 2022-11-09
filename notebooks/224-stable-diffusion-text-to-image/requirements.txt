@@ -1,4 +1,4 @@
-torch>=1.9
+torch~=1.9.1
 transformers>=4.21
 diffusers[torch]>=0.7.2
 huggingface-hub>=0.9.1
