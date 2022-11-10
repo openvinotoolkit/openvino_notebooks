@@ -1,10 +1,22 @@
-# PyTorch YoloV7 model to OpenVINO™ Model Conversion and Optimization Tutorial
+# Convert and Optimize YOLOv7 with OpenVINO™
 
-This tutorial explains how to convert Yolo V7 model to OpenVNO and optimize it.
+This tutorial explains how to convert and optimize the YOLOv7 PyTorch model with OpenVNO.
+
 
 ## Notebook Contents
 
-The notebook uses [Model Optimizer](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) and NNCF postraining quantization API
+This tutorial demonstrates step-by-step instructions on how to run and optimize PyTorch\* Yolo V7 with OpenVINO.
+
+The tutorial consists of the following steps:
+- Prepare PyTorch model
+- Download and prepare dataset
+- Validate original model
+- Convert PyTorch model to ONNX
+- Convert ONNX model to OpenVINO IR
+- Validate converted model
+- Prepare and run optimization pipeline
+- Compare accuracy of the FP32 and quantized models
+- Compare performance of the FP32 and quantized models
 
 ## Installation Instructions
 
