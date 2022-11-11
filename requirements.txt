@@ -16,7 +16,7 @@ torchvision==0.14.0; sys_platform == 'darwin'
 --find-links https://download.pytorch.org/whl/torch_stable.html
 torch==1.13.0+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchvision==0.14.0+cpu; sys_platform =='linux' or platform_system == 'Windows'
-torchmetrics==0.10.2
+torchmetrics[detection]==0.10.2
 
 # PaddlePaddle notebook requirements
 # For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
