@@ -323,4 +323,3 @@ jupyter kernelspec remove openvino_env
 ---
 
 \*其他名称和品牌可能被视为他人的财产。
-
