@@ -135,7 +135,8 @@ jobs:
       run: |
           curl -o notebooks/224-stable-diffusion-text-to-image/unet.xml 'https://public.dm.files.1drv.com/y4mJySZXMltpsot_pfFxFWLyjr1i9dWGF8R2G-_fGeq6pgIMQTtyA2_b-PDh4qPi4WE8gWaYWxigbO0yThVAFaSdHdo7IUpR83Iss6597XO-1hwG_tCAudFmoKVAxy52jMipee13iRUkxqRR2dLtQYVFqHdQeBYq44CEuSM5ilpd1C-EOuDyfoK9quXVRmMGhR6fyOA1Ml0tA7SmrNA3nOY7oc-tXgXe7oZ8fW8kPbl7Xo'
           curl -o notebooks/224-stable-diffusion-text-to-image/unet.bin 'https://public.dm.files.1drv.com/y4m8QMvAA-RJfgQ6yAgRjRhMrjnle64VTOXTBAjA8bW9mPX4MwnQWK7i_nBhmC5nRTGRoNg_0HUj_cwIKaoUH6f9CLhHW4YrQQB-9zQo8TYPSsOIOobtg97W_C_U8IKaa3RgStmoZHod837CXVb-XwmP5m-dTAxihslUr-ANN8thGJU_9AHCtTrtannllQlL4suM5k2hrQJZhe2tZlmbDpwIxnd7XcMI1NRFMMn7ElGwqw'
-
+          curl -o notebooks/224-stable-diffusion-text-to-image/vae_decoder.bin 'https://public.dm.files.1drv.com/y4mBE9bZtypPK65c9o8NQlpZ-_VDbMrQ4p1z4aXOJywGJpTdBOWxdQV_uizy3XRmj0ZudziSvqYhg0ozvcZaI1N7S0Au3wnSWCB568vgOrvFg5mShajpkwwMOy1bywYwbms5FKtMSfxYX7wQMOVkh88rKi-CKM05gIGcgh6sFoEHUvWPj7yXfVQkDTOawu-Du1COoEsW_AJNOGsRhs70E8ooH4DGu6VUCMGhTRx3F_2GcM'
+          curl -o notebooks/224-stable-diffusion-text-to-image/vae_decoder.xml '"https://public.dm.files.1drv.com/y4m8xGpD7D_K7Nc9px-3zENrYdIrQUR5BuxztkNHqf6spNpiDuJlDJdgKgsL64og4gpuLmgrBBAZyfhd0ZC9BuSx60-Wwk8JOk_L0C-Ziwf1g6puQTd5lXT_IgWgDarK6FYbhK5k1u-fDC1YJhTPx4gxq1Lxxw0W-giwh4xC-juZAtgsUW2urOhQT6QAe0Nob2zWElCpuoos_Tpm4rsIdfMiAtzGFNYZSRDQSWausRwXrc'
 
     - name: Install dependencies
       run: |
