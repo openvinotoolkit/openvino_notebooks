@@ -130,6 +130,14 @@ jobs:
         cp -r case_00030 case_00001
         mv case_00030 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
         mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+    
+    - name: Download long converted models
+      run: |
+          wget -O notebooks/224-stable-diffusion-text-to-image/unet.xml 'https://onedrive.live.com/download?cid=614D2D07C188F961&resid=614D2D07C188F961%21131&authkey=AMELDTpTI_yFvLc'
+          wget -O notebooks/224-stable-diffusion-text-to-image/unet.bin 'https://onedrive.live.com/download?cid=614D2D07C188F961&resid=614D2D07C188F961%21132&authkey=AP6osbQ-v9XciAU'
+          wget -O notebooks/224-stable-diffusion-text-to-image/vae_decoder.bin 'https://onedrive.live.com/download?cid=614D2D07C188F961&resid=614D2D07C188F961%21134&authkey=ANitY4fm2LDiZdo'
+          wget -O notebooks/224-stable-diffusion-text-to-image/vae_decoder.xml 'https://onedrive.live.com/download?cid=614D2D07C188F961&resid=614D2D07C188F961%21133&authkey=AEBK7fDSjDpYe5w'
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -180,7 +188,7 @@ jobs:
       if: runner.os == 'Linux'
       run: |
             chmod +x .ci/validate_notebooks.sh
-            .ci/validate_notebooks.sh 107-speech-recognition-quantization
+            .ci/validate_notebooks.sh 107-speech-recognition-quantization 224-stable-diffusion-text-to-image
       shell: bash
     - name: Analysing with nbval
       if: runner.os == 'MacOS'
