@@ -5,7 +5,6 @@
 
 
 import os
-import shutil
 import socket
 import threading
 import time
@@ -20,12 +19,11 @@ import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import openvino.inference_engine
+from openvino.runtime import Core, get_version
 from async_pipeline import AsyncPipeline
-from IPython.display import HTML, Image, Markdown, clear_output, display
+from IPython.display import HTML, Image, Markdown, display
 from matplotlib.lines import Line2D
 from models import model
-from openvino.inference_engine import IECore
 from tqdm.notebook import tqdm_notebook
 
 
@@ -557,7 +555,7 @@ def show_live_inference(
     next_frame_id = 0
     next_frame_id_to_show = 0
 
-    input_layer = next(iter(model.net.input_info))
+    input_layer = model.net.input(0)
 
     # Create asynchronous pipeline and print time it takes to load the model
     load_start_time = time.perf_counter()
@@ -637,7 +635,7 @@ def benchmark_model(
     :param batch: Batch size
     :param cache_dir: Directory that contains model/kernel cache files
     """
-    ie = IECore()
+    ie = Core()
     model_path = Path(model_path)
     if ("GPU" in device) and ("GPU" not in ie.available_devices):
         raise ValueError(
@@ -663,12 +661,11 @@ def benchmark_model(
         if "MULTI" in device:
             devices = device.replace("MULTI:", "").split(",")
             for single_device in devices:
-                device_name = ie.get_metric(
-                    device_name=single_device, metric_name="FULL_DEVICE_NAME"
+                device_name = ie.get_propery(single_device, "FULL_DEVICE_NAME"
                 )
                 print(f"{single_device} device: {device_name}")
         else:
-            print(f"Device: {ie.get_metric(device_name=device, metric_name='FULL_DEVICE_NAME')}")
+            print(f"Device: {ie.get_property(device, 'FULL_DEVICE_NAME')}")
 
 
 # ## Checks and Alerts
@@ -705,7 +702,7 @@ class DeviceNotFoundAlert(NotebookAlert):
         :return: A formatted alert box with the message that `device` is not available, and a list
                  of devices that are available.
         """
-        ie = IECore()
+        ie = Core()
         supported_devices = ie.available_devices
         self.message = (
             f"Running this cell requires a {device} device, "
@@ -729,7 +726,7 @@ def check_device(device: str) -> bool:
     :return: True if the device is available, False if not. If the device is not available,
              a DeviceNotFoundAlert will be shown.
     """
-    ie = IECore()
+    ie = Core()
     if device not in ie.available_devices:
         DeviceNotFoundAlert(device)
         return False
@@ -745,7 +742,7 @@ def check_openvino_version(version: str) -> bool:
     :return: True if the version is installed, False if not. If the version is not installed,
              an alert message will be shown.
     """
-    installed_version = openvino.inference_engine.get_version()
+    installed_version = get_version()
     if version not in installed_version:
         NotebookAlert(
             f"This notebook requires OpenVINO {version}. "

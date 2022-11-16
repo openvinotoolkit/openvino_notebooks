@@ -15,13 +15,14 @@
 """
 
 import logging
+from openvino.runtime import PartialShape
 
 
 class Model:
     def __init__(self, ie, model_path, input_transform=None):
         self.logger = logging.getLogger()
-        self.logger.info('Reading network from IR...')
-        self.net = ie.read_network(model_path)
+        self.logger.info('Reading model from IR...')
+        self.net = ie.read_model(model_path)
         self.set_batch_size(1)
         self.input_transform = input_transform
 
@@ -34,7 +35,8 @@ class Model:
 
     def set_batch_size(self, batch):
         shapes = {}
-        for input_layer in self.net.input_info:
-            new_shape = [batch] + self.net.input_info[input_layer].input_data.shape[1:]
+        for input_layer in self.net.inputs:
+            new_shape = list(input_layer.shape)
+            new_shape[0] = 1
             shapes.update({input_layer: new_shape})
         self.net.reshape(shapes)
