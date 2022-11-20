@@ -57,13 +57,12 @@ jobs:
         touch test_notebooks.txt
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           echo "$file was changed"
-          if  [startsWith($file, 'notebooks/')] && [endsWith($file, 'ipynb']; then
+          if  startsWith($file, 'notebooks/') && endsWith($file, 'ipynb'; then
             echo $file >> test_notebooks.txt
           fi
         done
         echo "testing notebooks"
         cat test_notebooks.txt
-      shell: bash
     - name: Dotenv Action
       id: dotenv
       uses: xom9ikk/dotenv@v1.0.2
