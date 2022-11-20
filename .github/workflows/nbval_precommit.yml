@@ -55,11 +55,10 @@ jobs:
     - name: List all changed files
       run: |
         touch test_notebooks.txt
+        pattern = "notebooks\/.*"
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           echo "$file was changed"
-          if [ "$file" =~ "notebooks\/.*" ]; then
-            echo "$file" >> test_notebooks.txt
-          fi
+          [[ $file == $pattern ]] && echo "Matches!" || echo "Doesn't match!"
         done
         echo "testing notebooks"
         cat test_notebooks.txt
