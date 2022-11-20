@@ -22,6 +22,13 @@ def prepare_test_plan(test_list, ignore_list):
     notebooks = list((ROOT / 'notebooks').rglob('**/test_*.ipynb'))
     statuses = {notebook.parent: {'status': '', 'path': notebook.parent} for notebook in notebooks}
     test_list = test_list or statuses.keys()
+    if len(test_list) == 1 and test_list[0].endswith('.txt'):
+        testing_notebooks = []
+        with open(test_list[0], 'r') as f:
+            for line in f.readlines():
+                testing_notebooks.append(Path(line.strip()).parent)
+        test_list = set(testing_notebooks)
+
     ignore_list = ignore_list or []
     for notebook in statuses:
         if notebook not in test_list:
@@ -36,7 +43,7 @@ def run_test(notebook_path, report_dir):
     report_file = report_dir / f'{notebook_path.name}_report.xml'
     with cd(notebook_path):
         retcode = subprocess.run([
-            sys.executable,  '-m',  'pytest', '--nbval', '-k', 'test_', '--durations', '10', '--junitxml', report_file
+            sys.executable,  '-m',  'pytest', '--nbval', '-k', 'test_', '--durations', '10', '--junitxml', str(report_file)
             ])
     return retcode
 
