@@ -53,7 +53,7 @@ jobs:
       uses: tj-actions/changed-files@v34
       with:
           files: |
-            notebooks/**
+            notebooks/*/**
 
     - name: List all changed files
       run: |
@@ -62,8 +62,6 @@ jobs:
           echo "$file was changed"
           echo $file >> test_notebooks.txt
         done
-        echo "testing notebooks"
-        cat test_notebooks.txt
       shell: bash
     - name: Dotenv Action
       id: dotenv
@@ -153,7 +151,12 @@ jobs:
         cp -r case_00030 case_00001
         mv case_00030 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
         mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
-
+    # Prevent test aborting by timeout
+    - name: Download long loading models
+      run: |
+          mkdir notebooks/203-meter-reader/model
+          curl -o notebooks/203-meter-reader/model/meter_det_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_det_model.tar.gz'
+          curl -o notebooks/203-meter-reader/model/meter_seg_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_seg_model.tar.gz'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
