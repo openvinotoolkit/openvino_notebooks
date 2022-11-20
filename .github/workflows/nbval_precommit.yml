@@ -60,7 +60,7 @@ jobs:
         touch test_notebooks.txt
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           echo "$file was changed"
-          echo "Sfile" >> test_notebooks.txt
+          echo Sfile >> test_notebooks.txt
         done
         echo "testing notebooks"
         cat test_notebooks.txt
