@@ -57,7 +57,7 @@ jobs:
         touch test_notebooks.txt
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           echo "$file was changed"
-          [[ $file == "notebooks\/.*" ]] && echo "Matches!" || echo "Doesn't match!"
+          [[ $file == .*notebooks\/.* ]] && echo "Matches!" || echo "Doesn't match!"
         done
         echo "testing notebooks"
         cat test_notebooks.txt
