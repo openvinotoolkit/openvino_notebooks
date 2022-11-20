@@ -61,6 +61,8 @@ jobs:
             echo $file >> test_notebooks.txt
           fi
         done
+        echo "testing notebooks"
+        cat test_notebooks.txt
       shell: bash
     - name: Dotenv Action
       id: dotenv

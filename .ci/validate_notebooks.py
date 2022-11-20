@@ -19,7 +19,7 @@ def parse_arguments():
 
 
 def prepare_test_plan(test_list, ignore_list):
-    notebooks = list((ROOT / 'notebooks').rglob('**/test_*.ipynb'))
+    notebooks = list((ROOT / 'notebooks').rglob('**/*.ipynb'))
     statuses = {notebook.parent: {'status': '', 'path': notebook.parent} for notebook in notebooks}
     test_list = test_list or statuses.keys()
     if len(test_list) == 1 and test_list[0].endswith('.txt'):
