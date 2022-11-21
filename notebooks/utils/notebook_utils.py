@@ -611,63 +611,6 @@ def show_live_inference(
     del pipeline
 
 
-# ## OpenVINO Tools
-
-# In[ ]:
-
-
-def benchmark_model(
-    model_path: PathLike,
-    device: str = "CPU",
-    seconds: int = 60,
-    api: str = "async",
-    batch: int = 1,
-    cache_dir: PathLike = "model_cache",
-):
-    """
-    Benchmark model `model_path` with `benchmark_app`. Returns the output of `benchmark_app`
-    without logging info, and information about the device
-
-    :param model_path: path to IR model xml file, or ONNX model
-    :param device: device to benchmark on. For example, "CPU" or "MULTI:CPU,GPU"
-    :param seconds: number of seconds to run benchmark_app
-    :param api: API. Possible options: sync or async
-    :param batch: Batch size
-    :param cache_dir: Directory that contains model/kernel cache files
-    """
-    ie = Core()
-    model_path = Path(model_path)
-    if ("GPU" in device) and ("GPU" not in ie.available_devices):
-        raise ValueError(
-            f"A GPU device is not available. Available devices are: {ie.available_devices}"
-        )
-    else:
-        benchmark_command = f"benchmark_app -m {model_path} -d {device} -t {seconds} -api {api} -b {batch} -cdir {cache_dir}"
-        display(
-            Markdown(
-                f"**Benchmark {model_path.name} with {device} for {seconds} seconds with {api} inference**"
-            )
-        )
-        display(Markdown(f"Benchmark command: `{benchmark_command}`"))
-
-        benchmark_output = get_ipython().run_line_magic("sx", "$benchmark_command")
-        benchmark_result = [
-            line
-            for line in benchmark_output
-            if not (line.startswith(r"[") or line.startswith("      ") or line == "")
-        ]
-        print("\n".join(benchmark_result))
-        print()
-        if "MULTI" in device:
-            devices = device.replace("MULTI:", "").split(",")
-            for single_device in devices:
-                device_name = ie.get_propery(single_device, "FULL_DEVICE_NAME"
-                )
-                print(f"{single_device} device: {device_name}")
-        else:
-            print(f"Device: {ie.get_property(device, 'FULL_DEVICE_NAME')}")
-
-
 # ## Checks and Alerts
 # 
 # Create an alert class to show stylized info/error/warning messages and a `check_device` function that checks whether a given device is available.
