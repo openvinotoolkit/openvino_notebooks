@@ -1,9 +1,5 @@
 # Live Style Transfer with OpenVINO™
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F404-style-transfer-webcam%2F404-style-transfer.ipynb)
-
-*Binder is a free service where the webcam will not work, and performance on the video will not be good. For the best performance, install the notebooks locally.*
-
 Artistic style transfer mixes the content of an image with the style of another image.
 
 ## Notebook Contents
