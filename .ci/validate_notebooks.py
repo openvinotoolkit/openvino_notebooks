@@ -17,16 +17,30 @@ def parse_arguments():
     parser.add_argument('--report_dir', default='report')
     return parser.parse_args()
 
+def find_notebook_dir(path, root):
+    for parent in path.parents:
+        if root == parent.parent:
+            return parent
+    return None
+            
+
 
 def prepare_test_plan(test_list, ignore_list):
-    notebooks = list((ROOT / 'notebooks').rglob('**/*.ipynb'))
+    notebooks_dir = ROOT / 'notebooks'
+    notebooks = list(notebooks_dir.rglob('**/*.ipynb'))
     statuses = {notebook.parent: {'status': '', 'path': notebook.parent} for notebook in notebooks}
     test_list = test_list or statuses.keys()
     if len(test_list) == 1 and test_list[0].endswith('.txt'):
         testing_notebooks = []
         with open(test_list[0], 'r') as f:
             for line in f.readlines():
-                testing_notebooks.append(Path(line.strip()).parent)
+                changed_path = Path(line.strip())
+                if changed_path.suffix == '.md':
+                    continue
+                notebook_subdir = find_notebook_dir(changed_path, notebooks_dir)
+                if notebook_subdir is None:
+                    continue
+                testing_notebooks.append(notebook_subdir)
         test_list = set(testing_notebooks)
 
     ignore_list = ignore_list or []
