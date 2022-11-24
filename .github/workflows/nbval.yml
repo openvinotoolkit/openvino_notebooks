@@ -119,7 +119,7 @@ jobs:
         unzip case_00030.zip
         cp -r case_00030 case_00001
         mv case_00030 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
-        mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames    
+        mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
     # Prevent test aborting by timeout
     - name: Download long loading models
       run: |
