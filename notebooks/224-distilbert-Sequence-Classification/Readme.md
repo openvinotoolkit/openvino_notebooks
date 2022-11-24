@@ -1,4 +1,4 @@
-# Sequence Classification OpenVINO API 2.0
+# Sequence Classification With OpenVINO API 2.0
 This notebook performs sequence classification using OpenVINO API 2.0. You can alternatively replace the model with the other bert-based models for sequence classification.
 
 Output from a user input would look like this.
