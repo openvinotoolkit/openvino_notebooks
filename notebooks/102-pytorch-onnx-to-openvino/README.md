@@ -9,7 +9,7 @@ This notebook demonstrates how to do inference on a PyTorch semantic segmentatio
 
 ## Notebook Contents
 
-The notebook uses [Model Optimizer](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) to convert the open source [fastseg](https://github.com/ekzhang/fastseg/) semantic segmentation model, trained on the [CityScapes](https://www.cityscapes-dataset.com) dataset, to OpenVINO IR. It also shows how to do segmentation inference on an image, using [OpenVINO Runtime](https://docs.openvino.ai/latest/openvino_docs_IE_DG_Deep_Learning_Inference_Engine_DevGuide.html) and compares the results of the PyTorch model with the OpenVINO IR model. 
+The notebook uses [Model Optimizer](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) to convert the open source a DeepLabV3 model with a MobileNetV3-Large backbone semantic segmentation model from [torchvision](https://pytorch.org/vision/stable/models/generated/torchvision.models.segmentation.deeplabv3_mobilenet_v3_large.html#torchvision.models.segmentation.deeplabv3_mobilenet_v3_large), trained on [COCO](https://cocodataset.org) dataset images using 20 categories that are present in the [Pascal VOC](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/index.html) dataset, to OpenVINO IR. It also shows how to do segmentation inference on an image, using [OpenVINO Runtime](https://docs.openvino.ai/latest/openvino_docs_IE_DG_Deep_Learning_Inference_Engine_DevGuide.html) and compares the results of the PyTorch model with the OpenVINO IR model. 
 
 ## Installation Instructions
 
