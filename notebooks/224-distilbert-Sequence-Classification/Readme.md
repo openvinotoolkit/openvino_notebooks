@@ -1,5 +1,5 @@
 # Sequence Classification With OpenVINO API 2.0
-This notebook performs sequence classification using OpenVINO API 2.0. and `distilbert-base-uncased` model from HuggingFace transformers finetuned on [SST-2](https://huggingface.co/datasets/sst2) dataset. More information about this model can be found in [model card](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english). You can alternatively replace the model with the other bert-based models for sequence classification.
+This notebook performs text classification using OpenVINO API 2.0 using `distilbert-base-uncased` model from HuggingFace transformers finetuned on [SST-2](https://huggingface.co/datasets/sst2) dataset. We'll convert the model to onnx using the transformers.onnx package from the transformers library and perform inference using OpenVINO. More information about this model can be found in [model card](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english). You can alternatively replace the model with the other bert-based models for sequence classification.
 
 
 Output from a user input would look like this.
