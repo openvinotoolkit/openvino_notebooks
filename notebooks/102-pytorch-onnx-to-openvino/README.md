@@ -2,7 +2,7 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F102-pytorch-onnx-to-openvino%2F102-pytorch-onnx-to-openvino.ipynb)
 
-![segmentation result](https://user-images.githubusercontent.com/77325899/138498903-b616c37d-8cb3-405c-80ea-609e08470c24.png)
+![segmentation result](https://user-images.githubusercontent.com/29454499/203723317-1716e3ca-b390-47e1-bb98-07b4d8d097a0.png)
 
 
 This notebook demonstrates how to do inference on a PyTorch semantic segmentation model, using [OpenVINO](https://github.com/openvinotoolkit/openvino).
