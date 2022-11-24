@@ -12,7 +12,7 @@ Output from a file would look something like this.
 
 
 ## Notebook Contents
-We'll be using distilbert-base-uncased-finetuned-sst-2-english transformers based model from Huggingface. Details of the model can be found [here].(https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english)
+We'll be using distilbert-base-uncased-finetuned-sst-2-english transformers based model from Huggingface. Details of the model can be found [here](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english).
 
 
 
