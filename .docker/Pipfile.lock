@@ -700,14 +700,6 @@
             ],
             "version": "==2.15.3"
         },
-        "fastseg": {
-            "hashes": [
-                "sha256:3e934203ce652da404d8b8b673c63c95dfc14d2958beecfec04d4c9191f1fa8a",
-                "sha256:e269fe8b3ef2458e5405745b286a0acef43d45fd64a242ea2c91daf951079639"
-            ],
-            "index": "pypi",
-            "version": "==0.1.2"
-        },
         "filelock": {
             "hashes": [
                 "sha256:55447caa666f2198c5b6b13a26d2084d26fa5b115c00d065664b2124680c4edc",
@@ -836,14 +828,6 @@
             ],
             "index": "pypi",
             "version": "==4.5.3"
-        },
-        "geffnet": {
-            "hashes": [
-                "sha256:4b139e1159185271d4e118f2e85e9942c24b0082d25a0830cfc1eabbc4e091d6",
-                "sha256:a07985b0cd902025ff3f29e170aa90c139e331dc520bf566a522fae42de2cf53"
-            ],
-            "index": "pypi",
-            "version": "==0.9.8"
         },
         "gitdb": {
             "hashes": [
@@ -3782,10 +3766,11 @@
                 "sha256:9aa576377a628cc7119011de497612a2affa0ea36c1096155f1f1c972c065cf1",
                 "sha256:cc46a60b7e3c2c5bd1ad5488404746fe03b1b83c4803eed63ca2ad1598909c55",
                 "sha256:d66cbfddf48ee790eeb4b9c59274143761f169c266ba2e78b9a057f5cdb0a92e",
-                "sha256:f0169e16b21f9ce0158012b29122543482822f99b13d4c59bfbd8908d749b1fb"
+                "sha256:f0169e16b21f9ce0158012b29122543482822f99b13d4c59bfbd8908d749b1fb",
+                "sha256:42b7d500629c9e99d875cb204a1a1f5b3f65f6743823b21de9b4cba5962300d8"
             ],
             "index": "pytorch-wheels",
-            "version": "==1.8.1+cpu"
+            "version": "==1.12.1+cpu"
         },
         "torchmetrics": {
             "hashes": [
@@ -3804,10 +3789,11 @@
                 "sha256:921f901ffb3fb347933372bee1527286525bdbf397b8e0bed7012fec7fd524ef",
                 "sha256:a0dadc78168437b26b3882792c484d161d53279912d29e0b2c04a10c8b020bd9",
                 "sha256:c3cc044b67f9c2c943bf31fe45ec6267fafff476f0517f381d5dc4e1bb77e5ae",
-                "sha256:c52a10dcad36ecd180a960d93a0bb62d08303d9aefca26674f76433bde01eafc"
+                "sha256:c52a10dcad36ecd180a960d93a0bb62d08303d9aefca26674f76433bde01eafc",
+                "sha256:b294ad478d69f155b93c22b363dc4d71ffa49cdf4429595412e6eb7513eb0747"
             ],
             "index": "pytorch-wheels",
-            "version": "==0.9.1+cpu"
+            "version": "==0.13.1+cpu"
         },
         "tornado": {
             "hashes": [
