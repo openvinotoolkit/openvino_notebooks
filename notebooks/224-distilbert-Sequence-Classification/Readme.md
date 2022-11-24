@@ -2,6 +2,7 @@
 This notebook performs sequence classification using OpenVINO API 2.0. You can alternatively replace the model with the other bert-based models for sequence classification.
 
 Output from a user input would look like this.
+
 ![image](https://user-images.githubusercontent.com/95271966/203713415-669a755d-3243-4e66-b19b-cd17774a1a64.png)
 
 
