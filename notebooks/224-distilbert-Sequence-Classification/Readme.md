@@ -1,5 +1,14 @@
 # Sequence Classification OpenVINO API 2.0
 This notebook performs sequence classification using OpenVINO API 2.0. You can alternatively replace the model with the other bert-based models for sequence classification.
+
+Output from a user input would look like this.
+![image](https://user-images.githubusercontent.com/95271966/203713415-669a755d-3243-4e66-b19b-cd17774a1a64.png)
+
+
+Output from a file would look something like this.
+![image](https://user-images.githubusercontent.com/95271966/203713154-b78b383e-ec42-4b3b-a142-47b00640bdea.png)
+
+
 ## Notebook Contents
 We'll be using distilbert-base-uncased-finetuned-sst-2-english transformers based model from Huggingface. Details of the model can be found [here].(https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english)
 
