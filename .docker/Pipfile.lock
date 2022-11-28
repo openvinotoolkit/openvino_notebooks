@@ -838,7 +838,8 @@
         },
         "gdown": {
             "hashes": [
-                "sha256:6cbf7dd4108588c734aa588131d8e1d52e64f0873870f71f74cbac195f0c60ef"
+                "sha256:6cbf7dd4108588c734aa588131d8e1d52e64f0873870f71f74cbac195f0c60ef",
+                "sha256:6970b375ea1adff253d8d041766e386ad23814c7ee279156222eb455ab01a936"
             ],
             "index": "pypi",
             "version": "==4.5.3"

@@ -140,6 +140,7 @@ More amazing notebooks here!
 | [221-machine-translation](221-machine-translation)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F221-machine-translation%2F221-machine-translation.ipynb) | Real-time translation from English to German |  |
 | [222-vision-image-colorization](222-vision-image-colorization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F222-vision-image-colorization%2F222-vision-image-colorization.ipynb) | Use pre-trained models to colorize black \& white images using OpenVINO | <img src = "https://user-images.githubusercontent.com/18904157/166343139-c6568e50-b856-4066-baef-5cdbd4e8bc18.png" width=225>  |
 | [223-gpt2-text-prediction](223-gpt2-text-prediction/)<br> | Use GPT-2 to perform text prediction on an input sequence | <img src=https://user-images.githubusercontent.com/91228207/185105225-0f996b0b-0a3b-4486-872d-364ac6fab68b.png  width=225> |
+| [224-3D-segmentation-point-clouds](224-3D-segmentation-point-clouds/)<br> | Process point cloud data and run 3D Part Segmentation with OpenVINO | <img src = "https://user-images.githubusercontent.com/91237924/185752178-3882902c-907b-4614-b0e6-ea1de08bf3ef.png" width=225> |
 
 
 
