@@ -10,7 +10,7 @@ Artistic style transfer mixes the content of an image with the style of another 
 
 ## Notebook Contents
 
-This notebook demonstrates style transfer with OpenVINO, using the [fast-neural-style-mosaic-onnx model](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/fast-neural-style-mosaic-onnx) model from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo).
+This notebook demonstrates style transfer with OpenVINO, using the [Fast Neural Style Transfer](https://github.com/onnx/models/tree/master/vision/style_transfer/fast_neural_style) model from [ONNX Model Repository](https://github.com/onnx/models).
 The idea is to use feed-forward convolutional neural networks to generate image transformations. The networks are trained using perceptual loss functions and effectively apply style transfer on a image / video.
 
 ## Installation Instructions
