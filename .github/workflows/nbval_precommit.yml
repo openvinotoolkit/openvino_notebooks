@@ -54,6 +54,7 @@ jobs:
       with:
           files: |
             notebooks/*/**
+            requirements.txt
 
     - name: List all changed files
       run: |
