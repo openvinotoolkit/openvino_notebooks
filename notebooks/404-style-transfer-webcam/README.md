@@ -1,12 +1,12 @@
 # Live Style Transfer with OpenVINO™
 
+![style transfer](https://user-images.githubusercontent.com/109281183/203772234-f17a0875-b068-43ef-9e77-403462fde1f5.gif)
+
+Artistic style transfer blends a single style to any given content image. The real-time style transfer is able to train a neural network to apply a single style to any given content image. Given this ability, a different network could be trained for each different style we wish to apply.
+
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F404-style-transfer-webcam%2F404-style-transfer.ipynb)
 
 *Binder is a free service where the webcam will not work, and performance on the video will not be good. For the best performance, install the notebooks locally.*
-
-![style transfer](https://user-images.githubusercontent.com/109281183/203772234-f17a0875-b068-43ef-9e77-403462fde1f5.gif)
-
-Artistic style transfer mixes the content of an image with the style of another image.
 
 ## Notebook Contents
 
