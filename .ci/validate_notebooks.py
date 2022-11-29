@@ -34,7 +34,12 @@ def prepare_test_plan(test_list, ignore_list):
         testing_notebooks = []
         with open(test_list[0], 'r') as f:
             for line in f.readlines():
+                print(line)
                 changed_path = Path(line.strip())
+                if changed_path.resolve() == (ROOT / 'requirements.txt').resolve():
+                    print('requirements.txt changed, check all notebooks')
+                    testing_notebooks = statuses.keys()
+                    break
                 if changed_path.suffix == '.md':
                     continue
                 notebook_subdir = find_notebook_dir(changed_path, notebooks_dir)
