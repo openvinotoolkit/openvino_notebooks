@@ -1,8 +1,8 @@
 import numpy as np
 
-from modules.pose import Pose, propagate_ids
+from engine.pose import Pose, propagate_ids
 try:
-    from modules.legacy_pose_extractor import extract_poses
+    from engine.legacy_pose_extractor import extract_poses
 except:
     print('legacy_pose_extractor has sth wrong')
 

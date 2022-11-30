@@ -14,7 +14,7 @@
 import cv2
 import numpy as np
 
-from modules.one_euro_filter import OneEuroFilter
+from engine.one_euro_filter import OneEuroFilter
 
 
 class Pose:
