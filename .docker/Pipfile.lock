@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "beba9115846a6fbe35f554a115602b0e68c7927929eca5d77a80bc47f2aa1c33"
+            "sha256": "4fd543dfa338b18a7fae79d00b1eaf404fb15a8daf859bc87180144d95bfc670"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -740,10 +740,9 @@
         },
         "flatbuffers": {
             "hashes": [
-                "sha256:8698aaa635ca8cf805c7d8414d4a4a8ecbffadca0325fa60551cb3ca78612356",
-                "sha256:e36d5ba7a5e9483ff0ec1d238fdc3011c866aab7f8ce77d5e9d445ac12071d84"
+                "sha256:9e9ef47fa92625c4721036e7c4124182668dc6021d9e7c73704edd395648deb9"
             ],
-            "version": "==22.10.26"
+            "version": "==1.12"
         },
         "frozenlist": {
             "hashes": [
@@ -831,10 +830,11 @@
         "gast": {
             "hashes": [
                 "sha256:211aac1e58c167b25d3504998f2db694454a24bb1fb1225bce99420166f21d6a",
-                "sha256:cfbea25820e653af9c7d1807f659ce0a0a9c64f2439421a7bba4f0983f532dea"
+                "sha256:cfbea25820e653af9c7d1807f659ce0a0a9c64f2439421a7bba4f0983f532dea",
+                "sha256:b7adcdd5adbebf1adf17378da5ba3f543684dbec47b1cda1f3997e573cd542c4"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==0.5.3"
+            "version": "==0.4.0"
         },
         "gdown": {
             "hashes": [
@@ -1395,9 +1395,9 @@
         },
         "keras": {
             "hashes": [
-                "sha256:744d39dc6577dcd80ff4a4d41549e92b77d6a17e0edd58a431d30656e29bc94e"
+                "sha256:55911256f89cfc9343c9fbe4b61ec45a2d33d89729cbe1ab9dcacf8b07b8b6ab"
             ],
-            "version": "==2.8.0"
+            "version": "==2.9.0"
         },
         "keras-preprocessing": {
             "hashes": [
@@ -1969,7 +1969,6 @@
         },
         "nncf": {
             "extras": [
-                "tf",
                 "torch"
             ],
             "git": "https://github.com/openvinotoolkit/nncf.git",
@@ -3575,10 +3574,10 @@
         },
         "tensorboard": {
             "hashes": [
-                "sha256:65a338e4424e9079f2604923bdbe301792adce2ace1be68da6b3ddf005170def"
+                "sha256:bd78211076dca5efa27260afacfaa96cd05c7db12a6c09cc76a1d6b2987ca621"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==2.8.0"
+            "version": "==2.9.0"
         },
         "tensorboard-data-server": {
             "hashes": [
@@ -3597,6 +3596,7 @@
         },
         "tensorflow": {
             "hashes": [
+                "sha256:437d0044d6a9537ffd0ded41c9a87a6ee80d4cde9232c616c61727bba28cbe9f",
                 "sha256:25dfb9a764dd7a50bcdb6229f1ae6287df106c760eb60c8ccbc151119b4aa136",
                 "sha256:26e00c51fab1198e39bcbf9c57d78d7bacd4e970e387e1072e078da43926215f",
                 "sha256:4a691a1dc1b1888a1e4320ed0e4bcdeb397fcd51acc692172df0b72dfdef66dd",
@@ -3611,7 +3611,7 @@
                 "sha256:fa3d4adfa8a22a863cdbed743488145a442c837f84d267bbdb86e4888954ca67"
             ],
             "index": "pypi",
-            "version": "==2.8.3"
+            "version": "==2.9.3"
         },
         "tensorflow-datasets": {
             "hashes": [
@@ -3623,10 +3623,10 @@
         },
         "tensorflow-estimator": {
             "hashes": [
-                "sha256:bee8e0520c60ae7eaf6ca8cb46c5a9f4b45725531380db8fbe38fcb48478b6bb"
+                "sha256:e9762bb302f51bc1eb2f35d19f0190a6a2d809d754d5def788c4328fe3746744"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==2.8.0"
+            "version": "==2.9.0"
         },
         "tensorflow-io-gcs-filesystem": {
             "hashes": [

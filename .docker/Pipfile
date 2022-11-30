@@ -53,8 +53,8 @@ torchvision = {index = "pytorch-wheels", version = "==0.9.1+cpu"}
 transformers = "*"
 yaspin = "*"
 pythreejs = "*"
-nncf = {extras = ["tf", "torch"], git = "https://github.com/openvinotoolkit/nncf.git"}
-tensorflow = ">=2.5,<=2.9.1"
+nncf = {extras = ["torch"], git = "https://github.com/openvinotoolkit/nncf.git"}
+tensorflow = ">=2.5,<=2.9.3"
 
 [dev-packages]
 
