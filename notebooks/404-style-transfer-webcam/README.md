@@ -1,6 +1,6 @@
 # Live Style Transfer with OpenVINO™
 
-![style transfer](https://user-images.githubusercontent.com/109281183/203772234-f17a0875-b068-43ef-9e77-403462fde1f5.gif)
+![style transfer](https://user-images.githubusercontent.com/109281183/204767232-95b8f0a8-010e-4f6d-981e-104200652098.jpg)
 
 Artistic style transfer blends a single style to any given content image. The real-time style transfer is able to train a neural network to apply a single style to any given content image. Given this ability, a different network could be trained for each different style we wish to apply.
 
@@ -11,7 +11,7 @@ Artistic style transfer blends a single style to any given content image. The re
 ## Notebook Contents
 
 This notebook demonstrates style transfer with OpenVINO, using the [Fast Neural Style Transfer](https://github.com/onnx/models/tree/master/vision/style_transfer/fast_neural_style) model from [ONNX Model Repository](https://github.com/onnx/models).
-The idea is to use feed-forward convolutional neural networks to generate image transformations. The networks are trained using perceptual loss functions and effectively apply style transfer on a image / video.
+The idea is to use feed-forward convolutional neural networks to generate image transformations. The networks are trained using [Perceptual Losses for Real-Time Style Transfer and Super-Resolution](https://arxiv.org/abs/1603.08155) along with [Instance Normalization](https://arxiv.org/abs/1607.08022) and effectively apply style transfer on a image / video.
 
 ## Installation Instructions
 
