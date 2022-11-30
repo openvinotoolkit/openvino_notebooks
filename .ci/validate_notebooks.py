@@ -20,21 +20,20 @@ def parse_arguments():
 def find_notebook_dir(path, root):
     for parent in path.parents:
         if root == parent.parent:
-            return parent
+            return parent.relative_to(root)
     return None
             
 
 
 def prepare_test_plan(test_list, ignore_list):
     notebooks_dir = ROOT / 'notebooks'
-    notebooks = list(notebooks_dir.rglob('**/*.ipynb'))
-    statuses = {notebook.parent: {'status': '', 'path': notebook.parent} for notebook in notebooks}
+    notebooks = sorted(list(notebooks_dir.rglob('**/*.ipynb')))
+    statuses = {notebook.parent.relative_to(notebooks_dir): {'status': '', 'path': notebook.parent} for notebook in notebooks}
     test_list = test_list or statuses.keys()
     if len(test_list) == 1 and test_list[0].endswith('.txt'):
         testing_notebooks = []
         with open(test_list[0], 'r') as f:
             for line in f.readlines():
-                print(line)
                 changed_path = Path(line.strip())
                 if changed_path.resolve() == (ROOT / 'requirements.txt').resolve():
                     print('requirements.txt changed, check all notebooks')
@@ -42,13 +41,16 @@ def prepare_test_plan(test_list, ignore_list):
                     break
                 if changed_path.suffix == '.md':
                     continue
-                notebook_subdir = find_notebook_dir(changed_path, notebooks_dir)
+                notebook_subdir = find_notebook_dir(changed_path.resolve(), notebooks_dir.resolve())
                 if notebook_subdir is None:
                     continue
                 testing_notebooks.append(notebook_subdir)
         test_list = set(testing_notebooks)
+    else:
+        test_list = set(map(lambda x: Path(x), test_list))
 
     ignore_list = ignore_list or []
+    ignore_list = set(map(lambda x: Path(x), ignore_list))
     for notebook in statuses:
         if notebook not in test_list:
             statuses[notebook]['status'] = 'SKIPPED'
@@ -63,7 +65,7 @@ def run_test(notebook_path, report_dir):
     with cd(notebook_path):
         retcode = subprocess.run([
             sys.executable,  '-m',  'pytest', '--nbval', '-k', 'test_', '--durations', '10', '--junitxml', str(report_file)
-            ])
+            ]).returncode
     return retcode
 
 
@@ -84,8 +86,6 @@ def finalize_status(failed_notebooks, test_plan, report_dir):
         writer.writerows(test_report) 
     return return_status
 
-
-import os
 
 class cd:
     """Context manager for changing the current working directory"""
@@ -109,10 +109,11 @@ def main():
     for notebook, report in test_plan.items():
         if report['status'] == "SKIPPED":
             continue
+        print(notebook)
         status = run_test(report['path'], reports_dir)
         report['status'] = 'SUCCESS' if not status else "FAILED"
-        if not status:
-            failed_notebooks.append(notebook)
+        if status:
+            failed_notebooks.append(str(notebook))
             if args.early_stop:
                 break
     exit_status = finalize_status(failed_notebooks, test_plan, reports_dir)
