@@ -109,7 +109,6 @@ def main():
     for notebook, report in test_plan.items():
         if report['status'] == "SKIPPED":
             continue
-        print(notebook)
         status = run_test(report['path'], reports_dir)
         report['status'] = 'SUCCESS' if not status else "FAILED"
         if status:
