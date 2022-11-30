@@ -32,7 +32,7 @@ onnx = ">=1.11.0,<1.12.0"
 openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.2.0"}
 ovmsclient = "*"
 paddle2onnx = ">=0.6,<=0.9.6"
-paddlehub = "<=2.2.0"
+paddlecla = ">=2.2"
 paddlenlp = "==2.0.8"  # pin to avoid conflict with requests
 paddlepaddle = "==2.4.*"
 parasail = "<=1.2.4"

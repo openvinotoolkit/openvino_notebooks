@@ -2240,12 +2240,12 @@
             "index": "pypi",
             "version": "==0.8.1"
         },
-        "paddlehub": {
+        "paddleclas": {
             "hashes": [
-                "sha256:2a99660d3c9bffe5256188ac6d2462beb3e95e7f869ddab2958b9537053da91f"
+                "sha256:2198f8454e4b84300f9e0c798f0625e63886c2020d6ad7d6d9b20dfb5c55094d"
             ],
             "index": "pypi",
-            "version": "==2.2.0"
+            "version": "==2.5.0"
         },
         "paddlenlp": {
             "hashes": [
