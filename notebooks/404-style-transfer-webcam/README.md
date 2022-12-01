@@ -2,7 +2,7 @@
 
 ![style transfer](https://user-images.githubusercontent.com/109281183/204767232-95b8f0a8-010e-4f6d-981e-104200652098.jpg)
 
-Artistic style transfer blends a single style to any given content image. The real-time style transfer is able to train a neural network to apply a single style to any given content image. Given this ability, a different network could be trained for each different style we wish to apply.
+Artistic style transfer blends a single style to any given image. The real-time style transfer model is a neural network trained to apply a single style to images. Different networks can be trained for different styles we may wish to apply.
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F404-style-transfer-webcam%2F404-style-transfer.ipynb)
 
@@ -10,8 +10,7 @@ Artistic style transfer blends a single style to any given content image. The re
 
 ## Notebook Contents
 
-This notebook demonstrates style transfer with OpenVINO, using the [Fast Neural Style Transfer](https://github.com/onnx/models/tree/master/vision/style_transfer/fast_neural_style) model from [ONNX Model Repository](https://github.com/onnx/models).
-The idea is to use feed-forward convolutional neural networks to generate image transformations. The networks are trained using [Perceptual Losses for Real-Time Style Transfer and Super-Resolution](https://arxiv.org/abs/1603.08155) along with [Instance Normalization](https://arxiv.org/abs/1607.08022) and effectively apply style transfer on a image / video.
+There are 5 pre-trained style transfer models you can use with this notebook with the following styles: Mosaic, Rain Princess, Candy, Udnie and Pointilism. The models are downloaded from [ONNX Model Repository](https://github.com/onnx/models). They are based on the research paper [Perceptual Losses for Real-Time Style Transfer and Super-Resolution](https://arxiv.org/abs/1603.08155) and [Instance Normalization](https://arxiv.org/abs/1607.08022). The final steps in this notebook show live inference results using video from a webcam and video file.
 
 ## Installation Instructions
 
