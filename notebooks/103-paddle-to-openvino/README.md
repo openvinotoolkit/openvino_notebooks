@@ -1,4 +1,4 @@
- # PaddlePaddle to ONNX and OpenVINO™ IR Tutorial
+ # PaddlePaddle to OpenVINO™ IR Tutorial
 
  [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-to-openvino%2F103-paddle-to-openvino-classification.ipynb) 
 
