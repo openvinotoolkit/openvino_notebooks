@@ -86,9 +86,9 @@ class AsyncPipeline:
     def __init__(self, ie, model, plugin_config, device='CPU', max_num_requests=0):
         cache_path = Path("model_cache")
         cache_path.mkdir(exist_ok=True)
-        # Enable model cachine for GPU devices
+        # Enable model caching for GPU devices
         if "GPU" in device and "GPU" in ie.available_devices:
-            ie.set_config({"CACHE_DIR": str(cache_path)}, device_name="GPU")
+            ie.set_property(device_name="GPU", properties={"CACHE_DIR": str(cache_path)})
 
         self.model = model
         self.logger = logging.getLogger()
