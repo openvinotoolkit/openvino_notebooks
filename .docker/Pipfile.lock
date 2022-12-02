@@ -673,14 +673,6 @@
             "markers": "python_version < '3.11'",
             "version": "==1.0.0"
         },
-        "exceptiongroup": {
-            "hashes": [
-                "sha256:2e3c3fc1538a094aab74fad52d6c33fc94de3dfee3ee01f187c0e0c72aec5337",
-                "sha256:9086a4a21ef9b31c72181c77c040a074ba0889ee56a7b289ff0afb0d97655f96"
-            ],
-            "markers": "python_version < '3.11'",
-            "version": "==1.0.0rc9"
-        },
         "fast-ctc-decode": {
             "hashes": [
                 "sha256:22487c63ea807a3eb7a12a71d0a492e31c9d1b408cdb499870797d73681306e8",
@@ -901,7 +893,7 @@
             "version": "==1.56.4"
         },
         "greenlet": {
-            "hashes": 
+            "hashes": [
                 "sha256:069a8a557541a04518dc3beb9a78637e4e6b286814849a2ecfac529eaa78562b",
                 "sha256:089e123d80dbc6f61fff1ff0eae547b02c343d50968832716a7b0a33bea5f792",
                 "sha256:09f00f9938eb5ae1fe203558b56081feb0ca34a2895f8374cd01129ddf4d111c",
@@ -1135,14 +1127,6 @@
                 "sha256:f20c8a35f1747eff5cc0a2d5222b0427f75d6096712e67ec2829f491bc5ed82e"
             ],
             "version": "==0.2.2"
-        },
-        "ipydatawidgets": {
-            "hashes": [
-                "sha256:2f2b997f6569d3ee1f4f7e35db0cb1da08c077b21a88f1c01c59f5b986a31aa6",
-                "sha256:c1d8e479f3adafba42378fe39126ddc14293ccb90341eeb2f6c1f568aa019c64"
-            ],
-            "markers": "python_version >= '3.7'",
-            "version": "==4.3.2"
         },
         "ipykernel": {
             "hashes": [
@@ -2816,14 +2800,6 @@
             ],
             "markers": "python_version >= '3.5'",
             "version": "==1.0.0"
-        },
-        "pythreejs": {
-            "hashes": [
-                "sha256:0ba5063a76312c45f65c376ce45f5af33199484b4ce7a59e791ad8c4d746a867",
-                "sha256:a8a758b4519e56984ae42c7fae512020129d504569a096656c09f040889ed598"
-            ],
-            "index": "pypi",
-            "version": "==2.4.1"
         },
         "pytorch-lightning": {
             "hashes": [

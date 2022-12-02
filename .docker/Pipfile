@@ -52,7 +52,6 @@ torchmetrics = "==0.6.2"
 torchvision = {index = "pytorch-wheels", version = "==0.9.1+cpu"}
 transformers = "*"
 yaspin = "*"
-pythreejs = "*"
 nncf = {extras = ["torch"], git = "https://github.com/openvinotoolkit/nncf.git"}
 tensorflow = ">=2.5,<=2.9.3"
 

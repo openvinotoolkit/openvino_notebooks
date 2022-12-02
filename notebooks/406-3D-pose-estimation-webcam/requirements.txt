@@ -1,0 +1,2 @@
+# 3D visualization
+pythreejs>=2.4.1

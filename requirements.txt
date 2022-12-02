@@ -38,9 +38,6 @@ tensorflow_datasets==4.2.0
 monai==0.9.1
 pytorch_lightning
 
-# 3D visualization
-pythreejs
-
 # Jupyter requirements
 jupyterlab
 
