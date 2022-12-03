@@ -1,6 +1,7 @@
 # 3D Human Pose Estimation with OpenVINO 
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks.git/main?labpath=notebooks%2F406-3D-pose-estimation-webcam%2F406-3D-pose-estimation.ipynb)
+
 *Binder is a free service where the webcam will not work, and performance on the video will not be good. For best performance, we recommend installing the notebooks locally.*
 
 ![pose estimation_webgl](https://user-images.githubusercontent.com/42672437/183292131-576cc05a-a724-472c-8dc9-f6bc092190bf.gif)
@@ -9,7 +10,7 @@ This notebook contains a 3D multi-person pose estimation demo.The model used in 
 
 ## Notebook Contents
 
-This notebook uses the "human-pose-estimation-3d-0001" model from OpenVINO Open Model Zoo, to estimate 3D human pose and draw them in 2D screen. Details of the model could be found here. The input source could be video files or webcam. It uses the [Three.js python api](https://pythreejs.readthedocs.io/en/stable/installing.html) to display 3D results in the web browsers. Note that to display the 3D inference results properly, for Windows and Ubuntu, Chrome is recommended to be used as the web browser. While for MacOS, Safari is recommended.
+This notebook uses the "human-pose-estimation-3d-0001" model from OpenVINO Open Model Zoo, to estimate 3D human pose and draw them in 2D screen. Details of the model could be found [here](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/human-pose-estimation-3d-0001). The input source could be video files or webcam. It uses the [Three.js python api](https://pythreejs.readthedocs.io/en/stable/installing.html) to display 3D results in the web browsers. Note that to display the 3D inference results properly, for Windows and Ubuntu, Chrome is recommended to be used as the web browser. While for MacOS, Safari is recommended.
 
 ## Installation Instructions
 
