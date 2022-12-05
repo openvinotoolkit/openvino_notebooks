@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 
-"""
-This script is like check-basics.py, but specific to the documentation.
-It's split off into a separate script, so that it can be easily run on its own.
-"""
-
-import os
 import sys
 import mistune
 import requests
@@ -39,8 +33,7 @@ def main():
     def complain(message):
         nonlocal all_passed
         all_passed = False
-        # print(message, file=sys.stderr)
-        print(message)
+        print(message, file=sys.stderr)
 
     for md_path in NOTEBOOKS_ROOT.glob('**/*README*.md'): 
         for url in get_all_references_from_md(md_path):
@@ -56,13 +49,13 @@ def main():
 
             if not components.scheme and not components.netloc:
                 # check if it is relative path on file from repo
-                file_name = os.path.join(os.path.dirname(md_path), components.path)
-                if not os.path.exists(file_name):
+                file_name = md_path.parent / components.path
+                if not file_name.exists():
                     complain(f'{md_path}: invalid URL reference {url!r}')
                 continue
 
             try:
-                get = requests.get(url, proxies={"http": "http://proxy-chain.intel.com:911", 'https': 'http://proxy-chain.intel.com:912'})
+                get = requests.get(url)
                 if get.status_code != 200:
                     complain(f'{md_path}: URL can not be reached {url!r}, status code {get.status_code}')    
             except Exception as err:
