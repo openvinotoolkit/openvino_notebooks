@@ -61,6 +61,8 @@ def main():
             except Exception as err:
                 complain(f'{md_path}: URL can not be reached {url!r}, error {err}')
 
+    sys.exit(0 if all_passed else 1)
+
 
 if __name__ == '__main__':
     main()

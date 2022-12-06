@@ -82,5 +82,7 @@ jobs:
     - name: Test READMEs and requirements
       run: |
         python -m pytest .ci/test_notebooks.py
-
+    - name: Test links from READMEs
+      run: |
+        python .ci/check_links.py
 
