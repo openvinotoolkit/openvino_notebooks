@@ -1,4 +1,4 @@
-openvino-dev[onnx,tensorflow2]==2022.2.0
+openvino-dev[onnx,tensorflow2]==2022.3.0.dev20221125
 gdown
 pytube>=12.1.0
 yaspin
@@ -25,6 +25,9 @@ paddlehub<=2.2.0
 # paddle2onnx 0.9.7 fails export in 206 and 207
 paddle2onnx>=0.6,<=0.9.6
 ppgan==2.1.*
+shapely>=1.7.1
+pyclipper>=1.2.1
+
 
 # BERT quantization notebook requirements
 transformers
