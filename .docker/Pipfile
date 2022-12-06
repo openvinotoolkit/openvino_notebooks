@@ -29,7 +29,7 @@ nbval = "*"
 nest-asyncio = "<=1.5.4"
 nltk = ">=3.6.4"
 onnx = ">=1.11.0,<1.12.0"
-openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.2.0"}
+openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.3.0.dev20221125"}
 ovmsclient = "*"
 paddle2onnx = ">=0.6,<=0.9.6"
 paddlehub = "<=2.2.0"
@@ -49,9 +49,9 @@ setuptools = ">56.0.0"
 shapely = ">=1.7.1"
 supervisor = "==4.1.0"
 tensorflow_datasets = "*"
-torch = {index = "pytorch-wheels", version = "==1.8.1+cpu"}
+torch = {index = "pytorch-wheels", version = "==1.12.1+cpu"}
 torchmetrics = "==0.6.2"
-torchvision = {index = "pytorch-wheels", version = "==0.9.1+cpu"}
+torchvision = {index = "pytorch-wheels", version = "==0.13.1+cpu"}
 transformers = "*"
 yaspin = "*"
 nncf = {extras = ["torch"], git = "https://github.com/openvinotoolkit/nncf.git"}
