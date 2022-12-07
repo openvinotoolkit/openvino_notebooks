@@ -1,4 +1,0 @@
-torch>1.9.1,<=1.13.0
-transformers>=4.21
-diffusers[torch]>=0.7.2
-huggingface-hub>=0.9.1
