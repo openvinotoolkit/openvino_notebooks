@@ -27,7 +27,7 @@ paddle2onnx>=0.6,<=0.9.6
 ppgan==2.1.*
 
 # BERT quantization notebook requirements
-transformers
+transformers<4.25
 
 # NNCF notebook requirements
 git+https://github.com/openvinotoolkit/nncf.git@f62b6629c71822b5241e175e0a03c3acb42ae01e#egg=nncf[torch]
