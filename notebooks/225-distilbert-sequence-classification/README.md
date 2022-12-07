@@ -8,8 +8,3 @@ We'll be using distilbert-base-uncased-finetuned-sst-2-english transformers base
 ## Installation Instructions
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the packages required to run this project.
-
-```bash
-pip install -r requirements.txt
-```
-
