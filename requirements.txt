@@ -14,7 +14,7 @@ onnx>=1.11.0,<1.12.0
 torch==1.12.1; sys_platform == 'darwin'
 torchvision==0.13.1; sys_platform == 'darwin'
 --find-links https://download.pytorch.org/whl/torch_stable.html
-torch==1.12.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
+torch==1.12.1; sys_platform =='linux' or platform_system == 'Windows' --extra-index-url https://download.pytorch.org/whl/cpu
 torchvision==0.13.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchmetrics==0.6.2
 
@@ -48,7 +48,7 @@ jupyterlab
 # other dependencies that are pinned to a specific version to avoid
 # compatibility issues or vulnerabilities
 seaborn>=0.11.0
-geffnet==0.9.8
+geffnet==1.0.2
 matplotlib<3.4
 jedi==0.17.2
 setuptools>=56.0.0

@@ -839,10 +839,11 @@
         "geffnet": {
             "hashes": [
                 "sha256:4b139e1159185271d4e118f2e85e9942c24b0082d25a0830cfc1eabbc4e091d6",
-                "sha256:a07985b0cd902025ff3f29e170aa90c139e331dc520bf566a522fae42de2cf53"
+                "sha256:a07985b0cd902025ff3f29e170aa90c139e331dc520bf566a522fae42de2cf53",
+                "sha256:259013030bf429bc7a4fc4e8dc3fef6364e9750a6cee24d28e1674f8c3048d3a"
             ],
             "index": "pypi",
-            "version": "==0.9.8"
+            "version": "==1.0.2"
         },
         "gitdb": {
             "hashes": [

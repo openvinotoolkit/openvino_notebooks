@@ -12,7 +12,7 @@ name = "pytorch-wheels"
 boto3 = "*"
 fastseg = "*"
 gdown = "*"
-geffnet = "==0.9.8"
+geffnet = "==1.0.2"
 ipykernel = "==5.*"
 ipython = "==7.16.3"  # pin to avoid vulnerability
 ipywidgets = "*"
