@@ -707,6 +707,13 @@
             "index": "pypi",
             "version": "==0.1.2"
         },
+        "faiss-cpu": {
+            "hashes": [
+                "sha256:441d1c305595d925138f2cde63dabe8c10ee05fc8ad66bf750e278a7e8c409bd",
+                "sha256:a40deb7d9023e3a869e51fad3b8643fbc7958274f8ca5cb89fe02103345de7ed"
+            ],
+            "version": "==1.7.1.post2"
+        },
         "filelock": {
             "hashes": [
                 "sha256:55447caa666f2198c5b6b13a26d2084d26fa5b115c00d065664b2124680c4edc",
@@ -2473,6 +2480,12 @@
             "index": "pypi",
             "version": "==2.1.0"
         },
+        "prettytable":{
+            "hashes": [
+                "sha256:fe391c3b545800028edf5dbb6a5360893feb398367fcc1cf8d7a5b29ce5c59a1"
+            ],
+            "version": "==3.5.0"
+        },
         "progress": {
             "hashes": [
                 "sha256:c9c86e98b5c03fa1fe11e3b67c1feda4788b8d0fe7336c2ff7d5644ccfba34cd"
@@ -3870,6 +3883,13 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==4.2"
+        },
+        "ujson": {
+            "hashes":[
+                "sha256:2a24b9a96364f943a4754fa00b47855d0a01b84ac4b8b11ebf058c8fb68c1f77",
+                "sha256:7174e81c137d480abe2f8036e9fb69157e509f2db0bfdee4488eb61dc3f0ff6b"
+            ],
+            "version": "==5.6.0"
         },
         "urllib3": {
             "hashes": [
