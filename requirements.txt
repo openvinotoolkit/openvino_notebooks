@@ -20,14 +20,14 @@ torchmetrics==0.6.2
 
 # PaddlePaddle notebook requirements
 # For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
-paddlepaddle==2.3.*
+paddlepaddle==2.4.*
 paddlehub<=2.2.0
 # paddle2onnx 0.9.7 fails export in 206 and 207
 paddle2onnx>=0.6,<=0.9.6
 ppgan==2.1.*
 
 # BERT quantization notebook requirements
-transformers
+transformers<4.25
 
 # NNCF notebook requirements
 git+https://github.com/openvinotoolkit/nncf.git@f62b6629c71822b5241e175e0a03c3acb42ae01e#egg=nncf[torch]

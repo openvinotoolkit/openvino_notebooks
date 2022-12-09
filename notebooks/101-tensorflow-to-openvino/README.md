@@ -4,7 +4,7 @@
 
 <img src="https://user-images.githubusercontent.com/36741649/127170593-86976dc3-e5e4-40be-b0a6-206379cd7df5.jpg" width=300>
 
-This tutorial explains how to convert [TensorFlow](www.tensorflow.org) models to OpenVINO IR. The notebook shows how to convert the [TensorFlow MobilenetV3 model](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet) and then classify an image with OpenVINO Runtime.
+This tutorial explains how to convert [TensorFlow](https://www.tensorflow.org) models to OpenVINO IR. The notebook shows how to convert the [TensorFlow MobilenetV3 model](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet) and then classify an image with OpenVINO Runtime.
 
 ## Notebook Contents
 

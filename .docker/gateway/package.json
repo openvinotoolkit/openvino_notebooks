@@ -6,7 +6,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "4.16.4",
+    "express": "4.17.3",
     "http-proxy-middleware": "0.19.1",
     "morgan": "1.9.1",
     "winston": "3.2.0"
