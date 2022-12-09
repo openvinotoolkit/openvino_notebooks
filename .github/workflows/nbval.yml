@@ -177,12 +177,12 @@ jobs:
     - name: Analysing with nbval (Linux)
       if: runner.os == 'Linux'
       run: |
-            python .ci/validate_notebooks.py  --ignore_list 107-speech-recognition-quantization --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
     - name: Analysing with nbval (MacOS)
       if: runner.os == 'MacOS'
       run: |
-           python .ci/validate_notebooks.py --ignore_list 107-speech-recognition-quantization 114-quantization-simplified-mode 115-async-api --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
 
       shell: bash
     - name: Archive test report
