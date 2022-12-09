@@ -187,13 +187,13 @@ jobs:
       if: runner.os == 'Linux'
       run: |
             chmod +x .ci/validate_notebooks.sh
-            .ci/validate_notebooks.sh 107-speech-recognition-quantization 225-stable-diffusion-text-to-image
+            .ci/validate_notebooks.sh 225-stable-diffusion-text-to-image
       shell: bash
     - name: Analysing with nbval
       if: runner.os == 'MacOS'
       run: |
-        chmod +x .ci/validate_notebooks.sh
-        .ci/validate_notebooks.sh 107-speech-recognition-quantization 114-quantization-simplified-mode 115-async-api 225-stable-diffusion-text-to-image
+            chmod +x .ci/validate_notebooks.sh
+            .ci/validate_notebooks.sh 225-stable-diffusion-text-to-image
       shell: bash
 
     # Show the cache after running the notebooks
