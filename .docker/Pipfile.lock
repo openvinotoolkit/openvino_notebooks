@@ -1937,9 +1937,6 @@
             "version": "==3.7"
         },
         "nncf": {
-            "extras": [
-                "torch"
-            ],
             "git": "https://github.com/openvinotoolkit/nncf.git",
             "ref": "6e1fdeb9a664b4d61e2d207a80de61f65dafd378"
         },
@@ -3770,7 +3767,7 @@
                 "sha256:42b7d500629c9e99d875cb204a1a1f5b3f65f6743823b21de9b4cba5962300d8"
             ],
             "index": "pytorch-wheels",
-            "version": "==1.12.1+cpu"
+            "version": "==1.13.0+cpu"
         },
         "torchmetrics": {
             "hashes": [
@@ -3793,7 +3790,7 @@
                 "sha256:b294ad478d69f155b93c22b363dc4d71ffa49cdf4429595412e6eb7513eb0747"
             ],
             "index": "pytorch-wheels",
-            "version": "==0.13.1+cpu"
+            "version": "==0.14.0+cpu"
         },
         "tornado": {
             "hashes": [

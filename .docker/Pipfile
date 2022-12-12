@@ -48,12 +48,12 @@ setuptools = ">56.0.0"
 shapely = ">=1.7.1"
 supervisor = "==4.1.0"
 tensorflow_datasets = "*"
-torch = {index = "pytorch-wheels", version = "==1.12.1+cpu"}
+torch = {index = "pytorch-wheels", version = "==1.13.0+cpu"}
 torchmetrics = "==0.6.2"
-torchvision = {index = "pytorch-wheels", version = "==0.9.1+cpu"}
+torchvision = {index = "pytorch-wheels", version = "==0.14.0+cpu"}
 transformers = "<4.25.0"
 yaspin = "*"
-nncf = {extras = ["torch"], git = "https://github.com/openvinotoolkit/nncf.git"}
+nncf = {git = "https://github.com/openvinotoolkit/nncf.git"}
 tensorflow = ">=2.5,<=2.9.3"
 
 [dev-packages]
