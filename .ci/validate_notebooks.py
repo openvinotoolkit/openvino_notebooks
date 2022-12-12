@@ -2,6 +2,7 @@ import sys
 import os
 import subprocess
 import csv
+import shutil
 from pathlib import Path
 from argparse import ArgumentParser
 
@@ -63,10 +64,10 @@ def clean_test_artefacts(before_test_files, after_test_files):
     for file_path in after_test_files:
         if file_path in before_test_files or not file_path.exists():
             continue
-        if not file_path.is_file():
+        if file_path.is_file():
             file_path.unlink()
         else:
-            file_path.rmdir()
+            shutil.rmtree(file_path, ignore_errors=True)
 
 
 def run_test(notebook_path, report_dir):
