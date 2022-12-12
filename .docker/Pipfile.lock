@@ -3788,7 +3788,8 @@
                 "sha256:a0dadc78168437b26b3882792c484d161d53279912d29e0b2c04a10c8b020bd9",
                 "sha256:c3cc044b67f9c2c943bf31fe45ec6267fafff476f0517f381d5dc4e1bb77e5ae",
                 "sha256:c52a10dcad36ecd180a960d93a0bb62d08303d9aefca26674f76433bde01eafc",
-                "sha256:b294ad478d69f155b93c22b363dc4d71ffa49cdf4429595412e6eb7513eb0747"
+                "sha256:b294ad478d69f155b93c22b363dc4d71ffa49cdf4429595412e6eb7513eb0747",
+                "sha256:6439b1f57091ed6262c228c58bc9104af8344a50b6b1f43cc7060ae7ec89d989"
             ],
             "index": "pytorch-wheels",
             "version": "==0.14.0+cpu"
