@@ -2515,6 +2515,13 @@
             "markers": "python_version >= '3.5'",
             "version": "==3.19.6"
         },
+        "psutil":{
+            "hashes": [
+                "sha256:3d7f9739eb435d4b1338944abe23f49584bde5395f27487d2ee25ad9a8774a62",
+                "sha256:54c0d3d8e0078b7666984e11b12b88af2db11d11249a8ac8920dd5ef68a66e08"
+            ],
+            "version": "==5.9.4"
+        },
         "ptyprocess": {
             "hashes": [
                 "sha256:4b41f3967fce3af57cc7e94b888626c18bf37a083e3651ca8feeb66d492fef35",

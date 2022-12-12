@@ -9,7 +9,7 @@ librosa==0.8.1
 ipywidgets
 
 # Upgrade onnx version to avoid 220 YOLOV5 pytorch to onnx model export issue on Windows
-onnx>=1.11.0,<1.12.0
+onnx>=1.11.0,<=1.12.0
 
 torch==1.13.0; sys_platform == 'darwin'
 torchvision==0.14.0; sys_platform == 'darwin'
@@ -31,6 +31,9 @@ pyclipper>=1.2.1
 
 # BERT quantization notebook requirements
 transformers<4.25
+
+# yolov5 notebok requirements
+psutil
 
 # NNCF notebook requirements
 git+https://github.com/openvinotoolkit/nncf.git#egg=nncf
