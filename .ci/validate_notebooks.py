@@ -2,6 +2,7 @@ import sys
 import os
 import subprocess
 import csv
+import shutil
 from pathlib import Path
 from argparse import ArgumentParser
 
@@ -59,13 +60,25 @@ def prepare_test_plan(test_list, ignore_list):
     return statuses
 
 
+def clean_test_artefacts(before_test_files, after_test_files):
+    for file_path in after_test_files:
+        if file_path in before_test_files or not file_path.exists():
+            continue
+        if file_path.is_file():
+            file_path.unlink()
+        else:
+            shutil.rmtree(file_path, ignore_errors=True)
+
+
 def run_test(notebook_path, report_dir):
     print(f'RUN {notebook_path.relative_to(ROOT)}')
     report_file = report_dir / f'{notebook_path.name}_report.xml'
     with cd(notebook_path):
+        existing_files = sorted(list(notebook_path.rglob("*")))
         retcode = subprocess.run([
             sys.executable,  '-m',  'pytest', '--nbval', '-k', 'test_', '--durations', '10', '--junitxml', str(report_file)
             ]).returncode
+        clean_test_artefacts(existing_files, sorted(list(notebook_path.rglob("*"))))
     return retcode
 
 
