@@ -1,26 +1,26 @@
-# Video subtitles generation with Whisper
-Whisper is a general-purpose speech recognition model, which is able to almost flawlessly transcribe speech across dozens of languages and even handle poor audio quality or excessive background noise.
-In this notebook we will try to apply its for generating transcription for video.
+# Video Subtitle Generation with OpenAI Whisper
+[Whisper](https://openai.com/blog/whisper/) is a general-purpose speech recognition model from [OpenAI](https://openai.com/). Themodel is able to almost flawlessly transcribe speech across dozens of languages and even handle poor audio quality or excessive background noise.
+In this notebook we will run the model with OpenVINO to generate transcription of video.
 
 
 ## Notebook Contents
 
-This notebook demonstrates how to generate video subtiteles using Whisper model. Whisper is an automatic speech recognition (ASR) system trained on 680,000 hours of multilingual and multitask supervised data collected from the web.  It is a multi-task model that can perform multilingual speech recognition as well as speech translation and language identification.
-You can find more information about this model in [paper](https://cdn.openai.com/papers/whisper.pdf), [OpenAI blogpost](https://openai.com/blog/whisper/), [model card](https://github.com/openai/whisper/blob/main/model-card.md) and [repository](https://github.com/openai/whisper).
+This notebook demonstrates how to generate video subtitles using the open-source Whisper model. Whisper is an automatic speech recognition (ASR) system trained on 680,000 hours of multilingual and multitask supervised data collected from the web.  It is a multi-task model that can perform multilingual speech recognition as well as speech translation and language identification.
+You can find more information about this model in the [research paper](https://cdn.openai.com/papers/whisper.pdf), [OpenAI blog](https://openai.com/blog/whisper/), [model card](https://github.com/openai/whisper/blob/main/model-card.md) and GitHub [repository](https://github.com/openai/whisper).
 
 In this notebook we will use its capabilities for generation subtitles to video.
 Notebook contains following steps:
-1. Download model.
-2. Instantiate original model pipeline
-3. Convert model to ONNX and then to IR using OpenVINO Model Optimizer tool.
-4. Run Whisper pipeline with OpenVINO models.
+1. Download the model
+2. Instantiate original PyTorch model pipeline
+3. Export ONNX model and convert to OpenVINO IR using the Model Optimizer tool
+4. Run the Whisper pipeline with OpenVINO
 
-The simplified demo pipeline represented on diagram below:
+A simplified demo pipeline is represented in the diagram below:
 ![whisper_pipeline.png](https://user-images.githubusercontent.com/29454499/204536733-1f4342f7-2328-476a-a431-cb596df69854.png)
-The result of notebook's work is `srt file` (one of the most popular video captioning format) with subtitles for video downloaded from YouTube video hosting. 
-This file can be integrated to player during video playback or directly embedded to video file using `ffmpeg` or any other tools for working with subtitles.
+The final output of running this notebook is an `srt file` (popular video captioning format) with subtitles for a sample video downloaded from YouTube.
+This file can be integrated with a video player during playback or embedded directly into a video file with `ffmpeg` or similar tools that support working with subtitles.
 
-The following image shows an example of the input video and corresponding transcription.
+The image below shows an example of the video as input and corresponding transcription as output.
 
 ![image](https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png)
 

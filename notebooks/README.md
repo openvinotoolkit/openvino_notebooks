@@ -148,7 +148,7 @@ More amazing notebooks here!
 | [224-3D-segmentation-point-clouds](224-3D-segmentation-point-clouds/)<br> | Process point cloud data and run 3D Part Segmentation with OpenVINO | <img src = "https://user-images.githubusercontent.com/91237924/185752178-3882902c-907b-4614-b0e6-ea1de08bf3ef.png" width=225> |
 | [225-stable-diffusion-text-to-image](225-stable-diffusion-text-to-image)<br> | Text-to-image generation with Stable Diffusion method | <img src=https://user-images.githubusercontent.com/15709723/200945747-1c584e5c-b3f2-4e43-b1c1-e35fd6edc2c3.png width=225>|
 | [226-yolov7-optimization](226-yolov7-optimization/)<br> | Optimize YOLOv7 using NNCF PTQ API | <img src=https://raw.githubusercontent.com/WongKinYiu/yolov7/main/figure/horses_prediction.jpg  width=225> |
-| [227-whisper-subtitles-generation](226-whisper-subtitles-generation/)<br> | Generate subtitles for video with Whisper | <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225> |
+| [227-whisper-subtitles-generation](227-whisper-subtitles-generation/)<br> | Generate subtitles for video with OpenAI Whisper and OpenVINO | <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225> |
 
 </details>
 </p>
