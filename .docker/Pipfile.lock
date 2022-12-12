@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ad7e167f89c698b2dc673c19698ab791ce5152b5220c2a5a57514ba22df0d842"
+            "sha256": "80f5a61ddc30dba4d1ed59dbe6d268d63f41729bb9541c875fa6981cd0148068"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -2100,9 +2100,10 @@
                 "sha256:97fa3f3419c8766b9419d493ab52eeb431eb678fe97a0bdd0fed4307c6a09292",
                 "sha256:b418a4312cf40a3010f31c09ff360d2a8aa8bc67c5c0b20859c80acafa630833",
                 "sha256:c60cbbef6ca6a0129e72bc89955875cebc793c5b4507aae59e6f055ed900c235",
-                "sha256:ddae2f441e32297d5caa7b25091beb8c2358616fd7094572fdb3df27a96bf79e"
+                "sha256:ddae2f441e32297d5caa7b25091beb8c2358616fd7094572fdb3df27a96bf79e",
+                "sha256:ce872509a44bd61f394bdee48293017b58888163da33f4160dc9853026bcc180"
             ],
-            "version": "==2022.2.0"
+            "version": "==2022.3.0dev20221125"
         },
         "openvino-dev": {
             "extras": [
@@ -2110,10 +2111,10 @@
                 "tensorflow2"
             ],
             "hashes": [
-                "sha256:6bb731fa67d40ea03bc9379c3d47607e70a831b6c33fe789fe8a29cbcce074c3"
+                "sha256:652ba670794b864f9739878a93112de2fcd9e50ed76e2a35bd50f47ff7261be9"
             ],
             "index": "pypi",
-            "version": "==2022.2.0"
+            "version": "==2022.3.0dev20221125"
         },
         "openvino-telemetry": {
             "hashes": [
@@ -2312,10 +2313,11 @@
                 "sha256:c61c043aafb69329d0f961b19faa30b1dab709dd34c9388143fc55680059e55a",
                 "sha256:c94ff2780a1fd89f190390130d6d36173ca59fcfb3fe0ff596f9a56518191ccb",
                 "sha256:edda9bacc3843dfbeebaf7a701763e68e741b08fccb889c003b0a52f0ee95782",
-                "sha256:f10fc41ee3c75a474d3bdf68d396f10782d013d7f67db99c0efbfd0acb99701b"
+                "sha256:f10fc41ee3c75a474d3bdf68d396f10782d013d7f67db99c0efbfd0acb99701b",
+                "sha256:8b6dbec5f3e6d5dc80dcfee250e0a2a652b3f28663492f7dab9a24416a48ac39"
             ],
             "markers": "python_full_version >= '3.6.1'",
-            "version": "==1.1.5"
+            "version": "==1.3.5"
         },
         "pandocfilters": {
             "hashes": [
@@ -3323,10 +3325,11 @@
                 "sha256:e98d49a5717369d8241d6cf33ecb0ca72deee392414118198a8e5b4c35c56340",
                 "sha256:ed572470af2438b526ea574ff8f05e7f39b44ac37f712105e57fc4d53a6fb660",
                 "sha256:f87b39f4d69cf7d7529d7b1098cb712033b17ea7714aed831b95628f483fd012",
-                "sha256:fa789583fc94a7689b45834453fec095245c7e69c58561dc159b5d5277057e4c"
+                "sha256:fa789583fc94a7689b45834453fec095245c7e69c58561dc159b5d5277057e4c",
+                "sha256:ad5be4039147c808e64f99c0e8a9641eb5d2fa079ff5894dcd8240e94e347af4"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==1.5.4"
+            "version": "==1.8.0"
         },
         "seaborn": {
             "hashes": [
