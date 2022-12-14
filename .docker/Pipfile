@@ -29,7 +29,8 @@ nbval = "*"
 nest-asyncio = "<=1.5.4"
 nltk = ">=3.6.4"
 onnx = ">=1.11.0,<1.12.0"
-openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.2.0"}
+openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.3.0.dev20221125"}
+openvino-telemetry = {git = "https://github.com/openvinotoolkit/telemetry.git"}
 ovmsclient = "*"
 paddle2onnx = ">=0.6,<=0.9.6"
 paddlehub = "<=2.2.0"
