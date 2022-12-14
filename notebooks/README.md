@@ -146,7 +146,6 @@ More amazing notebooks here!
 | [227-whisper-subtitles-generation](227-whisper-subtitles-generation/)<br> | Generate subtitles for video with OpenAI Whisper and OpenVINO | <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225> |
 | [228-clip-zero-shot-image-classification](228-clip-zero-shot-image-classification)<br> | Perform Zero-shot Image Classification with CLIP and OpenVINO | <img src=https://user-images.githubusercontent.com/29454499/207795060-437b42f9-e801-4332-a91f-cc26471e5ba2.png  width=500> |
 
-
 </details>
 </p>
 
