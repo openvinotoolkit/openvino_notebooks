@@ -16,6 +16,7 @@ def parse_arguments():
     parser.add_argument('--test_list', required=False, nargs='+')
     parser.add_argument('--early_stop', action='store_true')
     parser.add_argument('--report_dir', default='report')
+    parser.add_argument('--colect_reports', action='store_true')
     return parser.parse_args()
 
 def find_notebook_dir(path, root):
@@ -65,19 +66,23 @@ def clean_test_artefacts(before_test_files, after_test_files):
         if file_path in before_test_files or not file_path.exists():
             continue
         if file_path.is_file():
-            file_path.unlink()
+            try:
+                file_path.unlink()
+            except Exception:
+                pass
         else:
             shutil.rmtree(file_path, ignore_errors=True)
 
 
-def run_test(notebook_path, report_dir):
+def run_test(notebook_path, report_dir, collect_reports):
     print(f'RUN {notebook_path.relative_to(ROOT)}')
     report_file = report_dir / f'{notebook_path.name}_report.xml'
     with cd(notebook_path):
         existing_files = sorted(list(notebook_path.rglob("*")))
-        retcode = subprocess.run([
-            sys.executable,  '-m',  'pytest', '--nbval', '-k', 'test_', '--durations', '10', '--junitxml', str(report_file)
-            ]).returncode
+        main_command = [sys.executable,  '-m',  'pytest', '--nbval', '-k', 'test_', '--durations', '10']
+        if collect_reports:
+            main_command.extend(['--junitxml', str(report_file)])
+        retcode = subprocess.run().returncode
         clean_test_artefacts(existing_files, sorted(list(notebook_path.rglob("*"))))
     return retcode
 
@@ -102,15 +107,15 @@ def finalize_status(failed_notebooks, test_plan, report_dir):
 
 class cd:
     """Context manager for changing the current working directory"""
-    def __init__(self, newPath):
-        self.newPath = os.path.expanduser(newPath)
+    def __init__(self, new_path):
+        self.new_path = os.path.expanduser(new_path)
 
     def __enter__(self):
-        self.savedPath = os.getcwd()
-        os.chdir(self.newPath)
+        self.saved_path = os.getcwd()
+        os.chdir(self.new_path)
 
     def __exit__(self, etype, value, traceback):
-        os.chdir(self.savedPath)
+        os.chdir(self.saved_path)
 
 def main():
     failed_notebooks = []
@@ -122,7 +127,7 @@ def main():
     for notebook, report in test_plan.items():
         if report['status'] == "SKIPPED":
             continue
-        status = run_test(report['path'], reports_dir)
+        status = run_test(report['path'], reports_dir, args.collect_reports)
         report['status'] = 'SUCCESS' if not status else "FAILED"
         if status:
             failed_notebooks.append(str(notebook))
