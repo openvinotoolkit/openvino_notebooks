@@ -16,7 +16,7 @@ def parse_arguments():
     parser.add_argument('--test_list', required=False, nargs='+')
     parser.add_argument('--early_stop', action='store_true')
     parser.add_argument('--report_dir', default='report')
-    parser.add_argument('--colect_reports', action='store_true')
+    parser.add_argument('--collect_reports', action='store_true')
     return parser.parse_args()
 
 def find_notebook_dir(path, root):
