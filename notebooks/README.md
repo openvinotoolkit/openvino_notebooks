@@ -147,7 +147,6 @@ More amazing notebooks here!
 | [223-gpt2-text-prediction](223-gpt2-text-prediction/)<br> | Use GPT-2 to perform text prediction on an input sequence | <img src=https://user-images.githubusercontent.com/91228207/185105225-0f996b0b-0a3b-4486-872d-364ac6fab68b.png  width=225> |
 | [224-3D-segmentation-point-clouds](224-3D-segmentation-point-clouds/)<br> | Process point cloud data and run 3D Part Segmentation with OpenVINO | <img src = "https://user-images.githubusercontent.com/91237924/185752178-3882902c-907b-4614-b0e6-ea1de08bf3ef.png" width=225> |
 | [225-distilbert-sequence-classification](225-distilbert-sequence-classification/)<br> | Sequence Classification OpenVINO API 2.0 | <img src = "https://user-images.githubusercontent.com/95271966/206130638-d9847414-357a-4c79-9ca7-76f4ae5a6d7f.png" width=225> |
-| [226-bert-fill-mask](226-bert-fill-mask/)<br> | Fill Mask with Bert-Base-Uncased | <img src = "https://user-images.githubusercontent.com/95271966/206129198-524456ff-8fd3-4a61-82ed-cd8322cddfc3.png" width=225> |
 
 
 </details>
