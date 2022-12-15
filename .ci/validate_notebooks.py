@@ -82,7 +82,7 @@ def run_test(notebook_path, report_dir, collect_reports):
         main_command = [sys.executable,  '-m',  'pytest', '--nbval', '-k', 'test_', '--durations', '10']
         if collect_reports:
             main_command.extend(['--junitxml', str(report_file)])
-        retcode = subprocess.run().returncode
+        retcode = subprocess.run(main_command).returncode
         clean_test_artefacts(existing_files, sorted(list(notebook_path.rglob("*"))))
     return retcode
 
