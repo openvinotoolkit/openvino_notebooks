@@ -32,9 +32,9 @@ onnx = ">=1.11.0,<1.12.0"
 openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.2.0"}
 ovmsclient = "*"
 paddle2onnx = ">=0.6,<=0.9.6"
-paddlehub = "<=2.2.0"
+paddleclas = ">=2.2"
 paddlenlp = "==2.0.8"  # pin to avoid conflict with requests
-paddlepaddle = "==2.3.*"
+paddlepaddle = "==2.4.*"
 parasail = "<=1.2.4"
 Pillow = ">=8.3.2"
 ppgan = ">=2.1.0"
@@ -50,7 +50,7 @@ tensorflow_datasets = "*"
 torch = {index = "pytorch-wheels", version = "==1.8.1+cpu"}
 torchmetrics = "==0.6.2"
 torchvision = {index = "pytorch-wheels", version = "==0.9.1+cpu"}
-transformers = "*"
+transformers = "<4.25.0"
 yaspin = "*"
 nncf = {extras = ["torch"], git = "https://github.com/openvinotoolkit/nncf.git"}
 tensorflow = ">=2.5,<=2.9.3"
