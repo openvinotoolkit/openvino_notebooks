@@ -6,17 +6,16 @@ yaspin
 librosa==0.8.1
 
 # PyTorch/ONNX notebook requirements
-fastseg
 ipywidgets
 
 # Upgrade onnx version to avoid 220 YOLOV5 pytorch to onnx model export issue on Windows
-onnx>=1.11.0,<1.12.0
+onnx>=1.11.0,<=1.12.0
 
-torch==1.8.1; sys_platform == 'darwin'
-torchvision==0.9.1; sys_platform == 'darwin'
+torch==1.13.0; sys_platform == 'darwin'
+torchvision==0.14.0; sys_platform == 'darwin'
 --find-links https://download.pytorch.org/whl/torch_stable.html
-torch==1.8.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
-torchvision==0.9.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
+torch==1.13.0+cpu; sys_platform =='linux' or platform_system == 'Windows'
+torchvision==0.14.0+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchmetrics==0.6.2
 
 # PaddlePaddle notebook requirements
@@ -33,8 +32,11 @@ pyclipper>=1.2.1
 # BERT quantization notebook requirements
 transformers<4.25
 
+# yolov5 notebok requirements
+psutil
+
 # NNCF notebook requirements
-git+https://github.com/openvinotoolkit/nncf.git@f62b6629c71822b5241e175e0a03c3acb42ae01e#egg=nncf[torch]
+git+https://github.com/openvinotoolkit/nncf.git#egg=nncf
 tensorflow>=2.5,<=2.9.3
 tensorflow_datasets==4.2.0
 
@@ -49,7 +51,6 @@ jupyterlab
 # other dependencies that are pinned to a specific version to avoid
 # compatibility issues or vulnerabilities
 seaborn>=0.11.0
-geffnet==0.9.8
 matplotlib<3.4
 jedi==0.17.2
 setuptools>=56.0.0
