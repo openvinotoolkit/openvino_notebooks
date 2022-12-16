@@ -10,9 +10,7 @@ name = "pytorch-wheels"
 
 [packages]
 boto3 = "*"
-fastseg = "*"
 gdown = "*"
-geffnet = "==0.9.8"
 ipykernel = "==5.*"
 ipython = "==7.16.3"  # pin to avoid vulnerability
 ipywidgets = "*"
@@ -39,6 +37,7 @@ paddlepaddle = "==2.4.*"
 parasail = "<=1.2.4"
 Pillow = ">=8.3.2"
 ppgan = ">=2.1.0"
+psutil = "*"
 pyclipper = ">=1.2.1"
 pygments = ">=2.7.4"
 pytorch_lightning = "*"
@@ -50,12 +49,12 @@ setuptools = ">56.0.0"
 shapely = ">=1.7.1"
 supervisor = "==4.1.0"
 tensorflow_datasets = "*"
-torch = {index = "pytorch-wheels", version = "==1.8.1+cpu"}
+torch = {index = "pytorch-wheels", version = "==1.13.0+cpu"}
 torchmetrics = "==0.6.2"
-torchvision = {index = "pytorch-wheels", version = "==0.9.1+cpu"}
+torchvision = {index = "pytorch-wheels", version = "==0.14.0+cpu"}
 transformers = "<4.25.0"
 yaspin = "*"
-nncf = {extras = ["torch"], git = "https://github.com/openvinotoolkit/nncf.git"}
+nncf = {git = "https://github.com/openvinotoolkit/nncf.git"}
 tensorflow = ">=2.5,<=2.9.3"
 
 [dev-packages]
