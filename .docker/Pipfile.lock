@@ -700,7 +700,6 @@
             ],
             "version": "==2.15.3"
         },
-<<<<<<< HEAD
         "faiss-cpu": {
             "hashes": [
                 "sha256:441d1c305595d925138f2cde63dabe8c10ee05fc8ad66bf750e278a7e8c409bd",
@@ -708,8 +707,6 @@
             ],
             "version": "==1.7.1.post2"
         },
-=======
->>>>>>> 102 replace fastseg model (#673)
         "filelock": {
             "hashes": [
                 "sha256:55447caa666f2198c5b6b13a26d2084d26fa5b115c00d065664b2124680c4edc",
