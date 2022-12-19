@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c84acc1d6040c0bba105362e0dfe31eeb693237eb0221aae657fdc25f32f2e13"
+            "sha256": "f30c0ffa07144fa065733cef4fcb445df1b4e5d1546606e06f1c2c6c5b43c9e9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1946,7 +1946,7 @@
         },
         "nncf": {
             "git": "https://github.com/openvinotoolkit/nncf.git",
-            "ref": "6e1fdeb9a664b4d61e2d207a80de61f65dafd378"
+            "ref": "609a06f4448d81018c106749358f6c53e1d11a22"
         },
         "notebook": {
             "hashes": [
