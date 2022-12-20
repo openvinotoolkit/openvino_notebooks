@@ -2,7 +2,7 @@
 Zero-shot image classification is a computer vision task to classify images into one of several classes, without any prior training or knowledge of the classes. 
 
 ![zero-shot-pipeline](https://user-images.githubusercontent.com/29454499/207773481-d77cacf8-6cdc-4765-a31b-a1669476d620.png)
-In this tutorial we will use [OpenAI CLIP](https://github.com/openai/CLIP) model for performing zero-shot image classification. 
+In this tutorial we will use [OpenAI CLIP](https://github.com/openai/CLIP) model to perform zero-shot image classification. 
 
 
 ## Notebook Contents
