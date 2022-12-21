@@ -3,7 +3,7 @@ openvino-telemetry==2022.3.0
 gdown
 pytube>=12.1.0
 yaspin
-numba==0.53.1;python_version==3.10 # not directly required, but has conflict between librosa and ppgan on python3.10
+numba==0.53.1;python_version>"3.9" # not directly required, but has conflict between librosa and ppgan on python3.10
 librosa==0.8.1
 
 # PyTorch/ONNX notebook requirements
