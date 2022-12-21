@@ -10,7 +10,7 @@ This notebook contains a 3D multi-person pose estimation demo.The model used in 
 
 ## Notebook Contents
 
-This notebook uses the "human-pose-estimation-3d-0001" model from OpenVINO Open Model Zoo, to estimate 3D human pose and draw them in 2D screen. Details of the model could be found [here](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/human-pose-estimation-3d-0001). The input source could be video files or webcam. It uses the [Three.js python api](https://pythreejs.readthedocs.io/en/stable/installing.html) to display 3D results in the web browsers. Note that to display the 3D inference results properly, for Windows and Ubuntu, Chrome is recommended to be used as the web browser. While for MacOS, Safari is recommended.
+This notebook uses the "human-pose-estimation-3d-0001" model from OpenVINO Open Model Zoo, to estimate 3D human pose and represent on a 2D screen. Details of the model can be found [here](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/human-pose-estimation-3d-0001). The input source could be video files or a webcam. It uses the [Three.js](https://pythreejs.readthedocs.io/en/stable/installing.html Python API to display 3D results in a web browser. Note that to display the 3D inference results properly, for Windows and Ubuntu, Chrome is recommended as the web browser. While on macOS, Safari is recommended.
 
 ## Installation Instructions
 
