@@ -56,10 +56,7 @@ Pillow>=8.3.2
 ipykernel==5.*
 ipython==7.16.3 # not directly required, pinned to avoid a vulnerability
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
-nltk>=3.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
-scikit-learn>=0.24.2 # not directly required, pinned by Snyk to avoid a vulnerability
 paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
-parasail<=1.2.4 # higher version causes paddle issues
 nest-asyncio<=1.5.4
 jupyter-client<=7.2.0
