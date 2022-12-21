@@ -16,27 +16,22 @@ If you need help, please start a GitHub [Discussion](https://github.com/openvino
 
 ## Table of Contents
 
-* [➤ 📝 Installation Guide](#-installation-guide)
-	* [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows)
-	* [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu)
-	* [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS)
-	* [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
-	* [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
-	* [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML)
-	* [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker)
-	* [Amazon SageMaker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/SageMaker)
-* [➤ 🚀 Getting Started](#-getting-started)
-	* [First steps with OpenVINO](#-first-steps)
-	* [Convert & Optimize](#-convert--optimize)
-	* [Model Demos](#-model-demos)
-	* [Model Training](#-model-training)
-	* [Live Demos](#-live-demos)
-* [➤ ⚙️ System Requirements](#-system-requirements)
-* [➤ 💻 Run the Notebooks](#-run-the-notebooks)
-* [➤ 🧹 Cleaning Up](#-cleaning-up)
-* [➤ ⚠️ Troubleshooting](#-troubleshooting)
-* [➤ 🧑‍💻 Contributors](#-contributors)
-* [➤ ❓ FAQ](#-faq)
+- [Table of Contents](#table-of-contents)
+- [📝 Installation Guide](#-installation-guide)
+- [🚀 Getting Started](#-getting-started)
+	- [💻 First steps](#-first-steps)
+	- [⌚ Convert \& Optimize](#-convert--optimize)
+	- [🎯 Model Demos](#-model-demos)
+	- [🏃 Model Training](#-model-training)
+	- [📺 Live Demos](#-live-demos)
+- [⚙️ System Requirements](#️-system-requirements)
+- [💻 Run the Notebooks](#-run-the-notebooks)
+	- [To Launch a Single Notebook](#to-launch-a-single-notebook)
+	- [To Launch all Notebooks](#to-launch-all-notebooks)
+- [🧹 Cleaning Up](#-cleaning-up)
+- [⚠️ Troubleshooting](#️-troubleshooting)
+- [🧑‍💻 Contributors](#-contributors)
+- [❓ FAQ](#-faq)
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='-installation-guide'/>
@@ -149,6 +144,8 @@ More amazing notebooks here!
 | [225-stable-diffusion-text-to-image](225-stable-diffusion-text-to-image)<br> | Text-to-image generation with Stable Diffusion method | <img src=https://user-images.githubusercontent.com/15709723/200945747-1c584e5c-b3f2-4e43-b1c1-e35fd6edc2c3.png width=225>|
 | [226-yolov7-optimization](226-yolov7-optimization/)<br> | Optimize YOLOv7 using NNCF PTQ API | <img src=https://raw.githubusercontent.com/WongKinYiu/yolov7/main/figure/horses_prediction.jpg  width=225> |
 | [227-whisper-subtitles-generation](227-whisper-subtitles-generation/)<br> | Generate subtitles for video with OpenAI Whisper and OpenVINO | <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225> |
+| [228-clip-zero-shot-image-classification](228-clip-zero-shot-image-classification)<br> | Perform Zero-shot Image Classification with CLIP and OpenVINO | <img src=https://user-images.githubusercontent.com/29454499/207795060-437b42f9-e801-4332-a91f-cc26471e5ba2.png  width=500> |
+
 
 </details>
 </p>
