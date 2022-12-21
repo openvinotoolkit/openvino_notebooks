@@ -8,7 +8,7 @@ English | [简体中文](https://github.com/openvinotoolkit/openvino_notebooks/b
 
 A collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
 
-**NOTE: The main branch of this repository was updated to support the new OpenVINO 2022.2 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2021.4 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4). 
+**NOTE: The main branch of this repository was updated to support the new OpenVINO 2022.3 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2021.4 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4). 
 
 If you need help, please start a GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions).  
 
@@ -333,7 +333,7 @@ Made with [contributors-img](https://contrib.rocks).
 
 ## ❓ FAQ
 
-* [Which devices does OpenVINO support?](https://docs.openvino.ai/2022.1/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html)
+* [Which devices does OpenVINO support?](https://docs.openvino.ai/latest/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html#doxid-openvino-docs-o-v-u-g-supported-plugins-supported-devices)
 * [What is the first CPU generation you support with OpenVINO?](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/system-requirements.html)
 * [Are there any success stories about deploying real-world solutions with OpenVINO?](https://www.intel.com/content/www/us/en/internet-of-things/ai-in-production/success-stories.html)
 

@@ -1,11 +1,7 @@
 {
     "_meta": {
         "hash": {
-<<<<<<< Updated upstream
-            "sha256": "222789c4af518bef96e11b14a07eb447c567de21c1a021d1280a1e63c64f7242"
-=======
-            "sha256": "393ceaabeca730fddbe6ae4d1543890ccd216fcac4ce38c89b59453c1d2d27a2"
->>>>>>> Stashed changes
+            "sha256": "b550e5ae68e49327b796d2244443296b6da7ee00ec03ed7bd69142e4367ce8c5"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -2087,9 +2083,10 @@
                 "sha256:b418a4312cf40a3010f31c09ff360d2a8aa8bc67c5c0b20859c80acafa630833",
                 "sha256:c60cbbef6ca6a0129e72bc89955875cebc793c5b4507aae59e6f055ed900c235",
                 "sha256:ddae2f441e32297d5caa7b25091beb8c2358616fd7094572fdb3df27a96bf79e",
-                "sha256:ce872509a44bd61f394bdee48293017b58888163da33f4160dc9853026bcc180"
+                "sha256:ce872509a44bd61f394bdee48293017b58888163da33f4160dc9853026bcc180",
+                "sha256:b75ff3d29f7e9b9b8c6ff7ba95effa8a15a786408b025a92aaf98a35e1c0878c"
             ],
-            "version": "==2022.3.0dev20221125"
+            "version": "==2022.3.0"
         },
         "openvino-dev": {
             "extras": [
@@ -2097,10 +2094,10 @@
                 "tensorflow2"
             ],
             "hashes": [
-                "sha256:652ba670794b864f9739878a93112de2fcd9e50ed76e2a35bd50f47ff7261be9"
+                "sha256:f86cb3433c0b78fe78c11c3ca043eb66e46f66c727ca057059decfd927bb2a29"
             ],
             "index": "pypi",
-            "version": "==2022.3.0dev20221125"
+            "version": "==2022.3.0"
         },
         "openvino-telemetry": {
             "hashes": [

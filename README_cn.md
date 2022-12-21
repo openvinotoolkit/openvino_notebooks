@@ -8,7 +8,7 @@
 
 在这里，我们提供了一些可以运行的Jupyter* notebooks，用于学习和尝试使用OpenVINO™开发套件。这些notebooks旨在向各位开发者提供OpenVINO基础知识的介绍，并教会大家如何利用我们的API来优化深度学习推理。.
 
-**请注意：本仓库的主分支已经更新为支持OpenVINO 2022.2版本。** 如果想要升级到新版本，请在你的 `openvino_env` 虚拟环境中运行 `pip install --upgrade -r requirements.txt`. 如果你是第一次安装，请阅读下方的[安装指南](#-installation-guide)。如果你想要使用之前的OpenVINO长期支持版本(LTS)，请check out到 [2021.4 branch分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4)。
+**请注意：本仓库的主分支已经更新为支持OpenVINO 2022.3版本。** 如果想要升级到新版本，请在你的 `openvino_env` 虚拟环境中运行 `pip install --upgrade -r requirements.txt`. 如果你是第一次安装，请阅读下方的[安装指南](#-installation-guide)。如果你想要使用之前的OpenVINO长期支持版本(LTS)，请check out到 [2021.4 branch分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4)。
 
 如果你需要帮助，请创建一个GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions)。
 
@@ -315,7 +315,7 @@ jupyter kernelspec remove openvino_env
 
 ## ❓ 常见问题解答
 
-* [OpenVINO支持哪些设备？](https://docs.openvino.ai/2022.1/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html)
+* [OpenVINO支持哪些设备？](https://docs.openvino.ai/latest/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html#doxid-openvino-docs-o-v-u-g-supported-plugins-supported-devices)
 * [OpenVINO支持的第一代CPU是什么？](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/system-requirements.html)
 * [在使用OpenVINO部署现实世界解决方案方面有没有成功的案例？](https://www.intel.com/content/www/us/en/internet-of-things/ai-in-production/success-stories.html)
 

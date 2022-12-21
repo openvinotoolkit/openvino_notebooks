@@ -26,7 +26,7 @@ monai = "*"
 nbval = "*"
 nest-asyncio = "<=1.5.4"
 onnx = ">=1.11.0,<1.12.0"
-openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.3.0.dev20221125"}
+openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.3.0"}
 openvino-telemetry = "==2022.3.0"
 ovmsclient = "*"
 paddle2onnx = ">=0.6,<=0.9.6"
