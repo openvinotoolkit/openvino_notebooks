@@ -1,7 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d70bf7bdf274d7ec9be1b7cc83d4157963c9d1f44e255f07414665452b201a3a"
+<<<<<<< Updated upstream
+            "sha256": "222789c4af518bef96e11b14a07eb447c567de21c1a021d1280a1e63c64f7242"
+=======
+            "sha256": "393ceaabeca730fddbe6ae4d1543890ccd216fcac4ce38c89b59453c1d2d27a2"
+>>>>>>> Stashed changes
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1936,14 +1940,6 @@
             ],
             "version": "==1.10.2.4"
         },
-        "nltk": {
-            "hashes": [
-                "sha256:ba3de02490308b248f9b94c8bc1ac0683e9aa2ec49ee78536d8667afb5e3eec8",
-                "sha256:d6507d6460cec76d70afea4242a226a7542f85c669177b9c7f562b7cf1b05502"
-            ],
-            "index": "pypi",
-            "version": "==3.7"
-        },
         "nncf": {
             "git": "https://github.com/openvinotoolkit/nncf.git",
             "ref": "609a06f4448d81018c106749358f6c53e1d11a22"
@@ -2108,10 +2104,10 @@
         },
         "openvino-telemetry": {
             "hashes": [
-                "sha256:1f78db940aecf75ab2781a79f2591a92017f3a97509d45daebdf3c39e9056c41",
-                "sha256:f68d8f6a835fbbfba59214819e4a9d0525021bb312372ae0c5785de5cc913911"
+                "sha256:41eec1f6a9bbb528971bea8cf545ab9627e80e67522345fe77d2df3a2d3db73e",
+                "sha256:52d015cbcff1fa9e53be262ba818405a764d2b79f2055810ef3b8815f2164ec4"
             ],
-            "version": "==2022.1.1"
+            "version": "==2022.3.0"
         },
         "opt-einsum": {
             "hashes": [
@@ -2316,18 +2312,6 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==1.5.0"
-        },
-        "parasail": {
-            "hashes": [
-                "sha256:35bebac42193a0608fa59a42f34a3b393010d4d425a0c40a7bf3419ea7a0b2fe",
-                "sha256:37d17536b37886dcf87883f56c04ff614fec780e111db5a0cedd791c586ef252",
-                "sha256:500a181b5c8f96083423913efdb3070fde7ca8e1bb2de222d03e2ef1c37bec2c",
-                "sha256:5324e87262ae456a5c7165394734eda60f9b8927eb4bf6b88f6fe5f55c404e66",
-                "sha256:8e6e0762924a461bb437cbb71122765c6912dace880e338bd19c7f9d12efead2",
-                "sha256:fd940a737507e1980d3c08982f0c3aef084515c059daff39e1ebd370db2f5fa3"
-            ],
-            "index": "pypi",
-            "version": "==1.2.4"
         },
         "parso": {
             "hashes": [
