@@ -1,6 +1,6 @@
 # Live Style Transfer with OpenVINO™
 
-![style transfer](https://user-images.githubusercontent.com/109281183/204767232-95b8f0a8-010e-4f6d-981e-104200652098.jpg)
+![style transfer](https://user-images.githubusercontent.com/109281183/208703143-049f712d-2777-437c-8172-597ef7d53fc3.gif)
 
 Artistic style transfer blends a single style to any given image. The real-time style transfer model is a neural network trained to apply a single style to images. Different networks can be trained for different styles we may wish to apply.
 
