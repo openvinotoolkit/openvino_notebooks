@@ -21,10 +21,8 @@ torchmetrics==0.6.2
 # PaddlePaddle notebook requirements
 # For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
 paddlepaddle==2.4.*
-paddleclas>=2.2.0
 # paddle2onnx 0.9.7 fails export in 206 and 207
 paddle2onnx>=0.6,<=0.9.6
-ppgan==2.1.*
 shapely>=1.7.1
 pyclipper>=1.2.1
 
@@ -49,7 +47,8 @@ jupyterlab
 # other dependencies that are pinned to a specific version to avoid
 # compatibility issues or vulnerabilities
 seaborn>=0.11.0
-matplotlib<3.4
+matplotlib>=3.4
+scikit-image>=0.19.2
 jedi==0.17.2
 setuptools>=56.0.0
 Pillow>=8.3.2
