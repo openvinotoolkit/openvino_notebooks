@@ -3,7 +3,6 @@ openvino-telemetry==2022.3.0
 gdown
 pytube>=12.1.0
 yaspin
-numba==0.53.1;python_version>"3.9" # not directly required, but has conflict between librosa and ppgan on python3.10
 librosa==0.8.1
 
 # PyTorch/ONNX notebook requirements
@@ -25,7 +24,6 @@ paddlepaddle==2.4.*
 paddleclas>=2.2.0
 # paddle2onnx 0.9.7 fails export in 206 and 207
 paddle2onnx>=0.6,<=0.9.6
-ppgan==2.1.*
 shapely>=1.7.1
 pyclipper>=1.2.1
 
