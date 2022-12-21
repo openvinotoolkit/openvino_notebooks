@@ -35,8 +35,6 @@ transformers>=4.21.1
 # yolov5 notebok requirements
 psutil
 
-# NNCF notebook requirements
-git+https://github.com/openvinotoolkit/nncf.git#egg=nncf
 tensorflow>=2.5,<=2.9.3
 tensorflow_datasets==4.2.0
 
