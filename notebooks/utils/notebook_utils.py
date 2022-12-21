@@ -5,7 +5,6 @@
 
 
 import os
-import shutil
 import socket
 import threading
 import time
@@ -20,12 +19,11 @@ import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import openvino.inference_engine
+from openvino.runtime import Core, get_version
 from async_pipeline import AsyncPipeline
-from IPython.display import HTML, Image, Markdown, clear_output, display
+from IPython.display import HTML, Image, Markdown, display
 from matplotlib.lines import Line2D
 from models import model
-from openvino.inference_engine import IECore
 from tqdm.notebook import tqdm_notebook
 
 
@@ -559,7 +557,7 @@ def show_live_inference(
     next_frame_id = 0
     next_frame_id_to_show = 0
 
-    input_layer = next(iter(model.net.input_info))
+    input_layer = model.net.input(0)
 
     # Create asynchronous pipeline and print time it takes to load the model
     load_start_time = time.perf_counter()
@@ -615,64 +613,6 @@ def show_live_inference(
     del pipeline
 
 
-# ## OpenVINO Tools
-
-# In[ ]:
-
-
-def benchmark_model(
-    model_path: PathLike,
-    device: str = "CPU",
-    seconds: int = 60,
-    api: str = "async",
-    batch: int = 1,
-    cache_dir: PathLike = "model_cache",
-):
-    """
-    Benchmark model `model_path` with `benchmark_app`. Returns the output of `benchmark_app`
-    without logging info, and information about the device
-
-    :param model_path: path to IR model xml file, or ONNX model
-    :param device: device to benchmark on. For example, "CPU" or "MULTI:CPU,GPU"
-    :param seconds: number of seconds to run benchmark_app
-    :param api: API. Possible options: sync or async
-    :param batch: Batch size
-    :param cache_dir: Directory that contains model/kernel cache files
-    """
-    ie = IECore()
-    model_path = Path(model_path)
-    if ("GPU" in device) and ("GPU" not in ie.available_devices):
-        raise ValueError(
-            f"A GPU device is not available. Available devices are: {ie.available_devices}"
-        )
-    else:
-        benchmark_command = f"benchmark_app -m {model_path} -d {device} -t {seconds} -api {api} -b {batch} -cdir {cache_dir}"
-        display(
-            Markdown(
-                f"**Benchmark {model_path.name} with {device} for {seconds} seconds with {api} inference**"
-            )
-        )
-        display(Markdown(f"Benchmark command: `{benchmark_command}`"))
-
-        benchmark_output = get_ipython().run_line_magic("sx", "$benchmark_command")
-        benchmark_result = [
-            line
-            for line in benchmark_output
-            if not (line.startswith(r"[") or line.startswith("      ") or line == "")
-        ]
-        print("\n".join(benchmark_result))
-        print()
-        if "MULTI" in device:
-            devices = device.replace("MULTI:", "").split(",")
-            for single_device in devices:
-                device_name = ie.get_metric(
-                    device_name=single_device, metric_name="FULL_DEVICE_NAME"
-                )
-                print(f"{single_device} device: {device_name}")
-        else:
-            print(f"Device: {ie.get_metric(device_name=device, metric_name='FULL_DEVICE_NAME')}")
-
-
 # ## Checks and Alerts
 # 
 # Create an alert class to show stylized info/error/warning messages and a `check_device` function that checks whether a given device is available.
@@ -707,7 +647,7 @@ class DeviceNotFoundAlert(NotebookAlert):
         :return: A formatted alert box with the message that `device` is not available, and a list
                  of devices that are available.
         """
-        ie = IECore()
+        ie = Core()
         supported_devices = ie.available_devices
         self.message = (
             f"Running this cell requires a {device} device, "
@@ -731,7 +671,7 @@ def check_device(device: str) -> bool:
     :return: True if the device is available, False if not. If the device is not available,
              a DeviceNotFoundAlert will be shown.
     """
-    ie = IECore()
+    ie = Core()
     if device not in ie.available_devices:
         DeviceNotFoundAlert(device)
         return False
@@ -747,7 +687,7 @@ def check_openvino_version(version: str) -> bool:
     :return: True if the version is installed, False if not. If the version is not installed,
              an alert message will be shown.
     """
-    installed_version = openvino.inference_engine.get_version()
+    installed_version = get_version()
     if version not in installed_version:
         NotebookAlert(
             f"This notebook requires OpenVINO {version}. "

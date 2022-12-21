@@ -1,4 +1,5 @@
 # Image Colorization with OpenVINO Tutorial
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F222-vision-image-colorization%2F222-vision-image-colorization.ipynb)
 
 ![Let there be color](https://user-images.githubusercontent.com/18904157/180923280-9caefaf1-742b-4d2f-8943-5d4a6126e2fc.png)
 
@@ -20,4 +21,4 @@ This notebook demonstrates how to colorize images with OpenVINO using the Colori
 
 ## Installation Instructions
 
-If you have not done so already, please follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/215-image-inpainting/README.md) to install all required dependencies.
+If you have not done so already, please follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/215-image-inpainting/README.md) to install all required dependencies.

@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from os import PathLike
 from models import model
+from openvino.runtime import PartialShape
 from notebook_utils import segmentation_map_to_overlay
 
 
@@ -42,16 +43,14 @@ class SegmentationModel(model.Model):
         self.rgb = rgb
         self.rotate_and_flip = rotate_and_flip
 
-        self.net = ie.read_network(model_path, model_path.with_suffix(".bin"))
-        self.output_layer = next(iter(self.net.outputs))
-        self.input_layer = next(iter(self.net.input_info))
+        self.net = ie.read_model(model_path)
+        self.output_layer = self.net.output(0)
+        self.input_layer = self.net.input(0)
         if resize_shape is not None:
-            self.net.reshape({self.input_layer: resize_shape})
-        self.image_height, self.image_width = self.net.input_info[
-            self.input_layer
-        ].tensor_desc.dims[2:]
+            self.net.reshape({self.input_layer: PartialShape(resize_shape)})
+        self.image_height, self.image_width = self.input_layer.shape[2], self.input_layer.shape[3]
 
-        if colormap is None and self.net.outputs[self.output_layer].shape[1] == 1:
+        if colormap is None and self.output_layer.shape[1] == 1:
             self.colormap = np.array([[0, 0, 0], [0, 0, 255]])
         else:
             self.colormap = colormap
@@ -74,7 +73,7 @@ class SegmentationModel(model.Model):
             input_image = np.expand_dims(np.transpose(image, (2, 0, 1)), 0)
         else:
             input_image = np.expand_dims(np.expand_dims(image, 0), 0)
-        return {self.input_layer: input_image}, meta
+        return {self.input_layer.any_name: input_image}, meta
 
     def postprocess(self, outputs, preprocess_meta, to_rgb=False):
         """
@@ -91,7 +90,7 @@ class SegmentationModel(model.Model):
         else:
             # Create BGR image by repeating channels in one-channel image
             bgr_frame = np.repeat(np.expand_dims(preprocess_meta["frame"], -1), 3, 2)
-        res = outputs[self.output_layer].squeeze()
+        res = outputs[self.output_layer.any_name].squeeze()
 
         result_mask_ir = sigmoid(res) if self.sigmoid else res
 

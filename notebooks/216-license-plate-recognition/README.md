@@ -1,5 +1,7 @@
 # License Plate Recognition with OpenVINO™
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F216-license-plate-recognition%2F216-license-plate-recognition.ipynb)
+
 License plate recognition model helps you get the Chinese license plate number precisely in no time. The input of the color license plate image can be of any size. It will be resized and augmented before being put into the model. After matching the result to correct character, you can get the license plate number. The notebook shows how to create the following pipeline:
 
 ![text](https://user-images.githubusercontent.com/15709723/162659593-3f620d7a-44d2-4f49-a558-94c35a244a8e.png)

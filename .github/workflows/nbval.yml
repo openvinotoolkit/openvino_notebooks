@@ -2,21 +2,6 @@ name: nbval
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-    - 'main'
-    - '2021.4'
-    paths:
-    - 'notebooks/**.ipynb'
-    - 'notebooks/**.py'
-    - 'requirements.txt'
-    - '.ci/*'
-    - '.github/workflows/*.yml'
-    - '.github/workflows/.env'
-  push:
-    branches:
-    - 'main'
-    - '2021.4'
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
@@ -135,6 +120,12 @@ jobs:
         cp -r case_00030 case_00001
         mv case_00030 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
         mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+    # Prevent test aborting by timeout
+    - name: Download long loading models
+      run: |
+          mkdir notebooks/203-meter-reader/model
+          curl -o notebooks/203-meter-reader/model/meter_det_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_det_model.tar.gz'
+          curl -o notebooks/203-meter-reader/model/meter_seg_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_seg_model.tar.gz'
 
     - name: Install dependencies
       run: |
@@ -156,7 +147,7 @@ jobs:
         python -m pip freeze
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: pip-freeze
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
@@ -178,24 +169,32 @@ jobs:
         jupyter lab notebooks --help
 
     # Main notebooks test. Verifies that all notebooks run without errors
-    - name: Analysing with nbval
+    - name: Analysing with nbval (Windows)
       if: runner.os == 'Windows'
       run: |
-            chmod +x .ci/validate_notebooks.sh
-            .ci/validate_notebooks.sh
+            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
-    - name: Analysing with nbval
+    - name: Analysing with nbval (Linux)
       if: runner.os == 'Linux'
       run: |
-            chmod +x .ci/validate_notebooks.sh
-            .ci/validate_notebooks.sh 107-speech-recognition-quantization
+            python .ci/validate_notebooks.py  --ignore_list 107-speech-recognition-quantization --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
-    - name: Analysing with nbval
+    - name: Analysing with nbval (MacOS)
       if: runner.os == 'MacOS'
       run: |
-        chmod +x .ci/validate_notebooks.sh
-        .ci/validate_notebooks.sh 107-speech-recognition-quantization 114-quantization-simplified-mode 115-async-api
+           python .ci/validate_notebooks.py --ignore_list 107-speech-recognition-quantization 114-quantization-simplified-mode 115-async-api --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+
       shell: bash
+    - name: Archive test report
+      uses: actions/upload-artifact@v3
+      with:
+        name: test_report.csv
+        path: test_report.csv
+    - name: Archive notebook test report
+      uses: actions/upload-artifact@v3
+      with:
+        name: test_report
+        path: test_report/
 
     # Show the cache after running the notebooks
     - name: Show cache
@@ -203,4 +202,3 @@ jobs:
         ls -laR ${{ env.CACHE_DIR }}
         du -sh ${{ env.CACHE_DIR }}
       if: runner.os != 'Windows'
-
