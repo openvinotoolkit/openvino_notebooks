@@ -78,8 +78,8 @@ def clean_test_artefacts(before_test_files, after_test_files):
             shutil.rmtree(file_path, ignore_errors=True)
 
 
-def run_test(notebook_path, report_dir, collect_reports):
-    print(f'RUN {notebook_path.relative_to(ROOT)}')
+def run_test(notebook_path, report_dir, collect_reports, root):
+    print(f'RUN {notebook_path.relative_to(root)}')
     report_file = report_dir / f'{notebook_path.name}_report.xml'
     with cd(notebook_path):
         existing_files = sorted(list(notebook_path.rglob("*")))
@@ -137,7 +137,7 @@ def main():
     for notebook, report in test_plan.items():
         if report['status'] == "SKIPPED":
             continue
-        status = run_test(report['path'], reports_dir, args.collect_reports)
+        status = run_test(report['path'], reports_dir, args.collect_reports, root)
         report['status'] = 'SUCCESS' if not status else "FAILED"
         if status:
             failed_notebooks.append(str(notebook))
