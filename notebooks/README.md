@@ -215,7 +215,7 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 | Ubuntu 22.04 LTS, 64-bit                                   | 3.7, 3.8, 3.9, 3.10                                |
 | Red Hat Enterprise Linux 8, 64-bit                         | 3.8, 3.9, 3.10                                     |
 | CentOS 7, 64-bit                                           | 3.7, 3.8, 3.9, 3.10                                |
-| macOS 10.15.x versions                                     | 3.7, 3.8, 3.9, 3.10                                |
+| macOS 10.15.x versions or higher                           | 3.7, 3.8, 3.9, 3.10                                |
 | Windows 10, 64-bit Pro, Enterprise or Education editions   | 3.7, 3.8, 3.9, 3.10                                |
 | Windows Server 2016 or higher                              | 3.7, 3.8, 3.9, 3.10                                |
 
