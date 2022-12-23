@@ -6,7 +6,6 @@ on:
   push:
     branches:
     - 'main'
-    - 'ea/test_win' # TO DO remove after test
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
