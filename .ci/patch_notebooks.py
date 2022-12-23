@@ -1,6 +1,9 @@
-import nbformat
 import sys
 from pathlib import Path
+import nbformat
+import nbconvert
+from traitlets.config import Config
+
 
 # Notebooks that are excluded from the CI tests
 EXCLUDED_NOTEBOOKS = ["data-preparation-ct-scan.ipynb"]
@@ -21,6 +24,10 @@ def patch_notebooks(notebooks_dir):
     :param notebooks_dir: Directory that contains the notebook subdirectories.
                           For example: openvino_notebooks/notebooks
     """
+
+    nb_convert_config = Config()
+    nb_convert_config.NotebookExporter.preprocessors = ["nbconvert.preprocessors.ClearOutputPreprocessor"]
+    output_remover = nbconvert.NotebookExporter(nb_convert_config)
     for notebookfile in Path(notebooks_dir).glob("**/*.ipynb"):
         if (
             not str(notebookfile.name).startswith("test_")
@@ -46,11 +53,9 @@ def patch_notebooks(notebooks_dir):
                         )
             if not found:
                 print(f"No replacements found for {notebookfile}")
-            nbformat.write(
-                nb,
-                notebookfile.with_name(f"test_{notebookfile.name}"),
-                version=nbformat.NO_CONVERT,
-            )
+            nb_without_out, _ = output_remover.from_notebook_node(nb)
+            with notebookfile.with_name(f"test_{notebookfile.name}").open("w", encoding="utf-8") as out_file:
+                out_file.write(nb_without_out)
 
 
 if __name__ == "__main__":
