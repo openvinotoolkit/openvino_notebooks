@@ -5,7 +5,7 @@
 Commonly, knowledge graphs are used to encode domain information by representing them as factual triples of source, relation and target entities.
 For ex. For the countries domain, the domain knowledge can be encoded by representing the countries as entities (for ex. Germany, Poland) and relation between them (Neighbor) as factual triples (Poland, Neighbor, Germany) as well as other information as follows:
 <p style="text-align:center;">
-    <img src="./images/countries_knowledge_graph.png" width=500>
+    <img src="../data/image/countries_knowledge_graph.png" width=500>
 <p>
 
 These representations can then be used for tasks such as entity prediction (predict the target entity given the source entity and relation) and link prediction (whether a factual link exists between two given entities). However, such entity and link prediction tasks on large ontologies or knowledge bases can be challenging and time consuming as they can contain millions of factual triples. Hence several neural networks based embedding models have been proposed in recent literature for efficient representation of knowledge graphs. <br><br>

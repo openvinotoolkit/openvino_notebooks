@@ -166,12 +166,21 @@ Notebooks that work in Binder have a _Launch Binder_ badge in the README files.
 To maintain consistency between notebooks, please follow the directory structure outlined below.
 
 ```markdown
-<three-digit-number>-<title>/
-├── README.md
-├── <three-digit-number>-<title>.ipynb
-├── utils/
-├── model/
+notebooks/
 └── data/
+   └── video
+   └── image
+   └── audio
+   └── text
+   └── json
+   └── font
+   └── pts
+└──<three-digit-number>-<title>/
+   ├── README.md
+   ├── <three-digit-number>-<title>.ipynb
+   ├── utils/
+   ├── model/
+   └── data/
 ```
 
 In case of output provided by Notebook please create folder ```output``` on the same level as readme file.
@@ -189,6 +198,7 @@ Follow the below instructions to create embedded URL in GitHub:
   - Go to any issue on GitHub.
   - In the comment section, you can attach files. Just drag/drop, select or paste your image.
   - Copy the code/link displayed in the text area
+Otherwise we can accept the data placed in the common data/<type> folder which will be evaluated further for storage constraints.
 
 - License
 
