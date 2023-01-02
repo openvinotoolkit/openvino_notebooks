@@ -1,0 +1,1 @@
+optimum~=1.5[openvino, nncf]
