@@ -1,1 +1,1 @@
-optimum~=1.5[openvino, nncf]
+optimum[openvino, nncf]~=1.5
