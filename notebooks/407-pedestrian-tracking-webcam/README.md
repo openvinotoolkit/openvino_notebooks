@@ -10,7 +10,7 @@ This notebook shows a pedestrian tracking scenario: it reads frames from an inpu
 
 ## Notebook Contents
 
-In this case, We use the [Deep SORT](https://arxiv.org/abs/1703.07402) algorithm to perform object tracking.
+In this case, we use the [Deep SORT](https://arxiv.org/abs/1703.07402) algorithm to perform object tracking.
 [person detection model](https://docs.openvino.ai/nightly/omz_models_model_person_detection_0202.html) is deployed to detect the person in each frame of the video, and [reidentification model](https://docs.openvino.ai/nightly/omz_models_model_person_reidentification_retail_0287.html) is used to ouput embedding vector to match a pair of person images by the cosine distance.
 
 ## Installation Instructions
