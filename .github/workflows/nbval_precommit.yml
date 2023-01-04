@@ -6,6 +6,7 @@ on:
     branches:
     - 'main'
     - '2021.4'
+    - 'develop'
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
@@ -17,6 +18,7 @@ on:
     branches:
     - 'main'
     - '2021.4'
+    - 'develop'
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
@@ -35,8 +37,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, windows-2019, macos-11, macos-12]
-        python: [3.7, 3.8, 3.9]
+        os: [ubuntu-20.04, ubuntu-22.04, windows-2019, windows-2022, macos-11, macos-12]
+        python: ["3.7", "3.8", "3.9", "3.10"]
     steps:
 
     #### Installation/preparation ####
@@ -158,6 +160,9 @@ jobs:
           mkdir notebooks/203-meter-reader/model
           curl -o notebooks/203-meter-reader/model/meter_det_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_det_model.tar.gz'
           curl -o notebooks/203-meter-reader/model/meter_seg_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_seg_model.tar.gz'
+          mkdir notebooks/405-paddle-ocr-webcam/model
+          curl -o notebooks/405-paddle-ocr-webcam/model/ch_PP-OCRv3_det_infer.tar 'https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_det_infer.tar'
+          curl -o notebooks/405-paddle-ocr-webcam/model/ch_PP-OCRv3_rec_infer.tar 'https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_rec_infer.tar'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -203,17 +208,17 @@ jobs:
     - name: Analysing with nbval (Windows)
       if: runner.os == 'Windows'
       run: |
-            python .ci/validate_notebooks.py --test_list test_notebooks.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
       shell: bash
     - name: Analysing with nbval (Linux)
       if: runner.os == 'Linux'
       run: |
-            python .ci/validate_notebooks.py  --test_list test_notebooks.txt --ignore_list 107-speech-recognition-quantization --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+            python .ci/validate_notebooks.py  --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
     - name: Analysing with nbval (MacOS)
       if: runner.os == 'MacOS'
       run: |
-           python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 107-speech-recognition-quantization 114-quantization-simplified-mode 115-async-api --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+           python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
     - name: Archive test report
       uses: actions/upload-artifact@v3

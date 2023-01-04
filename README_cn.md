@@ -1,5 +1,6 @@
 [English](README.md) | 简体中文
 
+
 <h1 align="center">📚 OpenVINO™ Notebooks</h1>
 
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/LICENSE)
@@ -8,7 +9,7 @@
 
 在这里，我们提供了一些可以运行的Jupyter* notebooks，用于学习和尝试使用OpenVINO™开发套件。这些notebooks旨在向各位开发者提供OpenVINO基础知识的介绍，并教会大家如何利用我们的API来优化深度学习推理。.
 
-**请注意：本仓库的主分支已经更新为支持OpenVINO 2022.2版本。** 如果想要升级到新版本，请在你的 `openvino_env` 虚拟环境中运行 `pip install --upgrade -r requirements.txt`. 如果你是第一次安装，请阅读下方的[安装指南](#-installation-guide)。如果你想要使用之前的OpenVINO长期支持版本(LTS)，请check out到 [2021.4 branch分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4)。
+**请注意：本仓库的主分支已经更新为支持OpenVINO 2022.3版本。** 如果想要升级到新版本，请在你的 `openvino_env` 虚拟环境中运行 `pip install --upgrade -r requirements.txt`. 如果你是第一次安装，请阅读下方的[安装指南](#-installation-guide)。如果你想要使用之前的OpenVINO长期支持版本(LTS)，请check out到 [2021.4 branch分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4)。
 
 如果你需要帮助，请创建一个GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions)。
 
@@ -166,10 +167,10 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 ### 📺 实时演示
 在网络摄像头或视频文件上运行的实时推理演示。
 	
-| [401-object-detection-webcam](notebooks/401-object-detection-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F401-object-detection-webcam%2F401-object-detection.ipynb) | [402-pose-estimation-webcam](notebooks/402-pose-estimation-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F402-pose-estimation-webcam%2F402-pose-estimation.ipynb) | [403-action-recognition-webcam](notebooks/403-action-recognition-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb) | [405-paddle-ocr-webcam](notebooks/405-paddle-ocr-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F405-paddle-ocr-webcam%2F405-paddle-ocr-webcam.ipynb) |
-| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| 使用网络摄像头或视频文件进行目标检测 | 使用网络摄像头或视频文件进行人体姿态检测 |  使用网络摄像头或视频文件进行动作识别 | 使用网络摄像头或视频文件进行OCR |
-| <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225> |  <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=225> |  <img src="https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleocr.gif" width=225> |
+| [401-object-detection-webcam](notebooks/401-object-detection-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F401-object-detection-webcam%2F401-object-detection.ipynb) | [402-pose-estimation-webcam](notebooks/402-pose-estimation-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F402-pose-estimation-webcam%2F402-pose-estimation.ipynb) | [403-action-recognition-webcam](notebooks/403-action-recognition-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb) | [405-paddle-ocr-webcam](notebooks/405-paddle-ocr-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F405-paddle-ocr-webcam%2F405-paddle-ocr-webcam.ipynb) | [406-3D-pose-estimation-webcam](notebooks/406-3D-pose-estimation-webcam/)<br> [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks.git/main?labpath=notebooks%2F406-3D-pose-estimation-webcam%2F406-3D-pose-estimation.ipynb) |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | 
+| 使用网络摄像头或视频文件进行目标检测 | 使用网络摄像头或视频文件进行人体姿态检测 |  使用网络摄像头或视频文件进行动作识别 | 使用网络摄像头或视频文件进行OCR | 使用网络摄像头或视频文件进行三维人体姿态估计 |
+| <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225> |  <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=225> |  <img src="https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleocr.gif" width=225> | <img src = "https://user-images.githubusercontent.com/42672437/183292131-576cc05a-a724-472c-8dc9-f6bc092190bf.gif" width=225> |
 
 
 
@@ -189,17 +190,17 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 
 ## ⚙️ 系统要求
 
-Notebooks几乎可以在任何地方运行&mdash；您的笔记本电脑、云虚拟机，甚至是Docker容器。下表列出了支持的操作系统和Python版本。**注意:** Python 3.10还没有被支持。
+Notebooks几乎可以在任何地方运行&mdash；您的笔记本电脑、云虚拟机，甚至是Docker容器。下表列出了支持的操作系统和Python版本。
 
 | 支持的操作系统                                              | [Python 版本 (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- | :------------------------------------------------- |
-| Ubuntu 18.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8, 3.9                                      |
-| Ubuntu 20.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8, 3.9                                      |
-| Red Hat Enterprise Linux 8, 64-bit                       | 3.6, 3.8, 3.9                                           |
-| CentOS 7, 64-bit                                         | 3.6, 3.7, 3.8, 3.9                                      |
-| macOS 10.15.x versions                                   | 3.6, 3.7, 3.8, 3.9                                      |
-| Windows 10, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8, 3.9                                      |
-| Windows Server 2016 or higher                            | 3.6, 3.7, 3.8, 3.9                                      |
+| Ubuntu 20.04 LTS, 64-bit                                   | 3.7, 3.8, 3.9, 3.10                                |
+| Ubuntu 22.04 LTS, 64-bit                                   | 3.7, 3.8, 3.9, 3.10                                |
+| Red Hat Enterprise Linux 8, 64-bit                         | 3.8, 3.9, 3.10                                     |
+| CentOS 7, 64-bit                                           | 3.7, 3.8, 3.9, 3.10                                |
+| macOS 10.15.x versions or higher                           | 3.7, 3.8, 3.9, 3.10                                |
+| Windows 10, 64-bit Pro, Enterprise or Education editions   | 3.7, 3.8, 3.9, 3.10                                |
+| Windows Server 2016 or higher                              | 3.7, 3.8, 3.9, 3.10                                |
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)
 <div id='-run-the-notebooks'/>
@@ -315,7 +316,7 @@ jupyter kernelspec remove openvino_env
 
 ## ❓ 常见问题解答
 
-* [OpenVINO支持哪些设备？](https://docs.openvino.ai/2022.1/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html)
+* [OpenVINO支持哪些设备？](https://docs.openvino.ai/latest/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html#doxid-openvino-docs-o-v-u-g-supported-plugins-supported-devices)
 * [OpenVINO支持的第一代CPU是什么？](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/system-requirements.html)
 * [在使用OpenVINO部署现实世界解决方案方面有没有成功的案例？](https://www.intel.com/content/www/us/en/internet-of-things/ai-in-production/success-stories.html)
 

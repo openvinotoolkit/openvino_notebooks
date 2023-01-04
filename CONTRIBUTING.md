@@ -4,11 +4,12 @@
   - [Design Decisions](#design-decisions)
     - [General design considerations](#general-design-considerations)
     - [Implementation choices](#implementation-choices)
-    - [Coding guidelines](#coding-guidelines)
+    - [Coding Guidelines](#coding-guidelines)
     - [Other things to keep in mind](#other-things-to-keep-in-mind)
     - [Notebook naming](#notebook-naming)
-    - [Readmes](#readmes)
-    - [File structure](#file-structure)
+    - [READMEs](#readmes)
+    - [File Structure](#file-structure)
+      - [Recommendations for File Structure](#recommendations-for-file-structure)
     - [Notebook utils](#notebook-utils)
   - [Requirements](#requirements)
   - [Validation](#validation)
@@ -20,7 +21,7 @@
       - [JupyterLab Code Formatter](#jupyterlab-code-formatter)
   - [Getting started](#getting-started)
     - [Pull Requests (PRs)](#pull-requests-prs)
-  - [Help!](#help)
+  - [Help](#help)
 
 Thank you for being interested in contributing to the OpenVINO Notebooks repository! This guide
 explains the design decisions, requirements, and coding guidelines for the OpenVINO Notebooks
@@ -244,15 +245,9 @@ See [Getting started](#getting-started) about installing the tools mentioned in 
 #### nbval
 
 Tests are run in the CI with [nbval](https://github.com/computationalmodelling/nbval), a plugin for
-py.test. The tests will only pass if the output is stripped from the notebooks. There are different
-way to do this. `jupyter nbconvert --clear-output --inplace notebook.ipynb` should work without
-installing additional dependencies. It is also possible to add a pre-commit hook to do this. The
-article [Making Git and Jupyter Notebooks play
-nice](http://timstaley.co.uk/posts/making-git-and-jupyter-notebooks-play-nice/) offers more
-information and possible solutions.
+py.test.
 
-To run nbval locally, run `pytest --nbval .` to run the tests for all notebooks, or `pytest --nbval
-notebook.ipynb` for just one notebook. `nbval` fails if the notebook environment is not
+To run nbval locally, run `pytest --nbval .` to run the tests for all notebooks, or `pytest --nbval notebook.ipynb` for just one notebook. `nbval` fails if the notebook environment is not
 `openvino_env`.
 
 #### nbqa
