@@ -1,6 +1,6 @@
 # Live Pedestrian Tracking with OpenVINO™
 
-![frame](https://user-images.githubusercontent.com/91237924/210330058-e97a462c-b6d9-4f14-8bc9-44d6935032a0.png)
+![Pedestrian Tracking](https://user-images.githubusercontent.com/91237924/210479548-b70dbbaa-5948-4e49-b48e-6cb6613226da.gif)
 
 This notebook shows a pedestrian tracking scenario: it reads frames from an input video sequence, detects pedestrians in the frames, uniquely identify each one of them and track all of them until they leave the frame.
 
