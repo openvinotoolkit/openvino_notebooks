@@ -1,5 +1,6 @@
 # Sequence Classification with OpenVINO
 Sequence Classification (or Text Classification) is the NLP task of predicting a label for a sequence of words.
+
 Sentiment analysis is a sub-task of Sequence Classification. It is the use of natural language processing, text analysis, computational linguistics, and biometrics to systematically identify, extract, quantify, and study affective states and subjective information. This notebook performs sentiment analysis using OpenVINO. We will use the transformer-based [distilbert-base-uncased-finetuned-sst-2-english](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english) model from Hugging Face. The Hugging Face model needs to be converted to [ONNX](https://onnx.ai/) format using the [torch.onnx.export](https://pytorch.org/docs/stable/onnx.html#example-alexnet-from-pytorch-to-onnx) function. Then the ONNX model is converted to OpenVINO IR format. You can also replace the model with the other BERT-based models for sequence classification. The model predicts one of two classes: Positive or Negative after analyzing the sentiment of any given text. The notebook also estimates time required for inference. 
 
 
