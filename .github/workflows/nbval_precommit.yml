@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, windows-2019, macos-11, macos-12]
+        os: [ubuntu-20.04, ubuntu-22.04, windows-2019, windows-2022, macos-11, macos-12]
         python: ["3.7", "3.8", "3.9", "3.10"]
     steps:
 
@@ -208,7 +208,7 @@ jobs:
     - name: Analysing with nbval (Windows)
       if: runner.os == 'Windows'
       run: |
-            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
       shell: bash
     - name: Analysing with nbval (Linux)
       if: runner.os == 'Linux'

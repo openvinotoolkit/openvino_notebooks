@@ -208,17 +208,17 @@ You will have a lot of fun with this section:
 
 ## ⚙️ System Requirements
 
-The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Docker container. The table below lists the supported operating systems and Python versions. **Note:** Python 3.10 is not supported yet.
+The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Docker container. The table below lists the supported operating systems and Python versions.
 
 | Supported Operating System                                 | [Python Version (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- | :------------------------------------------------- |
-| Ubuntu 18.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8, 3.9                                      |
-| Ubuntu 20.04 LTS, 64-bit                                 | 3.6, 3.7, 3.8, 3.9                                      |
-| Red Hat Enterprise Linux 8, 64-bit                       | 3.6, 3.8, 3.9                                           |
-| CentOS 7, 64-bit                                         | 3.6, 3.7, 3.8, 3.9                                      |
-| macOS 10.15.x versions                                   | 3.6, 3.7, 3.8, 3.9                                      |
-| Windows 10, 64-bit Pro, Enterprise or Education editions | 3.6, 3.7, 3.8, 3.9                                      |
-| Windows Server 2016 or higher                            | 3.6, 3.7, 3.8, 3.9                                      |
+| Ubuntu 20.04 LTS, 64-bit                                   | 3.7, 3.8, 3.9, 3.10                                |
+| Ubuntu 22.04 LTS, 64-bit                                   | 3.7, 3.8, 3.9, 3.10                                |
+| Red Hat Enterprise Linux 8, 64-bit                         | 3.8, 3.9, 3.10                                     |
+| CentOS 7, 64-bit                                           | 3.7, 3.8, 3.9, 3.10                                |
+| macOS 10.15.x versions or higher                           | 3.7, 3.8, 3.9, 3.10                                |
+| Windows 10, 64-bit Pro, Enterprise or Education editions   | 3.7, 3.8, 3.9, 3.10                                |
+| Windows Server 2016 or higher                              | 3.7, 3.8, 3.9, 3.10                                |
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)
 <div id='-run-the-notebooks'/>
