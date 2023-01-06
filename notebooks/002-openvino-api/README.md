@@ -16,6 +16,8 @@ The OpenVINO API tutorial consists of the following steps:
 * Loading a Model
   * OpenVINO IR Model
   * ONNX Model
+  * PaddlePaddle Model
+  * TensorFlow Model
 * Getting Information about a Model
   * Model Inputs
   * Model Outputs
