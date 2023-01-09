@@ -34,7 +34,7 @@ transformers>=4.21.1
 psutil
 
 tensorflow>=2.5,<=2.9.3
-tensorflow_datasets>=4.2.0
+tensorflow_datasets==4.2.0
 
 # CT scan training/inference requirements
 monai>=0.9.1
