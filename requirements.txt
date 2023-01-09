@@ -3,7 +3,7 @@ openvino-telemetry==2022.3.0
 gdown
 pytube>=12.1.0
 yaspin
-librosa==0.8.1
+librosa>=0.8.1
 
 # PyTorch/ONNX notebook requirements
 ipywidgets
@@ -16,11 +16,11 @@ torchvision==0.14.1; sys_platform == 'darwin'
 --find-links https://download.pytorch.org/whl/torch_stable.html
 torch==1.13.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
 torchvision==0.14.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
-torchmetrics==0.6.2
+torchmetrics>=0.11.0
 
 # PaddlePaddle notebook requirements
 # For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
-paddlepaddle==2.4.*
+paddlepaddle>=2.4.*
 # paddle2onnx 0.9.7 fails export in 206 and 207
 paddle2onnx>=0.6,<=0.9.6
 shapely>=1.7.1
@@ -34,10 +34,10 @@ transformers>=4.21.1
 psutil
 
 tensorflow>=2.5,<=2.9.3
-tensorflow_datasets==4.2.0
+tensorflow_datasets>=4.2.0
 
 # CT scan training/inference requirements
-monai==0.9.1
+monai>=0.9.1
 pytorch_lightning
 
 # Jupyter requirements
@@ -49,13 +49,11 @@ jupyterlab
 seaborn>=0.11.0
 matplotlib>=3.4,<3.5.3
 scikit-image>=0.19.2
-jedi==0.17.2
+jedi>=0.17.2
 setuptools>=56.0.0
 Pillow>=8.3.2
-ipykernel==5.*
-ipython==7.16.3 # not directly required, pinned to avoid a vulnerability
+ipykernel>=5.*
+ipython>=7.16.3 # not directly required, pinned to avoid a vulnerability
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
-paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
-nest-asyncio<=1.5.4
-jupyter-client<=7.2.0
+paddlenlp>=2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
