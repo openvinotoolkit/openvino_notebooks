@@ -17,4 +17,4 @@ This notebook demonstrates text prediction with OpenVINO using the [gpt-2](https
 
 ## Installation Instructions
 
-If you have not done so already, please follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md") to install all required dependencies.
+If you have not done so already, please follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md) to install all required dependencies.

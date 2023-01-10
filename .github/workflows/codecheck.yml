@@ -5,6 +5,7 @@ on:
   pull_request:
     branches:
     - 'main'
+    - 'develop'
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
@@ -82,5 +83,7 @@ jobs:
     - name: Test READMEs and requirements
       run: |
         python -m pytest .ci/test_notebooks.py
-
+    - name: Test links from READMEs
+      run: |
+        python .ci/check_links.py
 
