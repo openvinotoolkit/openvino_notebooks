@@ -8,7 +8,5 @@ This tutorial demonstrates how to improve performance of sparse Transformer mode
 
 The tutorial consists of the following steps:
 
-* Download and convert the sparse BERT model.
-* Compare sparse vs. dense inference performance.
-* Quantize model.
-* Compare sparse 8-bit vs. dense 8-bit inference performance.
+- Download and quantize sparse BERT model from the public using HuggingFace Optimum for OpenVINO.
+- Compare sparse 8-bit vs. dense 8-bit inference performance.
