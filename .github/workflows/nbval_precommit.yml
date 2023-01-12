@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04, windows-2019, macos-11]
+        os: [ubuntu-20.04, windows-2019, macos-11, macos-12]
         python: ["3.7", "3.8", "3.9", "3.10"]
     steps:
 

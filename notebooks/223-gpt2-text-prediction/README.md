@@ -1,6 +1,6 @@
 # GPT-2 Text Prediction with OpenVINO
 Text generation is a type of natural language processing that uses computational linguistics and artificial intelligence to automatically produce text that can meet specific communicative needs.
-In this demo we use the **Generative Pre-trained Transformer 2 ([GPT-2](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/gpt-2))** model for text prediction.
+In this demo we use the **Generative Pre-trained Transformer 2 ([GPT-2](https://github.com/openai/gpt-2/blob/master/model_card.md))** model for text prediction.
 
 The complete pipeline of this demo's notebook is shown below.
 
@@ -13,7 +13,7 @@ The following image show an example of the input sequence and corresponding pred
 ![image](https://user-images.githubusercontent.com/91228207/185103977-54b1671a-f02c-4f4b-9722-5c4e8b119fc7.png)
 ## Notebook Contents
 
-This notebook demonstrates text prediction with OpenVINO using the [gpt-2](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/gpt-2) model from Open Model Zoo.
+This notebook demonstrates text prediction with OpenVINO using the [gpt-2](https://huggingface.co/gpt2) model from HuggingFace Transformers.
 
 ## Installation Instructions
 
