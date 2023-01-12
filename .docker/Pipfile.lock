@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5c64b3c4b64bb76f93299352d217a7a6a89ef1e9f8a1634dd81119c4a79ed602"
+            "sha256": "aa3a574da5931dc82111eeab9cb61853302e5e0556795b8406e639fbb698583c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -23,11 +23,11 @@
     "default": {
         "absl-py": {
             "hashes": [
-                "sha256:34995df9bd7a09b3b8749e230408f5a2a2dd7a68a0d33c12a3d0cb15a041a507",
-                "sha256:463c38a08d2e4cef6c498b76ba5bd4858e4c6ef51da1a5a1f27139a022e20248"
+                "sha256:0d3fe606adfa4f7db64792dd4c7aee4ee0c38ab75dfd353b7a83ed3e957fcb47",
+                "sha256:d2c244d01048ba476e7c080bd2c6df5e141d211de80223460d5b3b8a2a58433d"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==1.3.0"
+            "version": "==1.4.0"
         },
         "addict": {
             "hashes": [
@@ -341,19 +341,19 @@
         },
         "boto3": {
             "hashes": [
-                "sha256:1aa55698fa9deff6befd582df86ad5c24233f490b7f55897ef827abf5558180b",
-                "sha256:69b2ae445a5ba3a266c706defb9ce10cb1f046af771baa53af0ae130582205b2"
+                "sha256:8aa3fd453a815240b85c01190ed0d9924622a1a061c93423b1443379eadd3c43",
+                "sha256:a23fe87e9bafca736620dd9d7e5977eeaaa27c3abf5800f7d8b7b7d08b4ad736"
             ],
             "index": "pypi",
-            "version": "==1.26.47"
+            "version": "==1.26.48"
         },
         "botocore": {
             "hashes": [
-                "sha256:19807f62be89018ba751cbccdfb0312a3ec824480fec2b6c3b2103f44073ae13",
-                "sha256:3b9b6b9eaee8cb3bfa808a5c3a8d1d0f34e55a212271604ce0976b469f3a416f"
+                "sha256:17eeb963b3ae4a3ea4a972bdf78c9925c3efd9e2232875bfc19043640d3dac14",
+                "sha256:c5f57c1f694e67c29c870426c0a7ebffce90099e794025e3d283db7f1ad7a65b"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==1.29.47"
+            "version": "==1.29.48"
         },
         "cachetools": {
             "hashes": [
@@ -694,35 +694,6 @@
             "markers": "python_version >= '3.6'",
             "version": "==1.8.0"
         },
-        "dm-tree": {
-            "hashes": [
-                "sha256:0e9620ccf06393eb6b613b5e366469304622d4ea96ae6540b28a33840e6c89cf",
-                "sha256:0fcaabbb14e7980377439e7140bd05552739ca5e515ecb3119f234acee4b9430",
-                "sha256:181c35521d480d0365f39300542cb6cd7fd2b77351bb43d7acfda15aef63b317",
-                "sha256:250b692fb75f45f02e2f58fbef9ab338904ef334b90557565621fa251df267cf",
-                "sha256:2869228d9c619074de501a3c10dc7f07c75422f8fab36ecdcb859b6f1b1ec3ef",
-                "sha256:2f7915660f59c09068e428613c480150180df1060561fd0d1470684ae7007bd1",
-                "sha256:35cc164a79336bfcfafb47e5f297898359123bbd3330c1967f0c4994f9cf9f60",
-                "sha256:378cc8ad93c5fe3590f405a309980721f021c790ca1bdf9b15bb1d59daec57f5",
-                "sha256:39070ba268c0491af9fe7a58644d99e8b4f2cde6e5884ba3380bddc84ed43d5f",
-                "sha256:694c3654cfd2a81552c08ec66bb5c4a3d48fa292b9a181880fb081c36c5b9134",
-                "sha256:803bfc53b4659f447ac694dbd04235f94a73ef7c1fd1e0df7c84ac41e0bc963b",
-                "sha256:81fce77f22a302d7a5968aebdf4efafef4def7ce96528719a354e6990dcd49c7",
-                "sha256:83b7764de0d855338abefc6e3ee9fe40d301668310aa3baea3f778ff051f4393",
-                "sha256:8c60a7eadab64c2278861f56bca320b2720f163dca9d7558103c3b77f2416571",
-                "sha256:8ed3564abed97c806db122c2d3e1a2b64c74a63debe9903aad795167cc301368",
-                "sha256:a5d819c38c03f0bb5b3b3703c60e4b170355a0fc6b5819325bf3d4ceb3ae7e80",
-                "sha256:ad16ceba90a56ec47cf45b21856d14962ac314787975ef786efb5e6e9ca75ec7",
-                "sha256:b095ba4f8ca1ba19350fd53cf1f8f3eb0bd406aa28af64a6dfc86707b32a810a",
-                "sha256:b9bd9b9ccb59409d33d51d84b7668010c04c2af7d4a371632874c1ca356cff3d",
-                "sha256:b9f89a454e98806b44fe9d40ec9eee61f848388f7e79ac2371a55679bd5a3ac6",
-                "sha256:bb2d109f42190225112da899b9f3d46d0d5f26aef501c61e43529fe9322530b5",
-                "sha256:d16e1f2a073604cfcc09f7131ae8d534674f43c3aef4c25742eae295bc60d04f",
-                "sha256:d40fa4106ca6edc66760246a08f500ec0c85ef55c762fb4a363f6ee739ba02ee",
-                "sha256:e4d714371bb08839e4e5e29024fc95832d9affe129825ef38836b143028bd144"
-            ],
-            "version": "==0.1.8"
-        },
         "easydict": {
             "hashes": [
                 "sha256:11dcb2c20aaabbfee4c188b4bc143ef6be044b34dbf0ce5a593242c2695a080f"
@@ -736,18 +707,6 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==0.4"
-        },
-        "etils": {
-            "extras": [
-                "enp",
-                "epath"
-            ],
-            "hashes": [
-                "sha256:22ff08a4c964ee6caca372dc511c931b5f9b4ff21bdd30ef093018bc06c3b6b2",
-                "sha256:d10982f7702422bea8635d5284b8bed629f51919fc122ac1e1e4abf45ec8f785"
-            ],
-            "markers": "python_version >= '3.8'",
-            "version": "==1.0.0"
         },
         "exceptiongroup": {
             "hashes": [
@@ -2094,7 +2053,7 @@
         },
         "nncf": {
             "git": "https://github.com/openvinotoolkit/nncf.git",
-            "ref": "c60566bb3011a01fccf0910bff2bc75d2747dc97"
+            "ref": "3e3042392ba19c6aabfffcbfea637632ca7f5c05"
         },
         "notebook": {
             "hashes": [
@@ -3659,11 +3618,11 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:57f6f22bde4e042978bcd50176fdb381d7c21a9efa4041202288d3737a0c6a54",
-                "sha256:a7620757bf984b58deaf32fc8a4577a9bbc0850cf92c20e1ce41c38c19e5fb75"
+                "sha256:4d3c92fac8f1118bb77a22181355e29c239cabfe2b9effdaa665c66b711136d7",
+                "sha256:8ab4f1dbf2b4a65f7eec5ad0c620e84c34111a68d3349833494b9088212214dd"
             ],
             "index": "pypi",
-            "version": "==65.6.3"
+            "version": "==65.7.0"
         },
         "shapely": {
             "hashes": [
@@ -3875,11 +3834,11 @@
         },
         "tensorflow-datasets": {
             "hashes": [
-                "sha256:0669e1a8656f7c0253eae556eeb0c28d429d9a32b13a8ad30b2450ec99ec3fe4",
-                "sha256:e0aae3cfe8eea259a862ad17f655767ede03bbbc8180bb96072fa4e365f1db9f"
+                "sha256:93a89cd599b24e9cb04a3a3b43cc72728fc11889f41e9d69f0bd95a8318531bc",
+                "sha256:be2532e7de3c7aac3e95a094c3c95b9b1f1a7f2e98daeb16d212dda4382de264"
             ],
             "index": "pypi",
-            "version": "==4.8.1"
+            "version": "==4.2.0"
         },
         "tensorflow-estimator": {
             "hashes": [
