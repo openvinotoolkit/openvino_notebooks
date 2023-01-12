@@ -6,6 +6,7 @@ on:
   push:
     branches:
     - 'main'
+    - 'ea/docs_fix' # TODO remove after test
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
