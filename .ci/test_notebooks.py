@@ -18,10 +18,16 @@ def get_parsed_requirements(requirements_file: str) -> Set:
     separators = ("=", "<", ">", "[")
     for req in parsed_requirements:
         requirement = req.requirement
+        # requirements for Windows or macOS only
+        if ";" in requirement and "linux" not in requirement:
+            continue
+        if requirement.startswith('git+'):
+            requirement = requirement.split('#egg=')[-1]
         for separator in separators:
             requirement = requirement.replace(separator, "|")
 
         requirements_set.add(requirement.split("|")[0])
+
     return requirements_set
 
 

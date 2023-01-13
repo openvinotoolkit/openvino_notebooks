@@ -2,27 +2,12 @@ name: nbval
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-    - 'main'
-    - '2021.4'
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
     - 'requirements.txt'
     - '.ci/*'
-    - '.github/workflows/nbval.yml'
-    - '.github/workflows/.env'
-  push:
-    branches:
-    - 'main'
-    - '2021.4'
-    paths:
-    - 'notebooks/**.ipynb'
-    - 'notebooks/**.py'
-    - 'requirements.txt'
-    - '.ci/*'
-    - '.github/workflows/nbval.yml'
+    - '.github/workflows/*.yml'
     - '.github/workflows/.env'
   schedule:
     - cron:  '30 8 * * *'
@@ -37,17 +22,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, windows-2019, macos-10.15, macos-11]
-        python: [3.6, 3.7, 3.8, 3.9]
-        exclude:
-        - os: macos-11
-          python: 3.6
-        - os: macos-10.15
-          python: 3.7
-        - os: macos-10.15
-          python: 3.8
-        - os: windows-2019
-          python: 3.6
+        os: [ubuntu-20.04, ubuntu-22.04, windows-2019, windows-2022, macos-11, macos-12]
+        python: ["3.7", "3.8", "3.9", "3.10"]
     steps:
 
     #### Installation/preparation ####
@@ -144,7 +120,15 @@ jobs:
         cp -r case_00030 case_00001
         mv case_00030 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
         mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
-
+    # Prevent test aborting by timeout
+    - name: Download long loading models
+      run: |
+          mkdir notebooks/203-meter-reader/model
+          curl -o notebooks/203-meter-reader/model/meter_det_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_det_model.tar.gz'
+          curl -o notebooks/203-meter-reader/model/meter_seg_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_seg_model.tar.gz'
+          mkdir notebooks/405-paddle-ocr-webcam/model
+          curl -o notebooks/405-paddle-ocr-webcam/model/ch_PP-OCRv3_det_infer.tar 'https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_det_infer.tar'
+          curl -o notebooks/405-paddle-ocr-webcam/model/ch_PP-OCRv3_rec_infer.tar 'https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_rec_infer.tar'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -165,7 +149,7 @@ jobs:
         python -m pip freeze
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: pip-freeze
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
@@ -187,33 +171,32 @@ jobs:
         jupyter lab notebooks --help
 
     # Main notebooks test. Verifies that all notebooks run without errors
-    # Temporary workaround for Python 3.9 while NNCF is not updated to TF 2.5
-    # Temporary excluding 107 and 114 from MacOS due to performance issues
-    - name: Analysing with nbval
-      if: matrix.python == '3.9' && runner.os == 'MacOS'
+    - name: Analysing with nbval (Windows)
+      if: runner.os == 'Windows'
       run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/114-quantization-simplified-mode --durations 10
-    - name: Analysing with nbval
-      if: matrix.python != '3.9' && runner.os == 'MacOS'
+            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image --move_notebooks_dir c:/notebooks
+      shell: bash
+    - name: Analysing with nbval (Linux)
+      if: runner.os == 'Linux'
       run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/204-named-entity-recognition --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/114-quantization-simplified-mode --durations 10
-    - name: Analysing with nbval
-      if: matrix.python == '3.9' && runner.os == 'Linux'
+            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image
+      shell: bash
+    - name: Analysing with nbval (MacOS)
+      if: runner.os == 'MacOS'
       run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/107-speech-recognition-quantization --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10
-    - name: Analysing with nbval
-      if: matrix.python != '3.9' && runner.os == 'Linux'
-      run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/204-named-entity-recognition --ignore=notebooks/107-speech-recognition-quantization --durations 10  
-    - name: Analysing with nbval
-      if: matrix.python == '3.9' && runner.os == 'Windows'
-      run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/305-tensorflow-quantization-aware-training --durations 10
-    - name: Analysing with nbval
-      if: matrix.python != '3.9' && runner.os == 'Windows'
-      run: |
-            python -m pytest --nbval -k "test_ or notebook_utils" --ignore=notebooks/204-named-entity-recognition --durations 10  
+            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image
 
+      shell: bash
+    - name: Archive test report
+      uses: actions/upload-artifact@v3
+      with:
+        name: test_report.csv
+        path: test_report.csv
+    - name: Archive notebook test report
+      uses: actions/upload-artifact@v3
+      with:
+        name: test_report
+        path: test_report/
 
     # Show the cache after running the notebooks
     - name: Show cache
@@ -221,4 +204,3 @@ jobs:
         ls -laR ${{ env.CACHE_DIR }}
         du -sh ${{ env.CACHE_DIR }}
       if: runner.os != 'Windows'
-

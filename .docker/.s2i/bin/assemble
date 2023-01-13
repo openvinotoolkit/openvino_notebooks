@@ -60,15 +60,29 @@ mv ${APP_ROOT}/src/*.sh /opt/app-root/bin
 
 # Install oc command line client for OpenShift cluster.
 
-curl -s -o ${APP_ROOT}/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.153/linux/oc.tar.gz && \
+curl -L -o ${APP_ROOT}/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.153/linux/oc.tar.gz
+
+# Check if oc.tar.gz is not empty
+if [ -s ${APP_ROOT}/oc.tar.gz ]; then
     tar -C /opt/app-root/bin -zxf ${APP_ROOT}/oc.tar.gz oc && \
     mv /opt/app-root/bin/oc /opt/app-root/bin/oc-3.11 && \
     rm ${APP_ROOT}/oc.tar.gz
+else
+    echo "ERROR: Couldn't download OCP 3.11 client binary."
+    exit 1
+fi
 
-curl -s -o ${APP_ROOT}/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz&& \
+curl -L -o ${APP_ROOT}/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
+
+# Check if oc.tar.gz is not empty
+if [ -s ${APP_ROOT}/oc.tar.gz ]; then
     tar -C /opt/app-root/bin -zxf ${APP_ROOT}/oc.tar.gz oc && \
     mv /opt/app-root/bin/oc /opt/app-root/bin/oc-4 && \
     rm ${APP_ROOT}/oc.tar.gz
+else
+    echo "ERROR: Couldn't download OCP 4 client binary."
+    exit 1
+fi
 
 ln -s /opt/app-root/bin/oc-wrapper.sh /opt/app-root/bin/oc
 

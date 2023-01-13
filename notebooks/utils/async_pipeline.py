@@ -16,6 +16,7 @@
 
 import logging
 import threading
+import copy
 from collections import deque
 from typing import Dict, Set
 from pathlib import Path
@@ -85,36 +86,31 @@ class AsyncPipeline:
     def __init__(self, ie, model, plugin_config, device='CPU', max_num_requests=0):
         cache_path = Path("model_cache")
         cache_path.mkdir(exist_ok=True)
-        # Enable model cachine for GPU devices
+        # Enable model caching for GPU devices
         if "GPU" in device and "GPU" in ie.available_devices:
-            ie.set_config({"CACHE_DIR": str(cache_path)}, device_name="GPU")
+            ie.set_property(device_name="GPU", properties={"CACHE_DIR": str(cache_path)})
 
         self.model = model
         self.logger = logging.getLogger()
 
         self.logger.info('Loading network to {} plugin...'.format(device))
-        self.exec_net = ie.load_network(network=self.model.net, device_name=device,
-                                        config=plugin_config, num_requests=max_num_requests)
+        self.exec_net = ie.compile_model(self.model.net, device, plugin_config)
         if max_num_requests == 0:
-            # ExecutableNetwork doesn't allow creation of additional InferRequests. Reload ExecutableNetwork
-            # +1 to use it as a buffer of the pipeline
-            self.exec_net = ie.load_network(network=self.model.net, device_name=device,
-                                            config=plugin_config, num_requests=len(self.exec_net.requests) + 1)
-
-        self.empty_requests = deque(self.exec_net.requests)
+            max_num_requests = self.exec_net.get_property('OPTIMAL_NUMBER_OF_INFER_REQUESTS') + 1
+        self.requests = [self.exec_net.create_infer_request() for _ in range(max_num_requests)]
+        self.empty_requests = deque(self.requests)
         self.completed_request_results = {}
-        self.callback_exceptions = {}
+        self.callback_exceptions = []
         self.event = threading.Event()
 
-    def inference_completion_callback(self, status, callback_args):
+    def inference_completion_callback(self, callback_args):
         try:
             request, id, meta, preprocessing_meta = callback_args
-            if status != 0:
-                raise RuntimeError('Infer Request has returned status code {}'.format(status))
-            raw_outputs = {key: blob.buffer for key, blob in request.output_blobs.items()}
+            raw_outputs = {out.any_name: copy.deepcopy(res.data) for out, res in zip(request.model_outputs, request.output_tensors)}
             self.completed_request_results[id] = (raw_outputs, meta, preprocessing_meta)
             self.empty_requests.append(request)
         except Exception as e:
+            print(e)
             self.callback_exceptions.append(e)
         self.event.set()
 
@@ -123,9 +119,9 @@ class AsyncPipeline:
         if len(self.empty_requests) == 0:
             self.event.clear()
         inputs, preprocessing_meta = self.model.preprocess(inputs)
-        request.set_completion_callback(py_callback=self.inference_completion_callback,
-                                        py_data=(request, id, meta, preprocessing_meta))
-        request.async_infer(inputs=inputs)
+        request.set_callback(self.inference_completion_callback, (request, id, meta, preprocessing_meta))
+        request.start_async(inputs=inputs)
+        request.wait()
 
     def get_raw_result(self, id):
         if id in self.completed_request_results:
@@ -146,7 +142,7 @@ class AsyncPipeline:
         return len(self.completed_request_results) != 0
 
     def await_all(self):
-        for request in self.exec_net.requests:
+        for request in self.requests:
             request.wait()
 
     def await_any(self):
