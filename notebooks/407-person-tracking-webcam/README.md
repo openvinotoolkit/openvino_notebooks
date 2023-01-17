@@ -1,12 +1,12 @@
 # Live Person Tracking with OpenVINO™
 
-![Person Tracking](https://user-images.githubusercontent.com/91237924/210479548-b70dbbaa-5948-4e49-b48e-6cb6613226da.gif)
-
-This notebook shows a person tracking scenario: it reads frames from an input video sequence, detects people in the frames, uniquely identify each one of them and track all of them until they leave the frame.
-
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F407-person-tracking-webcam%2F407-person-tracking.ipynb)
 
 *Binder is a free service where the webcam will not work, and performance on the video will not be good. For the best performance, install the notebooks locally.*
+
+![Person Tracking](https://user-images.githubusercontent.com/91237924/210479548-b70dbbaa-5948-4e49-b48e-6cb6613226da.gif)
+
+This notebook shows a person tracking scenario: it reads frames from an input video sequence, detects people in the frames, uniquely identify each one of them and track all of them until they leave the frame.
 
 ## Notebook Contents
 
