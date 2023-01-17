@@ -118,7 +118,3 @@ def draw_boxes(img, bbox, identities=None, offset=(0, 0)):
             2
         )
     return img
-
-
-def cosin_metric(x1, x2):
-    return np.dot(x1, x2) / (np.linalg.norm(x1) * np.linalg.norm(x2))
