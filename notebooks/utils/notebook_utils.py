@@ -523,7 +523,7 @@ def viz_result_image(
 # In[ ]:
 
 
-def showarray(frame: np.ndarray, display_handle=None):
+def show_array(frame: np.ndarray, display_handle=None):
     """
     Display array `frame`. Replace information at `display_handle` with `frame`
     encoded as jpeg image. `frame` is expected to have data in BGR order.
