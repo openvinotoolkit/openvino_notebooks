@@ -1,6 +1,7 @@
 # Execute notebooks and convert them to Markdown and HTML
 # Output from notebook cells with tag "hide_output" will be hidden in converted notebooks
 
+ignore_list=$*
 rstdir=$PWD"/rst_files"
 binderlist=$rstdir"/notebooks_with_buttons.txt"
 tagslist=$rstdir"/notebooks_tags.json"
@@ -19,11 +20,13 @@ python $taggerpath $notebookspath $keywordspath> $tagslist
 
 git ls-files "*.ipynb" | while read notebook; do
     executed_notebook=${notebook/.ipynb/-with-output.ipynb}
-    echo $executed_notebook
-    jupyter nbconvert --log-level=INFO --execute --to notebook --output $executed_notebook --output-dir . --ExecutePreprocessor.kernel_name="python3" $notebook
-    jupyter nbconvert --to markdown $executed_notebook --output-dir $markdowndir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
-    jupyter nbconvert --to html $executed_notebook --output-dir $htmldir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
-    jupyter nbconvert --to rst $executed_notebook --output-dir $rstdir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
+    if ! echo "$ignore_list" | grep -w -q "$executed_notebook"; then
+        echo $executed_notebook
+        jupyter nbconvert --log-level=INFO --execute --to notebook --output $executed_notebook --output-dir . --ExecutePreprocessor.kernel_name="python3" $notebook
+        jupyter nbconvert --to markdown $executed_notebook --output-dir $markdowndir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
+        jupyter nbconvert --to html $executed_notebook --output-dir $htmldir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
+        jupyter nbconvert --to rst $executed_notebook --output-dir $rstdir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
+    fi
 done
 
 # Remove download links to local files. They only work after executing the notebook

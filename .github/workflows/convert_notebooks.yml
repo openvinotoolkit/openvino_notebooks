@@ -146,6 +146,13 @@ jobs:
         cp -r case_00030 case_00001
         mv case_00030 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
         mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+    - name: Download shared datasets
+      run: |
+          mkdir notebooks/data/librispeech
+          wget  -O notebooks/data/librispeech/test-clean.tar.gz http://openslr.elda.org/resources/12/test-clean.tar.gz
+          tar -xvf notebooks/data/librispeech/test-clean.tar.gz
+          mkdir notebooks/data/cifar10
+          wget -O notebooks/data/cifar10/cifar-10-python.tar.gz https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
     - name: Download long converted models
       run: |
           wget -O notebooks/225-stable-diffusion-text-to-image/unet.xml 'https://onedrive.live.com/download?cid=614D2D07C188F961&resid=614D2D07C188F961%21131&authkey=AMELDTpTI_yFvLc'
@@ -180,7 +187,7 @@ jobs:
     #### End installation/preparation
 
     - name: convert_notebooks
-      run: bash .ci/convert_notebooks.sh
+      run: bash .ci/convert_notebooks.sh notebooks/104-model-tools/104-model-tools-with-output.ipynb notebooks/110-ct-segmentation-quantize/data-preparation-ct-scan-with-output.ipynb notebooks/110-ct-segmentation-quantize/pytorch-monai-training-with-output.ipynb
     - name: Save HTML files
       uses: actions/upload-artifact@v2
       with:
