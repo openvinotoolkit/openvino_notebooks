@@ -187,7 +187,7 @@ jobs:
     #### End installation/preparation
 
     - name: convert_notebooks
-      run: bash .ci/convert_notebooks.sh notebooks/104-model-tools/104-model-tools-with-output.ipynb notebooks/110-ct-segmentation-quantize/data-preparation-ct-scan-with-output.ipynb notebooks/110-ct-segmentation-quantize/pytorch-monai-training-with-output.ipynb
+      run: bash .ci/convert_notebooks.sh notebooks/110-ct-segmentation-quantize/data-preparation-ct-scan-with-output.ipynb notebooks/110-ct-segmentation-quantize/pytorch-monai-training-with-output.ipynb notebooks/113-image-classification-quantization/113-image-classification-quantization-with-output.ipynb
     - name: Save HTML files
       uses: actions/upload-artifact@v2
       with:

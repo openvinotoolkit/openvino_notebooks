@@ -18,10 +18,13 @@ notebookspath=$(git ls-files "*.ipynb"| head -n 1)
 keywordspath=$(git ls-files "*keywords.json")
 python $taggerpath $notebookspath $keywordspath> $tagslist
 
+echo "start converting notebooks"
+echo $(date +"%T")
 git ls-files "*.ipynb" | while read notebook; do
     executed_notebook=${notebook/.ipynb/-with-output.ipynb}
     if ! echo "$ignore_list" | grep -w -q "$executed_notebook"; then
         echo $executed_notebook
+        echo $(date +"%T")
         jupyter nbconvert --log-level=INFO --execute --to notebook --output $executed_notebook --output-dir . --ExecutePreprocessor.kernel_name="python3" $notebook
         jupyter nbconvert --to markdown $executed_notebook --output-dir $markdowndir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
         jupyter nbconvert --to html $executed_notebook --output-dir $htmldir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
