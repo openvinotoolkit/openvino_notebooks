@@ -29,6 +29,9 @@ RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
 
 # GPU drivers
+RUN dnf install -y 'dnf-command(config-manager)' && \
+    dnf config-manager --add-repo  https://repositories.intel.com/graphics/rhel/8.5/intel-graphics.repo
+
 RUN rpm -ivh https://vault.centos.org/centos/8/AppStream/x86_64/os/Packages/mesa-filesystem-21.1.5-1.el8.x86_64.rpm && \
     dnf install --refresh -y \
     intel-opencl-22.28.23726.1-i419.el8.x86_64 intel-media intel-mediasdk libmfxgen1 libvpl2 \
