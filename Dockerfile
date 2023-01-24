@@ -29,19 +29,16 @@ RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
 
 # GPU drivers
-RUN apt-get update && apt-get install -y libnuma1 ocl-icd-libopencl1 --no-install-recommends && rm -rf /var/lib/apt/lists/* 
-RUN apt-get update && apt-get install -y --no-install-recommends gpg gpg-agent && \
-    curl https://repositories.intel.com/graphics/intel-graphics.key | gpg --dearmor --output /usr/share/keyrings/intel-graphics.gpg && \
-    echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/graphics/ubuntu focal-legacy main' | tee  /etc/apt/sources.list.d/intel.gpu.focal.list && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-    intel-opencl-icd=22.35.24055+i815~u20.04 \
-    intel-level-zero-gpu=1.3.24055+i815~u20.04 \
-    level-zero=1.8.5+i815~u20.04 && \
-    apt-get purge gpg gpg-agent --yes && apt-get --yes autoremove && \
-    apt-get clean ; \
-    rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
-RUN apt-get update && apt-get install -y --no-install-recommends clinfo && rm -rf /var/lib/apt/lists/*
+RUN rpm -ivh https://vault.centos.org/centos/8/AppStream/x86_64/os/Packages/mesa-filesystem-21.1.5-1.el8.x86_64.rpm && \
+    dnf install --refresh -y \
+    intel-opencl-22.28.23726.1-i419.el8.x86_64 intel-media intel-mediasdk libmfxgen1 libvpl2 \
+    level-zero intel-level-zero-gpu \
+    intel-metrics-library intel-igc-core intel-igc-cm \
+    libva libva-utils  intel-gmmlib && \
+    rpm -ivh http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/Packages/ocl-icd-2.2.12-1.el8.x86_64.rpm
+
+RUN yum install epel-release && \
+    yum install clinfo
 
 # Copying in override assemble/run scripts
 COPY .docker/.s2i/bin /tmp/scripts
