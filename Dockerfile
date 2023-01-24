@@ -28,6 +28,20 @@ RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum install -y nodejs-14.18.1 mesa-libGL dos2unix libsndfile && \
   yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
 
+# GPU drivers
+RUN apt-get update && apt-get install -y libnuma1 ocl-icd-libopencl1 --no-install-recommends && rm -rf /var/lib/apt/lists/* 
+RUN apt-get update && apt-get install -y --no-install-recommends gpg gpg-agent && \
+    curl https://repositories.intel.com/graphics/intel-graphics.key | gpg --dearmor --output /usr/share/keyrings/intel-graphics.gpg && \
+    echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/graphics/ubuntu focal-legacy main' | tee  /etc/apt/sources.list.d/intel.gpu.focal.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    intel-opencl-icd=22.35.24055+i815~u20.04 \
+    intel-level-zero-gpu=1.3.24055+i815~u20.04 \
+    level-zero=1.8.5+i815~u20.04 && \
+    apt-get purge gpg gpg-agent --yes && apt-get --yes autoremove && \
+    apt-get clean ; \
+    rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
+
 # Copying in override assemble/run scripts
 COPY .docker/.s2i/bin /tmp/scripts
 # Copying in source code
