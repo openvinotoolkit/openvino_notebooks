@@ -32,7 +32,7 @@ jobs:
 
       # Matrix is unnecessary here, but this allows easy copying of steps from nbval.yml
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04]
         python: [3.8]
 
     runs-on: ${{ matrix.os }}
@@ -42,6 +42,9 @@ jobs:
       run:  |
             sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
             sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
+            sudo rm -rf /opt/ghc
+            echo "Available storage:"
+            df -h
     - name: Set Swap Space
       uses: pierotofy/set-swap-space@master
       with:
@@ -187,7 +190,7 @@ jobs:
     #### End installation/preparation
 
     - name: convert_notebooks
-      run: bash .ci/convert_notebooks.sh notebooks/110-ct-segmentation-quantize/data-preparation-ct-scan-with-output.ipynb notebooks/110-ct-segmentation-quantize/pytorch-monai-training-with-output.ipynb notebooks/113-image-classification-quantization/113-image-classification-quantization-with-output.ipynb notebooks/225-stable-diffusion-text-to-image/225-stable-diffusion-text-to-image-with-output.ipynb
+      run: bash .ci/convert_notebooks.sh notebooks/110-ct-segmentation-quantize/data-preparation-ct-scan-with-output.ipynb notebooks/110-ct-segmentation-quantize/pytorch-monai-training-with-output.ipynb notebooks/113-image-classification-quantization/113-image-classification-quantization-with-output.ipynb
     - name: Save HTML files
       uses: actions/upload-artifact@v2
       with:
