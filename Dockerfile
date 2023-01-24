@@ -41,6 +41,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends gpg gpg-agent &
     apt-get purge gpg gpg-agent --yes && apt-get --yes autoremove && \
     apt-get clean ; \
     rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
+RUN apt-get update && apt-get install -y --no-install-recommends clinfo && rm -rf /var/lib/apt/lists/*
 
 # Copying in override assemble/run scripts
 COPY .docker/.s2i/bin /tmp/scripts
