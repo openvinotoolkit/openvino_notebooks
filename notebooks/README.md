@@ -3,7 +3,7 @@ English | [简体中文](https://github.com/openvinotoolkit/openvino_notebooks/b
 <h1 align="center">📚 OpenVINO™ Notebooks</h1>
 
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/LICENSE)
-[![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval.yml?query=event%3Apush)
+[![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval_precommit.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval_precommit.yml?query=event%3Apush)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml?query=event%3Apush)
 
 A collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
@@ -146,6 +146,8 @@ More amazing notebooks here!
 | [226-yolov7-optimization](226-yolov7-optimization/)<br> | Optimize YOLOv7 using NNCF PTQ API | <img src=https://raw.githubusercontent.com/WongKinYiu/yolov7/main/figure/horses_prediction.jpg  width=225> |
 | [227-whisper-subtitles-generation](227-whisper-subtitles-generation/)<br> | Generate subtitles for video with OpenAI Whisper and OpenVINO | <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225> |
 | [228-clip-zero-shot-image-classification](228-clip-zero-shot-image-classification)<br> | Perform Zero-shot Image Classification with CLIP and OpenVINO | <img src=https://user-images.githubusercontent.com/29454499/207795060-437b42f9-e801-4332-a91f-cc26471e5ba2.png  width=500> |
+| [229-distilbert-sequence-classification](229-distilbert-sequence-classification/)<br> | Sequence Classification with OpenVINO | <img src = "https://user-images.githubusercontent.com/95271966/206130638-d9847414-357a-4c79-9ca7-76f4ae5a6d7f.png" width=225> |
+| [230-yolov8-optimization](230-yolov8-optimization/)<br> | Optimize YOLOv8 using NNCF PTQ API | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> |
 
 
 </details>

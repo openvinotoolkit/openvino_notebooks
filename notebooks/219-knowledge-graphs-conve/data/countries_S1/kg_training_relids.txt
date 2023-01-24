@@ -1,4 +1,0 @@
-locatedin	0
-locatedin_reverse	1
-neighbor	2
-neighbor_reverse	3
