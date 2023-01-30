@@ -25,7 +25,7 @@ monai = "*"
 nbval = "*"
 nncf = {git = "https://github.com/openvinotoolkit/nncf.git"}
 numpy = ">=1.21.0"
-onnx = ">=1.11.0,<1.12.0"
+onnx = ">=1.13.0"
 opencv-python = "*"
 openvino-dev = {extras = ["onnx","tensorflow2"], version = "==2022.3.0"}
 openvino-telemetry = "==2022.3.0"

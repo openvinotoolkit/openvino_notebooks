@@ -2160,10 +2160,11 @@
                 "sha256:ea06dbf57a287657b6dc4e189918e4cb451450308589d482117216194d6f83d6",
                 "sha256:eb46f31f12bb0bfdcfb68497d10b20447cf8fa6c4f693120c013e052645357b8",
                 "sha256:eca224c7c2c8ee4072a0743e4898a84a9bdf8297b5e5910a2632e4c4182ffb2a",
-                "sha256:f335d982b8ed201cf767459b993630acfd20c32b100529f70af9f28a26e72167"
+                "sha256:f335d982b8ed201cf767459b993630acfd20c32b100529f70af9f28a26e72167",
+                "sha256:2ad8208252f6d61dcd487c2c62f6fbc1eee24bf11addb56c500cf0feb8966f36"
             ],
             "index": "pypi",
-            "version": "==1.11.0"
+            "version": "==1.13.0"
         },
         "opencv-python": {
             "hashes": [

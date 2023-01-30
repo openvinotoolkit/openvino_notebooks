@@ -4,7 +4,7 @@ openvino-telemetry==2022.3.0
 
 
 # deep learning frameworks
-onnx>=1.11.0,<=1.12.0
+onnx>=1.13.0
 
 tensorflow-macos>=2.5,<=2.9.3; sys_platform == 'darwin' and platform_machine == 'arm64' # macOS M1 and M2
 tensorflow>=2.5,<=2.9.3; sys_platform == 'darwin' and platform_machine != 'arm64' # macOS x86
