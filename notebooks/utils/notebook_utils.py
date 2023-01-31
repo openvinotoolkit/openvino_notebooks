@@ -573,7 +573,7 @@ def show_live_inference(
         if results:
             # Show next result from async pipeline
             result, meta = results
-            display_handle = showarray(result, display_handle)
+            display_handle = show_array(result, display_handle)
             next_frame_id_to_show += 1
         if pipeline.is_ready():
             # Submit new image to async pipeline
@@ -598,7 +598,7 @@ def show_live_inference(
         results = pipeline.get_result(next_frame_id_to_show)
         if results:
             result, meta = results
-            display_handle = showarray(result, display_handle)
+            display_handle = show_array(result, display_handle)
             next_frame_id_to_show += 1
 
     end_time = time.perf_counter()

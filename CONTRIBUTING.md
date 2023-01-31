@@ -138,6 +138,8 @@ Names should be descriptive but not too long. We use the following numbering sch
 - `300-` Training notebooks: notebooks that include code to train neural networks.
 - `400-` Live demo notebooks: demonstrate inference on a live webcam.
 
+Please use the first available number in the branch, trying to fill the holes e.g. choose 206, when there are 205 and 207 and 206 is missing.
+
 ### READMEs
 
 Every notebook must have a README file that briefly describes the content of the notebook. A simple structure for the README file is described below:

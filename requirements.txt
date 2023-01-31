@@ -20,7 +20,7 @@ torchmetrics>=0.11.0
 pytorch-lightning
 
 paddlepaddle>=2.4.0
-paddle2onnx>=0.6,<=0.9.6
+paddle2onnx>=0.6
 paddlenlp>=2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
 
 transformers>=4.21.1
