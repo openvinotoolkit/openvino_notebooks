@@ -23,7 +23,7 @@ librosa = ">=0.8.1"
 matplotlib = ">=3.4,<3.5.3"
 monai = "*"
 nbval = "*"
-nncf = {git = "https://github.com/openvinotoolkit/nncf.git"}
+nncf = "==2.4.0"
 numpy = ">=1.21.0"
 onnx = ">=1.11.0,<1.12.0"
 opencv-python = "*"
