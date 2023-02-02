@@ -1,13 +1,18 @@
-# Text-to-Image Generation with Stable Diffusion
+# Image Generation with Stable Diffusion
 
-Text-to-image generation using an AI method called "diffusion" enables us to create images from a text description as input
+
 In this notebook we demonstrate how to use a the **[Stable Diffusion](https://huggingface.co/CompVis/stable-diffusion)** model for image generation with OpenVINO.
+It consider 2 aproaches of image generation using an AI method called `diffusion`:
+
+    * `Text-to-image` generation to create images from a text description as input
+    * `Text-guided Image-to-Image` generation to create image using text description and initial image semantic
+
 
 The complete pipeline of this demo is shown below.
 
-![image2](https://raw.githubusercontent.com/patrickvonplaten/scientific_images/master/stable_diffusion.png)
+![image2](https://user-images.githubusercontent.com/29454499/216378932-7a9be39f-cc86-43e4-b072-66372a35d6bd.png)
 
-This is a demonstration in which the user can type a text description and the pipeline will generate an image that reflects the context of the input text.
+This is a demonstration in which the user can type a text description (and provide input image in case of Image-to-Image generation) and the pipeline will generate an image that reflects the context of the input text.
 Step-by-step the diffusion process will iteratively denoise latent image representation while being conditioned on the text embeddings provided by the text encoder.
 
 The following image shows an example of the input sequence and corresponding predicted image.
