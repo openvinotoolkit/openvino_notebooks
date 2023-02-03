@@ -17,7 +17,9 @@ Step-by-step the diffusion process will iteratively denoise latent image represe
 
 The following image shows an example of the input sequence and corresponding predicted image.
 
-![image](https://user-images.githubusercontent.com/15709723/200945747-1c584e5c-b3f2-4e43-b1c1-e35fd6edc2c3.png)
+**Input text:** cyberpunk cityscape like tokyo nework  with tall buildings at dusk golden hour  cinematic lighting, epic composition. A golden daylight, hyper-realistic environment. Hyper and intricate detail, photo-realistic. Cinematic and volumetric light. Epic concept art. Octane render and Unreal Engine, trending on artstation
+
+![image](https://user-images.githubusercontent.com/29454499/216524089-ed671fc7-a78b-42bf-aa96-9f7c791a9419.png)
 
 ## Notebook Contents
 
