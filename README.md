@@ -93,7 +93,7 @@ More amazing notebooks here!
 | [113-image-classification-quantization](notebooks/113-image-classification-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F113-image-classification-quantization%2F113-image-classification-quantization.ipynb) | Quantize mobilenet image classification |
 | [114-quantization-simplified-mode](notebooks/114-quantization-simplified-mode/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F114-quantization-simplified-mode%2F114-quantization-simplified-mode.ipynb) | Quantize Image Classification Models with POT in Simplified Mode|
 | [115-async-api](notebooks/115-async-api/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F115-async-api%2F115-async-api.ipynb) | Use Asynchronous Execution to Improve Data Pipelining| |
-| [116-sparsity-optimization](notebooks/116-sparsity-optimization/)| Improve performance of sparse Transformer models |
+| [116-sparsity-optimization](notebooks/116-sparsity-optimization/)<br> | Improve performance of sparse Transformer models |
 | [117-model-server](notebooks/117-model-server/)| A basic introduction to using OpenVINO™ Model Server (OVMS) |
 
 </details>
