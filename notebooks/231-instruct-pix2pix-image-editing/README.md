@@ -1,4 +1,4 @@
-# Image editng with InstructPix2Pix
+# Image editing with InstructPix2Pix
 
 AI image editing models are traditionally focused a single editing task such as style transfer or translation between image domains. [InstructPix2Pix](https://www.timothybrooks.com/instruct-pix2pix/) proposes a novel method for editing images using human instructions given an input image and a written text that tells the model what to do. The model follows these text-based instructions to edit the image.
 
