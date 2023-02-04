@@ -1,6 +1,6 @@
 # Introduction to OpenVINO™ Model Server
 
-This notebook demonstrates how to shows how to deploy a model server and request prediction from it.
+This notebook demonstrates how to deploy a model server and request predictions from a client application.
 
 OpenVINO Model Server (OVMS) is a high-performance system for serving models. Implemented in C++ for scalability and optimized for deployment on Intel architectures, the model server uses the same architecture and API as TensorFlow Serving and KServe while applying OpenVINO for inference execution. Inference service is provided via gRPC or REST API, making deploying new algorithms and AI experiments easy.
 
