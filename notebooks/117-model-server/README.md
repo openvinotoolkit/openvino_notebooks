@@ -11,7 +11,6 @@ OpenVINO Model Server (OVMS) is a high-performance system for serving models. Im
 The notebook covers following steps:
 
 * Prepare Docker
-* Download the Model Server
 * Preparing a Model Repository
 * Start the Model Server Container
 * Prepare the Example Client Components
