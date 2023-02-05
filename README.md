@@ -95,6 +95,7 @@ More amazing notebooks here!
 | [115-async-api](notebooks/115-async-api/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F115-async-api%2F115-async-api.ipynb) | Use Asynchronous Execution to Improve Data Pipelining| |
 | [116-sparsity-optimization](notebooks/116-sparsity-optimization/)<br> | Improve performance of sparse Transformer models |
 | [117-model-server](notebooks/117-model-server/)| Introduction to model serving with OpenVINO™ Model Server (OVMS) |
+| [118-optimize-preprocessing](notebooks/118-optimize-preprocessing/)| Improve performance of image preprocessing step |
 
 </details>
 </p>
