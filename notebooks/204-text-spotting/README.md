@@ -1,6 +1,6 @@
 # Test Spotting - Detection & Recognition
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F203-meter-reader%2F204-text-spotting.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F204-text-spotting%2F204-text-spotting.ipynb)
 
 ![meter](./text-spotted.jpg)
 
