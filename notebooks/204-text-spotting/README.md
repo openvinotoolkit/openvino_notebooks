@@ -1,4 +1,4 @@
-# Test Spotting - Detection & Recognition
+# Text Spotting - Detection & Recognition
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F204-text-spotting%2F204-text-spotting.ipynb)
 
