@@ -94,7 +94,7 @@ More amazing notebooks here!
 | [114-quantization-simplified-mode](114-quantization-simplified-mode/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F114-quantization-simplified-mode%2F114-quantization-simplified-mode.ipynb) | Quantize Image Classification Models with POT in Simplified Mode|
 | [115-async-api](115-async-api/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F115-async-api%2F115-async-api.ipynb) | Use Asynchronous Execution to Improve Data Pipelining| |
 | [116-sparsity-optimization](116-sparsity-optimization/)<br> | Improve performance of sparse Transformer models |
-| [117-model-server](notebooks/117-model-server/)| Introduction to model serving with OpenVINO™ Model Server (OVMS) |
+| [117-model-server](117-model-server/)| Introduction to model serving with OpenVINO™ Model Server (OVMS) |
 </details>
 </p>
 
