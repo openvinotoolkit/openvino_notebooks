@@ -229,7 +229,6 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 ## 💻 运行Notebooks
 
 ### 启动单个Notebook
-### To Launch a Single Notebook
 
 如果你希望启动单个的notebook（如：Monodepth notebook），运行以下命令：
 
