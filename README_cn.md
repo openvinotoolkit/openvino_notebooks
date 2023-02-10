@@ -238,7 +238,6 @@ jupyter 201-vision-monodepth.ipynb
 ```
 
 ### 启动所有Notebooks
-### To Launch all Notebooks
 
 ```bash
 jupyter lab notebooks
