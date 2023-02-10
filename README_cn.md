@@ -9,34 +9,30 @@
 
 在这里，我们提供了一些可以运行的Jupyter* notebooks，用于学习和尝试使用OpenVINO™开发套件。这些notebooks旨在向各位开发者提供OpenVINO基础知识的介绍，并教会大家如何利用我们的API来优化深度学习推理。.
 
-**请注意：本仓库的主分支已经更新为支持OpenVINO 2022.3版本。** 如果想要升级到新版本，请在你的 `openvino_env` 虚拟环境中运行 `pip install --upgrade -r requirements.txt`. 如果你是第一次安装，请阅读下方的[安装指南](#-installation-guide)。如果你想要使用之前的OpenVINO长期支持版本(LTS)，请check out到 [2021.4 branch分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4)。
+**请注意：本仓库的主分支已经更新为支持OpenVINO 2022.3版本。** 如果想要升级到新版本，请在你的 `openvino_env` 虚拟环境中运行 `pip install --upgrade -r requirements.txt`. 如果你是第一次安装，请阅读下方的[安装指南](#-installation-guide)。如果你想要使用之前的OpenVINO长期支持版本(LTS)，请check out到 [2021.4 分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4)。
 
 如果你需要帮助，请创建一个GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions)。
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
+
 ## 目录
 
-* [➤ 📝 安装指南](#-installation-guide)
-	* [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows)
-	* [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu)
-	* [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS)
-	* [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
-	* [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS)
-	* [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML)
-	* [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker)
-* [➤ 🚀 开始](#-getting-started)
-	* [使用OpenVINO的第一步](#-first-steps)
-	* [转换 & 优化](#-convert--optimize)
-	* [模型演示](#-model-demos)
-	* [模型训练](#-model-training)
-	* [实时演示](#-live-demos)
-* [➤ ⚙️ 系统要求](#-system-requirements)
-* [➤ 💻 运行Notebooks](#-run-the-notebooks)
-* [➤ 🧹 清理](#-cleaning-up)
-* [➤ ⚠️ 故障排除](#-troubleshooting)
-* [➤ 🧑‍💻 贡献者](#-contributors)
-* [➤ ❓ 常见问题解答](#-faq)
+- [📝 安装指南](#-installation-guide)
+- [🚀 开始](#-getting-started)
+	- [💻 使用OpenVINO的第一步](#-first-steps)
+	- [⌚ 转换 & 优化](#-convert--optimize)
+	- [🎯 模型演示](#-model-demos)
+	- [🏃 模型训练](#-model-training)
+	- [📺 实时演示](#-live-demos)
+- [⚙️ 系统要求 ](#️-system-requirements)
+- [💻 运行Notebooks](#-run-the-notebooks)
+	- [启动单个Notebook](#to-launch-a-single-notebook)
+	- [启动所有Notebooks](#to-launch-all-notebooks)
+- [🧹 清理](#-cleaning-up)
+- [⚠️ 故障排除](#-troubleshooting)
+- [🧑‍💻 贡献者](#-contributors)
+- [❓ 常见问题解答](#-faq)
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='-installation-guide'/>
@@ -45,8 +41,8 @@
 
 OpenVINO Notebooks需要预装Python和Git， 针对不同操作系统的安装参考以下英语指南:
 
-| [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) | [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker) |
-| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) | [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker) | [Amazon SageMaker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/SageMaker)|
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |--------------------------------------------------------------------------- |
 	
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='-getting-started'/>
@@ -93,12 +89,13 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [106-auto-device](notebooks/106-auto-device/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F106-auto-device%2F106-auto-device.ipynb) | 演示如何使用AUTO设备 |
 | [107-speech-recognition-quantization](notebooks/107-speech-recognition-quantization/) | 优化及量化预训练Wav2Vec2语音模型 |
 | [110-ct-segmentation-quantize](notebooks/110-ct-segmentation-quantize/)<br> | 量化肾脏分割模型并展示实时推理 | 
-| [111-detection-quantization](notebooks/111-detection-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F111-detection-quantization%2F111-detection-quantization.ipynb) | 量化目标检测模型 | 
-| [112-pytorch-post-training-quantization-nncf](notebooks/112-pytorch-post-training-quantization-nncf/) | 利用神经网络压缩框架(NNCF)在后训练模式下来量化PyTorch模型(没有模型微调)| 
-| [113-image-classification-quantization](notebooks/113-image-classification-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F113-image-classification-quantization%2F113-image-classification-quantization.ipynb) | 量化mobilenet图片分类 | 
+| [111-detection-quantization](notebooks/111-detection-quantization/) | 量化目标检测模型 | 
+| [112-pytorch-post-training-quantization-nncf](notebooks/112-pytorch-post-training-quantization-nncf/) | 利用神经网络压缩框架(NNCF)在后训练模式下来量化PyTorch模型(无需模型微调)| 
+| [113-image-classification-quantization](notebooks/113-image-classification-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F113-image-classification-quantization%2F113-image-classification-quantization.ipynb) | 量化mobilenet图片分类模型 | 
 | [114-quantization-simplified-mode](notebooks/114-quantization-simplified-mode/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F114-quantization-simplified-mode%2F114-quantization-simplified-mode.ipynb) | 使用POT在简化模式下量化图片分类模型 |
 | [115-async-api](notebooks/115-async-api/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F115-async-api%2F115-async-api.ipynb) | 使用异步执行改进数据流水线 |
 | [116-sparsity-optimization](notebooks/116-sparsity-optimization/)| 提高稀疏Transformer模型的性能 |
+| [117-model-server](notebooks/117-model-server/)| OpenVINO模型服务（OVMS）介绍 |
 </details>
 </p>
 
@@ -108,10 +105,10 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 
 演示对特定模型的推理。
 	
-| [210-ct-scan-live-inference](notebooks/210-ct-scan-live-inference/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F210-ct-scan-live-inference%2F210-ct-scan-live-inference.ipynb) | [211-speech-to-text](notebooks/211-speech-to-text/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F211-speech-to-text%2F211-speech-to-text.ipynb) | [213-question-answering](notebooks/213-question-answering/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F213-question-answering%2F213-question-answering.ipynb) | [208-optical-character-recognition](notebooks/208-optical-character-recognition/)<br> |  [209-handwritten-ocr](notebooks/209-handwritten-ocr/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F209-handwritten-ocr%2F209-handwritten-ocr.ipynb) |  
+| [210-ct-scan-live-inference](notebooks/210-ct-scan-live-inference/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F210-ct-scan-live-inference%2F210-ct-scan-live-inference.ipynb) | [225-stable-diffusion-text-to-image](notebooks/225-stable-diffusion-text-to-image/)| [227-whisper-subtitles-generation](notebooks/227-whisper-subtitles-generation/)| [230-yolov8-optimization](notebooks/230-yolov8-optimization/) |  [231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)|  
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | 
-| 演示CT扫描数据的实时分割 | 对语音转文本识别模型推理 | 根据上下文回答问题 | 使用文本识别resnet对图像上的文本进行注释 | 手写体中文及日文OCR |
-|<img src="https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif" width=225>| <img src="https://user-images.githubusercontent.com/36741649/140987347-279de058-55d7-4772-b013-0f2b12deaa61.png" width=225> | <img src="https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif" width=225> | <img src="https://user-images.githubusercontent.com/36741649/129315292-a37266dc-dfb2-4749-bca5-2ac9c1e93d64.jpg" width=225> | <img width="425" alt="handwritten_simplified_chinese_test" src="https://user-images.githubusercontent.com/36741649/132660640-da2211ec-c389-450e-8980-32a75ed14abb.png"> <br> 的人不一了是他有为在责新中任自之我们 |
+| 演示CT扫描数据的实时分割 | 用Stable Diffusion由文本生成图像 | 通过OpenAI Whisper和OpenVINO进行字幕生成 | 使用NNCF PTQ API优化YOLOv8 | InstructPix2Pix图片编辑 |
+|<img src="https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif" width=180>| <img src=https://user-images.githubusercontent.com/29454499/216524089-ed671fc7-a78b-42bf-aa96-9f7c791a9419.png width=225>| <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225> | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> | <img src=https://user-images.githubusercontent.com/29454499/215699964-2ebb05ea-0c0a-4548-9fb3-e8a5ab26f5a5.png width=750> |
 	
 更多有趣的notebooks在这里！
 
@@ -126,18 +123,15 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [202-vision-superresolution-image](notebooks/202-vision-superresolution/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F202-vision-superresolution%2F202-vision-superresolution-image.ipynb) | 使用超分辨率模型放大原始图像 | <img src="https://user-images.githubusercontent.com/36741649/170005347-e4409f9e-ec34-416b-afdf-a9d8185929ca.jpg" width="70">→<img src="https://user-images.githubusercontent.com/36741649/170005347-e4409f9e-ec34-416b-afdf-a9d8185929ca.jpg" width="130"> |
 | [202-vision-superresolution-video](notebooks/202-vision-superresolution/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F202-vision-superresolution%2F202-vision-superresolution-video.ipynb) | 使用超分辨率模型将360p视频转换为1080p视频 | <img src="https://user-images.githubusercontent.com/15709723/127269258-a8e2c03e-731e-4317-b5b2-ed2ee767ff5e.gif" width=80>→<img src="https://user-images.githubusercontent.com/15709723/127269258-a8e2c03e-731e-4317-b5b2-ed2ee767ff5e.gif" width="125"> |
 | [203-meter-reader](notebooks/203-meter-reader/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F203-meter-reader%2F203-meter-reader.ipynb) | PaddlePaddle预训练模型读取工业表计数据 | <img src="https://user-images.githubusercontent.com/91237924/166135627-194405b0-6c25-4fd8-9ad1-83fb3a00a081.jpg" width=225> |
-| [204-named-entity-recognition](notebooks/204-named-entity-recognition/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F204-named-entity-recognition%2F204-named-entity-recognition.ipynb) | 简单文本的命名实体识别 | <img src="https://user-images.githubusercontent.com/33627846/169470030-0370963e-6ad8-49e3-be7a-f02a2c677733.gif" width="225"> |
 | [205-vision-background-removal](notebooks/205-vision-background-removal/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F205-vision-background-removal%2F205-vision-background-removal.ipynb) | 使用显著目标检测移除并替换图像中的背景 | <img src="https://user-images.githubusercontent.com/15709723/125184237-f4b6cd00-e1d0-11eb-8e3b-d92c9a728372.png" width=455> |
 | [206-vision-paddlegan-anime](notebooks/206-vision-paddlegan-anime/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F206-vision-paddlegan-anime%2F206-vision-paddlegan-anime.ipynb) | 使用GAN把图片变为动画效果 | <img src="https://user-images.githubusercontent.com/15709723/127788059-1f069ae1-8705-4972-b50e-6314a6f36632.jpeg" width=100>→<img src="https://user-images.githubusercontent.com/15709723/125184441-b4584e80-e1d2-11eb-8964-d8131cd97409.png" width=100> |
-| [207-vision-paddlegan-superresolution](notebooks/207-vision-paddlegan-superresolution/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F207-vision-paddlegan-superresolution%2F207-vision-paddlegan-superresolution.ipynb) | 使用PaddleGAN模型以超分辨率放大小图像 |
+| [207-vision-paddlegan-superresolution](notebooks/207-vision-paddlegan-superresolution/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F207-vision-paddlegan-superresolution%2F207-vision-paddlegan-superresolution.ipynb) | 使用PaddleGAN模型以超分辨率放大小图像| |
 | [208-optical-character-recognition](notebooks/208-optical-character-recognition/)<br> | 使用文本识别resnet对图像上的文本进行注释 | <img src="https://user-images.githubusercontent.com/36741649/129315292-a37266dc-dfb2-4749-bca5-2ac9c1e93d64.jpg" width=225> |
 | [209-handwritten-ocr](notebooks/209-handwritten-ocr/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F209-handwritten-ocr%2F209-handwritten-ocr.ipynb) | 手写体中文及日文OCR | <img width="425" alt="handwritten_simplified_chinese_test" src="https://user-images.githubusercontent.com/36741649/132660640-da2211ec-c389-450e-8980-32a75ed14abb.png"> <br> 的人不一了是他有为在责新中任自之我们 |
 | [210-ct-scan-live-inference](notebooks/210-ct-scan-live-inference/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F210-ct-scan-live-inference%2F210-ct-scan-live-inference.ipynb) | 演示CT扫描数据的实时分割 | <img src="https://user-images.githubusercontent.com/77325899/154280563-0e94f972-2d1a-44f9-a894-1b61699d1781.gif" width=225> |
 | [211-speech-to-text](notebooks/211-speech-to-text/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F211-speech-to-text%2F211-speech-to-text.ipynb) | 运行语音转文本模型的推理 | <img src="https://user-images.githubusercontent.com/36741649/140987347-279de058-55d7-4772-b013-0f2b12deaa61.png" width=225>|
-| [212-onnx-style-transfer](notebooks/212-onnx-style-transfer/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F212-onnx-style-transfer%2F212-onnx-style-transfer.ipynb) | 使用神经风格转换将图像转换为五种不同风格 | <img src="https://user-images.githubusercontent.com/77325899/147358090-ff5b21f5-0efb-4aff-8444-9d07add49b92.png" width=100>→<img src="https://user-images.githubusercontent.com/77325899/147358009-0cf10d51-3150-40cb-a776-074558b98da5.png" width=100>|
 | [213-question-answering](notebooks/213-question-answering/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F213-question-answering%2F213-question-answering.ipynb) | 根据上下文回答问题 | <img src="https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif" width=225> |
-| [214-vision-paddle-classification](notebooks/214-vision-paddle-classification/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F214-vision-paddle-classification%2F214-vision-paddle-classification.ipynb) | 利用OpenVINO进行PaddlePaddle图像分类| |
-| [215-image-inpainting](notebooks/215-image-inpainting/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F215-image-inpainting%2F215-image-inpainting.ipynb) | 用绘画中的图像填充缺失像素 | <img src="https://user-images.githubusercontent.com/4547501/167121084-ec58fbdb-b269-4de2-9d4c-253c5b95de1e.png" width=225> |
+| [215-image-inpainting](notebooks/215-image-inpainting/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F215-image-inpainting%2F215-image-inpainting.ipynb)| 用绘画中的图像填充缺失像素 | <img src="https://user-images.githubusercontent.com/4547501/167121084-ec58fbdb-b269-4de2-9d4c-253c5b95de1e.png" width=225> |
 | [216-license-plate-recognition](notebooks/216-license-plate-recognition/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F216-license-plate-recognition%2F216-license-plate-recognition.ipynb) | 在交通中识别中国车牌 | <img src="https://user-images.githubusercontent.com/70456146/162759539-4a0a996f-dabe-40ea-98d6-85b4dce8511d.png" width=225> |
 | [217-vision-deblur](notebooks/217-vision-deblur/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/217-vision-deblur?labpath=notebooks%2F217-vision-deblur%2F217-vision-deblur.ipynb)| 使用DeblurGAN-v2去除图像模糊 | <img src="https://user-images.githubusercontent.com/41332813/158430181-05d07f42-cdb8-4b7a-b7dc-e7f7d9391877.png" width=225> |
 | [218-vehicle-detection-and-recognition](notebooks/218-vehicle-detection-and-recognition/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F218-vehicle-detection-and-recognition%2F218-vehicle-detection-and-recognition.ipynb) | 利用OpenVINO及预训练模型检测和识别车辆及其属性 | <img src = "https://user-images.githubusercontent.com/47499836/163544861-fa2ad64b-77df-4c16-b065-79183e8ed964.png" width=225> |
@@ -145,9 +139,15 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [220-yolov5-accuracy-check-and-quantization](notebooks/220-yolov5-accuracy-check-and-quantization)<br> | 使用OpenVINO POT API量化Ultralytics YOLOv5模型并检查准确性 | <img src = "https://user-images.githubusercontent.com/44352144/177097174-cfe78939-e946-445e-9fce-d8897417ef8e.png"  width=225> |
 | [221-machine-translation](notebooks/221-machine-translation)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F221-machine-translation%2F221-machine-translation.ipynb) | 从英语到德语的实时翻译 |  |
 | [222-vision-image-colorization](notebooks/222-vision-image-colorization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F222-vision-image-colorization%2F222-vision-image-colorization.ipynb) | 使用OpenVINO及预训练模型对黑白图像染色 | <img src = "https://user-images.githubusercontent.com/18904157/166343139-c6568e50-b856-4066-baef-5cdbd4e8bc18.png" width=225> |
-| [223-gpt2-text-prediction](notebooks/223-gpt2-text-prediction/)<br> | 使用GPT-2对输入序列执行文本预测 | <img src=https://user-images.githubusercontent.com/91228207/185105225-0f996b0b-0a3b-4486-872d-364ac6fab68b.png  width=225> |
-
-
+| [223-gpt2-text-prediction](notebooks/223-gpt2-text-prediction/)<br> |  使用GPT-2对输入序列执行文本预测 | <img src=https://user-images.githubusercontent.com/91228207/185105225-0f996b0b-0a3b-4486-872d-364ac6fab68b.png  width=225> |
+| [224-3D-segmentation-point-clouds](notebooks/224-3D-segmentation-point-clouds/)<br> |使用OpenVINO处理点云数据并进行3D分割 | <img src = "https://user-images.githubusercontent.com/91237924/185752178-3882902c-907b-4614-b0e6-ea1de08bf3ef.png" width=225> |
+| [225-stable-diffusion-text-to-image](notebooks/225-stable-diffusion-text-to-image)<br> | 用Stable Diffusion由文本生成图像 | <img src=https://user-images.githubusercontent.com/29454499/216524089-ed671fc7-a78b-42bf-aa96-9f7c791a9419.png width=225>|
+| [226-yolov7-optimization](notebooks/226-yolov7-optimization/)<br> | 使用NNCF PTQ API优化YOLOv7 | <img src=https://raw.githubusercontent.com/WongKinYiu/yolov7/main/figure/horses_prediction.jpg  width=225> |
+| [227-whisper-subtitles-generation](notebooks/227-whisper-subtitles-generation/)<br> | 利用OpenAI Whisper及OpenVINO为视频生成字幕 | <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225> |
+| [228-clip-zero-shot-image-classification](notebooks/228-clip-zero-shot-image-classification)<br> | 利用CLIP及OpenVINO进行零样本图像分类 | <img src=https://user-images.githubusercontent.com/29454499/207795060-437b42f9-e801-4332-a91f-cc26471e5ba2.png  width=500> |
+| [229-distilbert-sequence-classification](notebooks/229-distilbert-sequence-classification/)<br> | 利用OpenVINO进行句子分类 | <img src = "https://user-images.githubusercontent.com/95271966/206130638-d9847414-357a-4c79-9ca7-76f4ae5a6d7f.png" width=225> |
+| [230-yolov8-optimization](notebooks/230-yolov8-optimization/)<br> |使用NNCF PTQ API优化YOLOv8 | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> |
+|[231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)<br>| 利用InstructPix2Pix进行图像编辑 | <img src=https://user-images.githubusercontent.com/29454499/215699964-2ebb05ea-0c0a-4548-9fb3-e8a5ab26f5a5.png width=225> |
 </details>
 </p>
 
@@ -168,12 +168,31 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 ### 📺 实时演示
 在网络摄像头或视频文件上运行的实时推理演示。
 	
-| [401-object-detection-webcam](notebooks/401-object-detection-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F401-object-detection-webcam%2F401-object-detection.ipynb) | [402-pose-estimation-webcam](notebooks/402-pose-estimation-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F402-pose-estimation-webcam%2F402-pose-estimation.ipynb) | [403-action-recognition-webcam](notebooks/403-action-recognition-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb) | [405-paddle-ocr-webcam](notebooks/405-paddle-ocr-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F405-paddle-ocr-webcam%2F405-paddle-ocr-webcam.ipynb) | [406-3D-pose-estimation-webcam](notebooks/406-3D-pose-estimation-webcam/)<br> [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks.git/main?labpath=notebooks%2F406-3D-pose-estimation-webcam%2F406-3D-pose-estimation.ipynb) |
-| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | 
-| 使用网络摄像头或视频文件进行目标检测 | 使用网络摄像头或视频文件进行人体姿态检测 |  使用网络摄像头或视频文件进行动作识别 | 使用网络摄像头或视频文件进行OCR | 使用网络摄像头或视频文件进行三维人体姿态估计 |
-| <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225> |  <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=225> |  <img src="https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleocr.gif" width=225> | <img src = "https://user-images.githubusercontent.com/42672437/183292131-576cc05a-a724-472c-8dc9-f6bc092190bf.gif" width=225> |
+| [401-object-detection-webcam](notebooks/401-object-detection-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F401-object-detection-webcam%2F401-object-detection.ipynb) | [403-action-recognition-webcam](notebooks/403-action-recognition-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb) | [404-style-transfer-webcam](notebooks/404-style-transfer-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F404-style-transfer-webcam%2F404-style-transfer.ipynb) | [405-paddle-ocr-webcam](notebooks/405-paddle-ocr-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F405-paddle-ocr-webcam%2F405-paddle-ocr-webcam.ipynb) |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+|使用网络摄像头或视频文件进行目标检测  |  使用网络摄像头或视频文件进行动作识别 | 使用网络摄像头或视频文件进行样式变换| 使用网络摄像头或视频文件进行OCR |
+| <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=150> | <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=200> | <img src="https://user-images.githubusercontent.com/109281183/203772234-f17a0875-b068-43ef-9e77-403462fde1f5.gif" width=300> | <img src="https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleocr.gif" width=230> |
+
+更多有趣的notebooks在这里! 
+
+<p>
+<details>
+<summary> 点击这里查看完整列表! </summary>
+	
+	
+| Notebook | Description | Preview |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [401-object-detection-webcam](notebooks/401-object-detection-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F401-object-detection-webcam%2F401-object-detection.ipynb) | 使用网络摄像头或视频文件进行目标检测  | <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> |
+| [402-pose-estimation-webcam](notebooks/402-pose-estimation-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F402-pose-estimation-webcam%2F402-pose-estimation.ipynb) | 使用网络摄像头或视频文件进行人体姿态估计 | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225> |
+| [403-action-recognition-webcam](notebooks/403-action-recognition-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb) | 使用网络摄像头或视频文件进行动作识别 | <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=225> |
+| [404-style-transfer-webcam](notebooks/404-style-transfer-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F404-style-transfer-webcam%2F404-style-transfer.ipynb) | 使用网络摄像头或视频文件进行样式变换 | <img src="https://user-images.githubusercontent.com/109281183/203772234-f17a0875-b068-43ef-9e77-403462fde1f5.gif" width=250> |
+| [405-paddle-ocr-webcam](notebooks/405-paddle-ocr-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F405-paddle-ocr-webcam%2F405-paddle-ocr-webcam.ipynb) | 使用网络摄像头或视频文件进行OCR | <img src="https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleocr.gif" width=225> |
+| [406-3D-pose-estimation-webcam](notebooks/406-3D-pose-estimation-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks.git/main?labpath=notebooks%2F406-3D-pose-estimation-webcam%2F406-3D-pose-estimation.ipynb) | 使用网络摄像头或视频文件进行3D人体姿态估计 | <img src = "https://user-images.githubusercontent.com/42672437/183292131-576cc05a-a724-472c-8dc9-f6bc092190bf.gif" width=225> |
+| [407-person-tracking-webcam](notebooks/407-person-tracking-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F407-person-tracking-webcam%2F407-person-tracking.ipynb) | 使用网络摄像头或视频文件进行人体跟踪 | <img src = "https://user-images.githubusercontent.com/91237924/210479548-b70dbbaa-5948-4e49-b48e-6cb6613226da.gif" width=225> |
 
 
+</details>
+</p>
 
 如果你遇到了问题，请查看[故障排除](#-troubleshooting), [常见问题解答](#-faq) 或者创建一个GitHub [discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions)。
 
@@ -190,10 +209,11 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 <div id='-system-requirements'/>
 
 ## ⚙️ 系统要求
+## ⚙️ System Requirements
 
-Notebooks几乎可以在任何地方运行&mdash；您的笔记本电脑、云虚拟机，甚至是Docker容器。下表列出了支持的操作系统和Python版本。
+这些notebooks可以运行在任何地方，包括你的笔记本电脑，云VM，或者一个Docker容器。下表列出了所支持的操作系统和Python版本。
 
-| 支持的操作系统                                              | [Python 版本 (64-bit)](https://www.python.org/) |
+| 支持的操作系统                                              | [Python Version (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- | :------------------------------------------------- |
 | Ubuntu 20.04 LTS, 64-bit                                   | 3.7, 3.8, 3.9, 3.10                                |
 | Ubuntu 22.04 LTS, 64-bit                                   | 3.7, 3.8, 3.9, 3.10                                |
@@ -202,6 +222,7 @@ Notebooks几乎可以在任何地方运行&mdash；您的笔记本电脑、云�
 | macOS 10.15.x versions or higher                           | 3.7, 3.8, 3.9, 3.10                                |
 | Windows 10, 64-bit Pro, Enterprise or Education editions   | 3.7, 3.8, 3.9, 3.10                                |
 | Windows Server 2016 or higher                              | 3.7, 3.8, 3.9, 3.10                                |
+
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)
 <div id='-run-the-notebooks'/>
