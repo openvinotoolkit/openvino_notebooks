@@ -95,6 +95,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [114-quantization-simplified-mode](notebooks/114-quantization-simplified-mode/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F114-quantization-simplified-mode%2F114-quantization-simplified-mode.ipynb) | 使用POT在简化模式下量化图片分类模型 |
 | [115-async-api](notebooks/115-async-api/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F115-async-api%2F115-async-api.ipynb) | 使用异步执行改进数据流水线 |
 | [116-sparsity-optimization](notebooks/116-sparsity-optimization/)| 提高稀疏Transformer模型的性能 |
+| [117-model-server](notebooks/117-model-server/)| OpenVINO模型服务（OVMS）介绍 |
 </details>
 </p>
 
