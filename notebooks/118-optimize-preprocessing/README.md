@@ -8,7 +8,8 @@ This tutorial demonstrates how the image could be transform to the data format e
 The tutorial consists of the following steps:
 
 * Downloading the model
-* Setup preprocessing, loading the model and inference with original image
+* Setup preprocessing with ModelOptimizer, loading the model and inference with original image
+* Setup preprocessing with Preprocessing API, loading the model and inference with original image
 * Fitting image to the model input type and inference with prepared image
 * Comparing results on one picture
-* Comparing performance of the inference with and without using of preprocessing API
+* Comparing performance
