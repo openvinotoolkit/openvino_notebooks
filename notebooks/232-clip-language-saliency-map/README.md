@@ -9,6 +9,6 @@ The notebook will cover the following topics:
 
 ## Saliency Map
 
-A saliency map is a visualization technique that highlights regions of interest in an image. For example, it can be used to [explain image classification predictions](https://academic.oup.com/mnras/article/511/4/5032/6529251#389668570) for a particular label. Here is an example of a saliency map that we will get in this notebook:
+A saliency map is a visualization technique that highlights regions of interest in an image. For example, it can be used to [explain image classification predictions](https://arxiv.org/abs/2110.08288) for a particular label. Here is an example of a saliency map that we will get in this notebook:
 
-![](saliency_map_clip.JPG)
+![](https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG)
