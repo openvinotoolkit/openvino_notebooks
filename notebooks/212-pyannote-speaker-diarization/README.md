@@ -1,4 +1,4 @@
-# Spekaer Diarization with OpenVINO™
+# Speaker Diarization with OpenVINO™
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F212-pyannote-speaker-diarization%2F212-pyannote-speaker-diarization.ipynb)
 
