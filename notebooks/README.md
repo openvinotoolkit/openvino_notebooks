@@ -96,6 +96,7 @@ More amazing notebooks here!
 | [115-async-api](115-async-api/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F115-async-api%2F115-async-api.ipynb) | Use Asynchronous Execution to Improve Data Pipelining| |
 | [116-sparsity-optimization](116-sparsity-optimization/)<br> | Improve performance of sparse Transformer models |
 | [117-model-server](117-model-server/)| Introduction to model serving with OpenVINO™ Model Server (OVMS) |
+| [118-optimize-preprocessing](118-optimize-preprocessing/)| Improve performance of image preprocessing step |
 </details>
 </p>
 
@@ -148,6 +149,7 @@ More amazing notebooks here!
 | [229-distilbert-sequence-classification](229-distilbert-sequence-classification/)<br> | Sequence Classification with OpenVINO | <img src = "https://user-images.githubusercontent.com/95271966/206130638-d9847414-357a-4c79-9ca7-76f4ae5a6d7f.png" width=225> |
 | [230-yolov8-optimization](230-yolov8-optimization/)<br> | Optimize YOLOv8 using NNCF PTQ API | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> |
 |[231-instruct-pix2pix-image-editing](231-instruct-pix2pix-image-editing/)<br>| Image editing with InstructPix2Pix | <img src=https://user-images.githubusercontent.com/29454499/215699964-2ebb05ea-0c0a-4548-9fb3-e8a5ab26f5a5.png width=225> |
+|[232-clip-language-saliency-map](232-clip-language-saliency-map/)<br>| Language-Visual Saliency with CLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG width=225> | 
 
 
 </details>
