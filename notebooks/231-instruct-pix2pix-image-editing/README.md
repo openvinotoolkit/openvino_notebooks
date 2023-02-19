@@ -13,7 +13,7 @@ Step-by-step the diffusion process will iteratively denoise the latent image rep
 
 The following image shows an example of the input image with text-based prompt and the corresponding edited image.
 
-![image](https://user-images.githubusercontent.com/29454499/214905933-eda1b88d-ccc5-45a1-bc12-bb5e382811fb.png)
+![image](https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png)
 
 ## Notebook Contents
 
