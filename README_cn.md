@@ -18,21 +18,23 @@
 
 ## 目录
 
-- [📝 安装指南](#-installation-guide)
-- [🚀 开始](#-getting-started)
-	- [💻 使用OpenVINO的第一步](#-first-steps)
-	- [⌚ 转换 & 优化](#-convert--optimize)
-	- [🎯 模型演示](#-model-demos)
-	- [🏃 模型训练](#-model-training)
-	- [📺 实时演示](#-live-demos)
-- [⚙️ 系统要求 ](#️-system-requirements)
-- [💻 运行Notebooks](#-run-the-notebooks)
-	- [启动单个Notebook](#to-launch-a-single-notebook)
-	- [启动所有Notebooks](#to-launch-all-notebooks)
-- [🧹 清理](#-cleaning-up)
-- [⚠️ 故障排除](#-troubleshooting)
-- [🧑‍💻 贡献者](#-contributors)
-- [❓ 常见问题解答](#-faq)
+- [目录](#目录)
+- [📝 安装指南](#-安装指南)
+- [🚀 开始](#-开始)
+	- [💻 第一步](#-第一步)
+	- [⌚ 转换 \& 优化](#-转换--优化)
+	- [🎯 模型演示](#-模型演示)
+	- [🏃 模型训练](#-模型训练)
+	- [📺 实时演示](#-实时演示)
+- [⚙️ 系统要求](#️-系统要求)
+- [⚙️ System Requirements](#️-system-requirements)
+- [💻 运行Notebooks](#-运行notebooks)
+	- [启动单个Notebook](#启动单个notebook)
+	- [启动所有Notebooks](#启动所有notebooks)
+- [🧹 清理](#-清理)
+- [⚠️ 故障排除](#️-故障排除)
+- [🧑‍💻 贡献者](#-贡献者)
+- [❓ 常见问题解答](#-常见问题解答)
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='-installation-guide'/>
@@ -108,7 +110,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [210-ct-scan-live-inference](notebooks/210-ct-scan-live-inference/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F210-ct-scan-live-inference%2F210-ct-scan-live-inference.ipynb) | [225-stable-diffusion-text-to-image](notebooks/225-stable-diffusion-text-to-image/)| [227-whisper-subtitles-generation](notebooks/227-whisper-subtitles-generation/)| [230-yolov8-optimization](notebooks/230-yolov8-optimization/) |  [231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)|  
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | 
 | 演示CT扫描数据的实时分割 | 用Stable Diffusion由文本生成图像 | 通过OpenAI Whisper和OpenVINO进行字幕生成 | 使用NNCF PTQ API优化YOLOv8 | InstructPix2Pix图片编辑 |
-|<img src="https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif" width=180>| <img src=https://user-images.githubusercontent.com/29454499/216524089-ed671fc7-a78b-42bf-aa96-9f7c791a9419.png width=225>| <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225> | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> | <img src=https://user-images.githubusercontent.com/29454499/215699964-2ebb05ea-0c0a-4548-9fb3-e8a5ab26f5a5.png width=750> |
+|<img src="https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif" width=180>| <img src=https://user-images.githubusercontent.com/29454499/216524089-ed671fc7-a78b-42bf-aa96-9f7c791a9419.png width=225>| <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225> | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=750> |
 	
 更多有趣的notebooks在这里！
 
@@ -147,7 +149,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [228-clip-zero-shot-image-classification](notebooks/228-clip-zero-shot-image-classification)<br> | 利用CLIP及OpenVINO进行零样本图像分类 | <img src=https://user-images.githubusercontent.com/29454499/207795060-437b42f9-e801-4332-a91f-cc26471e5ba2.png  width=500> |
 | [229-distilbert-sequence-classification](notebooks/229-distilbert-sequence-classification/)<br> | 利用OpenVINO进行句子分类 | <img src = "https://user-images.githubusercontent.com/95271966/206130638-d9847414-357a-4c79-9ca7-76f4ae5a6d7f.png" width=225> |
 | [230-yolov8-optimization](notebooks/230-yolov8-optimization/)<br> |使用NNCF PTQ API优化YOLOv8 | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> |
-|[231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)<br>| 利用InstructPix2Pix进行图像编辑 | <img src=https://user-images.githubusercontent.com/29454499/215699964-2ebb05ea-0c0a-4548-9fb3-e8a5ab26f5a5.png width=225> |
+|[231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)<br>| 利用InstructPix2Pix进行图像编辑 | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=225> |
 </details>
 </p>
 
