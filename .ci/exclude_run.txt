@@ -1,0 +1,7 @@
+notebooks/110-ct-segmentation-quantize/data-preparation-ct-scan.ipynb
+notebooks/110-ct-segmentation-quantize/pytorch-monai-training.ipynb
+notebooks/113-image-classification-quantization/113-image-classification-quantization.ipynb
+notebooks/225-stable-diffusion-text-to-image/225-stable-diffusion-text-to-image.ipynb
+notebooks/231-instruct-pix2pix-image-editing/231-instruct-pix2pix-image-editing.ipynb
+notebooks/404-style-transfer-webcam/404-style-transfer.ipynb
+notebooks/230-yolov8-optimization/230-yolov8-optimization.ipynb
