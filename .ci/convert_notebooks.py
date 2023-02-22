@@ -8,6 +8,7 @@ import shutil
 def arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--exclude_execution_file")
+    parser.add_argument("--exclude_conversion_file")
     parser.add_argument("--timeout", type=float, default=3600,
                         help="timeout for notebook execution")
     parser.add_argument("--rst_dir", type=Path,
@@ -20,7 +21,7 @@ def arguments():
     return parser.parse_args()
 
 
-def prepare_ignore_execution_list(input_file):
+def prepare_ignore_list(input_file):
     with Path(input_file).open("r") as f:
         lines = f.readlines()
     return list(map(str.strip, lines))
@@ -28,19 +29,23 @@ def prepare_ignore_execution_list(input_file):
 
 def main():
     args = arguments()
+    ignore_conversion_list = []
     ignore_execution_list = []
     failed_notebooks = []
     markdown_failed = []
     rst_failed = []
     html_failed = []
+    if args.exclude_conversion_file is not None:
+        ignore_conversion_list = prepare_ignore_list(args.exclude_conversion_file)
     if args.exclude_execution_file is not None:
-        ignore_execution_list = prepare_ignore_execution_list(
-            args.exclude_execution_file)
+        ignore_execution_list = prepare_ignore_list(args.exclude_execution_file)
     ROOT = Path(__file__).parents[1]
     notebooks_dir = ROOT / "notebooks"
     notebooks = sorted(list(notebooks_dir.rglob('**/*.ipynb')))
     for notebook in notebooks:
         notebook_path = notebook.relative_to(ROOT)
+        if str(notebook_path) in ignore_conversion_list:
+            continue
         notebook_executed = notebook_path.parent / notebook_path.name.replace(".ipynb", "-with-output.ipynb")
         start = time.perf_counter()
         print(f"Convert {notebook_path}")

@@ -19,7 +19,7 @@ keywordspath=$(git ls-files "*keywords.json")
 python $taggerpath $notebookspath $keywordspath> $tagslist
 
 echo "start converting notebooks"
-python $PWD"/.ci/convert_notebooks.py" --rst_dir $rstdir --markdown_dir $markdowndir --html_dir $htmldir --exclude_execution_file $PWD"/.ci/ignore_convert_execution.txt"
+python $PWD"/.ci/convert_notebooks.py" --rst_dir $rstdir --markdown_dir $markdowndir --html_dir $htmldir --exclude_execution_file $PWD"/.ci/ignore_convert_execution.txt" --exclude_conversion_file $PWD"/.ci/ignore_convert_full.txt"
 
 # Remove download links to local files. They only work after executing the notebook
 # Replace relative links to other notebooks with relative links to documentation HTML pages
