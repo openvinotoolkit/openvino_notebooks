@@ -1,6 +1,7 @@
 # Execute notebooks and convert them to Markdown and HTML
 # Output from notebook cells with tag "hide_output" will be hidden in converted notebooks
 
+ignore_list=$*
 rstdir=$PWD"/rst_files"
 binderlist=$rstdir"/notebooks_with_buttons.txt"
 tagslist=$rstdir"/notebooks_tags.json"
@@ -17,14 +18,8 @@ notebookspath=$(git ls-files "*.ipynb"| head -n 1)
 keywordspath=$(git ls-files "*keywords.json")
 python $taggerpath $notebookspath $keywordspath> $tagslist
 
-git ls-files "*.ipynb" | while read notebook; do
-    executed_notebook=${notebook/.ipynb/-with-output.ipynb}
-    echo $executed_notebook
-    jupyter nbconvert --log-level=INFO --execute --to notebook --output $executed_notebook --output-dir . --ExecutePreprocessor.kernel_name="python3" $notebook
-    jupyter nbconvert --to markdown $executed_notebook --output-dir $markdowndir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
-    jupyter nbconvert --to html $executed_notebook --output-dir $htmldir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
-    jupyter nbconvert --to rst $executed_notebook --output-dir $rstdir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
-done
+echo "start converting notebooks"
+python $PWD"/.ci/convert_notebooks.py" --rst_dir $rstdir --markdown_dir $markdowndir --html_dir $htmldir --exclude_execution_file $PWD"/.ci/ignore_convert_execution.txt" --exclude_conversion_file $PWD"/.ci/ignore_convert_full.txt"
 
 # Remove download links to local files. They only work after executing the notebook
 # Replace relative links to other notebooks with relative links to documentation HTML pages

@@ -1,6 +1,7 @@
 # openvino and its dependencies
 openvino-dev==2022.3.0
 openvino-telemetry==2022.3.0
+nncf==2.4.0
 
 
 # deep learning frameworks
@@ -20,11 +21,11 @@ torchmetrics>=0.11.0
 pytorch-lightning
 
 paddlepaddle>=2.4.0
-paddle2onnx>=0.6,<=0.9.6
+paddle2onnx>=0.6
 paddlenlp>=2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
 
 transformers>=4.21.1
-monai>=0.9.1
+monai>=0.9.1,<1.0.0
 
 
 # jupyter
