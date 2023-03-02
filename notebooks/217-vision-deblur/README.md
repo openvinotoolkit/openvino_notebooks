@@ -1,5 +1,6 @@
 # Deblur Images with DeblurGAN-v2 and OpenVINO™
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ThanosM97/openvino_notebooks/217-vision-deblur?labpath=notebooks%2F217-vision-deblur%2F217-vision-deblur.ipynb)
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F217-vision-deblur%2F217-vision-deblur.ipynb)
 
 Deblurring is the task of removing motion blurs that usually occur in photos shot with hand-held cameras, when there are moving objects in the scene. Blurs not only reduce the human perception about the quality of the image, but also complicate computer vision analyses.
 
