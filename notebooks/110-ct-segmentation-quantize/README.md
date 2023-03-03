@@ -6,7 +6,7 @@
 
 This folder contains four notebooks that show how to train,
 optimize, quantize and show live inference on a [MONAI](https://monai.io/) segmentation model with
-[PyTorch Lightning](https://pytorchlightning.ai/) and OpenVINO:
+[PyTorch Lightning](https://lightning.ai/) and OpenVINO:
 
 1\. [Data Preparation for 2D Segmentation of 3D Medical Data](data-preparation-ct-scan.ipynb)
 

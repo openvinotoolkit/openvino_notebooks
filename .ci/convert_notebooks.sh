@@ -19,18 +19,7 @@ keywordspath=$(git ls-files "*keywords.json")
 python $taggerpath $notebookspath $keywordspath> $tagslist
 
 echo "start converting notebooks"
-echo $(date +"%T")
-git ls-files "*.ipynb" | while read notebook; do
-    executed_notebook=${notebook/.ipynb/-with-output.ipynb}
-    if ! echo "$ignore_list" | grep -w -q "$executed_notebook"; then
-        echo $executed_notebook
-        echo $(date +"%T")
-        jupyter nbconvert --log-level=INFO --execute --to notebook --output $executed_notebook --output-dir . --ExecutePreprocessor.kernel_name="python3" $notebook
-        jupyter nbconvert --to markdown $executed_notebook --output-dir $markdowndir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
-        jupyter nbconvert --to html $executed_notebook --output-dir $htmldir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
-        jupyter nbconvert --to rst $executed_notebook --output-dir $rstdir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
-    fi
-done
+python $PWD"/.ci/convert_notebooks.py" --rst_dir $rstdir --markdown_dir $markdowndir --html_dir $htmldir --exclude_execution_file $PWD"/.ci/ignore_convert_execution.txt" --exclude_conversion_file $PWD"/.ci/ignore_convert_full.txt"
 
 # Remove download links to local files. They only work after executing the notebook
 # Replace relative links to other notebooks with relative links to documentation HTML pages
