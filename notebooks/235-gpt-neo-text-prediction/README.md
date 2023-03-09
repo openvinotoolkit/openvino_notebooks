@@ -10,7 +10,7 @@ This is a demonstration in which the user can type the beginning of the text and
 
 The following image show an example of the input sequence and corresponding predicted sequence.
 
-![image](https://user-images.githubusercontent.com/91228207/185103977-54b1671a-f02c-4f4b-9722-5c4e8b119fc7.png)
+![image](https://user-images.githubusercontent.com/95569637/223999855-32c15531-0f41-42ee-a318-0f5b5ebd687e.png)
 ## Notebook Contents
 
 This notebook demonstrates text prediction with OpenVINO using the [gpt-neo](https://huggingface.co/EleutherAI/gpt-neo-125M) model from HuggingFace Transformers.
