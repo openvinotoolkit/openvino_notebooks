@@ -69,7 +69,7 @@ jobs:
           notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
           # 208 omz cache location is set to this with test_replace
           notebooks/208-optical-character-recognition/open_model_zoo_cache
-          notebooks/210-ct-scan-live-inference/kits19_frames_1
+          notebooks/110-ct-scan-live-inference/kits19_frames_1
           notebooks/212-onnx-style-transfer/model
           notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
         key: ${{ env.FILES_CACHE_KEY }}
