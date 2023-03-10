@@ -8,10 +8,10 @@ with OpenVINO.
 </div>
 
 Semantic segmentation is a difficult computer vision problem with many applications. 
-Its goal is to assign labels to each pixel according to object it belongs to, creating so-called segmentation masks.
-To properly assign this label, the model needs to consider local as well as global context of image.
+Its goal is to assign labels to each pixel according to the object it belongs to, creating so-called segmentation masks.
+To properly assign this label, the model needs to consider the local as well as global context of the image.
 This is where transformers offer their advantage as they work well in capturing global context.
-Segmenter is based on Vision Transformer working as encoder, and Mask Transformer working as decoder.
+Segmenter is based on Vision Transformer working as an encoder, and Mask Transformer working as a decoder.
 With this configuration, it achieves good results on different datasets such as ADE20K, Pascal Context and Cityscapes.
 
 <div style="text-align:center">
@@ -31,7 +31,6 @@ The tutorial consists of the following steps:
 * Converting PyTorch model to ONNX
 * Converting ONNX to OpenVINO IR
 * Validating inference of converted model
-* Validating converted model on a subset of ADE20K
 
 
 ## Installation Instructions
