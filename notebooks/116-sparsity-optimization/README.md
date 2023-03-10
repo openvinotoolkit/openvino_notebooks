@@ -10,3 +10,7 @@ The tutorial consists of the following steps:
 
 - Download and quantize sparse BERT model from the public using OpenVINO integration with Hugging Face Optimum.
 - Compare sparse 8-bit vs. dense 8-bit inference performance.
+
+## Installation Instructions
+
+If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).

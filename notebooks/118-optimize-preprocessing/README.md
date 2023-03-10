@@ -13,3 +13,7 @@ The tutorial consists of the following steps:
 * Fitting image to the model input type and inference with prepared image
 * Comparing results on one picture
 * Comparing performance
+
+## Installation Instructions
+
+If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).
