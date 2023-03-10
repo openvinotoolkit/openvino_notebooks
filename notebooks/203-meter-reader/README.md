@@ -15,4 +15,4 @@ In this notebook, we use the PaddlePaddle pre-trained model [PPYOLOv2](https://g
 
 ## Installation Instructions
 
-If you have not done so already, please follow the [Installation Guide](../../README.md) to install all required dependencies.
+If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).

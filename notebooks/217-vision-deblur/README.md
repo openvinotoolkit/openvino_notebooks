@@ -22,4 +22,4 @@ The authors release the dataset under the [CC BY 4.0 license](https://creativeco
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).

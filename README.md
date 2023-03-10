@@ -267,7 +267,7 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
   Please run it after activating the `openvino_env` virtual environment.
 - If you get an `ImportError`, doublecheck that you installed the Jupyter kernel. If necessary, choose the openvino\_env kernel from the _Kernel->Change Kernel_ menu) in Jupyter Lab or Jupyter Notebook
 - If OpenVINO is installed globally, do not run installation commands in a terminal where setupvars.bat or setupvars.sh are sourced.
-- For Windows installation, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
+- For Windows installation, it is recommended to use _Command Prompt (cmd.exe)_, not _PowerShell_.
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#-contributors)
 <div id='-contributors'/>

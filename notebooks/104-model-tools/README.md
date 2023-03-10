@@ -22,4 +22,4 @@ The notebook covers following topics:
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).

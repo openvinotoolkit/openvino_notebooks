@@ -12,12 +12,12 @@ This notebook shows a person tracking scenario: it reads frames from an input vi
 
 ## Notebook Contents
 
-In this case, we use the [Deep SORT](https://arxiv.org/abs/1703.07402) algorithm to perform object tracking.
-[person detection model]( https://docs.openvino.ai/latest/omz_models_model_person_detection_0202.html) is deployed to detect the person in each frame of the video, and [reidentification model]( https://docs.openvino.ai/latest/omz_models_model_person_reidentification_retail_0287.html) is used to output embedding vector to match a pair of person images by the cosine distance.
+In this tutorial, you will use the [Deep SORT](https://arxiv.org/abs/1703.07402) algorithm to perform object tracking.
+[person detection model]( https://docs.openvino.ai/latest/omz_models_model_person_detection_0202.html) is deployed to detect the person in each frame of the video, and [reidentification model]( https://docs.openvino.ai/latest/omz_models_model_person_reidentification_retail_0287.html) is used to output embedding vector to match a pair of images of a person by the cosine distance.
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).
 
 ### See Also
 
