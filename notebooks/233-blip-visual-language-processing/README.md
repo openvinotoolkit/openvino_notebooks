@@ -38,4 +38,4 @@ The tutorial consists of the following parts:
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).

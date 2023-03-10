@@ -4,7 +4,7 @@ Speaker diarization is the process of partitioning an audio stream containing hu
 
 ![image.png](https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/_images/asr_sd_diagram.png)
 
-This tutorial considers ways to build speaker diarization pipeline, using `pyannote.audio` and OpenVINO. `pyannote.audio` is an open-source toolkit written in Python for speaker diarization. Based on PyTorch deep learning framework, it provides a set of trainable end-to-end neural building blocks that can be combined and jointly optimized to build speaker diarization pipelines. You can find more information about pyannote pre-trained models in [model card](https://huggingface.co/pyannote/speaker-diarization), [repo](https://github.com/pyannote/pyannote-audio) and [paper](https://arxiv.org/abs/1911.01255).
+In this tutorial, we consider how to build speaker diarization pipeline using `pyannote.audio` and OpenVINO. `pyannote.audio` is an open-source toolkit written in Python for speaker diarization. Based on PyTorch deep learning framework, it provides a set of trainable end-to-end neural building blocks that can be combined and jointly optimized to build speaker diarization pipelines. You can find more information about pyannote pre-trained models in [model card](https://huggingface.co/pyannote/speaker-diarization), [repo](https://github.com/pyannote/pyannote-audio) and [paper](https://arxiv.org/abs/1911.01255).
 
 ## Notebook Contents
 
