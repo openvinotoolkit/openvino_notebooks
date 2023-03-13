@@ -8,7 +8,7 @@ This tutorial provides how to use the [Typo Detector](https://huggingface.co/m3h
 
 The model has been pretrained on the [NeuSpell](https://github.com/neuspell/neuspell) dataset.
 
-<img src=https://user-images.githubusercontent.com/80534358/224564463-ee686386-f846-4b2b-91af-7163586014b7.png width=225>
+<img src=https://user-images.githubusercontent.com/80534358/224564463-ee686386-f846-4b2b-91af-7163586014b7.png>
 
 ## Notebook Contents
 
