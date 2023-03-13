@@ -179,7 +179,7 @@ jobs:
     - name: Analysing with nbval (Linux)
       if: runner.os == 'Linux'
       run: |
-            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image
+            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image --use-pep517
       shell: bash
     - name: Analysing with nbval (MacOS)
       if: runner.os == 'MacOS'
