@@ -20,6 +20,7 @@ Notebook contains following steps:
 
 The image below shows an example of the DistillBERT model answering questions within a given context.
 
+![question_answering](https://user-images.githubusercontent.com/60800164/225013797-f1f24f74-8d7e-4279-bf07-44f1ea5e2aa3.jpg)
 
 ## Installation Instructions
 
