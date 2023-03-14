@@ -1,11 +1,14 @@
 # SegmentationModel implementation based on
 # https://github.com/openvinotoolkit/open_model_zoo/tree/master/demos/common/python/models
+import sys
 
 import cv2
 import numpy as np
 from os import PathLike
-from models import model
 from openvino.runtime import PartialShape
+import logging
+
+sys.path.append("../utils")
 from notebook_utils import segmentation_map_to_overlay
 
 
@@ -13,7 +16,31 @@ def sigmoid(x):
     return np.exp(-np.logaddexp(0, -x))
 
 
-class SegmentationModel(model.Model):
+class Model:
+    def __init__(self, ie, model_path, input_transform=None):
+        self.logger = logging.getLogger()
+        self.logger.info('Reading model from IR...')
+        self.net = ie.read_model(model_path)
+        self.set_batch_size(1)
+        self.input_transform = input_transform
+
+    def preprocess(self, inputs):
+        meta = {}
+        return inputs, meta
+
+    def postprocess(self, outputs, meta):
+        return outputs
+
+    def set_batch_size(self, batch):
+        shapes = {}
+        for input_layer in self.net.inputs:
+            new_shape = list(input_layer.shape)
+            new_shape[0] = 1
+            shapes.update({input_layer: new_shape})
+        self.net.reshape(shapes)
+
+
+class SegmentationModel(Model):
     def __init__(
         self,
         ie,

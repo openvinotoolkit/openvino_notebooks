@@ -103,7 +103,7 @@ jobs:
           notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
           # 208 omz cache location is set to this with test_replace
           notebooks/208-optical-character-recognition/open_model_zoo_cache
-          notebooks/210-ct-scan-live-inference/kits19_frames_1
+          notebooks/110-ct-scan-live-inference/kits19_frames_1
           notebooks/212-onnx-style-transfer/model
           notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
         key: ${{ env.FILES_CACHE_KEY }}
@@ -208,17 +208,17 @@ jobs:
     - name: Analysing with nbval (Windows)
       if: runner.os == 'Windows'
       run: |
-            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 108-gpu-device --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
+            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 108-gpu-device 235-controlnet-stable-diffusion --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
       shell: bash
     - name: Analysing with nbval (Linux)
       if: runner.os == 'Linux'
       run: |
-            python .ci/validate_notebooks.py  --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device 235-controlnet-stable-diffusion --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
     - name: Analysing with nbval (MacOS)
       if: runner.os == 'MacOS'
       run: |
-           python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 107-speech-recognition-quantization 108-gpu-device--report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+           python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 107-speech-recognition-quantization 108-gpu-device 235-controlnet-stable-diffusion --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
     - name: Archive test report
       uses: actions/upload-artifact@v3
