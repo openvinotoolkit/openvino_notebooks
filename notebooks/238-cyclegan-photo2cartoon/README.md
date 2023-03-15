@@ -14,6 +14,7 @@ The tutorial consists of the following steps:
 - Downlad pre-train model
 - Validate original model
 - Convert ONNX model to openVINO IR
+- Verify model inference
 
 ## Installation Instructions
 
