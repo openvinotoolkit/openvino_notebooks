@@ -157,6 +157,7 @@ More amazing notebooks here!
 |[235-controlnet-stable-diffusion](235-controlnet-stable-diffusion/)<br>| Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
 | [240-yolox-object-detection](240-yolox-object-detection/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F240-yolox-object-detection%2F240-yolox-object-detection.ipynb) | Detect Objects with YOLOx | <img src="https://user-images.githubusercontent.com/67541368/219980140-3dd1ddf2-fb68-464c-b205-5c2f6795ad4f.jpg" width=225> |
 
+
 </details>
 </p>
 
