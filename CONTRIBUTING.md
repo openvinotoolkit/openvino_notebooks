@@ -110,7 +110,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    `function(a=1, b=2)` instead of `function(1, 2)`
 5. Use `from pathlib import Path` for path manipulation instead of `os.path`
 6. Add type hints to functions: https://www.python.org/dev/peps/pep-0484/
-7. Add ReST style docstrings (see [110](https://docs.openvino.ai/latest/notebooks/110-ct-scan-live-inference-with-output.html)
+7. Add ReST style docstrings (see [403](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/403-action-recognition-webcam/403-action-recognition-webcam.ipynb)
    for an example). It is not necessary to specify the parameter type in the docstring, since
    type hints are already added to the function definition.
 8. Do not use global variables in functions: a function should not depend on values that are
