@@ -149,6 +149,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [229-distilbert-sequence-classification](notebooks/229-distilbert-sequence-classification/)<br> | 利用OpenVINO进行句子分类 | <img src = "https://user-images.githubusercontent.com/95271966/206130638-d9847414-357a-4c79-9ca7-76f4ae5a6d7f.png" width=225> |
 | [230-yolov8-optimization](notebooks/230-yolov8-optimization/)<br> |使用NNCF PTQ API优化YOLOv8 | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> |
 |[231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)<br>| 利用InstructPix2Pix进行图像编辑 | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=225> |
+|[238-cyclegan-photo2cartoon](notebooks/238-cyclegan-photo2cartoon/)<br>| 将Photo2Cartoon的ONNX 模型转换为OpenVINO™的IR | <img src=https://github.com/sususama/take/blob/master/scr/test/edu/cartoon_result.png width=225> |
 </details>
 </p>
 
