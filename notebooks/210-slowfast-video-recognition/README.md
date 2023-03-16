@@ -30,4 +30,4 @@ This tutorial consists of the following steps
 ## Installation Instructions
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md). 
-No additional libraries are required to run this notebook.
+Additional dependencies will be installed in the notebook.
