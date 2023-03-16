@@ -12,7 +12,7 @@ Its goal is to assign labels to each pixel according to the object it belongs to
 To properly assign this label, the model needs to consider the local as well as global context of the image.
 This is where transformers offer their advantage as they work well in capturing global context.
 Segmenter is based on Vision Transformer working as an encoder, and Mask Transformer working as a decoder.
-With this configuration, it achieves good results on different datasets such as ADE20K, Pascal Context and Cityscapes.
+With this configuration, it achieves good results on different datasets such as ADE20K, Pascal Context, and Cityscapes.
 
 <div style="text-align:center">
     <img src="https://user-images.githubusercontent.com/24582831/148507554-87eb80bd-02c7-4c31-b102-c6141e231ec8.png" width="70%"/>
@@ -26,11 +26,12 @@ More about the model and its details can be found in the following paper:
 The tutorial consists of the following steps:
 
 * Preparing PyTorch Segmenter model
-* Preparing preprocessing and visualization function
+* Preparing preprocessing and visualization functions
 * Validating inference of original model
 * Converting PyTorch model to ONNX
 * Converting ONNX to OpenVINO IR
-* Validating inference of converted model
+* Validating inference of the converted model
+* Benchmark performance of the converted model
 
 
 ## Installation Instructions
