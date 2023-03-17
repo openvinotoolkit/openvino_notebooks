@@ -1,8 +1,8 @@
 # Object Detection using YOLOX with OpenVINO™
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F235-yolox-object-detection%2F235-yolox-object-detection.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F240-yolox-object-detection%2F240-yolox-object-detection.ipynb)
 
-<img src="./test.jpg">
+<img src="https://raw.githubusercontent.com/Megvii-BaseDetection/YOLOX/main/assets/demo.png">
 
 Object detection is an important field in computer vision that enables machines to recognize and locate objects in images or videos. It has various applications in autonomous vehicles, surveillance systems, and medical imaging. 
 
@@ -10,6 +10,8 @@ YOLOX, an improved version of the YOLO (You Only Look Once) model, is advantageo
 
 YOLOX Paper Link: https://arxiv.org/abs/2107.08430  \
 YOLOx Repository: https://github.com/Megvii-BaseDetection/YOLOX
+
+
 ## Notebook Contents
 
 This notebook demonstrates Object Detection with OpenVINO by using the `YOLOX` model.
@@ -18,9 +20,11 @@ This notebook demonstrates Object Detection with OpenVINO by using the `YOLOX` m
 To give a overview of the notebook, the major sections of this notebook are:
 
 * Adding Google Colab Support
+* Setting up YOLOX model
 * Converting Model to use with OpenVino
-* Inference with YOLOX using OpenVino
+* Openvino Workflow(Test with own Image)
 * Validation on COCO 2017 dataset
+* Performance Testing 
 
 
 ## Installation Instructions
