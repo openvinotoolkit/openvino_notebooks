@@ -1,6 +1,6 @@
 # Convert Photo to cartoon ONNX Model to OpenVINO™ IR
 
-[Photo2Cartoon results](https://github.com/sususama/Test1/blob/master/AOP/1678799732564.png)
+[Photo2Cartoon results](https://user-images.githubusercontent.com/52159774/225785418-3e4d223e-572e-4bb5-bb3f-508e80d08a70.png)
 
 This tutorial explains how to convert the [photo2cartoon](https://github.com/minivision-ai/photo2cartoon) ONNX Model to OpenVINO™ IR
 
