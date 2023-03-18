@@ -6,8 +6,8 @@ In this demo we have the models:
 
 * **Generative Pre-trained Transformer 2 ([GPT-2](https://github.com/openai/gpt-2/blob/master/model_card.md))** model for text prediction.
 * **Generative Pre-trained Transformer Neo ([GPT-Neo](https://github.com/EleutherAI/gpt-neo))** model for text prediction.
-
-The complete pipeline of this demo's notebooks is shown below.
+* **PersonaGPT ([PersonaGPT](https://huggingface.co/af1tang/personaGPT))** model for Conversation
+The complete pipeline of this Text Generation is shown below.
 
 ![image2](https://user-images.githubusercontent.com/91228207/163990722-d2713ede-921e-4594-8b00-8b5c1a4d73b5.jpeg)
 
@@ -20,13 +20,22 @@ The following images show an example of the input sequence and corresponding pre
 * GPT-Neo:
 ![image](https://user-images.githubusercontent.com/95569637/223999855-32c15531-0f41-42ee-a318-0f5b5ebd687e.png)
 
+The Modified Pipeline For Conversation is shown below.
+
+![image2](https://user-images.githubusercontent.com/95569637/226101538-e204aebd-a34f-4c8b-b90c-5363ba41c080.jpeg)
+
+This is a demonstration in which a user can have a conversation with the model. The User provides some input based upon which the model generates a response,the user can further talk to the model as if having chat with the model.
+
+The following image shows and example of a conversation.
+
+![image](https://user-images.githubusercontent.com/95569637/226102963-ab545346-175b-4eb5-94f6-f2c0a4d573f5.png)
 ## Notebook Contents
 
-This notebook demonstrates text prediction with OpenVINO using the following models
+The notebooks demonstrates text prediction with OpenVINO using the following models
 
 * [gpt-2](https://huggingface.co/gpt2) model from HuggingFace Transformers.
 * [gpt-neo](https://huggingface.co/EleutherAI/gpt-neo-125M) model from HuggingFace Transformers.
-
+* [personaGPT](https://huggingface.co/af1tang/personaGPT) model from HiggingFace Transformers
 ## Installation Instructions
 
 If you have not done so already, please follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md) to install all required dependencies.
