@@ -3,9 +3,9 @@
 
 ## Notebook Content
 
-* Downloading and exporting the efficientDet-d0 model from TensorFlow-HUB
+* Downloading and exporting the efficientDet-d0 from TensorFlow-HUB
   * Validating inference of tf-model
-* Converting tf-model to OpenVINO-IR(Intermediate representation) file {FP16}
+* Converting tf-model to OpenVINO-IR(Intermediate representation) file
   * Validating inference of OpenVINO-model
   * Evaluating performance by AP( average Precision)
 
@@ -15,7 +15,7 @@
   * Validating Inference of INT8 model
   * Evaluating performance of INT8 model by AP
 
-<img src='https://i.ibb.co/FB8bLxd/download.png'>
+<img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' >
 
 ## Installation Instructions
 
