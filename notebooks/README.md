@@ -154,6 +154,7 @@ More amazing notebooks here!
 |[233-blip-visual-language-processing](233-blip-visual-language-processingp/)<br>| Visual Question Answering and Image Captioning using BLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> | 
 |[234-encodec-audio-compression](234-encodec-audio-compression/)<br>| Audio compression with EnCodec and OpenVINO™ | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
 |[235-controlnet-stable-diffusion](235-controlnet-stable-diffusion/)<br>| Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
+|[236-distillbert-question-answering](236-distillbert-question-answering/)<br>| Question Answering with DistillBERT and OpenVINO™ | <img src=https://raw.githubusercontent.com/Karthik-Bhaskar/Context-Based-Question-Answering/f2e0bbc03003aae65f4cabddecd5cd9fcdbfb333/docs_resources/CBQA_social_preview.png width=225> |
  
 
 
