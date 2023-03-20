@@ -12,15 +12,15 @@ This folder contains five notebooks that show how to train,
 optimize, quantize and show live inference on a [MONAI](https://monai.io/) segmentation model with
 [PyTorch Lightning](https://lightning.ai/) and OpenVINO:
 
-1\. [Data Preparation for 2D Segmentation of 3D Medical Data](data-preparation-ct-scan.ipynb)
+1. [Data Preparation for 2D Segmentation of 3D Medical Data](data-preparation-ct-scan.ipynb)
 
-2\. [Train a 2D-UNet Medical Imaging Model with PyTorch Lightning](pytorch-monai-training.ipynb)
+2. [Train a 2D-UNet Medical Imaging Model with PyTorch Lightning](pytorch-monai-training.ipynb)
 
 3a. [Convert and Quantize a UNet Model and Show Live Inference using POT](110-ct-segmentation-quantize.ipynb)
 
 3b. [Convert and Quantize a UNet Model and Show Live Inference using NNCF](110-ct-segmentation-quantize-nncf.ipynb)
 
-4\. [Live Inference and Benchmark CT-scan Data with OpenVINO](110-ct-scan-live-inference.ipynb)
+4. [Live Inference and Benchmark CT-scan Data with OpenVINO](110-ct-scan-live-inference.ipynb)
 
 The main difference between the POT and NNCF quantization notebooks is that NNCF performs quantization within the PyTorch framework, while POT performs
 quantization after the PyTorch model has been converted to OpenVINO IR format. There is a pre-trained model and a subset of the dataset provided for the quantization notebook, 
