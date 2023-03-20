@@ -8,8 +8,8 @@ nncf==2.4.0
 onnx>=1.13
 
 tensorflow-macos>=2.5,<=2.13; sys_platform == 'darwin' and platform_machine == 'arm64' # macOS M1 and M2
-tensorflow>=2.5,<=2.13; sys_platform == 'darwin' and platform_machine != 'arm64' # macOS x86
-tensorflow>=2.5,<=2.13; sys_platform == 'linux' or platform_system == 'Windows'
+tensorflow==2.12.0rc1; sys_platform == 'darwin' and platform_machine != 'arm64' # macOS x86
+tensorflow==2.12.0rc1; sys_platform == 'linux' or platform_system == 'Windows'
 tensorflow-datasets==4.2.0
 
 --find-links https://download.pytorch.org/whl/torch_stable.html
