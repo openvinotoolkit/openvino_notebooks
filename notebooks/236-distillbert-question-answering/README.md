@@ -1,7 +1,7 @@
 # Question Answering with DistilBERT and OpenVino
 [DistillBERT](https://paperswithcode.com/method/distillbert) is a smaller and faster version of BERT, a popular Transformer model for natural language processing. It is trained using knowledge distillation, a technique to compress a large model (the teacher) into a smaller model (the student). DistilBERT can be used for various NLP tasks such as question answering, text classification, sentiment analysis and more.
 In this notebook we will run the DistillBERT model with OpenVINO to answer questions given a context
-
+![diagram](https://raw.githubusercontent.com/Karthik-Bhaskar/Context-Based-Question-Answering/f2e0bbc03003aae65f4cabddecd5cd9fcdbfb333/docs_resources/CBQA_social_preview.png)
 ## Notebook Contents
 
 This notebook demonstrates how to perform extractive question answering with using the open-source DistillBERT model from HuggingFace. 
