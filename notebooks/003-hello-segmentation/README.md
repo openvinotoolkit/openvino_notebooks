@@ -14,4 +14,4 @@ A very basic introduction to segmentation with OpenVINO. This notebook uses the 
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).

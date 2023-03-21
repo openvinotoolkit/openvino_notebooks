@@ -10,4 +10,4 @@ The notebook also presents example commands for benchmark_app that you can run t
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).

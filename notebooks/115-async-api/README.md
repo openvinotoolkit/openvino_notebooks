@@ -13,4 +13,4 @@ With synchronous mode, you wait for the result of the first inference before sen
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).

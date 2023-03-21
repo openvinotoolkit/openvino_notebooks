@@ -12,4 +12,4 @@ This tutorial uses the [quartznet 15x5](https://docs.openvino.ai/2021.4/omz_mode
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).

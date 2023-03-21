@@ -14,7 +14,7 @@ There are five pre-trained style transfer models you can use with this notebook 
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
 
 ## See Also
 
