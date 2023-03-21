@@ -149,7 +149,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [229-distilbert-sequence-classification](notebooks/229-distilbert-sequence-classification/)<br> | 利用OpenVINO进行句子分类 | <img src = "https://user-images.githubusercontent.com/95271966/206130638-d9847414-357a-4c79-9ca7-76f4ae5a6d7f.png" width=225> |
 | [230-yolov8-optimization](notebooks/230-yolov8-optimization/)<br> |使用NNCF PTQ API优化YOLOv8 | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> |
 |[231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)<br>| 利用InstructPix2Pix进行图像编辑 | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=225> |
- |[240-EfficientDet-object-detection](240-EfficientDet-object-detection/)<br>| 可扩展且高效的对象检测 |<img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' width=250>|
+ |[240-EfficientDet-object-detection](notebooks/240-efficientdet-object-detection/)<br>| 可扩展且高效的对象检测 |<img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' width=250>|
 </details>
 </p>
 
