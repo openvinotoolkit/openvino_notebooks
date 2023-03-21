@@ -14,7 +14,7 @@ This notebook uses the "human-pose-estimation-3d-0001" model from OpenVINO Open 
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md).
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
 
 Make sure your [Jupyter extension](https://github.com/jupyter-widgets/pythreejs#jupyterlab) is working properly.
 To avoid errors that may arise from the version of the dependency package, it is recommended to use the **Jupyterlab** instead of the Jupyter notebook to display image results.
