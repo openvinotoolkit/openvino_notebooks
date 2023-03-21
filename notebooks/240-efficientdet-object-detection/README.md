@@ -18,7 +18,7 @@ Research Paper : [EfficientDet: Scalable and Efficient Object Detection](https:/
 * Post-training optimization with OpenVINO NNCF (Neural Network Compression Framework).
   * Quantization of FP16/32 model to INT8 model.
   * Validating Inference of INT8 model.
-  * Evaluating performance of INT8 model by AP.
+  * Evaluating performance of INT8 model by AP/mAP.
 
 ## Installation Instructions
 
