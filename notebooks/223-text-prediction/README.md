@@ -31,11 +31,11 @@ The following image shows and example of a conversation.
 ![image](https://user-images.githubusercontent.com/95569637/226102963-ab545346-175b-4eb5-94f6-f2c0a4d573f5.png)
 ## Notebook Contents
 
-The notebooks demonstrates text prediction with OpenVINO using the following models
+The notebook demonstrates text prediction with OpenVINO using the following models
 
 * [gpt-2](https://huggingface.co/gpt2) model from HuggingFace Transformers.
 * [gpt-neo](https://huggingface.co/EleutherAI/gpt-neo-125M) model from HuggingFace Transformers.
-* [personaGPT](https://huggingface.co/af1tang/personaGPT) model from HiggingFace Transformers
+* [personaGPT](https://huggingface.co/af1tang/personaGPT) model from HuggingFace Transformers
 ## Installation Instructions
 
 If you have not done so already, please follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md) to install all required dependencies.
