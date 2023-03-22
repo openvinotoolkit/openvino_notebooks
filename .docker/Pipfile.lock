@@ -4603,14 +4603,6 @@
             "markers": "python_version >= '3.7'",
             "version": "==1.8.2"
         },
-        "yaspin": {
-            "hashes": [
-                "sha256:17b5548479b3d5b30adec7a87ffcdcddb403d14a2bb86fbcee97f37951e13427",
-                "sha256:547afd1a9700ac3a29a9f5591c70343bef186ed5dfb5e545a9bb0c77e561a1c9"
-            ],
-            "index": "pypi",
-            "version": "==2.3.0"
-        },
         "zipp": {
             "hashes": [
                 "sha256:188834565033387710d046e3fe96acfc9b5e86cbca7f39ff69cf21a4128198b7",
