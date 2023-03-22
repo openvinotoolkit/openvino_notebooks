@@ -97,7 +97,7 @@ More amazing notebooks here!
 | [116-sparsity-optimization](116-sparsity-optimization/)<br> | Improve performance of sparse Transformer models |
 | [117-model-server](117-model-server/)| Introduction to model serving with OpenVINO™ Model Server (OVMS) |
 | [118-optimize-preprocessing](118-optimize-preprocessing/)| Improve performance of image preprocessing step |
-| [408-language-quantization-opt350m](notebooks/408-language-quantization-opt350m/)| Quantize OPT : Open Pre-trained Transformer Language Models with Post-Training Optimization Tool ​in OpenVINO™  |
+| [408-language-quantization-opt350m](408-language-quantization-opt350m/)| Quantize OPT : Open Pre-trained Transformer Language Models with Post-Training Optimization Tool ​in OpenVINO™  |
 </details>
 </p>
 
