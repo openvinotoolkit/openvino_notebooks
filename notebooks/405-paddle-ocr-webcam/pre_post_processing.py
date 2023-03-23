@@ -444,7 +444,7 @@ def draw_ocr_box_txt(image,
             1])**2)
         if box_height > 2 * box_width:
             font_size = max(int(box_width * 0.9), 10)
-            font = ImageFont.truetype('../data/font/simfang.ttf',32)
+            font = ImageFont.truetype('../data/font/simfang.ttf', font_size)
             cur_y = box[0][1]
             for c in txt:
                 char_size = font.getsize(c)
@@ -453,7 +453,7 @@ def draw_ocr_box_txt(image,
                 cur_y += char_size[1]
         else:
             font_size = max(int(box_height * 0.8), 10)
-            font = ImageFont.truetype('../data/font/simfang.ttf',32)
+            font = ImageFont.truetype('../data/font/simfang.ttf', font_size)
             draw_right.text(
                 [box[0][0], box[0][1]], txt, fill=(0, 0, 0), font=font)
     img_left = Image.blend(image, img_left, 0.5)

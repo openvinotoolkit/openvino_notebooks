@@ -1,6 +1,8 @@
 # Convert and Optimize YOLOv8 with OpenVINO™
 
-![YOLOv8 results](https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png)
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png"/>
+</p>
 
 This tutorial explains how to convert and optimize the [YOLOv8](https://github.com/ultralytics/) PyTorch\* model with OpenVNO.
 

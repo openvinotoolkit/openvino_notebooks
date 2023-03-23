@@ -10,7 +10,7 @@ This demo notebook shows image segmentation and removing/adding background with 
 ## Notebook Contents
 
 * Importing Pytorch library and loading U^2-Net model.
-* Converting PyTorch U^2-Net model to ONNX and OpenVINO IR.
+* Converting PyTorch U^2-Net model to OpenVINO IR format.
 * Loading and preprocessing input image.
 * Doing inference on OpenVINO IR model.
 * Visualizing results.
