@@ -162,15 +162,6 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 
 带有![binder logo](https://mybinder.org/badge_logo.svg) 按键的Notebooks可以在无需安装的情况下运行。[Binder](https://mybinder.org/) 是一项资源有限的免费在线服务。 如果享有获得最佳性能体验，请遵循[安装指南](#-installation-guide)在本地运行Notebooks。
 
-您将在这一部分中获得很多乐趣:
-
-| Notebook | Preview |
-| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [Vision-monodepth](notebooks/201-vision-monodepth/) | <img src="https://user-images.githubusercontent.com/15709723/127752390-f6aa371f-31b5-4846-84b9-18dd4f662406.gif" width=225> |
-| [Object-detection-webcam](notebooks/401-object-detection-webcam/) | <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=140> |
-| [Pose-estimation-webcam](notebooks/402-pose-estimation-webcam/) | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=185> |
-| [Action-recognition-webcam](notebooks/403-action-recognition-webcam/) | <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=185> |
-
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='-system-requirements'/>

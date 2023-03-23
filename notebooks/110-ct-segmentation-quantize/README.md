@@ -2,11 +2,13 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F110-ct-segmentation-quantize%2F110-ct-scan-live-inference.ipynb)
 
-![kidney segmentation animation](https://user-images.githubusercontent.com/77325899/154279555-aaa47111-c976-4e77-8d23-aac96f45872f.gif)
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/77325899/154279555-aaa47111-c976-4e77-8d23-aac96f45872f.gif"/>
+</p>
 
 ## Notebook Contents
 
-This folder contains five notebooks that show how to train,C
+This folder contains five notebooks that show how to train,
 optimize, quantize and show live inference on a [MONAI](https://monai.io/) segmentation model with
 [PyTorch Lightning](https://lightning.ai/) and OpenVINO:
 
