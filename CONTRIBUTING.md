@@ -236,7 +236,7 @@ We use Github Actions to automatically validate that all notebooks work. The fol
 and some style issues
   - Verifies that the notebook is included in the main README and the README in the notebooks directory. 
   - Runs the check_install script to test for installation issues
-- docker_nbval: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
+- docker_treon: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
   To manually run this test, build the Docker image with `docker build -t openvino_notebooks .` and run the tests with
   `docker run -it  --entrypoint /tmp/scripts/test openvino_notebooks`. It is recommended to build the image on a clean 
   repo because the full notebooks folder will be copied to the image.
