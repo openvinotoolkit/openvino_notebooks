@@ -81,18 +81,20 @@ def clean_test_artifacts(before_test_files, after_test_files):
 def run_test(notebook_path, root):
     print(f'RUN {notebook_path.relative_to(root)}')
     with cd(notebook_path):
-        existing_files = sorted(Path(os.getcwd()).iterdir())
+        existing_files = sorted(Path('.').iterdir())
+        print(f'EXISTING FILES: {existing_files}')
         if not len(existing_files):  # skip empty directories
             return 0
         
         try:
             notebook_name = str([filename for filename in existing_files if str(filename).startswith('test_')][0])
         except IndexError:  # if there is no 'test_' notebook generated
+            print('No test_ notebook found.')
             return 0
         
         main_command = [sys.executable,  '-m',  'treon', notebook_name]
         retcode = subprocess.run(main_command).returncode
-        clean_test_artifacts(existing_files, sorted(Path(os.getcwd()).iterdir()))
+        clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
     return retcode
 
 
