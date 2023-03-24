@@ -1,7 +1,9 @@
 # PaddleOCR with OpenVINO™
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F405-paddle-ocr-webcam%2F405-paddle-ocr-webcam.ipynb)
 
-![paddleocr-webcam](https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleocr.gif)
+<p align="center" width="100%">
+    <img width="80%" src="https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleocr.gif">
+</p>
 
 PaddleOCR performs the Optical Character Recognition (OCR) function from a video, an image, or a scanned document. It is mainly composed of three parts: DB text detection, detection frame correction and CRNN text recognition. For more details, refer to the PaddleOCR technical [article](https://arxiv.org/abs/2009.09941).
 
