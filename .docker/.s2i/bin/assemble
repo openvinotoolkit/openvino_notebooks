@@ -29,8 +29,6 @@ pip install 'mod_wsgi==4.6.8'
 
 # Install base packages needed for running Jupyter Notebooks.
 
-pip install -r ${APP_ROOT}/src/requirements.in
-
 npm cache clean --force
 
 rm -rf $HOME/.cache/yarn
