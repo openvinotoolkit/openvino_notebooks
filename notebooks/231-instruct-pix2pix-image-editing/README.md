@@ -6,14 +6,18 @@ In this notebook we demonstrate how to use a the **[InstructPix2Pix](https://git
 
 The complete pipeline of this demo is shown below.
 
-![diagram](https://user-images.githubusercontent.com/29454499/214895365-3063ac11-0486-4d9b-9e25-8f469aba5e5d.png)
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/29454499/214895365-3063ac11-0486-4d9b-9e25-8f469aba5e5d.png"/>
+</p>
 
 This is a demonstration in which the user can type text-based instructions and provide an input image to the pipeline that will generate a new image that reflects the context of the input text.
 Step-by-step the diffusion process will iteratively denoise the latent image representation while being conditioned on the text embeddings provided by the text encoder and an original image encoded by a variational autoencoder.
 
 The following image shows an example of the input image with text-based prompt and the corresponding edited image.
 
-![image](https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png)
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png"/>
+</p>
 
 ## Notebook Contents
 
