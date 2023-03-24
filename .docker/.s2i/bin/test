@@ -21,8 +21,5 @@ cp -r kits19_frames/case_00030 kits19_frames/case_00001
 # Patch notebooks to speed up test execution
 python /tmp/scripts/patch_notebooks.py /opt/app-root/notebooks
 
-# Move notebooks for validation
-mv /opt/app-root/notebooks/ /tmp/
-
 # Test notebooks
-python /tmp/scripts/validate_notebooks.py --ignore_list 225-stable-diffusion-text-to-image 107-speech-recognition-quantization 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 117-model-server 108-gpu-device 235-controlnet-stable-diffusion
+exec /opt/app-root/bin/pytest --durations=10 --nbval --current-env --ignore=/opt/app-root/notebooks/235-controlnet-stable-diffusion -k "test_" /opt/app-root/notebooks

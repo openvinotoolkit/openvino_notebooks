@@ -77,7 +77,7 @@ def test_requirements_binder():
     ), f"Binder requirements misses: {pip_requirements.difference(binder_requirements)}"
 
 
-@pytest.mark.skip(reason="URL existence is tested in docker_treon")
+@pytest.mark.skip(reason="URL existence is tested in docker_nbval")
 def test_urls_exist():
     """
     Test that urls that may be cached still exist on the server

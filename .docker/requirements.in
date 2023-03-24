@@ -45,7 +45,6 @@ pytube
 
 # validation
 nbval
-treon
 
 # openshift
 grpcio
