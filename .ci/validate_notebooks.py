@@ -79,10 +79,10 @@ def clean_test_artifacts(before_test_files, after_test_files):
 
 
 def run_test(notebook_path, root):
-    print(f'RUN {notebook_path.relative_to(root)}')
+    print(f'RUN {notebook_path.relative_to(root)}', flush=True)
+    
     with cd(notebook_path):
         existing_files = sorted(Path('.').iterdir())
-        print(f'EXISTING FILES: {existing_files}')
         if not len(existing_files):  # skip empty directories
             return 0
         
@@ -94,6 +94,7 @@ def run_test(notebook_path, root):
         
         main_command = [sys.executable,  '-m',  'treon', notebook_name]
         retcode = subprocess.run(main_command).returncode
+
         clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
     return retcode
 
