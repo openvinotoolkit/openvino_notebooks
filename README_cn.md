@@ -131,6 +131,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 |[233-blip-visual-language-processing](notebooks/233-blip-visual-language-processing/)<br>| 基于BLIP和OpenVINO™的视觉问答与图片注释 | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> |
 |[234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| # 基于EnCodec和OpenVINO™的音频压缩 | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
 |[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| # 使用ControlNet状态调节Stable Diffusion 实现文字生成图片 | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
+|[238-cyclegan-photo2cartoon](notebooks/238-cyclegan-photo2cartoon/)<br>| 将Photo2Cartoon的ONNX 模型转换为OpenVINO™的IR | <img src=https://user-images.githubusercontent.com/52159774/225785418-3e4d223e-572e-4bb5-bb3f-508e80d08a70.png width=225> |
 
 <div id='-model-training'/>
 
