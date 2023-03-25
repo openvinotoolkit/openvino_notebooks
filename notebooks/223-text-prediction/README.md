@@ -1,4 +1,4 @@
-# Text Prediction with OpenVINO
+# Text Prediction with OpenVINO™
 Text generation is a type of natural language processing that uses computational linguistics and artificial intelligence to automatically produce text that can meet specific communicative needs.
 
 
@@ -24,7 +24,7 @@ The Modified Pipeline For Conversation is shown below.
 
 ![image2](https://user-images.githubusercontent.com/95569637/226101538-e204aebd-a34f-4c8b-b90c-5363ba41c080.jpeg)
 
-This is a demonstration in which a user can have a conversation with the model. The user provides some input based on which the model generates a response. The user can further talk to the model as if having a chat with the model.
+This notebook demonstrates how to generate text using user input. By entering the beginning of a sentence or paragraph, the network generates additional text to complete the sequence. This process can be repeated as many times as the user desires, and the model responds to each input, allowing users to engage in a conversation-like interaction.
 
 The following image shows an example of a conversation.
 
