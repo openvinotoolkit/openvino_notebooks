@@ -17,6 +17,11 @@
                 "name": "pytorch-wheels",
                 "url": "https://download.pytorch.org/whl/",
                 "verify_ssl": true
+            },
+            {
+                "url":  "https://www.paddlepaddle.org.cn/whl/linux/cpu-mkl/develop.html",
+                "verify_ssl": true,
+                "name": "paddlepaddle-wheels"
             }
         ]
     },
@@ -2308,34 +2313,10 @@
         },
         "onnx": {
             "hashes": [
-                "sha256:0cf47c205b376b3763beef92a6de4152f3b1552d6f640d93044938500baf5958",
-                "sha256:3403884c482859f8cf2e0c276da84bd9ac2235d266726f4ddc9625d3fd263218",
-                "sha256:43b32a2f20c94aa98866deae9e4218faf0495144ad05402e918fa279674b6df9",
-                "sha256:4454906de80a351de6929b0896ad605d106c324c3112c92249240e531f68fbba",
-                "sha256:4aa899f74acd4c5543f0efed8bfe98a3b701df75c5ffa179212e3088c51971bb",
-                "sha256:58d4873ec587ac14c44227d8027787edc88cd61596e646e3417f2a826a920898",
-                "sha256:593ca9e11f15afa26b3aaf2d170bb803d4bd86dbd560aa7be4e5f535d03f83d5",
-                "sha256:67c6d2654c1c203e5c839a47900b51f588fd0de71bbd497fb193d30a0b3ec1e9",
-                "sha256:7924d9baa13dbbf335737229f6d068f380d153679f357e495da60007b61cf56d",
-                "sha256:7a2f5d6998fe79aed80fad9d4522140d02c4d29513047e335d5c5355c1ebda5e",
-                "sha256:82221a07707b1ccf71fb18c6abb77f2566517a55d5185809775b5ff008bfb35c",
-                "sha256:89420e5b824d7e182846fe2aa09190ddb41162b261465c6ca928174bc2ac10b7",
-                "sha256:997d91ffd7b7ae7aee09c6d652a896d906be430d425865c759b51a8de5df9fe0",
-                "sha256:9b9f58ea01c1b20b057f55f628df4fc0403bbc160b7282a56e3bb4df5c7fb96f",
-                "sha256:a6e9135f1d02539ca7573f699fb0d31d3c43d10fac1d2d2239a9a1c553506c29",
-                "sha256:ae74bf8fa343b64e2b7fe205091b7f3728887c018ae061d161dd86ec95eb66a8",
-                "sha256:b2de0b117ad77689d308824a0c9eb89539ec28a799b4e2e05b3bb977b0da0b45",
-                "sha256:c3d3503110f2cab2c818f4a7b2bc8abc3bc79649daa39e70d5fb504b208ddb1e",
-                "sha256:d6581dd2122525549d1d8b431b8bf375298993c77bddb8fd0bf0d92611df76a1",
-                "sha256:d6ddbe89e32f885db736d36fcb132784e368331a18c3b6168ac9f561eb462057",
-                "sha256:df85666ab2b88fd9cf9b2504bcb551da39422eab65a143926a8db58f81b09164",
-                "sha256:ea06dbf57a287657b6dc4e189918e4cb451450308589d482117216194d6f83d6",
-                "sha256:eb46f31f12bb0bfdcfb68497d10b20447cf8fa6c4f693120c013e052645357b8",
-                "sha256:eca224c7c2c8ee4072a0743e4898a84a9bdf8297b5e5910a2632e4c4182ffb2a",
-                "sha256:f335d982b8ed201cf767459b993630acfd20c32b100529f70af9f28a26e72167"
+                "sha256:e980706de4dc94ffafc57e4ae7e7f4117dbd4c377882637c28a261a6aed38246"
             ],
             "index": "pypi",
-            "version": "==1.11.0"
+            "version": "==1.13.1"
         },
         "opencv-python": {
             "hashes": [
@@ -2391,10 +2372,6 @@
             "version": "==2022.3.0"
         },
         "openvino-dev": {
-            "extras": [
-                "onnx",
-                "tensorflow2"
-            ],
             "hashes": [
                 "sha256:f86cb3433c0b78fe78c11c3ca043eb66e46f66c727ca057059decfd927bb2a29"
             ],
@@ -2580,8 +2557,8 @@
                 "sha256:d9d9eb4b3278ac5e55e712bfc9be1a230a3980f7d48f0cff53fc34decc4ed2ac",
                 "sha256:e7c94d42def30154707f99597bab04de2b6e3ce16e186b3627f12f9c99070594"
             ],
-            "index": "pypi",
-            "version": "==2.4.2"
+            "index": "paddlepaddle-wheels",
+            "version": "==0.0.0"
         },
         "pamela": {
             "hashes": [
@@ -2863,10 +2840,10 @@
                 "sha256:bb6776bd18f01ffe9920e78e03a8676530a5d6c5911934c6a1ac6eb78973ecb6",
                 "sha256:bbf5cea5048272e1c60d235c7bd12ce1b14b8a16e76917f371c718bd3005f045",
                 "sha256:c0ccd3f940fe7f3b35a261b1dd1b4fc850c8fde9f74207015431f174be5976b3",
-                "sha256:d0b635cefebd7a8a0f92020562dead912f81f401af7e71f16bf9506ff3bdbb38"
+                "sha256:f34464ab1207114e73bba0794d1257c150a2b89b7a9faf504e00af7c9fd58978"
             ],
             "markers": "python_version >= '3.5'",
-            "version": "==3.19.6"
+            "version": "==3.20.2"
         },
         "psutil": {
             "hashes": [
@@ -3999,10 +3976,11 @@
                 "sha256:dce712fcb75249a9f8a2a7e526f045890bb3e40857344fa6da36a2d3e87e56b0",
                 "sha256:e826634e04392a32ddc0aaae71dd690e3224acc008c0f2a45f3a00cb48db0029",
                 "sha256:f234d7660a334a5e0f241a4214754f6d496990c49e992b8e0e65491446c0a41d",
-                "sha256:fa3d4adfa8a22a863cdbed743488145a442c837f84d267bbdb86e4888954ca67"
+                "sha256:fa3d4adfa8a22a863cdbed743488145a442c837f84d267bbdb86e4888954ca67",
+                "sha256:23850332f1f9f778d697c9dba63ca52be72cb73363e75ad358f07ddafef63c01"
             ],
             "index": "pypi",
-            "version": "==2.9.3"
+            "version": "==2.12.0"
         },
         "tensorflow-datasets": {
             "hashes": [
@@ -4014,10 +3992,10 @@
         },
         "tensorflow-estimator": {
             "hashes": [
-                "sha256:e9762bb302f51bc1eb2f35d19f0190a6a2d809d754d5def788c4328fe3746744"
+                "sha256:59b191bead4883822de3d63ac02ace11a83bfe6c10d64d0c4dfde75a50e60ca1"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==2.9.0"
+            "version": "==2.12.0"
         },
         "tensorflow-io-gcs-filesystem": {
             "hashes": [
