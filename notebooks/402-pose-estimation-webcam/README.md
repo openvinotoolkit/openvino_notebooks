@@ -8,7 +8,7 @@
     <img width="70%" src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif">
 </p>
 
-Pose estimation predicts the 2D position and orientation of each person in an image or a video. Skeletons consisting of 18 predefined keypoints (joints) and 19 connections between them (limbs) are visualized as an overlay on the images or video.
+Pose estimation predicts the 2D position and orientation of each person in an image or a video. Skeletons consisting of 18 predefined key points (joints) and 19 connections between them (limbs) are visualized as an overlay on the images or video.
 
 ## Notebook Contents
 
