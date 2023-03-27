@@ -11,4 +11,4 @@ The notebook uses [Ultralytics Yolov5](https://github.com/ultralytics/yolov5) to
 
 ## Installation Instructions
 
-If you have not done so already, please follow the [Installation Guide](../../README.md) to install all required dependencies.
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
