@@ -9,7 +9,7 @@ This notebook demonstrates how to do inference on a PyTorch semantic segmentatio
 
 ## Notebook Contents
 
-The notebook uses [Model Optimizer](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) to convert the open-source Lite-RASPP semantic segmentation model with a MoblieNet V3 Large backbone from [torchvision](https://pytorch.org/vision/main/models/lraspp.html), trained on [COCO](https://cocodataset.org) dataset images using 20 categories that are present in the [Pascal VOC](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/index.html) dataset, to OpenVINO IR. It also shows how to do segmentation inference on an image, using [OpenVINO Runtime](https://docs.openvino.ai/latest/openvino_docs_IE_DG_Deep_Learning_Inference_Engine_DevGuide.html) and compares the results of the PyTorch model with the OpenVINO IR model. 
+The notebook uses [Model Optimizer](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) to convert the open-source Lite-RASPP semantic segmentation model with a MobileNet V3 Large backbone from [torchvision](https://pytorch.org/vision/main/models/lraspp.html), trained on [COCO](https://cocodataset.org) dataset images using 20 categories that are present in the [Pascal VOC](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/index.html) dataset, to OpenVINO IR. It also shows how to do segmentation inference on an image, using [OpenVINO Runtime](https://docs.openvino.ai/latest/openvino_docs_IE_DG_Deep_Learning_Inference_Engine_DevGuide.html) and compares the results of the PyTorch model with the OpenVINO IR model. 
 
 ## Installation Instructions
 
