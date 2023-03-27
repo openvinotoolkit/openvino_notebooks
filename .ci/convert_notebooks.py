@@ -53,6 +53,10 @@ def main():
             shutil.copyfile(notebook_path, notebook_executed)
         rst_retcode = subprocess.run(["jupyter", "nbconvert", "--to", "rst", str(notebook_executed), "--output-dir", str(args.rst_dir),
                                           "--TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True"], timeout=args.timeout).returncode
+        notebook_rst = args.rst_dir / notebook_executed.name.replace(".ipynb", ".rst")
+        # remove all non-printable characters
+        subprocess.run(["sed", "-i", "-e", "s/\x1b\[[0-9;]*m//g", "-e", "s/\x1b\[?25h//g", "-e", "s/\x1b\[?25l//g", str(notebook_rst)], timeout=args.timeout)
+
         end = time.perf_counter() - start
         print(f"Notebook conversion took: {end:.4f} s")
         if rst_retcode:
