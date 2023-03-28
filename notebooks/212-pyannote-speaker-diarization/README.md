@@ -4,14 +4,14 @@ Speaker diarization is the process of partitioning an audio stream containing hu
 
 ![image.png](https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/_images/asr_sd_diagram.png)
 
-In this tutorial we consider how to build speaker diarization pipeline using `pyannote.audio` and OpenVINO. `pyannote.audio` is an open-source toolkit written in Python for speaker diarization. Based on PyTorch deep learning framework, it provides a set of trainable end-to-end neural building blocks that can be combined and jointly optimized to build speaker diarization pipelines. You can find more information about pyannote pretrained models in [model card](https://huggingface.co/pyannote/speaker-diarization), [repo](https://github.com/pyannote/pyannote-audio) and [paper](https://arxiv.org/abs/1911.01255).
+In this tutorial, we consider how to build speaker diarization pipeline using `pyannote.audio` and OpenVINO. `pyannote.audio` is an open-source toolkit written in Python for speaker diarization. Based on PyTorch deep learning framework, it provides a set of trainable end-to-end neural building blocks that can be combined and jointly optimized to build speaker diarization pipelines. You can find more information about pyannote pre-trained models in [model card](https://huggingface.co/pyannote/speaker-diarization), [repo](https://github.com/pyannote/pyannote-audio) and [paper](https://arxiv.org/abs/1911.01255).
 
 ## Notebook Contents
 
 This tutorial uses the [pyannote/speaker-diarization](https://huggingface.co/pyannote/speaker-diarization) pipeline and demonstrates how to integrate OpenVINO for running model inference inside pipeline.
 
-The pipeline accepts input audio file and provides mapping between timestemps and speaker which this speech fragment belongs.
-Below example of output timemap produced by demo.
+The pipeline accepts input audio file and provides mapping between timestamps and a speaker, to which the corresponding speech fragment belongs.
+Below is an example of output time map produced by the demo.
 
 ![diarization](https://user-images.githubusercontent.com/29454499/218432101-0bd0c424-e1d8-46af-ba1d-ee29ed6d1229.png)
 

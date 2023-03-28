@@ -13,3 +13,7 @@ The tutorial consists of the following steps:
 * Compressing the model by using the simplified mode.
 * Comparing performance of the original and quantized models.
 * Demonstrating the results of the optimized model.
+
+## Installation Instructions
+
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).

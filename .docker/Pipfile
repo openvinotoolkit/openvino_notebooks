@@ -54,7 +54,6 @@ torch = {index = "pytorch-wheels", version = "==1.13.1+cpu"}
 torchmetrics = ">=0.11.0"
 torchvision = {index = "pytorch-wheels", version = "==0.14.1+cpu"}
 transformers = ">=4.21.1"
-yaspin = "*"
 
 [dev-packages]
 
