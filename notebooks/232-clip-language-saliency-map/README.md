@@ -14,3 +14,7 @@ A saliency map is a visualization technique that highlights regions of interest 
 <p align="center">
     <img width="80%" src="https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG"/>
 </p>
+
+## Installation Instructions
+
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
