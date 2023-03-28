@@ -130,8 +130,7 @@ Demos that demonstrate inference on a particular model.
 |[233-blip-visual-language-processing](notebook/233-blip-visual-language-processing/)<br>| Visual Question Answering and Image Captioning using BLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> |
 |[234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| # Audio compression with EnCodec and OpenVINO™ | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
 |[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| # A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
-<<<<<<< HEAD
- |[240-EfficientDet-object-detection](notebooks/240-efficientdet-object-detection/)<br>| Scalable and Efficient Object Detection |<img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' width=250>|
+ |[240-efficientdet-object-detection](notebooks/240-efficientdet-object-detection/)<br>| Scalable and Efficient Object Detection |<img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' width=250>|
 </details>
 </p>
 =======
