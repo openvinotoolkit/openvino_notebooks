@@ -133,7 +133,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 </p>
 =======
 |[232-clip-language-saliency-map](notebooks/232-clip-language-saliency-map/)<br>|  基于CLIP和OpenVINO™的视觉语言显著性检测 | <img src=https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG width=225> | 
-|[233-blip-visual-language-processing](notebook/233-blip-visual-language-processing/)<br>| 基于BLIP和OpenVINO™的视觉问答与图片注释 | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> |
+|[233-blip-visual-language-processing](notebooks/233-blip-visual-language-processing/)<br>| 基于BLIP和OpenVINO™的视觉问答与图片注释 | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> |
 |[234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| # 基于EnCodec和OpenVINO™的音频压缩 | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
 |[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| # 使用ControlNet状态调节Stable Diffusion 实现文字生成图片 | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
 >>>>>>> upstream/main
