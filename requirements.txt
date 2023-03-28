@@ -49,7 +49,6 @@ psutil
 gdown
 basicsr
 
-
 # The packages below are not directly required. They are dependencies of 
 # other dependencies that are pinned to a specific version to avoid
 # compatibility issues or vulnerabilities
