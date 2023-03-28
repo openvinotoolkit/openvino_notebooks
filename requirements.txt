@@ -47,8 +47,8 @@ shapely>=1.7.1
 pyclipper>=1.2.1
 psutil
 gdown
-yaspin
 basicsr
+
 
 # The packages below are not directly required. They are dependencies of 
 # other dependencies that are pinned to a specific version to avoid
