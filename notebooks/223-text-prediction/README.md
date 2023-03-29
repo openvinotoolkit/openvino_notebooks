@@ -11,7 +11,7 @@ The complete pipeline of this Text Generation is shown below.
 
 ![image2](https://user-images.githubusercontent.com/91228207/163990722-d2713ede-921e-4594-8b00-8b5c1a4d73b5.jpeg)
 
-This is a demonstration in which the user can type the beginning of the text and the network will generate a further. This procedure can be repeated as many times as the user desires.
+This notebook demonstrates how to generate text using user input. By entering the beginning of a sentence or paragraph, the network generates additional text to complete the sequence. Also, This process can be repeated as many times as the user desires, and the model responds to each input, allowing users to engage in a conversation-like interaction.
 
 The following images show an example of the input sequence and corresponding predicted sequence.
 
@@ -23,8 +23,6 @@ The following images show an example of the input sequence and corresponding pre
 The Modified Pipeline For Conversation is shown below.
 
 ![image2](https://user-images.githubusercontent.com/95569637/226101538-e204aebd-a34f-4c8b-b90c-5363ba41c080.jpeg)
-
-This notebook demonstrates how to generate text using user input. By entering the beginning of a sentence or paragraph, the network generates additional text to complete the sequence. This process can be repeated as many times as the user desires, and the model responds to each input, allowing users to engage in a conversation-like interaction.
 
 The following image shows an example of a conversation.
 
