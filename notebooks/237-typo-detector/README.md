@@ -12,7 +12,7 @@ The model has been pretrained on the [NeuSpell](https://github.com/neuspell/neus
 
 </br>
 
-The notebook provides two methods to use the typo detector in the OpenVino runtime.
+The notebook provides two methods to use the typo detector in the OpenVino runtime. I've demonstrated both methods so that you can experience both the loading of compiled models and loading models in other frameworks and converting them.
 
 1. Use the [Hugging Face Optimum](https://huggingface.co/docs/optimum/index) library to load the compiled model in OpenVino IR format. Then create a pipeline with the loaded model to run inference.
 
