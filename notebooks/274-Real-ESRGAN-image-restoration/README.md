@@ -6,11 +6,14 @@ This notebook demonstrates how to do inference on Real-ESRGAN a PyTorch image re
 # Example
 
 Low-resolution image:
-![low-res]()
+
+![lr_face](https://user-images.githubusercontent.com/86083079/228696879-f3b2fccd-bc6a-4dc6-a4cb-1cf5c404569f.png)
 
 
 4x-scaled enhanced image
-![scaled-res]()
+
+![result_torch](https://user-images.githubusercontent.com/86083079/228696914-772043e0-f74e-46a7-a234-a68b5ebe0f33.png)
+
 
 
 ## Notebook Contents
