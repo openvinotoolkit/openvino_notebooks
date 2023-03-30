@@ -66,28 +66,19 @@ Brief tutorials that demonstrate how to use OpenVINO's Python API for inference.
 ### ⌚ Convert & Optimize 
 
 Tutorials that explain how to optimize and quantize models with OpenVINO tools.
-	
-| [101-tensorflow-to-openvino](notebooks/101-tensorflow-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F101-tensorflow-to-openvino%2F101-tensorflow-to-openvino.ipynb) |  [102-pytorch-onnx-to-openvino](notebooks/102-pytorch-onnx-to-openvino/) | [103-paddle-to-openvino](notebooks/103-paddle-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-to-openvino%2F103-paddle-to-openvino-classification.ipynb) | [104-model-tools](notebooks/104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | 
-| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |  
-| Convert TensorFlow models to OpenVINO IR | Convert PyTorch models to OpenVINO IR | Convert PaddlePaddle models to OpenVINO IR | Download, convert and benchmark models from Open Model Zoo  | 
-| <img src="https://user-images.githubusercontent.com/15709723/127779167-9d33dcc6-9001-4d74-a089-8248310092fe.png" width=250> | <img src="https://user-images.githubusercontent.com/15709723/127779246-32e7392b-2d72-4a7d-b871-e79e7bfdd2e9.png" width=300 > | <img src="https://user-images.githubusercontent.com/15709723/127779326-dc14653f-a960-4877-b529-86908a6f2a61.png" width=300>  | <img src="https://user-images.githubusercontent.com/10940214/157541917-c5455105-b0d9-4adf-91a7-fbc142918015.png" width=150>  |
-	
-More amazing notebooks here! 
 
-<p>
-<details>
-<summary> Click here to show complete list!  </summary> 
 
-| Notebook | Description | 
-| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | 
-| [101-tensorflow-to-openvino](notebooks/101-tensorflow-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F101-tensorflow-to-openvino%2F101-tensorflow-to-openvino.ipynb) | Convert TensorFlow models to OpenVINO IR | 
-| [102-pytorch-onnx-to-openvino](notebooks/102-pytorch-onnx-to-openvino/) | Convert PyTorch models to OpenVINO IR | 
-| [103-paddle-to-openvino](notebooks/103-paddle-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-to-openvino%2F103-paddle-to-openvino-classification.ipynb) | Convert PaddlePaddle models to OpenVINO IR | 
-| [104-model-tools](notebooks/104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | Download, convert and benchmark models from Open Model Zoo | 
+| Notebook | Description |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- |
+| [101-tensorflow-to-openvino](notebooks/101-tensorflow-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F101-tensorflow-to-openvino%2F101-tensorflow-to-openvino.ipynb) | Convert TensorFlow models to OpenVINO IR |
+| [102-pytorch-onnx-to-openvino](notebooks/102-pytorch-onnx-to-openvino/) | Convert PyTorch models to OpenVINO IR |
+| [103-paddle-to-openvino](notebooks/103-paddle-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-to-openvino%2F103-paddle-to-openvino-classification.ipynb) | Convert PaddlePaddle models to OpenVINO IR |
+| [104-model-tools](notebooks/104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | Download, convert and benchmark models from Open Model Zoo |
 | [105-language-quantize-bert](notebooks/105-language-quantize-bert/) | Optimize and quantize a pre-trained BERT model |
 | [106-auto-device](notebooks/106-auto-device/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F106-auto-device%2F106-auto-device.ipynb) | Demonstrate how to use AUTO Device |
 | [107-speech-recognition-quantization](notebooks/107-speech-recognition-quantization/) | Optimize and quantize a pre-trained speech recognition models |
-| [110-ct-segmentation-quantize](notebooks/110-ct-segmentation-quantize/)<br> | Quantize a kidney segmentation model and show live inference | 
+| [108-gpu-device](notebooks/108-gpu-device/) | Working with GPUs in OpenVINO™ |
+| [110-ct-segmentation-quantize](notebooks/110-ct-segmentation-quantize/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F110-ct-segmentation-quantize%2F110-ct-scan-live-inference.ipynb) | Quantize a kidney segmentation model and show live inference | 
 | [111-detection-quantization](notebooks/111-detection-quantization/)<br> | Quantize an object detection model | 
 | [112-pytorch-post-training-quantization-nncf](notebooks/112-pytorch-post-training-quantization-nncf/) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model in post-training mode (without model fine-tuning)| 
 | [113-image-classification-quantization](notebooks/113-image-classification-quantization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F113-image-classification-quantization%2F113-image-classification-quantization.ipynb) | Quantize mobilenet image classification |
@@ -97,27 +88,13 @@ More amazing notebooks here!
 | [117-model-server](notebooks/117-model-server/)| Introduction to model serving with OpenVINO™ Model Server (OVMS) |
 | [118-optimize-preprocessing](notebooks/118-optimize-preprocessing/)| Improve performance of image preprocessing step |
 
-</details>
-</p>
 
 <div id='-model-demos'/>
 
 ### 🎯 Model Demos
 
 Demos that demonstrate inference on a particular model.
-	
-| [210-ct-scan-live-inference](notebooks/210-ct-scan-live-inference/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F210-ct-scan-live-inference%2F210-ct-scan-live-inference.ipynb) | [225-stable-diffusion-text-to-image](notebooks/225-stable-diffusion-text-to-image/)| [227-whisper-subtitles-generation](notebooks/227-whisper-subtitles-generation/)| [230-yolov8-optimization](notebooks/230-yolov8-optimization/) |  [231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)|
-| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | 
-| Show live inference on segmentation of CT-scan data | Text-to-image generation with Stable Diffusion method | Generate subtitles for video with OpenAI Whisper and OpenVINO | Optimize YOLOv8 using NNCF PTQ API | Image editing with InstructPix2Pix |
-|<img src="https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif" width=180>| <img src=https://user-images.githubusercontent.com/29454499/216524089-ed671fc7-a78b-42bf-aa96-9f7c791a9419.png width=225>| <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225> | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=750> |
-	
-More amazing notebooks here! 
 
-<p>
-<details>
-<summary> Click here to show complete list! </summary>
-	
-	
 | Notebook | Description | Preview |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | [201-vision-monodepth](notebooks/201-vision-monodepth/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F201-vision-monodepth%2F201-vision-monodepth.ipynb) | Monocular depth estimation with images and video | <img src="https://user-images.githubusercontent.com/15709723/127752390-f6aa371f-31b5-4846-84b9-18dd4f662406.gif" width=250> |
@@ -129,7 +106,6 @@ More amazing notebooks here!
 | [207-vision-paddlegan-superresolution](notebooks/207-vision-paddlegan-superresolution/)<br> | Upscale small images with superresolution using a PaddleGAN model| |
 | [208-optical-character-recognition](notebooks/208-optical-character-recognition/)<br> | Annotate text on images using text recognition resnet | <img src="https://user-images.githubusercontent.com/36741649/129315292-a37266dc-dfb2-4749-bca5-2ac9c1e93d64.jpg" width=225> |
 | [209-handwritten-ocr](notebooks/209-handwritten-ocr/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F209-handwritten-ocr%2F209-handwritten-ocr.ipynb) | OCR for handwritten simplified Chinese and Japanese | <img width="425" alt="handwritten_simplified_chinese_test" src="https://user-images.githubusercontent.com/36741649/132660640-da2211ec-c389-450e-8980-32a75ed14abb.png"> <br> 的人不一了是他有为在责新中任自之我们 |
-| [210-ct-scan-live-inference](notebooks/210-ct-scan-live-inference/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F210-ct-scan-live-inference%2F210-ct-scan-live-inference.ipynb) | Show live inference on segmentation of CT-scan data | <img src="https://user-images.githubusercontent.com/77325899/154280563-0e94f972-2d1a-44f9-a894-1b61699d1781.gif" width=225> |
 | [211-speech-to-text](notebooks/211-speech-to-text/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F211-speech-to-text%2F211-speech-to-text.ipynb) | Run inference on speech-to-text recognition model | <img src="https://user-images.githubusercontent.com/36741649/140987347-279de058-55d7-4772-b013-0f2b12deaa61.png" width=225>|
 | [212-pyannote-speaker-diarization](notebooks/212-pyannote-speaker-diarization/)<br> | Run inference on speaker diarization pipeline | <img src="https://user-images.githubusercontent.com/29454499/218432101-0bd0c424-e1d8-46af-ba1d-ee29ed6d1229.png" width=225>|
 | [213-question-answering](notebooks/213-question-answering/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F213-question-answering%2F213-question-answering.ipynb) | Answer your questions basing on a context | <img src="https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif" width=225> |
@@ -143,7 +119,7 @@ More amazing notebooks here!
 | [221-machine-translation](notebooks/221-machine-translation)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F221-machine-translation%2F221-machine-translation.ipynb) | Real-time translation from English to German |  |
 | [222-vision-image-colorization](notebooks/222-vision-image-colorization/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F222-vision-image-colorization%2F222-vision-image-colorization.ipynb) | Use pre-trained models to colorize black \& white images using OpenVINO | <img src = "https://user-images.githubusercontent.com/18904157/166343139-c6568e50-b856-4066-baef-5cdbd4e8bc18.png" width=225> |
 | [223-gpt2-text-prediction](notebooks/223-gpt2-text-prediction/)<br> | Use GPT-2 to perform text prediction on an input sequence | <img src=https://user-images.githubusercontent.com/91228207/185105225-0f996b0b-0a3b-4486-872d-364ac6fab68b.png  width=225> |
-| [224-3D-segmentation-point-clouds](notebooks/224-3D-segmentation-point-clouds/)<br> | Process point cloud data and run 3D Part Segmentation with OpenVINO | <img src = "https://user-images.githubusercontent.com/91237924/185752178-3882902c-907b-4614-b0e6-ea1de08bf3ef.png" width=225> |
+| [224-3D-segmentation-point-clouds](notebooks/224-3D-segmentation-point-clouds/)<br> | Process point cloud data and run 3D Part Segmentation with OpenVINO | <img src = "https://user-images.githubusercontent.com/91237924/185752178-3882902c-907b-4614-b0e6-ea1de08bf3ef.png" width=60%> |
 | [225-stable-diffusion-text-to-image](notebooks/225-stable-diffusion-text-to-image)<br> | Text-to-image generation with Stable Diffusion method | <img src=https://user-images.githubusercontent.com/29454499/216524089-ed671fc7-a78b-42bf-aa96-9f7c791a9419.png width=225>|
 | [226-yolov7-optimization](notebooks/226-yolov7-optimization/)<br> | Optimize YOLOv7 using NNCF PTQ API | <img src=https://raw.githubusercontent.com/WongKinYiu/yolov7/main/figure/horses_prediction.jpg  width=225> |
 | [227-whisper-subtitles-generation](notebooks/227-whisper-subtitles-generation/)<br> | Generate subtitles for video with OpenAI Whisper and OpenVINO | <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225> |
@@ -152,8 +128,9 @@ More amazing notebooks here!
 | [230-yolov8-optimization](notebooks/230-yolov8-optimization/)<br> | Optimize YOLOv8 using NNCF PTQ API | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> |
 |[231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)<br>| Image editing with InstructPix2Pix | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=225> |
 |[232-clip-language-saliency-map](notebooks/232-clip-language-saliency-map/)<br>| Language-Visual Saliency with CLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG width=225> | 
-</details>
-</p>
+|[233-blip-visual-language-processing](notebooks/233-blip-visual-language-processing/)<br>| Visual Question Answering and Image Captioning using BLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> |
+|[234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| # Audio compression with EnCodec and OpenVINO™ | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
+|[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| # A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
 
 <div id='-model-training'/>
 
@@ -171,19 +148,8 @@ Tutorials that include code to train neural networks.
 
 ### 📺 Live Demos
 Live inference demos that run on a webcam or video files.
-	
-| [401-object-detection-webcam](notebooks/401-object-detection-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F401-object-detection-webcam%2F401-object-detection.ipynb) | [403-action-recognition-webcam](notebooks/403-action-recognition-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb) | [404-style-transfer-webcam](notebooks/404-style-transfer-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F404-style-transfer-webcam%2F404-style-transfer.ipynb) | [405-paddle-ocr-webcam](notebooks/405-paddle-ocr-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F405-paddle-ocr-webcam%2F405-paddle-ocr-webcam.ipynb) |
-| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-|Object detection with a webcam or video file |  Human action recognition with a webcam or video file | Style transfer with a webcam or video file| OCR with a webcam or video file |
-| <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=150> | <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=200> | <img src="https://user-images.githubusercontent.com/109281183/203772234-f17a0875-b068-43ef-9e77-403462fde1f5.gif" width=300> | <img src="https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleocr.gif" width=230> |
-	
-More amazing notebooks here! 
 
-<p>
-<details>
-<summary> Click here to show complete list! </summary>
-	
-	
+
 | Notebook | Description | Preview |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | [401-object-detection-webcam](notebooks/401-object-detection-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F401-object-detection-webcam%2F401-object-detection.ipynb) | Object detection with a webcam or video file  | <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> |
@@ -195,18 +161,9 @@ More amazing notebooks here!
 | [407-person-tracking-webcam](notebooks/407-person-tracking-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F407-person-tracking-webcam%2F407-person-tracking.ipynb) | Person tracking with a webcam or video file | <img src = "https://user-images.githubusercontent.com/91237924/210479548-b70dbbaa-5948-4e49-b48e-6cb6613226da.gif" width=225> |
 
 
-</details>
-</p>
-
 If you run into issues, please check the [troubleshooting section](#-troubleshooting), [FAQs](#-faq) or start a GitHub [discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions). 
 
 Notebooks with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](#-installation-guide) and run the notebooks locally.
-
-You will have a lot of fun with this section:
-
-| [Vision-monodepth](notebooks/201-vision-monodepth/) | [CT-scan-live-inference](notebooks/210-ct-scan-live-inference/) | [Object-detection-webcam](notebooks/401-object-detection-webcam/) | [Pose-estimation-webcam](notebooks/402-pose-estimation-webcam/) | [Action-recognition-webcam](notebooks/403-action-recognition-webcam/) | 
-| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | 
-| <img src="https://user-images.githubusercontent.com/15709723/127752390-f6aa371f-31b5-4846-84b9-18dd4f662406.gif" width=225> | <img src="https://user-images.githubusercontent.com/15709723/134784204-cf8f7800-b84c-47f5-a1d8-25a9afab88f8.gif" width=140> | <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=140> | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=185>  | <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=185> | 
 
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
@@ -254,61 +211,50 @@ In your browser, select a notebook from the file browser in Jupyter Lab using th
 
 ## 🧹 Cleaning Up
 
-<p>
-<details>
-<summary>Shut Down Jupyter Kernel</summary>
+<div id='-shut-down-jupyter-kernel'>
+&#8226; Shut Down Jupyter Kernel
 
 To end your Jupyter session, press `Ctrl-c`. This will prompt you to `Shutdown this Jupyter server (y/[n])?` enter `y` and hit `Enter`.
-</details>
-</p>	
+</div>	
 	
-<p>
-<details>
-<summary>Deactivate Virtual Environment</summary>
+<div id='-deactivate-virtual-environment'>
+&#8226; Deactivate Virtual Environment
 
 To deactivate your virtualenv, simply run `deactivate` from the terminal window where you activated `openvino_env`. This will deactivate your environment.
 
 To reactivate your environment, run `source openvino_env/bin/activate` on Linux or `openvino_env\Scripts\activate` on Windows, then type `jupyter lab` or `jupyter notebook` to launch the notebooks again.
-</details>
-</p>	
-	
-<p>
-<details>
-<summary>Delete Virtual Environment _(Optional)_</summary>
+</div>	
+
+<div id='-delete-virtual-environment'>
+&#8226; Delete Virtual Environment _(Optional)_
 
 To remove your virtual environment, simply delete the `openvino_env` directory:
-</details>
-</p>	
-	
-<p>
-<details>
-<summary>On Linux and macOS:</summary>
+</div>
+
+<div id='-on-linux-and-macos'>
+&#8226; On Linux and macOS:
 
 ```bash
 rm -rf openvino_env
 ```
-</details>
-</p>
 
-<p>
-<details>
-<summary>On Windows:</summary>
+</div>
+
+<div id='-on-windows'>
+&#8226; On Windows:
 
 ```bash
 rmdir /s openvino_env
 ```
-</details>
-</p>
+</div>
 
-<p>
-<details>
-<summary>Remove openvino_env Kernel from Jupyter</summary>
+<div id='-remove-openvino-env-kernel'>
+&#8226; Remove openvino_env Kernel from Jupyter
 
 ```bash
 jupyter kernelspec remove openvino_env
 ```
-</details>
-</p>
+</div>
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='-troubleshooting'/>
@@ -322,7 +268,7 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
   Please run it after activating the `openvino_env` virtual environment.
 - If you get an `ImportError`, doublecheck that you installed the Jupyter kernel. If necessary, choose the openvino\_env kernel from the _Kernel->Change Kernel_ menu) in Jupyter Lab or Jupyter Notebook
 - If OpenVINO is installed globally, do not run installation commands in a terminal where setupvars.bat or setupvars.sh are sourced.
-- For Windows installation, we recommend using _Command Prompt (cmd.exe)_, not _PowerShell_.
+- For Windows installation, it is recommended to use _Command Prompt (cmd.exe)_, not _PowerShell_.
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#-contributors)
 <div id='-contributors'/>

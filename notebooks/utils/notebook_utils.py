@@ -20,10 +20,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from openvino.runtime import Core, get_version
-from async_pipeline import AsyncPipeline
 from IPython.display import HTML, Image, Markdown, display
 from matplotlib.lines import Line2D
-from models import model
 from tqdm.notebook import tqdm_notebook
 
 
@@ -536,79 +534,6 @@ def show_array(frame: np.ndarray, display_handle=None):
     else:
         display_handle.update(Image(data=frame.tobytes()))
     return display_handle
-
-
-def show_live_inference(
-    ie, image_paths: List, model: model.Model, device: str, reader: Optional[Callable] = None
-):
-    """
-    Do inference of images listed in `image_paths` on `model` on the given `device` and show
-    the results in real time in a Jupyter Notebook
-
-    :param image_paths: List of image filenames to load
-    :param model: Model instance for inference
-    :param device: Name of device to perform inference on. For example: "CPU"
-    :param reader: Image reader. Should return a numpy array with image data.
-                   If None, cv2.imread will be used, with the cv2.IMREAD_UNCHANGED flag
-    """
-    display_handle = None
-    next_frame_id = 0
-    next_frame_id_to_show = 0
-
-    input_layer = model.net.input(0)
-
-    # Create asynchronous pipeline and print time it takes to load the model
-    load_start_time = time.perf_counter()
-    pipeline = AsyncPipeline(
-        ie=ie, model=model, plugin_config={}, device=device, max_num_requests=0
-    )
-    load_end_time = time.perf_counter()
-
-    # Perform asynchronous inference
-    start_time = time.perf_counter()
-
-    while next_frame_id < len(image_paths) - 1:
-        results = pipeline.get_result(next_frame_id_to_show)
-
-        if results:
-            # Show next result from async pipeline
-            result, meta = results
-            display_handle = show_array(result, display_handle)
-            next_frame_id_to_show += 1
-        if pipeline.is_ready():
-            # Submit new image to async pipeline
-            image_path = image_paths[next_frame_id]
-            if reader is None:
-                image = cv2.imread(filename=str(image_path), flags=cv2.IMREAD_UNCHANGED)
-            else:
-                image = reader(str(image_path))
-            pipeline.submit_data(
-                inputs={input_layer: image}, id=next_frame_id, meta={"frame": image}
-            )
-            del image
-            next_frame_id += 1
-        else:
-            # If the pipeline is not ready yet and there are no results: wait
-            pipeline.await_any()
-
-    pipeline.await_all()
-
-    # Show all frames that are in the pipeline after all images have been submitted
-    while pipeline.has_completed_request():
-        results = pipeline.get_result(next_frame_id_to_show)
-        if results:
-            result, meta = results
-            display_handle = show_array(result, display_handle)
-            next_frame_id_to_show += 1
-
-    end_time = time.perf_counter()
-    duration = end_time - start_time
-    fps = len(image_paths) / duration
-    print(f"Loaded model to {device} in {load_end_time-load_start_time:.2f} seconds.")
-    print(f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}")
-
-    del pipeline.exec_net
-    del pipeline
 
 
 # ## Checks and Alerts
