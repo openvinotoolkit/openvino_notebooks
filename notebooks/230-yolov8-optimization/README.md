@@ -17,7 +17,7 @@ The tutorial consists of the following steps:
 - Validate the original model.
 - Convert the PyTorch model to OpenVINO IR.
 - Validate the converted model.
-- Prepare and run NNCF Postraining optimization pipeline.
+- Prepare and run NNCF post-training optimization pipeline.
 - Compare accuracy of the FP32 and quantized models.
 - Compare performance of the FP32 and quantized models.
 
