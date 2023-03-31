@@ -56,6 +56,3 @@ Notebook contains the following steps:
 
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
-
-Known Issues:
-* GPU plugin is not working properly on the Text-to-Image Demo. 
