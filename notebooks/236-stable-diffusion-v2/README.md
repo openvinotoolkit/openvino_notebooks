@@ -41,7 +41,7 @@ The following image shows an example of the input text and corresponding video.
 **Input text:** valley in the Alps at sunset, epic vista, beautiful landscape, 4k, 8k
 
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/1720147/229226730-683240f1-35b4-49d3-8c90-5b32a90e039c.gif"/>
+    <img src="https://user-images.githubusercontent.com/1720147/229233760-79c9425e-5691-4114-ad13-7e33f9327b52.gif"/>
 </p>
 
 
