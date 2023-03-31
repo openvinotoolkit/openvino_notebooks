@@ -56,3 +56,6 @@ Notebook contains the following steps:
 
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+
+## System Requirements
+It's important to know the conversion process takes up significant amount of memory (>64GB at peak). It's recommended that you have at least 64GB of RAM + a significant buffer (e.g., 32GB of swap). In Linux, we need at least 80GB of total memory to avoid crashing. On Windows, the swap size changes dynamically, but please do ensure there are enough disk space during the conversion process.
