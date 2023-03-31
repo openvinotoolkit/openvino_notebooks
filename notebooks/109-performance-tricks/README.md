@@ -1,6 +1,6 @@
 # Introduction to Performance Tricks in OpenVINO™
 
-![](https://user-images.githubusercontent.com/4547501/227954106-0df710c2-d91c-41cb-a420-fb762c664a14.png)
+![](https://user-images.githubusercontent.com/4547501/229120774-01f4f972-424d-4280-8395-220dd432985a.png)
 
 This notebook shows tips on how to optimize inference in OpenVINO™.   
 
