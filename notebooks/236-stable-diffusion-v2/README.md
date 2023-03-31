@@ -11,6 +11,7 @@ In previous notebooks, we already discussed how to run [Text-to-Image generation
 This notebook series demonstrates two approaches to image generation using an AI method called `diffusion`:
 
 * [Text-to-Image](./236-stable-diffusion-v2-text-to-image.ipynb) generation to create images from a text description as input.
+
 <p align="center">
     <img src="https://user-images.githubusercontent.com/29454499/228472288-be6fecb6-5ab5-411f-86dc-0e9c482c733e.png" />
 </p>
@@ -28,6 +29,7 @@ The following image shows an example of the input text and the corresponding pre
 
 
 * [Text-guided Inpaining](./236-stable-diffusion-v2-infinite-zoom.ipynb) generation to create an image, using text description and masked image region, which should be part of the generated image.
+
 <p align="center">
     <img src="https://user-images.githubusercontent.com/29454499/228501084-60f86a71-0907-4094-a796-96350264d8b8.png" />
 </p>
@@ -52,6 +54,5 @@ Notebook contains the following steps:
 2. Convert ONNX models to OpenVINO IR format, using Model Optimizer tool.
 3. Run Stable Diffusion V2 pipeline with OpenVINO.
 
-## Installation Instructions
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
