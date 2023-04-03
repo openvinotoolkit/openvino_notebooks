@@ -8,7 +8,6 @@ nncf==2.4.0
 tensorflow-macos>=2.5,<=2.12; sys_platform == 'darwin' and platform_machine == 'arm64' # macOS M1 and M2
 tensorflow>=2.5,<=2.12; sys_platform == 'darwin' and platform_machine != 'arm64' # macOS x86
 tensorflow>=2.5,<=2.12; sys_platform == 'linux' or platform_system == 'Windows'
-tensorflow-datasets==4.2.0
 
 onnx>=1.11.0
 
@@ -39,9 +38,6 @@ opencv-python
 Pillow>=8.3.2
 matplotlib>=3.4,<3.5.3
 scipy
-pytube>=12.1.0
-librosa>=0.8.1
-gdown
 
 # The packages below are not directly required. They are dependencies of 
 # other dependencies that are pinned to a specific version to avoid
