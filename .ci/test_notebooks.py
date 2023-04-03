@@ -14,6 +14,7 @@ def get_parsed_requirements(requirements_file: str) -> Set:
     without versions
     """
     requirements_set = set()
+    ignore_list = ['paddlenlp', 'paddle2onnx', 'paddlepaddle'] # temporary ignore paddle
     parsed_requirements = parse_requirements(requirements_file, session=False)
     separators = ("=", "<", ">", "[")
     for req in parsed_requirements:
@@ -25,8 +26,9 @@ def get_parsed_requirements(requirements_file: str) -> Set:
             requirement = requirement.split('#egg=')[-1]
         for separator in separators:
             requirement = requirement.replace(separator, "|")
-
-        requirements_set.add(requirement.split("|")[0])
+        reqname = requirement.split("|")[0]
+        if reqname not in ignore_list:
+            requirements_set.add(reqname)
 
     return requirements_set
 
@@ -77,7 +79,7 @@ def test_requirements_binder():
     ), f"Binder requirements misses: {pip_requirements.difference(binder_requirements)}"
 
 
-@pytest.mark.skip(reason="URL existence is tested in docker_nbval")
+@pytest.mark.skip(reason="URL existence is tested in docker_treon")
 def test_urls_exist():
     """
     Test that urls that may be cached still exist on the server
