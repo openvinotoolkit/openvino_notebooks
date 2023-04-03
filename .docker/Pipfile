@@ -8,11 +8,6 @@ url = "https://download.pytorch.org/whl/"
 verify_ssl = true
 name = "pytorch-wheels"
 
-[[source]]
-url = "https://www.paddlepaddle.org.cn/whl/linux/cpu-mkl/develop.html"
-verify_ssl = true
-name = "paddlepaddle-wheels"
-
 [packages]
 boto3 = "*"
 gdown = "*"
@@ -35,12 +30,7 @@ opencv-python = "*"
 openvino-dev = {version = "==2022.3.0"}
 openvino-telemetry = "==2022.3.0"
 ovmsclient = "*"
-paddle2onnx = ">=0.6,<=0.9.6"
-paddleclas = ">=2.2"
-paddlenlp = ">=2.0.8"  # pin to avoid conflict with requests
-paddlepaddle = {index = "paddlepaddle-wheels", version = "==0.0.0"}
 Pillow = ">=8.3.2"
-ppgan = ">=2.1.0"
 psutil = "*"
 pyclipper = ">=1.2.1"
 pygments = ">=2.7.4"
