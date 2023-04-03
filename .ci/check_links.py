@@ -4,7 +4,6 @@ import sys
 import mistune
 import requests
 import urllib.parse
-import urllib.request
 
 from pathlib import Path
 
