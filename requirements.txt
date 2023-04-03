@@ -5,12 +5,12 @@ nncf==2.4.0
 
 
 # deep learning frameworks
-onnx>=1.11.0,<=1.12.0
-
-tensorflow-macos>=2.5,<=2.9.3; sys_platform == 'darwin' and platform_machine == 'arm64' # macOS M1 and M2
-tensorflow>=2.5,<=2.9.3; sys_platform == 'darwin' and platform_machine != 'arm64' # macOS x86
-tensorflow>=2.5,<=2.9.3; sys_platform == 'linux' or platform_system == 'Windows'
+tensorflow-macos>=2.5,<=2.12; sys_platform == 'darwin' and platform_machine == 'arm64' # macOS M1 and M2
+tensorflow>=2.5,<=2.12; sys_platform == 'darwin' and platform_machine != 'arm64' # macOS x86
+tensorflow>=2.5,<=2.12; sys_platform == 'linux' or platform_system == 'Windows'
 tensorflow-datasets==4.2.0
+
+onnx>=1.11.0
 
 --find-links https://download.pytorch.org/whl/torch_stable.html
 torch==1.13.1; sys_platform == 'darwin'
@@ -20,7 +20,13 @@ torchvision==0.14.1+cpu; sys_platform == 'linux' or platform_system == 'Windows'
 torchmetrics>=0.11.0
 pytorch-lightning
 
-paddlepaddle>=2.4.0
+--find-links https://www.paddlepaddle.org.cn/whl/mac/cpu/develop.html
+paddlepaddle==0.0.0; sys_platform == 'darwin'
+--find-links https://www.paddlepaddle.org.cn/whl/windows/cpu-mkl-avx/develop.html
+paddlepaddle==0.0.0; platform_system == 'Windows'
+--find-links https://www.paddlepaddle.org.cn/whl/linux/cpu-mkl/develop.html
+paddlepaddle==0.0.0; sys_platform == 'linux'
+#paddlepaddle>=2.4.0
 paddle2onnx>=0.6
 paddlenlp>=2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
 
