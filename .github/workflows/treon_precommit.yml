@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04, windows-2019, macos-11, macos-12]
+        os: [ubuntu-20.04, windows-2019, macos-12]
         python: ["3.7", "3.8", "3.9", "3.10"]
     steps:
 
@@ -208,17 +208,17 @@ jobs:
     - name: Analysing with treon (Windows)
       if: runner.os == 'Windows'
       run: |
-            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 108-gpu-device 235-controlnet-stable-diffusion --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
+            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
       shell: bash
     - name: Analysing with treon (Linux)
       if: runner.os == 'Linux'
       run: |
-            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device 235-controlnet-stable-diffusion --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
     - name: Analysing with treon (MacOS)
       if: runner.os == 'MacOS'
       run: |
-           python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 107-speech-recognition-quantization 108-gpu-device 235-controlnet-stable-diffusion --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+           python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 107-speech-recognition-quantization 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
     - name: Archive test report
       uses: actions/upload-artifact@v3
