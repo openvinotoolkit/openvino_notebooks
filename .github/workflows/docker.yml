@@ -1,7 +1,7 @@
 # Build Docker image and test notebooks in Docker image
 # Test script location: .docker/.s2i/bin/test
 
-name: docker_nbval
+name: docker_treon
 
 on:
   workflow_dispatch:

@@ -6,3 +6,5 @@ notebooks/225-stable-diffusion-text-to-image/225-stable-diffusion-text-to-image.
 notebooks/230-yolov8-optimization/230-yolov8-optimization.ipynb
 notebooks/231-instruct-pix2pix-image-editing/231-instruct-pix2pix-image-editing.ipynb
 notebooks/235-controlnet-stable-diffusion/235-controlnet-stable-diffusion.ipynb
+notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-infinite-zoom.ipynb
+notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-text-to-image.ipynb
