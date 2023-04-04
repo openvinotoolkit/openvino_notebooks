@@ -21,4 +21,4 @@ The tutorial consists of the following steps:
 
 This is a standalone tutorial notebook. You can run it in Google Colab!
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/112-ptq/notebooks/112-pytorch-post-training-quantization-nncf/112-pytorch-post-training-quantization-nncf.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/enable-standalone-execution/notebooks/112-pytorch-post-training-quantization-nncf/112-pytorch-post-training-quantization-nncf.ipynb)
