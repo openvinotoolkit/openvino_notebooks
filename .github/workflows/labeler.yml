@@ -9,6 +9,7 @@ jobs:
     steps:
     - uses: github/issue-labeler@v3.1
       with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
         configuration-path: .github/laberer/labeler.yml
         not-before: 2023-03-30T00:00:00Z
         enable-versioned-regex: 0
