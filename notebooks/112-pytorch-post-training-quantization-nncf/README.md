@@ -19,6 +19,4 @@ The tutorial consists of the following steps:
 
 ## Installation Instructions
 
-This is a standalone tutorial notebook. You can run it in Google Colab!
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/112-ptq/notebooks/112-pytorch-post-training-quantization-nncf/112-pytorch-post-training-quantization-nncf.ipynb)
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
