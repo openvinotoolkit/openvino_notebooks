@@ -1,7 +1,12 @@
-name: nbval
+name: treon
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+    - 'main'
+    - '2021.4'
+    - 'develop'
     paths:
     - 'notebooks/**.ipynb'
     - 'notebooks/**.py'
@@ -9,20 +14,30 @@ on:
     - '.ci/*'
     - '.github/workflows/*.yml'
     - '.github/workflows/.env'
-  schedule:
-    - cron:  '30 8 * * *'
+  push:
+    branches:
+    - 'main'
+    - '2021.4'
+    - 'develop'
+    paths:
+    - 'notebooks/**.ipynb'
+    - 'notebooks/**.py'
+    - 'requirements.txt'
+    - '.ci/*'
+    - '.github/workflows/*.yml'
+    - '.github/workflows/.env'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
-  build_nbval:
+  build_treon:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, windows-2019, windows-2022, macos-11, macos-12]
+        os: [ubuntu-20.04, windows-2019, macos-12]
         python: ["3.7", "3.8", "3.9", "3.10"]
     steps:
 
@@ -31,7 +46,26 @@ jobs:
     # These steps are also copied to convert_notebooks.yml
 
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+      with:
+          fetch-depth: 0
+    
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v34
+      with:
+          files: |
+            notebooks/*/**
+            requirements.txt
+
+    - name: List all changed files
+      run: |
+        touch test_notebooks.txt
+        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          echo "$file was changed"
+          echo $file >> test_notebooks.txt
+        done
+      shell: bash
     - name: Dotenv Action
       id: dotenv
       uses: xom9ikk/dotenv@v1.0.2
@@ -63,7 +97,7 @@ jobs:
       with:
         path: |
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
-          # and change cache paths in both nbval.yml and convert_notebooks.yml
+          # and change cache paths in both treon.yml and convert_notebooks.yml
           case_00030.zip
           notebooks/110-ct-segmentation-quantize/kits19_frames_1
           notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
@@ -171,21 +205,20 @@ jobs:
         jupyter lab notebooks --help
 
     # Main notebooks test. Verifies that all notebooks run without errors
-    - name: Analysing with nbval (Windows)
+    - name: Analysing with treon (Windows)
       if: runner.os == 'Windows'
       run: |
-            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image --move_notebooks_dir c:/notebooks
+            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
       shell: bash
-    - name: Analysing with nbval (Linux)
+    - name: Analysing with treon (Linux)
       if: runner.os == 'Linux'
       run: |
-            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image
+            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
-    - name: Analysing with nbval (MacOS)
+    - name: Analysing with treon (MacOS)
       if: runner.os == 'MacOS'
       run: |
-            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image
-
+           python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 107-speech-recognition-quantization 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
     - name: Archive test report
       uses: actions/upload-artifact@v3
