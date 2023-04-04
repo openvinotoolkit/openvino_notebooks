@@ -1,5 +1,4 @@
-import urllib.error
-import urllib.request
+import requests
 from pathlib import Path
 from typing import Set
 import pytest
@@ -89,13 +88,9 @@ def test_urls_exist():
         "https://github.com/onnx/models/raw/main/vision/style_transfer/fast_neural_style/model/pointilism-9.onnx",
         "https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip",
     ]
-    opener = urllib.request.build_opener()
-    opener.addheaders = [("User-agent", "Mozilla/5.0")]
-    urllib.request.install_opener(opener)
+    headers = {"User-Agent": "Mozilla/5.0"}
     for url in urls:
-        try:
-            urlobject = urllib.request.urlopen(url, timeout=10)
-            assert urlobject.status == 200
-        except urllib.error.HTTPError:
+        response = requests.get(url=url, headers=headers)
+        if not response.status_code == 200:
             print(f"Downloading {url} failed")
             raise
