@@ -131,6 +131,7 @@ Demos that demonstrate inference on a particular model.
 |[234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| Audio compression with EnCodec and OpenVINO™ | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
 |[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
 |[236-stable-diffusion-v2](notebooks/236-stable-diffusion-v2/)<br>| Text-to-Image Generation and Infinite Zoom with Stable Diffusion v2 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/228882108-25c1f65d-4c23-4e1d-8ba4-f6164280a3e3.gif width=225> |
+|[250-nanodet](notebooks/250-nanodet/)<br>| Object Detection with OpenVINO™ using NanoDet| <img src=https://raw.githubusercontent.com/RangiLyu/nanodet/d3fb34fa91d6020f273d6d063bf324dcd97bac12/docs/imgs/Title.jpg width=225> |
 
 <div id='-model-training'/>
 
