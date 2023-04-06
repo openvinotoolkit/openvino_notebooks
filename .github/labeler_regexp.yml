@@ -1,4 +1,4 @@
 gsoc:
     - '/gsoc|summer/i'
-bug:
-    - '/bug|not working|fail|fails|error/i'
+fix:
+    - '/bug|not working|fail|fails|error|issue/i'
