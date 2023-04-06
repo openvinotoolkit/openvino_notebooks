@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: PR Labeler (RegExp)
+    - name: Add labels (Title/Description)
       uses: github/issue-labeler@v3.1
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
@@ -17,7 +17,7 @@ jobs:
         enable-versioned-regex: 0
         include-title: 1
         sync-labels: 1
-    - name: PR Labeler (Files)
+    - name: Add labels (Changed Files)
       uses: doka-guide/doka-labeler@v1.0.1
       with:
           token: "${{ secrets.GITHUB_TOKEN }}"
