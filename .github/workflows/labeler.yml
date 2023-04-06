@@ -4,14 +4,21 @@ on:
     types: [opened, edited]
 
 jobs:
-  triage:
+  labelling:
     runs-on: ubuntu-latest
     steps:
-    - uses: github/issue-labeler@v3.1
+    - name: PR Labeler (RegExp)
+      uses: github/issue-labeler@v3.1
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
-        configuration-path: .github/laberer/labeler.yml
+        configuration-path: .github/laberer/labeler_regexp.yml
         not-before: 2023-03-30T00:00:00Z
         enable-versioned-regex: 0
         include-title: 1
         sync-labels: 1
+    - uses: actions/checkout@v2
+    - name: PR Labeler (Files)
+      uses: doka-guide/doka-labeler@v1.0.1
+      with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          config: ".github/labeler/labeler_files.yml"
