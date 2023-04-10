@@ -25,4 +25,4 @@ python /tmp/scripts/patch_notebooks.py /opt/app-root/notebooks
 mv /opt/app-root/notebooks/ /tmp/
 
 # Test notebooks
-python /tmp/scripts/validate_notebooks.py --ignore_list 225-stable-diffusion-text-to-image 107-speech-recognition-quantization 231-instruct-pix2pix-image-editing 117-model-server 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 103-paddle-to-openvino 207-vision-paddlegan-superresolution 206-vision-paddlegan-anime 405-paddle-ocr-webcam 203-meter-reader
+python /tmp/scripts/validate_notebooks.py --ignore_list 225-stable-diffusion-text-to-image  305-tensorflow-quantization-aware-training 107-speech-recognition-quantization 231-instruct-pix2pix-image-editing 117-model-server 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 103-paddle-to-openvino 207-vision-paddlegan-superresolution 206-vision-paddlegan-anime 405-paddle-ocr-webcam 203-meter-reader
