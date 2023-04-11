@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 import paddle
 import math
-import random
 
 from PIL import Image, ImageDraw, ImageFont
 import copy
@@ -423,14 +422,14 @@ def draw_ocr_box_txt(image,
     img_left = image.copy()
     img_right = Image.new('RGB', (w, h), (255, 255, 255))
 
-    random.seed(0)
+    np.random.seed(0)
     draw_left = ImageDraw.Draw(img_left)
     draw_right = ImageDraw.Draw(img_right)
     for idx, (box, txt) in enumerate(zip(boxes, txts)):
         if scores is not None and scores[idx] < drop_score:
             continue
-        color = (random.randint(0, 255), random.randint(0, 255),
-                 random.randint(0, 255))
+        color = (np.random.randint(0, 255), np.random.randint(0, 255),
+                 np.random.randint(0, 255))
         draw_left.polygon(box, fill=color)
         draw_right.polygon(
             [
