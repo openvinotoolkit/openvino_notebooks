@@ -1,4 +1,8 @@
 name: "PR Labeler"
+
+permissions:
+  actions: read|write
+
 on:
   pull_request:
     types: [opened, edited]
