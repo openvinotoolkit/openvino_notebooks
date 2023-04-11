@@ -1,6 +1,7 @@
 name: "PR Labeler"
 
 permissions:
+  actions: read
   issues: read|write
   pull-requests: read|write
 
