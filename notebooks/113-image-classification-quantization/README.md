@@ -17,3 +17,7 @@ The tutorial consists of the following steps:
 * Preparing the model for quantization.
 * Running optimization pipeline.
 * Comparing performance of the original and quantized models.
+
+## Installation Instructions
+
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).

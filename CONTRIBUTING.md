@@ -15,7 +15,7 @@
   - [Validation](#validation)
     - [Automated tests](#automated-tests)
     - [Manual test and code quality tools](#manual-test-and-code-quality-tools)
-      - [nbval](#nbval)
+      - [treon](#treon)
       - [nbqa](#nbqa)
       - [nbdime](#nbdime)
       - [JupyterLab Code Formatter](#jupyterlab-code-formatter)
@@ -110,7 +110,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    `function(a=1, b=2)` instead of `function(1, 2)`
 5. Use `from pathlib import Path` for path manipulation instead of `os.path`
 6. Add type hints to functions: https://www.python.org/dev/peps/pep-0484/
-7. Add ReST style docstrings (see[110](https://docs.openvino.ai/latest/notebooks/210-ct-scan-live-inference-with-output.html)
+7. Add ReST style docstrings (see [403](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/403-action-recognition-webcam/403-action-recognition-webcam.ipynb)
    for an example). It is not necessary to specify the parameter type in the docstring, since
    type hints are already added to the function definition.
 8. Do not use global variables in functions: a function should not depend on values that are
@@ -230,13 +230,13 @@ Add all three files to the repository.
 
 We use Github Actions to automatically validate that all notebooks work. The following tests run automatically on a new notebook PR:
 
-- nbval: tests that the notebooks execute without problems on all supported platforms. 
+- treon: tests that the notebooks execute without problems on all supported platforms. 
 - codecheck: 
   - Uses [flake8](https://github.com/pycqa/flake8) to check for unnecessary imports and variables 
 and some style issues
   - Verifies that the notebook is included in the main README and the README in the notebooks directory. 
   - Runs the check_install script to test for installation issues
-- docker_nbval: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
+- docker_treon: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
   To manually run this test, build the Docker image with `docker build -t openvino_notebooks .` and run the tests with
   `docker run -it  --entrypoint /tmp/scripts/test openvino_notebooks`. It is recommended to build the image on a clean 
   repo because the full notebooks folder will be copied to the image.
@@ -254,12 +254,11 @@ it execute faster. As an example, if your notebook trains for 20 epochs, you can
 
 See [Getting started](#getting-started) about installing the tools mentioned in this section.
 
-#### nbval
+#### treon
 
-Tests are run in the CI with [nbval](https://github.com/computationalmodelling/nbval), a plugin for
-py.test.
+Tests are run in the CI with [treon](https://pypi.org/project/treon/), a test framework for Jupyter Notebooks.
 
-To run nbval locally, run `pytest --nbval .` to run the tests for all notebooks, or `pytest --nbval notebook.ipynb` for just one notebook. `nbval` fails if the notebook environment is not
+To run treon locally, run `treon` to run the tests for all notebooks, or `treon notebook.ipynb` for just one notebook. `treon` fails if the notebook environment is not
 `openvino_env`.
 
 #### nbqa
@@ -275,7 +274,7 @@ standard `diff` tool for `git`, with much more useful output than the regular `g
 
 #### JupyterLab Code Formatter
 
-[JupyterLab Code Formatter](https://jupyterlab-code-formatter.readthedocs.io/en/latest/) adds a
+[JupyterLab Code Formatter](https://ryantam626.github.io/jupyterlab_code_formatter/index.html) adds a
 button to Jupyter Lab to automatically format the code in notebooks with black and isort. Please
 use either this extension or a different way to automatically format your notebook.
 
@@ -288,12 +287,12 @@ use either this extension or a different way to automatically format your notebo
    mentioned in the [Validation](#Validation) section.
 3. Create a branch in this fork, from the *main* branch. Name the
    branch however you like.
-4. Doublecheck the points in the [Design](#Design) and [Validation](#Validation) sections.
+4. Doublecheck the points in the [Design Decisions](#design-decisions) and [Validation](#Validation) sections.
 5. Check that your notebook works in the CI
-   - Go to the GitHub page of your fork, click on _Actions_, select _nbval_ on the left. There will
+   - Go to the GitHub page of your fork, click on _Actions_, select _treon_ on the left. There will
      be a message _This workflow has a workflow_dispatch event trigger._ and a _Run workflow_ button.
      Click on the button and select the branch that you want to test.
-6. Test if the notebook works in [https://mybinder.org/](Binder) and if so, add _Launch Binder_ badges 
+6. Test if the notebook works in [Binder](https://mybinder.org/) and if so, add _Launch Binder_ badges 
    to the README files.
 
 Once your notebook passes in the CI and you have verified that everything looks good, make a Pull Request!
