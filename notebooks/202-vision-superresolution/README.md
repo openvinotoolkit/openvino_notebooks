@@ -4,7 +4,10 @@ image | video |
 |---|---|
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F202-vision-superresolution%2F202-vision-superresolution-image.ipynb) | [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F202-vision-superresolution%2F202-vision-superresolution-video.ipynb)
 
-![tower](../data/image/tower.jpg)
+
+<p align="center">
+    <img width="60%" src="../data/image/tower.jpg"/>
+</p>
 
 Super Resolution is the process of enhancing the quality of an image by increasing the pixel count using deep learning.
 

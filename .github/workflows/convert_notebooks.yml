@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
 
-      # Matrix is unnecessary here, but this allows easy copying of steps from nbval.yml
+      # Matrix is unnecessary here, but this allows easy copying of steps from treon.yml
       matrix:
         os: [ubuntu-22.04]
         python: [3.8]
@@ -91,13 +91,13 @@ jobs:
       with:
         path: |
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
-          # and change cache paths in both nbval.yml and convert_notebooks.yml
+          # and change cache paths in both treon.yml and convert_notebooks.yml
           case_00030.zip
           notebooks/110-ct-segmentation-quantize/kits19_frames_1
           notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
           # 208 omz cache location is set to this with test_replace
           notebooks/208-optical-character-recognition/open_model_zoo_cache
-          notebooks/210-ct-scan-live-inference/kits19_frames_1
+          notebooks/110-ct-scan-live-inference/kits19_frames_1
           notebooks/212-onnx-style-transfer/model
           notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
         key: ${{ env.FILES_CACHE_KEY }}

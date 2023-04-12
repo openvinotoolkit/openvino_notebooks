@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 import paddle
 import math
-import random
 
 from PIL import Image, ImageDraw, ImageFont
 import copy
@@ -423,14 +422,14 @@ def draw_ocr_box_txt(image,
     img_left = image.copy()
     img_right = Image.new('RGB', (w, h), (255, 255, 255))
 
-    random.seed(0)
+    np.random.seed(0)
     draw_left = ImageDraw.Draw(img_left)
     draw_right = ImageDraw.Draw(img_right)
     for idx, (box, txt) in enumerate(zip(boxes, txts)):
         if scores is not None and scores[idx] < drop_score:
             continue
-        color = (random.randint(0, 255), random.randint(0, 255),
-                 random.randint(0, 255))
+        color = (np.random.randint(0, 255), np.random.randint(0, 255),
+                 np.random.randint(0, 255))
         draw_left.polygon(box, fill=color)
         draw_right.polygon(
             [
@@ -444,7 +443,7 @@ def draw_ocr_box_txt(image,
             1])**2)
         if box_height > 2 * box_width:
             font_size = max(int(box_width * 0.9), 10)
-            font = ImageFont.truetype('../data/font/simfang.ttf',32)
+            font = ImageFont.truetype('../data/font/simfang.ttf', font_size)
             cur_y = box[0][1]
             for c in txt:
                 char_size = font.getsize(c)
@@ -453,7 +452,7 @@ def draw_ocr_box_txt(image,
                 cur_y += char_size[1]
         else:
             font_size = max(int(box_height * 0.8), 10)
-            font = ImageFont.truetype('../data/font/simfang.ttf',32)
+            font = ImageFont.truetype('../data/font/simfang.ttf', font_size)
             draw_right.text(
                 [box[0][0], box[0][1]], txt, fill=(0, 0, 0), font=font)
     img_left = Image.blend(image, img_left, 0.5)

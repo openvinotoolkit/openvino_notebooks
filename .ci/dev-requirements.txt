@@ -9,6 +9,7 @@ jupyterlab-code-formatter   # format code in notebooks in Jupyter Lab
 jupyterlab-git              # checkout and commit code in Jupyter Lab
 nbqa[toolchain]             # automatic code quality checking
 nbval                       # pytest plugin for automatic notebook testing
+treon                       # test framework for Jupyter Notebooks 
 toml                        # used for validating docker requirements
 mistune==2.0.4              # use for parsing README.md
 requests==2.28.1            # use for checking links
