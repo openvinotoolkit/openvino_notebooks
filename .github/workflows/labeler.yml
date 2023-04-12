@@ -1,17 +1,16 @@
 name: "PR Labeler"
 
-permissions:
-  actions: read
-  contents: read
-  issues: write
-  pull-requests: write
-
 on:
   pull_request:
     types: [opened, edited]
 
 jobs:
   labelling:
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
