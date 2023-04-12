@@ -3,8 +3,8 @@ name: "PR Labeler"
 permissions:
   actions: read
   contents: read
-  issues: read|write
-  pull-requests: read|write
+  issues: write
+  pull-requests: write
 
 on:
   pull_request:
