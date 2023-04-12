@@ -6,11 +6,7 @@ on:
 
 jobs:
   labelling:
-    permissions:
-      actions: read
-      contents: read
-      issues: write
-      pull-requests: write
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
