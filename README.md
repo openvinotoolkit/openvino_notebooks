@@ -132,6 +132,7 @@ Demos that demonstrate inference on a particular model.
 |[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
 |[236-stable-diffusion-v2](notebooks/236-stable-diffusion-v2/)<br>| Text-to-Image Generation and Infinite Zoom with Stable Diffusion v2 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/228882108-25c1f65d-4c23-4e1d-8ba4-f6164280a3e3.gif width=225> |
 |[237-segment-anything](notebooks/237-segment-anything/)<br>| Prompt based object segmentation mask generation using Segment Anything and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png width=225> |
+|[238-segmenter-semantic-segmentation](notebooks/238-segmenter-semantic-segmentation/)<br>| Semantic Segmentation with OpenVINO™ using Segmenter | <img src=https://user-images.githubusercontent.com/61357777/223854308-d1ac4a39-cc0c-4618-9e4f-d9d4d8b991e8.jpg width=225> |
 
 <div id='-model-training'/>
 
