@@ -14,9 +14,8 @@ This is where transformers offer their advantage as they work well in capturing 
 Segmenter is based on Vision Transformer working as an encoder, and Mask Transformer working as a decoder.
 With this configuration, it achieves good results on different datasets such as ADE20K, Pascal Context, and Cityscapes.
 
-<div style="text-align:center">
-    <img src="https://user-images.githubusercontent.com/24582831/148507554-87eb80bd-02c7-4c31-b102-c6141e231ec8.png" width="70%"/>
-</div>
+![Segmenteer diagram](https://user-images.githubusercontent.com/24582831/148507554-87eb80bd-02c7-4c31-b102-c6141e231ec8.png)
+> Credits for this image go to [original authors of Segmenter](https://github.com/rstrudel/segmenter).
 
 More about the model and its details can be found in the following paper:
 [Segmenter: Transformer for Semantic Segmentation](https://arxiv.org/abs/2105.05633)
