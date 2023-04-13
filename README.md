@@ -131,6 +131,7 @@ Demos that demonstrate inference on a particular model.
 |[233-blip-visual-language-processing](notebooks/233-blip-visual-language-processing/)<br>| Visual Question Answering and Image Captioning using BLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> |
 |[234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| # Audio compression with EnCodec and OpenVINO™ | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
 |[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| # A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
+|[274-Real-ESRGAN-image-restoration](notebooks/274-Real-ESRGAN-image-restoration/)<br>| Super Resolution for low quailty/scale images using OpenVINO™ | <img src=https://user-images.githubusercontent.com/86083079/231635094-398b404b-bdc1-4b02-a623-3a07b6e6295c.png width=1025> |
 
 <div id='-model-training'/>
 
