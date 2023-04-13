@@ -2,11 +2,14 @@ name: "PR Labeler"
 
 on:
   pull_request:
-    types: [opened, edited]
 
 jobs:
   labelling:
-    permissions: write-all
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -20,7 +23,8 @@ jobs:
         include-title: 1
         sync-labels: 1
     - name: Add labels (Changed Files)
-      uses: doka-guide/doka-labeler@v1.0.1
+      uses: akashchi/pr-labeler@v2.0
       with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           config: ".github/labeler_files.yml"
+          strategy: "append"
