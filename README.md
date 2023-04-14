@@ -128,15 +128,10 @@ Demos that demonstrate inference on a particular model.
 |[231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)<br>| Image editing with InstructPix2Pix | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=225> |
 |[232-clip-language-saliency-map](notebooks/232-clip-language-saliency-map/)<br>| Language-Visual Saliency with CLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG width=225> | 
 |[233-blip-visual-language-processing](notebooks/233-blip-visual-language-processing/)<br>| Visual Question Answering and Image Captioning using BLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> |
-<<<<<<< HEAD
-|[234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| # Audio compression with EnCodec and OpenVINO™ | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
-|[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| # A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
- |[240-efficientdet-object-detection](notebooks/240-efficientdet-object-detection/)<br> | Scalable and Efficient Object Detection | <img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' width=250> |
-=======
 |[234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| Audio compression with EnCodec and OpenVINO™ | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
 |[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
 |[236-stable-diffusion-v2](notebooks/236-stable-diffusion-v2/)<br>| Text-to-Image Generation and Infinite Zoom with Stable Diffusion v2 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/228882108-25c1f65d-4c23-4e1d-8ba4-f6164280a3e3.gif width=225> |
->>>>>>> upstream/main
+ |[240-efficientdet-object-detection](notebooks/240-efficientdet-object-detection/)<br> | Scalable and Efficient Object Detection | <img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' width=250> |
 
 <div id='-model-training'/>
 
