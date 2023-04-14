@@ -1,6 +1,6 @@
 import sys
 import os
-import subprocess
+import subprocess # nosec - disable B404:import-subprocess check
 import csv
 import shutil
 from pathlib import Path

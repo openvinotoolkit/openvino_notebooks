@@ -9,7 +9,7 @@ EfficientDet achieves accuracy of 55.1mAP on COCO test-dev, while being 4x - 9x 
 Research Paper : [EfficientDet: Scalable and Efficient Object Detection](https://openaccess.thecvf.com/content_CVPR_2020/papers/Tan_EfficientDet_Scalable_and_Efficient_Object_Detection_CVPR_2020_paper.pdf)\
 Official GitHub : [EfficientDet](https://github.com/google/automl/tree/master/efficientdet)
 
-## Notebook Contents:
+## Notebook Contents
 This notebook demonstrates OpenVINO implementation of the EfficientDet object detection model.
 Notebook contains the following steps:
 * Downloading and using EfficientDet-d0 with TensorFlow-HUB.
