@@ -126,16 +126,13 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [229-distilbert-sequence-classification](notebooks/229-distilbert-sequence-classification/)<br> | 利用OpenVINO进行句子分类 | <img src = "https://user-images.githubusercontent.com/95271966/206130638-d9847414-357a-4c79-9ca7-76f4ae5a6d7f.png" width=225> |
 | [230-yolov8-optimization](notebooks/230-yolov8-optimization/)<br> |使用NNCF PTQ API优化YOLOv8 | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> |
 |[231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)<br>| 利用InstructPix2Pix进行图像编辑 | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=225> |
-<<<<<<< HEAD
- |[240-EfficientDet-object-detection](notebooks/240-efficientdet-object-detection/)<br>| 可扩展且高效的对象检测 |<img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' width=250>|
-</details>
-</p>
-=======
 |[232-clip-language-saliency-map](notebooks/232-clip-language-saliency-map/)<br>|  基于CLIP和OpenVINO™的视觉语言显著性检测 | <img src=https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG width=225> | 
 |[233-blip-visual-language-processing](notebooks/233-blip-visual-language-processing/)<br>| 基于BLIP和OpenVINO™的视觉问答与图片注释 | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> |
 |[234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| # 基于EnCodec和OpenVINO™的音频压缩 | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
 |[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| # 使用ControlNet状态调节Stable Diffusion 实现文字生成图片 | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
->>>>>>> upstream/main
+ |[240-EfficientDet-object-detection](notebooks/240-efficient-object-detection/)<br>| 可扩展且高效的对象检测 |<img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' width=250>|
+</details>
+</p>
 
 <div id='-model-training'/>
 
