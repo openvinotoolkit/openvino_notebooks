@@ -42,7 +42,7 @@ The tutorial consists of the following steps:
 - Required libraries
 - Two possible methods
   - Using the HuggingFace Optimum library
-    - Loading the compiled model in OpenVino IR format
+    - Loading the compiled model in OpenVINO IR format
     - Creating the pipeline
     - Run inference/Demo
   - Using the pipeline to use the model
