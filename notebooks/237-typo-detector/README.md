@@ -14,7 +14,7 @@ The model has been pretrained on the [NeuSpell](https://github.com/neuspell/neus
 
 The notebook provides two methods to run the inference of typo detector with OpenVINO runtime, so that you can experience both calling the API of Optimum with OpenVINO Runtime included, and loading models in other frameworks, converting them to OpenVINO IR format, and running inference with OpenVINO Runtime.
 
-1. Use the [Hugging Face Optimum](https://huggingface.co/docs/optimum/index) library to load the compiled model in OpenVino IR format. Then create a pipeline with the loaded model to run inference.
+1. Use the [Hugging Face Optimum](https://huggingface.co/docs/optimum/index) library to load the compiled model in OpenVINO IR format. Then create a pipeline with the loaded model to run inference.
 
 2. Load the model and convert to ONNX and then to OpenVino IR.
    First the Pytorch model is convereted to the ONNX format and then the [Model Optimizer](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) tool is used to convert to [Openvino IR format](https://docs.openvino.ai/latest/openvino_ir.html). This method provides much more insight to the openvino environment and applications.
