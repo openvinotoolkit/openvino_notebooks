@@ -27,7 +27,7 @@ The following table summarises the major differences between the two methods
 | ------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | Load models from Optimum, an extension of transformers              | Load model from transformers                                       |
 | Load the model in OpenVINO IR format on the fly                     | Convert to ONNX and then to OpenVINO IR |
-| Load the compiled model by default                                  | Model has to be compiled after converting to OpenVino IR           |
+| Load the compiled model by default                                  | Compile the OpenVINO IR and run inference with OpenVINO Runtime          |
 | In this application, loaded model from optimum is around 15% faster | The converted model is slower                                      |
 | Pipeline is created to run inference with OpenVINO Runtime          | Have to manually run inference.                                    |
 
