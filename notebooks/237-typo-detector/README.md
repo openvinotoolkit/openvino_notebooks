@@ -16,7 +16,7 @@ The notebook provides two methods to run the inference of typo detector with Ope
 
 1. Use the [Hugging Face Optimum](https://huggingface.co/docs/optimum/index) library to load the compiled model in OpenVINO IR format. Then create a pipeline with the loaded model to run inference.
 
-2. Load the model and convert to ONNX and then to OpenVino IR.
+2. Load the model and convert to ONNX and then to OpenVINO IR.
    First the Pytorch model is convereted to the ONNX format and then the [Model Optimizer](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) tool is used to convert to [Openvino IR format](https://docs.openvino.ai/latest/openvino_ir.html). This method provides much more insight to the openvino environment and applications.
 
 The following table summarises the major differences between the two methods
