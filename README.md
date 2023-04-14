@@ -131,11 +131,8 @@ Demos that demonstrate inference on a particular model.
 |[234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| Audio compression with EnCodec and OpenVINO™ | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
 |[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
 |[236-stable-diffusion-v2](notebooks/236-stable-diffusion-v2/)<br>| Text-to-Image Generation and Infinite Zoom with Stable Diffusion v2 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/228882108-25c1f65d-4c23-4e1d-8ba4-f6164280a3e3.gif width=225> |
-<<<<<<< HEAD
- |[240-efficientdet-object-detection](notebooks/240-efficientdet-object-detection/)<br> | Scalable and Efficient Object Detection | <img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' width=250> |
-=======
 |[237-segment-anything](notebooks/237-segment-anything/)<br>| Prompt based object segmentation mask generation using Segment Anything and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png width=225> |
->>>>>>> upstream/main
+ |[240-efficientdet-object-detection](notebooks/240-efficientdet-object-detection/)<br> | Scalable and Efficient Object Detection | <img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' width=250> |
 
 <div id='-model-training'/>
 
