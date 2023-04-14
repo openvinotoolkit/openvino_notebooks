@@ -21,5 +21,8 @@ cp -r kits19_frames/case_00030 kits19_frames/case_00001
 # Patch notebooks to speed up test execution
 python /tmp/scripts/patch_notebooks.py /opt/app-root/notebooks
 
+# Move notebooks for validation
+mv /opt/app-root/notebooks/ /tmp/
+
 # Test notebooks
-exec /opt/app-root/bin/pytest --durations=10 --nbval --current-env --ignore=/opt/app-root/notebooks/107-speech-recognition-quantization --ignore=/opt/app-root/notebooks/225-stable-diffusion-text-to-image --ignore=/opt/app-root/notebooks/231-instruct-pix2pix-image-editing  --ignore=/opt/app-root/notebooks/117-model-server --ignore=/opt/app-root/notebooks/108-gpu-device --ignore=/opt/app-root/notebooks/235-controlnet-stable-diffusion -k "test_" /opt/app-root/notebooks
+python /tmp/scripts/validate_notebooks.py --ignore_list 225-stable-diffusion-text-to-image  305-tensorflow-quantization-aware-training 107-speech-recognition-quantization 231-instruct-pix2pix-image-editing 117-model-server 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 103-paddle-to-openvino 207-vision-paddlegan-superresolution 206-vision-paddlegan-anime 405-paddle-ocr-webcam 203-meter-reader

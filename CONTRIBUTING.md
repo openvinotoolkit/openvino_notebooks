@@ -15,7 +15,7 @@
   - [Validation](#validation)
     - [Automated tests](#automated-tests)
     - [Manual test and code quality tools](#manual-test-and-code-quality-tools)
-      - [nbval](#nbval)
+      - [treon](#treon)
       - [nbqa](#nbqa)
       - [nbdime](#nbdime)
       - [JupyterLab Code Formatter](#jupyterlab-code-formatter)
@@ -230,13 +230,13 @@ Add all three files to the repository.
 
 We use Github Actions to automatically validate that all notebooks work. The following tests run automatically on a new notebook PR:
 
-- nbval: tests that the notebooks execute without problems on all supported platforms. 
+- treon: tests that the notebooks execute without problems on all supported platforms. 
 - codecheck: 
   - Uses [flake8](https://github.com/pycqa/flake8) to check for unnecessary imports and variables 
 and some style issues
   - Verifies that the notebook is included in the main README and the README in the notebooks directory. 
   - Runs the check_install script to test for installation issues
-- docker_nbval: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
+- docker_treon: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
   To manually run this test, build the Docker image with `docker build -t openvino_notebooks .` and run the tests with
   `docker run -it  --entrypoint /tmp/scripts/test openvino_notebooks`. It is recommended to build the image on a clean 
   repo because the full notebooks folder will be copied to the image.
@@ -254,12 +254,11 @@ it execute faster. As an example, if your notebook trains for 20 epochs, you can
 
 See [Getting started](#getting-started) about installing the tools mentioned in this section.
 
-#### nbval
+#### treon
 
-Tests are run in the CI with [nbval](https://github.com/computationalmodelling/nbval), a plugin for
-py.test.
+Tests are run in the CI with [treon](https://pypi.org/project/treon/), a test framework for Jupyter Notebooks.
 
-To run nbval locally, run `pytest --nbval .` to run the tests for all notebooks, or `pytest --nbval notebook.ipynb` for just one notebook. `nbval` fails if the notebook environment is not
+To run treon locally, run `treon` to run the tests for all notebooks, or `treon notebook.ipynb` for just one notebook. `treon` fails if the notebook environment is not
 `openvino_env`.
 
 #### nbqa
@@ -290,7 +289,7 @@ use either this extension or a different way to automatically format your notebo
    branch however you like.
 4. Doublecheck the points in the [Design Decisions](#design-decisions) and [Validation](#Validation) sections.
 5. Check that your notebook works in the CI
-   - Go to the GitHub page of your fork, click on _Actions_, select _nbval_ on the left. There will
+   - Go to the GitHub page of your fork, click on _Actions_, select _treon_ on the left. There will
      be a message _This workflow has a workflow_dispatch event trigger._ and a _Run workflow_ button.
      Click on the button and select the branch that you want to test.
 6. Test if the notebook works in [Binder](https://mybinder.org/) and if so, add _Launch Binder_ badges 
