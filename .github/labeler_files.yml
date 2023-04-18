@@ -14,5 +14,6 @@ documentation:
 dependencies:
   - files:
       added: "**/*requirements*"
-      modified: "**/*requirements*"
-      modified: "**/Pipfile*"
+      modified: 
+        - "**/*requirements*"
+        - "**/Pipfile*"
