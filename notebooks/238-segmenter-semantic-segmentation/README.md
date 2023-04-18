@@ -3,9 +3,7 @@
 This notebook demonstrates how to convert and use [Segmenter](https://github.com/rstrudel/segmenter) PyTorch model 
 with OpenVINO.
 
-<div style="text-align:center">
-    <img src="https://user-images.githubusercontent.com/61357777/223854308-d1ac4a39-cc0c-4618-9e4f-d9d4d8b991e8.jpg" width="70%"/>
-</div>
+![Segmenter example](https://user-images.githubusercontent.com/61357777/223854308-d1ac4a39-cc0c-4618-9e4f-d9d4d8b991e8.jpg)
 
 Semantic segmentation is a difficult computer vision problem with many applications. 
 Its goal is to assign labels to each pixel according to the object it belongs to, creating so-called segmentation masks.
