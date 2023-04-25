@@ -51,7 +51,7 @@ Activate the virtual environment using the following command:
 source venv/bin/activate   # For Unix-based operating system such as Linux or macOS
 ```
 
-NOTE: If you are using Windows, use `venv\Scripts\activate` command instead.
+_NOTE: If you are using Windows, use `venv\Scripts\activate` command instead._
 
 This will activate the virtual environment and change your shell's prompt to indicate that you are now working within that environment.
 
@@ -83,5 +83,11 @@ python app.py --stream video_file.mp4 --model_path model/yolov8m_openvino_model/
 ```
 This will run the application with the specified arguments. Replace "video_file.mp4" with the path to your input video file, "zones.json" with the path to your zones configuration file, and "3" with the maximum number of customers allowed in the queue.
 You can also run the [run-the-application.ipynb](docs/run-the-application.ipynb) to learn more about the inference process.
+
+_NOTE: Alternatively, you can run all steps with the following command:_
+
+```shell
+python main.py --stream video_file.mp4
+```
 
 Congratulations! You have successfully set up and run the Intelligent Queue Management application with OpenVINO™.

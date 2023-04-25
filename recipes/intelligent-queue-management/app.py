@@ -1,7 +1,7 @@
-import time
 import argparse
 import json
 import logging as log
+import time
 from collections import defaultdict, deque
 from typing import Tuple, List
 
@@ -174,7 +174,7 @@ def get_annotators(json_path: str, resolution_wh: Tuple[int, int]) -> Tuple[List
     return zones, zone_annotators, box_annotators
 
 
-def draw_text(image, text, point, color=(255, 255, 255)) -> None:
+def draw_text(image: np.ndarray, text: str, point: tuple, color: tuple = (255, 255, 255)) -> None:
     """
     Draws "Store assistant required" in the bottom-right corner
 
@@ -199,14 +199,24 @@ def draw_text(image, text, point, color=(255, 255, 255)) -> None:
     cv2.putText(image, text=text, org=(text_x, text_y), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=f_width / 1500, color=color, thickness=2, lineType=cv2.LINE_AA)
 
 
-def main(args):
+def run(video_path: str, model_path: str, zones_config_file: str, customers_limit: int) -> None:
+    """
+    Runs main app
+
+    Parameters:
+        video_path: video path or camera number
+        model_path: path to the exported model
+        zones_config_file: path to config file for zones
+        customers_limit: limit of customers in the queue
+    """
+    # set up logging
+    log.getLogger().setLevel(log.INFO)
+
     # initialize and load model
-    model = get_model(args.model_path)
+    model = get_model(model_path)
     # input shape of the model (w, h, d)
     input_shape = tuple(model.inputs[0].shape)[:0:-1]
 
-    # video path or camera number
-    video_path = args.stream
     if video_path.isnumeric():
         video_path = int(video_path)
 
@@ -214,7 +224,7 @@ def main(args):
     player = utils.VideoPlayer(video_path, fps=60)
 
     # get zones, and zone and box annotators for zones
-    zones, zone_annotators, box_annotators = get_annotators(json_path=args.zones_config_file, resolution_wh=(player.width, player.height))
+    zones, zone_annotators, box_annotators = get_annotators(json_path=zones_config_file, resolution_wh=(player.width, player.height))
 
     # people counter
     queue_count = defaultdict(deque)
@@ -264,11 +274,11 @@ def main(args):
             mean_customer_count = np.mean(queue_count[zone_id], dtype=np.int32)
 
             # add alert text to the frame if necessary
-            if mean_customer_count > args.customers_limit:
+            if mean_customer_count > customers_limit:
                 draw_text(frame, text=f"Store assistant required on cash desk {zone_id}!", point=(f_width // 2, f_height - 50), color=(0, 0, 255))
 
             # print an info about number of customers in the queue, ask for the more assistants if required
-            log.info(f"Checkout queue: {zone_id}, avg customer count: {mean_customer_count} {'Store assistant required!' if mean_customer_count > args.customers_limit else ''}")
+            log.info(f"Checkout queue: {zone_id}, avg customer count: {mean_customer_count} {'Store assistant required!' if mean_customer_count > customers_limit else ''}")
 
         # Mean processing time [ms].
         processing_time = np.mean(processing_times) * 1000
@@ -290,13 +300,11 @@ def main(args):
 
 
 if __name__ == '__main__':
-    # set the logger level to info
-    log.getLogger().setLevel(log.INFO)
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--stream', type=str, required=True, help="Path to a video file or the webcam number")
     parser.add_argument('--model_path', type=str, default="model/yolov8m_openvino_model/yolov8m.xml", help="Path to the model")
     parser.add_argument('--zones_config_file', type=str, default="zones.json", help="Path to the zone config file (json)")
     parser.add_argument('--customers_limit', type=int, default=3, help="The maximum number of customers in the queue")
 
-    main(parser.parse_args())
+    args = parser.parse_args()
+    run(args.stream, args.model_path, args.zones_config_file, args.customers_limit)
