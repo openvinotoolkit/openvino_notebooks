@@ -80,6 +80,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [105-language-quantize-bert](notebooks/105-language-quantize-bert/) | 优化及量化BERT预训练模型 |
 | [106-auto-device](notebooks/106-auto-device/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F106-auto-device%2F106-auto-device.ipynb) | 演示如何使用AUTO设备 |
 | [107-speech-recognition-quantization](notebooks/107-speech-recognition-quantization/) | 优化及量化预训练Wav2Vec2语音模型 |
+| [109-performance-tricks](notebooks/109-performance-tricks/)| OpenVINO™ 的优化技巧|
 | [110-ct-segmentation-quantize](notebooks/110-ct-segmentation-quantize/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F110-ct-segmentation-quantize%2F110-ct-scan-live-inference.ipynb) | 量化肾脏分割模型并展示实时推理 | 
 | [111-detection-quantization](notebooks/111-detection-quantization/) | 量化目标检测模型 | 
 | [112-pytorch-post-training-quantization-nncf](notebooks/112-pytorch-post-training-quantization-nncf/) | 利用神经网络压缩框架(NNCF)在后训练模式下来量化PyTorch模型(无需模型微调)| 
