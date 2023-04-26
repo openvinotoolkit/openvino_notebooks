@@ -1,6 +1,6 @@
 import sys
 import os
-import subprocess
+import subprocess # nosec - disable B404:import-subprocess check
 import csv
 import shutil
 from pathlib import Path
@@ -65,7 +65,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
     return statuses
 
 
-def clean_test_artefacts(before_test_files, after_test_files):
+def clean_test_artifacts(before_test_files, after_test_files):
     for file_path in after_test_files:
         if file_path in before_test_files or not file_path.exists():
             continue
@@ -78,16 +78,24 @@ def clean_test_artefacts(before_test_files, after_test_files):
             shutil.rmtree(file_path, ignore_errors=True)
 
 
-def run_test(notebook_path, report_dir, collect_reports, root):
-    print(f'RUN {notebook_path.relative_to(root)}')
-    report_file = report_dir / f'{notebook_path.name}_report.xml'
+def run_test(notebook_path, root):
+    print(f'RUN {notebook_path.relative_to(root)}', flush=True)
+    
     with cd(notebook_path):
-        existing_files = sorted(list(notebook_path.rglob("*")))
-        main_command = [sys.executable,  '-m',  'pytest', '--nbval', '-k', 'test_', '--durations', '10']
-        if collect_reports:
-            main_command.extend(['--junitxml', str(report_file)])
+        existing_files = sorted(Path('.').iterdir())
+        if not len(existing_files):  # skip empty directories
+            return 0
+        
+        try:
+            notebook_name = str([filename for filename in existing_files if str(filename).startswith('test_')][0])
+        except IndexError:  # if there is no 'test_' notebook generated
+            print('No test_ notebook found.')
+            return 0
+        
+        main_command = [sys.executable,  '-m',  'treon', notebook_name]
         retcode = subprocess.run(main_command).returncode
-        clean_test_artefacts(existing_files, sorted(list(notebook_path.rglob("*"))))
+
+        clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
     return retcode
 
 
@@ -137,7 +145,7 @@ def main():
     for notebook, report in test_plan.items():
         if report['status'] == "SKIPPED":
             continue
-        status = run_test(report['path'], reports_dir, args.collect_reports, root)
+        status = run_test(report['path'], root)
         report['status'] = 'SUCCESS' if not status else "FAILED"
         if status:
             failed_notebooks.append(str(notebook))

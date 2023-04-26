@@ -12,4 +12,4 @@ The last cell is interactive, so you can type sentences in English that will be 
 
 ## Installation Instructions
 
-To install all dependencies, please follow the [official guide](../../README.md).
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).

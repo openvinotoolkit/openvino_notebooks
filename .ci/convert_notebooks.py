@@ -1,6 +1,6 @@
 import argparse
 import shutil
-import subprocess
+import subprocess # nosec - disable B404:import-subprocess check
 import time
 from pathlib import Path
 

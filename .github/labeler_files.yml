@@ -1,0 +1,17 @@
+new notebook:
+  files: 
+    added: notebooks/**/*.ipynb
+enhancement:
+  files:
+    modified: notebooks/**/*
+    added: notebooks/**/*
+documentation:
+  files:
+    modified: "**/*.md"
+    added: "**/*.md"
+dependencies:
+  files:
+    added: "**/*requirements*"
+    modified: 
+      - "**/*requirements*"
+      - "**/Pipfile*"

@@ -4,7 +4,7 @@
 <h1 align="center">📚 OpenVINO™ Notebooks</h1>
 
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/LICENSE)
-[![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval_precommit.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/nbval_precommit.yml?query=event%3Apush)
+[![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/treon_precommit.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/treon_precommit.yml?query=event%3Apush)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml?query=event%3Apush)
 
 在这里，我们提供了一些可以运行的Jupyter* notebooks，用于学习和尝试使用OpenVINO™开发套件。这些notebooks旨在向各位开发者提供OpenVINO基础知识的介绍，并教会大家如何利用我们的API来优化深度学习推理。.
@@ -69,17 +69,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 ### ⌚ 转换 & 优化 
 
 解释如何使用OpenVINO工具进行模型优化和量化的教程。
-	
-| [101-tensorflow-to-openvino](notebooks/101-tensorflow-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F101-tensorflow-to-openvino%2F101-tensorflow-to-openvino.ipynb) |  [102-pytorch-onnx-to-openvino](notebooks/102-pytorch-onnx-to-openvino/) | [103-paddle-to-openvino](notebooks/103-paddle-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-to-openvino%2F103-paddle-to-openvino-classification.ipynb) | [104-model-tools](notebooks/104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | 
-| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |  
-| 转换TensorFlow模型为OpenVINO IR | 转换PyTorch模型为OpenVINO IR | 转换PaddlePaddle模型为OpenVINO IR | 从Open Model Zoo进行模型下载，转换以及进行基线测试  | 
-| <img src="https://user-images.githubusercontent.com/15709723/127779167-9d33dcc6-9001-4d74-a089-8248310092fe.png" width=250> | <img src="https://user-images.githubusercontent.com/15709723/127779246-32e7392b-2d72-4a7d-b871-e79e7bfdd2e9.png" width=300 > | <img src="https://user-images.githubusercontent.com/15709723/127779326-dc14653f-a960-4877-b529-86908a6f2a61.png" width=300>  | <img src="https://user-images.githubusercontent.com/10940214/157541917-c5455105-b0d9-4adf-91a7-fbc142918015.png" width=150>  |
-	
-更多有趣的notebooks在这里！ 
 
-<p>
-<details>
-<summary> 点击这里查看完整列表!  </summary> 
 
 | Notebook | Description | 
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | 
@@ -90,6 +80,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [105-language-quantize-bert](notebooks/105-language-quantize-bert/) | 优化及量化BERT预训练模型 |
 | [106-auto-device](notebooks/106-auto-device/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F106-auto-device%2F106-auto-device.ipynb) | 演示如何使用AUTO设备 |
 | [107-speech-recognition-quantization](notebooks/107-speech-recognition-quantization/) | 优化及量化预训练Wav2Vec2语音模型 |
+| [109-performance-tricks](notebooks/109-performance-tricks/)| OpenVINO™ 的优化技巧|
 | [110-ct-segmentation-quantize](notebooks/110-ct-segmentation-quantize/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F110-ct-segmentation-quantize%2F110-ct-scan-live-inference.ipynb) | 量化肾脏分割模型并展示实时推理 | 
 | [111-detection-quantization](notebooks/111-detection-quantization/) | 量化目标检测模型 | 
 | [112-pytorch-post-training-quantization-nncf](notebooks/112-pytorch-post-training-quantization-nncf/) | 利用神经网络压缩框架(NNCF)在后训练模式下来量化PyTorch模型(无需模型微调)| 
@@ -98,27 +89,15 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [115-async-api](notebooks/115-async-api/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F115-async-api%2F115-async-api.ipynb) | 使用异步执行改进数据流水线 |
 | [116-sparsity-optimization](notebooks/116-sparsity-optimization/)| 提高稀疏Transformer模型的性能 |
 | [117-model-server](notebooks/117-model-server/)| OpenVINO模型服务（OVMS）介绍 |
-</details>
-</p>
+| [118-optimize-preprocessing](notebooks/118-optimize-preprocessing/)| 提升图片预处理性能 |
 
 <div id='-model-demos'/>
 
 ### 🎯 模型演示
 
 演示对特定模型的推理。
-	
-| [225-stable-diffusion-text-to-image](notebooks/225-stable-diffusion-text-to-image/)| [227-whisper-subtitles-generation](notebooks/227-whisper-subtitles-generation/)| [230-yolov8-optimization](notebooks/230-yolov8-optimization/) |  [231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)|  
-| --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | 
-| 用Stable Diffusion由文本生成图像 | 通过OpenAI Whisper和OpenVINO进行字幕生成 | 使用NNCF PTQ API优化YOLOv8 | InstructPix2Pix图片编辑 |
-| <img src=https://user-images.githubusercontent.com/29454499/216524089-ed671fc7-a78b-42bf-aa96-9f7c791a9419.png width=225>| <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225> | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=750> |
-	
-更多有趣的notebooks在这里！
 
-<p>
-<details>
-<summary> 点击这里查看完整列表！ </summary>
-	
-	
+
 | Notebook | Description | Preview |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | [201-vision-monodepth](notebooks/201-vision-monodepth/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F201-vision-monodepth%2F201-vision-monodepth.ipynb) | 利用图像和视频进行单目深度估计 | <img src="https://user-images.githubusercontent.com/15709723/127752390-f6aa371f-31b5-4846-84b9-18dd4f662406.gif" width=250> |
@@ -133,7 +112,6 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [211-speech-to-text](notebooks/211-speech-to-text/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F211-speech-to-text%2F211-speech-to-text.ipynb) | 运行语音转文本模型的推理 | <img src="https://user-images.githubusercontent.com/36741649/140987347-279de058-55d7-4772-b013-0f2b12deaa61.png" width=225>|
 | [213-question-answering](notebooks/213-question-answering/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F213-question-answering%2F213-question-answering.ipynb) | 根据上下文回答问题 | <img src="https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif" width=225> |
 | [215-image-inpainting](notebooks/215-image-inpainting/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F215-image-inpainting%2F215-image-inpainting.ipynb)| 用绘画中的图像填充缺失像素 | <img src="https://user-images.githubusercontent.com/4547501/167121084-ec58fbdb-b269-4de2-9d4c-253c5b95de1e.png" width=225> |
-| [216-license-plate-recognition](notebooks/216-license-plate-recognition/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F216-license-plate-recognition%2F216-license-plate-recognition.ipynb) | 在交通中识别中国车牌 | <img src="https://user-images.githubusercontent.com/70456146/162759539-4a0a996f-dabe-40ea-98d6-85b4dce8511d.png" width=225> |
 | [217-vision-deblur](notebooks/217-vision-deblur/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/217-vision-deblur?labpath=notebooks%2F217-vision-deblur%2F217-vision-deblur.ipynb)| 使用DeblurGAN-v2去除图像模糊 | <img src="https://user-images.githubusercontent.com/41332813/158430181-05d07f42-cdb8-4b7a-b7dc-e7f7d9391877.png" width=225> |
 | [218-vehicle-detection-and-recognition](notebooks/218-vehicle-detection-and-recognition/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F218-vehicle-detection-and-recognition%2F218-vehicle-detection-and-recognition.ipynb) | 利用OpenVINO及预训练模型检测和识别车辆及其属性 | <img src = "https://user-images.githubusercontent.com/47499836/163544861-fa2ad64b-77df-4c16-b065-79183e8ed964.png" width=225> |
 | [219-knowledge-graphs-conve](notebooks/219-knowledge-graphs-conve/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F219-knowledge-graphs-conve%2F219-knowledge-graphs-conve.ipynb) | 使用OpenVINO优化知识图谱嵌入模型(ConvE) ||
@@ -149,8 +127,10 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [229-distilbert-sequence-classification](notebooks/229-distilbert-sequence-classification/)<br> | 利用OpenVINO进行句子分类 | <img src = "https://user-images.githubusercontent.com/95271966/206130638-d9847414-357a-4c79-9ca7-76f4ae5a6d7f.png" width=225> |
 | [230-yolov8-optimization](notebooks/230-yolov8-optimization/)<br> |使用NNCF PTQ API优化YOLOv8 | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> |
 |[231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)<br>| 利用InstructPix2Pix进行图像编辑 | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=225> |
-</details>
-</p>
+|[232-clip-language-saliency-map](notebooks/232-clip-language-saliency-map/)<br>|  基于CLIP和OpenVINO™的视觉语言显著性检测 | <img src=https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG width=225> | 
+|[233-blip-visual-language-processing](notebooks/233-blip-visual-language-processing/)<br>| 基于BLIP和OpenVINO™的视觉问答与图片注释 | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> |
+|[234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| # 基于EnCodec和OpenVINO™的音频压缩 | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
+|[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| # 使用ControlNet状态调节Stable Diffusion 实现文字生成图片 | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
 
 <div id='-model-training'/>
 
@@ -169,17 +149,6 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 ### 📺 实时演示
 在网络摄像头或视频文件上运行的实时推理演示。
 	
-| [401-object-detection-webcam](notebooks/401-object-detection-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F401-object-detection-webcam%2F401-object-detection.ipynb) | [403-action-recognition-webcam](notebooks/403-action-recognition-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F403-action-recognition-webcam%2F403-action-recognition-webcam.ipynb) | [404-style-transfer-webcam](notebooks/404-style-transfer-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F404-style-transfer-webcam%2F404-style-transfer.ipynb) | [405-paddle-ocr-webcam](notebooks/405-paddle-ocr-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F405-paddle-ocr-webcam%2F405-paddle-ocr-webcam.ipynb) |
-| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-|使用网络摄像头或视频文件进行目标检测  |  使用网络摄像头或视频文件进行动作识别 | 使用网络摄像头或视频文件进行样式变换| 使用网络摄像头或视频文件进行OCR |
-| <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=150> | <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=200> | <img src="https://user-images.githubusercontent.com/109281183/203772234-f17a0875-b068-43ef-9e77-403462fde1f5.gif" width=300> | <img src="https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleocr.gif" width=230> |
-
-更多有趣的notebooks在这里! 
-
-<p>
-<details>
-<summary> 点击这里查看完整列表! </summary>
-	
 	
 | Notebook | Description | Preview |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
@@ -192,18 +161,9 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [407-person-tracking-webcam](notebooks/407-person-tracking-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F407-person-tracking-webcam%2F407-person-tracking.ipynb) | 使用网络摄像头或视频文件进行人体跟踪 | <img src = "https://user-images.githubusercontent.com/91237924/210479548-b70dbbaa-5948-4e49-b48e-6cb6613226da.gif" width=225> |
 
 
-</details>
-</p>
-
 如果你遇到了问题，请查看[故障排除](#-troubleshooting), [常见问题解答](#-faq) 或者创建一个GitHub [discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions)。
 
 带有![binder logo](https://mybinder.org/badge_logo.svg) 按键的Notebooks可以在无需安装的情况下运行。[Binder](https://mybinder.org/) 是一项资源有限的免费在线服务。 如果享有获得最佳性能体验，请遵循[安装指南](#-installation-guide)在本地运行Notebooks。
-
-您将在这一部分中获得很多乐趣:
-
-| [Vision-monodepth](notebooks/201-vision-monodepth/) | [Object-detection-webcam](notebooks/401-object-detection-webcam/) | [Pose-estimation-webcam](notebooks/402-pose-estimation-webcam/) | [Action-recognition-webcam](notebooks/403-action-recognition-webcam/) | 
-| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | 
-| <img src="https://user-images.githubusercontent.com/15709723/127752390-f6aa371f-31b5-4846-84b9-18dd4f662406.gif" width=250> | <img src="https://user-images.githubusercontent.com/4547501/141471665-82b28c86-cf64-4bfe-98b3-c314658f2d96.gif" width=225> | <img src="https://user-images.githubusercontent.com/4547501/138267961-41d754e7-59db-49f6-b700-63c3a636fad7.gif" width=225>  | <img src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif" width=225> | 
 
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
@@ -253,61 +213,49 @@ jupyter lab notebooks
 
 ## 🧹 清理
 
-<p>
-<details>
-<summary>停止Jupyter Kernel</summary>
+<div id='-shut-down-jupyter-kernel'>
+&#8226; 停止Jupyter Kernel
 
 按 Ctrl-c 结束 Jupyter session，会弹出一个提示框 Shutdown this Jupyter server (y/[n])? 输入 y 并按 回车。
-</details>
-</p>	
+</div>	
 	
-<p>
-<details>
-<summary>注销虚拟环境</summary>
+<div id='-deactivate-virtual-environment'>
+&#8226; 注销虚拟环境
 
 注销虚拟环境：只需在激活了 openvino_env 的终端窗口中运行 deactivate 即可。
 
 重新激活环境：在Linux上运行 source openvino_env/bin/activate 或者在Windows上运行 openvino_env\Scripts\activate 即可，然后输入 jupyter lab 或 jupyter notebook 即可重新运行notebooks。
-</details>
-</p>	
+</div>	
 	
-<p>
-<details>
-<summary>删除虚拟环境 _(可选)_</summary>
+<div id='-delete-virtual-environment'>
+&#8226; >删除虚拟环境 _(可选)_
 
 直接删除 openvino_env 目录即可删除虚拟环境：
-</details>
-</p>	
+</div>	
 	
-<p>
-<details>
-<summary>Linux和macOS:</summary>
+<div id='-on-linux-and-macos'>
+&#8226; Linux和macOS:
 
 ```bash
 rm -rf openvino_env
 ```
-</details>
-</p>
+</div>	
 
-<p>
-<details>
-<summary>Windows:</summary>
+<div id='-on-windows'>
+&#8226; Windows:
 
 ```bash
 rmdir /s openvino_env
 ```
-</details>
-</p>
+</div>	
 
-<p>
-<details>
-<summary>从Jupyter中移除openvino_env Kernel</summary>
+<div id='-remove-openvino-env-kernel'>
+&#8226;从Jupyter中移除openvino_env Kernel
 
 ```bash
 jupyter kernelspec remove openvino_env
 ```
-</details>
-</p>
+</div>	
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='-troubleshooting'/>
