@@ -29,6 +29,9 @@ ipywidgets
 ipykernel>=5.*
 ipython>=7.16.3
 
+# AI Painting notebook requirements
+gradio==3.28.0
+
 
 # others
 numpy>=1.21.0
