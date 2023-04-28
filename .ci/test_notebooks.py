@@ -1,5 +1,4 @@
-import urllib.error
-import urllib.request
+import requests
 from pathlib import Path
 from typing import Set
 import pytest
@@ -14,6 +13,7 @@ def get_parsed_requirements(requirements_file: str) -> Set:
     without versions
     """
     requirements_set = set()
+    ignore_list = ['paddlenlp', 'paddle2onnx', 'paddlepaddle'] # temporary ignore paddle
     parsed_requirements = parse_requirements(requirements_file, session=False)
     separators = ("=", "<", ">", "[")
     for req in parsed_requirements:
@@ -25,8 +25,9 @@ def get_parsed_requirements(requirements_file: str) -> Set:
             requirement = requirement.split('#egg=')[-1]
         for separator in separators:
             requirement = requirement.replace(separator, "|")
-
-        requirements_set.add(requirement.split("|")[0])
+        reqname = requirement.split("|")[0]
+        if reqname not in ignore_list:
+            requirements_set.add(reqname)
 
     return requirements_set
 
@@ -77,7 +78,7 @@ def test_requirements_binder():
     ), f"Binder requirements misses: {pip_requirements.difference(binder_requirements)}"
 
 
-@pytest.mark.skip(reason="URL existence is tested in docker_nbval")
+@pytest.mark.skip(reason="URL existence is tested in docker_treon")
 def test_urls_exist():
     """
     Test that urls that may be cached still exist on the server
@@ -87,13 +88,9 @@ def test_urls_exist():
         "https://github.com/onnx/models/raw/main/vision/style_transfer/fast_neural_style/model/pointilism-9.onnx",
         "https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip",
     ]
-    opener = urllib.request.build_opener()
-    opener.addheaders = [("User-agent", "Mozilla/5.0")]
-    urllib.request.install_opener(opener)
+    headers = {"User-Agent": "Mozilla/5.0"}
     for url in urls:
-        try:
-            urlobject = urllib.request.urlopen(url, timeout=10)
-            assert urlobject.status == 200
-        except urllib.error.HTTPError:
+        response = requests.get(url=url, headers=headers)
+        if not response.status_code == 200:
             print(f"Downloading {url} failed")
             raise

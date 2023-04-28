@@ -1,0 +1,239 @@
+name: treon
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+    - 'main'
+    - '2021.4'
+    - 'develop'
+    paths:
+    - 'notebooks/**.ipynb'
+    - 'notebooks/**.py'
+    - 'requirements.txt'
+    - '.ci/*'
+    - '.github/workflows/*.yml'
+    - '.github/workflows/.env'
+  push:
+    branches:
+    - 'main'
+    - '2021.4'
+    - 'develop'
+    paths:
+    - 'notebooks/**.ipynb'
+    - 'notebooks/**.py'
+    - 'requirements.txt'
+    - '.ci/*'
+    - '.github/workflows/*.yml'
+    - '.github/workflows/.env'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build_treon:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-20.04, windows-2019, macos-12]
+        python: ["3.7", "3.8", "3.9", "3.10"]
+    steps:
+
+    #### Installation/preparation ####
+    #
+    # These steps are also copied to convert_notebooks.yml
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+          fetch-depth: 0
+    
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v34
+      with:
+          files: |
+            notebooks/*/**
+            requirements.txt
+
+    - name: List all changed files
+      run: |
+        touch test_notebooks.txt
+        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          echo "$file was changed"
+          echo $file >> test_notebooks.txt
+        done
+      shell: bash
+    - name: Dotenv Action
+      id: dotenv
+      uses: xom9ikk/dotenv@v1.0.2
+      with:
+        path: ./.github/workflows
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install required packages
+      run:  |
+            if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt-get install libsndfile1 -y
+            fi
+      shell: bash
+
+    - name: Cache OpenVINO Pip Packages
+      id: cachepip
+      uses: actions/cache@v2
+      with:
+        path: |
+          pipcache
+        key: ${{ env.PIP_CACHE_KEY }}-${{ matrix.os }}-${{ matrix.python }}
+
+    # Cache specific files to reduce downloads or prevent network issues
+    - name: Cache Files
+      id: cachefiles
+      uses: actions/cache@v2
+      with:
+        path: |
+          # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
+          # and change cache paths in both treon.yml and convert_notebooks.yml
+          case_00030.zip
+          notebooks/110-ct-segmentation-quantize/kits19_frames_1
+          notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
+          # 208 omz cache location is set to this with test_replace
+          notebooks/208-optical-character-recognition/open_model_zoo_cache
+          notebooks/110-ct-scan-live-inference/kits19_frames_1
+          notebooks/212-onnx-style-transfer/model
+          notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
+        key: ${{ env.FILES_CACHE_KEY }}
+
+    # PaddleGAN stores cache in ppgan directory in CACHE_DIR
+    - name: Set CACHE_DIR
+      shell: bash
+      run: |
+        python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
+        # replace backslashes with forward slashes for Windows paths
+        python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+
+    # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
+    - name: Set HUB_HOME
+      shell: bash
+      run: |
+        echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
+
+    # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
+    - name: Cache PaddlePaddle cache directories
+      id: cacheusercache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ${{ env.HUB_HOME }}
+          ${{ env.CACHE_DIR }}/paddle
+          ${{ env.CACHE_DIR }}/ppgan
+        key: ${{ env.USER_CACHE_KEY }}-${{ runner.os }}
+    - name: Cache openvino packages
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        python -m pip install --upgrade pip
+        mkdir pipcache
+        python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
+        cp -r pipcache pipcache_openvino
+        python -m pip uninstall -y openvino openvino-dev nncf
+
+    # Download a small dataset to use for testing purposes in monai-kidney training notebook
+    - name: Download CT files
+      if: steps.cachefiles.outputs.cache-hit != 'true'
+      run: |
+        curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
+    - name: Copy CT files
+      run: |
+        mkdir notebooks/110-ct-segmentation-quantize/kits19
+        mkdir notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+        unzip case_00030.zip
+        cp -r case_00030 case_00001
+        mv case_00030 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+        mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
+    # Prevent test aborting by timeout
+    - name: Download long loading models
+      run: |
+          mkdir notebooks/203-meter-reader/model
+          curl -o notebooks/203-meter-reader/model/meter_det_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_det_model.tar.gz'
+          curl -o notebooks/203-meter-reader/model/meter_seg_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_seg_model.tar.gz'
+          mkdir notebooks/405-paddle-ocr-webcam/model
+          curl -o notebooks/405-paddle-ocr-webcam/model/ch_PP-OCRv3_det_infer.tar 'https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_det_infer.tar'
+          curl -o notebooks/405-paddle-ocr-webcam/model/ch_PP-OCRv3_rec_infer.tar 'https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_rec_infer.tar'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
+        python -m ipykernel install --user --name openvino_env
+
+      # Cache OpenVINO packages. mv works cross-platform
+    - name: Make pipcache directory with OpenVINO packages
+      if: steps.cachepip.outputs.cache-hit != 'true'
+      run: |
+        mv pipcache pipcache_full
+        mv pipcache_openvino pipcache
+
+    # Create list of installed pip packages that can be downloaded as artifacts
+    # to verify the exact environment of a specific test run
+    - name: Pip freeze
+      run: |
+        python -m pip freeze
+        python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+    - name: Archive pip freeze
+      uses: actions/upload-artifact@v3
+      with:
+        name: pip-freeze
+        path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+
+    #### End installation/preparation
+
+    - name: Check install
+      run: |
+        python check_install.py
+
+    # Patch long running cells to run faster
+    - name: Patch notebooks
+      run: |
+        python .ci/patch_notebooks.py
+
+    # Test that JupyterLab runs without errors
+    - name: Test Jupyterlab
+      run: |
+        jupyter lab notebooks --help
+
+    # Main notebooks test. Verifies that all notebooks run without errors
+    - name: Analysing with treon (Windows)
+      if: runner.os == 'Windows'
+      run: |
+            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
+      shell: bash
+    - name: Analysing with treon (Linux)
+      if: runner.os == 'Linux'
+      run: |
+            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+      shell: bash
+    - name: Analysing with treon (MacOS)
+      if: runner.os == 'MacOS'
+      run: |
+           python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 107-speech-recognition-quantization 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+      shell: bash
+    - name: Archive test report
+      uses: actions/upload-artifact@v3
+      with:
+        name: test_report.csv
+        path: test_report.csv
+    - name: Archive notebook test report
+      uses: actions/upload-artifact@v3
+      with:
+        name: test_report
+        path: test_report/
+
+    # Show the cache after running the notebooks
+    - name: Show cache
+      run: |
+        ls -laR ${{ env.CACHE_DIR }}
+        du -sh ${{ env.CACHE_DIR }}
+      if: runner.os != 'Windows'
