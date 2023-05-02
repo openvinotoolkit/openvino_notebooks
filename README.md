@@ -8,10 +8,6 @@ English | [简体中文](https://github.com/openvinotoolkit/openvino_notebooks/b
 
 A collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
 
-**NOTE: The main branch of this repository was updated to support the new OpenVINO 2022.3 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2021.4 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4). 
-
-If you need help, please start a GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions).  
-
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
 ## 🚀 AI Trends - Notebooks
@@ -63,6 +59,10 @@ OpenVINO Notebooks require Python and Git. To get started, select the guide for 
 ## 🚀 Getting Started
 
 The Jupyter notebooks are categorized into four classes, select one related to your needs or give them all a try. Good Luck! 
+
+**NOTE: The main branch of this repository was updated to support the new OpenVINO 2022.3 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2021.4 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2021.4). 
+
+If you need help, please start a GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions).  
 
 <div id='-first-steps'/>
 
