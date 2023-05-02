@@ -14,6 +14,20 @@ If you need help, please start a GitHub [Discussion](https://github.com/openvino
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
+## 🚀 AI Trends - Notebooks
+
+| **Notebook** | **Description** | **Complementary Materials** |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [YoloV8 - Optimization](notebooks/230-yolov8-optimization/)<br> | Optimize YOLOv8 using NNCF PTQ API | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> [Blog](https://medium.com/openvino-toolkit/how-to-get-yolov8-over-1000-fps-with-intel-gpus-9b0eeee879) |
+| [SAM - Segment Anything](notebooks/237-segment-anything/)<br>| Prompt based object segmentation mask generation using Segment Anything and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png width=225> [Blog - coming soon] |
+| [ControlNet - Stable-Diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> [Blog](https://medium.com/@paularamos_5416/control-your-stable-diffusion-model-with-controlnet-and-openvino-f2aa7e6b1ebd)|
+| [Stable Diffusion v2](notebooks/236-stable-diffusion-v2/)<br>| Text-to-Image Generation and Infinite Zoom with Stable Diffusion v2 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/228882108-25c1f65d-4c23-4e1d-8ba4-f6164280a3e3.gif width=225> [Blog](https://medium.com/openvino-toolkit/how-to-run-stable-diffusion-on-intel-gpus-with-openvino-840714f122b4)  |
+| [Whisper - Subtitles generation](notebooks/227-whisper-subtitles-generation/)<br> | Generate subtitles for video with OpenAI Whisper and OpenVINO | <img src=https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png  width=225>  |
+| [CLIP - zero-shot-image-classification](notebooks/228-clip-zero-shot-image-classification)<br> | Perform Zero-shot Image Classification with CLIP and OpenVINO | <img src=https://user-images.githubusercontent.com/29454499/207795060-437b42f9-e801-4332-a91f-cc26471e5ba2.png  width=500> [Blog](https://medium.com/@paularamos_5416/generative-ai-and-explainable-ai-with-openvino-2b5f8e4e720b) |
+| [BLIP - Visual-language-processing](notebooks/233-blip-visual-language-processing/)<br>| Visual Question Answering and Image Captioning using BLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> [Blog](https://medium.com/@paularamos_5416/multimodality-with-openvino-blip-b20bd3a2c87) |
+| [pix2pix - Image-editing](notebooks/231-instruct-pix2pix-image-editing/)<br>| Image editing with InstructPix2Pix | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=225> [Blog](https://medium.com/@paularamos_5416/generative-ai-and-explainable-ai-with-openvino-2b5f8e4e720b) |
+
+
 ## Table of Contents
 
 - [Table of Contents](#table-of-contents)
