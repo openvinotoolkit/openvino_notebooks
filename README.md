@@ -11,7 +11,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
 ## 🚀 AI Trends - Notebooks
-
+Check out the latest notebooks that show how to optimize and deploy popular models on Intel CPU and GPU. 
 | **Notebook** | **Description** | **Complementary Materials** |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | [YoloV8 - Optimization](notebooks/230-yolov8-optimization/)<br> | Optimize YOLOv8 using NNCF PTQ API | [Blog - How to get YOLOv8 Over 1000 fps with Intel GPUs?](https://medium.com/openvino-toolkit/how-to-get-yolov8-over-1000-fps-with-intel-gpus-9b0eeee879) <br /> <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" height=200>  |
