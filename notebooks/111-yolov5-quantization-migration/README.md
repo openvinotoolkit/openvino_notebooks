@@ -1,4 +1,4 @@
-# Migrate quantization from POT API to NNCF
+# Migrate quantization from POT API to NNCF API
 
 ![Ultralytics Yolov5 results](https://user-images.githubusercontent.com/44352144/177097174-cfe78939-e946-445e-9fce-d8897417ef8e.png)
 
@@ -8,7 +8,7 @@ This tutorial demonstrates how to migrate quantization pipeline written using th
 
 ## Notebook Contents
 
-The tutorial consist from following parts:
+The tutorial consists from the following parts:
 
 1. Convert YOLOv5 model to OpenVINO IR.
 2. Prepare dataset for quantization.
