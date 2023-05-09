@@ -1,3 +1,0 @@
-[submodule "anomalib"]
-	path = anomalib
-	url = https://github.com/openvinotoolkit/anomalib.git

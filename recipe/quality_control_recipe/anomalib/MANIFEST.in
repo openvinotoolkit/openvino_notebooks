@@ -1,4 +1,0 @@
-recursive-include requirements *
-
-# Include marker file for PEP 561
-include src/anomalib/py.typed
