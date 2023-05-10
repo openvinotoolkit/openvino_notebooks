@@ -12,5 +12,4 @@ Notebook contains the following steps:
 1. Convert PyTorch models to OpenVINO IR format, using Model Optimizer tool.
 2. Run DeepFloyd IF pipeline with OpenVINO.
 
-This is an example notebook with isolated requirements. You can run it standalone or 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/238-deeployd-if/notebooks/238-deeployd-if/deep-floyd-if.ipynb)
+The Jupyter notebook contains its own set of requirements installed directly within the notebook, allowing it to run independently as a standalone example.
