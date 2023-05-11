@@ -7,13 +7,13 @@
 
 In this directory, you will find two Jupyter notebooks. The first is an end-to-end deep learning training tutorial which borrows the open source code from the TensorFlow [image classification tutorial](https://www.tensorflow.org/tutorials/images/classification), demonstrating how to train the model and then convert to OpenVINO Intermediate Representation (OpenVINO IR). It leverages the [tf_flowers](https://www.tensorflow.org/datasets/catalog/tf_flowers) dataset which includes about 3,700 photos of flowers.
 
-The second notebook demonstrates how to quantize the OpenVINO IR model that was created in the first notebook. Post-training quantization speeds up inference on the trained model. The quantization is performed with the [Post Training Optimization Tool (POT)](https://docs.openvino.ai/latest/pot_introduction.html) from OpenVINO Toolkit. A custom dataloader and a metric will be defined, and accuracy and performance will be computed for the original OpenVINO IR model and the quantized model on CPU and iGPU (if available).
+The second notebook demonstrates how to quantize the OpenVINO IR model that was created in the first notebook. Post-training quantization speeds up inference on the trained model. The quantization is performed with the [Post-training Quantization with NNCF](https://docs.openvino.ai/latest/nncf_ptq_introduction.html) from OpenVINO Toolkit. A custom dataloader and a metric will be defined, and accuracy and performance will be computed for the original OpenVINO IR model and the quantized model on CPU and iGPU (if available).
 
 ## Jupyter Notebooks
 
 * `301-tensorflow-training-openvino.ipynb`
   * Demonstrates how to train, convert, and deploy an image classification model with TensorFlow and OpenVINO.
-* `301-tensorflow-training-openvino-pot.ipynb`
+* `301-tensorflow-training-openvino-nncf.ipynb`
   * Demonstrates how to quantize the OpenVINO IR model that was created by the previous notebook.
 
 ## TensorFlow Licenses
