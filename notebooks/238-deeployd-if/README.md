@@ -8,8 +8,10 @@ DeepFloyd IF is an advanced open-source text-to-image model that delivers remark
 
 This notebook demonstrates how to convert and run DeepFloyd IF models using OpenVINO.
 
-Notebook contains the following steps:
+The notebook contains the following steps:
 1. Convert PyTorch models to OpenVINO IR format, using Model Optimizer tool.
 2. Run DeepFloyd IF pipeline with OpenVINO.
+
+Please be aware that a machine with at least 32GB of RAM is necessary to run this example.
 
 The Jupyter notebook contains its own set of requirements installed directly within the notebook, allowing it to run independently as a standalone example.
