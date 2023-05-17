@@ -388,8 +388,8 @@ for res_path in glob.glob('/home/aistudio/test_data/mapper_res/*'):
     visualize = np.concatenate([input_img,res_img], axis=1)
     visualize=cv2.resize(visualize, (1024,512))
     res_im = Image.fromarray(visualize)
-   
     display(res_im)
-![image](https://github.com/ziyuanji/openvino_notebooks/assets/125521589/496865bf-9a2b-443d-bfcb-4c97c795076a)
+
+![kkkk](https://github.com/ziyuanji/openvino_notebooks/assets/125521589/710028ed-d945-4620-914c-f2b2808d75f2)
 
 
