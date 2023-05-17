@@ -1,6 +1,11 @@
 
 Model download link：
-openvino_notebooks model 1、StyleGAN2-ada-Generator.onnx 链接：https://pan.baidu.com/s/1bi5y62nOLvOnlYxbxKR-Ew?pwd=02ji 提取码：02ji 2、face_parsing.onnx 链接：https://pan.baidu.com/s/1c9Tkd2qEVIKdfXyTsc5PTw?pwd=8xh0 提取码：8xh0 3、mapper.onnx 链接：https://pan.baidu.com/s/1YQ-vpRq4-bXDiEukchNhEg?pwd=7wnk 提取码：7wnk 4、e4e_ffhq_encode.onnx 链接：https://pan.baidu.com/s/1PqjixAfF6hI-NPIqQoS7kA?pwd=cg8g 提取码：cg8g 5、shape_predictor_68_face_landmarks.dat 链接：https://pan.baidu.com/s/1jQgHY0RqXzqqjfUdKa7vSg?pwd=6c8d 提取码：6c8d
+openvino_notebooks model 
+1、StyleGAN2-ada-Generator.onnx 链接：https://pan.baidu.com/s/1bi5y62nOLvOnlYxbxKR-Ew?pwd=02ji  
+2、face_parsing.onnx 链接：https://pan.baidu.com/s/1c9Tkd2qEVIKdfXyTsc5PTw?pwd=8xh0
+3、mapper.onnx 链接：https://pan.baidu.com/s/1YQ-vpRq4-bXDiEukchNhEg?pwd=7wnk
+4、e4e_ffhq_encode.onnx 链接：https://pan.baidu.com/s/1PqjixAfF6hI-NPIqQoS7kA?pwd=cg8g
+5、shape_predictor_68_face_landmarks.dat 链接：https://pan.baidu.com/s/1jQgHY0RqXzqqjfUdKa7vSg?pwd=6c8d
 
 
 !pip install openvino==2022.03
