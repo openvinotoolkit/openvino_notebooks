@@ -24,7 +24,7 @@ if __name__ == "__main__":
     landmarks_model_path='./model/shape_predictor_68_face_landmarks.dat'
     # RAW_IMAGES_DIR = sys.argv[1]
     # ALIGNED_IMAGES_DIR = sys.argv[2]
-    RAW_IMAGES_DIR ='../test_data/origin/'
+    RAW_IMAGES_DIR ='../test_data/faceorigin/'
     ALIGNED_IMAGES_DIR =r'../test_data/origin/'
 
     landmarks_detector = LandmarksDetector(landmarks_model_path)
