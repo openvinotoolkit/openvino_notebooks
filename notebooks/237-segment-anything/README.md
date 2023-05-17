@@ -12,7 +12,7 @@ The two notebooks in this folder show how to convert and use the Segment Anythin
 
 The first notebook, `237-segment-anything.ipynb`, demonstrates how to work with model in tnteractive segmentation mode and automatic segmentation mode.
 
-The second notebook, `237-segment-anything-fiftyone.ipynb`, demonstrates how to use SAM and OpenVINO with FiftyOne for curation and visualization of model predictions across an entire dataset.
+The second notebook, `237-segment-anything-fiftyone.ipynb`, is a colaboration between OpenVINO and the open source [FiftyOne](https://github.com/voxel51/fiftyone) library. It demonstrates how to use SAM and OpenVINO with FiftyOne for curation and visualization of model predictions across an entire dataset. 
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
 ## Base Notebook Contents
