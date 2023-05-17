@@ -380,7 +380,6 @@ for res_path in glob.glob('/home/aistudio/test_data/mapper_res/*'):
     input_path = res_path.replace('mapper_res','origin')
     input_img = cv2.imread(input_path)[:,:,::-1]
     input_img=cv2.resize(input_img, (1024,1024))
-#     from IPython.core.debugger import Pdb; Pdb().set_trace()
     visualize = np.concatenate([input_img,res_img], axis=1)
     visualize=cv2.resize(visualize, (1024,512))
     res_im = Image.fromarray(visualize)
