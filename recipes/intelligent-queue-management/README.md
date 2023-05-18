@@ -69,7 +69,7 @@ pip install -r requirements.txt
 To convert and optimize the YOLOv8 model, run the following command:
 
 ```shell
-python convert_and_optimize.py --model_name yolov8m --model_dir model
+python convert_and_optimize.py --model_name yolov8m --model_dir model --data_dir data --quantize
 ```
 This will convert the YOLOv8 model to an OpenVINO™ Intermediate Representation (IR) format and optimize it for use with OpenVINO™.
 You can run either the python script or check out [convert-and-optimize-the-model.ipynb](docs/convert-and-optimize-the-model.ipynb) to learn more.

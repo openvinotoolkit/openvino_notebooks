@@ -8,3 +8,4 @@ opencv-python==4.7.0.72
 torch==1.13.1
 supervision==0.3.1
 jupyterlab==3.6.3
+tqdm==4.65.0
