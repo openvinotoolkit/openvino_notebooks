@@ -29,6 +29,7 @@ Notebook contains the following steps:
 1. Convert PyTorch models to OpeVINO format.
 2. Run OpenVINO model in interactive segmentation mode.
 3. Run OpenVINO model in automatic mask generation mode.
+4. Run NNCF post-training optimization pipeline to compress the encoder of SAM
 
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
