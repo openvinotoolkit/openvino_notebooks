@@ -1,7 +1,7 @@
 # Convert and Optimize OneFormer with OpenVINO™
 
 
-This tutorial explains how to convert and optimize the [OneFormer](https://huggingface.co/docs/transformers/model_doc/oneformer) HuggingFace model with OpenVNO.
+This tutorial explains how to convert and run inference on the [OneFormer](https://huggingface.co/docs/transformers/model_doc/oneformer) HuggingFace model with OpenVNO.
 
 
 ## Notebook Contents
