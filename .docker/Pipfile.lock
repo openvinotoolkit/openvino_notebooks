@@ -2347,16 +2347,16 @@
                 "sha256:ddae2f441e32297d5caa7b25091beb8c2358616fd7094572fdb3df27a96bf79e",
                 "sha256:e71ee05c3b36df446fa33f0eca8b57855e83266cafc1f2cdbb89d4c6730cfa5f",
                 "sha256:ee4d782db162fb6bdad51e7d8d5ff1fb8463826ef58bf1a2f61dad5c30dbe5b4",
-                "sha256:f490c914684edc8816b35724860c25fb91cea8131035255c069901d2a24b01cc"
+                "sha256:e97aedb821d08abaf12186fa9618967b09a610a8f788f086b5dd289776903e39"
             ],
-            "version": "==2022.3.0"
+            "version": "==2023.0.0.dev20230427"
         },
         "openvino-dev": {
             "hashes": [
-                "sha256:f86cb3433c0b78fe78c11c3ca043eb66e46f66c727ca057059decfd927bb2a29"
+                "sha256:33b4d651c856e42fed42126b0dfe0cf949e6b1ca86a2d58eb2c54849df5fc03a"
             ],
             "index": "pypi",
-            "version": "==2022.3.0"
+            "version": "==2023.0.0.dev20230427"
         },
         "openvino-telemetry": {
             "hashes": [
