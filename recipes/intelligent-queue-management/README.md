@@ -16,7 +16,7 @@ Now, let's dive into the steps starting with installing Python.
 
 ## Step 0
 
-This project requires Python 3.7 or higher. If you don't have Python installed on your machine, go to https://www.python.org/downloads/ and download the latest version for your operating system. Follow the prompts to install Python, making sure to check the option to add Python to your PATH environment variable.
+This project requires Python 3.8 or higher. If you don't have Python installed on your machine, go to https://www.python.org/downloads/ and download the latest version for your operating system. Follow the prompts to install Python, making sure to check the option to add Python to your PATH environment variable.
 
 ## Step 1
 
@@ -79,7 +79,7 @@ You can run either the python script or check out [convert-and-optimize-the-mode
 To run the application, use the following command:
 
 ```shell
-python app.py --stream video_file.mp4 --model_path model/yolov8m_openvino_model/yolov8m.xml --zones_config_file zones.json --customers_limit 3
+python app.py --stream video_file.mp4 --model_path model/yolov8m_openvino_int8_model/yolov8m.xml --zones_config_file zones.json --customers_limit 3
 ```
 This will run the application with the specified arguments. Replace "video_file.mp4" with the path to your input video file, "zones.json" with the path to your zones configuration file, and "3" with the maximum number of customers allowed in the queue.
 You can also run the [run-the-application.ipynb](docs/run-the-application.ipynb) to learn more about the inference process.
