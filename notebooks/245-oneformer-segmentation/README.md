@@ -1,4 +1,4 @@
-# Convert and Optimize OneFormer with OpenVINO™
+# Universal segmentation with OneFormer with OpenVINO™
 
 
 This tutorial explains how to convert and run inference on the [OneFormer](https://huggingface.co/docs/transformers/model_doc/oneformer) HuggingFace model with OpenVNO.
@@ -6,7 +6,7 @@ This tutorial explains how to convert and run inference on the [OneFormer](https
 
 ## Notebook Contents
 
-This tutorial demonstrates step-by-step instructions on how to run and optimize HuggingFace OneFormer with OpenVINO.
+This tutorial demonstrates step-by-step instructions on how to run HuggingFace OneFormer with OpenVINO.
 
 The tutorial consists of the following steps:
 - Install required libraries
