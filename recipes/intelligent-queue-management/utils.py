@@ -6,7 +6,7 @@ import urllib.parse
 from os import PathLike
 from pathlib import Path
 import cv2
-from tqdm.notebook import tqdm_notebook
+import tqdm
 
 class VideoPlayer:
     """
@@ -171,7 +171,7 @@ def download_file(
     filesize = int(response.headers.get("Content-length", 0))
     if not filename.exists() or (os.stat(filename).st_size != filesize):
 
-        with tqdm_notebook(
+        with tqdm.tqdm(
             total=filesize,
             unit="B",
             unit_scale=True,
