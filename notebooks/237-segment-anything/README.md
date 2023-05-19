@@ -19,10 +19,11 @@ If you have not installed all required dependencies, follow the [Installation Gu
 
 This notebook shows an example of how to convert and use Segment Anything Model using OpenVINO
 
-The notebook contains the following steps:
+Notebook contains the following steps:
 1. Convert PyTorch models to OpeVINO format.
 2. Run OpenVINO model in interactive segmentation mode.
 3. Run OpenVINO model in automatic mask generation mode.
+4. Run NNCF post-training optimization pipeline to compress the encoder of SAM
 
 * Interactive segmentation mode: in this demostration you can upload image and specify point related to object using [Gradio](https://gradio.app/) interface and as the result you get segmentation mask for specified point.
 The following image shows an example of the input text and the corresponding predicted image.
