@@ -8,3 +8,4 @@ notebooks/231-instruct-pix2pix-image-editing/231-instruct-pix2pix-image-editing.
 notebooks/235-controlnet-stable-diffusion/235-controlnet-stable-diffusion.ipynb
 notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-infinite-zoom.ipynb
 notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-text-to-image.ipynb
+notebooks/404-style-transfer-webcam/404-style-transfer.ipynb
