@@ -1,4 +1,4 @@
-# Accelerate Inference of NLP models with OpenVINO™ Post-Training Optimization Tool 
+# Accelerate Inference of NLP models with Post-Training Quantization API of NNCF 
 
 This tutorial demonstrates how to apply INT8 quantization to the Natural Language Processing model BERT, 
 using the [Post-Training Quantization API](https://docs.openvino.ai/latest/nncf_ptq_introduction.html). 
