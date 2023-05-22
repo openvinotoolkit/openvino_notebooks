@@ -8,9 +8,10 @@ This notebook demonstrates how the use [attention center model](https://github.c
 The tutorial consists of the following steps:
 
 * Downloading the model
-* Loading the model and make inference with OpenVINO API
 * Loading the model and make inference with TensowFlow Lite API
+* Loading the model and make inference with OpenVINO API
 * Comparing performance
+* Run Live Attention Center Detection
 
 ## Installation Instructions
 
