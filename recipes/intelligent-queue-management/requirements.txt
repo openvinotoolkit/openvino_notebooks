@@ -1,0 +1,11 @@
+openvino-dev==2022.3
+ovmsclient==2022.3
+ultralytics==8.0.43
+numpy==1.23.4
+nncf==2.4.0
+pillow==9.4.0
+opencv-python==4.7.0.72
+torch==1.13.1
+supervision==0.3.1
+jupyterlab==3.6.3
+tqdm==4.65.0
