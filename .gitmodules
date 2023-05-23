@@ -1,0 +1,3 @@
+[submodule "recipe/quality_control_recipe/anomalib"]
+	path = recipe/quality_control_recipe/anomalib
+	url = https://github.com/openvinotoolkit/anomalib.git
