@@ -10,4 +10,5 @@ notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-infinite-zoom.ipynb
 notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-text-to-image.ipynb
 notebooks/237-segment-anything/237-segment-anything.ipynb
 notebooks/237-segment-anything/237-segment-anything-fiftyone.ipynb
+notebooks/238-deeployd-if/238-deep-floyd-if.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb
