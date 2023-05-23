@@ -17,6 +17,11 @@ The tutorial consists of following steps:
 3. Convert the model to OpenVINO Intermediate Representation format (IR).
 4. Run model inference and analyze results.
 
+We will use ImageBind model for zero-shot audio and image classification. The result of model work demonstrated on the image below
+
+![image](https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png)
+
+
 ## Installation Instructions
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
