@@ -148,6 +148,8 @@ Demos that demonstrate inference on a particular model.
 |[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
 |[236-stable-diffusion-v2](notebooks/236-stable-diffusion-v2/)<br>| Text-to-Image Generation and Infinite Zoom with Stable Diffusion v2 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/228882108-25c1f65d-4c23-4e1d-8ba4-f6164280a3e3.gif width=225> |
 |[237-segment-anything](notebooks/237-segment-anything/)<br>| Prompt based segmentation using Segment Anything and OpenVINO™. [Use FiftyOne](notebooks/237-segment-anything/237-segment-anything-fiftyone.ipynb) for dataset curation!| <img src=https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png width=225> |
+|[004-hello-detection](notebooks/004-hello-detection/)<br>| Horizontal text detections on the [Total Text Dataset](https://www.kaggle.com/datasets/ipythonx/totaltextstr) using OpenVINO™ and open source [FiftyOne](https://docs.voxel51.com/index.html) computer vision toolset. [Use FiftyOne](notebooks/004-hello-detection/004-hello-detection-fiftyone.ipynb) for dataset curation!| <img src=https://github-production-user-asset-6210df.s3.amazonaws.com/66986430/240385227-40a112b5-e26b-4e1d-9e31-a2be1591d373.png width=225> |
+
 
 <div id='-model-training'/>
 
