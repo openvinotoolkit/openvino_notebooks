@@ -31,7 +31,7 @@ git clone https://github.com/openvinotoolkit/openvino_notebooks.git openvino_not
 This will clone the repository into a directory named "openvino_queue_management" in the current directory. Then, navigate into the directory using the following command:
 
 ```shell
-cd openvino_notebooks/recipes/intelligent-queue-management
+cd openvino_notebooks/recipes/intelligent_queue_management
 ```
 
 2. Create a virtual environment
