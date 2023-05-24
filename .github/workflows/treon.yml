@@ -174,17 +174,17 @@ jobs:
     - name: Analysing with treon (Windows)
       if: runner.os == 'Windows'
       run: |
-            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 --move_notebooks_dir c:/notebooks
+            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 237-segment-anything --move_notebooks_dir c:/notebooks
       shell: bash
     - name: Analysing with treon (Linux)
       if: runner.os == 'Linux'
       run: |
-            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 
+            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 237-segment-anything
       shell: bash
     - name: Analysing with treon (MacOS)
       if: runner.os == 'MacOS'
       run: |
-            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 
+            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 237-segment-anything 
 
       shell: bash
     - name: Archive test report
