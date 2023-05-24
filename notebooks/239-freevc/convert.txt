@@ -1,2 +1,0 @@
-title1|dataset/vctk-16k/p225/p225_001.wav|dataset/vctk-16k/p226/p226_002.wav
-title2|dataset/vctk-16k/p226/p226_002.wav|dataset/vctk-16k/p225/p225_001.wav
