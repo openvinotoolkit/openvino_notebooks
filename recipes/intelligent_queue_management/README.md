@@ -25,7 +25,7 @@ This project requires Python 3.8 or higher. If you don't have Python installed o
 To clone the repository, run the following command:
 
 ```shell
-git clone https://github.com/openvinotoolkit/openvino_notebooks.git openvino_notebooks
+git clone -b recipes https://github.com/openvinotoolkit/openvino_notebooks.git openvino_notebooks
 ```
 
 This will clone the repository into a directory named "openvino_queue_management" in the current directory. Then, navigate into the directory using the following command:
