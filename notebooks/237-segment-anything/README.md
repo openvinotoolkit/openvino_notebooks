@@ -8,9 +8,22 @@ The [Segment Anything Model (SAM)](https://github.com/facebookresearch/segment-a
 Previously, to solve any kind of segmentation problem, there were two classes of approaches. The first, interactive segmentation, allowed for segmenting any class of object but required a person to guide the method by iterative refining a mask. The second, automatic segmentation, allowed for segmentation of specific object categories defined ahead of time (e.g., cats or chairs) but required substantial amounts of manually annotated objects to train (e.g., thousands or even tens of thousands of examples of segmented cats), along with the compute resources and technical expertise to train the segmentation model. Neither approach provided a general, fully automatic approach to segmentation.
 
 Segment Anything Model is a generalization of these two classes of approaches. It is a single model that can easily perform both interactive segmentation and automatic segmentation.
-This notebook shows an example of how to convert and use Segment Anything Model in OpenVINO format, allowing it to run on a variety of platforms that support an OpenVINO.
+The two notebooks in this folder show how to convert and use the Segment Anything Model in OpenVINO format, allowing it to run on a variety of platforms that support OpenVINO.
 
-The notebook demonstrates how to work with model in 2 modes:
+The first notebook, `237-segment-anything.ipynb`, demonstrates how to work with model in tnteractive segmentation mode and automatic segmentation mode.
+
+The second notebook, `237-segment-anything-fiftyone.ipynb`, is a collaboration between OpenVINO and the open source [FiftyOne](https://github.com/voxel51/fiftyone) library. It demonstrates how to use SAM and OpenVINO with FiftyOne for curation and visualization of model predictions across an entire dataset. 
+
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+## Base Notebook Contents
+
+This notebook shows an example of how to convert and use Segment Anything Model using OpenVINO
+
+Notebook contains the following steps:
+1. Convert PyTorch models to OpeVINO format.
+2. Run OpenVINO model in interactive segmentation mode.
+3. Run OpenVINO model in automatic mask generation mode.
+4. Run NNCF post-training optimization pipeline to compress the encoder of SAM
 
 * Interactive segmentation mode: in this demostration you can upload image and specify point related to object using [Gradio](https://gradio.app/) interface and as the result you get segmentation mask for specified point.
 The following image shows an example of the input text and the corresponding predicted image.
@@ -20,15 +33,13 @@ The following image shows an example of the input text and the corresponding pre
 
 ![demo2](https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png)
 
+## FiftyOne Notebook Contents
 
-## Notebook Contents
+This notebook shows how to and apply the Segment Anything Model to a dataset using OpenVINO and FiftyOne. It is geared toward users who want to curate and visualize model predictions across an entire dataset.
 
-This notebook shows an example of how to convert and use Segment Anything Model using OpenVINO
-
-Notebook contains the following steps:
-1. Convert PyTorch models to OpeVINO format.
-2. Run OpenVINO model in interactive segmentation mode.
-3. Run OpenVINO model in automatic mask generation mode.
-
-
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+The notebook contains the following steps:
+1. Convert PyTorch models to OpeVINO format
+2. Preparing an image for OpenVINO SAM segmentation
+3. Run OpenVINO SAM with prompts
+4. Run OpenVINO SAM in automatic mask generation mode
+5. Curate and visualize model predictions across an entire dataset

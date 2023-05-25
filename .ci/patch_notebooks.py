@@ -17,7 +17,7 @@ def patch_notebooks(notebooks_dir):
     Github Actions CI.
 
     For example: change nr of epochs from 15 to 1 in
-    301-tensorflow-training-openvino-pot.ipynb by adding
+    301-tensorflow-training-openvino-nncf.ipynb by adding
     {"test_replace": {"epochs = 15": "epochs = 1"} to the cell
     metadata of the cell that contains `epochs = 15`
 
