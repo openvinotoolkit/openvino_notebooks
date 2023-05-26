@@ -149,7 +149,9 @@ Demos that demonstrate inference on a particular model.
 |[236-stable-diffusion-v2](notebooks/236-stable-diffusion-v2/)<br>| Text-to-Image Generation and Infinite Zoom with Stable Diffusion v2 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/228882108-25c1f65d-4c23-4e1d-8ba4-f6164280a3e3.gif width=225> |
 |[237-segment-anything](notebooks/237-segment-anything/)<br>| Prompt based segmentation using Segment Anything and OpenVINO™. [Use FiftyOne](notebooks/237-segment-anything/237-segment-anything-fiftyone.ipynb) for dataset curation!| <img src=https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png width=225> |
 |[238-deep-floyd-if](notebooks/238-deeployd-if/)<br>| Text-to-Image Generation with DeepFloyd IF and OpenVINO™ | <img src=https://user-images.githubusercontent.com/76463150/238697288-9055e9e8-d268-4f63-b78e-b36cb76ece73.png width=225> |
-[239-yolact-image-segmentation](/notebooks/238-yolact-instance-segmentation/) <br>| Instance segmentation on images using Yolact and OpenVINO™.| <img src=https://raw.githubusercontent.com/Abdullah-Elkasaby/238-yolact-image-segmentation/one-notebook-version/yolact_example.png width=225> |
+|[239-image-bind](notebooks/239-image-bind/)<br>| Binding multimodal data using ImageBind and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png width=225> |
+|[240-yolact-image-segmentation](/notebooks/238-yolact-instance-segmentation/) <br>| Instance segmentation on images using Yolact and OpenVINO™.| <img src=https://raw.githubusercontent.com/Abdullah-Elkasaby/238-yolact-image-segmentation/one-notebook-version/yolact_example.png width=225> |
+
 
 <div id='-model-training'/>
 
