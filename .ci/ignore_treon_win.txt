@@ -2,10 +2,18 @@
 108-gpu-device
 117-model-server
 225-stable-diffusion-text-to-image
+<<<<<<< HEAD
 231-instruct-pix2pix-image-editing
+=======
+>>>>>>> move ignored scope into file (#1082)
 233-blip-visual-language-processing
 235-controlnet-stable-diffusion
 236-stable-diffusion-v2
 237-segment-anything
+<<<<<<< HEAD
 238-deeployd-if
 239-image-bind
+=======
+238-deeployd-if 
+301-tensorflow-training-openvino
+>>>>>>> move ignored scope into file (#1082)
