@@ -185,7 +185,6 @@ jobs:
       if: runner.os == 'MacOS'
       run: |
            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_mac.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
-
       shell: bash
     - name: Archive test report
       uses: actions/upload-artifact@v3
