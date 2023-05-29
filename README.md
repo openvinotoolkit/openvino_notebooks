@@ -27,6 +27,7 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 
 ## Table of Contents
 
+- [🚀 AI Trends - Notebooks](#-ai-trends---notebooks)
 - [Table of Contents](#table-of-contents)
 - [📝 Installation Guide](#-installation-guide)
 - [🚀 Getting Started](#-getting-started)
@@ -148,7 +149,7 @@ Demos that demonstrate inference on a particular model.
 |[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
 |[236-stable-diffusion-v2](notebooks/236-stable-diffusion-v2/)<br>| Text-to-Image Generation and Infinite Zoom with Stable Diffusion v2 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/228882108-25c1f65d-4c23-4e1d-8ba4-f6164280a3e3.gif width=225> |
 |[237-segment-anything](notebooks/237-segment-anything/)<br>| Prompt based segmentation using Segment Anything and OpenVINO™. [Use FiftyOne](notebooks/237-segment-anything/237-segment-anything-fiftyone.ipynb) for dataset curation!| <img src=https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png width=225> |
-|[238-deep-floyd-if](notebooks/238-deeployd-if/)<br>| Text-to-Image Generation with DeepFloyd IF and OpenVINO™ | <img src=https://user-images.githubusercontent.com/76463150/238697288-9055e9e8-d268-4f63-b78e-b36cb76ece73.png width=225> |
+|[238-deep-floyd-if](notebooks/238-deeployd-if/)<br>| Text-to-Image Generation with DeepFloyd IF and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/241643886-dfcf3c48-8d50-4730-ae28-a21595d9504f.png width=225> |
 |[239-image-bind](notebooks/239-image-bind/)<br>| Binding multimodal data using ImageBind and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png width=225> |
 
 <div id='-model-training'/>
