@@ -213,20 +213,12 @@ jobs:
     - name: Analysing with treon (Linux)
       if: runner.os == 'Linux'
       run: |
-<<<<<<< HEAD
             python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list .ci/ignore_treon_linux.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
-=======
-            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list .ci/ignore_treon.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
->>>>>>> move ignored scope into file (#1082)
       shell: bash
     - name: Analysing with treon (MacOS)
       if: runner.os == 'MacOS'
       run: |
-<<<<<<< HEAD
            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list .ci/ignore_treon_mac.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
-=======
-           python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list .ci/ignore_treon.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
->>>>>>> move ignored scope into file (#1082)
       shell: bash
     - name: Archive test report
       uses: actions/upload-artifact@v3
