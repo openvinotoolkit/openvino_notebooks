@@ -27,7 +27,7 @@ As a routine task in a power grid, meter reading always brings a heavy workload 
 
 There are two notebooks for meter reader:
 - [One notebook](203-meter-reader.ipynb) uses pre-trained [PPYOLOv2](https://github.com/PaddlePaddle/PaddleDetection/tree/release/2.4/configs/ppyolo) PaddlePaddle model and [DeepLabV3P](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.5/configs/deeplabv3p) to build up a multiple inference task pipeline. This system will automatically detect the meters and find out their readings.
-- [Another](203-meter-reader-digital.ipynb) uses pre-trained [PP-OCR](https://github.com/PaddlePaddle/PaddleOCR) PaddlePaddle model to recognize the required text and numbers on industrial digital meters. This system will recognize texts in specific areas and output the structured information.
+- [Digital Meter Reader](203-meter-reader-digital.ipynb) uses pre-trained [PP-OCR](https://github.com/PaddlePaddle/PaddleOCR) PaddlePaddle model to recognize the required text and reading on industrial digital meters. This system will recognize texts in specific areas and output the structured information.
 
 ## Installation Instructions
 
