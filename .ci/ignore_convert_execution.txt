@@ -1,3 +1,4 @@
+notebooks/108-gpu-device/108-gpu-device.ipynb
 notebooks/117-model-server/117-model-server.ipynb
 notebooks/211-speech-to-text/211-speech-to-text.ipynb
 notebooks/214-grammar-correction/214-grammar-correction.ipynb
