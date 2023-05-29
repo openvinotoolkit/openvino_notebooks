@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 107-speech-recognition-quantization
 108-gpu-device
 117-model-server
@@ -13,12 +12,3 @@
 240-dolly-2-instruction-following
 241-riffusion-text-to-music
 404-style-transfer-webcam
-=======
-108-gpu-device
-225-stable-diffusion-text-to-image
-235-controlnet-stable-diffusion
-236-stable-diffusion-v2
-237-segment-anything
-238-deeployd-if 
-301-tensorflow-training-openvino
->>>>>>> Fixed docs conversion (#1089)
