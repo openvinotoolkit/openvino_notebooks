@@ -174,30 +174,16 @@ jobs:
     - name: Analysing with treon (Windows)
       if: runner.os == 'Windows'
       run: |
-<<<<<<< HEAD
-            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_win.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
-=======
             python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list .ci/ignore_treon_win.txt --move_notebooks_dir c:/notebooks
->>>>>>> move ignored scope into file (#1082)
       shell: bash
     - name: Analysing with treon (Linux)
       if: runner.os == 'Linux'
       run: |
-<<<<<<< HEAD
             python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_linux.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
     - name: Analysing with treon (MacOS)
       if: runner.os == 'MacOS'
       run: |
             python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_mac.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
-=======
-            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list .ci/ignore_treon.txt
-      shell: bash
-    - name: Analysing with treon (MacOS)
-      if: runner.os == 'MacOS'
-      run: |
-            python .ci/validate_notebooks.py --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --ignore_list .ci/ignore_treon.txt
-
->>>>>>> move ignored scope into file (#1082)
       shell: bash
     - name: Archive test report
       uses: actions/upload-artifact@v3
