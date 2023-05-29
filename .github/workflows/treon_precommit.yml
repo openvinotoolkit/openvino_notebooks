@@ -208,17 +208,17 @@ jobs:
     - name: Analysing with treon (Windows)
       if: runner.os == 'Windows'
       run: |
-            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 237-segment-anything 245-oneformer-segmentation --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
+            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list .ci/ignore_treon_win.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
       shell: bash
     - name: Analysing with treon (Linux)
       if: runner.os == 'Linux'
       run: |
-            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 231-instruct-pix2pix-image-editing 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 237-segment-anything 245-oneformer-segmentation --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list .ci/ignore_treon.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
     - name: Analysing with treon (MacOS)
       if: runner.os == 'MacOS'
       run: |
-           python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list 225-stable-diffusion-text-to-image 107-speech-recognition-quantization 108-gpu-device 235-controlnet-stable-diffusion 236-stable-diffusion-v2 237-segment-anything 245-oneformer-segmentation --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+           python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list .ci/ignore_treon.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
     - name: Archive test report
       uses: actions/upload-artifact@v3
