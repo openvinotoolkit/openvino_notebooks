@@ -9,8 +9,4 @@
 237-segment-anything
 238-deeployd-if
 239-image-bind
-<<<<<<< HEAD
-=======
 240-dolly-2-instruction-following
-301-tensorflow-training-openvino
->>>>>>> move notebook, align optimum install
