@@ -1,17 +1,10 @@
 108-gpu-device
 225-stable-diffusion-text-to-image
-<<<<<<< HEAD
 231-instruct-pix2pix-image-editing
 235-controlnet-stable-diffusion
 236-stable-diffusion-v2
 237-segment-anything
 238-deeployd-if
 239-image-bind
-404-style-transfer-webcam
-=======
-235-controlnet-stable-diffusion
-236-stable-diffusion-v2
-237-segment-anything
-238-deeployd-if 
 301-tensorflow-training-openvino
->>>>>>> Fixed docs conversion (#1089)
+404-style-transfer
