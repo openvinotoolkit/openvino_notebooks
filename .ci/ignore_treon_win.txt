@@ -9,4 +9,5 @@
 237-segment-anything
 238-deeployd-if
 239-image-bind
+245-oneformer-segmentation
 301-tensorflow-training-openvino
