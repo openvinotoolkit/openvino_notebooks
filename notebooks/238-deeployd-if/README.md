@@ -12,6 +12,12 @@ The notebook contains the following steps:
 1. Convert PyTorch models to OpenVINO IR format, using Model Optimizer tool.
 2. Run DeepFloyd IF pipeline with OpenVINO.
 
-Please be aware that a machine with at least 32GB of RAM is necessary to run this example.
+The result of notebook work demonstrated on the image below:
+[!owl.png](https://user-images.githubusercontent.com/29454499/241643886-dfcf3c48-8d50-4730-ae28-a21595d9504f.png)
+
+>**Note**: Please be aware that a machine with at least 32GB of RAM is necessary to run this example.
+
+
+# Installation Instructions
 
 The Jupyter notebook contains its own set of requirements installed directly within the notebook, allowing it to run independently as a standalone example.
