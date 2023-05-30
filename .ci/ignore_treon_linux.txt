@@ -1,4 +1,5 @@
 108-gpu-device
+208-optical-character-recognition
 225-stable-diffusion-text-to-image
 231-instruct-pix2pix-image-editing
 235-controlnet-stable-diffusion
@@ -7,3 +8,4 @@
 238-deeployd-if
 239-image-bind
 301-tensorflow-training-openvino
+404-style-transfer
