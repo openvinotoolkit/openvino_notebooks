@@ -6,5 +6,4 @@
 237-segment-anything
 238-deeployd-if
 239-image-bind
-301-tensorflow-training-openvino
 404-style-transfer
