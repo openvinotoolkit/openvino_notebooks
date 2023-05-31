@@ -1,7 +1,7 @@
 # Quantize Speech Recognition Models with OpenVINO™ Post-Training Optimization Tool 
 
 This tutorial demonstrates how to apply `INT8` quantization to the speech recognition models,
-using the [Post-Training Optimization Tool API (POT API)](https://docs.openvino.ai/latest/pot_compression_api_README.html)
+using the [Post-Training Optimization Tool API (POT API)](https://docs.openvino.ai/2023.0/pot_compression_api_README.html)
 (part of [OpenVINO Toolkit](https://docs.openvino.ai/)).
 
 Supported models:
