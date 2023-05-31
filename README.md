@@ -309,7 +309,7 @@ Made with [contributors-img](https://contrib.rocks).
 
 ## ❓ FAQ
 
-* [Which devices does OpenVINO support?](https://docs.openvino.ai/latest/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html#doxid-openvino-docs-o-v-u-g-supported-plugins-supported-devices)
+* [Which devices does OpenVINO support?](https://docs.openvino.ai/2023.0/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html#doxid-openvino-docs-o-v-u-g-supported-plugins-supported-devices)
 * [What is the first CPU generation you support with OpenVINO?](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/system-requirements.html)
 * [Are there any success stories about deploying real-world solutions with OpenVINO?](https://www.intel.com/content/www/us/en/internet-of-things/ai-in-production/success-stories.html)
 

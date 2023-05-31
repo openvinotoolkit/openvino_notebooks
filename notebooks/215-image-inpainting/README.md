@@ -9,7 +9,7 @@ This notebook uses a generative multi-column convolution neural network (GMCNN) 
 
 ## Notebook Contents
 
-This notebook provides a tutorial on how to use image in-painting with OpenVINO. The model used in this notebook is [GMCNN-places2-tf](https://docs.openvino.ai/latest/omz_models_model_gmcnn_places2_tf.html)
+This notebook provides a tutorial on how to use image in-painting with OpenVINO. The model used in this notebook is [GMCNN-places2-tf](https://docs.openvino.ai/2023.0/omz_models_model_gmcnn_places2_tf.html)
 
 ## Installation Instructions
 
