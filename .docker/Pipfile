@@ -27,7 +27,7 @@ nncf = "==2.4.0"
 numpy = ">=1.21.0"
 onnx = ">=1.11.0"
 opencv-python = "*"
-openvino-dev = {version = "==2023.0.0.dev20230427"}
+openvino-dev = {version = "==2023.0.0"}
 openvino-telemetry = "==2022.3.0"
 ovmsclient = "*"
 Pillow = ">=8.3.2"
