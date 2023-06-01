@@ -33,5 +33,5 @@ If you have not installed all required dependencies, follow the [Installation Gu
 ## See Also
 
 * [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
-* [Model Optimizer](https://docs.openvino.ai/2023.0/_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html)
+* [Model Optimizer](https://docs.openvino.ai/nightly/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html)
 * [Action Recognition Demo (OpenVINO - No notebooks)](https://docs.openvino.ai/2023.0/omz_demos_action_recognition_demo_python.html)
