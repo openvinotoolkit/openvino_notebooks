@@ -140,7 +140,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 |[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| # 使用ControlNet状态调节Stable Diffusion 实现文字生成图片 | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
 |[236-stable-diffusion-v2](notebooks/236-stable-diffusion-v2/)<br>| 利用Stable Diffusion v2 以及 OpenVINO™进行文本到图像生成和无限缩放使用 | <img src=https://user-images.githubusercontent.com/29454499/228882108-25c1f65d-4c23-4e1d-8ba4-f6164280a3e3.gif width=225> |
 |[237-segment-anything](notebooks/237-segment-anything/)<br>| 使用 Segment Anything以及OpenVINO™进行基于提示的对象分割掩码生成 | <img src=https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png width=225> |
-|[240-EfficientDet-object-detection](notebooks/240-efficient-object-detection/)<br>| 可扩展且高效的对象检测 |<img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' width=250>|
+|[250-efficient-object-detection](notebooks/250-efficient-object-detection/)<br>| 可扩展且高效的对象检测 |<img src='https://user-images.githubusercontent.com/71766106/226086430-a7e3cdc4-1f99-4c46-89f9-60dcbadea44a.png' width=250>|
 
 <div id='-model-training'/>
 
