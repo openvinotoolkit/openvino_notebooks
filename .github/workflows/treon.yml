@@ -179,7 +179,7 @@ jobs:
     - name: Analysing with treon (Linux)
       if: runner.os == 'Linux'
       run: |
-            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_linux.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_linux.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }})
       shell: bash
     - name: Analysing with treon (MacOS)
       if: runner.os == 'MacOS'

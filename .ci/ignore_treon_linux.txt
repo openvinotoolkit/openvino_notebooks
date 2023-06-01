@@ -6,4 +6,4 @@
 237-segment-anything
 238-deeployd-if
 239-image-bind
-404-style-transfer
+404-style-transfer-webcam
