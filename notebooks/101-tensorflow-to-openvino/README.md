@@ -8,7 +8,7 @@ This tutorial explains how to convert [TensorFlow](https://www.tensorflow.org) m
 
 ## Notebook Contents
 
-The notebook uses [Model Optimizer](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) to convert the same [MobilenetV3](https://docs.openvino.ai/latest/omz_models_model_mobilenet_v3_small_1_0_224_tf.html) model used in the [001-hello-world notebook](../001-hello-world/001-hello-world.ipynb).
+The notebook uses [Model Optimizer](https://docs.openvino.ai/2023.0/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) to convert the same [MobilenetV3](https://docs.openvino.ai/2023.0/omz_models_model_mobilenet_v3_small_1_0_224_tf.html) model used in the [001-hello-world notebook](../001-hello-world/001-hello-world.ipynb).
 
 ## Installation Instructions
 

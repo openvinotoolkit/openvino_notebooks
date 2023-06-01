@@ -1,5 +1,5 @@
 # openvino and its dependencies
-openvino-dev==2022.3.0
+openvino-dev==2023.0.0
 openvino-telemetry==2022.3.0
 nncf==2.4.0
 
