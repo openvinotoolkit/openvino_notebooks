@@ -174,12 +174,16 @@ jobs:
     - name: Analysing with treon (Windows)
       if: runner.os == 'Windows'
       run: |
-            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_win.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
+            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_win.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks)
       shell: bash
     - name: Analysing with treon (Linux)
       if: runner.os == 'Linux'
       run: |
+<<<<<<< HEAD
+            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_linux.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }})
+=======
             python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_linux.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+>>>>>>> Fixed docs conversion (#1089)
       shell: bash
     - name: Analysing with treon (MacOS)
       if: runner.os == 'MacOS'
