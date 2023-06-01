@@ -47,6 +47,7 @@ COPY .docker/.s2i/bin /tmp/scripts
 COPY .docker /tmp/src
 COPY .ci/patch_notebooks.py /tmp/scripts
 COPY .ci/validate_notebooks.py /tmp/scripts
+COPY .ci/ignore_treon_docker.txt /tmp/scripts
 
 # Git on Windows may convert line endings. Run dos2unix to enable
 # building the image when the scripts have CRLF line endings.

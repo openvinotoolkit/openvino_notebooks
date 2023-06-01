@@ -1,3 +1,2 @@
-notebooks/108-gpu-device/108-gpu-device.ipynb
 notebooks/110-ct-segmentation-quantize/data-preparation-ct-scan.ipynb
 notebooks/110-ct-segmentation-quantize/pytorch-monai-training.ipynb
