@@ -25,8 +25,8 @@ so it is not required to run the data preparation and training notebooks before 
 
 This quantization tutorial consists of the following steps:
 
-* Use Model Optimizer Python API to convert the model to OpenVINO IR. For more information about Model Optimizer Python API,  [Model Optimizer Developer Guide](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Python_API.html)..
-* Quantizing the model with NNCF with the [Post-training Quantization with NNCF Tool](https://docs.openvino.ai/latest/nncf_ptq_introduction.html) API in OpenVINO.
+* Use Model Optimizer Python API to convert the model to OpenVINO IR. For more information about Model Optimizer Python API,  [Model Optimizer Developer Guide](https://docs.openvino.ai/2023.0/openvino_docs_MO_DG_Python_API.html)..
+* Quantizing the model with NNCF with the [Post-training Quantization with NNCF Tool](https://docs.openvino.ai/nightly/basic_quantization_flow.html) API in OpenVINO.
 * Evaluating the F1 score metric of the original model and the quantized model.
 * Benchmarking performance of the original model and the quantized model.
 * Showing live inference with async API and MULTI plugin in OpenVINO.

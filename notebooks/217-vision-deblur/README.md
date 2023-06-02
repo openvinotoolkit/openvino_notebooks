@@ -8,7 +8,7 @@ Deblurring is the task of removing motion blurs that usually occur in photos sho
 
 ## Notebook Contents
 
-This tutorial demonstrates Single Image Motion Deblurring with DeblurGAN-v2 in OpenVINO, by first converting the [VITA-Group/DeblurGANv2](https://github.com/VITA-Group/DeblurGANv2) model to OpenVINO Intermediate Representation (OpenVINO IR) format. For more information about the model, see the [deblurgan-v2 model documentation](https://docs.openvino.ai/latest/omz_models_model_deblurgan_v2.html).
+This tutorial demonstrates Single Image Motion Deblurring with DeblurGAN-v2 in OpenVINO, by first converting the [VITA-Group/DeblurGANv2](https://github.com/VITA-Group/DeblurGANv2) model to OpenVINO Intermediate Representation (OpenVINO IR) format. For more information about the model, see the [deblurgan-v2 model documentation](https://docs.openvino.ai/2023.0/omz_models_model_deblurgan_v2.html).
 
 For more information, refer to the following research paper: 
 
