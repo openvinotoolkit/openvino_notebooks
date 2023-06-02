@@ -7,5 +7,6 @@
 237-segment-anything
 238-deeployd-if
 239-image-bind
+240-dolly-2-instruction-following
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
