@@ -2414,7 +2414,7 @@
         },
         "openvino-dev": {
             "hashes": [
-                "sha256:ddb7ad75654cbb495774d3252299a8602e6ff8b136e40ef7a9f039262a367c38"
+                "sha256:6427f6b4614bbba1fe8eca0e25a4a1bebc1f5b4965688740068277046bb79eb8"
             ],
             "index": "pypi",
             "version": "==2023.1.0.dev20230623"
