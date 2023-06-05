@@ -1,8 +1,7 @@
-# Quantize Speech Recognition Models with OpenVINO™ Post-Training Optimization Tool 
+# Quantize Speech Recognition Models using NNCF PTQ API 
 
 This tutorial demonstrates how to apply `INT8` quantization to the speech recognition models,
-using the [Post-Training Optimization Tool API (POT API)](https://docs.openvino.ai/2023.0/pot_compression_api_README.html)
-(part of [OpenVINO Toolkit](https://docs.openvino.ai/)).
+using post-training quantization with [NNCF](https://docs.openvino.ai/2022.3/nncf_ptq_introduction.html) (Neural Network Compression Framework).
 
 Supported models:
 * `107-speech-recognition-wav2vec2.ipynb` demonstrates how to apply post-training `INT8` quantization on a fine-tuned [Wav2Vec2-Base-960h](https://huggingface.co/facebook/wav2vec2-base-960h) [PyTorch](https://pytorch.org/) model, trained on the [LibriSpeech ASR corpus](https://www.openslr.org/12).
@@ -17,7 +16,7 @@ The tutorial consists of the following steps:
 * Downloading and preparing the model and dataset.
 * Defining data loading and accuracy validation functionality.
 * Preparing the model for quantization.
-* Running optimization pipeline.
+* Running quantization.
 * Comparing performance of the original and quantized models.
 * Compare accuracy of the original and quantized models.
 
