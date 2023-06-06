@@ -80,7 +80,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 1. Notebooks in this repository typically rely on a shared requirements.txt file. 
    However, contributors are encouraged to install the required packages at the top of their notebook using 
-   `!pip install ...` commands. This allows the notebooks to be run independently as standalone examples. 
+   `!pip install -q ...` commands. This allows the notebooks to be run independently as standalone examples. 
    To maintain package compatibility, contributors are expected to install the same versions of packages 
    as specified in the shared requirements.txt file. This helps ensure consistency in our testing pipelines 
    and prevents dependency conflicts.
