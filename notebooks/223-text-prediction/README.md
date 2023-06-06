@@ -38,4 +38,4 @@ The notebook demonstrates text prediction with OpenVINO using the following mode
 * [personaGPT](https://huggingface.co/af1tang/personaGPT) model from HuggingFace Transformers
 ## Installation Instructions
 
-If you have not done so already, please follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md) to install all required dependencies.
+This is a self-contained example that relies solely on its own code.
