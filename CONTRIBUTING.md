@@ -92,8 +92,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    - Add a README to the notebook subdirectory. Add a screenshot that gives an indication of what
      the notebook does if applicable.
    - Avoid adding any other files to the notebook's subdirectory. Instead, rely on model checkpoints and data samples available online and fetch them within the notebook. Please refer to the [Notebook utils](#notebook-utils) section.
-3. In case you want to utilize one of the Open Model Zoo models, see the recommended directory
-   structure in the [104 Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/main/notebooks/104-model-tools)
+3. In case you want to utilize one of the Open Model Zoo models, refer to the [104 Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/main/notebooks/104-model-tools)
    notebook.
 4. The notebooks should provide an easy way to clean up the downloaded data, for example with a
    commented-out cell at the end of the notebook.
@@ -173,10 +172,12 @@ notebooks/
    ├── <three-digit-number>-<title>.ipynb
    ├── utils/
    ├── model/
-   └── data/
+   ├── data/
+   └── output/
 ```
 
-In case of output provided by Notebook please create folder ```output``` on the same level as readme file.
+In case the example requires saving additional files to disk (e.g. models, data samples, utility modules, or outputs),
+please create corresponding folders on the same level as readme file.
 
 #### Recommendations for File Structure
 
