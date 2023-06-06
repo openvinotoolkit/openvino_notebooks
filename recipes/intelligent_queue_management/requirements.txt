@@ -1,4 +1,4 @@
-openvino-dev==2022.3
+openvino-dev==2023.0.0
 ovmsclient==2022.3
 ultralytics==8.0.43
 numpy==1.23.4
