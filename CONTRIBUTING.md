@@ -91,7 +91,7 @@ To do this, there are a few requirements that all notebooks need to pass.
      numbering of the notebooks.
    - Add a README to the notebook subdirectory. Add a screenshot that gives an indication of what
      the notebook does if applicable.
-   - Avoid adding any other files to the notebook's subdirectory. Instead, rely on model checkpoints and data samples available online and fetch them within the notebook. Please refer to the [Notebook utils](#notebook-utils) section.
+   - Avoid adding any other files to the notebook's subdirectory. Instead, rely on models and data samples available online and fetch them within the notebook. Please refer to the [Notebook utils](#notebook-utils) section.
 3. In case you want to utilize one of the Open Model Zoo models, refer to the [104 Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/main/notebooks/104-model-tools)
    notebook.
 4. The notebooks should provide an easy way to clean up the downloaded data, for example with a
@@ -183,7 +183,7 @@ please create corresponding folders on the same level as readme file.
 
 - Model
 
-We recommend to load your model checkpoints using url or other ways of distribution of pre-trained models, 
+We recommend to load your models using url or other ways of distribution of pre-trained models, 
 like PyTorch Hub or the Diffusers package. 
 
 - Data
