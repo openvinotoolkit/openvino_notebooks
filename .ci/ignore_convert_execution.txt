@@ -1,3 +1,4 @@
+notebooks/107-speech-recognition-quantization/107-speech-recognition-quantization-data2vec.ipynb
 notebooks/108-gpu-device/108-gpu-device.ipynb
 notebooks/117-model-server/117-model-server.ipynb
 notebooks/211-speech-to-text/211-speech-to-text.ipynb
