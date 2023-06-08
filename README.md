@@ -189,7 +189,7 @@ Live inference demos that run on a webcam or video files.
 
 If you run into issues, please check the [troubleshooting section](#-troubleshooting), [FAQs](#-faq) or start a GitHub [discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions). 
 
-Notebooks with a ![binder logo](https://mybinder.org/badge_logo.svg) button can be run without installing anything. [Binder](https://mybinder.org/) is a free online service with limited resources. For the best performance, please follow the [Installation Guide](#-installation-guide) and run the notebooks locally.
+Notebooks with ![binder logo](https://mybinder.org/badge_logo.svg) and ![colab logo](https://colab.research.google.com/assets/colab-badge.svg) buttons can be run without installing anything. [Binder](https://mybinder.org/) and [Google Colab](https://colab.research.google.com/) are free online services with limited resources. For the best performance, please follow the [Installation Guide](#-installation-guide) and run the notebooks locally.
 
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
