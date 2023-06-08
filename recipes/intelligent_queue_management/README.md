@@ -28,7 +28,7 @@ To clone the repository, run the following command:
 git clone -b recipes https://github.com/openvinotoolkit/openvino_notebooks.git openvino_notebooks
 ```
 
-This will clone the repository into a directory named "openvino_queue_management" in the current directory. Then, navigate into the directory using the following command:
+The above will clone the repository into a directory named "openvino_notebooks" in the current directory. It will also download a sample video. Then, navigate into the directory using the following command:
 
 ```shell
 cd openvino_notebooks/recipes/intelligent_queue_management
@@ -79,7 +79,7 @@ You can run either the python script or check out [convert-and-optimize-the-mode
 To run the application, use the following command:
 
 ```shell
-python app.py --stream video_file.mp4 --model_path model/yolov8m_openvino_int8_model/yolov8m.xml --zones_config_file zones.json --customers_limit 3
+python app.py --stream sample_video.mp4 --model_path model/yolov8m_openvino_int8_model/yolov8m.xml --zones_config_file zones.json --customers_limit 3
 ```
 This will run the application with the specified arguments. Replace "video_file.mp4" with the path to your input video file, "zones.json" with the path to your zones configuration file, and "3" with the maximum number of customers allowed in the queue.
 You can also run the [run-the-application.ipynb](docs/run-the-application.ipynb) to learn more about the inference process.
@@ -87,7 +87,7 @@ You can also run the [run-the-application.ipynb](docs/run-the-application.ipynb)
 _NOTE: Alternatively, you can run all steps with the following command:_
 
 ```shell
-python main.py --stream video_file.mp4
+python main.py --stream sample_video.mp4
 ```
 
 Congratulations! You have successfully set up and run the Intelligent Queue Management application with OpenVINO™.
