@@ -14,4 +14,5 @@ notebooks/237-segment-anything/237-segment-anything-fiftyone.ipynb
 notebooks/238-deeployd-if/238-deep-floyd-if.ipynb
 notebooks/239-image-bind/239-image-bind.ipynb
 notebooks/240-dolly-2-instruction-following/240-dolly-2-instruction-following.ipynb
+notebooks/241-riffusion-text-to-music
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb
