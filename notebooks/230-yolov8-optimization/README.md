@@ -1,4 +1,5 @@
 # Convert and Optimize YOLOv8 with OpenVINO™
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/colab-support-stage-1/notebooks/230-yolov8-optimization/230-yolov8-optimization.ipynb)
 
 <p align="center">
     <img src="https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png"/>
@@ -23,4 +24,4 @@ The tutorial consists of the following steps:
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+This is a self-contained example that relies solely on its own code.
