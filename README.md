@@ -107,7 +107,7 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | [116-sparsity-optimization](notebooks/116-sparsity-optimization/)<br> | Improve performance of sparse Transformer models                                                                            |
 | [117-model-server](notebooks/117-model-server/)| Introduction to model serving with OpenVINO™ Model Server (OVMS)                                                            |
 | [118-optimize-preprocessing](notebooks/118-optimize-preprocessing/)| Improve performance of image preprocessing step                                                                             |
-
+| [119-tflite-to-openvino](notebooks/119-tflite-to-openvino/) | Convert TensorFlow Lite models to OpenVINO IR                                                                                                            |
 
 <div id='-model-demos'/>
 
