@@ -65,12 +65,19 @@ pip install -r requirements.txt
 
 ## Step 2
 
-To run the application, use the following command:
+1. Prepare your detection and segmentation models:
+```shell
+cd model
+sudo sh ./download_pdmodel.sh
+```
+
+2. To run the application, use the following command:
 
 ```shell
-python main.py -i xxxx.jpg -c config/config.json -d "CPU" -t "analog"
+python main.py -i data/test.jpg -c config/config.json  -t "analog"
 ```
-This will run the application with the specified arguments. Replace "xxxx.jpg" with the path to your input image.
-You can also run the [run-the-application.ipynb](docs/run-the-application.ipynb) to learn more about the inference process.
+
+This will run the application with the specified arguments. Replace "data/test.jpg" with the path to your input image.
+The result images will be exported to "data" fold. You can also run the [run-the-application.ipynb](docs/run-the-application.ipynb) to learn more about the inference process.
 
 Congratulations! You have successfully set up and run the Automatic Industrial Meter Reading application with OpenVINO™.
