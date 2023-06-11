@@ -1,4 +1,5 @@
 # Language-Visual Saliency with CLIP and OpenVINO™
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/colab-support-stage-1/notebooks/232-clip-language-saliency-map/232-clip-language-saliency-map.ipynb)
 
 The notebook will cover the following topics:
 
@@ -17,4 +18,4 @@ A saliency map is a visualization technique that highlights regions of interest 
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+This is a self-contained example that relies solely on its own code.
