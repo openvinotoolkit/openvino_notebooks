@@ -6,7 +6,7 @@ image | video |
 
 
 <p align="center">
-    <img width="60%" src="../data/image/tower.jpg"/>
+    <img width="60%" src="https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/tower.jpg"/>
 </p>
 
 Super Resolution is the process of enhancing the quality of an image by increasing the pixel count using deep learning.
