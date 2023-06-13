@@ -21,4 +21,4 @@ The notebook contains a detailed tutorial of the visual-inertial depth estimatio
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+If you have not installed all required dependencies, follow the [Installation Guide](../../README.md#-installation-guide).
