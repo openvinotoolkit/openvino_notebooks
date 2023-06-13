@@ -16,7 +16,7 @@ The authors have published their work here:
 
 ## Notebook contents
 
-The notebook contains a detailed tutorial of the visual-inertial depth estimation pipeline starting from downloading pre - trained models, pre - processing images and the models, converting the models to the [OpenVINO IR](https://docs.openvino.ai/latest/openvino_ir.html) representation for inference and finally running them against an dedicated for inference.
+The notebook contains a detailed tutorial of the visual-inertial depth estimation pipeline starting from downloading pre - trained models, pre - processing images and the models, converting the models to the [OpenVINO IR](https://docs.openvino.ai/latest/openvino_ir.html) representation for inference and finally running them against an image dedicated for inference.
 
 
 ## Installation Instructions
