@@ -275,7 +275,7 @@ def run(video_path: str, model_path: str, zones_config_file: str, customers_limi
 
             # add alert text to the frame if necessary
             if mean_customer_count > customers_limit:
-                draw_text(frame, text=f"Store assistant required on cash desk {zone_id}!", point=(f_width // 2, f_height - 50), color=(0, 0, 255))
+                draw_text(frame, text=f"Store assistant required on cash desk {zone_id}!", point=(20, 20), color=(0, 0, 255))
 
             # print an info about number of customers in the queue, ask for the more assistants if required
             log.info(f"Checkout queue: {zone_id}, avg customer count: {mean_customer_count} {'Store assistant required!' if mean_customer_count > customers_limit else ''}")

@@ -116,16 +116,7 @@ def quantize(data_dir: Path, converted_model_path: Path, det_model_name: str, mo
             names=[
                 "/model.22/dfl/conv/Conv",  # in the post-processing subgraph
                 "/model.22/Add",
-                "/model.22/Add_1",
-                "/model.22/Add_2",
-                "/model.22/Add_3",
-                "/model.22/Add_4",
-                "/model.22/Add_5",
-                "/model.22/Add_6",
-                "/model.22/Add_7",
-                "/model.22/Add_8",
-                "/model.22/Add_9",
-                "/model.22/Add_10"
+                "/model.22/Add_1"
             ]
         )
 
