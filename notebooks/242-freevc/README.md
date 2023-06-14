@@ -30,8 +30,7 @@ Also, it requires some extra steps, that can be done manually or will be perform
 of the notebook, but in minimum necessary scope. 
 1. Clone this repo: git clone https://github.com/OlaWod/FreeVC.git.
 2. Download [WavLM-Large](https://github.com/microsoft/unilm/tree/master/wavlm) and put it under directory 'FreeVC/wavlm/'.
-3. Download the [VCTK](https://datashare.ed.ac.uk/handle/10283/3443) dataset. You can use any of them, 
-but for this example two of them already included and available under directory 'dataset': `vctk-16k/p225/p225_001.wav` 
-and `vctk-16k/p226/p226_002.wav`. To use other examples, you should change `convert.txt`.
+3. You can download the [VCTK](https://datashare.ed.ac.uk/handle/10283/3443) dataset. For this example we download only
+two of them from [Hugging Face FreeVC example](https://huggingface.co/spaces/OlaWod/FreeVC/tree/main).
 4. Download [pretrained models](https://1drv.ms/u/s!AnvukVnlQ3ZTx1rjrOZ2abCwuBAh?e=UlhRR5) and put it under directory
 'checkpoints' (for current example only `freevc.pth` are required).
