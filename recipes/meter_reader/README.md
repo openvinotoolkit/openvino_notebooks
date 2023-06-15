@@ -80,6 +80,6 @@ python main.py -i data/test.jpg -c config/config.json  -t "analog"
 ```
 
 This will run the application with the specified arguments. Replace "data/test.jpg" with the path to your input image.
-The result images will be exported to "data" fold. You can also run the [run-the-application.ipynb](docs/run-the-application.ipynb) to learn more about the inference process.
+The result images will be exported to "data" fold. You can also run the [203-meter-reader.ipynb](../../notebooks/203-meter-reader/203-meter-reader.ipynb) to learn more about the inference process.
 
 Congratulations! You have successfully set up and run the Automatic Industrial Meter Reading application with OpenVINO™.
