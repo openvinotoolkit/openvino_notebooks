@@ -18,6 +18,8 @@ Now, let's dive into the steps starting with installing Python.
 
 This project requires Python 3.8 or higher. If you don't have Python installed on your machine, go to https://www.python.org/downloads/ and download the latest version for your operating system. Follow the prompts to install Python, making sure to check the option to add Python to your PATH environment variable.
 
+_NOTE: If you are using Windows, you will probably need to install [Microsoft Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) also._
+
 ## Step 1
 
 1. Clone the Repository
