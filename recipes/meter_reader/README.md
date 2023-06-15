@@ -1,5 +1,7 @@
 # Automatic Industrial Meter Reading with OpenVINO™
 
+![workflow](https://user-images.githubusercontent.com/91237924/166137115-67284fa5-f703-4468-98f4-c43d2c584763.png)
+
 The automatic industrial meter reading project is an application that uses OpenVINO™, a toolkit that enables developers to deploy deep learning models on a variety of hardware platforms. The application is designed to help .
 
 Here are the steps involved in this project:
