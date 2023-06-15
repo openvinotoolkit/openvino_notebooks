@@ -18,4 +18,6 @@ A saliency map is a visualization technique that highlights regions of interest 
 
 ## Installation Instructions
 
-This is a self-contained example that relies solely on its own code.
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).

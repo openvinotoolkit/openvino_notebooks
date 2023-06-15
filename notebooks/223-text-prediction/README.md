@@ -40,4 +40,6 @@ The notebook demonstrates text prediction with OpenVINO using the following mode
 * [personaGPT](https://huggingface.co/af1tang/personaGPT) model from HuggingFace Transformers
 ## Installation Instructions
 
-This is a self-contained example that relies solely on its own code.
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
