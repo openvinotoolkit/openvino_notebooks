@@ -204,9 +204,8 @@ class VideoPlayer:
     :param skip_first_frames: Skip first N frames.
     """
 
-    import cv2
-
     def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
+        import cv2
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
             raise RuntimeError(
