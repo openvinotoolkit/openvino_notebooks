@@ -1,36 +1,21 @@
-import nncf
-from typing import Dict
 import argparse
 import zipfile as zf
 from pathlib import Path
+from typing import Dict
 
+import nncf
+import numpy as np
 from openvino import runtime as ov
+from torch.utils.data import DataLoader
+from torchvision import datasets
 from ultralytics import YOLO
-from ultralytics.yolo.cfg import get_cfg
-from ultralytics.yolo.data.utils import check_det_dataset
-from ultralytics.yolo.engine.validator import BaseValidator
-from ultralytics.yolo.utils import DEFAULT_CFG
+from ultralytics.yolo.data import augment
 
 import utils
 
 DATA_URL = "http://images.cocodataset.org/zips/val2017.zip"
 LABELS_URL = "https://github.com/ultralytics/yolov5/releases/download/v1.0/coco2017labels-segments.zip"
 CFG_URL = "https://raw.githubusercontent.com/ultralytics/ultralytics/main/ultralytics/datasets/coco.yaml"
-
-
-def load_model(det_model_name: str, model_dir: Path) -> YOLO:
-    """
-    Load YOLO model
-
-    Params:
-        det_model_name: name of the YOLO model we want to use
-        model_dir: dir to export model
-    Returns:
-       YOLO model
-    """
-    model_path = model_dir / f"{det_model_name}.pt"
-    # create a YOLO object detection model
-    return YOLO(model_path)
 
 
 def convert(det_model_name: str, model_dir: Path) -> Path:
@@ -43,7 +28,9 @@ def convert(det_model_name: str, model_dir: Path) -> Path:
     Returns:
        Path to exported model
     """
-    det_model = load_model(det_model_name, model_dir)
+    model_path = model_dir / f"{det_model_name}.pt"
+    # create a YOLO object detection model
+    det_model = YOLO(model_path)
 
     # export the model to OpenVINO format
     output_path = det_model.export(format="openvino", dynamic=False, half=True)
@@ -68,36 +55,33 @@ def download_data(data_dir: Path) -> None:
             zip_ref.extractall(data_dir / 'coco/images')
 
 
-def prepare_data(data_dir: Path, det_model_name: str, model_dir: Path) -> BaseValidator:
+def prepare_data(data_dir: Path) -> DataLoader:
     """
     Download COCO dataset and create data loader
 
     Params:
         data_dir: dir to download data
-        det_model_name: name of the YOLO model we want to use
-        model_dir: dir to export model
+    Returns:
+        PyTorch data loader
     """
     download_data(data_dir)
 
-    args = get_cfg(cfg=DEFAULT_CFG)
-    args.data = str(data_dir / "coco.yaml")
+    # create the COCO validation dataset
+    coco_dataset = datasets.CocoDetection(data_dir / "coco/images/val2017",
+                                          annFile=data_dir / "coco/annotations/instances_val2017.json",
+                                          transform=augment.Compose([lambda x: np.array(x), augment.ClassifyLetterBox(), augment.ToTensor()]))
 
-    det_model = load_model(det_model_name, model_dir)
-
-    det_validator = det_model.ValidatorClass(args=args)
-    det_validator.data = check_det_dataset(args.data)
-    return det_validator
+    # get the loader with batch size 1
+    return DataLoader(coco_dataset, batch_size=1, shuffle=True)
 
 
-def quantize(data_dir: Path, converted_model_path: Path, det_model_name: str, model_dir: Path) -> Path:
+def quantize(data_dir: Path, converted_model_path: Path) -> Path:
     """
     Quantize converted (IR) model
 
     Params:
         data_dir: dir to download data
         converted_model_path: path to converted model (IR)
-        det_model_name: name of the YOLO model we want to use
-        model_dir: dir to export model
     Returns:
        Path to quantized model
     """
@@ -106,8 +90,7 @@ def quantize(data_dir: Path, converted_model_path: Path, det_model_name: str, mo
     if not int8_model_path.exists():
         core = ov.Core()
 
-        validator = prepare_data(data_dir, det_model_name, model_dir)
-        data_loader = validator.get_dataloader(data_dir / "coco", batch_size=1)
+        data_loader = prepare_data(data_dir)
 
         ov_model = core.read_model(converted_model_path)
 
@@ -127,10 +110,9 @@ def quantize(data_dir: Path, converted_model_path: Path, det_model_name: str, mo
             Parameters:
                data_item: Dict with data item produced by DataLoader during iteration
             Returns:
-                input_tensor: Input data for quantization
+                Input data for quantization
             """
-            input_tensor = validator.preprocess(data_item)['img'].numpy()
-            return input_tensor
+            return data_item[0]
 
         quantization_dataset = nncf.Dataset(data_loader, transform_fn)
 
@@ -155,7 +137,7 @@ def optimize(det_model_name: str, model_dir: Path, quant: bool, data_dir: Path) 
     """
     model_path = convert(det_model_name, model_dir)
     if quant:
-        model_path = quantize(data_dir, model_path, det_model_name, model_dir)
+        model_path = quantize(data_dir, model_path)
 
     return model_path
 
