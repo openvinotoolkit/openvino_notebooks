@@ -289,7 +289,7 @@ def get_rotate_crop_image(img, points):
 postprocess_params = {
             'name': 'CTCLabelDecode',
             "character_type": "ch",
-            "character_dict_path": "../data/text/ppocr_keys_v1.txt",
+            "character_dict_path": "./fonts/ppocr_keys_v1.txt",
             "use_space_char": True
         }
 
