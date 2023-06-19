@@ -1,3 +1,4 @@
+107-speech-recognition-quantization
 108-gpu-device
 117-model-server
 225-stable-diffusion-text-to-image
@@ -8,5 +9,6 @@
 238-deeployd-if
 239-image-bind
 240-dolly-2-instruction-following
+241-riffusion-text-to-music
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
