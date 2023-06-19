@@ -17,7 +17,10 @@ if __name__ == "__main__":
 
     with open(args.config) as f:
         config = json.load(f)
-    meter_reader = analog_yolo(config)
+    if len(config["model_config"]["detector"]["model_shape"]) == 1:
+        meter_reader = analog_yolo(config)
+    else:
+        meter_reader = analog_paddle(config)
     image = cv2.imread(args.input)
     det_resutls = meter_reader.detect(image)
     seg_resutls = meter_reader.segment(det_resutls)
