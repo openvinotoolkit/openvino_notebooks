@@ -1,0 +1,74 @@
+    trained_model='weights/yolact_base_54_800000.pth',
+    top_k=5, 
+    cuda=True, 
+    fast_nms=True, 
+    cross_class_nms=False, 
+    display_masks=True, 
+    display_bboxes=True, 
+    display_text=True, 
+    display_scores=True, 
+    ap_data_file='results/ap_data.pkl', 
+    max_images=-1, 
+    bbox_det_file='results/bbox_detections.json', 
+    mask_det_file='results/mask_detections.json', 
+    config=None,
+    web_det_path='web/dets/', 
+    display_lincomb=False, 
+    benchmark=False
+    no_sort=False,
+    seed=None, 
+    mask_proto_debug=False
+    no_crop=False
+    image=None, 
+    images=None, 
+    video=None, 
+    video_multiframe=1, 
+    score_threshold=0, 
+    dataset=None, 
+    detect=False
+    display_fps=False
+    emulate_playback=False
+    no_bar=False,
+    display=False,
+    resume=False,
+    output_coco_json=False,
+    output_web_json=False,
+    shuffle=False,    
+    benchmark=False,
+    no_sort=False,
+    no_hash=False,
+    mask_proto_debug=False,
+    crop=True,
+    detect=False,
+    display_fps=False,
+    emulate_playback=False
+
+
+
+
+
+# After this, mask is of size [num_dets, h, w, 1]
+        device = torch.device('cpu')
+        # Move the tensors to the CPU
+
+        masks_cpu = masks.to(device, dtype=masks.dtype)
+        colors_cpu = colors.to(device, dtype=colors.dtype)
+
+        masks = masks[:num_dets_to_consider, :, :, None]
+        masks = masks.to(device, dtype=masks.dtype)
+        
+        # Prepare the RGB images for each mask given their color (size [num_dets, h, w, 1])
+        # colors = torch.cat([get_color(j, on_gpu=img_gpu.device.index).view(1, 1, 1, 3) for j in range(num_dets_to_consider)], dim=0)
+        # colors = np.concatenate([get_color(j).reshape(1, 1, 1, 3) for j in range(num_dets_to_consider)], axis=0)
+        colors = torch.cat(
+            [
+                torch.FloatTensor(get_color(j, on_gpu=img.device.index)).view(
+                    1, 1, 1, 3
+                )
+                for j in range(num_dets_to_consider)
+            ],
+            dim=0,
+        )
+
+        
+        colors = colors.to(device, dtype=colors.dtype)

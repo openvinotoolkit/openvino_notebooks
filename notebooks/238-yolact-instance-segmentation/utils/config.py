@@ -370,6 +370,7 @@ fpn_base = Config({
 
 # ----------------------- CONFIG DEFAULTS ----------------------- #
 
+
 coco_base_config = Config({
     'dataset': coco2014_dataset,
     'num_classes': 81, # This should include the background class
@@ -402,6 +403,13 @@ coco_base_config = Config({
     # Eval.py sets this if you just want to run YOLACT as a detector
     'eval_mask_branch': True,
 
+    # Top_k examples to consider for NMS
+    'nms_top_k': 200,
+    # Examples with confidence less than this are not considered by NMS
+    'nms_conf_thresh': 0.05,
+    # Boxes with IoU overlap greater than this threshold will be culled during NMS
+    'nms_thresh': 0.5,
+
     # See mask_type for details.
     'mask_type': mask_type.direct,
     'mask_size': 16,
@@ -430,6 +438,8 @@ coco_base_config = Config({
     'mask_proto_normalize_emulate_roi_pooling': False,
     'mask_proto_double_loss': False,
     'mask_proto_double_loss_alpha': 1,
+    'mask_proto_split_prototypes_by_head': False,
+    'mask_proto_crop_with_pred_box': False,
 
     # SSD data augmentation parameters
     # Randomize hue, vibrance, etc.
@@ -440,6 +450,14 @@ coco_base_config = Config({
     'augment_random_sample_crop': True,
     # Mirror the image with a probability of 1/2
     'augment_random_mirror': True,
+    # Flip the image vertically with a probability of 1/2
+    'augment_random_flip': False,
+    # With uniform probability, rotate the image [0,90,180,270] degrees
+    'augment_random_rot90': False,
+
+    # Discard detections with width and height smaller than this (in absolute width and height)
+    'discard_box_width': 4 / 550,
+    'discard_box_height': 4 / 550,
 
     # If using batchnorm anywhere in the backbone, freeze the batchnorm layer during training.
     # Note: any additional batch norm layers after the backbone will not be frozen.
@@ -463,6 +481,9 @@ coco_base_config = Config({
     # The initial bias toward forground objects, as specified in the focal loss paper
     'focal_loss_init_pi': 0.01,
 
+    # Keeps track of the average number of examples for each class, and weights the loss for that class accordingly.
+    'use_class_balanced_conf': False,
+
     # Whether to use sigmoid focal loss instead of softmax, all else being the same.
     'use_sigmoid_focal_loss': False,
 
@@ -479,6 +500,10 @@ coco_base_config = Config({
     # This branch is only evaluated during training time and is just there for multitask learning.
     'use_semantic_segmentation_loss': False,
     'semantic_segmentation_alpha': 1,
+
+    # Adds another branch to the netwok to predict Mask IoU.
+    'use_mask_scoring': False,
+    'mask_scoring_alpha': 1,
 
     # Match gt boxes using the Box2Pix change metric instead of the standard IoU metric.
     # Note that the threshold you set for iou_threshold should be negative with this setting on.
@@ -502,6 +527,9 @@ coco_base_config = Config({
     'positive_iou_threshold': 0.5,
     'negative_iou_threshold': 0.5,
 
+    # When using ohem, the ratio between positives and negatives (3 means 3 negatives to 1 positive)
+    'ohem_negpos_ratio': 3,
+
     # If less than 1, anchors treated as a negative that have a crowd iou over this threshold with
     # the crowd boxes will be treated as a neutral.
     'crowd_iou_threshold': 1,
@@ -509,8 +537,7 @@ coco_base_config = Config({
     # This is filled in at runtime by Yolact's __init__, so don't touch it
     'mask_dim': None,
 
-    # Input image size. If preserve_aspect_ratio is False, min_size is ignored.
-    'min_size': 200,
+    # Input image size.
     'max_size': 300,
     
     # Whether or not to do post processing on the cpu at test time
@@ -533,7 +560,7 @@ coco_base_config = Config({
     'use_gt_bboxes': False,
 
     # Whether or not to preserve aspect ratio when resizing the image.
-    # If True, uses the faster r-cnn resizing scheme.
+    # If True, this will resize all images to be max_size^2 pixels in area while keeping aspect ratio.
     # If False, all images are resized to max_size x max_size
     'preserve_aspect_ratio': False,
 
@@ -558,6 +585,23 @@ coco_base_config = Config({
 
     'backbone': None,
     'name': 'base_config',
+
+    # Fast Mask Re-scoring Network
+    # Inspried by Mask Scoring R-CNN (https://arxiv.org/abs/1903.00241)
+    # Do not crop out the mask with bbox but slide a convnet on the image-size mask,
+    # then use global pooling to get the final mask score
+    'use_maskiou': False,
+    
+    # Archecture for the mask iou network. A (num_classes-1, 1, {}) layer is appended to the end.
+    'maskiou_net': [],
+
+    # Discard predicted masks whose area is less than this
+    'discard_mask_area': -1,
+
+    'maskiou_alpha': 1.0,
+    'rescore_mask': False,
+    'rescore_bbox': False,
+    'maskious_to_train': -1,
 })
 
 
@@ -585,6 +629,7 @@ yolact_base_config = coco_base_config.copy({
         'selected_layers': list(range(1, 4)),
         'use_pixel_scales': True,
         'preapply_sqrt': False,
+        'use_square_anchors': True, # This is for backward compatability with a bug
 
         'pred_aspect_ratios': [ [[1, 1/2, 2]] ]*5,
         'pred_scales': [[24], [48], [96], [192], [384]],
@@ -613,6 +658,15 @@ yolact_base_config = coco_base_config.copy({
     'crowd_iou_threshold': 0.7,
 
     'use_semantic_segmentation_loss': True,
+})
+
+yolact_im400_config = yolact_base_config.copy({
+    'name': 'yolact_im400',
+
+    'max_size': 400,
+    'backbone': yolact_base_config.backbone.copy({
+        'pred_scales': [[int(x[0] / yolact_base_config.max_size * 400)] for x in yolact_base_config.backbone.pred_scales],
+    }),
 })
 
 yolact_im400_config = yolact_base_config.copy({
