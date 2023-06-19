@@ -78,11 +78,12 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 ### Implementation choices
 
-1. The notebooks use one shared requirements.txt. If "the notebooks don't work" it is often caused
-   by a dependency of a dependency having an issue. We are therefore reluctant to add new
-   dependencies and will only add them if they add real value. Do not let this discourage you if
-   you do want to include a certain package! If it is necessary, or can be useful for other
-   notebooks too, we are open to adding it.
+1. Notebooks in this repository typically rely on a shared requirements.txt file. 
+   However, contributors are encouraged to install the required packages at the top of their notebook using 
+   `!pip install -q ...` commands. This allows the notebooks to be run independently as standalone examples. 
+   To maintain package compatibility, contributors are expected to install the same versions of packages 
+   as specified in the shared requirements.txt file. This helps ensure consistency in our testing pipelines 
+   and prevents dependency conflicts.
 2. The notebooks are located in the "notebooks" subdirectory. There is a subdirectory for every
    notebook, with generally the same base name as the notebook.  For example, the
    001-hello-world.ipynb notebook can be found in the 001-hello-world directory.
@@ -90,12 +91,8 @@ To do this, there are a few requirements that all notebooks need to pass.
      numbering of the notebooks.
    - Add a README to the notebook subdirectory. Add a screenshot that gives an indication of what
      the notebook does if applicable.
-   - Add any supporting files to this subdirectory too. Supporting files should
-     be small (generally less than 5MB). Larger images, datasets and model
-     files should be downloaded from within the notebook.
-3. All related files, with the exception of Open Model Zoo models, should be saved to the notebook subdirectory,
-   even if that means that there is a small amount of duplication. For Open Model Zoo models, see the directory
-   structure in the [104 Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/main/notebooks/104-model-tools)
+   - Avoid adding any other files to the notebook's subdirectory. Instead, rely on models and data samples available online and fetch them within the notebook. Please refer to the [Notebook utils](#notebook-utils) section.
+3. In case you want to utilize one of the Open Model Zoo models, refer to the [104 Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/main/notebooks/104-model-tools)
    notebook.
 4. The notebooks should provide an easy way to clean up the downloaded data, for example with a
    commented-out cell at the end of the notebook.
@@ -125,7 +122,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    and the source GitHub (if available).
 2. Use only data and models with permissive licenses that allow for commercial use, and make sure to
    adhere to the terms of the license.
-3. If you include code from external sources in your notebook, or in files supporting your notebook, add the
+3. If you include code from external sources in your notebook add the
    name, URL and license of the third party code to the licensing/third-party-programs.txt file
 
 ### Notebook naming
@@ -161,6 +158,7 @@ Every notebook is also added to the notebooks overview table in the main
 [README](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md) and the 
 [README](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/README.md) in the notebooks directory
 Notebooks that work in Binder have a _Launch Binder_ badge in the README files.
+In the same way, notebooks that work in Google Colab have a _Launch Colab_ badge in the README files.
 
 
 ### File Structure
@@ -169,38 +167,32 @@ To maintain consistency between notebooks, please follow the directory structure
 
 ```markdown
 notebooks/
-└── data/
-   └── video
-   └── image
-   └── audio
-   └── text
-   └── json
-   └── font
-   └── pts
 └──<three-digit-number>-<title>/
    ├── README.md
    ├── <three-digit-number>-<title>.ipynb
    ├── utils/
    ├── model/
-   └── data/
+   ├── data/
+   └── output/
 ```
 
-In case of output provided by Notebook please create folder ```output``` on the same level as readme file.
+In case the example requires saving additional files to disk (e.g. models, data samples, utility modules, or outputs),
+please create corresponding folders on the same level as readme file.
 
 #### Recommendations for File Structure
 
 - Model
 
-We recommend to load the model using url otherwise we can accept the model placed in the model folder which will be evaluated further for storage constraints.
+We recommend to load your models using url or other ways of distribution of pre-trained models, 
+like PyTorch Hub or the Diffusers package. 
 
 - Data
 
-We recommend to use embedded URL for image/video data since GitHub limits the size of files allowed in repositories.
+We recommend to use embedded URL for image/video data.
 Follow the below instructions to create embedded URL in GitHub:
   - Go to any issue on GitHub.
   - In the comment section, you can attach files. Just drag/drop, select or paste your image.
   - Copy the code/link displayed in the text area
-Otherwise we can accept the data placed in the common data/<type> folder which will be evaluated further for storage constraints.
 
 - License
 
@@ -220,9 +212,10 @@ Add a "hide" tag to any demo cells (from the right side gear sidebar) to prevent
 
 ## Requirements
 
-If you need to add a requirement, add it to requirements.txt and .docker/Pipfile. Use Python 3.8 to install 
-[pipenv](https://pypi.org/project/pipenv/), and run `pipenv lock` in the .docker directory to create Pipfile.lock. 
-Add all three files to the repository. 
+Contributors are encouraged to install the required packages at the top of their notebook using 
+`!pip install ...` commands. This allows the notebooks to be run independently as standalone examples. 
+To maintain package compatibility, contributors are expected to install the same versions of packages 
+as specified in the shared requirements.txt file located in the repository root folder.
 
 ## Validation
 
@@ -292,7 +285,7 @@ use either this extension or a different way to automatically format your notebo
    - Go to the GitHub page of your fork, click on _Actions_, select _treon_ on the left. There will
      be a message _This workflow has a workflow_dispatch event trigger._ and a _Run workflow_ button.
      Click on the button and select the branch that you want to test.
-6. Test if the notebook works in [Binder](https://mybinder.org/) and if so, add _Launch Binder_ badges 
+6. Test if the notebook works in [Binder](https://mybinder.org/) and [Google Colab](https://colab.research.google.com/) and if so, add _Launch Binder_ and _Launch Binder_ badges 
    to the README files.
 
 Once your notebook passes in the CI and you have verified that everything looks good, make a Pull Request!

@@ -58,7 +58,7 @@ def download_file(
     show_progress: bool = True,
     silent: bool = False,
     timeout: int = 10,
-) -> str:
+) -> PathLike:
     """
     Download a file from a url and save it to the local filesystem. The file is saved to the
     current directory by default, or to `directory` if specified. If a filename is not given,

@@ -1,6 +1,6 @@
 # Working with GPUs in OpenVINO™
 
-This notebook shows how to do inference with Graphic Processing Units (GPUs). To learn more about GPUs in OpenVINO, refer to the [GPU Device](https://docs.openvino.ai/latest/openvino_docs_OV_UG_supported_plugins_GPU.html) section in the docs.
+This notebook shows how to do inference with Graphic Processing Units (GPUs). To learn more about GPUs in OpenVINO, refer to the [GPU Device](https://docs.openvino.ai/2023.0/openvino_docs_OV_UG_supported_plugins_GPU.html) section in the docs.
 
 ## Notebook Contents
 
