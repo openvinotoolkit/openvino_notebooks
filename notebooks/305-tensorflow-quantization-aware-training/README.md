@@ -1,5 +1,5 @@
 # Optimizing TensorFlow models with Neural Network Compression Framework of OpenVINO™ by 8-bit quantization.
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/colab-support-stage-1/notebooks/305-tensorflow-quantization-aware-training/305-tensorflow-quantization-aware-training.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/305-tensorflow-quantization-aware-training/305-tensorflow-quantization-aware-training.ipynb)
 
 This tutorial demonstrates how to use [NNCF](https://github.com/openvinotoolkit/nncf) 8-bit quantization to optimize the 
 [TensorFlow](https://www.tensorflow.org) model for inference with [OpenVINO Toolkit](https://docs.openvino.ai/). 

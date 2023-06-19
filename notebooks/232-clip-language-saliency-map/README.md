@@ -1,5 +1,5 @@
 # Language-Visual Saliency with CLIP and OpenVINO™
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/colab-support-stage-1/notebooks/232-clip-language-saliency-map/232-clip-language-saliency-map.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/232-clip-language-saliency-map/232-clip-language-saliency-map.ipynb)
 
 The notebook will cover the following topics:
 
