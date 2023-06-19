@@ -150,6 +150,7 @@ Demos that demonstrate inference on a particular model.
 |[237-segment-anything](notebooks/237-segment-anything/)<br>| Prompt based segmentation using Segment Anything and OpenVINO™. [Use FiftyOne](notebooks/237-segment-anything/237-segment-anything-fiftyone.ipynb) for dataset curation!| <img src=https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png width=225> |
 [242-yolact-image-segmentation](/notebooks/242-yolact-instance-segmentation/) <br>| Instance segmentation on images using Yolact and OpenVINO™.| <img src=https://raw.githubusercontent.com/Abdullah-Elkasaby/242-yolact-image-segmentation/one-notebook-version/yolact_example.png width=225> |
 
+
 <div id='-model-training'/>
 
 ### 🏃 Model Training

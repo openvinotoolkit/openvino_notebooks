@@ -36,6 +36,11 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
     notebooks = sorted(list(notebooks_dir.rglob('**/*.ipynb')))
     statuses = {notebook.parent.relative_to(notebooks_dir): {'status': '', 'path': notebook.parent} for notebook in notebooks}
     test_list = test_list or statuses.keys()
+    if len(ignore_list) == 1 and ignore_list[0].endswith('.txt'):
+        with open(ignore_list[0], 'r') as f:
+            ignore_list = list(map(lambda x: x.strip(), f.readlines()))
+            print(f"ignored notebooks: {ignore_list}")
+
     if len(test_list) == 1 and test_list[0].endswith('.txt'):
         testing_notebooks = []
         with open(test_list[0], 'r') as f:
