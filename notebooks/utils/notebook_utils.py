@@ -283,6 +283,8 @@ class VideoPlayer:
     """
 
     def next(self):
+        import cv2
+
         with self.__lock:
             if self.__frame is None:
                 return None
