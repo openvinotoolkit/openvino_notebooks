@@ -5,7 +5,6 @@
 
 
 import os
-import requests
 import threading
 import time
 import urllib.parse
@@ -36,6 +35,8 @@ def load_image(path: str) -> np.ndarray:
     :return: image as BGR numpy array
     """
     import cv2
+    import requests
+
     if path.startswith("http"):
         # Set User-Agent to Mozilla because some websites block
         # requests with User-Agent Python
@@ -71,6 +72,7 @@ def download_file(
     :return: path to downloaded file
     """
     from tqdm.notebook import tqdm_notebook
+    import requests
 
     filename = filename or Path(urllib.parse.urlparse(url).path).name
     chunk_size = 16384  # make chunks bigger so that not too many updates are triggered for Jupyter front-end
