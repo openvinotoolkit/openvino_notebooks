@@ -208,6 +208,8 @@ class VideoPlayer:
 
     def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
         import cv2
+
+        self.cv2 = cv2  # This is done to access the package in class methods
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
             raise RuntimeError(
@@ -293,9 +295,9 @@ class VideoPlayer:
             # need to copy frame, because can be cached and reused if fps is low
             frame = self.__frame.copy()
         if self.__size is not None:
-            frame = cv2.resize(frame, self.__size, interpolation=self.__interpolation)
+            frame = self.cv2.resize(frame, self.__size, interpolation=self.__interpolation)
         if self.__flip:
-            frame = cv2.flip(frame, 1)
+            frame = self.cv2.flip(frame, 1)
         return frame
 
 
