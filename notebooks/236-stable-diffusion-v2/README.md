@@ -8,12 +8,12 @@ Diffusion models have been shown to achieve state-of-the-art results for generat
 
 In previous notebooks, we already discussed how to run [Text-to-Image generation and Image-to-Image generation using Stable Diffusion v1](../225-stable-diffusion-text-to-image/225-stable-diffusion-text-to-image.ipynb) and [controlling its generation process using ControlNet](../235-controlnet-stable-diffusion/235-controlnet-stable-diffusion.ipynb). Now, we have Stable Diffusion v2 as our latest showcase.
 
-This notebook series demonstrates two approaches to image generation using an AI method called `diffusion`:
+This notebook series demonstrates approaches to image generation using an AI method called `diffusion`:
 
 * [Text-to-Image](./236-stable-diffusion-v2-text-to-image.ipynb) generation to create images from a text description as input.
 
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/29454499/228472288-be6fecb6-5ab5-411f-86dc-0e9c482c733e.png" />
+    <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/22090501/31f63b59-2d12-46c2-85c9-c7e9af0decf9" />
 </p>
 
 This is a demonstration in which you can type a text description and the pipeline will generate an image that reflects the context of the input text.
@@ -27,11 +27,12 @@ The following image shows an example of the input text and the corresponding pre
     <img src="https://user-images.githubusercontent.com/1720147/229231281-065641fd-53ea-4940-8c52-b1eebfbaa7fa.png"/>
 </p>
 
+* [Text-to-Image-demo](./236-stable-diffusion-v2-text-to-image-demo.ipynb) is a shorter version of the original notebook for demo purposes.
 
 * [Text-guided Inpainting](./236-stable-diffusion-v2-infinite-zoom.ipynb) generation to create an image, using text description and masked image region, which should be part of the generated image.
 
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/29454499/228501084-60f86a71-0907-4094-a796-96350264d8b8.png" />
+    <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/22090501/9ac6de45-186f-4a3c-aa20-825825a337eb" />
 </p>
 
 In this demonstration Stable Diffusion v2 Inpainting model for generating sequence of images for infinite zoom video effect, extending previous images beyond its borders.
@@ -53,6 +54,5 @@ Notebook contains the following steps:
 1. Convert PyTorch models to ONNX format.
 2. Convert ONNX models to OpenVINO IR format, using Model Optimizer tool.
 3. Run Stable Diffusion v2 pipeline with OpenVINO.
-
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
