@@ -1,4 +1,4 @@
-# TensorFlow 2 Object Detection to OpenVINO™ Model Conversion Tutorial
+# Convert TensorFlow 2 Object Detection Models to OpenVINO™ 
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F120-tf2-object-detection-to-openvino%2F120-tf2-object-detection-to-openvino.ipynb)
 
@@ -8,7 +8,7 @@ This tutorial explains how to convert [TensorFlow 2 Object Detection](https://gi
 
 ## Notebook Contents
 
-The notebook shows how to convert the [Faster R-CNN with Resnet-50 V1 Object Detection model](https://tfhub.dev/tensorflow/faster_rcnn/resnet50_v1_640x640/1) and then detect objects on an image with OpenVINO Runtime.
+The notebook shows how to convert the [Faster R-CNN with Resnet-50 V1 Object Detection model](https://tfhub.dev/tensorflow/faster_rcnn/resnet50_v1_640x640/1) and then detect objects in an image using OpenVINO Runtime.
 
 ## Installation Instructions
 
