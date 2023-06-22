@@ -107,7 +107,7 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | [117-model-server](notebooks/117-model-server/)| Introduction to model serving with OpenVINO™ Model Server (OVMS)                                                            |
 | [118-optimize-preprocessing](notebooks/118-optimize-preprocessing/)| Improve performance of image preprocessing step                                                                             |
 | [119-tflite-to-openvino](notebooks/119-tflite-to-openvino/) | Convert TensorFlow Lite models to OpenVINO IR                                                                                                            |
-| [120-tf2-object-detection-to-openvino](notebooks/120-tf2-object-detection-to-openvino/) | Convert TensorFlow 2 Object Detection models to OpenVINO IR                                                                                                            |
+| [120-tf2-object-detection-to-openvino](notebooks/120-tf2-object-detection-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F120-tf2-object-detection-to-openvino%2F120-tf2-object-detection-to-openvino.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/120-tf2-object-detection-to-openvino/120-tf2-object-detection-to-openvino.ipynb) | Convert TensorFlow 2 Object Detection models to OpenVINO IR                                                                                                            |
 
 <div id='-model-demos'/>
 
