@@ -34,7 +34,6 @@ ipython>=7.16.3
 numpy>=1.21.0
 opencv-python
 Pillow>=8.3.2
-matplotlib>=3.4,<3.5.3
 scipy
 
 # The packages below are not directly required. They are dependencies of 
