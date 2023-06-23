@@ -1,7 +1,7 @@
 # Convert TensorFlow Object Detection Models to OpenVINO™ 
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F120-tf2-object-detection-to-openvino%2F120-tf2-object-detection-to-openvino.ipynb)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/120-tf2-object-detection-to-openvino/120-tf2-object-detection-to-openvino.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F120-tf-object-detection-to-openvino%2F120-tf-object-detection-to-openvino.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/120-tf-object-detection-to-openvino/120-tf-object-detection-to-openvino.ipynb)
 
 <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/41733560/f9b59be1-1d2f-4e13-9678-67205be78841" width=300>
 
