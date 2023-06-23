@@ -158,7 +158,7 @@ Demos that demonstrate inference on a particular model.
 |[240-dolly-2-instruction-following](notebooks/240-dolly-2-instruction-following/)<br>| Instruction following using Databricks Dolly 2.0 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png width=225> |
 |[241-riffusion-text-to-music](notebooks/241-riffusion-text-to-music/)<br>| Text-to-Music generation using Riffusion and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/244291912-bbc6e08c-c0a9-41fe-bc2d-5f89a0d2463b.png width=225> | 
 |[242-freevc-voice-conversion](notebooks/242-freevc-voice-conversion/)<br> | High-Quality Text-Free One-Shot Voice Conversion with FeeVC and OpenVINO™ ||
-|[243-yolact-image-segmentation](notebooks/243-yolact-instance-segmentation/) <br>| Instance segmentation on images using Yolact and OpenVINO™.| <img src="notebooks/data/image/coco_bike_yolact.png" width=225> |
+|[243-yolact-image-segmentation](notebooks/243-yolact-instance-segmentation/) <br>| Instance segmentation on images using Yolact and OpenVINO™.| <img src="https://raw.githubusercontent.com/Abdullah-Elkasaby/yolact-isntance-segmentation-openvino/main/coco_bike_yolact.png" width=225> |
 
 
 <div id='-model-training'/>

@@ -6,13 +6,13 @@ with OpenVINO.
 
 
 
-![Inference example](../data/image/coco_bike_yolact.png)
+![Inference example](https://raw.githubusercontent.com/Abdullah-Elkasaby/yolact-isntance-segmentation-openvino/main/coco_bike_yolact.png)
 
 
 Instance segmentation is a crucial computer vision task that aims to detect and precisely delineate individual objects within an image, providing pixel-level segmentation masks for each instance. Unlike object detection, instance segmentation enables fine-grained localization and boundary understanding, opening up diverse applications in autonomous driving, robotics, and medical imaging, among others.
 
 
-![Yolact diagram](https://raw.githubusercontent.com/Abdullah-Elkasaby/238-yolact-image-segmentation/one-notebook-version/model_diagram.png)
+![Yolact diagram](https://raw.githubusercontent.com/Abdullah-Elkasaby/yolact-isntance-segmentation-openvino/main/model_diagram.png)
 > Credits for this image go to [original authors of Yolact](https://arxiv.org/abs/1904.02689).
 
 
