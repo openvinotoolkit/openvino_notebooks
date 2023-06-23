@@ -12,6 +12,8 @@ This notebook series demonstrates approaches to image generation using an AI met
 
 * [Text-to-Image](./236-stable-diffusion-v2-text-to-image.ipynb) generation to create images from a text description as input.
 
+* [Text-to-Image-demo](./236-stable-diffusion-v2-text-to-image-demo.ipynb) is a shorter version of the original notebook for demo purposes, if would like to get started right away and run the notebook more easily.
+
 <p align="center">
     <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/22090501/31f63b59-2d12-46c2-85c9-c7e9af0decf9" />
 </p>
@@ -26,8 +28,6 @@ The following image shows an example of the input text and the corresponding pre
 <p align="center">
     <img src="https://user-images.githubusercontent.com/1720147/229231281-065641fd-53ea-4940-8c52-b1eebfbaa7fa.png"/>
 </p>
-
-* [Text-to-Image-demo](./236-stable-diffusion-v2-text-to-image-demo.ipynb) is a shorter version of the original notebook for demo purposes.
 
 * [Text-guided Inpainting](./236-stable-diffusion-v2-infinite-zoom.ipynb) generation to create an image, using text description and masked image region, which should be part of the generated image.
 
