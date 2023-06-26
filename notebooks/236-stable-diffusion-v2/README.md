@@ -15,7 +15,7 @@ This notebook series demonstrates approaches to image generation using an AI met
 * [Text-to-Image-demo](./236-stable-diffusion-v2-text-to-image-demo.ipynb) is a shorter version of the original notebook for demo purposes, if would like to get started right away and run the notebook more easily.
 
 <p align="center">
-    <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/22090501/31f63b59-2d12-46c2-85c9-c7e9af0decf9" />
+    <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/22090501/ec454103-0d28-48e3-a18e-b55da3fab381" />
 </p>
 
 This is a demonstration in which you can type a text description and the pipeline will generate an image that reflects the context of the input text.
