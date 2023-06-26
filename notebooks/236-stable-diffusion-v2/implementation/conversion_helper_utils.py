@@ -146,7 +146,7 @@ def convert_txt_encoder_onnx_OV(model_dir, text_encoder):
 
     if not txt_encoder_ov_path.exists():
         convert_encoder_onnx(text_encoder, txt_encoder_onnx_path)
-        txt_encoder_ov_model = convert_model(txt_encoder_onnx_path, compress_to_fp16=True)
+        txt_encoder_ov_model = convert_model(txt_encoder_onnx_path)
         serialize(model=txt_encoder_ov_model, xml_path=str(txt_encoder_ov_path)) 
     else:
         print(f"Text encoder will be loaded from {txt_encoder_ov_path}")
@@ -163,7 +163,7 @@ def convert_unet_onnx_OV(model_dir, unet, num_channels=4, width=96, height=96):
 
     if not unet_ov_path.exists():
         convert_unet_onnx(unet, unet_onnx_path, num_channels=num_channels, width=width, height=height)
-        unet_ov_model = convert_model(unet_onnx_path, compress_to_fp16=True)
+        unet_ov_model = convert_model(unet_onnx_path)
         serialize(model=unet_ov_model, xml_path=str(unet_ov_path)) 
     else:
         print(f"U-Net will be loaded from {unet_ov_path}")
@@ -180,7 +180,7 @@ def convert_vae_encoder_onnx_OV(model_dir, vae, width=768, height=768):
 
     if not vae_encoder_ov_path.exists():
         convert_vae_encoder_onnx(vae, vae_encoder_onnx_path, width=width, height=height)
-        encoder_ov_model = convert_model(vae_encoder_onnx_path, compress_to_fp16=True)
+        encoder_ov_model = convert_model(vae_encoder_onnx_path)
         serialize(model=encoder_ov_model, xml_path=str(vae_encoder_ov_path))
     else:
         print(f"VAE-Encoder will be loaded from {vae_encoder_ov_path}")   
@@ -194,7 +194,7 @@ def convert_vae_decoder_onnx_OV(model_dir, vae, width=96, height=96):
 
     if not vae_decoder_ov_path.exists():
         convert_vae_decoder_onnx(vae, vae_decoder_onnx_path, width=width, height=height)
-        decoder_ov_model = convert_model(vae_decoder_onnx_path, compress_to_fp16=True)
+        decoder_ov_model = convert_model(vae_decoder_onnx_path)
         serialize(model=decoder_ov_model, xml_path=str(vae_decoder_ov_path)) 
     else:
         print(f"VAE decoder will be loaded from {vae_decoder_ov_path}")
