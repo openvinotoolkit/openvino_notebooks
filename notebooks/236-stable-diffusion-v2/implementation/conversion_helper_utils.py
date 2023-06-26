@@ -2,9 +2,9 @@ from pathlib import Path
 import gc
 import torch
 import numpy as np
-import subprocess
 from openvino.tools.mo import convert_model
 from openvino.runtime import serialize
+
 
 def convert_encoder_onnx(text_encoder: torch.nn.Module, onnx_path:Path):
     """
@@ -136,7 +136,9 @@ def convert_vae_decoder_onnx(vae: torch.nn.Module, onnx_path: Path, width:int = 
                               'latents'], output_names=['sample'])
         print('VAE decoder successfully converted to ONNX')
 
-#Helper code to convert models
+# Helper code to convert models
+
+
 def convert_txt_encoder_onnx_OV(model_dir, text_encoder):
     # Convert Text Encoder to ONNX then OpenVINO
     txt_encoder_onnx_path = model_dir / 'text_encoder.onnx'
@@ -153,13 +155,14 @@ def convert_txt_encoder_onnx_OV(model_dir, text_encoder):
     gc.collect();
     return txt_encoder_ov_path
 
-def convert_unet_onnx_OV(model_dir, unet, num_channels = 4, width=96, height=96):
+
+def convert_unet_onnx_OV(model_dir, unet, num_channels=4, width=96, height=96):
     # Convert U-Net to ONNX then OpenVINO
     unet_onnx_path = model_dir / 'unet/unet.onnx'
     unet_ov_path = unet_onnx_path.parents[1] / 'unet.xml'
 
     if not unet_ov_path.exists():
-        convert_unet_onnx(unet, unet_onnx_path, num_channels = num_channels, width=width, height=height)
+        convert_unet_onnx(unet, unet_onnx_path, num_channels=num_channels, width=width, height=height)
         unet_ov_model = convert_model(unet_onnx_path, compress_to_fp16=True)
         serialize(model=unet_ov_model, xml_path=str(unet_ov_path)) 
     else:
@@ -168,6 +171,7 @@ def convert_unet_onnx_OV(model_dir, unet, num_channels = 4, width=96, height=96)
     del unet
     gc.collect();
     return unet_ov_path
+
 
 def convert_vae_encoder_onnx_OV(model_dir, vae, width=768, height=768):
     # Converts the encoder VAE component to ONNX then OpenVINO
@@ -182,8 +186,9 @@ def convert_vae_encoder_onnx_OV(model_dir, vae, width=768, height=768):
         print(f"VAE-Encoder will be loaded from {vae_encoder_ov_path}")   
     return vae_encoder_ov_path
 
+
 def convert_vae_decoder_onnx_OV(model_dir, vae, width=96, height=96):
-    #Convert the VAE decoder to ONNX then OpenVINO
+    # Converts the VAE decoder to ONNX then OpenVINO
     vae_decoder_onnx_path = model_dir / 'vae_decoder.onnx'
     vae_decoder_ov_path = vae_decoder_onnx_path.with_suffix('.xml')
 

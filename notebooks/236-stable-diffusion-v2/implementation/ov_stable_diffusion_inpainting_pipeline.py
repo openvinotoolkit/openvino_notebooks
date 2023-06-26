@@ -4,7 +4,6 @@ from typing import List, Optional, Union, Dict
 import PIL
 import cv2
 
-import transformers
 import numpy as np
 import torch
 
@@ -61,6 +60,7 @@ def prepare_mask_and_masked_image(image:PIL.Image.Image, mask:PIL.Image.Image):
     masked_image = image * (mask < 0.5)
 
     return mask, masked_image
+
 
 class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
     def __init__(
@@ -419,6 +419,7 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
 
         return timesteps, num_inference_steps - t_start 
 
+
 def generate_video(
     pipe:OVStableDiffusionInpaintingPipeline,
     prompt:Union[str, List[str]],
@@ -532,6 +533,8 @@ def generate_video(
     save_path = video_file_name + ".mp4"
     write_video(save_path, all_frames, fps, reversed_order=zoom_in)
     return save_path
+
+
 def shrink_and_paste_on_blank(current_image:PIL.Image.Image, mask_width:int):
     """
     Decreases size of current_image by mask_width pixels from each side,
