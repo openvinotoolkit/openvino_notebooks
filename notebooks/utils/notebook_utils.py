@@ -13,18 +13,13 @@ from os import PathLike
 from pathlib import Path
 from typing import List, NamedTuple, Optional, Tuple
 
-import cv2
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 from openvino.runtime import Core, get_version
 from IPython.display import HTML, Image, display
-from matplotlib.lines import Line2D
-from tqdm.notebook import tqdm_notebook
 
 
 # ## Files
-# 
+#
 # Load an image, download a file, download an IR model, and create a progress bar to show download progress.
 
 # In[ ]:
@@ -40,6 +35,7 @@ def load_image(path: str) -> np.ndarray:
     :param path: Local path name or URL to image.
     :return: image as BGR numpy array
     """
+    import cv2
     if path.startswith("http"):
         # Set User-Agent to Mozilla because some websites block
         # requests with User-Agent Python
@@ -74,6 +70,8 @@ def download_file(
     :param timeout: Number of seconds before cancelling the connection attempt
     :return: path to downloaded file
     """
+    from tqdm.notebook import tqdm_notebook
+
     filename = filename or Path(urllib.parse.urlparse(url).path).name
     chunk_size = 16384  # make chunks bigger so that not too many updates are triggered for Jupyter front-end
 
@@ -89,7 +87,7 @@ def download_file(
         directory = Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
         filename = directory / Path(filename)
-    
+
     try:
         response = requests.get(url=url, 
                                 headers={"User-agent": "Mozilla/5.0"}, 
@@ -117,7 +115,7 @@ def download_file(
             desc=str(filename),
             disable=not show_progress,
         ) as progress_bar:
-            
+
             with open(filename, "wb") as file_object:
                 for chunk in response.iter_content(chunk_size):
                     file_object.write(chunk)
@@ -126,9 +124,9 @@ def download_file(
     else:
         if not silent:
             print(f"'{filename}' already exists.")
-    
+
     response.close()
-    
+
     return filename.resolve()
 
 
@@ -173,6 +171,7 @@ def to_rgb(image_data: np.ndarray) -> np.ndarray:
     """
     Convert image_data from BGR to RGB
     """
+    import cv2
     return cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
 
 
@@ -180,6 +179,7 @@ def to_bgr(image_data: np.ndarray) -> np.ndarray:
     """
     Convert image_data from RGB to BGR
     """
+    import cv2
     return cv2.cvtColor(image_data, cv2.COLOR_RGB2BGR)
 
 
@@ -205,6 +205,7 @@ class VideoPlayer:
     """
 
     def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
+        import cv2
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
             raise RuntimeError(
@@ -282,6 +283,8 @@ class VideoPlayer:
     """
 
     def next(self):
+        import cv2
+
         with self.__lock:
             if self.__frame is None:
                 return None
@@ -377,6 +380,7 @@ def segmentation_map_to_image(
     :param remove_holes: If True, remove holes in the segmentation result.
     :return: An RGB image where each pixel is an int8 value according to colormap.
     """
+    import cv2
     if len(result.shape) != 2 and result.shape[0] != 1:
         raise ValueError(
             f"Expected result with shape (H,W) or (1,H,W), got result with shape {result.shape}"
@@ -424,6 +428,7 @@ def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=Fal
     :param remove_holes: If True, remove holes in the segmentation result.
     :return: An RGP image with segmentation mask overlayed on the source image.
     """
+    import cv2
     if len(image.shape) == 2:
         image = np.repeat(np.expand_dims(image, -1), 3, 2)
     mask = segmentation_map_to_image(result, colormap, remove_holes)
@@ -448,7 +453,7 @@ def viz_result_image(
     resize: bool = False,
     bgr_to_rgb: bool = False,
     hide_axes: bool = False,
-) -> matplotlib.figure.Figure:
+):
     """
     Show result image, optionally together with source images, and a legend with labels.
 
@@ -465,6 +470,10 @@ def viz_result_image(
     :param hide_axes: If true, do not show matplotlib axes.
     :return: Matplotlib figure with result image
     """
+    import cv2
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+
     if bgr_to_rgb:
         source_image = to_rgb(source_image)
     if resize:
@@ -518,6 +527,7 @@ def show_array(frame: np.ndarray, display_handle=None):
 
     Create a display_handle with: `display_handle = display(display_id=True)`
     """
+    import cv2
     _, frame = cv2.imencode(ext=".jpeg", img=frame)
     if display_handle is None:
         display_handle = display(Image(data=frame.tobytes()), display_id=True)
@@ -614,4 +624,3 @@ def check_openvino_version(version: str) -> bool:
         return False
     else:
         return True
-
