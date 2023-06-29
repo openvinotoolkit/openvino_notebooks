@@ -4,7 +4,7 @@ The Intelligent Queue Management project is an application that uses OpenVINO™
 
 Here are the steps involved in this project:
 
-Step 0: Install Python
+Step 0: Install Python and prerequisites
 
 Step 1: Set up the environment
 
@@ -12,11 +12,17 @@ Step 2: Convert and Optimize the YOLOv8 Model
 
 Step 3: Run the Application
 
-Now, let's dive into the steps starting with installing Python.
+Now, let's dive into the steps starting with installing Python. We recommend using Ubuntu to set up and run this project.
 
 ## Step 0
 
-This project requires Python 3.8 or higher. If you don't have Python installed on your machine, go to https://www.python.org/downloads/ and download the latest version for your operating system. Follow the prompts to install Python, making sure to check the option to add Python to your PATH environment variable.
+This project requires Python 3.8 or higher and a few libraries. If you don't have Python installed on your machine, go to https://www.python.org/downloads/ and download the latest version for your operating system. Follow the prompts to install Python, making sure to check the option to add Python to your PATH environment variable.
+
+Install libraries and tools:
+
+```shell
+sudo apt install git git-lfs gcc python3-venv python3-dev
+```
 
 _NOTE: If you are using Windows, you will probably need to install [Microsoft Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) also._
 
@@ -34,6 +40,12 @@ The above will clone the repository into a directory named "openvino_notebooks" 
 
 ```shell
 cd openvino_notebooks/recipes/intelligent_queue_management
+```
+
+Then pull video sample:
+
+```shell
+git lfs pull
 ```
 
 2. Create a virtual environment
@@ -84,7 +96,7 @@ To run the application, use the following command:
 python app.py --stream sample_video.mp4 --model_path model/yolov8m_openvino_int8_model/yolov8m.xml --zones_config_file zones.json --customers_limit 3
 ```
 This will run the application with the specified arguments. Replace "video_file.mp4" with the path to your input video file, "zones.json" with the path to your zones configuration file, and "3" with the maximum number of customers allowed in the queue.
-You can also run the [run-the-application.ipynb](docs/run-the-application.ipynb) to learn more about the inference process.
+You can also run the [run-the-application.ipynb](docs/run-the-application.ipynb) to learn more about the inference process. To stop the application please, press 'q' or escape at any time.
 
 _NOTE: Alternatively, you can run all steps with the following command:_
 
