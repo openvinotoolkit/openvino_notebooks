@@ -1,4 +1,6 @@
 # Text Prediction with OpenVINO™
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/223-text-prediction/223-text-prediction.ipynb)
+
 Text generation is a type of natural language processing that uses computational linguistics and artificial intelligence to automatically produce text that can meet specific communicative needs.
 
 
@@ -38,4 +40,6 @@ The notebook demonstrates text prediction with OpenVINO using the following mode
 * [personaGPT](https://huggingface.co/af1tang/personaGPT) model from HuggingFace Transformers
 ## Installation Instructions
 
-If you have not done so already, please follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md) to install all required dependencies.
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
