@@ -1,0 +1,4 @@
+/home/ethan/intel/openvino_notebooks/recipes/meter_reader/model/yolov8.onnx filter=lfs diff=lfs merge=lfs -text
+/home/ethan/intel/openvino_notebooks/recipes/meter_reader/model/deeplabv3+.onnx filter=lfs diff=lfs merge=lfs -text
+recipes/meter_reader/model/yolov8.onnx filter=lfs diff=lfs merge=lfs -text
+recipes/meter_reader/model/deeplabv3+.onnx filter=lfs diff=lfs merge=lfs -text
