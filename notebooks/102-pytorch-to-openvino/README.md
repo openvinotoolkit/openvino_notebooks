@@ -6,6 +6,7 @@ This tutorial demonstrates how to convert PyTorch models to OpenVINO Intermediat
 
 * [102-pytorch-to-openvino](./102-pytorch-to-openvino.ipynb) shows how to convert the Pytorch model in formats `torch.nn.Module` and `torch.jit.ScriptModule` into OpenVINO Intermediate Representation. The tutorial uses [RegNetY_800MF](https://arxiv.org/abs/2003.13678) model from [torchvision](https://pytorch.org/vision/stable/index.html) pre-trained on [ImageNet](https://www.image-net.org/) dataset to demonstrate how to convert PyTorch models to OpenVINO Intermediate Representation using [Model Optimizer](https://docs.openvino.ai/2023.0/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html).  It also shows how to do classification inference on an image, using [OpenVINO Runtime](https://docs.openvino.ai/nightly/openvino_docs_OV_UG_OV_Runtime_User_Guide.html) and compares the results of the PyTorch model with the OpenVINO IR model.
 
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/eaidova/openvino_notebooks/blob/ea/pt_tutorial/notebooks/102-pytorch-to-openvino/102-pytorch-to-openvino.ipynb)
 ![classification_result](https://user-images.githubusercontent.com/29454499/250586825-2a4a74a6-e091-4e47-8f29-59a72fe4975f.png)
 
 
