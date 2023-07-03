@@ -1,11 +1,12 @@
 from analog.base import analog_base
 import numpy as np
 import cv2
+import os
 
 
 class analog_paddle(analog_base):
-    def __init__(self, config):
-        super().__init__(config)
+    def __init__(self, config, output_dir):
+        super().__init__(config, output_dir)
 
     def detect(self, input):
         # Prepare the input data for meter detection model
@@ -36,7 +37,7 @@ class analog_paddle(analog_base):
         # Create the pictures of detection results
         roi_stack = np.hstack(resize_imgs)
 
-        cv2.imwrite("./data/detection_results.jpg", roi_stack)
+        cv2.imwrite(os.path.join(self.output_dir, "detection_results.jpg"), roi_stack)
 
         return roi_imgs
 
@@ -63,7 +64,7 @@ class analog_paddle(analog_base):
         # Create the pictures of segmentation results
         mask_stack = np.hstack(image_list)
 
-        cv2.imwrite("./data/segmentation_results.jpg",
+        cv2.imwrite(os.path.join(self.output_dir, "segmentation_results.jpg"),
                     cv2.cvtColor(mask_stack, cv2.COLOR_RGB2BGR))
 
         return seg_results

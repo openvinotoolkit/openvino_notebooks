@@ -13,7 +13,7 @@
     ],
     "model_config": {
         "detector": {
-            "model_path": "/home/ethan/ultralytics/runs/detect/train6/weights/best.onnx",
+            "model_path": "./model/yolov8.onnx",
             "device": "CPU",
             "input_shape": 608,
             "model_shape": {
@@ -25,7 +25,7 @@
             "std": [1.0, 1.0, 1.0]
         },
         "segmenter": {
-            "model_path": "/home/ethan/Desktop/DeepLabV3Plus-Pytorch/deeplabv3+pth.onnx",
+            "model_path": "./model/deeplabv3+.onnx",
             "device": "CPU",
             "batch_size": 2,
             "input_shape": 512,
