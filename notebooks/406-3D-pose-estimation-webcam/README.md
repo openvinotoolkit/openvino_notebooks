@@ -6,7 +6,7 @@
 
 ![pose estimation_webgl](https://user-images.githubusercontent.com/42672437/183292131-576cc05a-a724-472c-8dc9-f6bc092190bf.gif)
 
-This notebook contains a 3D multi-person pose estimation demo.The model used in this demo is based on [Lightweight OpenPose](https://arxiv.org/abs/1811.12004) and [Single-Shot Multi-Person 3D Pose Estimation From Monocular RGB](https://arxiv.org/abs/1712.03453). It detects 2D coordinates of up to 18 types of key points: ears, eyes, nose, neck, shoulders, elbows, wrists, hips, knees, and ankles, as well as their 3D coordinates, which may then be used to construct the 3D display of human poses. OpenVINO™ is used to accelerate the inference on multiple devices, such as CPU, GPU and VPU. Also, this 3D display method may be extended to display the inference results of other 3D models without much effort.
+This notebook contains a 3D multi-person pose estimation demo.The model used in this demo is based on [Lightweight OpenPose](https://arxiv.org/abs/1811.12004) and [Single-Shot Multi-Person 3D Pose Estimation From Monocular RGB](https://arxiv.org/abs/1712.03453). It detects 2D coordinates of up to 18 types of key points: ears, eyes, nose, neck, shoulders, elbows, wrists, hips, knees, and ankles, as well as their 3D coordinates, which may then be used to construct the 3D display of human poses. OpenVINO™ is used to accelerate the inference on multiple devices, such as CPU, GPU. Also, this 3D display method may be extended to display the inference results of other 3D models without much effort.
 
 ## Notebook Contents
 

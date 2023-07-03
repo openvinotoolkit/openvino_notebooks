@@ -1,3 +1,4 @@
+notebooks/107-speech-recognition-quantization/107-speech-recognition-quantization-data2vec.ipynb
 notebooks/108-gpu-device/108-gpu-device.ipynb
 notebooks/117-model-server/117-model-server.ipynb
 notebooks/211-speech-to-text/211-speech-to-text.ipynb
@@ -13,4 +14,6 @@ notebooks/237-segment-anything/237-segment-anything.ipynb
 notebooks/237-segment-anything/237-segment-anything-fiftyone.ipynb
 notebooks/238-deeployd-if/238-deep-floyd-if.ipynb
 notebooks/239-image-bind/239-image-bind.ipynb
+notebooks/240-dolly-2-instruction-following/240-dolly-2-instruction-following.ipynb
+notebooks/241-riffusion-text-to-music/241-riffusion-text-to-music.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb
