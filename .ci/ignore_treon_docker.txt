@@ -1,6 +1,7 @@
 107-speech-recognition-quantization
 108-gpu-device
 117-model-server
+216-attention-center
 225-stable-diffusion-text-to-image
 231-instruct-pix2pix-image-editing
 235-controlnet-stable-diffusion
@@ -12,3 +13,4 @@
 241-riffusion-text-to-music
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
+404-style-transfer-webcam
