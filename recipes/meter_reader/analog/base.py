@@ -1,12 +1,12 @@
 import cv2
-import sys
+import os
 import numpy as np
 import math
 import openvino.runtime as ov
 
 
 class analog_base(object):
-    def __init__(self, config):
+    def __init__(self, config, output_dir):
         self.METER_SHAPE = [512, 512]
         self.CIRCLE_CENTER = [256, 256]
         self.CIRCLE_RADIUS = 250
@@ -17,6 +17,7 @@ class analog_base(object):
         self.COLORMAP = np.array(
             [[28, 28, 28], [238, 44, 44], [250, 250, 250]])
         self.config = config
+        self.output_dir = output_dir
 
         # There are 2 types of meters in test image datasets
         self.METER_CONFIG = self.config["meter_config"]
@@ -63,7 +64,7 @@ class analog_base(object):
             rectangle_meters_stack = self.segmentation_map_to_image(
                 rectangle_meters[0], self.COLORMAP)
 
-        cv2.imwrite("./data/rectangle_meters.jpg",
+        cv2.imwrite(os.path.join(self.output_dir, "rectangle_meters.jpg"),
                     cv2.cvtColor(rectangle_meters_stack, cv2.COLOR_RGB2BGR))
 
         return meter_readings
@@ -82,7 +83,7 @@ class analog_base(object):
                 self.loc[i][0] + 100, self.loc[i][1] + 40), (0, 150, 0), -1)
             cv2.putText(result_image, "#{:.3f}".format(
                 input[i]), (self.loc[i][0], self.loc[i][1] + 25), font, 0.8, (255, 255, 255), 2, cv2.LINE_AA)
-        cv2.imwrite(f"./data/reading_results.jpg", result_image)
+        cv2.imwrite(os.path.join(self.output_dir, "reading_results.jpg"), result_image)
 
     def det_preprocess(self, input_image, target_size):
         """
