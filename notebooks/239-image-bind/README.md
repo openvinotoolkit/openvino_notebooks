@@ -10,25 +10,26 @@ In this tutorial, we consider how to convert and run ImageBind model using OpenV
 
 ## Notebook Contents
 
-This folder contains two notebooks that show how to optimize and quantize model with OpenVINO:
+This folder contains two notebooks that show how to convert and quantize model with OpenVINO:
 
 1. [Optimize an ImageBind Model using OpenVINO](239-image-bind.ipynb)
 2. [Quantize an ImageBind Model using NNCF](239-image-bind-quantize-nncf.ipynb)
 
-The optimization tutorial consists of following steps:
+The 1st notebook is about the conversion to IR and consists of following steps:
 
 1. Download the pre-trained model.
 2. Prepare input data examples.
 3. Convert the model to OpenVINO Intermediate Representation format (IR).
 4. Run model inference and analyze results.
 
-NNCF performs quantization within the OpenVINO IR. It is required to run the optimization notebook before running the quantization tutorial.
+The 2nd notebook is about the optimization by 8-bit quantization and consists of the following steps:
 
-This quantization tutorial consists of the following steps:
-
-1. Quantize the converted OpenVINO model with the Post-training Quantization with NNCF Tool API in OpenVINO.
+1. Quantize the converted OpenVINO model with the Post-training Quantization with API of NNCF.
 2. Compare results of the converted OpenVINO model and the quantized model.
-3. Compare performance of the converted OpenVINO model and the quantized model.
+3. Compare model size of the converted OpenVINO model and the quantized model.
+4. Compare performance of the converted OpenVINO model and the quantized model.
+
+NNCF performs quantization within the OpenVINO IR. It is required to run the 1st notebook before running the 2nd notebook.
 
 We will use ImageBind model for zero-shot audio and image classification. The result of model work demonstrated on the image below
 
