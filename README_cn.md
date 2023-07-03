@@ -82,7 +82,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | Notebook | Description | 
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------- | 
 | [101-tensorflow-to-openvino](notebooks/101-tensorflow-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F101-tensorflow-to-openvino%2F101-tensorflow-to-openvino.ipynb) | 转换 TensorFlow模型为OpenVINO IR | 
-| [102-pytorch-onnx-to-openvino](notebooks/102-pytorch-onnx-to-openvino/) | 转换PyTorch模型为OpenVINO IR | 
+| [102-pytorch-to-openvino](notebooks/102-pytorch-to-openvino/) | 转换PyTorch模型为OpenVINO IR | 
 | [103-paddle-to-openvino](notebooks/103-paddle-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F103-paddle-to-openvino%2F103-paddle-to-openvino-classification.ipynb) | 转换PaddlePaddle模型为OpenVINO IR | 
 | [104-model-tools](notebooks/104-model-tools/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb) | 从Open Model Zoo进行模型下载，转换以及进行基线测试 | 
 | [105-language-quantize-bert](notebooks/105-language-quantize-bert/) | 优化及量化BERT预训练模型 |
