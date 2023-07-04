@@ -1,7 +1,7 @@
 # Background Removal Demo
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F205-vision-background-removal%2F205-vision-background-removal.ipynb)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/moving_data_to_cloud/notebooks/205-vision-background-removal/205-vision-background-removal.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/205-vision-background-removal/205-vision-background-removal.ipynb)
 
 This demo notebook shows image segmentation and removing/adding background with [U^2-Net](https://github.com/xuebinqin/U-2-Net) and OpenVINO™.
 

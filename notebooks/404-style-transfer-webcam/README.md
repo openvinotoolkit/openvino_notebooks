@@ -1,6 +1,6 @@
 # Live Style Transfer with OpenVINO™
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F404-style-transfer-webcam%2F404-style-transfer.ipynb)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/moving_data_to_cloud/notebooks/404-style-transfer-webcam/404-style-transfer.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/404-style-transfer-webcam/404-style-transfer.ipynb)
 
 *Binder and Google Colab are a free services where the webcam will not work, and performance on the video will not be good. For the best performance run the notebook locally.*
 

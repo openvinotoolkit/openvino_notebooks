@@ -1,7 +1,7 @@
 # Live Person Tracking with OpenVINO™
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F407-person-tracking-webcam%2F407-person-tracking.ipynb)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/moving_data_to_cloud/notebooks/407-person-tracking-webcam/407-person-tracking.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/407-person-tracking-webcam/407-person-tracking.ipynb)
 
 *Binder is a free service where the webcam will not work, and performance on the video will not be good. For the best performance, install the notebooks locally.*
 

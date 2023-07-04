@@ -1,7 +1,7 @@
 # Monodepth Demo
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F201-vision-monodepth%2F201-vision-monodepth.ipynb)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/moving_data_to_cloud/notebooks/201-vision-monodepth/201-vision-monodepth.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/201-vision-monodepth/201-vision-monodepth.ipynb)
 
 
 ![monodepth](https://user-images.githubusercontent.com/36741649/127173017-a0bbcf75-db24-4d2c-81b9-616e04ab7cd9.gif)

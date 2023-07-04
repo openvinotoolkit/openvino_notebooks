@@ -1,5 +1,5 @@
 # TensorFlow Lite to OpenVINO™ Model Conversion Tutorial
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/igor-davidyuk/openvino_notebooks/blob/moving_data_to_cloud/notebooks/119-tflite-to-openvino/119-tflite-to-openvino.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/119-tflite-to-openvino/119-tflite-to-openvino.ipynb)
 
 <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/581d8354-1615-453c-9825-ac1a0b937a73" width=300>
 
