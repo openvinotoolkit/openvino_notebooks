@@ -1,4 +1,5 @@
 # TensorFlow Lite to OpenVINO™ Model Conversion Tutorial
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/119-tflite-to-openvino/119-tflite-to-openvino.ipynb)
 
 <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/581d8354-1615-453c-9825-ac1a0b937a73" width=300>
 
@@ -10,4 +11,6 @@ The notebook uses [Model Optimizer](https://docs.openvino.ai/2023.0/openvino_doc
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
