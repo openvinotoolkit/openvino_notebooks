@@ -1,6 +1,7 @@
 107-speech-recognition-quantization
 108-gpu-device
 117-model-server
+216-attention-center
 225-stable-diffusion-text-to-image
 231-instruct-pix2pix-image-editing
 235-controlnet-stable-diffusion
@@ -10,3 +11,4 @@
 239-image-bind
 240-dolly-2-instruction-following
 241-riffusion-text-to-music
+404-style-transfer-webcam
