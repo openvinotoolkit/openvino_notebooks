@@ -2,6 +2,7 @@
 108-gpu-device
 117-model-server
 111-yolov5-quantization-migration
+223-text-prediction
 225-stable-diffusion-text-to-image
 231-instruct-pix2pix-image-editing
 233-blip-visual-language-processing
@@ -12,3 +13,4 @@
 239-image-bind
 240-dolly-2-instruction-following
 241-riffusion-text-to-music
+242-freevc-voice-conversion

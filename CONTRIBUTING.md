@@ -285,7 +285,7 @@ use either this extension or a different way to automatically format your notebo
    - Go to the GitHub page of your fork, click on _Actions_, select _treon_ on the left. There will
      be a message _This workflow has a workflow_dispatch event trigger._ and a _Run workflow_ button.
      Click on the button and select the branch that you want to test.
-6. Test if the notebook works in [Binder](https://mybinder.org/) and [Google Colab](https://colab.research.google.com/) and if so, add _Launch Binder_ and _Launch Binder_ badges 
+6. Test if the notebook works in [Binder](https://mybinder.org/) and [Google Colab](https://colab.research.google.com/) and if so, add _Launch Binder_ and _Launch Colab_ badges 
    to the README files.
 
 Once your notebook passes in the CI and you have verified that everything looks good, make a Pull Request!
