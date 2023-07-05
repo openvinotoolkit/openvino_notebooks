@@ -11,6 +11,7 @@
     - [File Structure](#file-structure)
       - [Recommendations for File Structure](#recommendations-for-file-structure)
     - [Notebook utils](#notebook-utils)
+    - [Interactive inference with Gradio](#interactive-inference-with-gradio)
   - [Requirements](#requirements)
   - [Validation](#validation)
     - [Automated tests](#automated-tests)
@@ -208,6 +209,17 @@ segmentation maps to images and display them. The Python file is generated from 
 If you want to add a function or class to _notebook_utils.py_, please add it to the notebook, and generate the
 Python file with `jupyter nbconvert notebook_utils.ipynb --TagRemovePreprocessor.remove_cell_tags=hide --to script`
 Add a "hide" tag to any demo cells (from the right side gear sidebar) to prevent these cells from being added to the script.
+
+
+### Interactive inference with Gradio
+To enhance the functionality of your notebook, it is recommended to include an interactive model inference interface at the end. We recommend using [Gradio](https://gradio.app) for this purpose.
+
+Here are some guidelines to follow:
+
+ - Install the latest version of Gradio by running `pip install gradio`.
+ - If you're using a `gradio.Interface` object in your demo, disable flagging by setting the `allow_flagging` keyword argument to `'never'`.
+ - Launch the interface with `debug=True`. This mode blocks the main thread, identifies any possible inference errors and stops the running Gradio server when execution is interrupted. It is important to disable it when executing on CI to prevent main thread hanging. It is done by adding `test_replace` metadata key to the cell containing the line with `launch` method, and replacing this line with the same one but excluding `debug` argument. More detailed instructions can be found [here](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Notebooks-Development---CI-Test-Speedup).
+ - Avoid setting `share=True` for the `launch` method of `gradio.Interface`. Enabling this option generates an unnecessary public link to your device, which can pose a security risk. Instead, if the interface window is not rendering in your case, consider temporarily setting the `server_name` and `server_port` parameters to the address where the server is located. This workaround is particularly useful when you are using remote Jupyter server. To assist other users, please leave a comment in your notebook explaining this solution. It will help them quickly resolve the issue if they encounter the same problem.
 
 
 ## Requirements
