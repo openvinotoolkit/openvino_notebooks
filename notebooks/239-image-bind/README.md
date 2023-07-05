@@ -25,9 +25,9 @@ The 1st notebook is about the conversion to IR and consists of following steps:
 The 2nd notebook is about the optimization by 8-bit quantization and consists of the following steps:
 
 1. Quantize the converted OpenVINO model with the Post-training Quantization with API of NNCF.
-2. Compare results of the converted OpenVINO model and the quantized model.
-3. Compare model size of the converted OpenVINO model and the quantized model.
-4. Compare performance of the converted OpenVINO model and the quantized model.
+2. Compare results of the converted OpenVINO and the quantized models.
+3. Compare model size of the converted OpenVINO and the quantized models.
+4. Compare performance of the converted OpenVINO and the quantized models.
 
 NNCF performs quantization within the OpenVINO IR. It is required to run the 1st notebook before running the 2nd notebook.
 
