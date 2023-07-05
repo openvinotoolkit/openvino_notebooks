@@ -159,7 +159,7 @@ Demos that demonstrate inference on a particular model.
 |[240-dolly-2-instruction-following](notebooks/240-dolly-2-instruction-following/)<br>| Instruction following using Databricks Dolly 2.0 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png width=225> |
 |[241-riffusion-text-to-music](notebooks/241-riffusion-text-to-music/)<br>| Text-to-Music generation using Riffusion and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/244291912-bbc6e08c-c0a9-41fe-bc2d-5f89a0d2463b.png width=225> | 
 |[242-freevc-voice-conversion](notebooks/242-freevc-voice-conversion/)<br> | High-Quality Text-Free One-Shot Voice Conversion with FeeVC and OpenVINO™ ||
-|[243-tflite-selfie-segmentation](notebooks/243-tflite-selfie-segmentation/)<br> | Selfie Segmentation using TFLite and OpenVINO™ |  <img src="https://user-images.githubusercontent.com/29454499/251085926-14045ebc-273b-4ccb-b04f-82a3f7811b87.gif" width=225>|
+|[243-tflite-selfie-segmentation](notebooks/243-tflite-selfie-segmentation/)<br> [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/eaidova/openvino_notebooks/blob/ea/selfie_segm/notebooks/243-tflite-selfie-segmentation/243-tflite-selfie-segmentation.ipynb)| Selfie Segmentation using TFLite and OpenVINO™ |  <img src="https://user-images.githubusercontent.com/29454499/251085926-14045ebc-273b-4ccb-b04f-82a3f7811b87.gif" width=400>|
 
 
 
