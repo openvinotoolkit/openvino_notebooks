@@ -13,7 +13,7 @@ The notebook contains the following steps:
 2. Run DeepFloyd IF pipeline with OpenVINO.
 
 The result of notebook work demonstrated on the image below:
-[!owl.png](https://user-images.githubusercontent.com/29454499/241643886-dfcf3c48-8d50-4730-ae28-a21595d9504f.png)
+![owl.png](https://user-images.githubusercontent.com/29454499/241643886-dfcf3c48-8d50-4730-ae28-a21595d9504f.png)
 
 >**Note**: Please be aware that a machine with at least 32GB of RAM is necessary to run this example.
 
