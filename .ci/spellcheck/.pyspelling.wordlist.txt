@@ -17,7 +17,6 @@ CentOS
 charlists
 chatbots
 ChatGPT
-chinese
 Cifar
 cityscape
 Cityscapes
@@ -62,7 +61,6 @@ EfficientNet
 embeddings
 EnCodec
 encodec
-english
 et
 finetuned
 floyd
@@ -100,7 +98,6 @@ installable
 InstructGPT
 InstructPix
 iteratively
-japanese
 Jupyter
 JupyterLab
 KServe
