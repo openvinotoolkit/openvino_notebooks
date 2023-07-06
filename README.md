@@ -80,7 +80,7 @@ Brief tutorials that demonstrate how to use OpenVINO's Python API for inference.
 | Classify an image with OpenVINO | Learn the OpenVINO Python API | Semantic segmentation with OpenVINO | Text detection with OpenVINO  | 
 | <img src="https://user-images.githubusercontent.com/36741649/127170593-86976dc3-e5e4-40be-b0a6-206379cd7df5.jpg" width=140> | <img src="https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png" width=250> | <img src="https://user-images.githubusercontent.com/15709723/128290691-e2eb875c-775e-4f4d-a2f4-15134044b4bb.png" width=150> | <img src="https://user-images.githubusercontent.com/36741649/128489933-bf215a3f-06fa-4918-8833-cb0bf9fb1cc7.jpg" width=150>  | 
 
-<div id='-convert--optimize'/>
+<div id='-convert--optimize'></div>
 
 ### ⌚ Convert & Optimize 
 
@@ -108,7 +108,7 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | [118-optimize-preprocessing](notebooks/118-optimize-preprocessing/)| Improve performance of image preprocessing step                                                                             |
 | [119-tflite-to-openvino](notebooks/119-tflite-to-openvino/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/119-tflite-to-openvino/119-tflite-to-openvino.ipynb) | Convert TensorFlow Lite models to OpenVINO IR                                                                                                            |                                                                                                            |
 | [120-tensorflow-object-detection-to-openvino](notebooks/120-tensorflow-object-detection-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F120-tensorflow-object-detection-to-openvino%2F120-tensorflow-object-detection-to-openvino.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/120-tensorflow-object-detection-to-openvino/120-tensorflow-object-detection-to-openvino.ipynb) | Convert TensorFlow Object Detection models to OpenVINO IR                                                                                                            |
-<div id='-model-demos'/>
+<div id='-model-demos'></div>
 
 ### 🎯 Model Demos
 
@@ -162,7 +162,7 @@ Demos that demonstrate inference on a particular model.
 
 
 
-<div id='-model-training'/>
+<div id='-model-training'></div>
 
 ### 🏃 Model Training
 
@@ -174,7 +174,7 @@ Tutorials that include code to train neural networks.
 | [302-pytorch-quantization-aware-training](notebooks/302-pytorch-quantization-aware-training/) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model | |
 | [305-tensorflow-quantization-aware-training](notebooks/305-tensorflow-quantization-aware-training/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/305-tensorflow-quantization-aware-training/305-tensorflow-quantization-aware-training.ipynb) | Use Neural Network Compression Framework (NNCF) to quantize TensorFlow model | |
 
-<div id='-live-demos'/>
+<div id='-live-demos'></div>
 
 ### 📺 Live Demos
 Live inference demos that run on a webcam or video files.
@@ -197,7 +197,7 @@ Notebooks with ![binder logo](https://mybinder.org/badge_logo.svg) and ![colab l
 
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
-<div id='-system-requirements'/>
+<div id='-system-requirements'></div>
 
 ## ⚙️ System Requirements
 
@@ -214,7 +214,7 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 | Windows Server 2016 or higher                              | 3.7, 3.8, 3.9, 3.10                                |
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)
-<div id='-run-the-notebooks'/>
+<div id='-run-the-notebooks'></div>
 
 ## 💻 Run the Notebooks
 
@@ -237,7 +237,7 @@ In your browser, select a notebook from the file browser in Jupyter Lab using th
 <img src="https://user-images.githubusercontent.com/15709723/120527271-006fd200-c38f-11eb-9935-2d36d50bab9f.gif">
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
-<div id='-cleaning-up'/>
+<div id='-cleaning-up'></div>
 
 ## 🧹 Cleaning Up
 
@@ -292,7 +292,7 @@ In your browser, select a notebook from the file browser in Jupyter Lab using th
 </div>
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
-<div id='-troubleshooting'/>
+<div id='-troubleshooting'></div>
 
 ## ⚠️ Troubleshooting
 
@@ -306,7 +306,7 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 - For Windows installation, it is recommended to use _Command Prompt (`cmd.exe`)_, not _PowerShell_.
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#-contributors)
-<div id='-contributors'/>
+<div id='-contributors'></div>
 
 ## 🧑‍💻 Contributors
 
@@ -317,7 +317,7 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 Made with [`contrib.rocks`](https://contrib.rocks).
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
-<div id='-faq'/>
+<div id='-faq'></div>
 
 ## ❓ FAQ
 
