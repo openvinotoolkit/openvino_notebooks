@@ -107,7 +107,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    `function(a=1, b=2)` instead of `function(1, 2)`
 5. Use `from pathlib import Path` for path manipulation instead of `os.path`
 6. Add type hints to functions: [PEP 484](https://www.python.org/dev/peps/pep-0484/)
-7. Add ReST style docstring (see [403](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/403-action-recognition-webcam/403-action-recognition-webcam.ipynb)
+7. Add REST style docstring (see [403](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/403-action-recognition-webcam/403-action-recognition-webcam.ipynb)
    for an example). It is not necessary to specify the parameter type in the docstring, since
    type hints are already added to the function definition.
 8. Do not use global variables in functions: a function should not depend on values that are
@@ -183,7 +183,7 @@ please create corresponding folders on the same level as `README.md` file.
 
 - Model
 
-We recommend to load your models using url or other ways of distribution of pre-trained models, 
+We recommend to load your models using URL or other ways of distribution of pre-trained models, 
 like PyTorch Hub or the Diffusers package. 
 
 - Data
@@ -221,11 +221,11 @@ as specified in the shared `requirements.txt` file located in the repository roo
 
 ### Automated tests
 
-We use Github Actions to automatically validate that all notebooks work. The following tests run automatically on a new notebook PR:
+We use GitHub Actions to automatically validate that all notebooks work. The following tests run automatically on a new notebook PR:
 
 - `treon`: tests that the notebooks execute without problems on all supported platforms. 
 - Code check: 
-  - Uses [flake8](https://github.com/pycqa/flake8) to check for unnecessary imports and variables 
+  - Uses [`flake8`](https://github.com/pycqa/flake8) to check for unnecessary imports and variables 
 and some style issues
   - Verifies that the notebook is included in the main `README.md` and the `README.md` in the notebooks directory. 
   - Runs the check_install script to test for installation issues
@@ -235,7 +235,7 @@ and some style issues
   repository because the full notebooks folder will be copied to the image.
 - [`CodeQL`](https://codeql.github.com/)
 
-  - In the rest of this guide, the automated tests in Github
+  - In the rest of this guide, the automated tests in GitHub
 Actions will be referred to as CI (for Continuous Integration).
 
 If your notebook takes longer than a few minutes to execute, it may be possible to patch it in the CI, to make 
@@ -274,7 +274,7 @@ use either this extension or a different way to automatically format your notebo
 ## Getting started
 
 1. Create a fork, a copy of the repository, by clicking on the Fork button on the top right of the
-   OpenVINO Notebooks [Github page](https://github.com/openvinotoolkit/openvino_notebooks)
+   OpenVINO Notebooks [GitHub page](https://github.com/openvinotoolkit/openvino_notebooks)
 2. Install the recommended packages for a development environment with `pip install -r
    .ci/dev-requirements.txt` inside the `openvino_env` environment. This installs all the packages
    mentioned in the [Validation](#Validation) section.
@@ -292,9 +292,8 @@ Once your notebook passes in the CI and you have verified that everything looks 
 
 ### Pull Requests (PRs)
 
-1. If some time has passed since you made the fork, rebase or merge your fork to the
-   openvino_notebooks main branch first.
-2. Create your PR against the openvino_notebooks main branch.
+1. If some time has passed since you made the fork, sync your fork via GitHub UI or update your form manually - rebase or merge `openvinotoolkit/openvino_notebooks` repository main branch to the main branch in your fork.
+2. Create your PR against the `openvinotoolkit/openvino_notebooks` repository main branch.
 3. Please create a description of what the notebook does with your PR. Screenshots are appreciated!
 4. On making or updating a Pull Request, the tests in the CI will run again. Please keep an
    eye on them. If the tests fail and you think the issue is not related to your PR, please make a comment on your PR.
