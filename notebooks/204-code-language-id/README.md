@@ -15,7 +15,7 @@ This tutorial will be divided in 2 parts:
 [`CodeBERTa-small-v1`](https://huggingface.co/huggingface/CodeBERTa-small-v1) and [`CodeBERTa-language-id`](https://huggingface.co/huggingface/CodeBERTa-language-id): no license found on Hugging Face Hub. 
 
 Dataset:
->Each example in the dataset has is extracted from a GitHub repository, and each repository has its own license. Example-wise license information is not (yet) included in this dataset: you will need to find out yourself which license the code is using.
+>Each example in the dataset is extracted from a GitHub repository, and each repository has its own license. Example-wise license information is not (yet) included in this dataset: you will need to find out yourself which license the code is using.
 
 Additional resources:
 - [Grammatical Error Correction with OpenVINO](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/214-grammar-correction/214-grammar-correction.ipynb)
