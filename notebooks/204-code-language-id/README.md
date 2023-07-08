@@ -2,7 +2,7 @@
 
 **Programming language classification** is the task of identifying which programming language is used in an arbitrary code snippet. This can be useful to label new data to include in a dataset, and potentially serve as an intermediary step when input snippets need to be process based on their programming language.
 
-More generally, this tutorial shows how to pull pre-trained models from the Hugging Face Hub using the Hugging Face [Transformers](https://huggingface.co/models) library and convert them to the OpenVINO™ IR format using the [Hugging Face Optimum](https://huggingface.co/docs/optimum) library. You will also learn how to conduct post-training quantization for OpenVINO models using Hugging Face Optimum and do some light benchmarking using the (Hugging Face Evaluate)[https://huggingface.co/docs/evaluate/index] library.
+More generally, this tutorial shows how to pull pre-trained models from the Hugging Face Hub using the Hugging Face [Transformers](https://huggingface.co/models) library and convert them to the OpenVINO™ IR format using the [Hugging Face Optimum](https://huggingface.co/docs/optimum) library. You will also learn how to conduct post-training quantization for OpenVINO models using Hugging Face Optimum and do some light benchmarking using the [Hugging Face Evaluate](https://huggingface.co/docs/evaluate/index) library.
 
 ## Notebook Contents
 
