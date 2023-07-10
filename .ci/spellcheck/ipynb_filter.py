@@ -3,8 +3,6 @@ PySpelling plugin for filtering Jupyter Notebook files (*.ipynb)
 """
 
 from pyspelling import filters
-import codecs
-import markdown
 import nbformat
 
 
