@@ -1,3 +1,4 @@
+
 3D
 accelerometers
 activations
@@ -104,10 +105,12 @@ DistilBERT
 distilbert
 docstring
 doi
+Dollár
 donut
 Downloader
 downloader
 downsampled
+dropdown
 EfficientNet
 embeddings
 EnCodec
@@ -131,6 +134,7 @@ frontend
 GAN
 gaussian
 GEC
+Girshick
 Gitee
 GitHub
 GLA
@@ -154,6 +158,7 @@ hyperparameters
 ICIP
 ICPR
 iGPU
+Ilija
 ImageBind
 ImageNet
 Imagenette
@@ -174,6 +179,7 @@ JSON
 Jupyter
 Jupyter's
 JupyterLab
+Kaiming
 Kalman
 kbps
 keras
@@ -182,6 +188,7 @@ keypoints
 KiTS
 Koltun
 Kondate
+Kosaraju
 KServe
 Kubernetes
 Kupyn
@@ -202,9 +209,11 @@ macOS
 Mahalanobis
 Mapillary
 Martyniuk
+MediaPipe
 mel
 Mels
 MERCHANTABILITY
+MF
 MiB
 microservices
 MiDaS
@@ -218,12 +227,15 @@ MONAI's
 Monodepth
 monodepth
 MRPC
+Multiclass
+multiclass
 MultiHeadAttention
 multimodal
 Multimodality
 Nakayosi
 nano
 nar
+NAS
 natively
 NETP
 NLP
@@ -253,6 +265,7 @@ OpenVINO
 openvino
 OpenVINO's
 opset
+optimizable
 overfitting
 overlayed
 OVMS
@@ -268,9 +281,11 @@ PAF
 PAFs
 parallelized
 parameterization
+parametrize
 performant
 PersonaGPT
 photorealism
+Piotr
 Pipelining
 PNDM
 Pointilism
@@ -282,6 +297,7 @@ Postprocessing
 PowerShell
 PPYOLOv
 PR
+Prateek
 pre
 Precisions
 prefetching
@@ -317,6 +333,8 @@ Quantizing
 quantizing
 QuartzNet
 Radiopaedia
+Radosavovic
+Raj
 Ranftl
 RASPP
 rcnn
@@ -325,6 +343,8 @@ Realtime
 realtime
 rebase
 redistributable
+RegNet
+RegNetY
 reidentification
 ReLU
 repo
@@ -355,6 +375,7 @@ Segmentations
 segmentations
 Segmenter
 segmenter
+serializable
 ShapeNet
 siggraph
 sigmoid
@@ -397,11 +418,13 @@ tokenizers
 tokenizes
 tokenizing
 TorchMetrics
+TorchScript
 torchvision
 tunable
 tv
 Udnie
 UI
+UINT
 Ultralytics
 Uncheck
 uncomment
@@ -442,4 +465,4 @@ XYWH
 YOLO
 YOLOv
 yolov
-Zongyuan
+Zongyuanx
