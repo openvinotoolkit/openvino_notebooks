@@ -1,7 +1,6 @@
 107-speech-recognition-quantization
 108-gpu-device
 117-model-server
-111-yolov5-quantization-migration
 223-text-prediction
 225-stable-diffusion-text-to-image
 231-instruct-pix2pix-image-editing
