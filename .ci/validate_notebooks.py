@@ -98,7 +98,8 @@ def run_test(notebook_path, root):
             return 0
         
         main_command = [sys.executable,  '-m',  'treon', notebook_name]
-        retcode = subprocess.run(main_command).returncode
+        print(main_command)
+        retcode = subprocess.run(main_command, shell=True).returncode
 
         clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
     return retcode
