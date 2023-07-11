@@ -5,7 +5,7 @@ import csv
 import shutil
 from pathlib import Path
 from argparse import ArgumentParser
-
+import platform
 
 ROOT = Path(__file__).parents[1]
 
@@ -99,7 +99,7 @@ def run_test(notebook_path, root):
         
         main_command = [sys.executable,  '-m',  'treon', notebook_name]
         print(main_command)
-        retcode = subprocess.run(main_command, shell=True).returncode
+        retcode = subprocess.run(main_command, shell=(platform.system() == "Windows")).returncode
 
         clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
     return retcode
