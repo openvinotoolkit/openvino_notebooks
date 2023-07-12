@@ -19,6 +19,7 @@
       - [`nbqa`](#nbqa)
       - [`nbdime`](#nbdime)
       - [JupyterLab Code Formatter](#jupyterlab-code-formatter)
+      - [`PySpelling`](#pyspelling)
   - [Getting started](#getting-started)
     - [Pull Requests (PRs)](#pull-requests-prs)
   - [Help](#help)
@@ -228,7 +229,8 @@ We use GitHub Actions to automatically validate that all notebooks work. The fol
   - Uses [`flake8`](https://github.com/pycqa/flake8) to check for unnecessary imports and variables 
 and some style issues
   - Verifies that the notebook is included in the main `README.md` and the `README.md` in the notebooks directory. 
-  - Runs the check_install script to test for installation issues
+  - Runs the `check_install.py` script to test for installation issues
+- Spell check: spell checking is performed by `PySpelling` module which requires `Aspell` spell checker in conjunction with our custom word list dictionary (`.ci/spellcheck/.pyspelling.wordlist.txt`).
 - `docker_treon`: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
   To manually run this test, build the Docker image with `docker build -t openvino_notebooks .` and run the tests with
   `docker run -it  --entrypoint /tmp/scripts/test openvino_notebooks`. It is recommended to build the image on a clean 
@@ -271,6 +273,10 @@ standard `diff` tool for `git`, with much more useful output than the regular `g
 button to Jupyter Lab to automatically format the code in notebooks with `black` and `isort`. Please
 use either this extension or a different way to automatically format your notebook.
 
+#### `PySpelling`
+
+[`PySpelling`](https://facelessuser.github.io/pyspelling/) is a module to help with automating spell checking and it is essentially a wrapper around the `Aspell` command line utility. To run spell checking locally, execute the following command: `python .ci/spellcheck/run_spellcheck.py`. Additional custom (project and domain specific) word list dictionary that extends standard `Aspell` dictionary is located in `.ci/spellcheck/.pyspelling.wordlist.txt` file. `PySpelling` configuration file can be found in `.ci/spellcheck/.pyspelling.yml` file.
+
 ## Getting started
 
 1. Create a fork, a copy of the repository, by clicking on the Fork button on the top right of the
@@ -278,6 +284,7 @@ use either this extension or a different way to automatically format your notebo
 2. Install the recommended packages for a development environment with `pip install -r
    .ci/dev-requirements.txt` inside the `openvino_env` environment. This installs all the packages
    mentioned in the [Validation](#Validation) section.
+      > **Note**: `PySpelling` dependency from `.ci/dev-requirements.txt` requires `Aspell` for spell checking that should be installed manually. For installation instructions please refer to the [`PySpelling` documentation](https://facelessuser.github.io/pyspelling/#prerequisites).
 3. Create a branch in this fork, from the *main* branch. Name the
    branch however you like.
 4. Double-check the points in the [Design Decisions](#design-decisions) and [Validation](#Validation) sections.
