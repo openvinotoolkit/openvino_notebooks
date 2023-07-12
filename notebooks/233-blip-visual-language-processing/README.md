@@ -30,11 +30,26 @@ The following image shows an example of the input image, question and answer gen
 
 ## Notebook Contents
 
-The tutorial consists of the following parts:
+This folder contains two notebooks that show how to convert and quantize model with OpenVINO:
+
+1. [Convert the BLIP model using OpenVINO](233-blip-visual-language-processing.ipynb)
+2. [Quantize the OpenVINO BLIP model using NNCF](233-blip-quantize-nncf.ipynb)
+
+The 1st notebook  consists of the following parts:
+
 1. Instantiate a BLIP model.
 2. Convert the BLIP model to OpenVINO IR.
 3. Run visual question answering and image captioning with OpenVINO.
 
+The 2nd notebook  consists of the following parts:
+
+1. Download and preprocess dataset for quantization.
+2. Quantize the converted OpenVINO models from [1st notebook](233-blip-visual-language-processing.ipynb) with NNCF.
+3. Check the model result using the same input data from the [1st notebook](233-blip-visual-language-processing.ipynb).
+4. Compare model size of converted and quantized models.
+5. Compare performance of converted and quantized models.
+
+NNCF performs quantization within the OpenVINO IR. It is required to run the 1st notebook before running the 2nd notebook.
 
 ## Installation Instructions
 
