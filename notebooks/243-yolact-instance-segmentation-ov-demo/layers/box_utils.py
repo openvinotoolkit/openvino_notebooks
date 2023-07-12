@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import torch
-from utils.postprocess import timer
+from utils import timer
 
-from utils.config import cfg
+from data.config import cfg
 
 # @torch.jit.script
 def point_form(boxes):

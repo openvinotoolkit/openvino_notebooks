@@ -5,7 +5,7 @@ import numpy as np
 import types
 from numpy import random
 
-from utils.config import cfg, MEANS, STD
+from data.config import cfg, MEANS, STD
 
 
 def intersect(box_a, box_b):
