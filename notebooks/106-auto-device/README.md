@@ -2,7 +2,7 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F106-auto-device%2F106-auto-device.ipynb)
 
-This notebook shows how to do inference with Automatic Device Selection (AUTO). To learn more about the logic of this mode, refer to the [Automatic device selection](https://docs.openvino.ai/latest/openvino_docs_IE_DG_supported_plugins_AUTO.html) article.
+This notebook shows how to do inference with Automatic Device Selection (AUTO). To learn more about the logic of this mode, refer to the [Automatic device selection](https://docs.openvino.ai/nightly/openvino_docs_OV_UG_supported_plugins_AUTO.html) article.
 
 ## Notebook Contents
 

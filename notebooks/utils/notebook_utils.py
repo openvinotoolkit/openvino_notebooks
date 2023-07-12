@@ -5,28 +5,20 @@
 
 
 import os
-import socket
 import threading
 import time
-import urllib
 import urllib.parse
-import urllib.request
 from os import PathLike
 from pathlib import Path
-from typing import Callable, List, NamedTuple, Optional, Tuple
+from typing import List, NamedTuple, Optional, Tuple
 
-import cv2
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 from openvino.runtime import Core, get_version
-from IPython.display import HTML, Image, Markdown, display
-from matplotlib.lines import Line2D
-from tqdm.notebook import tqdm_notebook
+from IPython.display import HTML, Image, display
 
 
 # ## Files
-# 
+#
 # Load an image, download a file, download an IR model, and create a progress bar to show download progress.
 
 # In[ ]:
@@ -42,27 +34,18 @@ def load_image(path: str) -> np.ndarray:
     :param path: Local path name or URL to image.
     :return: image as BGR numpy array
     """
+    import cv2
+    import requests
+
     if path.startswith("http"):
         # Set User-Agent to Mozilla because some websites block
         # requests with User-Agent Python
-        request = urllib.request.Request(path, headers={"User-Agent": "Mozilla/5.0"})
-        response = urllib.request.urlopen(request)
-        array = np.asarray(bytearray(response.read()), dtype="uint8")
+        response = requests.get(path, headers={"User-Agent": "Mozilla/5.0"})
+        array = np.asarray(bytearray(response.content), dtype="uint8")
         image = cv2.imdecode(array, -1)  # Loads the image as BGR
     else:
         image = cv2.imread(path)
     return image
-
-
-class DownloadProgressBar(tqdm_notebook):
-    """
-    TQDM Progress bar for downloading files with urllib.request.urlretrieve
-    """
-
-    def update_to(self, block_num: int, block_size: int, total_size: int):
-        downloaded = block_num * block_size
-        if downloaded <= total_size:
-            self.update(downloaded - self.n)
 
 
 def download_file(
@@ -72,7 +55,7 @@ def download_file(
     show_progress: bool = True,
     silent: bool = False,
     timeout: int = 10,
-) -> str:
+) -> PathLike:
     """
     Download a file from a url and save it to the local filesystem. The file is saved to the
     current directory by default, or to `directory` if specified. If a filename is not given,
@@ -88,25 +71,11 @@ def download_file(
     :param timeout: Number of seconds before cancelling the connection attempt
     :return: path to downloaded file
     """
-    try:
-        opener = urllib.request.build_opener()
-        opener.addheaders = [("User-agent", "Mozilla/5.0")]
-        urllib.request.install_opener(opener)
-        urlobject = urllib.request.urlopen(url, timeout=timeout)
-        if filename is None:
-            filename = urlobject.info().get_filename() or Path(urllib.parse.urlparse(url).path).name
-    except urllib.error.HTTPError as e:
-        raise Exception(f"File downloading failed with error: {e.code} {e.msg}") from None
-    except urllib.error.URLError as error:
-        if isinstance(error.reason, socket.timeout):
-            raise Exception(
-                "Connection timed out. If you access the internet through a proxy server, please "
-                "make sure the proxy is set in the shell from where you launched Jupyter. If your "
-                "internet connection is slow, you can call `download_file(url, timeout=30)` to "
-                "wait for 30 seconds before raising this error."
-            ) from None
-        else:
-            raise
+    from tqdm.notebook import tqdm_notebook
+    import requests
+
+    filename = filename or Path(urllib.parse.urlparse(url).path).name
+    chunk_size = 16384  # make chunks bigger so that not too many updates are triggered for Jupyter front-end
 
     filename = Path(filename)
     if len(filename.parts) > 1:
@@ -121,24 +90,45 @@ def download_file(
         directory.mkdir(parents=True, exist_ok=True)
         filename = directory / Path(filename)
 
+    try:
+        response = requests.get(url=url, 
+                                headers={"User-agent": "Mozilla/5.0"}, 
+                                stream=True)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as error:  # For error associated with not-200 codes. Will output something like: "404 Client Error: Not Found for url: {url}"
+        raise Exception(error) from None
+    except requests.exceptions.Timeout:
+        raise Exception(
+                "Connection timed out. If you access the internet through a proxy server, please "
+                "make sure the proxy is set in the shell from where you launched Jupyter."
+        ) from None
+    except requests.exceptions.RequestException as error:
+        raise Exception(f"File downloading failed with error: {error}") from None
+
     # download the file if it does not exist, or if it exists with an incorrect file size
-    urlobject_size = int(urlobject.info().get("Content-Length", 0))
-    if not filename.exists() or (os.stat(filename).st_size != urlobject_size):
-        progress_callback = DownloadProgressBar(
-            total=urlobject_size,
+    filesize = int(response.headers.get("Content-length", 0))
+    if not filename.exists() or (os.stat(filename).st_size != filesize):
+
+        with tqdm_notebook(
+            total=filesize,
             unit="B",
             unit_scale=True,
             unit_divisor=1024,
             desc=str(filename),
             disable=not show_progress,
-        )
-        urllib.request.urlretrieve(url, filename, reporthook=progress_callback.update_to)
-        if os.stat(filename).st_size >= urlobject_size:
-            progress_callback.update(urlobject_size - progress_callback.n)
-            progress_callback.refresh()
+        ) as progress_bar:
+
+            with open(filename, "wb") as file_object:
+                for chunk in response.iter_content(chunk_size):
+                    file_object.write(chunk)
+                    progress_bar.update(len(chunk))
+                    progress_bar.refresh()
     else:
         if not silent:
             print(f"'{filename}' already exists.")
+
+    response.close()
+
     return filename.resolve()
 
 
@@ -183,6 +173,7 @@ def to_rgb(image_data: np.ndarray) -> np.ndarray:
     """
     Convert image_data from BGR to RGB
     """
+    import cv2
     return cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
 
 
@@ -190,6 +181,7 @@ def to_bgr(image_data: np.ndarray) -> np.ndarray:
     """
     Convert image_data from RGB to BGR
     """
+    import cv2
     return cv2.cvtColor(image_data, cv2.COLOR_RGB2BGR)
 
 
@@ -215,6 +207,9 @@ class VideoPlayer:
     """
 
     def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
+        import cv2
+
+        self.cv2 = cv2  # This is done to access the package in class methods
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
             raise RuntimeError(
@@ -292,15 +287,17 @@ class VideoPlayer:
     """
 
     def next(self):
+        import cv2
+
         with self.__lock:
             if self.__frame is None:
                 return None
             # need to copy frame, because can be cached and reused if fps is low
             frame = self.__frame.copy()
         if self.__size is not None:
-            frame = cv2.resize(frame, self.__size, interpolation=self.__interpolation)
+            frame = self.cv2.resize(frame, self.__size, interpolation=self.__interpolation)
         if self.__flip:
-            frame = cv2.flip(frame, 1)
+            frame = self.cv2.flip(frame, 1)
         return frame
 
 
@@ -387,6 +384,7 @@ def segmentation_map_to_image(
     :param remove_holes: If True, remove holes in the segmentation result.
     :return: An RGB image where each pixel is an int8 value according to colormap.
     """
+    import cv2
     if len(result.shape) != 2 and result.shape[0] != 1:
         raise ValueError(
             f"Expected result with shape (H,W) or (1,H,W), got result with shape {result.shape}"
@@ -434,6 +432,7 @@ def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=Fal
     :param remove_holes: If True, remove holes in the segmentation result.
     :return: An RGP image with segmentation mask overlayed on the source image.
     """
+    import cv2
     if len(image.shape) == 2:
         image = np.repeat(np.expand_dims(image, -1), 3, 2)
     mask = segmentation_map_to_image(result, colormap, remove_holes)
@@ -458,7 +457,7 @@ def viz_result_image(
     resize: bool = False,
     bgr_to_rgb: bool = False,
     hide_axes: bool = False,
-) -> matplotlib.figure.Figure:
+):
     """
     Show result image, optionally together with source images, and a legend with labels.
 
@@ -475,6 +474,10 @@ def viz_result_image(
     :param hide_axes: If true, do not show matplotlib axes.
     :return: Matplotlib figure with result image
     """
+    import cv2
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+
     if bgr_to_rgb:
         source_image = to_rgb(source_image)
     if resize:
@@ -528,6 +531,7 @@ def show_array(frame: np.ndarray, display_handle=None):
 
     Create a display_handle with: `display_handle = display(display_id=True)`
     """
+    import cv2
     _, frame = cv2.imencode(ext=".jpeg", img=frame)
     if display_handle is None:
         display_handle = display(Image(data=frame.tobytes()), display_id=True)
@@ -624,4 +628,3 @@ def check_openvino_version(version: str) -> bool:
         return False
     else:
         return True
-

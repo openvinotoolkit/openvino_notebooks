@@ -4,7 +4,6 @@ import sys
 import mistune
 import requests
 import urllib.parse
-import urllib.request
 
 from pathlib import Path
 
@@ -55,7 +54,7 @@ def main():
                 continue
 
             try:
-                get = requests.get(url)
+                get = requests.get(url, timeout=5)
                 if get.status_code != 200:
                     complain(f'{md_path}: URL can not be reached {url!r}, status code {get.status_code}')    
             except Exception as err:
