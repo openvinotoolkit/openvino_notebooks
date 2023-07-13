@@ -12,8 +12,8 @@ In this tutorial, we consider how to convert and run ImageBind model using OpenV
 
 This folder contains two notebooks that show how to convert and quantize model with OpenVINO:
 
-1. [Convert an ImageBind Model using OpenVINO](239-image-bind.ipynb)
-2. [Quantize an ImageBind Model using NNCF](239-image-bind-quantize-nncf.ipynb)
+1. [Convert an ImageBind Model using OpenVINO](239-image-bind-convert.ipynb)
+2. [Quantize an ImageBind Model using NNCF](239-image-bind-quantize.ipynb)
 
 The 1st notebook is about the conversion to IR and consists of following steps:
 
