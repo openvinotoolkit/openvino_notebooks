@@ -12,8 +12,8 @@ You can find more information about this model in the [research paper](https://a
 
 This folder contains two notebooks that show how to convert and quantize model with OpenVINO:
 
-1. [Convert the CLIP model using OpenVINO](228-clip-zero-shot-image-classification.ipynb)
-2. [Quantize the OpenVINO CLIP model using NNCF](228-clip-quantize-nncf.ipynb)
+1. [Convert the CLIP model using OpenVINO](228-clip-zero-shot-convert.ipynb)
+2. [Quantize the OpenVINO CLIP model using NNCF](228-clip-quantize.ipynb)
 
 The 1st notebook contains the following steps:
 1. Download the model.
@@ -22,8 +22,8 @@ The 1st notebook contains the following steps:
 4. Run CLIP with OpenVINO.
 
 The 2nd notebook contains the following steps:
-1. Quantize the converted OpenVINO model from [notebook](228-clip-zero-shot-image-classification.ipynb) with NNCF.
-2. Check the model result using the same input data from the [1 st notebook](228-clip-zero-shot-image-classification.ipynb).
+1. Quantize the converted OpenVINO model from [notebook](228-clip-zero-shot-convert.ipynb) with NNCF.
+2. Check the model result using the same input data from the [1 st notebook](228-clip-zero-shot-convert.ipynb).
 3. Compare model size of converted and quantized models.
 4. Compare performance of converted and quantized models.
 
