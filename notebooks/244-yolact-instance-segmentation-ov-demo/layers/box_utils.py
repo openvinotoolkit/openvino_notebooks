@@ -4,6 +4,7 @@ from utils import timer
 
 from data.config import cfg
 
+# As of March 10, 2019, Pytorch DataParallel still doesn't support JIT Script Modules
 # @torch.jit.script
 def point_form(boxes):
     """ Convert prior_boxes to (xmin, ymin, xmax, ymax)
