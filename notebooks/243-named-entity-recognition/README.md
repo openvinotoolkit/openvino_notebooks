@@ -1,5 +1,5 @@
 # Named entity recognition with OpenVINO™
-[![Colab](https://colab.research.google.com/github/sbalandi/openvino_notebooks/blob/bert/notebooks/243-named-entity-recognition/243-named-entity-recognition.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/243-named-entity-recognition/243-named-entity-recognition.ipynb)
 
 The named entity recognition (NER) is one of the most popular data preprocessing task. It is a natural language processing (NLP) method that involves the detecting of key information in the unstructured text and categorizing it into pre-defined categories. These categories or named entities refer to the key subjects of text, such as names, locations, companies and etc.
 NER is a good method for the situations when a high-level overview of a large amout of text is needed. NER can be helfull with such task as analyzing key information in unstructured text or automates the information extraction of large amounts of data.
