@@ -23,11 +23,11 @@ The first notebook contains the following steps:
 
 The second notebook contains the following steps:
 1. Quantize the converted OpenVINO model from [notebook](228-clip-zero-shot-convert.ipynb) with NNCF.
-2. Check the model result using the same input data from the [1 st notebook](228-clip-zero-shot-convert.ipynb).
+2. Check the model result using the same input data from the [first notebook](228-clip-zero-shot-convert.ipynb).
 3. Compare model size of converted and quantized models.
 4. Compare performance of converted and quantized models.
 
-NNCF performs quantization within the OpenVINO IR. It is required to run the 1st notebook before running the 2nd notebook.
+NNCF performs quantization within the OpenVINO IR. It is required to run the first notebook before running the second notebook.
 
 We will use CLIP model for zero-shot image classification. The result of model work demonstrated on the image below
 ![image](https://user-images.githubusercontent.com/29454499/207795060-437b42f9-e801-4332-a91f-cc26471e5ba2.png)
