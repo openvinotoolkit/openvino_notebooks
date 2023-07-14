@@ -79,7 +79,7 @@ Brief tutorials that demonstrate how to use OpenVINO's Python API for inference.
 | Classify an image with OpenVINO | Learn the OpenVINO Python API | Semantic segmentation with OpenVINO | Text detection with OpenVINO  | 
 | <img src="https://user-images.githubusercontent.com/36741649/127170593-86976dc3-e5e4-40be-b0a6-206379cd7df5.jpg" width=140> | <img src="https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png" width=250> | <img src="https://user-images.githubusercontent.com/15709723/128290691-e2eb875c-775e-4f4d-a2f4-15134044b4bb.png" width=150> | <img src="https://user-images.githubusercontent.com/36741649/128489933-bf215a3f-06fa-4918-8833-cb0bf9fb1cc7.jpg" width=150>  | 
 
-<div id='-convert--optimize'/>
+<div id='-convert--optimize'></div>
 
 ### ⌚ Convert & Optimize 
 
@@ -106,7 +106,7 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | [118-optimize-preprocessing](notebooks/118-optimize-preprocessing/)| Improve performance of image preprocessing step                                                                             |
 | [119-tflite-to-openvino](notebooks/119-tflite-to-openvino/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/119-tflite-to-openvino/119-tflite-to-openvino.ipynb) | Convert TensorFlow Lite models to OpenVINO IR                                                                                                            |                                                                                                            |
 | [120-tensorflow-object-detection-to-openvino](notebooks/120-tensorflow-object-detection-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F120-tensorflow-object-detection-to-openvino%2F120-tensorflow-object-detection-to-openvino.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/120-tensorflow-object-detection-to-openvino/120-tensorflow-object-detection-to-openvino.ipynb) | Convert TensorFlow Object Detection models to OpenVINO IR                                                                                                            |
-<div id='-model-demos'/>
+<div id='-model-demos'></div>
 
 ### 🎯 Model Demos
 
@@ -128,7 +128,7 @@ Demos that demonstrate inference on a particular model.
 | [211-speech-to-text](notebooks/211-speech-to-text/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F211-speech-to-text%2F211-speech-to-text.ipynb) | Run inference on speech-to-text recognition model | <img src="https://user-images.githubusercontent.com/36741649/140987347-279de058-55d7-4772-b013-0f2b12deaa61.png" width=225>|
 | [212-pyannote-speaker-diarization](notebooks/212-pyannote-speaker-diarization/)<br> | Run inference on speaker diarization pipeline | <img src="https://user-images.githubusercontent.com/29454499/218432101-0bd0c424-e1d8-46af-ba1d-ee29ed6d1229.png" width=225>|
 | [213-question-answering](notebooks/213-question-answering/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F213-question-answering%2F213-question-answering.ipynb) | Answer your questions basing on a context | <img src="https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif" width=225> |
-| [214-grammar-correction](notebooks/214-grammar-correction/) | Grammatical Error Correction with OpenVINO | **input text**: I'm working in campany for last 2 yeas <br> **Generated text**: I'm working in a company for the last 2 years. |
+| [214-grammar-correction](notebooks/214-grammar-correction/) | Grammatical Error Correction with OpenVINO | **Input text**: `I'm working in campany for last 2 yeas.` <br> **Generated text**: `I'm working in a company for the last 2 years.` |
 | [215-image-inpainting](notebooks/215-image-inpainting/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F215-image-inpainting%2F215-image-inpainting.ipynb)| Fill missing pixels with image in-painting | <img src="https://user-images.githubusercontent.com/4547501/167121084-ec58fbdb-b269-4de2-9d4c-253c5b95de1e.png" width=225> |
 | [216-attention-center](notebooks/216-attention-center/)<br>| The attention center model with OpenVINO™ |  |
 | [217-vision-deblur](notebooks/217-vision-deblur/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F217-vision-deblur%2F217-vision-deblur.ipynb) | Deblur Images with DeblurGAN-v2 | <img src="https://user-images.githubusercontent.com/41332813/158430181-05d07f42-cdb8-4b7a-b7dc-e7f7d9391877.png" width=225> |
@@ -144,23 +144,22 @@ Demos that demonstrate inference on a particular model.
 | [228-clip-zero-shot-image-classification](notebooks/228-clip-zero-shot-image-classification)<br> | Perform Zero-shot Image Classification with CLIP and OpenVINO | <img src=https://user-images.githubusercontent.com/29454499/207795060-437b42f9-e801-4332-a91f-cc26471e5ba2.png  width=500> |
 | [229-distilbert-sequence-classification](notebooks/229-distilbert-sequence-classification/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F229-distilbert-sequence-classification%2F229-distilbert-sequence-classification.ipynb) | Sequence Classification with OpenVINO | <img src = "https://user-images.githubusercontent.com/95271966/206130638-d9847414-357a-4c79-9ca7-76f4ae5a6d7f.png" width=225> |
 | [230-yolov8-optimization](notebooks/230-yolov8-optimization/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/230-yolov8-optimization/230-yolov8-optimization.ipynb) | Optimize YOLOv8 using NNCF PTQ API | <img src = "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png" width=225> |
-|[231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)<br>| Image editing with InstructPix2Pix | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=225> |
-|[232-clip-language-saliency-map](notebooks/232-clip-language-saliency-map/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/232-clip-language-saliency-map/232-clip-language-saliency-map.ipynb) | Language-Visual Saliency with CLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG width=225> | 
-|[233-blip-visual-language-processing](notebooks/233-blip-visual-language-processing/)<br>| Visual Question Answering and Image Captioning using BLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> |
-|[234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| Audio compression with EnCodec and OpenVINO™ | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
-|[235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
-|[236-stable-diffusion-v2](notebooks/236-stable-diffusion-v2/)<br>| Text-to-Image Generation and Infinite Zoom with Stable Diffusion v2 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/228882108-25c1f65d-4c23-4e1d-8ba4-f6164280a3e3.gif width=225> |
-|[237-segment-anything](notebooks/237-segment-anything/)<br>| Prompt based segmentation using Segment Anything and OpenVINO™.| <img src=https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png width=225> |
-|[238-deep-floyd-if](notebooks/238-deeployd-if/)<br>| Text-to-Image Generation with DeepFloyd IF and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/241643886-dfcf3c48-8d50-4730-ae28-a21595d9504f.png width=225> |
-|[239-image-bind](notebooks/239-image-bind/)<br>| Binding multimodal data using ImageBind and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png width=225> |
-|[240-dolly-2-instruction-following](notebooks/240-dolly-2-instruction-following/)<br>| Instruction following using Databricks Dolly 2.0 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png width=225> |
-|[241-riffusion-text-to-music](notebooks/241-riffusion-text-to-music/)<br>| Text-to-Music generation using Riffusion and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/244291912-bbc6e08c-c0a9-41fe-bc2d-5f89a0d2463b.png width=225> | 
-|[242-freevc-voice-conversion](notebooks/242-freevc-voice-conversion/)<br> | High-Quality Text-Free One-Shot Voice Conversion with FeeVC and OpenVINO™ ||
-|[243-tflite-selfie-segmentation](notebooks/243-tflite-selfie-segmentation/) <br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F243-tflite-selfie-segmentation%2F243-tflite-selfie-segmentation.ipynb)<br> [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/243-tflite-selfie-segmentation/243-tflite-selfie-segmentation.ipynb)| Selfie Segmentation using TFLite and OpenVINO™ |  <img src="https://user-images.githubusercontent.com/29454499/251085926-14045ebc-273b-4ccb-b04f-82a3f7811b87.gif" width=400>|
-|[244-depth-estimation-videpth](notebooks/244-depth-estimation-videpth/)<br>| Monocular Visual-Inertial Depth Estimation with OpenVINO™ | <img src=https://raw.githubusercontent.com/alexklwong/void-dataset/master/figures/void_samples.png width=225> |
+| [231-instruct-pix2pix-image-editing](notebooks/231-instruct-pix2pix-image-editing/)<br>| Image editing with InstructPix2Pix | <img src=https://user-images.githubusercontent.com/29454499/219943222-d46a2e2d-d348-4259-8431-37cf14727eda.png width=225> |
+| [232-clip-language-saliency-map](notebooks/232-clip-language-saliency-map/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/232-clip-language-saliency-map/232-clip-language-saliency-map.ipynb) | Language-Visual Saliency with CLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG width=225> | 
+| [233-blip-visual-language-processing](notebooks/233-blip-visual-language-processing/)<br>| Visual Question Answering and Image Captioning using BLIP and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/221933762-4ff32ecb-5e5d-4484-80e1-e9396cb3c511.png width=225> |
+| [234-encodec-audio-compression](notebooks/234-encodec-audio-compression/)<br>| Audio compression with EnCodec and OpenVINO™ | <img src=https://github.com/facebookresearch/encodec/raw/main/thumbnail.png width=225> |
+| [235-controlnet-stable-diffusion](notebooks/235-controlnet-stable-diffusion/)<br>| A Text-to-Image Generation with ControlNet Conditioning and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/224541412-9d13443e-0e42-43f2-8210-aa31820c5b44.png width=225> |
+| [236-stable-diffusion-v2](notebooks/236-stable-diffusion-v2/)<br>| Text-to-Image Generation and Infinite Zoom with Stable Diffusion v2 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/228882108-25c1f65d-4c23-4e1d-8ba4-f6164280a3e3.gif width=225> |
+| [237-segment-anything](notebooks/237-segment-anything/)<br>| Prompt based segmentation using Segment Anything and OpenVINO™.| <img src=https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png width=225> |
+| [238-deep-floyd-if](notebooks/238-deeployd-if/)<br>| Text-to-Image Generation with DeepFloyd IF and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/241643886-dfcf3c48-8d50-4730-ae28-a21595d9504f.png width=225> |
+| [239-image-bind](notebooks/239-image-bind/)<br>| Binding multimodal data using ImageBind and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png width=225> |
+| [240-dolly-2-instruction-following](notebooks/240-dolly-2-instruction-following/)<br>| Instruction following using Databricks Dolly 2.0 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png width=225> |
+| [241-riffusion-text-to-music](notebooks/241-riffusion-text-to-music/)<br>| Text-to-Music generation using Riffusion and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/244291912-bbc6e08c-c0a9-41fe-bc2d-5f89a0d2463b.png width=225> | 
+| [242-freevc-voice-conversion](notebooks/242-freevc-voice-conversion/)<br> | High-Quality Text-Free One-Shot Voice Conversion with FreeVC and OpenVINO™ ||
+| [243-tflite-selfie-segmentation](notebooks/243-tflite-selfie-segmentation/) <br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F243-tflite-selfie-segmentation%2F243-tflite-selfie-segmentation.ipynb)<br> [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/243-tflite-selfie-segmentation/243-tflite-selfie-segmentation.ipynb)| Selfie Segmentation using TFLite and OpenVINO™ |  <img src="https://user-images.githubusercontent.com/29454499/251085926-14045ebc-273b-4ccb-b04f-82a3f7811b87.gif" width=400>|
+| [244-depth-estimation-videpth](notebooks/244-depth-estimation-videpth/)<br>| Monocular Visual-Inertial Depth Estimation with OpenVINO™ | <img src=https://raw.githubusercontent.com/alexklwong/void-dataset/master/figures/void_samples.png width=225> |
 
-
-<div id='-model-training'/>
+<div id='-model-training'></div>
 
 ### 🏃 Model Training
 
@@ -173,7 +172,7 @@ Tutorials that include code to train neural networks.
 | [302-pytorch-quantization-aware-training](notebooks/302-pytorch-quantization-aware-training/) | Use Neural Network Compression Framework (NNCF) to quantize PyTorch model | |
 | [305-tensorflow-quantization-aware-training](notebooks/305-tensorflow-quantization-aware-training/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/305-tensorflow-quantization-aware-training/305-tensorflow-quantization-aware-training.ipynb) | Use Neural Network Compression Framework (NNCF) to quantize TensorFlow model | |
 
-<div id='-live-demos'/>
+<div id='-live-demos'></div>
 
 ### 📺 Live Demos
 Live inference demos that run on a webcam or video files.
@@ -193,7 +192,7 @@ If you run into issues, please check the [troubleshooting section](#-troubleshoo
 Notebooks with ![binder logo](https://mybinder.org/badge_logo.svg) and ![colab logo](https://colab.research.google.com/assets/colab-badge.svg) buttons can be run without installing anything. [Binder](https://mybinder.org/) and [Google Colab](https://colab.research.google.com/) are free online services with limited resources. For the best performance, please follow the [Installation Guide](#-installation-guide) and run the notebooks locally.
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
-<div id='-system-requirements'/>
+<div id='-system-requirements'></div>
 
 ## ⚙️ System Requirements
 
@@ -210,7 +209,7 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 | Windows Server 2016 or higher                              | 3.8 - 3.10                                         |
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)
-<div id='-run-the-notebooks'/>
+<div id='-run-the-notebooks'></div>
 
 ## 💻 Run the Notebooks
 
@@ -233,57 +232,62 @@ In your browser, select a notebook from the file browser in Jupyter Lab using th
 <img src="https://user-images.githubusercontent.com/15709723/120527271-006fd200-c38f-11eb-9935-2d36d50bab9f.gif">
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
-<div id='-cleaning-up'/>
+<div id='-cleaning-up'></div>
 
 ## 🧹 Cleaning Up
 
-<div id='-shut-down-jupyter-kernel'>
-&#8226; Shut Down Jupyter Kernel
+<div id='-shut-down-jupyter-kernel' markdown="1">
 
-To end your Jupyter session, press `Ctrl-c`. This will prompt you to `Shutdown this Jupyter server (y/[n])?` enter `y` and hit `Enter`.
+1. Shut Down Jupyter Kernel
+
+	To end your Jupyter session, press `Ctrl-c`. This will prompt you to `Shutdown this Jupyter server (y/[n])?` enter `y` and hit `Enter`.
 </div>	
 	
-<div id='-deactivate-virtual-environment'>
-&#8226; Deactivate Virtual Environment
+<div id='-deactivate-virtual-environment' markdown="1">
 
-To deactivate your virtualenv, simply run `deactivate` from the terminal window where you activated `openvino_env`. This will deactivate your environment.
+2. Deactivate Virtual Environment
 
-To reactivate your environment, run `source openvino_env/bin/activate` on Linux or `openvino_env\Scripts\activate` on Windows, then type `jupyter lab` or `jupyter notebook` to launch the notebooks again.
+	To deactivate your virtualenv, simply run `deactivate` from the terminal window where you activated `openvino_env`. This will deactivate your environment.
+
+	To reactivate your environment, run `source openvino_env/bin/activate` on Linux or `openvino_env\Scripts\activate` on Windows, then type `jupyter lab` or `jupyter notebook` to launch the notebooks again.
 </div>	
 
-<div id='-delete-virtual-environment'>
-&#8226; Delete Virtual Environment _(Optional)_
+<div id='-delete-virtual-environment' markdown="1">
 
-To remove your virtual environment, simply delete the `openvino_env` directory:
+3. Delete Virtual Environment _(Optional)_
+
+	To remove your virtual environment, simply delete the `openvino_env` directory:
 </div>
 
-<div id='-on-linux-and-macos'>
-&#8226; On Linux and macOS:
+<div id='-on-linux-and-macos' markdown="1">
 
-```bash
-rm -rf openvino_env
-```
+  - On Linux and macOS:
 
+	```bash
+	rm -rf openvino_env
+	```
 </div>
 
-<div id='-on-windows'>
-&#8226; On Windows:
+<div id='-on-windows' markdown="1">
 
-```bash
-rmdir /s openvino_env
-```
+  - On Windows:
+
+	```bash
+	rmdir /s openvino_env
+	```
 </div>
 
-<div id='-remove-openvino-env-kernel'>
-&#8226; Remove openvino_env Kernel from Jupyter
+<div id='-remove-openvino-env-kernel' markdown="1">
 
-```bash
-jupyter kernelspec remove openvino_env
-```
+  - Remove `openvino_env` Kernel from Jupyter
+
+	```bash
+	jupyter kernelspec remove openvino_env
+	```
 </div>
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
-<div id='-troubleshooting'/>
+<div id='-troubleshooting'></div>
 
 ## ⚠️ Troubleshooting
 
@@ -292,12 +296,12 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 
 - To check some common installation problems, run `python check_install.py`. This script is located in the openvino_notebooks directory.
   Please run it after activating the `openvino_env` virtual environment.
-- If you get an `ImportError`, doublecheck that you installed the Jupyter kernel. If necessary, choose the openvino\_env kernel from the _Kernel->Change Kernel_ menu) in Jupyter Lab or Jupyter Notebook
-- If OpenVINO is installed globally, do not run installation commands in a terminal where setupvars.bat or setupvars.sh are sourced.
-- For Windows installation, it is recommended to use _Command Prompt (cmd.exe)_, not _PowerShell_.
+- If you get an `ImportError`, double-check that you installed the Jupyter kernel. If necessary, choose the `openvino_env` kernel from the _Kernel->Change Kernel_ menu in Jupyter Lab or Jupyter Notebook.
+- If OpenVINO is installed globally, do not run installation commands in a terminal where `setupvars.bat` or `setupvars.sh` are sourced.
+- For Windows installation, it is recommended to use _Command Prompt (`cmd.exe`)_, not _PowerShell_.
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#-contributors)
-<div id='-contributors'/>
+<div id='-contributors'></div>
 
 ## 🧑‍💻 Contributors
 
@@ -305,10 +309,10 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
   <img src="https://contrib.rocks/image?repo=openvinotoolkit/openvino_notebooks" />
 </a>
 
-Made with [contributors-img](https://contrib.rocks).
+Made with [`contrib.rocks`](https://contrib.rocks).
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
-<div id='-faq'/>
+<div id='-faq'></div>
 
 ## ❓ FAQ
 
