@@ -230,7 +230,7 @@ We use GitHub Actions to automatically validate that all notebooks work. The fol
 and some style issues
   - Verifies that the notebook is included in the main `README.md` and the `README.md` in the notebooks directory. 
   - Runs the `check_install.py` script to test for installation issues
-- Spell check: spell checking is performed by `PySpelling` module which requires `Aspell` spell checker in conjunction with our custom word list dictionary (`.ci/spellcheck/.pyspelling.wordlist.txt`).
+- Spell check: spell checking is performed by `PySpelling` module which requires `Aspell` spell checker in conjunction with our custom word list dictionary (`.ci/spellcheck/.pyspelling.wordlist.txt`). For information about dealing with found spelling problems please refer to th [`PySpelling` section below](#pyspelling).
 - `docker_treon`: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
   To manually run this test, build the Docker image with `docker build -t openvino_notebooks .` and run the tests with
   `docker run -it  --entrypoint /tmp/scripts/test openvino_notebooks`. It is recommended to build the image on a clean 
@@ -275,7 +275,17 @@ use either this extension or a different way to automatically format your notebo
 
 #### `PySpelling`
 
-[`PySpelling`](https://facelessuser.github.io/pyspelling/) is a module to help with automating spell checking and it is essentially a wrapper around the `Aspell` command line utility. To run spell checking locally, execute the following command: `python .ci/spellcheck/run_spellcheck.py`. Additional custom (project and domain specific) word list dictionary that extends standard `Aspell` dictionary is located in `.ci/spellcheck/.pyspelling.wordlist.txt` file. `PySpelling` configuration file can be found in `.ci/spellcheck/.pyspelling.yml` file.
+[`PySpelling`](https://facelessuser.github.io/pyspelling/) is a module to help with automating spell checking and it is essentially a wrapper around the `Aspell` command line utility. Additional custom (project and domain specific) word list dictionary that extends standard `Aspell` dictionary is located in `.ci/spellcheck/.pyspelling.wordlist.txt` file. `PySpelling` configuration file can be found in `.ci/spellcheck/.pyspelling.yml` file.
+
+To run spell checking locally, execute the following command:
+```
+python .ci/spellcheck/run_spellcheck.py
+```
+
+If spell check is failing, there are any typos or new words, you have two possible options how to fix it:
+
+1. Add new word (abbreviation, name, term etc.) to the word list dictionary (`.ci/spellcheck/.pyspelling.wordlist.txt`)
+2. Skip single occurrence of unknown word or even whole phrase - just wrap the text with `<spell>` tag (for example, `<spell>Unknown word or phrase</spell>`). Note that `<spell>` is a custom tag and it doesn't affect the Markdown formatting and style (unlike <spell>backticks</spell> in preformatted text and code blocks).
 
 ## Getting started
 
