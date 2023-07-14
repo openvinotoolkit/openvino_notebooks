@@ -15,7 +15,7 @@ This folder contains two notebooks that show how to convert and quantize model w
 1. [Convert the CLIP model using OpenVINO](228-clip-zero-shot-convert.ipynb)
 2. [Quantize the OpenVINO CLIP model using NNCF](228-clip-zero-shot-quantize.ipynb)
 
-The 1st notebook contains the following steps:
+The first notebook contains the following steps:
 1. Download the model.
 2. Instantiate the PyTorch model.
 3. Export the ONNX model and convert it to OpenVINO IR, using the Model Optimizer tool.
