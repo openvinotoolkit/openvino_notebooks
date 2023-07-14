@@ -21,7 +21,7 @@ The first notebook contains the following steps:
 3. Export the ONNX model and convert it to OpenVINO IR, using the Model Optimizer tool.
 4. Run CLIP with OpenVINO.
 
-The 2nd notebook contains the following steps:
+The second notebook contains the following steps:
 1. Quantize the converted OpenVINO model from [notebook](228-clip-zero-shot-convert.ipynb) with NNCF.
 2. Check the model result using the same input data from the [1 st notebook](228-clip-zero-shot-convert.ipynb).
 3. Compare model size of converted and quantized models.
