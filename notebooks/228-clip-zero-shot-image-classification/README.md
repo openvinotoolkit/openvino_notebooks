@@ -13,7 +13,7 @@ You can find more information about this model in the [research paper](https://a
 This folder contains two notebooks that show how to convert and quantize model with OpenVINO:
 
 1. [Convert the CLIP model using OpenVINO](228-clip-zero-shot-convert.ipynb)
-2. [Quantize the OpenVINO CLIP model using NNCF](228-clip-quantize.ipynb)
+2. [Quantize the OpenVINO CLIP model using NNCF](228-clip-zero-shot-quantize.ipynb)
 
 The 1st notebook contains the following steps:
 1. Download the model.
