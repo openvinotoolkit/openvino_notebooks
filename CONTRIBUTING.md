@@ -230,7 +230,7 @@ We use GitHub Actions to automatically validate that all notebooks work. The fol
 and some style issues
   - Verifies that the notebook is included in the main `README.md` and the `README.md` in the notebooks directory. 
   - Runs the `check_install.py` script to test for installation issues
-- Spell check: spell checking is performed by `PySpelling` module which requires `Aspell` spell checker in conjunction with our custom word list dictionary (`.ci/spellcheck/.pyspelling.wordlist.txt`). For information about dealing with found spelling problems please refer to th [`PySpelling` section below](#pyspelling).
+- Spell check: spell checking is performed by `PySpelling` module which requires `Aspell` spell checker in conjunction with our custom word list dictionary (`.ci/spellcheck/.pyspelling.wordlist.txt`). For information about dealing with found spelling problems please refer to the [`PySpelling` section below](#pyspelling).
 - `docker_treon`: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
   To manually run this test, build the Docker image with `docker build -t openvino_notebooks .` and run the tests with
   `docker run -it  --entrypoint /tmp/scripts/test openvino_notebooks`. It is recommended to build the image on a clean 
