@@ -2,7 +2,7 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F113-image-classification-quantization%2F113-image-classification-quantization.ipynb)
 
 This tutorial demonstrates how to apply `INT8` quantization to the MobileNet V2 Image Classification model, using the 
-[NNCF Post-Training Quantization API](https://docs.openvino.ai/2023.0/ptq_introduction.html). The tutorial uses [mobilenet-v2](https://pytorch.org/vision/stable/_modules/torchvision/models/mobilenetv2.html) and [Cifar10 dataset](https://www.cs.toronto.edu/~kriz/cifar.html).
+[NNCF Post-Training Quantization API](https://docs.openvino.ai/2023.0/ptq_introduction.html). The tutorial uses [MobileNetV2](https://pytorch.org/vision/stable/_modules/torchvision/models/mobilenetv2.html) and [Cifar10 dataset](https://www.cs.toronto.edu/~kriz/cifar.html).
 The code of the tutorial is designed to be extendable to custom models and datasets. 
 
 ## Notebook Contents
