@@ -10,7 +10,7 @@ This tutorial explains how to convert and optimize the [YOLOv8](https://github.c
 
 ## Notebook Contents
 
-This tutorial demonstrates step-by-step instructions on how to run and optimize PyTorch Yolo V8 with OpenVINO.
+This tutorial demonstrates step-by-step instructions on how to run and optimize PyTorch YOLOv8 with OpenVINO.
 
 The tutorial consists of the following steps:
 - Prepare the PyTorch model.
