@@ -237,6 +237,7 @@ nano
 nar
 NAS
 natively
+NER
 NETP
 NLP
 NMS
