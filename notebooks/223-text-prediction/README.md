@@ -35,9 +35,9 @@ The following image shows an example of a conversation.
 
 The notebook demonstrates text prediction with OpenVINO using the following models
 
-* [gpt-2](https://huggingface.co/gpt2) model from HuggingFace Transformers.
-* [gpt-neo](https://huggingface.co/EleutherAI/gpt-neo-125M) model from HuggingFace Transformers.
-* [personaGPT](https://huggingface.co/af1tang/personaGPT) model from HuggingFace Transformers
+* [GPT-2](https://huggingface.co/gpt2) model from HuggingFace Transformers.
+* [GPT-Neo 125M](https://huggingface.co/EleutherAI/gpt-neo-125M) model from HuggingFace Transformers.
+* [PersonaGPT](https://huggingface.co/af1tang/personaGPT) model from HuggingFace Transformers
 ## Installation Instructions
 
 This is a self-contained example that relies solely on its own code.</br>
