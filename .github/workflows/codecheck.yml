@@ -77,12 +77,9 @@ jobs:
     - name: Test Jupyterlab
       run: |
         jupyter lab notebooks --help
-    - name: Ruff
-      id: ruff
-      uses: chartboost/ruff-action@v1
-      with:
-        src: notebooks
-        args: --ignore=E124,E203,E231,E266,E402,E501,E703,F821,W503,W291,W293 --exclude="(301.*)|(302.*)"
+    - name: Flake8
+      run: |
+        nbqa flake8 --ignore=E124,E203,E231,E266,E402,E501,E703,F821,W503,W291,W293 --nbqa-exclude="(301.*)|(302.*)" notebooks
     - name: Test READMEs and requirements
       run: |
         python -m pytest .ci/test_notebooks.py
