@@ -114,10 +114,10 @@ def box_score_fast(bitmap, _box):
     '''
     h, w = bitmap.shape[:2]
     box = _box.copy()
-    xmin = np.clip(np.floor(box[:, 0].min()).astype(np.int), 0, w - 1)
-    xmax = np.clip(np.ceil(box[:, 0].max()).astype(np.int), 0, w - 1)
-    ymin = np.clip(np.floor(box[:, 1].min()).astype(np.int), 0, h - 1)
-    ymax = np.clip(np.ceil(box[:, 1].max()).astype(np.int), 0, h - 1)
+    xmin = np.clip(np.floor(box[:, 0].min()).astype(np.int32), 0, w - 1)
+    xmax = np.clip(np.ceil(box[:, 0].max()).astype(np.int32), 0, w - 1)
+    ymin = np.clip(np.floor(box[:, 1].min()).astype(np.int32), 0, h - 1)
+    ymax = np.clip(np.ceil(box[:, 1].max()).astype(np.int32), 0, h - 1)
 
     mask = np.zeros((ymax - ymin + 1, xmax - xmin + 1), dtype=np.uint8)
     box[:, 0] = box[:, 0] - xmin
@@ -289,7 +289,7 @@ def get_rotate_crop_image(img, points):
 postprocess_params = {
             'name': 'CTCLabelDecode',
             "character_type": "ch",
-            "character_dict_path": "../data/text/ppocr_keys_v1.txt",
+            "character_dict_path": "./fonts/ppocr_keys_v1.txt",
             "use_space_char": True
         }
 
@@ -417,7 +417,8 @@ def draw_ocr_box_txt(image,
                      boxes,
                      txts,
                      scores=None,
-                     drop_score=0.5):
+                     drop_score=0.5,
+                     font_path='./fonts/simfang.ttf'):
     h, w = image.height, image.width
     img_left = image.copy()
     img_right = Image.new('RGB', (w, h), (255, 255, 255))
@@ -443,7 +444,7 @@ def draw_ocr_box_txt(image,
             1])**2)
         if box_height > 2 * box_width:
             font_size = max(int(box_width * 0.9), 10)
-            font = ImageFont.truetype('../data/font/simfang.ttf', font_size)
+            font = ImageFont.truetype(font_path, font_size)
             cur_y = box[0][1]
             for c in txt:
                 char_size = font.getsize(c)
@@ -452,7 +453,7 @@ def draw_ocr_box_txt(image,
                 cur_y += char_size[1]
         else:
             font_size = max(int(box_height * 0.8), 10)
-            font = ImageFont.truetype('../data/font/simfang.ttf', font_size)
+            font = ImageFont.truetype(font_path, font_size)
             draw_right.text(
                 [box[0][0], box[0][1]], txt, fill=(0, 0, 0), font=font)
     img_left = Image.blend(image, img_left, 0.5)
