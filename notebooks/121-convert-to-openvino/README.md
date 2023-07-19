@@ -1,16 +1,16 @@
-# OpenVINO™ IR conversion tutorial
+# OpenVINO™ IR conversion API tutorial
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F121-convert-to-openvino%2F121-convert-to-openvino.ipynb)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/121-convert-to-openvino/121-convert-to-openvino.ipynb)
 
-This notebook shows how to convert model from original framework to the OpenVINO IR. It provides examples of Hugging Face and Pytorch models conversion to OpenVINO IR with various parameters.
+This notebook shows how to convert model from original framework format to the OpenVINO IR. It describes Python conversion API and Model Optimizer command-line tool. It provides examples of Hugging Face and Pytorch models conversion to OpenVINO IR.
 
 ## Notebook Contents
 
 The OpenVINO IR conversion tutorial consists of the following content:
 
 * OpenVINO IR format
-* IR preparation with Python model conversion API and Model Optimizer command-line tool
+* IR preparation with Python conversion API and Model Optimizer command-line tool
 * Fetching example models
 * Basic conversion
 * Model conversion parameters
