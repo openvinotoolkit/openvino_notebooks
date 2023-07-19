@@ -104,4 +104,33 @@ _NOTE: Alternatively, you can run all steps with the following command:_
 python main.py --stream sample_video.mp4
 ```
 
-Congratulations! You have successfully set up and run the Intelligent Queue Management application with OpenVINO™.
+## Step 4
+
+Benchmark the Model with OpenVINO's Benchmark_App
+Benchmarking provides insight into your YOLOv8 model's real-world performance. Performance may vary based on use and configuration.
+
+### Benchmark Results 
+
+![YOLOv8m Benchmark Results](https://github.com/AnishaUdayakumar/intelligent-queue-management-openvino/assets/109281183/8a81243e-ee32-4b30-9994-326ecb07d32f)
+
+The benchmarks for the YOLOv8m model were run using OpenVINO version 2023.0.0 on the 4th Gen Intel® Xeon® Scalable Processor:
+
+* **Throughput** 
+  * FP16: 252FPS
+  * INT8: 195 FPS
+* **Latency**
+  * FP16: 7.94 ms
+  * INT8: 10.19 ms
+
+These figures represent the model's theoretical maximums. It's recommended to test the model in your deployment environment to gauge its real-world performance.
+
+### Running the Benchmark
+
+Use the following command to run the benchmark:
+
+```shell
+!benchmark_app -m $int8_model_det_path -d $device -hint latency -t 30
+```
+Replace `int8_model_det_path` with the path to your INT8 model and $device with the specific device you're using (CPU, GPU, etc.). This command performs inference on the model for 30 seconds. Run `benchmark_app --help` for additional command-line options.
+
+Congratulations! You have successfully set up and run the Intelligent Queue Management application with OpenVINO™ and benchmarked the model.
