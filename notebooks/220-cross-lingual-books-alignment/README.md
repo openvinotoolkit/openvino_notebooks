@@ -22,4 +22,4 @@ By visualizing the result, you can evaluate which steps in the pipeline can be i
 <img src="https://user-images.githubusercontent.com/51917466/254583163-3bb85143-627b-4f02-b628-7bef37823520.png">
 
 ## Benchmark
-<img src="https://user-images.githubusercontent.com/51917466/254586043-12cdf96b-f5bc-4233-9ba8-bc18c8bfea6b.png">
+<img src="https://user-images.githubusercontent.com/51917466/254592797-0dbb6eb5-4035-48ae-b16f-5e09b93a7e72.png">
