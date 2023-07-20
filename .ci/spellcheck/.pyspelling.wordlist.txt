@@ -30,6 +30,7 @@ Bicubic
 bicubic
 bilinear
 biometrics
+boolean
 CentOS
 charlist
 charlists
@@ -102,6 +103,7 @@ Diffusers
 diffusers
 DistilBERT
 distilbert
+distiluse
 docstring
 doi
 Dollár
@@ -138,6 +140,7 @@ Gitee
 GitHub
 GLA
 GMCNN
+GNA
 googlenet
 GOPRO
 GPT
@@ -147,6 +150,7 @@ GPUs
 Gradio
 grayscale
 gRPC
+Gutendex
 Hafner
 HandBrake
 heatmap
@@ -174,6 +178,7 @@ IRs
 iteratively
 JFLEG
 JIT
+JS
 JSON
 Jupyter
 Jupyter's
@@ -192,6 +197,8 @@ KServe
 Kubernetes
 Kupyn
 labour
+labse
+LaBSE
 LAION
 Lasinger
 latents
@@ -218,6 +225,7 @@ microservices
 MiDaS
 MidasNet
 Midjourney
+MiniLM
 MobileNet
 MobileNetV
 modelled
@@ -372,6 +380,7 @@ Saliency
 saliency
 scalability
 Scalable
+scalable
 Segmentations
 segmentations
 Segmenter
@@ -389,6 +398,7 @@ sparsified
 sparsify
 spectrogram
 spectrograms
+splitters
 SPS
 SQuAD
 SRT
