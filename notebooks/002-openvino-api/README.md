@@ -1,6 +1,7 @@
 # OpenVINO™ API tutorial
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F002-openvino-api%2F002-openvino-api.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/002-openvino-api/002-openvino-api.ipynb)
 
 
 This notebook explains the basics of the OpenVINO Runtime API.
@@ -18,6 +19,7 @@ The OpenVINO API tutorial consists of the following steps:
   * ONNX Model
   * PaddlePaddle Model
   * TensorFlow Model
+  * TensorFlow Lite Model
 * Getting Information about a Model
   * Model Inputs
   * Model Outputs
@@ -28,4 +30,6 @@ The OpenVINO API tutorial consists of the following steps:
   
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).

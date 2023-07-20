@@ -3,6 +3,7 @@ import os
 import subprocess # nosec - disable B404:import-subprocess check
 import csv
 import shutil
+import platform
 from pathlib import Path
 from argparse import ArgumentParser
 
@@ -36,6 +37,11 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
     notebooks = sorted(list(notebooks_dir.rglob('**/*.ipynb')))
     statuses = {notebook.parent.relative_to(notebooks_dir): {'status': '', 'path': notebook.parent} for notebook in notebooks}
     test_list = test_list or statuses.keys()
+    if ignore_list is not None and len(ignore_list) == 1 and ignore_list[0].endswith('.txt'):
+        with open(ignore_list[0], 'r') as f:
+            ignore_list = list(map(lambda x: x.strip(), f.readlines()))
+            print(f"ignored notebooks: {ignore_list}")
+
     if len(test_list) == 1 and test_list[0].endswith('.txt'):
         testing_notebooks = []
         with open(test_list[0], 'r') as f:
@@ -93,7 +99,7 @@ def run_test(notebook_path, root):
             return 0
         
         main_command = [sys.executable,  '-m',  'treon', notebook_name]
-        retcode = subprocess.run(main_command).returncode
+        retcode = subprocess.run(main_command, shell=(platform.system() == "Windows")).returncode
 
         clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
     return retcode

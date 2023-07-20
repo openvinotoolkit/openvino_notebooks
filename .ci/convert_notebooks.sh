@@ -3,12 +3,14 @@
 
 ignore_list=$*
 rstdir=$PWD"/rst_files"
-binderlist=$rstdir"/notebooks_with_buttons.txt"
+binderlist=$rstdir"/notebooks_with_binder_buttons.txt"
+colablist=$rstdir"/notebooks_with_colab_buttons.txt"
 tagslist=$rstdir"/notebooks_tags.json"
 mkdir -p $rstdir
 
-# List all notebooks that contain binder buttons based on readme
-cat README.md | cut -d'|' --output-delimiter=$'\n' -f2- | grep -E ".*mybinder.*[0-9]{3}.*" | cut -f1 -d] | cut -f2 -d[ | sort | uniq > $binderlist
+# List all notebooks that contain binder or colab buttons based on readme
+cat README.md | grep -oP "https://mybinder.org/v2.*?[0-9]{3}.*?ipynb" | sed 's#%2F#/#g' | xargs basename -a -s .ipynb | sort | uniq > $binderlist
+cat README.md | grep -oP "https://colab.research.google.com/github.*?[0-9]{3}.*?ipynb" | xargs basename -s .ipynb | sort | uniq > $colablist
 taggerpath=$(git ls-files "*tagger.py")
 notebookspath=$(git ls-files "*.ipynb"| head -n 1)
 keywordspath=$(git ls-files "*keywords.json")
