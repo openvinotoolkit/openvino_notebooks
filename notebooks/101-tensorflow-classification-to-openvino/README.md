@@ -8,7 +8,7 @@ This tutorial explains how to convert [TensorFlow](https://www.tensorflow.org) m
 
 ## Notebook Contents
 
-The notebook shows how to convert the [TensorFlow MobilenetV3 model](https://www.tensorflow.org/api_docs/python/tf/keras/applications/MobileNetV3Small) and then classify an image with OpenVINO Runtime.
+The notebook shows how to convert the [TensorFlow MobileNetV3 model](https://www.tensorflow.org/api_docs/python/tf/keras/applications/MobileNetV3Small) and then classify an image with OpenVINO Runtime.
 
 ## Installation Instructions
 

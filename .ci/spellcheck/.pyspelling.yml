@@ -1,0 +1,49 @@
+spellchecker: aspell
+
+matrix:
+  - name: markdown
+    aspell:
+      lang: en
+      d: en_US
+    dictionary:
+      wordlists:
+        - .ci/spellcheck/.pyspelling.wordlist.txt
+      output: .ci/spellcheck/dictionary/pyspelling.dic
+    pipeline:
+      - pyspelling.filters.url
+      - pyspelling.filters.markdown:
+          markdown_extensions:
+            - markdown.extensions.extra
+      - pyspelling.filters.html:
+          comments: false
+          ignores:
+            - code
+            - pre
+            - spell
+    sources:
+      - README.md
+      - CONTRIBUTING.md
+      - notebooks/**/README.md
+
+  - name: notebooks
+    aspell:
+      lang: en
+      d: en_US
+    dictionary:
+      wordlists:
+        - .ci/spellcheck/.pyspelling.wordlist.txt
+      output: .ci/spellcheck/dictionary/pyspelling.dic
+    pipeline:
+      - ipynb_filter
+      - pyspelling.filters.url
+      - pyspelling.filters.markdown:
+          markdown_extensions:
+            - markdown.extensions.extra
+      - pyspelling.filters.html:
+          comments: false
+          ignores:
+            - code
+            - pre
+            - spell
+    sources:
+      - notebooks/**/*.ipynb

@@ -1,4 +1,4 @@
-# High-Quality Text-Free One-Shot Voice Conversion with FeeVC and OpenVINO™
+# High-Quality Text-Free One-Shot Voice Conversion with FreeVC and OpenVINO™
 [FreeVC](https://github.com/OlaWod/FreeVC) allows alter the voice of a source speaker to a target style, 
 while keeping the linguistic content unchanged, without text annotation.
 
@@ -28,9 +28,8 @@ If you have not installed all required dependencies, follow the [Installation Gu
 
 Also, it requires some extra steps, that can be done manually or will be performed automatically during the execution 
 of the notebook, but in minimum necessary scope. 
-1. Clone this repo: git clone https://github.com/OlaWod/FreeVC.git.
-2. Download [WavLM-Large](https://github.com/microsoft/unilm/tree/master/wavlm) and put it under directory 'FreeVC/wavlm/'.
+1. Clone this repo: `git clone https://github.com/OlaWod/FreeVC.git`.
+2. Download [WavLM-Large](https://github.com/microsoft/unilm/tree/master/wavlm) and put it under `FreeVC/wavlm/` directory.
 3. You can download the [VCTK](https://datashare.ed.ac.uk/handle/10283/3443) dataset. For this example we download only
 two of them from [Hugging Face FreeVC example](https://huggingface.co/spaces/OlaWod/FreeVC/tree/main).
-4. Download [pretrained models](https://1drv.ms/u/s!AnvukVnlQ3ZTx1rjrOZ2abCwuBAh?e=UlhRR5) and put it under directory
-'checkpoints' (for current example only `freevc.pth` are required).
+4. Download [pretrained models](https://1drv.ms/u/s!AnvukVnlQ3ZTx1rjrOZ2abCwuBAh?e=UlhRR5) and put it under `checkpoints` directory (for current example only `freevc.pth` are required).

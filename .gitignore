@@ -110,3 +110,6 @@ notebooks/cache/*
 # Local pip cache directories
 pipcache/
 pipcache_openvino/
+
+# PySpelling generated dictionary
+.ci/spellcheck/dictionary
