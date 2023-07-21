@@ -107,22 +107,15 @@ python main.py --stream sample_video.mp4
 ## Step 4
 
 Benchmark the Model with OpenVINO's Benchmark_App
+
 Benchmarking provides insight into your YOLOv8 model's real-world performance. Performance may vary based on use and configuration.
 
 ### Benchmark Results 
 
-![YOLOv8m Benchmark Results](https://github.com/AnishaUdayakumar/intelligent-queue-management-openvino/assets/109281183/8a81243e-ee32-4b30-9994-326ecb07d32f)
+![YOLOv8m Benchmark Results](https://github.com/openvinotoolkit/openvino_notebooks/assets/109281183/2d59819e-61b7-4995-bdf3-a6d1090afdd4)
+![](https://github.com/openvinotoolkit/openvino_notebooks/assets/109281183/bed6fc01-f0d4-4f8e-af6a-703182947232)
 
-The benchmarks for the YOLOv8m model were run using OpenVINO version 2023.0.0 on the 4th Gen Intel® Xeon® Scalable Processor:
-
-* **Throughput** 
-  * FP16: 252FPS
-  * INT8: 195 FPS
-* **Latency**
-  * FP16: 7.94 ms
-  * INT8: 10.19 ms
-
-These figures represent the model's theoretical maximums. It's recommended to test the model in your deployment environment to gauge its real-world performance.
+Benchmarking was performed on an Intel® Xeon® Platinum 8480+ (1 socket, 56 cores) running Ubuntu 22.04.2 LTS. The tests utilized the YOLOv8m model with OpenVINO 2023.0.
 
 ### Running the Benchmark
 
