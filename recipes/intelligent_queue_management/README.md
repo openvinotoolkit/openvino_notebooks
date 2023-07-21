@@ -106,7 +106,7 @@ python main.py --stream sample_video.mp4
 
 ## Step 4
 
-Benchmark the Model with OpenVINO's Benchmark_App
+Benchmark the Model with OpenVINO's `benchmark_app`.
 
 Benchmarking provides insight into your YOLOv8 model's real-world performance. Performance may vary based on use and configuration.
 
