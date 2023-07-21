@@ -126,7 +126,11 @@ Use the following command to run the benchmark:
 ```
 Replace `int8_model_det_path` with the path to your INT8 model and $device with the specific device you're using (CPU, GPU, etc.). This command performs inference on the model for 30 seconds. Run `benchmark_app --help` for additional command-line options.
 
-##### Platform Configurations for Performance Benchmarks for YOLOv8m Model
+Congratulations! You have successfully set up and run the Intelligent Queue Management application with OpenVINO™.
+
+### Appendix
+
+#### Platform Configurations for Performance Benchmarks for YOLOv8m Model
 
 | Type Device | | CPU | | | GPU | |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -145,5 +149,3 @@ Replace `int8_model_det_path` with the path to your INT8 model and $device with 
 | TDP | 350W | 15W | 45W | 235W | 45W | 45W |
 | Benchmark Date | May 31, 2023 | May 29, 2023 | June 15, 2023 | May 29, 2023 | June 15, 2023 | May 29, 2023 
 | Benchmarked by | Intel Corporation | Intel Corporation | Intel Corporation | Intel Corporation | Intel Corporation | Intel Corporation |
-
-Congratulations! You have successfully set up and run the Intelligent Queue Management application with OpenVINO™.
