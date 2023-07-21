@@ -15,7 +15,7 @@ import utils
 
 DATA_URL = "http://images.cocodataset.org/zips/val2017.zip"
 LABELS_URL = "https://github.com/ultralytics/yolov5/releases/download/v1.0/coco2017labels-segments.zip"
-CFG_URL = "https://raw.githubusercontent.com/ultralytics/ultralytics/main/ultralytics/datasets/coco.yaml"
+CFG_URL = "https://raw.githubusercontent.com/ultralytics/ultralytics/ed25db94268fe0e65030f0ddc55e6180e39ffe81/ultralytics/cfg/datasets/coco.yaml"
 
 
 def convert(det_model_name: str, model_dir: Path) -> Path:
