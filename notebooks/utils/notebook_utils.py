@@ -5,7 +5,6 @@
 
 
 import os
-import requests
 import threading
 import time
 import urllib.parse
@@ -36,6 +35,8 @@ def load_image(path: str) -> np.ndarray:
     :return: image as BGR numpy array
     """
     import cv2
+    import requests
+
     if path.startswith("http"):
         # Set User-Agent to Mozilla because some websites block
         # requests with User-Agent Python
@@ -71,6 +72,7 @@ def download_file(
     :return: path to downloaded file
     """
     from tqdm.notebook import tqdm_notebook
+    import requests
 
     filename = filename or Path(urllib.parse.urlparse(url).path).name
     chunk_size = 16384  # make chunks bigger so that not too many updates are triggered for Jupyter front-end
@@ -206,6 +208,8 @@ class VideoPlayer:
 
     def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
         import cv2
+
+        self.cv2 = cv2  # This is done to access the package in class methods
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
             raise RuntimeError(
@@ -291,9 +295,9 @@ class VideoPlayer:
             # need to copy frame, because can be cached and reused if fps is low
             frame = self.__frame.copy()
         if self.__size is not None:
-            frame = cv2.resize(frame, self.__size, interpolation=self.__interpolation)
+            frame = self.cv2.resize(frame, self.__size, interpolation=self.__interpolation)
         if self.__flip:
-            frame = cv2.flip(frame, 1)
+            frame = self.cv2.flip(frame, 1)
         return frame
 
 
