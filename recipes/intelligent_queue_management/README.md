@@ -126,4 +126,4 @@ Use the following command to run the benchmark:
 ```
 Replace `int8_model_det_path` with the path to your INT8 model and $device with the specific device you're using (CPU, GPU, etc.). This command performs inference on the model for 30 seconds. Run `benchmark_app --help` for additional command-line options.
 
-Congratulations! You have successfully set up and run the Intelligent Queue Management application with OpenVINO™ and benchmarked the model.
+Congratulations! You have successfully set up, run, and benchmarked the Intelligent Queue Management application with OpenVINO™.
