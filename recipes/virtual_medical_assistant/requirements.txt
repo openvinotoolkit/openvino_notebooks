@@ -1,0 +1,1 @@
+openvino-dev==2023.0.1
