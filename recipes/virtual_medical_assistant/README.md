@@ -1,0 +1,1 @@
+# Virtual Medical Assistant with OpenVINO™
