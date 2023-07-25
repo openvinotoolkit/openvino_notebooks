@@ -8,7 +8,7 @@ Previously, we already discussed how to build instruction-following pipeline usi
 In this tutorial we consider how to use power of OpenVINO for running Large Language Models for chat. We will use a pre-trained model from the [Hugging Face Transformers](https://huggingface.co/docs/transformers/index) library. To simplify the user experience, the [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index) library is used to convert the models to OpenVINO™ IR format.
 
 The tutorial supports different models, you can select one from provided options to compare quality of open source LLM solutions.
->**Note**: conversion of some models requries can requires additional actions from user side and at least 64GB RAM for conversion.
+>**Note**: conversion of some models can require additional actions from user side and at least 64GB RAM for conversion.
 
 The available options are:
 
@@ -32,7 +32,5 @@ The tutorial consists of the following steps:
 - Create an inference pipeline
 - Run chatbot
 
-
-
-
+## Installation Instructions
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
