@@ -125,6 +125,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    adhere to the terms of the license.
 3. If you include code from external sources in your notebook add the
    name, URL and license of the third party code to the `licensing/third-party-programs.txt` file.
+4. Don't use HTML for text cells, use Markdown markups instead.
 
 ### Notebook naming
 
