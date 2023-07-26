@@ -402,7 +402,7 @@ Realtime
 realtime
 rebase
 redistributable
-RedPijama
+RedPajama
 RegNet
 RegNetY
 regressively
