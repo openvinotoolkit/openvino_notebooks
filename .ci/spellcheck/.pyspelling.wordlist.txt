@@ -169,6 +169,8 @@ IMU
 IMUs
 InceptionResNetV
 inferencing
+InferRequest
+InferRequests
 inpainting
 installable
 InstructGPT

@@ -18,7 +18,7 @@ This folder contains two notebooks that show how to convert and quantize model w
 The first notebook contains the following steps:
 1. Download the model.
 2. Instantiate the PyTorch model.
-3. Export the ONNX model and convert it to OpenVINO IR, using the Model Optimizer tool.
+3. Export the ONNX model and convert it to OpenVINO IR, using the model conversion API.
 4. Run CLIP with OpenVINO.
 
 The second notebook contains the following steps:
