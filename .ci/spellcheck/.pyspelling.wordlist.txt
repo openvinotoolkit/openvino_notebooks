@@ -15,6 +15,7 @@ artstation
 ASPP
 ASR
 async
+AsyncInferQueue
 Atrous
 autoencoder
 autoregressively
@@ -97,6 +98,7 @@ detections
 Dettmers
 dev
 dGPU
+dGPUs
 DialoGPT
 diarization
 Diffusers
@@ -161,6 +163,7 @@ hyperparameters
 ICIP
 ICPR
 iGPU
+iGPUs
 Ilija
 ImageBind
 ImageNet
