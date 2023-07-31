@@ -19,6 +19,7 @@ matrix:
           ignores:
             - code
             - pre
+            - spell
     sources:
       - README.md
       - CONTRIBUTING.md
@@ -43,5 +44,6 @@ matrix:
           ignores:
             - code
             - pre
+            - spell
     sources:
       - notebooks/**/*.ipynb
