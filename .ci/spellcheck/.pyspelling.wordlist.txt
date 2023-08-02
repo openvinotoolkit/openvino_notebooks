@@ -387,6 +387,7 @@ overlayed
 OV
 OVC
 OVMS
+OvStableDiffusionInpaintingPipeline
 PaddleClas
 PaddleGAN
 paddlegan
@@ -543,6 +544,7 @@ SQuAD
 SRT
 SSDLite
 sst
+StableDiffusionInpaintPipeline
 STFT
 streamable
 Struct
