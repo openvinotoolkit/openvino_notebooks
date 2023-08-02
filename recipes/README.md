@@ -1,4 +1,4 @@
-# AI Solution Kits
+# Edge AI Reference Kits
 
 In this directory, you can find all AI Solution Kits helping you create an end-to-end solution on specific topics. Currently, there are the following kits:
 - [Intelligent Queue Management](intelligent_queue_management) - the solution for managing customer queues more effectively by analyzing camera video streams and detecting the number of people in each queue. The system then uses this information to optimize the queuing process and reduce customer waiting times.
