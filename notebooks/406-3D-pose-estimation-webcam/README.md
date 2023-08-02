@@ -10,14 +10,14 @@ This notebook contains a 3D multi-person pose estimation demo.The model used in 
 
 ## Notebook Contents
 
-This notebook uses the "human-pose-estimation-3d-0001" model from OpenVINO Open Model Zoo to estimate 3D human pose and represent it on a 2D screen. Details of the model can be found [here](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/human-pose-estimation-3d-0001). The input source may be video files or webcam feed. It uses the [Three.js](https://pythreejs.readthedocs.io/en/stable/installing.html Python API to display 3D results in a web browser. **To display the 3D inference results properly on Windows and Ubuntu, it is recommended to use Chrome web browser. For macOS, Safari is recommended**.
+This notebook uses the "human-pose-estimation-3d-0001" model from OpenVINO Open Model Zoo to estimate 3D human pose and represent it on a 2D screen. Details of the model can be found [here](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/human-pose-estimation-3d-0001). The input source may be video files or webcam feed. It uses the [`Three.js`](https://pythreejs.readthedocs.io/en/stable/installing.html) Python API to display 3D results in a web browser. **To display the 3D inference results properly on Windows and Ubuntu, it is recommended to use Chrome web browser. For macOS, Safari is recommended**.
 
 ## Installation Instructions
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
 
 Make sure your [Jupyter extension](https://github.com/jupyter-widgets/pythreejs#jupyterlab) is working properly.
-To avoid errors that may arise from the version of the dependency package, it is recommended to use the **Jupyterlab** instead of the Jupyter notebook to display image results.
+To avoid errors that may arise from the version of the dependency package, it is recommended to use the **JupyterLab** instead of the Jupyter notebook to display image results.
 ```
 - pip install --upgrade pip && pip install -r requirements.txt
 - jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager
