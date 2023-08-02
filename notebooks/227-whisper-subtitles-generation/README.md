@@ -1,4 +1,5 @@
 # Video Subtitle Generation with OpenAI Whisper
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/227-whisper-subtitles-generation/227-whisper-subtitles-generation.ipynb)
 [Whisper](https://openai.com/blog/whisper/) is a general-purpose speech recognition model from [OpenAI](https://openai.com/). The model is able to almost flawlessly transcribe speech across dozens of languages and even handle poor audio quality or excessive background noise.
 This notebook will run the model with OpenVINO to generate transcription of a video.
 
@@ -12,7 +13,7 @@ In this notebook, you will use its capabilities for generation of subtitles for 
 Notebook contains the following steps:
 1. Download the model.
 2. Instantiate original PyTorch model pipeline.
-3. Export the ONNX model and convert it to OpenVINO IR, using the Model Optimizer tool.
+3. Export the ONNX model and convert it to OpenVINO IR, using model conversion API.
 4. Run the Whisper pipeline with OpenVINO.
 
 A simplified demo pipeline is represented in the diagram below:
@@ -26,4 +27,6 @@ The image below shows an example of the video as input and corresponding transcr
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
