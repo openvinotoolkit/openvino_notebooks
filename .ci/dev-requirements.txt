@@ -13,3 +13,4 @@ treon                       # test framework for Jupyter Notebooks
 toml                        # used for validating docker requirements
 mistune==2.0.4              # use for parsing README.md
 requests==2.31.0            # use for checking links
+pyspelling                  # automating spell checking
