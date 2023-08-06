@@ -20,6 +20,8 @@ The image below illustrates the provided user instruction and generated image ex
 
 ![text2img_example.png](https://user-images.githubusercontent.com/29454499/258652206-2673ab36-0da3-45e3-bb9e-8b5fe0ef7e41.png)
 
+>**Note**: Some demonstrated models can require at least 64GB RAM for conversion and running.
+
 ## Notebook Contents
 
 The tutorial consists of the following steps:
