@@ -165,6 +165,7 @@ Hafner
 HandBrake
 heatmap
 HED
+hoc
 HuggingFace
 Husain
 HWC
@@ -403,6 +404,8 @@ scalability
 Scalable
 scalable
 ScaleMapLearner
+SDEdit
+SDXL
 Segmentations
 segmentations
 Segmenter
@@ -505,6 +508,7 @@ WER
 Wofk
 XCode
 Xeon
+xl
 XYWH
 YOLO
 YOLOv
