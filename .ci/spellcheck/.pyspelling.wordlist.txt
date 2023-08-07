@@ -1,4 +1,3 @@
-
 3D
 accelerometers
 activations
@@ -16,6 +15,7 @@ artstation
 ASPP
 ASR
 async
+AsyncInferQueue
 Atrous
 autoencoder
 autoregressively
@@ -31,6 +31,7 @@ Bicubic
 bicubic
 bilinear
 biometrics
+boolean
 CentOS
 charlist
 charlists
@@ -97,12 +98,14 @@ detections
 Dettmers
 dev
 dGPU
+dGPUs
 DialoGPT
 diarization
 Diffusers
 diffusers
 DistilBERT
 distilbert
+distiluse
 docstring
 doi
 Dollár
@@ -139,6 +142,7 @@ Gitee
 GitHub
 GLA
 GMCNN
+GNA
 googlenet
 GOPRO
 GPT
@@ -148,6 +152,7 @@ GPUs
 Gradio
 grayscale
 gRPC
+Gutendex
 Hafner
 HandBrake
 heatmap
@@ -158,6 +163,7 @@ hyperparameters
 ICIP
 ICPR
 iGPU
+iGPUs
 Ilija
 ImageBind
 ImageNet
@@ -166,6 +172,8 @@ IMU
 IMUs
 InceptionResNetV
 inferencing
+InferRequest
+InferRequests
 inpainting
 installable
 InstructGPT
@@ -175,6 +183,7 @@ IRs
 iteratively
 JFLEG
 JIT
+JS
 JSON
 Jupyter
 Jupyter's
@@ -193,6 +202,8 @@ KServe
 Kubernetes
 Kupyn
 labour
+labse
+LaBSE
 LAION
 Lasinger
 latents
@@ -219,6 +230,7 @@ microservices
 MiDaS
 MidasNet
 Midjourney
+MiniLM
 MobileNet
 MobileNetV
 modelled
@@ -302,6 +314,7 @@ Prateek
 pre
 Precisions
 prefetching
+preformatted
 PrePostProcessing
 prepostprocessing
 prepostprocessor
@@ -372,6 +385,7 @@ Saliency
 saliency
 scalability
 Scalable
+scalable
 Segmentations
 segmentations
 Segmenter
@@ -389,6 +403,7 @@ sparsified
 sparsify
 spectrogram
 spectrograms
+splitters
 SPS
 SQuAD
 SRT
