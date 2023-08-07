@@ -482,3 +482,9 @@ YOLO
 YOLOv
 yolov
 Zongyuan
+OneFormer
+oneformer
+Panoptic
+panoptic
+subtask
+Swin
