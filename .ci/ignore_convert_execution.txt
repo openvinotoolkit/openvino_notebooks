@@ -5,6 +5,8 @@ notebooks/211-speech-to-text/211-speech-to-text.ipynb
 notebooks/214-grammar-correction/214-grammar-correction.ipynb
 notebooks/215-image-inpainting/215-image-inpainting.ipynb
 notebooks/225-stable-diffusion-text-to-image/225-stable-diffusion-text-to-image.ipynb
+notebooks/228-clip-zero-shot-image-classification/228-clip-zero-shot-convert.ipynb
+notebooks/228-clip-zero-shot-image-classification/228-clip-zero-shot-quantize.ipynb
 notebooks/230-yolov8-optimization/230-yolov8-optimization.ipynb
 notebooks/231-instruct-pix2pix-image-editing/231-instruct-pix2pix-image-editing.ipynb
 notebooks/235-controlnet-stable-diffusion/235-controlnet-stable-diffusion.ipynb
@@ -19,4 +21,5 @@ notebooks/238-deeployd-if/238-deep-floyd-if.ipynb
 notebooks/239-image-bind/239-image-bind.ipynb
 notebooks/240-dolly-2-instruction-following/240-dolly-2-instruction-following.ipynb
 notebooks/241-riffusion-text-to-music/241-riffusion-text-to-music.ipynb
+notebooks/248-stable-diffusion-xl/248-stable-diffusion-xl.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb

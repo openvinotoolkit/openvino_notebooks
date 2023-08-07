@@ -11,3 +11,5 @@
 240-dolly-2-instruction-following
 241-riffusion-text-to-music
 242-freevc-voice-conversion
+248-stable-diffusion-xl
+404-style-transfer-webcam
