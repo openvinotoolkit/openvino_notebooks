@@ -33,15 +33,15 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 - [Table of Contents](#table-of-contents)
 - [📝 Installation Guide](#-installation-guide)
 - [🚀 Getting Started](#-getting-started)
-  - [💻 First steps](#-first-steps)
-  - [⌚ Convert \& Optimize](#-convert--optimize)
-  - [🎯 Model Demos](#-model-demos)
-  - [🏃 Model Training](#-model-training)
-  - [📺 Live Demos](#-live-demos)
+	- [💻 First steps](#-first-steps)
+	- [⌚ Convert \& Optimize](#-convert--optimize)
+	- [🎯 Model Demos](#-model-demos)
+	- [🏃 Model Training](#-model-training)
+	- [📺 Live Demos](#-live-demos)
 - [⚙️ System Requirements](#️-system-requirements)
 - [💻 Run the Notebooks](#-run-the-notebooks)
-  - [To Launch a Single Notebook](#to-launch-a-single-notebook)
-  - [To Launch all Notebooks](#to-launch-all-notebooks)
+	- [To Launch a Single Notebook](#to-launch-a-single-notebook)
+	- [To Launch all Notebooks](#to-launch-all-notebooks)
 - [🧹 Cleaning Up](#-cleaning-up)
 - [⚠️ Troubleshooting](#️-troubleshooting)
 - [🧑‍💻 Contributors](#-contributors)
@@ -161,9 +161,10 @@ Demos that demonstrate inference on a particular model.
 | [241-riffusion-text-to-music](notebooks/241-riffusion-text-to-music/)<br>| Text-to-Music generation using Riffusion and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/244291912-bbc6e08c-c0a9-41fe-bc2d-5f89a0d2463b.png width=225> | 
 | [242-freevc-voice-conversion](notebooks/242-freevc-voice-conversion/)<br> | High-Quality Text-Free One-Shot Voice Conversion with FreeVC and OpenVINO™ ||
 | [243-tflite-selfie-segmentation](notebooks/243-tflite-selfie-segmentation/) <br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F243-tflite-selfie-segmentation%2F243-tflite-selfie-segmentation.ipynb)<br> [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/243-tflite-selfie-segmentation/243-tflite-selfie-segmentation.ipynb)| Selfie Segmentation using TFLite and OpenVINO™ |  <img src="https://user-images.githubusercontent.com/29454499/251085926-14045ebc-273b-4ccb-b04f-82a3f7811b87.gif" width=400>|
-| [244-named-entity-recognition](notebooks/244-named-entity-recognition/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/244-named-entity-recognition/244-named-entity-recognition.ipynb) | Named entity recognition with OpenVINO™ | |
-| [246-depth-estimation-videpth](notebooks/245-depth-estimation-videpth/)<br>| Monocular Visual-Inertial Depth Estimation with OpenVINO™ | <img src=https://raw.githubusercontent.com/alexklwong/void-dataset/master/figures/void_samples.png width=225> |
-| [247-code-language-id](notebooks/245-code-language-id/245-code-language-id.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F245-code-language-id%2F245-code-language-id.ipynb) | Identify the programming language used in an arbitrary code snippet | ||[245-typo-detector](notebooks/245-typo-detector/)<br>| English Typo Detection in sentences with OpenVINO™ | <img src=https://user-images.githubusercontent.com/80534358/224564463-ee686386-f846-4b2b-91af-7163586014b7.png   width=225> |
+|[244-named-entity-recognition](notebooks/244-named-entity-recognition/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/244-named-entity-recognition/244-named-entity-recognition.ipynb) | Named entity recognition with OpenVINO™ | |
+|[245-typo-detector](notebooks/245-typo-detector/)<br>| English Typo Detection in sentences with OpenVINO™ | <img src=https://user-images.githubusercontent.com/80534358/224564463-ee686386-f846-4b2b-91af-7163586014b7.png   width=225> |
+|[246-depth-estimation-videpth](notebooks/246-depth-estimation-videpth/)<br>| Monocular Visual-Inertial Depth Estimation with OpenVINO™ | <img src=https://raw.githubusercontent.com/alexklwong/void-dataset/master/figures/void_samples.png width=225> |
+| [247-code-language-id](notebooks/247-code-language-id/247-code-language-id.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F247-code-language-id%2F247-code-language-id.ipynb) | Identify the programming language used in an arbitrary code snippet | ||
 
 <div id='-model-training'></div>
 
