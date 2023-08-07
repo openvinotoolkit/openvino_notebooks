@@ -19,6 +19,7 @@ AsyncInferQueue
 Atrous
 autoencoder
 autoregressively
+AutoTokenizer
 backend
 Baevski
 BasicUNet
@@ -106,6 +107,7 @@ diffusers
 DistilBERT
 distilbert
 distiluse
+DL
 docstring
 doi
 Dollár
@@ -251,6 +253,7 @@ NAS
 natively
 NER
 NETP
+NeuSpell
 NLP
 NMS
 NNCF
