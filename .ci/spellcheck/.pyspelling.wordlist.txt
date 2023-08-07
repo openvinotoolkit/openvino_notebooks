@@ -1,5 +1,6 @@
 3D
 accelerometers
+accelerometer
 activations
 adas
 ADE
@@ -23,6 +24,7 @@ AutoTokenizer
 backend
 Baevski
 BasicUNet
+BEiT
 Benchmarking
 benchmarking
 bert
@@ -39,6 +41,7 @@ charlists
 chatbot
 chatbots
 ChatGPT
+ckpt
 CHW
 Cifar
 cityscape
@@ -115,6 +118,7 @@ donut
 Downloader
 downloader
 downsampled
+dpredictor
 dropdown
 EfficientNet
 embeddings
@@ -138,6 +142,7 @@ Frontend
 frontend
 GAN
 gaussian
+Gb
 GEC
 Girshick
 Gitee
@@ -145,6 +150,7 @@ GitHub
 GLA
 GMCNN
 GNA
+Golang
 googlenet
 GOPRO
 GPT
@@ -160,6 +166,7 @@ HandBrake
 heatmap
 HED
 HuggingFace
+Husain
 HWC
 hyperparameters
 ICIP
@@ -209,6 +216,7 @@ LaBSE
 LAION
 Lasinger
 latents
+LeViT
 LibriSpeech
 Lim
 Liu
@@ -246,6 +254,7 @@ multiclass
 MultiHeadAttention
 multimodal
 Multimodality
+Müller
 Nakayosi
 nano
 nar
@@ -260,10 +269,12 @@ NNCF
 nncf
 noncomparable
 NONINFRINGEMENT
+nsamples
 numpy
 NumPy
 ocr
 OCRv
+odometry
 OMZ
 ONNX
 onnx
@@ -355,6 +366,7 @@ Raj
 Ranftl
 RASPP
 rcnn
+RealSense
 RealSR
 Realtime
 realtime
@@ -364,6 +376,7 @@ RegNet
 RegNetY
 reidentification
 ReLU
+René
 repo
 reproducibility
 rescale
@@ -389,6 +402,7 @@ saliency
 scalability
 Scalable
 scalable
+ScaleMapLearner
 Segmentations
 segmentations
 Segmenter
@@ -400,6 +414,8 @@ sigmoid
 SISR
 SlowFast
 slowfast
+SML
+sml
 softmax
 SOTA
 sparsified
@@ -421,6 +437,9 @@ subgraph
 sublicense
 summarization
 superresolution
+superset
+SwinV
+TartanAir
 TensorBoard
 tensorflow
 tf
@@ -441,12 +460,14 @@ TorchScript
 torchvision
 tunable
 tv
+TypeScript
 Udnie
 UI
 UINT
 Ultralytics
 Uncheck
 uncomment
+uncompressing
 UNet
 Unet
 Unimodal
@@ -468,16 +489,20 @@ variational
 VCTK
 Vec
 vec
+videpth
+VIO
 virtualenv
 ViT
 vit
 VM
+Vladlen
 VOC
 VQA
 Wav
 WavLM
 WebGL
 WER
+Wofk
 XCode
 Xeon
 XYWH
