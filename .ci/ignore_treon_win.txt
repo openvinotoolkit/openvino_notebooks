@@ -14,4 +14,4 @@
 240-dolly-2-instruction-following
 241-riffusion-text-to-music
 242-freevc-voice-conversion
-245-stable-diffusion-xl
+248-stable-diffusion-xl

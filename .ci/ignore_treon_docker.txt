@@ -10,7 +10,7 @@
 239-image-bind
 240-dolly-2-instruction-following
 241-riffusion-text-to-music
-245-stable-diffusion-xl
+248-stable-diffusion-xl
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
 404-style-transfer-webcam
