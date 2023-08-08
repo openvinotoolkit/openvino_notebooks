@@ -26,6 +26,7 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [DeepFloyd IF - Text-to-Image generation](notebooks/238-deeployd-if/)<br>| Text-to-Image Generation with DeepFloyd IF and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/241643886-dfcf3c48-8d50-4730-ae28-a21595d9504f.png width=300> |   |
 | [ImageBind](notebooks/239-image-bind/)<br>| Binding multimodal data using ImageBind and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png width=300> |   |
 | [Dolly v2](notebooks/240-dolly-2-instruction-following/)<br>| Instruction following using Databricks Dolly 2.0 and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png width=300> | |
+| [Stable Diffusion XL](notebooks/248-stable-diffusion-xl/)<br>| Image generation with Stable Diffusion XL and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/258651862-28b63016-c5ff-4263-9da8-73ca31100165.jpeg width=300> | |
 
 ## Table of Contents
 
@@ -48,21 +49,23 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 - [❓ FAQ](#-faq)
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+
 <div id='-installation-guide'/>
 
 ## 📝 Installation Guide
 
 OpenVINO Notebooks require Python and Git. To get started, select the guide for your operating system or environment:
 
-| [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) | [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker) | [Amazon SageMaker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/SageMaker)|
-| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |--------------------------------------------------------------------------- |
-	
+| [Windows](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows) | [Ubuntu](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu) | [macOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/macOS) | [Red Hat](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [CentOS](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Red-Hat-and-CentOS) | [Azure ML](https://github.com/openvinotoolkit/openvino_notebooks/wiki/AzureML) | [Docker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Docker) | [Amazon SageMaker](https://github.com/openvinotoolkit/openvino_notebooks/wiki/SageMaker) |
+| ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+
 <div id='-getting-started'/>
 
 ## 🚀 Getting Started
 
-The Jupyter notebooks are categorized into four classes, select one related to your needs or give them all a try. Good Luck! 
+The Jupyter notebooks are categorized into four classes, select one related to your needs or give them all a try. Good Luck!
 
 **NOTE: The main branch of this repository was updated to support the new OpenVINO 2023.0 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2022.3 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2022.3). 
 
@@ -81,7 +84,7 @@ Brief tutorials that demonstrate how to use OpenVINO's Python API for inference.
 
 <div id='-convert--optimize'></div>
 
-### ⌚ Convert & Optimize 
+### ⌚ Convert & Optimize
 
 Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 
@@ -106,6 +109,7 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | [118-optimize-preprocessing](notebooks/118-optimize-preprocessing/)| Improve performance of image preprocessing step                                                                             |
 | [119-tflite-to-openvino](notebooks/119-tflite-to-openvino/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/119-tflite-to-openvino/119-tflite-to-openvino.ipynb) | Convert TensorFlow Lite models to OpenVINO IR                                                                                                            |                                                                                                            |
 | [120-tensorflow-object-detection-to-openvino](notebooks/120-tensorflow-object-detection-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F120-tensorflow-object-detection-to-openvino%2F120-tensorflow-object-detection-to-openvino.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/120-tensorflow-object-detection-to-openvino/120-tensorflow-object-detection-to-openvino.ipynb) | Convert TensorFlow Object Detection models to OpenVINO IR                                                                                                            |
+| [121-convert-to-openvino](notebooks/121-convert-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F121-convert-to-openvino%2F121-convert-to-openvino.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/121-convert-to-openvino/121-convert-to-openvino.ipynb) | Learn OpenVINO model conversion API                                                                                                           |
 <div id='-model-demos'></div>
 
 ### 🎯 Model Demos
@@ -159,7 +163,11 @@ Demos that demonstrate inference on a particular model.
 | [242-freevc-voice-conversion](notebooks/242-freevc-voice-conversion/)<br> | High-Quality Text-Free One-Shot Voice Conversion with FreeVC and OpenVINO™ ||
 | [243-tflite-selfie-segmentation](notebooks/243-tflite-selfie-segmentation/) <br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F243-tflite-selfie-segmentation%2F243-tflite-selfie-segmentation.ipynb)<br> [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/243-tflite-selfie-segmentation/243-tflite-selfie-segmentation.ipynb)| Selfie Segmentation using TFLite and OpenVINO™ |  <img src="https://user-images.githubusercontent.com/29454499/251085926-14045ebc-273b-4ccb-b04f-82a3f7811b87.gif" width=400>|
 | [244-named-entity-recognition](notebooks/244-named-entity-recognition/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/244-named-entity-recognition/244-named-entity-recognition.ipynb) | Named entity recognition with OpenVINO™ | |
-| [248-fastcomposer-image-generation](notebooks/248-fastcomposer-image-generation/)<br> | Image generation with FastComposer and OpenVINO™ | |
+| [245-typo-detector](notebooks/245-typo-detector/)<br>| English Typo Detection in sentences with OpenVINO™ | <img src=https://user-images.githubusercontent.com/80534358/224564463-ee686386-f846-4b2b-91af-7163586014b7.png   width=225> |
+| [246-depth-estimation-videpth](notebooks/246-depth-estimation-videpth/)<br>| Monocular Visual-Inertial Depth Estimation with OpenVINO™ | <img src=https://raw.githubusercontent.com/alexklwong/void-dataset/master/figures/void_samples.png width=225> |
+| [247-code-language-id](notebooks/247-code-language-id/247-code-language-id.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F247-code-language-id%2F247-code-language-id.ipynb) | Identify the programming language used in an arbitrary code snippet | ||
+| [248-stable-diffusion-xl](notebooks/248-stable-diffusion-xl/)<br> |  Image generation with Stable Diffusion XL and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/258651862-28b63016-c5ff-4263-9da8-73ca31100165.jpeg width=225>  |
+| [249-fastcomposer-image-generation](notebooks/249-fastcomposer-image-generation/)<br> | Image generation with FastComposer and OpenVINO™ | |
 
 <div id='-model-training'></div>
 
@@ -177,6 +185,7 @@ Tutorials that include code to train neural networks.
 <div id='-live-demos'></div>
 
 ### 📺 Live Demos
+
 Live inference demos that run on a webcam or video files.
 
 | Notebook | Description | Preview |
@@ -189,7 +198,7 @@ Live inference demos that run on a webcam or video files.
 | [406-3D-pose-estimation-webcam](notebooks/406-3D-pose-estimation-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F406-3D-pose-estimation-webcam%2F406-3D-pose-estimation.ipynb) | 3D display of human pose estimation with a webcam or video file | <img src = "https://user-images.githubusercontent.com/42672437/183292131-576cc05a-a724-472c-8dc9-f6bc092190bf.gif" width=225> |
 | [407-person-tracking-webcam](notebooks/407-person-tracking-webcam/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F407-person-tracking-webcam%2F407-person-tracking.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/407-person-tracking-webcam/407-person-tracking.ipynb) | Person tracking with a webcam or video file | <img src = "https://user-images.githubusercontent.com/91237924/210479548-b70dbbaa-5948-4e49-b48e-6cb6613226da.gif" width=225> |
 
-If you run into issues, please check the [troubleshooting section](#-troubleshooting), [FAQs](#-faq) or start a GitHub [discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions). 
+If you run into issues, please check the [troubleshooting section](#-troubleshooting), [FAQs](#-faq) or start a GitHub [discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions).
 
 Notebooks with ![binder logo](https://mybinder.org/badge_logo.svg) and ![colab logo](https://colab.research.google.com/assets/colab-badge.svg) buttons can be run without installing anything. [Binder](https://mybinder.org/) and [Google Colab](https://colab.research.google.com/) are free online services with limited resources. For the best performance, please follow the [Installation Guide](#-installation-guide) and run the notebooks locally.
 
