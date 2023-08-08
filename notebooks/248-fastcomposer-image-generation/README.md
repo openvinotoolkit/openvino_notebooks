@@ -1,5 +1,4 @@
 # Image generation with FastComposer and OpenVINO™
-# Image generation with DeepFloyd IF and OpenVINO™
 
 FastComposer uses subject embeddings extracted by an image encoder to augment the generic text conditioning in diffusion models, enabling personalized image generation based on subject images and textual instructions with only forward passes.
 FastComposer generates images of multiple unseen individuals with different styles, actions, and contexts.
