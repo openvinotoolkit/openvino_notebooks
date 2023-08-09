@@ -269,7 +269,7 @@ class OpenVINOTextDecoderNew(torch.nn.Module):
         feed_dict = {'x': Tensor(x.numpy()), 'xa': Tensor(xa.numpy())}
         feed_dict = (self.preprocess_kv_cache_inputs(feed_dict, kv_cache))
         if COLLECT_INIT_DATA:
-            decoder_init_data.apend(feed_dict)
+            decoder_init_data.append(feed_dict)
         if verbose and start_time is not None:
             print(num_encoder_forwards, num_decoder_forwards, feed_dict["tokens"].shape, feed_dict["in_k_0a"].shape,
                   datetime.datetime.now() - start_time)
@@ -751,6 +751,10 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
         if not CALIBRATION_DATA_CACHE.exists():
             global COLLECT_INIT_DATA
 
+            patch_whisper_for_ov_inference(model)
+            model.encoder = OpenVINOAudioEncoder(core, BASE_DIR / ORIGINAL_ENCODER_MODEL_DIR / 'whisper_encoder.xml')
+            model.decoder = OpenVINOTextDecoder(core, BASE_DIR / ORIGINAL_DECODER_MODEL_DIR / 'whisper_decoder.xml')
+
             # collect model inputs for quantization
             COLLECT_INIT_DATA = True
             logger.info('Collecting calibration data...')
@@ -765,6 +769,9 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
                 CALIBRATION_DATA_CACHE.parent.mkdir(parents=True)
             with open(CALIBRATION_DATA_CACHE, 'wb') as f:
                 pickle.dump((convert_input_data_to_np(encoder_init_data), convert_input_data_to_np(decoder_init_data)), f)
+
+            model.encoder = original_encoder
+            model.decoder = original_decoder
         else:
             logger.info('Loading calibration data...')
             with open(CALIBRATION_DATA_CACHE, 'rb') as f:
@@ -853,7 +860,8 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
         model.decoder = OpenVINOTextDecoder(core, BASE_DIR / ORIGINAL_DECODER_MODEL_DIR / 'whisper_decoder.xml')
 
         if decoder_compression == "quantization":
-            if OVC_API_DECODER:
+            if OVC_API_DECODER and 'tokens' in decoder_init_data[0].keys():
+                # calibration data was collect in MO export format and with OVC export input names are different
                 input_name_mapping = {'tokens': 'x', 'audio_features': 'xa'}
                 new_input_names = [next(iter(inp.names)) for inp in model.decoder.model.inputs][2:]
                 for new_inp_name, old_inp_name in zip(new_input_names, list(decoder_init_data[0].keys())[2:]):
