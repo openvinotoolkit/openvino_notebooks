@@ -35,7 +35,6 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger("whisper")
 
-VIDEO_LINK = "https://www.youtube.com/watch?v=kgL5LBM-hFI"
 TASK = "transcribe"
 # TASK = "translate"
 
@@ -43,7 +42,7 @@ TASK = "transcribe"
 verbose = bool(0)
 
 
-base_dir = Path("./")
+BASE_DIR = Path("./")
 
 COLLECT_INIT_DATA = bool(0)
 encoder_init_data = []
@@ -55,14 +54,16 @@ total_transcribe_time = 0
 
 core = Core()
 
-CALIBRATION_DATA_CACHE = Path('./calibration/librispeech_asr_dummy_30.pkl')
+CALIBRATION_DATA_CACHE = BASE_DIR / Path('calibration/librispeech_asr_dummy_30.pkl')
 num_calibration_samples = 30
 
 start_time = None
 
-OVC_API = bool(1)
+OVC_API_ENCODER = bool(1)
+OVC_API_DECODER = bool(1)
 
-ORIGINAL_MODEL_DIR = 'original_model_ovc' if OVC_API else 'original_model'
+ORIGINAL_ENCODER_MODEL_DIR = BASE_DIR / ('original_model_ovc' if OVC_API_ENCODER else 'original_model')
+ORIGINAL_DECODER_MODEL_DIR = BASE_DIR / ('original_model_ovc' if OVC_API_DECODER else 'original_model')
 
 
 class OpenVINOAudioEncoder(torch.nn.Module):
@@ -276,7 +277,7 @@ class OpenVINOTextDecoderNew(torch.nn.Module):
         return self.postprocess_outputs(res)
 
 
-OpenVINOTextDecoder = OpenVINOTextDecoderNew if OVC_API else OpenVINOTextDecoderOld
+OpenVINOTextDecoder = OpenVINOTextDecoderNew if OVC_API_DECODER else OpenVINOTextDecoderOld
 
 
 class OpenVINOInference(Inference):
@@ -720,7 +721,8 @@ def run_benchmark(model_path: Path, shape: str = None, verbose: bool = True) -> 
     return float(match.group(1))
 
 
-def quantize(save_dir, encoder_compression, decoder_compression, use_pot, use_sq):
+def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alpha_encoder, sq_alpha_decoder,
+             ignore_logits, inplace_statistics_decoder):
     global encoder_init_data, decoder_init_data
 
     assert encoder_compression in ["weights", "quantization", None]
@@ -728,7 +730,7 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, use_sq
 
     save_dir = Path(save_dir)
     if not save_dir.exists():
-        save_dir.mkdir()
+        save_dir.mkdir(parents=True)
     log_file_path = Path(save_dir) / f"quantize_{datetime.datetime.now()}.log"
     from nncf import nncf_logger
     map(logger.removeHandler, logger.handlers)
@@ -759,6 +761,8 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, use_sq
                 model.transcribe(data_item["audio"]["array"].astype(np.float32), beam_size=5, best_of=5, task=TASK)
             COLLECT_INIT_DATA = False
 
+            if not CALIBRATION_DATA_CACHE.parent.exists():
+                CALIBRATION_DATA_CACHE.parent.mkdir(parents=True)
             with open(CALIBRATION_DATA_CACHE, 'wb') as f:
                 pickle.dump((convert_input_data_to_np(encoder_init_data), convert_input_data_to_np(decoder_init_data)), f)
         else:
@@ -771,17 +775,18 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, use_sq
     advanced_parameters = AdvancedQuantizationParameters(
         backend_params={"use_pot": use_pot},  # use legacy backend that supports Bias Correction
         overflow_fix=OverflowFix.DISABLE,  # disable overflow fix (can lead to accuracy drop on legacy platforms w/o DL Boost),
-        smooth_quant_alpha=0.95 if use_sq else -1
+        smooth_quant_alpha=sq_alpha_encoder
     )
+    logger.info(advanced_parameters)
 
     #
     # Encoder quantization
     #
 
-    compressed_model_path = base_dir / save_dir
+    compressed_model_path = BASE_DIR / save_dir
 
     if encoder_compression == "weights":
-        if OVC_API:
+        if OVC_API_ENCODER:
             compressed_encoder = nncf.compress_weights(model.encoder, use_fake_quantize=False)
             convert_pt_encoder_to_ov_directly(compressed_encoder, compressed_model_path)
         else:
@@ -791,7 +796,7 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, use_sq
             ov.serialize(compressed_encoder, str(quantized_model_path))
     else:
         del model.encoder
-        model.encoder = OpenVINOAudioEncoder(core, base_dir / ORIGINAL_MODEL_DIR / 'whisper_encoder.xml')
+        model.encoder = OpenVINOAudioEncoder(core, BASE_DIR / ORIGINAL_ENCODER_MODEL_DIR / 'whisper_encoder.xml')
 
         if encoder_compression == "quantization":
             quantization_dataset = nncf.Dataset(encoder_init_data)
@@ -816,17 +821,25 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, use_sq
     # Decoder quantization
     #
 
+    advanced_parameters = AdvancedQuantizationParameters(
+        backend_params={"use_pot": use_pot},  # use legacy backend that supports Bias Correction
+        overflow_fix=OverflowFix.DISABLE,  # disable overflow fix (can lead to accuracy drop on legacy platforms w/o DL Boost),
+        smooth_quant_alpha=sq_alpha_decoder,
+        inplace_statistics=inplace_statistics_decoder
+    )
+    logger.info(advanced_parameters)
+
     if decoder_compression == "weights":
         from whisper.model import Linear
         register_module()(Linear)
         model.decoder.linear = Linear(512, 51865, bias=False)
         model.decoder.linear.weight = model.decoder.token_embedding.weight
 
-        if OVC_API:
+        if OVC_API_DECODER:
             patch_whisper_decoder_for_export_ovc(model.decoder)
             compressed_decoder = nncf.compress_weights(model.decoder, use_fake_quantize=False)
             # compressed_decoder = model.decoder
-            logger.info(compressed_decoder)
+            # logger.info(compressed_decoder)
             convert_pt_decoder_to_ov_directly(original_encoder, compressed_decoder, compressed_model_path, decoder_already_patched=True)
         else:
             patch_whisper_decoder_for_export(model.decoder)
@@ -837,10 +850,23 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, use_sq
     else:
         patch_whisper_for_ov_inference(model)
         del model.decoder
-        model.decoder = OpenVINOTextDecoder(core, base_dir / ORIGINAL_MODEL_DIR / 'whisper_decoder.xml')
+        model.decoder = OpenVINOTextDecoder(core, BASE_DIR / ORIGINAL_DECODER_MODEL_DIR / 'whisper_decoder.xml')
 
         if decoder_compression == "quantization":
+            if OVC_API_DECODER:
+                input_name_mapping = {'tokens': 'x', 'audio_features': 'xa'}
+                new_input_names = [next(iter(inp.names)) for inp in model.decoder.model.inputs][2:]
+                for new_inp_name, old_inp_name in zip(new_input_names, list(decoder_init_data[0].keys())[2:]):
+                    input_name_mapping[old_inp_name] = new_inp_name
+                for d in decoder_init_data:
+                    for k in list(d.keys()):
+                        v = d[k]
+                        del d[k]
+                        d[input_name_mapping[k]] = v
+
             quantization_dataset = nncf.Dataset(decoder_init_data)
+            ignored_scope = IgnoredScope(names=["aten::to/Convert_713" if OVC_API_DECODER else "logits"]) \
+                if ignore_logits else None
             compressed_decoder = nncf.quantize(
                 model.decoder.model,
                 quantization_dataset,
@@ -848,12 +874,12 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, use_sq
                 fast_bias_correction=True,
                 subset_size=num_calibration_samples,
                 advanced_parameters=advanced_parameters,
-                # ignored_scope=IgnoredScope(names=["logits"])
+                ignored_scope=ignored_scope
             )
         elif decoder_compression is None:
             compressed_decoder = model.decoder.model
         else:
-                raise Exception
+            raise Exception
 
         quantized_model_path = compressed_model_path / "whisper_decoder.xml"
         ov.serialize(compressed_decoder, str(quantized_model_path))
@@ -873,19 +899,18 @@ def benchmark(model_path):
     model.encoder = OpenVINOAudioEncoder(core, model_path / "whisper_encoder.xml")
     model.decoder = OpenVINOTextDecoder(core, model_path / "whisper_decoder.xml")
 
-    if OVC_API:
-        input_names = [next(iter(inp.names)) for inp in model.decoder.model.inputs][2:]
-        decoder_shape = 'x[5,1],xa[5,1500,512],' + ','.join([f"{name}[5,1,512]" for name in input_names])
+    if OVC_API_DECODER:
+        decoder_shape = 'x[5,1],xa[5,1500,512],'
+    else:
+        decoder_shape = 'tokens[5,1],audio_features[5,1500,512],'
+
+    if OVC_API_ENCODER:
         encoder_shape = 'x[1,80,3000]'
     else:
-        decoder_shape = 'tokens[5,1],audio_features[5,1500,512],' \
-              'in_k_0a[5,1,512],in_v_0a[5,1,512],' \
-              'in_k_1a[5,1,512],in_v_1a[5,1,512],' \
-              'in_k_2a[5,1,512],in_v_2a[5,1,512],' \
-              'in_k_3a[5,1,512],in_v_3a[5,1,512],' \
-              'in_k_4a[5,1,512],in_v_4a[5,1,512],' \
-              'in_k_5a[5,1,512],in_v_5a[5,1,512]'
         encoder_shape = None
+
+    input_names = [next(iter(inp.names)) for inp in model.decoder.model.inputs][2:]
+    decoder_shape += ','.join([f"{name}[5,1,512]" for name in input_names])
 
     logger.info(f'Benchmarking model {model_path}')
     encoder_fps = run_benchmark(Path(model_path) / "whisper_encoder.xml", verbose=True, shape=encoder_shape)
@@ -1004,36 +1029,39 @@ def validate_model(model_path, temperatures=None):
     logger.info(f"Total S: {total_S}; D: {total_D}; I: {total_I}; H: {total_H}")
 
 
-video_path = download_video(base_dir, "https://youtu.be/kgL5LBM-hFI")  # Intel 1
+video_path = download_video(BASE_DIR, "https://youtu.be/kgL5LBM-hFI")  # Intel 1
 # video_path = download_video(base_dir, "https://www.youtube.com/watch?v=zasAa3Wgdp0")  # Intel 2
 # video_path = download_video(base_dir, "https://www.youtube.com/watch?v=JzPfMbG1vrE")  # Other 30 sec
 # video_path = download_video(base_dir, "https://www.youtube.com/watch?v=I8iBhUMFCIA")  # Other 45 sec
 
 
-compressed_model_path = quantize("quantized_models/compress_weights/encoder-none_decoder-weights_temp",
+compressed_model_path = quantize("models/test_model",
                                  # encoder_compression="weights",
-                                 # encoder_compression="quantization",
-                                 encoder_compression=None,
-                                 decoder_compression="weights",
-                                 # decoder_compression="quantization",
+                                 encoder_compression="quantization",
+                                 # encoder_compression=None,
+                                 # decoder_compression="weights",
+                                 decoder_compression="quantization",
                                  # decoder_compression=None,
                                  use_pot=bool(0),
-                                 use_sq=bool(0)
+                                 sq_alpha_encoder=0.5,
+                                 sq_alpha_decoder=0.15,
+                                 ignore_logits=bool(0),
+                                 inplace_statistics_decoder=bool(0),
                                  )
 benchmark(compressed_model_path)
 transcribe(compressed_model_path, video_path)
-validate_model(compressed_model_path)
+# validate_model(compressed_model_path)
 
-# model_path = Path('quantized_models/compress_weights/encoder-none_decoder-weights')
+# model_path = Path('quantized_models/compress_weights/encoder-ptq-sq-0.50_decoder-ptq-sq-0.95')
 # benchmark(model_path)
 # transcribe(model_path, video_path,
-           # temperatures=0
-           # )
-
-
+#            # temperatures=0
+#            )
 # validate_model(model_path,
-               # temperatures=0.2
-               # )
+#                # temperatures=0.2
+#                )
 
-if OVC_API:
-    logger.info('Used new API with conversion straight to IR')
+if OVC_API_ENCODER:
+    logger.info('Used new API with conversion straight to IR for encoder')
+if OVC_API_DECODER:
+    logger.info('Used new API with conversion straight to IR for decoder')
