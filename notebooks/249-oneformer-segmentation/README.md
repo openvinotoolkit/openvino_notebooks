@@ -12,10 +12,8 @@ The tutorial consists of the following steps:
 - Install required libraries
 - Prepare the environment
 - Load OneFormer fine-tuned on COCO for universal segmentation
-- Convert PyTorch model to ONNX
-- Convert ONNX model to OpenVINO IR
-- Prepare the image
-- Compile OpenVINO model
-- Semantic segmentation
-- Instance segmentation
-- Panoptic segmentation
+- Convert the model to OpenVINO IR format
+- Select inference device
+- Choose a segmentation task
+- Inference
+- Interactive demo
