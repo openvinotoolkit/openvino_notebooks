@@ -1,62 +1,44 @@
-openvino-dev[onnx,tensorflow2]==2022.2.0
-gdown
-pytube>=12.1.0
-yaspin
-librosa==0.8.1
+# openvino and its dependencies
+openvino-dev==2023.0.0
+openvino-telemetry==2022.3.0
+nncf==2.5.0
 
-# PyTorch/ONNX notebook requirements
-fastseg
-ipywidgets
 
-# Upgrade onnx version to avoid 220 YOLOV5 pytorch to onnx model export issue on Windows
-onnx>=1.11.0,<1.12.0
+# deep learning frameworks
+tensorflow-macos>=2.5,<=2.12; sys_platform == 'darwin' and platform_machine == 'arm64' # macOS M1 and M2
+tensorflow>=2.5,<=2.12; sys_platform == 'darwin' and platform_machine != 'arm64' # macOS x86
+tensorflow>=2.5,<=2.12; sys_platform == 'linux' or platform_system == 'Windows'
 
-torch==1.8.1; sys_platform == 'darwin'
-torchvision==0.9.1; sys_platform == 'darwin'
+onnx>=1.11.0
+
 --find-links https://download.pytorch.org/whl/torch_stable.html
-torch==1.8.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
-torchvision==0.9.1+cpu; sys_platform =='linux' or platform_system == 'Windows'
-torchmetrics==0.6.2
+torch==1.13.1; sys_platform == 'darwin'
+torch==1.13.1+cpu; sys_platform == 'linux' or platform_system == 'Windows'
+torchvision==0.14.1; sys_platform == 'darwin'
+torchvision==0.14.1+cpu; sys_platform == 'linux' or platform_system == 'Windows'
 
-# PaddlePaddle notebook requirements
-# For 103 PaddlePaddle MO conversion tutorial and 206 PaddleGAN/AnimeGAN demo
-paddlepaddle==2.4.*
-paddleclas>=2.2.0
-# paddle2onnx 0.9.7 fails export in 206 and 207
-paddle2onnx>=0.6,<=0.9.6
-ppgan==2.1.*
+#paddlepaddle>=2.4.0
 
-# BERT quantization notebook requirements
-transformers<4.25
 
-# NNCF notebook requirements
-git+https://github.com/openvinotoolkit/nncf.git@f62b6629c71822b5241e175e0a03c3acb42ae01e#egg=nncf[torch]
-tensorflow>=2.5,<=2.9.3
-tensorflow_datasets==4.2.0
+transformers>=4.21.1
 
-# CT scan training/inference requirements
-monai==0.9.1
-pytorch_lightning
 
-# Jupyter requirements
+# jupyter
 jupyterlab
+ipywidgets
+ipykernel>=5.*
+ipython>=7.16.3
+
+
+# others
+numpy>=1.21.0
+opencv-python
+Pillow>=8.3.2
+matplotlib>=3.4,<3.5.3
+scipy
 
 # The packages below are not directly required. They are dependencies of 
 # other dependencies that are pinned to a specific version to avoid
 # compatibility issues or vulnerabilities
-seaborn>=0.11.0
-geffnet==0.9.8
-matplotlib<3.4
-jedi==0.17.2
+scikit-image>=0.19.2
 setuptools>=56.0.0
-Pillow>=8.3.2
-ipykernel==5.*
-ipython==7.16.3 # not directly required, pinned to avoid a vulnerability
-pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
-nltk>=3.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
-rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
-scikit-learn>=0.24.2 # not directly required, pinned by Snyk to avoid a vulnerability
-paddlenlp==2.0.8 # workaround for "cannot import name '_C_ops'" error with paddlehub
-parasail<=1.2.4 # higher version causes paddle issues
-nest-asyncio<=1.5.4
-jupyter-client<=7.2.0

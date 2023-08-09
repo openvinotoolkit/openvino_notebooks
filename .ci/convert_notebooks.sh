@@ -1,30 +1,23 @@
 # Execute notebooks and convert them to Markdown and HTML
 # Output from notebook cells with tag "hide_output" will be hidden in converted notebooks
 
+ignore_list=$*
 rstdir=$PWD"/rst_files"
-binderlist=$rstdir"/notebooks_with_buttons.txt"
+binderlist=$rstdir"/notebooks_with_binder_buttons.txt"
+colablist=$rstdir"/notebooks_with_colab_buttons.txt"
 tagslist=$rstdir"/notebooks_tags.json"
-htmldir=$PWD"/html_files"
-markdowndir=$PWD"/markdown_files"
 mkdir -p $rstdir
-mkdir -p $htmldir
-mkdir -p $markdowndir
 
-# List all notebooks that contain binder buttons based on readme
-cat README.md | cut -d'|' --output-delimiter=$'\n' -f2- | grep -E ".*mybinder.*[0-9]{3}.*" | cut -f1 -d] | cut -f2 -d[ | sort | uniq > $binderlist
+# List all notebooks that contain binder or colab buttons based on readme
+cat README.md | grep -oP "https://mybinder.org/v2.*?[0-9]{3}.*?ipynb" | sed 's#%2F#/#g' | xargs basename -a -s .ipynb | sort | uniq > $binderlist
+cat README.md | grep -oP "https://colab.research.google.com/github.*?[0-9]{3}.*?ipynb" | xargs basename -s .ipynb | sort | uniq > $colablist
 taggerpath=$(git ls-files "*tagger.py")
 notebookspath=$(git ls-files "*.ipynb"| head -n 1)
 keywordspath=$(git ls-files "*keywords.json")
 python $taggerpath $notebookspath $keywordspath> $tagslist
 
-git ls-files "*.ipynb" | while read notebook; do
-    executed_notebook=${notebook/.ipynb/-with-output.ipynb}
-    echo $executed_notebook
-    jupyter nbconvert --log-level=INFO --execute --to notebook --output $executed_notebook --output-dir . --ExecutePreprocessor.kernel_name="python3" $notebook
-    jupyter nbconvert --to markdown $executed_notebook --output-dir $markdowndir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
-    jupyter nbconvert --to html $executed_notebook --output-dir $htmldir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
-    jupyter nbconvert --to rst $executed_notebook --output-dir $rstdir --TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True 
-done
+echo "start converting notebooks"
+python $PWD"/.ci/convert_notebooks.py" --rst_dir $rstdir --exclude_execution_file $PWD"/.ci/ignore_convert_execution.txt" --exclude_conversion_file $PWD"/.ci/ignore_convert_full.txt"
 
 # Remove download links to local files. They only work after executing the notebook
 # Replace relative links to other notebooks with relative links to documentation HTML pages

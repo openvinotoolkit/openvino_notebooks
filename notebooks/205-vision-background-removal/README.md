@@ -1,6 +1,7 @@
 # Background Removal Demo
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F205-vision-background-removal%2F205-vision-background-removal.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/205-vision-background-removal/205-vision-background-removal.ipynb)
 
 This demo notebook shows image segmentation and removing/adding background with [U^2-Net](https://github.com/xuebinqin/U-2-Net) and OpenVINO™.
 
@@ -10,7 +11,7 @@ This demo notebook shows image segmentation and removing/adding background with 
 ## Notebook Contents
 
 * Importing Pytorch library and loading U^2-Net model.
-* Converting PyTorch U^2-Net model to ONNX and OpenVINO IR.
+* Converting PyTorch U^2-Net model to OpenVINO IR format.
 * Loading and preprocessing input image.
 * Doing inference on OpenVINO IR model.
 * Visualizing results.
@@ -30,4 +31,6 @@ year = {2020}
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).

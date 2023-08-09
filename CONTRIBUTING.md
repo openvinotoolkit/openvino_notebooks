@@ -4,23 +4,25 @@
   - [Design Decisions](#design-decisions)
     - [General design considerations](#general-design-considerations)
     - [Implementation choices](#implementation-choices)
-    - [Coding guidelines](#coding-guidelines)
+    - [Coding Guidelines](#coding-guidelines)
     - [Other things to keep in mind](#other-things-to-keep-in-mind)
     - [Notebook naming](#notebook-naming)
-    - [Readmes](#readmes)
-    - [File structure](#file-structure)
+    - [`README.md` files](#readmemd-files)
+    - [File Structure](#file-structure)
+      - [Recommendations for File Structure](#recommendations-for-file-structure)
     - [Notebook utils](#notebook-utils)
   - [Requirements](#requirements)
   - [Validation](#validation)
     - [Automated tests](#automated-tests)
     - [Manual test and code quality tools](#manual-test-and-code-quality-tools)
-      - [nbval](#nbval)
-      - [nbqa](#nbqa)
-      - [nbdime](#nbdime)
+      - [`treon`](#treon)
+      - [`nbqa`](#nbqa)
+      - [`nbdime`](#nbdime)
       - [JupyterLab Code Formatter](#jupyterlab-code-formatter)
+      - [`PySpelling`](#pyspelling)
   - [Getting started](#getting-started)
     - [Pull Requests (PRs)](#pull-requests-prs)
-  - [Help!](#help)
+  - [Help](#help)
 
 Thank you for being interested in contributing to the OpenVINO Notebooks repository! This guide
 explains the design decisions, requirements, and coding guidelines for the OpenVINO Notebooks
@@ -49,8 +51,8 @@ To do this, there are a few requirements that all notebooks need to pass.
    systems](https://github.com/openvinotoolkit/openvino_notebooks#%EF%B8%8F-system-requirements))
    with Python 3.7, 3.8, 3.9 and 3.10.
 2. As a rule, the notebooks do not require installation of additional software that is not installable by
-   `pip`. We do not assume that users have installed XCode Dev Tools, Visual C++ redistributable,
-   cmake, etc. Please discuss if your notebook does need C++ - there are exceptions to this rule.
+   `pip`. We do not assume that users have installed XCode Developer Tools, Visual C++ redistributable,
+   `cmake`, etc. Please discuss if your notebook does need C++ - there are exceptions to this rule.
 3. The notebooks should work on all computers, and  in container images. We cannot assume that a
    user will have an iGPU or a webcam, so using these should be optional. For example, In the case
    of webcam inference, provide the option to use a video.
@@ -77,39 +79,36 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 ### Implementation choices
 
-1. The notebooks use one shared requirements.txt. If "the notebooks don't work" it is often caused
-   by a dependency of a dependency having an issue. We are therefore reluctant to add new
-   dependencies and will only add them if they add real value. Do not let this discourage you if
-   you do want to include a certain package! If it is necessary, or can be useful for other
-   notebooks too, we are open to adding it.
+1. Notebooks in this repository typically rely on a shared `requirements.txt` file. 
+   However, contributors are encouraged to install the required packages at the top of their notebook using 
+   `!pip install -q ...` commands. This allows the notebooks to be run independently as standalone examples. 
+   To maintain package compatibility, contributors are expected to install the same versions of packages 
+   as specified in the shared `requirements.txt` file. This helps ensure consistency in our testing pipelines 
+   and prevents dependency conflicts.
 2. The notebooks are located in the "notebooks" subdirectory. There is a subdirectory for every
    notebook, with generally the same base name as the notebook.  For example, the
-   001-hello-world.ipynb notebook can be found in the 001-hello-world directory.
+   `001-hello-world.ipynb` notebook can be found in the 001-hello-world directory.
    - See the [Notebook naming](#notebook-naming) section below, for the
      numbering of the notebooks.
-   - Add a README to the notebook subdirectory. Add a screenshot that gives an indication of what
+   - Add a `README.md` to the notebook subdirectory. Add a screenshot that gives an indication of what
      the notebook does if applicable.
-   - Add any supporting files to this subdirectory too. Supporting files should
-     be small (generally less than 5MB). Larger images, datasets and model
-     files should be downloaded from within the notebook.
-3. All related files, with the exception of Open Model Zoo models, should be saved to the notebook subdirectory,
-   even if that means that there is a small amount of duplication. For Open Model Zoo models, see the directory
-   structure in the [104 Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/main/notebooks/104-model-tools)
+   - Avoid adding any other files to the notebook's subdirectory. Instead, rely on models and data samples available online and fetch them within the notebook. Please refer to the [Notebook utils](#notebook-utils) section.
+3. In case you want to utilize one of the Open Model Zoo models, refer to the [104 Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/main/notebooks/104-model-tools)
    notebook.
 4. The notebooks should provide an easy way to clean up the downloaded data, for example with a
    commented-out cell at the end of the notebook.
 
 ### Coding Guidelines
 
-1. See https://www.python.org/dev/peps/pep-0020/
+1. See [PEP 20](https://www.python.org/dev/peps/pep-0020/)
 2. Format notebook code with [Black](https://github.com/psf/black), with a line width of 100. 
    See [Tools](#manual-test-and-code-quality-tools).
-3. Use f-strings for string formatting: https://www.python.org/dev/peps/pep-0498/
+3. Use f-strings for string formatting: [PEP 498](https://www.python.org/dev/peps/pep-0498/)
 4. Use keyword/named arguments when calling a function with more than one parameter:
    `function(a=1, b=2)` instead of `function(1, 2)`
 5. Use `from pathlib import Path` for path manipulation instead of `os.path`
-6. Add type hints to functions: https://www.python.org/dev/peps/pep-0484/
-7. Add ReST style docstrings (see[110](https://docs.openvino.ai/latest/notebooks/210-ct-scan-live-inference-with-output.html)
+6. Add type hints to functions: [PEP 484](https://www.python.org/dev/peps/pep-0484/)
+7. Add REST style docstring (see [403](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/403-action-recognition-webcam/403-action-recognition-webcam.ipynb)
    for an example). It is not necessary to specify the parameter type in the docstring, since
    type hints are already added to the function definition.
 8. Do not use global variables in functions: a function should not depend on values that are
@@ -124,8 +123,9 @@ To do this, there are a few requirements that all notebooks need to pass.
    and the source GitHub (if available).
 2. Use only data and models with permissive licenses that allow for commercial use, and make sure to
    adhere to the terms of the license.
-3. If you include code from external sources in your notebook, or in files supporting your notebook, add the
-   name, URL and license of the third party code to the licensing/third-party-programs.txt file
+3. If you include code from external sources in your notebook add the
+   name, URL and license of the third party code to the `licensing/third-party-programs.txt` file.
+4. Don't use HTML for text cells, use Markdown markups instead.
 
 ### Notebook naming
 
@@ -137,9 +137,11 @@ Names should be descriptive but not too long. We use the following numbering sch
 - `300-` Training notebooks: notebooks that include code to train neural networks.
 - `400-` Live demo notebooks: demonstrate inference on a live webcam.
 
-### READMEs
+Please use the first available number in the branch, trying to fill the holes e.g. choose 206, when there are 205 and 207 and 206 is missing.
 
-Every notebook must have a README file that briefly describes the content of the notebook. A simple structure for the README file is described below:
+### `README.md` files
+
+Every notebook must have a `README.md` file that briefly describes the content of the notebook. A simple structure for the `README.md` file is described below:
 
 ``` markdown
 # Title of Tutorial
@@ -155,9 +157,10 @@ Additional subsections, e.g license information.
 ```
 
 Every notebook is also added to the notebooks overview table in the main
-[README](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md) and the 
-[README](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/README.md) in the notebooks directory
-Notebooks that work in Binder have a _Launch Binder_ badge in the README files.
+[`README.md`](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md) and the 
+[`README.md`](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/README.md) in the notebooks directory.
+Notebooks that work in Binder have a _Launch Binder_ badge in the `README.md` files.
+In the same way, notebooks that work in Google Colab have a _Launch Colab_ badge in the `README.md` files.
 
 
 ### File Structure
@@ -165,25 +168,29 @@ Notebooks that work in Binder have a _Launch Binder_ badge in the README files.
 To maintain consistency between notebooks, please follow the directory structure outlined below.
 
 ```markdown
-<three-digit-number>-<title>/
-├── README.md
-├── <three-digit-number>-<title>.ipynb
-├── utils/
-├── model/
-└── data/
+notebooks/
+└──<three-digit-number>-<title>/
+   ├── README.md
+   ├── <three-digit-number>-<title>.ipynb
+   ├── utils/
+   ├── model/
+   ├── data/
+   └── output/
 ```
 
-In case of output provided by Notebook please create folder ```output``` on the same level as readme file.
+In case the example requires saving additional files to disk (e.g. models, data samples, utility modules, or outputs),
+please create corresponding folders on the same level as `README.md` file.
 
 #### Recommendations for File Structure
 
 - Model
 
-We recommend to load the model using url otherwise we can accept the model placed in the model folder which will be evaluated further for storage constraints.
+We recommend to load your models using URL or other ways of distribution of pre-trained models, 
+like PyTorch Hub or the Diffusers package. 
 
 - Data
 
-We recommend to use embedded URL for image/video data since GitHub limits the size of files allowed in repositories.
+We recommend to use embedded URL for image/video data.
 Follow the below instructions to create embedded URL in GitHub:
   - Go to any issue on GitHub.
   - In the comment section, you can attach files. Just drag/drop, select or paste your image.
@@ -197,39 +204,41 @@ Any datasets, images or videos used for fine-tuning, quantization or inference i
 
 ### Notebook utils
 
-The _notebook_utils.py_ file in the _notebooks/utils_ directory contains utility functions and classes that can be reused across
+The `notebook_utils.py` file in the `notebooks/utils` directory contains utility functions and classes that can be reused across
 notebooks. It contains a `download_file()` function that optionally shows a progress bar, and a standard way to convert
-segmentation maps to images and display them. The Python file is generated from _notebook_utils.ipynb_ notebook in the same directory.
-If you want to add a function or class to _notebook_utils.py_, please add it to the notebook, and generate the
+segmentation maps to images and display them. The Python file is generated from `notebook_utils.ipynb` notebook in the same directory.
+If you want to add a function or class to `notebook_utils.py`, please add it to the notebook, and generate the
 Python file with `jupyter nbconvert notebook_utils.ipynb --TagRemovePreprocessor.remove_cell_tags=hide --to script`
 Add a "hide" tag to any demo cells (from the right side gear sidebar) to prevent these cells from being added to the script.
 
 
 ## Requirements
 
-If you need to add a requirement, add it to requirements.txt and .docker/Pipfile. Use Python 3.8 to install 
-[pipenv](https://pypi.org/project/pipenv/), and run `pipenv lock` in the .docker directory to create Pipfile.lock. 
-Add all three files to the repository. 
+Contributors are encouraged to install the required packages at the top of their notebook using 
+`!pip install ...` commands. This allows the notebooks to be run independently as standalone examples. 
+To maintain package compatibility, contributors are expected to install the same versions of packages 
+as specified in the shared `requirements.txt` file located in the repository root folder.
 
 ## Validation
 
 ### Automated tests
 
-We use Github Actions to automatically validate that all notebooks work. The following tests run automatically on a new notebook PR:
+We use GitHub Actions to automatically validate that all notebooks work. The following tests run automatically on a new notebook PR:
 
-- nbval: tests that the notebooks execute without problems on all supported platforms. 
-- codecheck: 
-  - Uses [flake8](https://github.com/pycqa/flake8) to check for unnecessary imports and variables 
+- `treon`: tests that the notebooks execute without problems on all supported platforms. 
+- Code check: 
+  - Uses [`flake8`](https://github.com/pycqa/flake8) to check for unnecessary imports and variables 
 and some style issues
-  - Verifies that the notebook is included in the main README and the README in the notebooks directory. 
-  - Runs the check_install script to test for installation issues
-- docker_nbval: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
+  - Verifies that the notebook is included in the main `README.md` and the `README.md` in the notebooks directory. 
+  - Runs the `check_install.py` script to test for installation issues
+- Spell check: spell checking is performed by `PySpelling` module which requires `Aspell` spell checker in conjunction with our custom word list dictionary (`.ci/spellcheck/.pyspelling.wordlist.txt`). For information about dealing with found spelling problems please refer to the [`PySpelling` section below](#pyspelling).
+- `docker_treon`: tests that the docker image builds, and that the notebooks execute without errors in the Docker image. 
   To manually run this test, build the Docker image with `docker build -t openvino_notebooks .` and run the tests with
   `docker run -it  --entrypoint /tmp/scripts/test openvino_notebooks`. It is recommended to build the image on a clean 
-  repo because the full notebooks folder will be copied to the image.
-- [CodeQL](https://codeql.github.com/)
+  repository because the full notebooks folder will be copied to the image.
+- [`CodeQL`](https://codeql.github.com/)
 
-  - In the rest of this guide, the automated tests in Github
+  - In the rest of this guide, the automated tests in GitHub
 Actions will be referred to as CI (for Continuous Integration).
 
 If your notebook takes longer than a few minutes to execute, it may be possible to patch it in the CI, to make 
@@ -241,61 +250,68 @@ it execute faster. As an example, if your notebook trains for 20 epochs, you can
 
 See [Getting started](#getting-started) about installing the tools mentioned in this section.
 
-#### nbval
+#### `treon`
 
-Tests are run in the CI with [nbval](https://github.com/computationalmodelling/nbval), a plugin for
-py.test. The tests will only pass if the output is stripped from the notebooks. There are different
-way to do this. `jupyter nbconvert --clear-output --inplace notebook.ipynb` should work without
-installing additional dependencies. It is also possible to add a pre-commit hook to do this. The
-article [Making Git and Jupyter Notebooks play
-nice](http://timstaley.co.uk/posts/making-git-and-jupyter-notebooks-play-nice/) offers more
-information and possible solutions.
+Tests are run in the CI with [`treon`](https://pypi.org/project/treon/), a test framework for Jupyter Notebooks.
 
-To run nbval locally, run `pytest --nbval .` to run the tests for all notebooks, or `pytest --nbval
-notebook.ipynb` for just one notebook. `nbval` fails if the notebook environment is not
+To run `treon` locally, run `treon` to run the tests for all notebooks, or `treon notebook.ipynb` for just one notebook. `treon` fails if the notebook environment is not
 `openvino_env`.
 
-#### nbqa
+#### `nbqa`
 
-[nbqa](https://github.com/nbQA-dev/nbQA) allows using a variety of code quality tools on Jupyter
+[`nbqa`](https://github.com/nbQA-dev/nbQA) allows using a variety of code quality tools on Jupyter
 Notebooks. For example `nbqa flake8 notebook.ipynb` will warn about unused imports.
 
-#### nbdime
+#### `nbdime`
 
-[nbdime](https://github.com/jupyter/nbdime) has several useful tools, among which `nbdiff-web` to
+[`nbdime`](https://github.com/jupyter/nbdime) has several useful tools, among which `nbdiff-web` to
 show the difference between two notebooks in a web browser. `nbdiff` can also be used as the
 standard `diff` tool for `git`, with much more useful output than the regular `git diff` output.
 
 #### JupyterLab Code Formatter
 
-[JupyterLab Code Formatter](https://jupyterlab-code-formatter.readthedocs.io/en/latest/) adds a
-button to Jupyter Lab to automatically format the code in notebooks with black and isort. Please
+[JupyterLab Code Formatter](https://ryantam626.github.io/jupyterlab_code_formatter/index.html) adds a
+button to Jupyter Lab to automatically format the code in notebooks with `black` and `isort`. Please
 use either this extension or a different way to automatically format your notebook.
+
+#### `PySpelling`
+
+[`PySpelling`](https://facelessuser.github.io/pyspelling/) is a module to help with automating spell checking and it is essentially a wrapper around the `Aspell` command line utility. Additional custom (project and domain specific) word list dictionary that extends standard `Aspell` dictionary is located in `.ci/spellcheck/.pyspelling.wordlist.txt` file. `PySpelling` configuration file can be found in `.ci/spellcheck/.pyspelling.yml` file.
+
+To run spell checking locally, execute the following command:
+```
+python .ci/spellcheck/run_spellcheck.py
+```
+
+If spell check is failing, there are any typos or new words, you have two possible options how to fix it:
+
+1. Add new word (abbreviation, name, term etc.) to the word list dictionary (`.ci/spellcheck/.pyspelling.wordlist.txt`)
+2. Skip single occurrence of unknown word or even whole phrase - just wrap the text with `<spell>` tag (for example, `<spell>Unknown word or phrase</spell>`). Note that `<spell>` is a custom tag and it doesn't affect the Markdown formatting and style (unlike <spell>backticks</spell> in preformatted text and code blocks).
 
 ## Getting started
 
 1. Create a fork, a copy of the repository, by clicking on the Fork button on the top right of the
-   OpenVINO Notebooks [Github page](https://github.com/openvinotoolkit/openvino_notebooks)
+   OpenVINO Notebooks [GitHub page](https://github.com/openvinotoolkit/openvino_notebooks)
 2. Install the recommended packages for a development environment with `pip install -r
-   .ci/dev-requirements.txt` inside the `openvino_env` enviroment. This installs all the packages
+   .ci/dev-requirements.txt` inside the `openvino_env` environment. This installs all the packages
    mentioned in the [Validation](#Validation) section.
+      > **Note**: `PySpelling` dependency from `.ci/dev-requirements.txt` requires `Aspell` for spell checking that should be installed manually. For installation instructions please refer to the [`PySpelling` documentation](https://facelessuser.github.io/pyspelling/#prerequisites).
 3. Create a branch in this fork, from the *main* branch. Name the
    branch however you like.
-4. Doublecheck the points in the [Design](#Design) and [Validation](#Validation) sections.
+4. Double-check the points in the [Design Decisions](#design-decisions) and [Validation](#Validation) sections.
 5. Check that your notebook works in the CI
-   - Go to the GitHub page of your fork, click on _Actions_, select _nbval_ on the left. There will
+   - Go to the GitHub page of your fork, click on _Actions_, select `treon` on the left. There will
      be a message _This workflow has a workflow_dispatch event trigger._ and a _Run workflow_ button.
      Click on the button and select the branch that you want to test.
-6. Test if the notebook works in [https://mybinder.org/](Binder) and if so, add _Launch Binder_ badges 
-   to the README files.
+6. Test if the notebook works in [Binder](https://mybinder.org/) and [Google Colab](https://colab.research.google.com/) and if so, add _Launch Binder_ and _Launch Colab_ badges 
+   to the `README.md` files.
 
 Once your notebook passes in the CI and you have verified that everything looks good, make a Pull Request!
 
 ### Pull Requests (PRs)
 
-1. If some time has passed since you made the fork, rebase or merge your fork to the
-   openvino_notebooks main branch first.
-2. Create your PR against the openvino_notebooks main branch.
+1. If some time has passed since you made the fork, sync your fork via GitHub UI or update your form manually - rebase or merge `openvinotoolkit/openvino_notebooks` repository main branch to the main branch in your fork.
+2. Create your PR against the `openvinotoolkit/openvino_notebooks` repository main branch.
 3. Please create a description of what the notebook does with your PR. Screenshots are appreciated!
 4. On making or updating a Pull Request, the tests in the CI will run again. Please keep an
    eye on them. If the tests fail and you think the issue is not related to your PR, please make a comment on your PR.

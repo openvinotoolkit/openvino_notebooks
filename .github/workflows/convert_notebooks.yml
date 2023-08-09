@@ -16,6 +16,8 @@ on:
   pull_request:
     paths:
     - '.github/workflows/convert_notebooks.yml'
+  schedule:
+    - cron: "0 0 * * *"
 
 
 concurrency:
@@ -27,19 +29,28 @@ jobs:
     strategy:
       fail-fast: false
 
-      # Matrix is unnecessary here, but this allows easy copying of steps from nbval.yml
+      # Matrix is unnecessary here, but this allows easy copying of steps from treon.yml
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04]
         python: [3.8]
 
     runs-on: ${{ matrix.os }}
     
     steps:
+    - name: Maximize build space
+      run:  |
+            sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
+            sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
+            sudo rm -rf /opt/ghc
+            echo "Available storage:"
+            df -h
+    - name: Set Swap Space
+      uses: pierotofy/set-swap-space@master
+      with:
+        swap-size-gb: 10
     - name: Install required packages for rst converstion
       run:  |
             sudo apt-get update && sudo apt-get install texlive texlive-latex-extra pandoc -y
-            conda install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
-            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
       shell: bash
 
     #### Installation/preparation ####
@@ -80,13 +91,13 @@ jobs:
       with:
         path: |
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
-          # and change cache paths in both nbval.yml and convert_notebooks.yml
+          # and change cache paths in both treon.yml and convert_notebooks.yml
           case_00030.zip
           notebooks/110-ct-segmentation-quantize/kits19_frames_1
           notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
           # 208 omz cache location is set to this with test_replace
           notebooks/208-optical-character-recognition/open_model_zoo_cache
-          notebooks/210-ct-scan-live-inference/kits19_frames_1
+          notebooks/110-ct-scan-live-inference/kits19_frames_1
           notebooks/212-onnx-style-transfer/model
           notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
         key: ${{ env.FILES_CACHE_KEY }}
@@ -137,7 +148,13 @@ jobs:
         cp -r case_00030 case_00001
         mv case_00030 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
         mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
-
+    - name: Download shared datasets
+      run: |
+          mkdir notebooks/data/librispeech
+          wget  -O notebooks/data/librispeech/test-clean.tar.gz http://openslr.elda.org/resources/12/test-clean.tar.gz
+          tar -xvf notebooks/data/librispeech/test-clean.tar.gz
+          mkdir notebooks/data/cifar10
+          wget -O notebooks/data/cifar10/cifar-10-python.tar.gz https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip==21.3.*
@@ -166,7 +183,8 @@ jobs:
     #### End installation/preparation
 
     - name: convert_notebooks
-      run: bash .ci/convert_notebooks.sh
+      shell: bash
+      run: .ci/convert_notebooks.sh
     - name: Save HTML files
       uses: actions/upload-artifact@v2
       with:

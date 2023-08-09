@@ -10,13 +10,13 @@ Human action recognition finds actions over time in a video. The list of actions
 
 ## Notebook Contents
 
-This notebook demonstrates live human action recognition with OpenVINO, using the [Action Recognition Models](https://docs.openvino.ai/latest/omz_models_group_intel.html#action-recognition-models) from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo), specifically the Encoder and Decoder from [action-recognition-0001](https://docs.openvino.ai/latest/omz_models_model_action_recognition_0001.html). Both models create a sequence to sequence (`"seq2seq"`)<sup id="a1">[1](#f1)</sup> system to identify the  human activities for [Kinetics-400 dataset](https://deepmind.com/research/open-source/kinetics). The models use the Video Transformer approach with ResNet34 encoder<sup id="a2">[2](#f2)</sup>. The notebook shows how to create the following pipeline:
+This notebook demonstrates live human action recognition with OpenVINO, using the [Action Recognition Models](https://docs.openvino.ai/2023.0/omz_models_group_intel.html#action-recognition-models) from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo), specifically the Encoder and Decoder from [action-recognition-0001](https://docs.openvino.ai/2023.0/omz_models_model_action_recognition_0001.html). Both models create a sequence to sequence (`"seq2seq"`)<sup id="a1">[1](#f1)</sup> system to identify the  human activities for [Kinetics-400 dataset](https://deepmind.com/research/open-source/kinetics). The models use the Video Transformer approach with ResNet34 encoder<sup id="a2">[2](#f2)</sup>. The notebook shows how to create the following pipeline:
 
 <p align="center" width="100%">
     <img width="80%" src="https://user-images.githubusercontent.com/10940214/148401661-477aebcd-f2d0-4771-b107-4b37f94d0b1e.jpeg"> 
 </p>
 
-Final part of this notebook shows live inference results from a webcam. Additionaly, you can also upload a video file.
+Final part of this notebook shows live inference results from a webcam. Additionally, you can also upload a video file.
 
 > **NOTE**: To use the webcam, you must run this Jupyter notebook on a computer with a webcam. If you run on a server, the webcam will not work. However, you can still do inference on a video in the final step.
 
@@ -30,8 +30,8 @@ For more information about the pre-trained models, refer to the [Intel models do
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
 
-### See Also
+## See Also
 
 * [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
-* [Model Optimizer](https://docs.openvino.ai/latest/_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html)
-* [Action Recognition Demo (OpenVINO - No notebooks)](https://docs.openvino.ai/latest/omz_demos_action_recognition_demo_python.html)
+* [Model Conversion API](https://docs.openvino.ai/2023.0/openvino_docs_model_processing_introduction.html)
+* [Action Recognition Demo (OpenVINO - No notebooks)](https://docs.openvino.ai/2023.0/omz_demos_action_recognition_demo_python.html)

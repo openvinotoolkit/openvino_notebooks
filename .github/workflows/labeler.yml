@@ -1,0 +1,31 @@
+name: "PR Labeler"
+
+on:
+  pull_request:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  labelling:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Add labels (Title/Description)
+      uses: github/issue-labeler@v3.1
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        configuration-path: ".github/labeler_regexp.yml"
+        not-before: 2023-03-30T00:00:00Z
+        enable-versioned-regex: 0
+        include-title: 1
+        sync-labels: 1
+    - name: Add labels (Changed Files)
+      uses: akashchi/pr-labeler@v2.0
+      with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          config: ".github/labeler_files.yml"
+          strategy: "append"
