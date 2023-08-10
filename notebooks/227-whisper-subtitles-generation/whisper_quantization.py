@@ -15,13 +15,22 @@ import re
 from tqdm import tqdm
 from jiwer import compute_measures
 
+from transformers import WhisperProcessor
+from evaluate import load
+
 import subprocess
+
+import pyarrow as pa
+import pandas as pd
 
 import datetime
 from pathlib import Path
 import numpy as np
 import openvino.runtime as ov
 import nncf
+from nncf import nncf_logger
+from nncf.quantization.range_estimator import RangeEstimatorParameters, StatisticsCollectorParameters, StatisticsType, \
+    AggregatorType
 from nncf.torch import register_module
 from nncf import IgnoredScope
 from nncf.quantization.advanced_parameters import AdvancedQuantizationParameters, OverflowFix
@@ -39,7 +48,7 @@ TASK = "transcribe"
 # TASK = "translate"
 
 
-verbose = bool(0)
+VERBOSE = bool(0)
 
 
 BASE_DIR = Path("./")
@@ -50,7 +59,6 @@ decoder_init_data = []
 
 num_encoder_forwards = 0
 num_decoder_forwards = 0
-total_transcribe_time = 0
 
 core = Core()
 
@@ -98,10 +106,16 @@ class OpenVINOTextDecoderOld(torch.nn.Module):
     Helper for inference OpenVINO decoder model
     """
 
-    def __init__(self, core: Core, model_path: Path, device: str = 'CPU'):
+    def __init__(self, core: Core, model: Union[Path, ov.CompiledModel], device: str = 'CPU'):
         super().__init__()
         self._core = core
-        self.model = core.read_model(model_path)
+        if isinstance(model, ov.CompiledModel):
+            self.model = self.compiled_model = model
+        elif isinstance(model, Path):
+            self.model = core.read_model(model)
+            self.compiled_model = core.compile_model(self.model, device)
+        else:
+            raise Exception
         self._input_names = [inp.any_name for inp in self.model.inputs]
         self.compiled_model = core.compile_model(self.model, device)
         self.device = device
@@ -182,7 +196,7 @@ class OpenVINOTextDecoderOld(torch.nn.Module):
         feed_dict = (self.preprocess_kv_cache_inputs(feed_dict, kv_cache))
         if COLLECT_INIT_DATA:
             decoder_init_data.apend(feed_dict)
-        if verbose and start_time is not None:
+        if VERBOSE and start_time is not None:
             print(num_encoder_forwards, num_decoder_forwards, feed_dict["tokens"].shape, feed_dict["in_k_0a"].shape,
                   datetime.datetime.now() - start_time)
         res = self.compiled_model(feed_dict)
@@ -194,12 +208,17 @@ class OpenVINOTextDecoderNew(torch.nn.Module):
     Helper for inference OpenVINO decoder model
     """
 
-    def __init__(self, core: Core, model_path: Path, device: str = 'CPU'):
+    def __init__(self, core: Core, model: Union[Path, ov.CompiledModel], device: str = 'CPU'):
         super().__init__()
         self._core = core
-        self.model = core.read_model(model_path)
+        if isinstance(model, ov.CompiledModel):
+            self.model = self.compiled_model = model
+        elif isinstance(model, Path):
+            self.model = core.read_model(model)
+            self.compiled_model = core.compile_model(self.model, device)
+        else:
+            raise Exception
         self._input_names = [inp.any_name for inp in self.model.inputs]
-        self.compiled_model = core.compile_model(self.model, device)
         self.device = device
 
     def init_past_inputs(self, feed_dict):
@@ -207,7 +226,7 @@ class OpenVINOTextDecoderNew(torch.nn.Module):
         Initialize cache input for first step.
 
         Parameters:
-          feed_dict: Dictonary with inputs for inference
+          feed_dict: Dictionary with inputs for inference
         Returns:
           feed_dict: updated feed_dict
         """
@@ -270,7 +289,7 @@ class OpenVINOTextDecoderNew(torch.nn.Module):
         feed_dict = (self.preprocess_kv_cache_inputs(feed_dict, kv_cache))
         if COLLECT_INIT_DATA:
             decoder_init_data.append(feed_dict)
-        if verbose and start_time is not None:
+        if VERBOSE and start_time is not None:
             print(num_encoder_forwards, num_decoder_forwards, feed_dict["tokens"].shape, feed_dict["in_k_0a"].shape,
                   datetime.datetime.now() - start_time)
         res = self.compiled_model(feed_dict)
@@ -705,6 +724,26 @@ def convert_pt_decoder_to_ov_directly(encoder, decoder, save_dir, decoder_alread
     ov.serialize(decoder_model, save_dir / "whisper_decoder.xml")
 
 
+def load_init_data(decoder_model_inputs=None):
+    global encoder_init_data, decoder_init_data
+    with open(CALIBRATION_DATA_CACHE, 'rb') as f:
+        encoder_init_data, decoder_init_data = pickle.load(f)
+        encoder_init_data, decoder_init_data = convert_input_data_to_ov_tensor(encoder_init_data),\
+            convert_input_data_to_ov_tensor(decoder_init_data)
+
+    if decoder_model_inputs is not None and OVC_API_DECODER and 'tokens' in decoder_init_data[0].keys():
+        # calibration data was collected in MO export format and with OVC export input names are different
+        input_name_mapping = {'tokens': 'x', 'audio_features': 'xa'}
+        new_input_names = [next(iter(inp.names)) for inp in decoder_model_inputs][2:] #model.decoder.model.inputs
+        for new_inp_name, old_inp_name in zip(new_input_names, list(decoder_init_data[0].keys())[2:]):
+            input_name_mapping[old_inp_name] = new_inp_name
+        for d in decoder_init_data:
+            for k in list(d.keys()):
+                v = d[k]
+                del d[k]
+                d[input_name_mapping[k]] = v
+
+
 def run_benchmark(model_path: Path, shape: str = None, verbose: bool = True) -> float:
     command = f"~/venvs/ov_notebooks/bin/benchmark_app -m {model_path} -d CPU -api async -t 15 -hint latency"
     report_folder = model_path.parent / f'report_{model_path.stem}'
@@ -721,6 +760,67 @@ def run_benchmark(model_path: Path, shape: str = None, verbose: bool = True) -> 
     return float(match.group(1))
 
 
+def run_validation(model, dataset, return_only_accuracy=True, temperatures=None):
+    global num_encoder_forwards, num_decoder_forwards
+
+    processor = WhisperProcessor.from_pretrained("openai/whisper-large")
+
+    total_num_encoder_forwards = []
+    total_num_decoder_forwards = []
+    total_transcribe_time = 0
+
+    kwargs = {}
+    if temperatures is not None:
+        kwargs["temperature"] = temperatures
+
+    ground_truths = []
+    predictions = []
+    for b in tqdm(dataset, disable=return_only_accuracy):
+        reference = processor.tokenizer._normalize(b.get("text", b.get("transcription")))
+
+        num_encoder_forwards = num_decoder_forwards = 0
+
+        s_time = datetime.datetime.now()
+        transcription = model.transcribe(b["audio"]["array"].astype(np.float32), **kwargs)['text']
+        total_transcribe_time += (datetime.datetime.now() - s_time).total_seconds()
+
+        total_num_encoder_forwards.append(num_encoder_forwards)
+        total_num_decoder_forwards.append(num_decoder_forwards)
+
+        prediction = processor.tokenizer._normalize(transcription)
+
+        ground_truths.append(reference)
+        predictions.append(prediction)
+
+    # def map_to_pred(batch):
+    #     audio = batch["audio"]
+    #     batch["reference"] = processor.tokenizer._normalize(batch.get("text", batch.get("transcription")))
+    #
+    #     kwargs = {}
+    #     if temperatures is not None:
+    #         kwargs["temperature"] = temperatures
+    #
+    #     s_time = datetime.datetime.now()
+    #     transcription = model.transcribe(audio["array"].astype(np.float32), **kwargs)['text']
+    #     total_transcribe_time += (datetime.datetime.now() - s_time).total_seconds()
+    #
+    #     total_num_encoder_forwards.append(num_encoder_forwards)
+    #     total_num_decoder_forwards.append(num_decoder_forwards)
+    #
+    #     batch["prediction"] = processor.tokenizer._normalize(transcription)
+    #     return batch
+    # result = dataset.map(map_to_pred)
+    # ground_truths, predictions = result["reference"], result["prediction"]
+
+    wer = load("wer")
+    word_accuracy = 1 - wer.compute(references=ground_truths, predictions=predictions)
+
+    if return_only_accuracy:
+        return word_accuracy
+    return word_accuracy, ground_truths, predictions, total_transcribe_time, \
+        total_num_encoder_forwards, total_num_decoder_forwards
+
+
 def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alpha_encoder, sq_alpha_decoder,
              ignore_logits, inplace_statistics_decoder):
     global encoder_init_data, decoder_init_data
@@ -732,7 +832,6 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
     if not save_dir.exists():
         save_dir.mkdir(parents=True)
     log_file_path = Path(save_dir) / f"quantize_{datetime.datetime.now()}.log"
-    from nncf import nncf_logger
     map(logger.removeHandler, logger.handlers)
     logger.addHandler(logging.FileHandler(log_file_path))
     nncf_logger.addHandler(logging.FileHandler(log_file_path))
@@ -774,10 +873,8 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
             model.decoder = original_decoder
         else:
             logger.info('Loading calibration data...')
-            with open(CALIBRATION_DATA_CACHE, 'rb') as f:
-                encoder_init_data, decoder_init_data = pickle.load(f)
-                encoder_init_data, decoder_init_data = convert_input_data_to_ov_tensor(encoder_init_data),\
-                    convert_input_data_to_ov_tensor(decoder_init_data)
+            ov_decoder = OpenVINOTextDecoder(core,BASE_DIR/ORIGINAL_DECODER_MODEL_DIR/'whisper_decoder.xml').model
+            load_init_data(ov_decoder.inputs)
 
     advanced_parameters = AdvancedQuantizationParameters(
         backend_params={"use_pot": use_pot},  # use legacy backend that supports Bias Correction
@@ -812,7 +909,7 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
                 quantization_dataset,
                 model_type=nncf.ModelType.TRANSFORMER,
                 fast_bias_correction=True,
-                subset_size=num_calibration_samples,
+                subset_size=len(encoder_init_data),
                 advanced_parameters=advanced_parameters,
                 # ignored_scope=ignored_scope,
             )
@@ -832,7 +929,15 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
         backend_params={"use_pot": use_pot},  # use legacy backend that supports Bias Correction
         overflow_fix=OverflowFix.DISABLE,  # disable overflow fix (can lead to accuracy drop on legacy platforms w/o DL Boost),
         smooth_quant_alpha=sq_alpha_decoder,
-        inplace_statistics=inplace_statistics_decoder
+        inplace_statistics=inplace_statistics_decoder,
+        # activations_range_estimator_params=RangeEstimatorParameters(
+        #     min=StatisticsCollectorParameters(
+        #         statistics_type=StatisticsType.QUANTILE, aggregator_type=AggregatorType.MIN, quantile_outlier_prob=1e-4
+        #     ),
+        #     max=StatisticsCollectorParameters(
+        #         statistics_type=StatisticsType.QUANTILE, aggregator_type=AggregatorType.MAX, quantile_outlier_prob=1e-4
+        #     ),
+        # ),
     )
     logger.info(advanced_parameters)
 
@@ -860,18 +965,6 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
         model.decoder = OpenVINOTextDecoder(core, BASE_DIR / ORIGINAL_DECODER_MODEL_DIR / 'whisper_decoder.xml')
 
         if decoder_compression == "quantization":
-            if OVC_API_DECODER and 'tokens' in decoder_init_data[0].keys():
-                # calibration data was collect in MO export format and with OVC export input names are different
-                input_name_mapping = {'tokens': 'x', 'audio_features': 'xa'}
-                new_input_names = [next(iter(inp.names)) for inp in model.decoder.model.inputs][2:]
-                for new_inp_name, old_inp_name in zip(new_input_names, list(decoder_init_data[0].keys())[2:]):
-                    input_name_mapping[old_inp_name] = new_inp_name
-                for d in decoder_init_data:
-                    for k in list(d.keys()):
-                        v = d[k]
-                        del d[k]
-                        d[input_name_mapping[k]] = v
-
             quantization_dataset = nncf.Dataset(decoder_init_data)
             ignored_scope = IgnoredScope(names=["aten::to/Convert_713" if OVC_API_DECODER else "logits"]) \
                 if ignore_logits else None
@@ -880,7 +973,7 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
                 quantization_dataset,
                 model_type=nncf.ModelType.TRANSFORMER,
                 fast_bias_correction=True,
-                subset_size=num_calibration_samples,
+                subset_size=len(decoder_init_data),
                 advanced_parameters=advanced_parameters,
                 ignored_scope=ignored_scope
             )
@@ -928,9 +1021,9 @@ def benchmark(model_path):
 
 
 def transcribe(model_path, video_path, temperatures=None):
-    global start_time, verbose
+    global start_time, VERBOSE
 
-    verbose_value = verbose
+    verbose_value = VERBOSE
     # verbose = bool(1)
 
     log_file_path = model_path / f"transcribe_{datetime.datetime.now()}.log"
@@ -964,15 +1057,13 @@ def transcribe(model_path, video_path, temperatures=None):
     logger.info(f'Number of decoder calls: {num_decoder_forwards}')
     logger.info(f'Transcribing time: {finish_time - start_time}')
 
-    verbose = verbose_value
+    VERBOSE = verbose_value
 
 
 def validate_model(model_path, temperatures=None):
     log_file_path = model_path / f"validation_{datetime.datetime.now()}.log"
     map(logger.removeHandler, logger.handlers)
     logger.addHandler(logging.FileHandler(log_file_path))
-
-    global total_transcribe_time
 
     logger.info(f'Validating model {model_path} with temperatures: {temperatures}')
     model = whisper.load_model("base")
@@ -982,59 +1073,91 @@ def validate_model(model_path, temperatures=None):
     model.encoder = OpenVINOAudioEncoder(core, model_path / "whisper_encoder.xml")
     model.decoder = OpenVINOTextDecoder(core, model_path / "whisper_decoder.xml")
 
-    from transformers import WhisperProcessor
-    from evaluate import load
-
     dataset = load_dataset("librispeech_asr", "clean", split="test[:100]")
     # dataset = load_dataset("PolyAI/minds14", name="en-US", split="train[:100]")
     # dataset = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation[30:]")
+
     logger.info(f'Dataset info: {dataset.info}')
-    processor = WhisperProcessor.from_pretrained("openai/whisper-large")
 
-    total_num_encoder_forwards = []
-    total_num_decoder_forwards = []
-    total_transcribe_time = 0
-
-    def map_to_pred(batch):
-        global num_encoder_forwards, num_decoder_forwards, total_transcribe_time
-        audio = batch["audio"]
-        batch["reference"] = processor.tokenizer._normalize(batch.get("text", batch.get("transcription")))
-
-        kwargs = {}
-        if temperatures is not None:
-            kwargs["temperature"] = temperatures
-
-        num_encoder_forwards = num_decoder_forwards = 0
-
-        s_time = datetime.datetime.now()
-        transcription = model.transcribe(audio["array"].astype(np.float32), **kwargs)['text']
-        total_transcribe_time += (datetime.datetime.now() - s_time).total_seconds()
-
-        total_num_encoder_forwards.append(num_encoder_forwards)
-        total_num_decoder_forwards.append(num_decoder_forwards)
-
-        batch["prediction"] = processor.tokenizer._normalize(transcription)
-        return batch
-
-    result = dataset.map(map_to_pred)
+    word_accuracy, ground_truths, predictions, total_transcribe_time, \
+        total_num_encoder_forwards, total_num_decoder_forwards = \
+        run_validation(model, list(dataset), return_only_accuracy=False, temperatures=temperatures)
 
     total_S, total_D, total_I, total_H = 0, 0, 0, 0
-    for ref, pred in zip(result["reference"], result["prediction"]):
+    for ref, pred in zip(ground_truths, predictions):
         measures = compute_measures(ref, pred)
         S, D, I, H = measures["substitutions"], measures["deletions"], measures["insertions"], measures["hits"]
-        total_S += S; total_D += D; total_I += I; total_H += H
+        total_S += S;
+        total_D += D;
+        total_I += I;
+        total_H += H
         wer = (S + D + I) / (S + D + H)
         logger.info(f"WER: {wer:.04f}; S: {S}; D: {D}; I: {I}; H: {H}")
         logger.info(f"Reference: {ref}")
         logger.info(f"Prediction: {pred}")
         logger.info("\n")
 
-    wer = load("wer")
-    logger.info(f'Word accuracy (1-wer): {1 - wer.compute(references=result["reference"], predictions=result["prediction"])}')
+    logger.info(f'Word accuracy (1-wer): {word_accuracy}')
     logger.info(f'Total transcribe time: {total_transcribe_time}', )
     logger.info(f'Average encoder calls: {sum(total_num_encoder_forwards) / len(total_num_encoder_forwards)}')
     logger.info(f'Average decoder calls: {sum(total_num_decoder_forwards) / len(total_num_decoder_forwards)}')
     logger.info(f"Total S: {total_S}; D: {total_D}; I: {total_I}; H: {total_H}")
+
+
+def quantize_decoder_with_accuracy_control(model_path, sq_alpha_decoder, temperatures=None):
+    global decoder_init_data
+
+    model_path = Path(model_path)
+    save_dir = model_path / f'qwac_{datetime.datetime.now()}'
+
+    if not save_dir.exists():
+        save_dir.mkdir(parents=True)
+    log_file_path = Path(save_dir) / f"qwac_{datetime.datetime.now()}.log"
+    map(logger.removeHandler, logger.handlers)
+    logger.addHandler(logging.FileHandler(log_file_path))
+    nncf_logger.addHandler(logging.FileHandler(log_file_path))
+
+    model = whisper.load_model("base")
+    model.to("cpu")
+    model.eval()
+    patch_whisper_for_ov_inference(model)
+    model.encoder = OpenVINOAudioEncoder(core, model_path / "whisper_encoder.xml")
+    model.decoder = None
+    ov_decoder = core.read_model(model_path / "whisper_decoder.xml")
+
+    logger.info('Loading calibration data...')
+    load_init_data(ov_decoder.inputs)
+    quantization_dataset = nncf.Dataset(list(reversed(decoder_init_data)))
+
+    ptq_config = dict(
+        advanced_quantization_parameters=AdvancedQuantizationParameters(
+            overflow_fix=OverflowFix.DISABLE,
+            smooth_quant_alpha=sq_alpha_decoder
+        ),
+        model_type=nncf.ModelType.TRANSFORMER,
+        fast_bias_correction=True,
+        subset_size=min(300, len(decoder_init_data))
+    )
+
+    dataset = load_dataset("librispeech_asr", "clean", split="test[:100]")
+    # dataset = load_dataset("PolyAI/minds14", name="en-US", split="train[:100]")
+    # dataset = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation[30:]")
+
+    def validation_fn(m, d):
+        model.decoder = OpenVINOTextDecoder(core, m)
+        return run_validation(model, d, return_only_accuracy=True, temperatures=temperatures)
+
+    ov.serialize(ov_decoder, save_dir / "whisper_decoder_initial.xml")
+    compressed_decoder = nncf.quantize_with_accuracy_control(
+        ov_decoder,
+        quantization_dataset,
+        nncf.Dataset(list(dataset)),
+        validation_fn,
+        **ptq_config
+    )
+
+    ov.serialize(compressed_decoder, save_dir / "whisper_decoder.xml")
+    ov.serialize(model.encoder.model, save_dir / "whisper_encoder.xml")
 
 
 video_path = download_video(BASE_DIR, "https://youtu.be/kgL5LBM-hFI")  # Intel 1
@@ -1043,24 +1166,24 @@ video_path = download_video(BASE_DIR, "https://youtu.be/kgL5LBM-hFI")  # Intel 1
 # video_path = download_video(base_dir, "https://www.youtube.com/watch?v=I8iBhUMFCIA")  # Other 45 sec
 
 
-compressed_model_path = quantize("models/test_model",
-                                 # encoder_compression="weights",
-                                 encoder_compression="quantization",
-                                 # encoder_compression=None,
-                                 # decoder_compression="weights",
-                                 decoder_compression="quantization",
-                                 # decoder_compression=None,
-                                 use_pot=bool(0),
-                                 sq_alpha_encoder=0.5,
-                                 sq_alpha_decoder=0.15,
-                                 ignore_logits=bool(0),
-                                 inplace_statistics_decoder=bool(0),
-                                 )
-benchmark(compressed_model_path)
-transcribe(compressed_model_path, video_path)
+# compressed_model_path = quantize("quantized_models/ovc/encoder-ptq-no-sq_decoder-none",
+#                                  # encoder_compression="weights",
+#                                  encoder_compression="quantization",
+#                                  # encoder_compression=None,
+#                                  # decoder_compression="weights",
+#                                  # decoder_compression="quantization",
+#                                  decoder_compression=None,
+#                                  use_pot=bool(0),
+#                                  sq_alpha_encoder=-1,
+#                                  sq_alpha_decoder=-1,
+#                                  ignore_logits=bool(1),
+#                                  inplace_statistics_decoder=bool(1),
+#                                  )
+# benchmark(compressed_model_path)
+# transcribe(compressed_model_path, video_path)
 # validate_model(compressed_model_path)
 
-# model_path = Path('quantized_models/compress_weights/encoder-ptq-sq-0.50_decoder-ptq-sq-0.95')
+# model_path = Path('quantized_models/ovc/encoder-none_decoder-none')
 # benchmark(model_path)
 # transcribe(model_path, video_path,
 #            # temperatures=0
@@ -1069,7 +1192,13 @@ transcribe(compressed_model_path, video_path)
 #                # temperatures=0.2
 #                )
 
+
+quantize_decoder_with_accuracy_control("quantized_models/ovc/encoder-ptq-sq-0.50_decoder-none",
+                                       sq_alpha_decoder=-1,
+                                       temperatures=None)
+
+
 if OVC_API_ENCODER:
-    logger.info('Used new API with conversion straight to IR for encoder')
+    logger.info('Used OVC API with conversion straight to IR for encoder')
 if OVC_API_DECODER:
-    logger.info('Used new API with conversion straight to IR for decoder')
+    logger.info('Used OVC API with conversion straight to IR for decoder')
