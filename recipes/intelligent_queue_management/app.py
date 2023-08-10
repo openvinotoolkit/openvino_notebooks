@@ -95,14 +95,14 @@ def postprocess(pred_boxes: np.ndarray, input_size: Tuple[int, int], orig_img, m
 
     # no predictions in the image
     if not len(pred):
-        return sv.Detections(xyxy=np.empty((0, 4), dtype=np.float32), confidence=np.array([], dtype=np.float32), class_id=np.array([], dtype=int))
+        return sv.Detections.empty()
 
     # transform boxes to pixel coordinates
     pred[:, :4] = ops.scale_boxes(input_size, pred[:, :4], orig_img.shape).round()
     # numpy array from torch tensor
     pred = np.array(pred)
     # create detections in supervision format
-    det = sv.Detections(pred[:, :4], pred[:, 5], pred[:, 4])
+    det = sv.Detections(pred[:, :4], confidence=pred[:, 4], class_id=pred[:, 5])
     # filter out other predictions than people
     return det[det.class_id == 0]
 
