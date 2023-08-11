@@ -15,3 +15,4 @@
 241-riffusion-text-to-music
 242-freevc-voice-conversion
 248-stable-diffusion-xl
+249-oneformer-segmentation
