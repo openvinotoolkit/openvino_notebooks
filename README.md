@@ -167,7 +167,7 @@ Demos that demonstrate inference on a particular model.
 | [246-depth-estimation-videpth](notebooks/246-depth-estimation-videpth/)<br>| Monocular Visual-Inertial Depth Estimation with OpenVINO™ | <img src=https://raw.githubusercontent.com/alexklwong/void-dataset/master/figures/void_samples.png width=225> |
 | [247-code-language-id](notebooks/247-code-language-id/247-code-language-id.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F247-code-language-id%2F247-code-language-id.ipynb) | Identify the programming language used in an arbitrary code snippet | ||
 | [248-stable-diffusion-xl](notebooks/248-stable-diffusion-xl/)<br> |  Image generation with Stable Diffusion XL and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/258651862-28b63016-c5ff-4263-9da8-73ca31100165.jpeg width=225>  |
-| [249-yolact-image-segmentation](notebooks/249-yolact-instance-segmentation-ov-demo/) <br>| Instance segmentation on images using Yolact and OpenVINO™.| <img src="https://raw.githubusercontent.com/Abdullah-Elkasaby/yolact-isntance-segmentation-openvino/main/coco_bike_yolact.png" width=225> |
+| [250-yolact-image-segmentation](notebooks/250-yolact-instance-segmentation-ov-demo/) <br>| Instance segmentation on images using Yolact and OpenVINO™.| <img src="https://raw.githubusercontent.com/Abdullah-Elkasaby/yolact-isntance-segmentation-openvino/main/coco_bike_yolact.png" width=225> |
 
 <div id='-model-training'></div>
 
