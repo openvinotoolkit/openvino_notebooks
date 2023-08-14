@@ -34,7 +34,7 @@ def move_notebooks(nb_dir):
 
 def prepare_test_plan(test_list, ignore_list, nb_dir=None):
     notebooks_dir = ROOT / 'notebooks' if nb_dir is None else nb_dir
-    notebooks = sorted(list(notebooks_dir.rglob('**/*-hello-*.ipynb')))
+    notebooks = sorted(list(notebooks_dir.rglob('**/40*.ipynb')))
     statuses = {notebook.parent.relative_to(notebooks_dir): {'status': '', 'path': notebook.parent} for notebook in notebooks}
     test_list = test_list or statuses.keys()
     if ignore_list is not None and len(ignore_list) == 1 and ignore_list[0].endswith('.txt'):
