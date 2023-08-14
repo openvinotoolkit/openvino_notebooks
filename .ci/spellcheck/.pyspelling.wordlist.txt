@@ -277,6 +277,8 @@ ocr
 OCRv
 odometry
 OMZ
+OneFormer
+oneformer
 ONNX
 onnx
 ontologies
@@ -307,6 +309,8 @@ PaddlePaddle
 PaddlePaddle's
 PAF
 PAFs
+Panoptic
+panoptic
 parallelized
 parameterization
 parametrize
@@ -439,9 +443,11 @@ subdirectories
 subdirectory
 subgraph
 sublicense
+subtask
 summarization
 superresolution
 superset
+Swin
 SwinV
 TartanAir
 TensorBoard
