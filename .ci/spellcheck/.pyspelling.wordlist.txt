@@ -304,6 +304,8 @@ opset
 optimizable
 overfitting
 overlayed
+OV
+OVC
 OVMS
 PaddleClas
 PaddleGAN
