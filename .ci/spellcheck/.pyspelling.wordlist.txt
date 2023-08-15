@@ -47,6 +47,8 @@ Cifar
 cityscape
 Cityscapes
 CLIP's
+codebook
+codebooks
 codec
 codecs
 Codecs
@@ -186,9 +188,11 @@ InferRequest
 InferRequests
 inpainting
 installable
+instantiation
 InstructGPT
 InstructPix
 invertible
+intervaling
 IRs
 iteratively
 JFLEG
@@ -227,6 +231,7 @@ LMS
 logits
 LogSoftmax
 LTS
+LSTM
 macOS
 Mahalanobis
 Mapillary
@@ -244,6 +249,7 @@ Midjourney
 MiniLM
 MobileNet
 MobileNetV
+MusicGen
 modelled
 MONAI
 MONAI's
@@ -380,6 +386,7 @@ rebase
 redistributable
 RegNet
 RegNetY
+regressively
 reidentification
 ReLU
 René
