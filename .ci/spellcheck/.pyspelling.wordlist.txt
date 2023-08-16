@@ -167,6 +167,7 @@ heatmap
 HED
 hoc
 HuggingFace
+Huggingface
 Husain
 HWC
 hyperparameters
@@ -245,6 +246,7 @@ MiniLM
 MobileNet
 MobileNetV
 modelled
+Modelscope
 MONAI
 MONAI's
 Monodepth
@@ -417,6 +419,7 @@ Segmenter
 segmenter
 serializable
 ShapeNet
+Shutterstock
 siggraph
 sigmoid
 SISR
@@ -521,3 +524,5 @@ YOLO
 YOLOv
 yolov
 Zongyuan
+ZeroScope
+Zeroscope
