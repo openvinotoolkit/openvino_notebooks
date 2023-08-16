@@ -13,5 +13,5 @@
 242-freevc-voice-conversion
 248-stable-diffusion-xl
 249-oneformer-segmentation
-250-zeroscope_text2video
+250-zeroscope-text2video
 404-style-transfer-webcam
