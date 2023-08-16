@@ -168,7 +168,7 @@ Demos that demonstrate inference on a particular model.
 | [247-code-language-id](notebooks/247-code-language-id/247-code-language-id.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F247-code-language-id%2F247-code-language-id.ipynb) | Identify the programming language used in an arbitrary code snippet | ||
 | [248-stable-diffusion-xl](notebooks/248-stable-diffusion-xl/)<br> |  Image generation with Stable Diffusion XL and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/258651862-28b63016-c5ff-4263-9da8-73ca31100165.jpeg width=225>  |
 | [249-oneformer-segmentation](notebooks/249-oneformer-segmentation/)<br> | Universal segmentation with OneFormer and OpenVINO™ | <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/76161256/258640713-f801bd09-e927-4abd-aa2f-9990de4caf8d.gif" width=225> |
-| [250-zeroscope-text2video](notebooks/250-zeroscope-text2video)<br> | Text-to video synthesis with ZeroScope and OpenVINO™ | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/b2774676-b383-4886-afba-d82ec231b484" width=225> |
+| [250-zeroscope-text2video](notebooks/250-zeroscope-text2video)<br> | Text-to video synthesis with ZeroScope and OpenVINO™ | A panda eating bamboo on a rock <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/500956d5-4aac-4710-a77c-4df34bcda3be" width=225> |
 
 
 <div id='-model-training'></div>
