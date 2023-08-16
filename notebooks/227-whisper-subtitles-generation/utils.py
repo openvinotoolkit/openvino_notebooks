@@ -1,3 +1,5 @@
+import pathlib
+
 from openvino.runtime import Tensor
 
 from pytube import YouTube
@@ -35,9 +37,11 @@ def audio_to_float(audio):
     return audio.astype(np.float32) / np.iinfo(audio.dtype).max
 
 
-def download_video(base_dir, link):
+def download_video(base_dir: pathlib.Path, link):
     output_file = base_dir / "videos" / f"{link.split('/')[-1]}.mp4"
     if not output_file.exists():
+        if not output_file.parent.exists():
+            output_file.parent.mkdir(parents=True)
         print(f"Downloading video {link} started")
         yt = YouTube(link)
         yt.streams.get_highest_resolution().download(filename=output_file)
