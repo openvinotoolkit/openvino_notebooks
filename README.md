@@ -170,6 +170,7 @@ Demos that demonstrate inference on a particular model.
 | [248-stable-diffusion-xl](notebooks/248-stable-diffusion-xl/)<br> |  Image generation with Stable Diffusion XL and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/258651862-28b63016-c5ff-4263-9da8-73ca31100165.jpeg width=225>  |
 | [249-oneformer-segmentation](notebooks/249-oneformer-segmentation/)<br> | Universal segmentation with OneFormer and OpenVINO™ | <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/76161256/258640713-f801bd09-e927-4abd-aa2f-9990de4caf8d.gif" width=225> |
 | [250-music-generation](notebooks/250-music-generation/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F250-music-generation%2F250-music-generation.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/250-music-generation/250-music-generation.ipynb) | Controllable Music Generation with MusicGen and OpenVINO™ | <img src="https://user-images.githubusercontent.com/76463150/260439306-81c81c8d-1f9c-41d0-b881-9491766def8e.png" width=225> |
+|[251-tiny-sd-image-generation](notebooks/251-tiny-sd-image-generation/)<br> | Image Generation with Tiny-SD and OpenVINO™ | <img src="https://user-images.githubusercontent.com/29454499/260904650-274fc2f9-24d2-46a3-ac3d-d660ec3c9a19.png" width=225> |
 
 <div id='-model-training'></div>
 
