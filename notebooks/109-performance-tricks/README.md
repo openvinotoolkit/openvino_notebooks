@@ -17,7 +17,7 @@ This notebook demonstrates how to optimize the inference latency in OpenVINO™.
 
 This notebook demonstrates how to optimize the inference throughput in OpenVINO™.  A set of optimization tricks, including bigger batch size, “AUTO” device with throughput and cumulative throughput mode, asynchronous inference mode, etc., are introduced.
 
-![](https://github.com/openvinotoolkit/openvino_notebooks/assets/4547501/e1a6e230-7c80-491a-8732-02515c556f1b)
+![](https://github.com/openvinotoolkit/openvino_notebooks/assets/4547501/ac17148c-bee9-43aa-87fc-ead61ac75f1d)
 
 ## Installation Instructions
 
