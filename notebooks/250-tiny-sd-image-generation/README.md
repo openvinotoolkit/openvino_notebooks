@@ -3,7 +3,7 @@
 
 In recent times, the AI community has witnessed a remarkable surge in the development of larger and more performant language models, such as Falcon 40B, LLaMa-2 70B, Falcon 40B, MPT 30B, and in the imaging domain with models like SD2.1 and SDXL. These advancements have undoubtedly pushed the boundaries of what AI can achieve, enabling highly versatile and state-of-the-art image generation and language understanding capabilities. However, the breakthrough of large models comes with substantial computational demands. To resolve this issue, recent research on efficient Stable Diffusion has prioritized reducing the number of sampling steps and utilizing network quantization.
 
-Moving towards the goal of making image generative models faster, smaller, and cheaper, Tiny-SD was proposed by Segmind. Tiny SD is a compressed Stable Diffusion model that has been trained on Knowledge-Distillation (KD) techniques and the work has been largely based on this [paper](https://arxiv.org/pdf/2305.15798.pdf). The authors describe a Block-removal Knowledge-Distillation method where some of the UNet layers are removed and the student model weights are trained. Using the KD methods described in the paper, they were able to train two compressed models using the 🧨 diffusers library; Small and Tiny, that have 35% and 55% fewer parameters, respectively than the base model while achieving comparable image fidelity as the base model. More details about model can be found in [model card](https://huggingface.co/segmind/tiny-sd), [blog post](https://huggingface.co/blog/sd_distillation) and training [repository](https://github.com/segmind/distill-sd).
+Moving towards the goal of making image generative models faster, smaller, and cheaper, Tiny-SD was proposed by Segmind. Tiny SD is a compressed Stable Diffusion (SD) model that has been trained on Knowledge-Distillation (KD) techniques and the work has been largely based on this [paper](https://arxiv.org/pdf/2305.15798.pdf). The authors describe a Block-removal Knowledge-Distillation method where some of the UNet layers are removed and the student model weights are trained. Using the KD methods described in the paper, they were able to train two compressed models using the 🧨 diffusers library; Small and Tiny, that have 35% and 55% fewer parameters, respectively than the base model while achieving comparable image fidelity as the base model. More details about model can be found in [model card](https://huggingface.co/segmind/tiny-sd), [blog post](https://huggingface.co/blog/sd_distillation) and training [repository](https://github.com/segmind/distill-sd).
 
 This notebook demonstrates how to convert and run the Tiny-SD model using OpenVINO.
 It considers two approaches of image generation using an AI method called `diffusion`:
@@ -51,4 +51,6 @@ The notebook also provides interactive interface for image generation based on u
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
