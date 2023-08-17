@@ -891,19 +891,19 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
             ov_decoder = OpenVINOTextDecoder(core, BASE_DIR / ORIGINAL_DECODER_MODEL_DIR / 'whisper_decoder.xml').model
             load_init_data(ov_decoder.inputs)
 
-    advanced_parameters = AdvancedQuantizationParameters(
-        backend_params={"use_pot": use_pot},  # use legacy backend that supports Bias Correction
-        overflow_fix=OverflowFix.DISABLE,
-        # disable overflow fix (can lead to accuracy drop on legacy platforms w/o DL Boost),
-        smooth_quant_alpha=sq_alpha_encoder
-    )
-    logger.info(advanced_parameters)
+    compressed_model_path = BASE_DIR / save_dir
 
     #
     # Encoder quantization
     #
 
-    compressed_model_path = BASE_DIR / save_dir
+    advanced_parameters = AdvancedQuantizationParameters(
+        backend_params={"use_pot": use_pot},
+        overflow_fix=OverflowFix.DISABLE,
+        # disable overflow fix (can lead to accuracy drop on legacy platforms w/o DL Boost),
+        smooth_quant_alpha=sq_alpha_encoder
+    )
+    logger.info(advanced_parameters)
 
     if encoder_compression == "weights":
         if OVC_API_ENCODER:
@@ -925,7 +925,7 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
                 quantization_dataset,
                 model_type=nncf.ModelType.TRANSFORMER,
                 fast_bias_correction=True,
-                subset_size=len(encoder_init_data),
+                subset_size=30,
                 advanced_parameters=advanced_parameters,
                 # ignored_scope=ignored_scope,
             )
@@ -942,7 +942,7 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
     #
 
     advanced_parameters = AdvancedQuantizationParameters(
-        backend_params={"use_pot": use_pot},  # use legacy backend that supports Bias Correction
+        backend_params={"use_pot": use_pot},
         overflow_fix=OverflowFix.DISABLE,
         # disable overflow fix (can lead to accuracy drop on legacy platforms w/o DL Boost),
         smooth_quant_alpha=sq_alpha_decoder,
@@ -986,7 +986,7 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
 
         if decoder_compression == "quantization":
             quantization_dataset = nncf.Dataset(list(reversed(decoder_init_data)))
-            if decoder_ignored_scope is not None and ignore_logits:
+            if decoder_ignored_scope is None and ignore_logits:
                 decoder_ignored_scope = IgnoredScope(names=["aten::to/Convert_713" if OVC_API_DECODER else "logits"])
             compressed_decoder = nncf.quantize(
                 model.decoder.model,
@@ -1202,71 +1202,71 @@ video_path, video_transcription_ground_truths = (
 # video_path = download_video(base_dir, "https://www.youtube.com/watch?v=I8iBhUMFCIA")  # Other 45 sec
 
 
-# compressed_model_path = quantize("quantized_models/ovc/encoder-ptq-sq-0.5_decoder-ptq-sq-1.00",
-#                                  # encoder_compression="weights",
-#                                  encoder_compression="quantization",
-#                                  # encoder_compression=None,
-#                                  # decoder_compression="weights",
-#                                  decoder_compression="quantization",
-#                                  # decoder_compression=None,
-#                                  use_pot=bool(0),
-#                                  sq_alpha_encoder=0.5,
-#                                  sq_alpha_decoder=1,
-#                                  ignore_logits=bool(0),
-#                                  inplace_statistics_decoder=bool(1),
-#                                  # decoder_ignored_scope=IgnoredScope(
-#                                  #     names=[
-#                                  #         #
-#                                  #         # 1
-#                                  #         #
-#                                  #         # "__module.blocks.0.mlp.2/aten::linear/MatMul_133",
-#                                  #         # "__module.blocks.3.attn.query/aten::linear/MatMul_368",
-#                                  #         # "__module.blocks.3.attn.key/aten::linear/MatMul_369",
-#                                  #         # "__module.blocks.3.attn.value/aten::linear/MatMul_370",
-#                                  #         # "__module.blocks.5.attn/aten::matmul/MatMul",
-#                                  #         #
-#                                  #         # 2
-#                                  #         #
-#                                  #         "__module.blocks.3.attn.value/aten::linear/MatMul_370",
-#                                  #         "__module.blocks.3.attn.query/aten::linear/MatMul_368",
-#                                  #         "__module.blocks.3.attn.key/aten::linear/MatMul_369",
-#                                  #         "__module.blocks.0.mlp.0/aten::linear/MatMul_132",
-#                                  #         "__module.blocks.5.mlp.0/aten::linear/MatMul_707",
-#                                  #         "__module.blocks.5.attn.key/aten::linear/MatMul_599",
-#                                  #         "__module.blocks.5.attn.query/aten::linear/MatMul_598",
-#                                  #         "__module.blocks.5.attn.value/aten::linear/MatMul_600",
-#                                  #         "__module.blocks.4.attn.value/aten::linear/MatMul_485",
-#                                  #         "__module.blocks.4.attn.key/aten::linear/MatMul_484",
-#                                  #         "__module.blocks.4.attn.query/aten::linear/MatMul_483",
-#                                  #         #
-#                                  #         # 3
-#                                  #         #
-#                                  #         # "__module.blocks.3.attn.value/aten::linear/MatMul_370",
-#                                  #         # "__module.blocks.3.attn.query/aten::linear/MatMul_368",
-#                                  #         # "__module.blocks.3.attn.key/aten::linear/MatMul_369",
-#                                  #         # "__module.blocks.5.attn.key/aten::linear/MatMul_599",
-#                                  #         # "__module.blocks.5.attn.query/aten::linear/MatMul_598",
-#                                  #         # "__module.blocks.5.attn.value/aten::linear/MatMul_600",
-#                                  #         # "__module.blocks.5.mlp.0/aten::linear/MatMul_707",
-#                                  #         # "__module.blocks.1.cross_attn.query/aten::linear/MatMul_199",
-#                                  #         # "__module.blocks.5.cross_attn/aten::matmul/MatMul",
-#                                  #         # "__module.blocks.4.cross_attn.out/aten::linear/MatMul_587",
-#                                  #         # "__module.blocks.4.mlp.0/aten::linear/MatMul_592",
-#                                  #     ]
-#                                  # )
-#                                  )
-# benchmark(compressed_model_path)
-# transcribe(compressed_model_path, video_path)
-# validate_model(compressed_model_path)
+compressed_model_path = quantize("quantized_models/ovc/encoder-ptq-sq-0.5_decoder-ptq-sq-0.95_att4",
+                                 # encoder_compression="weights",
+                                 encoder_compression="quantization",
+                                 # encoder_compression=None,
+                                 # decoder_compression="weights",
+                                 decoder_compression="quantization",
+                                 # decoder_compression=None,
+                                 use_pot=bool(0),
+                                 sq_alpha_encoder=0.5,
+                                 sq_alpha_decoder=0.95,
+                                 ignore_logits=bool(0),
+                                 inplace_statistics_decoder=bool(1),
+                                 # decoder_ignored_scope=IgnoredScope(
+                                 #     names=[
+                                 #         #
+                                 #         # 1
+                                 #         #
+                                 #         # "__module.blocks.0.mlp.2/aten::linear/MatMul_133",
+                                 #         # "__module.blocks.3.attn.query/aten::linear/MatMul_368",
+                                 #         # "__module.blocks.3.attn.key/aten::linear/MatMul_369",
+                                 #         # "__module.blocks.3.attn.value/aten::linear/MatMul_370",
+                                 #         # "__module.blocks.5.attn/aten::matmul/MatMul",
+                                 #         #
+                                 #         # 2
+                                 #         #
+                                 #         "__module.blocks.3.attn.value/aten::linear/MatMul_370",
+                                 #         "__module.blocks.3.attn.query/aten::linear/MatMul_368",
+                                 #         "__module.blocks.3.attn.key/aten::linear/MatMul_369",
+                                 #         "__module.blocks.0.mlp.0/aten::linear/MatMul_132",
+                                 #         "__module.blocks.5.mlp.0/aten::linear/MatMul_707",
+                                 #         "__module.blocks.5.attn.key/aten::linear/MatMul_599",
+                                 #         "__module.blocks.5.attn.query/aten::linear/MatMul_598",
+                                 #         "__module.blocks.5.attn.value/aten::linear/MatMul_600",
+                                 #         "__module.blocks.4.attn.value/aten::linear/MatMul_485",
+                                 #         "__module.blocks.4.attn.key/aten::linear/MatMul_484",
+                                 #         "__module.blocks.4.attn.query/aten::linear/MatMul_483",
+                                 #         #
+                                 #         # 3
+                                 #         #
+                                 #         # "__module.blocks.3.attn.value/aten::linear/MatMul_370",
+                                 #         # "__module.blocks.3.attn.query/aten::linear/MatMul_368",
+                                 #         # "__module.blocks.3.attn.key/aten::linear/MatMul_369",
+                                 #         # "__module.blocks.5.attn.key/aten::linear/MatMul_599",
+                                 #         # "__module.blocks.5.attn.query/aten::linear/MatMul_598",
+                                 #         # "__module.blocks.5.attn.value/aten::linear/MatMul_600",
+                                 #         # "__module.blocks.5.mlp.0/aten::linear/MatMul_707",
+                                 #         # "__module.blocks.1.cross_attn.query/aten::linear/MatMul_199",
+                                 #         # "__module.blocks.5.cross_attn/aten::matmul/MatMul",
+                                 #         # "__module.blocks.4.cross_attn.out/aten::linear/MatMul_587",
+                                 #         # "__module.blocks.4.mlp.0/aten::linear/MatMul_592",
+                                 #     ]
+                                 # )
+                                 )
+benchmark(compressed_model_path)
+transcribe(compressed_model_path, video_path)
+validate_model(compressed_model_path)
 
-model_path = Path("quantized_models/ovc/encoder-ptq-sq-0.50_decoder-none/qwac_0.005")
-benchmark(model_path)
-transcribe(model_path, video_path, temperatures=None)
-validate_model(model_path, temperatures=None)
+# model_path = Path("quantized_models/ovc/encoder-ptq-sq-0.5_decoder-ptq-sq-0.95_att3")
+# benchmark(model_path)
+# transcribe(model_path, video_path, temperatures=None)
+# validate_model(model_path, temperatures=None)
 
 
 # quantize_decoder_with_accuracy_control("quantized_models/ovc/encoder-ptq-sq-0.50_decoder-none",
-#                                        save_dir="qwac_0.005",
+#                                        save_dir="qwac_0.005_att3",
 #                                        sq_alpha_decoder=0.95,
 #                                        max_drop=0.005,
 #                                        temperatures=None)
