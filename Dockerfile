@@ -39,7 +39,7 @@ RUN rpm -ivh https://vault.centos.org/centos/8/AppStream/x86_64/os/Packages/mesa
     intel-metrics-library intel-igc-core intel-igc-cm \
     libva libva-utils  intel-gmmlib && \
     rpm -ivh http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/Packages/ocl-icd-2.2.12-1.el8.x86_64.rpm && \
-    rpm -ivh https://download-ib01.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/c/clinfo-3.0.21.02.21-4.el8.x86_64.rpm
+    rpm -ivh https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/c/clinfo-3.0.21.02.21-4.el8.x86_64.rpm
 
 # Copying in override assemble/run scripts
 COPY .docker/.s2i/bin /tmp/scripts
