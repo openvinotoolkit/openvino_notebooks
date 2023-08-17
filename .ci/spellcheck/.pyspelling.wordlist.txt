@@ -167,7 +167,6 @@ heatmap
 HED
 hoc
 HuggingFace
-Huggingface
 Husain
 HWC
 hyperparameters
@@ -525,4 +524,4 @@ YOLOv
 yolov
 Zongyuan
 ZeroScope
-Zeroscope
+zeroscope
