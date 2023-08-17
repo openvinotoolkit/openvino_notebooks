@@ -20,4 +20,6 @@ The notebook contains the following steps:
 
 # Installation Instructions
 
-The Jupyter notebook contains its own set of requirements installed directly within the notebook, allowing it to run independently as a standalone example.
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
