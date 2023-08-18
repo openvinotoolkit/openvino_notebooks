@@ -47,6 +47,8 @@ Cifar
 cityscape
 Cityscapes
 CLIP's
+codebook
+codebooks
 codec
 codecs
 Codecs
@@ -98,6 +100,7 @@ denoises
 denoising
 denormalization
 denormalized
+depainting
 detections
 Dettmers
 dev
@@ -187,9 +190,11 @@ InferRequest
 InferRequests
 inpainting
 installable
+instantiation
 InstructGPT
 InstructPix
 invertible
+intervaling
 IRs
 iteratively
 JFLEG
@@ -202,6 +207,7 @@ JupyterLab
 Kaiming
 Kalman
 kbps
+KD
 keras
 keypoint
 keypoints
@@ -218,6 +224,7 @@ LaBSE
 LAION
 Lasinger
 latents
+LLaMa
 LeViT
 LibriSpeech
 Lim
@@ -228,6 +235,7 @@ LMS
 logits
 LogSoftmax
 LTS
+LSTM
 macOS
 Mahalanobis
 Mapillary
@@ -245,11 +253,13 @@ Midjourney
 MiniLM
 MobileNet
 MobileNetV
+MusicGen
 modelled
 MONAI
 MONAI's
 Monodepth
 monodepth
+MPT
 MRPC
 Multiclass
 multiclass
@@ -297,8 +307,11 @@ openvino
 OpenVINO's
 opset
 optimizable
+OVC
 overfitting
 overlayed
+OV
+OVC
 OVMS
 PaddleClas
 PaddleGAN
@@ -381,6 +394,7 @@ rebase
 redistributable
 RegNet
 RegNetY
+regressively
 reidentification
 ReLU
 René
@@ -410,12 +424,14 @@ scalability
 Scalable
 scalable
 ScaleMapLearner
+sd
 SDEdit
 SDXL
 Segmentations
 segmentations
 Segmenter
 segmenter
+Segmind
 serializable
 ShapeNet
 siggraph
