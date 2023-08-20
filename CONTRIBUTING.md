@@ -227,6 +227,8 @@ Here are some guidelines to follow:
 # Read more in the docs: https://gradio.app/docs/
 ```
 
+- We use Gradio Blocks only when we need to create a complex interface. The Gradio Interface class provides an easy-to-use interface and saves development time, so we use it whenever possible. However, for more complex interfaces, Gradio Blocks gives us more flexibility and control.
+
 
 ## Requirements
 
