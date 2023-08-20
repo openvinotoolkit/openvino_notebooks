@@ -9,18 +9,19 @@ The ZeroScope model is a powerful tool that can be used to create various videos
 Both versions of the ZeroScope model are available on Hugging Face:
 
 - Zeroscope_v2 576w
-- Zeroscope_v2 XL We will use the first one.
-Table of content:
+- Zeroscope_v2 XL
 
-- 1. Install and import required packages
-- 2. Load the model
-- 3. Convert the model
-    - 3.1. Define the conversion function
-    - 3.2. UNet
-    - 3.3. VAE
-    - 3.4. Text encoder
-- 4. Build a pipeline
-- 5. Inference with OpenVINO
-    - 5.1. Select inference device
-    - 5.2. Define a prompt
-    - 5.3. Video generation
+We will use the first one.
+## Notebook contents
+The tutorial constists of the following steps:
+
+- Install and import required packages
+- Load the model
+- Convert the model
+- Build a pipeline
+- Inference with OpenVINO
+
+## Installation instructions
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
