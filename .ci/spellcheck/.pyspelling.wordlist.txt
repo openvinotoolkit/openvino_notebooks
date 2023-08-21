@@ -251,6 +251,7 @@ MidasNet
 Midjourney
 MiniLM
 MLS
+mms
 MMS
 MobileNet
 MobileNetV
