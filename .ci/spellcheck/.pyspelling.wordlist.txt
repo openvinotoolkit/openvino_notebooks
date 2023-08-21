@@ -250,6 +250,8 @@ MiDaS
 MidasNet
 Midjourney
 MiniLM
+MLS
+MMS
 MobileNet
 MobileNetV
 MusicGen
@@ -453,6 +455,7 @@ SRT
 SSDLite
 sst
 STFT
+streamable
 subchunk
 subchunks
 subdirectories
@@ -484,6 +487,7 @@ tokenizing
 TorchMetrics
 TorchScript
 torchvision
+TTS
 tunable
 tv
 TypeScript
