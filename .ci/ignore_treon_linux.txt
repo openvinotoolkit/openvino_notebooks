@@ -11,4 +11,6 @@
 240-dolly-2-instruction-following
 241-riffusion-text-to-music
 248-stable-diffusion-xl
+249-oneformer-segmentation
+251-tiny-sd-image-generation
 404-style-transfer-webcam
