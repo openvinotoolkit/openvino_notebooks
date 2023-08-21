@@ -16,7 +16,7 @@ Both versions of the ZeroScope model are available on Hugging Face:
 
 We will use the first one.
 ## Notebook contents
-The tutorial constists of the following steps:
+The tutorial consists of the following steps:
 
 - Install and import required packages
 - Load the model
