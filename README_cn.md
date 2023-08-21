@@ -23,8 +23,9 @@
 | [DeepFloyd IF - Text-to-Image generation](notebooks/238-deeployd-if/)<br>| 利用DeepFloyd IF以及OpenVINO™进行文本到图像生成 | <img src=https://user-images.githubusercontent.com/29454499/241643886-dfcf3c48-8d50-4730-ae28-a21595d9504f.png width=300> |   |
 | [ImageBind](notebooks/239-image-bind/)<br>| 使用ImageBind以及OpenVINO™结合多模态数据 | <img src=https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png width=300> |   |
 | [Dolly v2](notebooks/240-dolly-2-instruction-following/)<br>| 使用Databricks Dolly 2.0以及OpenVINO™遵循指令进行文本生成 | <img src=https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png width=300> | |
-
-[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+| [Stable Diffusion XL](notebooks/248-stable-diffusion-xl/)<br>| 使用Stable Diffusion X以及OpenVINO™实现图像生成 | <img src=https://user-images.githubusercontent.com/29454499/258651862-28b63016-c5ff-4263-9da8-73ca31100165.jpeg width=300> | |
+| [MusicGen](notebooks/250-music-generation/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F250-music-generation%2F250-music-generation.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/250-music-generation/250-music-generation.ipynb) |  使用MusicGen以及OpenVINO™实现可控音乐生成 | <img src="https://user-images.githubusercontent.com/76463150/260439306-81c81c8d-1f9c-41d0-b881-9491766def8e.png" width=300> |
+|[Tiny SD](notebooks/251-tiny-sd-image-generation/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/251-tiny-sd-image-generation/251-tiny-sd-image-generation.ipynb) | 使用Tiny-SD以及OpenVINO™实现图像生成 | <img src="https://user-images.githubusercontent.com/29454499/260904650-274fc2f9-24d2-46a3-ac3d-d660ec3c9a19.png" width=300> | |
 
 
 ## 目录
@@ -103,7 +104,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [118-optimize-preprocessing](notebooks/118-optimize-preprocessing/)| 提升图片预处理性能    |   
 | [119-tflite-to-openvino](notebooks/119-tflite-to-openvino/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/119-tflite-to-openvino/119-tflite-to-openvino.ipynb) | TensorFlow Lite 模型转换为OpenVINO IR                                                                                                            |                                                                                                            |
 | [120-tensorflow-object-detection-to-openvino](notebooks/120-tensorflow-object-detection-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F120-tensorflow-object-detection-to-openvino%2F120-tensorflow-object-detection-to-openvino.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/120-tensorflow-object-detection-to-openvino/120-tensorflow-object-detection-to-openvino.ipynb) | TensorFlow目标检测模型转换为OpenVINO IR                                                                                                            |
-
+| [121-convert-to-openvino](notebooks/121-convert-to-openvino/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F121-convert-to-openvino%2F121-convert-to-openvino.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/121-convert-to-openvino/121-convert-to-openvino.ipynb) | 学习OpenVINO模型转换API                                                                                                           |
 <div id='-model-demos'/>
 
 ### 🎯 模型演示
@@ -155,6 +156,15 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 |[240-dolly-2-instruction-following](notebooks/240-dolly-2-instruction-following/)<br>| 使用Databricks Dolly 2.0以及OpenVINO™遵循指令生成文本 | <img src=https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png width=225> |
 |[241-riffusion-text-to-music](notebooks/241-riffusion-text-to-music/)<br>| 使用Riffusion以及OpenVINO™进行文本到音乐生成 | <img src=https://user-images.githubusercontent.com/29454499/244291912-bbc6e08c-c0a9-41fe-bc2d-5f89a0d2463b.png width=225> | 
 |[242-freevc-voice-conversion](notebooks/242-freevc-voice-conversion/)<br> | 利用FeeVC和OpenVINO™实现高质量的无文本一次性语音转换 ||
+| [243-tflite-selfie-segmentation](notebooks/243-tflite-selfie-segmentation/) <br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F243-tflite-selfie-segmentation%2F243-tflite-selfie-segmentation.ipynb)<br> [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/243-tflite-selfie-segmentation/243-tflite-selfie-segmentation.ipynb)| 使用TFLite以及OpenVINO™实现Selfie分割方案 |  <img src="https://user-images.githubusercontent.com/29454499/251085926-14045ebc-273b-4ccb-b04f-82a3f7811b87.gif" width=400>|
+| [244-named-entity-recognition](notebooks/244-named-entity-recognition/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/244-named-entity-recognition/244-named-entity-recognition.ipynb) | 使用OpenVINO™进行命名实体识别 | |
+| [245-typo-detector](notebooks/245-typo-detector/)<br>| 使用OpenVINO™进行英文文本纠错 | <img src=https://user-images.githubusercontent.com/80534358/224564463-ee686386-f846-4b2b-91af-7163586014b7.png   width=225> |
+| [246-depth-estimation-videpth](notebooks/246-depth-estimation-videpth/)<br>| 基使用OpenVINO™进行基于视觉的单目深度估测 | <img src=https://raw.githubusercontent.com/alexklwong/void-dataset/master/figures/void_samples.png width=225> |
+| [247-code-language-id](notebooks/247-code-language-id/247-code-language-id.ipynb)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F247-code-language-id%2F247-code-language-id.ipynb) | Identify the programming language used in an arbitrary code snippet | ||
+| [248-stable-diffusion-xl](notebooks/248-stable-diffusion-xl/)<br> |  使用Stable Diffusion X以及OpenVINO™实现图像生成 | <img src=https://user-images.githubusercontent.com/29454499/258651862-28b63016-c5ff-4263-9da8-73ca31100165.jpeg width=225>  |
+| [249-oneformer-segmentation](notebooks/249-oneformer-segmentation/)<br> | 使用OneFormer以及OpenVINO™实现通用分割任务 | <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/76161256/258640713-f801bd09-e927-4abd-aa2f-9990de4caf8d.gif" width=225> |
+| [250-music-generation](notebooks/250-music-generation/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F250-music-generation%2F250-music-generation.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/250-music-generation/250-music-generation.ipynb) | 使用MusicGen以及OpenVINO™实现可控音乐生成 | <img src="https://user-images.githubusercontent.com/76463150/260439306-81c81c8d-1f9c-41d0-b881-9491766def8e.png" width=225> |
+|[251-tiny-sd-image-generation](notebooks/251-tiny-sd-image-generation/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/251-tiny-sd-image-generation/251-tiny-sd-image-generation.ipynb) | 使用Tiny-SD以及OpenVINO™实现图像生成 | <img src="https://user-images.githubusercontent.com/29454499/260904650-274fc2f9-24d2-46a3-ac3d-d660ec3c9a19.png" width=225> |
 
 <div id='-model-training'/>
 
@@ -200,13 +210,13 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 
 | 支持的操作系统                                              | [Python Version (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- | :------------------------------------------------- |
-| Ubuntu 20.04 LTS, 64-bit                                   | 3.7, 3.8, 3.9, 3.10                                |
-| Ubuntu 22.04 LTS, 64-bit                                   | 3.7, 3.8, 3.9, 3.10                                |
-| Red Hat Enterprise Linux 8, 64-bit                         | 3.8, 3.9, 3.10                                     |
-| CentOS 7, 64-bit                                           | 3.7, 3.8, 3.9, 3.10                                |
-| macOS 10.15.x versions or higher                           | 3.7, 3.8, 3.9, 3.10                                |
-| Windows 10, 64-bit Pro, Enterprise or Education editions   | 3.7, 3.8, 3.9, 3.10                                |
-| Windows Server 2016 or higher                              | 3.7, 3.8, 3.9, 3.10                                |
+| Ubuntu 20.04 LTS, 64-bit                                   | 3.8 - 3.10                                         |
+| Ubuntu 22.04 LTS, 64-bit                                   | 3.8 - 3.10                                         |
+| Red Hat Enterprise Linux 8, 64-bit                         | 3.8 - 3.10                                         |
+| CentOS 7, 64-bit                                           | 3.8 - 3.10                                         |
+| macOS 10.15.x versions or higher                           | 3.8 - 3.10                                         |
+| Windows 10, 64-bit Pro, Enterprise or Education editions   | 3.8 - 3.10                                         |
+| Windows Server 2016 or higher                              | 3.8 - 3.10                                         |
 
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)
@@ -238,48 +248,55 @@ jupyter lab notebooks
 ## 🧹 清理
 
 <div id='-shut-down-jupyter-kernel'>
-&#8226; 停止Jupyter Kernel
+	
+1. 停止Jupyter Kernel
 
-按 Ctrl-c 结束 Jupyter session，会弹出一个提示框 Shutdown this Jupyter server (y/[n])? 输入 y 并按 回车。
+	按 Ctrl-c 结束 Jupyter session，会弹出一个提示框 Shutdown this Jupyter server (y/[n])? 输入 y 并按 回车。
 </div>	
 	
 <div id='-deactivate-virtual-environment'>
-&#8226; 注销虚拟环境
+	
+2. 注销虚拟环境
 
-注销虚拟环境：只需在激活了 openvino_env 的终端窗口中运行 deactivate 即可。
+	注销虚拟环境：只需在激活了 openvino_env 的终端窗口中运行 deactivate 即可。
 
-重新激活环境：在Linux上运行 source openvino_env/bin/activate 或者在Windows上运行 openvino_env\Scripts\activate 即可，然后输入 jupyter lab 或 jupyter notebook 即可重新运行notebooks。
+	重新激活环境：在Linux上运行 source openvino_env/bin/activate 或者在Windows上运行 openvino_env\Scripts\activate 即可，然后输入 jupyter lab 或 jupyter notebook 即可重新运行notebooks。
 </div>	
 	
 <div id='-delete-virtual-environment'>
-&#8226; >删除虚拟环境 _(可选)_
+	
+3. 删除虚拟环境 _(可选)_
 
-直接删除 openvino_env 目录即可删除虚拟环境：
+	直接删除 openvino_env 目录即可删除虚拟环境：
 </div>	
 	
-<div id='-on-linux-and-macos'>
-&#8226; Linux和macOS:
+<div id='-on-linux-and-macos' markdown="1">
 
-```bash
-rm -rf openvino_env
-```
-</div>	
+  - On Linux and macOS:
 
-<div id='-on-windows'>
-&#8226; Windows:
+	```bash
+	rm -rf openvino_env
+	```
+</div>
 
-```bash
-rmdir /s openvino_env
-```
-</div>	
+<div id='-on-windows' markdown="1">
 
-<div id='-remove-openvino-env-kernel'>
-&#8226;从Jupyter中移除openvino_env Kernel
+  - On Windows:
 
-```bash
-jupyter kernelspec remove openvino_env
-```
-</div>	
+	```bash
+	rmdir /s openvino_env
+	```
+</div>
+
+<div id='-remove-openvino-env-kernel' markdown="1">
+
+  - 从Jupyter中删除 `openvino_env` Kernel
+
+	```bash
+	jupyter kernelspec remove openvino_env
+	```
+</div>
+
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='-troubleshooting'/>
