@@ -1232,7 +1232,7 @@ video_path, video_transcription_ground_truths = (
 # video_path = download_video(base_dir, "https://www.youtube.com/watch?v=I8iBhUMFCIA")  # Other 45 sec
 
 
-compressed_model_path = quantize("calibration_datasets/librispeech_asr_test_clean/encoder-ptq-sq-0.5_decoder-ptq-sq-0.95/30",
+compressed_model_path = quantize("quantized_models/ovc/encoder-ptq-sq-0.50_decoder-ptq-sq-0.95/new-nncf_new-ov",
                                  # encoder_compression="weights",
                                  encoder_compression="quantization",
                                  # encoder_compression=None,
@@ -1251,7 +1251,7 @@ compressed_model_path = quantize("calibration_datasets/librispeech_asr_test_clea
                                  reverse_decoder_calibration_data=bool(0),
                                  # decoder_ignored_scope=ignored_scope3
                                  )
-# benchmark(compressed_model_path)
+benchmark(compressed_model_path)
 transcribe_video(compressed_model_path, video_path)
 validate_model(compressed_model_path)
 
