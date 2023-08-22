@@ -21,9 +21,6 @@ from evaluate import load
 
 import subprocess
 
-import pyarrow as pa
-import pandas as pd
-
 import datetime
 from pathlib import Path
 import numpy as np
@@ -39,6 +36,7 @@ from nncf.quantization.advanced_parameters import AdvancedQuantizationParameters
 from whisper.decoding import DecodingTask, Inference, DecodingOptions, DecodingResult
 
 from utils import download_video, get_audio, convert_input_data_to_ov_tensor, convert_input_data_to_np, prepare_srt
+from ignored_scopes import ignored_scope1, ignored_scope2, ignored_scope3
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -61,8 +59,16 @@ num_decoder_forwards = 0
 
 core = Core()
 
-CALIBRATION_DATA_CACHE = BASE_DIR / Path('calibration/librispeech_asr_dummy_30.pkl')
-num_calibration_samples = 30
+
+SAVE_CALIBRATION_DATA = bool(0)
+LOAD_CALIBRATION_DATA = bool(1)
+CALIBRATION_DATA_CACHE = 'calibration/librispeech_asr_dummy_{}.pkl'
+CALIBRATION_DATASET = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
+# CALIBRATION_DATASET = reversed(load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation"))
+# CALIBRATION_DATA_CACHE = 'calibration/librispeech_asr_clean_test_{}.pkl'
+# CALIBRATION_DATASET = load_dataset("librispeech_asr", "clean", split="test", streaming=True).take(30)
+# CALIBRATION_DATA_CACHE = 'calibration/common_voice_11_0_{}.pkl'
+# CALIBRATION_DATASET = load_dataset("mozilla-foundation/common_voice_11_0", "en", split="train", streaming=True).take(100)
 
 start_time = None
 
@@ -727,9 +733,9 @@ def convert_pt_decoder_to_ov_directly(encoder, decoder, save_dir, decoder_alread
     ov.serialize(decoder_model, save_dir / "whisper_decoder.xml")
 
 
-def load_init_data(decoder_model_inputs=None):
+def load_init_data(calibration_cache_path, decoder_model_inputs=None):
     global encoder_init_data, decoder_init_data
-    with open(CALIBRATION_DATA_CACHE, 'rb') as f:
+    with open(calibration_cache_path, 'rb') as f:
         encoder_init_data, decoder_init_data = pickle.load(f)
         encoder_init_data, decoder_init_data = convert_input_data_to_ov_tensor(encoder_init_data), \
             convert_input_data_to_ov_tensor(decoder_init_data)
@@ -810,7 +816,7 @@ def run_validation(model, dataset, return_only_accuracy=True, temperatures=None)
     ground_truths = []
     predictions = []
     for b in tqdm(dataset, disable=return_only_accuracy):
-        reference = processor.tokenizer._normalize(b.get("text", b.get("transcription")))
+        reference = processor.tokenizer._normalize(b.get("text", b.get("transcription", b.get("sentence"))))
 
         num_encoder_forwards = num_decoder_forwards = 0
 
@@ -836,7 +842,9 @@ def run_validation(model, dataset, return_only_accuracy=True, temperatures=None)
 
 @arg_logger
 def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alpha_encoder, sq_alpha_decoder,
-             ignore_logits, inplace_statistics_decoder, decoder_ignored_scope=None):
+             ignore_logits, inplace_statistics_decoder,
+             max_encoder_calibration_samples, max_decoder_calibration_samples, num_calibration_samples=30,
+             reverse_encoder_calibration_data=False, reverse_decoder_calibration_data=False, decoder_ignored_scope=None):
     global encoder_init_data, decoder_init_data
 
     assert encoder_compression in ["weights", "quantization", None]
@@ -849,19 +857,20 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
     map(logger.removeHandler, logger.handlers)
     logger.addHandler(logging.FileHandler(log_file_path))
     nncf_logger.addHandler(logging.FileHandler(log_file_path))
+    nncf_logger.setLevel(logging.INFO)
 
     model = whisper.load_model("base")
     model.to("cpu")
     model.eval()
     original_encoder, original_decoder = model.encoder, model.decoder
 
-    # mel = torch.zeros((1, 80, 3000))
-    # audio_features = original_encoder(mel)
-    # tokens = torch.ones((5, 3), dtype=torch.int64)
-    # _, kv_cache = original_decoder(tokens, audio_features, kv_cache={})
-
+    try:
+        logger.info(f'Calibration dataset info: {CALIBRATION_DATASET.info}')
+    except:
+        pass
     if encoder_compression == "quantization" or decoder_compression == "quantization":
-        if not CALIBRATION_DATA_CACHE.exists():
+        calibration_cache_path = BASE_DIR / CALIBRATION_DATA_CACHE.format(num_calibration_samples)
+        if not calibration_cache_path.exists() or not LOAD_CALIBRATION_DATA:
             global COLLECT_INIT_DATA
 
             patch_whisper_for_ov_inference(model)
@@ -871,25 +880,39 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
             # collect model inputs for quantization
             COLLECT_INIT_DATA = True
             logger.info('Collecting calibration data...')
-            dataset = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
-            for i, data_item in tqdm(enumerate(dataset)):
+            collection_start_time = datetime.datetime.now()
+            # grouped_encoder_init_data, grouped_decoder_init_data = [], []
+            for i, data_item in tqdm(enumerate(CALIBRATION_DATASET)):
                 if i == num_calibration_samples:
                     break
                 model.transcribe(data_item["audio"]["array"].astype(np.float32), beam_size=5, best_of=5, task=TASK)
+                # grouped_encoder_init_data.append(encoder_init_data)
+                # grouped_decoder_init_data.append(decoder_init_data)
+                # encoder_init_data, decoder_init_data = [], []
+            # encoder_init_data, decoder_init_data = grouped_encoder_init_data, grouped_decoder_init_data
+            # grouped_encoder_init_data = list(reversed(grouped_encoder_init_data))
+            # grouped_decoder_init_data = list(reversed(grouped_decoder_init_data))
+            # encoder_init_data, decoder_init_data = sum(grouped_encoder_init_data, []), sum(grouped_decoder_init_data, [])
+
+            # model.transcribe(get_audio(video_path), beam_size=5, best_of=5, task=TASK)
+
+            # encoder_init_data, decoder_init_data = list(reversed(encoder_init_data)), list(reversed(decoder_init_data))
+
             COLLECT_INIT_DATA = False
+            logger.info(f'Collecting calibration data took {datetime.datetime.now() - collection_start_time}')
 
-            if not CALIBRATION_DATA_CACHE.parent.exists():
-                CALIBRATION_DATA_CACHE.parent.mkdir(parents=True)
-            with open(CALIBRATION_DATA_CACHE, 'wb') as f:
-                pickle.dump((convert_input_data_to_np(encoder_init_data), convert_input_data_to_np(decoder_init_data)),
-                            f)
-
+            if SAVE_CALIBRATION_DATA:
+                if not calibration_cache_path.parent.exists():
+                    calibration_cache_path.parent.mkdir(parents=True)
+                with open(calibration_cache_path, 'wb') as f:
+                    pickle.dump((convert_input_data_to_np(encoder_init_data),
+                                 convert_input_data_to_np(decoder_init_data)), f)
             model.encoder = original_encoder
             model.decoder = original_decoder
         else:
             logger.info('Loading calibration data...')
             ov_decoder = OpenVINOTextDecoder(core, BASE_DIR / ORIGINAL_DECODER_MODEL_DIR / 'whisper_decoder.xml').model
-            load_init_data(ov_decoder.inputs)
+            load_init_data(calibration_cache_path, ov_decoder.inputs)
 
     compressed_model_path = BASE_DIR / save_dir
 
@@ -919,13 +942,16 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
         model.encoder = OpenVINOAudioEncoder(core, BASE_DIR / ORIGINAL_ENCODER_MODEL_DIR / 'whisper_encoder.xml')
 
         if encoder_compression == "quantization":
-            quantization_dataset = nncf.Dataset(encoder_init_data)
+            quantization_dataset = nncf.Dataset(list(reversed(encoder_init_data)) if reverse_decoder_calibration_data
+                                                else encoder_init_data)
+            if max_encoder_calibration_samples is None:
+                max_encoder_calibration_samples = len(encoder_init_data)
             compressed_encoder = nncf.quantize(
                 model.encoder.model,
                 quantization_dataset,
                 model_type=nncf.ModelType.TRANSFORMER,
                 fast_bias_correction=True,
-                subset_size=30,
+                subset_size=min(max_encoder_calibration_samples, len(encoder_init_data)),
                 advanced_parameters=advanced_parameters,
                 # ignored_scope=ignored_scope,
             )
@@ -985,15 +1011,18 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
         model.decoder = OpenVINOTextDecoder(core, BASE_DIR / ORIGINAL_DECODER_MODEL_DIR / 'whisper_decoder.xml')
 
         if decoder_compression == "quantization":
-            quantization_dataset = nncf.Dataset(list(reversed(decoder_init_data)))
+            quantization_dataset = nncf.Dataset(list(reversed(decoder_init_data)) if reverse_decoder_calibration_data
+                                                else decoder_init_data)
             if decoder_ignored_scope is None and ignore_logits:
                 decoder_ignored_scope = IgnoredScope(names=["aten::to/Convert_713" if OVC_API_DECODER else "logits"])
+            if max_decoder_calibration_samples is None:
+                max_decoder_calibration_samples = len(decoder_init_data)
             compressed_decoder = nncf.quantize(
                 model.decoder.model,
                 quantization_dataset,
                 model_type=nncf.ModelType.TRANSFORMER,
                 fast_bias_correction=True,
-                subset_size=min(300, len(decoder_init_data)),
+                subset_size=min(max_decoder_calibration_samples, len(decoder_init_data)),
                 advanced_parameters=advanced_parameters,
                 ignored_scope=decoder_ignored_scope
             )
@@ -1042,8 +1071,8 @@ def benchmark(model_path):
 
 
 @arg_logger
-def transcribe(model_path, video_path, temperatures=None):
-    global start_time, VERBOSE, video_transcription_ground_truths
+def transcribe_video(model_path, video_path, temperatures=None):
+    global start_time, VERBOSE, video_transcription_ground_truths, num_encoder_forwards, num_decoder_forwards
 
     verbose_value = VERBOSE
     # verbose = bool(1)
@@ -1062,6 +1091,8 @@ def transcribe(model_path, video_path, temperatures=None):
     model.decoder = OpenVINOTextDecoder(core, model_path / "whisper_decoder.xml")
 
     audio = get_audio(video_path)
+
+    num_encoder_forwards, num_decoder_forwards = 0, 0
 
     start_time = datetime.datetime.now()
     kwargs = dict()
@@ -1103,8 +1134,8 @@ def validate_model(model_path, temperatures=None):
     model.decoder = OpenVINOTextDecoder(core, model_path / "whisper_decoder.xml")
 
     dataset = load_dataset("librispeech_asr", "clean", split="test[:100]")
+    # dataset = load_dataset("mozilla-foundation/common_voice_11_0", "en", split="test", streaming=True).take(100)
     # dataset = load_dataset("PolyAI/minds14", name="en-US", split="train[:100]")
-    # dataset = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation[30:]")
 
     logger.info(f'Dataset info: {dataset.info}')
 
@@ -1156,7 +1187,7 @@ def quantize_decoder_with_accuracy_control(model_path, save_dir, sq_alpha_decode
     ov_decoder = core.read_model(model_path / "whisper_decoder.xml")
 
     logger.info('Loading calibration data...')
-    load_init_data(ov_decoder.inputs)
+    load_init_data(BASE_DIR / CALIBRATION_DATA_CACHE.format(30), ov_decoder.inputs)
     quantization_dataset = nncf.Dataset(list(reversed(decoder_init_data)))
 
     ptq_config = dict(
@@ -1172,7 +1203,6 @@ def quantize_decoder_with_accuracy_control(model_path, save_dir, sq_alpha_decode
 
     dataset = load_dataset("librispeech_asr", "clean", split="test[:100]")
     # dataset = load_dataset("PolyAI/minds14", name="en-US", split="train[:100]")
-    # dataset = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation[30:]")
 
     def validation_fn(m, d):
         model.decoder = OpenVINOTextDecoder(core, m)
@@ -1202,7 +1232,7 @@ video_path, video_transcription_ground_truths = (
 # video_path = download_video(base_dir, "https://www.youtube.com/watch?v=I8iBhUMFCIA")  # Other 45 sec
 
 
-compressed_model_path = quantize("quantized_models/ovc/encoder-ptq-sq-0.5_decoder-ptq-sq-0.95_att4",
+compressed_model_path = quantize("calibration_datasets/librispeech_asr_test_clean/encoder-ptq-sq-0.5_decoder-ptq-sq-0.95/30",
                                  # encoder_compression="weights",
                                  encoder_compression="quantization",
                                  # encoder_compression=None,
@@ -1210,58 +1240,24 @@ compressed_model_path = quantize("quantized_models/ovc/encoder-ptq-sq-0.5_decode
                                  decoder_compression="quantization",
                                  # decoder_compression=None,
                                  use_pot=bool(0),
-                                 sq_alpha_encoder=0.5,
+                                 sq_alpha_encoder=0.50,
                                  sq_alpha_decoder=0.95,
                                  ignore_logits=bool(0),
                                  inplace_statistics_decoder=bool(1),
-                                 # decoder_ignored_scope=IgnoredScope(
-                                 #     names=[
-                                 #         #
-                                 #         # 1
-                                 #         #
-                                 #         # "__module.blocks.0.mlp.2/aten::linear/MatMul_133",
-                                 #         # "__module.blocks.3.attn.query/aten::linear/MatMul_368",
-                                 #         # "__module.blocks.3.attn.key/aten::linear/MatMul_369",
-                                 #         # "__module.blocks.3.attn.value/aten::linear/MatMul_370",
-                                 #         # "__module.blocks.5.attn/aten::matmul/MatMul",
-                                 #         #
-                                 #         # 2
-                                 #         #
-                                 #         "__module.blocks.3.attn.value/aten::linear/MatMul_370",
-                                 #         "__module.blocks.3.attn.query/aten::linear/MatMul_368",
-                                 #         "__module.blocks.3.attn.key/aten::linear/MatMul_369",
-                                 #         "__module.blocks.0.mlp.0/aten::linear/MatMul_132",
-                                 #         "__module.blocks.5.mlp.0/aten::linear/MatMul_707",
-                                 #         "__module.blocks.5.attn.key/aten::linear/MatMul_599",
-                                 #         "__module.blocks.5.attn.query/aten::linear/MatMul_598",
-                                 #         "__module.blocks.5.attn.value/aten::linear/MatMul_600",
-                                 #         "__module.blocks.4.attn.value/aten::linear/MatMul_485",
-                                 #         "__module.blocks.4.attn.key/aten::linear/MatMul_484",
-                                 #         "__module.blocks.4.attn.query/aten::linear/MatMul_483",
-                                 #         #
-                                 #         # 3
-                                 #         #
-                                 #         # "__module.blocks.3.attn.value/aten::linear/MatMul_370",
-                                 #         # "__module.blocks.3.attn.query/aten::linear/MatMul_368",
-                                 #         # "__module.blocks.3.attn.key/aten::linear/MatMul_369",
-                                 #         # "__module.blocks.5.attn.key/aten::linear/MatMul_599",
-                                 #         # "__module.blocks.5.attn.query/aten::linear/MatMul_598",
-                                 #         # "__module.blocks.5.attn.value/aten::linear/MatMul_600",
-                                 #         # "__module.blocks.5.mlp.0/aten::linear/MatMul_707",
-                                 #         # "__module.blocks.1.cross_attn.query/aten::linear/MatMul_199",
-                                 #         # "__module.blocks.5.cross_attn/aten::matmul/MatMul",
-                                 #         # "__module.blocks.4.cross_attn.out/aten::linear/MatMul_587",
-                                 #         # "__module.blocks.4.mlp.0/aten::linear/MatMul_592",
-                                 #     ]
-                                 # )
+                                 num_calibration_samples=30,
+                                 max_encoder_calibration_samples=None,
+                                 max_decoder_calibration_samples=None,
+                                 reverse_encoder_calibration_data=bool(0),
+                                 reverse_decoder_calibration_data=bool(0),
+                                 # decoder_ignored_scope=ignored_scope3
                                  )
-benchmark(compressed_model_path)
-transcribe(compressed_model_path, video_path)
+# benchmark(compressed_model_path)
+transcribe_video(compressed_model_path, video_path)
 validate_model(compressed_model_path)
 
-# model_path = Path("quantized_models/ovc/encoder-ptq-sq-0.5_decoder-ptq-sq-0.95_att3")
+# model_path = Path("original_model_ovc")
 # benchmark(model_path)
-# transcribe(model_path, video_path, temperatures=None)
+# transcribe_video(model_path, video_path, temperatures=None)
 # validate_model(model_path, temperatures=None)
 
 

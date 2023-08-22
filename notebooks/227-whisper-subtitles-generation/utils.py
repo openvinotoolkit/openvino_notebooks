@@ -79,6 +79,9 @@ def convert_input_data_to_np(input_data):
             d = {}
             for k, v in it.items():
                 d[k] = v.data
+        elif isinstance(it, list):
+            converted_input_data.append(convert_input_data_to_np(it))
+            continue
         else:
             d = it.data
         converted_input_data.append(d)
