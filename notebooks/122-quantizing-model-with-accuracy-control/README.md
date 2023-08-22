@@ -13,7 +13,7 @@ The advanced quantization flow allows to apply 8-bit quantization to the model w
 - Since accuracy validation is run several times during the quantization process, quantization with accuracy control can take more time than the Basic 8-bit quantization flow.
 - The resulted model can provide smaller performance improvement than the Basic 8-bit quantization flow because some of the operations are kept in the original precision.
 
-> **NOTE**: Currently, 8-bit quantization with accuracy control is available only for models in OpenVINO representation.
+> **NOTE**: Currently, 8-bit quantization with accuracy control in NNCF is available only for models in OpenVINO representation.
 
 > **NOTE**: Quantization with accuracy control can take a long time and requires a lot of RAM. See details in each of the examples.
 
