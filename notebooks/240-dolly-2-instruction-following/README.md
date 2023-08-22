@@ -22,9 +22,6 @@ The tutorial consists of the following steps:
 - Create an instruction-following inference pipeline
 - Run instruction-following pipeline
 
-<<<<<<< HEAD
-=======
 ## Installation Instructions
->>>>>>> revert changes in dolly readme
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
