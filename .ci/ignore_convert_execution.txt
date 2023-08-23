@@ -9,6 +9,8 @@ notebooks/228-clip-zero-shot-image-classification/228-clip-zero-shot-convert.ipy
 notebooks/228-clip-zero-shot-image-classification/228-clip-zero-shot-quantize.ipynb
 notebooks/230-yolov8-optimization/230-yolov8-optimization.ipynb
 notebooks/231-instruct-pix2pix-image-editing/231-instruct-pix2pix-image-editing.ipynb
+notebooks/232-clip-language-saliency-map/232-clip-language-saliency-map.ipynb
+notebooks/233-blip-visual-language-processing/233-blip-visual-language-processing.ipynb
 notebooks/235-controlnet-stable-diffusion/235-controlnet-stable-diffusion.ipynb
 notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-infinite-zoom.ipynb
 notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-text-to-image.ipynb
