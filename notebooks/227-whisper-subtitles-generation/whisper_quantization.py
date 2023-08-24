@@ -3,11 +3,11 @@ import logging
 from functools import wraps
 
 from datasets import load_dataset
-from collections import namedtuple
 import torch
 import pickle
 from typing import Optional, Union, List, Dict, Tuple
 from functools import partial
+import multiprocessing
 
 from openvino.runtime import Core, Tensor
 import openvino.tools.mo
@@ -33,8 +33,6 @@ from nncf.torch import register_module
 from nncf import IgnoredScope
 from nncf.quantization.advanced_parameters import AdvancedQuantizationParameters, OverflowFix
 
-from whisper.decoding import DecodingTask, Inference, DecodingOptions, DecodingResult
-
 from internal_utils import download_video, get_audio, convert_input_data_to_ov_tensor, convert_input_data_to_np, \
     prepare_srt
 from utils import patch_whisper_for_ov_inference
@@ -44,8 +42,11 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger("whisper")
 
-# TASK = "transcribe"
-TASK = "translate"
+TASK = "transcribe"
+# TASK = "translate"
+
+# OV_COMPILE_MODEL_CONFIG = {"INFERENCE_NUM_THREADS": multiprocessing.cpu_count()}
+OV_COMPILE_MODEL_CONFIG = {"INFERENCE_NUM_THREADS": None}
 
 
 VERBOSE = bool(0)
@@ -64,11 +65,11 @@ core = Core()
 
 SAVE_CALIBRATION_DATA = bool(0)
 LOAD_CALIBRATION_DATA = bool(0)
-CALIBRATION_DATA_CACHE = 'calibration/librispeech_asr_dummy_{}.pkl'
-CALIBRATION_DATASET = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
+# CALIBRATION_DATA_CACHE = 'calibration/librispeech_asr_dummy_{}.pkl'
+# CALIBRATION_DATASET = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
 # CALIBRATION_DATASET = reversed(load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation"))
-# CALIBRATION_DATA_CACHE = 'calibration/librispeech_asr_clean_train100_{}.pkl'
-# CALIBRATION_DATASET = load_dataset("librispeech_asr", "clean", split="train.100", streaming=True).take(30)
+CALIBRATION_DATA_CACHE = 'calibration/librispeech_asr_clean_train100_{}.pkl'
+CALIBRATION_DATASET = load_dataset("librispeech_asr", "clean", split="train.100", streaming=True).take(30)
 # CALIBRATION_DATA_CACHE = 'calibration/common_voice_11_0_{}.pkl'
 # CALIBRATION_DATASET = load_dataset("mozilla-foundation/common_voice_11_0", "en", split="train", streaming=True).take(100)
 
@@ -93,7 +94,7 @@ class OpenVINOAudioEncoder(torch.nn.Module):
     def __init__(self, core, model_path, device='CPU'):
         super().__init__()
         self.model = core.read_model(model_path)
-        self.compiled_model = core.compile_model(self.model, device)
+        self.compiled_model = core.compile_model(self.model, device, config=OV_COMPILE_MODEL_CONFIG)
         self.output_blob = self.compiled_model.output(0)
 
     def forward(self, mel: torch.Tensor):
@@ -124,11 +125,11 @@ class OpenVINOTextDecoderOld(torch.nn.Module):
             self.model = self.compiled_model = model
         elif isinstance(model, Path):
             self.model = core.read_model(model)
-            self.compiled_model = core.compile_model(self.model, device)
+            self.compiled_model = core.compile_model(self.model, device, config=OV_COMPILE_MODEL_CONFIG)
         else:
             raise Exception
         self._input_names = [inp.any_name for inp in self.model.inputs]
-        self.compiled_model = core.compile_model(self.model, device)
+        self.compiled_model = core.compile_model(self.model, device, config=OV_COMPILE_MODEL_CONFIG)
         self.device = device
 
     def init_past_inputs(self, feed_dict):
@@ -227,7 +228,7 @@ class OpenVINOTextDecoderNew(torch.nn.Module):
             self.model = self.compiled_model = model
         elif isinstance(model, Path):
             self.model = core.read_model(model)
-            self.compiled_model = core.compile_model(self.model, device)
+            self.compiled_model = core.compile_model(self.model, device, config=OV_COMPILE_MODEL_CONFIG)
         else:
             raise Exception
         self._input_names = [inp.any_name for inp in self.model.inputs]
@@ -1147,7 +1148,7 @@ video_path, video_transcription_ground_truths = (
 # video_path = download_video(base_dir, "https://www.youtube.com/watch?v=I8iBhUMFCIA")  # Other 45 sec
 
 
-compressed_model_path = quantize("calibration_datasets/librispeech_asr_dummy/translate/15_att3",
+compressed_model_path = quantize("calibration_datasets/librispeech_asr_train100_clean/transcribe/15_att3",
                                  # encoder_compression="weights",
                                  encoder_compression="quantization",
                                  # encoder_compression=None,
