@@ -13,7 +13,7 @@ In this notebook, you will use its capabilities for generation of subtitles for 
 Notebook contains the following steps:
 1. Download the model.
 2. Instantiate original PyTorch model pipeline.
-3. Export the ONNX model and convert it to OpenVINO IR, using model conversion API.
+3. Convert model to OpenVINO IR, using model conversion API.
 4. Run the Whisper pipeline with OpenVINO.
 
 A simplified demo pipeline is represented in the diagram below:
