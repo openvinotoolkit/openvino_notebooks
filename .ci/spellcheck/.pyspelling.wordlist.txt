@@ -452,6 +452,7 @@ SML
 sml
 softmax
 SOTA
+Sparsification
 sparsified
 sparsify
 spectrogram
