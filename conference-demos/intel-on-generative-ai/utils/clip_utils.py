@@ -8,6 +8,22 @@ import numpy as np
 import torch
 import tqdm
 
+
+def plot_saliency_map(image_tensor, saliency_map, query, return_fig=True):
+    fig = plt.figure(dpi=150)
+    plt.imshow(image_tensor)
+    plt.imshow(
+        saliency_map, 
+        norm=colors.TwoSlopeNorm(vcenter=0), 
+        cmap="jet", 
+        alpha=0.5,  # make saliency map trasparent to see original picture
+    )
+    if query:
+        plt.title(f'Query: "{query}"')
+    plt.axis("off")
+    if return_fig == True:
+        return fig
+
 def get_random_crop_params(
     image_height: int, image_width: int, min_crop_size: int
 ) -> Tuple[int, int, int, int]:
@@ -40,15 +56,3 @@ def cosine_similarity(
 ) -> Union[np.ndarray, torch.Tensor]:
     return one @ other.T / (np.linalg.norm(one) * np.linalg.norm(other))
 
-def plot_saliency_map(image_tensor: np.array, saliency_map: np.array, query: str) -> None:
-    plt.figure(dpi=150)
-    plt.imshow(image_tensor)
-    plt.imshow(
-        saliency_map, 
-        norm=colors.TwoSlopeNorm(vcenter=0), 
-        cmap="jet", 
-        alpha=0.5,  # make saliency map trasparent to see original picture
-    )
-    plt.title(f'Query: "{query}"')
-    plt.axis("off")
-    plt.show()
