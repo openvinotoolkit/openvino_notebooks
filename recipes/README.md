@@ -7,7 +7,7 @@ Edge AI Reference Kits are fully functioning applications demonstrating deep lea
 ## Table of Contents
 
 - [Available Kits](#available-kits)
-	- [🧠 Intelligent Queue Management](#-intelligent-queue-management)
+	- [🚶 Intelligent Queue Management](#-intelligent-queue-management)
 	- [🔍 Defect Detection](#-defect-detection)
 	- [⏲️ Automatic Industrial Meter Reading](#%EF%B8%8F-automatic-industrial-meter-reading)
 - [Future Kits](#future-kits)
@@ -17,7 +17,7 @@ Edge AI Reference Kits are fully functioning applications demonstrating deep lea
 ## Available Kits
 Currently, there are the following kits:
 
-### 🧠 Intelligent Queue Management
+### 🚶 Intelligent Queue Management
 [![image](https://github.com/openvinotoolkit/openvino_notebooks/assets/138901786/6874cfe8-3462-4b30-8026-c14aab7b695c)](intelligent_queue_management)
 
 | [Intelligent Queue Management](intelligent_queue_management) |  |
