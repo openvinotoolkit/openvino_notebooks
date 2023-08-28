@@ -19,6 +19,7 @@ def parse_arguments():
     parser.add_argument('--report_dir', default='report')
     parser.add_argument('--collect_reports', action='store_true')
     parser.add_argument("--move_notebooks_dir")
+    parser.add_argument("--timeout", type=int, default=7200, help="Timeout for running single notebook in seconds")
     return parser.parse_args()
 
 def find_notebook_dir(path, root):
@@ -84,7 +85,7 @@ def clean_test_artifacts(before_test_files, after_test_files):
             shutil.rmtree(file_path, ignore_errors=True)
 
 
-def run_test(notebook_path, root):
+def run_test(notebook_path, root, timeout=7200):
     print(f'RUN {notebook_path.relative_to(root)}', flush=True)
     
     with cd(notebook_path):
@@ -99,7 +100,7 @@ def run_test(notebook_path, root):
             return 0
         
         main_command = [sys.executable,  '-m',  'treon', notebook_name]
-        retcode = subprocess.run(main_command, shell=(platform.system() == "Windows")).returncode
+        retcode = subprocess.run(main_command, shell=(platform.system() == "Windows"), timeout=timeout).returncode
 
         clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
     return retcode
@@ -151,7 +152,7 @@ def main():
     for notebook, report in test_plan.items():
         if report['status'] == "SKIPPED":
             continue
-        status = run_test(report['path'], root)
+        status = run_test(report['path'], root, args.timeout)
         report['status'] = 'SUCCESS' if not status else "FAILED"
         if status:
             failed_notebooks.append(str(notebook))
