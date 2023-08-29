@@ -123,6 +123,7 @@ downloader
 downsampled
 dpredictor
 dropdown
+editability
 EfficientNet
 embeddings
 EnCodec
@@ -130,6 +131,8 @@ encodec
 enum
 et
 EVS
+fastcomposer
+FastComposer
 FC
 FIL
 finetuned
@@ -250,6 +253,7 @@ MiDaS
 MidasNet
 Midjourney
 MiniLM
+MLP
 MobileNet
 MobileNetV
 MusicGen
@@ -264,6 +268,7 @@ MRPC
 Multiclass
 multiclass
 MultiHeadAttention
+multilayer
 multimodal
 Multimodality
 Müller
@@ -328,6 +333,7 @@ panoptic
 parallelized
 parameterization
 parametrize
+perceptron
 performant
 PersonaGPT
 photorealism
@@ -337,6 +343,7 @@ Pipelining
 PNDM
 Pointilism
 PointNet
+Postfuse
 postprocess
 postprocesses
 postprocessing
