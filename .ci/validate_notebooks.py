@@ -100,17 +100,22 @@ def run_test(notebook_path, root, timeout=7200):
             return 0
         
         main_command = [sys.executable,  '-m',  'treon', notebook_name]
-        retcode = subprocess.run(main_command, shell=(platform.system() == "Windows"), timeout=timeout).returncode
+        try:
+            retcode = subprocess.run(main_command, shell=(platform.system() == "Windows"), timeout=timeout).returncode
+        except subprocess.TimeoutExpired:
+            retcode = -42
 
         clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
     return retcode
 
 
-def finalize_status(failed_notebooks, test_plan, report_dir, root):
+def finalize_status(failed_notebooks, timeout_notebooks, test_plan, report_dir, root):
     return_status = 0
     if failed_notebooks:
         return_status = 1
         print("FAILED: \n{}".format('\n'.join(failed_notebooks)))
+    if timeout_notebooks:
+        print("FAILED BY TIMEOUT: \n{}".format('\n'.join(timeout_notebooks)))
     test_report = []
     for notebook, status in test_plan.items():
         test_status = status['status'] or 'NOT_RUN'
@@ -138,6 +143,7 @@ class cd:
 
 def main():
     failed_notebooks = []
+    timeout_notebooks = []
     args = parse_arguments()
     reports_dir = Path(args.report_dir)
     reports_dir.mkdir(exist_ok=True, parents=True)
@@ -153,12 +159,18 @@ def main():
         if report['status'] == "SKIPPED":
             continue
         status = run_test(report['path'], root, args.timeout)
-        report['status'] = 'SUCCESS' if not status else "FAILED"
         if status:
-            failed_notebooks.append(str(notebook))
+            report['status'] = "TIMEOUT" if status == -42 else "FAILED"
+        else:
+            report["status"] = 'SUCCESS'
+        if status:
+            if status == -42:
+                timeout_notebooks.append(str(notebook))
+            else:
+                failed_notebooks.append(str(notebook))
             if args.early_stop:
                 break
-    exit_status = finalize_status(failed_notebooks, test_plan, reports_dir, root)
+    exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
     return exit_status
 
 
