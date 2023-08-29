@@ -34,16 +34,13 @@ from nncf import IgnoredScope
 from nncf.quantization.advanced_parameters import AdvancedQuantizationParameters, OverflowFix
 
 from internal_utils import download_video, get_audio, convert_input_data_to_ov_tensor, convert_input_data_to_np, \
-    prepare_srt
+    prepare_srt, transcribe_trimmed
 from utils import patch_whisper_for_ov_inference
 from ignored_scopes import ignored_scope1, ignored_scope2, ignored_scope3
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger("whisper")
-
-TASK = "transcribe"
-# TASK = "translate"
 
 # OV_COMPILE_MODEL_CONFIG = {"INFERENCE_NUM_THREADS": multiprocessing.cpu_count()}
 OV_COMPILE_MODEL_CONFIG = {"INFERENCE_NUM_THREADS": None}
@@ -65,11 +62,11 @@ core = Core()
 
 SAVE_CALIBRATION_DATA = bool(0)
 LOAD_CALIBRATION_DATA = bool(0)
-# CALIBRATION_DATA_CACHE = 'calibration/librispeech_asr_dummy_{}.pkl'
-# CALIBRATION_DATASET = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
+CALIBRATION_DATA_CACHE = 'calibration/{}/librispeech_asr_dummy_{}.pkl'
+CALIBRATION_DATASET = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
 # CALIBRATION_DATASET = reversed(load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation"))
-CALIBRATION_DATA_CACHE = 'calibration/librispeech_asr_clean_train100_{}.pkl'
-CALIBRATION_DATASET = load_dataset("librispeech_asr", "clean", split="train.100", streaming=True).take(30)
+# CALIBRATION_DATA_CACHE = 'calibration/librispeech_asr_clean_train100_{}.pkl'
+# CALIBRATION_DATASET = load_dataset("librispeech_asr", "clean", split="train.100", streaming=True).take(30)
 # CALIBRATION_DATA_CACHE = 'calibration/common_voice_11_0_{}.pkl'
 # CALIBRATION_DATASET = load_dataset("mozilla-foundation/common_voice_11_0", "en", split="train", streaming=True).take(100)
 
@@ -707,7 +704,8 @@ def run_benchmark(model_path: Path, shape: str = None, verbose: bool = True) -> 
     return float(match.group(1))
 
 
-def run_validation(model, dataset, return_only_accuracy=True, temperatures=None):
+def run_validation(model, dataset, task, return_only_accuracy=True, temperatures=None, beam_search=False,
+                   with_timestamps=True):
     global num_encoder_forwards, num_decoder_forwards
 
     processor = WhisperProcessor.from_pretrained("openai/whisper-large")
@@ -728,7 +726,12 @@ def run_validation(model, dataset, return_only_accuracy=True, temperatures=None)
         num_encoder_forwards = num_decoder_forwards = 0
 
         s_time = datetime.datetime.now()
-        transcription = model.transcribe(b["audio"]["array"].astype(np.float32), **kwargs)['text']
+        if beam_search:
+            transcription = model.transcribe(b["audio"]["array"].astype(np.float32), task=task, beam_size=5, best_of=5,
+                                             without_timestamps=not with_timestamps, **kwargs)['text']
+        else:
+            transcription = model.transcribe(b["audio"]["array"].astype(np.float32), task=task,
+                                             without_timestamps=not with_timestamps, **kwargs)['text']
         total_transcribe_time += (datetime.datetime.now() - s_time).total_seconds()
 
         total_num_encoder_forwards.append(num_encoder_forwards)
@@ -739,7 +742,7 @@ def run_validation(model, dataset, return_only_accuracy=True, temperatures=None)
         ground_truths.append(reference)
         predictions.append(prediction)
 
-    word_accuracy = 1 - wer.compute(references=ground_truths, predictions=predictions)
+    word_accuracy = 100 * (1 - wer.compute(references=ground_truths, predictions=predictions))
 
     if return_only_accuracy:
         return word_accuracy
@@ -748,7 +751,7 @@ def run_validation(model, dataset, return_only_accuracy=True, temperatures=None)
 
 
 @arg_logger
-def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alpha_encoder, sq_alpha_decoder,
+def quantize(save_dir, task, encoder_compression, decoder_compression, use_pot, sq_alpha_encoder, sq_alpha_decoder,
              ignore_logits, inplace_statistics_decoder,
              max_encoder_calibration_samples, max_decoder_calibration_samples, num_calibration_samples=30,
              reverse_encoder_calibration_data=False, reverse_decoder_calibration_data=False, decoder_ignored_scope=None,
@@ -777,7 +780,7 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
     except:
         pass
     if encoder_compression == "quantization" or decoder_compression == "quantization":
-        calibration_cache_path = BASE_DIR / CALIBRATION_DATA_CACHE.format(num_calibration_samples)
+        calibration_cache_path = BASE_DIR / CALIBRATION_DATA_CACHE.format(task, num_calibration_samples)
         if not calibration_cache_path.exists() or not LOAD_CALIBRATION_DATA:
             global COLLECT_INIT_DATA
 
@@ -793,8 +796,8 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
             for i, data_item in tqdm(enumerate(CALIBRATION_DATASET)):
                 if i == num_calibration_samples:
                     break
-                model.transcribe(data_item["audio"]["array"].astype(np.float32), beam_size=5, best_of=5, task=TASK)
-                # model.transcribe(data_item["audio"]["array"].astype(np.float32), task=TASK)
+                model.transcribe(data_item["audio"]["array"].astype(np.float32), beam_size=5, best_of=5, task=task)
+                # model.transcribe(data_item["audio"]["array"].astype(np.float32), task=task)
                 # grouped_encoder_init_data.append(encoder_init_data)
                 # grouped_decoder_init_data.append(decoder_init_data)
                 # encoder_init_data, decoder_init_data = [], []
@@ -928,7 +931,7 @@ def quantize(save_dir, encoder_compression, decoder_compression, use_pot, sq_alp
             quantization_dataset = nncf.Dataset(list(reversed(decoder_init_data)) if reverse_decoder_calibration_data
                                                 else decoder_init_data)
             if decoder_ignored_scope is None and ignore_logits:
-                decoder_ignored_scope = IgnoredScope(names=["aten::to/Convert_713" if OVC_API_DECODER else "logits"])
+                decoder_ignored_scope = IgnoredScope(names=["aten::to/Convert_749" if OVC_API_DECODER else "logits"])
             if max_decoder_calibration_samples is None:
                 max_decoder_calibration_samples = len(decoder_init_data)
             compressed_decoder = nncf.quantize(
@@ -987,7 +990,7 @@ def benchmark(model_path):
 
 
 @arg_logger
-def transcribe_video(model_path, video_path, temperatures=None):
+def transcribe_video(model_path, video_path, task, beam_search, with_timestamps, temperatures=None):
     global start_time, VERBOSE, video_transcription_ground_truths, num_encoder_forwards, num_decoder_forwards
 
     verbose_value = VERBOSE
@@ -1014,15 +1017,19 @@ def transcribe_video(model_path, video_path, temperatures=None):
     kwargs = dict()
     if temperatures is not None:
         kwargs["temperature"] = temperatures
-    transcription = model.transcribe(audio, beam_size=5, best_of=5, task=TASK, **kwargs)
+    if beam_search:
+        transcription = model.transcribe(audio, beam_size=5, best_of=5, task=task,
+                                         without_timestamps=not with_timestamps, **kwargs)
+    else:
+        transcription = model.transcribe(audio, task=task, without_timestamps=not with_timestamps, **kwargs)
     finish_time = datetime.datetime.now()
 
     logger.info(f'Transcription: {transcription["text"]}')
     for gt in video_transcription_ground_truths:
-        word_accuracy = 1 - wer.compute(references=[transcription["text"]], predictions=[gt])
+        word_accuracy = 100 * (1 - wer.compute(references=[transcription["text"]], predictions=[gt]))
         measures = compute_measures(transcription["text"], gt)
         S, D, I, H = measures["substitutions"], measures["deletions"], measures["insertions"], measures["hits"]
-        logger.info(f"Accuracy: {word_accuracy:.04f}; S: {S}; D: {D}; I: {I}; H: {H}")
+        logger.info(f"Accuracy: {word_accuracy:.02f}; S: {S}; D: {D}; I: {I}; H: {H}")
 
     srt_lines = prepare_srt(transcription)
 
@@ -1036,7 +1043,7 @@ def transcribe_video(model_path, video_path, temperatures=None):
 
 
 @arg_logger
-def validate_model(model_path, temperatures=None):
+def validate_model(model_path, task, beam_search, with_timestamps, temperatures=None, print_predictions=False):
     log_file_path = model_path / f"validation_{datetime.datetime.now()}.log"
     map(logger.removeHandler, logger.handlers)
     logger.addHandler(logging.FileHandler(log_file_path))
@@ -1057,7 +1064,8 @@ def validate_model(model_path, temperatures=None):
 
     word_accuracy, ground_truths, predictions, total_transcribe_time, \
         total_num_encoder_forwards, total_num_decoder_forwards = \
-        run_validation(model, list(dataset), return_only_accuracy=False, temperatures=temperatures)
+        run_validation(model, list(dataset), task=task, return_only_accuracy=False, temperatures=temperatures,
+                       beam_search=beam_search, with_timestamps=with_timestamps)
 
     total_S, total_D, total_I, total_H = 0, 0, 0, 0
     for ref, pred in zip(ground_truths, predictions):
@@ -1068,20 +1076,24 @@ def validate_model(model_path, temperatures=None):
         total_I += I;
         total_H += H
         wer = (S + D + I) / (S + D + H)
-        logger.info(f"WER: {wer:.04f}; S: {S}; D: {D}; I: {I}; H: {H}")
-        logger.info(f"Reference : {ref}")
-        logger.info(f"Prediction: {pred}")
-        logger.info("\n")
+        if print_predictions:
+            logger.info(f"WER: {wer:.04f}; S: {S}; D: {D}; I: {I}; H: {H}")
+            logger.info(f"Reference : {ref}")
+            logger.info(f"Prediction: {pred}")
+            logger.info("\n")
 
-    logger.info(f'Word accuracy (1-wer): {word_accuracy}')
+    logger.info(f'Word accuracy (1-wer): {word_accuracy:.2f}')
     logger.info(f'Total transcribe time: {total_transcribe_time}', )
     logger.info(f'Average encoder calls: {sum(total_num_encoder_forwards) / len(total_num_encoder_forwards)}')
     logger.info(f'Average decoder calls: {sum(total_num_decoder_forwards) / len(total_num_decoder_forwards)}')
     logger.info(f"Total S: {total_S}; D: {total_D}; I: {total_I}; H: {total_H}")
 
+    return word_accuracy
+
 
 @arg_logger
-def quantize_decoder_with_accuracy_control(model_path, save_dir, sq_alpha_decoder, max_drop, temperatures=None):
+def quantize_decoder_with_accuracy_control(model_path, save_dir, task, sq_alpha_decoder, max_drop, temperatures=None,
+                                           beam_search=False, with_timestamps=True):
     global decoder_init_data
 
     model_path = Path(model_path)
@@ -1103,8 +1115,8 @@ def quantize_decoder_with_accuracy_control(model_path, save_dir, sq_alpha_decode
     ov_decoder = core.read_model(model_path / "whisper_decoder.xml")
 
     logger.info('Loading calibration data...')
-    load_init_data(BASE_DIR / CALIBRATION_DATA_CACHE.format(30), ov_decoder.inputs)
-    quantization_dataset = nncf.Dataset(list(reversed(decoder_init_data)))
+    load_init_data(BASE_DIR / CALIBRATION_DATA_CACHE.format(task, 15), ov_decoder.inputs)
+    quantization_dataset = nncf.Dataset(decoder_init_data)
 
     ptq_config = dict(
         advanced_quantization_parameters=AdvancedQuantizationParameters(
@@ -1113,7 +1125,7 @@ def quantize_decoder_with_accuracy_control(model_path, save_dir, sq_alpha_decode
         ),
         model_type=nncf.ModelType.TRANSFORMER,
         fast_bias_correction=True,
-        subset_size=min(300, len(decoder_init_data)),
+        subset_size=len(decoder_init_data),
         max_drop=max_drop,
     )
 
@@ -1122,9 +1134,9 @@ def quantize_decoder_with_accuracy_control(model_path, save_dir, sq_alpha_decode
 
     def validation_fn(m, d):
         model.decoder = OpenVINOTextDecoder(core, m)
-        return run_validation(model, d, return_only_accuracy=True, temperatures=temperatures)
+        return run_validation(model, d, task=task, return_only_accuracy=True, temperatures=temperatures,
+                              beam_search=beam_search, with_timestamps=with_timestamps)
 
-    ov.serialize(ov_decoder, save_dir / "whisper_decoder_initial.xml")
     compressed_decoder = nncf.quantize_with_accuracy_control(
         ov_decoder,
         quantization_dataset,
@@ -1135,6 +1147,44 @@ def quantize_decoder_with_accuracy_control(model_path, save_dir, sq_alpha_decode
 
     ov.serialize(compressed_decoder, save_dir / "whisper_decoder.xml")
     ov.serialize(model.encoder.model, save_dir / "whisper_encoder.xml")
+
+
+def sq_grid_search(task):
+    results_greedy = []
+    results_beam_search = []
+    for encoder_sq in np.arange(0.05, 0.96, 0.1):
+        results_greedy.append([])
+        results_beam_search.append([])
+        for decoder_sq in np.arange(0.05, 0.96, 0.1):
+            compressed_model_path = quantize(
+                f"quantized_models/ovc/grid-search-sq_transcribe_att2/enc-{encoder_sq:.2f}_dec-{decoder_sq:.2f}",
+                task=task,
+                # encoder_compression="weights",
+                encoder_compression="quantization",
+                # encoder_compression=None,
+                # decoder_compression="weights",
+                decoder_compression="quantization",
+                # decoder_compression=None,
+                use_pot=bool(0),
+                sq_alpha_encoder=encoder_sq,
+                sq_alpha_decoder=decoder_sq,
+                ignore_logits=bool(0),
+                inplace_statistics_decoder=bool(1),
+                num_calibration_samples=15,
+                max_encoder_calibration_samples=None,
+                max_decoder_calibration_samples=None,
+                reverse_encoder_calibration_data=bool(0),
+                reverse_decoder_calibration_data=bool(0),
+                filter_init_data=bool(0),
+                # decoder_ignored_scope=ignored_scope3
+                )
+            # benchmark(compressed_model_path)
+            transcribe_video(compressed_model_path, video_path)
+            results_beam_search[-1].append(validate_model(compressed_model_path, beam_search=True))
+            results_greedy[-1].append(validate_model(compressed_model_path, beam_search=False))
+
+    print('\n'.join(map(lambda lst: ", ".join(map(lambda it: f"{it:.2f}", lst)), results_beam_search)))
+    print('\n'.join(map(lambda lst: ", ".join(map(lambda it: f"{it:.2f}", lst)), results_greedy)))
 
 
 video_path, video_transcription_ground_truths = (
@@ -1148,41 +1198,54 @@ video_path, video_transcription_ground_truths = (
 # video_path = download_video(base_dir, "https://www.youtube.com/watch?v=I8iBhUMFCIA")  # Other 45 sec
 
 
-compressed_model_path = quantize("calibration_datasets/librispeech_asr_train100_clean/transcribe/15_att3",
-                                 # encoder_compression="weights",
-                                 encoder_compression="quantization",
-                                 # encoder_compression=None,
-                                 # decoder_compression="weights",
-                                 decoder_compression="quantization",
-                                 # decoder_compression=None,
-                                 use_pot=bool(0),
-                                 sq_alpha_encoder=0.50,
-                                 sq_alpha_decoder=0.95,
-                                 ignore_logits=bool(0),
-                                 inplace_statistics_decoder=bool(1),
-                                 num_calibration_samples=15,
-                                 max_encoder_calibration_samples=None,
-                                 max_decoder_calibration_samples=None,
-                                 reverse_encoder_calibration_data=bool(0),
-                                 reverse_decoder_calibration_data=bool(0),
-                                 filter_init_data=bool(0),
-                                 # decoder_ignored_scope=ignored_scope3
-                                 )
+# sq_grid_search()
+
+
+TASK = "transcribe"
+# TASK = "translate"
+BEAM_SEARCH = bool(0)
+WITH_TIMESTAMPS = bool(1)
+
+
+# compressed_model_path = quantize("calibration_datasets/librispeech_asr_dummy/15_calibration-beam-size-3",
+#                                  task=TASK,
+#                                  # encoder_compression="weights",
+#                                  encoder_compression="quantization",
+#                                  # encoder_compression=None,
+#                                  # decoder_compression="weights",
+#                                  decoder_compression="quantization",
+#                                  # decoder_compression=None,
+#                                  use_pot=bool(0),
+#                                  sq_alpha_encoder=0.50,
+#                                  sq_alpha_decoder=0.95,
+#                                  ignore_logits=bool(0),
+#                                  inplace_statistics_decoder=bool(1),
+#                                  num_calibration_samples=15,
+#                                  max_encoder_calibration_samples=None,
+#                                  max_decoder_calibration_samples=None,
+#                                  reverse_encoder_calibration_data=bool(0),
+#                                  reverse_decoder_calibration_data=bool(0),
+#                                  filter_init_data=bool(0),
+#                                  # decoder_ignored_scope=ignored_scope3
+#                                  )
+# transcribe_video(compressed_model_path, video_path, task=TASK, beam_search=bool(1), with_timestamps=bool(1))
+# validate_model(compressed_model_path, task=TASK, beam_search=bool(0), with_timestamps=bool(1))
 # benchmark(compressed_model_path)
-transcribe_video(compressed_model_path, video_path)
-# validate_model(compressed_model_path)
 
-# model_path = Path("./int8")
+# model_path = Path("./calibration_datasets/librispeech_asr_dummy/transcribe/15_att1")
+model_path = Path("./original_model_ovc")
 # benchmark(model_path)
-# transcribe_video(model_path, video_path, temperatures=None)
-# validate_model(model_path, temperatures=None)
+transcribe_video(model_path, video_path, task=TASK, beam_search=bool(0), with_timestamps=WITH_TIMESTAMPS)
+# validate_model(model_path, task=TASK, beam_search=bool(0), with_timestamps=WITH_TIMESTAMPS)
 
 
-# quantize_decoder_with_accuracy_control("quantized_models/ovc/encoder-ptq-sq-0.50_decoder-none",
-#                                        save_dir="qwac_0.005_att3",
+# quantize_decoder_with_accuracy_control("quantized_models/ovc/encoder-none_decoder-none",
+#                                        save_dir="qwac_translate_beam_timestamps_att2",
+#                                        task=TASK,
 #                                        sq_alpha_decoder=0.95,
-#                                        max_drop=0.005,
-#                                        temperatures=None)
+#                                        max_drop=0.5,
+#                                        beam_search=BEAM_SEARCH,
+#                                        with_timestamps=WITH_TIMESTAMPS)
 
 
 if OVC_API_ENCODER:

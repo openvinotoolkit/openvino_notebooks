@@ -133,3 +133,18 @@ def prepare_srt(transcription):
         segment_lines.append(time_str)
         segment_lines.append(segment["text"] + "\n\n")
     return segment_lines
+
+
+def transcribe_trimmed(model, audio, trim=True, **kwargs):
+    audio_duration = audio.shape[0] / 16000
+
+    result = model.transcribe(audio, **kwargs)
+    if trim:
+        new_segments = []
+        for segment in result["segments"]:
+            # if segment["start"] < audio_duration:
+            if segment["end"] <= audio_duration:
+                new_segments.append(segment)
+        result["segments"] = new_segments
+        result["text"] = " ".join(segment["text"] for segment in result["segments"])
+    return result
