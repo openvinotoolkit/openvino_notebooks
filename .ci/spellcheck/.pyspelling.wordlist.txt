@@ -258,6 +258,7 @@ MobileNet
 MobileNetV
 MusicGen
 modelled
+Modelscope
 MONAI
 MONAI's
 Monodepth
@@ -440,6 +441,7 @@ segmenter
 Segmind
 serializable
 ShapeNet
+Shutterstock
 siggraph
 sigmoid
 SISR
@@ -479,6 +481,7 @@ tf
 TFLite
 tflite
 th
+timestep
 Tokenization
 tokenization
 tokenize
@@ -545,3 +548,5 @@ YOLO
 YOLOv
 yolov
 Zongyuan
+ZeroScope
+zeroscope

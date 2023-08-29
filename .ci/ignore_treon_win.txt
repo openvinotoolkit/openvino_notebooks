@@ -18,3 +18,4 @@
 249-oneformer-segmentation
 251-tiny-sd-image-generation
 252-fastcomposer-image-generation
+253-zeroscope-text2video
