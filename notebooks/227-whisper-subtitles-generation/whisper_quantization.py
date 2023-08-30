@@ -65,11 +65,11 @@ core = Core()
 
 SAVE_CALIBRATION_DATA = bool(0)
 LOAD_CALIBRATION_DATA = bool(0)
-CALIBRATION_DATA_CACHE = 'calibration/{}/librispeech_asr_dummy_{}.pkl'
-CALIBRATION_DATASET = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
+# CALIBRATION_DATA_CACHE = 'calibration/{}/librispeech_asr_dummy_{}.pkl'
+# CALIBRATION_DATASET = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
 # CALIBRATION_DATASET = reversed(load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation"))
-# CALIBRATION_DATA_CACHE = 'calibration/librispeech_asr_clean_train100_{}.pkl'
-# CALIBRATION_DATASET = load_dataset("librispeech_asr", "clean", split="train.100", streaming=True).take(30)
+CALIBRATION_DATA_CACHE = 'calibration/librispeech_asr_clean_train100_{}.pkl'
+CALIBRATION_DATASET = load_dataset("librispeech_asr", "clean", split="train.100", streaming=True).take(30)
 # CALIBRATION_DATA_CACHE = 'calibration/common_voice_11_0_{}.pkl'
 # CALIBRATION_DATASET = load_dataset("mozilla-foundation/common_voice_11_0", "en", split="train", streaming=True).take(100)
 # CALIBRATION_DATA_CACHE = 'calibration/{}/ashraq_youtube-transcription_{}.pkl'
@@ -1307,7 +1307,7 @@ WITH_TIMESTAMPS = bool(1)
 
 
 # compressed_model_path = quantize("calibration_datasets/jamescalam_youtube-transcriptions/translate/60_duration-30_beam-search-2",
-compressed_model_path = quantize("calibration_datasets/librispeech_asr_dummy/translate/whisper_develop/15_no-beam-search",
+compressed_model_path = quantize("calibration_datasets/librispeech_asr_train100_clean/translate/whisper_develop/30",
                                  task=TASK,
                                  # encoder_compression="weights",
                                  encoder_compression="quantization",
@@ -1327,7 +1327,7 @@ compressed_model_path = quantize("calibration_datasets/librispeech_asr_dummy/tra
                                  filter_init_data=bool(0),
                                  decoder_ignored_scope=None,
 
-                                 num_calibration_samples=15,
+                                 num_calibration_samples=30,
                                  calibration_beam_search=bool(0),
                                  calibration_beam_size=5,
                                  sample_from_ends=bool(0),
