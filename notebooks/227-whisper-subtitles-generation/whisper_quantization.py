@@ -28,7 +28,7 @@ from pathlib import Path
 import numpy as np
 import openvino.runtime as ov
 import nncf
-from nncf import nncf_logger
+from nncf import nncf_logger, QuantizationPreset
 from nncf.quantization.range_estimator import RangeEstimatorParameters, StatisticsCollectorParameters, StatisticsType, \
     AggregatorType
 from nncf.torch import register_module
@@ -64,7 +64,7 @@ core = Core()
 
 
 SAVE_CALIBRATION_DATA = bool(0)
-LOAD_CALIBRATION_DATA = bool(1)
+LOAD_CALIBRATION_DATA = bool(0)
 CALIBRATION_DATA_CACHE = 'calibration/{}/librispeech_asr_dummy_{}.pkl'
 CALIBRATION_DATASET = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
 # CALIBRATION_DATASET = reversed(load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation"))
@@ -120,7 +120,7 @@ class OpenVINOAudioEncoder(torch.nn.Module):
         return torch.from_numpy(self.compiled_model(mel)[self.output_blob])
 
 
-class OpenVINOTextDecoderOld(torch.nn.Module):
+class OpenVINOTextDecoderMO(torch.nn.Module):
     """
     Helper for inference OpenVINO decoder model
     """
@@ -223,7 +223,7 @@ class OpenVINOTextDecoderOld(torch.nn.Module):
         return self.postprocess_outputs(res)
 
 
-class OpenVINOTextDecoderNew(torch.nn.Module):
+class OpenVINOTextDecoderOVC(torch.nn.Module):
     """
     Helper for inference OpenVINO decoder model
     """
@@ -240,6 +240,7 @@ class OpenVINOTextDecoderNew(torch.nn.Module):
             raise Exception
         self._input_names = [inp.any_name for inp in self.model.inputs]
         self.device = device
+        self.blocks = []
 
     def init_past_inputs(self, feed_dict):
         """
@@ -316,7 +317,7 @@ class OpenVINOTextDecoderNew(torch.nn.Module):
         return self.postprocess_outputs(res)
 
 
-OpenVINOTextDecoder = OpenVINOTextDecoderNew if OVC_API_DECODER else OpenVINOTextDecoderOld
+OpenVINOTextDecoder = OpenVINOTextDecoderOVC if OVC_API_DECODER else OpenVINOTextDecoderMO
 
 
 def patch_whisper_decoder_for_export(decoder):
@@ -976,18 +977,31 @@ def quantize(save_dir, task, encoder_compression, decoder_compression, use_pot, 
     # Decoder quantization
     #
 
+    # Best combination of parameters by htune:
+    # preset = QuantizationPreset.MIXED,
+    # advanced_parameters:
+    #   weights_range_estimator_params = RangeEstimatorParameters(
+    #       min=StatisticsCollectorParameters(statistics_type=StatisticsType.MIN, aggregator_type=None, clipping_value=None, quantile_outlier_prob=0.0001),
+    #       max=StatisticsCollectorParameters(statistics_type=StatisticsType.MAX, aggregator_type=None, clipping_value=None, quantile_outlier_prob=0.0001)),
+    #   activations_range_estimator_params = RangeEstimatorParameters(
+    #       min=StatisticsCollectorParameters(statistics_type=StatisticsType.MIN, aggregator_type=AggregatorType.MIN, clipping_value=None, quantile_outlier_prob=0.0001),
+    #       max=StatisticsCollectorParameters(statistics_type=StatisticsType.QUANTILE, aggregator_type=AggregatorType.MEAN, clipping_value=None, quantile_outlier_prob=0.001))
     advanced_parameters = AdvancedQuantizationParameters(
         backend_params={"use_pot": use_pot},
         overflow_fix=OverflowFix.DISABLE,
         # disable overflow fix (can lead to accuracy drop on legacy platforms w/o DL Boost),
         smooth_quant_alpha=sq_alpha_decoder,
         inplace_statistics=inplace_statistics_decoder,
+        # weights_range_estimator_params=RangeEstimatorParameters(
+        #     min=StatisticsCollectorParameters(statistics_type=StatisticsType.MIN, quantile_outlier_prob=1e-4),
+        #     max=StatisticsCollectorParameters(statistics_type=StatisticsType.MAX, quantile_outlier_prob=1e-4),
+        # ),
         # activations_range_estimator_params=RangeEstimatorParameters(
         #     min=StatisticsCollectorParameters(
-        #         statistics_type=StatisticsType.QUANTILE, aggregator_type=AggregatorType.MIN, quantile_outlier_prob=1e-4
+        #         statistics_type=StatisticsType.MIN, aggregator_type=AggregatorType.MIN, quantile_outlier_prob=1e-4
         #     ),
         #     max=StatisticsCollectorParameters(
-        #         statistics_type=StatisticsType.QUANTILE, aggregator_type=AggregatorType.MAX, quantile_outlier_prob=1e-4
+        #         statistics_type=StatisticsType.QUANTILE, aggregator_type=AggregatorType.MEAN, quantile_outlier_prob=1e-4
         #     ),
         # ),
     )
@@ -1033,7 +1047,8 @@ def quantize(save_dir, task, encoder_compression, decoder_compression, use_pot, 
                 fast_bias_correction=True,
                 subset_size=min(max_decoder_calibration_samples, len(decoder_init_data)),
                 advanced_parameters=advanced_parameters,
-                ignored_scope=decoder_ignored_scope
+                ignored_scope=decoder_ignored_scope,
+                # preset=QuantizationPreset.MIXED,
             )
             del decoder_init_data
             del quantization_dataset
@@ -1292,53 +1307,64 @@ WITH_TIMESTAMPS = bool(1)
 
 
 # compressed_model_path = quantize("calibration_datasets/jamescalam_youtube-transcriptions/translate/60_duration-30_beam-search-2",
-# compressed_model_path = quantize("quantized_models/ovc/encoder-ptq-sq-0.50_decoder-ptq-sq-0.95_ignored_scope5",
-# compressed_model_path = quantize("quantized_models/ovc/encoder-ptq-sq-0.50_decoder-none_new",
-#                                  task=TASK,
-#                                  # encoder_compression="weights",
-#                                  encoder_compression="quantization",
-#                                  # encoder_compression=None,
-#                                  # decoder_compression="weights",
-#                                  # decoder_compression="quantization",
-#                                  decoder_compression=None,
-#                                  use_pot=bool(0),
-#                                  sq_alpha_encoder=0.50,
-#                                  sq_alpha_decoder=0.95,
-#                                  ignore_logits=bool(0),
-#                                  inplace_statistics_decoder=bool(1),
-#                                  max_encoder_calibration_samples=None,
-#                                  max_decoder_calibration_samples=None,
-#                                  reverse_encoder_calibration_data=bool(0),
-#                                  reverse_decoder_calibration_data=bool(0),
-#                                  filter_init_data=bool(0),
-#                                  decoder_ignored_scope=None,
-#
-#                                  num_calibration_samples=15,
-#                                  calibration_beam_search=bool(1),
-#                                  calibration_beam_size=2,
-#                                  sample_from_ends=bool(0),
-#                                  audio_sample_duration=30,
-#                                  n_samples_per_video=1  # double it if sample_from_ends=True
-#                                  )
-# transcribe_video(compressed_model_path, video_path, task=TASK, beam_search=bool(1), with_timestamps=bool(1))
-# validate_model(compressed_model_path, task=TASK, beam_search=bool(1), with_timestamps=bool(1))
+compressed_model_path = quantize("calibration_datasets/librispeech_asr_dummy/translate/whisper_develop/15_no-beam-search",
+                                 task=TASK,
+                                 # encoder_compression="weights",
+                                 encoder_compression="quantization",
+                                 # encoder_compression=None,
+                                 # decoder_compression="weights",
+                                 decoder_compression="quantization",
+                                 # decoder_compression=None,
+                                 use_pot=bool(0),
+                                 sq_alpha_encoder=0.50,
+                                 sq_alpha_decoder=0.95,
+                                 ignore_logits=bool(0),
+                                 inplace_statistics_decoder=bool(1),
+                                 max_encoder_calibration_samples=None,
+                                 max_decoder_calibration_samples=None,
+                                 reverse_encoder_calibration_data=bool(0),
+                                 reverse_decoder_calibration_data=bool(0),
+                                 filter_init_data=bool(0),
+                                 decoder_ignored_scope=None,
+
+                                 num_calibration_samples=15,
+                                 calibration_beam_search=bool(0),
+                                 calibration_beam_size=5,
+                                 sample_from_ends=bool(0),
+                                 audio_sample_duration=30,
+                                 n_samples_per_video=1  # double it if sample_from_ends=True
+                                 )
+transcribe_video(compressed_model_path, video_path, task=TASK, beam_search=bool(0), with_timestamps=bool(1))
+transcribe_video(compressed_model_path, video_path, task=TASK, beam_search=bool(1), with_timestamps=bool(1))
+validate_model(compressed_model_path, task=TASK, beam_search=bool(0), with_timestamps=bool(1))
+validate_model(compressed_model_path, task=TASK, beam_search=bool(1), with_timestamps=bool(1))
 # benchmark(compressed_model_path)
 
-# model_path = Path("./quantized_models/ovc/encoder-none_decoder-none_new")
-# model_path = Path("./original_model_ovc")
+# model_path = Path("./calibration_datasets/librispeech_asr_dummy/translate/whisper_develop/15")
+# model_path = Path("./original_model_ovc_2")
 # benchmark(model_path)
-# transcribe_video(model_path, video_path, task=TASK, beam_search=bool(0), with_timestamps=WITH_TIMESTAMPS)
-# validate_model(model_path, task=TASK, beam_search=bool(1), with_timestamps=bool(1), print_predictions=bool(1))
+# transcribe_video(model_path, video_path, task=TASK, beam_search=bool(0), with_timestamps=bool(1))
+# transcribe_video(model_path, video_path, task=TASK, beam_search=bool(1), with_timestamps=bool(1))
+# validate_model(model_path, task=TASK, beam_search=bool(0), with_timestamps=bool(0), print_predictions=bool(1))
+# validate_model(model_path, task=TASK, beam_search=bool(1), with_timestamps=bool(0), print_predictions=bool(1))
+
+# for beam_search in [False, True]:
+#     for with_timestamps in [True, False]:
+#         print(f"beam_search: {beam_search}; with_timestamps: {with_timestamps}")
+#         transcribe_video(model_path, video_path, task=TASK, beam_search=beam_search, with_timestamps=with_timestamps)
+#         validate_model(model_path, task=TASK, beam_search=beam_search, with_timestamps=with_timestamps,
+#                        print_predictions=bool(0))
+#         print('-'*100)
 
 
-quantize_decoder_with_accuracy_control("quantized_models/ovc/encoder-ptq-sq-0.50_decoder-none_new",
-                                       save_dir="qwac_htune",
-                                       task=TASK,
-                                       tune_hyperparams=bool(1),
-                                       sq_alpha_decoder=-1,
-                                       max_drop=0.0,
-                                       beam_search=bool(1),
-                                       with_timestamps=bool(1))
+# quantize_decoder_with_accuracy_control("quantized_models/ovc/encoder-ptq-sq-0.50_decoder-none_new",
+#                                        save_dir="qwac_htune",
+#                                        task=TASK,
+#                                        tune_hyperparams=bool(1),
+#                                        sq_alpha_decoder=-1,
+#                                        max_drop=0.0,
+#                                        beam_search=bool(1),
+#                                        with_timestamps=bool(1))
 
 
 if OVC_API_ENCODER:

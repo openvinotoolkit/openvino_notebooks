@@ -160,7 +160,7 @@ class OpenVINOInference(Inference):
         """
         for module, tensor in self.kv_cache.items():
             # update the key/value cache to contain the selected sequences
-            self.kv_cache[module] = tensor[source_indices]
+            self.kv_cache[module] = tensor[source_indices].detach()
 
 
 class OpenVINODecodingTask(DecodingTask):
