@@ -37,14 +37,19 @@ def audio_to_float(audio):
     return audio.astype(np.float32) / np.iinfo(audio.dtype).max
 
 
-def download_video(base_dir: pathlib.Path, link):
-    output_file = base_dir / "videos" / f"{link.split('/')[-1]}.mp4"
+def download_video(base_dir: pathlib.Path, link, subdir="", resolution="high"):
+    output_file = base_dir / "videos" / subdir / f"{link.split('/')[-1]}.mp4"
     if not output_file.exists():
         if not output_file.parent.exists():
             output_file.parent.mkdir(parents=True)
         print(f"Downloading video {link} started")
         yt = YouTube(link)
-        yt.streams.get_highest_resolution().download(filename=output_file)
+        if resolution == "high":
+            yt.streams.get_highest_resolution().download(filename=output_file)
+        elif resolution == "low":
+            yt.streams.get_lowest_resolution().download(filename=output_file)
+        else:
+            raise Exception("Unknown resolution option")
         print(f"Video saved to {output_file}")
     return output_file
 
@@ -60,9 +65,10 @@ def get_audio(video_file):
       resampled_audio: mono-channel float audio signal with 16000 Hz sample rate
                        extracted from video
     """
-    input_video = VideoFileClip(str(video_file))
-    audio_file = str(video_file).replace('.mp4', '.wav')
-    input_video.audio.write_audiofile(audio_file, verbose=False, logger=None)
+    audio_file = pathlib.Path(str(video_file).replace('.mp4', '.wav'))
+    if not audio_file.exists():
+        input_video = VideoFileClip(str(video_file))
+        input_video.audio.write_audiofile(audio_file, verbose=False, logger=None)
     sample_rate, audio = wavfile.read(
         io.BytesIO(open(audio_file, 'rb').read()))
     audio = audio_to_float(audio)

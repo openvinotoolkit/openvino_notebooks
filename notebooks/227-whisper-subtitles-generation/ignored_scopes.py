@@ -41,3 +41,20 @@ ignored_scope3 = IgnoredScope(
          "__module.blocks.4.mlp.0/aten::linear/MatMul_592",
      ]
  )
+
+
+ignored_scope4 = IgnoredScope(
+    names=[
+        "__module.blocks.5.attn.out/aten::linear/MatMul_690"
+    ]
+)
+
+
+ignored_scope5 = IgnoredScope(
+    names=[
+        "__module.blocks.0.cross_attn/aten::matmul/MatMul",
+        "__module.blocks.2.attn.value/aten::linear/MatMul_267",
+        "__module.blocks.2.attn.query/aten::linear/MatMul_265",
+        "__module.blocks.2.attn.key/aten::linear/MatMul_266"
+    ]
+)
