@@ -10,7 +10,7 @@ It considers two approaches of image generation using an AI method called `diffu
 The complete pipeline of this demo is shown below.
 
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/29454499/216378932-7a9be39f-cc86-43e4-b072-66372a35d6bd.png"/>
+    <img src="https://user-images.githubusercontent.com/29454499/260981188-c112dd0a-5752-4515-adca-8b09bea5d14a.png"/>
 </p>
 
 
@@ -30,8 +30,8 @@ The following image shows an example of the input sequence and corresponding pre
 This notebook demonstrates how to convert and run stable diffusion using OpenVINO.
 
 Notebook contains the following steps:
-1. Convert PyTorch models to ONNX format.
-2. Convert ONNX models to OpenVINO IR format, using model conversion API.
+1. Create PyTorch models pipeline using Diffusers library.
+2. Convert models to OpenVINO IR format, using model conversion API.
 3. Run Stable Diffusion pipeline with OpenVINO.
 
 ## Installation Instructions
