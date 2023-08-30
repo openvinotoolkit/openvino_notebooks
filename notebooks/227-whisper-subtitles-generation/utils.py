@@ -49,6 +49,7 @@ class OpenVINOTextDecoder(torch.nn.Module):
         self._input_names = [inp.any_name for inp in self.model.inputs]
         self.compiled_model = core.compile_model(self.model, device)
         self.device = device
+        self.blocks = []
 
     def init_past_inputs(self, feed_dict):
         """
