@@ -551,3 +551,5 @@ yolov
 Zongyuan
 ZeroScope
 zeroscope
+librispeech
+asr
