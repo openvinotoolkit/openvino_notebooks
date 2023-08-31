@@ -16,7 +16,7 @@ This tutorial explains how to convert and optimize the [YOLOv8](https://github.c
 - [230-yolov8-keypoint-detection](./230-yolov8-keypoint-detection.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/230-yolov8-optimization/230-yolov8-keypoint-detection.ipynb)
 
 
-For each case, it will be describes the following steps in tutorials:
+Each case tutorial consists of the following steps::
 - Prepare the PyTorch model.
 - Download and prepare the dataset.
 - Validate the original model.
