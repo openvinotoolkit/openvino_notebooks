@@ -95,14 +95,14 @@ def postprocess(pred_boxes: np.ndarray, input_size: Tuple[int, int], orig_img, m
 
     # no predictions in the image
     if not len(pred):
-        return sv.Detections(xyxy=np.empty((0, 4), dtype=np.float32), confidence=np.array([], dtype=np.float32), class_id=np.array([], dtype=int))
+        return sv.Detections.empty()
 
     # transform boxes to pixel coordinates
     pred[:, :4] = ops.scale_boxes(input_size, pred[:, :4], orig_img.shape).round()
     # numpy array from torch tensor
     pred = np.array(pred)
     # create detections in supervision format
-    det = sv.Detections(pred[:, :4], pred[:, 5], pred[:, 4])
+    det = sv.Detections(pred[:, :4], confidence=pred[:, 4], class_id=pred[:, 5])
     # filter out other predictions than people
     return det[det.class_id == 0]
 
@@ -243,14 +243,14 @@ def run(video_path: str, model_path: str, zones_config_file: str, customers_limi
 
         f_height, f_width = frame.shape[:2]
 
-        start_time = time.time()
         # preprocessing
         input_image = preprocess(image=frame, input_size=input_shape[:2])
         # prediction
+        start_time = time.time()
         prediction = model(input_image)[model.outputs[0]]
+        processing_times.append(time.time() - start_time)
         # postprocessing
         detections = postprocess(pred_boxes=prediction, input_size=input_shape[:2], orig_img=frame)
-        processing_times.append(time.time() - start_time)
 
         # annotate the frame with the detected persons within each zone
         for zone_id, (zone, zone_annotator, box_annotator) in enumerate(zip(zones, zone_annotators, box_annotators)):
