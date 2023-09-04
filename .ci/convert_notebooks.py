@@ -53,6 +53,7 @@ def main():
         notebook_path = notebook.relative_to(root)
         if str(notebook_path) in ignore_conversion_list:
             continue
+        disable_gradio_debug(notebook_path)
         notebook_executed = notebook_path.parent / notebook_path.name.replace(".ipynb", "-with-output.ipynb")
         start = time.perf_counter()
         print(f"Convert {notebook_path}")
