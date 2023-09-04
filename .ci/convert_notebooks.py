@@ -10,13 +10,13 @@ def disable_gradio_debug(notebook_path):
     nb = nbformat.read(notebook_path, as_version=nbformat.NO_CONVERT)
     found = False
     for cell in nb["cells"]:
-        if "gradio" in cell["source"]:
+        if "gradio" in cell["source"] and "debug" in cell["source"]:
             found = True
-            cell["source"] = cell["source"].replace("debug=True", "")
+            cell["source"] = cell["source"].replace("debug=True", "debug=False")
     
     if found:
-        with notebook_path.open("w", encoding="utf-8") as out_file:
-            out_file.write(nb)
+        print(f"Disabled gradio debug mode for {notebook_path}")
+        nbformat.write(nb, str(notebook_path), version=nbformat.NO_CONVERT)
 
 def arguments():
     parser = argparse.ArgumentParser()
