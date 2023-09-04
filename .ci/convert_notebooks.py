@@ -3,7 +3,20 @@ import shutil
 import subprocess # nosec - disable B404:import-subprocess check
 import time
 from pathlib import Path
+import nbformat
 
+
+def disable_gradio_debug(notebook_path):
+    nb = nbformat.read(notebook_path, as_version=nbformat.NO_CONVERT)
+    found = False
+    for cell in nb["cells"]:
+        if "gradio" in cell["source"]:
+            found = True
+            cell["source"] = cell["source"].replace("debug=True", "")
+    
+    if found:
+        with notebook_path.open("w", encoding="utf-8") as out_file:
+            out_file.write(nb)
 
 def arguments():
     parser = argparse.ArgumentParser()
