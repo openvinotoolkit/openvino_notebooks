@@ -1,6 +1,6 @@
 from collections import namedtuple
 from functools import partial
-from openvino import Core, Tensor
+import openvino as ov
 from pathlib import Path
 from typing import List, Optional, Union
 
@@ -19,7 +19,7 @@ class OpenVINOAudioEncoder(torch.nn.Module):
     Helper for inference Whisper encoder model with OpenVINO
     """
 
-    def __init__(self, core, model_path: Path, device='CPU'):
+    def __init__(self, core:ov.Core, model_path: Path, device='CPU'):
         super().__init__()
         self.model = core.read_model(model_path)
         self.compiled_model = core.compile_model(self.model, device)
@@ -42,7 +42,7 @@ class OpenVINOTextDecoder(torch.nn.Module):
     Helper for inference OpenVINO decoder model
     """
 
-    def __init__(self, core: Core, model_path: Path, device: str = 'CPU'):
+    def __init__(self, core: ov.Core, model_path: Path, device: str = 'CPU'):
         super().__init__()
         self._core = core
         self.model = core.read_model(model_path)
@@ -66,7 +66,7 @@ class OpenVINOTextDecoder(torch.nn.Module):
         for name in self._input_names:
             if name in ['x', 'xa']:
                 continue
-            feed_dict[name] = Tensor(np.zeros((beam_size, previous_seq_len, audio_len), dtype=np.float32))
+            feed_dict[name] = ov.Tensor(np.zeros((beam_size, previous_seq_len, audio_len), dtype=np.float32))
         return feed_dict
 
     def preprocess_kv_cache_inputs(self, feed_dict, kv_cache):
@@ -82,7 +82,7 @@ class OpenVINOTextDecoder(torch.nn.Module):
         if not kv_cache:
             return self.init_past_inputs(feed_dict)
         for k, v in zip(self._input_names[2:], kv_cache):
-            feed_dict[k] = Tensor(v)
+            feed_dict[k] = ov.Tensor(v)
         return feed_dict
 
     def postprocess_outputs(self, outputs):
@@ -112,7 +112,7 @@ class OpenVINOTextDecoder(torch.nn.Module):
           logits: decoder predicted logits
           kv_cache: updated kv_cache with current step hidden states
         """
-        feed_dict = {'x': Tensor(x.numpy()), 'xa': Tensor(xa.numpy())}
+        feed_dict = {'x': ov.Tensor(x.numpy()), 'xa': ov.Tensor(xa.numpy())}
         feed_dict = (self.preprocess_kv_cache_inputs(feed_dict, kv_cache))
         res = self.compiled_model(feed_dict)
         return self.postprocess_outputs(res)
