@@ -194,6 +194,14 @@ def to_bgr(image_data: np.ndarray) -> np.ndarray:
 # In[ ]:
 
 
+import os
+import threading
+import time
+import urllib.parse
+from pathlib import Path
+import cv2
+
+
 class VideoPlayer:
     """
     Custom video player to fulfill FPS requirements. You can set target FPS and output size,
@@ -207,9 +215,6 @@ class VideoPlayer:
     """
 
     def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
-        import cv2
-
-        self.cv2 = cv2  # This is done to access the package in class methods
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
             raise RuntimeError(
@@ -228,6 +233,8 @@ class VideoPlayer:
         self.__interpolation = None
         if size is not None:
             self.__size = size
+            self.__cap.set(cv2.CAP_PROP_FRAME_WIDTH, size[0])
+            self.__cap.set(cv2.CAP_PROP_FRAME_HEIGHT, size[1])
             # AREA better for shrinking, LINEAR better for enlarging
             self.__interpolation = (
                 cv2.INTER_AREA
@@ -239,6 +246,10 @@ class VideoPlayer:
         self.__lock = threading.Lock()
         self.__thread = None
         self.__stop = False
+
+        self.fps = self.__input_fps
+        self.width = int(self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.height = int(self.__cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     """
     Start playing.
@@ -287,19 +298,16 @@ class VideoPlayer:
     """
 
     def next(self):
-        import cv2
-
         with self.__lock:
             if self.__frame is None:
                 return None
             # need to copy frame, because can be cached and reused if fps is low
             frame = self.__frame.copy()
         if self.__size is not None:
-            frame = self.cv2.resize(frame, self.__size, interpolation=self.__interpolation)
+            frame = cv2.resize(frame, self.__size, interpolation=self.__interpolation)
         if self.__flip:
-            frame = self.cv2.flip(frame, 1)
+            frame = cv2.flip(frame, 1)
         return frame
-
 
 # ## Visualization
 

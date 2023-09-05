@@ -197,7 +197,7 @@ jobs:
     # Patch long running cells to run faster
     - name: Patch notebooks
       run: |
-        python .ci/patch_notebooks.py
+        python .ci/patch_notebooks.py .
 
     # Test that JupyterLab runs without errors
     - name: Test Jupyterlab
