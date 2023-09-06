@@ -25,5 +25,5 @@ notebooks/244-named-entity-recognition/244-named-entity-recognition.ipynb
 notebooks/248-stable-diffusion-xl/248-stable-diffusion-xl.ipynb
 notebooks/249-oneformer-segmentation/249-oneformer-segmentation.ipynb
 notebooks/251-tiny-sd-image-generation/251-tiny-sd-image-generation.ipynb
-notebooks/252-llm-chatbot/252-llm-chatbot.ipynb
+notebooks/254-llm-chatbot/254-llm-chatbot.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb
