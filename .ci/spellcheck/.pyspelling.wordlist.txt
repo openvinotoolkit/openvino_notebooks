@@ -7,6 +7,7 @@ ADE
 aeroplane
 affective
 al
+ALiBi
 analytics
 AnimeGAN
 api
@@ -131,6 +132,7 @@ EnCodec
 encodec
 enum
 et
+Evol
 EVS
 fastcomposer
 FastComposer
@@ -165,13 +167,16 @@ gpu
 GPU's
 GPUs
 Gradio
+gradio
 grayscale
 gRPC
 Gutendex
 Hafner
 HandBrake
 heatmap
+HC
 HED
+HH
 hoc
 HuggingFace
 Husain
@@ -234,6 +239,8 @@ LibriSpeech
 librispeech
 Lim
 Liu
+LLama
+llm
 LLM
 LLMs
 LMS
@@ -266,6 +273,8 @@ MONAI
 MONAI's
 Monodepth
 monodepth
+MosaicPretrainedTransformer
+mpt
 MPT
 MRPC
 Multiclass
@@ -280,6 +289,7 @@ nano
 nar
 NAS
 natively
+NEOX
 NER
 NETP
 NeuSpell
@@ -292,6 +302,7 @@ NONINFRINGEMENT
 nsamples
 numpy
 NumPy
+OASST
 ocr
 OCRv
 odometry
@@ -402,6 +413,7 @@ Realtime
 realtime
 rebase
 redistributable
+RedPajama
 RegNet
 RegNetY
 regressively
@@ -444,6 +456,7 @@ segmenter
 Segmind
 serializable
 ShapeNet
+ShareGPT
 Shutterstock
 siggraph
 sigmoid
