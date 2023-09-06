@@ -30,7 +30,7 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [MusicGen](notebooks/250-music-generation/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F250-music-generation%2F250-music-generation.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/250-music-generation/250-music-generation.ipynb) | Controllable Music Generation with MusicGen and OpenVINO™ | <img src="https://user-images.githubusercontent.com/76463150/260439306-81c81c8d-1f9c-41d0-b881-9491766def8e.png" width=300> |
 |[Tiny SD](notebooks/251-tiny-sd-image-generation/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/251-tiny-sd-image-generation/251-tiny-sd-image-generation.ipynb) | Image Generation with Tiny-SD and OpenVINO™ | <img src="https://user-images.githubusercontent.com/29454499/260904650-274fc2f9-24d2-46a3-ac3d-d660ec3c9a19.png" width=300> | |
 | [ZeroScope Text-to-video synthesis](notebooks/253-zeroscope-text2video)<br> | Text-to-video synthesis with ZeroScope and OpenVINO™ | A panda eating bamboo on a rock <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/500956d5-4aac-4710-a77c-4df34bcda3be" width=300> |
-| [LLM chatbot](notebooks/254-llm-chatbot)<br> | Create LLM-powered Chatbot using OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png width=300> |
+| [LLM chatbot](notebooks/254-llm-chatbot)<br> | Create LLM-powered Chatbot using OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/255799218-611e7189-8979-4ef5-8a80-5a75e0136b50.png width=600> |
 
 ## Table of Contents
 
@@ -179,7 +179,7 @@ Demos that demonstrate inference on a particular model.
 | [251-tiny-sd-image-generation](notebooks/251-tiny-sd-image-generation/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/251-tiny-sd-image-generation/251-tiny-sd-image-generation.ipynb) | Image Generation with Tiny-SD and OpenVINO™ | <img src="https://user-images.githubusercontent.com/29454499/260904650-274fc2f9-24d2-46a3-ac3d-d660ec3c9a19.png" width=225> |
 | [252-fastcomposer-image-generation](notebooks/252-fastcomposer-image-generation/)<br> | Image generation with FastComposer and OpenVINO™ | |
 | [253-zeroscope-text2video](notebooks/253-zeroscope-text2video)<br> | Text-to-video synthesis with ZeroScope and OpenVINO™ | A panda eating bamboo on a rock <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/500956d5-4aac-4710-a77c-4df34bcda3be" width=225> |
-| [254-llm-chatbot](notebooks/254-llm-chatbot)<br> | Create LLM-powered Chatbot using OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png width=300> |
+| [254-llm-chatbot](notebooks/254-llm-chatbot)<br> | Create LLM-powered Chatbot using OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/255799218-611e7189-8979-4ef5-8a80-5a75e0136b50.png width=600> |
 
 <div id='-model-training'></div>
 
