@@ -25,7 +25,7 @@ USER root
 # Install dos2unix for line end conversion on Windows
 RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum remove -y nodejs && \
-  yum install -y nodejs-14.18.1 mesa-libGL dos2unix libsndfile && \
+  yum install -y nodejs-14.18.1 mesa-libGL dos2unix libsndfile --setopt=tsflags=nocrypto --nogpgcheck && \
   yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
 
 # GPU drivers
