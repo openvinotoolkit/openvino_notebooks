@@ -1,8 +1,8 @@
 import argparse
 from pathlib import Path
 
-from optimum.intel.openvino import OVModelForCausalLM
-
+from optimum.intel import OVModelForCausalLM
+from transformers import AutoTokenizer
 
 RED_PAJAMA_MODEL_MAPPING = {
     "3B": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
@@ -20,14 +20,19 @@ def convert_red_pajama(model_size, model_dir):
     Returns:
        Path to exported model
     """
+    output_dir = model_dir / "red_pajama"
+    model_name = RED_PAJAMA_MODEL_MAPPING[model_size]
     # load model and convert it to OpenVINO
-    pajama_model = OVModelForCausalLM.from_pretrained(RED_PAJAMA_MODEL_MAPPING[model_size], export=True, compile=False)
+    pajama_model = OVModelForCausalLM.from_pretrained(model_name, export=True, compile=False)
     # change precision to FP16
     pajama_model.half()
     # save model to disk
-    pajama_model.save_pretrained(model_dir)
+    pajama_model.save_pretrained(output_dir)
 
-    return Path(model_dir) / "openvino_model.xml"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer.save_pretrained(output_dir)
+
+    return Path(output_dir) / "openvino_model.xml"
 
 
 if __name__ == "__main__":
