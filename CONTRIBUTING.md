@@ -127,6 +127,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 3. If you include code from external sources in your notebook add the
    name, URL and license of the third party code to the `licensing/third-party-programs.txt` file.
 4. Don't use HTML for text cells, use Markdown markups instead.
+5. Add **Table of content** to top of the Notebook, it helps to get quick fist understanding of content and ease of navigation in the dev environment. There is no need to think about it during development, it can be built or updated after changes with `.ci\table_of_content.py`. Just run the script with the parameter `-s/--source`, specifying a Notebook or a folder with several notebooks as value, the changes will be applied to all of them.
 
 ### Notebook naming
 
