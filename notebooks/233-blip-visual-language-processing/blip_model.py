@@ -1,26 +1,28 @@
 import torch
 import numpy as np
-from openvino.runtime import Model
-from typing import List, Tuple, Dict
+import openvino.runtime as ov
+from typing import List, Dict
 from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
 
 
-def prepare_past_inputs(past_key_values:List[Tuple[torch.Tensor, torch.Tensor]]):
+def init_past_inputs(model_inputs:List):
     """
-    Helper function for rearrange input hidden states inputs to OpenVINO model expected format
+    Helper function for initialization of past inputs on first inference step
     Parameters:
-      past_key_values (List[Tuple[torch.Tensor, torch.Tensor]]): list of pairs key, value attention hidden states obtained as model outputs from previous step
+      model_inputs (List): list of model inputs
     Returns:
-      inputs (Dict[str, torch.Tensor]): dictionary with inputs for model
+      pkv (List[ov.Tensor]): list of filled past key values
     """
-    inputs = {}
-    for idx, (key, value) in enumerate(past_key_values):
-        inputs[f"in_past_key_value.{idx}.key"] = key
-        inputs[f"in_past_key_value.{idx}.value"] = value
-    return inputs
+    pkv = []
+    for input_tensor in model_inputs[4:]:
+        partial_shape = input_tensor.partial_shape
+        partial_shape[0] = 1
+        partial_shape[2] = 0
+        pkv.append(ov.Tensor(ov.Type.f32, partial_shape.get_shape()))
+    return pkv
 
 
-def postprocess_text_decoder_outputs(output:Dict, past_key_values_outs:List[str]):
+def postprocess_text_decoder_outputs(output:Dict):
     """
     Helper function for rearranging model outputs and wrapping to CausalLMOutputWithCrossAttentions
     Parameters:
@@ -28,13 +30,8 @@ def postprocess_text_decoder_outputs(output:Dict, past_key_values_outs:List[str]
     Returns
       wrapped_outputs (CausalLMOutputWithCrossAttentions): outputs wrapped to CausalLMOutputWithCrossAttentions format
     """
-    outs = {k.any_name: v for k, v in output.items()}
-    logits = torch.from_numpy(outs["logits"])
-    past_kv = []
-    for i in range(0, len(past_key_values_outs), 2):
-        key = past_key_values_outs[i]
-        value = key.replace(".key", ".value")
-        past_kv.append((torch.from_numpy(outs[key]), torch.from_numpy(outs[value])))
+    logits = torch.from_numpy(output[0])
+    past_kv = list(output.values())[1:]
     return CausalLMOutputWithCrossAttentions(
         loss=None,
         logits=logits,
@@ -46,38 +43,32 @@ def postprocess_text_decoder_outputs(output:Dict, past_key_values_outs:List[str]
 
 
 def text_decoder_forward(
-    input_ids:torch.Tensor,
-    attention_mask:torch.Tensor,
-    past_key_values:List[Tuple[torch.Tensor, torch.Tensor]],
-    encoder_hidden_states:torch.Tensor,
-    encoder_attention_mask:torch.Tensor,
-    past_key_values_outs:List[str],
-    ov_text_decoder:Model,
-    ov_text_decoder_with_past:Model,
-    **kwargs):
+        ov_text_decoder_with_past:ov.CompiledModel,
+        input_ids:torch.Tensor,
+        attention_mask:torch.Tensor,
+        past_key_values:List[ov.Tensor],
+        encoder_hidden_states:torch.Tensor,
+        encoder_attention_mask:torch.Tensor,
+        **kwargs
+    ):
     """
     Inference function for text_decoder in one generation step
     Parameters:
       input_ids (torch.Tensor): input token ids
       attention_mask (torch.Tensor): attention mask for input token ids
-      past_key_values (List[Tuple[torch.Tensor, torch.Tensor]]): list of cached decoder hidden states from previous step
+      past_key_values (List[ov.Tensor] list of cached decoder hidden states from previous step
       encoder_hidden_states (torch.Tensor): encoder (vision or text) hidden states
       encoder_attention_mask (torch.Tensor): attnetion mask for encoder hidden states
     Returns
       model outputs (CausalLMOutputWithCrossAttentions): model prediction wrapped to CausalLMOutputWithCrossAttentions class including predicted logits and hidden states for caching
     """
-    input_dict = {
-        "input_ids": input_ids,
-        "attention_mask": attention_mask,
-        "encoder_hidden_states": encoder_hidden_states,
-        "encoder_attention_mask": encoder_attention_mask
-    }
+    inputs = [input_ids, attention_mask, encoder_hidden_states, encoder_attention_mask]
     if past_key_values is None:
-        outputs = ov_text_decoder(input_dict)
+        inputs.extend(init_past_inputs(ov_text_decoder_with_past.inputs))
     else:
-        input_dict.update(prepare_past_inputs(past_key_values))
-        outputs = ov_text_decoder_with_past(input_dict)
-    return postprocess_text_decoder_outputs(outputs, past_key_values_outs)
+        inputs.extend(past_key_values)
+    outputs = ov_text_decoder_with_past(inputs)
+    return postprocess_text_decoder_outputs(outputs)
 
 
 class OVBlipModel:
