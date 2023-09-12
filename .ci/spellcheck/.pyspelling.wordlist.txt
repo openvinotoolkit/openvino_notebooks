@@ -130,7 +130,6 @@ EfficientNet
 embeddings
 EnCodec
 encodec
-encodings
 enum
 et
 Evol
@@ -304,7 +303,6 @@ nsamples
 numpy
 NumPy
 OASST
-objectness
 ocr
 OCRv
 odometry
@@ -334,7 +332,6 @@ overlayed
 OV
 OVC
 OVMS
-paddings
 PaddleClas
 PaddleGAN
 paddlegan
@@ -436,7 +433,6 @@ RLHF
 RoBERTa
 roberta
 ROI
-RPN
 Ruizhongtai
 Runtime
 runtime
