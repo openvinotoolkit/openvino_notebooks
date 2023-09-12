@@ -106,6 +106,8 @@ depainting
 detections
 Dettmers
 dev
+detectron
+Detectron
 dGPU
 dGPUs
 DialoGPT
@@ -144,6 +146,7 @@ FLAC
 floyd
 Formatter
 FP
+FPN
 FreeVC
 freevc
 frisbee
@@ -252,6 +255,7 @@ macOS
 Mahalanobis
 Mapillary
 Martyniuk
+maskrcnn
 MediaPipe
 mel
 Mels
@@ -423,6 +427,7 @@ René
 repo
 reproducibility
 rescale
+rescaling
 Rescaling
 ResNet
 resnet
