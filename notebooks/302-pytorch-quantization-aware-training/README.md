@@ -13,7 +13,7 @@ To speed up download and training, use a [ResNet-18](https://arxiv.org/abs/1512.
 This tutorial consists of the following steps:
 * Transforming the original `FP32` model to `INT8`
 * Using fine-tuning to restore the accuracy.
-* Exporting optimized and original models to ONNX and then to OpenVINO
+* Exporting optimized and original models to OpenVINO
 * Measuring and comparing the performance of the models.
 
 ## Installation Instructions
