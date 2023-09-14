@@ -23,7 +23,7 @@ def resample_wav(wav_file):
         audio = audio.mean(axis=1)
     resampled_audio = resample(audio, sample_rate, 16000)
     return resampled_audio
-    
+
 def resample(audio, src_sample_rate, dst_sample_rate):
     """
     Resample audio to specific sample rate
@@ -51,16 +51,17 @@ def audio_to_float(audio):
     """
     return audio.astype(np.float32) / np.iinfo(audio.dtype).max
 
+
 def get_audio(video_file):
     """
-    Extract audio signal from a given video file, then convert it to float, 
+    Extract audio signal from a given video file, then convert it to float,
     then mono-channel format and resample it to the expected sample rate
 
     Parameters:
         video_file: path to input video file
     Returns:
-      resampled_audio: mono-channel float audio signal with 16000 Hz sample rate 
-                       extracted from video  
+      resampled_audio: mono-channel float audio signal with 16000 Hz sample rate
+                       extracted from video
     """
     input_video = VideoFileClip(str(video_file))
     input_video.audio.write_audiofile(video_file.stem + '.wav', verbose=False, logger=None)
@@ -70,12 +71,16 @@ def get_audio(video_file):
     audio = audio_to_float(audio)
     if audio.ndim == 2:
         audio = audio.mean(axis=1)
+
+    # The model expects mono-channel audio with a 16000 Hz sample rate, represented in floating point range. When the
+    # audio from the input video does not meet these requirements, we will need to apply preprocessing.
     resampled_audio = resample(audio, sample_rate, 16000)
     return resampled_audio
 
+
 def format_timestamp(seconds: float):
     """
-    format time in srt-file excpected format
+    format time in srt-file expected format
     """
     assert seconds >= 0, "non-negative timestamp expected"
     milliseconds = round(seconds * 1000.0)
@@ -90,7 +95,6 @@ def format_timestamp(seconds: float):
     milliseconds -= seconds * 1_000
 
     return (f"{hours}:" if hours > 0 else "00:") + f"{minutes:02d}:{seconds:02d},{milliseconds:03d}"
-
 
 def prepare_srt(transcription):
     """
