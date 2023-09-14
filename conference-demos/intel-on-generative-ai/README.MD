@@ -13,7 +13,9 @@
 ## PLEASE READ - Initial Setup: Model Download Steps
 
 
-Running the notebook: To run the notebook, **you will need to have the model files for Whisper and CLIP pre-downloaded.** The model files for Stable Diffusion XL and RedPajama-INCITE will be downloaded via the main demo notebook.
+Running the notebook: To run the notebook, **you will need to have the model files for Whisper and CLIP pre-downloaded**. 
+
+	Further details: The Whisoer and CLIP OV models should be placed in *whisper_models/* and *clip/* directories respectively. The model files for Stable Diffusion XL and RedPajama-INCITE will be downloaded via the main demo notebook.
 
 Running the Gradio app: Please run the notebook prior to running the Gradio app to download the required models for the demo.
 
