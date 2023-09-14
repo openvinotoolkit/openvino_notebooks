@@ -3,7 +3,20 @@ import shutil
 import subprocess # nosec - disable B404:import-subprocess check
 import time
 from pathlib import Path
+import nbformat
 
+
+def disable_gradio_debug(notebook_path):
+    nb = nbformat.read(notebook_path, as_version=nbformat.NO_CONVERT)
+    found = False
+    for cell in nb["cells"]:
+        if "gradio" in cell["source"] and "debug" in cell["source"]:
+            found = True
+            cell["source"] = cell["source"].replace("debug=True", "debug=False")
+    
+    if found:
+        print(f"Disabled gradio debug mode for {notebook_path}")
+        nbformat.write(nb, str(notebook_path), version=nbformat.NO_CONVERT)
 
 def arguments():
     parser = argparse.ArgumentParser()
@@ -40,6 +53,7 @@ def main():
         notebook_path = notebook.relative_to(root)
         if str(notebook_path) in ignore_conversion_list:
             continue
+        disable_gradio_debug(notebook_path)
         notebook_executed = notebook_path.parent / notebook_path.name.replace(".ipynb", "-with-output.ipynb")
         start = time.perf_counter()
         print(f"Convert {notebook_path}")
