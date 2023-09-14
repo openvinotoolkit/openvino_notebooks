@@ -7,6 +7,7 @@ ADE
 aeroplane
 affective
 al
+ALiBi
 analytics
 AnimeGAN
 api
@@ -15,6 +16,7 @@ argmax
 artstation
 ASPP
 ASR
+asr
 async
 AsyncInferQueue
 Atrous
@@ -104,6 +106,8 @@ depainting
 detections
 Dettmers
 dev
+detectron
+Detectron
 dGPU
 dGPUs
 DialoGPT
@@ -123,13 +127,17 @@ downloader
 downsampled
 dpredictor
 dropdown
+editability
 EfficientNet
 embeddings
 EnCodec
 encodec
 enum
 et
+Evol
 EVS
+fastcomposer
+FastComposer
 FC
 FIL
 finetuned
@@ -138,6 +146,7 @@ FLAC
 floyd
 Formatter
 FP
+FPN
 FreeVC
 freevc
 frisbee
@@ -161,13 +170,16 @@ gpu
 GPU's
 GPUs
 Gradio
+gradio
 grayscale
 gRPC
 Gutendex
 Hafner
 HandBrake
 heatmap
+HC
 HED
+HH
 hoc
 HuggingFace
 Husain
@@ -179,8 +191,11 @@ iGPU
 iGPUs
 Ilija
 ImageBind
+imagenet
+Imagenet
 ImageNet
 Imagenette
+impactful
 IMU
 IMUs
 InceptionResNetV
@@ -226,8 +241,11 @@ latents
 LLaMa
 LeViT
 LibriSpeech
+librispeech
 Lim
 Liu
+LLama
+llm
 LLM
 LLMs
 LMS
@@ -239,6 +257,7 @@ macOS
 Mahalanobis
 Mapillary
 Martyniuk
+maskrcnn
 MediaPipe
 mel
 Mels
@@ -253,19 +272,24 @@ MiniLM
 MLS
 mms
 MMS
+MLP
 MobileNet
 MobileNetV
 MusicGen
 modelled
+Modelscope
 MONAI
 MONAI's
 Monodepth
 monodepth
+MosaicPretrainedTransformer
+mpt
 MPT
 MRPC
 Multiclass
 multiclass
 MultiHeadAttention
+multilayer
 multimodal
 Multimodality
 Müller
@@ -274,6 +298,7 @@ nano
 nar
 NAS
 natively
+NEOX
 NER
 NETP
 NeuSpell
@@ -286,6 +311,7 @@ NONINFRINGEMENT
 nsamples
 numpy
 NumPy
+OASST
 ocr
 OCRv
 odometry
@@ -330,6 +356,7 @@ panoptic
 parallelized
 parameterization
 parametrize
+perceptron
 performant
 PersonaGPT
 photorealism
@@ -339,6 +366,7 @@ Pipelining
 PNDM
 Pointilism
 PointNet
+Postfuse
 postprocess
 postprocesses
 postprocessing
@@ -394,6 +422,7 @@ Realtime
 realtime
 rebase
 redistributable
+RedPajama
 RegNet
 RegNetY
 regressively
@@ -403,6 +432,7 @@ René
 repo
 reproducibility
 rescale
+rescaling
 Rescaling
 ResNet
 resnet
@@ -436,6 +466,8 @@ segmenter
 Segmind
 serializable
 ShapeNet
+ShareGPT
+Shutterstock
 siggraph
 sigmoid
 SISR
@@ -476,6 +508,7 @@ tf
 TFLite
 tflite
 th
+timestep
 Tokenization
 tokenization
 tokenize
@@ -503,6 +536,7 @@ UNet
 Unet
 Unimodal
 unsqueeze
+Uparrow
 Upcroft
 upsample
 upsampled
@@ -542,3 +576,5 @@ YOLO
 YOLOv
 yolov
 Zongyuan
+ZeroScope
+zeroscope

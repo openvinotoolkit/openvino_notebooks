@@ -16,8 +16,8 @@ The notebook provides two methods to run the inference of typo detector with Ope
 
 1. Use the [Hugging Face Optimum](https://huggingface.co/docs/optimum/index) library to load the compiled model in OpenVINO IR format. Then create a pipeline with the loaded model to run inference.
 
-2. Load the model and convert to ONNX and then to OpenVINO IR.
-   First the Pytorch model is converted to the ONNX format and then the [Model Optimizer](https://docs.openvino.ai/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) tool is used to convert to [OpenVINO IR format](https://docs.openvino.ai/latest/openvino_ir.html). This method provides much more insight to how to set up a pipeline from model loading to model converting, compiling and running inference with OpenVINO, so that you could conveniently use OpenVINO to optimize and accelerate inference for other deep-learning models.
+2. Load the model and convert to OpenVINO IR.
+   The Pytorch model is converted to [OpenVINO IR format](https://docs.openvino.ai/latest/openvino_ir.html). This method provides much more insight to how to set up a pipeline from model loading to model converting, compiling and running inference with OpenVINO, so that you could conveniently use OpenVINO to optimize and accelerate inference for other deep-learning models.
 
 The following table summarizes the major differences between the two methods
 
@@ -26,9 +26,9 @@ The following table summarizes the major differences between the two methods
 | Method 1                                                   | Method 2                                                        |
 | ---------------------------------------------------------- | --------------------------------------------------------------- |
 | Load models from Optimum, an extension of transformers     | Load model from transformers                                    |
-| Load the model in OpenVINO IR format on the fly            | Convert to ONNX and then to OpenVINO IR                         |
+| Load the model in OpenVINO IR format on the fly            | Convert to OpenVINO IR                                          |
 | Load the compiled model by default                         | Compile the OpenVINO IR and run inference with OpenVINO Runtime |
-| Pipeline is created to run inference with OpenVINO Runtime | Manually run inference.                                 |
+| Pipeline is created to run inference with OpenVINO Runtime | Manually run inference.                                         |
 
 </br>
 
@@ -45,7 +45,6 @@ The tutorial consists of the following steps:
     - Creating the pipeline
     - Run inference/Demo
   - Using the pipeline to use the model
-    - Conversion to ONNX format
     - Conversion to OpenVINO IR format
     - Required helper functions
     - Run inference/Demo
