@@ -226,4 +226,4 @@ def patch_whisper_for_ov_inference(model):
 
     model.parameters = parameters
     model.decode = partial(decode, model)
-    model.logits = partial(logits, model)
+    model.logits = partial(logits, model) 

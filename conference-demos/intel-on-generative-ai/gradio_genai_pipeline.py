@@ -23,8 +23,8 @@ redpj_model = None
 sd2_model = None
 sdxl_model = None
 whisper_model = None
-
-#-----Code for setting up models - only run the first time the app is run-----
+ 
+#-----Code for setting up models-----
 def ready_whisper_model():
     #Download whisper base model    
     import whisper

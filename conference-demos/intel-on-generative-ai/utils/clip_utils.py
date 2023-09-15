@@ -16,7 +16,7 @@ def plot_saliency_map(image_tensor, saliency_map, query, return_fig=True):
         saliency_map, 
         norm=colors.TwoSlopeNorm(vcenter=0), 
         cmap="jet", 
-        alpha=0.5,  # make saliency map trasparent to see original picture
+        alpha=0.5,  # make saliency map transparent to see original picture
     )
     if query:
         plt.title(f'Query: "{query}"')
