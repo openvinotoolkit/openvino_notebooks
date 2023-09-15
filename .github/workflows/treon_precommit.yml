@@ -78,7 +78,7 @@ jobs:
     - name: Install required packages
       run:  |
             if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get install libsndfile1 -y
+            sudo apt-get install libsndfile1 -y --fix-missing
             fi
       shell: bash
 
