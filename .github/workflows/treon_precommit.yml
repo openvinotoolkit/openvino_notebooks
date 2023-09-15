@@ -75,12 +75,6 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
-    - name: Install required packages
-      run:  |
-            if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get install libsndfile1 -y
-            fi
-      shell: bash
 
     - name: Cache OpenVINO Pip Packages
       id: cachepip
