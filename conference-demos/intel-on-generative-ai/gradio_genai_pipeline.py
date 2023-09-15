@@ -248,6 +248,6 @@ with gr.Blocks() as demo:
   clip_im = gr.Plot()
   sd_im.change(clip_image_gen, inputs = sd_im, outputs = [query_clip, clip_im])
 
-demo.launch(server_name='10.3.233.70', server_port=8880, ssl_certfile="cert.pem", ssl_keyfile="key.pem", ssl_verify=False) 
+demo.launch() 
 
 del first_run, redpj_tokenizer, redpj_model, sd2_model, sdxl_model, whisper_model
