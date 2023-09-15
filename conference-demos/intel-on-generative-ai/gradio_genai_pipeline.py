@@ -185,11 +185,11 @@ with gr.Blocks() as demo:
     1. Whisper for speech transcription (INT8)
     2. RedPajama-INCITE (chat version - 3B parameters) for refinement of the generated text (INT8)
     3. Stable Diffusion (options: v2.1 and XL) for using the text as a prompt for image generation (FP16)
-    4. CLIP to explore interpretability of the generated image. 
+    4. CLIP to explore interpretability of the generated image. (FP16)
     
     Whisper, RedPajama-INCITE, and CLIP is run on CPU, while the Stable Diffusion model is run on GPU.
     
-    **NOTE:** Before running this demo, please run the associated notebook [here](https://github.com/openvinotoolkit/openvino_notebooks/tree/conference-demos/conference-demos/intel-on-generative-ai/final_e2e_genai_pipeline.ipynb) to download all required model files for the gradio demo. These elements were not included in the gradio app for conciseness.
+    **NOTE:** Before running this demo, please run the associated notebook [here](https://github.com/openvinotoolkit/openvino_notebooks/tree/conference-demos/conference-demos/intel-on-generative-ai/final_e2e_genai_pipeline.ipynb) to download all required model files for the gradio demo. These elements were not included in the gradio app for conciseness. Please ensure you place the Whisper IR models in a directory called *whisper_models/* and the clip models in *clip/*.
 
     The notebook also explores more of the details of the models and the OpenVINO implementation.
     """)
