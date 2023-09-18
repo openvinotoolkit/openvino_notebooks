@@ -27,8 +27,7 @@ The tutorial consists of the following steps:
 * Preparing PyTorch Segmenter model
 * Preparing preprocessing and visualization functions
 * Validating inference of original model
-* Converting PyTorch model to ONNX
-* Converting ONNX to OpenVINO IR
+* Converting PyTorch model to OpenVINO IR
 * Validating inference of the converted model
 * Benchmark performance of the converted model
 
