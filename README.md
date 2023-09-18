@@ -71,7 +71,7 @@ OpenVINO Notebooks require Python and Git. To get started, select the guide for 
 
 The Jupyter notebooks are categorized into four classes, select one related to your needs or give them all a try. Good Luck!
 
-**NOTE: The main branch of this repository was updated to support the new OpenVINO 2023.0 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2022.3 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2022.3). 
+**NOTE: The main branch of this repository was updated to support the new OpenVINO 2023.1 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous release version of OpenVINO, please checkout the [2023.0 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.0). If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2022.3 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2022.3). 
 
 If you need help, please start a GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions).  
 
