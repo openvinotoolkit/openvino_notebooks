@@ -37,7 +37,7 @@ def split_text(text: str) -> list:
 
 
 def correct_text(text: str, checker: transformers.pipelines.Pipeline, corrector: transformers.pipelines.Pipeline,
-                 separator: str = " ") -> str:
+                 separator: str = " ", disable_tqdm: bool = False) -> str:
     """
     Correct the grammar in a string of text using a text-classification and text-generation pipeline.
 
@@ -57,7 +57,7 @@ def correct_text(text: str, checker: transformers.pipelines.Pipeline, corrector:
 
     # Iterate through the sentence batches
     for batch in tqdm(
-        sentence_batches, total=len(sentence_batches), desc="correcting text.."
+        sentence_batches, total=len(sentence_batches), desc="correcting text..", disable=disable_tqdm
     ):
         # Join the sentences in the batch into a single string
         raw_text = " ".join(batch)
