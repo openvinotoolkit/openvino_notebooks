@@ -1,7 +1,6 @@
 import re
 import transformers
 from tqdm.notebook import tqdm
-import datetime
 
 
 def split_text(text: str) -> list:
@@ -64,19 +63,14 @@ def correct_text(text: str, checker: transformers.pipelines.Pipeline, corrector:
         raw_text = " ".join(batch)
 
         # Check the grammar quality of the text using the text-classification pipeline
-        start_time = datetime.datetime.now()
         results = checker(raw_text)
-        print(f"Check time: {(datetime.datetime.now() - start_time).total_seconds()}")
 
-        # Only correct the text if the results of the text-classification are not LABEL_1 or are LABEL_1 with a score
-        # below 0.9
+        # Only correct the text if the results of the text-classification are not LABEL_1 or are LABEL_1 with a score below 0.9
         if results[0]["label"] != "LABEL_1" or (
             results[0]["label"] == "LABEL_1" and results[0]["score"] < 0.9
         ):
             # Correct the text using the text-generation pipeline
-            start_time = datetime.datetime.now()
             corrected_batch = corrector(raw_text)
-            print(f"Correction time: {(datetime.datetime.now() - start_time).total_seconds()}")
             corrected_text.append(corrected_batch[0]["generated_text"])
         else:
             corrected_text.append(raw_text)
