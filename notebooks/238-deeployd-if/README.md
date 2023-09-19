@@ -17,7 +17,7 @@ The result of notebook work demonstrated on the image below:
 
 >**Note**: Please be aware that a machine with at least 32GB of RAM is necessary to run this example.
 
-The [second notebook](238-deep-floyd-if-optimized.ipynb) is about the optimization by 8-bit post-training quantization and weights compression and consists of the following steps:
+The [second notebook](238-deep-floyd-if-optimize.ipynb) is about the optimization by 8-bit post-training quantization and weights compression and consists of the following steps:
 1. Compress weights of the converted OpenVINO text encoder from [notebook](238-deep-floyd-if.ipynb) with NNCF.
 2. Quantize the converted stage_1 and stage_2 U-Nets from [notebook](238-deep-floyd-if.ipynb) with NNCF.
 2. Check the model result using the same input data from the [notebook](238-deep-floyd-if.ipynb).
