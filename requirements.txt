@@ -1,7 +1,7 @@
 # openvino and its dependencies
 openvino-dev>=2023.1.0
 openvino-telemetry>=2023.1.0
-nncf==2.5.0
+nncf==2.6.0
 
 
 # deep learning frameworks
