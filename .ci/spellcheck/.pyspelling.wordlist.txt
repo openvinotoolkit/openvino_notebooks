@@ -191,6 +191,8 @@ iGPU
 iGPUs
 Ilija
 ImageBind
+imagenet
+Imagenet
 ImageNet
 Imagenette
 impactful
@@ -530,6 +532,7 @@ Unet
 Unimodal
 unsqueeze
 Uparrow
+uparrow
 Upcroft
 upsample
 upsampled
