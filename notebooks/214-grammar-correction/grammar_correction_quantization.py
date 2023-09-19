@@ -6,6 +6,7 @@ from openvino.runtime import Core
 from pathlib import Path
 
 from nncf.quantization.advanced_parameters import AdvancedAccuracyRestorerParameters
+from nncf.quantization.range_estimator import RangeEstimatorParameters, StatisticsCollectorParameters, StatisticsType
 from optimum.intel.openvino.modeling_seq2seq import OVEncoder, OVDecoder
 from transformers import pipeline, AutoTokenizer
 from optimum.intel.openvino import OVModelForSeq2SeqLM, OVModelForSequenceClassification
@@ -264,7 +265,7 @@ def compress(grammar_corrector_pipe, quantize, save_calibration_data=True,
              num_calibration_samples=300,
              preset=nncf.QuantizationPreset.PERFORMANCE):
     if quantize:
-        model_path = Path(f"quantized_models/{preset.value}_{num_calibration_samples}_{smooth_quant_alpha:.2f}")
+        model_path = Path(f"quantized_models/{preset.value}_{num_calibration_samples}_{smooth_quant_alpha:.2f}_max-q1e-4")
     else:
         model_path = Path(f"compressed_model")
 
@@ -290,7 +291,12 @@ def compress(grammar_corrector_pipe, quantize, save_calibration_data=True,
                 subset_size=len(calibration_data),
                 # subset_size=300,
                 model_type=nncf.ModelType.TRANSFORMER,
-                advanced_parameters=nncf.AdvancedQuantizationParameters(smooth_quant_alpha=smooth_quant_alpha),
+                advanced_parameters=nncf.AdvancedQuantizationParameters(
+                    smooth_quant_alpha=smooth_quant_alpha,
+                    activations_range_estimator_params=RangeEstimatorParameters(
+                        max=StatisticsCollectorParameters(statistics_type=StatisticsType.QUANTILE)
+                    )
+                ),
             )
 
         ov.serialize(compressed_model, model_path)
@@ -346,18 +352,23 @@ def quantize_with_accuracy_control(grammar_corrector_pipe, num_calibration_sampl
         grammar_corrector_pipe.model.decoder_with_past._compile()
         return validate(grammar_corrector_pipe, verbose=False, return_per_sample=True, dataset=data)
 
+    def prepare_model_for_inference(self, model):
+        return model
+    from nncf.quantization.algorithms.accuracy_control.evaluator import Evaluator
+    Evaluator.prepare_model_for_inference = prepare_model_for_inference
+
     compressed_model = nncf.quantize_with_accuracy_control(model,
                                                            calibration_dataset,
                                                            validation_dataset,
                                                            validation_fn=validate_fn,
                                                            subset_size=len(calibration_data),
-                                                           max_drop=-2,
+                                                           max_drop=0,
                                                            preset=nncf.QuantizationPreset.PERFORMANCE,
                                                            model_type=nncf.ModelType.TRANSFORMER,
                                                            advanced_quantization_parameters=
-                                                           nncf.AdvancedQuantizationParameters(smooth_quant_alpha=0.95),
+                                                           nncf.AdvancedQuantizationParameters(smooth_quant_alpha=0.15),
                                                            advanced_accuracy_restorer_parameters=
-                                                           AdvancedAccuracyRestorerParameters(tune_hyperparams=True))
+                                                           AdvancedAccuracyRestorerParameters(tune_hyperparams=False))
 
     save_dir = Path("quantized_models/qwac")
     if not save_dir.exists():
@@ -392,11 +403,11 @@ add_encoder_decoder_wrappers(grammar_corrector_pipe.model.encoder, grammar_corre
 #          quantize=bool(1),
 #          save_calibration_data=bool(1),
 #          smooth_quant_alpha=0.95,
-#          num_calibration_samples=10,
+#          num_calibration_samples=50,
 #          preset=nncf.QuantizationPreset.PERFORMANCE,
 # )
 
-quantize_with_accuracy_control(grammar_corrector_pipe, 30)
+quantize_with_accuracy_control(grammar_corrector_pipe, 1)
 
 corrected_text = correct_text(default_text, grammar_checker_pipe, grammar_corrector_pipe)
 print(corrected_text)
