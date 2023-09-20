@@ -20,7 +20,9 @@ asr
 async
 AsyncInferQueue
 Atrous
+audiobooks
 autoencoder
+autoregressive
 autoregressively
 AutoTokenizer
 backend
@@ -374,6 +376,7 @@ PR
 Prateek
 pre
 Precisions
+precomputed
 prefetching
 preformatted
 PrePostProcessing
@@ -493,6 +496,7 @@ subgraph
 sublicense
 subtask
 summarization
+Suno
 superresolution
 superset
 Swin
@@ -517,6 +521,7 @@ tokenizing
 TorchMetrics
 TorchScript
 torchvision
+TTS
 tunable
 tv
 TypeScript

@@ -31,6 +31,7 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 |[Tiny SD](notebooks/251-tiny-sd-image-generation/)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/251-tiny-sd-image-generation/251-tiny-sd-image-generation.ipynb) | Image Generation with Tiny-SD and OpenVINO™ | <img src="https://user-images.githubusercontent.com/29454499/260904650-274fc2f9-24d2-46a3-ac3d-d660ec3c9a19.png" width=300> | |
 | [ZeroScope Text-to-video synthesis](notebooks/253-zeroscope-text2video)<br> | Text-to-video synthesis with ZeroScope and OpenVINO™ | A panda eating bamboo on a rock <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/500956d5-4aac-4710-a77c-4df34bcda3be" width=300> |
 | [LLM chatbot](notebooks/254-llm-chatbot)<br> | Create LLM-powered Chatbot using OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/255799218-611e7189-8979-4ef5-8a80-5a75e0136b50.png width=600> |
+| [Bark Text-to-Speech](notebooks/255-bark-text-to-audio/)<br> | Text-to-Speech generation using Bark and OpenVINO™ | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/9a770279-0045-480e-95f2-1a2f2d0a5115 width=300>
 
 ## Table of Contents
 
@@ -181,6 +182,7 @@ Demos that demonstrate inference on a particular model.
 | [252-fastcomposer-image-generation](notebooks/252-fastcomposer-image-generation/)<br> | Image generation with FastComposer and OpenVINO™ | |
 | [253-zeroscope-text2video](notebooks/253-zeroscope-text2video)<br> | Text-to-video synthesis with ZeroScope and OpenVINO™ | A panda eating bamboo on a rock <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/500956d5-4aac-4710-a77c-4df34bcda3be" width=225> |
 | [254-llm-chatbot](notebooks/254-llm-chatbot)<br> | Create LLM-powered Chatbot using OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/255799218-611e7189-8979-4ef5-8a80-5a75e0136b50.png width=600> |
+| [255-bark-text-to-audio](notebooks/255-bark-text-to-audio)<br> | Text-to-Speech generation using Bark and OpenVINO™ |  <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/9a770279-0045-480e-95f2-1a2f2d0a5115 width=225> |
 
 <div id='-model-training'></div>
 
