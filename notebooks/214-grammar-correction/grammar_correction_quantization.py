@@ -1,12 +1,14 @@
 import inspect
 from functools import wraps
+from contextlib import contextmanager
 
 import datasets
 from openvino.runtime import Core
 from pathlib import Path
 
 from nncf.quantization.advanced_parameters import AdvancedAccuracyRestorerParameters
-from nncf.quantization.range_estimator import RangeEstimatorParameters, StatisticsCollectorParameters, StatisticsType
+from nncf.quantization.range_estimator import RangeEstimatorParameters, StatisticsCollectorParameters, StatisticsType, \
+    AggregatorType
 from optimum.intel.openvino.modeling_seq2seq import OVEncoder, OVDecoder
 from transformers import pipeline, AutoTokenizer
 from optimum.intel.openvino import OVModelForSeq2SeqLM, OVModelForSequenceClassification
@@ -29,6 +31,7 @@ DEVICE = 'CPU'
 VERBOSE = bool(1)
 
 CALIBRATION_DATA_CACHE = Path("./calibration_data")
+COLLECT_CALIBRATION_DATA = False
 
 total_check_time = 0
 total_correction_time = 0
@@ -43,6 +46,16 @@ decoder_with_past_call_count = 0
 decoder_with_past_total_time = 0
 
 total_corrected_tokens = 0
+
+
+@contextmanager
+def calibration_data_collection():
+    global COLLECT_CALIBRATION_DATA
+    try:
+        COLLECT_CALIBRATION_DATA = True
+        yield
+    finally:
+        COLLECT_CALIBRATION_DATA = False
 
 
 def load_grammar_cheker():
@@ -111,7 +124,7 @@ def split_text(text: str) -> list:
 
 
 def correct_text(text: str, checker: transformers.pipelines.Pipeline, corrector: transformers.pipelines.Pipeline,
-                 separator: str = " ") -> str:
+                 separator: str = " ", disable_tqdm=False) -> str:
     """
     Correct the grammar in a string of text using a text-classification and text-generation pipeline.
 
@@ -137,7 +150,7 @@ def correct_text(text: str, checker: transformers.pipelines.Pipeline, corrector:
 
     # Iterate through the sentence batches
     for batch in tqdm(
-            sentence_batches, total=len(sentence_batches), desc="correcting text.."
+            sentence_batches, total=len(sentence_batches), desc="correcting text..", disable=disable_tqdm
     ):
         # Join the sentences in the batch into a single string
         raw_text = " ".join(batch)
@@ -237,7 +250,8 @@ def collect_calibration_data(ov_decoder, num_calibration_samples, save_calibrati
 
             def wrapper(*args, **kwargs):
                 inputs = kwargs.get("inputs", args[0])
-                calibration_data.append(inputs)
+                if COLLECT_CALIBRATION_DATA:
+                    calibration_data.append(inputs)
                 return original_fn(*args, **kwargs)
 
             ov_decoder.request.start_async = wrapper
@@ -247,8 +261,9 @@ def collect_calibration_data(ov_decoder, num_calibration_samples, save_calibrati
         num_calibration_samples = min(num_calibration_samples, 755)
         dataset = datasets.load_dataset("jfleg", split=f"validation[:{num_calibration_samples}]")
 
-        for data_item in tqdm(dataset, total=num_calibration_samples, desc="Collecting calibration data"):
-            grammar_corrector_pipe(data_item["sentence"])
+        with calibration_data_collection():
+            for data_item in tqdm(dataset, total=num_calibration_samples, desc="Collecting calibration data"):
+                grammar_corrector_pipe(data_item["sentence"])
 
         if save_calibration_data:
             if not calibration_data_file_path.parent.exists():
@@ -265,7 +280,9 @@ def compress(grammar_corrector_pipe, quantize, save_calibration_data=True,
              num_calibration_samples=300,
              preset=nncf.QuantizationPreset.PERFORMANCE):
     if quantize:
+        # model_path = Path(f"quantized_models/{preset.value}_{num_calibration_samples}_{smooth_quant_alpha:.2f}")
         model_path = Path(f"quantized_models/{preset.value}_{num_calibration_samples}_{smooth_quant_alpha:.2f}_max-q1e-4")
+        # model_path = Path(f"quantized_models/{preset.value}_{num_calibration_samples}_{smooth_quant_alpha:.2f}_tmp")
     else:
         model_path = Path(f"compressed_model")
 
@@ -289,12 +306,11 @@ def compress(grammar_corrector_pipe, quantize, save_calibration_data=True,
                 calibration_dataset=nncf.Dataset(calibration_data),
                 preset=preset,
                 subset_size=len(calibration_data),
-                # subset_size=300,
                 model_type=nncf.ModelType.TRANSFORMER,
                 advanced_parameters=nncf.AdvancedQuantizationParameters(
                     smooth_quant_alpha=smooth_quant_alpha,
                     activations_range_estimator_params=RangeEstimatorParameters(
-                        max=StatisticsCollectorParameters(statistics_type=StatisticsType.QUANTILE)
+                        max=StatisticsCollectorParameters(StatisticsType.QUANTILE),
                     )
                 ),
             )
@@ -313,16 +329,16 @@ def validate(grammar_corrector_pipe, verbose=True, return_per_sample=False, data
     predictions = []
     ground_truths = []
     for data_item in tqdm(dataset, desc="Evaluation", disable=not verbose):
-        corrected_text = grammar_corrector_pipe(data_item["sentence"])[0]["generated_text"]
+        corrected_text = correct_text(data_item["sentence"], grammar_checker_pipe, grammar_corrector_pipe,
+                                      disable_tqdm=True)
 
-        gts = []
-        ps = []
-        for gt in data_item["corrections"]:
-            if len(gt) > 0:
-                gts.append(gt)
-                ps.append(corrected_text)
-        predictions.append(ps)
-        ground_truths.append(gts)
+        # print(data_item["sentence"])
+        # print(grammar_corrector_pipe(data_item["sentence"])[0]["generated_text"])
+        # print(corrected_text)
+        # print()
+
+        ground_truths.append(data_item["corrections"])
+        predictions.append([corrected_text] * len(data_item["corrections"]))
 
     word_accuracy = 100 * (1 - wer.compute(references=sum(ground_truths, start=[]),
                                            predictions=sum(predictions, start=[])))
@@ -362,11 +378,11 @@ def quantize_with_accuracy_control(grammar_corrector_pipe, num_calibration_sampl
                                                            validation_dataset,
                                                            validation_fn=validate_fn,
                                                            subset_size=len(calibration_data),
-                                                           max_drop=0,
+                                                           max_drop=-2,
                                                            preset=nncf.QuantizationPreset.PERFORMANCE,
                                                            model_type=nncf.ModelType.TRANSFORMER,
                                                            advanced_quantization_parameters=
-                                                           nncf.AdvancedQuantizationParameters(smooth_quant_alpha=0.15),
+                                                           nncf.AdvancedQuantizationParameters(smooth_quant_alpha=0.95),
                                                            advanced_accuracy_restorer_parameters=
                                                            AdvancedAccuracyRestorerParameters(tune_hyperparams=False))
 
@@ -399,15 +415,17 @@ corrector_tokenizer, grammar_corrector_pipe = load_grammar_corrector()
 add_encoder_decoder_wrappers(grammar_corrector_pipe.model.encoder, grammar_corrector_pipe.model.decoder,
                              grammar_corrector_pipe.model.decoder_with_past)
 
-# compress(grammar_corrector_pipe,
-#          quantize=bool(1),
-#          save_calibration_data=bool(1),
-#          smooth_quant_alpha=0.95,
-#          num_calibration_samples=50,
-#          preset=nncf.QuantizationPreset.PERFORMANCE,
-# )
+# import numpy as np
+# np.seterr(over='raise')
+compress(grammar_corrector_pipe,
+         quantize=bool(1),
+         save_calibration_data=bool(1),
+         smooth_quant_alpha=0.95,
+         num_calibration_samples=10,
+         preset=nncf.QuantizationPreset.PERFORMANCE,
+)
 
-quantize_with_accuracy_control(grammar_corrector_pipe, 1)
+# quantize_with_accuracy_control(grammar_corrector_pipe, 10)
 
 corrected_text = correct_text(default_text, grammar_checker_pipe, grammar_corrector_pipe)
 print(corrected_text)
