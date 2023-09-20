@@ -532,6 +532,7 @@ Unet
 Unimodal
 unsqueeze
 Uparrow
+uparrow
 Upcroft
 upsample
 upsampled
