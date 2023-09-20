@@ -16,6 +16,7 @@ The tutorial consists of the following steps:
 - Prepare an example audio using https://huggingface.co/datasets/multilingual_librispeech
 - Make inference with the original model
 - Convert models to OpenVINO IR model and make inference
+- Interactive demo with gradio
 
 ## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>
