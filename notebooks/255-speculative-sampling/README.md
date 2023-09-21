@@ -10,7 +10,7 @@ Another necessary condition is that the optimizations are compatible with each o
 
 Often multiple optimizations are possible to gain maximum advantage. Let us take a look at one such collection of optimizations that would be desired for many text generation applications. We will consider the following optimizations given a full model:
 
-- **Quantization** - often we don't expect problems to arise if quantization was tested by itself. However, there could be some unexpected effects from the quantization and sampling of models. A full discussion on quantization is beyond the scope of this article (but is assumed to be essential in high-performance inference); we will focus on dynamic execution methods in this work.
+- **Model-Based Optimizations** - often we don't expect problems to arise if quantization (a commonly used model-based optimization) was tested by itself. However, there could be some unexpected effects from the quantization and sampling of models. A full discussion on quantization is beyond the scope of this article (but is assumed to be essential in high-performance inference); we will focus on dynamic execution methods in this work.
 - **KV Caching** (or Past-Value Caching) - autoregressive sampling predicts the next value in a series of tokens. Computations are performed on these tokens to create the prediction of the next token. The expanded collection of tokens (all previously appended with the newly generated token from the previous pass) now goes through another pass, and this continues until the number of tokens requested is reached. To avoid a lot of repetitive calculations on the past tokens, the intermediate values are stored in a KV cache [pope_efficiently_2022](). This method is very standard (enabled in HuggingFace by default) and poses no risk to accuracy. The only downside is that the KV cache can be quite large and increase memory requirements for the autoregressive process.
 - **Speculative Sampling** - A form of dynamic execution, there has been a lot of published research in this area about using a smaller, draft model to produce samples that should be "good enough" much of the time, and occasionally reject candidates and pay the price of the full model when needed. This method has been published, with slight differences, in several independent research publications. [schuster_confident_2022]() [belrose_eliciting_2023]() [chen_accelerating_2023]() [kim_big_2023]() [gante_joao_assisted_nodate]() [stern_blockwise_2018]() 
 
@@ -29,23 +29,12 @@ However, the draft model and target model have different sizes that would be rep
 
 Note that the authors \cite{chen_accelerating_2023} prove that the target distribution is recovered when performing speculative sampling - this guarantees the same sampling quality as autoregressive sampling on the target itself. Therefore, the situations for not leveraging speculative sampling is not worthwhile have to do with the case where there are not enough savings in the relative size of the draft model or the acceptance rate of the draft model is not high enough to benefit from the smaller size of the draft model.
 
-
-```markdown
-The image below illustrates provided user instruction and model answer examples.
-
-![example](https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png)
-```
-
-
-
 ## Notebook Contents
 
 The tutorial consists of the following steps:
 
 - Install prerequisites
 - Download and convert the model from a public source using the [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
-- Create an instruction-following inference pipeline
-- Run instruction-following pipeline
-
+- Run speculative sampling example and compare speed-up with respect to autoregressive sampling.
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
