@@ -16,6 +16,7 @@
 252-fastcomposer-image-generation
 253-zeroscope-text2video
 254-llm-chatbot
+255-mms-massively-multilingual-speech
 256-bark-text-to-audio
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
