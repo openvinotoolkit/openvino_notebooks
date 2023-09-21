@@ -43,6 +43,7 @@ charlists
 chatbot
 chatbots
 ChatGPT
+CIN
 ckpt
 CHW
 Cifar
@@ -489,6 +490,7 @@ SSDLite
 sst
 STFT
 streamable
+stylization
 subchunk
 subchunks
 subdirectories
