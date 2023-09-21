@@ -20,4 +20,4 @@
 252-fastcomposer-image-generation
 253-zeroscope-text2video
 254-llm-chatbot
-255-bark-text-to-audio
+256-bark-text-to-audio
