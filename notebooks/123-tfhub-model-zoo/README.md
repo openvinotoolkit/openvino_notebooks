@@ -17,3 +17,26 @@ MobileNetV2 is a compact and efficient deep learning architecture designed for m
 This is a self-contained example that relies solely on its own code.</br>
 We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
+
+
+## Image style transfer
+### Description
+This tutorial demonstrates step-by-step instructions on how to do inference on a classification model loaded from TensorFlow Hub using OpenVINO Runtime.
+
+We will use [arbitrary image stylization model](https://arxiv.org/abs/1705.06830) from [TensorFlow Hub](https://tfhub.dev). 
+
+The model contains conditional instance normalization (CIN) layers  
+
+The CIN network consists of two main components: a feature extractor and a stylization module. The feature extractor extracts a set of features from the content image. The stylization module then uses these features to generate a stylized image. 
+
+The stylization module is a stack of convolutional layers. Each convolutional layer is followed by a CIN layer. The CIN layer takes the features from the previous layer and the CIN parameters from the style image as input and produces a new set of features as output. 
+
+The output of the stylization module is a stylized image. The stylized image has the same content as the original content image, but the style has been transferred from the style image. 
+
+The CIN network is able to stylize images in real time because it is very efficient.  
+
+### Installation Instructions
+
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
