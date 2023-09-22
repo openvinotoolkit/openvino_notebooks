@@ -1,11 +1,12 @@
+import openvino as ov
+import diffusers
+import torch
+import numpy as np
+
 from collections import namedtuple
 from typing import Tuple, Union
 from pathlib import Path
 from PIL import Image
-from openvino.runtime import Core
-import diffusers
-import torch
-import numpy as np
 
 import sys
 sys.path.append("../utils")
@@ -32,7 +33,7 @@ class TextEncoder:
         """
         self.ir_path = ir_path
         self.dtype = dtype
-        self.encoder_openvino = Core().compile_model(self.ir_path, device)
+        self.encoder_openvino = ov.Core().compile_model(self.ir_path, device)
 
     def __call__(self, input_ids: torch.LongTensor, attention_mask: torch.FloatTensor = None):
         """Adapt the network call."""
@@ -69,7 +70,7 @@ class UnetFirstStage:
         Returns:
             None
         """
-        self.unet_openvino = Core().compile_model(unet_ir_path, device)
+        self.unet_openvino = ov.Core().compile_model(unet_ir_path, device)
         self.config = config
         self.dtype = dtype
 
@@ -116,7 +117,7 @@ class UnetSecondStage:
         Returns:
             None
         """
-        self.unet_openvino = Core().compile_model(unet_ir_path, device)
+        self.unet_openvino = ov.Core().compile_model(unet_ir_path, device)
         self.config = config
         self.dtype = dtype
 
