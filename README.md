@@ -71,7 +71,7 @@ OpenVINO Notebooks require Python and Git. To get started, select the guide for 
 
 The Jupyter notebooks are categorized into four classes, select one related to your needs or give them all a try. Good Luck!
 
-**NOTE: The main branch of this repository was updated to support the new OpenVINO 2023.0 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2022.3 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2022.3). 
+**NOTE: The main branch of this repository was updated to support the new OpenVINO 2023.1 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous release version of OpenVINO, please checkout the [2023.0 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.0). If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2022.3 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2022.3). 
 
 If you need help, please start a GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions).  
 
@@ -182,6 +182,7 @@ Demos that demonstrate inference on a particular model.
 | [252-fastcomposer-image-generation](notebooks/252-fastcomposer-image-generation/)<br> | Image generation with FastComposer and OpenVINO™ | |
 | [253-zeroscope-text2video](notebooks/253-zeroscope-text2video)<br> | Text-to-video synthesis with ZeroScope and OpenVINO™ | A panda eating bamboo on a rock <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/500956d5-4aac-4710-a77c-4df34bcda3be" width=225> |
 | [254-llm-chatbot](notebooks/254-llm-chatbot)<br> | Create LLM-powered Chatbot using OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/255799218-611e7189-8979-4ef5-8a80-5a75e0136b50.png width=600> |
+| [255-mms-massively-multilingual-speech](notebooks/255-mms-massively-multilingual-speech/)<br> | MMS: Scaling Speech Technology to 1000+ languages with OpenVINO™ | |
 
 <div id='-model-training'></div>
 

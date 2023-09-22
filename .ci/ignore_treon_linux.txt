@@ -1,7 +1,9 @@
 107-speech-recognition-quantization
 108-gpu-device
 117-model-server
+122-quantizing-model-with-accuracy-control
 225-stable-diffusion-text-to-image
+226-yolov7-optimization
 231-instruct-pix2pix-image-editing
 235-controlnet-stable-diffusion
 236-stable-diffusion-v2
@@ -16,4 +18,5 @@
 252-fastcomposer-image-generation
 253-zeroscope-text2video
 254-llm-chatbot
+255-mms-massively-multilingual-speech
 404-style-transfer-webcam
