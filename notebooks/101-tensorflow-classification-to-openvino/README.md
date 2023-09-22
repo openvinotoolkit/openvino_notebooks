@@ -1,6 +1,6 @@
 # TensorFlow to OpenVINO™ Model Conversion Tutorial
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F101-tensorflow-classification-to-openvino%2F101-tensorflow-classification-to-openvino.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/101-tensorflow-classification-to-openvino/101-tensorflow-classification-to-openvino.ipynb)
 
 <img src="https://user-images.githubusercontent.com/36741649/127170593-86976dc3-e5e4-40be-b0a6-206379cd7df5.jpg" width=300>
 
