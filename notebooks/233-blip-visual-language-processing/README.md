@@ -32,8 +32,8 @@ The following image shows an example of the input image, question and answer gen
 
 This folder contains two notebooks that show how to convert and quantize model with OpenVINO:
 
-1. [Convert the BLIP model using OpenVINO](233-blip-convert.ipynb)
-2. [Quantize the OpenVINO BLIP model using NNCF](233-blip-quantize-nncf.ipynb)
+1. [Convert the BLIP model using OpenVINO](233-blip-visual-language-processing.ipynb)
+2. [Quantize the OpenVINO BLIP model using NNCF](233-blip-optimize.ipynb)
 
 The first notebook consists of the following parts:
 
@@ -44,13 +44,13 @@ The first notebook consists of the following parts:
 The second notebook consists of the following parts:
 
 1. Download and preprocess dataset for quantization.
-2. Quantize the converted vision and text encoder OpenVINO models from [notebook](233-blip-convert.ipynb) with NNCF.
+2. Quantize the converted vision and text encoder OpenVINO models from [notebook](233-blip-visual-language-processing.ipynb) with NNCF.
 3. Compress weights of text decoder and convert model to OpenVINO IR.
-4. Check the model result using the same input data from the [notebook](233-blip-convert.ipynb).
+4. Check the model result using the same input data from the [notebook](233-blip-visual-language-processing.ipynb).
 5. Compare model size of converted and quantized models.
 6. Compare performance of converted and quantized models.
 
-NNCF performs quantization within the OpenVINO IR. It is required to run the [first notebook](233-blip-convert.ipynb) before running the [second notebook](233-blip-quantize-nncf.ipynb).
+NNCF performs quantization within the OpenVINO IR. It is required to run the [first notebook](233-blip-visual-language-processing.ipynb) before running the [second notebook](233-blip-optimize.ipynb).
 
 ## Installation Instructions
 
