@@ -256,6 +256,7 @@ LLMs
 LMS
 logits
 LogSoftmax
+lraspp
 LRASPP
 LTS
 LSTM
@@ -279,6 +280,7 @@ MLS
 mms
 MMS
 MLP
+mobilenet
 MobileNet
 MobileNetV
 MusicGen
