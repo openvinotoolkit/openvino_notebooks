@@ -30,10 +30,10 @@ The following image shows an example of the input image, question and answer gen
 
 ## Notebook Contents
 
-This folder contains two notebooks that show how to convert and quantize model with OpenVINO:
+This folder contains two notebooks that show how to convert and optimize model with OpenVINO:
 
-1. [Convert the BLIP model using OpenVINO](233-blip-visual-language-processing.ipynb)
-2. [Quantize the OpenVINO BLIP model using NNCF](233-blip-optimize.ipynb)
+1. [Convert the BLIP model using OpenVINO](233-blip-convert.ipynb)
+2. [Optimize the OpenVINO BLIP model using NNCF](233-blip-optimize.ipynb)
 
 The first notebook consists of the following parts:
 
@@ -44,13 +44,13 @@ The first notebook consists of the following parts:
 The second notebook consists of the following parts:
 
 1. Download and preprocess dataset for quantization.
-2. Quantize the converted vision and text encoder OpenVINO models from [notebook](233-blip-visual-language-processing.ipynb) with NNCF.
-3. Compress weights of text decoder and convert model to OpenVINO IR.
-4. Check the model result using the same input data from the [notebook](233-blip-visual-language-processing.ipynb).
-5. Compare model size of converted and quantized models.
-6. Compare performance of converted and quantized models.
+2. Quantize the converted vision and text encoder OpenVINO models from [notebook](233-blip-convert.ipynb) with NNCF.
+3. Compress weights of the OpenVINO text decoder model from [notebook](233-blip-convert.ipynb) with NNCF.
+4. Check the model result using the same input data from the [notebook](233-blip-convert.ipynb).
+5. Compare model size of converted and optimized models.
+6. Compare performance of converted and optimized models.
 
-NNCF performs quantization within the OpenVINO IR. It is required to run the [first notebook](233-blip-visual-language-processing.ipynb) before running the [second notebook](233-blip-optimize.ipynb).
+NNCF performs optimization within the OpenVINO IR. It is required to run the [first notebook](233-blip-convert.ipynb) before running the [second notebook](233-blip-optimize.ipynb).
 
 ## Installation Instructions
 
