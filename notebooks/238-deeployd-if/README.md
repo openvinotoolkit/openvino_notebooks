@@ -6,9 +6,9 @@ DeepFloyd IF is an advanced open-source text-to-image model that delivers remark
 
 ## Notebook Contents
 
-This notebook demonstrates how to convert and run DeepFloyd IF models using OpenVINO.
+This folder contains two notebooks that show how to convert, run and optimize models using OpenVINO.
 
-The notebook contains the following steps:
+The [first notebook](238-deep-floyd-if.ipynb) is about the conversion to IR and consists of following steps:
 1. Convert PyTorch models to OpenVINO IR format, using model conversion API.
 2. Run DeepFloyd IF pipeline with OpenVINO.
 
@@ -17,6 +17,14 @@ The result of notebook work demonstrated on the image below:
 
 >**Note**: Please be aware that a machine with at least 32GB of RAM is necessary to run this example.
 
+The [second notebook](238-deep-floyd-if-optimize.ipynb) is about the optimization by 8-bit post-training quantization and weights compression and consists of the following steps:
+1. Compress weights of the converted OpenVINO text encoder from the [first notebook](238-deep-floyd-if.ipynb) with NNCF.
+2. Quantize the converted stage_1 and stage_2 U-Nets from the [first notebook](238-deep-floyd-if.ipynb) with NNCF.
+2. Check the model result using text prompts from the [first notebook](238-deep-floyd-if.ipynb) .
+3. Compare model size of converted and optimized models.
+4. Compare performance of converted and optimized models.
+
+>**Note**: NNCF performs optimizations within the OpenVINO IR. It is required to run the first notebook before running the second notebook.
 
 # Installation Instructions
 
