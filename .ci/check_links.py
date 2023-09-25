@@ -9,7 +9,7 @@ from pathlib import Path
 
 NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
 
-EXCEPTIONS_URLs = ["medium.com", "https://www.paddlepaddle.org.cn/", "mybinder.org"]
+EXCEPTIONS_URLs = ["medium.com", "https://www.paddlepaddle.org.cn/", "mybinder.org", "https://arxiv.org"]
 
 def get_all_ast_nodes(ast_nodes):
     for node in ast_nodes:
