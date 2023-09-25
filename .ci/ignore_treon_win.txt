@@ -9,7 +9,7 @@
 235-controlnet-stable-diffusion
 236-stable-diffusion-v2
 237-segment-anything
-238-deeployd-if
+238-deepfloyd-if
 239-image-bind
 240-dolly-2-instruction-following
 241-riffusion-text-to-music
