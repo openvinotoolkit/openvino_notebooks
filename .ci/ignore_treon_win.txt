@@ -21,3 +21,4 @@
 253-zeroscope-text2video
 254-llm-chatbot
 255-mms-massively-multilingual-speech
+256-bark-text-to-audio
