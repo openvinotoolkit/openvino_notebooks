@@ -45,11 +45,19 @@ A numpy version of speculative sampling is available from Mody at https://jaykmo
 
 ## References
 [1] Pope et al, *Efficiently Scaling Transformer Inference,* http://arxiv.org/abs/2211.05102
+
 [2] Shazeer, *Fast Transformer Decoding: One Write-Head is All You Need,* http://arxiv.org/abs/1911.02150
+
 [3] Schuster et al, *Confident Adaptive Language Modeling,* https://arxiv.org/abs/2207.07061
+
 [4] Belrose et al, *Eliciting Latent Predictions from Transformers with the Tuned Lens,* http://arxiv.org/abs/2303.08112
+
 [5] Chen et al, *Accelerating Large Language Model Decoding with Speculative Sampling,* http://arxiv.org/abs/2302.01318
+
 [6] Kim et al, *Big Little Transformer Decoder,*  http://arxiv.org/abs/2302.07863
+
 [7] Gante, Joao, *Assisted Generation: a new direction toward low-latency text generation,* https://huggingface.co/blog/assisted-generation
+
 [8] Stern et al, *Blockwise Parallel Decoding for Deep Autoregressive Models,* http://arxiv.org/abs/1811.03115
+
 [9] Lai et al, *Understanding Autoregressive Model for Time Series as a Deterministic Dynamic System,*  https://www.soa.org/globalassets/assets/library/newsletters/predictive-analytics-and-futurism/2017/june/2017-predictive-analytics-iss15-lai-lu.pdf
