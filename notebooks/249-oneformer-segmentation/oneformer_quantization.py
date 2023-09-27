@@ -179,8 +179,8 @@ def segment(model, img: Image.Image, task: str):
 
 def run_segmentation(compiled_model, image, task, save_dir: Path):
     result, legend = segment(compiled_model, image, task)
-    result.savefig(save_dir / f"result.jpg", bbox_inches="tight")
-    legend.savefig(save_dir / f"legend.jpg", bbox_inches="tight")
+    result.savefig(save_dir / f"result.png", bbox_inches="tight")
+    legend.savefig(save_dir / f"legend.png", bbox_inches="tight")
 
 
 def download_coco128():
@@ -224,22 +224,26 @@ def run_quantization(model, save_dir: Path):
         inputs = prepare_inputs(image, TASK)
         return inputs
 
-    coco_dataset = download_coco128()
-    calibration_dataset = nncf.Dataset(coco_dataset, transform_fn)
-    print("model quantization started")
-    quantized_model = nncf.quantize(model,
-                                    calibration_dataset,
-                                    model_type=nncf.parameters.ModelType.TRANSFORMER,
-                                    preset=nncf.QuantizationPreset.MIXED,
-                                    subset_size=len(coco_dataset),
-                                    advanced_parameters=nncf.AdvancedQuantizationParameters(
-                                        smooth_quant_alpha=0.15,
-                                    )
-                                    )
-    print("model quantization finished")
-    if not save_dir.exists():
-        save_dir.mkdir(parents=True)
-    openvino.save_model(quantized_model, save_dir / "oneformer.xml")
+    save_path = save_dir / "oneformer.xml"
+    if save_path.exists():
+        quantized_model = core.read_model(save_path)
+    else:
+        coco_dataset = download_coco128()
+        calibration_dataset = nncf.Dataset(coco_dataset, transform_fn)
+        print("model quantization started")
+        quantized_model = nncf.quantize(model,
+                                        calibration_dataset,
+                                        model_type=nncf.parameters.ModelType.TRANSFORMER,
+                                        preset=nncf.QuantizationPreset.MIXED,
+                                        subset_size=len(coco_dataset),
+                                        advanced_parameters=nncf.AdvancedQuantizationParameters(
+                                            smooth_quant_alpha=0.15,
+                                        )
+                                        )
+        print("model quantization finished")
+        if not save_dir.exists():
+            save_dir.mkdir(parents=True)
+        openvino.save_model(quantized_model, save_path)
     compiled_quantized_model = core.compile_model(model=quantized_model, device_name=DEVICE)
     return compiled_quantized_model
 
@@ -263,7 +267,7 @@ def run_quantization(model, save_dir: Path):
 
 IR_PATH = Path("oneformer.xml")
 
-# quantization_dir = Path("quantized_models/mixed_sq-0.15")
+quantization_dir = Path("quantized_models/mixed_sq-0.50")
 # IR_PATH = quantization_dir / Path("oneformer.xml")
 
 
@@ -271,12 +275,12 @@ IR_PATH = Path("oneformer.xml")
 # exit(0)
 
 model = core.read_model(model=IR_PATH)
-compiled_model = core.compile_model(model=model, device_name=DEVICE)
+# compiled_model = core.compile_model(model=model, device_name=DEVICE)
 
 image = Image.open("sample.jpg")
-run_segmentation(compiled_model, image, TASK, save_dir=Path("./"))
+# run_segmentation(compiled_model, image, TASK, save_dir=Path("./"))
 
-# compiled_quantized_model = run_quantization(model, quantization_dir)
-# run_segmentation(compiled_quantized_model, image, TASK, save_dir=quantization_dir)
+compiled_quantized_model = run_quantization(model, quantization_dir)
+run_segmentation(compiled_quantized_model, image, TASK, save_dir=quantization_dir)
 
 # validate(compiled_model)
