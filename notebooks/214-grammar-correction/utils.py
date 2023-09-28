@@ -108,10 +108,10 @@ def get_quantized_pipeline(grammar_corrector_pipe: Pipeline, grammar_corrector_t
 def calculate_compression_rate(model_path_ov, model_path_ov_int8):
     model_size_fp32 = model_path_ov.with_suffix(".bin").stat().st_size / 1024
     model_size_int8 = model_path_ov_int8.with_suffix(".bin").stat().st_size / 1024
-    print(f"Model: {model_path_ov.stem}")
+    print("Model footprint comparison:")
     print(f"    * FP32 IR model size: {model_size_fp32:.2f} KB")
     print(f"    * INT8 IR model size: {model_size_int8:.2f} KB")
-    print(f"    * Model compression rate: {model_size_fp32 / model_size_int8:.3f}")
+    return model_size_fp32, model_size_int8
 
 
 def calculate_inference_time_and_accuracy(grammar_corrector_pipe: Pipeline, test_subset_size: int):
