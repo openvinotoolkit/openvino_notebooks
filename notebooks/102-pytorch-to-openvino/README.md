@@ -12,6 +12,7 @@ This tutorial demonstrates how to convert PyTorch models to OpenVINO Intermediat
 
 * [102-pytorch-onnx-to-openvino](./102-pytorch-onnx-to-openvino.ipynb) shows how to convert the PyTorch model to OpenVINO IR with the intermediate step of exporting PyTorch model to ONNX format.
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F102-pytorch-onnx-to-openvino%2F102-pytorch-onnx-to-openvino.ipynb)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/102-pytorch-to-openvino/102-pytorch-onnx-to-openvino.ipynb)
 ![segmentation result](https://user-images.githubusercontent.com/29454499/203723317-1716e3ca-b390-47e1-bb98-07b4d8d097a0.png)
 

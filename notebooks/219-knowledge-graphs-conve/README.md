@@ -1,5 +1,6 @@
 # Knowledge graphs model optimization using the Intel OpenVINO toolkit
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F219-knowledge-graphs-conve%2F219-knowledge-graphs-conve.ipynb)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/219-knowledge-graphs-conve/219-knowledge-graphs-conve.ipynb)
 
 [Knowledge graphs](https://arxiv.org/pdf/2002.00388.pdf) provide an efficient way to represent domain information and are used in a number of real-world applications.

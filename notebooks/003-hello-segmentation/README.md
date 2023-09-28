@@ -1,5 +1,6 @@
 # Introduction to Segmentation in OpenVINO™
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F003-hello-segmentation%2F003-hello-segmentation.ipynb)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/003-hello-segmentation/003-hello-segmentation.ipynb)
 
 |                                                                                                                             |                                                                                                                             |
