@@ -241,6 +241,7 @@ LAION
 Lasinger
 latents
 LLaMa
+LLaVA
 LeViT
 LibriSpeech
 librispeech

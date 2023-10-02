@@ -11,7 +11,7 @@ In the field of artificial intelligence, the goal is to create a versatile assis
 In this tutorial we consider how to use LLaVA model to build multimodal chatbot with OpenVINO help.
 
 ## Notebook contents
-The tutorail consists from following steps:
+The tutorial consists from following steps:
 
 - Install prerequisites
 - Prepare input processor and tokenizer
