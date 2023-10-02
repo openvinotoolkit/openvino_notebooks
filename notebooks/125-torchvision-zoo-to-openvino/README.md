@@ -7,8 +7,7 @@ video classification, and optical flow.
 # Contents:
 Throughout this notebook we will learn how to convert these pretrained model to OpenVINO. Here are two examples:
 
-1. ConvNext classification model. In these example will be also demonstrating how to convert a 
-`torchvision.transforms` object into OpenVINO preprocessing.
+1. ConvNext classification model.
 2. LRASPP MobileNetV3 semantic segmentation model. 
 
 # Installation Instructions
