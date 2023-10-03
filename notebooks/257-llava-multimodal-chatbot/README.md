@@ -1,10 +1,10 @@
 # Visual-language assistant with LLaVA and OpenVINO
 
-![bark_generated.png](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/9a770279-0045-480e-95f2-1a2f2d0a5115)
+![llava_logo.png](https://raw.githubusercontent.com/haotian-liu/LLaVA/main/images/llava_logo.png)
 
-*image generated using [Stable Diffusion XL notebook](../248-stable-diffusion-xl/)*
+*image source: [LLaVA repository](https://github.com/haotian-liu/LLaVA/blob/main/images/llava_logo.png)*
 
-LLaVA](https://llava-vl.github.io) (Large Language and Vision Assistant) is large multimodal model that aims to develop a general-purpose visual assistant that can follow both language and image instructions to complete various real-world tasks. The idea is to combine the power of large language models (LLMs) with vision encoders like CLIP to create an end-to-end trained neural assistant that understands and acts upon multimodal instructions.
+[LLaVA](https://llava-vl.github.io) (Large Language and Vision Assistant) is large multimodal model that aims to develop a general-purpose visual assistant that can follow both language and image instructions to complete various real-world tasks. The idea is to combine the power of large language models (LLMs) with vision encoders like CLIP to create an end-to-end trained neural assistant that understands and acts upon multimodal instructions.
 
 In the field of artificial intelligence, the goal is to create a versatile assistant capable of understanding and executing tasks based on both visual and language inputs. Current approaches often rely on large vision models that solve tasks independently, with language only used to describe image content. While effective, these models have fixed interfaces with limited interactivity and adaptability to user instructions. On the other hand, large language models (LLMs) have shown promise as a universal interface for general-purpose assistants. By explicitly representing various task instructions in language, these models can be guided to switch and solve different tasks. To extend this capability to the multimodal domain, the [LLaVA paper](https://arxiv.org/abs/2304.08485) introduces  `visual instruction-tuning`, a novel approach to building a general-purpose visual assistant. 
 
