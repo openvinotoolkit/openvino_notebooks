@@ -184,6 +184,7 @@ Demos that demonstrate inference on a particular model.
 | [254-llm-chatbot](notebooks/254-llm-chatbot)<br> | Create LLM-powered Chatbot using OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/255799218-611e7189-8979-4ef5-8a80-5a75e0136b50.png width=600> |
 | [255-mms-massively-multilingual-speech](notebooks/255-mms-massively-multilingual-speech/)<br> | MMS: Scaling Speech Technology to 1000+ languages with OpenVINO™ | |
 | [256-bark-text-to-audio](notebooks/256-bark-text-to-audio)<br> | Text-to-Speech generation using Bark and OpenVINO™ |  <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/9a770279-0045-480e-95f2-1a2f2d0a5115 width=225> |
+| [257-blip-diffusion-subject-generation](notebooks/257-blip-diffusion-subject-generation)<br> | Subject-driven image generation and editing using BLIP Diffusion and OpenVINO™ |  |
 
 <div id='-model-training'></div>
 
