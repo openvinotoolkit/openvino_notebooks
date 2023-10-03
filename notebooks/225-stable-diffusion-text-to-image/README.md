@@ -1,5 +1,6 @@
 # Image Generation with Stable Diffusion
 
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/224-3D-segmentation-point-clouds/224-3D-segmentation-point-clouds.ipynb)
 
 This notebook demonstrates how to use a **[Stable Diffusion](https://huggingface.co/CompVis/stable-diffusion)** model for image generation with OpenVINO.
 It considers two approaches of image generation using an AI method called `diffusion`:
