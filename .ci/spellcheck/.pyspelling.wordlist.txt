@@ -405,6 +405,7 @@ Pythia
 pytorch
 PyTorch
 PyTorchVideo
+QFormer
 Qi
 quant
 quantized
