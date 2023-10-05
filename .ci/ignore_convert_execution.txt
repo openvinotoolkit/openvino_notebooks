@@ -19,7 +19,7 @@ notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-optimum-demo.ipynb
 notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-text-to-image-demo.ipynb
 notebooks/237-segment-anything/237-segment-anything.ipynb
 notebooks/237-segment-anything/237-segment-anything-fiftyone.ipynb
-notebooks/238-deeployd-if/238-deep-floyd-if.ipynb
+notebooks/238-deepfloyd-if/238-deep-floyd-if.ipynb
 notebooks/239-image-bind/239-image-bind.ipynb
 notebooks/240-dolly-2-instruction-following/240-dolly-2-instruction-following.ipynb
 notebooks/241-riffusion-text-to-music/241-riffusion-text-to-music.ipynb
@@ -28,4 +28,5 @@ notebooks/248-stable-diffusion-xl/248-stable-diffusion-xl.ipynb
 notebooks/249-oneformer-segmentation/249-oneformer-segmentation.ipynb
 notebooks/251-tiny-sd-image-generation/251-tiny-sd-image-generation.ipynb
 notebooks/254-llm-chatbot/254-llm-chatbot.ipynb
+notebooks/257-llava-multimodal-chatbot/257-llava-multimodal-chatbot.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb
