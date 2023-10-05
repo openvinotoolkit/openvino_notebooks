@@ -69,6 +69,11 @@ ControlNet
 controlnet
 ConvE
 conve
+ConvNet
+ConvNets
+ConvNext
+ConvNeXt
+ConvNeXts
 Convolutional
 convolutional
 CPUs
@@ -255,6 +260,8 @@ LLMs
 LMS
 logits
 LogSoftmax
+lraspp
+LRASPP
 LTS
 LSTM
 macOS
@@ -277,6 +284,7 @@ MLS
 mms
 MMS
 MLP
+mobilenet
 MobileNet
 MobileNetV
 MusicGen
@@ -367,6 +375,7 @@ photorealism
 photorealistic
 Piotr
 Pipelining
+pixelwise
 PNDM
 Pointilism
 PointNet
@@ -500,6 +509,7 @@ subdirectories
 subdirectory
 subgraph
 sublicense
+subpackage
 subtask
 summarization
 Suno
@@ -527,6 +537,7 @@ tokenizing
 TorchMetrics
 TorchScript
 torchvision
+TorchVision
 TTS
 tunable
 tv
