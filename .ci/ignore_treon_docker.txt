@@ -18,6 +18,7 @@
 254-llm-chatbot
 255-mms-massively-multilingual-speech
 256-bark-text-to-audio
+257-llava-multimodal-chatbot
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
 404-style-transfer-webcam

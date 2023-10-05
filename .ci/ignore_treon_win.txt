@@ -22,3 +22,4 @@
 254-llm-chatbot
 255-mms-massively-multilingual-speech
 256-bark-text-to-audio
+257-llava-multimodal-chatbot
