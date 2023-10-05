@@ -28,4 +28,5 @@ notebooks/248-stable-diffusion-xl/248-stable-diffusion-xl.ipynb
 notebooks/249-oneformer-segmentation/249-oneformer-segmentation.ipynb
 notebooks/251-tiny-sd-image-generation/251-tiny-sd-image-generation.ipynb
 notebooks/254-llm-chatbot/254-llm-chatbot.ipynb
+notebooks/257-llava-multimodal-chatbot/257-llava-multimodal-chatbot.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb

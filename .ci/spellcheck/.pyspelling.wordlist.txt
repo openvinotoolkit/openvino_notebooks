@@ -245,13 +245,15 @@ LaBSE
 LAION
 Lasinger
 latents
-LLaMa
 LeViT
 LibriSpeech
 librispeech
 Lim
 Liu
 LLama
+LLaMa
+LLaVA
+llava
 llm
 LLM
 LLMs
