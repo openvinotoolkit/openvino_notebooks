@@ -6,7 +6,7 @@ This tutorial explains how to convert and run inference on the [OneFormer](https
 
 ## Notebook Contents
 
-This tutorial demonstrates step-by-step instructions on how to run HuggingFace OneFormer with OpenVINO.
+This tutorial demonstrates step-by-step instructions on how to run HuggingFace OneFormer with OpenVINO and quantize it with [NNCF](https://github.com/openvinotoolkit/nncf/).
 
 The tutorial consists of the following steps:
 - Install required libraries
@@ -16,4 +16,8 @@ The tutorial consists of the following steps:
 - Select inference device
 - Choose a segmentation task
 - Inference
+- Quantization
+  - Preparing calibration dataset
+  - Run quantization
+  - Compare model size and performance
 - Interactive demo
