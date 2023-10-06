@@ -1,5 +1,5 @@
-openvino-dev==2023.0
-nncf==2.5.0
+openvino>=2023.1.0
+nncf>=2.5.0
 ultralytics==8.0.117
 numpy==1.23.4
 pillow==9.4.0
