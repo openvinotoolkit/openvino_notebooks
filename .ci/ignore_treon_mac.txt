@@ -7,6 +7,7 @@
 225-stable-diffusion-text-to-image
 227-whisper-subtitles-generation
 231-instruct-pix2pix-image-editing
+234-encodec-audio-compression
 235-controlnet-stable-diffusion
 236-stable-diffusion-v2
 237-segment-anything

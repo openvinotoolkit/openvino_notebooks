@@ -1,8 +1,12 @@
 107-speech-recognition-quantization
 108-gpu-device
 117-model-server
+216-attention-center
+220-cross-lingual-books-alignment
 225-stable-diffusion-text-to-image
+227-whisper-subtitles-generation
 231-instruct-pix2pix-image-editing
+234-encodec-audio-compression
 235-controlnet-stable-diffusion
 236-stable-diffusion-v2
 237-segment-anything
@@ -12,6 +16,7 @@
 241-riffusion-text-to-music
 248-stable-diffusion-xl
 249-oneformer-segmentation
+250-music-generation
 251-tiny-sd-image-generation
 252-fastcomposer-image-generation
 253-zeroscope-text2video
