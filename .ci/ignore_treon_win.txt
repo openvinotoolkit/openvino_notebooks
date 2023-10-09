@@ -2,8 +2,11 @@
 108-gpu-device
 117-model-server
 122-quantizing-model-with-accuracy-control
+216-attention-center
+220-cross-lingual-books-alignment
 223-text-prediction
 225-stable-diffusion-text-to-image
+227-whisper-subtitles-generation
 231-instruct-pix2pix-image-editing
 233-blip-visual-language-processing
 235-controlnet-stable-diffusion
@@ -16,6 +19,7 @@
 242-freevc-voice-conversion
 248-stable-diffusion-xl
 249-oneformer-segmentation
+250-music-generation
 251-tiny-sd-image-generation
 252-fastcomposer-image-generation
 253-zeroscope-text2video
