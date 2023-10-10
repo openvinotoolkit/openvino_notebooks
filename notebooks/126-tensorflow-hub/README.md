@@ -1,5 +1,7 @@
 # TensorFlow Hub models + OpenVINO
 
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/126-tensorflow-hub/126-tensorflow-hub.ipynb)
+
 This tutorial demonstrates how to convert TensorFlow Hub models to OpenVINO Intermediate Representation.
 
 [TensorFlow Hub](https://tfhub.dev/) is a library and online platform developed by Google that simplifies machine learning model reuse and sharing. It serves as a repository of pre-trained models, embeddings, and reusable components, allowing researchers and developers to access and integrate state-of-the-art machine learning models into their own projects with ease. TensorFlow Hub provides a diverse range of models for various tasks like image classification, text embedding, and more. It streamlines the process of incorporating these models into TensorFlow workflows, fostering collaboration and accelerating the development of AI applications. This centralized hub enhances model accessibility and promotes the rapid advancement of machine learning capabilities across the community.
