@@ -87,6 +87,7 @@ def clean_test_artifacts(before_test_files, after_test_files):
 
 
 def run_test(notebook_path, root, timeout=7200, clean_artifacts=True):
+    os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path)
     print(f'RUN {notebook_path.relative_to(root)}', flush=True)
     
     with cd(notebook_path):
