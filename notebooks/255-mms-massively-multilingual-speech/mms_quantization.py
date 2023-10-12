@@ -2,6 +2,9 @@ from contextlib import contextmanager
 from pathlib import Path
 from datetime import datetime
 
+from scipy.io.wavfile import write as write_wav
+import soundfile as sf
+
 import nncf
 import numpy as np
 import torch
@@ -31,12 +34,12 @@ device = "CPU"
 
 lid_model_xml_path = Path('models/ov_lid_model.xml')
 compressed_lid_model_xml_path = Path('models/ov_lid_model_c.xml')
-# quantized_lid_model_xml_path = Path('models/ov_lid_model_quantized.xml')
-quantized_lid_model_xml_path = Path('models/ov_lid_model_q-p.xml')
+quantized_lid_model_xml_path = Path('models/ov_lid_model_quantized.xml')
+# quantized_lid_model_xml_path = Path('models/ov_lid_model_q-p.xml')
 asr_model_xml_path = Path(f'models/ov_asr_{LANG_ID}_model.xml')
 compressed_asr_model_xml_path = Path(f'models/ov_asr_{LANG_ID}_model_c.xml')
-# quantized_asr_model_xml_path = Path(f'models/ov_asr_{LANG_ID}_model_quantized.xml')
-quantized_asr_model_xml_path = Path(f'models/ov_asr_{LANG_ID}_model_q-p.xml')
+quantized_asr_model_xml_path = Path(f'models/ov_asr_{LANG_ID}_model_quantized.xml')
+# quantized_asr_model_xml_path = Path(f'models/ov_asr_{LANG_ID}_model_q-p.xml')
 
 mls = load_dataset("facebook/multilingual_librispeech", SAMPLE_LANG, split="test", streaming=True)
 
@@ -97,17 +100,20 @@ def get_asr_model(model_path):
 
 mls = iter(mls)  # make it iterable
 example = next(mls)  # get one example
+# write_wav("deutsch.wav", 16000, example['audio']['array'])
+sf.write("deutsch.wav", example['audio']['array'], 16000)
+exit(0)
 
-compiled_lid_model = get_lid_model(lid_model_xml_path)
+# compiled_lid_model = get_lid_model(lid_model_xml_path)
 # compiled_lid_model = get_lid_model(compressed_lid_model_xml_path)
-# compiled_lid_model = get_lid_model(quantized_lid_model_xml_path)
+compiled_lid_model = get_lid_model(quantized_lid_model_xml_path)
 start_time = datetime.now()
 lang_id = detect_lang(compiled_lid_model, example['audio']['array'])
 print(f"Language detection: {(datetime.now() - start_time).total_seconds()}")
 print(lang_id, LANG_ID)
-compiled_asr_model = get_asr_model(asr_model_xml_path)
+# compiled_asr_model = get_asr_model(asr_model_xml_path)
 # compiled_asr_model = get_asr_model(compressed_asr_model_xml_path)
-# compiled_asr_model = get_asr_model(quantized_asr_model_xml_path)
+compiled_asr_model = get_asr_model(quantized_asr_model_xml_path)
 start_time = datetime.now()
 transcription = recognize_audio(compiled_asr_model, example['audio']['array'])
 print(f"Speech recognition: {(datetime.now() - start_time).total_seconds()}")
@@ -120,29 +126,29 @@ print(transcription)
 # compressed_asr_model = nncf.compress_weights(core.read_model(asr_model_xml_path))
 # ov.save_model(compressed_asr_model, compressed_asr_model_xml_path)
 
-calibration_data = []
-for i in range(1):
-    data = asr_processor(next(mls)['audio']['array'], sampling_rate=16_000, return_tensors="pt")["input_values"]
-    calibration_data.append(data)
-
-quantized_lid_model = nncf.quantize(
-    core.read_model(lid_model_xml_path),
-    calibration_dataset=nncf.Dataset(calibration_data),
-    # preset=nncf.QuantizationPreset.MIXED,
-    preset=nncf.QuantizationPreset.PERFORMANCE,
-    subset_size=len(calibration_data),
-    fast_bias_correction=True,
-    model_type=nncf.ModelType.TRANSFORMER
-)
-ov.save_model(quantized_lid_model, quantized_lid_model_xml_path)
-
-quantized_asr_model = nncf.quantize(
-    core.read_model(asr_model_xml_path),
-    calibration_dataset=nncf.Dataset(calibration_data),
-    # preset=nncf.QuantizationPreset.MIXED,
-    preset=nncf.QuantizationPreset.PERFORMANCE,
-    subset_size=len(calibration_data),
-    fast_bias_correction=True,
-    model_type=nncf.ModelType.TRANSFORMER
-)
-ov.save_model(quantized_asr_model, quantized_asr_model_xml_path)
+# calibration_data = []
+# for i in range(1):
+#     data = asr_processor(next(mls)['audio']['array'], sampling_rate=16_000, return_tensors="pt")["input_values"]
+#     calibration_data.append(data)
+#
+# quantized_lid_model = nncf.quantize(
+#     core.read_model(lid_model_xml_path),
+#     calibration_dataset=nncf.Dataset(calibration_data),
+#     # preset=nncf.QuantizationPreset.MIXED,
+#     preset=nncf.QuantizationPreset.PERFORMANCE,
+#     subset_size=len(calibration_data),
+#     fast_bias_correction=True,
+#     model_type=nncf.ModelType.TRANSFORMER
+# )
+# ov.save_model(quantized_lid_model, quantized_lid_model_xml_path)
+#
+# quantized_asr_model = nncf.quantize(
+#     core.read_model(asr_model_xml_path),
+#     calibration_dataset=nncf.Dataset(calibration_data),
+#     # preset=nncf.QuantizationPreset.MIXED,
+#     preset=nncf.QuantizationPreset.PERFORMANCE,
+#     subset_size=len(calibration_data),
+#     fast_bias_correction=True,
+#     model_type=nncf.ModelType.TRANSFORMER
+# )
+# ov.save_model(quantized_asr_model, quantized_asr_model_xml_path)
