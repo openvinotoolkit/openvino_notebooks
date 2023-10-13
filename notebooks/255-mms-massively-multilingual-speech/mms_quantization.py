@@ -15,7 +15,7 @@ from transformers import Wav2Vec2ForSequenceClassification, AutoFeatureExtractor
 from transformers import Wav2Vec2ForCTC, AutoProcessor
 
 
-SAMPLE_LANG = ['german', 'dutch', 'french', 'spanish', 'italian', 'portuguese', 'polish'][0]
+SAMPLE_LANG = ['german', 'dutch', 'french', 'spanish', 'italian', 'portuguese', 'polish'][2]
 LANG_ID = {'german': 'deu', 'french': 'fra'}[SAMPLE_LANG]
 MAX_SEQ_LENGTH = 30480
 
@@ -100,8 +100,7 @@ def get_asr_model(model_path):
 
 mls = iter(mls)  # make it iterable
 example = next(mls)  # get one example
-# write_wav("deutsch.wav", 16000, example['audio']['array'])
-sf.write("deutsch.wav", example['audio']['array'], 16000)
+sf.write("french.wav", example['audio']['array'], 16000)
 exit(0)
 
 # compiled_lid_model = get_lid_model(lid_model_xml_path)
