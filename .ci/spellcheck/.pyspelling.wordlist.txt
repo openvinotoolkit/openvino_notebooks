@@ -101,6 +101,10 @@ deblurred
 Deblurring
 deblurring
 deconvolution
+decidiffusion
+Deci
+DeciDiffusion
+DeciDiffusion's
 deduplicated
 DeepFloyd
 DeepLabV
@@ -543,6 +547,7 @@ TorchMetrics
 TorchScript
 torchvision
 TorchVision
+transformative
 TTS
 tunable
 tv

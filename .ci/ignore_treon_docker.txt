@@ -26,6 +26,7 @@
 256-bark-text-to-audio
 257-llava-multimodal-chatbot
 258-blip-diffusion-subject-generation
+259-decidiffusion-image-generation
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
 404-style-transfer-webcam
