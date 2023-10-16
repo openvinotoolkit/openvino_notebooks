@@ -164,6 +164,7 @@ GAN
 gaussian
 Gb
 GEC
+GELU
 Girshick
 Gitee
 GitHub
@@ -246,6 +247,7 @@ LaBSE
 LAION
 Lasinger
 latents
+learnable
 LeViT
 LibriSpeech
 librispeech
