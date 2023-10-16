@@ -33,6 +33,7 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [LLM chatbot](notebooks/254-llm-chatbot)<br> | Create LLM-powered Chatbot using OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/255799218-611e7189-8979-4ef5-8a80-5a75e0136b50.png width=600> |
 | [Bark Text-to-Speech](notebooks/256-bark-text-to-audio/)<br> | Text-to-Speech generation using Bark and OpenVINO™ | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/9a770279-0045-480e-95f2-1a2f2d0a5115 width=300>
 | [LLaVA Multimodal Chatbot](notebooks/257-llava-multimodal-chatbot/)<br> | Visual-language assistant with LLaVA and OpenVINO™ | <img src=https://raw.githubusercontent.com/haotian-liu/LLaVA/main/images/llava_logo.png width=300>
+| [BLIP-Diffusion - Subject-Driven Generation](notebooks/258-blip-diffusion-subject-generation)<br> | Subject-driven image generation and editing using BLIP Diffusion and OpenVINO™ | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/0ecf621f-b544-44ae-8258-8a49be704989" width=300 />
 
 ## Table of Contents
 
