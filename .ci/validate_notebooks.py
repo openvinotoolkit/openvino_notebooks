@@ -17,6 +17,7 @@ def parse_arguments():
     parser.add_argument('--test_list', required=False, nargs='+')
     parser.add_argument('--early_stop', action='store_true')
     parser.add_argument('--report_dir', default='report')
+    parser.add_argument('--clean_artifacts', required=False, default=True)
     parser.add_argument('--collect_reports', action='store_true')
     parser.add_argument("--move_notebooks_dir")
     parser.add_argument("--timeout", type=int, default=7200, help="Timeout for running single notebook in seconds")
@@ -85,7 +86,8 @@ def clean_test_artifacts(before_test_files, after_test_files):
             shutil.rmtree(file_path, ignore_errors=True)
 
 
-def run_test(notebook_path, root, timeout=7200):
+def run_test(notebook_path, root, timeout=7200, clean_artifacts=True):
+    os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path)
     print(f'RUN {notebook_path.relative_to(root)}', flush=True)
     
     with cd(notebook_path):
@@ -105,7 +107,8 @@ def run_test(notebook_path, root, timeout=7200):
         except subprocess.TimeoutExpired:
             retcode = -42
 
-        clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
+        if clean_artifacts:
+            clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
     return retcode
 
 
@@ -158,7 +161,7 @@ def main():
     for notebook, report in test_plan.items():
         if report['status'] == "SKIPPED":
             continue
-        status = run_test(report['path'], root, args.timeout)
+        status = run_test(report['path'], root, args.timeout, args.clean_artifacts)
         if status:
             report['status'] = "TIMEOUT" if status == -42 else "FAILED"
         else:

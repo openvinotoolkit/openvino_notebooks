@@ -149,10 +149,10 @@ jobs:
         mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
     - name: Download shared datasets
       run: |
-          mkdir notebooks/data/librispeech
+          mkdir -p notebooks/data/librispeech
           wget  -O notebooks/data/librispeech/test-clean.tar.gz http://openslr.elda.org/resources/12/test-clean.tar.gz
           tar -xvf notebooks/data/librispeech/test-clean.tar.gz
-          mkdir notebooks/data/cifar10
+          mkdir -p notebooks/data/cifar10
           wget -O notebooks/data/cifar10/cifar-10-python.tar.gz https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
     - name: Install dependencies
       run: |
