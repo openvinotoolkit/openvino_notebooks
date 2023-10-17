@@ -1,4 +1,4 @@
-# Prompt controlled bject segmentations with FastSAM and OpenVINO™
+# Object segmentations with FastSAM and OpenVINO™
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F259-fast-segment-anything%2F259-fast-segment-anything.ipynb)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/259-fast-segment-anything/259-fast-segment-anything.ipynb)
