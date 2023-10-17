@@ -156,7 +156,7 @@ def download_file(
                                 headers={"User-agent": "Mozilla/5.0", "Accept-Encoding": "identity"},
                                 stream=True)
         response.raise_for_status()
-    except requests.exceptions.HTTPError as error:
+    except requests.exceptions.HTTPError as error:  # For error associated with not-200 codes. Will output something like: "404 Client Error: Not Found for url: {url}"
         raise Exception(error) from None
     except requests.exceptions.Timeout:
         raise Exception(
