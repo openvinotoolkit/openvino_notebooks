@@ -195,7 +195,7 @@ Demos that demonstrate inference on a particular model.
 | [257-llava-multimodal-chatbot](notebooks/257-llava-multimodal-chatbot)<br> | Visual-language assistant with LLaVA and OpenVINO™ |  <img src=https://raw.githubusercontent.com/haotian-liu/LLaVA/main/images/llava_logo.png width=225> |
 | [258-blip-diffusion-subject-generation](notebooks/258-blip-diffusion-subject-generation)<br> | Subject-driven image generation and editing using BLIP Diffusion and OpenVINO™ | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/0ecf621f-b544-44ae-8258-8a49be704989" width=225 /> |
 | [259-decidiffusion-image-generation](notebooks/259-decidiffusion-image-generation)<br> | Image generation with DeciDiffusion and OpenVINO™ |  <img src=https://github.com/huggingface/optimum-intel/assets/29454499/cd734349-9954-4656-ab96-08a903e846ef width=225> |
-| [260-pix2struct-docvqa](notebooks/260-pix2struct-docvqa)<br> | Document Visual Question Answering using Pix2Struct and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/276283074-df7464e6-8293-4c6c-8f77-8e95d8f94c11.png width=400>
+| [260-pix2struct-docvqa](notebooks/260-pix2struct-docvqa)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/260-pix2struct-docvqa/260-pix2struct-docvqa.ipynb)<br> | Document Visual Question Answering using Pix2Struct and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/276283074-df7464e6-8293-4c6c-8f77-8e95d8f94c11.png width=400>
 
 <div id='-model-training'></div>
 
