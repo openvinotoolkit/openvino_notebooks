@@ -64,6 +64,7 @@ conditionings
 config
 configs
 Connectionist
+ContentVec
 Contrastive
 ControlNet
 controlnet
@@ -490,7 +491,9 @@ slowfast
 SML
 sml
 softmax
+SoftVC
 SOTA
+Sovits
 sparsified
 sparsify
 spectrogram
@@ -515,6 +518,7 @@ summarization
 Suno
 superresolution
 superset
+svc
 Swin
 SwinV
 TartanAir
@@ -577,6 +581,8 @@ VIO
 virtualenv
 ViT
 vit
+vits
+VITS
 VM
 Vladlen
 VOC
