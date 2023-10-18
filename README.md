@@ -191,7 +191,7 @@ Demos that demonstrate inference on a particular model.
 | [255-mms-massively-multilingual-speech](notebooks/255-mms-massively-multilingual-speech/)<br> | MMS: Scaling Speech Technology to 1000+ languages with OpenVINO™ | |
 | [256-bark-text-to-audio](notebooks/256-bark-text-to-audio)<br> | Text-to-Speech generation using Bark and OpenVINO™ |  <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/9a770279-0045-480e-95f2-1a2f2d0a5115 width=225> |
 | [257-llava-multimodal-chatbot](notebooks/257-llava-multimodal-chatbot)<br> | Visual-language assistant with LLaVA and OpenVINO™ |  <img src=https://raw.githubusercontent.com/haotian-liu/LLaVA/main/images/llava_logo.png width=225> |
-
+| [259-softvc-voice-conversion](notebooks/259-softvc-voice-conversion)<br> | SoftVC VITS Singing Voice Conversion and OpenVINO™ | |
 <div id='-model-training'></div>
 
 ### 🏃 Model Training

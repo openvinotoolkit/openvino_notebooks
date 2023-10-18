@@ -1,4 +1,4 @@
-# SoftVC VITS Singing Voice Conversion and OpenVINO
+# SoftVC VITS Singing Voice Conversion and OpenVINO™
 
 This tutorial is based on SoftVC VITS Singing Voice Conversion project. The purpose of this project was to enable developers to have their beloved anime characters perform singing tasks. The developers' intention was to focus solely on fictional characters and avoid any involvement of real individuals, anything related to real individuals deviates from the developer's original intention.
 
