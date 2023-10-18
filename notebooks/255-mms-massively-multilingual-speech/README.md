@@ -7,15 +7,16 @@ There are the different models open sourced in the MMS project: Automatic Speech
 
 ## Notebook Contents
 
-This notebook demonstrates how to convert and run ASR and LID models using OpenVINO.
+This notebook demonstrates how to convert and run ASR and LID models using OpenVINO. An additional part demonstrates how to run models quantization with [NNCF](https://github.com/openvinotoolkit/nncf/) to improve their inference speed.
 
 The tutorial consists of the following steps:
 
 - Install and import prerequisite packages
 - Download pretrained model and processor
-- Prepare an example audio using https://huggingface.co/datasets/multilingual_librispeech
+- Prepare an example audio using [multilingual_librispeech](https://huggingface.co/datasets/facebook/multilingual_librispeech) dataset
 - Make inference with the original model
 - Convert models to OpenVINO IR model and make inference
+- Quantize models with [NNCF](https://github.com/openvinotoolkit/nncf/)
 - Interactive demo with gradio
 
 ## Installation instructions
