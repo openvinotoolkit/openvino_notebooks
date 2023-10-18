@@ -492,6 +492,7 @@ slowfast
 SML
 sml
 softmax
+softvc
 SoftVC
 SOTA
 Sovits
