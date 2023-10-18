@@ -43,4 +43,5 @@ notebooks/254-llm-chatbot/254-llm-chatbot.ipynb
 notebooks/255-mms-massively-multilingual-speech/255-mms-massively-multilingual-speech.ipynb
 notebooks/256-bark-text-to-audio/256-bark-text-to-audio.ipynb
 notebooks/257-llava-multimodal-chatbot/257-llava-multimodal-chatbot.ipynb
+notebooks/258-blip-diffusion-subject-generation/258-blip-diffusion-subject-generation.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb

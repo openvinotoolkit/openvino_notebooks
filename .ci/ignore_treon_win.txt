@@ -28,3 +28,4 @@
 255-mms-massively-multilingual-speech
 256-bark-text-to-audio
 257-llava-multimodal-chatbot
+258-blip-diffusion-subject-generation
