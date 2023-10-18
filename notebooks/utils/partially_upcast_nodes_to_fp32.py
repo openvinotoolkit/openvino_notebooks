@@ -158,6 +158,13 @@ def infer_tracked_op_on_gpu(op: Node, input_vals: Tuple, precision='f32') -> np.
     del request, exec_net, ov_model
     return result[0]
 
+def is_model_calibrated(model) -> bool:
+    for node in model.get_ordered_ops():
+        if node.get_type_name() not in ops_to_track_map.keys():
+            continue
+        if 'disable_fp16_compression_0' in node.get_rt_info().keys():
+            return True
+    return False
 
 def mark_nodes_to_upcast_to_fp32(model: Model, nodes: List[Node], fp16_infer_vals: List, fp32_infer_vals: List,
                                  thresholds: None) -> None:
