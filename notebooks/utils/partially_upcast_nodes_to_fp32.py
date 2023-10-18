@@ -28,7 +28,7 @@ def get_thresholds_per_op():
     }
 
 
-def inject_to_partially_upcast_nodes_to_fp32(orig, thresholds_per_op=None) -> Callable:  # orig type is OVModelForCausalLM
+def start_async_decorated_with_partially_upcast(orig, thresholds_per_op=None) -> Callable:  # orig type is OVModelForCausalLM
     def new_start_async(inputs, shared_memory):
         new_model = partially_upcast_nodes_to_fp32(orig.model, inputs, thresholds_per_op)
         orig.model = new_model
@@ -158,7 +158,7 @@ def infer_tracked_op_on_gpu(op: Node, input_vals: Tuple, precision='f32') -> np.
     del request, exec_net, ov_model
     return result[0]
 
-def is_model_calibrated(model) -> bool:
+def is_model_partially_upcasted(model) -> bool:
     for node in model.get_ordered_ops():
         if node.get_type_name() not in ops_to_track_map.keys():
             continue
@@ -178,7 +178,7 @@ def mark_nodes_to_upcast_to_fp32(model: Model, nodes: List[Node], fp16_infer_val
             node.get_rt_info()['disable_fp16_compression_0'] = ''
 
 
-def compare_tensors(node: Node, a: np.ndarray, b: np.ndarray, new_thresholds_per_op) -> bool:
+def compare_tensors(node: Node, a: np.ndarray, b: np.ndarray, new_thresholds_per_op, silent: bool = True) -> bool:
     """
     If values differ more than a certain metric then function returns True
     """
@@ -204,5 +204,6 @@ def compare_tensors(node: Node, a: np.ndarray, b: np.ndarray, new_thresholds_per
     if mean_rel_error < rel_tol:
         return False
     if rel_diff_ratio > rel_threshold_ratio:
-        print(f'upcasted node {node.get_friendly_name()} with 0.1 rel2_diff_ratio {rel_diff_ratio} and mean_rel_error {mean_rel_error}')
+        if not silent:
+            print(f'upcasted node {node.get_friendly_name()} with 0.1 rel2_diff_ratio {rel_diff_ratio} and mean_rel_error {mean_rel_error}')
         return True
