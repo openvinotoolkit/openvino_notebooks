@@ -151,10 +151,9 @@ def download_file(
         directory = Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
         filename = directory / Path(filename)
-    
     try:
         response = requests.get(url=url, 
-                                headers={"User-agent": "Mozilla/5.0"}, 
+                                headers={"User-agent": "Mozilla/5.0", "Accept-Encoding": "identity"},
                                 stream=True)
         response.raise_for_status()
     except requests.exceptions.HTTPError as error:  # For error associated with not-200 codes. Will output something like: "404 Client Error: Not Found for url: {url}"
