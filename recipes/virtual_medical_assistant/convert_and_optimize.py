@@ -6,9 +6,7 @@ from transformers import AutoTokenizer
 
 MODEL_MAPPING = {
     "llama2-7B": "meta-llama/Llama-2-7b-chat-hf",
-    "llama2-13B": "meta-llama/Llama-2-13b-chat-hf",
-    "redpajama-3B": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
-    "redpajama-7B": "togethercomputer/RedPajama-INCITE-7B-Chat",
+    "llama2-13B": "meta-llama/Llama-2-13b-chat-hf"
 }
 
 
@@ -39,7 +37,7 @@ def convert_chat_model(model_type, model_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--chat_model_type", type=str, choices=["redpajama-3B", "redpajama-7B", "llama2-7B", "llama2-13B"],
+    parser.add_argument("--chat_model_type", type=str, choices=["llama2-7B", "llama2-13B"],
                         default="llama2-7B", help="Chat model to be converted")
     parser.add_argument("--model_dir", type=str, default="model", help="Directory to place the model in")
 
