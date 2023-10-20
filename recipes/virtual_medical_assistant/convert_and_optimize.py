@@ -4,15 +4,17 @@ from pathlib import Path
 from optimum.intel import OVModelForCausalLM
 from transformers import AutoTokenizer
 
-RED_PAJAMA_MODEL_MAPPING = {
-    "3B": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
-    "7B": "togethercomputer/RedPajama-INCITE-7B-Chat"
+MODEL_MAPPING = {
+    "llama2-7B": "meta-llama/Llama-2-7b-chat-hf",
+    "llama2-13B": "meta-llama/Llama-2-13b-chat-hf",
+    "redpajama-3B": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
+    "redpajama-7B": "togethercomputer/RedPajama-INCITE-7B-Chat",
 }
 
 
-def convert_red_pajama(model_size, model_dir):
+def convert_chat_model(model_type, model_dir):
     """
-    Convert Red Pajama Chat model
+    Convert chat model
 
     Params:
         model_size: selected mode size
@@ -20,14 +22,14 @@ def convert_red_pajama(model_size, model_dir):
     Returns:
        Path to exported model
     """
-    output_dir = model_dir / "red_pajama"
-    model_name = RED_PAJAMA_MODEL_MAPPING[model_size]
+    output_dir = model_dir / model_type
+    model_name = MODEL_MAPPING[model_type]
     # load model and convert it to OpenVINO
-    pajama_model = OVModelForCausalLM.from_pretrained(model_name, export=True, compile=False)
+    model = OVModelForCausalLM.from_pretrained(model_name, export=True, compile=False)
     # change precision to FP16
-    pajama_model.half()
+    model.half()
     # save model to disk
-    pajama_model.save_pretrained(output_dir)
+    model.save_pretrained(output_dir)
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     tokenizer.save_pretrained(output_dir)
@@ -37,9 +39,9 @@ def convert_red_pajama(model_size, model_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--rp_model_size", type=str, choices=["3B", "7B"], default="3B",
-                        help="Red Pajama model size to be converted")
+    parser.add_argument("--chat_model_type", type=str, choices=["redpajama-3B", "redpajama-7B", "llama2-7B", "llama2-13B"],
+                        default="llama2-7B", help="Chat model to be converted")
     parser.add_argument("--model_dir", type=str, default="model", help="Directory to place the model in")
 
     args = parser.parse_args()
-    convert_red_pajama(args.rp_model_size, Path(args.model_dir))
+    convert_chat_model(args.chat_model_type, Path(args.model_dir))
