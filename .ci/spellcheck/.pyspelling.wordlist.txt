@@ -102,6 +102,10 @@ deblurred
 Deblurring
 deblurring
 deconvolution
+decidiffusion
+Deci
+DeciDiffusion
+DeciDiffusion's
 deduplicated
 DeepFloyd
 DeepLabV
@@ -165,6 +169,7 @@ GAN
 gaussian
 Gb
 GEC
+GELU
 Girshick
 Gitee
 GitHub
@@ -247,6 +252,7 @@ LaBSE
 LAION
 Lasinger
 latents
+learnable
 LeViT
 LibriSpeech
 librispeech
@@ -418,6 +424,7 @@ Pythia
 pytorch
 PyTorch
 PyTorchVideo
+QFormer
 Qi
 quant
 quantized
@@ -545,6 +552,7 @@ TorchMetrics
 TorchScript
 torchvision
 TorchVision
+transformative
 TTS
 tunable
 tv
