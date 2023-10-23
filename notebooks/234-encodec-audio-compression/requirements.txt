@@ -1,7 +1,10 @@
 librosa>=0.8.1
 --find-links https://download.pytorch.org/whl/torch_stable.html
+torch==1.13.1; sys_platform == 'darwin'
+torch==1.13.1+cpu; sys_platform == 'linux' or platform_system == 'Windows'
 torchaudio==0.13.1; sys_platform == 'darwin'
 torchaudio==0.13.1+cpu; sys_platform == 'linux' or platform_system == 'Windows'
 encodec;python_version>"3.7"
 git+https://git@github.com/eaidova/encodec#egg=encodec;python_version=="3.7"
 gradio
+openvino>=2023.1.0

@@ -17,6 +17,8 @@ The tutorial consists of the following steps:
 - Install prerequisites
 - Download and convert models from a public source using the [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
 - Create an inference pipeline for grammatical error checking
+- Optimize grammar correction pipeline with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.
+- Compare original and optimized pipelines from performance and accuracy standpoints.
 
 As the result, will be created inference pipeline which accepts text with grammatical errors and provides text with corrections as output.
 
