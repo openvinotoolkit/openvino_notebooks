@@ -197,7 +197,7 @@ Demos that demonstrate inference on a particular model.
 | [259-decidiffusion-image-generation](notebooks/259-decidiffusion-image-generation)<br> | Image generation with DeciDiffusion and OpenVINO™ |  <img src=https://github.com/huggingface/optimum-intel/assets/29454499/cd734349-9954-4656-ab96-08a903e846ef width=225> |
 | [260-pix2struct-docvqa](notebooks/260-pix2struct-docvqa)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/260-pix2struct-docvqa/260-pix2struct-docvqa.ipynb)<br> | Document Visual Question Answering using Pix2Struct and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/276283074-df7464e6-8293-4c6c-8f77-8e95d8f94c11.png width=400>
 | [261-fast-segment-anything](notebooks/261-fast-segment-anything/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F261-fast-segment-anything%2F261-fast-segment-anything.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/261-fast-segment-anything/261-fast-segment-anything.ipynb) | Object segmentations with FastSAM and OpenVINO™ | <img src="https://user-images.githubusercontent.com/26833433/248551984-d98f0f6d-7535-45d0-b380-2e1440b52ad7.jpg" width=225> |
-| [262-softvc-voice-conversion](notebooks/261-softvc-voice-conversion)<br> | SoftVC VITS Singing Voice Conversion and OpenVINO™ | |
+| [262-softvc-voice-conversion](notebooks/262-softvc-voice-conversion)<br> | SoftVC VITS Singing Voice Conversion and OpenVINO™ | |
 
 <div id='-model-training'></div>
 
