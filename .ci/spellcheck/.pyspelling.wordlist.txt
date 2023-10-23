@@ -94,6 +94,7 @@ DataModule
 dataset
 datasets
 DDIM
+DDPMs
 de
 Deblur
 deblur
@@ -282,6 +283,7 @@ LSTM
 macOS
 Mahalanobis
 Mapillary
+Markovian
 Martyniuk
 maskrcnn
 MediaPipe
