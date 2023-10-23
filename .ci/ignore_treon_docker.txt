@@ -28,6 +28,7 @@
 258-blip-diffusion-subject-generation
 259-decidiffusion-image-generation
 260-pix2struct-docvqa
+262-softvc-voice-conversion
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
 404-style-transfer-webcam
