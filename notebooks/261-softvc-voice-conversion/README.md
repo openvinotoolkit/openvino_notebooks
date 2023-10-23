@@ -1,5 +1,8 @@
 # SoftVC VITS Singing Voice Conversion and OpenVINO™
 
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/261-softvc-voice-conversion/261-softvc-voice-conversion.ipynb)
+
+
 This tutorial is based on SoftVC VITS Singing Voice Conversion project. The purpose of this project was to enable developers to have their beloved anime characters perform singing tasks. The developers' intention was to focus solely on fictional characters and avoid any involvement of real individuals, anything related to real individuals deviates from the developer's original intention.
 
 The singing voice conversion model uses SoftVC content encoder to extract speech features from the source audio. These feature vectors are directly fed into VITS without the need for conversion to a text-based intermediate representation. As a result, the pitch and intonations of the original audio are preserved.
