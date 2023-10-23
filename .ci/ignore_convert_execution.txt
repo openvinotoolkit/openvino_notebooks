@@ -47,4 +47,5 @@ notebooks/258-blip-diffusion-subject-generation/258-blip-diffusion-subject-gener
 notebooks/259-decidiffusion-image-generation/259-decidiffusion-image-generation.ipynb
 notebooks/260-pix2struct-docvqa/260-pix2struct-docvqa.ipynb
 notebooks/262-softvc-voice-conversion/262-softvc-voice-conversion.ipynb
+notebooks/263-wuerstchen-image-generation/263-wuerstchen-image-generation.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb

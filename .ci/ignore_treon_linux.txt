@@ -32,5 +32,6 @@
 258-blip-diffusion-subject-generation
 259-decidiffusion-image-generation
 260-pix2struct-docvqa
-262-softvc-voice-conversion
+263-softvc-voice-conversion
+258-wuerstchen-image-generation
 404-style-transfer-webcam
