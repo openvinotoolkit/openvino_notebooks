@@ -153,6 +153,7 @@ Evol
 EVS
 fastcomposer
 FastComposer
+FastSAM
 FC
 FIL
 finetuned
