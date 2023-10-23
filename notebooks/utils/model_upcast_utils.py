@@ -178,7 +178,7 @@ def mark_nodes_to_upcast_to_fp32(model: Model, nodes: List[Node], fp16_infer_val
             node.get_rt_info()['disable_fp16_compression_0'] = ''
 
 
-def compare_tensors(node: Node, a: np.ndarray, b: np.ndarray, new_thresholds_per_op, silent: bool = False) -> bool:
+def compare_tensors(node: Node, a: np.ndarray, b: np.ndarray, new_thresholds_per_op, silent: bool = True) -> bool:
     """
     If values differ more than a certain metric then function returns True
     """
