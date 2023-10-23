@@ -132,6 +132,8 @@ distilbert
 distiluse
 DL
 docstring
+DocVQA
+docvqa
 doi
 Dollár
 donut
@@ -412,6 +414,7 @@ preprocessing
 preprocessor
 pretrained
 Pretraining
+pretraining
 promptable
 proto
 PRs
@@ -515,6 +518,8 @@ SSDLite
 sst
 STFT
 streamable
+Struct
+struct
 stylization
 subchunk
 subchunks
@@ -559,6 +564,7 @@ tv
 TypeScript
 Udnie
 UI
+UIs
 UINT
 Ultralytics
 Uncheck
