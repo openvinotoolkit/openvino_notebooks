@@ -12,12 +12,6 @@ import openvino as ov
 ops_to_track_map = {
     'Convolution': convolution,
     'MatMul': matmul,
-    # todo: implement for some other ops
-    # 'ReduceSum': reduce_sum,
-    # 'ReduceMean': reduce_mean,
-    # 'ReduceProd': reduce_prod,
-    # 'Exp',
-    # 'Interpolate'
 }
 
 
@@ -26,17 +20,6 @@ def get_thresholds_per_op():
         'Convolution': (0.1, 0.003, 0.00),
         'MatMul': (0.1, 0.04, 0.03),
     }
-
-
-def start_async_decorated_with_partially_upcast(orig, thresholds_per_op=None) -> Callable:  # orig type is OVModelForCausalLM
-    def new_start_async(inputs, shared_memory):
-        new_model = partially_upcast_nodes_to_fp32(orig.model, inputs, thresholds_per_op)
-        orig.model = new_model
-        orig.request = None
-        orig.compile()  # compile will set orig.request for OVModelForCausalLM
-        orig.request.start_async(inputs, shared_memory=shared_memory)
-
-    return new_start_async
 
 
 def partially_upcast_nodes_to_fp32(orig_model: Model, example_input: Union[List, Dict],
@@ -58,6 +41,8 @@ def insert_results_for_tracked_ops(model) -> (List, List, List):
     outputs = []
     for i, op in enumerate(model.get_ordered_ops()):
         if op.get_type_name() not in ops_to_track_map.keys():
+            continue
+        if any(map(lambda input: input.get_node().get_type_name() == 'Result', op.output(0).get_target_inputs())):
             continue
         outputs.append(op.output(0))
         nodes_to_track.append(op)
