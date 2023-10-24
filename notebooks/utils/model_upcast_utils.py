@@ -1,13 +1,10 @@
-from typing import List, Dict, Union, Tuple, Callable
-
 import numpy as np
-from openvino._pyopenvino import Node
-from openvino.runtime import Core, Model  # pylint: disable=no-name-in-module,import-error
-from openvino.runtime.op import Parameter, Constant
-from openvino.runtime.opset12 import add, multiply, matmul, convert, convolution, reduce_sum, reduce_mean, reduce_prod
-from openvino.runtime.utils.types import get_element_type
-
 import openvino as ov
+from openvino._pyopenvino import Node
+from openvino.runtime.op import Parameter, Constant
+from openvino.runtime.opset12 import matmul, convolution
+from openvino.runtime.utils.types import get_element_type
+from typing import List, Dict, Union, Tuple
 
 ops_to_track_map = {
     'Convolution': convolution,
@@ -22,8 +19,8 @@ def get_thresholds_per_op():
     }
 
 
-def partially_upcast_nodes_to_fp32(orig_model: Model, example_input: Union[List, Dict],
-                                   thresholds_per_op: Dict[str, Tuple] = None) -> Model:
+def partially_upcast_nodes_to_fp32(orig_model: ov.Model, example_input: Union[List, Dict],
+                                   thresholds_per_op: Dict[str, Tuple] = None) -> ov.Model:
     model = orig_model.clone()  # todo: check if need to clone orig_models
     nodes_to_track, outs_to_track, _ = insert_results_for_tracked_ops(model)
     fp16_full_net_infer_values = infer_full_net_in_fp16(nodes_to_track, model, example_input)
@@ -82,8 +79,9 @@ def is_decompression_convert(node: Node) -> bool:
 
 
 def infer_full_net_in_fp16(nodes_to_track: List[Node], orig_model: ov.Model, example_inputs: List) -> List[Tuple]:
-    ie = Core()
-    exec_net = ie.compile_model(orig_model, 'GPU', config={"INFERENCE_PRECISION_HINT": "f16"})
+    core = ov.Core()
+    assert 'GPU' in core.available_devices
+    exec_net = core.compile_model(orig_model, 'GPU', config={"INFERENCE_PRECISION_HINT": "f16"})
     request = exec_net.create_infer_request()
     results = request.infer(example_inputs)
 
@@ -135,13 +133,13 @@ def infer_tracked_op_on_gpu(op: Node, input_vals: Tuple, precision='f32') -> np.
     new_op = ops_to_track_map[op.get_type_name()](*parameters, **op.get_attributes())
     ov_model = ov.Model([new_op], parameters)
 
-    ie = Core()
-    exec_net = ie.compile_model(ov_model, 'GPU', config={"INFERENCE_PRECISION_HINT": precision})
+    exec_net = ov.Core().compile_model(ov_model, 'GPU', config={"INFERENCE_PRECISION_HINT": precision})
     request = exec_net.create_infer_request()
     result = request.infer(input_vals)
     assert len(result) == 1
     del request, exec_net, ov_model
     return result[0]
+
 
 def is_model_partially_upcasted(model) -> bool:
     for node in model.get_ordered_ops():
@@ -151,7 +149,8 @@ def is_model_partially_upcasted(model) -> bool:
             return True
     return False
 
-def mark_nodes_to_upcast_to_fp32(model: Model, nodes: List[Node], fp16_infer_vals: List, fp32_infer_vals: List,
+
+def mark_nodes_to_upcast_to_fp32(model: ov.Model, nodes: List[Node], fp16_infer_vals: List, fp32_infer_vals: List,
                                  thresholds: None) -> None:
     nodes_with_errors = []
     for node, fp16_val, fp32_val in zip(nodes, fp16_infer_vals, fp32_infer_vals):
