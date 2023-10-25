@@ -36,6 +36,7 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [BLIP-Diffusion - Subject-Driven Generation](notebooks/258-blip-diffusion-subject-generation)<br> | Subject-driven image generation and editing using BLIP Diffusion and OpenVINO™ | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/0ecf621f-b544-44ae-8258-8a49be704989" width=300 />
 | [DeciDiffusion](notebooks/259-decidiffusion-image-generation/)<br> | Image generation with DeciDiffusion and OpenVINO™ | <img src=https://github.com/huggingface/optimum-intel/assets/29454499/cd734349-9954-4656-ab96-08a903e846ef width=300> |
 | [SoftVC VITS Singing Voice Conversion](notebooks/262-softvc-voice-conversion)<br> | SoftVC VITS Singing Voice Conversion and OpenVINO™ | |
+| [Latent Consistency Models: the next generation of Image Generation models ](notebooks/263-latent-consistency-models-image-generation)<br> | Image generation with Latent Consistency Models (LCM) and OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/277367065-13a8f622-8ea7-4d12-b3f8-241d4499305e.png width=300> |
 
 ## Table of Contents
 
@@ -199,6 +200,7 @@ Demos that demonstrate inference on a particular model.
 | [260-pix2struct-docvqa](notebooks/260-pix2struct-docvqa)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/260-pix2struct-docvqa/260-pix2struct-docvqa.ipynb)<br> | Document Visual Question Answering using Pix2Struct and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/276283074-df7464e6-8293-4c6c-8f77-8e95d8f94c11.png width=400>
 | [261-fast-segment-anything](notebooks/261-fast-segment-anything/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F261-fast-segment-anything%2F261-fast-segment-anything.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/261-fast-segment-anything/261-fast-segment-anything.ipynb) | Object segmentations with FastSAM and OpenVINO™ | <img src="https://user-images.githubusercontent.com/26833433/248551984-d98f0f6d-7535-45d0-b380-2e1440b52ad7.jpg" width=225> |
 | [262-softvc-voice-conversion](notebooks/262-softvc-voice-conversion)<br> | SoftVC VITS Singing Voice Conversion and OpenVINO™ | |
+| [263-latent-consistency-models-image-generation](notebooks/263-latent-consistency-models-image-generation)<br> | Image generation with Latent Consistency Models (LCM) and OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/277367065-13a8f622-8ea7-4d12-b3f8-241d4499305e.png width=225> |
 
 <div id='-model-training'></div>
 
