@@ -1,5 +1,5 @@
 # Image generation with Würstchen and OpenVINO
-| Antropomorphic cat dressed as a firefighter |
+| Anthropomorphic cat dressed as a firefighter |
 | --- |
 | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/6917c558-d74c-4cc9-b81a-679ce0a299ee" /> |
 
