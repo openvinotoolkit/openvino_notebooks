@@ -15,6 +15,7 @@ This tutorial consists of the following steps:
     - Decoder pipeline
 - Compiling models
 - Building the pipeline
+- Inference
 - Interactive inference
 
 ## Installation instructions
