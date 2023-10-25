@@ -48,4 +48,5 @@ notebooks/259-decidiffusion-image-generation/259-decidiffusion-image-generation.
 notebooks/260-pix2struct-docvqa/260-pix2struct-docvqa.ipynb
 notebooks/262-softvc-voice-conversion/262-softvc-voice-conversion.ipynb
 notebooks/263-latent-consistency-models-image-generation/263-latent-consistency-models-image-generation.ipynb
+notebooks/265-qrcode-monster/265-qrcode-monster.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb
