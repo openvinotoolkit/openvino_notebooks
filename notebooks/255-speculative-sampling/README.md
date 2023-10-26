@@ -1,5 +1,7 @@
 # Text Generation via Speculative Sampling, KV Caching, and OpenVINO™
 
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/255-speculative-sampling/255-speculative-sampling.ipynb)
+
 As model sizes grow, Generative AI implementations require significant inference resources. This not only increases the cost per generation from a prompt, but also increases the power consumption used to serve such requests.
 
 Inference optimizations for text generation are essential for reducing costs and power consumption. When optimizing the inference process, the amount of time and energy required to generate text can be significantly reduced. This can lead to cost savings in terms of hardware and software, as well as reduced power consumption. Additionally, inference optimizations can help improve the accuracy of text generation as well as the speed at which it can be generated. This can lead to an improved user experience and increased efficiency in text-generation tasks. In summary, inference optimizations for text generation are essential to reduce costs and power consumption, while also improving the accuracy and speed of text generation.
@@ -41,7 +43,7 @@ If you have not installed all required dependencies, follow the [Installation Gu
 
 ## Acknowlegement
 
-A numpy version of speculative sampling is available from Mody at https://jaykmody.com/blog/speculative-sampling/ - while our codebase was written from scratch, we did make use of this code back as a validation point for the technique.
+A numpy version of speculative sampling is available from Mody at https://jaykmody.com/blog/speculative-sampling/ - while our codebase was written from scratch, we did make use of this code as a validation point for the technique.
 
 ## References
 [1] Pope et al, *Efficiently Scaling Transformer Inference,* http://arxiv.org/abs/2211.05102
