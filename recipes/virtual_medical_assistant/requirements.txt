@@ -1,6 +1,6 @@
 openvino-dev==2023.1.0
-optimum-intel==1.11.0
-optimum==1.13.2
+optimum-intel==1.10.1
+optimum==1.12.0
 nncf==2.6.0
 tensorflow-cpu==2.12.0
 onnx==1.14.1
