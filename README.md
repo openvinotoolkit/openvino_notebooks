@@ -201,6 +201,7 @@ Demos that demonstrate inference on a particular model.
 | [261-fast-segment-anything](notebooks/261-fast-segment-anything/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F261-fast-segment-anything%2F261-fast-segment-anything.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/261-fast-segment-anything/261-fast-segment-anything.ipynb) | Object segmentations with FastSAM and OpenVINO™ | <img src="https://user-images.githubusercontent.com/26833433/248551984-d98f0f6d-7535-45d0-b380-2e1440b52ad7.jpg" width=225> |
 | [262-softvc-voice-conversion](notebooks/262-softvc-voice-conversion)<br> | SoftVC VITS Singing Voice Conversion and OpenVINO™ | |
 | [263-latent-consistency-models-image-generation](notebooks/263-latent-consistency-models-image-generation)<br> | Image generation with Latent Consistency Models (LCM) and OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/277367065-13a8f622-8ea7-4d12-b3f8-241d4499305e.png width=225> |
+| [266-table-question-answering](notebooks/266-table-question-answering)<br> | TAPAS base model fine-tuned on WikiTable Questions (WTQ) with OpenVINO™ ||
 
 <div id='-model-training'></div>
 
