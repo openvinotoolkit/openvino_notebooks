@@ -19,6 +19,10 @@ def get_thresholds_per_op():
     }
 
 
+def rt_info_name_to_keep_orig_precision():
+    return 'precise_0'
+
+
 def partially_upcast_nodes_to_fp32(orig_model: ov.Model, example_input: Union[List, Dict],
                                    thresholds_per_op: Dict[str, Tuple] = None) -> ov.Model:
     model = orig_model.clone()  # todo: check if need to clone orig_models
@@ -145,7 +149,7 @@ def is_model_partially_upcasted(model) -> bool:
     for node in model.get_ordered_ops():
         if node.get_type_name() not in ops_to_track_map.keys():
             continue
-        if 'disable_fp16_compression_0' in node.get_rt_info().keys():
+        if rt_info_name_to_keep_orig_precision() in node.get_rt_info().keys():
             return True
     return False
 
@@ -159,7 +163,7 @@ def mark_nodes_to_upcast_to_fp32(model: ov.Model, nodes: List[Node], fp16_infer_
 
     for node in model.get_ordered_ops():
         if node.get_friendly_name() in nodes_with_errors:
-            node.get_rt_info()['disable_fp16_compression_0'] = ''
+            node.get_rt_info()[rt_info_name_to_keep_orig_precision()] = ''
 
 
 def compare_tensors(node: Node, a: np.ndarray, b: np.ndarray, new_thresholds_per_op, silent: bool = True) -> bool:
