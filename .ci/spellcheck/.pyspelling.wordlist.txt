@@ -40,6 +40,7 @@ bilinear
 biometrics
 boolean
 CentOS
+CFG
 charlist
 charlists
 chatbot
@@ -93,6 +94,7 @@ DataModule
 dataset
 datasets
 DDIM
+DDPMs
 de
 Deblur
 deblur
@@ -141,6 +143,7 @@ Downloader
 downloader
 downsampled
 dpredictor
+Dreamshaper
 dropdown
 editability
 EfficientNet
@@ -255,6 +258,8 @@ LaBSE
 LAION
 Lasinger
 latents
+LCMs
+LDMs
 learnable
 LeViT
 LibriSpeech
@@ -278,6 +283,7 @@ LSTM
 macOS
 Mahalanobis
 Mapillary
+Markovian
 Martyniuk
 maskrcnn
 MediaPipe
@@ -332,6 +338,8 @@ nncf
 noncomparable
 NONINFRINGEMENT
 nsamples
+nsfw
+NSFW
 numpy
 NumPy
 OASST
