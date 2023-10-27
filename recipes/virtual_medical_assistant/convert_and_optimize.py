@@ -10,7 +10,7 @@ MODEL_MAPPING = {
 }
 
 
-def convert_chat_model(model_type, quantize_weights, model_dir):
+def convert_chat_model(model_type: str, quantize_weights: bool, model_dir: Path) -> Path:
     """
     Convert chat model
 
