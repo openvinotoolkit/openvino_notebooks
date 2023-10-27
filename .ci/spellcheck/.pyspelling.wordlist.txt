@@ -617,6 +617,8 @@ Wav
 WavLM
 WebGL
 WER
+WIKISQL
+WIKITQ
 Wofk
 XCode
 Xeon

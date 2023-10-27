@@ -1,0 +1,11 @@
+Rank,City,Country,Population,Is capital
+1,Berlin,Germany,3755251,Yes
+2,Madrid,Spain,3280782,Yes
+3,Rome,Italy,2748109,Yes
+4,Bucharest,Romania,2162281,Yes
+5,Paris,France,2102650,Yes
+6,Vienna,Austria,1982442,Yes
+7,Hamburg,Germany,1892122,No
+8,Warsaw,Poland,1861644,Yes
+9,Budapest,Hungary,1671004,Yes
+10,Barcelona,Spain,1636193,No
