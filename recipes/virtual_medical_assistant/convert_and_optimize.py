@@ -10,7 +10,7 @@ MODEL_MAPPING = {
 }
 
 
-def convert_chat_model(model_type, quantize_weights, model_dir, access_token=None):
+def convert_chat_model(model_type, quantize_weights, model_dir):
     """
     Convert chat model
 
@@ -26,13 +26,13 @@ def convert_chat_model(model_type, quantize_weights, model_dir, access_token=Non
 
     if quantize_weights:
         # load model
-        model = AutoModelForCausalLM.from_pretrained(model_name, token=access_token)
+        model = AutoModelForCausalLM.from_pretrained(model_name)
         # change precision to INT8 and save to disk
         quantizer = OVQuantizer.from_pretrained(model)
         quantizer.quantize(save_directory=output_dir, weights_only=True)
     else:
         # load model and convert it to OpenVINO
-        model = OVModelForCausalLM.from_pretrained(model_name, export=True, compile=False, token=access_token)
+        model = OVModelForCausalLM.from_pretrained(model_name, export=True, compile=False)
         # change precision to FP16
         model.half()
         # save model to disk
@@ -48,9 +48,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--chat_model_type", type=str, choices=["llama2-7B", "llama2-13B"],
                         default="llama2-7B", help="Chat model to be converted")
-    parser.add_argument("--access_token", type=str, default=None, help="Access token to the gated repo (Llama2)")
     parser.add_argument("--quantize_weights", default=False, action="store_true", help="Whether to quantize weights to INT8")
     parser.add_argument("--model_dir", type=str, default="model", help="Directory to place the model in")
 
     args = parser.parse_args()
-    convert_chat_model(args.chat_model_type, args.quantize_weights, Path(args.model_dir), args.access_token)
+    convert_chat_model(args.chat_model_type, args.quantize_weights, Path(args.model_dir))

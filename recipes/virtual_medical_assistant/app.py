@@ -19,7 +19,7 @@ You're an assistant of a doctor. You talk to a patient. Your task is to get all 
     prompt = system_prompt + message_template.format("I feel pain in my back", "")
 
     ov_config = {'PERFORMANCE_HINT': 'LATENCY', 'NUM_STREAMS': '1', "CACHE_DIR": ""}
-    chat_model = OVModelForCausalLM.from_pretrained(chat_model_dir, device="CPU", config=AutoConfig.from_pretrained(chat_model_dir), ov_config=ov_config)
+    chat_model = OVModelForCausalLM.from_pretrained(chat_model_dir, device="AUTO", config=AutoConfig.from_pretrained(chat_model_dir), ov_config=ov_config)
     tokenizer = AutoTokenizer.from_pretrained(chat_model_dir)
 
     inputs = tokenizer(prompt, return_tensors="pt").to(chat_model.device)
