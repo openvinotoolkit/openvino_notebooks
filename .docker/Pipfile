@@ -46,9 +46,10 @@ supervisor = "==4.1.0"
 tensorflow = ">=2.5,<=2.12"
 tensorflow-datasets = "==4.2.0"
 treon = "*"
-torch = {index = "pytorch-wheels", version = "==1.13.1+cpu"}
+torch = {index = "pytorch-wheels", version = "==2.1.0+cpu"}
+torchaudio = {index = "pytorch-wheels", version = "==2.1.0+cpu"}
 torchmetrics = ">=0.11.0"
-torchvision = {index = "pytorch-wheels", version = "==0.14.1+cpu"}
+torchvision = {index = "pytorch-wheels", version = "==0.16.0+cpu"}
 transformers = ">=4.21.1"
 
 [dev-packages]
