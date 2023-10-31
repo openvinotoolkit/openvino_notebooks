@@ -25,7 +25,7 @@ $$p(\tilde{x}_{n+1} | x_1, ..., x_n)$$
 
 This is known as autoregressive sampling [9] and is now a standard method of text-generation in generative models. This could be followed by one of several methods to select the token at $n+1$, for example, argmax or randomly selected from top-p. 
 
-<p align="center">[Speculative Sampling](SpeculativeSampling.png)
+<p align="center"><img alt="Speculative Sampling" src="./SpeculativeSampling.png" /> 
 <br />Figure 1: Speculative Sampling Flow</p><br />
 
 Note that sampling of models is memory intensive. Shazeer [2] shows that the ratio of memory access to arithmetic operations is very memory intensive for transformer-based sequential sampling. Chen et al. [5]] attribute the overall sampling time for large transformer-based models to linear layers, attention, and collective operations (all-reduce). We focus on a batch size of one for inference, but we can leverage a batch size of K words (sampled from a smaller draft model) to be evaluated in the target model together, taking about the same time as sampling a single token from the target model. For a reasonable value of K, we can, therefore, leverage the smaller draft model for much of the text generation, using the target model less often for evaluation (i.e., acceptance or rejection) and single token generation when rejection occurs. We have seen a significant increase in throughput using this method.
