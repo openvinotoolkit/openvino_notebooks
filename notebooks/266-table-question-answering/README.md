@@ -3,7 +3,7 @@
 Table Question Answering (Table QA) is the answering a question about an information on a given table. You can use the 
 Table Question Answering models to simulate SQL execution by inputting a table.
 
-In this tutorial we demonstrate how to use [this](https://huggingface.co/tasks/table-question-answering) base example 
+In this tutorial we demonstrate how to use [the base example](https://huggingface.co/tasks/table-question-answering).
 with OpenVINO. This example based on [TAPAS base model fine-tuned on WikiTable Questions (WTQ)](https://huggingface.co/google/tapas-base-finetuned-wtq) 
 that is based on the paper [TAPAS: Weakly Supervised Table Parsing via Pre-training](https://arxiv.org/abs/2004.02349#:~:text=Answering%20natural%20language%20questions%20over,denotations%20instead%20of%20logical%20forms).
 
