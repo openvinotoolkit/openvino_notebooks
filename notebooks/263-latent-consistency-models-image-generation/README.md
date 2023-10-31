@@ -30,7 +30,7 @@ The notebook contains the following steps:
 3. Run Inference pipeline with OpenVINO.
 4. Optimize `LatentConsistencyModelPipeline` with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.
 5. Compare results of original and optimized pipelines.
-6. Run Interactive demo
+6. Run Interactive demo.
 
 The notebook also provides interactive interface for image generation based on user input
 
