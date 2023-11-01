@@ -2,6 +2,7 @@
 Sequence Classification (or Text Classification) is the NLP task of predicting a label for a sequence of words.
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F229-distilbert-sequence-classification%2F229-distilbert-sequence-classification.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/229-distilbert-sequence-classification/229-distilbert-sequence-classification.ipynb)
 
 Sentiment analysis is a sub-task of Sequence Classification. It is the use of natural language processing, text analysis, computational linguistics, and biometrics to systematically identify, extract, quantify, and study affective states and subjective information. This notebook performs sentiment analysis using OpenVINO. We will use the transformer-based [DistilBERT base uncased finetuned SST-2](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english) model from Hugging Face converting to OpenVINO IR format using OpenVINO PyTorch Frontend and model conversion Python API. We can also replace the model with the other BERT-based models for sequence classification. The model predicts one of two classes: Positive or Negative, after analyzing the sentiment of any given text. The notebook also estimates time required for inference.
 

@@ -1,6 +1,7 @@
 # Open Model Zoo Tools Tutorial
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F104-model-tools%2F104-model-tools.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/104-model-tools/104-model-tools.ipynb)
 
 This notebook demonstrates how to download a model from Open Model Zoo, convert it to OpenVINO™ IR format, show information about the model, and benchmark the model.
 

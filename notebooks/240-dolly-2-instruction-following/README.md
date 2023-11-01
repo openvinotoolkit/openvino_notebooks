@@ -19,6 +19,7 @@ The tutorial consists of the following steps:
 
 - Install prerequisites
 - Download and convert the model from a public source using the [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
+- Compress model weights to INT8 with [OpenVINO NNCF](https://github.com/openvinotoolkit/nncf)
 - Create an instruction-following inference pipeline
 - Run instruction-following pipeline
 
