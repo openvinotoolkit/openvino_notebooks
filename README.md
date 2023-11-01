@@ -39,6 +39,7 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [SoftVC VITS Singing Voice Conversion](notebooks/262-softvc-voice-conversion)<br> | SoftVC VITS Singing Voice Conversion and OpenVINO™ | |
 | [Latent Consistency Models: the next generation of Image Generation models ](notebooks/263-latent-consistency-models-image-generation)<br> | Image generation with Latent Consistency Models (LCM) and OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/277367065-13a8f622-8ea7-4d12-b3f8-241d4499305e.png width=300> |
 | [QR Code Monster](notebooks/264-qrcode-monster/)<br> | Generate creative QR codes with ControlNet QR Code Monster and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/1a5978c6-e7a0-4824-9318-a3d8f4912c47" width=225> |
+| [Würstchen](notebooks/265-wuerstchen-image-generation)<br> | Text-to-image generation with Würstchen and OpenVINO™ | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/6917c558-d74c-4cc9-b81a-679ce0a299ee" width=300> |
 
 ## Table of Contents
 
@@ -203,6 +204,7 @@ Demos that demonstrate inference on a particular model.
 | [262-softvc-voice-conversion](notebooks/262-softvc-voice-conversion)<br> | SoftVC VITS Singing Voice Conversion and OpenVINO™ | |
 | [263-latent-consistency-models-image-generation](notebooks/263-latent-consistency-models-image-generation)<br> | Image generation with Latent Consistency Models (LCM) and OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/277367065-13a8f622-8ea7-4d12-b3f8-241d4499305e.png width=225> |
 | [264-qrcode-monster](notebooks/264-qrcode-monster/)<br> | Generate creative QR codes with ControlNet QR Code Monster and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/1a5978c6-e7a0-4824-9318-a3d8f4912c47" width=225> |
+| [265-wuerstchen-image-generation](notebooks/265-wuerstchen-image-generation)<br> | Text-to-image generation with Würstchen and OpenVINO™ | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/6917c558-d74c-4cc9-b81a-679ce0a299ee" width=225> |
 
 <div id='-model-training'></div>
 
