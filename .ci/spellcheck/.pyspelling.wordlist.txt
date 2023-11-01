@@ -440,6 +440,7 @@ PyTorch
 PyTorchVideo
 QFormer
 Qi
+qrcode
 quant
 quantized
 quantizer

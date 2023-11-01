@@ -31,5 +31,6 @@
 260-pix2struct-docvqa
 262-softvc-voice-conversion
 263-latent-consistency-models-image-generation
-264-wuerstchen-image-generation
+264-qrcode-monster
+265-wuerstchen-image-generation
 404-style-transfer-webcam

@@ -9,7 +9,7 @@ import numpy as np
 from transformers import CLIPTokenizer
 from diffusers.pipeline_utils import DiffusionPipeline
 from diffusers.schedulers import DDIMScheduler, LMSDiscreteScheduler, PNDMScheduler
-from openvino as ov
+import openvino as ov
 
 
 def scale_fit_to_window(dst_width:int, dst_height:int, image_width:int, image_height:int):
