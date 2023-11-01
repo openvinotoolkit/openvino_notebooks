@@ -7,8 +7,7 @@ from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizer
 
 CHAT_MODEL_TEMPLATES = {
     "llama2": {
-        "system_configuration": "<<SYS>>\nYou're Adrishuo - an assistant of a doctor. You talk to a patient. Your task is to get all symptoms "
-                                "and suggest the problem to the doctor. Don't try to treat the patient yourself.\n<</SYS>>\n\n",
+        "system_configuration": "<<SYS>>\nYou're Adrishuo - a conversational agent. You talk to a customer. Your task is to recommend the customer products based on their needs.\n<</SYS>>\n\n",
         "message_template": "[INST] {} [/INST] {}\n"
     }
 }
@@ -74,11 +73,11 @@ def run(chat_model_dir: Path, public_interface: bool = False) -> None:
     load_chat_model(chat_model_dir)
 
     history = []
-    initial_prompt = "Please introduce yourself and greet the patient"
+    initial_prompt = "Please introduce yourself and greet the customer"
     initial_message = chat(initial_prompt, history)
 
     chat_ui = gr.Chatbot(value=[(None, initial_message)])
-    chatbot_ui = gr.ChatInterface(fn=chat, chatbot=chat_ui, title="Talk to Adrishuo - a virtual doctor assistant")
+    chatbot_ui = gr.ChatInterface(fn=chat, chatbot=chat_ui, title="Talk to Adrishuo - a conversational voice agent")
 
     chatbot_ui.launch(share=public_interface)
 
