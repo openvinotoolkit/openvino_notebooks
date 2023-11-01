@@ -1,6 +1,6 @@
 # Text Generation via Speculative Sampling, KV Caching, and OpenVINO™
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/255-speculative-sampling/255-speculative-sampling.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/265-speculative-sampling/265-speculative-sampling.ipynb)
 
 As model sizes grow, Generative AI implementations require significant inference resources. This not only increases the cost per generation from a prompt, but also increases the power consumption used to serve such requests.
 
