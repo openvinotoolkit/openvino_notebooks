@@ -1,11 +1,13 @@
 3D
 accelerometers
 accelerometer
+acknowledgement
 activations
 adas
 ADE
 aeroplane
 affective
+ai
 al
 ALiBi
 analytics
@@ -252,6 +254,7 @@ Kosaraju
 KServe
 Kubernetes
 Kupyn
+KV
 labour
 labse
 LaBSE
@@ -363,6 +366,7 @@ OpenPose
 OpenShift
 OpenVINO
 openvino
+OpenVino
 OpenVINO's
 opset
 optimizable
