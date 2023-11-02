@@ -21,14 +21,16 @@ The following image shows an example of the input sequence and corresponding pre
 
 ## Notebook Contents
 
-This notebook demonstrates how to convert and run [LCM_Dreamshaper_v7](https://huggingface.co/SimianLuo/LCM_Dreamshaper_v7) using OpenVINO.
+This notebook demonstrates how to convert and run [LCM_Dreamshaper_v7](https://huggingface.co/SimianLuo/LCM_Dreamshaper_v7) using OpenVINO. An additional part demonstrates how to run quantization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
 
 The notebook contains the following steps:
 
 1. Convert PyTorch models to OpenVINO Intermediate Representation using OpenVINO Converter Tool (OVC).
 2. Prepare Inference Pipeline.
 3. Run Inference pipeline with OpenVINO.
-4. Run Interactive demo
+4. Optimize `LatentConsistencyModelPipeline` with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.
+5. Compare results of original and optimized pipelines.
+6. Run Interactive demo.
 
 The notebook also provides interactive interface for image generation based on user input
 

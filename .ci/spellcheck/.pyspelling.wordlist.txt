@@ -133,6 +133,7 @@ DialoGPT
 diarization
 Diffusers
 diffusers
+dimensionality
 DistilBERT
 distilbert
 distiluse
@@ -267,6 +268,7 @@ LAION
 Lasinger
 latents
 LCMs
+LDM
 LDMs
 learnable
 LeViT
@@ -590,6 +592,7 @@ UIs
 UINT
 Ultralytics
 Uncheck
+unCLIP
 uncomment
 uncompressing
 UNet
@@ -626,11 +629,15 @@ VM
 Vladlen
 VOC
 VQA
+VQGAN
 Wav
 WavLM
 WebGL
 WER
 Wofk
+wuerstchen
+WuerstchenDiffNeXt
+Würstchen
 XCode
 Xeon
 xl
