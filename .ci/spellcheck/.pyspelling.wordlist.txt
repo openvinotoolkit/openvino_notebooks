@@ -31,6 +31,7 @@ backend
 Baevski
 BasicUNet
 BEiT
+Belrose
 Benchmarking
 benchmarking
 bert
@@ -40,6 +41,7 @@ Bicubic
 bicubic
 bilinear
 biometrics
+blockwise
 boolean
 CentOS
 CFG
@@ -174,6 +176,7 @@ frisbee
 Frontend
 frontend
 GAN
+Gante
 gaussian
 Gb
 GEC
@@ -235,6 +238,7 @@ IRs
 iteratively
 JFLEG
 JIT
+Joao
 JS
 JSON
 Jupyter
@@ -258,6 +262,7 @@ KV
 labour
 labse
 LaBSE
+Lai
 LAION
 Lasinger
 latents
@@ -310,6 +315,7 @@ MobileNetV
 MusicGen
 modelled
 Modelscope
+Mody
 MONAI
 MONAI's
 Monodepth
@@ -496,6 +502,7 @@ scalability
 Scalable
 scalable
 ScaleMapLearner
+Schuster
 sd
 SDEdit
 SDXL
@@ -507,6 +514,7 @@ Segmind
 serializable
 ShapeNet
 ShareGPT
+Shazeer
 Shutterstock
 siggraph
 sigmoid

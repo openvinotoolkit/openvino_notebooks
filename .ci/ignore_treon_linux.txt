@@ -35,4 +35,5 @@
 262-softvc-voice-conversion
 263-latent-consistency-models-image-generation
 264-qrcode-monster
+265-speculative-execution
 404-style-transfer-webcam
