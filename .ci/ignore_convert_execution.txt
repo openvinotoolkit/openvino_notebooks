@@ -49,6 +49,6 @@ notebooks/260-pix2struct-docvqa/260-pix2struct-docvqa.ipynb
 notebooks/262-softvc-voice-conversion/262-softvc-voice-conversion.ipynb
 notebooks/263-latent-consistency-models-image-generation/263-latent-consistency-models-image-generation.ipynb
 notebooks/264-qrcode-monster/264-qrcode-monster.ipynb
-notebooks/265-speculative-execution/265-speculative-execution.ipynb
+notebooks/265-speculative-sampling/265-speculative-sampling.ipynb
 notebooks/265-wuerstchen-image-generation/265-wuerstchen-image-generation.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb
