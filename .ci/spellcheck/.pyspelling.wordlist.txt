@@ -146,6 +146,7 @@ downsampled
 dpredictor
 Dreamshaper
 dropdown
+ECCV
 editability
 EfficientNet
 embeddings
@@ -511,6 +512,7 @@ sigmoid
 SISR
 SlowFast
 slowfast
+slowmo
 SML
 sml
 softmax
