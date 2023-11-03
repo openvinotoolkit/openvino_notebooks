@@ -137,12 +137,12 @@ class OVBark:
 
         pieces = []
         for sentence in sentences:
-            semantic_tokens = self._text_to_semantic(
+            semantic_tokens = self.text_to_semantic(
                 sentence,
                 temp=text_temp,
                 silent=silent,
             )
-            audio_array = self._semantic_to_waveform(
+            audio_array = self.semantic_to_waveform(
                 semantic_tokens,
                 temp=waveform_temp,
                 silent=silent,
@@ -150,7 +150,7 @@ class OVBark:
             pieces.append(audio_array)
         return np.concatenate(pieces)
 
-    def _text_to_semantic(
+    def text_to_semantic(
             self,
             text: str,
             temp: float = 0.7,
@@ -166,14 +166,14 @@ class OVBark:
         Returns:
             numpy semantic array to be fed into `semantic_to_waveform`
         """
-        x_semantic = self._generate_text_semantic(
+        x_semantic = self.generate_text_semantic(
             text,
             temp=temp,
             silent=silent,
         )
         return x_semantic
 
-    def _generate_text_semantic(
+    def generate_text_semantic(
             self,
             text: str,
             temp: float = 0.7,
@@ -295,7 +295,7 @@ class OVBark:
         out = x.squeeze()[256 + 256 + 1 :]
         return out
 
-    def _semantic_to_waveform(
+    def semantic_to_waveform(
             self,
             semantic_tokens: np.ndarray,
             temp: float = 0.7,
@@ -311,19 +311,19 @@ class OVBark:
         Returns:
             numpy audio array at sample frequency 24khz
         """
-        coarse_tokens = self._generate_coarse(
+        coarse_tokens = self.generate_coarse(
             semantic_tokens,
             temp=temp,
             silent=silent,
         )
-        fine_tokens = self._generate_fine(
+        fine_tokens = self.generate_fine(
             coarse_tokens,
             temp=0.5,
         )
-        audio_arr = self._codec_decode(fine_tokens)
+        audio_arr = self.codec_decode(fine_tokens)
         return audio_arr
 
-    def _generate_coarse(
+    def generate_coarse(
             self,
             x_semantic: np.ndarray,
             temp: float = 0.7,
@@ -457,7 +457,7 @@ class OVBark:
             gen_coarse_audio_arr[n, :] -= n * CODEBOOK_SIZE
         return gen_coarse_audio_arr
 
-    def _generate_fine(
+    def generate_fine(
             self,
             x_coarse_gen: np.ndarray,
             temp: float = 0.5,
@@ -553,7 +553,7 @@ class OVBark:
         model.to(device)
         return model
 
-    def _codec_decode(self, fine_tokens):
+    def codec_decode(self, fine_tokens):
         """Turn quantized audio codes into audio array using encodec."""
         # load models if not yet exist
         device = next(self.encodec_model.parameters()).device
@@ -568,7 +568,9 @@ class OVBark:
 
     def _load_history_prompt(self, history_prompt_input):
         if isinstance(history_prompt_input, str):
-            history_prompt = np.load(os.path.join(os.path.abspath(os.path.dirname(__file__)), "assets", "voices", f"{history_prompt_input}.npz"))
+            # make sure this works on non-ubuntu
+            history_prompt_input = os.path.join(*history_prompt_input.split("/"))
+            history_prompt = np.load(os.path.join("assets", f"{history_prompt_input}.npz"))
         else:
             raise ValueError("history prompt format unrecognized")
         return history_prompt
