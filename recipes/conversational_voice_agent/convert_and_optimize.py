@@ -29,6 +29,7 @@ def convert_chat_model(model_type: str, quantize_weights: bool, model_dir: Path)
         model = AutoModelForCausalLM.from_pretrained(model_name)
         # change precision to INT8 and save to disk
         quantizer = OVQuantizer.from_pretrained(model)
+        output_dir = output_dir.with_name(output_dir.name + "-INT8")
         quantizer.quantize(save_directory=output_dir, weights_only=True)
     else:
         # load model and convert it to OpenVINO
@@ -36,6 +37,7 @@ def convert_chat_model(model_type: str, quantize_weights: bool, model_dir: Path)
         # change precision to FP16
         model.half()
         # save model to disk
+        output_dir = output_dir.with_name(output_dir.name + "-FP16")
         model.save_pretrained(output_dir)
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -48,7 +50,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--chat_model_type", type=str, choices=["llama2-7B", "llama2-13B"],
                         default="llama2-7B", help="Chat model to be converted")
-    parser.add_argument("--quantize_weights", default=False, action="store_true", help="Whether to quantize weights to INT8")
+    parser.add_argument("--quantize_weights", default=True, action="store_true", help="Whether to quantize weights to INT8")
     parser.add_argument("--model_dir", type=str, default="model", help="Directory to place the model in")
 
     args = parser.parse_args()

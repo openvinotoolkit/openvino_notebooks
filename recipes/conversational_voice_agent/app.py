@@ -84,7 +84,7 @@ def run(chat_model_dir: Path, public_interface: bool = False) -> None:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--chat_model_dir', type=str, default="model/llama2-7B", help="Path to the chat model directory")
+    parser.add_argument('--chat_model_dir', type=str, default="model/llama2-7B-INT8", help="Path to the chat model directory")
     parser.add_argument('--public_interface', default=False, action="store_true", help="Whether interface should be available publicly")
 
     args = parser.parse_args()
