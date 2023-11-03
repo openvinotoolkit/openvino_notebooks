@@ -16,7 +16,7 @@ The tutorial consists from following steps:
 - Install prerequisites
 - Prepare input processor and tokenizer
 - Download original model
-- Compress model weights to INT8 using NNCF
+- Compress model weights to INT4/INT8 using NNCF
 - Convert model to OpenVINO Intermediate Representation (IR) format
 - Prepare OpenVINO-based inference pipeline
 - Run OpenVINO model
