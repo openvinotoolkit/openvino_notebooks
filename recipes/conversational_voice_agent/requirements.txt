@@ -4,7 +4,9 @@ git+https://github.com/huggingface/optimum-intel.git
 optimum==1.13.0
 nncf==2.6.0
 tensorflow-cpu==2.12.0
+torch==2.1.0
 onnx==1.14.1
 onnxruntime==1.14.1
 transformers==4.34.1
+nltk==3.8.1
 gradio==4.0.2
