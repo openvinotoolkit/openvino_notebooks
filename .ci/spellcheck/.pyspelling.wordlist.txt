@@ -1,11 +1,13 @@
 3D
 accelerometers
 accelerometer
+acknowledgement
 activations
 adas
 ADE
 aeroplane
 affective
+ai
 al
 ALiBi
 analytics
@@ -29,6 +31,7 @@ backend
 Baevski
 BasicUNet
 BEiT
+Belrose
 Benchmarking
 benchmarking
 bert
@@ -38,6 +41,7 @@ Bicubic
 bicubic
 bilinear
 biometrics
+blockwise
 boolean
 CentOS
 CFG
@@ -173,6 +177,7 @@ frisbee
 Frontend
 frontend
 GAN
+Gante
 gaussian
 Gb
 GEC
@@ -234,6 +239,7 @@ IRs
 iteratively
 JFLEG
 JIT
+Joao
 JS
 JSON
 Jupyter
@@ -253,9 +259,11 @@ Kosaraju
 KServe
 Kubernetes
 Kupyn
+KV
 labour
 labse
 LaBSE
+Lai
 LAION
 Lasinger
 latents
@@ -309,6 +317,7 @@ MobileNetV
 MusicGen
 modelled
 Modelscope
+Mody
 MONAI
 MONAI's
 Monodepth
@@ -365,6 +374,7 @@ OpenPose
 OpenShift
 OpenVINO
 openvino
+OpenVino
 OpenVINO's
 opset
 optimizable
@@ -494,6 +504,7 @@ scalability
 Scalable
 scalable
 ScaleMapLearner
+Schuster
 sd
 SDEdit
 SDXL
@@ -505,6 +516,7 @@ Segmind
 serializable
 ShapeNet
 ShareGPT
+Shazeer
 Shutterstock
 siggraph
 sigmoid
