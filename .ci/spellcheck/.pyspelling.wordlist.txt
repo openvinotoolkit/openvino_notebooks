@@ -134,6 +134,8 @@ diarization
 Diffusers
 diffusers
 dimensionality
+Distil
+distil
 DistilBERT
 distilbert
 distiluse
@@ -260,6 +262,7 @@ KServe
 Kubernetes
 Kupyn
 KV
+Labelling
 labour
 labse
 LaBSE
