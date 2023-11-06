@@ -1,6 +1,6 @@
-# TAPAS base model fine-tuned on WikiTable Questions (WTQ) with OpenVINO
+# Table Question Answering using TAPAS and OpenVINO™
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/266-table-question-answering/266-table-question-answering.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/268-table-question-answering/268-table-question-answering.ipynb)
 
 Table Question Answering (Table QA) is the answering a question about an information on a given table. You can use the 
 Table Question Answering models to simulate SQL execution by inputting a table.
