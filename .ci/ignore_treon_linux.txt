@@ -36,5 +36,5 @@
 263-latent-consistency-models-image-generation
 264-qrcode-monster
 265-wuerstchen-image-generation
-265-speculative-sampling
+266-speculative-sampling
 404-style-transfer-webcam
