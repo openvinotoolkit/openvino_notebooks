@@ -208,6 +208,8 @@ Demos that demonstrate inference on a particular model.
 | [265-wuerstchen-image-generation](notebooks/265-wuerstchen-image-generation)<br> | Text-to-image generation with Würstchen and OpenVINO™ | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/6917c558-d74c-4cc9-b81a-679ce0a299ee" width=225> |
 | [266-speculative-sampling](notebooks/266-speculative-sampling)<br> | Text Generation via Speculative Sampling, KV Caching, and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/280659301-49a38beb-e6f3-4a2c-858e-be4ca4491016.png width=225> |
 | [267-distil-whisper-asr](notebooks/267-distil-whisper-asr)<br> | Automatic speech recognition using Distil-Whisper and OpenVINO™ | |
+| [268-table-question-answering](notebooks/268-table-question-answering)<br><br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/268-table-question-answering/268-table-question-answering.ipynb)<br> | Table Question Answering using TAPAS and OpenVINO™ ||
+
 
 <div id='-model-training'></div>
 
