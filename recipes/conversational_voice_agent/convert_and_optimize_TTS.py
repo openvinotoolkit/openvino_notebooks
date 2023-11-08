@@ -49,6 +49,17 @@ class FineModel(nn.Module):
     
 # Function to download and convert the text encoder model
 def download_and_convert_text_encoder(use_small: bool, models_dir: Path):
+    """
+    Downloads and converts the text encoder model to OpenVINO format.
+    
+    This function checks for the existence of text encoder model files and, if not found,
+    it loads the model using load_model function. It then converts the PyTorch model to an
+    OpenVINO model and saves it in IR format.
+
+    Parameters:
+    - use_small (bool): If set to True, the smaller variant of the model is used.
+    - models_dir (Path): The directory where the OpenVINO model files will be saved.
+    """
     text_model_suffix = "_small" if use_small else ""
     text_model_dir = models_dir / f"text_encoder{text_model_suffix}"
     text_model_dir.mkdir(exist_ok=True)
@@ -74,6 +85,17 @@ def download_and_convert_text_encoder(use_small: bool, models_dir: Path):
 
     # Function to download and convert the coarse encoder model
 def download_and_convert_coarse_encoder(use_small: bool, models_dir: Path):
+    """
+    Downloads and converts the coarse encoder model to OpenVINO format.
+
+    This function checks for the existence of the coarse encoder model file and, if not present,
+    it loads the model with the specified size variant. It then exports the model to OpenVINO
+    format and saves the converted model to disk.
+
+    Parameters:
+    - use_small (bool): If set to True, the smaller variant of the model is used.
+    - models_dir (Path): The directory where the OpenVINO model files will be saved.
+    """
     coarse_model_suffix = "_small" if use_small else ""
     coarse_model_dir = models_dir / f"coarse_model{coarse_model_suffix}"
     coarse_model_dir.mkdir(exist_ok=True)
@@ -93,6 +115,17 @@ def download_and_convert_coarse_encoder(use_small: bool, models_dir: Path):
 
 # Function to download and convert the fine model
 def download_and_convert_fine_model(use_small: bool, models_dir: Path):
+    """
+    Downloads and converts the fine model to OpenVINO format.
+
+    This function checks for the existence of the fine model file and, if not available,
+    it loads the fine model. It then converts the fine feature extractor and each language
+    model head to OpenVINO format, saving them to the specified directory.
+
+    Parameters:
+    - use_small (bool): If set to True, the smaller variant of the model is used.
+    - models_dir (Path): The directory where the OpenVINO model files will be saved.
+    """
     fine_model_suffix = "_small" if use_small else ""
     fine_model_dir = models_dir / f"fine_model{fine_model_suffix}"
     fine_model_dir.mkdir(exist_ok=True)
@@ -121,7 +154,16 @@ def download_and_convert_fine_model(use_small: bool, models_dir: Path):
             )
             
 def main(use_small: bool):
-    models_dir = Path("./model/TTS")
+    """
+    This function orchestrates the process of downloading and converting the text encoder,
+    coarse encoder, and fine model based on the specified model size variant. 
+
+    Parameters:
+    - use_small (bool): Flag indicating whether to download and convert the smaller variants
+                        of the models. This will also be reflected in the directory names.
+    """
+    model_suffix = "_small" if use_small else ""
+    models_dir = Path(f"./model/TTS_bark{model_suffix}")
     models_dir.mkdir(parents=True, exist_ok=True)
     download_and_convert_text_encoder(use_small, models_dir)
     download_and_convert_coarse_encoder(use_small, models_dir)
