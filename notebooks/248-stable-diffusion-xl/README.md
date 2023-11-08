@@ -42,7 +42,7 @@ The [Segmind Stable Diffusion Model (SSD-1B)](https://github.com/segmind/SSD-1B?
 
 This model employs a knowledge distillation strategy, where it leverages the teachings of several expert models in succession, including SDXL, ZavyChromaXL, and JuggernautXL, to combine their strengths and produce impressive visual outputs.
 
-### Image Comparision (SDXL-1.0 vs SSD-1B)
+### Image Comparison (SDXL-1.0 vs SSD-1B)
 ![image](https://user-images.githubusercontent.com/82945616/277419571-a5583e8a-6a05-4680-a540-f80502feed0b.png)
 In this tutorial, we consider how to run the SSD-1B model using OpenVINO.
 We will use a pre-trained model from the Hugging Face Diffusers library. To simplify the user experience, the Hugging Face Optimum Intel library is used to convert the models to OpenVINO™ IR format.
