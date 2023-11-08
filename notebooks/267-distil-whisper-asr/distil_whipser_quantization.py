@@ -62,7 +62,8 @@ class InferRequestWrapper:
 
     def __call__(self, *args, **kwargs):
         if COLLECT_CALIBRATION_DATA:
-            self.data_cache.append(args[0])
+            # self.data_cache.append(args[0])
+            self.data_cache.append(*args)
         return self.request(*args, *kwargs)
 
     def infer(self, inputs: Any = None, shared_memory: bool = False):
@@ -133,7 +134,11 @@ def collect_calibration_dataset(ov_model, calibration_dataset_size):
 
 
 def quantize(ov_model, calibration_dataset_size, encoder_sq_alpha, decoder_sq_alpha):
-    save_dir_name = f"subset{calibration_dataset_size}_enc-sq-{encoder_sq_alpha:.2f}_dec-sq-{decoder_sq_alpha:.2f}"
+    # encoder_calibration_data, decoder_calibration_data = collect_calibration_dataset(ov_model,
+    #                                                                                  calibration_dataset_size)
+    # print(len(encoder_calibration_data), len(decoder_calibration_data))
+
+    save_dir_name = f"subset{calibration_dataset_size}_enc-sq-{encoder_sq_alpha:.2f}_dec-sq-{decoder_sq_alpha:.2f}_tmp"
     save_dir = quantized_model_dir / save_dir_name
     if not save_dir.exists():
         encoder_calibration_data, decoder_calibration_data = collect_calibration_dataset(ov_model,
@@ -185,7 +190,8 @@ def predict(ov_model, n_samples, print_predictions):
     time_it(ov_model.decoder, "forward", decoder_infer_times)
     time_it(ov_model.decoder_with_past, "forward", decoder_with_past_infer_times)
 
-    for sample in tqdm(islice(dataset, n_samples), desc="Running", disable=not print_predictions):
+    for sample in tqdm(islice(dataset, n_samples), desc="Running", disable=print_predictions,
+                       total=n_samples):
         input_features = extract_input_features(sample)
         predicted_ids = ov_model.generate(input_features)
         transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)
@@ -207,7 +213,8 @@ def predict(ov_model, n_samples, print_predictions):
 
 
 def validate(ov_model, test_dataset_size=100):
-    dataset = load_dataset("librispeech_asr", "clean", split="test", streaming=True).take(test_dataset_size)
+    dataset = load_dataset("librispeech_asr", "clean", split="test", streaming=True)
+    dataset = dataset.shuffle(seed=42).take(test_dataset_size)
 
     ground_truths = []
     predictions = []
@@ -221,6 +228,9 @@ def validate(ov_model, test_dataset_size=100):
         transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)
         delta_time = (end_time - start_time).total_seconds()
 
+        print()
+        print(data_item["text"])
+        print(transcription[0])
         ground_truths.append(data_item["text"])
         predictions.append(transcription[0])
         inference_time.append(delta_time)
@@ -241,9 +251,9 @@ quantized_ov_model = quantize(ov_model,
                               encoder_sq_alpha=0.50,
                               decoder_sq_alpha=0.95)
 
-n_samples = 50
-predict(ov_model, n_samples=n_samples, print_predictions=bool(0))
-predict(quantized_ov_model, n_samples=n_samples, print_predictions=bool(0))
+# n_samples = 1
+# predict(ov_model, n_samples=n_samples, print_predictions=bool(0))
+# predict(quantized_ov_model, n_samples=n_samples, print_predictions=bool(0))
 
 test_size = 50
 transcription_time_fp32, accuracy_fp32 = validate(ov_model, test_dataset_size=test_size)
