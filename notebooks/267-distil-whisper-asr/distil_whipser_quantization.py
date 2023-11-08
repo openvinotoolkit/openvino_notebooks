@@ -92,7 +92,7 @@ class InferRequestWrapper:
         return getattr(self.request, attr)
 
 
-def sample_to_input_features(sample):
+def extract_input_features(sample):
     input_features = processor(
         sample["audio"]["array"],
         sampling_rate=sample["audio"]["sampling_rate"],
@@ -115,17 +115,16 @@ def time_it(obj, fn_name, time_list):
 
 
 def collect_calibration_dataset(ov_model, calibration_dataset_size):
-    dataset = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
-
     encoder_calibration_data = []
     decoder_calibration_data = []
+    ov_model.encoder.request = InferRequestWrapper(ov_model.encoder.request, encoder_calibration_data)
+    ov_model.decoder_with_past.request = InferRequestWrapper(ov_model.decoder_with_past.request,
+                                                             decoder_calibration_data)
+
+    dataset = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
     for sample in tqdm(islice(dataset, calibration_dataset_size), desc="Collecting calibration data",
                        total=calibration_dataset_size):
-        input_features = sample_to_input_features(sample)
-
-        ov_model.encoder.request = InferRequestWrapper(ov_model.encoder.request, encoder_calibration_data)
-        ov_model.decoder_with_past.request = InferRequestWrapper(ov_model.decoder_with_past.request,
-                                                                 decoder_calibration_data)
+        input_features = extract_input_features(sample)
 
         with calibration_data_collection():
             ov_model.generate(input_features)
@@ -187,7 +186,7 @@ def predict(ov_model, n_samples, print_predictions):
     time_it(ov_model.decoder_with_past, "forward", decoder_with_past_infer_times)
 
     for sample in tqdm(islice(dataset, n_samples), desc="Running", disable=not print_predictions):
-        input_features = sample_to_input_features(sample)
+        input_features = extract_input_features(sample)
         predicted_ids = ov_model.generate(input_features)
         transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)
         if print_predictions:
@@ -207,14 +206,14 @@ def predict(ov_model, n_samples, print_predictions):
           f"Count: {len(decoder_with_past_infer_times)} calls")
 
 
-def validate(ov_model, test_size=100):
-    dataset = load_dataset("librispeech_asr", "clean", split="test", streaming=True).take(test_size)
+def validate(ov_model, test_dataset_size=100):
+    dataset = load_dataset("librispeech_asr", "clean", split="test", streaming=True).take(test_dataset_size)
 
     ground_truths = []
     predictions = []
     inference_time = []
-    for data_item in tqdm(dataset, desc="Measuring performance and accuracy", total=test_size):
-        input_features = sample_to_input_features(data_item)
+    for data_item in tqdm(dataset, desc="Measuring performance and accuracy", total=test_dataset_size):
+        input_features = extract_input_features(data_item)
 
         start_time = datetime.now()
         predicted_ids = ov_model.generate(input_features)
@@ -247,8 +246,8 @@ predict(ov_model, n_samples=n_samples, print_predictions=bool(0))
 predict(quantized_ov_model, n_samples=n_samples, print_predictions=bool(0))
 
 test_size = 50
-transcription_time_fp32, accuracy_fp32 = validate(ov_model, test_size=test_size)
-transcription_time_int8, accuracy_int8 = validate(quantized_ov_model, test_size=test_size)
+transcription_time_fp32, accuracy_fp32 = validate(ov_model, test_dataset_size=test_size)
+transcription_time_int8, accuracy_int8 = validate(quantized_ov_model, test_dataset_size=test_size)
 print(f"Whisper transcription performance speedup: {transcription_time_fp32 / transcription_time_int8:.3f}")
 print(f"Whisper transcription word accuracy. FP32: {accuracy_fp32:.2f}%. INT8: {accuracy_int8:.2f}%. "
       f"Accuracy drop :{accuracy_fp32 - accuracy_int8:.2f}%.")
