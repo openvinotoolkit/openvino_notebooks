@@ -1192,11 +1192,11 @@
         },
         "huggingface-hub": {
             "hashes": [
-                "sha256:10eda12b9c1cfa800b4b7c096b3ace8843734c3f28d69d1c243743fb7d7a2e81",
-                "sha256:ee0b6b68acbf6aeb6d083ea081e981c277a1104b82ab67fdf6780ff5396830af"
+                "sha256:40439632b211311f788964602bf8b0d9d6b7a2314fba4e8d67b2ce3ecea0e3fd",
+                "sha256:545eb3665f6ac587add946e73984148f2ea5c7877eac2e845549730570c1933a"
             ],
             "markers": "python_full_version >= '3.8.0'",
-            "version": "==0.18.0"
+            "version": "==0.17.3"
         },
         "idna": {
             "hashes": [
