@@ -35,6 +35,7 @@ Belrose
 Benchmarking
 benchmarking
 bert
+BERT's
 Bewley
 BGR
 Bicubic
@@ -403,6 +404,7 @@ panoptic
 parallelized
 parameterization
 parametrize
+parsers
 perceptron
 performant
 PersonaGPT
@@ -540,6 +542,7 @@ spectrogram
 spectrograms
 splitters
 SPS
+SQA
 SQuAD
 SRT
 SSDLite
@@ -639,7 +642,11 @@ Wav
 WavLM
 WebGL
 WER
+WIKISQL
+WikiTable
+WIKITQ
 Wofk
+WTQ
 wuerstchen
 WuerstchenDiffNeXt
 Würstchen

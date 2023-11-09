@@ -14,6 +14,7 @@ The tutorial consists of the following steps:
 - Download the Fast Segment Anything Model using the [Ultralytics package](https://docs.ultralytics.com/).
 - Run the unconditioned segmentation mask generation pipeline
 - Convert the model backing the FastSAM pipeline
+- Quantize the model using NNCF
 - Run interactive segmentation pipeline using OpenVINO and Gradio
 
 ## Installation Instructions
