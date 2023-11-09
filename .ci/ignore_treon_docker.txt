@@ -1,6 +1,7 @@
 107-speech-recognition-quantization
 108-gpu-device
 117-model-server
+122-quantizing-model-with-accuracy-control
 216-attention-center
 220-cross-lingual-books-alignment
 225-stable-diffusion-text-to-image
@@ -29,6 +30,7 @@
 258-blip-diffusion-subject-generation
 259-decidiffusion-image-generation
 260-pix2struct-docvqa
+261-fast-segment-anything
 262-softvc-voice-conversion
 263-latent-consistency-models-image-generation
 264-qrcode-monster
