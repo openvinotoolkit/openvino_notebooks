@@ -57,6 +57,7 @@ CHW
 Cifar
 cityscape
 Cityscapes
+CLI
 CLIP's
 codebook
 codebooks
@@ -153,6 +154,7 @@ downsampled
 dpredictor
 Dreamshaper
 dropdown
+ECCV
 editability
 EfficientNet
 embeddings
@@ -236,8 +238,10 @@ installable
 instantiation
 InstructGPT
 InstructPix
+intel
 invertible
 intervaling
+im
 IRs
 iteratively
 JFLEG
@@ -388,6 +392,8 @@ overfitting
 overlayed
 OV
 OVC
+OVModel
+OVModelForXXX
 OVMS
 PaddleClas
 PaddleGAN
@@ -529,6 +535,7 @@ sigmoid
 SISR
 SlowFast
 slowfast
+slowmo
 SML
 sml
 softmax
@@ -568,6 +575,7 @@ superset
 svc
 Swin
 SwinV
+TaskManager
 TartanAir
 TensorBoard
 tensorflow
@@ -653,6 +661,7 @@ Würstchen
 XCode
 Xeon
 xl
+xvector
 XYWH
 YOLO
 YOLOv

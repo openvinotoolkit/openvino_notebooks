@@ -1192,11 +1192,11 @@
         },
         "huggingface-hub": {
             "hashes": [
-                "sha256:10eda12b9c1cfa800b4b7c096b3ace8843734c3f28d69d1c243743fb7d7a2e81",
-                "sha256:ee0b6b68acbf6aeb6d083ea081e981c277a1104b82ab67fdf6780ff5396830af"
+                "sha256:40439632b211311f788964602bf8b0d9d6b7a2314fba4e8d67b2ce3ecea0e3fd",
+                "sha256:545eb3665f6ac587add946e73984148f2ea5c7877eac2e845549730570c1933a"
             ],
             "markers": "python_full_version >= '3.8.0'",
-            "version": "==0.18.0"
+            "version": "==0.17.3"
         },
         "idna": {
             "hashes": [
@@ -4129,10 +4129,12 @@
                 "sha256:f247eae99800ef821a91f47c5280e9e9afaeed9980fc444208d5aa6ba69ff148",
                 "sha256:f3835c5be51de8c0a092058a4d4380cb9244fb34681fd0a295fbf0a52a5fdf33",
                 "sha256:f55c981ac44ba87c93e847c333e58c12abcbb377a0c2f2ef96e1a266e4184ff2",
-                "sha256:fc2a7fdf864554a0dacf09d32e17c0caa9afe72baf9dd7ddedc61973bae352d8"
+                "sha256:fc2a7fdf864554a0dacf09d32e17c0caa9afe72baf9dd7ddedc61973bae352d8",
+                "sha256:26fee36a6d8f2bd9464f3566b95e3e3fb7fd7dad723f775c500aac8204ec98c6",
+                "sha256:11284b32f0036fe7ef4b8b00201dda79c00f3fcea173bc0e5c599e09c937ab0f"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==0.13.3"
+            "version": "==0.14.1"
         },
         "toml": {
             "hashes": [
@@ -4215,12 +4217,12 @@
         },
         "transformers": {
             "hashes": [
-                "sha256:478e1709738237aa1b7bae1fd0ba7bd9d44352fe45972df7ed060077257e84f9",
-                "sha256:e90e9fc05310985f3ede2da278d11c91656b4a354b4935c54604f57409299aae"
+                "sha256:1d0258d5a18063b66005bbe1e3276ec5943d9ab4ab47f020db1fd485cc40ea22",
+                "sha256:d06ac09151d7b845e4a4acd6b143a591d946031ee67b4cbb20693b241920ffc0"
             ],
             "index": "pypi",
             "markers": "python_full_version >= '3.7.0'",
-            "version": "==4.30.0"
+            "version": "==4.34.1"
         },
         "treon": {
             "hashes": [
