@@ -60,8 +60,7 @@ def download_and_convert_text_encoder(use_small: bool, models_dir: Path):
     - use_small (bool): If set to True, the smaller variant of the model is used.
     - models_dir (Path): The directory where the OpenVINO model files will be saved.
     """
-    text_model_suffix = "_small" if use_small else ""
-    text_model_dir = models_dir / f"text_encoder{text_model_suffix}"
+    text_model_dir = models_dir / f"text_encoder"
     text_model_dir.mkdir(exist_ok=True)
     text_encoder_path1 = text_model_dir / "bark_text_encoder_1.xml"
     text_encoder_path0 = text_model_dir / "bark_text_encoder_0.xml"
@@ -96,8 +95,7 @@ def download_and_convert_coarse_encoder(use_small: bool, models_dir: Path):
     - use_small (bool): If set to True, the smaller variant of the model is used.
     - models_dir (Path): The directory where the OpenVINO model files will be saved.
     """
-    coarse_model_suffix = "_small" if use_small else ""
-    coarse_model_dir = models_dir / f"coarse_model{coarse_model_suffix}"
+    coarse_model_dir = models_dir / f"coarse_model"
     coarse_model_dir.mkdir(exist_ok=True)
     coarse_encoder_path = coarse_model_dir / "bark_coarse_encoder.xml"
     
@@ -126,8 +124,7 @@ def download_and_convert_fine_model(use_small: bool, models_dir: Path):
     - use_small (bool): If set to True, the smaller variant of the model is used.
     - models_dir (Path): The directory where the OpenVINO model files will be saved.
     """
-    fine_model_suffix = "_small" if use_small else ""
-    fine_model_dir = models_dir / f"fine_model{fine_model_suffix}"
+    fine_model_dir = models_dir / f"fine_model"
     fine_model_dir.mkdir(exist_ok=True)
     fine_feature_extractor_path = fine_model_dir / "bark_fine_feature_extractor.xml"
     if not fine_feature_extractor_path.exists():
@@ -165,9 +162,11 @@ def main(use_small: bool):
     model_suffix = "_small" if use_small else ""
     models_dir = Path(f"./model/TTS_bark{model_suffix}")
     models_dir.mkdir(parents=True, exist_ok=True)
+    
     download_and_convert_text_encoder(use_small, models_dir)
     download_and_convert_coarse_encoder(use_small, models_dir)
     download_and_convert_fine_model(use_small, models_dir)
+    
     print("All models have been downloaded and converted successfully.")
     
 if __name__ == "__main__":
