@@ -54,4 +54,7 @@ We will use a pre-trained model from the Hugging Face Diffusers library. To simp
 - [Text2image Generation Interactive Demo](#Text2image-Generation-Interactive-Demo-Uparrow)
 
 ## Installation Instructions
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
