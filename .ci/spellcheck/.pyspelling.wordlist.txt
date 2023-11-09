@@ -151,6 +151,7 @@ donut
 Downloader
 downloader
 downsampled
+DPO
 dpredictor
 Dreamshaper
 dropdown
@@ -315,6 +316,7 @@ MiDaS
 MidasNet
 Midjourney
 MiniLM
+mistralai
 MLS
 mms
 MMS
@@ -322,7 +324,6 @@ MLP
 mobilenet
 MobileNet
 MobileNetV
-MusicGen
 modelled
 Modelscope
 Mody
@@ -340,6 +341,7 @@ MultiHeadAttention
 multilayer
 multimodal
 Multimodality
+MusicGen
 Müller
 Nakayosi
 nano
