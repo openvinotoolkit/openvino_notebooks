@@ -15,6 +15,7 @@
 240-dolly-2-instruction-following
 241-riffusion-text-to-music
 242-freevc-voice-conversion
+247-code-language-id
 248-stable-diffusion-xl
 249-oneformer-segmentation
 250-music-generation
@@ -33,6 +34,7 @@
 264-qrcode-monster
 265-wuerstchen-image-generation
 266-speculative-sampling
+267-distil-whisper-asr
 269-film-slowmo
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training

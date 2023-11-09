@@ -57,6 +57,7 @@ CHW
 Cifar
 cityscape
 Cityscapes
+CLI
 CLIP's
 codebook
 codebooks
@@ -237,8 +238,10 @@ installable
 instantiation
 InstructGPT
 InstructPix
+intel
 invertible
 intervaling
+im
 IRs
 iteratively
 JFLEG
@@ -388,6 +391,8 @@ overfitting
 overlayed
 OV
 OVC
+OVModel
+OVModelForXXX
 OVMS
 PaddleClas
 PaddleGAN
@@ -568,6 +573,7 @@ superset
 svc
 Swin
 SwinV
+TaskManager
 TartanAir
 TensorBoard
 tensorflow
@@ -653,6 +659,7 @@ Würstchen
 XCode
 Xeon
 xl
+xvector
 XYWH
 YOLO
 YOLOv
