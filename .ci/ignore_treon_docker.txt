@@ -35,6 +35,7 @@
 265-wuerstchen-image-generation
 266-speculative-sampling
 267-distil-whisper-asr
+269-film-slowmo
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
 404-style-transfer-webcam
