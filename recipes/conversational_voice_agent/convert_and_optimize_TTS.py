@@ -48,7 +48,7 @@ class FineModel(nn.Module):
         return x
     
 # Function to download and convert the text encoder model
-def download_and_convert_text_encoder(use_small: bool, models_dir: Path):
+def download_and_convert_text_encoder(models_dir: Path):
     """
     Downloads and converts the text encoder model to OpenVINO format.
     
@@ -57,7 +57,7 @@ def download_and_convert_text_encoder(use_small: bool, models_dir: Path):
     OpenVINO model and saves it in IR format.
 
     Parameters:
-    - use_small (bool): If set to True, the smaller variant of the model is used.
+    
     - models_dir (Path): The directory where the OpenVINO model files will be saved.
     """
     text_model_dir = models_dir / f"text_encoder"
@@ -67,7 +67,7 @@ def download_and_convert_text_encoder(use_small: bool, models_dir: Path):
 
     if not text_encoder_path0.exists() or not text_encoder_path1.exists():
         text_encoder = load_model(
-            model_type="text", use_gpu=False, use_small=use_small, force_reload=False
+            model_type="text", use_gpu=False, force_reload=False
         )
         text_encoder_model = TextEncoderModel(text_encoder["model"])
         ov_model = ov.convert_model(
@@ -83,7 +83,7 @@ def download_and_convert_text_encoder(use_small: bool, models_dir: Path):
   
 
     # Function to download and convert the coarse encoder model
-def download_and_convert_coarse_encoder(use_small: bool, models_dir: Path):
+def download_and_convert_coarse_encoder(models_dir: Path):
     """
     Downloads and converts the coarse encoder model to OpenVINO format.
 
@@ -92,7 +92,7 @@ def download_and_convert_coarse_encoder(use_small: bool, models_dir: Path):
     format and saves the converted model to disk.
 
     Parameters:
-    - use_small (bool): If set to True, the smaller variant of the model is used.
+    
     - models_dir (Path): The directory where the OpenVINO model files will be saved.
     """
     coarse_model_dir = models_dir / f"coarse_model"
@@ -101,7 +101,7 @@ def download_and_convert_coarse_encoder(use_small: bool, models_dir: Path):
     
     if not coarse_encoder_path.exists():
         coarse_model = load_model(
-            model_type="coarse", use_gpu=False, use_small=use_small, force_reload=False
+            model_type="coarse", use_gpu=False, force_reload=False
         )
         coarse_encoder_exportable = CoarseEncoderModel(coarse_model)
         logits, kv_cache = coarse_encoder_exportable(torch.ones((1, 886), dtype=torch.int64))
@@ -112,7 +112,7 @@ def download_and_convert_coarse_encoder(use_small: bool, models_dir: Path):
         ov.save_model(ov_model, coarse_encoder_path)
 
 # Function to download and convert the fine model
-def download_and_convert_fine_model(use_small: bool, models_dir: Path):
+def download_and_convert_fine_model(models_dir: Path):
     """
     Downloads and converts the fine model to OpenVINO format.
 
@@ -121,14 +121,14 @@ def download_and_convert_fine_model(use_small: bool, models_dir: Path):
     model head to OpenVINO format, saving them to the specified directory.
 
     Parameters:
-    - use_small (bool): If set to True, the smaller variant of the model is used.
+    
     - models_dir (Path): The directory where the OpenVINO model files will be saved.
     """
     fine_model_dir = models_dir / f"fine_model"
     fine_model_dir.mkdir(exist_ok=True)
     fine_feature_extractor_path = fine_model_dir / "bark_fine_feature_extractor.xml"
     if not fine_feature_extractor_path.exists():
-        fine_model = load_model(model_type="fine", use_gpu=False, use_small=use_small, force_reload=False)
+        fine_model = load_model(model_type="fine", use_gpu=False, force_reload=False)
         fine_feature_extractor = FineModel(fine_model)
         feature_extractor_out = fine_feature_extractor(
             3, torch.zeros((1, 1024, 8), dtype=torch.int32)
@@ -163,9 +163,9 @@ def main(use_small: bool):
     models_dir = Path(f"./model/TTS_bark{model_suffix}")
     models_dir.mkdir(parents=True, exist_ok=True)
     
-    download_and_convert_text_encoder(use_small, models_dir)
-    download_and_convert_coarse_encoder(use_small, models_dir)
-    download_and_convert_fine_model(use_small, models_dir)
+    download_and_convert_text_encoder(models_dir)
+    download_and_convert_coarse_encoder(models_dir)
+    download_and_convert_fine_model(models_dir)
     
     print("All models have been downloaded and converted successfully.")
     
