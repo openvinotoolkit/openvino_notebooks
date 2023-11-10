@@ -98,7 +98,6 @@ jobs:
           # 208 omz cache location is set to this with test_replace
           notebooks/208-optical-character-recognition/open_model_zoo_cache
           notebooks/110-ct-scan-live-inference/kits19_frames_1
-          notebooks/212-onnx-style-transfer/model
           notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
         key: ${{ env.FILES_CACHE_KEY }}
 
@@ -150,10 +149,10 @@ jobs:
         mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
     - name: Download shared datasets
       run: |
-          mkdir notebooks/data/librispeech
+          mkdir -p notebooks/data/librispeech
           wget  -O notebooks/data/librispeech/test-clean.tar.gz http://openslr.elda.org/resources/12/test-clean.tar.gz
           tar -xvf notebooks/data/librispeech/test-clean.tar.gz
-          mkdir notebooks/data/cifar10
+          mkdir -p notebooks/data/cifar10
           wget -O notebooks/data/cifar10/cifar-10-python.tar.gz https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
     - name: Install dependencies
       run: |
@@ -185,16 +184,6 @@ jobs:
     - name: convert_notebooks
       shell: bash
       run: .ci/convert_notebooks.sh
-    - name: Save HTML files
-      uses: actions/upload-artifact@v2
-      with:
-        name: html_files
-        path: html_files
-    - name: Save Markdown files
-      uses: actions/upload-artifact@v2
-      with:
-        name: markdown_files
-        path: markdown_files
     - name: Save reStructuredText files
       uses: actions/upload-artifact@v2
       with:

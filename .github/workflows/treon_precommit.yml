@@ -71,16 +71,16 @@ jobs:
       uses: xom9ikk/dotenv@v1.0.2
       with:
         path: ./.github/workflows
+    # - name: Install required packages
+    #   run:  |
+    #         if [ "$RUNNER_OS" == "Linux" ]; then
+    #         sudo apt-get install libsndfile1 -y
+    #         fi
+    #   shell: bash
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
-    - name: Install required packages
-      run:  |
-            if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get install libsndfile1 -y
-            fi
-      shell: bash
 
     - name: Cache OpenVINO Pip Packages
       id: cachepip
@@ -104,7 +104,6 @@ jobs:
           # 208 omz cache location is set to this with test_replace
           notebooks/208-optical-character-recognition/open_model_zoo_cache
           notebooks/110-ct-scan-live-inference/kits19_frames_1
-          notebooks/212-onnx-style-transfer/model
           notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
         key: ${{ env.FILES_CACHE_KEY }}
 
@@ -197,7 +196,7 @@ jobs:
     # Patch long running cells to run faster
     - name: Patch notebooks
       run: |
-        python .ci/patch_notebooks.py
+        python .ci/patch_notebooks.py .
 
     # Test that JupyterLab runs without errors
     - name: Test Jupyterlab
