@@ -21,10 +21,12 @@ The following image shows an example of the input image, detected body key point
 This notebook demonstrates how to convert and run stable diffusion using OpenVINO.
 
 Notebook contains the following steps:
-1. Convert PyTorch models to ONNX format.
-2. Convert ONNX models to OpenVINO IR format using Model Optimizer tool.
+1. Create pipeline with PyTorch models using Diffusers library.
+2. Convert PyTorch models to OpenVINO IR format using model conversion API.
 3. Run Stable Diffusion ControlNet pipeline with OpenVINO.
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
