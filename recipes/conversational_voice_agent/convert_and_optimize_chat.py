@@ -50,7 +50,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--chat_model_type", type=str, choices=["llama2-7B", "llama2-13B"],
                         default="llama2-7B", help="Chat model to be converted")
-    parser.add_argument("--quantize_weights", default=True, action="store_true", help="Whether to quantize weights to INT8")
+    parser.add_argument("--quantize_weights", default=False, action="store_true", help="Whether to quantize weights to INT8")
     parser.add_argument("--model_dir", type=str, default="model", help="Directory to place the model in")
 
     args = parser.parse_args()
