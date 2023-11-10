@@ -1,11 +1,11 @@
 import argparse
-import sys
-import torch
-import openvino as ov
 from pathlib import Path
+
+import openvino as ov
+import torch
 from bark.generation import load_model
 from torch import nn
-import subprocess
+
 
 # Define the TextEncoderModel class
 class TextEncoderModel(nn.Module):
@@ -16,6 +16,7 @@ class TextEncoderModel(nn.Module):
     def forward(self, idx, past_kv=None):
         return self.encoder(idx, merge_context=True, past_kv=past_kv, use_cache=True)
 
+
 # Define the CoarseEncoderModel class
 class CoarseEncoderModel(nn.Module):
     def __init__(self, encoder):
@@ -24,6 +25,7 @@ class CoarseEncoderModel(nn.Module):
 
     def forward(self, idx, past_kv=None):
         return self.encoder(idx, past_kv=past_kv, use_cache=True)
+
 
 # Define the FineModel class
 class FineModel(nn.Module):
@@ -46,9 +48,10 @@ class FineModel(nn.Module):
             x = block(x)
         x = self.model.transformer.ln_f(x)
         return x
-    
+
+
 # Function to download and convert the text encoder model
-def download_and_convert_text_encoder(models_dir: Path):
+def download_and_convert_text_encoder(models_dir: Path) -> None:
     """
     Downloads and converts the text encoder model to OpenVINO format.
     
@@ -57,10 +60,9 @@ def download_and_convert_text_encoder(models_dir: Path):
     OpenVINO model and saves it in IR format.
 
     Parameters:
-    
-    - models_dir (Path): The directory where the OpenVINO model files will be saved.
+        models_dir (Path): The directory where the OpenVINO model files will be saved.
     """
-    text_model_dir = models_dir / f"text_encoder"
+    text_model_dir = models_dir / "text_encoder"
     text_model_dir.mkdir(exist_ok=True)
     text_encoder_path1 = text_model_dir / "bark_text_encoder_1.xml"
     text_encoder_path0 = text_model_dir / "bark_text_encoder_0.xml"
@@ -82,8 +84,8 @@ def download_and_convert_text_encoder(models_dir: Path):
         ov.save_model(ov_model, text_encoder_path1)
   
 
-    # Function to download and convert the coarse encoder model
-def download_and_convert_coarse_encoder(models_dir: Path):
+# Function to download and convert the coarse encoder model
+def download_and_convert_coarse_encoder(models_dir: Path) -> None:
     """
     Downloads and converts the coarse encoder model to OpenVINO format.
 
@@ -92,10 +94,9 @@ def download_and_convert_coarse_encoder(models_dir: Path):
     format and saves the converted model to disk.
 
     Parameters:
-    
-    - models_dir (Path): The directory where the OpenVINO model files will be saved.
+        models_dir (Path): The directory where the OpenVINO model files will be saved.
     """
-    coarse_model_dir = models_dir / f"coarse_model"
+    coarse_model_dir = models_dir / "coarse_model"
     coarse_model_dir.mkdir(exist_ok=True)
     coarse_encoder_path = coarse_model_dir / "bark_coarse_encoder.xml"
     
@@ -111,8 +112,9 @@ def download_and_convert_coarse_encoder(models_dir: Path):
         )
         ov.save_model(ov_model, coarse_encoder_path)
 
+
 # Function to download and convert the fine model
-def download_and_convert_fine_model(models_dir: Path):
+def download_and_convert_fine_model(models_dir: Path) -> None:
     """
     Downloads and converts the fine model to OpenVINO format.
 
@@ -121,10 +123,9 @@ def download_and_convert_fine_model(models_dir: Path):
     model head to OpenVINO format, saving them to the specified directory.
 
     Parameters:
-    
-    - models_dir (Path): The directory where the OpenVINO model files will be saved.
+        models_dir (Path): The directory where the OpenVINO model files will be saved.
     """
-    fine_model_dir = models_dir / f"fine_model"
+    fine_model_dir = models_dir / "fine_model"
     fine_model_dir.mkdir(exist_ok=True)
     fine_feature_extractor_path = fine_model_dir / "bark_fine_feature_extractor.xml"
     if not fine_feature_extractor_path.exists():
@@ -149,18 +150,19 @@ def download_and_convert_fine_model(models_dir: Path):
                 lm_head_model,
                 fine_model_dir / f"bark_fine_lm_{i}.xml",
             )
-            
-def main(use_small: bool):
+
+
+def convert_bark(use_small: bool) -> None:
     """
     This function orchestrates the process of downloading and converting the text encoder,
     coarse encoder, and fine model based on the specified model size variant. 
 
     Parameters:
-    - use_small (bool): Flag indicating whether to download and convert the smaller variants
-                        of the models. This will also be reflected in the directory names.
+        use_small (bool): Flag indicating whether to download and convert the smaller variants
+                          of the models. This will also be reflected in the directory names.
     """
     model_suffix = "_small" if use_small else ""
-    models_dir = Path(f"./model/TTS_bark{model_suffix}")
+    models_dir = Path(f"model/TTS_bark{model_suffix}")
     models_dir.mkdir(parents=True, exist_ok=True)
     
     download_and_convert_text_encoder(models_dir)
@@ -168,10 +170,11 @@ def main(use_small: bool):
     download_and_convert_fine_model(models_dir)
     
     print("All models have been downloaded and converted successfully.")
-    
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Download and convert models.')
-    parser.add_argument('--use_small', action='store_true', help='Use smaller model variants')
+    parser = argparse.ArgumentParser(description="Download and convert models")
+    parser.add_argument("--use_small_models", default=False, action="store_true", help="Use smaller model variants")
     args = parser.parse_args()
 
-    main(args.use_small)
+    convert_bark(args.use_small_models)
