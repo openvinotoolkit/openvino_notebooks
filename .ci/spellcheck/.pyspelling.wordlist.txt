@@ -213,6 +213,7 @@ HED
 HH
 hoc
 HuggingFace
+huggingfacehub
 Husain
 HWC
 hyperparameters

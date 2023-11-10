@@ -29,7 +29,6 @@ def create_title_for_tc(title):
 def create_link_for_tc(title):
     link = re.sub(r'[`$^]', '', title)
     link = link.replace(" ", "-")
-    link += '-Uparrow'
 
     return link
 
@@ -43,12 +42,37 @@ def remove_old_tc(cell, idx):
     return cell
 
 
-def get_tc_line(title, title_for_tc, link):
+def get_tc_line(title, title_for_tc, link, tc_list, titles_list):
     # calc indents for Table of content
-    indents = ("  " * ((title.index(" ") - 2) * 2)) + "-" + " "
+    indents_num = (title.index(" ") - 2) * 4
+    if len(tc_list) == 0 or indents_num < 0:
+        # when first list item have more than 1 indents the alignment would be broken
+        indents_num = 0
+    elif indents_num - tc_list[-1].index("-") > 4:
+        # when previous list item have n indents and current have n+4+1 it broke the alignment
+        indents_num = tc_list[-1].index("-") + 4
+    elif indents_num != tc_list[-1].index("-") and\
+         title.index(" ") == titles_list[-1].index(" "):
+        # when we have several titles with same wrong alignments
+        indents_num = tc_list[-1].index("-")
+
+    indents = " " * indents_num + "-" + " "
     line = f"{indents}[{title_for_tc}](#{link})\n"
 
     return line
+
+
+def is_ref_to_top_exists(cell, idx):
+    ref_exists = False
+    for row in cell[idx + 1:]:
+        row = row.strip()
+        if '[back to top ⬆️](#Table-of-content' in row:
+            ref_exists = True
+            break
+        elif row != '':
+            # content of block started
+            break
+    return ref_exists
 
 
 def is_markdown(cell):
@@ -60,7 +84,7 @@ def is_title(line):
 
 
 def generate_table_of_content(notebook_path: pathlib.Path):
-    table_of_content = ["\n", "### Table of content:\n"]
+    table_of_content = []
 
     table_of_content_cell = None
     table_of_content_cell_idx = None
@@ -71,24 +95,38 @@ def generate_table_of_content(notebook_path: pathlib.Path):
     table_of_content_cell, table_of_content_cell_idx =\
         find_tc_in_cell(notebook_json["cells"][0])
 
+    all_titles = []
     for cell in filter(is_markdown, notebook_json["cells"][1:]):
         if table_of_content_cell is None:
             table_of_content_cell, table_of_content_cell_idx = find_tc_in_cell(cell)
+            if not table_of_content_cell is None:
+                continue
 
         titles = [line for line in cell["source"] if is_title(line)]
         for title in titles:
             idx = cell["source"].index(title)
+            if not is_ref_to_top_exists(cell["source"], idx):
+                cell["source"].insert( idx + 1, '[back to top ⬆️](#Table-of-contents:)\n')
+                cell["source"].insert( idx + 2, '')
 
             title = title.strip()
-            if '[$\\Uparrow$](#Table-of-content:)' in cell["source"][idx]:
-                title = title.replace(" [$\\Uparrow$](#Table-of-content:)", "")
-            else:
-                cell["source"][idx] = title + ' [$\\Uparrow$](#Table-of-content:)\n'
-
             title_for_tc = create_title_for_tc(title)
             link_for_tc = create_link_for_tc(title_for_tc)
-            new_line = get_tc_line(title, title_for_tc, link_for_tc)
+            new_line = get_tc_line(title,
+                                   title_for_tc,
+                                   link_for_tc,
+                                   table_of_content,
+                                   all_titles)
+
+            if table_of_content.count(new_line) > 1:
+                print(f'WARINING: the title "{title_for_tc}" has already used in titles.\n' +
+                       'Navigation will work inccorect, the link will only point to ' +
+                       'the first encountered title')
+
             table_of_content.append(new_line)
+            all_titles.append(title)
+
+    table_of_content = ["\n", "#### Table of contents:\n"] + table_of_content
 
     if table_of_content_cell is not None:
         table_of_content_cell = remove_old_tc(table_of_content_cell, table_of_content_cell_idx)
@@ -107,7 +145,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-s', '--source',
                         help='Please, specify notebook or folder with notebooks.\
-                            Table of content will be added or modified in each.')
+                            Table of content will be added or modified in each.', required=True)
 
     args = parser.parse_args()
     path_to_source = pathlib.Path(args.source)
