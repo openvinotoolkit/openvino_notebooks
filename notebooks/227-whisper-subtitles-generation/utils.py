@@ -3,6 +3,7 @@ from functools import partial
 import openvino as ov
 from pathlib import Path
 from typing import List, Optional, Union
+from math import floor, ceil
 
 import io
 from scipy.io import wavfile
@@ -267,8 +268,10 @@ def get_audio(video_file):
     Returns:
       resampled_audio: mono-channel float audio signal with 16000 Hz sample rate
                        extracted from video
+      duration: duration of video fragment in seconds
     """
     input_video = VideoFileClip(str(video_file))
+    duration = input_video.duration
     input_video.audio.write_audiofile(video_file.stem + '.wav', verbose=False, logger=None)
     input_audio_file = video_file.stem + '.wav'
     sample_rate, audio = wavfile.read(
@@ -280,7 +283,7 @@ def get_audio(video_file):
     # The model expects mono-channel audio with a 16000 Hz sample rate, represented in floating point range. When the
     # audio from the input video does not meet these requirements, we will need to apply preprocessing.
     resampled_audio = resample(audio, sample_rate, 16000)
-    return resampled_audio
+    return resampled_audio, duration
 
 
 def format_timestamp(seconds: float):
@@ -302,12 +305,14 @@ def format_timestamp(seconds: float):
     return (f"{hours}:" if hours > 0 else "00:") + f"{minutes:02d}:{seconds:02d},{milliseconds:03d}"
 
 
-def prepare_srt(transcription):
+def prepare_srt(transcription, filter_duration=None):
     """
     Format transcription into srt file format
     """
     segment_lines = []
     for segment in transcription["segments"]:
+        if filter_duration is not None and (segment["start"] >= floor(filter_duration) or segment["end"] > ceil(filter_duration) + 1):
+            break
         segment_lines.append(str(segment["id"] + 1) + "\n")
         time_start = format_timestamp(segment["start"])
         time_end = format_timestamp(segment["end"])
