@@ -151,6 +151,7 @@ donut
 Downloader
 downloader
 downsampled
+DPO
 dpredictor
 Dreamshaper
 dropdown
@@ -213,6 +214,7 @@ HED
 HH
 hoc
 HuggingFace
+huggingfacehub
 Husain
 HWC
 hyperparameters
@@ -316,6 +318,7 @@ MiDaS
 MidasNet
 Midjourney
 MiniLM
+mistralai
 MLS
 mms
 MMS
@@ -323,7 +326,6 @@ MLP
 mobilenet
 MobileNet
 MobileNetV
-MusicGen
 modelled
 Modelscope
 Mody
@@ -341,6 +343,7 @@ MultiHeadAttention
 multilayer
 multimodal
 Multimodality
+MusicGen
 Müller
 Nakayosi
 nano
