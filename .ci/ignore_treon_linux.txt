@@ -20,6 +20,7 @@
 241-riffusion-text-to-music
 242-freevc-voice-conversion
 246-paint-by-example
+247-code-language-id
 248-stable-diffusion-xl
 249-oneformer-segmentation
 250-music-generation
@@ -33,9 +34,12 @@
 258-blip-diffusion-subject-generation
 259-decidiffusion-image-generation
 260-pix2struct-docvqa
+261-fast-segment-anything
 262-softvc-voice-conversion
 263-latent-consistency-models-image-generation
 264-qrcode-monster
 265-wuerstchen-image-generation
 266-speculative-sampling
+267-distil-whisper-asr
+269-film-slowmo
 404-style-transfer-webcam

@@ -57,6 +57,7 @@ CHW
 Cifar
 cityscape
 Cityscapes
+CLI
 CLIP's
 codebook
 codebooks
@@ -150,9 +151,11 @@ donut
 Downloader
 downloader
 downsampled
+DPO
 dpredictor
 Dreamshaper
 dropdown
+ECCV
 editability
 EfficientNet
 embeddings
@@ -211,6 +214,7 @@ HED
 HH
 hoc
 HuggingFace
+huggingfacehub
 Husain
 HWC
 hyperparameters
@@ -236,8 +240,10 @@ installable
 instantiation
 InstructGPT
 InstructPix
+intel
 invertible
 intervaling
+im
 IRs
 iteratively
 JFLEG
@@ -245,6 +251,7 @@ JIT
 Joao
 JS
 JSON
+JuggernautXL
 Jupyter
 Jupyter's
 JupyterLab
@@ -311,6 +318,7 @@ MiDaS
 MidasNet
 Midjourney
 MiniLM
+mistralai
 MLS
 mms
 MMS
@@ -318,7 +326,6 @@ MLP
 mobilenet
 MobileNet
 MobileNetV
-MusicGen
 modelled
 Modelscope
 Mody
@@ -336,6 +343,7 @@ MultiHeadAttention
 multilayer
 multimodal
 Multimodality
+MusicGen
 Müller
 Nakayosi
 nano
@@ -387,6 +395,8 @@ overfitting
 overlayed
 OV
 OVC
+OVModel
+OVModelForXXX
 OVMS
 OvStableDiffusionInpaintingPipeline
 PaddleClas
@@ -529,6 +539,7 @@ sigmoid
 SISR
 SlowFast
 slowfast
+slowmo
 SML
 sml
 softmax
@@ -545,6 +556,7 @@ SPS
 SQA
 SQuAD
 SRT
+SSD
 SSDLite
 sst
 StableDiffusionInpaintPipeline
@@ -568,6 +580,7 @@ superset
 svc
 Swin
 SwinV
+TaskManager
 TartanAir
 TensorBoard
 tensorflow
@@ -653,10 +666,12 @@ Würstchen
 XCode
 Xeon
 xl
+xvector
 XYWH
 YOLO
 YOLOv
 yolov
+ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope

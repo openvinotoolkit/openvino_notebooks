@@ -52,4 +52,6 @@ notebooks/263-latent-consistency-models-image-generation/263-latent-consistency-
 notebooks/264-qrcode-monster/264-qrcode-monster.ipynb
 notebooks/265-wuerstchen-image-generation/265-wuerstchen-image-generation.ipynb
 notebooks/266-speculative-sampling/266-speculative-sampling.ipynb
+notebooks/267-distil-whisper-asr/267-distil-whisper-asr.ipynb
+notebooks/269-film-slowmo/269-film-slowmo.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb
