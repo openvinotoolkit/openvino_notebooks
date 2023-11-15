@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "364bd5aef6d4ba6e21b258720306e26cddcce1a9b6549a294ee95fb05c14552c"
+            "sha256": "ebb6cc83ca54979e6b00943551e54d2f3a32f95887f7ffd1453ec393db2afaf2"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1192,11 +1192,11 @@
         },
         "huggingface-hub": {
             "hashes": [
-                "sha256:10eda12b9c1cfa800b4b7c096b3ace8843734c3f28d69d1c243743fb7d7a2e81",
-                "sha256:ee0b6b68acbf6aeb6d083ea081e981c277a1104b82ab67fdf6780ff5396830af"
+                "sha256:40439632b211311f788964602bf8b0d9d6b7a2314fba4e8d67b2ce3ecea0e3fd",
+                "sha256:545eb3665f6ac587add946e73984148f2ea5c7877eac2e845549730570c1933a"
             ],
             "markers": "python_full_version >= '3.8.0'",
-            "version": "==0.18.0"
+            "version": "==0.17.3"
         },
         "idna": {
             "hashes": [
@@ -2057,6 +2057,14 @@
             "index": "pypi",
             "markers": "python_version >= '3.7'",
             "version": "==0.9.1"
+        },
+        "mpmath": {
+            "hashes": [
+                "sha256:7a28eb2a9774d00c7bc92411c19a89209d5da7c4c9a9e227be8330a23a25b91f",
+                "sha256:a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c"
+            ],
+            "index": "pypi",
+            "version": "==1.3.0"
         },
         "msgpack": {
             "hashes": [
@@ -3910,6 +3918,14 @@
             "index": "pypi",
             "version": "==4.1.0"
         },
+        "sympy": {
+            "hashes":[
+                "sha256:c3588cd4295d0c0f603d0f2ae780587e64e2efeedb3521e46b9bb1d08d184fa5",
+                "sha256:ebf595c8dac3e0fdc4152c51878b498396ec7f30e7a914d6071e674d49420fb8"
+            ],
+            "index": "pypi",
+            "version": "==1.12" 
+        },
         "tensorboard": {
             "hashes": [
                 "sha256:b4a69366784bc347e02fbe7d847e01896a649ca52f8948a11005e205dcf724fb"
@@ -4113,10 +4129,12 @@
                 "sha256:f247eae99800ef821a91f47c5280e9e9afaeed9980fc444208d5aa6ba69ff148",
                 "sha256:f3835c5be51de8c0a092058a4d4380cb9244fb34681fd0a295fbf0a52a5fdf33",
                 "sha256:f55c981ac44ba87c93e847c333e58c12abcbb377a0c2f2ef96e1a266e4184ff2",
-                "sha256:fc2a7fdf864554a0dacf09d32e17c0caa9afe72baf9dd7ddedc61973bae352d8"
+                "sha256:fc2a7fdf864554a0dacf09d32e17c0caa9afe72baf9dd7ddedc61973bae352d8",
+                "sha256:26fee36a6d8f2bd9464f3566b95e3e3fb7fd7dad723f775c500aac8204ec98c6",
+                "sha256:11284b32f0036fe7ef4b8b00201dda79c00f3fcea173bc0e5c599e09c937ab0f"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==0.13.3"
+            "version": "==0.14.1"
         },
         "toml": {
             "hashes": [
@@ -4136,10 +4154,17 @@
         },
         "torch": {
             "hashes": [
-                "sha256:4a8b84834eb12b3428c24e9f264c9bd6a2cf449fffc191374e7dbb2b950fc6d7"
+                "sha256:9e5cfd931a65b38d222755a45dabb53b836be31bc620532bc66fee77e3ff67dc"
             ],
             "index": "pytorch-wheels",
-            "version": "==1.13.1+cpu"
+            "version": "==2.1.0+cpu"
+        },
+        "torchaudio": {
+            "hashes": [
+                "sha256:f2062f985504171368535bf86808acf86b29573d9730715dcc55408ae09a717b"
+            ],
+            "index": "pytorch-wheels",
+            "version": "==2.1.0+cpu"
         },
         "torchmetrics": {
             "hashes": [
@@ -4152,10 +4177,10 @@
         },
         "torchvision": {
             "hashes": [
-                "sha256:46ff03ec16b49a6031714e98b1321a18ce789d8440a5073981e83b470a0484d1"
+                "sha256:512ec79de67e04ff28b2d96353f6da555151dec89fc9b10c73bec8b2a1b304f6"
             ],
             "index": "pytorch-wheels",
-            "version": "==0.14.1+cpu"
+            "version": "==0.16.0+cpu"
         },
         "tornado": {
             "hashes": [
@@ -4192,12 +4217,12 @@
         },
         "transformers": {
             "hashes": [
-                "sha256:478e1709738237aa1b7bae1fd0ba7bd9d44352fe45972df7ed060077257e84f9",
-                "sha256:e90e9fc05310985f3ede2da278d11c91656b4a354b4935c54604f57409299aae"
+                "sha256:1d0258d5a18063b66005bbe1e3276ec5943d9ab4ab47f020db1fd485cc40ea22",
+                "sha256:d06ac09151d7b845e4a4acd6b143a591d946031ee67b4cbb20693b241920ffc0"
             ],
             "index": "pypi",
             "markers": "python_full_version >= '3.7.0'",
-            "version": "==4.30.0"
+            "version": "==4.34.1"
         },
         "treon": {
             "hashes": [

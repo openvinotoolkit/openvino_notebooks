@@ -17,6 +17,7 @@ The available options are:
 >**Note**: run model with demo, you will need to accept license agreement. 
 >You must be a registered user in 🤗 Hugging Face Hub. Please visit [HuggingFace model card](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf), carefully read terms of usage and click accept button.  You will need to use an access token for downloading model. For more information on access tokens, refer to [this section of the documentation](https://huggingface.co/docs/hub/security-tokens).
 * **mpt-7b-chat** - MPT-7B is part of the family of MosaicPretrainedTransformer (MPT) models, which use a modified transformer architecture optimized for efficient training and inference. These architectural changes include performance-optimized layer implementations and the elimination of context length limits by replacing positional embeddings with Attention with Linear Biases ([ALiBi](https://arxiv.org/abs/2108.12409)). Thanks to these modifications, MPT models can be trained with high throughput efficiency and stable convergence. MPT-7B-chat is a chatbot-like model for dialogue generation. It was built by finetuning MPT-7B on the [ShareGPT-Vicuna](https://huggingface.co/datasets/anon8231489123/ShareGPT_Vicuna_unfiltered), [HC3](https://huggingface.co/datasets/Hello-SimpleAI/HC3), [Alpaca](https://huggingface.co/datasets/tatsu-lab/alpaca), [HH-RLHF](https://huggingface.co/datasets/Anthropic/hh-rlhf), and [Evol-Instruct](https://huggingface.co/datasets/victor123/evol_instruct_70k) datasets. More details about model can be found in [blog post](https://www.mosaicml.com/blog/mpt-7b), [repository](https://github.com/mosaicml/llm-foundry/) and [HuggingFace model card](https://huggingface.co/mosaicml/mpt-7b-chat).
+* **zephyr-7b-beta** - Zephyr is a series of language models that are trained to act as helpful assistants. Zephyr-7B-beta is the second model in the series, and is a fine-tuned version of [mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1) that was trained on on a mix of publicly available, synthetic datasets using [Direct Preference Optimization (DPO)](https://arxiv.org/abs/2305.18290). You can find more details about model in [technical report](https://arxiv.org/abs/2310.16944) and [HuggingFace model card](https://huggingface.co/HuggingFaceH4/zephyr-7b-beta).
 
 The image below illustrates provided user instruction and model answer examples.
 
@@ -29,7 +30,7 @@ The tutorial consists of the following steps:
 
 - Install prerequisites
 - Download and convert the model from a public source using the [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
-- Compress model weights to INT8 precision using [NNCF](https://github.com/openvinotoolkit/nncf)
+- Compress model weights to INT4 or INT8 precision using [NNCF](https://github.com/openvinotoolkit/nncf)
 - Create an inference pipeline
 - Run chatbot
 

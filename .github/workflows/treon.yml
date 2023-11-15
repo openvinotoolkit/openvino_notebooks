@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, windows-2019, macos-11, macos-12]
+        os: [ubuntu-20.04, ubuntu-22.04, windows-2019, macos-12]
         python: ["3.8", "3.9", "3.10"]
     steps:
 
@@ -37,12 +37,12 @@ jobs:
       uses: xom9ikk/dotenv@v1.0.2
       with:
         path: ./.github/workflows
-    - name: Install required packages
-      run:  |
-            if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get install libsndfile1 -y
-            fi
-      shell: bash
+    # - name: Install required packages
+    #   run:  |
+    #         if [ "$RUNNER_OS" == "Linux" ]; then
+    #         sudo apt-get install libsndfile1 -y
+    #         fi
+    #   shell: bash
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
