@@ -175,6 +175,7 @@ finetuning
 FLAC
 floyd
 Formatter
+fp
 FP
 FPN
 FreeVC
@@ -620,6 +621,8 @@ Unimodal
 unsqueeze
 Uparrow
 uparrow
+upcast
+upcasts
 Upcroft
 upsample
 upsampled
