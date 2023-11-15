@@ -251,6 +251,7 @@ JIT
 Joao
 JS
 JSON
+JuggernautXL
 Jupyter
 Jupyter's
 JupyterLab
@@ -554,6 +555,7 @@ SPS
 SQA
 SQuAD
 SRT
+SSD
 SSDLite
 sst
 STFT
@@ -667,6 +669,7 @@ XYWH
 YOLO
 YOLOv
 yolov
+ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
