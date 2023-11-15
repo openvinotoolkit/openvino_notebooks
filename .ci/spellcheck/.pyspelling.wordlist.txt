@@ -9,6 +9,7 @@ aeroplane
 affective
 ai
 al
+Alibaba
 ALiBi
 analytics
 AnimeGAN
@@ -50,6 +51,8 @@ charlist
 charlists
 chatbot
 chatbots
+chatglm
+ChatGLM
 ChatGPT
 CIN
 ckpt
@@ -463,6 +466,7 @@ pytorch
 PyTorch
 PyTorchVideo
 QFormer
+Qianwen
 Qi
 qrcode
 quant
@@ -472,6 +476,8 @@ quantizers
 Quantizing
 quantizing
 QuartzNet
+qwen
+Qwen
 Radiopaedia
 Radosavovic
 Raj
@@ -594,6 +600,7 @@ Tokenizer
 tokenizers
 tokenizes
 tokenizing
+Tongyi
 TorchMetrics
 TorchScript
 torchvision
