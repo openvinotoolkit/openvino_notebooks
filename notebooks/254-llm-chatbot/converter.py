@@ -134,7 +134,38 @@ def convert_qwen(pt_model:torch.nn.Module, model_path:Path):
     del ov_model
     cleanup_torchscript_cache()
     del pt_model
-    
+
+@torch.jit.script_if_tracing
+def _chatglm2_get_context_layer(query_layer: torch.Tensor, key_layer: torch.Tensor, value_layer: torch.Tensor):
+    mask = torch.zeros((query_layer.shape[-2], key_layer.shape[-2]), dtype=query_layer.dtype)
+    if query_layer.shape[2] == key_layer.shape[2]:
+        tmp_mask = torch.ones((query_layer.shape[-2], key_layer.shape[-2]), dtype=torch.bool).triu(diagonal=1)
+        mask.masked_fill_(tmp_mask, float("-inf"))
+
+    context_layer = torch.nn.functional.scaled_dot_product_attention(query_layer, key_layer, value_layer, attn_mask=mask)
+    return context_layer
+
+def _core_attention_forward(self, query_layer, key_layer, value_layer, attention_mask):
+    query_layer, key_layer, value_layer = [k.permute(1, 2, 0, 3) for k in [query_layer, key_layer, value_layer]]
+    if attention_mask is None:
+        context_layer = _chatglm2_get_context_layer(query_layer, key_layer, value_layer)
+    else:
+        attention_mask = ~attention_mask
+        context_layer = torch.nn.functional.scaled_dot_product_attention(
+            query_layer, key_layer, value_layer, attention_mask
+        )
+    context_layer = context_layer.permute(2, 0, 1, 3)
+    new_context_layer_shape = context_layer.size()[:-2] + (self.hidden_size_per_partition,)
+    context_layer = context_layer.reshape(*new_context_layer_shape)
+
+    return context_layer
+
+def _patch_chatglm_core_attention_forward(model: "PreTrainedModel"):
+    for block in model.transformer.encoder.layers:
+        block.self_attention.core_attention.forward = types.MethodType(
+            _core_attention_forward, block.self_attention.core_attention
+        )
+        
 def convert_chatglm2(pt_model:torch.nn.Module, model_path:Path):
     """
     ChatGLM model conversion function
