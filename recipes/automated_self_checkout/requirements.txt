@@ -1,0 +1,7 @@
+openvino-dev==2023.0.0
+nncf==2.5.0
+ultralytics==8.0.117
+onnx==1.14.0
+supervision==0.16.0
+jupyterlab==4.0.7
+pycocotools==2.0.6
