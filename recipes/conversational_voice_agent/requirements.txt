@@ -1,5 +1,5 @@
-# todo update openvino, optimum intel to stable versions
-openvino-dev==2023.2.0dev20230922
+# todo update all packages to stable versions
+openvino==2023.2.0
 git+https://github.com/huggingface/optimum-intel.git
 optimum==1.14.0
 nncf==2.6.0
