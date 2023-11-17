@@ -9,6 +9,7 @@ from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizer
 
 from bark_utils import OVBark, SAMPLE_RATE
 
+# todo: get chat template from transformers
 CHAT_MODEL_TEMPLATES = {
     "llama2": {
         "system_configuration": "<<SYS>>\nYou're Adrishuo - a conversational agent. You talk to a customer. Your task is to recommend the customer products based on their needs.\n<</SYS>>\n\n",
@@ -68,7 +69,7 @@ def respond(prompt: str) -> str:
     Params:
         prompt: user's prompt
     Returns:
-       The chat's response
+        The chat's response
     """
     inputs = chat_tokenizer(prompt, return_tensors="pt").to(chat_model.device)
     input_length = inputs.input_ids.shape[1]
@@ -77,39 +78,54 @@ def respond(prompt: str) -> str:
     return chat_tokenizer.decode(token).split("</s>")[0]
 
 
-def chat(user_prompt: str, history: List) -> List[Tuple[str, str]]:
+def chat(history: List) -> List[Tuple[str, str]]:
     """
     Chat function. It generates response based on a prompt
 
     Params:
-        user_prompt: user's question
         history: history of the messages (conversation) so far
     Returns:
-       History with the latest chat's response
+        History with the latest chat's response
     """
-    messages = [message_template.format(human, ai if ai is not None else "") for human, ai in history]
+    user_prompt = history[-1][0]
+    messages = [message_template.format(human if human is not None else "", ai if ai is not None else "") for human, ai in history]
     messages.append(message_template.format(user_prompt, ""))
     conversation = system_configuration + "\n".join(messages)
 
     response = respond(conversation)
-    history.append((user_prompt, response))
+    history[-1][1] = response
 
     return history
 
 
-def synthesize(prompt: str) -> Tuple[int, np.ndarray]:
+def synthesize(conversation: List[Tuple[str, str]]) -> Tuple[int, np.ndarray]:
     """
     Generate audio from text
 
     Params:
-        prompt: text to generate audio from
+        conversation: conversation history with the chatbot
     Returns:
-       Sample rate and generated audio in form of numpy array
+        Sample rate and generated audio in form of numpy array
     """
-    while isinstance(prompt, list):
-        prompt = prompt[-1]
-
+    prompt = conversation[-1][-1]
     return SAMPLE_RATE, tts_model.generate_audio(prompt)
+
+
+def transcribe(audio: Tuple[int, np.ndarray], conversation: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
+    """
+    Transcribe audio to text
+
+    Params:
+        audio: audio to transcribe text from
+        conversation: conversation history with the chatbot
+    Returns:
+        Text in the next pair of messages
+    """
+    sample_rate, audio = audio
+    text = "I want to buy a car"
+
+    conversation.append((text, None))
+    return conversation
 
 
 def create_UI(initial_message: str) -> gr.Blocks:
@@ -119,17 +135,27 @@ def create_UI(initial_message: str) -> gr.Blocks:
     Params:
         initial_message: message to start with
     Returns:
-       Demo UI
+        Demo UI
     """
     with gr.Blocks(title="Talk to Adrishuo - a conversational voice agent") as demo:
-        chatbot_ui = gr.Chatbot(value=[(None, initial_message)])
-        audio_ui = gr.Audio(autoplay=True)
+        gr.Markdown("""
+        # Talk to Adrishuo - a conversational voice agent
+        
+        Instructions for use:
+        - record your question/comment using the first audio widget ("Your voice input")
+        - wait for the chatbot to response ("Chatbot")
+        - wait for the output voice in the last audio widget ("Chatbot voice output")
+        """)
         with gr.Row():
-            prompt_ui = gr.Textbox(label="Your message")
-            submit_btn = gr.Button("Submit", variant="primary", scale=1, max_width=50)
+            input_audio_ui = gr.Audio(sources=["microphone"], scale=5, label="Your voice input")
+            submit_audio_btn = gr.Button("Submit", variant="primary", scale=1)
 
-        submit_btn.click(chat, inputs=[prompt_ui, chatbot_ui], outputs=chatbot_ui)
-        chatbot_ui.change(synthesize, inputs=chatbot_ui, outputs=audio_ui)
+        chatbot_ui = gr.Chatbot(value=[(None, initial_message)], label="Chatbot")
+        output_audio_ui = gr.Audio(autoplay=True, interactive=False, label="Chatbot voice output")
+
+        # events
+        submit_audio_btn.click(transcribe, inputs=[input_audio_ui, chatbot_ui], outputs=chatbot_ui).then(chat, chatbot_ui, chatbot_ui)
+        # chatbot_ui.change(synthesize, inputs=chatbot_ui, outputs=output_audio_ui)
     return demo
 
 
