@@ -1,7 +1,7 @@
 # Sound Generation with AudioLDM2 and OpenVINO™
 
 [AudioLDM 2](https://huggingface.co/cvssp/audioldm2) is a latent text-to-audio diffusion model capable of generating realistic audio samples given any text input.
-AudioLDM 2 was proposed in the paper [AudioLDM 2: Learning Holistic Audio Generation with Self-supervised Pretraining](https://arxiv.org/abs/2308.05734) by Haohe Liu et al.
+AudioLDM 2 was proposed in the paper [AudioLDM 2: Learning Holistic Audio Generation with Self-supervised Pretraining](https://arxiv.org/abs/2308.05734) by `Haohe Liu` et al.
 The model takes a text prompt as input and predicts the corresponding audio. It can generate text-conditional sound effects, human speech and music.
 
 In this tutorial we will try out the pipeline, convert the models backing it one by one and will run an interactive app with Gradio!
