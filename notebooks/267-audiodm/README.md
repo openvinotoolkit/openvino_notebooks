@@ -1,19 +1,21 @@
-# Generate creative QR codes with ControlNet QR Code Monster and OpenVINO™
+# Sound Generation with AudioLDM2 and OpenVINO™
 
-[Stable Diffusion](https://github.com/CompVis/stable-diffusion), a cutting-edge image generation technique, but it can be further enhanced by combining it with [ControlNet](https://github.com/lllyasviel/ControlNet), a widely used control network approach. The combination allows Stable Diffusion to use a condition input to guide the image generation process, resulting in highly accurate and visually appealing images. The condition input could be in the form of various types of data such as scribbles, edge maps, pose key points, depth maps, segmentation maps, normal maps, or any other relevant information that helps to guide the content of the generated image, for example - QR codes! This method can be particularly useful in complex image generation scenarios where precise control and fine-tuning are required to achieve the desired results.
+[AudioLDM 2](https://huggingface.co/cvssp/audioldm2) is a latent text-to-audio diffusion model capable of generating realistic audio samples given any text input.
+AudioLDM 2 was proposed in the paper [AudioLDM 2: Learning Holistic Audio Generation with Self-supervised Pretraining](https://arxiv.org/abs/2308.05734) by Haohe Liu et al.
+The model takes a text prompt as input and predicts the corresponding audio. It can generate text-conditional sound effects, human speech and music.
 
-In this tutorial, we will learn how to convert and run [Controlnet QR Code Monster For SD-1.5](https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster) by [monster-labs](https://qrcodemonster.art/).
+In this tutorial we will try out the pipeline, convert the models backing it one by one and will run an interactive app with Gradio!
+![](https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/c93a0f86-d9cf-4bd1-93b9-e27532170d75)
 
-![](https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/1a5978c6-e7a0-4824-9318-a3d8f4912c47)
 
 ## Notebook Contents
 
-This notebook demonstrates how to convert and run ControlNet and Stable Diffusion using OpenVINO.
+This notebook demonstrates how to convert and run Audio LDM 2 using OpenVINO.
 
 Notebook contains the following steps:
 1. Create pipeline with PyTorch models using Diffusers library.
 2. Convert PyTorch models to OpenVINO IR format using model conversion API.
-3. Run Stable Diffusion ControlNet pipeline with OpenVINO.
+3. Run Audio LDM 2 pipeline with OpenVINO.
 
 ## Installation Instructions
 
