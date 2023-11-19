@@ -40,3 +40,4 @@
 266-speculative-sampling
 267-distil-whisper-asr
 269-film-slowmo
+270-sound-generation

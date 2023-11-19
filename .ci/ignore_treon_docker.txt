@@ -38,6 +38,7 @@
 266-speculative-sampling
 267-distil-whisper-asr
 269-film-slowmo
+270-sound-generation
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
 404-style-transfer-webcam
