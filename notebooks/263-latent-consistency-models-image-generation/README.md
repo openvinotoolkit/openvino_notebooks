@@ -10,7 +10,7 @@ In this[tutorial, we consider how to convert and run LCM using OpenVINO. We cons
 
 ## Using models prepared with Latent Consistency Distillation
 
-This notebook is a demonstration in which you can type a text description and the pipeline will generate an image that reflects the context of the input text, using model distilled using [Latent Consistency Distillation](LCD)(https://arxiv.org/abs/2310.04378) approach.
+This notebook is a demonstration in which you can type a text description and the pipeline will generate an image that reflects the context of the input text, using model distilled using [Latent Consistency Distillation (LCD)](https://arxiv.org/abs/2310.04378) approach.
 Step-by-step, the diffusion process will iteratively denoise latent image representation while being conditioned on the text embeddings provided by the text encoder.
 
 The following image shows an example of the input sequence and corresponding predicted image.
@@ -49,7 +49,7 @@ The LCM LoRA allows to training of just a small number of adapters, known as LoR
 
 ### Notebook Contents
 
-This [notebook](./263-lcm-lora-controlnet.ipynb) explores how to speed up ControlNet pipeline using LCM LoRA and OpenVINO. It demonstrates how to apply [LCM LoRA](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5) and convert and run [stable-diffusion-1.5](runwayml/stable-diffusion-v1-5) conditioned by [ConrolNet Normal Mapping](https://huggingface.co/lllyasviel/control_v11p_sd15_normalbae) using OpenVINO.
+This [notebook](./263-lcm-lora-controlnet.ipynb) explores how to speed up ControlNet pipeline using LCM LoRA and OpenVINO. It demonstrates how to apply [LCM LoRA](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5) and convert and run [stable-diffusion-1.5](https://huggingface.co/runwayml/stable-diffusion-v1-5) conditioned by [ConrolNet Normal Mapping](https://huggingface.co/lllyasviel/control_v11p_sd15_normalbae) using OpenVINO.
 
 The following image shows an example of the input sequence, input image, condition image and corresponding predicted image.
 
