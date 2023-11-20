@@ -41,7 +41,7 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [QR Code Monster](notebooks/264-qrcode-monster/)<br> | Generate creative QR codes with ControlNet QR Code Monster and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/1a5978c6-e7a0-4824-9318-a3d8f4912c47" width=225> |
 | [Würstchen](notebooks/265-wuerstchen-image-generation)<br> | Text-to-image generation with Würstchen and OpenVINO™ | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/6917c558-d74c-4cc9-b81a-679ce0a299ee" width=300> | |
 | [Distil-Whisper](notebooks/267-distil-whisper-asr)<br> | Automatic speech recognition using Distil-Whisper and OpenVINO™ | | |
-| [FILM](notebooks/269-film-slowmo)<br> | Frame interpolation with FILM and OpenVINO™ | <img src="https://github.com/googlestaging/frame-interpolation/raw/main/moment.gif" width=300> |
+| [FILM](notebooks/269-film-slowmo)<br> | Frame interpolation with FILM and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/1720147/8ac5178d-4a92-4a86-a3df-dd494434fed6" width=300> |
 
 ## Table of Contents
 
