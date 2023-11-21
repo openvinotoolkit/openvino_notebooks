@@ -24,6 +24,7 @@ async
 AsyncInferQueue
 Atrous
 audiobooks
+audioldm
 AudioLDM
 autoencoder
 autoregressive
