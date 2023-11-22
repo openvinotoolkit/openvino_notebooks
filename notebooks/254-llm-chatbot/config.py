@@ -71,9 +71,9 @@ SUPPORTED_MODELS = {
         "model_id": "THUDM/chatglm2-6b",
         "remote": True,
         "start_message": f"{DEFAULT_SYSTEM_PROMPT }\n\n",
-        "history_template": "[Round{num}\n\n问：{user}\n\n答：{assistant}\n\n",
+        "history_template": "[Round{num}]\n\n问：{user}\n\n答：{assistant}\n\n",
         "partial_text_processor": chatglm_partial_text_processor,
-        "current_message_template": "[Round{num}\n\n问：{user}\n\n答：{assistant}",
+        "current_message_template": "[Round{num}]\n\n问：{user}\n\n答：{assistant}",
         "stop_tokens": ["</s>"],
     },
     "zephyr-7b-beta": {
