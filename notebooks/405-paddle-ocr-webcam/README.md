@@ -10,7 +10,7 @@ PaddleOCR performs the Optical Character Recognition (OCR) function from a video
 
 ## Notebook Contents
 
-This notebook demonstrates live paddleOCR inference with OpenVINO, using the ["Chinese and English ultra-lightweight PP-OCRv3 model（16.2M）"](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/doc/doc_en/ppocr_introduction_en.md#pp-ocrv3) from [PaddleOCR Github](https://github.com/PaddlePaddle/PaddleOCR) or [PaddleOCR Gitee](https://gitee.com/paddlepaddle/PaddleOCR), which includes upgraded text detector and recognizer to improve accuracy compared to its previous version, PP-OCRv2. Both text detection and recognition results are visualized in a window, and text recognition results include both recognized text and its corresponding confidence level. The notebook shows how to create the following pipeline:
+This notebook demonstrates live PaddleOCR inference with OpenVINO, using the ["Chinese and English ultra-lightweight PP-OCRv3 model（16.2M）"](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/doc/doc_en/ppocr_introduction_en.md#pp-ocrv3) from [PaddleOCR GitHub](https://github.com/PaddlePaddle/PaddleOCR) or [PaddleOCR Gitee](https://gitee.com/paddlepaddle/PaddleOCR), which includes upgraded text detector and recognizer to improve accuracy compared to its previous version, PP-OCRv2. Both text detection and recognition results are visualized in a window, and text recognition results include both recognized text and its corresponding confidence level. The notebook shows how to create the following pipeline:
 
 <p align="center" width="100%">
     <img width="80%" src="https://raw.githubusercontent.com/yoyowz/classification/master/images/pipeline.png">
@@ -21,7 +21,7 @@ Final part of this notebook shows live inference results from a webcam. Addition
 > **NOTE**: To use the webcam, you must run this Jupyter notebook on a computer with a webcam. If you run on a server, the webcam will not work. However, you can still do inference on a video in the final step.
 
 
-For more information about the other PaddleOCR pre-trained models, refer to the [PaddleOCR Github](https://github.com/PaddlePaddle/PaddleOCR) or [PaddleOCR Gitee](https://gitee.com/paddlepaddle/PaddleOCR).
+For more information about the other PaddleOCR pre-trained models, refer to the [PaddleOCR GitHub](https://github.com/PaddlePaddle/PaddleOCR) or [PaddleOCR Gitee](https://gitee.com/paddlepaddle/PaddleOCR).
 
 ## Installation Instructions
 

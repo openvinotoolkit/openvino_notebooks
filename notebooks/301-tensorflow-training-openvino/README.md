@@ -21,7 +21,7 @@ The second notebook demonstrates how to quantize the OpenVINO IR model that was 
 These notebooks are based on the [TensorFlow Image Classification Tutorial](https://www.tensorflow.org/tutorials/images/classification), distributed with an Apache 2.0 License, displayed below. The images in the TensorFlow Flowers dataset are Licensed with [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/). See the `LICENSE.txt` file inside the `flower_photos.tgz` archive.
 
 You may not use this file except in compliance with the License.
-You may obtain a copy of the [License at apache.org](https://www.apache.org/licenses/LICENSE-2.0)
+You may obtain a copy of the License at https://www.apache.org/licenses/LICENSE-2.0.
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,

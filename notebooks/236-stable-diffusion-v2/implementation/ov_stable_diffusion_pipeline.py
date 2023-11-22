@@ -7,9 +7,9 @@ import torch
 import numpy as np
 
 from transformers import CLIPTokenizer
-from diffusers.pipeline_utils import DiffusionPipeline
+from diffusers import DiffusionPipeline
 from diffusers.schedulers import DDIMScheduler, LMSDiscreteScheduler, PNDMScheduler
-from openvino.runtime import Model
+import openvino as ov
 
 
 def scale_fit_to_window(dst_width:int, dst_height:int, image_width:int, image_height:int):
@@ -61,12 +61,12 @@ def preprocess(image: PIL.Image.Image):
 class OVStableDiffusionPipeline(DiffusionPipeline):
     def __init__(
         self,
-        vae_decoder: Model,
-        text_encoder: Model,
+        vae_decoder: ov.Model,
+        text_encoder: ov.Model,
         tokenizer: CLIPTokenizer,
-        unet: Model,
+        unet: ov.Model,
         scheduler: Union[DDIMScheduler, PNDMScheduler, LMSDiscreteScheduler],
-        vae_encoder: Model = None,
+        vae_encoder: ov.Model = None,
     ):
         """
         Pipeline for text-to-image generation using Stable Diffusion.
@@ -188,7 +188,7 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
             # compute the previous noisy sample x_t -> x_t-1
             latents = self.scheduler.step(torch.from_numpy(noise_pred), t, torch.from_numpy(latents), **extra_step_kwargs)["prev_sample"].numpy()
         # scale and decode the image latents with vae
-        image = self.vae_decoder(latents)[self._vae_d_output]
+        image = self.vae_decoder(latents * (1 / 0.18215))[self._vae_d_output]
 
         image = self.postprocess_image(image, meta, output_type)
         return {"sample": image}
@@ -281,10 +281,8 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
                 noise = noise * self.scheduler.sigmas[0].numpy()
             return noise, {}
         input_image, meta = preprocess(image)
-        moments = self.vae_encoder(input_image)[self._vae_e_output]
-        mean, logvar = np.split(moments, 2, axis=1) 
-        std = np.exp(logvar * 0.5)
-        latents = (mean + std * np.random.randn(*mean.shape)) * 0.18215
+        latents = self.vae_encoder(input_image)[self._vae_e_output]
+        latents = latents * 0.18215
         latents = self.scheduler.add_noise(torch.from_numpy(latents), torch.from_numpy(noise), latent_timestep).numpy()
         return latents, meta
 

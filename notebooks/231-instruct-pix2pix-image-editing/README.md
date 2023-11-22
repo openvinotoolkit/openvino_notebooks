@@ -24,9 +24,10 @@ The following image shows an example of the input image with text-based prompt a
 This notebook demonstrates how to convert and run stable diffusion using OpenVINO.
 
 Notebook contains the following steps:
-1. Convert PyTorch models to ONNX format.
-2. Convert ONNX models to OpenVINO IR format, using Model Optimizer tool.
-3. Run InstructPix2Pix pipeline with OpenVINO.
+1. Convert PyTorch models to OpenVINO IR format, using Model Conversion API.
+2. Run InstructPix2Pix pipeline with OpenVINO.
+3. Optimize InstructPix2Pix pipeline with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.
+4. Compare results of original and optimized pipelines.
 
 ## Installation Instructions
 
