@@ -24,6 +24,8 @@ async
 AsyncInferQueue
 Atrous
 audiobooks
+audioldm
+AudioLDM
 autoencoder
 autoregressive
 autoregressively
@@ -657,8 +659,11 @@ VITS
 VM
 Vladlen
 VOC
+Vocoder
 VQA
 VQGAN
+waveform
+waveforms
 Wav
 WavLM
 WebGL
