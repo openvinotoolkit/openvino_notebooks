@@ -78,7 +78,7 @@ def respond(prompt: str) -> str:
     return chat_tokenizer.decode(token).split("</s>")[0]
 
 
-def chat(history: List) -> List[Tuple[str, str]]:
+def chat(history: List) -> List[List[str]]:
     """
     Chat function. It generates response based on a prompt
 
@@ -98,7 +98,7 @@ def chat(history: List) -> List[Tuple[str, str]]:
     return history
 
 
-def synthesize(conversation: List[Tuple[str, str]]) -> Tuple[int, np.ndarray]:
+def synthesize(conversation: List[List[str]]) -> Tuple[int, np.ndarray]:
     """
     Generate audio from text
 
@@ -111,7 +111,7 @@ def synthesize(conversation: List[Tuple[str, str]]) -> Tuple[int, np.ndarray]:
     return SAMPLE_RATE, tts_model.generate_audio(prompt)
 
 
-def transcribe(audio: Tuple[int, np.ndarray], conversation: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
+def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> List[List[str]]:
     """
     Transcribe audio to text
 
@@ -124,7 +124,7 @@ def transcribe(audio: Tuple[int, np.ndarray], conversation: List[Tuple[str, str]
     sample_rate, audio = audio
     text = "I want to buy a car"
 
-    conversation.append((text, None))
+    conversation.append([text, None])
     return conversation
 
 
@@ -150,11 +150,11 @@ def create_UI(initial_message: str) -> gr.Blocks:
             input_audio_ui = gr.Audio(sources=["microphone"], scale=5, label="Your voice input")
             submit_audio_btn = gr.Button("Submit", variant="primary", scale=1)
 
-        chatbot_ui = gr.Chatbot(value=[(None, initial_message)], label="Chatbot")
+        chatbot_ui = gr.Chatbot(value=[[None, initial_message]], label="Chatbot")
         output_audio_ui = gr.Audio(autoplay=True, interactive=False, label="Chatbot voice output")
 
         # events
-        submit_audio_btn.click(transcribe, inputs=[input_audio_ui, chatbot_ui], outputs=chatbot_ui).then(chat, chatbot_ui, chatbot_ui)
+        submit_audio_btn.click(transcribe, inputs=[input_audio_ui, chatbot_ui], outputs=chatbot_ui).then(chat, chatbot_ui, chatbot_ui).then(synthesize, chatbot_ui, output_audio_ui)
         # chatbot_ui.change(synthesize, inputs=chatbot_ui, outputs=output_audio_ui)
     return demo
 
@@ -174,10 +174,10 @@ def run(chat_model_dir: Path, tts_model_dir: Path, speaker_type: str, public_int
     # load bark model
     load_tts_model(tts_model_dir, speaker_type)
 
-    history = []
     initial_prompt = "Please introduce yourself and greet the customer"
+    history = [[initial_prompt, None]]
     # get initial greeting
-    history = chat(initial_prompt, history)
+    history = chat(history)
     initial_message = history[0][1]
 
     # create user interface
