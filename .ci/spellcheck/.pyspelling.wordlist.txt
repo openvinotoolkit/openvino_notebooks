@@ -588,6 +588,7 @@ Suno
 superresolution
 superset
 svc
+SVTR
 Swin
 SwinV
 TaskManager
