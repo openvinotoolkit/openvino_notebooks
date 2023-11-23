@@ -1,6 +1,6 @@
 # todo update all packages to stable versions
 openvino==2023.2.0
-git+https://github.com/huggingface/optimum-intel.git
+git+https://github.com/eaidova/optimum-intel.git@8daff51900a115ba5d3699f7f552af1ca366ddb9
 optimum==1.14.0
 nncf==2.6.0
 
@@ -11,6 +11,7 @@ onnxruntime==1.14.1
 
 transformers==4.34.1
 nltk==3.8.1
+librosa==0.10.1
 
 gradio==4.3.0
 
