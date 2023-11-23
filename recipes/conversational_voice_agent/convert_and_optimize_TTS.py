@@ -164,17 +164,18 @@ def download_and_convert_fine_model(models_dir: Path, use_small: bool) -> None:
         del fine_model
 
 
-def convert_bark(use_small: bool) -> None:
+def convert_bark(model_dir: Path, use_small: bool) -> None:
     """
     This function orchestrates the process of downloading and converting the text encoder,
     coarse encoder, and fine model based on the specified model size variant. 
 
     Parameters:
+        model_dir (Path): Directory to export models to
         use_small (bool): Flag indicating whether to download and convert the smaller variants
                           of the models. This will also be reflected in the directory names.
     """
-    model_suffix = "_small" if use_small else ""
-    models_dir = Path(f"model/TTS_bark{model_suffix}")
+    model_suffix = "-small" if use_small else ""
+    models_dir = model_dir / f"TTS-bark{model_suffix}-FP16"
     models_dir.mkdir(parents=True, exist_ok=True)
     
     download_and_convert_text_encoder(models_dir, use_small)
@@ -186,7 +187,8 @@ def convert_bark(use_small: bool) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Download and convert models")
+    parser.add_argument("--model_dir", type=str, default="model", help="Directory to place the models in")
     parser.add_argument("--use_small_models", default=False, action="store_true", help="Use smaller model variants")
     args = parser.parse_args()
 
-    convert_bark(args.use_small_models)
+    convert_bark(Path(args.model_dir), args.use_small_models)
