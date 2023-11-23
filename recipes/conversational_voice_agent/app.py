@@ -3,11 +3,14 @@ from pathlib import Path
 from typing import Tuple, List
 
 import gradio as gr
+import librosa
 import numpy as np
-from optimum.intel import OVModelForCausalLM
-from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizer
+from optimum.intel import OVModelForCausalLM, OVModelForSpeechSeq2Seq
+from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizer, AutoProcessor
 
 from bark_utils import OVBark, SAMPLE_RATE
+
+AUDIO_WIDGET_SAMPLE_RATE = 16000
 
 # todo: get chat template from transformers
 CHAT_MODEL_TEMPLATES = {
@@ -24,15 +27,31 @@ message_template: str = None
 
 tts_model: OVBark = None
 
+asr_model: OVModelForSpeechSeq2Seq = None
+asr_processor: AutoProcessor = None
+
+
+def load_asr_model(model_dir: Path) -> None:
+    """
+    Load automatic speech recognition model and assign it to a global variable
+
+    Params:
+        model_dir: dir with the ASR model
+    """
+    global asr_model, asr_processor
+
+    asr_model = OVModelForSpeechSeq2Seq.from_pretrained(model_dir, compile=False, device="AUTO")
+    asr_processor = AutoProcessor.from_pretrained(model_dir)
+
 
 def load_tts_model(model_dir: Path, speaker_type: str) -> None:
     """
-        Load text-to-speech model and assign it to a global variable
+    Load text-to-speech model and assign it to a global variable
 
-        Params:
-            model_dir: dir with the TTS model
-            speaker_type: male or female
-        """
+    Params:
+        model_dir: dir with the TTS model
+        speaker_type: male or female
+    """
     global tts_model
 
     text_encoder_path0 = model_dir / "text_encoder" / "bark_text_encoder_0.xml"
@@ -122,9 +141,13 @@ def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> 
         Text in the next pair of messages
     """
     sample_rate, audio = audio
-    text = "I want to buy a car"
+    audio = librosa.resample(audio.astype(np.float32), orig_sr=sample_rate, target_sr=AUDIO_WIDGET_SAMPLE_RATE).astype(np.int16)
 
-    conversation.append([text, None])
+    input_features = asr_processor(audio, sampling_rate=AUDIO_WIDGET_SAMPLE_RATE, return_tensors="pt").input_features
+    predicted_ids = asr_model.generate(input_features)
+    transcription = asr_processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
+
+    conversation.append([transcription, None])
     return conversation
 
 
@@ -155,20 +178,22 @@ def create_UI(initial_message: str) -> gr.Blocks:
 
         # events
         submit_audio_btn.click(transcribe, inputs=[input_audio_ui, chatbot_ui], outputs=chatbot_ui).then(chat, chatbot_ui, chatbot_ui).then(synthesize, chatbot_ui, output_audio_ui)
-        # chatbot_ui.change(synthesize, inputs=chatbot_ui, outputs=output_audio_ui)
     return demo
 
 
-def run(chat_model_dir: Path, tts_model_dir: Path, speaker_type: str, public_interface: bool = False) -> None:
+def run(asr_model_dir: Path, chat_model_dir: Path, tts_model_dir: Path, speaker_type: str, public_interface: bool = False) -> None:
     """
     Run the assistant application
 
     Params
+        asr_model_dir: dir with the automatic speech recognition model
         chat_model_dir: dir with the chat model
         tts_model_dir: dir with the text-to-speech model
         speaker_type: type of voice: male or female
         public_interface: whether UI should be available publicly
     """
+    # load whisper model
+    load_asr_model(asr_model_dir)
     # load chat model
     load_chat_model(chat_model_dir)
     # load bark model
@@ -188,10 +213,11 @@ def run(chat_model_dir: Path, tts_model_dir: Path, speaker_type: str, public_int
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--asr_model_dir', type=str, default="model/distil-large-v2-FP16", help="Path to the chat model directory")
     parser.add_argument('--chat_model_dir', type=str, default="model/llama2-7B-INT8", help="Path to the chat model directory")
     parser.add_argument('--tts_model_dir', type=str, default="model/TTS-bark-small-FP16", help="Path to the text-to-speech model directory")
     parser.add_argument('--tts_speaker_type', type=str, default="male", choices=["male", "female"], help="The speaker's voice type")
     parser.add_argument('--public_interface', default=False, action="store_true", help="Whether interface should be available publicly")
 
     args = parser.parse_args()
-    run(Path(args.chat_model_dir), Path(args.tts_model_dir), args.tts_speaker_type, args.public_interface)
+    run(Path(args.asr_model_dir), Path(args.chat_model_dir), Path(args.tts_model_dir), args.tts_speaker_type, args.public_interface)
