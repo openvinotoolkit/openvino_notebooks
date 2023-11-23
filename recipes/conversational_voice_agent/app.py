@@ -189,7 +189,7 @@ def run(chat_model_dir: Path, tts_model_dir: Path, speaker_type: str, public_int
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--chat_model_dir', type=str, default="model/llama2-7B-INT8", help="Path to the chat model directory")
-    parser.add_argument('--tts_model_dir', type=str, default="model/TTS_bark_small", help="Path to the text-to-speech model directory")
+    parser.add_argument('--tts_model_dir', type=str, default="model/TTS-bark-small-FP16", help="Path to the text-to-speech model directory")
     parser.add_argument('--tts_speaker_type', type=str, default="male", choices=["male", "female"], help="The speaker's voice type")
     parser.add_argument('--public_interface', default=False, action="store_true", help="Whether interface should be available publicly")
 
