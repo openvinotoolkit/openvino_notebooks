@@ -12,13 +12,8 @@ from bark_utils import OVBark, SAMPLE_RATE
 
 AUDIO_WIDGET_SAMPLE_RATE = 16000
 
-# todo: get chat template from transformers
-CHAT_MODEL_TEMPLATES = {
-    "llama2": {
-        "system_configuration": "<<SYS>>\nYou're Adrishuo - a conversational agent. You talk to a customer. Your task is to recommend the customer products based on their needs.\n<</SYS>>\n\n",
-        "message_template": "[INST] {} [/INST] {}\n"
-    }
-}
+SYSTEM_CONFIGURATION = "You're Adrishuo - a conversational agent. You talk to a customer. Your task is to recommend the customer products based on their needs."
+GREET_THE_CUSTOMER = "Please introduce yourself and greet the customer"
 
 chat_model: OVModelForCausalLM = None
 chat_tokenizer: PreTrainedTokenizer = None
@@ -71,11 +66,6 @@ def load_chat_model(model_dir: Path) -> None:
     """
     global chat_model, chat_tokenizer, system_configuration, message_template
 
-    model_name = model_dir.name.split("-")[0]
-    # system and message templates specific to the loaded model
-    system_configuration = CHAT_MODEL_TEMPLATES[model_name]["system_configuration"]
-    message_template = CHAT_MODEL_TEMPLATES[model_name]["message_template"]
-
     ov_config = {'PERFORMANCE_HINT': 'LATENCY', 'NUM_STREAMS': '1', "CACHE_DIR": ""}
     chat_model = OVModelForCausalLM.from_pretrained(model_dir, device="AUTO", config=AutoConfig.from_pretrained(model_dir), ov_config=ov_config)
     chat_tokenizer = AutoTokenizer.from_pretrained(model_dir)
@@ -106,10 +96,16 @@ def chat(history: List) -> List[List[str]]:
     Returns:
         History with the latest chat's response
     """
-    user_prompt = history[-1][0]
-    messages = [message_template.format(human if human is not None else "", ai if ai is not None else "") for human, ai in history]
-    messages.append(message_template.format(user_prompt, ""))
-    conversation = system_configuration + "\n".join(messages)
+    conversation = [
+        {"role": "system", "content": SYSTEM_CONFIGURATION},
+        {"role": "user", "content": GREET_THE_CUSTOMER}
+    ]
+    for user_prompt, assistant_response in history:
+        if user_prompt:
+            conversation.append({"role": "user", "content": user_prompt})
+        if assistant_response:
+            conversation.append({"role": "assistant", "content": assistant_response})
+    conversation = chat_tokenizer.apply_chat_template(conversation, tokenize=False)
 
     response = respond(conversation)
     history[-1][1] = response
@@ -138,7 +134,7 @@ def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> 
         audio: audio to transcribe text from
         conversation: conversation history with the chatbot
     Returns:
-        Text in the next pair of messages
+        User prompt as a text
     """
     sample_rate, audio = audio
     audio = librosa.resample(audio.astype(np.float32), orig_sr=sample_rate, target_sr=AUDIO_WIDGET_SAMPLE_RATE).astype(np.int16)
@@ -199,8 +195,7 @@ def run(asr_model_dir: Path, chat_model_dir: Path, tts_model_dir: Path, speaker_
     # load bark model
     load_tts_model(tts_model_dir, speaker_type)
 
-    initial_prompt = "Please introduce yourself and greet the customer"
-    history = [[initial_prompt, None]]
+    history = [[None, None]]
     # get initial greeting
     history = chat(history)
     initial_message = history[0][1]
