@@ -35,6 +35,7 @@ def load_asr_model(model_dir: Path) -> None:
     """
     global asr_model, asr_processor
 
+    # create a distil-whisper model and its processor
     asr_model = OVModelForSpeechSeq2Seq.from_pretrained(model_dir, device="AUTO")
     asr_processor = AutoProcessor.from_pretrained(model_dir)
 
@@ -54,6 +55,7 @@ def load_tts_model(model_dir: Path, speaker_type: str) -> None:
     coarse_encoder_path = model_dir / "coarse_model" / "bark_coarse_encoder.xml"
     fine_model_dir = model_dir / "fine_model"
 
+    # create a bark model
     tts_model = OVBark(text_encoder_path0, text_encoder_path1, coarse_encoder_path, fine_model_dir, device="AUTO", speaker=speaker_type)
 
 
@@ -66,6 +68,7 @@ def load_chat_model(model_dir: Path) -> None:
     """
     global chat_model, chat_tokenizer, system_configuration, message_template
 
+    # load llama model and its tokenizer
     ov_config = {'PERFORMANCE_HINT': 'LATENCY', 'NUM_STREAMS': '1', "CACHE_DIR": ""}
     chat_model = OVModelForCausalLM.from_pretrained(model_dir, device="AUTO", config=AutoConfig.from_pretrained(model_dir), ov_config=ov_config)
     chat_tokenizer = AutoTokenizer.from_pretrained(model_dir)
@@ -80,10 +83,13 @@ def respond(prompt: str) -> str:
     Returns:
         The chat's response
     """
+    # tokenize input text
     inputs = chat_tokenizer(prompt, return_tensors="pt").to(chat_model.device)
     input_length = inputs.input_ids.shape[1]
+    # generate response tokens
     outputs = chat_model.generate(**inputs, max_new_tokens=256, do_sample=True, temperature=0.6, top_p=0.9, top_k=50)
     token = outputs[0, input_length:]
+    # decode tokens into text
     return chat_tokenizer.decode(token).split("</s>")[0]
 
 
@@ -96,20 +102,25 @@ def chat(history: List) -> List[List[str]]:
     Returns:
         History with the latest chat's response
     """
+    # the conversation must be in that format to use chat template
     conversation = [
         {"role": "system", "content": SYSTEM_CONFIGURATION},
         {"role": "user", "content": GREET_THE_CUSTOMER}
     ]
+    # add prompts to the conversation
     for user_prompt, assistant_response in history:
         if user_prompt:
             conversation.append({"role": "user", "content": user_prompt})
         if assistant_response:
             conversation.append({"role": "assistant", "content": assistant_response})
+    # use a template specific to the model
     conversation = chat_tokenizer.apply_chat_template(conversation, tokenize=False)
 
+    # generate response for the conversation
     response = respond(conversation)
     history[-1][1] = response
 
+    # return chat history as the list of message pairs
     return history
 
 
@@ -123,6 +134,7 @@ def synthesize(conversation: List[List[str]]) -> Tuple[int, np.ndarray]:
         Sample rate and generated audio in form of numpy array
     """
     prompt = conversation[-1][-1]
+    # generate audio for the last prompt (bot's response)
     return SAMPLE_RATE, tts_model.generate_audio(prompt)
 
 
@@ -137,12 +149,17 @@ def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> 
         User prompt as a text
     """
     sample_rate, audio = audio
+    # the whisper model requires 16000Hz, not 44100Hz
     audio = librosa.resample(audio.astype(np.float32), orig_sr=sample_rate, target_sr=AUDIO_WIDGET_SAMPLE_RATE).astype(np.int16)
 
+    # get input features from the audio
     input_features = asr_processor(audio, sampling_rate=AUDIO_WIDGET_SAMPLE_RATE, return_tensors="pt").input_features
+    # get output
     predicted_ids = asr_model.generate(input_features)
+    # decode output to text
     transcription = asr_processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
 
+    # add the text to the conversation
     conversation.append([transcription, None])
     return conversation
 
@@ -166,10 +183,14 @@ def create_UI(initial_message: str) -> gr.Blocks:
         - wait for the output voice in the last audio widget ("Chatbot voice output")
         """)
         with gr.Row():
+            # user's input
             input_audio_ui = gr.Audio(sources=["microphone"], scale=5, label="Your voice input")
+            # submit button
             submit_audio_btn = gr.Button("Submit", variant="primary", scale=1)
 
+        # chatbot
         chatbot_ui = gr.Chatbot(value=[[None, initial_message]], label="Chatbot")
+        # chatbot's audio response
         output_audio_ui = gr.Audio(autoplay=True, interactive=False, label="Chatbot voice output")
 
         # events
@@ -197,8 +218,8 @@ def run(asr_model_dir: Path, chat_model_dir: Path, tts_model_dir: Path, speaker_
     # load bark model
     load_tts_model(tts_model_dir, speaker_type)
 
-    history = [[None, None]]
     # get initial greeting
+    history = [[None, None]]
     history = chat(history)
     initial_message = history[0][1]
 
