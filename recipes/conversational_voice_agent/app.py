@@ -35,7 +35,7 @@ def load_asr_model(model_dir: Path) -> None:
     """
     global asr_model, asr_processor
 
-    asr_model = OVModelForSpeechSeq2Seq.from_pretrained(model_dir, compile=False, device="AUTO")
+    asr_model = OVModelForSpeechSeq2Seq.from_pretrained(model_dir, device="AUTO")
     asr_processor = AutoProcessor.from_pretrained(model_dir)
 
 
@@ -173,7 +173,9 @@ def create_UI(initial_message: str) -> gr.Blocks:
         output_audio_ui = gr.Audio(autoplay=True, interactive=False, label="Chatbot voice output")
 
         # events
-        submit_audio_btn.click(transcribe, inputs=[input_audio_ui, chatbot_ui], outputs=chatbot_ui).then(chat, chatbot_ui, chatbot_ui).then(synthesize, chatbot_ui, output_audio_ui)
+        submit_audio_btn.click(transcribe, inputs=[input_audio_ui, chatbot_ui], outputs=chatbot_ui)\
+            .then(chat, chatbot_ui, chatbot_ui)\
+            .then(synthesize, chatbot_ui, output_audio_ui)
     return demo
 
 
@@ -208,7 +210,7 @@ def run(asr_model_dir: Path, chat_model_dir: Path, tts_model_dir: Path, speaker_
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--asr_model_dir', type=str, default="model/distil-large-v2-FP16", help="Path to the chat model directory")
+    parser.add_argument('--asr_model_dir', type=str, default="model/distil-large-v2-FP16", help="Path to the automatic speech recognition model directory")
     parser.add_argument('--chat_model_dir', type=str, default="model/llama2-7B-INT8", help="Path to the chat model directory")
     parser.add_argument('--tts_model_dir', type=str, default="model/TTS-bark-small-FP16", help="Path to the text-to-speech model directory")
     parser.add_argument('--tts_speaker_type', type=str, default="male", choices=["male", "female"], help="The speaker's voice type")
