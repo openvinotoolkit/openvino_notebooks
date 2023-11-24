@@ -2,7 +2,7 @@
 openvino==2023.2.0
 git+https://github.com/eaidova/optimum-intel.git@8daff51900a115ba5d3699f7f552af1ca366ddb9
 optimum==1.14.0
-nncf==2.6.0
+nncf==2.7.0
 
 tensorflow-cpu==2.12.0
 torch==2.1.0
