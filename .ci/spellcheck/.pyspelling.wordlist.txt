@@ -9,6 +9,7 @@ aeroplane
 affective
 ai
 al
+Alibaba
 ALiBi
 analytics
 AnimeGAN
@@ -23,6 +24,8 @@ async
 AsyncInferQueue
 Atrous
 audiobooks
+audioldm
+AudioLDM
 autoencoder
 autoregressive
 autoregressively
@@ -50,6 +53,8 @@ charlist
 charlists
 chatbot
 chatbots
+chatglm
+ChatGLM
 ChatGPT
 CIN
 ckpt
@@ -175,6 +180,7 @@ finetuning
 FLAC
 floyd
 Formatter
+fp
 FP
 FPN
 FreeVC
@@ -279,6 +285,7 @@ LAION
 Lasinger
 latents
 LCMs
+LCMScheduler
 LDM
 LDMs
 learnable
@@ -297,6 +304,8 @@ LLMs
 LMS
 logits
 LogSoftmax
+LoRA
+LoRAs
 lraspp
 LRASPP
 LTS
@@ -465,6 +474,7 @@ pytorch
 PyTorch
 PyTorchVideo
 QFormer
+Qianwen
 Qi
 qrcode
 quant
@@ -474,6 +484,8 @@ quantizers
 Quantizing
 quantizing
 QuartzNet
+qwen
+Qwen
 Radiopaedia
 Radosavovic
 Raj
@@ -578,6 +590,7 @@ Suno
 superresolution
 superset
 svc
+SVTR
 Swin
 SwinV
 TaskManager
@@ -589,6 +602,7 @@ TFLite
 tflite
 th
 timestep
+timesteps
 Tokenization
 tokenization
 tokenize
@@ -598,6 +612,7 @@ Tokenizer
 tokenizers
 tokenizes
 tokenizing
+Tongyi
 TorchMetrics
 TorchScript
 torchvision
@@ -622,6 +637,8 @@ Unimodal
 unsqueeze
 Uparrow
 uparrow
+upcast
+upcasts
 Upcroft
 upsample
 upsampled
@@ -649,8 +666,11 @@ VITS
 VM
 Vladlen
 VOC
+Vocoder
 VQA
 VQGAN
+waveform
+waveforms
 Wav
 WavLM
 WebGL

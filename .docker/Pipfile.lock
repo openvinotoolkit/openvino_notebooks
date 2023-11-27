@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ebb6cc83ca54979e6b00943551e54d2f3a32f95887f7ffd1453ec393db2afaf2"
+            "sha256": "4b5d2aa2f974863166743ef0f2a7588e0c55d8f36db124d2ba233cd10e030417"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -2302,11 +2302,11 @@
         },
         "nncf": {
             "hashes": [
-                "sha256:3d425f5f24824659eee5314782d5a836fe72615baf67be6ac2b706c363739fbf",
-                "sha256:6d898ce94d81f4fa1f7cac757be0f52b1db25c78d37acf17967db178bf07004e"
+                "sha256:645cb21a3a6a252b95770f4565f5cd83cd8bc465287f92a798731edc73304414",
+                "sha256:95cdf43032964f292311d40003d1004a6f94c4560c09c6537e534fb3a38c1483"
             ],
             "index": "pypi",
-            "version": "==2.6.0"
+            "version": "==2.7.0"
         },
         "notebook": {
             "hashes": [
@@ -2476,23 +2476,24 @@
                 "sha256:e12ac5037932d93a5a8b5d15f167aae21ccf52e0cfdcaadb989fa3d6db7585f1",
                 "sha256:e47316a07d3cc1e9d1696d663017a39a29b2e89f090febf4d1a9fa5458a9e847",
                 "sha256:f06e32ed4ee7fe9f3c3262b8d0d36d66d1b8d830fb97fa9126884f9925e6e209",
-                "sha256:f2b78681ad00c4af92e63f0eed27312d21e3b94b843897289b75b39c31d5a2a5"
+                "sha256:f2b78681ad00c4af92e63f0eed27312d21e3b94b843897289b75b39c31d5a2a5",
+                "sha256:20a91ed12fd18f7eb1f7164f9c5ad7e9433d5ef707867eca37ee15b3b13e750e"
             ],
-            "version": "==2023.1.0"
+            "version": "==2023.2.0"
         },
         "openvino-dev": {
             "hashes": [
-                "sha256:c45f7503300024f4330149b228c2558cf665478f48d637b7070baae6270d2756"
+                "sha256:b273113339e3ba722549e7a305715881319b9414b3c04ff49108cc82a066bc57"
             ],
-            "version": "==2023.1.0"
+            "version": "==2023.2.0"
         },
         "openvino-telemetry": {
             "hashes": [
-                "sha256:29856c024fe8100b279bcda3259ee52d0196c60a6f4897d9054eada988c74e18",
-                "sha256:ec4ff4f0e1d7734de1f9d5eeb60e8565058fc871cd1896afb72dc13a002f83a7"
+                "sha256:496340f94d470dcec9d8b70b7f66097f71134ca1138b22e3a6d68d2cf3e10de2",
+                "sha256:ca2106b84671c6edfdc562c03b1c6dd3434d649a4c2174aa47f4628aa66e660a"
             ],
             "index": "pypi",
-            "version": "==2023.1.1"
+            "version": "==2023.2.1"
         },
         "opt-einsum": {
             "hashes": [
