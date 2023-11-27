@@ -24,6 +24,8 @@ async
 AsyncInferQueue
 Atrous
 audiobooks
+audioldm
+AudioLDM
 autoencoder
 autoregressive
 autoregressively
@@ -283,6 +285,7 @@ LAION
 Lasinger
 latents
 LCMs
+LCMScheduler
 LDM
 LDMs
 learnable
@@ -301,6 +304,8 @@ LLMs
 LMS
 logits
 LogSoftmax
+LoRA
+LoRAs
 lraspp
 LRASPP
 LTS
@@ -583,6 +588,7 @@ Suno
 superresolution
 superset
 svc
+SVTR
 Swin
 SwinV
 TaskManager
@@ -594,6 +600,7 @@ TFLite
 tflite
 th
 timestep
+timesteps
 Tokenization
 tokenization
 tokenize
@@ -657,8 +664,11 @@ VITS
 VM
 Vladlen
 VOC
+Vocoder
 VQA
 VQGAN
+waveform
+waveforms
 Wav
 WavLM
 WebGL

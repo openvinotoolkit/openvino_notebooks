@@ -6,7 +6,7 @@
     <img width="80%" src="https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleocr.gif">
 </p>
 
-PaddleOCR performs the Optical Character Recognition (OCR) function from a video, an image, or a scanned document. It is mainly composed of three parts: DB text detection, detection frame correction and CRNN text recognition. For more details, refer to the PaddleOCR technical [article](https://arxiv.org/abs/2009.09941).
+PaddleOCR performs the Optical Character Recognition (OCR) function from a video, an image, or a scanned document. It is mainly composed of three parts: DB text detection, detection frame correction and [SVTR](https://arxiv.org/abs/2205.00159) text recognition. For more details, refer to the PaddleOCR [introduction](https://github.com/PaddlePaddle/PaddleOCR/blob/4b17511491adcfd0f3e2970895d06814d1ce56cc/doc/doc_en/PP-OCRv3_introduction_en.md).
 
 ## Notebook Contents
 
@@ -20,7 +20,6 @@ This notebook demonstrates live PaddleOCR inference with OpenVINO, using the ["C
 Final part of this notebook shows live inference results from a webcam. Additionally, you can also upload a video file.
 > **NOTE**: To use the webcam, you must run this Jupyter notebook on a computer with a webcam. If you run on a server, the webcam will not work. However, you can still do inference on a video in the final step.
 
-> **NOTE**: If you would like to use iGPU as your device to run the inference for PaddleOCR, note that the text recognition model within PaddleOCR is a deep learning model with dynamic input shape. Since our current release of OpenVINO 2022.2 does not support dynamic shape on iGPU, you cannot switch inference device to "GPU" for this demo. If you still want to try running inference on iGPU for PaddleOCR, it is recommended to resize the input images, for example, the bounding box images from text detection, into a fixed size to remove the dynamic input shape effect, for which some performance loss may be expected.*
 
 For more information about the other PaddleOCR pre-trained models, refer to the [PaddleOCR GitHub](https://github.com/PaddlePaddle/PaddleOCR) or [PaddleOCR Gitee](https://gitee.com/paddlepaddle/PaddleOCR).
 

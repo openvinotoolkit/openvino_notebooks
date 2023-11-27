@@ -38,10 +38,12 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [Fast Segment Anything](notebooks/261-fast-segment-anything/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F261-fast-segment-anything%2F261-fast-segment-anything.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/261-fast-segment-anything/261-fast-segment-anything.ipynb) | Object segmentations with FastSAM and OpenVINO™ | <img src="https://user-images.githubusercontent.com/26833433/248551984-d98f0f6d-7535-45d0-b380-2e1440b52ad7.jpg" width=225> |
 | [SoftVC VITS Singing Voice Conversion](notebooks/262-softvc-voice-conversion)<br> | SoftVC VITS Singing Voice Conversion and OpenVINO™ | |
 | [Latent Consistency Models: the next generation of Image Generation models ](notebooks/263-latent-consistency-models-image-generation)<br> | Image generation with Latent Consistency Models (LCM) and OpenVINO™ |  <img src=https://user-images.githubusercontent.com/29454499/277367065-13a8f622-8ea7-4d12-b3f8-241d4499305e.png width=300> |
+| [Speedup ControlNet pipeline with LCM LoRA](notebooks/263-latent-consistency-models-image-generation)<br> | Text-to-Image Generation with LCM LoRA and ControlNet Conditioning | <img src=https://user-images.githubusercontent.com/29454499/284292122-f146e16d-7233-49f7-a401-edcb714b5288.png width=300> |
 | [QR Code Monster](notebooks/264-qrcode-monster/)<br> | Generate creative QR codes with ControlNet QR Code Monster and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/1a5978c6-e7a0-4824-9318-a3d8f4912c47" width=225> |
 | [Würstchen](notebooks/265-wuerstchen-image-generation)<br> | Text-to-image generation with Würstchen and OpenVINO™ | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/6917c558-d74c-4cc9-b81a-679ce0a299ee" width=300> | |
 | [Distil-Whisper](notebooks/267-distil-whisper-asr)<br> | Automatic speech recognition using Distil-Whisper and OpenVINO™ | | |
-| [FILM](notebooks/269-film-slowmo)<br> | Frame interpolation with FILM and OpenVINO™ | <img src="https://github.com/googlestaging/frame-interpolation/raw/main/moment.gif" width=300> |
+| [FILM](notebooks/269-film-slowmo)<br> | Frame interpolation with FILM and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/1720147/8ac5178d-4a92-4a86-a3df-dd494434fed6" width=300> |
+| [Audio LDM 2](notebooks/270-sound-generation-audioldm2/)<br> | Sound Generation with AudioLDM2 and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/c93a0f86-d9cf-4bd1-93b9-e27532170d75" width=225> |
 
 ## Table of Contents
 
@@ -210,8 +212,8 @@ Demos that demonstrate inference on a particular model.
 | [266-speculative-sampling](notebooks/266-speculative-sampling)<br> | Text Generation via Speculative Sampling, KV Caching, and OpenVINO™ | <img src=https://user-images.githubusercontent.com/29454499/280659301-49a38beb-e6f3-4a2c-858e-be4ca4491016.png width=225> |
 | [267-distil-whisper-asr](notebooks/267-distil-whisper-asr)<br> | Automatic speech recognition using Distil-Whisper and OpenVINO™ | |
 | [268-table-question-answering](notebooks/268-table-question-answering)<br><br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/268-table-question-answering/268-table-question-answering.ipynb)<br> | Table Question Answering using TAPAS and OpenVINO™ ||
-| [269-film-slowmo](notebooks/269-film-slowmo)<br> | Frame interpolation with FILM and OpenVINO™ | <img src="https://github.com/googlestaging/frame-interpolation/raw/main/moment.gif" width=225> |
-
+| [269-film-slowmo](notebooks/269-film-slowmo)<br> | Frame interpolation with FILM and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/1720147/8ac5178d-4a92-4a86-a3df-dd494434fed6" width=225> |
+| [270-sound-generation-audioldm2](notebooks/270-sound-generation-audioldm2/)<br> | Sound Generation with AudioLDM2 and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/c93a0f86-d9cf-4bd1-93b9-e27532170d75" width=225> |
 
 <div id='-model-training'></div>
 
