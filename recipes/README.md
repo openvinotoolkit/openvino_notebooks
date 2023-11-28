@@ -9,7 +9,7 @@ Edge AI Reference Kits are fully functioning applications demonstrating deep lea
 - [Available Kits](#available-kits)
 	- [🚶 Intelligent Queue Management](#-intelligent-queue-management)
 	- [🔍 Defect Detection](#-defect-detection)
-	- [⏲️ Automatic Industrial Meter Reading](#%EF%B8%8F-automatic-industrial-meter-reading)
+	- [⏲️ Smart Meter Scanning](#%EF%B8%8F-smart-meter-scanning)
 - [Future Kits](#future-kits)
 	- [🛍️ Retail Checkout](#%EF%B8%8F-retail-checkout)
 - [Troubleshooting and Resources](#troubleshooting-and-resources)
@@ -38,10 +38,10 @@ The solution for managing customer queues more effectively by analyzing camera v
 
 The solution offers a comprehensive solution to quality control. It provides companies and their technical teams a single-source, end-to-end solution to catch manufacturing defects in real time.
 
-### ⏲️ Automatic Industrial Meter Reading
+### ⏲️ Smart Meter Scanning
 [![image](https://github.com/openvinotoolkit/openvino_notebooks/assets/138901786/0136d123-15c9-4696-bf4d-b169b3c7db4d)](meter_reader)
 
-| [Intelligent Queue Management](intelligent_queue_management) |  |
+| [Smart Meter Scanning](meter_reader) |  |
 | - | - |
 | Related AI concepts | object detection, object segmentation, OCR |
 | Example industries | energy, manufacturing |
