@@ -22,8 +22,7 @@ The following image shows an example of the source image with a mask drawn over 
 This notebook demonstrates how to convert and run the Paint-by-Example model using OpenVINO.
 
 Notebook contains the following steps:
-1. Convert PyTorch models to ONNX format.
-2. Convert ONNX models to OpenVINO IR format, using Model Optimizer tool.
+1. Convert PyTorch models to OpenVINO IR format.
 3. Run Paint-by-Example pipeline with OpenVINO.
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
