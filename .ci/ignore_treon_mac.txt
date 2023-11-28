@@ -16,7 +16,6 @@
 240-dolly-2-instruction-following
 241-riffusion-text-to-music
 242-freevc-voice-conversion
-246-paint-by-example
 247-code-language-id
 248-stable-diffusion-xl
 249-oneformer-segmentation
@@ -40,4 +39,5 @@
 267-distil-whisper-asr
 269-film-slowmo
 270-sound-generation-audioldm2
+272-paint-by-example
 404-style-transfer-webcam

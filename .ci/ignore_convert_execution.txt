@@ -34,7 +34,6 @@ notebooks/239-image-bind/239-image-bind-convert.ipynb
 notebooks/240-dolly-2-instruction-following/240-dolly-2-instruction-following.ipynb
 notebooks/241-riffusion-text-to-music/241-riffusion-text-to-music.ipynb
 notebooks/244-named-entity-recognition/244-named-entity-recognition.ipynb
-notebooks/246-paint-by-example/246-paint-by-example.ipynb
 notebooks/248-stable-diffusion-xl/248-stable-diffusion-xl.ipynb
 notebooks/249-oneformer-segmentation/249-oneformer-segmentation.ipynb
 notebooks/251-tiny-sd-image-generation/251-tiny-sd-image-generation.ipynb
@@ -56,4 +55,5 @@ notebooks/266-speculative-sampling/266-speculative-sampling.ipynb
 notebooks/267-distil-whisper-asr/267-distil-whisper-asr.ipynb
 notebooks/269-film-slowmo/269-film-slowmo.ipynb
 notebooks/270-sound-generation-audioldm2/270-sound-generation-audioldm2.ipynb
+notebooks/272-paint-by-example/272-paint-by-example.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb

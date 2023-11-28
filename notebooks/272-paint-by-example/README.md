@@ -12,10 +12,7 @@ Step-by-step, the diffusion process will iteratively denoise latent image repres
 
 The following image shows an example of the source image with a mask drawn over the top of it. Below it is the reference image used for input context. Lastly, is shown the output image.
 
-<p align="center">
-    <img src="https://user-images.githubusercontent.com/103226580/235281192-66eeefee-6c6a-45af-b805-0eb10490f78e.png"/>
-</p>
-
+![Diagram](https://user-images.githubusercontent.com/103226580/235281192-66eeefee-6c6a-45af-b805-0eb10490f78e.png)
 
 ## Notebook Contents
 
