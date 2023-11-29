@@ -63,6 +63,7 @@ Cifar
 cityscape
 Cityscapes
 CLI
+cli
 CLIP's
 codebook
 codebooks
@@ -536,6 +537,7 @@ Schuster
 sd
 SDEdit
 SDXL
+sdxl
 Segmentations
 segmentations
 Segmenter
