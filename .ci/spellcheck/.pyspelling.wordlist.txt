@@ -41,6 +41,7 @@ bert
 BERT's
 Bewley
 BGR
+BMP
 Bicubic
 bicubic
 bilinear
@@ -462,6 +463,7 @@ Pretraining
 pretraining
 promptable
 proto
+protobuf
 PRs
 psychoacoustics
 PTQ
@@ -527,6 +529,7 @@ sagittal
 SALICON
 Saliency
 saliency
+SavedModel
 scalability
 Scalable
 scalable
