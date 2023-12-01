@@ -11,6 +11,7 @@ ai
 al
 Alibaba
 ALiBi
+AlpacaEval
 analytics
 AnimeGAN
 api
@@ -107,6 +108,7 @@ dataset
 datasets
 DDIM
 DDPMs
+dDPO
 de
 Deblur
 deblur
@@ -372,6 +374,8 @@ NNCF
 nncf
 noncomparable
 NONINFRINGEMENT
+Notus
+notus
 nsamples
 nsfw
 NSFW
@@ -546,6 +550,7 @@ Segmenter
 segmenter
 Segmind
 serializable
+sft
 ShapeNet
 ShareGPT
 Shazeer
