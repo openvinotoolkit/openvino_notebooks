@@ -7,7 +7,7 @@ Previously, we already discussed how to launch Stable Diffusion XL model using O
 
 We will use a pre-trained model from the [Hugging Face Diffusers](https://huggingface.co/docs/diffusers/index) library. To simplify the user experience, the [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index) library is used to convert the models to OpenVINO™ IR format.
 
-The notebook provides a simple interface that allows communication with a model using text instruction. In this demonstration user can provide input instructions and the model generates an image.
+The notebook provides a simple interface that allows communication with a model using text instruction. In this demonstration user can provide input instructions and the model generates an image. An additional part demonstrates how to run quantization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
 
 The image below illustrates the provided generated image example.
 
@@ -23,6 +23,8 @@ The tutorial consists of the following steps:
 - Convert model to OpenVINO intermediate representation (IR) format
 - Run Text-to-Image generation
 - Run Image-to-Image generation
+- Optimize model with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization
+- Compare results of original and optimized pipelines
 - Launch interactive demo
 
 ## Installation Instructions
