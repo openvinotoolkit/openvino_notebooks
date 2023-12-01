@@ -6,7 +6,7 @@ import torch
 
 DEFAULT_SYSTEM_PROMPT = """\
 You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
-If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\
+If a question does not make any sense or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\
 """
 
 
@@ -75,6 +75,16 @@ SUPPORTED_MODELS = {
         "partial_text_processor": chatglm_partial_text_processor,
         "current_message_template": "[Round{num}]\n\n问：{user}\n\n答：{assistant}",
         "stop_tokens": ["</s>"],
+    },
+    "mistal-7b": {
+        "model_id": "mistralai/Mistral-7B-v0.1",
+        "remote": False,
+        "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
+        "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
+        "current_message_template": "{user} [/INST]{assistant}",
+        "tokenizer_kwargs": {"add_special_tokens": False},
+        "partial_text_processor": llama_partial_text_processor,
+        
     },
     "zephyr-7b-beta": {
         "model_id": "HuggingFaceH4/zephyr-7b-beta",
