@@ -3,7 +3,7 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F121-convert-to-openvino%2F121-convert-to-openvino.ipynb)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/121-convert-to-openvino/121-convert-to-openvino.ipynb)
 
-This notebook shows how to convert model from original framework format to the OpenVINO IR. It describes Python conversion API and OVC command-line tool. It provides examples of Hugging Face and Pytorch models conversion to OpenVINO IR.
+This notebook shows how to convert a model from its original framework format to the OpenVINO IR. It describes the Python conversion API and the OpenVINO Model Converter command-line tool. It provides examples of converting Hugging Face and PyTorch models to OpenVINO IR.
 
 ## Notebook Contents
 
@@ -14,7 +14,7 @@ The OpenVINO IR conversion tutorial consists of the following content:
 * Conversion
     * Setting Input Shapes
     * Compressing a Model to FP16
-    * Convert Models from memory
+    * Converting Models from Memory
 * Migration from Legacy Conversion API
     * Specifying Layout
     * Changing Model Layout
