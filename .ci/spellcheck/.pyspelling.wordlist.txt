@@ -191,6 +191,7 @@ Frontend
 frontend
 GAN
 Gante
+Gaudi
 gaussian
 Gb
 gcc
@@ -401,6 +402,7 @@ OpenVino
 OpenVINO's
 opset
 optimizable
+Orca
 OVC
 overfitting
 overlayed
@@ -551,6 +553,7 @@ Shutterstock
 siggraph
 sigmoid
 SISR
+SlimOrca
 SlowFast
 slowfast
 slowmo

@@ -93,4 +93,15 @@ SUPPORTED_MODELS = {
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
     },
+
+    "neural-chat-7b-v3-1": {
+        "model_id": "Intel/neural-chat-7b-v3-1",
+        "remote": False,
+        "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
+        "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
+        "current_message_template": "{user} [/INST]{assistant}",
+        "tokenizer_kwargs": {"add_special_tokens": False},
+        "partial_text_processor": llama_partial_text_processor,
+        
+    },
 }
