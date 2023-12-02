@@ -49,7 +49,6 @@ SUPPORTED_MODELS = {
         "current_message_template": "{user} [/INST]{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": llama_partial_text_processor,
-        "revision": "5514c85fedd6c4fc0fc66fa533bc157de520da73",
     },
     "mpt-7b-chat": {
         "model_id": "mosaicml/mpt-7b-chat",
@@ -66,6 +65,7 @@ SUPPORTED_MODELS = {
         "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
         "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
         "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        "revision": "2abd8e5777bb4ce9c8ab4be7dbbd0fe4526db78d"
     },
     "chatglm2-6b": {
         "model_id": "THUDM/chatglm2-6b",
@@ -103,5 +103,12 @@ SUPPORTED_MODELS = {
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": llama_partial_text_processor,
         
+    },
+    "notus-7b-v1": {
+        "model_id": "argilla/notus-7b-v1",
+        "remote": False,
+        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
+        "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
+        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
     },
 }
