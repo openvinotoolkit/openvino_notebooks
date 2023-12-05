@@ -49,7 +49,7 @@ The LCM LoRA allows to training of just a small number of adapters, known as LoR
 
 ### Notebook Contents
 
-This [notebook](./263-lcm-lora-controlnet.ipynb) explores how to speed up ControlNet pipeline using LCM LoRA and OpenVINO. It demonstrates how to apply [LCM LoRA](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5) and convert and run [stable-diffusion-1.5](https://huggingface.co/runwayml/stable-diffusion-v1-5) conditioned by [ConrolNet Normal Mapping](https://huggingface.co/lllyasviel/control_v11p_sd15_normalbae) using OpenVINO.
+This [notebook](./263-lcm-lora-controlnet.ipynb) explores how to speed up ControlNet pipeline using LCM LoRA and OpenVINO. It demonstrates how to apply [LCM LoRA](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5) and convert and run [stable-diffusion-1.5](https://huggingface.co/runwayml/stable-diffusion-v1-5) conditioned by [ConrolNet Normal Mapping](https://huggingface.co/lllyasviel/control_v11p_sd15_normalbae) using OpenVINO. An additional part demonstrates how to run quantization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
 
 The following image shows an example of the input sequence, input image, condition image and corresponding predicted image.
 
@@ -64,7 +64,9 @@ The following image shows an example of the input sequence, input image, conditi
 1. Convert PyTorch models to OpenVINO Intermediate Representation using [OpenVINO Model Conversion API](https://docs.openvino.ai/2023.2/openvino_docs_model_processing_introduction.html#convert-a-model-with-python-convert-model)
 2. Prepare Inference Pipeline.
 3. Run Inference pipeline with OpenVINO.
-4. Run Interactive demo.
+4. Optimize `OVControlNetStableDiffusionPipeline` with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.
+5. Compare results of original and optimized pipelines.
+6. Run Interactive demo.
 
 The notebook also provides interactive interface for image generation based on user input.
 
