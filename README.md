@@ -43,7 +43,8 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [Würstchen](notebooks/265-wuerstchen-image-generation)<br> | Text-to-image generation with Würstchen and OpenVINO™ | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/6917c558-d74c-4cc9-b81a-679ce0a299ee" width=300> | |
 | [Distil-Whisper](notebooks/267-distil-whisper-asr)<br> | Automatic speech recognition using Distil-Whisper and OpenVINO™ | | |
 | [FILM](notebooks/269-film-slowmo)<br> | Frame interpolation with FILM and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/1720147/8ac5178d-4a92-4a86-a3df-dd494434fed6" width=300> |
-| [Audio LDM 2](notebooks/270-sound-generation-audioldm2/)<br> | Sound Generation with AudioLDM2 and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/c93a0f86-d9cf-4bd1-93b9-e27532170d75" width=225> |
+| [Audio LDM 2](notebooks/270-sound-generation-audioldm2/)<br> | Sound Generation with AudioLDM2 and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/c93a0f86-d9cf-4bd1-93b9-e27532170d75" width=300> |
+| [SDXL-Turbo](notebooks/271-sdxl-turbo/)<br> | Single-step image generation using SDXL-turbo and OpenVINO | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/79b625c7-0f0a-4f19-8e38-e6f896f75c3e" width=300> |
 
 ## Table of Contents
 
@@ -214,6 +215,7 @@ Demos that demonstrate inference on a particular model.
 | [268-table-question-answering](notebooks/268-table-question-answering)<br><br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/268-table-question-answering/268-table-question-answering.ipynb)<br> | Table Question Answering using TAPAS and OpenVINO™ ||
 | [269-film-slowmo](notebooks/269-film-slowmo)<br> | Frame interpolation with FILM and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/1720147/8ac5178d-4a92-4a86-a3df-dd494434fed6" width=225> |
 | [270-sound-generation-audioldm2](notebooks/270-sound-generation-audioldm2/)<br> | Sound Generation with AudioLDM2 and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/c93a0f86-d9cf-4bd1-93b9-e27532170d75" width=225> |
+| [271-sdxl-turbo](notebooks/271-sdxl-turbo/)<br> | Single-step image generation using SDXL-turbo and OpenVINO | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/79b625c7-0f0a-4f19-8e38-e6f896f75c3e" width=225> |
 | [272-paint-by-example](notebooks/272-paint-by-example/)<br>| Exemplar based image editing using diffusion models, [Paint-by-Example](https://github.com/Fantasy-Studio/Paint-by-Example), and OpenVINO™ | <img width="225" alt="ui_example" src="https://user-images.githubusercontent.com/103226580/236958011-0550ba7b-19b3-4dc6-8b50-eaedb84c1681.png"> |
 <div id='-model-training'></div>
 

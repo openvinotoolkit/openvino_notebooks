@@ -11,6 +11,7 @@ ai
 al
 Alibaba
 ALiBi
+AlpacaEval
 analytics
 AnimeGAN
 api
@@ -63,6 +64,7 @@ Cifar
 cityscape
 Cityscapes
 CLI
+cli
 CLIP's
 codebook
 codebooks
@@ -106,6 +108,7 @@ dataset
 datasets
 DDIM
 DDPMs
+dDPO
 de
 Deblur
 deblur
@@ -190,6 +193,7 @@ Frontend
 frontend
 GAN
 Gante
+Gaudi
 gaussian
 Gb
 gcc
@@ -370,6 +374,8 @@ NNCF
 nncf
 noncomparable
 NONINFRINGEMENT
+Notus
+notus
 nsamples
 nsfw
 NSFW
@@ -400,6 +406,7 @@ OpenVino
 OpenVINO's
 opset
 optimizable
+Orca
 OVC
 overfitting
 overlayed
@@ -537,12 +544,14 @@ Schuster
 sd
 SDEdit
 SDXL
+sdxl
 Segmentations
 segmentations
 Segmenter
 segmenter
 Segmind
 serializable
+sft
 ShapeNet
 ShareGPT
 Shazeer
@@ -550,6 +559,7 @@ Shutterstock
 siggraph
 sigmoid
 SISR
+SlimOrca
 SlowFast
 slowfast
 slowmo
