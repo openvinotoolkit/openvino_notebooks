@@ -1,4 +1,6 @@
-# Image generation with Stable Diffusion XL and OpenVINO
+# Image generation with Stable Diffusion XL and Segmind Stable Diffusion 1B (SSD-1B) and OpenVINO
+
+## Stable Diffusion XL
 
 Stable Diffusion XL or SDXL is the latest image generation model that is tailored towards more photorealistic outputs with more detailed imagery and composition compared to previous Stable Diffusion models, including Stable Diffusion 2.1.
 
@@ -22,7 +24,7 @@ The image below illustrates the provided user instruction and generated image ex
 
 >**Note**: Some demonstrated models can require at least 64GB RAM for conversion and running.
 
-## Notebook Contents
+### Notebook Contents
 
 The tutorial consists of the following steps:
 
@@ -33,5 +35,26 @@ The tutorial consists of the following steps:
 - Download and convert the Stable Diffusion XL Refiner model from a public source using the [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
 - Run 2-stages Stable Diffusion XL pipeline
 
+
+## Segmind Stable Diffusion 1B (SSD-1B)
+
+The [Segmind Stable Diffusion Model (SSD-1B)](https://github.com/segmind/SSD-1B?ref=blog.segmind.com) is a distilled 50% smaller version of the Stable Diffusion XL (SDXL), offering a 60% speedup while maintaining high-quality text-to-image generation capabilities. It has been trained on diverse datasets, including Grit and Midjourney scrape data, to enhance its ability to create a wide range of visual content based on textual prompts.
+
+This model employs a knowledge distillation strategy, where it leverages the teachings of several expert models in succession, including SDXL, ZavyChromaXL, and JuggernautXL, to combine their strengths and produce impressive visual outputs.
+
+### Image Comparison (SDXL-1.0 vs SSD-1B)
+![image](https://user-images.githubusercontent.com/82945616/277419571-a5583e8a-6a05-4680-a540-f80502feed0b.png)
+In this tutorial, we consider how to run the SSD-1B model using OpenVINO.
+We will use a pre-trained model from the Hugging Face Diffusers library. To simplify the user experience, the Hugging Face Optimum Intel library is used to convert the models to OpenVINO™ IR format.
+
+### Table of contents:
+- [Install Prerequisites](#Install-prerequisites-Uparrow)
+- [SSD-1B Base model](#SSD-1B-Base-model-Uparrow)
+- [Select inference device SSD-1B Base model](#Select-inference-device-SSD-1B-Base-model-Uparrow)
+- [Text2image Generation Interactive Demo](#Text2image-Generation-Interactive-Demo-Uparrow)
+
 ## Installation Instructions
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).

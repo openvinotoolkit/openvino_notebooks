@@ -22,6 +22,18 @@ def disable_gradio_debug(nb, notebook_path):
         print(f"Disabled gradio debug mode for {notebook_path}")
     return nb
 
+
+def disable_skip_ext(nb, notebook_path):
+    found = False
+    for cell in nb["cells"]:
+        if "%%skip" in cell["source"]:
+            found = True
+            cell["source"] = re.sub(r"%%skip.*.\n", "\n", cell["source"])
+    if found:
+        print(f"Disabled skip extension mode for {notebook_path}")
+    return nb
+
+
 def patch_notebooks(notebooks_dir, test_device=""):
     """
     Patch notebooks in notebooks directory with replacement values
@@ -75,6 +87,7 @@ def patch_notebooks(notebooks_dir, test_device=""):
             if not found:
                 print(f"No replacements found for {notebookfile}")
             disable_gradio_debug(nb, notebookfile)
+            disable_skip_ext(nb, notebookfile)
             nb_without_out, _ = output_remover.from_notebook_node(nb)
             with notebookfile.with_name(f"test_{notebookfile.name}").open("w", encoding="utf-8") as out_file:
                 out_file.write(nb_without_out)

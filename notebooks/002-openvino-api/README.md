@@ -20,6 +20,7 @@ The OpenVINO API tutorial consists of the following steps:
   * PaddlePaddle Model
   * TensorFlow Model
   * TensorFlow Lite Model
+  * PyTorch Model
 * Getting Information about a Model
   * Model Inputs
   * Model Outputs
