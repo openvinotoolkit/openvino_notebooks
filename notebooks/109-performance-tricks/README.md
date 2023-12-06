@@ -9,7 +9,7 @@ In this notebook, we’ll show a set of performance tricks for optimizing infere
 
 1. [Performance tricks in OpenVINO for latency mode](109-latency-tricks.ipynb)
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/109-performance-tricks\109-latency-tricks.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/109-performance-tricks/109-latency-tricks.ipynb)
 
 This notebook demonstrates how to optimize the inference latency in OpenVINO™.  A set of optimization tricks, including model conversion with different data precision, “AUTO” device with latency mode, shared memory, inference with a further configuration, inference on GPU, etc., are introduced.
 
@@ -17,7 +17,7 @@ This notebook demonstrates how to optimize the inference latency in OpenVINO™.
 
 2. [Performance tricks in OpenVINO for throughput mode](109-throughput-tricks.ipynb)
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/109-performance-tricks\109-throughput-tricks.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/109-performance-tricks/109-throughput-tricks.ipynb)
 
 This notebook demonstrates how to optimize the inference throughput in OpenVINO™.  A set of optimization tricks, including bigger batch size, “AUTO” device with throughput and cumulative throughput mode, asynchronous inference mode, etc., are introduced.
 
