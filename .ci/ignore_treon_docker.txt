@@ -40,6 +40,7 @@
 269-film-slowmo
 270-sound-generation-audioldm2
 271-sdxl-turbo
+272-paint-by-example
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
 404-style-transfer-webcam

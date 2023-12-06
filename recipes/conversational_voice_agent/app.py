@@ -183,7 +183,7 @@ def create_UI(initial_message: str) -> gr.Blocks:
         - wait for the output voice in the last audio widget ("Chatbot voice output")
         """)
         with gr.Row():
-            # user's input
+            # user's audio input
             input_audio_ui = gr.Audio(sources=["microphone"], scale=5, label="Your voice input")
             # submit button
             submit_audio_btn = gr.Button("Submit", variant="primary", scale=1)

@@ -32,6 +32,13 @@ def chatglm_partial_text_processor(partial_text, new_text):
 
 
 SUPPORTED_MODELS = {
+    "tiny-llama-1b-chat": {
+        "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v0.6",
+        "remote": False,
+        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
+        "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
+        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+    },
     "red-pajama-3b-chat": {
         "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
         "remote": False,
