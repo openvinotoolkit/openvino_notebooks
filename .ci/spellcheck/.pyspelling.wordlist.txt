@@ -415,6 +415,7 @@ OVC
 OVModel
 OVModelForXXX
 OVMS
+OvStableDiffusionInpaintingPipeline
 PaddleClas
 PaddleGAN
 paddlegan
@@ -581,6 +582,7 @@ SRT
 SSD
 SSDLite
 sst
+StableDiffusionInpaintPipeline
 STFT
 streamable
 Struct
