@@ -5,6 +5,7 @@ import openvino as ov
 import torch
 from bark.generation import load_model
 from torch import nn
+from encodec import EncodecModel
 
 
 # Define the TextEncoderModel class
@@ -50,6 +51,35 @@ class FineModel(nn.Module):
         return x
 
 
+# Define the FrameEncoder class        
+class FrameEncoder(nn.Module):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+
+    def forward(self, x: torch.Tensor):
+        codes, scale = self.model._encode_frame(x)
+        return codes if not self.model.normalize else (codes, scale)
+
+class FrameDecoder(nn.Module):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+
+    def forward(self, codes, scale=None):
+        return self.model._decode_frame((codes, scale))        
+
+
+# Define the FrameDecoder class
+class FrameDecoder(nn.Module):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+
+    def forward(self, codes, scale=None):
+        return self.model._decode_frame((codes, scale))
+         
+             
 # Function to download and convert the text encoder model
 def download_and_convert_text_encoder(models_dir: Path, use_small: bool) -> None:
     """
@@ -163,6 +193,47 @@ def download_and_convert_fine_model(models_dir: Path, use_small: bool) -> None:
 
         del fine_model
 
+# Function to download and convert the Encodec model
+def download_and_convert_encodec_model(encodec_model_dir: Path):
+    """
+    FrameEncoder is a PyTorch module that wraps around the Encodec model's frame encoding functionality.
+    It's responsible for converting audio frames into encoded representations, which can be further processed or decoded.
+
+    The Encodec model's internal '_encode_frame' method is used to perform the actual encoding.
+    This method typically produces a compact representation of the audio frame,
+    suitable for tasks like audio compression, transformation, or synthesis.
+
+    Attributes:
+        model (EncodecModel): An instance of EncodecModel which contains the logic for frame encoding.
+
+    Methods:
+        forward(x: torch.Tensor): Encodes an input tensor representing an audio frame.
+    """
+    encodec_model_dir.mkdir(parents=True, exist_ok=True)
+    encodec_model = EncodecModel.encodec_model_24khz()
+
+    encodec_encoder_path = encodec_model_dir / "encodec_encoder.xml"
+    encodec_decoder_path = encodec_model_dir / "encodec_decoder.xml"
+    encodec_encoder_onnx_path = encodec_model_dir / "encodec_encoder.onnx"
+    encodec_decoder_onnx_path = encodec_model_dir / "encodec_decoder.onnx"
+
+    if not encodec_encoder_path.exists() or not encodec_decoder_path.exists():
+        encoder = FrameEncoder(encodec_model)
+        decoder = FrameDecoder(encodec_model)
+
+        torch.onnx.export(encoder, torch.zeros(1, 1, 480000), encodec_encoder_onnx_path)
+        torch.onnx.export(decoder, torch.zeros([1, 8, 1500], dtype=torch.long), encodec_decoder_onnx_path, input_names=["codes", "scale"])
+
+        encoder_ov = ov.convert_model(str(encodec_encoder_onnx_path))
+        decoder_ov = ov.convert_model(str(encodec_decoder_onnx_path))
+
+        ov.save_model(encoder_ov, encodec_encoder_path)
+        ov.save_model(decoder_ov, encodec_decoder_path)
+
+        # Free resources
+        del encoder, decoder, encoder_ov, decoder_ov
+        
+
 
 def convert_bark(model_dir: Path, use_small: bool) -> None:
     """
@@ -185,6 +256,22 @@ def convert_bark(model_dir: Path, use_small: bool) -> None:
     print("All models have been downloaded and converted successfully.")
 
 
+def convert_encodec(model_dir: Path) -> None:
+    """
+    This function orchestrates the process of downloading and converting the Encodec model.
+
+    It creates a specific directory within the given base model directory for the Encodec model components. 
+
+    Parameters:
+        model_dir (Path): The base directory where the Encodec model directory will be created and to which 
+                          the converted model files will be saved.
+    """
+    encodec_models_dir = model_dir / "encodec_model"
+    download_and_convert_encodec_model(encodec_models_dir)
+    print("Encodec models have been downloaded and converted successfully.")    
+
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Download and convert models")
     parser.add_argument("--model_dir", type=str, default="model", help="Directory to place the models in")
@@ -192,3 +279,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     convert_bark(Path(args.model_dir), args.use_small_models)
+    convert_encodec(Path(args.model_dir))
