@@ -219,8 +219,7 @@ def run(asr_model_dir: Path, chat_model_dir: Path, tts_model_dir: Path, speaker_
     load_tts_model(tts_model_dir, speaker_type)
 
     # get initial greeting
-    history = [[None, None]]
-    history = chat(history)
+    history = chat([[None, None]])
     initial_message = history[0][1]
 
     # create user interface

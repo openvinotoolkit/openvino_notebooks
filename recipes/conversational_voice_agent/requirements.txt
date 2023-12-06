@@ -1,11 +1,10 @@
-# todo update all packages to stable versions
+# todo update all packages to stable versions (not available in Dec 2023)
 openvino==2023.2.0
 git+https://github.com/eaidova/optimum-intel.git@8daff51900a115ba5d3699f7f552af1ca366ddb9
 optimum==1.14.1
 nncf==2.7.0
 
-tensorflow-cpu==2.12.0
-torch==2.1.0
+torch==1.13.1
 onnx==1.14.1
 onnxruntime==1.14.1
 
