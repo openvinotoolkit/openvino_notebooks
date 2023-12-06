@@ -94,7 +94,7 @@ The application uses three separate models for its operation, each requiring con
 
 1. ASR-Distil Whisper Conversion:
 ```shell
-python convert_and_optimize_ASR.py
+python convert_and_optimize_asr.py
 ```
 This script will convert and optimize the automatic speech recognition (ASR) model.
 
@@ -106,7 +106,7 @@ This script will handle the conversion and optimization of the chat model.
 
 3. Text to Speech Bark Conversion::
 ```shell
-python convert_and_optimize_TTS.py
+python convert_and_optimize_tts.py
 ```
 This script will convert and optimize the text-to-speech (TTS) model.
 
