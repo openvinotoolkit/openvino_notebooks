@@ -47,11 +47,11 @@ This model employs a knowledge distillation strategy, where it leverages the tea
 In this tutorial, we consider how to run the SSD-1B model using OpenVINO.
 We will use a pre-trained model from the Hugging Face Diffusers library. To simplify the user experience, the Hugging Face Optimum Intel library is used to convert the models to OpenVINO™ IR format.
 
+Then we will consider [LCM distilled version of segmind/SSD-1B](https://huggingface.co/latent-consistency/lcm-ssd-1b) that allows to reduce the number of inference steps to only between 2 - 8 steps.
+
 ### Table of contents:
-- [Install Prerequisites](#Install-prerequisites-Uparrow)
-- [SSD-1B Base model](#SSD-1B-Base-model-Uparrow)
-- [Select inference device SSD-1B Base model](#Select-inference-device-SSD-1B-Base-model-Uparrow)
-- [Text2image Generation Interactive Demo](#Text2image-Generation-Interactive-Demo-Uparrow)
+- [SSD-1B Base model](#SSD-1B-Base-model)
+- [Latent Consistency Model (LCM)](#Latent-ConsistencyModel-(LCM))
 
 ## Installation Instructions
 
