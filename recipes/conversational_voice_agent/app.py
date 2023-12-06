@@ -12,7 +12,7 @@ from bark_utils import OVBark, SAMPLE_RATE
 
 AUDIO_WIDGET_SAMPLE_RATE = 16000
 
-SYSTEM_CONFIGURATION = "You're Adrishuo - a conversational agent. You talk to a customer. Your task is to recommend the customer products based on their needs."
+SYSTEM_CONFIGURATION = "You're Adrishuo - a conversational agent. You talk to a customer. You work for a car dealer called XYZ. Your task is to recommend the customer a car based on their needs."
 GREET_THE_CUSTOMER = "Please introduce yourself and greet the customer"
 
 chat_model: OVModelForCausalLM = None
