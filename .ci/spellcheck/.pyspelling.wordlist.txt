@@ -466,6 +466,7 @@ preprocessed
 preprocesses
 preprocessing
 preprocessor
+pretrain
 pretrained
 Pretraining
 pretraining
@@ -614,6 +615,7 @@ tflite
 th
 timestep
 timesteps
+TinyLlama
 Tokenization
 tokenization
 tokenize
