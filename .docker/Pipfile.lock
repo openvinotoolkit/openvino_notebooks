@@ -254,6 +254,13 @@
             "markers": "python_version >= '3.5'",
             "version": "==1.10"
         },
+        "async-lru":{
+            "hashes": [
+                "sha256:b8a59a5df60805ff63220b2a0c5b5393da5521b113cd5465a44eb037d81a5627",
+                "sha256:ff02944ce3c288c5be660c42dbcca0742b32c3b279d6dceda655190240b99224"
+            ],
+            "version": "==2.0.4"
+        },
         "async-timeout": {
             "hashes": [
                 "sha256:4640d96be84d82d02ed59ea2b7105a0f7b33abe8703703cd0ab0bf87c427522f",
@@ -1422,6 +1429,13 @@
             ],
             "version": "==0.2.0"
         },
+        "jupyter-lsp": {
+                "hashes": [
+                    "sha256:b17fab6d70fe83c8896b0cff59237640038247c196056b43684a0902b6a9e0fb",
+                    "sha256:17a689910c5e4ae5e7d334b02f31d08ffbe98108f6f658fb05e4304b4345368b"
+                ],
+                "version": "==2.2.1"
+        },
         "jupyter-nbextensions-configurator": {
             "hashes": [
                 "sha256:cece496f3f62cf80bb0b04867ea463c32ed5db19ff5814fe18a3a7f1bb9da95b"
@@ -1518,12 +1532,12 @@
         },
         "jupyterlab": {
             "hashes": [
-                "sha256:373e9cfb8a72edd294be14f16662563a220cecf0fb26de7aab1af9a29b689b82",
-                "sha256:6aba0caa771697d02fbf409f9767b2fdb4ee32ce935940e3b9a0d5d48d994d0f"
+                "sha256:9ebada41d52651f623c0c9f069ddb8a21d6848e4c887d8e5ddc0613166ed5c0b",
+                "sha256:9f6f8e36d543fdbcc3df961a1d6a3f524b4a4001be0327a398f68fa4e534107c"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.7'",
-            "version": "==3.6.3"
+            "version": "==4.0.9"
         },
         "jupyterlab-git": {
             "hashes": [
@@ -2305,11 +2319,11 @@
         },
         "notebook": {
             "hashes": [
-                "sha256:b4625a4b7a597839dd3156b140d5ba2c7123761f98245a3290f67a8b8ee048d9",
-                "sha256:c1e2eb2e3b6079a0552a04974883a48d04c3c05792170d64a4b23d707d453181"
+                "sha256:ec6113b06529019f7f287819af06c97a2baf7a95ac21a8f6e32192898e9f9a58",
+                "sha256:0fe8f67102fea3744fedf652e4c15339390902ca70c5a31c4f547fa23da697cc"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==6.5.6"
+            "version": "==7.0.6"
         },
         "notebook-shim": {
             "hashes": [
