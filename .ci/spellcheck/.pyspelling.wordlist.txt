@@ -415,6 +415,7 @@ OVC
 OVModel
 OVModelForXXX
 OVMS
+OvStableDiffusionInpaintingPipeline
 PaddleClas
 PaddleGAN
 paddlegan
@@ -465,6 +466,7 @@ preprocessed
 preprocesses
 preprocessing
 preprocessor
+pretrain
 pretrained
 Pretraining
 pretraining
@@ -582,6 +584,7 @@ SRT
 SSD
 SSDLite
 sst
+StableDiffusionInpaintPipeline
 STFT
 streamable
 Struct
@@ -613,6 +616,7 @@ tflite
 th
 timestep
 timesteps
+TinyLlama
 Tokenization
 tokenization
 tokenize
