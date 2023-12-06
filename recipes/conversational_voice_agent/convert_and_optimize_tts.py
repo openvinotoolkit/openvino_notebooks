@@ -175,7 +175,7 @@ def convert_bark(model_dir: Path, use_small: bool) -> None:
                           of the models. This will also be reflected in the directory names.
     """
     model_suffix = "-small" if use_small else ""
-    models_dir = model_dir / f"TTS-bark{model_suffix}-FP16"
+    models_dir = model_dir / f"bark{model_suffix}-FP16"
     models_dir.mkdir(parents=True, exist_ok=True)
     
     download_and_convert_text_encoder(models_dir, use_small)
