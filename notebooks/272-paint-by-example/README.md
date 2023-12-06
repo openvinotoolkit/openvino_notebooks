@@ -22,4 +22,5 @@ Notebook contains the following steps:
 1. Convert PyTorch models to OpenVINO IR format.
 3. Run Paint-by-Example pipeline with OpenVINO.
 
+## Installation instructions
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
