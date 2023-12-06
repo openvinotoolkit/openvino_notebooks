@@ -11,6 +11,7 @@ ai
 al
 Alibaba
 ALiBi
+AlpacaEval
 analytics
 AnimeGAN
 api
@@ -63,6 +64,7 @@ Cifar
 cityscape
 Cityscapes
 CLI
+cli
 CLIP's
 codebook
 codebooks
@@ -106,6 +108,7 @@ dataset
 datasets
 DDIM
 DDPMs
+dDPO
 de
 Deblur
 deblur
@@ -190,8 +193,10 @@ Frontend
 frontend
 GAN
 Gante
+Gaudi
 gaussian
 Gb
+gcc
 GEC
 GELU
 Girshick
@@ -369,6 +374,8 @@ NNCF
 nncf
 noncomparable
 NONINFRINGEMENT
+Notus
+notus
 nsamples
 nsfw
 NSFW
@@ -399,6 +406,7 @@ OpenVino
 OpenVINO's
 opset
 optimizable
+Orca
 OVC
 overfitting
 overlayed
@@ -407,6 +415,7 @@ OVC
 OVModel
 OVModelForXXX
 OVMS
+OvStableDiffusionInpaintingPipeline
 PaddleClas
 PaddleGAN
 paddlegan
@@ -457,6 +466,7 @@ preprocessed
 preprocesses
 preprocessing
 preprocessor
+pretrain
 pretrained
 Pretraining
 pretraining
@@ -535,12 +545,14 @@ Schuster
 sd
 SDEdit
 SDXL
+sdxl
 Segmentations
 segmentations
 Segmenter
 segmenter
 Segmind
 serializable
+sft
 ShapeNet
 ShareGPT
 Shazeer
@@ -548,6 +560,7 @@ Shutterstock
 siggraph
 sigmoid
 SISR
+SlimOrca
 SlowFast
 slowfast
 slowmo
@@ -570,6 +583,7 @@ SRT
 SSD
 SSDLite
 sst
+StableDiffusionInpaintPipeline
 STFT
 streamable
 Struct
@@ -601,6 +615,7 @@ tflite
 th
 timestep
 timesteps
+TinyLlama
 Tokenization
 tokenization
 tokenize

@@ -6,7 +6,7 @@ import torch
 
 DEFAULT_SYSTEM_PROMPT = """\
 You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
-If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\
+If a question does not make any sense or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\
 """
 
 
@@ -32,6 +32,13 @@ def chatglm_partial_text_processor(partial_text, new_text):
 
 
 SUPPORTED_MODELS = {
+    "tiny-llama-1b-chat": {
+        "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v0.6",
+        "remote": False,
+        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
+        "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
+        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+    },
     "red-pajama-3b-chat": {
         "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
         "remote": False,
@@ -49,7 +56,6 @@ SUPPORTED_MODELS = {
         "current_message_template": "{user} [/INST]{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": llama_partial_text_processor,
-        "revision": "5514c85fedd6c4fc0fc66fa533bc157de520da73",
     },
     "mpt-7b-chat": {
         "model_id": "mosaicml/mpt-7b-chat",
@@ -66,6 +72,7 @@ SUPPORTED_MODELS = {
         "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
         "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
         "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        "revision": "2abd8e5777bb4ce9c8ab4be7dbbd0fe4526db78d"
     },
     "chatglm2-6b": {
         "model_id": "THUDM/chatglm2-6b",
@@ -76,8 +83,36 @@ SUPPORTED_MODELS = {
         "current_message_template": "[Round{num}]\n\n问：{user}\n\n答：{assistant}",
         "stop_tokens": ["</s>"],
     },
+    "mistal-7b": {
+        "model_id": "mistralai/Mistral-7B-v0.1",
+        "remote": False,
+        "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
+        "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
+        "current_message_template": "{user} [/INST]{assistant}",
+        "tokenizer_kwargs": {"add_special_tokens": False},
+        "partial_text_processor": llama_partial_text_processor,
+        
+    },
     "zephyr-7b-beta": {
         "model_id": "HuggingFaceH4/zephyr-7b-beta",
+        "remote": False,
+        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
+        "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
+        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+    },
+
+    "neural-chat-7b-v3-1": {
+        "model_id": "Intel/neural-chat-7b-v3-1",
+        "remote": False,
+        "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
+        "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
+        "current_message_template": "{user} [/INST]{assistant}",
+        "tokenizer_kwargs": {"add_special_tokens": False},
+        "partial_text_processor": llama_partial_text_processor,
+        
+    },
+    "notus-7b-v1": {
+        "model_id": "argilla/notus-7b-v1",
         "remote": False,
         "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
