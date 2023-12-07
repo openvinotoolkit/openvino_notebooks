@@ -40,6 +40,7 @@ Benchmarking
 benchmarking
 bert
 BERT's
+BetterTransformer
 Bewley
 BGR
 Bicubic
@@ -199,6 +200,7 @@ Gb
 gcc
 GEC
 GELU
+genai
 Girshick
 Gitee
 GitHub
@@ -218,6 +220,7 @@ grayscale
 gRPC
 Gutendex
 Hafner
+HugginFaceH
 HandBrake
 heatmap
 HC
@@ -475,6 +478,7 @@ PRs
 psychoacoustics
 PTQ
 px
+py
 pyannote
 PyPI
 Pythia
@@ -584,6 +588,7 @@ SSDLite
 sst
 StableDiffusionInpaintPipeline
 STFT
+stateful
 streamable
 Struct
 struct

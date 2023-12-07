@@ -41,4 +41,5 @@
 270-sound-generation-audioldm2
 271-sdxl-turbo
 272-paint-by-example
+273-stable-zephyr-3b-chatbot
 404-style-transfer-webcam
