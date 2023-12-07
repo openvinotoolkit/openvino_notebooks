@@ -1,9 +1,11 @@
 import './App.scss';
 
+import { Header } from './components/Header/Header';
+
 function App(): JSX.Element {
   return (
     <>
-      <h1>Vite + React Initial App</h1>
+      <Header></Header>
     </>
   );
 }
