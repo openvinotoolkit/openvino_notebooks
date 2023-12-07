@@ -18,7 +18,7 @@ Install libraries and tools:
 sudo apt install git gcc python3-venv python3-dev
 ```
 
-_NOTE: If you are using Windows, you will probably need to install [Microsoft Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) also._
+_NOTE: If you are using Windows, you may need to install [Microsoft Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) also._
 
 ### Setting up your Environment
 
@@ -67,9 +67,10 @@ pip install -r requirements.txt
 ```
 ### How to Access LlaMA 2
 
-NOTE: If you already have access to the LlaMA 2 model weights, skip to the authentication step, which is mandatory for converting the LlaMA 2 model.
+_NOTE: If you already have access to the LlaMA 2 model weights, skip to the authentication step, which is mandatory for converting the LlaMA 2 model._
 
-Accessing Original Weights from Meta AI
+#### Accessing Original Weights from Meta AI
+
 To access the original LlaMA 2 model weights:
 
 Visit [Meta AI's website](https://ai.meta.com/resources/models-and-libraries/llama-downloads/) and fill in your details, including your name, email, and organization.
@@ -88,11 +89,11 @@ When prompted to add the token as a git credential, respond with 'n'. This step 
 
 Now, you're ready to download and optimize the models required to run the application.
 
-### Model Conversion and Optimization
+## Model Conversion and Optimization
 
 The application uses three separate models for its operation, each requiring conversion and optimization for use with OpenVINO™. Follow the order below to convert and optimize each model:
 
-1. ASR-Distil Whisper Conversion:
+1. Automated Speech Recognition Distil-Whisper Conversion:
 ```shell
 python convert_and_optimize_asr.py
 ```
@@ -100,26 +101,27 @@ This script will convert and optimize the automatic speech recognition (ASR) mod
 
 2. Chat LLama2 Conversion:
 ```shell
-python convert_and_optimize_chat.py
+python convert_and_optimize_chat.py --chat_model_type llama2-7B --quantize_weights
 ```
-This script will handle the conversion and optimization of the chat model.
+This script will handle the conversion and optimization of the chat model performing weights quantization. 
 
 3. Text to Speech Bark Conversion::
 ```shell
-python convert_and_optimize_tts.py
+python convert_and_optimize_tts.py --use_small_models
 ```
-This script will convert and optimize the text-to-speech (TTS) model.
+This script will convert and optimize the text-to-speech (TTS) model. Use small models parameter will select smaller models, which should perform faster.
 
 After running the conversion scripts, you can run app.py to launch the application.
 
-_NOTE: Running the above script may take up to 120 minutes (depending on your hardware Internet connection), as the models are huge._
+_NOTE: Running the above script may take up to 120 minutes (depending on your hardware Internet connection), as some models are huge (especially chatbots)._
 
-### Running the Gradio Interface
+## Running the Application (Gradio Interface)
+
 Execute the `app.py` script with the following command, including all necessary model directory arguments:
 ```shell
 python app.py --asr_model_dir path/to/asr_model --chat_model_dir path/to/chat_model --tts_model_dir path/to/tts_model --tts_speaker_type [male|female]
 ```
-Make sure to replace `path/to/asr_model`, `path/to/chat_model`, and `path/to/tts_model` with the actual paths to your respective models. Choose `male` or `female` for the `--tts_speaker_type` argument depending on the desired voice for the Text-to-Speech output.
+Make sure to replace `path/to/asr_model`, `path/to/chat_model`, and `path/to/tts_model` with the actual paths to your respective models. Choose `male` or `female` for the `--tts_speaker_type` argument depending on the desired voice for the Text-to-Speech output. Add `--public_interface` to make it publicly accessible.
 
 ### Accessing the Web Interface
 Upon successful execution of the script, Gradio will provide a local URL, typically `http://127.0.0.1:XXXX`, which you can open in your web browser to start interacting with the voice agent. If you configured the application to be accessible publicly, Gradio will also provide a public URL.
@@ -128,11 +130,16 @@ Trying Out the Application
 1. Navigate to the provided Gradio URL in your web browser.
 2. You will see the Gradio interface with options to input voice.
 3. To interact using voice:
-        - Click on the microphone icon and speak your query.
-        - Wait for the voice agent to process your speech and respond.
+    - Click on the microphone icon and speak your query.
+    - Wait for the voice agent to process your speech and respond.
 4. The voice agent will respond to your query in text and with synthesized speech.
 
 Feel free to engage with the Conversational Voice Agent, ask questions, or give commands as per the agent's capabilities. This hands-on experience will help you better understand the agent's interactive quality and performance.
 
 Enjoy exploring the capabilities of your Conversational Voice Agent!
 
+## Troubleshooting and Resources
+- Open a [discussion topic](https://github.com/openvinotoolkit/openvino_notebooks/discussions)
+- Create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issues)
+- Learn more about [OpenVINO](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/overview.html)
+- Explore [OpenVINO’s documentation](https://docs.openvino.ai/2023.0/home.html)
