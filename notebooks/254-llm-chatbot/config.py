@@ -9,6 +9,10 @@ You are a helpful, respectful and honest assistant. Always answer as helpfully a
 If a question does not make any sense or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\
 """
 
+DEFAULT_RAG_PROMPT = """\
+You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.\
+"""
+
 def red_pijama_partial_text_processor(partial_text, new_text):
     if new_text == "<":
         return partial_text
@@ -31,6 +35,19 @@ def chatglm_partial_text_processor(partial_text, new_text):
 
 
 SUPPORTED_LLM_MODELS = {
+    "tiny-llama-1b-chat": {
+        "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v0.6",
+        "remote": False,
+        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
+        "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
+        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>""" + """
+        <|user|>
+        Question: {question} 
+        Context: {context} 
+        Answer: </s>
+        <|assistant|>""",
+    },
     "red-pajama-3b-chat": {
         "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
         "remote": False,
@@ -39,6 +56,10 @@ SUPPORTED_LLM_MODELS = {
         "stop_tokens": [29, 0],
         "partial_text_processor": red_pijama_partial_text_processor,
         "current_message_template": "\n<human>:{user}\n<bot>:{assistant}",
+        "prompt_template": f"""{DEFAULT_RAG_PROMPT }""" + """
+        <human>: Question: {question} 
+        Context: {context} 
+        Answer: <bot>""",
     },
     "llama-2-chat-7b": {
         "model_id": "meta-llama/Llama-2-7b-chat-hf",
@@ -48,7 +69,7 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": "{user} [/INST]{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": llama_partial_text_processor,
-        "prompt_template": """[INST]Human: <<SYS>> You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.<</SYS>> 
+        "prompt_template": f"""[INST]Human: <<SYS>> {DEFAULT_RAG_PROMPT }<</SYS>>""" + """
         Question: {question} 
         Context: {context} 
         Answer: [/INST]""",
@@ -60,6 +81,12 @@ SUPPORTED_LLM_MODELS = {
         "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
         "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
         "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        "prompt_template": f"""<|im_start|>system 
+        {DEFAULT_RAG_PROMPT }<|im_end|>""" + """
+        <|im_start|>user
+        Question: {question} 
+        Context: {context} 
+        Answer: <im_end><|im_start|>assistant""",
     },
     "qwen-7b-chat": {
         "model_id": "Qwen/Qwen-7B-Chat",
@@ -69,6 +96,12 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
         "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
         "revision": "2abd8e5777bb4ce9c8ab4be7dbbd0fe4526db78d",
+        "prompt_template": """<|im_start|>基于以下已知信息，请简洁并专业地回答用户的问题。
+        如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。<|im_end|>
+        <|im_start|>user
+        问题: {question} 
+        已知内容: {context} 
+        回答: <im_end><|im_start|>assistant""",
     },
     "chatglm2-6b": {
         "model_id": "THUDM/chatglm2-6b",
@@ -80,10 +113,11 @@ SUPPORTED_LLM_MODELS = {
         "stop_tokens": ["</s>"],
         "prompt_template": """基于以下已知信息，请简洁并专业地回答用户的问题。
         如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。
+        问题:
+        {question}
         已知内容:
         {context}
-        问题:
-        {question}"""
+        回答："""
     },
     "mistal-7b": {
         "model_id": "mistralai/Mistral-7B-v0.1",
@@ -93,7 +127,7 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": "{user} [/INST]{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": llama_partial_text_processor,
-        "prompt_template": """<s> [INST] You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise. [/INST] </s> 
+        "prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>""" + """ 
         [INST] Question: {question} 
         Context: {context} 
         Answer: [/INST]""",
@@ -104,6 +138,12 @@ SUPPORTED_LLM_MODELS = {
         "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>""" + """ 
+        <|user|>
+        Question: {question} 
+        Context: {context} 
+        Answer: </s>
+        <|assistant|>""",
     },
     "neural-chat-7b-v3-1": {
         "model_id": "Intel/neural-chat-7b-v3-1",
@@ -113,7 +153,7 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": "{user} [/INST]{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": llama_partial_text_processor,
-        "prompt_template": """<s> [INST] You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise. [/INST] </s> 
+        "prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>""" + """
         [INST] Question: {question} 
         Context: {context} 
         Answer: [/INST]""",
@@ -124,6 +164,12 @@ SUPPORTED_LLM_MODELS = {
         "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>""" + """
+        <|user|>
+        Question: {question} 
+        Context: {context} 
+        Answer: </s>
+        <|assistant|>""",
     },
 }
 
