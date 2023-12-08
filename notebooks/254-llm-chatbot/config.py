@@ -174,5 +174,6 @@ SUPPORTED_LLM_MODELS = {
 }
 
 SUPPORTED_EMBEDDING_MODELS = {
-    "all-mpnet-base-v2": {"model_id": "sentence-transformers/all-mpnet-base-v2"}
+    # "chinese_embedding": {"model_id": "GanymedeNil/text2vec-large-chinese"},
+    "english_embedding": {"model_id": "sentence-transformers/all-mpnet-base-v2"},
 }
