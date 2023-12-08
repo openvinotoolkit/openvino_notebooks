@@ -9,6 +9,10 @@ You are a helpful, respectful and honest assistant. Always answer as helpfully a
 If a question does not make any sense or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\
 """
 
+DEFAULT_SYSTEM_PROMPT_JAPANESE = """\
+あなたは親切で、礼儀正しく、誠実なアシスタントです。 常に安全を保ちながら、できるだけ役立つように答えてください。 回答には、有害、非倫理的、人種差別的、性差別的、有毒、危険、または違法なコンテンツを含めてはいけません。 回答は社会的に偏見がなく、本質的に前向きなものであることを確認してください。
+質問が意味をなさない場合、または事実に一貫性がない場合は、正しくないことに答えるのではなく、その理由を説明してください。 質問の答えがわからない場合は、誤った情報を共有しないでください。\
+"""
 
 def red_pijama_partial_text_processor(partial_text, new_text):
     if new_text == "<":
@@ -27,6 +31,11 @@ def llama_partial_text_processor(partial_text, new_text):
 def chatglm_partial_text_processor(partial_text, new_text):
     new_text = new_text.strip()
     new_text = new_text.replace("[[训练时间]]", "2023年")
+    partial_text += new_text
+    return partial_text
+
+def youri_partial_text_processor(partial_text, new_text):
+    new_text = new_text.replace("システム:", "")
     partial_text += new_text
     return partial_text
 
@@ -117,5 +126,14 @@ SUPPORTED_MODELS = {
         "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+    },
+    "youri-7b-chat": {
+        "model_id": "rinna/youri-7b-chat",
+        "remote": False,
+        "start_message": f"設定: {DEFAULT_SYSTEM_PROMPT_JAPANESE}\n",
+        "history_template": "ユーザー: {user}\nシステム: {assistant}\n",
+        "current_message_template": "ユーザー: {user}\nシステム: {assistant}",
+        "tokenizer_kwargs": {"add_special_tokens": False},
+        "partial_text_processor": youri_partial_text_processor,
     },
 }
