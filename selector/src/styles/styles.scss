@@ -1,6 +1,14 @@
 @import '@spark-design/css/global/index.css';
 @import './font-face';
+@import './globals';
 
 body {
   margin: 0;
+  @include flex-col();
+  @include min-h-screen();
+}
+
+#root {
+  @include flex-col();
+  @include min-h-screen();
 }
