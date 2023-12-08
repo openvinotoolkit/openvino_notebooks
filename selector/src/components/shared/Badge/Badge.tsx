@@ -13,9 +13,9 @@ type BadgeProps = {
   size?: BageSize;
 };
 
-export const Badge = ({ text, size }: BadgeProps): JSX.Element => {
-  const badgeSize: BageSize = size || 's';
-  const sizeClassName = `${sparkClassNames.badgeSizePrefix}${badgeSize}`;
+export const Badge = (props: BadgeProps): JSX.Element => {
+  const { text, size = 's' } = props;
+  const sizeClassName = `${sparkClassNames.badgeSizePrefix}${size}`;
   return (
     <span className={`${sparkClassNames.badge} ${sizeClassName}`}>
       <span className={sparkClassNames.badgeText}>{text}</span>
