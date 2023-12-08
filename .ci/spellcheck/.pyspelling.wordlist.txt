@@ -528,6 +528,8 @@ resnet
 RGB
 Riffusion
 riffusion
+Rinna
+rinna
 RLHF
 RoBERTa
 roberta
@@ -709,6 +711,8 @@ XYWH
 YOLO
 YOLOv
 yolov
+Youri
+youri
 ZavyChromaXL
 Zongyuan
 ZeroScope
