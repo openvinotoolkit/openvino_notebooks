@@ -1,11 +1,19 @@
 import './App.scss';
 
-import { Header } from './components/Header/Header';
+import { ContentSection } from '@components/ContentSection/ContentSection';
+import { FiltersSection } from '@components/FiltersSection/FiltersSection';
+import { Header } from '@components/Header/Header';
 
 function App(): JSX.Element {
   return (
     <>
-      <Header></Header>
+      <Header />
+      <main className="flex-col flex-1">
+        <div className="flex">
+          <FiltersSection />
+          <ContentSection />
+        </div>
+      </main>
     </>
   );
 }

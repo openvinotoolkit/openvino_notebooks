@@ -1,6 +1,6 @@
 import './Header.scss';
 
-import logo from '../../assets/images/logo.svg';
+import logo from '@assets/images/logo.svg';
 
 export const Header = (): JSX.Element => {
   return (
