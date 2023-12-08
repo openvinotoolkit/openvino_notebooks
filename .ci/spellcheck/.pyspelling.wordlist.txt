@@ -560,6 +560,7 @@ segmentations
 Segmenter
 segmenter
 Segmind
+segmind
 serializable
 sft
 ShapeNet
