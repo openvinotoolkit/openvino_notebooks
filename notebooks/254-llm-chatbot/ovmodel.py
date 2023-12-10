@@ -23,7 +23,7 @@ class OVEmbeddings(BaseModel, Embeddings):
     model: Any  #: :meta private:
     """LLM Transformers model."""
     model_kwargs: Optional[dict] = None
-    """OpenVINO model configurations"""
+    """OpenVINO model configurations."""
     tokenizer: Any  #: :meta private:
     """Huggingface tokenizer model."""
     num_stream: int
@@ -35,14 +35,16 @@ class OVEmbeddings(BaseModel, Embeddings):
     def from_model_id(
         cls,
         model_id: str,
+        ov_config: Optional[dict],
         model_kwargs: Optional[dict],
         **kwargs: Any,
     ):
         _model_kwargs = model_kwargs or {}
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        _ov_config = ov_config or {}
+        tokenizer = AutoTokenizer.from_pretrained(model_id, **_model_kwargs)
         core = ov.Core()
         model_path = Path(model_id) / "openvino_model.xml"
-        model = core.compile_model(model_path, **_model_kwargs)
+        model = core.compile_model(model_path, **_ov_config)
         num_stream = model.get_property('NUM_STREAMS')
 
         return cls(
@@ -99,15 +101,14 @@ class OVEmbeddings(BaseModel, Embeddings):
             all_embeddings.extend(embeddings)
 
         infer_queue.set_callback(postprocess)
-
-        for sentence in sentences_sorted:
+        
+        for i, sentence in enumerate(sentences_sorted):
             inputs = {}
             features = self.tokenizer(
                 sentence, padding=True, truncation=True, return_tensors='np')
             for key in features:
                 inputs[key] = features[key]
-            # out_features = self.forward(features)
-            infer_queue.start_async(inputs)
+            infer_queue.start_async(inputs, i)
         infer_queue.wait_all()
         all_embeddings = np.asarray(all_embeddings)
         return all_embeddings

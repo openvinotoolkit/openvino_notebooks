@@ -45,6 +45,7 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [FILM](notebooks/269-film-slowmo)<br> | Frame interpolation with FILM and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/1720147/8ac5178d-4a92-4a86-a3df-dd494434fed6" width=300> |
 | [Audio LDM 2](notebooks/270-sound-generation-audioldm2/)<br> | Sound Generation with AudioLDM2 and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/c93a0f86-d9cf-4bd1-93b9-e27532170d75" width=300> |
 | [SDXL-Turbo](notebooks/271-sdxl-turbo/)<br> | Single-step image generation using SDXL-turbo and OpenVINO | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/79b625c7-0f0a-4f19-8e38-e6f896f75c3e" width=300> |
+| [Stable-Zephyr chatbot](notebooks/273-stable-zephyr-3b-chatbot/)<br> | Use Stable-Zephyr as chatbot assistant with OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cfac6ddb-6f22-4343-855c-e513269cf2bf width=300> |  
 
 ## Table of Contents
 

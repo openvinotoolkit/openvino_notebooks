@@ -57,4 +57,5 @@ notebooks/269-film-slowmo/269-film-slowmo.ipynb
 notebooks/270-sound-generation-audioldm2/270-sound-generation-audioldm2.ipynb
 notebooks/271-sdxl-turbo/271-sdxl-turbo.ipynb
 notebooks/272-paint-by-example/272-paint-by-example.ipynb
+notebooks/273-stable-zephyr-3b-chatbot/273-stable-zephyr-3b-chatbot.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb

@@ -40,8 +40,10 @@ Benchmarking
 benchmarking
 bert
 BERT's
+BetterTransformer
 Bewley
 BGR
+BMP
 Bicubic
 bicubic
 bilinear
@@ -200,6 +202,7 @@ Gb
 gcc
 GEC
 GELU
+genai
 Girshick
 Gitee
 GitHub
@@ -219,6 +222,7 @@ grayscale
 gRPC
 Gutendex
 Hafner
+HugginFaceH
 HandBrake
 heatmap
 HC
@@ -475,10 +479,12 @@ Pretraining
 pretraining
 promptable
 proto
+protobuf
 PRs
 psychoacoustics
 PTQ
 px
+py
 pyannote
 PyPI
 Pythia
@@ -527,6 +533,8 @@ resnet
 RGB
 Riffusion
 riffusion
+Rinna
+rinna
 RLHF
 RoBERTa
 roberta
@@ -540,6 +548,7 @@ sagittal
 SALICON
 Saliency
 saliency
+SavedModel
 scalability
 Scalable
 scalable
@@ -554,6 +563,7 @@ segmentations
 Segmenter
 segmenter
 Segmind
+segmind
 serializable
 sft
 ShapeNet
@@ -588,6 +598,7 @@ SSDLite
 sst
 StableDiffusionInpaintPipeline
 STFT
+stateful
 streamable
 Struct
 struct
@@ -708,6 +719,8 @@ XYWH
 YOLO
 YOLOv
 yolov
+Youri
+youri
 ZavyChromaXL
 Zongyuan
 ZeroScope

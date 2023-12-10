@@ -9,6 +9,11 @@ You are a helpful, respectful and honest assistant. Always answer as helpfully a
 If a question does not make any sense or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\
 """
 
+DEFAULT_SYSTEM_PROMPT_JAPANESE = """\
+あなたは親切で、礼儀正しく、誠実なアシスタントです。 常に安全を保ちながら、できるだけ役立つように答えてください。 回答には、有害、非倫理的、人種差別的、性差別的、有毒、危険、または違法なコンテンツを含めてはいけません。 回答は社会的に偏見がなく、本質的に前向きなものであることを確認してください。
+質問が意味をなさない場合、または事実に一貫性がない場合は、正しくないことに答えるのではなく、その理由を説明してください。 質問の答えがわからない場合は、誤った情報を共有しないでください。\
+"""
+
 DEFAULT_RAG_PROMPT = """\
 You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.\
 """
@@ -30,6 +35,11 @@ def llama_partial_text_processor(partial_text, new_text):
 def chatglm_partial_text_processor(partial_text, new_text):
     new_text = new_text.strip()
     new_text = new_text.replace("[[训练时间]]", "2023年")
+    partial_text += new_text
+    return partial_text
+
+def youri_partial_text_processor(partial_text, new_text):
+    new_text = new_text.replace("システム:", "")
     partial_text += new_text
     return partial_text
 
@@ -112,11 +122,11 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": "[Round{num}]\n\n问：{user}\n\n答：{assistant}",
         "stop_tokens": ["</s>"],
         "prompt_template": """基于以下已知信息，请简洁并专业地回答用户的问题。
-        如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。
+        如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。\n
         问题:
-        {question}
+        {question}\n
         已知内容:
-        {context}
+        {context}\n
         回答："""
     },
     "mistal-7b": {
@@ -171,9 +181,18 @@ SUPPORTED_LLM_MODELS = {
         Answer: </s>
         <|assistant|>""",
     },
+    "youri-7b-chat": {
+        "model_id": "rinna/youri-7b-chat",
+        "remote": False,
+        "start_message": f"設定: {DEFAULT_SYSTEM_PROMPT_JAPANESE}\n",
+        "history_template": "ユーザー: {user}\nシステム: {assistant}\n",
+        "current_message_template": "ユーザー: {user}\nシステム: {assistant}",
+        "tokenizer_kwargs": {"add_special_tokens": False},
+        "partial_text_processor": youri_partial_text_processor,
+    },
 }
 
 SUPPORTED_EMBEDDING_MODELS = {
-    # "chinese_embedding": {"model_id": "GanymedeNil/text2vec-large-chinese"},
-    "english_embedding": {"model_id": "sentence-transformers/all-mpnet-base-v2"},
+    "chinese_embedding": {"model_id": "GanymedeNil/text2vec-large-chinese"},
+    "default_embedding": {"model_id": "sentence-transformers/all-mpnet-base-v2"},
 }

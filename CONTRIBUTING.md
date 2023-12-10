@@ -236,9 +236,12 @@ Here are some guidelines to follow:
 ## Requirements
 
 Contributors are encouraged to install the required packages at the top of their notebook using 
-`!pip install ...` commands. This allows the notebooks to be run independently as standalone examples. 
+`%pip install ...` commands. This allows the notebooks to be run independently as standalone examples. 
 To maintain package compatibility, contributors are expected to install the same versions of packages 
 as specified in the shared `requirements.txt` file located in the repository root folder.
+Additional guidelines:
+1. Specify the widest compatible package version range. If your notebook has only a lower bound on some package version, consider specifying it with ">=" sign instead of "==". Specifying the exact version of package might lead to dependency conflict between notebooks. 
+2. Do not use spaces between package, version and comparison operator when specifying the package installed. Use "package==version" instead of "package == version".
 
 ## Validation
 
