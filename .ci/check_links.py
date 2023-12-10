@@ -9,6 +9,8 @@ from pathlib import Path
 
 NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
 
+EXCEPTIONS_URLs = ["medium.com", "https://www.paddlepaddle.org.cn/", "mybinder.org", "https://arxiv.org", "http://host.robots.ox.ac.uk"]
+
 def get_all_ast_nodes(ast_nodes):
     for node in ast_nodes:
         yield node
@@ -25,6 +27,18 @@ def get_all_references_from_md(md_path):
         elif node['type'] == 'link':
             yield node['link']
 
+
+def validate_colab_url(url: str) -> bool:
+    OPENVINO_COLAB_URL_PREFIX = 'https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/'
+
+    if not url.startswith(OPENVINO_COLAB_URL_PREFIX):
+        return
+
+    notebook_path = url.split(OPENVINO_COLAB_URL_PREFIX)[1]
+    absolute_notebook_path = NOTEBOOKS_ROOT / notebook_path
+
+    if not absolute_notebook_path.exists():
+        raise ValueError(f'notebook not found for colab url {url!r}')
 
 def main():
     all_passed = True
@@ -54,11 +68,22 @@ def main():
                 continue
 
             try:
-                get = requests.get(url, timeout=5)
+                validate_colab_url(url)
+            except ValueError as err:
+                complain(f'{md_path}: {err}')
+
+            try:
+                get = requests.get(url, timeout=10)
                 if get.status_code != 200:
+                    if get.status_code in [500, 429, 443] and any([known_url in url for known_url in EXCEPTIONS_URLs]):
+                        print(f'SKIP - {md_path}: URL can not be reached {url!r}, status code {get.status_code}')
+                        continue
                     complain(f'{md_path}: URL can not be reached {url!r}, status code {get.status_code}')    
             except Exception as err:
-                complain(f'{md_path}: URL can not be reached {url!r}, error {err}')
+                if any([known_url in url for known_url in EXCEPTIONS_URLs]):
+                    print(f'SKIP - {md_path}: URL can not be reached {url!r}, error {err}')
+                else:    
+                    complain(f'{md_path}: URL can not be reached {url!r}, error {err}')
 
     sys.exit(0 if all_passed else 1)
 

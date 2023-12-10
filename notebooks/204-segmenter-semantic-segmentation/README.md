@@ -1,6 +1,6 @@
 # Semantic Segmentation with OpenVINO™ using Segmenter
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/204-segmenter-semantic-segmentation/204-segmenter-semantic-segmentation.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/204-segmenter-semantic-segmentation/204-segmenter-semantic-segmentation.ipynb)
 
 This notebook demonstrates how to convert and use [Segmenter](https://github.com/rstrudel/segmenter) PyTorch model 
 with OpenVINO.
@@ -27,8 +27,7 @@ The tutorial consists of the following steps:
 * Preparing PyTorch Segmenter model
 * Preparing preprocessing and visualization functions
 * Validating inference of original model
-* Converting PyTorch model to ONNX
-* Converting ONNX to OpenVINO IR
+* Converting PyTorch model to OpenVINO IR
 * Validating inference of the converted model
 * Benchmark performance of the converted model
 
