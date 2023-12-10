@@ -122,11 +122,11 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": "[Round{num}]\n\n问：{user}\n\n答：{assistant}",
         "stop_tokens": ["</s>"],
         "prompt_template": """基于以下已知信息，请简洁并专业地回答用户的问题。
-        如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。\n
+        如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。
         问题:
-        {question}\n
+        {question}
         已知内容:
-        {context}\n
+        {context}
         回答："""
     },
     "mistal-7b": {
