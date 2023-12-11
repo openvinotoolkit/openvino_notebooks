@@ -23,6 +23,7 @@ type ButtonProps = {
   value?: string;
   onClick?: () => void;
   icon?: FunctionComponent<SVGProps<SVGSVGElement>>;
+  className?: string;
 };
 
 export const Button = ({
@@ -32,12 +33,18 @@ export const Button = ({
   disabled = false,
   onClick,
   icon,
+  className,
 }: ButtonProps): JSX.Element => {
   const sizeClassName = `${sparkClassNames.buttonSizePrefix}${size}`;
   const variantClassName = `${sparkClassNames.buttonVariantPrefix}${variant}`;
   const classNames = [sparkClassNames.button, sizeClassName, variantClassName];
+
   if (disabled) {
     classNames.push(sparkClassNames.disabledButton);
+  }
+
+  if (className) {
+    classNames.push(className);
   }
 
   return (
