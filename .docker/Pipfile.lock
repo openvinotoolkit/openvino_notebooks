@@ -1394,18 +1394,6 @@
             "markers": "python_version >= '3.7'",
             "version": "==6.6.3"
         },
-        "jupyter-contrib-core": {
-            "hashes": [
-                "sha256:1887212f3ca9d4487d624c0705c20dfdf03d5a0b9ea2557d3aaeeb4c38bdcabb"
-            ],
-            "version": "==0.4.2"
-        },
-        "jupyter-contrib-nbextensions": {
-            "hashes": [
-                "sha256:06e33f005885eb92f89cbe82711e921278201298d08ab0d886d1ba09e8c3e9ca"
-            ],
-            "version": "==0.7.0"
-        },
         "jupyter-core": {
             "hashes": [
                 "sha256:880b86053bf298a8724994f95e99b99130659022a4f7f45f563084b6223861d3",
