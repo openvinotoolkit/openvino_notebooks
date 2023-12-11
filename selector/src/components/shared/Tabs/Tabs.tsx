@@ -4,10 +4,10 @@ import { Badge } from '@components/shared/Badge/Badge';
 import { useState } from 'react';
 
 const sparkClassNames = {
-  tab: 'spark-button spark-button-ghost spark-button-size-m spark-focus-visible spark-focus-visible-self spark-focus-visible-snap spark-tabs-tab spark-tabs-size-m spark-tabs-ghost',
+  tab: 'spark-button spark-button-ghost spark-button-size-m spark-focus-visible spark-focus-visible-self spark-focus-visible-snap spark-tabs-tab',
   tabActive: 'spark-tabs-active',
   tabContent: 'spark-button-content',
-  tabs: 'spark-tabs spark-tabs-size-l spark-tabs-ghost',
+  tabs: 'spark-tabs spark-tabs-size-m spark-tabs-ghost',
 };
 
 type TabProps = {

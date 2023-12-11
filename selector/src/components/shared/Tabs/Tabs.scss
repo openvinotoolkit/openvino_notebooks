@@ -4,6 +4,10 @@
 .tabs-container {
   padding: var(--spark-tabs-block-l-padding-inline) 0;
 
+  .spark-tabs-size-m.spark-tabs-ghost .spark-tabs-tab {
+    padding-inline: var(--spark-tabs-block-m-padding-inline);
+  }
+
   .tab-content {
     padding: var(--spark-tabs-block-l-padding-inline);
   }
