@@ -280,14 +280,14 @@ def convert_chatglm2(pt_model: torch.nn.Module, model_path: Path):
     cleanup_torchscript_cache()
     del pt_model
 
-def convert_default(pt_model: torch.nn.Module, model_path: Path):
+def convert_mpnet(pt_model: torch.nn.Module, model_path: Path):
     ov_out_path = Path(model_path) / "openvino_model.xml"
     dummy_inputs = {"input_ids": torch.ones((1, 10), dtype=torch.long), "attention_mask": torch.ones(
     (1, 10), dtype=torch.long)}
     ov_model = ov.convert_model(pt_model, example_input=dummy_inputs)
     ov.save_model(ov_model, ov_out_path)
     
-def convert_chinese(pt_model: torch.nn.Module, model_path: Path):
+def convert_bert(pt_model: torch.nn.Module, model_path: Path):
     ov_out_path = Path(model_path) / "openvino_model.xml"
     dummy_inputs = {"input_ids": torch.ones((1, 10), dtype=torch.long), "attention_mask": torch.ones(
     (1, 10), dtype=torch.long), "token_type_ids": torch.zeros((1, 10), dtype=torch.long)}
@@ -301,6 +301,6 @@ converters = {
     "qwen": convert_qwen,
     "chatglm2": convert_chatglm2,
     # embedding models
-    "default_embedding": convert_default,
-    "chinese_embedding": convert_chinese,
+    "all-mpnet-base-v2": convert_mpnet,
+    "text2vec-large-chinese": convert_bert,
 }

@@ -193,6 +193,6 @@ SUPPORTED_LLM_MODELS = {
 }
 
 SUPPORTED_EMBEDDING_MODELS = {
-    "chinese_embedding": {"model_id": "GanymedeNil/text2vec-large-chinese"},
-    "default_embedding": {"model_id": "sentence-transformers/all-mpnet-base-v2"},
+    "all-mpnet-base-v2": {"model_id": "sentence-transformers/all-mpnet-base-v2"},
+    "text2vec-large-chinese": {"model_id": "GanymedeNil/text2vec-large-chinese"},
 }

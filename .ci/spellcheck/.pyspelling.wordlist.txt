@@ -59,6 +59,7 @@ chatbots
 chatglm
 ChatGLM
 ChatGPT
+chinese
 CIN
 ckpt
 CHW
@@ -94,6 +95,7 @@ ConvNeXt
 ConvNeXts
 Convolutional
 convolutional
+CoSENT
 CPUs
 CRNN
 CTC
