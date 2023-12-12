@@ -1,0 +1,25 @@
+@import '@spark-design/css/components/typography/index.css';
+
+.content-section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  .title {
+    margin: 0 1rem 0 0;
+  }
+
+  .counter {
+    color: var(--spark-color-carbon-tint1);
+  }
+
+  .reset-filters-button {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  .notebooks-search {
+    margin-left: auto;
+    min-width: 300px;
+  }
+}
