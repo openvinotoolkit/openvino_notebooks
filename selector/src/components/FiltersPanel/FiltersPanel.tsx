@@ -2,8 +2,9 @@ import './FiltersPanel.scss';
 
 import { useState } from 'react';
 
-import { FilterSection } from '../shared/FilterSection/FilterSection';
-import { ITabItem, Tabs } from '../shared/Tabs/Tabs';
+import { FilterSection } from '@/components/shared/FilterSection/FilterSection';
+import { Search } from '@/components/shared/Search/Search';
+import { ITabItem, Tabs } from '@/components/shared/Tabs/Tabs';
 
 // TODO Consider moving to models
 interface IFilterGroup<T extends string = string> {
@@ -65,12 +66,15 @@ export const FiltersPanel = (): JSX.Element => {
     title,
     badge: selectedTags[group].length,
     content: (
-      <FilterSection<FilterGroupKey>
-        group={group}
-        tags={tags}
-        selectedTags={selectedTags[group]}
-        onTagClick={(tag, group) => handleTagClick(tag, group!)}
-      ></FilterSection>
+      <>
+        <Search key={`search-${group}`} placeholder={`Filter ${title} by name`} className="filters-search"></Search>
+        <FilterSection<FilterGroupKey>
+          group={group}
+          tags={tags}
+          selectedTags={selectedTags[group]}
+          onTagClick={(tag, group) => handleTagClick(tag, group!)}
+        ></FilterSection>
+      </>
     ),
   }));
 
