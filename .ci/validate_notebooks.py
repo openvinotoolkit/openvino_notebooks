@@ -178,9 +178,19 @@ def main():
             if args.early_stop:
                 break
     exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
+    print("FINISH FINALIZE_STATUS!")
+    for proc in psutil.process_iter(["pid", "name", "username"]):
+        try:
+            ps_exe_path = os.path.abspath(proc.exe())
+            # can be psutil.AccessDenied, PermissionError, ZombieProcess
+        except Exception:
+            ps_exe_path = ""
+        print(proc, ps_exe_path)
+    print(f"STATUS={exit_status}")
     return exit_status
 
 
 if __name__ == '__main__':
     exit_code = main()
+    print("TEST1!")
     sys.exit(exit_code)
