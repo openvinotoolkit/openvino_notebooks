@@ -178,6 +178,7 @@ def main():
             if args.early_stop:
                 break
     exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
+    import psutil
     print("FINISH FINALIZE_STATUS!")
     for proc in psutil.process_iter(["pid", "name", "username"]):
         try:
