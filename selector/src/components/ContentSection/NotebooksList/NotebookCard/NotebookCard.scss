@@ -1,0 +1,48 @@
+@import '@spark-design/css/components/typography/index.css';
+@import '@spark-design/css/components/card/index.css';
+
+.spark-card-horizontal {
+  min-inline-size: 0;
+  width: 100%;
+}
+
+.spark-card-border-normal:hover {
+  box-shadow: 0 0 0 var(--spark-card-box-shadow1) var(--spark-color-classic-blue) !important;
+}
+
+.card-wrapper {
+  display: flex;
+  flex-grow: 1;
+  height: 200px;
+
+  .card-image {
+    width: 300px;
+    height: 100%;
+  }
+
+  .card-content {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    padding: 1rem;
+    width: min-content;
+
+    .card-description {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-footer {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 0;
+
+      .card-actions {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.5rem;
+      }
+    }
+  }
+}
