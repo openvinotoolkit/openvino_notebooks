@@ -56,7 +56,7 @@ export const Tabs = ({ items }: TabsProps): JSX.Element => {
             key={`tab-${i}`}
             title={title}
             active={i === selectedTabIndex}
-            badge={badge?.toString()}
+            badge={badge ? badge.toString() : undefined}
             onClick={() => setSelectedTabIndex(i)}
           />
         ))}
