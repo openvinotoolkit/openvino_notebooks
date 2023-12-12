@@ -59,6 +59,7 @@ chatbots
 chatglm
 ChatGLM
 ChatGPT
+chinese
 CIN
 ckpt
 CHW
@@ -94,6 +95,7 @@ ConvNeXt
 ConvNeXts
 Convolutional
 convolutional
+CoSENT
 CPUs
 CRNN
 CTC
@@ -155,6 +157,7 @@ DL
 docstring
 DocVQA
 docvqa
+DocumentLoaders
 doi
 Dollár
 donut
@@ -291,6 +294,7 @@ labse
 LaBSE
 Lai
 LAION
+LangChain
 Lasinger
 latents
 LCMs
@@ -352,6 +356,7 @@ MONAI's
 Monodepth
 monodepth
 MosaicPretrainedTransformer
+mpnet
 mpt
 MPT
 MRPC
@@ -679,6 +684,7 @@ validator
 variational
 VCTK
 Vec
+VectorStore
 vec
 videpth
 VIO
