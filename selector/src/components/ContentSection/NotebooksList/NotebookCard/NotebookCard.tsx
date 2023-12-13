@@ -3,6 +3,7 @@ import './NotebookCard.scss';
 import BinderIcon from '@assets/images/binder.svg?react';
 import ColabIcon from '@assets/images/colab.svg?react';
 import GitHubIcon from '@assets/images/github.svg?react';
+import OpenvinoLogo from '@assets/images/openvino-logo-colored.svg?react';
 
 import { Button } from '@/components/shared/Button/Button';
 import { INotebookMetadata } from '@/models/notebook';
@@ -14,6 +15,7 @@ const sparkClassNames = {
   cardImage: 'spark-card-horizontal-bg-image spark-card-bg-fit-cover',
   cardTitle: 'spark-heading spark-font-100 spark-card-horizontal-title',
   fontCardDescription: 'spark-font-75',
+  fontImagePlaceholder: 'spark-font-300',
   cardHorizontalLine: 'spark-card-horizontal-line',
 };
 
@@ -25,7 +27,13 @@ export const NotebookCard = ({ item }: NotebookCardProps): JSX.Element => {
   return (
     <div className={sparkClassNames.card}>
       <div className="card-wrapper">
-        <img src={item.imageUrl} className="card-image" />
+        <div className="card-image-container">
+          <div className="card-image-placeholder">
+            <OpenvinoLogo></OpenvinoLogo>
+            <span className={sparkClassNames.fontImagePlaceholder}>Notebooks</span>
+          </div>
+          <img src={item.imageUrl} className="card-image" />
+        </div>
         <div className="card-content">
           <h6 className={sparkClassNames.cardTitle}>{item.title}</h6>
           <div className="card-description">

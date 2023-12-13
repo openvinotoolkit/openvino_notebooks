@@ -4,6 +4,13 @@
 .spark-card-horizontal {
   min-inline-size: 0;
   width: 100%;
+
+  &:hover {
+    .card-image,
+    .card-image-placeholder {
+      transform: scale(1.1);
+    }
+  }
 }
 
 .spark-card-border-normal:hover {
@@ -15,9 +22,46 @@
   flex-grow: 1;
   height: 200px;
 
-  .card-image {
+  .card-image-container {
     width: 300px;
     height: 100%;
+    border-right: 1px solid var(--spark-color-carbon-tint2);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .card-image,
+    .card-image-placeholder {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      transition: transform 0.2s ease;
+    }
+
+    .card-image-placeholder {
+      background-color: var(--spark-color-carbon-tint2);
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      box-sizing: border-box;
+
+      .openvino-logo {
+        fill: var(--spark-color-theme-light-gray600);
+      }
+
+      span {
+        margin-top: 0.25rem;
+        color: var(--spark-color-theme-light-gray600);
+      }
+    }
   }
 
   .card-content {
