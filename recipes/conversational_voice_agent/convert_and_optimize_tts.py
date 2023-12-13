@@ -4,8 +4,8 @@ from pathlib import Path
 import openvino as ov
 import torch
 from bark.generation import load_model
-from torch import nn
 from encodec import EncodecModel
+from torch import nn
 
 
 # Define the TextEncoderModel class
@@ -49,17 +49,6 @@ class FineModel(nn.Module):
             x = block(x)
         x = self.model.transformer.ln_f(x)
         return x
-
-
-# Define the FrameEncoder class        
-class FrameEncoder(nn.Module):
-    def __init__(self, model):
-        super().__init__()
-        self.model = model
-
-    def forward(self, x: torch.Tensor):
-        codes, scale = self.model._encode_frame(x)
-        return codes if not self.model.normalize else (codes, scale)
 
 
 # Define the FrameDecoder class
@@ -200,27 +189,29 @@ def download_and_convert_encodec_model(model_dir: Path) -> None:
     encodec_model_dir = model_dir / "encodec_model"
     encodec_model_dir.mkdir(parents=True, exist_ok=True)
     encodec_model = EncodecModel.encodec_model_24khz()
+    encodec_model.set_target_bandwidth(6.0)
 
     encodec_encoder_path = encodec_model_dir / "encodec_encoder.xml"
     encodec_decoder_path = encodec_model_dir / "encodec_decoder.xml"
-    encodec_encoder_onnx_path = encodec_model_dir / "encodec_encoder.onnx"
     encodec_decoder_onnx_path = encodec_model_dir / "encodec_decoder.onnx"
 
     if not encodec_encoder_path.exists() or not encodec_decoder_path.exists():
-        encoder = FrameEncoder(encodec_model)
         decoder = FrameDecoder(encodec_model)
 
-        torch.onnx.export(encoder, torch.zeros(1, 1, 480000), encodec_encoder_onnx_path)
         torch.onnx.export(decoder, torch.zeros([1, 8, 1500], dtype=torch.long), encodec_decoder_onnx_path, input_names=["codes", "scale"])
 
-        encoder_ov = ov.convert_model(str(encodec_encoder_onnx_path))
         decoder_ov = ov.convert_model(str(encodec_decoder_onnx_path))
 
-        ov.save_model(encoder_ov, encodec_encoder_path)
+        # reshape the model to be dynamic
+        decoder_input_layer = decoder_ov.input(0)
+        shape = decoder_input_layer.partial_shape
+        shape[2] = -1
+        decoder_ov.reshape({decoder_input_layer: shape})
+
         ov.save_model(decoder_ov, encodec_decoder_path)
 
-        # Free resources
-        del encoder, decoder, encoder_ov, decoder_ov
+        # free resources
+        del decoder, decoder_ov
         
 
 
