@@ -19,6 +19,8 @@ class OVEmbeddings(BaseModel, Embeddings):
     """OpenVINO model configurations."""
     tokenizer: Any  #: :meta private:
     """Huggingface tokenizer model."""
+    do_norm: bool
+    """Whether normlizing the output of model"""
     num_stream: int
     """Number of stream."""
     encode_kwargs: Dict[str, Any] = Field(default_factory=dict)
@@ -28,6 +30,7 @@ class OVEmbeddings(BaseModel, Embeddings):
     def from_model_id(
         cls,
         model_id: str,
+        do_norm: bool,
         ov_config: Optional[dict],
         model_kwargs: Optional[dict],
         **kwargs: Any,
@@ -43,6 +46,7 @@ class OVEmbeddings(BaseModel, Embeddings):
         return cls(
             model=model,
             tokenizer=tokenizer,
+            do_norm = do_norm,
             num_stream=num_stream,
             **kwargs,
         )
@@ -90,7 +94,8 @@ class OVEmbeddings(BaseModel, Embeddings):
         def postprocess(request, userdata):
             embeddings = request.get_output_tensor(0).data
             embeddings = np.mean(embeddings, axis=1)
-            embeddings = normalize(embeddings, 'l2')
+            if self.do_norm:
+                embeddings = normalize(embeddings, 'l2')
             all_embeddings.extend(embeddings)
 
         infer_queue.set_callback(postprocess)

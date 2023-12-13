@@ -308,7 +308,7 @@ class OVQWENModel(OVModelForCausalLM):
             model=model, config=config, model_save_dir=model_cache_path.parent, **kwargs
         )
 
-class OVCHATGLM2Model(OVModelForCausalLM):
+class OVCHATGLMModel(OVModelForCausalLM):
     """
     Optimum intel compatible model wrapper for CHATGLM2
     """
@@ -451,7 +451,7 @@ class OVCHATGLM2Model(OVModelForCausalLM):
         )
 
         model = cls.load_model(model_cache_path, load_in_8bit=load_in_8bit)
-        init_cls = OVCHATGLM2Model
+        init_cls = OVCHATGLMModel
 
         return init_cls(
             model=model, config=config, model_save_dir=model_cache_path.parent, **kwargs
@@ -461,5 +461,5 @@ class OVCHATGLM2Model(OVModelForCausalLM):
 model_classes = {
     "mpt": OVMPTModel,
     "qwen": OVQWENModel,
-    "chatglm2": OVCHATGLM2Model,
+    "chatglm3": OVCHATGLMModel,
 }

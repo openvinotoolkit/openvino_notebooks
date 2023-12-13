@@ -18,6 +18,11 @@ DEFAULT_RAG_PROMPT = """\
 You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.\
 """
 
+DEFAULT_RAG_PROMPT_CHINESE = """\
+基于以下已知信息，请简洁并专业地回答用户的问题。如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。\
+"""
+
+
 def red_pijama_partial_text_processor(partial_text, new_text):
     if new_text == "<":
         return partial_text
@@ -38,6 +43,7 @@ def chatglm_partial_text_processor(partial_text, new_text):
     partial_text += new_text
     return partial_text
 
+
 def youri_partial_text_processor(partial_text, new_text):
     new_text = new_text.replace("システム:", "")
     partial_text += new_text
@@ -51,7 +57,8 @@ SUPPORTED_LLM_MODELS = {
         "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>""" + """
+        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
+        + """
         <|user|>
         Question: {question} 
         Context: {context} 
@@ -66,7 +73,8 @@ SUPPORTED_LLM_MODELS = {
         "stop_tokens": [29, 0],
         "partial_text_processor": red_pijama_partial_text_processor,
         "current_message_template": "\n<human>:{user}\n<bot>:{assistant}",
-        "prompt_template": f"""{DEFAULT_RAG_PROMPT }""" + """
+        "prompt_template": f"""{DEFAULT_RAG_PROMPT }"""
+        + """
         <human>: Question: {question} 
         Context: {context} 
         Answer: <bot>""",
@@ -79,7 +87,8 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": "{user} [/INST]{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": llama_partial_text_processor,
-        "prompt_template": f"""[INST]Human: <<SYS>> {DEFAULT_RAG_PROMPT }<</SYS>>""" + """
+        "prompt_template": f"""[INST]Human: <<SYS>> {DEFAULT_RAG_PROMPT }<</SYS>>"""
+        + """
         Question: {question} 
         Context: {context} 
         Answer: [/INST]""",
@@ -92,7 +101,8 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
         "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
         "prompt_template": f"""<|im_start|>system 
-        {DEFAULT_RAG_PROMPT }<|im_end|>""" + """
+        {DEFAULT_RAG_PROMPT }<|im_end|>"""
+        + """
         <|im_start|>user
         Question: {question} 
         Context: {context} 
@@ -106,28 +116,30 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
         "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
         "revision": "2abd8e5777bb4ce9c8ab4be7dbbd0fe4526db78d",
-        "prompt_template": """<|im_start|>基于以下已知信息，请简洁并专业地回答用户的问题。
-        如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。<|im_end|>
+        "prompt_template": f"""<|im_start|>system
+        {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
+        + """
         <|im_start|>user
         问题: {question} 
         已知内容: {context} 
-        回答: <im_end><|im_start|>assistant""",
+        回答: <|im_end|><|im_start|>assistant""",
     },
-    "chatglm2-6b": {
-        "model_id": "THUDM/chatglm2-6b",
+    "chatglm3-6b": {
+        "model_id": "THUDM/chatglm3-6b",
         "remote": True,
-        "start_message": f"{DEFAULT_SYSTEM_PROMPT }\n\n",
-        "history_template": "[Round{num}]\n\n问：{user}\n\n答：{assistant}\n\n",
+        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT }\n",
+        "history_template": "<|user|>\n{user}\n<|assistant|>\n{assistant}\n",
         "partial_text_processor": chatglm_partial_text_processor,
-        "current_message_template": "[Round{num}]\n\n问：{user}\n\n答：{assistant}",
+        "current_message_template": "<|user|>\n{user}\n<|assistant|>\n",
         "stop_tokens": ["</s>"],
-        "prompt_template": """基于以下已知信息，请简洁并专业地回答用户的问题。
-        如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。
-        问题:
-        {question}
-        已知内容:
-        {context}
-        回答："""
+        "prompt_template": f"""<|system|>
+        {DEFAULT_RAG_PROMPT_CHINESE }"""
+        + """
+        <|user|>
+        问题: {question} 
+        已知内容: {context} 
+        回答: 
+        <|assistant|>""",
     },
     "mistal-7b": {
         "model_id": "mistralai/Mistral-7B-v0.1",
@@ -137,7 +149,8 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": "{user} [/INST]{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": llama_partial_text_processor,
-        "prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>""" + """ 
+        "prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
+        + """ 
         [INST] Question: {question} 
         Context: {context} 
         Answer: [/INST]""",
@@ -148,7 +161,8 @@ SUPPORTED_LLM_MODELS = {
         "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>""" + """ 
+        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
+        + """ 
         <|user|>
         Question: {question} 
         Context: {context} 
@@ -163,7 +177,8 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": "{user} [/INST]{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": llama_partial_text_processor,
-        "prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>""" + """
+        "prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
+        + """
         [INST] Question: {question} 
         Context: {context} 
         Answer: [/INST]""",
@@ -174,7 +189,8 @@ SUPPORTED_LLM_MODELS = {
         "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>""" + """
+        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
+        + """
         <|user|>
         Question: {question} 
         Context: {context} 
@@ -193,6 +209,12 @@ SUPPORTED_LLM_MODELS = {
 }
 
 SUPPORTED_EMBEDDING_MODELS = {
-    "all-mpnet-base-v2": {"model_id": "sentence-transformers/all-mpnet-base-v2"},
-    "text2vec-large-chinese": {"model_id": "GanymedeNil/text2vec-large-chinese"},
+    "all-mpnet-base-v2": {
+        "model_id": "sentence-transformers/all-mpnet-base-v2",
+        "do_norm": True,
+    },
+    "text2vec-large-chinese": {
+        "model_id": "GanymedeNil/text2vec-large-chinese",
+        "do_norm": False,
+    },
 }
