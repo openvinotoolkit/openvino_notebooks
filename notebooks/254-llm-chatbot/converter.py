@@ -287,7 +287,7 @@ def _patch_chatglm_forward(model: "PreTrainedModel"):
         )
 
 
-def convert_chatglm2(pt_model: torch.nn.Module, model_path: Path):
+def convert_chatglm(pt_model: torch.nn.Module, model_path: Path):
     """
     ChatGLM model conversion function
 
@@ -369,7 +369,7 @@ converters = {
     # LLM models
     "mpt": convert_mpt,
     "qwen": convert_qwen,
-    "chatglm2": convert_chatglm2,
+    "chatglm3": convert_chatglm,
     # embedding models
     "all-mpnet-base-v2": convert_mpnet,
     "text2vec-large-chinese": convert_bert,
