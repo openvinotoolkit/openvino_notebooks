@@ -54,9 +54,10 @@ def load_tts_model(model_dir: Path, speaker_type: str) -> None:
     text_encoder_path1 = model_dir / "text_encoder" / "bark_text_encoder_1.xml"
     coarse_encoder_path = model_dir / "coarse_model" / "bark_coarse_encoder.xml"
     fine_model_dir = model_dir / "fine_model"
+    encodec_model_path = model_dir / "encodec_model" / "encodec_decoder.xml"
 
     # create a bark model
-    tts_model = OVBark(text_encoder_path0, text_encoder_path1, coarse_encoder_path, fine_model_dir, device="AUTO", speaker=speaker_type)
+    tts_model = OVBark(text_encoder_path0, text_encoder_path1, coarse_encoder_path, fine_model_dir, encodec_model_path, device="AUTO", speaker=speaker_type)
 
 
 def load_chat_model(model_dir: Path) -> None:
