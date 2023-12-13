@@ -8,7 +8,6 @@ import openvino as ov
 import torch
 import torch.nn.functional as F
 import tqdm
-from encodec import EncodecModel
 from transformers import BertTokenizer
 
 # a few constants from bark package
@@ -101,13 +100,24 @@ class OVBarkFineEncoder:
         return logits
 
 
+class OVEncodecDecoder:
+    def __init__(self, model_path, device):
+        core = ov.Core()
+        self.compiled_model = core.compile_model(model_path, device)
+
+    def __call__(self, tokens):
+        tokens = np.expand_dims(tokens, axis=0)
+        out = self.compiled_model(tokens)[0]
+        return out.squeeze()
+
+
 class OVBark:
 
-    def __init__(self, text_encoder_path0, text_encoder_path1, coarse_encoder_path, fine_model_dir, device, speaker: str = None):
+    def __init__(self, text_encoder_path0, text_encoder_path1, coarse_encoder_path, fine_model_dir, encodec_model_path, device, speaker: str = None):
         self.text_model = OVBarkTextEncoder(text_encoder_path0, text_encoder_path1, device)
         self.coarse_model = OVBarkEncoder(coarse_encoder_path, device)
         self.fine_model = OVBarkFineEncoder(fine_model_dir, device)
-        self.encodec_model = self._load_codec_model("cpu")
+        self.encodec_model = OVEncodecDecoder(encodec_model_path, device)
         self.tokenizer = BertTokenizer.from_pretrained("bert-base-multilingual-cased")
         if speaker is not None:
             self.history_prompt = self._load_history_prompt(speaker)
@@ -320,7 +330,7 @@ class OVBark:
             coarse_tokens,
             temp=0.5,
         )
-        audio_arr = self._codec_decode(fine_tokens)
+        audio_arr = self.encodec_model(fine_tokens)
         return audio_arr
 
     def _generate_coarse(
@@ -545,26 +555,6 @@ class OVBark:
         if n_remove_from_end > 0:
             gen_fine_arr = gen_fine_arr[:, :-n_remove_from_end]
         return gen_fine_arr
-
-    def _load_codec_model(self, device):
-        model = EncodecModel.encodec_model_24khz()
-        model.set_target_bandwidth(6.0)
-        model.eval()
-        model.to(device)
-        return model
-
-    def _codec_decode(self, fine_tokens):
-        """Turn quantized audio codes into audio array using encodec."""
-        # load models if not yet exist
-        device = next(self.encodec_model.parameters()).device
-        arr = torch.from_numpy(fine_tokens)[None]
-        arr = arr.to(device)
-        arr = arr.transpose(0, 1)
-        emb = self.encodec_model.quantizer.decode(arr)
-        out = self.encodec_model.decoder(emb)
-        audio_arr = out.detach().cpu().numpy().squeeze()
-        del arr, emb, out
-        return audio_arr
 
     def _load_history_prompt(self, history_prompt_input):
         if isinstance(history_prompt_input, str):
