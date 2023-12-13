@@ -2,7 +2,7 @@ import './Search.scss';
 
 import CrossIcon from '@assets/images/cross.svg?react';
 import SearchIcon from '@assets/images/search.svg?react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const sparkClassNames = {
   textFieldContainer: 'spark-text-field-container',
@@ -19,10 +19,13 @@ const sparkClassNames = {
 type SearchProps = {
   placeholder?: string;
   className?: string;
+  onSearch?: (value: string) => void;
 };
 
-export const Search = ({ placeholder, className = '' }: SearchProps): JSX.Element => {
+export const Search = ({ placeholder, className = '', onSearch }: SearchProps): JSX.Element => {
   const [searchValue, setSearchValue] = useState('');
+
+  useEffect(() => onSearch?.(searchValue), [onSearch, searchValue]);
 
   return (
     <div className={`${sparkClassNames.textFieldContainer} ${className}`}>
