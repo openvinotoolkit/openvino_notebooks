@@ -105,11 +105,9 @@ python convert_and_optimize_chat.py --chat_model_type llama2-7B --quantize_weigh
 ```
 This script will handle the conversion and optimization of the chat model performing weights quantization. 
 
-3. Text to Speech Bark Conversion::
-```shell
-python convert_and_optimize_tts.py --use_small_models
-```
-This script will convert and optimize the text-to-speech (TTS) model. Use small models parameter will select smaller models, which should perform faster.
+3. Text to Speech Bark Conversion:
+
+Bark model will be optimized with [Intel Extensions for Pytorch (IPEX)](https://github.com/intel/intel-extension-for-pytorch) before the first usage. No need to do it in advance.
 
 After running the conversion scripts, you can run app.py to launch the application.
 
