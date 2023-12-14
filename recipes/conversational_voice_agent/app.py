@@ -40,24 +40,18 @@ def load_asr_model(model_dir: Path) -> None:
     asr_processor = AutoProcessor.from_pretrained(model_dir)
 
 
-def load_tts_model(model_dir: Path, speaker_type: str) -> None:
+def load_tts_model(speaker_type: str, small_models: bool = True) -> None:
     """
     Load text-to-speech model and assign it to a global variable
 
     Params:
-        model_dir: dir with the TTS model
         speaker_type: male or female
+        small_models: whether to use small bark models
     """
     global tts_model
 
-    text_encoder_path0 = model_dir / "text_encoder" / "bark_text_encoder_0.xml"
-    text_encoder_path1 = model_dir / "text_encoder" / "bark_text_encoder_1.xml"
-    coarse_encoder_path = model_dir / "coarse_model" / "bark_coarse_encoder.xml"
-    fine_model_dir = model_dir / "fine_model"
-    encodec_model_path = model_dir / "encodec_model" / "encodec_decoder.xml"
-
     # create a bark model
-    tts_model = OVBark(text_encoder_path0, text_encoder_path1, coarse_encoder_path, fine_model_dir, encodec_model_path, device="AUTO", speaker=speaker_type)
+    tts_model = OVBark(small_models, speaker_type)
 
 
 def load_chat_model(model_dir: Path) -> None:
@@ -201,7 +195,7 @@ def create_UI(initial_message: str) -> gr.Blocks:
     return demo
 
 
-def run(asr_model_dir: Path, chat_model_dir: Path, tts_model_dir: Path, speaker_type: str, public_interface: bool = False) -> None:
+def run(asr_model_dir: Path, chat_model_dir: Path, speaker_type: str, small_tts_models: bool = True, public_interface: bool = False) -> None:
     """
     Run the assistant application
 
@@ -217,7 +211,7 @@ def run(asr_model_dir: Path, chat_model_dir: Path, tts_model_dir: Path, speaker_
     # load chat model
     load_chat_model(chat_model_dir)
     # load bark model
-    load_tts_model(tts_model_dir, speaker_type)
+    load_tts_model(speaker_type, small_tts_models)
 
     # get initial greeting
     history = chat([[None, None]])
@@ -233,9 +227,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--asr_model_dir', type=str, default="model/distil-large-v2-FP16", help="Path to the automatic speech recognition model directory")
     parser.add_argument('--chat_model_dir', type=str, default="model/llama2-7B-INT8", help="Path to the chat model directory")
-    parser.add_argument('--tts_model_dir', type=str, default="model/bark-small-FP16", help="Path to the text-to-speech model directory")
     parser.add_argument('--tts_speaker_type', type=str, default="male", choices=["male", "female"], help="The speaker's voice type")
+    parser.add_argument('--small_tts_models', default=False, action="store_true", help="Whether to use small bark models")
     parser.add_argument('--public_interface', default=False, action="store_true", help="Whether interface should be available publicly")
 
     args = parser.parse_args()
-    run(Path(args.asr_model_dir), Path(args.chat_model_dir), Path(args.tts_model_dir), args.tts_speaker_type, args.public_interface)
+    run(Path(args.asr_model_dir), Path(args.chat_model_dir), args.small_tts_models, args.tts_speaker_type, args.public_interface)
