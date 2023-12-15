@@ -141,7 +141,7 @@ SUPPORTED_LLM_MODELS = {
         回答: 
         <|assistant|>""",
     },
-    "mistal-7b": {
+    "mistral-7b": {
         "model_id": "mistralai/Mistral-7B-v0.1",
         "remote": False,
         "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
