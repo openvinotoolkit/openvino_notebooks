@@ -131,7 +131,8 @@ SUPPORTED_LLM_MODELS = {
         "history_template": "<|user|>\n{user}\n<|assistant|>\n{assistant}\n",
         "partial_text_processor": chatglm_partial_text_processor,
         "current_message_template": "<|user|>\n{user}\n<|assistant|>\n",
-        "stop_tokens": ["</s>"],
+        "tokenizer_kwargs": {"add_special_tokens": False},
+        "stop_tokens": ["</s>", "[MASK]", "[gMASK]", "[sMASK]", "sop", "eop"],
         "prompt_template": f"""<|system|>
         {DEFAULT_RAG_PROMPT_CHINESE }"""
         + """
