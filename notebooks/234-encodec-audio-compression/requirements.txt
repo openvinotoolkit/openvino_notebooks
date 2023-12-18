@@ -1,7 +1,0 @@
-librosa>=0.8.1
---extra-index-url https://download.pytorch.org/whl/cpu
-torch>=2.1
-torchaudio>=2.1
-encodec
-gradio
-openvino>=2023.1.0
