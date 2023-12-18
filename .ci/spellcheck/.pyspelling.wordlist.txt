@@ -9,7 +9,9 @@ aeroplane
 affective
 ai
 al
+Alibaba
 ALiBi
+AlpacaEval
 analytics
 AnimeGAN
 api
@@ -23,6 +25,8 @@ async
 AsyncInferQueue
 Atrous
 audiobooks
+audioldm
+AudioLDM
 autoencoder
 autoregressive
 autoregressively
@@ -50,6 +54,8 @@ charlist
 charlists
 chatbot
 chatbots
+chatglm
+ChatGLM
 ChatGPT
 CIN
 ckpt
@@ -58,6 +64,7 @@ Cifar
 cityscape
 Cityscapes
 CLI
+cli
 CLIP's
 codebook
 codebooks
@@ -101,6 +108,7 @@ dataset
 datasets
 DDIM
 DDPMs
+dDPO
 de
 Deblur
 deblur
@@ -151,6 +159,7 @@ donut
 Downloader
 downloader
 downsampled
+DPO
 dpredictor
 Dreamshaper
 dropdown
@@ -174,6 +183,7 @@ finetuning
 FLAC
 floyd
 Formatter
+fp
 FP
 FPN
 FreeVC
@@ -183,8 +193,10 @@ Frontend
 frontend
 GAN
 Gante
+Gaudi
 gaussian
 Gb
+gcc
 GEC
 GELU
 Girshick
@@ -250,6 +262,7 @@ JIT
 Joao
 JS
 JSON
+JuggernautXL
 Jupyter
 Jupyter's
 JupyterLab
@@ -277,6 +290,7 @@ LAION
 Lasinger
 latents
 LCMs
+LCMScheduler
 LDM
 LDMs
 learnable
@@ -295,6 +309,8 @@ LLMs
 LMS
 logits
 LogSoftmax
+LoRA
+LoRAs
 lraspp
 LRASPP
 LTS
@@ -316,6 +332,7 @@ MiDaS
 MidasNet
 Midjourney
 MiniLM
+mistralai
 MLS
 mms
 MMS
@@ -323,7 +340,6 @@ MLP
 mobilenet
 MobileNet
 MobileNetV
-MusicGen
 modelled
 Modelscope
 Mody
@@ -341,6 +357,7 @@ MultiHeadAttention
 multilayer
 multimodal
 Multimodality
+MusicGen
 Müller
 Nakayosi
 nano
@@ -357,6 +374,8 @@ NNCF
 nncf
 noncomparable
 NONINFRINGEMENT
+Notus
+notus
 nsamples
 nsfw
 NSFW
@@ -387,6 +406,7 @@ OpenVino
 OpenVINO's
 opset
 optimizable
+Orca
 OVC
 overfitting
 overlayed
@@ -395,6 +415,7 @@ OVC
 OVModel
 OVModelForXXX
 OVMS
+OvStableDiffusionInpaintingPipeline
 PaddleClas
 PaddleGAN
 paddlegan
@@ -445,6 +466,7 @@ preprocessed
 preprocesses
 preprocessing
 preprocessor
+pretrain
 pretrained
 Pretraining
 pretraining
@@ -461,6 +483,7 @@ pytorch
 PyTorch
 PyTorchVideo
 QFormer
+Qianwen
 Qi
 qrcode
 quant
@@ -470,6 +493,8 @@ quantizers
 Quantizing
 quantizing
 QuartzNet
+qwen
+Qwen
 Radiopaedia
 Radosavovic
 Raj
@@ -520,12 +545,14 @@ Schuster
 sd
 SDEdit
 SDXL
+sdxl
 Segmentations
 segmentations
 Segmenter
 segmenter
 Segmind
 serializable
+sft
 ShapeNet
 ShareGPT
 Shazeer
@@ -533,6 +560,7 @@ Shutterstock
 siggraph
 sigmoid
 SISR
+SlimOrca
 SlowFast
 slowfast
 slowmo
@@ -552,8 +580,10 @@ SPS
 SQA
 SQuAD
 SRT
+SSD
 SSDLite
 sst
+StableDiffusionInpaintPipeline
 STFT
 streamable
 Struct
@@ -572,6 +602,7 @@ Suno
 superresolution
 superset
 svc
+SVTR
 Swin
 SwinV
 TaskManager
@@ -583,6 +614,8 @@ TFLite
 tflite
 th
 timestep
+timesteps
+TinyLlama
 Tokenization
 tokenization
 tokenize
@@ -592,6 +625,7 @@ Tokenizer
 tokenizers
 tokenizes
 tokenizing
+Tongyi
 TorchMetrics
 TorchScript
 torchvision
@@ -616,6 +650,8 @@ Unimodal
 unsqueeze
 Uparrow
 uparrow
+upcast
+upcasts
 Upcroft
 upsample
 upsampled
@@ -643,8 +679,11 @@ VITS
 VM
 Vladlen
 VOC
+Vocoder
 VQA
 VQGAN
+waveform
+waveforms
 Wav
 WavLM
 WebGL
@@ -665,6 +704,7 @@ XYWH
 YOLO
 YOLOv
 yolov
+ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope

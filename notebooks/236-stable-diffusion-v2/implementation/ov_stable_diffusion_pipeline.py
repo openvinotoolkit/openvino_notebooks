@@ -7,7 +7,7 @@ import torch
 import numpy as np
 
 from transformers import CLIPTokenizer
-from diffusers.pipeline_utils import DiffusionPipeline
+from diffusers import DiffusionPipeline
 from diffusers.schedulers import DDIMScheduler, LMSDiscreteScheduler, PNDMScheduler
 import openvino as ov
 

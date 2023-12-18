@@ -1,8 +1,7 @@
 librosa>=0.8.1
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch
-torchaudio
-encodec;python_version>"3.7"
-git+https://git@github.com/eaidova/encodec#egg=encodec;python_version=="3.7"
+torch>=2.1
+torchaudio>=2.1
+encodec
 gradio
 openvino>=2023.1.0
