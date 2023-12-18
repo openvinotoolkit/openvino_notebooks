@@ -64,7 +64,7 @@ In this tutorial, we explore how to run and optimize Segmind-VegaRT with OpenVIN
 
 The notebook provides a simple interface that allows communication with a model using text instruction. In this demonstration user can provide input instructions and the model generates an image.
 
-The image below illustrates the provided user instruction and generated image example.
+The image below illustrates the generated image example.
 
 ![text2img_example.png](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/66bfe823-01c8-4749-a8aa-419a1d78a070)
 
