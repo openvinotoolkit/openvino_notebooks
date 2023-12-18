@@ -172,6 +172,8 @@ dropdown
 ECCV
 editability
 EfficientNet
+EfficientSAM
+EfficientSAMs
 embeddings
 EnCodec
 encodec
@@ -554,6 +556,8 @@ sagittal
 SALICON
 Saliency
 saliency
+SAMI
+sam
 SavedModel
 scalability
 Scalable
@@ -699,6 +703,7 @@ ViT
 vit
 vits
 VITS
+vitt
 VM
 Vladlen
 VOC
