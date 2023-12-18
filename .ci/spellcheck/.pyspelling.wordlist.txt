@@ -223,6 +223,7 @@ Gradio
 gradio
 grayscale
 gRPC
+Gu
 Gutendex
 Hafner
 HugginFaceH
@@ -324,6 +325,7 @@ lraspp
 LRASPP
 LTS
 LSTM
+Luo
 macOS
 Mahalanobis
 Mapillary
@@ -443,6 +445,7 @@ parameterization
 parametrize
 parsers
 perceptron
+Patil
 performant
 PersonaGPT
 photorealism
@@ -618,6 +621,7 @@ summarization
 Suno
 superresolution
 superset
+Suraj
 svc
 SVTR
 Swin
@@ -687,6 +691,7 @@ VCTK
 Vec
 VectorStore
 vec
+VegaRT
 videpth
 VIO
 virtualenv
@@ -719,6 +724,7 @@ Xeon
 xl
 xvector
 XYWH
+Yiqin
 YOLO
 YOLOv
 yolov

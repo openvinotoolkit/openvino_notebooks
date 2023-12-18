@@ -49,9 +49,24 @@ We will use a pre-trained model from the Hugging Face Diffusers library. To simp
 
 Then we will consider [LCM distilled version of segmind/SSD-1B](https://huggingface.co/latent-consistency/lcm-ssd-1b) that allows to reduce the number of inference steps to only between 2 - 8 steps.
 
-### Table of contents:
-- [SSD-1B Base model](#SSD-1B-Base-model)
-- [Latent Consistency Model (LCM)](#Latent-ConsistencyModel-(LCM))
+
+## Segmind-VegaRT
+
+The [Segmind Vega](https://huggingface.co/segmind/Segmind-Vega) Model is a distilled version of the [Stable Diffusion XL (SDXL)](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0), offering a remarkable 70% reduction in size and an impressive speedup while retaining high-quality text-to-image generation capabilities. Segmind Vega marks a significant milestone in the realm of text-to-image models, setting new standards for efficiency and speed. Engineered with a compact yet powerful design, it boasts only 745 million parameters. This streamlined architecture not only makes it the smallest in its class but also ensures lightning-fast performance, surpassing the capabilities of its predecessors. Vega represents a breakthrough in model optimization. Its compact size, compared to the 859 million parameters of the SD 1.5 and the hefty 2.6 billion parameters of SDXL, maintains a commendable balance between size and performance. Vega's ability to deliver high-quality images rapidly makes it a game-changer in the field, offering an unparalleled blend of speed, efficiency, and precision.
+
+Segmind Vega is a symmetrical, distilled version of the SDXL model; it is over 70% smaller and ~100% faster. The Down Block contains 247 million parameters, the Mid Block has 31 million, and the Up Block has 460 million. Apart from the size difference, the architecture is virtually identical to that of SDXL, ensuring compatibility with existing interfaces requiring no or minimal adjustments. Although smaller than the SD1.5 Model, Vega supports higher-resolution generation due to the SDXL architecture, making it an ideal replacement for [Stable Diffusion 1.5](https://huggingface.co/runwayml/stable-diffusion-v1-5)
+
+Segmind VegaRT is a distilled LCM-LoRA adapter for the Vega model, that allowed us to reduce the number of inference steps required to generate a good quality image to somewhere between 2 - 8 steps. . Latent Consistency Model (LCM) LoRA was proposed in [LCM-LoRA: A universal Stable-Diffusion Acceleration Module](https://arxiv.org/abs/2311.05556) by Simian Luo, Yiqin Tan, Suraj Patil, Daniel Gu et al.
+
+More details about models can be found in [Segmind blog post](https://blog.segmind.com/segmind-vega/)
+
+In this tutorial, we explore how to run and optimize Segmind-VegaRT with OpenVINO. We will use a pre-trained model from the [Hugging Face Diffusers](https://huggingface.co/docs/diffusers/index) library. To simplify the user experience, the [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index) library is used to convert the models to OpenVINO™ IR format. Additionally, we demonstrate how to improve pipeline latency with the quantization UNet model using [NNCF](https://github.com/openvinotoolkit/nncf).
+
+The notebook provides a simple interface that allows communication with a model using text instruction. In this demonstration user can provide input instructions and the model generates an image.
+
+The image below illustrates the generated image example.
+
+![text2img_example.png](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/66bfe823-01c8-4749-a8aa-419a1d78a070)
 
 ## Installation Instructions
 
