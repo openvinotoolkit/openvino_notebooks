@@ -56,7 +56,7 @@ This solution implements automated reading of industrial meters, using cameras a
 | - | - |
 | Related AI concepts | Speech Recognition, Natural Language Understanding, Speech Synthesis, Large Language Models (LLMs), Generative AI |
 | Example industries | Retail Customer Service, Smart Home Automation |
-| Demo | [Voice Interaction video](https://www.youtube.com/watch?v=voice_agent_demo) |
+| Demo |  |
 
 The Conversational Voice Agent, powered by the OpenVINO™ toolkit, integrates voice-activated interfaces into various applications. It employs advanced models for speech recognition, natural language processing, and speech synthesis. Additionally, the agent leverages the capabilities of Large Language Models (LLMs) and Generative AI, enabling it to understand complex queries, generate coherent responses, and offer a more dynamic and interactive communication experience. These advanced AI technologies enhance the agent's ability to engage in natural, human-like conversations, making it ideal for applications in customer service and smart home automation.
 
