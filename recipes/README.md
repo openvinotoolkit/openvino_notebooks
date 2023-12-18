@@ -50,7 +50,7 @@ The solution offers a comprehensive solution to quality control. It provides com
 This solution implements automated reading of industrial meters, using cameras and computer vision. By transforming analog data into digital, companies have access to an automated intake of real time data that allows them to make informed decisions and become more efficient with resource usage.
 
 ### 🗣️ Conversational Voice Agent
-[![image](https://github.com/openvinotoolkit/openvino_notebooks/assets/138901786/conversational_voice_agent_image)](conversational_voice_agent)
+[![image](https://github.com/openvinotoolkit/openvino_notebooks/assets/109281183/cc75fbe6-7bbe-4ee7-ae20-1c38be2804f0)](conversational_voice_agent)
 
 | [Conversational Voice Agent](conversational_voice_agent) |  |
 | - | - |
