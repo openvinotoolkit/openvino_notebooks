@@ -6,7 +6,7 @@ Segment Anything Model (SAM) has emerged as a powerful tool for numerous vision 
 
 More details about model can be found in [paper](https://arxiv.org/pdf/2312.00863.pdf), [model web page](https://yformer.github.io/efficient-sam/) and [original repository](https://github.com/yformer/EfficientSAM)
 
-In this tutorial, we consider how to convert and run EfficientSAM using OpenVINO.
+In this tutorial, we consider how to convert and run EfficientSAM using OpenVINO. We also demonstrate how to quantize model using [NNCF](https://github.com/openvinotoolkit/nncf)
 
 The image below illustrates the result of the segmented area of the image by provided points
 
@@ -22,6 +22,7 @@ The tutorial consists of the following steps:
 - Run PyTorch model inference
 - Convert PyTorch model to OpenVINO Intermediate Representation
 - Run OpenVINO model inference
+- Optimize OpenVINO model using [NNCF](https://github.com/openvinotoolkit/nncf)
 - Launch interactive segmentation demo
 
 ## Installation Instructions
