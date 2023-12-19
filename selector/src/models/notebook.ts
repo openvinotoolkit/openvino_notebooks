@@ -1,12 +1,13 @@
 export interface INotebookMetadata {
   title: string;
   description: string;
-  additionalResources: object | null;
-  imageUrl: string;
+  imageUrl: string | null;
+  createdDate: string;
+  modifiedDate: string;
   links: {
     github: string;
-    colab?: string;
-    binder?: string;
+    colab: string | null;
+    binder: string | null;
   };
   tags: {
     categories: string[];
