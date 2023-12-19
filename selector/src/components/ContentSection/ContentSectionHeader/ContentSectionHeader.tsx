@@ -7,15 +7,32 @@ const sparkClassNames = {
   fontTitleXs: 'spark-font-200',
 };
 
-export const ContentSectionHeader = (): JSX.Element => {
+type ContentSectionHeaderProps = {
+  totalCount: number;
+  filteredCount: number;
+  showResetFilters?: boolean;
+  onSearch?: (value: string) => void;
+};
+
+export const ContentSectionHeader = ({
+  totalCount,
+  filteredCount,
+  onSearch,
+}: ContentSectionHeaderProps): JSX.Element => {
+  const isFiltered = filteredCount !== totalCount;
+
   return (
     <div className="content-section-header">
       <div className="flex">
         <h1 className={`${sparkClassNames.fontTitleXs} title`}>Notebooks</h1>
-        <span className={`${sparkClassNames.fontTitleXs} counter`}>135</span>
+        <span className={`${sparkClassNames.fontTitleXs} counter`}>
+          {isFiltered ? `${filteredCount} of ${totalCount}` : totalCount}
+        </span>
       </div>
-      <Button text="Reset Filters" variant="secondary" size="s" className="reset-filters-button"></Button>
-      <Search placeholder="Filter notebooks by name" className="notebooks-search"></Search>
+      {isFiltered && (
+        <Button text="Reset Filters" variant="secondary" size="s" className="reset-filters-button"></Button>
+      )}
+      <Search placeholder="Filter notebooks by name" className="notebooks-search" onSearch={onSearch}></Search>
     </div>
   );
 };
