@@ -32,7 +32,7 @@ export const NotebookCard = ({ item }: NotebookCardProps): JSX.Element => {
             <OpenvinoLogo></OpenvinoLogo>
             <span className={sparkClassNames.fontImagePlaceholder}>Notebooks</span>
           </div>
-          <img src={item.imageUrl} className="card-image" />
+          {item.imageUrl && <img src={item.imageUrl} className="card-image" />}
         </div>
         <div className="card-content">
           <h6 className={sparkClassNames.cardTitle}>{item.title}</h6>
