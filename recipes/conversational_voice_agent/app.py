@@ -15,9 +15,31 @@ AUDIO_WIDGET_SAMPLE_RATE = 16000
 SYSTEM_CONFIGURATION = "You're Adrishuo - a conversational agent. You talk to a customer. You work for a car dealer called XYZ. Your task is to recommend the customer a car based on their needs."
 GREET_THE_CUSTOMER = "Please introduce yourself and greet the customer"
 
+NEURAL_CHAT_MODEL_TEMPLATE = ("{% if messages[0]['role'] == 'system' %}"
+                              "{% set loop_messages = messages[1:] %}"
+                              "{% set system_message = messages[0]['content'] %}"
+                              "{% else %}"
+                              "{% set loop_messages = messages %}"
+                              "{% set system_message = 'You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. "
+                              "Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. "
+                              "If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don\\'t know the answer to a question, please don\\'t share false information.' %}"
+                              "{% endif %}"
+                              "{{ '### System:\\n' + system_message.strip() + '\\n' }}"
+                              "{% for message in loop_messages %}"
+                              "{% if (message['role'] == 'user') != (loop.index0 % 2 == 0) %}"
+                              "{{ raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') }}"
+                              "{% endif %}"
+                              "{% set content = message['content'] %}"
+                              "{% if message['role'] == 'user' %}"
+                              "{{ '### User:\\n' + content.strip() + '\\n' }}"
+                              "{% elif message['role'] == 'assistant' %}"
+                              "{{ '### Assistant:\\n' + content.strip() + '\\n'}}"
+                              "{% endif %}"
+                              "{% endfor %}"
+                              )
+
 chat_model: OVModelForCausalLM = None
 chat_tokenizer: PreTrainedTokenizer = None
-system_configuration: str = None
 message_template: str = None
 
 tts_model: OVBark = None
@@ -61,12 +83,14 @@ def load_chat_model(model_dir: Path) -> None:
     Params:
         model_dir: dir with the chat model
     """
-    global chat_model, chat_tokenizer, system_configuration, message_template
+    global chat_model, chat_tokenizer, message_template
 
     # load llama model and its tokenizer
     ov_config = {'PERFORMANCE_HINT': 'LATENCY', 'NUM_STREAMS': '1', "CACHE_DIR": ""}
     chat_model = OVModelForCausalLM.from_pretrained(model_dir, device="AUTO", config=AutoConfig.from_pretrained(model_dir), ov_config=ov_config)
     chat_tokenizer = AutoTokenizer.from_pretrained(model_dir)
+    # neural chat requires different template than specified in the tokenizer
+    message_template = NEURAL_CHAT_MODEL_TEMPLATE if ("neural-chat" in model_dir.name) else chat_tokenizer.default_chat_template
 
 
 def respond(prompt: str) -> str:
@@ -108,8 +132,9 @@ def chat(history: List) -> List[List[str]]:
             conversation.append({"role": "user", "content": user_prompt})
         if assistant_response:
             conversation.append({"role": "assistant", "content": assistant_response})
+
     # use a template specific to the model
-    conversation = chat_tokenizer.apply_chat_template(conversation, tokenize=False)
+    conversation = chat_tokenizer.apply_chat_template(conversation, chat_template=message_template, tokenize=False)
 
     # generate response for the conversation
     response = respond(conversation)
@@ -178,7 +203,7 @@ def create_UI(initial_message: str) -> gr.Blocks:
         - wait for the output voice in the last audio widget ("Chatbot voice output")
         """)
         with gr.Row():
-            # user's audio input
+            # user's input
             input_audio_ui = gr.Audio(sources=["microphone"], scale=5, label="Your voice input")
             # submit button
             submit_audio_btn = gr.Button("Submit", variant="primary", scale=1)

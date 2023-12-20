@@ -101,7 +101,7 @@ This script will convert and optimize the automatic speech recognition (ASR) mod
 
 2. Chat LLama2 Conversion:
 ```shell
-python convert_and_optimize_chat.py --chat_model_type llama2-7B --quantize_weights
+python convert_and_optimize_chat.py --chat_model_type llama2-7B --quantize_weights int8
 ```
 This script will handle the conversion and optimization of the chat model performing weights quantization. 
 
