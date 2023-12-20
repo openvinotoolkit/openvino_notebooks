@@ -7,7 +7,8 @@ from transformers import AutoTokenizer
 
 MODEL_MAPPING = {
     "llama2-7B": "meta-llama/Llama-2-7b-chat-hf",
-    "llama2-13B": "meta-llama/Llama-2-13b-chat-hf"
+    "llama2-13B": "meta-llama/Llama-2-13b-chat-hf",
+    "neural-chat-7B": "Intel/neural-chat-7b-v3-3"
 }
 
 
@@ -30,8 +31,6 @@ def convert_chat_model(model_type: str, quantize_weights: str, model_dir: Path) 
     # change precision to FP16
     model.half()
 
-    output_dir = output_dir.with_name(output_dir.name + "-FP16")
-
     if quantize_weights:
         # select quantization mode
         mode = nncf.CompressWeightsMode.INT4_SYM if quantize_weights == "int4" else nncf.CompressWeightsMode.INT8
@@ -40,6 +39,8 @@ def convert_chat_model(model_type: str, quantize_weights: str, model_dir: Path) 
 
         suffix = "-INT4" if quantize_weights == "int4" else "-INT8"
         output_dir = output_dir.with_name(output_dir.name + suffix)
+    else:
+        output_dir = output_dir.with_name(output_dir.name + "-FP16")
 
     # save converted model
     model.save_pretrained(output_dir)
@@ -53,7 +54,7 @@ def convert_chat_model(model_type: str, quantize_weights: str, model_dir: Path) 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--chat_model_type", type=str, choices=["llama2-7B", "llama2-13B"],
+    parser.add_argument("--chat_model_type", type=str, choices=["llama2-7B", "llama2-13B", "neural-chat-7B"],
                         default="llama2-7B", help="Chat model to be converted")
     parser.add_argument("--quantize_weights", type=str, choices=["int8", "int4"], help="Whether to quantize weights to INT8 or INT4")
     parser.add_argument("--model_dir", type=str, default="model", help="Directory to place the model in")
