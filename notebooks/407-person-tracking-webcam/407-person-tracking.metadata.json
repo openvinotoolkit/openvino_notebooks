@@ -1,0 +1,19 @@
+{
+  "title": "Live Person Tracking with OpenVINO™",
+  "description": "",
+  "imageUrl": null,
+  "createdDate": "2023-01-31 15:45:54 +0800",
+  "modifiedDate": "2023-11-10 17:03:13 +0400",
+  "links": {
+    "github": "https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/407-person-tracking-webcam/407-person-tracking.ipynb",
+    "colab": "https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/407-person-tracking-webcam/407-person-tracking.ipynb",
+    "binder": "https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F407-person-tracking-webcam%2F407-person-tracking.ipynb"
+  },
+  "tags": {
+    "categories": [],
+    "tasks": [],
+    "models": [],
+    "libraries": [],
+    "other": []
+  }
+}
