@@ -47,7 +47,8 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [Audio LDM 2](notebooks/270-sound-generation-audioldm2/)<br> | Sound Generation with AudioLDM2 and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/c93a0f86-d9cf-4bd1-93b9-e27532170d75" width=300> |
 | [SDXL-Turbo](notebooks/271-sdxl-turbo/)<br> | Single-step image generation using SDXL-turbo and OpenVINO | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/79b625c7-0f0a-4f19-8e38-e6f896f75c3e" width=300> |
 | [Segmind-VegaRT](notebooks/248-stable-diffusion-xl/248-segmind-vegart.ipynb)<br> | High-resolution image generation with Segmind-VegaRT and OpenVINO | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/66bfe823-01c8-4749-a8aa-419a1d78a070" width=300> |
-| [Stable-Zephyr chatbot](notebooks/273-stable-zephyr-3b-chatbot/)<br> | Use Stable-Zephyr as chatbot assistant with OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cfac6ddb-6f22-4343-855c-e513269cf2bf width=300> |  
+| [Stable-Zephyr chatbot](notebooks/273-stable-zephyr-3b-chatbot/)<br> | Use Stable-Zephyr as chatbot assistant with OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cfac6ddb-6f22-4343-855c-e513269cf2bf width=300> |
+| [Efficient-SAM](notebooks/274-efficient-sam)<br> | Object segmentation with EfficientSAM and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/15d0a23a-0550-43c6-9ca9-f689e772a79a width=300> |
 
 ## Table of Contents
 
@@ -220,6 +221,8 @@ Demos that demonstrate inference on a particular model.
 | [270-sound-generation-audioldm2](notebooks/270-sound-generation-audioldm2/)<br> | Sound Generation with AudioLDM2 and OpenVINO™ | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/c93a0f86-d9cf-4bd1-93b9-e27532170d75" width=225> |
 | [271-sdxl-turbo](notebooks/271-sdxl-turbo/)<br> | Single-step image generation using SDXL-turbo and OpenVINO | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/79b625c7-0f0a-4f19-8e38-e6f896f75c3e" width=225> |
 | [272-paint-by-example](notebooks/272-paint-by-example/)<br>| Exemplar based image editing using diffusion models, [Paint-by-Example](https://github.com/Fantasy-Studio/Paint-by-Example), and OpenVINO™ | <img width="225" alt="ui_example" src="https://user-images.githubusercontent.com/103226580/236958011-0550ba7b-19b3-4dc6-8b50-eaedb84c1681.png"> |
+| [274-efficient-sam](notebooks/274-efficient-sam/)<br>| Object segmentation with EfficientSAM and OpenVINO™ | <img width="225" src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/15d0a23a-0550-43c6-9ca9-f689e772a79a"> |
+
 <div id='-model-training'></div>
 
 ### 🏃 Model Training
