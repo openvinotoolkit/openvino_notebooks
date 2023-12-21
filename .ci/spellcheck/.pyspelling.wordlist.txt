@@ -183,6 +183,7 @@ fastcomposer
 FastComposer
 FastSAM
 FC
+FFmpeg
 FIL
 finetuned
 finetuning
