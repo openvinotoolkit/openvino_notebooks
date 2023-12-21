@@ -326,6 +326,7 @@ LRASPP
 LTS
 LSTM
 Luo
+LVLM
 macOS
 Mahalanobis
 Mapillary

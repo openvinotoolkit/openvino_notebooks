@@ -8,4 +8,5 @@ notebooks/230-yolov8-optimization/230-yolov8-keypoint-detection.ipynb  # ultraly
 notebooks/230-yolov8-optimization/230-yolov8-object-detection.ipynb  # ultralytics==8.0.43
 notebooks/256-bark-text-to-audio/256-bark-text-to-audio.ipynb  # torch==1.13
 notebooks/257-llava-multimodal-chatbot/257-llava-multimodal-chatbot.ipynb # transformers<4.35
+notebooks/257-videollava-multimodal-chatbot/257-llava-multimodal-chatbot.ipynb # transformers<4.35
 notebooks/273-stable-zephyr-3b-chatbot/273-stable-zephyr-3b-chatbot.ipynb # install requirements.txt after clone repo
