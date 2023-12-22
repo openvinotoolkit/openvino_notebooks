@@ -81,6 +81,9 @@ The Conversational Voice Agent, powered by the OpenVINO™ toolkit, integrates v
 ## Future Kits
 This is a list of Edge AI Reference kits that are planned or are in development.
 
+### 🤖 Generative AI
+
+Kit that explores the potential of generative AI with OpenVINO.
 ## Troubleshooting and Resources
 - Open a [discussion topic](https://github.com/openvinotoolkit/openvino_notebooks/discussions)
 - Create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issues)
