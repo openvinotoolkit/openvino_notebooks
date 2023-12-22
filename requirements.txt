@@ -1,7 +1,7 @@
 # openvino and its dependencies
-openvino-dev>=2023.1.0
-openvino-telemetry>=2023.1.0
-nncf==2.6.0
+openvino-dev>=2023.2.0
+openvino-telemetry>=2023.2.1
+nncf==2.7.0
 
 
 # deep learning frameworks
@@ -32,7 +32,7 @@ ipython>=7.16.3
 numpy>=1.21.0
 opencv-python
 Pillow>=8.3.2
-matplotlib>=3.4,<3.5.3
+matplotlib>=3.4
 scipy
 
 # The packages below are not directly required. They are dependencies of 

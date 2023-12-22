@@ -9,7 +9,9 @@ aeroplane
 affective
 ai
 al
+Alibaba
 ALiBi
+AlpacaEval
 analytics
 AnimeGAN
 api
@@ -23,6 +25,8 @@ async
 AsyncInferQueue
 Atrous
 audiobooks
+audioldm
+AudioLDM
 autoencoder
 autoregressive
 autoregressively
@@ -36,8 +40,10 @@ Benchmarking
 benchmarking
 bert
 BERT's
+BetterTransformer
 Bewley
 BGR
+BMP
 Bicubic
 bicubic
 bilinear
@@ -50,7 +56,10 @@ charlist
 charlists
 chatbot
 chatbots
+chatglm
+ChatGLM
 ChatGPT
+chinese
 CIN
 ckpt
 CHW
@@ -58,6 +67,7 @@ Cifar
 cityscape
 Cityscapes
 CLI
+cli
 CLIP's
 codebook
 codebooks
@@ -85,8 +95,10 @@ ConvNeXt
 ConvNeXts
 Convolutional
 convolutional
+CoSENT
 CPUs
 CRNN
+CSV
 CTC
 CUDA
 CVF
@@ -101,6 +113,7 @@ dataset
 datasets
 DDIM
 DDPMs
+dDPO
 de
 Deblur
 deblur
@@ -145,12 +158,14 @@ DL
 docstring
 DocVQA
 docvqa
+DocumentLoaders
 doi
 Dollár
 donut
 Downloader
 downloader
 downsampled
+DPO
 dpredictor
 Dreamshaper
 dropdown
@@ -174,6 +189,7 @@ finetuning
 FLAC
 floyd
 Formatter
+fp
 FP
 FPN
 FreeVC
@@ -183,10 +199,13 @@ Frontend
 frontend
 GAN
 Gante
+Gaudi
 gaussian
 Gb
+gcc
 GEC
 GELU
+genai
 Girshick
 Gitee
 GitHub
@@ -204,8 +223,10 @@ Gradio
 gradio
 grayscale
 gRPC
+Gu
 Gutendex
 Hafner
+HugginFaceH
 HandBrake
 heatmap
 HC
@@ -250,6 +271,7 @@ JIT
 Joao
 JS
 JSON
+JuggernautXL
 Jupyter
 Jupyter's
 JupyterLab
@@ -274,9 +296,11 @@ labse
 LaBSE
 Lai
 LAION
+LangChain
 Lasinger
 latents
 LCMs
+LCMScheduler
 LDM
 LDMs
 learnable
@@ -295,10 +319,13 @@ LLMs
 LMS
 logits
 LogSoftmax
+LoRA
+LoRAs
 lraspp
 LRASPP
 LTS
 LSTM
+Luo
 macOS
 Mahalanobis
 Mapillary
@@ -316,6 +343,7 @@ MiDaS
 MidasNet
 Midjourney
 MiniLM
+mistralai
 MLS
 mms
 MMS
@@ -323,7 +351,6 @@ MLP
 mobilenet
 MobileNet
 MobileNetV
-MusicGen
 modelled
 Modelscope
 Mody
@@ -332,6 +359,7 @@ MONAI's
 Monodepth
 monodepth
 MosaicPretrainedTransformer
+mpnet
 mpt
 MPT
 MRPC
@@ -341,6 +369,7 @@ MultiHeadAttention
 multilayer
 multimodal
 Multimodality
+MusicGen
 Müller
 Nakayosi
 nano
@@ -357,6 +386,8 @@ NNCF
 nncf
 noncomparable
 NONINFRINGEMENT
+Notus
+notus
 nsamples
 nsfw
 NSFW
@@ -387,6 +418,7 @@ OpenVino
 OpenVINO's
 opset
 optimizable
+Orca
 OVC
 overfitting
 overlayed
@@ -395,6 +427,7 @@ OVC
 OVModel
 OVModelForXXX
 OVMS
+OvStableDiffusionInpaintingPipeline
 PaddleClas
 PaddleGAN
 paddlegan
@@ -412,6 +445,7 @@ parameterization
 parametrize
 parsers
 perceptron
+Patil
 performant
 PersonaGPT
 photorealism
@@ -445,15 +479,18 @@ preprocessed
 preprocesses
 preprocessing
 preprocessor
+pretrain
 pretrained
 Pretraining
 pretraining
 promptable
 proto
+protobuf
 PRs
 psychoacoustics
 PTQ
 px
+py
 pyannote
 PyPI
 Pythia
@@ -461,6 +498,7 @@ pytorch
 PyTorch
 PyTorchVideo
 QFormer
+Qianwen
 Qi
 qrcode
 quant
@@ -470,6 +508,8 @@ quantizers
 Quantizing
 quantizing
 QuartzNet
+qwen
+Qwen
 Radiopaedia
 Radosavovic
 Raj
@@ -499,6 +539,8 @@ resnet
 RGB
 Riffusion
 riffusion
+Rinna
+rinna
 RLHF
 RoBERTa
 roberta
@@ -512,6 +554,7 @@ sagittal
 SALICON
 Saliency
 saliency
+SavedModel
 scalability
 Scalable
 scalable
@@ -520,12 +563,15 @@ Schuster
 sd
 SDEdit
 SDXL
+sdxl
 Segmentations
 segmentations
 Segmenter
 segmenter
 Segmind
+segmind
 serializable
+sft
 ShapeNet
 ShareGPT
 Shazeer
@@ -533,6 +579,7 @@ Shutterstock
 siggraph
 sigmoid
 SISR
+SlimOrca
 SlowFast
 slowfast
 slowmo
@@ -552,9 +599,12 @@ SPS
 SQA
 SQuAD
 SRT
+SSD
 SSDLite
 sst
+StableDiffusionInpaintPipeline
 STFT
+stateful
 streamable
 Struct
 struct
@@ -571,7 +621,9 @@ summarization
 Suno
 superresolution
 superset
+Suraj
 svc
+SVTR
 Swin
 SwinV
 TaskManager
@@ -583,6 +635,8 @@ TFLite
 tflite
 th
 timestep
+timesteps
+TinyLlama
 Tokenization
 tokenization
 tokenize
@@ -592,6 +646,7 @@ Tokenizer
 tokenizers
 tokenizes
 tokenizing
+Tongyi
 TorchMetrics
 TorchScript
 torchvision
@@ -616,6 +671,8 @@ Unimodal
 unsqueeze
 Uparrow
 uparrow
+upcast
+upcasts
 Upcroft
 upsample
 upsampled
@@ -632,7 +689,9 @@ validator
 variational
 VCTK
 Vec
+VectorStore
 vec
+VegaRT
 videpth
 VIO
 virtualenv
@@ -643,8 +702,11 @@ VITS
 VM
 Vladlen
 VOC
+Vocoder
 VQA
 VQGAN
+waveform
+waveforms
 Wav
 WavLM
 WebGL
@@ -662,9 +724,13 @@ Xeon
 xl
 xvector
 XYWH
+Yiqin
 YOLO
 YOLOv
 yolov
+Youri
+youri
+ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
