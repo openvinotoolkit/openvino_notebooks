@@ -1,8 +1,8 @@
-# Detection and Tracking for Automated Self-Checkout with OpenVINO™
+# Automated Self-Checkout with OpenVINO™
 
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/LICENSE)
 
-The Detection and Tracking for Automated Self-Checkout project is an application that uses OpenVINO™, a toolkit that enables developers to deploy deep learning models on a variety of hardware platforms. The application is designed to help businesses manage customer queues more effectively, by analyzing video streams and detecting and tracking interactions with retail products. 
+Automated Self-Checkout is an application designed to help automate checkout for retail businesses, by analyzing video streams and detecting and tracking interactions with retail products. It uses OpenVINO, a toolkit that enables developers to deploy deep learning models on a variety of hardware platforms.
 
 ## Table of Contents
 
@@ -117,7 +117,7 @@ Use the following command to run the benchmark:
 ```
 Replace `int8_model_det_path` with the path to your INT8 model and $device with the specific device you're using (CPU, GPU, etc.). This command performs inference on the model for 30 seconds. Run `benchmark_app --help` for additional command-line options.
 
-Congratulations! You have successfully set up and run the Detection and Tracking for Automated Self-Checkout application with OpenVINO™.
+Congratulations! You have successfully set up and run the Detection and Tracking for Automated Self-Checkout application with OpenVINO.
 
 ## Appendix
 
