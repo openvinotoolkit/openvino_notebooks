@@ -2,16 +2,18 @@
 
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/LICENSE)
 
-Edge AI Reference Kits are fully functioning applications demonstrating deep learning AI use cases. You can leverage these pre-built components and code samples as the basis for solutions in industries like retail, healthcare, manufacturing, and more. Start development of your AI application on top of our kits, or integrate into your existing apps. 
+[Edge AI Reference Kits](https://www.intel.com/content/www/us/en/developer/topic-technology/edge-5g/open-potential.html) are fully functioning applications demonstrating deep learning AI use cases. You can leverage these pre-built components and code samples as the basis for solutions in industries like retail, healthcare, manufacturing, and more. Start development of your AI application on top of our kits, or integrate into your existing apps. 
 
 ## Table of Contents
 
 - [Available Kits](#available-kits)
 	- [🚶 Intelligent Queue Management](#-intelligent-queue-management)
 	- [🔍 Defect Detection](#-defect-detection)
-	- [⏲️ Automatic Industrial Meter Reading](#%EF%B8%8F-automatic-industrial-meter-reading)
+	- [⏲️ Smart Meter Scanning](#%EF%B8%8F-smart-meter-scanning)
+	- [🛍️ Automated Self-Checkout](#%EF%B8%8F-automated-self-checkout)
+	- [🗣️ Conversational Voice Agent](#%EF%B8%8F-conversational-voice-agent)
 - [Future Kits](#future-kits)
-	- [🛍️ Retail Checkout](#%EF%B8%8F-retail-checkout)
+
 - [Troubleshooting and Resources](#troubleshooting-and-resources)
 
 ## Available Kits
@@ -24,7 +26,9 @@ Currently, there are the following kits:
 | - | - |
 | Related AI concepts | object detection, object counting, YOLOv8 |
 | Example industries | retail business, healthcare |
+| Overview | [Solution video](https://www.youtube.com/watch?v=fwFbl4_8jk8) |
 | Demo | [Code video](https://www.youtube.com/watch?v=9E2baweCCXQ) |
+| Tutorial | [Step-by-step article](https://www.intel.com/content/www/us/en/developer/articles/training/create-intelligent-queue-management.html) |
 
 The solution for managing customer queues more effectively by analyzing camera video streams and detecting the number of people in each queue. The system then uses this real time data to optimize the queuing process and reduce customer waiting times.
 
@@ -35,19 +39,33 @@ The solution for managing customer queues more effectively by analyzing camera v
 | - | - |
 | Related AI concepts | object detection, anomaly detection, unsupervised learning, Padim |
 | Example industries | manufacturing, healthcare, agriculture |
+| Overview | [Solution video](https://www.youtube.com/watch?v=ho6R69EDyao) |
+| Demo | [Code video](https://www.youtube.com/watch?v=OifcJbZRaGM) |
+| Tutorial | [Step-by-step article](https://www.intel.com/content/www/us/en/developer/articles/training/defect-detection-with-anomalib.html) |
 
 The solution offers a comprehensive solution to quality control. It provides companies and their technical teams a single-source, end-to-end solution to catch manufacturing defects in real time.
 
-### ⏲️ Automatic Industrial Meter Reading
+### ⏲️ Smart Meter Scanning
 [![image](https://github.com/openvinotoolkit/openvino_notebooks/assets/138901786/0136d123-15c9-4696-bf4d-b169b3c7db4d)](meter_reader)
 
-| [Intelligent Queue Management](intelligent_queue_management) |  |
+| [Smart Meter Scanning](meter_reader) |  |
 | - | - |
 | Related AI concepts | object detection, object segmentation, OCR |
 | Example industries | energy, manufacturing |
+| Overview | [Solution video](https://www.youtube.com/watch?v=y2xCZYe8GAQ) |
 | Demo | [Code video](https://www.youtube.com/watch?v=9jcFGzFjHXo) |
+| Tutorial | [Step-by-step article](https://www.intel.com/content/www/us/en/developer/articles/training/create-smart-meter-scanning.html) |
 
 This solution implements automated reading of industrial meters, using cameras and computer vision. By transforming analog data into digital, companies have access to an automated intake of real time data that allows them to make informed decisions and become more efficient with resource usage.
+
+### 🛍️ Automated Self-Checkout
+
+| [Automated Self-Checkout](https://github.com/openvinotoolkit/openvino_notebooks/tree/recipes/recipes/automated_self_checkout) |  |
+| - | - |
+| Related AI concepts | object detection |
+| Example industries | retail |
+
+This solution is designed to help automate checkout for retail businesses more effectively, by analyzing video streams and detecting and tracking interactions with retail products.
 
 ### 🗣️ Conversational Voice Agent
 [![image](https://github.com/openvinotoolkit/openvino_notebooks/assets/109281183/cc75fbe6-7bbe-4ee7-ae20-1c38be2804f0)](conversational_voice_agent)
@@ -62,14 +80,6 @@ The Conversational Voice Agent, powered by the OpenVINO™ toolkit, integrates v
 
 ## Future Kits
 This is a list of Edge AI Reference kits that are planned or are in development.
-
-### 🛍️ Retail Checkout
-
-Automated checkout at retail.
-
-### 🏥 Virtual Medical Assistant
-
-The solution for performing routine clinical and administrative duties.
 
 ### 🤖 Generative AI
 
