@@ -11,7 +11,7 @@
 	- [🔍 Defect Detection](#-defect-detection)
 	- [⏲️ Smart Meter Scanning](#%EF%B8%8F-smart-meter-scanning)
 	- [🛍️ Automated Self-Checkout](#%EF%B8%8F-automated-self-checkout)
-	- [🔊 Conversational Voice Agent](#%EF%B8%8F-conversational-voice-agent)
+	- [🗣️ Conversational Voice Agent](#%EF%B8%8F-conversational-voice-agent)
 - [Future Kits](#future-kits)
 
 - [Troubleshooting and Resources](#troubleshooting-and-resources)
