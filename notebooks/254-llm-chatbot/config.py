@@ -130,7 +130,7 @@ SUPPORTED_LLM_MODELS = {
         "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "partial_text_processor": chatglm_partial_text_processor,
-        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n",
+        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "stop_tokens": ["</s>"],
         "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT_CHINESE }</s>"""
