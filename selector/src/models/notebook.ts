@@ -1,3 +1,8 @@
+import { CATEGORIES } from './notebook-tags.js';
+
+type ObjectValues<T> = T[keyof T];
+
+// TODO Consider adding notebook relative path
 export interface INotebookMetadata {
   title: string;
   description: string;
@@ -10,9 +15,8 @@ export interface INotebookMetadata {
     binder: string | null;
   };
   tags: {
-    categories: string[];
+    categories: ObjectValues<typeof CATEGORIES>[];
     tasks: string[];
-    models: string[];
     libraries: string[];
     other: string[];
   };
