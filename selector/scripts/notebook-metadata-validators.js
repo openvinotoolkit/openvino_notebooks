@@ -1,5 +1,7 @@
 // @ts-check
 
+import { CATEGORIES } from '../src/models/notebook-tags.js';
+
 /**
  * @typedef {import('../src/models/notebook').INotebookMetadata} INotebookMetadata
  * @typedef {(v) => boolean} isValidFn
@@ -55,12 +57,38 @@ const linksValidator = ({ github, colab, binder }) => {
 const tagsValidator = (tags) => {
   // TODO Add tags validator
   const errors = [];
+
   for (const [key, value] of Object.entries(tags)) {
     if (!isStringArray(value)) {
       errors.push(toErrorMessage({ key: `tags.${key}`, type: 'a string array or empty array', value }));
     }
   }
+
+  const { categories } = tags;
+
+  const categoriesError = validateCategoriesTags(categories);
+  if (categoriesError) {
+    errors.push(categoriesError);
+  }
+
   return errors.length ? errors.join('\n') : null;
+};
+
+/**
+ * @param {INotebookMetadata['tags']['categories']} categories
+ * @returns {ReturnType<ValidatorFn>}
+ */
+const validateCategoriesTags = (categories) => {
+  const validTags = Object.values(CATEGORIES);
+  const invalidTags = categories.filter((tag) => !validTags.includes(tag));
+  if (!invalidTags.length) {
+    return null;
+  }
+  return toErrorMessage({
+    key: 'tags.categories',
+    type: `a subset of ${JSON.stringify(validTags)}`,
+    value: invalidTags,
+  });
 };
 
 /** @type {Record<keyof INotebookMetadata, ValidatorFn>} */
@@ -85,7 +113,12 @@ export function validateNotebookMetadata(metadata) {
   const errors = [];
   const entries = /** @type {[keyof INotebookMetadata, any][]} */ (Object.entries(metadata));
   for (const [key, value] of entries) {
-    const error = NOTEBOOK_METADATA_VALIDATORS[key](value);
+    const validator = NOTEBOOK_METADATA_VALIDATORS[key];
+    if (!validator) {
+      errors.push(`Unknown metadata property "${key}".`);
+      continue;
+    }
+    const error = validator(value);
     if (error) {
       errors.push(error);
     }
