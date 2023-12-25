@@ -127,19 +127,18 @@ SUPPORTED_LLM_MODELS = {
     "chatglm3-6b": {
         "model_id": "THUDM/chatglm3-6b",
         "remote": True,
-        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT }\n",
-        "history_template": "<|user|>\n{user}\n<|assistant|>\n{assistant}\n",
+        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
+        "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "partial_text_processor": chatglm_partial_text_processor,
-        "current_message_template": "<|user|>\n{user}\n<|assistant|>\n",
+        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
-        "stop_tokens": ["</s>", "[MASK]", "[gMASK]", "[sMASK]", "sop", "eop"],
-        "prompt_template": f"""<|system|>
-        {DEFAULT_RAG_PROMPT_CHINESE }"""
+        "stop_tokens": ["</s>"],
+        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT_CHINESE }</s>"""
         + """
         <|user|>
         问题: {question} 
         已知内容: {context} 
-        回答: 
+        回答: </s>
         <|assistant|>""",
     },
     "mistral-7b": {
