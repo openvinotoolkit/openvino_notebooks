@@ -68,6 +68,7 @@ export class NotebookMetadataService {
   /**
    * Returns absolute notebook wile path
    *
+   * @private
    * @returns {string}
    */
   get _absoluteNotebookPath() {
@@ -84,6 +85,24 @@ export class NotebookMetadataService {
     const titleRegexp = /# (?<title>.+)/g;
     const readmeContent = readFileSync(this._readmeFilePath, { encoding: 'utf8' });
     const match = titleRegexp.exec(readmeContent);
+    if (!match || !match.groups || !match.groups.title) {
+      return null;
+    }
+    return match.groups.title;
+  }
+
+  /**
+   * Parses title from README.md file related to notebook
+   *
+   * @private
+   * @returns {string | null}
+   */
+  _getTitleFromNotebook() {
+    const titleRegexp = /# (?<title>.+)/g;
+    const notebookContent = readFileSync(this._absoluteNotebookPath, { encoding: 'utf8' });
+    const { cells } = JSON.parse(notebookContent);
+    const firstCellContent = cells[0].source.join('');
+    const match = titleRegexp.exec(firstCellContent);
     if (!match || !match.groups || !match.groups.title) {
       return null;
     }
@@ -159,13 +178,13 @@ export class NotebookMetadataService {
   /**
    * Generates new metadata object
    *
-   * @private
+   * @public
    * @returns {INotebookMetadata}
    */
   _generateMetadata() {
     // TODO Move parser functions to separate module
     return {
-      title: this._getTitleFromReadme() || '',
+      title: this._getTitleFromNotebook() || '',
       description: '', // TODO Add description parser
       imageUrl: null, // TODO Add image url parser
       createdDate: this._getNotebookCreatedDate(),
@@ -179,7 +198,6 @@ export class NotebookMetadataService {
         // TODO Add tags parser
         categories: [],
         tasks: [],
-        models: [],
         libraries: [],
         other: [],
       },
@@ -265,4 +283,33 @@ export class NotebookMetadataService {
       return acc;
     }, {});
   }
+}
+
+/**
+ *
+ * @param {INotebookMetadata} metadata
+ * @returns {string}
+ */
+export function toMarkdown(metadata) {
+  const { title, imageUrl, createdDate, modifiedDate, links, tags } = metadata;
+  const markdownLinks = Object.entries(links)
+    .filter(([, link]) => link)
+    .map(([key, link]) => `[${key}](${link})`);
+
+  /** @type {(tags: string[]) => string} */
+  const toTagsString = (tags) => tags.map((v) => `\`${v}\``).join(', ');
+
+  return `
+  | Notebook | \`./001-hello-world/001-hello-world.ipynb\` |
+  | - | - |
+  | Title | ${title} |
+  | Image | <img src="${imageUrl}"  height="100"> |
+  | Created Date | ${createdDate} |
+  | Modified Date | ${modifiedDate} |
+  | Links | ${markdownLinks.join(', ')} |
+  | **Tags:** | |
+  | Categories | ${toTagsString(tags.categories)} |
+  | Tasks | ${toTagsString(tags.tasks)} |
+  | Libraries | ${toTagsString(tags.libraries)} |
+  | Common | ${toTagsString(tags.other)} |`;
 }

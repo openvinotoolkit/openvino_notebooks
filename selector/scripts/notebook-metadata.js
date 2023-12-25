@@ -4,7 +4,7 @@ import { argv, exit } from 'process';
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
 
-import { NotebookMetadataService } from './notebook-metadata-service.js';
+import { NotebookMetadataService, toMarkdown } from './notebook-metadata-service.js';
 
 yargs(hideBin(argv))
   .command(
@@ -53,6 +53,7 @@ yargs(hideBin(argv))
     'validate',
     'Validate metadata file',
     {
+      // TODO Change option to files and accept comma separated files
       file: {
         alias: 'f',
         type: 'string',
@@ -61,7 +62,28 @@ yargs(hideBin(argv))
       },
     },
     ({ file }) => {
-      new NotebookMetadataService(file).validateMetadataFile();
+      try {
+        new NotebookMetadataService(file).validateMetadataFile();
+      } catch (error) {
+        console.error(error.message);
+        exit(1);
+      }
+    }
+  )
+  .command(
+    'to-markdown',
+    'Show notebook metadata as markdown',
+    {
+      file: {
+        alias: 'f',
+        type: 'string',
+        demandOption: true,
+        requiresArg: true,
+      },
+    },
+    ({ file }) => {
+      const metadata = new NotebookMetadataService(file)._generateMetadata();
+      console.info(toMarkdown(metadata));
     }
   )
   .help()
