@@ -1,0 +1,57 @@
+name: Validate Notebook Metadata Workflow
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      # - 'notebooks/**/*.metadata.json'
+      - 'notebooks/**/*.ipynb'
+    # paths-ignore:
+    # - 'notebooks/utils/**'
+
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  validate_notebook_metadata:
+    runs-on: ubuntu-20.04
+    name: Validate notebook metadata
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: ${{ github.event.pull_request.commits }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Get changed notebook files
+        shell: bash
+        run: |
+          # TODO Skip notebook_utils
+          CHANGED_NOTEBOOKS=$(git diff --name-only --relative=notebooks HEAD HEAD~${{ github.event.pull_request.commits }} -- *.ipynb ':!notebooks/utils')
+          echo "CHANGED_NOTEBOOKS=${CHANGED_NOTEBOOKS}" >> $GITHUB_ENV
+
+      - name: Visualize changed notebooks metadata
+        working-directory: ./selector
+        shell: bash
+        run: |
+          for notebook in ${{ env.CHANGED_NOTEBOOKS }}
+          do
+            NOTEBOOK_METADATA=$(node ./scripts/notebook-metadata.js to-markdown --file ${notebook})
+            echo ${NOTEBOOK_METADATA} >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          done
+
+      - name: Validate changed notebooks metadata
+        working-directory: ./selector
+        shell: bash
+        run: |
+          for notebook in ${{ env.CHANGED_NOTEBOOKS }}
+          do
+            node ./scripts/notebook-metadata.js validate --file ${notebook}
+          done
