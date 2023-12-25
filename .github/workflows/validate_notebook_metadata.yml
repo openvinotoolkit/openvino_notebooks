@@ -22,7 +22,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
-          fetch-depth: ${{ github.event.pull_request.commits }}
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
