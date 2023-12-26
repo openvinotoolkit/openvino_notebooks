@@ -2,9 +2,9 @@
 
 import { globSync } from 'glob';
 
-import { NotebookMetadataCollector, NOTEBOOKS_DIRECTORY_PATH } from './notebook-metadata-collector';
-import { toMarkdown } from './notebook-metadata-formatter';
-import { NotebookMetadataValidationError, validateNotebookMetadata } from './notebook-metadata-validator';
+import { NotebookMetadataCollector, NOTEBOOKS_DIRECTORY_PATH } from './notebook-metadata-collector.js';
+import { toMarkdown } from './notebook-metadata-formatter.js';
+import { NotebookMetadataValidationError, validateNotebookMetadata } from './notebook-metadata-validator.js';
 
 /** @typedef {import('../models/notebook').INotebookMetadata} INotebookMetadata */
 
