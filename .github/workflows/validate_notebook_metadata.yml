@@ -58,6 +58,7 @@ jobs:
               const notebookMarkdown = new NotebookMetadataHandler(notebook).toMarkdown();
               core.summary.addRaw(notebookMarkdown, true);
             }
+            core.summary.write();
 
       - name: Validate changed notebooks metadata
         working-directory: ./selector
