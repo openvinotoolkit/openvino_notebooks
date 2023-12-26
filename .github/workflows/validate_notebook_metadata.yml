@@ -33,7 +33,8 @@ jobs:
         shell: bash
         run: |
           # TODO Skip notebook_utils
-          CHANGED_NOTEBOOKS=$(git diff --name-only --relative=notebooks HEAD HEAD~${{ github.event.pull_request.commits }} -- *.ipynb ':!notebooks/utils')
+          # CHANGED_NOTEBOOKS=$(git diff --name-only --relative=notebooks HEAD HEAD~${{ github.event.pull_request.commits }} -- *.ipynb ':!notebooks/utils')
+          CHANGED_NOTEBOOKS=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files.[].path')
           echo "CHANGED_NOTEBOOKS=${CHANGED_NOTEBOOKS}" >> $GITHUB_ENV
 
       - name: Visualize changed notebooks metadata
