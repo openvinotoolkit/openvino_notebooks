@@ -173,8 +173,10 @@ export class NotebookMetadataCollector {
    */
   _getNotebookColabLink() {
     const readmeContent = this._getReadmeContent();
-    // eslint-disable-next-line no-useless-escape
-    const colabBadgeRegExp = new RegExp(`\[!\[Colab\]\(.+\)\]\((?<link>.+(?:${this._notebookFileName}))\)`, 'g');
+    const colabBadgeRegExp = new RegExp(
+      `\\[!\\[Colab\\]\\(.+\\)\\]\\((?<link>.+(?:${this._notebookFileName}))\\)`,
+      'g'
+    );
     const match = colabBadgeRegExp.exec(readmeContent);
     if (!match || !match.groups || !match.groups.link) {
       return null;
@@ -188,8 +190,10 @@ export class NotebookMetadataCollector {
    */
   _getNotebookBinderLink() {
     const readmeContent = this._getReadmeContent();
-    // eslint-disable-next-line no-useless-escape
-    const binderBadgeRegExp = new RegExp(`\[!\[Binder\]\(.+\)\]\((?<link>.+(?:${this._notebookFileName}))\)`, 'g');
+    const binderBadgeRegExp = new RegExp(
+      `\\[!\\[Binder\\]\\(.+\\)\\]\\((?<link>.+(?:${this._notebookFileName}))\\)`,
+      'g'
+    );
     const match = binderBadgeRegExp.exec(readmeContent);
     if (!match || !match.groups || !match.groups.link) {
       return null;
