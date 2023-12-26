@@ -30,14 +30,15 @@ jobs:
           node-version: 18
 
       - name: Get changed notebook files
+        id: get_changed_notebook_files
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # TODO Skip notebook_utils
-          # CHANGED_NOTEBOOKS=$(git diff --name-only --relative=notebooks HEAD HEAD~${{ github.event.pull_request.commits }} -- *.ipynb ':!notebooks/utils')
-          CHANGED_NOTEBOOKS=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files.[].path')
-          echo "CHANGED_NOTEBOOKS=${CHANGED_NOTEBOOKS}" >> $GITHUB_ENV
+          CHANGED_NOTEBOOKS=$(git diff --name-only --relative=notebooks HEAD main -- *.ipynb ':!notebooks/utils')
+          # CHANGED_NOTEBOOKS=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files.[].path')
+          echo "CHANGED_NOTEBOOKS=${CHANGED_NOTEBOOKS}" >> $GITHUB_OUTPUT
 
       - name: Visualize changed notebooks metadata
         working-directory: ./selector
