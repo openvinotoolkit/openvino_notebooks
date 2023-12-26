@@ -51,8 +51,8 @@ export class NotebookMetadataHandler {
    * @throws {NotebookMetadataValidationError} - All invalid metadata properties for each notebook
    */
   static validateNotebooks(notebooksPaths) {
+    const errors = [];
     for (const notebookPath of notebooksPaths) {
-      const errors = [];
       try {
         new NotebookMetadataHandler(notebookPath).validateMetadata();
       } catch (error) {
@@ -62,9 +62,9 @@ export class NotebookMetadataHandler {
           throw error;
         }
       }
-      if (errors.length) {
-        throw new NotebookMetadataValidationError(errors.join('\n\n'));
-      }
+    }
+    if (errors.length) {
+      throw new NotebookMetadataValidationError(errors.join('\n\n'));
     }
   }
 
