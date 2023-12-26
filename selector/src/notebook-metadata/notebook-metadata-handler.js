@@ -24,7 +24,14 @@ export class NotebookMetadataHandler {
    * @throws {NotebookMetadataValidationError} - All invalid metadata properties
    */
   validateMetadata() {
-    validateNotebookMetadata(this._metadata);
+    try {
+      validateNotebookMetadata(this._metadata);
+    } catch (error) {
+      if (error instanceof NotebookMetadataValidationError) {
+        error.message = `Invalid metadata for notebook "${this._notebookFilePath}".\n${error.message}`;
+      }
+      throw error;
+    }
   }
 
   toMarkdown() {
