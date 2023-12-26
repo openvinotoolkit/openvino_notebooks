@@ -273,6 +273,7 @@ JIT
 Joao
 JS
 JSON
+JT
 JuggernautXL
 Jupyter
 Jupyter's
