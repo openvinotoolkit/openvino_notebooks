@@ -58,6 +58,8 @@ const tagsValidator = (tags) => {
   // TODO Add tags validator
   const errors = [];
 
+  // TODO Consider validating that all keys exist
+
   for (const [key, value] of Object.entries(tags)) {
     if (!isStringArray(value)) {
       errors.push(toErrorMessage({ key: `tags.${key}`, type: 'a string array or empty array', value }));

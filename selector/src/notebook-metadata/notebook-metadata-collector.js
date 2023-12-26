@@ -87,9 +87,6 @@ export class NotebookMetadataCollector {
       console.warn(`No "openvino_notebooks" metadata found in notebook "${this._notebookFilePath}".`);
       return null;
     }
-    // if (!key) {
-    //   return metadata.openvino_notebooks;
-    // }
     const metadataPart = metadata.openvino_notebooks[key];
     if (metadataPart === undefined) {
       console.warn(`"${key}" is not found in "openvino_notebooks" metadata for notebook "${this._notebookFilePath}".`);
@@ -206,6 +203,7 @@ export class NotebookMetadataCollector {
    * @returns {INotebookMetadata['tags']}
    */
   _getTags() {
+    // TODO Consider merging of tags keys
     const tags = this._getNotebookFileMetadata('tags');
     return (
       tags || {
