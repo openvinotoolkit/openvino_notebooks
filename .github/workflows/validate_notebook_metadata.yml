@@ -51,9 +51,8 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            console.info(process.env.CHANGED_NOTEBOOKS);
-            const changedNotebooks = JSON.parse(process.env.CHANGED_NOTEBOOKS);
             const { NotebookMetadataHandler } = await import('${{ github.workspace }}/selector/src/notebook-metadata/notebook-metadata-handler.js');
+            const changedNotebooks = JSON.parse(process.env.CHANGED_NOTEBOOKS);
             for (const notebook of changedNotebooks) {
               const notebookMarkdown = new NotebookMetadataHandler(notebook).toMarkdown();
               core.summary.addRaw(notebookMarkdown, true);
@@ -61,10 +60,9 @@ jobs:
             core.summary.write();
 
       - name: Validate changed notebooks metadata
-        working-directory: ./selector
-        shell: bash
-        run: |
-          for notebook in ${{ env.CHANGED_NOTEBOOKS }}
-          do
-            echo "${notebook}"
-          done
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { NotebookMetadataHandler } = await import('${{ github.workspace }}/selector/src/notebook-metadata/notebook-metadata-handler.js');
+            const changedNotebooks = JSON.parse(process.env.CHANGED_NOTEBOOKS);
+            NotebookMetadataHandler.validateNotebooks(changedNotebooks);
