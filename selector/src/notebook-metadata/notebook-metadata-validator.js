@@ -1,9 +1,9 @@
 // @ts-check
 
-import { CATEGORIES } from '../src/models/notebook-tags.js';
+import { CATEGORIES } from '../models/notebook-tags.js';
 
 /**
- * @typedef {import('../src/models/notebook').INotebookMetadata} INotebookMetadata
+ * @typedef {import('../models/notebook.js').INotebookMetadata} INotebookMetadata
  * @typedef {(v) => boolean} isValidFn
  * @typedef {(v) => string | null} ValidatorFn
  */
@@ -94,7 +94,8 @@ const validateCategoriesTags = (categories) => {
 /** @type {Record<keyof INotebookMetadata, ValidatorFn>} */
 const NOTEBOOK_METADATA_VALIDATORS = {
   title: validate(isNotEmptyString, { key: 'title', type: 'not empty string' }),
-  description: validate(isNotEmptyString, { key: 'description', type: 'not empty string' }),
+  description: validate(isString, { key: 'description', type: 'a string' }),
+  path: validate(isNotEmptyString, { key: 'path', type: 'not empty string' }),
   imageUrl: validate(Nullable(isUrl), { key: 'imageUrl', type: 'a valid URL or null' }),
   createdDate: validate(isDate, { key: 'createdDate', type: 'a valid Date string' }),
   modifiedDate: validate(isDate, { key: 'modifiedDate', type: 'a valid Date string' }),
@@ -102,11 +103,13 @@ const NOTEBOOK_METADATA_VALIDATORS = {
   tags: tagsValidator,
 };
 
+export class NotebookMetadataValidationError extends Error {}
+
 /**
  * Validates notebook metadata object
  *
  * @param {INotebookMetadata} metadata
- *
+ * @throws {NotebookMetadataValidationError} Error message containing all metadata invalid properties
  * @returns {void}
  */
 export function validateNotebookMetadata(metadata) {
@@ -124,6 +127,8 @@ export function validateNotebookMetadata(metadata) {
     }
   }
   if (errors.length) {
-    throw Error(`The following notebook metadata properties are not valid:\n${errors.join('\n')}\n`);
+    throw new NotebookMetadataValidationError(
+      `The following notebook metadata properties are not valid:\n${errors.join('\n')}\n`
+    );
   }
 }

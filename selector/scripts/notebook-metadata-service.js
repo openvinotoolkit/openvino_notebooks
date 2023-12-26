@@ -1,12 +1,12 @@
 // @ts-check
 
 import { execSync } from 'child_process';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { globSync } from 'glob';
-import { basename, dirname, join } from 'path';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-import { validateNotebookMetadata } from './notebook-metadata-validators.js';
+import { validateNotebookMetadata } from '../src/notebook-metadata/notebook-metadata-validator.js';
 
 /**
  * @typedef {import('../src/models/notebook').INotebookMetadata} INotebookMetadata
@@ -26,17 +26,6 @@ function getNotebookReadmeFilePath(notebookPath) {
   return join(NOTEBOOKS_DIRECTORY_PATH, dirname(notebookPath), 'README.md');
 }
 
-/**
- * Returns path to metadata file releated to the notebook path
- *
- * @param {string} notebookPath
- * @returns {string}
- */
-function getNotebookMetadataFilePath(notebookPath) {
-  const metadataFileName = `${basename(notebookPath, '.ipynb')}.metadata.json`;
-  return join(NOTEBOOKS_DIRECTORY_PATH, dirname(notebookPath), metadataFileName);
-}
-
 export class NotebookMetadataService {
   /**
    * @param {string} notebookFilePath
@@ -46,8 +35,6 @@ export class NotebookMetadataService {
     this._notebookFilePath = notebookFilePath;
     /** @private */
     this._readmeFilePath = getNotebookReadmeFilePath(this._notebookFilePath);
-    /** @private */
-    this._metadataFilePath = getNotebookMetadataFilePath(this._notebookFilePath);
 
     this._checkFilesExist();
   }
@@ -186,6 +173,7 @@ export class NotebookMetadataService {
     return {
       title: this._getTitleFromNotebook() || '',
       description: '', // TODO Add description parser
+      path: this._notebookFilePath,
       imageUrl: null, // TODO Add image url parser
       createdDate: this._getNotebookCreatedDate(),
       modifiedDate: this._getNotebookModifiedDate(),
@@ -205,48 +193,19 @@ export class NotebookMetadataService {
   }
 
   /**
-   * Creates metadata file for corresponding notebook
-   *
-   * @returns {void}
-   */
-  generateMetadataFile() {
-    console.info(`Generating metadata file for notebook "${this._notebookFilePath}"...`);
-    const metadata = this._generateMetadata();
-    writeFileSync(this._metadataFilePath, JSON.stringify(metadata, null, 2), { flag: 'w' });
-    console.info(`Metadata file "${this._metadataFilePath}" is generated.`);
-  }
-
-  /**
-   * Updates metadata file for corresponding notebook
-   *
-   * @returns {void}
-   */
-  updateMetadataFile() {
-    console.info(`Updating metadata file "${this._metadataFilePath}"...`);
-    /** @type {INotebookMetadata} */
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const metadata = JSON.parse(readFileSync(this._metadataFilePath, { encoding: 'utf8' }));
-    metadata.modifiedDate = this._getNotebookModifiedDate();
-    writeFileSync(this._metadataFilePath, JSON.stringify(metadata, null, 2), { flag: 'w' });
-    console.info(`Metadata file is updated.`);
-  }
-
-  /**
    * Validates metadata file for corresponding notebook
    *
    * @returns {void}
    */
   validateMetadataFile() {
-    console.info(`Validating metadata file "${this._metadataFilePath}"...`);
-    /** @type {INotebookMetadata} */
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const metadata = JSON.parse(readFileSync(this._metadataFilePath, { encoding: 'utf8' }));
+    console.info(`Validating metadata for notebook "${this._notebookFilePath}"...`);
+    const metadata = this._generateMetadata();
     try {
       validateNotebookMetadata(metadata);
     } catch (error) {
-      throw Error(`Invalid metadata file "${this._metadataFilePath}".\n${error}`);
+      throw Error(`Invalid metadata for notebook "${this._notebookFilePath}".\n${error}`);
     }
-    console.info(`Metadata file is valid.`);
+    console.info(`Metadata is valid.`);
   }
 
   static getNotebooksPaths() {
@@ -257,21 +216,6 @@ export class NotebookMetadataService {
   }
 
   /**
-   * Returns notebook metadata object by notebook path
-   *
-   * @param {string} notebookFilePath
-   * @private
-   * @returns {INotebookMetadata}
-   */
-  static _getNotebookMetadata(notebookFilePath) {
-    const metadataFilePath = getNotebookMetadataFilePath(notebookFilePath);
-    const absoluteMetadataFilePath = join(NOTEBOOKS_DIRECTORY_PATH, metadataFilePath);
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return JSON.parse(readFileSync(absoluteMetadataFilePath, { encoding: 'utf8' }));
-  }
-
-  /**
    * Returns map with metadata objects for all notebooks
    *
    * @returns {Record<string, INotebookMetadata>}
@@ -279,37 +223,9 @@ export class NotebookMetadataService {
   static getNotebooksMetadataMap() {
     const notebookPaths = this.getNotebooksPaths();
     return notebookPaths.reduce((acc, notebookPath) => {
-      acc[notebookPath] = this._getNotebookMetadata(notebookPath);
+      const metadata = new NotebookMetadataService(notebookPath)._generateMetadata();
+      acc[notebookPath] = metadata;
       return acc;
     }, {});
   }
-}
-
-/**
- *
- * @param {INotebookMetadata} metadata
- * @returns {string}
- */
-export function toMarkdown(metadata) {
-  const { title, imageUrl, createdDate, modifiedDate, links, tags } = metadata;
-  const markdownLinks = Object.entries(links)
-    .filter(([, link]) => link)
-    .map(([key, link]) => `[${key}](${link})`);
-
-  /** @type {(tags: string[]) => string} */
-  const toTagsString = (tags) => tags.map((v) => `\`${v}\``).join(', ');
-
-  return `
-  | Notebook | \`./001-hello-world/001-hello-world.ipynb\` |
-  | - | - |
-  | Title | ${title} |
-  | Image | <img src="${imageUrl}"  height="100"> |
-  | Created Date | ${createdDate} |
-  | Modified Date | ${modifiedDate} |
-  | Links | ${markdownLinks.join(', ')} |
-  | **Tags:** | |
-  | Categories | ${toTagsString(tags.categories)} |
-  | Tasks | ${toTagsString(tags.tasks)} |
-  | Libraries | ${toTagsString(tags.libraries)} |
-  | Common | ${toTagsString(tags.other)} |`;
 }
