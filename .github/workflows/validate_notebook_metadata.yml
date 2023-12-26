@@ -19,10 +19,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          # fetch-depth: 0
+        # with:
+        #   ref: ${{ github.event.pull_request.head.ref }}
+        #   repository: ${{ github.event.pull_request.head.repo.full_name }}
+        #   fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
