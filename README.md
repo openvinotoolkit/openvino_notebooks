@@ -49,6 +49,7 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [Segmind-VegaRT](notebooks/248-stable-diffusion-xl/248-segmind-vegart.ipynb)<br> | High-resolution image generation with Segmind-VegaRT and OpenVINO | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/66bfe823-01c8-4749-a8aa-419a1d78a070" width=300> |
 | [Stable-Zephyr chatbot](notebooks/273-stable-zephyr-3b-chatbot/)<br> | Use Stable-Zephyr as chatbot assistant with OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cfac6ddb-6f22-4343-855c-e513269cf2bf width=300> |
 | [Efficient-SAM](notebooks/274-efficient-sam)<br> | Object segmentation with EfficientSAM and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/15d0a23a-0550-43c6-9ca9-f689e772a79a width=300> |
+| [LLM Instruction following pipeline](notebooks/275-llm-question-answering)<br> | Usage variety of LLM models for answering questions using OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/daafd702-5a42-4f54-ae72-2e4480d73501 width=300> | 
 
 ## Table of Contents
 
@@ -222,6 +223,7 @@ Demos that demonstrate inference on a particular model.
 | [271-sdxl-turbo](notebooks/271-sdxl-turbo/)<br> | Single-step image generation using SDXL-turbo and OpenVINO | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/79b625c7-0f0a-4f19-8e38-e6f896f75c3e" width=225> |
 | [272-paint-by-example](notebooks/272-paint-by-example/)<br>| Exemplar based image editing using diffusion models, [Paint-by-Example](https://github.com/Fantasy-Studio/Paint-by-Example), and OpenVINO™ | <img width="225" alt="ui_example" src="https://user-images.githubusercontent.com/103226580/236958011-0550ba7b-19b3-4dc6-8b50-eaedb84c1681.png"> |
 | [274-efficient-sam](notebooks/274-efficient-sam/)<br>| Object segmentation with EfficientSAM and OpenVINO™ | <img width="225" src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/15d0a23a-0550-43c6-9ca9-f689e772a79a"> |
+| [275-llm-question-answering](notebooks/275-llm-question-answering)<br> | LLM Instruction following pipeline | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/daafd702-5a42-4f54-ae72-2e4480d73501 width=225> | 
 
 <div id='-model-training'></div>
 

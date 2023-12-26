@@ -29,6 +29,8 @@ The tutorial consists of the following steps:
 
 The image below illustrates the provided user instruction and model answer examples.
 
+![phi2-example.png](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/daafd702-5a42-4f54-ae72-2e4480d73501)
+
 ## Installation Instructions
 
 This is a self-contained example that relies solely on its own code.</br>
