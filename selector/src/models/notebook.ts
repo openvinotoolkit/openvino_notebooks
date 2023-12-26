@@ -5,7 +5,8 @@ type ObjectValues<T> = T[keyof T];
 // TODO Consider adding notebook relative path
 export interface INotebookMetadata {
   title: string;
-  description: string;
+  description?: string;
+  path: string;
   imageUrl: string | null;
   createdDate: string;
   modifiedDate: string;
