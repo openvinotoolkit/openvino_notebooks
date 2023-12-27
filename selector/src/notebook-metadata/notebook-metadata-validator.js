@@ -66,6 +66,10 @@ const tagsValidator = (tags) => {
     }
   }
 
+  if (errors.length) {
+    return errors.join('\n');
+  }
+
   const { categories } = tags;
 
   const categoriesError = validateCategoriesTags(categories);
