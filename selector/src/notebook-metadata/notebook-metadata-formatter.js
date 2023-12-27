@@ -13,8 +13,8 @@ export function toMarkdown(metadata) {
     .filter(([, link]) => link)
     .map(([key, link]) => `[${key}](${link})`);
 
-  /** @type {(tags: string[]) => string} */
-  const toTagsString = (tags) => tags.map((v) => `\`${v}\``).join(', ');
+  /** @type {(tags?: string[]) => string} */
+  const toTagsString = (tags) => tags?.map((v) => `\`${v}\``).join(', ') || 'N/A';
 
   return `
   | Notebook | \`${path}\` |
@@ -25,9 +25,9 @@ export function toMarkdown(metadata) {
   | Modified Date | ${modifiedDate} |
   | Links | ${markdownLinks.join(', ')} |
   | **Tags:** | |
-  | Categories | ${toTagsString(tags.categories)} |
-  | Tasks | ${toTagsString(tags.tasks)} |
-  | Libraries | ${toTagsString(tags.libraries)} |
-  | Common | ${toTagsString(tags.other)} |
+  | Categories | ${toTagsString(tags?.categories)} |
+  | Tasks | ${toTagsString(tags?.tasks)} |
+  | Libraries | ${toTagsString(tags?.libraries)} |
+  | Common | ${toTagsString(tags?.other)} |
   `;
 }
