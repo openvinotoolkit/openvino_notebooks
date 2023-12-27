@@ -5,9 +5,10 @@
 /**
  *
  * @param {INotebookMetadata} metadata
+ * @param {boolean} hasError
  * @returns {string}
  */
-export function toMarkdown(metadata) {
+export function toMarkdown(metadata, hasError) {
   const { title, imageUrl, path, createdDate, modifiedDate, links, tags } = metadata;
   const markdownLinks = Object.entries(links)
     .filter(([, link]) => link)
@@ -19,6 +20,7 @@ export function toMarkdown(metadata) {
   return `
   | Notebook | \`${path}\` |
   | - | - |
+  | Valid | ${hasError ? '❌' : '✅'} |
   | Title | ${title} |
   | Image | <img src="${imageUrl}"  height="100"> |
   | Created Date | ${createdDate} |
@@ -29,5 +31,5 @@ export function toMarkdown(metadata) {
   | Tasks | ${toTagsString(tags?.tasks)} |
   | Libraries | ${toTagsString(tags?.libraries)} |
   | Common | ${toTagsString(tags?.other)} |
-  `;
+`;
 }

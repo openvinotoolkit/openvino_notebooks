@@ -21,7 +21,7 @@ export class NotebookMetadataHandler {
   }
 
   /**
-   * @throws {NotebookMetadataValidationError} - All invalid metadata properties
+   * @returns {string | null} Validation error
    */
   validateMetadata() {
     try {
@@ -29,13 +29,18 @@ export class NotebookMetadataHandler {
     } catch (error) {
       if (error instanceof NotebookMetadataValidationError) {
         error.message = `Invalid metadata for notebook "${this._notebookFilePath}".\n${error.message}`;
+        return error.message;
       }
       throw error;
     }
+    return null;
   }
 
-  toMarkdown() {
-    return toMarkdown(this._metadata);
+  /**
+   * @param {boolean} hasError
+   */
+  toMarkdown(hasError) {
+    return toMarkdown(this._metadata, hasError);
   }
 
   static getNotebooksPaths() {
@@ -48,31 +53,25 @@ export class NotebookMetadataHandler {
 
   /**
    * @param {string[]} notebooksPaths
-   * @throws {NotebookMetadataValidationError} - All invalid metadata properties for each notebook
+   * @return {[string | null, string[]]} Tuple of validation error (if exist) and array of metadata markdown representations
    */
   static validateNotebooks(notebooksPaths) {
     const errors = [];
+    const metadataMarkdowns = [];
     for (const notebookPath of notebooksPaths) {
-      try {
-        new NotebookMetadataHandler(notebookPath).validateMetadata();
-      } catch (error) {
-        if (error instanceof NotebookMetadataValidationError) {
-          errors.push(error.message);
-        } else {
-          throw error;
-        }
+      const notebookMetadataHandler = new NotebookMetadataHandler(notebookPath);
+      const error = notebookMetadataHandler.validateMetadata();
+      if (error) {
+        errors.push(error);
       }
+      const metadataMarkdown = notebookMetadataHandler.toMarkdown(Boolean(error));
+      metadataMarkdowns.push(metadataMarkdown);
     }
-    if (errors.length) {
-      throw new NotebookMetadataValidationError(errors.join('\n\n'));
-    }
+    return [errors.length ? errors.join('\n\n') : null, metadataMarkdowns];
   }
 
-  /**
-   * @throws {NotebookMetadataValidationError} - All invalid metadata properties for each notebook
-   */
   static validateAll() {
     const notebooksPaths = NotebookMetadataHandler.getNotebooksPaths();
-    NotebookMetadataHandler.validateNotebooks(notebooksPaths);
+    return NotebookMetadataHandler.validateNotebooks(notebooksPaths);
   }
 }

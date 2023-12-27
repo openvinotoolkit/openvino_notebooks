@@ -47,22 +47,16 @@ jobs:
         shell: bash
         run: npm ci
 
-      - name: Visualize changed notebooks metadata
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { NotebookMetadataHandler } = await import('${{ github.workspace }}/selector/src/notebook-metadata/notebook-metadata-handler.js');
-            const changedNotebooks = JSON.parse(process.env.CHANGED_NOTEBOOKS);
-            for (const notebook of changedNotebooks) {
-              const notebookMarkdown = new NotebookMetadataHandler(notebook).toMarkdown();
-              core.summary.addRaw(notebookMarkdown, true);
-            }
-            core.summary.write();
-
       - name: Validate changed notebooks metadata
         uses: actions/github-script@v7
         with:
           script: |
             const { NotebookMetadataHandler } = await import('${{ github.workspace }}/selector/src/notebook-metadata/notebook-metadata-handler.js');
             const changedNotebooks = JSON.parse(process.env.CHANGED_NOTEBOOKS);
-            NotebookMetadataHandler.validateNotebooks(changedNotebooks);
+            const [error, metadataMarkdowns] = NotebookMetadataHandler.validateNotebooks(changedNotebooks);
+            core.summary.addHeading('Modified Notebooks', '2');
+            core.summary.addRaw(metadataMarkdowns.join('\n\n'));
+            core.summary.write();
+            if (error) {
+              core.setFailed(error);
+            }
