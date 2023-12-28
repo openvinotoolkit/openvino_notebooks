@@ -9,6 +9,11 @@ You are a helpful, respectful and honest assistant. Always answer as helpfully a
 If a question does not make any sense or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\
 """
 
+DEFAULT_SYSTEM_PROMPT_CHINESE = """\
+你是一个乐于助人、尊重他人以及诚实可靠的助手。在安全的情况下，始终尽可能有帮助地回答。 您的回答不应包含任何有害、不道德、种族主义、性别歧视、有毒、危险或非法的内容。请确保您的回答在社会上是公正的和积极的。
+如果一个问题没有任何意义或与事实不符，请解释原因，而不是回答错误的问题。如果您不知道问题的答案，请不要分享虚假信息。另外，答案请使用中文。\
+"""
+
 DEFAULT_SYSTEM_PROMPT_JAPANESE = """\
 あなたは親切で、礼儀正しく、誠実なアシスタントです。 常に安全を保ちながら、できるだけ役立つように答えてください。 回答には、有害、非倫理的、人種差別的、性差別的、有毒、危険、または違法なコンテンツを含めてはいけません。 回答は社会的に偏見がなく、本質的に前向きなものであることを確認してください。
 質問が意味をなさない場合、または事実に一貫性がない場合は、正しくないことに答えるのではなく、その理由を説明してください。 質問の答えがわからない場合は、誤った情報を共有しないでください。\
@@ -111,7 +116,7 @@ SUPPORTED_LLM_MODELS = {
     "qwen-7b-chat": {
         "model_id": "Qwen/Qwen-7B-Chat",
         "remote": True,
-        "start_message": f"<|im_start|>system\n {DEFAULT_SYSTEM_PROMPT }<|im_end|>",
+        "start_message": f"<|im_start|>system\n {DEFAULT_SYSTEM_PROMPT_CHINESE }<|im_end|>",
         "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
         "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
         "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
@@ -127,21 +132,18 @@ SUPPORTED_LLM_MODELS = {
     "chatglm3-6b": {
         "model_id": "THUDM/chatglm3-6b",
         "remote": True,
-        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT }\n",
-        "history_template": "<|user|>\n{user}\n<|assistant|>\n{assistant}\n",
-        "partial_text_processor": chatglm_partial_text_processor,
-        "current_message_template": "<|user|>\n{user}\n<|assistant|>\n",
-        "stop_tokens": ["</s>"],
-        "prompt_template": f"""<|system|>
-        {DEFAULT_RAG_PROMPT_CHINESE }"""
+        "start_message": f"{DEFAULT_SYSTEM_PROMPT_CHINESE }",
+        "roles": ["system", "user", "assistant"],
+        "tokenizer_kwargs": {"add_special_tokens": False},
+        "stop_tokens": [2, 64795, 64797],
+        "prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
         + """
-        <|user|>
         问题: {question} 
         已知内容: {context} 
         回答: 
-        <|assistant|>""",
+        """,
     },
-    "mistal-7b": {
+    "mistral-7b": {
         "model_id": "mistralai/Mistral-7B-v0.1",
         "remote": False,
         "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",

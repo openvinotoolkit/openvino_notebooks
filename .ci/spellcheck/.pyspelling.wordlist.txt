@@ -172,6 +172,8 @@ dropdown
 ECCV
 editability
 EfficientNet
+EfficientSAM
+EfficientSAMs
 embeddings
 EnCodec
 encodec
@@ -223,6 +225,7 @@ Gradio
 gradio
 grayscale
 gRPC
+Gu
 Gutendex
 Hafner
 HugginFaceH
@@ -270,6 +273,7 @@ JIT
 Joao
 JS
 JSON
+JT
 JuggernautXL
 Jupyter
 Jupyter's
@@ -324,6 +328,7 @@ lraspp
 LRASPP
 LTS
 LSTM
+Luo
 macOS
 Mahalanobis
 Mapillary
@@ -443,6 +448,7 @@ parameterization
 parametrize
 parsers
 perceptron
+Patil
 performant
 PersonaGPT
 photorealism
@@ -551,6 +557,8 @@ sagittal
 SALICON
 Saliency
 saliency
+SAMI
+sam
 SavedModel
 scalability
 Scalable
@@ -618,6 +626,7 @@ summarization
 Suno
 superresolution
 superset
+Suraj
 svc
 SVTR
 Swin
@@ -687,6 +696,7 @@ VCTK
 Vec
 VectorStore
 vec
+VegaRT
 videpth
 VIO
 virtualenv
@@ -694,6 +704,7 @@ ViT
 vit
 vits
 VITS
+vitt
 VM
 Vladlen
 VOC
@@ -719,6 +730,7 @@ Xeon
 xl
 xvector
 XYWH
+Yiqin
 YOLO
 YOLOv
 yolov
