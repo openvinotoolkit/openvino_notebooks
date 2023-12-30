@@ -46,7 +46,7 @@ jobs:
     # These steps are also copied to convert_notebooks.yml
 
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
           fetch-depth: 0
     
@@ -78,13 +78,13 @@ jobs:
             fi
       shell: bash
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
 
     - name: Cache OpenVINO Pip Packages
       id: cachepip
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           pipcache
@@ -93,7 +93,7 @@ jobs:
     # Cache specific files to reduce downloads or prevent network issues
     - name: Cache Files
       id: cachefiles
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
@@ -124,7 +124,7 @@ jobs:
     # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
     - name: Cache PaddlePaddle cache directories
       id: cacheusercache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ${{ env.HUB_HOME }}
@@ -182,9 +182,9 @@ jobs:
         python -m pip freeze
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: pip-freeze
+        name: pip-freeze-${{matrix.os}}-${{ matrix.python }}
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
 
     #### End installation/preparation
@@ -220,14 +220,14 @@ jobs:
            python .ci/validate_notebooks.py --test_list test_notebooks.txt --ignore_list .ci/ignore_treon_mac.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
       shell: bash
     - name: Archive test report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: test_report.csv
+        name: test_report.csv-${{matrix.os}}-${{ matrix.python }}
         path: test_report.csv
     - name: Archive notebook test report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: test_report
+        name: test_report-${{matrix.os}}-${{ matrix.python }}
         path: test_report/
 
     # Show the cache after running the notebooks
