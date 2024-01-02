@@ -2,7 +2,6 @@ import { CATEGORIES } from './notebook-tags.js';
 
 type ObjectValues<T> = T[keyof T];
 
-// TODO Consider adding notebook relative path
 export interface INotebookMetadata {
   title: string;
   description?: string;

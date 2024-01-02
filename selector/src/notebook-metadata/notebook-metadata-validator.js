@@ -3,31 +3,29 @@
 import { CATEGORIES } from '../models/notebook-tags.js';
 
 /**
- * @typedef {import('../models/notebook.js').INotebookMetadata} INotebookMetadata
- * @typedef {(v) => boolean} isValidFn
- * @typedef {(v) => string | null} ValidatorFn
+ * @typedef {import('../models/notebook-metadata.ts').INotebookMetadata} INotebookMetadata
+ * @typedef {(v: any) => boolean} isValidFn
+ * @typedef {(v: any) => string | null} ValidatorFn
  */
 
+/** @type {(_: { key: string, type: string, value: any }) => string} */
 const toErrorMessage = ({ key, type, value }) => `'${key}' should be ${type}. Invalid value: ${JSON.stringify(value)}.`;
 
 /** @type {(isValid: isValidFn, assertion: { key: string, type: string }) => ValidatorFn} */
-
 const validate =
   (isValid, { key, type }) =>
   (v) =>
     isValid(v) ? null : toErrorMessage({ key, type, value: v }); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
 
-const isString = (v) => typeof v === 'string' || v instanceof String;
+const isString = (/** @type {any} */ v) => typeof v === 'string' || v instanceof String;
 
-const isNotEmptyString = (v) => !!v && isString(v);
+const isNotEmptyString = (/** @type {any} */ v) => !!v && isString(v);
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-const isUrl = (v) => URL.canParse(v);
+const isUrl = (/** @type {string} */ v) => URL.canParse(v);
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-const isDate = (v) => isString(v) && !isNaN(new Date(v).getTime());
+const isDate = (/** @type {string} */ v) => isString(v) && !isNaN(new Date(v).getTime());
 
-const isStringArray = (v) => Array.isArray(v) && v.every(isString);
+const isStringArray = (/** @type {any[]} */ v) => Array.isArray(v) && v.every(isString);
 
 /** @type {(f: isValidFn) => isValidFn} */
 const Nullable = (f) => (v) => v === null || f(v);
