@@ -1,4 +1,4 @@
-import { CATEGORIES } from './notebook-tags.js';
+import { CATEGORIES, TASKS_VALUES } from './notebook-tags.js';
 
 type ObjectValues<T> = T[keyof T];
 
@@ -16,7 +16,7 @@ export interface INotebookMetadata {
   };
   tags: {
     categories: ObjectValues<typeof CATEGORIES>[];
-    tasks: string[];
+    tasks: typeof TASKS_VALUES;
     libraries: string[];
     other: string[];
   };
