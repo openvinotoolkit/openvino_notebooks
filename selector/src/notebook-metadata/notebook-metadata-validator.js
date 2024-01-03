@@ -1,6 +1,6 @@
 // @ts-check
 
-import { CATEGORIES } from '../models/notebook-tags.js';
+import { CATEGORIES, TASKS_VALUES } from '../models/notebook-tags.js';
 
 /**
  * @typedef {import('../models/notebook-metadata.ts').INotebookMetadata} INotebookMetadata
@@ -68,11 +68,16 @@ const tagsValidator = (tags) => {
     return errors.join('\n');
   }
 
-  const { categories } = tags;
+  const { categories, tasks } = tags;
 
   const categoriesError = validateCategoriesTags(categories);
   if (categoriesError) {
     errors.push(categoriesError);
+  }
+
+  const tasksError = validateTasksTags(tasks);
+  if (tasksError) {
+    errors.push(tasksError);
   }
 
   return errors.length ? errors.join('\n') : null;
@@ -90,6 +95,23 @@ const validateCategoriesTags = (categories) => {
   }
   return toErrorMessage({
     key: 'tags.categories',
+    type: `a subset of ${JSON.stringify(validTags)}`,
+    value: invalidTags,
+  });
+};
+
+/**
+ * @param {INotebookMetadata['tags']['tasks']} tasks
+ * @returns {ReturnType<ValidatorFn>}
+ */
+const validateTasksTags = (tasks) => {
+  const validTags = TASKS_VALUES;
+  const invalidTags = tasks.filter((tag) => !validTags.includes(tag));
+  if (!invalidTags.length) {
+    return null;
+  }
+  return toErrorMessage({
+    key: 'tags.tasks',
     type: `a subset of ${JSON.stringify(validTags)}`,
     value: invalidTags,
   });
