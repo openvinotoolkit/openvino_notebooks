@@ -46,7 +46,7 @@ class TrackedNodeInfo:
     input_values_full_precision: np.ndarray = None  # Results of the target node inputs in full precision
 
 
-def partially_upcast_nodes_to_fp32(orig_model: Model, example_input: Union[List, Dict], half_type: str,
+def partially_upcast_nodes_to_fp32(orig_model: Model, example_input: Union[List, Dict], half_type: str = "f16",
                                    batch_size: int = 50, operation_types: List[str] = None, upcast_ratio: float = 0.1,
                                    verbose: bool = False) -> Model:
     """
