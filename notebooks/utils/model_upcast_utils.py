@@ -10,7 +10,7 @@ import openvino.runtime.opset12 as opset
 from openvino.runtime.utils.types import get_element_type
 
 import openvino as ov
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 OPERATION_TYPE_MAP = {
     "MatMul": opset.matmul,
