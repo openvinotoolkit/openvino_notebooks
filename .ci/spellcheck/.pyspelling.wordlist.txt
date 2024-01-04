@@ -172,6 +172,8 @@ dropdown
 ECCV
 editability
 EfficientNet
+EfficientSAM
+EfficientSAMs
 embeddings
 EnCodec
 encodec
@@ -272,6 +274,7 @@ JIT
 Joao
 JS
 JSON
+JT
 JuggernautXL
 Jupyter
 Jupyter's
@@ -556,6 +559,8 @@ sagittal
 SALICON
 Saliency
 saliency
+SAMI
+sam
 SavedModel
 scalability
 Scalable
@@ -701,6 +706,7 @@ ViT
 vit
 vits
 VITS
+vitt
 VM
 Vladlen
 VOC
