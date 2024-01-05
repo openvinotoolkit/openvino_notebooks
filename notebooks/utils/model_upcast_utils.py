@@ -54,6 +54,9 @@ def partially_upcast_nodes_to_fp32(orig_model: Model, example_input: Union[List,
     Nodes are selected based on Signal-to-Noise Ratio (SNR) metric: upcast_ratio fraction of tracked nodes with the
     lowest SNR are marked for full precision execution.
 
+    Note: Input model should have fp16 weights (i.e. saved with compress_to_fp16=True) in order to conserve
+    calibration memory.
+
     :param orig_model: Model to process
     :param example_input: Example input for model inference
     :param half_type: Either "f16" or "bf16"
