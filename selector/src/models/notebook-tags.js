@@ -26,6 +26,7 @@ export const TASKS = /** @type {const} */ ({
     OBJECT_DETECTION: 'Object Detection',
     DEPTH_ESTIMTAION: 'Depth Estimation',
     SUPER_RESOLUTION: 'Super Resolution',
+    STYLE_TRANSFER: 'Style Transfer',
   },
   NLP: {
     TEXT_CLASSIFICATION: 'Text Classification',
