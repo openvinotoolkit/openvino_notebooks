@@ -40,8 +40,10 @@ Benchmarking
 benchmarking
 bert
 BERT's
+BetterTransformer
 Bewley
 BGR
+BMP
 Bicubic
 bicubic
 bilinear
@@ -57,6 +59,7 @@ chatbots
 chatglm
 ChatGLM
 ChatGPT
+chinese
 CIN
 ckpt
 CHW
@@ -92,8 +95,10 @@ ConvNeXt
 ConvNeXts
 Convolutional
 convolutional
+CoSENT
 CPUs
 CRNN
+CSV
 CTC
 CUDA
 CVF
@@ -153,6 +158,7 @@ DL
 docstring
 DocVQA
 docvqa
+DocumentLoaders
 doi
 Dollár
 donut
@@ -166,6 +172,8 @@ dropdown
 ECCV
 editability
 EfficientNet
+EfficientSAM
+EfficientSAMs
 embeddings
 EnCodec
 encodec
@@ -199,6 +207,7 @@ Gb
 gcc
 GEC
 GELU
+genai
 Girshick
 Gitee
 GitHub
@@ -216,8 +225,10 @@ Gradio
 gradio
 grayscale
 gRPC
+Gu
 Gutendex
 Hafner
+HugginFaceH
 HandBrake
 heatmap
 HC
@@ -262,6 +273,7 @@ JIT
 Joao
 JS
 JSON
+JT
 JuggernautXL
 Jupyter
 Jupyter's
@@ -287,6 +299,7 @@ labse
 LaBSE
 Lai
 LAION
+LangChain
 Lasinger
 latents
 LCMs
@@ -315,6 +328,7 @@ lraspp
 LRASPP
 LTS
 LSTM
+Luo
 macOS
 Mahalanobis
 Mapillary
@@ -348,6 +362,7 @@ MONAI's
 Monodepth
 monodepth
 MosaicPretrainedTransformer
+mpnet
 mpt
 MPT
 MRPC
@@ -433,6 +448,7 @@ parameterization
 parametrize
 parsers
 perceptron
+Patil
 performant
 PersonaGPT
 photorealism
@@ -472,10 +488,12 @@ Pretraining
 pretraining
 promptable
 proto
+protobuf
 PRs
 psychoacoustics
 PTQ
 px
+py
 pyannote
 PyPI
 Pythia
@@ -524,6 +542,8 @@ resnet
 RGB
 Riffusion
 riffusion
+Rinna
+rinna
 RLHF
 RoBERTa
 roberta
@@ -537,6 +557,9 @@ sagittal
 SALICON
 Saliency
 saliency
+SAMI
+sam
+SavedModel
 scalability
 Scalable
 scalable
@@ -551,6 +574,7 @@ segmentations
 Segmenter
 segmenter
 Segmind
+segmind
 serializable
 sft
 ShapeNet
@@ -585,6 +609,7 @@ SSDLite
 sst
 StableDiffusionInpaintPipeline
 STFT
+stateful
 streamable
 Struct
 struct
@@ -601,6 +626,7 @@ summarization
 Suno
 superresolution
 superset
+Suraj
 svc
 SVTR
 Swin
@@ -668,7 +694,9 @@ validator
 variational
 VCTK
 Vec
+VectorStore
 vec
+VegaRT
 videpth
 VIO
 virtualenv
@@ -676,6 +704,7 @@ ViT
 vit
 vits
 VITS
+vitt
 VM
 Vladlen
 VOC
@@ -701,9 +730,12 @@ Xeon
 xl
 xvector
 XYWH
+Yiqin
 YOLO
 YOLOv
 yolov
+Youri
+youri
 ZavyChromaXL
 Zongyuan
 ZeroScope

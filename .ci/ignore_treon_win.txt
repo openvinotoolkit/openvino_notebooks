@@ -1,7 +1,9 @@
 107-speech-recognition-quantization
 108-gpu-device
+111-yolov5-quantization-migration
 117-model-server
 122-quantizing-model-with-accuracy-control
+204-segmenter-semantic-segmentation
 216-attention-center
 220-cross-lingual-books-alignment
 223-text-prediction
@@ -43,3 +45,4 @@
 270-sound-generation-audioldm2
 271-sdxl-turbo
 272-paint-by-example
+273-stable-zephyr-3b-chatbot
