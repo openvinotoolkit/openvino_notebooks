@@ -15,10 +15,6 @@ jobs:
     runs-on: ubuntu-20.04
     name: Validate notebook metadata
     steps:
-      - name: Get PR fetch depth
-        shell: bash
-        run: echo "PR_FETCH_DEPTH=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> $GITHUB_ENV
-
       - name: Checkout code
         uses: actions/checkout@v3
         with:
