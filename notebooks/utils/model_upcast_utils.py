@@ -1,4 +1,3 @@
-import gc
 from collections import defaultdict, OrderedDict
 from dataclasses import dataclass
 from typing import List, Dict, Union
@@ -122,8 +121,6 @@ def partially_upcast_nodes_to_fp32(orig_model: Model, example_input: Union[List,
                     raise e
             node_names_and_snrs.append((node_info.node.get_friendly_name(), snr))
 
-        gc.collect()
-
     if upcast_ratio != 0.0 and upcast_ratio != 1.0:
         node_names = [it[0] for it in node_names_and_snrs]
         node_snrs = np.array([it[1] for it in node_names_and_snrs], dtype=np.float32)
@@ -239,7 +236,6 @@ def infer_full_net(nodes_to_track: List[TrackedNodeInfo], orig_model: Model, exa
                 # If input is not constant, retrieve its input from inference results
                 input_value = friendly_name_to_result_map[node_info.input_result_nodes[input_node].get_friendly_name()]
             node_info.input_values_full_precision.append(input_value)
-    del request, exec_net, results, friendly_name_to_result_map
 
 
 def infer_nodes(nodes_to_track: List[TrackedNodeInfo], device: str, precision: str) -> None:
@@ -286,7 +282,6 @@ def infer_tracked_op(node_info: TrackedNodeInfo, device: str, precision: str) ->
 
     node_info.node_value_half_precision = result[0]
     assert len(result) == 1
-    del request, exec_net, ov_model
 
 
 def is_model_partially_upcasted(model) -> bool:
