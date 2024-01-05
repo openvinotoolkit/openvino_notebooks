@@ -53,12 +53,13 @@ const linksValidator = ({ github, colab, binder }) => {
  * @returns {ReturnType<ValidatorFn>}
  */
 const tagsValidator = (tags) => {
-  // TODO Add tags validator
   const errors = [];
 
-  // TODO Consider validating that all keys exist
+  /** @type {(keyof typeof tags)[]} */
+  const tagsKeys = ['categories', 'tasks', 'libraries', 'other'];
 
-  for (const [key, value] of Object.entries(tags)) {
+  for (const key of tagsKeys) {
+    const value = tags[key];
     if (!isStringArray(value)) {
       errors.push(toErrorMessage({ key: `tags.${key}`, type: 'a string array or empty array', value }));
     }
