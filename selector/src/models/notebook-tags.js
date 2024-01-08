@@ -22,7 +22,9 @@ export const TASKS = /** @type {const} */ ({
   CV: {
     IMAGE_CLASSIFICATION: 'Image Classification',
     IMAGE_SEGMENTATION: 'Image Segmentation',
-    IMAGE_GENERATION: 'Image Generation', // Image-to-Image
+    IMAGE_GENERATION: 'Image Generation',
+    IMAGE_INPAINTING: 'Image Inpainting',
+    IMAGE_TO_IMAGE: 'Image-to-Image',
     OBJECT_DETECTION: 'Object Detection',
     DEPTH_ESTIMTAION: 'Depth Estimation',
     SUPER_RESOLUTION: 'Super Resolution',
@@ -44,6 +46,8 @@ export const TASKS = /** @type {const} */ ({
     AUDIO_COMPRESSION: 'Audio Compression',
     VOICE_CONVERSION: 'Voice Conversion',
     AUDIO_GENERATION: 'Audio Generation',
+    AUDIO_CLASSIFICATION: 'Audio Classification',
+    VOICE_ACTIVITY_DETECTION: 'Voice Activity Detection',
   },
 });
 
