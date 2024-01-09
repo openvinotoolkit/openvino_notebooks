@@ -125,17 +125,18 @@ def partially_upcast_nodes_to_fp32(orig_model: Model, example_input: Union[List,
             node_names_and_snrs.append((node_info.node.get_friendly_name(), snr))
 
     if upcast_ratio != 0.0 and upcast_ratio != 1.0:
-        node_names = [it[0] for it in node_names_and_snrs]
-        node_snrs = np.array([it[1] for it in node_names_and_snrs], dtype=np.float32)
-        snr_quantile = np.quantile(node_snrs, upcast_ratio)
-        node_to_upcast_names = [node_names[i] for i in np.where(node_snrs <= snr_quantile + 1e-6)[0]]
+        node_names_and_snrs = sorted(node_names_and_snrs, key=lambda it: it[1])
+        node_names, node_snrs = tuple(zip(*node_names_and_snrs))
+
+        n_nodes = len(node_names)
+        nodes_to_upcast_cnt = int(np.ceil(n_nodes * upcast_ratio))
+        node_to_upcast_names = node_names[:nodes_to_upcast_cnt]
 
         if verbose:
-            print(f"Upcasted {len(node_to_upcast_names)}/{len(node_names)} nodes with SNR less than "
-                  f"{snr_quantile:.2f}.")
-            for node_name, node_snr in node_names_and_snrs:
-                if node_name in node_to_upcast_names:
-                    print(node_name, node_snr)
+            snr_quantile = node_snrs[nodes_to_upcast_cnt - 1]
+            print(f"Upcasted {nodes_to_upcast_cnt}/{n_nodes} nodes with SNR less than {snr_quantile:.2f}.")
+            for node_name, node_snr in node_names_and_snrs[:nodes_to_upcast_cnt]:
+                print(node_name, node_snr)
     elif upcast_ratio == 0.0:
         if verbose:
             print("Skipping algorithm because upcast ratio equals 0.0. Nothing to upcast.")
@@ -200,7 +201,7 @@ def get_const_value_from_ovmodel(node: Union[Constant, Node]) -> np.ndarray:
         # If model is compressed and constant values flow through decompression convert
         const_node = node.input_value(0).get_node()
         assert const_node.get_type_name() == "Constant"
-        assert const_node.get_element_type().is_real()
+        assert const_node.get_element_type().is_real(), const_node.get_element_type()
         return node.input_value(0).get_node().get_data()  # return f16 weight
     else:
         raise Exception(
