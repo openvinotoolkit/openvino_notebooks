@@ -91,7 +91,7 @@ const tagsValidator = (tags) => {
 const validateCategoriesTags = (categories) => {
   const validTags = Object.values(CATEGORIES);
   const invalidTags = categories.filter((tag) => !validTags.includes(tag));
-  if (!invalidTags.length) {
+  if (categories.length && !invalidTags.length) {
     return null;
   }
   return toErrorMessage({
