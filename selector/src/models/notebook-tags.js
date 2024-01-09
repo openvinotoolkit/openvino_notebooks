@@ -33,13 +33,16 @@ export const TASKS = /** @type {const} */ ({
   NLP: {
     TEXT_CLASSIFICATION: 'Text Classification',
     TEXT_GENERATION: 'Text Generation',
+    TOKEN_CLASSIFICATION: 'Token Classification',
     TRANSLATION: 'Translation',
+    TABLE_QUESTION_ANSWERING: 'Table Question Answering',
     SUMMARIZATION: 'Summarization',
     CONVERSATIONAL: 'Conversational',
     ERROR_CORRECTION: 'Error Correction',
     QUESTION_ANSWERING: 'Question Answering',
   },
   AUDIO: {
+    AUDIO_TO_AUDIO: 'Audio-to-Audio',
     TEXT_TO_SPEECH: 'Text-to-Speech',
     SPEECH_TO_TEXT: 'Speech-to-Text',
     SPEECH_RECOGNITION: 'Speech Recognition',
