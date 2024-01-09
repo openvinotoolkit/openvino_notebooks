@@ -22,7 +22,7 @@ export function toMarkdown(metadata, hasError) {
   | - | - |
   | Valid | ${hasError ? '❌' : '✅'} |
   | Title | ${title} |
-  | Image | <img src="${imageUrl}"  height="100"> |
+  | Image | ${imageUrl ? `<img src="${imageUrl}" height="100">` : 'N/A'} |
   | Created Date | ${createdDate} |
   | Modified Date | ${modifiedDate} |
   | Links | ${markdownLinks.join(', ')} |
