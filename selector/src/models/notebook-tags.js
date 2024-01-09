@@ -12,9 +12,9 @@ export const CATEGORIES = /** @type {const} */ ({
 export const TASKS = /** @type {const} */ ({
   MULTIMODAL: {
     TEXT_TO_IMAGE: 'Text-to-Image',
-    IMAGE_TO_TEXT: 'Image-to-Text',
+    IMAGE_TO_TEXT: 'Image-to-Text', // TODO Consider adding OCR task
     TEXT_TO_VIDEO: 'Text-to-Video',
-    VIDEO_TO_TEXT: 'Video-to-Text',
+    VIDEO_TO_TEXT: 'Video-to-Text', // TODO Consider adding OCR task
     TEXT_TO_AUDIO: 'Text-to-Audio',
     AUDIO_TO_TEXT: 'Audio-to-Text',
     VISUAL_QUESTION_ANSWERING: 'Visual Question Answering',
@@ -22,7 +22,6 @@ export const TASKS = /** @type {const} */ ({
   CV: {
     IMAGE_CLASSIFICATION: 'Image Classification',
     IMAGE_SEGMENTATION: 'Image Segmentation',
-    IMAGE_GENERATION: 'Image Generation',
     IMAGE_INPAINTING: 'Image Inpainting',
     IMAGE_TO_IMAGE: 'Image-to-Image',
     OBJECT_DETECTION: 'Object Detection',
@@ -44,8 +43,6 @@ export const TASKS = /** @type {const} */ ({
   },
   AUDIO: {
     AUDIO_TO_AUDIO: 'Audio-to-Audio',
-    TEXT_TO_SPEECH: 'Text-to-Speech',
-    SPEECH_TO_TEXT: 'Speech-to-Text',
     SPEECH_RECOGNITION: 'Speech Recognition',
     AUDIO_COMPRESSION: 'Audio Compression',
     VOICE_CONVERSION: 'Voice Conversion',
