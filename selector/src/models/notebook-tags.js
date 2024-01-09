@@ -12,9 +12,9 @@ export const CATEGORIES = /** @type {const} */ ({
 export const TASKS = /** @type {const} */ ({
   MULTIMODAL: {
     TEXT_TO_IMAGE: 'Text-to-Image',
-    IMAGE_TO_TEXT: 'Image-to-Text', // TODO Consider adding OCR task
+    IMAGE_TO_TEXT: 'Image-to-Text',
     TEXT_TO_VIDEO: 'Text-to-Video',
-    VIDEO_TO_TEXT: 'Video-to-Text', // TODO Consider adding OCR task
+    VIDEO_TO_TEXT: 'Video-to-Text',
     TEXT_TO_AUDIO: 'Text-to-Audio',
     AUDIO_TO_TEXT: 'Audio-to-Text',
     VISUAL_QUESTION_ANSWERING: 'Visual Question Answering',
