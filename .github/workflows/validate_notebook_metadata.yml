@@ -50,7 +50,7 @@ jobs:
             const { NotebookMetadataHandler } = await import('${{ github.workspace }}/selector/src/notebook-metadata/notebook-metadata-handler.js');
             const changedNotebooks = JSON.parse(process.env.CHANGED_NOTEBOOKS);
             const [error, metadataMarkdowns] = NotebookMetadataHandler.validateNotebooks(changedNotebooks);
-            core.summary.addHeading('Modified Notebooks', '2');
+            core.summary.addHeading(`Modified Notebooks (${metadataMarkdowns.length})`, '2');
             core.summary.addRaw(metadataMarkdowns.join('\n\n'));
             core.summary.write();
             if (error) {
