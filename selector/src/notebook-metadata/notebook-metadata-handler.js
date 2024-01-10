@@ -20,6 +20,12 @@ export class NotebookMetadataHandler {
     this._metadata = new NotebookMetadataCollector(this._notebookFilePath).getMetadata();
   }
 
+  /** @private @const */
+  static _skippedNotebooks = [
+    '110-ct-segmentation-quantize/data-preparation-ct-scan.ipynb',
+    '110-ct-segmentation-quantize/pytorch-monai-training.ipynb',
+  ];
+
   /**
    * @returns {string | null} Validation error
    */
@@ -46,7 +52,7 @@ export class NotebookMetadataHandler {
   static getNotebooksPaths() {
     // TODO Consider removing external glob dependency
     return globSync('**/*.ipynb', {
-      ignore: ['**/.ipynb_checkpoints/*', '**/notebook_utils.ipynb'],
+      ignore: ['**/.ipynb_checkpoints/*', '**/notebook_utils.ipynb', ...this._skippedNotebooks],
       cwd: NOTEBOOKS_DIRECTORY_PATH,
     });
   }
@@ -59,6 +65,9 @@ export class NotebookMetadataHandler {
     const errors = [];
     const metadataMarkdowns = [];
     for (const notebookPath of notebooksPaths) {
+      if (NotebookMetadataHandler._skippedNotebooks.includes(notebookPath)) {
+        continue;
+      }
       const notebookMetadataHandler = new NotebookMetadataHandler(notebookPath);
       const error = notebookMetadataHandler.validateMetadata();
       if (error) {
