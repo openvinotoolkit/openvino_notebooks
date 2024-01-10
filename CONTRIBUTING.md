@@ -236,7 +236,7 @@ Here are some guidelines to follow:
 
 ### Notebooks Metadata
 
-Each notebook file has metadata that includes additional information about the notebook. Some metadata fields (e.g. title, creation date, links to GitHub, Colab, Binder etc.) are generated automatically from notebook content or related `README.md` file. However other fields (e.g. tags, image URL) should be defined by notebook contributor. As each notebook file has JSON format, manually defined metadata fields are stored in corresponding `.ipynb` file in global notebook metadata object (`metadata.openvino_notebooks` field).
+Each notebook file has metadata that includes additional information about the notebook. Some metadata fields (e.g. title, creation date, links to GitHub, Colab, Binder etc.) are generated automatically from notebook content or related `README.md` file. However other fields (e.g. tags, image URL) should be defined by notebook contributor. As each notebook file has JSON format, manually defined metadata fields are stored in corresponding `.ipynb` file in global notebook metadata object (`metadata.openvino_notebooks` field in the end of notebook JSON structure).
 
 Example of such manually defined notebook metadata:
 
