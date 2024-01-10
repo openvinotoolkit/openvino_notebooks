@@ -18,6 +18,7 @@ export const TASKS = /** @type {const} */ ({
     TEXT_TO_AUDIO: 'Text-to-Audio',
     AUDIO_TO_TEXT: 'Audio-to-Text',
     VISUAL_QUESTION_ANSWERING: 'Visual Question Answering',
+    FEATURE_EXTRACTION: 'Feature Extraction',
   },
   CV: {
     IMAGE_CLASSIFICATION: 'Image Classification',
@@ -25,10 +26,12 @@ export const TASKS = /** @type {const} */ ({
     IMAGE_INPAINTING: 'Image Inpainting',
     IMAGE_TO_IMAGE: 'Image-to-Image',
     OBJECT_DETECTION: 'Object Detection',
+    SALIENT_OBJECT_DETECTION: 'Salient Object Detection',
     DEPTH_ESTIMTAION: 'Depth Estimation',
     SUPER_RESOLUTION: 'Super Resolution',
     STYLE_TRANSFER: 'Style Transfer',
     POSE_ESTIMATION: 'Pose Estimation',
+    ZERO_SHOT_IMAGE_CLASSIFICATION: 'Zero-Shot Image Classification',
   },
   NLP: {
     TEXT_CLASSIFICATION: 'Text Classification',
@@ -36,10 +39,10 @@ export const TASKS = /** @type {const} */ ({
     TOKEN_CLASSIFICATION: 'Token Classification',
     TRANSLATION: 'Translation',
     TABLE_QUESTION_ANSWERING: 'Table Question Answering',
-    SUMMARIZATION: 'Summarization',
     CONVERSATIONAL: 'Conversational',
     ERROR_CORRECTION: 'Error Correction',
     QUESTION_ANSWERING: 'Question Answering',
+    PARAPHRASE_IDENTIFICATION: 'Paraphrase Identification',
   },
   AUDIO: {
     AUDIO_TO_AUDIO: 'Audio-to-Audio',
