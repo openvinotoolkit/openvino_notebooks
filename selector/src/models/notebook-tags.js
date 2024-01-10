@@ -43,6 +43,8 @@ export const TASKS = /** @type {const} */ ({
     ERROR_CORRECTION: 'Error Correction',
     QUESTION_ANSWERING: 'Question Answering',
     PARAPHRASE_IDENTIFICATION: 'Paraphrase Identification',
+    KNOWLEDGE_REPRESENTATION: 'Knowledge Representation',
+    NAMED_ENTITY_RECOGNITION: 'Named Entity Recognition',
   },
   AUDIO: {
     AUDIO_TO_AUDIO: 'Audio-to-Audio',
