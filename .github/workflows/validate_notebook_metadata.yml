@@ -1,4 +1,4 @@
-name: Validate Notebook Metadata Workflow
+name: Validate Notebooks Metadata
 
 on:
   pull_request:
@@ -11,9 +11,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate_notebook_metadata:
+  validate_notebooks_metadata:
     runs-on: ubuntu-20.04
-    name: Validate notebook metadata
+    name: Validate notebooks metadata
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
