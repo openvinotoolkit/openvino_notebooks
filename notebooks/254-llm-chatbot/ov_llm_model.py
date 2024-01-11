@@ -101,7 +101,7 @@ class OVMPTModel(OVModelForCausalLM):
             inputs["attention_mask"] = np.array(attention_mask)
 
         # Run inference
-        self.request.start_async(inputs, shared_memory=True)
+        self.request.start_async(inputs, share_inputs=True)
         self.request.wait()
 
         logits = torch.from_numpy(self.request.get_tensor("logits").data).to(
@@ -248,7 +248,7 @@ class OVQWENModel(OVModelForCausalLM):
         if "token_type_ids" in self.input_names and attention_mask is not None:
             inputs["token_type_ids"] = np.array(attention_mask)
         # Run inference
-        self.request.start_async(inputs, shared_memory=True)
+        self.request.start_async(inputs, share_inputs=True)
         self.request.wait()
 
         logits = torch.from_numpy(self.request.get_tensor("logits").data).to(
@@ -397,7 +397,7 @@ class OVCHATGLMModel(OVModelForCausalLM):
         if "position_ids" in self.input_names and attention_mask is not None:
             inputs["position_ids"] = np.array(position_ids)
         # Run inference
-        self.request.start_async(inputs, shared_memory=True)
+        self.request.start_async(inputs, share_inputs=True)
         self.request.wait()
 
         logits = torch.from_numpy(self.request.get_tensor("logits").data).to(
