@@ -2,7 +2,7 @@ import { INotebookMetadata } from './notebook-metadata';
 
 class NotebooksService {
   static async loadNotebooks(): Promise<NotebooksService> {
-    const notebooksMap = (await import('../../public/notebooks-metadata-map.json')).default as Record<
+    const notebooksMap = (await fetch('/notebooks-metadata-map.json').then((response) => response.json())) as Record<
       string,
       INotebookMetadata
     >;
