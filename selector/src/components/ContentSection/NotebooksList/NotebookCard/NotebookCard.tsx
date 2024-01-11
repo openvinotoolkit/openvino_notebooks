@@ -14,8 +14,7 @@ const sparkClassNames = {
   card: 'spark-card spark-card-horizontal spark-card-border-normal',
   cardImage: 'spark-card-horizontal-bg-image spark-card-bg-fit-cover',
   cardTitle: 'spark-heading spark-font-100 spark-card-horizontal-title',
-  fontCardDescription: 'spark-font-75',
-  fontImagePlaceholder: 'spark-font-300',
+  fontImagePlaceholder: 'spark-font-200',
   cardHorizontalLine: 'spark-card-horizontal-line',
 };
 
@@ -36,9 +35,6 @@ export const NotebookCard = ({ item }: NotebookCardProps): JSX.Element => {
         </div>
         <div className="card-content">
           <h6 className={sparkClassNames.cardTitle}>{item.title}</h6>
-          <div className="card-description">
-            <span className={sparkClassNames.fontCardDescription}>{item.description}</span>
-          </div>
           <div className="card-footer">
             <div className={sparkClassNames.cardHorizontalLine}></div>
             <div className="card-actions">
@@ -46,6 +42,7 @@ export const NotebookCard = ({ item }: NotebookCardProps): JSX.Element => {
                 text="View on GitHub"
                 variant="action"
                 icon={GitHubIcon}
+                size="m"
                 onClick={() => openLink(item.links.github)}
               ></Button>
               {item.links.colab && (
@@ -53,6 +50,7 @@ export const NotebookCard = ({ item }: NotebookCardProps): JSX.Element => {
                   text="Open in Colab"
                   variant="primary"
                   icon={ColabIcon}
+                  size="m"
                   onClick={() => openLink(item.links.colab!)}
                 ></Button>
               )}
@@ -61,6 +59,7 @@ export const NotebookCard = ({ item }: NotebookCardProps): JSX.Element => {
                   text="Launch in Binder"
                   variant="primary"
                   icon={BinderIcon}
+                  size="m"
                   onClick={() => openLink(item.links.binder!)}
                 ></Button>
               )}
