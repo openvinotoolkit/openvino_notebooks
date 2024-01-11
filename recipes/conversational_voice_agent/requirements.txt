@@ -1,6 +1,5 @@
-# todo update all packages to stable versions (not available in Dec 2023)
 openvino==2023.2.0
-git+https://github.com/huggingface/optimum-intel.git@b05617797ce920959c0326ea942589fe65f3e9f3
+optimum-intel==1.12.3
 optimum==1.14.1
 nncf==2.7.0
 intel-extension-for-pytorch==2.1.100
