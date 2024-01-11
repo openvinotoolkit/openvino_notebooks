@@ -1,5 +1,7 @@
 .filters-panel {
-  width: min-content;
+  min-width: min-content;
+  width: 100%;
+  max-width: 25%;
   background-color: var(--spark-color-theme-light-gray75);
   border-right: 1px solid var(--spark-color-carbon-tint2);
 

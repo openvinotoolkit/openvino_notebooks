@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { FilterSection } from '@/components/shared/FilterSection/FilterSection';
 import { Search } from '@/components/shared/Search/Search';
 import { ITabItem, Tabs } from '@/components/shared/Tabs/Tabs';
+import { CATEGORIES, TASKS_VALUES } from '@/models/notebook-tags';
 
 // TODO Consider moving to models
 interface IFilterGroup<T extends string = string> {
@@ -36,10 +37,9 @@ const filterGroups: IFilterGroup<FilterGroupKey>[] = [
   {
     title: 'Categories',
     group: 'categories',
-    tags: ['AI Trends', 'First Steps', 'Convert & Optimize', 'Model Demos', 'Model Training', 'Live Demos'],
+    tags: Object.values(CATEGORIES),
   },
-  { title: 'Tasks', group: 'tasks', tags: ['Multimodal', 'Computer Vision', 'Natural Language Processing', 'Audio'] },
-  { title: 'Models', group: 'models', tags: ['ControlNet', 'MobileNet'] },
+  { title: 'Tasks', group: 'tasks', tags: TASKS_VALUES },
   { title: 'Libraries', group: 'libraries', tags: ['Tensorflow', 'PyTorch'] },
   { title: 'Other', group: 'other', tags: ['INT8'] },
 ];
