@@ -3,15 +3,20 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import svgr from 'vite-plugin-svgr';
 
+import { generateNotebooksMapFilePlugin } from './src/notebook-metadata/generate-notebooks-map.js';
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), svgr()],
+  plugins: [react(), svgr(), generateNotebooksMapFilePlugin()],
+  build: {
+    target: 'esnext', // TODO Consider removing esnext build target
+  },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
       '@assets': resolve(__dirname, './src/assets'),
       '@components': resolve(__dirname, './src/components'),
-      '@spark-design/css': resolve(__dirname, './src/@spark-design/css'),
+      '@spark-design': resolve(__dirname, './src/@spark-design'),
     },
   },
 });
