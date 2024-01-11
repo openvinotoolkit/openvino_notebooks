@@ -2,13 +2,15 @@ import './ContentSection.scss';
 
 import { useState } from 'react';
 
-import { notebooks } from '@/models/notebooks.mock';
+import { notebooksService } from '@/models/notebooks.service';
 
 import { ContentSectionHeader } from './ContentSectionHeader/ContentSectionHeader';
 import { NotebooksList } from './NotebooksList/NotebooksList';
 
 export const ContentSection = (): JSX.Element => {
   const [searchValue, setSearchValue] = useState('');
+
+  const notebooks = notebooksService.notebooks;
 
   const filteredNotebooks = searchValue
     ? notebooks.filter(({ title }) => title.toLowerCase().includes(searchValue.toLowerCase()))

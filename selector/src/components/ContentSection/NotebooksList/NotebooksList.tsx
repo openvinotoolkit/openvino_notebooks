@@ -1,6 +1,6 @@
 import './NotebooksList.scss';
 
-import { INotebookMetadata } from '@/models/notebook';
+import { INotebookMetadata } from '@/models/notebook-metadata';
 
 import { NotebookCard } from './NotebookCard/NotebookCard';
 

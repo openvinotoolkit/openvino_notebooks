@@ -6,7 +6,7 @@ import GitHubIcon from '@assets/images/github.svg?react';
 import OpenvinoLogo from '@assets/images/openvino-logo-colored.svg?react';
 
 import { Button } from '@/components/shared/Button/Button';
-import { INotebookMetadata } from '@/models/notebook';
+import { INotebookMetadata } from '@/models/notebook-metadata';
 
 const openLink = (url: string) => window.open(url, '_blank');
 
