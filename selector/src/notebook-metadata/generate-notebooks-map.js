@@ -51,7 +51,7 @@ export const generateNotebooksMapFilePlugin = () => {
       const notebooksMapFileExists = existsSync(join(distPath, NOTEBOOKS_MAP_FILE_NAME));
       if (config.command === 'serve' && notebooksMapFileExists) {
         console.info(
-          `"${NOTEBOOKS_MAP_FILE_NAME}" file already exists and is server from "${distPath}" dist directory.`
+          `"${NOTEBOOKS_MAP_FILE_NAME}" file already exists and is served from "${distPath}" dist directory.`
         );
         return;
       }
