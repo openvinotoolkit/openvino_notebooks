@@ -1,0 +1,62 @@
+/**
+ * Copyright (C) 2023 Intel Corporation
+ * SPDX-License-Identifier: MIT
+*/
+
+.bg-pure-white {
+    background-color: #ffffff;
+    border-block-end: 1px solid #e2e2e4;
+}
+
+.bg-light-theam {
+    background-color: #f4f5f5;
+    border-block-end: 1px solid #e2e2e4;
+}
+
+.bg-dark-theam {
+    background-color: #313236 !important;
+}
+
+.bg-carbon {
+    background-color: #262626;
+}
+
+.bg-geode {
+    background-color: #653171;
+}
+
+.bg-cobalt {
+    background-color: #000864;
+}
+
+.bg-classic-blue {
+    background-color: #0054ae;
+}
+
+.bg-classic-blue-shade-1 {
+    background-color: #00377c;
+}
+
+.bg-energy-blue {
+    background-color: #00c7fd;
+}
+
+.bg-blue-steet {
+    background-color: #183544;
+}
+
+.bg-moss {
+    background-color: #515a3d;
+}
+
+.bg-dalsy {
+    background-color: #c98f00;
+}
+
+.bg-rust {
+    background-color: #b24501;
+}
+
+.bg-coral {
+    background-color: #c81326;
+}

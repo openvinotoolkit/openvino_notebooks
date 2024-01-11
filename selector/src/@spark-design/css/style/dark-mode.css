@@ -1,0 +1,36 @@
+/**
+ * Copyright (C) 2023 Intel Corporation
+ * SPDX-License-Identifier: MIT
+*/
+
+/* light mode theme */
+
+:root {
+    --global-bg-color: var(--spark-color-theme-light-gray50, white);
+    --global-bg-color-faint: var(--spark-color-theme-light-gray200, #eee);
+    --global-theme-toggle-content: '🌞 light';
+    --global-body-color: var(--spark-color-theme-light-gray900, #222);
+    --global-body-link-color: var(--spark-color-classic-blue, blue);
+    --global-disabled-color: var(--spark-color-theme-light-gray500, #747474);
+    --global-success-color: var(--spark-color-moss-shade1, green);
+    --global-error-color: var(--spark-color-coral-shade1, red);
+    /* TODO: `0 55 124` is just the RGB values for --spark-color-classic-blue */
+    /*       Could this be a packaged token instead? */
+    --global-sb-color-rgb-focus-primary: 0 55 124;
+}
+
+/* Dark Mode theme */
+
+html[data-theme='dark'] {
+    --global-bg-color: var(--spark-color-theme-dark-gray100, #333);
+    --global-bg-color-faint: var(--spark-color-theme-dark-gray300, #444);
+    --global-theme-toggle-content: '🌝 dark';
+    --global-body-color: var(--spark-color-theme-dark-gray900, white);
+    --global-body-link-color: var(--spark-color-energy-blue, lightblue);
+    --global-disabled-color: var(--spark-color-theme-dark-gray500, #747474);
+    --global-success-color: var(--spark-color-moss-tint1, lightgreen);
+    --global-error-color: var(--spark-color-coral-tint1, red);
+    /* TODO: `0 199 253` is just the RGB values for --spark-color-energy-blue */
+    /*       Could this be a packaged token instead? */
+    --global-sb-color-rgb-focus-primary: 0 199 253;
+}

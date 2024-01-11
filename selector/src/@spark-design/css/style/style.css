@@ -1,0 +1,91 @@
+/**
+ * Copyright (C) 2023 Intel Corporation
+ * SPDX-License-Identifier: MIT
+*/
+
+@import 'dark-mode.css';
+@import 'colors.css';
+@import 'sb-components.css';
+body {
+    min-inline-size: 430px;
+    margin: 0;
+    color: var(--global-body-color);
+    background-color: var(--global-bg-color);
+    font-size: 14px;
+    font-family: 'IntelOneText', 'Segoe UI', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+    font-variant: tabular-nums;
+    line-height: 1.5715;
+    -webkit-font-feature-settings: 'tnum';
+    font-feature-settings: 'tnum', 'tnum';
+}
+
+.theme-toggle {
+    position: absolute;
+    inset-block-start: 55px;
+    inset-inline-end: 10px;
+    background: #adceec;
+    color: black;
+    padding: 0px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+.theme-toggle::after {
+    content: var(--global-theme-toggle-content);
+}
+
+li {
+    display: list-item;
+    color: var(--global-body-color);
+}
+
+a,
+area,
+label,
+select,
+summary,
+textarea {
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+}
+
+a {
+    text-decoration: underline;
+    background-color: transparent;
+    cursor: pointer;
+    -webkit-transition: color 0.3s;
+    transition: color 0.3s;
+    -webkit-text-decoration-skip: objects;
+    color: var(--global-body-link-color);
+}
+
+abbr {
+    text-decoration: none;
+}
+
+.mr-auto,
+.mx-auto {
+    margin-inline-end: auto !important;
+}
+
+*,
+*::before,
+*::after {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+*,
+::after,
+::before {
+    box-sizing: border-box;
+}
+
+::selection {
+    color: #fff;
+    background: var(--global-body-link-color);
+}
