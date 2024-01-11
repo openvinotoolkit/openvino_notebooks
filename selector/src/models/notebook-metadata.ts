@@ -4,7 +4,6 @@ type ObjectValues<T> = T[keyof T];
 
 export interface INotebookMetadata {
   title: string;
-  description?: string;
   path: string;
   imageUrl: string | null;
   createdDate: string;

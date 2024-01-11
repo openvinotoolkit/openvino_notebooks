@@ -120,15 +120,6 @@ export class NotebookMetadataCollector {
 
   /**
    * @private
-   * @returns {string}
-   */
-  _getNotebookDescription() {
-    const description = this._getNotebookFileMetadata('description');
-    return description || '';
-  }
-
-  /**
-   * @private
    * @returns {string | null}
    */
   _getImageUrl() {
@@ -224,7 +215,6 @@ export class NotebookMetadataCollector {
   getMetadata() {
     return {
       title: this._getNotebookTitle(),
-      description: this._getNotebookDescription(),
       path: this._notebookFilePath,
       imageUrl: this._getImageUrl(),
       createdDate: this._getNotebookCreatedDate(),
