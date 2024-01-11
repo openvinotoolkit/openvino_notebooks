@@ -20,6 +20,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
+    "allowJs": true,
+
     /* Path aliases */
     "baseUrl": "./",
     "paths": {
