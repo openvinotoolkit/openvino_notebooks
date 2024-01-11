@@ -26,6 +26,10 @@ export class NotebookMetadataHandler {
     '110-ct-segmentation-quantize/pytorch-monai-training.ipynb',
   ];
 
+  get metadata() {
+    return this._metadata;
+  }
+
   /**
    * @returns {string | null} Validation error
    */
