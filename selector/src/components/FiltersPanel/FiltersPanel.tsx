@@ -1,11 +1,13 @@
 import './FiltersPanel.scss';
 
-import { useState } from 'react';
+import { useContext } from 'react';
 
 import { FilterSection } from '@/components/shared/FilterSection/FilterSection';
 import { Search } from '@/components/shared/Search/Search';
 import { ITabItem, Tabs } from '@/components/shared/Tabs/Tabs';
+import { INotebookMetadata } from '@/models/notebook-metadata';
 import { CATEGORIES, TASKS_VALUES } from '@/models/notebook-tags';
+import { NotebooksContext } from '@/models/notebooks-context';
 
 // TODO Consider moving to models
 interface IFilterGroup<T extends string = string> {
@@ -14,24 +16,9 @@ interface IFilterGroup<T extends string = string> {
   tags: string[];
 }
 
-// TODO Consider moving to models
-interface INotebookTags {
-  categories: string[];
-  tasks: string[];
-  models: string[];
-  libraries: string[];
-  other: string[];
-}
+type NotebookTags = INotebookMetadata['tags'];
 
-const initialTags: INotebookTags = {
-  categories: [],
-  tasks: [],
-  models: [],
-  libraries: [],
-  other: [],
-};
-
-type FilterGroupKey = keyof INotebookTags;
+type FilterGroupKey = keyof NotebookTags;
 
 const filterGroups: IFilterGroup<FilterGroupKey>[] = [
   {
@@ -45,7 +32,7 @@ const filterGroups: IFilterGroup<FilterGroupKey>[] = [
 ];
 
 export const FiltersPanel = (): JSX.Element => {
-  const [selectedTags, setSelectedTags] = useState<INotebookTags>(initialTags);
+  const { selectedTags, setSelectedTags } = useContext(NotebooksContext);
 
   const handleTagClick = (tag: string, group: FilterGroupKey): void => {
     if (selectedTags[group].includes(tag)) {
