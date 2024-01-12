@@ -1,8 +1,7 @@
 import argparse
 from pathlib import Path
 
-import nncf
-from optimum.intel import OVModelForCausalLM
+from optimum.intel import OVModelForCausalLM, OVConfig, OVQuantizer
 from transformers import AutoTokenizer
 
 MODEL_MAPPING = {
@@ -33,17 +32,20 @@ def convert_chat_model(model_type: str, quantize_weights: str, model_dir: Path) 
 
     if quantize_weights:
         # select quantization mode
-        mode = nncf.CompressWeightsMode.INT4_SYM if quantize_weights == "int4" else nncf.CompressWeightsMode.INT8
-        # quantize weights
-        model.model = nncf.compress_weights(model.model, mode=mode)
+        mode = {"type": "int4_sym_g128", "ratio": 0.8, "algorithm": "quantization"} if quantize_weights == "int4" else {"type": "int8", "algorithm": "quantization"}
+        config = OVConfig(mode)
 
         suffix = "-INT4" if quantize_weights == "int4" else "-INT8"
         output_dir = output_dir.with_name(output_dir.name + suffix)
+
+        # create a quantizer
+        quantizer = OVQuantizer.from_pretrained(model, task="seq2seq-lm")
+        # quantize weights and save the model to the output dir
+        quantizer.quantize(save_directory=output_dir, weights_only=True, quantization_config=config)
     else:
         output_dir = output_dir.with_name(output_dir.name + "-FP16")
-
-    # save converted model
-    model.save_pretrained(output_dir)
+        # save converted model
+        model.save_pretrained(output_dir)
 
     # export also tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name)
