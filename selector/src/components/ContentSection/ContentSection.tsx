@@ -10,7 +10,7 @@ import { ContentSectionHeader } from './ContentSectionHeader/ContentSectionHeade
 import { NotebooksList } from './NotebooksList/NotebooksList';
 
 export const ContentSection = (): JSX.Element => {
-  const { selectedTags, searchValue, setSearchValue } = useContext(NotebooksContext);
+  const { selectedTags, searchValue } = useContext(NotebooksContext);
 
   const [notebooks, setNotebooks] = useState<INotebookMetadata[]>([]);
 
@@ -23,11 +23,7 @@ export const ContentSection = (): JSX.Element => {
 
   return (
     <section className="flex-col flex-1 content-section">
-      <ContentSectionHeader
-        totalCount={notebooksTotalCount}
-        filteredCount={notebooks.length}
-        onSearch={setSearchValue}
-      ></ContentSectionHeader>
+      <ContentSectionHeader totalCount={notebooksTotalCount} filteredCount={notebooks.length}></ContentSectionHeader>
       <NotebooksList items={notebooks}></NotebooksList>
     </section>
   );

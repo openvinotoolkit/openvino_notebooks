@@ -7,6 +7,7 @@ interface INotebooksSelector {
   setSelectedTags: Dispatch<SetStateAction<INotebooksSelector['selectedTags']>>;
   searchValue: string;
   setSearchValue: Dispatch<SetStateAction<string>>;
+  resetFilters: () => void;
 }
 
 const defaultSelectedTags: INotebookMetadata['tags'] = {
@@ -21,15 +22,22 @@ export const NotebooksContext = createContext<INotebooksSelector>({
   setSelectedTags: () => {},
   searchValue: '',
   setSearchValue: () => {},
+  resetFilters: () => {},
 });
 
 export function useNotebooksSelector(): INotebooksSelector {
   const [selectedTags, setSelectedTags] = useState(defaultSelectedTags);
   const [searchValue, setSearchValue] = useState('');
+  const resetFilters = () => {
+    setSelectedTags(defaultSelectedTags);
+    setSearchValue('');
+  };
+
   return {
     selectedTags,
     setSelectedTags,
     searchValue,
     setSearchValue,
+    resetFilters,
   };
 }

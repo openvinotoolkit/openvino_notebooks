@@ -1,7 +1,10 @@
 import './ContentSectionHeader.scss';
 
+import { useContext } from 'react';
+
 import { Button } from '@/components/shared/Button/Button';
 import { Search } from '@/components/shared/Search/Search';
+import { NotebooksContext } from '@/models/notebooks-context';
 
 const sparkClassNames = {
   fontTitleXs: 'spark-font-200',
@@ -10,15 +13,11 @@ const sparkClassNames = {
 type ContentSectionHeaderProps = {
   totalCount: number;
   filteredCount: number;
-  showResetFilters?: boolean;
-  onSearch?: (value: string) => void;
 };
 
-export const ContentSectionHeader = ({
-  totalCount,
-  filteredCount,
-  onSearch,
-}: ContentSectionHeaderProps): JSX.Element => {
+export const ContentSectionHeader = ({ totalCount, filteredCount }: ContentSectionHeaderProps): JSX.Element => {
+  const { searchValue, setSearchValue, resetFilters } = useContext(NotebooksContext);
+
   const isFiltered = filteredCount !== totalCount;
 
   return (
@@ -30,9 +29,20 @@ export const ContentSectionHeader = ({
         </span>
       </div>
       {isFiltered && (
-        <Button text="Reset Filters" variant="secondary" size="s" className="reset-filters-button"></Button>
+        <Button
+          text="Reset Filters"
+          variant="secondary"
+          size="s"
+          className="reset-filters-button"
+          onClick={resetFilters}
+        ></Button>
       )}
-      <Search placeholder="Filter notebooks by name" className="notebooks-search" onSearch={onSearch}></Search>
+      <Search
+        placeholder="Filter notebooks by name"
+        className="notebooks-search"
+        search={setSearchValue}
+        value={searchValue}
+      ></Search>
     </div>
   );
 };
