@@ -5,7 +5,7 @@ import { join, resolve } from 'path';
 
 import { NotebookMetadataHandler } from './notebook-metadata-handler.js';
 
-const NOTEBOOKS_MAP_FILE_NAME = 'notebooks-metadata-map.json';
+export const NOTEBOOKS_MAP_FILE_NAME = 'notebooks-metadata-map.json';
 
 /**
  *
