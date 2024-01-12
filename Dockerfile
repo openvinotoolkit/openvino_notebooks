@@ -23,11 +23,10 @@ USER root
 
 # Upgrade NodeJS > 12.0
 # Install dos2unix for line end conversion on Windows
-RUN dnf remove -y nodejs && \
-  dnf module -y reset nodejs && \
-  dnf module -y enable nodejs:20 && \
-  dnf install -y nodejs-20.9.0 mesa-libGL dos2unix libsndfile && \
-  dnf -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
+RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
+  yum remove -y nodejs && \
+  yum install -y nodejs-14.18.1 mesa-libGL dos2unix libsndfile --setopt=tsflags=nocrypto --nogpgcheck && \
+  yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
 
 # GPU drivers
 RUN dnf install -y 'dnf-command(config-manager)' && \

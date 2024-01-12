@@ -59,14 +59,14 @@ jobs:
     # This should ideally be a reusable workflow
 
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v2
     - name: Dotenv Action
       id: dotenv
       uses: xom9ikk/dotenv@v1.0.2
       with:
         path: ./.github/workflows
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
     - name: Install required packages
@@ -78,7 +78,7 @@ jobs:
 
     - name: Cache OpenVINO Pip Packages
       id: cachepip
-      uses: actions/cache@v3
+      uses: actions/cache@v2
       with:
         path: |
           pipcache
@@ -87,7 +87,7 @@ jobs:
     # Cache specific files to reduce downloads or prevent network issues
     - name: Cache Files
       id: cachefiles
-      uses: actions/cache@v3
+      uses: actions/cache@v2
       with:
         path: |
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
@@ -118,7 +118,7 @@ jobs:
     # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
     - name: Cache PaddlePaddle cache directories (per OS)
       id: cacheusercache
-      uses: actions/cache@v3
+      uses: actions/cache@v2
       with:
         path: |
           ${{ env.HUB_HOME }}
@@ -174,9 +174,9 @@ jobs:
         python -m pip freeze
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v2
       with:
-        name: pip-freeze-${{matrix.os}}-${{ matrix.python }}
+        name: pip-freeze
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
 
     #### End installation/preparation
@@ -185,7 +185,7 @@ jobs:
       shell: bash
       run: .ci/convert_notebooks.sh
     - name: Save reStructuredText files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v2
       with:
         name: rst_files
         path: rst_files

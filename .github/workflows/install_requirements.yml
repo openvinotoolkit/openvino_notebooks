@@ -16,22 +16,22 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04, ubuntu-22.04, windows-2019, windows-2022, macos-11, macos-12]
-        python: ["3.8", "3.9", "3.10", "3.11"]
+        python: ["3.7", "3.8", "3.9", "3.10"]
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v2
     - name: Dotenv Action
       id: dotenv
       uses: xom9ikk/dotenv@v1.0.2
       with:
         path: ./.github/workflows
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
     - name: Cache OpenVINO Pip Packages
       id: cachepip
-      uses: actions/cache@v3
+      uses: actions/cache@v2
       with:
         path: |
           pipcache
@@ -60,9 +60,9 @@ jobs:
         python -m pip freeze
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v2
       with:
-        name: pip-freeze-${{matrix.os}}-${{ matrix.python }}
+        name: pip-freeze
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Check install
       run: |
