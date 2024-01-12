@@ -2,7 +2,6 @@ import './Search.scss';
 
 import CrossIcon from '@assets/images/cross.svg?react';
 import SearchIcon from '@assets/images/search.svg?react';
-import { useEffect, useState } from 'react';
 
 const sparkClassNames = {
   textFieldContainer: 'spark-text-field-container',
@@ -19,14 +18,11 @@ const sparkClassNames = {
 type SearchProps = {
   placeholder?: string;
   className?: string;
-  onSearch?: (value: string) => void;
+  value?: string;
+  search?: (value: string) => void;
 };
 
-export const Search = ({ placeholder, className = '', onSearch }: SearchProps): JSX.Element => {
-  const [searchValue, setSearchValue] = useState('');
-
-  useEffect(() => onSearch?.(searchValue), [onSearch, searchValue]);
-
+export const Search = ({ placeholder, className = '', value = '', search }: SearchProps): JSX.Element => {
   return (
     <div className={`${sparkClassNames.textFieldContainer} ${className}`}>
       <div className={sparkClassNames.fieldTextWrapper}>
@@ -39,12 +35,12 @@ export const Search = ({ placeholder, className = '', onSearch }: SearchProps): 
             className={sparkClassNames.input}
             placeholder={placeholder}
             inputMode="text"
-            value={searchValue}
-            onChange={(event) => setSearchValue(event.target.value)}
+            value={value}
+            onChange={(event) => search?.(event.target.value)}
           />
           <div className={sparkClassNames.textFieldEndSlot}>
-            {searchValue && (
-              <button className={sparkClassNames.iconButton} onClick={() => setSearchValue('')}>
+            {value && (
+              <button className={sparkClassNames.iconButton} onClick={() => search?.('')}>
                 <CrossIcon className={sparkClassNames.icon}></CrossIcon>
               </button>
             )}
