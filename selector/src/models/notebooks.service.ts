@@ -1,5 +1,3 @@
-import { NOTEBOOKS_MAP_FILE_NAME } from '@/notebook-metadata/generate-notebooks-map.js';
-
 import { INotebookMetadata } from './notebook-metadata';
 
 interface INotebooksFilters {
@@ -9,7 +7,7 @@ interface INotebooksFilters {
 
 class NotebooksService {
   static async loadNotebooks(): Promise<NotebooksService> {
-    const notebooksMap = (await fetch(`/${NOTEBOOKS_MAP_FILE_NAME}`).then((response) => response.json())) as Record<
+    const notebooksMap = (await fetch(`/notebooks-metadata-map.json`).then((response) => response.json())) as Record<
       string,
       INotebookMetadata
     >;
