@@ -6,25 +6,57 @@ import { INotebookMetadata } from '@/models/notebook-metadata';
 import { notebooksService } from '@/models/notebooks.service';
 import { NotebooksContext } from '@/models/notebooks-context';
 
+import { Pagination } from '../shared/Pagination/Pagination';
 import { ContentSectionHeader } from './ContentSectionHeader/ContentSectionHeader';
 import { NotebooksList } from './NotebooksList/NotebooksList';
 
+const notebooksPerPageOptions = [5, 10, 25, 50];
+
 export const ContentSection = (): JSX.Element => {
-  const { selectedTags, searchValue, sort } = useContext(NotebooksContext);
+  const { selectedTags, searchValue, sort, page, setPage } = useContext(NotebooksContext);
 
   const [notebooks, setNotebooks] = useState<INotebookMetadata[]>([]);
+  const [filteredNotebooksLength, setFilteredNotebooksLength] = useState<number>(0);
+
+  const [itemsPerPage, setItemsPerPage] = useState<number>(notebooksPerPageOptions[0]);
 
   const { notebooksTotalCount } = notebooksService;
 
+  const totalPages = Math.ceil(filteredNotebooksLength / itemsPerPage);
+
   useEffect(() => {
-    const filteredNotebooks = notebooksService.filterNotebooks({ tags: selectedTags, searchValue, sort });
-    setNotebooks(filteredNotebooks);
-  }, [selectedTags, searchValue, sort]);
+    setPage(1);
+  }, [filteredNotebooksLength, sort, setPage]);
+
+  useEffect(() => {
+    const [paginatedNotebooks, totalSearchedNotebooks] = notebooksService.getNotebooks({
+      tags: selectedTags,
+      searchValue,
+      sort,
+      offset: (page - 1) * itemsPerPage,
+      limit: itemsPerPage,
+    });
+    setNotebooks(paginatedNotebooks);
+    setFilteredNotebooksLength(totalSearchedNotebooks);
+  }, [selectedTags, searchValue, sort, page, itemsPerPage]);
 
   return (
     <section className="flex-col flex-1 content-section">
-      <ContentSectionHeader totalCount={notebooksTotalCount} filteredCount={notebooks.length}></ContentSectionHeader>
+      <ContentSectionHeader
+        totalCount={notebooksTotalCount}
+        filteredCount={filteredNotebooksLength}
+      ></ContentSectionHeader>
       <NotebooksList items={notebooks}></NotebooksList>
+      {notebooks.length && (
+        <Pagination
+          itemsPerPageOptions={notebooksPerPageOptions}
+          itemsPerPage={itemsPerPage}
+          page={page}
+          totalPages={totalPages}
+          onChangePage={setPage}
+          onChangeItemsPerPage={setItemsPerPage}
+        ></Pagination>
+      )}
     </section>
   );
 };

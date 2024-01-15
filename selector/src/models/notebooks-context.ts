@@ -11,6 +11,8 @@ interface INotebooksSelector {
   resetFilters: () => void;
   sort: SortValues;
   setSort: Dispatch<SetStateAction<INotebooksSelector['sort']>>;
+  page: number;
+  setPage: Dispatch<SetStateAction<INotebooksSelector['page']>>;
 }
 
 const defaultSelectedTags: INotebookMetadata['tags'] = {
@@ -28,12 +30,15 @@ export const NotebooksContext = createContext<INotebooksSelector>({
   resetFilters: () => {},
   sort: SORT_OPTIONS.RECENTLY_ADDED,
   setSort: () => {},
+  page: 1,
+  setPage: () => {},
 });
 
 export function useNotebooksSelector(): INotebooksSelector {
   const [selectedTags, setSelectedTags] = useState(defaultSelectedTags);
   const [searchValue, setSearchValue] = useState('');
   const [sort, setSort] = useState<SortValues>(SORT_OPTIONS.DEFAULT);
+  const [page, setPage] = useState<number>(1);
 
   const resetFilters = () => {
     setSelectedTags(defaultSelectedTags);
@@ -48,5 +53,7 @@ export function useNotebooksSelector(): INotebooksSelector {
     resetFilters,
     sort,
     setSort,
+    page,
+    setPage,
   };
 }

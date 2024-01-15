@@ -14,6 +14,8 @@ interface INotebooksFilters {
   tags: INotebookMetadata['tags'];
   searchValue: string;
   sort: SortValues;
+  offset: number;
+  limit: number;
 }
 
 class NotebooksService {
@@ -27,7 +29,7 @@ class NotebooksService {
 
   constructor(private _notebooksMap: Record<string, INotebookMetadata>) {}
 
-  get notebooks(): INotebookMetadata[] {
+  private get _notebooks(): INotebookMetadata[] {
     return Object.values(this._notebooksMap);
   }
 
@@ -35,16 +37,17 @@ class NotebooksService {
     return Object.keys(this._notebooksMap).length;
   }
 
-  filterNotebooks({ tags, searchValue, sort }: INotebooksFilters): INotebookMetadata[] {
-    return this.notebooks
+  getNotebooks({ tags, searchValue, sort, offset, limit }: INotebooksFilters): [INotebookMetadata[], number] {
+    const filteredNotebooks = this._notebooks
       .filter((notebook) => {
         const flatNotebookTags = Object.values(notebook.tags).flat();
         const flatSelectedTags = Object.values(tags).flat();
 
         return flatSelectedTags.every((tag) => flatNotebookTags.includes(tag));
       })
-      .filter(({ title }) => title.toLowerCase().includes(searchValue.toLowerCase()))
-      .sort(this._getCompareFn(sort));
+      .filter(({ title }) => title.toLowerCase().includes(searchValue.toLowerCase()));
+    const sortedPaginatedNotebooks = filteredNotebooks.sort(this._getCompareFn(sort)).slice(offset, offset + limit);
+    return [sortedPaginatedNotebooks, filteredNotebooks.length];
   }
 
   private _getCompareFn(sort: SortValues): Parameters<Array<INotebookMetadata>['sort']>[0] {
