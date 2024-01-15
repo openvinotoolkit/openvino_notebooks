@@ -16,9 +16,7 @@ interface IFilterGroup<T extends string = string> {
   tags: string[];
 }
 
-type NotebookTags = INotebookMetadata['tags'];
-
-type FilterGroupKey = keyof NotebookTags;
+type FilterGroupKey = keyof INotebookMetadata['tags'];
 
 const filterGroups: IFilterGroup<FilterGroupKey>[] = [
   {
@@ -35,15 +33,16 @@ export const FiltersPanel = (): JSX.Element => {
   const { selectedTags, setSelectedTags } = useContext(NotebooksContext);
 
   const handleTagClick = (tag: string, group: FilterGroupKey): void => {
-    if (selectedTags[group].includes(tag)) {
+    const tagsGroup = selectedTags[group] as string[];
+    if (tagsGroup.includes(tag)) {
       setSelectedTags({
         ...selectedTags,
-        [group]: selectedTags[group].filter((v) => v !== tag),
+        [group]: tagsGroup.filter((v) => v !== tag),
       });
     } else {
       setSelectedTags({
         ...selectedTags,
-        [group]: [...selectedTags[group], tag],
+        [group]: [...tagsGroup, tag],
       });
     }
   };
