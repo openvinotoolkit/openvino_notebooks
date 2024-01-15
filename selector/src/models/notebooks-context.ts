@@ -1,13 +1,16 @@
 import { createContext, Dispatch, SetStateAction, useState } from 'react';
 
 import { INotebookMetadata } from './notebook-metadata';
+import { SORT_OPTIONS, SortValues } from './notebooks.service';
 
 interface INotebooksSelector {
   selectedTags: INotebookMetadata['tags'];
   setSelectedTags: Dispatch<SetStateAction<INotebooksSelector['selectedTags']>>;
   searchValue: string;
-  setSearchValue: Dispatch<SetStateAction<string>>;
+  setSearchValue: Dispatch<SetStateAction<INotebooksSelector['searchValue']>>;
   resetFilters: () => void;
+  sort: SortValues;
+  setSort: Dispatch<SetStateAction<INotebooksSelector['sort']>>;
 }
 
 const defaultSelectedTags: INotebookMetadata['tags'] = {
@@ -23,11 +26,15 @@ export const NotebooksContext = createContext<INotebooksSelector>({
   searchValue: '',
   setSearchValue: () => {},
   resetFilters: () => {},
+  sort: SORT_OPTIONS.RECENTLY_ADDED,
+  setSort: () => {},
 });
 
 export function useNotebooksSelector(): INotebooksSelector {
   const [selectedTags, setSelectedTags] = useState(defaultSelectedTags);
   const [searchValue, setSearchValue] = useState('');
+  const [sort, setSort] = useState<SortValues>(SORT_OPTIONS.DEFAULT);
+
   const resetFilters = () => {
     setSelectedTags(defaultSelectedTags);
     setSearchValue('');
@@ -39,5 +46,7 @@ export function useNotebooksSelector(): INotebooksSelector {
     searchValue,
     setSearchValue,
     resetFilters,
+    sort,
+    setSort,
   };
 }

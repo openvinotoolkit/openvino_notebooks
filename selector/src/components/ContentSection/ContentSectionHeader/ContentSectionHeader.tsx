@@ -3,7 +3,9 @@ import './ContentSectionHeader.scss';
 import { useContext } from 'react';
 
 import { Button } from '@/components/shared/Button/Button';
+import { Dropdown } from '@/components/shared/Dropdown/Dropdown';
 import { Search } from '@/components/shared/Search/Search';
+import { SORT_OPTIONS, SortValues } from '@/models/notebooks.service';
 import { NotebooksContext } from '@/models/notebooks-context';
 
 const sparkClassNames = {
@@ -16,7 +18,7 @@ type ContentSectionHeaderProps = {
 };
 
 export const ContentSectionHeader = ({ totalCount, filteredCount }: ContentSectionHeaderProps): JSX.Element => {
-  const { searchValue, setSearchValue, resetFilters } = useContext(NotebooksContext);
+  const { searchValue, setSearchValue, resetFilters, sort, setSort } = useContext(NotebooksContext);
 
   const isFiltered = filteredCount !== totalCount;
 
@@ -43,6 +45,13 @@ export const ContentSectionHeader = ({ totalCount, filteredCount }: ContentSecti
         search={setSearchValue}
         value={searchValue}
       ></Search>
+      <Dropdown
+        className="notebooks-sort"
+        options={Object.values(SORT_OPTIONS)}
+        selectedOption={sort}
+        selectedPrefix="Sort"
+        onSelect={(option) => setSort(option as SortValues)}
+      ></Dropdown>
     </div>
   );
 };

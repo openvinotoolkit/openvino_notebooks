@@ -10,16 +10,16 @@ import { ContentSectionHeader } from './ContentSectionHeader/ContentSectionHeade
 import { NotebooksList } from './NotebooksList/NotebooksList';
 
 export const ContentSection = (): JSX.Element => {
-  const { selectedTags, searchValue } = useContext(NotebooksContext);
+  const { selectedTags, searchValue, sort } = useContext(NotebooksContext);
 
   const [notebooks, setNotebooks] = useState<INotebookMetadata[]>([]);
 
   const { notebooksTotalCount } = notebooksService;
 
   useEffect(() => {
-    const filteredNotebooks = notebooksService.filterNotebooks({ tags: selectedTags, searchValue });
+    const filteredNotebooks = notebooksService.filterNotebooks({ tags: selectedTags, searchValue, sort });
     setNotebooks(filteredNotebooks);
-  }, [selectedTags, searchValue]);
+  }, [selectedTags, searchValue, sort]);
 
   return (
     <section className="flex-col flex-1 content-section">
