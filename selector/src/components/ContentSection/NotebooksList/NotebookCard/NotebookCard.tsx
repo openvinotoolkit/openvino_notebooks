@@ -8,6 +8,12 @@ import OpenvinoLogo from '@assets/images/openvino-logo-colored.svg?react';
 import { Button } from '@/components/shared/Button/Button';
 import { INotebookMetadata } from '@/models/notebook-metadata';
 
+const htmlToText = (value: string): string => {
+  const div = document.createElement('div');
+  div.innerHTML = value;
+  return div.textContent || value;
+};
+
 const openLink = (url: string) => window.open(url, '_blank');
 
 const sparkClassNames = {
@@ -34,7 +40,7 @@ export const NotebookCard = ({ item }: NotebookCardProps): JSX.Element => {
           {item.imageUrl && <img src={item.imageUrl} className="card-image" />}
         </div>
         <div className="card-content">
-          <h6 className={sparkClassNames.cardTitle}>{item.title}</h6>
+          <h6 className={sparkClassNames.cardTitle}>{htmlToText(item.title)}</h6>
           <div className="card-footer">
             <div className={sparkClassNames.cardHorizontalLine}></div>
             <div className="card-actions">
