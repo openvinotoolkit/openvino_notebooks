@@ -1,6 +1,6 @@
 import './FiltersPanel.scss';
 
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 import { FilterSection } from '@/components/shared/FilterSection/FilterSection';
 import { Search } from '@/components/shared/Search/Search';
@@ -9,7 +9,6 @@ import { INotebookMetadata } from '@/models/notebook-metadata';
 import { CATEGORIES, TASKS, TASKS_VALUES } from '@/models/notebook-tags';
 import { NotebooksContext } from '@/models/notebooks-context';
 
-// TODO Consider moving to models
 interface IFilterGroup<T extends string = string> {
   title: string;
   group: T;
@@ -39,6 +38,11 @@ const taskSectionTitlesMap: Record<keyof typeof TASKS, string> = {
 export const FiltersPanel = (): JSX.Element => {
   const { selectedTags, setSelectedTags } = useContext(NotebooksContext);
 
+  const [tagsSearch, setTagsSearch] = useState('');
+
+  const filterTags = (tags: string[]): string[] =>
+    tags.filter((tag) => tag.toLowerCase().includes(tagsSearch.toLowerCase()));
+
   const handleTagClick = (tag: string, group: FilterGroupKey): void => {
     const tagsGroup = selectedTags[group] as string[];
     if (tagsGroup.includes(tag)) {
@@ -57,13 +61,16 @@ export const FiltersPanel = (): JSX.Element => {
   const tasksFilterSections = Object.entries(TASKS).map(([sectionKey, tagsMap]) => {
     const group = 'tasks';
     const title = taskSectionTitlesMap[sectionKey as keyof typeof TASKS];
-    const tags = Object.values(tagsMap);
+    const filteredTags = filterTags(Object.values(tagsMap));
+    if (!filteredTags.length) {
+      return <></>;
+    }
     return (
       <FilterSection<typeof group>
         key={`${group}-${sectionKey}`}
         title={title}
         group={group}
-        tags={tags}
+        tags={filteredTags}
         selectedTags={selectedTags[group]}
         onTagClick={(tag, group) => handleTagClick(tag, group!)}
       ></FilterSection>
@@ -76,13 +83,19 @@ export const FiltersPanel = (): JSX.Element => {
     badge: selectedTags[group].length,
     content: (
       <>
-        <Search key={`search-${group}`} placeholder={`Filter ${title} by name`} className="filters-search"></Search>
+        <Search
+          key={`search-${group}`}
+          placeholder={`Filter ${title} by name`}
+          className="filters-search"
+          value={tagsSearch}
+          search={setTagsSearch}
+        ></Search>
         {group === 'tasks' ? (
           tasksFilterSections
         ) : (
           <FilterSection<FilterGroupKey>
             group={group}
-            tags={tags}
+            tags={filterTags(tags)}
             selectedTags={selectedTags[group]}
             onTagClick={(tag, group) => handleTagClick(tag, group!)}
           ></FilterSection>
@@ -93,7 +106,7 @@ export const FiltersPanel = (): JSX.Element => {
 
   return (
     <section className="flex-col filters-panel">
-      <Tabs items={tabItems}></Tabs>
+      <Tabs items={tabItems} onTabChange={() => setTagsSearch('')}></Tabs>
     </section>
   );
 };

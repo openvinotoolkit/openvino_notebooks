@@ -43,9 +43,10 @@ export interface ITabItem {
 
 type TabsProps = {
   items: ITabItem[];
+  onTabChange?: () => void;
 };
 
-export const Tabs = ({ items }: TabsProps): JSX.Element => {
+export const Tabs = ({ items, onTabChange }: TabsProps): JSX.Element => {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
   return (
@@ -57,7 +58,10 @@ export const Tabs = ({ items }: TabsProps): JSX.Element => {
             title={title}
             active={i === selectedTabIndex}
             badge={badge ? badge.toString() : undefined}
-            onClick={() => setSelectedTabIndex(i)}
+            onClick={() => {
+              setSelectedTabIndex(i);
+              onTabChange?.();
+            }}
           />
         ))}
       </nav>
