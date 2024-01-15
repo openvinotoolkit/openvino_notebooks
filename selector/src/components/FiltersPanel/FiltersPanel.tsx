@@ -6,7 +6,7 @@ import { FilterSection } from '@/components/shared/FilterSection/FilterSection';
 import { Search } from '@/components/shared/Search/Search';
 import { ITabItem, Tabs } from '@/components/shared/Tabs/Tabs';
 import { INotebookMetadata } from '@/models/notebook-metadata';
-import { CATEGORIES, TASKS_VALUES } from '@/models/notebook-tags';
+import { CATEGORIES, TASKS, TASKS_VALUES } from '@/models/notebook-tags';
 import { NotebooksContext } from '@/models/notebooks-context';
 
 // TODO Consider moving to models
@@ -29,6 +29,13 @@ const filterGroups: IFilterGroup<FilterGroupKey>[] = [
   { title: 'Other', group: 'other', tags: ['INT8'] },
 ];
 
+const taskSectionTitlesMap: Record<keyof typeof TASKS, string> = {
+  MULTIMODAL: 'Multimodal',
+  CV: 'Computer Vision',
+  NLP: 'Natural Language Processing',
+  AUDIO: 'Audio',
+};
+
 export const FiltersPanel = (): JSX.Element => {
   const { selectedTags, setSelectedTags } = useContext(NotebooksContext);
 
@@ -47,6 +54,22 @@ export const FiltersPanel = (): JSX.Element => {
     }
   };
 
+  const tasksFilterSections = Object.entries(TASKS).map(([sectionKey, tagsMap]) => {
+    const group = 'tasks';
+    const title = taskSectionTitlesMap[sectionKey as keyof typeof TASKS];
+    const tags = Object.values(tagsMap);
+    return (
+      <FilterSection<typeof group>
+        key={`${group}-${sectionKey}`}
+        title={title}
+        group={group}
+        tags={tags}
+        selectedTags={selectedTags[group]}
+        onTagClick={(tag, group) => handleTagClick(tag, group!)}
+      ></FilterSection>
+    );
+  });
+
   const tabItems: ITabItem[] = filterGroups.map(({ title, group, tags }) => ({
     key: group,
     title,
@@ -54,12 +77,16 @@ export const FiltersPanel = (): JSX.Element => {
     content: (
       <>
         <Search key={`search-${group}`} placeholder={`Filter ${title} by name`} className="filters-search"></Search>
-        <FilterSection<FilterGroupKey>
-          group={group}
-          tags={tags}
-          selectedTags={selectedTags[group]}
-          onTagClick={(tag, group) => handleTagClick(tag, group!)}
-        ></FilterSection>
+        {group === 'tasks' ? (
+          tasksFilterSections
+        ) : (
+          <FilterSection<FilterGroupKey>
+            group={group}
+            tags={tags}
+            selectedTags={selectedTags[group]}
+            onTagClick={(tag, group) => handleTagClick(tag, group!)}
+          ></FilterSection>
+        )}
       </>
     ),
   }));
