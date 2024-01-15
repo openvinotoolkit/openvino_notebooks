@@ -30,3 +30,9 @@
     fill: var(--spark-button-action-color);
   }
 }
+
+.spark-button-disabled {
+  .button-icon {
+    fill: var(--spark-button-disabled-color);
+  }
+}
