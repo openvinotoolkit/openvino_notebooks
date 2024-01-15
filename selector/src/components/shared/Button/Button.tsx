@@ -9,6 +9,7 @@ const sparkClassNames = {
   disabledButton: 'spark-button-disabled',
   buttonStartSlot: 'spark-button-start-slot',
   buttonContent: 'spark-button-content',
+  buttonOnly: 'spark-button-icon-only',
 };
 
 type ButtonVariant = 'action' | 'primary' | 'secondary' | 'ghost';
@@ -16,7 +17,7 @@ type ButtonVariant = 'action' | 'primary' | 'secondary' | 'ghost';
 type ButtonSize = 'l' | 'm' | 's';
 
 type ButtonProps = {
-  text: string;
+  text?: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
   disabled?: boolean;
@@ -41,6 +42,10 @@ export const Button = ({
 
   if (disabled) {
     classNames.push(sparkClassNames.disabledButton);
+  }
+
+  if (!text && icon) {
+    classNames.push(sparkClassNames.buttonOnly);
   }
 
   if (className) {
