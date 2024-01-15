@@ -115,7 +115,8 @@ export class NotebookMetadataCollector {
     if (!match || !match.groups || !match.groups.title) {
       return '';
     }
-    return match.groups.title;
+    const markdownLinkRegExp = /\[(.+)\]\(.+\)/g;
+    return match.groups.title.replace(markdownLinkRegExp, (value, group) => `${group || value}`).trim();
   }
 
   /**
