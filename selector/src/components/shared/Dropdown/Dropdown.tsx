@@ -41,15 +41,18 @@ const sparkClassNames = {
 } as const;
 
 type DropdownPopoverProps = {
+  // TODO Consider adding selected prop for dropdown item
   items: { text: string; onClick: () => void }[];
+  direction: DropdownProps['direction'];
 };
 
 const DropdownPopover = forwardRef(function DropdownPopover(
-  { items }: DropdownPopoverProps,
+  { items, direction = 'bottom' }: DropdownPopoverProps,
   ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element {
+  const directionClassName = `dropdown-popover-${direction}`;
   return (
-    <div ref={ref} className={sparkClassNames.popover}>
+    <div ref={ref} className={`${sparkClassNames.popover} ${directionClassName}`}>
       <div tabIndex={-1} className={sparkClassNames.dropdownListWrapper} role="group">
         <ul className={sparkClassNames.dropdownList} role="listbox" tabIndex={-1}>
           {items.map(({ text, onClick }, i) => (
@@ -76,6 +79,7 @@ type DropdownProps = {
   placeholder?: string;
   selectedPrefix?: string;
   className?: string;
+  direction?: 'bottom' | 'top';
 };
 
 export const Dropdown = ({
@@ -85,6 +89,7 @@ export const Dropdown = ({
   placeholder = 'Select an Option',
   selectedPrefix = '',
   className = '',
+  direction = 'bottom',
 }: DropdownProps): JSX.Element => {
   const { ref, isOpened, setIsOpened } = useIsOpened();
 
@@ -112,6 +117,7 @@ export const Dropdown = ({
         </button>
         {isOpened && (
           <DropdownPopover
+            direction={direction}
             items={options.map((option) => ({
               text: option,
               onClick: () => {

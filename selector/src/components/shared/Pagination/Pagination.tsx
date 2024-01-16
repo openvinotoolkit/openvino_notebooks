@@ -41,6 +41,7 @@ export const Pagination = ({
         <span className="spark-font-75">Items per page</span>
         <Dropdown
           className="items-per-page-dropdown"
+          direction="top"
           options={itemsPerPageOptions.map((v) => v.toString())}
           selectedOption={itemsPerPage.toString()}
           onSelect={(v) => {
