@@ -26,7 +26,7 @@ export const ContentSection = (): JSX.Element => {
 
   useEffect(() => {
     setPage(1);
-  }, [filteredNotebooksLength, sort, setPage]);
+  }, [selectedTags, searchValue, sort, setPage]);
 
   useEffect(() => {
     const [paginatedNotebooks, totalSearchedNotebooks] = notebooksService.getNotebooks({
@@ -38,6 +38,7 @@ export const ContentSection = (): JSX.Element => {
     });
     setNotebooks(paginatedNotebooks);
     setFilteredNotebooksLength(totalSearchedNotebooks);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [selectedTags, searchValue, sort, page, itemsPerPage]);
 
   return (
@@ -47,6 +48,7 @@ export const ContentSection = (): JSX.Element => {
         filteredCount={filteredNotebooksLength}
       ></ContentSectionHeader>
       <NotebooksList items={notebooks}></NotebooksList>
+      {/* TODO Add component for empty notebooks search */}
       {notebooks.length && (
         <Pagination
           itemsPerPageOptions={notebooksPerPageOptions}
