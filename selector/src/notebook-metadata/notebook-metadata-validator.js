@@ -121,7 +121,6 @@ const validateTasksTags = (tasks) => {
 /** @type {Record<keyof INotebookMetadata, ValidatorFn>} */
 const NOTEBOOK_METADATA_VALIDATORS = {
   title: validate(isNotEmptyString, { key: 'title', type: 'not empty string' }),
-  description: validate(isString, { key: 'description', type: 'a string' }),
   path: validate(isNotEmptyString, { key: 'path', type: 'not empty string' }),
   imageUrl: validate(Nullable(isUrl), { key: 'imageUrl', type: 'a valid URL or null' }),
   createdDate: validate(isDate, { key: 'createdDate', type: 'a valid Date string' }),
