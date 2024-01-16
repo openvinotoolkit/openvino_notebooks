@@ -6,7 +6,7 @@ import { NotebookMetadataCollector, NOTEBOOKS_DIRECTORY_PATH } from './notebook-
 import { toMarkdown } from './notebook-metadata-formatter.js';
 import { NotebookMetadataValidationError, validateNotebookMetadata } from './notebook-metadata-validator.js';
 
-/** @typedef {import('../models/notebook-metadata.ts').INotebookMetadata} INotebookMetadata */
+/** @typedef {import('../shared/notebook-metadata.ts').INotebookMetadata} INotebookMetadata */
 
 export class NotebookMetadataHandler {
   /**

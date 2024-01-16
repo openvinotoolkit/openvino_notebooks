@@ -5,8 +5,8 @@ import { useContext } from 'react';
 import { Button } from '@/components/shared/Button/Button';
 import { Dropdown } from '@/components/shared/Dropdown/Dropdown';
 import { Search } from '@/components/shared/Search/Search';
-import { SORT_OPTIONS, SortValues } from '@/models/notebooks.service';
-import { NotebooksContext } from '@/models/notebooks-context';
+import { SORT_OPTIONS, SortValues } from '@/shared/notebooks.service';
+import { NotebooksContext } from '@/shared/notebooks-context';
 
 const sparkClassNames = {
   fontTitleXs: 'spark-font-200',

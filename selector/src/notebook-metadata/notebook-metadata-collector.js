@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'fs';
 import { basename, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-/** @typedef {import('../models/notebook-metadata.ts').INotebookMetadata} INotebookMetadata */
+/** @typedef {import('../shared/notebook-metadata.ts').INotebookMetadata} INotebookMetadata */
 /**
  * @typedef {{
  *  metadata: { openvino_notebooks?: Partial<INotebookMetadata> };

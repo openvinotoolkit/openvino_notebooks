@@ -4,7 +4,7 @@ import { ContentSection } from '@components/ContentSection/ContentSection';
 import { FiltersPanel } from '@components/FiltersPanel/FiltersPanel';
 import { Header } from '@components/Header/Header';
 
-import { NotebooksContext, useNotebooksSelector } from './models/notebooks-context';
+import { NotebooksContext, useNotebooksSelector } from './shared/notebooks-context';
 
 function App(): JSX.Element {
   const notebooksSelector = useNotebooksSelector();

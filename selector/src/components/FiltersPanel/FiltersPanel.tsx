@@ -5,9 +5,9 @@ import { useContext, useState } from 'react';
 import { FilterSection } from '@/components/shared/FilterSection/FilterSection';
 import { Search } from '@/components/shared/Search/Search';
 import { ITabItem, Tabs } from '@/components/shared/Tabs/Tabs';
-import { INotebookMetadata } from '@/models/notebook-metadata';
-import { CATEGORIES, TASKS, TASKS_VALUES } from '@/models/notebook-tags';
-import { NotebooksContext } from '@/models/notebooks-context';
+import { INotebookMetadata } from '@/shared/notebook-metadata';
+import { CATEGORIES, TASKS, TASKS_VALUES } from '@/shared/notebook-tags';
+import { NotebooksContext } from '@/shared/notebooks-context';
 
 interface IFilterGroup<T extends string = string> {
   title: string;

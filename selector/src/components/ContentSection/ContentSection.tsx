@@ -2,9 +2,9 @@ import './ContentSection.scss';
 
 import { useContext, useEffect, useState } from 'react';
 
-import { INotebookMetadata } from '@/models/notebook-metadata';
-import { notebooksService } from '@/models/notebooks.service';
-import { NotebooksContext } from '@/models/notebooks-context';
+import { INotebookMetadata } from '@/shared/notebook-metadata';
+import { notebooksService } from '@/shared/notebooks.service';
+import { NotebooksContext } from '@/shared/notebooks-context';
 
 import { Pagination } from '../shared/Pagination/Pagination';
 import { ContentSectionHeader } from './ContentSectionHeader/ContentSectionHeader';

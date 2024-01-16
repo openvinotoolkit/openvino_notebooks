@@ -6,7 +6,7 @@ import GitHubIcon from '@assets/images/github.svg?react';
 import OpenvinoLogo from '@assets/images/openvino-logo-colored.svg?react';
 
 import { Button } from '@/components/shared/Button/Button';
-import { INotebookMetadata } from '@/models/notebook-metadata';
+import { INotebookMetadata } from '@/shared/notebook-metadata';
 
 const htmlToText = (value: string): string => {
   const div = document.createElement('div');

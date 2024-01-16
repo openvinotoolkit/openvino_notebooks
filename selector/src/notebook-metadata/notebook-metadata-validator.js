@@ -1,9 +1,9 @@
 // @ts-check
 
-import { CATEGORIES, TASKS_VALUES } from '../models/notebook-tags.js';
+import { CATEGORIES, TASKS_VALUES } from '../shared/notebook-tags.js';
 
 /**
- * @typedef {import('../models/notebook-metadata.ts').INotebookMetadata} INotebookMetadata
+ * @typedef {import('../shared/notebook-metadata.ts').INotebookMetadata} INotebookMetadata
  * @typedef {(v: any) => boolean} isValidFn
  * @typedef {(v: any) => string | null} ValidatorFn
  */

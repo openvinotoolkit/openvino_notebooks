@@ -1,6 +1,6 @@
 // @ts-check
 
-/** @typedef {import('../models/notebook-metadata.ts').INotebookMetadata} INotebookMetadata */
+/** @typedef {import('../shared/notebook-metadata.ts').INotebookMetadata} INotebookMetadata */
 
 /**
  *
