@@ -18,6 +18,8 @@ function generateNotebooksMapFile(path) {
   /** @type {Record<string, INotebookMetadata>} */
   const notebooksMetadataMap = {};
 
+  console.info(`Creating notebooks map file...`);
+
   const notebooksPaths = NotebookMetadataHandler.getNotebooksPaths();
 
   for (const notebookPath of notebooksPaths) {
@@ -33,6 +35,8 @@ function generateNotebooksMapFile(path) {
   writeFileSync(join(path, NOTEBOOKS_MAP_FILE_NAME), JSON.stringify(notebooksMetadataMap, null, 2), {
     flag: 'w',
   });
+
+  console.info(`Notebooks map file is created in "${path}".`);
 }
 
 /**
@@ -51,19 +55,21 @@ export const generateNotebooksMapFilePlugin = () => {
       config = resolvedConfig;
       distPath = resolve(config.root, config.build.outDir);
     },
-    buildStart() {
+    closeBundle() {
+      if (config.command === 'build') {
+        generateNotebooksMapFile(distPath);
+      }
+    },
+    configureServer(devServer) {
       const notebooksMapFileExists = existsSync(join(distPath, NOTEBOOKS_MAP_FILE_NAME));
-      if (config.command === 'serve' && notebooksMapFileExists) {
+      if (notebooksMapFileExists) {
         console.info(
           `"${NOTEBOOKS_MAP_FILE_NAME}" file already exists and is served from "${distPath}" dist directory.`
         );
-        return;
+      } else {
+        generateNotebooksMapFile(distPath);
       }
-      console.info(`Creating notebooks map file...`);
-      generateNotebooksMapFile(distPath);
-      console.info(`Notebooks map file is created in "${distPath}".`);
-    },
-    configureServer(devServer) {
+
       devServer.middlewares.use(`/${NOTEBOOKS_MAP_FILE_NAME}`, (_, res) => {
         const notebooksFileMapContent = readFileSync(join(distPath, NOTEBOOKS_MAP_FILE_NAME), { encoding: 'utf8' });
         res.writeHead(200, { 'Content-Type': 'application/json' });
