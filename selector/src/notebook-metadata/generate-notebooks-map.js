@@ -1,6 +1,6 @@
 // @ts-check
 
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, resolve } from 'path';
 
 import { NotebookMetadataHandler } from './notebook-metadata-handler.js';
@@ -24,6 +24,10 @@ function generateNotebooksMapFile(path) {
     console.info(`Collecting metadata for notebook "${notebookPath}"`);
     const { metadata } = new NotebookMetadataHandler(notebookPath);
     notebooksMetadataMap[notebookPath] = metadata;
+  }
+
+  if (!existsSync(path)) {
+    mkdirSync(path, { recursive: true });
   }
 
   writeFileSync(join(path, NOTEBOOKS_MAP_FILE_NAME), JSON.stringify(notebooksMetadataMap, null, 2), {
