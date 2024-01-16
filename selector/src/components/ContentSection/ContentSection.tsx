@@ -48,8 +48,7 @@ export const ContentSection = (): JSX.Element => {
         filteredCount={filteredNotebooksLength}
       ></ContentSectionHeader>
       <NotebooksList items={notebooks}></NotebooksList>
-      {/* TODO Add component for empty notebooks search */}
-      {notebooks.length && (
+      {Boolean(notebooks.length) && (
         <Pagination
           itemsPerPageOptions={notebooksPerPageOptions}
           itemsPerPage={itemsPerPage}
