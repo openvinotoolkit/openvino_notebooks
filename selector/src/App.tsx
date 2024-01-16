@@ -1,5 +1,3 @@
-import './App.scss';
-
 import { ContentSection } from '@components/ContentSection/ContentSection';
 import { FiltersPanel } from '@components/FiltersPanel/FiltersPanel';
 import { Header } from '@components/Header/Header';
