@@ -81,7 +81,7 @@ export class NotebookMetadataCollector {
    * @param {K} key
    * @returns {Partial<INotebookMetadata>[K] | null}
    */
-  _getNotebookFileMetadata(key) {
+  _getMetadataFromNotebookFile(key) {
     const { metadata } = this._getNotebookJson();
     if (!metadata.openvino_notebooks) {
       console.warn(`No "openvino_notebooks" metadata found in notebook "${this._notebookFilePath}".`);
@@ -124,7 +124,7 @@ export class NotebookMetadataCollector {
    * @returns {string | null}
    */
   _getImageUrl() {
-    const imageUrl = this._getNotebookFileMetadata('imageUrl');
+    const imageUrl = this._getMetadataFromNotebookFile('imageUrl');
     return imageUrl || null;
   }
 
@@ -195,8 +195,7 @@ export class NotebookMetadataCollector {
    * @returns {INotebookMetadata['tags']}
    */
   _getTags() {
-    // TODO Consider merging of tags keys
-    const tags = this._getNotebookFileMetadata('tags');
+    const tags = this._getMetadataFromNotebookFile('tags');
     return (
       tags || {
         categories: [],
