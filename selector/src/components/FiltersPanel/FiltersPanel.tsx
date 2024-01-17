@@ -23,7 +23,7 @@ const filterGroups: IFilterGroup<FilterGroupKey>[] = [
     group: 'categories',
     tags: Object.values(CATEGORIES),
   },
-  { title: 'Tasks', group: 'tasks', tags: TASKS_VALUES },
+  { title: 'AI Tasks', group: 'tasks', tags: TASKS_VALUES },
   { title: 'Libraries', group: 'libraries', tags: ['Tensorflow', 'PyTorch'] },
   { title: 'Other', group: 'other', tags: ['INT8'] },
 ];
