@@ -12,6 +12,7 @@ al
 Alibaba
 ALiBi
 AlpacaEval
+aMUSEd
 analytics
 AnimeGAN
 api
@@ -709,8 +710,10 @@ VM
 Vladlen
 VOC
 Vocoder
+VQ
 VQA
 VQGAN
+VQVAE
 waveform
 waveforms
 Wav
@@ -729,6 +732,7 @@ XCode
 Xeon
 xl
 xvector
+xxl
 XYWH
 Yiqin
 YOLO
