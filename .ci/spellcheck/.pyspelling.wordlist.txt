@@ -185,6 +185,7 @@ fastcomposer
 FastComposer
 FastSAM
 FC
+FFmpeg
 FIL
 finetuned
 finetuning
@@ -329,6 +330,7 @@ LRASPP
 LTS
 LSTM
 Luo
+LVLM
 macOS
 Mahalanobis
 Mapillary
