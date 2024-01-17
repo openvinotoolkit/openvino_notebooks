@@ -6,7 +6,7 @@
 of the [muse](https://arxiv.org/pdf/2301.00704.pdf) architecture. Amused is particularly useful in applications that 
 require a lightweight and fast model such as generating many images quickly at once.
 
-Amused is a vqvae token based transformer that can generate an image in fewer forward passes than many diffusion models.
+Amused is a VQVAE token based transformer that can generate an image in fewer forward passes than many diffusion models.
  In contrast with muse, it uses the smaller text encoder CLIP-L/14 instead of t5-xxl. Due to its small parameter count 
  and few forward pass generation process, amused can generate many images quickly. This benefit is seen particularly at 
  larger batch size
