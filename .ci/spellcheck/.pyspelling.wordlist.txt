@@ -164,6 +164,7 @@ Dollár
 donut
 Downloader
 downloader
+downsample
 downsampled
 DPO
 dpredictor
@@ -306,6 +307,7 @@ LCMs
 LCMScheduler
 LDM
 LDMs
+LDP
 learnable
 LeViT
 LibriSpeech
@@ -335,6 +337,7 @@ Mapillary
 Markovian
 Martyniuk
 maskrcnn
+mathbf
 MediaPipe
 mel
 Mels
@@ -350,10 +353,14 @@ mistralai
 MLS
 mms
 MMS
+MMVLM
 MLP
+MobileLLaMA
 mobilenet
 MobileNet
 MobileNetV
+mobilevlm
+MobileVLM
 modelled
 Modelscope
 Mody

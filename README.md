@@ -50,6 +50,7 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [Stable-Zephyr chatbot](notebooks/273-stable-zephyr-3b-chatbot/)<br> | Use Stable-Zephyr as chatbot assistant with OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cfac6ddb-6f22-4343-855c-e513269cf2bf width=300> |
 | [Efficient-SAM](notebooks/274-efficient-sam)<br> | Object segmentation with EfficientSAM and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/15d0a23a-0550-43c6-9ca9-f689e772a79a width=300> |
 | [LLM Instruction following pipeline](notebooks/275-llm-question-answering)<br> | Usage variety of LLM models for answering questions using OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/daafd702-5a42-4f54-ae72-2e4480d73501 width=300> | 
+| [MobileVLM](notebooks/276-mobilevlm-language-assistant)<br> | Mobile language assistant with MobileVLM and OpenVINO | | 
 
 ## Table of Contents
 
@@ -225,6 +226,7 @@ Demos that demonstrate inference on a particular model.
 | [273-stable-zephyr-3b-chatbot](notebooks/273-stable-zephyr-3b-chatbot)<br> |  Use Stable-Zephyr as chatbot assistant with OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cfac6ddb-6f22-4343-855c-e513269cf2bf width=225> |
 | [274-efficient-sam](notebooks/274-efficient-sam/)<br>| Object segmentation with EfficientSAM and OpenVINO™ | <img width="225" src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/15d0a23a-0550-43c6-9ca9-f689e772a79a"> |
 | [275-llm-question-answering](notebooks/275-llm-question-answering)<br> | LLM Instruction following pipeline | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/daafd702-5a42-4f54-ae72-2e4480d73501 width=225> | 
+| [276-mobilevlm-language-assistant](notebooks/276-mobilevlm-language-assistant)<br> | Mobile language assistant with MobileVLM and OpenVINO | | 
 
 <div id='-model-training'></div>
 
