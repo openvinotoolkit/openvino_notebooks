@@ -1,4 +1,5 @@
 from functools import wraps
+import warnings
 import torch
 import openvino as ov
 from pathlib import Path
@@ -6,6 +7,36 @@ from typing import Tuple, Optional
 import types
 from transformers.modeling_outputs import BaseModelOutputWithPast
 
+try:
+    from optimum.exporters.openvino.stateful import make_stateful
+    from optimum.exporters.openvino.stateful import fuse_cache_reorder
+except ImportError:
+    warnings.warn("We recommend to update optimum-intel for getting optimal performance")
+    make_stateful = None
+    fuse_cache_reorder = None
+
+
+def patch_stateful(ov_model, model_type):
+    key_value_input_names = [
+        key.get_any_name() for key in ov_model.inputs if any("key_values" in key_name for key_name in key.get_names())
+    ]
+    key_value_output_names = [
+        key.get_any_name() for key in ov_model.outputs if any("present" in key_name for key_name in key.get_names())
+    ]
+    not_kv_inputs = [
+        input for input in ov_model.inputs if not any(name in key_value_input_names for name in input.get_names())
+    ]
+    if not key_value_input_names or not key_value_output_names:
+        return
+    batch_dim = 1 if model_type == "chatglm" else 0
+    num_attention_heads = 1
+
+    fuse_cache_reorder(ov_model, not_kv_inputs, key_value_input_names, batch_dim)
+    make_stateful(
+        ov_model, not_kv_inputs, key_value_input_names, key_value_output_names, batch_dim, num_attention_heads, None
+    )
+
+    
 
 def flattenize_inputs(inputs):
     """
@@ -51,11 +82,11 @@ def convert_mpt(pt_model: torch.nn.Module, model_path: Path):
     inputs = ["input_ids"]
     outputs = ["logits"]
 
-    dynamic_shapes = {"input_ids": {1: "seq_len"}, "attention_mask": {1: "seq_len"}}
+    dynamic_shapes = {"input_ids": {0: "batch_size", 1: "seq_len"}, "attention_mask": {0: "batch_size", 1: "seq_len"}}
     for idx in range(len(outs.past_key_values)):
         inputs.extend([f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"])
-        dynamic_shapes[inputs[-1]] = {2: "past_sequence + sequence"}
-        dynamic_shapes[inputs[-2]] = {3: "past_sequence + sequence"}
+        dynamic_shapes[inputs[-1]] = {0: "batch_size", 2: "past_sequence + sequence"}
+        dynamic_shapes[inputs[-2]] = {0: "batch_size", 3: "past_sequence + sequence"}
         outputs.extend([f"present.{idx}.key", f"present.{idx}.value"])
 
     inputs.append("attention_mask")
@@ -99,6 +130,8 @@ def convert_mpt(pt_model: torch.nn.Module, model_path: Path):
         out.get_tensor().set_names({out_name})
 
     ov_model.validate_nodes_and_infer_types()
+    if make_stateful is not None:
+        patch_stateful(ov_model, "mpt")
     ov.save_model(ov_model, ov_out_path)
     del ov_model
     cleanup_torchscript_cache()
@@ -131,14 +164,14 @@ def convert_qwen(pt_model: torch.nn.Module, model_path: Path):
     outputs = ["logits"]
 
     dynamic_shapes = {
-        "input_ids": {1: "seq_len"},
-        "attention_mask": {1: "seq_len"},
-        "token_type_ids": {1: "seq_len"},
+        "input_ids": {0: "batch_size", 1: "seq_len"},
+        "attention_mask": {0: "batch_size", 1: "seq_len"},
+        "token_type_ids": {0: "batch_size", 1: "seq_len"},
     }
     for idx in range(len(outs.past_key_values)):
         inputs.extend([f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"])
-        dynamic_shapes[inputs[-1]] = {1: "past_sequence + sequence"}
-        dynamic_shapes[inputs[-2]] = {1: "past_sequence + sequence"}
+        dynamic_shapes[inputs[-1]] = {0: "batch_size", 1: "past_sequence + sequence"}
+        dynamic_shapes[inputs[-2]] = {0: "batch_size", 1: "past_sequence + sequence"}
         outputs.extend([f"present.{idx}.key", f"present.{idx}.value"])
 
     inputs += ["attention_mask", "token_type_ids"]
@@ -167,6 +200,8 @@ def convert_qwen(pt_model: torch.nn.Module, model_path: Path):
         out.get_tensor().set_names({out_name})
 
     ov_model.validate_nodes_and_infer_types()
+    if make_stateful is not None:
+        patch_stateful(ov_model, "qwen")
     ov.save_model(ov_model, ov_out_path)
     del ov_model
     cleanup_torchscript_cache()
@@ -309,15 +344,15 @@ def convert_chatglm(pt_model: torch.nn.Module, model_path: Path):
     outputs = ["logits"]
 
     dynamic_shapes = {
-        "input_ids": {1: "seq_len"},
-        "position_ids": {1: "seq_len"},
-        "attention_mask": {1: "seq_len"},
+        "input_ids": {0: "batch_size", 1: "seq_len"},
+        "position_ids": {0: "batch_size", 1: "seq_len"},
+        "attention_mask": {0: "batch_size", 1: "seq_len"},
     }
     inputs += ["position_ids", "attention_mask"]
     for idx in range(len(outs.past_key_values)):
         inputs.extend([f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"])
-        dynamic_shapes[inputs[-1]] = {0: "past_sequence + sequence"}
-        dynamic_shapes[inputs[-2]] = {0: "past_sequence + sequence"}
+        dynamic_shapes[inputs[-1]] = {0: "past_sequence + sequence", 1: "batch_size"}
+        dynamic_shapes[inputs[-2]] = {0: "past_sequence + sequence", 1: "batch_size"}
         outputs.extend([f"present.{idx}.key", f"present.{idx}.value"])
 
     dummy_inputs = {
@@ -345,6 +380,9 @@ def convert_chatglm(pt_model: torch.nn.Module, model_path: Path):
         out.get_tensor().set_names({out_name})
 
     ov_model.validate_nodes_and_infer_types()
+    if make_stateful is not None:
+        print("PATCH STATEFUL")
+        patch_stateful(ov_model, "chatglm")
     ov.save_model(ov_model, ov_out_path)
     del ov_model
     cleanup_torchscript_cache()
