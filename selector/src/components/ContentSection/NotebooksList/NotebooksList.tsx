@@ -19,7 +19,7 @@ export const NotebooksList = ({ items }: NotebooksListProps): JSX.Element => {
   return (
     <div className="notebooks-container">
       {items.length ? (
-        items.map((notebook, i) => <NotebookCard key={`notebook-${i}`} item={notebook}></NotebookCard>)
+        items.map((notebook) => <NotebookCard key={notebook.path} item={notebook}></NotebookCard>)
       ) : (
         <EmptyNotebooksList />
       )}
