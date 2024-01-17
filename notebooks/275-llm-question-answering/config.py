@@ -1,6 +1,6 @@
 SUPPORTED_LLM_MODELS = {
     "tiny-llama-1b": {
-        "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v0.6", 
+        "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0", 
         "prompt_template":  "<|user|>\n{instruction}</s> \n<|assistant|>\n",
         "tokenizer_kwargs": {"add_special_tokens": False},
     },
