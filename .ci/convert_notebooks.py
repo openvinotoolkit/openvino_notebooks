@@ -58,8 +58,12 @@ def main():
         start = time.perf_counter()
         print(f"Convert {notebook_path}")
         if str(notebook_path) not in ignore_execution_list:
-            retcode = subprocess.run(["jupyter", "nbconvert",  "--log-level=INFO", "--execute", "--to",  "notebook", "--output",
-                                     str(notebook_executed),  '--output-dir', str(root), '--ExecutePreprocessor.kernel_name=python3', str(notebook_path)], timeout=args.timeout).returncode
+            try:
+                retcode = subprocess.run(["jupyter", "nbconvert",  "--log-level=INFO", "--execute", "--to",  "notebook", "--output",
+                                        str(notebook_executed),  '--output-dir', str(root), '--ExecutePreprocessor.kernel_name=python3', str(notebook_path)], timeout=args.timeout).returncode
+            except subprocess.TimeoutExpired:
+                retcode = -42
+                print(f"TIMEOUT: {notebook_path}")
             if retcode:
                 failed_notebooks.append(str(notebook_path))
                 continue
