@@ -11,4 +11,5 @@ notebooks/254-llm-chatbot/254-rag-chatbot.ipynb # nncf@https://github.com/openvi
 notebooks/256-bark-text-to-audio/256-bark-text-to-audio.ipynb  # torch==1.13
 notebooks/257-llava-multimodal-chatbot/257-llava-multimodal-chatbot.ipynb # transformers<4.35
 notebooks/273-stable-zephyr-3b-chatbot/273-stable-zephyr-3b-chatbot.ipynb # install requirements.txt after clone repo
+notebooks/276-mobilevlm-language-assistant/276-mobilevlm-language-assistant.ipynb # transformers<4.35
 notebooks/204-segmenter-semantic-segmentation/204-segmenter-semantic-segmentation.ipynb # timm==0.4.12, install Segmenter requirements
