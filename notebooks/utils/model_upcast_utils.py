@@ -13,18 +13,7 @@ from tqdm.auto import tqdm
 
 OPERATION_TYPE_MAP = {
     "MatMul": opset.matmul,
-    "Convolution": opset.convolution,
-    # "Softmax": opset.softmax,
-    # "MVN": opset.mvn,
-    # "Multiply": opset.multiply,
-    # "Divide": opset.divide,
-    # "Add": opset.add,
-    # "Subtract": opset.subtract,
-    # "Concat": opset.concat,
-    # "Power": opset.power,
-    # "Transpose": opset.transpose,
-    # "Broadcast": opset.broadcast,
-    # "ShapeOf": opset.shape_of
+    "Convolution": opset.convolution
 }
 
 ORIGINAL_PRECISION_RT_INFO_NAME = "precise_0"
