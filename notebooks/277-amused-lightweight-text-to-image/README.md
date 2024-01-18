@@ -1,5 +1,8 @@
 # Lightweight image generation with aMUSEd and OpenVINO™
 
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/277-amused-lightweight-text-to-image/277-amused-lightweight-text-to-image.ipynb)
+
+
 <img src="https://huggingface.co/amused/amused-256/resolve/main/assets/collage_small.png" />
 
 [Amused](https://huggingface.co/docs/diffusers/api/pipelines/amused) is a lightweight text to image model based off 
