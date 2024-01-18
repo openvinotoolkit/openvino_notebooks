@@ -13,7 +13,7 @@ def disable_gradio_debug(notebook_path):
         if "gradio" in cell["source"] and "debug" in cell["source"]:
             found = True
             cell["source"] = cell["source"].replace("debug=True", "debug=False")
-    
+
     if found:
         print(f"Disabled gradio debug mode for {notebook_path}")
         nbformat.write(nb, str(notebook_path), version=nbformat.NO_CONVERT)
@@ -22,7 +22,7 @@ def arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--exclude_execution_file")
     parser.add_argument("--exclude_conversion_file")
-    parser.add_argument("--timeout", type=float, default=3600,
+    parser.add_argument("--timeout", type=float, default=7200,
                         help="timeout for notebook execution")
     parser.add_argument("--rst_dir", type=Path,
                         help="rst files output directory", default=Path("rst"))
@@ -75,7 +75,7 @@ def main():
         print(f"Notebook conversion took: {end:.4f} s")
         if rst_retcode:
             rst_failed.append(str(notebook_path))
-    
+
     if failed_notebooks:
         print("EXECUTION FAILED:")
         print("\n".join(failed_notebooks))
