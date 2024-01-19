@@ -225,6 +225,7 @@ Demos that demonstrate inference on a particular model.
 | [273-stable-zephyr-3b-chatbot](notebooks/273-stable-zephyr-3b-chatbot)<br> |  Use Stable-Zephyr as chatbot assistant with OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cfac6ddb-6f22-4343-855c-e513269cf2bf width=225> |
 | [274-efficient-sam](notebooks/274-efficient-sam/)<br>| Object segmentation with EfficientSAM and OpenVINO™ | <img width="225" src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/15d0a23a-0550-43c6-9ca9-f689e772a79a"> |
 | [275-llm-question-answering](notebooks/275-llm-question-answering)<br> | LLM Instruction following pipeline | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/daafd702-5a42-4f54-ae72-2e4480d73501 width=225> | 
+| [276-stable-diffusion-torchdynamo-backend](notebooks/276-stable-diffusion-torchdynamo-backend/)<br> | Image generation with Stable Diffusion and OpenVINO™ `torch.compile` feature | <img src=https://user-images.githubusercontent.com/32199725/270969617-ee88eb42-3b0d-42f4-ac71-992c40451849.png width=225> |
 
 <div id='-model-training'></div>
 
