@@ -96,6 +96,7 @@ ConvNeXt
 ConvNeXts
 Convolutional
 convolutional
+coreference
 CoSENT
 CPUs
 CRNN
@@ -292,6 +293,8 @@ KiTS
 Koltun
 Kondate
 Kosaraju
+Kosmos
+KOSMOS
 KServe
 Kubernetes
 Kupyn
@@ -354,6 +357,7 @@ mistralai
 MLS
 mms
 MMS
+MLLMs
 MLP
 mobilenet
 MobileNet
