@@ -211,7 +211,7 @@ Demos that demonstrate inference on a particular model.
 | [267-distil-whisper-asr](notebooks/267-distil-whisper-asr)<br> | Automatic speech recognition using Distil-Whisper and OpenVINO™ | |
 | [268-table-question-answering](notebooks/268-table-question-answering)<br><br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/268-table-question-answering/268-table-question-answering.ipynb)<br> | Table Question Answering using TAPAS and OpenVINO™ ||
 | [269-film-slowmo](notebooks/269-film-slowmo)<br> | Frame interpolation with FILM and OpenVINO™ | <img src="[https://github.com/googlestaging/frame-interpolation/raw/main/moment.gif](https://github.com/openvinotoolkit/openvino_notebooks/assets/1720147/8ac5178d-4a92-4a86-a3df-dd494434fed6)" width=225> |
-| [271-kosmos2-multimodal-large-language-model](notebooks/2271-kosmos2-multimodal-large-language-model)<br> | Kosmos-2: Multimodal Large Language Model and OpenVINO™ | <img src="[https://github.com/googlestaging/frame-interpolation/raw/main/moment.gif](https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/annotated_snowman.jpg)" width=225> |
+| [278-kosmos2-multimodal-large-language-model](notebooks/2271-kosmos2-multimodal-large-language-model)<br> | Kosmos-2: Multimodal Large Language Model and OpenVINO™ | <img src="[https://github.com/googlestaging/frame-interpolation/raw/main/moment.gif](https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/annotated_snowman.jpg)" width=225> |
 
 <div id='-model-training'></div>
 
