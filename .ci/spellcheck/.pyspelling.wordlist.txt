@@ -32,6 +32,7 @@ autoregressive
 autoregressively
 AutoTokenizer
 backend
+backends
 Baevski
 BasicUNet
 BEiT
@@ -251,6 +252,7 @@ imagenet
 Imagenet
 ImageNet
 Imagenette
+ImgPipeline
 impactful
 IMU
 IMUs
@@ -610,6 +612,9 @@ SSD
 SSDLite
 sst
 StableDiffusionInpaintPipeline
+StableDiffusionPipeline
+StableDiffusionImg
+StableDiffusionImg2ImgPipeline
 STFT
 stateful
 streamable
@@ -621,6 +626,7 @@ subchunks
 subdirectories
 subdirectory
 subgraph
+subgraphs
 sublicense
 subpackage
 subtask
@@ -654,6 +660,8 @@ tokenizers
 tokenizes
 tokenizing
 Tongyi
+TorchDynamo
+torchdynamo
 TorchMetrics
 TorchScript
 torchvision
@@ -718,6 +726,7 @@ waveforms
 Wav
 WavLM
 WebGL
+WebUI
 WER
 WIKISQL
 WikiTable

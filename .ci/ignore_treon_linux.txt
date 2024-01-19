@@ -47,4 +47,5 @@
 271-sdxl-turbo
 272-paint-by-example
 273-stable-zephyr-3b-chatbot
+276-stable-diffusion-torchdynamo-backend
 404-style-transfer-webcam
