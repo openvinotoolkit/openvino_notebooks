@@ -293,6 +293,7 @@ KiTS
 Koltun
 Kondate
 Kosaraju
+kosmos
 Kosmos
 KOSMOS
 KServe
@@ -357,6 +358,7 @@ mistralai
 MLS
 mms
 MMS
+MLLM
 MLLMs
 MLP
 mobilenet
