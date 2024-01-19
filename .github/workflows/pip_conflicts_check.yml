@@ -1,0 +1,42 @@
+name: pip_conflicts_check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+    - 'main'
+    - 'develop'
+    paths:
+      - 'notebooks/**.ipynb'
+  push:
+    branches:
+    - 'main'
+    paths:
+      - 'notebooks/**.ipynb'
+
+jobs:
+  build_pip_conflicts_check:
+    runs-on: ubuntu-20.04  # change cachepip step when changing this
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Dotenv Action
+      id: dotenv
+      uses: xom9ikk/dotenv@v1.0.2
+      with:
+        path: ./.github/workflows
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.8  # change cachepip step when changing this
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install jupyter "notebook<7"
+
+    - name: Run pip conflicts check
+      run: |
+        bash .ci/pip_conflicts_check.sh --ignore .ci/ignore_pip_conflicts.txt
