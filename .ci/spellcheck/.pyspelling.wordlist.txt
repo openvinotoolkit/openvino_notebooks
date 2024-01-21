@@ -3,6 +3,7 @@ accelerometers
 accelerometer
 acknowledgement
 activations
+adaptively
 adas
 ADE
 aeroplane
@@ -455,6 +456,7 @@ perceptron
 Patil
 performant
 PersonaGPT
+PhotoMaker
 photorealism
 photorealistic
 Piotr
