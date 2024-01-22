@@ -203,6 +203,8 @@ def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> 
     Returns:
         User prompt as a text
     """
+    start_time = time.time()  # Start time for ASR
+
     sample_rate, audio = audio
     # the whisper model requires 16000Hz, not 44100Hz
     audio = librosa.resample(audio.astype(np.float32), orig_sr=sample_rate, target_sr=AUDIO_WIDGET_SAMPLE_RATE).astype(np.int16)
@@ -216,6 +218,10 @@ def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> 
 
     # add the text to the conversation
     conversation.append([transcription, None])
+
+    end_time = time.time()  # End time for ASR
+    print("ASR processing time: {:.2f} seconds".format(end_time - start_time))
+  
     return conversation
 
 
