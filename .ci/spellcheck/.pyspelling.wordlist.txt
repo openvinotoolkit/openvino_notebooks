@@ -32,6 +32,7 @@ autoregressive
 autoregressively
 AutoTokenizer
 backend
+backends
 Baevski
 BasicUNet
 BEiT
@@ -185,6 +186,7 @@ fastcomposer
 FastComposer
 FastSAM
 FC
+FFmpeg
 FIL
 finetuned
 finetuning
@@ -250,6 +252,7 @@ imagenet
 Imagenet
 ImageNet
 Imagenette
+ImgPipeline
 impactful
 IMU
 IMUs
@@ -329,6 +332,7 @@ LRASPP
 LTS
 LSTM
 Luo
+LVLM
 macOS
 Mahalanobis
 Mapillary
@@ -608,6 +612,9 @@ SSD
 SSDLite
 sst
 StableDiffusionInpaintPipeline
+StableDiffusionPipeline
+StableDiffusionImg
+StableDiffusionImg2ImgPipeline
 STFT
 stateful
 streamable
@@ -619,6 +626,7 @@ subchunks
 subdirectories
 subdirectory
 subgraph
+subgraphs
 sublicense
 subpackage
 subtask
@@ -652,6 +660,8 @@ tokenizers
 tokenizes
 tokenizing
 Tongyi
+TorchDynamo
+torchdynamo
 TorchMetrics
 TorchScript
 torchvision
@@ -716,6 +726,7 @@ waveforms
 Wav
 WavLM
 WebGL
+WebUI
 WER
 WIKISQL
 WikiTable
