@@ -228,7 +228,7 @@ Demos that demonstrate inference on a particular model.
 | [275-llm-question-answering](notebooks/275-llm-question-answering)<br> | LLM Instruction following pipeline | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/daafd702-5a42-4f54-ae72-2e4480d73501 width=225> | 
 | [276-stable-diffusion-torchdynamo-backend](notebooks/276-stable-diffusion-torchdynamo-backend/)<br> | Image generation with Stable Diffusion and OpenVINO™ `torch.compile` feature | <img src=https://user-images.githubusercontent.com/32199725/270969617-ee88eb42-3b0d-42f4-ac71-992c40451849.png width=225> |
 | [277-amused-lightweight-text-to-image](notebooks/277-amused-lightweight-text-to-image)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/277-amused-lightweight-text-to-image/277-amused-lightweight-text-to-image.ipynb)<br>| Lightweight image generation with aMUSEd and OpenVINO™ | <img src=https://huggingface.co/amused/amused-256/resolve/main/assets/collage_small.png width=225> | 
-| [279-photo-maker](notebooks/279-photo-maker)<br> | Text-to-image generation using PhotoMaker and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4 width=300> | 
+| [279-photo-maker](notebooks/279-photo-maker)<br> | Text-to-image generation using PhotoMaker and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4 width=225> | 
 
 
 <div id='-model-training'></div>
