@@ -71,14 +71,13 @@ def load_tts_model() -> None:
 
         tts_processor (SpeechT5Processor): Processor for preparing text inputs.
         tts_model (SpeechT5ForTextToSpeech): TTS model for converting text to speech.
-        tts_vocoder (SpeechT5HifiGan): Vocoder for generating audible speech.                              
-    """
+        tts_vocoder (SpeechT5HifiGan): Vocoder for generating audible speech.
+        """
     global tts_processor, tts_model, tts_vocoder
 
     tts_processor = SpeechT5Processor.from_pretrained("microsoft/speecht5_tts")
     tts_model = SpeechT5ForTextToSpeech.from_pretrained("microsoft/speecht5_tts")
     tts_vocoder = SpeechT5HifiGan.from_pretrained("microsoft/speecht5_hifigan")
-
 
 
 def load_chat_model(model_dir: Path) -> None:
@@ -157,11 +156,11 @@ def synthesize(conversation: List[List[str]]) -> Tuple[int, np.ndarray]:
     Synthesizes speech from the last message in a conversation using a TTS model.
 
     Parameters:
-        conversation (List[List[str]]): A list of message pairs, each pair containing a 
+        conversation (List[List[str]]): A list of message pairs, each pair containing a
                                         user prompt and an assistant response.
 
     Returns:
-        Tuple[int, np.ndarray]: A tuple containing the sampling rate (int) and the 
+        Tuple[int, np.ndarray]: A tuple containing the sampling rate (int) and the
                                 synthesized audio as a numpy ndarray.
     """
     start_time = time.time()  # Start time
@@ -185,13 +184,13 @@ def synthesize(conversation: List[List[str]]) -> Tuple[int, np.ndarray]:
             speaker_embeddings = torch.tensor(embeddings_dataset[7306]["xvector"]).unsqueeze(0)
             speech = tts_model.generate_speech(inputs["input_ids"], speaker_embeddings, vocoder=tts_vocoder)
             audio_segments.append(speech.numpy())
-    
+
     # Combine audio segments
     combined_audio = np.concatenate(audio_segments, axis=0) if audio_segments else np.array([])
     end_time = time.time()  # End time
     print("TTS model synthesis time: {:.2f} seconds".format(end_time - start_time))
-    
-    return 16000, combined_audio
+
+    return AUDIO_WIDGET_SAMPLE_RATE, combined_audio
 
 
 def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> List[List[str]]:
@@ -232,21 +231,21 @@ def create_UI(initial_message: str) -> gr.Blocks:
     with gr.Blocks(title="Talk to Adrishuo - a conversational voice agent") as demo:
         gr.Markdown("""
         # Talk to Adrishuo - a conversational voice agent
-        
+
         Instructions for use:
         - record your question/comment using the first audio widget ("Your voice input")
         - wait for the chatbot to response ("Chatbot")
         - wait for the output voice in the last audio widget ("Chatbot voice output")
         """)
         with gr.Row():
-	    # user's input
+            # user's input
             input_audio_ui = gr.Audio(sources=["microphone"], scale=5, label="Your voice input")
-	    # submit button
+            # submit button
             submit_audio_btn = gr.Button("Submit", variant="primary", scale=1)
-	
-	# chatbot
+
+        # chatbot
         chatbot_ui = gr.Chatbot(value=[[None, initial_message]], label="Chatbot")
-	# chatbot's audio response
+        # chatbot's audio response
         output_audio_ui = gr.Audio(autoplay=True, interactive=False, label="Chatbot voice output")
 
         # events
