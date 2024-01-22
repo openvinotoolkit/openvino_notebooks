@@ -64,6 +64,7 @@ class OVOpenVoiceTTS(torch.nn.Module):
             self.ov_tts = core.read_model(self.ir_path)
         else:
             self.ov_tts = ov.convert_model(self, example_input=self.get_example_input())
+            ov.save_model(self.ov_tts, self.ir_path)
         
         self.compiled_model = core.compile_model(self.ov_tts, ov_device)
 
@@ -119,6 +120,7 @@ class OVOpenVoiceConvert(torch.nn.Module):
             self.ov_voice_conversion = core.read_model(self.ir_path)
         else:
             self.ov_voice_conversion = ov.convert_model(self, example_input=self.get_example_input())
+            ov.save_model(self.ov_voice_conversion, self.ir_path)
         
         self.compiled_model = core.compile_model(self.ov_voice_conversion, ov_device)
     
