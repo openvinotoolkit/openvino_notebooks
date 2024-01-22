@@ -1,35 +1,10 @@
-from api import OpenVoiceBaseClass
-from mel_processing import spectrogram_torch
+from OpenVoice.mel_processing import spectrogram_torch
 import torch
 import librosa
 import openvino as ov
 import os
 import re
 import soundfile
-
-
-
-def get_tts_forward(base_class: OpenVoiceBaseClass):
-    for par in base_class.model.parameters():
-        par.requires_grad = False
-    
-    speed = 1.0
-    kwargs = dict(noise_scale = 0.667, length_scale = 1.0 / speed, noise_scale_w = 0.6, sdp_ratio = 0.2)
-
-    def tts_forward_wrapper(x, x_lengths, sid):
-        return base_class.model.infer(x, x_lengths, sid,
-                                            noise_scale=kwargs['noise_scale'], 
-                                            length_scale=kwargs['length_scale'], 
-                                            noise_scale_w=kwargs['noise_scale_w'], 
-                                            sdp_ratio=kwargs['sdp_ratio'])
-    return tts_forward_wrapper
-
-def get_converter_forward(base_class: OpenVoiceBaseClass):
-    for par in base_class.model.parameters():
-        par.requires_grad = False
-    def converter_forward_wrapper(y, y_lengths, sid_src, sid_tgt):
-        return base_class.model.voice_conversion(y, y_lengths, sid_src, sid_tgt, tau=0.3)
-    return converter_forward_wrapper
 
 
 class OVOpenVoiceTTS(torch.nn.Module):
@@ -97,6 +72,7 @@ class OVOpenVoiceTTS(torch.nn.Module):
         else:
             soundfile.write(output_path, audio, tts_model.hps.data.sampling_rate)
 
+
 class OVOpenVoiceConvert(torch.nn.Module):
     def __init__(self, voice_conversion_model, tau=0.3, ir_path='openvoice_converter.xml'):
         super().__init__()
@@ -107,7 +83,7 @@ class OVOpenVoiceConvert(torch.nn.Module):
              tau = tau, 
         )
     
-    def get_example_input():
+    def get_example_input(self):
         y = torch.randn([1, 513, 238], dtype=torch.float32)
         y_lengths = torch.LongTensor([y.size(-1)])
         target_se = torch.randn(*(1, 256, 1))

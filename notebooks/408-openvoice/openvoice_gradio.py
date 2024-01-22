@@ -1,12 +1,9 @@
 import os
 import torch
-import argparse
 import gradio as gr
 import langid
 import se_extractor
-from api import BaseSpeakerTTS, ToneColorConverter
 
-# This online demo mainly supports English and Chinese
 supported_languages = ['zh', 'en']
 
 def build_predict(output_dir, tone_color_converter, en_tts_model, zh_tts_model, en_source_default_se, en_source_style_se, zh_source_se):
@@ -15,9 +12,7 @@ def build_predict(output_dir, tone_color_converter, en_tts_model, zh_tts_model, 
     return predict
 
 def predict_impl(prompt, style, audio_file_pth, agree, output_dir, tone_color_converter, en_tts_model, zh_tts_model, en_source_default_se, en_source_style_se, zh_source_se):
-    # initialize a empty info
     text_hint = ''
-    # agree with the terms
     if agree == False:
         text_hint += '[ERROR] Please accept the Terms & Condition!\n'
         gr.Warning("Please accept the Terms & Condition!")
@@ -27,7 +22,6 @@ def predict_impl(prompt, style, audio_file_pth, agree, output_dir, tone_color_co
             None,
         )
 
-    # first detect the input language
     language_predicted = langid.classify(prompt)[0].strip()  
     print(f"Detected language:{language_predicted}")
 
@@ -39,7 +33,6 @@ def predict_impl(prompt, style, audio_file_pth, agree, output_dir, tone_color_co
 
         return (
             text_hint,
-            None,
             None,
         )
     
@@ -53,7 +46,6 @@ def predict_impl(prompt, style, audio_file_pth, agree, output_dir, tone_color_co
             return (
                 text_hint,
                 None,
-                None,
             )
 
     else:
@@ -63,12 +55,12 @@ def predict_impl(prompt, style, audio_file_pth, agree, output_dir, tone_color_co
         else:
             source_se = en_source_style_se
         language = 'English'
-        if style not in ['default', 'whispering', 'shouting', 'excited', 'cheerful', 'terrified', 'angry', 'sad', 'friendly']:
-            text_hint += f"[ERROR] The style {style} is not supported for English, which should be in ['default', 'whispering', 'shouting', 'excited', 'cheerful', 'terrified', 'angry', 'sad', 'friendly']\n"
-            gr.Warning(f"The style {style} is not supported for English, which should be in ['default', 'whispering', 'shouting', 'excited', 'cheerful', 'terrified', 'angry', 'sad', 'friendly']")
+        supported_styles = ['default', 'whispering', 'shouting', 'excited', 'cheerful', 'terrified', 'angry', 'sad', 'friendly']
+        if style not in supported_styles:
+            text_hint += f"[ERROR] The style {style} is not supported for English, which should be in {*supported_styles,}\n"
+            gr.Warning(f"The style {style} is not supported for English, which should be in {*supported_styles,}")
             return (
                 text_hint,
-                None,
                 None,
             )
 
@@ -80,7 +72,6 @@ def predict_impl(prompt, style, audio_file_pth, agree, output_dir, tone_color_co
         return (
             text_hint,
             None,
-            None,
         )
     if len(prompt) > 200:
         text_hint += f"[ERROR] Text length limited to 200 characters for this demo, please try shorter text. You can clone our open-source repo and try for your usage \n"
@@ -89,7 +80,6 @@ def predict_impl(prompt, style, audio_file_pth, agree, output_dir, tone_color_co
         )
         return (
             text_hint,
-            None,
             None,
         )
     
@@ -104,14 +94,12 @@ def predict_impl(prompt, style, audio_file_pth, agree, output_dir, tone_color_co
         return (
             text_hint,
             None,
-            None,
         )
 
     src_path = f'{output_dir}/tmp.wav'
     tts_model.tts(prompt, src_path, speaker=style, language=language)
 
     save_path = f'{output_dir}/output.wav'
-    # Run the tone color converter
     encode_message = "@MyShell"
     tone_color_converter.convert(
         audio_src_path=src_path, 
@@ -125,15 +113,18 @@ def predict_impl(prompt, style, audio_file_pth, agree, output_dir, tone_color_co
     return (
         text_hint,
         save_path,
-        speaker_wav,
     )
 
-
+description = """
+    # OpenVoice accelerated by OpenVINO:
+    
+    a versatile instant voice cloning approach that requires only a short audio clip from the reference speaker to replicate their voice and generate speech in multiple languages. OpenVoice enables granular control over voice styles, including emotion, accent, rhythm, pauses, and intonation, in addition to replicating the tone color of the reference speaker. OpenVoice also achieves zero-shot cross-lingual voice cloning for languages not included in the massive-speaker training set.
+"""
 
 content = """
 <div>
-  <strong>If the generated voice does not sound like the reference voice, please refer to <a href='https://github.com/myshell-ai/OpenVoice/blob/main/docs/QA.md'>this QnA</a>.</strong> <strong>For multi-lingual & cross-lingual examples, please refer to <a href='https://github.com/myshell-ai/OpenVoice/blob/main/demo_part2.ipynb'>this jupyter notebook</a>.</strong>
-  This online demo mainly supports <strong>English</strong>. The <em>default</em> style also supports <strong>Chinese</strong>. But OpenVoice can adapt to any other language as long as a base speaker is provided.
+<strong>If the generated voice does not sound like the reference voice, please refer to <a href='https://github.com/myshell-ai/OpenVoice/blob/main/docs/QA.md'>this QnA</a>.</strong> <strong>For multi-lingual & cross-lingual examples, please refer to <a href='https://github.com/myshell-ai/OpenVoice/blob/main/demo_part2.ipynb'>this jupyter notebook</a>.</strong>
+This online demo mainly supports <strong>English</strong>. The <em>default</em> style also supports <strong>Chinese</strong>. But OpenVoice can adapt to any other language as long as a base speaker is provided.
 </div>
 """
 wrapped_markdown_content = f"<div style='border: 1px solid #000; padding: 10px;'>{content}</div>"
@@ -162,7 +153,8 @@ examples = [
 def get_demo(output_dir, tone_color_converter, en_tts_model, zh_tts_model, en_source_default_se, en_source_style_se, zh_source_se):
     with gr.Blocks(analytics_enabled=False) as demo:
 
-                
+        with gr.Row():
+            gr.Markdown(description)
         with gr.Row():
             gr.HTML(wrapped_markdown_content)
 
@@ -198,7 +190,7 @@ def get_demo(output_dir, tone_color_converter, en_tts_model, zh_tts_model, en_so
             with gr.Column():
                 out_text_gr = gr.Text(label="Info")
                 audio_gr = gr.Audio(label="Synthesised Audio", autoplay=True)
-                ref_audio_gr = gr.Audio(label="Reference Audio Used")
+                # ref_audio_gr = gr.Audio(label="Reference Audio Used")
                 predict = build_predict(
                     output_dir, 
                     tone_color_converter, 
@@ -212,8 +204,8 @@ def get_demo(output_dir, tone_color_converter, en_tts_model, zh_tts_model, en_so
                 gr.Examples(examples,
                             label="Examples",
                             inputs=[input_text_gr, style_gr, ref_gr, tos_gr],
-                            outputs=[out_text_gr, audio_gr, ref_audio_gr],
+                            outputs=[out_text_gr, audio_gr],
                             fn=predict,
                             cache_examples=False,)
-                tts_button.click(predict, [input_text_gr, style_gr, ref_gr, tos_gr], outputs=[out_text_gr, audio_gr, ref_audio_gr])
+                tts_button.click(predict, [input_text_gr, style_gr, ref_gr, tos_gr], outputs=[out_text_gr, audio_gr])
     return demo
