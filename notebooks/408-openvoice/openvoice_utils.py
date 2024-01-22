@@ -1,3 +1,27 @@
+from api import OpenVoiceBaseClass
+
+def get_tts_forward(base_class: OpenVoiceBaseClass):
+    for par in base_class.model.parameters():
+        par.requires_grad = False
+    
+    speed = 1.0
+    kwargs = dict(noise_scale = 0.667, length_scale = 1.0 / speed, noise_scale_w = 0.6, sdp_ratio = 0.2)
+
+    def tts_forward_wrapper(x, x_lengths, sid):
+        return base_class.model.infer(x, x_lengths, sid,
+                                            noise_scale=kwargs['noise_scale'], 
+                                            length_scale=kwargs['length_scale'], 
+                                            noise_scale_w=kwargs['noise_scale_w'], 
+                                            sdp_ratio=kwargs['sdp_ratio'])
+    return tts_forward_wrapper
+
+def get_converter_forward(base_class: OpenVoiceBaseClass):
+    for par in base_class.model.parameters():
+        par.requires_grad = False
+    def converter_forward_wrapper(y, y_lengths, sid_src, sid_tgt):
+        return base_class.model.voice_conversion(y, y_lengths, sid_src, sid_tgt, tau=0.3)
+    return converter_forward_wrapper
+
 def convert(self, audio_src_path, src_se, tgt_se, output_path=None, tau=0.3, message="default", ov_model = None):
     hps = self.hps
     # load audio
