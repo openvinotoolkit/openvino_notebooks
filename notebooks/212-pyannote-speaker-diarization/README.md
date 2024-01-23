@@ -2,7 +2,7 @@
 
 Speaker diarization is the process of partitioning an audio stream containing human speech into homogeneous segments according to the identity of each speaker. It can enhance the readability of an automatic speech transcription by structuring the audio stream into speaker turns and, when used together with speaker recognition systems, by providing the speaker’s true identity. It is used to answer the question "who spoke when?". Speaker diarization is an essential feature for a speech recognition system to enrich the transcription with speaker labels.
 
-![image.png](https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/_images/asr_sd_diagram.png)
+![image.png](https://developer-blogs.nvidia.com/wp-content/uploads/2022/09/speaker-diarization.png)
 
 In this tutorial, we consider how to build speaker diarization pipeline using `pyannote.audio` and OpenVINO. `pyannote.audio` is an open-source toolkit written in Python for speaker diarization. Based on PyTorch deep learning framework, it provides a set of trainable end-to-end neural building blocks that can be combined and jointly optimized to build speaker diarization pipelines. You can find more information about pyannote pre-trained models in [model card](https://huggingface.co/pyannote/speaker-diarization), [repo](https://github.com/pyannote/pyannote-audio) and [paper](https://arxiv.org/abs/1911.01255).
 
