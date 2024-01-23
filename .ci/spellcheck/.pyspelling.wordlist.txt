@@ -48,6 +48,7 @@ Bicubic
 bicubic
 bilinear
 biometrics
+BiT
 blockwise
 boolean
 CentOS
