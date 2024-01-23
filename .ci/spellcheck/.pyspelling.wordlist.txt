@@ -100,6 +100,7 @@ Convolutional
 convolutional
 CoSENT
 CPUs
+cpu
 CRNN
 CSV
 CTC
@@ -140,6 +141,7 @@ denoising
 denormalization
 denormalized
 depainting
+DepthAnything
 detections
 Dettmers
 dev
@@ -756,3 +758,4 @@ ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
+xformers

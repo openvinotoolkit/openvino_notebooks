@@ -9,7 +9,7 @@
 The framework of Depth Anything is shown below. it adopts a standard pipeline to unleashing the power of large-scale unlabeled images. 
 ![image.png](attachment:df8f001d-8132-4ea5-bec2-b6b9f55089a1.png)
 
-More details about model can be found in [project webpage](https://depth-anything.github.io/), [paper](https://arxiv.org/abs/2401.10891), and official [repository](https://github.com/LiheYoung/Depth-Anything)
+More details about model can be found in [project web page](https://depth-anything.github.io/), [paper](https://arxiv.org/abs/2401.10891), and official [repository](https://github.com/LiheYoung/Depth-Anything)
 
 In this tutorial we will explore how to convert and run DepthAnything using OpenVINO.
 
