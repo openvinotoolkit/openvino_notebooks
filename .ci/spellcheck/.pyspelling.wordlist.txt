@@ -754,12 +754,9 @@ Youri
 youri
 ZavyChromaXL
 Zongyuan
-<<<<<<< HEAD
 FastBaseTransform
 YOLACT
 yolact
 Yolact
-=======
 ZeroScope
 zeroscope
->>>>>>> remote/main
