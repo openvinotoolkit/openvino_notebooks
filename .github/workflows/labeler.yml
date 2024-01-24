@@ -13,7 +13,7 @@ jobs:
   labelling:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
     - name: Add labels (Title/Description)
       uses: github/issue-labeler@v3.1
       with:
