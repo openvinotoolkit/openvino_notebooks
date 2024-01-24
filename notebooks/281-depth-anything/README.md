@@ -17,6 +17,14 @@ In this tutorial we will explore how to convert and run DepthAnything using Open
 
 This notebook demonstrates Monocular Depth Estimation with the [DepthAnything](https://github.com/LiheYoung/Depth-Anything) in OpenVINO.
 
+The tutorial consists of following steps:
+- Install prerequisites
+- Load and run PyTorch model inference
+- Convert Model to Openvino Intermediate Representation format
+- Run OpenVINO model inference on single image
+- Run OpenVINO model inference on video
+- Launch interactive demo
+
 ## Installation Instructions
 
 This is a self-contained example that relies solely on its own code.</br>
