@@ -272,6 +272,7 @@ intel
 invertible
 intervaling
 im
+ip
 IRs
 iteratively
 JFLEG
@@ -344,6 +345,7 @@ Markovian
 Martyniuk
 maskrcnn
 mathbf
+MBs
 MediaPipe
 mel
 Mels
@@ -462,6 +464,7 @@ parametrize
 parsers
 perceptron
 Patil
+PEFT
 performant
 PersonaGPT
 photorealism
