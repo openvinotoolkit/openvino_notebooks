@@ -37,6 +37,7 @@ backend
 backends
 Baevski
 BasicUNet
+bboxes
 BEiT
 Belrose
 Benchmarking
