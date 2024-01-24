@@ -50,8 +50,8 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [Stable-Zephyr chatbot](notebooks/273-stable-zephyr-3b-chatbot/)<br> | Use Stable-Zephyr as chatbot assistant with OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cfac6ddb-6f22-4343-855c-e513269cf2bf width=300> |
 | [Efficient-SAM](notebooks/274-efficient-sam)<br> | Object segmentation with EfficientSAM and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/15d0a23a-0550-43c6-9ca9-f689e772a79a width=300> |
 | [LLM Instruction following pipeline](notebooks/275-llm-question-answering)<br> | Usage variety of LLM models for answering questions using OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/daafd702-5a42-4f54-ae72-2e4480d73501 width=300> | 
-| [Stable Diffusion with IP-Adapter](notebooks/278-stable-diffusion-ip-adapter)<br> | Image conditioning in Stable Diffusion pipeline using IP-Adapter | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/182657d9-2aa3-40b3-9fc4-a90b803419fe width=300> |
-| [PhotoMaker](notebooks/279-photo-maker)<br> | Text-to-image generation using PhotoMaker and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4 width=300> | 
+|[Stable Diffusion with IP-Adapter](notebooks/278-stable-diffusion-ip-adapter)<br> | Image conditioning in Stable Diffusion pipeline using IP-Adapter | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/182657d9-2aa3-40b3-9fc4-a90b803419fe width=300> |
+| [PhotoMaker](notebooks/279-photo-maker)<br> | Text-to-image generation using PhotoMaker and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4 width=300> |
 
 ## Table of Contents
 
@@ -231,7 +231,6 @@ Demos that demonstrate inference on a particular model.
 | [277-amused-lightweight-text-to-image](notebooks/277-amused-lightweight-text-to-image)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/277-amused-lightweight-text-to-image/277-amused-lightweight-text-to-image.ipynb)<br>| Lightweight image generation with aMUSEd and OpenVINO™ | <img src=https://huggingface.co/amused/amused-256/resolve/main/assets/collage_small.png width=225> | 
 | [278-stable-diffusion-ip-adapter](notebooks/278-stable-diffusion-ip-adapter)<br> | Image conditioning in Stable Diffusion pipeline using IP-Adapter |  <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/182657d9-2aa3-40b3-9fc4-a90b803419fe width=300> |
 | [279-photo-maker](notebooks/279-photo-maker)<br> | Text-to-image generation using PhotoMaker and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4 width=225> | 
-
 
 <div id='-model-training'></div>
 
