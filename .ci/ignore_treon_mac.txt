@@ -45,5 +45,5 @@
 272-paint-by-example
 273-stable-zephyr-3b-chatbot
 276-stable-diffusion-torchdynamo-backend
-278-mobilevlm-language-assistant
+279-mobilevlm-language-assistant
 404-style-transfer-webcam
