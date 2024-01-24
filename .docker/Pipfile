@@ -24,11 +24,11 @@ matplotlib = ">=3.4"
 monai = ">=0.9.1,<1.0.0"
 nbval = "*"
 notebook = "<7.0.0"
-nncf = "==2.7.0"
+nncf = "==2.8.0"
 numpy = ">=1.21.0"
 onnx = ">=1.11.0"
 opencv-python = "*"
-openvino-dev = {version = "==2023.2.0"}
+openvino-dev = {version = "==2023.3.0"}
 openvino-telemetry = "==2023.2.1"
 ovmsclient = "*"
 Pillow = ">=8.3.2"

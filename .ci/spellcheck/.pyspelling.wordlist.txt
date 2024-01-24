@@ -101,6 +101,7 @@ convolutional
 coreference
 CoSENT
 CPUs
+cpu
 CRNN
 CSV
 CTC
@@ -141,6 +142,7 @@ denoising
 denormalization
 denormalized
 depainting
+DepthAnything
 detections
 Dettmers
 dev
@@ -168,6 +170,7 @@ Dollár
 donut
 Downloader
 downloader
+downsample
 downsampled
 DPO
 dpredictor
@@ -272,6 +275,7 @@ intel
 invertible
 intervaling
 im
+ip
 IRs
 iteratively
 JFLEG
@@ -315,6 +319,7 @@ LCMs
 LCMScheduler
 LDM
 LDMs
+LDP
 learnable
 LeViT
 LibriSpeech
@@ -345,6 +350,8 @@ Mapillary
 Markovian
 Martyniuk
 maskrcnn
+mathbf
+MBs
 MediaPipe
 mel
 Mels
@@ -362,10 +369,14 @@ mms
 MMS
 MLLM
 MLLMs
+MMVLM
 MLP
+MobileLLaMA
 mobilenet
 MobileNet
 MobileNetV
+mobilevlm
+MobileVLM
 modelled
 Modelscope
 Mody
@@ -461,6 +472,7 @@ parametrize
 parsers
 perceptron
 Patil
+PEFT
 performant
 PersonaGPT
 photorealism
@@ -762,3 +774,4 @@ ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
+xformers
