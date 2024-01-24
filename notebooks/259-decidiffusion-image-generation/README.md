@@ -6,7 +6,7 @@ The domain of text-to-image generation, with its transformative potential in des
 
 More details about model can be found in [blog post](https://deci.ai/blog/decidiffusion-1-0-3x-faster-than-stable-diffusion-same-quality/) and [model card](https://huggingface.co/Deci/DeciDiffusion-v1-0).
 
-In this tutorial we consider how to convert and run DeciDiffusion using OpenVINO, making text-to-image generative applications more accessible and feasible.
+In this tutorial we consider how to convert and run DeciDiffusion using OpenVINO, making text-to-image generative applications more accessible and feasible. An additional part demonstrates how to run quantization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
 It considers two approaches of image generation using an AI method called `diffusion`:
 
 * `Text-to-image` generation to create images from a text description as input.
@@ -39,7 +39,9 @@ The notebook contains the following steps:
 1. Convert PyTorch models to OpenVINO Intermediate Representation using OpenVINO Converter Tool (OVC).
 2. Prepare Inference Pipeline.
 3. Run Inference pipeline with OpenVINO.
-4. Run Interactive demo for DeciDiffusion model
+4. Optimize `OVStableDiffusionPipeline` with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.
+5. Compare results of original and optimized pipelines.
+6. Run Interactive demo for DeciDiffusion model.
 
 The notebook also provides interactive interface for image generation based on user input (text prompts and source image, if required).
 
