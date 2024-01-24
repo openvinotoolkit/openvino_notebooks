@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "227181f4da74201247b09ed04584b8e76db2546ca31f8cd289cab344662ac61f"
+            "sha256": "bfd1026fcde32c0b31dd94d90b3c4f1f8fd9e0d3dda635d273fb8a49eab08236"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -2352,11 +2352,11 @@
         },
         "nncf": {
             "hashes": [
-                "sha256:645cb21a3a6a252b95770f4565f5cd83cd8bc465287f92a798731edc73304414",
-                "sha256:95cdf43032964f292311d40003d1004a6f94c4560c09c6537e534fb3a38c1483"
+                "sha256:5affe2c33d00feef54f1fc80184e5b79c16afcb8e28f07d71e89aa10cc11f046",
+                "sha256:a8e1d3091b530810de598ba557dcfb40ab6cdb0127ff62ba3b173e219a9082b4"
             ],
             "index": "pypi",
-            "version": "==2.7.0"
+            "version": "==2.8.0"
         },
         "notebook": {
             "hashes": [
@@ -2518,15 +2518,16 @@
                 "sha256:c941a65bd9f8b1ddfa12ad3d93078d8ed087da2ae528c6bac9d60bf8477ed33c",
                 "sha256:cac7a91a2d0e073350c50cfecfdc6de748395597e22ec10285a8bd393786b5dd",
                 "sha256:dfd4cf70ce0c16ede7e43903167db1c6e469987d2cc980339f3e79f2ce786dd4",
-                "sha256:e1b59ce212697eedd09b042aff6a5cfde6851ed2cfea1e9348d152b847776574"
+                "sha256:e1b59ce212697eedd09b042aff6a5cfde6851ed2cfea1e9348d152b847776574",
+                "sha256:1f4d0bb3ae9e763d5fe983e2396d798c7392dec10eb4b06d9e82ebf94a4cea97"
             ],
-            "version": "==2023.2.0"
+            "version": "==2023.3.0"
         },
         "openvino-dev": {
             "hashes": [
-                "sha256:b273113339e3ba722549e7a305715881319b9414b3c04ff49108cc82a066bc57"
+                "sha256:0dacd775c0047f2dd234cdc1f465b0e801532371893d24977f699515c35f2c4a"
             ],
-            "version": "==2023.2.0"
+            "version": "==2023.3.0"
         },
         "openvino-telemetry": {
             "hashes": [
