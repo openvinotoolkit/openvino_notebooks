@@ -45,7 +45,7 @@
 272-paint-by-example
 273-stable-zephyr-3b-chatbot
 276-stable-diffusion-torchdynamo-backend
-279-photo-maker
+281-photo-maker
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
 404-style-transfer-webcam
