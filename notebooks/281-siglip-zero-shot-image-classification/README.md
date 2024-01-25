@@ -34,7 +34,7 @@ Notebook contains the following steps:
 NNCF performs quantization within the OpenVINO IR. It is required to run the first notebook before running the second notebook.
 
 We will use SigLIP model for zero-shot image classification. The result of model work demonstrated on the image below
-![image](https://user-images.githubusercontent.com/29454499/207795060-437b42f9-e801-4332-a91f-cc26471e5ba2.png)
+![image](https://github.com/openvinotoolkit/openvino_notebooks/assets/67365453/8e025ba2-faec-45a2-9e7e-e8ae375593bd)
 
 ## Installation Instructions
 
