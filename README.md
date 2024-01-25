@@ -228,6 +228,7 @@ Demos that demonstrate inference on a particular model.
 | [276-stable-diffusion-torchdynamo-backend](notebooks/276-stable-diffusion-torchdynamo-backend/)<br> | Image generation with Stable Diffusion and OpenVINO™ `torch.compile` feature | <img src=https://user-images.githubusercontent.com/32199725/270969617-ee88eb42-3b0d-42f4-ac71-992c40451849.png width=225> |
 | [277-amused-lightweight-text-to-image](notebooks/277-amused-lightweight-text-to-image)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/277-amused-lightweight-text-to-image/277-amused-lightweight-text-to-image.ipynb)<br>| Lightweight image generation with aMUSEd and OpenVINO™ | <img src=https://huggingface.co/amused/amused-256/resolve/main/assets/collage_small.png width=225> | 
 | [278-stable-diffusion-ip-adapter](notebooks/278-stable-diffusion-ip-adapter)<br> | Image conditioning in Stable Diffusion pipeline using IP-Adapter |  <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/182657d9-2aa3-40b3-9fc4-a90b803419fe width=300> |
+| [280-siglip-zero-shot-image-classification](notebooks/280-siglip-zero-shot-image-classification)<br> | Zero-shot Image Classification with SigLIP | |
 
 <div id='-model-training'></div>
 
