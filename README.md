@@ -49,29 +49,25 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [Segmind-VegaRT](notebooks/248-stable-diffusion-xl/248-segmind-vegart.ipynb)<br> | High-resolution image generation with Segmind-VegaRT and OpenVINO | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/66bfe823-01c8-4749-a8aa-419a1d78a070" width=300> |
 | [Stable-Zephyr chatbot](notebooks/273-stable-zephyr-3b-chatbot/)<br> | Use Stable-Zephyr as chatbot assistant with OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cfac6ddb-6f22-4343-855c-e513269cf2bf width=300> |
 | [Efficient-SAM](notebooks/274-efficient-sam)<br> | Object segmentation with EfficientSAM and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/15d0a23a-0550-43c6-9ca9-f689e772a79a width=300> |
-| [LLM Instruction following pipeline](notebooks/275-llm-question-answering)<br> | Usage variety of LLM models for answering questions using OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/daafd702-5a42-4f54-ae72-2e4480d73501 width=300> | 
+| [LLM Instruction following pipeline](notebooks/275-llm-question-answering)<br> | Usage variety of LLM models for answering questions using OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/daafd702-5a42-4f54-ae72-2e4480d73501 width=300> |
 |[Stable Diffusion with IP-Adapter](notebooks/278-stable-diffusion-ip-adapter)<br> | Image conditioning in Stable Diffusion pipeline using IP-Adapter | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/182657d9-2aa3-40b3-9fc4-a90b803419fe width=300> |
-| [PhotoMaker](notebooks/279-photo-maker)<br> | Text-to-image generation using PhotoMaker and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4 width=300> |
+| [MobileVLM](notebooks/279-mobilevlm-language-assistant)<br> | Mobile language assistant with MobileVLM and OpenVINO | |
+| [DepthAnything](notebooks/280-depth-anything)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F280-depth-anythingh%2F280-depth-anything.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/280-depth-anything/280-depth-anything.ipynb) | Monocular Depth estimation with DepthAnything and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/a9a16658-512f-470c-a33c-0e1f9d0ae72c width=300> |
+| [PhotoMaker](notebooks/281-photo-maker)<br> | Text-to-image generation using PhotoMaker and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4 width=300> |
 
 ## Table of Contents
 
-- [🚀 AI Trends - Notebooks](#-ai-trends---notebooks)
-- [Table of Contents](#table-of-contents)
-- [📝 Installation Guide](#-installation-guide)
-- [🚀 Getting Started](#-getting-started)
-	- [💻 First steps](#-first-steps)
-	- [⌚ Convert \& Optimize](#-convert--optimize)
-	- [🎯 Model Demos](#-model-demos)
-	- [🏃 Model Training](#-model-training)
-	- [📺 Live Demos](#-live-demos)
-- [⚙️ System Requirements](#️-system-requirements)
-- [💻 Run the Notebooks](#-run-the-notebooks)
-	- [To Launch a Single Notebook](#to-launch-a-single-notebook)
-	- [To Launch all Notebooks](#to-launch-all-notebooks)
-- [🧹 Cleaning Up](#-cleaning-up)
-- [⚠️ Troubleshooting](#️-troubleshooting)
-- [🧑‍💻 Contributors](#-contributors)
-- [❓ FAQ](#-faq)
+- [| 279-photo-maker | Text-to-image generation using PhotoMaker and OpenVINO |  |](#-279-photo-maker--text-to-image-generation-using-photomaker-and-openvino---)
+		- [🏃 Model Training](#-model-training)
+		- [📺 Live Demos](#-live-demos)
+	- [⚙️ System Requirements](#️-system-requirements)
+	- [💻 Run the Notebooks](#-run-the-notebooks)
+		- [To Launch a Single Notebook](#to-launch-a-single-notebook)
+		- [To Launch all Notebooks](#to-launch-all-notebooks)
+	- [🧹 Cleaning Up](#-cleaning-up)
+	- [⚠️ Troubleshooting](#️-troubleshooting)
+	- [🧑‍💻 Contributors](#-contributors)
+	- [❓ FAQ](#-faq)
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
@@ -92,7 +88,7 @@ OpenVINO Notebooks require Python and Git. To get started, select the guide for 
 
 The Jupyter notebooks are categorized into four classes, select one related to your needs or give them all a try. Good Luck!
 
-**NOTE: The main branch of this repository was updated to support the new OpenVINO 2023.2 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous release version of OpenVINO, please checkout the [2023.1 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.1). If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2022.3 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2022.3). 
+**NOTE: The main branch of this repository was updated to support the new OpenVINO 2023.3 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous release version of OpenVINO, please checkout the [2023.2 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.2). If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2022.3 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2022.3).
 
 If you need help, please start a GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions).  
 
@@ -230,7 +226,9 @@ Demos that demonstrate inference on a particular model.
 | [276-stable-diffusion-torchdynamo-backend](notebooks/276-stable-diffusion-torchdynamo-backend/)<br> | Image generation with Stable Diffusion and OpenVINO™ `torch.compile` feature | <img src=https://user-images.githubusercontent.com/32199725/270969617-ee88eb42-3b0d-42f4-ac71-992c40451849.png width=225> |
 | [277-amused-lightweight-text-to-image](notebooks/277-amused-lightweight-text-to-image)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/277-amused-lightweight-text-to-image/277-amused-lightweight-text-to-image.ipynb)<br>| Lightweight image generation with aMUSEd and OpenVINO™ | <img src=https://huggingface.co/amused/amused-256/resolve/main/assets/collage_small.png width=225> | 
 | [278-stable-diffusion-ip-adapter](notebooks/278-stable-diffusion-ip-adapter)<br> | Image conditioning in Stable Diffusion pipeline using IP-Adapter |  <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/182657d9-2aa3-40b3-9fc4-a90b803419fe width=300> |
-| [279-photo-maker](notebooks/279-photo-maker)<br> | Text-to-image generation using PhotoMaker and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4 width=225> | 
+| [279-mobilevlm-language-assistant](notebooks/279-mobilevlm-language-assistant)<br> | Mobile language assistant with MobileVLM and OpenVINO | |
+| [280-depth-anything](notebooks/280-depth-anything)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F280-depth-anythingh%2F280-depth-anything.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/280-depth-anything/280-depth-anything.ipynb) | Monocular Depth Estimation with DepthAnything and OpenVINO |  <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/a9a16658-512f-470c-a33c-0e1f9d0ae72c width=225> |
+| [281-photo-maker](notebooks/279-photo-maker)<br> | Text-to-image generation using PhotoMaker and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4 width=225> | 
 
 <div id='-model-training'></div>
 

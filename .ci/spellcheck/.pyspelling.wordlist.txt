@@ -101,6 +101,7 @@ Convolutional
 convolutional
 CoSENT
 CPUs
+cpu
 CRNN
 CSV
 CTC
@@ -141,6 +142,7 @@ denoising
 denormalization
 denormalized
 depainting
+DepthAnything
 detections
 Dettmers
 dev
@@ -168,6 +170,7 @@ Dollár
 donut
 Downloader
 downloader
+downsample
 downsampled
 DPO
 dpredictor
@@ -313,6 +316,7 @@ LCMs
 LCMScheduler
 LDM
 LDMs
+LDP
 learnable
 LeViT
 LibriSpeech
@@ -343,6 +347,7 @@ Mapillary
 Markovian
 Martyniuk
 maskrcnn
+mathbf
 MBs
 MediaPipe
 mel
@@ -359,10 +364,14 @@ mistralai
 MLS
 mms
 MMS
+MMVLM
 MLP
+MobileLLaMA
 mobilenet
 MobileNet
 MobileNetV
+mobilevlm
+MobileVLM
 modelled
 Modelscope
 Mody
@@ -761,3 +770,4 @@ ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
+xformers
