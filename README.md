@@ -57,17 +57,23 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 
 ## Table of Contents
 
-- [| 279-photo-maker | Text-to-image generation using PhotoMaker and OpenVINO |  |](#-279-photo-maker--text-to-image-generation-using-photomaker-and-openvino---)
-		- [🏃 Model Training](#-model-training)
-		- [📺 Live Demos](#-live-demos)
-	- [⚙️ System Requirements](#️-system-requirements)
-	- [💻 Run the Notebooks](#-run-the-notebooks)
-		- [To Launch a Single Notebook](#to-launch-a-single-notebook)
-		- [To Launch all Notebooks](#to-launch-all-notebooks)
-	- [🧹 Cleaning Up](#-cleaning-up)
-	- [⚠️ Troubleshooting](#️-troubleshooting)
-	- [🧑‍💻 Contributors](#-contributors)
-	- [❓ FAQ](#-faq)
+- [🚀 AI Trends - Notebooks](#-ai-trends---notebooks)
+- [Table of Contents](#table-of-contents)
+- [📝 Installation Guide](#-installation-guide)
+- [🚀 Getting Started](#-getting-started)
+	- [💻 First steps](#-first-steps)
+	- [⌚ Convert \& Optimize](#-convert--optimize)
+	- [🎯 Model Demos](#-model-demos)
+	- [🏃 Model Training](#-model-training)
+	- [📺 Live Demos](#-live-demos)
+- [⚙️ System Requirements](#️-system-requirements)
+- [💻 Run the Notebooks](#-run-the-notebooks)
+	- [To Launch a Single Notebook](#to-launch-a-single-notebook)
+	- [To Launch all Notebooks](#to-launch-all-notebooks)
+- [🧹 Cleaning Up](#-cleaning-up)
+- [⚠️ Troubleshooting](#️-troubleshooting)
+- [🧑‍💻 Contributors](#-contributors)
+- [❓ FAQ](#-faq)
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
@@ -228,7 +234,7 @@ Demos that demonstrate inference on a particular model.
 | [278-stable-diffusion-ip-adapter](notebooks/278-stable-diffusion-ip-adapter)<br> | Image conditioning in Stable Diffusion pipeline using IP-Adapter |  <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/182657d9-2aa3-40b3-9fc4-a90b803419fe width=300> |
 | [279-mobilevlm-language-assistant](notebooks/279-mobilevlm-language-assistant)<br> | Mobile language assistant with MobileVLM and OpenVINO | |
 | [280-depth-anything](notebooks/280-depth-anything)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F280-depth-anythingh%2F280-depth-anything.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/280-depth-anything/280-depth-anything.ipynb) | Monocular Depth Estimation with DepthAnything and OpenVINO |  <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/a9a16658-512f-470c-a33c-0e1f9d0ae72c width=225> |
-| [281-photo-maker](notebooks/279-photo-maker)<br> | Text-to-image generation using PhotoMaker and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4 width=225> | 
+| [281-photo-maker](notebooks/281-photo-maker)<br> | Text-to-image generation using PhotoMaker and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4 width=225> | 
 
 <div id='-model-training'></div>
 
