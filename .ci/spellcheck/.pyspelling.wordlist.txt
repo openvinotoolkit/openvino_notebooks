@@ -87,6 +87,7 @@ configs
 Connectionist
 ContentVec
 Contrastive
+contrastive
 ControlNet
 controlnet
 ConvE
