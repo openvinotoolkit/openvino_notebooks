@@ -601,6 +601,8 @@ Shazeer
 Shutterstock
 siggraph
 sigmoid
+SigLIP
+siglip
 SISR
 SlimOrca
 SlowFast
