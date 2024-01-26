@@ -2,15 +2,15 @@
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/281-siglip-zero-shot-image-classification/281-siglip-zero-shot-image-classification.ipynb)
 
-Zero-shot image classification is a computer vision task to classify images into one of several classes, without any prior training or knowledge of the classes.
+Zero-shot image classification is a computer vision task with the goal to classify images into one of several classes without any prior training or knowledge of these classes.
 
 ![zero-shot-pipeline](https://user-images.githubusercontent.com/29454499/207773481-d77cacf8-6cdc-4765-a31b-a1669476d620.png)
 
-In this tutorial, you will use [SigLIP](https://huggingface.co/docs/transformers/main/en/model_doc/siglip) model to perform zero-shot image classification.
+In this tutorial, you will use the [SigLIP](https://huggingface.co/docs/transformers/main/en/model_doc/siglip) model to perform zero-shot image classification.
 
 ## Notebook Contents
 
-This tutorial demonstrates how to perform zero-shot image classification using the open-source SigLIP model. The SigLIP model was proposed in [Sigmoid Loss for Language Image Pre-Training](https://arxiv.org/abs/2303.15343) by Xiaohua Zhai, Basil Mustafa, Alexander Kolesnikov, Lucas Beyer. SigLIP proposes to replace the loss function used in [CLIP](https://github.com/openai/CLIP) (Contrastive Language–Image Pre-training) by a simple pairwise sigmoid loss. This results in better performance in terms of zero-shot classification accuracy on ImageNet.
+This tutorial demonstrates how to perform zero-shot image classification using the open-source SigLIP model. The SigLIP model was proposed in the [Sigmoid Loss for Language Image Pre-Training](https://arxiv.org/abs/2303.15343) paper. SigLIP suggests replacing the loss function used in [CLIP](https://github.com/openai/CLIP) (Contrastive Language–Image Pre-training) with a simple pairwise sigmoid loss. This results in better performance in terms of zero-shot classification accuracy on ImageNet.
 
 ![siglip-performance-comparison](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/model_doc/siglip_table.jpeg)
 
@@ -18,23 +18,21 @@ This tutorial demonstrates how to perform zero-shot image classification using t
 
 You can find more information about this model in the [research paper](https://arxiv.org/abs/2303.15343), [GitHub repository](https://github.com/google-research/big_vision), [Hugging Face model page](https://huggingface.co/docs/transformers/main/en/model_doc/siglip).
 
-Notebook contains the following steps:
+The notebook contains the following steps:
 
-1. Instantiate model
-1. Run PyTorch model inference
-1. Convert model to OpenVINO Intermediate Representation (IR) format.
-1. Run OpenVINO model
-1. Apply post-training quantization using NNCF
-    1. Prepare dataset
-    1. Quantize model
-    1. Run quantized OpenVINO model
-    1. Compare File Size
-    1. Compare inference time of the FP16 IR and quantized models
+1. Instantiate model.
+1. Run PyTorch model inference.
+1. Convert the model to OpenVINO Intermediate Representation (IR) format.
+1. Run OpenVINO model.
+1. Apply post-training quantization using [NNCF](https://github.com/openvinotoolkit/nncf):
+   1. Prepare dataset.
+   1. Quantize model.
+   1. Run quantized OpenVINO model.
+   1. Compare File Size.
+   1. Compare inference time of the FP16 IR and quantized models.
 
-NNCF performs quantization within the OpenVINO IR. It is required to run the first notebook before running the second notebook.
-
-We will use SigLIP model for zero-shot image classification. The result of model work demonstrated on the image below
-![image](https://github.com/openvinotoolkit/openvino_notebooks/assets/67365453/8e025ba2-faec-45a2-9e7e-e8ae375593bd)
+The results of the SigLIP model's performance in zero-shot image classification from this notebook are demonstrated in the image below.
+![image](https://github.com/openvinotoolkit/openvino_notebooks/assets/67365453/c4eb782c-0fef-4a89-a5c6-5cc43518490b)
 
 ## Installation Instructions
 
