@@ -3,6 +3,7 @@ accelerometers
 accelerometer
 acknowledgement
 activations
+adaptively
 adas
 ADE
 aeroplane
@@ -477,6 +478,7 @@ Patil
 PEFT
 performant
 PersonaGPT
+PhotoMaker
 photorealism
 photorealistic
 Piotr

@@ -44,6 +44,7 @@
 272-paint-by-example
 273-stable-zephyr-3b-chatbot
 276-stable-diffusion-torchdynamo-backend
+281-photo-maker
 281-kosmos2-multimodal-large-language-model
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
