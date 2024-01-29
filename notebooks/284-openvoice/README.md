@@ -1,12 +1,12 @@
 # Voice tone cloning with OpenVoice and OpenVINO
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F280-openvoice%2F280-openvoice.ipynb)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/280-openvoice/280-openvoice.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F284-openvoice%2F284-openvoice.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/284-openvoice/284-openvoice.ipynb)
 
 <!-- TODO: insert link with the image/gif -->
 ![sdf](openvoice_scheme.png)
 
-[OpenVoice](https://github.com/myshell-ai/OpenVoice) a versatile instant voice tone transfering and generating speech in various languages with just a brief audio snippet from the source speaker. OpenVoice represents has three main features: (i) high quality tone color replication with multiple languages and accents; (ii) it provides fine-tuned control over voice styles, including emotions, accents, as well as other parameters such as rhythm, pauses, and intonation. (iii) OpenVoice achieves zero-shot cross-lingual voice cloning, eliminating the need for the generated speech and the reference speech to be part of a massive-speaker multilingual training dataset
+[OpenVoice](https://github.com/myshell-ai/OpenVoice) a versatile instant voice tone transferring and generating speech in various languages with just a brief audio snippet from the source speaker. OpenVoice represents has three main features: (i) high quality tone color replication with multiple languages and accents; (ii) it provides fine-tuned control over voice styles, including emotions, accents, as well as other parameters such as rhythm, pauses, and intonation. (iii) OpenVoice achieves zero-shot cross-lingual voice cloning, eliminating the need for the generated speech and the reference speech to be part of a massive-speaker multilingual training dataset
 
 More details about model can be found in [project web page](https://research.myshell.ai/open-voice), [paper](https://arxiv.org/abs/2312.01479), and official [repository](https://github.com/myshell-ai/OpenVoice)
 
