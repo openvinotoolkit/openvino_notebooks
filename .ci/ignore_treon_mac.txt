@@ -1,6 +1,5 @@
 107-speech-recognition-quantization
 108-gpu-device
-111-yolov5-quantization-migration
 117-model-server
 122-quantizing-model-with-accuracy-control
 204-segmenter-semantic-segmentation
@@ -45,5 +44,6 @@
 272-paint-by-example
 273-stable-zephyr-3b-chatbot
 276-stable-diffusion-torchdynamo-backend
+281-kosmos2-multimodal-large-language-model
 279-mobilevlm-language-assistant
 404-style-transfer-webcam
