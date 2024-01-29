@@ -769,3 +769,10 @@ Zongyuan
 ZeroScope
 zeroscope
 xformers
+OpenVoice
+BaseSpeakerTTS
+ToneColorConverter
+nn
+lang
+OpenVoiceBaseClass
+processings
