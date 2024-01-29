@@ -1,0 +1,17 @@
+notebooks/109-performance-tricks/109-latency-tricks.ipynb  # ultralytics<=8.0.178
+notebooks/109-performance-tricks/109-throughput-tricks.ipynb  # ultralytics<=8.0.178
+notebooks/123-detectron2-to-openvino/123-detectron2-to-openvino.ipynb # detectron2@https://github.com/facebookresearch/detectron2
+notebooks/122-quantizing-model-with-accuracy-control/122-yolov8-quantization-with-accuracy-control.ipynb  # ultralytics==8.0.43
+notebooks/204-segmenter-semantic-segmentation/204-segmenter-semantic-segmentation.ipynb # timm==0.4.12, install Segmenter requirements
+notebooks/212-pyannote-speaker-diarization/212-pyannote-speaker-diarization.ipynb  # pyannote-audio@https://github.com/eaidova/pyannote-audio
+notebooks/230-yolov8-optimization/230-yolov8-instance-segmentation.ipynb  # ultralytics==8.0.43
+notebooks/230-yolov8-optimization/230-yolov8-keypoint-detection.ipynb  # ultralytics==8.0.159
+notebooks/230-yolov8-optimization/230-yolov8-object-detection.ipynb  # ultralytics==8.0.43
+notebooks/254-llm-chatbot/254-llm-chatbot.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
+notebooks/254-llm-chatbot/254-rag-chatbot.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
+notebooks/256-bark-text-to-audio/256-bark-text-to-audio.ipynb  # torch==1.13
+notebooks/257-llava-multimodal-chatbot/257-llava-multimodal-chatbot.ipynb # transformers<4.35
+notebooks/257-llava-multimodal-chatbot/257-videollava-multimodal-chatbot.ipynb # transformers<4.35
+notebooks/273-stable-zephyr-3b-chatbot/273-stable-zephyr-3b-chatbot.ipynb # install requirements.txt after clone repo
+notebooks/279-mobilevlm-language-assistant/279-mobilevlm-language-assistant.ipynb # transformers<4.35
+notebooks/280-depth-anything/280-depth-anything.ipynb # install requirements.txt after clone repo
