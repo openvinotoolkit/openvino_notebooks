@@ -1,6 +1,5 @@
 107-speech-recognition-quantization
 108-gpu-device
-111-yolov5-quantization-migration
 117-model-server
 122-quantizing-model-with-accuracy-control
 204-segmenter-semantic-segmentation
