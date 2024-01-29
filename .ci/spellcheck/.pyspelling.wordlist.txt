@@ -38,6 +38,7 @@ backend
 backends
 Baevski
 BasicUNet
+bboxes
 BEiT
 Belrose
 Benchmarking
@@ -88,6 +89,7 @@ configs
 Connectionist
 ContentVec
 Contrastive
+contrastive
 ControlNet
 controlnet
 ConvE
@@ -99,6 +101,7 @@ ConvNeXt
 ConvNeXts
 Convolutional
 convolutional
+coreference
 CoSENT
 CPUs
 cpu
@@ -299,6 +302,9 @@ KiTS
 Koltun
 Kondate
 Kosaraju
+kosmos
+Kosmos
+KOSMOS
 KServe
 Kubernetes
 Kupyn
@@ -364,6 +370,8 @@ mistralai
 MLS
 mms
 MMS
+MLLM
+MLLMs
 MMVLM
 MLP
 MobileLLaMA
@@ -603,6 +611,8 @@ Shazeer
 Shutterstock
 siggraph
 sigmoid
+SigLIP
+siglip
 SISR
 SlimOrca
 SlowFast
