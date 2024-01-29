@@ -53,6 +53,7 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 |[Stable Diffusion with IP-Adapter](notebooks/278-stable-diffusion-ip-adapter)<br> | Image conditioning in Stable Diffusion pipeline using IP-Adapter | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/182657d9-2aa3-40b3-9fc4-a90b803419fe width=300> |
 | [MobileVLM](notebooks/279-mobilevlm-language-assistant)<br> | Mobile language assistant with MobileVLM and OpenVINO | |
 | [DepthAnything](notebooks/280-depth-anything)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F280-depth-anythingh%2F280-depth-anything.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/280-depth-anything/280-depth-anything.ipynb) | Monocular Depth estimation with DepthAnything and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/a9a16658-512f-470c-a33c-0e1f9d0ae72c width=300> |
+| [Kosmos-2: Grounding Multimodal Large Language Models](notebooks/281-kosmos2-multimodal-large-language-model)<br> | Kosmos-2: Grounding Multimodal Large Language Model and OpenVINO™ | <img src=https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/annotated_snowman.jpg width=225> |
 
 ## Table of Contents
 
@@ -233,6 +234,8 @@ Demos that demonstrate inference on a particular model.
 | [278-stable-diffusion-ip-adapter](notebooks/278-stable-diffusion-ip-adapter)<br> | Image conditioning in Stable Diffusion pipeline using IP-Adapter |  <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/182657d9-2aa3-40b3-9fc4-a90b803419fe width=300> |
 | [279-mobilevlm-language-assistant](notebooks/279-mobilevlm-language-assistant)<br> | Mobile language assistant with MobileVLM and OpenVINO | |
 | [280-depth-anything](notebooks/280-depth-anything)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F280-depth-anythingh%2F280-depth-anything.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/280-depth-anything/280-depth-anything.ipynb) | Monocular Depth Estimation with DepthAnything and OpenVINO |  <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/a9a16658-512f-470c-a33c-0e1f9d0ae72c width=225> |
+| [281-kosmos2-multimodal-large-language-model](notebooks/281-kosmos2-multimodal-large-language-model)<br> | Kosmos-2: Multimodal Large Language Model and OpenVINO™ | <img src=https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/annotated_snowman.jpg width=225> |
+
 
 <div id='-model-training'></div>
 
