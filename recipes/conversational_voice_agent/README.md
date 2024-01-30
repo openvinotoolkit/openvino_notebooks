@@ -105,9 +105,13 @@ python convert_and_optimize_chat.py --chat_model_type llama2-7B --quantize_weigh
 ```
 This script will handle the conversion and optimization of the chat model performing weights quantization. 
 
-3. Text to Speech Bark Conversion:
+3. Text to Speech SpeechT5 Model Loading:
 
-Bark model will be optimized with [Intel Extensions for Pytorch (IPEX)](https://github.com/intel/intel-extension-for-pytorch) before the first usage. No need to do it in advance.
+SpeechT5 model will be loaded.
+
+```shell
+python load_tts.py
+```
 
 After running the conversion scripts, you can run app.py to launch the application.
 
@@ -117,9 +121,9 @@ _NOTE: Running the above script may take up to 120 minutes (depending on your ha
 
 Execute the `app.py` script with the following command, including all necessary model directory arguments:
 ```shell
-python app.py --asr_model_dir path/to/asr_model --chat_model_dir path/to/chat_model --tts_model_dir path/to/tts_model --tts_speaker_type [male|female]
+python app.py --asr_model_dir path/to/asr_model --chat_model_dir path/to/chat_model --public_interface
 ```
-Make sure to replace `path/to/asr_model`, `path/to/chat_model`, and `path/to/tts_model` with the actual paths to your respective models. Choose `male` or `female` for the `--tts_speaker_type` argument depending on the desired voice for the Text-to-Speech output. Add `--public_interface` to make it publicly accessible.
+Make sure to replace `path/to/asr_model`, `path/to/chat_model` with the actual paths to your respective models. Add `--public_interface` to make it publicly accessible.
 
 ### Accessing the Web Interface
 Upon successful execution of the script, Gradio will provide a local URL, typically `http://127.0.0.1:XXXX`, which you can open in your web browser to start interacting with the voice agent. If you configured the application to be accessible publicly, Gradio will also provide a public URL.
