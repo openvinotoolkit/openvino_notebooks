@@ -1,17 +1,17 @@
-openvino==2023.2.0
-optimum-intel==1.12.3
-optimum==1.14.1
-nncf==2.7.0
+openvino==2023.3.0
+optimum-intel==1.13.0
+optimum==1.16.2
+nncf==2.8.0
 intel-extension-for-pytorch==2.1.100
 
 onnx==1.14.1
 onnxruntime==1.14.1
 
-transformers==4.34.1
+transformers==4.37.2
 nltk==3.8.1
 librosa==0.10.1
 
-gradio==4.3.0
+gradio==4.16.0
 
 # Bark model from the GitHub repository
 git+https://github.com/suno-ai/bark.git@773624d26db84278a55aacae9a16d7b25fbccab8
