@@ -142,7 +142,7 @@ export class NotebookMetadataCollector {
    */
   _getNotebookCreatedDate() {
     return execSync(
-      `git log --pretty=format:"%ad" --date=iso --diff-filter=A -- ${this._absoluteNotebookPath}`
+      `git log -1 --pretty=format:"%ad" --date=iso --diff-filter=A -- ${this._absoluteNotebookPath}`
     ).toString();
   }
 
@@ -152,7 +152,7 @@ export class NotebookMetadataCollector {
    */
   _getNotebookModifiedDate() {
     return execSync(
-      `git log -1 --pretty=format:"%cd" --date=iso --diff-filter=M -- ${this._absoluteNotebookPath}`
+      `git log -1 --pretty=format:"%ad" --date=iso --diff-filter=a -- ${this._absoluteNotebookPath}`
     ).toString();
   }
 
@@ -228,7 +228,7 @@ export class NotebookMetadataCollector {
       path: this._notebookFilePath,
       imageUrl: this._getImageUrl(),
       createdDate: this._getNotebookCreatedDate(),
-      modifiedDate: this._getNotebookModifiedDate(),
+      modifiedDate: this._getNotebookModifiedDate() || this._getNotebookCreatedDate(),
       links: {
         github: this._getNotebookGitHubLink(),
         colab: this._getNotebookColabLink(),
