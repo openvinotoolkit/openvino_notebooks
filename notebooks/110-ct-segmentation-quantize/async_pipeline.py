@@ -146,16 +146,16 @@ def get_user_config(flags_d: str, flags_nstreams: str, flags_nthreads: int)-> Di
         if device == 'CPU':  # CPU supports a few special performance-oriented keys
             # limit threading for CPU portion of inference
             if flags_nthreads:
-                config['CPU_THREADS_NUM'] = str(flags_nthreads)
+                config['NUM_STREAMS'] = str(flags_nthreads)
 
-            config['CPU_BIND_THREAD'] = 'NO'
+            config['ENABLE_CPU_PINNING'] = 'NO'
 
             # for CPU execution, more throughput-oriented execution via streams
-            config['CPU_THROUGHPUT_STREAMS'] = str(device_nstreams[device]) \
-                if device in device_nstreams else 'CPU_THROUGHPUT_AUTO'
+            config['NUM_STREAMS'] = str(device_nstreams[device]) \
+                if device in device_nstreams else 'AUTO'
         elif device == 'GPU':
-            config['GPU_THROUGHPUT_STREAMS'] = str(device_nstreams[device]) \
-                if device in device_nstreams else 'GPU_THROUGHPUT_AUTO'
+            config['NUM_STREAMS'] = str(device_nstreams[device]) \
+                if device in device_nstreams else 'AUTO'
             if 'MULTI' in flags_d and 'CPU' in devices:
                 # multi-device execution with the CPU + GPU performs best with GPU throttling hint,
                 # which releases another CPU thread (that is otherwise used by the GPU driver for active polling)
