@@ -7,7 +7,7 @@ This tutorial explains how to convert [TensorFlow Lite](https://www.tensorflow.o
 
 ## Notebook Contents
 
-The notebook uses [model conversion API](https://docs.openvino.ai/2023.0/openvino_docs_model_processing_introduction.html) to convert model to OpenVINO Intermediate Representation format.
+The notebook uses [model conversion API](https://docs.openvino.ai/2023.3/openvino_docs_model_processing_introduction.html) to convert model to OpenVINO Intermediate Representation format.
 
 ## Installation Instructions
 
