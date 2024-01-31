@@ -20,10 +20,10 @@ interface INotebooksFilters {
 
 class NotebooksService {
   static async loadNotebooks(): Promise<NotebooksService> {
-    const notebooksMap = (await fetch(`/notebooks-metadata-map.json`).then((response) => response.json())) as Record<
-      string,
-      INotebookMetadata
-    >;
+    const { BASE_URL } = import.meta.env;
+    const notebooksMap = (await fetch(`${BASE_URL}notebooks-metadata-map.json`).then((response) =>
+      response.json()
+    )) as Record<string, INotebookMetadata>;
     return new NotebooksService(notebooksMap);
   }
 

@@ -70,7 +70,7 @@ export const generateNotebooksMapFilePlugin = () => {
         generateNotebooksMapFile(distPath);
       }
 
-      devServer.middlewares.use(`/${NOTEBOOKS_MAP_FILE_NAME}`, (_, res) => {
+      devServer.middlewares.use(`${config.base}${NOTEBOOKS_MAP_FILE_NAME}`, (_, res) => {
         const notebooksFileMapContent = readFileSync(join(distPath, NOTEBOOKS_MAP_FILE_NAME), { encoding: 'utf8' });
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.write(notebooksFileMapContent);
