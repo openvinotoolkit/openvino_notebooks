@@ -8,6 +8,7 @@ import { generateNotebooksMapFilePlugin } from './src/notebook-metadata/generate
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), svgr(), generateNotebooksMapFilePlugin()],
+  base: '/openvino_notebooks/',
   build: {
     target: 'esnext', // TODO Consider removing esnext build target
   },
