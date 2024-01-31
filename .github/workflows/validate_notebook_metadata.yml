@@ -34,7 +34,7 @@ jobs:
           script: |
             const { execSync } = require('child_process');
             const { commits } = context.payload.pull_request;
-            const gitDiffCommand = `git diff --name-only --relative=notebooks HEAD HEAD~${commits} -- *.ipynb ':!notebooks/utils'`;
+            const gitDiffCommand = `git diff --name-only --relative=notebooks --diff-filter=d HEAD~${commits} -- *.ipynb ':!notebooks/utils'`;
             const changedNotebooks = execSync(gitDiffCommand).toString().split('\n').filter(Boolean);
             core.exportVariable('CHANGED_NOTEBOOKS', JSON.stringify(changedNotebooks));
 
