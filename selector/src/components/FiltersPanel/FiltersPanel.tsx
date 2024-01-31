@@ -42,16 +42,16 @@ export const FiltersPanel = (): JSX.Element => {
     tags.filter((tag) => tag.toLowerCase().includes(tagsSearch.toLowerCase()));
 
   const handleTagClick = (tag: string, group: FilterGroupKey): void => {
-    const tagsGroup = selectedTags[group] as string[];
-    if (tagsGroup.includes(tag)) {
+    const tags = selectedTags[group] as string[];
+    if (tags.includes(tag)) {
       setSelectedTags({
         ...selectedTags,
-        [group]: tagsGroup.filter((v) => v !== tag),
+        [group]: tags.filter((v) => v !== tag),
       });
     } else {
       setSelectedTags({
         ...selectedTags,
-        [group]: [...tagsGroup, tag],
+        [group]: [tag],
       });
     }
   };
