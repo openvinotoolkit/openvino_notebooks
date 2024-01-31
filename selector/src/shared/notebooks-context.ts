@@ -37,7 +37,7 @@ export const NotebooksContext = createContext<INotebooksSelector>({
 export function useNotebooksSelector(): INotebooksSelector {
   const [selectedTags, setSelectedTags] = useState(defaultSelectedTags);
   const [searchValue, setSearchValue] = useState('');
-  const [sort, setSort] = useState<SortValues>(SORT_OPTIONS.DEFAULT);
+  const [sort, setSort] = useState<SortValues>(SORT_OPTIONS.RECENTLY_ADDED);
   const [page, setPage] = useState<number>(1);
 
   const resetFilters = () => {
