@@ -46,4 +46,5 @@
 276-stable-diffusion-torchdynamo-backend
 281-kosmos2-multimodal-large-language-model
 279-mobilevlm-language-assistant
+283-photo-maker
 404-style-transfer-webcam
