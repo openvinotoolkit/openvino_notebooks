@@ -37,17 +37,18 @@ const sparkClassNames = {
     'spark-scrollbar spark-scrollbar-y spark-focus-visible spark-focus-visible-self spark-focus-visible-snap spark-dropdown-list-box-scroll',
   dropdownList: 'spark-list spark-list-size-m spark-dropdown-list-box spark-dropdown-primary',
   dropdownListItem: 'spark-list-item',
+  dropdownListActiveItem: 'spark-list-is-focused',
   dropdownListItemText: 'spark-list-item-text',
 } as const;
 
 type DropdownPopoverProps = {
-  // TODO Consider adding selected prop for dropdown item
   items: { text: string; onClick: () => void }[];
   direction: DropdownProps['direction'];
+  selectedOption: string | null;
 };
 
 const DropdownPopover = forwardRef(function DropdownPopover(
-  { items, direction = 'bottom' }: DropdownPopoverProps,
+  { items, selectedOption, direction = 'bottom' }: DropdownPopoverProps,
   ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element {
   const directionClassName = `dropdown-popover-${direction}`;
@@ -58,7 +59,9 @@ const DropdownPopover = forwardRef(function DropdownPopover(
           {items.map(({ text, onClick }, i) => (
             <li
               key={`dropdown-item-${i}-${text}`}
-              className={sparkClassNames.dropdownListItem}
+              className={`${sparkClassNames.dropdownListItem} ${
+                text === selectedOption ? sparkClassNames.dropdownListActiveItem : ''
+              }`}
               role="option"
               tabIndex={0}
               onClick={onClick}
@@ -118,6 +121,7 @@ export const Dropdown = ({
         {isOpened && (
           <DropdownPopover
             direction={direction}
+            selectedOption={selectedOption}
             items={options.map((option) => ({
               text: option,
               onClick: () => {
