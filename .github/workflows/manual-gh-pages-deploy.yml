@@ -1,0 +1,62 @@
+name: Manual Deploy to GitHub Pages
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_assets:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Node.js dependencies
+        working-directory: ./selector
+        shell: bash
+        run: npm ci
+
+      - name: Validate all notebooks metadata
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { NotebookMetadataHandler } = await import('${{ github.workspace }}/selector/src/notebook-metadata/notebook-metadata-handler.js');
+            const [error, metadataMarkdowns] = NotebookMetadataHandler.validateAll();
+            core.summary.addHeading(`Validated Notebooks (${metadataMarkdowns.length})`, '2');
+            core.summary.addRaw(metadataMarkdowns.join('\n\n'));
+            core.summary.write();
+            if (error) {
+              core.setFailed(error);
+            }
+
+      - name: Build static for GitHub Pages
+        working-directory: ./selector
+        shell: bash
+        run: npm run build
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./selector/dist
+
+  deploy_github_pages:
+    runs-on: ubuntu-20.04
+    needs: build_assets
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
