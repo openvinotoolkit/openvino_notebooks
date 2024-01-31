@@ -24,8 +24,6 @@ const filterGroups: IFilterGroup<FilterGroupKey>[] = [
     tags: Object.values(CATEGORIES),
   },
   { title: 'AI Tasks', group: 'tasks', tags: TASKS_VALUES },
-  { title: 'Libraries', group: 'libraries', tags: ['Tensorflow', 'PyTorch'] },
-  { title: 'Other', group: 'other', tags: ['INT8'] },
 ];
 
 const taskSectionTitlesMap: Record<keyof typeof TASKS, string> = {
