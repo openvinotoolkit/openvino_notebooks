@@ -47,7 +47,7 @@ jobs:
         run: npm run build
 
       - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./selector/dist
 
