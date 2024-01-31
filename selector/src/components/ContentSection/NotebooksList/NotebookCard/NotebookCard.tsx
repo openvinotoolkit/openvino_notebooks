@@ -6,7 +6,9 @@ import GitHubIcon from '@assets/images/github.svg?react';
 import OpenvinoLogo from '@assets/images/openvino-logo-colored.svg?react';
 
 import { Button } from '@/components/shared/Button/Button';
+import { Tag } from '@/components/shared/Tag/Tag';
 import { INotebookMetadata } from '@/shared/notebook-metadata';
+import { CATEGORIES } from '@/shared/notebook-tags';
 
 const htmlToText = (value: string): string => {
   const div = document.createElement('div');
@@ -40,7 +42,12 @@ export const NotebookCard = ({ item }: NotebookCardProps): JSX.Element => {
           {item.imageUrl && <img src={item.imageUrl} className="card-image" />}
         </div>
         <div className="card-content">
-          <h6 className={sparkClassNames.cardTitle}>{htmlToText(item.title)}</h6>
+          <h6 className={sparkClassNames.cardTitle}>
+            {item.tags.categories.includes(CATEGORIES.AI_TRENDS) && (
+              <Tag text="🚀 AI Trends" theme="daisy-tint1" variant="action"></Tag>
+            )}
+            <span>{htmlToText(item.title)}</span>
+          </h6>
           <div className="card-footer">
             <div className={sparkClassNames.cardHorizontalLine}></div>
             <div className="card-actions">

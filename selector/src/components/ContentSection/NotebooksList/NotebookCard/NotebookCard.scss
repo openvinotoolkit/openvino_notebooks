@@ -72,6 +72,12 @@
     width: min-content;
 
     .spark-card-horizontal-title {
+      .spark-tag {
+        margin-right: 0.5rem;
+      }
+    }
+
+    .spark-card-horizontal-title {
       max-inline-size: 100%;
       white-space: normal;
     }
