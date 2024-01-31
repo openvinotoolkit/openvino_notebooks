@@ -3,6 +3,10 @@ name: Manual Deploy to GitHub Pages
 on:
   workflow_dispatch:
 
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
 jobs:
   build_assets:
     runs-on: ubuntu-20.04
