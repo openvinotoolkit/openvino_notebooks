@@ -55,7 +55,7 @@ RUN dos2unix /tmp/src/builder/*
 RUN chown -R 1001:0 /tmp/scripts /tmp/src
 USER 1001
 RUN mkdir /opt/app-root/notebooks
-COPY notebooks/ /opt/app-root/notebooks
+COPY /conference-demos/paint-your-dreams-demo/263-lcm-image-generation-paint-your-dreams.ipynb /opt/app-root/notebooks/
 RUN chmod +x /tmp/scripts/assemble
 RUN /tmp/scripts/assemble
 RUN pip check
