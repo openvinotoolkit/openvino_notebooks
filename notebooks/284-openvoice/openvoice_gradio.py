@@ -38,6 +38,12 @@ def predict_impl(prompt, style, audio_file_pth, agree, output_dir, tone_color_co
     
     if language_predicted == "zh":
         tts_model = zh_tts_model
+        if zh_tts_model is None:
+            gr.Warning(f"TTS model for Chinece language was not loaded please set 'enable_chinese_lang=True`")
+            return (
+                text_hint,
+                None,
+            )
         source_se = zh_source_se
         language = 'Chinese'
         if style not in ['default']:
