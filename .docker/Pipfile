@@ -20,15 +20,16 @@ jupyterhub = "==2.2.*"
 jupyterlab = "*"
 jupyterlab-git = "==0.30"
 librosa = ">=0.8.1"
-matplotlib = ">=3.4,<3.5.3"
+matplotlib = ">=3.4"
 monai = ">=0.9.1,<1.0.0"
 nbval = "*"
-nncf = "==2.5.0"
+notebook = "<7.0.0"
+nncf = "==2.8.0"
 numpy = ">=1.21.0"
 onnx = ">=1.11.0"
 opencv-python = "*"
-openvino-dev = {version = "==2023.0.0"}
-openvino-telemetry = "==2022.3.0"
+openvino-dev = {version = "==2023.3.0"}
+openvino-telemetry = "==2023.2.1"
 ovmsclient = "*"
 Pillow = ">=8.3.2"
 psutil = "*"
@@ -42,13 +43,14 @@ scipy = "*"
 seaborn = ">=0.11.0"
 setuptools = ">56.0.0"
 shapely = ">=1.7.1"
-supervisor = "==4.1.0"
+supervisor = ">=4.1.0"
 tensorflow = ">=2.5,<=2.12"
 tensorflow-datasets = "==4.2.0"
 treon = "*"
-torch = {index = "pytorch-wheels", version = "==1.13.1+cpu"}
+torch = {index = "pytorch-wheels", version = "==2.1.0+cpu"}
+torchaudio = {index = "pytorch-wheels", version = "==2.1.0+cpu"}
 torchmetrics = ">=0.11.0"
-torchvision = {index = "pytorch-wheels", version = "==0.14.1+cpu"}
+torchvision = {index = "pytorch-wheels", version = "==0.16.0+cpu"}
 transformers = ">=4.21.1"
 
 [dev-packages]

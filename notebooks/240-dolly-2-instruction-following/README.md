@@ -8,7 +8,7 @@ In this tutorial, we consider how to run an instruction-following text generatio
 
 The notebook provides a simple interface that allows communication with a model using text instruction. In this demonstration user can provide input instructions and the model generates an answer in streaming format.
 
-The image below illustrates provided user instruction and model answer examples.
+The image below illustrates provided user instruction and model answer example:
 
 ![example](https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png)
 
@@ -19,8 +19,10 @@ The tutorial consists of the following steps:
 
 - Install prerequisites
 - Download and convert the model from a public source using the [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
+- Compress model weights to INT8 with [OpenVINO NNCF](https://github.com/openvinotoolkit/nncf)
 - Create an instruction-following inference pipeline
 - Run instruction-following pipeline
 
+## Installation Instructions
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).

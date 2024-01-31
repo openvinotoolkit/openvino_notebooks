@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, windows-2019, macos-11, macos-12]
+        os: [ubuntu-20.04, ubuntu-22.04, windows-2019, macos-12]
         python: ["3.8", "3.9", "3.10"]
     steps:
 
@@ -31,26 +31,26 @@ jobs:
     # These steps are also copied to convert_notebooks.yml
 
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Dotenv Action
       id: dotenv
       uses: xom9ikk/dotenv@v1.0.2
       with:
         path: ./.github/workflows
-    - name: Set up Python
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python }}
     - name: Install required packages
       run:  |
             if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt-get install libsndfile1 -y
             fi
       shell: bash
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python }}
 
     - name: Cache OpenVINO Pip Packages
       id: cachepip
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           pipcache
@@ -59,7 +59,7 @@ jobs:
     # Cache specific files to reduce downloads or prevent network issues
     - name: Cache Files
       id: cachefiles
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
@@ -70,10 +70,8 @@ jobs:
           # 208 omz cache location is set to this with test_replace
           notebooks/208-optical-character-recognition/open_model_zoo_cache
           notebooks/110-ct-scan-live-inference/kits19_frames_1
-          notebooks/212-onnx-style-transfer/model
           notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
         key: ${{ env.FILES_CACHE_KEY }}
-
     # PaddleGAN stores cache in ppgan directory in CACHE_DIR
     - name: Set CACHE_DIR
       shell: bash
@@ -91,7 +89,7 @@ jobs:
     # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
     - name: Cache PaddlePaddle cache directories
       id: cacheusercache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ${{ env.HUB_HOME }}
@@ -149,9 +147,9 @@ jobs:
         python -m pip freeze
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: pip-freeze
+        name: pip-freeze-${{matrix.os}}-${{ matrix.python }}
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
 
     #### End installation/preparation
@@ -174,27 +172,27 @@ jobs:
     - name: Analysing with treon (Windows)
       if: runner.os == 'Windows'
       run: |
-            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_win.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks
+            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_win.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --move_notebooks_dir c:/notebooks --timeout 1200
       shell: bash
     - name: Analysing with treon (Linux)
       if: runner.os == 'Linux'
       run: |
-            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_linux.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_linux.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --timeout 1200
       shell: bash
     - name: Analysing with treon (MacOS)
       if: runner.os == 'MacOS'
       run: |
-            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_mac.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }}
+            python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_mac.txt --report_dir test_report/${{matrix.os}}-${{ matrix.python }} --timeout 1200
       shell: bash
     - name: Archive test report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: test_report.csv
+        name: test_report.csv-${{matrix.os}}-${{ matrix.python }}
         path: test_report.csv
     - name: Archive notebook test report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: test_report
+        name: test_report-${{matrix.os}}-${{ matrix.python }}
         path: test_report/
 
     # Show the cache after running the notebooks

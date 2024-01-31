@@ -59,14 +59,14 @@ jobs:
     # This should ideally be a reusable workflow
 
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Dotenv Action
       id: dotenv
       uses: xom9ikk/dotenv@v1.0.2
       with:
         path: ./.github/workflows
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
     - name: Install required packages
@@ -78,7 +78,7 @@ jobs:
 
     - name: Cache OpenVINO Pip Packages
       id: cachepip
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           pipcache
@@ -87,7 +87,7 @@ jobs:
     # Cache specific files to reduce downloads or prevent network issues
     - name: Cache Files
       id: cachefiles
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
@@ -98,7 +98,6 @@ jobs:
           # 208 omz cache location is set to this with test_replace
           notebooks/208-optical-character-recognition/open_model_zoo_cache
           notebooks/110-ct-scan-live-inference/kits19_frames_1
-          notebooks/212-onnx-style-transfer/model
           notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
         key: ${{ env.FILES_CACHE_KEY }}
 
@@ -119,7 +118,7 @@ jobs:
     # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
     - name: Cache PaddlePaddle cache directories (per OS)
       id: cacheusercache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ${{ env.HUB_HOME }}
@@ -150,10 +149,10 @@ jobs:
         mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
     - name: Download shared datasets
       run: |
-          mkdir notebooks/data/librispeech
+          mkdir -p notebooks/data/librispeech
           wget  -O notebooks/data/librispeech/test-clean.tar.gz http://openslr.elda.org/resources/12/test-clean.tar.gz
           tar -xvf notebooks/data/librispeech/test-clean.tar.gz
-          mkdir notebooks/data/cifar10
+          mkdir -p notebooks/data/cifar10
           wget -O notebooks/data/cifar10/cifar-10-python.tar.gz https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
     - name: Install dependencies
       run: |
@@ -175,9 +174,9 @@ jobs:
         python -m pip freeze
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
-        name: pip-freeze
+        name: pip-freeze-${{matrix.os}}-${{ matrix.python }}
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
 
     #### End installation/preparation
@@ -185,18 +184,8 @@ jobs:
     - name: convert_notebooks
       shell: bash
       run: .ci/convert_notebooks.sh
-    - name: Save HTML files
-      uses: actions/upload-artifact@v2
-      with:
-        name: html_files
-        path: html_files
-    - name: Save Markdown files
-      uses: actions/upload-artifact@v2
-      with:
-        name: markdown_files
-        path: markdown_files
     - name: Save reStructuredText files
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: rst_files
         path: rst_files

@@ -23,8 +23,7 @@ This tutorial consists of the following steps
 - Preparing the PyTorch model
 - Download and prepare data
 - Check inference with the PyTorch model
-- Convert to ONNX format
-- Convert ONNX Model to OpenVINO Intermediate Representation
+- Convert Model to OpenVINO Intermediate Representation
 - Verify inference with the converted model
 
 ## Installation Instructions
