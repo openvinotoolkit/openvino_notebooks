@@ -1,13 +1,3 @@
-import nltk
-from nltk.tokenize import word_tokenize
-
-# Attempt to download the 'punkt' tokenizer
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
-
-
 from transformers import SpeechT5Processor, SpeechT5ForTextToSpeech, SpeechT5HifiGan
 
 def download_models():
