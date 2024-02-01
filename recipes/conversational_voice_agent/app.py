@@ -69,9 +69,6 @@ def load_tts_model() -> None:
     """
     Loads the Text-to-Speech (TTS) models and processor for SpeechT5.
 
-        tts_processor (SpeechT5Processor): Processor for preparing text inputs.
-        tts_model (SpeechT5ForTextToSpeech): TTS model for converting text to speech.
-        tts_vocoder (SpeechT5HifiGan): Vocoder for generating audible speech.
     """
     global tts_processor, tts_model, tts_vocoder
 
