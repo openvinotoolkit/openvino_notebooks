@@ -5,12 +5,15 @@ from typing import Tuple, List
 import gradio as gr
 import librosa
 import numpy as np
-import re
 import time
 import torch
 from datasets import load_dataset
 from optimum.intel import OVModelForCausalLM, OVModelForSpeechSeq2Seq
 from transformers import AutoConfig, AutoTokenizer, AutoProcessor, SpeechT5Processor, SpeechT5ForTextToSpeech, SpeechT5HifiGan, PreTrainedTokenizer
+
+# Import nltk and download the punkt tokenizer models
+import nltk
+nltk.download('punkt', quiet=True)
 
 # Global variables initialization
 AUDIO_WIDGET_SAMPLE_RATE = 16000
@@ -148,47 +151,77 @@ def chat(history: List) -> List[List[str]]:
     return history
 
 
+def chunk_sentence(sentence, max_length, processor):
+    """
+    Chunk a sentence into smaller parts based on the max token length.
+
+    Args:
+        sentence (str): The sentence to chunk.
+        max_length (int): The maximum length of each chunk in tokens.
+        processor: The processor used for tokenization.
+
+    Returns:
+        List[str]: A list of sentence chunks.
+    """
+    words = sentence.split()
+    chunks = []
+    current_chunk = []
+
+    for word in words:
+        # Check if adding the next word exceeds the max_length
+        if len(processor.tokenize(" ".join(current_chunk + [word]))) <= max_length:
+            current_chunk.append(word)
+        else:
+            if current_chunk:
+                # Add the current chunk to the chunks list
+                chunks.append(" ".join(current_chunk))
+                current_chunk = [word]
+            else:
+                # Handle case where a single word exceeds max_length
+                chunks.append(word)
+
+    # Add the last chunk if it's not empty
+    if current_chunk:
+        chunks.append(" ".join(current_chunk))
+
+    return chunks
+
+
 def synthesize(conversation: List[List[str]]) -> Tuple[int, np.ndarray]:
     """
     Synthesizes speech from the last message in a conversation using a TTS model.
-
-    Parameters:
-        conversation (List[List[str]]): A list of message pairs, each pair containing a
-                                        user prompt and an assistant response.
-
-    Returns:
-        Tuple[int, np.ndarray]: A tuple containing the sampling rate (int) and the
-                                synthesized audio as a numpy ndarray.
     """
-    start_time = time.time()  # Start time
+    start_time = time.time()
     prompt = conversation[-1][-1]
-
-    # Function to split text into sentences
-    def split_into_sentences(text):
-        sentences = re.split(r'(?<=[^A-Z].[.!?]) +(?=[A-Z])', text)
-        return [sentence.strip() for sentence in sentences if sentence.strip()]
-
-    # Split the prompt into sentences
-    sentences = split_into_sentences(prompt)
+    sentences = nltk.sent_tokenize(prompt)
     audio_segments = []
+
+    # Load speaker embeddings once
+    embeddings_dataset = load_dataset("Matthijs/cmu-arctic-xvectors", split="validation")
+    speaker_embeddings = torch.tensor(embeddings_dataset[7306]["xvector"]).unsqueeze(0)
 
     for sentence in sentences:
         inputs = tts_processor(text=sentence, return_tensors="pt")
 
-        # Check if the token count is within the limit
         if inputs.input_ids.size(1) <= 600:
-            embeddings_dataset = load_dataset("Matthijs/cmu-arctic-xvectors", split="validation")
-            speaker_embeddings = torch.tensor(embeddings_dataset[7306]["xvector"]).unsqueeze(0)
             speech = tts_model.generate_speech(inputs["input_ids"], speaker_embeddings, vocoder=tts_vocoder)
             audio_segments.append(speech.numpy())
+        else:
+            # Chunk the sentence and process each chunk
+            sentence_chunks = chunk_sentence(sentence, 600, tts_processor)
+            for chunk in sentence_chunks:
+                print("Processing chunk:", chunk)  # Debugging: print each chunk being processed
+                chunk_inputs = tts_processor(text=chunk, return_tensors="pt")
+                chunk_speech = tts_model.generate_speech(chunk_inputs["input_ids"], speaker_embeddings, vocoder=tts_vocoder)
+                audio_segments.append(chunk_speech.numpy())
 
     # Combine audio segments
-    combined_audio = np.concatenate(audio_segments, axis=0) if audio_segments else np.array([])
-    end_time = time.time()  # End time
+    combined_audio = np.concatenate(audio_segments, axis=0)
+
+    end_time = time.time()
     print("TTS model synthesis time: {:.2f} seconds".format(end_time - start_time))
-
     return AUDIO_WIDGET_SAMPLE_RATE, combined_audio
-
+  
 
 def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> List[List[str]]:
     """
