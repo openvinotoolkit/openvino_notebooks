@@ -31,15 +31,16 @@ We recommend running the notebook in a virtual environment. You only need a Jupy
 For details, please refer to [Installation Guide](../../README.md).
 
 ## Docker Installation Instructions
+
 1. Open terminal in "openvino_notebooks" root directory
 2. Build docker image: `sudo docker build -f conference-demos/paint-your-dreams-demo/Dockerfile -t your_image_name .`
 3. Run docker
-
-a) CPU ONLY: `sudo docker run -it -p 8888:8888 -p 7860-7870:7860-7870 your_image_name`
-
-b) CPU+GPU: `sudo docker run -it --device=/dev/dri --group-add=$(stat -c "%g" /dev/dri/render* | head -n 1) -p 8888:8888 -p 7860-7870:7860-7870 your_image_name`
+    1. CPU ONLY: `sudo docker run -it -p 8888:8888 -p 7860-7870:7860-7870 your_image_name`
+    2. CPU+GPU: `sudo docker run -it --device=/dev/dri --group-add=$(stat -c "%g" /dev/dri/render* | head -n 1) -p 8888:8888 -p 7860-7870:7860-7870 your_image_name`
 
 *8888 port opens port for jupyter*
+
 *7860 is default port for Gradio Apps*
+
 
 
