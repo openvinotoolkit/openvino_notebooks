@@ -65,7 +65,7 @@ def patch_notebooks(notebooks_dir, test_device=""):
                 if test_device and DEVICE_WIDGET in cell["source"]:
                     device_found = True
                     cell["source"] = re.sub(r"value=.*,", f"value='{test_device.upper()}',", cell["source"])
-                    cell["source"] = re.sub(r"options=.*,", f"options=['{test_device.upper()}'],", cell["source"])
+                    cell["source"] = re.sub(r"options=", f"options=['{test_device.upper()}'] + ", cell["source"])
                     print(f"Replaced testing device to {test_device}")
                 replace_dict = cell.get("metadata", {}).get("test_replace")
                 if replace_dict is not None:
