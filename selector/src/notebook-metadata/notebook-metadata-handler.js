@@ -54,7 +54,6 @@ export class NotebookMetadataHandler {
   }
 
   static getNotebooksPaths() {
-    // TODO Consider removing external glob dependency
     return globSync('**/*.ipynb', {
       ignore: ['**/.ipynb_checkpoints/*', '**/notebook_utils.ipynb', ...this._skippedNotebooks],
       cwd: NOTEBOOKS_DIRECTORY_PATH,
