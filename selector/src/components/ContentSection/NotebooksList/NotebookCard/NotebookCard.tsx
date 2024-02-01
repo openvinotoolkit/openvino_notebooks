@@ -22,15 +22,17 @@ const sparkClassNames = {
   card: 'spark-card spark-card-horizontal spark-card-border-normal',
   cardImage: 'spark-card-horizontal-bg-image spark-card-bg-fit-cover',
   cardTitle: 'spark-heading spark-font-100 spark-card-horizontal-title',
+  fontCardDescription: 'spark-font-50',
   fontImagePlaceholder: 'spark-font-200',
   cardHorizontalLine: 'spark-card-horizontal-line',
 };
 
 type NotebookCardProps = {
   item: INotebookMetadata;
+  showTasks?: boolean;
 };
 
-export const NotebookCard = ({ item }: NotebookCardProps): JSX.Element => {
+export const NotebookCard = ({ item, showTasks = false }: NotebookCardProps): JSX.Element => {
   return (
     <div className={sparkClassNames.card}>
       <div className="card-wrapper">
@@ -48,6 +50,11 @@ export const NotebookCard = ({ item }: NotebookCardProps): JSX.Element => {
             )}
             <span>{htmlToText(item.title)}</span>
           </h6>
+          {showTasks && (
+            <div className={`${sparkClassNames.fontCardDescription} card-description`}>
+              {item.tags.tasks.join(' • ')}
+            </div>
+          )}
           <div className="card-footer">
             <div className={sparkClassNames.cardHorizontalLine}></div>
             <div className="card-actions">

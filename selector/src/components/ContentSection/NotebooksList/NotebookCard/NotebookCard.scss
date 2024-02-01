@@ -72,14 +72,18 @@
     width: min-content;
 
     .spark-card-horizontal-title {
+      max-inline-size: 100%;
+      white-space: normal;
+
       .spark-tag {
         margin-right: 0.5rem;
       }
     }
 
-    .spark-card-horizontal-title {
-      max-inline-size: 100%;
-      white-space: normal;
+    .card-description {
+      margin-top: 0.25rem;
+      color: var(--spark-color-carbon-tint1);
+      font-weight: 500;
     }
 
     .card-footer {
