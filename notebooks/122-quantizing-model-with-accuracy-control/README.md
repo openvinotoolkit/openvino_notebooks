@@ -6,7 +6,7 @@ These tutorials demonstrate how to apply 8-bit quantization with accuracy contro
 
 The code of the tutorials is designed to be extendable to the same model types trained on custom datasets.
 
-The advanced quantization flow allows to apply 8-bit quantization to the model with control of accuracy metric. This is achieved by keeping the most impactful operations within the model in the original precision. The flow is based on the [Quantizing with Accuracy Control](https://docs.openvino.ai/2023.0/quantization_w_accuracy_control.html) and has the following specifics:
+The advanced quantization flow allows to apply 8-bit quantization to the model with control of accuracy metric. This is achieved by keeping the most impactful operations within the model in the original precision. The flow is based on the [Quantizing with Accuracy Control](https://docs.openvino.ai/2023.3/quantization_w_accuracy_control.html) and has the following specifics:
 
 - Besides the calibration dataset, a validation dataset is required to compute the accuracy metric. Both datasets can refer to the same data in the simplest case.
 - Validation function, used to compute accuracy metric is required. It can be a function that is already available in the source framework or a custom function.

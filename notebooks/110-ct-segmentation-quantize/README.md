@@ -25,7 +25,7 @@ so it is not required to run the data preparation and training notebooks before 
 
 This quantization tutorial consists of the following steps:
 
-* Use model conversion Python API to convert the model to OpenVINO IR. For more information about model conversion Python API, see this [page](https://docs.openvino.ai/2023.0/openvino_docs_model_processing_introduction.html).
+* Use model conversion Python API to convert the model to OpenVINO IR. For more information about model conversion Python API, see this [page](https://docs.openvino.ai/2023.3/openvino_docs_model_processing_introduction.html).
 * Quantizing the model with NNCF with the [Post-training Quantization with NNCF Tool](https://docs.openvino.ai/nightly/basic_quantization_flow.html) API in OpenVINO.
 * Evaluating the F1 score metric of the original model and the quantized model.
 * Benchmarking performance of the original model and the quantized model.

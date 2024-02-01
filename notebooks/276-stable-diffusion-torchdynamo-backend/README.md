@@ -1,6 +1,6 @@
 # Image Generation with Stable Diffusion using OpenVINO TorchDynamo backend
 
-This notebook demonstrates how to use a **[Stable Diffusion](https://huggingface.co/stabilityai/stable-diffusion-2-1)** model for image generation with [OpenVINO TorchDynamo backend](https://docs.openvino.ai/2023.1/pytorch_2_0_torch_compile.html). The `torch.compile` feature enables you to use OpenVINO for PyTorch-native applications. It speeds up PyTorch code by JIT-compiling it into optimized kernels.
+This notebook demonstrates how to use a **[Stable Diffusion](https://huggingface.co/stabilityai/stable-diffusion-2-1)** model for image generation with [OpenVINO TorchDynamo backend](https://docs.openvino.ai/2023.3/pytorch_2_0_torch_compile.html). The `torch.compile` feature enables you to use OpenVINO for PyTorch-native applications. It speeds up PyTorch code by JIT-compiling it into optimized kernels.
 
 By default, Torch code runs in eager-mode, but with the use of torch.compile it goes through the following steps:
 
