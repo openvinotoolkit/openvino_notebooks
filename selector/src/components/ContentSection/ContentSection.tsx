@@ -16,36 +16,39 @@ export const ContentSection = (): JSX.Element => {
   const { selectedTags, searchValue, sort, page, setPage } = useContext(NotebooksContext);
 
   const [notebooks, setNotebooks] = useState<INotebookMetadata[]>([]);
-  const [filteredNotebooksLength, setFilteredNotebooksLength] = useState<number>(0);
+  const [filteredNotebooksCount, setFilteredNotebooksCount] = useState<number>(0);
+  const [totalNotebooksCount, setTotalNotebooksCount] = useState<number>(0);
 
   const [itemsPerPage, setItemsPerPage] = useState<number>(notebooksPerPageOptions[0]);
 
-  const { notebooksTotalCount } = notebooksService;
-
-  const totalPages = Math.ceil(filteredNotebooksLength / itemsPerPage);
+  const totalPages = Math.ceil(filteredNotebooksCount / itemsPerPage);
 
   useEffect(() => {
     setPage(1);
   }, [selectedTags, searchValue, sort, setPage]);
 
   useEffect(() => {
-    const [paginatedNotebooks, totalSearchedNotebooks] = notebooksService.getNotebooks({
-      tags: selectedTags,
-      searchValue,
-      sort,
-      offset: (page - 1) * itemsPerPage,
-      limit: itemsPerPage,
-    });
-    setNotebooks(paginatedNotebooks);
-    setFilteredNotebooksLength(totalSearchedNotebooks);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    void notebooksService
+      .getNotebooks({
+        tags: selectedTags,
+        searchValue,
+        sort,
+        offset: (page - 1) * itemsPerPage,
+        limit: itemsPerPage,
+      })
+      .then(([paginatedNotebooks, totalSearchedNotebooks, totalNotebooksCount]) => {
+        setNotebooks(paginatedNotebooks);
+        setFilteredNotebooksCount(totalSearchedNotebooks);
+        setTotalNotebooksCount(totalNotebooksCount);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
   }, [selectedTags, searchValue, sort, page, itemsPerPage]);
 
   return (
     <section className="flex-col flex-1 content-section">
       <ContentSectionHeader
-        totalCount={notebooksTotalCount}
-        filteredCount={filteredNotebooksLength}
+        totalCount={totalNotebooksCount}
+        filteredCount={filteredNotebooksCount}
       ></ContentSectionHeader>
       <NotebooksList items={notebooks}></NotebooksList>
       {Boolean(notebooks.length) && (

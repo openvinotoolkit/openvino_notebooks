@@ -9,9 +9,6 @@ import { generateNotebooksMapFilePlugin } from './src/notebook-metadata/generate
 export default defineConfig({
   plugins: [react(), svgr(), generateNotebooksMapFilePlugin()],
   base: '/openvino_notebooks/',
-  build: {
-    target: 'esnext', // TODO Consider removing esnext build target
-  },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),

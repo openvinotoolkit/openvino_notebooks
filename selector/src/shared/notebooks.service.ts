@@ -19,26 +19,28 @@ interface INotebooksFilters {
 }
 
 class NotebooksService {
-  static async loadNotebooks(): Promise<NotebooksService> {
-    const { BASE_URL } = import.meta.env;
-    const notebooksMap = (await fetch(`${BASE_URL}notebooks-metadata-map.json`).then((response) =>
-      response.json()
-    )) as Record<string, INotebookMetadata>;
-    return new NotebooksService(notebooksMap);
+  private _notebooksMap: Record<string, INotebookMetadata> | null = null;
+
+  private async _getNotebooksMap(): Promise<Record<string, INotebookMetadata>> {
+    if (!this._notebooksMap) {
+      const { BASE_URL } = import.meta.env;
+      const notebooksMap = (await fetch(`${BASE_URL}notebooks-metadata-map.json`).then((response) =>
+        response.json()
+      )) as Record<string, INotebookMetadata>;
+      this._notebooksMap = notebooksMap;
+    }
+    return this._notebooksMap;
   }
 
-  constructor(private _notebooksMap: Record<string, INotebookMetadata>) {}
-
-  private get _notebooks(): INotebookMetadata[] {
-    return Object.values(this._notebooksMap);
-  }
-
-  get notebooksTotalCount(): number {
-    return Object.keys(this._notebooksMap).length;
-  }
-
-  getNotebooks({ tags, searchValue, sort, offset, limit }: INotebooksFilters): [INotebookMetadata[], number] {
-    const filteredNotebooks = this._notebooks
+  async getNotebooks({
+    tags,
+    searchValue,
+    sort,
+    offset,
+    limit,
+  }: INotebooksFilters): Promise<[INotebookMetadata[], number, number]> {
+    const notebooks = Object.values(await this._getNotebooksMap());
+    const filteredNotebooks = notebooks
       .filter((notebook) => {
         const flatNotebookTags = Object.values(notebook.tags).flat();
         const flatSelectedTags = Object.values(tags).flat();
@@ -47,7 +49,7 @@ class NotebooksService {
       })
       .filter(({ title }) => title.toLowerCase().includes(searchValue.toLowerCase()));
     const sortedPaginatedNotebooks = filteredNotebooks.sort(this._getCompareFn(sort)).slice(offset, offset + limit);
-    return [sortedPaginatedNotebooks, filteredNotebooks.length];
+    return [sortedPaginatedNotebooks, filteredNotebooks.length, notebooks.length];
   }
 
   private _getCompareFn(sort: SortValues): Parameters<Array<INotebookMetadata>['sort']>[0] {
@@ -71,4 +73,4 @@ class NotebooksService {
   }
 }
 
-export const notebooksService = await NotebooksService.loadNotebooks();
+export const notebooksService = new NotebooksService();
