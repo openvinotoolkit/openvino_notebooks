@@ -107,7 +107,8 @@ This script will handle the conversion and optimization of the chat model perfor
 
 3. Text to Speech SpeechT5 Model Loading:
 
-SpeechT5 model will be loaded.
+The SpeechT5 model will be downloaded.
+
 
 ```shell
 python load_tts.py
