@@ -257,7 +257,7 @@ def create_UI(initial_message: str) -> gr.Blocks:
     return demo
 
 
-def run(asr_model_dir: Path, chat_model_dir: Path, public_interface: bool = False):
+def run(asr_model_dir: Path, chat_model_dir: Path, public_interface: bool = False) -> None:
     """
     Run the assistant application
 
