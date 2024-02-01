@@ -57,7 +57,7 @@ def youri_partial_text_processor(partial_text, new_text):
 
 SUPPORTED_LLM_MODELS = {
     "tiny-llama-1b-chat": {
-        "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v0.6",
+        "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
         "remote": False,
         "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
@@ -172,7 +172,7 @@ SUPPORTED_LLM_MODELS = {
         <|assistant|>""",
     },
     "neural-chat-7b-v3-1": {
-        "model_id": "Intel/neural-chat-7b-v3-1",
+        "model_id": "Intel/neural-chat-7b-v3-3",
         "remote": False,
         "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
         "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
