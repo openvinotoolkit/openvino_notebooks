@@ -367,7 +367,7 @@ jupyter lab notebooks
 
 ## ❓ 常见问题解答
 
-* [OpenVINO支持哪些设备？](https://docs.openvino.ai/2023.0/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html#doxid-openvino-docs-o-v-u-g-supported-plugins-supported-devices)
+* [OpenVINO支持哪些设备？](https://docs.openvino.ai/2023.3/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html#doxid-openvino-docs-o-v-u-g-supported-plugins-supported-devices)
 * [OpenVINO支持的第一代CPU是什么？](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/system-requirements.html)
 * [在使用OpenVINO部署现实世界解决方案方面有没有成功的案例？](https://www.intel.com/content/www/us/en/internet-of-things/ai-in-production/success-stories.html)
 
