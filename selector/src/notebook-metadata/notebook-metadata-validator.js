@@ -108,10 +108,7 @@ const validateCategoriesTags = (categories) => {
 const validateTasksTags = (tasks) => {
   const validTags = TASKS_VALUES;
   const invalidTags = tasks.filter((tag) => !validTags.includes(tag));
-  if (!tasks.length) {
-    console.warn(`'tags.tasks' are empty. Consider adding some tags from ${JSON.stringify(validTags)}.`);
-  }
-  if (!invalidTags.length) {
+  if (tasks.length && !invalidTags.length) {
     return null;
   }
   return toErrorMessage({
