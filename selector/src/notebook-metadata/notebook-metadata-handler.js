@@ -2,7 +2,8 @@
 
 import { globSync } from 'glob';
 
-import { NotebookMetadataCollector, NOTEBOOKS_DIRECTORY_PATH } from './notebook-metadata-collector.js';
+import { NOTEBOOKS_DIRECTORY_PATH } from './notebook-content-reader.js';
+import { NotebookMetadataCollector } from './notebook-metadata-collector.js';
 import { toMarkdown } from './notebook-metadata-formatter.js';
 import { NotebookMetadataValidationError, validateNotebookMetadata } from './notebook-metadata-validator.js';
 
