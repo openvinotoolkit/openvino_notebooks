@@ -22,6 +22,8 @@ import time
 from collections import deque
 from pathlib import Path
 from typing import Dict, Set, List, Optional, Callable
+import openvino.properties as props
+import openvino.properties.hint as hints
 
 import cv2
 
@@ -146,15 +148,15 @@ def get_user_config(flags_d: str, flags_nstreams: str, flags_nthreads: int)-> Di
         if device == 'CPU':  # CPU supports a few special performance-oriented keys
             # limit threading for CPU portion of inference
             if flags_nthreads:
-                config['NUM_STREAMS'] = str(flags_nthreads)
+                config[props.inference_num_threads()] = str(flags_nthreads)
 
-            config['ENABLE_CPU_PINNING'] = 'NO'
+            config[hints.enable_cpu_pinning()] = 'NO'
 
             # for CPU execution, more throughput-oriented execution via streams
-            config['NUM_STREAMS'] = str(device_nstreams[device]) \
+            config[props.num_streams()] = str(device_nstreams[device]) \
                 if device in device_nstreams else 'AUTO'
         elif device == 'GPU':
-            config['NUM_STREAMS'] = str(device_nstreams[device]) \
+            config[props.num_streams()] = str(device_nstreams[device]) \
                 if device in device_nstreams else 'AUTO'
             if 'MULTI' in flags_d and 'CPU' in devices:
                 # multi-device execution with the CPU + GPU performs best with GPU throttling hint,
@@ -177,7 +179,7 @@ class AsyncPipeline:
         self.logger.info('Loading network to {} plugin...'.format(device))
         self.exec_net = ie.compile_model(self.model.net, device, plugin_config)
         if max_num_requests == 0:
-            max_num_requests = self.exec_net.get_property('OPTIMAL_NUMBER_OF_INFER_REQUESTS') + 1
+            max_num_requests = self.exec_net.get_property(props.optimal_number_of_infer_requests()) + 1
         self.requests = [self.exec_net.create_infer_request() for _ in range(max_num_requests)]
         self.empty_requests = deque(self.requests)
         self.completed_request_results = {}
