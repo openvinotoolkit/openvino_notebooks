@@ -142,6 +142,7 @@ Tutorials that explain how to optimize and quantize models with OpenVINO tools.
 | [124-hugging-face-hub](notebooks/124-hugging-face-hub/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F124-hugging-face-hub%2F124-hugging-face-hub.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/124-hugging-face-hub/124-hugging-face-hub.ipynb) | Load models from Hugging Face Model Hub with OpenVINO™ |
 | [125-torchvision-zoo-to-openvino](notebooks/125-torchvision-zoo-to-openvino/)<br>Classification<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F125-torchvision-zoo-to-openvino%2F125-convnext-classification.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/125-torchvision-zoo-to-openvino/125-convnext-classification.ipynb)<br>Semantic Segmentation<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F125-torchvision-zoo-to-openvino%2F125-lraspp-segmentation.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/125-torchvision-zoo-to-openvino/125-lraspp-segmentation.ipynb)| Convert torchvision classification and semantic segmentation models to OpenVINO IR |
 | [126-tensorflow-hub](notebooks/126-tensorflow-hub/)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F126-tensorflow-hub%2F126-tensorflow-hub.ipynb)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/126-tensorflow-hub/126-tensorflow-hub.ipynb) | Convert TensorFlow Hub models to OpenVINO IR |
+| [127-big-transfer-quantization](notebooks/127-big-transfer-quantization/)| BiT Image Classification OpenVINO IR model Quantization with NNCF |
 
 <div id='-model-demos'></div>
 
@@ -396,7 +397,7 @@ Made with [`contrib.rocks`](https://contrib.rocks).
 
 ## ❓ FAQ
 
-* [Which devices does OpenVINO support?](https://docs.openvino.ai/2023.0/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html#doxid-openvino-docs-o-v-u-g-supported-plugins-supported-devices)
+* [Which devices does OpenVINO support?](https://docs.openvino.ai/2023.3/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html#doxid-openvino-docs-o-v-u-g-supported-plugins-supported-devices)
 * [What is the first CPU generation you support with OpenVINO?](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/system-requirements.html)
 * [Are there any success stories about deploying real-world solutions with OpenVINO?](https://www.intel.com/content/www/us/en/internet-of-things/ai-in-production/success-stories.html)
 

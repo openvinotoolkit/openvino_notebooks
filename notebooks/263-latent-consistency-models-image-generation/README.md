@@ -29,7 +29,7 @@ This [notebook](./263-latent-consistency-models-image-generation.ipynb) demonstr
 
 The notebook contains the following steps:
 
-1. Convert PyTorch models to OpenVINO Intermediate Representation using [OpenVINO Model Conversion API](https://docs.openvino.ai/2023.2/openvino_docs_model_processing_introduction.html#convert-a-model-with-python-convert-model)
+1. Convert PyTorch models to OpenVINO Intermediate Representation using [OpenVINO Model Conversion API](https://docs.openvino.ai/2023.3/openvino_docs_model_processing_introduction.html#convert-a-model-with-python-convert-model)
 2. Prepare Inference Pipeline.
 3. Run Inference pipeline with OpenVINO.
 4. Optimize `LatentConsistencyModelPipeline` with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.
@@ -61,7 +61,7 @@ The following image shows an example of the input sequence, input image, conditi
     <img src="https://user-images.githubusercontent.com/29454499/284291731-9c4ee978-a934-43ea-9484-b6b91a9f9407.png"/>
 </p>
 
-1. Convert PyTorch models to OpenVINO Intermediate Representation using [OpenVINO Model Conversion API](https://docs.openvino.ai/2023.2/openvino_docs_model_processing_introduction.html#convert-a-model-with-python-convert-model)
+1. Convert PyTorch models to OpenVINO Intermediate Representation using [OpenVINO Model Conversion API](https://docs.openvino.ai/2023.3/openvino_docs_model_processing_introduction.html#convert-a-model-with-python-convert-model)
 2. Prepare Inference Pipeline.
 3. Run Inference pipeline with OpenVINO.
 4. Optimize `OVControlNetStableDiffusionPipeline` with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.
