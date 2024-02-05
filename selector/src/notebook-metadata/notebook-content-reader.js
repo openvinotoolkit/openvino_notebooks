@@ -76,6 +76,14 @@ export class NotebookContentReader {
 
   /**
    * @protected
+   * @returns {INotebookJson['cells']}
+   */
+  _getCodeCells() {
+    return this._getNotebookJson().cells.filter(({ cell_type }) => cell_type === 'code');
+  }
+
+  /**
+   * @protected
    * @returns {string}
    */
   _getReadmeContent() {
