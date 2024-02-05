@@ -96,18 +96,34 @@ export class NotebookMetadataCollector extends NotebookContentReader {
 
   /**
    * @private
+   * @returns {INotebookMetadata['tags']['libraries']}
+   */
+  _getLibrariesTags() {
+    const codeCells = this._getCodeCells();
+    const content = codeCells.map(({ source }) => source.join('\n')).join('\n');
+    const tags = [];
+    for (const [tag, patterns] of Object.entries(librariesPatterns)) {
+      if (patterns.some((pattern) => content.includes(pattern))) {
+        tags.push(tag);
+      }
+    }
+    return tags;
+  }
+
+  /**
+   * @private
    * @returns {INotebookMetadata['tags']}
    */
   _getTags() {
     const tags = this._getMetadataFromNotebookFile('tags');
-    return (
-      tags || {
-        categories: [],
-        tasks: [],
-        libraries: [],
-        other: [],
-      }
-    );
+    const libraries = this._getLibrariesTags();
+    return {
+      categories: [],
+      tasks: [],
+      other: [],
+      ...tags,
+      libraries,
+    };
   }
 
   /**
@@ -132,3 +148,23 @@ export class NotebookMetadataCollector extends NotebookContentReader {
     };
   }
 }
+
+/** @typedef {typeof import('../shared/notebook-tags.js').LIBRARIES_VALUES} LIBRARIES_VALUES */
+/** @type {Record<LIBRARIES_VALUES[number], string[]>} */
+const librariesPatterns = {
+  NNCF: ['import nncf', 'from nncf'],
+  'Model Converter': ['ov.convert_model(', 'openvino.convert_model(', '! ovc'],
+  'Model Server': ['import ovmsclient', 'from ovmsclient'],
+  'Open Model Zoo': ['omz_downloader', 'omz_converter', 'omz_info_dumper'],
+  'Benchmark Tool': ['benchmark_app'],
+  'Optimum Intel': ['import optimum.intel', 'from optimum.intel'],
+  Transformers: ['import transformers', 'from transformers'],
+  Diffusers: ['import diffusers', 'from diffusers'],
+  TensorFlow: ['import tensorflow', 'from tensorflow'],
+  'TF Lite': ['.tflite'],
+  PyTorch: ['import torch', 'from torch'],
+  ONNX: ['.onnx'],
+  PaddlePaddle: ['import paddle', 'from paddle'],
+  Ultralytics: ['import ultralytics', 'from ultralytics'],
+  Gradio: ['import gradio', 'from gradio'],
+};
