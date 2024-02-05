@@ -47,4 +47,5 @@
 281-kosmos2-multimodal-large-language-model
 279-mobilevlm-language-assistant
 283-photo-maker
+284-openvoice
 404-style-transfer-webcam
