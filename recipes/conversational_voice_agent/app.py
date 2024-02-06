@@ -7,6 +7,7 @@ import librosa
 import numpy as np
 import time
 import torch
+import intel_extension_for_pytorch as ipex
 from datasets import load_dataset
 from optimum.intel import OVModelForCausalLM, OVModelForSpeechSeq2Seq
 from transformers import AutoConfig, AutoTokenizer, AutoProcessor, SpeechT5Processor, SpeechT5ForTextToSpeech, SpeechT5HifiGan, PreTrainedTokenizer
@@ -17,6 +18,7 @@ nltk.download('punkt', quiet=True)
 
 # Global variables initialization
 AUDIO_WIDGET_SAMPLE_RATE = 16000
+USE_IPEX = True  # Globally control the use of IPEX optimizations
 SYSTEM_CONFIGURATION = "You're Adrishuo - a conversational agent. You talk to a customer. You work for a car dealer called XYZ. Your task is to recommend the customer a car based on their needs."
 GREET_THE_CUSTOMER = "Please introduce yourself and greet the customer"
 NEURAL_CHAT_MODEL_TEMPLATE = ("{% if messages[0]['role'] == 'system' %}"
@@ -68,17 +70,24 @@ def load_asr_model(model_dir: Path) -> None:
     asr_processor = AutoProcessor.from_pretrained(model_dir)
 
 
-# Function to load SpeechT5 models
+# Function to load SpeechT5 models with IPEX optimization
 def load_tts_model() -> None:
     """
-    Loads the Text-to-Speech (TTS) models and processor for SpeechT5.
+    Loads the Text-to-Speech (TTS) models and processor for SpeechT5 with optional IPEX optimization.
 
+    Params:
+        use_ipex: A boolean flag to determine if IPEX optimization should be used.
     """
     global tts_processor, tts_model, tts_vocoder, speaker_embeddings
 
     tts_processor = SpeechT5Processor.from_pretrained("microsoft/speecht5_tts")
     tts_model = SpeechT5ForTextToSpeech.from_pretrained("microsoft/speecht5_tts")
     tts_vocoder = SpeechT5HifiGan.from_pretrained("microsoft/speecht5_hifigan")
+
+    if USE_IPEX:
+        # Apply IPEX optimization to the models
+        tts_model = ipex.optimize(tts_model)
+        tts_vocoder = ipex.optimize(tts_vocoder)
 
     # Load speaker embeddings
     embeddings_dataset = load_dataset("Matthijs/cmu-arctic-xvectors", split="validation")
@@ -159,7 +168,16 @@ def chat(history: List) -> List[List[str]]:
 def synthesize(conversation: List[List[str]]) -> Tuple[int, np.ndarray]:
     """
     Synthesizes speech from the last message in a conversation using a TTS model.
+
+    Params:
+        conversation: The conversation history.
+        use_ipex: Indicates whether IPEX optimization is used for inference.
+
+    Returns:
+        A tuple of the audio sample rate and the combined audio numpy array.
     """
+    print(f"Running inference with {'IPEX optimization.' if USE_IPEX else 'standard PyTorch.'}")
+
     start_time = time.time()
     prompt = conversation[-1][-1]
     sentences = nltk.sent_tokenize(prompt)
