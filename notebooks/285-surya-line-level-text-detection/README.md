@@ -1,4 +1,4 @@
-# Surya line-level text detection
+# Line-level text detection with Surya
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/285-surya-line-level-text-detection/285-surya-line-level-text-detection.ipynb)
 
