@@ -9,7 +9,7 @@ OpenVINO Tokenizers is an OpenVINO extension and a Python library designed to st
 The tutorial consists of the following steps:
 - Explain the basics of tokenization
 - Install OpenVINO Tokenizers
-- Convert tokenizer from Huggingface Hub using CLI and Python API
+- Convert tokenizer from HuggingFace Hub using CLI and Python API
 - Create a Text Generation pipeline with OpenVINO tokenizer and detokenizer
 - Combine an OpenVINO tokenizer with a classification model
 

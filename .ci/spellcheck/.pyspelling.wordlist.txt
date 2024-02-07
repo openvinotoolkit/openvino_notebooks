@@ -1,4 +1,5 @@
 3D
+abstractive
 accelerometers
 accelerometer
 acknowledgement
@@ -138,6 +139,8 @@ denormalization
 denormalized
 depainting
 detections
+detokenization
+detokenizer
 Dettmers
 dev
 detectron
@@ -208,6 +211,7 @@ gcc
 GEC
 GELU
 genai
+genAI
 Girshick
 Gitee
 GitHub
@@ -649,6 +653,7 @@ tokenized
 tokenizer
 Tokenizer
 tokenizers
+Tokenziers
 tokenizes
 tokenizing
 Tongyi
