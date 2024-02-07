@@ -1,6 +1,6 @@
 # Surya line-level text detection
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)]()
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/285-surya-line-level-text-detection/285-surya-line-level-text-detection.ipynb)
 
 In this tutorial we will perform line-level text detection using [Surya](https://github.com/VikParuchuri/surya) toolkit and OpenVINO.
 
