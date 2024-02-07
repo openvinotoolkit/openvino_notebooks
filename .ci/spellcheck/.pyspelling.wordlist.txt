@@ -3,6 +3,7 @@ accelerometers
 accelerometer
 acknowledgement
 activations
+adaptively
 adas
 ADE
 aeroplane
@@ -52,6 +53,7 @@ Bicubic
 bicubic
 bilinear
 biometrics
+BiT
 blockwise
 boolean
 CentOS
@@ -477,6 +479,7 @@ Patil
 PEFT
 performant
 PersonaGPT
+PhotoMaker
 photorealism
 photorealistic
 Piotr
@@ -779,3 +782,10 @@ Zongyuan
 ZeroScope
 zeroscope
 xformers
+OpenVoice
+BaseSpeakerTTS
+ToneColorConverter
+nn
+lang
+OpenVoiceBaseClass
+processings
