@@ -1,7 +1,7 @@
 # OpenVINO Tokenizers: Incorporate Text Processing Into OpenVINO Pipelines
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F261-fast-segment-anything%2F261-fast-segment-anything.ipynb)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/232-clip-language-saliency-map/232-clip-language-saliency-map.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F127-opnevino-tokenizers%2F127-opnevino-tokenizers.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/127-openvino-tokenizers/127-opnevino-tokenizers.ipynb)
 
 OpenVINO Tokenizers is an OpenVINO extension and a Python library designed to streamline tokenizer conversion for seamless integration into your projects. It supports Python and C++ environments and is compatible with all major platforms: Linux, Windows, and MacOS.
 
