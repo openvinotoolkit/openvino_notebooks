@@ -91,6 +91,8 @@ Now, you're ready to download and optimize the models required to run the applic
 
 ## Model Conversion and Optimization
 
+_NOTE: This reference kit requires much bandwidth and disk space (>8GB) for downloading models. Also, the conversion may take much time (>2h) and need much memory (>32GB)) when running for the first time as the models used here are huge. However, after the first run, the subsequent runs will be done much faster._
+
 The application uses three separate models for its operation, each requiring conversion and optimization for use with OpenVINO™. Follow the order below to convert and optimize each model:
 
 1. Automated Speech Recognition Distil-Whisper Conversion:
@@ -107,13 +109,13 @@ This script will handle the conversion and optimization of the chat model perfor
 
 3. Text to Speech SpeechT5 Model Loading:
 
-The SpeechT5 model will be downloaded.
+The SpeechT5 model will be downloaded when running application for the first time.
 
 After running the conversion scripts, you can run app.py to launch the application.
 
-_NOTE: Running the above script may take up to 120 minutes (depending on your hardware Internet connection), as some models are huge (especially chatbots)._
-
 ## Running the Application (Gradio Interface)
+
+_NOTE: This application requires much memory (>16GB) as the models used here are huge (especially chatbot). It may also be slow for less powerful devices._
 
 Execute the `app.py` script with the following command, including all necessary model directory arguments:
 ```shell
