@@ -688,7 +688,7 @@ tokenized
 tokenizer
 Tokenizer
 tokenizers
-Tokenziers
+Tokenizers
 tokenizes
 tokenizing
 Tongyi
