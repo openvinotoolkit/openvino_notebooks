@@ -6,7 +6,7 @@ import { NotebookMetadataCollector, NOTEBOOKS_DIRECTORY_PATH } from './notebook-
 import { toMarkdown } from './notebook-metadata-formatter.js';
 import { NotebookMetadataValidationError, validateNotebookMetadata } from './notebook-metadata-validator.js';
 
-/** @typedef {import('../models/notebook-metadata.ts').INotebookMetadata} INotebookMetadata */
+/** @typedef {import('../shared/notebook-metadata.ts').INotebookMetadata} INotebookMetadata */
 
 export class NotebookMetadataHandler {
   /**
@@ -25,6 +25,10 @@ export class NotebookMetadataHandler {
     '110-ct-segmentation-quantize/data-preparation-ct-scan.ipynb',
     '110-ct-segmentation-quantize/pytorch-monai-training.ipynb',
   ];
+
+  get metadata() {
+    return this._metadata;
+  }
 
   /**
    * @returns {string | null} Validation error
@@ -50,7 +54,6 @@ export class NotebookMetadataHandler {
   }
 
   static getNotebooksPaths() {
-    // TODO Consider removing external glob dependency
     return globSync('**/*.ipynb', {
       ignore: ['**/.ipynb_checkpoints/*', '**/notebook_utils.ipynb', ...this._skippedNotebooks],
       cwd: NOTEBOOKS_DIRECTORY_PATH,
