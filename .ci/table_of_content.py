@@ -128,7 +128,7 @@ def generate_table_of_content(notebook_path: pathlib.Path):
             table_of_content.append(new_line)
             all_titles.append(title)
 
-    table_of_content = ["\n", "#### Table of contents:\n"] + table_of_content
+    table_of_content = ["\n", "#### Table of contents:\n\n"] + table_of_content + ["\n"]
 
     if table_of_content_cell is not None:
         table_of_content_cell = remove_old_tc(table_of_content_cell, table_of_content_cell_idx)
