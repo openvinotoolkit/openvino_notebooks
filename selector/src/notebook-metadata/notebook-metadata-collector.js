@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'fs';
 import { basename, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-/** @typedef {import('../models/notebook-metadata.ts').INotebookMetadata} INotebookMetadata */
+/** @typedef {import('../shared/notebook-metadata.ts').INotebookMetadata} INotebookMetadata */
 /**
  * @typedef {{
  *  metadata: { openvino_notebooks?: Partial<INotebookMetadata> };
@@ -81,7 +81,7 @@ export class NotebookMetadataCollector {
    * @param {K} key
    * @returns {Partial<INotebookMetadata>[K] | null}
    */
-  _getNotebookFileMetadata(key) {
+  _getMetadataFromNotebookFile(key) {
     const { metadata } = this._getNotebookJson();
     if (!metadata.openvino_notebooks) {
       console.warn(`No "openvino_notebooks" metadata found in notebook "${this._notebookFilePath}".`);
@@ -115,16 +115,8 @@ export class NotebookMetadataCollector {
     if (!match || !match.groups || !match.groups.title) {
       return '';
     }
-    return match.groups.title;
-  }
-
-  /**
-   * @private
-   * @returns {string}
-   */
-  _getNotebookDescription() {
-    const description = this._getNotebookFileMetadata('description');
-    return description || '';
+    const markdownLinkRegExp = /\[(.+)\]\(.+\)/g;
+    return match.groups.title.replace(markdownLinkRegExp, (value, group) => `${group || value}`).trim();
   }
 
   /**
@@ -132,7 +124,7 @@ export class NotebookMetadataCollector {
    * @returns {string | null}
    */
   _getImageUrl() {
-    const imageUrl = this._getNotebookFileMetadata('imageUrl');
+    const imageUrl = this._getMetadataFromNotebookFile('imageUrl');
     return imageUrl || null;
   }
 
@@ -203,8 +195,7 @@ export class NotebookMetadataCollector {
    * @returns {INotebookMetadata['tags']}
    */
   _getTags() {
-    // TODO Consider merging of tags keys
-    const tags = this._getNotebookFileMetadata('tags');
+    const tags = this._getMetadataFromNotebookFile('tags');
     return (
       tags || {
         categories: [],
@@ -224,7 +215,6 @@ export class NotebookMetadataCollector {
   getMetadata() {
     return {
       title: this._getNotebookTitle(),
-      description: this._getNotebookDescription(),
       path: this._notebookFilePath,
       imageUrl: this._getImageUrl(),
       createdDate: this._getNotebookCreatedDate(),

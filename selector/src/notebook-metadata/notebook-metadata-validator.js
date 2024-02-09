@@ -1,9 +1,9 @@
 // @ts-check
 
-import { CATEGORIES, TASKS_VALUES } from '../models/notebook-tags.js';
+import { CATEGORIES, TASKS_VALUES } from '../shared/notebook-tags.js';
 
 /**
- * @typedef {import('../models/notebook-metadata.ts').INotebookMetadata} INotebookMetadata
+ * @typedef {import('../shared/notebook-metadata.ts').INotebookMetadata} INotebookMetadata
  * @typedef {(v: any) => boolean} isValidFn
  * @typedef {(v: any) => string | null} ValidatorFn
  */
@@ -108,7 +108,7 @@ const validateCategoriesTags = (categories) => {
 const validateTasksTags = (tasks) => {
   const validTags = TASKS_VALUES;
   const invalidTags = tasks.filter((tag) => !validTags.includes(tag));
-  if (!invalidTags.length) {
+  if (tasks.length && !invalidTags.length) {
     return null;
   }
   return toErrorMessage({
@@ -121,7 +121,6 @@ const validateTasksTags = (tasks) => {
 /** @type {Record<keyof INotebookMetadata, ValidatorFn>} */
 const NOTEBOOK_METADATA_VALIDATORS = {
   title: validate(isNotEmptyString, { key: 'title', type: 'not empty string' }),
-  description: validate(isString, { key: 'description', type: 'a string' }),
   path: validate(isNotEmptyString, { key: 'path', type: 'not empty string' }),
   imageUrl: validate(Nullable(isUrl), { key: 'imageUrl', type: 'a valid URL or null' }),
   createdDate: validate(isDate, { key: 'createdDate', type: 'a valid Date string' }),

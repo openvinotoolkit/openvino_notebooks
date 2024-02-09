@@ -1,0 +1,10 @@
+@import '@spark-design/css/components/tag/index.css';
+
+.spark-tag-theme-daisy-tint1 {
+  color: var(--spark-tag-text-color);
+  background-color: var(--spark-color-daisy-tint1);
+
+  &:hover {
+    background-color: var(--spark-color-daisy-tint1);
+  }
+}

@@ -44,7 +44,11 @@ def remove_old_tc(cell, idx):
 
 def get_tc_line(title, title_for_tc, link, tc_list, titles_list):
     # calc indents for Table of content
-    indents_num = (title.index(" ") - 2) * 4
+    try:
+        indents_num = (title.index(" ") - 2) * 4
+    except:
+        indents_num = -1
+
     if len(tc_list) == 0 or indents_num < 0:
         # when first list item have more than 1 indents the alignment would be broken
         indents_num = 0
@@ -91,6 +95,9 @@ def generate_table_of_content(notebook_path: pathlib.Path):
 
     with open(notebook_path, 'r', encoding='utf-8') as notebook_file:
         notebook_json = json.load(notebook_file)
+
+    if not notebook_json["cells"]:
+        return
 
     table_of_content_cell, table_of_content_cell_idx =\
         find_tc_in_cell(notebook_json["cells"][0])
