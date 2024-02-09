@@ -28,7 +28,7 @@ We will use a pre-trained model from the [Hugging Face Diffusers](https://huggin
 The notebook provides a simple interface that allows communication with a model using text instruction and images. In this demonstration user can provide input instructions and image and the model generates an image. 
 The image below illustrates the provided generated image example.
 
-![text2img_example.gif](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/e07f21a6-a7cf-49cf-bd2f-ec26cb7276d6)
+![generation_example.png(https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/082b3da7-6bb6-4551-bfa6-0e43d8e80b51))
 
 >**Note**: Some demonstrated models can require at least 32GB RAM for conversion and running.
 
@@ -37,7 +37,7 @@ The image below illustrates the provided generated image example.
 The tutorial consists of the following steps:
 
 - Install prerequisites
-- Prepare Face analisys pipeline with OpenVINO
+- Prepare Face analysis pipeline with OpenVINO
 - Prepare Diffusers pipeline
 - Convert PyTorch models
 - Prepare OpenVINO inference pipeline

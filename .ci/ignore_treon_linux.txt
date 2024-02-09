@@ -51,4 +51,5 @@
 281-kosmos2-multimodal-large-language-model
 283-photo-maker
 285-surya-line-level-text-detection
+286-instant-id
 404-style-transfer-webcam
