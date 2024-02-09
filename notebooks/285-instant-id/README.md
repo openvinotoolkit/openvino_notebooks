@@ -28,7 +28,7 @@ We will use a pre-trained model from the [Hugging Face Diffusers](https://huggin
 The notebook provides a simple interface that allows communication with a model using text instruction and images. In this demonstration user can provide input instructions and image and the model generates an image. 
 The image below illustrates the provided generated image example.
 
-![generation_example.png(https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/082b3da7-6bb6-4551-bfa6-0e43d8e80b51))
+![generation_example.png](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/082b3da7-6bb6-4551-bfa6-0e43d8e80b51)
 
 >**Note**: Some demonstrated models can require at least 32GB RAM for conversion and running.
 
