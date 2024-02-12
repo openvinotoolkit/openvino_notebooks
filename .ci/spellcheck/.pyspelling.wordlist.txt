@@ -454,6 +454,7 @@ OpenVINO
 openvino
 OpenVino
 OpenVINO's
+openvoice
 opset
 optimizable
 Orca
