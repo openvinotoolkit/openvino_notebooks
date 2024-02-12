@@ -23,6 +23,7 @@ const openNotebookInDocs = ({ path }: INotebookMetadata) => {
   const notebookFileName = fileNameRegexp.exec(path)?.groups?.fileName;
   const url = `https://docs.openvino.ai/2023.3/notebooks/${notebookFileName}-with-output.html`;
   const isEmbedded = window !== window.parent;
+  // TODO Disable opening docs page for ignored notebooks (and possibly for new not released notebooks)
   window.open(url, isEmbedded ? '_self' : '_blank');
 };
 
