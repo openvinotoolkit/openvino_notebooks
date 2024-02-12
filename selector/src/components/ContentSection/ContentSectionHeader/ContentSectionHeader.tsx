@@ -2,7 +2,7 @@ import './ContentSectionHeader.scss';
 
 import { useContext } from 'react';
 
-import { openFiltersPanel } from '@/components/FiltersPanel/FiltersPanel';
+import { openFiltersPanel } from '@/components/FiltersPanel/filters-panel-handlers';
 import { Button } from '@/components/shared/Button/Button';
 import { Dropdown } from '@/components/shared/Dropdown/Dropdown';
 import { Search } from '@/components/shared/Search/Search';

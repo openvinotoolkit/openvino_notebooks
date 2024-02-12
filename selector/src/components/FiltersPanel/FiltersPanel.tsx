@@ -11,6 +11,7 @@ import { CATEGORIES, LIBRARIES, LIBRARIES_VALUES, TASKS, TASKS_VALUES } from '@/
 import { NotebooksContext } from '@/shared/notebooks-context';
 
 import { Button } from '../shared/Button/Button';
+import { closeFiltersPanel } from './filters-panel-handlers';
 
 interface IFilterGroup<T extends string = string> {
   title: string;
@@ -167,12 +168,4 @@ export const FiltersPanel = (): JSX.Element => {
       </div>
     </section>
   );
-};
-
-export const openFiltersPanel = (): void => {
-  document.body.classList.add('filters-opened');
-};
-
-const closeFiltersPanel = (): void => {
-  document.body.classList.remove('filters-opened');
 };
