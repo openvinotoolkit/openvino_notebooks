@@ -2,12 +2,15 @@ import './FiltersPanel.scss';
 
 import { useContext, useState } from 'react';
 
+import CrossIcon from '@/assets/images/cross.svg?react';
 import { FilterSection } from '@/components/shared/FilterSection/FilterSection';
 import { Search } from '@/components/shared/Search/Search';
 import { ITabItem, Tabs } from '@/components/shared/Tabs/Tabs';
 import { INotebookMetadata } from '@/shared/notebook-metadata';
 import { CATEGORIES, LIBRARIES, LIBRARIES_VALUES, TASKS, TASKS_VALUES } from '@/shared/notebook-tags';
 import { NotebooksContext } from '@/shared/notebooks-context';
+
+import { Button } from '../shared/Button/Button';
 
 interface IFilterGroup<T extends string = string> {
   title: string;
@@ -62,7 +65,7 @@ function getTagsFilterSections<T extends Record<string, Record<string, string>>>
     }
     return (
       <FilterSection<typeof group>
-        key={`${group}-${sectionKey}`}
+        key={`filter-section-${group}-${sectionKey}`}
         title={title}
         group={group}
         tags={filteredTags}
@@ -133,6 +136,7 @@ export const FiltersPanel = (): JSX.Element => {
           librariesFilterSections
         ) : (
           <FilterSection<FilterGroupKey>
+            key={`filter-section-${group}`}
             group={group}
             tags={filterTags(tags)}
             selectedTags={selectedTags[group]}
@@ -145,7 +149,30 @@ export const FiltersPanel = (): JSX.Element => {
 
   return (
     <section className="flex-col filters-panel">
+      <div className="lg-hidden filters-panel-header">
+        <span>Edit Notebooks filters</span>
+        <span onClick={closeFiltersPanel} className="close-icon">
+          <CrossIcon />
+        </span>
+      </div>
       <Tabs items={tabItems} onTabChange={() => setTagsSearch('')}></Tabs>
+      <div className="lg-hidden filters-panel-footer">
+        <Button
+          onClick={closeFiltersPanel}
+          text="Apply filters"
+          variant="action"
+          size="l"
+          className="apply-filters-button"
+        ></Button>
+      </div>
     </section>
   );
+};
+
+export const openFiltersPanel = (): void => {
+  document.body.classList.add('filters-opened');
+};
+
+const closeFiltersPanel = (): void => {
+  document.body.classList.remove('filters-opened');
 };

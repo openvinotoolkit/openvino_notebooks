@@ -9,3 +9,62 @@
     margin-bottom: 1rem;
   }
 }
+
+.filters-panel-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1rem 0;
+  font-weight: 500;
+
+  .close-icon {
+    margin-left: auto;
+    width: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+}
+
+.filters-panel-footer {
+  padding: 1rem 0;
+  margin-top: auto;
+  position: fixed;
+  bottom: 0;
+  right: 1rem;
+  left: 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: inherit;
+  border-top: 1px solid var(--spark-color-carbon-tint2);
+
+  .apply-filters-button {
+    width: 100%;
+    max-inline-size: none;
+  }
+}
+
+@media screen and (max-width: 50.5rem) {
+  // @media screen and (max-width: 808px) {
+  body.filters-opened {
+    overflow: hidden;
+
+    .filters-panel {
+      display: flex;
+      padding-bottom: 2rem;
+    }
+  }
+
+  .filters-panel {
+    display: none;
+    max-width: 100%;
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    z-index: 100;
+    overflow-y: auto;
+  }
+}

@@ -30,3 +30,9 @@
 .min-h-screen {
   @include min-h-screen();
 }
+
+@media screen and (min-width: 50.5rem) {
+  .lg-hidden {
+    display: none !important;
+  }
+}
