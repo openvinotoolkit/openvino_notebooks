@@ -11,7 +11,7 @@ The framework of Depth Anything is shown below. it adopts a standard pipeline to
 
 More details about model can be found in [project web page](https://depth-anything.github.io/), [paper](https://arxiv.org/abs/2401.10891), and official [repository](https://github.com/LiheYoung/Depth-Anything)
 
-In this tutorial we will explore how to convert and run DepthAnything using OpenVINO.
+In this tutorial we will explore how to convert and run DepthAnything using OpenVINO. An additional part demonstrates how to run quantization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up the model.
 
 ## Notebook Contents
 
@@ -23,6 +23,8 @@ The tutorial consists of following steps:
 - Convert Model to Openvino Intermediate Representation format
 - Run OpenVINO model inference on single image
 - Run OpenVINO model inference on video
+- Optimize Model
+- Compare results of original and optimized models
 - Launch interactive demo
 
 ## Installation Instructions
