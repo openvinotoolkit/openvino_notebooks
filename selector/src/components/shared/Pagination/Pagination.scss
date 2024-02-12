@@ -1,0 +1,25 @@
+@import '@spark-design/css/components/button/index.css';
+
+.pagination {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+
+  .pagination-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-wrap: nowrap;
+
+    .items-per-page-dropdown {
+      max-width: 72px;
+    }
+  }
+
+  .pagination-list {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 2rem;
+  }
+}

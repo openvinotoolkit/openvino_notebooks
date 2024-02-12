@@ -1,0 +1,212 @@
+/**
+ * Copyright (C) 2023 Intel Corporation
+ * SPDX-License-Identifier: MIT
+*/
+
+.spark-tag .spark-icon {
+    color: var(--spark-tag-close-icon-color);
+}
+
+/* ------------------------------- Action ------------------------------- */
+
+.spark-tag-action {
+    background: var(--spark-tag-action-background-color);
+    color: var(--spark-tag-action-text-color);
+}
+
+.spark-tag-action .spark-icon {
+    color: var(--spark-tag-action-text-color);
+}
+
+.spark-tag-action:hover {
+    background: var(--spark-tag-action-background-color-hover);
+}
+
+.spark-tag-action:active {
+    background: var(--spark-tag-action-background-color-active);
+}
+
+.spark-tag-action:focus-visible {
+    background: var(--spark-tag-action-background-color-focus);
+    outline: none;
+}
+
+/* ---------------------- Primary/Secondary/Ghost ----------------------- */
+
+.spark-tag-primary,
+.spark-tag-secondary,
+.spark-tag-ghost {
+    background: var(--spark-tag-background-color);
+    color: var(--spark-tag-text-color);
+}
+
+.spark-tag-primary {
+    box-shadow: inset 0 0 0 1px var(--spark-tag-primary-border-color);
+}
+
+.spark-tag-secondary {
+    box-shadow: inset 0 0 0 1px var(--spark-tag-secondary-border-color);
+}
+
+.spark-tag-primary:hover,
+.spark-tag-secondary:hover,
+.spark-tag-ghost:hover {
+    background: var(--spark-tag-hover-color);
+}
+
+.spark-tag-primary:active,
+.spark-tag-secondary:active,
+.spark-tag-ghost:active {
+    background: var(--spark-tag-active-color);
+}
+
+.spark-tag-primary:focus-visible,
+.spark-tag-secondary:focus-visible,
+.spark-tag-ghost:focus-visible {
+    background: var(--spark-tag-focus-background-color);
+    color: var(--spark-tag-focus-border-color);
+    box-shadow: inset 0 0 0 1px var(--spark-tag-focus-border-color);
+    outline: none;
+}
+
+.spark-tag-primary:focus-visible .spark-icon,
+.spark-tag-secondary:focus-visible .spark-icon,
+.spark-tag-ghost:focus-visible .spark-icon {
+    color: var(--spark-tag-focus-border-color);
+}
+
+.spark-tag.is-disabled .spark-icon,
+.spark-tag.spark-tag-secondary.is-disabled .spark-icon {
+    color: var(--spark-tag-disabled-text-color);
+}
+
+.spark-tag.is-disabled,
+.spark-tag.spark-tag-action.is-disabled {
+    background: var(--spark-tag-disabled-background-color);
+    color: var(--spark-tag-disabled-text-color);
+    box-shadow: none;
+}
+
+.spark-tag-dashed {
+    border: 1px dashed var(--spark-tag-secondary-border-color);
+    box-shadow: none;
+    block-size: calc(var(--spark-tag-block-size) - 2px) !important;
+    padding-inline: calc(var(--spark-tag-padding) - 1px) !important;
+}
+
+.spark-tag-secondary.spark-tag-classic .spark-icon {
+    color: var(--spark-tag-action-background-color);
+}
+
+.spark-tag-secondary.spark-tag-geode .spark-icon {
+    color: var(--spark-tag-theme-geode);
+}
+
+.spark-tag-secondary.spark-tag-moss .spark-icon {
+    color: var(--spark-tag-theme-moss);
+}
+
+.spark-tag-secondary.spark-tag-rust .spark-icon {
+    color: var(--spark-tag-theme-rust);
+}
+
+.spark-tag-secondary.spark-tag-coral .spark-icon {
+    color: var(--spark-tag-theme-coral);
+}
+
+.spark-tag-action.spark-tag-geode {
+    background: var(--spark-tag-theme-geode);
+}
+
+.spark-tag-action.spark-tag-geode:hover,
+.spark-tag-action.spark-tag-geode:focus-visible {
+    background: var(--spark-tag-theme-geode-hover);
+}
+
+.spark-tag-action.spark-tag-geode:active {
+    background: var(--spark-tag-theme-geode-active);
+}
+
+.spark-tag-action.spark-tag-moss {
+    background: var(--spark-tag-theme-moss);
+}
+
+.spark-tag-action.spark-tag-moss:hover,
+.spark-tag-action.spark-tag-moss:focus-visible {
+    background: var(--spark-tag-theme-moss-hover);
+}
+
+.spark-tag-action.spark-tag-moss:active {
+    background: var(--spark-tag-theme-moss-active);
+}
+
+.spark-tag-action.spark-tag-rust {
+    background: var(--spark-tag-theme-rust);
+}
+
+.spark-tag-action.spark-tag-rust:hover,
+.spark-tag-action.spark-tag-rust:focus-visible {
+    background: var(--spark-tag-theme-rust-hover);
+}
+
+.spark-tag-action.spark-tag-rust:active {
+    background: var(--spark-tag-theme-rust-active);
+}
+
+.spark-tag-action.spark-tag-coral {
+    background: var(--spark-tag-theme-coral);
+}
+
+.spark-tag-action.spark-tag-coral:hover,
+.spark-tag-action.spark-tag-coral:focus-visible {
+    background: var(--spark-tag-theme-coral-hover);
+}
+
+.spark-tag-action.spark-tag-coral:active {
+    background: var(--spark-tag-theme-coral-active);
+}
+
+.spark-tag-secondary.spark-tag-classic:focus-visible .spark-icon,
+.spark-tag-secondary.spark-tag-geode:focus-visible .spark-icon,
+.spark-tag-secondary.spark-tag-moss:focus-visible .spark-icon,
+.spark-tag-secondary.spark-tag-rust:focus-visible .spark-icon,
+.spark-tag-secondary.spark-tag-coral:focus-visible .spark-icon {
+    color: var(--spark-tag-focus-border-color);
+}
+
+.spark-tag-secondary.spark-tag-classic.spark-tag-shadow {
+    box-shadow: inset 0 0 0 1px var(--spark-tag-secondary-border-color),
+        0 1px 0 0 var(--spark-tag-action-background-color);
+}
+
+.spark-tag-secondary.spark-tag-geode.spark-tag-shadow {
+    box-shadow: inset 0 0 0 1px var(--spark-tag-secondary-border-color),
+        0 1px 0 0 var(--spark-tag-theme-geode);
+}
+
+.spark-tag-secondary.spark-tag-moss.spark-tag-shadow {
+    box-shadow: inset 0 0 0 1px var(--spark-tag-secondary-border-color),
+        0 1px 0 0 var(--spark-tag-theme-moss);
+}
+
+.spark-tag-secondary.spark-tag-rust.spark-tag-shadow {
+    box-shadow: inset 0 0 0 1px var(--spark-tag-secondary-border-color),
+        0 1px 0 0 var(--spark-tag-theme-rust);
+}
+
+.spark-tag-secondary.spark-tag-coral.spark-tag-shadow {
+    box-shadow: inset 0 0 0 1px var(--spark-tag-secondary-border-color),
+        0 1px 0 0 var(--spark-tag-theme-coral);
+}
+
+.spark-tag-secondary.spark-tag-shadow:focus-visible {
+    background: var(--spark-tag-focus-background-color);
+    color: var(--spark-tag-focus-border-color);
+    box-shadow: inset 0 0 0 1px var(--spark-tag-focus-border-color),
+        0 1px 0 0 var(--spark-tag-focus-border-color);
+    outline: none;
+}
+
+.spark-tag-secondary.spark-tag-shadow.is-disabled {
+    box-shadow: inset 0 0 0 1px var(--spark-tag-disabled-background-color);
+}

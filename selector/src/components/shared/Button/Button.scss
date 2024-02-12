@@ -1,0 +1,38 @@
+@import '@spark-design/css/components/button/index.css';
+
+.spark-button-start-slot {
+  display: flex;
+}
+
+.spark-button-size-s {
+  .button-icon {
+    height: var(--spark-button-s-line-height);
+    width: var(--spark-button-s-line-height);
+  }
+}
+
+.spark-button-size-m {
+  .button-icon {
+    height: var(--spark-button-m-line-height);
+    width: var(--spark-button-m-line-height);
+  }
+}
+
+.spark-button-size-l {
+  .button-icon {
+    height: var(--spark-button-l-line-height);
+    width: var(--spark-button-l-line-height);
+  }
+}
+
+.spark-button-action {
+  .button-icon {
+    fill: var(--spark-button-action-color);
+  }
+}
+
+.spark-button-disabled {
+  .button-icon {
+    fill: var(--spark-button-disabled-color);
+  }
+}
