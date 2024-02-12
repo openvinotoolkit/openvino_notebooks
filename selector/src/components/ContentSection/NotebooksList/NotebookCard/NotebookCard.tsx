@@ -22,7 +22,8 @@ const openNotebookInDocs = ({ path }: INotebookMetadata) => {
   const fileNameRegexp = /\/(?<fileName>.+)\.ipynb/g;
   const notebookFileName = fileNameRegexp.exec(path)?.groups?.fileName;
   const url = `https://docs.openvino.ai/2023.3/notebooks/${notebookFileName}-with-output.html`;
-  window.open(url, '_blank');
+  const isEmbedded = window !== window.parent;
+  window.open(url, isEmbedded ? '_self' : '_blank');
 };
 
 const sparkClassNames = {
