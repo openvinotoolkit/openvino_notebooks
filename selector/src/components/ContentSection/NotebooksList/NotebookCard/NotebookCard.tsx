@@ -18,6 +18,13 @@ const htmlToText = (value: string): string => {
 
 const openLink = (url: string) => window.open(url, '_blank');
 
+const openNotebookInDocs = ({ path }: INotebookMetadata) => {
+  const fileNameRegexp = /\/(?<fileName>.+)\.ipynb/g;
+  const notebookFileName = fileNameRegexp.exec(path)?.groups?.fileName;
+  const url = `https://docs.openvino.ai/2023.3/notebooks/${notebookFileName}-with-output.html`;
+  window.open(url, '_blank');
+};
+
 const sparkClassNames = {
   card: 'spark-card spark-card-horizontal spark-card-border-normal',
   cardImage: 'spark-card-horizontal-bg-image spark-card-bg-fit-cover',
@@ -36,7 +43,7 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
   const { categories, tasks } = item.tags;
   const descriptionTags = [...categories.filter((v) => v !== CATEGORIES.AI_TRENDS), ...tasks];
   return (
-    <div className={sparkClassNames.card}>
+    <div className={sparkClassNames.card} onClick={() => openNotebookInDocs(item)}>
       <div className="card-wrapper">
         <div className="card-image-container">
           <div className="card-image-placeholder">

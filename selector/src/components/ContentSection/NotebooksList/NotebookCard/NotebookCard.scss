@@ -4,6 +4,7 @@
 .spark-card-horizontal {
   min-inline-size: 0;
   width: 100%;
+  cursor: pointer;
 
   &:hover {
     .card-image,
