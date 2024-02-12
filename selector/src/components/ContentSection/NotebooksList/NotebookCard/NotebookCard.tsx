@@ -32,7 +32,9 @@ type NotebookCardProps = {
   showTasks?: boolean;
 };
 
-export const NotebookCard = ({ item, showTasks = false }: NotebookCardProps): JSX.Element => {
+export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX.Element => {
+  const { categories, tasks } = item.tags;
+  const descriptionTags = [...categories.filter((v) => v !== CATEGORIES.AI_TRENDS), ...tasks];
   return (
     <div className={sparkClassNames.card}>
       <div className="card-wrapper">
@@ -52,7 +54,7 @@ export const NotebookCard = ({ item, showTasks = false }: NotebookCardProps): JS
           </h6>
           {showTasks && (
             <div className={`${sparkClassNames.fontCardDescription} card-description`}>
-              {item.tags.tasks.join(' • ')}
+              {descriptionTags.join(' • ')}
             </div>
           )}
           <div className="card-footer">
