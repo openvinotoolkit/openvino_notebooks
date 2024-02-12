@@ -31,7 +31,7 @@ export const TASKS = /** @type {const} */ ({
     SUPER_RESOLUTION: 'Super Resolution',
     STYLE_TRANSFER: 'Style Transfer',
     POSE_ESTIMATION: 'Pose Estimation',
-    ZERO_SHOT_IMAGE_CLASSIFICATION: 'Zero-Shot Image Classification',,
+    ZERO_SHOT_IMAGE_CLASSIFICATION: 'Zero-Shot Image Classification',
     TEXT_DETECTION: 'Text Detection',
   },
   NLP: {
