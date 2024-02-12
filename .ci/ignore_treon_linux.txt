@@ -50,4 +50,5 @@
 276-stable-diffusion-torchdynamo-backend
 281-kosmos2-multimodal-large-language-model
 283-photo-maker
+285-surya-line-level-text-detection
 404-style-transfer-webcam
