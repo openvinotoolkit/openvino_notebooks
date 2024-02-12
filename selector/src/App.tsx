@@ -7,9 +7,11 @@ import { NotebooksContext, useNotebooksSelector } from './shared/notebooks-conte
 function App(): JSX.Element {
   const notebooksSelector = useNotebooksSelector();
 
+  const isEmbedded = window !== window.parent;
+
   return (
     <>
-      <Header />
+      {!isEmbedded && <Header />}
       <main className="flex-col flex-1">
         <div className="flex flex-1">
           <NotebooksContext.Provider value={notebooksSelector}>
