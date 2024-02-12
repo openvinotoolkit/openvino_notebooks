@@ -20,10 +20,10 @@
 .card-wrapper {
   display: flex;
   flex-grow: 1;
-  height: 130px;
+  min-height: 150px;
 
   .card-image-container {
-    width: 200px;
+    width: 150px;
     height: 100%;
     border-right: 1px solid var(--spark-color-carbon-tint2);
     position: relative;
@@ -34,7 +34,7 @@
 
     .card-image,
     .card-image-placeholder {
-      height: 100%;
+      height: auto;
       width: 100%;
       position: absolute;
       transition: transform 0.2s ease;
@@ -96,6 +96,7 @@
       .card-actions {
         margin-top: 1rem;
         display: flex;
+        flex-wrap: wrap;
         gap: 0.5rem;
       }
     }
