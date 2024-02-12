@@ -165,6 +165,7 @@ DistilBERT
 distilbert
 distiluse
 DL
+DocLayNet
 docstring
 DocVQA
 docvqa
@@ -598,6 +599,7 @@ sd
 SDEdit
 SDXL
 sdxl
+Segformer
 Segmentations
 segmentations
 Segmenter
@@ -662,6 +664,7 @@ Suno
 superresolution
 superset
 Suraj
+surya
 svc
 SVTR
 Swin
