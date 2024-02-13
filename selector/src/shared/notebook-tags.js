@@ -61,3 +61,29 @@ export const TASKS = /** @type {const} */ ({
 export const TASKS_VALUES = Object.values(TASKS)
   .map((v) => Object.values(v))
   .flat();
+
+export const LIBRARIES = /** @type {const} */ ({
+  OPENVINO: {
+    NNCF: 'NNCF',
+    OVC: 'Model Converter',
+    BENCHMARK_APP: 'Benchmark Tool',
+    OVMS: 'Model Server',
+    OMZ: 'Open Model Zoo',
+  },
+  OTHER: {
+    OPTIMUM_INTEL: 'Optimum Intel',
+    TRANSFORMERS: 'Transformers',
+    DIFFUSERS: 'Diffusers',
+    TENSORFLOW: 'TensorFlow',
+    TFLITE: 'TF Lite',
+    PYTORCH: 'PyTorch',
+    ONNX: 'ONNX',
+    PADDLE: 'PaddlePaddle',
+    ULTRALYTICS: 'Ultralytics',
+    GRADIO: 'Gradio',
+  },
+});
+
+export const LIBRARIES_VALUES = Object.values(LIBRARIES)
+  .map((v) => Object.values(v))
+  .flat();

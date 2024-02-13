@@ -6,7 +6,7 @@ import { FilterSection } from '@/components/shared/FilterSection/FilterSection';
 import { Search } from '@/components/shared/Search/Search';
 import { ITabItem, Tabs } from '@/components/shared/Tabs/Tabs';
 import { INotebookMetadata } from '@/shared/notebook-metadata';
-import { CATEGORIES, TASKS, TASKS_VALUES } from '@/shared/notebook-tags';
+import { CATEGORIES, LIBRARIES, LIBRARIES_VALUES, TASKS, TASKS_VALUES } from '@/shared/notebook-tags';
 import { NotebooksContext } from '@/shared/notebooks-context';
 
 interface IFilterGroup<T extends string = string> {
@@ -24,14 +24,54 @@ const filterGroups: IFilterGroup<FilterGroupKey>[] = [
     tags: Object.values(CATEGORIES),
   },
   { title: 'AI Tasks', group: 'tasks', tags: TASKS_VALUES },
+  { title: 'Ecosystem', group: 'libraries', tags: LIBRARIES_VALUES },
 ];
 
-const taskSectionTitlesMap: Record<keyof typeof TASKS, string> = {
+const tasksSectionsTitlesMap: Record<keyof typeof TASKS, string> = {
   MULTIMODAL: 'Multimodal',
   CV: 'Computer Vision',
   NLP: 'Natural Language Processing',
   AUDIO: 'Audio',
 };
+
+const librariesSectionsTitlesMap: Record<keyof typeof LIBRARIES, string> = {
+  OPENVINO: 'OpenVINO',
+  OTHER: 'Other Tools',
+};
+
+function getTagsFilterSections<T extends Record<string, Record<string, string>>>({
+  group,
+  tagsMap,
+  titlesMap,
+  selectedTags,
+  filterTags,
+  handleTagClick,
+}: {
+  group: keyof INotebookMetadata['tags'];
+  tagsMap: T;
+  titlesMap: Record<keyof T, string>;
+  selectedTags: INotebookMetadata['tags'];
+  filterTags: (tags: string[]) => string[];
+  handleTagClick: (tag: string, group: FilterGroupKey) => void;
+}): JSX.Element[] {
+  return Object.entries(tagsMap).map(([sectionKey, tagsMap]) => {
+    const title = titlesMap[sectionKey];
+    const filteredTags = filterTags(Object.values(tagsMap));
+    if (!filteredTags.length) {
+      return <></>;
+    }
+    return (
+      <FilterSection<typeof group>
+        key={`${group}-${sectionKey}`}
+        title={title}
+        group={group}
+        tags={filteredTags}
+        selectedTags={selectedTags[group]}
+        onTagClick={(tag, group) => handleTagClick(tag, group!)}
+      ></FilterSection>
+    );
+  });
+}
 
 export const FiltersPanel = (): JSX.Element => {
   const { selectedTags, setSelectedTags } = useContext(NotebooksContext);
@@ -56,23 +96,22 @@ export const FiltersPanel = (): JSX.Element => {
     }
   };
 
-  const tasksFilterSections = Object.entries(TASKS).map(([sectionKey, tagsMap]) => {
-    const group = 'tasks';
-    const title = taskSectionTitlesMap[sectionKey as keyof typeof TASKS];
-    const filteredTags = filterTags(Object.values(tagsMap));
-    if (!filteredTags.length) {
-      return <></>;
-    }
-    return (
-      <FilterSection<typeof group>
-        key={`${group}-${sectionKey}`}
-        title={title}
-        group={group}
-        tags={filteredTags}
-        selectedTags={selectedTags[group]}
-        onTagClick={(tag, group) => handleTagClick(tag, group!)}
-      ></FilterSection>
-    );
+  const tasksFilterSections = getTagsFilterSections<typeof TASKS>({
+    group: 'tasks',
+    tagsMap: TASKS,
+    titlesMap: tasksSectionsTitlesMap,
+    selectedTags,
+    filterTags,
+    handleTagClick,
+  });
+
+  const librariesFilterSections = getTagsFilterSections<typeof LIBRARIES>({
+    group: 'libraries',
+    tagsMap: LIBRARIES,
+    titlesMap: librariesSectionsTitlesMap,
+    selectedTags,
+    filterTags,
+    handleTagClick,
   });
 
   const tabItems: ITabItem[] = filterGroups.map(({ title, group, tags }) => ({
@@ -90,6 +129,8 @@ export const FiltersPanel = (): JSX.Element => {
         ></Search>
         {group === 'tasks' ? (
           tasksFilterSections
+        ) : group === 'libraries' ? (
+          librariesFilterSections
         ) : (
           <FilterSection<FilterGroupKey>
             group={group}
