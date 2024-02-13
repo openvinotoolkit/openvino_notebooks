@@ -40,7 +40,7 @@
 | [QR Code Monster](notebooks/264-qrcode-monster/)<br> | 使用ControlNet QR Code Monster 和 OpenVINO™生成创意二维码 | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/1a5978c6-e7a0-4824-9318-a3d8f4912c47" width=225> |
 | [Würstchen](notebooks/265-wuerstchen-image-generation)<br> | 基于Würstchen 和 OpenVINO™实现文本到图像生成 | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/6917c558-d74c-4cc9-b81a-679ce0a299ee" width=300> | |
 | [Distil-Whisper](notebooks/267-distil-whisper-asr)<br> | 基于Distil-Whisper 和 OpenVINO™实现自动语音识别 | | |
-| [FILM](notebooks/269-film-slowmo)<br> | 使用FILM 和 OpenVINO™实现视频插帧| <img src="https://github.com/googlestaging/frame-interpolation/raw/main/moment.gif" width=300> |
+| [FILM](notebooks/269-film-slowmo)<br> | 使用FILM 和 OpenVINO™实现视频插帧| <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/7e87e1a5-6197-4a15-9ced-44e21dd05b02" width=300> |
 
 
 ## 目录
@@ -202,7 +202,7 @@ Jupyter notebooks 分为四个大类，选择一个跟你需求相关的开始�
 | [266-speculative-sampling](notebooks/266-speculative-sampling)<br> | 基于推测性抽样, KV Caching, 和 OpenVINO™的文本生成任务 | <img src=https://user-images.githubusercontent.com/29454499/280659301-49a38beb-e6f3-4a2c-858e-be4ca4491016.png width=225> |
 | [267-distil-whisper-asr](notebooks/267-distil-whisper-asr)<br> | 基于Distil-Whisper 和 OpenVINO™实现自动语音识别 | |
 | [268-table-question-answering](notebooks/268-table-question-answering)<br><br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/268-table-question-answering/268-table-question-answering.ipynb)<br> | 使用TAPAS 和 OpenVINO™面向表格文件进行问答 ||
-| [269-film-slowmo](notebooks/269-film-slowmo)<br> | 使用FILM 和 OpenVINO™实现视频插帧 | <img src="https://github.com/googlestaging/frame-interpolation/raw/main/moment.gif" width=225> |
+| [269-film-slowmo](notebooks/269-film-slowmo)<br> | 使用FILM 和 OpenVINO™实现视频插帧 | <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/7e87e1a5-6197-4a15-9ced-44e21dd05b02" width=225> |
 
 <div id='-model-training'/>
 
