@@ -61,11 +61,10 @@ jobs:
     - name: List all changed files
       run: |
         touch test_notebooks.txt
-        file_posix=""
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          echo "$file was changed"
           file_posix=$(($file | sed 's/\\/\//g' | sed 's/://'))
-          echo "$file_posix was changed"
-          echo  $file_posix >> test_notebooks.txt
+          echo $file >> test_notebooks.txt
         done
       shell: bash
     - name: Dotenv Action
