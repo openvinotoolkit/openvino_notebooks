@@ -90,13 +90,10 @@ def clean_test_artifacts(before_test_files, after_test_files):
 def run_test(notebook_path, root, timeout=7200, keep_artifacts=False):
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path)
     print(f'RUN {notebook_path.relative_to(root)}', flush=True)
-    
+    retcodes = []
+
     with cd(notebook_path):
         existing_files = sorted(Path('.').glob("test_*.ipynb"))
-        if not len(existing_files):  # skip empty directories
-            return 0
-        
-        retcodes = []
         
         for notebook_name in existing_files:
         
@@ -166,6 +163,9 @@ def main():
         if report['status'] == "SKIPPED":
             continue
         statuses = run_test(report['path'], root, args.timeout, keep_artifacts)
+        if not statuses:
+            print(f"{str(notebook)}: No testing notebooks found")
+            report['status'] = "EMPTY"
         for subnotebook, status in statuses:
             if status:
                 report['status'] = "TIMEOUT" if status == -42 else "FAILED"
