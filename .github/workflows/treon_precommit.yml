@@ -63,7 +63,6 @@ jobs:
         touch test_notebooks.txt
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           echo "$file was changed"
-          file_posix=$(($file | sed 's/\\/\//g' | sed 's/://'))
           echo $file >> test_notebooks.txt
         done
       shell: bash
