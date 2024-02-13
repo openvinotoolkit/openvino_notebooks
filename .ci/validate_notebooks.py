@@ -65,6 +65,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
 
     ignore_list = ignore_list or []
     ignore_list = set(map(lambda x: Path(x), ignore_list))
+
     for notebook in statuses:
         if notebook not in test_list:
             statuses[notebook]['status'] = 'SKIPPED'
@@ -91,25 +92,24 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False):
     print(f'RUN {notebook_path.relative_to(root)}', flush=True)
     
     with cd(notebook_path):
-        existing_files = sorted(Path('.').iterdir())
+        existing_files = sorted(Path('.').glob("test_*.ipynb"))
         if not len(existing_files):  # skip empty directories
             return 0
         
-        try:
-            notebook_name = str([filename for filename in existing_files if str(filename).startswith('test_')][0])
-        except IndexError:  # if there is no 'test_' notebook generated
-            print('No test_ notebook found.')
-            return 0
+        retcodes = []
         
-        main_command = [sys.executable,  '-m',  'treon', notebook_name]
-        try:
-            retcode = subprocess.run(main_command, shell=(platform.system() == "Windows"), timeout=timeout).returncode
-        except subprocess.TimeoutExpired:
-            retcode = -42
+        for notebook_name in existing_files:
+        
+            main_command = [sys.executable,  '-m',  'treon', str(notebook_name)]
+            try:
+                retcode = subprocess.run(main_command, shell=(platform.system() == "Windows"), timeout=timeout).returncode
+            except subprocess.TimeoutExpired:
+                retcode = -42
+            retcodes.append((str(notebook_name), retcode))
 
         if not keep_artifacts:
             clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
-    return retcode
+    return retcodes
 
 
 def finalize_status(failed_notebooks, timeout_notebooks, test_plan, report_dir, root):
@@ -165,16 +165,17 @@ def main():
     for notebook, report in test_plan.items():
         if report['status'] == "SKIPPED":
             continue
-        status = run_test(report['path'], root, args.timeout, keep_artifacts)
-        if status:
-            report['status'] = "TIMEOUT" if status == -42 else "FAILED"
-        else:
-            report["status"] = 'SUCCESS'
-        if status:
-            if status == -42:
-                timeout_notebooks.append(str(notebook))
+        statuses = run_test(report['path'], root, args.timeout, keep_artifacts)
+        for subnotebook, status in statuses:
+            if status:
+                report['status'] = "TIMEOUT" if status == -42 else "FAILED"
             else:
-                failed_notebooks.append(str(notebook))
+                report["status"] = 'SUCCESS' if not report["status"] in ["TIMEOUT", "FAILED"] else report["status"]
+            if status:
+                if status == -42:
+                    timeout_notebooks.append(str(subnotebook))
+                else:
+                    failed_notebooks.append(str(subnotebook))
             if args.early_stop:
                 break
     exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
