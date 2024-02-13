@@ -35,7 +35,8 @@ def move_notebooks(nb_dir):
 
 
 def prepare_test_plan(test_list, ignore_list, nb_dir=None):
-    notebooks_dir = ROOT / 'notebooks' if nb_dir is None else nb_dir
+    orig_nb_dir = ROOT / 'notebooks'
+    notebooks_dir = orig_nb_dir if nb_dir is None else nb_dir
     notebooks = sorted(list(notebooks_dir.rglob('**/*.ipynb')))
     statuses = {notebook.parent.relative_to(notebooks_dir): {'status': '', 'path': notebook.parent} for notebook in notebooks}
     test_list = test_list or statuses.keys()
@@ -55,7 +56,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
                     break
                 if changed_path.suffix == '.md':
                     continue
-                notebook_subdir = find_notebook_dir(changed_path.resolve(), notebooks_dir.resolve())
+                notebook_subdir = find_notebook_dir(changed_path.resolve(), orig_nb_dir.resolve())
                 if notebook_subdir is None:
                     continue
                 testing_notebooks.append(notebook_subdir)
