@@ -3,6 +3,8 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F127-opnevino-tokenizers%2F127-opnevino-tokenizers.ipynb)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/127-openvino-tokenizers/127-opnevino-tokenizers.ipynb)
 
+<center><img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/51917466/047f9167-a4ef-4d3d-a33b-d124541f9e2c"></center>
+
 OpenVINO Tokenizers is an OpenVINO extension and a Python library designed to streamline tokenizer conversion for seamless integration into your projects. It supports Python and C++ environments and is compatible with all major platforms: Linux, Windows, and MacOS.
 
 ## Notebook Contents
