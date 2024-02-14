@@ -1,0 +1,20 @@
+@import '@spark-design/css/components/button/index.css';
+@import '@spark-design/css/components/tabs/index.css';
+
+.tabs-container {
+  padding: var(--spark-tabs-block-l-padding-inline) 0;
+
+  .spark-tabs-size-m.spark-tabs-ghost .spark-tabs-tab {
+    padding-inline: var(--spark-tabs-block-m-padding-inline);
+  }
+
+  .tab-content {
+    padding: var(--spark-tabs-block-l-padding-inline);
+  }
+}
+
+.superscript-badge {
+  margin-top: calc(-2 * var(--spark-tabs-badge-gap));
+  margin-bottom: auto;
+  width: 0;
+}

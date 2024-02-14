@@ -1,0 +1,36 @@
+/**
+ * Copyright (C) 2023 Intel Corporation
+ * SPDX-License-Identifier: MIT
+*/
+
+html[data-theme='dark'] {
+    --spark-tag-close-icon-color: white;
+    --spark-tag-action-background-color: #00c7fd;
+    --spark-tag-action-background-color-hover: #0095ca;
+    --spark-tag-action-background-color-active: #005b85;
+    --spark-tag-action-background-color-focus: #0095ca;
+    --spark-tag-action-text-color: #242528;
+    --spark-tag-background-color: transparent;
+    --spark-tag-text-color: white;
+    --spark-tag-hover-color: #3c3e42;
+    --spark-tag-active-color: #585a62;
+    --spark-tag-focus-background-color: transparent;
+    --spark-tag-focus-border-color: #00c7fd;
+    --spark-tag-primary-border-color: #b7b9be;
+    --spark-tag-secondary-border-color: #585a62;
+    --spark-tag-disabled-background-color: #3c3e42;
+    --spark-tag-disabled-text-color: #6b6e76;
+
+    --spark-tag-theme-geode: var(--spark-color-geode-tint1);
+    --spark-tag-theme-geode-hover: var(--spark-color-geode);
+    --spark-tag-theme-geode-active: var(--spark-color-geode-shade1);
+    --spark-tag-theme-moss: var(--spark-color-moss-tint1);
+    --spark-tag-theme-moss-hover: var(--spark-color-moss);
+    --spark-tag-theme-moss-active: var(--spark-color-moss-shade1);
+    --spark-tag-theme-rust: var(--spark-color-rust-tint1);
+    --spark-tag-theme-rust-hover: var(--spark-color-rust);
+    --spark-tag-theme-rust-active: var(--spark-color-rust-shade1);
+    --spark-tag-theme-coral: var(--spark-color-coral-tint1);
+    --spark-tag-theme-coral-hover: var(--spark-color-coral);
+    --spark-tag-theme-coral-active: var(--spark-color-coral-shade1);
+}

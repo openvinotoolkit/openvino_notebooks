@@ -17,8 +17,10 @@ AlpacaEval
 aMUSEd
 analytics
 AnimeGAN
+Antelopev
 api
 APIs
+Arcface
 argmax
 artstation
 ASPP
@@ -93,6 +95,7 @@ ContentVec
 Contrastive
 contrastive
 ControlNet
+ControlNets
 controlnet
 ConvE
 conve
@@ -168,6 +171,7 @@ DistilBERT
 distilbert
 distiluse
 DL
+DocLayNet
 docstring
 DocVQA
 docvqa
@@ -181,6 +185,7 @@ downsample
 downsampled
 DPO
 dpredictor
+DreamBooth
 Dreamshaper
 dropdown
 ECCV
@@ -259,6 +264,7 @@ hyperparameters
 ICIP
 ICPR
 iGPU
+IdentityNet
 iGPUs
 Ilija
 ImageBind
@@ -275,7 +281,9 @@ inferencing
 InferRequest
 InferRequests
 inpainting
+InsightFace
 installable
+InstantID
 instantiation
 InstructGPT
 InstructPix
@@ -450,6 +458,7 @@ OpenVINO
 openvino
 OpenVino
 OpenVINO's
+openvoice
 opset
 optimizable
 Orca
@@ -572,6 +581,7 @@ rescaling
 Rescaling
 ResNet
 resnet
+RetinaFace
 RGB
 Riffusion
 riffusion
@@ -602,6 +612,7 @@ sd
 SDEdit
 SDXL
 sdxl
+Segformer
 Segmentations
 segmentations
 Segmenter
@@ -666,6 +677,7 @@ Suno
 superresolution
 superset
 Suraj
+surya
 svc
 SVTR
 Swin
