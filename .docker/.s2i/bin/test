@@ -18,9 +18,9 @@ mkdir kits19_frames
 mv case_00030 kits19_frames
 cp -r kits19_frames/case_00030 kits19_frames/case_00001
 
+cd "/tmp"
 # Patch notebooks to speed up test execution
 python /tmp/scripts/patch_notebooks.py /opt/app-root/notebooks
-
 # Move notebooks for validation
 mv /opt/app-root/notebooks/ /tmp/
 
