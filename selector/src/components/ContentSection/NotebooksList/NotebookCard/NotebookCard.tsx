@@ -18,13 +18,12 @@ const htmlToText = (value: string): string => {
 
 const openLink = (url: string) => window.open(url, '_blank');
 
-const openNotebookInDocs = ({ path }: INotebookMetadata) => {
-  const fileNameRegexp = /\/(?<fileName>.+)\.ipynb/g;
-  const notebookFileName = fileNameRegexp.exec(path)?.groups?.fileName;
-  const url = `https://docs.openvino.ai/2023.3/notebooks/${notebookFileName}-with-output.html`;
+const openNotebookInDocs = ({ links }: INotebookMetadata) => {
+  if (!links.docs) {
+    return;
+  }
   const isEmbedded = window !== window.parent;
-  // TODO Disable opening docs page for ignored notebooks (and possibly for new not released notebooks)
-  window.open(url, isEmbedded ? '_self' : '_blank');
+  window.open(links.docs, isEmbedded ? '_self' : '_blank');
 };
 
 const sparkClassNames = {
@@ -45,7 +44,10 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
   const { categories, tasks } = item.tags;
   const descriptionTags = [...categories.filter((v) => v !== CATEGORIES.AI_TRENDS), ...tasks];
   return (
-    <div className={sparkClassNames.card} onClick={() => openNotebookInDocs(item)}>
+    <div
+      className={`${sparkClassNames.card} ${item.links.docs ? 'clickable' : ''}`}
+      onClick={() => openNotebookInDocs(item)}
+    >
       <div className="card-wrapper">
         <div className="card-image-container">
           <div className="card-image-placeholder">
