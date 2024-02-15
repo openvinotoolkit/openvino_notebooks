@@ -16,6 +16,10 @@ except ImportError:
     fuse_cache_reorder = None
 
 
+def register_configs():
+    from optimum.exporters.tasks import TasksManager
+    TasksManager._SUPPORTED_MODEL_TYPE["minicpm"] = TasksManager._SUPPORTED_MODEL_TYPE["llama"]
+
 def patch_stateful(ov_model, model_type):
     key_value_input_names = [
         key.get_any_name() for key in ov_model.inputs if any("key_values" in key_name for key_name in key.get_names())
