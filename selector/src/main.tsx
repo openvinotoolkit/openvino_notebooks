@@ -1,4 +1,5 @@
 import './styles/styles.scss';
+import '@/shared/iframe-message-emitter';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';

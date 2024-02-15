@@ -2,15 +2,25 @@ import './ContentSection.scss';
 
 import { useContext, useEffect, useState } from 'react';
 
+import { Pagination } from '@/components/shared/Pagination/Pagination';
+import { isEmbedded } from '@/shared/iframe-detector';
+import { sendScrollMessage } from '@/shared/iframe-message-emitter';
 import { INotebookMetadata } from '@/shared/notebook-metadata';
 import { notebooksService } from '@/shared/notebooks.service';
 import { NotebooksContext } from '@/shared/notebooks-context';
 
-import { Pagination } from '../shared/Pagination/Pagination';
 import { ContentSectionHeader } from './ContentSectionHeader/ContentSectionHeader';
 import { NotebooksList } from './NotebooksList/NotebooksList';
 
 const notebooksPerPageOptions = [5, 10, 25, 50];
+
+const scrollToTop = () => {
+  if (isEmbedded) {
+    sendScrollMessage();
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+};
 
 export const ContentSection = (): JSX.Element => {
   const { selectedTags, searchValue, sort, page, setPage } = useContext(NotebooksContext);
@@ -40,7 +50,7 @@ export const ContentSection = (): JSX.Element => {
         setNotebooks(paginatedNotebooks);
         setFilteredNotebooksCount(totalSearchedNotebooks);
         setTotalNotebooksCount(totalNotebooksCount);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        scrollToTop();
       });
   }, [selectedTags, searchValue, sort, page, itemsPerPage]);
 
