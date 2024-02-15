@@ -7,6 +7,7 @@ import OpenvinoLogo from '@assets/images/openvino-logo-colored.svg?react';
 
 import { Button } from '@/components/shared/Button/Button';
 import { Tag } from '@/components/shared/Tag/Tag';
+import { isEmbedded } from '@/shared/iframe-detector';
 import { INotebookMetadata } from '@/shared/notebook-metadata';
 import { CATEGORIES } from '@/shared/notebook-tags';
 
@@ -16,14 +17,13 @@ const htmlToText = (value: string): string => {
   return div.textContent || value;
 };
 
-const openLink = (url: string) => window.open(url, '_blank');
+const openLink = (url: string) => window.parent.open(url, '_blank');
 
 const openNotebookInDocs = ({ links }: INotebookMetadata) => {
   if (!links.docs) {
     return;
   }
-  const isEmbedded = window !== window.parent;
-  window.open(links.docs, isEmbedded ? '_self' : '_blank');
+  window.parent.open(links.docs, isEmbedded ? '_self' : '_blank');
 };
 
 const sparkClassNames = {
