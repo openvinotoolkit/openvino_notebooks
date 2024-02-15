@@ -4,12 +4,14 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, resolve } from 'path';
 
 import { NotebookMetadataHandler } from './notebook-metadata-handler.js';
+import { NotebookMetadataValidationError } from './notebook-metadata-validator.js';
 
 export const NOTEBOOKS_MAP_FILE_NAME = 'notebooks-metadata-map.json';
 
 /**
  *
  * @param {string} path
+ * @throws {NotebookMetadataValidationError}
  * @returns {void}
  */
 function generateNotebooksMapFile(path) {
@@ -24,8 +26,12 @@ function generateNotebooksMapFile(path) {
 
   for (const notebookPath of notebooksPaths) {
     console.info(`Collecting metadata for notebook "${notebookPath}"`);
-    const { metadata } = new NotebookMetadataHandler(notebookPath);
-    notebooksMetadataMap[notebookPath] = metadata;
+    const notebookMetadataHandler = new NotebookMetadataHandler(notebookPath);
+    const error = notebookMetadataHandler.validateMetadata();
+    if (error) {
+      throw new NotebookMetadataValidationError(error);
+    }
+    notebooksMetadataMap[notebookPath] = notebookMetadataHandler.metadata;
   }
 
   if (!existsSync(path)) {
