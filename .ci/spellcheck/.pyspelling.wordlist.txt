@@ -40,6 +40,7 @@ AutoTokenizer
 backend
 backends
 Baevski
+BaseSpeakerTTS
 BasicUNet
 bboxes
 BEiT
@@ -108,6 +109,7 @@ Convolutional
 convolutional
 coreference
 CoSENT
+cpm
 CPUs
 cpu
 CRNN
@@ -184,6 +186,7 @@ downloader
 downsample
 downsampled
 DPO
+dpo
 dpredictor
 DreamBooth
 Dreamshaper
@@ -378,6 +381,7 @@ microservices
 MiDaS
 MidasNet
 Midjourney
+MiniCPM
 MiniLM
 mistralai
 MLS
@@ -394,6 +398,7 @@ MobileNetV
 mobilevlm
 MobileVLM
 modelled
+ModelBest
 Modelscope
 Mody
 MONAI
@@ -424,6 +429,7 @@ NETP
 NeuSpell
 NLP
 NMS
+nn
 NNCF
 nncf
 noncomparable
@@ -459,6 +465,8 @@ openvino
 OpenVino
 OpenVINO's
 openvoice
+OpenVoice
+OpenVoiceBaseClass
 opset
 optimizable
 Orca
@@ -528,6 +536,7 @@ pretrain
 pretrained
 Pretraining
 pretraining
+processings
 promptable
 proto
 protobuf
@@ -703,6 +712,7 @@ tokenizers
 Tokenizers
 tokenizes
 tokenizing
+ToneColorConverter
 Tongyi
 TorchDynamo
 torchdynamo
@@ -712,6 +722,7 @@ torchvision
 TorchVision
 transformative
 TTS
+TsinghuaNLP
 tunable
 tv
 TypeScript
@@ -799,10 +810,3 @@ Zongyuan
 ZeroScope
 zeroscope
 xformers
-OpenVoice
-BaseSpeakerTTS
-ToneColorConverter
-nn
-lang
-OpenVoiceBaseClass
-processings

@@ -70,6 +70,22 @@ SUPPORTED_LLM_MODELS = {
         Answer: </s>
         <|assistant|>""",
     },
+    "minicpm-2b-dpo": {
+        "model_id": "openbmb/MiniCPM-2B-dpo-fp16",
+        "remote_code": True,
+        "remote": False,
+        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
+        "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
+        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+        "stop_tokens": ["<|user|>", "<|assistant|>"],
+        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
+        + """
+        <|user|>
+        Question: {question} 
+        Context: {context} 
+        Answer: </s>
+        <|assistant|>""",
+    },
     "red-pajama-3b-chat": {
         "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
         "remote": False,
