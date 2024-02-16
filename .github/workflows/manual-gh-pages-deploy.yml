@@ -49,7 +49,7 @@ jobs:
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./selector/dist
+          path: ./selector/dist/openvino_notebooks
 
   deploy_github_pages:
     runs-on: ubuntu-20.04
