@@ -59,11 +59,15 @@ The solution offers a comprehensive solution to quality control. It provides com
 This solution implements automated reading of industrial meters, using cameras and computer vision. By transforming analog data into digital, companies have access to an automated intake of real time data that allows them to make informed decisions and become more efficient with resource usage.
 
 ### 🛍️ Automated Self-Checkout
+![automated-self-checkout](https://github.com/openvinotoolkit/openvino_notebooks/assets/138901786/965a6604-fa15-427e-9d44-c23fa0bbeb6b)
 
 | [Automated Self-Checkout](https://github.com/openvinotoolkit/openvino_notebooks/tree/recipes/recipes/automated_self_checkout) |  |
 | - | - |
 | Related AI concepts | object detection |
 | Example industries | retail |
+| Overview | [Solution video](https://www.youtube.com/watch?v=VrJRr_thxcs) |
+| Demo | [Code video](https://www.youtube.com/watch?v=rw8cTr-hD-g) |
+| Tutorial | [Step-by-step article](https://www.intel.com/content/www/us/en/developer/articles/training/detect-objects-openvino-automated-self-checkout.html) |
 
 This solution is designed to help automate checkout for retail businesses more effectively, by analyzing video streams and detecting and tracking interactions with retail products.
 
