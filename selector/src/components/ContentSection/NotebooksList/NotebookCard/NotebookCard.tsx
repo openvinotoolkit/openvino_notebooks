@@ -17,13 +17,13 @@ const htmlToText = (value: string): string => {
   return div.textContent || value;
 };
 
-const openLink = (url: string) => window.parent.open(url, '_blank');
+const openLink = (url: string) => window.open(url, '_blank');
 
 const openNotebookInDocs = ({ links }: INotebookMetadata) => {
   if (!links.docs) {
     return;
   }
-  window.parent.open(links.docs, isEmbedded ? '_self' : '_blank');
+  window.open(links.docs, isEmbedded ? '_parent' : '_blank');
 };
 
 const sparkClassNames = {
