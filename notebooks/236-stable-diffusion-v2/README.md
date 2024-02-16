@@ -10,7 +10,7 @@ In previous notebooks, we already discussed how to run [Text-to-Image generation
 
 This notebook series demonstrates approaches to image generation using an AI method called `diffusion`:
 
-* [Text-to-Image](./236-stable-diffusion-v2-text-to-image.ipynb) generation to create images from a text description as input.
+* [Text-to-Image](./236-stable-diffusion-v2-text-to-image.ipynb) generation to create images from a text description as input. This notebook also contains hybrid post-training quantization of UNet model with [NNCF](https://github.com/openvinotoolkit/nncf/).
 
 * [Text-to-Image-demo](./236-stable-diffusion-v2-text-to-image-demo.ipynb) is a shorter version of the original notebook for demo purposes, if would like to get started right away and run the notebook more easily.
 

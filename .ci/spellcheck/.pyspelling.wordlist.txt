@@ -366,6 +366,7 @@ Markovian
 Martyniuk
 maskrcnn
 mathbf
+MatMul
 MBs
 MediaPipe
 mel
