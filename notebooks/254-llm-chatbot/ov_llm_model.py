@@ -204,7 +204,7 @@ class OVMPTModel(OVModelForCausalLM):
         )
 
 
-class OVQWENModel(OVModelForCausalLM):
+class OVBAICHUANModel(OVModelForCausalLM):
     """
     Optimum intel compatible model wrapper for QWEN
     """
@@ -219,7 +219,7 @@ class OVQWENModel(OVModelForCausalLM):
         model_save_dir: Optional[Union[str, Path]] = None,
         **kwargs,
     ):
-        NormalizedConfigManager._conf["qwen"] = NormalizedTextConfig.with_args(
+        NormalizedConfigManager._conf["baichuan"] = NormalizedTextConfig.with_args(
             num_layers="num_hidden_layers",
             num_attention_heads="num_attention_heads",
             hidden_size="hidden_size",
@@ -270,11 +270,12 @@ class OVQWENModel(OVModelForCausalLM):
         )
 
         model = cls.load_model(model_cache_path, load_in_8bit=load_in_8bit)
-        init_cls = OVQWENModel
+        init_cls = OVBAICHUANModel
 
         return init_cls(
             model=model, config=config, model_save_dir=model_cache_path.parent, **kwargs
         )
+
 
 class OVCHATGLMModel(OVModelForCausalLM):
     """
@@ -364,6 +365,6 @@ class OVCHATGLMModel(OVModelForCausalLM):
 
 model_classes = {
     "mpt": OVMPTModel,
-    "qwen": OVQWENModel,
+    "baichuan2": OVBAICHUANModel,
     "chatglm3": OVCHATGLMModel,
 }

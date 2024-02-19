@@ -39,6 +39,8 @@ AutoTokenizer
 backend
 backends
 Baevski
+Baichuan
+baichuan
 BaseSpeakerTTS
 BasicUNet
 bboxes
@@ -551,6 +553,7 @@ PyTorchVideo
 QFormer
 Qianwen
 Qi
+QKV
 qrcode
 quant
 quantized
@@ -687,6 +690,7 @@ surya
 svc
 SVTR
 Swin
+SwiGLU
 SwinV
 TaskManager
 TartanAir
