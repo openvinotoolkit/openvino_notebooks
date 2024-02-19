@@ -129,14 +129,13 @@ SUPPORTED_LLM_MODELS = {
         Context: {context} 
         Answer: <im_end><|im_start|>assistant""",
     },
-    "qwen-7b-chat": {
-        "model_id": "Qwen/Qwen-7B-Chat",
-        "remote": True,
+    "qwen1.5-7b-chat": {
+        "model_id": "Qwen/Qwen1.5-7B-Chat",
+        "remote": False,
         "start_message": f"<|im_start|>system\n {DEFAULT_SYSTEM_PROMPT_CHINESE }<|im_end|>",
         "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
         "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
         "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
-        "revision": "2abd8e5777bb4ce9c8ab4be7dbbd0fe4526db78d",
         "prompt_template": f"""<|im_start|>system
         {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
         + """
@@ -223,6 +222,20 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": "ユーザー: {user}\nシステム: {assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": youri_partial_text_processor,
+    },
+    "baichuan2-7b-chat": {
+        "model_id": "baichuan-inc/Baichuan2-7B-Chat",
+        "remote": True,
+        "start_message": f"{DEFAULT_SYSTEM_PROMPT_CHINESE }",
+        "roles": [195, 196],
+        "tokenizer_kwargs": {"add_special_tokens": False},
+        "stop_tokens": [2],
+        "prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
+        + """
+        问题: {question} 
+        已知内容: {context} 
+        回答: 
+        """,
     },
 }
 

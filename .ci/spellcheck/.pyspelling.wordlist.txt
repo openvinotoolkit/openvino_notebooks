@@ -40,6 +40,8 @@ AutoTokenizer
 backend
 backends
 Baevski
+Baichuan
+baichuan
 BaseSpeakerTTS
 BasicUNet
 bboxes
@@ -370,6 +372,7 @@ Markovian
 Martyniuk
 maskrcnn
 mathbf
+MatMul
 MBs
 MediaPipe
 mel
@@ -554,6 +557,7 @@ PyTorchVideo
 QFormer
 Qianwen
 Qi
+QKV
 qrcode
 quant
 quantized
@@ -690,6 +694,7 @@ surya
 svc
 SVTR
 Swin
+SwiGLU
 SwinV
 TaskManager
 TartanAir

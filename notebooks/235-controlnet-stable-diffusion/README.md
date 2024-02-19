@@ -4,7 +4,7 @@ Diffusion models make a revolution in AI generated art. This technology enables 
 
 ControlNet was introduced in [Adding Conditional Control to Text-to-Image Diffusion Models](https://arxiv.org/abs/2302.05543) paper. It provides a framework that enables support for various spatial contexts such as a depth map, a segmentation map, a scribble, key points that can serve as additional conditionings to Diffusion models such as Stable Diffusion.
 
-This notebook explores [ControlNet](https://github.com/lllyasviel/ControlNet) in depth, especially a new technique for imparting high levels of control over the shape of synthesized images. It also demonstrates how to run it, using OpenVINO. Let us get "controlling"!
+This notebook explores [ControlNet](https://github.com/lllyasviel/ControlNet) in depth, especially a new technique for imparting high levels of control over the shape of synthesized images. It also demonstrates how to run it, using OpenVINO. An additional part demonstrates how to run quantization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline. Let us get "controlling"!
 The complete pipeline of this demo is shown below.
 
 ![diagram](https://user-images.githubusercontent.com/29454499/224248986-eedf6492-dd7a-402b-b65d-36de952094ec.png)
@@ -23,7 +23,9 @@ This notebook demonstrates how to convert and run stable diffusion using OpenVIN
 Notebook contains the following steps:
 1. Create pipeline with PyTorch models using Diffusers library.
 2. Convert PyTorch models to OpenVINO IR format using model conversion API.
-3. Run Stable Diffusion ControlNet pipeline with OpenVINO.
+3. Optimize `OVContrlNetStableDiffusionPipeline` with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.
+4. Compare results of original and optimized pipelines.
+5. Run Stable Diffusion ControlNet pipeline with OpenVINO.
 
 ## Installation Instructions
 
