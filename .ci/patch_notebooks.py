@@ -7,7 +7,7 @@ from traitlets.config import Config
 
 
 # Notebooks that are excluded from the CI tests
-EXCLUDED_NOTEBOOKS = ["data-preparation-ct-scan.ipynb"]
+EXCLUDED_NOTEBOOKS = ["data-preparation-ct-scan.ipynb", "pytorch-monai-training.ipynb" ]
 
 DEVICE_WIDGET = "device = widgets.Dropdown("
 

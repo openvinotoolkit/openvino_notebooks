@@ -16,8 +16,10 @@ AlpacaEval
 aMUSEd
 analytics
 AnimeGAN
+Antelopev
 api
 APIs
+Arcface
 argmax
 artstation
 ASPP
@@ -37,6 +39,9 @@ AutoTokenizer
 backend
 backends
 Baevski
+Baichuan
+baichuan
+BaseSpeakerTTS
 BasicUNet
 bboxes
 BEiT
@@ -92,6 +97,7 @@ ContentVec
 Contrastive
 contrastive
 ControlNet
+ControlNets
 controlnet
 ConvE
 conve
@@ -104,6 +110,7 @@ Convolutional
 convolutional
 coreference
 CoSENT
+cpm
 CPUs
 cpu
 CRNN
@@ -165,6 +172,7 @@ DistilBERT
 distilbert
 distiluse
 DL
+DocLayNet
 docstring
 DocVQA
 docvqa
@@ -177,7 +185,9 @@ downloader
 downsample
 downsampled
 DPO
+dpo
 dpredictor
+DreamBooth
 Dreamshaper
 dropdown
 ECCV
@@ -255,6 +265,7 @@ hyperparameters
 ICIP
 ICPR
 iGPU
+IdentityNet
 iGPUs
 Ilija
 ImageBind
@@ -271,7 +282,9 @@ inferencing
 InferRequest
 InferRequests
 inpainting
+InsightFace
 installable
+InstantID
 instantiation
 InstructGPT
 InstructPix
@@ -355,6 +368,7 @@ Markovian
 Martyniuk
 maskrcnn
 mathbf
+MatMul
 MBs
 MediaPipe
 mel
@@ -366,6 +380,7 @@ microservices
 MiDaS
 MidasNet
 Midjourney
+MiniCPM
 MiniLM
 mistralai
 MLS
@@ -382,6 +397,7 @@ MobileNetV
 mobilevlm
 MobileVLM
 modelled
+ModelBest
 Modelscope
 Mody
 MONAI
@@ -412,6 +428,7 @@ NETP
 NeuSpell
 NLP
 NMS
+nn
 NNCF
 nncf
 noncomparable
@@ -446,6 +463,9 @@ OpenVINO
 openvino
 OpenVino
 OpenVINO's
+openvoice
+OpenVoice
+OpenVoiceBaseClass
 opset
 optimizable
 Orca
@@ -515,6 +535,7 @@ pretrain
 pretrained
 Pretraining
 pretraining
+processings
 promptable
 proto
 protobuf
@@ -532,6 +553,7 @@ PyTorchVideo
 QFormer
 Qianwen
 Qi
+QKV
 qrcode
 quant
 quantized
@@ -568,6 +590,7 @@ rescaling
 Rescaling
 ResNet
 resnet
+RetinaFace
 RGB
 Riffusion
 riffusion
@@ -598,6 +621,7 @@ sd
 SDEdit
 SDXL
 sdxl
+Segformer
 Segmentations
 segmentations
 Segmenter
@@ -662,9 +686,11 @@ Suno
 superresolution
 superset
 Suraj
+surya
 svc
 SVTR
 Swin
+SwiGLU
 SwinV
 TaskManager
 TartanAir
@@ -686,6 +712,7 @@ Tokenizer
 tokenizers
 tokenizes
 tokenizing
+ToneColorConverter
 Tongyi
 TorchDynamo
 torchdynamo
@@ -695,6 +722,7 @@ torchvision
 TorchVision
 transformative
 TTS
+TsinghuaNLP
 tunable
 tv
 TypeScript
@@ -782,10 +810,3 @@ Zongyuan
 ZeroScope
 zeroscope
 xformers
-OpenVoice
-BaseSpeakerTTS
-ToneColorConverter
-nn
-lang
-OpenVoiceBaseClass
-processings

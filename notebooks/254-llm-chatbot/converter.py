@@ -16,6 +16,11 @@ except ImportError:
     fuse_cache_reorder = None
 
 
+def register_configs():
+    from optimum.exporters.tasks import TasksManager
+    TasksManager._SUPPORTED_MODEL_TYPE["minicpm"] = TasksManager._SUPPORTED_MODEL_TYPE["llama"]
+    TasksManager._SUPPORTED_MODEL_TYPE["qwen2"] = TasksManager._SUPPORTED_MODEL_TYPE["llama"]
+
 def patch_stateful(ov_model, model_type):
     key_value_input_names = [
         key.get_any_name() for key in ov_model.inputs if any("key_values" in key_name for key_name in key.get_names())
@@ -138,21 +143,15 @@ def convert_mpt(pt_model: torch.nn.Module, model_path: Path):
     del pt_model
 
 
-def _update_qwen_rotary_embedding_cache(model):
-    model.transformer.rotary_emb(2048)
-
-
-def convert_qwen(pt_model: torch.nn.Module, model_path: Path):
+def convert_baichuan(pt_model: torch.nn.Module, model_path: Path):
     """
-    Qwen model conversion function
-
+    Baichuan model conversion function
     Params:
       pt_model: PyTorch model
       model_path: path for saving model
     Returns:
       None
     """
-    _update_qwen_rotary_embedding_cache(pt_model)
     ov_out_path = Path(model_path) / "openvino_model.xml"
     pt_model.config.save_pretrained(ov_out_path.parent)
     pt_model.config.use_cache = True
@@ -160,26 +159,23 @@ def convert_qwen(pt_model: torch.nn.Module, model_path: Path):
         input_ids=torch.ones((1, 10), dtype=torch.long),
         attention_mask=torch.ones((1, 10), dtype=torch.long),
     )
-    inputs = ["input_ids"]
+    inputs = ["input_ids", "attention_mask"]
     outputs = ["logits"]
 
     dynamic_shapes = {
         "input_ids": {0: "batch_size", 1: "seq_len"},
         "attention_mask": {0: "batch_size", 1: "seq_len"},
-        "token_type_ids": {0: "batch_size", 1: "seq_len"},
     }
     for idx in range(len(outs.past_key_values)):
         inputs.extend([f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"])
-        dynamic_shapes[inputs[-1]] = {0: "batch_size", 1: "past_sequence + sequence"}
-        dynamic_shapes[inputs[-2]] = {0: "batch_size", 1: "past_sequence + sequence"}
+        dynamic_shapes[inputs[-1]] = {0: "batch_size", 2: "past_sequence + sequence"}
+        dynamic_shapes[inputs[-2]] = {0: "batch_size", 2: "past_sequence + sequence"}
         outputs.extend([f"present.{idx}.key", f"present.{idx}.value"])
 
-    inputs += ["attention_mask", "token_type_ids"]
     dummy_inputs = {
         "input_ids": torch.ones((1, 2), dtype=torch.long),
-        "past_key_values": outs.past_key_values,
         "attention_mask": torch.ones((1, 12), dtype=torch.long),
-        "token_type_ids": torch.ones((1, 2), dtype=torch.long),
+        "past_key_values": outs.past_key_values,
     }
     pt_model.config.torchscript = True
     ov_model = ov.convert_model(pt_model, example_input=dummy_inputs)
@@ -201,7 +197,7 @@ def convert_qwen(pt_model: torch.nn.Module, model_path: Path):
 
     ov_model.validate_nodes_and_infer_types()
     if make_stateful is not None:
-        patch_stateful(ov_model, "qwen")
+        patch_stateful(ov_model, "baichuan")
     ov.save_model(ov_model, ov_out_path)
     del ov_model
     cleanup_torchscript_cache()
@@ -406,8 +402,8 @@ def convert_bert(pt_model: torch.nn.Module, model_path: Path):
 converters = {
     # LLM models
     "mpt": convert_mpt,
-    "qwen": convert_qwen,
     "chatglm3": convert_chatglm,
+    "baichuan2": convert_baichuan,
     # embedding models
     "all-mpnet-base-v2": convert_mpnet,
     "text2vec-large-chinese": convert_bert,
