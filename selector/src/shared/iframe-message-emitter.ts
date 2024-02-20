@@ -19,7 +19,7 @@ const report = () => {
     type: 'resize',
     height: document.body.offsetHeight,
   };
-  window.parent.postMessage(message);
+  window.parent.postMessage(message, '*');
 };
 
 new ResizeObserver(report).observe(document.body);
