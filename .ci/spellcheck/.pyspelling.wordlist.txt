@@ -1,4 +1,5 @@
 3D
+abstractive
 accelerometers
 accelerometer
 acknowledgement
@@ -155,6 +156,8 @@ denormalized
 depainting
 DepthAnything
 detections
+detokenization
+detokenizer
 Dettmers
 dev
 detectron
@@ -230,6 +233,7 @@ gcc
 GEC
 GELU
 genai
+genAI
 Girshick
 Gitee
 GitHub
@@ -694,6 +698,7 @@ SwiGLU
 SwinV
 TaskManager
 TartanAir
+tbb
 TensorBoard
 tensorflow
 tf
@@ -710,6 +715,7 @@ tokenized
 tokenizer
 Tokenizer
 tokenizers
+Tokenizers
 tokenizes
 tokenizing
 ToneColorConverter
