@@ -2,6 +2,7 @@
 
 import { execSync } from 'child_process';
 
+import { docsNotebooks } from './docs-notebooks.js';
 import { NotebookContentReader } from './notebook-content-reader.js';
 
 /** @typedef {import('./notebook-content-reader.js').INotebookMetadata} INotebookMetadata */
@@ -58,6 +59,18 @@ export class NotebookMetadataCollector extends NotebookContentReader {
    */
   _getNotebookGitHubLink() {
     return `https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/${this._notebookFilePath}`;
+  }
+
+  /**
+   * @private
+   * @returns {string | null}
+   */
+  _getDocsLink() {
+    const { latestDocsNotebooks, latestOVReleaseTag } = docsNotebooks;
+    const notebookFileName = this._notebookFileName.replace('.ipynb', '');
+    const docsVersion = latestOVReleaseTag.split('.').slice(0, 2).join('.');
+    const docsUrl = `https://docs.openvino.ai/${docsVersion}/notebooks/${notebookFileName}-with-output.html`;
+    return latestDocsNotebooks.includes(this._notebookFilePath) ? docsUrl : null;
   }
 
   /**
@@ -141,6 +154,7 @@ export class NotebookMetadataCollector extends NotebookContentReader {
       modifiedDate: this._getNotebookModifiedDate() || this._getNotebookCreatedDate(),
       links: {
         github: this._getNotebookGitHubLink(),
+        docs: this._getDocsLink(),
         colab: this._getNotebookColabLink(),
         binder: this._getNotebookBinderLink(),
       },

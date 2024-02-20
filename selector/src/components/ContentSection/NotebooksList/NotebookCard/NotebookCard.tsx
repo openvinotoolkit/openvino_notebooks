@@ -7,6 +7,7 @@ import OpenvinoLogo from '@assets/images/openvino-logo-colored.svg?react';
 
 import { Button } from '@/components/shared/Button/Button';
 import { Tag } from '@/components/shared/Tag/Tag';
+import { isEmbedded } from '@/shared/iframe-detector';
 import { INotebookMetadata } from '@/shared/notebook-metadata';
 import { CATEGORIES } from '@/shared/notebook-tags';
 
@@ -17,6 +18,13 @@ const htmlToText = (value: string): string => {
 };
 
 const openLink = (url: string) => window.open(url, '_blank');
+
+const openNotebookInDocs = ({ links }: INotebookMetadata) => {
+  if (!links.docs) {
+    return;
+  }
+  window.open(links.docs, isEmbedded ? '_parent' : '_blank');
+};
 
 const sparkClassNames = {
   card: 'spark-card spark-card-horizontal spark-card-border-normal',
@@ -32,9 +40,14 @@ type NotebookCardProps = {
   showTasks?: boolean;
 };
 
-export const NotebookCard = ({ item, showTasks = false }: NotebookCardProps): JSX.Element => {
+export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX.Element => {
+  const { categories, tasks } = item.tags;
+  const descriptionTags = [...categories.filter((v) => v !== CATEGORIES.AI_TRENDS), ...tasks];
   return (
-    <div className={sparkClassNames.card}>
+    <div
+      className={`${sparkClassNames.card} ${item.links.docs ? 'clickable' : ''}`}
+      onClick={() => openNotebookInDocs(item)}
+    >
       <div className="card-wrapper">
         <div className="card-image-container">
           <div className="card-image-placeholder">
@@ -52,7 +65,7 @@ export const NotebookCard = ({ item, showTasks = false }: NotebookCardProps): JS
           </h6>
           {showTasks && (
             <div className={`${sparkClassNames.fontCardDescription} card-description`}>
-              {item.tags.tasks.join(' • ')}
+              {descriptionTags.join(' • ')}
             </div>
           )}
           <div className="card-footer">

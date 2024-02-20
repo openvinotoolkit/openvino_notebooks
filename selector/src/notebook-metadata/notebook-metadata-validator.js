@@ -34,10 +34,13 @@ const Nullable = (f) => (v) => v === null || f(v);
  * @param {INotebookMetadata['links']} links
  * @returns {ReturnType<ValidatorFn>}
  */
-const linksValidator = ({ github, colab, binder }) => {
+const linksValidator = ({ github, docs, colab, binder }) => {
   const errors = [];
   if (!isUrl(github)) {
     errors.push(toErrorMessage({ key: 'links.github', type: 'a valid URL', value: github }));
+  }
+  if (!Nullable(isUrl)(docs)) {
+    errors.push(toErrorMessage({ key: 'links.docs', type: 'a valid URL or null', value: docs }));
   }
   if (!Nullable(isUrl)(colab)) {
     errors.push(toErrorMessage({ key: 'links.colab', type: 'a valid URL or null', value: colab }));

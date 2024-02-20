@@ -41,7 +41,7 @@ export const Search = ({ placeholder, className = '', value = '', search }: Sear
           <div className={sparkClassNames.textFieldEndSlot}>
             {value && (
               <button className={sparkClassNames.iconButton} onClick={() => search?.('')}>
-                <CrossIcon className={sparkClassNames.icon}></CrossIcon>
+                <CrossIcon className={sparkClassNames.icon} width="10"></CrossIcon>
               </button>
             )}
           </div>

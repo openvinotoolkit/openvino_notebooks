@@ -4,10 +4,12 @@
 body {
   margin: 0;
   @include flex-col();
-  @include min-h-screen();
 }
 
 #root {
   @include flex-col();
-  @include min-h-screen();
+}
+
+main {
+  min-height: calc(100vh - var(--spark-header-s-block-size));
 }

@@ -10,6 +10,7 @@ export interface INotebookMetadata {
   modifiedDate: string;
   links: {
     github: string;
+    docs: string | null;
     colab: string | null;
     binder: string | null;
   };

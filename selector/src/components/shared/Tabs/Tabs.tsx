@@ -36,6 +36,7 @@ const Tab = ({ title, active, badge, onClick }: TabProps): JSX.Element => (
 );
 
 export interface ITabItem {
+  key: string;
   title: string;
   badge?: number;
   content: JSX.Element;
@@ -52,9 +53,9 @@ export const Tabs = ({ items, onTabChange }: TabsProps): JSX.Element => {
   return (
     <div className="tabs-container">
       <nav className={sparkClassNames.tabs} aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-        {items.map(({ title, badge }, i) => (
+        {items.map(({ title, badge, key }, i) => (
           <Tab
-            key={`tab-${i}`}
+            key={`tab-${key}`}
             title={title}
             active={i === selectedTabIndex}
             badge={badge ? badge.toString() : undefined}
