@@ -36,8 +36,12 @@ find "$(pwd)" -type f -name "*.ipynb" -exec realpath --relative-to="$(pwd)" {} +
 
   # Convert to Python script first to flatten multi-line commands
   output=$(jupyter nbconvert --no-prompt --to script --stdout "$file")
-  matched=$(grep -Po "$PARSER_REGEX" <<< "$output" || { echo "No %pip install line found in $file"; exit 1; })
-  
+  matched=$(grep -Po "$PARSER_REGEX" <<< "$output" || true)
+  if [ -z "$matched" ]; then
+    echo "ERROR: No '%pip install' command found in $file"
+    exit 1
+  fi
+
   while IFS= read -r line; do
     index_url=$(grep -Po "(--index-url \S+)" <<< "$line" || true)
     extra_index_url=$(grep -Po "(--extra-index-url \S+)" <<< "$line" || true)
@@ -63,4 +67,4 @@ find "$(pwd)" -type f -name "*.ipynb" -exec realpath --relative-to="$(pwd)" {} +
   echo "-r ${req_file_name##*/}" >> "$REQ_FILE"  # add partial requirements to the main file
 done
 echo "Checking requirements..."
-python -m pip install -vvv -r $REQ_FILE --dry-run --ignore-installed
+python -m pip install -r $REQ_FILE --dry-run --ignore-installed
