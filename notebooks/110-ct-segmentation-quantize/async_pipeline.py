@@ -187,7 +187,7 @@ class AsyncPipeline:
     def inference_completion_callback(self, callback_args):
         try:
             request, id, meta, preprocessing_meta = callback_args
-            raw_outputs = {out.any_name: copy.deepcopy(res.data) for out, res in zip(request.model_outputs, request.output_tensors)}
+            raw_outputs = {idx: copy.deepcopy(res.data) for idx, (out, res) in enumerate(zip(request.model_outputs, request.output_tensors))}
             self.completed_request_results[id] = (raw_outputs, meta, preprocessing_meta)
             self.empty_requests.append(request)
         except Exception as e:
