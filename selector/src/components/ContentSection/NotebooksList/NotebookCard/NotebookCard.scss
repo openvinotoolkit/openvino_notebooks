@@ -7,6 +7,12 @@
 
   &.clickable {
     cursor: pointer;
+
+    &:hover {
+      .spark-card-horizontal-title {
+        text-decoration: underline;
+      }
+    }
   }
 
   &:hover {
