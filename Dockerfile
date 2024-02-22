@@ -26,7 +26,7 @@ USER root
 RUN dnf --disableplugin=subscription-manager remove -y nodejs && \
   dnf --disableplugin=subscription-manager module -y reset nodejs && \
   dnf --disableplugin=subscription-manager module -y enable nodejs:20 && \
-  dnf --disableplugin=subscription-manager install -y nodejs:20 mesa-libGL dos2unix libsndfile && \
+  dnf --disableplugin=subscription-manager install -y nodejs mesa-libGL dos2unix libsndfile && \
   dnf --disableplugin=subscription-manager -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
 
 # GPU drivers
