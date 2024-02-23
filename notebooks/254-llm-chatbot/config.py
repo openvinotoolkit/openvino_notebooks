@@ -86,6 +86,14 @@ SUPPORTED_LLM_MODELS = {
         Answer: </s>
         <|assistant|>""",
     },
+    "gemma-2b-it": {
+        "model_id": "google/gemma-2b-it",
+        "remote": True,
+        "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
+        "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
+        "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
+        "prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{question}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
+    },
     "red-pajama-3b-chat": {
         "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
         "remote": False,
@@ -99,6 +107,14 @@ SUPPORTED_LLM_MODELS = {
         <human>: Question: {question} 
         Context: {context} 
         Answer: <bot>""",
+    },
+    "gemma-7b-it": {
+        "model_id": "google/gemma-7b-it",
+        "remote": True,
+        "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
+        "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
+        "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
+        "prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{question}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
     },
     "llama-2-chat-7b": {
         "model_id": "meta-llama/Llama-2-7b-chat-hf",
