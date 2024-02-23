@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'yt/fix-iframe-communication' # TODO Remove after testing
   workflow_dispatch:
 
 concurrency:
