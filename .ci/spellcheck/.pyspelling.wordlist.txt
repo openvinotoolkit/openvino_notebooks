@@ -252,6 +252,8 @@ GPUs
 Gradio
 gradio
 grayscale
+GroundedSAM
+GroundingDINO
 gRPC
 Gu
 Gutendex
