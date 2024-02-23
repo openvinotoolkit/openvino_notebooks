@@ -47,8 +47,6 @@ The following image shows an example of the input text and corresponding video.
 
 * [Text-to-Image with Optimum-Intel-OpenVINO](./236-stable-diffusion-v2-optimum-demo.ipynb) can create images from a text description as input, using Optimum-Intel-OpenVINO. You can load optimized models from the Hugging Face Hub and create pipelines to run inference with OpenVINO Runtime without rewriting your APIs. You can run this notebook multiple times.
 
-* [Text-to-Image with Optimum-Intel-OpenVINO in Multiple Hardware](./236-stable-diffusion-v2-optimum-demo-comparison.ipynb). This notebook will provide you a way to see different precision models performing in different hardware. This notebook was done for showing case the use of Optimum-Intel-OpenVINO and it is not optimized for running multiple times.
-
 
 ## For [Text-guided Inpainting](./236-stable-diffusion-v2-infinite-zoom.ipynb) and [Text-to-Image](./236-stable-diffusion-v2-text-to-image.ipynb) Notebooks
 
