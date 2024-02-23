@@ -60,8 +60,9 @@ jobs:
             const { readFile } = require('fs/promises');
             const { checksumFileName } = await import('${{ github.workspace }}/selector/src/shared/build-checksum.js');
             const { owner, repo } = context.repo;
-            const { html_url } = await github.rest.repos.getPages({ owner, repo });
-            const deployedChecksum = await fetch(`${html_url}/${checksumFileName}`).then((res) => res.status === 200 ? res.text() : null);
+            const response = await github.rest.repos.getPages({ owner, repo });
+            console.log(response);
+            const deployedChecksum = await fetch(`${response.html_url}/${checksumFileName}`).then((res) => res.status === 200 ? res.text() : null);
             const currentChecksum = await readFile(`${{ github.workspace }}/selector/dist/openvino_notebooks/${checksumFileName}`, { encoding: 'utf8'});
             const isManualDeploy = context.eventName === 'workflow_dispatch';
             const shouldDeploy = isManualDeploy || currentChecksum !== deployedChecksum;
