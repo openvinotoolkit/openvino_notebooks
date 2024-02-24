@@ -481,7 +481,8 @@ OVC
 OVModel
 OVModelForXXX
 OVMS
-OvStableDiffusionInpaintingPipeline
+OvStableDiffusion
+InpaintingPipeline
 PaddleClas
 PaddleGAN
 paddlegan
