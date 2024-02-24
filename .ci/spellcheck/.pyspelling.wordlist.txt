@@ -232,6 +232,8 @@ Gb
 gcc
 GEC
 GELU
+Gemma
+gemma
 genai
 genAI
 Girshick

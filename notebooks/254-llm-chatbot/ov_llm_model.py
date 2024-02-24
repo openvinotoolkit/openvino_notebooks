@@ -367,4 +367,5 @@ model_classes = {
     "mpt": OVMPTModel,
     "baichuan2": OVBAICHUANModel,
     "chatglm3": OVCHATGLMModel,
+    "gemma": OVModelForCausalLM
 }
