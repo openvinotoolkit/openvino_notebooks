@@ -4,6 +4,10 @@
 body {
   margin: 0;
   @include flex-col();
+
+  &.embedded {
+    overflow-y: hidden;
+  }
 }
 
 #root {

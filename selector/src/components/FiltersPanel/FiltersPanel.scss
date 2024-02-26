@@ -66,4 +66,12 @@
     z-index: 100;
     overflow-y: auto;
   }
+
+  body.embedded {
+    .filters-panel-footer {
+      margin-top: -2.5rem;
+      position: initial;
+      padding: 1rem;
+    }
+  }
 }

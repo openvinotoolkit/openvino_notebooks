@@ -33,6 +33,14 @@ export default defineConfig(({ mode }) => {
           index: resolve(__dirname, 'index.html'),
           embedded: resolve(__dirname, 'embedded.html'),
         },
+        output: {
+          entryFileNames({ name, isEntry }) {
+            if (name === 'embedded' && isEntry) {
+              return 'assets/[name].js';
+            }
+            return 'assets/[name]-[hash].js';
+          },
+        },
       },
     },
     envDir: ENV_DIR,
