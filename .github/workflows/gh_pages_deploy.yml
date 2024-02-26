@@ -1,6 +1,9 @@
-name: Manual Deploy to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
+  push:
+    branches:
+      - 'main'
   workflow_dispatch:
 
 concurrency:
@@ -10,6 +13,8 @@ concurrency:
 jobs:
   build_assets:
     runs-on: ubuntu-20.04
+    outputs:
+      should_deploy: ${{ steps.check_deploy.outputs.should_deploy }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -46,7 +51,23 @@ jobs:
         shell: bash
         run: npm run build
 
+      - name: Check if deploy needed
+        id: check_deploy
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { readFile } = require('fs/promises');
+            const { checksumFileName } = await import('${{ github.workspace }}/selector/src/shared/build-checksum.js');
+            const { owner, repo } = context.repo;
+            const { data: { html_url }} = await github.rest.repos.getPages({ owner, repo });
+            const deployedChecksum = await fetch(`${html_url}/${checksumFileName}`).then((res) => res.status === 200 ? res.text() : null);
+            const currentChecksum = await readFile(`${{ github.workspace }}/selector/dist/openvino_notebooks/${checksumFileName}`, { encoding: 'utf8'});
+            const isManualDeploy = context.eventName === 'workflow_dispatch';
+            const shouldDeploy = isManualDeploy || currentChecksum !== deployedChecksum;
+            core.setOutput('should_deploy', shouldDeploy);
+
       - name: Upload pages artifact
+        if: ${{ steps.check_deploy.outputs.should_deploy == 'true' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./selector/dist/openvino_notebooks
@@ -54,6 +75,7 @@ jobs:
   deploy_github_pages:
     runs-on: ubuntu-20.04
     needs: build_assets
+    if: ${{ needs.build_assets.outputs.should_deploy == 'true' }}
     permissions:
       pages: write
       id-token: write

@@ -10,24 +10,19 @@ In this tutorial, you will use [OpenAI CLIP](https://github.com/openai/CLIP) mod
 This tutorial demonstrates how to perform zero-shot image classification using the open-source CLIP model. CLIP is a multi-modal vision and language model. It can be instructed in natural language to predict the most relevant text snippet, given an image, without directly optimizing for the task. According to the [paper](https://arxiv.org/abs/2103.00020), CLIP matches the performance of the original ResNet50 on ImageNet “zero-shot” without using any of the original 1.28M labeled examples, overcoming several major challenges in computer vision.
 You can find more information about this model in the [research paper](https://arxiv.org/abs/2103.00020), [OpenAI blog](https://openai.com/blog/clip/), [model card](https://github.com/openai/CLIP/blob/main/model-card.md) and GitHub [repository](https://github.com/openai/CLIP).
 
-This folder contains two notebooks that show how to convert and quantize model with OpenVINO:
+This folder contains notebook that show how to convert and quantize model with OpenVINO and NNCF
 
-1. [Convert the CLIP model using OpenVINO](228-clip-zero-shot-convert.ipynb)
-2. [Quantize the OpenVINO CLIP model using NNCF](228-clip-zero-shot-quantize.ipynb)
-
-The first notebook contains the following steps:
+The notebook contains the following steps:
 1. Download the model.
 2. Instantiate the PyTorch model.
 3. Convert model to OpenVINO IR, using the model conversion API.
 4. Run CLIP with OpenVINO.
+5. Quantize the converted model with NNCF.
+6. Check the quantized model inference result.
+7. Compare model size of converted and quantized models.
+8. Compare performance of converted and quantized models.
+9. Launch interactive demo
 
-The second notebook contains the following steps:
-1. Quantize the converted OpenVINO model from [notebook](228-clip-zero-shot-convert.ipynb) with NNCF.
-2. Check the model result using the same input data from the [first notebook](228-clip-zero-shot-convert.ipynb).
-3. Compare model size of converted and quantized models.
-4. Compare performance of converted and quantized models.
-
-NNCF performs quantization within the OpenVINO IR. It is required to run the first notebook before running the second notebook.
 
 We will use CLIP model for zero-shot image classification. The result of model work demonstrated on the image below
 ![image](https://user-images.githubusercontent.com/29454499/207795060-437b42f9-e801-4332-a91f-cc26471e5ba2.png)

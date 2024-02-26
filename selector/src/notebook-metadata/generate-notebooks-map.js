@@ -3,6 +3,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, resolve } from 'path';
 
+import { createBuildChecksumFile } from '../shared/build-checksum.js';
 import { NotebookMetadataValidationError } from './notebook-metadata-validator.js';
 
 export const NOTEBOOKS_MAP_FILE_NAME = 'notebooks-metadata-map.json';
@@ -65,6 +66,7 @@ export const generateNotebooksMapFilePlugin = () => {
     async closeBundle() {
       if (config.command === 'build') {
         await generateNotebooksMapFile(distPath);
+        await createBuildChecksumFile(distPath);
       }
     },
     async configureServer(devServer) {
