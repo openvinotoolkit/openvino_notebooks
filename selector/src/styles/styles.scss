@@ -1,0 +1,19 @@
+@import '@spark-design/css/global/index.css';
+@import './globals';
+
+body {
+  margin: 0;
+  @include flex-col();
+
+  &.embedded {
+    overflow-y: hidden;
+  }
+}
+
+#root {
+  @include flex-col();
+}
+
+main {
+  min-height: calc(100vh - var(--spark-header-s-block-size));
+}

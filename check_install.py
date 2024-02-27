@@ -63,7 +63,7 @@ CORRECT_KERNEL_PYTHON = PYTHON_EXECUTABLE == KERNEL_PYTHON
 
 IN_OPENVINO_ENV = "openvino_env" in sys.executable
 SUPPORTED_PYTHON_VERSION = PYTHON_VERSION.major == 3 and (
-    PYTHON_VERSION.minor >= 6 and PYTHON_VERSION.minor <= 9
+    PYTHON_VERSION.minor >= 8 and PYTHON_VERSION.minor <= 11
 )
 GLOBAL_OPENVINO_INSTALLED = "openvino_202" in os.environ.get(
     "LD_LIBRARY_PATH", ""
@@ -90,12 +90,9 @@ except ImportError:
 
 DEVTOOLS_INSTALLED = True
 try:
-    import mo_onnx  # OpenVINO 2021.4
+    from openvino.tools.mo import mo  # OpenVINO 2022.1
 except ImportError:
-    try:
-        from openvino.tools.mo import mo  # OpenVINO 2022.1
-    except ImportError:
-        DEVTOOLS_INSTALLED = False
+    DEVTOOLS_INSTALLED = False
 
 
 print("System information:")
@@ -141,10 +138,6 @@ if not OPENVINO_IMPORT and OS != "win32" and not GLOBAL_OPENVINO_INSTALLED:
     )
     if OS == "linux":
         print(
-            "If you use Python 3.7 on Ubuntu/Debian Linux, you can install the Python\n"
-            "libraries with `apt install libpython3.7-dev` (you may need to use `sudo`).\n"
-            "On Ubuntu 20, libraries for Python 3.6 and 3.7 are not available to install\n"
-            "with apt by default and it is recommended to use Python 3.8.\n"
             "If you have multiple Python version installed, use the full path to the Python\n"
             "executable for creating the virtual environment with a specific Python version.\n"
             "For example: `/usr/bin/python3.8 -m venv openvino_env`. Once you have activated\n"

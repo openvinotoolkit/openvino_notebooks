@@ -256,7 +256,7 @@ Example of such manually defined notebook metadata:
 }
 ```
 
-Notebook tags in metadata can have several values and should be a subset of defined tags that can be found in `./selector/src/models/notebook-tags.js`.
+Notebook tags in metadata can have several values and should be a subset of defined tags that can be found in `./selector/src/shared/notebook-tags.js`.
  - `tags.categories` tags relate to notebook groups like "AI Trends", "First Steps", "Model Demos" etc.
  - `tags.tasks` tags relate to particular AI tasks that are demonstrated in notebook.
  - `tags.other` tags are free-form tags and can be any string (please follow capitalization naming convention).

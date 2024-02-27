@@ -1,0 +1,11 @@
+/**
+ * Copyright (C) 2023 Intel Corporation
+ * SPDX-License-Identifier: MIT
+*/
+
+/**
+  *  import this file to get all interaction CSS
+  */
+
+@import './focus/index.css';
+@import './focus-visible/index.css';

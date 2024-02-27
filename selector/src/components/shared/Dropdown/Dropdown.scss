@@ -1,0 +1,18 @@
+@import '@spark-design/css/components/shadow/index.css';
+@import '@spark-design/css/components/list/index.css';
+@import '@spark-design/css/components/popover/index.css';
+@import '@spark-design/css/components/dropdown/index.css';
+
+.spark-popover {
+  position: absolute;
+  z-index: 100000;
+}
+
+.dropdown-popover-bottom {
+  margin-top: 0.25rem;
+}
+
+.dropdown-popover-top {
+  margin-bottom: 0.25rem;
+  bottom: 100%;
+}

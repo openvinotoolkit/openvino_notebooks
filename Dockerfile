@@ -23,18 +23,18 @@ USER root
 
 # Upgrade NodeJS > 12.0
 # Install dos2unix for line end conversion on Windows
-RUN dnf remove -y nodejs && \
-  dnf module -y reset nodejs && \
-  dnf module -y enable nodejs:20 && \
-  dnf install -y nodejs-20.9.0 mesa-libGL dos2unix libsndfile && \
-  dnf -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
+RUN dnf --disableplugin=subscription-manager remove -y nodejs && \
+  dnf --disableplugin=subscription-manager module -y reset nodejs && \
+  dnf --disableplugin=subscription-manager module -y enable nodejs:20 && \
+  dnf --disableplugin=subscription-manager install -y nodejs mesa-libGL dos2unix libsndfile && \
+  dnf --disableplugin=subscription-manager -y update-minimal --security --sec-severity=Important --sec-severity=Critical --sec-severity=Moderate
 
 # GPU drivers
-RUN dnf install -y 'dnf-command(config-manager)' && \
-    dnf config-manager --add-repo  https://repositories.intel.com/graphics/rhel/8.5/intel-graphics.repo
+RUN dnf --disableplugin=subscription-manager install -y 'dnf-command(config-manager)' && \
+    dnf --disableplugin=subscription-manager config-manager --add-repo  https://repositories.intel.com/graphics/rhel/8.5/intel-graphics.repo
 
 RUN rpm -ivh https://vault.centos.org/centos/8/AppStream/x86_64/os/Packages/mesa-filesystem-21.1.5-1.el8.x86_64.rpm && \
-    dnf install --refresh -y \
+    dnf --disableplugin=subscription-manager install --refresh -y \
     intel-opencl-22.28.23726.1-i419.el8.x86_64 intel-media intel-mediasdk libmfxgen1 libvpl2 \
     level-zero intel-level-zero-gpu \
     intel-metrics-library intel-igc-core intel-igc-cm \

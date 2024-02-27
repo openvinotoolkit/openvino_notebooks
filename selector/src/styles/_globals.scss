@@ -1,0 +1,38 @@
+@mixin flex {
+  display: flex;
+}
+
+@mixin flex-col {
+  @include flex();
+  flex-direction: column;
+}
+
+@mixin flex-1 {
+  flex: 1 1 0%;
+}
+
+@mixin min-h-screen {
+  min-height: 100vh;
+}
+
+.flex {
+  @include flex();
+}
+
+.flex-col {
+  @include flex-col();
+}
+
+.flex-1 {
+  @include flex-1();
+}
+
+.min-h-screen {
+  @include min-h-screen();
+}
+
+@media screen and (min-width: 50.5rem) {
+  .lg-hidden {
+    display: none !important;
+  }
+}

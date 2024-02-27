@@ -1,0 +1,19 @@
+@import '@spark-design/css/components/button/index.css';
+@import '@spark-design/css/components/input/index.css';
+@import '@spark-design/css/components/text-field/index.css';
+
+.spark-text-field-start-slot,
+.spark-text-field-end-slot {
+  .spark-icon {
+    z-index: 2;
+  }
+}
+
+.spark-text-field-end-slot {
+  z-index: 2;
+  border: var(--spark-input-border-width) solid transparent;
+
+  .spark-button {
+    height: 100%;
+  }
+}

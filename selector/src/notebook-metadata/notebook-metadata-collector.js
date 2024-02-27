@@ -1,108 +1,13 @@
 // @ts-check
 
 import { execSync } from 'child_process';
-import { existsSync, readFileSync } from 'fs';
-import { basename, dirname, join } from 'path';
-import { fileURLToPath } from 'url';
 
-/** @typedef {import('../models/notebook-metadata.ts').INotebookMetadata} INotebookMetadata */
-/**
- * @typedef {{
- *  metadata: { openvino_notebooks?: Partial<INotebookMetadata> };
- *  cells: Array<{ cell_type: 'markdown' | 'code'; source: string[]; }>
- * }} INotebookJson
- */
+import { docsNotebooks } from './docs-notebooks.js';
+import { NotebookContentReader } from './notebook-content-reader.js';
 
-const CURRENT_DIR_PATH = dirname(fileURLToPath(import.meta.url));
+/** @typedef {import('./notebook-content-reader.js').INotebookMetadata} INotebookMetadata */
 
-export const NOTEBOOKS_DIRECTORY_PATH = join(CURRENT_DIR_PATH, '..', '..', '..', 'notebooks');
-
-export class NotebookMetadataCollector {
-  /**
-   * @param {string} notebookFilePath
-   */
-  constructor(notebookFilePath) {
-    /** @private */
-    this._notebookFilePath = notebookFilePath;
-
-    this._checkFilesExist();
-  }
-
-  /**
-   * @private
-   */
-  _checkFilesExist() {
-    if (!existsSync(this._absoluteNotebookPath)) {
-      throw Error(`Notebook file "${this._notebookFilePath}" does not exists.`);
-    }
-
-    if (!existsSync(this._readmeFilePath)) {
-      throw Error(`README.md file does not exists for notebook "${this._notebookFilePath}".`);
-    }
-  }
-
-  /**
-   * @private
-   * @returns {string}
-   */
-  get _readmeFilePath() {
-    return join(NOTEBOOKS_DIRECTORY_PATH, dirname(this._notebookFilePath), 'README.md');
-  }
-
-  /**
-   * @private
-   * @returns {string}
-   */
-  get _absoluteNotebookPath() {
-    return join(NOTEBOOKS_DIRECTORY_PATH, this._notebookFilePath);
-  }
-
-  /**
-   * @private
-   * @returns {string}
-   */
-  get _notebookFileName() {
-    return basename(this._notebookFilePath);
-  }
-
-  /**
-   * @private
-   * @returns {INotebookJson}
-   */
-  _getNotebookJson() {
-    const notebookContent = readFileSync(this._absoluteNotebookPath, { encoding: 'utf8' });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return JSON.parse(notebookContent);
-  }
-
-  /**
-   * @private
-   * @template {keyof INotebookMetadata} K
-   * @param {K} key
-   * @returns {Partial<INotebookMetadata>[K] | null}
-   */
-  _getNotebookFileMetadata(key) {
-    const { metadata } = this._getNotebookJson();
-    if (!metadata.openvino_notebooks) {
-      console.warn(`No "openvino_notebooks" metadata found in notebook "${this._notebookFilePath}".`);
-      return null;
-    }
-    const metadataPart = metadata.openvino_notebooks[key];
-    if (metadataPart === undefined) {
-      console.warn(`"${key}" is not found in "openvino_notebooks" metadata for notebook "${this._notebookFilePath}".`);
-      return null;
-    }
-    return metadataPart;
-  }
-
-  /**
-   * @private
-   * @returns {string}
-   */
-  _getReadmeContent() {
-    return readFileSync(this._readmeFilePath, { encoding: 'utf8' });
-  }
-
+export class NotebookMetadataCollector extends NotebookContentReader {
   /**
    * @private
    * @returns {string}
@@ -115,16 +20,8 @@ export class NotebookMetadataCollector {
     if (!match || !match.groups || !match.groups.title) {
       return '';
     }
-    return match.groups.title;
-  }
-
-  /**
-   * @private
-   * @returns {string}
-   */
-  _getNotebookDescription() {
-    const description = this._getNotebookFileMetadata('description');
-    return description || '';
+    const markdownLinkRegExp = /\[(.+)\]\(.+\)/g;
+    return match.groups.title.replace(markdownLinkRegExp, (value, group) => `${group || value}`).trim();
   }
 
   /**
@@ -132,7 +29,7 @@ export class NotebookMetadataCollector {
    * @returns {string | null}
    */
   _getImageUrl() {
-    const imageUrl = this._getNotebookFileMetadata('imageUrl');
+    const imageUrl = this._getMetadataFromNotebookFile('imageUrl');
     return imageUrl || null;
   }
 
@@ -162,6 +59,18 @@ export class NotebookMetadataCollector {
    */
   _getNotebookGitHubLink() {
     return `https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/${this._notebookFilePath}`;
+  }
+
+  /**
+   * @private
+   * @returns {string | null}
+   */
+  _getDocsLink() {
+    const { latestDocsNotebooks, latestOVReleaseTag } = docsNotebooks;
+    const notebookFileName = this._notebookFileName.replace('.ipynb', '');
+    const docsVersion = latestOVReleaseTag.split('.').slice(0, 2).join('.');
+    const docsUrl = `https://docs.openvino.ai/${docsVersion}/notebooks/${notebookFileName}-with-output.html`;
+    return latestDocsNotebooks.includes(this._notebookFilePath) ? docsUrl : null;
   }
 
   /**
@@ -200,19 +109,34 @@ export class NotebookMetadataCollector {
 
   /**
    * @private
+   * @returns {INotebookMetadata['tags']['libraries']}
+   */
+  _getLibrariesTags() {
+    const codeCells = this._getCodeCells();
+    const content = codeCells.map(({ source }) => source.join('\n')).join('\n');
+    const tags = [];
+    for (const [tag, patterns] of Object.entries(librariesPatterns)) {
+      if (patterns.some((pattern) => content.includes(pattern))) {
+        tags.push(tag);
+      }
+    }
+    return tags;
+  }
+
+  /**
+   * @private
    * @returns {INotebookMetadata['tags']}
    */
   _getTags() {
-    // TODO Consider merging of tags keys
-    const tags = this._getNotebookFileMetadata('tags');
-    return (
-      tags || {
-        categories: [],
-        tasks: [],
-        libraries: [],
-        other: [],
-      }
-    );
+    const tags = this._getMetadataFromNotebookFile('tags');
+    const libraries = this._getLibrariesTags();
+    return {
+      categories: [],
+      tasks: [],
+      other: [],
+      ...tags,
+      libraries,
+    };
   }
 
   /**
@@ -224,13 +148,13 @@ export class NotebookMetadataCollector {
   getMetadata() {
     return {
       title: this._getNotebookTitle(),
-      description: this._getNotebookDescription(),
       path: this._notebookFilePath,
       imageUrl: this._getImageUrl(),
       createdDate: this._getNotebookCreatedDate(),
       modifiedDate: this._getNotebookModifiedDate() || this._getNotebookCreatedDate(),
       links: {
         github: this._getNotebookGitHubLink(),
+        docs: this._getDocsLink(),
         colab: this._getNotebookColabLink(),
         binder: this._getNotebookBinderLink(),
       },
@@ -238,3 +162,23 @@ export class NotebookMetadataCollector {
     };
   }
 }
+
+/** @typedef {typeof import('../shared/notebook-tags.js').LIBRARIES_VALUES} LIBRARIES_VALUES */
+/** @type {Record<LIBRARIES_VALUES[number], string[]>} */
+const librariesPatterns = {
+  NNCF: ['import nncf', 'from nncf'],
+  'Model Converter': ['ov.convert_model(', 'openvino.convert_model(', '! ovc'],
+  'Model Server': ['import ovmsclient', 'from ovmsclient'],
+  'Open Model Zoo': ['omz_downloader', 'omz_converter', 'omz_info_dumper'],
+  'Benchmark Tool': ['benchmark_app'],
+  'Optimum Intel': ['import optimum.intel', 'from optimum.intel'],
+  Transformers: ['import transformers', 'from transformers'],
+  Diffusers: ['import diffusers', 'from diffusers'],
+  TensorFlow: ['import tensorflow', 'from tensorflow'],
+  'TF Lite': ['.tflite'],
+  PyTorch: ['import torch', 'from torch'],
+  ONNX: ['.onnx'],
+  PaddlePaddle: ['import paddle', 'from paddle'],
+  Ultralytics: ['import ultralytics', 'from ultralytics'],
+  Gradio: ['import gradio', 'from gradio'],
+};

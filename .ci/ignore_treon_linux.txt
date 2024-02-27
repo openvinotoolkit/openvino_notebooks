@@ -3,6 +3,7 @@
 112-pytorch-post-training-quantization-nncf
 117-model-server
 122-quantizing-model-with-accuracy-control
+127-big-transfer-quantization
 204-segmenter-semantic-segmentation
 214-grammar-correction
 216-attention-center
@@ -46,7 +47,11 @@
 271-sdxl-turbo
 272-paint-by-example
 273-stable-zephyr-3b-chatbot
+275-llm-question-answering
 276-stable-diffusion-torchdynamo-backend
+278-stable-diffusion-ip-adapter
 281-kosmos2-multimodal-large-language-model
 283-photo-maker
+285-surya-line-level-text-detection
+286-instant-id
 404-style-transfer-webcam
