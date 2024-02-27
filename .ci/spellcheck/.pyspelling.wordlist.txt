@@ -673,6 +673,7 @@ StableDiffusionInpaintPipeline
 StableDiffusionPipeline
 StableDiffusionImg
 StableDiffusionImg2ImgPipeline
+stabilityai
 STFT
 stateful
 streamable
