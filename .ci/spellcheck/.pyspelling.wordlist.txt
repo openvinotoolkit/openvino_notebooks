@@ -483,6 +483,7 @@ OVC
 OVModel
 OVModelForXXX
 OVMS
+OVStableDiffusionPipeline
 OvStableDiffusionInpaintingPipeline
 PaddleClas
 PaddleGAN
@@ -672,6 +673,7 @@ StableDiffusionInpaintPipeline
 StableDiffusionPipeline
 StableDiffusionImg
 StableDiffusionImg2ImgPipeline
+stabilityai
 STFT
 stateful
 streamable
