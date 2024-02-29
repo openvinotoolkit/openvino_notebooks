@@ -2,7 +2,6 @@ openvino==2023.3.0
 optimum-intel==1.13.0
 optimum==1.16.2
 nncf==2.8.0
-intel-extension-for-pytorch==2.1.100
 
 onnx==1.14.1
 onnxruntime==1.14.1
@@ -12,8 +11,3 @@ nltk==3.8.1
 librosa==0.10.1
 
 gradio==4.16.0
-
-# SpeechT5
-datasets==2.16.1
-torch==2.1.2
-soundfile==0.12.1

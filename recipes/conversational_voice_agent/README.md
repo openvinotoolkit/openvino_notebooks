@@ -2,7 +2,7 @@
 
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/LICENSE)
 
-The Conversational Voice Agent utilizes the OpenVINO™ toolkit to create a streamlined, voice-activated interface that developers can easily integrate and deploy. At its core, the application harnesses state-of-the-art models for speech recognition, natural language understanding, and speech synthesis. It's configured to understand user prompts, engage in dialogue, and provide auditory responses, facilitating an interactive and user-friendly conversational agent.
+The Conversational Voice Agent utilizes the OpenVINO™ toolkit to create a streamlined, voice-activated interface that developers can easily integrate and deploy. At its core, the application harnesses state-of-the-art models for speech recognition and natural language understanding. It's configured to understand user prompts and engage in dialogue, facilitating an interactive and user-friendly conversational agent.
 
 ## Getting Started
 
@@ -97,19 +97,15 @@ The application uses three separate models for its operation, each requiring con
 
 1. Automated Speech Recognition Distil-Whisper Conversion:
 ```shell
-python convert_and_optimize_asr.py --quantize_weights
+python convert_and_optimize_asr.py --quantize_weights int8
 ```
-This script will convert and optimize the automatic speech recognition (ASR) model.
+This script will convert and optimize the automatic speech recognition (ASR) model performing weights quantization.
 
 2. Chat LLama2 Conversion:
 ```shell
 python convert_and_optimize_chat.py --chat_model_type llama2-7B --quantize_weights int8
 ```
 This script will handle the conversion and optimization of the chat model performing weights quantization. 
-
-3. Text to Speech SpeechT5 Model Loading:
-
-The SpeechT5 model will be downloaded when running application for the first time.
 
 After running the conversion scripts, you can run app.py to launch the application.
 
@@ -119,9 +115,9 @@ _NOTE: This application requires much memory (>16GB) as the models used here are
 
 Execute the `app.py` script with the following command, including all necessary model directory arguments:
 ```shell
-python app.py --asr_model_dir path/to/asr_model --chat_model_dir path/to/chat_model --tts_model_dir path/to/tts_model --tts_speaker_type [male|female]
+python app.py --asr_model_dir path/to/asr_model --chat_model_dir path/to/chat_model
 ```
-Make sure to replace `path/to/asr_model`, `path/to/chat_model`, and `path/to/tts_model` with the actual paths to your respective models. Choose `male` or `female` for the `--tts_speaker_type` argument depending on the desired voice for the Text-to-Speech output. Add `--public_interface` to make it publicly accessible.
+Make sure to replace path/to/asr_model and path/to/chat_model with actual paths to your respective models. Add `--public_interface` to make it publicly accessible.
 
 ### Accessing the Web Interface
 Upon successful execution of the script, Gradio will provide a local URL, typically `http://127.0.0.1:XXXX`, which you can open in your web browser to start interacting with the voice agent. If you configured the application to be accessible publicly, Gradio will also provide a public URL.
@@ -132,7 +128,7 @@ Trying Out the Application
 3. To interact using voice:
     - Click on the microphone icon and speak your query.
     - Wait for the voice agent to process your speech and respond.
-4. The voice agent will respond to your query in text and with synthesized speech.
+4. The voice agent will respond to your query in text.
 
 Feel free to engage with the Conversational Voice Agent, ask questions, or give commands as per the agent's capabilities. This hands-on experience will help you better understand the agent's interactive quality and performance.
 
