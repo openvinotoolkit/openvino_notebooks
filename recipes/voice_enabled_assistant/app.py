@@ -6,14 +6,15 @@ import gradio as gr
 import librosa
 import numpy as np
 import time
-from datasets import load_dataset
 from optimum.intel import OVModelForCausalLM, OVModelForSpeechSeq2Seq
 from transformers import AutoConfig, AutoTokenizer, AutoProcessor, PreTrainedTokenizer
 
 # Global variables initialization
 AUDIO_WIDGET_SAMPLE_RATE = 16000
-SYSTEM_CONFIGURATION = "You're Adrishuo - a conversational agent. You talk to a customer. You work for a car dealer called XYZ. Your task is to recommend the customer a car based on their needs."
-GREET_THE_CUSTOMER = "Please introduce yourself and greet the customer"
+SYSTEM_CONFIGURATION = ("You're Adrishuo - a helpful, respectful and honest doctor assistant. Your role is talking to a patient, who just came in. "
+                        "Your task is to get all symptoms from the patient and summarize them to the doctor. You cannot treat the patient yourself.")
+GREET_THE_CUSTOMER = "Please introduce yourself and greet the patient"
+SUMMARIZE_THE_CUSTOMER = "Summarize the above patient to the doctor. Use only information provided by patient."
 NEURAL_CHAT_MODEL_TEMPLATE = ("{% if messages[0]['role'] == 'system' %}"
                               "{% set loop_messages = messages[1:] %}"
                               "{% set system_message = messages[0]['content'] %}"
@@ -161,6 +162,20 @@ def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> 
     return conversation
 
 
+def summarize(conversation: List) -> str:
+    """
+    Summarize the patient case
+
+    Params
+        conversation: history of the messages so far
+    Returns:
+        Summary
+    """
+    conversation.append([SUMMARIZE_THE_CUSTOMER, None])
+    conversation = chat(conversation)
+    return conversation[-1][1]
+
+
 def create_UI(initial_message: str) -> gr.Blocks:
     """
     Create web user interface
@@ -170,13 +185,14 @@ def create_UI(initial_message: str) -> gr.Blocks:
     Returns:
         Demo UI
     """
-    with gr.Blocks(title="Talk to Adrishuo - a conversational voice agent") as demo:
+    with gr.Blocks(title="Talk to Adrishuo - a voice-enabled assistant working as a healthcare assistant") as demo:
         gr.Markdown("""
-        # Talk to Adrishuo - a conversational voice agent
+        # Talk to Adrishuo - a voice-enabled assistant working as a healthcare assistant
 
         Instructions for use:
         - record your question/comment using the first audio widget ("Your voice input")
         - wait for the chatbot to response ("Chatbot")
+        - click summarize button to make a summary
         """)
         with gr.Row():
             # user's input
@@ -187,9 +203,17 @@ def create_UI(initial_message: str) -> gr.Blocks:
         # chatbot
         chatbot_ui = gr.Chatbot(value=[[None, initial_message]], label="Chatbot")
 
+        # summarize
+        summarize_button = gr.Button("Summarize", variant="primary")
+        summary_ui = gr.Textbox(label="Summary", interactive=False)
+
         # events
         submit_audio_btn.click(transcribe, inputs=[input_audio_ui, chatbot_ui], outputs=chatbot_ui)\
-            .then(chat, chatbot_ui, chatbot_ui)
+            .then(chat, chatbot_ui, chatbot_ui)\
+            .then(lambda: None, inputs=[], outputs=[input_audio_ui])
+
+        summarize_button.click(summarize, inputs=chatbot_ui, outputs=summary_ui)
+
     return demo
 
 
@@ -219,7 +243,7 @@ def run(asr_model_dir: Path, chat_model_dir: Path, public_interface: bool = Fals
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--asr_model_dir', type=str, default="model/distil-large-v2-INT8", help="Path to the automatic speech recognition model directory")
+    parser.add_argument('--asr_model_dir', type=str, default="model/distil-large-v2-FP16", help="Path to the automatic speech recognition model directory")
     parser.add_argument('--chat_model_dir', type=str, default="model/llama2-7B-INT8", help="Path to the chat model directory")
     parser.add_argument('--public_interface', default=False, action="store_true", help="Whether interface should be available publicly")
 

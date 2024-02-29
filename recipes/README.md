@@ -11,7 +11,7 @@
 	- [🔍 Defect Detection](#-defect-detection)
 	- [⏲️ Smart Meter Scanning](#%EF%B8%8F-smart-meter-scanning)
 	- [🛍️ Automated Self-Checkout](#%EF%B8%8F-automated-self-checkout)
-	- [🗣️ Conversational Voice Agent](#%EF%B8%8F-conversational-voice-agent)
+	- [🗣️ Voice-Enabled Assistant](#%EF%B8%8F-voice-enabled-assistant)
 - [Future Kits](#future-kits)
 
 - [Troubleshooting and Resources](#troubleshooting-and-resources)
@@ -71,16 +71,16 @@ This solution implements automated reading of industrial meters, using cameras a
 
 This solution is designed to help automate checkout for retail businesses more effectively, by analyzing video streams and detecting and tracking interactions with retail products.
 
-### 🗣️ Conversational Voice Agent
-[![image](https://github.com/openvinotoolkit/openvino_notebooks/assets/109281183/cc75fbe6-7bbe-4ee7-ae20-1c38be2804f0)](conversational_voice_agent)
+### 🗣️ Voice-Enabled Assistant
+[![image](https://github.com/huggingface/optimum-intel/assets/4547501/1a871fb6-688c-4ddc-b5f6-a89c129dcef4)](voice_enabled_assistant)
 
-| [Conversational Voice Agent](conversational_voice_agent) |  |
-| - | - |
-| Related AI concepts | Speech Recognition, Natural Language Understanding, Speech Synthesis, Large Language Models (LLMs), Generative AI |
-| Example industries | Retail Customer Service, Smart Home Automation |
-| Demo |  |
+| [Voice-Enabled Assistant](voice_enabled_assistant) |  |
+|----------------------------------------------------| - |
+| Related AI concepts                                | Speech Recognition, Natural Language Understanding, Large Language Models (LLMs), Generative AI |
+| Example industries                                 | Retail Customer Service, Smart Home Automation |
+| Demo                                               |  |
 
-The Conversational Voice Agent, powered by the OpenVINO™ toolkit, integrates voice-activated interfaces into various applications. It employs advanced models for speech recognition, natural language processing, and speech synthesis. Additionally, the agent leverages the capabilities of Large Language Models (LLMs) and Generative AI, enabling it to understand complex queries, generate coherent responses, and offer a more dynamic and interactive communication experience. These advanced AI technologies enhance the agent's ability to engage in natural, human-like conversations, making it ideal for applications in customer service and smart home automation.
+The Voice-Enabled Assistant, powered by the OpenVINO™ toolkit, integrates voice-activated interfaces into various applications. It employs advanced models for speech recognition, natural language processing, and speech synthesis. Additionally, the agent leverages the capabilities of Large Language Models (LLMs) and Generative AI, enabling it to understand complex queries, generate coherent responses, and offer a more dynamic and interactive communication experience. These advanced AI technologies enhance the agent's ability to engage in natural, human-like conversations, making it ideal for applications in customer service and smart home automation.
 
 ## Future Kits
 This is a list of Edge AI Reference kits that are planned or are in development.
