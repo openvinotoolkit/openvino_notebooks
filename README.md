@@ -11,6 +11,8 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 
 [OpenVINO™ Notebooks at GitHub Pages](https://openvinotoolkit.github.io/openvino_notebooks/)
 
+[![notebooks-selector-preview](https://github.com/openvinotoolkit/openvino_notebooks/assets/41733560/a69efb78-1637-404c-b5ef-63974db2bf1b)](https://openvinotoolkit.github.io/openvino_notebooks/)
+
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
