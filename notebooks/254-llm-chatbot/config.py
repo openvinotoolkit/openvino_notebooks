@@ -148,9 +148,7 @@ SUPPORTED_LLM_MODELS = {
     "qwen1.5-7b-chat": {
         "model_id": "Qwen/Qwen1.5-7B-Chat",
         "remote": False,
-        "start_message": f"<|im_start|>system\n {DEFAULT_SYSTEM_PROMPT_CHINESE }<|im_end|>",
-        "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
-        "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
+        "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
         "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
         "prompt_template": f"""<|im_start|>system
         {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
@@ -163,10 +161,9 @@ SUPPORTED_LLM_MODELS = {
     "chatglm3-6b": {
         "model_id": "THUDM/chatglm3-6b",
         "remote": True,
-        "start_message": f"{DEFAULT_SYSTEM_PROMPT_CHINESE }",
-        "roles": ["system", "user", "assistant"],
+        "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
         "tokenizer_kwargs": {"add_special_tokens": False},
-        "stop_tokens": [2, 64795, 64797],
+        "stop_tokens": [0, 2],
         "prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
         + """
         问题: {question} 
