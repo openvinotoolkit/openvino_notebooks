@@ -62,7 +62,7 @@ SUPPORTED_LLM_MODELS = {
         "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
+        "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
         + """
         <|user|>
         Question: {question} 
@@ -78,7 +78,7 @@ SUPPORTED_LLM_MODELS = {
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
         "stop_tokens": ["<|user|>", "<|assistant|>"],
-        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
+        "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
         + """
         <|user|>
         Question: {question} 
@@ -92,7 +92,7 @@ SUPPORTED_LLM_MODELS = {
         "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
         "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
         "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
-        "prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{question}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
+        "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{question}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
     },
     "red-pajama-3b-chat": {
         "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
@@ -102,7 +102,7 @@ SUPPORTED_LLM_MODELS = {
         "stop_tokens": [29, 0],
         "partial_text_processor": red_pijama_partial_text_processor,
         "current_message_template": "\n<human>:{user}\n<bot>:{assistant}",
-        "prompt_template": f"""{DEFAULT_RAG_PROMPT }"""
+        "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT }"""
         + """
         <human>: Question: {question} 
         Context: {context} 
@@ -114,7 +114,7 @@ SUPPORTED_LLM_MODELS = {
         "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
         "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
         "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
-        "prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{question}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
+        "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{question}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
     },
     "llama-2-chat-7b": {
         "model_id": "meta-llama/Llama-2-7b-chat-hf",
@@ -124,7 +124,7 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": "{user} [/INST]{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": llama_partial_text_processor,
-        "prompt_template": f"""[INST]Human: <<SYS>> {DEFAULT_RAG_PROMPT }<</SYS>>"""
+        "rag_prompt_template": f"""[INST]Human: <<SYS>> {DEFAULT_RAG_PROMPT }<</SYS>>"""
         + """
         Question: {question} 
         Context: {context} 
@@ -137,7 +137,7 @@ SUPPORTED_LLM_MODELS = {
         "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
         "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
         "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
-        "prompt_template": f"""<|im_start|>system 
+        "rag_prompt_template": f"""<|im_start|>system 
         {DEFAULT_RAG_PROMPT }<|im_end|>"""
         + """
         <|im_start|>user
@@ -148,11 +148,9 @@ SUPPORTED_LLM_MODELS = {
     "qwen1.5-7b-chat": {
         "model_id": "Qwen/Qwen1.5-7B-Chat",
         "remote": False,
-        "start_message": f"<|im_start|>system\n {DEFAULT_SYSTEM_PROMPT_CHINESE }<|im_end|>",
-        "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
-        "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
+        "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
         "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
-        "prompt_template": f"""<|im_start|>system
+        "rag_prompt_template": f"""<|im_start|>system
         {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
         + """
         <|im_start|>user
@@ -163,11 +161,10 @@ SUPPORTED_LLM_MODELS = {
     "chatglm3-6b": {
         "model_id": "THUDM/chatglm3-6b",
         "remote": True,
-        "start_message": f"{DEFAULT_SYSTEM_PROMPT_CHINESE }",
-        "roles": ["system", "user", "assistant"],
+        "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
         "tokenizer_kwargs": {"add_special_tokens": False},
-        "stop_tokens": [2, 64795, 64797],
-        "prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
+        "stop_tokens": [0, 2],
+        "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
         + """
         问题: {question} 
         已知内容: {context} 
@@ -182,7 +179,7 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": "{user} [/INST]{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": llama_partial_text_processor,
-        "prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
+        "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
         + """ 
         [INST] Question: {question} 
         Context: {context} 
@@ -194,7 +191,7 @@ SUPPORTED_LLM_MODELS = {
         "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
+        "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
         + """ 
         <|user|>
         Question: {question} 
@@ -210,7 +207,7 @@ SUPPORTED_LLM_MODELS = {
         "current_message_template": "{user} [/INST]{assistant}",
         "tokenizer_kwargs": {"add_special_tokens": False},
         "partial_text_processor": llama_partial_text_processor,
-        "prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
+        "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
         + """
         [INST] Question: {question} 
         Context: {context} 
@@ -222,7 +219,7 @@ SUPPORTED_LLM_MODELS = {
         "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
         "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
         "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-        "prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
+        "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
         + """
         <|user|>
         Question: {question} 
@@ -246,7 +243,7 @@ SUPPORTED_LLM_MODELS = {
         "roles": [195, 196],
         "tokenizer_kwargs": {"add_special_tokens": False},
         "stop_tokens": [2],
-        "prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
+        "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
         + """
         问题: {question} 
         已知内容: {context} 
