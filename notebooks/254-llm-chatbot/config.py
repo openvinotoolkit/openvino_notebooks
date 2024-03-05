@@ -240,15 +240,28 @@ SUPPORTED_LLM_MODELS = {
         "model_id": "baichuan-inc/Baichuan2-7B-Chat",
         "remote": True,
         "start_message": f"{DEFAULT_SYSTEM_PROMPT_CHINESE }",
-        "roles": [195, 196],
         "tokenizer_kwargs": {"add_special_tokens": False},
-        "stop_tokens": [2],
+        "stop_tokens": [0, 2],
         "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
         + """
         问题: {question} 
         已知内容: {context} 
         回答: 
         """,
+    },
+    "internlm2-chat-7b": {
+        "model_id": "internlm/internlm2-chat-7b",
+        "remote_code": True,
+        "remote": False,
+        "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+        "stop_tokens": [2],
+        "rag_prompt_template": f"""<|im_start|>system
+        {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
+        + """
+        <|im_start|>user
+        问题: {question} 
+        已知内容: {context} 
+        回答: <|im_end|><|im_start|>assistant""",
     },
 }
 
