@@ -18,7 +18,11 @@ function setInitialIframeHeight(iframeElement: HTMLIFrameElement): void {
 }
 
 window.onmessage = (message: MessageEvent<IResizeMessage | IScrollMessage>) => {
-  if (message.origin !== window.origin) {
+  const { origin: allowedOrigin } = new URL(
+    import.meta.env.PROD ? (import.meta.env.VITE_APP_LOCATION as string) : import.meta.url
+  );
+
+  if (message.origin !== allowedOrigin) {
     return;
   }
 

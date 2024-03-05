@@ -301,14 +301,7 @@ class OVCHATGLMModel(OVModelForCausalLM):
             model, config, device, dynamic_shapes, ov_config, model_save_dir, **kwargs
         )
     
-    def _reshape(
-        self,
-        model: "Model",
-        batch_size: int,
-        sequence_length: int,
-        height: int = None,
-        width: int = None,
-    ):
+    def _reshape(self, model: "Model", *args, **kwargs):
         shapes = {}
         for inputs in model.inputs:
             shapes[inputs] = inputs.get_partial_shape()

@@ -123,6 +123,7 @@ CVPR
 Databricks
 databricks
 dataloader
+dataloaders
 DataLoader
 DataLoaders
 DataModule
@@ -232,6 +233,7 @@ Gb
 gcc
 GEC
 GELU
+GELAN
 Gemma
 gemma
 genai
@@ -485,6 +487,7 @@ OVC
 OVModel
 OVModelForXXX
 OVMS
+OVStableDiffusionPipeline
 OvStableDiffusionInpaintingPipeline
 PaddleClas
 PaddleGAN
@@ -507,6 +510,7 @@ Patil
 PEFT
 performant
 PersonaGPT
+PGI
 PhotoMaker
 photorealism
 photorealistic
@@ -674,6 +678,7 @@ StableDiffusionInpaintPipeline
 StableDiffusionPipeline
 StableDiffusionImg
 StableDiffusionImg2ImgPipeline
+stabilityai
 STFT
 stateful
 streamable
