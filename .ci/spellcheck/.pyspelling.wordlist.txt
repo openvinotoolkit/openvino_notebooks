@@ -123,6 +123,7 @@ CVPR
 Databricks
 databricks
 dataloader
+dataloaders
 DataLoader
 DataLoaders
 DataModule
@@ -232,6 +233,7 @@ Gb
 gcc
 GEC
 GELU
+GELAN
 Gemma
 gemma
 genai
@@ -506,6 +508,7 @@ Patil
 PEFT
 performant
 PersonaGPT
+PGI
 PhotoMaker
 photorealism
 photorealistic

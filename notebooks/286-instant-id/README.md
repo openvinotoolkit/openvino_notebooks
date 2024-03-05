@@ -25,7 +25,7 @@ In this tutorial, we consider how to use InstantID with OpenVINO.
 
 We will use a pre-trained model from the [Hugging Face Diffusers](https://huggingface.co/docs/diffusers/index) library.
 
-The notebook provides a simple interface that allows communication with a model using text instruction and images. In this demonstration user can provide input instructions and image and the model generates an image. 
+The notebook provides a simple interface that allows communication with a model using text instruction and images. In this demonstration user can provide input instructions and image and the model generates an image. An additional part demonstrates how to run optimization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
 The image below illustrates the provided generated image example.
 
 ![generation_example.png](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/082b3da7-6bb6-4551-bfa6-0e43d8e80b51)
@@ -42,6 +42,8 @@ The tutorial consists of the following steps:
 - Convert PyTorch models
 - Prepare OpenVINO inference pipeline
 - Run model inference
+- Optimize pipeline with [NNCF](https://github.com/openvinotoolkit/nncf/)
+- Compare results of original and optimized pipelines
 - Launch interactive demo
 
 ## Installation Instructions

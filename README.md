@@ -11,6 +11,8 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 
 [OpenVINO™ Notebooks at GitHub Pages](https://openvinotoolkit.github.io/openvino_notebooks/)
 
+[![notebooks-selector-preview](https://github.com/openvinotoolkit/openvino_notebooks/assets/41733560/a69efb78-1637-404c-b5ef-63974db2bf1b)](https://openvinotoolkit.github.io/openvino_notebooks/)
+
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
@@ -59,7 +61,8 @@ Check out the latest notebooks that show how to optimize and deploy popular mode
 | [Kosmos-2: Grounding Multimodal Large Language Models](notebooks/281-kosmos2-multimodal-large-language-model)<br> | Kosmos-2: Grounding Multimodal Large Language Model and OpenVINO™ | <img src=https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/annotated_snowman.jpg width=225> |
 | [PhotoMaker](notebooks/283-photo-maker)<br> | Text-to-image generation using PhotoMaker and OpenVINO | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4 width=300> |
 | [OpenVoice](notebooks/284-openvoice)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F284-openvoice%2F284-openvoice.ipynb)[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/284-openvoice/284-openvoice.ipynb) | OpenVoice a versatile instant voice tone transferring and generating speech in various languages. |<img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/5703039/ca7eab80-148d-45b0-84e8-a5a279846b51 width=300> |
-| [InstantID](notebooks/286-instant-id)<br> | InstantID: Zero-shot Identity-Preserving Image Generation using OpenVINO| <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/082b3da7-6bb6-4551-bfa6-0e43d8e80b51 width=300> |
+| [InstantID](notebooks/286-instant-id)<br> | InstantID: Zero-shot Identity-Preserving Image Generation using OpenVINO| <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/082b3da7-6bb6-4551-bfa6-0e43d8e80b51 width=300> | |
+| [YOLOv9 Optimization](notebooks/287-yolov9-optimization)<br> | Optimize YOLOv9 using NNCF | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/ae3a7653-eead-4c41-9cad-a7c95d3a4578 width=300> | |
 
 ## Table of Contents
 
@@ -246,6 +249,7 @@ Demos that demonstrate inference on a particular model.
 | [284-openvoice](notebooks/284-openvoice)<br>[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F284-openvoice%2F284-openvoice.ipynb)[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/284-openvoice/284-openvoice.ipynb) | OpenVoice a versatile instant voice tone transferring and generating speech in various languages. |<img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/5703039/ca7eab80-148d-45b0-84e8-a5a279846b51 width=300> |
 | [285-surya-line-level-text-detection](notebooks/285-surya-line-level-text-detection)<br>[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/285-surya-line-level-text-detection/285-surya-line-level-text-detection.ipynb) | Line-level text detection with Surya | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/67365453/7672eb6d-fafb-4ae3-b894-9f98acfeb53a width=225> |
 | [286-instant-id](notebooks/286-instant-id)<br> | InstantID: Zero-shot Identity-Preserving Image Generation using OpenVINO| <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/082b3da7-6bb6-4551-bfa6-0e43d8e80b51 width=225> |
+| [287-yolov9-optimization](notebooks/287-yolov9-optimization)<br> | Optimize YOLOv9 using NNCF | <img src=https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/ae3a7653-eead-4c41-9cad-a7c95d3a4578 width=225> |
 
 <div id='-model-training'></div>
 
