@@ -283,8 +283,10 @@ class OVCHATGLMModel(OVModelForCausalLM):
         )
 
 
+
 model_classes = {
     "mpt": OVMPTModel,
     "chatglm3": OVCHATGLMModel,
-    "gemma": OVModelForCausalLM
+    "gemma": OVModelForCausalLM,
+    "baichuan2": OVModelForCausalLM,
 }

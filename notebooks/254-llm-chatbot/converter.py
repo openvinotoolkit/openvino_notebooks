@@ -20,7 +20,6 @@ def register_configs():
     from optimum.exporters.tasks import TasksManager
     TasksManager._SUPPORTED_MODEL_TYPE["minicpm"] = TasksManager._SUPPORTED_MODEL_TYPE["llama"]
     TasksManager._SUPPORTED_MODEL_TYPE["qwen2"] = TasksManager._SUPPORTED_MODEL_TYPE["llama"]
-    TasksManager._SUPPORTED_MODEL_TYPE["baichuan"] = TasksManager._SUPPORTED_MODEL_TYPE["llama"]
     TasksManager._SUPPORTED_MODEL_TYPE["internlm2"] = TasksManager._SUPPORTED_MODEL_TYPE["llama"]
 
 def patch_stateful(ov_model, model_type):
@@ -324,9 +323,9 @@ def convert_chatglm(pt_model: torch.nn.Module, model_path: Path):
     cleanup_torchscript_cache()
     del pt_model
 
-def convert_gemma(pt_model: torch.nn.Module, model_path: Path):
+def convert_default(pt_model: torch.nn.Module, model_path: Path):
     """
-    Gamma model conversion function
+    model conversion function
 
     Params:
       pt_model: PyTorch model
@@ -335,6 +334,7 @@ def convert_gemma(pt_model: torch.nn.Module, model_path: Path):
       None
     """
     ov_out_path = Path(model_path) / "openvino_model.xml"
+    model_name = str(model_path.parent).split("-")[0]
     pt_model.config.save_pretrained(ov_out_path.parent)
     pt_model.config.use_cache = True
     outs = pt_model(input_ids=torch.ones((2, 10), dtype=torch.long))
@@ -379,7 +379,7 @@ def convert_gemma(pt_model: torch.nn.Module, model_path: Path):
 
     ov_model.validate_nodes_and_infer_types()
     if make_stateful is not None:
-        patch_stateful(ov_model, "gemma")
+        patch_stateful(ov_model, model_name)
     ov.save_model(ov_model, ov_out_path)
     del ov_model
     cleanup_torchscript_cache()
@@ -406,8 +406,8 @@ converters = {
     # LLM models
     "mpt": convert_mpt,
     "chatglm3": convert_chatglm,
-    "baichuan2": convert_baichuan,
-    "gemma": convert_gemma,
+    "baichuan2": convert_default,
+    "gemma": convert_default,
     # embedding models
     "all-mpnet-base-v2": convert_mpnet,
     "text2vec-large-chinese": convert_bert,

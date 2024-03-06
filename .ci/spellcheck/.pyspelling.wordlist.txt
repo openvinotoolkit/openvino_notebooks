@@ -297,6 +297,8 @@ instantiation
 InstructGPT
 InstructPix
 intel
+InternLM
+internlm
 invertible
 intervaling
 im
