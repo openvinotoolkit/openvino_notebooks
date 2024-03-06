@@ -49,6 +49,7 @@
 278-stable-diffusion-ip-adapter
 281-kosmos2-multimodal-large-language-model
 283-photo-maker
+284-openvoice
 285-surya-line-level-text-detection
 286-instant-id
 301-tensorflow-training-openvino
