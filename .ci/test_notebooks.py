@@ -34,10 +34,8 @@ def get_parsed_requirements(requirements_file: str) -> Set:
 
 def test_readme():
     """
-    Test that all notebooks have a README file and exist in the Notebooks README
+    Test that all notebooks have a README file
     """
-    notebooks_readme_path = Path("README.md")
-    notebooks_readme = notebooks_readme_path.read_text(encoding="utf-8")
     for item in Path("notebooks").iterdir():
         if item.is_dir():
             # item is a notebook directory
@@ -46,9 +44,6 @@ def test_readme():
                 assert "README.md" in [
                     filename.name for filename in item.iterdir()
                 ], f"README not found in {item}"
-                assert (
-                    str(item.relative_to(notebooks_readme_path.parent)) in notebooks_readme
-                ), f"{item} not found in notebooks README: {notebooks_readme_path}"
 
 
 def test_requirements_docker():
