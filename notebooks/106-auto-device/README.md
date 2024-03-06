@@ -1,6 +1,6 @@
 # Introduction to Auto Device Selection in OpenVINO™
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F106-auto-device%2F106-auto-device.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eaidova/openvino_notebooks_binder.git/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fopenvinotoolkit%252Fopenvino_notebooks%26urlpath%3Dtree%252Fopenvino_notebooks%252Fnotebooks%2F106-auto-device%2F106-auto-device.ipynb)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/106-auto-device/106-auto-device.ipynb)
 
 This notebook shows how to do inference with Automatic Device Selection (AUTO). To learn more about the logic of this mode, refer to the [Automatic device selection](https://docs.openvino.ai/nightly/openvino_docs_OV_UG_supported_plugins_AUTO.html) article.
