@@ -20,6 +20,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 
 - [Table of Contents](#table-of-contents)
 - [📝 Installation Guide](#-installation-guide)
+- [🚀 Getting Started](#-getting-started)
 - [⚙️ System Requirements](#️-system-requirements)
 - [💻 Run the Notebooks](#-run-the-notebooks)
 	- [To Launch a Single Notebook](#to-launch-a-single-notebook)
