@@ -83,7 +83,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 1. Notebooks in this repository typically rely on a shared `requirements.txt` file. 
    However, contributors are encouraged to install the required packages at the top of their notebook using 
-   `!pip install -q ...` commands. This allows the notebooks to be run independently as standalone examples. 
+   `%pip install -q ...` commands. This allows the notebooks to be run independently as standalone examples. 
    To maintain package compatibility, contributors are expected to install the same versions of packages 
    as specified in the shared `requirements.txt` file. This helps ensure consistency in our testing pipelines 
    and prevents dependency conflicts.
@@ -158,10 +158,6 @@ Additional subsections, e.g license information.
 ## Installation Instructions
 [link to installation guide, other important information for install process]
 ```
-
-Every notebook is also added to the notebooks overview table in the main
-[`README.md`](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md) and the 
-[`README.md`](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/README.md) in the notebooks directory.
 Notebooks that work in Binder have a _Launch Binder_ badge in the `README.md` files.
 In the same way, notebooks that work in Google Colab have a _Launch Colab_ badge in the `README.md` files.
 
