@@ -1,5 +1,5 @@
 # openvino and its dependencies
-openvino-dev>=2023.3.0
+openvino-dev>=2024.0.0
 openvino-telemetry>=2023.2.1
 nncf==2.8.0
 
