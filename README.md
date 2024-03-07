@@ -20,6 +20,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 
 - [Table of Contents](#table-of-contents)
 - [📝 Installation Guide](#-installation-guide)
+- [🚀 Getting Started](#-getting-started)
 - [⚙️ System Requirements](#️-system-requirements)
 - [💻 Run the Notebooks](#-run-the-notebooks)
 	- [To Launch a Single Notebook](#to-launch-a-single-notebook)
@@ -41,6 +42,17 @@ OpenVINO Notebooks require Python and Git. To get started, select the guide for 
 | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+
+<div id='-getting-started'/>
+
+## 🚀 Getting Started
+
+Explore Jupyter notebooks using this [page](https://openvinotoolkit.github.io/openvino_notebooks/), select one related to your needs or give them all a try. Good Luck!
+
+**NOTE: The main branch of this repository was updated to support the new OpenVINO 2024.0 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous release version of OpenVINO, please checkout the [2023.3 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.3). If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2022.3 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2022.3).
+
+If you need help, please start a GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions).  
+
 
 If you run into issues, please check the [troubleshooting section](#-troubleshooting), [FAQs](#-faq) or start a GitHub [discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions).
 
@@ -171,7 +183,7 @@ Made with [`contrib.rocks`](https://contrib.rocks).
 
 ## ❓ FAQ
 
-* [Which devices does OpenVINO support?](https://docs.openvino.ai/2023.3/openvino_docs_OV_UG_supported_plugins_Supported_Devices.html#doxid-openvino-docs-o-v-u-g-supported-plugins-supported-devices)
+* [Which devices does OpenVINO support?](https://docs.openvino.ai/2024/openvino-workflow/running-inference/inference-devices-and-modes.html)
 * [What is the first CPU generation you support with OpenVINO?](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/system-requirements.html)
 * [Are there any success stories about deploying real-world solutions with OpenVINO?](https://www.intel.com/content/www/us/en/internet-of-things/ai-in-production/success-stories.html)
 
