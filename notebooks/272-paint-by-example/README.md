@@ -20,6 +20,7 @@ This notebook demonstrates how to convert and run the Paint-by-Example model usi
 
 Notebook contains the following steps:
 1. Convert PyTorch models to OpenVINO IR format.
+2. Quantization.
 3. Run Paint-by-Example pipeline with OpenVINO.
 
 ## Installation instructions
