@@ -68,7 +68,7 @@ export class NotebookMetadataCollector extends NotebookContentReader {
   _getDocsLink() {
     const { latestDocsNotebooks, latestOVReleaseTag } = docsNotebooks;
     const notebookFileName = this._notebookFileName.replace('.ipynb', '');
-    const docsVersion = latestOVReleaseTag.split('.').slice(0, 2).join('.');
+    const docsVersion = latestOVReleaseTag.split('.').slice(0, 2)[0];
     const docsUrl = `https://docs.openvino.ai/${docsVersion}/notebooks/${notebookFileName}-with-output.html`;
     return latestDocsNotebooks.includes(this._notebookFilePath) ? docsUrl : null;
   }
