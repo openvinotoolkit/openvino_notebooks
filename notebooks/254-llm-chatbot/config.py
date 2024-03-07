@@ -226,6 +226,22 @@ SUPPORTED_LLM_MODELS = {
             已知内容: {context} 
             回答: <|im_end|><|im_start|>assistant""",
         },
+        "qwen-7b-chat": {
+            "model_id": "Qwen/Qwen-7B-Chat",
+            "remote": True,
+            "start_message": f"<|im_start|>system\n {DEFAULT_SYSTEM_PROMPT_CHINESE }<|im_end|>",
+            "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
+            "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "revision": "2abd8e5777bb4ce9c8ab4be7dbbd0fe4526db78d",
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
+            + """
+            <|im_start|>user
+            问题: {question} 
+            已知内容: {context} 
+            回答: <|im_end|><|im_start|>assistant""",
+        },
         "chatglm3-6b": {
             "model_id": "THUDM/chatglm3-6b",
             "remote": True,

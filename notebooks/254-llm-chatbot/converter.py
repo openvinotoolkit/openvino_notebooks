@@ -22,6 +22,7 @@ def register_configs():
     TasksManager._SUPPORTED_MODEL_TYPE["qwen2"] = TasksManager._SUPPORTED_MODEL_TYPE["llama"]
     TasksManager._SUPPORTED_MODEL_TYPE["internlm2"] = TasksManager._SUPPORTED_MODEL_TYPE["llama"]
 
+
 def patch_stateful(ov_model, model_type):
     key_value_input_names = [
         key.get_any_name() for key in ov_model.inputs if any("key_values" in key_name for key_name in key.get_names())
@@ -43,7 +44,6 @@ def patch_stateful(ov_model, model_type):
     )
 
     
-
 def flattenize_inputs(inputs):
     """
     Helper function for making nested inputs flattens
@@ -323,6 +323,75 @@ def convert_chatglm(pt_model: torch.nn.Module, model_path: Path):
     cleanup_torchscript_cache()
     del pt_model
 
+
+def _update_qwen_rotary_embedding_cache(model):
+    model.transformer.rotary_emb(2048)
+
+
+def convert_qwen(pt_model: torch.nn.Module, model_path: Path):
+    """
+    Qwen model conversion function
+    Params:
+      pt_model: PyTorch model
+      model_path: path for saving model
+    Returns:
+      None
+    """
+    _update_qwen_rotary_embedding_cache(pt_model)
+    ov_out_path = Path(model_path) / "openvino_model.xml"
+    pt_model.config.save_pretrained(ov_out_path.parent)
+    pt_model.config.use_cache = True
+    outs = pt_model(
+        input_ids=torch.ones((1, 10), dtype=torch.long),
+        attention_mask=torch.ones((1, 10), dtype=torch.long),
+    )
+    inputs = ["input_ids"]
+    outputs = ["logits"]
+
+    dynamic_shapes = {
+        "input_ids": {0: "batch_size", 1: "seq_len"},
+        "attention_mask": {0: "batch_size", 1: "seq_len"},
+        "token_type_ids": {0: "batch_size", 1: "seq_len"},
+    }
+    for idx in range(len(outs.past_key_values)):
+        inputs.extend([f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"])
+        dynamic_shapes[inputs[-1]] = {0: "batch_size", 1: "past_sequence + sequence"}
+        dynamic_shapes[inputs[-2]] = {0: "batch_size", 1: "past_sequence + sequence"}
+        outputs.extend([f"present.{idx}.key", f"present.{idx}.value"])
+
+    inputs += ["attention_mask", "token_type_ids"]
+    dummy_inputs = {
+        "input_ids": torch.ones((1, 2), dtype=torch.long),
+        "past_key_values": outs.past_key_values,
+        "attention_mask": torch.ones((1, 12), dtype=torch.long),
+        "token_type_ids": torch.zeros((1, 2), dtype=torch.long),
+    }
+    pt_model.config.torchscript = True
+    ov_model = ov.convert_model(pt_model, example_input=dummy_inputs)
+    for inp_name, m_input, input_data in zip(
+        inputs, ov_model.inputs, flattenize_inputs(dummy_inputs.values())
+    ):
+        input_node = m_input.get_node()
+        if input_node.element_type == ov.Type.dynamic:
+            m_input.get_node().set_element_type(ov.Type.f32)
+        shape = list(input_data.shape)
+        if inp_name in dynamic_shapes:
+            for k in dynamic_shapes[inp_name]:
+                shape[k] = -1
+        input_node.set_partial_shape(ov.PartialShape(shape))
+        m_input.get_tensor().set_names({inp_name})
+    for out, out_name in zip(ov_model.outputs, outputs):
+        out.get_tensor().set_names({out_name})
+
+    ov_model.validate_nodes_and_infer_types()
+    if make_stateful is not None:
+        patch_stateful(ov_model, "qwen")
+    ov.save_model(ov_model, ov_out_path)
+    del ov_model
+    cleanup_torchscript_cache()
+    del pt_model
+    
+
 def convert_default(pt_model: torch.nn.Module, model_path: Path):
     """
     model conversion function
@@ -406,6 +475,7 @@ converters = {
     # LLM models
     "mpt": convert_mpt,
     "chatglm3": convert_chatglm,
+    "qwen": convert_qwen,
     "baichuan2": convert_default,
     "gemma": convert_default,
     # embedding models
