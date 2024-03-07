@@ -10,7 +10,7 @@ In this tutorial optical character recognition is presented. This notebook is a 
 
 ## Notebook Contents
 
-In addition to previously used [horizontal-text-detection-0001](https://docs.openvino.ai/2023.3/omz_models_model_horizontal_text_detection_0001.html) model, a[text-recognition-resnet](https://docs.openvino.ai/2023.3/omz_models_model_text_recognition_resnet_fc.html) model is used. This model reads tight aligned crop with detected text converted to a grayscale image and returns tensor that is easily decoded to predicted text. Both models are from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/).
+In addition to previously used [horizontal-text-detection-0001](https://docs.openvino.ai/2024/omz_models_model_horizontal_text_detection_0001.html) model, a[text-recognition-resnet](https://docs.openvino.ai/2024/omz_models_model_text_recognition_resnet_fc.html) model is used. This model reads tight aligned crop with detected text converted to a grayscale image and returns tensor that is easily decoded to predicted text. Both models are from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/).
 
 ## Installation Instructions
 
