@@ -1,6 +1,5 @@
 # Object detection and masking from prompts with GroundedSAM (GroundingDINO + SAM) and OpenVINO
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F288-grounded-segment-anything%2F288-grounded-segment-anything.ipynb)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/288-grounded-segment-anything/288-grounded-segment-anything.ipynb)
 
 In this notebook, we provide the OpenVINO™ optimization for the combination of GroundingDINO + SAM = [GroundedSAM](https://github.com/IDEA-Research/Grounded-Segment-Anything) on Intel® platforms. 
