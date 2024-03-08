@@ -54,4 +54,5 @@
 284-openvoice
 285-surya-line-level-text-detection
 286-instant-id
+288-grounded-segment-anything
 404-style-transfer-webcam
