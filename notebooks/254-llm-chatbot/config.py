@@ -192,16 +192,9 @@ SUPPORTED_LLM_MODELS = {
             "remote": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
-            "rag_prompt_template": f"""<|im_start|>system
-            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
-            + """
-            <|im_start|>user
-            问题: {question} 
-            已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
         },
         "qwen1.5-1.8b-chat": {
-            "model_id": "Qwen/Qwen-1_8B-Chat",
+            "model_id": "Qwen/Qwen1.5-1.8B-Chat",
             "remote": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
@@ -274,12 +267,6 @@ SUPPORTED_LLM_MODELS = {
             "remote": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": [2],
-            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
-            + """
-            问题: {question} 
-            已知内容: {context} 
-            回答: 
-            """,
         },
         "internlm2-chat-1.8b": {
             "model_id": "internlm/internlm2-chat-1_8b",
@@ -288,13 +275,6 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": [2, 92542],
             "partial_text_processor": internlm_partial_text_processor,
-            "rag_prompt_template": f"""<|im_start|>system
-            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
-            + """
-            <|im_start|>user
-            问题: {question} 
-            已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
         },  
     },
     "Japanese":{
