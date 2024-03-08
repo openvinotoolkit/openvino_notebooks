@@ -6,19 +6,15 @@ import gradio as gr
 import librosa
 import numpy as np
 import time
-import torch
-from datasets import load_dataset
 from optimum.intel import OVModelForCausalLM, OVModelForSpeechSeq2Seq
-from transformers import AutoConfig, AutoTokenizer, AutoProcessor, SpeechT5Processor, SpeechT5ForTextToSpeech, SpeechT5HifiGan, PreTrainedTokenizer
-
-# Import nltk and download the punkt tokenizer models
-import nltk
-nltk.download('punkt', quiet=True)
+from transformers import AutoConfig, AutoTokenizer, AutoProcessor, PreTrainedTokenizer
 
 # Global variables initialization
 AUDIO_WIDGET_SAMPLE_RATE = 16000
-SYSTEM_CONFIGURATION = "You're Adrishuo - a conversational agent. You talk to a customer. You work for a car dealer called XYZ. Your task is to recommend the customer a car based on their needs."
-GREET_THE_CUSTOMER = "Please introduce yourself and greet the customer"
+SYSTEM_CONFIGURATION = ("You're Adrishuo - a helpful, respectful and honest doctor assistant. Your role is talking to a patient, who just came in. "
+                        "Your task is to get all symptoms from the patient and summarize them to the doctor. You cannot treat the patient yourself.")
+GREET_THE_CUSTOMER = "Please introduce yourself and greet the patient"
+SUMMARIZE_THE_CUSTOMER = "Summarize the above patient to the doctor. Use only information provided by patient."
 NEURAL_CHAT_MODEL_TEMPLATE = ("{% if messages[0]['role'] == 'system' %}"
                               "{% set loop_messages = messages[1:] %}"
                               "{% set system_message = messages[0]['content'] %}"
@@ -48,10 +44,6 @@ chat_tokenizer: PreTrainedTokenizer = None
 message_template: str = None
 asr_model: OVModelForSpeechSeq2Seq = None
 asr_processor: AutoProcessor = None
-tts_processor: SpeechT5Processor = None
-tts_model: SpeechT5ForTextToSpeech = None
-tts_vocoder: SpeechT5HifiGan = None
-speaker_embeddings = None
 
 
 def load_asr_model(model_dir: Path) -> None:
@@ -66,23 +58,6 @@ def load_asr_model(model_dir: Path) -> None:
     # create a distil-whisper model and its processor
     asr_model = OVModelForSpeechSeq2Seq.from_pretrained(model_dir, device="AUTO")
     asr_processor = AutoProcessor.from_pretrained(model_dir)
-
-
-# Function to load SpeechT5 models
-def load_tts_model() -> None:
-    """
-    Loads the Text-to-Speech (TTS) models and processor for SpeechT5.
-
-    """
-    global tts_processor, tts_model, tts_vocoder, speaker_embeddings
-
-    tts_processor = SpeechT5Processor.from_pretrained("microsoft/speecht5_tts")
-    tts_model = SpeechT5ForTextToSpeech.from_pretrained("microsoft/speecht5_tts")
-    tts_vocoder = SpeechT5HifiGan.from_pretrained("microsoft/speecht5_hifigan")
-
-    # Load speaker embeddings
-    embeddings_dataset = load_dataset("Matthijs/cmu-arctic-xvectors", split="validation")
-    speaker_embeddings = torch.tensor(embeddings_dataset[7306]["xvector"]).unsqueeze(0)
 
 
 def load_chat_model(model_dir: Path) -> None:
@@ -156,31 +131,6 @@ def chat(history: List) -> List[List[str]]:
     return history
 
 
-def synthesize(conversation: List[List[str]]) -> Tuple[int, np.ndarray]:
-    """
-    Synthesizes speech from the last message in a conversation using a TTS model.
-    """
-    start_time = time.time()
-    prompt = conversation[-1][-1]
-    sentences = nltk.sent_tokenize(prompt)
-    audio_segments = []
-
-    # Global speaker embeddings variable
-    global speaker_embeddings
-
-    for sentence in sentences:
-        inputs = tts_processor(text=sentence, return_tensors="pt")
-        speech = tts_model.generate_speech(inputs["input_ids"], speaker_embeddings, vocoder=tts_vocoder)
-        audio_segments.append(speech.numpy())
-
-    # Combine audio segments
-    combined_audio = np.concatenate(audio_segments, axis=0)
-
-    end_time = time.time()
-    print("TTS model synthesis time: {:.2f} seconds".format(end_time - start_time))
-    return AUDIO_WIDGET_SAMPLE_RATE, combined_audio
-
-
 def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> List[List[str]]:
     """
     Transcribe audio to text
@@ -212,6 +162,20 @@ def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> 
     return conversation
 
 
+def summarize(conversation: List) -> str:
+    """
+    Summarize the patient case
+
+    Params
+        conversation: history of the messages so far
+    Returns:
+        Summary
+    """
+    conversation.append([SUMMARIZE_THE_CUSTOMER, None])
+    conversation = chat(conversation)
+    return conversation[-1][1]
+
+
 def create_UI(initial_message: str) -> gr.Blocks:
     """
     Create web user interface
@@ -221,14 +185,14 @@ def create_UI(initial_message: str) -> gr.Blocks:
     Returns:
         Demo UI
     """
-    with gr.Blocks(title="Talk to Adrishuo - a conversational voice agent") as demo:
+    with gr.Blocks(title="Talk to Adrishuo - a voice-enabled assistant working as a healthcare assistant") as demo:
         gr.Markdown("""
-        # Talk to Adrishuo - a conversational voice agent
+        # Talk to Adrishuo - a voice-enabled assistant working as a healthcare assistant
 
         Instructions for use:
         - record your question/comment using the first audio widget ("Your voice input")
         - wait for the chatbot to response ("Chatbot")
-        - wait for the output voice in the last audio widget ("Chatbot voice output")
+        - click summarize button to make a summary
         """)
         with gr.Row():
             # user's input
@@ -238,13 +202,18 @@ def create_UI(initial_message: str) -> gr.Blocks:
 
         # chatbot
         chatbot_ui = gr.Chatbot(value=[[None, initial_message]], label="Chatbot")
-        # chatbot's audio response
-        output_audio_ui = gr.Audio(autoplay=True, interactive=False, label="Chatbot voice output")
+
+        # summarize
+        summarize_button = gr.Button("Summarize", variant="primary")
+        summary_ui = gr.Textbox(label="Summary", interactive=False)
 
         # events
         submit_audio_btn.click(transcribe, inputs=[input_audio_ui, chatbot_ui], outputs=chatbot_ui)\
             .then(chat, chatbot_ui, chatbot_ui)\
-            .then(synthesize, chatbot_ui, output_audio_ui)
+            .then(lambda: None, inputs=[], outputs=[input_audio_ui])
+
+        summarize_button.click(summarize, inputs=chatbot_ui, outputs=summary_ui)
+
     return demo
 
 
@@ -255,15 +224,12 @@ def run(asr_model_dir: Path, chat_model_dir: Path, public_interface: bool = Fals
     Params
         asr_model_dir: dir with the automatic speech recognition model
         chat_model_dir: dir with the chat model
-        tts_model_dir: dir with the text-to-speech model
         public_interface: whether UI should be available publicly
     """
     # load whisper model
     load_asr_model(asr_model_dir)
     # load chat model
     load_chat_model(chat_model_dir)
-    # load speecht5 model
-    load_tts_model()
 
     # get initial greeting
     history = chat([[None, None]])
