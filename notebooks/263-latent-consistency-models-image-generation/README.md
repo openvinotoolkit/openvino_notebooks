@@ -1,9 +1,9 @@
 # Image generation with Latent Consistency Model and OpenVINO
 
-LCMs: The next generation of generative models after Latent Diffusion Models (LDMs). 
+LCMs: The next generation of generative models after Latent Diffusion Models (LDMs).
 Latent Diffusion models (LDMs) have achieved remarkable results in synthesizing high-resolution images. However, the iterative sampling is computationally intensive and leads to slow generation.
 
-Inspired by [Consistency Models](https://arxiv.org/abs/2303.01469), [Latent Consistency Models](https://arxiv.org/pdf/2310.04378.pdf) (LCMs) were proposed, enabling swift inference with minimal steps on any pre-trained LDMs, including Stable Diffusion. 
+Inspired by [Consistency Models](https://arxiv.org/abs/2303.01469), [Latent Consistency Models](https://arxiv.org/pdf/2310.04378.pdf) (LCMs) were proposed, enabling swift inference with minimal steps on any pre-trained LDMs, including Stable Diffusion.
 The [Consistency Model (CM) (Song et al., 2023)](https://arxiv.org/abs/2303.01469) is a new family of generative models that enables one-step or few-step generation. The core idea of the CM is to learn the function that maps any points on a trajectory of the PF-ODE (probability flow of [ordinary differential equation](https://en.wikipedia.org/wiki/Ordinary_differential_equation)) to that trajectory’s origin (i.e., the solution of the PF-ODE). By learning consistency mappings that maintain point consistency on ODE-trajectory, these models allow for single-step generation, eliminating the need for computation-intensive iterations. However, CM is constrained to pixel space image generation tasks, making it unsuitable for synthesizing high-resolution images. LCMs adopt a consistency model in the image latent space for generation high-resolution images.  Viewing the guided reverse diffusion process as solving an augmented probability flow ODE (PF-ODE), LCMs are designed to directly predict the solution of such ODE in latent space, mitigating the need for numerous iterations and allowing rapid, high-fidelity sampling. Utilizing image latent space in large-scale diffusion models like Stable Diffusion (SD) has effectively enhanced image generation quality and reduced computational load. The authors of LCMs provide a simple and efficient one-stage guided consistency distillation method named Latent Consistency Distillation (LCD) to distill SD for few-step (2∼4) or even 1-step sampling and propose the SKIPPING-STEP technique to further accelerate the convergence. More details about the proposed approach and models can be found using the following resources: [project page](https://latent-consistency-models.github.io/), [paper](https://arxiv.org/abs/2310.04378), [original repository](https://github.com/luosiallen/latent-consistency-model).
 
 In this[tutorial, we consider how to convert and run LCM using OpenVINO. We consider 2 examples of using LCM:
@@ -29,7 +29,7 @@ This [notebook](./263-latent-consistency-models-image-generation.ipynb) demonstr
 
 The notebook contains the following steps:
 
-1. Convert PyTorch models to OpenVINO Intermediate Representation using [OpenVINO Model Conversion API](https://docs.openvino.ai/2023.3/openvino_docs_model_processing_introduction.html#convert-a-model-with-python-convert-model)
+1. Convert PyTorch models to OpenVINO Intermediate Representation using [OpenVINO Model Conversion API](https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html#convert-a-model-with-python-convert-model)
 2. Prepare Inference Pipeline.
 3. Run Inference pipeline with OpenVINO.
 4. Optimize `LatentConsistencyModelPipeline` with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.
@@ -44,7 +44,7 @@ The notebook also provides interactive interface for image generation based on u
 
 ## Using models prepared using LCM LoRA
 
-The LCM LoRA allows to training of just a small number of adapters, known as LoRA layers, instead of the full model. The resulting LoRAs can then be applied to any fine-tuned version of the model without having to distill them separately. The benefit of this LCM LoRA distillation process is that it can be integrated into the existing inference pipelines without changes to the main code, for example, into the ControlNet-guided Stable Diffusion pipeline. More details about LCM LoRA can be found in the [technical report](https://arxiv.org/abs/2311.05556) and [blog post](https://huggingface.co/blog/lcm_lora)  
+The LCM LoRA allows to training of just a small number of adapters, known as LoRA layers, instead of the full model. The resulting LoRAs can then be applied to any fine-tuned version of the model without having to distill them separately. The benefit of this LCM LoRA distillation process is that it can be integrated into the existing inference pipelines without changes to the main code, for example, into the ControlNet-guided Stable Diffusion pipeline. More details about LCM LoRA can be found in the [technical report](https://arxiv.org/abs/2311.05556) and [blog post](https://huggingface.co/blog/lcm_lora)
 
 
 ### Notebook Contents
@@ -61,7 +61,7 @@ The following image shows an example of the input sequence, input image, conditi
     <img src="https://user-images.githubusercontent.com/29454499/284291731-9c4ee978-a934-43ea-9484-b6b91a9f9407.png"/>
 </p>
 
-1. Convert PyTorch models to OpenVINO Intermediate Representation using [OpenVINO Model Conversion API](https://docs.openvino.ai/2023.3/openvino_docs_model_processing_introduction.html#convert-a-model-with-python-convert-model)
+1. Convert PyTorch models to OpenVINO Intermediate Representation using [OpenVINO Model Conversion API](https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html#convert-a-model-with-python-convert-model)
 2. Prepare Inference Pipeline.
 3. Run Inference pipeline with OpenVINO.
 4. Optimize `OVControlNetStableDiffusionPipeline` with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.

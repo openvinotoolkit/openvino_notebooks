@@ -1,9 +1,3 @@
-from transformers import (
-    StoppingCriteria,
-    StoppingCriteriaList,
-)
-import torch
-
 DEFAULT_SYSTEM_PROMPT = """\
 You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
 If a question does not make any sense or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\
@@ -55,201 +49,265 @@ def youri_partial_text_processor(partial_text, new_text):
     return partial_text
 
 
+def internlm_partial_text_processor(partial_text, new_text):
+    partial_text += new_text
+    return partial_text.split("<|im_end|>")[0]
+
+
 SUPPORTED_LLM_MODELS = {
-    "tiny-llama-1b-chat": {
-        "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-        "remote": False,
-        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
-        "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
-        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-        "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
-        + """
-        <|user|>
-        Question: {question} 
-        Context: {context} 
-        Answer: </s>
-        <|assistant|>""",
+    "English":{
+        "tiny-llama-1b-chat": {
+            "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+            "remote": False,
+            "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
+            "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
+            "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
+            + """
+            <|user|>
+            Question: {question} 
+            Context: {context} 
+            Answer: </s>
+            <|assistant|>""",
+        },
+        "gemma-2b-it": {
+            "model_id": "google/gemma-2b-it",
+            "remote": True,
+            "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
+            "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
+            "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{question}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
+        },
+        "red-pajama-3b-chat": {
+            "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
+            "remote": False,
+            "start_message": "",
+            "history_template": "\n<human>:{user}\n<bot>:{assistant}",
+            "stop_tokens": [29, 0],
+            "partial_text_processor": red_pijama_partial_text_processor,
+            "current_message_template": "\n<human>:{user}\n<bot>:{assistant}",
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT }"""
+            + """
+            <human>: Question: {question} 
+            Context: {context} 
+            Answer: <bot>""",
+        },
+        "gemma-7b-it": {
+            "model_id": "google/gemma-7b-it",
+            "remote": True,
+            "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
+            "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
+            "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{question}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
+        },
+        "llama-2-chat-7b": {
+            "model_id": "meta-llama/Llama-2-7b-chat-hf",
+            "remote": False,
+            "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
+            "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
+            "current_message_template": "{user} [/INST]{assistant}",
+            "tokenizer_kwargs": {"add_special_tokens": False},
+            "partial_text_processor": llama_partial_text_processor,
+            "rag_prompt_template": f"""[INST]Human: <<SYS>> {DEFAULT_RAG_PROMPT }<</SYS>>"""
+            + """
+            Question: {question} 
+            Context: {context} 
+            Answer: [/INST]""",
+        },
+        "mpt-7b-chat": {
+            "model_id": "mosaicml/mpt-7b-chat",
+            "remote": True,
+            "start_message": f"<|im_start|>system\n {DEFAULT_SYSTEM_PROMPT }<|im_end|>",
+            "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
+            "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "rag_prompt_template": f"""<|im_start|>system 
+            {DEFAULT_RAG_PROMPT }<|im_end|>"""
+            + """
+            <|im_start|>user
+            Question: {question} 
+            Context: {context} 
+            Answer: <im_end><|im_start|>assistant""",
+        },
+        "mistral-7b": {
+            "model_id": "mistralai/Mistral-7B-v0.1",
+            "remote": False,
+            "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
+            "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
+            "current_message_template": "{user} [/INST]{assistant}",
+            "tokenizer_kwargs": {"add_special_tokens": False},
+            "partial_text_processor": llama_partial_text_processor,
+            "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
+            + """ 
+            [INST] Question: {question} 
+            Context: {context} 
+            Answer: [/INST]""",
+        },
+        "zephyr-7b-beta": {
+            "model_id": "HuggingFaceH4/zephyr-7b-beta",
+            "remote": False,
+            "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
+            "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
+            "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
+            + """ 
+            <|user|>
+            Question: {question} 
+            Context: {context} 
+            Answer: </s>
+            <|assistant|>""",
+        },
+        "neural-chat-7b-v3-1": {
+            "model_id": "Intel/neural-chat-7b-v3-3",
+            "remote": False,
+            "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
+            "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
+            "current_message_template": "{user} [/INST]{assistant}",
+            "tokenizer_kwargs": {"add_special_tokens": False},
+            "partial_text_processor": llama_partial_text_processor,
+            "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
+            + """
+            [INST] Question: {question} 
+            Context: {context} 
+            Answer: [/INST]""",
+        },
+        "notus-7b-v1": {
+            "model_id": "argilla/notus-7b-v1",
+            "remote": False,
+            "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
+            "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
+            "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
+            + """
+            <|user|>
+            Question: {question} 
+            Context: {context} 
+            Answer: </s>
+            <|assistant|>""",
+        },
     },
-    "minicpm-2b-dpo": {
-        "model_id": "openbmb/MiniCPM-2B-dpo-fp16",
-        "remote_code": True,
-        "remote": False,
-        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
-        "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
-        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-        "stop_tokens": ["<|user|>", "<|assistant|>"],
-        "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
-        + """
-        <|user|>
-        Question: {question} 
-        Context: {context} 
-        Answer: </s>
-        <|assistant|>""",
+    "Chinese":{
+        "qwen1.5-0.5b-chat": {
+            "model_id": "Qwen/Qwen1.5-0.5B-Chat",
+            "remote": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
+            + """
+            <|im_start|>user
+            问题: {question} 
+            已知内容: {context} 
+            回答: <|im_end|><|im_start|>assistant""",
+        },
+        "qwen1.5-1.8b-chat": {
+            "model_id": "Qwen/Qwen-1_8B-Chat",
+            "remote": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
+            + """
+            <|im_start|>user
+            问题: {question} 
+            已知内容: {context} 
+            回答: <|im_end|><|im_start|>assistant""",
+        },
+        "qwen1.5-7b-chat": {
+            "model_id": "Qwen/Qwen1.5-7B-Chat",
+            "remote": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
+            + """
+            <|im_start|>user
+            问题: {question} 
+            已知内容: {context} 
+            回答: <|im_end|><|im_start|>assistant""",
+        },
+        "qwen-7b-chat": {
+            "model_id": "Qwen/Qwen-7B-Chat",
+            "remote": True,
+            "start_message": f"<|im_start|>system\n {DEFAULT_SYSTEM_PROMPT_CHINESE }<|im_end|>",
+            "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
+            "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "revision": "2abd8e5777bb4ce9c8ab4be7dbbd0fe4526db78d",
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
+            + """
+            <|im_start|>user
+            问题: {question} 
+            已知内容: {context} 
+            回答: <|im_end|><|im_start|>assistant""",
+        },
+        "chatglm3-6b": {
+            "model_id": "THUDM/chatglm3-6b",
+            "remote": True,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "tokenizer_kwargs": {"add_special_tokens": False},
+            "stop_tokens": [0, 2],
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
+            + """
+            问题: {question} 
+            已知内容: {context} 
+            回答: 
+            """,
+        },
+        "baichuan2-7b-chat": {
+            "model_id": "baichuan-inc/Baichuan2-7B-Chat",
+            "remote": True,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "tokenizer_kwargs": {"add_special_tokens": False},
+            "stop_tokens": [0, 2],
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
+            + """
+            问题: {question} 
+            已知内容: {context} 
+            回答: 
+            """,
+        },
+        "minicpm-2b-dpo": {
+            "model_id": "openbmb/MiniCPM-2B-dpo-fp16",
+            "remote_code": True,
+            "remote": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": [2],
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
+            + """
+            问题: {question} 
+            已知内容: {context} 
+            回答: 
+            """,
+        },
+        "internlm2-chat-1.8b": {
+            "model_id": "internlm/internlm2-chat-1_8b",
+            "remote_code": True,
+            "remote": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": [2, 92542],
+            "partial_text_processor": internlm_partial_text_processor,
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
+            + """
+            <|im_start|>user
+            问题: {question} 
+            已知内容: {context} 
+            回答: <|im_end|><|im_start|>assistant""",
+        },  
     },
-    "gemma-2b-it": {
-        "model_id": "google/gemma-2b-it",
-        "remote": True,
-        "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
-        "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
-        "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
-        "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{question}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
-    },
-    "red-pajama-3b-chat": {
-        "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
-        "remote": False,
-        "start_message": "",
-        "history_template": "\n<human>:{user}\n<bot>:{assistant}",
-        "stop_tokens": [29, 0],
-        "partial_text_processor": red_pijama_partial_text_processor,
-        "current_message_template": "\n<human>:{user}\n<bot>:{assistant}",
-        "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT }"""
-        + """
-        <human>: Question: {question} 
-        Context: {context} 
-        Answer: <bot>""",
-    },
-    "gemma-7b-it": {
-        "model_id": "google/gemma-7b-it",
-        "remote": True,
-        "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
-        "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
-        "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
-        "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{question}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
-    },
-    "llama-2-chat-7b": {
-        "model_id": "meta-llama/Llama-2-7b-chat-hf",
-        "remote": False,
-        "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
-        "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
-        "current_message_template": "{user} [/INST]{assistant}",
-        "tokenizer_kwargs": {"add_special_tokens": False},
-        "partial_text_processor": llama_partial_text_processor,
-        "rag_prompt_template": f"""[INST]Human: <<SYS>> {DEFAULT_RAG_PROMPT }<</SYS>>"""
-        + """
-        Question: {question} 
-        Context: {context} 
-        Answer: [/INST]""",
-    },
-    "mpt-7b-chat": {
-        "model_id": "mosaicml/mpt-7b-chat",
-        "remote": True,
-        "start_message": f"<|im_start|>system\n {DEFAULT_SYSTEM_PROMPT }<|im_end|>",
-        "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
-        "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
-        "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
-        "rag_prompt_template": f"""<|im_start|>system 
-        {DEFAULT_RAG_PROMPT }<|im_end|>"""
-        + """
-        <|im_start|>user
-        Question: {question} 
-        Context: {context} 
-        Answer: <im_end><|im_start|>assistant""",
-    },
-    "qwen1.5-7b-chat": {
-        "model_id": "Qwen/Qwen1.5-7B-Chat",
-        "remote": False,
-        "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
-        "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
-        "rag_prompt_template": f"""<|im_start|>system
-        {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
-        + """
-        <|im_start|>user
-        问题: {question} 
-        已知内容: {context} 
-        回答: <|im_end|><|im_start|>assistant""",
-    },
-    "chatglm3-6b": {
-        "model_id": "THUDM/chatglm3-6b",
-        "remote": True,
-        "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
-        "tokenizer_kwargs": {"add_special_tokens": False},
-        "stop_tokens": [0, 2],
-        "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
-        + """
-        问题: {question} 
-        已知内容: {context} 
-        回答: 
-        """,
-    },
-    "mistral-7b": {
-        "model_id": "mistralai/Mistral-7B-v0.1",
-        "remote": False,
-        "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
-        "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
-        "current_message_template": "{user} [/INST]{assistant}",
-        "tokenizer_kwargs": {"add_special_tokens": False},
-        "partial_text_processor": llama_partial_text_processor,
-        "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
-        + """ 
-        [INST] Question: {question} 
-        Context: {context} 
-        Answer: [/INST]""",
-    },
-    "zephyr-7b-beta": {
-        "model_id": "HuggingFaceH4/zephyr-7b-beta",
-        "remote": False,
-        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
-        "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
-        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-        "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
-        + """ 
-        <|user|>
-        Question: {question} 
-        Context: {context} 
-        Answer: </s>
-        <|assistant|>""",
-    },
-    "neural-chat-7b-v3-1": {
-        "model_id": "Intel/neural-chat-7b-v3-3",
-        "remote": False,
-        "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
-        "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
-        "current_message_template": "{user} [/INST]{assistant}",
-        "tokenizer_kwargs": {"add_special_tokens": False},
-        "partial_text_processor": llama_partial_text_processor,
-        "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
-        + """
-        [INST] Question: {question} 
-        Context: {context} 
-        Answer: [/INST]""",
-    },
-    "notus-7b-v1": {
-        "model_id": "argilla/notus-7b-v1",
-        "remote": False,
-        "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
-        "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
-        "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-        "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
-        + """
-        <|user|>
-        Question: {question} 
-        Context: {context} 
-        Answer: </s>
-        <|assistant|>""",
-    },
-    "youri-7b-chat": {
-        "model_id": "rinna/youri-7b-chat",
-        "remote": False,
-        "start_message": f"設定: {DEFAULT_SYSTEM_PROMPT_JAPANESE}\n",
-        "history_template": "ユーザー: {user}\nシステム: {assistant}\n",
-        "current_message_template": "ユーザー: {user}\nシステム: {assistant}",
-        "tokenizer_kwargs": {"add_special_tokens": False},
-        "partial_text_processor": youri_partial_text_processor,
-    },
-    "baichuan2-7b-chat": {
-        "model_id": "baichuan-inc/Baichuan2-7B-Chat",
-        "remote": True,
-        "start_message": f"{DEFAULT_SYSTEM_PROMPT_CHINESE }",
-        "roles": [195, 196],
-        "tokenizer_kwargs": {"add_special_tokens": False},
-        "stop_tokens": [2],
-        "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
-        + """
-        问题: {question} 
-        已知内容: {context} 
-        回答: 
-        """,
-    },
+    "Japanese":{
+        "youri-7b-chat": {
+            "model_id": "rinna/youri-7b-chat",
+            "remote": False,
+            "start_message": f"設定: {DEFAULT_SYSTEM_PROMPT_JAPANESE}\n",
+            "history_template": "ユーザー: {user}\nシステム: {assistant}\n",
+            "current_message_template": "ユーザー: {user}\nシステム: {assistant}",
+            "tokenizer_kwargs": {"add_special_tokens": False},
+            "partial_text_processor": youri_partial_text_processor,
+        },
+    }
 }
 
 SUPPORTED_EMBEDDING_MODELS = {

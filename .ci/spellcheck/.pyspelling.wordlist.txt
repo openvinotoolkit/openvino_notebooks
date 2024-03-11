@@ -254,6 +254,8 @@ GPUs
 Gradio
 gradio
 grayscale
+GroundedSAM
+GroundingDINO
 gRPC
 Gu
 Gutendex
@@ -297,6 +299,8 @@ instantiation
 InstructGPT
 InstructPix
 intel
+InternLM
+internlm
 invertible
 intervaling
 im

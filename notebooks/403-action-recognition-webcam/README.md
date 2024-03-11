@@ -1,7 +1,7 @@
 # Live Action Recognition with OpenVINO™
 
 <p align="center" width="100%">
-    <img width="80%" src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif"> 
+    <img width="80%" src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif">
 </p>
 
 Human action recognition finds actions over time in a video. The list of actions in this notebook is extensive (400 in total) and covers *Person Actions*, (for example, drawing, drinking, laughing), *Person-Person Actions* (for example, hugging, shaking hands), and *Person-Object Actions* (for example, opening present, mowing the lawn, playing "instrument"). You could find several parent-child groupings on the list of labels, such as braiding hair and brushing hair, salsa dancing, robot dancing, or playing violin and playing guitar. For more information about the labels and the dataset, see the ["The Kinetics Human Action Video Dataset"](https://arxiv.org/pdf/1705.06950.pdf) research paper.
@@ -10,10 +10,10 @@ Human action recognition finds actions over time in a video. The list of actions
 
 ## Notebook Contents
 
-This notebook demonstrates live human action recognition with OpenVINO, using the [Action Recognition Models](https://docs.openvino.ai/2023.3/omz_models_group_intel.html#action-recognition-models) from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo), specifically the Encoder and Decoder from [action-recognition-0001](https://docs.openvino.ai/2023.3/omz_models_model_action_recognition_0001.html). Both models create a sequence to sequence (`"seq2seq"`)<sup id="a1">[1](#f1)</sup> system to identify the  human activities for [Kinetics-400 dataset](https://deepmind.com/research/open-source/kinetics). The models use the Video Transformer approach with ResNet34 encoder<sup id="a2">[2](#f2)</sup>. The notebook shows how to create the following pipeline:
+This notebook demonstrates live human action recognition with OpenVINO, using the [Action Recognition Models](https://docs.openvino.ai/2024/omz_models_group_intel.html#action-recognition-models) from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo), specifically the Encoder and Decoder from [action-recognition-0001](https://docs.openvino.ai/2024/omz_models_model_action_recognition_0001.html). Both models create a sequence to sequence (`"seq2seq"`)<sup id="a1">[1](#f1)</sup> system to identify the  human activities for [Kinetics-400 dataset](https://deepmind.com/research/open-source/kinetics). The models use the Video Transformer approach with ResNet34 encoder<sup id="a2">[2](#f2)</sup>. The notebook shows how to create the following pipeline:
 
 <p align="center" width="100%">
-    <img width="80%" src="https://user-images.githubusercontent.com/10940214/148401661-477aebcd-f2d0-4771-b107-4b37f94d0b1e.jpeg"> 
+    <img width="80%" src="https://user-images.githubusercontent.com/10940214/148401661-477aebcd-f2d0-4771-b107-4b37f94d0b1e.jpeg">
 </p>
 
 Final part of this notebook shows live inference results from a webcam. Additionally, you can also upload a video file.
@@ -33,5 +33,5 @@ If you have not installed all required dependencies, follow the [Installation Gu
 ## See Also
 
 * [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
-* [Model Conversion API](https://docs.openvino.ai/2023.3/openvino_docs_model_processing_introduction.html)
-* [Action Recognition Demo (OpenVINO - No notebooks)](https://docs.openvino.ai/2023.3/omz_demos_action_recognition_demo_python.html)
+* [Model Conversion API](https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html)
+* [Action Recognition Demo (OpenVINO - No notebooks)](https://docs.openvino.ai/2024/omz_demos_action_recognition_demo_python.html)
