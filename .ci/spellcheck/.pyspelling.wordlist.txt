@@ -232,6 +232,9 @@ gaussian
 Gb
 gcc
 GEC
+GELU
+GELAN
+Gemma
 gemma
 genai
 genAI
