@@ -212,7 +212,7 @@ FastSAM
 FC
 FFmpeg
 FIL
-finetuned");
+finetuned
 finetuning
 FLAC
 floyd
@@ -231,7 +231,7 @@ Gaudi
 gaussian
 Gb
 gcc
-GEC");
+GEC
 gemma
 genai
 genAI
