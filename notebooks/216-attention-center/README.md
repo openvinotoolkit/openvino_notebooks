@@ -20,4 +20,4 @@ If you have not installed all required dependencies, follow the [Installation Gu
 ### See Also
 
 * [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
-* [OpenVINO Model Conversion API](https://docs.openvino.ai/2023.3/openvino_docs_model_processing_introduction.html)
+* [OpenVINO Model Conversion API](https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html)

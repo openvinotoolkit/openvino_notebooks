@@ -1,12 +1,12 @@
-# Accelerate Inference of NLP models with Post-Training Quantization API of NNCF 
+# Accelerate Inference of NLP models with Post-Training Quantization API of NNCF
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/105-language-quantize-bert/105-language-quantize-bert.ipynb)
 
-This tutorial demonstrates how to apply INT8 quantization to the Natural Language Processing model BERT, 
-using the [Post-Training Quantization API](https://docs.openvino.ai/nightly/basic_quantization_flow.html). 
-The [HuggingFace BERT](https://huggingface.co/docs/transformers/model_doc/bert) [PyTorch](https://pytorch.org/) model, 
-fine-tuned for [Microsoft Research Paraphrase Corpus (MRPC)](https://www.microsoft.com/en-us/download/details.aspx?id=52398) task 
-is used. The code of this tutorial is designed to be extendable to custom models and datasets. 
+This tutorial demonstrates how to apply INT8 quantization to the Natural Language Processing model BERT,
+using the [Post-Training Quantization API](https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/quantizing-models-post-training/basic-quantization-flow.html).
+The [HuggingFace BERT](https://huggingface.co/docs/transformers/model_doc/bert) [PyTorch](https://pytorch.org/) model,
+fine-tuned for [Microsoft Research Paraphrase Corpus (MRPC)](https://www.microsoft.com/en-us/download/details.aspx?id=52398) task
+is used. The code of this tutorial is designed to be extendable to custom models and datasets.
 
 ## Notebook Contents
 
