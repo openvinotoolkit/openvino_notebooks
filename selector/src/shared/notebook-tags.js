@@ -18,7 +18,10 @@ export const TASKS = /** @type {const} */ ({
     TEXT_TO_AUDIO: 'Text-to-Audio',
     AUDIO_TO_TEXT: 'Audio-to-Text',
     VISUAL_QUESTION_ANSWERING: 'Visual Question Answering',
+    IMAGE_CAPTIONING: "Image Captioning",
     FEATURE_EXTRACTION: 'Feature Extraction',
+    TEXT_TO_IMAGE_RETRIEVAL: "Text-to-Image Retrieval",
+    IMAGE_TO_TEXT_RETRIEVAL: "Image-to-Text Retrieval"
   },
   CV: {
     IMAGE_CLASSIFICATION: 'Image Classification',

@@ -8,7 +8,7 @@ Historically, building a robust search engine for images was difficult. One coul
 
 [Contrastive Language-Image Pre-Training (CLIP)](https://arxiv.org/abs/2103.00020) models provide the means through which you can implement a semantic search engine with a few dozen lines of code. The CLIP model has been trained on millions of pairs of text and images, encoding semantics from images and text combined. Using CLIP, you can provide a text query and CLIP will return the images most related to the query.
 
-In this tutorial, we consider how to use [MobileCLIP](https://arxiv.org/pdf/2311.17049.pdf) for implementing a visual content search engine for finding relevant frames in vide
+In this tutorial, we consider how to use [MobileCLIP](https://arxiv.org/pdf/2311.17049.pdf) for implementing a visual content search engine for finding relevant frames in video
 
 ## Notebook Contents
 

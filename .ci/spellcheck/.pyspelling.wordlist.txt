@@ -212,7 +212,7 @@ FastSAM
 FC
 FFmpeg
 FIL
-finetuned
+finetuned");
 finetuning
 FLAC
 floyd
@@ -231,10 +231,7 @@ Gaudi
 gaussian
 Gb
 gcc
-GEC
-GELU
-GELAN
-Gemma
+GEC");
 gemma
 genai
 genAI
@@ -398,6 +395,7 @@ MLLM
 MLLMs
 MMVLM
 MLP
+MobileCLIP
 MobileLLaMA
 mobilenet
 MobileNet
