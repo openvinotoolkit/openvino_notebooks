@@ -21,5 +21,5 @@ For details, please refer to [Installation Guide](../../README.md).
 ## See Also
 
 * [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
-* [Model Conversion API](https://docs.openvino.ai/2023.3/openvino_docs_model_processing_introduction.html)
-* [Image Processing Demo](https://docs.openvino.ai/2023.3/omz_demos_image_processing_demo_cpp.html)
+* [Model Conversion API](https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html)
+* [Image Processing Demo](https://docs.openvino.ai/2024/omz_demos_image_processing_demo_cpp.html)
