@@ -402,6 +402,7 @@ MLLM
 MLLMs
 MMVLM
 MLP
+MobileCLIP
 MobileLLaMA
 mobilenet
 MobileNet
