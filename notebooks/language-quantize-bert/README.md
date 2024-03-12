@@ -1,6 +1,6 @@
 # Accelerate Inference of NLP models with Post-Training Quantization API of NNCF
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/105-language-quantize-bert/105-language-quantize-bert.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/language-quantize-bert/language-quantize-bert.ipynb)
 
 This tutorial demonstrates how to apply INT8 quantization to the Natural Language Processing model BERT,
 using the [Post-Training Quantization API](https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/quantizing-models-post-training/basic-quantization-flow.html).
