@@ -89,7 +89,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    and prevents dependency conflicts.
 2. The notebooks are located in the "notebooks" subdirectory. There is a subdirectory for every
    notebook, with generally the same base name as the notebook.  For example, the
-   `001-hello-world.ipynb` notebook can be found in the 001-hello-world directory.
+   `hello-world.ipynb` notebook can be found in the hello-world directory.
    - See the [Notebook naming](#notebook-naming) section below, for the
      numbering of the notebooks.
    - Add a `README.md` to the notebook subdirectory. Add a screenshot that gives an indication of what
