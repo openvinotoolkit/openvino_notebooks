@@ -1,4 +1,4 @@
-107-speech-recognition-quantization
+speech-recognition-quantization
 108-gpu-device
 112-pytorch-post-training-quantization-nncf
 117-model-server

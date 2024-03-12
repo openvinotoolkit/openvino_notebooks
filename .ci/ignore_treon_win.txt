@@ -1,4 +1,4 @@
-107-speech-recognition-quantization
+speech-recognition-quantization
 108-gpu-device
 117-model-server
 122-quantizing-model-with-accuracy-control

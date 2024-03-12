@@ -1,12 +1,12 @@
 # Quantize Speech Recognition Models using NNCF PTQ API
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/107-speech-recognition-quantization/107-speech-recognition-quantization-data2vec.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/speech-recognition-quantization/speech-recognition-quantization-data2vec.ipynb)
 
 This tutorial demonstrates how to apply `INT8` quantization to the speech recognition models,
 using post-training quantization with [NNCF](https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/quantizing-models-post-training.html) (Neural Network Compression Framework).
 
 Supported models:
-* `107-speech-recognition-wav2vec2.ipynb` demonstrates how to apply post-training `INT8` quantization on a fine-tuned [Wav2Vec2-Base-960h](https://huggingface.co/facebook/wav2vec2-base-960h) [PyTorch](https://pytorch.org/) model, trained on the [LibriSpeech ASR corpus](https://www.openslr.org/12).
-* `107-speech-recognition-data2vec.ipynb` demonstrates how to apply post-training `INT8` quantization on a fine-tuned [Data2Vec-Audio-Base-960h](https://huggingface.co/facebook/data2vec-audio-base-960h) [PyTorch](https://pytorch.org/) model, trained on the [LibriSpeech ASR corpus](https://www.openslr.org/12).
+* `speech-recognition-quantization-wav2vec2.ipynb` demonstrates how to apply post-training `INT8` quantization on a fine-tuned [Wav2Vec2-Base-960h](https://huggingface.co/facebook/wav2vec2-base-960h) [PyTorch](https://pytorch.org/) model, trained on the [LibriSpeech ASR corpus](https://www.openslr.org/12).
+* `speech-recognition-quantization-data2vec.ipynb` demonstrates how to apply post-training `INT8` quantization on a fine-tuned [Data2Vec-Audio-Base-960h](https://huggingface.co/facebook/data2vec-audio-base-960h) [PyTorch](https://pytorch.org/) model, trained on the [LibriSpeech ASR corpus](https://www.openslr.org/12).
 
 The code of the tutorials is designed to be extendable to custom models and datasets.
 
