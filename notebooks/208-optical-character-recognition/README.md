@@ -6,7 +6,7 @@
 |---|---|
 | <img src="https://user-images.githubusercontent.com/36741649/129315238-f1f4297e-83d0-4749-a66e-663ba4169099.jpg" width=300> | <img src="https://user-images.githubusercontent.com/36741649/129315292-a37266dc-dfb2-4749-bca5-2ac9c1e93d64.jpg" width=300> |
 
-In this tutorial optical character recognition is presented. This notebook is a continuation of [004-hello-detection](../004-hello-detection) notebook.
+In this tutorial optical character recognition is presented. This notebook is a continuation of [hello-detection](../hello-detection) notebook.
 
 ## Notebook Contents
 
