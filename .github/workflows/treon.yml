@@ -65,7 +65,7 @@ jobs:
             # and change cache paths in both treon.yml and convert_notebooks.yml
             case_00030.zip
             notebooks/ct-segmentation-quantize/kits19_frames_1
-            notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
+            notebooks/pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
             # 208 omz cache location is set to this with test_replace
             notebooks/208-optical-character-recognition/open_model_zoo_cache
             notebooks/ct-scan-live-inference/kits19_frames_1

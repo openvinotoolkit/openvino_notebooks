@@ -1,6 +1,6 @@
 speech-recognition-quantization
 gpu-device
-112-pytorch-post-training-quantization-nncf
+pytorch-post-training-quantization-nncf
 117-model-server
 122-quantizing-model-with-accuracy-control
 127-big-transfer-quantization
