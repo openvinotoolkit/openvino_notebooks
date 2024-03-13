@@ -10,8 +10,10 @@ tagslist=$rstdir"/notebooks_tags.json"
 mkdir -p $rstdir
 
 # List all notebooks that contain binder or colab buttons based on readme
-cat README.md | grep -oP "https://mybinder.org/v2.*?[0-9]{3}.*?ipynb" | sed 's#%2F#/#g' | xargs basename -a -s .ipynb | sort | uniq > $binderlist
-cat README.md | grep -oP "https://colab.research.google.com/github.*?[0-9]{3}.*?ipynb" | xargs basename -s .ipynb | sort | uniq > $colablist
+for n in $(git ls-files '*.ipynb' ':!:*utils.ipynb'| head); do
+    cat ${n%/*}"/README.md" | grep -oP "https://mybinder.org/v2.*?[0-9]{3}.*?ipynb" | sed 's#%2F#/#g' | xargs basename -a -s .ipynb {} | sort | uniq > $binderlist
+    cat ${n%/*}"/README.md" | grep -oP "https://colab.research.google.com/github.*?[0-9]{3}.*?ipynb" | xargs basename -s .ipynb {} | sort | uniq > $colablist
+done
 find notebooks -maxdepth 2 -name "*.ipynb" | sort > $notebooklist
 taggerpath=$(git ls-files "*tagger.py")
 notebookspath=$(git ls-files "*.ipynb"| head -n 1)
