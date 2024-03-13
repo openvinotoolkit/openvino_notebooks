@@ -5,20 +5,19 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - 'main'
+      - 'main'
     paths:
-    - 'notebooks/**.ipynb'
-    - 'notebooks/**.py'
-    - 'requirements.txt'
-    - 'README.md'
-    - '.ci/*'
-    - '.github/workflows/convert_notebooks.yml'
+      - 'notebooks/**.ipynb'
+      - 'notebooks/**.py'
+      - 'requirements.txt'
+      - 'README.md'
+      - '.ci/*'
+      - '.github/workflows/convert_notebooks.yml'
   pull_request:
     paths:
-    - '.github/workflows/convert_notebooks.yml'
+      - '.github/workflows/convert_notebooks.yml'
   schedule:
-    - cron: "0 0 * * *"
-
+    - cron: '0 0 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -35,158 +34,157 @@ jobs:
         python: [3.8]
 
     runs-on: ${{ matrix.os }}
-    
+
     steps:
-    - name: Maximize build space
-      run:  |
-            sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
-            sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
-            sudo rm -rf /opt/ghc
-            echo "Available storage:"
-            df -h
-    - name: Set Swap Space
-      uses: pierotofy/set-swap-space@master
-      with:
-        swap-size-gb: 10
-    - name: Install required packages for rst converstion
-      run:  |
-            sudo apt-get update && sudo apt-get install texlive texlive-latex-extra pandoc -y
-      shell: bash
+      - name: Maximize build space
+        run: |
+          sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
+          sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
+          sudo rm -rf /opt/ghc
+          echo "Available storage:"
+          df -h
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 10
+      - name: Install required packages for rst converstion
+        run: |
+          sudo apt-get update && sudo apt-get install texlive texlive-latex-extra pandoc -y
+        shell: bash
 
-    #### Installation/preparation ####
-    #
-    # These steps are copied from convert_notebooks.yml
-    # This should ideally be a reusable workflow
+      #### Installation/preparation ####
+      #
+      # These steps are copied from convert_notebooks.yml
+      # This should ideally be a reusable workflow
 
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    - name: Dotenv Action
-      id: dotenv
-      uses: xom9ikk/dotenv@v1.0.2
-      with:
-        path: ./.github/workflows
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python }}
-    - name: Install required packages
-      run:  |
-            if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get install libsndfile1 -y
-            fi
-      shell: bash
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Dotenv Action
+        id: dotenv
+        uses: xom9ikk/dotenv@v1.0.2
+        with:
+          path: ./.github/workflows
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install required packages
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get install libsndfile1 -y
+          fi
+        shell: bash
 
-    - name: Cache OpenVINO Pip Packages
-      id: cachepip
-      uses: actions/cache@v3
-      with:
-        path: |
-          pipcache
-        key: ${{ env.PIP_CACHE_KEY }}-${{ matrix.os }}-${{ matrix.python }}
+      - name: Cache OpenVINO Pip Packages
+        id: cachepip
+        uses: actions/cache@v3
+        with:
+          path: |
+            pipcache
+          key: ${{ env.PIP_CACHE_KEY }}-${{ matrix.os }}-${{ matrix.python }}
 
-    # Cache specific files to reduce downloads or prevent network issues
-    - name: Cache Files
-      id: cachefiles
-      uses: actions/cache@v3
-      with:
-        path: |
-          # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
-          # and change cache paths in both treon.yml and convert_notebooks.yml
-          case_00030.zip
-          notebooks/110-ct-segmentation-quantize/kits19_frames_1
-          notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
-          # 208 omz cache location is set to this with test_replace
-          notebooks/208-optical-character-recognition/open_model_zoo_cache
-          notebooks/110-ct-scan-live-inference/kits19_frames_1
-          notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
-        key: ${{ env.FILES_CACHE_KEY }}
+      # Cache specific files to reduce downloads or prevent network issues
+      - name: Cache Files
+        id: cachefiles
+        uses: actions/cache@v3
+        with:
+          path: |
+            # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
+            # and change cache paths in both treon.yml and convert_notebooks.yml
+            case_00030.zip
+            notebooks/ct-segmentation-quantize/kits19_frames_1
+            notebooks/112-pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
+            # 208 omz cache location is set to this with test_replace
+            notebooks/208-optical-character-recognition/open_model_zoo_cache
+            notebooks/ct-scan-live-inference/kits19_frames_1
+            notebooks/302-pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
+          key: ${{ env.FILES_CACHE_KEY }}
 
-    # PaddleGAN stores cache in ppgan directory in CACHE_DIR
-    - name: Set CACHE_DIR
-      shell: bash
-      run: |
-        python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
-        # replace backslashes with forward slashes for Windows paths
-        python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+      # PaddleGAN stores cache in ppgan directory in CACHE_DIR
+      - name: Set CACHE_DIR
+        shell: bash
+        run: |
+          python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
+          # replace backslashes with forward slashes for Windows paths
+          python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
 
-    # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
-    - name: Set HUB_HOME
-      shell: bash
-      run: |
-        echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
+      # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
+      - name: Set HUB_HOME
+        shell: bash
+        run: |
+          echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
 
-    # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
-    - name: Cache PaddlePaddle cache directories (per OS)
-      id: cacheusercache
-      uses: actions/cache@v3
-      with:
-        path: |
-          ${{ env.HUB_HOME }}
-          ${{ env.CACHE_DIR }}/paddle
-          ${{ env.CACHE_DIR }}/ppgan
-        key: ${{ env.USER_CACHE_KEY }}-${{ runner.os }}
-    - name: Cache openvino packages
-      if: steps.cachepip.outputs.cache-hit != 'true'
-      run: |
-        python -m pip install --upgrade pip==21.3.*
-        mkdir pipcache
-        python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
-        cp -r pipcache pipcache_openvino
-        python -m pip uninstall -y openvino openvino-dev nncf
+      # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
+      - name: Cache PaddlePaddle cache directories (per OS)
+        id: cacheusercache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ env.HUB_HOME }}
+            ${{ env.CACHE_DIR }}/paddle
+            ${{ env.CACHE_DIR }}/ppgan
+          key: ${{ env.USER_CACHE_KEY }}-${{ runner.os }}
+      - name: Cache openvino packages
+        if: steps.cachepip.outputs.cache-hit != 'true'
+        run: |
+          python -m pip install --upgrade pip==21.3.*
+          mkdir pipcache
+          python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
+          cp -r pipcache pipcache_openvino
+          python -m pip uninstall -y openvino openvino-dev nncf
 
-    # Download a small dataset to use for testing purposes in monai-kidney training notebook
-    - name: Download CT files
-      if: steps.cachefiles.outputs.cache-hit != 'true'
-      run: |
-        curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
-    - name: Copy CT files
-      run: |
-        mkdir notebooks/110-ct-segmentation-quantize/kits19
-        mkdir notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
-        unzip case_00030.zip
-        cp -r case_00030 case_00001
-        mv case_00030 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
-        mv case_00001 notebooks/110-ct-segmentation-quantize/kits19/kits19_frames
-    - name: Download shared datasets
-      run: |
+      # Download a small dataset to use for testing purposes in monai-kidney training notebook
+      - name: Download CT files
+        if: steps.cachefiles.outputs.cache-hit != 'true'
+        run: |
+          curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
+      - name: Copy CT files
+        run: |
+          mkdir notebooks/ct-segmentation-quantize/kits19
+          mkdir notebooks/ct-segmentation-quantize/kits19/kits19_frames
+          unzip case_00030.zip
+          cp -r case_00030 case_00001
+          mv case_00030 notebooks/ct-segmentation-quantize/kits19/kits19_frames
+          mv case_00001 notebooks/ct-segmentation-quantize/kits19/kits19_frames
+      - name: Download shared datasets
+        run: |
           mkdir -p notebooks/data/librispeech
           wget  -O notebooks/data/librispeech/test-clean.tar.gz http://openslr.elda.org/resources/12/test-clean.tar.gz
           tar -xvf notebooks/data/librispeech/test-clean.tar.gz
           mkdir -p notebooks/data/cifar10
           wget -O notebooks/data/cifar10/cifar-10-python.tar.gz https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip==21.3.*
-        python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
-        python -m ipykernel install --user --name openvino_env
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip==21.3.*
+          python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
+          python -m ipykernel install --user --name openvino_env
 
-      # Cache OpenVINO packages. mv works cross-platform
-    - name: Make pipcache directory with OpenVINO packages
-      if: steps.cachepip.outputs.cache-hit != 'true'
-      run: |
-        mv pipcache pipcache_full
-        mv pipcache_openvino pipcache
+        # Cache OpenVINO packages. mv works cross-platform
+      - name: Make pipcache directory with OpenVINO packages
+        if: steps.cachepip.outputs.cache-hit != 'true'
+        run: |
+          mv pipcache pipcache_full
+          mv pipcache_openvino pipcache
 
-    # Create list of installed pip packages that can be downloaded as artifacts
-    # to verify the exact environment of a specific test run
-    - name: Pip freeze
-      run: |
-        python -m pip freeze
-        python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
-    - name: Archive pip freeze
-      uses: actions/upload-artifact@v4
-      with:
-        name: pip-freeze-${{matrix.os}}-${{ matrix.python }}
-        path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+      # Create list of installed pip packages that can be downloaded as artifacts
+      # to verify the exact environment of a specific test run
+      - name: Pip freeze
+        run: |
+          python -m pip freeze
+          python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
+      - name: Archive pip freeze
+        uses: actions/upload-artifact@v4
+        with:
+          name: pip-freeze-${{matrix.os}}-${{ matrix.python }}
+          path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
 
-    #### End installation/preparation
+      #### End installation/preparation
 
-    - name: convert_notebooks
-      shell: bash
-      run: .ci/convert_notebooks.sh
-    - name: Save reStructuredText files
-      uses: actions/upload-artifact@v4
-      with:
-        name: rst_files
-        path: rst_files
-
+      - name: convert_notebooks
+        shell: bash
+        run: .ci/convert_notebooks.sh
+      - name: Save reStructuredText files
+        uses: actions/upload-artifact@v4
+        with:
+          name: rst_files
+          path: rst_files
