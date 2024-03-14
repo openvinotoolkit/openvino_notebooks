@@ -1,7 +1,7 @@
 speech-recognition-quantization
 gpu-device
 model-server
-122-quantizing-model-with-accuracy-control
+quantizing-model-with-accuracy-control
 127-big-transfer-quantization
 204-segmenter-semantic-segmentation
 216-attention-center

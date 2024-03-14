@@ -1,8 +1,8 @@
 notebooks/speech-recognition-quantization/speech-recognition-quantization-data2vec.ipynb
 notebooks/gpu-device/gpu-device.ipynb
 notebooks/model-server/model-server.ipynb
-notebooks/122-quantizing-model-with-accuracy-control/122-speech-recognition-quantization-wav2vec2.ipynb
-notebooks/122-quantizing-model-with-accuracy-control/122-yolov8-quantization-with-accuracy-control.ipynb
+notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb
+notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb
 notebooks/211-speech-to-text/211-speech-to-text.ipynb
 notebooks/214-grammar-correction/214-grammar-correction.ipynb
 notebooks/215-image-inpainting/215-image-inpainting.ipynb
