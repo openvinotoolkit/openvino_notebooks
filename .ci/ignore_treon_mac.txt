@@ -5,7 +5,7 @@ quantizing-model-with-accuracy-control
 big-transfer-quantization
 openvino-tokenizers
 segmenter-semantic-segmentation
-216-attention-center
+attention-center
 220-cross-lingual-books-alignment
 225-stable-diffusion-text-to-image
 227-whisper-subtitles-generation

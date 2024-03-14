@@ -6,7 +6,7 @@ quantizing-model-with-accuracy-control
 big-transfer-quantization
 segmenter-semantic-segmentation
 grammar-correction
-216-attention-center
+attention-center
 220-cross-lingual-books-alignment
 225-stable-diffusion-text-to-image
 226-yolov7-optimization
