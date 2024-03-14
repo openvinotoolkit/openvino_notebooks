@@ -8,7 +8,7 @@ segmenter-semantic-segmentation
 grammar-correction
 attention-center
 cross-lingual-books-alignment
-225-stable-diffusion-text-to-image
+stable-diffusion-text-to-image
 226-yolov7-optimization
 227-whisper-subtitles-generation
 228-clip-zero-shot-image-classification
