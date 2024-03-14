@@ -11,10 +11,26 @@ from transformers import AutoConfig, AutoTokenizer, AutoProcessor, PreTrainedTok
 
 # Global variables initialization
 AUDIO_WIDGET_SAMPLE_RATE = 16000
-SYSTEM_CONFIGURATION = ("You're Adrishuo - a helpful, respectful and honest doctor assistant. Your role is talking to a patient, who just came in. "
-                        "Your task is to get all symptoms from the patient and summarize them to the doctor. You cannot treat the patient yourself.")
+SYSTEM_CONFIGURATION = """
+You're Adrishuo - a helpful, respectful, and honest virtual doctor assistant. Your role is talking to a patient who just came in. 
+Your task is to gather symptoms from the patient, ask clarifying questions if necessary, and summarize health-related information for the doctor's review. 
+You cannot attempt to treat the patient yourself.
+You cannot attempt to suggest or recommend any form of treatment.
+You cannot provide and suggest any pain relievers.
+You cannot provide and suggest any over-the-counter medication.
+You cannot provide and suggest any other medicines.
+Avoid offering medical advice. 
+Do not collect or use any personal information like age, name, contact, gender, etc. 
+Remember, you're here to support the information gathering process in a respectful and non-invasive manner.
+Focus on understanding the patient's health concerns without diagnosing or suggesting treatments.
+You cannot collect personal information like age, name, contact, gender, and other personal informations.
+Your responses should be safe, unbiased, and factually coherent. If unsure, do not provide false information.
+"""
 GREET_THE_CUSTOMER = "Please introduce yourself and greet the patient"
-SUMMARIZE_THE_CUSTOMER = "Summarize the above patient to the doctor. Use only information provided by patient."
+SUMMARIZE_THE_CUSTOMER = """
+"Summarize the above patient to the doctor. Use only health-related information provided by patient. 
+Strictly do not mention any personal data like age, name, gender, contact, non-health information etc. when summarizing.
+"""
 NEURAL_CHAT_MODEL_TEMPLATE = ("{% if messages[0]['role'] == 'system' %}"
                               "{% set loop_messages = messages[1:] %}"
                               "{% set system_message = messages[0]['content'] %}"
@@ -44,6 +60,24 @@ chat_tokenizer: PreTrainedTokenizer = None
 message_template: str = None
 asr_model: OVModelForSpeechSeq2Seq = None
 asr_processor: AutoProcessor = None
+
+
+def is_health_related_query(prompt: str) -> bool:
+    if prompt is None:
+        return False
+    health_keywords = ['pain', 'fever', 'Loss of appetite', 'nausea', 'injury', 'symptoms', 'illness', 'sick', 'health', 'cold', 'cough', 'fatigue', 'accident', 'infection', 'Ear', 'Eyes', 'Adbomen', 'chest pain']
+    return any(keyword in prompt.lower() for keyword in health_keywords)
+  
+
+def post_process_response(response: str) -> str:
+    # Keywords or phrases that indicate medical advice, treatments, or medication
+    advice_keywords = ['take', 'try', 'suggest', 'recommend', 'breathing', 'difficult', 'medication', 'over-the-counter', 'pain reliever', 'ibuprofen', 'naproxen', 'treatment']
+    
+    for keyword in advice_keywords:
+        if keyword in response.lower():
+            return "It's important to consult with a healthcare professional for any medical advice or treatment options."
+    
+    return response
 
 
 def load_asr_model(model_dir: Path) -> None:
@@ -101,34 +135,32 @@ def respond(prompt: str) -> str:
 
 def chat(history: List) -> List[List[str]]:
     """
-    Chat function. It generates response based on a prompt
-
+    Processes chat history, generates responses for health-related queries,
+    and handles non-health-related queries with a generic message.
+    
     Params:
         history: history of the messages (conversation) so far
     Returns:
         History with the latest chat's response
     """
-    # the conversation must be in that format to use chat template
-    conversation = [
-        {"role": "system", "content": SYSTEM_CONFIGURATION},
-        {"role": "user", "content": GREET_THE_CUSTOMER}
-    ]
-    # add prompts to the conversation
-    for user_prompt, assistant_response in history:
-        if user_prompt:
-            conversation.append({"role": "user", "content": user_prompt})
-        if assistant_response:
-            conversation.append({"role": "assistant", "content": assistant_response})
+    if not history or not history[-1][0]:  # If there's no user prompt, provide a default response.
+        return [[None, "How can I assist you with your health concerns today?"]]
 
-    # use a template specific to the model
-    conversation = chat_tokenizer.apply_chat_template(conversation, chat_template=message_template, tokenize=False)
+    user_prompt = history[-1][0]  # Extract the last user prompt from history
 
-    # generate response for the conversation
-    response = respond(conversation)
-    history[-1][1] = response
+    if is_health_related_query(user_prompt):
+        # Process the prompt with the model for health-related queries
+        conversation = [{"role": "system", "content": SYSTEM_CONFIGURATION}, {"role": "user", "content": user_prompt}]
+        # Format the conversation for the model
+        conversation_formatted = chat_tokenizer.apply_chat_template(conversation, chat_template=message_template, tokenize=False)
+        # Generate the model's response
+        model_response = respond(conversation_formatted)
+        history[-1][1] = model_response
+    else:
+        # For non-health-related queries, return a generic guidance response
+        history[-1][1] = "I'm here to assist with health-related inquiries. Please let me know if you have any health concerns or symptoms you'd like to discuss."
 
-    # return chat history as the list of message pairs
-    return history
+    return history    
 
 
 def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> List[List[str]]:
@@ -174,7 +206,7 @@ def summarize(conversation: List) -> str:
     conversation.append([SUMMARIZE_THE_CUSTOMER, None])
     conversation = chat(conversation)
     return conversation[-1][1]
-
+    
 
 def create_UI(initial_message: str) -> gr.Blocks:
     """
