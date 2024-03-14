@@ -1,6 +1,6 @@
 # 🤗 Hugging Face Model Hub with OpenVINO™
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eaidova/openvino_notebooks_binder.git/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fopenvinotoolkit%252Fopenvino_notebooks%26urlpath%3Dtree%252Fopenvino_notebooks%252Fnotebooks%2F124-hugging-face-hub%2F124-hugging-face-hub.ipynb)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/124-hugging-face-hub/124-hugging-face-hub.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eaidova/openvino_notebooks_binder.git/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fopenvinotoolkit%252Fopenvino_notebooks%26urlpath%3Dtree%252Fopenvino_notebooks%252Fnotebooks%2Fhugging-face-hub%2Fhugging-face-hub.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/hugging-face-hub/hugging-face-hub.ipynb)
 
 The Hugging Face (HF) Model Hub is a central repository for pre-trained deep learning models. It allows exploration and provides access to thousands of models for a wide range of tasks, including text classification, question answering, and image classification.
 Hugging Face provides Python packages that serve as APIs and tools to easily download and fine tune state-of-the-art pretrained models, namely [transformers] and [diffusers] packages.
