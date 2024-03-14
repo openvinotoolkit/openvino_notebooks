@@ -1,6 +1,6 @@
 speech-recognition-quantization
 gpu-device
-117-model-server
+model-server
 122-quantizing-model-with-accuracy-control
 127-big-transfer-quantization
 128-openvino-tokenizers
