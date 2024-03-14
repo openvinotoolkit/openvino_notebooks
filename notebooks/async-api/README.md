@@ -1,7 +1,7 @@
 # Asynchronous Inference with OpenVINO™
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2F115-async-api%2F115-async-api.ipynb)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/115-async-api/115-async-api.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2Fasync-api%2Fasync-api.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/async-api/async-api.ipynb)
 
 
 This notebook demonstrates how to use the [Async API](https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/general-optimizations.html) and [`AsyncInferQueue`](https://docs.openvino.ai/2024/openvino-workflow/running-inference/integrate-openvino-with-your-application/python-api-exclusives.html#asyncinferqueue) for asynchronous execution with OpenVINO.
