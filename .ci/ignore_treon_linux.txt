@@ -3,7 +3,7 @@ gpu-device
 pytorch-post-training-quantization-nncf
 model-server
 quantizing-model-with-accuracy-control
-127-big-transfer-quantization
+big-transfer-quantization
 204-segmenter-semantic-segmentation
 214-grammar-correction
 216-attention-center
