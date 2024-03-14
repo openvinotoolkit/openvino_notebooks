@@ -1,6 +1,7 @@
 # TensorFlow Hub models + OpenVINO
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/126-tensorflow-hub/126-tensorflow-hub.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/tensorflow-hub/tensorflow-hub.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eaidova/openvino_notebooks_binder.git/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fopenvinotoolkit%252Fopenvino_notebooks%26urlpath%3Dtree%252Fopenvino_notebooks%252Fnotebooks%2Ftensorflow-hub%2Ftensorflow-hub.ipynb)
 
 This tutorial demonstrates how to convert TensorFlow Hub models to OpenVINO Intermediate Representation.
 
