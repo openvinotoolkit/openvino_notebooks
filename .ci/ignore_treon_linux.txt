@@ -5,7 +5,7 @@ model-server
 quantizing-model-with-accuracy-control
 big-transfer-quantization
 segmenter-semantic-segmentation
-214-grammar-correction
+grammar-correction
 216-attention-center
 220-cross-lingual-books-alignment
 225-stable-diffusion-text-to-image

@@ -18,7 +18,7 @@ Dataset:
 >Each example in the dataset is extracted from a GitHub repository, and each repository has its own license. Example-wise license information is not (yet) included in this dataset: you will need to find out yourself which license the code is using.
 
 Additional resources:
-- [Grammatical Error Correction with OpenVINO](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/214-grammar-correction/214-grammar-correction.ipynb)
+- [Grammatical Error Correction with OpenVINO](../grammar-correction/grammar-correction.ipynb)
 - [Quantize a Hugging Face Question-Answering Model with OpenVINO](https://github.com/huggingface/optimum-intel/blob/main/notebooks/openvino/question_answering_quantization.ipynb)
 
 
