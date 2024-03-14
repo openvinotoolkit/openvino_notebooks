@@ -87,7 +87,7 @@ OpenVINO™ Notebooks需要预装Python和Git， 针对不同操作系统的安�
 如果你希望启动单个的notebook（如：Monodepth notebook），运行以下命令：
 
 ```bash
-jupyter 201-vision-monodepth.ipynb
+jupyter vision-monodepth.ipynb
 ```
 
 ### 启动所有Notebooks

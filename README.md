@@ -85,7 +85,7 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 If you wish to launch only one notebook, like the Monodepth notebook, run the command below.
 
 ```bash
-jupyter 201-vision-monodepth.ipynb
+jupyter vision-monodepth.ipynb
 ```
 
 ### To Launch all Notebooks
