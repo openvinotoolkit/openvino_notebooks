@@ -155,9 +155,9 @@ jobs:
       # Prevent test aborting by timeout
       - name: Download long loading models
         run: |
-          mkdir notebooks/203-meter-reader/model
-          curl -o notebooks/203-meter-reader/model/meter_det_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_det_model.tar.gz'
-          curl -o notebooks/203-meter-reader/model/meter_seg_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_seg_model.tar.gz'
+          mkdir notebooks/meter-reader/model
+          curl -o notebooks/meter-reader/model/meter_det_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_det_model.tar.gz'
+          curl -o notebooks/meter-reader/model/meter_seg_model.tar.gz 'https://bj.bcebos.com/paddlex/examples2/meter_reader/meter_seg_model.tar.gz'
           mkdir notebooks/405-paddle-ocr-webcam/model
           curl -o notebooks/405-paddle-ocr-webcam/model/ch_PP-OCRv3_det_infer.tar 'https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_det_infer.tar'
           curl -o notebooks/405-paddle-ocr-webcam/model/ch_PP-OCRv3_rec_infer.tar 'https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_rec_infer.tar'
