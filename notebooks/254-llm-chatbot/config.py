@@ -132,16 +132,16 @@ SUPPORTED_LLM_MODELS = {
         "mistral-7b": {
             "model_id": "mistralai/Mistral-7B-v0.1",
             "remote": False,
-            "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
-            "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
-            "current_message_template": "{user} [/INST]{assistant}",
-            "tokenizer_kwargs": {"add_special_tokens": False},
-            "partial_text_processor": llama_partial_text_processor,
-            "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
+            "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
+            "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
+            "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
             + """ 
-            [INST] Question: {question} 
+            <|user|>
+            Question: {question} 
             Context: {context} 
-            Answer: [/INST]""",
+            Answer: </s>
+            <|assistant|>""",
         },
         "zephyr-7b-beta": {
             "model_id": "HuggingFaceH4/zephyr-7b-beta",
@@ -187,8 +187,8 @@ SUPPORTED_LLM_MODELS = {
         },
     },
     "Chinese":{
-        "qwen1.5-0.5b-chat": {
-            "model_id": "Qwen/Qwen1.5-0.5B-Chat",
+        "qwen1.5-1.8b-chat": {
+            "model_id": "Qwen/Qwen1.5-1.8B-Chat",
             "remote": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
@@ -200,18 +200,11 @@ SUPPORTED_LLM_MODELS = {
             已知内容: {context} 
             回答: <|im_end|><|im_start|>assistant""",
         },
-        "qwen1.5-1.8b-chat": {
-            "model_id": "Qwen/Qwen-1_8B-Chat",
+        "qwen1.5-0.5b-chat": {
+            "model_id": "Qwen/Qwen1.5-0.5B-Chat",
             "remote": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
-            "rag_prompt_template": f"""<|im_start|>system
-            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
-            + """
-            <|im_start|>user
-            问题: {question} 
-            已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
         },
         "qwen1.5-7b-chat": {
             "model_id": "Qwen/Qwen1.5-7B-Chat",
@@ -274,12 +267,6 @@ SUPPORTED_LLM_MODELS = {
             "remote": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": [2],
-            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
-            + """
-            问题: {question} 
-            已知内容: {context} 
-            回答: 
-            """,
         },
         "internlm2-chat-1.8b": {
             "model_id": "internlm/internlm2-chat-1_8b",
@@ -288,13 +275,6 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": [2, 92542],
             "partial_text_processor": internlm_partial_text_processor,
-            "rag_prompt_template": f"""<|im_start|>system
-            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
-            + """
-            <|im_start|>user
-            问题: {question} 
-            已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
         },  
     },
     "Japanese":{
