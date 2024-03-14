@@ -5,7 +5,7 @@ notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization
 notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb
 notebooks/speech-to-text/speech-to-text.ipynb
 notebooks/grammar-correction/grammar-correction.ipynb
-notebooks/215-image-inpainting/215-image-inpainting.ipynb
+notebooks/image-inpainting/image-inpainting.ipynb
 notebooks/220-cross-lingual-books-alignment/220-cross-lingual-books-alignment.ipynb
 notebooks/225-stable-diffusion-text-to-image/225-stable-diffusion-text-to-image.ipynb
 notebooks/227-whisper-subtitles-generation/227-whisper-convert.ipynb
