@@ -7,7 +7,7 @@ big-transfer-quantization
 segmenter-semantic-segmentation
 grammar-correction
 attention-center
-220-cross-lingual-books-alignment
+cross-lingual-books-alignment
 225-stable-diffusion-text-to-image
 226-yolov7-optimization
 227-whisper-subtitles-generation

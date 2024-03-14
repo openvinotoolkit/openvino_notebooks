@@ -6,7 +6,7 @@ big-transfer-quantization
 openvino-tokenizers
 segmenter-semantic-segmentation
 attention-center
-220-cross-lingual-books-alignment
+cross-lingual-books-alignment
 225-stable-diffusion-text-to-image
 227-whisper-subtitles-generation
 228-clip-zero-shot-image-classification
