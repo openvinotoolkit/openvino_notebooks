@@ -1,5 +1,5 @@
 # Photo to Anime with PaddleGAN Tutorial
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/206-vision-paddlegan-anime/206-vision-paddlegan-anime.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/vision-paddlegan-anime/vision-paddlegan-anime.ipynb)
 
 ![anime coco](https://user-images.githubusercontent.com/15709723/123559130-04550100-d74f-11eb-819c-a02284654428.jpg)
 
