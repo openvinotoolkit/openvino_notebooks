@@ -1,6 +1,6 @@
 # Optical Character Recognition (OCR) with OpenVINO™
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/208-optical-character-recognition/208-optical-character-recognition.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/optical-character-recognition/optical-character-recognition.ipynb)
 
 | | |
 |---|---|

@@ -7,7 +7,7 @@
 
 的人不一了是他有为在责新中任自之我们
 
-This tutorial demonstrates optical character recognition for handwritten Chinese (simplified) and Japanese. An OCR tutorial for the Latin alphabet is available in the [optical character recognition 208-notebook](../208-optical-character-recognition)
+This tutorial demonstrates optical character recognition for handwritten Chinese (simplified) and Japanese. An OCR tutorial for the Latin alphabet is available in the [optical character recognition notebook](../optical-character-recognition)
 
 ## Notebook Contents
 
