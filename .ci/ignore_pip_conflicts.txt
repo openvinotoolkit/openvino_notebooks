@@ -1,7 +1,7 @@
 notebooks/performance-tricks/latency-tricks.ipynb  # ultralytics<=8.0.178
 notebooks/performance-tricks/throughput-tricks.ipynb  # ultralytics<=8.0.178
 notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb  # ultralytics==8.0.43
-notebooks/123-detectron2-to-openvino/123-detectron2-to-openvino.ipynb # detectron2@https://github.com/facebookresearch/detectron2
+notebooks/detectron2-to-openvino/detectron2-to-openvino.ipynb # detectron2@https://github.com/facebookresearch/detectron2
 notebooks/204-segmenter-semantic-segmentation/204-segmenter-semantic-segmentation.ipynb # timm==0.4.12, install Segmenter requirements
 notebooks/212-pyannote-speaker-diarization/212-pyannote-speaker-diarization.ipynb  # pyannote-audio@https://github.com/eaidova/pyannote-audio
 notebooks/230-yolov8-optimization/230-yolov8-instance-segmentation.ipynb  # ultralytics==8.0.43
