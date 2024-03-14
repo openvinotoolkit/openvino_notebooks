@@ -4,7 +4,7 @@ pytorch-post-training-quantization-nncf
 model-server
 quantizing-model-with-accuracy-control
 big-transfer-quantization
-204-segmenter-semantic-segmentation
+segmenter-semantic-segmentation
 214-grammar-correction
 216-attention-center
 220-cross-lingual-books-alignment
