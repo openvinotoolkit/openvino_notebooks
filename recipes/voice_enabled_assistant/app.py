@@ -1,13 +1,15 @@
 import argparse
+import time
 from pathlib import Path
-from typing import Tuple, List
+from threading import Thread
+from typing import Tuple, List, Optional
 
 import gradio as gr
 import librosa
 import numpy as np
-import time
 from optimum.intel import OVModelForCausalLM, OVModelForSpeechSeq2Seq
-from transformers import AutoConfig, AutoTokenizer, AutoProcessor, PreTrainedTokenizer
+from transformers import AutoConfig, AutoTokenizer, AutoProcessor, PreTrainedTokenizer, TextIteratorStreamer
+from transformers.generation.streamers import BaseStreamer
 
 # Global variables initialization
 AUDIO_WIDGET_SAMPLE_RATE = 16000
@@ -39,11 +41,11 @@ NEURAL_CHAT_MODEL_TEMPLATE = ("{% if messages[0]['role'] == 'system' %}"
                               )
 
 # Initialize Model variables
-chat_model: OVModelForCausalLM = None
-chat_tokenizer: PreTrainedTokenizer = None
-message_template: str = None
-asr_model: OVModelForSpeechSeq2Seq = None
-asr_processor: AutoProcessor = None
+chat_model: Optional[OVModelForCausalLM] = None
+chat_tokenizer: Optional[PreTrainedTokenizer] = None
+message_template: Optional[str] = None
+asr_model: Optional[OVModelForSpeechSeq2Seq] = None
+asr_processor: Optional[AutoProcessor] = None
 
 
 def load_asr_model(model_dir: Path) -> None:
@@ -77,12 +79,13 @@ def load_chat_model(model_dir: Path) -> None:
     message_template = NEURAL_CHAT_MODEL_TEMPLATE if ("neural-chat" in model_dir.name) else chat_tokenizer.default_chat_template
 
 
-def respond(prompt: str) -> str:
+def respond(prompt: str, streamer: BaseStreamer | None = None) -> str:
     """
     Respond to the current prompt
 
     Params:
         prompt: user's prompt
+        streamer: if not None will use it to stream tokens
     Returns:
         The chat's response
     """
@@ -91,7 +94,7 @@ def respond(prompt: str) -> str:
     inputs = chat_tokenizer(prompt, return_tensors="pt").to(chat_model.device)
     input_length = inputs.input_ids.shape[1]
     # generate response tokens
-    outputs = chat_model.generate(**inputs, max_new_tokens=256, do_sample=True, temperature=0.6, top_p=0.9, top_k=50)
+    outputs = chat_model.generate(**inputs, max_new_tokens=256, do_sample=True, temperature=0.6, top_p=0.9, top_k=50, streamer=streamer)
     token = outputs[0, input_length:]
     # decode tokens into text
     end_time = time.time()  # End time
@@ -99,14 +102,14 @@ def respond(prompt: str) -> str:
     return chat_tokenizer.decode(token).split("</s>")[0]
 
 
-def chat(history: List) -> List[List[str]]:
+def get_conversation(history: List[List[str]]) -> str:
     """
-    Chat function. It generates response based on a prompt
+    Combines all messages into one string
 
     Params:
         history: history of the messages (conversation) so far
     Returns:
-        History with the latest chat's response
+        All messages combined into one string
     """
     # the conversation must be in that format to use chat template
     conversation = [
@@ -121,14 +124,48 @@ def chat(history: List) -> List[List[str]]:
             conversation.append({"role": "assistant", "content": assistant_response})
 
     # use a template specific to the model
-    conversation = chat_tokenizer.apply_chat_template(conversation, chat_template=message_template, tokenize=False)
+    return chat_tokenizer.apply_chat_template(conversation, chat_template=message_template, tokenize=False)
 
-    # generate response for the conversation
-    response = respond(conversation)
-    history[-1][1] = response
 
-    # return chat history as the list of message pairs
-    return history
+def generate_initial_greeting() -> str:
+    """
+    Generates customer/patient greeting
+
+    Returns:
+        Generated greeting
+    """
+    conv = get_conversation([[None, None]])
+    return respond(conv)
+
+
+def chat(history: List[List[str]]) -> List[List[str]]:
+    """
+    Chat function. It generates response based on a prompt
+
+    Params:
+        history: history of the messages (conversation) so far
+    Returns:
+        History with the latest chat's response (yields partial response)
+    """
+    # convert list of message to conversation string
+    conversation = get_conversation(history)
+
+    # use streamer to show response word by word
+    chat_streamer = TextIteratorStreamer(chat_tokenizer, skip_prompt=True, Timeout=5)
+
+    # generate response for the conversation in a new thread to deliver response token by token
+    thread = Thread(target=respond, args=[conversation, chat_streamer])
+    thread.start()
+
+    # get token by token and merge to the final response
+    history[-1][1] = ""
+    for partial_text in chat_streamer:
+        history[-1][1] += partial_text
+        # "return" partial response
+        yield history
+
+    # wait for the thread
+    thread.join()
 
 
 def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> List[List[str]]:
@@ -172,8 +209,8 @@ def summarize(conversation: List) -> str:
         Summary
     """
     conversation.append([SUMMARIZE_THE_CUSTOMER, None])
-    conversation = chat(conversation)
-    return conversation[-1][1]
+    for partial_summary in chat(conversation):
+        yield partial_summary[-1][1].split("</s>")[0]
 
 
 def create_UI(initial_message: str) -> gr.Blocks:
@@ -232,8 +269,7 @@ def run(asr_model_dir: Path, chat_model_dir: Path, public_interface: bool = Fals
     load_chat_model(chat_model_dir)
 
     # get initial greeting
-    history = chat([[None, None]])
-    initial_message = history[0][1]
+    initial_message = generate_initial_greeting()
 
     # create user interface
     demo = create_UI(initial_message)
