@@ -1,5 +1,5 @@
 # Visual Content Search using MobileCLIP and OpenVINO™
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/289-mobileclip-video-search/289-mobileclip-video-search.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/mobileclip-video-search/mobileclip-video-search.ipynb)
 
 ![example.png](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/4e241f82-548e-41c2-b1f4-45b319d3e519)
 
