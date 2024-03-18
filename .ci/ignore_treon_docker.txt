@@ -20,7 +20,7 @@ image-bind
 dolly-2-instruction-following
 riffusion-text-to-music
 freevc-voice-conversion
-247-code-language-id
+code-language-id
 248-stable-diffusion-xl
 249-oneformer-segmentation
 250-music-generation
