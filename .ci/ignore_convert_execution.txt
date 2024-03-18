@@ -40,7 +40,7 @@ notebooks/fastcomposer-image-generation/fastcomposer-image-generation.ipynb
 notebooks/zeroscope-text2video/zeroscope-text2video.ipynb
 notebooks/llm-chatbot/llm-chatbot.ipynb
 notebooks/llm-chatbot/rag-chatbot.ipynb
-notebooks/255-mms-massively-multilingual-speech/255-mms-massively-multilingual-speech.ipynb
+notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb
 notebooks/256-bark-text-to-audio/256-bark-text-to-audio.ipynb
 notebooks/257-llava-multimodal-chatbot/257-llava-multimodal-chatbot.ipynb
 notebooks/257-llava-multimodal-chatbot/257-videollava-multimodal-chatbot.ipynb
