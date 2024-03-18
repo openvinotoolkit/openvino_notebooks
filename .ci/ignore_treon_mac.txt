@@ -54,7 +54,7 @@ mobilevlm-language-assistant
 kosmos2-multimodal-large-language-model
 photo-maker
 openvoice
-285-surya-line-level-text-detection
+surya-line-level-text-detection
 286-instant-id
 288-grounded-segment-anything
 404-style-transfer-webcam

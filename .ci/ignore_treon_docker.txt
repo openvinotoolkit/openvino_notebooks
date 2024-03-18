@@ -52,7 +52,7 @@ stable-diffusion-ip-adapter
 kosmos2-multimodal-large-language-model
 photo-maker
 openvoice
-285-surya-line-level-text-detection
+surya-line-level-text-detection
 286-instant-id
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
