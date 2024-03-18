@@ -5,6 +5,7 @@ on:
   pull_request:
     branches:
       - 'main'
+      - 'master'
       - '2021.4'
       - 'develop'
     paths:
@@ -17,6 +18,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'master'
       - '2021.4'
       - 'develop'
     paths:
