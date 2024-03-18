@@ -56,7 +56,7 @@ notebooks/speculative-sampling/speculative-sampling.ipynb
 notebooks/distil-whisper-asr/distil-whisper-asr.ipynb
 notebooks/film-slowmo/film-slowmo.ipynb
 notebooks/sound-generation-audioldm2/sound-generation-audioldm2.ipynb
-notebooks/271-sdxl-turbo/271-sdxl-turbo.ipynb
+notebooks/sdxl-turbo/sdxl-turbo.ipynb
 notebooks/272-paint-by-example/272-paint-by-example.ipynb
 notebooks/273-stable-zephyr-3b-chatbot/273-stable-zephyr-3b-chatbot.ipynb
 notebooks/275-llm-question-answering/275-llm-question-answering.ipynb
