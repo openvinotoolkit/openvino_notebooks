@@ -10,7 +10,7 @@ notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb
 notebooks/stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb
 notebooks/whisper-subtitles-generation/whisper-convert.ipynb
 notebooks/whisper-subtitles-generation/whisper-nncf-quantize.ipynb
-notebooks/228-clip-zero-shot-image-classification/228-clip-zero-shot-classification.ipynb
+notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb
 notebooks/230-yolov8-optimization/230-yolov8-instance-segmentation.ipynb
 notebooks/230-yolov8-optimization/230-yolov8-keypoint-detection.ipynb
 notebooks/230-yolov8-optimization/230-yolov8-object-detection.ipynb
