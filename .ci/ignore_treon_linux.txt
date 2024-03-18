@@ -14,7 +14,7 @@ whisper-subtitles-generation
 clip-zero-shot-image-classification
 instruct-pix2pix-image-editing
 blip-visual-language-processing
-234-encodec-audio-compression
+encodec-audio-compression
 235-controlnet-stable-diffusion
 236-stable-diffusion-v2
 237-segment-anything
