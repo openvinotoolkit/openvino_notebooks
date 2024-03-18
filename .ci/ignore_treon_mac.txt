@@ -41,7 +41,7 @@ latent-consistency-models-image-generation
 qrcode-monster
 wuerstchen-image-generation
 speculative-sampling
-267-distil-whisper-asr
+distil-whisper-asr
 269-film-slowmo
 270-sound-generation-audioldm2
 271-sdxl-turbo
