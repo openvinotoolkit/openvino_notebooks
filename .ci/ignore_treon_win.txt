@@ -18,7 +18,7 @@ stable-diffusion-v2
 segment-anything
 deepfloyd-if
 image-bind
-240-dolly-2-instruction-following
+dolly-2-instruction-following
 241-riffusion-text-to-music
 242-freevc-voice-conversion
 247-code-language-id

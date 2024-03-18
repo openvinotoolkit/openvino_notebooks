@@ -28,7 +28,7 @@ notebooks/deepfloyd-if/deep-floyd-if-convert.ipynb
 notebooks/deepfloyd-if/deep-floyd-if-optimize.ipynb
 notebooks/image-bind/image-bind-convert.ipynb
 notebooks/image-bind/image-bind-quantize.ipynb
-notebooks/240-dolly-2-instruction-following/240-dolly-2-instruction-following.ipynb
+notebooks/dolly-2-instruction-following/dolly-2-instruction-following.ipynb
 notebooks/241-riffusion-text-to-music/241-riffusion-text-to-music.ipynb
 notebooks/244-named-entity-recognition/244-named-entity-recognition.ipynb
 notebooks/248-stable-diffusion-xl/248-stable-diffusion-xl.ipynb
