@@ -13,7 +13,7 @@ notebooks/bark-text-to-audio/bark-text-to-audio.ipynb  # torch==1.13
 notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb # transformers<4.35
 notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb # transformers<4.35
 notebooks/paint-by-example/paint-by-example.ipynb # gradio==3.44.1
-notebooks/273-stable-zephyr-3b-chatbot/273-stable-zephyr-3b-chatbot.ipynb # install requirements.txt after clone repo
+notebooks/stable-zephyr-3b-chatbot/stable-zephyr-3b-chatbot.ipynb # install requirements.txt after clone repo
 notebooks/279-mobilevlm-language-assistant/279-mobilevlm-language-assistant.ipynb # transformers<4.35
 notebooks/280-depth-anything/280-depth-anything.ipynb # install requirements.txt after clone repo
 notebooks/285-surya-line-level-text-detection/285-surya-line-level-text-detection.ipynb # requires python >=3.9
