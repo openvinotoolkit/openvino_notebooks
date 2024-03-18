@@ -56,5 +56,5 @@ photo-maker
 openvoice
 surya-line-level-text-detection
 instant-id
-288-grounded-segment-anything
+grounded-segment-anything
 404-style-transfer-webcam
