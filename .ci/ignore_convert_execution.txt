@@ -51,7 +51,7 @@ notebooks/softvc-voice-conversion/softvc-voice-conversion.ipynb
 notebooks/latent-consistency-models-image-generation/latent-consistency-models-image-generation.ipynb
 notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb
 notebooks/qrcode-monster/qrcode-monster.ipynb
-notebooks/265-wuerstchen-image-generation/265-wuerstchen-image-generation.ipynb
+notebooks/wuerstchen-image-generation/wuerstchen-image-generation.ipynb
 notebooks/266-speculative-sampling/266-speculative-sampling.ipynb
 notebooks/267-distil-whisper-asr/267-distil-whisper-asr.ipynb
 notebooks/269-film-slowmo/269-film-slowmo.ipynb

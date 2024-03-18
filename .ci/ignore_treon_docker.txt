@@ -38,7 +38,7 @@ fast-segment-anything
 softvc-voice-conversion
 latent-consistency-models-image-generation
 qrcode-monster
-265-wuerstchen-image-generation
+wuerstchen-image-generation
 266-speculative-sampling
 267-distil-whisper-asr
 269-film-slowmo
