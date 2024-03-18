@@ -45,7 +45,7 @@ distil-whisper-asr
 film-slowmo
 sound-generation-audioldm2
 sdxl-turbo
-272-paint-by-example
+paint-by-example
 273-stable-zephyr-3b-chatbot
 275-llm-question-answering
 276-stable-diffusion-torchdynamo-backend
