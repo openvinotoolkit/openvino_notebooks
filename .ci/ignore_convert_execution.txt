@@ -47,7 +47,7 @@ notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb
 notebooks/blip-diffusion-subject-generation/blip-diffusion-subject-generation.ipynb
 notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb
 notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb
-notebooks/262-softvc-voice-conversion/262-softvc-voice-conversion.ipynb
+notebooks/softvc-voice-conversion/softvc-voice-conversion.ipynb
 notebooks/263-latent-consistency-models-image-generation/263-latent-consistency-models-image-generation.ipynb
 notebooks/263-latent-consistency-models-image-generation/263-lcm-lora-controlnet.ipynb
 notebooks/264-qrcode-monster/264-qrcode-monster.ipynb
