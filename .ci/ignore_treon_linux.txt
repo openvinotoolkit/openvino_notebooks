@@ -27,7 +27,7 @@ code-language-id
 stable-diffusion-xl
 oneformer-segmentation
 music-generation
-251-tiny-sd-image-generation
+tiny-sd-image-generation
 252-fastcomposer-image-generation
 253-zeroscope-text2video
 254-llm-chatbot

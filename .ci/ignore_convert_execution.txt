@@ -35,7 +35,7 @@ notebooks/stable-diffusion-xl/stable-diffusion-xl.ipynb
 notebooks/stable-diffusion-xl/segmind-vegart.ipynb
 notebooks/stable-diffusion-xl/ssd-b1.ipynb
 notebooks/oneformer-segmentation/oneformer-segmentation.ipynb
-notebooks/251-tiny-sd-image-generation/251-tiny-sd-image-generation.ipynb
+notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb
 notebooks/252-fastcomposer-image-generation/252-fastcomposer-image-generation.ipynb
 notebooks/253-zeroscope-text2video/253-zeroscope-text2video.ipynb
 notebooks/254-llm-chatbot/254-llm-chatbot.ipynb
