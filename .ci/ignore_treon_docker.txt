@@ -23,7 +23,7 @@ freevc-voice-conversion
 code-language-id
 stable-diffusion-xl
 oneformer-segmentation
-250-music-generation
+music-generation
 251-tiny-sd-image-generation
 252-fastcomposer-image-generation
 253-zeroscope-text2video
