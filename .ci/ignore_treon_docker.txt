@@ -48,7 +48,7 @@ paint-by-example
 stable-zephyr-3b-chatbot
 llm-question-answering
 stable-diffusion-torchdynamo-backend
-278-stable-diffusion-ip-adapter
+stable-diffusion-ip-adapter
 281-kosmos2-multimodal-large-language-model
 283-photo-maker
 284-openvoice
