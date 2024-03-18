@@ -53,7 +53,7 @@ kosmos2-multimodal-large-language-model
 photo-maker
 openvoice
 surya-line-level-text-detection
-286-instant-id
+instant-id
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
 404-style-transfer-webcam

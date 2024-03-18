@@ -60,5 +60,5 @@ notebooks/sdxl-turbo/sdxl-turbo.ipynb
 notebooks/paint-by-example/paint-by-example.ipynb
 notebooks/stable-zephyr-3b-chatbot/stable-zephyr-3b-chatbot.ipynb
 notebooks/llm-question-answering/llm-question-answering.ipynb
-notebooks/286-instant-id/286-instant-id.ipynb
+notebooks/instant-id/instant-id.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb

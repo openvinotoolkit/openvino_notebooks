@@ -54,4 +54,4 @@ kosmos2-multimodal-large-language-model
 photo-maker
 openvoice
 surya-line-level-text-detection
-286-instant-id
+instant-id

@@ -55,6 +55,6 @@ kosmos2-multimodal-large-language-model
 photo-maker
 openvoice
 surya-line-level-text-detection
-286-instant-id
+instant-id
 288-grounded-segment-anything
 404-style-transfer-webcam
