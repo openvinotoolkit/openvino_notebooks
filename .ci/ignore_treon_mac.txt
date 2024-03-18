@@ -10,7 +10,7 @@ cross-lingual-books-alignment
 stable-diffusion-text-to-image
 whisper-subtitles-generation
 clip-zero-shot-image-classification
-231-instruct-pix2pix-image-editing
+instruct-pix2pix-image-editing
 233-blip-visual-language-processing
 234-encodec-audio-compression
 235-controlnet-stable-diffusion
