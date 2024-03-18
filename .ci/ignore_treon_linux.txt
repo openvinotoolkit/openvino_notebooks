@@ -32,7 +32,7 @@ fastcomposer-image-generation
 zeroscope-text2video
 llm-chatbot
 mms-massively-multilingual-speech
-256-bark-text-to-audio
+bark-text-to-audio
 257-llava-multimodal-chatbot
 258-blip-diffusion-subject-generation
 259-decidiffusion-image-generation
