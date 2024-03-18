@@ -2,7 +2,7 @@
 
 ![bark_generated.png](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/9a770279-0045-480e-95f2-1a2f2d0a5115)
 
-*image generated using [Stable Diffusion XL notebook](../248-stable-diffusion-xl/)*
+*image generated using [Stable Diffusion XL notebook](../stable-diffusion-xl/)*
 
 🐶 Bark is a transformer-based text-to-audio model created by [Suno](https://suno.ai). Bark can generate highly realistic, multilingual speech as well as other audio - including music, background noise and simple sound effects. The model can also produce nonverbal communications like laughing, sighing and crying. 
 

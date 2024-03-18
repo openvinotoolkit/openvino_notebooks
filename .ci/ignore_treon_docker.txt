@@ -21,7 +21,7 @@ dolly-2-instruction-following
 riffusion-text-to-music
 freevc-voice-conversion
 code-language-id
-248-stable-diffusion-xl
+stable-diffusion-xl
 249-oneformer-segmentation
 250-music-generation
 251-tiny-sd-image-generation

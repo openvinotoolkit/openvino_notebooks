@@ -31,9 +31,9 @@ notebooks/image-bind/image-bind-quantize.ipynb
 notebooks/dolly-2-instruction-following/dolly-2-instruction-following.ipynb
 notebooks/riffusion-text-to-music/riffusion-text-to-music.ipynb
 notebooks/named-entity-recognition/named-entity-recognition.ipynb
-notebooks/248-stable-diffusion-xl/248-stable-diffusion-xl.ipynb
-notebooks/248-stable-diffusion-xl/248-segmind-vegart.ipynb
-notebooks/248-stable-diffusion-xl/248-ssd-b1.ipynb
+notebooks/stable-diffusion-xl/stable-diffusion-xl.ipynb
+notebooks/stable-diffusion-xl/segmind-vegart.ipynb
+notebooks/stable-diffusion-xl/ssd-b1.ipynb
 notebooks/249-oneformer-segmentation/249-oneformer-segmentation.ipynb
 notebooks/251-tiny-sd-image-generation/251-tiny-sd-image-generation.ipynb
 notebooks/252-fastcomposer-image-generation/252-fastcomposer-image-generation.ipynb
