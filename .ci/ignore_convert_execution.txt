@@ -37,7 +37,7 @@ notebooks/stable-diffusion-xl/ssd-b1.ipynb
 notebooks/oneformer-segmentation/oneformer-segmentation.ipynb
 notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb
 notebooks/fastcomposer-image-generation/fastcomposer-image-generation.ipynb
-notebooks/253-zeroscope-text2video/253-zeroscope-text2video.ipynb
+notebooks/zeroscope-text2video/zeroscope-text2video.ipynb
 notebooks/254-llm-chatbot/254-llm-chatbot.ipynb
 notebooks/254-llm-chatbot/254-rag-chatbot.ipynb
 notebooks/255-mms-massively-multilingual-speech/255-mms-massively-multilingual-speech.ipynb
