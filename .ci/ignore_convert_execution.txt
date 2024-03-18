@@ -59,6 +59,6 @@ notebooks/sound-generation-audioldm2/sound-generation-audioldm2.ipynb
 notebooks/sdxl-turbo/sdxl-turbo.ipynb
 notebooks/paint-by-example/paint-by-example.ipynb
 notebooks/stable-zephyr-3b-chatbot/stable-zephyr-3b-chatbot.ipynb
-notebooks/275-llm-question-answering/275-llm-question-answering.ipynb
+notebooks/llm-question-answering/llm-question-answering.ipynb
 notebooks/286-instant-id/286-instant-id.ipynb
 notebooks/404-style-transfer-webcam/404-style-transfer.ipynb
