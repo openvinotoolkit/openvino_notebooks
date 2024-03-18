@@ -91,7 +91,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    notebook, with generally the same base name as the notebook.  For example, the
    `hello-world.ipynb` notebook can be found in the hello-world directory.
    - See the [Notebook naming](#notebook-naming) section below, for the
-     numbering of the notebooks.
+     naming of the notebooks.
    - Add a `README.md` to the notebook subdirectory. Add a screenshot that gives an indication of what
      the notebook does if applicable.
    - Avoid adding any other files to the notebook's subdirectory. Instead, rely on models and data samples available online and fetch them within the notebook. Please refer to the [Notebook utils](#notebook-utils) section.
@@ -132,15 +132,9 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 ### Notebook naming
 
-Names should be descriptive but not too long. We use the following numbering scheme:
-
-- `000-` hello world like notebooks: very small tutorials that help to quickly show how OpenVINO works.
-- `100-` OpenVINO tool tutorials: explain how to optimize and quantize notebooks.
-- `200-` OpenVINO model demos: demonstrate inference on a particular model.
-- `300-` Training notebooks: notebooks that include code to train neural networks.
-- `400-` Live demo notebooks: demonstrate inference on a live webcam.
-
-Please use the first available number in the branch, trying to fill the holes e.g. choose 206, when there are 205 and 207 and 206 is missing.
+ - Names should be descriptive but not too long.
+ - Please use hyphen symbol `-` (not underscore `_`) to separate words in directories and notebooks names.
+ - Directory name should match the corresponding notebook file name (e.g. `./hello-word/hello-word.ipynb`).
 
 ### `README.md` files
 
@@ -168,9 +162,9 @@ To maintain consistency between notebooks, please follow the directory structure
 
 ```markdown
 notebooks/
-└──<three-digit-number>-<title>/
+└──<title>/
    ├── README.md
-   ├── <three-digit-number>-<title>.ipynb
+   ├── <title>.ipynb
    ├── utils/
    ├── model/
    ├── data/
