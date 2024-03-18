@@ -3,7 +3,7 @@
 This AI painting notebook provides an interactive tool for users to create photo-realistic images based on an exemplar image and a sketch using OpenVINO. This notebook heavily leverages the "Paint by example" exemplar-based model, which is a deep learning model that has shown promising results for creating high-quality images [Paint-by-Example](https://github.com/Fantasy-Studio/Paint-by-Example). This is the original [white paper](https://arxiv.org/abs/2211.13227). This notebook explores how deep learning can be used to create an interactive python notebook for image semantic translation. The notebook utilizes the Paint by Example model from [HuggingFace Paint-by-Example](https://huggingface.co/Fantasy-Studio/Paint-by-Example) and performs a conversion using the ONNX export function which will produce an OpenVINO IR.
 
 
-In previous notebooks, we already discussed how to run [Text-to-Image generation and Image-to-Image generation using Stable Diffusion v1](../stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb) and [controlling its generation process using ControlNet](../235-controlnet-stable-diffusion/235-controlnet-stable-diffusion.ipynb).
+In previous notebooks, we already discussed how to run [Text-to-Image generation and Image-to-Image generation using Stable Diffusion v1](../stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb) and [controlling its generation process using ControlNet](../controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb).
 
 This notebook demonstrates in-painting using a reference image as input and a hand-drawn mask:
 

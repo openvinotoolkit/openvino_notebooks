@@ -17,7 +17,7 @@ notebooks/yolov8-optimization/yolov8-object-detection.ipynb
 notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb
 notebooks/clip-language-saliency-map/clip-language-saliency-map.ipynb
 notebooks/blip-visual-language-processing/blip-visual-language-processing.ipynb
-notebooks/235-controlnet-stable-diffusion/235-controlnet-stable-diffusion.ipynb
+notebooks/controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb
 notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-infinite-zoom.ipynb
 notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-text-to-image.ipynb
 notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-optimum-demo-comparison.ipynb
