@@ -47,7 +47,6 @@ export const TASKS = /** @type {const} */ ({
     ERROR_CORRECTION: 'Error Correction',
     QUESTION_ANSWERING: 'Question Answering',
     PARAPHRASE_IDENTIFICATION: 'Paraphrase Identification',
-    KNOWLEDGE_REPRESENTATION: 'Knowledge Representation',
     NAMED_ENTITY_RECOGNITION: 'Named Entity Recognition',
   },
   AUDIO: {
@@ -59,6 +58,10 @@ export const TASKS = /** @type {const} */ ({
     AUDIO_CLASSIFICATION: 'Audio Classification',
     VOICE_ACTIVITY_DETECTION: 'Voice Activity Detection',
   },
+  OTHER: {
+    KNOWLEDGE_REPRESENTATION: 'Knowledge Representation',
+    BYTES_CLASSIFICATION: "Bytes Classification"
+  }
 });
 
 export const TASKS_VALUES = Object.values(TASKS)
