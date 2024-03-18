@@ -50,7 +50,7 @@ stable-zephyr-3b-chatbot
 llm-question-answering
 stable-diffusion-torchdynamo-backend
 stable-diffusion-ip-adapter
-279-mobilevlm-language-assistant
+mobilevlm-language-assistant
 281-kosmos2-multimodal-large-language-model
 283-photo-maker
 284-openvoice
