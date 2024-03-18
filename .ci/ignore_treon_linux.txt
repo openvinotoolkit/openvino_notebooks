@@ -57,4 +57,4 @@ photo-maker
 openvoice
 surya-line-level-text-detection
 instant-id
-404-style-transfer-webcam
+style-transfer-webcam

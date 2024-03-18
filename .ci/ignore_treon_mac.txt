@@ -57,4 +57,4 @@ openvoice
 surya-line-level-text-detection
 instant-id
 grounded-segment-anything
-404-style-transfer-webcam
+style-transfer-webcam

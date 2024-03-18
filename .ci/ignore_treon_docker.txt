@@ -56,4 +56,4 @@ surya-line-level-text-detection
 instant-id
 tensorflow-training-openvino
 tensorflow-quantization-aware-training
-404-style-transfer-webcam
+style-transfer-webcam
