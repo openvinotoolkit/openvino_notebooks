@@ -42,7 +42,7 @@ softvc-voice-conversion
 latent-consistency-models-image-generation
 qrcode-monster
 wuerstchen-image-generation
-266-speculative-sampling
+speculative-sampling
 267-distil-whisper-asr
 269-film-slowmo
 270-sound-generation-audioldm2
