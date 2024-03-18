@@ -15,7 +15,7 @@ encodec-audio-compression
 controlnet-stable-diffusion
 stable-diffusion-v2
 segment-anything
-238-deepfloyd-if
+deepfloyd-if
 239-image-bind
 240-dolly-2-instruction-following
 241-riffusion-text-to-music
