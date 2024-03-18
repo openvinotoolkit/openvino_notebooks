@@ -19,7 +19,7 @@ segment-anything
 deepfloyd-if
 image-bind
 dolly-2-instruction-following
-241-riffusion-text-to-music
+riffusion-text-to-music
 242-freevc-voice-conversion
 247-code-language-id
 248-stable-diffusion-xl
