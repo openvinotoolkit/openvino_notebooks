@@ -48,8 +48,8 @@ notebooks/blip-diffusion-subject-generation/blip-diffusion-subject-generation.ip
 notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb
 notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb
 notebooks/softvc-voice-conversion/softvc-voice-conversion.ipynb
-notebooks/263-latent-consistency-models-image-generation/263-latent-consistency-models-image-generation.ipynb
-notebooks/263-latent-consistency-models-image-generation/263-lcm-lora-controlnet.ipynb
+notebooks/latent-consistency-models-image-generation/latent-consistency-models-image-generation.ipynb
+notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb
 notebooks/264-qrcode-monster/264-qrcode-monster.ipynb
 notebooks/265-wuerstchen-image-generation/265-wuerstchen-image-generation.ipynb
 notebooks/266-speculative-sampling/266-speculative-sampling.ipynb
