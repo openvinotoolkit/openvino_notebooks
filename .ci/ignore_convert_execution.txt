@@ -45,7 +45,7 @@ notebooks/bark-text-to-audio/bark-text-to-audio.ipynb
 notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb
 notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb
 notebooks/blip-diffusion-subject-generation/blip-diffusion-subject-generation.ipynb
-notebooks/259-decidiffusion-image-generation/259-decidiffusion-image-generation.ipynb
+notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb
 notebooks/260-pix2struct-docvqa/260-pix2struct-docvqa.ipynb
 notebooks/262-softvc-voice-conversion/262-softvc-voice-conversion.ipynb
 notebooks/263-latent-consistency-models-image-generation/263-latent-consistency-models-image-generation.ipynb

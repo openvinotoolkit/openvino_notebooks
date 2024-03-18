@@ -35,7 +35,7 @@ mms-massively-multilingual-speech
 bark-text-to-audio
 llava-multimodal-chatbot
 blip-diffusion-subject-generation
-259-decidiffusion-image-generation
+decidiffusion-image-generation
 260-pix2struct-docvqa
 261-fast-segment-anything
 262-softvc-voice-conversion
