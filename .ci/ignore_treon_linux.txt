@@ -52,7 +52,7 @@ stable-zephyr-3b-chatbot
 llm-question-answering
 stable-diffusion-torchdynamo-backend
 stable-diffusion-ip-adapter
-281-kosmos2-multimodal-large-language-model
+kosmos2-multimodal-large-language-model
 283-photo-maker
 284-openvoice
 285-surya-line-level-text-detection
