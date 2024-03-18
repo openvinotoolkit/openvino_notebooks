@@ -11,9 +11,9 @@ YOLO stands for “You Only Look Once”, it is a popular family of real-time ob
 
 This tutorial explains how to convert and optimize the [YOLOv8](https://github.com/ultralytics/) PyTorch models with OpenVINO. These tutorials are considered object detection, instance segmentation and keypoint detection scenarios:
 
-- [yolov8-object-detection](./yolov8-object-detection.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/yolov8-optimization/yolov8-object-detection.ipynb)
-- [yolov8-instance-segmentation](./yolov8-instance-segmentation.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb)
-- [yolov8-keypoint-detection](./yolov8-keypoint-detection.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb)
+- [yolov8-object-detection](./yolov8-object-detection.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/master/notebooks/yolov8-optimization/yolov8-object-detection.ipynb)
+- [yolov8-instance-segmentation](./yolov8-instance-segmentation.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/master/notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb)
+- [yolov8-keypoint-detection](./yolov8-keypoint-detection.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/master/notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb)
 
 
 Each case tutorial consists of the following steps::

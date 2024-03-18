@@ -1,6 +1,6 @@
 # PaddleOCR with OpenVINO™
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2Fpaddle-ocr-webcam%2Fpaddle-ocr-webcam.ipynb)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/paddle-ocr-webcam/paddle-ocr-webcam.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/master/notebooks/paddle-ocr-webcam/paddle-ocr-webcam.ipynb)
 
 <p align="center" width="100%">
     <img width="80%" src="https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleocr.gif">

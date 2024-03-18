@@ -36,7 +36,7 @@ def get_all_references_from_md(md_path):
 
 
 def validate_colab_url(url: str) -> bool:
-    OPENVINO_COLAB_URL_PREFIX = 'https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/'
+    OPENVINO_COLAB_URL_PREFIX = 'https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/master/'
 
     if not url.startswith(OPENVINO_COLAB_URL_PREFIX):
         return

@@ -58,7 +58,7 @@ export class NotebookMetadataCollector extends NotebookContentReader {
    * @returns {string}
    */
   _getNotebookGitHubLink() {
-    return `https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/${this._notebookFilePath}`;
+    return `https://github.com/openvinotoolkit/openvino_notebooks/blob/master/notebooks/${this._notebookFilePath}`;
   }
 
   /**

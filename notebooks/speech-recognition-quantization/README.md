@@ -1,5 +1,5 @@
 # Quantize Speech Recognition Models using NNCF PTQ API
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/speech-recognition-quantization/speech-recognition-quantization-data2vec.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/master/notebooks/speech-recognition-quantization/speech-recognition-quantization-data2vec.ipynb)
 
 This tutorial demonstrates how to apply `INT8` quantization to the speech recognition models,
 using post-training quantization with [NNCF](https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/quantizing-models-post-training.html) (Neural Network Compression Framework).
