@@ -19,7 +19,7 @@ deepfloyd-if
 image-bind
 dolly-2-instruction-following
 riffusion-text-to-music
-242-freevc-voice-conversion
+freevc-voice-conversion
 247-code-language-id
 248-stable-diffusion-xl
 249-oneformer-segmentation
