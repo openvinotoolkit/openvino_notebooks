@@ -15,7 +15,7 @@ blip-visual-language-processing
 encodec-audio-compression
 controlnet-stable-diffusion
 stable-diffusion-v2
-237-segment-anything
+segment-anything
 238-deepfloyd-if
 239-image-bind
 240-dolly-2-instruction-following

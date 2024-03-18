@@ -23,7 +23,7 @@ notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image.ipynb
 notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo-comparison.ipynb
 notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.ipynb
 notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image-demo.ipynb
-notebooks/237-segment-anything/237-segment-anything.ipynb
+notebooks/segment-anything/segment-anything.ipynb
 notebooks/238-deepfloyd-if/238-deep-floyd-if-convert.ipynb
 notebooks/238-deepfloyd-if/238-deep-floyd-if-optimize.ipynb
 notebooks/239-image-bind/239-image-bind-convert.ipynb
