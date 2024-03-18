@@ -33,7 +33,7 @@ bark-text-to-audio
 llava-multimodal-chatbot
 blip-diffusion-subject-generation
 decidiffusion-image-generation
-260-pix2struct-docvqa
+pix2struct-docvqa
 261-fast-segment-anything
 262-softvc-voice-conversion
 263-latent-consistency-models-image-generation
