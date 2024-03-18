@@ -3,7 +3,7 @@
 Magika is a novel AI powered file type detection tool that relies on the recent advance of deep learning to provide accurate detection. Under the hood, Magika employs a custom, highly optimized model that only weighs about 1MB, and enables precise file identification within milliseconds, even when running on a single CPU.
 
 
-Why identifying file type is difficult?
+**Why identifying file type is difficult?**
 
 Since the early days of computing, accurately detecting file types has been crucial in determining how to process files. Linux comes equipped with `libmagic` and the `file` utility, which have served as the de facto standard for file type identification for over 50 years. Today web browsers, code editors, and countless other software rely on file-type detection to decide how to properly render a file. For example, modern code editors use file-type detection to choose which syntax coloring scheme to use as the developer starts typing in a new file.
 
@@ -11,9 +11,9 @@ Accurate file-type detection is a notoriously difficult problem because each fil
 
 This manual approach is both time consuming and error prone as it is hard for humans to create generalized rules by hand. In particular for security applications, creating dependable detection is especially challenging as attackers are constantly attempting to confuse detection with adversarially-crafted payloads.
 
-To address this issue and provide fast and accurate file-type detection Magika was develiped. More details about apporach and model can be found in original [repo](https://github.com/google/magika) and [Google's blogpost](https://opensource.googleblog.com/2024/02/magika-ai-powered-fast-and-efficient-file-type-identification.html).
+To address this issue and provide fast and accurate file-type detection Magika was developed. More details about approach and model can be found in original [repo](https://github.com/google/magika) and [Google's blog post](https://opensource.googleblog.com/2024/02/magika-ai-powered-fast-and-efficient-file-type-identification.html).
 
-In this tutrial we consider how to bring OpenVINO power into Magika.
+In this tutorial we consider how to bring OpenVINO power into Magika.
 
 ## Notebook Contents
 
