@@ -50,7 +50,7 @@ llm-question-answering
 stable-diffusion-torchdynamo-backend
 stable-diffusion-ip-adapter
 kosmos2-multimodal-large-language-model
-283-photo-maker
+photo-maker
 284-openvoice
 285-surya-line-level-text-detection
 286-instant-id
