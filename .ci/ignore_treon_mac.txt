@@ -17,7 +17,7 @@ controlnet-stable-diffusion
 stable-diffusion-v2
 segment-anything
 deepfloyd-if
-239-image-bind
+image-bind
 240-dolly-2-instruction-following
 241-riffusion-text-to-music
 242-freevc-voice-conversion
