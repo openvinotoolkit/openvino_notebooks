@@ -1,5 +1,5 @@
 # Video Subtitle Generation with OpenAI Whisper
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/227-whisper-subtitles-generation/227-whisper-convert.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/whisper-subtitles-generation/whisper-convert.ipynb)
 [Whisper](https://openai.com/blog/whisper/) is a general-purpose speech recognition model from [OpenAI](https://openai.com/). The model is able to almost flawlessly transcribe speech across dozens of languages and even handle poor audio quality or excessive background noise.
 This notebook will run the model with OpenVINO to generate transcription of a video.
 
@@ -11,8 +11,8 @@ You can find more information about this model in the [research paper](https://c
 
 This folder contains two notebooks that show how to convert and quantize model with OpenVINO:
 
-1. [Convert Whisper model using OpenVINO](227-whisper-convert.ipynb)
-2. [Quantize OpenVINO Whisper model using NNCF](227-whisper-nncf-quantize.ipynb)
+1. [Convert Whisper model using OpenVINO](whisper-convert.ipynb)
+2. [Quantize OpenVINO Whisper model using NNCF](whisper-nncf-quantize.ipynb)
 
 In these notebooks, you will use its capabilities for generation of subtitles for a video.
 
@@ -36,7 +36,7 @@ The image below shows an example of the video as input and corresponding transcr
 
 ### Quantize OpenVINO Whisper model using NNCF
 The second notebook will guide you through steps of improving model performance by INT8 quantization with [NNCF](https://github.com/openvinotoolkit/nncf):
-1. Quantize the converted OpenVINO model from [227-whisper-convert notebook](227-whisper-convert.ipynb) with NNCF.
+1. Quantize the converted OpenVINO model from [whisper-convert notebook](whisper-convert.ipynb) with NNCF.
 2. Check model result for the demo video.
 3. Compare model size, performance and accuracy of FP32 and quantized INT8 models.
 
