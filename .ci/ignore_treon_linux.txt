@@ -30,7 +30,7 @@ music-generation
 tiny-sd-image-generation
 fastcomposer-image-generation
 zeroscope-text2video
-254-llm-chatbot
+llm-chatbot
 255-mms-massively-multilingual-speech
 256-bark-text-to-audio
 257-llava-multimodal-chatbot

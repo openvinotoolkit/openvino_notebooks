@@ -7,8 +7,8 @@ notebooks/pyannote-speaker-diarization/pyannote-speaker-diarization.ipynb  # pya
 notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb  # ultralytics==8.0.43
 notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb  # ultralytics==8.0.159
 notebooks/yolov8-optimization/yolov8-object-detection.ipynb  # ultralytics==8.0.43
-notebooks/254-llm-chatbot/254-llm-chatbot.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
-notebooks/254-llm-chatbot/254-rag-chatbot.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
+notebooks/llm-chatbot/llm-chatbot.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
+notebooks/llm-chatbot/rag-chatbot.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
 notebooks/256-bark-text-to-audio/256-bark-text-to-audio.ipynb  # torch==1.13
 notebooks/257-llava-multimodal-chatbot/257-llava-multimodal-chatbot.ipynb # transformers<4.35
 notebooks/257-llava-multimodal-chatbot/257-videollava-multimodal-chatbot.ipynb # transformers<4.35

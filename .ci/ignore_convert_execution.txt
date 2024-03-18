@@ -38,8 +38,8 @@ notebooks/oneformer-segmentation/oneformer-segmentation.ipynb
 notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb
 notebooks/fastcomposer-image-generation/fastcomposer-image-generation.ipynb
 notebooks/zeroscope-text2video/zeroscope-text2video.ipynb
-notebooks/254-llm-chatbot/254-llm-chatbot.ipynb
-notebooks/254-llm-chatbot/254-rag-chatbot.ipynb
+notebooks/llm-chatbot/llm-chatbot.ipynb
+notebooks/llm-chatbot/rag-chatbot.ipynb
 notebooks/255-mms-massively-multilingual-speech/255-mms-massively-multilingual-speech.ipynb
 notebooks/256-bark-text-to-audio/256-bark-text-to-audio.ipynb
 notebooks/257-llava-multimodal-chatbot/257-llava-multimodal-chatbot.ipynb
