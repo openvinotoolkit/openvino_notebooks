@@ -42,8 +42,8 @@ notebooks/llm-chatbot/llm-chatbot.ipynb
 notebooks/llm-chatbot/rag-chatbot.ipynb
 notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb
 notebooks/bark-text-to-audio/bark-text-to-audio.ipynb
-notebooks/257-llava-multimodal-chatbot/257-llava-multimodal-chatbot.ipynb
-notebooks/257-llava-multimodal-chatbot/257-videollava-multimodal-chatbot.ipynb
+notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb
+notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb
 notebooks/258-blip-diffusion-subject-generation/258-blip-diffusion-subject-generation.ipynb
 notebooks/259-decidiffusion-image-generation/259-decidiffusion-image-generation.ipynb
 notebooks/260-pix2struct-docvqa/260-pix2struct-docvqa.ipynb
