@@ -11,9 +11,9 @@ The second notebook demonstrates how to quantize the OpenVINO IR model that was 
 
 ## Jupyter Notebooks
 
-* `301-tensorflow-training-openvino.ipynb`
+* `tensorflow-training-openvino.ipynb`
   * Demonstrates how to train, convert, and deploy an image classification model with TensorFlow and OpenVINO.
-* `301-tensorflow-training-openvino-nncf.ipynb`
+* `tensorflow-training-openvino-nncf.ipynb`
   * Demonstrates how to quantize the OpenVINO IR model that was created by the previous notebook.
 
 ## TensorFlow Licenses

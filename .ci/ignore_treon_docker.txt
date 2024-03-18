@@ -54,6 +54,6 @@ photo-maker
 openvoice
 surya-line-level-text-detection
 instant-id
-301-tensorflow-training-openvino
+tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
 404-style-transfer-webcam
