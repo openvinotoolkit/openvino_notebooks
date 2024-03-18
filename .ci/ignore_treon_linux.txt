@@ -40,7 +40,7 @@ pix2struct-docvqa
 fast-segment-anything
 softvc-voice-conversion
 latent-consistency-models-image-generation
-264-qrcode-monster
+qrcode-monster
 265-wuerstchen-image-generation
 266-speculative-sampling
 267-distil-whisper-asr
