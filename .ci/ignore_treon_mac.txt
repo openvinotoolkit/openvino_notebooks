@@ -26,7 +26,7 @@ stable-diffusion-xl
 oneformer-segmentation
 music-generation
 tiny-sd-image-generation
-252-fastcomposer-image-generation
+fastcomposer-image-generation
 253-zeroscope-text2video
 254-llm-chatbot
 255-mms-massively-multilingual-speech
