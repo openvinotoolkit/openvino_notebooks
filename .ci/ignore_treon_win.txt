@@ -52,6 +52,6 @@ stable-diffusion-torchdynamo-backend
 stable-diffusion-ip-adapter
 kosmos2-multimodal-large-language-model
 photo-maker
-284-openvoice
+openvoice
 285-surya-line-level-text-detection
 286-instant-id

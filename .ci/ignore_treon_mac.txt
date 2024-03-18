@@ -53,7 +53,7 @@ stable-diffusion-ip-adapter
 mobilevlm-language-assistant
 kosmos2-multimodal-large-language-model
 photo-maker
-284-openvoice
+openvoice
 285-surya-line-level-text-detection
 286-instant-id
 288-grounded-segment-anything
