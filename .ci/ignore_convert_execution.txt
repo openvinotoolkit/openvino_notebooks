@@ -18,11 +18,11 @@ notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb
 notebooks/clip-language-saliency-map/clip-language-saliency-map.ipynb
 notebooks/blip-visual-language-processing/blip-visual-language-processing.ipynb
 notebooks/controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb
-notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-infinite-zoom.ipynb
-notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-text-to-image.ipynb
-notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-optimum-demo-comparison.ipynb
-notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-optimum-demo.ipynb
-notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-text-to-image-demo.ipynb
+notebooks/stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.ipynb
+notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image.ipynb
+notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo-comparison.ipynb
+notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.ipynb
+notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image-demo.ipynb
 notebooks/237-segment-anything/237-segment-anything.ipynb
 notebooks/238-deepfloyd-if/238-deep-floyd-if-convert.ipynb
 notebooks/238-deepfloyd-if/238-deep-floyd-if-optimize.ipynb

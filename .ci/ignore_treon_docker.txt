@@ -13,7 +13,7 @@ instruct-pix2pix-image-editing
 blip-visual-language-processing
 encodec-audio-compression
 controlnet-stable-diffusion
-236-stable-diffusion-v2
+stable-diffusion-v2
 237-segment-anything
 238-deepfloyd-if
 239-image-bind
