@@ -10,30 +10,22 @@ In this tutorial, we consider how to convert and run ImageBind model using OpenV
 
 ## Notebook Contents
 
-This folder contains two notebooks that show how to convert and quantize model with OpenVINO:
+This folder contains notebook that show how to convert and quantize model with OpenVINO. We will use ImageBind model for zero-shot audio and image classification. The result of model work demonstrated on the image below
 
-1. [Convert an ImageBind Model using OpenVINO](239-image-bind-convert.ipynb)
-2. [Quantize an ImageBind Model using NNCF](239-image-bind-quantize.ipynb)
+![image](https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png)
 
-The first notebook is about the conversion to IR and consists of following steps:
+The notebook consists of following steps:
 
 1. Download the pre-trained model.
 2. Prepare input data examples.
 3. Convert the model to OpenVINO Intermediate Representation format (IR).
 4. Run model inference and analyze results.
+5. Quantize the converted OpenVINO model with the Post-training Quantization with API of NNCF.
+6. Compare results of the converted OpenVINO and the quantized models.
+7. Compare model size of the converted OpenVINO and the quantized models.
+8. Compare performance of the converted OpenVINO and the quantized models.
 
-The second notebook is about the optimization by 8-bit quantization and consists of the following steps:
 
-1. Quantize the converted OpenVINO model with the Post-training Quantization with API of NNCF.
-2. Compare results of the converted OpenVINO and the quantized models.
-3. Compare model size of the converted OpenVINO and the quantized models.
-4. Compare performance of the converted OpenVINO and the quantized models.
-
-NNCF performs quantization within the OpenVINO IR. It is required to run the first notebook before running the second notebook.
-
-We will use ImageBind model for zero-shot audio and image classification. The result of model work demonstrated on the image below
-
-![image](https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png)
 
 
 ## Installation Instructions
