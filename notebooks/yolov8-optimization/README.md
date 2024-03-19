@@ -14,6 +14,7 @@ This tutorial explains how to convert and optimize the [YOLOv8](https://github.c
 - [yolov8-object-detection](./yolov8-object-detection.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/master/notebooks/yolov8-optimization/yolov8-object-detection.ipynb)
 - [yolov8-instance-segmentation](./yolov8-instance-segmentation.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/master/notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb)
 - [yolov8-keypoint-detection](./yolov8-keypoint-detection.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/master/notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb)
+- [yolov8-obb](./yolov8-obb.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/master/notebooks/yolov8-optimization/yolov8-obb.ipynb)
 
 
 Each case tutorial consists of the following steps::

@@ -208,25 +208,6 @@ class OVCHATGLMModel(OVModelForCausalLM):
     """
     Optimum intel compatible model wrapper for CHATGLM2
     """
-
-    def __init__(
-        self,
-        model: "Model",
-        config: "PretrainedConfig" = None,
-        device: str = "CPU",
-        dynamic_shapes: bool = True,
-        ov_config: Optional[Dict[str, str]] = None,
-        model_save_dir: Optional[Union[str, Path]] = None,
-        **kwargs,
-    ):
-        NormalizedConfigManager._conf["chatglm"] = NormalizedTextConfig.with_args(
-            num_layers="num_hidden_layers",
-            num_attention_heads="num_attention_heads",
-            hidden_size="hidden_size",
-        )
-        super().__init__(
-            model, config, device, dynamic_shapes, ov_config, model_save_dir, **kwargs
-        )
     
     def _reshape(self, model: "Model", *args, **kwargs):
         shapes = {}
@@ -243,68 +224,12 @@ class OVCHATGLMModel(OVModelForCausalLM):
                 shapes[inputs][1] = -1
         model.reshape(shapes)
         return model
-
-    @classmethod
-    def _from_pretrained(
-        cls,
-        model_id: Union[str, Path],
-        config: PretrainedConfig,
-        use_auth_token: Optional[Union[bool, str, None]] = None,
-        revision: Optional[Union[str, None]] = None,
-        force_download: bool = False,
-        cache_dir: Optional[str] = None,
-        file_name: Optional[str] = None,
-        subfolder: str = "",
-        from_onnx: bool = False,
-        local_files_only: bool = False,
-        load_in_8bit: bool = False,
-        **kwargs,
-    ):
-        model_path = Path(model_id)
-        default_file_name = OV_XML_FILE_NAME
-        file_name = file_name or default_file_name
-
-        model_cache_path = cls._cached_file(
-            model_path=model_path,
-            use_auth_token=use_auth_token,
-            revision=revision,
-            force_download=force_download,
-            cache_dir=cache_dir,
-            file_name=file_name,
-            subfolder=subfolder,
-            local_files_only=local_files_only,
-        )
-
-        model = cls.load_model(model_cache_path, load_in_8bit=load_in_8bit)
-        init_cls = OVCHATGLMModel
-
-        return init_cls(
-            model=model, config=config, model_save_dir=model_cache_path.parent, **kwargs
-        )
         
         
 class OVQWENModel(OVModelForCausalLM):
     """
     Optimum intel compatible model wrapper for QWEN
     """
-    def __init__(
-        self,
-        model: "Model",
-        config: "PretrainedConfig" = None,
-        device: str = "CPU",
-        dynamic_shapes: bool = True,
-        ov_config: Optional[Dict[str, str]] = None,
-        model_save_dir: Optional[Union[str, Path]] = None,
-        **kwargs,
-    ):
-        NormalizedConfigManager._conf["qwen"] = NormalizedTextConfig.with_args(
-            num_layers="num_hidden_layers",
-            num_attention_heads="num_attention_heads",
-            hidden_size="hidden_size",
-        )
-        super().__init__(
-            model, config, device, dynamic_shapes, ov_config, model_save_dir, **kwargs
-        )
         
     def _reshape(self, model: "Model", *args, **kwargs):
         shapes = {}

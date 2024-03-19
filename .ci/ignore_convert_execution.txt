@@ -14,6 +14,7 @@ notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipyn
 notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb
 notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb
 notebooks/yolov8-optimization/yolov8-object-detection.ipynb
+notebooks/yolov8-optimization/yolov8-obb.ipynb
 notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb
 notebooks/clip-language-saliency-map/clip-language-saliency-map.ipynb
 notebooks/blip-visual-language-processing/blip-visual-language-processing.ipynb
