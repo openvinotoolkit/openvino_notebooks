@@ -184,6 +184,8 @@ DocumentLoaders
 doi
 Dollár
 donut
+DOTA
+DOTAv
 Downloader
 downloader
 downsample
@@ -454,6 +456,8 @@ NSFW
 numpy
 NumPy
 OASST
+OBB
+obb
 ocr
 OCRv
 odometry
