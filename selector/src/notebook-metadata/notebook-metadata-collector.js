@@ -39,7 +39,7 @@ export class NotebookMetadataCollector extends NotebookContentReader {
    */
   _getNotebookCreatedDate() {
     return execSync(
-      `git log -1 --pretty=format:"%ad" --date=iso --diff-filter=A -- ${this._absoluteNotebookPath}`
+      `git log --follow -1 --pretty=format:"%ad" --date=iso --diff-filter=AC -- ${this._absoluteNotebookPath}`
     ).toString();
   }
 
