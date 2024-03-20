@@ -36,6 +36,7 @@ const tasksSectionsTitlesMap: Record<keyof typeof TASKS, string> = {
   CV: 'Computer Vision',
   NLP: 'Natural Language Processing',
   AUDIO: 'Audio',
+  OTHER: 'Other',
 };
 
 const librariesSectionsTitlesMap: Record<keyof typeof LIBRARIES, string> = {
