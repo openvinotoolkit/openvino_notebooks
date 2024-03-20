@@ -3,7 +3,7 @@
 # black==21.8 requires typing-extensions>3.10 which is incompatible
 # with other packages
 -r ../requirements.txt
-black==21.7b0               # format Python code
+black==24.3.0               # format Python code
 isort                       # sort imports
 jupyterlab-code-formatter   # format code in notebooks in Jupyter Lab
 jupyterlab-git              # checkout and commit code in Jupyter Lab
