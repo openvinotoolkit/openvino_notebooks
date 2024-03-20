@@ -7,6 +7,7 @@ export const CATEGORIES = /** @type {const} */ ({
   MODEL_DEMOS: 'Model Demos',
   MODEL_TRAINING: 'Model Training',
   LIVE_DEMOS: 'Live Demos',
+  XAI: 'Explainable AI',
 });
 
 export const TASKS = /** @type {const} */ ({
@@ -72,6 +73,7 @@ export const LIBRARIES = /** @type {const} */ ({
     BENCHMARK_APP: 'Benchmark Tool',
     OVMS: 'Model Server',
     OMZ: 'Open Model Zoo',
+    TOKENIZERS: 'OpenVINO Tokenizers',
   },
   OTHER: {
     OPTIMUM_INTEL: 'Optimum Intel',
