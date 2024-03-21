@@ -31,12 +31,22 @@ class OVRanker(BaseDocumentCompressor):
     model_dir: str
     device: str = "CPU"
     ov_config: Dict[str, Any] = Field(default_factory=dict)
-    top_n: int = 3
+    top_n: int = 4
     
     def __init__(self, **kwargs: Any):
         super().__init__(**kwargs)
         self.tokenizer = self._get_tokenizer()
         self.ov_model = OVModelForSequenceClassification.from_pretrained(self.model_dir, device=self.device, ov_config=self.ov_config)
+        
+    def _load_vocab(self, vocab_file):
+    
+        vocab = collections.OrderedDict()
+        with open(vocab_file, "r", encoding="utf-8") as reader:
+            tokens = reader.readlines()
+        for index, token in enumerate(tokens):
+            token = token.rstrip("\n")
+            vocab[token] = index
+        return vocab
 
     def _get_tokenizer(self, max_length = 512):
       
@@ -76,17 +86,36 @@ class OVRanker(BaseDocumentCompressor):
           tokenizer.ids_to_tokens = collections.OrderedDict([(ids, tok) for tok, ids in tokenizer.vocab.items()])                
         
         return tokenizer
-
+    
     def rerank(self, request):
         query = request.query
         passages = request.passages
 
         query_passage_pairs = [[query, passage["text"]] for passage in passages]
+        input_text = self.tokenizer.encode_batch(query_passage_pairs)
+        input_ids = [e.ids for e in input_text]
+        token_type_ids = [e.type_ids for e in input_text]
+        attention_mask = [e.attention_mask for e in input_text]
+        
+        use_token_type_ids = token_type_ids is not None and not np.all(token_type_ids == 0)
 
-        input_text = self.tokenizer.encode(query_passage_pairs)
+        if use_token_type_ids:
+            input_tensors = {
+                "input_ids": input_ids,
+                "attention_mask": attention_mask,
+                "token_type_ids": token_type_ids,
+            }
+        else:
+            input_tensors = {
+                "input_ids": input_ids,
+                "attention_mask": attention_mask
+            }
 
-        outputs = self.ov_model(**input_text, return_dict=True).numpy()
 
+        # input_data = {k: v for k, v in onnx_input.items()}
+        print(input_tensors)
+        outputs = self.ov_model(**input_tensors, return_dict=True)
+        print(outputs)
         if outputs[0].shape[1] > 1:
             scores = outputs[0][:, 1]
         else:
