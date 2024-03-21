@@ -291,12 +291,34 @@ SUPPORTED_LLM_MODELS = {
 }
 
 SUPPORTED_EMBEDDING_MODELS = {
-    "all-mpnet-base-v2": {
-        "model_id": "sentence-transformers/all-mpnet-base-v2",
-        "do_norm": True,
+    "English":{
+        "bge-small-en-v1.5": {
+            "model_id": "BAAI/bge-small-en-v1.5",
+            "do_norm": True,
+        },
+        "bge-large-en-v1.5": {
+            "model_id": "BAAI/bge-large-en-v1.5",
+            "do_norm": True,
+        },
     },
-    "text2vec-large-chinese": {
-        "model_id": "GanymedeNil/text2vec-large-chinese",
-        "do_norm": False,
+    "Chinese":{
+        "bge-small-zh-v1.5": {
+            "model_id": "BAAI/bge-small-zh-v1.5",
+            "do_norm": True,
+        },
+        "bge-large-zh-v1.5": {
+            "model_id": "BAAI/bge-large-zh-v1.5",
+            "do_norm": True,
+        },
     },
+}
+
+SUPPORTED_RERANK_MODELS = {
+    "bge-reranker-large": {
+        "model_id": "BAAI/bge-reranker-large",
+    },
+    "bge-reranker-base": {
+        "model_id": "BAAI/bge-reranker-base",
+    },
+    
 }
