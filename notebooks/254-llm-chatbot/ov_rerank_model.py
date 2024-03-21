@@ -5,7 +5,7 @@ from langchain.callbacks.manager import Callbacks
 from langchain_core.documents import Document
 from langchain.retrievers.document_compressors.base import BaseDocumentCompressor
 from typing import Optional, Dict, Any, Sequence
-from langchain.pydantic_v1 import BaseModel, Extra, Field
+from langchain.pydantic_v1 import Field
 import json
 from pathlib import Path
 from tokenizers import AddedToken, Tokenizer
@@ -21,12 +21,23 @@ class RerankRequest:
 
 
 class OVRanker(BaseDocumentCompressor):
+    """
+    OpenVINO BGE rerank models.
+
+    """
+
     ov_model: Any
+    """OpenVINO model object."""
     tokenizer: Any
+    """Tokenizer for embedding model."""
     model_dir: str
+    """Path to store models."""
     device: str = "CPU"
+    """Device for model deployment. """
     ov_config: Dict[str, Any] = Field(default_factory=dict)
+    """OpenVINO configuration arguments to pass to the model."""
     top_n: int = 4
+    """return Top n texts."""
 
     def __init__(self, **kwargs: Any):
         super().__init__(**kwargs)
@@ -116,9 +127,7 @@ class OVRanker(BaseDocumentCompressor):
             }
 
         # input_data = {k: v for k, v in onnx_input.items()}
-        print(input_tensors)
         outputs = self.ov_model(**input_tensors, return_dict=True)
-        print(outputs)
         if outputs[0].shape[1] > 1:
             scores = outputs[0][:, 1]
         else:
