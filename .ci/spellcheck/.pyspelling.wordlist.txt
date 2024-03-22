@@ -606,6 +606,7 @@ René
 repo
 reproducibility
 rerank
+reranker
 reranking
 rescale
 rescaling
