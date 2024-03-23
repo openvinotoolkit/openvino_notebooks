@@ -32,10 +32,8 @@ class OVRanker(BaseDocumentCompressor):
     """Tokenizer for embedding model."""
     model_dir: str
     """Path to store models."""
-    device: str = "CPU"
-    """Device for model deployment. """
-    ov_config: Dict[str, Any] = Field(default_factory=dict)
-    """OpenVINO configuration arguments to pass to the model."""
+    model_kwargs: Dict[str, Any]
+    """Keyword arguments passed to the model."""
     top_n: int = 4
     """return Top n texts."""
 
@@ -43,7 +41,7 @@ class OVRanker(BaseDocumentCompressor):
         super().__init__(**kwargs)
         self.tokenizer = self._get_tokenizer()
         self.ov_model = OVModelForSequenceClassification.from_pretrained(
-            self.model_dir, device=self.device, ov_config=self.ov_config)
+            self.model_dir, **self.model_kwargs)
 
     def _load_vocab(self, vocab_file):
 

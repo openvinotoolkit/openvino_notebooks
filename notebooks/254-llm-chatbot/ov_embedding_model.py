@@ -31,10 +31,8 @@ class OVBgeEmbeddings(BaseModel, Embeddings):
     """Tokenizer for embedding model."""
     model_dir: str
     """Path to store models."""
-    device: str = "CPU"
-    """Device for model deployment. """
-    ov_config: Dict[str, Any] = Field(default_factory=dict)
-    """OpenVINO configuration arguments to pass to the model."""
+    model_kwargs: Dict[str, Any]
+    """Keyword arguments passed to the model."""
     encode_kwargs: Dict[str, Any] = Field(default_factory=dict)
     """Keyword arguments to pass when calling the `encode` method of the model."""
     query_instruction: str = DEFAULT_QUERY_BGE_INSTRUCTION_EN
@@ -45,7 +43,7 @@ class OVBgeEmbeddings(BaseModel, Embeddings):
         super().__init__(**kwargs)
 
         self.ov_model = OVModelForFeatureExtraction.from_pretrained(
-            self.model_dir, device=self.device, ov_config=self.ov_config)
+            self.model_dir, **self.model_kwargs)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_dir)
 
         if "-zh" in self.model_dir:

@@ -614,6 +614,7 @@ Rescaling
 ResNet
 resnet
 RetinaFace
+RetroMAE
 RGB
 Riffusion
 riffusion
