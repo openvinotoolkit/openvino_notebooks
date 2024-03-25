@@ -59,3 +59,4 @@ instant-id
 grounded-segment-anything
 stable-diffusion-keras-cv
 style-transfer-webcam
+animate-anyone
