@@ -37,3 +37,8 @@ month = "jan",
 year = "2019",
 url = "http://download.tensorflow.org/example_images/flower_photos.tgz" }
 ```
+## Installation Instructions
+
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
