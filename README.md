@@ -2,7 +2,7 @@ English | [简体中文](README_cn.md)
 
 <h1>📚 OpenVINO™ Notebooks</h1>
 
-[![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/LICENSE)
+[![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/master/LICENSE)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/treon_precommit.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/treon_precommit.yml?query=event%3Apush)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml?query=event%3Apush)
 
@@ -85,7 +85,7 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 If you wish to launch only one notebook, like the Monodepth notebook, run the command below.
 
 ```bash
-jupyter 201-vision-monodepth.ipynb
+jupyter vision-monodepth.ipynb
 ```
 
 ### To Launch all Notebooks

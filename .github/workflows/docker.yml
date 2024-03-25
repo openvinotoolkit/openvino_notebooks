@@ -6,14 +6,15 @@ name: docker_treon
 on:
   workflow_dispatch:
   schedule:
-    - cron:  '30 3 * * *'
+    - cron: '30 3 * * *'
   push:
     branches:
-    - 'main'
+      - 'main'
+      - 'master'
     paths:
-      - "Dockerfile"
-      - ".docker/**"
-      - ".github/workflows/*.yml"
+      - 'Dockerfile'
+      - '.docker/**'
+      - '.github/workflows/*.yml'
       - '.github/workflows/.env'
       - 'notebooks/**.ipynb'
       - 'notebooks/**.py'
@@ -21,12 +22,13 @@ on:
       - '.ci/*requirements.txt'
   pull_request:
     branches:
-    - 'main'
-    - 'develop'
+      - 'main'
+      - 'master'
+      - 'develop'
     paths:
-      - "Dockerfile"
-      - ".docker/**"
-      - ".github/workflows/*.yml"
+      - 'Dockerfile'
+      - '.docker/**'
+      - '.github/workflows/*.yml'
       - '.github/workflows/.env'
       - 'notebooks/**.ipynb'
       - 'notebooks/**.py'
@@ -39,22 +41,22 @@ jobs:
   build_docker:
     strategy:
       fail-fast: false
-  
+
     runs-on: ubuntu-20.04
 
     steps:
-    - name: Maximize build space
-      run:  |
-            sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
-            sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
-            sudo rm -rf /opt/ghc
-            echo "Available storage:"
-            df -h
-    - uses: actions/checkout@v4
-    - name: Build Docker image
-      run: |
-        docker build . -t openvino_notebooks
-    - name: Test notebooks in Docker image
-      run: |
-        # Test script location: .docker/.s2i/bin/test
-        docker run --entrypoint /tmp/scripts/test openvino_notebooks
+      - name: Maximize build space
+        run: |
+          sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
+          sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
+          sudo rm -rf /opt/ghc
+          echo "Available storage:"
+          df -h
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: |
+          docker build . -t openvino_notebooks
+      - name: Test notebooks in Docker image
+        run: |
+          # Test script location: .docker/.s2i/bin/test
+          docker run --entrypoint /tmp/scripts/test openvino_notebooks
