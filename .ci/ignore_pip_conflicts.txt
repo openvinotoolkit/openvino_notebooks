@@ -20,3 +20,4 @@ notebooks/mobilevlm-language-assistant/mobilevlm-language-assistant.ipynb # tran
 notebooks/depth-anything/depth-anything.ipynb # install requirements.txt after clone repo
 notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb # requires python >=3.9
 notebooks/mobileclip-video-search/mobileclip-video-search.ipynb # install requirements.txt inside
+notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb # requires python >=3.9

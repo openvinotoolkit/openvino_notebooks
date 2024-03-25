@@ -57,4 +57,5 @@ photo-maker
 openvoice
 surya-line-level-text-detection
 instant-id
+stable-diffusion-keras-cv
 style-transfer-webcam
