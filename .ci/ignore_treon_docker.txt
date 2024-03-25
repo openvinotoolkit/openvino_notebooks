@@ -54,6 +54,7 @@
 284-openvoice
 285-surya-line-level-text-detection
 286-instant-id
+290-stable-diffusion-keras-cv
 301-tensorflow-training-openvino
 305-tensorflow-quantization-aware-training
 404-style-transfer-webcam
