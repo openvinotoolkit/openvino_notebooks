@@ -29,9 +29,12 @@ SYSTEM_CONFIGURATION = (
     )
 GREET_THE_CUSTOMER = "Please introduce yourself and greet the patient"
 SUMMARIZE_THE_CUSTOMER = (
-    "Summarize the above patient to the doctor. Use only health-related information provided by patient."
+    "You are now required to summarize the patient's exact provided symptoms for the doctor's review. "
     "Strictly do not mention any personal data like age, name, gender, contact, non-health information etc. when summarizing."
-    )
+    "Warn the patients for immediate medical seeking in case they exhibit symptoms indicative of critical conditions such as heart attacks, strokes, severe allergic reactions, breathing difficulties, high fever with severe symptoms, significant burns, or severe injuries."
+    "Summarize the health-related concerns mentioned by the patient in this conversation, focusing only on the information explicitly provided, without adding any assumptions or unrelated symptoms."
+
+)
 
 NEURAL_CHAT_MODEL_TEMPLATE = ("{% if messages[0]['role'] == 'system' %}"
                               "{% set loop_messages = messages[1:] %}"
@@ -67,14 +70,38 @@ asr_processor: AutoProcessor = None
 def is_health_related_query(prompt: str) -> bool:
     if prompt is None:
         return False
-    health_keywords = ['pain', 'fever', 'Loss of appetite', 'nausea', 'injury', 'symptoms', 'illness', 'sick', 'health', 'cold', 'cough', 'fatigue', 'accident', 'infection', 'Ear', 'Eyes', 'Adbomen', 'chest pain']
+    health_keywords = [
+        'pain', 'ache', 'fever', 'chills', 'fatigue', 'weakness', 'dizziness', 'nausea', 'vomiting', 'diarrhea',
+        'constipation', 'abdominal pain', 'cramps', 'bloating', 'gas', 'heartburn', 'loss of appetite', 'weight loss',
+        'weight gain', 'dehydration', 'urination issues', 'itching', 'rash', 'hives', 'redness', 'swelling', 'bruising',
+        'bleeding', 'cough', 'sore throat', 'stuffy nose', 'runny nose', 'sinus pressure', 'headache', 'migraine',
+        'vision changes', 'hearing loss', 'tinnitus', 'ear pain', 'dental pain', 'jaw pain', 'shortness of breath',
+        'chest pain', 'palpitations', 'fainting', 'seizures', 'numbness', 'tingling', 'paralysis', 'muscle weakness',
+        'muscle spasms', 'joint pain', 'stiffness', 'edema', 'insomnia', 'sleepiness', 'anxiety', 'depression',
+        'mood swings', 'confusion', 'memory loss', 'hallucinations', 'delusions', 'sweating', 'temperature sensitivity',
+        'thirst', 'skin changes', 'hair loss', 'nail changes', 'lymph node enlargement', 'breast lump',
+        'urinary changes', 'sexual dysfunction', 'menstrual changes', 'pregnancy', 'injuries', 'burns', 'poisoning',
+        'allergies', 'infections', 'chronic diseases', 'acute illnesses', 'screening', 'vaccination', 'health check-up',
+        'vision', 'eye', 'sight', 'blurry', 'cannot see', 'vision loss', 'eye pain', 'walking', 'mobility',
+        'trouble walking', 'difficulty walking', 'limping', 'gait', 'balance', 'depression', 'anxiety', 'mood swings',
+        'irritability', 'panic attacks', 'sleep problems', 'insomnia', 'sleepiness', 'snoring', 'sleep apnea', 'accident', 'hurt'
+    ]
     return any(keyword in prompt.lower() for keyword in health_keywords)
 
 
 def post_process_response(response: str) -> str:
     # Keywords or phrases that indicate medical advice, treatments, or medication
-    advice_keywords = ['take', 'try', 'suggest', 'recommend', 'breathing', 'difficult', 'medication', 'over-the-counter', 'pain reliever', 'ibuprofen', 'naproxen', 'treatment']
-
+    advice_keywords = [
+        'take', 'try', 'suggest', 'recommend', 'breathing exercises', 'apply', 'consult', 'see a doctor', 'medical attention',
+        'difficult', 'medication', 'over-the-counter', 'pain reliever', 'ibuprofen', 'naproxen', 'treatment', 'chest pain',
+        'heart attack', 'shortness of breath', 'severe pain', 'sneezing', 'vomiting', 'headache', 'numb', 'stroke', 'drooping',
+        'dizzy', 'lightheaded', 'injury', 'swollen', 'asthma', 'breath', 'chills', 'dizziness', 'blurred vision', 'congestion',
+        'elevated heart rate', 'itching', 'high blood pressure', 'low blood pressure', 'abdominal pain', 'bleeding', 'numbness',
+        'seizure', 'forgetfulness', 'confusion', 'difficulty sleeping', 'anxiety', 'prescribe', 'therapy', 'surgical', 'procedure',
+        'emergency room', 'urgent care', 'hospital', 'clinic', 'physiotherapy', 'rehabilitation', 'exercise', 'diet', 'hydration',
+        'rest', 'sleep', 'avoid', 'stop', 'discontinue', 'increase', 'decrease', 'monitor', 'check', 'test for', 'diagnose',
+        'screening', 'evaluation', 'assessment', 'measure', 'track', 'follow up'
+    ]
     for keyword in advice_keywords:
         if keyword in response.lower():
             return "It's important to consult with a healthcare professional for any medical advice or treatment options."
@@ -198,16 +225,29 @@ def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> 
 
 def summarize(conversation: List) -> str:
     """
-    Summarize the patient case
+    Summarize the patient case based on the conversation so far, focusing specifically on the patient's inputs.
 
-    Params
+    Params:
         conversation: history of the messages so far
     Returns:
-        Summary
+        A bullet-point summary of the patient's case
     """
-    conversation.append([SUMMARIZE_THE_CUSTOMER, None])
+
+    # Extract patient inputs from the conversation
+    patient_inputs = "\n- ".join(msg[0] for msg in conversation if msg[0])
+
+    # Create a summarization prompt that includes both the directive and the patient's inputs
+    summarization_prompt = f"{SUMMARIZE_THE_CUSTOMER}\n\nPatient symptoms:\n- {patient_inputs}"
+
+    # Append this as a new system message to guide the summarization
+    conversation.append([summarization_prompt, None])
+
+    # Use the chat function to process this new conversation entry
     conversation = chat(conversation)
-    return conversation[-1][1]
+
+    # Extract and return the summary from the conversation
+    # Assuming the chat function updates the [None] part with its response
+    return conversation[-1][1].split("</s>")[0] if conversation[-1][1] else "Summary unavailable."
 
 
 def create_UI(initial_message: str) -> gr.Blocks:
