@@ -7,9 +7,7 @@ from langchain.retrievers.document_compressors.base import BaseDocumentCompresso
 from typing import Optional, Dict, Any, Sequence
 from langchain.pydantic_v1 import Field
 import json
-from pathlib import Path
 from tokenizers import AddedToken, Tokenizer
-import numpy as np
 import collections
 
 
