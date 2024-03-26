@@ -326,6 +326,7 @@ Kalman
 kbps
 KD
 keras
+KerasCV
 keypoint
 keypoints
 KiTS

@@ -1,11 +1,10 @@
 import { INotebookMetadata } from './notebook-metadata';
 
 export const SORT_OPTIONS = {
-  DEFAULT: 'Default',
   RECENTLY_ADDED: 'Recently Added',
   RECENTLY_UPDATED: 'Recently Updated',
-  NAME_ASCENDING: 'Name (Ascending)',
-  NAME_DESCENDING: 'Name (Descending)',
+  NAME_ASCENDING: 'Name (A-Z)',
+  NAME_DESCENDING: 'Name (Z-A)',
 } as const;
 
 export type SortValues = (typeof SORT_OPTIONS)[keyof typeof SORT_OPTIONS];
@@ -66,9 +65,6 @@ class NotebooksService {
     }
     if (sort === SORT_OPTIONS.NAME_DESCENDING) {
       return (a: INotebookMetadata, b: INotebookMetadata) => b.title.toUpperCase().localeCompare(a.title.toUpperCase());
-    }
-    if (sort === SORT_OPTIONS.DEFAULT) {
-      return (a: INotebookMetadata, b: INotebookMetadata) => b.path.toUpperCase().localeCompare(a.path.toUpperCase());
     }
   }
 }

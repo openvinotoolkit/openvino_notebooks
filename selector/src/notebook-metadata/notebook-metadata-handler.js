@@ -23,8 +23,8 @@ export class NotebookMetadataHandler {
 
   /** @private @const */
   static _skippedNotebooks = [
-    '110-ct-segmentation-quantize/data-preparation-ct-scan.ipynb',
-    '110-ct-segmentation-quantize/pytorch-monai-training.ipynb',
+    'ct-segmentation-quantize/data-preparation-ct-scan.ipynb',
+    'ct-segmentation-quantize/pytorch-monai-training.ipynb',
   ];
 
   get metadata() {
