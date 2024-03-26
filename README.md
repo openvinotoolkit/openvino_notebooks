@@ -82,17 +82,25 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 
 ### To Launch a Single Notebook
 
-If you wish to launch only one notebook, like the Monodepth notebook, run the command below.
+If you wish to launch only one notebook, like the Monodepth notebook, run the command below (from the repository root directory):
 
 ```bash
-jupyter vision-monodepth.ipynb
+jupyter lab notebooks/vision-monodepth/vision-monodepth.ipynb
 ```
 
 ### To Launch all Notebooks
 
-```bash
-jupyter lab notebooks
-```
+1. Generate notebooks index file for easier navigation between notebooks directories and files *(optional, but recommended)*:
+   
+	```bash
+	python3 ./utils/generate_notebooks_index.py
+	```
+
+2. Launch Jupyter Lab (from the repository root directory):
+	
+	```bash
+	jupyter lab notebooks/index.md
+	```
 
 In your browser, select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
 
