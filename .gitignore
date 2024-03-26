@@ -105,6 +105,7 @@ notebooks/*/model/**
 notebooks/*/data/**
 notebooks/*/cache/**
 notebooks/*/.cache/**
+notebooks/index.md
 
 # Local pip cache directories
 pipcache/
