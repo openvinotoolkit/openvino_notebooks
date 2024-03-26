@@ -7,7 +7,6 @@ activations
 adaptively
 adas
 ADE
-adversarially
 aeroplane
 affective
 ai
@@ -54,6 +53,7 @@ bert
 BERT's
 BetterTransformer
 Bewley
+bge
 BGR
 BMP
 Bicubic
@@ -209,7 +209,6 @@ enum
 et
 Evol
 EVS
-facto
 fastcomposer
 FastComposer
 FastSAM
@@ -326,7 +325,6 @@ Kalman
 kbps
 KD
 keras
-KerasCV
 keypoint
 keypoints
 KiTS
@@ -379,7 +377,6 @@ LSTM
 Luo
 LVLM
 macOS
-Magika
 Mahalanobis
 Mapillary
 Markovian
@@ -608,12 +605,16 @@ ReLU
 René
 repo
 reproducibility
+rerank
+reranker
+reranking
 rescale
 rescaling
 Rescaling
 ResNet
 resnet
 RetinaFace
+RetroMAE
 RGB
 Riffusion
 riffusion
@@ -835,4 +836,5 @@ ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
+zh
 xformers
