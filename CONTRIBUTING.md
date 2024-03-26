@@ -132,7 +132,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 6. In case if notebook has specific requirements on python version or OS, it should be noted on top of notebook (before any code blocks) using
    following colored block:
    ```
-   <div class="alert alert-block alert-danger"> <b>Important note:</b> This notebook requires python >= 3.9. Please make sure that your environment fulfit to this requirement  before running it </div>
+   <div class="alert alert-block alert-danger"> <b>Important note:</b> This notebook requires python >= 3.9. Please make sure that your environment fulfill to this requirement  before running it </div>
    ```
 
 ### Notebook naming
