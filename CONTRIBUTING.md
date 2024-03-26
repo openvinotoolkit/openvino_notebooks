@@ -51,7 +51,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 1. The notebooks work on Windows, macOS and Linux (see [supported operating
    systems](https://github.com/openvinotoolkit/openvino_notebooks#%EF%B8%8F-system-requirements))
-   with Python 3.7, 3.8, 3.9 and 3.10.
+   with Python 3.8, 3.9, 3.10 and 3.11.
 2. As a rule, the notebooks do not require installation of additional software that is not installable by
    `pip`. We do not assume that users have installed XCode Developer Tools, Visual C++ redistributable,
    `cmake`, etc. Please discuss if your notebook does need C++ - there are exceptions to this rule.
@@ -129,6 +129,11 @@ To do this, there are a few requirements that all notebooks need to pass.
    name, URL and license of the third party code to the `licensing/third-party-programs.txt` file.
 4. Don't use HTML for text cells, use Markdown markups instead.
 5. Add **Table of content** to top of the Notebook, it helps to get quick fist understanding of content and ease of navigation in the dev environment. There is no need to think about it during development, it can be built or updated after changes with `.ci\table_of_content.py`. Just run the script with the parameter `-s/--source`, specifying a Notebook or a folder with several notebooks as value, the changes will be applied to all of them.
+6. In case if notebook has specific requirements on python version or OS, it should be noted on top of notebook (before any code blocks) using
+   following colored block:
+   ```
+   <div class="alert alert-block alert-danger"> <b>Important note:</b> This notebook requires python >= 3.9. Please make sure that your environment fulfill to this requirement  before running it </div>
+   ```
 
 ### Notebook naming
 

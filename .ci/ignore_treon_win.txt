@@ -53,7 +53,5 @@ stable-diffusion-ip-adapter
 kosmos2-multimodal-large-language-model
 photo-maker
 openvoice
-surya-line-level-text-detection
 instant-id
-stable-diffusion-keras-cv
 animate-anyone
