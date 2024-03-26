@@ -54,6 +54,8 @@ bert
 BERT's
 BetterTransformer
 Bewley
+BGE
+bge
 BGR
 BMP
 Bicubic
@@ -839,4 +841,5 @@ ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
+zh
 xformers

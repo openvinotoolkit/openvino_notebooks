@@ -72,7 +72,7 @@ class OVRanker(BaseDocumentCompressor):
           raise FileNotFoundError(
               f"special_tokens_map.json missing in  {Path(self.model_dir)}")
 
-       with config_path.open() as config_file:
+        with config_path.open() as config_file:
            config = json.load(config_file)
         tokenizer_config = json.load(open(str(tokenizer_config_path)))
         tokens_map = json.load(open(str(tokens_map_path)))
@@ -92,8 +92,7 @@ class OVRanker(BaseDocumentCompressor):
         vocab_file = Path(self.model_dir) / "vocab.txt"
         if vocab_file.exists():
           tokenizer.vocab = self._load_vocab(vocab_file)
-          tokenizer.ids_to_tokens = collections.OrderedDict(
-              [(ids, tok) for tok, ids in tokenizer.vocab.items()])
+          tokenizer.ids_to_tokens = [(ids, tok) for tok, ids in tokenizer.vocab.items()]
 
         return tokenizer
 
