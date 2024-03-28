@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages, update notebooks index
 
 on:
   push:
@@ -87,3 +87,24 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  update_notebooks_index:
+    runs-on: ubuntu-20.04
+    needs: build_assets
+    if: ${{ needs.build_assets.outputs.should_deploy == 'true' }}
+    steps:
+      - name: Generate new notebooks index
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { generateNotebooksIndex } = await import('${{ github.workspace }}/selector/src/shared/generate-notebooks-index.js');
+            generateNotebooksIndex(`${{ github.workspace }}/selector/dist/openvino_notebooks/notebooks-metadata-map.json`);
+
+      - name: Commit notebooks index
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ./notebooks/README.md
+          git commit "Update notebooks index readme file [skip ci]"
+          git push
