@@ -1,10 +1,10 @@
-# Data and Model Explainability for Computer Vision with OpenVINO Toolkit™
+# Data and Model Explainability for Computer Vision with OpenVINO™ Toolkit
 
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/LICENSE)
 
 Computer vision models are continuing to rapidly grow in their capabilities and the use cases they can support, including intelligent queue management and automated self-checkout for retail use cases, anomaly detection of transistors on the manufacturing floor, and more.
 
-Understanding why computer vision models make certain predictions using data and model explainability can help us refine our models to be more efficient and performant. The Data and Model Explainability for Computer Vision with OpenVINO Toolkit™ kit is an application designed to demonstrate how to use data quality measurements and saliency maps to understand the predictions and performance of computer vision models during inference. It uses OpenVINO, a toolkit that enables developers to deploy deep learning models on a variety of hardware platforms.
+Understanding why computer vision models make certain predictions using data and model explainability can help us refine our models to be more efficient and performant. The Data and Model Explainability for Computer Vision with OpenVINO™ Toolkit kit is an application designed to demonstrate how to use data quality measurements and saliency maps to understand the predictions and performance of computer vision models during inference. It uses OpenVINO, a toolkit that enables developers to deploy deep learning models on a variety of hardware platforms.
 
 You can following along with our Jupyter Notebook on our Github repository. You will be using the following stack of technologies: OpenVINO™ Toolkit, Ultralytic’s YOLOv8, and the [OpenVINO Datumaru](https://github.com/openvinotoolkit/datumaro/tree/develop) library.
 
@@ -96,7 +96,7 @@ pip install -r requirements.txt
 
 ### Running the Application
 
-You can run the [Computer Vision Data Quality and Explainability Kit.ipynb](Computer Vision Data Quality and Explainability Kit.ipynb) to learn more about the inference process. This notebook contains detailed instructions to run the CV Explainability application, load and analyze a short section of data with data quality metrics leveraging content from [datumaro]'s tutorials(https://github.com/openvinotoolkit/datumaro/blob/develop/notebooks/11_validate.ipynb), and generating saliency maps with a OpenVINO YOLOv8 model using Ultralytics.
+You can run the [Computer Vision Data Quality and Explainability Kit.ipynb](Computer Vision Data Quality and Explainability Kit.ipynb) to learn more about the inference process. This notebook contains detailed instructions to run the CV Explainability application, load and analyze a short section of data with data quality metrics, and generate saliency maps with a OpenVINO YOLOv8 model using Ultralytics. For the data quality metrics generation, we leverage the  open-source toolkit datumaro, including specifically the tutorial [here](https://github.com/openvinotoolkit/datumaro/blob/develop/notebooks/11_validate.ipynb). This edge AI reference kit focuses on a specific digital transportation use case, with an analysis of only a few data quality metrics - please visit the [Datumaro tutorials](https://github.com/openvinotoolkit/datumaro/tree/develop/notebooks) for resources on how to perform advanced data exploration, and explore and remediate more types of data quality issues.
 
 ## Benchmarking the Model with OpenVINO's `benchmark_app`
 
@@ -118,7 +118,7 @@ Use the following command to run the benchmark:
 ```
 Replace `int8_model_det_path` with the path to your INT8 model and $device with the specific device you're using (CPU, GPU, etc.). This command performs inference on the model for 30 seconds. Run `benchmark_app --help` for additional command-line options.
 
-Congratulations! You have successfully set up and run the Data and Model Explainability for Computer Vision with OpenVINO Toolkit™ application.
+Congratulations! You have successfully set up and run the Data and Model Explainability for Computer Vision with OpenVINO™ Toolkit application.
 
 ## Appendix
 
