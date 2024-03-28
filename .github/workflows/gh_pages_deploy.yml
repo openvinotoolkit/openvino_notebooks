@@ -5,6 +5,7 @@ on:
     branches:
       - 'main'
       - 'master'
+      - 'yt/notebooks-index' # TODO Remove after testing
   workflow_dispatch:
 
 concurrency:
