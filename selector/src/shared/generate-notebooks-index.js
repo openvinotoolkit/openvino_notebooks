@@ -36,6 +36,7 @@ function getCategoryToNotebooksMetadataMap(notebooksMetadataMap) {
 function formatToIndexMarkdown(categoryToNotebooksMetadataMap) {
   const mdContents = [
     '# OpenVINO Notebooks\n\n',
+    '# Testing GitHub Action', // TODO Remove after testing
     '[OpenVINO™ Notebooks at GitHub Pages](https://openvinotoolkit.github.io/openvino_notebooks/)\n\n',
   ];
 
