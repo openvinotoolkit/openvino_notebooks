@@ -57,3 +57,4 @@ photo-maker
 openvoice
 instant-id
 style-transfer-webcam
+animate-anyone

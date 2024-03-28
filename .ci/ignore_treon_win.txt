@@ -54,3 +54,4 @@ kosmos2-multimodal-large-language-model
 photo-maker
 openvoice
 instant-id
+animate-anyone
