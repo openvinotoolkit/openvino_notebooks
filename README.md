@@ -90,10 +90,10 @@ jupyter lab notebooks/vision-monodepth/vision-monodepth.ipynb
 
 ### To Launch all Notebooks
 
-Launch Jupyter Lab with index file opened for easier navigation between notebooks directories and files. Run the following command from the repository root directory:
+Launch Jupyter Lab with index readme file opened for easier navigation between notebooks directories and files. Run the following command from the repository root directory:
 	
 ```bash
-jupyter lab notebooks/index.md
+jupyter lab notebooks/README.md
 ```
 
 Alternatively, in your browser select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
