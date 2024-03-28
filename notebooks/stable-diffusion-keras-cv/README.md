@@ -2,7 +2,7 @@
 
 This notebook demonstrates how to run [KerasCV Stable Diffusion](https://www.tensorflow.org/tutorials/generative/generate_images_with_stable_diffusion) using OpenVINO.
 
-![stable-diffusion-result](https://github.com/openvinotoolkit/openvino_notebooks/assets/67365453/6716805a-0727-4276-98da-ccfd2b07b2d3)
+![stable-diffusion-result](https://github.com/openvinotoolkit/openvino_notebooks/assets/67365453/4dc86beb-cbdf-48da-8465-f9079d15a7fd)
 
 ## Notebook Contents
 
