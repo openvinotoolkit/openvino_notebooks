@@ -14,6 +14,8 @@ concurrency:
 jobs:
   build_assets:
     runs-on: ubuntu-20.04
+    permissions:
+      contents: write
     outputs:
       should_deploy: ${{ steps.check_deploy.outputs.should_deploy }}
     steps:
