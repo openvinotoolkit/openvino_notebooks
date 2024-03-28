@@ -235,21 +235,31 @@ def create_UI(initial_message: str) -> gr.Blocks:
             # user's input
             input_audio_ui = gr.Audio(sources=["microphone"], scale=5, label="Your voice input")
             # submit button
-            submit_audio_btn = gr.Button("Submit", variant="primary", scale=1)
+            submit_audio_btn = gr.Button("Submit", variant="primary", scale=1, interactive=False)
 
         # chatbot
         chatbot_ui = gr.Chatbot(value=[[None, initial_message]], label="Chatbot")
 
         # summarize
-        summarize_button = gr.Button("Summarize", variant="primary")
+        summarize_button = gr.Button("Summarize", variant="primary", interactive=False)
         summary_ui = gr.Textbox(label="Summary", interactive=False)
 
         # events
-        submit_audio_btn.click(transcribe, inputs=[input_audio_ui, chatbot_ui], outputs=chatbot_ui)\
-            .then(chat, chatbot_ui, chatbot_ui)\
-            .then(lambda: None, inputs=[], outputs=[input_audio_ui])
+        # block submit button when no audio input
+        input_audio_ui.change(lambda x: gr.Button(interactive=False) if x is None else gr.Button(interactive=True), inputs=input_audio_ui, outputs=submit_audio_btn)
 
-        summarize_button.click(summarize, inputs=chatbot_ui, outputs=summary_ui)
+        # block buttons, do the transcription and conversation, clear audio, unblock buttons
+        submit_audio_btn.click(lambda: gr.Button(interactive=False), outputs=submit_audio_btn) \
+            .then(lambda: gr.Button(interactive=False), outputs=summarize_button)\
+            .then(transcribe, inputs=[input_audio_ui, chatbot_ui], outputs=chatbot_ui)\
+            .then(chat, chatbot_ui, chatbot_ui)\
+            .then(lambda: None, inputs=[], outputs=[input_audio_ui])\
+            .then(lambda: gr.Button(interactive=True), outputs=summarize_button)
+
+        # block button, do the summarization, unblock button
+        summarize_button.click(lambda: gr.Button(interactive=False), outputs=summarize_button) \
+            .then(summarize, inputs=chatbot_ui, outputs=summary_ui) \
+            .then(lambda: gr.Button(interactive=True), outputs=summarize_button)
 
     return demo
 
