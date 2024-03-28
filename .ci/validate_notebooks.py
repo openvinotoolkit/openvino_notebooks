@@ -40,10 +40,15 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
     notebooks = sorted(list(notebooks_dir.rglob('**/*.ipynb')))
     statuses = {notebook.parent.relative_to(notebooks_dir): {'status': '', 'path': notebook.parent} for notebook in notebooks}
     test_list = test_list or statuses.keys()
-    if ignore_list is not None and len(ignore_list) == 1 and ignore_list[0].endswith('.txt'):
-        with open(ignore_list[0], 'r') as f:
-            ignore_list = list(map(lambda x: x.strip(), f.readlines()))
-            print(f"ignored notebooks: {ignore_list}")
+    ignored_notebooks = []
+    if ignore_list is not None:
+        for ig_nb in ignore_list:
+            if ig_nb.endswith('.txt'):
+                with open(ig_nb, 'r') as f:
+                    ignored_notebooks.extend(list(map(lambda x: x.strip(), f.readlines())))
+            else:
+                ignored_notebooks.append(ig_nb)
+        print(f"ignored notebooks: {ignored_notebooks}")
 
     if len(test_list) == 1 and test_list[0].endswith('.txt'):
         testing_notebooks = []
@@ -64,8 +69,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
     else:
         test_list = set(map(lambda x: Path(x), test_list))
 
-    ignore_list = ignore_list or []
-    ignore_list = set(map(lambda x: Path(x), ignore_list))
+    ignore_list = set(map(lambda x: Path(x), ignored_notebooks))
 
     for notebook in statuses:
         if notebook not in test_list:
