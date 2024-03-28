@@ -180,6 +180,7 @@
 - [Semantic Segmentation with OpenVINO™ using Segmenter](./segmenter-semantic-segmentation/segmenter-semantic-segmentation.ipynb)
 - [Object masks from prompts with SAM and OpenVINO](./segment-anything/segment-anything.ipynb)
 - [Single step image generation using SDXL-turbo and OpenVINO](./sdxl-turbo/sdxl-turbo.ipynb)
+- [Background removal with RMBG v1.4 and OpenVINO](./rmbg-background-removal/rmbg-background-removal.ipynb)
 - [Text-to-Music generation using Riffusion and OpenVINO](./riffusion-text-to-music/riffusion-text-to-music.ipynb)
 - [Interactive question answering with OpenVINO™](./question-answering/question-answering.ipynb)
 - [Generate creative QR codes with ControlNet QR Code Monster and OpenVINO™](./qrcode-monster/qrcode-monster.ipynb)
