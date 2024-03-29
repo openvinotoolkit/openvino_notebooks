@@ -31,7 +31,7 @@ RUN dnf --disableplugin=subscription-manager remove -y nodejs && \
 
 # GPU drivers
 RUN dnf --disableplugin=subscription-manager install -y 'dnf-command(config-manager)' && \
-    dnf --disableplugin=subscription-manager config-manager --add-repo  https://repositories.intel.com/graphics/rhel/8.5/intel-graphics.repo
+    dnf --disableplugin=subscription-manager config-manager --add-repo  https://repositories.intel.com/graphics/rhel/8.6/intel-graphics.repo
 
 RUN rpm -ivh https://vault.centos.org/centos/8/AppStream/x86_64/os/Packages/mesa-filesystem-21.1.5-1.el8.x86_64.rpm && \
     dnf --disableplugin=subscription-manager install --refresh -y \
