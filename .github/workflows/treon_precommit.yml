@@ -5,9 +5,7 @@ on:
   pull_request:
     branches:
       - 'main'
-      - 'master'
-      - '2021.4'
-      - 'develop'
+      - 'latest'
     paths:
       - 'notebooks/**.ipynb'
       - 'notebooks/**.py'
@@ -18,9 +16,7 @@ on:
   push:
     branches:
       - 'main'
-      - 'master'
-      - '2021.4'
-      - 'develop'
+      - 'latest'
     paths:
       - 'notebooks/**.ipynb'
       - 'notebooks/**.py'
