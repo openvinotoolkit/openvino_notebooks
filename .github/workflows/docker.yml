@@ -10,7 +10,7 @@ on:
   push:
     branches:
       - 'main'
-      - 'master'
+      - 'latest'
     paths:
       - 'Dockerfile'
       - '.docker/**'
@@ -23,7 +23,7 @@ on:
   pull_request:
     branches:
       - 'main'
-      - 'master'
+      - 'latest'
       - 'develop'
     paths:
       - 'Dockerfile'
