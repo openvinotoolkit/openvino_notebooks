@@ -10,8 +10,8 @@ python -c "import ovmsclient"
 export HUB_HOME=/tmp
 
 # Download CT scan image for 110 training notebook
-mkdir /opt/app-root/notebooks/110-ct-segmentation-quantize/kits19
-cd /opt/app-root/notebooks/110-ct-segmentation-quantize/kits19
+mkdir /opt/app-root/notebooks/ct-segmentation-quantize/kits19
+cd /opt/app-root/notebooks/ct-segmentation-quantize/kits19
 curl -O -C - https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
 unzip case_00030.zip
 mkdir kits19_frames

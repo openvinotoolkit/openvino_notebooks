@@ -2,7 +2,7 @@
 
 <h1 align="center">📚 OpenVINO™ Notebooks</h1>
 
-[![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/LICENSE)
+[![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/LICENSE)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/treon_precommit.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/treon_precommit.yml?query=event%3Apush)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml?query=event%3Apush)
 
@@ -87,7 +87,7 @@ OpenVINO™ Notebooks需要预装Python和Git， 针对不同操作系统的安�
 如果你希望启动单个的notebook（如：Monodepth notebook），运行以下命令：
 
 ```bash
-jupyter 201-vision-monodepth.ipynb
+jupyter vision-monodepth.ipynb
 ```
 
 ### 启动所有Notebooks

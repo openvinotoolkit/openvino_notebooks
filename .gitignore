@@ -103,9 +103,8 @@ dmypy.json
 notebooks/*/output/**
 notebooks/*/model/**
 notebooks/*/data/**
-
-# cache directory
-notebooks/cache/*
+notebooks/*/cache/**
+notebooks/*/.cache/**
 
 # Local pip cache directories
 pipcache/

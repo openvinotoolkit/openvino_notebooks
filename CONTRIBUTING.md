@@ -51,7 +51,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 1. The notebooks work on Windows, macOS and Linux (see [supported operating
    systems](https://github.com/openvinotoolkit/openvino_notebooks#%EF%B8%8F-system-requirements))
-   with Python 3.7, 3.8, 3.9 and 3.10.
+   with Python 3.8, 3.9, 3.10 and 3.11.
 2. As a rule, the notebooks do not require installation of additional software that is not installable by
    `pip`. We do not assume that users have installed XCode Developer Tools, Visual C++ redistributable,
    `cmake`, etc. Please discuss if your notebook does need C++ - there are exceptions to this rule.
@@ -89,13 +89,13 @@ To do this, there are a few requirements that all notebooks need to pass.
    and prevents dependency conflicts.
 2. The notebooks are located in the "notebooks" subdirectory. There is a subdirectory for every
    notebook, with generally the same base name as the notebook.  For example, the
-   `001-hello-world.ipynb` notebook can be found in the 001-hello-world directory.
+   `hello-world.ipynb` notebook can be found in the hello-world directory.
    - See the [Notebook naming](#notebook-naming) section below, for the
-     numbering of the notebooks.
+     naming of the notebooks.
    - Add a `README.md` to the notebook subdirectory. Add a screenshot that gives an indication of what
      the notebook does if applicable.
    - Avoid adding any other files to the notebook's subdirectory. Instead, rely on models and data samples available online and fetch them within the notebook. Please refer to the [Notebook utils](#notebook-utils) section.
-3. In case you want to utilize one of the Open Model Zoo models, refer to the [104 Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/main/notebooks/104-model-tools)
+3. In case you want to utilize one of the Open Model Zoo models, refer to the [Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/master/notebooks/model-tools)
    notebook.
 4. The notebooks should provide an easy way to clean up the downloaded data, for example with a
    commented-out cell at the end of the notebook.
@@ -110,7 +110,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    `function(a=1, b=2)` instead of `function(1, 2)`
 5. Use `from pathlib import Path` for path manipulation instead of `os.path`
 6. Add type hints to functions: [PEP 484](https://www.python.org/dev/peps/pep-0484/)
-7. Add REST style docstring (see [403](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/403-action-recognition-webcam/403-action-recognition-webcam.ipynb)
+7. Add REST style docstring (see [action-recognition-webcam](./notebooks/action-recognition-webcam/action-recognition-webcam.ipynb)
    for an example). It is not necessary to specify the parameter type in the docstring, since
    type hints are already added to the function definition.
 8. Do not use global variables in functions: a function should not depend on values that are
@@ -129,18 +129,17 @@ To do this, there are a few requirements that all notebooks need to pass.
    name, URL and license of the third party code to the `licensing/third-party-programs.txt` file.
 4. Don't use HTML for text cells, use Markdown markups instead.
 5. Add **Table of content** to top of the Notebook, it helps to get quick fist understanding of content and ease of navigation in the dev environment. There is no need to think about it during development, it can be built or updated after changes with `.ci\table_of_content.py`. Just run the script with the parameter `-s/--source`, specifying a Notebook or a folder with several notebooks as value, the changes will be applied to all of them.
+6. In case if notebook has specific requirements on python version or OS, it should be noted on top of notebook (before any code blocks) using
+   following colored block:
+   ```
+   <div class="alert alert-block alert-danger"> <b>Important note:</b> This notebook requires python >= 3.9. Please make sure that your environment fulfill to this requirement  before running it </div>
+   ```
 
 ### Notebook naming
 
-Names should be descriptive but not too long. We use the following numbering scheme:
-
-- `000-` hello world like notebooks: very small tutorials that help to quickly show how OpenVINO works.
-- `100-` OpenVINO tool tutorials: explain how to optimize and quantize notebooks.
-- `200-` OpenVINO model demos: demonstrate inference on a particular model.
-- `300-` Training notebooks: notebooks that include code to train neural networks.
-- `400-` Live demo notebooks: demonstrate inference on a live webcam.
-
-Please use the first available number in the branch, trying to fill the holes e.g. choose 206, when there are 205 and 207 and 206 is missing.
+ - Names should be descriptive but not too long.
+ - Please use hyphen symbol `-` (not underscore `_`) to separate words in directories and notebooks names.
+ - Directory name should match the corresponding notebook file name (e.g. `./hello-word/hello-word.ipynb`).
 
 ### `README.md` files
 
@@ -168,9 +167,9 @@ To maintain consistency between notebooks, please follow the directory structure
 
 ```markdown
 notebooks/
-└──<three-digit-number>-<title>/
+└──<title>/
    ├── README.md
-   ├── <three-digit-number>-<title>.ipynb
+   ├── <title>.ipynb
    ├── utils/
    ├── model/
    ├── data/

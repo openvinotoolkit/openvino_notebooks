@@ -1,6 +1,9 @@
 // @ts-check
 
+import { readFileSync } from 'fs';
 import { globSync } from 'glob';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 import { NOTEBOOKS_DIRECTORY_PATH } from './notebook-content-reader.js';
 import { NotebookMetadataCollector } from './notebook-metadata-collector.js';
@@ -22,10 +25,7 @@ export class NotebookMetadataHandler {
   }
 
   /** @private @const */
-  static _skippedNotebooks = [
-    '110-ct-segmentation-quantize/data-preparation-ct-scan.ipynb',
-    '110-ct-segmentation-quantize/pytorch-monai-training.ipynb',
-  ];
+  static _skippedNotebooks = this._getSkippedNotebooks();
 
   get metadata() {
     return this._metadata;
@@ -86,5 +86,16 @@ export class NotebookMetadataHandler {
   static validateAll() {
     const notebooksPaths = NotebookMetadataHandler.getNotebooksPaths();
     return NotebookMetadataHandler.validateNotebooks(notebooksPaths);
+  }
+
+  /** @private */
+  static _getSkippedNotebooks() {
+    const currentDirectory = dirname(fileURLToPath(import.meta.url));
+    const skippedNotebooksFilePath = join(currentDirectory, 'skipped-notebooks.txt');
+    const skippedNotebooksFileContent = readFileSync(skippedNotebooksFilePath, { encoding: 'utf8' });
+    return skippedNotebooksFileContent
+      .trim()
+      .split('\n')
+      .map((v) => v.trim());
   }
 }
