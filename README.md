@@ -6,7 +6,7 @@ English | [简体中文](README_cn.md)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/treon_precommit.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/treon_precommit.yml?query=event%3Apush)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml?query=event%3Apush)
 
-> **Note:** This branch of the notebooks repository is deprecated and will be maintained until September 30, 2024. The new branch offers a better user experience and simplifies maintenance due to significant refactoring and a more preferred folder name structure. Please use the local [README.md](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/README.md) file and [OpenVINO™ Notebooks at GitHub Pages](https://openvinotoolkit.github.io/openvino_notebooks/) to navigate through the content.
+> **Note:** This branch of the notebooks repository is deprecated and will be maintained until September 30, 2024. The new branch offers a better user experience and simplifies maintenance due to significant refactoring and a more preferred folder name structure. Please use the local [`README.md`](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/README.md) file and [OpenVINO™ Notebooks at GitHub Pages](https://openvinotoolkit.github.io/openvino_notebooks/) to navigate through the content.
 
 A collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit. The notebooks provide an introduction to OpenVINO basics and teach developers how to leverage our API for optimized deep learning inference.
 
