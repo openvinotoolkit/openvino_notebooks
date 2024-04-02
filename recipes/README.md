@@ -72,16 +72,16 @@ This solution implements automated reading of industrial meters, using cameras a
 
 This solution is designed to help automate checkout for retail businesses more effectively, by analyzing video streams and detecting and tracking interactions with retail products.
 
-### 🗣️ Voice-Enabled Assistant
-[![image](https://github.com/huggingface/optimum-intel/assets/4547501/1a871fb6-688c-4ddc-b5f6-a89c129dcef4)](voice_enabled_assistant)
+### 🗣️ Custom AI Assistant
+[![image](https://github.com/openvinotoolkit/openvino_notebooks/assets/4547501/ced161b8-c21a-492f-a438-d7d823c1195e)](custom_ai_assistant)
 
-| [Voice-Enabled Assistant](voice_enabled_assistant) |  |
+| [Custom AI Assistant](custom_ai_assistant) |  |
 |----------------------------------------------------| - |
 | Related AI concepts                                | Speech Recognition, Natural Language Understanding, Large Language Models (LLMs), Generative AI |
 | Example industries                                 | Retail Customer Service, Smart Home Automation |
 | Demo                                               |  |
 
-The Voice-Enabled Assistant, powered by the OpenVINO™ toolkit, integrates voice-activated interfaces into various applications. It employs advanced models for speech recognition, natural language processing, and speech synthesis. Additionally, the agent leverages the capabilities of Large Language Models (LLMs) and Generative AI, enabling it to understand complex queries, generate coherent responses, and offer a more dynamic and interactive communication experience. These advanced AI technologies enhance the agent's ability to engage in natural, human-like conversations, making it ideal for applications in customer service and smart home automation.
+The Custom AI Assistant, powered by the OpenVINO™ toolkit, integrates voice-activated interfaces into various applications. It employs advanced models for speech recognition, natural language processing, and speech synthesis. Additionally, the agent leverages the capabilities of Large Language Models (LLMs) and Generative AI, enabling it to understand complex queries, generate coherent responses, and offer a more dynamic and interactive communication experience. These advanced AI technologies enhance the agent's ability to engage in natural, human-like conversations, making it ideal for applications in customer service and smart home automation.
 
 ### 🔦 Explainable AI
 | [Explainable AI](explainable_ai) |  |
