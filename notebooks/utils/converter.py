@@ -453,22 +453,6 @@ def convert_default(pt_model: torch.nn.Module, model_path: Path):
     del ov_model
     cleanup_torchscript_cache()
     del pt_model
-    
-    
-
-def convert_mpnet(pt_model: torch.nn.Module, model_path: Path):
-    ov_out_path = Path(model_path) / "openvino_model.xml"
-    dummy_inputs = {"input_ids": torch.ones((1, 10), dtype=torch.long), "attention_mask": torch.ones(
-    (1, 10), dtype=torch.long)}
-    ov_model = ov.convert_model(pt_model, example_input=dummy_inputs)
-    ov.save_model(ov_model, ov_out_path)
-    
-def convert_bert(pt_model: torch.nn.Module, model_path: Path):
-    ov_out_path = Path(model_path) / "openvino_model.xml"
-    dummy_inputs = {"input_ids": torch.ones((1, 10), dtype=torch.long), "attention_mask": torch.ones(
-    (1, 10), dtype=torch.long), "token_type_ids": torch.zeros((1, 10), dtype=torch.long)}
-    ov_model = ov.convert_model(pt_model, example_input=dummy_inputs)
-    ov.save_model(ov_model, ov_out_path)
 
     
 converters = {
@@ -478,7 +462,4 @@ converters = {
     "qwen": convert_qwen,
     "baichuan2": convert_default,
     "gemma": convert_default,
-    # embedding models
-    "all-mpnet-base-v2": convert_mpnet,
-    "text2vec-large-chinese": convert_bert,
 }

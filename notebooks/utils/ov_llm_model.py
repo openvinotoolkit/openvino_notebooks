@@ -1,13 +1,12 @@
-from transformers import PretrainedConfig, AutoTokenizer
+from transformers import PretrainedConfig
 
 from optimum.utils import NormalizedTextConfig, NormalizedConfigManager
 from optimum.intel.openvino import OVModelForCausalLM
 from transformers.modeling_outputs import CausalLMOutputWithPast
 from optimum.intel.openvino.utils import OV_XML_FILE_NAME
 from pathlib import Path
-from typing import Optional, Union, Dict, Tuple, Any, List
+from typing import Optional, Union, Dict, Tuple
 from pathlib import Path
-import openvino as ov
 import torch
 import numpy as np
 
