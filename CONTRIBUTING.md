@@ -202,7 +202,7 @@ Any datasets, images or videos used for fine-tuning, quantization or inference i
 
 ### Notebook utils
 
-The `notebook_utils.py` file in the `notebooks/utils` directory contains utility functions and classes that can be reused across
+The `notebook_utils.py` file in the `./utils` directory (in the repository root) contains utility functions and classes that can be reused across
 notebooks. It contains a `download_file()` function that optionally shows a progress bar, and a standard way to convert
 segmentation maps to images and display them. The Python file is generated from `notebook_utils.ipynb` notebook in the same directory.
 If you want to add a function or class to `notebook_utils.py`, please add it to the notebook, and generate the
