@@ -243,9 +243,9 @@ def create_UI(initial_message: str) -> gr.Blocks:
     Returns:
         Demo UI
     """
-    with gr.Blocks(title="Talk to Adrishuo - a voice-enabled assistant working as a healthcare assistant") as demo:
+    with gr.Blocks(title="Talk to Adrishuo - a custom AI assistant working as a healthcare assistant") as demo:
         gr.Markdown("""
-        # Talk to Adrishuo - a voice-enabled assistant working as a healthcare assistant
+        # Talk to Adrishuo - a custom AI assistant working today as a healthcare assistant
 
         Instructions for use:
         - record your question/comment using the first audio widget ("Your voice input")

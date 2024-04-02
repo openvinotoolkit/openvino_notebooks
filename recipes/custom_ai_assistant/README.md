@@ -1,8 +1,8 @@
-# Voice-Enabled Assistant with OpenVINO™
+# Custom AI Assistant with OpenVINO™
 
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/LICENSE)
 
-The Voice-Enabled Assistant utilizes the OpenVINO™ toolkit to create a streamlined, voice-activated interface that developers can easily integrate and deploy. At its core, the application harnesses state-of-the-art models for speech recognition and natural language understanding. It's configured to understand user prompts and engage in dialogue, facilitating an interactive and user-friendly conversational agent.
+The Custom AI Assistant utilizes the OpenVINO™ toolkit to create a streamlined, voice-activated interface that developers can easily integrate and deploy. At its core, the application harnesses state-of-the-art models for speech recognition and natural language understanding. It's configured to understand user prompts and engage in dialogue, facilitating an interactive and user-friendly conversational agent.
 
 ## Getting Started
 
@@ -33,7 +33,7 @@ git clone -b recipes https://github.com/openvinotoolkit/openvino_notebooks.git o
 The above will clone the repository into a directory named "openvino_notebooks" in the current directory. Then, navigate into the directory using the following command:
 
 ```shell
-cd openvino_notebooks/recipes/voice_enabled_assistant
+cd openvino_notebooks/recipes/custom_ai_assistant
 ```
 
 #### Creating a Virtual Environment
@@ -120,19 +120,19 @@ python app.py --asr_model_dir path/to/asr_model --chat_model_dir path/to/chat_mo
 Make sure to replace `path/to/asr_model` and `path/to/chat_model` with actual paths to your respective models. Add `--public_interface` to make it publicly accessible.
 
 ### Accessing the Web Interface
-Upon successful execution of the script, Gradio will provide a local URL, typically `http://127.0.0.1:XXXX`, which you can open in your web browser to start interacting with the voice agent. If you configured the application to be accessible publicly, Gradio will also provide a public URL.
+Upon successful execution of the script, Gradio will provide a local URL, typically `http://127.0.0.1:XXXX`, which you can open in your web browser to start interacting with the assistant. If you configured the application to be accessible publicly, Gradio will also provide a public URL.
 
 Trying Out the Application
 1. Navigate to the provided Gradio URL in your web browser.
 2. You will see the Gradio interface with options to input voice.
 3. To interact using voice:
     - Click on the microphone icon and speak your query.
-    - Wait for the voice agent to process your speech and respond.
-4. The voice agent will respond to your query in text.
+    - Wait for the assistant to process your speech and respond.
+4. The assistant will respond to your query in text.
 
-Feel free to engage with the Voice-Enabled Assistant, ask questions, or give commands as per the assistant's capabilities. This hands-on experience will help you better understand the assistant's interactive quality and performance.
+Feel free to engage with the Custom AI Assistant, ask questions, or give commands as per the assistant's capabilities. This hands-on experience will help you better understand the assistant's interactive quality and performance.
 
-Enjoy exploring the capabilities of your Voice-Enabled Assistant!
+Enjoy exploring the capabilities of your Custom AI Assistant!
 
 ## Troubleshooting and Resources
 - Open a [discussion topic](https://github.com/openvinotoolkit/openvino_notebooks/discussions)
