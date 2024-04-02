@@ -12,7 +12,7 @@
 	- [⏲️ Smart Meter Scanning](#%EF%B8%8F-smart-meter-scanning)
 	- [🛍️ Automated Self-Checkout](#%EF%B8%8F-automated-self-checkout)
 	- [🗣️ Voice-Enabled Assistant](#%EF%B8%8F-voice-enabled-assistant)
-	- [🔦 Explainable AI](#%EF%B8%8F-explainable-ai) 
+	- [🔦 Explainable AI](#-explainable-ai) 
 - [Future Kits](#future-kits)
 
 - [Troubleshooting and Resources](#troubleshooting-and-resources)
