@@ -23,3 +23,4 @@ notebooks/mobileclip-video-search/mobileclip-video-search.ipynb # install requir
 notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb # requires python >=3.9
 notebooks/ct-segmentation-quantize/data-preparation-ct-scan.ipynb # not executed in validation
 notebooks/ct-segmentation-quantize/pytorch-monai-training.ipynb # outdated required version, lead to long execution
+notebooks/depth-estimation-videpth/depth-estimation-videpth.ipynb # outdated required version, lead to long execution
