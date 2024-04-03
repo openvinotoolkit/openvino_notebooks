@@ -6,7 +6,6 @@ on:
     branches:
       - 'main'
       - 'latest'
-      - 'develop'
     paths:
       - '.ci/spellcheck/*'
       - 'README.md'
