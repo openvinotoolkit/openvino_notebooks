@@ -25,7 +25,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           fetch-depth: 0
-          # token: ${{ secrets.GH_ACTIONS_BOT_TOKEN }}
+          token: ${{ secrets.GH_ACTIONS_BOT_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
