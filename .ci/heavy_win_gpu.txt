@@ -1,0 +1,12 @@
+detectron2-to-openvino
+knowledge-graphs-conve
+instruct-pix2pix-image-editing
+controlnet-stable-diffusion
+stable-diffusion-text-to-image
+qrcode-monster
+wuerstchen-image-generation
+film-slowmo
+sdxl-turbo
+paint-by-example
+instant-id
+tensorflow-quantization-aware-training
