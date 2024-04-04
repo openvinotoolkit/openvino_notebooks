@@ -16,7 +16,6 @@
 
 import copy
 import logging
-import sys
 import threading
 import time
 from collections import deque
@@ -27,8 +26,16 @@ import cv2
 
 from custom_segmentation import Model
 
-sys.path.append("../utils")
+
+# Fetch `notebook_utils` module
+import urllib.request
+
+urllib.request.urlretrieve(
+    url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
+    filename='notebook_utils.py'
+)
 from notebook_utils import show_array
+
 
 def show_live_inference(
     ie, image_paths: List, model: Model, device: str, reader: Optional[Callable] = None

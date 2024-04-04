@@ -8,7 +8,13 @@ from os import PathLike
 from openvino.runtime import PartialShape
 import logging
 
-sys.path.append("../utils")
+# Fetch `notebook_utils` module
+import urllib.request
+
+urllib.request.urlretrieve(
+    url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
+    filename='notebook_utils.py'
+)
 from notebook_utils import segmentation_map_to_overlay
 
 

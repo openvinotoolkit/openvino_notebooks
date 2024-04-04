@@ -8,9 +8,15 @@ from typing import Tuple, Union
 from pathlib import Path
 from PIL import Image
 
-import sys
-sys.path.append("../utils")
+# Fetch `notebook_utils` module
+import urllib.request
+
+urllib.request.urlretrieve(
+    url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
+    filename="notebook_utils.py",
+)
 from notebook_utils import download_file
+
 
 class TextEncoder:
     """
