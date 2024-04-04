@@ -31,7 +31,7 @@ from custom_segmentation import Model
 import urllib.request
 
 urllib.request.urlretrieve(
-    url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
+    url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/notebooks/utils/notebook_utils.py',
     filename='notebook_utils.py'
 )
 from notebook_utils import show_array
