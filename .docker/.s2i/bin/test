@@ -3,7 +3,7 @@
 set -eo pipefail
 
 # Test that jupyterhub and ovmsclient imports work (required for image to work in RedHat cluster)
-python -c "from jupyterhub.singleuser import SingleUserNotebookApp as SingleUserServerApp"
+python -c "from jupyterhub.singleuser.mixins import make_singleuser_app"
 python -c "import ovmsclient"
 
 # Required for PaddlePaddle
