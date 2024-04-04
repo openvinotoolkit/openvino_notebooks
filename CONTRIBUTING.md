@@ -95,7 +95,7 @@ To do this, there are a few requirements that all notebooks need to pass.
    - Add a `README.md` to the notebook subdirectory. Add a screenshot that gives an indication of what
      the notebook does if applicable.
    - Avoid adding any other files to the notebook's subdirectory. Instead, rely on models and data samples available online and fetch them within the notebook. Please refer to the [Notebook utils](#notebook-utils) section.
-3. In case you want to utilize one of the Open Model Zoo models, refer to the [Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/master/notebooks/model-tools)
+3. In case you want to utilize one of the Open Model Zoo models, refer to the [Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/model-tools)
    notebook.
 4. The notebooks should provide an easy way to clean up the downloaded data, for example with a
    commented-out cell at the end of the notebook.
@@ -202,7 +202,7 @@ Any datasets, images or videos used for fine-tuning, quantization or inference i
 
 ### Notebook utils
 
-The `notebook_utils.py` file in the `notebooks/utils` directory contains utility functions and classes that can be reused across
+The `notebook_utils.py` file in the `./utils` directory (in the repository root) contains utility functions and classes that can be reused across
 notebooks. It contains a `download_file()` function that optionally shows a progress bar, and a standard way to convert
 segmentation maps to images and display them. The Python file is generated from `notebook_utils.ipynb` notebook in the same directory.
 If you want to add a function or class to `notebook_utils.py`, please add it to the notebook, and generate the
