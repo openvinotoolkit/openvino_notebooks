@@ -12,8 +12,8 @@ import logging
 import urllib.request
 
 urllib.request.urlretrieve(
-    url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/notebooks/utils/notebook_utils.py',
-    filename='notebook_utils.py'
+    url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
+    filename="notebook_utils.py",
 )
 from notebook_utils import segmentation_map_to_overlay
 
@@ -25,7 +25,7 @@ def sigmoid(x):
 class Model:
     def __init__(self, ie, model_path, input_transform=None):
         self.logger = logging.getLogger()
-        self.logger.info('Reading model from IR...')
+        self.logger.info("Reading model from IR...")
         self.net = ie.read_model(model_path)
         self.set_batch_size(1)
         self.input_transform = input_transform
@@ -56,7 +56,7 @@ class SegmentationModel(Model):
         sigmoid=False,
         argmax=False,
         rgb=False,
-        rotate_and_flip=False
+        rotate_and_flip=False,
     ):
         """
         Segmentation Model for use with Async Pipeline.
@@ -81,7 +81,10 @@ class SegmentationModel(Model):
         self.output_layer = self.net.output(0)
         if resize_shape is not None:
             self.net.reshape({self.input_layer: PartialShape(resize_shape)})
-        self.image_height, self.image_width = self.input_layer.shape[2], self.input_layer.shape[3]
+        self.image_height, self.image_width = (
+            self.input_layer.shape[2],
+            self.input_layer.shape[3],
+        )
 
         if colormap is None and self.output_layer.shape[1] == 1:
             self.colormap = np.array([[0, 0, 0], [0, 0, 255]])
@@ -111,7 +114,7 @@ class SegmentationModel(Model):
     def postprocess(self, outputs, preprocess_meta, to_rgb=False):
         """
         Convert raw network results into a segmentation map with overlay. Returns
-        a BGR image for further processing with OpenCV. 
+        a BGR image for further processing with OpenCV.
         """
         alpha = 0.4
 
@@ -135,5 +138,7 @@ class SegmentationModel(Model):
             bgr_frame, result_mask_ir, alpha, colormap=self.colormap
         )
         if self.rotate_and_flip:
-            overlay = cv2.flip(cv2.rotate(overlay, rotateCode=cv2.ROTATE_90_CLOCKWISE), flipCode=1)
+            overlay = cv2.flip(
+                cv2.rotate(overlay, rotateCode=cv2.ROTATE_90_CLOCKWISE), flipCode=1
+            )
         return overlay

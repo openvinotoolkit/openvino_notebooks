@@ -12,7 +12,7 @@ from PIL import Image
 import urllib.request
 
 urllib.request.urlretrieve(
-    url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/notebooks/utils/notebook_utils.py",
+    url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     filename="notebook_utils.py",
 )
 from notebook_utils import download_file
@@ -26,7 +26,9 @@ class TextEncoder:
     into the `stage_1.encode_prompt` routine.
     """
 
-    def __init__(self, ir_path: Union[str, Path], dtype: torch.dtype, device: str = 'CPU') -> None:
+    def __init__(
+        self, ir_path: Union[str, Path], dtype: torch.dtype, device: str = "CPU"
+    ) -> None:
         """
         Init the adapter with the IR model path.
 
@@ -41,7 +43,9 @@ class TextEncoder:
         self.dtype = dtype
         self.encoder_openvino = ov.Core().compile_model(self.ir_path, device)
 
-    def __call__(self, input_ids: torch.LongTensor, attention_mask: torch.FloatTensor = None):
+    def __call__(
+        self, input_ids: torch.LongTensor, attention_mask: torch.FloatTensor = None
+    ):
         """Adapt the network call."""
         result = self.encoder_openvino(input_ids)
         result_numpy = result[self.encoder_openvino.outputs[0]]
@@ -49,7 +53,7 @@ class TextEncoder:
 
 
 # The pipelines for Stages 1 and 2 expect the UNet models to return an object containing a sample attribute.
-result_tuple = namedtuple('result', 'sample')
+result_tuple = namedtuple("result", "sample")
 
 
 class UnetFirstStage:
@@ -60,11 +64,13 @@ class UnetFirstStage:
     the `stage_1` diffusion pipeline.
     """
 
-    def __init__(self, unet_ir_path: Union[str, Path],
-                 config: diffusers.configuration_utils.FrozenDict,
-                 dtype: torch.dtype,
-                 device: str = 'CPU'
-                 ) -> None:
+    def __init__(
+        self,
+        unet_ir_path: Union[str, Path],
+        config: diffusers.configuration_utils.FrozenDict,
+        dtype: torch.dtype,
+        device: str = "CPU",
+    ) -> None:
         """
         Init the adapter with the IR model path and model config.
 
@@ -80,14 +86,15 @@ class UnetFirstStage:
         self.config = config
         self.dtype = dtype
 
-    def __call__(self,
-                 sample: torch.FloatTensor,
-                 timestamp: int,
-                 encoder_hidden_states: torch.Tensor,
-                 class_labels: torch.Tensor = None,
-                 cross_attention_kwargs: int = None,
-                 return_dict: bool = False  # pipeline uses this argument when calling
-                ) -> Tuple:
+    def __call__(
+        self,
+        sample: torch.FloatTensor,
+        timestamp: int,
+        encoder_hidden_states: torch.Tensor,
+        class_labels: torch.Tensor = None,
+        cross_attention_kwargs: int = None,
+        return_dict: bool = False,  # pipeline uses this argument when calling
+    ) -> Tuple:
         """
         Adapt the network call.
 
@@ -107,11 +114,13 @@ class UnetSecondStage:
     the `stage_2` diffusion pipeline.
     """
 
-    def __init__(self, unet_ir_path: Union[str, Path],
-                 config: diffusers.configuration_utils.FrozenDict,
-                 dtype: torch.dtype,
-                 device: str = 'CPU'
-                 ) -> None:
+    def __init__(
+        self,
+        unet_ir_path: Union[str, Path],
+        config: diffusers.configuration_utils.FrozenDict,
+        dtype: torch.dtype,
+        device: str = "CPU",
+    ) -> None:
         """
         Init the adapter with the IR model path and model config.
 
@@ -127,21 +136,24 @@ class UnetSecondStage:
         self.config = config
         self.dtype = dtype
 
-    def __call__(self,
-                 sample: torch.FloatTensor,
-                 timestamp: int,
-                 encoder_hidden_states: torch.Tensor,
-                 class_labels: torch.Tensor = None,
-                 cross_attention_kwargs: int = None,
-                 return_dict: bool = False  # pipeline uses this argument when calling
-                ) -> Tuple:
+    def __call__(
+        self,
+        sample: torch.FloatTensor,
+        timestamp: int,
+        encoder_hidden_states: torch.Tensor,
+        class_labels: torch.Tensor = None,
+        cross_attention_kwargs: int = None,
+        return_dict: bool = False,  # pipeline uses this argument when calling
+    ) -> Tuple:
         """
         Adapt the network call.
 
         To learn more abould the model parameters please refer to
         its source code: https://github.com/huggingface/diffusers/blob/7200985eab7126801fffcf8251fd149c1cf1f291/src/diffusers/models/unet_2d_condition.py#L610
         """
-        result = self.unet_openvino([sample, timestamp, encoder_hidden_states, class_labels])
+        result = self.unet_openvino(
+            [sample, timestamp, encoder_hidden_states, class_labels]
+        )
         result_numpy = result[self.unet_openvino.outputs[0]]
         return result_tuple(torch.tensor(result_numpy, dtype=self.dtype))
 
@@ -156,22 +168,21 @@ def convert_result_to_image(result) -> np.ndarray:
     result = 255 * result.squeeze(0).transpose(1, 2, 0)
     result[result < 0] = 0
     result[result > 255] = 255
-    return Image.fromarray(result.astype(np.uint8), 'RGB')
+    return Image.fromarray(result.astype(np.uint8), "RGB")
 
 
 def download_omz_model(model_name, models_dir):
-    sr_model_xml_name = f'{model_name}.xml'
-    sr_model_bin_name = f'{model_name}.bin'
+    sr_model_xml_name = f"{model_name}.xml"
+    sr_model_bin_name = f"{model_name}.bin"
 
     sr_model_xml_path = models_dir / sr_model_xml_name
 
     if not sr_model_xml_path.exists():
-        base_url = f'https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1/{model_name}/FP16/'
+        base_url = f"https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1/{model_name}/FP16/"
         model_xml_url = base_url + sr_model_xml_name
         model_bin_url = base_url + sr_model_bin_name
 
         download_file(model_xml_url, sr_model_xml_name, models_dir)
         download_file(model_bin_url, sr_model_bin_name, models_dir)
     else:
-        print(f'{model_name} already downloaded to {models_dir}')
-
+        print(f"{model_name} already downloaded to {models_dir}")
