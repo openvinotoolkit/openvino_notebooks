@@ -17,6 +17,7 @@ ALiBi
 AlpacaEval
 aMUSEd
 analytics
+AnimateAnyone
 AnimeGAN
 Antelopev
 api
@@ -98,6 +99,7 @@ Connectionist
 ContentVec
 Contrastive
 contrastive
+controllability
 ControlNet
 ControlNets
 controlnet
@@ -376,6 +378,7 @@ lraspp
 LRASPP
 LTS
 LSTM
+LSTMs
 Luo
 LVLM
 macOS
@@ -445,6 +448,7 @@ NEOX
 NER
 NETP
 NeuSpell
+NeXT
 NLP
 NMS
 nn
@@ -600,6 +604,7 @@ realtime
 rebase
 redistributable
 RedPajama
+ReferenceNet
 RegNet
 RegNetY
 regressively
@@ -763,6 +768,7 @@ unCLIP
 uncomment
 uncompressing
 UNet
+UNets
 Unet
 Unimodal
 unsqueeze

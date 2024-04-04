@@ -58,3 +58,5 @@ stable-diffusion-keras-cv
 tensorflow-training-openvino
 tensorflow-quantization-aware-training
 style-transfer-webcam
+animate-anyone
+llava-next-multimodal-chatbot
