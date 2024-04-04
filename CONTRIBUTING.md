@@ -204,10 +204,7 @@ Any datasets, images or videos used for fine-tuning, quantization or inference i
 
 The `notebook_utils.py` file in the `./utils` directory (in the repository root) contains utility functions and classes that can be reused across
 notebooks. It contains a `download_file()` function that optionally shows a progress bar, and a standard way to convert
-segmentation maps to images and display them. The Python file is generated from `notebook_utils.ipynb` notebook in the same directory.
-If you want to add a function or class to `notebook_utils.py`, please add it to the notebook, and generate the
-Python file with `jupyter nbconvert notebook_utils.ipynb --TagRemovePreprocessor.remove_cell_tags=hide --to script`
-Add a "hide" tag to any demo cells (from the right side gear sidebar) to prevent these cells from being added to the script.
+segmentation maps to images and display them.
 
 
 ### Interactive inference with Gradio
