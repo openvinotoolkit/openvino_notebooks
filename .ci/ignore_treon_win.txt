@@ -55,3 +55,4 @@ photo-maker
 openvoice
 instant-id
 animate-anyone
+llava-next-multimodal-chatbot

@@ -17,7 +17,7 @@ The tutorial consists from following steps:
 - Launch Interactive demo
 
 In this demonstration, you'll create interactive chatbot that can answer questions about provided image's content. Image bellow shows a result of model work.
-![](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/51263b7c-fff4-454b-b347-fb16bdc7673)
+![](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/a562e9de-5b94-4e24-ac52-532019fc92d3)
 
 
 ## Installation instructions
