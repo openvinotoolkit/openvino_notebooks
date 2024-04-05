@@ -25,3 +25,4 @@ notebooks/ct-segmentation-quantize/data-preparation-ct-scan.ipynb # not executed
 notebooks/ct-segmentation-quantize/pytorch-monai-training.ipynb # outdated required version, lead to long execution
 notebooks/depth-estimation-videpth/depth-estimation-videpth.ipynb # outdated required version, lead to long execution
 notebooks/animate-anyone/animate-anyone.ipynb # install requirements.txt after clone repo
+notebooks/whisper-subtitles-generation/whisper-convert.ipynb # pytube
