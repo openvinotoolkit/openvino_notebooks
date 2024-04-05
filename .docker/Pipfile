@@ -16,7 +16,7 @@ ipython = ">=7.16.3"  # pin to avoid vulnerability
 ipywidgets = "*"
 jedi = ">=0.17.2"
 jupyter-nbrequirements = "*"
-jupyterhub = "==2.2.*"
+jupyterhub = "==4.1.*"
 jupyterlab = "*"
 jupyterlab-git = "==0.30"
 librosa = ">=0.8.1"

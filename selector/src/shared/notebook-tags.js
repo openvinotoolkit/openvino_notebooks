@@ -24,6 +24,7 @@ export const TASKS = /** @type {const} */ ({
     TEXT_TO_IMAGE_RETRIEVAL: "Text-to-Image Retrieval",
     IMAGE_TO_TEXT_RETRIEVAL: "Image-to-Text Retrieval",
     IMAGE_TO_3D: "Image-to-3D",
+    IMAGE_TO_VIDEO: "Image-to-Video"
   },
   CV: {
     IMAGE_CLASSIFICATION: 'Image Classification',

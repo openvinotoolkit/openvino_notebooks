@@ -58,3 +58,5 @@ instant-id
 grounded-segment-anything
 style-transfer-webcam
 triposr-3d-reconstruction
+animate-anyone
+llava-next-multimodal-chatbot

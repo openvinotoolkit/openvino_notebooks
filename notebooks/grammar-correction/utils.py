@@ -21,16 +21,17 @@ def collect_calibration_data(grammar_corrector_pipe_fp32: Pipeline, calibration_
     ov_decoder = grammar_corrector_pipe_fp32.model.decoder_with_past
 
     # Wrap decoder inference for data collection
-    original_infer_request = ov_decoder.request
-    ov_decoder.request = InferRequestWrapper(original_infer_request, calibration_data)
+    ov_decoder.request = InferRequestWrapper(ov_decoder.request, calibration_data, apply_caching=True)
 
     # Run inference for data collection
-    calibration_dataset = datasets.load_dataset("jfleg", split="validation").shuffle(seed=42)[:calibration_dataset_size]
-    for data_item in tqdm(calibration_dataset["sentence"], total=calibration_dataset_size,
-                          desc="Collecting calibration data"):
-        grammar_corrector_pipe_fp32(data_item)
-
-    ov_decoder.request = original_infer_request
+    try:
+        calibration_dataset = datasets.load_dataset("jfleg", split="validation")
+        calibration_dataset = calibration_dataset.shuffle(seed=42)[:calibration_dataset_size]
+        for data_item in tqdm(calibration_dataset["sentence"], total=calibration_dataset_size,
+                              desc="Collecting calibration data"):
+            grammar_corrector_pipe_fp32(data_item)
+    finally:
+        ov_decoder.request = ov_decoder.request.request
 
     return calibration_data
 

@@ -31,4 +31,4 @@ The notebook contains a detailed tutorial of the visual-inertial depth estimatio
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/pronoym99/openvino_notebooks/blob/master/README.md#-installation-guide).
+If you have not installed all required dependencies, follow the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/README.md#-installation-guide).

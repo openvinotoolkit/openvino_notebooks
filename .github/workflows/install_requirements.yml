@@ -5,7 +5,7 @@ on:
   pull_request:
     branches:
       - 'main'
-      - 'master'
+      - 'latest'
     paths:
       - '.github/workflows/install_requirements.yml'
       - 'check_install.py'
