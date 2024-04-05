@@ -16,7 +16,6 @@
 
 import copy
 import logging
-import sys
 import threading
 import time
 from collections import deque
@@ -27,8 +26,16 @@ import cv2
 
 from custom_segmentation import Model
 
-sys.path.append("../utils")
+
+# Fetch `notebook_utils` module
+import urllib.request
+
+urllib.request.urlretrieve(
+    url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
+    filename="notebook_utils.py",
+)
 from notebook_utils import show_array
+
 
 def show_live_inference(
     ie, image_paths: List, model: Model, device: str, reader: Optional[Callable] = None
@@ -97,88 +104,104 @@ def show_live_inference(
     duration = end_time - start_time
     fps = len(image_paths) / duration
     print(f"Loaded model to {device} in {load_end_time-load_start_time:.2f} seconds.")
-    print(f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}")
+    print(
+        f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}"
+    )
 
     del pipeline.exec_net
     del pipeline
 
 
 def parse_devices(device_string):
-    colon_position = device_string.find(':')
+    colon_position = device_string.find(":")
     if colon_position != -1:
         device_type = device_string[:colon_position]
-        if device_type == 'HETERO' or device_type == 'MULTI':
-            comma_separated_devices = device_string[colon_position + 1:]
-            devices = comma_separated_devices.split(',')
+        if device_type == "HETERO" or device_type == "MULTI":
+            comma_separated_devices = device_string[colon_position + 1 :]
+            devices = comma_separated_devices.split(",")
             for device in devices:
-                parenthesis_position = device.find(':')
+                parenthesis_position = device.find(":")
                 if parenthesis_position != -1:
                     device = device[:parenthesis_position]
             return devices
     return (device_string,)
 
 
-def parse_value_per_device(devices: Set[str], values_string: str)-> Dict[str, int]:
+def parse_value_per_device(devices: Set[str], values_string: str) -> Dict[str, int]:
     """Format: <device1>:<value1>,<device2>:<value2> or just <value>"""
     values_string_upper = values_string.upper()
     result = {}
-    device_value_strings = values_string_upper.split(',')
+    device_value_strings = values_string_upper.split(",")
     for device_value_string in device_value_strings:
-        device_value_list = device_value_string.split(':')
+        device_value_list = device_value_string.split(":")
         if len(device_value_list) == 2:
             if device_value_list[0] in devices:
                 result[device_value_list[0]] = int(device_value_list[1])
-        elif len(device_value_list) == 1 and device_value_list[0] != '':
+        elif len(device_value_list) == 1 and device_value_list[0] != "":
             for device in devices:
                 result[device] = int(device_value_list[0])
-        elif device_value_list[0] != '':
-            raise RuntimeError(f'Unknown string format: {values_string}')
+        elif device_value_list[0] != "":
+            raise RuntimeError(f"Unknown string format: {values_string}")
     return result
 
 
-def get_user_config(flags_d: str, flags_nstreams: str, flags_nthreads: int)-> Dict[str, str]:
+def get_user_config(
+    flags_d: str, flags_nstreams: str, flags_nthreads: int
+) -> Dict[str, str]:
     config = {}
 
     devices = set(parse_devices(flags_d))
 
     device_nstreams = parse_value_per_device(devices, flags_nstreams)
     for device in devices:
-        if device == 'CPU':  # CPU supports a few special performance-oriented keys
+        if device == "CPU":  # CPU supports a few special performance-oriented keys
             # limit threading for CPU portion of inference
             if flags_nthreads:
-                config['CPU_THREADS_NUM'] = str(flags_nthreads)
+                config["CPU_THREADS_NUM"] = str(flags_nthreads)
 
-            config['CPU_BIND_THREAD'] = 'NO'
+            config["CPU_BIND_THREAD"] = "NO"
 
             # for CPU execution, more throughput-oriented execution via streams
-            config['CPU_THROUGHPUT_STREAMS'] = str(device_nstreams[device]) \
-                if device in device_nstreams else 'CPU_THROUGHPUT_AUTO'
-        elif device == 'GPU':
-            config['GPU_THROUGHPUT_STREAMS'] = str(device_nstreams[device]) \
-                if device in device_nstreams else 'GPU_THROUGHPUT_AUTO'
-            if 'MULTI' in flags_d and 'CPU' in devices:
+            config["CPU_THROUGHPUT_STREAMS"] = (
+                str(device_nstreams[device])
+                if device in device_nstreams
+                else "CPU_THROUGHPUT_AUTO"
+            )
+        elif device == "GPU":
+            config["GPU_THROUGHPUT_STREAMS"] = (
+                str(device_nstreams[device])
+                if device in device_nstreams
+                else "GPU_THROUGHPUT_AUTO"
+            )
+            if "MULTI" in flags_d and "CPU" in devices:
                 # multi-device execution with the CPU + GPU performs best with GPU throttling hint,
                 # which releases another CPU thread (that is otherwise used by the GPU driver for active polling)
-                config['GPU_PLUGIN_THROTTLE'] = '1'
+                config["GPU_PLUGIN_THROTTLE"] = "1"
     return config
 
 
 class AsyncPipeline:
-    def __init__(self, ie, model, plugin_config, device='CPU', max_num_requests=0):
+    def __init__(self, ie, model, plugin_config, device="CPU", max_num_requests=0):
         cache_path = Path("model_cache")
         cache_path.mkdir(exist_ok=True)
         # Enable model caching for GPU devices
         if "GPU" in device and "GPU" in ie.available_devices:
-            ie.set_property(device_name="GPU", properties={"CACHE_DIR": str(cache_path)})
+            ie.set_property(
+                device_name="GPU", properties={"CACHE_DIR": str(cache_path)}
+            )
 
         self.model = model
         self.logger = logging.getLogger()
 
-        self.logger.info('Loading network to {} plugin...'.format(device))
+        self.logger.info("Loading network to {} plugin...".format(device))
         self.exec_net = ie.compile_model(self.model.net, device, plugin_config)
         if max_num_requests == 0:
-            max_num_requests = self.exec_net.get_property('OPTIMAL_NUMBER_OF_INFER_REQUESTS') + 1
-        self.requests = [self.exec_net.create_infer_request() for _ in range(max_num_requests)]
+            max_num_requests = (
+                self.exec_net.get_property("OPTIMAL_NUMBER_OF_INFER_REQUESTS") + 1
+            )
+        self.requests = [
+            self.exec_net.create_infer_request() for _ in range(max_num_requests)
+        ]
         self.empty_requests = deque(self.requests)
         self.completed_request_results = {}
         self.callback_exceptions = []
@@ -187,7 +210,12 @@ class AsyncPipeline:
     def inference_completion_callback(self, callback_args):
         try:
             request, id, meta, preprocessing_meta = callback_args
-            raw_outputs = {idx: copy.deepcopy(res.data) for idx, (out, res) in enumerate(zip(request.model_outputs, request.output_tensors))}
+            raw_outputs = {
+                idx: copy.deepcopy(res.data)
+                for idx, (out, res) in enumerate(
+                    zip(request.model_outputs, request.output_tensors)
+                )
+            }
             self.completed_request_results[id] = (raw_outputs, meta, preprocessing_meta)
             self.empty_requests.append(request)
         except Exception as e:
@@ -200,7 +228,9 @@ class AsyncPipeline:
         if len(self.empty_requests) == 0:
             self.event.clear()
         inputs, preprocessing_meta = self.model.preprocess(inputs)
-        request.set_callback(self.inference_completion_callback, (request, id, meta, preprocessing_meta))
+        request.set_callback(
+            self.inference_completion_callback, (request, id, meta, preprocessing_meta)
+        )
         request.start_async(inputs=inputs)
         request.wait()
 

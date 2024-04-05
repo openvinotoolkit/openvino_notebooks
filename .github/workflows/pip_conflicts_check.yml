@@ -5,14 +5,13 @@ on:
   pull_request:
     branches:
       - 'main'
-      - 'master'
-      - 'develop'
+      - 'latest'
     paths:
       - 'notebooks/**.ipynb'
   push:
     branches:
       - 'main'
-      - 'master'
+      - 'latest'
     paths:
       - 'notebooks/**.ipynb'
 

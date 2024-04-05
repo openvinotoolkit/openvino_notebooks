@@ -2,7 +2,7 @@ English | [简体中文](README_cn.md)
 
 <h1>📚 OpenVINO™ Notebooks</h1>
 
-[![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/master/LICENSE)
+[![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/LICENSE)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/treon_precommit.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/treon_precommit.yml?query=event%3Apush)
 [![CI](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml/badge.svg?event=push)](https://github.com/openvinotoolkit/openvino_notebooks/actions/workflows/docker.yml?query=event%3Apush)
 
@@ -13,6 +13,7 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 
 [![notebooks-selector-preview](https://github.com/openvinotoolkit/openvino_notebooks/assets/41733560/a69efb78-1637-404c-b5ef-63974db2bf1b)](https://openvinotoolkit.github.io/openvino_notebooks/)
 
+List of all notebooks is available in [index file](./notebooks/README.md).
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
@@ -82,19 +83,21 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 
 ### To Launch a Single Notebook
 
-If you wish to launch only one notebook, like the Monodepth notebook, run the command below.
+If you wish to launch only one notebook, like the Monodepth notebook, run the command below (from the repository root directory):
 
 ```bash
-jupyter vision-monodepth.ipynb
+jupyter lab notebooks/vision-monodepth/vision-monodepth.ipynb
 ```
 
 ### To Launch all Notebooks
 
+Launch Jupyter Lab with index `README.md` file opened for easier navigation between notebooks directories and files. Run the following command from the repository root directory:
+	
 ```bash
-jupyter lab notebooks
+jupyter lab notebooks/README.md
 ```
 
-In your browser, select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
+Alternatively, in your browser select a notebook from the file browser in Jupyter Lab using the left sidebar. Each tutorial is located in a subdirectory within the `notebooks` directory.
 
 <img src="https://user-images.githubusercontent.com/15709723/120527271-006fd200-c38f-11eb-9935-2d36d50bab9f.gif">
 
