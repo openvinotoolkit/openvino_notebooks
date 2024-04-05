@@ -1,0 +1,10 @@
+speech-recognition-quantization
+knowledge-graphs-conve
+whisper-subtitles-generation
+instruct-pix2pix-image-editing
+controlnet-stable-diffusion
+stable-diffusion-v2
+zeroscope-text2video
+llava-multimodal-chatbot
+blip-diffusion-subject-generation
+decidiffusion-image-generation
