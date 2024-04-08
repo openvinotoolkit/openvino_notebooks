@@ -216,6 +216,7 @@ fastcomposer
 FastComposer
 FastSAM
 FC
+feedforward
 FFmpeg
 FIL
 finetuned
@@ -753,6 +754,8 @@ TorchScript
 torchvision
 TorchVision
 transformative
+Tripo
+TripoSR
 TTS
 TsinghuaNLP
 tunable
