@@ -58,3 +58,4 @@ instant-id
 grounded-segment-anything
 style-transfer-webcam
 animate-anyone
+llava-next-multimodal-chatbot
