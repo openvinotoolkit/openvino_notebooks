@@ -58,7 +58,7 @@ SUPPORTED_LLM_MODELS = {
     "English":{
         "tiny-llama-1b-chat": {
             "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-            "remote": False,
+            "remote_code": False,
             "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
             "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
             "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
@@ -72,7 +72,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "gemma-2b-it": {
             "model_id": "google/gemma-2b-it",
-            "remote": True,
+            "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
             "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
             "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
@@ -80,7 +80,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "red-pajama-3b-chat": {
             "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
-            "remote": False,
+            "remote_code": False,
             "start_message": "",
             "history_template": "\n<human>:{user}\n<bot>:{assistant}",
             "stop_tokens": [29, 0],
@@ -94,7 +94,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "gemma-7b-it": {
             "model_id": "google/gemma-7b-it",
-            "remote": True,
+            "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
             "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
             "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
@@ -102,7 +102,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "llama-2-chat-7b": {
             "model_id": "meta-llama/Llama-2-7b-chat-hf",
-            "remote": False,
+            "remote_code": False,
             "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
             "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
             "current_message_template": "{user} [/INST]{assistant}",
@@ -116,7 +116,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "mpt-7b-chat": {
             "model_id": "mosaicml/mpt-7b-chat",
-            "remote": True,
+            "remote_code": False,
             "start_message": f"<|im_start|>system\n {DEFAULT_SYSTEM_PROMPT }<|im_end|>",
             "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
             "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
@@ -131,7 +131,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "mistral-7b": {
             "model_id": "mistralai/Mistral-7B-v0.1",
-            "remote": False,
+            "remote_code": False,
             "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
             "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
             "current_message_template": "{user} [/INST]{assistant}",
@@ -145,7 +145,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "zephyr-7b-beta": {
             "model_id": "HuggingFaceH4/zephyr-7b-beta",
-            "remote": False,
+            "remote_code": False,
             "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
             "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
             "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
@@ -159,7 +159,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "notus-7b-v1": {
             "model_id": "argilla/notus-7b-v1",
-            "remote": False,
+            "remote_code": False,
             "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
             "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
             "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
@@ -173,7 +173,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "neural-chat-7b-v3-1": {
             "model_id": "Intel/neural-chat-7b-v3-3",
-            "remote": False,
+            "remote_code": False,
             "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
             "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
             "current_message_template": "{user} [/INST]{assistant}",
@@ -189,13 +189,13 @@ SUPPORTED_LLM_MODELS = {
     "Chinese":{
         "qwen1.5-0.5b-chat": {
             "model_id": "Qwen/Qwen1.5-0.5B-Chat",
-            "remote": False,
+            "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
         },
         "qwen1.5-7b-chat": {
             "model_id": "Qwen/Qwen1.5-7B-Chat",
-            "remote": False,
+            "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "rag_prompt_template": f"""<|im_start|>system
@@ -208,7 +208,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "qwen-7b-chat": {
             "model_id": "Qwen/Qwen-7B-Chat",
-            "remote": True,
+            "remote_code": True,
             "start_message": f"<|im_start|>system\n {DEFAULT_SYSTEM_PROMPT_CHINESE }<|im_end|>",
             "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
             "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
@@ -224,7 +224,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "chatglm3-6b": {
             "model_id": "THUDM/chatglm3-6b",
-            "remote": True,
+            "remote_code": True,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "tokenizer_kwargs": {"add_special_tokens": False},
             "stop_tokens": [0, 2],
@@ -237,7 +237,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "baichuan2-7b-chat": {
             "model_id": "baichuan-inc/Baichuan2-7B-Chat",
-            "remote": True,
+            "remote_code": True,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "tokenizer_kwargs": {"add_special_tokens": False},
             "stop_tokens": [0, 2],
@@ -251,21 +251,19 @@ SUPPORTED_LLM_MODELS = {
         "minicpm-2b-dpo": {
             "model_id": "openbmb/MiniCPM-2B-dpo-fp16",
             "remote_code": True,
-            "remote": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": [2],
         },
         "internlm2-chat-1.8b": {
             "model_id": "internlm/internlm2-chat-1_8b",
             "remote_code": True,
-            "remote": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": [2, 92542],
             "partial_text_processor": internlm_partial_text_processor,
         },  
         "qwen1.5-1.8b-chat": {
             "model_id": "Qwen/Qwen1.5-1.8B-Chat",
-            "remote": False,
+            "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "rag_prompt_template": f"""<|im_start|>system
@@ -280,7 +278,7 @@ SUPPORTED_LLM_MODELS = {
     "Japanese":{
         "youri-7b-chat": {
             "model_id": "rinna/youri-7b-chat",
-            "remote": False,
+            "remote_code": False,
             "start_message": f"設定: {DEFAULT_SYSTEM_PROMPT_JAPANESE}\n",
             "history_template": "ユーザー: {user}\nシステム: {assistant}\n",
             "current_message_template": "ユーザー: {user}\nシステム: {assistant}",
