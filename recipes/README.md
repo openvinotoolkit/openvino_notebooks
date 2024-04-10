@@ -11,7 +11,8 @@
 	- [🔍 Defect Detection](#-defect-detection)
 	- [⏲️ Smart Meter Scanning](#%EF%B8%8F-smart-meter-scanning)
 	- [🛍️ Automated Self-Checkout](#%EF%B8%8F-automated-self-checkout)
-	- [🗣️ Custom AI Assistant](#%EF%B8%8F-custom-ai-assistant)
+	- [🗣️ Voice-Enabled Assistant](#%EF%B8%8F-voice-enabled-assistant)
+	- [🔦 Explainable AI](#-explainable-ai) 
 - [Future Kits](#future-kits)
 
 - [Troubleshooting and Resources](#troubleshooting-and-resources)
@@ -61,7 +62,7 @@ This solution implements automated reading of industrial meters, using cameras a
 ### 🛍️ Automated Self-Checkout
 ![automated-self-checkout](https://github.com/openvinotoolkit/openvino_notebooks/assets/138901786/965a6604-fa15-427e-9d44-c23fa0bbeb6b)
 
-| [Automated Self-Checkout](https://github.com/openvinotoolkit/openvino_notebooks/tree/recipes/recipes/automated_self_checkout) |  |
+| [Automated Self-Checkout](automated_self_checkout) |  |
 | - | - |
 | Related AI concepts | object detection |
 | Example industries | retail |
@@ -81,6 +82,14 @@ This solution is designed to help automate checkout for retail businesses more e
 | Demo                                               |  |
 
 The Custom AI Assistant, powered by the OpenVINO™ toolkit, integrates voice-activated interfaces into various applications. It employs advanced models for speech recognition, natural language processing, and speech synthesis. Additionally, the agent leverages the capabilities of Large Language Models (LLMs) and Generative AI, enabling it to understand complex queries, generate coherent responses, and offer a more dynamic and interactive communication experience. These advanced AI technologies enhance the agent's ability to engage in natural, human-like conversations, making it ideal for applications in customer service and smart home automation.
+
+### 🔦 Explainable AI
+| [Explainable AI](explainable_ai) |  |
+| - | - |
+| Related AI concepts | object detection |
+| Example industries | digital transporation |
+
+Understanding why computer vision models make certain predictions using data and model explainability can help us refine our models to be more efficient and performant. This solution demonstrates how to leverage the OpenVINO™ toolkit, Datumaro, and Ultralytics to generate data quality measurements and saliency maps to understand the predictions and performance of computer vision models during inference.
 
 ## Future Kits
 This is a list of Edge AI Reference kits that are planned or are in development.
