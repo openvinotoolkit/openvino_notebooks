@@ -9,12 +9,12 @@ from pathlib import Path
 from PIL import Image
 
 # Fetch `notebook_utils` module
-import urllib.request
-
-urllib.request.urlretrieve(
-    url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
-    filename="notebook_utils.py",
+import requests
+r = requests.get(
+    url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
 )
+
+open('notebook_utils.py', 'w').write(r.text)
 from notebook_utils import download_file
 
 
