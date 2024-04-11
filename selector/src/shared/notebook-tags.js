@@ -7,6 +7,7 @@ export const CATEGORIES = /** @type {const} */ ({
   MODEL_DEMOS: 'Model Demos',
   MODEL_TRAINING: 'Model Training',
   LIVE_DEMOS: 'Live Demos',
+  XAI: 'Explainable AI',
 });
 
 export const TASKS = /** @type {const} */ ({
@@ -47,7 +48,6 @@ export const TASKS = /** @type {const} */ ({
     ERROR_CORRECTION: 'Error Correction',
     QUESTION_ANSWERING: 'Question Answering',
     PARAPHRASE_IDENTIFICATION: 'Paraphrase Identification',
-    KNOWLEDGE_REPRESENTATION: 'Knowledge Representation',
     NAMED_ENTITY_RECOGNITION: 'Named Entity Recognition',
   },
   AUDIO: {
@@ -59,6 +59,10 @@ export const TASKS = /** @type {const} */ ({
     AUDIO_CLASSIFICATION: 'Audio Classification',
     VOICE_ACTIVITY_DETECTION: 'Voice Activity Detection',
   },
+  OTHER: {
+    KNOWLEDGE_REPRESENTATION: 'Knowledge Representation',
+    BYTES_CLASSIFICATION: "Bytes Classification"
+  }
 });
 
 export const TASKS_VALUES = Object.values(TASKS)
@@ -72,6 +76,7 @@ export const LIBRARIES = /** @type {const} */ ({
     BENCHMARK_APP: 'Benchmark Tool',
     OVMS: 'Model Server',
     OMZ: 'Open Model Zoo',
+    TOKENIZERS: 'OpenVINO Tokenizers',
   },
   OTHER: {
     OPTIMUM_INTEL: 'Optimum Intel',

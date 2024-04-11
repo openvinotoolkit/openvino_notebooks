@@ -57,4 +57,5 @@
 284-openvoice
 285-surya-line-level-text-detection
 286-instant-id
+291-stable-diffusion-keras-cv
 404-style-transfer-webcam
