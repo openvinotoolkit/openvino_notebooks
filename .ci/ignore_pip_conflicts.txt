@@ -10,7 +10,7 @@ notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb  # ultralytics==8.
 notebooks/yolov8-optimization/yolov8-object-detection.ipynb  # ultralytics==8.0.43
 notebooks/yolov8-optimization/yolov8-obb.ipynb  # ultralytics==8.1.24
 notebooks/llm-chatbot/llm-chatbot.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
-notebooks/llm-chatbot/rag-chatbot.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
+notebooks/llm-rag-langchain/llm-rag-langchain.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
 notebooks/bark-text-to-audio/bark-text-to-audio.ipynb  # torch==1.13
 notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb # transformers<4.35
 notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb # transformers<4.35

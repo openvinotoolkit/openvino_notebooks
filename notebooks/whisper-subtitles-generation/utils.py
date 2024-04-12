@@ -20,7 +20,7 @@ class OpenVINOAudioEncoder(torch.nn.Module):
     Helper for inference Whisper encoder model with OpenVINO
     """
 
-    def __init__(self, core:ov.Core, model_path: Path, device='CPU'):
+    def __init__(self, core: ov.Core, model_path: Path, device="CPU"):
         super().__init__()
         self.model = core.read_model(model_path)
         self.compiled_model = core.compile_model(self.model, device)
@@ -43,7 +43,7 @@ class OpenVINOTextDecoder(torch.nn.Module):
     Helper for inference OpenVINO decoder model
     """
 
-    def __init__(self, core: ov.Core, model_path: Path, device: str = 'CPU'):
+    def __init__(self, core: ov.Core, model_path: Path, device: str = "CPU"):
         super().__init__()
         self._core = core
         self.model = core.read_model(model_path)
@@ -61,13 +61,15 @@ class OpenVINOTextDecoder(torch.nn.Module):
         Returns:
           feed_dict: updated feed_dict
         """
-        beam_size = feed_dict['x'].shape[0]
-        audio_len = feed_dict['xa'].shape[2]
+        beam_size = feed_dict["x"].shape[0]
+        audio_len = feed_dict["xa"].shape[2]
         previous_seq_len = 0
         for name in self._input_names:
-            if name in ['x', 'xa']:
+            if name in ["x", "xa"]:
                 continue
-            feed_dict[name] = ov.Tensor(np.zeros((beam_size, previous_seq_len, audio_len), dtype=np.float32))
+            feed_dict[name] = ov.Tensor(
+                np.zeros((beam_size, previous_seq_len, audio_len), dtype=np.float32)
+            )
         return feed_dict
 
     def preprocess_kv_cache_inputs(self, feed_dict, kv_cache):
@@ -100,7 +102,9 @@ class OpenVINOTextDecoder(torch.nn.Module):
         kv_cache = list(outputs.values())[1:]
         return logits, kv_cache
 
-    def forward(self, x: torch.Tensor, xa: torch.Tensor, kv_cache: Optional[dict] = None):
+    def forward(
+        self, x: torch.Tensor, xa: torch.Tensor, kv_cache: Optional[dict] = None
+    ):
         """
         Inference decoder model.
 
@@ -113,8 +117,8 @@ class OpenVINOTextDecoder(torch.nn.Module):
           logits: decoder predicted logits
           kv_cache: updated kv_cache with current step hidden states
         """
-        feed_dict = {'x': ov.Tensor(x.numpy()), 'xa': ov.Tensor(xa.numpy())}
-        feed_dict = (self.preprocess_kv_cache_inputs(feed_dict, kv_cache))
+        feed_dict = {"x": ov.Tensor(x.numpy()), "xa": ov.Tensor(xa.numpy())}
+        feed_dict = self.preprocess_kv_cache_inputs(feed_dict, kv_cache)
         res = self.compiled_model(feed_dict)
         return self.postprocess_outputs(res)
 
@@ -129,7 +133,9 @@ class OpenVINOInference(Inference):
         self.initial_token_length = initial_token_length
         self.kv_cache = {}
 
-    def logits(self, tokens: torch.Tensor, audio_features: torch.Tensor) -> torch.Tensor:
+    def logits(
+        self, tokens: torch.Tensor, audio_features: torch.Tensor
+    ) -> torch.Tensor:
         """
         getting logits for given tokens sequence and audio features and save kv_cache
 
@@ -143,7 +149,8 @@ class OpenVINOInference(Inference):
             # only need to use the last token except in the first forward pass
             tokens = tokens[:, -1:]
         logits, self.kv_cache = self.model.decoder(
-            tokens, audio_features, kv_cache=self.kv_cache)
+            tokens, audio_features, kv_cache=self.kv_cache
+        )
         return logits
 
     def cleanup_caching(self):
@@ -177,8 +184,11 @@ class OpenVINODecodingTask(DecodingTask):
 
 def patch_whisper_for_ov_inference(model):
     @torch.no_grad()
-    def decode(model: "Whisper", mel: torch.Tensor, options: DecodingOptions = DecodingOptions()) -> Union[
-        DecodingResult, List[DecodingResult]]:
+    def decode(
+        model: "Whisper",
+        mel: torch.Tensor,
+        options: DecodingOptions = DecodingOptions(),
+    ) -> Union[DecodingResult, List[DecodingResult]]:
         """
         Performs decoding of 30-second audio segment(s), provided as Mel spectrogram(s).
 
@@ -209,10 +219,10 @@ def patch_whisper_for_ov_inference(model):
 
         return result
 
-    Parameter = namedtuple('Parameter', ['device'])
+    Parameter = namedtuple("Parameter", ["device"])
 
     def parameters():
-        return iter([Parameter(torch.device('cpu'))])
+        return iter([Parameter(torch.device("cpu"))])
 
     def logits(model, tokens: torch.Tensor, audio_features: torch.Tensor):
         """
@@ -272,10 +282,11 @@ def get_audio(video_file):
     """
     input_video = VideoFileClip(str(video_file))
     duration = input_video.duration
-    input_video.audio.write_audiofile(video_file.stem + '.wav', verbose=False, logger=None)
-    input_audio_file = video_file.stem + '.wav'
-    sample_rate, audio = wavfile.read(
-        io.BytesIO(open(input_audio_file, 'rb').read()))
+    input_video.audio.write_audiofile(
+        video_file.stem + ".wav", verbose=False, logger=None
+    )
+    input_audio_file = video_file.stem + ".wav"
+    sample_rate, audio = wavfile.read(io.BytesIO(open(input_audio_file, "rb").read()))
     audio = audio_to_float(audio)
     if audio.ndim == 2:
         audio = audio.mean(axis=1)
@@ -302,7 +313,9 @@ def format_timestamp(seconds: float):
     seconds = milliseconds // 1_000
     milliseconds -= seconds * 1_000
 
-    return (f"{hours}:" if hours > 0 else "00:") + f"{minutes:02d}:{seconds:02d},{milliseconds:03d}"
+    return (
+        f"{hours}:" if hours > 0 else "00:"
+    ) + f"{minutes:02d}:{seconds:02d},{milliseconds:03d}"
 
 
 def prepare_srt(transcription, filter_duration=None):
@@ -311,7 +324,10 @@ def prepare_srt(transcription, filter_duration=None):
     """
     segment_lines = []
     for segment in transcription["segments"]:
-        if filter_duration is not None and (segment["start"] >= floor(filter_duration) or segment["end"] > ceil(filter_duration) + 1):
+        if filter_duration is not None and (
+            segment["start"] >= floor(filter_duration)
+            or segment["end"] > ceil(filter_duration) + 1
+        ):
             break
         segment_lines.append(str(segment["id"] + 1) + "\n")
         time_start = format_timestamp(segment["start"])

@@ -8,6 +8,7 @@ class IpyExit(SystemExit):
 
     Exception temporarily redirects stderr to buffer.
     """
+
     def __init__(self):
         # print("exiting")  # optionally print some message to stdout, too
         # ... or do other stuff before exit
@@ -22,7 +23,7 @@ def ipy_exit():
     raise IpyExit
 
 
-if get_ipython():    # ...run with IPython
+if get_ipython():  # ...run with IPython
     exit = ipy_exit  # rebind to custom exit
 else:
-    exit = exit      # just make exit importable
+    exit = exit  # just make exit importable

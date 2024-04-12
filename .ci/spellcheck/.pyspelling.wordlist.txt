@@ -55,6 +55,8 @@ bert
 BERT's
 BetterTransformer
 Bewley
+BGE
+bge
 BGR
 BMP
 Bicubic
@@ -224,6 +226,7 @@ finetuning
 FLAC
 floyd
 Formatter
+formatter
 fp
 FP
 FPN
@@ -614,12 +617,16 @@ ReLU
 René
 repo
 reproducibility
+rerank
+Rerank
+reranker
 rescale
 rescaling
 Rescaling
 ResNet
 resnet
 RetinaFace
+RetroMAE
 RGB
 Riffusion
 riffusion
@@ -845,4 +852,5 @@ ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
+zh
 xformers

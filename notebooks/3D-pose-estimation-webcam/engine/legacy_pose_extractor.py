@@ -4,10 +4,48 @@ import cv2
 import math
 import numpy as np
 
-BODY_PARTS_KPT_IDS = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7], [1, 8], [8, 9], [9, 10], [1, 11],
-                      [11, 12], [12, 13], [1, 0], [0, 14], [14, 16], [0, 15], [15, 17], [2, 16], [5, 17]]
-BODY_PARTS_PAF_IDS = ([12, 13], [20, 21], [14, 15], [16, 17], [22, 23], [24, 25], [0, 1], [2, 3], [4, 5],
-                      [6, 7], [8, 9], [10, 11], [28, 29], [30, 31], [34, 35], [32, 33], [36, 37], [18, 19], [26, 27])
+BODY_PARTS_KPT_IDS = [
+    [1, 2],
+    [1, 5],
+    [2, 3],
+    [3, 4],
+    [5, 6],
+    [6, 7],
+    [1, 8],
+    [8, 9],
+    [9, 10],
+    [1, 11],
+    [11, 12],
+    [12, 13],
+    [1, 0],
+    [0, 14],
+    [14, 16],
+    [0, 15],
+    [15, 17],
+    [2, 16],
+    [5, 17],
+]
+BODY_PARTS_PAF_IDS = (
+    [12, 13],
+    [20, 21],
+    [14, 15],
+    [16, 17],
+    [22, 23],
+    [24, 25],
+    [0, 1],
+    [2, 3],
+    [4, 5],
+    [6, 7],
+    [8, 9],
+    [10, 11],
+    [28, 29],
+    [30, 31],
+    [34, 35],
+    [32, 33],
+    [36, 37],
+    [18, 19],
+    [26, 27],
+)
 
 
 def linspace2d(start, stop, n=10):
@@ -17,19 +55,35 @@ def linspace2d(start, stop, n=10):
 
 def extract_keypoints(heatmap, all_keypoints, total_keypoint_num):
     heatmap[heatmap < 0.1] = 0
-    heatmap_with_borders = np.pad(heatmap, [(2, 2), (2, 2)], mode='constant')
-    heatmap_center = heatmap_with_borders[1:heatmap_with_borders.shape[0]-1, 1:heatmap_with_borders.shape[1]-1]
-    heatmap_left = heatmap_with_borders[1:heatmap_with_borders.shape[0]-1, 2:heatmap_with_borders.shape[1]]
-    heatmap_right = heatmap_with_borders[1:heatmap_with_borders.shape[0]-1, 0:heatmap_with_borders.shape[1]-2]
-    heatmap_up = heatmap_with_borders[2:heatmap_with_borders.shape[0], 1:heatmap_with_borders.shape[1]-1]
-    heatmap_down = heatmap_with_borders[0:heatmap_with_borders.shape[0]-2, 1:heatmap_with_borders.shape[1]-1]
+    heatmap_with_borders = np.pad(heatmap, [(2, 2), (2, 2)], mode="constant")
+    heatmap_center = heatmap_with_borders[
+        1 : heatmap_with_borders.shape[0] - 1, 1 : heatmap_with_borders.shape[1] - 1
+    ]
+    heatmap_left = heatmap_with_borders[
+        1 : heatmap_with_borders.shape[0] - 1, 2 : heatmap_with_borders.shape[1]
+    ]
+    heatmap_right = heatmap_with_borders[
+        1 : heatmap_with_borders.shape[0] - 1, 0 : heatmap_with_borders.shape[1] - 2
+    ]
+    heatmap_up = heatmap_with_borders[
+        2 : heatmap_with_borders.shape[0], 1 : heatmap_with_borders.shape[1] - 1
+    ]
+    heatmap_down = heatmap_with_borders[
+        0 : heatmap_with_borders.shape[0] - 2, 1 : heatmap_with_borders.shape[1] - 1
+    ]
 
-    heatmap_peaks = (heatmap_center > heatmap_left) &\
-                    (heatmap_center > heatmap_right) &\
-                    (heatmap_center > heatmap_up) &\
-                    (heatmap_center > heatmap_down)
-    heatmap_peaks = heatmap_peaks[1:heatmap_center.shape[0]-1, 1:heatmap_center.shape[1]-1]
-    keypoints = list(zip(np.nonzero(heatmap_peaks)[1], np.nonzero(heatmap_peaks)[0]))  # (w, h)
+    heatmap_peaks = (
+        (heatmap_center > heatmap_left)
+        & (heatmap_center > heatmap_right)
+        & (heatmap_center > heatmap_up)
+        & (heatmap_center > heatmap_down)
+    )
+    heatmap_peaks = heatmap_peaks[
+        1 : heatmap_center.shape[0] - 1, 1 : heatmap_center.shape[1] - 1
+    ]
+    keypoints = list(
+        zip(np.nonzero(heatmap_peaks)[1], np.nonzero(heatmap_peaks)[0])
+    )  # (w, h)
     keypoints = sorted(keypoints, key=itemgetter(0))
 
     suppressed = np.zeros(len(keypoints), np.uint8)
@@ -38,21 +92,34 @@ def extract_keypoints(heatmap, all_keypoints, total_keypoint_num):
     for i in range(len(keypoints)):
         if suppressed[i]:
             continue
-        for j in range(i+1, len(keypoints)):
-            if math.sqrt((keypoints[i][0] - keypoints[j][0]) ** 2 +
-                         (keypoints[i][1] - keypoints[j][1]) ** 2) < 6:
+        for j in range(i + 1, len(keypoints)):
+            if (
+                math.sqrt(
+                    (keypoints[i][0] - keypoints[j][0]) ** 2
+                    + (keypoints[i][1] - keypoints[j][1]) ** 2
+                )
+                < 6
+            ):
                 suppressed[j] = 1
-        keypoint_with_score_and_id = (keypoints[i][0], keypoints[i][1], heatmap[keypoints[i][1], keypoints[i][0]],
-                                      total_keypoint_num + keypoint_num)
+        keypoint_with_score_and_id = (
+            keypoints[i][0],
+            keypoints[i][1],
+            heatmap[keypoints[i][1], keypoints[i][0]],
+            total_keypoint_num + keypoint_num,
+        )
         keypoints_with_score_and_id.append(keypoint_with_score_and_id)
         keypoint_num += 1
     all_keypoints.append(keypoints_with_score_and_id)
     return keypoint_num
 
 
-def group_keypoints(all_keypoints_by_type, pafs, pose_entry_size=20, min_paf_score=0.05):
+def group_keypoints(
+    all_keypoints_by_type, pafs, pose_entry_size=20, min_paf_score=0.05
+):
     pose_entries = []
-    all_keypoints = np.array([item for sublist in all_keypoints_by_type for item in sublist])
+    all_keypoints = np.array(
+        [item for sublist in all_keypoints_by_type for item in sublist]
+    )
     for part_id in range(len(BODY_PARTS_PAF_IDS)):
         part_pafs = pafs[BODY_PARTS_PAF_IDS[part_id]]
         kpts_a = all_keypoints_by_type[BODY_PARTS_KPT_IDS[part_id][0]]
@@ -67,15 +134,17 @@ def group_keypoints(all_keypoints_by_type, pafs, pose_entry_size=20, min_paf_sco
         elif num_kpts_a == 0:  # body part has just 'b' keypoints
             for i in range(num_kpts_b):
                 num = 0
-                for j in range(len(pose_entries)):  # check if already in some pose, was added by another body part
+                for j in range(
+                    len(pose_entries)
+                ):  # check if already in some pose, was added by another body part
                     if pose_entries[j][kpt_b_id] == kpts_b[i][3]:
                         num += 1
                         continue
                 if num == 0:
                     pose_entry = np.ones(pose_entry_size) * -1
                     pose_entry[kpt_b_id] = kpts_b[i][3]  # keypoint idx
-                    pose_entry[-1] = 1                   # num keypoints in pose
-                    pose_entry[-2] = kpts_b[i][2]        # pose score
+                    pose_entry[-1] = 1  # num keypoints in pose
+                    pose_entry[-2] = kpts_b[i][2]  # pose score
                     pose_entries.append(pose_entry)
             continue
         elif num_kpts_b == 0:  # body part has just 'a' keypoints
@@ -99,8 +168,10 @@ def group_keypoints(all_keypoints_by_type, pafs, pose_entry_size=20, min_paf_sco
             for j in range(num_kpts_b):
                 kpt_b = np.array(kpts_b[j][0:2])
                 mid_point = [(), ()]
-                mid_point[0] = (int(round((kpt_a[0] + kpt_b[0]) * 0.5)),
-                                int(round((kpt_a[1] + kpt_b[1]) * 0.5)))
+                mid_point[0] = (
+                    int(round((kpt_a[0] + kpt_b[0]) * 0.5)),
+                    int(round((kpt_a[1] + kpt_b[1]) * 0.5)),
+                )
                 mid_point[1] = mid_point[0]
 
                 vec = [kpt_b[0] - kpt_a[0], kpt_b[1] - kpt_a[1]]
@@ -109,8 +180,10 @@ def group_keypoints(all_keypoints_by_type, pafs, pose_entry_size=20, min_paf_sco
                     continue
                 vec[0] /= vec_norm
                 vec[1] /= vec_norm
-                cur_point_score = (vec[0] * part_pafs[0, mid_point[0][1], mid_point[0][0]] +
-                                   vec[1] * part_pafs[1, mid_point[1][1], mid_point[1][0]])
+                cur_point_score = (
+                    vec[0] * part_pafs[0, mid_point[0][1], mid_point[0][0]]
+                    + vec[1] * part_pafs[1, mid_point[1][1], mid_point[1][0]]
+                )
 
                 height_n = pafs.shape[1] // 2
                 success_ratio = 0
@@ -147,7 +220,9 @@ def group_keypoints(all_keypoints_by_type, pafs, pose_entry_size=20, min_paf_sco
                 break
             i, j, cur_point_score = connections[row][0:3]
             if not has_kpt_a[i] and not has_kpt_b[j]:
-                filtered_connections.append([kpts_a[i][3], kpts_b[j][3], cur_point_score])
+                filtered_connections.append(
+                    [kpts_a[i][3], kpts_b[j][3], cur_point_score]
+                )
                 has_kpt_a[i] = 1
                 has_kpt_b[j] = 1
         connections = filtered_connections
@@ -155,20 +230,30 @@ def group_keypoints(all_keypoints_by_type, pafs, pose_entry_size=20, min_paf_sco
             continue
 
         if part_id == 0:
-            pose_entries = [np.ones(pose_entry_size) * -1 for _ in range(len(connections))]
+            pose_entries = [
+                np.ones(pose_entry_size) * -1 for _ in range(len(connections))
+            ]
             for i in range(len(connections)):
                 pose_entries[i][BODY_PARTS_KPT_IDS[0][0]] = connections[i][0]
                 pose_entries[i][BODY_PARTS_KPT_IDS[0][1]] = connections[i][1]
                 pose_entries[i][-1] = 2
-                pose_entries[i][-2] = np.sum(all_keypoints[connections[i][0:2], 2]) + connections[i][2]
+                pose_entries[i][-2] = (
+                    np.sum(all_keypoints[connections[i][0:2], 2]) + connections[i][2]
+                )
         elif part_id == 17 or part_id == 18:
             kpt_a_id = BODY_PARTS_KPT_IDS[part_id][0]
             kpt_b_id = BODY_PARTS_KPT_IDS[part_id][1]
             for i in range(len(connections)):
                 for j in range(len(pose_entries)):
-                    if pose_entries[j][kpt_a_id] == connections[i][0] and pose_entries[j][kpt_b_id] == -1:
+                    if (
+                        pose_entries[j][kpt_a_id] == connections[i][0]
+                        and pose_entries[j][kpt_b_id] == -1
+                    ):
                         pose_entries[j][kpt_b_id] = connections[i][1]
-                    elif pose_entries[j][kpt_b_id] == connections[i][1] and pose_entries[j][kpt_a_id] == -1:
+                    elif (
+                        pose_entries[j][kpt_b_id] == connections[i][1]
+                        and pose_entries[j][kpt_a_id] == -1
+                    ):
                         pose_entries[j][kpt_a_id] = connections[i][0]
             continue
         else:
@@ -181,13 +266,18 @@ def group_keypoints(all_keypoints_by_type, pafs, pose_entry_size=20, min_paf_sco
                         pose_entries[j][kpt_b_id] = connections[i][1]
                         num += 1
                         pose_entries[j][-1] += 1
-                        pose_entries[j][-2] += all_keypoints[connections[i][1], 2] + connections[i][2]
+                        pose_entries[j][-2] += (
+                            all_keypoints[connections[i][1], 2] + connections[i][2]
+                        )
                 if num == 0:
                     pose_entry = np.ones(pose_entry_size) * -1
                     pose_entry[kpt_a_id] = connections[i][0]
                     pose_entry[kpt_b_id] = connections[i][1]
                     pose_entry[-1] = 2
-                    pose_entry[-2] = np.sum(all_keypoints[connections[i][0:2], 2]) + connections[i][2]
+                    pose_entry[-2] = (
+                        np.sum(all_keypoints[connections[i][0:2], 2])
+                        + connections[i][2]
+                    )
                     pose_entries.append(pose_entry)
 
     filtered_entries = []
@@ -211,8 +301,10 @@ def extract_poses(heatmaps, pafs, upsample_ratio):
     total_keypoints_num = 0
     all_keypoints_by_type = []
     for kpt_idx in range(num_keypoints):
-        total_keypoints_num += extract_keypoints(heatmaps[kpt_idx], all_keypoints_by_type, total_keypoints_num)
-    
+        total_keypoints_num += extract_keypoints(
+            heatmaps[kpt_idx], all_keypoints_by_type, total_keypoints_num
+        )
+
     pose_entries, all_keypoints = group_keypoints(all_keypoints_by_type, pafs)
 
     found_poses = []
@@ -222,13 +314,19 @@ def extract_poses(heatmaps, pafs, upsample_ratio):
         pose_keypoints = np.ones((num_keypoints * 3 + 1), dtype=np.float32) * -1
         for kpt_id in range(num_keypoints):
             if pose_entry[kpt_id] != -1.0:
-                pose_keypoints[kpt_id * 3 + 0] = all_keypoints[int(pose_entry[kpt_id]), 0]
-                pose_keypoints[kpt_id * 3 + 1] = all_keypoints[int(pose_entry[kpt_id]), 1]
-                pose_keypoints[kpt_id * 3 + 2] = all_keypoints[int(pose_entry[kpt_id]), 2]
+                pose_keypoints[kpt_id * 3 + 0] = all_keypoints[
+                    int(pose_entry[kpt_id]), 0
+                ]
+                pose_keypoints[kpt_id * 3 + 1] = all_keypoints[
+                    int(pose_entry[kpt_id]), 1
+                ]
+                pose_keypoints[kpt_id * 3 + 2] = all_keypoints[
+                    int(pose_entry[kpt_id]), 2
+                ]
         pose_keypoints[-1] = pose_entry[18]
         found_poses.append(pose_keypoints)
 
     if not found_poses:
-        return np.array(found_poses, dtype=np.float32).reshape((0,0)), None
+        return np.array(found_poses, dtype=np.float32).reshape((0, 0)), None
 
     return np.array(found_poses, dtype=np.float32), None
