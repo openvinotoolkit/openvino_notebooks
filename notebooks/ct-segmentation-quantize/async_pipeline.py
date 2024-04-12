@@ -31,7 +31,6 @@ from custom_segmentation import Model
 import requests
 r = requests.get(
     url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-    filename='notebook_utils.py'
 )
 open('notebook_utils.py', 'w').write(r.text)
 
