@@ -26,9 +26,9 @@ class TrackedNodeInfo:
     snr: float = None  # SNR of the target node
     input_nodes: List[Node] = None  # Input nodes of the target node
     result_node: Node = None  # Result node of the target node
-    input_result_nodes: Dict[
-        Node, Node
-    ] = None  # Result nodes of non-const inputs of the target node
+    input_result_nodes: Dict[Node, Node] = (
+        None  # Result nodes of non-const inputs of the target node
+    )
     node_value_full_precision: np.ndarray = None  # Result of the node in full precision
     node_value_half_precision: np.ndarray = None  # Result of the node in half precision
     input_values_full_precision: np.ndarray = (

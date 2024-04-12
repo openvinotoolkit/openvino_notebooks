@@ -118,9 +118,7 @@ def generate_table_of_content(notebook_path: pathlib.Path):
             if not is_ref_to_top_exists(cell["source"], idx):
                 if not title.endswith("\n"):
                     cell["source"].insert(idx, title + "\n")
-                cell["source"].insert(
-                    idx + 1, "[back to top ⬆️](#Table-of-contents:)\n"
-                )
+                cell["source"].insert(idx + 1, "[back to top ⬆️](#Table-of-contents:)\n")
                 cell["source"].insert(idx + 2, "")
 
             title = title.strip()
