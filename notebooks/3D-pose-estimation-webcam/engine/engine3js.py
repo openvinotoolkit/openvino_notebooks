@@ -32,7 +32,6 @@ class Engine3js:
         grid=False,
         axis=False,
     ):
-
         self.view_width = view_width
         self.view_height = view_height
         self.position = position

@@ -13,7 +13,11 @@ def get_parsed_requirements(requirements_file: str) -> Set:
     without versions
     """
     requirements_set = set()
-    ignore_list = ['paddlenlp', 'paddle2onnx', 'paddlepaddle'] # temporary ignore paddle
+    ignore_list = [
+        "paddlenlp",
+        "paddle2onnx",
+        "paddlepaddle",
+    ]  # temporary ignore paddle
     parsed_requirements = parse_requirements(requirements_file, session=False)
     separators = ("=", "<", ">", "[")
     for req in parsed_requirements:
@@ -21,8 +25,8 @@ def get_parsed_requirements(requirements_file: str) -> Set:
         # requirements for Windows or macOS only
         if ";" in requirement and "linux" not in requirement:
             continue
-        if requirement.startswith('git+'):
-            requirement = requirement.split('#egg=')[-1]
+        if requirement.startswith("git+"):
+            requirement = requirement.split("#egg=")[-1]
         for separator in separators:
             requirement = requirement.replace(separator, "|")
         reqname = requirement.split("|")[0]

@@ -10,8 +10,9 @@ import logging
 
 # Fetch `notebook_utils` module
 import requests
+
 r = requests.get(
-    url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
+    url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
 )
 from notebook_utils import segmentation_map_to_overlay
 

@@ -26,11 +26,16 @@ def _expand_mask(mask: torch.Tensor, dtype: torch.dtype, tgt_len: Optional[int] 
 
     inverted_mask = 1.0 - expanded_mask
 
-    return inverted_mask.masked_fill(inverted_mask.to(torch.bool), torch.finfo(dtype).min)
+    return inverted_mask.masked_fill(
+        inverted_mask.to(torch.bool), torch.finfo(dtype).min
+    )
 
 
 def _make_causal_mask(
-    input_ids_shape: torch.Size, dtype: torch.dtype, device: torch.device, past_key_values_length: int = 0
+    input_ids_shape: torch.Size,
+    dtype: torch.dtype,
+    device: torch.device,
+    past_key_values_length: int = 0,
 ):
     """
     Make causal mask used for bi-directional self-attention.
@@ -42,8 +47,18 @@ def _make_causal_mask(
     mask = mask.to(dtype)
 
     if past_key_values_length > 0:
-        mask = torch.cat([torch.zeros(tgt_len, past_key_values_length, dtype=dtype, device=device), mask], dim=-1)
-    return mask[None, None, :, :].expand(bsz, 1, tgt_len, tgt_len + past_key_values_length)
+        mask = torch.cat(
+            [
+                torch.zeros(
+                    tgt_len, past_key_values_length, dtype=dtype, device=device
+                ),
+                mask,
+            ],
+            dim=-1,
+        )
+    return mask[None, None, :, :].expand(
+        bsz, 1, tgt_len, tgt_len + past_key_values_length
+    )
 
 
 class MLP(nn.Module):
@@ -69,10 +84,9 @@ class MLP(nn.Module):
 
 
 class FastComposerCLIPImageEncoder(CLIPPreTrainedModel):
-
     @staticmethod
     def from_pretrained(
-            global_model_name_or_path,
+        global_model_name_or_path,
     ):
         model = CLIPModel.from_pretrained(global_model_name_or_path)
         vision_model = model.vision_model
@@ -88,10 +102,10 @@ class FastComposerCLIPImageEncoder(CLIPPreTrainedModel):
         )
 
     def __init__(
-            self,
-            vision_model,
-            visual_projection,
-            vision_processor,
+        self,
+        vision_model,
+        visual_projection,
+        vision_processor,
     ):
         super().__init__(vision_model.config)
         self.vision_model = vision_model
@@ -119,11 +133,11 @@ class FastComposerCLIPImageEncoder(CLIPPreTrainedModel):
 
 
 def scatter_object_embeddings(
-        inputs_embeds,
-        image_token_mask,
-        object_embeds,
-        num_objects,
-        image_embedding_transform=None,
+    inputs_embeds,
+    image_token_mask,
+    object_embeds,
+    num_objects,
+    image_embedding_transform=None,
 ):
     object_embeds = object_embeds.to(inputs_embeds.dtype)
 
@@ -134,8 +148,8 @@ def scatter_object_embeddings(
     )
 
     valid_object_mask = (
-            torch.arange(max_num_objects, device=flat_object_embeds.device)[None, :]
-            < num_objects[:, None]
+        torch.arange(max_num_objects, device=flat_object_embeds.device)[None, :]
+        < num_objects[:, None]
     )
 
     valid_object_embeds = flat_object_embeds[valid_object_mask.flatten()]
@@ -153,11 +167,11 @@ def scatter_object_embeddings(
 
 
 def fuse_object_embeddings(
-        inputs_embeds,
-        image_token_mask,
-        object_embeds,
-        num_objects,
-        fuse_fn=torch.add,
+    inputs_embeds,
+    image_token_mask,
+    object_embeds,
+    num_objects,
+    fuse_fn=torch.add,
 ):
     object_embeds = object_embeds.to(inputs_embeds.dtype)
 
@@ -168,8 +182,8 @@ def fuse_object_embeddings(
     )
 
     valid_object_mask = (
-            torch.arange(max_num_objects, device=flat_object_embeds.device)[None, :]
-            < num_objects[:, None]
+        torch.arange(max_num_objects, device=flat_object_embeds.device)[None, :]
+        < num_objects[:, None]
     )
 
     valid_object_embeds = flat_object_embeds[valid_object_mask.flatten()]
@@ -202,11 +216,11 @@ class FastComposerPostfuseModule(nn.Module):
         return text_object_embeds
 
     def forward(
-            self,
-            text_embeds,
-            object_embeds,
-            image_token_mask,
-            num_objects,
+        self,
+        text_embeds,
+        object_embeds,
+        image_token_mask,
+        num_objects,
     ) -> torch.Tensor:
         text_object_embeds = fuse_object_embeddings(
             text_embeds, image_token_mask, object_embeds, num_objects, self.fuse_fn
@@ -216,7 +230,6 @@ class FastComposerPostfuseModule(nn.Module):
 
 
 class FastComposerTextEncoder(CLIPPreTrainedModel):
-
     @staticmethod
     def from_pretrained(model_name_or_path, **kwargs):
         model = CLIPTextModel.from_pretrained(model_name_or_path, **kwargs)
@@ -231,15 +244,15 @@ class FastComposerTextEncoder(CLIPPreTrainedModel):
         self.encoder = text_model.encoder
 
     def forward(
-            self,
-            input_ids,
-            image_token_mask=None,
-            object_embeds=None,
-            num_objects=None,
-            attention_mask: Optional[torch.Tensor] = None,
-            output_attentions: Optional[bool] = None,
-            output_hidden_states: Optional[bool] = None,
-            return_dict: Optional[bool] = None,
+        self,
+        input_ids,
+        image_token_mask=None,
+        object_embeds=None,
+        num_objects=None,
+        attention_mask: Optional[torch.Tensor] = None,
+        output_attentions: Optional[bool] = None,
+        output_hidden_states: Optional[bool] = None,
+        return_dict: Optional[bool] = None,
     ) -> Union[Tuple, BaseModelOutputWithPooling]:
         output_attentions = (
             output_attentions
@@ -260,7 +273,9 @@ class FastComposerTextEncoder(CLIPPreTrainedModel):
 
         hidden_states = self.embeddings(input_ids)
 
-        causal_attention_mask = _make_causal_mask(input_shape, hidden_states.dtype, device=hidden_states.device)
+        causal_attention_mask = _make_causal_mask(
+            input_shape, hidden_states.dtype, device=hidden_states.device
+        )
 
         # expand attention_mask
         if attention_mask is not None:
@@ -354,7 +369,7 @@ class BalancedL1Loss(nn.Module):
     def forward(self, object_token_attn_prob, object_segmaps):
         if self.normalize:
             object_token_attn_prob = object_token_attn_prob / (
-                    object_token_attn_prob.max(dim=2, keepdim=True)[0] + 1e-5
+                object_token_attn_prob.max(dim=2, keepdim=True)[0] + 1e-5
             )
         background_segmaps = 1 - object_segmaps
         background_segmaps_sum = background_segmaps.sum(dim=2) + 1e-5
@@ -372,15 +387,15 @@ class BalancedL1Loss(nn.Module):
 
 
 def get_object_localization_loss_for_one_layer(
-        cross_attention_scores,
-        object_segmaps,
-        object_token_idx,
-        object_token_idx_mask,
-        loss_fn,
+    cross_attention_scores,
+    object_segmaps,
+    object_token_idx,
+    object_token_idx_mask,
+    loss_fn,
 ):
     bxh, num_noise_latents, num_text_tokens = cross_attention_scores.shape
     b, max_num_objects, _, _ = object_segmaps.shape
-    size = int(num_noise_latents ** 0.5)
+    size = int(num_noise_latents**0.5)
 
     # Resize the object segmentation maps to the size of the cross attention scores
     object_segmaps = F.interpolate(
@@ -422,11 +437,11 @@ def get_object_localization_loss_for_one_layer(
 
 
 def get_object_localization_loss(
-        cross_attention_scores,
-        object_segmaps,
-        image_token_idx,
-        image_token_idx_mask,
-        loss_fn,
+    cross_attention_scores,
+    object_segmaps,
+    image_token_idx,
+    image_token_idx_mask,
+    loss_fn,
 ):
     num_layers = len(cross_attention_scores)
     loss = 0

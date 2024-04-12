@@ -42,7 +42,11 @@ class IpynbFilter(filters.Filter):
 
     def sfilter(self, source):
         """Execute filter."""
-        return [filters.SourceText(self._filter(source.text), source.context, source.encoding, "ipynb")]
+        return [
+            filters.SourceText(
+                self._filter(source.text), source.context, source.encoding, "ipynb"
+            )
+        ]
 
 
 def get_plugin():

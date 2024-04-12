@@ -91,16 +91,18 @@ def download_file(
         filename = directory / Path(filename)
 
     try:
-        response = requests.get(url=url, 
-                                headers={"User-agent": "Mozilla/5.0"}, 
-                                stream=True)
+        response = requests.get(
+            url=url, headers={"User-agent": "Mozilla/5.0"}, stream=True
+        )
         response.raise_for_status()
-    except requests.exceptions.HTTPError as error:  # For error associated with not-200 codes. Will output something like: "404 Client Error: Not Found for url: {url}"
+    except (
+        requests.exceptions.HTTPError
+    ) as error:  # For error associated with not-200 codes. Will output something like: "404 Client Error: Not Found for url: {url}"
         raise Exception(error) from None
     except requests.exceptions.Timeout:
         raise Exception(
-                "Connection timed out. If you access the internet through a proxy server, please "
-                "make sure the proxy is set in the shell from where you launched Jupyter."
+            "Connection timed out. If you access the internet through a proxy server, please "
+            "make sure the proxy is set in the shell from where you launched Jupyter."
         ) from None
     except requests.exceptions.RequestException as error:
         raise Exception(f"File downloading failed with error: {error}") from None
@@ -108,7 +110,6 @@ def download_file(
     # download the file if it does not exist, or if it exists with an incorrect file size
     filesize = int(response.headers.get("Content-length", 0))
     if not filename.exists() or (os.stat(filename).st_size != filesize):
-
         with tqdm_notebook(
             total=filesize,
             unit="B",
@@ -117,7 +118,6 @@ def download_file(
             desc=str(filename),
             disable=not show_progress,
         ) as progress_bar:
-
             with open(filename, "wb") as file_object:
                 for chunk in response.iter_content(chunk_size):
                     file_object.write(chunk)
@@ -132,7 +132,9 @@ def download_file(
     return filename.resolve()
 
 
-def download_ir_model(model_xml_url: str, destination_folder: PathLike = None) -> PathLike:
+def download_ir_model(
+    model_xml_url: str, destination_folder: PathLike = None
+) -> PathLike:
     """
     Download IR model from `model_xml_url`. Downloads model xml and bin file; the weights file is
     assumed to exist at the same location and name as model_xml_url with a ".bin" extension.
@@ -143,7 +145,9 @@ def download_ir_model(model_xml_url: str, destination_folder: PathLike = None) -
     :return: path to downloaded xml model file
     """
     model_bin_url = model_xml_url[:-4] + ".bin"
-    model_xml_path = download_file(model_xml_url, directory=destination_folder, show_progress=False)
+    model_xml_path = download_file(
+        model_xml_url, directory=destination_folder, show_progress=False
+    )
     download_file(model_bin_url, directory=destination_folder)
     return model_xml_path
 
@@ -151,7 +155,7 @@ def download_ir_model(model_xml_url: str, destination_folder: PathLike = None) -
 # ## Images
 
 # ### Convert Pixel Data
-# 
+#
 # Normalize image pixel values between 0 and 1, and convert images to RGB and BGR.
 
 # In[ ]:
@@ -174,6 +178,7 @@ def to_rgb(image_data: np.ndarray) -> np.ndarray:
     Convert image_data from BGR to RGB
     """
     import cv2
+
     return cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
 
 
@@ -182,13 +187,14 @@ def to_bgr(image_data: np.ndarray) -> np.ndarray:
     Convert image_data from RGB to BGR
     """
     import cv2
+
     return cv2.cvtColor(image_data, cv2.COLOR_RGB2BGR)
 
 
 # ## Videos
 
 # ### Video Player
-# 
+#
 # Custom video player to fulfill FPS requirements. You can set target FPS and output size, flip the video horizontally or skip first N frames.
 
 # In[ ]:
@@ -295,7 +301,9 @@ class VideoPlayer:
             # need to copy frame, because can be cached and reused if fps is low
             frame = self.__frame.copy()
         if self.__size is not None:
-            frame = self.cv2.resize(frame, self.__size, interpolation=self.__interpolation)
+            frame = self.cv2.resize(
+                frame, self.__size, interpolation=self.__interpolation
+            )
         if self.__flip:
             frame = self.cv2.flip(frame, 1)
         return frame
@@ -304,7 +312,7 @@ class VideoPlayer:
 # ## Visualization
 
 # ### Segmentation
-# 
+#
 # Define a SegmentationMap NamedTuple that keeps the labels and colormap for a segmentation project/dataset. Create CityScapesSegmentation and BinarySegmentation SegmentationMaps. Create a function to convert a segmentation map to an RGB image with a colormap, and to show the segmentation result as an overlay over the original image.
 
 # In[ ]:
@@ -385,6 +393,7 @@ def segmentation_map_to_image(
     :return: An RGB image where each pixel is an int8 value according to colormap.
     """
     import cv2
+
     if len(result.shape) != 2 and result.shape[0] != 1:
         raise ValueError(
             f"Expected result with shape (H,W) or (1,H,W), got result with shape {result.shape}"
@@ -420,7 +429,9 @@ def segmentation_map_to_image(
     return mask
 
 
-def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=False) -> np.ndarray:
+def segmentation_map_to_overlay(
+    image, result, alpha, colormap, remove_holes=False
+) -> np.ndarray:
     """
     Returns a new image where a segmentation mask (created with colormap) is overlayed on
     the source image.
@@ -433,6 +444,7 @@ def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=Fal
     :return: An RGP image with segmentation mask overlayed on the source image.
     """
     import cv2
+
     if len(image.shape) == 2:
         image = np.repeat(np.expand_dims(image, -1), 3, 2)
     mask = segmentation_map_to_image(result, colormap, remove_holes)
@@ -442,7 +454,7 @@ def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=Fal
 
 
 # ### Network Results
-# 
+#
 # Show network result image, optionally together with the source image and a legend with labels.
 
 # In[ ]:
@@ -481,7 +493,9 @@ def viz_result_image(
     if bgr_to_rgb:
         source_image = to_rgb(source_image)
     if resize:
-        result_image = cv2.resize(result_image, (source_image.shape[1], source_image.shape[0]))
+        result_image = cv2.resize(
+            result_image, (source_image.shape[1], source_image.shape[0])
+        )
 
     num_images = 1 if source_image is None else 2
 
@@ -532,6 +546,7 @@ def show_array(frame: np.ndarray, display_handle=None):
     Create a display_handle with: `display_handle = display(display_id=True)`
     """
     import cv2
+
     _, frame = cv2.imencode(ext=".jpeg", img=frame)
     if display_handle is None:
         display_handle = display(Image(data=frame.tobytes()), display_id=True)
@@ -541,7 +556,7 @@ def show_array(frame: np.ndarray, display_handle=None):
 
 
 # ## Checks and Alerts
-# 
+#
 # Create an alert class to show stylized info/error/warning messages and a `check_device` function that checks whether a given device is available.
 
 # In[ ]:
@@ -582,10 +597,13 @@ class DeviceNotFoundAlert(NotebookAlert):
         )
         self.alert_class = "warning"
         if len(supported_devices) == 1:
-            self.message += f"The following device is available: {ie.available_devices[0]}"
+            self.message += (
+                f"The following device is available: {ie.available_devices[0]}"
+            )
         else:
             self.message += (
-                "The following devices are available: " f"{', '.join(ie.available_devices)}"
+                "The following devices are available: "
+                f"{', '.join(ie.available_devices)}"
             )
         super().__init__(self.message, self.alert_class)
 

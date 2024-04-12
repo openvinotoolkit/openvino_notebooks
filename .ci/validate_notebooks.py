@@ -1,6 +1,6 @@
 import sys
 import os
-import subprocess # nosec - disable B404:import-subprocess check
+import subprocess  # nosec - disable B404:import-subprocess check
 import csv
 import shutil
 import platform
@@ -13,15 +13,21 @@ ROOT = Path(__file__).parents[1]
 
 def parse_arguments():
     parser = ArgumentParser()
-    parser.add_argument('--ignore_list', required=False, nargs='+')
-    parser.add_argument('--test_list', required=False, nargs='+')
-    parser.add_argument('--early_stop', action='store_true')
-    parser.add_argument('--report_dir', default='report')
-    parser.add_argument('--keep_artifacts', action='store_true')
-    parser.add_argument('--collect_reports', action='store_true')
+    parser.add_argument("--ignore_list", required=False, nargs="+")
+    parser.add_argument("--test_list", required=False, nargs="+")
+    parser.add_argument("--early_stop", action="store_true")
+    parser.add_argument("--report_dir", default="report")
+    parser.add_argument("--keep_artifacts", action="store_true")
+    parser.add_argument("--collect_reports", action="store_true")
     parser.add_argument("--move_notebooks_dir")
-    parser.add_argument("--timeout", type=int, default=7200, help="Timeout for running single notebook in seconds")
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=7200,
+        help="Timeout for running single notebook in seconds",
+    )
     return parser.parse_args()
+
 
 def find_notebook_dir(path, root):
     for parent in path.parents:
@@ -29,39 +35,50 @@ def find_notebook_dir(path, root):
             return parent.relative_to(root)
     return None
 
+
 def move_notebooks(nb_dir):
-    current_notebooks_dir = ROOT / 'notebooks'
-    shutil.copytree(current_notebooks_dir, nb_dir)         
+    current_notebooks_dir = ROOT / "notebooks"
+    shutil.copytree(current_notebooks_dir, nb_dir)
 
 
 def prepare_test_plan(test_list, ignore_list, nb_dir=None):
-    orig_nb_dir = ROOT / 'notebooks'
+    orig_nb_dir = ROOT / "notebooks"
     notebooks_dir = orig_nb_dir if nb_dir is None else nb_dir
-    notebooks = sorted(list(notebooks_dir.rglob('**/*.ipynb')))
-    statuses = {notebook.parent.relative_to(notebooks_dir): {'status': '', 'path': notebook.parent} for notebook in notebooks}
+    notebooks = sorted(list(notebooks_dir.rglob("**/*.ipynb")))
+    statuses = {
+        notebook.parent.relative_to(notebooks_dir): {
+            "status": "",
+            "path": notebook.parent,
+        }
+        for notebook in notebooks
+    }
     test_list = test_list or statuses.keys()
     ignored_notebooks = []
     if ignore_list is not None:
         for ig_nb in ignore_list:
-            if ig_nb.endswith('.txt'):
-                with open(ig_nb, 'r') as f:
-                    ignored_notebooks.extend(list(map(lambda x: x.strip(), f.readlines())))
+            if ig_nb.endswith(".txt"):
+                with open(ig_nb, "r") as f:
+                    ignored_notebooks.extend(
+                        list(map(lambda x: x.strip(), f.readlines()))
+                    )
             else:
                 ignored_notebooks.append(ig_nb)
         print(f"ignored notebooks: {ignored_notebooks}")
 
-    if len(test_list) == 1 and test_list[0].endswith('.txt'):
+    if len(test_list) == 1 and test_list[0].endswith(".txt"):
         testing_notebooks = []
-        with open(test_list[0], 'r') as f:
+        with open(test_list[0], "r") as f:
             for line in f.readlines():
                 changed_path = Path(line.strip())
-                if changed_path.resolve() == (ROOT / 'requirements.txt').resolve():
-                    print('requirements.txt changed, check all notebooks')
+                if changed_path.resolve() == (ROOT / "requirements.txt").resolve():
+                    print("requirements.txt changed, check all notebooks")
                     testing_notebooks = statuses.keys()
                     break
-                if changed_path.suffix == '.md':
+                if changed_path.suffix == ".md":
                     continue
-                notebook_subdir = find_notebook_dir(changed_path.resolve(), orig_nb_dir.resolve())
+                notebook_subdir = find_notebook_dir(
+                    changed_path.resolve(), orig_nb_dir.resolve()
+                )
                 if notebook_subdir is None:
                     continue
                 testing_notebooks.append(notebook_subdir)
@@ -73,9 +90,9 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
 
     for notebook in statuses:
         if notebook not in test_list:
-            statuses[notebook]['status'] = 'SKIPPED'
+            statuses[notebook]["status"] = "SKIPPED"
         if notebook in ignore_list:
-            statuses[notebook]['status'] = 'SKIPPED'
+            statuses[notebook]["status"] = "SKIPPED"
     return statuses
 
 
@@ -94,23 +111,26 @@ def clean_test_artifacts(before_test_files, after_test_files):
 
 def run_test(notebook_path, root, timeout=7200, keep_artifacts=False):
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path)
-    print(f'RUN {notebook_path.relative_to(root)}', flush=True)
+    print(f"RUN {notebook_path.relative_to(root)}", flush=True)
     retcodes = []
 
     with cd(notebook_path):
-        existing_files = sorted(Path('.').glob("test_*.ipynb"))
-        
+        existing_files = sorted(Path(".").glob("test_*.ipynb"))
+
         for notebook_name in existing_files:
-        
-            main_command = [sys.executable,  '-m',  'treon', str(notebook_name)]
+            main_command = [sys.executable, "-m", "treon", str(notebook_name)]
             try:
-                retcode = subprocess.run(main_command, shell=(platform.system() == "Windows"), timeout=timeout).returncode
+                retcode = subprocess.run(
+                    main_command,
+                    shell=(platform.system() == "Windows"),
+                    timeout=timeout,
+                ).returncode
             except subprocess.TimeoutExpired:
                 retcode = -42
             retcodes.append((str(notebook_name), retcode))
 
         if not keep_artifacts:
-            clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
+            clean_test_artifacts(existing_files, sorted(Path(".").iterdir()))
     return retcodes
 
 
@@ -118,24 +138,29 @@ def finalize_status(failed_notebooks, timeout_notebooks, test_plan, report_dir, 
     return_status = 0
     if failed_notebooks:
         return_status = 1
-        print("FAILED: \n{}".format('\n'.join(failed_notebooks)))
+        print("FAILED: \n{}".format("\n".join(failed_notebooks)))
     if timeout_notebooks:
-        print("FAILED BY TIMEOUT: \n{}".format('\n'.join(timeout_notebooks)))
+        print("FAILED BY TIMEOUT: \n{}".format("\n".join(timeout_notebooks)))
     test_report = []
     for notebook, status in test_plan.items():
-        test_status = status['status'] or 'NOT_RUN'
-        test_report.append({
-            'name': notebook, 'status': test_status, 'full_path': str(status['path'].relative_to(root))
-        })
-    with (report_dir / 'test_report.csv').open('w') as f:
-        writer = csv.DictWriter(f, fieldnames=['name', 'status', 'full_path'])
+        test_status = status["status"] or "NOT_RUN"
+        test_report.append(
+            {
+                "name": notebook,
+                "status": test_status,
+                "full_path": str(status["path"].relative_to(root)),
+            }
+        )
+    with (report_dir / "test_report.csv").open("w") as f:
+        writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path"])
         writer.writeheader()
-        writer.writerows(test_report) 
+        writer.writerows(test_report)
     return return_status
 
 
 class cd:
     """Context manager for changing the current working directory"""
+
     def __init__(self, new_path):
         self.new_path = os.path.expanduser(new_path)
 
@@ -145,6 +170,7 @@ class cd:
 
     def __exit__(self, etype, value, traceback):
         os.chdir(self.saved_path)
+
 
 def main():
     failed_notebooks = []
@@ -158,24 +184,30 @@ def main():
         notebooks_moving_dir = Path(notebooks_moving_dir)
         root = notebooks_moving_dir.parent
         move_notebooks(notebooks_moving_dir)
-    
+
     keep_artifacts = False
     if args.keep_artifacts:
         keep_artifacts = True
-    
-    test_plan = prepare_test_plan(args.test_list, args.ignore_list, notebooks_moving_dir)
+
+    test_plan = prepare_test_plan(
+        args.test_list, args.ignore_list, notebooks_moving_dir
+    )
     for notebook, report in test_plan.items():
-        if report['status'] == "SKIPPED":
+        if report["status"] == "SKIPPED":
             continue
-        statuses = run_test(report['path'], root, args.timeout, keep_artifacts)
+        statuses = run_test(report["path"], root, args.timeout, keep_artifacts)
         if not statuses:
             print(f"{str(notebook)}: No testing notebooks found")
-            report['status'] = "EMPTY"
+            report["status"] = "EMPTY"
         for subnotebook, status in statuses:
             if status:
-                report['status'] = "TIMEOUT" if status == -42 else "FAILED"
+                report["status"] = "TIMEOUT" if status == -42 else "FAILED"
             else:
-                report["status"] = 'SUCCESS' if not report["status"] in ["TIMEOUT", "FAILED"] else report["status"]
+                report["status"] = (
+                    "SUCCESS"
+                    if not report["status"] in ["TIMEOUT", "FAILED"]
+                    else report["status"]
+                )
             if status:
                 if status == -42:
                     timeout_notebooks.append(str(subnotebook))
@@ -183,10 +215,12 @@ def main():
                     failed_notebooks.append(str(subnotebook))
             if args.early_stop:
                 break
-    exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
+    exit_status = finalize_status(
+        failed_notebooks, timeout_notebooks, test_plan, reports_dir, root
+    )
     return exit_status
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     exit_code = main()
     sys.exit(exit_code)
