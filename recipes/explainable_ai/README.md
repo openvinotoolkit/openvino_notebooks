@@ -1,12 +1,10 @@
-# Data and Model Explainability for Computer Vision with OpenVINO™ Toolkit
+# Explainable AI with OpenVINO™ Toolkit
 
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/LICENSE)
 
-Computer vision models are continuing to rapidly grow in their capabilities and the use cases they can support, including intelligent queue management and automated self-checkout for retail use cases, anomaly detection of transistors on the manufacturing floor, and more.
+The Explainable AI kit is an application that demonstrates how to use data quality measurements and saliency maps to understand the predictions and performance of computer vision models during inference. Data and model explainability help us understand how computer vision models make predictions, and this helps refine our models for efficiency and performance. Computer vision models are continuing to rapidly grow in their capabilities and the use cases they can support, including intelligent queue management and automated self-checkout for retail use cases, anomaly detection of transistors on the manufacturing floor, and more.
 
-Understanding why computer vision models make certain predictions using data and model explainability can help us refine our models to be more efficient and performant. The Data and Model Explainability for Computer Vision with OpenVINO™ Toolkit kit is an application designed to demonstrate how to use data quality measurements and saliency maps to understand the predictions and performance of computer vision models during inference. It uses OpenVINO, a toolkit that enables developers to deploy deep learning models on a variety of hardware platforms.
-
-You can following along with our Jupyter Notebook on our Github repository. You will be using the following stack of technologies: OpenVINO™ Toolkit, Ultralytic’s YOLOv8, and the [OpenVINO Datumaru](https://github.com/openvinotoolkit/datumaro/tree/develop) library.
+This kit uses the OpenVINO toolkit, enabling developers to deploy deep learning models on various hardware platforms. You can follow along with our Jupyter Notebook on our GitHub repository. You will be using the following stack of technologies: OpenVINO toolkit, Ultralytic’s YOLOv8, and the [OpenVINO Datumaro](https://github.com/openvinotoolkit/datumaro/tree/develop) library.
 
 
 ## Table of Contents
@@ -18,13 +16,13 @@ You can following along with our Jupyter Notebook on our Github repository. You 
 		- [Creating a Virtual Environment](#creating-a-virtual-environment)
 		- [Activating the Environment](#activating-the-environment)
 		- [Installing the Packages](#installing-the-packages)
-	- [Converting and Optimizing the Model](#converting-and-optimizing-the-model)
 	- [Running the Application](#running-the-application)
 - [Benchmarking the Model with OpenVINO's `benchmark_app`](#benchmarking-the-model-with-openvinos-benchmark_app)
 	- [Benchmark Results](#benchmark-results)
 	- [Running the Benchmark](#running-the-benchmark)
 - [Appendix](#appendix)
-- [Troubleshooting and Resources](#troubleshooting-and-resources)
+- [Relevant Resources](#relevant-resources)
+- [Troubleshooting](#troubleshooting)
 
 ## Getting Started
 
@@ -58,7 +56,7 @@ The above will clone the repository into a directory named "openvino_notebooks" 
 cd openvino_notebooks/recipes/cv_explainability
 ```
 
-Then pull video sample:
+Then pull the video sample:
 
 ```shell
 git lfs pull
@@ -78,10 +76,10 @@ This will create a new virtual environment named "venv" in the current directory
 Activate the virtual environment using the following command:
 
 ```shell
-source venv/bin/activate   # For Unix-based operating system such as Linux or macOS
+source venv/bin/activate   # For Unix-based operating systems such as Linux or macOS
 ```
 
-_NOTE: If you are using Windows, use `venv\Scripts\activate` command instead._
+_NOTE: If you are using Windows, use the `venv\Scripts\activate` command instead._
 
 This will activate the virtual environment and change your shell's prompt to indicate that you are now working within that environment.
 
@@ -96,7 +94,7 @@ pip install -r requirements.txt
 
 ### Running the Application
 
-You can run the [Computer Vision Data Quality and Explainability Kit.ipynb](Computer Vision Data Quality and Explainability Kit.ipynb) to learn more about the inference process. This notebook contains detailed instructions to run the CV Explainability application, load and analyze a short section of data with data quality metrics, and generate saliency maps with a OpenVINO YOLOv8 model using Ultralytics. For the data quality metrics generation, we leverage the  open-source toolkit datumaro, including specifically the tutorial [here](https://github.com/openvinotoolkit/datumaro/blob/develop/notebooks/11_validate.ipynb). This edge AI reference kit focuses on a specific digital transportation use case, with an analysis of only a few data quality metrics - please visit the [Datumaro tutorials](https://github.com/openvinotoolkit/datumaro/tree/develop/notebooks) for resources on how to perform advanced data exploration, and explore and remediate more types of data quality issues.
+You can run the [Computer Vision Data Quality and Explainability Kit.ipynb](Computer Vision Data Quality and Explainability Kit.ipynb) to learn more about the inference process. This notebook contains detailed instructions to run the CV Explainability application, load and analyze a short data section with data quality metrics, and generate saliency maps with an OpenVINO YOLOv8 model using Ultralytics. For the data quality metrics generation, we leverage the open-source toolkit datumaro, including specifically the tutorial [here](https://github.com/openvinotoolkit/datumaro/blob/develop/notebooks/11_validate.ipynb). This edge AI reference kit focuses on a specific digital transportation use case, with an analysis of only a few data quality metrics - please visit the [Datumaro tutorials](https://github.com/openvinotoolkit/datumaro/tree/develop/notebooks) for resources on how to perform advanced data exploration, and explore and remediate more types of data quality issues.
 
 ## Benchmarking the Model with OpenVINO's `benchmark_app`
 
@@ -118,7 +116,7 @@ Use the following command to run the benchmark:
 ```
 Replace `int8_model_det_path` with the path to your INT8 model and $device with the specific device you're using (CPU, GPU, etc.). This command performs inference on the model for 30 seconds. Run `benchmark_app --help` for additional command-line options.
 
-Congratulations! You have successfully set up and run the Data and Model Explainability for Computer Vision with OpenVINO™ Toolkit application.
+Congratulations! You have successfully set up and run the Explainable AI kit.
 
 ## Appendix
 
@@ -142,7 +140,12 @@ Platform Configurations for Performance Benchmarks for YOLOv8m Model
 | Benchmark Date | May 31, 2023 | May 29, 2023 | June 15, 2023 | May 29, 2023 | June 15, 2023 | May 29, 2023 
 | Benchmarked by | Intel Corporation | Intel Corporation | Intel Corporation | Intel Corporation | Intel Corporation | Intel Corporation |
 
-## Troubleshooting and Resources
+## Relevant Resources
+- [DarwinAI Case Study](https://www.intel.com/content/www/us/en/internet-of-things/ai-in-production/partners/documents/darwinai-delivers-explainable-ai-case-study.html): See how others are implementing Explainable AI practices with Intel ​
+- [Interview on building Ethical AI with Explainable AI](https://www.youtube.com/watch?v=wWjlWpI4EIE): Learn more about key topics around Explainable AI from Ria, our evangelist ​and creator of the Explainable AI kit
+- [Edge AI Reference Kits​](https://github.com/openvinotoolkit/openvino_notebooks/tree/recipes/recipes): Explore more of our kits
+
+## Troubleshooting
 - Open a [discussion topic](https://github.com/openvinotoolkit/openvino_notebooks/discussions)
 - Create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issues)
 - Learn more about [OpenVINO](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/overview.html)
