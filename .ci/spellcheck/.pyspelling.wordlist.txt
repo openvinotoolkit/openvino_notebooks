@@ -55,6 +55,8 @@ bert
 BERT's
 BetterTransformer
 Bewley
+BGE
+bge
 BGR
 BMP
 Bicubic
@@ -614,12 +616,16 @@ ReLU
 René
 repo
 reproducibility
+rerank
+Rerank
+reranker
 rescale
 rescaling
 Rescaling
 ResNet
 resnet
 RetinaFace
+RetroMAE
 RGB
 Riffusion
 riffusion
@@ -845,4 +851,5 @@ ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
+zh
 xformers

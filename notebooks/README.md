@@ -38,7 +38,6 @@
 - [Visual Content Search using MobileCLIP and OpenVINO](./mobileclip-video-search/mobileclip-video-search.ipynb)
 - [Magika: AI powered fast and efficient file type identification using OpenVINO](./magika-content-type-recognition/magika-content-type-recognition.ipynb)
 - [LLM Instruction-following pipeline with OpenVINO](./llm-question-answering/llm-question-answering.ipynb)
-- [Create an LLM-powered RAG system using OpenVINO](./llm-chatbot/rag-chatbot.ipynb)
 - [Create an LLM-powered Chatbot using OpenVINO](./llm-chatbot/llm-chatbot.ipynb)
 - [Visual-language assistant with LLaVA Next and OpenVINO](./llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb)
 - [Visual-language assistant with Video-LLaVA and OpenVINO](./llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb)
@@ -205,7 +204,6 @@
 - [Magika: AI powered fast and efficient file type identification using OpenVINO](./magika-content-type-recognition/magika-content-type-recognition.ipynb)
 - [Machine translation demo](./machine-translation/machine-translation.ipynb)
 - [LLM Instruction-following pipeline with OpenVINO](./llm-question-answering/llm-question-answering.ipynb)
-- [Create an LLM-powered RAG system using OpenVINO](./llm-chatbot/rag-chatbot.ipynb)
 - [Create an LLM-powered Chatbot using OpenVINO](./llm-chatbot/llm-chatbot.ipynb)
 - [Visual-language assistant with LLaVA Next and OpenVINO](./llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb)
 - [Visual-language assistant with Video-LLaVA and OpenVINO](./llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb)
@@ -248,6 +246,8 @@
 - [Image-to-Video synthesis with AnimateAnyone and OpenVINO](./animate-anyone/animate-anyone.ipynb)
 - [Lightweight image generation with aMUSEd and OpenVINO](./amused-lightweight-text-to-image/amused-lightweight-text-to-image.ipynb)
 - [Part Segmentation of 3D Point Clouds with OpenVINO™](./3D-segmentation-point-clouds/3D-segmentation-point-clouds.ipynb)
+- - [Create a RAG system using OpenVINO and LangChain](./llm-rag-langchain/llm-rag-langchain.ipynb)
+
 
 ## Model Training
 
