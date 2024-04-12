@@ -3,7 +3,7 @@ import PIL
 import numpy as np
 
 
-def visualize_results(orig_img:PIL.Image.Image, answer:str, question:str = None):
+def visualize_results(orig_img: PIL.Image.Image, answer: str, question: str = None):
     """
     Helper function for results visualization
 
@@ -15,7 +15,7 @@ def visualize_results(orig_img:PIL.Image.Image, answer:str, question:str = None)
        fig (matplotlib.pyplot.Figure): matplotlib generated figure contains drawing result
     """
     fig = plt.figure()
-    fig.patch.set_facecolor('white')
+    fig.patch.set_facecolor("white")
     ax = fig.add_subplot(111)
     ax.set_xticklabels([])
     ax.set_yticklabels([])
@@ -25,6 +25,11 @@ def visualize_results(orig_img:PIL.Image.Image, answer:str, question:str = None)
     ax.imshow(np.array(orig_img))
     qa_text = "question: {}\nanswer: {}"
     cap_text = "caption: {}"
-    ax.set_title(qa_text.format(question, answer) if question is not None else cap_text.format(answer),
-                 y=-0.01, pad=-30 if question is not None else -15)
+    ax.set_title(
+        qa_text.format(question, answer)
+        if question is not None
+        else cap_text.format(answer),
+        y=-0.01,
+        pad=-30 if question is not None else -15,
+    )
     return fig

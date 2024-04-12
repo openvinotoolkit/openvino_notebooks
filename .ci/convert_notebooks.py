@@ -1,6 +1,6 @@
 import argparse
 import shutil
-import subprocess # nosec - disable B404:import-subprocess check
+import subprocess  # nosec - disable B404:import-subprocess check
 import time
 from pathlib import Path
 import nbformat
@@ -18,14 +18,17 @@ def disable_gradio_debug(notebook_path):
         print(f"Disabled gradio debug mode for {notebook_path}")
         nbformat.write(nb, str(notebook_path), version=nbformat.NO_CONVERT)
 
+
 def arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--exclude_execution_file")
     parser.add_argument("--exclude_conversion_file")
-    parser.add_argument("--timeout", type=float, default=7200,
-                        help="timeout for notebook execution")
-    parser.add_argument("--rst_dir", type=Path,
-                        help="rst files output directory", default=Path("rst"))
+    parser.add_argument(
+        "--timeout", type=float, default=7200, help="timeout for notebook execution"
+    )
+    parser.add_argument(
+        "--rst_dir", type=Path, help="rst files output directory", default=Path("rst")
+    )
 
     return parser.parse_args()
 
@@ -48,19 +51,36 @@ def main():
         ignore_execution_list = prepare_ignore_list(args.exclude_execution_file)
     root = Path(__file__).parents[1]
     notebooks_dir = root / "notebooks"
-    notebooks = sorted(list(notebooks_dir.rglob('**/*.ipynb')))
+    notebooks = sorted(list(notebooks_dir.rglob("**/*.ipynb")))
     for notebook in notebooks:
         notebook_path = notebook.relative_to(root)
         if str(notebook_path) in ignore_conversion_list:
             continue
         disable_gradio_debug(notebook_path)
-        notebook_executed = notebook_path.parent / notebook_path.name.replace(".ipynb", "-with-output.ipynb")
+        notebook_executed = notebook_path.parent / notebook_path.name.replace(
+            ".ipynb", "-with-output.ipynb"
+        )
         start = time.perf_counter()
         print(f"Convert {notebook_path}")
         if str(notebook_path) not in ignore_execution_list:
             try:
-                retcode = subprocess.run(["jupyter", "nbconvert",  "--log-level=INFO", "--execute", "--to",  "notebook", "--output",
-                                        str(notebook_executed),  '--output-dir', str(root), '--ExecutePreprocessor.kernel_name=python3', str(notebook_path)], timeout=args.timeout).returncode
+                retcode = subprocess.run(
+                    [
+                        "jupyter",
+                        "nbconvert",
+                        "--log-level=INFO",
+                        "--execute",
+                        "--to",
+                        "notebook",
+                        "--output",
+                        str(notebook_executed),
+                        "--output-dir",
+                        str(root),
+                        "--ExecutePreprocessor.kernel_name=python3",
+                        str(notebook_path),
+                    ],
+                    timeout=args.timeout,
+                ).returncode
             except subprocess.TimeoutExpired:
                 retcode = -42
                 print(f"TIMEOUT: {notebook_path}")
@@ -69,11 +89,35 @@ def main():
                 continue
         else:
             shutil.copyfile(notebook_path, notebook_executed)
-        rst_retcode = subprocess.run(["jupyter", "nbconvert", "--to", "rst", str(notebook_executed), "--output-dir", str(args.rst_dir),
-                                          "--TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True"], timeout=args.timeout).returncode
+        rst_retcode = subprocess.run(
+            [
+                "jupyter",
+                "nbconvert",
+                "--to",
+                "rst",
+                str(notebook_executed),
+                "--output-dir",
+                str(args.rst_dir),
+                "--TagRemovePreprocessor.remove_all_outputs_tags=hide_output --TagRemovePreprocessor.enabled=True",
+            ],
+            timeout=args.timeout,
+        ).returncode
         notebook_rst = args.rst_dir / notebook_executed.name.replace(".ipynb", ".rst")
         # remove all non-printable characters
-        subprocess.run(["sed", "-i", "-e", "s/\x1b\[[0-9;]*m//g", "-e", "s/\x1b\[?25h//g", "-e", "s/\x1b\[?25l//g", str(notebook_rst)], timeout=args.timeout)
+        subprocess.run(
+            [
+                "sed",
+                "-i",
+                "-e",
+                "s/\x1b\[[0-9;]*m//g",
+                "-e",
+                "s/\x1b\[?25h//g",
+                "-e",
+                "s/\x1b\[?25l//g",
+                str(notebook_rst),
+            ],
+            timeout=args.timeout,
+        )
 
         end = time.perf_counter() - start
         print(f"Notebook conversion took: {end:.4f} s")

@@ -13,7 +13,7 @@ from diffusers.schedulers import DDIMScheduler, LMSDiscreteScheduler, PNDMSchedu
 import openvino as ov
 
 
-def prepare_mask_and_masked_image(image:PIL.Image.Image, mask:PIL.Image.Image):
+def prepare_mask_and_masked_image(image: PIL.Image.Image, mask: PIL.Image.Image):
     """
     Prepares a pair (image, mask) to be consumed by the Stable Diffusion pipeline. This means that those inputs will be
     converted to ``np.array`` with shapes ``batch x channels x height x width`` where ``channels`` is ``3`` for the
@@ -49,7 +49,9 @@ def prepare_mask_and_masked_image(image:PIL.Image.Image, mask:PIL.Image.Image):
         mask = [mask]
 
     if isinstance(mask, list) and isinstance(mask[0], PIL.Image.Image):
-        mask = np.concatenate([np.array(m.convert("L"))[None, None, :] for m in mask], axis=0)
+        mask = np.concatenate(
+            [np.array(m.convert("L"))[None, None, :] for m in mask], axis=0
+        )
         mask = mask.astype(np.float32) / 255.0
     elif isinstance(mask, list) and isinstance(mask[0], np.ndarray):
         mask = np.concatenate([m[None, None, :] for m in mask], axis=0)
@@ -66,7 +68,7 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
     def __init__(
         self,
         vae_decoder: ov.Model,
-        text_encoder:ov. Model,
+        text_encoder: ov.Model,
         tokenizer: CLIPTokenizer,
         unet: ov.Model,
         scheduler: Union[DDIMScheduler, PNDMScheduler, LMSDiscreteScheduler],
@@ -125,7 +127,9 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
           mask (np.array): resized mask tensor
           masked_image_latents (np.array): masked image encoded into latent space using VAE
         """
-        mask = torch.nn.functional.interpolate(torch.from_numpy(mask), size=(height // 8, width // 8))
+        mask = torch.nn.functional.interpolate(
+            torch.from_numpy(mask), size=(height // 8, width // 8)
+        )
         mask = mask.numpy()
 
         # encode the mask image into latents space so we can concatenate it to the latents
@@ -263,7 +267,13 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
         image = self.postprocess_image(image, meta, output_type)
         return {"sample": image}
 
-    def _encode_prompt(self, prompt:Union[str, List[str]], num_images_per_prompt:int = 1, do_classifier_free_guidance:bool = True, negative_prompt:Union[str, List[str]] = None):
+    def _encode_prompt(
+        self,
+        prompt: Union[str, List[str]],
+        num_images_per_prompt: int = 1,
+        do_classifier_free_guidance: bool = True,
+        negative_prompt: Union[str, List[str]] = None,
+    ):
         """
         Encodes the prompt into text encoder hidden states.
 
@@ -287,16 +297,15 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
         )
         text_input_ids = text_inputs.input_ids
 
-        text_embeddings = self.text_encoder(
-            text_input_ids)[self._text_encoder_output]
+        text_embeddings = self.text_encoder(text_input_ids)[self._text_encoder_output]
 
         # duplicate text embeddings for each generation per prompt
         if num_images_per_prompt != 1:
             bs_embed, seq_len, _ = text_embeddings.shape
-            text_embeddings = np.tile(
-                text_embeddings, (1, num_images_per_prompt, 1))
+            text_embeddings = np.tile(text_embeddings, (1, num_images_per_prompt, 1))
             text_embeddings = np.reshape(
-                text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1))
+                text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1)
+            )
 
         # get unconditional embeddings for classifier free guidance
         if do_classifier_free_guidance:
@@ -316,12 +325,18 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
                 return_tensors="np",
             )
 
-            uncond_embeddings = self.text_encoder(uncond_input.input_ids)[self._text_encoder_output]
+            uncond_embeddings = self.text_encoder(uncond_input.input_ids)[
+                self._text_encoder_output
+            ]
 
             # duplicate unconditional embeddings for each generation per prompt, using mps friendly method
             seq_len = uncond_embeddings.shape[1]
-            uncond_embeddings = np.tile(uncond_embeddings, (1, num_images_per_prompt, 1))
-            uncond_embeddings = np.reshape(uncond_embeddings, (batch_size * num_images_per_prompt, seq_len, -1))
+            uncond_embeddings = np.tile(
+                uncond_embeddings, (1, num_images_per_prompt, 1)
+            )
+            uncond_embeddings = np.reshape(
+                uncond_embeddings, (batch_size * num_images_per_prompt, seq_len, -1)
+            )
 
             # For classifier free guidance, we need to do two forward passes.
             # Here we concatenate the unconditional and text embeddings into a single batch
@@ -330,10 +345,12 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
 
         return text_embeddings
 
-    def prepare_latents(self, image:PIL.Image.Image = None, latent_timestep:torch.Tensor = None):
+    def prepare_latents(
+        self, image: PIL.Image.Image = None, latent_timestep: torch.Tensor = None
+    ):
         """
         Function for getting initial latents for starting generation
-        
+
         Parameters:
             image (PIL.Image.Image, *optional*, None):
                 Input image for generation, if not provided randon noise will be used as starting point
@@ -353,14 +370,18 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
         input_image, meta = preprocess(image)
         latents = self.vae_encoder(input_image)[self._vae_e_output]
         latents = latents * 0.18215
-        latents = self.scheduler.add_noise(torch.from_numpy(latents), torch.from_numpy(noise), latent_timestep).numpy()
+        latents = self.scheduler.add_noise(
+            torch.from_numpy(latents), torch.from_numpy(noise), latent_timestep
+        ).numpy()
         return latents, meta
 
-    def postprocess_image(self, image:np.ndarray, meta:Dict, output_type:str = "pil"):
+    def postprocess_image(
+        self, image: np.ndarray, meta: Dict, output_type: str = "pil"
+    ):
         """
-        Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required), 
+        Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required),
         normalize and convert to [0, 255] pixels range. Optionally, convertes it from np.ndarray to PIL.Image format
-        
+
         Parameters:
             image (np.ndarray):
                 Generated image
@@ -386,25 +407,26 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
             image = self.numpy_to_pil(image)
             if "src_height" in meta:
                 orig_height, orig_width = meta["src_height"], meta["src_width"]
-                image = [img.resize((orig_width, orig_height),
-                                    PIL.Image.Resampling.LANCZOS) for img in image]
+                image = [
+                    img.resize((orig_width, orig_height), PIL.Image.Resampling.LANCZOS)
+                    for img in image
+                ]
         else:
             if "src_height" in meta:
                 orig_height, orig_width = meta["src_height"], meta["src_width"]
-                image = [cv2.resize(img, (orig_width, orig_width))
-                         for img in image]
+                image = [cv2.resize(img, (orig_width, orig_width)) for img in image]
         return image
 
-    def get_timesteps(self, num_inference_steps:int, strength:float):
+    def get_timesteps(self, num_inference_steps: int, strength: float):
         """
         Helper function for getting scheduler timesteps for generation
         In case of image-to-image generation, it updates number of steps according to strength
-        
+
         Parameters:
            num_inference_steps (int):
               number of inference steps for generation
            strength (float):
-               value between 0.0 and 1.0, that controls the amount of noise that is added to the input image. 
+               value between 0.0 and 1.0, that controls the amount of noise that is added to the input image.
                Values that approach 1.0 allow for lots of variations but will also produce images that are not semantically consistent with the input.
         """
         # get the original timestep using init_timestep
@@ -413,23 +435,23 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
         t_start = max(num_inference_steps - init_timestep, 0)
         timesteps = self.scheduler.timesteps[t_start:]
 
-        return timesteps, num_inference_steps - t_start 
+        return timesteps, num_inference_steps - t_start
 
 
 def generate_video(
-    pipe:OVStableDiffusionInpaintingPipeline,
-    prompt:Union[str, List[str]],
-    negative_prompt:Union[str, List[str]],
-    guidance_scale:float = 7.5,
-    num_inference_steps:int = 20,
-    num_frames:int = 20,
-    mask_width:int = 128,
-    seed:int = 9999,
-    zoom_in:bool = False,
+    pipe: OVStableDiffusionInpaintingPipeline,
+    prompt: Union[str, List[str]],
+    negative_prompt: Union[str, List[str]],
+    guidance_scale: float = 7.5,
+    num_inference_steps: int = 20,
+    num_frames: int = 20,
+    mask_width: int = 128,
+    seed: int = 9999,
+    zoom_in: bool = False,
 ):
     """
     Zoom video generation function
-    
+
     Parameters:
       pipe (OVStableDiffusionInpaintingPipeline): inpainting pipeline.
       prompt (str or List[str]): The prompt or prompts to guide the image generation.
@@ -505,7 +527,15 @@ def generate_video(
         # interpolation steps bewteen 2 inpainted images (=sequential zoom and crop)
         for j in range(num_interpol_frames - 1):
             interpol_image = current_image
-            interpol_width = round((1 - (1 - 2 * mask_width / height) ** (1 - (j + 1) / num_interpol_frames)) * height / 2)
+            interpol_width = round(
+                (
+                    1
+                    - (1 - 2 * mask_width / height)
+                    ** (1 - (j + 1) / num_interpol_frames)
+                )
+                * height
+                / 2
+            )
             interpol_image = interpol_image.crop(
                 (
                     interpol_width,
@@ -518,8 +548,14 @@ def generate_video(
             interpol_image = interpol_image.resize((height, width))
 
             # paste the higher resolution previous image in the middle to avoid drop in quality caused by zooming
-            interpol_width2 = round((1 - (height - 2 * mask_width) / (height - 2 * interpol_width)) / 2 * height)
-            prev_image_fix_crop = shrink_and_paste_on_blank(prev_image_fix, interpol_width2)
+            interpol_width2 = round(
+                (1 - (height - 2 * mask_width) / (height - 2 * interpol_width))
+                / 2
+                * height
+            )
+            prev_image_fix_crop = shrink_and_paste_on_blank(
+                prev_image_fix, interpol_width2
+            )
             interpol_image.paste(prev_image_fix_crop, mask=prev_image_fix_crop)
             all_frames.append(interpol_image)
         all_frames.append(current_image)
@@ -531,12 +567,12 @@ def generate_video(
     return save_path
 
 
-def shrink_and_paste_on_blank(current_image:PIL.Image.Image, mask_width:int):
+def shrink_and_paste_on_blank(current_image: PIL.Image.Image, mask_width: int):
     """
     Decreases size of current_image by mask_width pixels from each side,
     then adds a mask_width width transparent frame,
     so that the image the function returns is the same size as the input.
-    
+
     Parameters:
         current_image (PIL.Image): input image to transform
         mask_width (int): width in pixels to shrink from each side
@@ -565,10 +601,10 @@ def shrink_and_paste_on_blank(current_image:PIL.Image.Image, mask_width:int):
     return prev_image
 
 
-def image_grid(imgs:List[PIL.Image.Image], rows:int, cols:int):
+def image_grid(imgs: List[PIL.Image.Image], rows: int, cols: int):
     """
     Insert images to grid
-    
+
     Parameters:
         imgs (List[PIL.Image.Image]): list of images for making grid
         rows (int): number of rows in grid
@@ -586,10 +622,16 @@ def image_grid(imgs:List[PIL.Image.Image], rows:int, cols:int):
     return grid
 
 
-def write_video(file_path:str, frames:List[PIL.Image.Image], fps:float, reversed_order:bool = True, gif:bool = True):
+def write_video(
+    file_path: str,
+    frames: List[PIL.Image.Image],
+    fps: float,
+    reversed_order: bool = True,
+    gif: bool = True,
+):
     """
     Writes frames to an mp4 video file and optionaly to gif
-    
+
     Parameters:
         file_path (str): Path to output video, must end with .mp4
         frames (List of PIL.Image): list of frames

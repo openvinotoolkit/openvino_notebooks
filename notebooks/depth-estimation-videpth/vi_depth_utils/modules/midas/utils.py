@@ -17,7 +17,6 @@ def read_pfm(path):
         tuple: (data, scale)
     """
     with open(path, "rb") as file:
-
         color = None
         width = None
         height = None
@@ -176,7 +175,7 @@ def write_depth(path, depth, bits=1):
     depth_min = depth.min()
     depth_max = depth.max()
 
-    max_val = (2**(8*bits))-1
+    max_val = (2 ** (8 * bits)) - 1
 
     if depth_max - depth_min > np.finfo("float").eps:
         out = max_val * (depth - depth_min) / (depth_max - depth_min)
@@ -202,7 +201,7 @@ def write_png(path, array, bits=2):
     array_min = np.min(array)
     array_max = np.max(array)
 
-    max_val = (2**(8*bits))-1
+    max_val = (2 ** (8 * bits)) - 1
 
     if array_max - array_min > np.finfo("float").eps:
         out = max_val * (array - array_min) / (array_max - array_min)
@@ -231,5 +230,5 @@ def normalize_unit_range(data):
         normalized = (data - np.min(data)) / (np.max(data) - np.min(data))
     else:
         raise ValueError("cannot normalize array, max-min range is 0")
-    
+
     return normalized
