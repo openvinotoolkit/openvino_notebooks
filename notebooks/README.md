@@ -66,6 +66,7 @@
 - [Subject-driven image generation and editing using BLIP Diffusion and OpenVINO](./blip-diffusion-subject-generation/blip-diffusion-subject-generation.ipynb)
 - [Text-to-speech generation using Bark and OpenVINO](./bark-text-to-audio/bark-text-to-audio.ipynb)
 - [Image-to-Video synthesis with AnimateAnyone and OpenVINO](./animate-anyone/animate-anyone.ipynb)
+- [Create a RAG system using OpenVINO and LangChain](./llm-rag-langchain/llm-rag-langchain.ipynb)
 
 ## API Overview
 
