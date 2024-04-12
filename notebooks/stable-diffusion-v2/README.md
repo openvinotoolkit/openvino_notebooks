@@ -57,4 +57,9 @@ Notebook contains the following steps:
 2. Convert PyTorch models to OpenVINO IR format, using model conversion API.
 3. Run Stable Diffusion v2 pipeline with OpenVINO.
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+
+## Installation Instructions
+
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
