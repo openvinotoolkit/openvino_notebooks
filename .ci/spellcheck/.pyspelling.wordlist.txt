@@ -7,6 +7,7 @@ activations
 adaptively
 adas
 ADE
+adversarially
 aeroplane
 affective
 ai
@@ -208,6 +209,7 @@ enum
 et
 Evol
 EVS
+facto
 fastcomposer
 FastComposer
 FastSAM
@@ -324,6 +326,7 @@ Kalman
 kbps
 KD
 keras
+KerasCV
 keypoint
 keypoints
 KiTS
@@ -376,6 +379,7 @@ LSTM
 Luo
 LVLM
 macOS
+Magika
 Mahalanobis
 Mapillary
 Markovian
