@@ -23,5 +23,8 @@ The tutorial also provides interactive demo, where the model is used as a chatbo
 
 ![stable_zephyr](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cfac6ddb-6f22-4343-855c-e513269cf2bf)
 
-## Installation Instructions
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+## Installation instructions
+
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
