@@ -37,6 +37,7 @@
 - [Mobile language assistant with MobileVLM and OpenVINO](./mobilevlm-language-assistant/mobilevlm-language-assistant.ipynb)
 - [Visual Content Search using MobileCLIP and OpenVINO](./mobileclip-video-search/mobileclip-video-search.ipynb)
 - [Magika: AI powered fast and efficient file type identification using OpenVINO](./magika-content-type-recognition/magika-content-type-recognition.ipynb)
+- [Create a RAG system using OpenVINO and LangChain](./llm-rag-langchain/llm-rag-langchain.ipynb)
 - [LLM Instruction-following pipeline with OpenVINO](./llm-question-answering/llm-question-answering.ipynb)
 - [Create an LLM-powered Chatbot using OpenVINO](./llm-chatbot/llm-chatbot.ipynb)
 - [Visual-language assistant with LLaVA Next and OpenVINO](./llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb)
@@ -65,7 +66,6 @@
 - [Subject-driven image generation and editing using BLIP Diffusion and OpenVINO](./blip-diffusion-subject-generation/blip-diffusion-subject-generation.ipynb)
 - [Text-to-speech generation using Bark and OpenVINO](./bark-text-to-audio/bark-text-to-audio.ipynb)
 - [Image-to-Video synthesis with AnimateAnyone and OpenVINO](./animate-anyone/animate-anyone.ipynb)
-- [Create a RAG system using OpenVINO and LangChain](./llm-rag-langchain/llm-rag-langchain.ipynb)
 
 ## API Overview
 
@@ -203,6 +203,7 @@
 - [Industrial Meter Reader](./meter-reader/meter-reader.ipynb)
 - [Magika: AI powered fast and efficient file type identification using OpenVINO](./magika-content-type-recognition/magika-content-type-recognition.ipynb)
 - [Machine translation demo](./machine-translation/machine-translation.ipynb)
+- [Create a RAG system using OpenVINO and LangChain](./llm-rag-langchain/llm-rag-langchain.ipynb)
 - [LLM Instruction-following pipeline with OpenVINO](./llm-question-answering/llm-question-answering.ipynb)
 - [Create an LLM-powered Chatbot using OpenVINO](./llm-chatbot/llm-chatbot.ipynb)
 - [Visual-language assistant with LLaVA Next and OpenVINO](./llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb)
@@ -246,8 +247,6 @@
 - [Image-to-Video synthesis with AnimateAnyone and OpenVINO](./animate-anyone/animate-anyone.ipynb)
 - [Lightweight image generation with aMUSEd and OpenVINO](./amused-lightweight-text-to-image/amused-lightweight-text-to-image.ipynb)
 - [Part Segmentation of 3D Point Clouds with OpenVINO™](./3D-segmentation-point-clouds/3D-segmentation-point-clouds.ipynb)
-- - [Create a RAG system using OpenVINO and LangChain](./llm-rag-langchain/llm-rag-langchain.ipynb)
-
 
 ## Model Training
 
