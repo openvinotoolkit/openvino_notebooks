@@ -55,7 +55,7 @@ def internlm_partial_text_processor(partial_text, new_text):
 
 
 SUPPORTED_LLM_MODELS = {
-    "English":{
+    "English": {
         "tiny-llama-1b-chat": {
             "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
             "remote_code": False,
@@ -65,7 +65,7 @@ SUPPORTED_LLM_MODELS = {
             "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
             + """
             <|user|>
-            Question: {question} 
+            Question: {input} 
             Context: {context} 
             Answer: </s>
             <|assistant|>""",
@@ -76,7 +76,7 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
             "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
             "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
-            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{question}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{input}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
         },
         "red-pajama-3b-chat": {
             "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
@@ -88,7 +88,7 @@ SUPPORTED_LLM_MODELS = {
             "current_message_template": "\n<human>:{user}\n<bot>:{assistant}",
             "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT }"""
             + """
-            <human>: Question: {question} 
+            <human>: Question: {input} 
             Context: {context} 
             Answer: <bot>""",
         },
@@ -98,7 +98,7 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
             "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
             "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
-            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{question}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{input}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
         },
         "llama-2-chat-7b": {
             "model_id": "meta-llama/Llama-2-7b-chat-hf",
@@ -110,7 +110,7 @@ SUPPORTED_LLM_MODELS = {
             "partial_text_processor": llama_partial_text_processor,
             "rag_prompt_template": f"""[INST]Human: <<SYS>> {DEFAULT_RAG_PROMPT }<</SYS>>"""
             + """
-            Question: {question} 
+            Question: {input} 
             Context: {context} 
             Answer: [/INST]""",
         },
@@ -125,7 +125,7 @@ SUPPORTED_LLM_MODELS = {
             {DEFAULT_RAG_PROMPT }<|im_end|>"""
             + """
             <|im_start|>user
-            Question: {question} 
+            Question: {input} 
             Context: {context} 
             Answer: <im_end><|im_start|>assistant""",
         },
@@ -139,7 +139,7 @@ SUPPORTED_LLM_MODELS = {
             "partial_text_processor": llama_partial_text_processor,
             "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
             + """ 
-            [INST] Question: {question} 
+            [INST] Question: {input} 
             Context: {context} 
             Answer: [/INST]""",
         },
@@ -152,7 +152,7 @@ SUPPORTED_LLM_MODELS = {
             "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
             + """ 
             <|user|>
-            Question: {question} 
+            Question: {input} 
             Context: {context} 
             Answer: </s>
             <|assistant|>""",
@@ -166,7 +166,7 @@ SUPPORTED_LLM_MODELS = {
             "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
             + """
             <|user|>
-            Question: {question} 
+            Question: {input} 
             Context: {context} 
             Answer: </s>
             <|assistant|>""",
@@ -181,12 +181,12 @@ SUPPORTED_LLM_MODELS = {
             "partial_text_processor": llama_partial_text_processor,
             "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
             + """
-            [INST] Question: {question} 
+            [INST] Question: {input} 
             Context: {context} 
             Answer: [/INST]""",
         },
     },
-    "Chinese":{
+    "Chinese": {
         "qwen1.5-0.5b-chat": {
             "model_id": "Qwen/Qwen1.5-0.5B-Chat",
             "remote_code": False,
@@ -202,7 +202,7 @@ SUPPORTED_LLM_MODELS = {
             {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
             + """
             <|im_start|>user
-            问题: {question} 
+            问题: {input} 
             已知内容: {context} 
             回答: <|im_end|><|im_start|>assistant""",
         },
@@ -218,7 +218,7 @@ SUPPORTED_LLM_MODELS = {
             {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
             + """
             <|im_start|>user
-            问题: {question} 
+            问题: {input} 
             已知内容: {context} 
             回答: <|im_end|><|im_start|>assistant""",
         },
@@ -230,7 +230,7 @@ SUPPORTED_LLM_MODELS = {
             "stop_tokens": [0, 2],
             "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
             + """
-            问题: {question} 
+            问题: {input} 
             已知内容: {context} 
             回答: 
             """,
@@ -243,7 +243,7 @@ SUPPORTED_LLM_MODELS = {
             "stop_tokens": [0, 2],
             "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
             + """
-            问题: {question} 
+            问题: {input} 
             已知内容: {context} 
             回答: 
             """,
@@ -260,7 +260,7 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": [2, 92542],
             "partial_text_processor": internlm_partial_text_processor,
-        },  
+        },
         "qwen1.5-1.8b-chat": {
             "model_id": "Qwen/Qwen1.5-1.8B-Chat",
             "remote_code": False,
@@ -270,12 +270,12 @@ SUPPORTED_LLM_MODELS = {
             {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
             + """
             <|im_start|>user
-            问题: {question} 
+            问题: {input} 
             已知内容: {context} 
             回答: <|im_end|><|im_start|>assistant""",
         },
     },
-    "Japanese":{
+    "Japanese": {
         "youri-7b-chat": {
             "model_id": "rinna/youri-7b-chat",
             "remote_code": False,
@@ -289,12 +289,32 @@ SUPPORTED_LLM_MODELS = {
 }
 
 SUPPORTED_EMBEDDING_MODELS = {
-    "all-mpnet-base-v2": {
-        "model_id": "sentence-transformers/all-mpnet-base-v2",
-        "do_norm": True,
-    },
-    "text2vec-large-chinese": {
-        "model_id": "GanymedeNil/text2vec-large-chinese",
-        "do_norm": False,
-    },
+    "English": {
+        "bge-small-en-v1.5": {
+            "model_id": "BAAI/bge-small-en-v1.5",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
+        "bge-large-en-v1.5": {
+            "model_id": "BAAI/bge-large-en-v1.5",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        }, },
+    "Chinese": {
+        "bge-small-zh-v1.5": {
+            "model_id": "BAAI/bge-small-zh-v1.5",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
+        "bge-large-zh-v1.5": {
+            "model_id": "bge-large-zh-v1.5",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        }, }
+}
+
+
+SUPPORTED_RERANK_MODELS = {
+    "bge-reranker-large": {"model_id": "BAAI/bge-reranker-large"},
+    "bge-reranker-base": {"model_id": "BAAI/bge-reranker-base"}
 }

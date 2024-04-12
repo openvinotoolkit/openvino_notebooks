@@ -39,7 +39,7 @@ notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb
 notebooks/fastcomposer-image-generation/fastcomposer-image-generation.ipynb
 notebooks/zeroscope-text2video/zeroscope-text2video.ipynb
 notebooks/llm-chatbot/llm-chatbot.ipynb
-notebooks/llm-chatbot/rag-chatbot.ipynb
+notebooks/llm-rag-langchain/llm-rag-langchain.ipynb
 notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb
 notebooks/bark-text-to-audio/bark-text-to-audio.ipynb
 notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb
