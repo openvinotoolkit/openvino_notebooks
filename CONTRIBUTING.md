@@ -322,7 +322,7 @@ button to Jupyter Lab to automatically format the code in notebooks with `black`
 use either this extension or a different way to automatically format your notebook.
 
 #### Black Automatic Code Formatter
-[Black](https://black.readthedocs.io/en/stable/getting_started.html) is the uncompromising Python code formatter that has extension for jupyter notebooks.
+[Black](https://black.readthedocs.io/en/stable/getting_started.html) is the uncompromising Python code formatter that has extension for Jupyter notebooks.
 
 #### `PySpelling`
 

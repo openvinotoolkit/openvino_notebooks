@@ -76,7 +76,8 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
             "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
             "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
-            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{input}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""
+            + """<start_of_turn>user{input}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model""",
         },
         "red-pajama-3b-chat": {
             "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
@@ -98,7 +99,8 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
             "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
             "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
-            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""+"""<start_of_turn>user{input}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model"""
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""
+            + """<start_of_turn>user{input}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model""",
         },
         "llama-2-chat-7b": {
             "model_id": "meta-llama/Llama-2-7b-chat-hf",
@@ -285,7 +287,7 @@ SUPPORTED_LLM_MODELS = {
             "tokenizer_kwargs": {"add_special_tokens": False},
             "partial_text_processor": youri_partial_text_processor,
         },
-    }
+    },
 }
 
 SUPPORTED_EMBEDDING_MODELS = {
@@ -299,7 +301,8 @@ SUPPORTED_EMBEDDING_MODELS = {
             "model_id": "BAAI/bge-large-en-v1.5",
             "mean_pooling": False,
             "normalize_embeddings": True,
-        }, },
+        },
+    },
     "Chinese": {
         "bge-small-zh-v1.5": {
             "model_id": "BAAI/bge-small-zh-v1.5",
@@ -310,11 +313,12 @@ SUPPORTED_EMBEDDING_MODELS = {
             "model_id": "bge-large-zh-v1.5",
             "mean_pooling": False,
             "normalize_embeddings": True,
-        }, }
+        },
+    },
 }
 
 
 SUPPORTED_RERANK_MODELS = {
     "bge-reranker-large": {"model_id": "BAAI/bge-reranker-large"},
-    "bge-reranker-base": {"model_id": "BAAI/bge-reranker-base"}
+    "bge-reranker-base": {"model_id": "BAAI/bge-reranker-base"},
 }
