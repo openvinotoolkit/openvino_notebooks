@@ -37,11 +37,7 @@ def get_paragraphs(url_list):
         parser.feed(response.text)
         title = " ".join(parser.ended_tags["title"])
         paragraphs = parser.ended_tags["p"]
-        log.info(
-            "Page '{}' has {} chars in {} paragraphs".format(
-                title, sum(len(p) for p in paragraphs), len(paragraphs)
-            )
-        )
+        log.info("Page '{}' has {} chars in {} paragraphs".format(title, sum(len(p) for p in paragraphs), len(paragraphs)))
         paragraphs_all.extend(paragraphs)
 
     return paragraphs_all

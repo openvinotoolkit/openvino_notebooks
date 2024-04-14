@@ -78,18 +78,14 @@ def convert_unet(
             input_info.append((shape, element_type))
 
         with torch.no_grad():
-            ov_model = ov.convert_model(
-                unet, example_input=dummy_inputs, input=input_info
-            )
+            ov_model = ov.convert_model(unet, example_input=dummy_inputs, input=input_info)
         ov.save_model(ov_model, ir_path)
         del ov_model
         cleanup_torchscript_cache()
         print("U-Net successfully converted to IR")
 
 
-def convert_vae_encoder(
-    vae: torch.nn.Module, ir_path: Path, width: int = 512, height: int = 512
-):
+def convert_vae_encoder(vae: torch.nn.Module, ir_path: Path, width: int = 512, height: int = 512):
     """
     Convert VAE model to IR format.
     VAE model, creates wrapper class for export only necessary for inference part,
@@ -116,18 +112,14 @@ def convert_vae_encoder(
         vae_encoder.eval()
         image = torch.zeros((1, 3, width, height))
         with torch.no_grad():
-            ov_model = ov.convert_model(
-                vae_encoder, example_input=image, input=([1, 3, width, height],)
-            )
+            ov_model = ov.convert_model(vae_encoder, example_input=image, input=([1, 3, width, height],))
         ov.save_model(ov_model, ir_path)
         del ov_model
         cleanup_torchscript_cache()
         print("VAE encoder successfully converted to IR")
 
 
-def convert_vae_decoder(
-    vae: torch.nn.Module, ir_path: Path, width: int = 64, height: int = 64
-):
+def convert_vae_decoder(vae: torch.nn.Module, ir_path: Path, width: int = 64, height: int = 64):
     """
     Convert VAE decoder model to IR format.
     Function accepts VAE model, creates wrapper class for export only necessary for inference part,
@@ -155,9 +147,7 @@ def convert_vae_decoder(
 
         vae_decoder.eval()
         with torch.no_grad():
-            ov_model = ov.convert_model(
-                vae_decoder, example_input=latents, input=([1, 4, width, height],)
-            )
+            ov_model = ov.convert_model(vae_decoder, example_input=latents, input=([1, 4, width, height],))
         ov.save_model(ov_model, ir_path)
         del ov_model
         cleanup_torchscript_cache()

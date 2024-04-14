@@ -58,9 +58,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
         for ig_nb in ignore_list:
             if ig_nb.endswith(".txt"):
                 with open(ig_nb, "r") as f:
-                    ignored_notebooks.extend(
-                        list(map(lambda x: x.strip(), f.readlines()))
-                    )
+                    ignored_notebooks.extend(list(map(lambda x: x.strip(), f.readlines())))
             else:
                 ignored_notebooks.append(ig_nb)
         print(f"ignored notebooks: {ignored_notebooks}")
@@ -76,9 +74,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
                     break
                 if changed_path.suffix == ".md":
                     continue
-                notebook_subdir = find_notebook_dir(
-                    changed_path.resolve(), orig_nb_dir.resolve()
-                )
+                notebook_subdir = find_notebook_dir(changed_path.resolve(), orig_nb_dir.resolve())
                 if notebook_subdir is None:
                     continue
                 testing_notebooks.append(notebook_subdir)
@@ -189,9 +185,7 @@ def main():
     if args.keep_artifacts:
         keep_artifacts = True
 
-    test_plan = prepare_test_plan(
-        args.test_list, args.ignore_list, notebooks_moving_dir
-    )
+    test_plan = prepare_test_plan(args.test_list, args.ignore_list, notebooks_moving_dir)
     for notebook, report in test_plan.items():
         if report["status"] == "SKIPPED":
             continue
@@ -203,11 +197,7 @@ def main():
             if status:
                 report["status"] = "TIMEOUT" if status == -42 else "FAILED"
             else:
-                report["status"] = (
-                    "SUCCESS"
-                    if not report["status"] in ["TIMEOUT", "FAILED"]
-                    else report["status"]
-                )
+                report["status"] = "SUCCESS" if not report["status"] in ["TIMEOUT", "FAILED"] else report["status"]
             if status:
                 if status == -42:
                     timeout_notebooks.append(str(subnotebook))
@@ -215,9 +205,7 @@ def main():
                     failed_notebooks.append(str(subnotebook))
             if args.early_stop:
                 break
-    exit_status = finalize_status(
-        failed_notebooks, timeout_notebooks, test_plan, reports_dir, root
-    )
+    exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
     return exit_status
 
 

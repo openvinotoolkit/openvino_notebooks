@@ -20,23 +20,17 @@ from transformers import Pipeline, pipeline, PreTrainedTokenizer
 CALIBRATION_DATASET_SIZE = 10
 
 
-def collect_calibration_data(
-    grammar_corrector_pipe_fp32: Pipeline, calibration_dataset_size: int
-) -> List[Dict]:
+def collect_calibration_data(grammar_corrector_pipe_fp32: Pipeline, calibration_dataset_size: int) -> List[Dict]:
     calibration_data = []
     ov_decoder = grammar_corrector_pipe_fp32.model.decoder_with_past
 
     # Wrap decoder inference for data collection
-    ov_decoder.request = InferRequestWrapper(
-        ov_decoder.request, calibration_data, apply_caching=True
-    )
+    ov_decoder.request = InferRequestWrapper(ov_decoder.request, calibration_data, apply_caching=True)
 
     # Run inference for data collection
     try:
         calibration_dataset = datasets.load_dataset("jfleg", split="validation")
-        calibration_dataset = calibration_dataset.shuffle(seed=42)[
-            :calibration_dataset_size
-        ]
+        calibration_dataset = calibration_dataset.shuffle(seed=42)[:calibration_dataset_size]
         for data_item in tqdm(
             calibration_dataset["sentence"],
             total=calibration_dataset_size,
@@ -59,9 +53,7 @@ def quantize(
         print("Loading quantized model")
         quantized_model = core.read_model(model=quantized_model_path)
     else:
-        calibration_data = collect_calibration_data(
-            grammar_corrector_pipe_fp32, calibration_dataset_size
-        )
+        calibration_data = collect_calibration_data(grammar_corrector_pipe_fp32, calibration_dataset_size)
         ov_decoder = grammar_corrector_pipe_fp32.model.decoder_with_past
         quantized_model = nncf.quantize(
             ov_decoder.model,
@@ -96,14 +88,10 @@ def get_quantized_pipeline(
     calibration_dataset_size=CALIBRATION_DATASET_SIZE,
 ):
     # Get quantized OV model
-    quantized_model = quantize(
-        grammar_corrector_pipe, core, quantized_model_path, calibration_dataset_size
-    )
+    quantized_model = quantize(grammar_corrector_pipe, core, quantized_model_path, calibration_dataset_size)
 
     # Load quantized model into grammar correction pipeline
-    grammar_corrector_model_int8 = OVModelForSeq2SeqLM.from_pretrained(
-        grammar_corrector_dir, device=device
-    )
+    grammar_corrector_model_int8 = OVModelForSeq2SeqLM.from_pretrained(grammar_corrector_dir, device=device)
     grammar_corrector_model_int8.decoder_with_past.model = quantized_model
     grammar_corrector_model_int8.decoder_with_past.request = None
     grammar_corrector_model_int8.decoder_with_past._compile()
@@ -125,20 +113,14 @@ def calculate_compression_rate(model_path_ov, model_path_ov_int8):
     return model_size_fp32, model_size_int8
 
 
-def calculate_inference_time_and_accuracy(
-    grammar_corrector_pipe: Pipeline, test_subset_size: int
-):
+def calculate_inference_time_and_accuracy(grammar_corrector_pipe: Pipeline, test_subset_size: int):
     ground_truths = []
     predictions = []
     inference_time = []
 
-    test_dataset = datasets.load_dataset("jfleg", split="test").shuffle(seed=42)[
-        :test_subset_size
-    ]
+    test_dataset = datasets.load_dataset("jfleg", split="test").shuffle(seed=42)[:test_subset_size]
     zipped_dataset = zip(test_dataset["sentence"], test_dataset["corrections"])
-    for input_text, references in tqdm(
-        zipped_dataset, total=test_subset_size, desc="Evaluation"
-    ):
+    for input_text, references in tqdm(zipped_dataset, total=test_subset_size, desc="Evaluation"):
         # For example, a sample pair may look like:
         # input_text: "For not use car . "
         # references: [ "Not for use with a car . ", "Do not use in the car . ", "Car not for use . "]

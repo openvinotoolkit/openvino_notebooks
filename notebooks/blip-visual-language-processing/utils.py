@@ -26,11 +26,7 @@ def visualize_results(orig_img: PIL.Image.Image, answer: str, question: str = No
     qa_text = "question: {}\nanswer: {}"
     cap_text = "caption: {}"
     ax.set_title(
-        (
-            qa_text.format(question, answer)
-            if question is not None
-            else cap_text.format(answer)
-        ),
+        (qa_text.format(question, answer) if question is not None else cap_text.format(answer)),
         y=-0.01,
         pad=-30 if question is not None else -15,
     )

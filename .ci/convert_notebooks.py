@@ -23,12 +23,8 @@ def arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--exclude_execution_file")
     parser.add_argument("--exclude_conversion_file")
-    parser.add_argument(
-        "--timeout", type=float, default=7200, help="timeout for notebook execution"
-    )
-    parser.add_argument(
-        "--rst_dir", type=Path, help="rst files output directory", default=Path("rst")
-    )
+    parser.add_argument("--timeout", type=float, default=7200, help="timeout for notebook execution")
+    parser.add_argument("--rst_dir", type=Path, help="rst files output directory", default=Path("rst"))
 
     return parser.parse_args()
 
@@ -57,9 +53,7 @@ def main():
         if str(notebook_path) in ignore_conversion_list:
             continue
         disable_gradio_debug(notebook_path)
-        notebook_executed = notebook_path.parent / notebook_path.name.replace(
-            ".ipynb", "-with-output.ipynb"
-        )
+        notebook_executed = notebook_path.parent / notebook_path.name.replace(".ipynb", "-with-output.ipynb")
         start = time.perf_counter()
         print(f"Convert {notebook_path}")
         if str(notebook_path) not in ignore_execution_list:

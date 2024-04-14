@@ -95,24 +95,14 @@ class Resize(object):
                     # fit height
                     scale_width = scale_height
             else:
-                raise ValueError(
-                    f"resize_method {self.__resize_method} not implemented"
-                )
+                raise ValueError(f"resize_method {self.__resize_method} not implemented")
 
         if self.__resize_method == "lower_bound":
-            new_height = self.constrain_to_multiple_of(
-                scale_height * height, min_val=self.__height
-            )
-            new_width = self.constrain_to_multiple_of(
-                scale_width * width, min_val=self.__width
-            )
+            new_height = self.constrain_to_multiple_of(scale_height * height, min_val=self.__height)
+            new_width = self.constrain_to_multiple_of(scale_width * width, min_val=self.__width)
         elif self.__resize_method == "upper_bound":
-            new_height = self.constrain_to_multiple_of(
-                scale_height * height, max_val=self.__height
-            )
-            new_width = self.constrain_to_multiple_of(
-                scale_width * width, max_val=self.__width
-            )
+            new_height = self.constrain_to_multiple_of(scale_height * height, max_val=self.__height)
+            new_width = self.constrain_to_multiple_of(scale_width * width, max_val=self.__width)
         elif self.__resize_method == "minimal":
             new_height = self.constrain_to_multiple_of(scale_height * height)
             new_width = self.constrain_to_multiple_of(scale_width * width)
@@ -122,9 +112,7 @@ class Resize(object):
         return (new_width, new_height)
 
     def __call__(self, sample):
-        width, height = self.get_size(
-            sample["image"].shape[1], sample["image"].shape[0]
-        )
+        width, height = self.get_size(sample["image"].shape[1], sample["image"].shape[0])
 
         # resize sample
         for item in sample.keys():
@@ -137,9 +125,7 @@ class Resize(object):
 
         if self.__resize_target:
             if "depth" in sample:
-                sample["depth"] = cv2.resize(
-                    sample["depth"], (width, height), interpolation=cv2.INTER_NEAREST
-                )
+                sample["depth"] = cv2.resize(sample["depth"], (width, height), interpolation=cv2.INTER_NEAREST)
 
             if "mask" in sample:
                 sample["mask"] = cv2.resize(
@@ -177,14 +163,10 @@ class NormalizeIntermediate(object):
 
     def __call__(self, sample):
         if "int_depth" in sample and sample["int_depth"] is not None:
-            sample["int_depth"] = (
-                sample["int_depth"] - self.__int_depth_mean
-            ) / self.__int_depth_std
+            sample["int_depth"] = (sample["int_depth"] - self.__int_depth_mean) / self.__int_depth_std
 
         if "int_scales" in sample and sample["int_scales"] is not None:
-            sample["int_scales"] = (
-                sample["int_scales"] - self.__int_scales_mean
-            ) / self.__int_scales_std
+            sample["int_scales"] = (sample["int_scales"] - self.__int_scales_mean) / self.__int_scales_std
 
         return sample
 
@@ -283,9 +265,7 @@ def get_transforms(depth_predictor, sparsifier, nsamples):
             resize_method=resize_method_dict[depth_predictor],
             image_interpolation_method=cv2.INTER_CUBIC,
         ),
-        NormalizeImage(
-            mean=image_mean_dict[depth_predictor], std=image_std_dict[depth_predictor]
-        ),
+        NormalizeImage(mean=image_mean_dict[depth_predictor], std=image_std_dict[depth_predictor]),
         PrepareForNet(),
         Tensorize(),
     ]
@@ -301,12 +281,8 @@ def get_transforms(depth_predictor, sparsifier, nsamples):
             image_interpolation_method=cv2.INTER_CUBIC,
         ),
         NormalizeIntermediate(
-            mean=normalization.VOID_INTERMEDIATE[depth_predictor][
-                f"{sparsifier}_{nsamples}"
-            ]["mean"],
-            std=normalization.VOID_INTERMEDIATE[depth_predictor][
-                f"{sparsifier}_{nsamples}"
-            ]["std"],
+            mean=normalization.VOID_INTERMEDIATE[depth_predictor][f"{sparsifier}_{nsamples}"]["mean"],
+            std=normalization.VOID_INTERMEDIATE[depth_predictor][f"{sparsifier}_{nsamples}"]["std"],
         ),
         PrepareForNet(),
         Tensorize(),

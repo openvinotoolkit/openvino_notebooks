@@ -3,7 +3,9 @@ import json
 from table_of_content import find_tc_in_cell
 from patch_notebooks import DEVICE_WIDGET
 from pathlib import Path
+
 NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
+
 
 def main():
     all_passed = True
@@ -21,12 +23,12 @@ def main():
             toc_found = False
             device_found = False
             for cell in notebook_json["cells"]:
-                
+
                 if not toc_found and cell["cell_type"] == "markdown":
                     tc_cell, tc_line = find_tc_in_cell(cell)
                     if tc_line is not None:
                         toc_found = True
-                
+
                 if not device_found and cell["cell_type"] == "code":
                     device_found = DEVICE_WIDGET in cell["source"]
 
@@ -38,7 +40,6 @@ def main():
             if not device_found:
                 no_device.append(nb_path.relative_to(NOTEBOOKS_ROOT))
                 complain(f"FAILEd: {nb_path.relative_to(NOTEBOOKS_ROOT)}: device widget is not found")
-    
 
     if not all_passed:
         print("SUMMARY:")
@@ -48,9 +49,9 @@ def main():
         print("==================================")
         print("NO DEVICE SELECTION:")
         print("\n".join(no_device))
-    
+
     sys.exit(0 if all_passed else 1)
+
 
 if __name__ == "__main__":
     main()
-    

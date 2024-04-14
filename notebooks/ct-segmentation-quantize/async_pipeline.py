@@ -38,9 +38,7 @@ open("notebook_utils.py", "w").write(r.text)
 from notebook_utils import show_array
 
 
-def show_live_inference(
-    ie, image_paths: List, model: Model, device: str, reader: Optional[Callable] = None
-):
+def show_live_inference(ie, image_paths: List, model: Model, device: str, reader: Optional[Callable] = None):
     """
     Do inference of images listed in `image_paths` on `model` on the given `device` and show
     the results in real time in a Jupyter Notebook
@@ -59,9 +57,7 @@ def show_live_inference(
 
     # Create asynchronous pipeline and print time it takes to load the model
     load_start_time = time.perf_counter()
-    pipeline = AsyncPipeline(
-        ie=ie, model=model, plugin_config={}, device=device, max_num_requests=0
-    )
+    pipeline = AsyncPipeline(ie=ie, model=model, plugin_config={}, device=device, max_num_requests=0)
     load_end_time = time.perf_counter()
 
     # Perform asynchronous inference
@@ -82,9 +78,7 @@ def show_live_inference(
                 image = cv2.imread(filename=str(image_path), flags=cv2.IMREAD_UNCHANGED)
             else:
                 image = reader(str(image_path))
-            pipeline.submit_data(
-                inputs={input_layer: image}, id=next_frame_id, meta={"frame": image}
-            )
+            pipeline.submit_data(inputs={input_layer: image}, id=next_frame_id, meta={"frame": image})
             del image
             next_frame_id += 1
         else:
@@ -105,9 +99,7 @@ def show_live_inference(
     duration = end_time - start_time
     fps = len(image_paths) / duration
     print(f"Loaded model to {device} in {load_end_time-load_start_time:.2f} seconds.")
-    print(
-        f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}"
-    )
+    print(f"Total time for {next_frame_id} frames: {duration:.2f} seconds, fps:{fps:.2f}")
 
     del pipeline.exec_net
     del pipeline
@@ -146,9 +138,7 @@ def parse_value_per_device(devices: Set[str], values_string: str) -> Dict[str, i
     return result
 
 
-def get_user_config(
-    flags_d: str, flags_nstreams: str, flags_nthreads: int
-) -> Dict[str, str]:
+def get_user_config(flags_d: str, flags_nstreams: str, flags_nthreads: int) -> Dict[str, str]:
     config = {}
 
     devices = set(parse_devices(flags_d))
@@ -163,17 +153,9 @@ def get_user_config(
             config["CPU_BIND_THREAD"] = "NO"
 
             # for CPU execution, more throughput-oriented execution via streams
-            config["CPU_THROUGHPUT_STREAMS"] = (
-                str(device_nstreams[device])
-                if device in device_nstreams
-                else "CPU_THROUGHPUT_AUTO"
-            )
+            config["CPU_THROUGHPUT_STREAMS"] = str(device_nstreams[device]) if device in device_nstreams else "CPU_THROUGHPUT_AUTO"
         elif device == "GPU":
-            config["GPU_THROUGHPUT_STREAMS"] = (
-                str(device_nstreams[device])
-                if device in device_nstreams
-                else "GPU_THROUGHPUT_AUTO"
-            )
+            config["GPU_THROUGHPUT_STREAMS"] = str(device_nstreams[device]) if device in device_nstreams else "GPU_THROUGHPUT_AUTO"
             if "MULTI" in flags_d and "CPU" in devices:
                 # multi-device execution with the CPU + GPU performs best with GPU throttling hint,
                 # which releases another CPU thread (that is otherwise used by the GPU driver for active polling)
@@ -187,9 +169,7 @@ class AsyncPipeline:
         cache_path.mkdir(exist_ok=True)
         # Enable model caching for GPU devices
         if "GPU" in device and "GPU" in ie.available_devices:
-            ie.set_property(
-                device_name="GPU", properties={"CACHE_DIR": str(cache_path)}
-            )
+            ie.set_property(device_name="GPU", properties={"CACHE_DIR": str(cache_path)})
 
         self.model = model
         self.logger = logging.getLogger()
@@ -197,12 +177,8 @@ class AsyncPipeline:
         self.logger.info("Loading network to {} plugin...".format(device))
         self.exec_net = ie.compile_model(self.model.net, device, plugin_config)
         if max_num_requests == 0:
-            max_num_requests = (
-                self.exec_net.get_property("OPTIMAL_NUMBER_OF_INFER_REQUESTS") + 1
-            )
-        self.requests = [
-            self.exec_net.create_infer_request() for _ in range(max_num_requests)
-        ]
+            max_num_requests = self.exec_net.get_property("OPTIMAL_NUMBER_OF_INFER_REQUESTS") + 1
+        self.requests = [self.exec_net.create_infer_request() for _ in range(max_num_requests)]
         self.empty_requests = deque(self.requests)
         self.completed_request_results = {}
         self.callback_exceptions = []
@@ -211,12 +187,7 @@ class AsyncPipeline:
     def inference_completion_callback(self, callback_args):
         try:
             request, id, meta, preprocessing_meta = callback_args
-            raw_outputs = {
-                idx: copy.deepcopy(res.data)
-                for idx, (out, res) in enumerate(
-                    zip(request.model_outputs, request.output_tensors)
-                )
-            }
+            raw_outputs = {idx: copy.deepcopy(res.data) for idx, (out, res) in enumerate(zip(request.model_outputs, request.output_tensors))}
             self.completed_request_results[id] = (raw_outputs, meta, preprocessing_meta)
             self.empty_requests.append(request)
         except Exception as e:
@@ -229,9 +200,7 @@ class AsyncPipeline:
         if len(self.empty_requests) == 0:
             self.event.clear()
         inputs, preprocessing_meta = self.model.preprocess(inputs)
-        request.set_callback(
-            self.inference_completion_callback, (request, id, meta, preprocessing_meta)
-        )
+        request.set_callback(self.inference_completion_callback, (request, id, meta, preprocessing_meta))
         request.start_async(inputs=inputs)
         request.wait()
 

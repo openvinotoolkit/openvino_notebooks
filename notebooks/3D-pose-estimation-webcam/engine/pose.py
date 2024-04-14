@@ -73,9 +73,7 @@ class Pose:
         super().__init__()
         self.keypoints = keypoints
         self.confidence = confidence
-        found_keypoints = np.zeros(
-            (np.count_nonzero(keypoints[:, 0] != -1), 2), dtype=np.int32
-        )
+        found_keypoints = np.zeros((np.count_nonzero(keypoints[:, 0] != -1), 2), dtype=np.int32)
         found_kpt_id = 0
         for kpt_id in range(keypoints.shape[0]):
             if keypoints[kpt_id, 0] == -1:
@@ -99,9 +97,7 @@ class Pose:
     def filter(self, translation):
         filtered_translation = []
         for coordinate_id in range(3):
-            filtered_translation.append(
-                self.translation_filter[coordinate_id](translation[coordinate_id])
-            )
+            filtered_translation.append(self.translation_filter[coordinate_id](translation[coordinate_id]))
         return filtered_translation
 
 
@@ -111,9 +107,7 @@ def get_similarity(a, b, threshold=0.5):
         if a.keypoints[kpt_id, 0] != -1 and b.keypoints[kpt_id, 0] != -1:
             distance = np.sum((a.keypoints[kpt_id] - b.keypoints[kpt_id]) ** 2)
             area = max(a.bbox[2] * a.bbox[3], b.bbox[2] * b.bbox[3])
-            similarity = np.exp(
-                -distance / (2 * (area + np.spacing(1)) * Pose.vars[kpt_id])
-            )
+            similarity = np.exp(-distance / (2 * (area + np.spacing(1)) * Pose.vars[kpt_id]))
             if similarity > threshold:
                 num_similar_kpt += 1
     return num_similar_kpt
@@ -142,9 +136,7 @@ def propagate_ids(previous_poses, current_poses, threshold=3):
         for previous_pose_id in range(len(previous_poses)):
             if not mask[previous_pose_id]:
                 continue
-            iou = get_similarity(
-                current_poses[current_pose_id], previous_poses[previous_pose_id]
-            )
+            iou = get_similarity(current_poses[current_pose_id], previous_poses[previous_pose_id])
             if iou > best_matched_iou:
                 best_matched_iou = iou
                 best_matched_pose_id = previous_poses[previous_pose_id].id
@@ -155,6 +147,4 @@ def propagate_ids(previous_poses, current_poses, threshold=3):
             best_matched_pose_id = None
         current_poses[current_pose_id].update_id(best_matched_pose_id)
         if best_matched_pose_id is not None:
-            current_poses[current_pose_id].translation_filter = previous_poses[
-                best_matched_id
-            ].translation_filter
+            current_poses[current_pose_id].translation_filter = previous_poses[best_matched_id].translation_filter
