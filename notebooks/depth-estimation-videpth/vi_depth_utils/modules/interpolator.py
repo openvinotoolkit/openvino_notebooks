@@ -35,9 +35,7 @@ class Interpolator2D(object):
 
         self.knot_list = []
         for i in range(self.num_knots):
-            self.knot_list.append(
-                (int(self.knot_coords[0, i]), int(self.knot_coords[1, i]))
-            )
+            self.knot_list.append((int(self.knot_coords[0, i]), int(self.knot_coords[1, i])))
 
         # to be computed
         self.interpolated_map = None

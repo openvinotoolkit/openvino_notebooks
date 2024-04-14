@@ -25,9 +25,7 @@ class IpynbFilter(filters.Filter):
 
     def filter(self, source_file, encoding):  # noqa A001
         """Open and filter the file from disk."""
-        nb: nbformat.NotebookNode = nbformat.read(
-            source_file, as_version=nbformat.NO_CONVERT
-        )
+        nb: nbformat.NotebookNode = nbformat.read(source_file, as_version=nbformat.NO_CONVERT)
 
         return [filters.SourceText(self._filter(nb), source_file, encoding, "ipynb")]
 
@@ -42,11 +40,7 @@ class IpynbFilter(filters.Filter):
 
     def sfilter(self, source):
         """Execute filter."""
-        return [
-            filters.SourceText(
-                self._filter(source.text), source.context, source.encoding, "ipynb"
-            )
-        ]
+        return [filters.SourceText(self._filter(source.text), source.context, source.encoding, "ipynb")]
 
 
 def get_plugin():

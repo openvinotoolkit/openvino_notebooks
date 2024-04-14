@@ -40,9 +40,7 @@ class LeastSquaresEstimator(object):
         self.output = None
 
     def compute_scale_and_shift(self):
-        self.scale, self.shift = compute_scale_and_shift_ls(
-            self.estimate, self.target, self.valid
-        )
+        self.scale, self.shift = compute_scale_and_shift_ls(self.estimate, self.target, self.valid)
 
     def apply_scale_and_shift(self):
         self.output = self.estimate * self.scale + self.shift

@@ -96,13 +96,7 @@ class OVBlipModel:
         self.decoder_start_token_id = decoder_start_token_id
         self.decoder_input_ids = config.text_config.bos_token_id
 
-    def generate_answer(
-        self,
-        pixel_values: torch.Tensor,
-        input_ids: torch.Tensor,
-        attention_mask: torch.Tensor,
-        **generate_kwargs
-    ):
+    def generate_answer(self, pixel_values: torch.Tensor, input_ids: torch.Tensor, attention_mask: torch.Tensor, **generate_kwargs):
         """
         Visual Question Answering prediction
         Parameters:
@@ -112,9 +106,7 @@ class OVBlipModel:
         Retruns:
           generation output (torch.Tensor): tensor which represents sequence of generated answer token ids
         """
-        image_embed = self.vision_model(pixel_values.detach().numpy())[
-            self.vision_model_out
-        ]
+        image_embed = self.vision_model(pixel_values.detach().numpy())[self.vision_model_out]
         image_attention_mask = np.ones(image_embed.shape[:-1], dtype=int)
         if isinstance(input_ids, list):
             input_ids = torch.LongTensor(input_ids)
@@ -128,9 +120,7 @@ class OVBlipModel:
         )[self.text_encoder_out]
         question_attention_mask = np.ones(question_embeds.shape[:-1], dtype=int)
 
-        bos_ids = np.full(
-            (question_embeds.shape[0], 1), fill_value=self.decoder_start_token_id
-        )
+        bos_ids = np.full((question_embeds.shape[0], 1), fill_value=self.decoder_start_token_id)
 
         outputs = self.text_decoder.generate(
             input_ids=torch.from_numpy(bos_ids),
@@ -142,13 +132,7 @@ class OVBlipModel:
         )
         return outputs
 
-    def generate_caption(
-        self,
-        pixel_values: torch.Tensor,
-        input_ids: torch.Tensor = None,
-        attention_mask: torch.Tensor = None,
-        **generate_kwargs
-    ):
+    def generate_caption(self, pixel_values: torch.Tensor, input_ids: torch.Tensor = None, attention_mask: torch.Tensor = None, **generate_kwargs):
         """
         Image Captioning prediction
         Parameters:
@@ -160,9 +144,7 @@ class OVBlipModel:
         """
         batch_size = pixel_values.shape[0]
 
-        image_embeds = self.vision_model(pixel_values.detach().numpy())[
-            self.vision_model_out
-        ]
+        image_embeds = self.vision_model(pixel_values.detach().numpy())[self.vision_model_out]
 
         image_attention_mask = torch.ones(image_embeds.shape[:-1], dtype=torch.long)
 

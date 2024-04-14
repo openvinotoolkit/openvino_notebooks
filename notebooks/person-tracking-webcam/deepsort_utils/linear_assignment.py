@@ -136,9 +136,7 @@ def matching_cascade(
         if len(unmatched_detections) == 0:  # No detections left
             break
 
-        track_indices_l = [
-            k for k in track_indices if tracks[k].time_since_update == 1 + level
-        ]
+        track_indices_l = [k for k in track_indices if tracks[k].time_since_update == 1 + level]
         if len(track_indices_l) == 0:  # Nothing to match at this level
             continue
 
@@ -204,8 +202,6 @@ def gate_cost_matrix(
     measurements = np.asarray([detections[i].to_xyah() for i in detection_indices])
     for row, track_idx in enumerate(track_indices):
         track = tracks[track_idx]
-        gating_distance = kf.gating_distance(
-            track.mean, track.covariance, measurements, only_position
-        )
+        gating_distance = kf.gating_distance(track.mean, track.covariance, measurements, only_position)
         cost_matrix[row, gating_distance > gating_threshold] = gated_cost
     return cost_matrix

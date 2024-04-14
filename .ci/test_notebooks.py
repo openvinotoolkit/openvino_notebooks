@@ -45,9 +45,7 @@ def test_readme():
             # item is a notebook directory
             notebook_dir = item.relative_to(Path("notebooks"))
             if str(notebook_dir)[0].isdigit():
-                assert "README.md" in [
-                    filename.name for filename in item.iterdir()
-                ], f"README not found in {item}"
+                assert "README.md" in [filename.name for filename in item.iterdir()], f"README not found in {item}"
 
 
 def test_requirements_docker():
@@ -60,9 +58,7 @@ def test_requirements_docker():
         docker_requirements = set(list(pipfile_contents["packages"].keys()))
 
     pip_requirements = get_parsed_requirements("requirements.txt")
-    assert pip_requirements.issubset(
-        docker_requirements
-    ), f"Docker Pipfile misses: {pip_requirements.difference(docker_requirements)}"
+    assert pip_requirements.issubset(docker_requirements), f"Docker Pipfile misses: {pip_requirements.difference(docker_requirements)}"
 
 
 def test_requirements_binder():
@@ -72,9 +68,7 @@ def test_requirements_binder():
     """
     pip_requirements = get_parsed_requirements("requirements.txt")
     binder_requirements = get_parsed_requirements(".binder/requirements.txt")
-    assert pip_requirements.issubset(
-        binder_requirements
-    ), f"Binder requirements misses: {pip_requirements.difference(binder_requirements)}"
+    assert pip_requirements.issubset(binder_requirements), f"Binder requirements misses: {pip_requirements.difference(binder_requirements)}"
 
 
 @pytest.mark.skip(reason="URL existence is tested in docker_treon")
