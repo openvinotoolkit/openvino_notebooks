@@ -26,9 +26,7 @@ def _expand_mask(mask: torch.Tensor, dtype: torch.dtype, tgt_len: Optional[int] 
 
     inverted_mask = 1.0 - expanded_mask
 
-    return inverted_mask.masked_fill(
-        inverted_mask.to(torch.bool), torch.finfo(dtype).min
-    )
+    return inverted_mask.masked_fill(inverted_mask.to(torch.bool), torch.finfo(dtype).min)
 
 
 def _make_causal_mask(
@@ -49,16 +47,12 @@ def _make_causal_mask(
     if past_key_values_length > 0:
         mask = torch.cat(
             [
-                torch.zeros(
-                    tgt_len, past_key_values_length, dtype=dtype, device=device
-                ),
+                torch.zeros(tgt_len, past_key_values_length, dtype=dtype, device=device),
                 mask,
             ],
             dim=-1,
         )
-    return mask[None, None, :, :].expand(
-        bsz, 1, tgt_len, tgt_len + past_key_values_length
-    )
+    return mask[None, None, :, :].expand(bsz, 1, tgt_len, tgt_len + past_key_values_length)
 
 
 class MLP(nn.Module):
@@ -121,9 +115,7 @@ class FastComposerCLIPImageEncoder(CLIPPreTrainedModel):
 
         if h != self.image_size or w != self.image_size:
             h, w = self.image_size, self.image_size
-            object_pixel_values = F.interpolate(
-                object_pixel_values, (h, w), mode="bilinear", antialias=True
-            )
+            object_pixel_values = F.interpolate(object_pixel_values, (h, w), mode="bilinear", antialias=True)
 
         object_pixel_values = self.vision_processor(object_pixel_values)
         object_embeds = self.vision_model(object_pixel_values)[1]
@@ -143,14 +135,9 @@ def scatter_object_embeddings(
 
     batch_size, max_num_objects = object_embeds.shape[:2]
     seq_length = inputs_embeds.shape[1]
-    flat_object_embeds = object_embeds.view(
-        -1, object_embeds.shape[-2], object_embeds.shape[-1]
-    )
+    flat_object_embeds = object_embeds.view(-1, object_embeds.shape[-2], object_embeds.shape[-1])
 
-    valid_object_mask = (
-        torch.arange(max_num_objects, device=flat_object_embeds.device)[None, :]
-        < num_objects[:, None]
-    )
+    valid_object_mask = torch.arange(max_num_objects, device=flat_object_embeds.device)[None, :] < num_objects[:, None]
 
     valid_object_embeds = flat_object_embeds[valid_object_mask.flatten()]
 
@@ -177,14 +164,9 @@ def fuse_object_embeddings(
 
     batch_size, max_num_objects = object_embeds.shape[:2]
     seq_length = inputs_embeds.shape[1]
-    flat_object_embeds = object_embeds.view(
-        -1, object_embeds.shape[-2], object_embeds.shape[-1]
-    )
+    flat_object_embeds = object_embeds.view(-1, object_embeds.shape[-2], object_embeds.shape[-1])
 
-    valid_object_mask = (
-        torch.arange(max_num_objects, device=flat_object_embeds.device)[None, :]
-        < num_objects[:, None]
-    )
+    valid_object_mask = torch.arange(max_num_objects, device=flat_object_embeds.device)[None, :] < num_objects[:, None]
 
     valid_object_embeds = flat_object_embeds[valid_object_mask.flatten()]
 
@@ -222,9 +204,7 @@ class FastComposerPostfuseModule(nn.Module):
         image_token_mask,
         num_objects,
     ) -> torch.Tensor:
-        text_object_embeds = fuse_object_embeddings(
-            text_embeds, image_token_mask, object_embeds, num_objects, self.fuse_fn
-        )
+        text_object_embeds = fuse_object_embeddings(text_embeds, image_token_mask, object_embeds, num_objects, self.fuse_fn)
 
         return text_object_embeds
 
@@ -254,28 +234,16 @@ class FastComposerTextEncoder(CLIPPreTrainedModel):
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
     ) -> Union[Tuple, BaseModelOutputWithPooling]:
-        output_attentions = (
-            output_attentions
-            if output_attentions is not None
-            else self.config.output_attentions
-        )
-        output_hidden_states = (
-            output_hidden_states
-            if output_hidden_states is not None
-            else self.config.output_hidden_states
-        )
-        return_dict = (
-            return_dict if return_dict is not None else self.config.use_return_dict
-        )
+        output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
+        output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
+        return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
         input_shape = input_ids.size()
         input_ids = input_ids.view(-1, input_shape[-1])
 
         hidden_states = self.embeddings(input_ids)
 
-        causal_attention_mask = _make_causal_mask(
-            input_shape, hidden_states.dtype, device=hidden_states.device
-        )
+        causal_attention_mask = _make_causal_mask(input_shape, hidden_states.dtype, device=hidden_states.device)
 
         # expand attention_mask
         if attention_mask is not None:
@@ -299,9 +267,7 @@ class FastComposerTextEncoder(CLIPPreTrainedModel):
         # casting to torch.int for onnx compatibility: argmax doesn't support int64 inputs with opset 14
         pooled_output = last_hidden_state[
             torch.arange(last_hidden_state.shape[0], device=last_hidden_state.device),
-            input_ids.to(dtype=torch.int, device=last_hidden_state.device).argmax(
-                dim=-1
-            ),
+            input_ids.to(dtype=torch.int, device=last_hidden_state.device).argmax(dim=-1),
         ]
 
         if not return_dict:
@@ -338,9 +304,7 @@ def unet_store_cross_attention_scores(unet, attention_scores, layers=5):
 
     def make_new_get_attention_scores_fn(name):
         def new_get_attention_scores(module, query, key, attention_mask=None):
-            attention_probs = module.old_get_attention_scores(
-                query, key, attention_mask
-            )
+            attention_probs = module.old_get_attention_scores(query, key, attention_mask)
             attention_scores[name] = attention_probs
             return attention_probs
 
@@ -353,9 +317,7 @@ def unet_store_cross_attention_scores(unet, attention_scores, layers=5):
             if isinstance(module.processor, AttnProcessor2_0):
                 module.set_processor(AttnProcessor())
             module.old_get_attention_scores = module.get_attention_scores
-            module.get_attention_scores = types.MethodType(
-                make_new_get_attention_scores_fn(name), module
-            )
+            module.get_attention_scores = types.MethodType(make_new_get_attention_scores_fn(name), module)
 
     return unet
 
@@ -368,20 +330,14 @@ class BalancedL1Loss(nn.Module):
 
     def forward(self, object_token_attn_prob, object_segmaps):
         if self.normalize:
-            object_token_attn_prob = object_token_attn_prob / (
-                object_token_attn_prob.max(dim=2, keepdim=True)[0] + 1e-5
-            )
+            object_token_attn_prob = object_token_attn_prob / (object_token_attn_prob.max(dim=2, keepdim=True)[0] + 1e-5)
         background_segmaps = 1 - object_segmaps
         background_segmaps_sum = background_segmaps.sum(dim=2) + 1e-5
         object_segmaps_sum = object_segmaps.sum(dim=2) + 1e-5
 
-        background_loss = (object_token_attn_prob * background_segmaps).sum(
-            dim=2
-        ) / background_segmaps_sum
+        background_loss = (object_token_attn_prob * background_segmaps).sum(dim=2) / background_segmaps_sum
 
-        object_loss = (object_token_attn_prob * object_segmaps).sum(
-            dim=2
-        ) / object_segmaps_sum
+        object_loss = (object_token_attn_prob * object_segmaps).sum(dim=2) / object_segmaps_sum
 
         return background_loss - object_loss
 
@@ -398,34 +354,22 @@ def get_object_localization_loss_for_one_layer(
     size = int(num_noise_latents**0.5)
 
     # Resize the object segmentation maps to the size of the cross attention scores
-    object_segmaps = F.interpolate(
-        object_segmaps, size=(size, size), mode="bilinear", antialias=True
-    )  # (b, max_num_objects, size, size)
+    object_segmaps = F.interpolate(object_segmaps, size=(size, size), mode="bilinear", antialias=True)  # (b, max_num_objects, size, size)
 
-    object_segmaps = object_segmaps.view(
-        b, max_num_objects, -1
-    )  # (b, max_num_objects, num_noise_latents)
+    object_segmaps = object_segmaps.view(b, max_num_objects, -1)  # (b, max_num_objects, num_noise_latents)
 
     num_heads = bxh // b
 
-    cross_attention_scores = cross_attention_scores.view(
-        b, num_heads, num_noise_latents, num_text_tokens
-    )
+    cross_attention_scores = cross_attention_scores.view(b, num_heads, num_noise_latents, num_text_tokens)
 
     # Gather object_token_attn_prob
     object_token_attn_prob = torch.gather(
         cross_attention_scores,
         dim=3,
-        index=object_token_idx.view(b, 1, 1, max_num_objects).expand(
-            b, num_heads, num_noise_latents, max_num_objects
-        ),
+        index=object_token_idx.view(b, 1, 1, max_num_objects).expand(b, num_heads, num_noise_latents, max_num_objects),
     )  # (b, num_heads, num_noise_latents, max_num_objects)
 
-    object_segmaps = (
-        object_segmaps.permute(0, 2, 1)
-        .unsqueeze(1)
-        .expand(b, num_heads, num_noise_latents, max_num_objects)
-    )
+    object_segmaps = object_segmaps.permute(0, 2, 1).unsqueeze(1).expand(b, num_heads, num_noise_latents, max_num_objects)
 
     loss = loss_fn(object_token_attn_prob, object_segmaps)
 
@@ -446,9 +390,7 @@ def get_object_localization_loss(
     num_layers = len(cross_attention_scores)
     loss = 0
     for k, v in cross_attention_scores.items():
-        layer_loss = get_object_localization_loss_for_one_layer(
-            v, object_segmaps, image_token_idx, image_token_idx_mask, loss_fn
-        )
+        layer_loss = get_object_localization_loss_for_one_layer(v, object_segmaps, image_token_idx, image_token_idx_mask, loss_fn)
         loss += layer_loss
     return loss / num_layers
 
@@ -477,9 +419,7 @@ class FastComposerModel(nn.Module):
 
         if self.object_localization:
             self.cross_attention_scores = {}
-            self.unet = unet_store_cross_attention_scores(
-                self.unet, self.cross_attention_scores, self.localization_layers
-            )
+            self.unet = unet_store_cross_attention_scores(self.unet, self.cross_attention_scores, self.localization_layers)
             self.object_localization_loss_fn = BalancedL1Loss(
                 args.object_localization_threshold,
                 args.object_localization_normalize,
@@ -500,9 +440,7 @@ class FastComposerModel(nn.Module):
             subfolder="text_encoder",
             revision=args.revision,
         )
-        vae = AutoencoderKL.from_pretrained(
-            args.pretrained_model_name_or_path, subfolder="vae", revision=args.revision
-        )
+        vae = AutoencoderKL.from_pretrained(args.pretrained_model_name_or_path, subfolder="vae", revision=args.revision)
         unet = UNet2DConditionModel.from_pretrained(
             args.pretrained_model_name_or_path,
             subfolder="unet",
@@ -548,9 +486,7 @@ class FastComposerModel(nn.Module):
         noise = torch.randn_like(latents)
         bsz = latents.shape[0]
         # Sample a random timestep for each image
-        timesteps = torch.randint(
-            0, noise_scheduler.num_train_timesteps, (bsz,), device=latents.device
-        )
+        timesteps = torch.randint(0, noise_scheduler.num_train_timesteps, (bsz,), device=latents.device)
         timesteps = timesteps.long()
 
         # Add noise to the latents according to the noise magnitude at each timestep
@@ -560,11 +496,7 @@ class FastComposerModel(nn.Module):
         # (bsz, max_num_objects, num_image_tokens, dim)
         object_embeds = self.image_encoder(object_pixel_values)
 
-        encoder_hidden_states = self.text_encoder(
-            input_ids, image_token_mask, object_embeds, num_objects
-        )[
-            0
-        ]  # (bsz, seq_len, dim)
+        encoder_hidden_states = self.text_encoder(input_ids, image_token_mask, object_embeds, num_objects)[0]  # (bsz, seq_len, dim)
 
         encoder_hidden_states = self.postfuse_module(
             encoder_hidden_states,
@@ -579,9 +511,7 @@ class FastComposerModel(nn.Module):
         elif noise_scheduler.config.prediction_type == "v_prediction":
             target = noise_scheduler.get_velocity(latents, noise, timesteps)
         else:
-            raise ValueError(
-                f"Unknown prediction type {noise_scheduler.config.prediction_type}"
-            )
+            raise ValueError(f"Unknown prediction type {noise_scheduler.config.prediction_type}")
 
         pred = self.unet(noisy_latents, timesteps, encoder_hidden_states).sample
 

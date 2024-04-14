@@ -134,11 +134,7 @@ class SegmentationModel(Model):
             result_mask_ir = np.argmax(res, axis=0).astype(np.uint8)
         else:
             result_mask_ir = result_mask_ir.round().astype(np.uint8)
-        overlay = segmentation_map_to_overlay(
-            bgr_frame, result_mask_ir, alpha, colormap=self.colormap
-        )
+        overlay = segmentation_map_to_overlay(bgr_frame, result_mask_ir, alpha, colormap=self.colormap)
         if self.rotate_and_flip:
-            overlay = cv2.flip(
-                cv2.rotate(overlay, rotateCode=cv2.ROTATE_90_CLOCKWISE), flipCode=1
-            )
+            overlay = cv2.flip(cv2.rotate(overlay, rotateCode=cv2.ROTATE_90_CLOCKWISE), flipCode=1)
         return overlay

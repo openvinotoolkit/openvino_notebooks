@@ -80,9 +80,7 @@ class OpenPoseDecoder:
                 np.clip(kpts[:, 0], 0, w - 1, out=kpts[:, 0])
                 np.clip(kpts[:, 1], 0, h - 1, out=kpts[:, 1])
 
-        pose_entries, keypoints = self.group_keypoints(
-            keypoints, pafs, pose_entry_size=self.num_joints + 2
-        )
+        pose_entries, keypoints = self.group_keypoints(keypoints, pafs, pose_entry_size=self.num_joints + 2)
         poses, scores = self.convert_to_coco_format(pose_entries, keypoints)
         if len(poses) > 0:
             poses = np.asarray(poses, dtype=np.float32)
@@ -142,9 +140,7 @@ class OpenPoseDecoder:
     @staticmethod
     def refine(heatmap, x, y):
         h, w = heatmap.shape[-2:]
-        valid = np.logical_and(
-            np.logical_and(x > 0, x < w - 1), np.logical_and(y > 0, y < h - 1)
-        )
+        valid = np.logical_and(np.logical_and(x > 0, x < w - 1), np.logical_and(y > 0, y < h - 1))
         xx = x[valid]
         yy = y[valid]
         dx = np.sign(heatmap[yy, xx + 1] - heatmap[yy, xx - 1], dtype=np.float32) * 0.25
@@ -184,9 +180,7 @@ class OpenPoseDecoder:
                 pose_entry[kpt_a_id] = connection[0]
                 pose_entry[kpt_b_id] = connection[1]
                 pose_entry[-1] = 2
-                pose_entry[-2] = (
-                    np.sum(all_keypoints[connection[0:2], 2]) + connection[2]
-                )
+                pose_entry[-2] = np.sum(all_keypoints[connection[0:2], 2]) + connection[2]
                 pose_entries.append(pose_entry)
             elif pose_a_idx >= 0 and pose_b_idx >= 0 and pose_a_idx != pose_b_idx:
                 # Merge two poses are disjoint merge them, otherwise ignore connection.
@@ -270,24 +264,18 @@ class OpenPoseDecoder:
             affinity_scores = (field * vec).sum(-1).reshape(-1, self.points_per_limb)
             valid_affinity_scores = affinity_scores > self.min_paf_alignment_score
             valid_num = valid_affinity_scores.sum(1)
-            affinity_scores = (affinity_scores * valid_affinity_scores).sum(1) / (
-                valid_num + 1e-6
-            )
+            affinity_scores = (affinity_scores * valid_affinity_scores).sum(1) / (valid_num + 1e-6)
             success_ratio = valid_num / self.points_per_limb
 
             # Get a list of limbs according to the obtained affinity score.
-            valid_limbs = np.where(
-                np.logical_and(affinity_scores > 0, success_ratio > 0.8)
-            )[0]
+            valid_limbs = np.where(np.logical_and(affinity_scores > 0, success_ratio > 0.8))[0]
             if len(valid_limbs) == 0:
                 continue
             b_idx, a_idx = np.divmod(valid_limbs, n)
             affinity_scores = affinity_scores[valid_limbs]
 
             # Suppress incompatible connections.
-            a_idx, b_idx, affinity_scores = self.connections_nms(
-                a_idx, b_idx, affinity_scores
-            )
+            a_idx, b_idx, affinity_scores = self.connections_nms(a_idx, b_idx, affinity_scores)
             connections = list(
                 zip(
                     kpts_a[a_idx, 3].astype(np.int32),
@@ -309,9 +297,7 @@ class OpenPoseDecoder:
             )
 
         # Remove poses with not enough points.
-        pose_entries = np.asarray(pose_entries, dtype=np.float32).reshape(
-            -1, pose_entry_size
-        )
+        pose_entries = np.asarray(pose_entries, dtype=np.float32).reshape(-1, pose_entry_size)
         pose_entries = pose_entries[pose_entries[:, -1] >= 3]
         return pose_entries, all_keypoints
 

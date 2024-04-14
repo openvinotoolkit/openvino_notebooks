@@ -134,9 +134,7 @@ def boxes_from_bitmap(pred, _bitmap, dest_width, dest_height):
     bitmap = _bitmap
     height, width = bitmap.shape
 
-    outs = cv2.findContours(
-        (bitmap * 255).astype(np.uint8), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE
-    )
+    outs = cv2.findContours((bitmap * 255).astype(np.uint8), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     if len(outs) == 3:
         img, contours, _ = outs[0], outs[1], outs[2]
     elif len(outs) == 2:
@@ -240,9 +238,7 @@ def sorted_boxes(dt_boxes):
     _boxes = list(sorted_boxes)
 
     for i in range(num_boxes - 1):
-        if abs(_boxes[i + 1][0][1] - _boxes[i][0][1]) < 10 and (
-            _boxes[i + 1][0][0] < _boxes[i][0][0]
-        ):
+        if abs(_boxes[i + 1][0][1] - _boxes[i][0][1]) < 10 and (_boxes[i + 1][0][0] < _boxes[i][0][0]):
             tmp = _boxes[i]
             _boxes[i] = _boxes[i + 1]
             _boxes[i + 1] = tmp
@@ -261,16 +257,8 @@ def get_rotate_crop_image(img, points):
     points[:, 1] = points[:, 1] - top
     """
     assert len(points) == 4, "shape of points must be 4*2"
-    img_crop_width = int(
-        max(
-            np.linalg.norm(points[0] - points[1]), np.linalg.norm(points[2] - points[3])
-        )
-    )
-    img_crop_height = int(
-        max(
-            np.linalg.norm(points[0] - points[3]), np.linalg.norm(points[1] - points[2])
-        )
-    )
+    img_crop_width = int(max(np.linalg.norm(points[0] - points[1]), np.linalg.norm(points[2] - points[3])))
+    img_crop_height = int(max(np.linalg.norm(points[0] - points[3]), np.linalg.norm(points[1] - points[2])))
     pts_std = np.float32(
         [
             [0, 0],
@@ -305,9 +293,7 @@ postprocess_params = {
 class BaseRecLabelDecode(object):
     """Convert between text-label and text-index"""
 
-    def __init__(
-        self, character_dict_path=None, character_type="ch", use_space_char=False
-    ):
+    def __init__(self, character_dict_path=None, character_type="ch", use_space_char=False):
         support_character_type = [
             "ch",
             "en",
@@ -343,11 +329,7 @@ class BaseRecLabelDecode(object):
             "cyrillic",
             "devanagari",
         ]
-        assert (
-            character_type in support_character_type
-        ), "Only {} are supported now but get {}".format(
-            support_character_type, character_type
-        )
+        assert character_type in support_character_type, "Only {} are supported now but get {}".format(support_character_type, character_type)
 
         self.beg_str = "sos"
         self.end_str = "eos"
@@ -361,11 +343,7 @@ class BaseRecLabelDecode(object):
             dict_character = list(self.character_str)
         elif character_type in support_character_type:
             self.character_str = []
-            assert (
-                character_dict_path is not None
-            ), "character_dict_path should not be None when character_type is {}".format(
-                character_type
-            )
+            assert character_dict_path is not None, "character_dict_path should not be None when character_type is {}".format(character_type)
             with open(character_dict_path, "rb") as fin:
                 lines = fin.readlines()
                 for line in lines:
@@ -399,10 +377,7 @@ class BaseRecLabelDecode(object):
                     continue
                 if is_remove_duplicate:
                     # only for predict
-                    if (
-                        idx > 0
-                        and text_index[batch_idx][idx - 1] == text_index[batch_idx][idx]
-                    ):
+                    if idx > 0 and text_index[batch_idx][idx - 1] == text_index[batch_idx][idx]:
                         continue
                 char_list.append(self.character[int(text_index[batch_idx][idx])])
                 if text_prob is not None:
@@ -420,16 +395,8 @@ class BaseRecLabelDecode(object):
 class CTCLabelDecode(BaseRecLabelDecode):
     """Convert between text-label and text-index"""
 
-    def __init__(
-        self,
-        character_dict_path=None,
-        character_type="ch",
-        use_space_char=False,
-        **kwargs
-    ):
-        super(CTCLabelDecode, self).__init__(
-            character_dict_path, character_type, use_space_char
-        )
+    def __init__(self, character_dict_path=None, character_type="ch", use_space_char=False, **kwargs):
+        super(CTCLabelDecode, self).__init__(character_dict_path, character_type, use_space_char)
 
     def __call__(self, preds, label=None, *args, **kwargs):
         if isinstance(preds, paddle.Tensor):
@@ -454,9 +421,7 @@ def build_post_process(config):
     return module_class
 
 
-def draw_ocr_box_txt(
-    image, boxes, txts, scores=None, drop_score=0.5, font_path="./fonts/simfang.ttf"
-):
+def draw_ocr_box_txt(image, boxes, txts, scores=None, drop_score=0.5, font_path="./fonts/simfang.ttf"):
     h, w = image.height, image.width
     img_left = image.copy()
     img_right = Image.new("RGB", (w, h), (255, 255, 255))
@@ -486,12 +451,8 @@ def draw_ocr_box_txt(
             ],
             outline=color,
         )
-        box_height = math.sqrt(
-            (box[0][0] - box[3][0]) ** 2 + (box[0][1] - box[3][1]) ** 2
-        )
-        box_width = math.sqrt(
-            (box[0][0] - box[1][0]) ** 2 + (box[0][1] - box[1][1]) ** 2
-        )
+        box_height = math.sqrt((box[0][0] - box[3][0]) ** 2 + (box[0][1] - box[3][1]) ** 2)
+        box_width = math.sqrt((box[0][0] - box[1][0]) ** 2 + (box[0][1] - box[1][1]) ** 2)
         if box_height > 2 * box_width:
             font_size = max(int(box_width * 0.9), 10)
             font = ImageFont.truetype(font_path, font_size)

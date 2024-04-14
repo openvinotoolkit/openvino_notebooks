@@ -18,9 +18,7 @@ result = subprocess.run(
     env=dict(os.environ, PYTHONPATH=PYTHONPATH),
 )
 
-result_output = (
-    result.stdout.strip("\n") if result.stdout else result.stderr.strip("\n")
-)
+result_output = result.stdout.strip("\n") if result.stdout else result.stderr.strip("\n")
 
 print(result_output, file=sys.stderr if result.returncode else sys.stdout, flush=True)
 

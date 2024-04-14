@@ -49,9 +49,7 @@ def prepare_mask_and_masked_image(image: PIL.Image.Image, mask: PIL.Image.Image)
         mask = [mask]
 
     if isinstance(mask, list) and isinstance(mask[0], PIL.Image.Image):
-        mask = np.concatenate(
-            [np.array(m.convert("L"))[None, None, :] for m in mask], axis=0
-        )
+        mask = np.concatenate([np.array(m.convert("L"))[None, None, :] for m in mask], axis=0)
         mask = mask.astype(np.float32) / 255.0
     elif isinstance(mask, list) and isinstance(mask[0], np.ndarray):
         mask = np.concatenate([m[None, None, :] for m in mask], axis=0)
@@ -127,9 +125,7 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
           mask (np.array): resized mask tensor
           masked_image_latents (np.array): masked image encoded into latent space using VAE
         """
-        mask = torch.nn.functional.interpolate(
-            torch.from_numpy(mask), size=(height // 8, width // 8)
-        )
+        mask = torch.nn.functional.interpolate(torch.from_numpy(mask), size=(height // 8, width // 8))
         mask = mask.numpy()
 
         # encode the mask image into latents space so we can concatenate it to the latents
@@ -137,11 +133,7 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
         masked_image_latents = logits * 0.18215
 
         mask = np.concatenate([mask] * 2) if do_classifier_free_guidance else mask
-        masked_image_latents = (
-            np.concatenate([masked_image_latents] * 2)
-            if do_classifier_free_guidance
-            else masked_image_latents
-        )
+        masked_image_latents = np.concatenate([masked_image_latents] * 2) if do_classifier_free_guidance else masked_image_latents
         return mask, masked_image_latents
 
     def __call__(
@@ -202,9 +194,7 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
         # prepare mask
         mask, masked_image = prepare_mask_and_masked_image(image, mask_image)
         # set timesteps
-        accepts_offset = "offset" in set(
-            inspect.signature(self.scheduler.set_timesteps).parameters.keys()
-        )
+        accepts_offset = "offset" in set(inspect.signature(self.scheduler.set_timesteps).parameters.keys())
         extra_set_kwargs = {}
         if accepts_offset:
             extra_set_kwargs["offset"] = 1
@@ -225,34 +215,22 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
         # eta (η) is only used with the DDIMScheduler, it will be ignored for other schedulers.
         # eta corresponds to η in DDIM paper: https://arxiv.org/abs/2010.02502
         # and should be between [0, 1]
-        accepts_eta = "eta" in set(
-            inspect.signature(self.scheduler.step).parameters.keys()
-        )
+        accepts_eta = "eta" in set(inspect.signature(self.scheduler.step).parameters.keys())
         extra_step_kwargs = {}
         if accepts_eta:
             extra_step_kwargs["eta"] = eta
 
         for t in self.progress_bar(timesteps):
             # expand the latents if we are doing classifier free guidance
-            latent_model_input = (
-                np.concatenate([latents] * 2)
-                if do_classifier_free_guidance
-                else latents
-            )
+            latent_model_input = np.concatenate([latents] * 2) if do_classifier_free_guidance else latents
             latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
-            latent_model_input = np.concatenate(
-                [latent_model_input, mask, masked_image_latents], axis=1
-            )
+            latent_model_input = np.concatenate([latent_model_input, mask, masked_image_latents], axis=1)
             # predict the noise residual
-            noise_pred = self.unet(
-                [latent_model_input, np.array(t, dtype=np.float32), text_embeddings]
-            )[self._unet_output]
+            noise_pred = self.unet([latent_model_input, np.array(t, dtype=np.float32), text_embeddings])[self._unet_output]
             # perform guidance
             if do_classifier_free_guidance:
                 noise_pred_uncond, noise_pred_text = noise_pred[0], noise_pred[1]
-                noise_pred = noise_pred_uncond + guidance_scale * (
-                    noise_pred_text - noise_pred_uncond
-                )
+                noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
 
             # compute the previous noisy sample x_t -> x_t-1
             latents = self.scheduler.step(
@@ -303,9 +281,7 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
         if num_images_per_prompt != 1:
             bs_embed, seq_len, _ = text_embeddings.shape
             text_embeddings = np.tile(text_embeddings, (1, num_images_per_prompt, 1))
-            text_embeddings = np.reshape(
-                text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1)
-            )
+            text_embeddings = np.reshape(text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1))
 
         # get unconditional embeddings for classifier free guidance
         if do_classifier_free_guidance:
@@ -325,18 +301,12 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
                 return_tensors="np",
             )
 
-            uncond_embeddings = self.text_encoder(uncond_input.input_ids)[
-                self._text_encoder_output
-            ]
+            uncond_embeddings = self.text_encoder(uncond_input.input_ids)[self._text_encoder_output]
 
             # duplicate unconditional embeddings for each generation per prompt, using mps friendly method
             seq_len = uncond_embeddings.shape[1]
-            uncond_embeddings = np.tile(
-                uncond_embeddings, (1, num_images_per_prompt, 1)
-            )
-            uncond_embeddings = np.reshape(
-                uncond_embeddings, (batch_size * num_images_per_prompt, seq_len, -1)
-            )
+            uncond_embeddings = np.tile(uncond_embeddings, (1, num_images_per_prompt, 1))
+            uncond_embeddings = np.reshape(uncond_embeddings, (batch_size * num_images_per_prompt, seq_len, -1))
 
             # For classifier free guidance, we need to do two forward passes.
             # Here we concatenate the unconditional and text embeddings into a single batch
@@ -345,9 +315,7 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
 
         return text_embeddings
 
-    def prepare_latents(
-        self, image: PIL.Image.Image = None, latent_timestep: torch.Tensor = None
-    ):
+    def prepare_latents(self, image: PIL.Image.Image = None, latent_timestep: torch.Tensor = None):
         """
         Function for getting initial latents for starting generation
 
@@ -370,14 +338,10 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
         input_image, meta = preprocess(image)
         latents = self.vae_encoder(input_image)[self._vae_e_output]
         latents = latents * 0.18215
-        latents = self.scheduler.add_noise(
-            torch.from_numpy(latents), torch.from_numpy(noise), latent_timestep
-        ).numpy()
+        latents = self.scheduler.add_noise(torch.from_numpy(latents), torch.from_numpy(noise), latent_timestep).numpy()
         return latents, meta
 
-    def postprocess_image(
-        self, image: np.ndarray, meta: Dict, output_type: str = "pil"
-    ):
+    def postprocess_image(self, image: np.ndarray, meta: Dict, output_type: str = "pil"):
         """
         Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required),
         normalize and convert to [0, 255] pixels range. Optionally, convertes it from np.ndarray to PIL.Image format
@@ -407,10 +371,7 @@ class OVStableDiffusionInpaintingPipeline(DiffusionPipeline):
             image = self.numpy_to_pil(image)
             if "src_height" in meta:
                 orig_height, orig_width = meta["src_height"], meta["src_width"]
-                image = [
-                    img.resize((orig_width, orig_height), PIL.Image.Resampling.LANCZOS)
-                    for img in image
-                ]
+                image = [img.resize((orig_width, orig_height), PIL.Image.Resampling.LANCZOS) for img in image]
         else:
             if "src_height" in meta:
                 orig_height, orig_width = meta["src_height"], meta["src_width"]
@@ -527,15 +488,7 @@ def generate_video(
         # interpolation steps bewteen 2 inpainted images (=sequential zoom and crop)
         for j in range(num_interpol_frames - 1):
             interpol_image = current_image
-            interpol_width = round(
-                (
-                    1
-                    - (1 - 2 * mask_width / height)
-                    ** (1 - (j + 1) / num_interpol_frames)
-                )
-                * height
-                / 2
-            )
+            interpol_width = round((1 - (1 - 2 * mask_width / height) ** (1 - (j + 1) / num_interpol_frames)) * height / 2)
             interpol_image = interpol_image.crop(
                 (
                     interpol_width,
@@ -548,14 +501,8 @@ def generate_video(
             interpol_image = interpol_image.resize((height, width))
 
             # paste the higher resolution previous image in the middle to avoid drop in quality caused by zooming
-            interpol_width2 = round(
-                (1 - (height - 2 * mask_width) / (height - 2 * interpol_width))
-                / 2
-                * height
-            )
-            prev_image_fix_crop = shrink_and_paste_on_blank(
-                prev_image_fix, interpol_width2
-            )
+            interpol_width2 = round((1 - (height - 2 * mask_width) / (height - 2 * interpol_width)) / 2 * height)
+            prev_image_fix_crop = shrink_and_paste_on_blank(prev_image_fix, interpol_width2)
             interpol_image.paste(prev_image_fix_crop, mask=prev_image_fix_crop)
             all_frames.append(interpol_image)
         all_frames.append(current_image)
@@ -593,9 +540,7 @@ def shrink_and_paste_on_blank(current_image: PIL.Image.Image, mask_width: int):
     blank_image[:, :, 3] = 1
 
     # paste shrinked onto blank
-    blank_image[
-        mask_width : height - mask_width, mask_width : width - mask_width, :
-    ] = prev_image
+    blank_image[mask_width : height - mask_width, mask_width : width - mask_width, :] = prev_image
     prev_image = PIL.Image.fromarray(blank_image)
 
     return prev_image

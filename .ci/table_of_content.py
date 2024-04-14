@@ -36,9 +36,7 @@ def create_link_for_tc(title):
 def remove_old_tc(cell, idx):
     if cell is not None:
         for line in cell["source"][idx:]:
-            if re.match(r"\s*-\s*\[.*\]\(#.*\).*", line) or re.match(
-                TABLE_OF_CONTENT, line
-            ):
+            if re.match(r"\s*-\s*\[.*\]\(#.*\).*", line) or re.match(TABLE_OF_CONTENT, line):
                 cell["source"].remove(line)
     return cell
 
@@ -56,9 +54,7 @@ def get_tc_line(title, title_for_tc, link, tc_list, titles_list):
     elif indents_num - tc_list[-1].index("-") > 4:
         # when previous list item have n indents and current have n+4+1 it broke the alignment
         indents_num = tc_list[-1].index("-") + 4
-    elif indents_num != tc_list[-1].index("-") and title.index(" ") == titles_list[
-        -1
-    ].index(" "):
+    elif indents_num != tc_list[-1].index("-") and title.index(" ") == titles_list[-1].index(" "):
         # when we have several titles with same wrong alignments
         indents_num = tc_list[-1].index("-")
 
@@ -101,9 +97,7 @@ def generate_table_of_content(notebook_path: pathlib.Path):
     if not notebook_json["cells"]:
         return
 
-    table_of_content_cell, table_of_content_cell_idx = find_tc_in_cell(
-        notebook_json["cells"][0]
-    )
+    table_of_content_cell, table_of_content_cell_idx = find_tc_in_cell(notebook_json["cells"][0])
 
     all_titles = []
     for cell in filter(is_markdown, notebook_json["cells"][1:]):
@@ -124,9 +118,7 @@ def generate_table_of_content(notebook_path: pathlib.Path):
             title = title.strip()
             title_for_tc = create_title_for_tc(title)
             link_for_tc = create_link_for_tc(title_for_tc)
-            new_line = get_tc_line(
-                title, title_for_tc, link_for_tc, table_of_content, all_titles
-            )
+            new_line = get_tc_line(title, title_for_tc, link_for_tc, table_of_content, all_titles)
 
             if table_of_content.count(new_line) > 1:
                 print(
@@ -141,9 +133,7 @@ def generate_table_of_content(notebook_path: pathlib.Path):
     table_of_content = ["\n", "#### Table of contents:\n\n"] + table_of_content + ["\n"]
 
     if table_of_content_cell is not None:
-        table_of_content_cell = remove_old_tc(
-            table_of_content_cell, table_of_content_cell_idx
-        )
+        table_of_content_cell = remove_old_tc(table_of_content_cell, table_of_content_cell_idx)
 
     if table_of_content_cell is not None:
         table_of_content_cell["source"].extend(table_of_content)

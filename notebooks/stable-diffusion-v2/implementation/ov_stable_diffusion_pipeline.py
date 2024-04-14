@@ -12,9 +12,7 @@ from diffusers.schedulers import DDIMScheduler, LMSDiscreteScheduler, PNDMSchedu
 import openvino as ov
 
 
-def scale_fit_to_window(
-    dst_width: int, dst_height: int, image_width: int, image_height: int
-):
+def scale_fit_to_window(dst_width: int, dst_height: int, image_width: int, image_height: int):
     """
     Preprocessing helper function for calculating image size for resize with peserving original aspect ratio
     and fitting image to specific window size
@@ -47,9 +45,7 @@ def preprocess(image: PIL.Image.Image):
     """
     src_width, src_height = image.size
     dst_width, dst_height = scale_fit_to_window(512, 512, src_width, src_height)
-    image = np.array(
-        image.resize((dst_width, dst_height), resample=PIL.Image.Resampling.LANCZOS)
-    )[None, :]
+    image = np.array(image.resize((dst_width, dst_height), resample=PIL.Image.Resampling.LANCZOS))[None, :]
     pad_width = 512 - dst_width
     pad_height = 512 - dst_height
     pad = ((0, 0), (0, pad_height), (0, pad_width), (0, 0))
@@ -158,17 +154,13 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
             negative_prompt=negative_prompt,
         )
         # set timesteps
-        accepts_offset = "offset" in set(
-            inspect.signature(self.scheduler.set_timesteps).parameters.keys()
-        )
+        accepts_offset = "offset" in set(inspect.signature(self.scheduler.set_timesteps).parameters.keys())
         extra_set_kwargs = {}
         if accepts_offset:
             extra_set_kwargs["offset"] = 1
 
         self.scheduler.set_timesteps(num_inference_steps, **extra_set_kwargs)
-        timesteps, num_inference_steps = self.get_timesteps(
-            num_inference_steps, strength
-        )
+        timesteps, num_inference_steps = self.get_timesteps(num_inference_steps, strength)
         latent_timestep = timesteps[:1]
 
         # get the initial random noise unless the user supplied it
@@ -178,40 +170,25 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
         # eta (η) is only used with the DDIMScheduler, it will be ignored for other schedulers.
         # eta corresponds to η in DDIM paper: https://arxiv.org/abs/2010.02502
         # and should be between [0, 1]
-        accepts_eta = "eta" in set(
-            inspect.signature(self.scheduler.step).parameters.keys()
-        )
+        accepts_eta = "eta" in set(inspect.signature(self.scheduler.step).parameters.keys())
         extra_step_kwargs = {}
         if accepts_eta:
             extra_step_kwargs["eta"] = eta
 
         for t in self.progress_bar(timesteps):
             # expand the latents if we are doing classifier free guidance
-            latent_model_input = (
-                np.concatenate([latents] * 2)
-                if do_classifier_free_guidance
-                else latents
-            )
+            latent_model_input = np.concatenate([latents] * 2) if do_classifier_free_guidance else latents
             latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
 
             # predict the noise residual
-            noise_pred = self.unet(
-                [latent_model_input, np.array(t, dtype=np.float32), text_embeddings]
-            )[self._unet_output]
+            noise_pred = self.unet([latent_model_input, np.array(t, dtype=np.float32), text_embeddings])[self._unet_output]
             # perform guidance
             if do_classifier_free_guidance:
                 noise_pred_uncond, noise_pred_text = noise_pred[0], noise_pred[1]
-                noise_pred = noise_pred_uncond + guidance_scale * (
-                    noise_pred_text - noise_pred_uncond
-                )
+                noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
 
             # compute the previous noisy sample x_t -> x_t-1
-            latents = self.scheduler.step(
-                torch.from_numpy(noise_pred),
-                t,
-                torch.from_numpy(latents),
-                **extra_step_kwargs
-            )["prev_sample"].numpy()
+            latents = self.scheduler.step(torch.from_numpy(noise_pred), t, torch.from_numpy(latents), **extra_step_kwargs)["prev_sample"].numpy()
         # scale and decode the image latents with vae
         image = self.vae_decoder(latents * (1 / 0.18215))[self._vae_d_output]
 
@@ -254,9 +231,7 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
         if num_images_per_prompt != 1:
             bs_embed, seq_len, _ = text_embeddings.shape
             text_embeddings = np.tile(text_embeddings, (1, num_images_per_prompt, 1))
-            text_embeddings = np.reshape(
-                text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1)
-            )
+            text_embeddings = np.reshape(text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1))
 
         # get unconditional embeddings for classifier free guidance
         if do_classifier_free_guidance:
@@ -276,18 +251,12 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
                 return_tensors="np",
             )
 
-            uncond_embeddings = self.text_encoder(uncond_input.input_ids)[
-                self._text_encoder_output
-            ]
+            uncond_embeddings = self.text_encoder(uncond_input.input_ids)[self._text_encoder_output]
 
             # duplicate unconditional embeddings for each generation per prompt, using mps friendly method
             seq_len = uncond_embeddings.shape[1]
-            uncond_embeddings = np.tile(
-                uncond_embeddings, (1, num_images_per_prompt, 1)
-            )
-            uncond_embeddings = np.reshape(
-                uncond_embeddings, (batch_size * num_images_per_prompt, seq_len, -1)
-            )
+            uncond_embeddings = np.tile(uncond_embeddings, (1, num_images_per_prompt, 1))
+            uncond_embeddings = np.reshape(uncond_embeddings, (batch_size * num_images_per_prompt, seq_len, -1))
 
             # For classifier free guidance, we need to do two forward passes.
             # Here we concatenate the unconditional and text embeddings into a single batch
@@ -296,9 +265,7 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
 
         return text_embeddings
 
-    def prepare_latents(
-        self, image: PIL.Image.Image = None, latent_timestep: torch.Tensor = None
-    ):
+    def prepare_latents(self, image: PIL.Image.Image = None, latent_timestep: torch.Tensor = None):
         """
         Function for getting initial latents for starting generation
 
@@ -321,14 +288,10 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
         input_image, meta = preprocess(image)
         latents = self.vae_encoder(input_image)[self._vae_e_output]
         latents = latents * 0.18215
-        latents = self.scheduler.add_noise(
-            torch.from_numpy(latents), torch.from_numpy(noise), latent_timestep
-        ).numpy()
+        latents = self.scheduler.add_noise(torch.from_numpy(latents), torch.from_numpy(noise), latent_timestep).numpy()
         return latents, meta
 
-    def postprocess_image(
-        self, image: np.ndarray, meta: Dict, output_type: str = "pil"
-    ):
+    def postprocess_image(self, image: np.ndarray, meta: Dict, output_type: str = "pil"):
         """
         Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required),
         normalize and convert to [0, 255] pixels range. Optionally, convertes it from np.ndarray to PIL.Image format
@@ -358,10 +321,7 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
             image = self.numpy_to_pil(image)
             if "src_height" in meta:
                 orig_height, orig_width = meta["src_height"], meta["src_width"]
-                image = [
-                    img.resize((orig_width, orig_height), PIL.Image.Resampling.LANCZOS)
-                    for img in image
-                ]
+                image = [img.resize((orig_width, orig_height), PIL.Image.Resampling.LANCZOS) for img in image]
         else:
             if "src_height" in meta:
                 orig_height, orig_width = meta["src_height"], meta["src_width"]

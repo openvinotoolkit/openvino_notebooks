@@ -130,9 +130,7 @@ class MidasNet_small_videpth(BaseModel):
             align_corners=align_corners,
         )
 
-        self.scratch.output_conv = OutputConv(
-            features, self.groups, self.scratch.activation, non_negative
-        )
+        self.scratch.output_conv = OutputConv(features, self.groups, self.scratch.activation, non_negative)
 
         if path:
             self.load(path)
