@@ -89,3 +89,6 @@ jobs:
       - name: Test links from READMEs
         run: |
           python .ci/check_links.py
+      - name: Test table of content and device widget
+        run: |
+          python .ci/check_notebooks.py
