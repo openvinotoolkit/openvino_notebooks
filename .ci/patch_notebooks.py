@@ -35,7 +35,54 @@ def disable_skip_ext(nb, notebook_path):
     return nb
 
 
-def patch_notebooks(notebooks_dir, test_device=""):
+def remove_ov_install(cell):
+    updated_lines = []
+
+    def has_additional_deps(str_part):
+        if "%pip" in str_part:
+            return False
+        if "install" in str_part:
+            return False
+        if str_part.startswith("-"):
+            return False
+        if str_part.startswith("https://"):
+            return False
+        return True
+
+    lines = cell["source"].split("\n")
+    for line in lines:
+        if "openvino" in line:
+            updated_line_content = []
+            empty = True
+            for part in line.split(" "):
+                if "openvino-dev" in part:
+                    continue
+                if "openvino-nightly" in part:
+                    continue
+                if "openvino-tokenizers" in part:
+                    continue
+                if "openvino>" in part or "openvino=" in part:
+                    continue
+                if empty:
+                    empty = not has_additional_deps(part)
+                updated_line_content.append(part)
+
+            updated_lines.append("# " + line)
+            if not empty:
+                updated_line = " ".join(updated_line_content)
+                if line.startswith(" "):
+                    for token in line:
+                        if token != " ":
+                            break
+                        # keep indention
+                        updated_line = " " + updated_line
+                updated_lines.append(updated_line)
+        else:
+            updated_lines.append(line)
+    cell["source"] = "\n".join(updated_lines)
+
+
+def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
     """
     Patch notebooks in notebooks directory with replacement values
     found in notebook metadata to speed up test execution.
@@ -60,6 +107,8 @@ def patch_notebooks(notebooks_dir, test_device=""):
             found = False
             device_found = False
             for cell in nb["cells"]:
+                if skip_ov_install and "%pip" in cell["source"]:
+                    remove_ov_install(cell)
                 if test_device and DEVICE_WIDGET in cell["source"]:
                     device_found = True
                     cell["source"] = re.sub(r"value=.*,", f"value='{test_device.upper()}',", cell["source"])
@@ -93,7 +142,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Notebook patcher")
     parser.add_argument("notebooks_dir", default=".")
     parser.add_argument("-td", "--test_device", default="")
+    parser.add_argument("--skip_ov_install", action="store_true")
     args = parser.parse_args()
     if not Path(args.notebooks_dir).is_dir():
         raise ValueError(f"'{args.notebooks_dir}' is not an existing directory")
-    patch_notebooks(args.notebooks_dir, args.test_device)
+    patch_notebooks(args.notebooks_dir, args.test_device, args.skip_ov_install)
