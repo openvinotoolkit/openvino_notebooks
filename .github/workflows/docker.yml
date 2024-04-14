@@ -52,10 +52,26 @@ jobs:
           echo "Available storage:"
           df -h
       - uses: actions/checkout@v4
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: |
+            notebooks/*/**
+            requirements.txt
+
+      - name: List all changed files
+        run: |
+          touch .ci/test_notebooks.txt
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+            echo $file >> .ci/test_notebooks.txt
+          done
+        shell: bash
       - name: Build Docker image
         run: |
           docker build . -t openvino_notebooks
       - name: Test notebooks in Docker image
         run: |
-          # Test script location: .docker/.s2i/bin/test
-          docker run --entrypoint /tmp/scripts/test openvino_notebooks
+          # Test script location: .docker/.s2i/bin/test_precommit
+          docker run --entrypoint /tmp/scripts/test_precommit openvino_notebooks

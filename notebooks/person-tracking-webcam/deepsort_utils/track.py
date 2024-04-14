@@ -60,8 +60,7 @@ class Track:
 
     """
 
-    def __init__(self, mean, covariance, track_id, n_init, max_age,
-                 feature=None):
+    def __init__(self, mean, covariance, track_id, n_init, max_age, feature=None):
         self.mean = mean
         self.covariance = covariance
         self.track_id = track_id
@@ -132,8 +131,7 @@ class Track:
             The associated detection.
 
         """
-        self.mean, self.covariance = kf.update(
-            self.mean, self.covariance, detection.to_xyah())
+        self.mean, self.covariance = kf.update(self.mean, self.covariance, detection.to_xyah())
         self.features.append(detection.feature)
 
         self.hits += 1
@@ -142,16 +140,14 @@ class Track:
             self.state = TrackState.Confirmed
 
     def mark_missed(self):
-        """Mark this track as missed (no association at the current time step).
-        """
+        """Mark this track as missed (no association at the current time step)."""
         if self.state == TrackState.Tentative:
             self.state = TrackState.Deleted
         elif self.time_since_update > self._max_age:
             self.state = TrackState.Deleted
 
     def is_tentative(self):
-        """Returns True if this track is tentative (unconfirmed).
-        """
+        """Returns True if this track is tentative (unconfirmed)."""
         return self.state == TrackState.Tentative
 
     def is_confirmed(self):

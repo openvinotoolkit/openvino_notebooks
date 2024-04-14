@@ -1,43 +1,5 @@
-# openvino and its dependencies
-openvino-dev>=2024.0.0
-openvino-telemetry>=2023.2.1
-nncf==2.9.0
-
-
-# deep learning frameworks
-tensorflow-macos>=2.5,<=2.14; sys_platform == 'darwin' and platform_machine == 'arm64' and python_version > "3.8" # macOS M1 and M2
-tensorflow-macos>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine == 'arm64' and python_version <= "3.8" # macOS M1 and M2
-tensorflow>=2.5,<=2.14; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version > "3.8" # macOS x86
-tensorflow>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version <= "3.8" # macOS x86
-tensorflow>=2.5,<=2.14; sys_platform != 'darwin' and python_version > "3.8"
-tensorflow>=2.5,<=2.12.0; sys_platform != 'darwin' and python_version <= "3.8"
-
-onnx>=1.11.0
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.1.0
-torchvision==0.16.0
-torchaudio==2.1.0
-
-transformers>=4.21.1
-
-
 # jupyter
 jupyterlab
 ipywidgets
 ipykernel>=5.*
 ipython>=7.16.3
-
-
-# others
-numpy>=1.21.0
-opencv-python
-Pillow>=8.3.2
-matplotlib>=3.4,<3.7; platform_system == "Windows"
-matplotlib>=3.4; platform_system != "Windows"
-scipy
-
-# The packages below are not directly required. They are dependencies of 
-# other dependencies that are pinned to a specific version to avoid
-# compatibility issues or vulnerabilities
-scikit-image>=0.19.2
-setuptools>=56.0.0

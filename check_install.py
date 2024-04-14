@@ -1,5 +1,5 @@
 import os
-import subprocess # nosec - disable B404:import-subprocess check
+import subprocess  # nosec - disable B404:import-subprocess check
 import sys
 from pathlib import Path
 from pprint import pprint
@@ -34,9 +34,7 @@ def show_supported(supported):
 
 
 def pip_check():
-    result = subprocess.run(
-        ["pip", "check"], universal_newlines=True, stdout=subprocess.PIPE
-    )
+    result = subprocess.run(["pip", "check"], universal_newlines=True, stdout=subprocess.PIPE)
     if "No broken requirements found" in result.stdout:
         return True, ""
     else:
@@ -62,12 +60,8 @@ NO_BROKEN_REQUIREMENTS, PIP_CHECK_OUTPUT = pip_check()
 CORRECT_KERNEL_PYTHON = PYTHON_EXECUTABLE == KERNEL_PYTHON
 
 IN_OPENVINO_ENV = "openvino_env" in sys.executable
-SUPPORTED_PYTHON_VERSION = PYTHON_VERSION.major == 3 and (
-    PYTHON_VERSION.minor >= 8 and PYTHON_VERSION.minor <= 11
-)
-GLOBAL_OPENVINO_INSTALLED = "openvino_202" in os.environ.get(
-    "LD_LIBRARY_PATH", ""
-) + ":".join(sys.path)
+SUPPORTED_PYTHON_VERSION = PYTHON_VERSION.major == 3 and (PYTHON_VERSION.minor >= 8 and PYTHON_VERSION.minor <= 11)
+GLOBAL_OPENVINO_INSTALLED = "openvino_202" in os.environ.get("LD_LIBRARY_PATH", "") + ":".join(sys.path)
 
 
 try:
@@ -105,20 +99,12 @@ print(f"OpenVINO environment activated: {show_supported(IN_OPENVINO_ENV)}")
 print(f"Jupyter kernel installed for openvino_env: {show_supported(KERNEL_INSTALLED)}")
 if KERNEL_INSTALLED:
     print(f"Jupyter kernel Python executable: {KERNEL_PYTHON}")
-    print(
-        "Jupyter kernel Python and OpenVINO environment Python match: "
-        f"{show_supported(CORRECT_KERNEL_PYTHON)}"
-    )
-print(
-    f"Python version: {PYTHON_VERSION.major}.{PYTHON_VERSION.minor} "
-    f"{show_supported(SUPPORTED_PYTHON_VERSION)}"
-)
+    print("Jupyter kernel Python and OpenVINO environment Python match: " f"{show_supported(CORRECT_KERNEL_PYTHON)}")
+print(f"Python version: {PYTHON_VERSION.major}.{PYTHON_VERSION.minor} " f"{show_supported(SUPPORTED_PYTHON_VERSION)}")
 print(f"OpenVINO pip package installed: {show_supported(PIP_OPENVINO_INSTALLED)}")
 print(f"OpenVINO import succeeds: {show_supported(OPENVINO_IMPORT)}")
 print(f"OpenVINO development tools installed: {show_supported(DEVTOOLS_INSTALLED)}")
-print(
-    f"OpenVINO not installed globally: {show_supported(not GLOBAL_OPENVINO_INSTALLED)}"
-)
+print(f"OpenVINO not installed globally: {show_supported(not GLOBAL_OPENVINO_INSTALLED)}")
 
 print(f"No broken requirements: {show_supported(NO_BROKEN_REQUIREMENTS)}")
 print()
@@ -132,10 +118,7 @@ if not PIP_OPENVINO_INSTALLED:
     sys.exit(0)
 
 if not OPENVINO_IMPORT and OS != "win32" and not GLOBAL_OPENVINO_INSTALLED:
-    print(
-        "OpenVINO is installed, but importing fails. This is likely due to a missing\n"
-        "libpython.so library for the Python version you are using.\n"
-    )
+    print("OpenVINO is installed, but importing fails. This is likely due to a missing\n" "libpython.so library for the Python version you are using.\n")
     if OS == "linux":
         print(
             "If you have multiple Python version installed, use the full path to the Python\n"
@@ -202,8 +185,7 @@ if (not OPENVINO_IMPORT) and (OS == "win32" and PIP_OPENVINO_INSTALLED):
 if not DEVTOOLS_INSTALLED:
     print()
     print(
-        "OpenVINO development tools are not installed in this Python environment. \n"
-        "Please follow the instructions in the README to install `openvino-dev`\n"
+        "OpenVINO development tools are not installed in this Python environment. \n" "Please follow the instructions in the README to install `openvino-dev`\n"
     )
 
 if not NO_BROKEN_REQUIREMENTS:
@@ -225,13 +207,8 @@ if (
     if NO_BROKEN_REQUIREMENTS:
         print("Everything looks good!")
     else:
-        print(
-            "Summary: The installation looks good, but there are conflicting requirements."
-        )
+        print("Summary: The installation looks good, but there are conflicting requirements.")
 else:
-    print(
-        "The README.md file is located in the openvino_notebooks directory \n"
-        "and at https://github.com/openvinotoolkit/openvino_notebooks"
-    )
+    print("The README.md file is located in the openvino_notebooks directory \n" "and at https://github.com/openvinotoolkit/openvino_notebooks")
 if not NO_BROKEN_REQUIREMENTS:
     print("Broken requirements are often harmless, but could cause issues.")

@@ -21,6 +21,7 @@
       - [`nbqa`](#nbqa)
       - [`nbdime`](#nbdime)
       - [JupyterLab Code Formatter](#jupyterlab-code-formatter)
+      - [Black Automatic Code Formatter](#black-automatic-code-formatter)
       - [`PySpelling`](#pyspelling)
   - [Getting started](#getting-started)
     - [Pull Requests (PRs)](#pull-requests-prs)
@@ -319,6 +320,9 @@ standard `diff` tool for `git`, with much more useful output than the regular `g
 [JupyterLab Code Formatter](https://ryantam626.github.io/jupyterlab_code_formatter/index.html) adds a
 button to Jupyter Lab to automatically format the code in notebooks with `black` and `isort`. Please
 use either this extension or a different way to automatically format your notebook.
+
+#### Black Automatic Code Formatter
+[Black](https://black.readthedocs.io/en/stable/getting_started.html) is the uncompromising Python code formatter that has extension for Jupyter notebooks.
 
 #### `PySpelling`
 

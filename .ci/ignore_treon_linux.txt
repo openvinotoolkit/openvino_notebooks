@@ -59,3 +59,4 @@ instant-id
 style-transfer-webcam
 animate-anyone
 llava-next-multimodal-chatbot
+llm-rag-langchain
