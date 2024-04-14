@@ -6,7 +6,7 @@
 
 The image below illustrates the provided user instruction and model answer examples.
 
-![example](https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/c47550b9-f28e-48af-a6fe-63b6c5b68ca7)
+![example](https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/87770915-1742-43d7-903b-b5960eda8011)
 
 ## Notebook Contents
 
