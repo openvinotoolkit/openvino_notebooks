@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def compute_scale_and_shift_ls(prediction, target, mask):
     # tuple specifying with axes to sum
     sum_axes = (0, 1)
@@ -26,6 +27,7 @@ def compute_scale_and_shift_ls(prediction, target, mask):
 
     return x_0, x_1
 
+
 class LeastSquaresEstimator(object):
     def __init__(self, estimate, target, valid):
         self.estimate = estimate
@@ -46,13 +48,13 @@ class LeastSquaresEstimator(object):
     def clamp_min_max(self, clamp_min=None, clamp_max=None):
         if clamp_min is not None:
             if clamp_min > 0:
-                clamp_min_inv = 1.0/clamp_min
+                clamp_min_inv = 1.0 / clamp_min
                 self.output[self.output > clamp_min_inv] = clamp_min_inv
                 assert np.max(self.output) <= clamp_min_inv
-            else: # divide by zero, so skip
+            else:  # divide by zero, so skip
                 pass
         if clamp_max is not None:
-            clamp_max_inv = 1.0/clamp_max
+            clamp_max_inv = 1.0 / clamp_max
             self.output[self.output < clamp_max_inv] = clamp_max_inv
             # print(np.min(self.output), clamp_max_inv)
             assert np.min(self.output) >= clamp_max_inv

@@ -36,7 +36,7 @@ def encode_by_voc(w, vocab):
             else:
                 e -= 1
         if s < e0:
-            tokens = [vocab['[UNK]']]
+            tokens = [vocab["[UNK]"]]
         res.extend(tokens)
     return res
 
@@ -46,8 +46,8 @@ def encode_by_voc(w, vocab):
 def split_to_words(text):
     prev_is_sep = True  # mark initial prev as space to start word from 0 char
     for i, c in enumerate(text + " "):
-        is_punc = (c in string.punctuation or unicodedata.category(c)[0] == "P")
-        cur_is_sep = (c.isspace() or is_punc)
+        is_punc = c in string.punctuation or unicodedata.category(c)[0] == "P"
+        cur_is_sep = c.isspace() or is_punc
         if prev_is_sep != cur_is_sep:
             if prev_is_sep:
                 start = i

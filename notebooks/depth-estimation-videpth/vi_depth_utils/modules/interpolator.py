@@ -1,18 +1,20 @@
 import numpy as np
+
 np.set_printoptions(suppress=True)
 
 from scipy.interpolate import griddata
 
 
 def interpolate_knots(map_size, knot_coords, knot_values, interpolate, fill_corners):
-    grid_x, grid_y = np.mgrid[0:map_size[0], 0:map_size[1]]
+    grid_x, grid_y = np.mgrid[0 : map_size[0], 0 : map_size[1]]
 
     interpolated_map = griddata(
         points=knot_coords.T,
         values=knot_values,
         xi=(grid_y, grid_x),
         method=interpolate,
-        fill_value=1.0)
+        fill_value=1.0,
+    )
 
     return interpolated_map
 
@@ -33,7 +35,7 @@ class Interpolator2D(object):
 
         self.knot_list = []
         for i in range(self.num_knots):
-            self.knot_list.append((int(self.knot_coords[0,i]), int(self.knot_coords[1,i])))
+            self.knot_list.append((int(self.knot_coords[0, i]), int(self.knot_coords[1, i])))
 
         # to be computed
         self.interpolated_map = None
@@ -42,9 +44,9 @@ class Interpolator2D(object):
 
     def generate_interpolated_scale_map(self, interpolate_method, fill_corners=False):
         self.interpolated_scale_map = interpolate_knots(
-            map_size=self.map_size, 
-            knot_coords=self.knot_coords, 
+            map_size=self.map_size,
+            knot_coords=self.knot_coords,
             knot_values=self.knot_scales,
             interpolate=interpolate_method,
-            fill_corners=fill_corners
+            fill_corners=fill_corners,
         ).astype(np.float32)

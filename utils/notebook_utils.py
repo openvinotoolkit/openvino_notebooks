@@ -91,16 +91,16 @@ def download_file(
         filename = directory / Path(filename)
 
     try:
-        response = requests.get(url=url, 
-                                headers={"User-agent": "Mozilla/5.0"}, 
-                                stream=True)
+        response = requests.get(url=url, headers={"User-agent": "Mozilla/5.0"}, stream=True)
         response.raise_for_status()
-    except requests.exceptions.HTTPError as error:  # For error associated with not-200 codes. Will output something like: "404 Client Error: Not Found for url: {url}"
+    except (
+        requests.exceptions.HTTPError
+    ) as error:  # For error associated with not-200 codes. Will output something like: "404 Client Error: Not Found for url: {url}"
         raise Exception(error) from None
     except requests.exceptions.Timeout:
         raise Exception(
-                "Connection timed out. If you access the internet through a proxy server, please "
-                "make sure the proxy is set in the shell from where you launched Jupyter."
+            "Connection timed out. If you access the internet through a proxy server, please "
+            "make sure the proxy is set in the shell from where you launched Jupyter."
         ) from None
     except requests.exceptions.RequestException as error:
         raise Exception(f"File downloading failed with error: {error}") from None
@@ -108,7 +108,6 @@ def download_file(
     # download the file if it does not exist, or if it exists with an incorrect file size
     filesize = int(response.headers.get("Content-length", 0))
     if not filename.exists() or (os.stat(filename).st_size != filesize):
-
         with tqdm_notebook(
             total=filesize,
             unit="B",
@@ -117,7 +116,6 @@ def download_file(
             desc=str(filename),
             disable=not show_progress,
         ) as progress_bar:
-
             with open(filename, "wb") as file_object:
                 for chunk in response.iter_content(chunk_size):
                     file_object.write(chunk)
@@ -151,7 +149,7 @@ def download_ir_model(model_xml_url: str, destination_folder: PathLike = None) -
 # ## Images
 
 # ### Convert Pixel Data
-# 
+#
 # Normalize image pixel values between 0 and 1, and convert images to RGB and BGR.
 
 # In[ ]:
@@ -162,10 +160,7 @@ def normalize_minmax(data):
     Normalizes the values in `data` between 0 and 1
     """
     if data.max() == data.min():
-        raise ValueError(
-            "Normalization is not possible because all elements of"
-            f"`data` have the same value: {data.max()}."
-        )
+        raise ValueError("Normalization is not possible because all elements of" f"`data` have the same value: {data.max()}.")
     return (data - data.min()) / (data.max() - data.min())
 
 
@@ -174,6 +169,7 @@ def to_rgb(image_data: np.ndarray) -> np.ndarray:
     Convert image_data from BGR to RGB
     """
     import cv2
+
     return cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
 
 
@@ -182,13 +178,14 @@ def to_bgr(image_data: np.ndarray) -> np.ndarray:
     Convert image_data from RGB to BGR
     """
     import cv2
+
     return cv2.cvtColor(image_data, cv2.COLOR_RGB2BGR)
 
 
 # ## Videos
 
 # ### Video Player
-# 
+#
 # Custom video player to fulfill FPS requirements. You can set target FPS and output size, flip the video horizontally or skip first N frames.
 
 # In[ ]:
@@ -212,9 +209,7 @@ class VideoPlayer:
         self.cv2 = cv2  # This is done to access the package in class methods
         self.__cap = cv2.VideoCapture(source)
         if not self.__cap.isOpened():
-            raise RuntimeError(
-                f"Cannot open {'camera' if isinstance(source, int) else ''} {source}"
-            )
+            raise RuntimeError(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
         # skip first N frames
         self.__cap.set(cv2.CAP_PROP_POS_FRAMES, skip_first_frames)
         # fps of input file
@@ -229,11 +224,7 @@ class VideoPlayer:
         if size is not None:
             self.__size = size
             # AREA better for shrinking, LINEAR better for enlarging
-            self.__interpolation = (
-                cv2.INTER_AREA
-                if size[0] < self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-                else cv2.INTER_LINEAR
-            )
+            self.__interpolation = cv2.INTER_AREA if size[0] < self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH) else cv2.INTER_LINEAR
         # first frame
         _, self.__frame = self.__cap.read()
         self.__lock = threading.Lock()
@@ -304,7 +295,7 @@ class VideoPlayer:
 # ## Visualization
 
 # ### Segmentation
-# 
+#
 # Define a SegmentationMap NamedTuple that keeps the labels and colormap for a segmentation project/dataset. Create CityScapesSegmentation and BinarySegmentation SegmentationMaps. Create a function to convert a segmentation map to an RGB image with a colormap, and to show the segmentation result as an overlay over the original image.
 
 # In[ ]:
@@ -372,9 +363,7 @@ BinarySegmentation = SegmentationMap(binary_labels)
 # In[ ]:
 
 
-def segmentation_map_to_image(
-    result: np.ndarray, colormap: np.ndarray, remove_holes: bool = False
-) -> np.ndarray:
+def segmentation_map_to_image(result: np.ndarray, colormap: np.ndarray, remove_holes: bool = False) -> np.ndarray:
     """
     Convert network result of floating point numbers to an RGB image with
     integer values from 0-255 by applying a colormap.
@@ -385,10 +374,9 @@ def segmentation_map_to_image(
     :return: An RGB image where each pixel is an int8 value according to colormap.
     """
     import cv2
+
     if len(result.shape) != 2 and result.shape[0] != 1:
-        raise ValueError(
-            f"Expected result with shape (H,W) or (1,H,W), got result with shape {result.shape}"
-        )
+        raise ValueError(f"Expected result with shape (H,W) or (1,H,W), got result with shape {result.shape}")
 
     if len(np.unique(result)) > colormap.shape[0]:
         raise ValueError(
@@ -406,9 +394,7 @@ def segmentation_map_to_image(
     for label_index, color in enumerate(colormap):
         label_index_map = result == label_index
         label_index_map = label_index_map.astype(np.uint8) * 255
-        contours, hierarchies = cv2.findContours(
-            label_index_map, contour_mode, cv2.CHAIN_APPROX_SIMPLE
-        )
+        contours, hierarchies = cv2.findContours(label_index_map, contour_mode, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(
             mask,
             contours,
@@ -433,6 +419,7 @@ def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=Fal
     :return: An RGP image with segmentation mask overlayed on the source image.
     """
     import cv2
+
     if len(image.shape) == 2:
         image = np.repeat(np.expand_dims(image, -1), 3, 2)
     mask = segmentation_map_to_image(result, colormap, remove_holes)
@@ -442,7 +429,7 @@ def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=Fal
 
 
 # ### Network Results
-# 
+#
 # Show network result image, optionally together with the source image and a legend with labels.
 
 # In[ ]:
@@ -532,6 +519,7 @@ def show_array(frame: np.ndarray, display_handle=None):
     Create a display_handle with: `display_handle = display(display_id=True)`
     """
     import cv2
+
     _, frame = cv2.imencode(ext=".jpeg", img=frame)
     if display_handle is None:
         display_handle = display(Image(data=frame.tobytes()), display_id=True)
@@ -541,7 +529,7 @@ def show_array(frame: np.ndarray, display_handle=None):
 
 
 # ## Checks and Alerts
-# 
+#
 # Create an alert class to show stylized info/error/warning messages and a `check_device` function that checks whether a given device is available.
 
 # In[ ]:
@@ -576,17 +564,12 @@ class DeviceNotFoundAlert(NotebookAlert):
         """
         ie = Core()
         supported_devices = ie.available_devices
-        self.message = (
-            f"Running this cell requires a {device} device, "
-            "which is not available on this system. "
-        )
+        self.message = f"Running this cell requires a {device} device, " "which is not available on this system. "
         self.alert_class = "warning"
         if len(supported_devices) == 1:
             self.message += f"The following device is available: {ie.available_devices[0]}"
         else:
-            self.message += (
-                "The following devices are available: " f"{', '.join(ie.available_devices)}"
-            )
+            self.message += "The following devices are available: " f"{', '.join(ie.available_devices)}"
         super().__init__(self.message, self.alert_class)
 
 

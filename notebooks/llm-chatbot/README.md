@@ -5,7 +5,7 @@ Large Language Models (LLMs) are artificial intelligence systems that can unders
 While a decent intent-based chatbot can answer basic, one-touch inquiries like order management, FAQs, and policy questions, LLM chatbots can tackle more complex, multi-touch questions. LLM enables chatbots to provide support in a conversational manner, similar to how humans do, through contextual memory. Leveraging the capabilities of Language Models, chatbots are becoming increasingly intelligent, capable of understanding and responding to human language with remarkable accuracy.
 
 Previously, we already discussed how to build instruction-following pipeline using OpenVINO and Optimum Intel, please check out [Dolly v2 example](../dolly-2-instruction-following) for reference.
-In this tutorial we consider how to use power of OpenVINO for running Large Language Models for both chat and QA over document. We will use a pre-trained model from the [Hugging Face Transformers](https://huggingface.co/docs/transformers/index) library. To simplify the user experience, the [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index) library is used to convert the models to OpenVINO™ IR format. In addition, we will use [LangChain](https://python.langchain.com/docs/get_started/introduction) to augmenting LLM knowledge with additional data, which allow you to build AI applications that can reason about private data or data introduced after a model’s cutoff date.
+In this tutorial we consider how to use power of OpenVINO for running Large Language Models for both chat and QA over document. We will use a pre-trained model from the [Hugging Face Transformers](https://huggingface.co/docs/transformers/index) library. To simplify the user experience, the [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index) library is used to convert the models to OpenVINO™ IR format. 
 
 The tutorial supports different models, you can select one from provided options to compare quality of open source LLM solutions.
 >**Note**: conversion of some models can require additional actions from user side and at least 64GB RAM for conversion.
@@ -52,4 +52,6 @@ The tutorial consists of the following steps:
 - Run chatbot / QA over document
 
 ## Installation Instructions
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).

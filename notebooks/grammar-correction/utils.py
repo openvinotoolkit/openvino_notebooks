@@ -5,7 +5,11 @@ import time
 
 from contextlib import contextmanager
 from jiwer import wer, wer_standardize
-from nncf.quantization.range_estimator import RangeEstimatorParameters, StatisticsCollectorParameters, StatisticsType
+from nncf.quantization.range_estimator import (
+    RangeEstimatorParameters,
+    StatisticsCollectorParameters,
+    StatisticsType,
+)
 from optimum.intel import OVModelForSeq2SeqLM
 from optimum.intel.openvino.quantization import InferRequestWrapper
 from pathlib import Path
@@ -27,8 +31,11 @@ def collect_calibration_data(grammar_corrector_pipe_fp32: Pipeline, calibration_
     try:
         calibration_dataset = datasets.load_dataset("jfleg", split="validation")
         calibration_dataset = calibration_dataset.shuffle(seed=42)[:calibration_dataset_size]
-        for data_item in tqdm(calibration_dataset["sentence"], total=calibration_dataset_size,
-                              desc="Collecting calibration data"):
+        for data_item in tqdm(
+            calibration_dataset["sentence"],
+            total=calibration_dataset_size,
+            desc="Collecting calibration data",
+        ):
             grammar_corrector_pipe_fp32(data_item)
     finally:
         ov_decoder.request = ov_decoder.request.request
@@ -36,8 +43,12 @@ def collect_calibration_data(grammar_corrector_pipe_fp32: Pipeline, calibration_
     return calibration_data
 
 
-def quantize(grammar_corrector_pipe_fp32: Pipeline, core: ov.Core, quantized_model_path: Path,
-             calibration_dataset_size: int):
+def quantize(
+    grammar_corrector_pipe_fp32: Pipeline,
+    core: ov.Core,
+    quantized_model_path: Path,
+    calibration_dataset_size: int,
+):
     if quantized_model_path.exists():
         print("Loading quantized model")
         quantized_model = core.read_model(model=quantized_model_path)
@@ -56,7 +67,7 @@ def quantize(grammar_corrector_pipe_fp32: Pipeline, core: ov.Core, quantized_mod
                     # Quantile statistic is employed due to outliers in some activations
                     # This parameter was found useful by quantize_with_accuracy_control method
                     max=StatisticsCollectorParameters(StatisticsType.QUANTILE)
-                )
+                ),
             ),
         )
 
@@ -67,9 +78,15 @@ def quantize(grammar_corrector_pipe_fp32: Pipeline, core: ov.Core, quantized_mod
     return quantized_model
 
 
-def get_quantized_pipeline(grammar_corrector_pipe: Pipeline, grammar_corrector_tokenizer: PreTrainedTokenizer,
-                           core: ov.Core, grammar_corrector_dir: Path, quantized_model_path: Path, device: str,
-                           calibration_dataset_size=CALIBRATION_DATASET_SIZE):
+def get_quantized_pipeline(
+    grammar_corrector_pipe: Pipeline,
+    grammar_corrector_tokenizer: PreTrainedTokenizer,
+    core: ov.Core,
+    grammar_corrector_dir: Path,
+    quantized_model_path: Path,
+    device: str,
+    calibration_dataset_size=CALIBRATION_DATASET_SIZE,
+):
     # Get quantized OV model
     quantized_model = quantize(grammar_corrector_pipe, core, quantized_model_path, calibration_dataset_size)
 
@@ -78,8 +95,11 @@ def get_quantized_pipeline(grammar_corrector_pipe: Pipeline, grammar_corrector_t
     grammar_corrector_model_int8.decoder_with_past.model = quantized_model
     grammar_corrector_model_int8.decoder_with_past.request = None
     grammar_corrector_model_int8.decoder_with_past._compile()
-    grammar_corrector_pipe_int8 = pipeline("text2text-generation", model=grammar_corrector_model_int8,
-                                           tokenizer=grammar_corrector_tokenizer)
+    grammar_corrector_pipe_int8 = pipeline(
+        "text2text-generation",
+        model=grammar_corrector_model_int8,
+        tokenizer=grammar_corrector_tokenizer,
+    )
 
     return grammar_corrector_pipe_int8
 
@@ -114,7 +134,14 @@ def calculate_inference_time_and_accuracy(grammar_corrector_pipe: Pipeline, test
         predictions.extend([corrected_text] * len(references))
         inference_time.append(delta_time)
 
-    word_accuracy = (1 - wer(ground_truths, predictions, reference_transform=wer_standardize,
-                             hypothesis_transform=wer_standardize)) * 100
+    word_accuracy = (
+        1
+        - wer(
+            ground_truths,
+            predictions,
+            reference_transform=wer_standardize,
+            hypothesis_transform=wer_standardize,
+        )
+    ) * 100
     sum_inference_time = sum(inference_time)
     return sum_inference_time, word_accuracy

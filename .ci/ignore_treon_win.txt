@@ -56,3 +56,4 @@ openvoice
 instant-id
 animate-anyone
 llava-next-multimodal-chatbot
+llm-rag-langchain

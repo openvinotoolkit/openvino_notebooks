@@ -20,7 +20,5 @@ def load_sparse_depth(input_sparse_depth_fp):
     return input_sparse_depth
 
 
-if __name__=="__main__":
-
+if __name__ == "__main__":
     main()
-

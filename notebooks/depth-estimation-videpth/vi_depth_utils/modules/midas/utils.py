@@ -1,5 +1,6 @@
 """Utils for monoDepth.
 """
+
 import sys
 import re
 import numpy as np
@@ -17,7 +18,6 @@ def read_pfm(path):
         tuple: (data, scale)
     """
     with open(path, "rb") as file:
-
         color = None
         width = None
         height = None
@@ -75,9 +75,7 @@ def write_pfm(path, image, scale=1):
 
         if len(image.shape) == 3 and image.shape[2] == 3:  # color image
             color = True
-        elif (
-            len(image.shape) == 2 or len(image.shape) == 3 and image.shape[2] == 1
-        ):  # greyscale
+        elif len(image.shape) == 2 or len(image.shape) == 3 and image.shape[2] == 1:  # greyscale
             color = False
         else:
             raise Exception("Image must have H x W x 3, H x W x 1 or H x W dimensions.")
@@ -136,9 +134,7 @@ def resize_image(img):
 
     img_resized = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
 
-    img_resized = (
-        torch.from_numpy(np.transpose(img_resized, (2, 0, 1))).contiguous().float()
-    )
+    img_resized = torch.from_numpy(np.transpose(img_resized, (2, 0, 1))).contiguous().float()
     img_resized = img_resized.unsqueeze(0)
 
     return img_resized
@@ -157,9 +153,7 @@ def resize_depth(depth, width, height):
     """
     depth = torch.squeeze(depth[0, :, :, :]).to("cpu")
 
-    depth_resized = cv2.resize(
-        depth.numpy(), (width, height), interpolation=cv2.INTER_CUBIC
-    )
+    depth_resized = cv2.resize(depth.numpy(), (width, height), interpolation=cv2.INTER_CUBIC)
 
     return depth_resized
 
@@ -176,7 +170,7 @@ def write_depth(path, depth, bits=1):
     depth_min = depth.min()
     depth_max = depth.max()
 
-    max_val = (2**(8*bits))-1
+    max_val = (2 ** (8 * bits)) - 1
 
     if depth_max - depth_min > np.finfo("float").eps:
         out = max_val * (depth - depth_min) / (depth_max - depth_min)
@@ -202,7 +196,7 @@ def write_png(path, array, bits=2):
     array_min = np.min(array)
     array_max = np.max(array)
 
-    max_val = (2**(8*bits))-1
+    max_val = (2 ** (8 * bits)) - 1
 
     if array_max - array_min > np.finfo("float").eps:
         out = max_val * (array - array_min) / (array_max - array_min)
@@ -231,5 +225,5 @@ def normalize_unit_range(data):
         normalized = (data - np.min(data)) / (np.max(data) - np.min(data))
     else:
         raise ValueError("cannot normalize array, max-min range is 0")
-    
+
     return normalized

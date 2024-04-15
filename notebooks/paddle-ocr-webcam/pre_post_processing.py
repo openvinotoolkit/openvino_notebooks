@@ -12,8 +12,9 @@ import pyclipper
 import string
 from paddle.nn import functional as F
 
+
 def DetResizeForTest(data):
-    img = data['image']
+    img = data["image"]
     src_h, src_w, _ = img.shape
 
     ####resize image to a size multiple of 32 which is required by the network args:
@@ -29,7 +30,7 @@ def DetResizeForTest(data):
         else:
             ratio = float(limit_side_len) / w
     else:
-        ratio = 1.
+        ratio = 1.0
 
     resize_h = int(h * ratio)
     resize_w = int(w * ratio)
@@ -46,31 +47,31 @@ def DetResizeForTest(data):
         sys.exit(0)
     ratio_h = resize_h / float(h)
     ratio_w = resize_w / float(w)
-        
-    data['image'] = img
-    data['shape'] = np.array([src_h, src_w, ratio_h, ratio_w])
+
+    data["image"] = img
+    data["shape"] = np.array([src_h, src_w, ratio_h, ratio_w])
     return data
 
 
 def NormalizeImage(data):
-    """ normalize image such as substract mean, divide std
-    """
+    """normalize image such as substract mean, divide std"""
 
-    scale =  1.0 / 255.0
+    scale = 1.0 / 255.0
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
 
     shape = (1, 1, 3)
-    mean = np.array(mean).reshape(shape).astype('float32')
-    std = np.array(std).reshape(shape).astype('float32')
+    mean = np.array(mean).reshape(shape).astype("float32")
+    std = np.array(std).reshape(shape).astype("float32")
 
-    img = data['image']
+    img = data["image"]
     from PIL import Image
+
     if isinstance(img, Image.Image):
         img = np.array(img)
 
-    assert isinstance(img,np.ndarray), "invalid input 'img' in NormalizeImage"
-    data['image'] = (img.astype('float32') * scale - mean) / std
+    assert isinstance(img, np.ndarray), "invalid input 'img' in NormalizeImage"
+    data["image"] = (img.astype("float32") * scale - mean) / std
     return data
 
 
@@ -102,16 +103,14 @@ def get_mini_boxes(contour):
         index_2 = 3
         index_3 = 2
 
-    box = [
-        points[index_1], points[index_2], points[index_3], points[index_4]
-    ]
+    box = [points[index_1], points[index_2], points[index_3], points[index_4]]
     return box, min(bounding_box[1])
 
 
 def box_score_fast(bitmap, _box):
-    '''
+    """
     box_score_fast: use bbox mean score as the mean score
-    '''
+    """
     h, w = bitmap.shape[:2]
     box = _box.copy()
     xmin = np.clip(np.floor(box[:, 0].min()).astype(np.int32), 0, w - 1)
@@ -123,26 +122,25 @@ def box_score_fast(bitmap, _box):
     box[:, 0] = box[:, 0] - xmin
     box[:, 1] = box[:, 1] - ymin
     cv2.fillPoly(mask, box.reshape(1, -1, 2).astype(np.int32), 1)
-    return cv2.mean(bitmap[ymin:ymax + 1, xmin:xmax + 1], mask)[0]
+    return cv2.mean(bitmap[ymin : ymax + 1, xmin : xmax + 1], mask)[0]
 
 
 def boxes_from_bitmap(pred, _bitmap, dest_width, dest_height):
-    '''
+    """
     _bitmap: single map with shape (1, H, W),
             whose values are binarized as {0, 1}
-    '''
+    """
 
     bitmap = _bitmap
     height, width = bitmap.shape
 
-    outs = cv2.findContours((bitmap * 255).astype(np.uint8), cv2.RETR_LIST,
-                            cv2.CHAIN_APPROX_SIMPLE)
+    outs = cv2.findContours((bitmap * 255).astype(np.uint8), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     if len(outs) == 3:
         img, contours, _ = outs[0], outs[1], outs[2]
     elif len(outs) == 2:
         contours, _ = outs[0], outs[1]
 
-    num_contours = min(len(contours), 1000)     
+    num_contours = min(len(contours), 1000)
     score_mode = "fast"
 
     boxes = []
@@ -165,10 +163,8 @@ def boxes_from_bitmap(pred, _bitmap, dest_width, dest_height):
         if sside < 3 + 2:
             continue
         box = np.array(box)
-        box[:, 0] = np.clip(
-            np.round(box[:, 0] / width * dest_width), 0, dest_width)
-        box[:, 1] = np.clip(
-            np.round(box[:, 1] / height * dest_height), 0, dest_height)
+        box[:, 0] = np.clip(np.round(box[:, 0] / width * dest_width), 0, dest_width)
+        box[:, 1] = np.clip(np.round(box[:, 1] / height * dest_height), 0, dest_height)
         boxes.append(box.astype(np.int16))
         scores.append(score)
     return np.array(boxes, dtype=np.int16), scores
@@ -242,8 +238,7 @@ def sorted_boxes(dt_boxes):
     _boxes = list(sorted_boxes)
 
     for i in range(num_boxes - 1):
-        if abs(_boxes[i + 1][0][1] - _boxes[i][0][1]) < 10 and \
-                (_boxes[i + 1][0][0] < _boxes[i][0][0]):
+        if abs(_boxes[i + 1][0][1] - _boxes[i][0][1]) < 10 and (_boxes[i + 1][0][0] < _boxes[i][0][0]):
             tmp = _boxes[i]
             _boxes[i] = _boxes[i + 1]
             _boxes[i + 1] = tmp
@@ -251,7 +246,7 @@ def sorted_boxes(dt_boxes):
 
 
 def get_rotate_crop_image(img, points):
-    '''
+    """
     img_height, img_width = img.shape[0:2]
     left = int(np.min(points[:, 0]))
     right = int(np.max(points[:, 0]))
@@ -260,25 +255,26 @@ def get_rotate_crop_image(img, points):
     img_crop = img[top:bottom, left:right, :].copy()
     points[:, 0] = points[:, 0] - left
     points[:, 1] = points[:, 1] - top
-    '''
+    """
     assert len(points) == 4, "shape of points must be 4*2"
-    img_crop_width = int(
-        max(
-            np.linalg.norm(points[0] - points[1]),
-            np.linalg.norm(points[2] - points[3])))
-    img_crop_height = int(
-        max(
-            np.linalg.norm(points[0] - points[3]),
-            np.linalg.norm(points[1] - points[2])))
-    pts_std = np.float32([[0, 0], [img_crop_width, 0],
-                          [img_crop_width, img_crop_height],
-                          [0, img_crop_height]])
+    img_crop_width = int(max(np.linalg.norm(points[0] - points[1]), np.linalg.norm(points[2] - points[3])))
+    img_crop_height = int(max(np.linalg.norm(points[0] - points[3]), np.linalg.norm(points[1] - points[2])))
+    pts_std = np.float32(
+        [
+            [0, 0],
+            [img_crop_width, 0],
+            [img_crop_width, img_crop_height],
+            [0, img_crop_height],
+        ]
+    )
     M = cv2.getPerspectiveTransform(points, pts_std)
     dst_img = cv2.warpPerspective(
         img,
-        M, (img_crop_width, img_crop_height),
+        M,
+        (img_crop_width, img_crop_height),
         borderMode=cv2.BORDER_REPLICATE,
-        flags=cv2.INTER_CUBIC)
+        flags=cv2.INTER_CUBIC,
+    )
     dst_img_height, dst_img_width = dst_img.shape[0:2]
     if dst_img_height * 1.0 / dst_img_width >= 1.5:
         dst_img = np.rot90(dst_img)
@@ -287,28 +283,53 @@ def get_rotate_crop_image(img, points):
 
 ## Postprocessing for recognition
 postprocess_params = {
-            'name': 'CTCLabelDecode',
-            "character_type": "ch",
-            "character_dict_path": "./fonts/ppocr_keys_v1.txt",
-            "use_space_char": True
-        }
+    "name": "CTCLabelDecode",
+    "character_type": "ch",
+    "character_dict_path": "./fonts/ppocr_keys_v1.txt",
+    "use_space_char": True,
+}
 
 
 class BaseRecLabelDecode(object):
-    """ Convert between text-label and text-index """
+    """Convert between text-label and text-index"""
 
-    def __init__(self,
-                 character_dict_path=None,
-                 character_type='ch',
-                 use_space_char=False):
+    def __init__(self, character_dict_path=None, character_type="ch", use_space_char=False):
         support_character_type = [
-            'ch', 'en', 'EN_symbol', 'french', 'german', 'japan', 'korean',
-            'it', 'xi', 'pu', 'ru', 'ar', 'ta', 'ug', 'fa', 'ur', 'rs', 'oc',
-            'rsc', 'bg', 'uk', 'be', 'te', 'ka', 'chinese_cht', 'hi', 'mr',
-            'ne', 'EN', 'latin', 'arabic', 'cyrillic', 'devanagari'
+            "ch",
+            "en",
+            "EN_symbol",
+            "french",
+            "german",
+            "japan",
+            "korean",
+            "it",
+            "xi",
+            "pu",
+            "ru",
+            "ar",
+            "ta",
+            "ug",
+            "fa",
+            "ur",
+            "rs",
+            "oc",
+            "rsc",
+            "bg",
+            "uk",
+            "be",
+            "te",
+            "ka",
+            "chinese_cht",
+            "hi",
+            "mr",
+            "ne",
+            "EN",
+            "latin",
+            "arabic",
+            "cyrillic",
+            "devanagari",
         ]
-        assert character_type in support_character_type, "Only {} are supported now but get {}".format(
-            support_character_type, character_type)
+        assert character_type in support_character_type, "Only {} are supported now but get {}".format(support_character_type, character_type)
 
         self.beg_str = "sos"
         self.end_str = "eos"
@@ -322,12 +343,11 @@ class BaseRecLabelDecode(object):
             dict_character = list(self.character_str)
         elif character_type in support_character_type:
             self.character_str = []
-            assert character_dict_path is not None, "character_dict_path should not be None when character_type is {}".format(
-                character_type)
+            assert character_dict_path is not None, "character_dict_path should not be None when character_type is {}".format(character_type)
             with open(character_dict_path, "rb") as fin:
                 lines = fin.readlines()
                 for line in lines:
-                    line = line.decode('utf-8').strip("\n").strip("\r\n")
+                    line = line.decode("utf-8").strip("\n").strip("\r\n")
                     self.character_str.append(line)
             if use_space_char:
                 self.character_str.append(" ")
@@ -341,13 +361,11 @@ class BaseRecLabelDecode(object):
             self.dict[char] = i
         self.character = dict_character
 
-        
     def add_special_char(self, dict_character):
         return dict_character
 
-    
     def decode(self, text_index, text_prob=None, is_remove_duplicate=False):
-        """ convert text-index into text-label. """
+        """convert text-index into text-label."""
         result_list = []
         ignored_tokens = self.get_ignored_tokens()
         batch_size = len(text_index)
@@ -359,36 +377,27 @@ class BaseRecLabelDecode(object):
                     continue
                 if is_remove_duplicate:
                     # only for predict
-                    if idx > 0 and text_index[batch_idx][idx - 1] == text_index[
-                            batch_idx][idx]:
+                    if idx > 0 and text_index[batch_idx][idx - 1] == text_index[batch_idx][idx]:
                         continue
-                char_list.append(self.character[int(text_index[batch_idx][
-                    idx])])
+                char_list.append(self.character[int(text_index[batch_idx][idx])])
                 if text_prob is not None:
                     conf_list.append(text_prob[batch_idx][idx])
                 else:
                     conf_list.append(1)
-            text = ''.join(char_list)
+            text = "".join(char_list)
             result_list.append((text, np.mean(conf_list)))
         return result_list
 
-    
     def get_ignored_tokens(self):
         return [0]  # for ctc blank
 
-    
+
 class CTCLabelDecode(BaseRecLabelDecode):
-    """ Convert between text-label and text-index """
+    """Convert between text-label and text-index"""
 
-    def __init__(self,
-                 character_dict_path=None,
-                 character_type='ch',
-                 use_space_char=False,
-                 **kwargs):
-        super(CTCLabelDecode, self).__init__(character_dict_path,
-                                             character_type, use_space_char)
+    def __init__(self, character_dict_path=None, character_type="ch", use_space_char=False, **kwargs):
+        super(CTCLabelDecode, self).__init__(character_dict_path, character_type, use_space_char)
 
-        
     def __call__(self, preds, label=None, *args, **kwargs):
         if isinstance(preds, paddle.Tensor):
             preds = preds.numpy()
@@ -400,28 +409,22 @@ class CTCLabelDecode(BaseRecLabelDecode):
         label = self.decode(label)
         return text, label
 
-    
     def add_special_char(self, dict_character):
-        dict_character = ['blank'] + dict_character
+        dict_character = ["blank"] + dict_character
         return dict_character
 
-    
+
 def build_post_process(config):
     config = copy.deepcopy(config)
-    module_name = config.pop('name')
+    module_name = config.pop("name")
     module_class = eval(module_name)(**config)
     return module_class
 
 
-def draw_ocr_box_txt(image,
-                     boxes,
-                     txts,
-                     scores=None,
-                     drop_score=0.5,
-                     font_path='./fonts/simfang.ttf'):
+def draw_ocr_box_txt(image, boxes, txts, scores=None, drop_score=0.5, font_path="./fonts/simfang.ttf"):
     h, w = image.height, image.width
     img_left = image.copy()
-    img_right = Image.new('RGB', (w, h), (255, 255, 255))
+    img_right = Image.new("RGB", (w, h), (255, 255, 255))
 
     np.random.seed(0)
     draw_left = ImageDraw.Draw(img_left)
@@ -429,35 +432,41 @@ def draw_ocr_box_txt(image,
     for idx, (box, txt) in enumerate(zip(boxes, txts)):
         if scores is not None and scores[idx] < drop_score:
             continue
-        color = (np.random.randint(0, 255), np.random.randint(0, 255),
-                 np.random.randint(0, 255))
+        color = (
+            np.random.randint(0, 255),
+            np.random.randint(0, 255),
+            np.random.randint(0, 255),
+        )
         draw_left.polygon(box, fill=color)
         draw_right.polygon(
             [
-                box[0][0], box[0][1], box[1][0], box[1][1], box[2][0],
-                box[2][1], box[3][0], box[3][1]
+                box[0][0],
+                box[0][1],
+                box[1][0],
+                box[1][1],
+                box[2][0],
+                box[2][1],
+                box[3][0],
+                box[3][1],
             ],
-            outline=color)
-        box_height = math.sqrt((box[0][0] - box[3][0])**2 + (box[0][1] - box[3][
-            1])**2)
-        box_width = math.sqrt((box[0][0] - box[1][0])**2 + (box[0][1] - box[1][
-            1])**2)
+            outline=color,
+        )
+        box_height = math.sqrt((box[0][0] - box[3][0]) ** 2 + (box[0][1] - box[3][1]) ** 2)
+        box_width = math.sqrt((box[0][0] - box[1][0]) ** 2 + (box[0][1] - box[1][1]) ** 2)
         if box_height > 2 * box_width:
             font_size = max(int(box_width * 0.9), 10)
             font = ImageFont.truetype(font_path, font_size)
             cur_y = box[0][1]
             for c in txt:
                 char_size = font.getsize(c)
-                draw_right.text(
-                    (box[0][0] + 3, cur_y), c, fill=(0, 0, 0), font=font)
+                draw_right.text((box[0][0] + 3, cur_y), c, fill=(0, 0, 0), font=font)
                 cur_y += char_size[1]
         else:
             font_size = max(int(box_height * 0.8), 10)
             font = ImageFont.truetype(font_path, font_size)
-            draw_right.text(
-                [box[0][0], box[0][1]], txt, fill=(0, 0, 0), font=font)
+            draw_right.text([box[0][0], box[0][1]], txt, fill=(0, 0, 0), font=font)
     img_left = Image.blend(image, img_left, 0.5)
-    img_show = Image.new('RGB', (w * 2, h), (255, 255, 255))
+    img_show = Image.new("RGB", (w * 2, h), (255, 255, 255))
     img_show.paste(img_left, (0, 0, w, h))
     img_show.paste(img_right, (w, 0, w * 2, h))
     return np.array(img_show)

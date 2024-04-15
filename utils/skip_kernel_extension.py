@@ -1,5 +1,6 @@
 # https://github.com/RobbeSneyders/Jupyter-skip-extension/blob/e77e3708ebb37a3ff0e851fd773adc851d7c1d6a/skip_kernel_extension.py
 
+
 def skip(line, cell=None):
     """Skips execution of the current line/cell."""
     if eval(line):

@@ -19,13 +19,52 @@ from engine.one_euro_filter import OneEuroFilter
 
 class Pose:
     num_kpts = 18
-    kpt_names = ['neck', 'nose',
-                 'l_sho', 'l_elb', 'l_wri', 'l_hip', 'l_knee', 'l_ank',
-                 'r_sho', 'r_elb', 'r_wri', 'r_hip', 'r_knee', 'r_ank',
-                 'r_eye', 'l_eye',
-                 'r_ear', 'l_ear']
-    sigmas = np.array([.79, .26, .79, .72, .62, 1.07, .87, .89, .79, .72, .62, 1.07, .87, .89, .25, .25, .35, .35],
-                      dtype=np.float32) / 10.0
+    kpt_names = [
+        "neck",
+        "nose",
+        "l_sho",
+        "l_elb",
+        "l_wri",
+        "l_hip",
+        "l_knee",
+        "l_ank",
+        "r_sho",
+        "r_elb",
+        "r_wri",
+        "r_hip",
+        "r_knee",
+        "r_ank",
+        "r_eye",
+        "l_eye",
+        "r_ear",
+        "l_ear",
+    ]
+    sigmas = (
+        np.array(
+            [
+                0.79,
+                0.26,
+                0.79,
+                0.72,
+                0.62,
+                1.07,
+                0.87,
+                0.89,
+                0.79,
+                0.72,
+                0.62,
+                1.07,
+                0.87,
+                0.89,
+                0.25,
+                0.25,
+                0.35,
+                0.35,
+            ],
+            dtype=np.float32,
+        )
+        / 10.0
+    )
     vars = (sigmas * 2) ** 2
     last_id = -1
     color = [0, 224, 255]
@@ -43,9 +82,11 @@ class Pose:
             found_kpt_id += 1
         self.bbox = cv2.boundingRect(found_keypoints)
         self.id = None
-        self.translation_filter = [OneEuroFilter(freq=80, beta=0.01),
-                                   OneEuroFilter(freq=80, beta=0.01),
-                                   OneEuroFilter(freq=80, beta=0.01)]
+        self.translation_filter = [
+            OneEuroFilter(freq=80, beta=0.01),
+            OneEuroFilter(freq=80, beta=0.01),
+            OneEuroFilter(freq=80, beta=0.01),
+        ]
 
     def update_id(self, id=None):
         self.id = id
@@ -83,7 +124,10 @@ def propagate_ids(previous_poses, current_poses, threshold=3):
     """
     current_poses_sorted_ids = list(range(len(current_poses)))
     current_poses_sorted_ids = sorted(
-        current_poses_sorted_ids, key=lambda pose_id: current_poses[pose_id].confidence, reverse=True)  # match confident poses first
+        current_poses_sorted_ids,
+        key=lambda pose_id: current_poses[pose_id].confidence,
+        reverse=True,
+    )  # match confident poses first
     mask = np.ones(len(previous_poses), dtype=np.int32)
     for current_pose_id in current_poses_sorted_ids:
         best_matched_id = None

@@ -7,9 +7,9 @@ import torchvision.transforms as transforms
 from modules.midas.utils import normalize_unit_range
 import modules.midas.normalization as normalization
 
+
 class Resize(object):
-    """Resize sample to given size (width, height).
-    """
+    """Resize sample to given size (width, height)."""
 
     def __init__(
         self,
@@ -95,24 +95,14 @@ class Resize(object):
                     # fit height
                     scale_width = scale_height
             else:
-                raise ValueError(
-                    f"resize_method {self.__resize_method} not implemented"
-                )
+                raise ValueError(f"resize_method {self.__resize_method} not implemented")
 
         if self.__resize_method == "lower_bound":
-            new_height = self.constrain_to_multiple_of(
-                scale_height * height, min_val=self.__height
-            )
-            new_width = self.constrain_to_multiple_of(
-                scale_width * width, min_val=self.__width
-            )
+            new_height = self.constrain_to_multiple_of(scale_height * height, min_val=self.__height)
+            new_width = self.constrain_to_multiple_of(scale_width * width, min_val=self.__width)
         elif self.__resize_method == "upper_bound":
-            new_height = self.constrain_to_multiple_of(
-                scale_height * height, max_val=self.__height
-            )
-            new_width = self.constrain_to_multiple_of(
-                scale_width * width, max_val=self.__width
-            )
+            new_height = self.constrain_to_multiple_of(scale_height * height, max_val=self.__height)
+            new_width = self.constrain_to_multiple_of(scale_width * width, max_val=self.__width)
         elif self.__resize_method == "minimal":
             new_height = self.constrain_to_multiple_of(scale_height * height)
             new_width = self.constrain_to_multiple_of(scale_width * width)
@@ -122,9 +112,7 @@ class Resize(object):
         return (new_width, new_height)
 
     def __call__(self, sample):
-        width, height = self.get_size(
-            sample["image"].shape[1], sample["image"].shape[0]
-        )
+        width, height = self.get_size(sample["image"].shape[1], sample["image"].shape[0])
 
         # resize sample
         for item in sample.keys():
@@ -136,13 +124,8 @@ class Resize(object):
             )
 
         if self.__resize_target:
-
             if "depth" in sample:
-                sample["depth"] = cv2.resize(
-                    sample["depth"], 
-                    (width, height), 
-                    interpolation=cv2.INTER_NEAREST
-                )
+                sample["depth"] = cv2.resize(sample["depth"], (width, height), interpolation=cv2.INTER_NEAREST)
 
             if "mask" in sample:
                 sample["mask"] = cv2.resize(
@@ -156,8 +139,7 @@ class Resize(object):
 
 
 class NormalizeImage(object):
-    """Normalize image by given mean and std.
-    """
+    """Normalize image by given mean and std."""
 
     def __init__(self, mean, std):
         self.__mean = mean
@@ -168,12 +150,11 @@ class NormalizeImage(object):
 
         return sample
 
+
 class NormalizeIntermediate(object):
-    """Normalize intermediate data by given mean and std.
-    """
+    """Normalize intermediate data by given mean and std."""
 
     def __init__(self, mean, std):
-
         self.__int_depth_mean = mean["int_depth"]
         self.__int_depth_std = std["int_depth"]
 
@@ -181,7 +162,6 @@ class NormalizeIntermediate(object):
         self.__int_scales_std = std["int_scales"]
 
     def __call__(self, sample):
-
         if "int_depth" in sample and sample["int_depth"] is not None:
             sample["int_depth"] = (sample["int_depth"] - self.__int_depth_mean) / self.__int_depth_std
 
@@ -190,17 +170,15 @@ class NormalizeIntermediate(object):
 
         return sample
 
+
 class PrepareForNet(object):
-    """Prepare sample for usage as network input.
-    """
+    """Prepare sample for usage as network input."""
 
     def __init__(self):
         pass
 
     def __call__(self, sample):
-
         for item in sample.keys():
-
             if sample[item] is None:
                 pass
             elif item == "image":
@@ -208,73 +186,69 @@ class PrepareForNet(object):
                 sample["image"] = np.ascontiguousarray(image).astype(np.float32)
             else:
                 array = sample[item].astype(np.float32)
-                array = np.expand_dims(array, axis=0) # add channel dim
+                array = np.expand_dims(array, axis=0)  # add channel dim
                 sample[item] = np.ascontiguousarray(array)
 
         return sample
 
 
 class Tensorize(object):
-    """Convert sample to tensor.
-    """
+    """Convert sample to tensor."""
 
     def __init__(self):
         pass
 
     def __call__(self, sample):
-
         for item in sample.keys():
-
             if sample[item] is None:
                 pass
             else:
                 # before tensorizing, verify that data is clean
-                assert not np.any(np.isnan(sample[item])) 
+                assert not np.any(np.isnan(sample[item]))
                 sample[item] = torch.Tensor(sample[item])
 
         return sample
 
 
 def get_transforms(depth_predictor, sparsifier, nsamples):
-
     image_mean_dict = {
-        "dpt_beit_large_512"    : [0.5, 0.5, 0.5],
-        "dpt_swin2_large_384"   : [0.5, 0.5, 0.5],
-        "dpt_large"             : [0.5, 0.5, 0.5], 
-        "dpt_hybrid"            : [0.5, 0.5, 0.5],
-        "dpt_swin2_tiny_256"    : [0.5, 0.5, 0.5],
-        "dpt_levit_224"         : [0.5, 0.5, 0.5],
-        "midas_small"           : [0.485, 0.456, 0.406],
+        "dpt_beit_large_512": [0.5, 0.5, 0.5],
+        "dpt_swin2_large_384": [0.5, 0.5, 0.5],
+        "dpt_large": [0.5, 0.5, 0.5],
+        "dpt_hybrid": [0.5, 0.5, 0.5],
+        "dpt_swin2_tiny_256": [0.5, 0.5, 0.5],
+        "dpt_levit_224": [0.5, 0.5, 0.5],
+        "midas_small": [0.485, 0.456, 0.406],
     }
 
     image_std_dict = {
-        "dpt_beit_large_512"    : [0.5, 0.5, 0.5],
-        "dpt_swin2_large_384"   : [0.5, 0.5, 0.5],
-        "dpt_large"             : [0.5, 0.5, 0.5], 
-        "dpt_hybrid"            : [0.5, 0.5, 0.5],
-        "dpt_swin2_tiny_256"    : [0.5, 0.5, 0.5],
-        "dpt_levit_224"         : [0.5, 0.5, 0.5],
-        "midas_small"           : [0.229, 0.224, 0.225],
+        "dpt_beit_large_512": [0.5, 0.5, 0.5],
+        "dpt_swin2_large_384": [0.5, 0.5, 0.5],
+        "dpt_large": [0.5, 0.5, 0.5],
+        "dpt_hybrid": [0.5, 0.5, 0.5],
+        "dpt_swin2_tiny_256": [0.5, 0.5, 0.5],
+        "dpt_levit_224": [0.5, 0.5, 0.5],
+        "midas_small": [0.229, 0.224, 0.225],
     }
 
     resize_method_dict = {
-        "dpt_beit_large_512"    : "minimal", 
-        "dpt_swin2_large_384"   : "minimal",
-        "dpt_large"             : "minimal", 
-        "dpt_hybrid"            : "minimal", 
-        "dpt_swin2_tiny_256"    : "minimal",
-        "dpt_levit_224"         : "minimal",
-        "midas_small"           : "upper_bound",
+        "dpt_beit_large_512": "minimal",
+        "dpt_swin2_large_384": "minimal",
+        "dpt_large": "minimal",
+        "dpt_hybrid": "minimal",
+        "dpt_swin2_tiny_256": "minimal",
+        "dpt_levit_224": "minimal",
+        "midas_small": "upper_bound",
     }
 
     resize_dict = {
-        "dpt_beit_large_512"    : 384,
-        "dpt_swin2_large_384"   : 384,
-        "dpt_large"             : 384,
-        "dpt_hybrid"            : 384,
-        "dpt_swin2_tiny_256"    : 256,
-        "dpt_levit_224"         : 224,
-        "midas_small"           : 384,
+        "dpt_beit_large_512": 384,
+        "dpt_swin2_large_384": 384,
+        "dpt_large": 384,
+        "dpt_hybrid": 384,
+        "dpt_swin2_tiny_256": 256,
+        "dpt_levit_224": 224,
+        "midas_small": 384,
     }
 
     keep_aspect_ratio = True
@@ -291,12 +265,9 @@ def get_transforms(depth_predictor, sparsifier, nsamples):
             resize_method=resize_method_dict[depth_predictor],
             image_interpolation_method=cv2.INTER_CUBIC,
         ),
-        NormalizeImage(
-            mean=image_mean_dict[depth_predictor], 
-            std=image_std_dict[depth_predictor]
-        ),
+        NormalizeImage(mean=image_mean_dict[depth_predictor], std=image_std_dict[depth_predictor]),
         PrepareForNet(),
-        Tensorize(),     
+        Tensorize(),
     ]
 
     sml_model_transform_steps = [
@@ -310,7 +281,7 @@ def get_transforms(depth_predictor, sparsifier, nsamples):
             image_interpolation_method=cv2.INTER_CUBIC,
         ),
         NormalizeIntermediate(
-            mean=normalization.VOID_INTERMEDIATE[depth_predictor][f"{sparsifier}_{nsamples}"]["mean"], 
+            mean=normalization.VOID_INTERMEDIATE[depth_predictor][f"{sparsifier}_{nsamples}"]["mean"],
             std=normalization.VOID_INTERMEDIATE[depth_predictor][f"{sparsifier}_{nsamples}"]["std"],
         ),
         PrepareForNet(),
@@ -318,6 +289,6 @@ def get_transforms(depth_predictor, sparsifier, nsamples):
     ]
 
     return {
-        "depth_model" : transforms.Compose(depth_model_transform_steps),
-        "sml_model"   : transforms.Compose(sml_model_transform_steps),
+        "depth_model": transforms.Compose(depth_model_transform_steps),
+        "sml_model": transforms.Compose(sml_model_transform_steps),
     }
