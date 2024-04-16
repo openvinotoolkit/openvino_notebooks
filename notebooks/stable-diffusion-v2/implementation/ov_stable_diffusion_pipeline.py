@@ -12,11 +12,11 @@ from diffusers.schedulers import DDIMScheduler, LMSDiscreteScheduler, PNDMSchedu
 import openvino as ov
 
 
-def scale_fit_to_window(dst_width:int, dst_height:int, image_width:int, image_height:int):
+def scale_fit_to_window(dst_width: int, dst_height: int, image_width: int, image_height: int):
     """
-    Preprocessing helper function for calculating image size for resize with peserving original aspect ratio 
+    Preprocessing helper function for calculating image size for resize with peserving original aspect ratio
     and fitting image to specific window size
-    
+
     Parameters:
       dst_width (int): destination window width
       dst_height (int): destination window height
@@ -36,7 +36,7 @@ def preprocess(image: PIL.Image.Image):
     then converts it to np.ndarray and adds padding with zeros on right or bottom side of image (depends from aspect ratio), after that
     converts data to float32 data type and change range of values from [0, 255] to [-1, 1], finally, converts data layout from planar NHWC to NCHW.
     The function returns preprocessed input tensor and padding size, which can be used in postprocessing.
-    
+
     Parameters:
       image (PIL.Image.Image): input image
     Returns:
@@ -44,10 +44,8 @@ def preprocess(image: PIL.Image.Image):
        meta (Dict): dictionary with preprocessing metadata info
     """
     src_width, src_height = image.size
-    dst_width, dst_height = scale_fit_to_window(
-        512, 512, src_width, src_height)
-    image = np.array(image.resize((dst_width, dst_height),
-                     resample=PIL.Image.Resampling.LANCZOS))[None, :]
+    dst_width, dst_height = scale_fit_to_window(512, 512, src_width, src_height)
+    image = np.array(image.resize((dst_width, dst_height), resample=PIL.Image.Resampling.LANCZOS))[None, :]
     pad_width = 512 - dst_width
     pad_height = 512 - dst_height
     pad = ((0, 0), (0, pad_height), (0, pad_width), (0, 0))
@@ -140,7 +138,7 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
             strength (int, *optional*, 1.0):
                 strength between initial image and generated in Image-to-Image pipeline, do not used in Text-to-Image
         Returns:
-            Dictionary with keys: 
+            Dictionary with keys:
                 sample - the last generated image PIL.Image.Image or np.array
         """
         if seed is not None:
@@ -150,7 +148,11 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
         # corresponds to doing no classifier free guidance.
         do_classifier_free_guidance = guidance_scale > 1.0
         # get prompt text embeddings
-        text_embeddings = self._encode_prompt(prompt, do_classifier_free_guidance=do_classifier_free_guidance, negative_prompt=negative_prompt)
+        text_embeddings = self._encode_prompt(
+            prompt,
+            do_classifier_free_guidance=do_classifier_free_guidance,
+            negative_prompt=negative_prompt,
+        )
         # set timesteps
         accepts_offset = "offset" in set(inspect.signature(self.scheduler.set_timesteps).parameters.keys())
         extra_set_kwargs = {}
@@ -193,7 +195,13 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
         image = self.postprocess_image(image, meta, output_type)
         return {"sample": image}
 
-    def _encode_prompt(self, prompt:Union[str, List[str]], num_images_per_prompt:int = 1, do_classifier_free_guidance:bool = True, negative_prompt:Union[str, List[str]] = None):
+    def _encode_prompt(
+        self,
+        prompt: Union[str, List[str]],
+        num_images_per_prompt: int = 1,
+        do_classifier_free_guidance: bool = True,
+        negative_prompt: Union[str, List[str]] = None,
+    ):
         """
         Encodes the prompt into text encoder hidden states.
 
@@ -217,16 +225,13 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
         )
         text_input_ids = text_inputs.input_ids
 
-        text_embeddings = self.text_encoder(
-            text_input_ids)[self._text_encoder_output]
+        text_embeddings = self.text_encoder(text_input_ids)[self._text_encoder_output]
 
         # duplicate text embeddings for each generation per prompt
         if num_images_per_prompt != 1:
             bs_embed, seq_len, _ = text_embeddings.shape
-            text_embeddings = np.tile(
-                text_embeddings, (1, num_images_per_prompt, 1))
-            text_embeddings = np.reshape(
-                text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1))
+            text_embeddings = np.tile(text_embeddings, (1, num_images_per_prompt, 1))
+            text_embeddings = np.reshape(text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1))
 
         # get unconditional embeddings for classifier free guidance
         if do_classifier_free_guidance:
@@ -260,10 +265,10 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
 
         return text_embeddings
 
-    def prepare_latents(self, image:PIL.Image.Image = None, latent_timestep:torch.Tensor = None):
+    def prepare_latents(self, image: PIL.Image.Image = None, latent_timestep: torch.Tensor = None):
         """
         Function for getting initial latents for starting generation
-        
+
         Parameters:
             image (PIL.Image.Image, *optional*, None):
                 Input image for generation, if not provided randon noise will be used as starting point
@@ -286,11 +291,11 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
         latents = self.scheduler.add_noise(torch.from_numpy(latents), torch.from_numpy(noise), latent_timestep).numpy()
         return latents, meta
 
-    def postprocess_image(self, image:np.ndarray, meta:Dict, output_type:str = "pil"):
+    def postprocess_image(self, image: np.ndarray, meta: Dict, output_type: str = "pil"):
         """
-        Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required), 
+        Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required),
         normalize and convert to [0, 255] pixels range. Optionally, convertes it from np.ndarray to PIL.Image format
-        
+
         Parameters:
             image (np.ndarray):
                 Generated image
@@ -316,25 +321,23 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
             image = self.numpy_to_pil(image)
             if "src_height" in meta:
                 orig_height, orig_width = meta["src_height"], meta["src_width"]
-                image = [img.resize((orig_width, orig_height),
-                                    PIL.Image.Resampling.LANCZOS) for img in image]
+                image = [img.resize((orig_width, orig_height), PIL.Image.Resampling.LANCZOS) for img in image]
         else:
             if "src_height" in meta:
                 orig_height, orig_width = meta["src_height"], meta["src_width"]
-                image = [cv2.resize(img, (orig_width, orig_width))
-                         for img in image]
+                image = [cv2.resize(img, (orig_width, orig_width)) for img in image]
         return image
 
-    def get_timesteps(self, num_inference_steps:int, strength:float):
+    def get_timesteps(self, num_inference_steps: int, strength: float):
         """
         Helper function for getting scheduler timesteps for generation
         In case of image-to-image generation, it updates number of steps according to strength
-        
+
         Parameters:
            num_inference_steps (int):
               number of inference steps for generation
            strength (float):
-               value between 0.0 and 1.0, that controls the amount of noise that is added to the input image. 
+               value between 0.0 and 1.0, that controls the amount of noise that is added to the input image.
                Values that approach 1.0 allow for lots of variations but will also produce images that are not semantically consistent with the input.
         """
         # get the original timestep using init_timestep
@@ -343,4 +346,4 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
         t_start = max(num_inference_steps - init_timestep, 0)
         timesteps = self.scheduler.timesteps[t_start:]
 
-        return timesteps, num_inference_steps - t_start 
+        return timesteps, num_inference_steps - t_start

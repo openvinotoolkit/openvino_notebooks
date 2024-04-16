@@ -13,7 +13,11 @@ def get_parsed_requirements(requirements_file: str) -> Set:
     without versions
     """
     requirements_set = set()
-    ignore_list = ['paddlenlp', 'paddle2onnx', 'paddlepaddle'] # temporary ignore paddle
+    ignore_list = [
+        "paddlenlp",
+        "paddle2onnx",
+        "paddlepaddle",
+    ]  # temporary ignore paddle
     parsed_requirements = parse_requirements(requirements_file, session=False)
     separators = ("=", "<", ">", "[")
     for req in parsed_requirements:
@@ -21,8 +25,8 @@ def get_parsed_requirements(requirements_file: str) -> Set:
         # requirements for Windows or macOS only
         if ";" in requirement and "linux" not in requirement:
             continue
-        if requirement.startswith('git+'):
-            requirement = requirement.split('#egg=')[-1]
+        if requirement.startswith("git+"):
+            requirement = requirement.split("#egg=")[-1]
         for separator in separators:
             requirement = requirement.replace(separator, "|")
         reqname = requirement.split("|")[0]
@@ -41,9 +45,7 @@ def test_readme():
             # item is a notebook directory
             notebook_dir = item.relative_to(Path("notebooks"))
             if str(notebook_dir)[0].isdigit():
-                assert "README.md" in [
-                    filename.name for filename in item.iterdir()
-                ], f"README not found in {item}"
+                assert "README.md" in [filename.name for filename in item.iterdir()], f"README not found in {item}"
 
 
 def test_requirements_docker():
@@ -56,9 +58,7 @@ def test_requirements_docker():
         docker_requirements = set(list(pipfile_contents["packages"].keys()))
 
     pip_requirements = get_parsed_requirements("requirements.txt")
-    assert pip_requirements.issubset(
-        docker_requirements
-    ), f"Docker Pipfile misses: {pip_requirements.difference(docker_requirements)}"
+    assert pip_requirements.issubset(docker_requirements), f"Docker Pipfile misses: {pip_requirements.difference(docker_requirements)}"
 
 
 def test_requirements_binder():
@@ -68,9 +68,7 @@ def test_requirements_binder():
     """
     pip_requirements = get_parsed_requirements("requirements.txt")
     binder_requirements = get_parsed_requirements(".binder/requirements.txt")
-    assert pip_requirements.issubset(
-        binder_requirements
-    ), f"Binder requirements misses: {pip_requirements.difference(binder_requirements)}"
+    assert pip_requirements.issubset(binder_requirements), f"Binder requirements misses: {pip_requirements.difference(binder_requirements)}"
 
 
 @pytest.mark.skip(reason="URL existence is tested in docker_treon")

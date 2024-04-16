@@ -24,12 +24,6 @@ in Python and without CUDA devices. It consists of the following steps:
 
 
 ## Installation Instructions
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
-
-Also, it requires some extra steps, that can be done manually or will be performed automatically during the execution 
-of the notebook, but in minimum necessary scope. 
-1. Clone this repo: `git clone https://github.com/OlaWod/FreeVC.git`.
-2. Download [WavLM-Large](https://github.com/microsoft/unilm/tree/master/wavlm) and put it under `FreeVC/wavlm/` directory.
-3. You can download the [VCTK](https://datashare.ed.ac.uk/handle/10283/3443) dataset. For this example we download only
-two of them from [Hugging Face FreeVC example](https://huggingface.co/spaces/OlaWod/FreeVC/tree/main).
-4. Download [pretrained models](https://1drv.ms/u/s!AnvukVnlQ3ZTx1rjrOZ2abCwuBAh?e=UlhRR5) and put it under `checkpoints` directory (for current example only `freevc.pth` are required).
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).

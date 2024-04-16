@@ -29,4 +29,6 @@ We will use CLIP model for zero-shot image classification. The result of model w
 
 ## Installation Instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md)..

@@ -56,9 +56,9 @@ class OneEuroFilter:
         return x_filtered
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     filter = OneEuroFilter(freq=15, beta=0.1)
     for val in range(10):
-        x = val + (-1)**(val % 2)
+        x = val + (-1) ** (val % 2)
         x_filtered = filter(x)
         print(x_filtered, x)

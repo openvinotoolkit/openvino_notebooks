@@ -5,7 +5,7 @@ from typing import List, Dict
 from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
 
 
-def init_past_inputs(model_inputs:List):
+def init_past_inputs(model_inputs: List):
     """
     Helper function for initialization of past inputs on first inference step
     Parameters:
@@ -22,7 +22,7 @@ def init_past_inputs(model_inputs:List):
     return pkv
 
 
-def postprocess_text_decoder_outputs(output:Dict):
+def postprocess_text_decoder_outputs(output: Dict):
     """
     Helper function for rearranging model outputs and wrapping to CausalLMOutputWithCrossAttentions
     Parameters:
@@ -38,19 +38,19 @@ def postprocess_text_decoder_outputs(output:Dict):
         past_key_values=past_kv,
         hidden_states=None,
         attentions=None,
-        cross_attentions=None
+        cross_attentions=None,
     )
 
 
 def text_decoder_forward(
-        ov_text_decoder_with_past:ov.CompiledModel,
-        input_ids:torch.Tensor,
-        attention_mask:torch.Tensor,
-        past_key_values:List[ov.Tensor],
-        encoder_hidden_states:torch.Tensor,
-        encoder_attention_mask:torch.Tensor,
-        **kwargs
-    ):
+    ov_text_decoder_with_past: ov.CompiledModel,
+    input_ids: torch.Tensor,
+    attention_mask: torch.Tensor,
+    past_key_values: List[ov.Tensor],
+    encoder_hidden_states: torch.Tensor,
+    encoder_attention_mask: torch.Tensor,
+    **kwargs
+):
     """
     Inference function for text_decoder in one generation step
     Parameters:
@@ -75,7 +75,15 @@ class OVBlipModel:
     """
     Model class for inference BLIP model with OpenVINO
     """
-    def __init__(self, config, decoder_start_token_id:int, vision_model, text_encoder, text_decoder):
+
+    def __init__(
+        self,
+        config,
+        decoder_start_token_id: int,
+        vision_model,
+        text_encoder,
+        text_decoder,
+    ):
         """
         Initialization class parameters
         """
@@ -88,7 +96,7 @@ class OVBlipModel:
         self.decoder_start_token_id = decoder_start_token_id
         self.decoder_input_ids = config.text_config.bos_token_id
 
-    def generate_answer(self, pixel_values:torch.Tensor, input_ids:torch.Tensor, attention_mask:torch.Tensor, **generate_kwargs):
+    def generate_answer(self, pixel_values: torch.Tensor, input_ids: torch.Tensor, attention_mask: torch.Tensor, **generate_kwargs):
         """
         Visual Question Answering prediction
         Parameters:
@@ -102,7 +110,14 @@ class OVBlipModel:
         image_attention_mask = np.ones(image_embed.shape[:-1], dtype=int)
         if isinstance(input_ids, list):
             input_ids = torch.LongTensor(input_ids)
-        question_embeds = self.text_encoder([input_ids.detach().numpy(), attention_mask.detach().numpy(), image_embed, image_attention_mask])[self.text_encoder_out]
+        question_embeds = self.text_encoder(
+            [
+                input_ids.detach().numpy(),
+                attention_mask.detach().numpy(),
+                image_embed,
+                image_attention_mask,
+            ]
+        )[self.text_encoder_out]
         question_attention_mask = np.ones(question_embeds.shape[:-1], dtype=int)
 
         bos_ids = np.full((question_embeds.shape[0], 1), fill_value=self.decoder_start_token_id)
@@ -117,7 +132,7 @@ class OVBlipModel:
         )
         return outputs
 
-    def generate_caption(self, pixel_values:torch.Tensor, input_ids:torch.Tensor = None, attention_mask:torch.Tensor = None, **generate_kwargs):
+    def generate_caption(self, pixel_values: torch.Tensor, input_ids: torch.Tensor = None, attention_mask: torch.Tensor = None, **generate_kwargs):
         """
         Image Captioning prediction
         Parameters:
@@ -136,10 +151,14 @@ class OVBlipModel:
         if isinstance(input_ids, list):
             input_ids = torch.LongTensor(input_ids)
         elif input_ids is None:
-            input_ids = (
-                torch.LongTensor([[self.config.text_config.bos_token_id, self.config.text_config.eos_token_id]])
-                .repeat(batch_size, 1)
-            )
+            input_ids = torch.LongTensor(
+                [
+                    [
+                        self.config.text_config.bos_token_id,
+                        self.config.text_config.eos_token_id,
+                    ]
+                ]
+            ).repeat(batch_size, 1)
         input_ids[:, 0] = self.config.text_config.bos_token_id
         attention_mask = attention_mask[:, :-1] if attention_mask is not None else None
 

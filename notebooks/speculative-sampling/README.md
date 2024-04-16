@@ -43,7 +43,12 @@ The tutorial consists of the following steps:
 - Download and convert the model from a public source using the [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
 - Run speculative sampling example and compare speed-up with respect to autoregressive sampling.
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+## Installation instructions
+
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
+
 
 ## Acknowledgement
 

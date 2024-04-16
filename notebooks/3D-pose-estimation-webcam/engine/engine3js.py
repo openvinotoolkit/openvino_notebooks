@@ -32,15 +32,12 @@ class Engine3js:
         grid=False,
         axis=False,
     ):
-
         self.view_width = view_width
         self.view_height = view_height
         self.position = position
 
         # set the camera
-        self.cam = PerspectiveCamera(
-            position=self.position, aspect=self.view_width / self.view_height
-        )
+        self.cam = PerspectiveCamera(position=self.position, aspect=self.view_width / self.view_height)
         self.cam.lookAt(lookAtPos)
 
         # x,y,z axis
@@ -109,9 +106,7 @@ class Skeleton(Geometry):
 
     def __init__(self, name="skeleton", lineWidth=3, body_edges=[]):
         super(Skeleton, self).__init__(name)
-        self.material = LineBasicMaterial(
-            vertexColors="VertexColors", linewidth=lineWidth
-        )
+        self.material = LineBasicMaterial(vertexColors="VertexColors", linewidth=lineWidth)
         self.colorSet = BufferAttribute(
             np.array(
                 [
@@ -177,9 +172,7 @@ class Cloudpoint(Geometry):
     This is the class for drawing cloud points.
     """
 
-    def __init__(
-        self, name="cloudpoint", points=[], point_size=5, line=None, points_color="blue"
-    ):
+    def __init__(self, name="cloudpoint", points=[], point_size=5, line=None, points_color="blue"):
         super(Cloudpoint, self).__init__(name)
         self.material = PointsMaterial(size=point_size, color=points_color)
         self.points = points
@@ -266,9 +259,7 @@ class Cloudpoint(Geometry):
 def Box_bounding(Geometry):
     def __init__(self, name="Box", lineWidth=3):
         super(Box_bounding, self).__init__(name)
-        self.material = LineBasicMaterial(
-            vertexColors="VertexColors", linewidth=lineWidth
-        )
+        self.material = LineBasicMaterial(vertexColors="VertexColors", linewidth=lineWidth)
         self.edge = []
 
     def __call__(self, points=None):

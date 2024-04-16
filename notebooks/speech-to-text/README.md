@@ -11,6 +11,8 @@ In this tutorial speech to text recognition is presented.
 
 This tutorial uses the [QuartzNet 15x5](https://docs.openvino.ai/2024/omz_models_model_quartznet_15x5_en.html) model. QuartzNet performs automatic speech recognition. Its design is based on the Jasper architecture, which is a convolutional model trained with Connectionist Temporal Classification (CTC) loss. The model is available from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/).
 
-## Installation Instructions
+## Installation instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).

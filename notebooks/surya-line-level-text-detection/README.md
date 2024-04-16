@@ -22,6 +22,8 @@ Model used for line-level text detection based on [Segformer](https://arxiv.org/
 1. Run OpenVINO model.
 1. Interactive inference.
 
-## Installation Instructions
+## Installation instructions
 
-If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
