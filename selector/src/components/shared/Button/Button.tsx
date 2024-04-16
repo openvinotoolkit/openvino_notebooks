@@ -1,6 +1,6 @@
 import './Button.scss';
 
-import { FunctionComponent, SVGProps } from 'react';
+import { AnchorHTMLAttributes, ButtonHTMLAttributes, FunctionComponent, SVGProps } from 'react';
 
 const sparkClassNames = {
   button: 'spark-button spark-focus-visible spark-focus-visible-self spark-focus-visible-snap',
@@ -16,6 +16,10 @@ type ButtonVariant = 'action' | 'primary' | 'secondary' | 'ghost';
 
 type ButtonSize = 'l' | 'm' | 's';
 
+type AsElementProps =
+  | (ButtonHTMLAttributes<HTMLButtonElement> & { as?: 'button' })
+  | (AnchorHTMLAttributes<HTMLAnchorElement> & { as?: 'link' });
+
 type ButtonProps = {
   text?: string;
   variant?: ButtonVariant;
@@ -25,16 +29,18 @@ type ButtonProps = {
   onClick?: () => void;
   icon?: FunctionComponent<SVGProps<SVGSVGElement>>;
   className?: string;
-};
+} & AsElementProps;
 
 export const Button = ({
   text,
+  as = 'button',
   variant = 'primary',
   size = 'm',
   disabled = false,
   onClick,
   icon,
   className,
+  ...props
 }: ButtonProps): JSX.Element => {
   const sizeClassName = `${sparkClassNames.buttonSizePrefix}${size}`;
   const variantClassName = `${sparkClassNames.buttonVariantPrefix}${variant}`;
@@ -52,10 +58,30 @@ export const Button = ({
     classNames.push(className);
   }
 
-  return (
-    <button className={classNames.join(' ')} type="button" role="radio" onClick={() => onClick?.()} aria-label={text}>
+  const buttonContent = (
+    <>
       {icon && <span className={sparkClassNames.buttonStartSlot}>{icon({ className: 'button-icon' })}</span>}
       <span className={sparkClassNames.buttonContent}>{text}</span>
+    </>
+  );
+
+  if (as === 'link') {
+    return (
+      <a
+        className={classNames.join(' ')}
+        href={(props as AnchorHTMLAttributes<HTMLAnchorElement>).href}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={text}
+      >
+        {buttonContent}
+      </a>
+    );
+  }
+
+  return (
+    <button className={classNames.join(' ')} type="button" role="radio" onClick={() => onClick?.()} aria-label={text}>
+      {buttonContent}
     </button>
   );
 };
