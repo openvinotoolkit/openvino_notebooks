@@ -8,6 +8,7 @@ import { Search } from '@/components/shared/Search/Search';
 import { ITabItem, Tabs } from '@/components/shared/Tabs/Tabs';
 import { INotebookMetadata } from '@/shared/notebook-metadata';
 import { CATEGORIES, LIBRARIES, LIBRARIES_VALUES, TASKS, TASKS_VALUES } from '@/shared/notebook-tags';
+import { notebooksService } from '@/shared/notebooks.service';
 import { NotebooksContext } from '@/shared/notebooks-context';
 
 import { Button } from '../shared/Button/Button';
@@ -29,6 +30,7 @@ const filterGroups: IFilterGroup<FilterGroupKey>[] = [
   },
   { title: 'AI Tasks', group: 'tasks', tags: TASKS_VALUES },
   { title: 'Ecosystem', group: 'libraries', tags: LIBRARIES_VALUES },
+  { title: 'Other', group: 'other', tags: await notebooksService.getOtherTags() },
 ];
 
 const tasksSectionsTitlesMap: Record<keyof typeof TASKS, string> = {
