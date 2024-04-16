@@ -56,4 +56,8 @@ openvoice
 instant-id
 animate-anyone
 llava-next-multimodal-chatbot
+<<<<<<< HEAD
 llm-rag-langchain
+=======
+llm-agent
+>>>>>>> b9ea5c96 (rename)
