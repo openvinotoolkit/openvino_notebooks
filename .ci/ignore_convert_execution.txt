@@ -63,3 +63,4 @@ notebooks/llm-question-answering/llm-question-answering.ipynb
 notebooks/instant-id/instant-id.ipynb
 notebooks/style-transfer-webcam/style-transfer.ipynb
 notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
+notebooks/agent-langchain/agent-langchain.ipynb
