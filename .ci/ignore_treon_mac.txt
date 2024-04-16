@@ -50,6 +50,7 @@ stable-zephyr-3b-chatbot
 llm-question-answering
 stable-diffusion-torchdynamo-backend
 stable-diffusion-ip-adapter
+stable-diffusion-keras-cv
 mobilevlm-language-assistant
 kosmos2-multimodal-large-language-model
 photo-maker
