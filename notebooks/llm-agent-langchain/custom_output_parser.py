@@ -7,18 +7,10 @@ from langchain_core.exceptions import OutputParserException
 from langchain.agents.agent import AgentOutputParser
 from langchain.agents.mrkl.prompt import FORMAT_INSTRUCTIONS
 
-FINAL_ANSWER_ACTIONS = [
-    "Final Answer:**", "Final Answer:", "Final Answer**:", "Final Answer"
-]
-MISSING_ACTION_AFTER_THOUGHT_ERROR_MESSAGE = (
-    "Invalid Format: Missing 'Action:' after 'Thought:"
-)
-MISSING_ACTION_INPUT_AFTER_ACTION_ERROR_MESSAGE = (
-    "Invalid Format: Missing 'Action Input:' after 'Action:'"
-)
-FINAL_ANSWER_AND_PARSABLE_ACTION_ERROR_MESSAGE = (
-    "Parsing LLM output produced both a final answer and a parse-able action:"
-)
+FINAL_ANSWER_ACTIONS = ["Final Answer:**", "Final Answer:", "Final Answer**:", "Final Answer"]
+MISSING_ACTION_AFTER_THOUGHT_ERROR_MESSAGE = "Invalid Format: Missing 'Action:' after 'Thought:"
+MISSING_ACTION_INPUT_AFTER_ACTION_ERROR_MESSAGE = "Invalid Format: Missing 'Action Input:' after 'Action:'"
+FINAL_ANSWER_AND_PARSABLE_ACTION_ERROR_MESSAGE = "Parsing LLM output produced both a final answer and a parse-able action:"
 
 
 class ReActSingleInputOutputParser(AgentOutputParser):
@@ -52,15 +44,11 @@ class ReActSingleInputOutputParser(AgentOutputParser):
 
     def parse(self, text: str) -> Union[AgentAction, AgentFinish]:
         for final_answer_action in FINAL_ANSWER_ACTIONS:
-            includes_answer = final_answer_action in text 
+            includes_answer = final_answer_action in text
             if includes_answer:
-                return AgentFinish(
-                    {"output": text.split(final_answer_action)[-1].strip()}, text
-                )
-                
-        regex = (
-            r"Action\s*\d*\s*:[\s]*(.*?)[\s]*Action\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
-        )
+                return AgentFinish({"output": text.split(final_answer_action)[-1].strip()}, text)
+
+        regex = r"Action\s*\d*\s*:[\s]*(.*?)[\s]*Action\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
         action_match = re.search(regex, text, re.DOTALL)
         if action_match:
             action = action_match.group(1).strip()
@@ -77,9 +65,7 @@ class ReActSingleInputOutputParser(AgentOutputParser):
                 llm_output=text,
                 send_to_llm=True,
             )
-        elif not re.search(
-            r"[\s]*Action\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)", text, re.DOTALL
-        ):
+        elif not re.search(r"[\s]*Action\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)", text, re.DOTALL):
             raise OutputParserException(
                 f"Could not parse LLM output: `{text}`",
                 observation=MISSING_ACTION_INPUT_AFTER_ACTION_ERROR_MESSAGE,

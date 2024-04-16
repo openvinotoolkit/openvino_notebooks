@@ -1,4 +1,4 @@
-# Create a LLM Agent using OpenVINO
+# Create a LLM Agent using OpenVINO and LangChain
 
 LLM are limited to the knowledge on which they have been trained and the additional knowledge provided as context, as a result, if a useful piece of information is missing the provided knowledge, the model cannot “go around” and try to find it in other sources. This is the reason why we need to introduce the concept of Agents.
 
