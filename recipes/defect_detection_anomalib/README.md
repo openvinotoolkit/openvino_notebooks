@@ -19,8 +19,8 @@ This AI Recipe uses the notebooks in the actual Anomalib repository. Here you wi
 
 | Notebook |  |
 | - | - |
-| Dataset Creation and Inference | [![Jupyter Notebook](https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white)](https://github.com/openvinotoolkit/anomalib/blob/main/notebooks/500_use_cases/501_dobot/501a_training_a_model_with_cubes_from_a_robotic_arm.ipynb) |
-| Training a Model | [![Jupyter Notebook](https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white)](https://github.com/openvinotoolkit/anomalib/blob/93239858c51de63dba064bfc6b1e66522d2586ae/notebooks/500_use_cases/501_dobot/501b_inference_with_a_robotic_arm.ipynb) |
+| Training a Model | [![Jupyter Notebook](https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white)](https://github.com/openvinotoolkit/anomalib/blob/main/notebooks/500_use_cases/501_dobot/501a_training_a_model_with_cubes_from_a_robotic_arm.ipynb) |
+| Dataset Creation and Inference | [![Jupyter Notebook](https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white)](https://github.com/openvinotoolkit/anomalib/blob/93239858c51de63dba064bfc6b1e66522d2586ae/notebooks/500_use_cases/501_dobot/501b_inference_with_a_robotic_arm.ipynb) |
 
 Before running the above notebooks, run the installation process inside the OpenVINO Notebooks environment.
 
