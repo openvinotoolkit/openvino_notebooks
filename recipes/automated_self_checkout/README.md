@@ -13,7 +13,6 @@ Automated Self-Checkout is an application designed to help automate checkout for
 		- [Creating a Virtual Environment](#creating-a-virtual-environment)
 		- [Activating the Environment](#activating-the-environment)
 		- [Installing the Packages](#installing-the-packages)
-	- [Converting and Optimizing the Model](#converting-and-optimizing-the-model)
 	- [Running the Application](#running-the-application)
 - [Benchmarking the Model with OpenVINO's `benchmark_app`](#benchmarking-the-model-with-openvinos-benchmark_app)
 	- [Benchmark Results](#benchmark-results)
@@ -53,7 +52,7 @@ The above will clone the repository into a directory named "openvino_notebooks" 
 cd openvino_notebooks/recipes/automated_self_checkout
 ```
 
-Then pull video sample:
+Then pull the video sample:
 
 ```shell
 git lfs pull
@@ -73,7 +72,7 @@ This will create a new virtual environment named "venv" in the current directory
 Activate the virtual environment using the following command:
 
 ```shell
-source venv/bin/activate   # For Unix-based operating system such as Linux or macOS
+source venv/bin/activate   # For Unix-based operating systems such as Linux or macOS
 ```
 
 _NOTE: If you are using Windows, use `venv\Scripts\activate` command instead._
@@ -89,13 +88,9 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Converting and Optimizing the Model
-
-To convert and optimize the YOLOv8 model, visit the [convert-and-optimize-the-model.ipynb](docs/convert-and-optimize-the-model.ipynb) to learn more.
-
 ### Running the Application
 
-You can run the [run-the-application.ipynb](docs/run-the-application.ipynb) to learn more about the inference process.
+You can run the [run-the-application.ipynb](self-checkout-recipe.ipynb) to learn more about the inference process.
 
 ## Benchmarking the Model with OpenVINO's `benchmark_app`
 
