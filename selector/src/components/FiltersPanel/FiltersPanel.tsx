@@ -22,6 +22,8 @@ interface IFilterGroup<T extends string = string> {
 
 type FilterGroupKey = keyof INotebookMetadata['tags'];
 
+const OTHER_TAGS = await notebooksService.getOtherTags();
+
 const filterGroups: IFilterGroup<FilterGroupKey>[] = [
   {
     title: 'Categories',
@@ -30,7 +32,6 @@ const filterGroups: IFilterGroup<FilterGroupKey>[] = [
   },
   { title: 'AI Tasks', group: 'tasks', tags: TASKS_VALUES },
   { title: 'Ecosystem', group: 'libraries', tags: LIBRARIES_VALUES },
-  { title: 'Other', group: 'other', tags: await notebooksService.getOtherTags() },
 ];
 
 const tasksSectionsTitlesMap: Record<keyof typeof TASKS, string> = {
@@ -54,7 +55,7 @@ function getTagsFilterSections<T extends Record<string, Record<string, string>>>
   filterTags,
   handleTagClick,
 }: {
-  group: keyof INotebookMetadata['tags'];
+  group: FilterGroupKey;
   tagsMap: T;
   titlesMap: Record<keyof T, string>;
   selectedTags: INotebookMetadata['tags'];
@@ -121,10 +122,15 @@ export const FiltersPanel = (): JSX.Element => {
     handleTagClick,
   });
 
+  const getFiltersCount = (group: FilterGroupKey): number => {
+    const groupFiltersCount = selectedTags[group].length;
+    return group === 'categories' ? groupFiltersCount + selectedTags['other'].length : groupFiltersCount;
+  };
+
   const tabItems: ITabItem[] = filterGroups.map(({ title, group, tags }) => ({
-    key: group,
+    key: `tab-item-${group}`,
     title,
-    badge: selectedTags[group].length,
+    badge: getFiltersCount(group),
     content: (
       <>
         <Search
@@ -144,6 +150,16 @@ export const FiltersPanel = (): JSX.Element => {
             group={group}
             tags={filterTags(tags)}
             selectedTags={selectedTags[group]}
+            onTagClick={(tag, group) => handleTagClick(tag, group!)}
+          ></FilterSection>
+        )}
+        {group === 'categories' && !!filterTags(OTHER_TAGS).length && (
+          <FilterSection<FilterGroupKey>
+            key={`filter-section-other`}
+            group="other"
+            title="Quick Filters"
+            tags={filterTags(OTHER_TAGS)}
+            selectedTags={selectedTags['other']}
             onTagClick={(tag, group) => handleTagClick(tag, group!)}
           ></FilterSection>
         )}
