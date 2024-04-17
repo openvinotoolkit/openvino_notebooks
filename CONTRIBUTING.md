@@ -360,8 +360,8 @@ Once your notebook passes in the CI and you have verified that everything looks 
 
 ### Pull Requests (PRs)
 
-1. If some time has passed since you made the fork, sync your fork via GitHub UI or update your form manually - rebase or merge `openvinotoolkit/openvino_notebooks` repository latest branch to the latest branch in your fork.
-2. Create your PR against the `openvinotoolkit/openvino_notebooks` repository latest branch.
+1. If some time has passed since you made the fork, sync your fork via GitHub UI or update your form manually - rebase or merge `openvinotoolkit/openvino_notebooks` repository *latest* branch to the *latest* branch in your fork.
+2. Create your PR against the `openvinotoolkit/openvino_notebooks` repository *latest* branch.
 3. Please create a description of what the notebook does with your PR. Screenshots are appreciated!
 4. On making or updating a Pull Request, the tests in the CI will run again. Please keep an
    eye on them. If the tests fail and you think the issue is not related to your PR, please make a comment on your PR.
