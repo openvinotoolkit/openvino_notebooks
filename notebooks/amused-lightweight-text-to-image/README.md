@@ -24,6 +24,10 @@ The tutorial consists from following steps:
   - Convert the U-ViT transformer
   - Convert VQ-GAN decoder (VQVAE)
 - Compiling models and prepare pipeline
+- Quantization with [NNCF](https://github.com/openvinotoolkit/nncf/)
+  - Prepare calibration dataset
+  - Run model quantization
+  - Compute Inception Scores and inference time
 - Interactive inference
 
 ## Installation instructions
