@@ -51,6 +51,20 @@ class NotebooksService {
     return [sortedPaginatedNotebooks, filteredNotebooks.length, notebooks.length];
   }
 
+  async getOtherTags(): Promise<string[]> {
+    const notebooks = Object.values(await this._getNotebooksMap());
+    return notebooks
+      .reduce((acc, { tags }) => {
+        for (const tag of tags.other) {
+          if (!acc.includes(tag)) {
+            acc.push(tag);
+          }
+        }
+        return acc;
+      }, [] as string[])
+      .sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
+  }
+
   private _getCompareFn(sort: SortValues): Parameters<Array<INotebookMetadata>['sort']>[0] {
     if (sort === SORT_OPTIONS.RECENTLY_ADDED) {
       return (a: INotebookMetadata, b: INotebookMetadata) =>
