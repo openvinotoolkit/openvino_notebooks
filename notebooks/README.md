@@ -82,7 +82,7 @@
 - [Quantization of Image Classification Models](./image-classification-quantization/image-classification-quantization.ipynb)
 - [🤗 Hugging Face Model Hub with OpenVINO™](./hugging-face-hub/hugging-face-hub.ipynb)
 - [Working with GPUs in OpenVINO™](./gpu-device/gpu-device.ipynb)
-- [Working with NPU in OpenVINO™](./gpu-device/hello-npu.ipynb)
+- [Working with NPU in OpenVINO™](./hello-npu/hello-npu.ipynb)
 - [OpenVINO™ model conversion API](./convert-to-openvino/legacy-mo-convert-to-openvino.ipynb)
 - [OpenVINO™ Model conversion](./convert-to-openvino/convert-to-openvino.ipynb)
 - [Big Transfer Image Classification Model Quantization pipeline with NNCF](./big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb)
