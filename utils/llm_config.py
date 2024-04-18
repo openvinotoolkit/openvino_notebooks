@@ -116,6 +116,27 @@ SUPPORTED_LLM_MODELS = {
             Context: {context} 
             Answer: [/INST]""",
         },
+        "llama-3-8b-instruct": {
+            "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+            "remote_code": False,
+            "start_message":" <|start_header_id|>system<|end_header_id|>\n\n"+DEFAULT_SYSTEM_PROMPT + "<|eot_id|>",
+            "history_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>",
+            "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
+            "stop_tokens": ["<|eot_id|>"],
+            "rag_prompt_template": f"""<|start_header_id|>system<|end_header_id|>
+            
+            
+            {DEFAULT_RAG_PROMPT}<|eot_id|>""""
+            + """
+            <|start_header_id|>user<|end_header_id|>
+
+            
+            Question: {question} 
+            Context: {context}
+            Answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+            
+            """,
+        },
         "mpt-7b-chat": {
             "model_id": "mosaicml/mpt-7b-chat",
             "remote_code": False,
