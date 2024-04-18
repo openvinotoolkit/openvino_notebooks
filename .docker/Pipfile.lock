@@ -2497,11 +2497,12 @@
                 "sha256:d8a7c94d2ebead8f739fdb70d1ce5a71726f4e17b3e5b8ad64455ea1b2801a85",
                 "sha256:ef4d9eb44b111e69e4534f3233fc2c13d1e26920d24ae4359d513bd54694bc6d",
                 "sha256:f1ad3d77fc2f4b4296f0ac2c8cadd8c1dcf765fc586b737462d3a0fe8f7c696a",
-                "sha256:f277d4861729f5253a51fa41ce91bfec1c4574ee41b5637056b43500917295ce"
+                "sha256:f277d4861729f5253a51fa41ce91bfec1c4574ee41b5637056b43500917295ce",
+                "sha256:e5752bbbd5717304a7643643dba383a2fb31e8eb0682f4e7b7d141206328a73b"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==1.15.0"
+            "version": "==1.16.0"
         },
         "opencv-python": {
             "hashes": [
