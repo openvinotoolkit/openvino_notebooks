@@ -40,6 +40,7 @@ def move_notebooks(nb_dir):
     current_notebooks_dir = ROOT / "notebooks"
     shutil.copytree(current_notebooks_dir, nb_dir)
 
+
 def get_notebooks_subdir(changed_path, orig_nb_dir):
     if (orig_nb_dir / changed_path).exists() and (orig_nb_dir / changed_path).is_dir():
         notebook_subdir = orig_nb_dir / changed_path
@@ -74,7 +75,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
             else:
                 ignored_notebooks.append(ig_nb)
         print(f"ignored notebooks: {ignored_notebooks}")
-    
+
     testing_notebooks = []
     if len(test_list) == 1 and test_list[0].endswith(".txt"):
         testing_notebooks = []
