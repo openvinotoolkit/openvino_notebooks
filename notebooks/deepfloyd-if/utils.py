@@ -28,9 +28,7 @@ class TextEncoder:
     into the `stage_1.encode_prompt` routine.
     """
 
-    def __init__(
-        self, ir_path: Union[str, Path], dtype: torch.dtype, device: str = "CPU"
-    ) -> None:
+    def __init__(self, ir_path: Union[str, Path], dtype: torch.dtype, device: str = "CPU") -> None:
         """
         Init the adapter with the IR model path.
 
@@ -45,9 +43,7 @@ class TextEncoder:
         self.dtype = dtype
         self.encoder_openvino = ov.Core().compile_model(self.ir_path, device)
 
-    def __call__(
-        self, input_ids: torch.LongTensor, attention_mask: torch.FloatTensor = None
-    ):
+    def __call__(self, input_ids: torch.LongTensor, attention_mask: torch.FloatTensor = None):
         """Adapt the network call."""
         result = self.encoder_openvino(input_ids)
         result_numpy = result[self.encoder_openvino.outputs[0]]
@@ -153,9 +149,7 @@ class UnetSecondStage:
         To learn more abould the model parameters please refer to
         its source code: https://github.com/huggingface/diffusers/blob/7200985eab7126801fffcf8251fd149c1cf1f291/src/diffusers/models/unet_2d_condition.py#L610
         """
-        result = self.unet_openvino(
-            [sample, timestamp, encoder_hidden_states, class_labels]
-        )
+        result = self.unet_openvino([sample, timestamp, encoder_hidden_states, class_labels])
         result_numpy = result[self.unet_openvino.outputs[0]]
         return result_tuple(torch.tensor(result_numpy, dtype=self.dtype))
 
