@@ -13,6 +13,7 @@ EXPECTED_NO_DEVICE = [
     Path("notebooks/ct-segmentation-quantize/data-preparation-ct-scan.ipynb"),  # device-agnostic
     Path("notebooks/ct-segmentation-quantize/pytorch-monai-training.ipynb"),  # device-agnostic
     Path("notebooks/gpu-device/gpu-device.ipynb"),  # gpu device expected to be used
+    Path("notebooks/hello-npu/hello-npu.ipynb"),  # npu device expected to be used
     Path("notebooks/model-server/model-server.ipynb"),  # can not change device in docker configuration on the fly
     Path("notebooks/openvino-tokenizers/openvino-tokenizers.ipynb"),  # cpu required for loading extensions
     Path("notebooks/performance-tricks/latency-tricks.ipynb"),  # cpu expected to be used
