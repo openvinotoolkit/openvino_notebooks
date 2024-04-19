@@ -30,4 +30,9 @@ SUPPORTED_LLM_MODELS = {
         "prompt_template": "<s> [INST] {instruction} [/INST] </s>",
         "tokenizer_kwargs": {"add_special_tokens": False},
     },
+    "llama-3-8b-instruct": {
+        "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "end_key": "<|eot_id|>",
+        "prompt_template": "<|start_header_id|>system<|end_header_id|>\n\nBelow is an instruction that describes a task. Write a response that appropriately completes the request.<|eot_id|><|start_header_id|>user<|end_header_id|>Instruction: {instruction} Answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>",
+    },
 }
