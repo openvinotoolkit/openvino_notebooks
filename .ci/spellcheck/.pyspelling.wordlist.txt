@@ -19,6 +19,7 @@ aMUSEd
 analytics
 AnimateAnyone
 AnimeGAN
+AnimateLCM
 Antelopev
 api
 APIs
@@ -314,6 +315,7 @@ internlm
 invertible
 intervaling
 im
+img
 ip
 IRs
 iteratively
@@ -726,6 +728,7 @@ superset
 Suraj
 surya
 svc
+SVD
 SVTR
 Swin
 SwiGLU
@@ -839,6 +842,7 @@ Würstchen
 XCode
 Xeon
 xl
+xt
 xvector
 xxl
 XYWH
