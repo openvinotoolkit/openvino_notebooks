@@ -221,6 +221,7 @@ FC
 feedforward
 FFmpeg
 FIL
+FEIL
 finetuned
 finetuning
 FLAC
@@ -467,6 +468,8 @@ nsfw
 NSFW
 numpy
 NumPy
+NPU
+NPUs
 OASST
 OBB
 obb
@@ -778,6 +781,7 @@ Uncheck
 unCLIP
 uncomment
 uncompressing
+UMD
 UNet
 UNets
 Unet
