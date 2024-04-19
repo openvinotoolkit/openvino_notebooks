@@ -52,6 +52,7 @@ stable-zephyr-3b-chatbot
 llm-question-answering
 stable-diffusion-torchdynamo-backend
 stable-diffusion-ip-adapter
+stable-diffusion-keras-cv
 kosmos2-multimodal-large-language-model
 photo-maker
 openvoice
@@ -61,3 +62,4 @@ animate-anyone
 llava-next-multimodal-chatbot
 llm-rag-langchain
 stable-video-diffusion
+llm-agent-langchain
