@@ -41,6 +41,19 @@ def move_notebooks(nb_dir):
     shutil.copytree(current_notebooks_dir, nb_dir)
 
 
+def get_notebooks_subdir(changed_path, orig_nb_dir):
+    if (orig_nb_dir / changed_path).exists() and (orig_nb_dir / changed_path).is_dir():
+        notebook_subdir = orig_nb_dir / changed_path
+        if not list(notebook_subdir.rglob("**/*.ipynb")):
+            notebook_subdir = None
+        else:
+            notebook_subdir = notebook_subdir.relative_to(orig_nb_dir)
+        print(notebook_subdir)
+    else:
+        notebook_subdir = find_notebook_dir(changed_path.resolve(), orig_nb_dir.resolve())
+    return notebook_subdir
+
+
 def prepare_test_plan(test_list, ignore_list, nb_dir=None):
     orig_nb_dir = ROOT / "notebooks"
     notebooks_dir = orig_nb_dir if nb_dir is None else nb_dir
@@ -63,6 +76,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
                 ignored_notebooks.append(ig_nb)
         print(f"ignored notebooks: {ignored_notebooks}")
 
+    testing_notebooks = []
     if len(test_list) == 1 and test_list[0].endswith(".txt"):
         testing_notebooks = []
         with open(test_list[0], "r") as f:
@@ -74,16 +88,19 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
                     break
                 if changed_path.suffix == ".md":
                     continue
-                notebook_subdir = find_notebook_dir(changed_path.resolve(), orig_nb_dir.resolve())
+                notebook_subdir = get_notebooks_subdir(changed_path, orig_nb_dir)
                 if notebook_subdir is None:
                     continue
                 testing_notebooks.append(notebook_subdir)
-        test_list = set(testing_notebooks)
     else:
-        test_list = set(map(lambda x: Path(x), test_list))
+        for test_item in test_list:
+            notebook_subdir = get_notebooks_subdir(Path(test_item), orig_nb_dir)
+            if notebook_subdir is not None:
+                testing_notebooks.append(notebook_subdir)
+    test_list = set(testing_notebooks)
+    print(f"test notebooks: {test_list}")
 
     ignore_list = set(map(lambda x: Path(x), ignored_notebooks))
-
     for notebook in statuses:
         if notebook not in test_list:
             statuses[notebook]["status"] = "SKIPPED"

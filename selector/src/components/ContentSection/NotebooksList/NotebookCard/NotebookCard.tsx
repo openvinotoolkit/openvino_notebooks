@@ -17,8 +17,6 @@ const htmlToText = (value: string): string => {
   return div.textContent || value;
 };
 
-const openLink = (url: string) => window.open(url, '_blank');
-
 const openNotebookInDocs = ({ links }: INotebookMetadata) => {
   if (!links.docs) {
     return;
@@ -72,28 +70,31 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
             <div className={sparkClassNames.cardHorizontalLine}></div>
             <div className="card-actions">
               <Button
-                text="View on GitHub"
+                as="link"
                 variant="action"
-                icon={GitHubIcon}
                 size="m"
-                onClick={() => openLink(item.links.github)}
+                text="View on GitHub"
+                icon={GitHubIcon}
+                href={item.links.github}
               ></Button>
               {item.links.colab && (
                 <Button
-                  text="Open in Colab"
+                  as="link"
                   variant="primary"
-                  icon={ColabIcon}
                   size="m"
-                  onClick={() => openLink(item.links.colab!)}
+                  text="Open in Colab"
+                  icon={ColabIcon}
+                  href={item.links.colab}
                 ></Button>
               )}
               {item.links.binder && (
                 <Button
-                  text="Launch in Binder"
+                  as="link"
                   variant="primary"
-                  icon={BinderIcon}
                   size="m"
-                  onClick={() => openLink(item.links.binder!)}
+                  text="Launch in Binder"
+                  icon={BinderIcon}
+                  href={item.links.binder}
                 ></Button>
               )}
             </div>

@@ -45,6 +45,7 @@ distil-whisper-asr
 film-slowmo
 sound-generation-audioldm2
 sdxl-turbo
+stable-diffusion-keras-cv
 paint-by-example
 stable-zephyr-3b-chatbot
 llm-question-answering
@@ -58,3 +59,4 @@ animate-anyone
 llava-next-multimodal-chatbot
 llm-rag-langchain
 stable-video-diffusion
+llm-agent-langchain

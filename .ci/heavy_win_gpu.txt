@@ -1,0 +1,12 @@
+controlnet-stable-diffusion
+detectron2-to-openvino
+film-slowmo
+instant-id
+instruct-pix2pix-image-editing
+knowledge-graphs-conve
+mms-massively-multilingual-speech
+paint-by-example
+qrcode-monster
+sdxl-turbo
+stable-diffusion-text-to-image
+wuerstchen-image-generation

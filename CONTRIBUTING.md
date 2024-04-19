@@ -346,7 +346,7 @@ If spell check is failing, there are any typos or new words, you have two possib
    .ci/dev-requirements.txt` inside the `openvino_env` environment. This installs all the packages
    mentioned in the [Validation](#Validation) section.
       > **Note**: `PySpelling` dependency from `.ci/dev-requirements.txt` requires `Aspell` for spell checking that should be installed manually. For installation instructions please refer to the [`PySpelling` documentation](https://facelessuser.github.io/pyspelling/#prerequisites).
-3. Create a branch in this fork, from the *main* branch. Name the
+3. Create a branch in this fork, from the *latest* branch. Name the
    branch however you like.
 4. Double-check the points in the [Design Decisions](#design-decisions) and [Validation](#Validation) sections.
 5. Check that your notebook works in the CI
@@ -360,8 +360,8 @@ Once your notebook passes in the CI and you have verified that everything looks 
 
 ### Pull Requests (PRs)
 
-1. If some time has passed since you made the fork, sync your fork via GitHub UI or update your form manually - rebase or merge `openvinotoolkit/openvino_notebooks` repository main branch to the main branch in your fork.
-2. Create your PR against the `openvinotoolkit/openvino_notebooks` repository main branch.
+1. If some time has passed since you made the fork, sync your fork via GitHub UI or update your form manually - rebase or merge `openvinotoolkit/openvino_notebooks` repository *latest* branch to the *latest* branch in your fork.
+2. Create your PR against the `openvinotoolkit/openvino_notebooks` repository *latest* branch.
 3. Please create a description of what the notebook does with your PR. Screenshots are appreciated!
 4. On making or updating a Pull Request, the tests in the CI will run again. Please keep an
    eye on them. If the tests fail and you think the issue is not related to your PR, please make a comment on your PR.
