@@ -63,3 +63,4 @@ llava-next-multimodal-chatbot
 llm-rag-langchain
 stable-video-diffusion
 llm-agent-langchain
+hello-npu
