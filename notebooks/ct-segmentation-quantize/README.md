@@ -8,7 +8,7 @@
 
 ## Notebook Contents
 
-This folder contains five notebooks that show how to train,
+This folder contains four notebooks that show how to train,
 optimize, quantize and show live inference on a [MONAI](https://monai.io/) segmentation model with
 [PyTorch Lightning](https://lightning.ai/) and OpenVINO:
 
