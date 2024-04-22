@@ -256,6 +256,7 @@
 - [From Training to Deployment with TensorFlow and OpenVINO™](./tensorflow-training-openvino/tensorflow-training-openvino.ipynb)
 - [Quantization Aware Training with NNCF, using TensorFlow Framework](./tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb)
 - [Quantization Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-aware-training/pytorch-quantization-aware-training.ipynb)
+- [Quantization Sparsity Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb)
 
 ## Optimize
 
