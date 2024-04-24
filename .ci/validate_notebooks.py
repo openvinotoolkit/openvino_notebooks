@@ -122,7 +122,7 @@ def clean_test_artifacts(before_test_files, after_test_files):
             shutil.rmtree(file_path, ignore_errors=True)
 
 
-def run_test(notebook_path, root, timeout=7200, keep_artifacts=False):
+def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir="."):
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path)
     print(f"RUN {notebook_path.relative_to(root)}", flush=True)
     retcodes = []
@@ -131,6 +131,17 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False):
         existing_files = sorted(Path(".").glob("test_*.ipynb"))
 
         for notebook_name in existing_files:
+            print("Packages before notebook run")
+            reqs = subprocess.check_output(
+                [sys.executable, "-m", "pip", "freeze"],
+                shell=(platform.system() == "Windows"),
+            )
+            reqs_before_file = report_dir / (notebook_name.stem + "_env_before.txt")
+            with reqs_before_file.open("wb") as f:
+                f.write(reqs)
+            with reqs_before_file.open("r") as f:
+                print(f.read())
+
             main_command = [sys.executable, "-m", "treon", str(notebook_name)]
             try:
                 retcode = subprocess.run(
@@ -144,6 +155,16 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False):
 
         if not keep_artifacts:
             clean_test_artifacts(existing_files, sorted(Path(".").iterdir()))
+        print("Packages after notebook run")
+        reqs = subprocess.check_output(
+            [sys.executable, "-m", "pip", "freeze"],
+            shell=(platform.system() == "Windows"),
+        )
+        reqs_after_file = report_dir / (notebook_name.stem + "_env_after.txt")
+        with reqs_after_file.open("wb") as f:
+            f.write(reqs)
+        with reqs_after_file.open("r") as f:
+            print(f.read())
     return retcodes
 
 
@@ -206,7 +227,7 @@ def main():
     for notebook, report in test_plan.items():
         if report["status"] == "SKIPPED":
             continue
-        statuses = run_test(report["path"], root, args.timeout, keep_artifacts)
+        statuses = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute())
         if not statuses:
             print(f"{str(notebook)}: No testing notebooks found")
             report["status"] = "EMPTY"
