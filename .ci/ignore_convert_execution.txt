@@ -61,6 +61,7 @@ notebooks/paint-by-example/paint-by-example.ipynb
 notebooks/stable-zephyr-3b-chatbot/stable-zephyr-3b-chatbot.ipynb
 notebooks/llm-question-answering/llm-question-answering.ipynb
 notebooks/instant-id/instant-id.ipynb
+notebooks/style-transfer-webcam/style-transfer.ipynb
 notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
 notebooks/stable-video-diffusion/stable-video-diffusion.ipynb
 notebooks/llm-agent-langchain/llm-agent-langchain.ipynb
