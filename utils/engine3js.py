@@ -400,6 +400,7 @@ def propagate_ids(previous_poses, current_poses, threshold=3):
         if best_matched_pose_id is not None:
             current_poses[current_pose_id].translation_filter = previous_poses[best_matched_id].translation_filter
 
+
 AVG_PERSON_HEIGHT = 180
 
 # pelvis (body center) is missing, id == 2
