@@ -57,7 +57,6 @@ kosmos2-multimodal-large-language-model
 photo-maker
 openvoice
 instant-id
-style-transfer-webcam
 animate-anyone
 llava-next-multimodal-chatbot
 llm-rag-langchain
