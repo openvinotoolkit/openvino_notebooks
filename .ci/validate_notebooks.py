@@ -1,4 +1,5 @@
 import sys
+import time
 import os
 import subprocess  # nosec - disable B404:import-subprocess check
 import csv
@@ -144,6 +145,7 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
                 print(f.read())
 
             main_command = [sys.executable, "-m", "treon", str(notebook_name)]
+            start = time.perf_counter()
             try:
                 retcode = subprocess.run(
                     main_command,
@@ -152,7 +154,8 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
                 ).returncode
             except subprocess.TimeoutExpired:
                 retcode = -42
-            retcodes.append((str(notebook_name), retcode))
+            duration = time.perf_counter() - start
+            retcodes.append((str(notebook_name), retcode, duration))
 
         if not keep_artifacts:
             clean_test_artifacts(existing_files, sorted(Path(".").iterdir()))
@@ -187,7 +190,7 @@ def finalize_status(failed_notebooks, timeout_notebooks, test_plan, report_dir, 
             }
         )
     with (report_dir / "test_report.csv").open("w") as f:
-        writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path"])
+        writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
         writer.writeheader()
         writer.writerows(test_report)
     return return_status
@@ -207,9 +210,9 @@ class cd:
         os.chdir(self.saved_path)
 
 
-def write_single_notebook_report(notebook_name, status, saving_dir):
+def write_single_notebook_report(notebook_name, status, duration, saving_dir):
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
-    report = {"notebook_name": notebook_name.replace("test_", ""), "status": status}
+    report = {"notebook_name": notebook_name.replace("test_", ""), "status": status, "duration": duration}
     with report_file.open("w") as f:
         json.dump(report, f)
 
@@ -236,11 +239,12 @@ def main():
         if report["status"] == "SKIPPED":
             continue
         statuses = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute())
+        timing = 0
         if not statuses:
             print(f"{str(notebook)}: No testing notebooks found")
             report["status"] = "EMPTY"
-        for subnotebook, status in statuses:
-
+            report["duration"] = timing
+        for subnotebook, status, duration in statuses:
             if status:
                 status_code = "TIMEOUT" if status == -42 else "FAILED"
                 report["status"] = status_code
@@ -252,8 +256,10 @@ def main():
                     timeout_notebooks.append(str(subnotebook))
                 else:
                     failed_notebooks.append(str(subnotebook))
+            timing += duration
+            report["duration"] = timing
             if args.collect_reports:
-                write_single_notebook_report(subnotebook, status, reports_dir)
+                write_single_notebook_report(subnotebook, status, duration, reports_dir)
             if args.early_stop:
                 break
     exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
