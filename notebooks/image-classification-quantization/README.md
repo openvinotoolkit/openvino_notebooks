@@ -1,6 +1,6 @@
 # Accelerate Inference of MobileNet V2 Image Classification Model with NNCF in OpenVINO™
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?labpath=notebooks%2Fimage-classification-quantization%2Fimage-classification-quantization.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eaidova/openvino_notebooks_binder.git/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fopenvinotoolkit%252Fopenvino_notebooks%26urlpath%3Dtree%252Fopenvino_notebooks%252Fnotebooks%2Fimage-classification-quantization%2Fimage-classification-quantization.ipynb)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/image-classification-quantization/image-classification-quantization.ipynb)
 
 This tutorial demonstrates how to apply `INT8` quantization to the MobileNet V2 Image Classification model, using the
