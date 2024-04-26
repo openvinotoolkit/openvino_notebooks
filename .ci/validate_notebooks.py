@@ -2,6 +2,7 @@ import sys
 import os
 import subprocess  # nosec - disable B404:import-subprocess check
 import csv
+import json
 import shutil
 import platform
 from pathlib import Path
@@ -206,6 +207,13 @@ class cd:
         os.chdir(self.saved_path)
 
 
+def write_single_notebook_report(notebook_name, status, saving_dir):
+    report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
+    report = {"notebook_name": notebook_name.replace("test_", ""), "status": status}
+    with report_file.open("w") as f:
+        json.dump(report, f)
+
+
 def main():
     failed_notebooks = []
     timeout_notebooks = []
@@ -232,15 +240,20 @@ def main():
             print(f"{str(notebook)}: No testing notebooks found")
             report["status"] = "EMPTY"
         for subnotebook, status in statuses:
+
             if status:
-                report["status"] = "TIMEOUT" if status == -42 else "FAILED"
+                status_code = "TIMEOUT" if status == -42 else "FAILED"
+                report["status"] = status_code
             else:
+                status_code = "SUCCESS"
                 report["status"] = "SUCCESS" if not report["status"] in ["TIMEOUT", "FAILED"] else report["status"]
             if status:
                 if status == -42:
                     timeout_notebooks.append(str(subnotebook))
                 else:
                     failed_notebooks.append(str(subnotebook))
+            if args.collect_reports:
+                write_single_notebook_report(subnotebook, status, reports_dir)
             if args.early_stop:
                 break
     exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
