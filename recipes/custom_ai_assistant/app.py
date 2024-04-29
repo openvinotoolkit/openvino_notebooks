@@ -14,22 +14,30 @@ from transformers.generation.streamers import BaseStreamer
 # Global variables initialization
 AUDIO_WIDGET_SAMPLE_RATE = 16000
 SYSTEM_CONFIGURATION = (
-    "You're Adrishuo - a helpful, respectful, and honest virtual doctor assistant."
+    "You are Adrishuo - a helpful, respectful, and honest virtual doctor assistant. "
     "Your role is talking to a patient who just came in."
-    "Your task is to gather symptoms from the patient, ask clarifying questions if necessary, and summarize health-related information for the doctor's review."
-    "You cannot attempt to treat the patient yourself."
-    "You cannot attempt to suggest or recommend any form of treatment."
-    "You cannot provide and suggest any pain relievers."
-    "You cannot provide and suggest any over-the-counter medication."
-    "You cannot provide and suggest any other medicines."
-    "Avoid offering medical advice."
+    "Your primary role is to assist in the collection of Symptom information from patients. "
+    "Focus solely on gathering symptom details without offering treatment or medical advice."
+    "You must only ask follow-up questions based on the patient's initial descriptions to clarify and gather more details about their symtpoms. "
+    "You must not attempt to diagnose, treat, or offer health advice. "
+    "Ask one and only the symptom related followup questions and keep it short. "
+    "You must strictly not suggest or recommend any treatments, including over-the-counter medication. "
+    "You must strictly avoid making any assumptions or conclusions about the causes or nature of the patient's symptoms. "
+    "You must strictly avoid providing suggestions to manage their symptoms. "
+    "Your interactions should be focused solely on understanding and recording the patient's stated symptoms."
     "Do not collect or use any personal information like age, name, contact, gender, etc."
-    "Remember, you're here to support the information gathering process in a respectful and non-invasive manner."
-    "Focus on understanding the patient's health concerns without diagnosing or suggesting treatments."
-    "You cannot collect personal information like age, name, contact, gender, and other personal information."
-    "Your responses should be safe, unbiased, and factually coherent. If unsure, do not provide false information."
+    "Remember, your role is to aid in symptom information collection in a supportive, unbiased, and factually accurate manner. "
+    "Your responses should consistently encourage the patient to discuss their symptoms in greater detail while remaining neutral and non-diagnostic."
 )
+
 GREET_THE_CUSTOMER = "Please introduce yourself and greet the patient"
+
+NON_HEALTH_QUERY_PROMPT = (
+    "You're Adrishuo, a virtual assistant and here to provide support for health-related questions. While I understand you might have other interests, "
+    "You're design is specifically tailored to discuss health concerns. If you have any health-related questions or "
+    "if there's anything else you're curious about health-wise, You're here to help."
+)
+
 SUMMARIZE_THE_CUSTOMER = (
     "You are now required to summarize the patient's exact provided symptoms for the doctor's review. "
     "Strictly do not mention any personal data like age, name, gender, contact, non-health information etc. when summarizing."
@@ -67,6 +75,39 @@ chat_tokenizer: Optional[PreTrainedTokenizer] = None
 message_template: Optional[str] = None
 asr_model: Optional[OVModelForSpeechSeq2Seq] = None
 asr_processor: Optional[AutoProcessor] = None
+
+
+health_keywords = [
+    'pain', 'ache', 'fever', 'chills', 'fatigue', 'weakness', 'dizziness', 'nausea', 'vomiting', 'diarrhea',
+    'constipation', 'abdominal pain', 'cramps', 'bloating', 'gas', 'heartburn', 'loss of appetite', 'weight loss',
+    'weight gain', 'dehydration', 'urination issues', 'itching', 'rash', 'hives', 'redness', 'swelling', 'bruising',
+    'bleeding', 'cough', 'sore throat', 'stuffy nose', 'runny nose', 'sinus pressure', 'headache', 'migraine',
+    'vision changes', 'hearing loss', 'tinnitus', 'ear pain', 'dental pain', 'jaw pain', 'shortness of breath',
+    'chest pain', 'palpitations', 'fainting', 'seizures', 'numbness', 'tingling', 'paralysis', 'muscle weakness',
+    'muscle spasms', 'joint pain', 'stiffness', 'edema', 'insomnia', 'sleepiness', 'anxiety', 'depression',
+    'mood swings', 'confusion', 'memory loss', 'hallucinations', 'delusions', 'sweating', 'temperature sensitivity',
+    'thirst', 'skin changes', 'hair loss', 'nail changes', 'lymph node enlargement', 'breast lump', 'urinary changes',
+    'sexual dysfunction', 'menstrual changes', 'pregnancy', 'injuries', 'burns', 'poisoning', 'allergies', 'infections',
+    'chronic diseases', 'acute illnesses', 'screening', 'vaccination', 'health check-up', 'asthma', 'diabetes',
+    'hypertension', 'heart disease', 'cancer', 'flu', 'cold', 'allergy', 'eczema', 'psoriasis', 'arthritis', 'anemia',
+    'covid', 'coronavirus', 'migraine', 'obesity', 'thyroid', 'influenza', 'stroke', 'heart attack', 'bronchitis',
+    'pneumonia', 'tuberculosis', 'malaria', 'dengue', 'chickenpox', 'measles', 'hepatitis', 'hiv', 'aids',
+    'cystic fibrosis', 'scoliosis', 'osteoporosis', 'dementia', 'alzheimer', 'parkinson', 'multiple sclerosis',
+    'minute', 'hour', 'day', 'minutes', 'hours', 'days', 'morning', 'evening', 'night', 'yesterday', 'today', 'stress', 'anxious', 'irritability',
+    'panic attacks', 'sleep problems', 'snoring', 'sleep apnea', 'accident', 'hurt', 'swollen', 'inflammation',
+    'infection', 'discharge', 'itch', 'burning', 'discomfort', 'sensitivity', 'soreness', 'dryness', 'odor', 'taste',
+    'vision', 'hearing', 'balance', 'coordination', 'appetite', 'thirst', 'temperature', 'fatigue', 'energy', 'mood',
+    'concentration', 'memory', 'alertness', 'awareness', 'frequent', 'head', 'arm', 'leg', 'face', 'nose', 'eye', 'ear', 'mouth', 'throat', 'chest', 'back', 'abdomen', 'groin', 
+        'hand', 'foot', 'finger', 'toe', 'brain', 'heart', 'lung', 'liver', 'stomach', 'kidney', 'bladder', 'spine', 
+        'muscle', 'bone', 'joint', 'skin', 'hair', 'nail', 'vein', 'artery', 'gland', 'sneeze', 'terrible', 'body', 'frequent', 'sharp', 'body',
+]
+
+
+def is_health_related_query(prompt: str) -> bool:
+    if prompt is None:
+        return False
+    prompt_lower = prompt.lower()
+    return any(keyword in prompt_lower for keyword in health_keywords)
 
 
 def load_asr_model(model_dir: Path) -> None:
@@ -160,33 +201,39 @@ def generate_initial_greeting() -> str:
 
 
 def chat(history: List[List[str]]) -> List[List[str]]:
-    """
-    Chat function. It generates response based on a prompt
+    if not history:
+        return history  # Handle empty history gracefully
 
-    Params:
-        history: history of the messages (conversation) so far
-    Returns:
-        History with the latest chat's response (yields partial response)
-    """
-    # convert list of message to conversation string
-    conversation = get_conversation(history)
+    user_prompt = history[-1][0] if history[-1] else ""
 
-    # use streamer to show response word by word
-    chat_streamer = TextIteratorStreamer(chat_tokenizer, skip_prompt=True, Timeout=5)
-
-    # generate response for the conversation in a new thread to deliver response token by token
-    thread = Thread(target=respond, args=[conversation, chat_streamer])
-    thread.start()
-
-    # get token by token and merge to the final response
-    history[-1][1] = ""
-    for partial_text in chat_streamer:
-        history[-1][1] += partial_text
-        # "return" partial response
+    if not is_health_related_query(user_prompt):
+        # Use the NON_HEALTH_QUERY_PROMPT to incorporate the user's query into a more guided response
+        non_health_context = NON_HEALTH_QUERY_PROMPT + f" '{user_prompt}'"
+        # Format the conversation for the LLM, adjusting it to include the new context
+        conversation_formatted = get_conversation(history[:-1] + [[non_health_context, None]])
+        # Generate a response using the formatted conversation context
+        non_health_response = respond(conversation_formatted).strip().split('\n')[0]
+        # Update the latest entry in history with the generated response
+        history[-1][1] = non_health_response
         yield history
+    else:
+        # Handle health-related queries using the model and streaming
+        conversation = get_conversation(history)
+        chat_streamer = TextIteratorStreamer(chat_tokenizer, skip_prompt=True, timeout=5)
+        thread = Thread(target=lambda: respond(conversation, chat_streamer))
+        thread.start()
 
-    # wait for the thread
-    thread.join()
+        try:
+            for partial_text in chat_streamer:
+                if history[-1][1] is None:
+                    history[-1][1] = partial_text
+                else:
+                    history[-1][1] += partial_text
+                yield history
+        finally:
+            thread.join()
+
+    return history
 
 
 def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> List[List[str]]:
@@ -222,16 +269,31 @@ def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> 
 
 def summarize(conversation: List) -> str:
     """
-    Summarize the patient case
+    Generate a summary of the patient's case based on the conversation so far,
+    focusing specifically on the patient's inputs about symptoms.
 
-    Params
+    Params:
         conversation: history of the messages so far
     Returns:
-        Summary
+        A generator yielding a bullet-point summary of the patient's case
     """
-    conversation.append([SUMMARIZE_THE_CUSTOMER, None])
-    for partial_summary in chat(conversation):
-        yield partial_summary[-1][1].split("</s>")[0]
+    # Extract patient inputs from the conversation
+    patient_inputs = "\n- ".join(msg[0] for msg in conversation if msg[0] and 'assistant' not in msg[0])
+
+    # Create a summarization prompt that includes both the directive and the patient's inputs
+    summarization_prompt = f"{SUMMARIZE_THE_CUSTOMER}\n\nPatient symptoms:\n- {patient_inputs}"
+
+    # Append this as a new system message to guide the summarization
+    conversation.append([summarization_prompt, None])
+
+    # Use the chat function to process this new conversation entry, now including the summary instruction
+    summary_generator = chat(conversation)
+
+    # Yield the summary parts as they are generated
+    for partial_summary in summary_generator:
+        # Split at sentence end for better readability, if needed
+        if partial_summary[-1][1]:
+            yield partial_summary[-1][1].split("</s>")[0]
 
 
 def create_UI(initial_message: str) -> gr.Blocks:
