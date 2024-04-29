@@ -73,7 +73,7 @@ This solution implements automated reading of industrial meters, using cameras a
 This solution is designed to help automate checkout for retail businesses more effectively, by analyzing video streams and detecting and tracking interactions with retail products.
 
 ### 🗣️ Custom AI Assistant
-[![custom-ai-assistant](https://github.com/openvinotoolkit/openvino_notebooks/assets/138901786/1a88876a-16d2-45b3-9d28-3b90600dd4da)](custom_ai_assistant)
+[![custom-ai-assistant](https://github.com/openvinotoolkit/openvino_notebooks/assets/138901786/e0c2f2db-c213-4071-970b-09ebc1eea710)](custom_ai_assistant)
 
 | [Custom AI Assistant](custom_ai_assistant) |  |
 |----------------------------------------------------| - |
