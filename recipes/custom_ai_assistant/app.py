@@ -97,9 +97,9 @@ health_keywords = [
     'panic attacks', 'sleep problems', 'snoring', 'sleep apnea', 'accident', 'hurt', 'swollen', 'inflammation',
     'infection', 'discharge', 'itch', 'burning', 'discomfort', 'sensitivity', 'soreness', 'dryness', 'odor', 'taste',
     'vision', 'hearing', 'balance', 'coordination', 'appetite', 'thirst', 'temperature', 'fatigue', 'energy', 'mood',
-    'concentration', 'memory', 'alertness', 'awareness', 'frequent', 'head', 'arm', 'leg', 'face', 'nose', 'eye', 'ear', 'mouth', 'throat', 'chest', 'back', 'abdomen', 'groin', 
-        'hand', 'foot', 'finger', 'toe', 'brain', 'heart', 'lung', 'liver', 'stomach', 'kidney', 'bladder', 'spine', 
-        'muscle', 'bone', 'joint', 'skin', 'hair', 'nail', 'vein', 'artery', 'gland', 'sneeze', 'terrible', 'body', 'frequent', 'sharp', 'body',
+    'concentration', 'memory', 'alertness', 'awareness', 'frequent', 'head', 'arm', 'leg', 'face', 'nose', 'eye', 'ear', 'mouth', 'throat', 'chest', 'back', 'abdomen', 'groin',
+    'hand', 'foot', 'finger', 'toe', 'brain', 'heart', 'lung', 'liver', 'stomach', 'kidney', 'bladder', 'spine',
+    'muscle', 'bone', 'joint', 'skin', 'hair', 'nail', 'vein', 'artery', 'gland', 'sneeze', 'terrible', 'body', 'frequent', 'sharp', 'body',
 ]
 
 
