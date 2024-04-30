@@ -65,4 +65,3 @@ notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
 notebooks/stable-video-diffusion/stable-video-diffusion.ipynb
 notebooks/llm-agent-langchain/llm-agent-langchain.ipynb
 notebooks/hello-npu/hello-npu.ipynb
-notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb
