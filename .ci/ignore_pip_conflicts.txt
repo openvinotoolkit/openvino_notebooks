@@ -30,3 +30,4 @@ notebooks/whisper-subtitles-generation/whisper-convert.ipynb # pytube
 notebooks/grounded-segment-anything/grounded-segment-anything.ipynb # deprecated installer
 notebooks/vision-paddlegan-anime/vision-paddlegan-anime.ipynb # old scipy
 notebooks/vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb # old scipy and scikit-image
+notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.ipynb
