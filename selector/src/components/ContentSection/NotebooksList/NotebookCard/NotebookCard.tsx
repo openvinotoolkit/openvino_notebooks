@@ -111,14 +111,16 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
                   href={item.links.binder}
                 ></Button>
               )}
-              <Button
-                ref={statusButtonRef}
-                as="button"
-                variant="secondary"
-                size="m"
-                text={`${isStatusVisible ? 'Hide' : 'Show'} Status`}
-                onClick={() => showStatus(!isStatusVisible)}
-              ></Button>
+              {!isEmbedded && (
+                <Button
+                  ref={statusButtonRef}
+                  as="button"
+                  variant="secondary"
+                  size="m"
+                  text={`${isStatusVisible ? 'Hide' : 'Show'} Status`}
+                  onClick={() => showStatus(!isStatusVisible)}
+                ></Button>
+              )}
             </div>
           </div>
         </div>
