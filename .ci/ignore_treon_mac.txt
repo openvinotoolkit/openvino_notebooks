@@ -4,8 +4,6 @@ model-server
 quantizing-model-with-accuracy-control
 big-transfer-quantization
 openvino-tokenizers
-segmenter-semantic-segmentation
-attention-center
 cross-lingual-books-alignment
 stable-diffusion-text-to-image
 whisper-subtitles-generation
@@ -16,7 +14,6 @@ encodec-audio-compression
 controlnet-stable-diffusion
 stable-diffusion-v2
 segment-anything
-deepfloyd-if
 image-bind
 dolly-2-instruction-following
 riffusion-text-to-music
@@ -26,13 +23,11 @@ stable-diffusion-xl
 oneformer-segmentation
 music-generation
 tiny-sd-image-generation
-fastcomposer-image-generation
 zeroscope-text2video
 llm-chatbot
 mms-massively-multilingual-speech
 bark-text-to-audio
 llava-multimodal-chatbot
-blip-diffusion-subject-generation
 decidiffusion-image-generation
 pix2struct-docvqa
 fast-segment-anything

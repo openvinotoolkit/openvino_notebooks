@@ -1,4 +1,4 @@
-# Image generation with Stable Diffusion XL and Segmind Stable Diffusion 1B (SSD-1B) and OpenVINO
+# Image generation with Stable Diffusion XL and OpenVINO
 
 ## Stable Diffusion XL
 
@@ -34,20 +34,6 @@ The tutorial consists of the following steps:
 - Run Image2Image generation pipeline using Stable Diffusion XL base
 - Download and convert the Stable Diffusion XL Refiner model from a public source using the [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
 - Run 2-stages Stable Diffusion XL pipeline
-
-
-## Segmind Stable Diffusion 1B (SSD-1B)
-
-The [Segmind Stable Diffusion Model (SSD-1B)](https://github.com/segmind/SSD-1B?ref=blog.segmind.com) is a distilled 50% smaller version of the Stable Diffusion XL (SDXL), offering a 60% speedup while maintaining high-quality text-to-image generation capabilities. It has been trained on diverse datasets, including Grit and Midjourney scrape data, to enhance its ability to create a wide range of visual content based on textual prompts.
-
-This model employs a knowledge distillation strategy, where it leverages the teachings of several expert models in succession, including SDXL, ZavyChromaXL, and JuggernautXL, to combine their strengths and produce impressive visual outputs.
-
-### Image Comparison (SDXL-1.0 vs SSD-1B)
-![image](https://user-images.githubusercontent.com/82945616/277419571-a5583e8a-6a05-4680-a540-f80502feed0b.png)
-In this tutorial, we consider how to run the SSD-1B model using OpenVINO.
-We will use a pre-trained model from the Hugging Face Diffusers library. To simplify the user experience, the Hugging Face Optimum Intel library is used to convert the models to OpenVINO™ IR format.
-
-Then we will consider [LCM distilled version of segmind/SSD-1B](https://huggingface.co/latent-consistency/lcm-ssd-1b) that allows to reduce the number of inference steps to only between 2 - 8 steps.
 
 
 ## Segmind-VegaRT
