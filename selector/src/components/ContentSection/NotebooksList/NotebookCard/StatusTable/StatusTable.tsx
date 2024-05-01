@@ -74,5 +74,17 @@ export const StatusTable = () => (
       <div className="cell">{getStatusIcon('SKIPPED')}</div>
       <div className="cell">{getStatusIcon('FAILED')}</div>
     </div>
+    <div className="devices-header">
+      <div className="cell">Devices</div>
+    </div>
+    <div className="devices">
+      <div className="cell">CPU</div>
+    </div>
+    <div className="devices-statuses">
+      <div className="cell">{getStatusIcon('SUCCESS')}</div>
+      <div className="cell">{getStatusIcon('SUCCESS')}</div>
+      <div className="cell">{getStatusIcon('SUCCESS')}</div>
+      <div className="cell">{getStatusIcon('SUCCESS')}</div>
+    </div>
   </div>
 );
