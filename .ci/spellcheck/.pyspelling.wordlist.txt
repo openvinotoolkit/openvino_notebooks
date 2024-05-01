@@ -705,6 +705,7 @@ SRT
 SSD
 SSDLite
 sst
+StableCascade
 StableDiffusionInpaintPipeline
 StableDiffusionPipeline
 StableDiffusionImg
