@@ -1,8 +1,5 @@
-notebooks/performance-tricks/latency-tricks.ipynb  # ultralytics<=8.0.178
-notebooks/performance-tricks/throughput-tricks.ipynb  # ultralytics<=8.0.178
 notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb  # ultralytics==8.0.43
 notebooks/detectron2-to-openvino/detectron2-to-openvino.ipynb # detectron2@https://github.com/facebookresearch/detectron2
-notebooks/segmenter-semantic-segmentation/segmenter-semantic-segmentation.ipynb # timm==0.4.12, install Segmenter requirements
 notebooks/speech-to-text/speech-to-text.ipynb # numpy<1.24
 notebooks/pyannote-speaker-diarization/pyannote-speaker-diarization.ipynb  # pyannote-audio@https://github.com/eaidova/pyannote-audio
 notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb  # ultralytics==8.0.43
@@ -22,9 +19,6 @@ notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb 
 notebooks/mobileclip-video-search/mobileclip-video-search.ipynb # install requirements.txt inside
 notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb # requires python >=3.9
 notebooks/triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb # requires torch that installing in the notebook
-notebooks/ct-segmentation-quantize/data-preparation-ct-scan.ipynb # not executed in validation
-notebooks/ct-segmentation-quantize/pytorch-monai-training.ipynb # outdated required version, lead to long execution
-notebooks/depth-estimation-videpth/depth-estimation-videpth.ipynb # outdated required version, lead to long execution
 notebooks/animate-anyone/animate-anyone.ipynb # diffusers<=0.24
 notebooks/whisper-subtitles-generation/whisper-convert.ipynb # pytube
 notebooks/grounded-segment-anything/grounded-segment-anything.ipynb # deprecated installer
