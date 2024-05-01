@@ -132,6 +132,7 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
             if not found:
                 print(f"No replacements found for {notebookfile}")
             disable_gradio_debug(nb, notebookfile)
+            disable_skip_ext(nb, notebookfile)
             nb_without_out, _ = output_remover.from_notebook_node(nb)
             with notebookfile.with_name(f"test_{notebookfile.name}").open("w", encoding="utf-8") as out_file:
                 out_file.write(nb_without_out)
