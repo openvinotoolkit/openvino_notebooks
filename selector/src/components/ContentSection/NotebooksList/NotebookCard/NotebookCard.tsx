@@ -4,12 +4,15 @@ import BinderIcon from '@assets/images/binder.svg?react';
 import ColabIcon from '@assets/images/colab.svg?react';
 import GitHubIcon from '@assets/images/github.svg?react';
 import OpenvinoLogo from '@assets/images/openvino-logo-colored.svg?react';
+import React, { CSSProperties, useRef, useState } from 'react';
 
 import { Button } from '@/components/shared/Button/Button';
 import { Tag } from '@/components/shared/Tag/Tag';
 import { isEmbedded } from '@/shared/iframe-detector';
 import { INotebookMetadata } from '@/shared/notebook-metadata';
 import { CATEGORIES } from '@/shared/notebook-tags';
+
+import { StatusTable } from './StatusTable/StatusTable';
 
 const htmlToText = (value: string): string => {
   const div = document.createElement('div');
@@ -22,6 +25,15 @@ const openNotebookInDocs = ({ links }: INotebookMetadata) => {
     return;
   }
   window.open(links.docs, isEmbedded ? '_parent' : '_blank');
+};
+
+const getPointerLeftOffset = (buttonRef: React.RefObject<HTMLButtonElement>): string => {
+  if (!buttonRef.current) {
+    return '1rem';
+  }
+  const { offsetLeft, offsetWidth } = buttonRef.current;
+  const pointerSize = 10;
+  return `${offsetLeft + offsetWidth / 2 - pointerSize}px`;
 };
 
 const sparkClassNames = {
@@ -39,6 +51,8 @@ type NotebookCardProps = {
 };
 
 export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX.Element => {
+  const [isStatusVisible, showStatus] = useState(false);
+  const statusButtonRef = useRef<HTMLButtonElement>(null);
   const { categories, tasks } = item.tags;
   const descriptionTags = [...categories.filter((v) => v !== CATEGORIES.AI_TRENDS), ...tasks];
   return (
@@ -97,10 +111,30 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
                   href={item.links.binder}
                 ></Button>
               )}
+              <Button
+                ref={statusButtonRef}
+                as="button"
+                variant="secondary"
+                size="m"
+                text={`${isStatusVisible ? 'Hide' : 'Show'} Status`}
+                onClick={() => showStatus(!isStatusVisible)}
+              ></Button>
             </div>
           </div>
         </div>
       </div>
+      {isStatusVisible && (
+        <div
+          className="card-footer-panel"
+          style={
+            {
+              '--pointer-left-offset': getPointerLeftOffset(statusButtonRef),
+            } as CSSProperties
+          }
+        >
+          <StatusTable />
+        </div>
+      )}
     </div>
   );
 };

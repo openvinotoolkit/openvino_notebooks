@@ -4,6 +4,8 @@
 .spark-card-horizontal {
   min-inline-size: 0;
   width: 100%;
+  z-index: auto;
+  flex-direction: column;
 
   &.clickable {
     cursor: pointer;
@@ -84,8 +86,9 @@
     .spark-card-horizontal-title {
       max-inline-size: 100%;
       white-space: normal;
+      overflow: visible;
 
-      .spark-tag {
+      & > :not(:last-child) {
         margin-right: 0.5rem;
       }
     }
@@ -110,5 +113,38 @@
         gap: 0.5rem;
       }
     }
+  }
+}
+
+.card-footer-panel {
+  --pointer-size: 10px;
+
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-top: 1px solid var(--spark-color-carbon-tint2);
+  background-color: var(--spark-color-theme-light-gray75);
+  padding: 1rem;
+
+  &:before,
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 100%;
+    width: 0;
+    height: 0;
+  }
+
+  &:before {
+    left: calc(var(--pointer-left-offset) - 1px);
+    border: var(--pointer-size) solid transparent;
+    border-bottom-color: var(--spark-color-carbon-tint2);
+  }
+
+  &:after {
+    left: var(--pointer-left-offset);
+    border: calc(var(--pointer-size) - 2px) solid transparent;
+    border-bottom-color: var(--spark-color-theme-light-gray75);
   }
 }
