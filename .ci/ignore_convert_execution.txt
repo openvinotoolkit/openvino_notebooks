@@ -25,8 +25,6 @@ notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo-comparison.ipynb
 notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.ipynb
 notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image-demo.ipynb
 notebooks/segment-anything/segment-anything.ipynb
-notebooks/deepfloyd-if/deep-floyd-if-convert.ipynb
-notebooks/deepfloyd-if/deep-floyd-if-optimize.ipynb
 notebooks/image-bind/image-bind.ipynb
 notebooks/dolly-2-instruction-following/dolly-2-instruction-following.ipynb
 notebooks/riffusion-text-to-music/riffusion-text-to-music.ipynb
@@ -36,7 +34,6 @@ notebooks/stable-diffusion-xl/segmind-vegart.ipynb
 notebooks/stable-diffusion-xl/ssd-b1.ipynb
 notebooks/oneformer-segmentation/oneformer-segmentation.ipynb
 notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb
-notebooks/fastcomposer-image-generation/fastcomposer-image-generation.ipynb
 notebooks/zeroscope-text2video/zeroscope-text2video.ipynb
 notebooks/llm-chatbot/llm-chatbot.ipynb
 notebooks/llm-rag-langchain/llm-rag-langchain.ipynb
@@ -44,7 +41,6 @@ notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ip
 notebooks/bark-text-to-audio/bark-text-to-audio.ipynb
 notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb
 notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb
-notebooks/blip-diffusion-subject-generation/blip-diffusion-subject-generation.ipynb
 notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb
 notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb
 notebooks/softvc-voice-conversion/softvc-voice-conversion.ipynb

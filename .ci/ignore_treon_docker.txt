@@ -3,8 +3,6 @@ gpu-device
 model-server
 quantizing-model-with-accuracy-control
 big-transfer-quantization
-segmenter-semantic-segmentation
-attention-center
 cross-lingual-books-alignment
 stable-diffusion-text-to-image
 whisper-subtitles-generation
@@ -15,12 +13,10 @@ encodec-audio-compression
 controlnet-stable-diffusion
 stable-diffusion-v2
 segment-anything
-deepfloyd-if
 image-bind
 dolly-2-instruction-following
 riffusion-text-to-music
 freevc-voice-conversion
-code-language-id
 stable-diffusion-xl
 oneformer-segmentation
 music-generation
@@ -31,7 +27,6 @@ llm-chatbot
 mms-massively-multilingual-speech
 bark-text-to-audio
 llava-multimodal-chatbot
-blip-diffusion-subject-generation
 decidiffusion-image-generation
 pix2struct-docvqa
 fast-segment-anything
@@ -63,3 +58,4 @@ llm-rag-langchain
 stable-video-diffusion
 llm-agent-langchain
 hello-npu
+stable-cascade-image-generation
