@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "037400e3fcb3707dd677922a4f9aadcaa6f83c4d56197233c6317da5101d9c36"
+            "sha256": "1df74a8a07898bb82047fbe00360ad00a70ed96a68275e9b34462a6823bd0413"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -2379,10 +2379,11 @@
         "nncf": {
             "hashes": [
                 "sha256:13d92cdda7f326af1ae1e4a31e4e5778c0b1712474c4b58a46d8bbe3b91ff3a7",
-                "sha256:aedd6f35038297218f23c2f799c0f3d29ac078126d65b79a9fdca1e5c49ecb49"
+                "sha256:aedd6f35038297218f23c2f799c0f3d29ac078126d65b79a9fdca1e5c49ecb49",
+                "sha256:c621727330543908f2c024d858d5d0383a3586bf3311b20cb9ce5d2c91190634"
             ],
             "index": "pypi",
-            "version": "==2.9.0"
+            "version": "==2.10.0"
         },
         "notebook": {
             "hashes": [
@@ -2547,15 +2548,17 @@
                 "sha256:dfd4cf70ce0c16ede7e43903167db1c6e469987d2cc980339f3e79f2ce786dd4",
                 "sha256:e1b59ce212697eedd09b042aff6a5cfde6851ed2cfea1e9348d152b847776574",
                 "sha256:1f4d0bb3ae9e763d5fe983e2396d798c7392dec10eb4b06d9e82ebf94a4cea97",
-                "sha256:39f6b2c099fedc9fa99fdddf7305f85aefe9addbf9fe406f1a6d4bf01d37a13f"
+                "sha256:39f6b2c099fedc9fa99fdddf7305f85aefe9addbf9fe406f1a6d4bf01d37a13f",
+                "sha256:72db34469075492aeae2657bfc8b4edd5e72fba8fac1ba0a63e1c5c54d596e4d",
+                "sha256:86d4de1686a23ce9fa5d7a40409831700b028add8fc29ec40e952caf8c2a1440"
             ],
-            "version": "==2024.0.0"
+            "version": "==2024.1.0"
         },
         "openvino-dev": {
             "hashes": [
-                "sha256:bf27ba90359d66997c51f91f49e99df5b942d474c3075723b13ce76e358ff475"
+                "sha256:1be43bb1390e0f73b5cc7adab8eb46cefedba858f1d2c706177a71f4703d00b5"
             ],
-            "version": "==2024.0.0"
+            "version": "==2024.1.0"
         },
         "openvino-telemetry": {
             "hashes": [
@@ -4029,6 +4032,13 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==1.12"
+        },
+        "tabulate": {
+            "hashes": [
+                "sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f",
+                "sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c"
+            ],
+            "version": "==0.9.0"
         },
         "tensorboard": {
             "hashes": [

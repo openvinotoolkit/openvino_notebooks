@@ -1,7 +1,9 @@
 import sys
+import time
 import os
 import subprocess  # nosec - disable B404:import-subprocess check
 import csv
+import json
 import shutil
 import platform
 from pathlib import Path
@@ -122,7 +124,7 @@ def clean_test_artifacts(before_test_files, after_test_files):
             shutil.rmtree(file_path, ignore_errors=True)
 
 
-def run_test(notebook_path, root, timeout=7200, keep_artifacts=False):
+def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir="."):
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path)
     print(f"RUN {notebook_path.relative_to(root)}", flush=True)
     retcodes = []
@@ -131,7 +133,19 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False):
         existing_files = sorted(Path(".").glob("test_*.ipynb"))
 
         for notebook_name in existing_files:
+            print("Packages before notebook run")
+            reqs = subprocess.check_output(
+                [sys.executable, "-m", "pip", "freeze"],
+                shell=(platform.system() == "Windows"),
+            )
+            reqs_before_file = report_dir / (notebook_name.stem + "_env_before.txt")
+            with reqs_before_file.open("wb") as f:
+                f.write(reqs)
+            with reqs_before_file.open("r") as f:
+                print(f.read())
+
             main_command = [sys.executable, "-m", "treon", str(notebook_name)]
+            start = time.perf_counter()
             try:
                 retcode = subprocess.run(
                     main_command,
@@ -140,10 +154,21 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False):
                 ).returncode
             except subprocess.TimeoutExpired:
                 retcode = -42
-            retcodes.append((str(notebook_name), retcode))
+            duration = time.perf_counter() - start
+            retcodes.append((str(notebook_name), retcode, duration))
 
         if not keep_artifacts:
             clean_test_artifacts(existing_files, sorted(Path(".").iterdir()))
+        print("Packages after notebook run")
+        reqs = subprocess.check_output(
+            [sys.executable, "-m", "pip", "freeze"],
+            shell=(platform.system() == "Windows"),
+        )
+        reqs_after_file = report_dir / (notebook_name.stem + "_env_after.txt")
+        with reqs_after_file.open("wb") as f:
+            f.write(reqs)
+        with reqs_after_file.open("r") as f:
+            print(f.read())
     return retcodes
 
 
@@ -165,7 +190,7 @@ def finalize_status(failed_notebooks, timeout_notebooks, test_plan, report_dir, 
             }
         )
     with (report_dir / "test_report.csv").open("w") as f:
-        writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path"])
+        writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
         writer.writeheader()
         writer.writerows(test_report)
     return return_status
@@ -183,6 +208,13 @@ class cd:
 
     def __exit__(self, etype, value, traceback):
         os.chdir(self.saved_path)
+
+
+def write_single_notebook_report(notebook_name, status, duration, saving_dir):
+    report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
+    report = {"notebook_name": notebook_name.replace("test_", ""), "status": status, "duration": duration}
+    with report_file.open("w") as f:
+        json.dump(report, f)
 
 
 def main():
@@ -206,20 +238,28 @@ def main():
     for notebook, report in test_plan.items():
         if report["status"] == "SKIPPED":
             continue
-        statuses = run_test(report["path"], root, args.timeout, keep_artifacts)
+        statuses = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute())
+        timing = 0
         if not statuses:
             print(f"{str(notebook)}: No testing notebooks found")
             report["status"] = "EMPTY"
-        for subnotebook, status in statuses:
+            report["duration"] = timing
+        for subnotebook, status, duration in statuses:
             if status:
-                report["status"] = "TIMEOUT" if status == -42 else "FAILED"
+                status_code = "TIMEOUT" if status == -42 else "FAILED"
+                report["status"] = status_code
             else:
+                status_code = "SUCCESS"
                 report["status"] = "SUCCESS" if not report["status"] in ["TIMEOUT", "FAILED"] else report["status"]
             if status:
                 if status == -42:
                     timeout_notebooks.append(str(subnotebook))
                 else:
                     failed_notebooks.append(str(subnotebook))
+            timing += duration
+            report["duration"] = timing
+            if args.collect_reports:
+                write_single_notebook_report(subnotebook, status, duration, reports_dir)
             if args.early_stop:
                 break
     exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)

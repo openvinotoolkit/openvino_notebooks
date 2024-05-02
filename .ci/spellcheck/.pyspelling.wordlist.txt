@@ -19,6 +19,7 @@ aMUSEd
 analytics
 AnimateAnyone
 AnimeGAN
+AnimateLCM
 Antelopev
 api
 APIs
@@ -221,6 +222,7 @@ FC
 feedforward
 FFmpeg
 FIL
+FEIL
 finetuned
 finetuning
 FLAC
@@ -314,6 +316,7 @@ internlm
 invertible
 intervaling
 im
+img
 ip
 IRs
 iteratively
@@ -467,6 +470,8 @@ nsfw
 NSFW
 numpy
 NumPy
+NPU
+NPUs
 OASST
 OBB
 obb
@@ -700,6 +705,7 @@ SRT
 SSD
 SSDLite
 sst
+StableCascade
 StableDiffusionInpaintPipeline
 StableDiffusionPipeline
 StableDiffusionImg
@@ -727,6 +733,7 @@ superset
 Suraj
 surya
 svc
+SVD
 SVTR
 Swin
 SwiGLU
@@ -778,6 +785,7 @@ Uncheck
 unCLIP
 uncomment
 uncompressing
+UMD
 UNet
 UNets
 Unet
@@ -840,6 +848,7 @@ Würstchen
 XCode
 Xeon
 xl
+xt
 xvector
 xxl
 XYWH

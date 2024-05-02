@@ -1,24 +1,12 @@
 # Quantize a Segmentation Model and Show Live Inference
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eaidova/openvino_notebooks_binder.git/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fopenvinotoolkit%252Fopenvino_notebooks%26urlpath%3Dtree%252Fopenvino_notebooks%252Fnotebooks%2Fct-segmentation-quantize%2Fct-scan-live-inference.ipynb)
-
 <p align="center">
     <img src="https://user-images.githubusercontent.com/77325899/154279555-aaa47111-c976-4e77-8d23-aac96f45872f.gif"/>
 </p>
 
 ## Notebook Contents
 
-This folder contains five notebooks that show how to train,
-optimize, quantize and show live inference on a [MONAI](https://monai.io/) segmentation model with
-[PyTorch Lightning](https://lightning.ai/) and OpenVINO:
-
-1\. [Data Preparation for 2D Segmentation of 3D Medical Data](data-preparation-ct-scan.ipynb)
-
-2\. [Train a 2D-UNet Medical Imaging Model with PyTorch Lightning](pytorch-monai-training.ipynb)
-
-3\. [Convert and Quantize a UNet Model and Show Live Inference using NNCF](ct-segmentation-quantize-nncf.ipynb)
-
-4\. [Live Inference and Benchmark CT-scan Data with OpenVINO](ct-scan-live-inference.ipynb)
+This folder contains notebook that show how to quantize and show live inference on a [MONAI](https://monai.io/) segmentation model with OpenVINO,
 
 NNCF performs quantization within the PyTorch framework. There is a pre-trained model and a subset of the dataset provided for the quantization notebook,
 so it is not required to run the data preparation and training notebooks before running the quantization tutorial.

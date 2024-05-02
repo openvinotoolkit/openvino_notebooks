@@ -5,10 +5,7 @@ classification, pixelwise semantic segmentation, object detection, instance segm
 video classification, and optical flow.
 
 # Contents:
-Throughout this notebook we will learn how to convert these pretrained model to OpenVINO. Here are two examples:
-
-1. [ConvNext classification model](https://pytorch.org/vision/stable/models/convnext.html).
-2. [LRASPP MobileNetV3 semantic segmentation model](https://pytorch.org/vision/stable/models/lraspp.html). 
+Throughout this notebook we will learn how to convert these pretrained model to OpenVINO. 
 
 # Installation Instructions
 
