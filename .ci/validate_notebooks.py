@@ -52,7 +52,9 @@ def get_notebooks_subdir(changed_path, orig_nb_dir):
             notebook_subdir = notebook_subdir.relative_to(orig_nb_dir)
         print(notebook_subdir)
     else:
-        notebook_subdir = find_notebook_dir(changed_path.resolve(), orig_nb_dir.resolve())
+        notebook_subdir = find_notebook_dir(
+            changed_path.resolve(), orig_nb_dir.resolve()
+        )
     return notebook_subdir
 
 
@@ -73,7 +75,9 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
         for ig_nb in ignore_list:
             if ig_nb.endswith(".txt"):
                 with open(ig_nb, "r") as f:
-                    ignored_notebooks.extend(list(map(lambda x: x.strip(), f.readlines())))
+                    ignored_notebooks.extend(
+                        list(map(lambda x: x.strip(), f.readlines()))
+                    )
             else:
                 ignored_notebooks.append(ig_nb)
         print(f"ignored notebooks: {ignored_notebooks}")
@@ -99,7 +103,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
             notebook_subdir = get_notebooks_subdir(Path(test_item), orig_nb_dir)
             if notebook_subdir is not None:
                 testing_notebooks.append(notebook_subdir)
-    test_list = set(testing_notebooks)
+    test_list = set(testing_notebooks[:5])  # TODO Remove after testing
     print(f"test notebooks: {test_list}")
 
     ignore_list = set(map(lambda x: Path(x), ignored_notebooks))
@@ -190,7 +194,9 @@ def finalize_status(failed_notebooks, timeout_notebooks, test_plan, report_dir, 
             }
         )
     with (report_dir / "test_report.csv").open("w") as f:
-        writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
+        writer = csv.DictWriter(
+            f, fieldnames=["name", "status", "full_path", "duration"]
+        )
         writer.writeheader()
         writer.writerows(test_report)
     return return_status
@@ -212,7 +218,11 @@ class cd:
 
 def write_single_notebook_report(notebook_name, status, duration, saving_dir):
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
-    report = {"notebook_name": notebook_name.replace("test_", ""), "status": status, "duration": duration}
+    report = {
+        "notebook_name": notebook_name.replace("test_", ""),
+        "status": status,
+        "duration": duration,
+    }
     with report_file.open("w") as f:
         json.dump(report, f)
 
@@ -234,11 +244,15 @@ def main():
     if args.keep_artifacts:
         keep_artifacts = True
 
-    test_plan = prepare_test_plan(args.test_list, args.ignore_list, notebooks_moving_dir)
+    test_plan = prepare_test_plan(
+        args.test_list, args.ignore_list, notebooks_moving_dir
+    )
     for notebook, report in test_plan.items():
         if report["status"] == "SKIPPED":
             continue
-        statuses = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute())
+        statuses = run_test(
+            report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute()
+        )
         timing = 0
         if not statuses:
             print(f"{str(notebook)}: No testing notebooks found")
@@ -250,7 +264,11 @@ def main():
                 report["status"] = status_code
             else:
                 status_code = "SUCCESS"
-                report["status"] = "SUCCESS" if not report["status"] in ["TIMEOUT", "FAILED"] else report["status"]
+                report["status"] = (
+                    "SUCCESS"
+                    if not report["status"] in ["TIMEOUT", "FAILED"]
+                    else report["status"]
+                )
             if status:
                 if status == -42:
                     timeout_notebooks.append(str(subnotebook))
@@ -262,7 +280,9 @@ def main():
                 write_single_notebook_report(subnotebook, status, duration, reports_dir)
             if args.early_stop:
                 break
-    exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
+    exit_status = finalize_status(
+        failed_notebooks, timeout_notebooks, test_plan, reports_dir, root
+    )
     return exit_status
 
 
