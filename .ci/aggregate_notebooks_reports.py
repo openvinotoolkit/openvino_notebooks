@@ -11,8 +11,8 @@ class ValidationMatrix:
     # TODO Uncomment after testing
     # os = ("ubuntu-20.04", "ubuntu-22.04", "windows-2019", "macos-12")
     # python = ("3.8", "3.9", "3.10")
-    os = "ubuntu-20.04"
-    python = "3.8"
+    os = ("ubuntu-20.04",)
+    python = ("3.8",)
 
     @classmethod
     def values(cls):
