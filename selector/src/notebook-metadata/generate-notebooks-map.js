@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, resolve } from 'path';
 
 import { createBuildChecksumFile } from '../shared/build-checksum.js';
-import { fetchNotebooksStatusesFile, NOTEBOOKS_STATUS_FILE_NAME } from '../shared/fetch-notebooks-status.js';
+import { fetchNotebooksStatusFile, NOTEBOOKS_STATUS_FILE_NAME } from '../shared/fetch-notebooks-status.js';
 import { NotebookMetadataValidationError } from './notebook-metadata-validator.js';
 
 export const NOTEBOOKS_METADATA_FILE_NAME = 'notebooks-metadata-map.json';
@@ -68,7 +68,7 @@ export const generateNotebooksMapFilePlugin = () => {
     async closeBundle() {
       if (config.command === 'build') {
         await generateNotebooksMapFile(distPath);
-        await fetchNotebooksStatusesFile(distPath);
+        await fetchNotebooksStatusFile(distPath);
         await createBuildChecksumFile(distPath);
       }
     },
@@ -88,7 +88,7 @@ export const generateNotebooksMapFilePlugin = () => {
         );
       } else {
         // TODO Consider generating mock file
-        await fetchNotebooksStatusesFile(distPath);
+        await fetchNotebooksStatusFile(distPath);
       }
 
       devServer.middlewares.use(...getFileMiddleware(NOTEBOOKS_METADATA_FILE_NAME, config.base, distPath));

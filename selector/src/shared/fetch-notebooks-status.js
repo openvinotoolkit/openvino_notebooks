@@ -14,7 +14,7 @@ export const NOTEBOOKS_STATUS_FILE_NAME = 'notebooks-status-map.json';
 /**
  * @returns {string}
  */
-function getLatestNotebooksStatusesArtifactUrl() {
+function getLatestNotebooksStatusArtifactUrl() {
   const artifactsResponse = execSync(
     // TODO Uncomment after testing
     // `curl -L https://api.github.com/repos/openvinotoolkit/openvino_notebooks/actions/artifacts?per_page=1&name=${NOTEBOOKS_STATUS_FILE_NAME}`
@@ -32,14 +32,14 @@ function getLatestNotebooksStatusesArtifactUrl() {
  * @param {string} distPath
  * @returns {Promise<void>}
  */
-export async function fetchNotebooksStatusesFile(distPath) {
+export async function fetchNotebooksStatusFile(distPath) {
   const { GITHUB_TOKEN } = process.env;
   if (!GITHUB_TOKEN) {
     throw Error(`"GITHUB_TOKEN" env varible is not set. Please provide it to fetch notebooks statuses.`);
   }
   console.info(`Fetching latest notebooks status file...`);
 
-  const artifactUrl = getLatestNotebooksStatusesArtifactUrl();
+  const artifactUrl = getLatestNotebooksStatusArtifactUrl();
   const artifactArchiveFileName = `${parse(NOTEBOOKS_STATUS_FILE_NAME).name}.zip`;
   execSync(
     `curl -H "Accept: application/vnd.github+json" -H "Authorization: token ${GITHUB_TOKEN}" -L --fail -o ${artifactArchiveFileName} "${artifactUrl}"`

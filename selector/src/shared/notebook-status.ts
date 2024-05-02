@@ -13,7 +13,7 @@ export enum ValidationStatus {
 
 export interface INotebookStatus {
   name: string;
-  statuses: {
+  status: {
     [OS in ValidatedOS]: {
       [PythonVersion in ValidatedPythonVersion]: ValidationStatus | null;
     };

@@ -18,7 +18,7 @@ interface INotebooksFilters {
   limit: number;
 }
 
-type NotebooksMap = Record<string, INotebookMetadata & { status?: INotebookStatus['statuses'] }>;
+type NotebooksMap = Record<string, INotebookMetadata & { status?: INotebookStatus['status'] }>;
 
 export type NotebookItem = NotebooksMap[string];
 
@@ -97,13 +97,13 @@ class NotebooksService {
   ): NotebooksMap {
     const result = { ...metadataMap } as NotebooksMap;
     const notebooksKeys = Object.keys(result);
-    for (const [key, { statuses }] of Object.entries(statusMap)) {
+    for (const [key, { status }] of Object.entries(statusMap)) {
       // TODO Unify keys in both maps to prevent searching similar keys
       const notebookKey = notebooksKeys.find((v) => v.includes(key));
       if (!notebookKey || !result[notebookKey]) {
         continue;
       }
-      result[notebookKey].status = statuses;
+      result[notebookKey].status = status;
     }
     return result;
   }
