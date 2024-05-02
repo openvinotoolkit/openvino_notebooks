@@ -33,9 +33,10 @@ SYSTEM_CONFIGURATION = (
 GREET_THE_CUSTOMER = "Please introduce yourself and greet the patient"
 
 NON_HEALTH_QUERY_PROMPT = (
-    "You're Adrishuo, a virtual assistant and here to provide support for health-related questions. While I understand you might have other interests, "
-    "You're design is specifically tailored to discuss health concerns. If you have any health-related questions or "
-    "if there's anything else you're curious about health-wise, You're here to help."
+    "I'm here to assist with health-related questions."
+    "While I can't engage in other topics, I'm fully equipped to help with medical concerns."
+    "If you have questions about symptoms or other health issues, please let me know so I can gather your health related symptoms for further analysis with healthcare professional."
+    "Let's keep our discussion focused on your health and well-being."
 )
 
 SUMMARIZE_THE_CUSTOMER = (
@@ -104,7 +105,18 @@ health_keywords = [
 
 
 def is_health_related_query(prompt: str) -> bool:
-    if prompt is None:
+    """
+    Determines if a given prompt contains any health-related keywords.
+
+    This function checks if any keywords related to health conditions, symptoms, or related terms appear in the prompt. It is used to ensure the assistant focuses on health-related queries.
+
+    Args:
+        prompt (str): The user's input prompt to analyze.
+
+    Returns:
+        bool: True if the prompt contains health-related keywords, False otherwise.
+    """
+    if not prompt:
         return False
     prompt_lower = prompt.lower()
     return any(keyword in prompt_lower for keyword in health_keywords)
@@ -201,40 +213,53 @@ def generate_initial_greeting() -> str:
 
 
 def chat(history: List[List[str]]) -> List[List[str]]:
+    """
+    Interacts with a user by processing and responding to user inputs in a conversational format. This function uses a streamer to generate responses token by token, providing a real-time simulation of typing for a more dynamic interaction.
+
+    This function updates the conversation history with responses generated based on the user's last prompt. It utilizes a streaming mechanism to deliver each part of the response as it is generated, which can mimic real-time typing in a UI.
+
+    Args:
+        history (List[List[str]]): A list of conversation turns, where each turn is a list containing the user's prompt and the assistant's response.
+
+    Yields:
+        List[List[str]]: The updated history including the latest response from the assistant, yielding each part as it is generated.
+
+    Details:
+        The function first formats the current conversation history into a string that the model can process. It then initializes a streaming mechanism that handles the generation of the response incrementally. A separate thread is used to invoke the model's response function with the streamer, allowing the main thread to yield each part of the response as soon as it is available. The function ensures that the streaming continues until the entire response is generated, and then it terminates the thread.
+    """
     if not history:
         return history  # Handle empty history gracefully
 
     user_prompt = history[-1][0] if history[-1] else ""
 
+    # Prepare the prompt based on the query type
     if not is_health_related_query(user_prompt):
         # Use the NON_HEALTH_QUERY_PROMPT to incorporate the user's query into a more guided response
-        non_health_context = NON_HEALTH_QUERY_PROMPT + f" '{user_prompt}'"
-        # Format the conversation for the LLM, adjusting it to include the new context
-        conversation_formatted = get_conversation(history[:-1] + [[non_health_context, None]])
-        # Generate a response using the formatted conversation context
-        non_health_response = respond(conversation_formatted).strip().split('\n')[0]
-        # Update the latest entry in history with the generated response
-        history[-1][1] = non_health_response
-        yield history
+        prompt_to_use = NON_HEALTH_QUERY_PROMPT + f" '{user_prompt}'"
     else:
-        # Handle health-related queries using the model and streaming
-        conversation = get_conversation(history)
-        chat_streamer = TextIteratorStreamer(chat_tokenizer, skip_prompt=True, timeout=5)
-        thread = Thread(target=lambda: respond(conversation, chat_streamer))
-        thread.start()
+        # Use the health-related query as it is
+        prompt_to_use = user_prompt
 
-        try:
-            for partial_text in chat_streamer:
-                if history[-1][1] is None:
-                    history[-1][1] = partial_text
-                else:
-                    history[-1][1] += partial_text
-                yield history
-        finally:
-            thread.join()
+    # Format the conversation for the LLM, adjusting it to include the new context
+    conversation_formatted = get_conversation(history[:-1] + [[prompt_to_use, None]])
+
+    # Use streaming for generating responses, regardless of the query type
+    chat_streamer = TextIteratorStreamer(chat_tokenizer, skip_prompt=True, timeout=5)
+    thread = Thread(target=lambda: respond(conversation_formatted, chat_streamer))
+    thread.start()
+
+    try:
+        for partial_text in chat_streamer:
+            if history[-1][1] is None:
+                history[-1][1] = partial_text
+            else:
+                history[-1][1] += partial_text
+            yield history
+    finally:
+        thread.join()
 
     return history
-
+   
 
 def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> List[List[str]]:
     """
@@ -368,7 +393,6 @@ def run(asr_model_dir: Path, chat_model_dir: Path, public_interface: bool = Fals
     demo = create_UI(initial_message)
     # launch demo
     demo.launch(share=public_interface)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
