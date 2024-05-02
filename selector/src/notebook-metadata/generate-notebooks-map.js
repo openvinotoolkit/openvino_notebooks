@@ -4,9 +4,10 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, resolve } from 'path';
 
 import { createBuildChecksumFile } from '../shared/build-checksum.js';
+import { fetchNotebooksStatusesFile, NOTEBOOKS_STATUS_FILE_NAME } from '../shared/fetch-notebooks-status.js';
 import { NotebookMetadataValidationError } from './notebook-metadata-validator.js';
 
-export const NOTEBOOKS_MAP_FILE_NAME = 'notebooks-metadata-map.json';
+export const NOTEBOOKS_METADATA_FILE_NAME = 'notebooks-metadata-map.json';
 
 /**
  *
@@ -14,6 +15,7 @@ export const NOTEBOOKS_MAP_FILE_NAME = 'notebooks-metadata-map.json';
  * @throws {NotebookMetadataValidationError}
  * @returns {Promise<void>}
  */
+// TODO Consider renaming to `generateNotebooksMetadataFile`
 async function generateNotebooksMapFile(path) {
   /** @typedef {import("./notebook-metadata-collector.js").INotebookMetadata} INotebookMetadata */
 
@@ -40,7 +42,7 @@ async function generateNotebooksMapFile(path) {
     mkdirSync(path, { recursive: true });
   }
 
-  writeFileSync(join(path, NOTEBOOKS_MAP_FILE_NAME), JSON.stringify(notebooksMetadataMap, null, 2), {
+  writeFileSync(join(path, NOTEBOOKS_METADATA_FILE_NAME), JSON.stringify(notebooksMetadataMap, null, 2), {
     flag: 'w',
   });
 
@@ -51,10 +53,10 @@ async function generateNotebooksMapFile(path) {
  *
  * @returns {import('vite').PluginOption}
  */
+// TODO Consider renaming (e.g. collectNotebooksFiles)
 export const generateNotebooksMapFilePlugin = () => {
   /** @type {import('vite').ResolvedConfig} */
   let config;
-
   let distPath = '';
 
   return {
@@ -66,25 +68,51 @@ export const generateNotebooksMapFilePlugin = () => {
     async closeBundle() {
       if (config.command === 'build') {
         await generateNotebooksMapFile(distPath);
+        await fetchNotebooksStatusesFile(distPath);
         await createBuildChecksumFile(distPath);
       }
     },
     async configureServer(devServer) {
-      const notebooksMapFileExists = existsSync(join(distPath, NOTEBOOKS_MAP_FILE_NAME));
+      const notebooksMapFileExists = existsSync(join(distPath, NOTEBOOKS_METADATA_FILE_NAME));
       if (notebooksMapFileExists) {
         console.info(
-          `"${NOTEBOOKS_MAP_FILE_NAME}" file already exists and is served from "${distPath}" dist directory.`
+          `"${NOTEBOOKS_METADATA_FILE_NAME}" file already exists and is served from "${distPath}" dist directory.`
         );
       } else {
         await generateNotebooksMapFile(distPath);
       }
+      const notebooksStatusFileExists = existsSync(join(distPath, NOTEBOOKS_STATUS_FILE_NAME));
+      if (notebooksStatusFileExists) {
+        console.info(
+          `"${NOTEBOOKS_STATUS_FILE_NAME}" file already exists and is served from "${distPath}" dist directory.`
+        );
+      } else {
+        // TODO Consider generating mock file
+        await fetchNotebooksStatusesFile(distPath);
+      }
 
-      devServer.middlewares.use(`${config.base}${NOTEBOOKS_MAP_FILE_NAME}`, (_, res) => {
-        const notebooksFileMapContent = readFileSync(join(distPath, NOTEBOOKS_MAP_FILE_NAME), { encoding: 'utf8' });
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.write(notebooksFileMapContent);
-        res.end();
-      });
+      devServer.middlewares.use(...getFileMiddleware(NOTEBOOKS_METADATA_FILE_NAME, config.base, distPath));
+      devServer.middlewares.use(...getFileMiddleware(NOTEBOOKS_STATUS_FILE_NAME, config.base, distPath));
     },
   };
 };
+
+/**
+ * @param {string} fileName
+ * @param {string} urlBase
+ * @param {string} distPath
+ * @returns {[string, import('vite').Connect.NextHandleFunction]}
+ */
+function getFileMiddleware(fileName, urlBase, distPath) {
+  const route = `${urlBase}${fileName}`;
+  /** @type {import('vite').Connect.NextHandleFunction} */
+  const handler = (_, res) => {
+    const fileContent = readFileSync(join(distPath, fileName), {
+      encoding: 'utf8',
+    });
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.write(fileContent);
+    res.end();
+  };
+  return [route, handler];
+}
