@@ -20,6 +20,10 @@ Model used for line-level text detection based on [Segformer](https://arxiv.org/
 1. Run PyTorch inference.
 1. Convert model to OpenVINO Intermediate Representation (IR) format.
 1. Run OpenVINO model.
+1. Apply post-training quantization using NNCF
+    1. Prepare dataset
+    1. Quantize model
+1. Run quantized OpenVINO model
 1. Interactive inference.
 
 ## Installation instructions
