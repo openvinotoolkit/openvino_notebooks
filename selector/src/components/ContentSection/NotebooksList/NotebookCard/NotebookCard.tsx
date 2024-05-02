@@ -11,6 +11,7 @@ import { Tag } from '@/components/shared/Tag/Tag';
 import { isEmbedded } from '@/shared/iframe-detector';
 import { INotebookMetadata } from '@/shared/notebook-metadata';
 import { CATEGORIES } from '@/shared/notebook-tags';
+import { NotebookItem } from '@/shared/notebooks.service';
 
 import { StatusTable } from './StatusTable/StatusTable';
 
@@ -46,7 +47,7 @@ const sparkClassNames = {
 };
 
 type NotebookCardProps = {
-  item: INotebookMetadata;
+  item: NotebookItem;
   showTasks?: boolean;
 };
 
@@ -111,7 +112,7 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
                   href={item.links.binder}
                 ></Button>
               )}
-              {!isEmbedded && (
+              {!isEmbedded && item.status && (
                 <Button
                   ref={statusButtonRef}
                   as="button"
@@ -134,7 +135,7 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
             } as CSSProperties
           }
         >
-          <StatusTable />
+          <StatusTable status={item.status!} />
         </div>
       )}
     </div>
