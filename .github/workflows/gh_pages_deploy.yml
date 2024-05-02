@@ -54,6 +54,8 @@ jobs:
         working-directory: ./selector
         shell: bash
         run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check if deploy needed
         id: check_deploy
