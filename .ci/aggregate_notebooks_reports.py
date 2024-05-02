@@ -8,11 +8,8 @@ REPORTS_DIR = "test_reports"
 
 
 class ValidationMatrix:
-    # TODO Uncomment after testing
-    # os = ("ubuntu-20.04", "ubuntu-22.04", "windows-2019", "macos-12")
-    # python = ("3.8", "3.9", "3.10")
-    os = ("ubuntu-20.04",)
-    python = ("3.8",)
+    os = ("ubuntu-20.04", "ubuntu-22.04", "windows-2019", "macos-12")
+    python = ("3.8", "3.9", "3.10")
 
     @classmethod
     def values(cls):
@@ -31,7 +28,7 @@ def get_default_status_dict(notebook_name: str) -> Dict:
 
     return {
         "name": notebook_name,
-        "statuses": dict((os, _get_python_status_dict()) for os in ValidationMatrix.os),
+        "status": dict((os, _get_python_status_dict()) for os in ValidationMatrix.os),
     }
 
 
@@ -44,13 +41,17 @@ def main():
     NOTEBOOKS_STATUS_MAP = {}
     for os, python in ValidationMatrix.values():
         report_file_path = get_report_file_path(os, python)
+        if not report_file_path.exists():
+            print(f'Report file "{report_file_path}" does not exists.')
+            continue
+        print(f'Processing report file "{report_file_path}".')
         with open(report_file_path, "r") as report_file:
             for row in csv.DictReader(report_file):
                 name = row["name"]
                 status = row["status"]
                 if name not in NOTEBOOKS_STATUS_MAP:
                     NOTEBOOKS_STATUS_MAP[name] = get_default_status_dict(name)
-                NOTEBOOKS_STATUS_MAP[name]["statuses"][os][python] = status
+                NOTEBOOKS_STATUS_MAP[name]["status"][os][python] = status
     write_json_file(
         Path(REPORTS_DIR) / "notebooks-status-map.json", NOTEBOOKS_STATUS_MAP
     )
