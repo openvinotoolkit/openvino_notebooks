@@ -1,4 +1,5 @@
 import { INotebookMetadata } from './notebook-metadata';
+import { INotebookStatus } from './notebook-status';
 
 export const SORT_OPTIONS = {
   RECENTLY_ADDED: 'Recently Added',
@@ -17,16 +18,24 @@ interface INotebooksFilters {
   limit: number;
 }
 
-class NotebooksService {
-  private _notebooksMap: Record<string, INotebookMetadata> | null = null;
+type NotebooksMap = Record<string, INotebookMetadata & { status?: INotebookStatus['statuses'] }>;
 
-  private async _getNotebooksMap(): Promise<Record<string, INotebookMetadata>> {
+export type NotebookItem = NotebooksMap[string];
+
+class NotebooksService {
+  private _notebooksMap: NotebooksMap | null = null;
+
+  private async _getNotebooksMap(): Promise<NotebooksMap> {
     if (!this._notebooksMap) {
       const { BASE_URL } = import.meta.env;
-      const notebooksMap = (await fetch(`${BASE_URL}notebooks-metadata-map.json`).then((response) =>
+      const notebooksMetadataMap = (await fetch(`${BASE_URL}notebooks-metadata-map.json`).then((response) =>
         response.json()
       )) as Record<string, INotebookMetadata>;
-      this._notebooksMap = notebooksMap;
+      // TODO Consider reusing filename
+      const notebooksStatusMap = (await fetch(`${BASE_URL}notebooks-status-map.json`).then((response) =>
+        response.json()
+      )) as Record<string, INotebookStatus>;
+      this._notebooksMap = this._getNotebooksMapWithStatuses(notebooksMetadataMap, notebooksStatusMap);
     }
     return this._notebooksMap;
   }
@@ -80,6 +89,23 @@ class NotebooksService {
     if (sort === SORT_OPTIONS.NAME_DESCENDING) {
       return (a: INotebookMetadata, b: INotebookMetadata) => b.title.toUpperCase().localeCompare(a.title.toUpperCase());
     }
+  }
+
+  private _getNotebooksMapWithStatuses(
+    metadataMap: Record<string, INotebookMetadata>,
+    statusMap: Record<string, INotebookStatus>
+  ): NotebooksMap {
+    const result = { ...metadataMap } as NotebooksMap;
+    const notebooksKeys = Object.keys(result);
+    for (const [key, { statuses }] of Object.entries(statusMap)) {
+      // TODO Unify keys in both maps to prevent searching similar keys
+      const notebookKey = notebooksKeys.find((v) => v.includes(key));
+      if (!notebookKey || !result[notebookKey]) {
+        continue;
+      }
+      result[notebookKey].status = statuses;
+    }
+    return result;
   }
 }
 
