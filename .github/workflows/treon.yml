@@ -225,13 +225,18 @@ jobs:
     runs-on: ubuntu-20.04
     needs: build_treon
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
       - name: Collect artifacts with reports
         uses: actions/download-artifact@v4
         with:
           pattern: test_report-*
           merge-multiple: true
           path: './test_reports'
-      - run: ls -R # TODO Remove after testing
       - name: Create agregated report
         run: |
           python .ci/aggregate_notebooks_reports.py
