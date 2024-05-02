@@ -6,83 +6,85 @@ import DenyIcon from '@/assets/images/deny.svg?react';
 import PythonIcon from '@/assets/images/python.svg?react';
 import TimeoutIcon from '@/assets/images/timeout.svg?react';
 import { Tooltip } from '@/components/shared/Tooltip/Tooltip';
+import { ValidationStatus } from '@/shared/notebook-status';
+import { NotebookItem } from '@/shared/notebooks.service';
 
-type CheckPythonStatus = 'SUCCESS' | 'FAILED' | 'TIMEOUT' | 'NOT_RUN' | 'SKIPPED' | 'EMPTY' | null;
-
-const getStatusIcon = (status: CheckPythonStatus): JSX.Element => {
-  if (status === 'SUCCESS') {
+const getStatusIcon = (status: ValidationStatus | null): JSX.Element => {
+  if (status === ValidationStatus.SUCCESS) {
     return (
       <Tooltip content="Passed">
         <CheckIcon className="status-icon status-icon-success" />
       </Tooltip>
     );
   }
-  if (status === 'FAILED') {
+  if (status === ValidationStatus.FAILED) {
     return (
       <Tooltip content="Failed">
         <CrossIcon className="status-icon status-icon-failed" />
       </Tooltip>
     );
   }
-  if (status === 'TIMEOUT') {
+  if (status === ValidationStatus.TIMEOUT) {
     return (
       <Tooltip content="Exceeded time limits (2 hours)">
         <TimeoutIcon className="status-icon status-icon-warn" />
       </Tooltip>
     );
   }
-  return (
-    <Tooltip content="Skipped">
-      <DenyIcon className="status-icon status-icon-skipped" />
-    </Tooltip>
-  );
+  if ([ValidationStatus.SKIPPED, ValidationStatus.NOT_RUN, ValidationStatus.EMPTY].includes(status!)) {
+    return (
+      <Tooltip content="Skipped">
+        <DenyIcon className="status-icon status-icon-skipped" />
+      </Tooltip>
+    );
+  }
+  return <Tooltip content="Not available">N/A</Tooltip>;
 };
 
-export const StatusTable = () => (
-  <div className="status-table spark-font-75">
-    <div className="device-header">
-      <div className="cell">CPU</div>
-    </div>
-    <div className="python-versions">
-      <div className="cell">
-        <PythonIcon className="python-icon" />
-        3.8
+type StatusTableProps = {
+  status: NonNullable<NotebookItem['status']>;
+};
+
+export const StatusTable = ({ status }: StatusTableProps) => {
+  const osOptions = Object.keys(status) as (keyof typeof status)[];
+  const statuses = osOptions.map((os) => Object.values(status[os]));
+
+  return (
+    <div className="status-table spark-font-75">
+      <div className="device-header">
+        <div className="cell">CPU</div>
       </div>
-      <div className="cell">
-        <PythonIcon className="python-icon" />
-        3.9
+      <div className="python-versions">
+        <div className="cell">
+          <PythonIcon className="python-icon" />
+          3.8
+        </div>
+        <div className="cell">
+          <PythonIcon className="python-icon" />
+          3.9
+        </div>
+        <div className="cell">
+          <PythonIcon className="python-icon" />
+          3.10
+        </div>
       </div>
-      <div className="cell">
-        <PythonIcon className="python-icon" />
-        3.10
+      <div className="os-header">
+        <div className="cell">OS</div>
+      </div>
+      <div className="os-names">
+        {osOptions.map((os) => (
+          <div key={os} className="cell">
+            {os}
+          </div>
+        ))}
+      </div>
+      <div className="statuses">
+        {statuses.flat().map((v, i) => (
+          <div key={`status-cpu-${i}`} className="cell">
+            {getStatusIcon(v)}
+          </div>
+        ))}
       </div>
     </div>
-    <div className="os-header">
-      <div className="cell">OS</div>
-    </div>
-    <div className="os-names">
-      <div className="cell">ubuntu-20.04</div>
-      <div className="cell">ubuntu-22.04</div>
-      <div className="cell">windows-2019</div>
-      <div className="cell">macos-12</div>
-    </div>
-    <div className="statuses">
-      {/* Row OS 1 */}
-      <div className="cell">{getStatusIcon('SUCCESS')}</div>
-      <div className="cell">{getStatusIcon('TIMEOUT')}</div>
-      <div className="cell">{getStatusIcon('SKIPPED')}</div>
-      {/* Row OS 2 */}
-      <div className="cell">{getStatusIcon('SUCCESS')}</div>
-      <div className="cell">{getStatusIcon('SUCCESS')}</div>
-      <div className="cell">{getStatusIcon('SUCCESS')}</div>
-      {/* Row OS 3 */}
-      <div className="cell">{getStatusIcon('FAILED')}</div>
-      <div className="cell">{getStatusIcon('SUCCESS')}</div>
-      <div className="cell">{getStatusIcon('SKIPPED')}</div>
-      {/* Row OS 4 */}
-      <div className="cell">{getStatusIcon('SUCCESS')}</div>
-      <div className="cell">{getStatusIcon('SKIPPED')}</div>
-      <div className="cell">{getStatusIcon('FAILED')}</div>
-    </div>
-  </div>
-);
+  );
+};
