@@ -245,3 +245,4 @@ jobs:
         with:
           name: notebooks-status-map.json
           path: test_reports/notebooks-status-map.json
+          if-no-files-found: error
