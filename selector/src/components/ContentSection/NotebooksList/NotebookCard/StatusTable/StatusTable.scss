@@ -21,22 +21,31 @@
   }
 }
 
+.python-icon {
+  width: 1.25rem;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.25rem;
+}
+
 .status-table {
   --table-border-color: var(--spark-color-theme-light-gray400);
 
   border: 1px solid var(--table-border-color);
   border-bottom: 0;
   display: grid;
-  grid-template-columns: auto repeat(4, auto);
+  grid-template-columns: auto repeat(3, auto);
   grid-template-rows: repeat(6, 1fr);
   grid-auto-flow: row;
   grid-template-areas:
-    'os-header  python-header   python-header   python-header   devices-header'
-    'os-header  python-versions python-versions python-versions devices'
-    'os-names   python-statuses python-statuses python-statuses devices-statuses'
-    'os-names   python-statuses python-statuses python-statuses devices-statuses'
-    'os-names   python-statuses python-statuses python-statuses devices-statuses'
-    'os-names   python-statuses python-statuses python-statuses devices-statuses';
+    'os-header  device-header   device-header   device-header'
+    'os-header  python-versions python-versions python-versions'
+    'os-names   statuses        statuses        statuses'
+    'os-names   statuses        statuses        statuses'
+    'os-names   statuses        statuses        statuses'
+    'os-names   statuses        statuses        statuses';
 
   .cell {
     display: flex;
@@ -69,8 +78,8 @@
   }
 }
 
-.python-header {
-  grid-area: python-header;
+.device-header {
+  grid-area: device-header;
   font-weight: 500;
 }
 
@@ -82,56 +91,24 @@
   border-bottom: 1px solid var(--table-border-color);
 }
 
-.python-statuses {
-  grid-area: python-statuses;
+.statuses {
+  grid-area: statuses;
   display: grid;
   grid-template-columns: subgrid;
   grid-template-rows: subgrid;
 }
 
-.python-header,
+.device-header,
 .python-versions,
-.python-statuses {
+.statuses {
   .cell {
     padding-left: 1rem;
   }
 }
 
 .os-names,
-.python-statuses,
-.devices-statuses {
+.statuses {
   .cell {
     border-bottom: 1px solid var(--table-border-color);
-  }
-}
-
-.devices-header {
-  grid-area: devices-header;
-  font-weight: 500;
-}
-
-.devices {
-  grid-area: devices;
-  font-weight: 500;
-  display: grid;
-  grid-template-columns: subgrid;
-  border-bottom: 1px solid var(--table-border-color);
-}
-
-.devices-statuses {
-  grid-area: devices-statuses;
-  display: grid;
-  grid-template-columns: subgrid;
-  grid-template-rows: subgrid;
-}
-
-.devices-header,
-.devices,
-.devices-statuses {
-  border-left: 1px solid var(--table-border-color);
-
-  .cell {
-    padding-left: 1rem;
-    padding-right: 1rem;
   }
 }
