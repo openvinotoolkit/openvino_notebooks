@@ -63,7 +63,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
     notebooks_dir = orig_nb_dir if nb_dir is None else nb_dir
     notebooks = sorted(list(notebooks_dir.rglob("**/*.ipynb")))
     statuses = {
-        notebook.parent.relative_to(notebooks_dir): {
+        notebook.relative_to(notebooks_dir): {
             "status": "",
             "path": notebook.parent,
         }
