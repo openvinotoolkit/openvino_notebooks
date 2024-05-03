@@ -96,14 +96,12 @@ class NotebooksService {
     statusMap: Record<string, INotebookStatus>
   ): NotebooksMap {
     const result = { ...metadataMap } as NotebooksMap;
-    const notebooksKeys = Object.keys(result);
-    for (const [key, { status }] of Object.entries(statusMap)) {
-      // TODO Unify keys in both maps to prevent searching similar keys
-      const notebookKey = notebooksKeys.find((v) => v.includes(key));
-      if (!notebookKey || !result[notebookKey]) {
+    for (const [notebookName, { status }] of Object.entries(statusMap)) {
+      if (!result[notebookName]) {
+        console.warn(`Unknown notebook "${notebookName}" found in status report.`);
         continue;
       }
-      result[notebookKey].status = status;
+      result[notebookName].status = status;
     }
     return result;
   }
