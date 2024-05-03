@@ -99,9 +99,11 @@ class NotebooksService {
     statusMap: Record<string, INotebookStatus>
   ): NotebooksMap {
     const result = { ...metadataMap } as NotebooksMap;
-    for (const [notebookName, { status }] of Object.entries(statusMap)) {
-      if (!result[notebookName]) {
-        console.warn(`Unknown notebook "${notebookName}" found in status report.`);
+    const notebooksNames = Object.keys(metadataMap);
+    for (const [notebookDir, { status }] of Object.entries(statusMap)) {
+      const notebookName = notebooksNames.find((v) => v.includes(notebookDir));
+      if (!notebookName || !result[notebookName]) {
+        console.warn(`Unknown notebook "${notebookDir}" found in status report.`);
         continue;
       }
       result[notebookName].status = status;
