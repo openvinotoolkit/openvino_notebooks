@@ -103,7 +103,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
             notebook_subdir = get_notebooks_subdir(Path(test_item), orig_nb_dir)
             if notebook_subdir is not None:
                 testing_notebooks.append(notebook_subdir)
-    test_list = set(testing_notebooks[:5])  # TODO Remove after testing
+    test_list = set(testing_notebooks)
     print(f"test notebooks: {test_list}")
 
     ignore_list = set(map(lambda x: Path(x), ignored_notebooks))
