@@ -5,11 +5,11 @@ import { execSync } from 'child_process';
 import decompress from 'decompress';
 import { parse } from 'path';
 
+import { NOTEBOOKS_STATUS_FILE_NAME } from './constants.js';
+
 /**
  * @typedef {{ artifacts: { archive_download_url: string }[] }} ArtifactsResponse
  */
-
-export const NOTEBOOKS_STATUS_FILE_NAME = 'notebooks-status-map.json';
 
 /**
  * @returns {string}

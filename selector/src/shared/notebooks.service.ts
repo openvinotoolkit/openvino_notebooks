@@ -1,3 +1,4 @@
+import { NOTEBOOKS_METADATA_FILE_NAME, NOTEBOOKS_STATUS_FILE_NAME } from './constants';
 import { INotebookMetadata } from './notebook-metadata';
 import { INotebookStatus } from './notebook-status';
 
@@ -28,13 +29,15 @@ class NotebooksService {
   private async _getNotebooksMap(): Promise<NotebooksMap> {
     if (!this._notebooksMap) {
       const { BASE_URL } = import.meta.env;
-      const notebooksMetadataMap = (await fetch(`${BASE_URL}notebooks-metadata-map.json`).then((response) =>
+
+      const notebooksMetadataMap = (await fetch(`${BASE_URL}${NOTEBOOKS_METADATA_FILE_NAME}`).then((response) =>
         response.json()
       )) as Record<string, INotebookMetadata>;
-      // TODO Consider reusing filename
-      const notebooksStatusMap = (await fetch(`${BASE_URL}notebooks-status-map.json`).then((response) =>
+
+      const notebooksStatusMap = (await fetch(`${BASE_URL}${NOTEBOOKS_STATUS_FILE_NAME}`).then((response) =>
         response.json()
       )) as Record<string, INotebookStatus>;
+
       this._notebooksMap = this._getNotebooksMapWithStatuses(notebooksMetadataMap, notebooksStatusMap);
     }
     return this._notebooksMap;

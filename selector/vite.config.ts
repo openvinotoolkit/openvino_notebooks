@@ -4,7 +4,7 @@ import { URL } from 'url';
 import { defineConfig, loadEnv } from 'vite';
 import svgr from 'vite-plugin-svgr';
 
-import { generateNotebooksMapFilePlugin } from './src/notebook-metadata/generate-notebooks-map.js';
+import { collectNotebooksFilesPlugin } from './src/shared/collect-notebooks-files-plugin.js';
 
 const ENV_DIR = join(__dirname, 'vite-env');
 
@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
   const viteEnv = loadEnv(mode, ENV_DIR);
 
   return {
-    plugins: [react(), svgr(), generateNotebooksMapFilePlugin()],
+    plugins: [react(), svgr(), collectNotebooksFilesPlugin()],
     base: '/openvino_notebooks/',
     resolve: {
       alias: {
