@@ -1,6 +1,6 @@
 # Quantize a Segmentation Model and Show Live Inference
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F110-ct-segmentation-quantize%2F110-ct-scan-live-inference.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eaidova/openvino_notebooks_binder.git/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fopenvinotoolkit%252Fopenvino_notebooks%26urlpath%3Dtree%252Fopenvino_notebooks%252Fnotebooks%2F110-ct-segmentation-quantize%2F110-ct-scan-live-inference.ipynb)
 
 <p align="center">
     <img src="https://user-images.githubusercontent.com/77325899/154279555-aaa47111-c976-4e77-8d23-aac96f45872f.gif"/>
@@ -20,13 +20,13 @@ optimize, quantize and show live inference on a [MONAI](https://monai.io/) segme
 
 4\. [Live Inference and Benchmark CT-scan Data with OpenVINO](110-ct-scan-live-inference.ipynb)
 
-NNCF performs quantization within the PyTorch framework. There is a pre-trained model and a subset of the dataset provided for the quantization notebook, 
+NNCF performs quantization within the PyTorch framework. There is a pre-trained model and a subset of the dataset provided for the quantization notebook,
 so it is not required to run the data preparation and training notebooks before running the quantization tutorial.
 
 This quantization tutorial consists of the following steps:
 
-* Use model conversion Python API to convert the model to OpenVINO IR. For more information about model conversion Python API, see this [page](https://docs.openvino.ai/2023.0/openvino_docs_model_processing_introduction.html).
-* Quantizing the model with NNCF with the [Post-training Quantization with NNCF Tool](https://docs.openvino.ai/nightly/basic_quantization_flow.html) API in OpenVINO.
+* Use model conversion Python API to convert the model to OpenVINO IR. For more information about model conversion Python API, see this [page](https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html).
+* Quantizing the model with NNCF with the [Post-training Quantization with NNCF Tool](https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/quantizing-models-post-training/basic-quantization-flow.html) API in OpenVINO.
 * Evaluating the F1 score metric of the original model and the quantized model.
 * Benchmarking performance of the original model and the quantized model.
 * Showing live inference with async API and MULTI plugin in OpenVINO.

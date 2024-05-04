@@ -35,7 +35,8 @@ def move_notebooks(nb_dir):
 
 
 def prepare_test_plan(test_list, ignore_list, nb_dir=None):
-    notebooks_dir = ROOT / 'notebooks' if nb_dir is None else nb_dir
+    orig_nb_dir = ROOT / 'notebooks'
+    notebooks_dir = orig_nb_dir if nb_dir is None else nb_dir
     notebooks = sorted(list(notebooks_dir.rglob('**/*.ipynb')))
     statuses = {notebook.parent.relative_to(notebooks_dir): {'status': '', 'path': notebook.parent} for notebook in notebooks}
     test_list = test_list or statuses.keys()
@@ -55,7 +56,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
                     break
                 if changed_path.suffix == '.md':
                     continue
-                notebook_subdir = find_notebook_dir(changed_path.resolve(), notebooks_dir.resolve())
+                notebook_subdir = find_notebook_dir(changed_path.resolve(), orig_nb_dir.resolve())
                 if notebook_subdir is None:
                     continue
                 testing_notebooks.append(notebook_subdir)
@@ -65,6 +66,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
 
     ignore_list = ignore_list or []
     ignore_list = set(map(lambda x: Path(x), ignore_list))
+
     for notebook in statuses:
         if notebook not in test_list:
             statuses[notebook]['status'] = 'SKIPPED'
@@ -89,27 +91,23 @@ def clean_test_artifacts(before_test_files, after_test_files):
 def run_test(notebook_path, root, timeout=7200, keep_artifacts=False):
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path)
     print(f'RUN {notebook_path.relative_to(root)}', flush=True)
-    
+    retcodes = []
+
     with cd(notebook_path):
-        existing_files = sorted(Path('.').iterdir())
-        if not len(existing_files):  # skip empty directories
-            return 0
+        existing_files = sorted(Path('.').glob("test_*.ipynb"))
         
-        try:
-            notebook_name = str([filename for filename in existing_files if str(filename).startswith('test_')][0])
-        except IndexError:  # if there is no 'test_' notebook generated
-            print('No test_ notebook found.')
-            return 0
+        for notebook_name in existing_files:
         
-        main_command = [sys.executable,  '-m',  'treon', notebook_name]
-        try:
-            retcode = subprocess.run(main_command, shell=(platform.system() == "Windows"), timeout=timeout).returncode
-        except subprocess.TimeoutExpired:
-            retcode = -42
+            main_command = [sys.executable,  '-m',  'treon', str(notebook_name)]
+            try:
+                retcode = subprocess.run(main_command, shell=(platform.system() == "Windows"), timeout=timeout).returncode
+            except subprocess.TimeoutExpired:
+                retcode = -42
+            retcodes.append((str(notebook_name), retcode))
 
         if not keep_artifacts:
             clean_test_artifacts(existing_files, sorted(Path('.').iterdir()))
-    return retcode
+    return retcodes
 
 
 def finalize_status(failed_notebooks, timeout_notebooks, test_plan, report_dir, root):
@@ -165,16 +163,20 @@ def main():
     for notebook, report in test_plan.items():
         if report['status'] == "SKIPPED":
             continue
-        status = run_test(report['path'], root, args.timeout, keep_artifacts)
-        if status:
-            report['status'] = "TIMEOUT" if status == -42 else "FAILED"
-        else:
-            report["status"] = 'SUCCESS'
-        if status:
-            if status == -42:
-                timeout_notebooks.append(str(notebook))
+        statuses = run_test(report['path'], root, args.timeout, keep_artifacts)
+        if not statuses:
+            print(f"{str(notebook)}: No testing notebooks found")
+            report['status'] = "EMPTY"
+        for subnotebook, status in statuses:
+            if status:
+                report['status'] = "TIMEOUT" if status == -42 else "FAILED"
             else:
-                failed_notebooks.append(str(notebook))
+                report["status"] = 'SUCCESS' if not report["status"] in ["TIMEOUT", "FAILED"] else report["status"]
+            if status:
+                if status == -42:
+                    timeout_notebooks.append(str(subnotebook))
+                else:
+                    failed_notebooks.append(str(subnotebook))
             if args.early_stop:
                 break
     exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)

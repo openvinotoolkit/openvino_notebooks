@@ -1,0 +1,61 @@
+/**
+ * Copyright (C) 2023 Intel Corporation
+ * SPDX-License-Identifier: MIT
+*/
+
+@import '../../global/index.css';
+
+:root {
+    /* main tag properties */
+    --spark-tag-padding: 8px;
+    --spark-tag-label-gap: 4px;
+    --spark-tag-font-size: 12px;
+    --spark-tag-line-height: 15px;
+    --spark-tag-block-size: 24px;
+
+    /* tag color properties */
+    --spark-tag-close-icon-color: #8b8e97;
+    --spark-tag-action-background-color: #0054ae;
+    --spark-tag-action-background-color-hover: #00377c;
+    --spark-tag-action-background-color-active: #001e50;
+    --spark-tag-action-background-color-focus: #00377c;
+    --spark-tag-action-text-color: white;
+    --spark-tag-background-color: transparent;
+    --spark-tag-text-color: #2b2c30;
+    --spark-tag-hover-color: #e9eaeb;
+    --spark-tag-active-color: #c9cace;
+    --spark-tag-focus-background-color: transparent;
+    --spark-tag-focus-border-color: #00377c;
+    --spark-tag-primary-border-color: #6a6d75;
+    --spark-tag-secondary-border-color: #c9cace;
+    --spark-tag-disabled-background-color: #e9eaeb;
+    --spark-tag-disabled-text-color: #b2b3b9;
+
+    /* tag color properties for specific themes */
+    --spark-tag-theme-geode: var(--spark-color-geode);
+    --spark-tag-theme-geode-hover: var(--spark-color-geode-tint1);
+    --spark-tag-theme-geode-active: var(--spark-color-geode-shade1);
+    --spark-tag-theme-moss: var(--spark-color-moss);
+    --spark-tag-theme-moss-hover: var(--spark-color-moss-shade1);
+    --spark-tag-theme-moss-active: var(--spark-color-moss-shade2);
+    --spark-tag-theme-rust: var(--spark-color-rust);
+    --spark-tag-theme-rust-hover: var(--spark-color-rust-tint1);
+    --spark-tag-theme-rust-active: var(--spark-color-rust-shade1);
+    --spark-tag-theme-coral: var(--spark-color-coral);
+    --spark-tag-theme-coral-hover: var(--spark-color-coral-tint1);
+    --spark-tag-theme-coral-active: var(--spark-color-coral-shade1);
+
+    /* tag small */
+    --spark-tag-s-padding: 4px;
+    --spark-tag-s-label-gap: 2px;
+    --spark-tag-s-block-size: 16px;
+    --spark-tag-s-font-size: 11px;
+    --spark-tag-s-line-height: 14px;
+
+    /* tag large */
+    --spark-tag-l-padding: 8px;
+    --spark-tag-l-label-gap: 4px;
+    --spark-tag-l-block-size: 24px;
+    --spark-tag-l-font-size: 12px;
+    --spark-tag-l-line-height: 16px;
+}

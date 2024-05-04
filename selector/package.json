@@ -1,0 +1,36 @@
+{
+  "name": "openvino-notebooks-selector",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext js,ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "18.11.18",
+    "@types/react": "18.2.37",
+    "@types/react-dom": "18.2.15",
+    "@typescript-eslint/eslint-plugin": "6.10.0",
+    "@typescript-eslint/parser": "6.10.0",
+    "@vitejs/plugin-react": "4.2.0",
+    "eslint": "8.53.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-react": "7.33.2",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "eslint-plugin-react-refresh": "0.4.4",
+    "eslint-plugin-simple-import-sort": "10.0.0",
+    "glob": "10.3.10",
+    "prettier": "3.1.0",
+    "sass": "1.69.5",
+    "typescript": "5.2.2",
+    "vite": "5.0.12",
+    "vite-plugin-svgr": "4.2.0"
+  }
+}

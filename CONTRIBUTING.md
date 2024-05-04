@@ -12,6 +12,7 @@
       - [Recommendations for File Structure](#recommendations-for-file-structure)
     - [Notebook utils](#notebook-utils)
     - [Interactive inference with Gradio](#interactive-inference-with-gradio)
+    - [Notebooks Metadata](#notebooks-metadata)
   - [Requirements](#requirements)
   - [Validation](#validation)
     - [Automated tests](#automated-tests)
@@ -82,7 +83,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 1. Notebooks in this repository typically rely on a shared `requirements.txt` file. 
    However, contributors are encouraged to install the required packages at the top of their notebook using 
-   `!pip install -q ...` commands. This allows the notebooks to be run independently as standalone examples. 
+   `%pip install -q ...` commands. This allows the notebooks to be run independently as standalone examples. 
    To maintain package compatibility, contributors are expected to install the same versions of packages 
    as specified in the shared `requirements.txt` file. This helps ensure consistency in our testing pipelines 
    and prevents dependency conflicts.
@@ -157,10 +158,6 @@ Additional subsections, e.g license information.
 ## Installation Instructions
 [link to installation guide, other important information for install process]
 ```
-
-Every notebook is also added to the notebooks overview table in the main
-[`README.md`](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/README.md) and the 
-[`README.md`](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/README.md) in the notebooks directory.
 Notebooks that work in Binder have a _Launch Binder_ badge in the `README.md` files.
 In the same way, notebooks that work in Google Colab have a _Launch Colab_ badge in the `README.md` files.
 
@@ -233,6 +230,34 @@ Here are some guidelines to follow:
 - We use Gradio Blocks only when we need to create a complex interface. The Gradio Interface class provides an easy-to-use interface and saves development time, so we use it whenever possible. However, for more complex interfaces, Gradio Blocks gives us more flexibility and control.
 
 
+### Notebooks Metadata
+
+Each notebook file has metadata that includes additional information about the notebook. Some metadata fields (e.g. title, creation date, links to GitHub, Colab, Binder etc.) are generated automatically from notebook content or related `README.md` file. However other fields (e.g. tags, image URL) should be defined by notebook contributor. As each notebook file has JSON format, manually defined metadata fields are stored in corresponding `.ipynb` file in global notebook metadata object (`metadata.openvino_notebooks` field in the end of notebook JSON structure).
+
+Example of such manually defined notebook metadata:
+
+```JSON
+"openvino_notebooks": {
+ "imageUrl": "...",
+ "tags": {
+  "categories": [
+   "First Steps"
+  ],
+  "libraries": [],
+  "other": [],
+  "tasks": [
+   "Image Classification"
+  ]
+ }
+}
+```
+
+Notebook tags in metadata can have several values and should be a subset of defined tags that can be found in `./selector/src/shared/notebook-tags.js`.
+ - `tags.categories` tags relate to notebook groups like "AI Trends", "First Steps", "Model Demos" etc.
+ - `tags.tasks` tags relate to particular AI tasks that are demonstrated in notebook.
+ - `tags.other` tags are free-form tags and can be any string (please follow capitalization naming convention).
+
+
 ## Requirements
 
 Contributors are encouraged to install the required packages at the top of their notebook using 
@@ -261,6 +286,7 @@ and some style issues
   `docker run -it  --entrypoint /tmp/scripts/test openvino_notebooks`. It is recommended to build the image on a clean 
   repository because the full notebooks folder will be copied to the image.
 - [`CodeQL`](https://codeql.github.com/)
+- Notebooks Metadata Validation: verifies that all added or modified notebooks in PR have valid metadata and visualizes them in workflow summary.
 
   - In the rest of this guide, the automated tests in GitHub
 Actions will be referred to as CI (for Continuous Integration).

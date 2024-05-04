@@ -1,6 +1,6 @@
 # Live Person Tracking with OpenVINO™
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F407-person-tracking-webcam%2F407-person-tracking.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eaidova/openvino_notebooks_binder.git/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fopenvinotoolkit%252Fopenvino_notebooks%26urlpath%3Dtree%252Fopenvino_notebooks%252Fnotebooks%2F407-person-tracking-webcam%2F407-person-tracking.ipynb)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/407-person-tracking-webcam/407-person-tracking.ipynb)
 
 *Binder is a free service where the webcam will not work, and performance on the video will not be good. For the best performance, install the notebooks locally.*
@@ -14,7 +14,7 @@ This notebook shows a person tracking scenario: it reads frames from an input vi
 ## Notebook Contents
 
 This tutorial uses the [Deep SORT](https://arxiv.org/abs/1703.07402) algorithm to perform object tracking.
-[person detection model]( https://docs.openvino.ai/2023.0/omz_models_model_person_detection_0202.html) is deployed to detect the person in each frame of the video, and [reidentification model]( https://docs.openvino.ai/2023.0/omz_models_model_person_reidentification_retail_0287.html) is used to output embedding vector to match a pair of images of a person by the cosine distance.
+[person detection model]( https://docs.openvino.ai/2024/omz_models_model_person_detection_0202.html) is deployed to detect the person in each frame of the video, and [reidentification model]( https://docs.openvino.ai/2024/omz_models_model_person_reidentification_retail_0287.html) is used to output embedding vector to match a pair of images of a person by the cosine distance.
 
 ## Installation Instructions
 
@@ -25,5 +25,5 @@ For details, please refer to [Installation Guide](../../README.md).
 ### See Also
 
 * [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
-* [Model Conversion API](https://docs.openvino.ai/nightly/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html)
-* [Pedestrian Tracker C++ Demo](https://docs.openvino.ai/2023.0/omz_demos_pedestrian_tracker_demo_cpp.html#doxid-omz-demos-pedestrian-tracker-demo-cpp)
+* [Model Conversion API](https://docs.openvino.ai/2024/openvino-workflow/model-preparation/convert-model-to-ir.html)
+* [Pedestrian Tracker C++ Demo](https://docs.openvino.ai/2024/omz_demos_pedestrian_tracker_demo_cpp.html)

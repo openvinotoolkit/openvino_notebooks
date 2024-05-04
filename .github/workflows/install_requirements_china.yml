@@ -16,9 +16,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python 
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
     - name: Install dependencies
@@ -29,9 +29,9 @@ jobs:
         python -m ipykernel install --user --name openvino_env
         python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Archive pip freeze
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
-        name: pip-freeze
+        name: pip-freeze-${{matrix.os}}-${{ matrix.python }}
         path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
     - name: Test that `jupyter lab` works
       run: |

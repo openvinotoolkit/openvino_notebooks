@@ -1,0 +1,58 @@
+name: Validate Notebooks Metadata
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'notebooks/**/*.ipynb'
+
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  validate_notebooks_metadata:
+    runs-on: ubuntu-20.04
+    name: Validate notebooks metadata
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Get changed notebook files
+        id: get_changed_notebook_files
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const { commits } = context.payload.pull_request;
+            const gitDiffCommand = `git diff --name-only --relative=notebooks --diff-filter=d HEAD~${commits} -- *.ipynb ':!notebooks/utils'`;
+            const changedNotebooks = execSync(gitDiffCommand).toString().split('\n').filter(Boolean);
+            core.exportVariable('CHANGED_NOTEBOOKS', JSON.stringify(changedNotebooks));
+
+      - name: Install Node.js dependencies
+        working-directory: ./selector
+        shell: bash
+        run: npm ci
+
+      - name: Validate changed notebooks metadata
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { NotebookMetadataHandler } = await import('${{ github.workspace }}/selector/src/notebook-metadata/notebook-metadata-handler.js');
+            const changedNotebooks = JSON.parse(process.env.CHANGED_NOTEBOOKS);
+            const [error, metadataMarkdowns] = NotebookMetadataHandler.validateNotebooks(changedNotebooks);
+            core.summary.addHeading(`Modified Notebooks (${metadataMarkdowns.length})`, '2');
+            core.summary.addRaw(metadataMarkdowns.join('\n\n'));
+            core.summary.write();
+            if (error) {
+              core.setFailed(error);
+            }

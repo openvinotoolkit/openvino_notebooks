@@ -34,7 +34,7 @@ class Model:
     def set_batch_size(self, batch):
         shapes = {}
         for input_layer in self.net.inputs:
-            new_shape = list(input_layer.shape)
+            new_shape = input_layer.partial_shape
             new_shape[0] = 1
             shapes.update({input_layer: new_shape})
         self.net.reshape(shapes)
@@ -71,8 +71,8 @@ class SegmentationModel(Model):
         self.rotate_and_flip = rotate_and_flip
 
         self.net = ie.read_model(model_path)
-        self.output_layer = self.net.output(0)
         self.input_layer = self.net.input(0)
+        self.output_layer = self.net.output(0)
         if resize_shape is not None:
             self.net.reshape({self.input_layer: PartialShape(resize_shape)})
         self.image_height, self.image_width = self.input_layer.shape[2], self.input_layer.shape[3]
@@ -100,7 +100,7 @@ class SegmentationModel(Model):
             input_image = np.expand_dims(np.transpose(image, (2, 0, 1)), 0)
         else:
             input_image = np.expand_dims(np.expand_dims(image, 0), 0)
-        return {self.input_layer.any_name: input_image}, meta
+        return {0: input_image}, meta
 
     def postprocess(self, outputs, preprocess_meta, to_rgb=False):
         """
@@ -117,7 +117,7 @@ class SegmentationModel(Model):
         else:
             # Create BGR image by repeating channels in one-channel image
             bgr_frame = np.repeat(np.expand_dims(preprocess_meta["frame"], -1), 3, 2)
-        res = outputs[self.output_layer.any_name].squeeze()
+        res = outputs[0].squeeze()
 
         result_mask_ir = sigmoid(res) if self.sigmoid else res
 

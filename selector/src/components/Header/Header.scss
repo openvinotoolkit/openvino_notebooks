@@ -1,0 +1,56 @@
+:root {
+  --spark-header-background: var(--spark-color-classic-blue, #0054ae);
+  --spark-header-color: var(--spark-color-theme-dark-gray900, #ffffff);
+  --spark-header-margin-inline-start: 2rem;
+  --spark-header-margin-inline-end: 2rem;
+  --spark-header-padding: 0.5rem;
+
+  --spark-header-s-block-size: 3rem;
+  --spark-header-s-inline-size: 3rem;
+  --spark-header-s-line-height: 3rem;
+
+  --spark-header-project-font-weight: 400;
+  --spark-header-project-font-size: 1.25rem;
+}
+
+.spark-header {
+  color: var(--spark-header-color);
+  display: inline-flex;
+  inline-size: 100%;
+  background-color: var(--spark-header-background);
+
+  &.spark-header-size-s {
+    block-size: var(--spark-header-s-block-size);
+    line-height: var(--spark-header-s-line-height);
+  }
+
+  .spark-header-brand {
+    text-align: center;
+    display: flex;
+    margin-inline-start: calc(var(--spark-header-margin-inline-start) - var(--spark-header-padding));
+
+    .spark-header-brand-logoimg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        padding-top: 0.25rem;
+      }
+    }
+  }
+
+  .spark-header-region-start {
+    display: flex;
+    inline-size: fit-content;
+    white-space: nowrap;
+    min-inline-size: max-content;
+    margin-inline-start: calc(var(--spark-header-margin-inline-start) - var(--spark-header-padding) * 2);
+  }
+
+  .spark-header-project-name {
+    font-size: var(--spark-header-project-font-size);
+    font-weight: var(--spark-header-project-font-weight);
+    margin-inline-end: var(--spark-header-margin-inline-end);
+  }
+}

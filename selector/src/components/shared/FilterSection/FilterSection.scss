@@ -1,0 +1,25 @@
+@import '@spark-design/css/components/typography/index.css';
+
+.filter-section {
+  --section-margin: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--section-margin);
+
+  &-title {
+    margin-bottom: calc(var(--section-margin) / 2);
+  }
+
+  &-content {
+    display: flex;
+    flex-wrap: wrap;
+
+    .filter-tag {
+      --tag-margin: 0.5rem;
+
+      margin-right: var(--tag-margin);
+      margin-bottom: var(--tag-margin);
+    }
+  }
+}

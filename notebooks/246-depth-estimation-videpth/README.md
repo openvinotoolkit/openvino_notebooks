@@ -25,7 +25,7 @@ The notebook contains a detailed tutorial of the visual-inertial depth estimatio
 2. Download an appropriate depth predictor from the [VI-Depth repository](https://github.com/isl-org/VI-Depth/).
 3. Get the appropriate predictor model corresponding to the above _depth_ (a `PyTorch` model callable).
 4. Download images and their depth maps for dummy input creation.
-5. Convert and transform the models to the [OpenVINO IR](https://docs.openvino.ai/latest/openvino_ir.html) representation for inference using the dummy inputs from 4.
+5. Convert and transform the models to the [OpenVINO IR](https://docs.openvino.ai/2024/documentation/openvino-ir-format.html) representation for inference using the dummy inputs from 4.
 6. Download another set of images similar to the one used in step 4. and finally run the models against them.
 
 
