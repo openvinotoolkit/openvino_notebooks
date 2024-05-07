@@ -6,7 +6,7 @@ Latent Diffusion models (LDMs) have achieved remarkable results in synthesizing 
 **Input text:** tree with lightning in the background, 8k
 
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/29454499/277367065-13a8f622-8ea7-4d12-b3f8-241d4499305e.png"/>
+    <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/105707993/73cb12e3-152d-463a-bb06-5ea0ddedc6d6"/>
 </p>
 
 ### Notebook Contents
