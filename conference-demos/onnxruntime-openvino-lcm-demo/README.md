@@ -16,14 +16,36 @@ This [notebook](./Latent Consistency Models with ONNX and OpenVINO Execution Pro
 
 
 ## Installation Instructions
-We recommend to use virtual environment. To create it use python -m venv <virtual-environment-name>
-To activate the virtual environment use \<virtual-environment-name>\Scripts\activate
-Install onnxruntime-openvino 1.18.0 : pip install onnxruntime_openvino-1.18.0-cp311-cp311-win_amd64.whl 
-Install OpenVINO 2024.1 on Windows from an Archive File as descreibed here https://docs.openvino.ai/2024/get-started/install-openvino/install-openvino-archive-windows.html 
-Initialize openvino (e.g., using .\w_openvino_toolkit_windows_2024.1.0.dev20240405_x86_64\w_openvino_toolkit_windows_2024.1.0.dev20240405_x86_64\setupvars.bat)
-Now you only need a Jupyter server to start.
-All other dependancies are installed in the notebook itself
-For details, please refer to [Installation Guide](../../README.md).
+- We recommend to use virtual environment. To create it use python -m venv <virtual-environment-name>
+- To activate the virtual environment use \<virtual-environment-name>\Scripts\activate
+- Install onnxruntime-openvino 1.18.0 : pip install onnxruntime_openvino-1.18.0-cp311-cp311-win_amd64.whl 
+- Install OpenVINO 2024.1 on Windows from an Archive File as descreibed here https://docs.openvino.ai/2024/get-started/install-openvino/install-openvino-archive-windows.html 
+- Initialize openvino (e.g., using .\w_openvino_toolkit_windows_2024.1.0.dev20240405_x86_64\w_openvino_toolkit_windows_2024.1.0.dev20240405_x86_64\setupvars.bat)
+- Now you only need a Jupyter server to start.
+- All other dependancies are installed in the notebook itself
+- For details, please refer to [Installation Guide](../../README.md).
+
+
+## How to build onnxruntime_openvino 
+- onnxruntime_openvino-1.18 is used along with OpenVINO 2024.1 
+
+- Ensure Visual Studio is installed 
+
+- Ensure Python version is 3.11 
+
+- Ensure OpenVINO is installed from the archive (OpenVINO 2024.1 for onnxruntime_openvino-1.18) 
+
+- Build a wheel 
+
+    git clone https://github.com/microsoft/onnxruntime.git 
+
+    cd onnxruntime && mkdir build 
+
+    Initialize openvino (e.g., using .\w_openvino_toolkit_windows_2024.1.0.dev20240405_x86_64\w_openvino_toolkit_windows_2024.1.0.dev20240405_x86_64\setupvars.bat ) 
+
+    Windows build: .\build.bat --config Debug --use_openvino CPU --build_shared_lib --build_wheel --parallel --skip_tests 
+
+    Discover the wheel file in the path - eg: \onnxruntime\build\Windows\Debug\Debug\dist\ 
 
 
 
