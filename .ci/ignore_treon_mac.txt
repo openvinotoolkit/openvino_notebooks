@@ -60,3 +60,4 @@ stable-video-diffusion
 llm-agent-langchain
 hello-npu
 stable-cascade-image-generation
+dynamicrafter-animating-images
