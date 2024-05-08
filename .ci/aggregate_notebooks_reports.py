@@ -1,7 +1,7 @@
 import csv
 import json
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict
 from itertools import product
 
 REPORTS_DIR = "test_reports"
@@ -52,9 +52,7 @@ def main():
                 if name not in NOTEBOOKS_STATUS_MAP:
                     NOTEBOOKS_STATUS_MAP[name] = get_default_status_dict(name)
                 NOTEBOOKS_STATUS_MAP[name]["status"][os][python] = status
-    write_json_file(
-        Path(REPORTS_DIR) / "notebooks-status-map.json", NOTEBOOKS_STATUS_MAP
-    )
+    write_json_file(Path(REPORTS_DIR) / "notebooks-status-map.json", NOTEBOOKS_STATUS_MAP)
 
 
 if __name__ == "__main__":
