@@ -61,7 +61,7 @@ def remove_ov_install(cell):
                     continue
                 if "openvino-tokenizers" in part:
                     continue
-                if "openvino>" in part or "openvino=" in part:
+                if "openvino>" in part or "openvino=" in part or "openvino" in part:
                     continue
                 if empty:
                     empty = not has_additional_deps(part)
