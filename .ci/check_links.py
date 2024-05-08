@@ -16,7 +16,7 @@ EXCEPTIONS_URLs = [
     "https://arxiv.org",
     "http://host.robots.ox.ac.uk",
     "https://gitee.com/",
-    "https://openai.com/"
+    "https://openai.com/",
 ]
 
 
