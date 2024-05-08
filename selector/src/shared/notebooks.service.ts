@@ -35,7 +35,7 @@ class NotebooksService {
       )) as Record<string, INotebookMetadata>;
 
       const notebooksStatusMap = (await fetch(`${BASE_URL}${NOTEBOOKS_STATUS_FILE_NAME}`).then((response) =>
-        response.json()
+        response.ok ? response.json() : {}
       )) as Record<string, INotebookStatus>;
 
       this._notebooksMap = this._getNotebooksMapWithStatuses(notebooksMetadataMap, notebooksStatusMap);
