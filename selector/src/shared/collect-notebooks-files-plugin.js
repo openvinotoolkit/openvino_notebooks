@@ -45,8 +45,14 @@ export const collectNotebooksFilesPlugin = () => {
           `"${NOTEBOOKS_STATUS_FILE_NAME}" file already exists and is served from "${distPath}" dist directory.`
         );
       } else {
-        // TODO Consider generating mock file
-        await fetchNotebooksStatusFile(distPath);
+        console.info(`"${NOTEBOOKS_STATUS_FILE_NAME}" file is not found in "${distPath}" dist directory.\nFetching...`);
+        try {
+          await fetchNotebooksStatusFile(distPath);
+        } catch (error) {
+          console.warn(`Unable to fetch "${NOTEBOOKS_STATUS_FILE_NAME}".`);
+          console.warn(error);
+          // TODO Consider generating mock file
+        }
       }
 
       devServer.middlewares.use(...getFileMiddleware(NOTEBOOKS_METADATA_FILE_NAME, config.base, distPath));

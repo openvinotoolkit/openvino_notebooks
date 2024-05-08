@@ -106,6 +106,9 @@ class NotebooksService {
         console.warn(`Unknown notebook "${notebookDir}" found in status report.`);
         continue;
       }
+      if (result[notebookName].status) {
+        console.warn(`Status of the notebook "${notebookDir}" already exists and will be overrided.`);
+      }
       result[notebookName].status = status;
     }
     return result;
