@@ -173,6 +173,7 @@
 - [Text Generation via Speculative Sampling, KV Caching, and OpenVINO™](./speculative-sampling/speculative-sampling.ipynb)
 - [Sound Generation with AudioLDM2 and OpenVINO™](./sound-generation-audioldm2/sound-generation-audioldm2.ipynb)
 - [SoftVC VITS Singing Voice Conversion and OpenVINO™](./softvc-voice-conversion/softvc-voice-conversion.ipynb)
+- [One Step Sketch to Image translation with pix2pix-turbo and OpenVINO](./sketch-to-image-pix2pix-turbo/sketch-to-image-pix2pix-turbo.ipynb)
 - [Zero-shot Image Classification with SigLIP](./siglip-zero-shot-image-classification/siglip-zero-shot-image-classification.ipynb)
 - [Object masks from prompts with SAM and OpenVINO](./segment-anything/segment-anything.ipynb)
 - [Single step image generation using SDXL-turbo and OpenVINO](./sdxl-turbo/sdxl-turbo.ipynb)
