@@ -16,13 +16,14 @@ import { NOTEBOOKS_STATUS_FILE_NAME } from './constants.js';
  */
 function getLatestNotebooksStatusArtifactUrl() {
   const artifactsResponse = execSync(
-    `curl -L https://api.github.com/repos/openvinotoolkit/openvino_notebooks/actions/artifacts?per_page=1&name=${NOTEBOOKS_STATUS_FILE_NAME}`
+    `curl -L "https://api.github.com/repos/openvinotoolkit/openvino_notebooks/actions/artifacts?per_page=1&name=${NOTEBOOKS_STATUS_FILE_NAME}"`
   ).toString();
-  console.info(artifactsResponse); // TODO Remove
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const artifactsResponseJson = /** @type {ArtifactsResponse} */ (JSON.parse(artifactsResponse));
   if (!artifactsResponseJson || !artifactsResponseJson?.artifacts?.length) {
-    throw Error(`Unable to fetch latest artifacts via GitHub API. Response: ${artifactsResponse}.`);
+    throw Error(
+      `Unable to fetch latest artifact "${NOTEBOOKS_STATUS_FILE_NAME}" via GitHub API. Response: ${artifactsResponse}.`
+    );
   }
   return artifactsResponseJson.artifacts[0].archive_download_url;
 }
@@ -38,7 +39,14 @@ export async function fetchNotebooksStatusFile(distPath) {
   }
   console.info(`Fetching latest notebooks status file...`);
 
-  const artifactUrl = getLatestNotebooksStatusArtifactUrl();
+  let artifactUrl;
+  try {
+    artifactUrl = getLatestNotebooksStatusArtifactUrl();
+  } catch (error) {
+    console.warn(error);
+    console.warn('Notebooks status file is not downloaded.');
+    return;
+  }
   const artifactArchiveFileName = `${parse(NOTEBOOKS_STATUS_FILE_NAME).name}.zip`;
   execSync(
     `curl -H "Accept: application/vnd.github+json" -H "Authorization: token ${GITHUB_TOKEN}" -L --fail -o ${artifactArchiveFileName} "${artifactUrl}"`
