@@ -11,7 +11,7 @@ Latent Diffusion models (LDMs) have achieved remarkable results in synthesizing 
 
 ### Notebook Contents
 
-This [notebook](./Latent Consistency Models with ONNX and OpenVINO Execution Provider.ipynb) demonstrates how to  run [LCM_Dreamshaper_v7](https://huggingface.co/SimianLuo/LCM_Dreamshaper_v7) using ONNX Runtime and OpenVINO Execution Provider on iGPU of AI PC 
+This notebook demonstrates how to  run [LCM_Dreamshaper_v7](https://huggingface.co/SimianLuo/LCM_Dreamshaper_v7) using ONNX Runtime and OpenVINO Execution Provider on iGPU of AI PC 
 
 
 
