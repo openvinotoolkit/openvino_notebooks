@@ -124,12 +124,13 @@ def clean_test_artifacts(before_test_files, after_test_files):
         else:
             shutil.rmtree(file_path, ignore_errors=True)
 
-def get_openvino_version_from_pip_freeze(pip_freeze_input):
-    for line in pip_freeze_input.split('\n'):
-        if "openvino==" in line:
-            version = line.split("==")[1]
+def get_openvino_version():
+    try:
+        import openvino as ov
+        version = ov.get_version()
+    except ImportError:
+        sys.exit('Missing openvino in validation environment.')
     return version
-
 
 def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir="."):
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path)
@@ -145,12 +146,12 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
                 [sys.executable, "-m", "pip", "freeze"],
                 shell=(platform.system() == "Windows"),
             )
+            ov_version_before = get_openvino_version()
             reqs_before_file = report_dir / (notebook_name.stem + "_env_before.txt")        
             with reqs_before_file.open("wb") as f:
                 f.write(reqs)
             with reqs_before_file.open("r") as f:
                 content = f.read()
-                ov_version_before = get_openvino_version_from_pip_freeze(content)
                 print(content)
 
             main_command = [sys.executable, "-m", "treon", str(notebook_name)]
@@ -173,13 +174,13 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
             [sys.executable, "-m", "pip", "freeze"],
             shell=(platform.system() == "Windows"),
         )
+        ov_version_after = get_openvino_version()       
         reqs_after_file = report_dir / (notebook_name.stem + "_env_after.txt")
 
         with reqs_after_file.open("wb") as f:
             f.write(reqs)
         with reqs_after_file.open("r") as f:
             content = f.read()
-            ov_version_after = get_openvino_version_from_pip_freeze(content)
             print(content)
 
         retcodes.append((str(notebook_name), retcode, duration, ov_version_before, ov_version_after))
@@ -226,7 +227,13 @@ class cd:
 
 def write_single_notebook_report(base_version, notebook_name, status, duration, ov_version_before, ov_version_after, saving_dir):
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
-    report = {"version": base_version, "notebook_name": notebook_name.replace("test_", ""), "status": status, "duration": duration, "ov_version_before": ov_version_before, "ov_version_after": ov_version_after}
+    report = {"version": base_version, 
+              "notebook_name": notebook_name.replace("test_", ""), 
+              "status": status, 
+              "duration": duration, 
+              "ov_version_before": ov_version_before, 
+              "ov_version_after": ov_version_after
+             }
     with report_file.open("w") as f:
         json.dump(report, f)
 
@@ -248,11 +255,7 @@ def main():
     if args.keep_artifacts:
         keep_artifacts = True
 
-    try:
-        import openvino as ov
-        base_version = ov.get_version()
-    except ImportError:
-        sys.exit('Missing openvino in validation environment.')
+    base_version = get_openvino_version()
 
     test_plan = prepare_test_plan(args.test_list, args.ignore_list, notebooks_moving_dir)
     for notebook, report in test_plan.items():
@@ -282,17 +285,19 @@ def main():
                 write_single_notebook_report(base_version, subnotebook, status, duration, ov_version_before, ov_version_after, reports_dir)
             if args.upload_to_db:
                 report_to_upload = reports_dir / subnotebook.replace(".ipynb", ".json")
-                print(report_to_upload)
                 cmd = [sys.executable, args.upload_to_db, report_to_upload]
-                print(cmd)
                 try:
-                    retcode = subprocess.run(
+                    output = subprocess.run(
                         cmd,
                         shell=(platform.system() == "Windows"),
                         timeout=60,
-                    ).returncode
-                except subprocess.TimeoutExpired:
-                    retcode = -42
+                        capture_output=True, 
+                        text=True
+                    )
+                    print(output)
+                    print(f"Uploaded {report_to_upload} to database.")
+                except subprocess.CalledProcessError as e:
+                    print(e.output)
             
             if args.early_stop:
                 break
