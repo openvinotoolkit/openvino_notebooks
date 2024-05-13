@@ -63,7 +63,10 @@ This notebook demonstrates how to  run [LCM_Dreamshaper_v7](https://huggingface.
     ```sh
     .\build.bat --config Debug --use_openvino CPU --build_shared_lib --build_wheel --parallel --skip_tests
     ```
-    Discover the wheel file in the path - e.g.: \onnxruntime\build\Windows\Debug\Debug\dist\ 
+    Discover the wheel file in the path - e.g.: 
+    ```sh
+    \onnxruntime\build\Windows\Debug\Debug\dist\ 
+    ```
 
 
 
