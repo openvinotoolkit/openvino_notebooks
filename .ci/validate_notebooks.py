@@ -296,15 +296,18 @@ def main():
                 report_to_upload = reports_dir / subnotebook.replace(".ipynb", ".json")
                 cmd = [sys.executable, args.upload_to_db, report_to_upload]
                 try:
-                    output = subprocess.run(
+                    dbprocess = subprocess.Popen(
                         cmd,
                         shell=(platform.system() == "Windows"),
-                        timeout=60,
-                        capture_output=True, 
-                        text=True
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        universal_newlines=True
                     )
-                    print(output)
-                    print(f"Uploaded {report_to_upload} to database.")
+                    for line in dbprocess.stdout:
+                        sys.stdout.write(line)
+                        sys.stdout.flush()
+                        
+                    print(f"\nUploaded {report_to_upload} to database.\n")
                 except subprocess.CalledProcessError as e:
                     print(e.output)
             
