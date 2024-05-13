@@ -154,8 +154,7 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
             with reqs_before_file.open("wb") as f:
                 f.write(reqs)
             with reqs_before_file.open("r") as f:
-                content = f.read()
-                print(content)
+                print(f.read())
 
             main_command = [sys.executable, "-m", "treon", str(notebook_name)]
             start = time.perf_counter()
@@ -168,7 +167,6 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
             except subprocess.TimeoutExpired:
                 retcode = -42
             duration = time.perf_counter() - start
-            #retcodes.append((str(notebook_name), retcode, duration))
 
         if not keep_artifacts:
             clean_test_artifacts(existing_files, sorted(Path(".").iterdir()))
@@ -183,8 +181,7 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
         with reqs_after_file.open("wb") as f:
             f.write(reqs)
         with reqs_after_file.open("r") as f:
-            content = f.read()
-            print(content)
+            print(f.read())
 
         retcodes.append((str(notebook_name), retcode, duration, ov_version_before, ov_version_after))
     return retcodes
