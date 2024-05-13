@@ -35,7 +35,7 @@ This notebook demonstrates how to  run [LCM_Dreamshaper_v7](https://huggingface.
   ```
 - Now you only need a Jupyter server to start.
 - All other dependencies are installed in the notebook itself
-- For details, please refer to [Installation Guide](../../README.md).
+- For details, please refer to [Installation Guide](../../README.md#-installation-guide).
 
 
 ## How to build onnxruntime_openvino 
