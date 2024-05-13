@@ -131,7 +131,8 @@ def get_openvino_version():
         import openvino as ov
         version = ov.get_version()
     except ImportError:
-        sys.exit('Missing openvino in validation environment.')
+        print('Missing openvino in validation environment.')
+        version = "Openvino is not installed missing"
     return version
 
 def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir="."):
