@@ -22,6 +22,8 @@ def parse_arguments():
     parser.add_argument("--keep_artifacts", action="store_true")
     parser.add_argument("--collect_reports", action="store_true")
     parser.add_argument("--move_notebooks_dir")
+    parser.add_argument("--job_name")
+    parser.add_argument("--device_used")
     parser.add_argument("--upload_to_db")
     parser.add_argument(
         "--timeout",
@@ -225,14 +227,16 @@ class cd:
         os.chdir(self.saved_path)
 
 
-def write_single_notebook_report(base_version, notebook_name, status, duration, ov_version_before, ov_version_after, saving_dir):
+def write_single_notebook_report(base_version, notebook_name, status, duration, ov_version_before, ov_version_after, job_name, device_used, saving_dir):
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
     report = {"version": base_version, 
               "notebook_name": notebook_name.replace("test_", ""), 
               "status": status, 
               "duration": duration, 
               "ov_version_before": ov_version_before, 
-              "ov_version_after": ov_version_after
+              "ov_version_after": ov_version_after,
+              "job_name": job_name,
+              "device_used": device_used
              }
     with report_file.open("w") as f:
         json.dump(report, f)
@@ -282,7 +286,11 @@ def main():
             timing += duration
             report["duration"] = timing
             if args.collect_reports:
-                write_single_notebook_report(base_version, subnotebook, status, duration, ov_version_before, ov_version_after, reports_dir)
+                if args.job_name: job_name = args.job_name
+                else: job_name = "Unknown"
+                if args.device_used: device_used = args.device_used
+                else: device_used = "Unknown"
+                write_single_notebook_report(base_version, subnotebook, status, duration, ov_version_before, ov_version_after, job_name, device_used, reports_dir)
             if args.upload_to_db:
                 report_to_upload = reports_dir / subnotebook.replace(".ipynb", ".json")
                 cmd = [sys.executable, args.upload_to_db, report_to_upload]
