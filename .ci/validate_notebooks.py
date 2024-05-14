@@ -55,7 +55,9 @@ def get_notebooks_subdir(changed_path, orig_nb_dir):
             notebook_subdir = notebook_subdir.relative_to(orig_nb_dir)
         print(notebook_subdir)
     else:
-        notebook_subdir = find_notebook_dir(changed_path.resolve(), orig_nb_dir.resolve())
+        notebook_subdir = find_notebook_dir(
+            changed_path.resolve(), orig_nb_dir.resolve()
+        )
     return notebook_subdir
 
 
@@ -76,7 +78,9 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
         for ig_nb in ignore_list:
             if ig_nb.endswith(".txt"):
                 with open(ig_nb, "r") as f:
-                    ignored_notebooks.extend(list(map(lambda x: x.strip(), f.readlines())))
+                    ignored_notebooks.extend(
+                        list(map(lambda x: x.strip(), f.readlines()))
+                    )
             else:
                 ignored_notebooks.append(ig_nb)
         print(f"ignored notebooks: {ignored_notebooks}")
@@ -126,14 +130,17 @@ def clean_test_artifacts(before_test_files, after_test_files):
         else:
             shutil.rmtree(file_path, ignore_errors=True)
 
+
 def get_openvino_version():
     try:
         import openvino as ov
+
         version = ov.get_version()
     except ImportError:
-        print('Missing openvino in validation environment.')
+        print("Missing openvino in validation environment.")
         version = "Openvino is not installed missing"
     return version
+
 
 def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir="."):
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path)
@@ -150,7 +157,7 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
                 shell=(platform.system() == "Windows"),
             )
             ov_version_before = get_openvino_version()
-            reqs_before_file = report_dir / (notebook_name.stem + "_env_before.txt")        
+            reqs_before_file = report_dir / (notebook_name.stem + "_env_before.txt")
             with reqs_before_file.open("wb") as f:
                 f.write(reqs)
             with reqs_before_file.open("r") as f:
@@ -175,7 +182,7 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
             [sys.executable, "-m", "pip", "freeze"],
             shell=(platform.system() == "Windows"),
         )
-        ov_version_after = get_openvino_version()       
+        ov_version_after = get_openvino_version()
         reqs_after_file = report_dir / (notebook_name.stem + "_env_after.txt")
 
         with reqs_after_file.open("wb") as f:
@@ -183,7 +190,9 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
         with reqs_after_file.open("r") as f:
             print(f.read())
 
-        retcodes.append((str(notebook_name), retcode, duration, ov_version_before, ov_version_after))
+        retcodes.append(
+            (str(notebook_name), retcode, duration, ov_version_before, ov_version_after)
+        )
     return retcodes
 
 
@@ -205,7 +214,9 @@ def finalize_status(failed_notebooks, timeout_notebooks, test_plan, report_dir, 
             }
         )
     with (report_dir / "test_report.csv").open("w") as f:
-        writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
+        writer = csv.DictWriter(
+            f, fieldnames=["name", "status", "full_path", "duration"]
+        )
         writer.writeheader()
         writer.writerows(test_report)
     return return_status
@@ -225,17 +236,28 @@ class cd:
         os.chdir(self.saved_path)
 
 
-def write_single_notebook_report(base_version, notebook_name, status, duration, ov_version_before, ov_version_after, job_name, device_used, saving_dir):
+def write_single_notebook_report(
+    base_version,
+    notebook_name,
+    status,
+    duration,
+    ov_version_before,
+    ov_version_after,
+    job_name,
+    device_used,
+    saving_dir,
+):
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
-    report = {"version": base_version, 
-              "notebook_name": notebook_name.replace("test_", ""), 
-              "status": status, 
-              "duration": duration, 
-              "ov_version_before": ov_version_before, 
-              "ov_version_after": ov_version_after,
-              "job_name": job_name,
-              "device_used": device_used
-             }
+    report = {
+        "version": base_version,
+        "notebook_name": notebook_name.replace("test_", ""),
+        "status": status,
+        "duration": duration,
+        "ov_version_before": ov_version_before,
+        "ov_version_after": ov_version_after,
+        "job_name": job_name,
+        "device_used": device_used,
+    }
     with report_file.open("w") as f:
         json.dump(report, f)
 
@@ -259,23 +281,37 @@ def main():
 
     base_version = get_openvino_version()
 
-    test_plan = prepare_test_plan(args.test_list, args.ignore_list, notebooks_moving_dir)
+    test_plan = prepare_test_plan(
+        args.test_list, args.ignore_list, notebooks_moving_dir
+    )
     for notebook, report in test_plan.items():
         if report["status"] == "SKIPPED":
             continue
-        statuses = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute())
+        statuses = run_test(
+            report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute()
+        )
         timing = 0
         if not statuses:
             print(f"{str(notebook)}: No testing notebooks found")
             report["status"] = "EMPTY"
             report["duration"] = timing
-        for subnotebook, status, duration, ov_version_before, ov_version_after in statuses:
+        for (
+            subnotebook,
+            status,
+            duration,
+            ov_version_before,
+            ov_version_after,
+        ) in statuses:
             if status:
                 status_code = "TIMEOUT" if status == -42 else "FAILED"
                 report["status"] = status_code
             else:
                 status_code = "SUCCESS"
-                report["status"] = "SUCCESS" if not report["status"] in ["TIMEOUT", "FAILED"] else report["status"]
+                report["status"] = (
+                    "SUCCESS"
+                    if not report["status"] in ["TIMEOUT", "FAILED"]
+                    else report["status"]
+                )
             if status:
                 if status == -42:
                     timeout_notebooks.append(str(subnotebook))
@@ -284,11 +320,25 @@ def main():
             timing += duration
             report["duration"] = timing
             if args.collect_reports:
-                if args.job_name: job_name = args.job_name
-                else: job_name = "Unknown"
-                if args.device_used: device_used = args.device_used
-                else: device_used = "Unknown"
-                write_single_notebook_report(base_version, subnotebook, status, duration, ov_version_before, ov_version_after, job_name, device_used, reports_dir)
+                if args.job_name:
+                    job_name = args.job_name
+                else:
+                    job_name = "Unknown"
+                if args.device_used:
+                    device_used = args.device_used
+                else:
+                    device_used = "Unknown"
+                write_single_notebook_report(
+                    base_version,
+                    subnotebook,
+                    status,
+                    duration,
+                    ov_version_before,
+                    ov_version_after,
+                    job_name,
+                    device_used,
+                    reports_dir,
+                )
             if args.upload_to_db:
                 report_to_upload = reports_dir / subnotebook.replace(".ipynb", ".json")
                 cmd = [sys.executable, args.upload_to_db, report_to_upload]
@@ -299,17 +349,19 @@ def main():
                         shell=(platform.system() == "Windows"),
                         stdout=subprocess.PIPE,
                         stderr=subprocess.STDOUT,
-                        universal_newlines=True
+                        universal_newlines=True,
                     )
                     for line in dbprocess.stdout:
                         sys.stdout.write(line)
-                        sys.stdout.flush()   
+                        sys.stdout.flush()
                 except subprocess.CalledProcessError as e:
                     print(e.output)
-            
+
             if args.early_stop:
                 break
-    exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
+    exit_status = finalize_status(
+        failed_notebooks, timeout_notebooks, test_plan, reports_dir, root
+    )
     return exit_status
 
 
