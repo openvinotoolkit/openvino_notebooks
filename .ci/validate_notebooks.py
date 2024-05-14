@@ -292,6 +292,7 @@ def main():
             if args.upload_to_db:
                 report_to_upload = reports_dir / subnotebook.replace(".ipynb", ".json")
                 cmd = [sys.executable, args.upload_to_db, report_to_upload]
+                print(f"\nUploading {report_to_upload} to database. CMD: {cmd}")
                 try:
                     dbprocess = subprocess.Popen(
                         cmd,
@@ -302,9 +303,7 @@ def main():
                     )
                     for line in dbprocess.stdout:
                         sys.stdout.write(line)
-                        sys.stdout.flush()
-                        
-                    print(f"\nUploaded {report_to_upload} to database.\n")
+                        sys.stdout.flush()   
                 except subprocess.CalledProcessError as e:
                     print(e.output)
             
