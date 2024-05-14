@@ -133,8 +133,8 @@ def get_openvino_version():
 
         version = ov.get_version()
     except ImportError:
-        print("Missing openvino in validation environment.")
-        version = "Openvino is not installed missing"
+        print("Openvino is missing in validation environment.")
+        version = "Openvino is missing"
     return version
 
 
