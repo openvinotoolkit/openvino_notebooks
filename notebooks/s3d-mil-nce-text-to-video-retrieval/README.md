@@ -1,6 +1,6 @@
 # Text-to-Video retrieval with S3D MIL-NCE and OpenVINO
 
-This tutorial based on [the TenosrFlow tutorial](https://www.tensorflow.org/hub/tutorials/text_to_video_retrieval_with_s3d_milnce) that demonstrates how to use the [S3D MIL-NCE](https://tfhub.dev/deepmind/mil-nce/s3d/1) model from TensorFlow Hub to do text-to-video retrieval to find the most similar videos for a given text query.
+This tutorial based on [the TensorFlow tutorial](https://www.tensorflow.org/hub/tutorials/text_to_video_retrieval_with_s3d_milnce) that demonstrates how to use the [S3D MIL-NCE](https://tfhub.dev/deepmind/mil-nce/s3d/1) model from TensorFlow Hub to do text-to-video retrieval to find the most similar videos for a given text query.
 
 ## Notebook contents
 This tutorial consists of the following steps:
