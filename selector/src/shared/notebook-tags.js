@@ -23,6 +23,7 @@ export const TASKS = /** @type {const} */ ({
     FEATURE_EXTRACTION: 'Feature Extraction',
     TEXT_TO_IMAGE_RETRIEVAL: "Text-to-Image Retrieval",
     IMAGE_TO_TEXT_RETRIEVAL: "Image-to-Text Retrieval",
+    TEXT_TO_VIDEO_RETRIEVAL: "Text-to-Video Retrieval",
     IMAGE_TO_3D: "Image-to-3D",
     IMAGE_TO_VIDEO: "Image-to-Video"
   },
