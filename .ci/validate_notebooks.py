@@ -114,7 +114,7 @@ def prepare_test_plan(test_list: List[str], ignore_list: List[str], nb_dir: Opti
     test_list = set(testing_notebooks)
     print(f"test notebooks: {test_list}")
 
-    ignore_list = set(map(lambda x: Path(x).relative_to(orig_nb_dir), ignored_notebooks))
+    ignore_list = set(map(lambda x: Path(x), ignored_notebooks))
     for notebook in statuses:
         if notebook not in test_list:
             statuses[notebook]["status"] = "SKIPPED"
