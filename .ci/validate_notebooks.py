@@ -106,7 +106,11 @@ def prepare_test_plan(test_list: List[str], ignore_list: List[str], nb_dir: Opti
             # notebook_subdir = get_notebooks_subdir(Path(test_item), orig_nb_dir)
             # if notebook_subdir is not None:
             #     testing_notebooks.append(notebook_subdir)
-            testing_notebooks.append(Path(test_item).relative_to(orig_nb_dir))
+            try:
+                testing_notebook_path = Path(test_item).relative_to(orig_nb_dir)
+            except ValueError:
+                testing_notebook_path = Path(test_item)
+            testing_notebooks.append(testing_notebook_path)
     test_list = set(testing_notebooks)
     print(f"test notebooks: {test_list}")
 
