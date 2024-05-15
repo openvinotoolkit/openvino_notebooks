@@ -212,7 +212,11 @@ class cd:
 
 def write_single_notebook_report(notebook_name, status, duration, saving_dir):
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
-    report = {"notebook_name": notebook_name.replace("test_", ""), "status": status, "duration": duration}
+    report = {
+        "notebook_name": notebook_name.replace("test_", ""),
+        "status": status,
+        "duration": duration,
+    }
     with report_file.open("w") as f:
         json.dump(report, f)
 
