@@ -54,29 +54,36 @@ def remove_ov_install(cell):
         if "openvino" in line:
             updated_line_content = []
             empty = True
+            package_found = False
             for part in line.split(" "):
                 if "openvino-dev" in part:
+                    package_found = True
                     continue
                 if "openvino-nightly" in part:
+                    package_found = True
                     continue
                 if "openvino-tokenizers" in part:
+                    package_found = True
                     continue
                 if "openvino>" in part or "openvino=" in part or "openvino" == part:
+                    package_found = True
                     continue
                 if empty:
                     empty = not has_additional_deps(part)
                 updated_line_content.append(part)
 
-            updated_lines.append("# " + line)
-            if not empty:
-                updated_line = " ".join(updated_line_content)
-                if line.startswith(" "):
-                    for token in line:
-                        if token != " ":
-                            break
-                        # keep indention
-                        updated_line = " " + updated_line
-                updated_lines.append(updated_line)
+            if package_found:
+                if not empty:
+                    updated_line = " ".join(updated_line_content)
+                    if line.startswith(" "):
+                        for token in line:
+                            if token != " ":
+                                break
+                            # keep indention
+                            updated_line = " " + updated_line
+                    updated_lines.append(updated_line + "# " + line)
+            else:
+                updated_lines.append(line)
         else:
             updated_lines.append(line)
     cell["source"] = "\n".join(updated_lines)
