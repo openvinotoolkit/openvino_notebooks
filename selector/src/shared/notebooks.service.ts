@@ -99,17 +99,15 @@ class NotebooksService {
     statusMap: Record<string, INotebookStatus>
   ): NotebooksMap {
     const result = { ...metadataMap } as NotebooksMap;
-    const notebooksNames = Object.keys(metadataMap);
-    for (const [notebookDir, { status }] of Object.entries(statusMap)) {
-      const notebookName = notebooksNames.find((v) => v.includes(notebookDir));
-      if (!notebookName || !result[notebookName]) {
-        console.warn(`Unknown notebook "${notebookDir}" found in status report.`);
+    for (const [notebookPath, { status }] of Object.entries(statusMap)) {
+      if (!result[notebookPath]) {
+        console.warn(`Unknown notebook "${notebookPath}" found in status report.`);
         continue;
       }
-      if (result[notebookName].status) {
-        console.warn(`Status of the notebook "${notebookDir}" already exists and will be overrided.`);
+      if (result[notebookPath].status) {
+        console.warn(`Status of the notebook "${notebookPath}" already exists and will be overrided.`);
       }
-      result[notebookName].status = status;
+      result[notebookPath].status = status;
     }
     return result;
   }
