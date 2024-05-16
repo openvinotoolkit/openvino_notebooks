@@ -13,6 +13,8 @@ from typing import Dict, List, Optional, Tuple, TypedDict
 
 ROOT = Path(__file__).parents[1]
 
+NOTEBOOKS_DIR = Path("notebooks")
+
 
 class NotebookReport(TypedDict):
     status: str
@@ -41,6 +43,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
+# TODO Consider removing as unused
 def find_notebook_dir(path, root):
     for parent in path.parents:
         if root == parent.parent:
@@ -49,10 +52,11 @@ def find_notebook_dir(path, root):
 
 
 def move_notebooks(nb_dir):
-    current_notebooks_dir = ROOT / "notebooks"
+    current_notebooks_dir = ROOT / NOTEBOOKS_DIR
     shutil.copytree(current_notebooks_dir, nb_dir)
 
 
+# TODO Consider removing as unused
 def get_notebooks_subdir(changed_path, orig_nb_dir) -> Optional[Path]:
     if (orig_nb_dir / changed_path).exists() and (orig_nb_dir / changed_path).is_dir():
         notebook_subdir = orig_nb_dir / changed_path
@@ -66,28 +70,37 @@ def get_notebooks_subdir(changed_path, orig_nb_dir) -> Optional[Path]:
     return notebook_subdir
 
 
-def prepare_test_plan(test_list: List[str], ignore_list: List[str], nb_dir: Optional[Path] = None) -> TestPlan:
-    orig_nb_dir = ROOT / "notebooks"
-    notebooks_dir = orig_nb_dir if nb_dir is None else nb_dir
+# TODO Consider renaming
+def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb_dir: Optional[Path] = None) -> TestPlan:
+    orig_nb_dir = ROOT / NOTEBOOKS_DIR
+    notebooks_dir = nb_dir or orig_nb_dir
     notebooks = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
 
+    # TODO Consider renaming
     statuses = {notebook.relative_to(notebooks_dir): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
 
-    test_list = test_list or statuses.keys()
-    ignored_notebooks = []
+    ignored_notebooks: List[Path] = []
     if ignore_list is not None:
         for ignore_item in ignore_list:
             if ignore_item.endswith(".txt"):
                 # Paths to ignore files are provided to `--ignore_list` argument
                 with open(ignore_item, "r") as f:
-                    ignored_notebooks.extend(list(map(lambda x: x.strip(), f.readlines())))
+                    ignored_notebooks.extend(list(map(lambda line: Path(line.strip()), f.readlines())))
             else:
-                # Notebooks list is provided to `--ignore_list` argument
-                ignored_notebooks.append(ignore_item)
-        print(f"ignored notebooks: {ignored_notebooks}")
+                # Ignored notebooks are provided as several items to `--ignore_list` argument
+                ignored_notebooks.append(Path(ignore_item))
+    try:
+        ignored_notebooks = list(set(map(lambda n: n.relative_to(NOTEBOOKS_DIR), ignored_notebooks)))
+    except ValueError:
+        raise ValueError(
+            f"Ignore list items should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\nInvalid ignored notebooks: {ignored_notebooks}"
+        )
+    print(f"Ignored notebooks: {ignored_notebooks}")
 
-    testing_notebooks = []
-    if len(test_list) == 1 and test_list[0].endswith(".txt"):
+    testing_notebooks: List[Path] = []
+    if not test_list:
+        testing_notebooks.extend([Path(n) for n in statuses.keys()])
+    elif len(test_list) == 1 and test_list[0].endswith(".txt"):
         with open(test_list[0], "r") as f:
             for line in f.readlines():
                 changed_file_path = Path(line.strip())
@@ -95,30 +108,28 @@ def prepare_test_plan(test_list: List[str], ignore_list: List[str], nb_dir: Opti
                     print("requirements.txt changed, check all notebooks")
                     testing_notebooks = statuses.keys()
                     break
-                if changed_file_path.suffix == ".md":
+                if changed_file_path.suffix != ".ipynb":
                     continue
-                # notebook_subdir = get_notebooks_subdir(changed_file_path, orig_nb_dir)
-                # if notebook_subdir is not None:
-                # testing_notebooks.append(notebook_subdir)
-                testing_notebooks.append(changed_file_path.relative_to(orig_nb_dir))
+                try:
+                    testing_notebook_path = changed_file_path.relative_to(NOTEBOOKS_DIR)
+                except ValueError:
+                    raise ValueError(
+                        "Items in test list file should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\n"
+                        f"Invalid line: {changed_file_path}"
+                    )
+                testing_notebooks.append(testing_notebook_path)
     else:
-        for test_item in test_list:
-            # notebook_subdir = get_notebooks_subdir(Path(test_item), orig_nb_dir)
-            # if notebook_subdir is not None:
-            #     testing_notebooks.append(notebook_subdir)
-            try:
-                testing_notebook_path = Path(test_item).relative_to(orig_nb_dir)
-            except ValueError:
-                testing_notebook_path = Path(test_item)
-            testing_notebooks.append(testing_notebook_path)
-    test_list = set(testing_notebooks)
-    print(f"test notebooks: {test_list}")
+        raise ValueError(
+            "Testing notebooks should be provided to '--test_list' argument as a txt file or should be empty to test all notebooks.\n"
+            f"Received test list: {test_list}"
+        )
+    testing_notebooks = list(set(testing_notebooks))
+    print(f"Testing notebooks: {testing_notebooks}")
 
-    ignore_list = set(map(lambda x: Path(x), ignored_notebooks))
     for notebook in statuses:
-        if notebook not in test_list:
+        if notebook not in testing_notebooks:
             statuses[notebook]["status"] = "SKIPPED"
-        if notebook in ignore_list:
+        if notebook in ignored_notebooks:
             statuses[notebook]["status"] = "SKIPPED"
     return statuses
 
@@ -179,6 +190,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         result = (str(patched_notebook), retcode, duration)
 
         if not keep_artifacts:
+            # TODO Check which artifacts need to be cleaned
             clean_test_artifacts([patched_notebook], sorted(Path(".").iterdir()))
         print("Packages after notebook run")
         reqs = subprocess.check_output(
