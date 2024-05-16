@@ -173,8 +173,6 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         reqs_before_file = report_dir / (patched_notebook.stem + "_env_before.txt")
         with reqs_before_file.open("wb") as f:
             f.write(reqs)
-        with reqs_before_file.open("r") as f:
-            print(f.read())
 
         main_command = [sys.executable, "-m", "treon", str(patched_notebook)]
         start = time.perf_counter()
@@ -200,8 +198,6 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         reqs_after_file = report_dir / (patched_notebook.stem + "_env_after.txt")
         with reqs_after_file.open("wb") as f:
             f.write(reqs)
-        with reqs_after_file.open("r") as f:
-            print(f.read())
     return result
 
 
