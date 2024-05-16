@@ -57,19 +57,13 @@ jobs:
 
       - name: List all changed files
         run: |
-          if [ "$RUNNER_OS" = "Windows"]; then
-            echo. > test_notebooks.txt
-            for %%f in ${{ steps.changed-files.outputs.all_changed_files }}; do
-              echo %%f was changed
-              echo %%f >> test_list.txt
-            done
-          else
-            touch test_notebooks.txt
-            for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-              echo "$file was changed"
-              echo $file >> test_notebooks.txt
-            done
-          fi
+          touch test_notebooks.txt
+          changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+          changed_files=$(echo $files | tr '\\' '/')
+          for file in $changed_files; do
+            echo "$file was changed"
+            echo $file >> test_notebooks.txt
+          done
         shell: bash
       - name: Dotenv Action
         id: dotenv
