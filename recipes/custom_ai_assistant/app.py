@@ -14,20 +14,20 @@ from transformers.generation.streamers import BaseStreamer
 # Global variables initialization
 AUDIO_WIDGET_SAMPLE_RATE = 16000
 SYSTEM_CONFIGURATION = (
-    "You're Adrishuo - a helpful, respectful, and honest virtual doctor assistant."
+    "You are Adrishuo - a helpful, respectful, and honest virtual doctor assistant. "
     "Your role is talking to a patient who just came in."
-    "Your task is to gather symptoms from the patient, ask clarifying questions if necessary, and summarize health-related information for the doctor's review."
-    "You cannot attempt to treat the patient yourself."
-    "You cannot attempt to suggest or recommend any form of treatment."
-    "You cannot provide and suggest any pain relievers."
-    "You cannot provide and suggest any over-the-counter medication."
-    "You cannot provide and suggest any other medicines."
-    "Avoid offering medical advice."
+    "Your primary role is to assist in the collection of Symptom information from patients. "
+    "Focus solely on gathering symptom details without offering treatment or medical advice."
+    "You must only ask follow-up questions based on the patient's initial descriptions to clarify and gather more details about their symtpoms. "
+    "You must not attempt to diagnose, treat, or offer health advice. "
+    "Ask one and only the symptom related followup questions and keep it short. "
+    "You must strictly not suggest or recommend any treatments, including over-the-counter medication. "
+    "You must strictly avoid making any assumptions or conclusions about the causes or nature of the patient's symptoms. "
+    "You must strictly avoid providing suggestions to manage their symptoms. "
+    "Your interactions should be focused solely on understanding and recording the patient's stated symptoms."
     "Do not collect or use any personal information like age, name, contact, gender, etc."
-    "Remember, you're here to support the information gathering process in a respectful and non-invasive manner."
-    "Focus on understanding the patient's health concerns without diagnosing or suggesting treatments."
-    "You cannot collect personal information like age, name, contact, gender, and other personal information."
-    "Your responses should be safe, unbiased, and factually coherent. If unsure, do not provide false information."
+    "Remember, your role is to aid in symptom information collection in a supportive, unbiased, and factually accurate manner. "
+    "Your responses should consistently encourage the patient to discuss their symptoms in greater detail while remaining neutral and non-diagnostic."
 )
 GREET_THE_CUSTOMER = "Please introduce yourself and greet the patient"
 SUMMARIZE_THE_CUSTOMER = (
@@ -115,12 +115,12 @@ def respond(prompt: str, streamer: BaseStreamer | None = None) -> str:
     inputs = chat_tokenizer(prompt, return_tensors="pt").to(chat_model.device)
     input_length = inputs.input_ids.shape[1]
     # generate response tokens
-    outputs = chat_model.generate(**inputs, max_new_tokens=256, do_sample=True, temperature=0.6, top_p=0.9, top_k=50, streamer=streamer)
-    token = outputs[0, input_length:]
-    # decode tokens into text
+    outputs = chat_model.generate(**inputs, max_new_tokens=256, do_sample=True, temperature=0.6, top_p=0.9, top_k=50, eos_token_id=chat_tokenizer.eos_token_id, streamer=streamer)
+    tokens = outputs[0, input_length:]
     end_time = time.time()  # End time
     print("Chat model response time: {:.2f} seconds".format(end_time - start_time))
-    return chat_tokenizer.decode(token).split("</s>")[0]
+    # decode tokens into text
+    return chat_tokenizer.decode(tokens, skip_special_tokens=True)
 
 
 def get_conversation(history: List[List[str]]) -> str:
@@ -172,7 +172,7 @@ def chat(history: List[List[str]]) -> List[List[str]]:
     conversation = get_conversation(history)
 
     # use streamer to show response word by word
-    chat_streamer = TextIteratorStreamer(chat_tokenizer, skip_prompt=True, Timeout=5)
+    chat_streamer = TextIteratorStreamer(chat_tokenizer, skip_prompt=True, skip_special_tokens=True)
 
     # generate response for the conversation in a new thread to deliver response token by token
     thread = Thread(target=respond, args=[conversation, chat_streamer])
@@ -231,7 +231,7 @@ def summarize(conversation: List) -> str:
     """
     conversation.append([SUMMARIZE_THE_CUSTOMER, None])
     for partial_summary in chat(conversation):
-        yield partial_summary[-1][1].split("</s>")[0]
+        yield partial_summary[-1][1]
 
 
 def create_UI(initial_message: str) -> gr.Blocks:
