@@ -35,36 +35,11 @@ SUMMARIZE_THE_CUSTOMER = (
     "Strictly do not mention any personal data like age, name, gender, contact, non-health information etc. when summarizing."
     "Warn the patients for immediate medical seeking in case they exhibit symptoms indicative of critical conditions such as heart attacks, strokes, severe allergic reactions, breathing difficulties, high fever with severe symptoms, significant burns, or severe injuries."
     "Summarize the health-related concerns mentioned by the patient in this conversation, focusing only on the information explicitly provided, without adding any assumptions or unrelated symptoms."
-
 )
-
-NEURAL_CHAT_MODEL_TEMPLATE = ("{% if messages[0]['role'] == 'system' %}"
-                              "{% set loop_messages = messages[1:] %}"
-                              "{% set system_message = messages[0]['content'] %}"
-                              "{% else %}"
-                              "{% set loop_messages = messages %}"
-                              "{% set system_message = 'You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. "
-                              "Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. "
-                              "If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don\\'t know the answer to a question, please don\\'t share false information.' %}"
-                              "{% endif %}"
-                              "{{ '### System:\\n' + system_message.strip() + '\\n' }}"
-                              "{% for message in loop_messages %}"
-                              "{% if (message['role'] == 'user') != (loop.index0 % 2 == 0) %}"
-                              "{{ raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') }}"
-                              "{% endif %}"
-                              "{% set content = message['content'] %}"
-                              "{% if message['role'] == 'user' %}"
-                              "{{ '### User:\\n' + content.strip() + '\\n' }}"
-                              "{% elif message['role'] == 'assistant' %}"
-                              "{{ '### Assistant:\\n' + content.strip() + '\\n'}}"
-                              "{% endif %}"
-                              "{% endfor %}"
-                              )
 
 # Initialize Model variables
 chat_model: Optional[OVModelForCausalLM] = None
 chat_tokenizer: Optional[PreTrainedTokenizer] = None
-message_template: Optional[str] = None
 asr_model: Optional[OVModelForSpeechSeq2Seq] = None
 asr_processor: Optional[AutoProcessor] = None
 
@@ -90,14 +65,12 @@ def load_chat_model(model_dir: Path) -> None:
     Params:
         model_dir: dir with the chat model
     """
-    global chat_model, chat_tokenizer, message_template
+    global chat_model, chat_tokenizer
 
     # load llama model and its tokenizer
     ov_config = {'PERFORMANCE_HINT': 'LATENCY', 'NUM_STREAMS': '1', "CACHE_DIR": ""}
     chat_model = OVModelForCausalLM.from_pretrained(model_dir, device="AUTO", config=AutoConfig.from_pretrained(model_dir), ov_config=ov_config)
     chat_tokenizer = AutoTokenizer.from_pretrained(model_dir)
-    # neural chat requires different template than specified in the tokenizer
-    message_template = NEURAL_CHAT_MODEL_TEMPLATE if ("neural-chat" in model_dir.name) else chat_tokenizer.default_chat_template
 
 
 def respond(prompt: str, streamer: BaseStreamer | None = None) -> str:
@@ -145,7 +118,7 @@ def get_conversation(history: List[List[str]]) -> str:
             conversation.append({"role": "assistant", "content": assistant_response})
 
     # use a template specific to the model
-    return chat_tokenizer.apply_chat_template(conversation, chat_template=message_template, tokenize=False)
+    return chat_tokenizer.apply_chat_template(conversation, tokenize=False)
 
 
 def generate_initial_greeting() -> str:

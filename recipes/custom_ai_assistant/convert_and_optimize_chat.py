@@ -10,6 +10,29 @@ MODEL_MAPPING = {
     "neural-chat-7B": "Intel/neural-chat-7b-v3-3"
 }
 
+NEURAL_CHAT_MODEL_TEMPLATE = ("{% if messages[0]['role'] == 'system' %}"
+                              "{% set loop_messages = messages[1:] %}"
+                              "{% set system_message = messages[0]['content'] %}"
+                              "{% else %}"
+                              "{% set loop_messages = messages %}"
+                              "{% set system_message = 'You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. "
+                              "Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. "
+                              "If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don\\'t know the answer to a question, please don\\'t share false information.' %}"
+                              "{% endif %}"
+                              "{{ '### System:\\n' + system_message.strip() + '\\n' }}"
+                              "{% for message in loop_messages %}"
+                              "{% if (message['role'] == 'user') != (loop.index0 % 2 == 0) %}"
+                              "{{ raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') }}"
+                              "{% endif %}"
+                              "{% set content = message['content'] %}"
+                              "{% if message['role'] == 'user' %}"
+                              "{{ '### User:\\n' + content.strip() + '\\n' }}"
+                              "{% elif message['role'] == 'assistant' %}"
+                              "{{ '### Assistant:\\n' + content.strip() + '\\n'}}"
+                              "{% endif %}"
+                              "{% endfor %}"
+                              )
+
 
 def convert_chat_model(model_type: str, quantize_weights: str, model_dir: Path) -> Path:
     """
@@ -49,6 +72,10 @@ def convert_chat_model(model_type: str, quantize_weights: str, model_dir: Path) 
 
     # export also tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+    if model_type == "neural-chat-7B":
+        tokenizer.chat_template = NEURAL_CHAT_MODEL_TEMPLATE
+
     tokenizer.save_pretrained(output_dir)
 
     return Path(output_dir) / "openvino_model.xml"
