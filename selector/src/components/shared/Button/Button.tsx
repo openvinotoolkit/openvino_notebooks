@@ -1,6 +1,6 @@
 import './Button.scss';
 
-import { AnchorHTMLAttributes, ButtonHTMLAttributes, FunctionComponent, SVGProps } from 'react';
+import { AnchorHTMLAttributes, ButtonHTMLAttributes, forwardRef, FunctionComponent, SVGProps } from 'react';
 
 const sparkClassNames = {
   button: 'spark-button spark-focus-visible spark-focus-visible-self spark-focus-visible-snap',
@@ -31,17 +31,10 @@ type ButtonProps = {
   className?: string;
 } & AsElementProps;
 
-export const Button = ({
-  text,
-  as = 'button',
-  variant = 'primary',
-  size = 'm',
-  disabled = false,
-  onClick,
-  icon,
-  className,
-  ...props
-}: ButtonProps): JSX.Element => {
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { text, as = 'button', variant = 'primary', size = 'm', disabled = false, onClick, icon, className, ...props },
+  ref
+): JSX.Element {
   const sizeClassName = `${sparkClassNames.buttonSizePrefix}${size}`;
   const variantClassName = `${sparkClassNames.buttonVariantPrefix}${variant}`;
   const classNames = [sparkClassNames.button, sizeClassName, variantClassName];
@@ -80,8 +73,15 @@ export const Button = ({
   }
 
   return (
-    <button className={classNames.join(' ')} type="button" role="radio" onClick={() => onClick?.()} aria-label={text}>
+    <button
+      className={classNames.join(' ')}
+      type="button"
+      role="radio"
+      onClick={(e) => onClick?.(e)}
+      aria-label={text}
+      ref={ref}
+    >
       {buttonContent}
     </button>
   );
-};
+});
