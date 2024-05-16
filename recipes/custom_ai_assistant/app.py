@@ -88,7 +88,7 @@ def respond(prompt: str, streamer: BaseStreamer | None = None) -> str:
     inputs = chat_tokenizer(prompt, return_tensors="pt").to(chat_model.device)
     input_length = inputs.input_ids.shape[1]
     # generate response tokens
-    outputs = chat_model.generate(**inputs, max_new_tokens=256, do_sample=True, temperature=0.6, top_p=0.9, top_k=50, eos_token_id=chat_tokenizer.eos_token_id, streamer=streamer)
+    outputs = chat_model.generate(**inputs, max_new_tokens=256, do_sample=True, temperature=0.6, top_p=0.9, top_k=50, streamer=streamer)
     tokens = outputs[0, input_length:]
     end_time = time.time()  # End time
     print("Chat model response time: {:.2f} seconds".format(end_time - start_time))
@@ -118,7 +118,7 @@ def get_conversation(history: List[List[str]]) -> str:
             conversation.append({"role": "assistant", "content": assistant_response})
 
     # use a template specific to the model
-    return chat_tokenizer.apply_chat_template(conversation, tokenize=False)
+    return chat_tokenizer.apply_chat_template(conversation, add_generation_prompt=True, tokenize=False)
 
 
 def generate_initial_greeting() -> str:
@@ -284,7 +284,7 @@ def run(asr_model_dir: Path, chat_model_dir: Path, public_interface: bool = Fals
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--asr_model_dir', type=str, default="model/distil-large-v2-FP16", help="Path to the automatic speech recognition model directory")
-    parser.add_argument('--chat_model_dir', type=str, default="model/llama2-7B-INT8", help="Path to the chat model directory")
+    parser.add_argument('--chat_model_dir', type=str, default="model/llama3-8B-INT8", help="Path to the chat model directory")
     parser.add_argument('--public_interface', default=False, action="store_true", help="Whether interface should be available publicly")
 
     args = parser.parse_args()

@@ -65,20 +65,22 @@ To install the required packages, run the following commands:
 python -m pip install --upgrade pip 
 pip install -r requirements.txt
 ```
-### How to Access LlaMA 2
+### How to Access LlaMA
 
-_NOTE: If you already have access to the LlaMA 2 model weights, skip to the authentication step, which is mandatory for converting the LlaMA 2 model._
+_NOTE: If you already have access to the LlaMA model weights, skip to the authentication step, which is mandatory for converting the LlaMA model._
 
 #### Accessing Original Weights from Meta AI
 
-To access the original LlaMA 2 model weights:
+To access the original LlaMA model weights:
 
 Visit [Meta AI's website](https://ai.meta.com/resources/models-and-libraries/llama-downloads/) and fill in your details, including your name, email, and organization.
 Accept the terms and submit the form. You will receive an email granting access to download the model weights.
-Using LlaMA 2 with Hugging Face
+
+#### Using LlaMA with Hugging Face
+
 Set Up a Hugging Face Account: If you don't have one, create a [Hugging Face account](https://huggingface.co/welcome).
 
-Authenticate with Meta AI: Go to the LlaMA 2 model page on Hugging Face. You'll need to enter the same email address you used for the Meta AI website to be authenticated. After authentication, you'll gain access to the model.
+Authenticate with Meta AI: Go to the LlaMA model (v2 or v3) page on Hugging Face. You'll need to enter the same email address you used for the Meta AI website to be authenticated. After authentication, you'll gain access to the model.
 
 To use the model, authenticate using the Hugging Face CLI:
 
@@ -101,9 +103,9 @@ python convert_and_optimize_asr.py --quantize_weights
 ```
 This script will convert and optimize the automatic speech recognition (ASR) model performing weights quantization.
 
-2. Chat LLama2 Conversion:
+2. Chat LLama Conversion:
 ```shell
-python convert_and_optimize_chat.py --chat_model_type llama2-7B --quantize_weights int8
+python convert_and_optimize_chat.py --chat_model_type llama3-8B --quantize_weights int8
 ```
 This script will handle the conversion and optimization of the chat model performing weights quantization. 
 
