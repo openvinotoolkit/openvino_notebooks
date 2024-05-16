@@ -59,10 +59,10 @@ jobs:
         run: |
           if [ "$RUNNER_OS" = "Windows"]; then
             echo. > test_notebooks.txt
-            for %%f in ${{ steps.changed-files.outputs.all_changed_files }} do (
+            for %%f in ${{ steps.changed-files.outputs.all_changed_files }}; do
               echo %%f was changed
               echo %%f >> test_list.txt
-            )
+            done
           else
             touch test_notebooks.txt
             for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
