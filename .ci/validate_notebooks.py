@@ -69,7 +69,7 @@ def get_notebooks_subdir(changed_path, orig_nb_dir) -> Optional[Path]:
 def prepare_test_plan(test_list: List[str], ignore_list: List[str], nb_dir: Optional[Path] = None) -> TestPlan:
     orig_nb_dir = ROOT / "notebooks"
     notebooks_dir = orig_nb_dir if nb_dir is None else nb_dir
-    notebooks = sorted(list(notebooks_dir.rglob("**/*.ipynb")))
+    notebooks = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
 
     statuses = {notebook.relative_to(notebooks_dir): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
 
@@ -142,16 +142,16 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
     result = None
 
     if notebook_path.is_dir():
-        print('Notebook path "{notebook_path}" is a directory, but path to "*.ipynb" file was expected.')
+        print(f'Notebook path "{notebook_path}" is a directory, but path to "*.ipynb" file was expected.')
         return result
     if notebook_path.suffix != ".ipynb":
-        print('Notebook path "{notebook_path}" should have "*.ipynb" extension.')
+        print(f'Notebook path "{notebook_path}" should have "*.ipynb" extension.')
         return result
 
     with cd(notebook_path.parent):
         patched_notebook = Path(f"test_{notebook_path.name}")
         if not patched_notebook.exists():
-            print('Patched notebook "{patched_notebook}" does not exist.')
+            print(f'Patched notebook "{patched_notebook}" does not exist.')
             return result
 
         print("Packages before notebook run")
@@ -260,7 +260,7 @@ def main():
         test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute())
         timing = 0
         if not test_result:
-            print(f"{str(notebook)}: No testing notebooks found")
+            print(f'Testing notebooks "{str(notebook)}" is not found.')
             report["status"] = "EMPTY"
             report["duration"] = timing
         else:
