@@ -59,7 +59,7 @@ jobs:
         run: |
           touch test_notebooks.txt
           changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
-          changed_files=$(echo $files | tr '\\' '/')
+          changed_files=$(echo $changed_files | tr '\\' '/')
           for file in $changed_files; do
             echo "$file was changed"
             echo $file >> test_notebooks.txt
