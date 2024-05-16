@@ -26,7 +26,7 @@ def convert_chat_model(model_type: str, quantize_weights: str, model_dir: Path) 
     model_name = MODEL_MAPPING[model_type]
 
     # load model and convert it to OpenVINO
-    model = OVModelForCausalLM.from_pretrained(model_name, export=True, compile=False)
+    model = OVModelForCausalLM.from_pretrained(model_name, export=True, compile=False, load_in_8bit=False)
     # change precision to FP16
     model.half()
 
@@ -41,7 +41,7 @@ def convert_chat_model(model_type: str, quantize_weights: str, model_dir: Path) 
         # create a quantizer
         quantizer = OVQuantizer.from_pretrained(model, task="seq2seq-lm")
         # quantize weights and save the model to the output dir
-        quantizer.quantize(save_directory=output_dir, weights_only=True, quantization_config=config)
+        quantizer.quantize(save_directory=output_dir, weights_only=True, ov_config=config)
     else:
         output_dir = output_dir.with_name(output_dir.name + "-FP16")
         # save converted model
