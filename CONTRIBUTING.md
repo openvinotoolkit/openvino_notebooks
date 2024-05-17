@@ -104,7 +104,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 ### Coding Guidelines
 
 1. See [PEP 20](https://www.python.org/dev/peps/pep-0020/)
-2. Format notebook code with [Black](https://github.com/psf/black), with a line width of 100. 
+2. Format notebook code with [Black](https://github.com/psf/black), with a line width of 160. 
    See [Tools](#manual-test-and-code-quality-tools).
 3. Use f-strings for string formatting: [PEP 498](https://www.python.org/dev/peps/pep-0498/)
 4. Use keyword/named arguments when calling a function with more than one parameter:
@@ -323,6 +323,15 @@ use either this extension or a different way to automatically format your notebo
 
 #### Black Automatic Code Formatter
 [Black](https://black.readthedocs.io/en/stable/getting_started.html) is the uncompromising Python code formatter that has extension for Jupyter notebooks.
+
+Install `black` with Jupyter Notebooks support:
+```
+python3 -m pip install black[jupyter]
+```
+Run formatting command in notebooks directory:
+```
+black -l 160 <notebooks_dir>
+```
 
 #### `PySpelling`
 
