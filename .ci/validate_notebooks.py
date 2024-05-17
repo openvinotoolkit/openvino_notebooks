@@ -134,7 +134,7 @@ def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb
         )
     testing_notebooks = list(set(testing_notebooks))
     # TODO Remove after testing
-    testing_notebooks = list(filter(lambda n: "yolov8-optimization/" in str(n), testing_notebooks))
+    testing_notebooks = list(filter(lambda n: "yolov8-optimization" in str(n), testing_notebooks))
     print(f"Testing notebooks: {testing_notebooks}")
 
     for notebook in test_plan:
