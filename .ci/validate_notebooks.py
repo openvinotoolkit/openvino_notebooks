@@ -6,14 +6,24 @@ import csv
 import json
 import shutil
 import platform
-from pathlib import Path
+
 from argparse import ArgumentParser
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple, TypedDict
 
 
 ROOT = Path(__file__).parents[1]
 
 NOTEBOOKS_DIR = Path("notebooks")
+
+
+class NotebookStatus:
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+    TIMEOUT = "TIMEOUT"
+    SKIPPED = "SKIPPED"
+    NOT_RUN = "NOT_RUN"
+    EMPTY = "EMPTY"
 
 
 class NotebookReport(TypedDict):
@@ -127,9 +137,9 @@ def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb
 
     for notebook in test_plan:
         if notebook not in testing_notebooks:
-            test_plan[notebook]["status"] = "SKIPPED"
+            test_plan[notebook]["status"] = NotebookStatus.SKIPPED
         if notebook in ignored_notebooks:
-            test_plan[notebook]["status"] = "SKIPPED"
+            test_plan[notebook]["status"] = NotebookStatus.SKIPPED
     return test_plan
 
 
@@ -209,7 +219,7 @@ def finalize_status(failed_notebooks: List[str], timeout_notebooks: List[str], t
         print("FAILED BY TIMEOUT: \n{}".format("\n".join(timeout_notebooks)))
     test_report = []
     for notebook, status in test_plan.items():
-        test_status = status["status"] or "NOT_RUN"
+        test_status = status["status"] or NotebookStatus.NOT_RUN
         test_report.append(
             {"name": notebook.as_posix(), "status": test_status, "full_path": str(status["path"].relative_to(root)), "duration": status["duration"]}
         )
@@ -264,26 +274,26 @@ def main():
 
     test_plan = prepare_test_plan(args.test_list, args.ignore_list, notebooks_moving_dir)
     for notebook, report in test_plan.items():
-        if report["status"] == "SKIPPED":
+        if report["status"] == NotebookStatus.SKIPPED:
             continue
         test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute())
         timing = 0
         if not test_result:
             print(f'Testing notebooks "{str(notebook)}" is not found.')
-            report["status"] = "EMPTY"
+            report["status"] = NotebookStatus.EMPTY
             report["duration"] = timing
         else:
             patched_notebook, status_code, duration = test_result
             if status_code:
                 if status_code == -42:
-                    status = "TIMEOUT"
+                    status = NotebookStatus.TIMEOUT
                     timeout_notebooks.append(patched_notebook)
                 else:
-                    status = "FAILED"
+                    status = NotebookStatus.FAILED
                     failed_notebooks.append(patched_notebook)
                 report["status"] = status
             else:
-                report["status"] = "SUCCESS" if not report["status"] in ["TIMEOUT", "FAILED"] else report["status"]
+                report["status"] = NotebookStatus.SUCCESS if not report["status"] in [NotebookStatus.TIMEOUT, NotebookStatus.FAILED] else report["status"]
 
             timing += duration
             report["duration"] = timing
