@@ -74,10 +74,9 @@ def get_notebooks_subdir(changed_path, orig_nb_dir) -> Optional[Path]:
 def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb_dir: Optional[Path] = None) -> TestPlan:
     orig_nb_dir = ROOT / NOTEBOOKS_DIR
     notebooks_dir = nb_dir or orig_nb_dir
-    notebooks = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
+    notebooks: List[Path] = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
 
-    # TODO Consider renaming
-    statuses = {notebook.relative_to(notebooks_dir): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
+    test_plan: TestPlan = {notebook.relative_to(notebooks_dir): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
 
     ignored_notebooks: List[Path] = []
     if ignore_list is not None:
@@ -99,14 +98,14 @@ def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb
 
     testing_notebooks: List[Path] = []
     if not test_list:
-        testing_notebooks.extend([Path(n) for n in statuses.keys()])
+        testing_notebooks = [Path(n) for n in test_plan.keys()]
     elif len(test_list) == 1 and test_list[0].endswith(".txt"):
         with open(test_list[0], "r") as f:
             for line in f.readlines():
                 changed_file_path = Path(line.strip())
                 if changed_file_path.resolve() == (ROOT / "requirements.txt").resolve():
                     print("requirements.txt changed, check all notebooks")
-                    testing_notebooks = statuses.keys()
+                    testing_notebooks = [Path(n) for n in test_plan.keys()]
                     break
                 if changed_file_path.suffix != ".ipynb":
                     continue
@@ -126,12 +125,12 @@ def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb
     testing_notebooks = list(set(testing_notebooks))
     print(f"Testing notebooks: {testing_notebooks}")
 
-    for notebook in statuses:
+    for notebook in test_plan:
         if notebook not in testing_notebooks:
-            statuses[notebook]["status"] = "SKIPPED"
+            test_plan[notebook]["status"] = "SKIPPED"
         if notebook in ignored_notebooks:
-            statuses[notebook]["status"] = "SKIPPED"
-    return statuses
+            test_plan[notebook]["status"] = "SKIPPED"
+    return test_plan
 
 
 def clean_test_artifacts(before_test_files: List[Path], after_test_files: List[Path]):
@@ -211,7 +210,9 @@ def finalize_status(failed_notebooks: List[str], timeout_notebooks: List[str], t
     test_report = []
     for notebook, status in test_plan.items():
         test_status = status["status"] or "NOT_RUN"
-        test_report.append({"name": notebook, "status": test_status, "full_path": str(status["path"].relative_to(root)), "duration": status["duration"]})
+        test_report.append(
+            {"name": notebook.as_posix(), "status": test_status, "full_path": str(status["path"].relative_to(root)), "duration": status["duration"]}
+        )
     with (report_dir / "test_report.csv").open("w") as f:
         writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
         writer.writeheader()
