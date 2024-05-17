@@ -161,8 +161,6 @@ jobs:
       - name: Patch notebooks
         run: |
           python .ci/patch_notebooks.py .
-          # TODO Remove after testing
-          ls -la notebooks/yolov8-optimization/
 
       # Test that JupyterLab runs without errors
       - name: Test Jupyterlab
