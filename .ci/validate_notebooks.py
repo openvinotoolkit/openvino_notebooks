@@ -22,6 +22,9 @@ def parse_arguments():
     parser.add_argument("--keep_artifacts", action="store_true")
     parser.add_argument("--collect_reports", action="store_true")
     parser.add_argument("--move_notebooks_dir")
+    parser.add_argument("--job_name")
+    parser.add_argument("--device_used")
+    parser.add_argument("--upload_to_db")
     parser.add_argument(
         "--timeout",
         type=int,
@@ -124,6 +127,17 @@ def clean_test_artifacts(before_test_files, after_test_files):
             shutil.rmtree(file_path, ignore_errors=True)
 
 
+def get_openvino_version():
+    try:
+        import openvino as ov
+
+        version = ov.get_version()
+    except ImportError:
+        print("Openvino is missing in validation environment.")
+        version = "Openvino is missing"
+    return version
+
+
 def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir="."):
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path)
     print(f"RUN {notebook_path.relative_to(root)}", flush=True)
@@ -138,6 +152,7 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
                 [sys.executable, "-m", "pip", "freeze"],
                 shell=(platform.system() == "Windows"),
             )
+            ov_version_before = get_openvino_version()
             reqs_before_file = report_dir / (notebook_name.stem + "_env_before.txt")
             with reqs_before_file.open("wb") as f:
                 f.write(reqs)
@@ -155,7 +170,6 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
             except subprocess.TimeoutExpired:
                 retcode = -42
             duration = time.perf_counter() - start
-            retcodes.append((str(notebook_name), retcode, duration))
 
         if not keep_artifacts:
             clean_test_artifacts(existing_files, sorted(Path(".").iterdir()))
@@ -164,11 +178,15 @@ def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir
             [sys.executable, "-m", "pip", "freeze"],
             shell=(platform.system() == "Windows"),
         )
+        ov_version_after = get_openvino_version()
         reqs_after_file = report_dir / (notebook_name.stem + "_env_after.txt")
+
         with reqs_after_file.open("wb") as f:
             f.write(reqs)
         with reqs_after_file.open("r") as f:
             print(f.read())
+
+        retcodes.append((str(notebook_name), retcode, duration, ov_version_before, ov_version_after))
     return retcodes
 
 
@@ -210,12 +228,17 @@ class cd:
         os.chdir(self.saved_path)
 
 
-def write_single_notebook_report(notebook_name, status, duration, saving_dir):
+def write_single_notebook_report(base_version, notebook_name, status, duration, ov_version_before, ov_version_after, job_name, device_used, saving_dir):
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
     report = {
+        "version": base_version,
         "notebook_name": notebook_name.replace("test_", ""),
         "status": status,
         "duration": duration,
+        "ov_version_before": ov_version_before,
+        "ov_version_after": ov_version_after,
+        "job_name": job_name,
+        "device_used": device_used,
     }
     with report_file.open("w") as f:
         json.dump(report, f)
@@ -238,6 +261,8 @@ def main():
     if args.keep_artifacts:
         keep_artifacts = True
 
+    base_version = get_openvino_version()
+
     test_plan = prepare_test_plan(args.test_list, args.ignore_list, notebooks_moving_dir)
     for notebook, report in test_plan.items():
         if report["status"] == "SKIPPED":
@@ -248,7 +273,7 @@ def main():
             print(f"{str(notebook)}: No testing notebooks found")
             report["status"] = "EMPTY"
             report["duration"] = timing
-        for subnotebook, status, duration in statuses:
+        for subnotebook, status, duration, ov_version_before, ov_version_after in statuses:
             if status:
                 status_code = "TIMEOUT" if status == -42 else "FAILED"
                 report["status"] = status_code
@@ -263,7 +288,31 @@ def main():
             timing += duration
             report["duration"] = timing
             if args.collect_reports:
-                write_single_notebook_report(subnotebook, status, duration, reports_dir)
+                if args.job_name:
+                    job_name = args.job_name
+                else:
+                    job_name = "Unknown"
+                if args.device_used:
+                    device_used = args.device_used
+                else:
+                    device_used = "Unknown"
+                write_single_notebook_report(
+                    base_version, subnotebook, status, duration, ov_version_before, ov_version_after, job_name, device_used, reports_dir
+                )
+            if args.upload_to_db:
+                report_to_upload = reports_dir / subnotebook.replace(".ipynb", ".json")
+                cmd = [sys.executable, args.upload_to_db, report_to_upload]
+                print(f"\nUploading {report_to_upload} to database. CMD: {cmd}")
+                try:
+                    dbprocess = subprocess.Popen(
+                        cmd, shell=(platform.system() == "Windows"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
+                    )
+                    for line in dbprocess.stdout:
+                        sys.stdout.write(line)
+                        sys.stdout.flush()
+                except subprocess.CalledProcessError as e:
+                    print(e.output)
+
             if args.early_stop:
                 break
     exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
