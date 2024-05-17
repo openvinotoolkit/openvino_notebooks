@@ -58,6 +58,15 @@ def move_notebooks(nb_dir):
     shutil.copytree(current_notebooks_dir, nb_dir)
 
 
+def collect_python_packages(output_file: Path):
+    reqs = subprocess.check_output(
+        [sys.executable, "-m", "pip", "freeze"],
+        shell=(platform.system() == "Windows"),
+    )
+    with output_file.open("wb") as f:
+        f.write(reqs)
+
+
 def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb_dir: Optional[Path] = None) -> TestPlan:
     orig_nb_dir = ROOT / NOTEBOOKS_DIR
     notebooks_dir = nb_dir or orig_nb_dir
@@ -154,14 +163,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
             print(f'Patched notebook "{patched_notebook}" does not exist.')
             return result
 
-        print("Collecting packages before notebook run.")
-        reqs = subprocess.check_output(
-            [sys.executable, "-m", "pip", "freeze"],
-            shell=(platform.system() == "Windows"),
-        )
-        reqs_before_file = report_dir / (patched_notebook.stem + "_env_before.txt")
-        with reqs_before_file.open("wb") as f:
-            f.write(reqs)
+        collect_python_packages(report_dir / (patched_notebook.stem + "_env_before.txt"))
 
         main_command = [sys.executable, "-m", "treon", str(patched_notebook)]
         start = time.perf_counter()
@@ -179,14 +181,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         if not keep_artifacts:
             clean_test_artifacts(files_before_test, sorted(Path(".").iterdir()))
 
-        print("Collecting packages after notebook run.")
-        reqs = subprocess.check_output(
-            [sys.executable, "-m", "pip", "freeze"],
-            shell=(platform.system() == "Windows"),
-        )
-        reqs_after_file = report_dir / (patched_notebook.stem + "_env_after.txt")
-        with reqs_after_file.open("wb") as f:
-            f.write(reqs)
+        collect_python_packages(report_dir / (patched_notebook.stem + "_env_after.txt"))
     return result
 
 
