@@ -171,12 +171,13 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         return result
 
     with cd(notebook_path.parent):
+        files_before_test = sorted(Path(".").iterdir())
         patched_notebook = Path(f"test_{notebook_path.name}")
         if not patched_notebook.exists():
             print(f'Patched notebook "{patched_notebook}" does not exist.')
             return result
 
-        print("Packages before notebook run")
+        print("Collecting packages before notebook run.")
         reqs = subprocess.check_output(
             [sys.executable, "-m", "pip", "freeze"],
             shell=(platform.system() == "Windows"),
@@ -199,9 +200,9 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         result = (str(patched_notebook), retcode, duration)
 
         if not keep_artifacts:
-            # TODO Check which artifacts need to be cleaned
-            clean_test_artifacts([patched_notebook], sorted(Path(".").iterdir()))
-        print("Packages after notebook run")
+            clean_test_artifacts(files_before_test, sorted(Path(".").iterdir()))
+
+        print("Collecting packages after notebook run.")
         reqs = subprocess.check_output(
             [sys.executable, "-m", "pip", "freeze"],
             shell=(platform.system() == "Windows"),
