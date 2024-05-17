@@ -53,34 +53,11 @@ def parse_arguments():
     return parser.parse_args()
 
 
-# TODO Consider removing as unused
-def find_notebook_dir(path, root):
-    for parent in path.parents:
-        if root == parent.parent:
-            return parent.relative_to(root)
-    return None
-
-
 def move_notebooks(nb_dir):
     current_notebooks_dir = ROOT / NOTEBOOKS_DIR
     shutil.copytree(current_notebooks_dir, nb_dir)
 
 
-# TODO Consider removing as unused
-def get_notebooks_subdir(changed_path, orig_nb_dir) -> Optional[Path]:
-    if (orig_nb_dir / changed_path).exists() and (orig_nb_dir / changed_path).is_dir():
-        notebook_subdir = orig_nb_dir / changed_path
-        if not list(notebook_subdir.rglob("**/*.ipynb")):
-            notebook_subdir = None
-        else:
-            notebook_subdir = notebook_subdir.relative_to(orig_nb_dir)
-        print(notebook_subdir)
-    else:
-        notebook_subdir = find_notebook_dir(changed_path.resolve(), orig_nb_dir.resolve())
-    return notebook_subdir
-
-
-# TODO Consider renaming
 def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb_dir: Optional[Path] = None) -> TestPlan:
     orig_nb_dir = ROOT / NOTEBOOKS_DIR
     notebooks_dir = nb_dir or orig_nb_dir
