@@ -9,6 +9,7 @@ This tutorial consists of the following steps:
 - Convert the model to OpenVINO IR
 - Compiling models
 - Inference
+- Model quantization
 
 ## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>
