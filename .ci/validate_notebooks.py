@@ -147,7 +147,7 @@ def clean_test_artifacts(before_test_files: List[Path], after_test_files: List[P
             shutil.rmtree(file_path, ignore_errors=True)
 
 
-def get_openvino_version():
+def get_openvino_version() -> str:
     try:
         import openvino as ov
 
@@ -158,7 +158,7 @@ def get_openvino_version():
     return version
 
 
-def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[Tuple[str, int, float]]:
+def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[Tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
     print(f"RUN {notebook_path.relative_to(root)}", flush=True)
     result = None
@@ -235,12 +235,22 @@ class cd:
         os.chdir(self.saved_path)
 
 
-def write_single_notebook_report(base_version, notebook_name, status, duration, ov_version_before, ov_version_after, job_name, device_used, saving_dir):
+def write_single_notebook_report(
+    base_version: str,
+    notebook_name: str,
+    status_code: int,
+    duration: float,
+    ov_version_before: str,
+    ov_version_after: str,
+    job_name: str,
+    device_used: str,
+    saving_dir: Path,
+) -> Path:
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
     report = {
         "version": base_version,
         "notebook_name": notebook_name.replace("test_", ""),
-        "status": status,
+        "status": status_code,
         "duration": duration,
         "ov_version_before": ov_version_before,
         "ov_version_after": ov_version_after,
@@ -249,6 +259,7 @@ def write_single_notebook_report(base_version, notebook_name, status, duration, 
     }
     with report_file.open("w") as f:
         json.dump(report, f)
+    return report_file
 
 
 def main():
@@ -296,30 +307,23 @@ def main():
             timing += duration
             report["duration"] = timing
             if args.collect_reports:
-                if args.job_name:
-                    job_name = args.job_name
-                else:
-                    job_name = "Unknown"
-                if args.device_used:
-                    device_used = args.device_used
-                else:
-                    device_used = "Unknown"
-                write_single_notebook_report(
+                job_name = args.job_name or "Unknown"
+                device_used = args.device_used or "Unknown"
+                report_path = write_single_notebook_report(
                     base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device_used, reports_dir
                 )
-            if args.upload_to_db:
-                report_to_upload = reports_dir / patched_notebook.replace(".ipynb", ".json")
-                cmd = [sys.executable, args.upload_to_db, report_to_upload]
-                print(f"\nUploading {report_to_upload} to database. CMD: {cmd}")
-                try:
-                    dbprocess = subprocess.Popen(
-                        cmd, shell=(platform.system() == "Windows"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
-                    )
-                    for line in dbprocess.stdout:
-                        sys.stdout.write(line)
-                        sys.stdout.flush()
-                except subprocess.CalledProcessError as e:
-                    print(e.output)
+                if args.upload_to_db:
+                    cmd = [sys.executable, args.upload_to_db, report_path]
+                    print(f"\nUploading {report_path} to database. CMD: {cmd}")
+                    try:
+                        dbprocess = subprocess.Popen(
+                            cmd, shell=(platform.system() == "Windows"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
+                        )
+                        for line in dbprocess.stdout:
+                            sys.stdout.write(line)
+                            sys.stdout.flush()
+                    except subprocess.CalledProcessError as e:
+                        print(e.output)
 
             if args.early_stop:
                 break
