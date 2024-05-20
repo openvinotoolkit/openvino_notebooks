@@ -12,7 +12,7 @@ from transformers import AutoConfig, AutoTokenizer, AutoProcessor, PreTrainedTok
 from transformers.generation.streamers import BaseStreamer
 
 # Global variables initialization
-AUDIO_WIDGET_SAMPLE_RATE = 16000
+TARGET_AUDIO_SAMPLE_RATE = 16000
 SYSTEM_CONFIGURATION = (
     "You are Adrishuo - a helpful, respectful, and honest virtual doctor assistant. "
     "Your role is talking to a patient who just came in."
@@ -176,20 +176,31 @@ def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> 
 
     sample_rate, audio = audio
     # the whisper model requires 16000Hz, not 44100Hz
-    audio = librosa.resample(audio.astype(np.float32), orig_sr=sample_rate, target_sr=AUDIO_WIDGET_SAMPLE_RATE).astype(np.int16)
+    audio = librosa.resample(audio.astype(np.float32), orig_sr=sample_rate, target_sr=TARGET_AUDIO_SAMPLE_RATE).astype(np.int16)
 
     # get input features from the audio
-    input_features = asr_processor(audio, sampling_rate=AUDIO_WIDGET_SAMPLE_RATE, return_tensors="pt").input_features
-    # get output
-    predicted_ids = asr_model.generate(input_features)
-    # decode output to text
-    transcription = asr_processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
+    input_features = asr_processor(audio, sampling_rate=TARGET_AUDIO_SAMPLE_RATE, return_tensors="pt").input_features
+
+    # use streamer to show transcription word by word
+    text_streamer = TextIteratorStreamer(asr_processor, skip_prompt=True, skip_special_tokens=True)
+
+    # transcribe in the background to deliver response token by token
+    thread = Thread(target=asr_model.generate, kwargs={"input_features": input_features, "streamer": text_streamer})
+    thread.start()
+
+    conversation.append(["", None])
+    # get token by token and merge to the final response
+    for partial_text in text_streamer:
+        conversation[-1][0] += partial_text
+        # "return" partial response
+        yield conversation
 
     end_time = time.time()  # End time for ASR process
     print(f"ASR model response time: {end_time - start_time:.2f} seconds")  # Print the ASR processing time
 
-    # add the text to the conversation
-    conversation.append([transcription, None])
+    # wait for the thread
+    thread.join()
+
     return conversation
 
 
