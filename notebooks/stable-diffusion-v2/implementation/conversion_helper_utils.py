@@ -68,7 +68,7 @@ def convert_unet(
         encoder_hidden_state = torch.ones((2, 77, 1024))
         latents_shape = (2, num_channels, width, height)
         latents = torch.randn(latents_shape)
-        t = torch.from_numpy(np.array(1, dtype=np.float32))
+        t = torch.from_numpy(np.array([1], dtype=np.float32))
         unet.eval()
         dummy_inputs = (latents, t, encoder_hidden_state)
         input_info = []
