@@ -44,6 +44,9 @@ def parse_arguments():
     parser.add_argument("--keep_artifacts", action="store_true")
     parser.add_argument("--collect_reports", action="store_true")
     parser.add_argument("--move_notebooks_dir")
+    parser.add_argument("--job_name")
+    parser.add_argument("--device_used")
+    parser.add_argument("--upload_to_db")
     parser.add_argument(
         "--timeout",
         type=int,
@@ -144,6 +147,17 @@ def clean_test_artifacts(before_test_files: List[Path], after_test_files: List[P
             shutil.rmtree(file_path, ignore_errors=True)
 
 
+def get_openvino_version():
+    try:
+        import openvino as ov
+
+        version = ov.get_version()
+    except ImportError:
+        print("Openvino is missing in validation environment.")
+        version = "Openvino is missing"
+    return version
+
+
 def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[Tuple[str, int, float]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
     print(f"RUN {notebook_path.relative_to(root)}", flush=True)
@@ -158,6 +172,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
     with cd(notebook_path.parent):
         files_before_test = sorted(Path(".").iterdir())
+        ov_version_before = get_openvino_version()
         patched_notebook = Path(f"test_{notebook_path.name}")
         if not patched_notebook.exists():
             print(f'Patched notebook "{patched_notebook}" does not exist.')
@@ -176,12 +191,13 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         except subprocess.TimeoutExpired:
             retcode = -42
         duration = time.perf_counter() - start
-        result = (str(patched_notebook), retcode, duration)
+        ov_version_after = get_openvino_version()
+        result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after)
 
         if not keep_artifacts:
             clean_test_artifacts(files_before_test, sorted(Path(".").iterdir()))
-
         collect_python_packages(report_dir / (patched_notebook.stem + "_env_after.txt"))
+
     return result
 
 
@@ -219,12 +235,17 @@ class cd:
         os.chdir(self.saved_path)
 
 
-def write_single_notebook_report(notebook_name, status, duration, saving_dir):
+def write_single_notebook_report(base_version, notebook_name, status, duration, ov_version_before, ov_version_after, job_name, device_used, saving_dir):
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
     report = {
+        "version": base_version,
         "notebook_name": notebook_name.replace("test_", ""),
         "status": status,
         "duration": duration,
+        "ov_version_before": ov_version_before,
+        "ov_version_after": ov_version_after,
+        "job_name": job_name,
+        "device_used": device_used,
     }
     with report_file.open("w") as f:
         json.dump(report, f)
@@ -247,6 +268,8 @@ def main():
     if args.keep_artifacts:
         keep_artifacts = True
 
+    base_version = get_openvino_version()
+
     test_plan = prepare_test_plan(args.test_list, args.ignore_list, notebooks_moving_dir)
     for notebook, report in test_plan.items():
         if report["status"] == NotebookStatus.SKIPPED:
@@ -258,7 +281,7 @@ def main():
             report["status"] = NotebookStatus.EMPTY
             report["duration"] = timing
         else:
-            patched_notebook, status_code, duration = test_result
+            patched_notebook, status_code, duration, ov_version_before, ov_version_after = test_result
             if status_code:
                 if status_code == -42:
                     status = NotebookStatus.TIMEOUT
@@ -273,7 +296,31 @@ def main():
             timing += duration
             report["duration"] = timing
             if args.collect_reports:
-                write_single_notebook_report(patched_notebook, status_code, duration, reports_dir)
+                if args.job_name:
+                    job_name = args.job_name
+                else:
+                    job_name = "Unknown"
+                if args.device_used:
+                    device_used = args.device_used
+                else:
+                    device_used = "Unknown"
+                write_single_notebook_report(
+                    base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device_used, reports_dir
+                )
+            if args.upload_to_db:
+                report_to_upload = reports_dir / patched_notebook.replace(".ipynb", ".json")
+                cmd = [sys.executable, args.upload_to_db, report_to_upload]
+                print(f"\nUploading {report_to_upload} to database. CMD: {cmd}")
+                try:
+                    dbprocess = subprocess.Popen(
+                        cmd, shell=(platform.system() == "Windows"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
+                    )
+                    for line in dbprocess.stdout:
+                        sys.stdout.write(line)
+                        sys.stdout.flush()
+                except subprocess.CalledProcessError as e:
+                    print(e.output)
+
             if args.early_stop:
                 break
 
