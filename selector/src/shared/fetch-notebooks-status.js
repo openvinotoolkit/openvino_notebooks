@@ -16,8 +16,7 @@ import { NOTEBOOKS_STATUS_FILE_NAME } from './constants.js';
  */
 function getLatestNotebooksStatusArtifactUrl() {
   const artifactsResponse = execSync(
-    // TODO Remove after testing
-    `curl -L "https://api.github.com/repos/yatarkan/openvino_notebooks/actions/artifacts?per_page=1&name=${NOTEBOOKS_STATUS_FILE_NAME}"`
+    `curl -L "https://api.github.com/repos/openvinotoolkit/openvino_notebooks/actions/artifacts?per_page=1&name=${NOTEBOOKS_STATUS_FILE_NAME}"`
   ).toString();
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const artifactsResponseJson = /** @type {ArtifactsResponse} */ (JSON.parse(artifactsResponse));
