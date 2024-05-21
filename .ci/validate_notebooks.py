@@ -6,11 +6,33 @@ import csv
 import json
 import shutil
 import platform
-from pathlib import Path
+
 from argparse import ArgumentParser
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, TypedDict
 
 
 ROOT = Path(__file__).parents[1]
+
+NOTEBOOKS_DIR = Path("notebooks")
+
+
+class NotebookStatus:
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+    TIMEOUT = "TIMEOUT"
+    SKIPPED = "SKIPPED"
+    NOT_RUN = "NOT_RUN"
+    EMPTY = "EMPTY"
+
+
+class NotebookReport(TypedDict):
+    status: str
+    path: Path
+    duration: float = 0
+
+
+TestPlan = Dict[Path, NotebookReport]
 
 
 def parse_arguments():
@@ -34,87 +56,83 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def find_notebook_dir(path, root):
-    for parent in path.parents:
-        if root == parent.parent:
-            return parent.relative_to(root)
-    return None
-
-
 def move_notebooks(nb_dir):
-    current_notebooks_dir = ROOT / "notebooks"
+    current_notebooks_dir = ROOT / NOTEBOOKS_DIR
     shutil.copytree(current_notebooks_dir, nb_dir)
 
 
-def get_notebooks_subdir(changed_path, orig_nb_dir):
-    if (orig_nb_dir / changed_path).exists() and (orig_nb_dir / changed_path).is_dir():
-        notebook_subdir = orig_nb_dir / changed_path
-        if not list(notebook_subdir.rglob("**/*.ipynb")):
-            notebook_subdir = None
-        else:
-            notebook_subdir = notebook_subdir.relative_to(orig_nb_dir)
-        print(notebook_subdir)
-    else:
-        notebook_subdir = find_notebook_dir(changed_path.resolve(), orig_nb_dir.resolve())
-    return notebook_subdir
+def collect_python_packages(output_file: Path):
+    reqs = subprocess.check_output(
+        [sys.executable, "-m", "pip", "freeze"],
+        shell=(platform.system() == "Windows"),
+    )
+    with output_file.open("wb") as f:
+        f.write(reqs)
 
 
-def prepare_test_plan(test_list, ignore_list, nb_dir=None):
-    orig_nb_dir = ROOT / "notebooks"
-    notebooks_dir = orig_nb_dir if nb_dir is None else nb_dir
-    notebooks = sorted(list(notebooks_dir.rglob("**/*.ipynb")))
-    statuses = {
-        notebook.parent.relative_to(notebooks_dir): {
-            "status": "",
-            "path": notebook.parent,
-        }
-        for notebook in notebooks
-    }
-    test_list = test_list or statuses.keys()
-    ignored_notebooks = []
+def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb_dir: Optional[Path] = None) -> TestPlan:
+    orig_nb_dir = ROOT / NOTEBOOKS_DIR
+    notebooks_dir = nb_dir or orig_nb_dir
+    notebooks: List[Path] = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
+
+    test_plan: TestPlan = {notebook.relative_to(notebooks_dir): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
+
+    ignored_notebooks: List[Path] = []
     if ignore_list is not None:
-        for ig_nb in ignore_list:
-            if ig_nb.endswith(".txt"):
-                with open(ig_nb, "r") as f:
-                    ignored_notebooks.extend(list(map(lambda x: x.strip(), f.readlines())))
+        for ignore_item in ignore_list:
+            if ignore_item.endswith(".txt"):
+                # Paths to ignore files are provided to `--ignore_list` argument
+                with open(ignore_item, "r") as f:
+                    ignored_notebooks.extend(list(map(lambda line: Path(line.strip()), f.readlines())))
             else:
-                ignored_notebooks.append(ig_nb)
-        print(f"ignored notebooks: {ignored_notebooks}")
+                # Ignored notebooks are provided as several items to `--ignore_list` argument
+                ignored_notebooks.append(Path(ignore_item))
+    try:
+        ignored_notebooks = list(set(map(lambda n: n.relative_to(NOTEBOOKS_DIR), ignored_notebooks)))
+    except ValueError:
+        raise ValueError(
+            f"Ignore list items should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\nInvalid ignored notebooks: {ignored_notebooks}"
+        )
+    print(f"Ignored notebooks: {ignored_notebooks}")
 
-    testing_notebooks = []
-    if len(test_list) == 1 and test_list[0].endswith(".txt"):
-        testing_notebooks = []
+    testing_notebooks: List[Path] = []
+    if not test_list:
+        testing_notebooks = [Path(n) for n in test_plan.keys()]
+    elif len(test_list) == 1 and test_list[0].endswith(".txt"):
         with open(test_list[0], "r") as f:
             for line in f.readlines():
-                changed_path = Path(line.strip())
-                if changed_path.resolve() == (ROOT / "requirements.txt").resolve():
+                changed_file_path = Path(line.strip())
+                if changed_file_path.resolve() == (ROOT / "requirements.txt").resolve():
                     print("requirements.txt changed, check all notebooks")
-                    testing_notebooks = statuses.keys()
+                    testing_notebooks = [Path(n) for n in test_plan.keys()]
                     break
-                if changed_path.suffix == ".md":
+                if changed_file_path.suffix != ".ipynb":
                     continue
-                notebook_subdir = get_notebooks_subdir(changed_path, orig_nb_dir)
-                if notebook_subdir is None:
-                    continue
-                testing_notebooks.append(notebook_subdir)
+                try:
+                    testing_notebook_path = changed_file_path.relative_to(NOTEBOOKS_DIR)
+                except ValueError:
+                    raise ValueError(
+                        "Items in test list file should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\n"
+                        f"Invalid line: {changed_file_path}"
+                    )
+                testing_notebooks.append(testing_notebook_path)
     else:
-        for test_item in test_list:
-            notebook_subdir = get_notebooks_subdir(Path(test_item), orig_nb_dir)
-            if notebook_subdir is not None:
-                testing_notebooks.append(notebook_subdir)
-    test_list = set(testing_notebooks)
-    print(f"test notebooks: {test_list}")
+        raise ValueError(
+            "Testing notebooks should be provided to '--test_list' argument as a txt file or should be empty to test all notebooks.\n"
+            f"Received test list: {test_list}"
+        )
+    testing_notebooks = list(set(testing_notebooks))
+    print(f"Testing notebooks: {testing_notebooks}")
 
-    ignore_list = set(map(lambda x: Path(x), ignored_notebooks))
-    for notebook in statuses:
-        if notebook not in test_list:
-            statuses[notebook]["status"] = "SKIPPED"
-        if notebook in ignore_list:
-            statuses[notebook]["status"] = "SKIPPED"
-    return statuses
+    for notebook in test_plan:
+        if notebook not in testing_notebooks:
+            test_plan[notebook]["status"] = NotebookStatus.SKIPPED
+        if notebook in ignored_notebooks:
+            test_plan[notebook]["status"] = NotebookStatus.SKIPPED
+    return test_plan
 
 
-def clean_test_artifacts(before_test_files, after_test_files):
+def clean_test_artifacts(before_test_files: List[Path], after_test_files: List[Path]):
     for file_path in after_test_files:
         if file_path in before_test_files or not file_path.exists():
             continue
@@ -127,7 +145,7 @@ def clean_test_artifacts(before_test_files, after_test_files):
             shutil.rmtree(file_path, ignore_errors=True)
 
 
-def get_openvino_version():
+def get_openvino_version() -> str:
     try:
         import openvino as ov
 
@@ -138,59 +156,50 @@ def get_openvino_version():
     return version
 
 
-def run_test(notebook_path, root, timeout=7200, keep_artifacts=False, report_dir="."):
-    os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path)
+def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[Tuple[str, int, float, str, str]]:
+    os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
     print(f"RUN {notebook_path.relative_to(root)}", flush=True)
-    retcodes = []
+    result = None
 
-    with cd(notebook_path):
-        existing_files = sorted(Path(".").glob("test_*.ipynb"))
+    if notebook_path.is_dir():
+        print(f'Notebook path "{notebook_path}" is a directory, but path to "*.ipynb" file was expected.')
+        return result
+    if notebook_path.suffix != ".ipynb":
+        print(f'Notebook path "{notebook_path}" should have "*.ipynb" extension.')
+        return result
 
-        for notebook_name in existing_files:
-            print("Packages before notebook run")
-            reqs = subprocess.check_output(
-                [sys.executable, "-m", "pip", "freeze"],
+    with cd(notebook_path.parent):
+        files_before_test = sorted(Path(".").iterdir())
+        ov_version_before = get_openvino_version()
+        patched_notebook = Path(f"test_{notebook_path.name}")
+        if not patched_notebook.exists():
+            print(f'Patched notebook "{patched_notebook}" does not exist.')
+            return result
+
+        collect_python_packages(report_dir / (patched_notebook.stem + "_env_before.txt"))
+
+        main_command = [sys.executable, "-m", "treon", str(patched_notebook)]
+        start = time.perf_counter()
+        try:
+            retcode = subprocess.run(
+                main_command,
                 shell=(platform.system() == "Windows"),
-            )
-            ov_version_before = get_openvino_version()
-            reqs_before_file = report_dir / (notebook_name.stem + "_env_before.txt")
-            with reqs_before_file.open("wb") as f:
-                f.write(reqs)
-            with reqs_before_file.open("r") as f:
-                print(f.read())
-
-            main_command = [sys.executable, "-m", "treon", str(notebook_name)]
-            start = time.perf_counter()
-            try:
-                retcode = subprocess.run(
-                    main_command,
-                    shell=(platform.system() == "Windows"),
-                    timeout=timeout,
-                ).returncode
-            except subprocess.TimeoutExpired:
-                retcode = -42
-            duration = time.perf_counter() - start
+                timeout=timeout,
+            ).returncode
+        except subprocess.TimeoutExpired:
+            retcode = -42
+        duration = time.perf_counter() - start
+        ov_version_after = get_openvino_version()
+        result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after)
 
         if not keep_artifacts:
-            clean_test_artifacts(existing_files, sorted(Path(".").iterdir()))
-        print("Packages after notebook run")
-        reqs = subprocess.check_output(
-            [sys.executable, "-m", "pip", "freeze"],
-            shell=(platform.system() == "Windows"),
-        )
-        ov_version_after = get_openvino_version()
-        reqs_after_file = report_dir / (notebook_name.stem + "_env_after.txt")
+            clean_test_artifacts(files_before_test, sorted(Path(".").iterdir()))
+        collect_python_packages(report_dir / (patched_notebook.stem + "_env_after.txt"))
 
-        with reqs_after_file.open("wb") as f:
-            f.write(reqs)
-        with reqs_after_file.open("r") as f:
-            print(f.read())
-
-        retcodes.append((str(notebook_name), retcode, duration, ov_version_before, ov_version_after))
-    return retcodes
+    return result
 
 
-def finalize_status(failed_notebooks, timeout_notebooks, test_plan, report_dir, root):
+def finalize_status(failed_notebooks: List[str], timeout_notebooks: List[str], test_plan: TestPlan, report_dir: Path, root: Path) -> int:
     return_status = 0
     if failed_notebooks:
         return_status = 1
@@ -199,13 +208,9 @@ def finalize_status(failed_notebooks, timeout_notebooks, test_plan, report_dir, 
         print("FAILED BY TIMEOUT: \n{}".format("\n".join(timeout_notebooks)))
     test_report = []
     for notebook, status in test_plan.items():
-        test_status = status["status"] or "NOT_RUN"
+        test_status = status["status"] or NotebookStatus.NOT_RUN
         test_report.append(
-            {
-                "name": notebook,
-                "status": test_status,
-                "full_path": str(status["path"].relative_to(root)),
-            }
+            {"name": notebook.as_posix(), "status": test_status, "full_path": str(status["path"].relative_to(root)), "duration": status["duration"]}
         )
     with (report_dir / "test_report.csv").open("w") as f:
         writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
@@ -228,12 +233,22 @@ class cd:
         os.chdir(self.saved_path)
 
 
-def write_single_notebook_report(base_version, notebook_name, status, duration, ov_version_before, ov_version_after, job_name, device_used, saving_dir):
+def write_single_notebook_report(
+    base_version: str,
+    notebook_name: str,
+    status_code: int,
+    duration: float,
+    ov_version_before: str,
+    ov_version_after: str,
+    job_name: str,
+    device_used: str,
+    saving_dir: Path,
+) -> Path:
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
     report = {
         "version": base_version,
         "notebook_name": notebook_name.replace("test_", ""),
-        "status": status,
+        "status": status_code,
         "duration": duration,
         "ov_version_before": ov_version_before,
         "ov_version_after": ov_version_after,
@@ -242,6 +257,7 @@ def write_single_notebook_report(base_version, notebook_name, status, duration, 
     }
     with report_file.open("w") as f:
         json.dump(report, f)
+    return report_file
 
 
 def main():
@@ -265,56 +281,51 @@ def main():
 
     test_plan = prepare_test_plan(args.test_list, args.ignore_list, notebooks_moving_dir)
     for notebook, report in test_plan.items():
-        if report["status"] == "SKIPPED":
+        if report["status"] == NotebookStatus.SKIPPED:
             continue
-        statuses = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute())
+        test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute())
         timing = 0
-        if not statuses:
-            print(f"{str(notebook)}: No testing notebooks found")
-            report["status"] = "EMPTY"
+        if not test_result:
+            print(f'Testing notebooks "{str(notebook)}" is not found.')
+            report["status"] = NotebookStatus.EMPTY
             report["duration"] = timing
-        for subnotebook, status, duration, ov_version_before, ov_version_after in statuses:
-            if status:
-                status_code = "TIMEOUT" if status == -42 else "FAILED"
-                report["status"] = status_code
-            else:
-                status_code = "SUCCESS"
-                report["status"] = "SUCCESS" if not report["status"] in ["TIMEOUT", "FAILED"] else report["status"]
-            if status:
-                if status == -42:
-                    timeout_notebooks.append(str(subnotebook))
+        else:
+            patched_notebook, status_code, duration, ov_version_before, ov_version_after = test_result
+            if status_code:
+                if status_code == -42:
+                    status = NotebookStatus.TIMEOUT
+                    timeout_notebooks.append(patched_notebook)
                 else:
-                    failed_notebooks.append(str(subnotebook))
+                    status = NotebookStatus.FAILED
+                    failed_notebooks.append(patched_notebook)
+                report["status"] = status
+            else:
+                report["status"] = NotebookStatus.SUCCESS if not report["status"] in [NotebookStatus.TIMEOUT, NotebookStatus.FAILED] else report["status"]
+
             timing += duration
             report["duration"] = timing
             if args.collect_reports:
-                if args.job_name:
-                    job_name = args.job_name
-                else:
-                    job_name = "Unknown"
-                if args.device_used:
-                    device_used = args.device_used
-                else:
-                    device_used = "Unknown"
-                write_single_notebook_report(
-                    base_version, subnotebook, status, duration, ov_version_before, ov_version_after, job_name, device_used, reports_dir
+                job_name = args.job_name or "Unknown"
+                device_used = args.device_used or "Unknown"
+                report_path = write_single_notebook_report(
+                    base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device_used, reports_dir
                 )
-            if args.upload_to_db:
-                report_to_upload = reports_dir / subnotebook.replace(".ipynb", ".json")
-                cmd = [sys.executable, args.upload_to_db, report_to_upload]
-                print(f"\nUploading {report_to_upload} to database. CMD: {cmd}")
-                try:
-                    dbprocess = subprocess.Popen(
-                        cmd, shell=(platform.system() == "Windows"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
-                    )
-                    for line in dbprocess.stdout:
-                        sys.stdout.write(line)
-                        sys.stdout.flush()
-                except subprocess.CalledProcessError as e:
-                    print(e.output)
+                if args.upload_to_db:
+                    cmd = [sys.executable, args.upload_to_db, report_path]
+                    print(f"\nUploading {report_path} to database. CMD: {cmd}")
+                    try:
+                        dbprocess = subprocess.Popen(
+                            cmd, shell=(platform.system() == "Windows"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
+                        )
+                        for line in dbprocess.stdout:
+                            sys.stdout.write(line)
+                            sys.stdout.flush()
+                    except subprocess.CalledProcessError as e:
+                        print(e.output)
 
             if args.early_stop:
                 break
+
     exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
     return exit_status
 
