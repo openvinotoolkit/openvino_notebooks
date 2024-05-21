@@ -1,4 +1,6 @@
+import { NOTEBOOKS_METADATA_FILE_NAME, NOTEBOOKS_STATUS_FILE_NAME } from './constants';
 import { INotebookMetadata } from './notebook-metadata';
+import { INotebookStatus } from './notebook-status';
 
 export const SORT_OPTIONS = {
   RECENTLY_ADDED: 'Recently Added',
@@ -17,16 +19,26 @@ interface INotebooksFilters {
   limit: number;
 }
 
-class NotebooksService {
-  private _notebooksMap: Record<string, INotebookMetadata> | null = null;
+type NotebooksMap = Record<string, INotebookMetadata & { status?: INotebookStatus['status'] }>;
 
-  private async _getNotebooksMap(): Promise<Record<string, INotebookMetadata>> {
+export type NotebookItem = NotebooksMap[string];
+
+class NotebooksService {
+  private _notebooksMap: NotebooksMap | null = null;
+
+  private async _getNotebooksMap(): Promise<NotebooksMap> {
     if (!this._notebooksMap) {
       const { BASE_URL } = import.meta.env;
-      const notebooksMap = (await fetch(`${BASE_URL}notebooks-metadata-map.json`).then((response) =>
+
+      const notebooksMetadataMap = (await fetch(`${BASE_URL}${NOTEBOOKS_METADATA_FILE_NAME}`).then((response) =>
         response.json()
       )) as Record<string, INotebookMetadata>;
-      this._notebooksMap = notebooksMap;
+
+      const notebooksStatusMap = (await fetch(`${BASE_URL}${NOTEBOOKS_STATUS_FILE_NAME}`).then((response) =>
+        response.ok ? response.json() : {}
+      )) as Record<string, INotebookStatus>;
+
+      this._notebooksMap = this._getNotebooksMapWithStatuses(notebooksMetadataMap, notebooksStatusMap);
     }
     return this._notebooksMap;
   }
@@ -80,6 +92,24 @@ class NotebooksService {
     if (sort === SORT_OPTIONS.NAME_DESCENDING) {
       return (a: INotebookMetadata, b: INotebookMetadata) => b.title.toUpperCase().localeCompare(a.title.toUpperCase());
     }
+  }
+
+  private _getNotebooksMapWithStatuses(
+    metadataMap: Record<string, INotebookMetadata>,
+    statusMap: Record<string, INotebookStatus>
+  ): NotebooksMap {
+    const result = { ...metadataMap } as NotebooksMap;
+    for (const [notebookPath, { status }] of Object.entries(statusMap)) {
+      if (!result[notebookPath]) {
+        console.warn(`Unknown notebook "${notebookPath}" found in status report.`);
+        continue;
+      }
+      if (result[notebookPath].status) {
+        console.warn(`Status of the notebook "${notebookPath}" already exists and will be overrided.`);
+      }
+      result[notebookPath].status = status;
+    }
+    return result;
   }
 }
 

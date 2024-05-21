@@ -8,6 +8,7 @@ adaptively
 adas
 ADE
 adversarially
+AE
 aeroplane
 affective
 ai
@@ -56,6 +57,7 @@ bert
 BERT's
 BetterTransformer
 Bewley
+bfloat
 BGE
 bge
 BGR
@@ -202,6 +204,7 @@ dpredictor
 DreamBooth
 Dreamshaper
 dropdown
+DynamiCrafter
 ECCV
 editability
 EfficientNet
@@ -451,6 +454,7 @@ nano
 nar
 NAS
 natively
+NCE
 NEOX
 NER
 NETP
@@ -791,6 +795,7 @@ UNets
 Unet
 Unimodal
 unsqueeze
+uncurated
 Uparrow
 uparrow
 upcast

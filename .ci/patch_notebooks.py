@@ -24,12 +24,24 @@ def disable_gradio_debug(nb, notebook_path):
     return nb
 
 
-def disable_skip_ext(nb, notebook_path):
+def disable_skip_ext(nb, notebook_path, test_device=""):
     found = False
+
+    skip_for_device = None if test_device else False
     for cell in nb["cells"]:
+        if test_device is not None and skip_for_device is None:
+            if (
+                'skip_for_device = "{}" in device.value'.format(test_device) in cell["source"]
+                and "to_quantize = widgets.Checkbox(value=not skip_for_device" in cell["source"]
+            ):
+                skip_for_device = True
+
         if "%%skip" in cell["source"]:
             found = True
-            cell["source"] = re.sub(r"%%skip.*.\n", "\n", cell["source"])
+            if not skip_for_device:
+                cell["source"] = re.sub(r"%%skip.*.\n", "\n", cell["source"])
+            else:
+                cell["source"] = '"""\n' + cell["source"] + '\n"""'
     if found:
         print(f"Disabled skip extension mode for {notebook_path}")
     return nb
@@ -54,29 +66,36 @@ def remove_ov_install(cell):
         if "openvino" in line:
             updated_line_content = []
             empty = True
+            package_found = False
             for part in line.split(" "):
                 if "openvino-dev" in part:
+                    package_found = True
                     continue
                 if "openvino-nightly" in part:
+                    package_found = True
                     continue
                 if "openvino-tokenizers" in part:
+                    package_found = True
                     continue
                 if "openvino>" in part or "openvino=" in part or "openvino" == part:
+                    package_found = True
                     continue
                 if empty:
                     empty = not has_additional_deps(part)
                 updated_line_content.append(part)
 
-            updated_lines.append("# " + line)
-            if not empty:
-                updated_line = " ".join(updated_line_content)
-                if line.startswith(" "):
-                    for token in line:
-                        if token != " ":
-                            break
-                        # keep indention
-                        updated_line = " " + updated_line
-                updated_lines.append(updated_line)
+            if package_found:
+                if not empty:
+                    updated_line = " ".join(updated_line_content)
+                    if line.startswith(" "):
+                        for token in line:
+                            if token != " ":
+                                break
+                            # keep indention
+                            updated_line = " " + updated_line
+                    updated_lines.append(updated_line + "# " + line)
+            else:
+                updated_lines.append(line)
         else:
             updated_lines.append(line)
     cell["source"] = "\n".join(updated_lines)
@@ -132,7 +151,7 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
             if not found:
                 print(f"No replacements found for {notebookfile}")
             disable_gradio_debug(nb, notebookfile)
-            disable_skip_ext(nb, notebookfile)
+            disable_skip_ext(nb, notebookfile, args.test_device)
             nb_without_out, _ = output_remover.from_notebook_node(nb)
             with notebookfile.with_name(f"test_{notebookfile.name}").open("w", encoding="utf-8") as out_file:
                 out_file.write(nb_without_out)

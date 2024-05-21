@@ -1,0 +1,20 @@
+@import '@spark-design/css/components/tooltip/index.css';
+
+.spark-tooltip-toggle {
+  display: inline-flex;
+}
+
+.spark-tooltip {
+  z-index: 999;
+
+  &-bottom {
+    left: 50%;
+    transform: translateX(-50%);
+    top: 100%;
+    margin-top: 0.625rem;
+
+    &.spark-tooltip-left {
+      left: -50%;
+    }
+  }
+}
