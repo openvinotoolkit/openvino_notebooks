@@ -178,6 +178,7 @@
 - [Zero-shot Image Classification with SigLIP](./siglip-zero-shot-image-classification/siglip-zero-shot-image-classification.ipynb)
 - [Object masks from prompts with SAM and OpenVINO](./segment-anything/segment-anything.ipynb)
 - [Single step image generation using SDXL-turbo and OpenVINO](./sdxl-turbo/sdxl-turbo.ipynb)
+- [Text-to-Video retrieval with S3D MIL-NCE and OpenVINO](./s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb)
 - [Background removal with RMBG v1.4 and OpenVINO](./rmbg-background-removal/rmbg-background-removal.ipynb)
 - [Text-to-Music generation using Riffusion and OpenVINO](./riffusion-text-to-music/riffusion-text-to-music.ipynb)
 - [Generate creative QR codes with ControlNet QR Code Monster and OpenVINO™](./qrcode-monster/qrcode-monster.ipynb)
