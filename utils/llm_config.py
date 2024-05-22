@@ -86,6 +86,13 @@ SUPPORTED_LLM_MODELS = {
             "history_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}<|end|>\n",
             "current_message_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}",
             "stop_tokens": ["<|end|>"],
+            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }<|end|>"""
+            + """
+            <|user|>
+            Question: {input} 
+            Context: {context} 
+            Answer: <|end|>
+            <|assistant|>""",
         },
         "red-pajama-3b-chat": {
             "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
@@ -210,7 +217,7 @@ SUPPORTED_LLM_MODELS = {
             [INST] Question: {input} 
             Context: {context} 
             Answer: [/INST]""",
-        },
+        }
     },
     "Chinese": {
         "qwen1.5-0.5b-chat": {
