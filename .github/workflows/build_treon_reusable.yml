@@ -16,7 +16,6 @@ on:
 
 jobs:
   build_treon:
-    name: Build treon
     runs-on: ${{ inputs.runs_on }}
     container:
       image: ${{ inputs.container }}
