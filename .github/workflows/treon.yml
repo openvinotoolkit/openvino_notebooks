@@ -34,7 +34,7 @@ jobs:
       matrix:
         runs_on: ['gpu']
         python: ['3.8', '3.9', '3.10']
-        container: [ubuntu:20.04, ubuntu:22.04] # Windows and macOS are not available in machine pool with GPU
+        container: ['ubuntu:20.04', 'ubuntu:22.04'] # Windows and macOS are not available in machine pool with GPU
     uses: ./.github/workflows/build_treon_reusable.yml
     with:
       runs_on: ${{ matrix.runs_on }}
