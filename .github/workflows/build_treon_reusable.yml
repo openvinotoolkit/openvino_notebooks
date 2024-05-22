@@ -23,16 +23,16 @@ jobs:
       volumes:
         - /dev/dri:/dev/dri
     steps:
-      - name: Set OS name
-        id: set_os_name
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const container = "${{ inputs.container }}";
-            console.log('container', container);
-            const osName = !container ? "${{ inputs.runs_on }}" : container.replace(':', '-');
-            console.log('osName', osName);
-            core.exportVariable('OS_NAME', osName);
+      # - name: Set OS name
+      #   id: set_os_name
+      #   uses: actions/github-script@v7
+      #   with:
+      #     script: |
+      #       const container = "${{ inputs.container }}";
+      #       console.log('container', container);
+      #       const osName = !container ? "${{ inputs.runs_on }}" : container.replace(':', '-');
+      #       console.log('osName', osName);
+      #       core.exportVariable('OS_NAME', osName);
 
       #### Installation/preparation ####
       #
