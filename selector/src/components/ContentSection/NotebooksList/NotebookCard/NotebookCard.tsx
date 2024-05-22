@@ -112,7 +112,7 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
                   href={item.links.binder}
                 ></Button>
               )}
-              {!isEmbedded && item.status && (
+              {item.status && (
                 <Button
                   ref={statusButtonRef}
                   as="button"
