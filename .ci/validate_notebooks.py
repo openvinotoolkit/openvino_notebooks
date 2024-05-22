@@ -179,7 +179,8 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         collect_python_packages(report_dir / (patched_notebook.stem + "_env_before.txt"))
 
         main_command = [sys.executable, "-m", "treon", str(patched_notebook)]
-        convert_command = ['jupyter', 'nbconvert', '--to python', str(patched_notebook)]
+        convert_command = ['jupyter', 'nbconvert', '--to python ', str(patched_notebook)]
+        print(convert_command)
         start = time.perf_counter()
         try:
             convprocess = subprocess.Popen(
