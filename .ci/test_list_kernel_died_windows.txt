@@ -1,0 +1,4 @@
+animate-anyone
+instant-id
+stable-cascade-image-generation
+stable-diffusion-ip-adapter

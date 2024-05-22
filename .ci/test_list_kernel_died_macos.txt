@@ -1,0 +1,4 @@
+sound-generation-audioldm2
+stable-cascade-image-generation
+stable-diffusion-ip-adapter
+stable-diffusion-xl
