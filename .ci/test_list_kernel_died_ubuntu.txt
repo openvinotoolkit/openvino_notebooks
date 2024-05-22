@@ -1,2 +1,2 @@
-instant-id
-videollava-multimodal-chatbot
+notebooks/instant-id/instant-id.ipynb
+notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb

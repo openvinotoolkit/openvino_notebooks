@@ -1,4 +1,4 @@
-sound-generation-audioldm2
-stable-cascade-image-generation
-stable-diffusion-ip-adapter
-stable-diffusion-xl
+notebooks/sound-generation-audioldm2/sound-generation-audioldm2.ipynb
+notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb
+notebooks/stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb
+notebooks/stable-diffusion-xl/stable-diffusion-xl.ipynb

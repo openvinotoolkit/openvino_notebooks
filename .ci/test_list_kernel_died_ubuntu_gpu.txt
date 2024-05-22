@@ -1,4 +1,4 @@
-blip-visual-language-processing
-cross-lingual-books-alignment
-image-bind
-instruct-pix2pix-image-editing
+notebooks/blip-visual-language-processing/blip-visual-language-processing.ipynb
+notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb
+notebooks/image-bind/image-bind.ipynb
+notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb

@@ -1,2 +1,2 @@
-decidiffusion-image-generation
-knowledge-graphs-conve
+notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb
+notebooks/knowledge-graphs-conve/knowledge-graphs-conve.ipynb

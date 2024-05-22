@@ -1,2 +1,2 @@
-animate-anyone
-cross-lingual-books-alignment
+notebooks/animate-anyone/animate-anyone.ipynb
+notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb
