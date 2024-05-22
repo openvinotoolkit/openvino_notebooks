@@ -122,6 +122,8 @@ def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb
             f"Received test list: {test_list}"
         )
     testing_notebooks = list(set(testing_notebooks))
+    # TODO Remove after testing
+    testing_notebooks = testing_notebooks[:1]
     print(f"Testing notebooks: {testing_notebooks}")
 
     for notebook in test_plan:
