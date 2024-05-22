@@ -31,7 +31,7 @@ jobs:
           script: |
             const container = "${{ inputs.container }}";
             console.log('container', container);
-            const osName = !container ? "${{ inputs.runs_on }}" : container.replace(':', '-')";
+            const osName = !container ? "${{ inputs.runs_on }}" : container.replace(':', '-');
             console.log('osName', osName);
             core.exportVariable('OS_NAME', osName);
 
