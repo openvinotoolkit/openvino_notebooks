@@ -37,7 +37,7 @@ jobs:
             core.exportVariable('TEST_REPORT_DIR', testReportDir);
 
       #### Installation/preparation ####
-      # 
+      #
       # These steps are also copied to convert_notebooks.yml
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -117,6 +117,8 @@ jobs:
 
       # PaddleGAN stores cache in ppgan directory in CACHE_DIR
       - name: Set CACHE_DIR
+        # TODO Remove
+        if: false
         shell: bash
         run: |
           python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
