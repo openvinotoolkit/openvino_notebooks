@@ -50,8 +50,8 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-          ${{ !inputs.container && 'sudo' || '' }} apt-get update
-          ${{ !inputs.container && 'sudo' || '' }} apt-get install libsndfile1 -y
+          ${{ !inputs.container && 'sudo' || '' }} apt-get update -y
+          ${{ !inputs.container && 'sudo' || '' }} apt-get install libsndfile1 libssl-dev -y
           fi
 
       - name: Set up Python
