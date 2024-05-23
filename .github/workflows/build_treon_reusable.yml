@@ -63,8 +63,23 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
           apt-get update -y
-          apt-get install curl libsndfile1 libssl-dev unzip -y
+          apt-get install curl wget libsndfile1 libssl-dev unzip -y
+          wget https://raw.githubusercontent.com/openvinotoolkit/openvino/master/scripts/install_dependencies/install_openvino_dependencies.sh
+          install_openvino_dependencies.sh -c=core -c=dev -c=gpu -y
           fi
+
+      - name: Install GPU Drivers
+        if: ${{ inputs.container }}
+        shell: bash
+        run: |
+          wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.15985.7/intel-igc-core_1.0.15985.7_amd64.deb
+          wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.15985.7/intel-igc-opencl_1.0.15985.7_amd64.deb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-level-zero-gpu-dbgsym_1.3.28454.6_amd64.ddeb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-level-zero-gpu_1.3.28454.6_amd64.deb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-opencl-icd-dbgsym_24.05.28454.6_amd64.ddeb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-opencl-icd_24.05.28454.6_amd64.deb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/libigdgmm12_22.3.11_amd64.deb
+          dpkg -i *.deb
 
       - name: Set up Python
         uses: actions/setup-python@v5
