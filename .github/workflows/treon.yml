@@ -69,6 +69,7 @@ jobs:
       - name: Upload aggregated report
         uses: actions/upload-artifact@v4
         with:
-          name: notebooks-status-map.json
+          # TODO Remove after testing
+          name: test-notebooks-status-map.json
           path: test_reports/notebooks-status-map.json
           if-no-files-found: error
