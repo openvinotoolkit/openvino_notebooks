@@ -47,11 +47,21 @@ jobs:
           path: ./.github/workflows
 
       - name: Install required packages
+        if: !inputs.container
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-          ${{ !inputs.container && 'sudo' || '' }} apt-get update -y
-          ${{ !inputs.container && 'sudo' || '' }} apt-get install libsndfile1 libssl-dev -y
+          sudo apt-get update -y
+          sudo apt-get install libsndfile1 -y
+          fi
+
+      - name: Install required packages (container)
+        if: inputs.container
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+          apt-get update -y
+          apt-get install curl libsndfile1 libssl-dev glibc -y
           fi
 
       - name: Set up Python
