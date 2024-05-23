@@ -61,13 +61,13 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
           apt-get update -y
-          apt-get install curl libsndfile1 libssl-dev glibc -y
+          apt-get install curl libsndfile1 libssl-dev -y
           fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.python }}
+          python-version: '${{ inputs.python }}'
 
       - name: Cache OpenVINO Pip Packages
         id: cachepip
