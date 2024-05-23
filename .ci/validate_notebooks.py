@@ -180,7 +180,10 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
         # main_command = [sys.executable, "-m", "treon", str(patched_notebook)]
         convert_command = ['jupyter', 'nbconvert', '--to=python', str(patched_notebook)]
-        print(convert_command)
+        main_command = [sys.executable, patched_notebook.stem + '.py']
+        print(f"Convert command: {convert_command}")
+        print(f"Execute command: {main_command}")
+        time.sleep(2)
         start = time.perf_counter()
         try:
             subprocess.Popen(
@@ -193,13 +196,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
             print("stdout:", e.output)
             print("stderr:", e.stderr)
 
-        time.sleep(3)
-        
-        main_command = [sys.executable, "-m", "treon", patched_notebook.stem + '.py']
-        # main_command = [sys.executable, "-m", "treon", str(patched_notebook), '--verbose']
-        print(main_command)
-        
-        time.sleep(3)
+        time.sleep(5)
         try:
             retcode = subprocess.run(
                 main_command,
