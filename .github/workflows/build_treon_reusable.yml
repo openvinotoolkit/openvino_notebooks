@@ -65,7 +65,7 @@ jobs:
           apt-get update -y
           apt-get install curl wget libsndfile1 libssl-dev unzip -y
           wget https://raw.githubusercontent.com/openvinotoolkit/openvino/master/scripts/install_dependencies/install_openvino_dependencies.sh
-          ls -la
+          chmod +x ./install_openvino_dependencies.sh
           ./install_openvino_dependencies.sh -c=core -c=dev -c=gpu -y
           fi
 
