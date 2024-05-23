@@ -61,7 +61,7 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
           apt-get update -y
-          apt-get install curl libsndfile1 libssl-dev -y
+          apt-get install curl libsndfile1 libssl-dev unzip -y
           fi
 
       - name: Set up Python
