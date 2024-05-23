@@ -47,7 +47,7 @@ jobs:
           path: ./.github/workflows
 
       - name: Install required packages
-        if: !inputs.container
+        if: ${{ !inputs.container }}
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
@@ -56,7 +56,7 @@ jobs:
           fi
 
       - name: Install required packages (container)
-        if: inputs.container
+        if: ${{ inputs.container }}
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
