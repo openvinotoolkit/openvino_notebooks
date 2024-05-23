@@ -31,12 +31,14 @@ concurrency:
 
 jobs:
   build_treon:
+    # TODO Remove after testing
+    if: false
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
       matrix:
         os: [ubuntu-20.04, windows-2019, macos-12]
-        python: ["3.10", "3.9", "3.8"]
+        python: ['3.10', '3.9', '3.8']
     steps:
       #### Installation/preparation ####
       #
@@ -139,7 +141,7 @@ jobs:
           cp -r pipcache pipcache_openvino
           python -m pip uninstall -y openvino openvino-dev nncf
 
-     # Download a small dataset to use for testing purposes in monai-kidney training notebook
+      # Download a small dataset to use for testing purposes in monai-kidney training notebook
       - name: Download CT files
         if: steps.cachefiles.outputs.cache-hit != 'true'
         run: |
