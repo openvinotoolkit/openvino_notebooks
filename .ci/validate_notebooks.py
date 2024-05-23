@@ -195,8 +195,8 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
         time.sleep(3)
         
-        # main_command = [sys.executable, "-m", "treon", patched_notebook.stem + '.py']
-        main_command = [sys.executable, "-m", "treon", str(patched_notebook), '--verbose']
+        main_command = [sys.executable, "-m", "treon", patched_notebook.stem + '.py']
+        # main_command = [sys.executable, "-m", "treon", str(patched_notebook), '--verbose']
         print(main_command)
         
         time.sleep(3)
