@@ -66,7 +66,7 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
           apt-get update -y
-          apt-get install curl wget libsndfile1 libssl-dev unzip libsqlite3-dev libedit-dev -y
+          apt-get install curl wget libsndfile1 libssl-dev unzip libsqlite3-dev libedit-dev libgl1-mesa-glx -y
           wget https://raw.githubusercontent.com/openvinotoolkit/openvino/master/scripts/install_dependencies/install_openvino_dependencies.sh
           chmod +x ./install_openvino_dependencies.sh
           ./install_openvino_dependencies.sh -c=core -c=dev -c=gpu -y
