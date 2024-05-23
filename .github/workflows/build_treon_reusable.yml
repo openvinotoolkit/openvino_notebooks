@@ -50,7 +50,7 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-          ${{ !inputs.container && 'sudo' }} apt-get install libsndfile1 -y
+          ${{ !inputs.container && 'sudo' || '' }} apt-get install libsndfile1 -y
           fi
 
       - name: Set up Python
