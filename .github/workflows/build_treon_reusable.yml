@@ -23,16 +23,18 @@ jobs:
       volumes:
         - /dev/dri:/dev/dri
     steps:
-      - name: Set OS name
-        id: set_os_name
+      - name: Set env variables
         uses: actions/github-script@v7
         with:
           script: |
             const container = "${{ inputs.container }}";
-            console.log('container', container);
+            const runsOn = "${{ inputs.runs_on }}";
             const osName = !container ? "${{ inputs.runs_on }}" : container.replace(':', '-');
-            console.log('osName', osName);
+            const testDevice = runsOn === 'gpu' ? 'gpu' : 'cpu';
+            const testReportDir = `${testDevice}-${osName}-${{ inputs.python }}`;
             core.exportVariable('OS_NAME', osName);
+            core.exportVariable('TEST_DEVICE', testDevice);
+            core.exportVariable('TEST_REPORT_DIR', testReportDir);
 
       #### Installation/preparation ####
       #
@@ -170,12 +172,12 @@ jobs:
       - name: pip freeze
         run: |
           python -m pip freeze
-          python -m pip freeze > pip-freeze-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
+          python -m pip freeze > pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
       - name: Upload pip freeze artifact
         uses: actions/upload-artifact@v4
         with:
-          name: pip-freeze-${{ env.OS_NAME }}-${{ inputs.python }}
-          path: pip-freeze-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
+          name: pip-freeze-${{ env.TEST_DEVICE }}-${{ env.OS_NAME }}-${{ inputs.python }}
+          path: pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
       #### End installation/preparation
 
       - name: Check install
@@ -185,7 +187,7 @@ jobs:
       # Patch long running cells to run faster
       - name: Patch notebooks
         run: |
-          python .ci/patch_notebooks.py .
+          python .ci/patch_notebooks.py . -td ${{ env.TEST_DEVICE }}
 
       # Test that JupyterLab runs without errors
       - name: Test Jupyterlab
@@ -197,38 +199,38 @@ jobs:
         if: runner.os == 'Windows' && inputs.python != '3.8'
         shell: bash
         run: |
-          python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_win.txt --report_dir test_report/${{ env.OS_NAME }}-${{ inputs.python }} --move_notebooks_dir c:/notebooks --timeout 1200
+          python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_win.txt --report_dir test_report/${{ env.TEST_REPORT_DIR }} --move_notebooks_dir c:/notebooks --timeout 1200
       - name: Analysing with treon (Windows) python 3.8
         if: runner.os == 'Windows' && inputs.python == '3.8'
         shell: bash
         run: |
-          python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_win.txt .ci/ignore_treon_py38.txt --report_dir test_report/${{ env.OS_NAME }}-${{ inputs.python }} --move_notebooks_dir c:/notebooks --timeout 1200
+          python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_win.txt .ci/ignore_treon_py38.txt --report_dir test_report/${{ env.TEST_REPORT_DIR }} --move_notebooks_dir c:/notebooks --timeout 1200
       - name: Analysing with treon (Linux) python > 3.8
         if: runner.os == 'Linux' && inputs.python != '3.8'
         shell: bash
         run: |
-          python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_linux.txt --report_dir test_report/${{ env.OS_NAME }}-${{ inputs.python }} --timeout 1200
+          python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_linux.txt --report_dir test_report/${{ env.TEST_REPORT_DIR }} --timeout 1200
       - name: Analysing with treon (Linux) python 3.8
         if: runner.os == 'Linux' && inputs.python == '3.8'
         shell: bash
         run: |
-          python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_linux.txt .ci/ignore_treon_py38.txt --report_dir test_report/${{ env.OS_NAME }}-${{ inputs.python }} --timeout 1200
+          python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_linux.txt .ci/ignore_treon_py38.txt --report_dir test_report/${{ env.TEST_REPORT_DIR }} --timeout 1200
       - name: Analysing with treon (MacOS) python > 3.8
         if: runner.os == 'MacOS' && inputs.python != '3.8'
         shell: bash
         run: |
-          python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_mac.txt --report_dir test_report/${{ env.OS_NAME }}-${{ inputs.python }} --timeout 1200
+          python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_mac.txt --report_dir test_report/${{ env.TEST_REPORT_DIR }} --timeout 1200
       - name: Analysing with treon (MacOS) python 3.8
         if: runner.os == 'MacOS' && inputs.python == '3.8'
         shell: bash
         run: |
-          python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_mac.txt .ci/ignore_treon_py38.txt --report_dir test_report/${{ env.OS_NAME }}-${{ inputs.python }} --timeout 1200
+          python .ci/validate_notebooks.py --ignore_list .ci/ignore_treon_mac.txt .ci/ignore_treon_py38.txt --report_dir test_report/${{ env.TEST_REPORT_DIR }} --timeout 1200
 
       - name: Archive notebook test report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test_report-${{ env.OS_NAME }}-${{ inputs.python }}
+          name: test_report-${{ env.TEST_REPORT_DIR }}
           path: test_report/
 
       # Show the cache after running the notebooks
