@@ -1,4 +1,5 @@
-name: treon_nightly
+# TODO Remove after testing
+name: treon_nightly_test
 
 on:
   workflow_dispatch:
@@ -47,7 +48,9 @@ jobs:
       container: ${{ matrix.container }}
 
   aggregate_notebooks_reports:
-    if: always()
+    # if: always()
+    # TODO Remove after testing
+    if: false
     runs-on: ubuntu-20.04
     needs: [build_treon_cpu, build_treon_gpu]
     steps:
