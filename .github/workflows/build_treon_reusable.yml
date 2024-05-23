@@ -50,6 +50,7 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
+          ${{ !inputs.container && 'sudo' || '' }} apt-get update
           ${{ !inputs.container && 'sudo' || '' }} apt-get install libsndfile1 -y
           fi
 
