@@ -37,7 +37,7 @@ jobs:
             core.exportVariable('TEST_REPORT_DIR', testReportDir);
 
       #### Installation/preparation ####
-      #
+      # 
       # These steps are also copied to convert_notebooks.yml
       - name: Checkout repository
         uses: actions/checkout@v4
