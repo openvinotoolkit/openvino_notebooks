@@ -11,6 +11,11 @@ on:
       - '.github/workflows/.env'
   schedule:
     - cron: '30 8 * * *'
+  # TODO Remove after testing
+  pull_request:
+    branches:
+      - 'main'
+      - 'latest'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
