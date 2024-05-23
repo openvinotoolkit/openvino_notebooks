@@ -60,6 +60,9 @@ jobs:
       - name: Install required packages (container)
         if: ${{ inputs.container }}
         shell: bash
+        env:
+          DEBIAN_FRONTEND: noninteractive # to prevent apt-get from waiting user input
+          TZ: 'Europe/London' # to prevent tzdata from waiting user input
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
           apt-get update -y
