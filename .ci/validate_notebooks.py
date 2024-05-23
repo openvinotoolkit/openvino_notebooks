@@ -178,19 +178,28 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
         collect_python_packages(report_dir / (patched_notebook.stem + "_env_before.txt"))
 
-        main_command = [sys.executable, "-m", "treon", str(patched_notebook)]
-        convert_command = ['jupyter', 'nbconvert', '--to python ', str(patched_notebook)]
+        # main_command = [sys.executable, "-m", "treon", str(patched_notebook)]
+        convert_command = ['jupyter', 'nbconvert', '--to=python', str(patched_notebook)]
         print(convert_command)
         start = time.perf_counter()
         try:
-            convprocess = subprocess.Popen(
-                convert_command, shell=(platform.system() == "Windows"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
-            )
-            for line in convprocess.stdout:
-                sys.stdout.write(line)
-                sys.stdout.flush()
+            subprocess.Popen(
+                convert_command,
+                shell=(platform.system() == "Windows")
+            )            
+            
         except subprocess.CalledProcessError as e:
-            print(e.output)
+            print("An error occurred:")
+            print("stdout:", e.output)
+            print("stderr:", e.stderr)
+
+        time.sleep(3)
+        
+        # main_command = [sys.executable, "-m", "treon", patched_notebook.stem + '.py']
+        main_command = [sys.executable, "-m", "treon", str(patched_notebook), '--verbose']
+        print(main_command)
+        
+        time.sleep(3)
         try:
             retcode = subprocess.run(
                 main_command,
