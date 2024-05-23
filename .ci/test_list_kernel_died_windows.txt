@@ -1,0 +1,4 @@
+notebooks/animate-anyone/animate-anyone.ipynb
+notebooks/instant-id/instant-id.ipynb
+notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb
+notebooks/stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb
