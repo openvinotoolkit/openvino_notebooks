@@ -92,7 +92,7 @@ jobs:
         with:
           python-version: '${{ inputs.python }}'
         env:
-          AGENT_TOOLSDIRECTORY: /opt/hostedtoolcache
+          AGENT_TOOLSDIRECTORY: ${{ inputs.container && '/opt/hostedtoolcache' || '' }}
 
       - name: Print python
         shell: bash
