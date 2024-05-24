@@ -116,14 +116,14 @@ jobs:
       #     key: ${{ env.FILES_CACHE_KEY }}
 
       # PaddleGAN stores cache in ppgan directory in CACHE_DIR
-      # - name: Set CACHE_DIR
-      #   # TODO Remove
-      #   if: false
-      #   shell: bash
-      #   run: |
-      #     python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
-      #     # replace backslashes with forward slashes for Windows paths
-      #     python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+      - name: Set CACHE_DIR
+        # TODO Remove
+        # if: false
+        shell: bash
+        run: |
+          python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
+          # replace backslashes with forward slashes for Windows paths
+          python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
 
       # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
       - name: Set HUB_HOME
