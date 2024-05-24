@@ -92,6 +92,13 @@ jobs:
         with:
           python-version: '${{ inputs.python }}'
 
+      - name: Print python
+        shell: bash
+        run: |
+          which python
+          which python3
+          echo $RUNNER_OS
+
       # - name: Cache OpenVINO Pip Packages
       #   id: cachepip
       #   uses: actions/cache@v3
