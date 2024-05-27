@@ -36,16 +36,16 @@
   border: 1px solid var(--table-border-color);
   border-bottom: 0;
   display: grid;
-  grid-template-columns: auto repeat(3, auto);
+  grid-template-columns: auto repeat(6, auto);
   grid-template-rows: repeat(6, 1fr);
   grid-auto-flow: row;
   grid-template-areas:
-    'os-header  device-header   device-header   device-header'
-    'os-header  python-versions python-versions python-versions'
-    'os-names   statuses        statuses        statuses'
-    'os-names   statuses        statuses        statuses'
-    'os-names   statuses        statuses        statuses'
-    'os-names   statuses        statuses        statuses';
+    'os-header  cpu-device-header   cpu-device-header   cpu-device-header   gpu-device-header   gpu-device-header   gpu-device-header'
+    'os-header  cpu-python-versions cpu-python-versions cpu-python-versions gpu-python-versions gpu-python-versions gpu-python-versions'
+    'os-names   cpu-statuses        cpu-statuses        cpu-statuses        gpu-statuses        gpu-statuses        gpu-statuses'
+    'os-names   cpu-statuses        cpu-statuses        cpu-statuses        gpu-statuses        gpu-statuses        gpu-statuses'
+    'os-names   cpu-statuses        cpu-statuses        cpu-statuses        gpu-statuses        gpu-statuses        gpu-statuses'
+    'os-names   cpu-statuses        cpu-statuses        cpu-statuses        gpu-statuses        gpu-statuses        gpu-statuses';
 
   .cell {
     display: flex;
@@ -70,29 +70,48 @@
 
 .os-header,
 .os-names {
-  border-right: 1px solid var(--table-border-color);
-
   .cell {
     padding-left: 1rem;
     padding-right: 1rem;
   }
 }
 
+.cpu-device-header {
+  grid-area: cpu-device-header;
+}
+
+.gpu-device-header {
+  grid-area: gpu-device-header;
+}
+
 .device-header {
-  grid-area: device-header;
   font-weight: 500;
 }
 
+.cpu-python-versions {
+  grid-area: cpu-python-versions;
+}
+
+.gpu-python-versions {
+  grid-area: gpu-python-versions;
+}
+
 .python-versions {
-  grid-area: python-versions;
   font-weight: 500;
   display: grid;
   grid-template-columns: subgrid;
   border-bottom: 1px solid var(--table-border-color);
 }
 
+.cpu-statuses {
+  grid-area: cpu-statuses;
+}
+
+.gpu-statuses {
+  grid-area: gpu-statuses;
+}
+
 .statuses {
-  grid-area: statuses;
   display: grid;
   grid-template-columns: subgrid;
   grid-template-rows: subgrid;
@@ -111,4 +130,10 @@
   .cell {
     border-bottom: 1px solid var(--table-border-color);
   }
+}
+
+.device-header,
+.python-versions,
+.statuses {
+  border-left: 1px solid var(--table-border-color);
 }
