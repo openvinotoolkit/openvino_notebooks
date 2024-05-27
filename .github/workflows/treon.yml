@@ -48,9 +48,7 @@ jobs:
       container: ${{ matrix.container }}
 
   aggregate_notebooks_reports:
-    # if: always()
-    # TODO Remove after testing
-    if: false
+    if: always()
     runs-on: ubuntu-20.04
     needs: [build_treon_cpu, build_treon_gpu]
     steps:
@@ -74,5 +72,5 @@ jobs:
         with:
           # TODO Remove after testing
           name: test-notebooks-status-map.json
-          path: test_reports/notebooks-status-map.json
+          path: test_reports/test-notebooks-status-map.json
           if-no-files-found: error
