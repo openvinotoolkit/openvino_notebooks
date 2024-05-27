@@ -1,5 +1,7 @@
 # Visual-language assistant with LLaVA Next and OpenVINO
 
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/nano-llava-multimodal-chatbot/nano-llava-multimodal-chatbot.ipynb)
+
 nanoLLaVA is a "small but mighty" 1B vision-language model designed to run efficiently on edge devices. It uses [SigLIP-400m](https://huggingface.co/google/siglip-so400m-patch14-384) as Image Encoder and [Qwen1.5-0.5B](https://huggingface.co/Qwen/Qwen1.5-0.5B) as LLM.
 In this tutorial, we consider how to convert and run nanoLLaVA model using OpenVINO. Additionally, we will optimize model  using [NNCF](https://github.com/openvinotoolkit/nncf)
 
