@@ -452,6 +452,7 @@ MusicGen
 Müller
 Nakayosi
 nano
+nanoLLaVA
 nar
 NAS
 natively

@@ -44,7 +44,6 @@ def main():
                 print(f"SKIPPED: {nb_path.relative_to(NOTEBOOKS_ROOT)} for device wdget check")
                 device_found = True
             for cell in notebook_json["cells"]:
-
                 if not toc_found and cell["cell_type"] == "markdown":
                     tc_cell, tc_line = find_tc_in_cell(cell)
                     if tc_line is not None:
