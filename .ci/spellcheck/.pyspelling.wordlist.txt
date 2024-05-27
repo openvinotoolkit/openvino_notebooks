@@ -201,18 +201,7 @@ downsampled
 DPO
 dpo
 dpredictor
-DreamBooth
-Dreamshaper
-dropdown
-DynamiCrafter
-ECCV
-editability
-EfficientNet
-EfficientSAM
-EfficientSAMs
-embeddings
-EnCodec
-encodec
+DreamBooth Tsinghua
 enum
 et
 Evol
@@ -776,6 +765,7 @@ transformative
 Tripo
 TripoSR
 TTS
+Tsinghua
 TsinghuaNLP
 tunable
 tv
