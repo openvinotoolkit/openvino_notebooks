@@ -202,6 +202,7 @@ DPO
 dpo
 dpredictor
 DreamBooth
+DreamBooth Tsinghua
 Dreamshaper
 dropdown
 DynamiCrafter
@@ -776,6 +777,7 @@ transformative
 Tripo
 TripoSR
 TTS
+Tsinghua
 TsinghuaNLP
 tunable
 tv
