@@ -274,7 +274,7 @@ jobs:
         if: runner.os == 'Linux' && inputs.python == '3.8'
         shell: bash
         run: |
-          python .ci/validate_notebooks.py 
+          python .ci/validate_notebooks.py \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
             --ignore_list .ci/ignore_treon_linux.txt .ci/ignore_treon_py38.txt ${{ env.TEST_DEVICE == 'gpu' && '.ci/heavy_ubuntu_gpu.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
@@ -283,7 +283,7 @@ jobs:
         if: runner.os == 'MacOS' && inputs.python != '3.8'
         shell: bash
         run: |
-          python .ci/validate_notebooks.py 
+          python .ci/validate_notebooks.py \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
             --ignore_list .ci/ignore_treon_mac.txt \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
@@ -292,7 +292,7 @@ jobs:
         if: runner.os == 'MacOS' && inputs.python == '3.8'
         shell: bash
         run: |
-          python .ci/validate_notebooks.py 
+          python .ci/validate_notebooks.py \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
             --ignore_list .ci/ignore_treon_mac.txt .ci/ignore_treon_py38.txt \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
