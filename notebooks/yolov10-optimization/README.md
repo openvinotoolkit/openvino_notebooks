@@ -1,4 +1,4 @@
-# Convert and Optimize YOLOv9 with OpenVINO™
+# Convert and Optimize YOLOv10 with OpenVINO™
 
 <p align="center">
     <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/ec5211d6-c052-4ee7-9faf-841bd60517be"/>
