@@ -18,7 +18,7 @@ References:
 
 In this clip, you can see the difference (Inference time and FPS) between running yoloV8 natively with pyTorch vs optimized with OpenVINO.
 
-<div align="center"><img src="optimized.gif" width=900/></div>
+<div align="center"><img src="https://github.com/antoniomtz/people-counting-yolov8-openvino/raw/main/optimized.gif" width=900/></div>
 
 ## Docker Installation
 
