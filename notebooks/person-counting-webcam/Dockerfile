@@ -19,10 +19,10 @@ RUN apt-get update && apt-get install -y \
 RUN pip install --upgrade pip && pip install --no-cache-dir jupyterlab
 
 # Copy only the necessary file
-COPY people-counting.ipynb /usr/src/app/
+COPY person-counting.ipynb /usr/src/app/
 
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
 
 # Run JupyterLab when the container launches
-CMD ["jupyter-lab", "people-counting.ipynb", "--ip=0.0.0.0", "--port=8888","--allow-root"]
+CMD ["jupyter-lab", "person-counting.ipynb", "--ip=0.0.0.0", "--port=8888","--allow-root"]
