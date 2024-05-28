@@ -69,7 +69,7 @@ jobs:
         shell: bash
       - name: Dotenv Action
         id: dotenv
-        uses: xom9ikk/dotenv@v1.0.2
+        uses: xom9ikk/dotenv@v2.3.0
         with:
           path: ./.github/workflows
       - name: Install required packages
