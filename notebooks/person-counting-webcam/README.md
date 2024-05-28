@@ -43,7 +43,7 @@ Or copy and paste one of these URLs:
 
 ## Run it locally
 
-Run the following commands to create a virtual env on your local system
+Run the following commands to create a virtual environment on your local system
 
 ```
 python3 -m venv jup1
