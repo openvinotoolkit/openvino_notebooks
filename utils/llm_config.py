@@ -217,7 +217,7 @@ SUPPORTED_LLM_MODELS = {
             [INST] Question: {input} 
             Context: {context} 
             Answer: [/INST]""",
-        }
+        },
     },
     "Chinese": {
         "qwen1.5-0.5b-chat": {

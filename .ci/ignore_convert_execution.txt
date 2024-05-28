@@ -61,3 +61,4 @@ notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
 notebooks/stable-video-diffusion/stable-video-diffusion.ipynb
 notebooks/llm-agent-langchain/llm-agent-langchain.ipynb
 notebooks/hello-npu/hello-npu.ipynb
+notebooks/yolov10-optimization/yolov10-optimization.ipynb

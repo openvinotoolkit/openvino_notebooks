@@ -202,6 +202,7 @@ DPO
 dpo
 dpredictor
 DreamBooth
+DreamBooth Tsinghua
 Dreamshaper
 dropdown
 DynamiCrafter
@@ -451,6 +452,7 @@ MusicGen
 Müller
 Nakayosi
 nano
+nanoLLaVA
 nar
 NAS
 natively
@@ -776,6 +778,7 @@ transformative
 Tripo
 TripoSR
 TTS
+Tsinghua
 TsinghuaNLP
 tunable
 tv
