@@ -1,4 +1,4 @@
-# Person Counting System using YoloV8 and OpenVINO
+# Person Counting System using YOLOv8 and OpenVINO
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/person-counting-webcam/person-counting.ipynb)
 
@@ -8,7 +8,7 @@ By utilizing the OpenVINO runtime on Intel hardware, the system achieves signifi
 
 References:
 
-- YoloV8 Object counting documentation: <a href="https://docs.ultralytics.com/guides/object-counting/" target="_blank">https://docs.ultralytics.com/guides/object-counting/</a>
+- YOLOv8 Object counting documentation: <a href="https://docs.ultralytics.com/guides/object-counting/" target="_blank">https://docs.ultralytics.com/guides/object-counting/</a>
 - OpenVINO Jupyter Notebooks: <a href="https://github.com/openvinotoolkit/openvino_notebooks/" target="_blank">https://github.com/openvinotoolkit/openvino_notebooks/</a>
 
 <div align="center"><img src="person-count.gif" width=900/></div>
@@ -16,7 +16,7 @@ References:
 
 ## Performance
 
-In this clip, you can see the difference (Inference time and FPS) between running yoloV8 natively with pyTorch vs optimized with OpenVINO.
+In this clip, you can see the difference (Inference time and FPS) between running YOLOv8 natively with PyTorch vs optimized with OpenVINO.
 
 <div align="center"><img src="https://github.com/antoniomtz/people-counting-yolov8-openvino/raw/main/optimized.gif" width=900/></div>
 
@@ -34,7 +34,7 @@ $ docker build . -t person-count
 docker run -it --device=/dev/dri --device=/dev/video0 --privileged --group-add=$(stat -c "%g" /dev/dri/render* | head -n 1) -p 8888:8888 person-count
 ```
 
-It will prompt the jupyter lab URL on the console, copy and paste it on your browser:
+It will prompt the Jupyter lab URL on the console, copy and paste it on your browser:
 
 ```
 Or copy and paste one of these URLs:
@@ -51,7 +51,7 @@ source jup1/bin/activate
 pip install jupyterlab
 ```
 
-Run jupyter notebook:
+Run Jupyter notebook:
 
 ```
 jupyter lab person-counting.ipynb
