@@ -3,6 +3,7 @@ name: Build Treon Reusable Workflow
 on:
   workflow_call:
     inputs:
+      # TODO Add input for testing only changed notebooks (for precommit usage)
       runs_on:
         required: true
         type: string
