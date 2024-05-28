@@ -267,7 +267,7 @@ jobs:
         run: |
           python .ci/validate_notebooks.py \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list .ci/ignore_treon_linux.txt ${{ env.TEST_DEVICE == 'gpu' && '.ci/heavy_ubuntu_gpu' || '' }} \
+            --ignore_list .ci/ignore_treon_linux.txt ${{ env.TEST_DEVICE == 'gpu' && '.ci/heavy_ubuntu_gpu.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --timeout 1200
       - name: Analysing with treon (Linux) python 3.8
@@ -276,7 +276,7 @@ jobs:
         run: |
           python .ci/validate_notebooks.py 
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list .ci/ignore_treon_linux.txt .ci/ignore_treon_py38.txt ${{ env.TEST_DEVICE == 'gpu' && '.ci/heavy_ubuntu_gpu' || '' }} \
+            --ignore_list .ci/ignore_treon_linux.txt .ci/ignore_treon_py38.txt ${{ env.TEST_DEVICE == 'gpu' && '.ci/heavy_ubuntu_gpu.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --timeout 1200
       - name: Analysing with treon (MacOS) python > 3.8
