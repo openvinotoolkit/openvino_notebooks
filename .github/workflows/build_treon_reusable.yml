@@ -39,6 +39,7 @@ jobs:
             core.exportVariable('OS_NAME', osName);
             core.exportVariable('TEST_DEVICE', testDevice);
             core.exportVariable('TEST_REPORT_DIR', testReportDir);
+            core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
 
       - name: Get changed files
         if: ${{ inputs.test_only_changed }}
