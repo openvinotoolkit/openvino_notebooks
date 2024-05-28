@@ -93,7 +93,7 @@ def remove_ov_install(cell):
                                 break
                             # keep indention
                             updated_line = " " + updated_line
-                    updated_lines.append(updated_line + "# " + line)
+                    updated_lines.append(updated_line + "\n# " + line)
             else:
                 updated_lines.append(line)
         else:
