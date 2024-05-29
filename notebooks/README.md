@@ -243,8 +243,8 @@
 ## Model Training
 
 - [Quantization Aware Training with NNCF, using TensorFlow Framework](./tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb)
+- [Quantization-Sparsity Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb)
 - [Quantization Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-aware-training/pytorch-quantization-aware-training.ipynb)
-- [Quantization Sparsity Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb)
 
 ## Optimize
 
@@ -254,6 +254,7 @@
 - [Accelerate Inference of Sparse Transformer Models with OpenVINO™ and 4th Gen Intel&reg; Xeon&reg; Scalable Processors](./sparsity-optimization/sparsity-optimization.ipynb)
 - [Convert and Optimize YOLOv8 with OpenVINO™](./quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb)
 - [Quantize Speech Recognition Models with accuracy control using NNCF PTQ API](./quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb)
+- [Quantization-Sparsity Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb)
 - [Quantization Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-aware-training/pytorch-quantization-aware-training.ipynb)
 - [Post-Training Quantization of PyTorch models with NNCF](./pytorch-post-training-quantization-nncf/pytorch-post-training-quantization-nncf.ipynb)
 - [Optimize Preprocessing](./optimize-preprocessing/optimize-preprocessing.ipynb)
