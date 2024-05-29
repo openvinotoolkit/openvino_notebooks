@@ -1,4 +1,0 @@
-jupyterlab
-ipywidgets
-ipykernel>=5.*
-ipython>=7.16.3
