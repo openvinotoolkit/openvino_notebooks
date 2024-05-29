@@ -11,7 +11,7 @@ References:
 - YOLOv8 Object counting documentation: <a href="https://docs.ultralytics.com/guides/object-counting/" target="_blank">https://docs.ultralytics.com/guides/object-counting/</a>
 - OpenVINO Jupyter Notebooks: <a href="https://github.com/openvinotoolkit/openvino_notebooks/" target="_blank">https://github.com/openvinotoolkit/openvino_notebooks/</a>
 
-<div align="center"><img src="person-count.gif" width=900/></div>
+<div align="center"><img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/e0525f8a-4578-4c56-a0a5-ce68e30d2d45" width=900/></div>
 
 
 ## Performance
