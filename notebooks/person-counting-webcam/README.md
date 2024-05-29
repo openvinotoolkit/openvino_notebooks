@@ -20,39 +20,8 @@ In this clip, you can see the difference (Inference time and FPS) between runnin
 
 <div align="center"><img src="https://github.com/antoniomtz/people-counting-yolov8-openvino/raw/main/optimized.gif" width=900/></div>
 
-## Docker Installation
+## Installation Instructions
 
-### Build docker image
-
-```
-$ docker build . -t person-count
-```
-
-### Run docker container
-
-```
-docker run -it --device=/dev/dri --device=/dev/video0 --privileged --group-add=$(stat -c "%g" /dev/dri/render* | head -n 1) -p 8888:8888 person-count
-```
-
-It will prompt the Jupyter lab URL on the console, copy and paste it on your browser:
-
-```
-Or copy and paste one of these URLs:
-        http://localhost:8888/lab?token=<token>
-```
-
-## Run it locally
-
-Run the following commands to create a virtual environment on your local system
-
-```
-python3 -m venv jup1
-source jup1/bin/activate
-pip install jupyterlab
-```
-
-Run Jupyter notebook:
-
-```
-jupyter lab person-counting.ipynb
-```
+This is a self-contained example that relies solely on its own code.</br>
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
