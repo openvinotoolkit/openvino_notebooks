@@ -1,0 +1,36 @@
+{
+    "target_device": "CPU",
+    "input_info": {
+    "sample_size": [
+          1,
+          3,
+          224,
+          224
+        ]
+    },
+    "compression": [
+    {
+      "algorithm": "magnitude_sparsity",
+      "sparsity_init": 0,
+      "params": {
+            "schedule": "multistep",
+            "sparsity_freeze_epoch": 5,
+            "multistep_steps": [2],
+            "multistep_sparsity_levels": [0.3, 0.5]
+       },
+      "ignored_scopes": [
+        "ResNet/NNCFConv2d[conv1]/conv2d_0"
+      ]
+    },
+    {
+      "algorithm": "quantization",
+      "initializer": {
+        "range": {
+          "num_init_samples": 10000
+        }
+      },
+      "ignored_scopes": [
+      ]
+    }
+  ]
+}
