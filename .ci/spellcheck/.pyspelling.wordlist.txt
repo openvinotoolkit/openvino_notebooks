@@ -329,6 +329,7 @@ JIT
 Joao
 JS
 JSON
+json
 JT
 JuggernautXL
 Jupyter
@@ -699,6 +700,8 @@ softvc
 SoftVC
 SOTA
 Sovits
+sparsity
+Sparisty
 sparsified
 sparsify
 spectrogram

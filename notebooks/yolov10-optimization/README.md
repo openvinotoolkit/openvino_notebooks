@@ -1,7 +1,7 @@
 # Convert and Optimize YOLOv10 with OpenVINO™
 
 <p align="center">
-    <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/ec5211d6-c052-4ee7-9faf-841bd60517be"/>
+    <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/81ff3233-9c8d-4fe8-ab21-baf9ce530cff"/>
 </p>
 
 Real-time object detection aims to accurately predict object categories and positions in images with low latency. The YOLO series has been at the forefront of this research due to its balance between performance and efficiency. However, reliance on NMS and architectural inefficiencies have hindered optimal performance. YOLOv10 addresses these issues by introducing consistent dual assignments for NMS-free training and a holistic efficiency-accuracy driven model design strategy.

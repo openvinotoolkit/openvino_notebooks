@@ -126,6 +126,7 @@
 - [Style Transfer with OpenVINO™](./style-transfer-webcam/style-transfer.ipynb)
 - [Live Human Pose Estimation with OpenVINO™](./pose-estimation-webcam/pose-estimation.ipynb)
 - [Person Tracking with OpenVINO™](./person-tracking-webcam/person-tracking.ipynb)
+- [Person Counting System using YOLOV8 and OpenVINO™](./person-counting-webcam/person-counting.ipynb)
 - [PaddleOCR with OpenVINO™](./paddle-ocr-webcam/paddle-ocr-webcam.ipynb)
 - [Voice tone cloning with OpenVoice and OpenVINO](./openvoice/openvoice.ipynb)
 - [Live Object Detection with OpenVINO™](./object-detection-webcam/object-detection.ipynb)
@@ -243,6 +244,7 @@
 ## Model Training
 
 - [Quantization Aware Training with NNCF, using TensorFlow Framework](./tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb)
+- [Quantization-Sparsity Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb)
 - [Quantization Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-aware-training/pytorch-quantization-aware-training.ipynb)
 
 ## Optimize
@@ -253,6 +255,7 @@
 - [Accelerate Inference of Sparse Transformer Models with OpenVINO™ and 4th Gen Intel&reg; Xeon&reg; Scalable Processors](./sparsity-optimization/sparsity-optimization.ipynb)
 - [Convert and Optimize YOLOv8 with OpenVINO™](./quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb)
 - [Quantize Speech Recognition Models with accuracy control using NNCF PTQ API](./quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb)
+- [Quantization-Sparsity Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb)
 - [Quantization Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-aware-training/pytorch-quantization-aware-training.ipynb)
 - [Post-Training Quantization of PyTorch models with NNCF](./pytorch-post-training-quantization-nncf/pytorch-post-training-quantization-nncf.ipynb)
 - [Optimize Preprocessing](./optimize-preprocessing/optimize-preprocessing.ipynb)
