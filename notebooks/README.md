@@ -126,6 +126,7 @@
 - [Style Transfer with OpenVINO™](./style-transfer-webcam/style-transfer.ipynb)
 - [Live Human Pose Estimation with OpenVINO™](./pose-estimation-webcam/pose-estimation.ipynb)
 - [Person Tracking with OpenVINO™](./person-tracking-webcam/person-tracking.ipynb)
+- [Person Counting System using YOLOV8 and OpenVINO™](./person-counting-webcam/person-counting.ipynb)
 - [PaddleOCR with OpenVINO™](./paddle-ocr-webcam/paddle-ocr-webcam.ipynb)
 - [Voice tone cloning with OpenVoice and OpenVINO](./openvoice/openvoice.ipynb)
 - [Live Object Detection with OpenVINO™](./object-detection-webcam/object-detection.ipynb)
@@ -133,7 +134,6 @@
 - [Quantize a Segmentation Model and Show Live Inference](./ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb)
 - [Human Action Recognition with OpenVINO™](./action-recognition-webcam/action-recognition-webcam.ipynb)
 - [Live 3D Human Pose Estimation with OpenVINO](./3D-pose-estimation-webcam/3D-pose-estimation.ipynb)
-- [Person counting](./person-counting-webcam/person-counting.ipynb)
 
 ## Model Demos
 
