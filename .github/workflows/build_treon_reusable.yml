@@ -232,6 +232,13 @@ jobs:
           python check_install.py
 
       # TODO Remove after testing
+      - name: Debug install detectron
+        shell: bash
+        run: |
+          pip install -q --extra-index-url https://download.pytorch.org/whl/cpu torch torchvision
+          pip install -q "git+https://github.com/facebookresearch/detectron2.git" --extra-index-url https://download.pytorch.org/whl/cpu
+          pip install -q "openvino>=2023.1.0"
+      # TODO Remove after testing
       # - name: Print devices
       #   run: |
       #     python -m pip install openvino
