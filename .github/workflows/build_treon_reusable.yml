@@ -234,6 +234,7 @@ jobs:
       # TODO Remove after testing
       - name: Print devices
         run: |
+          python -m pip install openvino
           python -c 'import openvino as ov;print(ov.Core().available_devices)'
 
       # Patch long running cells to run faster
