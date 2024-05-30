@@ -238,6 +238,11 @@ jobs:
         run: |
           python check_install.py
 
+      # TODO Remove after testing
+      - name: Print devices
+        run: |
+          python -c 'import openvino as ov;print(ov.Core().available_devices)'
+
       # Patch long running cells to run faster
       - name: Patch notebooks
         run: |
