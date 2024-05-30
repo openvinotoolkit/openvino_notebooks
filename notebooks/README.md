@@ -133,6 +133,7 @@
 - [Quantize a Segmentation Model and Show Live Inference](./ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb)
 - [Human Action Recognition with OpenVINO™](./action-recognition-webcam/action-recognition-webcam.ipynb)
 - [Live 3D Human Pose Estimation with OpenVINO](./3D-pose-estimation-webcam/3D-pose-estimation.ipynb)
+- [Person counting](./person-counting-webcam/person-counting.ipynb)
 
 ## Model Demos
 
