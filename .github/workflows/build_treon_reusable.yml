@@ -98,13 +98,6 @@ jobs:
             ./install_openvino_dependencies.sh -c=core -c=dev -c=gpu -y
           fi
 
-      # TODO Remove
-      - name: Check Git
-        shell: bash
-        run: |
-          git --version
-          which git
-
       - name: Install GPU Drivers
         if: ${{ inputs.container }}
         shell: bash
