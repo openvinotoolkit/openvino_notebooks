@@ -115,8 +115,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '${{ inputs.python }}'
-        env:
-          AGENT_TOOLSDIRECTORY: ${{ inputs.container && '/opt/hostedtoolcache' || '' }}
+        # env:
+        #   AGENT_TOOLSDIRECTORY: ${{ inputs.container && '/opt/hostedtoolcache' || '' }}
 
       # TODO Remove after testing
       - name: Debug install detectron
@@ -126,7 +126,7 @@ jobs:
           pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu -v
           pip freeze | grep torch
           python -c 'import torch'
-          pip install "git+https://github.com/facebookresearch/detectron2.git" -v --no-build-isolation
+          pip install "git+https://github.com/facebookresearch/detectron2.git" -v
           pip freeze | grep detectron2
           pip install -q "openvino>=2023.1.0"
 
