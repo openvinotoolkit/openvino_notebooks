@@ -235,7 +235,7 @@ jobs:
       - name: Debug install detectron
         shell: bash
         run: |
-          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu -v
+          pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --index-url https://download.pytorch.org/whl/cpu -v
           pip freeze | grep torch
           pip install "git+https://github.com/facebookresearch/detectron2.git" -v
           pip freeze | grep detectron2
