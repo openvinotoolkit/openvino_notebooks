@@ -122,6 +122,7 @@ jobs:
       - name: Debug install detectron
         shell: bash
         run: |
+          pip install ninja
           pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu -v
           pip freeze | grep torch
           python -c 'import torch'
