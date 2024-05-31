@@ -125,7 +125,7 @@ jobs:
           pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu -v
           pip freeze | grep torch
           python -c 'import torch'
-          pip install "git+https://github.com/facebookresearch/detectron2.git" -v
+          pip install "git+https://github.com/facebookresearch/detectron2.git" -v --no-build-isolation
           pip freeze | grep detectron2
           pip install -q "openvino>=2023.1.0"
 
