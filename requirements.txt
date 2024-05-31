@@ -1,4 +1,4 @@
-# jupyter
+# jupyter requirements
 jupyterlab
 ipywidgets
 ipykernel>=5.*
