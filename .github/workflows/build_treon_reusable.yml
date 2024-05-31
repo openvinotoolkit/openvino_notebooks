@@ -118,25 +118,13 @@ jobs:
         env:
           AGENT_TOOLSDIRECTORY: ${{ inputs.container && '/opt/hostedtoolcache' || '' }}
 
-      # TODO Remove after testing
-      - name: Debug install detectron
-        shell: bash
-        run: |
-          pip install wheel
-          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu -v
-          pip freeze | grep torch
-          python -c 'import torch'
-          pip install "git+https://github.com/facebookresearch/detectron2.git" -v
-          pip freeze | grep detectron2
-          # pip install -q "openvino>=2023.1.0"
-
-      # - name: Cache Pip Packages
-      #   id: cachepip
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: |
-      #       pipcache
-      #     key: ${{ env.PIP_CACHE_KEY }}-${{ env.OS_NAME }}-${{ inputs.python }}
+      - name: Cache Pip Packages
+        id: cachepip
+        uses: actions/cache@v3
+        with:
+          path: |
+            pipcache
+          key: ${{ env.PIP_CACHE_KEY }}-${{ env.OS_NAME }}-${{ inputs.python }}
 
       # Cache specific files to reduce downloads or prevent network issues
       - name: Cache Files
