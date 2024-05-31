@@ -124,12 +124,12 @@ def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb
         )
     # TODO Remove after testing
     notebooks_to_check = [
-        "amused-lightweight-text-to-image.ipynb",
+        # "amused-lightweight-text-to-image.ipynb",
         "detectron2-to-openvino.ipynb",
-        "meter-reader.ipynb",
-        "openvino-tokenizers.ipynb",
-        "s3d-mil-nce-text-to-video-retrieval.ipynb",
-        "table-question-answering.ipynb",
+        # "meter-reader.ipynb",
+        # "openvino-tokenizers.ipynb",
+        # "s3d-mil-nce-text-to-video-retrieval.ipynb",
+        # "table-question-answering.ipynb",
     ]
     testing_notebooks = list(filter(lambda tn: any(n in str(tn) for n in notebooks_to_check), testing_notebooks))
     testing_notebooks = sorted(list(set(testing_notebooks)))
