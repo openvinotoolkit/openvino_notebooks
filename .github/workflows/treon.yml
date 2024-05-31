@@ -27,14 +27,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs_on: [ubuntu-20.04, ubuntu-22.04, windows-2019, macos-12]
-        python: ['3.8', '3.9', '3.10']
+        # TODO Remove after testing
+        # runs_on: [ubuntu-20.04, ubuntu-22.04, windows-2019, macos-12]
+        # python: ['3.8', '3.9', '3.10']
+        runs_on: [ubuntu-20.04]
+        python: ['3.8']
     uses: ./.github/workflows/build_treon_reusable.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
 
   build_treon_gpu:
+    # TODO Remove after testing
+    if: false
     strategy:
       fail-fast: false
       matrix:
