@@ -59,8 +59,7 @@ def main():
                 if name not in NOTEBOOKS_STATUS_MAP:
                     NOTEBOOKS_STATUS_MAP[name] = get_default_status_dict(name)
                 NOTEBOOKS_STATUS_MAP[name]["status"][os][device][python] = status
-    # TODO Remove test prefix aftertesting
-    write_json_file(Path(REPORTS_DIR) / "test-notebooks-status-map.json", NOTEBOOKS_STATUS_MAP)
+    write_json_file(Path(REPORTS_DIR) / "notebooks-status-map.json", NOTEBOOKS_STATUS_MAP)
 
 
 if __name__ == "__main__":
