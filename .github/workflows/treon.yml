@@ -1,5 +1,4 @@
-# TODO Remove after testing
-name: treon_nightly_test
+name: treon_nightly
 
 on:
   workflow_dispatch:
@@ -12,11 +11,6 @@ on:
       - '.github/workflows/.env'
   schedule:
     - cron: '30 8 * * *'
-  # TODO Remove after testing
-  pull_request:
-    branches:
-      - 'main'
-      - 'latest'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
@@ -70,7 +64,6 @@ jobs:
       - name: Upload aggregated report
         uses: actions/upload-artifact@v4
         with:
-          # TODO Remove after testing
-          name: test-notebooks-status-map.json
-          path: test_reports/test-notebooks-status-map.json
+          name: notebooks-status-map.json
+          path: test_reports/notebooks-status-map.json
           if-no-files-found: error

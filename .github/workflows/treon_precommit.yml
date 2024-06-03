@@ -31,8 +31,6 @@ concurrency:
 
 jobs:
   build_treon:
-    # TODO Remove after testing
-    if: false
     strategy:
       fail-fast: true
       matrix:

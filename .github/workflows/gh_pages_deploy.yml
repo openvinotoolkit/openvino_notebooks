@@ -5,11 +5,10 @@ on:
     branches:
       - 'main'
       - 'latest'
-  # TODO Remove after testing
-  # workflow_run:
-  #   workflows: [treon_nightly]
-  #   types:
-  #     - completed
+  workflow_run:
+    workflows: [treon_nightly]
+    types:
+      - completed
   workflow_dispatch:
 
 concurrency:
