@@ -93,6 +93,7 @@ def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb
         raise ValueError(
             f"Ignore list items should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\nInvalid ignored notebooks: {ignored_notebooks}"
         )
+    ignored_notebooks = sorted(ignored_notebooks)
     print(f"Ignored notebooks: {ignored_notebooks}")
 
     testing_notebooks: List[Path] = []
@@ -121,7 +122,7 @@ def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb
             "Testing notebooks should be provided to '--test_list' argument as a txt file or should be empty to test all notebooks.\n"
             f"Received test list: {test_list}"
         )
-    testing_notebooks = list(set(testing_notebooks))
+    testing_notebooks = sorted(list(set(testing_notebooks)))
     print(f"Testing notebooks: {testing_notebooks}")
 
     for notebook in test_plan:
