@@ -41,6 +41,12 @@ jobs:
             core.exportVariable('TEST_REPORT_DIR', testReportDir);
             core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
 
+      #### Installation/preparation ####
+      #
+      # These steps are also copied to convert_notebooks.yml
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Get changed files
         if: ${{ inputs.test_only_changed }}
         id: changed-files
@@ -61,12 +67,6 @@ jobs:
             echo "$file was changed"
             echo $file >> test_notebooks.txt
           done
-
-      #### Installation/preparation ####
-      #
-      # These steps are also copied to convert_notebooks.yml
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       - name: Dotenv Action
         id: dotenv
