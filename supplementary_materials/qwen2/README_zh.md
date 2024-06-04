@@ -42,7 +42,7 @@ pip install -r requirements.txt
 由于需要将Huggingface模型转换为OpenVINO IR模型，因此您需要下载模型并转换。
 
 ```
-python3 convert.py --model_id qwen/Qwen2-7B-Instruct --precision int4 --output {your_path}/Qwen2-7B-Instruct-ov 
+python3 convert.py --model_id qwen/Qwen2-7B-Instruct --precision int4 --output {your_path}/Qwen2-7B-Instruct-ov --modelscope
 ```
 
 ### 可以选择的参数
