@@ -140,6 +140,9 @@ datasets
 DDIM
 DDPMs
 dDPO
+DDColor's
+DDColor
+ddcolor
 de
 Deblur
 deblur
