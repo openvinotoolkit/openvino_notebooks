@@ -231,6 +231,7 @@
 - [Automatic speech recognition using Distil-Whisper and OpenVINO](./distil-whisper-asr/distil-whisper-asr.ipynb)
 - [Depth estimation with DepthAnything and OpenVINO](./depth-anything/depth-anything.ipynb)
 - [Image generation with DeciDiffusion and OpenVINO](./decidiffusion-image-generation/decidiffusion-image-generation.ipynb)
+- [Colorize grayscale images using 🎨 DDColor and OpenVINO](./ddcolor-image-colorization/ddcolor-image-colorization.ipynb)
 - [Cross-lingual Books Alignment with Transformers and OpenVINO™](./cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb)
 - [Text-to-Image Generation with ControlNet Conditioning](./controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb)
 - [Zero-shot Image Classification with OpenAI CLIP and OpenVINO™](./clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb)
