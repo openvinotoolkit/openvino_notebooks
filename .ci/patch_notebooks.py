@@ -41,7 +41,7 @@ def disable_skip_ext(nb, notebook_path, test_device=""):
             if not skip_for_device:
                 cell["source"] = re.sub(r"%%skip.*.\n", "\n", cell["source"])
             else:
-                cell["source"] = '"""\n' + cell["source"] + '\n"""'
+                cell["source"] = ""
     if found:
         print(f"Disabled skip extension mode for {notebook_path}")
     return nb
@@ -64,6 +64,9 @@ def remove_ov_install(cell):
     lines = cell["source"].split("\n")
     for line in lines:
         if "openvino" in line:
+            if "optimum-cli" in line or line.startswith("#"):
+                updated_lines.append(line)
+                continue
             updated_line_content = []
             empty = True
             package_found = False
