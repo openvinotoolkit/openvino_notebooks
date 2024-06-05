@@ -15,6 +15,7 @@ EXPECTED_NO_DEVICE = [
     Path("notebooks/model-server/model-server.ipynb"),  # can not change device in docker configuration on the fly
     Path("notebooks/openvino-tokenizers/openvino-tokenizers.ipynb"),  # cpu required for loading extensions
     Path("notebooks/sparsity-optimization/sparsity-optimization.ipynb"),  # cpu expected to be used
+    Path("notebooks/s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb"),  # only cpu
 ]
 
 
