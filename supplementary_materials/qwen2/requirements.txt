@@ -4,4 +4,5 @@ transformers>=4.38.2
 openvino>=2024.1.0
 onnx>=1.15.0
 huggingface-hub>=0.21.3
+torch>=2.1
 modelscope

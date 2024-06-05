@@ -50,13 +50,13 @@ if __name__ == "__main__":
                  "NUM_STREAMS": "1", "CACHE_DIR": ""}
 
     tokenizer = AutoTokenizer.from_pretrained(
-        model_dir, trust_remote_code=True)
+        model_dir)
     print("====Compiling model====")
     ov_model = OVModelForCausalLM.from_pretrained(
         model_dir,
         device=args.device,
         ov_config=ov_config,
-        config=AutoConfig.from_pretrained(model_dir, trust_remote_code=True),
+        config=AutoConfig.from_pretrained(model_dir),
         trust_remote_code=True,
     )
 

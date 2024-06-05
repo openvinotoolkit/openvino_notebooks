@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer, AutoConfig
+from transformers import AutoTokenizer
 from optimum.intel import OVWeightQuantizationConfig
 from optimum.intel.openvino import OVModelForCausalLM
 
@@ -27,7 +27,6 @@ if __name__ == '__main__':
                         help='fp16, int8 or int4')
     parser.add_argument('-o',
                         '--output',
-                        default='./Qwen1.5-0.5B-ov',
                         required=False,
                         type=str,
                         help='path to save the ir model')
@@ -37,7 +36,9 @@ if __name__ == '__main__':
                         help='download model from Model Scope')
     args = parser.parse_args()
 
-    ir_model_path = Path(args.output)
+    ir_model_path = Path(args.model_id.split(
+        "/")[1] + '-ov') if args.output is None else Path(args.output)
+
     if ir_model_path.exists() == False:
         os.mkdir(ir_model_path)
 
@@ -68,7 +69,10 @@ if __name__ == '__main__':
 
     ov_model.save_pretrained(ir_model_path)
 
-    print("====Exporting tokenizer=====")
     tokenizer = AutoTokenizer.from_pretrained(
-        model_path, trust_remote_code=True)
+        model_path)
     tokenizer.save_pretrained(ir_model_path)
+
+    print("====Exporting IR tokenizer=====")
+    from optimum.exporters.openvino.convert import export_tokenizer
+    export_tokenizer(tokenizer, ir_model_path)
