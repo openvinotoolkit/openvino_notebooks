@@ -101,3 +101,5 @@ Qwen2-OpenVINO: "小兔子与朋友们的冒险之旅"
 
 4. 是否支持C++？
    - C++示例可以[参考](https://github.com/openvinotoolkit/openvino.genai/tree/master/text_generation/causal_lm/cpp)
+
+您也可以在这里提交 [问题](https://community.intel.com/t5/Intel-Distribution-of-OpenVINO/bd-p/distribution-openvino-toolkit).

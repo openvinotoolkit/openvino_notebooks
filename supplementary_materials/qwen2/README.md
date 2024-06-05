@@ -39,7 +39,7 @@ pip install -r requirements.txt
 
 ## 2. Convert model
 
-Since the Huggingface model needs to be converted to an OpenVINO IR model, you need to download the model and convert.
+Since the Hugging Face model needs to be converted to an OpenVINO IR model, you need to download the model and convert.
 
 ```
 python3 convert.py --model_id qwen/Qwen2-7B-Instruct --precision int4 --output {your_path}/Qwen2-7B-Instruct-ov --modelscope
@@ -51,7 +51,7 @@ python3 convert.py --model_id qwen/Qwen2-7B-Instruct --precision int4 --output {
   where the model is located.
 * `--precision` - model precision: fp16, int8 or int4.
 * `--output` - the path where the converted model is saved.
-* `--modelscope` - if to download model from Model Scope.
+* `--modelscope` - if downloading the model from Model Scope.
 
 ## 3. Run streaming chatbot
 
@@ -65,7 +65,7 @@ python3 chat.py --model_path {your_path}/Qwen2-7B-Instruct-ov --max_sequence_len
 * `--max_sequence_length` - Maximum size of output tokens.
 * `--device` - The device to run inference on. e.g "CPU","GPU".
 
-## example
+## Example
 
 ```
 ====Starting conversation====
@@ -92,22 +92,24 @@ User: please give this story a title
 Qwen2-OpenVINO: "Nature's Magic: A Journey Through the Forest Crystal"
 ```
 
-## Common problem
+## FAQ
 
 1. Do I need to install the OpenVINO C++ inference engine?
     - Unnecessary
 
 2. Do I have to use Intel hardware?
-    - We only tried it on Intel devices, and we recommend using x86 architecture Intel devices, including but not
-      limited to:
+    - It is recommended to use Intel x86 devices, and this is where we tested it. For example:
     - Intel CPU, including personal computer CPU and server CPU.
     - Intel's integrated GPU. For example: Arc™ Series and Iris® Series.
     - Intel's discrete graphics card. For example: ARC™ A770 graphics card.
   
-3. Why OpenVINO cannot find GPU device in my system?
-   - Ensure OpenCL diivess are installed correctly.
+3. Why can't OpenVINO find the GPU in my system(Linux)?
+   - Ensure OpenCL drivers are installed correctly.
    - Ensure you enabled the right permissions for GPU device
    - More information can be found in [Install GPU drivers](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu#1-install-python-git-and-gpu-drivers-optional)
 
-4. Whether support C++?
+4. Is C++ supported ?
    - Please refer to this [example](https://github.com/openvinotoolkit/openvino.genai/tree/master/text_generation/causal_lm/cpp)
+
+
+Post your questions [here](https://community.intel.com/t5/Intel-Distribution-of-OpenVINO/bd-p/distribution-openvino-toolkit).
