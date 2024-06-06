@@ -23,6 +23,7 @@ USER root
 
 # Upgrade NodeJS > 12.0
 # Install dos2unix for line end conversion on Windows
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -sL https://rpm.nodesource.com/setup_14.x | bash -  && \
   yum remove -y nodejs && \
   yum install -y nodejs-14.18.1 mesa-libGL dos2unix libsndfile --setopt=tsflags=nocrypto --nogpgcheck && \
@@ -67,9 +68,9 @@ RUN chown -R 1001:0 /opt/app-root/notebooks
 USER 1001
 
 # Install additional packages
-RUN pip install "torch" --index-url https://download.pytorch.org/whl/cpu
-RUN pip install "openvino>=2023.1.0" transformers "diffusers>=0.23.1" pillow gradio "nncf>=2.6.0" datasets --extra-index-url https://download.pytorch.org/whl/cpu
-RUN pip install accelerate
+RUN pip install "torch==2.3.1" --index-url https://download.pytorch.org/whl/cpu
+RUN pip install "openvino==2024.1.0" "transformers==4.41.2" "diffusers==0.28.2" "pillow==10.3.0" "gradio==4.33.0" "nncf==2.10.0" "datasets==2.19.2" --extra-index-url https://download.pytorch.org/whl/cpu
+RUN pip install "accelerate==0.30.1"
 
 # RUN jupyter lab build
-CMD /tmp/scripts/run
+CMD ["/tmp/scripts/run"]
