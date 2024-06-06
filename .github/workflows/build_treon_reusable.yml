@@ -166,7 +166,7 @@ jobs:
             ${{ env.HUB_HOME }}
             ${{ env.CACHE_DIR }}/paddle
             ${{ env.CACHE_DIR }}/ppgan
-          key: ${{ env.USER_CACHE_KEY }}-${{ env.OS_NAME }}
+          key: ${{ env.USER_CACHE_KEY }}-${{ env.OS_NAME }}-${{ inputs.python }}
 
       - name: Cache openvino packages
         if: steps.cachepip.outputs.cache-hit != 'true'
