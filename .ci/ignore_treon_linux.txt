@@ -69,3 +69,4 @@ notebooks/llm-agent-langchain/llm-agent-langchain.ipynb
 notebooks/hello-npu/hello-npu.ipynb
 notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb
 notebooks/dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb
+notebooks/yolov10-optimization/yolov10-optimization.ipynb

@@ -141,6 +141,9 @@ datasets
 DDIM
 DDPMs
 dDPO
+DDColor's
+DDColor
+ddcolor
 de
 Deblur
 deblur
@@ -203,6 +206,7 @@ DPO
 dpo
 dpredictor
 DreamBooth
+DreamBooth Tsinghua
 Dreamshaper
 dropdown
 DynamiCrafter
@@ -329,6 +333,7 @@ JIT
 Joao
 JS
 JSON
+json
 JT
 JuggernautXL
 Jupyter
@@ -452,6 +457,7 @@ MusicGen
 Müller
 Nakayosi
 nano
+nanoLLaVA
 nar
 NAS
 natively
@@ -698,6 +704,8 @@ softvc
 SoftVC
 SOTA
 Sovits
+sparsity
+Sparisty
 sparsified
 sparsify
 spectrogram
@@ -777,6 +785,7 @@ transformative
 Tripo
 TripoSR
 TTS
+Tsinghua
 TsinghuaNLP
 tunable
 tv

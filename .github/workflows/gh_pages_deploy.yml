@@ -3,10 +3,11 @@ name: Deploy to GitHub Pages, Update notebooks index
 on:
   push:
     branches:
-      - 'main'
       - 'latest'
   workflow_run:
     workflows: [treon_nightly]
+    branches:
+      - 'latest'
     types:
       - completed
   workflow_dispatch:

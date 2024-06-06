@@ -15,6 +15,7 @@ EXPECTED_NO_DEVICE = [
     Path("notebooks/model-server/model-server.ipynb"),  # can not change device in docker configuration on the fly
     Path("notebooks/openvino-tokenizers/openvino-tokenizers.ipynb"),  # cpu required for loading extensions
     Path("notebooks/sparsity-optimization/sparsity-optimization.ipynb"),  # cpu expected to be used
+    Path("notebooks/s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb"),  # only cpu
 ]
 
 
@@ -44,7 +45,6 @@ def main():
                 print(f"SKIPPED: {nb_path.relative_to(NOTEBOOKS_ROOT)} for device wdget check")
                 device_found = True
             for cell in notebook_json["cells"]:
-
                 if not toc_found and cell["cell_type"] == "markdown":
                     tc_cell, tc_line = find_tc_in_cell(cell)
                     if tc_line is not None:
