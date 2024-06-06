@@ -70,6 +70,12 @@ SUPPORTED_LLM_MODELS = {
             Answer: </s>
             <|assistant|>""",
         },
+        "qwen2-1.5b-instruct": {
+            "model_id": "Qwen/Qwen2-1.5B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        },
         "gemma-2b-it": {
             "model_id": "google/gemma-2b-it",
             "remote_code": False,
@@ -107,6 +113,18 @@ SUPPORTED_LLM_MODELS = {
             <human>: Question: {input} 
             Context: {context} 
             Answer: <bot>""",
+        },
+        "qwen2-7b-instruct": {
+            "model_id": "Qwen/Qwen2-7B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT }<|im_end|>"""
+            + """
+            <|im_start|>user
+            Question: {input} 
+            Context: {context} 
+            Answer: <|im_end|><|im_start|>assistant""",
         },
         "gemma-7b-it": {
             "model_id": "google/gemma-7b-it",
@@ -225,6 +243,25 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        },
+        "qwen2-1.5b-instruct": {
+            "model_id": "Qwen/Qwen2-1.5B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        },
+        "qwen2-7b-instruct": {
+            "model_id": "Qwen/Qwen2-7B-Instruct",
+            "remote_code": False,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
+            + """
+            <|im_start|>user
+            问题: {input} 
+            已知内容: {context} 
+            回答: <|im_end|><|im_start|>assistant""",
         },
         "qwen1.5-7b-chat": {
             "model_id": "Qwen/Qwen1.5-7B-Chat",
