@@ -241,6 +241,11 @@ jobs:
         run: |
           jupyter lab notebooks --help
 
+      # TODO Remove after testing
+      - name: Test paddle installation
+        run: |
+          pip install "paddlepaddle>=2.5.1" "paddle2onnx>=0.6" -v
+
       # Main notebooks test. Verifies that all notebooks run without errors
       - name: Analysing with treon (Windows) python > 3.8
         if: runner.os == 'Windows' && inputs.python != '3.8'
