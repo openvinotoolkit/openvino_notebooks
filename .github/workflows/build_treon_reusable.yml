@@ -244,7 +244,9 @@ jobs:
       # TODO Remove after testing
       - name: Test paddle installation
         run: |
+          pip install "openvino>=2023.1.0"
           pip install "paddlepaddle>=2.5.1" "paddle2onnx>=0.6" -v
+          pip install "git+https://github.com/PaddlePaddle/PaddleGAN.git" --no-deps
 
       # Main notebooks test. Verifies that all notebooks run without errors
       - name: Analysing with treon (Windows) python > 3.8
