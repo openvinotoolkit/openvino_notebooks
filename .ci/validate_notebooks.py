@@ -122,9 +122,6 @@ def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb
             "Testing notebooks should be provided to '--test_list' argument as a txt file or should be empty to test all notebooks.\n"
             f"Received test list: {test_list}"
         )
-    # TODO Remove after testing
-    notebooks_to_check = ["vision-paddlegan-anime.ipynb", "vision-paddlegan-superresolution.ipynb"]
-    testing_notebooks = list(filter(lambda tn: any(n in str(tn) for n in notebooks_to_check), testing_notebooks))
     testing_notebooks = sorted(list(set(testing_notebooks)))
     print(f"Testing notebooks: {testing_notebooks}")
 
