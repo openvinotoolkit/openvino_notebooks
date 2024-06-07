@@ -25,6 +25,8 @@ The tutorial consists of the following steps:
 - Run the agent
 - Interactive Demo
   - Use built-in tool
+  - Create customized tools
+  - Create AI agent demo with Gradio UI
 
 ## Installation Instructions
 
