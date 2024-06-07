@@ -248,7 +248,7 @@ jobs:
         run: |
           python .ci/validate_notebooks.py \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list .ci/ignore_treon_win.txt \
+            --ignore_list .ci/ignore_treon_win.txt ${{ inputs.python == '3.11' && '.ci/ignore_treon_py311.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --move_notebooks_dir c:/notebooks \
             --timeout 1200
@@ -286,7 +286,7 @@ jobs:
         run: |
           python .ci/validate_notebooks.py \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list .ci/ignore_treon_mac.txt \
+            --ignore_list .ci/ignore_treon_mac.txt ${{ inputs.python == '3.11' && '.ci/ignore_treon_py311.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --timeout 1200
       - name: Analysing with treon (MacOS) python 3.8

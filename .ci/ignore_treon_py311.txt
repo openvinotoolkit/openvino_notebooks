@@ -1,0 +1,2 @@
+notebooks/vision-paddlegan-anime/vision-paddlegan-anime.ipynb
+notebooks/vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb
