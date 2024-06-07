@@ -5,7 +5,7 @@ Large Language Models (LLMs) are artificial intelligence systems that can unders
 While a decent intent-based chatbot can answer basic, one-touch inquiries like order management, FAQs, and policy questions, LLM chatbots can tackle more complex, multi-touch questions. LLM enables chatbots to provide support in a conversational manner, similar to how humans do, through contextual memory. Leveraging the capabilities of Language Models, chatbots are becoming increasingly intelligent, capable of understanding and responding to human language with remarkable accuracy.
 
 Previously, we already discussed how to build instruction-following pipeline using OpenVINO and Optimum Intel, please check out [Dolly v2 example](../dolly-2-instruction-following) for reference.
-In this tutorial we consider how to use power of OpenVINO for running Large Language Models for both chat and QA over document. We will use a pre-trained model from the [Hugging Face Transformers](https://huggingface.co/docs/transformers/index) library. To simplify the user experience, the [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index) library is used to convert the models to OpenVINO™ IR format. 
+In this tutorial we consider how to use power of OpenVINO for running Large Language Models for both chat and QA over document. We will use a pre-trained model from the [Hugging Face Transformers](https://huggingface.co/docs/transformers/index) library. The [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index) library converts the models to OpenVINO™ IR format. To simplify the user experience, we will use [OpenVINO Generate API](https://github.com/openvinotoolkit/openvino.genai) for generation of instruction-following inference pipeline.
 
 The tutorial supports different models, you can select one from provided options to compare quality of open source LLM solutions.
 >**Note**: conversion of some models can require additional actions from user side and at least 64GB RAM for conversion.
@@ -55,7 +55,7 @@ The tutorial consists of the following steps:
 - Install prerequisites
 - Download and convert the model from a public source using the [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
 - Compress model weights to INT4 or INT8 precision using [NNCF](https://github.com/openvinotoolkit/nncf)
-- Create an inference pipeline
+- Create an inference pipeline with [OpenVINO Generate API](https://github.com/openvinotoolkit/openvino.genai/blob/master/src/README.md).
 - Run chatbot / QA over document
 
 ## Installation Instructions
