@@ -709,6 +709,8 @@ sparsified
 sparsify
 spectrogram
 spectrograms
+SpeechBrain
+speechbrain
 splitters
 SPS
 SQA
