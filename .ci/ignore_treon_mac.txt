@@ -8,8 +8,6 @@ notebooks/big-transfer-quantization/tensorflow-bit-image-classification-nncf-qua
 notebooks/openvino-tokenizers/openvino-tokenizers.ipynb
 notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb
 notebooks/stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb
-notebooks/whisper-subtitles-generation/whisper-convert.ipynb
-notebooks/whisper-subtitles-generation/whisper-nncf-quantize.ipynb
 notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb
 notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb
 notebooks/blip-visual-language-processing/blip-visual-language-processing.ipynb
@@ -72,3 +70,4 @@ notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb
 notebooks/dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb
 notebooks/yolov10-optimization/yolov10-optimization.ipynb
 notebooks/nano-llava-multimodal-chatbot/nano-llava-multimodal-chatbot.ipynb
+notebooks/whisper-subtitles-generation/whisper-subtitles-generation.ipynb
