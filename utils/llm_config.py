@@ -56,6 +56,12 @@ def internlm_partial_text_processor(partial_text, new_text):
 
 SUPPORTED_LLM_MODELS = {
     "English": {
+        "qwen2-0.5b-instruct": {
+            "model_id": "Qwen/Qwen2-0.5B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        },
         "tiny-llama-1b-chat": {
             "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
             "remote_code": False,
