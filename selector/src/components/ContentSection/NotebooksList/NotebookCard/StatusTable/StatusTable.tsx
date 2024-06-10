@@ -58,13 +58,8 @@ type StatusTableProps = {
 
 export const StatusTable = ({ status }: StatusTableProps) => {
   const osOptions = Object.keys(status) as (keyof typeof status)[];
-  // TODO Remove explicit setting of `3.11` key
-  const cpuStatuses = osOptions
-    .map((os) => Object.values({ ...status[os]['cpu'], '3.11': status[os]['cpu']['3.11'] }))
-    .flat();
-  const gpuStatuses = osOptions
-    .map((os) => Object.values({ ...status[os]['gpu'], '3.11': status[os]['cpu']['3.11'] }))
-    .flat();
+  const cpuStatuses = osOptions.map((os) => Object.values(status[os]['cpu'])).flat();
+  const gpuStatuses = osOptions.map((os) => Object.values(status[os]['gpu'])).flat();
 
   return (
     <div className="status-table spark-font-75">
