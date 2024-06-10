@@ -28,7 +28,6 @@ notebooks/oneformer-segmentation/oneformer-segmentation.ipynb
 notebooks/music-generation/music-generation.ipynb
 notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb
 notebooks/zeroscope-text2video/zeroscope-text2video.ipynb
-notebooks/llm-chatbot/llm-chatbot.ipynb
 notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb
 notebooks/bark-text-to-audio/bark-text-to-audio.ipynb
 notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb
