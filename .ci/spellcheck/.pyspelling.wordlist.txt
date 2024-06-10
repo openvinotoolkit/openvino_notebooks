@@ -854,6 +854,7 @@ WebUI
 WER
 WIKISQL
 WikiTable
+Wikitext
 WIKITQ
 Wofk
 WTQ
