@@ -7,8 +7,6 @@ notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accura
 notebooks/big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb
 notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb
 notebooks/stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb
-notebooks/whisper-subtitles-generation/whisper-convert.ipynb
-notebooks/whisper-subtitles-generation/whisper-nncf-quantize.ipynb
 notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb
 notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb
 notebooks/blip-visual-language-processing/blip-visual-language-processing.ipynb
