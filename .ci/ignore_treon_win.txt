@@ -8,8 +8,6 @@ notebooks/big-transfer-quantization/tensorflow-bit-image-classification-nncf-qua
 notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb
 notebooks/text-prediction/text-prediction.ipynb
 notebooks/stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb
-notebooks/whisper-subtitles-generation/whisper-convert.ipynb
-notebooks/whisper-subtitles-generation/whisper-nncf-quantize.ipynb
 notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb
 notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb
 notebooks/blip-visual-language-processing/blip-visual-language-processing.ipynb
@@ -30,7 +28,6 @@ notebooks/oneformer-segmentation/oneformer-segmentation.ipynb
 notebooks/music-generation/music-generation.ipynb
 notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb
 notebooks/zeroscope-text2video/zeroscope-text2video.ipynb
-notebooks/llm-chatbot/llm-chatbot.ipynb
 notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb
 notebooks/bark-text-to-audio/bark-text-to-audio.ipynb
 notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb
@@ -68,3 +65,4 @@ notebooks/hello-npu/hello-npu.ipynb
 notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb
 notebooks/dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb
 notebooks/yolov10-optimization/yolov10-optimization.ipynb
+notebooks/whisper-subtitles-generation/whisper-subtitles-generation.ipynb
