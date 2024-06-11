@@ -99,7 +99,7 @@ The application uses three separate models for its operation, each requiring con
 
 1. Automated Speech Recognition Distil-Whisper Conversion:
 ```shell
-python convert_and_optimize_asr.py --quantize_weights
+python convert_and_optimize_asr.py --quantize_weights int8
 ```
 This script will convert and optimize the automatic speech recognition (ASR) model performing weights quantization.
 
