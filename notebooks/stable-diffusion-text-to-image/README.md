@@ -29,8 +29,9 @@ The following image shows an example of the input sequence and corresponding pre
 This notebook demonstrates how to convert and run stable diffusion using OpenVINO.
 
 Notebook contains the following steps:
-1. Create PyTorch models pipeline using Diffusers library.
-2. Convert models to OpenVINO IR format, using model conversion API.
+1. Download and convert Stable Diffusion model from a public source using [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
+2. Create a text-to-image inference pipeline
+3. Create a image-to-image inference pipeline
 3. Run Stable Diffusion pipeline with OpenVINO.
 
 ## Installation Instructions
