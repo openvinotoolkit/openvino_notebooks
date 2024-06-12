@@ -86,9 +86,11 @@ CHW
 Cifar
 cityscape
 Cityscapes
+classname
 CLI
 cli
 CLIP's
+codebase
 codebook
 codebooks
 codec
@@ -127,6 +129,7 @@ CRNN
 CSV
 CTC
 CUDA
+CustomEncoderWav
 CVF
 CVPR
 Databricks
@@ -294,6 +297,7 @@ HWC
 hyperparameters
 ICIP
 ICPR
+IEMOCAP
 iGPU
 IdentityNet
 iGPUs
@@ -592,6 +596,7 @@ PTQ
 px
 py
 pyannote
+pymodule
 PyPI
 Pythia
 pytorch
@@ -710,6 +715,9 @@ sparsified
 sparsify
 spectrogram
 spectrograms
+SpeechBrain
+SpeechBrain's
+speechbrain
 splitters
 SPS
 SQA
@@ -848,6 +856,7 @@ VQVAE
 waveform
 waveforms
 Wav
+wav
 WavLM
 WebGL
 WebUI
