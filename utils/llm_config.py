@@ -91,21 +91,6 @@ SUPPORTED_LLM_MODELS = {
             "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""
             + """<start_of_turn>user{input}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model""",
         },
-        "phi-3-mini-instruct": {
-            "model_id": "microsoft/Phi-3-mini-4k-instruct",
-            "remote_code": True,
-            "start_message": "<|system|>\n{DEFAULT_SYSTEM_PROMPT}<|end|>\n",
-            "history_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}<|end|>\n",
-            "current_message_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}",
-            "stop_tokens": ["<|end|>"],
-            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }<|end|>"""
-            + """
-            <|user|>
-            Question: {input} 
-            Context: {context} 
-            Answer: <|end|>
-            <|assistant|>""",
-        },
         "red-pajama-3b-chat": {
             "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
             "remote_code": False,
@@ -241,6 +226,21 @@ SUPPORTED_LLM_MODELS = {
             [INST] Question: {input} 
             Context: {context} 
             Answer: [/INST]""",
+        },
+        "phi-3-mini-instruct": {
+            "model_id": "microsoft/Phi-3-mini-4k-instruct",
+            "remote_code": True,
+            "start_message": "<|system|>\n{DEFAULT_SYSTEM_PROMPT}<|end|>\n",
+            "history_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}<|end|>\n",
+            "current_message_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}",
+            "stop_tokens": ["<|end|>"],
+            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }<|end|>"""
+            + """
+            <|user|>
+            Question: {input} 
+            Context: {context} 
+            Answer: <|end|>
+            <|assistant|>""",
         },
     },
     "Chinese": {
