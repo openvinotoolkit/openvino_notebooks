@@ -61,6 +61,7 @@ export const TASKS = /** @type {const} */ ({
     AUDIO_GENERATION: 'Audio Generation',
     AUDIO_CLASSIFICATION: 'Audio Classification',
     VOICE_ACTIVITY_DETECTION: 'Voice Activity Detection',
+    AUDIO_CLASSIFICATION: "Audio Classification",
   },
   OTHER: {
     KNOWLEDGE_REPRESENTATION: 'Knowledge Representation',
