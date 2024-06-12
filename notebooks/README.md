@@ -245,6 +245,7 @@
 ## Optimize
 
 - [Quantization Aware Training with NNCF, using TensorFlow Framework](./tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb)
+- [SpeechBrain Emotion Recognition with OpenVINO](./speechbrain-emotion-recognition/speechbrain-emotion-recognition.ipynb)
 - [Quantize Wav2Vec Speech Recognition Model using NNCF PTQ API](./speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb)
 - [Quantize Data2Vec Speech Recognition Model using NNCF PTQ API](./speech-recognition-quantization/speech-recognition-quantization-data2vec.ipynb)
 - [Accelerate Inference of Sparse Transformer Models with OpenVINO™ and 4th Gen Intel&reg; Xeon&reg; Scalable Processors](./sparsity-optimization/sparsity-optimization.ipynb)
