@@ -401,6 +401,7 @@ LSTM
 LSTMs
 Luo
 LVLM
+Lyth
 macOS
 Magika
 Mahalanobis
@@ -543,6 +544,7 @@ panoptic
 parallelized
 parameterization
 parametrize
+Parler
 parsers
 perceptron
 Patil
