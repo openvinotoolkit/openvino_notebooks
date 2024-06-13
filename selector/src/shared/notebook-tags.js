@@ -17,6 +17,7 @@ export const TASKS = /** @type {const} */ ({
     TEXT_TO_VIDEO: 'Text-to-Video',
     VIDEO_TO_TEXT: 'Video-to-Text',
     TEXT_TO_AUDIO: 'Text-to-Audio',
+    TEXT_TO_SPEECH: 'Text-to-Speech',
     AUDIO_TO_TEXT: 'Audio-to-Text',
     VISUAL_QUESTION_ANSWERING: 'Visual Question Answering',
     IMAGE_CAPTIONING: "Image Captioning",
@@ -61,7 +62,6 @@ export const TASKS = /** @type {const} */ ({
     AUDIO_GENERATION: 'Audio Generation',
     AUDIO_CLASSIFICATION: 'Audio Classification',
     VOICE_ACTIVITY_DETECTION: 'Voice Activity Detection',
-    AUDIO_CLASSIFICATION: "Audio Classification",
   },
   OTHER: {
     KNOWLEDGE_REPRESENTATION: 'Knowledge Representation',
