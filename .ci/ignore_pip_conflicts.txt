@@ -26,4 +26,7 @@ notebooks/vision-paddlegan-anime/vision-paddlegan-anime.ipynb # old scipy
 notebooks/vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb # old scipy and scikit-image
 notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.ipynb
 notebooks/sketch-to-image-pix2pix-turbo/sketch-to-image-pix2pix-turbo.ipynb
-notebooks/yolov10-optimization/yolov10-optimization.ipynb
+notebooks/yolov10-optimization/yolov10-optimization.ipynb # nncf from git
+notebooks/person-counting-webcam/person-counting.ipynb # numpy should be installed first
+notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb # torchvision < 0.17.0
+notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb # torch >= 2.2
