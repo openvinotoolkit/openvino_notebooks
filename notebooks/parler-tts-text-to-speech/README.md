@@ -6,7 +6,7 @@ Parler-TTS is a lightweight text-to-speech (TTS) model that can generate high-qu
 
 Text-to-speech models trained on large-scale datasets have demonstrated impressive in-context learning capabilities and naturalness. However, control of speaker identity and style in these models typically requires conditioning on reference speech recordings, limiting creative applications. Alternatively, natural language prompting of speaker identity and style has demonstrated promising results and provides an intuitive method of control. However, reliance on human-labeled descriptions prevents scaling to large datasets.
 
-This work bridges the gap between these two approaches. The authors propose a scalable method for labeling various aspects of speaker identity, style, and recording conditions. This method then is applied to a 45k hour dataset, which is useed to train a speech language model. Furthermore, the authors propose simple methods for increasing audio fidelity, significantly outperforming recent work despite relying entirely on found data.
+This work bridges the gap between these two approaches. The authors propose a scalable method for labeling various aspects of speaker identity, style, and recording conditions. This method then is applied to a 45k hour dataset, which is used to train a speech language model. Furthermore, the authors propose simple methods for increasing audio fidelity, significantly outperforming recent work despite relying entirely on found data.
 
 
 [GitHub repository](https://github.com/huggingface/parler-tts)
