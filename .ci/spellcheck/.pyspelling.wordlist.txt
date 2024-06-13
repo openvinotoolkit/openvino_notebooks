@@ -190,6 +190,10 @@ distil
 DistilBERT
 distilbert
 distiluse
+DIT
+DiT
+DiT’s
+DiT’s
 DL
 DocLayNet
 docstring
@@ -218,6 +222,7 @@ editability
 EfficientNet
 EfficientSAM
 EfficientSAMs
+Embedder
 embeddings
 EnCodec
 encodec
@@ -292,6 +297,8 @@ HH
 hoc
 HuggingFace
 huggingfacehub
+Hunyuan
+HunyuanDIT
 Husain
 HWC
 hyperparameters
@@ -325,6 +332,7 @@ InstructPix
 intel
 InternLM
 internlm
+Interpolative
 invertible
 intervaling
 im
@@ -659,6 +667,7 @@ RMBG
 RoBERTa
 roberta
 ROI
+RoPE
 Ruizhongtai
 Runtime
 runtime

@@ -68,3 +68,4 @@ notebooks/dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb
 notebooks/yolov10-optimization/yolov10-optimization.ipynb
 notebooks/whisper-subtitles-generation/whisper-subtitles-generation.ipynb
 notebooks/speechbrain-emotion-recognition/speechbrain-emotion-recognition.ipynb
+notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb
