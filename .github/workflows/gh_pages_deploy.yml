@@ -16,6 +16,9 @@ concurrency:
   group: 'pages'
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   build_assets:
     runs-on: ubuntu-20.04
@@ -25,13 +28,13 @@ jobs:
       should_deploy: ${{ steps.check_deploy.outputs.should_deploy }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_ACTIONS_BOT_TOKEN }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: 18
 
@@ -41,7 +44,7 @@ jobs:
         run: npm ci
 
       - name: Validate all notebooks metadata
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
           script: |
             const { NotebookMetadataHandler } = await import('${{ github.workspace }}/selector/src/notebook-metadata/notebook-metadata-handler.js');
@@ -62,7 +65,7 @@ jobs:
 
       - name: Check if deploy needed
         id: check_deploy
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
           script: |
             const { readFile } = require('fs/promises');
@@ -77,13 +80,13 @@ jobs:
 
       - name: Upload pages artifact
         if: ${{ steps.check_deploy.outputs.should_deploy == 'true' }}
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: ./selector/dist/openvino_notebooks
 
       - name: Generate new notebooks index
         if: ${{ steps.check_deploy.outputs.should_deploy == 'true' }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
           script: |
             const { generateNotebooksIndex } = await import('${{ github.workspace }}/selector/src/shared/generate-notebooks-index.js');
@@ -112,4 +115,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
