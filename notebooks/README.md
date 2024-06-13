@@ -184,6 +184,7 @@
 - [Speaker diarization](./pyannote-speaker-diarization/pyannote-speaker-diarization.ipynb)
 - [Document Visual Question Answering Using Pix2Struct and OpenVINO™](./pix2struct-docvqa/pix2struct-docvqa.ipynb)
 - [Text-to-image generation using PhotoMaker and OpenVINO](./photo-maker/photo-maker.ipynb)
+- [Text-to-speech (TTS) with Parler-TTS and OpenVINO](./parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb)
 - [Paint By Example: Exemplar-based Image Editing with Diffusion Models](./paint-by-example/paint-by-example.ipynb)
 - [Optical Character Recognition (OCR) with OpenVINO™](./optical-character-recognition/optical-character-recognition.ipynb)
 - [Voice tone cloning with OpenVoice and OpenVINO](./openvoice/openvoice.ipynb)
