@@ -298,6 +298,7 @@ hoc
 HuggingFace
 huggingfacehub
 Hunyuan
+hunyuan
 HunyuanDIT
 Husain
 HWC
