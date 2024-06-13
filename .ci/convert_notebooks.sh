@@ -6,7 +6,6 @@ rstdir=$PWD"/rst_files"
 binderlist=$rstdir"/notebooks_with_binder_buttons.txt"
 colablist=$rstdir"/notebooks_with_colab_buttons.txt"
 notebooklist=$rstdir"/all_notebooks_paths.txt"
-tagslist=$rstdir"/notebooks_tags.json"
 mkdir -p $rstdir
 
 # List all notebooks that contain binder or colab buttons based on readme
@@ -17,8 +16,6 @@ done
 find notebooks -maxdepth 2 -name "*.ipynb" | sort > $notebooklist
 taggerpath=$(git ls-files "*tagger.py")
 notebookspath=$(git ls-files "*.ipynb"| head -n 1)
-keywordspath=$(git ls-files "*keywords.json")
-python $taggerpath $notebookspath $keywordspath> $tagslist
 
 echo "start converting notebooks"
 python $PWD"/.ci/convert_notebooks.py" --rst_dir $rstdir --exclude_execution_file $PWD"/.ci/ignore_convert_execution.txt"
