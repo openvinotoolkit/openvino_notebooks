@@ -54,7 +54,7 @@ def load_asr_model(model_dir: Path) -> None:
     global asr_model, asr_processor
 
     # create a distil-whisper model and its processor
-    asr_model = OVModelForSpeechSeq2Seq.from_pretrained(model_dir, device="AUTO")
+    asr_model = OVModelForSpeechSeq2Seq.from_pretrained(model_dir, device="GPU")
     asr_processor = AutoProcessor.from_pretrained(model_dir)
 
 
@@ -69,7 +69,7 @@ def load_chat_model(model_dir: Path) -> None:
 
     # load llama model and its tokenizer
     ov_config = {'PERFORMANCE_HINT': 'LATENCY', 'NUM_STREAMS': '1', "CACHE_DIR": ""}
-    chat_model = OVModelForCausalLM.from_pretrained(model_dir, device="AUTO", config=AutoConfig.from_pretrained(model_dir), ov_config=ov_config)
+    chat_model = OVModelForCausalLM.from_pretrained(model_dir, device="GPU", config=AutoConfig.from_pretrained(model_dir), ov_config=ov_config)
     chat_tokenizer = AutoTokenizer.from_pretrained(model_dir)
 
 
@@ -228,19 +228,24 @@ def create_UI(initial_message: str) -> gr.Blocks:
         Demo UI
     """
     with gr.Blocks(title="Talk to Adrishuo - a custom AI assistant working as a healthcare assistant") as demo:
-        gr.Markdown("""
+        gr.Markdown(
+            """
         # Talk to Adrishuo - a custom AI assistant working today as a healthcare assistant
 
         Instructions for use:
         - record your question/comment using the first audio widget ("Your voice input")
         - wait for the chatbot to response ("Chatbot")
         - click summarize button to make a summary
-        """)
-        with gr.Row():
+        """
+        )
+        with gr.Row(equal_height=True):
             # user's input
-            input_audio_ui = gr.Audio(sources=["microphone"], scale=5, label="Your voice input")
+            input_audio_ui = gr.Audio(sources=["microphone"], label="Your voice input")
+            input_text_ui = gr.Textbox(placeholder="Type your question or comment here", label="Your text input")
+        with gr.Row(equal_height=True):
             # submit button
-            submit_audio_btn = gr.Button("Submit", variant="primary", scale=1, interactive=False)
+            submit_audio_btn = gr.Button("Submit Audio", variant="primary", interactive=False)
+            submit_text_btn = gr.Button("Submit Text", variant="primary", interactive=False)
 
         # chatbot
         chatbot_ui = gr.Chatbot(value=[[None, initial_message]], label="Chatbot")
@@ -249,22 +254,49 @@ def create_UI(initial_message: str) -> gr.Blocks:
         summarize_button = gr.Button("Summarize", variant="primary", interactive=False)
         summary_ui = gr.Textbox(label="Summary", interactive=False)
 
+        # Handle the user's text input and update the conversation history
+        def handle_text_input(text, conversation):
+            if text:
+                conversation.append([text, None])
+            return conversation
+
         # events
         # block submit button when no audio input
-        input_audio_ui.change(lambda x: gr.Button(interactive=False) if x is None else gr.Button(interactive=True), inputs=input_audio_ui, outputs=submit_audio_btn)
+        input_audio_ui.change(lambda x: gr.Button(interactive=True) if x else gr.Button(interactive=False), inputs=input_audio_ui, outputs=submit_audio_btn)
+        input_text_ui.change(
+            lambda x: gr.Button(interactive=True) if x.strip() else gr.Button(interactive=False), inputs=input_text_ui, outputs=submit_text_btn
+        )
 
-        # block buttons, do the transcription and conversation, clear audio, unblock buttons
-        submit_audio_btn.click(lambda: gr.Button(interactive=False), outputs=submit_audio_btn) \
-            .then(lambda: gr.Button(interactive=False), outputs=summarize_button)\
-            .then(transcribe, inputs=[input_audio_ui, chatbot_ui], outputs=chatbot_ui)\
-            .then(chat, chatbot_ui, chatbot_ui)\
-            .then(lambda: None, inputs=[], outputs=[input_audio_ui])\
-            .then(lambda: gr.Button(interactive=True), outputs=summarize_button)
+        # Handle audio input submission
+        submit_audio_btn.click(
+            lambda: [gr.Button(interactive=False), gr.Button(interactive=False), gr.Button(interactive=False)],
+            outputs=[submit_audio_btn, submit_text_btn, summarize_button],
+        ).then(transcribe, inputs=[input_audio_ui, chatbot_ui], outputs=chatbot_ui).then(chat, inputs=chatbot_ui, outputs=chatbot_ui).then(
+            lambda: None, inputs=[], outputs=input_audio_ui
+        ).then(
+            lambda: [gr.Button(interactive=True), gr.Button(interactive=False), gr.Button(interactive=True)],
+            outputs=[submit_audio_btn, submit_text_btn, summarize_button],
+        )
 
-        # block button, do the summarization, unblock button
-        summarize_button.click(lambda: gr.Button(interactive=False), outputs=summarize_button) \
-            .then(summarize, inputs=chatbot_ui, outputs=summary_ui) \
-            .then(lambda: gr.Button(interactive=True), outputs=summarize_button)
+        # Handle text input submission
+        submit_text_btn.click(
+            lambda: [gr.Button(interactive=False), gr.Button(interactive=False), gr.Button(interactive=False)],
+            outputs=[submit_audio_btn, submit_text_btn, summarize_button],
+        ).then(handle_text_input, inputs=[input_text_ui, chatbot_ui], outputs=chatbot_ui).then(chat, inputs=chatbot_ui, outputs=chatbot_ui).then(
+            lambda: "", inputs=[], outputs=input_text_ui
+        ).then(
+            lambda: [gr.Button(interactive=False), gr.Button(interactive=False), gr.Button(interactive=True)],
+            outputs=[submit_audio_btn, submit_text_btn, summarize_button],
+        )
+
+        # Handle summary generation
+        summarize_button.click(
+            lambda: [gr.Button(interactive=False), gr.Button(interactive=False), gr.Button(interactive=False)],
+            outputs=[submit_audio_btn, submit_text_btn, summarize_button],
+        ).then(summarize, inputs=chatbot_ui, outputs=summary_ui).then(
+            lambda: [gr.Button(interactive=False), gr.Button(interactive=False), gr.Button(interactive=True)],
+            outputs=[submit_audio_btn, submit_text_btn, summarize_button],
+        )
 
     return demo
 
