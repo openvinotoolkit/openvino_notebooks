@@ -323,6 +323,7 @@ InceptionResNetV
 inferencing
 InferRequest
 InferRequests
+Inpaint
 inpainting
 InsightFace
 installable
@@ -537,6 +538,7 @@ OVModel
 OVModelForXXX
 OVMS
 OVStableDiffusionPipeline
+OvStableDiffusionInpaintPipeline
 OvStableDiffusionInpaintingPipeline
 PaddleClas
 PaddleGAN
