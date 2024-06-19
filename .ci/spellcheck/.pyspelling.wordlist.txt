@@ -399,6 +399,7 @@ llm
 LLM
 LLMs
 LMS
+LLMPipeline
 logits
 LogSoftmax
 LoRA
