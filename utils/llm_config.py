@@ -384,7 +384,7 @@ SUPPORTED_EMBEDDING_MODELS = {
             "normalize_embeddings": True,
         },
         "bge-large-zh-v1.5": {
-            "model_id": "bge-large-zh-v1.5",
+            "model_id": "BAAI/bge-large-zh-v1.5",
             "mean_pooling": False,
             "normalize_embeddings": True,
         },
