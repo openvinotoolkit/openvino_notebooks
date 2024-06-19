@@ -68,3 +68,4 @@ notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb
 notebooks/dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb
 notebooks/yolov10-optimization/yolov10-optimization.ipynb
 notebooks/whisper-subtitles-generation/whisper-subtitles-generation.ipynb
+notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb
