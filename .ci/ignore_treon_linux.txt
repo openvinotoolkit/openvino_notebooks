@@ -62,7 +62,6 @@ notebooks/animate-anyone/animate-anyone.ipynb
 notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
 notebooks/llm-rag-langchain/llm-rag-langchain.ipynb
 notebooks/stable-video-diffusion/stable-video-diffusion.ipynb
-notebooks/llm-agent-langchain/llm-agent-langchain.ipynb
 notebooks/hello-npu/hello-npu.ipynb
 notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb
 notebooks/dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb
