@@ -5,7 +5,13 @@ Large Language Models (LLMs) are artificial intelligence systems that can unders
 While a decent intent-based chatbot can answer basic, one-touch inquiries like order management, FAQs, and policy questions, LLM chatbots can tackle more complex, multi-touch questions. LLM enables chatbots to provide support in a conversational manner, similar to how humans do, through contextual memory. Leveraging the capabilities of Language Models, chatbots are becoming increasingly intelligent, capable of understanding and responding to human language with remarkable accuracy.
 
 Previously, we already discussed how to build instruction-following pipeline using OpenVINO and Optimum Intel, please check out [Dolly v2 example](../dolly-2-instruction-following) for reference.
-In this tutorial we consider how to use power of OpenVINO for running Large Language Models for both chat and QA over document. We will use a pre-trained model from the [Hugging Face Transformers](https://huggingface.co/docs/transformers/index) library. To simplify the user experience, the [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index) library is used to convert the models to OpenVINO™ IR format. 
+In this tutorial we consider how to use power of OpenVINO for running Large Language Models for both chat and QA over document. We will use a pre-trained model from the [Hugging Face Transformers](https://huggingface.co/docs/transformers/index) library.
+
+This notebook series includes demonstration of two different ways to create inference pipelines:
+
+* [LLM chatbot with Optimum Intel](./llm-chatbot.ipynb). The [Hugging Face Optimum Intel library](https://huggingface.co/docs/optimum/intel/inference) is used to create pipelines to run inference with OpenVINO Runtime.
+
+* [LLM chatbot with Generate API](./llm-chatbot-generate-api.ipynb). The [OpenVINO Generate API](https://github.com/openvinotoolkit/openvino.genai) is used for generation of instruction-following inference pipeline. 
 
 The tutorial supports different models, you can select one from provided options to compare quality of open source LLM solutions.
 >**Note**: conversion of some models can require additional actions from user side and at least 64GB RAM for conversion.
