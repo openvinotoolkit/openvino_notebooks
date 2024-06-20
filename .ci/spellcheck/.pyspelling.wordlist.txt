@@ -441,6 +441,7 @@ MLLM
 MLLMs
 MMVLM
 MLP
+MMDiT
 MobileCLIP
 MobileLLaMA
 mobilenet
