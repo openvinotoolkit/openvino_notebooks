@@ -178,6 +178,7 @@ Dettmers
 dev
 detectron
 Detectron
+DepthAnythingV
 dGPU
 dGPUs
 DialoGPT
