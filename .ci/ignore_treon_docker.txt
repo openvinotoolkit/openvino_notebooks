@@ -1,5 +1,4 @@
 notebooks/speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb
-notebooks/speech-recognition-quantization/speech-recognition-quantization-data2vec.ipynb
 notebooks/gpu-device/gpu-device.ipynb
 notebooks/model-server/model-server.ipynb
 notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb
