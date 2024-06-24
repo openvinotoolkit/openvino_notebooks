@@ -84,7 +84,6 @@
 - [🤗 Hugging Face Model Hub with OpenVINO™](./hugging-face-hub/hugging-face-hub.ipynb)
 - [Hello NPU](./hello-npu/hello-npu.ipynb)
 - [Working with GPUs in OpenVINO™](./gpu-device/gpu-device.ipynb)
-- [OpenVINO™ model conversion API](./convert-to-openvino/legacy-mo-convert-to-openvino.ipynb)
 - [OpenVINO™ Model conversion](./convert-to-openvino/convert-to-openvino.ipynb)
 - [Big Transfer Image Classification Model Quantization pipeline with NNCF](./big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb)
 - [Automatic Device Selection with OpenVINO™](./auto-device/auto-device.ipynb)
@@ -108,7 +107,6 @@
 - [Object detection and masking from prompts with GroundedSAM (GroundingDINO + SAM) and OpenVINO](./grounded-segment-anything/grounded-segment-anything.ipynb)
 - [Convert Detectron2 Models to OpenVINO™](./detectron2-to-openvino/detectron2-to-openvino.ipynb)
 - [Quantize a Segmentation Model and Show Live Inference](./ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb)
-- [OpenVINO™ model conversion API](./convert-to-openvino/legacy-mo-convert-to-openvino.ipynb)
 - [OpenVINO™ Model conversion](./convert-to-openvino/convert-to-openvino.ipynb)
 
 ## Explainable AI
@@ -186,7 +184,6 @@
 - [Background removal with RMBG v1.4 and OpenVINO](./rmbg-background-removal/rmbg-background-removal.ipynb)
 - [Text-to-Music generation using Riffusion and OpenVINO](./riffusion-text-to-music/riffusion-text-to-music.ipynb)
 - [Generate creative QR codes with ControlNet QR Code Monster and OpenVINO™](./qrcode-monster/qrcode-monster.ipynb)
-- [Speaker diarization](./pyannote-speaker-diarization/pyannote-speaker-diarization.ipynb)
 - [Document Visual Question Answering Using Pix2Struct and OpenVINO™](./pix2struct-docvqa/pix2struct-docvqa.ipynb)
 - [Text-to-image generation using PhotoMaker and OpenVINO](./photo-maker/photo-maker.ipynb)
 - [Text-to-speech (TTS) with Parler-TTS and OpenVINO](./parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb)
@@ -256,7 +253,6 @@
 - [Quantization Aware Training with NNCF, using TensorFlow Framework](./tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb)
 - [SpeechBrain Emotion Recognition with OpenVINO](./speechbrain-emotion-recognition/speechbrain-emotion-recognition.ipynb)
 - [Quantize Wav2Vec Speech Recognition Model using NNCF PTQ API](./speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb)
-- [Quantize Data2Vec Speech Recognition Model using NNCF PTQ API](./speech-recognition-quantization/speech-recognition-quantization-data2vec.ipynb)
 - [Accelerate Inference of Sparse Transformer Models with OpenVINO™ and 4th Gen Intel&reg; Xeon&reg; Scalable Processors](./sparsity-optimization/sparsity-optimization.ipynb)
 - [Convert and Optimize YOLOv8 with OpenVINO™](./quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb)
 - [Quantize Speech Recognition Models with accuracy control using NNCF PTQ API](./quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb)
