@@ -1,7 +1,7 @@
 # GitHub CodeQL
 # https://docs.github.com/en/code-security/secure-coding/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning
 
-name: "CodeQL"
+name: 'CodeQL'
 
 on:
   workflow_dispatch:
@@ -12,9 +12,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   CodeQL:
-
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -22,9 +24,9 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
         with:
           python-version: '3.8'
       - name: Install dependencies
@@ -33,17 +35,12 @@ jobs:
           if [ -f requirements.txt ];
           then pip install -r requirements.txt;
           fi
-          # Set the `CODEQL-PYTHON` environment variable to the Python executable
+          # Set the `CODEQL_EXTRACTOR_PYTHON_ANALYSIS_VERSION` environment variable to the Python executable
           # that includes the dependencies
-          echo "CODEQL_PYTHON=$(which python)" >> $GITHUB_ENV
+          echo "CODEQL_EXTRACTOR_PYTHON_ANALYSIS_VERSION=$(which python)" >> $GITHUB_ENV
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@530d4feaa9c62aaab2d250371e2061eb7a172363 # v3.25.9
         with:
           languages: python
-          # Override the default behavior so that the action doesn't attempt
-          # to auto-install Python dependencies
-          setup-python-dependencies: false
-          
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-
+        uses: github/codeql-action/analyze@530d4feaa9c62aaab2d250371e2061eb7a172363 # v3.25.9

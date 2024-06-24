@@ -86,9 +86,11 @@ CHW
 Cifar
 cityscape
 Cityscapes
+classname
 CLI
 cli
 CLIP's
+codebase
 codebook
 codebooks
 codec
@@ -127,6 +129,7 @@ CRNN
 CSV
 CTC
 CUDA
+CustomEncoderWav
 CVF
 CVPR
 Databricks
@@ -175,6 +178,7 @@ Dettmers
 dev
 detectron
 Detectron
+DepthAnythingV
 dGPU
 dGPUs
 DialoGPT
@@ -187,6 +191,10 @@ distil
 DistilBERT
 distilbert
 distiluse
+DIT
+DiT
+DiT’s
+DiT’s
 DL
 DocLayNet
 docstring
@@ -215,6 +223,7 @@ editability
 EfficientNet
 EfficientSAM
 EfficientSAMs
+Embedder
 embeddings
 EnCodec
 encodec
@@ -289,11 +298,15 @@ HH
 hoc
 HuggingFace
 huggingfacehub
+Hunyuan
+hunyuan
+HunyuanDIT
 Husain
 HWC
 hyperparameters
 ICIP
 ICPR
+IEMOCAP
 iGPU
 IdentityNet
 iGPUs
@@ -311,6 +324,7 @@ InceptionResNetV
 inferencing
 InferRequest
 InferRequests
+Inpaint
 inpainting
 InsightFace
 installable
@@ -321,6 +335,7 @@ InstructPix
 intel
 InternLM
 internlm
+Interpolative
 invertible
 intervaling
 im
@@ -386,6 +401,7 @@ llm
 LLM
 LLMs
 LMS
+LLMPipeline
 logits
 LogSoftmax
 LoRA
@@ -397,6 +413,7 @@ LSTM
 LSTMs
 Luo
 LVLM
+Lyth
 macOS
 Magika
 Mahalanobis
@@ -427,6 +444,7 @@ MLLM
 MLLMs
 MMVLM
 MLP
+MMDiT
 MobileCLIP
 MobileLLaMA
 mobilenet
@@ -523,6 +541,7 @@ OVModel
 OVModelForXXX
 OVMS
 OVStableDiffusionPipeline
+OVStableDiffusionInpaintPipeline
 OvStableDiffusionInpaintingPipeline
 PaddleClas
 PaddleGAN
@@ -539,6 +558,7 @@ panoptic
 parallelized
 parameterization
 parametrize
+Parler
 parsers
 perceptron
 Patil
@@ -592,6 +612,7 @@ PTQ
 px
 py
 pyannote
+pymodule
 PyPI
 Pythia
 pytorch
@@ -654,6 +675,7 @@ RMBG
 RoBERTa
 roberta
 ROI
+RoPE
 Ruizhongtai
 Runtime
 runtime
@@ -710,6 +732,9 @@ sparsified
 sparsify
 spectrogram
 spectrograms
+SpeechBrain
+SpeechBrain's
+speechbrain
 splitters
 SPS
 SQA
@@ -848,6 +873,7 @@ VQVAE
 waveform
 waveforms
 Wav
+wav
 WavLM
 WebGL
 WebUI

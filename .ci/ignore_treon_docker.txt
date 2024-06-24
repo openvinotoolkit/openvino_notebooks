@@ -1,5 +1,4 @@
 notebooks/speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb
-notebooks/speech-recognition-quantization/speech-recognition-quantization-data2vec.ipynb
 notebooks/gpu-device/gpu-device.ipynb
 notebooks/model-server/model-server.ipynb
 notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb
@@ -61,9 +60,11 @@ notebooks/animate-anyone/animate-anyone.ipynb
 notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
 notebooks/llm-rag-langchain/llm-rag-langchain.ipynb
 notebooks/stable-video-diffusion/stable-video-diffusion.ipynb
-notebooks/llm-agent-langchain/llm-agent-langchain.ipynb
 notebooks/hello-npu/hello-npu.ipynb
 notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb
 notebooks/dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb
 notebooks/yolov10-optimization/yolov10-optimization.ipynb
 notebooks/whisper-subtitles-generation/whisper-subtitles-generation.ipynb
+notebooks/speechbrain-emotion-recognition/speechbrain-emotion-recognition.ipynb
+notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb
+notebooks/stable-diffusion-v3/stable-diffusion-v3.ipynb

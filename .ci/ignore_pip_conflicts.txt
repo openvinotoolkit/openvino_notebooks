@@ -1,7 +1,5 @@
 notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb  # ultralytics==8.0.43
 notebooks/detectron2-to-openvino/detectron2-to-openvino.ipynb # detectron2@https://github.com/facebookresearch/detectron2
-notebooks/speech-to-text/speech-to-text.ipynb # numpy<1.24
-notebooks/pyannote-speaker-diarization/pyannote-speaker-diarization.ipynb  # pyannote-audio@https://github.com/eaidova/pyannote-audio
 notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb  # ultralytics==8.0.43
 notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb  # ultralytics==8.0.159
 notebooks/yolov8-optimization/yolov8-object-detection.ipynb  # ultralytics==8.0.43
@@ -26,4 +24,8 @@ notebooks/vision-paddlegan-anime/vision-paddlegan-anime.ipynb # old scipy
 notebooks/vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb # old scipy and scikit-image
 notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.ipynb
 notebooks/sketch-to-image-pix2pix-turbo/sketch-to-image-pix2pix-turbo.ipynb
-notebooks/yolov10-optimization/yolov10-optimization.ipynb
+notebooks/yolov10-optimization/yolov10-optimization.ipynb # nncf from git
+notebooks/person-counting-webcam/person-counting.ipynb # numpy should be installed first
+notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb # torchvision < 0.17.0
+notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb # torch >= 2.2
+notebooks/stable-diffusion-v3/stable-diffusion-v3.ipynb # diffusers from git
