@@ -77,6 +77,9 @@ def collect_python_packages(output_file: Path):
 def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig) -> List[Path]:
     ignored_notebooks: List[Path] = []
     skip_config_file_path = Path(__file__).parents[0] / "skipped_notebooks.yml"
+    if not skip_config_file_path.exists():
+        print(f"Skipped notebooks config yaml file does not exist at path '{str(skip_config_file_path)}'.")
+        return ignored_notebooks
     with open(skip_config_file_path, "r") as f:
         skipped_notebooks_config: List[SkippedNotebook] = yaml.safe_load(f)
     for skipped_notebook in skipped_notebooks_config:
