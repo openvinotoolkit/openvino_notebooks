@@ -43,7 +43,7 @@ def parse_arguments():
     parser.add_argument("--test_list", required=False, nargs="+")
     parser.add_argument("--os", type=validation_config_arg("os"))
     parser.add_argument("--python", type=validation_config_arg("python"))
-    parser.add_argument("--device_used", type=validation_config_arg("device"))  # TODO Rename to device
+    parser.add_argument("--device", type=validation_config_arg("device"))
     parser.add_argument("--early_stop", action="store_true")
     parser.add_argument("--report_dir", default="report")
     parser.add_argument("--keep_artifacts", action="store_true")
@@ -83,6 +83,8 @@ def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig) -> List
         skips = skipped_notebook["skips"]
         for skip in skips:
             for key in validation_config.keys():
+                if not validation_config[key]:
+                    print(f"Warning: validation config argument '{key}' is not provided.")
                 if validation_config[key] in skip.get(key, []):
                     ignored_notebooks.append(Path(skipped_notebook["notebook"]))
 
@@ -261,7 +263,7 @@ def write_single_notebook_report(
     ov_version_before: str,
     ov_version_after: str,
     job_name: str,
-    device_used: str,
+    device: str,
     saving_dir: Path,
 ) -> Path:
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
@@ -273,7 +275,7 @@ def write_single_notebook_report(
         "ov_version_before": ov_version_before,
         "ov_version_after": ov_version_after,
         "job_name": job_name,
-        "device_used": device_used,
+        "device_used": device,
     }
     with report_file.open("w") as f:
         json.dump(report, f)
@@ -299,7 +301,7 @@ def main():
 
     base_version = get_openvino_version()
 
-    validation_config = ValidationConfig(os=args.os, python=args.python, device=args.device_used)
+    validation_config = ValidationConfig(os=args.os, python=args.python, device=args.device)
 
     test_plan = prepare_test_plan(validation_config, args.test_list, args.ignore_list, notebooks_moving_dir)
 
@@ -329,9 +331,9 @@ def main():
             report["duration"] = timing
             if args.collect_reports:
                 job_name = args.job_name or "Unknown"
-                device_used = args.device_used or "Unknown"
+                device = args.device or "Unknown"
                 report_path = write_single_notebook_report(
-                    base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device_used, reports_dir
+                    base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir
                 )
                 if args.upload_to_db:
                     cmd = [sys.executable, args.upload_to_db, report_path]
