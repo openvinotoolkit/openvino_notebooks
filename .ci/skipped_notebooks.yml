@@ -477,6 +477,13 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/llm-rag-llamaindex/llm-rag-llamaindex.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
 - notebook: notebooks/openvino-tokenizers/openvino-tokenizers.ipynb
   skips:
     - os:
