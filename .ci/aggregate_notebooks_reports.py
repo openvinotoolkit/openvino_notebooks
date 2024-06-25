@@ -2,19 +2,9 @@ import csv
 import json
 from pathlib import Path
 from typing import Dict
-from itertools import product
+from validation_matrix import ValidationMatrix
 
 REPORTS_DIR = "test_reports"
-
-
-class ValidationMatrix:
-    os = ("ubuntu-20.04", "ubuntu-22.04", "windows-2019", "macos-12")
-    python = ("3.8", "3.9", "3.10", "3.11")
-    device = ("cpu", "gpu")
-
-    @classmethod
-    def values(cls):
-        return product(cls.device, cls.os, cls.python)
 
 
 def get_report_file_path(device: str, os: str, python: str) -> Path:
