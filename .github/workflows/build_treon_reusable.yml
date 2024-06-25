@@ -250,12 +250,11 @@ jobs:
         shell: bash
         run: |
           python .ci/validate_notebooks.py \
+            --os ${{ env.OS_NAME }} \
+            --python ${{ inputs.python }} \
+            --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list \
-              .ci/ignore_treon_win.txt \
-              ${{ inputs.python == '3.8' && '.ci/ignore_treon_py38.txt' || '' }} \
-              ${{ inputs.python == '3.11' && '.ci/ignore_treon_py311.txt' || '' }} \
-              ${{ env.TEST_DEVICE == 'gpu' && '.ci/ignore_treon_gpu.txt .ci/heavy_win_gpu.txt' || '' }} \
+            ${{ env.TEST_DEVICE == 'gpu' && '--ignore_list .ci/heavy_win_gpu.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --move_notebooks_dir c:/notebooks \
             --timeout 1200
@@ -264,11 +263,11 @@ jobs:
         shell: bash
         run: |
           python .ci/validate_notebooks.py \
+            --os ${{ env.OS_NAME }} \
+            --python ${{ inputs.python }} \
+            --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list \
-              .ci/ignore_treon_linux.txt \
-              ${{ inputs.python == '3.8' && '.ci/ignore_treon_py38.txt' || '' }} \
-              ${{ env.TEST_DEVICE == 'gpu' && '.ci/ignore_treon_gpu.txt .ci/heavy_ubuntu_gpu.txt' || '' }} \
+            ${{ env.TEST_DEVICE == 'gpu' && '--ignore_list .ci/heavy_ubuntu_gpu.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --timeout 1200
       - name: Analysing with treon (MacOS)
@@ -276,12 +275,10 @@ jobs:
         shell: bash
         run: |
           python .ci/validate_notebooks.py \
+            --os ${{ env.OS_NAME }} \
+            --python ${{ inputs.python }} \
+            --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list \
-              .ci/ignore_treon_mac.txt \
-              ${{ inputs.python == '3.8' && '.ci/ignore_treon_py38.txt' || '' }} \
-              ${{ inputs.python == '3.11' && '.ci/ignore_treon_py311.txt' || '' }} \
-              ${{ env.TEST_DEVICE == 'gpu' && '.ci/ignore_treon_gpu.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --timeout 1200
 
