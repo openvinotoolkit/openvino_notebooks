@@ -395,6 +395,7 @@ Lim
 Liu
 LLama
 LLaMa
+LlamaIndex
 LLaVA
 llava
 llm

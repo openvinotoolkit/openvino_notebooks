@@ -69,3 +69,4 @@ notebooks/whisper-subtitles-generation/whisper-subtitles-generation.ipynb
 notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb
 notebooks/stable-diffusion-v3/stable-diffusion-v3.ipynb
 notebooks/pixart/pixart.ipynb
+notebooks/llm-rag-llamaindex/llm-rag-llamaindex.ipynb
