@@ -2,7 +2,7 @@ import csv
 import json
 from pathlib import Path
 from typing import Dict
-from validation_matrix import ValidationMatrix
+from validation_config import ValidationMatrix
 
 REPORTS_DIR = "test_reports"
 
