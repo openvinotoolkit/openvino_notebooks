@@ -6,10 +6,12 @@ import csv
 import json
 import shutil
 import platform
+import yaml
 
 from argparse import ArgumentParser
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, TypedDict
+from validation_config import ValidationConfig, validation_config_arg, SkippedNotebook
 
 
 ROOT = Path(__file__).parents[1]
@@ -39,13 +41,15 @@ def parse_arguments():
     parser = ArgumentParser()
     parser.add_argument("--ignore_list", required=False, nargs="+")
     parser.add_argument("--test_list", required=False, nargs="+")
+    parser.add_argument("--os", type=validation_config_arg("os"))
+    parser.add_argument("--python", type=validation_config_arg("python"))
+    parser.add_argument("--device_used", type=validation_config_arg("device"))  # TODO Rename to device
     parser.add_argument("--early_stop", action="store_true")
     parser.add_argument("--report_dir", default="report")
     parser.add_argument("--keep_artifacts", action="store_true")
     parser.add_argument("--collect_reports", action="store_true")
     parser.add_argument("--move_notebooks_dir")
     parser.add_argument("--job_name")
-    parser.add_argument("--device_used")
     parser.add_argument("--upload_to_db")
     parser.add_argument(
         "--timeout",
@@ -70,14 +74,29 @@ def collect_python_packages(output_file: Path):
         f.write(reqs)
 
 
-def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb_dir: Optional[Path] = None) -> TestPlan:
+def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig) -> List[Path]:
+    ignored_notebooks: List[Path] = []
+    skip_config_file_path = Path(__file__).parents[0] / "skipped_notebooks.yml"
+    with open(skip_config_file_path, "r") as f:
+        skipped_notebooks_config: List[SkippedNotebook] = yaml.safe_load(f)
+    for skipped_notebook in skipped_notebooks_config:
+        skips = skipped_notebook["skips"]
+        for skip in skips:
+            for key in validation_config.keys():
+                if validation_config[key] in skip.get(key, []):
+                    ignored_notebooks.append(Path(skipped_notebook["notebook"]))
+
+    return list(set(ignored_notebooks))
+
+
+def prepare_test_plan(validation_config: ValidationConfig, test_list: Optional[List[str]], ignore_list: List[str], nb_dir: Optional[Path] = None) -> TestPlan:
     orig_nb_dir = ROOT / NOTEBOOKS_DIR
     notebooks_dir = nb_dir or orig_nb_dir
     notebooks: List[Path] = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
 
     test_plan: TestPlan = {notebook.relative_to(notebooks_dir): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
 
-    ignored_notebooks: List[Path] = []
+    ignored_notebooks = get_ignored_notebooks_from_yaml(validation_config)
     if ignore_list is not None:
         for ignore_item in ignore_list:
             if ignore_item.endswith(".txt"):
@@ -280,7 +299,10 @@ def main():
 
     base_version = get_openvino_version()
 
-    test_plan = prepare_test_plan(args.test_list, args.ignore_list, notebooks_moving_dir)
+    validation_config = ValidationConfig(os=args.os, python=args.python, device=args.device_used)
+
+    test_plan = prepare_test_plan(validation_config, args.test_list, args.ignore_list, notebooks_moving_dir)
+
     for notebook, report in test_plan.items():
         if report["status"] == NotebookStatus.SKIPPED:
             continue
