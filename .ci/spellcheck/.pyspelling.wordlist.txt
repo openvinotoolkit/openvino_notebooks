@@ -572,6 +572,8 @@ photorealism
 photorealistic
 Piotr
 Pipelining
+PixArt
+PIXART
 pixelwise
 PNDM
 Pointilism
