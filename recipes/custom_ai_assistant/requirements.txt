@@ -1,6 +1,6 @@
-openvino==2024.1
+openvino==2024.2
 optimum-intel==1.16.1
-nncf==2.10.0
+nncf==2.11.0
 
 onnx==1.16.0
 onnxruntime==1.16.0

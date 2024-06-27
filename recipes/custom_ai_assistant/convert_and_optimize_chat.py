@@ -56,9 +56,9 @@ def convert_chat_model(model_type: str, quantize_weights: str, model_dir: Path) 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--chat_model_type", type=str, choices=["llama2-7B", "llama2-13B", "llama3-8B", "neural-chat-7B"],
+    parser.add_argument("--chat_model_type", type=str, choices=["llama2-7B", "llama2-13B", "llama3-8B"],
                         default="llama3-8B", help="Chat model to be converted")
-    parser.add_argument("--quantize_weights", type=str, choices=["int8", "int4"], help="Whether to quantize weights to INT8 or INT4")
+    parser.add_argument("--quantize_weights", type=str, default="int4", choices=["int8", "int4"], help="Whether to quantize weights to INT8 or INT4")
     parser.add_argument("--model_dir", type=str, default="model", help="Directory to place the model in")
 
     args = parser.parse_args()

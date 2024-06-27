@@ -294,8 +294,8 @@ def run(asr_model_dir: Path, chat_model_dir: Path, public_interface: bool = Fals
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--asr_model_dir', type=str, default="model/distil-whisper-large-v2-FP16", help="Path to the automatic speech recognition model directory")
-    parser.add_argument('--chat_model_dir', type=str, default="model/llama3-8B-INT8", help="Path to the chat model directory")
+    parser.add_argument('--asr_model_dir', type=str, default="model/distil-whisper-large-v2-INT8", help="Path to the automatic speech recognition model directory")
+    parser.add_argument('--chat_model_dir', type=str, default="model/llama3-8B-INT4", help="Path to the chat model directory")
     parser.add_argument('--public_interface', default=False, action="store_true", help="Whether interface should be available publicly")
 
     args = parser.parse_args()

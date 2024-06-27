@@ -49,7 +49,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--asr_model_type", type=str, choices=["distil-whisper-large-v2"],
                         default="distil-whisper-large-v2", help="Speech recognition model to be converted")
-    parser.add_argument("--quantize_weights", type=bool, default=False, help="Whether the model should be quantized")
+    parser.add_argument("--quantize_weights", type=bool, default=True, help="Whether the model should be quantized")
     parser.add_argument("--model_dir", type=str, default="model", help="Directory to place the model in")
     args = parser.parse_args()
 
