@@ -1,0 +1,4 @@
+openvino==2024.2.0
+opencv-python==4.10.0.82
+tqdm==4.66.3
+requests==2.32.3
