@@ -295,7 +295,7 @@ it execute faster. As an example, if your notebook trains for 20 epochs, you can
 
 In CI notebooks are validated using the `.ci/validate_notebooks.py` script, which uses [`treon`](#treon) for notebooks execution. 
 The script prepares lists of testing and ignored notebooks based on the several arguments: `--os`, `--python`, `--device` or `--ignore_list`.
-If `--os`, `--python` or `--device` argumets are provided, the script looks through `.ci/skipped_notebooks.yml` file to get ignored notebooks list.
+If `--os`, `--python` or `--device` arguments are provided, the script looks through `.ci/skipped_notebooks.yml` file to get ignored notebooks list.
 Providing `--ignore_list` argument with `*.txt` files you can extend the ignored notebooks list.
 
 To skip validation of a particular notebook, you should modify the existing notebook entry or add a new one to the `.ci/skipped_notebooks.yml` and define list of skip configurations as `yaml` objects with one of `os`, `python`, `device` keys or their combinations.
