@@ -33,7 +33,7 @@ def download_file(
     :param timeout: Number of seconds before cancelling the connection attempt
     :return: path to downloaded file
     """
-    from tqdm.notebook import tqdm_notebook
+    from tqdm import tqdm
     import requests
 
     filename = filename or Path(urllib.parse.urlparse(url).path).name
@@ -71,7 +71,7 @@ def download_file(
     filesize = int(response.headers.get("Content-length", 0))
     if not filename.exists() or (os.stat(filename).st_size != filesize):
 
-        with tqdm_notebook(
+        with tqdm(
             total=filesize,
             unit="B",
             unit_scale=True,
