@@ -183,6 +183,7 @@
 - [Background removal with RMBG v1.4 and OpenVINO](./rmbg-background-removal/rmbg-background-removal.ipynb)
 - [Text-to-Music generation using Riffusion and OpenVINO](./riffusion-text-to-music/riffusion-text-to-music.ipynb)
 - [Generate creative QR codes with ControlNet QR Code Monster and OpenVINO™](./qrcode-monster/qrcode-monster.ipynb)
+- [PixArt-α: Fast Training of Diffusion Transformer for Photorealistic Text-to-Image Synthesis with OpenVINO](./pixart/pixart.ipynb)
 - [Document Visual Question Answering Using Pix2Struct and OpenVINO™](./pix2struct-docvqa/pix2struct-docvqa.ipynb)
 - [Text-to-image generation using PhotoMaker and OpenVINO](./photo-maker/photo-maker.ipynb)
 - [Text-to-speech (TTS) with Parler-TTS and OpenVINO](./parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb)
