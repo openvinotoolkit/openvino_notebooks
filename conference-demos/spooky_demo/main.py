@@ -76,31 +76,107 @@ def process_results(img, pafs, heatmaps, model, decoder):
     return poses, scores
 
 
-colors = ((255, 0, 0), (255, 0, 255), (170, 0, 255), (255, 0, 85), (255, 0, 170), (85, 255, 0),
-          (255, 170, 0), (0, 255, 0), (255, 255, 0), (0, 255, 85), (170, 255, 0), (0, 85, 255),
-          (0, 255, 170), (0, 0, 255), (0, 255, 255), (85, 0, 255), (0, 170, 255))
+default_skeleton = ((15, 13), (13, 11), (16, 14), (14, 12), (11, 12), (5, 6), (5, 7), (6, 8), (7, 9), (8, 10),
+                    (1, 2), (0, 1), (0, 2), (1, 3), (2, 4), (17, 18), (20, 21), (23, 24), (26, 27), (29, 30))
 
-default_skeleton = ((15, 13), (13, 11), (16, 14), (14, 12), (11, 12), (5, 11), (6, 12), (5, 6), (5, 7),
-                    (6, 8), (7, 9), (8, 10), (1, 2), (0, 1), (0, 2), (1, 3), (2, 4), (3, 5), (4, 6))
+
+pumpkin_img = cv2.imread("pumpkin.png", cv2.IMREAD_UNCHANGED)
+
+
+def add_artificial_points(pose, point_score_threshold):
+    # neck, bellybutton, ribs
+    neck = (pose[5] + pose[6]) / 2
+    bellybutton = (pose[11] + pose[12]) / 2
+    if neck[2] > point_score_threshold and bellybutton[2] > point_score_threshold:
+        rib_1_center = (neck + bellybutton) / 2
+        rib_1_left = (pose[5] + bellybutton) / 2
+        rib_1_right = (pose[6] + bellybutton) / 2
+        rib_2_center = (neck + rib_1_center) / 2
+        rib_2_left = (pose[5] + rib_1_left) / 2
+        rib_2_right = (pose[6] + rib_1_right) / 2
+        rib_3_center = (neck + rib_2_center) / 2
+        rib_3_left = (pose[5] + rib_2_left) / 2
+        rib_3_right = (pose[6] + rib_2_right) / 2
+        rib_4_center = (rib_1_center + rib_2_center) / 2
+        rib_4_left = (rib_1_left + rib_2_left) / 2
+        rib_4_right = (rib_1_right + rib_2_right) / 2
+        new_points = [neck, bellybutton, rib_1_center, rib_1_left, rib_1_right, rib_2_center, rib_2_left, rib_2_right,
+                      rib_3_center, rib_3_left, rib_3_right, rib_4_center, rib_4_left, rib_4_right]
+        pose = np.vstack([pose, new_points])
+    return pose
 
 
 def draw_poses(img, poses, point_score_threshold, skeleton=default_skeleton):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.multiply(img, 0.5)
+    img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
     if poses.size == 0:
         return img
 
-    img_limbs = np.copy(img)
     for pose in poses:
+        pose = add_artificial_points(pose, point_score_threshold)
+
         points = pose[:, :2].astype(np.int32)
         points_scores = pose[:, 2]
+
+        out_thickness = img.shape[0] // 100
+        if points_scores[5] > point_score_threshold and points_scores[6] > point_score_threshold:
+            out_thickness = max(2, abs(points[5, 0] - points[6, 0]) // 15)
+        in_thickness = out_thickness // 2
+
+        img_limbs = np.copy(img)
+        # Draw limbs.
+        for i, j in skeleton:
+            if i < len(points_scores) and j < len(points_scores) and points_scores[i] > point_score_threshold and points_scores[j] > point_score_threshold:
+                cv2.line(img_limbs, tuple(points[i]), tuple(points[j]), color=(0, 0, 0), thickness=out_thickness, lineType=cv2.LINE_AA)
+                cv2.line(img_limbs, tuple(points[i]), tuple(points[j]), color=(255, 255, 255), thickness=in_thickness, lineType=cv2.LINE_AA)
         # Draw joints.
         for i, (p, v) in enumerate(zip(points, points_scores)):
             if v > point_score_threshold:
-                cv2.circle(img, tuple(p), 1, colors[i], 2)
-        # Draw limbs.
-        for i, j in skeleton:
-            if points_scores[i] > point_score_threshold and points_scores[j] > point_score_threshold:
-                cv2.line(img_limbs, tuple(points[i]), tuple(points[j]), color=colors[j], thickness=4)
-    cv2.addWeighted(img, 0.4, img_limbs, 0.6, 0, dst=img)
+                cv2.circle(img_limbs, tuple(p), 1, color=(0, 0, 0), thickness=2 * out_thickness, lineType=cv2.LINE_AA)
+                cv2.circle(img_limbs, tuple(p), 1, color=(255, 255, 255), thickness=2 * in_thickness, lineType=cv2.LINE_AA)
+
+        cv2.addWeighted(img, 0.3, img_limbs, 0.7, 0, dst=img)
+
+        face_size_scale = 2.2
+        left_ear = 3
+        right_ear = 4
+        left_eye = 1
+        right_eye = 2
+        # if left eye and right eye and left ear or right ear are visible
+        if points_scores[left_eye] > point_score_threshold and points_scores[right_eye] > point_score_threshold and (points_scores[left_ear] > point_score_threshold or points_scores[right_ear] > point_score_threshold):
+            # visible left ear and right ear
+            if points_scores[left_ear] > point_score_threshold and points_scores[right_ear] > point_score_threshold:
+                face_width = np.linalg.norm(points[left_ear] - points[right_ear]) * face_size_scale
+                face_center = (points[left_ear] + points[right_ear]) // 2
+            # visible left ear and right eye
+            elif points_scores[left_ear] > point_score_threshold and points_scores[right_eye] > point_score_threshold:
+                face_width = np.linalg.norm(points[left_ear] - points[right_eye]) * face_size_scale
+                face_center = (points[left_ear] + points[right_eye]) // 2
+            # visible right ear and left eye
+            elif points_scores[left_eye] > point_score_threshold and points_scores[right_ear] > point_score_threshold:
+                face_width = np.linalg.norm(points[left_eye] - points[right_ear]) * face_size_scale
+                face_center = (points[left_eye] + points[right_ear]) // 2
+
+            face_width = max(1.0, face_width)
+            scale = face_width / pumpkin_img.shape[1]
+            pumpkin_face = cv2.resize(pumpkin_img, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+
+            # left-top and right-bottom points
+            x1, y1 = face_center[0] - pumpkin_face.shape[1] // 2, face_center[1] - pumpkin_face.shape[0] * 2 // 3
+            x2, y2 = face_center[0] + pumpkin_face.shape[1] // 2, face_center[1] + pumpkin_face.shape[0] // 3
+
+            # face image to be overlayed
+            face_crop = img[max(0, y1):min(y2, img.shape[0]), max(0, x1):min(x2, img.shape[1])]
+            # overlay
+            pumpkin_face = pumpkin_face[max(0, -y1):max(0, -y1) + face_crop.shape[0], max(0, -x1):max(0, -x1) + face_crop.shape[1]]
+            # alpha channel to blend images
+            alpha_pumpkin = pumpkin_face[:, :, 3:4] / 255.0
+            alpha_bg = 1.0 - alpha_pumpkin
+
+            # blend images
+            face_crop[:] = (alpha_pumpkin * pumpkin_face)[:, :, :3] + alpha_bg * face_crop
+
     return img
 
 
@@ -182,7 +258,7 @@ def run_pose_estimation(source, model_name, model_precision, device, flip):
             poses, scores = process_results(frame, pafs, heatmaps, compiled_model, decoder)
 
             # Draw poses on a frame.
-            frame = draw_poses(frame, poses, 0.1)
+            frame = draw_poses(frame, poses, 0.25)
 
             processing_times.append(stop_time - start_time)
             # Use processing times from last 200 frames.
@@ -197,7 +273,6 @@ def run_pose_estimation(source, model_name, model_precision, device, flip):
                         cv2.FONT_HERSHEY_COMPLEX, f_width / 1500, (0, 0, 0), 2, cv2.LINE_AA)
             cv2.putText(frame, f"Inference time: {processing_time:.1f}ms ({fps:.1f} FPS)", (20, 40),
                         cv2.FONT_HERSHEY_COMPLEX, f_width / 1500, (255, 255, 255), 1, cv2.LINE_AA)
-
             cv2.imshow(title, frame)
             key = cv2.waitKey(1)
             # escape = 27
