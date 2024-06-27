@@ -80,7 +80,7 @@ default_skeleton = ((15, 13), (13, 11), (16, 14), (14, 12), (11, 12), (5, 6), (5
                     (1, 2), (0, 1), (0, 2), (1, 3), (2, 4), (17, 18), (20, 21), (23, 24), (26, 27), (29, 30))
 
 
-pumpkin_img = cv2.imread("pumpkin.png", cv2.IMREAD_UNCHANGED)
+pumpkin_img = cv2.imread("assets/pumpkin.png", cv2.IMREAD_UNCHANGED)
 
 
 def add_artificial_points(pose, point_score_threshold):
@@ -199,7 +199,7 @@ def load_and_compile_model(model_name, precision, device):
     return compiled_model
 
 
-def run_pose_estimation(source, model_name, model_precision, device, flip):
+def run_demo(source, model_name, model_precision, device, flip):
     decoder = OpenPoseDecoder()
 
     compiled_model = load_and_compile_model(model_name, model_precision, device)
@@ -301,4 +301,4 @@ if __name__ == '__main__':
     parser.add_argument("--flip", type=bool, default=True, help="Mirror input video")
 
     args = parser.parse_args()
-    run_pose_estimation(args.stream, args.model_name, args.model_precision, args.device, args.flip)
+    run_demo(args.stream, args.model_name, args.model_precision, args.device, args.flip)
