@@ -72,10 +72,8 @@ pip install -r requirements.txt
 
 ## Step 2
 
-To convert and optimize the YOLOv8 model, run the [convert-and-optimize-the-model.ipynb](convert-and-optimize-the-model.ipynb) notebook. This will convert the YOLOv8 model to an OpenVINO™ Intermediate Representation (IR) format and optimize it for use with OpenVINO™.
+To run the application, use the following command:
 
-## Step 3
-
-To run the application, use the [run-the-application.ipynb](run-the-application.ipynb). To stop the application please, press 'q' or escape at any time. There are some arguments in the last cell, which you can change to change the behavior of the app.
-
-Congratulations! You have successfully set up and run the People Counting application with OpenVINO™.
+```shell
+python main.py --stream 0
+```

@@ -1,9 +1,9 @@
-openvino-dev==2023.0
-nncf==2.5.0
-ultralytics==8.0.117
-numpy==1.23.4
+openvino-dev==2024.2
+nncf==2.11.0
+ultralytics==8.2.10
+numpy==1.23.5
 pillow==10.3.0
-opencv-python==4.7.0.72
+opencv-python==4.10.0.82
 onnx==1.16.0
 torch==1.13.1
 torchvision==0.14.1
