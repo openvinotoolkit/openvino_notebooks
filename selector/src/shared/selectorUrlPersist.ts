@@ -65,12 +65,16 @@ export function getUrlState(): UrlPersistState | null {
   return fromSearchParams(searchParams);
 }
 
-function toSearchParams(state: UrlPersistState): URLSearchParams {
+export function getUrlParamsWithSearch(searchValue: string): URLSearchParams {
   const urlSearchParams = new URLSearchParams();
-
-  if (state.searchValue) {
-    urlSearchParams.set('search', state.searchValue);
+  if (searchValue) {
+    urlSearchParams.set('search', searchValue);
   }
+  return urlSearchParams;
+}
+
+function toSearchParams(state: UrlPersistState): URLSearchParams {
+  const urlSearchParams = getUrlParamsWithSearch(state.searchValue);
 
   for (const [key, filterValues] of Object.entries(state.selectedTags) as Entries<typeof state.selectedTags>) {
     if (filterValues.length) {
