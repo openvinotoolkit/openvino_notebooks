@@ -8,7 +8,7 @@ Step 1: Set up the environment
 
 Step 2: Run the Application
 
-Now, let's dive into the steps starting with installing Python. We recommend using Ubuntu to set up and run this project.
+Now, let's dive into the steps starting with installing Python. 
 
 ## Step 0
 

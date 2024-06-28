@@ -1,46 +1,89 @@
-# Image generation with Latent Consistency Model and OpenVINO
+# Image generation with Latent Consistency Model and OpenVINO™
 
-LCMs: The next generation of generative models after Latent Diffusion Models (LDMs). 
-Latent Diffusion models (LDMs) have achieved remarkable results in synthesizing high-resolution images. However, the iterative sampling is computationally intensive and leads to slow generation.
+Here are the steps involved in this demo:
+
+Step 0: Install Python and prerequisites
+
+Step 1: Set up the environment
+
+Step 2: Run the Application
+
+Now, let's dive into the steps starting with installing Python.
 
 **Input text:** a beautiful pink unicorn, 8k
 
-<p align="center">
-    <img src="https://user-images.githubusercontent.com/29454499/277367065-13a8f622-8ea7-4d12-b3f8-241d4499305e.png"/>
-</p>
+![](https://user-images.githubusercontent.com/29454499/277367065-13a8f622-8ea7-4d12-b3f8-241d4499305e.png)
 
-### Notebook Contents
+## Step 0
 
-This [notebook](./263-lcm-image-generation-paint-your-dreams.ipynb) demonstrates how to convert and run [LCM_Dreamshaper_v7](https://huggingface.co/SimianLuo/LCM_Dreamshaper_v7) using OpenVINO. An additional part demonstrates how to run quantization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline. Also it compares those models runned on CPU and GPU.
+This project requires Python 3.8 or higher and a few libraries. If you don't have Python installed on your machine, go to https://www.python.org/downloads/ and download the latest version for your operating system. Follow the prompts to install Python, making sure to check the option to add Python to your PATH environment variable.
 
-The notebook contains the following steps:
+Install libraries and tools:
 
-1. Convert PyTorch models to OpenVINO Intermediate Representation using [OpenVINO Model Conversion API](https://docs.openvino.ai/2023.2/openvino_docs_model_processing_introduction.html#convert-a-model-with-python-convert-model)
-2. Prepare Inference Pipeline.
-3. Run Inference pipeline with OpenVINO.
-4. Optimize `LatentConsistencyModelPipeline` with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.
-5. Compare results of original, optimized and GPU pipelines.
-6. Run Interactive demo.
+```shell
+sudo apt install git git-lfs gcc python3-venv python3-dev
+```
 
-The notebook also provides interactive interface for image generation based on user input.
+_NOTE: If you are using Windows, you will probably need to install [Microsoft Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) also._
 
-## Installation Instructions
+## Step 1
 
-This is a self-contained example that relies solely on its own code.</br>
-We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
-For details, please refer to [Installation Guide](../../README.md).
+1. Clone the Repository
 
-## Docker Installation Instructions
+To clone the repository, run the following command:
 
-1. Open terminal in "openvino_notebooks" root directory
-2. Build docker image: `sudo docker build -f conference-demos/paint-your-dreams-demo/Dockerfile -t your_image_name .`
-3. Run docker
-    1. CPU ONLY: `sudo docker run -it -p 8888:8888 -p 7860-7870:7860-7870 your_image_name`
-    2. CPU+GPU: `sudo docker run -it --device=/dev/dri --group-add=$(stat -c "%g" /dev/dri/render* | head -n 1) -p 8888:8888 -p 7860-7870:7860-7870 your_image_name`
+```shell
+git clone -b conference-demos https://github.com/openvinotoolkit/openvino_notebooks.git openvino_notebooks
+```
 
-*8888 port opens port for jupyter*
+The above will clone the repository into a directory named "openvino_notebooks" in the current directory. It will also download a sample video. Then, navigate into the directory using the following command:
 
-*7860 is default port for Gradio Apps*
+```shell
+cd openvino_notebooks/conference-demos/strike_a_pose_demo
+```
 
+2. Create a virtual environment
 
+To create a virtual environment, open your terminal or command prompt and navigate to the directory where you want to create the environment. Then, run the following command:
 
+```shell
+python3 -m venv venv
+```
+This will create a new virtual environment named "venv" in the current directory.
+
+3. Activate the environment
+
+Activate the virtual environment using the following command:
+
+```shell
+source venv/bin/activate   # For Unix-based operating system such as Linux or macOS
+```
+
+_NOTE: If you are using Windows, use `venv\Scripts\activate` command instead._
+
+This will activate the virtual environment and change your shell's prompt to indicate that you are now working within that environment.
+
+4. Install the Packages
+
+To install the required packages, run the following commands:
+
+```shell
+python -m pip install --upgrade pip 
+pip install -r requirements.txt
+```
+
+## Step 2
+
+To run the application, use the following command:
+
+```shell
+python main.py
+```
+
+or
+
+```shell
+python main_infinite.py --device AUTO
+```
+
+to start endless generation of images.

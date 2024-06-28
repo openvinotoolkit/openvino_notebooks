@@ -1,0 +1,9 @@
+openvino==2024.2.0
+optimum-intel==1.18.0
+diffusers==0.29.2
+transformers==4.41.2
+onnx==1.16.0
+opencv-python==4.10.0.82
+tqdm==4.66.3
+requests==2.32.3
+gradio==4.37.1

@@ -11,5 +11,3 @@ supervision==0.11.0
 tqdm==4.66.3
 pycocotools==2.0.6
 cython==0.29.35
-ipywidgets==8.0.6
-jupyterlab==4.0.11
