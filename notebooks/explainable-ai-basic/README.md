@@ -1,10 +1,10 @@
 # eXplainable AI (XAI) for OpenVINO™ IR Models
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/hello-xai/hello-xai.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/explainable-ai-basic/explainable-ai-basic.ipynb)
 
 The notebook will cover the following topics:
 
 * Explanation of [OpenVINO™ Explainable AI (XAI)](https://github.com/openvinotoolkit/openvino_xai/) and saliency maps.
-* How to create salincy map for OpenVINO™ IR models using [OpenVINO™ Explainable AI (XAI)](https://github.com/openvinotoolkit/openvino_xai/).
+* How to create saliency map for OpenVINO™ IR models using [OpenVINO™ Explainable AI (XAI)](https://github.com/openvinotoolkit/openvino_xai/).
 
 ## Saliency Map
 

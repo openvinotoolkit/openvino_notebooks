@@ -230,6 +230,8 @@ enum
 et
 Evol
 EVS
+eXplainable
+Explainer
 facto
 fastcomposer
 FastComposer
@@ -883,6 +885,7 @@ WTQ
 wuerstchen
 WuerstchenDiffNeXt
 Würstchen
+XAI
 XCode
 Xeon
 xl
