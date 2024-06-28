@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import { isEmbedded } from './iframe-detector';
 import { CATEGORIES, LIBRARIES_VALUES, TASKS_VALUES } from './notebook-tags';
 import { notebooksService } from './notebooks.service';
 import { defaultSelectedTags, INotebooksSelector } from './notebooks-context';
@@ -14,7 +15,7 @@ const OTHER_TAGS = await notebooksService.getOtherTags();
 
 export function initializeSelectorUrlPersist(): UrlPersistState | null {
   const preservedUrlState = getUrlState();
-  if (!preservedUrlState) {
+  if (isEmbedded || !preservedUrlState) {
     return null;
   }
   return preservedUrlState;
@@ -22,6 +23,9 @@ export function initializeSelectorUrlPersist(): UrlPersistState | null {
 
 export function useSelectorUrlPersist(notebooksSelector: INotebooksSelector): void {
   useEffect(() => {
+    if (isEmbedded) {
+      return;
+    }
     const parent = window.parent;
     const stateSearchParams = toSearchParams(notebooksSelector).toString();
     const url = new URL(parent.location.toString());
