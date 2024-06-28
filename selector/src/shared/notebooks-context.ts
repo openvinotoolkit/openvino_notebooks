@@ -3,7 +3,7 @@ import { createContext, Dispatch, SetStateAction, useState } from 'react';
 import { INotebookMetadata } from './notebook-metadata';
 import { SORT_OPTIONS, SortValues } from './notebooks.service';
 
-interface INotebooksSelector {
+export interface INotebooksSelector {
   selectedTags: INotebookMetadata['tags'];
   setSelectedTags: Dispatch<SetStateAction<INotebooksSelector['selectedTags']>>;
   searchValue: string;
@@ -15,7 +15,7 @@ interface INotebooksSelector {
   setPage: Dispatch<SetStateAction<INotebooksSelector['page']>>;
 }
 
-const defaultSelectedTags: INotebookMetadata['tags'] = {
+export const defaultSelectedTags: INotebookMetadata['tags'] = {
   categories: [],
   tasks: [],
   libraries: [],
@@ -34,9 +34,9 @@ export const NotebooksContext = createContext<INotebooksSelector>({
   setPage: () => {},
 });
 
-export function useNotebooksSelector(): INotebooksSelector {
-  const [selectedTags, setSelectedTags] = useState(defaultSelectedTags);
-  const [searchValue, setSearchValue] = useState('');
+export function useNotebooksSelector(initialState: Partial<INotebooksSelector> | null): INotebooksSelector {
+  const [selectedTags, setSelectedTags] = useState(initialState?.selectedTags || defaultSelectedTags);
+  const [searchValue, setSearchValue] = useState(initialState?.searchValue || '');
   const [sort, setSort] = useState<SortValues>(SORT_OPTIONS.RECENTLY_ADDED);
   const [page, setPage] = useState<number>(1);
 
