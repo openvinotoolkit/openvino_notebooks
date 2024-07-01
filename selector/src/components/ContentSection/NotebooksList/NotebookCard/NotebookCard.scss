@@ -7,7 +7,7 @@
   z-index: auto;
   flex-direction: column;
 
-  &.clickable {
+  .card-wrapper.clickable {
     cursor: pointer;
 
     &:hover {

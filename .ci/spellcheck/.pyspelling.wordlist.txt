@@ -336,6 +336,7 @@ intel
 InternLM
 internlm
 Interpolative
+interpretable
 invertible
 intervaling
 im
@@ -572,6 +573,8 @@ photorealism
 photorealistic
 Piotr
 Pipelining
+PixArt
+PIXART
 pixelwise
 PNDM
 Pointilism
