@@ -336,6 +336,7 @@ intel
 InternLM
 internlm
 Interpolative
+interpretable
 invertible
 intervaling
 im
