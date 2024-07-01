@@ -8,8 +8,6 @@ The core idea of agents is to use a language model to choose a sequence of actio
 
 This notebook explores how to create Function-calling Agent step by step using OpenVINO. Function calling allows a model to detect when one or more tools should be called and respond with the inputs that should be passed to those tools. In an API call, you can describe tools and have the model intelligently choose to output a structured object like JSON containing arguments to call these tools. The goal of tools APIs is to more reliably return valid and useful tool calls than what can be done using a generic text completion or chat API.
 
-LLM models can be run locally through the `HuggingFacePipeline` class in LangChain. To deploy a model with OpenVINO, you can specify the `backend="openvino"` parameter to trigger OpenVINO as backend inference framework. For [more information](https://python.langchain.com/docs/integrations/llms/openvino/).
-
 
 ### Notebook Contents
 
