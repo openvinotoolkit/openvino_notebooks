@@ -56,7 +56,7 @@ notebooks/llm-question-answering/llm-question-answering.ipynb
 notebooks/instant-id/instant-id.ipynb
 notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
 notebooks/stable-video-diffusion/stable-video-diffusion.ipynb
-notebooks/llm-agent-langchain/llm-agent-langchain.ipynb
+notebooks/llm-agent-react/llm-agent-react-langchain.ipynb
 notebooks/hello-npu/hello-npu.ipynb
 notebooks/yolov10-optimization/yolov10-optimization.ipynb
 notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb

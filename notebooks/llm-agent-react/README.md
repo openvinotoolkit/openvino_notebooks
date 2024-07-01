@@ -1,4 +1,4 @@
-# Create a LLM Agent using OpenVINO and LangChain
+# Create a ReAct Agent using OpenVINO
 
 LLM are limited to the knowledge on which they have been trained and the additional knowledge provided as context, as a result, if a useful piece of information is missing the provided knowledge, the model cannot “go around” and try to find it in other sources. This is the reason why we need to introduce the concept of Agents.
 
@@ -6,7 +6,7 @@ The core idea of agents is to use a language model to choose a sequence of actio
 
 ![agent ui](https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/2abb2389-e612-4599-82c6-64cdac259120)
 
-This notebook explores how to create an AI Agent step by step using OpenVINO and LangChain. [LangChain](https://python.langchain.com/docs/get_started/introduction) is a framework for developing applications powered by language models. It comes with a number of built-in agents that are optimized for different use cases.
+This notebook explores how to create an ReAct Agent step by step using OpenVINO. [ReAct](https://arxiv.org/abs/2210.03629) is an approach to combine reasoning (e.g. chain-of-thought prompting) and acting. ReAct overcomes issues of hallucination and error propagation prevalent in chain-of-thought reasoning by interacting with a simple Wikipedia API, and generates human-like task-solving trajectories that are more interpretable than baselines without reasoning traces. 
 
 LLM models can be run locally through the `HuggingFacePipeline` class in LangChain. To deploy a model with OpenVINO, you can specify the `backend="openvino"` parameter to trigger OpenVINO as backend inference framework. For [more information](https://python.langchain.com/docs/integrations/llms/openvino/).
 
