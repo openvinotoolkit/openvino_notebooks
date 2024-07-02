@@ -15,3 +15,4 @@ image_config_file = "/opt/app-root/src/.jupyter/jupyter_kernel_gateway_config.py
 if os.path.exists(image_config_file):
     with open(image_config_file) as fp:
         exec(compile(fp.read(), image_config_file, "exec"), globals())
+
