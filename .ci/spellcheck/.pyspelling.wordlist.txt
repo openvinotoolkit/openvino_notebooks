@@ -348,6 +348,9 @@ IRs
 iteratively
 JFLEG
 JIT
+Jina
+jina
+jinaai
 Joao
 JS
 JSON
@@ -476,6 +479,7 @@ multilayer
 multimodal
 Multimodality
 MusicGen
+MuRAG
 Müller
 Nakayosi
 nano
@@ -578,6 +582,7 @@ Pipelining
 PixArt
 PIXART
 pixelwise
+PIL
 PNDM
 Pointilism
 PointNet
