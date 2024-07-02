@@ -311,6 +311,19 @@ SUPPORTED_LLM_MODELS = {
             回答: 
             """,
         },
+        "glm-4-9b-chat": {
+            "model_id": "THUDM/glm-4-9b-chat",
+            "remote_code": True,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "tokenizer_kwargs": {"add_special_tokens": False},
+            "stop_tokens": [0, 2],
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
+            + """
+            问题: {input} 
+            已知内容: {context} 
+            回答: 
+            """,
+        },
         "baichuan2-7b-chat": {
             "model_id": "baichuan-inc/Baichuan2-7B-Chat",
             "remote_code": True,
