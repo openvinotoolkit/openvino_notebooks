@@ -95,7 +95,7 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             apt-get update -y
-            apt-get install git curl wget libsndfile1 libssl-dev unzip libsqlite3-dev libedit-dev libgl1 libgl1-mesa-glx libglib2.0-0 -y
+            apt-get install git curl wget libsndfile1 libssl-dev unzip libsqlite3-dev libedit-dev libgl1 libgl1-mesa-glx libglib2.0-0 tk -y
             wget https://raw.githubusercontent.com/openvinotoolkit/openvino/master/scripts/install_dependencies/install_openvino_dependencies.sh
             chmod +x ./install_openvino_dependencies.sh
             ./install_openvino_dependencies.sh -c=core -c=dev -c=gpu -y
@@ -245,60 +245,40 @@ jobs:
           jupyter lab notebooks --help
 
       # Main notebooks test. Verifies that all notebooks run without errors
-      - name: Analysing with treon (Windows) python > 3.8
-        if: runner.os == 'Windows' && inputs.python != '3.8'
+      - name: Analysing with treon (Windows)
+        if: runner.os == 'Windows'
         shell: bash
         run: |
           python .ci/validate_notebooks.py \
+            --os ${{ env.OS_NAME }} \
+            --python ${{ inputs.python }} \
+            --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list .ci/ignore_treon_win.txt ${{ inputs.python == '3.11' && '.ci/ignore_treon_py311.txt' || '' }} \
+            ${{ env.TEST_DEVICE == 'gpu' && '--ignore_list .ci/heavy_win_gpu.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --move_notebooks_dir c:/notebooks \
             --timeout 1200
-      - name: Analysing with treon (Windows) python 3.8
-        if: runner.os == 'Windows' && inputs.python == '3.8'
+      - name: Analysing with treon (Linux)
+        if: runner.os == 'Linux'
         shell: bash
         run: |
           python .ci/validate_notebooks.py \
+            --os ${{ env.OS_NAME }} \
+            --python ${{ inputs.python }} \
+            --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list .ci/ignore_treon_win.txt .ci/ignore_treon_py38.txt \
-            --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
-            --move_notebooks_dir c:/notebooks \
-            --timeout 1200
-      - name: Analysing with treon (Linux) python > 3.8
-        if: runner.os == 'Linux' && inputs.python != '3.8'
-        shell: bash
-        run: |
-          python .ci/validate_notebooks.py \
-            ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list .ci/ignore_treon_linux.txt ${{ env.TEST_DEVICE == 'gpu' && '.ci/heavy_ubuntu_gpu.txt' || '' }} \
+            ${{ env.TEST_DEVICE == 'gpu' && '--ignore_list .ci/heavy_ubuntu_gpu.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --timeout 1200
-      - name: Analysing with treon (Linux) python 3.8
-        if: runner.os == 'Linux' && inputs.python == '3.8'
+      - name: Analysing with treon (MacOS)
+        if: runner.os == 'MacOS'
         shell: bash
         run: |
           python .ci/validate_notebooks.py \
+            --os ${{ env.OS_NAME }} \
+            --python ${{ inputs.python }} \
+            --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list .ci/ignore_treon_linux.txt .ci/ignore_treon_py38.txt ${{ env.TEST_DEVICE == 'gpu' && '.ci/heavy_ubuntu_gpu.txt' || '' }} \
-            --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
-            --timeout 1200
-      - name: Analysing with treon (MacOS) python > 3.8
-        if: runner.os == 'MacOS' && inputs.python != '3.8'
-        shell: bash
-        run: |
-          python .ci/validate_notebooks.py \
-            ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list .ci/ignore_treon_mac.txt ${{ inputs.python == '3.11' && '.ci/ignore_treon_py311.txt' || '' }} \
-            --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
-            --timeout 1200
-      - name: Analysing with treon (MacOS) python 3.8
-        if: runner.os == 'MacOS' && inputs.python == '3.8'
-        shell: bash
-        run: |
-          python .ci/validate_notebooks.py \
-            ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            --ignore_list .ci/ignore_treon_mac.txt .ci/ignore_treon_py38.txt \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --timeout 1200
 
