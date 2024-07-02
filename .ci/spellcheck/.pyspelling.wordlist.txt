@@ -178,6 +178,7 @@ Dettmers
 dev
 detectron
 Detectron
+DepthAnythingV
 dGPU
 dGPUs
 DialoGPT
@@ -272,6 +273,8 @@ Girshick
 Gitee
 GitHub
 GLA
+GLM
+glm
 GMCNN
 GNA
 Golang
@@ -325,6 +328,7 @@ InceptionResNetV
 inferencing
 InferRequest
 InferRequests
+Inpaint
 inpainting
 InsightFace
 installable
@@ -336,6 +340,7 @@ intel
 InternLM
 internlm
 Interpolative
+interpretable
 invertible
 intervaling
 im
@@ -395,6 +400,7 @@ Lim
 Liu
 LLama
 LLaMa
+LlamaIndex
 LLaVA
 llava
 llm
@@ -444,6 +450,7 @@ MLLM
 MLLMs
 MMVLM
 MLP
+MMDiT
 MobileCLIP
 MobileLLaMA
 mobilenet
@@ -540,6 +547,7 @@ OVModel
 OVModelForXXX
 OVMS
 OVStableDiffusionPipeline
+OVStableDiffusionInpaintPipeline
 OvStableDiffusionInpaintingPipeline
 PaddleClas
 PaddleGAN
@@ -569,6 +577,8 @@ photorealism
 photorealistic
 Piotr
 Pipelining
+PixArt
+PIXART
 pixelwise
 PNDM
 Pointilism
@@ -877,6 +887,7 @@ WebGL
 WebUI
 WER
 WIKISQL
+wikipedia
 WikiTable
 Wikitext
 WIKITQ
@@ -903,5 +914,6 @@ ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
+Zhipu
 zh
 xformers

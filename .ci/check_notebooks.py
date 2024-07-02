@@ -9,7 +9,6 @@ NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_NO_DEVICE = [
     Path("notebooks/auto-device/auto-device.ipynb"),  # auto device expected to be used
     Path("notebooks/convert-to-openvino/convert-to-openvino.ipynb"),  # device-agnostic
-    Path("notebooks/convert-to-openvino/legacy-mo-convert-to-openvino.ipynb"),  # device-agnostic
     Path("notebooks/gpu-device/gpu-device.ipynb"),  # gpu device expected to be used
     Path("notebooks/hello-npu/hello-npu.ipynb"),  # npu device expected to be used
     Path("notebooks/model-server/model-server.ipynb"),  # can not change device in docker configuration on the fly

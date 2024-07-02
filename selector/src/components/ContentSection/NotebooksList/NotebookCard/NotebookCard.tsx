@@ -57,11 +57,8 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
   const { categories, tasks } = item.tags;
   const descriptionTags = [...categories.filter((v) => v !== CATEGORIES.AI_TRENDS), ...tasks];
   return (
-    <div
-      className={`${sparkClassNames.card} ${item.links.docs ? 'clickable' : ''}`}
-      onClick={() => openNotebookInDocs(item)}
-    >
-      <div className="card-wrapper">
+    <div className={sparkClassNames.card}>
+      <div className={`card-wrapper ${item.links.docs ? 'clickable' : ''}`} onClick={() => openNotebookInDocs(item)}>
         <div className="card-image-container">
           <div className="card-image-placeholder">
             <OpenvinoLogo></OpenvinoLogo>
