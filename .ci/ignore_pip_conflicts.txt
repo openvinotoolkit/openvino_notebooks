@@ -29,3 +29,4 @@ notebooks/person-counting-webcam/person-counting.ipynb # numpy should be install
 notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb # torchvision < 0.17.0
 notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb # torch >= 2.2
 notebooks/stable-diffusion-v3/stable-diffusion-v3.ipynb # diffusers from git
+notebooks/explainable-ai-2-deep-dive/xai_classification.ipynb # install latest fixes via git
