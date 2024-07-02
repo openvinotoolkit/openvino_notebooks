@@ -10,6 +10,7 @@ import numpy as np
 from optimum.intel import OVModelForCausalLM, OVModelForSpeechSeq2Seq
 from transformers import AutoConfig, AutoTokenizer, AutoProcessor, PreTrainedTokenizer, TextIteratorStreamer
 from transformers.generation.streamers import BaseStreamer
+import logging as log
 
 # Global variables initialization
 TARGET_AUDIO_SAMPLE_RATE = 16000
@@ -54,6 +55,10 @@ def load_asr_model(model_dir: Path) -> None:
     """
     global asr_model, asr_processor
 
+    if not model_dir.exists():
+        log.error(f"Cannot find {model_dir}")
+        return
+
     # create a distil-whisper model and its processor
     asr_model = OVModelForSpeechSeq2Seq.from_pretrained(model_dir, device="AUTO")
     asr_processor = AutoProcessor.from_pretrained(model_dir)
@@ -67,6 +72,10 @@ def load_chat_model(model_dir: Path) -> None:
         model_dir: dir with the chat model
     """
     global chat_model, chat_tokenizer
+
+    if not model_dir.exists():
+        log.error(f"Cannot find {model_dir}")
+        return
 
     # load llama model and its tokenizer
     ov_config = {'PERFORMANCE_HINT': 'LATENCY', 'NUM_STREAMS': '1', "CACHE_DIR": ""}
@@ -92,7 +101,7 @@ def respond(prompt: str, streamer: BaseStreamer | None = None) -> str:
     outputs = chat_model.generate(**inputs, max_new_tokens=256, do_sample=True, temperature=0.6, top_p=0.9, top_k=50, streamer=streamer)
     tokens = outputs[0, input_length:]
     end_time = time.time()  # End time
-    print("Chat model response time: {:.2f} seconds".format(end_time - start_time))
+    log.info("Chat model response time: {:.2f} seconds".format(end_time - start_time))
     # decode tokens into text
     return chat_tokenizer.decode(tokens, skip_special_tokens=True)
 
@@ -197,7 +206,7 @@ def transcribe(audio: Tuple[int, np.ndarray], conversation: List[List[str]]) -> 
         yield conversation
 
     end_time = time.time()  # End time for ASR process
-    print(f"ASR model response time: {end_time - start_time:.2f} seconds")  # Print the ASR processing time
+    log.info(f"ASR model response time: {end_time - start_time:.2f} seconds")  # Print the ASR processing time
 
     # wait for the thread
     thread.join()
@@ -279,10 +288,17 @@ def run(asr_model_dir: Path, chat_model_dir: Path, public_interface: bool = Fals
         chat_model_dir: dir with the chat model
         public_interface: whether UI should be available publicly
     """
+    # set up logging
+    log.getLogger().setLevel(log.INFO)
+
     # load whisper model
     load_asr_model(asr_model_dir)
     # load chat model
     load_chat_model(chat_model_dir)
+
+    if chat_model is None or asr_model is None:
+        log.error("Required models are not loaded. Exiting...")
+        return
 
     # get initial greeting
     initial_message = generate_initial_greeting()
