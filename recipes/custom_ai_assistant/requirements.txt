@@ -1,5 +1,5 @@
 openvino==2024.2
-optimum-intel==1.16.1
+optimum-intel==1.18.0
 nncf==2.11.0
 
 onnx==1.16.0
@@ -8,4 +8,4 @@ onnxruntime==1.16.0
 transformers==4.40.2
 librosa==0.10.2
 
-gradio==4.31.3
+gradio==4.37.2

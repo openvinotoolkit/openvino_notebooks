@@ -11,13 +11,13 @@ MODEL_MAPPING = {
 }
 
 
-def convert_chat_model(model_type: str, quantize_weights: str, model_dir: Path) -> Path:
+def convert_chat_model(model_type: str, precision: str, model_dir: Path) -> Path:
     """
     Convert chat model
 
     Params:
         model_type: selected mode type and size
-        quantize_weights: whether quantize weights to INT8 or INT4
+        precision: model precision
         model_dir: dir to export model
     Returns:
        Path to exported model
@@ -30,12 +30,12 @@ def convert_chat_model(model_type: str, quantize_weights: str, model_dir: Path) 
     # change precision to FP16
     model.half()
 
-    if quantize_weights:
+    if precision != "fp16":
         # select quantization mode
-        quant_config = OVWeightQuantizationConfig(bits=4, sym=False, ratio=0.8) if quantize_weights == "int4" else OVWeightQuantizationConfig(bits=8, sym=False)
+        quant_config = OVWeightQuantizationConfig(bits=4, sym=False, ratio=0.8) if precision == "int4" else OVWeightQuantizationConfig(bits=8, sym=False)
         config = OVConfig(quantization_config=quant_config)
 
-        suffix = "-INT4" if quantize_weights == "int4" else "-INT8"
+        suffix = "-INT4" if precision == "int4" else "-INT8"
         output_dir = output_dir.with_name(output_dir.name + suffix)
 
         # create a quantizer
@@ -58,8 +58,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--chat_model_type", type=str, choices=["llama2-7B", "llama2-13B", "llama3-8B"],
                         default="llama3-8B", help="Chat model to be converted")
-    parser.add_argument("--quantize_weights", type=str, default="int4", choices=["int8", "int4"], help="Whether to quantize weights to INT8 or INT4")
+    parser.add_argument("--precision", type=str, default="int4", choices=["fp16", "int8", "int4"], help="Model precision")
     parser.add_argument("--model_dir", type=str, default="model", help="Directory to place the model in")
 
     args = parser.parse_args()
-    convert_chat_model(args.chat_model_type, args.quantize_weights, Path(args.model_dir))
+    convert_chat_model(args.chat_model_type, args.precision, Path(args.model_dir))
