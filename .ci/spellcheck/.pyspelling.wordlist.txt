@@ -883,6 +883,7 @@ WebGL
 WebUI
 WER
 WIKISQL
+wikipedia
 WikiTable
 Wikitext
 WIKITQ
