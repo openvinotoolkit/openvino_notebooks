@@ -18,6 +18,8 @@ ROOT = Path(__file__).parents[1]
 
 NOTEBOOKS_DIR = Path("notebooks")
 
+SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
+
 
 class NotebookStatus:
     SUCCESS = "SUCCESS"
@@ -39,6 +41,7 @@ TestPlan = Dict[Path, NotebookReport]
 
 def parse_arguments():
     parser = ArgumentParser()
+    parser.add_argument("--ignore_config", required=False, default=SKIPPED_NOTEBOOKS_CONFIG_FILENAME)
     parser.add_argument("--ignore_list", required=False, nargs="+")
     parser.add_argument("--test_list", required=False, nargs="+")
     parser.add_argument("--os", type=validation_config_arg("os"))
@@ -74,9 +77,8 @@ def collect_python_packages(output_file: Path):
         f.write(reqs)
 
 
-def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig) -> List[Path]:
+def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig, skip_config_file_path: Path) -> List[Path]:
     ignored_notebooks: List[Path] = []
-    skip_config_file_path = Path(__file__).parents[0] / "skipped_notebooks.yml"
     if not skip_config_file_path.exists():
         print(f"Skipped notebooks config yaml file does not exist at path '{str(skip_config_file_path)}'.")
         return ignored_notebooks
@@ -94,14 +96,17 @@ def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig) -> List
     return list(set(ignored_notebooks))
 
 
-def prepare_test_plan(validation_config: ValidationConfig, test_list: Optional[List[str]], ignore_list: List[str], nb_dir: Optional[Path] = None) -> TestPlan:
+def prepare_test_plan(
+    validation_config: ValidationConfig, test_list: Optional[List[str]], ignore_config: str, ignore_list: Optional[List[str]], nb_dir: Optional[Path] = None
+) -> TestPlan:
     orig_nb_dir = ROOT / NOTEBOOKS_DIR
     notebooks_dir = nb_dir or orig_nb_dir
     notebooks: List[Path] = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
 
     test_plan: TestPlan = {notebook.relative_to(notebooks_dir): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
 
-    ignored_notebooks = get_ignored_notebooks_from_yaml(validation_config)
+    skip_config_file_path = Path(__file__).parents[0] / ignore_config
+    ignored_notebooks = get_ignored_notebooks_from_yaml(validation_config, skip_config_file_path)
     if ignore_list is not None:
         for ignore_item in ignore_list:
             if ignore_item.endswith(".txt"):
@@ -306,7 +311,7 @@ def main():
 
     validation_config = ValidationConfig(os=args.os, python=args.python, device=args.device)
 
-    test_plan = prepare_test_plan(validation_config, args.test_list, args.ignore_list, notebooks_moving_dir)
+    test_plan = prepare_test_plan(validation_config, args.test_list, args.ignore_config, args.ignore_list, notebooks_moving_dir)
 
     for notebook, report in test_plan.items():
         if report["status"] == NotebookStatus.SKIPPED:
