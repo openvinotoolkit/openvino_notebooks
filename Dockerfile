@@ -1,6 +1,6 @@
-FROM quay.io/opendatahub/workbench-images:intel-runtime-ml-ubi9-python-3.9
+FROM quay.io/opendatahub/workbench-images:runtime-minimal-ubi9-python-3.9
 
-LABEL name="odh-notebook-jupyter-intel-ml-ubi9-python-3.9" \
+LABEL name="odh-notebook-jupyter-intel-openvino-ubi9-python-3.9" \
     maintainer="helena.kloosterman@intel.com" \
     vendor="Intel Corporation" \
     release="2024.2" \
@@ -9,6 +9,25 @@ LABEL name="odh-notebook-jupyter-intel-ml-ubi9-python-3.9" \
     io.k8s.display-name="Jupyter Intel® OpenVINO notebook image for ODH notebooks." \
     io.k8s.description="Jupyter Intel® OpenVINO notebook image with base Python 3.9 builder image based on UBI9 for ODH notebooks" \
     io.openshift.build.commit.ref="main"
+
+USER 0
+WORKDIR /opt/app-root/src
+
+RUN . /etc/os-release && \
+    #TODO: Remove explicit declaration of VERSION_ID once available on version 9.4
+    VERSION_ID=9.3 && \
+    dnf install -y 'dnf-command(config-manager)' && \
+    dnf config-manager --add-repo \
+        https://repositories.intel.com/gpu/rhel/${VERSION_ID}/lts/2350/unified/intel-gpu-${VERSION_ID}.repo  && \
+    dnf install -y \
+        intel-opencl \
+        level-zero intel-level-zero-gpu level-zero-devel \
+        intel-metrics-discovery \
+        intel-metrics-library  && \
+    dnf clean all -y && \
+    rm -rf /var/cache/dnf/*
+
+USER 1001
 
 WORKDIR /opt/app-root/bin
 
