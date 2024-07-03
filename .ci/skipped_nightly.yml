@@ -1,0 +1,9 @@
+- notebook: notebooks/hello-npu/hello-npu.ipynb
+  skips:
+    - device:
+        - cpu
+        - gpu
+- notebook: notebooks/gpu-device/gpu-device.ipynb
+  skips:
+    - device:
+        - cpu

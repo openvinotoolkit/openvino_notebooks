@@ -48,6 +48,7 @@ COPY .docker/.s2i/bin /tmp/scripts
 COPY .docker /tmp/src
 COPY .ci/patch_notebooks.py /tmp/scripts
 COPY .ci/validate_notebooks.py /tmp/scripts
+COPY .ci/validation_config.py /tmp/scripts
 COPY .ci/ignore_treon_docker.txt /tmp/scripts
 # workaround for coping file if it does not exists
 COPY .ci/test_notebooks.* /tmp/scripts
