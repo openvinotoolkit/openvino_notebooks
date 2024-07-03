@@ -21,9 +21,9 @@ RUN . /etc/os-release && \
         https://repositories.intel.com/gpu/rhel/${VERSION_ID}/lts/2350/unified/intel-gpu-${VERSION_ID}.repo  && \
     dnf install -y \
         intel-opencl \
-        level-zero intel-level-zero-gpu level-zero-devel \
-        intel-metrics-discovery \
-        intel-metrics-library  && \
+        level-zero intel-level-zero-gpu level-zero-devel && \
+    rpm -ivh https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/Packages/c/clinfo-3.0.21.02.21-4.el9.x86_64.rpm  \
+    https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/ocl-icd-2.2.13-4.el9.x86_64.rpm && \
     dnf clean all -y && \
     rm -rf /var/cache/dnf/*
 
@@ -33,9 +33,6 @@ WORKDIR /opt/app-root/bin
 
 # Install Python packages and Jupyterlab extensions from Pipfile.lock
 COPY .docker/Pipfile.lock Pipfile.lock
-
-COPY --chown=1001:0 .docker/.patch_sklearn.py /opt/app-root/bin/.patch_sklearn.py
-ENV PYTHONSTARTUP="/opt/app-root/bin/.patch_sklearn.py"
 
 RUN echo "Installing softwares and packages" && \
     micropipenv install && \
