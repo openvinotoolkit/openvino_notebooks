@@ -271,6 +271,8 @@ Girshick
 Gitee
 GitHub
 GLA
+GLM
+glm
 GMCNN
 GNA
 Golang
@@ -883,6 +885,7 @@ WebGL
 WebUI
 WER
 WIKISQL
+wikipedia
 WikiTable
 Wikitext
 WIKITQ
@@ -908,5 +911,6 @@ ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
+Zhipu
 zh
 xformers
