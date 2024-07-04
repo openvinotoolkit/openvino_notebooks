@@ -24,7 +24,7 @@ transformers>=4.21.1
 # jupyter
 jupyterlab
 ipywidgets
-ipykernel>=5.*
+ipykernel>=5
 ipython>=7.16.3
 
 
