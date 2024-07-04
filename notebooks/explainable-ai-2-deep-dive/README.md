@@ -25,3 +25,13 @@ The tutorial consists of the following steps:
     - Insert XAI branch to use updated model in own pipelines
 - Run explainer in Black-box mode
 - Advanced: add label names and use them to save saliency maps instead of label indexes 
+
+These are explainable AI algorithms supported by OpenVINO XAI :
+
+| Domain          | Task                 | Type      | Algorithm           | Links |
+|-----------------|----------------------|-----------|---------------------|-------|
+| Comptuer Vision | Image Classification | White-Box | ReciproCAM          | [arxiv](https://arxiv.org/abs/2209.14074) / [src](openvino_xai/methods/white_box/recipro_cam.py) |
+|                 |                      |           | VITReciproCAM  (for transformer models)     | [arxiv](https://arxiv.org/abs/2310.02588) / [src](openvino_xai/methods/white_box/recipro_cam.py) |
+|                 |                      |           | ActivationMap       | experimental / [src](openvino_xai/methods/white_box/activation_map.py) |
+|                   |                    | Black-Box | RISE                | [arxiv](https://arxiv.org/abs/1806.07421v3) / [src](openvino_xai/methods/black_box/rise.py) |
+|                 | Object Detection     |           | ClassProbabilityMap | experimental / [src](openvino_xai/methods/white_box/det_class_probability_map.py) |
