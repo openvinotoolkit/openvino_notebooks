@@ -36,6 +36,7 @@ def move_notebooks(nb_dir):
 
 def prepare_test_plan(test_list, ignore_list, nb_dir=None):
     orig_nb_dir = ROOT / 'notebooks'
+    print("orig_nb_dir",orig_nb_dir)
     notebooks_dir = orig_nb_dir if nb_dir is None else nb_dir
     notebooks = sorted(list(notebooks_dir.rglob('**/*.ipynb')))
     statuses = {notebook.parent.relative_to(notebooks_dir): {'status': '', 'path': notebook.parent} for notebook in notebooks}
@@ -72,6 +73,7 @@ def prepare_test_plan(test_list, ignore_list, nb_dir=None):
             statuses[notebook]['status'] = 'SKIPPED'
         if notebook in ignore_list:
             statuses[notebook]['status'] = 'SKIPPED'
+    print
     return statuses
 
 

@@ -57,4 +57,4 @@ jobs:
     - name: Test notebooks in Docker image
       run: |
         # Test script location: .docker/.s2i/bin/test
-        docker run --entrypoint /tmp/scripts/test openvino_notebooks
+        docker run --entrypoint /tmp/scripts/test -v ${PWD}:/opt/app-root/openvino_notebooks openvino_notebooks

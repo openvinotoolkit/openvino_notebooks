@@ -42,10 +42,18 @@ RUN echo "Installing softwares and packages" && \
     chmod -R g+w /opt/app-root/lib/python3.9/site-packages && \
     fix-permissions /opt/app-root -P
 
-#Replacing kernel manually with oneapi variable setting script
 COPY --chown=1001:0 .docker/start-notebook.sh /opt/app-root/bin
 COPY --chown=1001:0 .docker/builder /opt/app-root/builder
 COPY --chown=1001:0 .docker/utils /opt/app-root/bin/utils
+
+COPY --chown=1001:0 .docker/tests/test /tmp/scripts/test
+COPY --chown=1001:0 .docker/tests/test_precommit /tmp/scripts
+COPY --chown=1001:0 .ci/patch_notebooks.py /tmp/scripts
+COPY --chown=1001:0 .ci/validate_notebooks.py /tmp/scripts
+COPY --chown=1001:0 .ci/ignore_treon_docker.txt /tmp/scripts
+# workaround for coping file if it does not exists
+COPY --chown=1001:0 .ci/test_notebooks.* /tmp/scripts
+
 
 WORKDIR /opt/app-root/src
 

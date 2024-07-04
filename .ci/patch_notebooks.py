@@ -54,6 +54,7 @@ def patch_notebooks(notebooks_dir, test_device=""):
     nb_convert_config.NotebookExporter.preprocessors = ["nbconvert.preprocessors.ClearOutputPreprocessor"]
     output_remover = nbconvert.NotebookExporter(nb_convert_config)
     for notebookfile in Path(notebooks_dir).glob("**/*.ipynb"):
+        print(notebookfile)
         if (
             not str(notebookfile.name).startswith("test_")
             and notebookfile.name not in EXCLUDED_NOTEBOOKS
