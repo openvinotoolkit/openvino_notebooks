@@ -76,5 +76,5 @@ jobs:
           docker build . -t openvino_notebooks
       - name: Test notebooks in Docker image
         run: |
-          # Test script location: .docker/.s2i/bin/test_precommit
-          docker run --entrypoint /tmp/scripts/test_precommit openvino_notebooks
+          # Test script location: .docker/tests/test_precommit
+          docker run -v ${PWD}:/opt/app-root/openvino_notebooks --entrypoint /tmp/scripts/test_precommit openvino_notebooks
