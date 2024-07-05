@@ -30,6 +30,8 @@ This tutorial consists of the following steps:
 - Convert the model to OpenVINO IR
 - Compiling models
 - Building the pipeline
+- Optimize pipeline with [NNCF](https://github.com/openvinotoolkit/nncf/)
+- Compare results of original and optimized pipelines
 - Interactive inference
 
 ## Installation instructions
