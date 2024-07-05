@@ -33,7 +33,6 @@ WORKDIR /opt/app-root/bin
 
 # Install Python packages and Jupyterlab extensions from Pipfile.lock
 COPY .docker/Pipfile.lock Pipfile.lock
-
 RUN echo "Installing softwares and packages" && \
     micropipenv install && \
     rm -f ./Pipfile.lock && \
@@ -50,6 +49,7 @@ COPY --chown=1001:0 .docker/tests/test /tmp/scripts/test
 COPY --chown=1001:0 .docker/tests/test_precommit /tmp/scripts
 COPY --chown=1001:0 .ci/patch_notebooks.py /tmp/scripts
 COPY --chown=1001:0 .ci/validate_notebooks.py /tmp/scripts
+COPY --chown=1001:0 .ci/validation_config.py /tmp/scripts
 COPY --chown=1001:0 .ci/ignore_treon_docker.txt /tmp/scripts
 # workaround for coping file if it does not exists
 COPY --chown=1001:0 .ci/test_notebooks.* /tmp/scripts
@@ -58,6 +58,6 @@ COPY --chown=1001:0 .ci/test_notebooks.* /tmp/scripts
 WORKDIR /opt/app-root/src
 
 ENV JUPYTER_PRELOAD_REPOS="https://github.com/openvinotoolkit/openvino_notebooks"
-ENV REPO_BRANCH="main"
+ENV REPO_BRANCH="latest"
 
 ENTRYPOINT ["bash", "-c", "/opt/app-root/builder/run"]
