@@ -115,7 +115,9 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             Question: {input} 
             Context: {context} 
-            Answer: <|im_end|><|im_start|>assistant""",
+            Answer: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
         "gemma-7b-it": {
             "model_id": "google/gemma-7b-it",
@@ -267,7 +269,9 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             问题: {input} 
             已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
         "qwen1.5-7b-chat": {
             "model_id": "Qwen/Qwen1.5-7B-Chat",
@@ -280,7 +284,9 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             问题: {input} 
             已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
         "qwen-7b-chat": {
             "model_id": "Qwen/Qwen-7B-Chat",
@@ -296,7 +302,9 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             问题: {input} 
             已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
         "chatglm3-6b": {
             "model_id": "THUDM/chatglm3-6b",
@@ -361,7 +369,9 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             问题: {input} 
             已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
     },
     "Japanese": {
