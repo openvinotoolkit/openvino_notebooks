@@ -6,7 +6,7 @@ on:
     branches:
       - 'latest'
     paths:
-      - 'selector/*'
+      - 'selector/**'
       - '.github/workflows/selector_precommit.yml'
 
 concurrency:
