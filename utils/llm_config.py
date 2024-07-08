@@ -399,6 +399,11 @@ SUPPORTED_EMBEDDING_MODELS = {
             "mean_pooling": False,
             "normalize_embeddings": True,
         },
+        "bge-m3": {
+            "model_id": "BAAI/bge-m3",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
     },
     "Chinese": {
         "bge-small-zh-v1.5": {
@@ -411,11 +416,17 @@ SUPPORTED_EMBEDDING_MODELS = {
             "mean_pooling": False,
             "normalize_embeddings": True,
         },
+        "bge-m3": {
+            "model_id": "BAAI/bge-m3",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
     },
 }
 
 
 SUPPORTED_RERANK_MODELS = {
+    "bge-reranker-v2-m3": {"model_id": "BAAI/bge-reranker-v2-m3"},
     "bge-reranker-large": {"model_id": "BAAI/bge-reranker-large"},
     "bge-reranker-base": {"model_id": "BAAI/bge-reranker-base"},
 }
