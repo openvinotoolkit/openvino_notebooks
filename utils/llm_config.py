@@ -115,7 +115,9 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             Question: {input} 
             Context: {context} 
-            Answer: <|im_end|><|im_start|>assistant""",
+            Answer: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
         "gemma-7b-it": {
             "model_id": "google/gemma-7b-it",
@@ -267,7 +269,9 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             问题: {input} 
             已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
         "qwen1.5-7b-chat": {
             "model_id": "Qwen/Qwen1.5-7B-Chat",
@@ -280,7 +284,9 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             问题: {input} 
             已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
         "qwen-7b-chat": {
             "model_id": "Qwen/Qwen-7B-Chat",
@@ -296,10 +302,25 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             问题: {input} 
             已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
         "chatglm3-6b": {
             "model_id": "THUDM/chatglm3-6b",
+            "remote_code": True,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "tokenizer_kwargs": {"add_special_tokens": False},
+            "stop_tokens": [0, 2],
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
+            + """
+            问题: {input} 
+            已知内容: {context} 
+            回答: 
+            """,
+        },
+        "glm-4-9b-chat": {
+            "model_id": "THUDM/glm-4-9b-chat",
             "remote_code": True,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "tokenizer_kwargs": {"add_special_tokens": False},
@@ -348,7 +369,9 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             问题: {input} 
             已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
     },
     "Japanese": {
@@ -376,6 +399,11 @@ SUPPORTED_EMBEDDING_MODELS = {
             "mean_pooling": False,
             "normalize_embeddings": True,
         },
+        "bge-m3": {
+            "model_id": "BAAI/bge-m3",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
     },
     "Chinese": {
         "bge-small-zh-v1.5": {
@@ -388,11 +416,17 @@ SUPPORTED_EMBEDDING_MODELS = {
             "mean_pooling": False,
             "normalize_embeddings": True,
         },
+        "bge-m3": {
+            "model_id": "BAAI/bge-m3",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
     },
 }
 
 
 SUPPORTED_RERANK_MODELS = {
+    "bge-reranker-v2-m3": {"model_id": "BAAI/bge-reranker-v2-m3"},
     "bge-reranker-large": {"model_id": "BAAI/bge-reranker-large"},
     "bge-reranker-base": {"model_id": "BAAI/bge-reranker-base"},
 }

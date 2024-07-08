@@ -1,3 +1,0 @@
-notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb
-notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb
-notebooks/speechbrain-emotion-recognition/speechbrain-emotion-recognition.ipynb

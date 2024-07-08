@@ -10,15 +10,17 @@ const useIsOpened = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (!ref.current?.contains(event.target as Node)) {
-        setIsOpened(!isOpened);
+      if (!ref.current?.contains(event.target as Node) && isOpened) {
+        setIsOpened(false);
       }
     };
 
-    document.addEventListener('click', handleClickOutside, !isOpened);
+    if (isOpened) {
+      document.addEventListener('click', handleClickOutside);
+    }
 
     return () => {
-      document.removeEventListener('click', handleClickOutside, !isOpened);
+      document.removeEventListener('click', handleClickOutside);
     };
   }, [isOpened]);
 

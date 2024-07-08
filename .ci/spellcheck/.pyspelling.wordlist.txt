@@ -271,6 +271,8 @@ Girshick
 Gitee
 GitHub
 GLA
+GLM
+glm
 GMCNN
 GNA
 Golang
@@ -336,6 +338,7 @@ intel
 InternLM
 internlm
 Interpolative
+interpretable
 invertible
 intervaling
 im
@@ -345,6 +348,9 @@ IRs
 iteratively
 JFLEG
 JIT
+Jina
+jina
+jinaai
 Joao
 JS
 JSON
@@ -473,6 +479,7 @@ multilayer
 multimodal
 Multimodality
 MusicGen
+MuRAG
 Müller
 Nakayosi
 nano
@@ -572,7 +579,10 @@ photorealism
 photorealistic
 Piotr
 Pipelining
+PixArt
+PIXART
 pixelwise
+PIL
 PNDM
 Pointilism
 PointNet
@@ -880,6 +890,7 @@ WebGL
 WebUI
 WER
 WIKISQL
+wikipedia
 WikiTable
 Wikitext
 WIKITQ
@@ -905,5 +916,6 @@ ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
+Zhipu
 zh
 xformers

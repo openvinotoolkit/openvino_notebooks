@@ -293,6 +293,14 @@ it execute faster. As an example, if your notebook trains for 20 epochs, you can
 1 epoch in the CI. If you do inference on 100 frames of a video, you can set it to do inference on only 1. See 
 [this Wiki page](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Notebooks-Development---CI-Test-Speedup) for more information.
 
+In CI notebooks are validated using the `.ci/validate_notebooks.py` script, which uses [`treon`](#treon) for notebooks execution. 
+The script prepares lists of testing and ignored notebooks based on the several arguments: `--os`, `--python`, `--device` or `--ignore_list`.
+If `--os`, `--python` or `--device` arguments are provided, the script looks through `.ci/skipped_notebooks.yml` file to get ignored notebooks list.
+Providing `--ignore_list` argument with `*.txt` files you can extend the ignored notebooks list.
+
+To skip validation of a particular notebook, you should modify the existing notebook entry or add a new one to the `.ci/skipped_notebooks.yml` and define list of skip configurations as `yaml` objects with one of `os`, `python`, `device` keys or their combinations.
+
+
 ### Manual test and code quality tools
 
 See [Getting started](#getting-started) about installing the tools mentioned in this section.
@@ -303,6 +311,7 @@ Tests are run in the CI with [`treon`](https://pypi.org/project/treon/), a test 
 
 To run `treon` locally, run `treon` to run the tests for all notebooks, or `treon notebook.ipynb` for just one notebook. `treon` fails if the notebook environment is not
 `openvino_env`.
+
 
 #### `nbqa`
 

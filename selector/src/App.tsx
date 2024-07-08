@@ -5,9 +5,13 @@ import { Header } from '@components/Header/Header';
 import { isEmbedded } from '@/shared/iframe-detector';
 
 import { NotebooksContext, useNotebooksSelector } from './shared/notebooks-context';
+import { initializeSelectorUrlPersist, useSelectorUrlPersist } from './shared/selectorUrlPersist';
+
+const initialState = initializeSelectorUrlPersist();
 
 function App(): JSX.Element {
-  const notebooksSelector = useNotebooksSelector();
+  const notebooksSelector = useNotebooksSelector(initialState);
+  useSelectorUrlPersist(notebooksSelector);
 
   return (
     <>
