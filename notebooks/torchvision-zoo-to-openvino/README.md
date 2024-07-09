@@ -1,5 +1,7 @@
 # TorchVision Zoo with OpenVINO™
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/torchvision-zoo-to-openvino/README.md" />
+
 The [`torchvision.models`](https://pytorch.org/vision/stable/models.html) subpackage contains definitions of models for addressing different tasks, including: image 
 classification, pixelwise semantic segmentation, object detection, instance segmentation, person keypoint detection, 
 video classification, and optical flow.

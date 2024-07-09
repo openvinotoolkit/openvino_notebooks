@@ -1,5 +1,7 @@
 # Image generation with HunyuanDIT and OpenVINO
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/hunyuan-dit-image-generation/README.md" />
+
 Hunyuan-DiT is a powerful text-to-image diffusion transformer with fine-grained understanding of both English and Chinese. The model architecture expertly blends diffusion models and transformer networks to unlock the potential of Chinese text-to-image generation.
 
 ![](https://raw.githubusercontent.com/Tencent/HunyuanDiT/main/asset/framework.png)

@@ -1,5 +1,7 @@
 # Single-step image generation using SDXL-turbo and OpenVINO
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/sdxl-turbo/README.md" />
+
 SDXL-Turbo is a fast generative text-to-image model that can synthesize photorealistic images from a text prompt in a single network evaluation. SDXL-Turbo is a distilled version of [SDXL 1.0](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0), trained for real-time synthesis. 
 SDXL Turbo is based on a novel distillation technique called Adversarial Diffusion Distillation (ADD), which enables the model to synthesize image outputs in a single step and generate real-time text-to-image outputs while maintaining high sampling fidelity. More details about this distillation approach can be found in [technical report](https://stability.ai/research/adversarial-diffusion-distillation). More details about model can be found in [Stability AI blog post](https://stability.ai/news/stability-ai-sdxl-turbo).
 

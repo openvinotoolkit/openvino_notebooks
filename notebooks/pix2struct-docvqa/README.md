@@ -1,4 +1,6 @@
 # Document Visual Question Answering Using Pix2Struct and OpenVINO
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/pix2struct-docvqa/README.md" />
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb)
 
 DocVQA (Document Visual Question Answering) is a research field in computer vision and natural language processing that focuses on developing algorithms to answer questions related to the content of a document represented in image format, like a scanned document, screenshots, or an image of a text document. Unlike other types of visual question answering, where the focus is on answering questions related to images or videos, DocVQA is focused on understanding and answering questions based on the text and layout of a document. The questions can be about any aspect of the document text. DocVQA requires understanding the document’s visual content and the ability to read and comprehend the text in it.

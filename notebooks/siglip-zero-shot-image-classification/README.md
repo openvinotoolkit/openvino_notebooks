@@ -1,5 +1,7 @@
 # Zero-shot Image Classification with SigLIP
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/siglip-zero-shot-image-classification/README.md" />
+
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/siglip-zero-shot-image-classification/siglip-zero-shot-image-classification.ipynb)
 
 Zero-shot image classification is a computer vision task with the goal to classify images into one of several classes without any prior training or knowledge of these classes.

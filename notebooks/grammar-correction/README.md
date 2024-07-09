@@ -1,5 +1,7 @@
 # Grammatical Error Correction with OpenVINO
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/grammar-correction/README.md" />
+
 
 Grammatical Error Correction (GEC) is the task of correcting different types of errors in text such as spelling, punctuation, grammatical and word choice errors. 
 GEC is typically formulated as a sentence correction task. A GEC system takes a potentially erroneous sentence as input and is expected to transform it into a more correct version. See the example given below:

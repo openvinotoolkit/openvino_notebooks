@@ -1,5 +1,7 @@
 # Visual-language assistant with LLaVA and OpenVINO
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/llava-multimodal-chatbot/README.md" />
+
 ![llava_logo.png](https://raw.githubusercontent.com/haotian-liu/LLaVA/main/images/llava_logo.png)
 
 *image source: [LLaVA repository](https://github.com/haotian-liu/LLaVA/blob/main/images/llava_logo.png)*

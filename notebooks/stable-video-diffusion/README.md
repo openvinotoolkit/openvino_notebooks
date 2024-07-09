@@ -1,5 +1,7 @@
 # Image to Video Generation with Stable Video Diffusion
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/stable-video-diffusion/README.md" />
+
 [Stable Video Diffusion (SVD)](https://stability.ai/stable-video) Image-to-Video is a diffusion model that takes in a still image as a conditioning frame, and generates a video from it. In this tutorial we consider how to convert and run Stable Video Diffusion using OpenVINO.
 We will use [stable-video-diffusion-img2video-xt](https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt) model as example. Additionally, to speedup video generation process we apply [AnimateLCM](https://arxiv.org/abs/2402.00769) LoRA weights and run optimization with [NNCF](https://github.com/openvinotoolkit/nncf/).
 

@@ -1,5 +1,7 @@
 # Visual-language assistant with LLaVA Next and OpenVINO
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/llava-next-multimodal-chatbot/README.md" />
+
 [LLaVA-NeXT](https://llava-vl.github.io/blog/2024-01-30-llava-next/) is new generation of LLaVA model family that marks breakthrough in advanced language reasoning over images, introducing improved OCR and expanded world knowledge. [LLaVA](https://llava-vl.github.io) (Large Language and Vision Assistant) is large multimodal model that aims to develop a general-purpose visual assistant that can follow both language and image instructions to complete various real-world tasks. The idea is to combine the power of large language models (LLMs) with vision encoders like CLIP to create an end-to-end trained neural assistant that understands and acts upon multimodal instructions.
 
 In this tutorial we consider how to convert and optimize LLaVA-NeXT model from Transformers library for creating multimodal chatbot. We will utilize the power of [llava-v1.6-mistral-7b](https://huggingface.co/llava-hf/llava-v1.6-mistral-7b-hf) model for creating multimodal chatbot, but the similar actions are also applicable to other models of LLaVA family compatible with HuggingFace transformers implementation. Additionally, we demonstrate how to apply stateful transformation on LLM part and model optimization techniques like weights compression and quantization using [NNCF](https://github.com/openvinotoolkit/nncf) 

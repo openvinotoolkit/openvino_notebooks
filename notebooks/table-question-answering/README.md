@@ -1,5 +1,7 @@
 # Table Question Answering using TAPAS and OpenVINO™
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/table-question-answering/README.md" />
+
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/table-question-answering/table-question-answering.ipynb)
 
 Table Question Answering (Table QA) is the answering a question about an information on a given table. You can use the 

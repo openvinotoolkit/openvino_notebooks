@@ -1,5 +1,7 @@
 # SpeechBrain Emotion Recognition with OpenVINO
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/speechbrain-emotion-recognition/README.md" />
+
 [SpeechBrain](https://github.com/speechbrain/speechbrain) is an open-source PyTorch toolkit that accelerates Conversational AI development, i.e., the technology behind speech assistants, chatbots, and large language models. It is crafted for fast and easy creation of advanced technologies for Speech and Text Processing.
 
 Lear more in [GitHub repo](https://github.com/speechbrain/speechbrain) and [paper](https://arxiv.org/pdf/2106.04624)

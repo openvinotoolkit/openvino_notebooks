@@ -1,5 +1,7 @@
 # Create a RAG system using OpenVINO and LlamaIndex
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/llm-rag-llamaindex/README.md" />
+
 **Retrieval-augmented generation (RAG)** is a technique for augmenting LLM knowledge with additional, often private or real-time, data. LLMs can reason about wide-ranging topics, but their knowledge is limited to the public data up to a specific point in time that they were trained on. If you want to build AI applications that can reason about private data or data introduced after a model’s cutoff date, you need to augment the knowledge of the model with the specific information it needs. The process of bringing the appropriate information and inserting it into the model prompt is known as Retrieval Augmented Generation (RAG).
 
 ![UI](https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/5d145de6-69ee-4f7c-bfcb-6bdf6a5534a6)

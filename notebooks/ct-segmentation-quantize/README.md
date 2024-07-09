@@ -1,5 +1,7 @@
 # Quantize a Segmentation Model and Show Live Inference
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/ct-segmentation-quantize/README.md" />
+
 <p align="center">
     <img src="https://user-images.githubusercontent.com/77325899/154279555-aaa47111-c976-4e77-8d23-aac96f45872f.gif"/>
 </p>

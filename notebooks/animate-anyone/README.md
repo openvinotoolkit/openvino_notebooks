@@ -1,4 +1,6 @@
 # Image-to-video synthesis with AnimateAnyone and OpenVINO
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/animate-anyone/README.md" />
 ![](./animate-anyone.gif)
 
 [AnimateAnyone](https://arxiv.org/pdf/2311.17117.pdf) tackles the task of generating animation sequences from a single character image. It builds upon diffusion models pre-trained on vast character image datasets.

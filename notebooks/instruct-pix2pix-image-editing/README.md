@@ -1,5 +1,7 @@
 # Image editing with InstructPix2Pix
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/instruct-pix2pix-image-editing/README.md" />
+
 AI image editing models are traditionally focused on a single editing task such as style transfer or translation between image domains. [InstructPix2Pix](https://www.timothybrooks.com/instruct-pix2pix/) proposes a novel method for editing images using human instructions given an input image and a written text that tells the model what to do. The model follows these text-based instructions to edit the image.
 
 This notebook demonstrates how to use the **[InstructPix2Pix](https://github.com/timothybrooks/instruct-pix2pix)** model for image editing with OpenVINO.

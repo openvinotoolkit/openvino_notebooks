@@ -1,5 +1,7 @@
 # Working with NPU in OpenVINO™
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/hello-npu/README.md" />
+
 To learn more about NPU in OpenVINO, refer to the [NPU Device](https://docs.openvino.ai/2024/openvino-workflow/running-inference/inference-devices-and-modes/npu-device.html) section in the docs.
 
 ## Notebook Contents

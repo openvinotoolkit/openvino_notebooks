@@ -1,5 +1,7 @@
 # Big Transfer Image Classification Model Quantization with NNCF in OpenVINO™
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/big-transfer-quantization/README.md" />
+
 This tutorial demonstrates how to apply 'INT8' quantization to the [Big Transfer](https://tfhub.dev/google/bit/m-r50x1) Image Classification model. Here we demonstrate fine-tuning the model, OpenVINO optimization and followed by INT8 quantization processing with [NNCF](https://github.com/openvinotoolkit/nncf/).
 
 ## Notebook Contents

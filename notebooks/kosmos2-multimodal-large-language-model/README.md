@@ -1,5 +1,7 @@
 # Kosmos-2: Multimodal Large Language Model and OpenVINO
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/kosmos2-multimodal-large-language-model/README.md" />
+
 [KOSMOS-2](https://github.com/microsoft/unilm/tree/master/kosmos-2) is a multimodal large language model (MLLM) that has new capabilities of multimodal grounding and 
 referring. KOSMOS-2 can understand multimodal input, follow instructions, 
 perceive object descriptions (e.g., bounding boxes), and ground language to the visual world.

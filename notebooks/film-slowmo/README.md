@@ -1,5 +1,7 @@
 # Frame interpolation with FILM and OpenVINO
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/film-slowmo/README.md" />
+
 [Frame interpolation](https://en.wikipedia.org/wiki/Motion_interpolation) is the process of synthesizing in-between images from a given set of images. The technique is often used for [temporal up-sampling](https://en.wikipedia.org/wiki/Frame_rate#Frame_rate_up-conversion) to increase the refresh rate of videos or to create slow motion effects. Nowadays, with digital cameras and smartphones, we often take several photos within a few seconds to capture the best picture. Interpolating between these “near-duplicate” photos can lead to engaging videos that reveal scene motion, often delivering an even more pleasing sense of the moment than the original photos.
 
 ![](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/7e87e1a5-6197-4a15-9ced-44e21dd05b02)

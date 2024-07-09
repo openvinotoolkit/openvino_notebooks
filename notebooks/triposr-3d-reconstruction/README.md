@@ -1,5 +1,7 @@
 # TripoSR feedforward 3D reconstruction from a single image and OpenVINO™
 
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/triposr-3d-reconstruction/README.md" />
+
 
 [TripoSR](https://huggingface.co/spaces/stabilityai/TripoSR) is a state-of-the-art open-source model for fast feedforward 3D reconstruction from a single image, developed in collaboration between [Tripo AI](https://www.tripo3d.ai/) and [Stability AI](https://stability.ai/news/triposr-3d-generation).
 
