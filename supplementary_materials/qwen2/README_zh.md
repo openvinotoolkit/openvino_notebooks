@@ -36,6 +36,9 @@ pip install wheel setuptools
 
 pip install -r requirements.txt
 ```
+> Note:
+> 如果你使用的是一个已经存在的python环境，请使用以下方法进行更新
+> pip install -U --upgrade-strategy eager -r requirements.txt
 
 ## 2. 转换模型
 
@@ -100,6 +103,6 @@ Qwen2-OpenVINO: "小兔子与朋友们的冒险之旅"
    - 更多信息可以参考[Install GPU drivers](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Ubuntu#1-install-python-git-and-gpu-drivers-optional)
 
 4. 是否支持C++？
-   - C++示例可以[参考](https://github.com/openvinotoolkit/openvino.genai/tree/master/text_generation/causal_lm/cpp)
+   - C++示例可以[参考](https://github.com/openvinotoolkit/openvino.genai/tree/master/src)
 
 您也可以在这里提交 [问题](https://community.intel.com/t5/Intel-Distribution-of-OpenVINO/bd-p/distribution-openvino-toolkit).
