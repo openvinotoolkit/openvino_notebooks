@@ -539,3 +539,7 @@
   skips:
     - device:
         - cpu
+- notebook: notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb
+  skips:
+    - python:
+        - '3.8'
