@@ -1,0 +1,51 @@
+name: Notebooks Selector Precommit
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - 'latest'
+    paths:
+      - 'selector/**'
+      - '.github/workflows/selector_precommit.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  link_build_selector:
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: 18
+
+      - name: Install Node.js dependencies
+        working-directory: ./selector
+        shell: bash
+        run: npm ci
+
+      - name: Lint
+        working-directory: ./selector
+        shell: bash
+        run: npm run lint
+
+      - name: Build
+        working-directory: ./selector
+        shell: bash
+        run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

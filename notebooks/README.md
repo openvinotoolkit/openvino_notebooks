@@ -131,6 +131,7 @@
 - [PaddleOCR with OpenVINO™](./paddle-ocr-webcam/paddle-ocr-webcam.ipynb)
 - [Voice tone cloning with OpenVoice and OpenVINO](./openvoice/openvoice.ipynb)
 - [Live Object Detection with OpenVINO™](./object-detection-webcam/object-detection.ipynb)
+- [CLIP model with Jina CLIP and OpenVINO](./jina-clip/jina-clip.ipynb)
 - [Object detection and masking from prompts with GroundedSAM (GroundingDINO + SAM) and OpenVINO](./grounded-segment-anything/grounded-segment-anything.ipynb)
 - [Quantize a Segmentation Model and Show Live Inference](./ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb)
 - [Human Action Recognition with OpenVINO™](./action-recognition-webcam/action-recognition-webcam.ipynb)

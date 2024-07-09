@@ -20,13 +20,13 @@ export const TASKS = /** @type {const} */ ({
     TEXT_TO_SPEECH: 'Text-to-Speech',
     AUDIO_TO_TEXT: 'Audio-to-Text',
     VISUAL_QUESTION_ANSWERING: 'Visual Question Answering',
-    IMAGE_CAPTIONING: "Image Captioning",
+    IMAGE_CAPTIONING: 'Image Captioning',
     FEATURE_EXTRACTION: 'Feature Extraction',
-    TEXT_TO_IMAGE_RETRIEVAL: "Text-to-Image Retrieval",
-    IMAGE_TO_TEXT_RETRIEVAL: "Image-to-Text Retrieval",
-    TEXT_TO_VIDEO_RETRIEVAL: "Text-to-Video Retrieval",
-    IMAGE_TO_3D: "Image-to-3D",
-    IMAGE_TO_VIDEO: "Image-to-Video"
+    TEXT_TO_IMAGE_RETRIEVAL: 'Text-to-Image Retrieval',
+    IMAGE_TO_TEXT_RETRIEVAL: 'Image-to-Text Retrieval',
+    TEXT_TO_VIDEO_RETRIEVAL: 'Text-to-Video Retrieval',
+    IMAGE_TO_3D: 'Image-to-3D',
+    IMAGE_TO_VIDEO: 'Image-to-Video',
   },
   CV: {
     IMAGE_CLASSIFICATION: 'Image Classification',
@@ -65,8 +65,8 @@ export const TASKS = /** @type {const} */ ({
   },
   OTHER: {
     KNOWLEDGE_REPRESENTATION: 'Knowledge Representation',
-    BYTES_CLASSIFICATION: "Bytes Classification"
-  }
+    BYTES_CLASSIFICATION: 'Bytes Classification',
+  },
 });
 
 export const TASKS_VALUES = Object.values(TASKS)
@@ -81,6 +81,7 @@ export const LIBRARIES = /** @type {const} */ ({
     OVMS: 'Model Server',
     OMZ: 'Open Model Zoo',
     TOKENIZERS: 'OpenVINO Tokenizers',
+    GENAI: 'OpenVINO GenAI',
   },
   OTHER: {
     OPTIMUM_INTEL: 'Optimum Intel',

@@ -80,6 +80,9 @@ def remove_ov_install(cell):
                 if "openvino-tokenizers" in part:
                     package_found = True
                     continue
+                if "openvino-genai" in part:
+                    package_found = True
+                    continue
                 if "openvino>" in part or "openvino=" in part or "openvino" == part:
                     package_found = True
                     continue
