@@ -237,13 +237,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb
-  skips:
-    - os:
-        - macos-12
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb
   skips:
     - os:
