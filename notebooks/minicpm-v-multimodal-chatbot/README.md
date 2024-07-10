@@ -2,7 +2,7 @@
 
 MiniCPM-V 2 is a strong multimodal large language model for efficient end-side deployment. The model is built based on SigLip-400M and MiniCPM-2.4B, connected by a perceiver resampler. MiniCPM-V 2.0 has several notable features:
 * **Outperforming many popular models on many benchmarks** (including OCRBench, TextVQA, MME, MMB, MathVista, etc). Strong OCR capability, achieving comparable performance to Gemini Pro in scene-text understanding.
-* **Trustworthy Behavior**. LMMs are known for suffering from hallucination, often generating text not factually grounded in images. MiniCPM-V 2.0 is the first end-side LMM aligned via multimodal RLHF for trustworthy behavior (using the recent [RLHF-V](https://rlhf-v.github.io/) [CVPR'24] series technique). This allows the model to match GPT-4V in preventing hallucinations on Object HalBench.
+* **Trustworthy Behavior**. LLMs are known for suffering from hallucination, often generating text not factually grounded in images. MiniCPM-V 2.0 is the first end-side LLM aligned via multimodal RLHF for trustworthy behavior (using the recent [RLHF-V](https://rlhf-v.github.io/) [CVPR'24] series technique). This allows the model to match GPT-4V in preventing hallucinations on Object HalBench.
 * **High-Resolution Images at Any Aspect Raito.** MiniCPM-V 2.0 can accept 1.8 million pixels (e.g., 1344x1344) images at any aspect ratio. This enables better perception of fine-grained visual information such as small objects and optical characters, which is achieved via a recent technique from [LLaVA-UHD](https://arxiv.org/pdf/2403.11703).
 * **High Efficiency.** For visual encoding, model compresses the image representations into much fewer tokens via a perceiver resampler. This allows MiniCPM-V 2.0 to operate with favorable memory cost and speed during inference even when dealing with high-resolution images.
 * **Bilingual Support.** MiniCPM-V 2.0 supports strong bilingual multimodal capabilities in both English and Chinese. This is enabled by generalizing multimodal capabilities across languages, a technique from [VisCPM](https://arxiv.org/abs/2308.12038)[ICLR'24].
@@ -21,7 +21,7 @@ The tutorial consists from following steps:
 - Launch Interactive demo
 
 In this demonstration, you'll create interactive chatbot that can answer questions about provided image's content. Image bellow shows a result of model work.
-![](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/2727402e-3697-442e-beca-26b149967c84)
+![](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/7b0919ea-6fe4-4c8f-8395-cb0ee6e87937)
 
 
 ## Installation instructions
