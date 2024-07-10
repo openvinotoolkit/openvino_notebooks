@@ -3,9 +3,7 @@
 **OpenVINO™ Explainable AI (XAI) Toolkit** provides a suite of XAI algorithms for visual explanation of
 [**OpenVINO™**](https://github.com/openvinotoolkit/openvino) Intermediate Representation (IR) models.
 
-Given **OpenVINO** models and input images, **OpenVINO XAI** generates **saliency maps**
-which highlights regions of the interest in the inputs from the models' perspective
-to help users understand the reason why the complex AI models give such responses.
+Using **OpenVINO XAI**, you can generate **saliency maps** that highlight regions of interest in input images from the model's perspective. This helps users understand why complex AI models produce specific responses.
 
 This notebook shows an example how to use OpenVINO XAI.
 
