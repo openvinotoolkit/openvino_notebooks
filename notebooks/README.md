@@ -149,8 +149,6 @@
 - [Convert and Optimize YOLOv10 with OpenVINO](./yolov10-optimization/yolov10-optimization.ipynb)
 - [Image generation with Würstchen and OpenVINO](./wuerstchen-image-generation/wuerstchen-image-generation.ipynb)
 - [Video Subtitle Generation using Whisper and OpenVINO™](./whisper-subtitles-generation/whisper-subtitles-generation.ipynb)
-- [Super Resolution with PaddleGAN and OpenVINO™](./vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb)
-- [Photos to Anime with PaddleGAN and OpenVINO](./vision-paddlegan-anime/vision-paddlegan-anime.ipynb)
 - [Monodepth Estimation with OpenVINO](./vision-monodepth/vision-monodepth.ipynb)
 - [Image Background Removal with U^2-Net and OpenVINO™](./vision-background-removal/vision-background-removal.ipynb)
 - [Vehicle Detection And Recognition with OpenVINO™](./vehicle-detection-and-recognition/vehicle-detection-and-recognition.ipynb)

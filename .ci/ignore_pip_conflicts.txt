@@ -20,8 +20,6 @@ notebooks/triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb # requires t
 notebooks/animate-anyone/animate-anyone.ipynb # diffusers<=0.24
 notebooks/whisper-subtitles-generation/whisper-convert.ipynb # pytube
 notebooks/grounded-segment-anything/grounded-segment-anything.ipynb # deprecated installer
-notebooks/vision-paddlegan-anime/vision-paddlegan-anime.ipynb # old scipy
-notebooks/vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb # old scipy and scikit-image
 notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.ipynb
 notebooks/sketch-to-image-pix2pix-turbo/sketch-to-image-pix2pix-turbo.ipynb
 notebooks/yolov10-optimization/yolov10-optimization.ipynb # nncf from git

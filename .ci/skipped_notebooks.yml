@@ -511,14 +511,6 @@
   skips:
     - python:
         - '3.8'
-- notebook: notebooks/vision-paddlegan-anime/vision-paddlegan-anime.ipynb
-  skips:
-    - python:
-        - '3.11'
-- notebook: notebooks/vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb
-  skips:
-    - python:
-        - '3.11'
 - notebook: notebooks/s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb
   skips:
     - device:
