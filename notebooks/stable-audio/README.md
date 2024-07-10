@@ -1,0 +1,26 @@
+# Sound Generation with Stable Audio Open 1.0 and OpenVINO™
+
+[Stable Audio Open](https://huggingface.co/stabilityai/stable-audio-open-1.0) is an open-source model optimized for generating short audio samples, sound effects, and production elements using text prompts. The model was trained on data from Freesound and the Free Music Archive, respecting creator rights.
+
+<img src="https://huggingface.co/stabilityai/stable-audio-open-1.0/resolve/main/stable_audio_light.png?raw=true" />
+
+#### Key Takeaways:
+
+ - Stable Audio Open is an open source text-to-audio model for generating up to 47 seconds of samples and sound effects.
+ - Users can create drum beats, instrument riffs, ambient sounds, foley and production elements.
+ - The model enables audio variations and style transfer of audio samples.
+
+This model is made to be used with the [stable-audio-tools](https://github.com/Stability-AI/stable-audio-tools) library for inference.
+
+## Notebook contents
+This tutorial consists of the following steps:
+- Prerequisites
+- Load the original model and inference
+- Convert the model to OpenVINO IR
+- Compiling models and inference
+- Interactive inference
+
+## Installation instructions
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
