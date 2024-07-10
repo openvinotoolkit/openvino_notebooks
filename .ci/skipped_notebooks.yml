@@ -539,3 +539,11 @@
   skips:
     - device:
         - cpu
+- notebook: notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+
