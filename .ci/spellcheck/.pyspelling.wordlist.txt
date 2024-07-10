@@ -294,6 +294,7 @@ Gu
 Gutendex
 Hafner
 HugginFaceH
+HalBench
 HandBrake
 heatmap
 HC
@@ -431,6 +432,7 @@ Markovian
 Martyniuk
 maskrcnn
 mathbf
+MathVista
 MatMul
 MBs
 MediaPipe
@@ -447,6 +449,7 @@ MiniCPM
 MiniLM
 mistralai
 MLS
+MMB
 mms
 MMS
 MLLM
@@ -515,6 +518,7 @@ OASST
 OBB
 obb
 ocr
+OCRBench
 OCRv
 odometry
 OMZ
@@ -573,6 +577,7 @@ parsers
 perceptron
 Patil
 PEFT
+perceiver
 performant
 PersonaGPT
 PGI
@@ -647,6 +652,7 @@ qwen
 Qwen
 Radiopaedia
 Radosavovic
+Raito
 Raj
 Ranftl
 RASPP
@@ -671,6 +677,8 @@ reproducibility
 rerank
 Rerank
 reranker
+resampler
+Resampler
 rescale
 rescaling
 Rescaling
@@ -726,6 +734,7 @@ Shutterstock
 siggraph
 sigmoid
 SigLIP
+SigLip
 siglip
 SISR
 SlimOrca
@@ -794,6 +803,7 @@ TartanAir
 tbb
 TensorBoard
 tensorflow
+TextVQA
 tf
 TFLite
 tflite
@@ -829,6 +839,7 @@ tunable
 tv
 TypeScript
 Udnie
+UHD
 UI
 UIs
 UINT
@@ -870,6 +881,7 @@ VegaRT
 videpth
 VIO
 virtualenv
+VisCPM
 ViT
 vit
 vits
