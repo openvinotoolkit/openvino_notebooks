@@ -11,6 +11,8 @@ adversarially
 AE
 aeroplane
 affective
+Agentic
+agentic
 ai
 al
 Alibaba
