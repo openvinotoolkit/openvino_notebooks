@@ -71,3 +71,4 @@ notebooks/stable-diffusion-v3/stable-diffusion-v3.ipynb
 notebooks/pixart/pixart.ipynb
 notebooks/llm-rag-llamaindex/llm-rag-llamaindex.ipynb
 notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
+notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb
