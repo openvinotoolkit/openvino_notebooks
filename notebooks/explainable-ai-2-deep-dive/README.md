@@ -20,9 +20,9 @@ The tutorial consists of the following steps:
 - Run explainer in Auto-mode
 - Specify preprocess and postprocess functions
 - Run explainer in White-box mode
-    - Insert XAI branch to use updated model in own pipelines
+  - Insert XAI branch to use updated model in own pipelines
 - Run explainer in Black-box mode
-- Advanced: add label names and use them to save saliency maps instead of label indexes 
+- Advanced: add label names and use them to save saliency maps instead of label indexes
 
 These are explainable AI algorithms supported by OpenVINO XAI :
 
