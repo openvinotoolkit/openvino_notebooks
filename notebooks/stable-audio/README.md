@@ -2,7 +2,7 @@
 
 [Stable Audio Open](https://huggingface.co/stabilityai/stable-audio-open-1.0) is an open-source model optimized for generating short audio samples, sound effects, and production elements using text prompts. The model was trained on data from Freesound and the Free Music Archive, respecting creator rights.
 
-<img src="https://huggingface.co/stabilityai/stable-audio-open-1.0/resolve/main/stable_audio_light.png?raw=true" />
+<img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/76171391/ed4aa0f2-0501-4519-8b24-c1c3072b4ef2" />
 
 #### Key Takeaways:
 

@@ -535,3 +535,8 @@
   skips:
     - python:
         - '3.8'
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
