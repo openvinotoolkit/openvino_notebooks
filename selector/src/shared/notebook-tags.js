@@ -82,6 +82,7 @@ export const LIBRARIES = /** @type {const} */ ({
     OMZ: 'Open Model Zoo',
     TOKENIZERS: 'OpenVINO Tokenizers',
     GENAI: 'OpenVINO GenAI',
+    XAI: 'OpenVINO Explainable AI',
   },
   OTHER: {
     OPTIMUM_INTEL: 'Optimum Intel',
