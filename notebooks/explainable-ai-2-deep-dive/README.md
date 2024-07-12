@@ -11,7 +11,7 @@ It depicts a heatmap with areas of interest where neural network (classification
 
 Example: Saliency map for `flat-coated retriever` class for MobileNetV3 classification model:
 
-![Saliency Map Example](./retriever-saliency-map.jpg)
+![Saliency Map Example](https://github.com/user-attachments/assets/5557d79d-2e9a-4784-aa17-fea2931a1435)
 
 ## Notebook Contents
 
