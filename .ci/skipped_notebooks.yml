@@ -524,6 +524,11 @@
   skips:
     - device:
         - cpu
+- notebook: notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb
+  skips:
+    - python:
+        - '3.8'
+        - '3.9'
 - notebook: notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
   skips:
     - os:
@@ -531,4 +536,3 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-

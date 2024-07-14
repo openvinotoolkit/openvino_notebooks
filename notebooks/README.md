@@ -121,6 +121,7 @@
 - [Hello Image Classification](./hello-world/hello-world.ipynb)
 - [Hello Image Segmentation](./hello-segmentation/hello-segmentation.ipynb)
 - [Hello Object Detection](./hello-detection/hello-detection.ipynb)
+- [eXplainable AI (XAI) for OpenVINO™ IR Models](./explainable-ai-1-basic/explainable-ai-1-basic.ipynb)
 
 ## Live Demos
 
