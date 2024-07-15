@@ -3,6 +3,7 @@ abstractive
 accelerometers
 accelerometer
 acknowledgement
+ActivationMap
 activations
 adaptively
 adas
@@ -27,6 +28,7 @@ APIs
 Arcface
 argmax
 artstation
+arxiv
 ASPP
 ASR
 asr
@@ -87,6 +89,7 @@ Cifar
 cityscape
 Cityscapes
 classname
+ClassProbabilityMap
 CLI
 cli
 CLIP's
@@ -232,6 +235,7 @@ et
 Evol
 EVS
 eXplainable
+explainer
 Explainer
 facto
 fastcomposer
@@ -510,6 +514,7 @@ notus
 nsamples
 nsfw
 NSFW
+num
 numpy
 NumPy
 NPU
@@ -663,6 +668,7 @@ RealSR
 Realtime
 realtime
 rebase
+ReciproCAM
 redistributable
 RedPajama
 ReferenceNet
@@ -761,6 +767,7 @@ splitters
 SPS
 SQA
 SQuAD
+src
 SRT
 SSD
 SSDLite
@@ -884,6 +891,7 @@ virtualenv
 VisCPM
 ViT
 vit
+VITReciproCAM
 vits
 VITS
 vitt
