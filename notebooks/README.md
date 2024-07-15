@@ -113,6 +113,7 @@
 
 ## Explainable AI
 
+- [OpenVINO™ Explainable AI Toolkit: Deep Dive notebook](./explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb)
 - [eXplainable AI (XAI) for OpenVINO™ IR Models](./explainable-ai-1-basic/explainable-ai-1-basic.ipynb)
 - [Language-Visual Saliency with CLIP and OpenVINO™](./clip-language-saliency-map/clip-language-saliency-map.ipynb)
 
