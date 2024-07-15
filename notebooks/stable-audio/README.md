@@ -1,4 +1,4 @@
-# Sound Generation with Stable Audio Open 1.0 and OpenVINO™
+# Sound Generation with Stable Audio Open and OpenVINO™
 
 [Stable Audio Open](https://huggingface.co/stabilityai/stable-audio-open-1.0) is an open-source model optimized for generating short audio samples, sound effects, and production elements using text prompts. The model was trained on data from Freesound and the Free Music Archive, respecting creator rights.
 
