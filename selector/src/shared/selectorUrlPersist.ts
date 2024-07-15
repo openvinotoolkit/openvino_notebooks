@@ -47,6 +47,10 @@ export function useSelectorUrlPersist(notebooksSelector: INotebooksSelector): vo
     parent.history.pushState(null, '', url);
   });
 
+  if (isEmbedded) {
+    return;
+  }
+
   // listen for parent history state change
   // on each change set selector state according to url search params
   parent.onpopstate = () => {
@@ -62,7 +66,7 @@ export function useSelectorUrlPersist(notebooksSelector: INotebooksSelector): vo
 
 export function getUrlState(): UrlPersistState | null {
   const parent = window.parent;
-  if (!parent.location.search) {
+  if (isEmbedded || !parent.location.search) {
     return null;
   }
   const searchParams = new URLSearchParams(parent.location.search);
