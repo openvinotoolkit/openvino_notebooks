@@ -72,4 +72,5 @@ notebooks/pixart/pixart.ipynb
 notebooks/llm-rag-llamaindex/llm-rag-llamaindex.ipynb
 notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
 notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb
+notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb
 notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb
