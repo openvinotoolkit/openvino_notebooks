@@ -26,6 +26,8 @@ can provide a more convenient and efficient human-AI interaction for vision-lang
 - Infer the original model
 - Convert the model to OpenVINO IR
 - Inference
+- Optimize pipeline with [NNCF](https://github.com/openvinotoolkit/nncf/)
+- Compare results of original and optimized pipelines
 - Interactive inference
 
 ## Installation instructions
