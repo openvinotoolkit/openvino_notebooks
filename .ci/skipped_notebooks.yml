@@ -541,3 +541,7 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb
+  skips:
+    - python:
+        - '3.8'
