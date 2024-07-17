@@ -8,14 +8,6 @@ from transformers import TextIteratorStreamer
 
 def make_demo(model, processor):
     example_image_urls = [
-        (
-            "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/1d6a0188-5613-418d-a1fd-4560aae1d907",
-            "bee.jpg",
-        ),
-        (
-            "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/6cc7feeb-0721-4b5d-8791-2576ed9d2863",
-            "baklava.png",
-        ),
         ("https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/dd5105d6-6a64-4935-8a34-3058a82c8d5d", "small.png"),
         ("https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/1221e2a8-a6da-413a-9af6-f04d56af3754", "chart.png"),
     ]
@@ -27,12 +19,14 @@ def make_demo(model, processor):
     def bot_streaming(message, history):
         print(f"message is - {message}")
         print(f"history is - {history}")
-        if message["files"]:
+        files = message["files"] if isinstance(message, dict) else message.files
+        message_text = message["text"] if isinstance(message, dict) else message.text
+        if files:
             # message["files"][-1] is a Dict or just a string
-            if type(message["files"][-1]) == dict:
-                image = message["files"][-1]["path"]
+            if isinstance(files[-1], dict):
+                image = files[-1]["path"]
             else:
-                image = message["files"][-1]
+                image = files[-1] if isinstance(files[-1], (list, tuple)) else files[-1].path
         else:
             # if there's no image uploaded for this turn, look for images in the past turns
             # kept inside tuples, take the last one
@@ -63,9 +57,9 @@ def make_demo(model, processor):
             conversation.extend([{"role": "user", "content": user}, {"role": "assistant", "content": assistant}])
 
         if len(history) == 0:
-            conversation.append({"role": "user", "content": f"<|image_1|>\n{message['text']}"})
+            conversation.append({"role": "user", "content": f"<|image_1|>\n{message_text}"})
         else:
-            conversation.append({"role": "user", "content": message["text"]})
+            conversation.append({"role": "user", "content": message_text})
         print(f"prompt is -\n{conversation}")
         prompt = processor.tokenizer.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
         image = Image.open(image)
@@ -100,8 +94,6 @@ def make_demo(model, processor):
         fn=bot_streaming,
         title="Phi3 Vision 128K Instruct with OpenVINO",
         examples=[
-            {"text": "What is on the flower?", "files": ["./bee.jpg"]},
-            {"text": "How to make this pastry?", "files": ["./baklava.png"]},
             {"text": "What is the text saying?", "files": ["./small.png"]},
             {"text": "What does the chart display?", "files": ["./chart.png"]},
         ],

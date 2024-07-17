@@ -28,6 +28,27 @@ from openvino.runtime import opset10 as ops
 # In[ ]:
 
 
+def device_widget(default="AUTO", exclude=None):
+    import openvino as ov
+    import ipywidgets as widgets
+
+    core = ov.Core()
+
+    support_devices = core.available_devices+ ["AUTO"]
+    exclude = exclude or []
+    if exclude:
+        for ex_device in exclude:
+            if ex_device in support_devices:
+                support_devices.remove(ex_device)
+
+    device = widgets.Dropdown(
+        options=supported_devices,
+        value=default,
+        description="Device:",
+        disabled=False,
+    )
+    return device
+
 def load_image(path: str) -> np.ndarray:
     """
     Loads an image from `path` and returns it as BGR numpy array. `path`
