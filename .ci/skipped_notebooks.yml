@@ -545,3 +545,7 @@
   skips:
     - python:
       - '3.8'
+- notebook: notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb
+  skips:
+    - python:
+        - '3.8'
