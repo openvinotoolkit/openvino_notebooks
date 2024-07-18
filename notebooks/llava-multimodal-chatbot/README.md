@@ -24,11 +24,6 @@ The tutorial consists from following steps:
 - Prepare OpenVINO-based inference pipeline
 - Run OpenVINO model
 
-### Installation instructions
-This is a self-contained example that relies solely on its own code.</br>
-We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
-For details, please refer to [Installation Guide](../../README.md).
-
 ## Video-LLaVA
 ### Notebook contents
 The tutorial consists from following steps:
@@ -40,7 +35,7 @@ The tutorial consists from following steps:
 - Prepare OpenVINO-based inference pipeline
 - Run OpenVINO model
 
-### Installation instructions
+## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
