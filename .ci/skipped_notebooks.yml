@@ -541,8 +541,10 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/phi-3-vision/phi-3-vision.ipynb
+- notebook: notebooks/stable-audio/stable-audio.ipynb
   skips:
+    - python:
+        - '3.8'
     - os:
         - macos-12
         - ubuntu-20.04
@@ -556,3 +558,10 @@
   skips:
     - python:
         - '3.8'
+- notebook: notebooks/phi-3-vision/phi-3-vision.ipynb
+  skips:
+      - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
