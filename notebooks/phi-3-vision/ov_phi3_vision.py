@@ -221,7 +221,7 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
-        print("✅ Input embedding model sucessfuly converted")
+        print("✅ Input embedding model successfully converted")
 
     vision_embed_tokens = model.model.vision_embed_tokens
     if not image_embed_path.exists():
@@ -232,7 +232,7 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
-        print("✅ Image embedding model sucessfuly converted")
+        print("✅ Image embedding model successfully converted")
 
     if not img_projection_path.exists():
         print("⌛ Convert Image projection model")
@@ -241,7 +241,7 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
-        print("✅ Image projection model sucessfuly converted")
+        print("✅ Image projection model successfully converted")
 
     if not lang_model_path.exists():
         print("⌛ Convert Language model")
@@ -279,12 +279,12 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
         for output, output_name in zip(ov_model.outputs, model_outputs):
             output.get_tensor().set_names({output_name})
         patch_stateful(ov_model)
-        print("✅ Language model sucessfuly converted")
+        print("✅ Language model successfully converted")
 
         if quantization_config is not None:
-            print(f"⌛ Start weights compression with {quantization_config['mode']} mode")
+            print(f"⌛ Weights compression with {quantization_config['mode']} mode started")
             ov_model = nncf.compress_weights(ov_model, **quantization_config)
-            print("✅ Weights comoression is finished")
+            print("✅ Weights compression finished")
 
         ov.save_model(ov_model, lang_model_path)
         del ov_model
