@@ -252,11 +252,13 @@ finetuned
 finetuning
 FLAC
 floyd
+foley
 Formatter
 formatter
 fp
 FP
 FPN
+Freesound
 FreeVC
 freevc
 frisbee
