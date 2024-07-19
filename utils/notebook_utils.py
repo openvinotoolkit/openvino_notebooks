@@ -34,12 +34,12 @@ def device_widget(default="AUTO", exclude=None):
 
     core = ov.Core()
 
-    support_devices = core.available_devices+ ["AUTO"]
+    supported_devices = core.available_devices + ["AUTO"]
     exclude = exclude or []
     if exclude:
         for ex_device in exclude:
-            if ex_device in support_devices:
-                support_devices.remove(ex_device)
+            if ex_device in supported_devices:
+                supported_devices.remove(ex_device)
 
     device = widgets.Dropdown(
         options=supported_devices,

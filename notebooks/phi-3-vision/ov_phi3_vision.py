@@ -204,36 +204,47 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
     embed_token_path = output_dir / "embed_token.xml"
 
     if all([lang_model_path.exists(), image_embed_path.exists(), img_projection_path.exists(), embed_token_path.exists()]):
+        print(f"✅ Phi-3-vision model already converted. You can find results in {output_dir}")
         return
+    print("⌛ Phi-3-vision conversion started. Be patient, it may takes some time.")
+    print("⌛ Load Original model")
     model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True, _attn_implementation="eager")
     processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
     model.config.save_pretrained(output_dir)
     processor.save_pretrained(output_dir)
+    print("✅ Original model successfully loaded")
 
     if not embed_token_path.exists():
+        print("⌛ Convert Input embedding model")
         ov_model = ov.convert_model(model.model.embed_tokens, example_input=torch.ones([2, 2], dtype=torch.int64))
         ov.save_model(ov_model, embed_token_path)
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
+        print("✅ Input embedding model sucessfuly converted")
 
     vision_embed_tokens = model.model.vision_embed_tokens
     if not image_embed_path.exists():
+        print("⌛ Convert Image embedding model")
         vision_embed_tokens.forward = vision_embed_tokens.get_img_features
         ov_model = ov.convert_model(vision_embed_tokens, example_input=torch.ones([17, 3, 336, 336]))
         ov.save_model(ov_model, image_embed_path)
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
+        print("✅ Image embedding model sucessfuly converted")
 
     if not img_projection_path.exists():
+        print("⌛ Convert Image projection model")
         ov_model = ov.convert_model(vision_embed_tokens.img_projection, example_input=torch.ones([1, 1921, 4096]))
         ov.save_model(ov_model, img_projection_path)
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
+        print("✅ Image projection model sucessfuly converted")
 
     if not lang_model_path.exists():
+        print("⌛ Convert Language model")
 
         def forward_wrap(self, attention_mask, position_ids=None, past_key_values=None, inputs_embeds=None):
             result = self._orig_forward(
@@ -268,15 +279,19 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
         for output, output_name in zip(ov_model.outputs, model_outputs):
             output.get_tensor().set_names({output_name})
         patch_stateful(ov_model)
+        print("✅ Language model sucessfuly converted")
 
         if quantization_config is not None:
+            print(f"⌛ Start weights compression with {quantization_config['mode']} mode")
             ov_model = nncf.compress_weights(ov_model, **quantization_config)
+            print("✅ Weights comoression is finished")
 
         ov.save_model(ov_model, lang_model_path)
         del ov_model
         cleanup_torchscript_cache()
         del model
         gc.collect()
+        print(f"✅ Phi-3-vision model conversion finished. You can find results in {output_dir}")
 
 
 class OvPhi3Vision(GenerationMixin):
