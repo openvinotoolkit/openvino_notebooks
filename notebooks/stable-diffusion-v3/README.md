@@ -5,7 +5,7 @@ Stable Diffusion V3 is next generation of latent diffusion image Stable Diffusio
 ![mmdit.png](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/dd079427-89f2-4d28-a10e-c80792d750bf)
 
 More details about model can be found in [model card](https://huggingface.co/stabilityai/stable-diffusion-3-medium), [research paper](https://stability.ai/news/stable-diffusion-3-research-paper) and [Stability.AI blog post](https://stability.ai/news/stable-diffusion-3-medium).
-In this tutorial, we will consider how to convert and optimize Stable Diffusion v3 for running with OpenVINO.
+In this tutorial, we will consider how to convert Stable Diffusion v3 for running with OpenVINO. An additional part demonstrates how to run optimization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
 If you want to run previous Stable Diffusion versions, please check our other notebooks:
 
 * [Stable Diffusion](../stable-diffusion-text-to-image)
@@ -33,6 +33,8 @@ The tutorial consists of the following steps:
 - Convert model to OpenVINO intermediate representation (IR) format and compress weights using NNCF
 - Prepare OpenVINO Inference pipeline
 - Run Text-to-Image generation
+- Optimize pipeline with [NNCF](https://github.com/openvinotoolkit/nncf/)
+- Compare the results of the original and optimized pipelines
 - Launch interactive demo
 
 ## Installation Instructions
