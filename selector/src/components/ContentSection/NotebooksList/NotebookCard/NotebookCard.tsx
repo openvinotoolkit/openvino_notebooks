@@ -10,6 +10,7 @@ import React, { CSSProperties, useRef, useState } from 'react';
 import { Button } from '@/components/shared/Button/Button';
 import { Tag } from '@/components/shared/Tag/Tag';
 import { Tooltip } from '@/components/shared/Tooltip/Tooltip';
+import { analytics } from '@/shared/analytics/analytics';
 import { copyToClipboard } from '@/shared/copy';
 import { isEmbedded } from '@/shared/iframe-detector';
 import { INotebookMetadata } from '@/shared/notebook-metadata';
@@ -29,6 +30,7 @@ const openNotebookInDocs = ({ links }: INotebookMetadata) => {
   if (!links.docs) {
     return;
   }
+  analytics.sendNavigateEvent(links.docs);
   window.open(links.docs, isEmbedded ? '_parent' : '_blank');
 };
 
@@ -99,6 +101,9 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
                 text="View on GitHub"
                 icon={GitHubIcon}
                 href={item.links.github}
+                onClick={() => {
+                  analytics.sendNavigateEvent(item.links.github);
+                }}
               ></Button>
               {item.links.colab && (
                 <Button
@@ -108,6 +113,9 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
                   text="Open in Colab"
                   icon={ColabIcon}
                   href={item.links.colab}
+                  onClick={() => {
+                    analytics.sendNavigateEvent(item.links.colab!);
+                  }}
                 ></Button>
               )}
               {item.links.binder && (
@@ -118,6 +126,9 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
                   text="Launch in Binder"
                   icon={BinderIcon}
                   href={item.links.binder}
+                  onClick={() => {
+                    analytics.sendNavigateEvent(item.links.binder!);
+                  }}
                 ></Button>
               )}
               {item.status && (
@@ -138,6 +149,7 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
                   icon={LinkIcon}
                   onClick={() => {
                     copyNotebookShareUrl(item);
+                    analytics.sendCopyLinkEvent(item.path);
                     setLinkCopied(true);
                     setTimeout(() => setLinkCopied(false), 1000);
                   }}
