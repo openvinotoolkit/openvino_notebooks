@@ -237,13 +237,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb
-  skips:
-    - os:
-        - macos-12
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb
   skips:
     - os:
@@ -518,14 +511,6 @@
   skips:
     - python:
         - '3.8'
-- notebook: notebooks/vision-paddlegan-anime/vision-paddlegan-anime.ipynb
-  skips:
-    - python:
-        - '3.11'
-- notebook: notebooks/vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb
-  skips:
-    - python:
-        - '3.11'
 - notebook: notebooks/s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb
   skips:
     - device:
@@ -539,3 +524,37 @@
   skips:
     - device:
         - cpu
+- notebook: notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb
+  skips:
+    - python:
+        - '3.8'
+        - '3.9'
+- notebook: notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb
+  skips:
+    - python:
+        - '3.8'
+        - '3.9'
+- notebook: notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/stable-audio/stable-audio.ipynb
+  skips:
+    - python:
+        - '3.8'
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb
+  skips:
+    - python:
+      - '3.8'
+- notebook: notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb
+  skips:
+    - python:
+        - '3.8'

@@ -28,6 +28,7 @@
 - [Stable Diffusion with KerasCV and OpenVINO](./stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb)
 - [Image Generation with Stable Diffusion and IP-Adapter](./stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb)
 - [Image generation with Stable Cascade and OpenVINO](./stable-cascade-image-generation/stable-cascade-image-generation.ipynb)
+- [Sound Generation with Stable Audio Open and OpenVINO™](./stable-audio/stable-audio.ipynb)
 - [Sound Generation with AudioLDM2 and OpenVINO™](./sound-generation-audioldm2/sound-generation-audioldm2.ipynb)
 - [SoftVC VITS Singing Voice Conversion and OpenVINO™](./softvc-voice-conversion/softvc-voice-conversion.ipynb)
 - [Object masks from prompts with SAM and OpenVINO](./segment-anything/segment-anything.ipynb)
@@ -39,6 +40,7 @@
 - [Controllable Music Generation with MusicGen and OpenVINO](./music-generation/music-generation.ipynb)
 - [Mobile language assistant with MobileVLM and OpenVINO](./mobilevlm-language-assistant/mobilevlm-language-assistant.ipynb)
 - [Visual Content Search using MobileCLIP and OpenVINO](./mobileclip-video-search/mobileclip-video-search.ipynb)
+- [Visual-language assistant with MiniCPM-V2 and OpenVINO](./minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb)
 - [Magika: AI powered fast and efficient file type identification using OpenVINO](./magika-content-type-recognition/magika-content-type-recognition.ipynb)
 - [Create a RAG system using OpenVINO and LlamaIndex](./llm-rag-llamaindex/llm-rag-llamaindex.ipynb)
 - [Create a RAG system using OpenVINO and LangChain](./llm-rag-langchain/llm-rag-langchain.ipynb)
@@ -46,6 +48,7 @@
 - [Create an LLM-powered Chatbot using OpenVINO](./llm-chatbot/llm-chatbot.ipynb)
 - [Create an LLM-powered Chatbot using OpenVINO Generate API](./llm-chatbot/llm-chatbot-generate-api.ipynb)
 - [Create ReAct Agent using OpenVINO and LangChain](./llm-agent-react/llm-agent-react-langchain.ipynb)
+- [Create an Agentic RAG using OpenVINO and LlamaIndex](./llm-agent-react/llm-agent-rag-llamaindex.ipynb)
 - [Create Function-calling Agent using OpenVINO and Qwen-Agent](./llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb)
 - [Visual-language assistant with LLaVA Next and OpenVINO](./llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb)
 - [Visual-language assistant with Video-LLaVA and OpenVINO](./llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb)
@@ -67,7 +70,6 @@
 - [Automatic speech recognition using Distil-Whisper and OpenVINO](./distil-whisper-asr/distil-whisper-asr.ipynb)
 - [Depth estimation with DepthAnything and OpenVINO](./depth-anything/depth-anything.ipynb)
 - [Depth estimation with DepthAnythingV2 and OpenVINO](./depth-anything/depth-anything-v2.ipynb)
-- [Image generation with DeciDiffusion and OpenVINO](./decidiffusion-image-generation/decidiffusion-image-generation.ipynb)
 - [Text-to-Image Generation with ControlNet Conditioning](./controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb)
 - [Zero-shot Image Classification with OpenAI CLIP and OpenVINO™](./clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb)
 - [Visual Question Answering and Image Captioning using BLIP and OpenVINO](./blip-visual-language-processing/blip-visual-language-processing.ipynb)
@@ -113,6 +115,8 @@
 
 ## Explainable AI
 
+- [OpenVINO™ Explainable AI Toolkit: Deep Dive notebook](./explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb)
+- [eXplainable AI (XAI) for OpenVINO™ IR Models](./explainable-ai-1-basic/explainable-ai-1-basic.ipynb)
 - [Language-Visual Saliency with CLIP and OpenVINO™](./clip-language-saliency-map/clip-language-saliency-map.ipynb)
 
 ## First Steps
@@ -121,6 +125,7 @@
 - [Hello Image Classification](./hello-world/hello-world.ipynb)
 - [Hello Image Segmentation](./hello-segmentation/hello-segmentation.ipynb)
 - [Hello Object Detection](./hello-detection/hello-detection.ipynb)
+- [eXplainable AI (XAI) for OpenVINO™ IR Models](./explainable-ai-1-basic/explainable-ai-1-basic.ipynb)
 
 ## Live Demos
 
@@ -149,8 +154,6 @@
 - [Convert and Optimize YOLOv10 with OpenVINO](./yolov10-optimization/yolov10-optimization.ipynb)
 - [Image generation with Würstchen and OpenVINO](./wuerstchen-image-generation/wuerstchen-image-generation.ipynb)
 - [Video Subtitle Generation using Whisper and OpenVINO™](./whisper-subtitles-generation/whisper-subtitles-generation.ipynb)
-- [Super Resolution with PaddleGAN and OpenVINO™](./vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb)
-- [Photos to Anime with PaddleGAN and OpenVINO](./vision-paddlegan-anime/vision-paddlegan-anime.ipynb)
 - [Monodepth Estimation with OpenVINO](./vision-monodepth/vision-monodepth.ipynb)
 - [Image Background Removal with U^2-Net and OpenVINO™](./vision-background-removal/vision-background-removal.ipynb)
 - [Vehicle Detection And Recognition with OpenVINO™](./vehicle-detection-and-recognition/vehicle-detection-and-recognition.ipynb)
@@ -174,6 +177,7 @@
 - [Stable Diffusion with KerasCV and OpenVINO](./stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb)
 - [Image Generation with Stable Diffusion and IP-Adapter](./stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb)
 - [Image generation with Stable Cascade and OpenVINO](./stable-cascade-image-generation/stable-cascade-image-generation.ipynb)
+- [Sound Generation with Stable Audio Open and OpenVINO™](./stable-audio/stable-audio.ipynb)
 - [Text Generation via Speculative Sampling, KV Caching, and OpenVINO™](./speculative-sampling/speculative-sampling.ipynb)
 - [Sound Generation with AudioLDM2 and OpenVINO™](./sound-generation-audioldm2/sound-generation-audioldm2.ipynb)
 - [SoftVC VITS Singing Voice Conversion and OpenVINO™](./softvc-voice-conversion/softvc-voice-conversion.ipynb)
@@ -199,6 +203,7 @@
 - [Mobile language assistant with MobileVLM and OpenVINO](./mobilevlm-language-assistant/mobilevlm-language-assistant.ipynb)
 - [Visual Content Search using MobileCLIP and OpenVINO](./mobileclip-video-search/mobileclip-video-search.ipynb)
 - [MMS: Scaling Speech Technology to 1000+ languages with OpenVINO™](./mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb)
+- [Visual-language assistant with MiniCPM-V2 and OpenVINO](./minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb)
 - [Industrial Meter Reader](./meter-reader/meter-reader.ipynb)
 - [Magika: AI powered fast and efficient file type identification using OpenVINO](./magika-content-type-recognition/magika-content-type-recognition.ipynb)
 - [Create a RAG system using OpenVINO and LlamaIndex](./llm-rag-llamaindex/llm-rag-llamaindex.ipynb)
@@ -207,6 +212,7 @@
 - [Create an LLM-powered Chatbot using OpenVINO](./llm-chatbot/llm-chatbot.ipynb)
 - [Create an LLM-powered Chatbot using OpenVINO Generate API](./llm-chatbot/llm-chatbot-generate-api.ipynb)
 - [Create ReAct Agent using OpenVINO and LangChain](./llm-agent-react/llm-agent-react-langchain.ipynb)
+- [Create an Agentic RAG using OpenVINO and LlamaIndex](./llm-agent-react/llm-agent-rag-llamaindex.ipynb)
 - [Create Function-calling Agent using OpenVINO and Qwen-Agent](./llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb)
 - [Visual-language assistant with LLaVA Next and OpenVINO](./llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb)
 - [Visual-language assistant with Video-LLaVA and OpenVINO](./llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb)
@@ -234,7 +240,6 @@
 - [Automatic speech recognition using Distil-Whisper and OpenVINO](./distil-whisper-asr/distil-whisper-asr.ipynb)
 - [Depth estimation with DepthAnything and OpenVINO](./depth-anything/depth-anything.ipynb)
 - [Depth estimation with DepthAnythingV2 and OpenVINO](./depth-anything/depth-anything-v2.ipynb)
-- [Image generation with DeciDiffusion and OpenVINO](./decidiffusion-image-generation/decidiffusion-image-generation.ipynb)
 - [Colorize grayscale images using 🎨 DDColor and OpenVINO](./ddcolor-image-colorization/ddcolor-image-colorization.ipynb)
 - [Cross-lingual Books Alignment with Transformers and OpenVINO™](./cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb)
 - [Text-to-Image Generation with ControlNet Conditioning](./controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb)

@@ -16,3 +16,6 @@ The notebook uses `Faster R-CNN FPN x1` model and `Mask R-CNN FPN x3` pretrained
 ## Installation Instructions
 
 This is a self-contained example that relies solely on its own code.
+
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
