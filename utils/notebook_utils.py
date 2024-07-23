@@ -49,6 +49,7 @@ def device_widget(default="AUTO", exclude=None):
     )
     return device
 
+
 def load_image(path: str) -> np.ndarray:
     """
     Loads an image from `path` and returns it as BGR numpy array. `path`

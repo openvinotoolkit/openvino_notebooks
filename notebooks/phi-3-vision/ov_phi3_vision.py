@@ -3,17 +3,13 @@ import types
 from typing import Optional, Tuple, Union
 import gc
 import openvino as ov
+from openvino.runtime import opset13
+import nncf
+import numpy as np
 import torch
-from transformers import AutoModelForCausalLM
-from transformers import AutoProcessor
+from transformers import AutoModelForCausalLM, AutoProcessor, AutoConfig
 from transformers.generation import GenerationConfig, GenerationMixin
 from transformers.modeling_outputs import CausalLMOutputWithPast, BaseModelOutputWithPast
-from transformers import AutoConfig
-
-from typing import Optional, Tuple, List
-from openvino.runtime import opset13
-import numpy as np
-import nncf
 
 
 def model_has_state(ov_model: ov.Model):
@@ -203,7 +199,14 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
     img_projection_path = output_dir / "img_projection.xml"
     embed_token_path = output_dir / "embed_token.xml"
 
-    if all([lang_model_path.exists(), image_embed_path.exists(), img_projection_path.exists(), embed_token_path.exists()]):
+    if all(
+        [
+            lang_model_path.exists(),
+            image_embed_path.exists(),
+            img_projection_path.exists(),
+            embed_token_path.exists(),
+        ]
+    ):
         print(f"✅ Phi-3-vision model already converted. You can find results in {output_dir}")
         return
     print("⌛ Phi-3-vision conversion started. Be patient, it may takes some time.")
@@ -216,7 +219,10 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
 
     if not embed_token_path.exists():
         print("⌛ Convert Input embedding model")
-        ov_model = ov.convert_model(model.model.embed_tokens, example_input=torch.ones([2, 2], dtype=torch.int64))
+        ov_model = ov.convert_model(
+            model.model.embed_tokens,
+            example_input=torch.ones([2, 2], dtype=torch.int64),
+        )
         ov.save_model(ov_model, embed_token_path)
         del ov_model
         cleanup_torchscript_cache()
@@ -236,7 +242,10 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
 
     if not img_projection_path.exists():
         print("⌛ Convert Image projection model")
-        ov_model = ov.convert_model(vision_embed_tokens.img_projection, example_input=torch.ones([1, 1921, 4096]))
+        ov_model = ov.convert_model(
+            vision_embed_tokens.img_projection,
+            example_input=torch.ones([1, 1921, 4096]),
+        )
         ov.save_model(ov_model, img_projection_path)
         del ov_model
         cleanup_torchscript_cache()
@@ -246,16 +255,29 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
     if not lang_model_path.exists():
         print("⌛ Convert Language model")
 
-        def forward_wrap(self, attention_mask, position_ids=None, past_key_values=None, inputs_embeds=None):
+        def forward_wrap(
+            self,
+            attention_mask,
+            position_ids=None,
+            past_key_values=None,
+            inputs_embeds=None,
+        ):
             result = self._orig_forward(
-                input_ids=None, attention_mask=attention_mask, position_ids=position_ids, past_key_values=past_key_values, inputs_embeds=inputs_embeds
+                input_ids=None,
+                attention_mask=attention_mask,
+                position_ids=position_ids,
+                past_key_values=past_key_values,
+                inputs_embeds=inputs_embeds,
             )
             return tuple(result.values())
 
         model._orig_forward = model.forward
         model.forward = types.MethodType(forward_wrap, model)
         llm_input = torch.zeros([2, 2, 3072])
-        pkv = model(inputs_embeds=llm_input, attention_mask=torch.ones((2, 2), dtype=torch.int64))[1]
+        pkv = model(
+            inputs_embeds=llm_input,
+            attention_mask=torch.ones((2, 2), dtype=torch.int64),
+        )[1]
         model_inputs = ["attention_mask", "position_ids"]
         model_outputs = ["logits"]
         for idx in range(len(pkv)):
@@ -393,7 +415,14 @@ class OvPhi3Vision(GenerationMixin):
         return self._past_length
 
     def prepare_inputs_for_generation(
-        self, input_ids, past_key_values=None, attention_mask=None, inputs_embeds=None, pixel_values=None, image_sizes=None, **kwargs
+        self,
+        input_ids,
+        past_key_values=None,
+        attention_mask=None,
+        inputs_embeds=None,
+        pixel_values=None,
+        image_sizes=None,
+        **kwargs,
     ):
         if past_key_values is not None:
             past_length = self._get_past_length(past_key_values)
@@ -435,7 +464,12 @@ class OvPhi3Vision(GenerationMixin):
         )
         return model_inputs
 
-    def vision_embed_tokens(self, input_ids: torch.LongTensor, pixel_values: torch.FloatTensor, image_sizes=None) -> torch.FloatTensor:
+    def vision_embed_tokens(
+        self,
+        input_ids: torch.LongTensor,
+        pixel_values: torch.FloatTensor,
+        image_sizes=None,
+    ) -> torch.FloatTensor:
         MAX_INPUT_ID = int(1e9)
         img_embeds = pixel_values
         img_sizes = image_sizes
