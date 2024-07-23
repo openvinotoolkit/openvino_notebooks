@@ -1,6 +1,4 @@
 # Photo to Anime with PaddleGAN Tutorial
-
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/vision-paddlegan-anime/README.md" />
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/vision-paddlegan-anime/vision-paddlegan-anime.ipynb)
 
 ![anime coco](https://user-images.githubusercontent.com/15709723/123559130-04550100-d74f-11eb-819c-a02284654428.jpg)

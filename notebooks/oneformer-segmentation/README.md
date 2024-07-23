@@ -1,7 +1,5 @@
 # Universal segmentation with OneFormer with OpenVINO™
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/oneformer-segmentation/README.md" />
-
 
 This tutorial explains how to convert and run inference on the [OneFormer](https://huggingface.co/docs/transformers/model_doc/oneformer) HuggingFace model with OpenVINO. Additionally, [NNCF](https://github.com/openvinotoolkit/nncf/) quantization is applied to improve OneFormer segmentation speed.
 

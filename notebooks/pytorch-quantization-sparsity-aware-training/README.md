@@ -1,7 +1,5 @@
 # Optimizing PyTorch models with Neural Network Compression Framework of OpenVINO™ by 8-bit quantization.
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/pytorch-quantization-sparsity-aware-training/README.md" />
-
 This tutorial demonstrates how to use [NNCF](https://github.com/openvinotoolkit/nncf) 8-bit sparse quantization to optimize the 
 [PyTorch](https://pytorch.org/) model for inference with [OpenVINO Toolkit](https://docs.openvino.ai/). 
 For more advanced usage, refer to these [examples](https://github.com/openvinotoolkit/nncf/tree/develop/examples).

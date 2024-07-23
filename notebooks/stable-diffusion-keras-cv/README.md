@@ -1,7 +1,5 @@
 # Stable Diffusion with KerasCV and OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/stable-diffusion-keras-cv/README.md" />
-
 This notebook demonstrates how to run [KerasCV Stable Diffusion](https://www.tensorflow.org/tutorials/generative/generate_images_with_stable_diffusion) using OpenVINO. An additional part demonstrates how to run optimization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
 
 ![stable-diffusion-result](https://github.com/openvinotoolkit/openvino_notebooks/assets/67365453/4dc86beb-cbdf-48da-8465-f9079d15a7fd)

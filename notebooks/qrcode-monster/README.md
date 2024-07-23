@@ -1,7 +1,5 @@
 # Generate creative QR codes with ControlNet QR Code Monster and OpenVINO™
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/qrcode-monster/README.md" />
-
 [Stable Diffusion](https://github.com/CompVis/stable-diffusion), a cutting-edge image generation technique, but it can be further enhanced by combining it with [ControlNet](https://github.com/lllyasviel/ControlNet), a widely used control network approach. The combination allows Stable Diffusion to use a condition input to guide the image generation process, resulting in highly accurate and visually appealing images. The condition input could be in the form of various types of data such as scribbles, edge maps, pose key points, depth maps, segmentation maps, normal maps, or any other relevant information that helps to guide the content of the generated image, for example - QR codes! This method can be particularly useful in complex image generation scenarios where precise control and fine-tuning are required to achieve the desired results.
 
 In this tutorial, we will learn how to convert and run [Controlnet QR Code Monster For SD-1.5](https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster) by [monster-labs](https://qrcodemonster.art/). An additional part demonstrates how to run quantization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.

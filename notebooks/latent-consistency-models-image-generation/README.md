@@ -1,7 +1,5 @@
 # Image generation with Latent Consistency Model and OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/latent-consistency-models-image-generation/README.md" />
-
 LCMs: The next generation of generative models after Latent Diffusion Models (LDMs).
 Latent Diffusion models (LDMs) have achieved remarkable results in synthesizing high-resolution images. However, the iterative sampling is computationally intensive and leads to slow generation.
 

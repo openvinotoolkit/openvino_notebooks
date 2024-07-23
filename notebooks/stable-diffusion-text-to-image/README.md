@@ -1,7 +1,5 @@
 # Image Generation with Stable Diffusion
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/stable-diffusion-text-to-image/README.md" />
-
 This notebook demonstrates how to use a **[Stable Diffusion](https://huggingface.co/CompVis/stable-diffusion)** model for image generation with OpenVINO.
 It considers two approaches of image generation using an AI method called `diffusion`:
 

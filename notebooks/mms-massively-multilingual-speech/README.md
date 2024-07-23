@@ -1,7 +1,5 @@
 # MMS: Scaling Speech Technology to 1000+ languages with OpenVINO™
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/mms-massively-multilingual-speech/README.md" />
-
 The Massively Multilingual Speech (MMS) project expands speech technology from about 100 languages to over 1,000 by building a single multilingual speech recognition model supporting over 1,100 languages (more than 10 times as many as before), language identification models able to identify over 4,000 languages (40 times more than before), pretrained models supporting over 1,400 languages, and text-to-speech models for over 1,100 languages.
 The MMS model was proposed in [Scaling Speech Technology to 1,000+ Languages](https://arxiv.org/abs/2305.13516).  The models and code are originally released [here](https://github.com/facebookresearch/fairseq/tree/main/examples/mms).
 There are the different models open sourced in the MMS project: Automatic Speech Recognition (ASR), Language Identification (LID) and Speech Synthesis (TTS).

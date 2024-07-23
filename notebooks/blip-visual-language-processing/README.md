@@ -1,6 +1,4 @@
 # Visual Question Answering and Image Captioning using BLIP and OpenVINO
-
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/blip-visual-language-processing/README.md" />
 [BLIP](https://arxiv.org/abs/2201.12086) is a pre-training framework for unified vision-language understanding and generation, which achieves state-of-the-art results on a wide range of vision-language tasks.
 This tutorial considers ways to use BLIP for visual question answering and image captioning.
 

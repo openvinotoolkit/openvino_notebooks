@@ -1,7 +1,5 @@
 # PyTorch to OpenVINO™ IR Tutorial
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/pytorch-to-openvino/README.md" />
-
 This tutorial demonstrates how to convert PyTorch models to OpenVINO Intermediate Representation (IR) format.
 
 ## Notebook Contents

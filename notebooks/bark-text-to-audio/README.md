@@ -1,7 +1,5 @@
 # Text-to-Speech generation with BARK and OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/bark-text-to-audio/README.md" />
-
 ![bark_generated.png](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/9a770279-0045-480e-95f2-1a2f2d0a5115)
 
 *image generated using [Stable Diffusion XL notebook](../stable-diffusion-xl/)*

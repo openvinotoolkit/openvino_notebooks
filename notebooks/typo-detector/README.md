@@ -1,7 +1,5 @@
 # Convert and Optimize Typo Detector with OpenVINO™
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/typo-detector/README.md" />
-
 Typo detection in AI is a process of identifying and correcting typographical errors in text data using machine learning algorithms. The goal of typo detection is to improve the accuracy, readability, and usability of text by identifying and correcting mistakes made during the writing process.
 
 A typo detector takes a sentence as an input and identify all typographical errors such as misspellings and homophone errors.

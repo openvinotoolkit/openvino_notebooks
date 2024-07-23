@@ -1,7 +1,5 @@
 # Cross-lingual Books Alignment With Transformers and OpenVINO™
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/cross-lingual-books-alignment/README.md" />
-
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eaidova/openvino_notebooks_binder.git/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fopenvinotoolkit%252Fopenvino_notebooks%26urlpath%3Dtree%252Fopenvino_notebooks%252Fnotebooks%2Fcross-lingual-books-alignment%2Fcross-lingual-books-alignment.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb)
 
 Cross-lingual text alignment is the task of matching sentences in a pair of texts that are translations of each other. In this notebook, you'll learn how to use a deep learning model to create a parallel book in English and German

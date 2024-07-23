@@ -1,7 +1,5 @@
 # CLIP model with Jina CLIP and OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/jina-clip/README.md" />
-
 This tutorial will show how to run CLIP model pipeline with [jina-clip-v1](https://huggingface.co/jinaai/jina-clip-v1) model and OpenVINO.
 
 ## Notebook Contents

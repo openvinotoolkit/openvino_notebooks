@@ -1,7 +1,5 @@
 # Live Action Recognition with OpenVINO™
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/action-recognition-webcam/README.md" />
-
 <p align="center" width="100%">
     <img width="80%" src="https://user-images.githubusercontent.com/10940214/151552326-642d6e49-f5a0-4fc1-bf14-ae3f457e1fec.gif">
 </p>

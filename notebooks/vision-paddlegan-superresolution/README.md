@@ -1,7 +1,5 @@
 # Super Resolution with PaddleGAN and OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/vision-paddlegan-superresolution/README.md" />
-
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb)
 
 This notebook demonstrates converting the RealSR (real-world super-resolution) model from [PaddlePaddle/PaddleGAN](https://github.com/PaddlePaddle/PaddleGAN) to OpenVINO Intermediate Representation (OpenVINO IR) format, and shows inference results on both the PaddleGAN and OpenVINO IR models. 

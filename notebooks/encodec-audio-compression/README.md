@@ -1,7 +1,5 @@
 # Audio compression with EnCodec and OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/encodec-audio-compression/README.md" />
-
 Compression is an important part of the Internet today because it enables people to easily share high-quality photos, listen to audio messages, stream their favorite shows, and so much more. Even when using today’s state-of-the-art techniques, enjoying these rich multimedia experiences requires a high speed Internet connection and plenty of storage space. AI helps to overcome these limitations: "Imagine listening to a friend’s audio message in an area with low connectivity and not having it stall or glitch."
 
 In this tutorial, we consider how to use OpenVINO and EnCodec algorithm for hyper compression of audio.

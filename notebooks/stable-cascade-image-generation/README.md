@@ -1,7 +1,5 @@
 # Image generation with StableCascade and OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/stable-cascade-image-generation/README.md" />
-
 <img src="https://huggingface.co/stabilityai/stable-cascade/resolve/main/figures/collage_1.jpg" />
 
 [Stable Cascade](https://huggingface.co/stabilityai/stable-cascade) is built upon the [Würstchen](https://openreview.net/forum?id=gU58d5QeGv) architecture and its main difference to other models like Stable Diffusion is that it is working at a much smaller latent space. Why is this important? The smaller the latent space, the faster you can run inference and the cheaper the training becomes. How small is the latent space? Stable Diffusion uses a compression factor of 8, resulting in a 1024x1024 image being encoded to 128x128. Stable Cascade achieves a compression factor of 42, meaning that it is possible to encode a 1024x1024 image to 24x24, while maintaining crisp reconstructions. The text-conditional model is then trained in the highly compressed latent space.

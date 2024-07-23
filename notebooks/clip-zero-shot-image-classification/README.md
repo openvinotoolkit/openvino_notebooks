@@ -1,6 +1,4 @@
 # Zero-shot Image Classification with OpenAI CLIP
-
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/clip-zero-shot-image-classification/README.md" />
 Zero-shot image classification is a computer vision task to classify images into one of several classes, without any prior training or knowledge of the classes.
 
 ![zero-shot-pipeline](https://user-images.githubusercontent.com/29454499/207773481-d77cacf8-6cdc-4765-a31b-a1669476d620.png)

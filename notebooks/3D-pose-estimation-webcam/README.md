@@ -1,7 +1,5 @@
 # 3D Human Pose Estimation with OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/3D-pose-estimation-webcam/README.md" />
-
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks.git/main?labpath=notebooks%2F3D-pose-estimation-webcam%2F3D-pose-estimation.ipynb)
 
 *Binder is a free service where the webcam will not work, and performance on the video will not be good. For best performance, it is recommended to install the notebooks locally.*

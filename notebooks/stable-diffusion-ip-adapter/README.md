@@ -1,7 +1,5 @@
 # Image Generation with Stable Diffusion and IP-Adapter
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/stable-diffusion-ip-adapter/README.md" />
-
 [IP-Adapter](https://hf.co/papers/2308.06721) is an effective and lightweight adapter that adds image prompting capabilities to a diffusion model. This adapter works by decoupling the cross-attention layers of the image and text features. All the other model components are frozen and only the embedded image features in the UNet are trained. As a result, IP-Adapter files are typically only ~100MBs.
 ![ip-adapter-pipe.png](https://huggingface.co/h94/IP-Adapter/resolve/main/fig1.png)
 

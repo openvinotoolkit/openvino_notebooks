@@ -1,6 +1,4 @@
 # Visual Content Search using MobileCLIP and OpenVINO™
-
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/mobileclip-video-search/README.md" />
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/mobileclip-video-search/mobileclip-video-search.ipynb)
 
 ![example.png](https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/4e241f82-548e-41c2-b1f4-45b319d3e519)

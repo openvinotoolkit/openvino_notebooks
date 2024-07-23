@@ -1,7 +1,5 @@
 # Text-to-Image Generation with ControlNet Conditioning
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/controlnet-stable-diffusion/README.md" />
-
 Diffusion models make a revolution in AI generated art. This technology enables creation of high-quality images simply by writing a text prompt. Despite the fact that this technology gives very promising results, the diffusion process, in first order, is a process of generation of images from random noise and text conditions, which do not always clarify how the desired content should look like, which forms it should have and where it is located in relation to other objects on the image. The researches have been looking for ways to have more control over the results of the generation process. ControlNet provides a minimal interface, which enables users to customize the generation process up to a great extent.
 
 ControlNet was introduced in [Adding Conditional Control to Text-to-Image Diffusion Models](https://arxiv.org/abs/2302.05543) paper. It provides a framework that enables support for various spatial contexts such as a depth map, a segmentation map, a scribble, key points that can serve as additional conditionings to Diffusion models such as Stable Diffusion.

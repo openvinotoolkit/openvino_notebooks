@@ -1,7 +1,5 @@
 # Object segmentations with EfficientSAM and OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/efficient-sam/README.md" />
-
 Segment Anything Model (SAM) has emerged as a powerful tool for numerous vision applications. A key component that drives the impressive performance for zero-shot transfer and high versatility is a super large Transformer model trained on the extensive high-quality SA-1B dataset. While beneficial, the huge computation cost of SAM model has limited its applications to wider real-world applications. To address this limitation, EfficientSAMs, light-weight SAM models that exhibit decent performance with largely reduced complexity, were proposed. The idea behind EfficientSAM is based on leveraging masked image pretraining, SAMI, which learns to reconstruct features from SAM image encoder for effective visual representation learning.
 
 ![overview.png](https://yformer.github.io/efficient-sam/EfficientSAM_files/overview.png)

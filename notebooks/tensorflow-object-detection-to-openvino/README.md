@@ -1,7 +1,5 @@
 # Convert TensorFlow Object Detection and Instance Segmentation Models to OpenVINO™ 
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/tensorflow-object-detection-to-openvino/README.md" />
-
 This tutorial explains how to convert [TensorFlow Object Detection](https://github.com/tensorflow/models/tree/master/research/object_detection) models to OpenVINO IR.
 
 ## Object Detection

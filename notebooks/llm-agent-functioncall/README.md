@@ -1,7 +1,5 @@
 # Create a Function-calling Agent using OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/llm-agent-functioncall/README.md" />
-
 LLM are limited to the knowledge on which they have been trained and the additional knowledge provided as context, as a result, if a useful piece of information is missing the provided knowledge, the model cannot “go around” and try to find it in other sources. This is the reason why we need to introduce the concept of Agents.
 
 The core idea of agents is to use a language model to choose a sequence of actions to take. In agents, a language model is used as a reasoning engine to determine which actions to take and in which order. Agents can be seen as applications powered by LLMs and integrated with a set of tools like search engines, databases, websites, and so on. Within an agent, the LLM is the reasoning engine that, based on the user input, is able to plan and execute a set of actions that are needed to fulfill the request.

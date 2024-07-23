@@ -1,7 +1,5 @@
 # Text-to-video generation with ZeroScope and OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/zeroscope-text2video/README.md" />
-
 |Darth Vader is surfing on waves|
 | :---: |
 |![](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/darthvader_cerpense.gif)|

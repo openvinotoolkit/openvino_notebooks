@@ -1,6 +1,4 @@
 # Video Subtitle Generation with OpenAI Whisper
-
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/whisper-subtitles-generation/README.md" />
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/whisper-subtitles-generation/whisper-subtitles-generation.ipynb)
 [Whisper](https://openai.com/index/whisper/) is a general-purpose speech recognition model from [OpenAI](https://openai.com). The model is able to almost flawlessly transcribe speech across dozens of languages and even handle poor audio quality or excessive background noise.
 This notebook will run the model with OpenVINO to generate transcription of a video.

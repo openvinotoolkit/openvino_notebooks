@@ -1,7 +1,5 @@
 # Post-Training Quantization of PyTorch models with NNCF
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/pytorch-post-training-quantization-nncf/README.md" />
-
 This tutorial demonstrates how to use [NNCF](https://github.com/openvinotoolkit/nncf) 8-bit quantization in
 post-training mode (without the fine-tuning pipeline) to optimize a [PyTorch](https://pytorch.org/) model
 for high-speed inference via [OpenVINO Toolkit](https://docs.openvino.ai/). For more advanced NNCF

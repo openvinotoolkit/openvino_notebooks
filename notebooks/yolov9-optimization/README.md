@@ -1,7 +1,5 @@
 # Convert and Optimize YOLOv9 with OpenVINO™
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/yolov9-optimization/README.md" />
-
 <p align="center">
     <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/ae3a7653-eead-4c41-9cad-a7c95d3a4578"/>
 </p>

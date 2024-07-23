@@ -1,7 +1,5 @@
 # Person Counting System using YOLOv8 and OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/person-counting-webcam/README.md" />
-
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/person-counting-webcam/person-counting.ipynb)
 
 In this project, we utilized the YOLOv8 Object Counting class to develop a real-time person counting system using the YOLOv8 object detection model and tracking, optimized for Intel's OpenVINO toolkit to enhance inferencing speed. This system effectively monitors the number of individuals entering and exiting a room, leveraging the optimized YOLOv8 model for accurate person detection under varied conditions.

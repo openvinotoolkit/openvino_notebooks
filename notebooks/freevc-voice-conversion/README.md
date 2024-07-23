@@ -1,6 +1,4 @@
 # High-Quality Text-Free One-Shot Voice Conversion with FreeVC and OpenVINO™
-
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/freevc-voice-conversion/README.md" />
 [FreeVC](https://github.com/OlaWod/FreeVC) allows alter the voice of a source speaker to a target style, 
 while keeping the linguistic content unchanged, without text annotation.
 

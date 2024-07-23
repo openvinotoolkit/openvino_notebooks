@@ -1,6 +1,4 @@
 # Image generation with Würstchen and OpenVINO
-
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/wuerstchen-image-generation/README.md" />
 | Anthropomorphic cat dressed as a fire fighter |
 | --- |
 | <img src="https://github.com/itrushkin/openvino_notebooks/assets/76161256/6917c558-d74c-4cc9-b81a-679ce0a299ee" /> |

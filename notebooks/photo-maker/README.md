@@ -1,7 +1,5 @@
 # Text-to-image generation using PhotoMaker and OpenVINO
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/photo-maker/README.md" />
-
 PhotoMaker is an efficient personalized text-to-image generation method, which mainly encodes an arbitrary number of input ID images into a stack ID embedding for preserving ID information. Such an embedding, serving as a unified ID representation, can not only encapsulate the characteristics of the same input ID comprehensively, but also accommodate the characteristics of different IDs for subsequent integration. This paves the way for more intriguing and practically valuable applications. Users can input one or a few face photos, along with a text prompt, to receive a customized photo or painting (no training required!). Additionally, this model can be adapted to any base model based on `SDXL` or used in conjunction with other `LoRA` modules.More details about PhotoMaker can be found in the [technical report](https://arxiv.org/pdf/2312.04461.pdf).
 
 The notebook provides a simple interface that allows communication with a model using text instruction. In this demonstration user can provide input instructions and the model generates an image. 

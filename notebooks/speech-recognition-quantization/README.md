@@ -1,6 +1,4 @@
 # Quantize Speech Recognition Models using NNCF PTQ API
-
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/speech-recognition-quantization/README.md" />
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb)
 
 This tutorial demonstrates how to apply `INT8` quantization to the speech recognition models,

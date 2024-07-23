@@ -1,6 +1,4 @@
 # Accelerate Inference of Sparse Transformer Models with OpenVINO™ and 4th Gen Intel&reg; Xeon&reg; Scalable Processors
-
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/sparsity-optimization/README.md" />
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/sparsity-optimization/sparsity-optimization.ipynb)
 
 This tutorial demonstrates how to improve performance of sparse Transformer models with [OpenVINO](https://docs.openvino.ai/) on 4th Gen Intel&reg; Xeon&reg; Scalable processors. It uses a pre-trained model from the [Hugging Face Transformers](https://huggingface.co/docs/transformers/index) library and shows how to convert it to the OpenVINO™ IR format and run inference on a CPU, using a dedicated runtime option that enables sparsity optimizations. It also demonstrates how to get more performance stacking sparsity with 8-bit quantization. To simplify the user experience, the [Hugging Face Optimum](https://huggingface.co/docs/optimum) library is used to convert the model to the OpenVINO™ IR format and quantize it using [Neural Network Compression Framework](https://github.com/openvinotoolkit/nncf).
