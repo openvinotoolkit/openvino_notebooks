@@ -37,3 +37,5 @@ JupyterLab v...
     jupyter-threejs v... enabled OK
 ```
 
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/3D-pose-estimation-webcam/README.md" />
