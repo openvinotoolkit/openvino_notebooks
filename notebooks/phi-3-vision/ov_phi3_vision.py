@@ -1,6 +1,6 @@
 from pathlib import Path
 import types
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, List
 import gc
 import openvino as ov
 from openvino.runtime import opset13
