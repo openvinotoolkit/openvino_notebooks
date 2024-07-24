@@ -558,6 +558,8 @@
   skips:
     - python:
         - '3.8'
+    - os:
+      - macos-12
 - notebook: notebooks/phi-3-vision/phi-3-vision.ipynb
   skips:
       - os:
