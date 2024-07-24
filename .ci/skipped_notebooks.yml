@@ -335,13 +335,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/stable-zephyr-3b-chatbot/stable-zephyr-3b-chatbot.ipynb
-  skips:
-    - os:
-        - macos-12
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/llm-question-answering/llm-question-answering.ipynb
   skips:
     - os:

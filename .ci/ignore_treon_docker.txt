@@ -45,7 +45,6 @@ notebooks/film-slowmo/film-slowmo.ipynb
 notebooks/sound-generation-audioldm2/sound-generation-audioldm2.ipynb
 notebooks/sdxl-turbo/sdxl-turbo.ipynb
 notebooks/paint-by-example/paint-by-example.ipynb
-notebooks/stable-zephyr-3b-chatbot/stable-zephyr-3b-chatbot.ipynb
 notebooks/llm-question-answering/llm-question-answering.ipynb
 notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.ipynb
 notebooks/stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb
