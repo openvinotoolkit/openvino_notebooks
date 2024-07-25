@@ -28,7 +28,7 @@ from openvino.runtime import opset10 as ops
 # In[ ]:
 
 
-def device_widget(default="AUTO", exclude=None):
+def device_widget(default="AUTO", exclude=None, added=None):
     import openvino as ov
     import ipywidgets as widgets
 
@@ -40,6 +40,12 @@ def device_widget(default="AUTO", exclude=None):
         for ex_device in exclude:
             if ex_device in supported_devices:
                 supported_devices.remove(ex_device)
+
+    added = added or []
+    if added:
+        for add_device in added:
+            if add_device not in supported_devices:
+                supported_devices.append(add_device)
 
     device = widgets.Dropdown(
         options=supported_devices,
