@@ -31,13 +31,9 @@ export function addAnalyticsScript(): void {
 enum COMPONENT {
   NAVIGATE = 'ov-notebooks:navigate',
   COPY_LINK = 'ov-notebooks:copy-link',
-  // SHOW_STATUS = 'ov-notebooks:show-status',
-  // FILTER = 'ov-notebooks:filter',
 }
 
-interface AdobeTrackFn {
-  (componentName: COMPONENT, value: string): void;
-}
+type AdobeTrackFn = (componentName: COMPONENT, label: string, detail?: string) => void;
 
 function getAdobeAnalyticsFunction(window: Window): AdobeTrackFn | null {
   if (typeof window.wap_tms?.custom?.trackComponentClick !== 'function') {
@@ -59,7 +55,7 @@ class Analytics {
     this._window = window;
   }
 
-  private _send = (component: COMPONENT, value: string) => {
+  private _send: AdobeTrackFn = (component, label, detail) => {
     if (!this._window) {
       this._consoleNotification.notInitialized();
       return;
@@ -67,7 +63,7 @@ class Analytics {
 
     if (import.meta.env.DEV) {
       this._consoleNotification.devMode();
-      console.log(`[Analytics] Component: ${component}. Value: ${value}.`);
+      console.log(`[Analytics] Component: ${component}\n\tLabel: ${label}\n\tDetail: ${detail}`);
     }
 
     const adobeSend = getAdobeAnalyticsFunction(this._window);
@@ -78,14 +74,14 @@ class Analytics {
     }
 
     try {
-      adobeSend(component, value);
+      adobeSend(component, label, detail);
     } catch (e) {
       console.error(e);
     }
   };
 
-  sendNavigateEvent(destination: string): void {
-    this._send(COMPONENT.NAVIGATE, `${destination}`);
+  sendNavigateEvent(notebookPath: string, url: string): void {
+    this._send(COMPONENT.NAVIGATE, notebookPath, url);
   }
 
   sendCopyLinkEvent(notebookPath: string): void {

@@ -26,11 +26,11 @@ const htmlToText = (value: string): string => {
   return div.textContent || value;
 };
 
-const openNotebookInDocs = ({ links }: INotebookMetadata) => {
+const openNotebookInDocs = ({ links, path }: INotebookMetadata) => {
   if (!links.docs) {
     return;
   }
-  analytics.sendNavigateEvent(links.docs);
+  analytics.sendNavigateEvent(path, links.docs);
   window.open(links.docs, isEmbedded ? '_parent' : '_blank');
 };
 
@@ -102,7 +102,7 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
                 icon={GitHubIcon}
                 href={item.links.github}
                 onClick={() => {
-                  analytics.sendNavigateEvent(item.links.github);
+                  analytics.sendNavigateEvent(item.path, item.links.github);
                 }}
               ></Button>
               {item.links.colab && (
@@ -114,7 +114,7 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
                   icon={ColabIcon}
                   href={item.links.colab}
                   onClick={() => {
-                    analytics.sendNavigateEvent(item.links.colab!);
+                    analytics.sendNavigateEvent(item.path, item.links.colab!);
                   }}
                 ></Button>
               )}
@@ -127,7 +127,7 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
                   icon={BinderIcon}
                   href={item.links.binder}
                   onClick={() => {
-                    analytics.sendNavigateEvent(item.links.binder!);
+                    analytics.sendNavigateEvent(item.path, item.links.binder!);
                   }}
                 ></Button>
               )}
