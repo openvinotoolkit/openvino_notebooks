@@ -536,3 +536,94 @@ def get_optimum_cli_command(model_id, weight_format, output_dir, compression_opt
 
     command += " {}".format(output_dir)
     return command
+
+default_language = 'English'
+
+SUPPORTED_OPTIMIZATIONS = ["INT4", "INT4-AWQ", "INT8", "FP16"]
+
+def get_llm_selection_widget():
+    import ipywidgets as widgets
+    lang_drop_down = widgets.Dropdown(options=list(SUPPORTED_LLM_MODELS))
+
+    # Define dependent drop down
+
+    model_drop_down = widgets.Dropdown(options=(SUPPORTED_LLM_MODELS[default_language]))
+
+    def dropdown_handler(change):
+        global default_language
+        default_language = change.new
+        # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
+        model_drop_down.options=SUPPORTED_LLM_MODELS[change.new]
+    lang_drop_down.observe(dropdown_handler, names='value')
+    compression_drop_down = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS)
+
+    form_items = [         
+    widgets.Box([widgets.Label(value='Language:'), lang_drop_down]),
+    widgets.Box([widgets.Label(value='Model:'), model_drop_down]),
+    widgets.Box([widgets.Label(value='Compression:'), compression_drop_down])
+    ]
+    
+    form = widgets.Box(form_items, layout=widgets.Layout(
+    display='flex',
+    flex_flow='column',
+    border='solid 1px',
+    align_items='stretch',
+    width='30%',
+    padding = '1%'))
+    return form, lang_drop_down, model_drop_down, compression_drop_down
+
+def convert_tokenizer(model_id, remote_code, model_dir):
+    import openvino as ov
+    from transformers import AutoTokenizer
+    from openvino_tokenizers import convert_tokenizer
+
+    hf_tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=remote_code)
+    ov_tokenizer, ov_detokenizer = convert_tokenizer(hf_tokenizer, with_detokenizer=True)
+    ov.save_model(ov_tokenizer, model_dir / "openvino_tokenizer.xml")
+    ov.save_model(ov_detokenizer, model_dir / "openvino_detokenizer.xml")
+
+
+def convert_and_compress_model(model_id, model_config, precision):
+    from pathlib import Path
+    from IPython.display import Markdown, display
+    import subprocess
+    import platform
+
+    pt_model_id = model_config["model_id"]
+    pt_model_name = model_id.split("-")[0]
+    model_subdir = precision if precision == "FP16" else precision + "_compressed_weights"
+    model_dir = Path(pt_model_name) / model_subdir
+    remote_code = model_config.get("remote_code", False)
+    if (model_dir / "openvino_model.xml").exists():
+        print(f"✅ {precision} {model_id} model already converted and can be found in {model_dir}")
+
+        if not (model_dir / "openvino_tokenizer.xml").exists() or not (model_dir / "openvino_detokenizer.xml").exists():
+            convert_tokenizer(pt_model_id, remote_code, model_dir)
+        return model_dir
+    model_compression_params = {}
+    if "INT4" in precision:
+        model_compression_params = compression_configs.get(model_id, compression_configs["default"])
+    weight_format = precision.split("-")[0].lower()
+    optimum_cli_command = get_optimum_cli_command(pt_model_id, weight_format, model_dir, model_compression_params, "AWQ" in precision, remote_code)
+    print(f"⌛ {model_id} conversion to {precision} started. It may takes some time.")
+    display(Markdown("**Export command:**"))
+    display(Markdown(f"`{optimum_cli_command}`"))
+    subprocess.run(optimum_cli_command.split(" "), shell=(platform.system() == "Windows"), check=True)
+    print(f"✅ {precision} {model_id} model converted and can be found in {model_dir}")
+    return model_dir
+
+    
+def compare_model_size(model_dir):
+    
+    fp16_weights = model_dir.parent / "FP16" / "openvino_model.bin"
+    int8_weights = model_dir.parent / "INT8_compressed_weights" / "openvino_model.bin"
+    int4_weights = model_dir.parent / "INT4_compressed_weights" / "openvino_model.bin"
+    int4_awq_weights = model_dir.parent / "INT4-AWQ_compressed_weights" / "openvino_model.bin"
+
+    if fp16_weights.exists():
+        print(f"Size of FP16 model is {fp16_weights.stat().st_size / 1024 / 1024:.2f} MB")
+    for precision, compressed_weights in zip(["INT8", "INT4", "INT4-AWQ"], [int8_weights, int4_weights, int4_awq_weights]):
+        if compressed_weights.exists():
+            print(f"Size of model with {precision} compressed weights is {compressed_weights.stat().st_size / 1024 / 1024:.2f} MB")
+        if compressed_weights.exists() and fp16_weights.exists():
+            print(f"Compression rate for {precision} model: {fp16_weights.stat().st_size / compressed_weights.stat().st_size:.3f}")
