@@ -185,8 +185,10 @@ def get_openvino_version() -> str:
             if line.startswith('openvino '):
                 version = line.split()[1]
                 return version
+        print("Openvino is missing in validation environment.")
         return "No version detected"
     except Exception as e:
+        print(f"ERROR: Exception during package version discovery: {e}")
         return f"Error: {e}"
 
 
