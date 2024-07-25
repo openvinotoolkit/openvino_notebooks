@@ -1,0 +1,30 @@
+footer {
+  .footer-container {
+    display: flex;
+
+    padding-right: 1rem;
+    padding-left: 1rem;
+    background-color: var(--spark-color-theme-light-gray200);
+    border-top: 1px solid var(--spark-color-theme-light-gray400);
+    font-size: var(--spark-font-size-50);
+  }
+
+  .footer-list {
+    list-style-type: none;
+    display: inline-flex;
+    gap: 2rem;
+  }
+
+  a {
+    color: var(--spark-color-classic-blue);
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  #wap_dns,
+  #wap_nac {
+    display: none;
+  }
+}
