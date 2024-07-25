@@ -177,13 +177,17 @@ def clean_test_artifacts(before_test_files: List[Path], after_test_files: List[P
 
 def get_openvino_version() -> str:
     try:
-        import openvino as ov
-
-        version = ov.get_version()
-    except ImportError:
-        print("Openvino is missing in validation environment.")
-        version = "Openvino is missing"
-    return version
+        reqs = subprocess.check_output(
+            [sys.executable, "-m", "pip", "list"],
+            shell=(platform.system() == "Windows"),
+        ).decode('utf-8')
+        for line in reqs.split('\n'):
+            if line.startswith('openvino '):
+                version = line.split()[1]
+                return version
+        return "No version detected"
+    except Exception as e:
+        return f"Error: {e}"
 
 
 def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[Tuple[str, int, float, str, str]]:
