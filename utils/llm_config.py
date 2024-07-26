@@ -146,7 +146,31 @@ SUPPORTED_LLM_MODELS = {
             "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
-            "stop_tokens": ["<|eot_id|>"],
+            "stop_tokens": ["<|eot_id|>", "<|end_of_text|>"],
+            "has_chat_template": True,
+            "start_message": " <|start_header_id|>system<|end_header_id|>\n\n" + DEFAULT_SYSTEM_PROMPT + "<|eot_id|>",
+            "history_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>",
+            "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
+            "rag_prompt_template": f"<|start_header_id|>system<|end_header_id|>\n\n{DEFAULT_RAG_PROMPT}<|eot_id|>"
+            + """<|start_header_id|>user<|end_header_id|>
+            
+            
+            Question: {input}
+            Context: {context}
+            Answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+            
+            """,
+        },
+        "llama-3.1-8b-instruct": {
+            "model_id": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|eot_id|>", "<|end_of_text|>"],
+            "has_chat_template": True,
+            "start_message": " <|start_header_id|>system<|end_header_id|>\n\n" + DEFAULT_SYSTEM_PROMPT + "<|eot_id|>",
+            "history_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>",
+            "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
             "rag_prompt_template": f"<|start_header_id|>system<|end_header_id|>\n\n{DEFAULT_RAG_PROMPT}<|eot_id|>"
             + """<|start_header_id|>user<|end_header_id|>
             
@@ -399,6 +423,11 @@ SUPPORTED_EMBEDDING_MODELS = {
             "mean_pooling": False,
             "normalize_embeddings": True,
         },
+        "bge-m3": {
+            "model_id": "BAAI/bge-m3",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
     },
     "Chinese": {
         "bge-small-zh-v1.5": {
@@ -411,11 +440,99 @@ SUPPORTED_EMBEDDING_MODELS = {
             "mean_pooling": False,
             "normalize_embeddings": True,
         },
+        "bge-m3": {
+            "model_id": "BAAI/bge-m3",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
     },
 }
 
 
 SUPPORTED_RERANK_MODELS = {
+    "bge-reranker-v2-m3": {"model_id": "BAAI/bge-reranker-v2-m3"},
     "bge-reranker-large": {"model_id": "BAAI/bge-reranker-large"},
     "bge-reranker-base": {"model_id": "BAAI/bge-reranker-base"},
 }
+
+compression_configs = {
+    "zephyr-7b-beta": {
+        "sym": True,
+        "group_size": 64,
+        "ratio": 0.6,
+    },
+    "mistral-7b": {
+        "sym": True,
+        "group_size": 64,
+        "ratio": 0.6,
+    },
+    "minicpm-2b-dpo": {
+        "sym": True,
+        "group_size": 64,
+        "ratio": 0.6,
+    },
+    "gemma-2b-it": {
+        "sym": True,
+        "group_size": 64,
+        "ratio": 0.6,
+    },
+    "notus-7b-v1": {
+        "sym": True,
+        "group_size": 64,
+        "ratio": 0.6,
+    },
+    "neural-chat-7b-v3-1": {
+        "sym": True,
+        "group_size": 64,
+        "ratio": 0.6,
+    },
+    "llama-2-chat-7b": {
+        "sym": True,
+        "group_size": 128,
+        "ratio": 0.8,
+    },
+    "llama-3-8b-instruct": {
+        "sym": True,
+        "group_size": 128,
+        "ratio": 0.8,
+    },
+    "gemma-7b-it": {
+        "sym": True,
+        "group_size": 128,
+        "ratio": 0.8,
+    },
+    "chatglm2-6b": {
+        "sym": True,
+        "group_size": 128,
+        "ratio": 0.72,
+    },
+    "qwen-7b-chat": {"sym": True, "group_size": 128, "ratio": 0.6},
+    "red-pajama-3b-chat": {
+        "sym": False,
+        "group_size": 128,
+        "ratio": 0.5,
+    },
+    "default": {
+        "sym": False,
+        "group_size": 128,
+        "ratio": 0.8,
+    },
+}
+
+
+def get_optimum_cli_command(model_id, weight_format, output_dir, compression_options=None, enable_awq=False, trust_remote_code=False):
+    base_command = "optimum-cli export openvino --model {} --task text-generation-with-past --weight-format {}"
+    command = base_command.format(model_id, weight_format)
+    if compression_options:
+        compression_args = " --group-size {} --ratio {}".format(compression_options["group_size"], compression_options["ratio"])
+        if compression_options["sym"]:
+            compression_args += " --sym"
+        if enable_awq:
+            compression_args += " --awq --dataset wikitext2 --num-samples 128"
+
+        command = command + compression_args
+    if trust_remote_code:
+        command += "  --trust-remote-code"
+
+    command += " {}".format(output_dir)
+    return command

@@ -8,8 +8,6 @@ The core idea of agents is to use a language model to choose a sequence of actio
 
 This notebook explores how to create an ReAct Agent step by step using OpenVINO. [ReAct](https://arxiv.org/abs/2210.03629) is an approach to combine reasoning (e.g. chain-of-thought prompting) and acting. ReAct overcomes issues of hallucination and error propagation prevalent in chain-of-thought reasoning by interacting with a simple Wikipedia API, and generates human-like task-solving trajectories that are more interpretable than baselines without reasoning traces. 
 
-LLM models can be run locally through the `HuggingFacePipeline` class in LangChain. To deploy a model with OpenVINO, you can specify the `backend="openvino"` parameter to trigger OpenVINO as backend inference framework. For [more information](https://python.langchain.com/docs/integrations/llms/openvino/).
-
 
 ### Notebook Contents
 
@@ -33,3 +31,5 @@ The tutorial consists of the following steps:
 This is a self-contained example that relies solely on its own code.</br>
 We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/llm-agent-react/README.md" />

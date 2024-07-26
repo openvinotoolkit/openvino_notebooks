@@ -194,3 +194,5 @@ jupyter lab notebooks
 ---
 
 \*其他名称和品牌可能被视为他人的财产。
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=README_cn.md" />

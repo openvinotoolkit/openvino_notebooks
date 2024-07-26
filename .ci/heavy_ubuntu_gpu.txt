@@ -1,4 +1,3 @@
-notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb
 notebooks/distil-whisper-asr/distil-whisper-asr.ipynb
 notebooks/film-slowmo/film-slowmo.ipynb
 notebooks/grounded-segment-anything/grounded-segment-anything.ipynb
