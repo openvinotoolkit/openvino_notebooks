@@ -179,9 +179,9 @@ def get_base_openvino_version() -> str:
     try:
         import openvino as ov
         version = ov.get_version()
-        print(f"Openvino version in environment before tests started: {version}")
+        print(f"OpenVINO version in environment before tests started: {version}")
     except ImportError:
-        print("Openvino is missing in validation environment.")
+        print("OpenVINO is missing in validation environment.")
         version = "Openvino is missing"
     return version
 
@@ -192,7 +192,7 @@ def get_pip_openvino_version(text_input: str) -> str:
         version = metadata.version("openvino")
         print(f"{text_input}: {version}")
     except metadata.PackageNotFoundError:
-        print("Openvino is missing in validation environment.")
+        print("OpenVINO is missing in validation environment.")
         version = "Openvino is missing"
     return version
 
@@ -212,7 +212,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
     with cd(notebook_path.parent):
         files_before_test = sorted(Path(".").iterdir())
-        ov_version_before = get_pip_openvino_version("Before notebook execution")
+        ov_version_before = get_pip_openvino_version("OpenVINO before notebook execution")
         patched_notebook = Path(f"test_{notebook_path.name}")
         if not patched_notebook.exists():
             print(f'Patched notebook "{patched_notebook}" does not exist.')
@@ -231,7 +231,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         except subprocess.TimeoutExpired:
             retcode = -42
         duration = time.perf_counter() - start
-        ov_version_after = get_pip_openvino_version("After notebook execution")
+        ov_version_after = get_pip_openvino_version("OpenVINO after notebook execution")
         result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after)
 
         if not keep_artifacts:
