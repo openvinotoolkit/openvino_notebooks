@@ -184,6 +184,7 @@ def get_openvino_version() -> str:
         for line in reqs.split('\n'):
             if line.startswith('openvino '):
                 version = line.split()[1]
+                print(f"Openvino version detected: {version}")
                 return version
         print("Openvino is missing in validation environment.")
         return "No version detected"
