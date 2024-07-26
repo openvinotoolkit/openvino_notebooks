@@ -28,3 +28,5 @@ For details, please refer to [Installation Guide](../../README.md).
 
 * [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
 * [Hugging Face Optimum](https://huggingface.co/docs/optimum)
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/named-entity-recognition/README.md" />

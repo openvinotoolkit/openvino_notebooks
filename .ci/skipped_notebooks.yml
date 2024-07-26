@@ -335,13 +335,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/stable-zephyr-3b-chatbot/stable-zephyr-3b-chatbot.ipynb
-  skips:
-    - os:
-        - macos-12
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/llm-question-answering/llm-question-answering.ipynb
   skips:
     - os:
@@ -529,9 +522,40 @@
     - python:
         - '3.8'
         - '3.9'
+- notebook: notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb
+  skips:
+    - python:
+        - '3.8'
+        - '3.9'
 - notebook: notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
   skips:
     - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/stable-audio/stable-audio.ipynb
+  skips:
+    - python:
+        - '3.8'
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb
+  skips:
+    - python:
+      - '3.8'
+- notebook: notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb
+  skips:
+    - python:
+        - '3.8'
+    - os:
+      - macos-12
+- notebook: notebooks/phi-3-vision/phi-3-vision.ipynb
+  skips:
+      - os:
         - macos-12
         - ubuntu-20.04
         - ubuntu-22.04

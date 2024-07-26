@@ -13,3 +13,4 @@ Note that you need to [install a proper NPU driver](https://docs.openvino.ai/202
 ## Installation Instructions
 
 If you have not installed all required dependencies, follow the [Installation Guide](../../README.md).
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/hello-npu/README.md" />

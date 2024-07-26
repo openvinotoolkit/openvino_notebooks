@@ -66,7 +66,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         target="_blank"
         rel="noreferrer"
         aria-label={text}
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick?.();
+        }}
       >
         {buttonContent}
       </a>

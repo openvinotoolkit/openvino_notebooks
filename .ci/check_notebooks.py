@@ -1,7 +1,7 @@
 import sys
 import json
 from table_of_content import find_tc_in_cell
-from patch_notebooks import DEVICE_WIDGET
+from patch_notebooks import DEVICE_WIDGET, DEVICE_WIDGET_NEW
 from pathlib import Path
 
 NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
@@ -15,12 +15,13 @@ EXPECTED_NO_DEVICE = [
     Path("notebooks/openvino-tokenizers/openvino-tokenizers.ipynb"),  # cpu required for loading extensions
     Path("notebooks/sparsity-optimization/sparsity-optimization.ipynb"),  # cpu expected to be used
     Path("notebooks/s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb"),  # only cpu
+    Path("notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb"),  # device-agnostic
 ]
 
 
 def find_device_in_cell(cell):
     for line_idx, line in enumerate(cell["source"]):
-        if DEVICE_WIDGET in line:
+        if DEVICE_WIDGET in line or DEVICE_WIDGET_NEW in line:
             return line_idx
     return None
 

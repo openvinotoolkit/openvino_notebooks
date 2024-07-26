@@ -50,7 +50,6 @@ notebooks/film-slowmo/film-slowmo.ipynb
 notebooks/sound-generation-audioldm2/sound-generation-audioldm2.ipynb
 notebooks/sdxl-turbo/sdxl-turbo.ipynb
 notebooks/paint-by-example/paint-by-example.ipynb
-notebooks/stable-zephyr-3b-chatbot/stable-zephyr-3b-chatbot.ipynb
 notebooks/llm-question-answering/llm-question-answering.ipynb
 notebooks/instant-id/instant-id.ipynb
 notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
@@ -62,3 +61,4 @@ notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb
 notebooks/stable-diffusion-v3/stable-diffusion-v3.ipynb
 notebooks/llm-rag-llamaindex/llm-rag-llamaindex.ipynb
 notebooks/llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb
+notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb

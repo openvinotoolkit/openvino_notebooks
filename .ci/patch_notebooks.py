@@ -10,6 +10,7 @@ from traitlets.config import Config
 EXCLUDED_NOTEBOOKS = ["data-preparation-ct-scan.ipynb", "pytorch-monai-training.ipynb"]
 
 DEVICE_WIDGET = "device = widgets.Dropdown("
+DEVICE_WIDGET_NEW = "device = device_widget("
 
 
 def disable_gradio_debug(nb, notebook_path):
@@ -134,15 +135,20 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
             for cell in nb["cells"]:
                 if skip_ov_install and "%pip" in cell["source"]:
                     remove_ov_install(cell)
-                if test_device and DEVICE_WIDGET in cell["source"]:
+                if test_device and DEVICE_WIDGET in cell["source"] or DEVICE_WIDGET_NEW in cell["source"]:
                     device_found = True
-                    cell["source"] = re.sub(r"value=.*,", f"value='{test_device.upper()}',", cell["source"])
-                    cell["source"] = re.sub(
-                        r"options=",
-                        f"options=['{test_device.upper()}'] + ",
-                        cell["source"],
-                    )
-                    print(f"Replaced testing device to {test_device}")
+                    if not DEVICE_WIDGET_NEW in cell["source"]:
+                        cell["source"] = re.sub(r"value=.*,", f"value='{test_device.upper()}',", cell["source"])
+                        cell["source"] = re.sub(
+                            r"options=",
+                            f"options=['{test_device.upper()}'] + ",
+                            cell["source"],
+                        )
+                        print(f"Replaced testing device to {test_device}")
+                    else:
+                        cell["source"] = re.sub(
+                            r"device_widget\(.*\)", f"device_widget(default='{test_device.upper()}', added=['{test_device.upper()}'])", cell["source"]
+                        )
                 replace_dict = cell.get("metadata", {}).get("test_replace")
                 if replace_dict is not None:
                     found = True
