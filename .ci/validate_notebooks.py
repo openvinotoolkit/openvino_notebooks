@@ -193,7 +193,7 @@ def get_pip_openvino_version(text_input: str) -> str:
         print(f"{text_input}: {version}")
     except metadata.PackageNotFoundError:
         print("OpenVINO is missing in validation environment.")
-        version = "Openvino is missing"
+        version = "OpenVINO is missing"
     return version
 
 
