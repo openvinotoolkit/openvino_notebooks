@@ -179,6 +179,7 @@ def get_base_openvino_version() -> str:
     try:
         import openvino as ov
         version = ov.get_version()
+        print(f"Openvino version in environment before tests started: {version}")
     except ImportError:
         print("Openvino is missing in validation environment.")
         version = "Openvino is missing"
