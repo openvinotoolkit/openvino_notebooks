@@ -175,22 +175,25 @@ def clean_test_artifacts(before_test_files: List[Path], after_test_files: List[P
             shutil.rmtree(file_path, ignore_errors=True)
 
 
-def get_openvino_version() -> str:
+def get_base_openvino_version() -> str:
     try:
-        reqs = subprocess.check_output(
-            [sys.executable, "-m", "pip", "list"],
-            shell=(platform.system() == "Windows"),
-        ).decode('utf-8')
-        for line in reqs.split('\n'):
-            if line.startswith('openvino '):
-                version = line.split()[1]
-                print(f"Openvino version detected: {version}")
-                return version
+        import openvino as ov
+        version = ov.get_version()
+    except ImportError:
         print("Openvino is missing in validation environment.")
-        return "No version detected"
-    except Exception as e:
-        print(f"ERROR: Exception during package version discovery: {e}")
-        return f"Error: {e}"
+        version = "Openvino is missing"
+    return version
+
+
+def get_pip_openvino_version(text_input: str) -> str:
+    try:
+        from importlib.metadata import version
+        version = version("openvino")
+        print(f"{text_input}: {version}")
+    except PackageNotFoundError:
+        print("Openvino is missing in validation environment.")
+        version = "Openvino is missing"
+    return version
 
 
 def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[Tuple[str, int, float, str, str]]:
@@ -208,7 +211,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
     with cd(notebook_path.parent):
         files_before_test = sorted(Path(".").iterdir())
-        ov_version_before = get_openvino_version()
+        ov_version_before = get_pip_openvino_version("Before notebook execution")
         patched_notebook = Path(f"test_{notebook_path.name}")
         if not patched_notebook.exists():
             print(f'Patched notebook "{patched_notebook}" does not exist.')
@@ -227,7 +230,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         except subprocess.TimeoutExpired:
             retcode = -42
         duration = time.perf_counter() - start
-        ov_version_after = get_openvino_version()
+        ov_version_after = get_pip_openvino_version("After notebook execution")
         result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after)
 
         if not keep_artifacts:
@@ -315,7 +318,7 @@ def main():
     if args.keep_artifacts:
         keep_artifacts = True
 
-    base_version = get_openvino_version()
+    base_version = get_base_openvino_version()
 
     validation_config = ValidationConfig(os=args.os, python=args.python, device=args.device)
 
