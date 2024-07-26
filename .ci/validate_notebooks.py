@@ -178,6 +178,7 @@ def clean_test_artifacts(before_test_files: List[Path], after_test_files: List[P
 def get_base_openvino_version() -> str:
     try:
         import openvino as ov
+
         version = ov.get_version()
         print(f"OpenVINO version in environment before tests started: {version}")
     except ImportError:
@@ -189,6 +190,7 @@ def get_base_openvino_version() -> str:
 def get_pip_openvino_version(text_input: str) -> str:
     try:
         from importlib import metadata
+
         version = metadata.version("openvino")
         print(f"{text_input}: {version}")
     except metadata.PackageNotFoundError:
