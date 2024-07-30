@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -eo pipefail
+
+# Test that jupyterhub and ovmsclient imports work (required for image to work in RedHat cluster)
+python -c "from jupyterhub.singleuser.mixins import make_singleuser_app"
+python -c "import ovmsclient"
+
+# Required for PaddlePaddle
+export HUB_HOME=/tmp
+
+# Move notebooks for validation
+cp -R /opt/app-root/openvino_notebooks/notebooks /tmp/
+# Download CT scan image for 110 training notebook
+mkdir -p /tmp/notebooks/110-ct-segmentation-quantize/kits19
+cd /tmp/notebooks/110-ct-segmentation-quantize/kits19
+curl -O -C - https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
+unzip case_00030.zip
+mkdir kits19_frames
+mv case_00030 kits19_frames
+cp -r kits19_frames/case_00030 kits19_frames/case_00001
+
+cd "/tmp"
+# Patch notebooks to speed up test execution
+python /tmp/scripts/patch_notebooks.py /tmp/notebooks
+
+# Test notebooks
+python /tmp/scripts/validate_notebooks.py --ignore_list /tmp/scripts/ignore_treon_docker.txt --test_list /tmp/scripts/test_notebooks.txt
