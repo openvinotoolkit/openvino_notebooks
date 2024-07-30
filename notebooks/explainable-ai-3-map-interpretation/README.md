@@ -4,9 +4,9 @@
 
 This is the **third notebook** in series of exploring [OpenVINO™ Explainable AI (XAI)](https://github.com/openvinotoolkit/openvino_xai/):
 
-1. [OpenVINO™ Explainable AI Toolkit (1/3): Basic](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/explainable-ai-1-basic)
-2. [OpenVINO™ Explainable AI Toolkit (2/3): Deep Dive](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/explainable-ai-2-deep-dive)
-3. [**OpenVINO™ Explainable AI Toolkit (3/3): Saliency map interpretation**](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/explainable-ai-3-map-interpretation)
+1. [OpenVINO™ Explainable AI Toolkit (1/3): Basic](../explainable-ai-1-basic/README.md)
+2. [OpenVINO™ Explainable AI Toolkit (2/3): Deep Dive](../explainable-ai-2-deep-dive/README.md)
+3. [**OpenVINO™ Explainable AI Toolkit (3/3): Saliency map interpretation**](../explainable-ai-3-map-interpretation/README.md)
 
 [OpenVINO™ Explainable AI (XAI)](https://github.com/openvinotoolkit/openvino_xai/) provides a suite of XAI algorithms for visual explanation of
 [OpenVINO™](https://github.com/openvinotoolkit/openvino) Intermediate Representation (IR) models.
