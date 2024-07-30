@@ -25,7 +25,7 @@ The tutorial consists of the following steps:
   - Define preprocess and postprocess functions
 - Explain model using ImageNet labels
 - Explain for multiple images
-- Saliency map examples in different usecases and their interpretations
+- Saliency map examples in different use cases and their interpretations
   - True Positive High confidence
   - True Positive Low confidence
   - False Positive High confidence
