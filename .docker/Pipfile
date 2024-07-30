@@ -38,7 +38,7 @@ pytube = ">=12.1.0"
 rsa = ">=4.7"
 scipy = "*"
 seaborn = ">=0.11.0"
-setuptools = ">56.0.0"
+setuptools = "<70.0.0"
 shapely = ">=1.7.1"
 supervisor = ">=4.1.0"
 tensorflow = ">=2.5,<=2.12"
@@ -53,4 +53,4 @@ transformers = ">=4.21.1"
 [dev-packages]
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"
