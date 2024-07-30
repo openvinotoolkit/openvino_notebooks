@@ -26,16 +26,22 @@ export function addAnalyticsScript(): void {
   scriptElement.src = url;
   const headElement = document.getElementsByTagName('head')[0];
   headElement.appendChild(scriptElement);
+  // Set analytics vars
+  window.wapLocalCode = 'us-en';
+  window.wapSection = 'openvinotoolkit';
 }
 
 enum COMPONENT {
   NAVIGATE = 'ov-notebooks:navigate',
   COPY_LINK = 'ov-notebooks:copy-link',
+  FILTER = 'ov-notebooks:filter',
+  SEARCH = 'ov-notebooks:search',
 }
 
 type AdobeTrackFn = (componentName: COMPONENT, label: string, detail?: string) => void;
 
 function getAdobeAnalyticsFunction(window: Window): AdobeTrackFn | null {
+  // TODO Fix Uncaught DOMException: Failed to read a named property 'wap_tms' from 'Window': Blocked a frame with origin "https://openvinotoolkit.github.io" from accessing a cross-origin frame.
   if (typeof window.wap_tms?.custom?.trackComponentClick !== 'function') {
     return null;
   }
@@ -86,6 +92,14 @@ class Analytics {
 
   sendCopyLinkEvent(notebookPath: string): void {
     this._send(COMPONENT.COPY_LINK, notebookPath);
+  }
+
+  sendFilterEvent(filterOption: string) {
+    this._send(COMPONENT.FILTER, filterOption);
+  }
+
+  sendSearchEvent(searchValue: string) {
+    this._send(COMPONENT.SEARCH, searchValue);
   }
 }
 
