@@ -1,7 +1,11 @@
 # OpenVINO™ Explainable AI Toolkit: Classification Explanation
 
-**OpenVINO™ Explainable AI (XAI) Toolkit** provides a suite of XAI algorithms for visual explanation of
-[**OpenVINO™**](https://github.com/openvinotoolkit/openvino) Intermediate Representation (IR) models.
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb)
+
+This is the **second notebook** in series of exploring [OpenVINO™ Explainable AI (XAI)](https://github.com/openvinotoolkit/openvino_xai/).
+
+[OpenVINO™ Explainable AI (XAI)](https://github.com/openvinotoolkit/openvino_xai/) provides a suite of XAI algorithms for visual explanation of
+[OpenVINO™](https://github.com/openvinotoolkit/openvino) Intermediate Representation (IR) models.
 
 Using **OpenVINO XAI**, you can generate **saliency maps** that highlight regions of interest in input images from the model's perspective. This helps users understand why complex AI models produce specific responses.
 
