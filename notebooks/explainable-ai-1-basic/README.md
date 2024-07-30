@@ -1,8 +1,12 @@
-# OpenVINO™ Explainable AI Toolkit: Basic notebook
+# OpenVINO™ Explainable AI Toolkit (1/3): Basic
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb)
 
-This is the **first notebook** in series of exploring [OpenVINO™ Explainable AI (XAI)](https://github.com/openvinotoolkit/openvino_xai/).
+This is the **first notebook** in series of exploring [OpenVINO™ Explainable AI (XAI)](https://github.com/openvinotoolkit/openvino_xai/):
+
+1. [**OpenVINO™ Explainable AI Toolkit (1/3): Basic**](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/explainable-ai-1-basic)
+2. [OpenVINO™ Explainable AI Toolkit (2/3): Deep Dive](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/explainable-ai-2-deep-dive)
+3. [OpenVINO™ Explainable AI Toolkit (3/3): Saliency map interpretation](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/explainable-ai-3-map-interpretation)
 
 It will show the first steps in the XAI toolkit, covering the following topics:
 
