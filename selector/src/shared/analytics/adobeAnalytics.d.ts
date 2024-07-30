@@ -5,6 +5,8 @@ declare global {
         trackComponentClick?: (componentName: string, value: string) => void;
       };
     };
+    wapLocalCode?: string;
+    wapSection?: string;
   }
 }
 
