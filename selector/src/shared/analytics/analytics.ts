@@ -1,3 +1,6 @@
+import { isEmbedded } from '../iframe-detector';
+import { sendAnalyticsMessage } from '../iframe-message-emitter';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const once = function <T extends (...args: any[]) => any>(fn: T) {
   let result: ReturnType<T>;
@@ -38,10 +41,13 @@ enum COMPONENT {
   SEARCH = 'ov-notebooks:search',
 }
 
-type AdobeTrackFn = (componentName: COMPONENT, label: string, detail?: string) => void;
+export type AdobeTrackFn = (componentName: COMPONENT, label: string, detail?: string) => void;
 
 function getAdobeAnalyticsFunction(window: Window): AdobeTrackFn | null {
-  // TODO Fix Uncaught DOMException: Failed to read a named property 'wap_tms' from 'Window': Blocked a frame with origin "https://openvinotoolkit.github.io" from accessing a cross-origin frame.
+  if (isEmbedded) {
+    return sendAnalyticsMessage;
+  }
+
   if (typeof window.wap_tms?.custom?.trackComponentClick !== 'function') {
     return null;
   }
