@@ -556,21 +556,23 @@ def get_llm_selection_widget():
         model_drop_down.options=SUPPORTED_LLM_MODELS[change.new]
     lang_drop_down.observe(dropdown_handler, names='value')
     compression_drop_down = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS)
+    preconverted = widgets.Checkbox(value=True)
 
     form_items = [         
     widgets.Box([widgets.Label(value='Language:'), lang_drop_down]),
     widgets.Box([widgets.Label(value='Model:'), model_drop_down]),
-    widgets.Box([widgets.Label(value='Compression:'), compression_drop_down])
+    widgets.Box([widgets.Label(value='Compression:'), compression_drop_down]),
+    widgets.Box([widgets.Label(value="Use preconverted models:"), preconverted])
     ]
     
     form = widgets.Box(form_items, layout=widgets.Layout(
     display='flex',
     flex_flow='column',
     border='solid 1px',
-    align_items='stretch',
+    #align_items='stretch',
     width='30%',
     padding = '1%'))
-    return form, lang_drop_down, model_drop_down, compression_drop_down
+    return form, lang_drop_down, model_drop_down, compression_drop_down, preconverted
 
 def convert_tokenizer(model_id, remote_code, model_dir):
     import openvino as ov
@@ -583,7 +585,7 @@ def convert_tokenizer(model_id, remote_code, model_dir):
     ov.save_model(ov_detokenizer, model_dir / "openvino_detokenizer.xml")
 
 
-def convert_and_compress_model(model_id, model_config, precision):
+def convert_and_compress_model(model_id, model_config, precision, use_preconverted=True):
     from pathlib import Path
     from IPython.display import Markdown, display
     import subprocess
@@ -600,6 +602,20 @@ def convert_and_compress_model(model_id, model_config, precision):
         if not (model_dir / "openvino_tokenizer.xml").exists() or not (model_dir / "openvino_detokenizer.xml").exists():
             convert_tokenizer(pt_model_id, remote_code, model_dir)
         return model_dir
+    if use_preconverted:
+        OV_ORG = "OpenVINO"
+        pt_model_name = pt_model_id.split("/")[-1]
+        ov_model_name = pt_model_name + f"-{precision.lower()}-ov"
+        ov_model_hub_id = f"{OV_ORG}/{ov_model_name}"
+        import huggingface_hub as hf_hub
+
+        hub_api = hf_hub.HfApi()
+        if hub_api.repo_exists(ov_model_hub_id):
+            print(f"⌛Found preconverted {precision} {model_id}. Downloading model started. It may takes some time.")
+            hf_hub.snapshot_download(ov_model_hub_id, local_dir=model_dir)
+            print(f"✅ {precision} {model_id} model downloaded and can be found in {model_dir}")
+            return model_dir
+
     model_compression_params = {}
     if "INT4" in precision:
         model_compression_params = compression_configs.get(model_id, compression_configs["default"])

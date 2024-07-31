@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+from typing import Any
 import numpy as np
 from queue import Queue
 import openvino_tokenizers
@@ -42,15 +43,14 @@ japanese_examples = [
         ["人工知能と「OpenVINOの利点」について100語程度のブログ記事を書いてください。"],
 ]
 
-
-class TextStreamerIterator(StreamerBase):
-    def __init__(self, tokenizer, model_dir, stop_tokens=None):
-        super().__init__()
-        self.tokenizer = tokenizer
-        self.compiled_detokenizer = core.compile_model(Path(model_dir, "openvino_detokenizer.xml").as_posix())
+class TextQueue:
+    def __init__(self) -> None:
         self.text_queue = Queue()
         self.stop_signal = None
-        self.stop_tokens = stop_tokens or []
+        self.stop_tokens = []
+
+    def __call__(self, text) -> Any:
+        self.text_queue.put(text)
 
     def __iter__(self):
         return self
@@ -62,21 +62,14 @@ class TextStreamerIterator(StreamerBase):
         else:
             return value
 
-    def put(self, token_id):
-        openvino_output = self.compiled_detokenizer(np.array([[token_id]], dtype=int))
-        text = str(openvino_output["string_output"][0])
-        if text in self.stop_tokens:
-            self.end()
-            return
-        # remove labels/special symbols
-        text = re.sub("<.*>", "", text)
-        self.text_queue.put(text)
+    def reset(self):
+        self.text_queue = Queue()
 
     def end(self):
         self.text_queue.put(self.stop_signal)
 
 
-def get_gradio_helper(pipe, model_configuration, model_dir, model_id, model_language):
+def get_gradio_helper(pipe, model_configuration, model_id, model_language):
     import gradio as gr
 
     max_new_tokens = 256
@@ -161,8 +154,7 @@ def get_gradio_helper(pipe, model_configuration, model_dir, model_id, model_lang
         history: updated history with message and answer from chatbot
         active_chat: if we are here, the chat is running or will be started, so return True
         """
-        streamer = TextStreamerIterator(pipe.get_tokenizer(), model_dir, model_configuration.get("stop_tokens"))
-
+        streamer = TextQueue()
         config = pipe.get_generation_config()
         config.temperature = temperature
         config.top_p = top_p
@@ -181,9 +173,10 @@ def get_gradio_helper(pipe, model_configuration, model_dir, model_id, model_lang
             """
             genration function for single thread
             """
-            global start_time
+            streamer.reset()
             pipe.generate(new_prompt, config, streamer)
             stream_complete.set()
+            streamer.end()
 
         t1 = Thread(target=generate_and_signal_complete)
         t1.start()
