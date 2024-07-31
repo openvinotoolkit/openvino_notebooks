@@ -2318,13 +2318,15 @@
                 "sha256:cc240163bf6d1ebcad5fcd40d0ae803d7eae84c6a9319d0d314269270cd0ba12",
                 "sha256:db30ba9e8af7188436ff76ce79ad7a8a2a5204e3c4757d2728223270b6a73080",
                 "sha256:e941dfe7196b3a75364fcee4e0fe79cee63fa9d4e2a1852fb459048d7daa83f5",
-                "sha256:f31dfd3d793a787a799930568e9e1dc736bb3a7069b266f2d80b2ad623c29d84"
+                "sha256:f31dfd3d793a787a799930568e9e1dc736bb3a7069b266f2d80b2ad623c29d84",
+                "sha256:0352b1e385cefb9dcc74baaa7b0f754a309a960344a1d39e5dec6ba8cb3eee3e",
+                "sha256:83023fa124b6da51a409d5b1d6950e4f4c4bf4b4e2925138bda8595f83b5cd4f"
             ],
             "version": "==2024.3.0"
         },
         "openvino-dev": {
             "hashes": [
-                "sha256:81c17f0bd7c7414b2ad3164ef1a5e64e0e745e4f16896820cefae3387ac5624f"
+                "sha256:8a1fd3cda47daca7b99b204475997abee3cb4f8c54ba468e1af3e0c2e1192df2"
             ],
             "version": "==2024.3.0"
         },
@@ -3484,12 +3486,12 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:6c1fccdac05a97e598fb0ae3bbed5904ccb317337a51139dcd51453611bbb987",
-                "sha256:c636ac361bc47580504644275c9ad802c50415c7522212252c033bd15f301f32"
+                "sha256:032d42ee9fb536e33087fb66cac5f840eb9391ed05637b3f2a76a7c8fb477936",
+                "sha256:33874fdc59b3188304b2e7c80d9029097ea31627180896fb549c578ceb8a0855"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==69.5.1"
+            "version": "==71.1.0"
         },
         "shapely": {
             "hashes": [
@@ -3828,14 +3830,14 @@
         },
         "torch": {
             "hashes": [
-                "sha256:86cc28df491fa84738affe752f9870791026565342f69e4ab63e5b935f00a495"
+                "sha256:1e86e225e472392440ace378ba3165b5e87648e8b5fbf16adc41c0df881c38b8"
             ],
             "index": "pytorch-wheels",
             "version": "==2.3.0+cpu"
         },
         "torchaudio": {
             "hashes": [
-                "sha256:b2f634b380264010916d26324ab0f2040412e77029b1cfe59333adf2070f4b99"
+                "sha256:19e21c8eac310df3eeb55a930f726270cd71b8dd5ab9ae1f5a5915f5791fc9d3"
             ],
             "index": "pytorch-wheels",
             "version": "==2.3.0+cpu"
@@ -3851,7 +3853,7 @@
         },
         "torchvision": {
             "hashes": [
-                "sha256:f9363ed8c9870455ae1bfb1d5ac691e63daefd98e1f30f0b654f368415e33056"
+                "sha256:0e764a15c69f51742b09ec17cc2dcd1eee445e87cfd93a9b13b1caa2037f154d"
             ],
             "index": "pytorch-wheels",
             "version": "==0.18.0+cpu"
