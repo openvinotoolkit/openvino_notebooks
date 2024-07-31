@@ -1,3 +1,6 @@
+import { isEmbedded } from '../iframe-detector';
+import { sendAnalyticsMessage } from '../iframe-message-emitter';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const once = function <T extends (...args: any[]) => any>(fn: T) {
   let result: ReturnType<T>;
@@ -26,16 +29,25 @@ export function addAnalyticsScript(): void {
   scriptElement.src = url;
   const headElement = document.getElementsByTagName('head')[0];
   headElement.appendChild(scriptElement);
+  // Set analytics vars
+  window.wapLocalCode = 'us-en';
+  window.wapSection = 'openvinotoolkit';
 }
 
 enum COMPONENT {
   NAVIGATE = 'ov-notebooks:navigate',
   COPY_LINK = 'ov-notebooks:copy-link',
+  FILTER = 'ov-notebooks:filter',
+  SEARCH = 'ov-notebooks:search',
 }
 
-type AdobeTrackFn = (componentName: COMPONENT, label: string, detail?: string) => void;
+export type AdobeTrackFn = (componentName: COMPONENT, label: string, detail?: string) => void;
 
 function getAdobeAnalyticsFunction(window: Window): AdobeTrackFn | null {
+  if (isEmbedded) {
+    return sendAnalyticsMessage;
+  }
+
   if (typeof window.wap_tms?.custom?.trackComponentClick !== 'function') {
     return null;
   }
@@ -86,6 +98,14 @@ class Analytics {
 
   sendCopyLinkEvent(notebookPath: string): void {
     this._send(COMPONENT.COPY_LINK, notebookPath);
+  }
+
+  sendFilterEvent(filterOption: string) {
+    this._send(COMPONENT.FILTER, filterOption);
+  }
+
+  sendSearchEvent(searchValue: string) {
+    this._send(COMPONENT.SEARCH, searchValue);
   }
 }
 

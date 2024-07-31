@@ -1,11 +1,12 @@
 import './ContentSectionHeader.scss';
 
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 
 import { openFiltersPanel } from '@/components/FiltersPanel/filters-panel-handlers';
 import { Button } from '@/components/shared/Button/Button';
 import { Dropdown } from '@/components/shared/Dropdown/Dropdown';
 import { Search } from '@/components/shared/Search/Search';
+import { analytics } from '@/shared/analytics/analytics';
 import { SORT_OPTIONS, SortValues } from '@/shared/notebooks.service';
 import { NotebooksContext } from '@/shared/notebooks-context';
 
@@ -22,6 +23,17 @@ export const ContentSectionHeader = ({ totalCount, filteredCount }: ContentSecti
   const { searchValue, setSearchValue, resetFilters, sort, setSort } = useContext(NotebooksContext);
 
   const isFiltered = filteredCount !== totalCount;
+
+  // Send search event to analytics with debouncing
+  useEffect(() => {
+    const sendSearchEventTimeout = setTimeout(() => {
+      if (searchValue) {
+        analytics.sendSearchEvent(searchValue);
+      }
+    }, 2000);
+
+    return () => clearTimeout(sendSearchEventTimeout);
+  }, [searchValue]);
 
   return (
     <div className="content-section-header">
