@@ -36,6 +36,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   build_docker:
     strategy:
@@ -51,10 +54,10 @@ jobs:
           sudo rm -rf /opt/ghc
           echo "Available storage:"
           df -h
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@cbda684547adc8c052d50711417fa61b428a9f88 # v41.1.2
         with:
           files: |
             notebooks/*/**
@@ -73,5 +76,5 @@ jobs:
           docker build . -t openvino_notebooks
       - name: Test notebooks in Docker image
         run: |
-          # Test script location: .docker/.s2i/bin/test_precommit
-          docker run --entrypoint /tmp/scripts/test_precommit openvino_notebooks
+          # Test script location: .docker/tests/test_precommit
+          docker run -v ${PWD}:/opt/app-root/openvino_notebooks --entrypoint /tmp/scripts/test_precommit openvino_notebooks

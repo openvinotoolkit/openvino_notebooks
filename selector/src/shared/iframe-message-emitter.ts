@@ -1,3 +1,4 @@
+import { type AdobeTrackFn } from './analytics/analytics';
 import { isEmbedded } from './iframe-detector';
 
 export interface IResizeMessage {
@@ -8,6 +9,19 @@ export interface IResizeMessage {
 export interface IScrollMessage {
   type: 'scroll';
 }
+
+export interface IAnalyticsMessage {
+  type: 'analytics';
+  args: Parameters<AdobeTrackFn>;
+}
+
+export const sendAnalyticsMessage = (...args: IAnalyticsMessage['args']): void => {
+  const message: IAnalyticsMessage = {
+    type: 'analytics',
+    args,
+  };
+  window.parent.postMessage(message, '*');
+};
 
 export const sendScrollMessage = (): void => {
   const message: IScrollMessage = {

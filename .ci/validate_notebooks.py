@@ -6,15 +6,19 @@ import csv
 import json
 import shutil
 import platform
+import yaml
 
 from argparse import ArgumentParser
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, TypedDict
+from validation_config import ValidationConfig, validation_config_arg, SkippedNotebook
 
 
 ROOT = Path(__file__).parents[1]
 
 NOTEBOOKS_DIR = Path("notebooks")
+
+SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
 
 
 class NotebookStatus:
@@ -37,15 +41,18 @@ TestPlan = Dict[Path, NotebookReport]
 
 def parse_arguments():
     parser = ArgumentParser()
+    parser.add_argument("--ignore_config", required=False, default=SKIPPED_NOTEBOOKS_CONFIG_FILENAME)
     parser.add_argument("--ignore_list", required=False, nargs="+")
     parser.add_argument("--test_list", required=False, nargs="+")
+    parser.add_argument("--os", type=validation_config_arg("os"))
+    parser.add_argument("--python", type=validation_config_arg("python"))
+    parser.add_argument("--device", type=validation_config_arg("device"))
     parser.add_argument("--early_stop", action="store_true")
     parser.add_argument("--report_dir", default="report")
     parser.add_argument("--keep_artifacts", action="store_true")
     parser.add_argument("--collect_reports", action="store_true")
     parser.add_argument("--move_notebooks_dir")
     parser.add_argument("--job_name")
-    parser.add_argument("--device_used")
     parser.add_argument("--upload_to_db")
     parser.add_argument(
         "--timeout",
@@ -70,14 +77,36 @@ def collect_python_packages(output_file: Path):
         f.write(reqs)
 
 
-def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb_dir: Optional[Path] = None) -> TestPlan:
+def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig, skip_config_file_path: Path) -> List[Path]:
+    ignored_notebooks: List[Path] = []
+    if not skip_config_file_path.exists():
+        print(f"Skipped notebooks config yaml file does not exist at path '{str(skip_config_file_path)}'.")
+        return ignored_notebooks
+    with open(skip_config_file_path, "r") as f:
+        skipped_notebooks_config: List[SkippedNotebook] = yaml.safe_load(f)
+    for skipped_notebook in skipped_notebooks_config:
+        skips = skipped_notebook["skips"]
+        for skip in skips:
+            for key in validation_config.keys():
+                if not validation_config[key]:
+                    print(f"Warning: validation config argument '{key}' is not provided.")
+                if validation_config[key] in skip.get(key, []):
+                    ignored_notebooks.append(Path(skipped_notebook["notebook"]))
+
+    return list(set(ignored_notebooks))
+
+
+def prepare_test_plan(
+    validation_config: ValidationConfig, test_list: Optional[List[str]], ignore_config: str, ignore_list: Optional[List[str]], nb_dir: Optional[Path] = None
+) -> TestPlan:
     orig_nb_dir = ROOT / NOTEBOOKS_DIR
     notebooks_dir = nb_dir or orig_nb_dir
     notebooks: List[Path] = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
 
     test_plan: TestPlan = {notebook.relative_to(notebooks_dir): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
 
-    ignored_notebooks: List[Path] = []
+    skip_config_file_path = Path(__file__).parents[0] / ignore_config
+    ignored_notebooks = get_ignored_notebooks_from_yaml(validation_config, skip_config_file_path)
     if ignore_list is not None:
         for ignore_item in ignore_list:
             if ignore_item.endswith(".txt"):
@@ -93,6 +122,7 @@ def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb
         raise ValueError(
             f"Ignore list items should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\nInvalid ignored notebooks: {ignored_notebooks}"
         )
+    ignored_notebooks = sorted(ignored_notebooks)
     print(f"Ignored notebooks: {ignored_notebooks}")
 
     testing_notebooks: List[Path] = []
@@ -121,7 +151,7 @@ def prepare_test_plan(test_list: Optional[List[str]], ignore_list: List[str], nb
             "Testing notebooks should be provided to '--test_list' argument as a txt file or should be empty to test all notebooks.\n"
             f"Received test list: {test_list}"
         )
-    testing_notebooks = list(set(testing_notebooks))
+    testing_notebooks = sorted(list(set(testing_notebooks)))
     print(f"Testing notebooks: {testing_notebooks}")
 
     for notebook in test_plan:
@@ -145,19 +175,33 @@ def clean_test_artifacts(before_test_files: List[Path], after_test_files: List[P
             shutil.rmtree(file_path, ignore_errors=True)
 
 
-def get_openvino_version() -> str:
+def get_base_openvino_version() -> str:
     try:
         import openvino as ov
 
         version = ov.get_version()
+        print(f"OpenVINO version in environment before tests started: {version}")
     except ImportError:
-        print("Openvino is missing in validation environment.")
+        print("OpenVINO is missing in validation environment.")
         version = "Openvino is missing"
+    return version
+
+
+def get_pip_openvino_version(text_input: str) -> str:
+    try:
+        from importlib import metadata
+
+        version = metadata.version("openvino")
+        print(f"{text_input}: {version}")
+    except metadata.PackageNotFoundError:
+        print("OpenVINO is missing in validation environment.")
+        version = "OpenVINO is missing"
     return version
 
 
 def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[Tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
+    os.environ["HF_HUB_CACHE"] = str(notebook_path.parent)
     print(f"RUN {notebook_path.relative_to(root)}", flush=True)
     result = None
 
@@ -170,7 +214,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
     with cd(notebook_path.parent):
         files_before_test = sorted(Path(".").iterdir())
-        ov_version_before = get_openvino_version()
+        ov_version_before = get_pip_openvino_version("OpenVINO before notebook execution")
         patched_notebook = Path(f"test_{notebook_path.name}")
         if not patched_notebook.exists():
             print(f'Patched notebook "{patched_notebook}" does not exist.')
@@ -189,7 +233,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         except subprocess.TimeoutExpired:
             retcode = -42
         duration = time.perf_counter() - start
-        ov_version_after = get_openvino_version()
+        ov_version_after = get_pip_openvino_version("OpenVINO after notebook execution")
         result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after)
 
         if not keep_artifacts:
@@ -241,7 +285,7 @@ def write_single_notebook_report(
     ov_version_before: str,
     ov_version_after: str,
     job_name: str,
-    device_used: str,
+    device: str,
     saving_dir: Path,
 ) -> Path:
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
@@ -253,7 +297,7 @@ def write_single_notebook_report(
         "ov_version_before": ov_version_before,
         "ov_version_after": ov_version_after,
         "job_name": job_name,
-        "device_used": device_used,
+        "device_used": device,
     }
     with report_file.open("w") as f:
         json.dump(report, f)
@@ -277,9 +321,12 @@ def main():
     if args.keep_artifacts:
         keep_artifacts = True
 
-    base_version = get_openvino_version()
+    base_version = get_base_openvino_version()
 
-    test_plan = prepare_test_plan(args.test_list, args.ignore_list, notebooks_moving_dir)
+    validation_config = ValidationConfig(os=args.os, python=args.python, device=args.device)
+
+    test_plan = prepare_test_plan(validation_config, args.test_list, args.ignore_config, args.ignore_list, notebooks_moving_dir)
+
     for notebook, report in test_plan.items():
         if report["status"] == NotebookStatus.SKIPPED:
             continue
@@ -306,9 +353,9 @@ def main():
             report["duration"] = timing
             if args.collect_reports:
                 job_name = args.job_name or "Unknown"
-                device_used = args.device_used or "Unknown"
+                device = args.device or "Unknown"
                 report_path = write_single_notebook_report(
-                    base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device_used, reports_dir
+                    base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir
                 )
                 if args.upload_to_db:
                     cmd = [sys.executable, args.upload_to_db, report_path]

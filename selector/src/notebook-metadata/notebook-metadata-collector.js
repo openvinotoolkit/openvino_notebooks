@@ -182,4 +182,6 @@ const librariesPatterns = {
   Ultralytics: ['import ultralytics', 'from ultralytics'],
   Gradio: ['import gradio', 'from gradio'],
   'OpenVINO Tokenizers': ['import openvino_tokenizers', 'from openvino_tokenizers'],
+  'OpenVINO GenAI': ['import openvino_genai', 'from openvino_genai'],
+  'OpenVINO Explainable AI': ['import openvino_xai', 'from openvino_xai'],
 };

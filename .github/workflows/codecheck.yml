@@ -25,6 +25,9 @@ on:
       - '.github/workflows/*.yml'
       - '.github/workflows/.env'
 
+permissions:
+  contents: read
+
 jobs:
   build_codecheck:
     strategy:
@@ -32,19 +35,19 @@ jobs:
     runs-on: ubuntu-20.04 # change cachepip step when changing this
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - name: Dotenv Action
         id: dotenv
-        uses: xom9ikk/dotenv@v1.0.2
+        uses: xom9ikk/dotenv@ac290ca23a42155a0cba1031d23afa46240116a9 # v2.3.0
         with:
           path: ./.github/workflows
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
         with:
           python-version: 3.8 # change cachepip step when changing this
       - name: Cache OpenVINO Pip Packages
         id: cachepip
-        uses: actions/cache@v3
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
         with:
           path: |
             pipcache

@@ -2,7 +2,7 @@
 
 LLM stands for “Large Language Model”, which refers to a type of artificial intelligence model that is designed to understand and generate human-like text based on the input it receives. LLMs are trained on large datasets of text to learn patterns, grammar, and semantic relationships, allowing them to generate coherent and contextually relevant responses. One core capability of Large Language Models (LLMs) is to follow natural language instructions. Instruction-following models are capable of generating text in response to prompts and are often used for tasks like writing assistance, chatbots, and content generation.
 
-In this tutorial, we consider how to run an instruction-following text generation pipeline using popular LLMs and OpenVINO. We will use pre-trained models from the [Hugging Face Transformers](https://huggingface.co/docs/transformers/index) library. To simplify the user experience, the [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index) library converts the models to OpenVINO™ IR format.
+In this tutorial, we consider how to run an instruction-following text generation pipeline using popular LLMs and OpenVINO. We will use pre-trained models from the [Hugging Face Transformers](https://huggingface.co/docs/transformers/index) library and convert them to OpenVINO™ IR format using The [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index) library. To simplify the user experience, we will use [OpenVINO Generate API](https://github.com/openvinotoolkit/openvino.genai) for generation of instruction-following inference pipeline.  
 
 
 The tutorial supports different models, you can select one from provided options to compare quality of open source LLM solutions.
@@ -20,9 +20,9 @@ The available options are:
 The tutorial consists of the following steps:
 
 - Install prerequisites
-- Download and convert the model from a public source using the [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
+- Download the model from Hugging Face and convert it to OpenVINO IR via [optimum-intel CLI](https://github.com/huggingface/optimum-intel)
 - Compress model weights to INT8 and INT4 with [OpenVINO NNCF](https://github.com/openvinotoolkit/nncf)
-- Create an instruction-following inference pipeline
+- Create an instruction-following inference pipeline with [OpenVINO Generate API](https://github.com/openvinotoolkit/openvino.genai/blob/master/src/README.md)
 - Run instruction-following pipeline
 
 The image below illustrates the provided user instruction and model answer examples.
@@ -34,3 +34,5 @@ The image below illustrates the provided user instruction and model answer examp
 This is a self-contained example that relies solely on its own code.</br>
 We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/llm-question-answering/README.md" />

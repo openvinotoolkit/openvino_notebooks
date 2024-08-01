@@ -21,3 +21,13 @@ The tutorial consists of the following steps:
   - Run quantization
   - Compare model size and performance
 - Interactive demo
+
+
+### Installation Instructions
+
+This is a self-contained example that relies solely on its own code.
+
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/oneformer-segmentation/README.md" />

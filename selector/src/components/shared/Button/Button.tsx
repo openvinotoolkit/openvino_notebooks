@@ -66,6 +66,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         target="_blank"
         rel="noreferrer"
         aria-label={text}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick?.();
+        }}
       >
         {buttonContent}
       </a>
@@ -77,7 +81,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       className={classNames.join(' ')}
       type="button"
       role="radio"
-      onClick={(e) => onClick?.(e)}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.();
+      }}
       aria-label={text}
       ref={ref}
     >

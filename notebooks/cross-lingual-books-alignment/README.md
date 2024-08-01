@@ -23,3 +23,13 @@ By visualizing the result, you can evaluate which steps in the pipeline can be i
 
 ## Benchmark
 <img src="https://user-images.githubusercontent.com/51917466/254592797-0dbb6eb5-4035-48ae-b16f-5e09b93a7e72.png">
+
+
+### Installation Instructions
+
+This is a self-contained example that relies solely on its own code.
+
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/cross-lingual-books-alignment/README.md" />

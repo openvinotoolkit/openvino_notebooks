@@ -1,8 +1,8 @@
-film-slowmo
-instant-id
-instruct-pix2pix-image-editing
-knowledge-graphs-conve
-mms-massively-multilingual-speech
-qrcode-monster
-sdxl-turbo
-wuerstchen-image-generation
+notebooks/film-slowmo/film-slowmo.ipynb
+notebooks/instant-id/instant-id.ipynb
+notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb
+notebooks/knowledge-graphs-conve/knowledge-graphs-conve.ipynb
+notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb
+notebooks/qrcode-monster/qrcode-monster.ipynb
+notebooks/sdxl-turbo/sdxl-turbo.ipynb
+notebooks/wuerstchen-image-generation/wuerstchen-image-generation.ipynb

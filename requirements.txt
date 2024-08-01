@@ -1,5 +1,5 @@
 # jupyter
 jupyterlab
 ipywidgets
-ipykernel>=5.*
+ipykernel>=5.0
 ipython>=7.16.3

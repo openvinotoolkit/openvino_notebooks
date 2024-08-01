@@ -37,3 +37,5 @@ For details, please refer to [Installation Guide](../../README.md).
 * [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
 * [Model Conversion API](https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html)
 * [Action Recognition Demo (OpenVINO - No notebooks)](https://docs.openvino.ai/2024/omz_demos_action_recognition_demo_python.html)
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/action-recognition-webcam/README.md" />

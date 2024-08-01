@@ -17,6 +17,7 @@ EXCEPTIONS_URLs = [
     "http://host.robots.ox.ac.uk",
     "https://gitee.com/",
     "https://openai.com/",
+    "https://deci.ai/",
 ]
 
 

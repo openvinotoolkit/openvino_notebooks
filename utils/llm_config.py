@@ -56,6 +56,12 @@ def internlm_partial_text_processor(partial_text, new_text):
 
 SUPPORTED_LLM_MODELS = {
     "English": {
+        "qwen2-0.5b-instruct": {
+            "model_id": "Qwen/Qwen2-0.5B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        },
         "tiny-llama-1b-chat": {
             "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
             "remote_code": False,
@@ -70,6 +76,12 @@ SUPPORTED_LLM_MODELS = {
             Answer: </s>
             <|assistant|>""",
         },
+        "qwen2-1.5b-instruct": {
+            "model_id": "Qwen/Qwen2-1.5B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        },
         "gemma-2b-it": {
             "model_id": "google/gemma-2b-it",
             "remote_code": False,
@@ -78,14 +90,6 @@ SUPPORTED_LLM_MODELS = {
             "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
             "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""
             + """<start_of_turn>user{input}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model""",
-        },
-        "phi-3-mini-instruct": {
-            "model_id": "microsoft/Phi-3-mini-4k-instruct",
-            "remote_code": True,
-            "start_message": "<|system|>\n{DEFAULT_SYSTEM_PROMPT}<|end|>\n",
-            "history_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}<|end|>\n",
-            "current_message_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}",
-            "stop_tokens": ["<|end|>"],
         },
         "red-pajama-3b-chat": {
             "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
@@ -100,6 +104,20 @@ SUPPORTED_LLM_MODELS = {
             <human>: Question: {input} 
             Context: {context} 
             Answer: <bot>""",
+        },
+        "qwen2-7b-instruct": {
+            "model_id": "Qwen/Qwen2-7B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT }<|im_end|>"""
+            + """
+            <|im_start|>user
+            Question: {input} 
+            Context: {context} 
+            Answer: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
         "gemma-7b-it": {
             "model_id": "google/gemma-7b-it",
@@ -128,7 +146,31 @@ SUPPORTED_LLM_MODELS = {
             "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
-            "stop_tokens": ["<|eot_id|>"],
+            "stop_tokens": ["<|eot_id|>", "<|end_of_text|>"],
+            "has_chat_template": True,
+            "start_message": " <|start_header_id|>system<|end_header_id|>\n\n" + DEFAULT_SYSTEM_PROMPT + "<|eot_id|>",
+            "history_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>",
+            "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
+            "rag_prompt_template": f"<|start_header_id|>system<|end_header_id|>\n\n{DEFAULT_RAG_PROMPT}<|eot_id|>"
+            + """<|start_header_id|>user<|end_header_id|>
+            
+            
+            Question: {input}
+            Context: {context}
+            Answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+            
+            """,
+        },
+        "llama-3.1-8b-instruct": {
+            "model_id": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|eot_id|>", "<|end_of_text|>"],
+            "has_chat_template": True,
+            "start_message": " <|start_header_id|>system<|end_header_id|>\n\n" + DEFAULT_SYSTEM_PROMPT + "<|eot_id|>",
+            "history_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>",
+            "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
             "rag_prompt_template": f"<|start_header_id|>system<|end_header_id|>\n\n{DEFAULT_RAG_PROMPT}<|eot_id|>"
             + """<|start_header_id|>user<|end_header_id|>
             
@@ -211,6 +253,21 @@ SUPPORTED_LLM_MODELS = {
             Context: {context} 
             Answer: [/INST]""",
         },
+        "phi-3-mini-instruct": {
+            "model_id": "microsoft/Phi-3-mini-4k-instruct",
+            "remote_code": True,
+            "start_message": "<|system|>\n{DEFAULT_SYSTEM_PROMPT}<|end|>\n",
+            "history_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}<|end|>\n",
+            "current_message_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}",
+            "stop_tokens": ["<|end|>"],
+            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }<|end|>"""
+            + """
+            <|user|>
+            Question: {input} 
+            Context: {context} 
+            Answer: <|end|>
+            <|assistant|>""",
+        },
     },
     "Chinese": {
         "qwen1.5-0.5b-chat": {
@@ -218,6 +275,27 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        },
+        "qwen2-1.5b-instruct": {
+            "model_id": "Qwen/Qwen2-1.5B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        },
+        "qwen2-7b-instruct": {
+            "model_id": "Qwen/Qwen2-7B-Instruct",
+            "remote_code": False,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
+            + """
+            <|im_start|>user
+            问题: {input} 
+            已知内容: {context} 
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
         "qwen1.5-7b-chat": {
             "model_id": "Qwen/Qwen1.5-7B-Chat",
@@ -230,7 +308,9 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             问题: {input} 
             已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
         "qwen-7b-chat": {
             "model_id": "Qwen/Qwen-7B-Chat",
@@ -246,10 +326,25 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             问题: {input} 
             已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
         "chatglm3-6b": {
             "model_id": "THUDM/chatglm3-6b",
+            "remote_code": True,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "tokenizer_kwargs": {"add_special_tokens": False},
+            "stop_tokens": [0, 2],
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
+            + """
+            问题: {input} 
+            已知内容: {context} 
+            回答: 
+            """,
+        },
+        "glm-4-9b-chat": {
+            "model_id": "THUDM/glm-4-9b-chat",
             "remote_code": True,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "tokenizer_kwargs": {"add_special_tokens": False},
@@ -298,7 +393,9 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             问题: {input} 
             已知内容: {context} 
-            回答: <|im_end|><|im_start|>assistant""",
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
         },
     },
     "Japanese": {
@@ -326,6 +423,11 @@ SUPPORTED_EMBEDDING_MODELS = {
             "mean_pooling": False,
             "normalize_embeddings": True,
         },
+        "bge-m3": {
+            "model_id": "BAAI/bge-m3",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
     },
     "Chinese": {
         "bge-small-zh-v1.5": {
@@ -334,7 +436,12 @@ SUPPORTED_EMBEDDING_MODELS = {
             "normalize_embeddings": True,
         },
         "bge-large-zh-v1.5": {
-            "model_id": "bge-large-zh-v1.5",
+            "model_id": "BAAI/bge-large-zh-v1.5",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
+        "bge-m3": {
+            "model_id": "BAAI/bge-m3",
             "mean_pooling": False,
             "normalize_embeddings": True,
         },
@@ -343,6 +450,89 @@ SUPPORTED_EMBEDDING_MODELS = {
 
 
 SUPPORTED_RERANK_MODELS = {
+    "bge-reranker-v2-m3": {"model_id": "BAAI/bge-reranker-v2-m3"},
     "bge-reranker-large": {"model_id": "BAAI/bge-reranker-large"},
     "bge-reranker-base": {"model_id": "BAAI/bge-reranker-base"},
 }
+
+compression_configs = {
+    "zephyr-7b-beta": {
+        "sym": True,
+        "group_size": 64,
+        "ratio": 0.6,
+    },
+    "mistral-7b": {
+        "sym": True,
+        "group_size": 64,
+        "ratio": 0.6,
+    },
+    "minicpm-2b-dpo": {
+        "sym": True,
+        "group_size": 64,
+        "ratio": 0.6,
+    },
+    "gemma-2b-it": {
+        "sym": True,
+        "group_size": 64,
+        "ratio": 0.6,
+    },
+    "notus-7b-v1": {
+        "sym": True,
+        "group_size": 64,
+        "ratio": 0.6,
+    },
+    "neural-chat-7b-v3-1": {
+        "sym": True,
+        "group_size": 64,
+        "ratio": 0.6,
+    },
+    "llama-2-chat-7b": {
+        "sym": True,
+        "group_size": 128,
+        "ratio": 0.8,
+    },
+    "llama-3-8b-instruct": {
+        "sym": True,
+        "group_size": 128,
+        "ratio": 0.8,
+    },
+    "gemma-7b-it": {
+        "sym": True,
+        "group_size": 128,
+        "ratio": 0.8,
+    },
+    "chatglm2-6b": {
+        "sym": True,
+        "group_size": 128,
+        "ratio": 0.72,
+    },
+    "qwen-7b-chat": {"sym": True, "group_size": 128, "ratio": 0.6},
+    "red-pajama-3b-chat": {
+        "sym": False,
+        "group_size": 128,
+        "ratio": 0.5,
+    },
+    "default": {
+        "sym": False,
+        "group_size": 128,
+        "ratio": 0.8,
+    },
+}
+
+
+def get_optimum_cli_command(model_id, weight_format, output_dir, compression_options=None, enable_awq=False, trust_remote_code=False):
+    base_command = "optimum-cli export openvino --model {} --task text-generation-with-past --weight-format {}"
+    command = base_command.format(model_id, weight_format)
+    if compression_options:
+        compression_args = " --group-size {} --ratio {}".format(compression_options["group_size"], compression_options["ratio"])
+        if compression_options["sym"]:
+            compression_args += " --sym"
+        if enable_awq:
+            compression_args += " --awq --dataset wikitext2 --num-samples 128"
+
+        command = command + compression_args
+    if trust_remote_code:
+        command += "  --trust-remote-code"
+
+    command += " {}".format(output_dir)
+    return command

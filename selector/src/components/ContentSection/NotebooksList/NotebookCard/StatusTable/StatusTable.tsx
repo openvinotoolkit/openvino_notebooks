@@ -6,7 +6,7 @@ import DenyIcon from '@/assets/images/deny.svg?react';
 import PythonIcon from '@/assets/images/python.svg?react';
 import TimeoutIcon from '@/assets/images/timeout.svg?react';
 import { Tooltip } from '@/components/shared/Tooltip/Tooltip';
-import { ValidationStatus } from '@/shared/notebook-status';
+import { VALIDATED_PYTHON_VERSIONS, ValidationStatus } from '@/shared/notebook-status';
 import { NotebookItem } from '@/shared/notebooks.service';
 
 const getStatusIcon = (status: ValidationStatus | null): JSX.Element => {
@@ -41,33 +41,36 @@ const getStatusIcon = (status: ValidationStatus | null): JSX.Element => {
   return <Tooltip content="Not available">N/A</Tooltip>;
 };
 
+const pythonVersionsCells = (
+  <>
+    {VALIDATED_PYTHON_VERSIONS.map((v) => (
+      <div key={`python-${v}`} className="cell">
+        <PythonIcon className="python-icon" />
+        {v}
+      </div>
+    ))}
+  </>
+);
+
 type StatusTableProps = {
   status: NonNullable<NotebookItem['status']>;
 };
 
 export const StatusTable = ({ status }: StatusTableProps) => {
   const osOptions = Object.keys(status) as (keyof typeof status)[];
-  const statuses = osOptions.map((os) => Object.values(status[os]));
+  const cpuStatuses = osOptions.map((os) => Object.values(status[os]['cpu'])).flat();
+  const gpuStatuses = osOptions.map((os) => Object.values(status[os]['gpu'])).flat();
 
   return (
     <div className="status-table spark-font-75">
-      <div className="device-header">
+      <div className="cpu-device-header device-header">
         <div className="cell">CPU</div>
       </div>
-      <div className="python-versions">
-        <div className="cell">
-          <PythonIcon className="python-icon" />
-          3.8
-        </div>
-        <div className="cell">
-          <PythonIcon className="python-icon" />
-          3.9
-        </div>
-        <div className="cell">
-          <PythonIcon className="python-icon" />
-          3.10
-        </div>
+      <div className="gpu-device-header device-header">
+        <div className="cell">GPU</div>
       </div>
+      <div className="cpu-python-versions python-versions">{pythonVersionsCells}</div>
+      <div className="gpu-python-versions python-versions">{pythonVersionsCells}</div>
       <div className="os-header">
         <div className="cell">OS</div>
       </div>
@@ -78,9 +81,16 @@ export const StatusTable = ({ status }: StatusTableProps) => {
           </div>
         ))}
       </div>
-      <div className="statuses">
-        {statuses.flat().map((v, i) => (
+      <div className="cpu-statuses statuses">
+        {cpuStatuses.map((v, i) => (
           <div key={`status-cpu-${i}`} className="cell">
+            {getStatusIcon(v)}
+          </div>
+        ))}
+      </div>
+      <div className="gpu-statuses statuses">
+        {gpuStatuses.map((v, i) => (
+          <div key={`status-gpu-${i}`} className="cell">
             {getStatusIcon(v)}
           </div>
         ))}

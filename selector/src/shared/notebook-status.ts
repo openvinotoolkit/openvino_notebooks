@@ -1,6 +1,10 @@
 type ValidatedOS = 'ubuntu-20.04' | 'ubuntu-22.04' | 'windows-2019' | 'macos-12';
 
-type ValidatedPythonVersion = '3.8' | '3.9' | '3.10';
+type ValidatedDevice = 'cpu' | 'gpu';
+
+export const VALIDATED_PYTHON_VERSIONS = ['3.8', '3.9', '3.10', '3.11'] as const;
+
+type ValidatedPythonVersion = (typeof VALIDATED_PYTHON_VERSIONS)[number];
 
 export enum ValidationStatus {
   SUCCESS = 'SUCCESS',
@@ -15,7 +19,9 @@ export interface INotebookStatus {
   name: string;
   status: {
     [OS in ValidatedOS]: {
-      [PythonVersion in ValidatedPythonVersion]: ValidationStatus | null;
+      [Device in ValidatedDevice]: {
+        [PythonVersion in ValidatedPythonVersion]: ValidationStatus | null;
+      };
     };
   };
 }

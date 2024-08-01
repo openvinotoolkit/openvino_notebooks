@@ -13,8 +13,12 @@ from pathlib import Path
 from typing import List, NamedTuple, Optional, Tuple
 
 import numpy as np
-from openvino.runtime import Core, get_version
+from openvino.runtime import Core, Type, get_version
 from IPython.display import HTML, Image, display
+
+import openvino as ov
+from openvino.runtime.passes import Manager, MatcherPass, WrapType, Matcher
+from openvino.runtime import opset10 as ops
 
 
 # ## Files
@@ -22,6 +26,34 @@ from IPython.display import HTML, Image, display
 # Load an image, download a file, download an IR model, and create a progress bar to show download progress.
 
 # In[ ]:
+
+
+def device_widget(default="AUTO", exclude=None, added=None):
+    import openvino as ov
+    import ipywidgets as widgets
+
+    core = ov.Core()
+
+    supported_devices = core.available_devices + ["AUTO"]
+    exclude = exclude or []
+    if exclude:
+        for ex_device in exclude:
+            if ex_device in supported_devices:
+                supported_devices.remove(ex_device)
+
+    added = added or []
+    if added:
+        for add_device in added:
+            if add_device not in supported_devices:
+                supported_devices.append(add_device)
+
+    device = widgets.Dropdown(
+        options=supported_devices,
+        value=default,
+        description="Device:",
+        disabled=False,
+    )
+    return device
 
 
 def load_image(path: str) -> np.ndarray:
@@ -611,3 +643,46 @@ def check_openvino_version(version: str) -> bool:
         return False
     else:
         return True
+
+
+packed_layername_tensor_dict_list = [{"name": "aten::mul/Multiply"}]
+
+
+class ReplaceTensor(MatcherPass):
+    def __init__(self, packed_layername_tensor_dict_list):
+        MatcherPass.__init__(self)
+        self.model_changed = False
+
+        param = WrapType("opset10.Multiply")
+
+        def callback(matcher: Matcher) -> bool:
+            root = matcher.get_match_root()
+            if root is None:
+                return False
+            for y in packed_layername_tensor_dict_list:
+                root_name = root.get_friendly_name()
+                if root_name.find(y["name"]) != -1:
+                    max_fp16 = np.array([[[[-np.finfo(np.float16).max]]]]).astype(np.float32)
+                    new_tenser = ops.constant(max_fp16, Type.f32, name="Constant_4431")
+                    root.set_arguments([root.input_value(0).node, new_tenser])
+                    packed_layername_tensor_dict_list.remove(y)
+
+            return True
+
+        self.register_matcher(Matcher(param, "ReplaceTensor"), callback)
+
+
+def optimize_bge_embedding(model_path, output_model_path):
+    """
+    optimize_bge_embedding used to optimize BGE model for NPU device
+
+    Arguments:
+        model_path {str} -- original BGE IR model path
+        output_model_path {str} -- Converted BGE IR model path
+    """
+    core = Core()
+    ov_model = core.read_model(model_path)
+    manager = Manager()
+    manager.register_pass(ReplaceTensor(packed_layername_tensor_dict_list))
+    manager.run_passes(ov_model)
+    ov.save_model(ov_model, output_model_path, compress_to_fp16=False)
