@@ -6,6 +6,7 @@ import CrossIcon from '@/assets/images/cross.svg?react';
 import { FilterSection } from '@/components/shared/FilterSection/FilterSection';
 import { Search } from '@/components/shared/Search/Search';
 import { ITabItem, Tabs } from '@/components/shared/Tabs/Tabs';
+import { analytics } from '@/shared/analytics/analytics';
 import { INotebookMetadata } from '@/shared/notebook-metadata';
 import { CATEGORIES, LIBRARIES, LIBRARIES_VALUES, TASKS, TASKS_VALUES } from '@/shared/notebook-tags';
 import { notebooksService } from '@/shared/notebooks.service';
@@ -101,6 +102,7 @@ export const FiltersPanel = (): JSX.Element => {
         ...selectedTags,
         [group]: [tag],
       });
+      analytics.sendFilterEvent(tag);
     }
   };
 

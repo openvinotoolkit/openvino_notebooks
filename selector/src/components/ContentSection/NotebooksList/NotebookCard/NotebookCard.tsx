@@ -35,7 +35,7 @@ const openNotebookInDocs = ({ links, path }: INotebookMetadata) => {
 };
 
 const copyNotebookShareUrl = ({ title }: INotebookMetadata): void => {
-  const shareUrl = new URL(window.parent.location.toString());
+  const shareUrl = new URL(window.location.toString());
   shareUrl.search = getUrlParamsWithSearch(title).toString();
   void copyToClipboard(shareUrl.toString());
 };

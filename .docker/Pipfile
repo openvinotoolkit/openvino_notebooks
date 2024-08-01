@@ -26,7 +26,7 @@ notebook = "<7.0.0"
 numpy = ">=1.21.0"
 onnx = ">=1.11.0"
 opencv-python = "*"
-openvino-dev = {version = "==2024.2.0"}
+openvino-dev = {version = "==2024.3.0"}
 openvino-telemetry = "==2023.2.1"
 ovmsclient = "*"
 Pillow = ">=8.3.2"
@@ -38,16 +38,14 @@ pytube = ">=12.1.0"
 rsa = ">=4.7"
 scipy = "*"
 seaborn = ">=0.11.0"
-setuptools = "<70.0.0"
+setuptools = ">70.0.0"
 shapely = ">=1.7.1"
 supervisor = ">=4.1.0"
-tensorflow = ">=2.5,<=2.12"
-tensorflow-datasets = "==4.2.0"
 treon = "*"
-torch = {index = "pytorch-wheels", version = "==2.1.0+cpu"}
-torchaudio = {index = "pytorch-wheels", version = "==2.1.0+cpu"}
+torch = {index = "pytorch-wheels", version = "==2.3.0+cpu"}
+torchaudio = {index = "pytorch-wheels", version = "==2.3.0+cpu"}
 torchmetrics = ">=0.11.0"
-torchvision = {index = "pytorch-wheels", version = "==0.16.0+cpu"}
+torchvision = {index = "pytorch-wheels", version = "==0.18.0+cpu"}
 transformers = ">=4.21.1"
 
 [dev-packages]

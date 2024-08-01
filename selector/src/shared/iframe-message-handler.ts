@@ -1,4 +1,4 @@
-import type { IResizeMessage, IScrollMessage } from './iframe-message-emitter';
+import type { IAnalyticsMessage, IResizeMessage, IScrollMessage } from './iframe-message-emitter';
 
 const notebooksSelectorElement = document.getElementById('notebooks-selector') as HTMLIFrameElement;
 
@@ -17,7 +17,7 @@ function setInitialIframeHeight(iframeElement: HTMLIFrameElement): void {
   }
 }
 
-window.onmessage = (message: MessageEvent<IResizeMessage | IScrollMessage>) => {
+window.onmessage = (message: MessageEvent<IResizeMessage | IScrollMessage | IAnalyticsMessage>) => {
   const { origin: allowedOrigin } = new URL(
     import.meta.env.PROD ? (import.meta.env.VITE_APP_LOCATION as string) : import.meta.url
   );
@@ -33,6 +33,15 @@ window.onmessage = (message: MessageEvent<IResizeMessage | IScrollMessage>) => {
 
   if (message.data.type === 'scroll') {
     notebooksSelectorElement.scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+
+  if (message.data.type === 'analytics') {
+    if (typeof window.wap_tms?.custom?.trackComponentClick === 'function') {
+      window.wap_tms.custom.trackComponentClick(...message.data.args);
+    } else {
+      console.log('Analytics is not found on the host page.');
+    }
     return;
   }
 };
