@@ -2,6 +2,7 @@ import sys
 import json
 from table_of_content import find_tc_in_cell
 from patch_notebooks import DEVICE_WIDGET, DEVICE_WIDGET_NEW
+from install_instructions import check_install_instructions
 from scarf_pixel import check_scarf_tag
 from pathlib import Path
 
@@ -32,6 +33,7 @@ def main():
     no_tocs = []
     no_device = []
     no_scarf_tag = []
+    no_install_instructions = []
 
     def complain(message):
         nonlocal all_passed
@@ -70,9 +72,12 @@ def main():
             if not check_scarf_tag(nb_path):
                 no_scarf_tag.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
                 complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Scarf Pixel tag is not found")
+            if not check_install_instructions(nb_path):
+                no_install_instructions.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
+                complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Install Instructions section is not found")
 
     if not all_passed:
-        print("SUMMARY:")
+        print("\nSUMMARY:")
         print("==================================")
         if no_tocs:
             print("NO TABLE OF CONTENT:")
@@ -85,6 +90,10 @@ def main():
         if no_scarf_tag:
             print("NO SCARF PIXEL TAG:")
             print("\n".join(no_scarf_tag))
+            print("==================================")
+        if no_install_instructions:
+            print("NO INSTALL INSTRUCTIONS SECTION:")
+            print("\n".join(no_install_instructions))
             print("==================================")
 
     sys.exit(0 if all_passed else 1)
