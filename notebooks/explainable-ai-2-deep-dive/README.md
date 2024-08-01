@@ -42,7 +42,6 @@ These are explainable AI algorithms supported by OpenVINO XAI :
 |                   |                    | Black-Box | RISE                | [arxiv](https://arxiv.org/abs/1806.07421v3) / [src](https://github.com/openvinotoolkit/openvino_xai/blob/releases/1.0.0/openvino_xai/methods/black_box/rise.py) |
 |                 | Object Detection     |           | ClassProbabilityMap | experimental / [src](https://github.com/openvinotoolkit/openvino_xai/blob/releases/1.0.0/openvino_xai/methods/white_box/det_class_probability_map.py) |
 
-
 ### Installation Instructions
 
 This is a self-contained example that relies solely on its own code.

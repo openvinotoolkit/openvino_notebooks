@@ -34,3 +34,10 @@ The tutorial consists of the following steps:
   - True Positive Low confidence
   - False Positive High confidence
   - Two mixed predictions
+
+### Installation Instructions
+
+This is a self-contained example that relies solely on its own code.
+
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
