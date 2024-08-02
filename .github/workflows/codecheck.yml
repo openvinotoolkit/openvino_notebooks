@@ -75,23 +75,30 @@ jobs:
         run: |
           python -m pip freeze
       - name: Check install
+        if: always()
         run: |
           python check_install.py
       - name: Test Jupyterlab
+        if: always()
         run: |
           jupyter lab notebooks --help
       - name: Flake8
+        if: always()
         run: |
           nbqa flake8 --ignore=E124,E203,E231,E266,E402,E501,E703,F821,W503,W291,W293 --nbqa-exclude="(tensorflow-training-openvino)|(pytorch-quantization-aware-training)" notebooks
       - name: Black
+        if: always()
         run: |
           black --check -l 160 .
       - name: Test READMEs and requirements
+        if: always()
         run: |
           python -m pytest .ci/test_notebooks.py
       - name: Test links from READMEs
+        if: always()
         run: |
           python .ci/check_links.py
       - name: Test table of content and device widget
+        if: always()
         run: |
           python .ci/check_notebooks.py
