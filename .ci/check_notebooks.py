@@ -82,6 +82,7 @@ def main():
         if no_tocs:
             print("NO TABLE OF CONTENT:")
             print("\n".join(no_tocs))
+            print("\nYou can generate Table of content with the following command:\n    python .ci/table_of_content.py -s <PATH>")
             print("==================================")
         if no_device:
             print("NO DEVICE SELECTION:")
@@ -90,6 +91,7 @@ def main():
         if no_scarf_tag:
             print("NO SCARF PIXEL TAG:")
             print("\n".join(no_scarf_tag))
+            print("\nYou can generate Scarf Pixel tag with the following command:\n    python .ci/scarf_pixel.py -s <PATH>")
             print("==================================")
         if no_install_instructions:
             print("NO INSTALL INSTRUCTIONS SECTION:")
