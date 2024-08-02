@@ -42,10 +42,7 @@ def test_readme():
     """
     for item in Path("notebooks").iterdir():
         if item.is_dir():
-            # item is a notebook directory
-            notebook_dir = item.relative_to(Path("notebooks"))
-            if str(notebook_dir)[0].isdigit():
-                assert "README.md" in [filename.name for filename in item.iterdir()], f"README not found in {item}"
+            assert "README.md" in [filename.name for filename in item.iterdir()], f"README not found in {item}"
 
 
 def test_requirements_docker():
