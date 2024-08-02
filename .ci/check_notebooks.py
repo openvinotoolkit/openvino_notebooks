@@ -96,6 +96,7 @@ def main():
         if no_install_instructions:
             print("NO INSTALL INSTRUCTIONS SECTION:")
             print("\n".join(no_install_instructions))
+            print("\nYou can generate Install Instructions with the following command:\n    python .ci/install_instructions.py -s <PATH>")
             print("==================================")
 
     sys.exit(0 if all_passed else 1)

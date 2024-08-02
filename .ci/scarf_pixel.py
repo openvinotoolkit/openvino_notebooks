@@ -50,6 +50,7 @@ def add_scarf_tag_to_notebook(notebook_path: Path):
         nb_node: nbformat.NotebookNode = nbformat.read(fr, as_version=4)
         first_cell_source: str = nb_node["cells"][0]["source"]
         first_cell_source_lines = first_cell_source.split("\n")
+        first_cell_source_lines.append("")
         first_cell_source_lines.append(get_scarf_tag(notebook_path))
         first_cell_source_lines.append("")
         nb_node["cells"][0]["source"] = "\n".join(first_cell_source_lines)

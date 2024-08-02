@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 from typing import Optional, Tuple
 import nbformat
@@ -40,3 +41,24 @@ def add_install_instructions(notebook_path: Path):
         nb_node["cells"][i]["source"] = "\n".join(cell_source_lines)
     with open(notebook_path, "w") as fw:
         nbformat.write(nb_node, fw)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "-s",
+        "--source",
+        help="Specify the path to the notebook file, where Install Instructions section should be added",
+        required=True,
+    )
+
+    args = parser.parse_args()
+    file_path = Path(args.source)
+    if not file_path.exists():
+        print(f'File does not exist at path "{file_path}"')
+        exit(1)
+    if not file_path.is_file():
+        print(f"Provided path is not a file")
+        exit(1)
+    add_install_instructions(file_path)
