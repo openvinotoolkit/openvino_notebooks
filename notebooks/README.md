@@ -115,8 +115,9 @@
 
 ## Explainable AI
 
-- [OpenVINO™ Explainable AI Toolkit: Deep Dive notebook](./explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb)
-- [eXplainable AI (XAI) for OpenVINO™ IR Models](./explainable-ai-1-basic/explainable-ai-1-basic.ipynb)
+- [OpenVINO™ Explainable AI Toolkit (3/3): Saliency map interpretation](./explainable-ai-3-map-interpretation/explainable-ai-3-map-interpretation.ipynb)
+- [OpenVINO™ Explainable AI Toolkit (2/3): Deep Dive](./explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb)
+- [OpenVINO™ Explainable AI Toolkit (1/3): Basic](./explainable-ai-1-basic/explainable-ai-1-basic.ipynb)
 - [Language-Visual Saliency with CLIP and OpenVINO™](./clip-language-saliency-map/clip-language-saliency-map.ipynb)
 
 ## First Steps
@@ -125,7 +126,7 @@
 - [Hello Image Classification](./hello-world/hello-world.ipynb)
 - [Hello Image Segmentation](./hello-segmentation/hello-segmentation.ipynb)
 - [Hello Object Detection](./hello-detection/hello-detection.ipynb)
-- [eXplainable AI (XAI) for OpenVINO™ IR Models](./explainable-ai-1-basic/explainable-ai-1-basic.ipynb)
+- [OpenVINO™ Explainable AI Toolkit (1/3): Basic](./explainable-ai-1-basic/explainable-ai-1-basic.ipynb)
 
 ## Live Demos
 
