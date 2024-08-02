@@ -239,7 +239,7 @@ SUPPORTED_LLM_MODELS = {
             Answer: </s>
             <|assistant|>""",
         },
-        "neural-chat-7b-v3-1": {
+        "neural-chat-7b-v3-3": {
             "model_id": "Intel/neural-chat-7b-v3-3",
             "remote_code": False,
             "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
@@ -270,8 +270,8 @@ SUPPORTED_LLM_MODELS = {
         },
     },
     "Chinese": {
-        "qwen1.5-0.5b-chat": {
-            "model_id": "Qwen/Qwen1.5-0.5B-Chat",
+        "qwen2-0.5b-instruct": {
+            "model_id": "Qwen/Qwen2-0.5B-Instruct",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],

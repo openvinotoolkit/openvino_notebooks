@@ -1,10 +1,5 @@
-import re
-from pathlib import Path
 from typing import Any
-import numpy as np
 from queue import Queue
-import openvino_tokenizers
-from openvino_genai import StreamerBase
 import openvino as ov
 from uuid import uuid4
 from threading import Event, Thread
@@ -43,6 +38,26 @@ japanese_examples = [
         ["人工知能と「OpenVINOの利点」について100語程度のブログ記事を書いてください。"],
 ]
 
+DEFAULT_SYSTEM_PROMPT = """\
+You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
+If a question does not make any sense or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\
+"""
+
+DEFAULT_SYSTEM_PROMPT_CHINESE = """\
+你是一个乐于助人、尊重他人以及诚实可靠的助手。在安全的情况下，始终尽可能有帮助地回答。 您的回答不应包含任何有害、不道德、种族主义、性别歧视、有毒、危险或非法的内容。请确保您的回答在社会上是公正的和积极的。
+如果一个问题没有任何意义或与事实不符，请解释原因，而不是回答错误的问题。如果您不知道问题的答案，请不要分享虚假信息。另外，答案请使用中文。\
+"""
+
+DEFAULT_SYSTEM_PROMPT_JAPANESE = """\
+あなたは親切で、礼儀正しく、誠実なアシスタントです。 常に安全を保ちながら、できるだけ役立つように答えてください。 回答には、有害、非倫理的、人種差別的、性差別的、有毒、危険、または違法なコンテンツを含めてはいけません。 回答は社会的に偏見がなく、本質的に前向きなものであることを確認してください。
+質問が意味をなさない場合、または事実に一貫性がない場合は、正しくないことに答えるのではなく、その理由を説明してください。 質問の答えがわからない場合は、誤った情報を共有しないでください。\
+"""
+
+
+def get_system_prompt(model_language):
+    return DEFAULT_SYSTEM_PROMPT_CHINESE if (model_language == "Chinese") else DEFAULT_SYSTEM_PROMPT_JAPANESE if (model_language == "Japanese") else DEFAULT_SYSTEM_PROMPT
+
+
 class TextQueue:
     def __init__(self) -> None:
         self.text_queue = Queue()
@@ -74,49 +89,13 @@ def get_gradio_helper(pipe, model_configuration, model_id, model_language):
 
     max_new_tokens = 256
 
-    start_message = model_configuration["start_message"]
-    history_template = model_configuration.get("history_template")
-    current_message_template = model_configuration.get("current_message_template")
-
+    start_message = get_system_prompt(model_language)
 
     def get_uuid():
         """
         universal unique identifier for thread
         """
         return str(uuid4())
-
-
-    def convert_history_to_input(history):
-        """
-        function for conversion history stored as list pairs of user and assistant messages to tokens according to model expected conversation template
-        Params:
-        history: dialogue history
-        Returns:
-        history in token format
-        """
-        new_prompt = f"{start_message}"
-        if history_template is None:
-            for user_msg, model_msg in history:
-                new_prompt += user_msg + "\n" + model_msg + "\n"
-            return new_prompt
-        else:
-            new_prompt = "".join(["".join([history_template.format(num=round, user=item[0], assistant=item[1])]) for round, item in enumerate(history[:-1])])
-            new_prompt += "".join(
-                [
-                    "".join(
-                        [
-                            current_message_template.format(
-                                num=len(history) + 1,
-                                user=history[-1][0],
-                                assistant=history[-1][1],
-                            )
-                        ]
-                    )
-                ]
-            )
-
-        return new_prompt
-
 
     def default_partial_text_processor(partial_text: str, new_text: str):
         """
@@ -162,10 +141,12 @@ def get_gradio_helper(pipe, model_configuration, model_id, model_language):
         config.do_sample = temperature > 0.0
         config.max_new_tokens = max_new_tokens
         config.repetition_penalty = repetition_penalty
+        history = history or []
+        if not history:
+            pipe.start_chat(system_message=start_message)
 
-        # history = [['message', 'chatbot answer'], ...]
         history.append([message, ""])
-        new_prompt = convert_history_to_input(history)
+        new_prompt = message
 
         stream_complete = Event()
 
@@ -197,6 +178,7 @@ def get_gradio_helper(pipe, model_configuration, model_id, model_language):
     def stop_chat_and_clear_history(streamer):
         if streamer is not None:
             streamer.end()
+        pipe.finish_chat()
         return None, None
 
     examples = chinese_examples if (model_language == "Chinese") else japanese_examples if (model_language == "Japanese") else english_examples
