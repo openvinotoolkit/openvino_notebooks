@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 import nbformat
 
@@ -37,11 +38,11 @@ def check_scarf_tag_in_readme(readme_path: Path) -> bool:
 
 def add_scarf_tag(file_path: Path):
     if file_path.suffix == ".ipynb":
-        return add_scarf_tag_to_notebook(file_path)
-    if file_path.suffix == ".md":
-        return add_scarf_tag_to_readme(file_path)
-    print(f'Invalid file extension at path "{str(file_path)}". Only .ipynb and .md files are supported.')
-    return False
+        add_scarf_tag_to_notebook(file_path)
+    elif file_path.suffix == ".md":
+        add_scarf_tag_to_readme(file_path)
+    else:
+        raise Exception(f'Invalid file extension at path "{str(file_path)}". Only .ipynb and .md files are supported.')
 
 
 def add_scarf_tag_to_notebook(notebook_path: Path):
@@ -49,7 +50,6 @@ def add_scarf_tag_to_notebook(notebook_path: Path):
         nb_node: nbformat.NotebookNode = nbformat.read(fr, as_version=4)
         first_cell_source: str = nb_node["cells"][0]["source"]
         first_cell_source_lines = first_cell_source.split("\n")
-        first_cell_source_lines.append("")
         first_cell_source_lines.append(get_scarf_tag(notebook_path))
         first_cell_source_lines.append("")
         nb_node["cells"][0]["source"] = "\n".join(first_cell_source_lines)
@@ -65,3 +65,24 @@ def add_scarf_tag_to_readme(readme_path: Path):
         content_lines.append("\n")
     with open(readme_path, "w", encoding="utf8") as fw:
         fw.writelines(content_lines)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "-s",
+        "--source",
+        help="Specify the path to the notebook or README file, where Scarf Pixel tag should be added",
+        required=True,
+    )
+
+    args = parser.parse_args()
+    file_path = Path(args.source)
+    if not file_path.exists():
+        print(f'File does not exist at path "{file_path}"')
+        exit(1)
+    if not file_path.is_file():
+        print(f"Provided path is not a file")
+        exit(1)
+    add_scarf_tag(file_path)
