@@ -9,33 +9,33 @@ max_new_tokens = 256
 core = ov.Core()
 
 chinese_examples = [
-        ["你好!"],
-        ["你是谁?"],
-        ["请介绍一下上海"],
-        ["请介绍一下英特尔公司"],
-        ["晚上睡不着怎么办？"],
-        ["给我讲一个年轻人奋斗创业最终取得成功的故事。"],
-        ["给这个故事起一个标题。"],
+    ["你好!"],
+    ["你是谁?"],
+    ["请介绍一下上海"],
+    ["请介绍一下英特尔公司"],
+    ["晚上睡不着怎么办？"],
+    ["给我讲一个年轻人奋斗创业最终取得成功的故事。"],
+    ["给这个故事起一个标题。"],
 ]
 
 english_examples = [
-        ["Hello there! How are you doing?"],
-        ["What is OpenVINO?"],
-        ["Who are you?"],
-        ["Can you explain to me briefly what is Python programming language?"],
-        ["Explain the plot of Cinderella in a sentence."],
-        ["What are some common mistakes to avoid when writing code?"],
-        ["Write a 100-word blog post on “Benefits of Artificial Intelligence and OpenVINO“"],
+    ["Hello there! How are you doing?"],
+    ["What is OpenVINO?"],
+    ["Who are you?"],
+    ["Can you explain to me briefly what is Python programming language?"],
+    ["Explain the plot of Cinderella in a sentence."],
+    ["What are some common mistakes to avoid when writing code?"],
+    ["Write a 100-word blog post on “Benefits of Artificial Intelligence and OpenVINO“"],
 ]
 
 japanese_examples = [
-        ["こんにちは！調子はどうですか?"],
-        ["OpenVINOとは何ですか?"],
-        ["あなたは誰ですか?"],
-        ["Pythonプログラミング言語とは何か簡単に説明してもらえますか?"],
-        ["シンデレラのあらすじを一文で説明してください。"],
-        ["コードを書くときに避けるべきよくある間違いは何ですか?"],
-        ["人工知能と「OpenVINOの利点」について100語程度のブログ記事を書いてください。"],
+    ["こんにちは！調子はどうですか?"],
+    ["OpenVINOとは何ですか?"],
+    ["あなたは誰ですか?"],
+    ["Pythonプログラミング言語とは何か簡単に説明してもらえますか?"],
+    ["シンデレラのあらすじを一文で説明してください。"],
+    ["コードを書くときに避けるべきよくある間違いは何ですか?"],
+    ["人工知能と「OpenVINOの利点」について100語程度のブログ記事を書いてください。"],
 ]
 
 DEFAULT_SYSTEM_PROMPT = """\
@@ -55,7 +55,11 @@ DEFAULT_SYSTEM_PROMPT_JAPANESE = """\
 
 
 def get_system_prompt(model_language):
-    return DEFAULT_SYSTEM_PROMPT_CHINESE if (model_language == "Chinese") else DEFAULT_SYSTEM_PROMPT_JAPANESE if (model_language == "Japanese") else DEFAULT_SYSTEM_PROMPT
+    return (
+        DEFAULT_SYSTEM_PROMPT_CHINESE
+        if (model_language == "Chinese")
+        else DEFAULT_SYSTEM_PROMPT_JAPANESE if (model_language == "Japanese") else DEFAULT_SYSTEM_PROMPT
+    )
 
 
 class TextQueue:
@@ -111,9 +115,7 @@ def get_gradio_helper(pipe, model_configuration, model_id, model_language):
         partial_text += new_text
         return partial_text
 
-
     text_processor = model_configuration.get("partial_text_processor", default_partial_text_processor)
-
 
     def bot(message, history, temperature, top_p, top_k, repetition_penalty):
         """
@@ -168,12 +170,10 @@ def get_gradio_helper(pipe, model_configuration, model_id, model_language):
             history[-1][1] = partial_text
             yield "", history, streamer
 
-
     def stop_chat(streamer):
         if streamer is not None:
             streamer.end()
         return None
-
 
     def stop_chat_and_clear_history(streamer):
         if streamer is not None:
@@ -182,7 +182,6 @@ def get_gradio_helper(pipe, model_configuration, model_id, model_language):
         return None, None
 
     examples = chinese_examples if (model_language == "Chinese") else japanese_examples if (model_language == "Japanese") else english_examples
-
 
     with gr.Blocks(
         theme=gr.themes.Soft(),

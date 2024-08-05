@@ -537,12 +537,15 @@ def get_optimum_cli_command(model_id, weight_format, output_dir, compression_opt
     command += " {}".format(output_dir)
     return command
 
-default_language = 'English'
+
+default_language = "English"
 
 SUPPORTED_OPTIMIZATIONS = ["INT4", "INT4-AWQ", "INT8", "FP16"]
 
+
 def get_llm_selection_widget():
     import ipywidgets as widgets
+
     lang_drop_down = widgets.Dropdown(options=list(SUPPORTED_LLM_MODELS))
 
     # Define dependent drop down
@@ -553,26 +556,32 @@ def get_llm_selection_widget():
         global default_language
         default_language = change.new
         # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
-        model_drop_down.options=SUPPORTED_LLM_MODELS[change.new]
-    lang_drop_down.observe(dropdown_handler, names='value')
+        model_drop_down.options = SUPPORTED_LLM_MODELS[change.new]
+
+    lang_drop_down.observe(dropdown_handler, names="value")
     compression_drop_down = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS)
     preconverted = widgets.Checkbox(value=True)
 
-    form_items = [         
-    widgets.Box([widgets.Label(value='Language:'), lang_drop_down]),
-    widgets.Box([widgets.Label(value='Model:'), model_drop_down]),
-    widgets.Box([widgets.Label(value='Compression:'), compression_drop_down]),
-    widgets.Box([widgets.Label(value="Use preconverted models:"), preconverted])
+    form_items = [
+        widgets.Box([widgets.Label(value="Language:"), lang_drop_down]),
+        widgets.Box([widgets.Label(value="Model:"), model_drop_down]),
+        widgets.Box([widgets.Label(value="Compression:"), compression_drop_down]),
+        widgets.Box([widgets.Label(value="Use preconverted models:"), preconverted]),
     ]
-    
-    form = widgets.Box(form_items, layout=widgets.Layout(
-    display='flex',
-    flex_flow='column',
-    border='solid 1px',
-    #align_items='stretch',
-    width='30%',
-    padding = '1%'))
+
+    form = widgets.Box(
+        form_items,
+        layout=widgets.Layout(
+            display="flex",
+            flex_flow="column",
+            border="solid 1px",
+            # align_items='stretch',
+            width="30%",
+            padding="1%",
+        ),
+    )
     return form, lang_drop_down, model_drop_down, compression_drop_down, preconverted
+
 
 def convert_tokenizer(model_id, remote_code, model_dir):
     import openvino as ov
@@ -628,9 +637,8 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
     print(f"✅ {precision} {model_id} model converted and can be found in {model_dir}")
     return model_dir
 
-    
+
 def compare_model_size(model_dir):
-    
     fp16_weights = model_dir.parent / "FP16" / "openvino_model.bin"
     int8_weights = model_dir.parent / "INT8_compressed_weights" / "openvino_model.bin"
     int4_weights = model_dir.parent / "INT4_compressed_weights" / "openvino_model.bin"
