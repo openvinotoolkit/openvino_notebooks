@@ -86,7 +86,7 @@ def main():
             try:
                 get = requests.get(url, timeout=10)
                 if get.status_code != 200:
-                    if get.status_code in [500, 429, 443, 403] and any([known_url in url for known_url in EXCEPTIONS_URLs]):
+                    if get.status_code in [502, 500, 429, 443, 403] and any([known_url in url for known_url in EXCEPTIONS_URLs]):
                         print(f"SKIP - {md_path}: URL can not be reached {url!r}, status code {get.status_code}")
                         continue
                     complain(f"{md_path}: URL can not be reached {url!r}, status code {get.status_code}")
