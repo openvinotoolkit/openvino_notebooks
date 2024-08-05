@@ -1,0 +1,40 @@
+{
+    "True_positive_high_confidence": {
+      "confidence": 0.79,
+      "paths": [
+        "train/n02088364/n02088364_2019.JPEG",
+        "train/n02099601/n02099601_6505.JPEG",
+        "train/n02105641/n02105641_817.JPEG",
+        "train/n02111889/n02111889_17737.JPEG"
+      ]
+    },
+    "True_positive_low_confidence": {
+      "confidence": 0.175,
+      "paths": [
+        "train/n02086240/n02086240_1765.JPEG",
+        "val/n02086240/n02086240_1422.JPEG",
+        "train/n02086240/n02086240_3709.JPEG",
+        "val/n02099601/n02099601_7942.JPEG"
+      ]
+    },
+    "False_positive_high_confidence": {
+      "confidence": 0.60,
+      "paths": [
+        "train/n02087394/n02087394_6357.JPEG",
+        "val/n02088364/n02088364_2430.JPEG",
+        "train/n02088364/n02088364_12304.JPEG",
+        "train/n02096294/n02096294_2323.JPEG",
+        "train/n02099601/n02099601_4933.JPEG",
+        "val/n02111889/n02111889_1931.JPEG",
+        "train/n02111889/n02111889_14926.JPEG",
+        "val/n02115641/n02115641_5752.JPEG"
+      ]
+    },
+    "True_positive_two_predictions": {
+      "confidence": 0.17,
+      "paths": [
+        "train/n02099601/n02099601_634.JPEG",
+        "train/n02111889/n02111889_374.JPEG"
+      ]
+    }
+}

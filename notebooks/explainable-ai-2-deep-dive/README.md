@@ -1,7 +1,15 @@
-# OpenVINO™ Explainable AI Toolkit: Classification Explanation
+# OpenVINO™ Explainable AI Toolkit (2/3): Deep Dive
 
-**OpenVINO™ Explainable AI (XAI) Toolkit** provides a suite of XAI algorithms for visual explanation of
-[**OpenVINO™**](https://github.com/openvinotoolkit/openvino) Intermediate Representation (IR) models.
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb)
+
+This is the **second notebook** in series of exploring [OpenVINO™ Explainable AI (XAI)](https://github.com/openvinotoolkit/openvino_xai/):
+
+1. [OpenVINO™ Explainable AI Toolkit (1/3): Basic](../explainable-ai-1-basic/README.md)
+2. [**OpenVINO™ Explainable AI Toolkit (2/3): Deep Dive**](../explainable-ai-2-deep-dive/README.md)
+3. [OpenVINO™ Explainable AI Toolkit (3/3): Saliency map interpretation](../explainable-ai-3-map-interpretation/README.md)
+
+[OpenVINO™ Explainable AI (XAI)](https://github.com/openvinotoolkit/openvino_xai/) provides a suite of XAI algorithms for visual explanation of
+[OpenVINO™](https://github.com/openvinotoolkit/openvino) Intermediate Representation (IR) models.
 
 Using **OpenVINO XAI**, you can generate **saliency maps** that highlight regions of interest in input images from the model's perspective. This helps users understand why complex AI models produce specific responses.
 
@@ -33,7 +41,6 @@ These are explainable AI algorithms supported by OpenVINO XAI :
 |                 |                      |           | ActivationMap       | experimental / [src](https://github.com/openvinotoolkit/openvino_xai/blob/releases/1.0.0/openvino_xai/methods/white_box/activation_map.py) |
 |                   |                    | Black-Box | RISE                | [arxiv](https://arxiv.org/abs/1806.07421v3) / [src](https://github.com/openvinotoolkit/openvino_xai/blob/releases/1.0.0/openvino_xai/methods/black_box/rise.py) |
 |                 | Object Detection     |           | ClassProbabilityMap | experimental / [src](https://github.com/openvinotoolkit/openvino_xai/blob/releases/1.0.0/openvino_xai/methods/white_box/det_class_probability_map.py) |
-
 
 ### Installation Instructions
 

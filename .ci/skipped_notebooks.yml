@@ -527,6 +527,11 @@
     - python:
         - '3.8'
         - '3.9'
+- notebook: notebooks/explainable-ai-3-map-interpretation/explainable-ai-3-map-interpretation.ipynb
+  skips:
+    - python:
+        - '3.8'
+        - '3.9'
 - notebook: notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
   skips:
     - os:
