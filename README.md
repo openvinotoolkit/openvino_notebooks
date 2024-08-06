@@ -15,6 +15,9 @@ A collection of ready-to-run Jupyter notebooks for learning and experimenting wi
 
 List of all notebooks is available in [index file](./notebooks/README.md).
 
+OpenVINO™ toolkit takes advantage of the discrete GPUs using oneAPI, an open programming model for multi-architecture programming. The 
+[oneAPI-samples](https://github.com/oneapi-src/oneAPI-samples) repository demonstrates the performance and productivity offered by oneAPI and its toolkits such as oneDNN in a multiarchitecture environment.
+
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 
 ## Table of Contents
