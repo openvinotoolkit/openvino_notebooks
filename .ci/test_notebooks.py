@@ -2,6 +2,7 @@ import requests
 from pathlib import Path
 from typing import Set
 import pytest
+from scarf_pixel import check_scarf_tag
 
 import toml
 from pip._internal.req import parse_requirements
@@ -38,11 +39,15 @@ def get_parsed_requirements(requirements_file: str) -> Set:
 
 def test_readme():
     """
-    Test that all notebooks have a README file
+    Test that all notebooks have a README file and README file includes Scarg Pixel tag
     """
     for item in Path("notebooks").iterdir():
         if item.is_dir():
             assert "README.md" in [filename.name for filename in item.iterdir()], f"README not found in {item}"
+            readme_path = item / "README.md"
+            assert check_scarf_tag(
+                readme_path
+            ), f"README file at path '{str(readme_path)}' does not contain Scarf Pixel tag.\nYou can generate Scarf Pixel tag with the following command:\n    python .ci/scarf_pixel.py -s <PATH>"
 
 
 def test_requirements_docker():
