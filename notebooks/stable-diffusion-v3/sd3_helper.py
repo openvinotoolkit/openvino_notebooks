@@ -35,17 +35,17 @@ TEXT_ENCODER_2_PATH = MODEL_DIR / "text_encoder_2.xml"
 TEXT_ENCODER_3_PATH = MODEL_DIR / "text_encoder_3.xml"
 
 
-def get_pipeline_options():
+def get_pipeline_options(default_value=(True, False)):
     import ipywidgets as widgets
 
     use_flash_lora = widgets.Checkbox(
-        value=True,
+        value=default_value[0],
         description="Use flash SD3",
         disabled=False,
     )
 
     load_t5 = widgets.Checkbox(
-        value=False,
+        value=default_value[1],
         description="Use t5 text encoder",
         disabled=False,
     )
@@ -66,19 +66,19 @@ def get_pipeline_selection_option(opt_models_dict):
     return use_quantized_models
 
 
-def get_pipeline_components(use_flash_lora, load_t5):
+def get_pipeline_components(use_flash_lora, load_t5, model_id="stabilityai/stable-diffusion-3-medium-diffusers"):
     pipe_kwargs = {}
     if use_flash_lora:
         # Load LoRA
         transformer = SD3Transformer2DModel.from_pretrained(
-            "stabilityai/stable-diffusion-3-medium-diffusers",
+            model_id,
             subfolder="transformer",
         )
         transformer = PeftModel.from_pretrained(transformer, "jasperai/flash-sd3")
         pipe_kwargs["transformer"] = transformer
     if not load_t5:
         pipe_kwargs.update({"text_encoder_3": None, "tokenizer_3": None})
-    pipe = StableDiffusion3Pipeline.from_pretrained("stabilityai/stable-diffusion-3-medium-diffusers", **pipe_kwargs)
+    pipe = StableDiffusion3Pipeline.from_pretrained(model_id, **pipe_kwargs)
     pipe.tokenizer.save_pretrained(MODEL_DIR / "tokenizer")
     pipe.tokenizer_2.save_pretrained(MODEL_DIR / "tokenizer_2")
     if load_t5:
@@ -126,6 +126,8 @@ def convert_transformer(transformer):
                 return_dict=return_dict,
             )
 
+    attention_dim = transformer.config.joint_attention_dim
+    projection_dim = transformer.config.pooled_projection_dim
     if isinstance(transformer, PeftModel):
         transformer = TransformerWrapper(transformer)
     transformer.forward = partial(transformer.forward, return_dict=False)
@@ -136,8 +138,8 @@ def convert_transformer(transformer):
             example_input={
                 "hidden_states": torch.zeros((2, 16, 64, 64)),
                 "timestep": torch.tensor([1, 1]),
-                "encoder_hidden_states": torch.ones([2, 154, 4096]),
-                "pooled_projections": torch.ones([2, 2048]),
+                "encoder_hidden_states": torch.ones([2, 154, attention_dim]),
+                "pooled_projections": torch.ones([2, projection_dim]),
             },
         )
     ov.save_model(ov_model, TRANSFORMER_PATH)
@@ -171,7 +173,7 @@ def convert_vae_decoder(vae):
     cleanup_torchscript_cache()
 
 
-def convert_sd3(load_t5, use_flash_lora):
+def convert_sd3(load_t5, use_flash_lora, model_id="stabilityai/stable-diffusion-3-medium-diffusers"):
     conversion_statuses = [TRANSFORMER_PATH.exists(), VAE_DECODER_PATH.exists(), TEXT_ENCODER_PATH.exists(), TEXT_ENCODER_2_PATH.exists()]
 
     if load_t5:
@@ -183,7 +185,7 @@ def convert_sd3(load_t5, use_flash_lora):
 
 
     if requires_conversion:
-        transformer, vae, text_encoder, text_encoder_2, text_encoder_3 = get_pipeline_components(use_flash_lora, load_t5)
+        transformer, vae, text_encoder, text_encoder_2, text_encoder_3 = get_pipeline_components(use_flash_lora, load_t5, model_id)
     else:
         print("SD3 model already converted")
         return
@@ -340,6 +342,7 @@ class OVStableDiffusion3Pipeline(DiffusionPipeline):
         tokenizer_2: CLIPTokenizer,
         text_encoder_3: T5EncoderModel = None,
         tokenizer_3: T5TokenizerFast = None,
+        text_encoder_3_dim = 4096
     ):
         super().__init__()
 
@@ -360,6 +363,7 @@ class OVStableDiffusion3Pipeline(DiffusionPipeline):
         self.vae_scaling_factor = 1.5305
         self.vae_shift_factor = 0.0609
         self.default_sample_size = 64
+        self._text_encoder_3_dim = text_encoder_3_dim
 
     def _get_t5_prompt_embeds(
         self,
@@ -371,7 +375,7 @@ class OVStableDiffusion3Pipeline(DiffusionPipeline):
 
         if self.text_encoder_3 is None:
             return torch.zeros(
-                (batch_size, self.tokenizer_max_length, 4096),
+                (batch_size, self.tokenizer_max_length, self._text_encoder_3_dim),
             )
 
         text_inputs = self.tokenizer_3(
@@ -789,7 +793,7 @@ class OVStableDiffusion3Pipeline(DiffusionPipeline):
         return StableDiffusion3PipelineOutput(images=image)
 
 
-def init_pipeline(models_dict: Dict[str, Any], device:str, use_flash_lora:bool):
+def init_pipeline(models_dict: Dict[str, Any], device:str, use_flash_lora:bool, text_encoder_3_dim=4096):
     pipeline_args = {}
 
     ov_config = {}
@@ -817,5 +821,6 @@ def init_pipeline(models_dict: Dict[str, Any], device:str, use_flash_lora:bool):
     pipeline_args["tokenizer"] = tokenizer
     pipeline_args["tokenizer_2"] = tokenizer_2
     pipeline_args["tokenizer_3"] = tokenizer_3
+    pipeline_args["text_encoder_3_dim"] = text_encoder_3_dim
     ov_pipe = OVStableDiffusion3Pipeline(**pipeline_args)
     return ov_pipe

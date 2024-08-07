@@ -87,12 +87,12 @@ def collect_calibration_data(ov_pipe, calibration_dataset_size: int, num_inferen
     return calibration_data
 
 
-def compress_model(model_path, save_path):
+def compress_model(model_path, save_path, group_size=128, ratio=0.8):
     if not save_path.exists():
         print(f"{model_path.stem} compression started")
-        print(f"Compression parameters:\n\tmode = {nncf.CompressWeightsMode.INT4_SYM}\n\tratio = 0.8\n\tgroup_size = 128")
+        print(f"Compression parameters:\n\tmode = {nncf.CompressWeightsMode.INT4_SYM}\n\tratio = {ratio}\n\tgroup_size = {group_size}")
         model = core.read_model(model_path)
-        compressed_model = nncf.compress_weights(model, mode=nncf.CompressWeightsMode.INT4_SYM, ratio=0.8, group_size=128)
+        compressed_model = nncf.compress_weights(model, mode=nncf.CompressWeightsMode.INT4_SYM, ratio=ratio, group_size=group_size)
         ov.save_model(compressed_model, save_path)
         print(f"{model_path.stem} compression finished")
     print(f"Compressed {model_path.stem} can be found in {save_path}")
@@ -140,12 +140,12 @@ def compare_models_size():
         print(f"{fp16_path.stem} compression rate: {fp16_ir_model_size / optimized_model_size:.3f}")
 
 
-def compress_models():
-    compress_model(TEXT_ENCODER_PATH, TEXT_ENCODER_INT4_PATH)
-    compress_model(TEXT_ENCODER_2_PATH, TEXT_ENCODER_2_INT4_PATH)
-    compress_model(VAE_DECODER_PATH, VAE_DECODER_INT4_PATH)
+def compress_models(group_size=128, ratio=0.8):
+    compress_model(TEXT_ENCODER_PATH, TEXT_ENCODER_INT4_PATH, group_size, ratio)
+    compress_model(TEXT_ENCODER_2_PATH, TEXT_ENCODER_2_INT4_PATH, group_size, ratio)
+    compress_model(VAE_DECODER_PATH, VAE_DECODER_INT4_PATH, group_size, ratio)
     if TEXT_ENCODER_3_PATH.exists():
-        compress_model(TEXT_ENCODER_3_PATH, TEXT_ENCODER_3_INT4_PATH)
+        compress_model(TEXT_ENCODER_3_PATH, TEXT_ENCODER_3_INT4_PATH, group_size, ratio)
 
 
 def calculate_inference_time(pipeline, validation_data, num_inference_steps, guidance_scale):
@@ -168,17 +168,17 @@ def calculate_inference_time(pipeline, validation_data, num_inference_steps, gui
     return np.median(inference_time)
 
 
-def compare_perf(models_dict, opt_models_dict, device, use_flash_lora, validation_size=5):
+def compare_perf(models_dict, opt_models_dict, device, use_flash_lora, validation_size=5, text_encoder_3_dim=4096):
     validation_dataset = datasets.load_dataset("google-research-datasets/conceptual_captions", split="train", streaming=True, trust_remote_code=True)
     validation_dataset = validation_dataset.take(validation_size)
     validation_data = [batch["caption"] for batch in validation_dataset]
 
     print("Load FP16 pipeline")
-    ov_pipe = init_pipeline(models_dict, device, use_flash_lora)
+    ov_pipe = init_pipeline(models_dict, device, use_flash_lora, text_encoder_3_dim)
     fp_latency = calculate_inference_time(ov_pipe, validation_data, 20 if not use_flash_lora else 4, 5 if not use_flash_lora else 0)
     del ov_pipe
     gc.collect()
     print("Load Optimized pipeline")
-    optimized_pipe = init_pipeline(opt_models_dict, device, use_flash_lora)
+    optimized_pipe = init_pipeline(opt_models_dict, device, use_flash_lora, text_encoder_3_dim)
     opt_latency = calculate_inference_time(optimized_pipe, validation_data, 20 if not use_flash_lora else 4, 5 if not use_flash_lora else 0)
     print(f"Performance speed-up: {fp_latency / opt_latency:.3f}")
