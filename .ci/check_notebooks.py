@@ -2,6 +2,8 @@ import sys
 import json
 from table_of_content import find_tc_in_cell
 from patch_notebooks import DEVICE_WIDGET, DEVICE_WIDGET_NEW
+from install_instructions import check_install_instructions
+from scarf_pixel import check_scarf_tag
 from pathlib import Path
 
 NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
@@ -30,13 +32,19 @@ def main():
     all_passed = True
     no_tocs = []
     no_device = []
+    no_scarf_tag = []
+    no_install_instructions = []
 
     def complain(message):
         nonlocal all_passed
         all_passed = False
         print(message, file=sys.stderr)
 
+    checkpoints_paths = set(NOTEBOOKS_ROOT.glob("**/.ipynb_checkpoints/*"))
+
     for nb_path in NOTEBOOKS_ROOT.glob("notebooks/**/*.ipynb"):
+        if nb_path in checkpoints_paths:
+            continue
         with open(nb_path, "r", encoding="utf-8") as notebook_file:
             notebook_json = json.load(notebook_file)
             toc_found = False
@@ -61,17 +69,35 @@ def main():
             if not device_found:
                 no_device.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
                 complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: device widget is not found")
+            if not check_scarf_tag(nb_path):
+                no_scarf_tag.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
+                complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Scarf Pixel tag is not found")
+            if not check_install_instructions(nb_path):
+                no_install_instructions.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
+                complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Install Instructions section is not found")
 
     if not all_passed:
-        print("SUMMARY:")
+        print("\nSUMMARY:")
         print("==================================")
         if no_tocs:
             print("NO TABLE OF CONTENT:")
             print("\n".join(no_tocs))
+            print("\nYou can generate Table of content with the following command:\n    python .ci/table_of_content.py -s <PATH>")
             print("==================================")
         if no_device:
             print("NO DEVICE SELECTION:")
             print("\n".join(no_device))
+            print("==================================")
+        if no_scarf_tag:
+            print("NO SCARF PIXEL TAG:")
+            print("\n".join(no_scarf_tag))
+            print("\nYou can generate Scarf Pixel tag with the following command:\n    python .ci/scarf_pixel.py -s <PATH>")
+            print("==================================")
+        if no_install_instructions:
+            print("NO INSTALL INSTRUCTIONS SECTION:")
+            print("\n".join(no_install_instructions))
+            print("\nYou can generate Install Instructions with the following command:\n    python .ci/install_instructions.py -s <PATH>")
+            print("==================================")
 
     sys.exit(0 if all_passed else 1)
 
