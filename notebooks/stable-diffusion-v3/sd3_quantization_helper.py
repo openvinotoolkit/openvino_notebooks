@@ -36,9 +36,9 @@ core = ov.Core()
 
 def disable_progress_bar(pipeline, disable=True):
     if not hasattr(pipeline, "_progress_bar_config"):
-        pipeline._progress_bar_config = {'disable': disable}
+        pipeline._progress_bar_config = {"disable": disable}
     else:
-        pipeline._progress_bar_config['disable'] = disable
+        pipeline._progress_bar_config["disable"] = disable
 
 
 class CompiledModelDecorator(ov.CompiledModel):
@@ -68,14 +68,7 @@ def collect_calibration_data(ov_pipe, calibration_dataset_size: int, num_inferen
     for batch in dataset:
         prompt = batch["caption"]
         negative_prompt = np.random.choice(negative_prompts)
-        ov_pipe(
-            prompt,
-            negative_prompt=negative_prompt,
-            num_inference_steps=num_inference_steps,
-            guidance_scale=guidance_scale,
-            height=512,
-            width=512
-        )
+        ov_pipe(prompt, negative_prompt=negative_prompt, num_inference_steps=num_inference_steps, guidance_scale=guidance_scale, height=512, width=512)
         if len(calibration_data) >= calibration_dataset_size:
             pbar.update(calibration_dataset_size - pbar.n)
             break
@@ -110,7 +103,7 @@ def visualize_results(orig_img, optimized_img):
     orig_title = "FP16 pipeline"
     control_title = "INT8 pipeline"
     figsize = (20, 20)
-    fig, axs = plt.subplots(1, 2, figsize=figsize, sharex='all', sharey='all')
+    fig, axs = plt.subplots(1, 2, figsize=figsize, sharex="all", sharey="all")
     list_axes = list(axs.flat)
     for a in list_axes:
         a.set_xticklabels([])

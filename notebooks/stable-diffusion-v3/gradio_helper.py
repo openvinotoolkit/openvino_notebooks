@@ -25,6 +25,7 @@ css = """
 }
 """
 
+
 def make_demo(pipeline, use_flash_lora):
     def infer(prompt, negative_prompt, seed, randomize_seed, width, height, guidance_scale, num_inference_steps, progress=gr.Progress(track_tqdm=True)):
         if randomize_seed:
@@ -43,7 +44,7 @@ def make_demo(pipeline, use_flash_lora):
         ).images[0]
 
         return image, seed
-    
+
     with gr.Blocks(css=css) as demo:
         with gr.Column(elem_id="col-container"):
             gr.Markdown(
@@ -123,5 +124,5 @@ def make_demo(pipeline, use_flash_lora):
             inputs=[prompt, negative_prompt, seed, randomize_seed, width, height, guidance_scale, num_inference_steps],
             outputs=[result, seed],
         )
-    
+
     return demo

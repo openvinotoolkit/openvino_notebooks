@@ -57,9 +57,9 @@ def get_pipeline_selection_option(opt_models_dict):
 
     model_available = all([pth.exists() for pth in opt_models_dict.values()])
     use_quantized_models = widgets.Checkbox(
-    value=model_available,
-    description="Use quantized models",
-    disabled=not model_available,
+        value=model_available,
+        description="Use quantized models",
+        disabled=not model_available,
     )
     return use_quantized_models
 
@@ -99,6 +99,7 @@ def get_pipeline_components(use_flash_lora, load_t5, model_id="stabilityai/stabl
         text_encoder_3 = pipe.text_encoder_3
         text_encoder_3.eval()
     return transformer, vae, text_encoder, text_encoder_2, text_encoder_3
+
 
 def cleanup_torchscript_cache():
     """
@@ -181,7 +182,6 @@ def convert_sd3(load_t5, use_flash_lora, model_id="stabilityai/stable-diffusion-
 
     transformer, vae, text_encoder, text_encoder_2, text_encoder_3 = None, None, None, None, None
 
-
     if requires_conversion:
         transformer, vae, text_encoder, text_encoder_2, text_encoder_3 = get_pipeline_components(use_flash_lora, load_t5, model_id)
     else:
@@ -194,7 +194,7 @@ def convert_sd3(load_t5, use_flash_lora, model_id="stabilityai/stable-diffusion-
         del transformer
         gc.collect()
         print("Transformer model conversion finished")
-    
+
     else:
         print("Found converted transformer model")
 
@@ -206,7 +206,7 @@ def convert_sd3(load_t5, use_flash_lora, model_id="stabilityai/stable-diffusion-
         print("T5 encoder conversion finished")
     elif load_t5:
         print("Found converted T5 encoder model")
-    
+
     if not TEXT_ENCODER_PATH.exists():
         print("Clip Text encoder 1 conversion started")
         convert_clip_model(text_encoder, TEXT_ENCODER_PATH)
@@ -230,7 +230,7 @@ def convert_sd3(load_t5, use_flash_lora, model_id="stabilityai/stable-diffusion-
         convert_vae_decoder(vae)
         del vae
         gc.collect()
-    
+
 
 # Copied from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.retrieve_timesteps
 def retrieve_timesteps(
@@ -340,7 +340,7 @@ class OVStableDiffusion3Pipeline(DiffusionPipeline):
         tokenizer_2: CLIPTokenizer,
         text_encoder_3: T5EncoderModel = None,
         tokenizer_3: T5TokenizerFast = None,
-        text_encoder_3_dim = 4096
+        text_encoder_3_dim=4096,
     ):
         super().__init__()
 
@@ -791,19 +791,18 @@ class OVStableDiffusion3Pipeline(DiffusionPipeline):
         return StableDiffusion3PipelineOutput(images=image)
 
 
-def init_pipeline(models_dict: Dict[str, Any], device:str, use_flash_lora:bool, text_encoder_3_dim=4096):
+def init_pipeline(models_dict: Dict[str, Any], device: str, use_flash_lora: bool, text_encoder_3_dim=4096):
     pipeline_args = {}
 
     ov_config = {}
     if "GPU" in device:
         ov_config["INFERENCE_PRECISION_HINT"] = "f32"
-    
+
     print("Models compilation")
     core = ov.Core()
     for model_name, model_path in models_dict.items():
         pipeline_args[model_name] = core.compile_model(model_path, device, ov_config if "text_encoder" in model_name else {})
         print(f"{model_name} - Done!")
-    
 
     scheduler = (
         FlowMatchEulerDiscreteScheduler.from_pretrained(MODEL_DIR / "scheduler")
