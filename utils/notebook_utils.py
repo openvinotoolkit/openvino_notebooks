@@ -56,10 +56,10 @@ def device_widget(default="AUTO", exclude=None, added=None):
     return device
 
 
-def quantization_widget():
+def quantization_widget(default=True):
     import ipywidgets as widgets
     to_quantize = widgets.Checkbox(
-    value=True,
+    value=default,
     description="Quantization",
     disabled=False,
     )

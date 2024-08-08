@@ -1,15 +1,14 @@
-
 import gc
 import time
 from typing import Any, Dict, List
 import datasets
+import matplotlib.pyplot as plt
+import nncf
 import numpy as np
+import openvino as ov
 import torch
 from tqdm.notebook import tqdm
 from transformers import set_seed
-import openvino as ov
-import nncf
-import matplotlib.pyplot as plt
 from sd3_helper import MODEL_DIR, TRANSFORMER_PATH, TEXT_ENCODER_PATH, TEXT_ENCODER_2_PATH, TEXT_ENCODER_3_PATH, VAE_DECODER_PATH, init_pipeline
 
 TRANSFORMER_INT8_PATH = MODEL_DIR / "transformer_int8.xml"
