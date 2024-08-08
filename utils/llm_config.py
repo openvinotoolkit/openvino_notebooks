@@ -182,23 +182,8 @@ SUPPORTED_LLM_MODELS = {
             
             """,
         },
-        "mpt-7b-chat": {
-            "model_id": "mosaicml/mpt-7b-chat",
-            "remote_code": False,
-            "start_message": f"<|im_start|>system\n {DEFAULT_SYSTEM_PROMPT }<|im_end|>",
-            "history_template": "<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}<|im_end|>",
-            "current_message_template": '"<|im_start|>user\n{user}<im_end><|im_start|>assistant\n{assistant}',
-            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
-            "rag_prompt_template": f"""<|im_start|>system 
-            {DEFAULT_RAG_PROMPT }<|im_end|>"""
-            + """
-            <|im_start|>user
-            Question: {input} 
-            Context: {context} 
-            Answer: <im_end><|im_start|>assistant""",
-        },
-        "mistral-7b": {
-            "model_id": "mistralai/Mistral-7B-v0.1",
+        "mistral-7b-instruct": {
+            "model_id": "mistralai/Mistral-7B-Instruct-v0.1",
             "remote_code": False,
             "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
             "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
@@ -297,21 +282,6 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>assistant
             """,
         },
-        "qwen1.5-7b-chat": {
-            "model_id": "Qwen/Qwen1.5-7B-Chat",
-            "remote_code": False,
-            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
-            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
-            "rag_prompt_template": f"""<|im_start|>system
-            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
-            + """
-            <|im_start|>user
-            问题: {input} 
-            已知内容: {context} 
-            回答: <|im_end|>
-            <|im_start|>assistant
-            """,
-        },
         "qwen-7b-chat": {
             "model_id": "Qwen/Qwen-7B-Chat",
             "remote_code": True,
@@ -335,7 +305,6 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": True,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "tokenizer_kwargs": {"add_special_tokens": False},
-            "stop_tokens": [0, 2],
             "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
             + """
             问题: {input} 
@@ -348,7 +317,6 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": True,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "tokenizer_kwargs": {"add_special_tokens": False},
-            "stop_tokens": [0, 2],
             "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
             + """
             问题: {input} 
@@ -361,7 +329,7 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": True,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "tokenizer_kwargs": {"add_special_tokens": False},
-            "stop_tokens": [0, 2],
+            "stop_tokens": ["<unk>", "</s>"],
             "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
             + """
             问题: {input} 
@@ -373,13 +341,12 @@ SUPPORTED_LLM_MODELS = {
             "model_id": "openbmb/MiniCPM-2B-dpo-fp16",
             "remote_code": True,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
-            "stop_tokens": [2],
         },
         "internlm2-chat-1.8b": {
             "model_id": "internlm/internlm2-chat-1_8b",
             "remote_code": True,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
-            "stop_tokens": [2, 92542],
+            "stop_tokens": ["</s>", "<|im_end|>"],
             "partial_text_processor": internlm_partial_text_processor,
         },
         "qwen1.5-1.8b-chat": {
