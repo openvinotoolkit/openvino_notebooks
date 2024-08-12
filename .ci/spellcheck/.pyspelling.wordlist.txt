@@ -148,6 +148,7 @@ DataLoaders
 DataModule
 dataset
 datasets
+DaViT
 DDIM
 DDPMs
 dDPO
@@ -253,6 +254,7 @@ FEIL
 finetuned
 finetuning
 FLAC
+FLD
 floyd
 fn
 foley
