@@ -47,6 +47,7 @@ autoregressive
 autoregressively
 AutoTokenizer
 AWQ
+awq
 backend
 backends
 Baevski
@@ -395,6 +396,7 @@ KServe
 Kubernetes
 Kupyn
 KV
+KVCache
 Labelling
 labour
 labse
@@ -621,6 +623,7 @@ Prateek
 pre
 Precisions
 precomputed
+preconverted
 prefetching
 preformatted
 PrePostProcessing
