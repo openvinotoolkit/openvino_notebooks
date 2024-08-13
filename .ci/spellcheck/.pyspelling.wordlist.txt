@@ -47,6 +47,7 @@ autoregressive
 autoregressively
 AutoTokenizer
 AWQ
+awq
 backend
 backends
 Baevski
@@ -147,6 +148,7 @@ DataLoaders
 DataModule
 dataset
 datasets
+DaViT
 DDIM
 DDPMs
 dDPO
@@ -252,6 +254,7 @@ FEIL
 finetuned
 finetuning
 FLAC
+FLD
 floyd
 fn
 foley
@@ -393,6 +396,7 @@ KServe
 Kubernetes
 Kupyn
 KV
+KVCache
 Labelling
 labour
 labse
@@ -619,6 +623,7 @@ Prateek
 pre
 Precisions
 precomputed
+preconverted
 prefetching
 preformatted
 PrePostProcessing

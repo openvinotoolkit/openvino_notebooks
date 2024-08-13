@@ -56,6 +56,18 @@ def device_widget(default="AUTO", exclude=None, added=None):
     return device
 
 
+def quantization_widget(default=True):
+    import ipywidgets as widgets
+
+    to_quantize = widgets.Checkbox(
+        value=default,
+        description="Quantization",
+        disabled=False,
+    )
+
+    return to_quantize
+
+
 def load_image(path: str) -> np.ndarray:
     """
     Loads an image from `path` and returns it as BGR numpy array. `path`

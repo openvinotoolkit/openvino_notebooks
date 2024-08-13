@@ -1,7 +1,7 @@
+import torch
 import gradio as gr
 import numpy as np
 import random
-import torch
 
 MAX_SEED = np.iinfo(np.int32).max
 MAX_IMAGE_SIZE = 1344
@@ -103,9 +103,9 @@ def make_demo(pipeline, use_flash_lora):
                     guidance_scale = gr.Slider(
                         label="Guidance scale",
                         minimum=0.0,
-                        maximum=10.0 if not use_flash_lora.value else 2,
+                        maximum=10.0 if not use_flash_lora else 2,
                         step=0.1,
-                        value=5.0 if not use_flash_lora.value else 0,
+                        value=5.0 if not use_flash_lora else 0,
                     )
 
                     num_inference_steps = gr.Slider(
@@ -113,7 +113,7 @@ def make_demo(pipeline, use_flash_lora):
                         minimum=1,
                         maximum=50,
                         step=1,
-                        value=28 if not use_flash_lora.value else 4,
+                        value=28 if not use_flash_lora else 4,
                     )
 
             gr.Examples(examples=examples, inputs=[prompt])
