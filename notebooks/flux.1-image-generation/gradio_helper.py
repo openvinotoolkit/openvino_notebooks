@@ -12,7 +12,7 @@ examples = [
     "an anime illustration of a wiener schnitzel",
 ]
 
-css="""
+css = """
 #col-container {
     margin: 0 auto;
     max-width: 520px;
@@ -26,22 +26,17 @@ def make_demo(ov_pipe):
             seed = random.randint(0, MAX_SEED)
         generator = torch.Generator().manual_seed(seed)
         image = ov_pipe(
-                prompt = prompt, 
-                width = width,
-                height = height,
-                num_inference_steps = num_inference_steps, 
-                generator = generator,
-                guidance_scale=guidance_scale
-        ).images[0] 
+            prompt=prompt, width=width, height=height, num_inference_steps=num_inference_steps, generator=generator, guidance_scale=guidance_scale
+        ).images[0]
         return image, seed
 
     with gr.Blocks(css=css) as demo:
-        
+
         with gr.Column(elem_id="col-container"):
             gr.Markdown(f"""# FLUX.1 OpenVINO demo""")
-            
+
             with gr.Row():
-                
+
                 prompt = gr.Text(
                     label="Prompt",
                     show_label=False,
@@ -49,13 +44,13 @@ def make_demo(ov_pipe):
                     placeholder="Enter your prompt",
                     container=False,
                 )
-                
+
                 run_button = gr.Button("Run", scale=0)
-            
+
             result = gr.Image(label="Result", show_label=False)
-            
+
             with gr.Accordion("Advanced Settings", open=False):
-                
+
                 seed = gr.Slider(
                     label="Seed",
                     minimum=0,
@@ -63,11 +58,11 @@ def make_demo(ov_pipe):
                     step=1,
                     value=0,
                 )
-                
+
                 randomize_seed = gr.Checkbox(label="Randomize seed", value=True)
-                
+
                 with gr.Row():
-                    
+
                     width = gr.Slider(
                         label="Width",
                         minimum=256,
@@ -75,7 +70,7 @@ def make_demo(ov_pipe):
                         step=32,
                         value=512,
                     )
-                    
+
                     height = gr.Slider(
                         label="Height",
                         minimum=256,
@@ -83,7 +78,7 @@ def make_demo(ov_pipe):
                         step=32,
                         value=512,
                     )
-                
+
                 with gr.Row():
                     guidance_scale = gr.Slider(
                         label="Guidance Scale",
@@ -91,7 +86,7 @@ def make_demo(ov_pipe):
                         maximum=15,
                         step=0.1,
                         value=3.5 if ov_pipe.transformer_config.get("guidance_embeds", False) else 0.0,
-                        visible=not ov_pipe.transformer_config.get("guidance_embeds", False)
+                        visible=not ov_pipe.transformer_config.get("guidance_embeds", False),
                     )
                     num_inference_steps = gr.Slider(
                         label="Number of inference steps",
@@ -100,16 +95,16 @@ def make_demo(ov_pipe):
                         step=1,
                         value=4,
                     )
-            
+
             gr.Examples(
-                examples = examples,
-                inputs = [prompt],
+                examples=examples,
+                inputs=[prompt],
             )
 
         gr.on(
             triggers=[run_button.click, prompt.submit],
-            fn = infer,
-            inputs = [prompt, seed, randomize_seed, width, height, num_inference_steps, guidance_scale],
-            outputs = [result, seed]
+            fn=infer,
+            inputs=[prompt, seed, randomize_seed, width, height, num_inference_steps, guidance_scale],
+            outputs=[result, seed],
         )
     return demo

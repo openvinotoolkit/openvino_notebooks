@@ -22,7 +22,7 @@ from transformers import AutoTokenizer
 
 MODEL_DIR = Path("flux.1-shnell")
 
-TRANSFORMER_PATH =  Path("transformer/transformer.xml")
+TRANSFORMER_PATH = Path("transformer/transformer.xml")
 VAE_DECODER_PATH = Path("vae/vae_decoder.xml")
 TEXT_ENCODER_PATH = Path("text_encoder/text_encoder.xml")
 TEXT_ENCODER_2_PATH = Path("text_encoder_2/text_encoder_2.xml")
@@ -41,6 +41,7 @@ def get_model_selector(default="black-forest-labs/FLUX.1-schnell"):
     )
 
     return model_checkpoint
+
 
 def weight_compression_widget():
     import ipywidgets as widgets
@@ -108,24 +109,23 @@ def _prepare_latent_image_ids(batch_size, height, width, device=torch.device("cp
     latent_image_id_height, latent_image_id_width, latent_image_id_channels = latent_image_ids.shape
 
     latent_image_ids = latent_image_ids[None, :].repeat(batch_size, 1, 1, 1)
-    latent_image_ids = latent_image_ids.reshape(
-        batch_size, latent_image_id_height * latent_image_id_width, latent_image_id_channels
-    )
+    latent_image_ids = latent_image_ids.reshape(batch_size, latent_image_id_height * latent_image_id_width, latent_image_id_channels)
 
     return latent_image_ids.to(device=device, dtype=dtype)
+
 
 def convert_transformer(transformer, model_path):
     attention_dim = transformer.config.joint_attention_dim
     projection_dim = transformer.config.pooled_projection_dim
     transformer.forward = partial(transformer.forward, return_dict=False)
     __make_16bit_traceable(transformer)
-    example_input={
-                "hidden_states": torch.zeros((1, 256, 64)),
-                "timestep": torch.tensor([1], dtype=torch.float32),
-                "encoder_hidden_states": torch.ones([1, 256, attention_dim]),
-                "pooled_projections": torch.ones([1, projection_dim]),
-                "txt_ids": torch.zeros([1, 256, 3]),
-                "img_ids": _prepare_latent_image_ids(1, 32, 32)
+    example_input = {
+        "hidden_states": torch.zeros((1, 256, 64)),
+        "timestep": torch.tensor([1], dtype=torch.float32),
+        "encoder_hidden_states": torch.ones([1, 256, attention_dim]),
+        "pooled_projections": torch.ones([1, projection_dim]),
+        "txt_ids": torch.zeros([1, 256, 3]),
+        "img_ids": _prepare_latent_image_ids(1, 32, 32),
     }
     if transformer.config.guidance_embeds:
         example_input["guidance"] = torch.tensor([5.0])
@@ -172,12 +172,11 @@ def convert_vae_decoder(vae, model_path):
 def convert_flux(model_id="black-forest-labs/FLUX.1-schnell"):
     model_dir = Path(model_id.split("/")[-1])
     conversion_statuses = [
-        (model_dir / TRANSFORMER_PATH).exists(), 
+        (model_dir / TRANSFORMER_PATH).exists(),
         (model_dir / VAE_DECODER_PATH).exists(),
         (model_dir / TEXT_ENCODER_PATH).exists(),
-        (model_dir / TEXT_ENCODER_2_PATH).exists()
+        (model_dir / TEXT_ENCODER_2_PATH).exists(),
     ]
-
 
     requires_conversion = not all(conversion_statuses)
 
@@ -198,7 +197,6 @@ def convert_flux(model_id="black-forest-labs/FLUX.1-schnell"):
 
     else:
         print("✅ Found converted transformer model")
-
 
     if not (model_dir / TEXT_ENCODER_PATH).exists():
         print("⌛ Clip Text encoder conversion started")
@@ -229,6 +227,7 @@ def convert_flux(model_id="black-forest-labs/FLUX.1-schnell"):
 
     print(f"✅ {model_id} successfully converted and can be found in {model_dir}")
     return model_dir
+
 
 def calculate_shift(
     image_seq_len,
@@ -317,12 +316,9 @@ class OVFluxPipeline(DiffusionPipeline):
         )
         self.vae_config = vae_config
         self.transformer_config = transformer_config
-        self.vae_scale_factor = 2 ** (len(self.vae_config.get("block_out_channels", [0] * 16)) if hasattr(self, "vae") and self.vae is not None else 16
-        )
+        self.vae_scale_factor = 2 ** (len(self.vae_config.get("block_out_channels", [0] * 16)) if hasattr(self, "vae") and self.vae is not None else 16)
         self.image_processor = VaeImageProcessor(vae_scale_factor=self.vae_scale_factor)
-        self.tokenizer_max_length = (
-            self.tokenizer.model_max_length if hasattr(self, "tokenizer") and self.tokenizer is not None else 77
-        )
+        self.tokenizer_max_length = self.tokenizer.model_max_length if hasattr(self, "tokenizer") and self.tokenizer is not None else 77
         self.default_sample_size = 64
 
     def _get_t5_prompt_embeds(
@@ -449,21 +445,16 @@ class OVFluxPipeline(DiffusionPipeline):
         if height % 8 != 0 or width % 8 != 0:
             raise ValueError(f"`height` and `width` have to be divisible by 8 but are {height} and {width}.")
 
-
         if prompt is not None and prompt_embeds is not None:
             raise ValueError(
-                f"Cannot forward both `prompt`: {prompt} and `prompt_embeds`: {prompt_embeds}. Please make sure to"
-                " only forward one of the two."
+                f"Cannot forward both `prompt`: {prompt} and `prompt_embeds`: {prompt_embeds}. Please make sure to" " only forward one of the two."
             )
         elif prompt_2 is not None and prompt_embeds is not None:
             raise ValueError(
-                f"Cannot forward both `prompt_2`: {prompt_2} and `prompt_embeds`: {prompt_embeds}. Please make sure to"
-                " only forward one of the two."
+                f"Cannot forward both `prompt_2`: {prompt_2} and `prompt_embeds`: {prompt_embeds}. Please make sure to" " only forward one of the two."
             )
         elif prompt is None and prompt_embeds is None:
-            raise ValueError(
-                "Provide either `prompt` or `prompt_embeds`. Cannot leave both `prompt` and `prompt_embeds` undefined."
-            )
+            raise ValueError("Provide either `prompt` or `prompt_embeds`. Cannot leave both `prompt` and `prompt_embeds` undefined.")
         elif prompt is not None and (not isinstance(prompt, str) and not isinstance(prompt, list)):
             raise ValueError(f"`prompt` has to be of type `str` or `list` but is {type(prompt)}")
         elif prompt_2 is not None and (not isinstance(prompt_2, str) and not isinstance(prompt_2, list)):
@@ -703,13 +694,18 @@ class OVFluxPipeline(DiffusionPipeline):
                 else:
                     guidance = None
 
-                transformer_input = {"hidden_states": latents, "timestep": timestep / 1000, "pooled_projections": pooled_prompt_embeds, "encoder_hidden_states": prompt_embeds, "txt_ids": text_ids, "img_ids": latent_image_ids}
+                transformer_input = {
+                    "hidden_states": latents,
+                    "timestep": timestep / 1000,
+                    "pooled_projections": pooled_prompt_embeds,
+                    "encoder_hidden_states": prompt_embeds,
+                    "txt_ids": text_ids,
+                    "img_ids": latent_image_ids,
+                }
                 if guidance is not None:
                     transformer_input["guidance"] = guidance
-                
-                noise_pred = torch.from_numpy(self.transformer(
-                    transformer_input
-                )[0])
+
+                noise_pred = torch.from_numpy(self.transformer(transformer_input)[0])
 
                 latents = self.scheduler.step(noise_pred, t, latents, return_dict=False)[0]
 
@@ -722,7 +718,7 @@ class OVFluxPipeline(DiffusionPipeline):
 
         else:
             latents = self._unpack_latents(latents, height, width, self.vae_scale_factor)
-            latents = (latents / self.vae_config.get("scaling_factor") + self.vae_config.get("shift_factor"))
+            latents = latents / self.vae_config.get("scaling_factor") + self.vae_config.get("shift_factor")
             image = self.vae(latents)[0]
             image = self.image_processor.postprocess(torch.from_numpy(image), output_type=output_type)
 
@@ -741,7 +737,7 @@ def init_pipeline(model_dir, models_dict: Dict[str, Any], device: str):
         pipeline_args[model_name] = core.compile_model(model_path, device)
         print(f"✅ {model_name} - Done!")
 
-    transformer_path  = models_dict["transformer"]
+    transformer_path = models_dict["transformer"]
     transformer_config_path = transformer_path.parent / "config.json"
     with transformer_config_path.open("r") as f:
         transformer_config = json.load(f)
