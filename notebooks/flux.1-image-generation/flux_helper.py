@@ -189,7 +189,7 @@ def convert_vae_decoder(vae, model_path):
     __make_16bit_traceable(vae)
     with torch.no_grad():
         vae.forward = vae.decode
-        ov_model = ov.convert_model(vae, example_input=torch.ones([1, 16, 64, 64]))
+        ov_model = ov.convert_model(vae, example_input=torch.ones([1, vae.config.latent_channels, 64, 64]))
     ov.save_model(ov_model, model_path)
     del ov_model
     cleanup_torchscript_cache()
