@@ -129,6 +129,7 @@ def rope(pos: torch.Tensor, dim: int, theta: int) -> torch.Tensor:
     out = stacked_out.view(batch_size, -1, dim // 2, 2, 2)
     return out.float()
 
+
 def _embednb_forward(self, ids: torch.Tensor) -> torch.Tensor:
     n_axes = ids.shape[-1]
     emb = torch.cat(
@@ -142,7 +143,7 @@ def convert_transformer(transformer, model_path):
     attention_dim = transformer.config.joint_attention_dim
     projection_dim = transformer.config.pooled_projection_dim
     transformer.forward = partial(transformer.forward, return_dict=False)
-    transformer.pos_embed.forward = types.MethodType(transformer.pos_embed, _embednb_forward)
+    transformer.pos_embed.forward = types.MethodType(_embednb_forward, transformer.pos_embed)
     __make_16bit_traceable(transformer)
     example_input = {
         "hidden_states": torch.zeros((1, 256, 64)),
