@@ -3,8 +3,8 @@ import inspect
 import json
 from functools import partial
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Union, Any
-import nncf
+from typing import Dict, List, Optional, Union, Any
+import types
 
 import openvino as ov
 from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
@@ -114,10 +114,35 @@ def _prepare_latent_image_ids(batch_size, height, width, device=torch.device("cp
     return latent_image_ids.to(device=device, dtype=dtype)
 
 
+def rope(pos: torch.Tensor, dim: int, theta: int) -> torch.Tensor:
+    assert dim % 2 == 0, "The dimension must be even."
+
+    scale = torch.arange(0, dim, 2, dtype=torch.float32, device=pos.device) / dim
+    omega = 1.0 / (theta**scale)
+
+    batch_size, seq_length = pos.shape
+    out = pos.unsqueeze(-1) * omega.unsqueeze(0).unsqueeze(0)
+    cos_out = torch.cos(out)
+    sin_out = torch.sin(out)
+
+    stacked_out = torch.stack([cos_out, -sin_out, sin_out, cos_out], dim=-1)
+    out = stacked_out.view(batch_size, -1, dim // 2, 2, 2)
+    return out.float()
+
+def _embednb_forward(self, ids: torch.Tensor) -> torch.Tensor:
+    n_axes = ids.shape[-1]
+    emb = torch.cat(
+        [rope(ids[..., i], self.axes_dim[i], self.theta) for i in range(n_axes)],
+        dim=-3,
+    )
+    return emb.unsqueeze(1)
+
+
 def convert_transformer(transformer, model_path):
     attention_dim = transformer.config.joint_attention_dim
     projection_dim = transformer.config.pooled_projection_dim
     transformer.forward = partial(transformer.forward, return_dict=False)
+    transformer.pos_embed.forward = types.MethodType(transformer.pos_embed, _embednb_forward)
     __make_16bit_traceable(transformer)
     example_input = {
         "hidden_states": torch.zeros((1, 256, 64)),
