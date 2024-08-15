@@ -595,7 +595,7 @@ parameterization
 parametrize
 Parler
 parsers
-perceptronmultiarchitecture
+perceptron
 Patil
 PEFT
 perceiver
