@@ -28,6 +28,7 @@ List of all notebooks is available in [index file](./notebooks/README.md).
 	- [To Launch all Notebooks](#to-launch-all-notebooks)
 - [🧹 Cleaning Up](#-cleaning-up)
 - [⚠️ Troubleshooting](#️-troubleshooting)
+- [📚 Additional Resources](#-additional-resources)
 - [🧑‍💻 Contributors](#-contributors)
 - [❓ FAQ](#-faq)
 
@@ -169,6 +170,17 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 - If you get an `ImportError`, double-check that you installed the Jupyter kernel. If necessary, choose the `openvino_env` kernel from the _Kernel->Change Kernel_ menu in Jupyter Lab or Jupyter Notebook.
 - If OpenVINO is installed globally, do not run installation commands in a terminal where `setupvars.bat` or `setupvars.sh` are sourced.
 - For Windows installation, it is recommended to use _Command Prompt (`cmd.exe`)_, not _PowerShell_.
+
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+<div id='-additional-resource'></div>
+
+## 📚 Additional Resources
+* [OpenVINO Blog](https://blog.openvino.ai/) - a collection of technical articles with OpenVINO best practices, interesting use cases and tutorials.
+* [Awesome OpenVINO](https://github.com/openvinotoolkit/awesome-openvino) - a curated list of OpenVINO based AI projects.
+* [OpenVINO GenAI Samples](https://github.com/openvinotoolkit/openvino.genai?tab=readme-ov-file#openvino-genai-samples) - collection of OpenVINO GenAI API samples.
+* [Edge AI Reference Kit](https://github.com/openvinotoolkit/openvino_build_deploy) - pre-built components and code samples designed to accelerate the development and deployment of production-grade AI applications across various industries, such as retail, healthcare, and manufacturing.
+* [Open Model Zoo demos](https://github.com/openvinotoolkit/open_model_zoo/blob/master/demos/README.md) -  console applications that provide templates to help implement specific deep learning inference scenarios. These applications show how to preprocess and postprocess data for model inference and organize processing pipelines.
+* [oneAPI-samples](https://github.com/oneapi-src/oneAPI-samples) repository demonstrates the performance and productivity offered by oneAPI and its toolkits such as oneDNN in a multiarchitecture environment. OpenVINO™ toolkit takes advantage of the discrete GPUs using oneAPI, an open programming model for multi-architecture programming.
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#-contributors)
 <div id='-contributors'></div>

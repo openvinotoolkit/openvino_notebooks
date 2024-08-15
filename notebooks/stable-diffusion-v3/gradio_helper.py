@@ -6,7 +6,6 @@ import random
 MAX_SEED = np.iinfo(np.int32).max
 MAX_IMAGE_SIZE = 1344
 
-
 examples = [
     "Astronaut in a jungle, cold color palette, muted colors, detailed, 8k",
     "An astronaut riding a green horse",

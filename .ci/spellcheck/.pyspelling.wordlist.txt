@@ -493,6 +493,7 @@ mpnet
 mpt
 MPT
 MRPC
+multiarchitecture
 Multiclass
 multiclass
 MultiHeadAttention
@@ -541,6 +542,8 @@ odometry
 OMZ
 OneFormer
 oneformer
+oneAPI
+oneDNN
 ONNX
 onnx
 ontologies
@@ -734,6 +737,7 @@ scalability
 Scalable
 scalable
 ScaleMapLearner
+schnell
 Schuster
 sd
 SDEdit
@@ -846,6 +850,7 @@ tokenizes
 tokenizing
 ToneColorConverter
 Tongyi
+toolkits
 TorchDynamo
 torchdynamo
 TorchMetrics
