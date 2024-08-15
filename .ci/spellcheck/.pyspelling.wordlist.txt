@@ -493,6 +493,7 @@ mpnet
 mpt
 MPT
 MRPC
+multiarchitecture
 Multiclass
 multiclass
 MultiHeadAttention
@@ -541,6 +542,8 @@ odometry
 OMZ
 OneFormer
 oneformer
+oneAPI
+oneDNN
 ONNX
 onnx
 ontologies
@@ -592,7 +595,7 @@ parameterization
 parametrize
 Parler
 parsers
-perceptron
+perceptronmultiarchitecture
 Patil
 PEFT
 perceiver
@@ -847,6 +850,7 @@ tokenizes
 tokenizing
 ToneColorConverter
 Tongyi
+toolkits
 TorchDynamo
 torchdynamo
 TorchMetrics
