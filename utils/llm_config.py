@@ -54,6 +54,10 @@ def internlm_partial_text_processor(partial_text, new_text):
     return partial_text.split("<|im_end|>")[0]
 
 
+def phi_completion_to_prompt(completion):
+    return f"<|system|><|end|><|user|>{completion}<|end|><|assistant|>\n"
+
+
 SUPPORTED_LLM_MODELS = {
     "English": {
         "qwen2-0.5b-instruct": {
@@ -252,6 +256,7 @@ SUPPORTED_LLM_MODELS = {
             Context: {context} 
             Answer: <|end|>
             <|assistant|>""",
+            "completion_to_prompt": phi_completion_to_prompt,
         },
     },
     "Chinese": {
