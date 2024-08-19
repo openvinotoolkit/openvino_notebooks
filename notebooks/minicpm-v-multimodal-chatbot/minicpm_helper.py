@@ -32,7 +32,7 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
     Helper function for checking that model has specified input or output name
 
     Parameters:
-      ov_model (ov.Model): 
+      ov_model (ov.Model):
       name (str):
           name of input or output
 
@@ -238,10 +238,10 @@ def get_1d_sincos_pos_embed_from_grid_new(embed_dim, pos):
     """
     assert embed_dim % 2 == 0
     omega = np.arange(embed_dim // 2, dtype=np.float32)
-    omega /= embed_dim / 2.
-    omega = 1. / 10000 ** omega  # (D/2,)
+    omega /= embed_dim / 2.0
+    omega = 1.0 / 10000**omega  # (D/2,)
 
-    out = np.einsum('hw,d->hwd', pos, omega)  # (H, W, D/2), outer product
+    out = np.einsum("hw,d->hwd", pos, omega)  # (H, W, D/2), outer product
 
     emb_sin = np.sin(out)  # (H, W, D/2)
     emb_cos = np.cos(out)  # (H, W, D/2)
@@ -256,17 +256,16 @@ def patch_model_code(orig_model_dir):
     if not orig_model_file.exists():
         model_file.rename(orig_model_file)
         with orig_model_file.open("r") as f:
-           content = f.read()
-           content = content.replace("if is_flash_attn_2_available():", "")
-           content = content.replace("from flash_attn import flash_attn_func, flash_attn_varlen_func", "")
-           content = content.replace("from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input", "")
+            content = f.read()
+            content = content.replace("if is_flash_attn_2_available():", "")
+            content = content.replace("from flash_attn import flash_attn_func, flash_attn_varlen_func", "")
+            content = content.replace("from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input", "")
 
-           with model_file.open("w") as out_f:
-               out_f.write(content)
+            with model_file.open("w") as out_f:
+                out_f.write(content)
 
 
 def convert_llm(model, model_dir):
-
     model.llm.config.save_pretrained(model_dir / text_emb_path.parent)
     if not (model_dir / text_emb_path).exists():
         print("⌛ Convert Input embedding model")
@@ -277,12 +276,12 @@ def convert_llm(model, model_dir):
         cleanup_torchscript_cache()
         gc.collect()
         print("✅ Input embedding model successfully converted")
-    
+
     if not (model_dir / llm_path).exists():
         print("⌛ Convert Language model")
         hidden_size = model.llm.config.hidden_size
         num_pkv = model.llm.config.num_hidden_layers
-        pkv_shape = (2, model.llm.config.num_key_value_heads, 2,  hidden_size // model.llm.config.num_attention_heads)
+        pkv_shape = (2, model.llm.config.num_key_value_heads, 2, hidden_size // model.llm.config.num_attention_heads)
 
         input_embeds = torch.randn((2, 2, hidden_size))
         attention_mask = torch.ones([2, 4], dtype=torch.long)
@@ -298,12 +297,7 @@ def convert_llm(model, model_dir):
             output_names.extend([f"present.{i}.key", f"present.{i}.value"])
         input_names.append("inputs_embeds")
 
-        example_input = {
-            "inputs_embeds": input_embeds,
-            "attention_mask": attention_mask,
-            "position_ids": position_ids,
-            "past_key_values": past_key_values
-        }
+        example_input = {"inputs_embeds": input_embeds, "attention_mask": attention_mask, "position_ids": position_ids, "past_key_values": past_key_values}
 
         model.llm.config.torchscript = True
 
@@ -311,10 +305,10 @@ def convert_llm(model, model_dir):
 
         for out, out_name in zip(ov_model.outputs, output_names):
             out.get_tensor().set_names({out_name})
-        
+
         for inp, inp_name in zip(ov_model.inputs, input_names):
             inp.get_tensor().set_names({inp_name})
-        
+
         patch_stateful(ov_model)
 
         ov.save_model(ov_model, model_dir / llm_path)
@@ -331,15 +325,16 @@ def convert_vision_encoder(model, model_dir):
         print("⌛ Convert Image embedding model")
         pixel_values = torch.randn([1, 3, 14, 14490])
         patch_attn_mask = torch.zeros((1, 1, 1035), dtype=torch.bool)
-        patch_attn_mask[0, 0, :tgt_sizes[0][0] * tgt_sizes[0][1]] = True
+        patch_attn_mask[0, 0, : tgt_sizes[0][0] * tgt_sizes[0][1]] = True
         ov_model = ov.convert_model(model.vpm, example_input={"pixel_values": pixel_values, "tgt_sizes": tgt_sizes, "patch_attention_mask": patch_attn_mask})
         ov.save_model(ov_model, model_dir / image_emb_path)
         del ov_model
         cleanup_torchscript_cache()
         print("✅ Image embedding model successfully converted")
-    
+
     if not (model_dir / resampler_path).exists():
         print("⌛ Convert Resamler model")
+
         def resampler_forward(self, x, pos_embed, key_padding_mask):
             bs = x.shape[0]
             x = self.kv_proj(x)  # B * L * D
@@ -347,18 +342,14 @@ def convert_vision_encoder(model, model_dir):
 
             q = self.ln_q(self.query)  # Q * D
 
-            out = self.attn(
-                self._repeat(q, bs),  # Q * B * D
-                x + pos_embed,  # L * B * D +  L * B * D
-                x,
-                key_padding_mask=key_padding_mask)[0]
+            out = self.attn(self._repeat(q, bs), x + pos_embed, x, key_padding_mask=key_padding_mask)[0]  # Q * B * D  # L * B * D +  L * B * D
             #  out: Q * B * D
             x = out.permute(1, 0, 2)  # B * Q * D
 
             x = self.ln_post(x)
             x = x @ self.proj
             return x
-        
+
         model.resampler.forward = types.MethodType(resampler_forward, model.resampler)
 
         pos_embed_base = get_2d_sincos_pos_embed(model.resampler.embed_dim, 70)
@@ -370,9 +361,8 @@ def convert_vision_encoder(model, model_dir):
 
         pos_embed = []
         tgt_h, tgt_w = tgt_sizes[0]
-        pos_embed = torch.from_numpy(pos_embed_base[:tgt_h, :tgt_w, :].reshape((tgt_h * tgt_w, 1, -1))) # patches * D
+        pos_embed = torch.from_numpy(pos_embed_base[:tgt_h, :tgt_w, :].reshape((tgt_h * tgt_w, 1, -1)))  # patches * D
         key_padding_mask[0, patch_len:] = True
-
 
         ov_model = ov.convert_model(model.resampler, example_input=[torch.randn(1, 1035, 1152), pos_embed, key_padding_mask])
         ov.save_model(ov_model, model_dir / resampler_path)
@@ -383,12 +373,9 @@ def convert_vision_encoder(model, model_dir):
 
 def convert_minicpmv26(model_id, remove_checkpoint=False):
     model_dir = Path(model_id.split("/")[-1])
-    requires_conversion = not all([
-        (model_dir / text_emb_path).exists(), 
-        (model_dir / image_emb_path).exists(), 
-        (model_dir / resampler_path).exists(), 
-        (model_dir / llm_path).exists()
-    ] )
+    requires_conversion = not all(
+        [(model_dir / text_emb_path).exists(), (model_dir / image_emb_path).exists(), (model_dir / resampler_path).exists(), (model_dir / llm_path).exists()]
+    )
 
     if not requires_conversion:
         print(f"✅ {model_id} model already converted. You can find results in {model_dir}")
@@ -424,6 +411,7 @@ def copy_llm_files(model_dir, dst_dir):
     shutil.copy(model_dir / llm_path.parent / "config.json", model_dir / dst_dir / "config.json")
     shutil.copy(model_dir / llm_path.parent / "configuration_minicpm.py", model_dir / dst_dir / "configuration_minicpm.py")
     shutil.copy(model_dir / llm_path / "modeling_navit_siglip.py", model_dir / dst_dir / "modeling_navit_siglip.py")
+
 
 core = ov.Core()
 
@@ -501,8 +489,8 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         past_len = self._get_past_length(past_key_values)
 
         if inputs_embeds is None:
-            inputs_embeds = self.embed_tokens(input_ids if past_key_values is None else input_ids[:, -1:]) 
-            
+            inputs_embeds = self.embed_tokens(input_ids if past_key_values is None else input_ids[:, -1:])
+
             if hasattr(self.config, "scale_emb"):
                 inputs_embeds = inputs_embeds * self.config.scale_emb
         inputs["inputs_embeds"] = inputs_embeds
@@ -625,7 +613,6 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         return self.forward(*args, **kwargs)
 
 
-
 class OvMiniCPMV:
     def __init__(self, config, vpm, resampler, llm, processor):
         self.config = config
@@ -637,7 +624,7 @@ class OvMiniCPMV:
         self._pos_embeds = torch.from_numpy(get_2d_sincos_pos_embed(self.embed_dim, 70)).float()
         self.max_size = (70, 70)
 
-        self.terminators = ['<|im_end|>', '<|endoftext|>']
+        self.terminators = ["<|im_end|>", "<|endoftext|>"]
 
     def set_decoder(self, decoder):
         self.llm = decoder
@@ -659,11 +646,10 @@ class OvMiniCPMV:
         for i in range(bs):
             tgt_h, tgt_w = tgt_sizes[i]
             pos_embed.append(self._pos_embeds[:tgt_h, :tgt_w, :].reshape((tgt_h * tgt_w, -1)))  # patches * D
-            key_padding_mask[i, patch_len[i]:] = True
+            key_padding_mask[i, patch_len[i] :] = True
 
-        pos_embed = torch.nn.utils.rnn.pad_sequence(
-            pos_embed, batch_first=True, padding_value=0.0).permute(1, 0, 2)  # BLD => L * B * D
-    
+        pos_embed = torch.nn.utils.rnn.pad_sequence(pos_embed, batch_first=True, padding_value=0.0).permute(1, 0, 2)  # BLD => L * B * D
+
         res = torch.from_numpy(self._resampler([x, pos_embed, key_padding_mask])[0])
         return res
 
@@ -679,9 +665,9 @@ class OvMiniCPMV:
             self._set_2d_pos_cache(self.max_sizes)
 
     def get_vllm_embedding(self, data):
-        if 'vision_hidden_states' not in data:
-            tgt_sizes = data['tgt_sizes']
-            pixel_values_list = data['pixel_values']
+        if "vision_hidden_states" not in data:
+            tgt_sizes = data["tgt_sizes"]
+            pixel_values_list = data["pixel_values"]
             vision_hidden_states = []
             all_pixel_values = []
             img_cnt = []
@@ -696,14 +682,13 @@ class OvMiniCPMV:
 
                 max_patches = torch.max(tgt_sizes[:, 0] * tgt_sizes[:, 1])
 
-                all_pixel_values = torch.nn.utils.rnn.pad_sequence(all_pixel_values, batch_first=True,
-                                                                   padding_value=0.0)
+                all_pixel_values = torch.nn.utils.rnn.pad_sequence(all_pixel_values, batch_first=True, padding_value=0.0)
                 B, L, _ = all_pixel_values.shape
                 all_pixel_values = all_pixel_values.permute(0, 2, 1).reshape(B, 3, -1, L)
 
                 patch_attn_mask = torch.zeros((B, 1, max_patches), dtype=torch.bool)
                 for i in range(B):
-                    patch_attn_mask[i, 0, :tgt_sizes[i][0] * tgt_sizes[i][1]] = True
+                    patch_attn_mask[i, 0, : tgt_sizes[i][0] * tgt_sizes[i][1]] = True
 
                 vision_batch_size = 1
                 all_pixel_values = all_pixel_values
@@ -712,7 +697,9 @@ class OvMiniCPMV:
                     for i in range(0, B, vision_batch_size):
                         start_idx = i
                         end_idx = i + vision_batch_size
-                        tmp_hs = torch.from_numpy(self.vpm([all_pixel_values[start_idx:end_idx], patch_attn_mask[start_idx:end_idx], tgt_sizes[start_idx:end_idx]])[0])
+                        tmp_hs = torch.from_numpy(
+                            self.vpm([all_pixel_values[start_idx:end_idx], patch_attn_mask[start_idx:end_idx], tgt_sizes[start_idx:end_idx]])[0]
+                        )
                         hs.append(tmp_hs)
                     vision_embedding = torch.cat(hs, dim=0)
                 else:
@@ -723,36 +710,33 @@ class OvMiniCPMV:
                 for pixel_values in pixel_values_list:
                     img_cnt = len(pixel_values)
                     if img_cnt > 0:
-                        vision_hidden_states.append(vision_embedding[start: start + img_cnt])
+                        vision_hidden_states.append(vision_embedding[start : start + img_cnt])
                         start += img_cnt
                     else:
                         vision_hidden_states.append([])
-            else: # no image
+            else:  # no image
                 dummy_feature = []
                 for _ in range(len(pixel_values_list)):
                     vision_hidden_states.append(dummy_feature)
 
         else:
-            vision_hidden_states = data['vision_hidden_states']
+            vision_hidden_states = data["vision_hidden_states"]
 
-        if hasattr(self.llm.config, 'scale_emb'):
-            vllm_embedding = self.llm.embed_tokens(data['input_ids']) * self.llm.config.scale_emb
+        if hasattr(self.llm.config, "scale_emb"):
+            vllm_embedding = self.llm.embed_tokens(data["input_ids"]) * self.llm.config.scale_emb
         else:
-            vllm_embedding = self.llm.embed_tokens(data['input_ids'])
+            vllm_embedding = self.llm.embed_tokens(data["input_ids"])
 
-        bs = len(data['input_ids'])
+        bs = len(data["input_ids"])
         for i in range(bs):
             cur_vs_hs = vision_hidden_states[i]
             if len(cur_vs_hs) > 0:
                 cur_vllm_emb = torch.from_numpy(vllm_embedding[i])
-                cur_image_bound = data['image_bound'][i]
+                cur_image_bound = data["image_bound"][i]
                 if len(cur_image_bound) > 0:
-                    image_indices = torch.stack(
-                        [torch.arange(r[0], r[1], dtype=torch.long) for r in cur_image_bound]
-                    )
+                    image_indices = torch.stack([torch.arange(r[0], r[1], dtype=torch.long) for r in cur_image_bound])
 
-                    cur_vllm_emb.scatter_(0, image_indices.view(-1, 1).repeat(1, cur_vllm_emb.shape[-1]),
-                                          cur_vs_hs.view(-1, cur_vs_hs.shape[-1]))
+                    cur_vllm_emb.scatter_(0, image_indices.view(-1, 1).repeat(1, cur_vllm_emb.shape[-1]), cur_vs_hs.view(-1, cur_vs_hs.shape[-1]))
         return vllm_embedding
 
     def forward(self, data, **kwargs):
@@ -761,21 +745,12 @@ class OvMiniCPMV:
         if position_ids.dtype != torch.int64:
             position_ids = position_ids.long()
 
-        return self.llm(
-            input_ids=None,
-            position_ids=position_ids,
-            inputs_embeds=vllm_embedding,
-            **kwargs
-        )
-    
+        return self.llm(input_ids=None, position_ids=position_ids, inputs_embeds=vllm_embedding, **kwargs)
+
     def _decode(self, inputs_embeds, tokenizer, attention_mask, decode_text=False, **kwargs):
         terminators = [tokenizer.convert_tokens_to_ids(i) for i in self.terminators]
         output = self.llm.generate(
-            inputs_embeds=torch.from_numpy(inputs_embeds),
-            pad_token_id=0,
-            eos_token_id=terminators,
-            attention_mask=attention_mask,
-            **kwargs
+            inputs_embeds=torch.from_numpy(inputs_embeds), pad_token_id=0, eos_token_id=terminators, attention_mask=attention_mask, **kwargs
         )
         if decode_text:
             return self._decode_text(output, tokenizer)
@@ -784,17 +759,12 @@ class OvMiniCPMV:
     def _decode_stream(self, inputs_embeds, tokenizer, **kwargs):
         terminators = [tokenizer.convert_tokens_to_ids(i) for i in self.terminators]
         streamer = TextIteratorStreamer(tokenizer=tokenizer)
-        generation_kwargs = {
-            'inputs_embeds': torch.from_numpy(inputs_embeds),
-            'pad_token_id': 0,
-            'eos_token_id': terminators,
-            'streamer': streamer
-        }
+        generation_kwargs = {"inputs_embeds": torch.from_numpy(inputs_embeds), "pad_token_id": 0, "eos_token_id": terminators, "streamer": streamer}
         generation_kwargs.update(kwargs)
 
         thread = Thread(target=self.llm.generate, kwargs=generation_kwargs)
         thread.start()
-    
+
         return streamer
 
     def _decode_text(self, result_ids, tokenizer):
@@ -821,7 +791,7 @@ class OvMiniCPMV:
         return_vision_hidden_states=False,
         stream=False,
         decode_text=False,
-        **kwargs
+        **kwargs,
     ):
         assert input_ids is not None
         assert len(input_ids) == len(pixel_values)
@@ -833,18 +803,18 @@ class OvMiniCPMV:
 
         if vision_hidden_states is None:
             model_inputs["pixel_values"] = pixel_values
-            model_inputs['tgt_sizes'] = tgt_sizes
+            model_inputs["tgt_sizes"] = tgt_sizes
         else:
             model_inputs["vision_hidden_states"] = vision_hidden_states
 
         with torch.inference_mode():
-            model_inputs["inputs_embeds"]  = self.get_vllm_embedding(model_inputs)
+            model_inputs["inputs_embeds"] = self.get_vllm_embedding(model_inputs)
 
             if stream:
                 result = self._decode_stream(model_inputs["inputs_embeds"], tokenizer, **kwargs)
             else:
                 result = self._decode(model_inputs["inputs_embeds"], tokenizer, attention_mask, decode_text=decode_text, **kwargs)
-        
+
         return result
 
     def chat(
@@ -858,11 +828,11 @@ class OvMiniCPMV:
         min_new_tokens=0,
         sampling=True,
         max_inp_length=8192,
-        system_prompt='',
+        system_prompt="",
         stream=False,
         max_slice_nums=None,
         use_image_id=None,
-        **kwargs
+        **kwargs,
     ):
         if isinstance(msgs[0], list):
             batched = True
@@ -870,7 +840,7 @@ class OvMiniCPMV:
             batched = False
         msgs_list = msgs
         images_list = image
-        
+
         if batched is False:
             images_list, msgs_list = [images_list], [msgs_list]
         else:
@@ -882,12 +852,22 @@ class OvMiniCPMV:
             if self.processor is None:
                 self.processor = AutoProcessor.from_pretrained(self.config._name_or_path, trust_remote_code=True)
             processor = self.processor
-        
-        assert self.config.query_num == processor.image_processor.image_feature_size, "These two values should be the same. Check `config.json` and `preprocessor_config.json`."
-        assert self.config.patch_size == processor.image_processor.patch_size, "These two values should be the same. Check `config.json` and `preprocessor_config.json`."
-        assert self.config.use_image_id == processor.image_processor.use_image_id, "These two values should be the same. Check `config.json` and `preprocessor_config.json`."
-        assert self.config.slice_config.max_slice_nums == processor.image_processor.max_slice_nums, "These two values should be the same. Check `config.json` and `preprocessor_config.json`."
-        assert self.config.slice_mode == processor.image_processor.slice_mode, "These two values should be the same. Check `config.json` and `preprocessor_config.json`."
+
+        assert (
+            self.config.query_num == processor.image_processor.image_feature_size
+        ), "These two values should be the same. Check `config.json` and `preprocessor_config.json`."
+        assert (
+            self.config.patch_size == processor.image_processor.patch_size
+        ), "These two values should be the same. Check `config.json` and `preprocessor_config.json`."
+        assert (
+            self.config.use_image_id == processor.image_processor.use_image_id
+        ), "These two values should be the same. Check `config.json` and `preprocessor_config.json`."
+        assert (
+            self.config.slice_config.max_slice_nums == processor.image_processor.max_slice_nums
+        ), "These two values should be the same. Check `config.json` and `preprocessor_config.json`."
+        assert (
+            self.config.slice_mode == processor.image_processor.slice_mode
+        ), "These two values should be the same. Check `config.json` and `preprocessor_config.json`."
 
         prompts_lists = []
         input_images_lists = []
@@ -921,41 +901,28 @@ class OvMiniCPMV:
                 msg["content"] = "\n".join(cur_msgs)
 
             if system_prompt:
-                sys_msg = {'role': 'system', 'content': system_prompt}
-                copy_msgs = [sys_msg] + copy_msgs        
+                sys_msg = {"role": "system", "content": system_prompt}
+                copy_msgs = [sys_msg] + copy_msgs
 
             prompts_lists.append(processor.tokenizer.apply_chat_template(copy_msgs, tokenize=False, add_generation_prompt=True))
             input_images_lists.append(images)
 
         inputs = processor(
-            prompts_lists, 
-            input_images_lists, 
-            max_slice_nums=max_slice_nums,
-            use_image_id=use_image_id,
-            return_tensors="pt", 
-            max_length=max_inp_length
+            prompts_lists, input_images_lists, max_slice_nums=max_slice_nums, use_image_id=use_image_id, return_tensors="pt", max_length=max_inp_length
         )
 
         if sampling:
-            generation_config = {
-                "top_p": 0.8,
-                "top_k": 100,
-                "temperature": 0.7,
-                "do_sample": True,
-                "repetition_penalty": 1.05
-            }
+            generation_config = {"top_p": 0.8, "top_k": 100, "temperature": 0.7, "do_sample": True, "repetition_penalty": 1.05}
         else:
             generation_config = {
                 "num_beams": 3,
                 "repetition_penalty": 1.2,
             }
-            
-        if min_new_tokens > 0:
-            generation_config['min_new_tokens'] = min_new_tokens
 
-        generation_config.update(
-            (k, kwargs[k]) for k in generation_config.keys() & kwargs.keys()
-        )
+        if min_new_tokens > 0:
+            generation_config["min_new_tokens"] = min_new_tokens
+
+        generation_config.update((k, kwargs[k]) for k in generation_config.keys() & kwargs.keys())
 
         inputs.pop("image_sizes")
         with torch.inference_mode():
@@ -966,15 +933,17 @@ class OvMiniCPMV:
                 vision_hidden_states=vision_hidden_states,
                 stream=stream,
                 decode_text=True,
-                **generation_config
+                **generation_config,
             )
-        
+
         if stream:
+
             def stream_gen():
                 for text in res:
                     for term in self.terminators:
-                        text = text.replace(term, '')
+                        text = text.replace(term, "")
                     yield text
+
             return stream_gen()
 
         else:
@@ -986,7 +955,7 @@ class OvMiniCPMV:
 
 
 def init_model(model_dir, llm_model_dir, device):
-    config  = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)      
+    config = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)
     llm = OvModelForCausalLMWithEmb(model_dir / llm_model_dir, device)
     img_emb = core.compile_model(model_dir / image_emb_path, device)
     resampler = core.compile_model(model_dir / resampler_path, device)
@@ -999,11 +968,7 @@ def init_model(model_dir, llm_model_dir, device):
 def lm_variant_selector(int4_model_dir):
     import ipywidgets as widgets
 
-    use_int4_lang_model = widgets.Checkbox(
-        value=int4_model_dir.exists(),
-        description="INT4 language model",
-        disabled=not int4_model_dir.exists()
-    )
+    use_int4_lang_model = widgets.Checkbox(value=int4_model_dir.exists(), description="INT4 language model", disabled=not int4_model_dir.exists())
     return use_int4_lang_model
 
 

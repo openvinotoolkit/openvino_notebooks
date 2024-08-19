@@ -34,6 +34,7 @@ def create_component(params, comp="Slider"):
     elif comp == "Button":
         return gr.Button(value=params["value"], interactive=True)
 
+
 def upload_img(image, _chatbot, _app_session):
     image = Image.fromarray(image)
 
@@ -42,6 +43,7 @@ def upload_img(image, _chatbot, _app_session):
     _app_session["img"] = image
     _chatbot.append(("", "Image uploaded successfully, you can talk to me now"))
     return _chatbot, _app_session
+
 
 def make_demo(model):
     def chat(img, msgs, ctx, params=None, vision_hidden_states=None):
@@ -70,7 +72,6 @@ def make_demo(model):
             print(err)
             traceback.print_exc()
             return -1, ERROR_MSG, None, None
-
 
     def respond(_question, _chat_bot, _app_cfg, params_form, num_beams, repetition_penalty, repetition_penalty_2, top_p, top_k, temperature):
         if _app_cfg.get("ctx", None) is None:
@@ -106,7 +107,6 @@ def make_demo(model):
                 _app_cfg["sts"] = sts
             yield "", _chat_bot, _app_cfg
 
-
     def regenerate_button_clicked(_question, _chat_bot, _app_cfg, params_form, num_beams, repetition_penalty, repetition_penalty_2, top_p, top_k, temperature):
         if len(_chat_bot) <= 1:
             _chat_bot.append(("Regenerate", "No question for regeneration."))
@@ -121,7 +121,6 @@ def make_demo(model):
             _question, _chat_bot, _app_cfg, params_form, num_beams, repetition_penalty, repetition_penalty_2, top_p, top_k, temperature
         ):
             yield text, _chatbot, _app_cfg
-
 
     with gr.Blocks() as demo:
         with gr.Row():
@@ -152,6 +151,8 @@ def make_demo(model):
                     [txt_message, chat_bot, app_session, params_form, num_beams, repetition_penalty, repetition_penalty_2, top_p, top_k, temperature],
                     [txt_message, chat_bot, app_session],
                 )
-                bt_pic.upload(lambda: None, None, chat_bot, queue=False).then(upload_img, inputs=[bt_pic, chat_bot, app_session], outputs=[chat_bot, app_session])
+                bt_pic.upload(lambda: None, None, chat_bot, queue=False).then(
+                    upload_img, inputs=[bt_pic, chat_bot, app_session], outputs=[chat_bot, app_session]
+                )
 
     return demo
