@@ -1,6 +1,8 @@
 import torch
 from threading import Thread
 from copy import deepcopy
+import shutil
+import json
 from PIL import Image
 from transformers import AutoModel, AutoTokenizer, AutoProcessor, TextIteratorStreamer
 from transformers.generation import GenerationMixin
@@ -30,7 +32,7 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
     Helper function for checking that model has specified input or output name
 
     Parameters:
-      ov_model (ov.Model):   # TODO: Can we derive the dimensions from the model topology?
+      ov_model (ov.Model): 
       name (str):
           name of input or output
 
@@ -71,7 +73,7 @@ def fuse_cache_reorder(
         raise ValueError("Model already has fused cache")
     input_batch = ov_model.input("inputs_embeds").get_partial_shape()[0]
     beam_idx = opset13.parameter(name="beam_idx", dtype=ov.Type.i32, shape=ov.PartialShape([input_batch]))
-    beam_idx.output(0).get_tensor().add_names({"beam_idx"})  # why list is not accepted?
+    beam_idx.output(0).get_tensor().add_names({"beam_idx"})
     ov_model.add_parameters([beam_idx])
     not_kv_inputs.append(ov_model.inputs[-1])
     # Go over all cache parameters and fuse _reorder_cache with indices provided by the new parameter beam_idx
@@ -260,21 +262,24 @@ def patch_model_code(orig_model_dir):
            content = content.replace("from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input", "")
 
            with model_file.open("w") as out_f:
-               model_file.write(content)
+               out_f.write(content)
 
 
 def convert_llm(model, model_dir):
 
     model.llm.config.save_pretrained(model_dir / text_emb_path.parent)
     if not (model_dir / text_emb_path).exists():
+        print("⌛ Convert Input embedding model")
         ov_model = ov.convert_model(model.llm.model.embed_tokens, example_input=torch.ones([1, 10], dtype=torch.long))
 
         ov.save_model(ov_model, model_dir / text_emb_path)
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
+        print("✅ Input embedding model successfully converted")
     
     if not (model_dir / llm_path).exists():
+        print("⌛ Convert Language model")
         hidden_size = model.llm.config.hidden_size
         num_pkv = model.llm.config.num_hidden_layers
         pkv_shape = (2, model.llm.config.num_key_value_heads, 2,  hidden_size // model.llm.config.num_attention_heads)
@@ -317,11 +322,13 @@ def convert_llm(model, model_dir):
 
         cleanup_torchscript_cache()
         gc.collect()
+        print("✅ Language model successfully converted")
 
 
 def convert_vision_encoder(model, model_dir):
     tgt_sizes = torch.tensor([[23, 45]])
     if not (model_dir / image_emb_path).exists():
+        print("⌛ Convert Image embedding model")
         pixel_values = torch.randn([1, 3, 14, 14490])
         patch_attn_mask = torch.zeros((1, 1, 1035), dtype=torch.bool)
         patch_attn_mask[0, 0, :tgt_sizes[0][0] * tgt_sizes[0][1]] = True
@@ -329,8 +336,10 @@ def convert_vision_encoder(model, model_dir):
         ov.save_model(ov_model, model_dir / image_emb_path)
         del ov_model
         cleanup_torchscript_cache()
+        print("✅ Image embedding model successfully converted")
     
     if not (model_dir / resampler_path).exists():
+        print("⌛ Convert Resamler model")
         def resampler_forward(self, x, pos_embed, key_padding_mask):
             bs = x.shape[0]
             x = self.kv_proj(x)  # B * L * D
@@ -357,21 +366,19 @@ def convert_vision_encoder(model, model_dir):
         patch_len = tgt_sizes[:, 0] * tgt_sizes[:, 1]
 
         max_patch_len = torch.max(patch_len)
-        key_padding_mask = torch.zeros((3, max_patch_len), dtype=torch.bool)
+        key_padding_mask = torch.zeros((1, max_patch_len), dtype=torch.bool)
 
         pos_embed = []
-        for i in range(3):
-            tgt_h, tgt_w = tgt_sizes[i]
-            pos_embed.append(torch.from_numpy(pos_embed_base[:tgt_h, :tgt_w, :].reshape((tgt_h * tgt_w, -1))))  # patches * D
-            key_padding_mask[i, patch_len[i]:] = True
+        tgt_h, tgt_w = tgt_sizes[0]
+        pos_embed = torch.from_numpy(pos_embed_base[:tgt_h, :tgt_w, :].reshape((tgt_h * tgt_w, 1, -1))) # patches * D
+        key_padding_mask[0, patch_len:] = True
 
-        pos_embed = torch.nn.utils.rnn.pad_sequence(
-            pos_embed, batch_first=True, padding_value=0.0).permute(1, 0, 2)
 
-        ov_model = ov.convert_model(model.resampler, example_input=[torch.randn(3, 1035, 1152), pos_embed, key_padding_mask])
+        ov_model = ov.convert_model(model.resampler, example_input=[torch.randn(1, 1035, 1152), pos_embed, key_padding_mask])
         ov.save_model(ov_model, model_dir / resampler_path)
         del ov_model
         cleanup_torchscript_cache()
+        print("✅ Resampler model successfully converted")
 
 
 def convert_minicpmv26(model_id, remove_checkpoint=False):
@@ -387,12 +394,14 @@ def convert_minicpmv26(model_id, remove_checkpoint=False):
         print(f"✅ {model_id} model already converted. You can find results in {model_dir}")
         return model_dir
 
+    print(f"⌛ {model_id} conversion started. Be patient, it may takes some time.")
+    print("⌛ Load Original model")
     ckpt = model_dir / "ckpt"
     if not ckpt.exists():
-        snapshot_download(model_id, local_dir=ckpt)
+        snapshot_download(model_id, local_dir=ckpt, force_download=True)
         patch_model_code(ckpt)
     model = AutoModel.from_pretrained(ckpt, trust_remote_code=True)
-    
+    print("✅ Original model successfully loaded")
     model.eval()
     model.config.save_pretrained(model_dir)
     tokenizer = AutoTokenizer.from_pretrained(ckpt, trust_remote_code=True)
@@ -405,7 +414,16 @@ def convert_minicpmv26(model_id, remove_checkpoint=False):
     gc.collect()
 
     convert_vision_encoder(model, model_dir)
+    print(f"✅ {model_id} model sucessfully converted. You can find results in {model_dir}")
     return model_dir
+
+
+def copy_llm_files(model_dir, dst_dir):
+    shutil.copy(model_dir / text_emb_path, model_dir / dst_dir / text_emb_path.name)
+    shutil.copy(model_dir / text_emb_path.with_suffix(".bin"), model_dir / dst_dir / text_emb_path.with_suffix(".bin").name)
+    shutil.copy(model_dir / llm_path.parent / "config.json", model_dir / dst_dir / "config.json")
+    shutil.copy(model_dir / llm_path.parent / "configuration_minicpm.py", model_dir / dst_dir / "configuration_minicpm.py")
+    shutil.copy(model_dir / llm_path / "modeling_navit_siglip.py", model_dir / dst_dir / "modeling_navit_siglip.py")
 
 core = ov.Core()
 
@@ -608,7 +626,7 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
 
 
 
-class OVMiniCPMV:
+class OvMiniCPMV:
     def __init__(self, config, vpm, resampler, llm, processor):
         self.config = config
         self.llm = llm
@@ -967,28 +985,35 @@ class OVMiniCPMV:
             return answer
 
 
-model_dir = convert_minicpmv26(model_id="openbmb/MiniCPM-V-2_6")
+def init_model(model_dir, llm_model_dir, device):
+    config  = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)      
+    llm = OvModelForCausalLMWithEmb(model_dir / llm_model_dir, device)
+    img_emb = core.compile_model(model_dir / image_emb_path, device)
+    resampler = core.compile_model(model_dir / resampler_path, device)
+    processor = AutoProcessor.from_pretrained(model_dir, trust_remote_code=True)
 
-config  = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)      
-llm = OvModelForCausalLMWithEmb(model_dir / llm_path.parent, "CPU")
-img_emb = core.compile_model(model_dir / image_emb_path, "CPU")
-resampler = core.compile_model(model_dir / resampler_path, "CPU")
-processor = AutoProcessor.from_pretrained(model_dir, trust_remote_code=True)
-
-ov_model = OVMiniCPMV(config, img_emb, resampler, llm, processor)
-
-import requests
-
-url = "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/d5fbbd1a-d484-415c-88cb-9986625b7b11"
-image = Image.open(requests.get(url, stream=True).raw)
-question = "What is unusual on this image?"
-
-print(f"Question:\n{question}")
+    ov_model = OvMiniCPMV(config, img_emb, resampler, llm, processor)
+    return ov_model
 
 
-msgs = [{"role": "user", "content": question}]
+def lm_variant_selector(int4_model_dir):
+    import ipywidgets as widgets
+
+    use_int4_lang_model = widgets.Checkbox(
+        value=int4_model_dir.exists(),
+        description="INT4 language model",
+        disabled=not int4_model_dir.exists()
+    )
+    return use_int4_lang_model
 
 
-print("Answer:")
-res = ov_model.chat(image=image, msgs=msgs, context=None, tokenizer=processor.tokenizer, sampling=True, temperature=0.7)
-print(res)
+def compression_widget(default_value=True):
+    import ipywidgets as widgets
+
+    to_compress_weights = widgets.Checkbox(
+        value=default_value,
+        description="Weights Compression",
+        disabled=False,
+    )
+
+    return to_compress_weights
