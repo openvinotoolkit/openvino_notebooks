@@ -26,6 +26,7 @@ example_schema = """{
     }
 }"""
 
+
 def make_demo(fn: Callable):
     with gr.Blocks() as demo:
         gr.Markdown("# Structure Extraction with NuExtract and OpenVINO")
@@ -39,19 +40,19 @@ def make_demo(fn: Callable):
                 )
                 schema_textbox = gr.Code(
                     label="JSON Schema",
-                    language='json',
+                    language="json",
                     lines=5,
                 )
             with gr.Column():
                 model_output_textbox = gr.Code(
                     label="Model Response",
-                    language='json',
+                    language="json",
                     interactive=False,
                     lines=10,
                 )
         with gr.Row():
             gr.ClearButton(components=[text_textbox, schema_textbox, model_output_textbox])
-            submit_button = gr.Button(value="Submit", variant='primary')
+            submit_button = gr.Button(value="Submit", variant="primary")
         with gr.Row():
             gr.Examples(examples=[[example_text, example_schema]], inputs=[text_textbox, schema_textbox])
 
