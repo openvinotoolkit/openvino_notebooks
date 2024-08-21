@@ -527,6 +527,7 @@ notus
 nsamples
 nsfw
 NSFW
+NuExtract
 num
 numpy
 NumPy
