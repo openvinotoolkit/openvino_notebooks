@@ -25,6 +25,7 @@ export type NotebookItem = NotebooksMap[string];
 
 class NotebooksService {
   private _notebooksMap: NotebooksMap | null = null;
+  private _allNotebooksTags: string[] = [];
 
   private async _getNotebooksMap(): Promise<NotebooksMap> {
     if (!this._notebooksMap) {
@@ -39,6 +40,7 @@ class NotebooksService {
       )) as Record<string, INotebookStatus>;
 
       this._notebooksMap = this._getNotebooksMapWithStatuses(notebooksMetadataMap, notebooksStatusMap);
+      this._allNotebooksTags = this._getAllNotebooksTags(this._notebooksMap);
     }
     return this._notebooksMap;
   }
@@ -77,6 +79,10 @@ class NotebooksService {
       .sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
   }
 
+  get allNotebooksTags(): typeof this._allNotebooksTags {
+    return this._allNotebooksTags;
+  }
+
   private _getCompareFn(sort: SortValues): Parameters<Array<INotebookMetadata>['sort']>[0] {
     if (sort === SORT_OPTIONS.RECENTLY_ADDED) {
       return (a: INotebookMetadata, b: INotebookMetadata) =>
@@ -110,6 +116,14 @@ class NotebooksService {
       result[notebookPath].status = status;
     }
     return result;
+  }
+
+  private _getAllNotebooksTags(notebooksMap: NotebooksMap): string[] {
+    const tagsSet = Object.values(notebooksMap).reduce((acc, { tags }) => {
+      const notebookTags = Object.values(tags).flat();
+      return new Set([...acc, ...notebookTags]);
+    }, new Set<string>());
+    return [...tagsSet];
   }
 }
 
