@@ -1,6 +1,6 @@
+from pathlib import Path
 from typing import Callable
 import gradio as gr
-import os
 from gradio_imageslider import ImageSlider
 
 css = """
@@ -16,7 +16,7 @@ css = """
 """
 
 
-def make_demo(fn: Callable):
+def make_demo(fn: Callable, examples_dir: str):
     with gr.Blocks(css=css) as demo:
         gr.Markdown("# Depth Anything with OpenVINO")
         gr.Markdown("### Depth Prediction demo")
@@ -30,9 +30,10 @@ def make_demo(fn: Callable):
 
         submit.click(fn=fn, inputs=[input_image], outputs=[depth_image_slider, raw_file])
 
-        example_files = os.listdir("assets/examples")
-        example_files.sort()
-        example_files = [os.path.join("assets/examples", filename) for filename in example_files]
+        if not Path(examples_dir).exists():
+            gr.Error(f"Examples directory {examples_dir} does not exist.")
+            raise FileNotFoundError(f"Examples directory {examples_dir} does not exist.")
+        example_files = sorted([str(image_path) for image_path in Path(examples_dir).iterdir()])
         examples = gr.Examples(
             examples=example_files,
             inputs=[input_image],
