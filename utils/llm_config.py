@@ -515,31 +515,37 @@ default_language = "English"
 SUPPORTED_OPTIMIZATIONS = ["INT4", "INT4-AWQ", "INT8", "FP16"]
 
 
-def get_llm_selection_widget():
+def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True):
     import ipywidgets as widgets
 
-    lang_drop_down = widgets.Dropdown(options=list(SUPPORTED_LLM_MODELS))
+    lang_dropdown = widgets.Dropdown(options=languages or [])
 
     # Define dependent drop down
 
-    model_drop_down = widgets.Dropdown(options=(SUPPORTED_LLM_MODELS[default_language]))
+    model_dropdown = widgets.Dropdown(options=models)
 
     def dropdown_handler(change):
         global default_language
         default_language = change.new
         # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
-        model_drop_down.options = SUPPORTED_LLM_MODELS[change.new]
+        model_dropdown.options = SUPPORTED_LLM_MODELS[change.new]
 
-    lang_drop_down.observe(dropdown_handler, names="value")
-    compression_drop_down = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS)
-    preconverted = widgets.Checkbox(value=True)
+    lang_dropdown.observe(dropdown_handler, names="value")
+    compression_dropdown = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS)
+    preconverted_checkbox = widgets.Checkbox(value=True)
 
-    form_items = [
-        widgets.Box([widgets.Label(value="Language:"), lang_drop_down]),
-        widgets.Box([widgets.Label(value="Model:"), model_drop_down]),
-        widgets.Box([widgets.Label(value="Compression:"), compression_drop_down]),
-        widgets.Box([widgets.Label(value="Use preconverted models:"), preconverted]),
-    ]
+    form_items = []
+
+    if languages:
+        form_items.append(widgets.Box([widgets.Label(value="Language:"), lang_dropdown]))
+    form_items.extend(
+        [
+            widgets.Box([widgets.Label(value="Model:"), model_dropdown]),
+            widgets.Box([widgets.Label(value="Compression:"), compression_dropdown]),
+        ]
+    )
+    if show_preconverted_checkbox:
+        form_items.append(widgets.Box([widgets.Label(value="Use preconverted models:"), preconverted_checkbox]))
 
     form = widgets.Box(
         form_items,
@@ -552,7 +558,7 @@ def get_llm_selection_widget():
             padding="1%",
         ),
     )
-    return form, lang_drop_down, model_drop_down, compression_drop_down, preconverted
+    return form, lang_dropdown, model_dropdown, compression_dropdown, preconverted_checkbox
 
 
 def convert_tokenizer(model_id, remote_code, model_dir):
