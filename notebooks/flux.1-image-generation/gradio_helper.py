@@ -31,12 +31,10 @@ def make_demo(ov_pipe):
         return image, seed
 
     with gr.Blocks(css=css) as demo:
-
         with gr.Column(elem_id="col-container"):
             gr.Markdown(f"""# FLUX.1 OpenVINO demo""")
 
             with gr.Row():
-
                 prompt = gr.Text(
                     label="Prompt",
                     show_label=False,
@@ -50,7 +48,6 @@ def make_demo(ov_pipe):
             result = gr.Image(label="Result", show_label=False)
 
             with gr.Accordion("Advanced Settings", open=False):
-
                 seed = gr.Slider(
                     label="Seed",
                     minimum=0,
@@ -62,7 +59,6 @@ def make_demo(ov_pipe):
                 randomize_seed = gr.Checkbox(label="Randomize seed", value=True)
 
                 with gr.Row():
-
                     width = gr.Slider(
                         label="Width",
                         minimum=256,
