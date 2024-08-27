@@ -662,7 +662,7 @@ class OvMiniCPMV:
         max_w = torch.max(tgt_sizes[:, 1])
         if max_h > self.max_size[0] or max_w > self.max_size[1]:
             self.max_size = [max(max_h, self.max_size[0]), max(max_w, self.max_size[1])]
-            self._set_2d_pos_cache(self.max_sizes)
+            self._set_2d_pos_cache(self.max_size)
 
     def get_vllm_embedding(self, data):
         if "vision_hidden_states" not in data:
