@@ -10,7 +10,7 @@ from traitlets.config import Config
 EXCLUDED_NOTEBOOKS = ["data-preparation-ct-scan.ipynb", "pytorch-monai-training.ipynb"]
 
 DEVICE_WIDGET = "device = widgets.Dropdown("
-DEVICE_WIDGET_NEW = "device = device_widget("
+DEVICE_WIDGET_NEW = "device_widget("
 
 
 def disable_gradio_debug(nb, notebook_path):
