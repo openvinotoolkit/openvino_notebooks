@@ -252,10 +252,10 @@ class VideoPlayer:
 
         self.cv2 = cv2  # This is done to access the package in class methods
         self.__cap = cv2.VideoCapture(source)
-        #try HD by default to get better video quality 
+        # try HD by default to get better video quality
         self.__cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
         self.__cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
-        
+
         if not self.__cap.isOpened():
             raise RuntimeError(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
         # skip first N frames
