@@ -36,6 +36,7 @@ def handle_errors(fn: Callable):
             raise gr.Error(f"Invalid JSON Schema: {e}", duration=None)
         except Exception as e:
             raise gr.Error(e, duration=None)
+
     return wrapped_fn
 
 
