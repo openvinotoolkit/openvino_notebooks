@@ -410,7 +410,7 @@ def copy_llm_files(model_dir, dst_dir):
     shutil.copy(model_dir / text_emb_path.with_suffix(".bin"), model_dir / dst_dir / text_emb_path.with_suffix(".bin").name)
     shutil.copy(model_dir / llm_path.parent / "config.json", model_dir / dst_dir / "config.json")
     shutil.copy(model_dir / llm_path.parent / "configuration_minicpm.py", model_dir / dst_dir / "configuration_minicpm.py")
-    shutil.copy(model_dir / llm_path / "modeling_navit_siglip.py", model_dir / dst_dir / "modeling_navit_siglip.py")
+    shutil.copy(model_dir / llm_path.parent / "modeling_navit_siglip.py", model_dir / dst_dir / "modeling_navit_siglip.py")
 
 
 core = ov.Core()
