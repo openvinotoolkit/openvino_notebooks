@@ -154,7 +154,6 @@
 - [YOLOv8 Oriented Bounding Boxes Object Detection with OpenVINO™](./yolov8-optimization/yolov8-obb.ipynb)
 - [Convert and Optimize YOLOv8 keypoint detection model with OpenVINO™](./yolov8-optimization/yolov8-keypoint-detection.ipynb)
 - [Convert and Optimize YOLOv8 instance segmentation model with OpenVINO™](./yolov8-optimization/yolov8-instance-segmentation.ipynb)
-- [Convert and Optimize YOLOv7 with OpenVINO™](./yolov7-optimization/yolov7-optimization.ipynb)
 - [Convert and Optimize YOLOv10 with OpenVINO](./yolov10-optimization/yolov10-optimization.ipynb)
 - [Image generation with Würstchen and OpenVINO](./wuerstchen-image-generation/wuerstchen-image-generation.ipynb)
 - [Video Subtitle Generation using Whisper and OpenVINO™](./whisper-subtitles-generation/whisper-subtitles-generation.ipynb)
