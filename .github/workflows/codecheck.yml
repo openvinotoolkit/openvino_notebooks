@@ -7,8 +7,9 @@ on:
       - 'main'
       - 'latest'
     paths:
+      - '**.py'
       - 'notebooks/**.ipynb'
-      - 'notebooks/**.py'
+      - 'notebooks/**.md'
       - 'requirements.txt'
       - '.ci/*'
       - '.github/workflows/*.yml'
@@ -18,8 +19,9 @@ on:
       - 'main'
       - 'latest'
     paths:
+      - '**.py'
       - 'notebooks/**.ipynb'
-      - 'notebooks/**.py'
+      - 'notebooks/**.md'
       - 'requirements.txt'
       - '.ci/*'
       - '.github/workflows/*.yml'
