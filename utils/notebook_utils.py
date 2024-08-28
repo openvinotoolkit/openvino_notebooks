@@ -247,14 +247,14 @@ class VideoPlayer:
     :param skip_first_frames: Skip first N frames.
     """
 
-    def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
+    def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0, width=1280, height=720):
         import cv2
 
         self.cv2 = cv2  # This is done to access the package in class methods
         self.__cap = cv2.VideoCapture(source)
         #try HD by default to get better video quality 
-        self.__cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-        self.__cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        self.__cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        self.__cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
         
         if not self.__cap.isOpened():
             raise RuntimeError(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
