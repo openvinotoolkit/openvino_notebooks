@@ -6,6 +6,7 @@ from typing import Optional, Tuple, List
 import huggingface_hub as hf_hub
 import openvino as ov
 import numpy as np
+import nncf
 import torch
 from transformers import AutoProcessor, AutoConfig, AutoModelForCausalLM, GenerationMixin, GenerationConfig
 from transformers.modeling_outputs import Seq2SeqLMOutput, BaseModelOutput
@@ -33,6 +34,18 @@ def get_model_selector(default="microsoft/Florence-2-base-ft"):
     return model_checkpoint
 
 
+def compression_widget(default_value=True):
+    import ipywidgets as widgets
+
+    to_compress_weights = widgets.Checkbox(
+        value=default_value,
+        description="Weights Compression",
+        disabled=False,
+    )
+
+    return to_compress_weights
+
+
 def cleanup_torchscript_cache():
     """
     Helper for removing cached model representation
@@ -42,7 +55,7 @@ def cleanup_torchscript_cache():
     torch.jit._state._clear_class_state()
 
 
-def convert_florence2(model_id, output_dir):
+def convert_florence2(model_id, output_dir, to_compress_weights=True):
     output_dir = Path(output_dir)
 
     required_conversion = not all(
@@ -92,6 +105,8 @@ def convert_florence2(model_id, output_dir):
         ov_model = ov.convert_model(
             model, example_input=example_input, input=[-1, 3, model.config.vision_config.projection_dim, model.config.vision_config.projection_dim]
         )
+        if to_compress_weights:
+            ov_model = nncf.compress_weights(ov_model, mode=nncf.CompressWeightsMode.INT4_ASYM)
         ov.save_model(ov_model, output_dir / IMAGE_EMBEDDING_NAME)
         del ov_model
         cleanup_torchscript_cache()
@@ -115,6 +130,8 @@ def convert_florence2(model_id, output_dir):
         encoder = model.get_encoder()
         example_input = {"inputs_embeds": torch.zeros([1, 590, model.config.text_config.d_model]), "attention_mask": torch.ones([1, 590])}
         ov_model = ov.convert_model(encoder, example_input=example_input)
+        if to_compress_weights:
+            ov_model = nncf.compress_weights(ov_model, mode=nncf.CompressWeightsMode.INT4_ASYM)
         ov.save_model(ov_model, output_dir / ENCODER_NAME)
         del ov_model
         cleanup_torchscript_cache()
@@ -172,6 +189,8 @@ def convert_florence2(model_id, output_dir):
             ov_model = ov.convert_model(model, example_input=example_input)
             for out, name in zip(ov_model.outputs, output_names):
                 out.get_tensor().set_names({name})
+            if to_compress_weights:
+                ov_model = nncf.compress_weights(ov_model, mode=nncf.CompressWeightsMode.INT4_ASYM)
             ov.save_model(ov_model, output_dir / DECODER_NAME)
             del ov_model
             cleanup_torchscript_cache()
@@ -188,6 +207,8 @@ def convert_florence2(model_id, output_dir):
             for inp, name in zip(ov_model.inputs[3:], input_names):
                 inp.get_tensor().set_names({name})
 
+            if to_compress_weights:
+                ov_model = nncf.compress_weights(ov_model, mode=nncf.CompressWeightsMode.INT4_ASYM)
             ov.save_model(ov_model, output_dir / DECODER_WITH_PAST_NAME)
             del ov_model
             cleanup_torchscript_cache()
