@@ -575,7 +575,7 @@ def convert_tokenizer(model_id, remote_code, model_dir):
 def convert_and_compress_model(model_id, model_config, precision, use_preconverted=True):
     from pathlib import Path
     from IPython.display import Markdown, display
-    import subprocess
+    import subprocess  # nosec - disable B404:import-subprocess check
     import platform
 
     pt_model_id = model_config["model_id"]

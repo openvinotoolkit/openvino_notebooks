@@ -1,7 +1,6 @@
 import torch
 import gradio as gr
 import numpy as np
-import random
 
 MAX_SEED = np.iinfo(np.int32).max
 MAX_IMAGE_SIZE = 1344
@@ -28,7 +27,7 @@ css = """
 def make_demo(pipeline, use_flash_lora):
     def infer(prompt, negative_prompt, seed, randomize_seed, width, height, guidance_scale, num_inference_steps, progress=gr.Progress(track_tqdm=True)):
         if randomize_seed:
-            seed = random.randint(0, MAX_SEED)
+            seed = np.random.randint(0, MAX_SEED)
 
         generator = torch.Generator().manual_seed(seed)
 
