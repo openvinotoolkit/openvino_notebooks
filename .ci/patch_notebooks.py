@@ -62,7 +62,6 @@ def remove_ov_install(cell):
             return False
         return True
 
-    
     lines = cell["source"].replace("pip_instal(", "pip_install( ").split("\n")
     for line in lines:
         if "openvino" in line:
@@ -74,27 +73,27 @@ def remove_ov_install(cell):
             package_found = False
             for part in line.split(" "):
                 if "openvino-dev" in part:
-                    if part.endswith(')'):
+                    if part.endswith(")"):
                         updated_line_content.append(")")
                     package_found = True
                     continue
                 if "openvino-nightly" in part:
                     package_found = True
-                    if part.endswith(')'):
+                    if part.endswith(")"):
                         updated_line_content.append(")")
                     continue
                 if "openvino-tokenizers" in part:
                     package_found = True
-                    if part.endswith(')'):
+                    if part.endswith(")"):
                         updated_line_content.append(")")
                     continue
                 if "openvino-genai" in part:
                     package_found = True
-                    if part.endswith(')'):
+                    if part.endswith(")"):
                         updated_line_content.append(")")
                     continue
                 if "openvino>" in part or "openvino=" in part or "openvino" == part:
-                    if part.endswith(')'):
+                    if part.endswith(")"):
                         updated_line_content.append(")")
                     package_found = True
                     continue
