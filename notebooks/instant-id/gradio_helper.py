@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Callable
 import gradio as gr
-import random
 import numpy as np
 from diffusers.utils import load_image
 from style_template import styles
@@ -32,7 +31,7 @@ css = """
 
 def randomize_seed_fn(seed: int, randomize_seed: bool) -> int:
     if randomize_seed:
-        seed = random.randint(0, MAX_SEED)
+        seed = np.random.randint(0, MAX_SEED)
     return seed
 
 

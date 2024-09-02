@@ -1,4 +1,3 @@
-import random
 from typing import Callable
 import gradio as gr
 from PIL import Image
@@ -261,7 +260,7 @@ def make_demo(fn: Callable):
 
         demo.load(None, None, None, _js=scripts)
         randomize_seed.click(
-            lambda x: random.randint(0, MAX_SEED),
+            lambda x: np.random.randint(0, MAX_SEED),
             inputs=[],
             outputs=seed,
             queue=False,

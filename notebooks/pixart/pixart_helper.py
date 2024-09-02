@@ -6,6 +6,7 @@ TEXT_ENCODER_PATH = MODEL_DIR / "text_encoder.xml"
 TRANSFORMER_OV_PATH = MODEL_DIR / "transformer_ir.xml"
 VAE_DECODER_PATH = MODEL_DIR / "vae_decoder.xml"
 
+
 def get_pipeline_selection_option(optimized_pipe=None):
     import ipywidgets as widgets
 

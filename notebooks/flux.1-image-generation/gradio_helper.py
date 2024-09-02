@@ -1,6 +1,5 @@
 import gradio as gr
 import numpy as np
-import random
 import torch
 
 MAX_SEED = np.iinfo(np.int32).max
@@ -23,7 +22,7 @@ css = """
 def make_demo(ov_pipe):
     def infer(prompt, seed=42, randomize_seed=False, width=1024, height=1024, num_inference_steps=4, guidance_scale=0, progress=gr.Progress(track_tqdm=True)):
         if randomize_seed:
-            seed = random.randint(0, MAX_SEED)
+            seed = np.random.randint(0, MAX_SEED)
         generator = torch.Generator().manual_seed(seed)
         image = ov_pipe(
             prompt=prompt, width=width, height=height, num_inference_steps=num_inference_steps, generator=generator, guidance_scale=guidance_scale
