@@ -33,9 +33,9 @@ NEGATIVE_PROMPTS = [
 
 def disable_progress_bar(pipeline, disable=True):
     if not hasattr(pipeline, "_progress_bar_config"):
-        pipeline._progress_bar_config = {'disable': disable}
+        pipeline._progress_bar_config = {"disable": disable}
     else:
-        pipeline._progress_bar_config['disable'] = disable
+        pipeline._progress_bar_config["disable"] = disable
 
 
 class CompiledModelDecorator(ov.CompiledModel):
@@ -50,7 +50,7 @@ class CompiledModelDecorator(ov.CompiledModel):
         return super().__call__(*args, **kwargs)
 
 
-def collect_calibration_data(pipe: 'PixArtAlphaPipeline', subset_size: int) -> List[Dict]:
+def collect_calibration_data(pipe: "PixArtAlphaPipeline", subset_size: int) -> List[Dict]:
     calibration_data = []
     ov_transformer_model = pipe.transformer.transformer
     pipe.transformer.transformer = CompiledModelDecorator(ov_transformer_model, calibration_data, keep_prob=1.0)
@@ -71,7 +71,7 @@ def collect_calibration_data(pipe: 'PixArtAlphaPipeline', subset_size: int) -> L
             prompt=caption,
             num_inference_steps=NUM_INFERENCE_STEPS,
             guidance_scale=0.0,
-            generator=torch.Generator('cpu').manual_seed(42),
+            generator=torch.Generator("cpu").manual_seed(42),
             negative_prompt=negative_prompt,
             height=256,
             width=256,
@@ -187,7 +187,7 @@ def calculate_inference_time(pipeline, validation_data):
             negative_prompt=negative_prompt,
             num_inference_steps=NUM_INFERENCE_STEPS,
             guidance_scale=0.0,
-            generator=torch.Generator('cpu').manual_seed(42),
+            generator=torch.Generator("cpu").manual_seed(42),
         )
         end = time.perf_counter()
         delta = end - start

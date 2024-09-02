@@ -3,7 +3,7 @@ from typing import Optional
 from diffusers.utils import load_image, export_to_video
 import PIL
 import gradio as gr
-import random
+import numpy as np
 import torch
 
 max_64_bit_int = 2**63 - 1
@@ -78,7 +78,7 @@ def make_demo(pipeline):
             image = image.convert("RGB")
 
         if randomize_seed:
-            seed = random.randint(0, max_64_bit_int)
+            seed = np.random.randint(0, max_64_bit_int)
         generator = torch.manual_seed(seed)
 
         output_folder = Path(output_folder)
