@@ -58,6 +58,14 @@ def phi_completion_to_prompt(completion):
     return f"<|system|><|end|><|user|>{completion}<|end|><|assistant|>\n"
 
 
+def llama3_completion_to_prompt(completion):
+    return f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{completion}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+
+
+def qwen_completion_to_prompt(completion):
+    return f"<|im_start|>system\n<|im_end|>\n<|im_start|>user\n{completion}<|im_end|>\n<|im_start|>assistant\n"
+
+
 SUPPORTED_LLM_MODELS = {
     "English": {
         "qwen2-0.5b-instruct": {
@@ -65,6 +73,7 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "tiny-llama-1b-chat": {
             "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
@@ -85,6 +94,7 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "gemma-2b-it": {
             "model_id": "google/gemma-2b-it",
@@ -122,6 +132,7 @@ SUPPORTED_LLM_MODELS = {
             Answer: <|im_end|>
             <|im_start|>assistant
             """,
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "gemma-7b-it": {
             "model_id": "google/gemma-7b-it",
@@ -165,6 +176,7 @@ SUPPORTED_LLM_MODELS = {
 
             
             """,
+            "completion_to_prompt": llama3_completion_to_prompt,
         },
         "llama-3.1-8b-instruct": {
             "model_id": "meta-llama/Meta-Llama-3.1-8B-Instruct",
@@ -185,6 +197,7 @@ SUPPORTED_LLM_MODELS = {
 
             
             """,
+            "completion_to_prompt": llama3_completion_to_prompt,
         },
         "mistral-7b-instruct": {
             "model_id": "mistralai/Mistral-7B-Instruct-v0.1",
@@ -265,12 +278,14 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "qwen2-1.5b-instruct": {
             "model_id": "Qwen/Qwen2-1.5B-Instruct",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "qwen2-7b-instruct": {
             "model_id": "Qwen/Qwen2-7B-Instruct",
@@ -286,6 +301,7 @@ SUPPORTED_LLM_MODELS = {
             回答: <|im_end|>
             <|im_start|>assistant
             """,
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "qwen-7b-chat": {
             "model_id": "Qwen/Qwen-7B-Chat",

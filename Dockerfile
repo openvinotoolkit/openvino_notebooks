@@ -24,6 +24,7 @@ RUN . /etc/os-release && \
         level-zero intel-level-zero-gpu level-zero-devel && \
     rpm -ivh https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/Packages/c/clinfo-3.0.21.02.21-4.el9.x86_64.rpm  \
     https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/ocl-icd-2.2.13-4.el9.x86_64.rpm && \
+    yum install -y libsndfile && \
     dnf clean all -y && \
     rm -rf /var/cache/dnf/*
 
