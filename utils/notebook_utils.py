@@ -73,7 +73,10 @@ def quantization_widget(default=True):
 def pip_install(*args):
     import subprocess  # nosec - disable B404:import-subprocess check
 
-    subprocess.run([sys.executable, "-m", "pip", "install", *args], shell=(platform.system() == "Windows"), check=True)
+    cli_args = []
+    for arg in args:
+        cli_args.extend(str(arg).split(" "))
+    subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], shell=(platform.system() == "Windows"), check=True)
 
 
 def load_image(path: str) -> np.ndarray:
