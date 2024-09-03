@@ -1,6 +1,7 @@
 import sys
 import platform
 
+
 def pip_install(*args):
     import subprocess  # nosec - disable B404:import-subprocess check
 
