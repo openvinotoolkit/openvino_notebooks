@@ -143,7 +143,7 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
             found = False
             device_found = False
             for cell in nb["cells"]:
-                if skip_ov_install and "%pip" in cell["source"] or "pip_install(" in cell["source"]:
+                if skip_ov_install and ("%pip" in cell["source"] or "pip_install(" in cell["source"]):
                     remove_ov_install(cell)
                 if test_device and (DEVICE_WIDGET in cell["source"] or DEVICE_WIDGET_NEW in cell["source"]):
                     device_found = True
