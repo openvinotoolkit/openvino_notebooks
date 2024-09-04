@@ -1,14 +1,17 @@
 from pathlib import Path
 import types
-from typing import Optional, Tuple, Union, List
+from typing import Optional, Tuple, Union, List, Dict, Any
 import gc
 import openvino as ov
 from openvino.runtime import opset13
 import nncf
 import numpy as np
 import torch
-from transformers import Qwen2VLForConditionalGeneration, AutoTokenizer, AutoProcessor
-from qwen_vl_utils import process_vision_info, AutoProcessor, AutoConfig
+from transformers import Qwen2VLForConditionalGeneration, AutoTokenizer, AutoProcessor, AutoConfig
+from transformers.models.qwen2_vl.modeling_qwen2_vl import Qwen2VLCausalLMOutputWithPast
+from transformers.cache_utils import DynamicCache
+from transformers.modeling_outputs import ModelOutput
+from qwen_vl_utils import process_vision_info
 from transformers.generation import GenerationConfig, GenerationMixin
 from transformers.modeling_outputs import CausalLMOutputWithPast, BaseModelOutputWithPast
 
@@ -192,12 +195,16 @@ def cleanup_torchscript_cache():
     torch.jit._state._clear_class_state()
 
 
+LANGUAGE_MODEL_NAME = "openvino_language_model.xml"
+IMAGE_EMBEDDING_NAME = "openvino_image_embeddings_model.xml"
+TEXT_EMBEDDING_NAME= "openvino_text_embeddings_model.xml"
+
 def convert_qwen2vl_model(model_id, output_dir, quantization_config):
     output_dir = Path(output_dir)
 
-    lang_model_path = output_dir / "openvino_language_model.xml"
-    image_embed_path = output_dir / "openvino_image_embeddings_model.xml"
-    embed_token_path = output_dir / "openvino_text_embeddings_model.xml"
+    lang_model_path = output_dir / LANGUAGE_MODEL_NAME
+    image_embed_path = output_dir / IMAGE_EMBEDDING_NAME
+    embed_token_path = output_dir / TEXT_EMBEDDING_NAME
 
     if all(
         [
@@ -208,7 +215,7 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
     ):
         print(f"✅ {model_id} model already converted. You can find results in {output_dir}")
         return
-    print("⌛ {model_id} conversion started. Be patient, it may takes some time.")
+    print(f"⌛ {model_id} conversion started. Be patient, it may takes some time.")
     print("⌛ Load Original model")
     model = Qwen2VLForConditionalGeneration.from_pretrained(model_id)
     processor = AutoProcessor.from_pretrained(model_id)
@@ -228,11 +235,26 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
         gc.collect()
         print("✅ Input embedding model successfully converted")
 
-    vision_embed_tokens = model.model.vision_embed_tokens
     if not image_embed_path.exists():
+        vision_embed_tokens = model.visual
+        def image_embed_forward(self, hidden_states: torch.Tensor, grid_thw: torch.Tensor) -> torch.Tensor:
+            hidden_states = self.patch_embed(hidden_states)
+            rotary_pos_emb = self.rot_pos_emb(grid_thw)
+
+            cu_seqlens = (grid_thw[:, 1] * grid_thw[:, 2]).cumsum(
+                dim=0, dtype=torch.int32
+            )
+            cu_seqlens = torch.nn.functional.pad(cu_seqlens, (1, 0), value=0)
+
+            for blk in self.blocks:
+                hidden_states = blk(hidden_states, cu_seqlens=cu_seqlens, rotary_pos_emb=rotary_pos_emb)
+
+            return self.merger(hidden_states)
+
+        vision_embed_tokens.forward = types.MethodType(image_embed_forward, vision_embed_tokens)
+
         print("⌛ Convert Image embedding model")
-        vision_embed_tokens.forward = vision_embed_tokens.get_img_features
-        ov_model = ov.convert_model(vision_embed_tokens, example_input={"pixel_values": torch.randn([4988, 1176]), "image_grid_thw": torch.tensor([[1, 58, 96]], dtype=torch.long)})
+        ov_model = ov.convert_model(vision_embed_tokens, example_input={"hidden_states": torch.randn([5568, 1176]), "grid_thw": torch.tensor([[1, 58, 96]], dtype=torch.long)}, input=[[-1, -1], [-1, 3]])
         ov.save_model(ov_model, image_embed_path)
         del ov_model
         cleanup_torchscript_cache()
@@ -250,13 +272,19 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
             past_key_values=None,
             inputs_embeds=None,
         ):
+            new_past_key_values = DynamicCache.from_legacy_cache(past_key_values)
+            past_seen_tokens = past_key_values[0][0].shape[-2]
+            cache_position = torch.arange(past_seen_tokens, past_seen_tokens + inputs_embeds.shape[1], device=inputs_embeds.device)
             result = self._orig_forward(
                 input_ids=None,
                 attention_mask=attention_mask,
                 position_ids=position_ids,
-                past_key_values=past_key_values,
+                past_key_values=new_past_key_values,
                 inputs_embeds=inputs_embeds,
+                cache_position=cache_position
             )
+            if past_key_values is not None:
+                result["past_key_values"] = result["past_key_values"].to_legacy_cache()
             return tuple(result.values())
 
         model._orig_forward = model.forward
@@ -264,10 +292,11 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
         hidden_size = model.config.hidden_size
         num_pkv = model.config.num_hidden_layers
         pkv_shape = (2, model.config.num_key_value_heads, 2, hidden_size // model.config.num_attention_heads)
+        cache_position = torch.arange(2, 4)
+        position_ids = cache_position.view(1, 1, -1).expand(3, 2, -1)
 
         input_embeds = torch.randn((2, 2, hidden_size))
         attention_mask = torch.ones([2, 4], dtype=torch.long)
-        position_ids = torch.tensor([[2, 3], [2, 3]], dtype=torch.long)
         input_names = ["attention_mask", "position_ids"]
         output_names = ["logits"]
 
@@ -304,16 +333,16 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
         cleanup_torchscript_cache()
         del model
         gc.collect()
-        print(f"✅ Phi-3-vision model conversion finished. You can find results in {output_dir}")
+        print(f"✅ {model_id} model conversion finished. You can find results in {output_dir}")
 
+convert_qwen2vl_model("Qwen/Qwen2-VL-2B-Instruct", "qwen2-vl-2b-instruct", None)
 
 class OvQwen2VL(GenerationMixin):
     def __init__(self, model_dir, device):
         model_dir = Path(model_dir)
-        self.model = core.read_model(model_dir / "language_model.xml")
-        self.image_embed = core.compile_model(model_dir / "image_embed.xml", device)
-        self.img_projection = core.compile_model(model_dir / "img_projection.xml", device)
-        self.embed_tokem = core.compile_model(model_dir / "embed_token.xml", device)
+        self.model = core.read_model(model_dir / LANGUAGE_MODEL_NAME)
+        self.visual = core.compile_model(model_dir / IMAGE_EMBEDDING_NAME, device)
+        self.embed_tokens = core.compile_model(model_dir / TEXT_EMBEDDING_NAME, device)
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
         compiled_model = core.compile_model(self.model, device)
@@ -326,35 +355,265 @@ class OvQwen2VL(GenerationMixin):
         self._supports_cache_class = False
         self.next_beam_idx = None
         self._past_length = None
-        self.hd_transform_order = "glb_sub"
-        self.num_img_tokens = self.config.img_processor["num_img_tokens"]
-        self.image_dim_out = self.config.img_processor["image_dim_out"]
-        self.glb_GN = torch.zeros([1, 1, self.image_dim_out * 4])
-        self.sub_GN = torch.zeros([1, 1, 1, self.image_dim_out * 4])
 
     def can_generate(self):
         """Returns True to validate the check that the model using `GenerationMixin.generate()` can indeed generate."""
         return True
 
-    def __call__(
-        self,
-        input_ids: torch.LongTensor,
-        pixel_values: torch.Tensor,
-        attention_mask: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
-        position_ids: Optional[torch.LongTensor] = None,
-        image_sizes=None,
-        **kwargs,
-    ) -> CausalLMOutputWithPast:
+    def __call__(self, *args, **kwargs) -> CausalLMOutputWithPast:
         return self.forward(
-            input_ids=input_ids,
-            pixel_values=pixel_values,
-            attention_mask=attention_mask,
-            past_key_values=past_key_values,
-            position_ids=position_ids,
-            image_sizes=image_sizes,
+            *args,
             **kwargs,
         )
+
+
+    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+        """
+        This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
+        [`~PreTrainedModel.beam_sample`] is called.
+        This is required to match `past_key_values` with the correct beam_idx at every generation step.
+        """
+        self.next_beam_idx = np.array(beam_idx)  # save beam_idx to be used as an input in the next iteration
+        return past_key_values
+
+    def _get_past_length(self, past_key_values=None):
+        if past_key_values is None:
+            return 0
+        return self._past_length
+
+
+    def get_rope_index(
+        self,
+        input_ids: torch.LongTensor,
+        image_grid_thw: Optional[torch.LongTensor] = None,
+        video_grid_thw: Optional[torch.LongTensor] = None,
+        attention_mask: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Calculate the 3D rope index based on image and video's temporal, height and width in LLM.
+
+        Explanation:
+            Each embedding sequence contains vision embedding and text embedding or just contains text embedding.
+
+            For pure text embedding sequence, the rotary position embedding has no difference with mordern LLMs.
+            Examples:
+                input_ids: [T T T T T], here T is for text.
+                temporal position_ids: [0, 1, 2, 3, 4]
+                height position_ids: [0, 1, 2, 3, 4]
+                width position_ids: [0, 1, 2, 3, 4]
+
+            For vision and text embedding sequence, we calculate 3D rotary position embedding for vision part
+            and 1D rotary position embeddin for text part.
+            Examples:
+                Assume we have a video input with 3 temporal patches, 2 height patches and 2 width patches.
+                input_ids: [V V V V V V V V V V V V T T T T T], here V is for vision.
+                vision temporal position_ids: [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2]
+                vision height position_ids: [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1]
+                vision width position_ids: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
+                text temporal position_ids: [3, 4, 5, 6, 7]
+                text height position_ids: [3, 4, 5, 6, 7]
+                text width position_ids: [3, 4, 5, 6, 7]
+                Here we calculate the text start position_ids as the max vision position_ids plus 1.
+
+        Args:
+            input_ids (`torch.LongTensor` of shape `(batch_size, sequence_length)`):
+                Indices of input sequence tokens in the vocabulary. Padding will be ignored by default should you provide
+                it.
+            image_grid_thw (`torch.LongTensor` of shape `(num_images, 3)`, *optional*):
+                The temporal, height and width of feature shape of each image in LLM.
+            video_grid_thw (`torch.LongTensor` of shape `(num_videos, 3)`, *optional*):
+                The temporal, height and width of feature shape of each video in LLM.
+            attention_mask (`torch.Tensor` of shape `(batch_size, sequence_length)`, *optional*):
+                Mask to avoid performing attention on padding token indices. Mask values selected in `[0, 1]`:
+
+                - 1 for tokens that are **not masked**,
+                - 0 for tokens that are **masked**.
+
+        Returns:
+            position_ids (`torch.LongTensor` of shape `(3, batch_size, sequence_length)`)
+            mrope_position_deltas (`torch.Tensor` of shape `(batch_size)`)
+        """
+        spatial_merge_size = self.config.vision_config.spatial_merge_size
+        image_token_id = self.config.image_token_id
+        video_token_id = self.config.video_token_id
+        vision_start_token_id = self.config.vision_start_token_id
+        mrope_position_deltas = []
+        if image_grid_thw is not None or video_grid_thw is not None:
+            total_input_ids = input_ids
+            position_ids = torch.ones(
+                3, input_ids.shape[0], input_ids.shape[1], dtype=input_ids.dtype, device=input_ids.device
+            )
+            image_index, video_index = 0, 0
+            for i, input_ids in enumerate(total_input_ids):
+                if attention_mask is not None:
+                    input_ids = input_ids[attention_mask[i] == 1]
+                image_nums, video_nums = 0, 0
+                vision_start_indices = torch.argwhere(input_ids == vision_start_token_id).squeeze(1)
+                vision_tokens = input_ids[vision_start_indices + 1]
+                image_nums = (vision_tokens == image_token_id).sum()
+                video_nums = (vision_tokens == video_token_id).sum()
+                input_tokens = input_ids.tolist()
+                llm_pos_ids_list: list = []
+                st = 0
+                remain_images, remain_videos = image_nums, video_nums
+                for _ in range(image_nums + video_nums):
+                    if image_token_id in input_tokens and remain_images > 0:
+                        ed_image = input_tokens.index(image_token_id, st)
+                    else:
+                        ed_image = len(input_tokens) + 1
+                    if video_token_id in input_tokens and remain_videos > 0:
+                        ed_video = input_tokens.index(video_token_id, st)
+                    else:
+                        ed_video = len(input_tokens) + 1
+                    if ed_image < ed_video:
+                        t, h, w = (
+                            image_grid_thw[image_index][0],
+                            image_grid_thw[image_index][1],
+                            image_grid_thw[image_index][2],
+                        )
+                        image_index += 1
+                        remain_images -= 1
+                        ed = ed_image
+                    else:
+                        t, h, w = (
+                            video_grid_thw[video_index][0],
+                            video_grid_thw[video_index][1],
+                            video_grid_thw[video_index][2],
+                        )
+                        video_index += 1
+                        remain_videos -= 1
+                        ed = ed_video
+                    llm_grid_t, llm_grid_h, llm_grid_w = (
+                        t.item(),
+                        h.item() // spatial_merge_size,
+                        w.item() // spatial_merge_size,
+                    )
+                    text_len = ed - st
+
+                    st_idx = llm_pos_ids_list[-1].max() + 1 if len(llm_pos_ids_list) > 0 else 0
+                    llm_pos_ids_list.append(torch.arange(text_len).view(1, -1).expand(3, -1) + st_idx)
+
+                    t_index = torch.arange(llm_grid_t).view(-1, 1).expand(-1, llm_grid_h * llm_grid_w).flatten()
+                    h_index = torch.arange(llm_grid_h).view(1, -1, 1).expand(llm_grid_t, -1, llm_grid_w).flatten()
+                    w_index = torch.arange(llm_grid_w).view(1, 1, -1).expand(llm_grid_t, llm_grid_h, -1).flatten()
+                    llm_pos_ids_list.append(torch.stack([t_index, h_index, w_index]) + text_len + st_idx)
+                    st = ed + llm_grid_t * llm_grid_h * llm_grid_w
+
+                if st < len(input_tokens):
+                    st_idx = llm_pos_ids_list[-1].max() + 1 if len(llm_pos_ids_list) > 0 else 0
+                    text_len = len(input_tokens) - st
+                    llm_pos_ids_list.append(torch.arange(text_len).view(1, -1).expand(3, -1) + st_idx)
+
+                llm_positions = torch.cat(llm_pos_ids_list, dim=1).reshape(3, -1)
+                position_ids[..., i, attention_mask[i] == 1] = llm_positions.to(position_ids.device)
+                mrope_position_deltas.append(llm_positions.max() + 1 - len(total_input_ids[i]))
+            mrope_position_deltas = torch.tensor(mrope_position_deltas, device=input_ids.device).unsqueeze(1)
+            return position_ids, mrope_position_deltas
+        else:
+            if attention_mask is not None:
+                position_ids = attention_mask.long().cumsum(-1) - 1
+                position_ids.masked_fill_(attention_mask == 0, 1)
+                position_ids = position_ids.unsqueeze(0).expand(3, -1, -1).to(input_ids.device)
+                max_position_ids = position_ids.max(0, keepdim=False)[0].max(-1, keepdim=True)[0]
+                mrope_position_deltas = max_position_ids + 1 - attention_mask.shape[-1]
+            else:
+                position_ids = (
+                    torch.arange(input_ids.shape[1], device=input_ids.device)
+                    .view(1, 1, -1)
+                    .expand(3, input_ids.shape[0], -1)
+                )
+                mrope_position_deltas = torch.zeros(
+                    [input_ids.shape[0], 1],
+                    device=input_ids.device,
+                    dtype=input_ids.dtype,
+                )
+
+            return position_ids, mrope_position_deltas
+
+    def _update_model_kwargs_for_generation(
+        self,
+        outputs: ModelOutput,
+        model_kwargs: Dict[str, Any],
+        is_encoder_decoder: bool = False,
+        num_new_tokens: int = 1,
+    ) -> Dict[str, Any]:
+        model_kwargs = super()._update_model_kwargs_for_generation(
+            outputs=outputs,
+            model_kwargs=model_kwargs,
+            is_encoder_decoder=is_encoder_decoder,
+            num_new_tokens=num_new_tokens,
+        )
+
+        if getattr(outputs, "rope_deltas", None) is not None:
+            model_kwargs["rope_deltas"] = outputs.rope_deltas
+
+        return model_kwargs
+
+    def prepare_inputs_for_generation(
+        self,
+        input_ids,
+        past_key_values=None,
+        attention_mask=None,
+        inputs_embeds=None,
+        cache_position=None,
+        position_ids=None,
+        use_cache=True,
+        pixel_values=None,
+        pixel_values_videos=None,
+        image_grid_thw=None,
+        video_grid_thw=None,
+        **kwargs,
+    ):
+        # If we have cache: let's slice `input_ids` through `cache_position`, to keep only the unprocessed tokens
+        # Exception 1: when passing input_embeds, input_ids may be missing entries
+        # Exception 2: some generation methods do special slicing of input_ids, so we don't need to do it here
+        if past_key_values is not None:
+            if inputs_embeds is not None:  # Exception 1
+                input_ids = input_ids[:, -cache_position.shape[0] :]
+            elif input_ids.shape[1] != cache_position.shape[0]:  # Default case (the "else", a no op, is Exception 2)
+                input_ids = input_ids[:, cache_position]
+
+        rope_deltas = kwargs.get("rope_deltas", None)
+        if attention_mask is not None and position_ids is None:
+            if cache_position is None or (cache_position is not None and cache_position[0] == 0):
+                position_ids, rope_deltas = self.get_rope_index(
+                    input_ids, image_grid_thw, video_grid_thw, attention_mask
+                )
+            else:
+                batch_size, seq_length = input_ids.shape
+                delta = (
+                    cache_position[0] + rope_deltas if cache_position is not None and rope_deltas is not None else 0
+                )
+                position_ids = torch.arange(seq_length, device=input_ids.device)
+                position_ids = position_ids.view(1, -1).expand(batch_size, -1)
+                position_ids = position_ids.add(delta)
+                position_ids = position_ids.unsqueeze(0).expand(3, -1, -1)
+
+        if cache_position[0] != 0:
+            pixel_values = None
+            pixel_values_videos = None
+
+        # if `inputs_embeds` are passed, we only want to use them in the 1st generation step
+        if inputs_embeds is not None and cache_position[0] == 0:
+            model_inputs = {"inputs_embeds": inputs_embeds}
+        else:
+            model_inputs = {"input_ids": input_ids}
+
+
+        model_inputs.update(
+            {
+                "position_ids": position_ids,
+                "past_key_values": past_key_values,
+                "use_cache": use_cache,
+                "attention_mask": attention_mask,
+                "pixel_values": pixel_values,
+                "pixel_values_videos": pixel_values_videos,
+                "image_grid_thw": image_grid_thw,
+                "video_grid_thw": video_grid_thw,
+                "rope_deltas": rope_deltas,
+            }
+        )
+        return model_inputs
 
     def forward(
         self,
@@ -363,15 +622,71 @@ class OvQwen2VL(GenerationMixin):
         position_ids: Optional[torch.LongTensor] = None,
         past_key_values: Optional[List[torch.FloatTensor]] = None,
         inputs_embeds: Optional[torch.FloatTensor] = None,
-        pixel_values: Optional[torch.FloatTensor] = None,
-        image_sizes: Optional[torch.LongTensor] = None,
-        **kwargs,
-    ) -> Union[Tuple, BaseModelOutputWithPast]:
+        use_cache: Optional[bool] = None,
+        output_attentions: Optional[bool] = None,
+        output_hidden_states: Optional[bool] = None,
+        return_dict: Optional[bool] = None,
+        pixel_values: Optional[torch.Tensor] = None,
+        pixel_values_videos: Optional[torch.FloatTensor] = None,
+        image_grid_thw: Optional[torch.LongTensor] = None,
+        video_grid_thw: Optional[torch.LongTensor] = None,
+        rope_deltas: Optional[torch.LongTensor] = None,
+    ) -> Union[Tuple, Qwen2VLCausalLMOutputWithPast]:
+        r"""
+        Args:.to(inputs_embeds.device)
+            labels (`torch.LongTensor` of shape `(batch_size, sequence_length)`, *optional*):
+                Labels for computing the masked language modeling loss. Indices should either be in `[0, ...,
+                config.vocab_size]` or -100 (see `input_ids` docstring). Tokens with indices set to `-100` are ignored
+                (masked), the loss is only computed for the tokens with labels in `[0, ..., config.vocab_size]`.
+
+        Returns:
+
+        Example:
+
+        ```python
+        >>> from PIL import Image
+        >>> import requests
+        >>> from transformers import AutoProcessor, Qwen2VLForConditionalGeneration
+
+        >>> model = Qwen2VLForConditionalGeneration.from_pretrained("Qwen/Qwen2-VL-7B-Instruct")
+        >>> processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct")
+
+        >>> messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image"},
+                    {"type": "text", "text": "What is shown in this image?"},
+                ],
+            },
+        ]
+        >>> url = "https://www.ilankelman.org/stopsigns/australia.jpg"
+        >>> image = Image.open(requests.get(url, stream=True).raw)
+
+        >>> text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        >>> inputs = processor(text=[text], images=[image], vision_infos=[vision_infos])
+
+        >>> # Generate
+        >>> generate_ids = model.generate(inputs.input_ids, max_length=30)
+        >>> tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
+        "The image shows a street scene with a red stop sign in the foreground. In the background, there is a large red gate with Chinese characters ..."
+        ```"""
         if inputs_embeds is None:
-            if pixel_values is not None and image_sizes is not None:
-                inputs_embeds = self.vision_embed_tokens(input_ids, pixel_values=pixel_values, image_sizes=image_sizes)
-            else:
-                inputs_embeds = self.embed_token(input_ids)[0]
+            inputs_embeds = self.embed_tokens(input_ids)[0]
+            if pixel_values is not None:
+                pixel_values = pixel_values
+                image_embeds = self.visual([pixel_values, image_grid_thw])[0]
+                image_mask = input_ids == self.config.image_token_id
+                inputs_embeds[image_mask] = image_embeds
+            if pixel_values_videos is not None:
+                pixel_values_videos = pixel_values_videos.type(self.visual.get_dtype())
+                video_embeds = self.visual(pixel_values_videos, grid_thw=video_grid_thw).to(inputs_embeds.device)
+                video_mask = input_ids == self.config.video_token_id
+                inputs_embeds[video_mask] = video_embeds
+            if attention_mask is not None:
+                attention_mask = attention_mask
+
+        print(input_ids)
         if past_key_values is None:
             self.request.reset_state()
             self.next_beam_idx = np.arange(inputs_embeds.shape[0], dtype=int)
@@ -389,193 +704,54 @@ class OvQwen2VL(GenerationMixin):
         past_key_values = ((),)
         self._past_length += inputs["inputs_embeds"].shape[1]
 
-        return CausalLMOutputWithPast(logits=logits, past_key_values=past_key_values)
-
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
-        """
-        This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
-        [`~PreTrainedModel.beam_sample`] is called.
-        This is required to match `past_key_values` with the correct beam_idx at every generation step.
-        """
-        self.next_beam_idx = np.array(beam_idx)  # save beam_idx to be used as an input in the next iteration
-        return past_key_values
-
-    def _get_past_length(self, past_key_values=None):
-        if past_key_values is None:
-            return 0
-        return self._past_length
-
-    def prepare_inputs_for_generation(
-        self,
-        input_ids,
-        past_key_values=None,
-        attention_mask=None,
-        inputs_embeds=None,
-        pixel_values=None,
-        image_sizes=None,
-        **kwargs,
-    ):
-        if past_key_values is not None:
-            past_length = self._get_past_length(past_key_values)
-
-            # Keep only the unprocessed tokens:
-            # 1 - If the length of the attention_mask exceeds the length of input_ids, then we are in a setting where
-            # some of the inputs are exclusively passed as part of the cache (e.g. when passing input_embeds as
-            # input)
-            if attention_mask is not None and attention_mask.shape[1] > input_ids.shape[1]:
-                input_ids = input_ids[:, -(attention_mask.shape[1] - past_length) :]
-            # 2 - If the past_length is smaller than input_ids', then input_ids holds all input tokens. We can discard
-            # input_ids based on the past_length.
-            elif past_length < input_ids.shape[1]:
-                input_ids = input_ids[:, past_length:]
-
-        position_ids = kwargs.get("position_ids", None)
-        if attention_mask is not None and position_ids is None:
-            # create position_ids on the fly for batch generation
-            position_ids = attention_mask.long().cumsum(-1) - 1
-            position_ids.masked_fill_(attention_mask == 0, 1)
-            if past_key_values:
-                position_ids = position_ids[:, -input_ids.shape[1] :]
-
-        # if `inputs_embeds` are passed, we only want to use them in the 1st generation step
-        if inputs_embeds is not None and past_key_values is None:
-            model_inputs = {"inputs_embeds": inputs_embeds}
-        else:
-            model_inputs = {"input_ids": input_ids}
-
-        model_inputs.update(
-            {
-                "position_ids": position_ids,
-                "past_key_values": past_key_values,
-                "use_cache": kwargs.get("use_cache"),
-                "attention_mask": attention_mask,
-                "pixel_values": pixel_values,
-                "image_sizes": image_sizes,
-            }
+        return Qwen2VLCausalLMOutputWithPast(
+            loss=None,
+            logits=logits,
+            past_key_values=past_key_values,
+            rope_deltas=rope_deltas,
         )
-        return model_inputs
+#convert_qwen2vl_model("Qwen/Qwen2-VL-2B-Instruct", Path("qwen2-vl-2b-instruct"), None)
 
-    def vision_embed_tokens(
-        self,
-        input_ids: torch.LongTensor,
-        pixel_values: torch.FloatTensor,
-        image_sizes=None,
-    ) -> torch.FloatTensor:
-        MAX_INPUT_ID = int(1e9)
-        img_embeds = pixel_values
-        img_sizes = image_sizes
+model = OvQwen2VL(Path("qwen2-vl-2b-instruct"), "CPU")
+processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct")
 
-        input_shape = input_ids.size()
-        input_ids = input_ids.view(-1, input_shape[-1])
+# The default range for the number of visual tokens per image in the model is 4-16384. You can set min_pixels and max_pixels according to your needs, such as a token count range of 256-1280, to balance speed and memory usage.
+# min_pixels = 256*28*28
+# max_pixels = 1280*28*28
+# processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct", min_pixels=min_pixels, max_pixels=max_pixels)
 
-        with torch.no_grad():
-            positions = torch.nonzero((input_ids < 0) & (input_ids > -MAX_INPUT_ID), as_tuple=False)
+messages = [
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "image",
+                "image": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg",
+            },
+            {"type": "text", "text": "Describe this image."},
+        ],
+    }
+]
 
-        select = False
-        if len(positions.tolist()) > 0:
-            g_values = abs(input_ids[positions[:, 0], positions[:, 1]])
+# Preparation for inference
+text = processor.apply_chat_template(
+    messages, tokenize=False, add_generation_prompt=True
+)
+image_inputs, video_inputs = process_vision_info(messages)
+inputs = processor(
+    text=[text],
+    images=image_inputs,
+    videos=video_inputs,
+    padding=True,
+    return_tensors="pt",
+)
 
-            if img_sizes is not None and len(img_sizes):
-                hd_transform = True
-                bs = img_embeds.shape[0]
-                # Nx(HW)xC
-                img_features = torch.from_numpy(self.image_embed(img_embeds.flatten(0, 1))[0])
-                base_feat_height = base_feat_width = int(img_features.shape[1] ** 0.5)
-
-                # bs x max_num_crops x (24x24) x C
-                img_features = img_features.view(bs, -1, base_feat_height * base_feat_width, self.image_dim_out)
-                C = self.image_dim_out
-                H = base_feat_height
-
-                output_imgs = []
-                output_len = []
-                # training is tensor, inference is list
-                if isinstance(img_sizes, torch.Tensor):
-                    img_sizes = img_sizes.view(-1, 2)
-                for _bs in range(bs):
-                    h, w = img_sizes[_bs]
-                    h = h // 336
-                    w = w // 336
-                    B_ = h * w
-
-                    # 1 x (24x24) x 1024
-                    global_img_feature = img_features[_bs, :1]
-
-                    # 1 x 12 x 12 x 4096
-                    glb_img = (
-                        global_img_feature.reshape(1, H, H, C)
-                        .reshape(1, H // 2, 2, H // 2, 2, C)
-                        .contiguous()
-                        .permute(0, 1, 3, 2, 4, 5)
-                        .reshape(1, H // 2, H // 2, 4 * C)
-                        .contiguous()
-                    )
-                    temp_glb_GN = self.sub_GN.repeat(1, H // 2, 1, 1)
-
-                    # 1 x 156 x 4096
-                    glb_img = torch.cat([glb_img, temp_glb_GN], dim=2).reshape(1, -1, 4 * C)
-
-                    # (max_num_crops-1) x (12x12) x C
-                    sub_img = img_features[_bs, 1:]
-                    # 16x574x1024
-                    # get rid of padding sub_img
-                    sub_img = sub_img[:B_]
-
-                    # (num_crops, 12, 2, 12, 2, 1024) -> (num_crops, 12, 12, 2, 2, 1024) -> (num_crops, 12*12, 4*1024)
-                    sub_img = (
-                        sub_img.reshape(B_, H, H, C)
-                        .reshape(B_, H // 2, 2, H // 2, 2, C)
-                        .contiguous()
-                        .permute(0, 1, 3, 2, 4, 5)
-                        .reshape(B_, -1, 4 * C)
-                        .contiguous()
-                    )
-                    sub_img = sub_img.reshape(1, h, w, 12, 12, -1).permute(0, 1, 3, 2, 4, 5).reshape(1, h * 12, w * 12, 4 * C)
-                    temp_sub_GN = self.sub_GN.repeat(1, h * 12, 1, 1)
-                    sub_img = torch.cat([sub_img, temp_sub_GN], dim=2).reshape(1, -1, 4 * C)
-                    # (1, num_img_tokens, 1024*4)
-
-                    # glb + sub
-                    if self.hd_transform_order == "glb_sub":
-                        output_imgs.append(torch.cat([glb_img, self.glb_GN, sub_img], dim=1))
-                    elif self.hd_transform_order == "sub_glb":
-                        output_imgs.append(torch.cat([sub_img, self.glb_GN, glb_img], dim=1))
-                    else:
-                        raise NotImplementedError(f"hd_transform_order = {self.hd_transform_order}, not implemented")
-
-                    temp_len = int((h * w + 1) * 144 + 1 + (h + 1) * 12)
-                    output_len.append(temp_len)
-
-                num_img_tokens = output_len
-                img_set_tensor = []
-                for _output_img in output_imgs:
-                    img_feature_proj = torch.from_numpy(self.img_projection(_output_img)[0])
-                    img_set_tensor.append(img_feature_proj)
-            elif img_embeds.ndim == 4:
-                selected_g_values = g_values[:: self.num_img_tokens]
-                tt = self.image_embed(img_embeds).reshape(-1, self.image_dim_out)[0]
-                img_set_tensor = torch.from_numpy(self.img_projection(tt)[0])  # adapted visual features.
-            elif img_embeds.ndim == 3:
-                selected_g_values = g_values[:: self.num_img_tokens]
-                tt = img_embeds.view(-1, self.image_dim_out)
-                img_set_tensor = torch.from_numpy(self.img_projection(tt)[0])  # adapted visual features.
-            else:
-                raise NotImplementedError
-            select = True
-            input_ids.clamp_min_(0).clamp_max_(self.config.vocab_size)
-
-        hidden_states = torch.from_numpy(self.embed_tokem(input_ids)[0])
-        if select:
-            if hd_transform:
-                idx = 0
-                for i, cnt in enumerate(num_img_tokens):
-                    hidden_states[positions[idx, 0], positions[idx, 1] : positions[idx, 1] + cnt] = img_set_tensor[i]
-                    idx += cnt
-            else:
-                idx = 0
-                for i, g in enumerate(selected_g_values):
-                    cnt = self.num_img_tokens
-                    hidden_states[positions[idx, 0], positions[idx, 1] : positions[idx, 1] + cnt] = img_set_tensor[i * cnt : (i + 1) * cnt]
-                    idx += cnt
-
-        return hidden_states
+# Inference: Generation of the output
+generated_ids = model.generate(**inputs, max_new_tokens=28)
+generated_ids_trimmed = [
+    out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+]
+output_text = processor.batch_decode(
+    generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+)
+print(output_text)
