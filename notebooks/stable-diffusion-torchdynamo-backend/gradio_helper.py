@@ -1,4 +1,4 @@
-import random
+import numpy as np
 import time
 import gradio as gr
 import torch
@@ -45,7 +45,7 @@ def make_demo(model_id):
         neg_prompt="",
     ):
         if seed == -1:
-            seed = random.randint(0, 10000000)
+            seed = np.randint(0, 10000000)
         generator = torch.Generator().manual_seed(seed)
         res = None
 

@@ -18,6 +18,7 @@ EXCEPTIONS_URLs = [
     "https://gitee.com/",
     "https://openai.com/",
     "https://deci.ai/",
+    "https://llama.meta.com/llama3",
 ]
 
 

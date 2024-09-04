@@ -5,6 +5,8 @@
 
 
 import os
+import platform
+import sys
 import threading
 import time
 import urllib.parse
@@ -66,6 +68,15 @@ def quantization_widget(default=True):
     )
 
     return to_quantize
+
+
+def pip_install(*args):
+    import subprocess  # nosec - disable B404:import-subprocess check
+
+    cli_args = []
+    for arg in args:
+        cli_args.extend(str(arg).split(" "))
+    subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], shell=(platform.system() == "Windows"), check=True)
 
 
 def load_image(path: str) -> np.ndarray:
