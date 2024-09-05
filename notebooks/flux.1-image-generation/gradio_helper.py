@@ -1,6 +1,5 @@
 import gradio as gr
 import numpy as np
-import random
 import torch
 
 MAX_SEED = np.iinfo(np.int32).max
@@ -23,7 +22,7 @@ css = """
 def make_demo(ov_pipe):
     def infer(prompt, seed=42, randomize_seed=False, width=1024, height=1024, num_inference_steps=4, guidance_scale=0, progress=gr.Progress(track_tqdm=True)):
         if randomize_seed:
-            seed = random.randint(0, MAX_SEED)
+            seed = np.random.randint(0, MAX_SEED)
         generator = torch.Generator().manual_seed(seed)
         image = ov_pipe(
             prompt=prompt, width=width, height=height, num_inference_steps=num_inference_steps, generator=generator, guidance_scale=guidance_scale
@@ -31,12 +30,10 @@ def make_demo(ov_pipe):
         return image, seed
 
     with gr.Blocks(css=css) as demo:
-
         with gr.Column(elem_id="col-container"):
             gr.Markdown(f"""# FLUX.1 OpenVINO demo""")
 
             with gr.Row():
-
                 prompt = gr.Text(
                     label="Prompt",
                     show_label=False,
@@ -50,7 +47,6 @@ def make_demo(ov_pipe):
             result = gr.Image(label="Result", show_label=False)
 
             with gr.Accordion("Advanced Settings", open=False):
-
                 seed = gr.Slider(
                     label="Seed",
                     minimum=0,
@@ -62,7 +58,6 @@ def make_demo(ov_pipe):
                 randomize_seed = gr.Checkbox(label="Randomize seed", value=True)
 
                 with gr.Row():
-
                     width = gr.Slider(
                         label="Width",
                         minimum=256,

@@ -9,12 +9,14 @@
 
 ## Notebook Contents
 
-This notebook demonstrates how to convert and run the Paint-by-Example model using OpenVINO.
+This notebook demonstrates how to convert and run the Paint-by-Example model using OpenVINO. An additional part demonstrates how to run optimization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
 
 Notebook contains the following steps:
 1. Convert PyTorch models to OpenVINO IR format.
 2. Run PixArt-α pipeline with OpenVINO.
-3. Interactive demo.
+3. Optimize pipeline with [NNCF](https://github.com/openvinotoolkit/nncf/)
+4. Compare results of FP16 and optimized pipelines
+5. Interactive demo.
 
 ## Installation instructions
 

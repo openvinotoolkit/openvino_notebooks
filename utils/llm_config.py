@@ -54,6 +54,18 @@ def internlm_partial_text_processor(partial_text, new_text):
     return partial_text.split("<|im_end|>")[0]
 
 
+def phi_completion_to_prompt(completion):
+    return f"<|system|><|end|><|user|>{completion}<|end|><|assistant|>\n"
+
+
+def llama3_completion_to_prompt(completion):
+    return f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{completion}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+
+
+def qwen_completion_to_prompt(completion):
+    return f"<|im_start|>system\n<|im_end|>\n<|im_start|>user\n{completion}<|im_end|>\n<|im_start|>assistant\n"
+
+
 SUPPORTED_LLM_MODELS = {
     "English": {
         "qwen2-0.5b-instruct": {
@@ -61,6 +73,7 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "tiny-llama-1b-chat": {
             "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
@@ -81,6 +94,7 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "gemma-2b-it": {
             "model_id": "google/gemma-2b-it",
@@ -118,6 +132,7 @@ SUPPORTED_LLM_MODELS = {
             Answer: <|im_end|>
             <|im_start|>assistant
             """,
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "gemma-7b-it": {
             "model_id": "google/gemma-7b-it",
@@ -161,6 +176,7 @@ SUPPORTED_LLM_MODELS = {
 
             
             """,
+            "completion_to_prompt": llama3_completion_to_prompt,
         },
         "llama-3.1-8b-instruct": {
             "model_id": "meta-llama/Meta-Llama-3.1-8B-Instruct",
@@ -181,6 +197,7 @@ SUPPORTED_LLM_MODELS = {
 
             
             """,
+            "completion_to_prompt": llama3_completion_to_prompt,
         },
         "mistral-7b-instruct": {
             "model_id": "mistralai/Mistral-7B-Instruct-v0.1",
@@ -252,6 +269,7 @@ SUPPORTED_LLM_MODELS = {
             Context: {context} 
             Answer: <|end|>
             <|assistant|>""",
+            "completion_to_prompt": phi_completion_to_prompt,
         },
     },
     "Chinese": {
@@ -260,12 +278,14 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "qwen2-1.5b-instruct": {
             "model_id": "Qwen/Qwen2-1.5B-Instruct",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "qwen2-7b-instruct": {
             "model_id": "Qwen/Qwen2-7B-Instruct",
@@ -281,6 +301,7 @@ SUPPORTED_LLM_MODELS = {
             回答: <|im_end|>
             <|im_start|>assistant
             """,
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "qwen-7b-chat": {
             "model_id": "Qwen/Qwen-7B-Chat",
@@ -510,31 +531,37 @@ default_language = "English"
 SUPPORTED_OPTIMIZATIONS = ["INT4", "INT4-AWQ", "INT8", "FP16"]
 
 
-def get_llm_selection_widget():
+def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True):
     import ipywidgets as widgets
 
-    lang_drop_down = widgets.Dropdown(options=list(SUPPORTED_LLM_MODELS))
+    lang_dropdown = widgets.Dropdown(options=languages or [])
 
     # Define dependent drop down
 
-    model_drop_down = widgets.Dropdown(options=(SUPPORTED_LLM_MODELS[default_language]))
+    model_dropdown = widgets.Dropdown(options=models)
 
     def dropdown_handler(change):
         global default_language
         default_language = change.new
         # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
-        model_drop_down.options = SUPPORTED_LLM_MODELS[change.new]
+        model_dropdown.options = SUPPORTED_LLM_MODELS[change.new]
 
-    lang_drop_down.observe(dropdown_handler, names="value")
-    compression_drop_down = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS)
-    preconverted = widgets.Checkbox(value=True)
+    lang_dropdown.observe(dropdown_handler, names="value")
+    compression_dropdown = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS)
+    preconverted_checkbox = widgets.Checkbox(value=True)
 
-    form_items = [
-        widgets.Box([widgets.Label(value="Language:"), lang_drop_down]),
-        widgets.Box([widgets.Label(value="Model:"), model_drop_down]),
-        widgets.Box([widgets.Label(value="Compression:"), compression_drop_down]),
-        widgets.Box([widgets.Label(value="Use preconverted models:"), preconverted]),
-    ]
+    form_items = []
+
+    if languages:
+        form_items.append(widgets.Box([widgets.Label(value="Language:"), lang_dropdown]))
+    form_items.extend(
+        [
+            widgets.Box([widgets.Label(value="Model:"), model_dropdown]),
+            widgets.Box([widgets.Label(value="Compression:"), compression_dropdown]),
+        ]
+    )
+    if show_preconverted_checkbox:
+        form_items.append(widgets.Box([widgets.Label(value="Use preconverted models:"), preconverted_checkbox]))
 
     form = widgets.Box(
         form_items,
@@ -547,7 +574,7 @@ def get_llm_selection_widget():
             padding="1%",
         ),
     )
-    return form, lang_drop_down, model_drop_down, compression_drop_down, preconverted
+    return form, lang_dropdown, model_dropdown, compression_dropdown, preconverted_checkbox
 
 
 def convert_tokenizer(model_id, remote_code, model_dir):
@@ -564,7 +591,7 @@ def convert_tokenizer(model_id, remote_code, model_dir):
 def convert_and_compress_model(model_id, model_config, precision, use_preconverted=True):
     from pathlib import Path
     from IPython.display import Markdown, display
-    import subprocess
+    import subprocess  # nosec - disable B404:import-subprocess check
     import platform
 
     pt_model_id = model_config["model_id"]

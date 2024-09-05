@@ -64,11 +64,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/yolov7-optimization/yolov7-optimization.ipynb
-  skips:
-    - os:
-        - ubuntu-20.04
-        - ubuntu-22.04
 - notebook: notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb
   skips:
     - os:

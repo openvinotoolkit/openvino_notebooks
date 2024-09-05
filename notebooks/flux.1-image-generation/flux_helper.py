@@ -381,7 +381,6 @@ class OVFluxPipeline(DiffusionPipeline):
         prompt: Union[str, List[str]],
         num_images_per_prompt: int = 1,
     ):
-
         prompt = [prompt] if isinstance(prompt, str) else prompt
         batch_size = len(prompt)
 

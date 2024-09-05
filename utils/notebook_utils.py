@@ -5,6 +5,8 @@
 
 
 import os
+import platform
+import sys
 import threading
 import time
 import urllib.parse
@@ -66,6 +68,15 @@ def quantization_widget(default=True):
     )
 
     return to_quantize
+
+
+def pip_install(*args):
+    import subprocess  # nosec - disable B404:import-subprocess check
+
+    cli_args = []
+    for arg in args:
+        cli_args.extend(str(arg).split(" "))
+    subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], shell=(platform.system() == "Windows"), check=True)
 
 
 def load_image(path: str) -> np.ndarray:
@@ -247,11 +258,15 @@ class VideoPlayer:
     :param skip_first_frames: Skip first N frames.
     """
 
-    def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0):
+    def __init__(self, source, size=None, flip=False, fps=None, skip_first_frames=0, width=1280, height=720):
         import cv2
 
         self.cv2 = cv2  # This is done to access the package in class methods
         self.__cap = cv2.VideoCapture(source)
+        # try HD by default to get better video quality
+        self.__cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        self.__cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
         if not self.__cap.isOpened():
             raise RuntimeError(f"Cannot open {'camera' if isinstance(source, int) else ''} {source}")
         # skip first N frames
