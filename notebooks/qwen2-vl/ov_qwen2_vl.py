@@ -8,7 +8,7 @@ import nncf
 import numpy as np
 import torch
 from transformers import Qwen2VLForConditionalGeneration, AutoTokenizer, AutoProcessor, AutoConfig
-from transformers.models.qwen2_vl.modeling_qwen2_vl import Qwen2VLCausalLMOutputWithPast
+from transformers.models.qwen2_vl.modeling_qwen2_vl import Qwen2VLCausalLMOutputWithPast, VisionRotaryEmbedding
 from transformers.cache_utils import DynamicCache
 from transformers.modeling_outputs import ModelOutput
 from qwen_vl_utils import process_vision_info
@@ -196,8 +196,10 @@ def cleanup_torchscript_cache():
 
 
 LANGUAGE_MODEL_NAME = "openvino_language_model.xml"
-IMAGE_EMBEDDING_NAME = "openvino_image_embeddings_model.xml"
+IMAGE_EMBEDDING_NAME = "openvino_vision_embeddings_model.xml"
+IMAGE_EMBEDDING_MERGER_NAME = "openvino_vision_embeddings_merger_model.xml"
 TEXT_EMBEDDING_NAME= "openvino_text_embeddings_model.xml"
+
 
 def convert_qwen2vl_model(model_id, output_dir, quantization_config):
     output_dir = Path(output_dir)
@@ -205,6 +207,7 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
     lang_model_path = output_dir / LANGUAGE_MODEL_NAME
     image_embed_path = output_dir / IMAGE_EMBEDDING_NAME
     embed_token_path = output_dir / TEXT_EMBEDDING_NAME
+    image_embed_merger_path = output_dir / IMAGE_EMBEDDING_MERGER_NAME
 
     if all(
         [
@@ -235,29 +238,30 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
         gc.collect()
         print("✅ Input embedding model successfully converted")
 
-    if not image_embed_path.exists():
+    if not image_embed_path.exists() or not image_embed_merger_path.exists():
+        
+        print("⌛ Convert Image embedding model")
+
         vision_embed_tokens = model.visual
-        def image_embed_forward(self, hidden_states: torch.Tensor, grid_thw: torch.Tensor) -> torch.Tensor:
-            hidden_states = self.patch_embed(hidden_states)
-            rotary_pos_emb = self.rot_pos_emb(grid_thw)
+        if not image_embed_path.exists():
+            ov_model = ov.convert_model(vision_embed_tokens.patch_embed,  example_input={"hidden_states": torch.randn([4988, 1176])})
+            ov.save_model(ov_model, image_embed_path)
+            del ov_model
 
-            cu_seqlens = (grid_thw[:, 1] * grid_thw[:, 2]).cumsum(
-                dim=0, dtype=torch.int32
-            )
-            cu_seqlens = torch.nn.functional.pad(cu_seqlens, (1, 0), value=0)
-
+        def image_embed_forward(self, hidden_states: torch.Tensor, cu_seqlens: torch.Tensor, rotary_pos_emb:torch.Tensor) -> torch.Tensor:
             for blk in self.blocks:
                 hidden_states = blk(hidden_states, cu_seqlens=cu_seqlens, rotary_pos_emb=rotary_pos_emb)
 
             return self.merger(hidden_states)
 
-        vision_embed_tokens.forward = types.MethodType(image_embed_forward, vision_embed_tokens)
+        if not image_embed_merger_path.exists():
+            vision_embed_tokens.forward = types.MethodType(image_embed_forward, vision_embed_tokens)
 
-        print("⌛ Convert Image embedding model")
-        ov_model = ov.convert_model(vision_embed_tokens, example_input={"hidden_states": torch.randn([5568, 1176]), "grid_thw": torch.tensor([[1, 58, 96]], dtype=torch.long)}, input=[[-1, -1], [-1, 3]])
-        ov.save_model(ov_model, image_embed_path)
-        del ov_model
-        cleanup_torchscript_cache()
+            ov_model = ov.convert_model(vision_embed_tokens, example_input={"hidden_states": torch.randn([4988, 1280]), "cu_seqlens": torch.tensor([   0, 4988], dtype=torch.int32), "rotary_pos_emb": torch.randn([4988, 40])})
+            ov.save_model(ov_model, image_embed_merger_path)
+            del ov_model
+            cleanup_torchscript_cache()
+        del vision_embed_tokens
         gc.collect()
         print("✅ Image embedding model successfully converted")
 
@@ -273,15 +277,12 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
             inputs_embeds=None,
         ):
             new_past_key_values = DynamicCache.from_legacy_cache(past_key_values)
-            past_seen_tokens = past_key_values[0][0].shape[-2]
-            cache_position = torch.arange(past_seen_tokens, past_seen_tokens + inputs_embeds.shape[1], device=inputs_embeds.device)
             result = self._orig_forward(
                 input_ids=None,
                 attention_mask=attention_mask,
                 position_ids=position_ids,
                 past_key_values=new_past_key_values,
                 inputs_embeds=inputs_embeds,
-                cache_position=cache_position
             )
             if past_key_values is not None:
                 result["past_key_values"] = result["past_key_values"].to_legacy_cache()
@@ -328,7 +329,7 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
             ov_model = nncf.compress_weights(ov_model, **quantization_config)
             print("✅ Weights compression finished")
 
-        ov.save_model(ov_model, lang_model_path)
+        ov.save_model(ov_model, lang_model_path, False)
         del ov_model
         cleanup_torchscript_cache()
         del model
@@ -341,7 +342,8 @@ class OvQwen2VL(GenerationMixin):
     def __init__(self, model_dir, device):
         model_dir = Path(model_dir)
         self.model = core.read_model(model_dir / LANGUAGE_MODEL_NAME)
-        self.visual = core.compile_model(model_dir / IMAGE_EMBEDDING_NAME, device)
+        self.image_embed = core.compile_model(model_dir / IMAGE_EMBEDDING_NAME, device)
+        self.image_embed_merger = core.compile_model(model_dir / IMAGE_EMBEDDING_MERGER_NAME, device)
         self.embed_tokens = core.compile_model(model_dir / TEXT_EMBEDDING_NAME, device)
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
@@ -355,6 +357,7 @@ class OvQwen2VL(GenerationMixin):
         self._supports_cache_class = False
         self.next_beam_idx = None
         self._past_length = None
+        self._rotary_pos_emb = VisionRotaryEmbedding(self.config.vision_config.embed_dim // self.config.vision_config.num_heads // 2)
 
     def can_generate(self):
         """Returns True to validate the check that the model using `GenerationMixin.generate()` can indeed generate."""
@@ -675,12 +678,12 @@ class OvQwen2VL(GenerationMixin):
             inputs_embeds = self.embed_tokens(input_ids)[0]
             if pixel_values is not None:
                 pixel_values = pixel_values
-                image_embeds = self.visual([pixel_values, image_grid_thw])[0]
+                image_embeds = self.visual(pixel_values, image_grid_thw)
                 image_mask = input_ids == self.config.image_token_id
                 inputs_embeds[image_mask] = image_embeds
             if pixel_values_videos is not None:
-                pixel_values_videos = pixel_values_videos.type(self.visual.get_dtype())
-                video_embeds = self.visual(pixel_values_videos, grid_thw=video_grid_thw).to(inputs_embeds.device)
+                pixel_values_videos = pixel_values_videos
+                video_embeds = self.visual(pixel_values_videos, video_grid_thw)
                 video_mask = input_ids == self.config.video_token_id
                 inputs_embeds[video_mask] = video_embeds
             if attention_mask is not None:
@@ -695,11 +698,13 @@ class OvQwen2VL(GenerationMixin):
         inputs["inputs_embeds"] = inputs_embeds
         inputs["attention_mask"] = attention_mask
         inputs["position_ids"] = position_ids
+        print(position_ids)
         if "beam_idx" in self.input_names:
             inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(inputs_embeds.shape[0], dtype=int)
         self.request.start_async(inputs, share_inputs=True)
         self.request.wait()
         logits = self.request.get_tensor("logits").data
+        print(logits)
         logits = torch.from_numpy(logits).to(self.device)
         past_key_values = ((),)
         self._past_length += inputs["inputs_embeds"].shape[1]
@@ -710,15 +715,57 @@ class OvQwen2VL(GenerationMixin):
             past_key_values=past_key_values,
             rope_deltas=rope_deltas,
         )
-#convert_qwen2vl_model("Qwen/Qwen2-VL-2B-Instruct", Path("qwen2-vl-2b-instruct"), None)
+    
+    def rot_pos_emb(self, grid_thw):
+        pos_ids = []
+        for t, h, w in grid_thw:
+            hpos_ids = torch.arange(h).unsqueeze(1).expand(-1, w)
+            hpos_ids = hpos_ids.reshape(
+                h // self.config.vision_config.spatial_merge_size,
+                self.config.vision_config.spatial_merge_size,
+                w // self.config.vision_config.spatial_merge_size,
+                self.config.vision_config.spatial_merge_size,
+            )
+            hpos_ids = hpos_ids.permute(0, 2, 1, 3)
+            hpos_ids = hpos_ids.flatten()
+
+            wpos_ids = torch.arange(w).unsqueeze(0).expand(h, -1)
+            wpos_ids = wpos_ids.reshape(
+                h // self.config.vision_config.spatial_merge_size,
+                self.config.vision_config.spatial_merge_size,
+                w // self.config.vision_config.spatial_merge_size,
+                self.config.vision_config.spatial_merge_size,
+            )
+            wpos_ids = wpos_ids.permute(0, 2, 1, 3)
+            wpos_ids = wpos_ids.flatten()
+            pos_ids.append(torch.stack([hpos_ids, wpos_ids], dim=-1).repeat(t, 1))
+        pos_ids = torch.cat(pos_ids, dim=0)
+        max_grid_size = grid_thw[:, 1:].max()
+        rotary_pos_emb_full = self._rotary_pos_emb(max_grid_size)
+        rotary_pos_emb = rotary_pos_emb_full[pos_ids].flatten(1)
+        return rotary_pos_emb
+
+    def visual(self, hidden_states, grid_thw):
+        hidden_states = self.image_embed(hidden_states)[0]
+        rotary_pos_emb = self.rot_pos_emb(grid_thw)
+
+        cu_seqlens = torch.repeat_interleave(grid_thw[:, 1] * grid_thw[:, 2], grid_thw[:, 0]).cumsum(
+            dim=0, dtype=torch.int32
+        )
+        cu_seqlens = torch.nn.functional.pad(cu_seqlens, (1, 0), value=0)
+        print(self.image_embed_merger)
+        return self.image_embed_merger([torch.from_numpy(hidden_states), cu_seqlens, rotary_pos_emb])[0]
+
+
+convert_qwen2vl_model("Qwen/Qwen2-VL-2B-Instruct", Path("qwen2-vl-2b-instruct"), None)
 
 model = OvQwen2VL(Path("qwen2-vl-2b-instruct"), "CPU")
-processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct")
+# processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct")
 
 # The default range for the number of visual tokens per image in the model is 4-16384. You can set min_pixels and max_pixels according to your needs, such as a token count range of 256-1280, to balance speed and memory usage.
-# min_pixels = 256*28*28
-# max_pixels = 1280*28*28
-# processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct", min_pixels=min_pixels, max_pixels=max_pixels)
+min_pixels = 256*28*28
+max_pixels = 1280*28*28
+processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct", min_pixels=min_pixels, max_pixels=max_pixels)
 
 messages = [
     {
