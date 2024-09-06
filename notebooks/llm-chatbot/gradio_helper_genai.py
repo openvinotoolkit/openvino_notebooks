@@ -88,7 +88,7 @@ class TextQueue:
         self.text_queue.put(self.stop_signal)
 
 
-def get_gradio_helper(pipe, model_configuration, model_id, model_language):
+def make_demo(pipe, model_configuration, model_id, model_language):
     import gradio as gr
 
     max_new_tokens = 256
