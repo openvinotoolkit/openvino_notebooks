@@ -213,7 +213,6 @@ def cleanup_torchscript_cache():
 
 LANGUAGE_MODEL_NAME = "openvino_language_model.xml"
 IMAGE_EMBEDDING_NAME = "openvino_vision_embeddings_model.xml"
-IMAGE_EMBEDDING_MERGER_NAME = "openvino_vision_embeddings_merger_model.xml"
 TEXT_EMBEDDING_NAME = "openvino_text_embeddings_model.xml"
 
 
