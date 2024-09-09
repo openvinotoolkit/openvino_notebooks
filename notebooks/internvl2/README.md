@@ -19,7 +19,6 @@ In this demonstration, you'll create interactive chatbot that can answer questio
 The image bellow illustrates example of input prompt and model answer.
 ![example.png](https://github.com/user-attachments/assets/1c3cf42a-db40-4fa2-81e0-ead9bde7ace6)
 
-
 ## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
