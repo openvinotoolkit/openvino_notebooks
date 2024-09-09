@@ -18,12 +18,8 @@ from transformers.generation import GenerationConfig, GenerationMixin
 from transformers.modeling_outputs import CausalLMOutputWithPast
 from conversation import get_conv_template
 
-model_ids = [
-    "OpenGVLab/InternVL2-1B",
-    "OpenGVLab/InternVL2-2B",
-    "OpenGVLab/InternVL2-4B",
-    "OpenGVLab/InternVL2-8B"
-]
+model_ids = ["OpenGVLab/InternVL2-1B", "OpenGVLab/InternVL2-2B", "OpenGVLab/InternVL2-4B", "OpenGVLab/InternVL2-8B"]
+
 
 def model_selector(default=model_ids[0]):
     import ipywidgets as widgets
@@ -218,7 +214,7 @@ def cleanup_torchscript_cache():
 LANGUAGE_MODEL_NAME = "openvino_language_model.xml"
 IMAGE_EMBEDDING_NAME = "openvino_vision_embeddings_model.xml"
 IMAGE_EMBEDDING_MERGER_NAME = "openvino_vision_embeddings_merger_model.xml"
-TEXT_EMBEDDING_NAME= "openvino_text_embeddings_model.xml"
+TEXT_EMBEDDING_NAME = "openvino_text_embeddings_model.xml"
 
 
 def convert_internvl2_model(model_id, output_dir, quantization_config):
@@ -227,7 +223,7 @@ def convert_internvl2_model(model_id, output_dir, quantization_config):
     lang_model_path = output_dir / LANGUAGE_MODEL_NAME
     image_embed_path = output_dir / IMAGE_EMBEDDING_NAME
     embed_token_path = output_dir / TEXT_EMBEDDING_NAME
-    #image_embed_merger_path = output_dir / IMAGE_EMBEDDING_MERGER_NAME
+    # image_embed_merger_path = output_dir / IMAGE_EMBEDDING_MERGER_NAME
 
     if all(
         [
@@ -259,20 +255,19 @@ def convert_internvl2_model(model_id, output_dir, quantization_config):
         print("✅ Input embedding model successfully converted")
 
     if not image_embed_path.exists():
-        
+
         print("⌛ Convert Image embedding model")
 
         model.forward = model.extract_feature
         if not image_embed_path.exists():
-            ov_model = ov.convert_model(model,  example_input={"pixel_values": torch.randn([13, 3, 448, 448])}, input=[-1, 3, 448, 448])
-            if quantization_config is not None:   
+            ov_model = ov.convert_model(model, example_input={"pixel_values": torch.randn([13, 3, 448, 448])}, input=[-1, 3, 448, 448])
+            if quantization_config is not None:
                 print(f"⌛ Weights compression with {quantization_config['mode']} mode started")
                 ov_model = nncf.compress_weights(ov_model, **quantization_config)
                 print("✅ Weights compression finished")
             ov.save_model(ov_model, image_embed_path)
             del ov_model
         print("✅ Image embedding model successfully converted")
-
 
     if not lang_model_path.exists():
         print("⌛ Convert Language model")
@@ -542,14 +537,15 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
 
 class OVInternVLChatModel:
 
-    def __init__(self, model_dir:Path, device:str):
+    def __init__(self, model_dir: Path, device: str):
         config = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)
         image_size = config.force_image_size or config.vision_config.image_size
         patch_size = config.vision_config.patch_size
+        self.config = config
         self.patch_size = patch_size
         self.select_layer = config.select_layer
         self.template = config.template
-        self.num_image_token = int((image_size // patch_size) ** 2 * (config.downsample_ratio ** 2))
+        self.num_image_token = int((image_size // patch_size) ** 2 * (config.downsample_ratio**2))
         self.downsample_ratio = config.downsample_ratio
         self.ps_version = config.ps_version
         self.vision_model = core.compile_model(model_dir / IMAGE_EMBEDDING_NAME, device)
@@ -560,17 +556,15 @@ class OVInternVLChatModel:
         self.system_message = self.conv_template.system_message
 
     def forward(
-            self,
-            pixel_values: torch.FloatTensor,
-            input_ids: torch.LongTensor = None,
-            attention_mask: Optional[torch.Tensor] = None,
-            position_ids: Optional[torch.LongTensor] = None,
-            image_flags: Optional[torch.LongTensor] = None,
-            past_key_values: Optional[List[torch.FloatTensor]] = None,
-            use_cache: Optional[bool] = None,
-            return_dict: Optional[bool] = None,
+        self,
+        pixel_values: torch.FloatTensor,
+        input_ids: torch.LongTensor = None,
+        attention_mask: Optional[torch.Tensor] = None,
+        position_ids: Optional[torch.LongTensor] = None,
+        image_flags: Optional[torch.LongTensor] = None,
+        past_key_values: Optional[List[torch.FloatTensor]] = None,
+        use_cache: Optional[bool] = None,
     ) -> Union[Tuple, CausalLMOutputWithPast]:
-        return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
         image_flags = image_flags.squeeze(-1)
         input_embeds = self.language_model.embed_tokens(input_ids)
@@ -582,13 +576,12 @@ class OVInternVLChatModel:
         input_embeds = input_embeds.reshape(B * N, C)
 
         input_ids = input_ids.reshape(B * N)
-        selected = (input_ids == self.img_context_token_id)
+        selected = input_ids == self.img_context_token_id
         try:
             input_embeds[selected] = input_embeds[selected] * 0.0 + vit_embeds.reshape(-1, C)
         except Exception as e:
             vit_embeds = vit_embeds.reshape(-1, C)
-            print(f'warning: {e}, input_embeds[selected].shape={input_embeds[selected].shape}, '
-                  f'vit_embeds.shape={vit_embeds.shape}')
+            print(f"warning: {e}, input_embeds[selected].shape={input_embeds[selected].shape}, " f"vit_embeds.shape={vit_embeds.shape}")
             n_token = selected.sum()
             input_embeds[selected] = input_embeds[selected] * 0.0 + vit_embeds[:n_token]
 
@@ -614,31 +607,43 @@ class OVInternVLChatModel:
         vit_embeds = self.vision_model(pixel_values)[0]
         return vit_embeds
 
-    def batch_chat(self, tokenizer, pixel_values, questions, generation_config, num_patches_list=None,
-                   history=None, return_history=False, IMG_START_TOKEN='<img>', IMG_END_TOKEN='</img>',
-                   IMG_CONTEXT_TOKEN='<IMG_CONTEXT>', verbose=False, image_counts=None):
+    def batch_chat(
+        self,
+        tokenizer,
+        pixel_values,
+        questions,
+        generation_config,
+        num_patches_list=None,
+        history=None,
+        return_history=False,
+        IMG_START_TOKEN="<img>",
+        IMG_END_TOKEN="</img>",
+        IMG_CONTEXT_TOKEN="<IMG_CONTEXT>",
+        verbose=False,
+        image_counts=None,
+    ):
         from conversation import get_conv_template
 
         if history is not None or return_history:
-            print('Now multi-turn chat is not supported in batch_chat.')
+            print("Now multi-turn chat is not supported in batch_chat.")
             raise NotImplementedError
 
         if image_counts is not None:
             num_patches_list = image_counts
-            print('Warning: `image_counts` is deprecated. Please use `num_patches_list` instead.')
+            print("Warning: `image_counts` is deprecated. Please use `num_patches_list` instead.")
 
         img_context_token_id = tokenizer.convert_tokens_to_ids(IMG_CONTEXT_TOKEN)
         self.img_context_token_id = img_context_token_id
 
         if verbose and pixel_values is not None:
             image_bs = pixel_values.shape[0]
-            print(f'dynamic ViT batch size: {image_bs}')
+            print(f"dynamic ViT batch size: {image_bs}")
 
         queries = []
         for idx, num_patches in enumerate(num_patches_list):
             question = questions[idx]
-            if pixel_values is not None and '<image>' not in question:
-                question = '<image>\n' + question
+            if pixel_values is not None and "<image>" not in question:
+                question = "<image>\n" + question
             template = get_conv_template(self.template)
             template.system_message = self.system_message
             template.append_message(template.roles[0], question)
@@ -646,33 +651,39 @@ class OVInternVLChatModel:
             query = template.get_prompt()
 
             image_tokens = IMG_START_TOKEN + IMG_CONTEXT_TOKEN * self.num_image_token * num_patches + IMG_END_TOKEN
-            query = query.replace('<image>', image_tokens, 1)
+            query = query.replace("<image>", image_tokens, 1)
             queries.append(query)
 
-        tokenizer.padding_side = 'left'
-        model_inputs = tokenizer(queries, return_tensors='pt', padding=True)
-        input_ids = model_inputs['input_ids']
-        attention_mask = model_inputs['attention_mask']
+        tokenizer.padding_side = "left"
+        model_inputs = tokenizer(queries, return_tensors="pt", padding=True)
+        input_ids = model_inputs["input_ids"]
+        attention_mask = model_inputs["attention_mask"]
         eos_token_id = tokenizer.convert_tokens_to_ids(template.sep)
-        generation_config['eos_token_id'] = eos_token_id
-        generation_output = self.generate(
-            pixel_values=pixel_values,
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-            **generation_config
-        )
+        generation_config["eos_token_id"] = eos_token_id
+        generation_output = self.generate(pixel_values=pixel_values, input_ids=input_ids, attention_mask=attention_mask, **generation_config)
         responses = tokenizer.batch_decode(generation_output, skip_special_tokens=True)
         responses = [response.split(template.sep)[0].strip() for response in responses]
         return responses
 
-    def chat(self, tokenizer, pixel_values, question, generation_config, history=None, return_history=False,
-             num_patches_list=None, IMG_START_TOKEN='<img>', IMG_END_TOKEN='</img>', IMG_CONTEXT_TOKEN='<IMG_CONTEXT>',
-             verbose=False):
-    
+    def chat(
+        self,
+        tokenizer,
+        pixel_values,
+        question,
+        generation_config,
+        history=None,
+        return_history=False,
+        num_patches_list=None,
+        IMG_START_TOKEN="<img>",
+        IMG_END_TOKEN="</img>",
+        IMG_CONTEXT_TOKEN="<IMG_CONTEXT>",
+        verbose=False,
+    ):
+
         from conversation import get_conv_template
 
-        if history is None and pixel_values is not None and '<image>' not in question:
-            question = '<image>\n' + question
+        if history is None and pixel_values is not None and "<image>" not in question:
+            question = "<image>\n" + question
 
         if num_patches_list is None:
             num_patches_list = [pixel_values.shape[0]] if pixel_values is not None else []
@@ -686,7 +697,7 @@ class OVInternVLChatModel:
         eos_token_id = tokenizer.convert_tokens_to_ids(template.sep)
 
         history = [] if history is None else history
-        for (old_question, old_answer) in history:
+        for old_question, old_answer in history:
             template.append_message(template.roles[0], old_question)
             template.append_message(template.roles[1], old_answer)
         template.append_message(template.roles[0], question)
@@ -695,45 +706,40 @@ class OVInternVLChatModel:
 
         if verbose and pixel_values is not None:
             image_bs = pixel_values.shape[0]
-            print(f'dynamic ViT batch size: {image_bs}')
+            print(f"dynamic ViT batch size: {image_bs}")
 
         for num_patches in num_patches_list:
             image_tokens = IMG_START_TOKEN + IMG_CONTEXT_TOKEN * self.num_image_token * num_patches + IMG_END_TOKEN
-            query = query.replace('<image>', image_tokens, 1)
+            query = query.replace("<image>", image_tokens, 1)
 
-        model_inputs = tokenizer(query, return_tensors='pt')
-        input_ids = model_inputs['input_ids']
-        attention_mask = model_inputs['attention_mask']
-        generation_config['eos_token_id'] = eos_token_id
-        generation_output = self.generate(
-            pixel_values=pixel_values,
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-            **generation_config
-        )
+        model_inputs = tokenizer(query, return_tensors="pt")
+        input_ids = model_inputs["input_ids"]
+        attention_mask = model_inputs["attention_mask"]
+        generation_config["eos_token_id"] = eos_token_id
+        generation_output = self.generate(pixel_values=pixel_values, input_ids=input_ids, attention_mask=attention_mask, **generation_config)
         response = tokenizer.batch_decode(generation_output, skip_special_tokens=True)[0]
         response = response.split(template.sep)[0].strip()
         history.append((question, response))
         if return_history:
             return response, history
         else:
-            query_to_print = query.replace(IMG_CONTEXT_TOKEN, '')
-            query_to_print = query_to_print.replace(f'{IMG_START_TOKEN}{IMG_END_TOKEN}', '<image>')
+            query_to_print = query.replace(IMG_CONTEXT_TOKEN, "")
+            query_to_print = query_to_print.replace(f"{IMG_START_TOKEN}{IMG_END_TOKEN}", "<image>")
             if verbose:
                 print(query_to_print, response)
             return response
 
     @torch.no_grad()
     def generate(
-            self,
-            pixel_values: Optional[torch.FloatTensor] = None,
-            input_ids: Optional[torch.FloatTensor] = None,
-            attention_mask: Optional[torch.LongTensor] = None,
-            visual_features: Optional[torch.FloatTensor] = None,
-            generation_config: Optional[GenerationConfig] = None,
-            output_hidden_states: Optional[bool] = None,
-            return_dict: Optional[bool] = None,
-            **generate_kwargs,
+        self,
+        pixel_values: Optional[torch.FloatTensor] = None,
+        input_ids: Optional[torch.FloatTensor] = None,
+        attention_mask: Optional[torch.LongTensor] = None,
+        visual_features: Optional[torch.FloatTensor] = None,
+        generation_config: Optional[GenerationConfig] = None,
+        output_hidden_states: Optional[bool] = None,
+        return_dict: Optional[bool] = None,
+        **generate_kwargs,
     ) -> torch.LongTensor:
 
         assert self.img_context_token_id is not None
@@ -747,13 +753,13 @@ class OVInternVLChatModel:
             input_embeds = input_embeds.reshape(B * N, C)
 
             input_ids = input_ids.reshape(B * N)
-            selected = (input_ids == self.img_context_token_id)
+            selected = input_ids == self.img_context_token_id
             assert selected.sum() != 0
             input_embeds[selected] = vit_embeds.reshape(-1, C)
 
             input_embeds = input_embeds.reshape(B, N, C)
         else:
-            input_embeds = self.language_model.get_input_embeddings()(input_ids)
+            input_embeds = self.language_model.embed_tokens(input_ids)
 
         outputs = self.language_model.generate(
             inputs_embeds=torch.from_numpy(input_embeds),
@@ -771,18 +777,22 @@ class OVInternVLChatModel:
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
 
+
 def build_transform(input_size):
     MEAN, STD = IMAGENET_MEAN, IMAGENET_STD
-    transform = T.Compose([
-        T.Lambda(lambda img: img.convert('RGB') if img.mode != 'RGB' else img),
-        T.Resize((input_size, input_size), interpolation=InterpolationMode.BICUBIC),
-        T.ToTensor(),
-        T.Normalize(mean=MEAN, std=STD)
-    ])
+    transform = T.Compose(
+        [
+            T.Lambda(lambda img: img.convert("RGB") if img.mode != "RGB" else img),
+            T.Resize((input_size, input_size), interpolation=InterpolationMode.BICUBIC),
+            T.ToTensor(),
+            T.Normalize(mean=MEAN, std=STD),
+        ]
+    )
     return transform
 
+
 def find_closest_aspect_ratio(aspect_ratio, target_ratios, width, height, image_size):
-    best_ratio_diff = float('inf')
+    best_ratio_diff = float("inf")
     best_ratio = (1, 1)
     area = width * height
     for ratio in target_ratios:
@@ -796,19 +806,17 @@ def find_closest_aspect_ratio(aspect_ratio, target_ratios, width, height, image_
                 best_ratio = ratio
     return best_ratio
 
+
 def dynamic_preprocess(image, min_num=1, max_num=12, image_size=448, use_thumbnail=False):
     orig_width, orig_height = image.size
     aspect_ratio = orig_width / orig_height
 
     # calculate the existing image aspect ratio
-    target_ratios = set(
-        (i, j) for n in range(min_num, max_num + 1) for i in range(1, n + 1) for j in range(1, n + 1) if
-        i * j <= max_num and i * j >= min_num)
+    target_ratios = set((i, j) for n in range(min_num, max_num + 1) for i in range(1, n + 1) for j in range(1, n + 1) if i * j <= max_num and i * j >= min_num)
     target_ratios = sorted(target_ratios, key=lambda x: x[0] * x[1])
 
     # find the closest aspect ratio to the target
-    target_aspect_ratio = find_closest_aspect_ratio(
-        aspect_ratio, target_ratios, orig_width, orig_height, image_size)
+    target_aspect_ratio = find_closest_aspect_ratio(aspect_ratio, target_ratios, orig_width, orig_height, image_size)
 
     # calculate the target width and height
     target_width = image_size * target_aspect_ratio[0]
@@ -823,7 +831,7 @@ def dynamic_preprocess(image, min_num=1, max_num=12, image_size=448, use_thumbna
             (i % (target_width // image_size)) * image_size,
             (i // (target_width // image_size)) * image_size,
             ((i % (target_width // image_size)) + 1) * image_size,
-            ((i // (target_width // image_size)) + 1) * image_size
+            ((i // (target_width // image_size)) + 1) * image_size,
         )
         # split the image
         split_img = resized_img.crop(box)
@@ -834,13 +842,15 @@ def dynamic_preprocess(image, min_num=1, max_num=12, image_size=448, use_thumbna
         processed_images.append(thumbnail_img)
     return processed_images
 
+
 def load_image(image_file, input_size=448, max_num=12):
-    image = Image.open(image_file).convert('RGB')
+    image = Image.open(image_file).convert("RGB")
     transform = build_transform(input_size=input_size)
     images = dynamic_preprocess(image, image_size=input_size, use_thumbnail=True, max_num=max_num)
     pixel_values = [transform(image) for image in images]
     pixel_values = torch.stack(pixel_values)
     return pixel_values
+
 
 # pixel_values = load_image('examples_image1.jpg', max_num=12)
 # generation_config = dict(max_new_tokens=64, do_sample=True)
