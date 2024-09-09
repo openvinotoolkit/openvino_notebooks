@@ -343,8 +343,10 @@ InceptionResNetV
 inferencing
 InferRequest
 InferRequests
+infographics
 Inpaint
 inpainting
+InternVL
 InsightFace
 installable
 InstantID
