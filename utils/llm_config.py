@@ -271,6 +271,22 @@ SUPPORTED_LLM_MODELS = {
             <|assistant|>""",
             "completion_to_prompt": phi_completion_to_prompt,
         },
+        "phi-3.5-mini-instruct": {
+            "model_id": "microsoft/Phi-3.5-mini-instruct",
+            "remote_code": True,
+            "start_message": "<|system|>\n{DEFAULT_SYSTEM_PROMPT}<|end|>\n",
+            "history_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}<|end|>\n",
+            "current_message_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}",
+            "stop_tokens": ["<|end|>"],
+            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }<|end|>"""
+            + """
+            <|user|>
+            Question: {input} 
+            Context: {context} 
+            Answer: <|end|>
+            <|assistant|>""",
+            "completion_to_prompt": phi_completion_to_prompt,
+        },
     },
     "Chinese": {
         "qwen2-0.5b-instruct": {
