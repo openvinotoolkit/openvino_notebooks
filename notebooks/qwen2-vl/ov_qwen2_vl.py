@@ -213,6 +213,7 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
         [
             lang_model_path.exists(),
             image_embed_path.exists(),
+            image_embed_merger_path.exists(),
             embed_token_path.exists(),
         ]
     ):
@@ -248,16 +249,45 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
             ov.save_model(ov_model, image_embed_path)
             del ov_model
 
-        def image_embed_forward(self, hidden_states: torch.Tensor, cu_seqlens: torch.Tensor, rotary_pos_emb:torch.Tensor) -> torch.Tensor:
+        def image_embed_forward(self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb:torch.Tensor) -> torch.Tensor:
             for blk in self.blocks:
-                hidden_states = blk(hidden_states, cu_seqlens=cu_seqlens, rotary_pos_emb=rotary_pos_emb)
+                hidden_states = blk(hidden_states, attention_mask=attention_mask, rotary_pos_emb=rotary_pos_emb)
 
             return self.merger(hidden_states)
+    
+        def sdpa_attn_forward(
+            self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb: torch.Tensor = None
+        ) -> torch.Tensor:
+            
+            from transformers.models.qwen2_vl.modeling_qwen2_vl import apply_rotary_pos_emb_vision
+            seq_length = hidden_states.shape[0]
+            q, k, v = self.qkv(hidden_states).reshape(seq_length, 3, self.num_heads, -1).permute(1, 0, 2, 3).unbind(0)
+            q = apply_rotary_pos_emb_vision(q.unsqueeze(0), rotary_pos_emb).squeeze(0)
+            k = apply_rotary_pos_emb_vision(k.unsqueeze(0), rotary_pos_emb).squeeze(0)
+
+            q = q.transpose(0, 1)
+            k = k.transpose(0, 1)
+            v = v.transpose(0, 1)
+            attn_output = torch.nn.functional.scaled_dot_product_attention(q, k, v, attention_mask, dropout_p=0.0)
+            attn_output = attn_output.transpose(0, 1)
+            attn_output = attn_output.reshape(seq_length, -1)
+            attn_output = self.proj(attn_output)
+            return attn_output
+    
+        def block_forward(self, hidden_states, attention_mask, rotary_pos_emb) -> torch.Tensor:
+            hidden_states = hidden_states + self.attn(
+                self.norm1(hidden_states), attention_mask=attention_mask, rotary_pos_emb=rotary_pos_emb
+            )
+            hidden_states = hidden_states + self.mlp(self.norm2(hidden_states))
+            return hidden_states
 
         if not image_embed_merger_path.exists():
             vision_embed_tokens.forward = types.MethodType(image_embed_forward, vision_embed_tokens)
+            for block in vision_embed_tokens.blocks:
+                block.forward = types.MethodType(block_forward, block)
+                block.attn.forward = types.MethodType(sdpa_attn_forward, block.attn)
 
-            ov_model = ov.convert_model(vision_embed_tokens, example_input={"hidden_states": torch.randn([4988, 1280]), "cu_seqlens": torch.tensor([   0, 4988], dtype=torch.int32), "rotary_pos_emb": torch.randn([4988, 40])})
+            ov_model = ov.convert_model(vision_embed_tokens, example_input={"hidden_states": torch.randn([4988, 1280]), "attention_mask": torch.ones([1, 4988, 4988]), "rotary_pos_emb": torch.randn([4988, 40])})
             ov.save_model(ov_model, image_embed_merger_path)
             del ov_model
             cleanup_torchscript_cache()
@@ -688,8 +718,6 @@ class OvQwen2VL(GenerationMixin):
                 inputs_embeds[video_mask] = video_embeds
             if attention_mask is not None:
                 attention_mask = attention_mask
-
-        print(input_ids)
         if past_key_values is None:
             self.request.reset_state()
             self.next_beam_idx = np.arange(inputs_embeds.shape[0], dtype=int)
@@ -698,13 +726,11 @@ class OvQwen2VL(GenerationMixin):
         inputs["inputs_embeds"] = inputs_embeds
         inputs["attention_mask"] = attention_mask
         inputs["position_ids"] = position_ids
-        print(position_ids)
         if "beam_idx" in self.input_names:
             inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(inputs_embeds.shape[0], dtype=int)
         self.request.start_async(inputs, share_inputs=True)
         self.request.wait()
         logits = self.request.get_tensor("logits").data
-        print(logits)
         logits = torch.from_numpy(logits).to(self.device)
         past_key_values = ((),)
         self._past_length += inputs["inputs_embeds"].shape[1]
@@ -748,29 +774,35 @@ class OvQwen2VL(GenerationMixin):
     def visual(self, hidden_states, grid_thw):
         hidden_states = self.image_embed(hidden_states)[0]
         rotary_pos_emb = self.rot_pos_emb(grid_thw)
-
         cu_seqlens = torch.repeat_interleave(grid_thw[:, 1] * grid_thw[:, 2], grid_thw[:, 0]).cumsum(
             dim=0, dtype=torch.int32
         )
         cu_seqlens = torch.nn.functional.pad(cu_seqlens, (1, 0), value=0)
-        print(self.image_embed_merger)
-        return self.image_embed_merger([torch.from_numpy(hidden_states), cu_seqlens, rotary_pos_emb])[0]
+        attention_mask = torch.zeros((1, hidden_states.shape[0], hidden_states.shape[0]), dtype=torch.bool)
+        causal_mask = torch.zeros_like(attention_mask, dtype=torch.float32)
+        for i in range(1, len(cu_seqlens)):
+            attention_mask[..., cu_seqlens[i - 1] : cu_seqlens[i], cu_seqlens[i - 1] : cu_seqlens[i]] = True
+        
+        causal_mask.masked_fill_(torch.logical_not(attention_mask), float("-inf"))
 
-
-convert_qwen2vl_model("Qwen/Qwen2-VL-2B-Instruct", Path("qwen2-vl-2b-instruct"), None)
+        res = self.image_embed_merger([hidden_states, causal_mask, rotary_pos_emb])[0]
+        return res
 
 model = OvQwen2VL(Path("qwen2-vl-2b-instruct"), "CPU")
-# processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct")
 
 # The default range for the number of visual tokens per image in the model is 4-16384. You can set min_pixels and max_pixels according to your needs, such as a token count range of 256-1280, to balance speed and memory usage.
 min_pixels = 256*28*28
 max_pixels = 1280*28*28
-processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct", min_pixels=min_pixels, max_pixels=max_pixels)
+processor = AutoProcessor.from_pretrained(Path("qwen2-vl-2b-instruct"), min_pixels=min_pixels, max_pixels=max_pixels)
+if processor.chat_template is None:
+    tok = AutoTokenizer.from_pretrained(Path("qwen2-vl-2b-instruct"))
+    processor.chat_template = tok.chat_template
 
 messages = [
     {
         "role": "user",
         "content": [
+            # {"type": "text", "text": "Hi!"}
             {
                 "type": "image",
                 "image": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg",
