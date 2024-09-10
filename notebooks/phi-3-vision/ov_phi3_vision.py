@@ -380,7 +380,7 @@ class OvPhi3Vision(GenerationMixin):
             if pixel_values is not None and image_sizes is not None:
                 inputs_embeds = self.vision_embed_tokens(input_ids, pixel_values=pixel_values, image_sizes=image_sizes)
             else:
-                inputs_embeds = self.embed_token(input_ids)[0]
+                inputs_embeds = self.embed_tokem(input_ids)[0]
         if past_key_values is None:
             self.request.reset_state()
             self.next_beam_idx = np.arange(inputs_embeds.shape[0], dtype=int)
