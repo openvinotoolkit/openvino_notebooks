@@ -52,20 +52,24 @@ def remove_ov_install(cell):
     updated_lines = []
 
     def has_additional_deps(str_part):
+        if "pip_install(" in str_part:
+            return False
         if "%pip" in str_part:
             return False
         if "install" in str_part:
             return False
-        if str_part.startswith("-"):
+        if str_part.startswith("-") or str_part.startswith('"-'):
             return False
-        if str_part.startswith("https://"):
+        if str_part.startswith("https://") or str_part.startswith('"https://'):
+            return False
+        if ")" == str_part:
             return False
         return True
 
     lines = cell["source"].replace("pip_instal(", "pip_install( ").split("\n")
     for line in lines:
         if "openvino" in line:
-            if "optimum-cli" in line or line.startswith("#"):
+            if "optimum-cli" in line or line.startswith("#") or "-openvino" in line:
                 updated_lines.append(line)
                 continue
             updated_line_content = []
