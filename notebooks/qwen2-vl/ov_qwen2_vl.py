@@ -369,15 +369,15 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
 convert_qwen2vl_model("Qwen/Qwen2-VL-2B-Instruct", "qwen2-vl-2b-instruct", None)
 
 class OvQwen2VL(GenerationMixin):
-    def __init__(self, model_dir, device):
+    def __init__(self, model_dir, device, ov_config=None):
         model_dir = Path(model_dir)
         self.model = core.read_model(model_dir / LANGUAGE_MODEL_NAME)
-        self.image_embed = core.compile_model(model_dir / IMAGE_EMBEDDING_NAME, device)
-        self.image_embed_merger = core.compile_model(model_dir / IMAGE_EMBEDDING_MERGER_NAME, device)
+        self.image_embed = core.compile_model(model_dir / IMAGE_EMBEDDING_NAME, device, ov_config)
+        self.image_embed_merger = core.compile_model(model_dir / IMAGE_EMBEDDING_MERGER_NAME, device, ov_config)
         self.embed_tokens = core.compile_model(model_dir / TEXT_EMBEDDING_NAME, device)
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
-        compiled_model = core.compile_model(self.model, device)
+        compiled_model = core.compile_model(self.model, device, ov_config)
         self.request = compiled_model.create_infer_request()
         self.config = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)
         self.generation_config = GenerationConfig.from_model_config(self.config)
