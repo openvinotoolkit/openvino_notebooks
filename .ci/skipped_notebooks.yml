@@ -560,10 +560,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/mobileclip-video-search/mobileclip-video-search.ipynb
-  skips:
-    - os:
-        - macos-12
 - notebook: notebooks/internvl2/internvl2.ipynb
   skips:
     - os:
