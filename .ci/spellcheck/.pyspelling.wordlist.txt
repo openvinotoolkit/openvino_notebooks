@@ -182,6 +182,7 @@ DepthAnything
 detections
 detokenization
 detokenizer
+detokenizers
 Dettmers
 dev
 detectron
