@@ -27,6 +27,7 @@ def model_selector(default=model_ids[0]):
     )
     return model_checkpoint
 
+
 def model_has_state(ov_model: ov.Model):
     return len(ov_model.get_sinks()) > 0
 
@@ -209,7 +210,7 @@ def cleanup_torchscript_cache():
 LANGUAGE_MODEL_NAME = "openvino_language_model.xml"
 IMAGE_EMBEDDING_NAME = "openvino_vision_embeddings_model.xml"
 IMAGE_EMBEDDING_MERGER_NAME = "openvino_vision_embeddings_merger_model.xml"
-TEXT_EMBEDDING_NAME= "openvino_text_embeddings_model.xml"
+TEXT_EMBEDDING_NAME = "openvino_text_embeddings_model.xml"
 
 
 def convert_qwen2vl_model(model_id, output_dir, quantization_config):
@@ -251,27 +252,26 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
         print("✅ Input embedding model successfully converted")
 
     if not image_embed_path.exists() or not image_embed_merger_path.exists():
-        
+
         print("⌛ Convert Image embedding model")
 
         vision_embed_tokens = model.visual
         if not image_embed_path.exists():
-            ov_model = ov.convert_model(vision_embed_tokens.patch_embed,  example_input={"hidden_states": torch.randn([4988, 1176])})
+            ov_model = ov.convert_model(vision_embed_tokens.patch_embed, example_input={"hidden_states": torch.randn([4988, 1176])})
             ov.save_model(ov_model, image_embed_path)
             del ov_model
             cleanup_torchscript_cache()
 
-        def image_embed_forward(self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb:torch.Tensor) -> torch.Tensor:
+        def image_embed_forward(self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb: torch.Tensor) -> torch.Tensor:
             for blk in self.blocks:
                 hidden_states = blk(hidden_states, attention_mask=attention_mask, rotary_pos_emb=rotary_pos_emb)
 
             return self.merger(hidden_states)
-    
-        def sdpa_attn_forward(
-            self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb: torch.Tensor = None
-        ) -> torch.Tensor:
-            
+
+        def sdpa_attn_forward(self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb: torch.Tensor = None) -> torch.Tensor:
+
             from transformers.models.qwen2_vl.modeling_qwen2_vl import apply_rotary_pos_emb_vision
+
             seq_length = hidden_states.shape[0]
             q, k, v = self.qkv(hidden_states).reshape(seq_length, 3, self.num_heads, -1).permute(1, 0, 2, 3).unbind(0)
             q = apply_rotary_pos_emb_vision(q.unsqueeze(0), rotary_pos_emb).squeeze(0)
@@ -285,11 +285,9 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
             attn_output = attn_output.reshape(seq_length, -1)
             attn_output = self.proj(attn_output)
             return attn_output
-    
+
         def block_forward(self, hidden_states, attention_mask, rotary_pos_emb) -> torch.Tensor:
-            hidden_states = hidden_states + self.attn(
-                self.norm1(hidden_states), attention_mask=attention_mask, rotary_pos_emb=rotary_pos_emb
-            )
+            hidden_states = hidden_states + self.attn(self.norm1(hidden_states), attention_mask=attention_mask, rotary_pos_emb=rotary_pos_emb)
             hidden_states = hidden_states + self.mlp(self.norm2(hidden_states))
             return hidden_states
 
@@ -299,19 +297,25 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
                 block.forward = types.MethodType(block_forward, block)
                 block.attn.forward = types.MethodType(sdpa_attn_forward, block.attn)
 
-            ov_model = ov.convert_model(vision_embed_tokens, example_input={"hidden_states": torch.randn([4988, 1280]), "attention_mask": torch.ones([1, 4988, 4988]), "rotary_pos_emb": torch.randn([4988, 40])})
+            ov_model = ov.convert_model(
+                vision_embed_tokens,
+                example_input={
+                    "hidden_states": torch.randn([4988, 1280]),
+                    "attention_mask": torch.ones([1, 4988, 4988]),
+                    "rotary_pos_emb": torch.randn([4988, 40]),
+                },
+            )
             if quantization_config is not None:
                 print(f"⌛ Weights compression with {quantization_config['mode']} mode started")
                 ov_model = nncf.compress_weights(ov_model, **quantization_config)
                 print("✅ Weights compression finished")
-            
+
             ov.save_model(ov_model, image_embed_merger_path)
             del ov_model
             cleanup_torchscript_cache()
         del vision_embed_tokens
         gc.collect()
         print("✅ Image embedding model successfully converted")
-
 
     if not lang_model_path.exists():
         print("⌛ Convert Language model")
@@ -415,7 +419,6 @@ class OVQwen2VLModel(GenerationMixin):
             **kwargs,
         )
 
-
     def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
@@ -429,7 +432,6 @@ class OVQwen2VLModel(GenerationMixin):
         if past_key_values is None:
             return 0
         return self._past_length
-
 
     def get_rope_index(
         self,
@@ -489,9 +491,7 @@ class OVQwen2VLModel(GenerationMixin):
         mrope_position_deltas = []
         if image_grid_thw is not None or video_grid_thw is not None:
             total_input_ids = input_ids
-            position_ids = torch.ones(
-                3, input_ids.shape[0], input_ids.shape[1], dtype=input_ids.dtype, device=input_ids.device
-            )
+            position_ids = torch.ones(3, input_ids.shape[0], input_ids.shape[1], dtype=input_ids.dtype, device=input_ids.device)
             image_index, video_index = 0, 0
             for i, input_ids in enumerate(total_input_ids):
                 if attention_mask is not None:
@@ -566,11 +566,7 @@ class OVQwen2VLModel(GenerationMixin):
                 max_position_ids = position_ids.max(0, keepdim=False)[0].max(-1, keepdim=True)[0]
                 mrope_position_deltas = max_position_ids + 1 - attention_mask.shape[-1]
             else:
-                position_ids = (
-                    torch.arange(input_ids.shape[1], device=input_ids.device)
-                    .view(1, 1, -1)
-                    .expand(3, input_ids.shape[0], -1)
-                )
+                position_ids = torch.arange(input_ids.shape[1], device=input_ids.device).view(1, 1, -1).expand(3, input_ids.shape[0], -1)
                 mrope_position_deltas = torch.zeros(
                     [input_ids.shape[0], 1],
                     device=input_ids.device,
@@ -625,14 +621,10 @@ class OVQwen2VLModel(GenerationMixin):
         rope_deltas = kwargs.get("rope_deltas", None)
         if attention_mask is not None and position_ids is None:
             if cache_position is None or (cache_position is not None and cache_position[0] == 0):
-                position_ids, rope_deltas = self.get_rope_index(
-                    input_ids, image_grid_thw, video_grid_thw, attention_mask
-                )
+                position_ids, rope_deltas = self.get_rope_index(input_ids, image_grid_thw, video_grid_thw, attention_mask)
             else:
                 batch_size, seq_length = input_ids.shape
-                delta = (
-                    cache_position[0] + rope_deltas if cache_position is not None and rope_deltas is not None else 0
-                )
+                delta = cache_position[0] + rope_deltas if cache_position is not None and rope_deltas is not None else 0
                 position_ids = torch.arange(seq_length, device=input_ids.device)
                 position_ids = position_ids.view(1, -1).expand(batch_size, -1)
                 position_ids = position_ids.add(delta)
@@ -647,7 +639,6 @@ class OVQwen2VLModel(GenerationMixin):
             model_inputs = {"inputs_embeds": inputs_embeds}
         else:
             model_inputs = {"input_ids": input_ids}
-
 
         model_inputs.update(
             {
@@ -757,7 +748,7 @@ class OVQwen2VLModel(GenerationMixin):
             past_key_values=past_key_values,
             rope_deltas=rope_deltas,
         )
-    
+
     def rot_pos_emb(self, grid_thw):
         pos_ids = []
         for t, h, w in grid_thw:
@@ -790,15 +781,13 @@ class OVQwen2VLModel(GenerationMixin):
     def visual(self, hidden_states, grid_thw):
         hidden_states = self.image_embed(hidden_states)[0]
         rotary_pos_emb = self.rot_pos_emb(grid_thw)
-        cu_seqlens = torch.repeat_interleave(grid_thw[:, 1] * grid_thw[:, 2], grid_thw[:, 0]).cumsum(
-            dim=0, dtype=torch.int32
-        )
+        cu_seqlens = torch.repeat_interleave(grid_thw[:, 1] * grid_thw[:, 2], grid_thw[:, 0]).cumsum(dim=0, dtype=torch.int32)
         cu_seqlens = torch.nn.functional.pad(cu_seqlens, (1, 0), value=0)
         attention_mask = torch.zeros((1, hidden_states.shape[0], hidden_states.shape[0]), dtype=torch.bool)
         causal_mask = torch.zeros_like(attention_mask, dtype=torch.float32)
         for i in range(1, len(cu_seqlens)):
             attention_mask[..., cu_seqlens[i - 1] : cu_seqlens[i], cu_seqlens[i - 1] : cu_seqlens[i]] = True
-        
+
         causal_mask.masked_fill_(torch.logical_not(attention_mask), float("-inf"))
 
         res = self.image_embed_merger([hidden_states, causal_mask, rotary_pos_emb])[0]
