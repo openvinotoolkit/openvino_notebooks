@@ -207,3 +207,5 @@ Made with [`contrib.rocks`](https://contrib.rocks).
 \* Other names and brands may be claimed as the property of others.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=README.md" />
+
+Human Rights Information: “Intel is committed to respecting human rights and avoiding causing or contributing to adverse impacts on human rights. See Intel’s Global Human Rights Principles at https://www.intel.com/content/dam/www/central-libraries/us/en/documents/policy-human-rights.pdf. Intel’s products and software are intended only to be used in applications that do not cause or contribute to adverse impacts on human rights.
