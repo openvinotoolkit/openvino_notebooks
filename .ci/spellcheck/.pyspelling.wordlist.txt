@@ -452,6 +452,7 @@ LVLM
 Lyth
 macOS
 Magika
+masklet
 Mahalanobis
 Mapillary
 Markovian

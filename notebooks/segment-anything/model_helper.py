@@ -11,15 +11,119 @@ from torch.nn.init import trunc_normal_
 
 from sam2.sam2_video_predictor import SAM2VideoPredictor
 
+import math
+import warnings
+from typing import Tuple
+
+import torch
+import torch.nn.functional as F
+from torch import Tensor
+
+
+# Matrix version of rotary enc
+# https://github.com/facebookresearch/segment-anything-2/issues/186
+
+
+def get_rotation_matrices(dim, end_x, end_y, theta=10000.0, device=None, dtype=None):
+
+    powers = torch.linspace(0, 1, 1 + (dim // 4), device=device, dtype=dtype)[:-1]
+    base_angles = torch.pow(theta, -powers)
+
+    end_x, end_y = int(end_x), int(end_y)
+    x_mults = torch.arange(end_x, device=device, dtype=dtype).repeat(end_y)
+    y_mults = torch.arange(end_y, device=device, dtype=dtype).repeat_interleave(end_x)
+    angles_xy = (torch.outer(mults, base_angles) for mults in (x_mults, y_mults))
+
+    rotmats_list = []
+    for angles in angles_xy:
+        sterm, cterm = torch.sin(-angles), torch.cos(-angles)
+        rotmat = torch.stack(
+            [
+                torch.stack([cterm, -sterm], dim=-1),
+                torch.stack([sterm, cterm], dim=-1),
+            ],
+            dim=-1,
+        )
+        rotmats_list.append(rotmat)
+
+    return torch.cat(rotmats_list, dim=1).unsqueeze(0).unsqueeze(0)
+
+
+def apply_rotary_matenc(xq, xk, rotmats, repeat_freqs_k=False):
+
+    bq, hq, nq, cq = xq.shape
+    bk, hk, nk, ck = xk.shape
+
+    q_out = torch.matmul(rotmats, xq.reshape(bq, hq, nq, cq // 2, 2, 1)).flatten(3)
+    k_rotmat = rotmats.repeat(1, 1, nk // nq, 1, 1, 1) if repeat_freqs_k else rotmats
+    k_out = torch.matmul(k_rotmat, xk.reshape(bk, hk, nk, ck // 2, 2, 1)).flatten(3)
+
+    return q_out, k_out
+
+
+def matrix_rope_forward(self, q: Tensor, k: Tensor, v: Tensor, num_k_exclude_rope: int = 0) -> Tensor:
+    # Input projections
+    q = self.q_proj(q)
+    k = self.k_proj(k)
+    v = self.v_proj(v)
+
+    # Separate into heads
+    q = self._separate_heads(q, self.num_heads)
+    k = self._separate_heads(k, self.num_heads)
+    v = self._separate_heads(v, self.num_heads)
+
+    # Apply rotary position encoding
+    w = h = math.sqrt(q.shape[-2])
+    self.freqs_cis = self.freqs_cis.to(q.device)
+    if self.freqs_cis.shape[0] != q.shape[-2]:
+        self.freqs_cis = self.compute_cis(end_x=w, end_y=h).to(q.device)
+
+    self.rotmats = self.rotmats.to(q.device)
+    if self.rotmats.shape[0] != q.shape[-2]:
+        self.rotmats = get_rotation_matrices(dim=self.internal_dim // self.num_heads, end_x=w, end_y=h, theta=self.rope_theta)
+
+    if q.shape[-2] != k.shape[-2]:
+        assert self.rope_k_repeat
+
+    num_k_rope = k.size(-2) - num_k_exclude_rope
+    q, k[:, :, :num_k_rope] = apply_rotary_matenc(
+        q,
+        k[:, :, :num_k_rope],
+        rotmats=self.rotmats,
+        repeat_freqs_k=self.rope_k_repeat,
+    )
+
+    dropout_p = self.dropout_p if self.training else 0.0
+    # Attention
+    try:
+        with sdp_kernel_context(dropout_p):
+            out = F.scaled_dot_product_attention(q, k, v, dropout_p=dropout_p)
+    except Exception as e:
+        # Fall back to all kernels if the Flash attention kernel fails
+        warnings.warn(
+            f"Flash Attention kernel failed due to: {e}\nFalling back to all available "
+            f"kernels for scaled_dot_product_attention (which may have a slower speed).",
+            category=UserWarning,
+            stacklevel=2,
+        )
+        global ALLOW_ALL_KERNELS
+        ALLOW_ALL_KERNELS = True
+        out = F.scaled_dot_product_attention(q, k, v, dropout_p=dropout_p)
+
+    out = self._recombine_heads(out)
+    out = self.out_proj(out)
+
+    return out
+
 
 class OVSAM2VideoPredictor(SAM2VideoPredictor):
     def __init__(
         self,
         ov_image_encoder,
         ov_mask_encoder,
-        sam_predictor,
         ov_memory_encoder,
         ov_memory_attention_model,
+        memory_encoder_out_proj_weight_shape=None,
         fill_hole_area=0,
         # whether to apply non-overlapping constraints on the output object masks
         non_overlap_masks=False,
@@ -28,7 +132,7 @@ class OVSAM2VideoPredictor(SAM2VideoPredictor):
         clear_non_cond_mem_around_input=False,
         # whether to also clear non-conditioning memory of the surrounding frames (only effective when `clear_non_cond_mem_around_input` is True).
         clear_non_cond_mem_for_multi_obj=False,
-        **kwargs
+        **kwargs,
     ) -> None:
 
         super().__init__(
@@ -45,17 +149,23 @@ class OVSAM2VideoPredictor(SAM2VideoPredictor):
         self.ov_memory_encoder = ov_memory_encoder
         self.ov_memory_attention_model = ov_memory_attention_model
 
-        if hasattr(sam_predictor.memory_encoder, "out_proj") and hasattr(sam_predictor.memory_encoder.out_proj, "weight"):
-            self.mem_dim = sam_predictor.memory_encoder.out_proj.weight.shape[0]
+        if not memory_encoder_out_proj_weight_shape is None:
+            self.mem_dim = memory_encoder_out_proj_weight_shape
 
         # Temporal encoding of the memories
-        self.maskmem_tpos_enc = torch.nn.Parameter(torch.zeros(sam_predictor.num_maskmem, 1, 1, self.mem_dim))
+        self.maskmem_tpos_enc = torch.nn.Parameter(torch.zeros(self.num_maskmem, 1, 1, self.mem_dim))
 
     @classmethod
     def from_pretrained(
-        cls, predictor_video, model_info, ov_image_encoder, ov_mask_encoder, ov_memory_encoder, ov_memory_attention_model, apply_postprocessing=True
+        cls,
+        model_info,
+        ov_image_encoder,
+        ov_mask_encoder,
+        ov_memory_encoder,
+        ov_memory_attention_model,
+        memory_encoder_out_proj_weight_shape=None,
+        apply_postprocessing=True,
     ):
-        memory_attention = predictor_video.memory_attention
 
         v_inputs = {
             "sigmoid_scale_for_mem_enc": model_info["model"]["sigmoid_scale_for_mem_enc"],
@@ -80,7 +190,7 @@ class OVSAM2VideoPredictor(SAM2VideoPredictor):
             "iou_prediction_use_sigmoid": model_info["model"]["iou_prediction_use_sigmoid"],
             "compile_image_encoder": False,
             "image_encoder": ov_image_encoder,
-            "memory_attention": memory_attention,
+            "memory_attention": ov_memory_attention_model,
             "memory_encoder": ov_memory_encoder,
         }
 
@@ -91,11 +201,9 @@ class OVSAM2VideoPredictor(SAM2VideoPredictor):
         return cls(
             ov_image_encoder=ov_image_encoder,
             ov_mask_encoder=ov_mask_encoder,
-            sam_predictor=predictor_video,
             ov_memory_encoder=ov_memory_encoder,
             ov_memory_attention_model=ov_memory_attention_model,
-            # memory_attention=memory_attention,
-            # memory_encoder_out_proj_weight=out_proj_weight,
+            memory_encoder_out_proj_weight_shape=memory_encoder_out_proj_weight_shape,
             **v_inputs,
         )
 
@@ -211,7 +319,6 @@ class OVSAM2VideoPredictor(SAM2VideoPredictor):
                 feats = prev["maskmem_features"].to(device, non_blocking=True)
                 to_cat_memory.append(feats.flatten(2).permute(2, 0, 1))
                 # Spatial positional encoding (it might have been offloaded to CPU in eval)
-                print(len(prev["maskmem_pos_enc"]), prev["maskmem_pos_enc"][-1].shape, prev["maskmem_pos_enc"][0].shape)
                 maskmem_enc = prev["maskmem_pos_enc"][-1].to(device)
                 maskmem_enc = maskmem_enc.flatten(2).permute(2, 0, 1)
                 # Temporal positional encoding

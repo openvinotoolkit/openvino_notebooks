@@ -591,3 +591,8 @@
   skips:
     - python:
       - '3.8'
+- notebook: notebooks/segment-anything/segment-anything-2.ipynb
+  skips:
+    - python:
+        - '3.8'
+        - '3.9'
