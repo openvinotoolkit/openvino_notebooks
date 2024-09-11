@@ -283,6 +283,7 @@ Gemma
 gemma
 genai
 genAI
+GenerationMixin
 Girshick
 Gitee
 GitHub
@@ -454,6 +455,7 @@ mathbf
 MathVista
 MatMul
 MBs
+md
 MediaPipe
 mel
 Mels
@@ -496,6 +498,7 @@ mpnet
 mpt
 MPT
 MRPC
+MTVQA
 multiarchitecture
 Multiclass
 multiclass
@@ -573,12 +576,15 @@ Orca
 OVC
 overfitting
 overlayed
+ov
 OV
 OVC
 OVModel
+OVModelForCausalLM
 OVModelForXXX
 OVModelForXxx
 OVMS
+OVQwen
 OVStableDiffusionPipeline
 OVStableDiffusionInpaintPipeline
 OvStableDiffusionInpaintingPipeline
@@ -616,6 +622,7 @@ PIXART
 pixelwise
 PIL
 PNDM
+png
 Pointilism
 PointNet
 Postfuse
@@ -677,6 +684,7 @@ quantizing
 QuartzNet
 qwen
 Qwen
+QwenVL
 Radiopaedia
 Radosavovic
 Raito
@@ -685,10 +693,12 @@ Ranftl
 RASPP
 rcnn
 ReAct
+README
 RealSense
 RealSR
 Realtime
 realtime
+RealWorldQA
 rebase
 ReciproCAM
 redistributable
@@ -776,6 +786,7 @@ softmax
 softvc
 SoftVC
 SOTA
+SoTA
 Sovits
 sparsity
 Sparisty
@@ -920,6 +931,9 @@ VITReciproCAM
 vits
 VITS
 vitt
+VL
+vl
+VLModel
 VM
 Vladlen
 VOC
