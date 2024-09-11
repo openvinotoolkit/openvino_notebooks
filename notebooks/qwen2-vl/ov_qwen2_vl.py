@@ -7,14 +7,25 @@ from openvino.runtime import opset13
 import nncf
 import numpy as np
 import torch
-from transformers import Qwen2VLForConditionalGeneration, AutoTokenizer, AutoProcessor, AutoConfig
+from transformers import Qwen2VLForConditionalGeneration, AutoProcessor, AutoConfig
 from transformers.models.qwen2_vl.modeling_qwen2_vl import Qwen2VLCausalLMOutputWithPast, VisionRotaryEmbedding
 from transformers.cache_utils import DynamicCache
 from transformers.modeling_outputs import ModelOutput
-from qwen_vl_utils import process_vision_info
 from transformers.generation import GenerationConfig, GenerationMixin
-from transformers.modeling_outputs import CausalLMOutputWithPast, BaseModelOutputWithPast
+from transformers.modeling_outputs import CausalLMOutputWithPast
 
+model_ids = ["Qwen/Qwen2-VL-2B-Instruct", "Qwen/Qwen2-VL-7B-Instruct"]
+
+
+def model_selector(default=model_ids[0]):
+    import ipywidgets as widgets
+
+    model_checkpoint = widgets.Dropdown(
+        options=model_ids,
+        default=default,
+        description="Model:",
+    )
+    return model_checkpoint
 
 def model_has_state(ov_model: ov.Model):
     return len(ov_model.get_sinks()) > 0
@@ -248,6 +259,7 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
             ov_model = ov.convert_model(vision_embed_tokens.patch_embed,  example_input={"hidden_states": torch.randn([4988, 1176])})
             ov.save_model(ov_model, image_embed_path)
             del ov_model
+            cleanup_torchscript_cache()
 
         def image_embed_forward(self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb:torch.Tensor) -> torch.Tensor:
             for blk in self.blocks:
@@ -288,6 +300,11 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
                 block.attn.forward = types.MethodType(sdpa_attn_forward, block.attn)
 
             ov_model = ov.convert_model(vision_embed_tokens, example_input={"hidden_states": torch.randn([4988, 1280]), "attention_mask": torch.ones([1, 4988, 4988]), "rotary_pos_emb": torch.randn([4988, 40])})
+            if quantization_config is not None:
+                print(f"⌛ Weights compression with {quantization_config['mode']} mode started")
+                ov_model = nncf.compress_weights(ov_model, **quantization_config)
+                print("✅ Weights compression finished")
+            
             ov.save_model(ov_model, image_embed_merger_path)
             del ov_model
             cleanup_torchscript_cache()
@@ -366,9 +383,8 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
         gc.collect()
         print(f"✅ {model_id} model conversion finished. You can find results in {output_dir}")
 
-convert_qwen2vl_model("Qwen/Qwen2-VL-2B-Instruct", "qwen2-vl-2b-instruct", None)
 
-class OvQwen2VL(GenerationMixin):
+class OVQwen2VLModel(GenerationMixin):
     def __init__(self, model_dir, device, ov_config=None):
         model_dir = Path(model_dir)
         self.model = core.read_model(model_dir / LANGUAGE_MODEL_NAME)
@@ -787,50 +803,3 @@ class OvQwen2VL(GenerationMixin):
 
         res = self.image_embed_merger([hidden_states, causal_mask, rotary_pos_emb])[0]
         return res
-
-model = OvQwen2VL(Path("qwen2-vl-2b-instruct"), "CPU")
-
-# The default range for the number of visual tokens per image in the model is 4-16384. You can set min_pixels and max_pixels according to your needs, such as a token count range of 256-1280, to balance speed and memory usage.
-min_pixels = 256*28*28
-max_pixels = 1280*28*28
-processor = AutoProcessor.from_pretrained(Path("qwen2-vl-2b-instruct"), min_pixels=min_pixels, max_pixels=max_pixels)
-if processor.chat_template is None:
-    tok = AutoTokenizer.from_pretrained(Path("qwen2-vl-2b-instruct"))
-    processor.chat_template = tok.chat_template
-
-messages = [
-    {
-        "role": "user",
-        "content": [
-            # {"type": "text", "text": "Hi!"}
-            {
-                "type": "image",
-                "image": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg",
-            },
-            {"type": "text", "text": "Describe this image."},
-        ],
-    }
-]
-
-# Preparation for inference
-text = processor.apply_chat_template(
-    messages, tokenize=False, add_generation_prompt=True
-)
-image_inputs, video_inputs = process_vision_info(messages)
-inputs = processor(
-    text=[text],
-    images=image_inputs,
-    videos=video_inputs,
-    padding=True,
-    return_tensors="pt",
-)
-
-# Inference: Generation of the output
-generated_ids = model.generate(**inputs, max_new_tokens=28)
-generated_ids_trimmed = [
-    out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
-]
-output_text = processor.batch_decode(
-    generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
-)
-print(output_text)
