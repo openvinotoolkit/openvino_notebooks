@@ -1,4 +1,4 @@
-from tkinter import Image
+from PIL import Image
 from typing import Callable
 import gradio as gr
 import requests
