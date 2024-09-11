@@ -322,7 +322,7 @@ class OvPhi3Vision(GenerationMixin):
         self.model = core.read_model(model_dir / "language_model.xml")
         self.image_embed = core.compile_model(model_dir / "image_embed.xml", device)
         self.img_projection = core.compile_model(model_dir / "img_projection.xml", device)
-        self.embed_tokem = core.compile_model(model_dir / "embed_token.xml", device)
+        self.embed_token = core.compile_model(model_dir / "embed_token.xml", device)
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
         compiled_model = core.compile_model(self.model, device)
@@ -573,7 +573,7 @@ class OvPhi3Vision(GenerationMixin):
             select = True
             input_ids.clamp_min_(0).clamp_max_(self.config.vocab_size)
 
-        hidden_states = torch.from_numpy(self.embed_tokem(input_ids)[0])
+        hidden_states = torch.from_numpy(self.embed_token(input_ids)[0])
         if select:
             if hd_transform:
                 idx = 0
