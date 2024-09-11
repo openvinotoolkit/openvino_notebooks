@@ -10,7 +10,7 @@ Human action recognition finds actions over time in a video. The list of actions
 
 ## Notebook Contents
 
-This notebook demonstrates live human action recognition with OpenVINO, using the [Action Recognition Models](https://docs.openvino.ai/2024/omz_models_group_intel.html#action-recognition-models) from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo), specifically the Encoder and Decoder from [action-recognition-0001](https://docs.openvino.ai/2024/omz_models_model_action_recognition_0001.html). Both models create a sequence to sequence (`"seq2seq"`)<sup id="a1">[1](#f1)</sup> system to identify the  human activities for [Kinetics-400 dataset](https://arxiv.org/pdf/1705.06950.pdf). The models use the Video Transformer approach with ResNet34 encoder<sup id="a2">[2](#f2)</sup>. The notebook shows how to create the following pipeline:
+This notebook demonstrates live human action recognition with OpenVINO, using the [Action Recognition Models](https://github.com/openvinotoolkit/open_model_zoo/blob/master/models/intel/index.md#action-recognition-models) from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo), specifically the Encoder and Decoder from [action-recognition-0001](https://github.com/openvinotoolkit/open_model_zoo/blob/master/models/intel/action-recognition-0001/README.md). Both models create a sequence to sequence (`"seq2seq"`)<sup id="a1">[1](#f1)</sup> system to identify the  human activities for [Kinetics-400 dataset](https://arxiv.org/pdf/1705.06950.pdf). The models use the Video Transformer approach with ResNet34 encoder<sup id="a2">[2](#f2)</sup>. The notebook shows how to create the following pipeline:
 
 <p align="center" width="100%">
     <img width="80%" src="https://user-images.githubusercontent.com/10940214/148401661-477aebcd-f2d0-4771-b107-4b37f94d0b1e.jpeg">
@@ -36,6 +36,6 @@ For details, please refer to [Installation Guide](../../README.md).
 
 * [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
 * [Model Conversion API](https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html)
-* [Action Recognition Demo (OpenVINO - No notebooks)](https://docs.openvino.ai/2024/omz_demos_action_recognition_demo_python.html)
+* [Action Recognition Demo (OpenVINO - No notebooks)](https://github.com/openvinotoolkit/open_model_zoo/blob/master/demos/action_recognition_demo/python/README.md)
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/action-recognition-webcam/README.md" />
