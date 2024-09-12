@@ -238,7 +238,13 @@ def convert_qwen2audio_model(model_id, output_dir, quantization_config):
 
     if not audio_embed_path.exists():
         print("⌛ Convert Audio embedding model")
-        ov_model = ov.convert_model(model.audio_tower, example_input={"input_features": torch.randn([2, 128, 3000]), "attention_mask": torch.ones([2, 1, 1500, 1500]),})
+        ov_model = ov.convert_model(
+            model.audio_tower,
+            example_input={
+                "input_features": torch.randn([2, 128, 3000]),
+                "attention_mask": torch.ones([2, 1, 1500, 1500]),
+            },
+        )
         ov.save_model(ov_model, audio_embed_path)
         del ov_model
         cleanup_torchscript_cache()
@@ -290,17 +296,14 @@ def convert_qwen2audio_model(model_id, output_dir, quantization_config):
         output_names = ["logits"]
         past_key_values = []
         for i in range(num_pkv):
-                kv = [torch.randn(pkv_shape) for _ in range(2)]
-                past_key_values.append(kv)
-                input_names.extend([f"past_key_values.{i}.key", f"past_key_values.{i}.value"])
-                output_names.extend([f"present.{i}.key", f"present.{i}.value"])
+            kv = [torch.randn(pkv_shape) for _ in range(2)]
+            past_key_values.append(kv)
+            input_names.extend([f"past_key_values.{i}.key", f"past_key_values.{i}.value"])
+            output_names.extend([f"present.{i}.key", f"present.{i}.value"])
         input_names.append("inputs_embeds")
 
         example_input = {"inputs_embeds": input_embeds, "attention_mask": attention_mask, "position_ids": position_ids, "past_key_values": past_key_values}
-        ov_model = ov.convert_model(
-            lang_model,
-            example_input=example_input
-        )
+        ov_model = ov.convert_model(lang_model, example_input=example_input)
 
         for input, input_name in zip(ov_model.inputs, input_names):
             input.get_tensor().set_names({input_name})
@@ -524,7 +527,7 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
     def __init__(self, model_dir, device="CPU", ov_config=None):
         self.config = AutoConfig.from_pretrained(model_dir)
         self.generation_config = GenerationConfig.from_model_config(self.config)
-        
+
         self.audio_tower = core.compile_model(model_dir / AUDIO_EMBEDING_NAME, device, ov_config)
 
         self.multi_modal_projector = core.compile_model(model_dir / MULTIMODAL_PROJECTOR_NAME)
@@ -537,7 +540,7 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
         self._supports_cache_class = False
         self.main_input_name = "input_ids"
         self.device = torch.device("cpu")
-    
+
     def can_generate(self):
         return True
 
@@ -554,9 +557,7 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
             raise ValueError(f"{padding_side} is not `left` or `right`.")
         self._padding_side = padding_side
 
-    def _merge_input_ids_with_audio_features(
-        self, audio_features, num_audio_tokens, inputs_embeds, input_ids, attention_mask
-    ):
+    def _merge_input_ids_with_audio_features(self, audio_features, num_audio_tokens, inputs_embeds, input_ids, attention_mask):
         """
         Merge input_ids with with audio features into final embeddings
 
@@ -597,9 +598,7 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
         # 1. Create a mask to know where special audio tokens are
         special_audio_token_mask = input_ids == self.config.audio_token_index
         num_special_audio_tokens = torch.sum(special_audio_token_mask, dim=-1)
-        batch_indices, non_audio_indices = torch.where(
-            (input_ids != self.config.audio_token_index) & (attention_mask == 1)
-        )
+        batch_indices, non_audio_indices = torch.where((input_ids != self.config.audio_token_index) & (attention_mask == 1))
 
         # 2. Compute the positions where text should be written
         # Calculate new positions for text tokens in merged audio-text sequence.
@@ -616,15 +615,9 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
         text_to_overwrite = new_token_positions[batch_indices, non_audio_indices]
 
         # 3. Create the full embedding, already padded to the maximum position
-        final_embedding = torch.zeros(
-            batch_size, max_token_num, embed_dim, dtype=inputs_embeds.dtype, device=inputs_embeds.device
-        )
-        final_attention_mask = torch.zeros(
-            batch_size, max_token_num, dtype=attention_mask.dtype, device=inputs_embeds.device
-        )
-        final_input_ids = torch.full(
-            (batch_size, max_token_num), self.pad_token_id, dtype=input_ids.dtype, device=inputs_embeds.device
-        )
+        final_embedding = torch.zeros(batch_size, max_token_num, embed_dim, dtype=inputs_embeds.dtype, device=inputs_embeds.device)
+        final_attention_mask = torch.zeros(batch_size, max_token_num, dtype=attention_mask.dtype, device=inputs_embeds.device)
+        final_input_ids = torch.full((batch_size, max_token_num), self.pad_token_id, dtype=input_ids.dtype, device=inputs_embeds.device)
 
         # 4. Fill the embeddings based on the mask. If we have ["hey" "<audio>", "how", "are"]
         # we need to index copy on [0, 577, 578, 579] for the text and [1:576] for the audio features
@@ -632,9 +625,7 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
         final_attention_mask[batch_indices, text_to_overwrite] = attention_mask[batch_indices, non_audio_indices]
         final_input_ids[batch_indices, text_to_overwrite] = input_ids[batch_indices, non_audio_indices]
         # 5. Fill the embeddings corresponding to the audios. Anything that is still zeros needs filling
-        audio_to_overwrite = torch.full(
-            (batch_size, max_token_num), True, dtype=torch.bool
-        )
+        audio_to_overwrite = torch.full((batch_size, max_token_num), True, dtype=torch.bool)
         audio_to_overwrite[batch_indices, text_to_overwrite] = False
         seq_indices = torch.arange(max_token_num).unsqueeze(0)
         seq_indices = seq_indices.expand(batch_size, max_token_num)
@@ -642,9 +633,7 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
         if left_padding:
             # exclude padding on the left
             max_token_num = max_token_num
-            val = (max_token_num - seq_indices) <= (
-                token_placeholder_num.sum(-1) - (attention_mask == 0).long().sum(-1)
-            )[:, None]
+            val = (max_token_num - seq_indices) <= (token_placeholder_num.sum(-1) - (attention_mask == 0).long().sum(-1))[:, None]
         else:
             # exclude padding on the right
             val = seq_indices < (token_placeholder_num.sum(-1) - (attention_mask == 0).long().sum(-1))[:, None]
@@ -657,14 +646,12 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
                 f" the number of audio given to the model is {num_audios}. This prevents correct indexing and breaks batch generation."
             )
 
-        final_embedding[audio_to_overwrite] = (
-            masked_audio_features.contiguous().reshape(-1, embed_dim)
-        )
+        final_embedding[audio_to_overwrite] = masked_audio_features.contiguous().reshape(-1, embed_dim)
         final_attention_mask |= audio_to_overwrite
         position_ids = (final_attention_mask.cumsum(-1) - 1).masked_fill_((final_attention_mask == 0), 1)
 
         return final_embedding, final_attention_mask, position_ids, final_input_ids
-    
+
     def get_input_embeddings(self, input_ids):
         input_embeds = torch.from_numpy(self.language_model.embed_tokens(input_ids))
         return input_embeds
@@ -677,7 +664,6 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
         output_lengths = (input_lengths - 2) // 2 + 1
         return input_lengths, output_lengths
 
-
     def forward(
         self,
         input_ids: torch.LongTensor = None,
@@ -688,7 +674,7 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
         past_key_values: Optional[List[torch.FloatTensor]] = None,
         inputs_embeds: Optional[torch.FloatTensor] = None,
         use_cache: bool = True,
-        return_dict: bool = True
+        return_dict: bool = True,
     ) -> Union[Tuple, Qwen2AudioCausalLMOutputWithPast]:
 
         if input_features is not None:
@@ -701,30 +687,20 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
 
             # 2. Merge text and audios
             if input_features is not None and input_ids.shape[1] != 1:
-                audio_feat_lengths, audio_output_lengths = self._get_audio_feat_extract_output_lengths(
-                    feature_attention_mask.sum(-1)
-                )
+                audio_feat_lengths, audio_output_lengths = self._get_audio_feat_extract_output_lengths(feature_attention_mask.sum(-1))
                 batch_size, _, max_mel_seq_len = input_features.shape
                 max_seq_len = (max_mel_seq_len - 2) // 2 + 1
                 # Create a sequence tensor of shape (batch_size, max_seq_len)
-                seq_range = (
-                    torch.arange(0, max_seq_len, dtype=audio_feat_lengths.dtype)
-                    .unsqueeze(0)
-                    .expand(batch_size, max_seq_len)
-                )
+                seq_range = torch.arange(0, max_seq_len, dtype=audio_feat_lengths.dtype).unsqueeze(0).expand(batch_size, max_seq_len)
                 lengths_expand = audio_feat_lengths.unsqueeze(1).expand(batch_size, max_seq_len)
                 # Create mask
                 padding_mask = seq_range >= lengths_expand
 
-                audio_attention_mask_ = padding_mask.view(batch_size, 1, 1, max_seq_len).expand(
-                    batch_size, 1, max_seq_len, max_seq_len
-                )
-                audio_attention_mask = audio_attention_mask_.to(
-                    dtype=torch.float32
-                )
+                audio_attention_mask_ = padding_mask.view(batch_size, 1, 1, max_seq_len).expand(batch_size, 1, max_seq_len, max_seq_len)
+                audio_attention_mask = audio_attention_mask_.to(dtype=torch.float32)
                 audio_attention_mask[audio_attention_mask_] = float("-inf")
 
-                audio_outputs = self.audio_tower([input_features,audio_attention_mask])
+                audio_outputs = self.audio_tower([input_features, audio_attention_mask])
                 selected_audio_feature = audio_outputs[0]
                 audio_features = self.multi_modal_projector(selected_audio_feature)[0]
 
@@ -733,12 +709,7 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
                 )
 
         outputs = self.language_model(
-            None,
-            attention_mask=attention_mask,
-            position_ids=position_ids,
-            past_key_values=past_key_values,
-            inputs_embeds=inputs_embeds,
-            use_cache=True
+            None, attention_mask=attention_mask, position_ids=position_ids, past_key_values=past_key_values, inputs_embeds=inputs_embeds, use_cache=True
         )
 
         logits = outputs[0]
@@ -765,9 +736,7 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
             # Here, we get the attention_mask, which was previously stored in the state after _merge_input_ids_with_audio_features.
             if input_features is not None and kwargs.get("attention_mask") is not None:
                 attention_mask = kwargs["attention_mask"]
-                attention_mask = torch.cat(
-                    [attention_mask, attention_mask.new_ones((attention_mask.shape[0], 1))], dim=-1
-                )
+                attention_mask = torch.cat([attention_mask, attention_mask.new_ones((attention_mask.shape[0], 1))], dim=-1)
 
             # Keep only the unprocessed tokens:
             # 1 - If the length of the attention_mask exceeds the length of input_ids, then we are in a setting where
@@ -840,9 +809,7 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
             # update attention mask
             if "attention_mask" in model_kwargs:
                 attention_mask = model_kwargs["attention_mask"]
-                model_kwargs["attention_mask"] = torch.cat(
-                    [attention_mask, attention_mask.new_ones((attention_mask.shape[0], 1))], dim=-1
-                )
+                model_kwargs["attention_mask"] = torch.cat([attention_mask, attention_mask.new_ones((attention_mask.shape[0], 1))], dim=-1)
         else:
             # update decoder attention mask
             if "decoder_attention_mask" in model_kwargs:
@@ -856,9 +823,7 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
             model_kwargs["cache_position"] = model_kwargs["cache_position"][-1:] + num_new_tokens
         else:
             past_positions = model_kwargs.pop("cache_position")
-            new_positions = torch.arange(
-                past_positions[-1] + 1, past_positions[-1] + num_new_tokens + 1, dtype=past_positions.dtype
-            ).to(past_positions.device)
+            new_positions = torch.arange(past_positions[-1] + 1, past_positions[-1] + num_new_tokens + 1, dtype=past_positions.dtype).to(past_positions.device)
             model_kwargs["cache_position"] = torch.cat((past_positions, new_positions))
         return model_kwargs
 

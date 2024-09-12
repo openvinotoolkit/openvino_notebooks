@@ -79,3 +79,4 @@ notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb
 notebooks/stable-audio/stable-audio.ipynb
 notebooks/internvl2/internvl2.ipynb
 notebooks/qwen2-vl/qwen2-vl.ipynb
+notebooks/qwen2-audio/qwen2-audio.ipynb

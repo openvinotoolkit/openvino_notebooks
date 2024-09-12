@@ -38,6 +38,7 @@ async
 AsyncInferQueue
 Atrous
 audiobooks
+AudioForConditionalGeneration
 audioldm
 AudioLDM
 autoencoder
