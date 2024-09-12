@@ -11,9 +11,6 @@ from transformers import Qwen2AudioForConditionalGeneration, AutoProcessor, Auto
 from transformers.generation import GenerationConfig, GenerationMixin
 from transformers.modeling_outputs import CausalLMOutputWithPast, ModelOutput
 from transformers.models.qwen2_audio.modeling_qwen2_audio import Qwen2AudioCausalLMOutputWithPast
-from io import BytesIO
-from urllib.request import urlopen
-import librosa
 
 
 def model_has_state(ov_model: ov.Model):
@@ -752,13 +749,12 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
             attention_mask=attention_mask,
         )
 
-    # Copied from transformers.models.llava_next.modeling_llava_next.LlavaNextForConditionalGeneration.prepare_inputs_for_generation with image->audio
     def prepare_inputs_for_generation(
         self,
         input_ids,
         past_key_values=None,
         inputs_embeds=None,
-        input_features=None,  # Ignore copy
+        input_features=None,
         attention_mask=None,
         **kwargs,
     ):
@@ -805,7 +801,6 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
         else:
             model_inputs = {"input_ids": input_ids}
 
-        # Ignore copy
         feature_attention_mask = kwargs.get("feature_attention_mask", None)
         model_inputs.update(
             {

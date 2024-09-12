@@ -74,27 +74,10 @@ def make_demo(model, processor):
             chatbot[-1][-1] = generated_text
             task_history[-1]["content"][0]["text"] = generated_text
             yield chatbot, task_history
-        
-
-
-
-       
-
 
 
     with gr.Blocks() as demo:
-        gr.Markdown("""<p align="center"><img src="https://modelscope.oss-cn-beijing.aliyuncs.com/resource/qwen.png" style="height: 80px"/><p>""")  ## todo
-        gr.Markdown("""<center><font size=8>Qwen2-Audio-Instruct Bot</center>""")
-        gr.Markdown(
-            """\
-    <center><font size=3>This WebUI is based on Qwen2-Audio-Instruct, developed by Alibaba Cloud. \
-    (本WebUI基于Qwen2-Audio-Instruct打造，实现聊天机器人功能。)</center>""")
-        gr.Markdown("""\
-    <center><font size=4>Qwen2-Audio <a href="https://modelscope.cn/models/qwen/Qwen2-Audio-7B">🤖 </a> 
-    | <a href="https://huggingface.co/Qwen/Qwen2-Audio-7B">🤗</a>&nbsp ｜ 
-    Qwen2-Audio-Instruct <a href="https://modelscope.cn/models/qwen/Qwen2-Audio-7B-Instruct">🤖 </a> | 
-    <a href="https://huggingface.co/Qwen/Qwen2-Audio-7B-Instruct">🤗</a>&nbsp ｜ 
-    &nbsp<a href="https://github.com/QwenLM/Qwen2-Audio">Github</a></center>""")
+        gr.Markdown("""<center><font size=8>OpenVINO Qwen2-Audio-Instruct Bot</center>""")
         chatbot = mgr.Chatbot(label='Qwen2-Audio-7B-Instruct', elem_classes="control-height", height=750)
         user_input = mgr.MultimodalInput(
             interactive=True,
