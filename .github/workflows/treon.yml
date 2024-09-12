@@ -32,6 +32,7 @@ jobs:
       python: ${{ matrix.python }}
 
   build_treon_gpu:
+    if: ${{ false }} # TODO Enable when GPU runners will be available in GitHub Actions
     strategy:
       fail-fast: false
       matrix:
