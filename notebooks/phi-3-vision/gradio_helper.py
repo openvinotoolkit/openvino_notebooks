@@ -7,6 +7,8 @@ from transformers import TextIteratorStreamer
 
 
 def make_demo(model, processor):
+    model_name = Path(model.config._name_or_path).parent.name
+
     example_image_urls = [
         ("https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/dd5105d6-6a64-4935-8a34-3058a82c8d5d", "small.png"),
         ("https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/1221e2a8-a6da-413a-9af6-f04d56af3754", "chart.png"),
@@ -92,12 +94,12 @@ def make_demo(model, processor):
 
     demo = gr.ChatInterface(
         fn=bot_streaming,
-        title="Phi3 Vision 128K Instruct with OpenVINO",
+        title=f"{model_name} with OpenVINO",
         examples=[
             {"text": "What is the text saying?", "files": ["./small.png"]},
             {"text": "What does the chart display?", "files": ["./chart.png"]},
         ],
-        description="Try the [Phi3-Vision model](https://huggingface.co/microsoft/Phi-3-vision-128k-instruct) from Microsoft wiht OpenVINO. Upload an image and start chatting about it, or simply try one of the examples below. If you won't upload an image, you will receive an error.",
+        description=f"Try the [{model_name} model](https://huggingface.co/microsoft/{model_name}) from Microsoft with OpenVINO. Upload an image and start chatting about it, or simply try one of the examples below. If you won't upload an image, you will receive an error.",
         stop_btn="Stop Generation",
         multimodal=True,
     )
