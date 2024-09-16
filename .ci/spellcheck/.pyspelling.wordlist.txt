@@ -97,6 +97,7 @@ classname
 ClassProbabilityMap
 CLI
 cli
+ClipBasedHeadEstimator
 CLIP's
 codebase
 codebook
@@ -196,7 +197,7 @@ diarization
 Diffusers
 diffusers
 dimensionality
-Dinov
+DINOv
 Distil
 distil
 DistilBERT
@@ -425,6 +426,7 @@ LeViT
 LibriSpeech
 librispeech
 Lim
+LinearCameraEmbedder
 Liu
 LLama
 LLaMa
@@ -455,6 +457,8 @@ Mapillary
 Markovian
 Martyniuk
 maskrcnn
+MaterialMLP
+MaterialNet
 mathbf
 MathVista
 MatMul
@@ -623,6 +627,7 @@ Piotr
 Pipelining
 PixArt
 PIXART
+PixelShuffleUpsampleNetwork
 pixelwise
 PIL
 PNDM
@@ -878,6 +883,9 @@ TorchScript
 torchvision
 TorchVision
 transformative
+triplane
+TriplaneLearnablePositionalEmbedding
+triplanes
 Tripo
 TripoSR
 TTS
@@ -885,6 +893,7 @@ Tsinghua
 TsinghuaNLP
 tunable
 tv
+TwoStreamInterleaveTransformer
 TypeScript
 Udnie
 UHD
