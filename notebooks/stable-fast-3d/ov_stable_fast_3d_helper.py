@@ -115,7 +115,7 @@ def convert_camera_embedder(camera_embedder, output_dir):
                 "intrinsic_normed_cond": intrinsic_normed_cond,
             }
             embedding = self.camera_embedder(**kwargs)
-    
+
             return embedding
 
     example_input = {
