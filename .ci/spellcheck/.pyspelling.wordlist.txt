@@ -196,6 +196,7 @@ diarization
 Diffusers
 diffusers
 dimensionality
+Dinov
 Distil
 distil
 DistilBERT
@@ -233,6 +234,7 @@ editability
 EfficientNet
 EfficientSAM
 EfficientSAMs
+embedder
 Embedder
 embeddings
 EnCodec
@@ -366,6 +368,7 @@ intervaling
 im
 img
 ip
+ir
 IRs
 iteratively
 JFLEG
@@ -626,6 +629,7 @@ PNDM
 png
 Pointilism
 PointNet
+pos
 Postfuse
 postprocess
 postprocesses

@@ -11,3 +11,5 @@
   skips:
     - python:
       - '3.8'
+    - os:
+        - macos-12

@@ -106,14 +106,7 @@ def convert_camera_embedder(camera_embedder, output_dir):
             super().__init__()
             self.camera_embedder = camera_embedder
 
-        def forward(
-            self,
-            rgb_cond=None,
-            mask_cond=None,
-            c2w_cond=None,
-            intrinsic_cond=None,
-            intrinsic_normed_cond=None,
-        ):
+        def forward(self, rgb_cond, mask_cond, c2w_cond, intrinsic_cond, intrinsic_normed_cond):
             kwargs = {
                 "rgb_cond": rgb_cond,
                 "mask_cond": mask_cond,
@@ -122,7 +115,7 @@ def convert_camera_embedder(camera_embedder, output_dir):
                 "intrinsic_normed_cond": intrinsic_normed_cond,
             }
             embedding = self.camera_embedder(**kwargs)
-
+    
             return embedding
 
     example_input = {
