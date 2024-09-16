@@ -25,17 +25,15 @@ def convert(model: torch.nn.Module, xml_path: str, example_input):
 
 
 def convert_image_tokenizer(image_tokenizer, output_dir):
-    def interpolate_pos_encoding(
-        self, embeddings: torch.Tensor, height: int, width: int
-    ) -> torch.Tensor:
+    def interpolate_pos_encoding(self, embeddings: torch.Tensor, height: int, width: int) -> torch.Tensor:
         """
         This method allows to interpolate the pre-trained position encodings, to be able to use the model on higher
         resolution images.
-    
+
         Source:
         https://github.com/facebookresearch/dino/blob/de9ee3df6cf39fac952ab558447af1fa1365362a/vision_transformer.py#L174
         """
-    
+
         num_patches = embeddings.shape[1] - 1
         num_positions = self.position_embeddings.shape[1] - 1
         if num_patches == num_positions and height == width:
@@ -48,15 +46,15 @@ def convert_image_tokenizer(image_tokenizer, output_dir):
         # we add a small number to avoid floating point error in the interpolation
         # see discussion at https://github.com/facebookresearch/dino/issues/8
         height, width = height + 0.1, width + 0.1
-        patch_pos_embed = patch_pos_embed.reshape(
-            1, int(math.sqrt(num_positions)), int(math.sqrt(num_positions)), dim
-        )
+        patch_pos_embed = patch_pos_embed.reshape(1, int(math.sqrt(num_positions)), int(math.sqrt(num_positions)), dim)
         patch_pos_embed = patch_pos_embed.permute(0, 3, 1, 2)
-    
-        scale_factor=(
+
+        scale_factor = (
+            (
                 height / math.sqrt(num_positions),
                 width / math.sqrt(num_positions),
             ),
+        )
         patch_pos_embed = nn.functional.interpolate(
             patch_pos_embed,
             scale_factor=(
@@ -66,16 +64,10 @@ def convert_image_tokenizer(image_tokenizer, output_dir):
             mode="bicubic",
             align_corners=False,
         )
-        if (
-            int(height) != patch_pos_embed.shape[-2]
-            or int(width) != patch_pos_embed.shape[-1]
-        ):
-            raise ValueError(
-                "Width or height does not match with the interpolated position embeddings"
-            )
+        if int(height) != patch_pos_embed.shape[-2] or int(width) != patch_pos_embed.shape[-1]:
+            raise ValueError("Width or height does not match with the interpolated position embeddings")
         patch_pos_embed = patch_pos_embed.permute(0, 2, 3, 1).view(1, -1, dim)
         return torch.cat((class_pos_embed.unsqueeze(0), patch_pos_embed), dim=1)
-
 
     image_tokenizer.model.embeddings.interpolate_pos_encoding = types.MethodType(interpolate_pos_encoding, image_tokenizer.model.embeddings)
 
@@ -83,7 +75,7 @@ def convert_image_tokenizer(image_tokenizer, output_dir):
         "images": torch.rand([1, 1, 3, 512, 512], dtype=torch.float32),
         "modulation_cond": torch.rand([1, 1, 768], dtype=torch.float32),
     }
-    
+
     convert(image_tokenizer, output_dir, example_input)
 
 
@@ -96,7 +88,7 @@ def convert_backbone(backbone, output_dir):
         "hidden_states": torch.rand([1, 1024, 27648], dtype=torch.float32),
         "encoder_hidden_states": torch.rand([1, 1297, 1024], dtype=torch.float32),
     }
-    
+
     convert(backbone, output_dir, example_input)
 
 
@@ -113,7 +105,7 @@ def convert_camera_embedder(camera_embedder, output_dir):
         def __init__(self, camera_embedder):
             super().__init__()
             self.camera_embedder = camera_embedder
-    
+
         def forward(
             self,
             rgb_cond=None,
@@ -130,9 +122,8 @@ def convert_camera_embedder(camera_embedder, output_dir):
                 "intrinsic_normed_cond": intrinsic_normed_cond,
             }
             embedding = self.camera_embedder(**kwargs)
-    
-            return embedding
 
+            return embedding
 
     example_input = {
         "rgb_cond": torch.rand([1, 1, 512, 512, 3], dtype=torch.float32),
@@ -153,7 +144,7 @@ def convert_image_estimator(image_estimator, output_dir):
         def __init__(self, image_estimator):
             super().__init__()
             self.image_estimator = image_estimator
-    
+
         def forward(self, cond_image):
             outputs = self.image_estimator(cond_image)
             filtered_ouptuts = {}
@@ -161,11 +152,10 @@ def convert_image_estimator(image_estimator, output_dir):
                 if k.startswith("decoder_"):
                     filtered_ouptuts[k] = v
             return filtered_ouptuts
-    
-    
+
     IMAGE_ESTIMATOR_OV_PATH = Path("models/image_estimator_ir.xml")
     example_input = {
-        'cond_image': torch.rand([1, 1, 512, 512, 3], dtype=torch.float32),
+        "cond_image": torch.rand([1, 1, 512, 512, 3], dtype=torch.float32),
     }
     convert(
         ImageEstimatorWrapper(image_estimator),
@@ -177,16 +167,14 @@ def convert_image_estimator(image_estimator, output_dir):
 def convert_decoder(decoder, include_decoder_output_dir, exclude_decoder_output_dir):
     include_cfg_decoder = [h for h in decoder.cfg.heads if h.name in ["vertex_offset", "density"]]
     exclude_cfg_decoder = [h for h in decoder.cfg.heads if h.name not in ["density", "vertex_offset"]]
-    
-    
+
     decoder.cfg_heads = include_cfg_decoder
     convert(
         decoder,
         include_decoder_output_dir,
         torch.rand([1, 535882, 120], dtype=torch.float32),
     )
-    
-    
+
     decoder.cfg_heads = exclude_cfg_decoder
     convert(
         decoder,
@@ -292,7 +280,7 @@ class DecoderWrapper(torch.nn.Module):
 
 
 def get_compiled_model(
-    model, 
+    model,
     device,
     image_tokenizer_ov_path,
     tokenizer_ov_path,
@@ -301,7 +289,7 @@ def get_compiled_model(
     camera_embedder_ov_path,
     image_estimator_ov_path,
     include_decoder_ov_path,
-    exclude_decoder_ov_path
+    exclude_decoder_ov_path,
 ):
     core = ov.Core()
 

@@ -27,15 +27,11 @@ BACKGROUND_COLOR = [0.5, 0.5, 0.5]
 
 # Cached. Doesn't change
 c2w_cond = sf3d_utils.default_cond_c2w(COND_DISTANCE)
-intrinsic, intrinsic_normed_cond = sf3d_utils.create_intrinsic_from_fov_deg(
-    COND_FOVY_DEG, COND_HEIGHT, COND_WIDTH
-)
+intrinsic, intrinsic_normed_cond = sf3d_utils.create_intrinsic_from_fov_deg(COND_FOVY_DEG, COND_HEIGHT, COND_WIDTH)
 
 generated_files = []
 
-example_files = [
-    os.path.join("stable-fast-3d/demo_files/examples", f) for f in os.listdir("stable-fast-3d/demo_files/examples")
-]
+example_files = [os.path.join("stable-fast-3d/demo_files/examples", f) for f in os.listdir("stable-fast-3d/demo_files/examples")]
 
 
 def run_model(model, input_image, remesh_option, vertex_count, texture_size):
@@ -43,14 +39,12 @@ def run_model(model, input_image, remesh_option, vertex_count, texture_size):
     with torch.no_grad():
         with nullcontext():
             model_batch = create_batch(input_image)
-            model_batch = {k: v.to('cpu') for k, v in model_batch.items()}
-            print(f'{model_batch.keys()=}')
-            print(f'{texture_size=}')
-            print(f'{remesh_option=}')
-            print(f'{vertex_count=}')
-            trimesh_mesh, _glob_dict = model.generate_mesh(
-                model_batch, texture_size, remesh_option, vertex_count
-            )
+            model_batch = {k: v.to("cpu") for k, v in model_batch.items()}
+            print(f"{model_batch.keys()=}")
+            print(f"{texture_size=}")
+            print(f"{remesh_option=}")
+            print(f"{vertex_count=}")
+            trimesh_mesh, _glob_dict = model.generate_mesh(model_batch, texture_size, remesh_option, vertex_count)
             trimesh_mesh = trimesh_mesh[0]
 
     # Create new tmp file
@@ -65,18 +59,9 @@ def run_model(model, input_image, remesh_option, vertex_count, texture_size):
 
 
 def create_batch(input_image: Image) -> dict[str, Any]:
-    img_cond = (
-        torch.from_numpy(
-            np.asarray(input_image.resize((COND_WIDTH, COND_HEIGHT))).astype(np.float32)
-            / 255.0
-        )
-        .float()
-        .clip(0, 1)
-    )
+    img_cond = torch.from_numpy(np.asarray(input_image.resize((COND_WIDTH, COND_HEIGHT))).astype(np.float32) / 255.0).float().clip(0, 1)
     mask_cond = img_cond[:, :, -1:]
-    rgb_cond = torch.lerp(
-        torch.tensor(BACKGROUND_COLOR)[None, None, :], img_cond[:, :, :3], mask_cond
-    )
+    rgb_cond = torch.lerp(torch.tensor(BACKGROUND_COLOR)[None, None, :], img_cond[:, :, :3], mask_cond)
 
     batch_elem = {
         "rgb_cond": rgb_cond,
@@ -97,11 +82,7 @@ def checkerboard(squares: int, size: int, min_value: float = 0.5):
     base[::2, 1::2] = 1
 
     repeat_mult = size // squares
-    return (
-        base.repeat(repeat_mult, axis=0)
-        .repeat(repeat_mult, axis=1)[:, :, None]
-        .repeat(3, axis=-1)
-    )
+    return base.repeat(repeat_mult, axis=0).repeat(repeat_mult, axis=1)[:, :, None].repeat(3, axis=-1)
 
 
 def remove_background(input_image: Image) -> Image:
@@ -145,9 +126,7 @@ def resize_foreground(
         mode="constant",
         constant_values=((0, 0), (0, 0), (0, 0)),
     )
-    new_image = Image.fromarray(new_image, mode="RGBA").resize(
-        (COND_WIDTH, COND_HEIGHT)
-    )
+    new_image = Image.fromarray(new_image, mode="RGBA").resize((COND_WIDTH, COND_HEIGHT))
     return new_image
 
 
@@ -158,9 +137,7 @@ def square_crop(input_image: Image) -> Image:
     top = (input_image.size[1] - min_size) // 2
     right = (input_image.size[0] + min_size) // 2
     bottom = (input_image.size[1] + min_size) // 2
-    return input_image.crop((left, top, right, bottom)).resize(
-        (COND_WIDTH, COND_HEIGHT)
-    )
+    return input_image.crop((left, top, right, bottom)).resize((COND_WIDTH, COND_HEIGHT))
 
 
 def show_mask_img(input_image: Image) -> Image:
@@ -213,8 +190,8 @@ def update_foreground_ratio(img_proc, fr):
         gr.update(value=show_mask_img(foreground_res)),
     )
 
-def make_demo(model):
 
+def make_demo(model):
     def run_button(
         run_btn,
         input_image,
@@ -227,16 +204,12 @@ def make_demo(model):
         if run_btn == "Run":
             if torch.cuda.is_available():
                 torch.cuda.reset_peak_memory_stats()
-            glb_file: str = run_model(
-                model, background_state, remesh_option.lower(), vertex_count, texture_size
-            )
+            glb_file: str = run_model(model, background_state, remesh_option.lower(), vertex_count, texture_size)
             if torch.cuda.is_available():
                 print("Peak Memory:", torch.cuda.max_memory_allocated() / 1024 / 1024, "MB")
             elif torch.backends.mps.is_available():
-                print(
-                    "Peak Memory:", torch.mps.driver_allocated_memory() / 1024 / 1024, "MB"
-                )
-    
+                print("Peak Memory:", torch.mps.driver_allocated_memory() / 1024 / 1024, "MB")
+
             return (
                 gr.update(),
                 gr.update(),
@@ -247,10 +220,10 @@ def make_demo(model):
             )
         elif run_btn == "Remove Background":
             rem_removed = remove_background(input_image)
-    
+
             sqr_crop = square_crop(rem_removed)
             fr_res = resize_foreground(sqr_crop, foreground_ratio)
-    
+
             return (
                 gr.update(value="Run", visible=True),
                 sqr_crop,
@@ -259,11 +232,12 @@ def make_demo(model):
                 gr.update(value=None, visible=False),
                 gr.update(visible=False),
             )
-    
+
     with gr.Blocks() as demo:
         img_proc_state = gr.State()
         background_remove_state = gr.State()
-        gr.Markdown("""
+        gr.Markdown(
+            """
         # SF3D: Stable Fast 3D Mesh Reconstruction with UV-unwrapping and Illumination Disentanglement
     
         **SF3D** is a state-of-the-art method for 3D mesh reconstruction from a single image.
@@ -274,13 +248,12 @@ def make_demo(model):
         2. You can adjust the foreground ratio to control the size of the foreground object. This can influence the shape
         3. You can select the remeshing option to control the mesh topology. This can introduce artifacts in the mesh on thin surfaces and should be turned off in such cases.
         4. You can upload your own HDR environment map to light the 3D model.
-        """)
+        """
+        )
         with gr.Row(variant="panel"):
             with gr.Column():
                 with gr.Row():
-                    input_img = gr.Image(
-                        type="pil", label="Input Image", sources="upload", image_mode="RGBA"
-                    )
+                    input_img = gr.Image(type="pil", label="Input Image", sources="upload", image_mode="RGBA")
                     preview_removal = gr.Image(
                         label="Preview Background Removal",
                         type="pil",
@@ -288,7 +261,7 @@ def make_demo(model):
                         interactive=False,
                         visible=False,
                     )
-    
+
                 foreground_ratio = gr.Slider(
                     label="Foreground Ratio",
                     minimum=0.5,
@@ -296,20 +269,20 @@ def make_demo(model):
                     value=0.85,
                     step=0.05,
                 )
-    
+
                 foreground_ratio.change(
                     update_foreground_ratio,
                     inputs=[img_proc_state, foreground_ratio],
                     outputs=[background_remove_state, preview_removal],
                 )
-    
+
                 remesh_option = gr.Radio(
                     choices=["None", "Triangle", "Quad"],
                     label="Remeshing",
                     value="None",
                     visible=True,
                 )
-    
+
                 vertex_count_slider = gr.Slider(
                     label="Target Vertex Count",
                     minimum=1000,
@@ -318,7 +291,7 @@ def make_demo(model):
                     step=1000,
                     visible=True,
                 )
-    
+
                 texture_size = gr.Slider(
                     label="Texture Size",
                     minimum=512,
@@ -327,9 +300,9 @@ def make_demo(model):
                     step=256,
                     visible=True,
                 )
-    
+
                 run_btn = gr.Button("Run", variant="primary", visible=False)
-    
+
             with gr.Column():
                 output_3d = LitModel3D(
                     label="3D Model",
@@ -340,35 +313,32 @@ def make_demo(model):
                     scale=1.0,
                 )
                 with gr.Column(visible=False, scale=1.0) as hdr_row:
-                    gr.Markdown("""## HDR Environment Map
+                    gr.Markdown(
+                        """## HDR Environment Map
     
                     Select an HDR environment map to light the 3D model. You can also upload your own HDR environment maps.
-                    """)
-    
+                    """
+                    )
+
                     with gr.Row():
-                        hdr_illumination_file = gr.File(
-                            label="HDR Env Map", file_types=[".hdr"], file_count="single"
-                        )
-                        example_hdris = [
-                            os.path.join("stable-fast-3d/demo_files/hdri", f)
-                            for f in os.listdir("stable-fast-3d/demo_files/hdri")
-                        ]
+                        hdr_illumination_file = gr.File(label="HDR Env Map", file_types=[".hdr"], file_count="single")
+                        example_hdris = [os.path.join("stable-fast-3d/demo_files/hdri", f) for f in os.listdir("stable-fast-3d/demo_files/hdri")]
                         hdr_illumination_example = gr.Examples(
                             examples=example_hdris,
                             inputs=hdr_illumination_file,
                         )
-    
+
                         hdr_illumination_file.change(
                             lambda x: gr.update(env_map=x.name if x is not None else None),
                             inputs=hdr_illumination_file,
                             outputs=[output_3d],
                         )
-    
+
         examples = gr.Examples(
             examples=example_files,
             inputs=input_img,
         )
-    
+
         input_img.change(
             requires_bg_remove,
             inputs=[input_img, foreground_ratio],
@@ -381,7 +351,7 @@ def make_demo(model):
                 hdr_row,
             ],
         )
-    
+
         run_btn.click(
             run_button,
             inputs=[
