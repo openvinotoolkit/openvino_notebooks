@@ -158,22 +158,24 @@ def convert_image_estimator(image_estimator, output_dir):
 
 
 def convert_decoder(decoder, include_decoder_output_dir, exclude_decoder_output_dir):
+    heads = decoder.cfg.heads
     include_cfg_decoder = [h for h in decoder.cfg.heads if h.name in ["vertex_offset", "density"]]
     exclude_cfg_decoder = [h for h in decoder.cfg.heads if h.name not in ["density", "vertex_offset"]]
 
-    decoder.cfg_heads = include_cfg_decoder
+    decoder.cfg.heads = include_cfg_decoder
     convert(
         decoder,
         include_decoder_output_dir,
         torch.rand([1, 535882, 120], dtype=torch.float32),
     )
 
-    decoder.cfg_heads = exclude_cfg_decoder
+    decoder.cfg.heads = exclude_cfg_decoder
     convert(
         decoder,
         exclude_decoder_output_dir,
         torch.rand([263302, 120], dtype=torch.float32),
     )
+    decoder.cfg.heads = heads
 
 
 class ImageTokenizerWrapper(torch.nn.Module):
