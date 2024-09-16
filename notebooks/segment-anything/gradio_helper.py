@@ -54,7 +54,11 @@ def make_video_demo(segmenter, sample_path):
             coordinates_np = []
             for coords in coordinates_txt.split(";"):
                 temp = [float(numb) for numb in coords.split(",")]
-                coordinates_np.append(temp)
+                if len(temp) == 4:
+                    box_coords = np.array(temp).reshape(2, 2)
+                    coordinates_np.append(box_coords)
+                else:
+                    coordinates_np.append(temp)
 
             labels_np = []
             for l in labels_txt.split(","):
@@ -69,6 +73,9 @@ def make_video_demo(segmenter, sample_path):
         submit_btn.click(segment_video, inputs=[input_video, coordinates, labels], outputs=[output_video])
         input_video.upload(on_video_change, [input_video], [input_video])
 
-        examples = gr.Examples(examples=[[sample_path / "coco.mp4", "430, 130; 500, 100", "1, 1"]], inputs=[input_video, coordinates, labels])
+        examples = gr.Examples(
+            examples=[[sample_path / "coco.mp4", "430, 130; 500, 100", "1, 1"], [sample_path / "coco.mp4", "380, 75, 530, 260", "2, 3"]],
+            inputs=[input_video, coordinates, labels],
+        )
 
     return demo

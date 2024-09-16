@@ -31,9 +31,9 @@ def disable_skip_ext(nb, notebook_path, test_device=""):
     skip_for_device = None if test_device else False
     for cell in nb["cells"]:
         if test_device is not None and skip_for_device is None:
-            if (
-                'skip_for_device = "{}" in device.value'.format(test_device) in cell["source"]
-                and "to_quantize = widgets.Checkbox(value=not skip_for_device" in cell["source"]
+            if 'skip_for_device = "{}" in device.value'.format(test_device.upper()) in cell["source"] and (
+                "to_quantize = widgets.Checkbox(value=not skip_for_device" in cell["source"]
+                or "to_quantize = quantization_widget(not skip_for_device" in cell["source"]
             ):
                 skip_for_device = True
 
