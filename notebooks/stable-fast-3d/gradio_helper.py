@@ -40,10 +40,6 @@ def run_model(model, input_image, remesh_option, vertex_count, texture_size):
         with nullcontext():
             model_batch = create_batch(input_image)
             model_batch = {k: v.to("cpu") for k, v in model_batch.items()}
-            print(f"{model_batch.keys()=}")
-            print(f"{texture_size=}")
-            print(f"{remesh_option=}")
-            print(f"{vertex_count=}")
             trimesh_mesh, _glob_dict = model.generate_mesh(model_batch, texture_size, remesh_option, vertex_count)
             trimesh_mesh = trimesh_mesh[0]
 
