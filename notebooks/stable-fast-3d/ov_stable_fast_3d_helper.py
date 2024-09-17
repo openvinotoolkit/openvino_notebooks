@@ -96,12 +96,7 @@ def convert_backbone(backbone, output_dir):
 
 
 def convert_post_processor(post_processor, output_dir):
-    convert(
-        post_processor,
-        output_dir,
-        torch.rand([1, 3, 1024, 32, 32], dtype=torch.float32),
-        "Post processor"
-    )
+    convert(post_processor, output_dir, torch.rand([1, 3, 1024, 32, 32], dtype=torch.float32), "Post processor")
 
 
 def convert_camera_embedder(camera_embedder, output_dir):
@@ -129,12 +124,7 @@ def convert_camera_embedder(camera_embedder, output_dir):
         "intrinsic_cond": torch.rand([1, 1, 1, 3, 3], dtype=torch.float32),
         "intrinsic_normed_cond": torch.rand([1, 1, 1, 3, 3], dtype=torch.float32),
     }
-    convert(
-        CameraEmbedderWrapper(camera_embedder),
-        output_dir,
-        example_input,
-        "Camera embedder"
-    )
+    convert(CameraEmbedderWrapper(camera_embedder), output_dir, example_input, "Camera embedder")
 
 
 def convert_image_estimator(image_estimator, output_dir):
@@ -155,12 +145,7 @@ def convert_image_estimator(image_estimator, output_dir):
     example_input = {
         "cond_image": torch.rand([1, 1, 512, 512, 3], dtype=torch.float32),
     }
-    convert(
-        ImageEstimatorWrapper(image_estimator),
-        output_dir,
-        torch.rand([1, 1, 512, 512, 3], dtype=torch.float32),
-        "Image estimator"
-    )
+    convert(ImageEstimatorWrapper(image_estimator), output_dir, torch.rand([1, 1, 512, 512, 3], dtype=torch.float32), "Image estimator")
 
 
 def convert_decoder(decoder, include_decoder_output_dir, exclude_decoder_output_dir):
@@ -169,20 +154,10 @@ def convert_decoder(decoder, include_decoder_output_dir, exclude_decoder_output_
     exclude_cfg_decoder = [h for h in decoder.cfg.heads if h.name not in ["density", "vertex_offset"]]
 
     decoder.cfg.heads = include_cfg_decoder
-    convert(
-        decoder,
-        include_decoder_output_dir,
-        torch.rand([1, 535882, 120], dtype=torch.float32),
-        "Decoder with include list"
-    )
+    convert(decoder, include_decoder_output_dir, torch.rand([1, 535882, 120], dtype=torch.float32), "Decoder with include list")
 
     decoder.cfg.heads = exclude_cfg_decoder
-    convert(
-        decoder,
-        exclude_decoder_output_dir,
-        torch.rand([263302, 120], dtype=torch.float32),
-        "Decoder with exclude list"
-    )
+    convert(decoder, exclude_decoder_output_dir, torch.rand([263302, 120], dtype=torch.float32), "Decoder with exclude list")
     decoder.cfg.heads = heads
 
 
