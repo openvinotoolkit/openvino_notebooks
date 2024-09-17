@@ -10,9 +10,10 @@ from torch import nn
 import openvino as ov
 
 
-def convert(model: torch.nn.Module, xml_path: str, example_input):
+def convert(model: torch.nn.Module, xml_path: str, example_input, model_name: str):
     xml_path = Path(xml_path)
     if not xml_path.exists():
+        print(f"⌛ {model_name} conversion started")
         xml_path.parent.mkdir(parents=True, exist_ok=True)
         with torch.no_grad():
             converted_model = ov.convert_model(model, example_input=example_input)
@@ -22,6 +23,9 @@ def convert(model: torch.nn.Module, xml_path: str, example_input):
         torch._C._jit_clear_class_registry()
         torch.jit._recursive.concrete_type_store = torch.jit._recursive.ConcreteTypeStore()
         torch.jit._state._clear_class_state()
+        print(f"✅ {model_name} model conversion finished")
+    else:
+        print(f"✅ Found converted {model_name} model")
 
 
 def convert_image_tokenizer(image_tokenizer, output_dir):
@@ -75,12 +79,11 @@ def convert_image_tokenizer(image_tokenizer, output_dir):
         "images": torch.rand([1, 1, 3, 512, 512], dtype=torch.float32),
         "modulation_cond": torch.rand([1, 1, 768], dtype=torch.float32),
     }
-
-    convert(image_tokenizer, output_dir, example_input)
+    convert(image_tokenizer, output_dir, example_input, "Image tokenizer")
 
 
 def convert_tokenizer(tokenizer, output_dir):
-    convert(tokenizer, output_dir, torch.tensor(1))
+    convert(tokenizer, output_dir, torch.tensor(1), "Tokenizer")
 
 
 def convert_backbone(backbone, output_dir):
@@ -89,7 +92,7 @@ def convert_backbone(backbone, output_dir):
         "encoder_hidden_states": torch.rand([1, 1297, 1024], dtype=torch.float32),
     }
 
-    convert(backbone, output_dir, example_input)
+    convert(backbone, output_dir, example_input, "Backbone")
 
 
 def convert_post_processor(post_processor, output_dir):
@@ -97,6 +100,7 @@ def convert_post_processor(post_processor, output_dir):
         post_processor,
         output_dir,
         torch.rand([1, 3, 1024, 32, 32], dtype=torch.float32),
+        "Post processor"
     )
 
 
@@ -129,6 +133,7 @@ def convert_camera_embedder(camera_embedder, output_dir):
         CameraEmbedderWrapper(camera_embedder),
         output_dir,
         example_input,
+        "Camera embedder"
     )
 
 
@@ -154,11 +159,12 @@ def convert_image_estimator(image_estimator, output_dir):
         ImageEstimatorWrapper(image_estimator),
         output_dir,
         torch.rand([1, 1, 512, 512, 3], dtype=torch.float32),
+        "Image estimator"
     )
 
 
 def convert_decoder(decoder, include_decoder_output_dir, exclude_decoder_output_dir):
-    heads = decoder.cfg.heads
+    heads = [h for h in decoder.cfg.heads]
     include_cfg_decoder = [h for h in decoder.cfg.heads if h.name in ["vertex_offset", "density"]]
     exclude_cfg_decoder = [h for h in decoder.cfg.heads if h.name not in ["density", "vertex_offset"]]
 
@@ -167,6 +173,7 @@ def convert_decoder(decoder, include_decoder_output_dir, exclude_decoder_output_
         decoder,
         include_decoder_output_dir,
         torch.rand([1, 535882, 120], dtype=torch.float32),
+        "Decoder with include list"
     )
 
     decoder.cfg.heads = exclude_cfg_decoder
@@ -174,6 +181,7 @@ def convert_decoder(decoder, include_decoder_output_dir, exclude_decoder_output_
         decoder,
         exclude_decoder_output_dir,
         torch.rand([263302, 120], dtype=torch.float32),
+        "Decoder with exclude list"
     )
     decoder.cfg.heads = heads
 
