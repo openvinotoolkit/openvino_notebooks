@@ -948,6 +948,11 @@ wuerstchen
 WuerstchenDiffNeXt
 Würstchen
 XAI
+AISE
+WHITEBOX
+BLACKBOX
+Netron
+KDE
 XCode
 Xeon
 xl
