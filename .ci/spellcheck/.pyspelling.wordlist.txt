@@ -949,6 +949,8 @@ WuerstchenDiffNeXt
 Würstchen
 XAI
 AISE
+AISEClassification
+AISEDetection
 WHITEBOX
 BLACKBOX
 Netron
