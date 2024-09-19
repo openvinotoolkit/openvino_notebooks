@@ -58,9 +58,7 @@ def get_system_prompt(model_language):
     return (
         DEFAULT_SYSTEM_PROMPT_CHINESE
         if (model_language == "Chinese")
-        else DEFAULT_SYSTEM_PROMPT_JAPANESE
-        if (model_language == "Japanese")
-        else DEFAULT_SYSTEM_PROMPT
+        else DEFAULT_SYSTEM_PROMPT_JAPANESE if (model_language == "Japanese") else DEFAULT_SYSTEM_PROMPT
     )
 
 
