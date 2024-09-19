@@ -530,7 +530,7 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
 
         self.audio_tower = core.compile_model(model_dir / AUDIO_EMBEDING_NAME, device, ov_config)
 
-        self.multi_modal_projector = core.compile_model(model_dir / MULTIMODAL_PROJECTOR_NAME)
+        self.multi_modal_projector = core.compile_model(model_dir / MULTIMODAL_PROJECTOR_NAME, device, ov_config)
         self.vocab_size = self.config.text_config.vocab_size
         self.language_model = OvModelForCausalLMWithEmb(model_dir, device, self.config.text_config, ov_config)
         self.pad_token_id = self.config.pad_token_id if self.config.pad_token_id is not None else -1
