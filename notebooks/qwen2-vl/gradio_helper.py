@@ -71,7 +71,6 @@ def transform_messages(original_messages):
 
 def make_demo(model, processor):
     def call_local_model(model, processor, messages):
-
         messages = transform_messages(messages)
 
         text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
@@ -92,7 +91,6 @@ def make_demo(model, processor):
             yield generated_text
 
     def create_predict_fn():
-
         def predict(_chatbot, task_history):
             chat_query = _chatbot[-1][0]
             query = task_history[-1][0]
@@ -131,7 +129,6 @@ def make_demo(model, processor):
         return predict
 
     def create_regenerate_fn():
-
         def regenerate(_chatbot, task_history):
             if not task_history:
                 return _chatbot

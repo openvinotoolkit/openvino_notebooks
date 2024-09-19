@@ -6,7 +6,6 @@ from threading import Thread
 
 
 def make_demo(model, processor):
-
     def add_text(chatbot, task_history, input):
         text_content = input.text
         content = []

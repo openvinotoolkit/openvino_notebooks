@@ -676,7 +676,6 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
         use_cache: bool = True,
         return_dict: bool = True,
     ) -> Union[Tuple, Qwen2AudioCausalLMOutputWithPast]:
-
         if input_features is not None:
             input_features = input_features
             feature_attention_mask = feature_attention_mask
