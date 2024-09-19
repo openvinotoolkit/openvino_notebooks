@@ -30,7 +30,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     model_dir = args.model_path
 
-    ov_config = {hints.performance_mode: hints.PerformanceMode.LATENCY, streams.num: "1", props.cache_dir: ""}
+    ov_config = {hints.performance_mode: hints.PerformanceMode.LATENCY, streams.num: streams.Num(1), props.cache_dir: ""}
 
     tokenizer = AutoTokenizer.from_pretrained(model_dir)
     print("====Compiling model====")
