@@ -1,5 +1,5 @@
 from pathlib import Path
-from transformers import MllamaForConditionalGeneration, AutoProcessor, AutoConfig, GenerationConfig
+from transformers import MllamaForConditionalGeneration, AutoProcessor, AutoConfig, GenerationConfig, TextStreamer
 from transformers.cache_utils import DynamicCache
 from transformers.models.llama.modeling_llama import repeat_kv
 from typing import Optional, Union, List, Tuple, Dict
@@ -172,13 +172,8 @@ def convert_mllama(model_id, out_dir):
         cleanup_torchscript_cache()
         del model
         gc.collect()
-            
-        
-
-convert_mllama("/home/ea/llama3.2/Llama-3.2-11B-Vision-Instruct", "Llama-3.2-11B-Vision-Instruct/OV")
 
 core = ov.Core()
-
 
 @dataclass
 class MLlamaOutputWithPast(ModelOutput):
@@ -191,7 +186,10 @@ class MLlamaOutputWithPast(ModelOutput):
 
 
 class OVMLlamaForConditionalGeneration(GenerationMixin):
-    def __init__(self, model_dir:Union[str, Path], device:str="CPU", ov_config:Optional[Dict[str, str]]=None):
+    def __init__(self, model_dir:Union[str, Path],
+                 device:str="CPU",
+                 ov_config:Optional[Dict[str, str]]=None,
+                 LANGUAGE_MODEL_NAME=None):
         model_dir = Path(model_dir)
         self.config = AutoConfig.from_pretrained(model_dir)
         self.generation_config = GenerationConfig.from_model_config(self.config)
@@ -201,7 +199,10 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         self._supports_cache_class = False
         self.next_beam_idx = None
         self._past_length = None
-        self.model = core.read_model(model_dir / LANGUAGE_MODEL)
+        if LANGUAGE_MODEL_NAME:
+            self.model = core.read_model(model_dir / LANGUAGE_MODEL_NAME)
+        else:    
+            self.model = core.read_model(model_dir / LANGUAGE_MODEL)
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
         self.lm_cross_attn_inputs = [key for key in self.input_names if "cross_attn_key_values" in key]
@@ -295,6 +296,8 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             if aspect_ratio_ids is None:
                 raise ValueError("`aspect_ratio_ids` must be provided if `pixel_values` is provided")
             # get vision tokens from vision model
+            #DEBUG
+            print(pixel_values.shape, aspect_ratio_ids.shape, aspect_ratio_mask.shape)
             self.vision_request.start_async([pixel_values, aspect_ratio_ids, aspect_ratio_mask], share_inputs=True)
             self.vision_request.wait()
             cross_attn_key_values = [self.vision_request.get_tensor(name).data for name in self.cross_attn_outputs]
@@ -500,15 +503,77 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
 
         return cross_attention_mask, full_text_row_masked_out_mask
 
+    def prepare_vision_outputs(self, pixel_values, aspect_ratio_ids, aspect_ratio_mask,
+                           cross_attention_mask=None, past_key_values=None, cache_position=None):
+        if pixel_values is not None:
+            if aspect_ratio_ids is None:
+                raise ValueError("`aspect_ratio_ids` must be provided if `pixel_values` is provided")
+            # get vision tokens from vision model
+            #DEBUG
+            print(pixel_values.shape, aspect_ratio_ids.shape, aspect_ratio_mask.shape)
+            self.vision_request.start_async([pixel_values, aspect_ratio_ids, aspect_ratio_mask], share_inputs=True)
+            self.vision_request.wait()
+            cross_attn_key_values = [self.vision_request.get_tensor(name).data for name in self.cross_attn_outputs]
+            cross_attention_states = torch.from_numpy(self.vision_request.get_tensor("cross_attention_states").data)
+        cross_attention_mask, full_text_row_masked_out_mask = self._prepare_cross_attention_mask(
+            cross_attention_mask,
+            past_key_values=past_key_values,
+            num_vision_tokens=self.num_patches,
+            cross_attention_layers=cross_attn_key_values if past_key_values is not None else None,
+            cross_attention_states=cross_attention_states,
+            device=self.device,
+            dtype=torch.float32,
+        )
 
-model_id = "Llama-3.2-11B-Vision-Instruct/OV"
-ov_model = OVMLlamaForConditionalGeneration(model_id, device="CPU")
-processor = AutoProcessor.from_pretrained(model_id)
+        if cross_attention_mask is not None and cache_position is not None:
+            cross_attention_mask = cross_attention_mask[:, :, cache_position]
+            full_text_row_masked_out_mask = full_text_row_masked_out_mask[:, :, cache_position]
 
-prompt = "<|image|><|begin_of_text|>If I had to write a haiku for this one"
-url = "https://llava-vl.github.io/static/images/view.jpg"
-raw_image = Image.open(requests.get(url, stream=True).raw)
 
-inputs = processor(prompt, raw_image, return_tensors="pt")
-output = ov_model.generate(**inputs, do_sample=False, max_new_tokens=25)
-print(processor.decode(output[0], skip_special_tokens=True)[len(prompt):])
+        return {
+            "cross_attention_mask": cross_attention_mask,
+            "full_text_row_masked_out_mask": full_text_row_masked_out_mask,
+            "past_key_values": past_key_values,
+            "cache_position": cache_position,
+            "cross_attention_key_values": cross_attn_key_values
+        }
+
+    def prepare_llm_inputs(self, input_ids, attention_mask, position_ids, cross_attention_mask, full_text_row_masked_out_mask, past_key_values, cache_position, cross_attention_key_values):
+        model_inputs = {
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+            "position_ids": position_ids,
+            "cross_attention_mask": cross_attention_mask,
+            "full_text_row_masked_out_mask": full_text_row_masked_out_mask,
+            "cache_position": cache_position
+        }
+        #print(self.request)
+
+        if past_key_values is None:
+            self.request.reset_state()
+            self.next_beam_idx = np.arange(input_ids.shape[0], dtype=int)
+            self._past_length = 0
+        
+        model_inputs.update(dict(zip(self.lm_cross_attn_inputs, cross_attention_key_values)))
+        if "beam_idx" in self.input_names:
+            model_inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(input_ids.shape[0], dtype=int)
+        
+        return model_inputs
+
+if __name__ == "__main__":
+    #convert_mllama("/home/aanuf/tmp/models/new_llamas/Llama-3.2-11B-Vision_final", "Llama-3.2-11B-Vision-Instruct/OV")
+    #convert_mllama("/home/aanuf/tmp/models/new_llamas/Llama-3.2-11B-Vision-Instruct/", "Llama-3.2-11B-Vision-Instruct/OV")
+
+    model_id = "Llama-3.2-11B-Vision-Instruct/OV"
+    ov_model = OVMLlamaForConditionalGeneration(model_id, device="CPU", LANGUAGE_MODEL_NAME="llm_int4_asym_r10_gs64_max_activation_variance_awq_scale.xml")
+    processor = AutoProcessor.from_pretrained(model_id)
+
+    prompt = "<|image|><|begin_of_text|>If I had to write a haiku for this one"
+    url = "https://llava-vl.github.io/static/images/view.jpg"
+    raw_image = Image.open(requests.get(url, stream=True).raw)
+
+    inputs = processor(prompt, raw_image, return_tensors="pt")
+    streamer = TextStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=True)
+    output = ov_model.generate(**inputs, do_sample=False, max_new_tokens=50, streamer=streamer)
+    #print(processor.decode(output[0], skip_special_tokens=True)[len(prompt):])
+   # print(processor.decode(output[0], skip_special_tokens=True)[:])
