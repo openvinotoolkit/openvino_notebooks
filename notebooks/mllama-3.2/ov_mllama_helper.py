@@ -269,6 +269,10 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             self.model = core.read_model(model_dir / language_model_name)
         else:    
             self.model = core.read_model(model_dir / LANGUAGE_MODEL)
+        if image_encoder_name:
+            self.vision_model = core.read_model(model_dir / image_encoder_name)
+        else:
+            self.vision_model = core.read_model(model_dir / IMAGE_ENCODER)
         self.update_pkv_precision()
         self.slice_lm_head()
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
@@ -276,10 +280,6 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         self.lm_cross_attn_inputs = [key for key in self.input_names if "cross_attn_key_values" in key]
         compiled_model = core.compile_model(self.model, device, ov_config)
         self.request = compiled_model.create_infer_request()
-        if image_encoder_name:
-            self.vision_model = core.read_model(model_dir / image_encoder_name)
-        else:
-            self.vision_model = core.read_model(model_dir / IMAGE_ENCODER)
         self.cross_attn_outputs = [key.get_any_name() for key in self.vision_model.outputs if "cross_attn_key_values" in key.get_any_name() ]
         compiled_vision_model = core.compile_model(self.vision_model, device, ov_config)
         self.vision_request = compiled_vision_model.create_infer_request()
@@ -316,6 +316,12 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
                     ppp.input(key.get_any_name()).tensor().set_element_type(pkv_precision)
 
             self.model = ppp.build()
+
+            ppp_v = ov.preprocess.PrePostProcessor(self.vision_model)
+            for key in self.vision_model.outputs:
+                if "cross_attn_key_values" in key.get_any_name() and pkv_precision != key.get_element_type():
+                    ppp_v.output(key.get_any_name()).tensor().set_element_type(pkv_precision)
+            self.vision_model = ppp_v.build()
             self._pkv_precision = pkv_precision
     
     def slice_lm_head(self):
@@ -445,7 +451,8 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             self._past_length = 0
             self.llm_infer_time = []
         
-        model_inputs.update(dict(zip(self.lm_cross_attn_inputs, cross_attention_key_values)))
+        if self._device != "GPU":
+            model_inputs.update(dict(zip(self.lm_cross_attn_inputs, cross_attention_key_values)))
         if "beam_idx" in self.input_names:
             model_inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(input_ids.shape[0], dtype=int)
         
@@ -666,7 +673,7 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
     def prepare_remote_tensors(self):
         context = core.get_default_context("GPU")
         for idx, name in enumerate(self.lm_cross_attn_inputs):
-            remote_tensor = context.create_tensor(ov.Type.f32, ov.Shape([1, 32, 6404, 128]), {})
+            remote_tensor = context.create_tensor(ov.Type.f16, ov.Shape([1, 32, 6404, 128]), {})
             self.vision_request.set_tensor(self.cross_attn_outputs[idx], remote_tensor)
             self.request.set_tensor(name, remote_tensor)
 
