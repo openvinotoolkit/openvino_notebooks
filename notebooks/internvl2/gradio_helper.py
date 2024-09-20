@@ -377,7 +377,6 @@ def make_demo(model, tokenizer):
         max_new_tokens,
         max_input_tiles,
     ):
-
         streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
         generation_config = {
             "num_beams": 1,

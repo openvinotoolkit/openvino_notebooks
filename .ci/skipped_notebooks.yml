@@ -587,3 +587,7 @@
       - '3.8'
     - os:
         - macos-12
+- notebook: notebooks/llm-agent-react/llm-agent-react-langchain.ipynb
+  skips:
+    - python:
+      - '3.8'

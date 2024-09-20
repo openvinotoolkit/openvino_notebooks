@@ -254,7 +254,6 @@ def convert_internvl2_model(model_id, output_dir, quantization_config):
         print("✅ Input embedding model successfully converted")
 
     if not image_embed_path.exists():
-
         print("⌛ Convert Image embedding model")
 
         model.forward = model.extract_feature
@@ -535,7 +534,6 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
 
 
 class OVInternVLChatModel:
-
     def __init__(self, model_dir: Path, device: str):
         config = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)
         image_size = config.force_image_size or config.vision_config.image_size
@@ -564,7 +562,6 @@ class OVInternVLChatModel:
         past_key_values: Optional[List[torch.FloatTensor]] = None,
         use_cache: Optional[bool] = None,
     ) -> Union[Tuple, CausalLMOutputWithPast]:
-
         image_flags = image_flags.squeeze(-1)
         input_embeds = self.language_model.embed_tokens(input_ids)
 
@@ -678,7 +675,6 @@ class OVInternVLChatModel:
         IMG_CONTEXT_TOKEN="<IMG_CONTEXT>",
         verbose=False,
     ):
-
         from conversation import get_conv_template
 
         if history is None and pixel_values is not None and "<image>" not in question:
@@ -740,7 +736,6 @@ class OVInternVLChatModel:
         return_dict: Optional[bool] = None,
         **generate_kwargs,
     ) -> torch.LongTensor:
-
         assert self.img_context_token_id is not None
         if pixel_values is not None:
             if visual_features is not None:

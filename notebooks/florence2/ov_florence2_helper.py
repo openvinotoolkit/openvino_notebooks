@@ -353,7 +353,6 @@ class OVFlorence2Model:
         self.language_model = OVFlorence2LangModel(model_dir, self.config.text_config, device, ov_config)
 
     def generate(self, input_ids, inputs_embeds=None, pixel_values=None, **kwargs):
-
         if inputs_embeds is None:
             # 1. Extra the input embeddings
             if input_ids is not None:

@@ -617,6 +617,7 @@ perceptron
 Patil
 PEFT
 perceiver
+PerformanceMode
 performant
 PersonaGPT
 PGI
