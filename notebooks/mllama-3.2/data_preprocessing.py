@@ -120,7 +120,7 @@ def prepare_calibration_data_vision(dataloader, init_steps):
                         {
                             "pixel_values": batch["pixel_values"].to("cpu"),
                             "aspect_ratio_ids": inputs.data["aspect_ratio_ids"].to("cpu"),
-                            "attention_mask": inputs.data["aspect_ratio_mask"]
+                            "aspect_ratio_mask": inputs.data["aspect_ratio_mask"]
                         }
                     )
     return data
@@ -134,6 +134,7 @@ def prepare_dataset_vision(opt_init_steps=50, max_train_samples=1000):
     train_dataset = dataset["train"].shuffle(seed=42)
     dataloader = torch.utils.data.DataLoader(train_dataset, collate_fn=collate_fn, batch_size=1)
     calibration_data = prepare_calibration_data_vision(dataloader, opt_init_steps)
+    return calibration_data
 
 
 def prepare_calibration_data_llm(dataloader, init_steps, mllm):
