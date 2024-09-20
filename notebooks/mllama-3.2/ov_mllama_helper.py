@@ -189,7 +189,8 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
     def __init__(self, model_dir:Union[str, Path],
                  device:str="CPU",
                  ov_config:Optional[Dict[str, str]]=None,
-                 LANGUAGE_MODEL_NAME=None):
+                 LANGUAGE_MODEL_NAME=None,
+                 IMAGE_ENCODER_NAME=None):
         model_dir = Path(model_dir)
         self.config = AutoConfig.from_pretrained(model_dir)
         self.generation_config = GenerationConfig.from_model_config(self.config)
@@ -208,7 +209,10 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         self.lm_cross_attn_inputs = [key for key in self.input_names if "cross_attn_key_values" in key]
         compiled_model = core.compile_model(self.model, device, ov_config)
         self.request = compiled_model.create_infer_request()
-        self.vision_model = core.read_model(model_dir / IMAGE_ENCODER)
+        if IMAGE_ENCODER_NAME:
+            self.vision_model = core.read_model(model_dir / IMAGE_ENCODER_NAME)
+        else:
+            self.vision_model = core.read_model(model_dir / IMAGE_ENCODER)
         self.cross_attn_outputs = [key.get_any_name() for key in self.vision_model.outputs if "cross_attn_key_values" in key.get_any_name() ]
         compiled_vision_model = core.compile_model(self.vision_model, device, ov_config)
         self.vision_request = compiled_vision_model.create_infer_request()

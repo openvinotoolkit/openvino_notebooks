@@ -122,7 +122,7 @@ def prepare_calibration_data_vision(dataloader, init_steps):
                         {
                             "pixel_values": batch["pixel_values"].to("cpu"),
                             "aspect_ratio_ids": inputs.data["aspect_ratio_ids"].to("cpu"),
-                            "attention_mask": inputs.data["aspect_ratio_mask"]
+                            "aspect_ratio_mask": inputs.data["aspect_ratio_mask"]
                         }
                     )
     return data
