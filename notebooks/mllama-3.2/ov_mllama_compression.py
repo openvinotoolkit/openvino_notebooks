@@ -47,6 +47,7 @@ def compress(model: OVMLlamaForConditionalGeneration, algo = CompressWeightsMode
 
     start = time.perf_counter()
     dataset = prepare_dataset_llm(model, 64)
+    
 
     nncf_dataset = Dataset(dataset)
 
@@ -71,7 +72,7 @@ def compress(model: OVMLlamaForConditionalGeneration, algo = CompressWeightsMode
 
 
 model_id = "Llama-3.2-11B-Vision-Instruct/OV"
-ov_model = OVMLlamaForConditionalGeneration(model_id)
+ov_model = OVMLlamaForConditionalGeneration(model_id, slice_lm_head=False)
 processor = AutoProcessor.from_pretrained(model_id)
 
 compress(ov_model)

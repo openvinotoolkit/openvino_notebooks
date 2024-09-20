@@ -253,7 +253,7 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
     def __init__(self, model_dir:Union[str, Path],
                  device:str="CPU",
                  ov_config:Optional[Dict[str, str]]=None,
-                 language_model_name=None, image_encoder_name=None):
+                 language_model_name=None, image_encoder_name=None, slice_lm_head=True):
         model_dir = Path(model_dir)
         self.config = AutoConfig.from_pretrained(model_dir)
         self.generation_config = GenerationConfig.from_pretrained(model_dir)
@@ -274,7 +274,8 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         else:
             self.vision_model = core.read_model(model_dir / IMAGE_ENCODER)
         self.update_pkv_precision()
-        self.slice_lm_head()
+        if slice_lm_head:
+            self.slice_lm_head()
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
         self.lm_cross_attn_inputs = [key for key in self.input_names if "cross_attn_key_values" in key]
@@ -408,14 +409,13 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             # get vision tokens from vision model
             self.vision_request.start_async([pixel_values, aspect_ratio_ids, aspect_ratio_mask], share_inputs=True)
             self.vision_request.wait()
-            cross_attn_key_values = [self.vision_request.get_tensor(name).data for name in self.cross_attn_outputs]
-            cross_attention_states = torch.from_numpy(self.vision_request.get_tensor("cross_attention_states").data)
+            cross_attn_key_values = [self.vision_request.get_tensor(name) for name in self.cross_attn_outputs]
         cross_attention_mask, full_text_row_masked_out_mask = self._prepare_cross_attention_mask(
             cross_attention_mask,
             past_key_values=past_key_values,
             num_vision_tokens=self.num_patches,
             cross_attention_layers=cross_attn_key_values if past_key_values is not None else None,
-            cross_attention_states=cross_attention_states,
+            cross_attention_states=((),),
             device=self.device,
             dtype=torch.float32,
         )
