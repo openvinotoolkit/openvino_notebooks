@@ -6,6 +6,7 @@ from typing import Optional, Union, List, Tuple, Dict
 from optimum.exporters.openvino.stateful import patch_stateful
 from transformers.generation import GenerationMixin
 from transformers.modeling_outputs import ModelOutput
+import openvino.runtime.opset13 as ops
 import types
 import openvino as ov
 import gc
@@ -14,6 +15,7 @@ import numpy as np
 from dataclasses import dataclass
 import requests
 from PIL import Image
+from openvino.runtime.passes import Manager, MatcherPass, WrapType, Matcher
 
 IMAGE_ENCODER = "openvino_vision_encoder.xml"
 LANGUAGE_MODEL = "openvino_language_model.xml"
@@ -26,6 +28,67 @@ def cleanup_torchscript_cache():
     torch.jit._recursive.concrete_type_store = torch.jit._recursive.ConcreteTypeStore()
     torch.jit._state._clear_class_state()
 
+
+class InsertSlice(MatcherPass):
+    def __init__(self):
+        MatcherPass.__init__(self)
+        self.model_changed = False
+
+        param = WrapType("opset10.Result")
+
+        def callback(matcher: Matcher) -> bool:
+            root = matcher.get_match_root()
+            print("root: ", root)
+            if root is None:
+                return False
+            root_output = matcher.get_match_value()
+            print("root_output", root_output)
+            root_name = root.get_friendly_name()
+            if (len(root.get_output_partial_shape(0)) == 3):
+                print(f"Find target root node name: {root_name}")
+                parent = root.input_value(0).get_node()
+                print(f"Find target parent node name: {parent.get_friendly_name()}")
+                grand_parent = parent.input_value(0).get_node()
+                print(f"Find grandparent node name: {grand_parent.get_friendly_name()}")
+                grand_parent_output = parent.input(0).get_source_output()
+                print("grand_parent_output: ", grand_parent_output)
+                consumers = grand_parent_output.get_target_inputs()
+                
+                print(f"consumers: {consumers}")
+                print("Original reshape node output shape:", grand_parent_output.get_partial_shape())
+                start = np.array([0, -1, 0], dtype=np.int32)
+                stop = np.array([1, -2, grand_parent_output.get_partial_shape()[-1].get_length()], dtype=np.int32)
+                step = np.array([1, -1, 1], dtype=np.int32)
+                axes = np.array([0, 1, 2], dtype=np.int32)
+                slice = ops.slice(grand_parent, start, stop, step, axes, name="inserted_slice")
+                print("After insert slice node, output shape:", slice.output(0).get_partial_shape())
+
+                for consumer in consumers:
+                    consumer.replace_source_output(slice.output(0))
+                self.model_changed = True
+                # Use new operation for additional matching
+                self.register_new_node(slice)
+                                
+                return True
+
+        self.register_matcher(Matcher(param,"InsertSlice"), callback)
+
+
+STR_TO_OV_TYPE = {
+    "boolean": ov.Type.boolean,
+    "f16": ov.Type.f16,
+    "f32": ov.Type.f32,
+    "f64": ov.Type.f64,
+    "i8": ov.Type.i8,
+    "i16": ov.Type.i16,
+    "i32": ov.Type.i32,
+    "i64": ov.Type.i64,
+    "u8": ov.Type.u8,
+    "u16": ov.Type.u16,
+    "u32": ov.Type.u32,
+    "u64": ov.Type.u64,
+    "bf16": ov.Type.bf16,
+}
 
 def convert_mllama(model_id, out_dir):
 
@@ -189,26 +252,33 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
     def __init__(self, model_dir:Union[str, Path],
                  device:str="CPU",
                  ov_config:Optional[Dict[str, str]]=None,
-                 LANGUAGE_MODEL_NAME=None):
+                 language_model_name=None, image_encoder_name=None):
         model_dir = Path(model_dir)
         self.config = AutoConfig.from_pretrained(model_dir)
         self.generation_config = GenerationConfig.from_model_config(self.config)
         self.main_input_name = "input_ids"
         self.device = torch.device("cpu")
+        self._device = device
+        self.ov_config = ov_config
         self.num_pkv = 2
         self._supports_cache_class = False
         self.next_beam_idx = None
         self._past_length = None
-        if LANGUAGE_MODEL_NAME:
-            self.model = core.read_model(model_dir / LANGUAGE_MODEL_NAME)
+        if language_model_name:
+            self.model = core.read_model(model_dir / language_model_name)
         else:    
             self.model = core.read_model(model_dir / LANGUAGE_MODEL)
+        self.update_pkv_precision()
+        self.slice_lm_head()
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
         self.lm_cross_attn_inputs = [key for key in self.input_names if "cross_attn_key_values" in key]
         compiled_model = core.compile_model(self.model, device, ov_config)
         self.request = compiled_model.create_infer_request()
-        self.vision_model = core.read_model(model_dir / IMAGE_ENCODER)
+        if image_encoder_name:
+            self.vision_model = core.read_model(model_dir / image_encoder_name)
+        else:
+            self.vision_model = core.read_model(model_dir / IMAGE_ENCODER)
         self.cross_attn_outputs = [key.get_any_name() for key in self.vision_model.outputs if "cross_attn_key_values" in key.get_any_name() ]
         compiled_vision_model = core.compile_model(self.vision_model, device, ov_config)
         self.vision_request = compiled_vision_model.create_infer_request()
@@ -220,6 +290,37 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         if past_key_values is None:
             return 0
         return self._past_length
+
+    def update_pkv_precision(self, force_fp32=False):
+        pkv_precision = ov.Type.f32
+        if not force_fp32:
+            device = self._device.upper()
+            try:
+                if "INFERENCE_PRECISION_HINT" in core.get_property(device, "SUPPORTED_PROPERTIES"):
+                    pkv_precision = core.get_property(device, "INFERENCE_PRECISION_HINT")
+            except RuntimeError:  # use default precision when get_property fails, e.g. when device is "AUTO:GPU"
+                pass
+
+            # ov_config["INFERENCE_PRECISION_HINT"] may override the prefer precision
+            if self.ov_config:
+                inference_precision_hint = self.ov_config.get("INFERENCE_PRECISION_HINT", "")
+                if inference_precision_hint in STR_TO_OV_TYPE:
+                    pkv_precision = STR_TO_OV_TYPE[inference_precision_hint]
+
+            ppp = ov.preprocess.PrePostProcessor(self.model)
+            for key in self.model.inputs:
+                if "cross_attn_key_values" in key.get_any_name() and pkv_precision != key.get_element_type():
+                    ppp.input(key.get_any_name()).tensor().set_element_type(pkv_precision)
+
+            self.model = ppp.build()
+            self._pkv_precision = pkv_precision
+    
+    def slice_lm_head(self):
+        manager = Manager()
+        manager.register_pass(InsertSlice())
+        manager.run_passes(self.model)
+        self.model.validate_nodes_and_infer_types()
+
 
     def forward(
         self,
@@ -296,8 +397,6 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             if aspect_ratio_ids is None:
                 raise ValueError("`aspect_ratio_ids` must be provided if `pixel_values` is provided")
             # get vision tokens from vision model
-            #DEBUG
-            print(pixel_values.shape, aspect_ratio_ids.shape, aspect_ratio_mask.shape)
             self.vision_request.start_async([pixel_values, aspect_ratio_ids, aspect_ratio_mask], share_inputs=True)
             self.vision_request.wait()
             cross_attn_key_values = [self.vision_request.get_tensor(name).data for name in self.cross_attn_outputs]
@@ -509,8 +608,6 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             if aspect_ratio_ids is None:
                 raise ValueError("`aspect_ratio_ids` must be provided if `pixel_values` is provided")
             # get vision tokens from vision model
-            #DEBUG
-            print(pixel_values.shape, aspect_ratio_ids.shape, aspect_ratio_mask.shape)
             self.vision_request.start_async([pixel_values, aspect_ratio_ids, aspect_ratio_mask], share_inputs=True)
             self.vision_request.wait()
             cross_attn_key_values = [self.vision_request.get_tensor(name).data for name in self.cross_attn_outputs]
@@ -547,7 +644,6 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             "full_text_row_masked_out_mask": full_text_row_masked_out_mask,
             "cache_position": cache_position
         }
-        #print(self.request)
 
         if past_key_values is None:
             self.request.reset_state()
@@ -561,19 +657,29 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         return model_inputs
 
 if __name__ == "__main__":
-    #convert_mllama("/home/aanuf/tmp/models/new_llamas/Llama-3.2-11B-Vision_final", "Llama-3.2-11B-Vision-Instruct/OV")
-    #convert_mllama("/home/aanuf/tmp/models/new_llamas/Llama-3.2-11B-Vision-Instruct/", "Llama-3.2-11B-Vision-Instruct/OV")
-
     model_id = "Llama-3.2-11B-Vision-Instruct/OV"
-    ov_model = OVMLlamaForConditionalGeneration(model_id, device="CPU", LANGUAGE_MODEL_NAME="llm_int4_asym_r10_gs64_max_activation_variance_awq_scale.xml")
+    LANGUAGE_MODEL_NAME = "llm_int4_asym_r10_gs64_max_activation_variance_awq_scale.xml"
+    IMAGE_ENCODER_NAME = "openvino_vision_encoder.xml"
+    ov_model = OVMLlamaForConditionalGeneration(model_id, device="CPU", language_model_name=LANGUAGE_MODEL_NAME, image_encoder_name=IMAGE_ENCODER_NAME)
     processor = AutoProcessor.from_pretrained(model_id)
 
     prompt = "<|image|><|begin_of_text|>If I had to write a haiku for this one"
     url = "https://llava-vl.github.io/static/images/view.jpg"
     raw_image = Image.open(requests.get(url, stream=True).raw)
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "image"},
+                {"type": "text", "text": "Describe image in two sentences"}
+            ]
+        }
+    ]
+    text = processor.apply_chat_template(messages, add_generation_prompt=True)
 
-    inputs = processor(prompt, raw_image, return_tensors="pt")
+    url = "https://llava-vl.github.io/static/images/view.jpg"
+    raw_image = Image.open(requests.get(url, stream=True).raw)
+
+    inputs = processor(text=text, images=raw_image, return_tensors="pt")
     streamer = TextStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=True)
     output = ov_model.generate(**inputs, do_sample=False, max_new_tokens=50, streamer=streamer)
-    #print(processor.decode(output[0], skip_special_tokens=True)[len(prompt):])
-   # print(processor.decode(output[0], skip_special_tokens=True)[:])

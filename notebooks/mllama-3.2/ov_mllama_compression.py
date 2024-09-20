@@ -26,7 +26,7 @@ from ov_mllama_helper import OVMLlamaForConditionalGeneration
 def compress(model: OVMLlamaForConditionalGeneration, algo = CompressWeightsMode.INT4_ASYM, ratio = 1.0,
                  sm = SensitivityMetric.MAX_ACTIVATION_VARIANCE,
                  awq=True, scale_estimation=True,
-                 lora=False, gptq=False, group_size=64):
+                 lora=False, gptq=False, group_size=64, all_layers=True):
     postfix = f"llm_{algo}_r{ratio}_gs{group_size}_{sm}"
     if awq:
         postfix += "_awq"
@@ -36,6 +36,8 @@ def compress(model: OVMLlamaForConditionalGeneration, algo = CompressWeightsMode
         postfix += "_gptq"
     if lora:
         postfix += "_lora"
+    if all_layers:
+        postfix += "_all_layers"
 
     postfix = postfix.replace('.', '')
     dst_name = postfix+".xml"
@@ -55,7 +57,7 @@ def compress(model: OVMLlamaForConditionalGeneration, algo = CompressWeightsMode
                                     sensitivity_metric=sm,
                                     awq=awq,
                                     scale_estimation=scale_estimation,
-                                    gptq=gptq,
+                                    gptq=gptq, all_layers=all_layers
                                     )
 
     end = time.perf_counter()
