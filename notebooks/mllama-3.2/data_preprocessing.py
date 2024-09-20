@@ -15,7 +15,7 @@ from transformers import MllamaForConditionalGeneration, AutoProcessor, AutoToke
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-model_id = "/home/aanuf/tmp/models/new_llamas/Llama-3.2-11B-Vision-Instruct/"
+model_id = "Llama-3.2-11B-Vision-Instruct/OV"
 #model = MllamaForConditionalGeneration.from_pretrained(model_id)
 processor = AutoProcessor.from_pretrained(model_id)
 
@@ -67,8 +67,6 @@ def collate_fn(example, image_column="image_url", text_column="caption"):
             return None
     except Exception:
         return None
-
-    print(example[text_column])
     inputs = processor(text="<|image|><|begin_of_text|> Please describe image content based on information: "+example[text_column], images=image, return_tensors="pt", padding=True)
     if inputs['input_ids'].shape[1] > max_length:
         return None
