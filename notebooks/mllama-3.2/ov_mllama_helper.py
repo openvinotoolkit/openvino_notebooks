@@ -16,6 +16,7 @@ from dataclasses import dataclass
 import requests
 from PIL import Image
 from openvino.runtime.passes import Manager, MatcherPass, WrapType, Matcher
+import time
 
 IMAGE_ENCODER = "openvino_vision_encoder.xml"
 LANGUAGE_MODEL = "openvino_language_model.xml"
@@ -255,7 +256,7 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
                  language_model_name=None, image_encoder_name=None):
         model_dir = Path(model_dir)
         self.config = AutoConfig.from_pretrained(model_dir)
-        self.generation_config = GenerationConfig.from_model_config(self.config)
+        self.generation_config = GenerationConfig.from_pretrained(model_dir)
         self.main_input_name = "input_ids"
         self.device = torch.device("cpu")
         self._device = device
@@ -282,6 +283,8 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         self.cross_attn_outputs = [key.get_any_name() for key in self.vision_model.outputs if "cross_attn_key_values" in key.get_any_name() ]
         compiled_vision_model = core.compile_model(self.vision_model, device, ov_config)
         self.vision_request = compiled_vision_model.create_infer_request()
+        if self._device == "GPU":
+            self.prepare_remote_tensors()
         self.next_beam_idx = None
         self.num_patches = (self.config.vision_config.image_size // self.config.vision_config.patch_size) ** 2 + 1
         self._past_length = 0
@@ -428,25 +431,29 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
 
     def language_model(self, input_ids, attention_mask, position_ids, cross_attention_mask, full_text_row_masked_out_mask, past_key_values, cache_position, cross_attention_key_values):
         model_inputs = {
-            "input_ids": input_ids,
-            "attention_mask": attention_mask,
-            "position_ids": position_ids,
-            "cross_attention_mask": cross_attention_mask,
-            "full_text_row_masked_out_mask": full_text_row_masked_out_mask,
-            "cache_position": cache_position
+            "input_ids": ov.Tensor(np.array(input_ids)),
+            "attention_mask": ov.Tensor(np.array(attention_mask)),
+            "position_ids": ov.Tensor(np.array(position_ids)),
+            "cross_attention_mask": ov.Tensor(np.array(cross_attention_mask)),
+            "full_text_row_masked_out_mask": ov.Tensor(np.array(full_text_row_masked_out_mask)),
+            "cache_position": ov.Tensor(np.array(cache_position))
         }
 
         if past_key_values is None:
             self.request.reset_state()
             self.next_beam_idx = np.arange(input_ids.shape[0], dtype=int)
             self._past_length = 0
+            self.llm_infer_time = []
         
         model_inputs.update(dict(zip(self.lm_cross_attn_inputs, cross_attention_key_values)))
         if "beam_idx" in self.input_names:
             model_inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(input_ids.shape[0], dtype=int)
         
+        start = time.perf_counter()
         self.request.start_async(model_inputs, share_inputs=True)
         self.request.wait()
+        end = time.perf_counter()
+        self.llm_infer_time.append(end - start)
         logits = torch.from_numpy(self.request.get_tensor("logits").data)
         past_key_values = ((), )
         self._past_length += input_ids.shape[1]
@@ -656,10 +663,18 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         
         return model_inputs
 
+    def prepare_remote_tensors(self):
+        context = core.get_default_context("GPU")
+        for idx, name in enumerate(self.lm_cross_attn_inputs):
+            remote_tensor = context.create_tensor(ov.Type.f32, ov.Shape([1, 32, 6404, 128]), {})
+            self.vision_request.set_tensor(self.cross_attn_outputs[idx], remote_tensor)
+            self.request.set_tensor(name, remote_tensor)
+
 if __name__ == "__main__":
+    #convert_mllama("/home/ea/llama3.2/Llama-3.2-11B-Vision-Instruct", "Llama-3.2-11B-Vision-Instruct/OV")
     model_id = "Llama-3.2-11B-Vision-Instruct/OV"
-    LANGUAGE_MODEL_NAME = "llm_int4_asym_r10_gs64_max_activation_variance_awq_scale_all_layers.xml"
-    IMAGE_ENCODER_NAME = "openvino_vision_encoder_int8.xml"
+    LANGUAGE_MODEL_NAME = "llm_int4_asym_r10_gs64_max_activation_variance_all_layers.xml"
+    IMAGE_ENCODER_NAME = "openvino_vision_encoder.xml"
     ov_model = OVMLlamaForConditionalGeneration(model_id, device="CPU", language_model_name=LANGUAGE_MODEL_NAME, image_encoder_name=IMAGE_ENCODER_NAME)
     processor = AutoProcessor.from_pretrained(model_id)
 
@@ -683,3 +698,4 @@ if __name__ == "__main__":
     inputs = processor(text=text, images=raw_image, return_tensors="pt")
     streamer = TextStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=True)
     output = ov_model.generate(**inputs, do_sample=False, max_new_tokens=50, streamer=streamer)
+    print(f"First token latency {ov_model.llm_infer_time[0] * 1000}ms, Second token latency {np.mean(np.array(ov_model.llm_infer_time[1:])) * 1000}ms")
