@@ -20,7 +20,6 @@ core = ov.Core()
 
 nncf.set_log_level(logging.ERROR)
 fp16_model_path = "Llama-3.2-11B-Vision-Instruct/OV/openvino_vision_encoder.xml"
-fp16_model_path = "/home/aanuf/tmp/models/Meta-Llama-3.2-11B-Vision-Early/Llama-3.2-11B-Vision-Instruct/OV/openvino_vision_encoder.xml"
 int8_model_path = fp16_model_path.replace('.xml', '_int8.xml')
 ov_model = core.read_model(fp16_model_path)
 

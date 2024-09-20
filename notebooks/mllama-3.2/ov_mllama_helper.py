@@ -658,8 +658,8 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
 
 if __name__ == "__main__":
     model_id = "Llama-3.2-11B-Vision-Instruct/OV"
-    LANGUAGE_MODEL_NAME = "llm_int4_asym_r10_gs64_max_activation_variance_awq_scale.xml"
-    IMAGE_ENCODER_NAME = "openvino_vision_encoder.xml"
+    LANGUAGE_MODEL_NAME = "llm_int4_asym_r10_gs64_max_activation_variance_awq_scale_all_layers.xml"
+    IMAGE_ENCODER_NAME = "openvino_vision_encoder_int8.xml"
     ov_model = OVMLlamaForConditionalGeneration(model_id, device="CPU", language_model_name=LANGUAGE_MODEL_NAME, image_encoder_name=IMAGE_ENCODER_NAME)
     processor = AutoProcessor.from_pretrained(model_id)
 
