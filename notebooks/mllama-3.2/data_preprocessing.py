@@ -2,21 +2,16 @@ import torch
 from datasets import load_dataset
 from tqdm import tqdm
 
-import logging
-import nncf
-import openvino as ov
-
 import requests
 from io import BytesIO
 import numpy as np
 from PIL import Image
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from transformers import MllamaForConditionalGeneration, AutoProcessor, AutoTokenizer
+from transformers import AutoProcessor
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 model_id = "Llama-3.2-11B-Vision-Instruct/OV"
-#model = MllamaForConditionalGeneration.from_pretrained(model_id)
 processor = AutoProcessor.from_pretrained(model_id)
 
 # example
@@ -25,7 +20,7 @@ url = "https://www.ilankelman.org/stopsigns/australia.jpg"
 image = Image.open(requests.get(url, stream=True).raw)
 inputs = processor(text=prompt, images=image, return_tensors="pt")
 
-max_length = 4048 #model.config.text_config.max_position_embeddings
+max_length = 4048
 
 def check_text_data(data):
     """
@@ -173,9 +168,6 @@ def prepare_calibration_data_llm(dataloader, init_steps, mllm):
                     res['position_ids'] = position_ids
 
                     res = mllm.prepare_llm_inputs(**res)
-                    # for k, v in res.items():
-                    #     print(k, v.shape)
-
                     data.append(
                         res
                     )

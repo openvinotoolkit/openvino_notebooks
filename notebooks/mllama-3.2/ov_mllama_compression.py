@@ -1,29 +1,17 @@
 import shutil
 import time
 import os
-from glob import glob
-from functools import partial
-import numpy as np
-import nncf
 from nncf import compress_weights, Dataset
 from nncf.parameters import CompressWeightsMode, SensitivityMetric
-from transformers import AutoTokenizer
-from transformers import AutoConfig
 import openvino as ov
-import json
-from optimum.intel.openvino import OVModelForCausalLM
-from datasets import load_dataset
-from dataclasses import dataclass
-from optimum.utils import NormalizedTextConfig, NormalizedConfigManager
-from optimum.exporters import TasksManager
-from nncf.quantization.advanced_parameters import AdvancedCompressionParameters
-from transformers import AutoProcessor, AutoConfig, GenerationConfig
+from transformers import AutoProcessor
+from pathlib import Path
 
 
 from data_preprocessing import prepare_dataset_llm
 from ov_mllama_helper import OVMLlamaForConditionalGeneration
 
-def compress(model: OVMLlamaForConditionalGeneration, algo = CompressWeightsMode.INT4_ASYM, ratio = 1.0,
+def compress(model: OVMLlamaForConditionalGeneration, out_dir: Path, algo = CompressWeightsMode.INT4_ASYM, ratio = 1.0,
                  sm = SensitivityMetric.MAX_ACTIVATION_VARIANCE,
                  awq=True, scale_estimation=True,
                  lora=False, gptq=False, group_size=64, all_layers=True):
@@ -66,8 +54,7 @@ def compress(model: OVMLlamaForConditionalGeneration, algo = CompressWeightsMode
 
     print("Time: ", end - start)
     print(dst_name)
-    ov.save_model(model.model, dst_name)
-    #model.save_pretrained(dst_name)
+    ov.save_model(model.model, Path(out_dir) / dst_name)
 
 
 
@@ -75,4 +62,4 @@ model_id = "Llama-3.2-11B-Vision-Instruct/OV"
 ov_model = OVMLlamaForConditionalGeneration(model_id, slice_lm_head=False)
 processor = AutoProcessor.from_pretrained(model_id)
 
-compress(ov_model)
+compress(ov_model, model_id)

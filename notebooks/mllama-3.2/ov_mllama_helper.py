@@ -39,36 +39,27 @@ class InsertSlice(MatcherPass):
 
         def callback(matcher: Matcher) -> bool:
             root = matcher.get_match_root()
-            print("root: ", root)
             if root is None:
                 return False
             root_output = matcher.get_match_value()
-            print("root_output", root_output)
             root_name = root.get_friendly_name()
             if (len(root.get_output_partial_shape(0)) == 3):
-                print(f"Find target root node name: {root_name}")
                 parent = root.input_value(0).get_node()
-                print(f"Find target parent node name: {parent.get_friendly_name()}")
                 grand_parent = parent.input_value(0).get_node()
-                print(f"Find grandparent node name: {grand_parent.get_friendly_name()}")
+    
                 grand_parent_output = parent.input(0).get_source_output()
-                print("grand_parent_output: ", grand_parent_output)
                 consumers = grand_parent_output.get_target_inputs()
-                
-                print(f"consumers: {consumers}")
-                print("Original reshape node output shape:", grand_parent_output.get_partial_shape())
                 start = np.array([0, -1, 0], dtype=np.int32)
                 stop = np.array([1, -2, grand_parent_output.get_partial_shape()[-1].get_length()], dtype=np.int32)
                 step = np.array([1, -1, 1], dtype=np.int32)
                 axes = np.array([0, 1, 2], dtype=np.int32)
                 slice = ops.slice(grand_parent, start, stop, step, axes, name="inserted_slice")
-                print("After insert slice node, output shape:", slice.output(0).get_partial_shape())
-
                 for consumer in consumers:
                     consumer.replace_source_output(slice.output(0))
                 self.model_changed = True
                 # Use new operation for additional matching
                 self.register_new_node(slice)
+                print("applied slice for lm head")
                                 
                 return True
 
@@ -253,7 +244,7 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
     def __init__(self, model_dir:Union[str, Path],
                  device:str="CPU",
                  ov_config:Optional[Dict[str, str]]=None,
-                 language_model_name=None, image_encoder_name=None, slice_lm_head=True):
+                 language_model_name=None, image_encoder_name=None, slice_lm_head=True, use_remote_tensors=True, dynamic_shape=False):
         model_dir = Path(model_dir)
         self.config = AutoConfig.from_pretrained(model_dir)
         self.generation_config = GenerationConfig.from_pretrained(model_dir)
@@ -273,6 +264,8 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             self.vision_model = core.read_model(model_dir / image_encoder_name)
         else:
             self.vision_model = core.read_model(model_dir / IMAGE_ENCODER)
+        if not dynamic_shape:
+            self.reshape_vision_model()
         self.update_pkv_precision()
         if slice_lm_head:
             self.slice_lm_head()
@@ -284,16 +277,22 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         self.cross_attn_outputs = [key.get_any_name() for key in self.vision_model.outputs if "cross_attn_key_values" in key.get_any_name() ]
         compiled_vision_model = core.compile_model(self.vision_model, device, ov_config)
         self.vision_request = compiled_vision_model.create_infer_request()
-        if self._device == "GPU":
+        self.use_remote_tensors = use_remote_tensors
+        if self._device == "GPU" and use_remote_tensors:
             self.prepare_remote_tensors()
         self.next_beam_idx = None
         self.num_patches = (self.config.vision_config.image_size // self.config.vision_config.patch_size) ** 2 + 1
         self._past_length = 0
+        self.llm_infer_time = []
+        self.vision_encoder_infer_time = []
 
     def _get_past_length(self, past_key_values=None):
         if past_key_values is None:
             return 0
         return self._past_length
+
+    def reshape_vision_model(self):
+        self.vision_model.reshape({0: ov.PartialShape([1, 1, 4, 3, self.config.vision_config.image_size, self.config.vision_config.image_size]), 1: ov.PartialShape([1, 1]), 2: ov.PartialShape([1, 1, 4])})
 
     def update_pkv_precision(self, force_fp32=False):
         pkv_precision = ov.Type.f32
@@ -407,8 +406,12 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             if aspect_ratio_ids is None:
                 raise ValueError("`aspect_ratio_ids` must be provided if `pixel_values` is provided")
             # get vision tokens from vision model
+            start = time.perf_counter()
             self.vision_request.start_async([pixel_values, aspect_ratio_ids, aspect_ratio_mask], share_inputs=True)
             self.vision_request.wait()
+            end = time.perf_counter()
+            self.vision_encoder_infer_time.append(end - start)
+
             cross_attn_key_values = [self.vision_request.get_tensor(name) for name in self.cross_attn_outputs]
         cross_attention_mask, full_text_row_masked_out_mask = self._prepare_cross_attention_mask(
             cross_attention_mask,
@@ -451,7 +454,7 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             self._past_length = 0
             self.llm_infer_time = []
         
-        if self._device != "GPU":
+        if not self.use_remote_tensors:
             model_inputs.update(dict(zip(self.lm_cross_attn_inputs, cross_attention_key_values)))
         if "beam_idx" in self.input_names:
             model_inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(input_ids.shape[0], dtype=int)
@@ -682,10 +685,8 @@ if __name__ == "__main__":
     model_id = "Llama-3.2-11B-Vision-Instruct/OV"
     LANGUAGE_MODEL_NAME = "llm_int4_asym_r10_gs64_max_activation_variance_all_layers.xml"
     IMAGE_ENCODER_NAME = "openvino_vision_encoder.xml"
-    ov_model = OVMLlamaForConditionalGeneration(model_id, device="CPU", language_model_name=LANGUAGE_MODEL_NAME, image_encoder_name=IMAGE_ENCODER_NAME)
+    ov_model = OVMLlamaForConditionalGeneration(model_id, device="GPU", language_model_name=LANGUAGE_MODEL_NAME, image_encoder_name=IMAGE_ENCODER_NAME)
     processor = AutoProcessor.from_pretrained(model_id)
-
-    prompt = "<|image|><|begin_of_text|>If I had to write a haiku for this one"
     url = "https://llava-vl.github.io/static/images/view.jpg"
     raw_image = Image.open(requests.get(url, stream=True).raw)
     messages = [
@@ -705,4 +706,5 @@ if __name__ == "__main__":
     inputs = processor(text=text, images=raw_image, return_tensors="pt")
     streamer = TextStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=True)
     output = ov_model.generate(**inputs, do_sample=False, max_new_tokens=50, streamer=streamer)
+    print(f"Visual encoder time {ov_model.vision_encoder_infer_time[0]}ms")
     print(f"First token latency {ov_model.llm_infer_time[0] * 1000}ms, Second token latency {np.mean(np.array(ov_model.llm_infer_time[1:])) * 1000}ms")
