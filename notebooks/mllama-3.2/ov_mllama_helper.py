@@ -2,6 +2,7 @@ from pathlib import Path
 from transformers import MllamaForConditionalGeneration, AutoProcessor, AutoConfig, GenerationConfig, TextStreamer
 from transformers.cache_utils import DynamicCache, Cache
 from transformers.models.llama.modeling_llama import repeat_kv
+from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
 from typing import Optional, Union, List, Tuple, Dict
 from optimum.exporters.openvino.stateful import patch_stateful
 from transformers.generation import GenerationMixin
@@ -92,7 +93,8 @@ def convert_mllama(model_id, out_dir):
         print(f"model already converted and can be found in {out_dir}")
         return
     print("Load original model")
-    model = MllamaForConditionalGeneration.from_pretrained(model_id)
+    model = MllamaForConditionalGeneration.from_pretrained(model_id,  torch_dtype=torch.float16)
+    model.eval()
     model.config.save_pretrained(out_dir)
     model.generation_config.save_pretrained(out_dir)
     processor = AutoProcessor.from_pretrained(model_id)
@@ -129,7 +131,11 @@ def convert_mllama(model_id, out_dir):
                 return cross_attention_states, cross_attention_kv_cache
         
         image_encoder = VisionEncoder(model)
-        ov_model = ov.convert_model(image_encoder, example_input={"pixel_values": torch.randn((1, 1, 4, 3, model.config.vision_config.image_size, model.config.vision_config.image_size)), "aspect_ratio_ids": torch.tensor([[6]]) , "aspect_ratio_mask": torch.tensor([[[1, 1, 1, 1]]])})
+        image_encoder.eval()
+        __make_16bit_traceable(image_encoder)
+
+        with torch.no_grad():
+            ov_model = ov.convert_model(image_encoder, example_input={"pixel_values": torch.randn((1, 1, 4, 3, model.config.vision_config.image_size, model.config.vision_config.image_size)), "aspect_ratio_ids": torch.tensor([[6]]) , "aspect_ratio_mask": torch.tensor([[[1, 1, 1, 1]]])})
 
         output_names = ["cross_attention_states"]
         
@@ -236,7 +242,7 @@ def convert_mllama(model_id, out_dir):
             return attn_output, attn_weights, past_key_value
 
         for layer_idx in model.language_model.model.cross_attention_layers:
-            cross_attn = model.language_model.model.layers[layer_idx].layer.cross_attn
+            cross_attn = model.language_model.model.layers[layer_idx].cross_attn
             cross_attn.forward = types.MethodType(cross_attn_forward, cross_attn)
         
         model.language_model.orig_forward = model.language_model.forward
@@ -273,9 +279,13 @@ def convert_mllama(model_id, out_dir):
         
         example_inpit["past_key_values"] = past_key_values
         example_inpit["cross_attn_key_values"] = cross_attn_key_values
+
+        __make_16bit_traceable(model.language_model)
+        model.language_model.eval()
         
 
-        ov_model = ov.convert_model(model.language_model, example_input=example_inpit)
+        with torch.no_grad():
+            ov_model = ov.convert_model(model.language_model, example_input=example_inpit)
 
         for input, input_name in zip(ov_model.inputs, input_names):
             input.get_tensor().set_names({input_name})
@@ -472,7 +482,7 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             if aspect_ratio_ids is None:
                 raise ValueError("`aspect_ratio_ids` must be provided if `pixel_values` is provided")
             # get vision tokens from vision model
-            cross_attn_key_values = self.visual_model(pixel_values, aspect_ratio_ids, aspect_ratio_mask)
+            cross_attn_key_values = self.visual_encoder(pixel_values, aspect_ratio_ids, aspect_ratio_mask)
         cross_attention_mask, full_text_row_masked_out_mask = self._prepare_cross_attention_mask(
             cross_attention_mask,
             past_key_values=past_key_values,
@@ -678,10 +688,11 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
 
         return cross_attention_mask, full_text_row_masked_out_mask
 
-    def visual_model(self, pixel_values, aspect_ratio_ids, aspect_ratio_mask):
+    def visual_encoder(self, pixel_values, aspect_ratio_ids, aspect_ratio_mask):
         if pixel_values is not None:
             if aspect_ratio_ids is None:
                 raise ValueError("`aspect_ratio_ids` must be provided if `pixel_values` is provided")
+            self.vision_encoder_infer_time = []
             start = time.perf_counter()
             # get vision tokens from vision model
             self.vision_request.start_async([pixel_values, aspect_ratio_ids, aspect_ratio_mask], share_inputs=True)
@@ -693,7 +704,8 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
 
     def prepare_vision_outputs(self, pixel_values, aspect_ratio_ids, aspect_ratio_mask,
                            cross_attention_mask=None, past_key_values=None, cache_position=None):
-        cross_attn_key_values = self.vision_model(pixel_values, aspect_ratio_ids, aspect_ratio_mask)
+        cross_attn_key_values = self.visual_encoder(pixel_values, aspect_ratio_ids, aspect_ratio_mask)
+        cross_attn_key_values = [v.data for v in cross_attn_key_values]
         cross_attention_mask, full_text_row_masked_out_mask = self._prepare_cross_attention_mask(
             cross_attention_mask,
             past_key_values=past_key_values,

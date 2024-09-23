@@ -1,8 +1,10 @@
 import torch
 from datasets import load_dataset
-from tqdm import tqdm
+from transformers import AutoProcessor
+from tqdm.autonotebook import tqdm
 from pathlib import Path
 import pickle
+import gc
 
 import requests
 from io import BytesIO
@@ -10,12 +12,7 @@ import numpy as np
 from PIL import Image
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
-
-model_id = "Llama-3.2-11B-Vision-Instruct/OV"
-processor = AutoProcessor.from_pretrained(model_id)
-
-# example
+from ov_mllama_helper import OVMLlamaForConditionalGeneration
 
 
 max_length = 4048
@@ -76,6 +73,8 @@ def prepare_calibration_data_vision(dataloader, init_steps):
     prompt = "<|image|><|begin_of_text|>If I had to write a haiku for this one"
     url = "https://www.ilankelman.org/stopsigns/australia.jpg"
     image = Image.open(requests.get(url, stream=True).raw)
+    model_id = "Llama-3.2-11B-Vision-Instruct/OV"
+    processor = AutoProcessor.from_pretrained(model_id)
     inputs = processor(text=prompt, images=image, return_tensors="pt")
     data = []
     print(f"Fetching {init_steps} samples for the initialization...")
@@ -96,7 +95,7 @@ def prepare_calibration_data_vision(dataloader, init_steps):
     return data
 
 
-def prepare_dataset_vision(processor, opt_init_steps=50, max_train_samples=1000, file_path="data/vision_dataset.pickle"):
+def prepare_dataset_vision(processor, opt_init_steps=50, max_train_samples=1000, file_path="vision_dataset.pickle", save_dataset=True):
     """
     Prepares a vision-text dataset for quantization.
     """
@@ -143,7 +142,7 @@ def prepare_dataset_vision(processor, opt_init_steps=50, max_train_samples=1000,
     return calibration_data
 
 
-def prepare_calibration_data_llm(dataloader, init_steps, mllm):
+def prepare_calibration_data_llm(dataloader, init_steps, mllm, processor):
     """
     This function prepares calibration data from a dataloader for a specified number of initialization steps.
     It iterates over the dataloader, fetching batches and storing the relevant data.
@@ -168,16 +167,16 @@ def prepare_calibration_data_llm(dataloader, init_steps, mllm):
                     
                     vision_input = {
                             "pixel_values": batch["pixel_values"].to("cpu"),
-                            "aspect_ratio_ids": inputs.data["aspect_ratio_ids"].to("cpu"),
-                            "aspect_ratio_mask": inputs.data["aspect_ratio_mask"].to("cpu"),
-                            "cross_attention_mask": inputs.data["cross_attention_mask"].to("cpu"),
+                            "aspect_ratio_ids": batch.data["aspect_ratio_ids"].to("cpu"),
+                            "aspect_ratio_mask": batch.data["aspect_ratio_mask"].to("cpu"),
+                            "cross_attention_mask": batch.data["cross_attention_mask"].to("cpu"),
                             "cache_position": cache_position[0, :]
                     }
                     
                     cross_attention_states = mllm.prepare_vision_outputs(**vision_input)
                     res = {
-                            "input_ids": inputs.data["input_ids"].to("cpu"),
-                            "attention_mask": inputs.data["attention_mask"].to("cpu"),
+                            "input_ids": batch.data["input_ids"].to("cpu"),
+                            "attention_mask": batch.data["attention_mask"].to("cpu"),
                             **cross_attention_states
                         }
                     position_ids = np.cumsum(res['attention_mask'], axis=1) - 1
@@ -191,7 +190,7 @@ def prepare_calibration_data_llm(dataloader, init_steps, mllm):
     return data
 
 
-def prepare_dataset_llm(mllm, processor, opt_init_steps=50, max_train_samples=1000, file_path="data/llm_dataset.pickle"):
+def prepare_dataset_llm(mllm_id, opt_init_steps=50, max_train_samples=1000, file_path="llm_dataset.pickle", save_dataset=False):
     """
     Prepares a vision-text dataset for quantization.
     """
@@ -201,6 +200,9 @@ def prepare_dataset_llm(mllm, processor, opt_init_steps=50, max_train_samples=10
         with open(file_path, "rb") as f:
             calibration_data = pickle.load(f)
         return calibration_data
+
+    mllm = OVMLlamaForConditionalGeneration(mllm_id, slice_lm_head=False)
+    processor = AutoProcessor.from_pretrained(mllm_id)
 
     def collate_fn(example, image_column="image_url", text_column="caption"):
         """
@@ -232,10 +234,14 @@ def prepare_dataset_llm(mllm, processor, opt_init_steps=50, max_train_samples=10
     dataset = load_dataset("google-research-datasets/conceptual_captions", trust_remote_code=True)
     train_dataset = dataset["train"].shuffle(seed=42)
     dataloader = torch.utils.data.DataLoader(train_dataset, collate_fn=collate_fn, batch_size=1)
-    calibration_data = prepare_calibration_data_llm(dataloader, opt_init_steps, mllm)
+    calibration_data = prepare_calibration_data_llm(dataloader, opt_init_steps, mllm, processor)
 
-    with open(file_path, "wb") as f:
-        print(f"calibration data will be saved into {file_path}")
-        pickle.dump(calibration_data, f)
+    if save_dataset:
+        with open(file_path, "wb") as f:
+            print(f"calibration data will be saved into {file_path}")
+            pickle.dump(calibration_data, f)
+    
+    del mllm
+    gc.collect()
 
     return calibration_data
