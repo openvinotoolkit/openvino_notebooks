@@ -6,12 +6,15 @@ from nncf.parameters import CompressWeightsMode, SensitivityMetric
 import openvino as ov
 from transformers import AutoProcessor
 from pathlib import Path
+import gc
 
 
 from data_preprocessing import prepare_dataset_llm
-from ov_mllama_helper import OVMLlamaForConditionalGeneration
+from ov_mllama_helper import OVMLlamaForConditionalGeneration, LANGUAGE_MODEL
 
-def compress(model: OVMLlamaForConditionalGeneration, out_dir: Path, algo = CompressWeightsMode.INT4_ASYM, ratio = 1.0,
+core = ov.Core()
+
+def compress(model_dir: Path, processor:AutoProcessor, algo = CompressWeightsMode.INT4_ASYM, ratio = 1.0,
                  sm = SensitivityMetric.MAX_ACTIVATION_VARIANCE,
                  awq=True, scale_estimation=True,
                  lora=False, gptq=False, group_size=64, all_layers=True):
@@ -34,12 +37,18 @@ def compress(model: OVMLlamaForConditionalGeneration, out_dir: Path, algo = Comp
         shutil.rmtree(dst_name)
 
     start = time.perf_counter()
-    dataset = prepare_dataset_llm(model, 64)
-    
+    nncf_dataset = None
+    if awq or lora or gptq or scale_estimation:
+        model = OVMLlamaForConditionalGeneration(model_dir, slice_lm_head=False)
+        dataset = prepare_dataset_llm(model, processor, 64)
+        nncf_dataset = Dataset(dataset)
+        lm_model = model.model
+        del model
+        gc.collect()
+    else:
+        lm_model = core.read_model(model_dir / LANGUAGE_MODEL)
 
-    nncf_dataset = Dataset(dataset)
-
-    model.model = compress_weights(model.model, mode=algo,
+    lm_model = compress_weights(lm_model, mode=algo,
                                     group_size=group_size,
                                     ratio=ratio,
                                     dataset=nncf_dataset,
@@ -53,13 +62,15 @@ def compress(model: OVMLlamaForConditionalGeneration, out_dir: Path, algo = Comp
 
 
     print("Time: ", end - start)
-    print(dst_name)
-    ov.save_model(model.model, Path(out_dir) / dst_name)
+    saving_path = Path(model_dir) / dst_name
+    ov.save_model(lm_model, saving_path)
+    del lm_model
+    gc.collect()
+    return saving_path
 
 
 
 model_id = "Llama-3.2-11B-Vision-Instruct/OV"
-ov_model = OVMLlamaForConditionalGeneration(model_id, slice_lm_head=False)
 processor = AutoProcessor.from_pretrained(model_id)
 
-compress(ov_model, model_id)
+compress(model_id, processor)
