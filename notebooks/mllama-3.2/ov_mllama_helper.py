@@ -1,6 +1,6 @@
 from pathlib import Path
 from transformers import MllamaForConditionalGeneration, AutoProcessor, AutoConfig, GenerationConfig, TextStreamer
-from transformers.cache_utils import DynamicCache
+from transformers.cache_utils import DynamicCache, Cache
 from transformers.models.llama.modeling_llama import repeat_kv
 from typing import Optional, Union, List, Tuple, Dict
 from optimum.exporters.openvino.stateful import patch_stateful
@@ -41,8 +41,6 @@ class InsertSlice(MatcherPass):
             root = matcher.get_match_root()
             if root is None:
                 return False
-            root_output = matcher.get_match_value()
-            root_name = root.get_friendly_name()
             if (len(root.get_output_partial_shape(0)) == 3):
                 parent = root.input_value(0).get_node()
                 grand_parent = parent.input_value(0).get_node()
@@ -176,6 +174,70 @@ def convert_mllama(model_id, out_dir):
             result = self.orig_forward(input_ids=input_ids, attention_mask=attention_mask, position_ids=position_ids, cross_attention_mask=cross_attention_mask, full_text_row_masked_out_mask=full_text_row_masked_out_mask, past_key_values=common_cache, cache_position=cache_position)
             present_kv = [kv_cache for idx, kv_cache in enumerate(result.past_key_values.to_legacy_cache()) if idx not in self.model.cross_attention_layers]
             return result.logits, tuple(present_kv)
+
+        def cross_attn_forward(
+            self,
+            hidden_states: torch.Tensor,
+            cross_attention_states: Optional[torch.Tensor] = None,
+            past_key_value: Optional[Cache] = None,
+            attention_mask: Optional[torch.Tensor] = None,
+            output_attentions: bool = False,
+            use_cache: bool = None,
+            cache_position: Optional[torch.LongTensor] = None,
+        ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
+            """Input shape: Batch x Time x Channel"""
+            bsz, q_len, _ = hidden_states.size()
+            query_states = self.q_proj(hidden_states)
+            query_states = query_states.view(bsz, q_len, self.num_heads, self.head_dim).transpose(1, 2)
+            query_states = self.q_norm(query_states)
+
+            if cross_attention_states is not None:
+                key_states = self.k_proj(cross_attention_states)
+                value_states = self.v_proj(cross_attention_states)
+                key_states = key_states.view(bsz, -1, self.num_key_value_heads, self.head_dim).transpose(1, 2)
+                value_states = value_states.view(bsz, -1, self.num_key_value_heads, self.head_dim).transpose(1, 2)
+                key_states = repeat_kv(key_states, self.num_key_value_groups)
+                value_states = repeat_kv(value_states, self.num_key_value_groups)
+
+                key_states = self.k_norm(key_states)
+                if past_key_value is not None:
+                    # if we have a new image + new tokens, we only computed key_states on that new image
+                    # we still update the cross key states, past_image, new_image. And use it!
+                    key_states, value_states = past_key_value.update(
+                        key_states, value_states, self.layer_idx, {"cache_position": cache_position}
+                    )
+            elif past_key_value.get_seq_length(self.layer_idx) != 0:
+                key_states, value_states = (
+                    past_key_value.key_cache[self.layer_idx],
+                    past_key_value.value_cache[self.layer_idx],
+                )
+            else:
+                raise ValueError(
+                    "Cross attention layer can't find neither `cross_attn_states` nor cached values for key/values!"
+                )
+
+
+            if attention_mask is not None:  # no matter the length, we just slice it
+                causal_mask = attention_mask[:, :, :, : key_states.shape[-2]]
+
+            attn_output = torch.nn.functional.scaled_dot_product_attention(query_states,
+                key_states,
+                value_states,
+                attn_mask=causal_mask,
+                dropout_p=self.dropout if self.training else 0.0,
+                is_causal=False)
+            attn_output = attn_output.transpose(1, 2).contiguous()
+            attn_output = attn_output.reshape(bsz, q_len, -1)
+            attn_output = self.o_proj(attn_output)
+
+            if not output_attentions:
+                attn_weights = None
+
+            return attn_output, attn_weights, past_key_value
+
+        for layer_idx in model.language_model.model.cross_attention_layers:
+            cross_attn = model.language_model.model.layers[layer_idx].layer.cross_attn
+            cross_attn.forward = types.MethodType(cross_attn_forward, cross_attn)
         
         model.language_model.orig_forward = model.language_model.forward
         model.language_model.forward = types.MethodType(lm_forward_wrapper, model.language_model)
@@ -217,9 +279,13 @@ def convert_mllama(model_id, out_dir):
 
         for input, input_name in zip(ov_model.inputs, input_names):
             input.get_tensor().set_names({input_name})
+            if input_name.startswith("cross_attn_key_values"):
+                input.get_node().set_partial_shape(ov.PartialShape([-1, 32, 6404, 128]))
 
         for output, output_name in zip(ov_model.outputs, output_names):
             output.get_tensor().set_names({output_name})
+
+        ov_model.validate_nodes_and_infer_types()
         
         patch_stateful(model.config.text_config, ov_model)
         ov.save_model(ov_model, lang_model_path)
@@ -277,8 +343,8 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         self.cross_attn_outputs = [key.get_any_name() for key in self.vision_model.outputs if "cross_attn_key_values" in key.get_any_name() ]
         compiled_vision_model = core.compile_model(self.vision_model, device, ov_config)
         self.vision_request = compiled_vision_model.create_infer_request()
-        self.use_remote_tensors = use_remote_tensors
-        if self._device == "GPU" and use_remote_tensors:
+        self.use_remote_tensors = use_remote_tensors and self._device == "GPU"
+        if self.use_remote_tensors:
             self.prepare_remote_tensors()
         self.next_beam_idx = None
         self.num_patches = (self.config.vision_config.image_size // self.config.vision_config.patch_size) ** 2 + 1
@@ -406,13 +472,7 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             if aspect_ratio_ids is None:
                 raise ValueError("`aspect_ratio_ids` must be provided if `pixel_values` is provided")
             # get vision tokens from vision model
-            start = time.perf_counter()
-            self.vision_request.start_async([pixel_values, aspect_ratio_ids, aspect_ratio_mask], share_inputs=True)
-            self.vision_request.wait()
-            end = time.perf_counter()
-            self.vision_encoder_infer_time.append(end - start)
-
-            cross_attn_key_values = [self.vision_request.get_tensor(name) for name in self.cross_attn_outputs]
+            cross_attn_key_values = self.visual_model(pixel_values, aspect_ratio_ids, aspect_ratio_mask)
         cross_attention_mask, full_text_row_masked_out_mask = self._prepare_cross_attention_mask(
             cross_attention_mask,
             past_key_values=past_key_values,
@@ -515,7 +575,6 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             elif input_ids.shape[1] != cache_position.shape[0]:  # Default case (the "else", a no op, is Exception 2)
                 input_ids = input_ids[:, cache_position]
 
-        # TODO: we have no attention_mask so this won't work, check if we really won't need attention mask and find another way
         if attention_mask is not None and position_ids is None:
             # create position_ids on the fly for batch generation
             position_ids = attention_mask.long().cumsum(-1) - 1
@@ -619,22 +678,28 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
 
         return cross_attention_mask, full_text_row_masked_out_mask
 
-    def prepare_vision_outputs(self, pixel_values, aspect_ratio_ids, aspect_ratio_mask,
-                           cross_attention_mask=None, past_key_values=None, cache_position=None):
+    def visual_model(self, pixel_values, aspect_ratio_ids, aspect_ratio_mask):
         if pixel_values is not None:
             if aspect_ratio_ids is None:
                 raise ValueError("`aspect_ratio_ids` must be provided if `pixel_values` is provided")
+            start = time.perf_counter()
             # get vision tokens from vision model
             self.vision_request.start_async([pixel_values, aspect_ratio_ids, aspect_ratio_mask], share_inputs=True)
             self.vision_request.wait()
-            cross_attn_key_values = [self.vision_request.get_tensor(name).data for name in self.cross_attn_outputs]
-            cross_attention_states = torch.from_numpy(self.vision_request.get_tensor("cross_attention_states").data)
+            end = time.perf_counter()
+            cross_attn_key_values = [self.vision_request.get_tensor(name) for name in self.cross_attn_outputs]
+            self.vision_encoder_infer_time.append(end - start)
+        return cross_attn_key_values
+
+    def prepare_vision_outputs(self, pixel_values, aspect_ratio_ids, aspect_ratio_mask,
+                           cross_attention_mask=None, past_key_values=None, cache_position=None):
+        cross_attn_key_values = self.vision_model(pixel_values, aspect_ratio_ids, aspect_ratio_mask)
         cross_attention_mask, full_text_row_masked_out_mask = self._prepare_cross_attention_mask(
             cross_attention_mask,
             past_key_values=past_key_values,
             num_vision_tokens=self.num_patches,
             cross_attention_layers=cross_attn_key_values if past_key_values is not None else None,
-            cross_attention_states=cross_attention_states,
+            cross_attention_states=1,
             device=self.device,
             dtype=torch.float32,
         )
@@ -685,7 +750,7 @@ if __name__ == "__main__":
     model_id = "Llama-3.2-11B-Vision-Instruct/OV"
     LANGUAGE_MODEL_NAME = "llm_int4_asym_r10_gs64_max_activation_variance_all_layers.xml"
     IMAGE_ENCODER_NAME = "openvino_vision_encoder.xml"
-    ov_model = OVMLlamaForConditionalGeneration(model_id, device="GPU", language_model_name=LANGUAGE_MODEL_NAME, image_encoder_name=IMAGE_ENCODER_NAME)
+    ov_model = OVMLlamaForConditionalGeneration(model_id, device="CPU", language_model_name=LANGUAGE_MODEL_NAME, image_encoder_name=IMAGE_ENCODER_NAME)
     processor = AutoProcessor.from_pretrained(model_id)
     url = "https://llava-vl.github.io/static/images/view.jpg"
     raw_image = Image.open(requests.get(url, stream=True).raw)
@@ -696,15 +761,15 @@ if __name__ == "__main__":
                 {"type": "image"},
                 {"type": "text", "text": "Describe image in two sentences"}
             ]
-        }
+        },
     ]
     text = processor.apply_chat_template(messages, add_generation_prompt=True)
 
     url = "https://llava-vl.github.io/static/images/view.jpg"
     raw_image = Image.open(requests.get(url, stream=True).raw)
 
-    inputs = processor(text=text, images=raw_image, return_tensors="pt")
+    inputs = processor(text=text, images=[raw_image], return_tensors="pt")
     streamer = TextStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=True)
     output = ov_model.generate(**inputs, do_sample=False, max_new_tokens=50, streamer=streamer)
-    print(f"Visual encoder time {ov_model.vision_encoder_infer_time[0]}ms")
+    print(f"Visual encoder time {ov_model.vision_encoder_infer_time[0] * 1000} ms")
     print(f"First token latency {ov_model.llm_infer_time[0] * 1000}ms, Second token latency {np.mean(np.array(ov_model.llm_infer_time[1:])) * 1000}ms")
