@@ -25,11 +25,11 @@ Example: Saliency map for `flat-coated retriever` class for MobileNetV3 classifi
 
 The tutorial consists of the following steps:
 
-- Run explainer in `Auto` mode
+- Run `Explainer` in `AUTO` mode
 - Specify preprocess and postprocess functions
-- Run explainer in `WHITEBOX` mode
-  - Insert XAI branch to use updated model in own pipelines
-- Run explainer in `BLACKBOX` mode
+- Run `Explainer` in `WHITEBOX` mode
+  - Insert XAI branch to IR or PyTorch model to use updated model in own pipelines
+- Run `Explainer` in `BLACKBOX` mode
 - Advanced: add label names and use them to save saliency maps instead of label indexes
 
 These are explainable AI algorithms supported by OpenVINO XAI:
