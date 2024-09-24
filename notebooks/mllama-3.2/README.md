@@ -1,7 +1,7 @@
 # Visual-language assistant with Llama-3.2-11B-Vision and OpenVINO
 
 Llama-3.2-11B-Vision is the latest model from LLama3 model family those capabilities extended to understand images content.
-More details about model can be found in [model card](), [blog]() and original [repo]().
+More details about model can be found in [model card](https://github.com/meta-llama/llama-models/blob/main/models/llama3_2/MODEL_CARD_VISION.md), and original [repo](https://github.com/meta-llama/llama-models).
 
 In this tutorial we consider how to convert and optimize Llama-Vision model for creating multimodal chatbot. Additionally, we demonstrate how to apply stateful transformation on LLM part and model optimization techniques like weights compression and quantization using [NNCF](https://github.com/openvinotoolkit/nncf)
 
