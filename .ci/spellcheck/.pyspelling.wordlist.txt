@@ -453,6 +453,7 @@ LVLM
 Lyth
 macOS
 Magika
+masklet
 Mahalanobis
 Mapillary
 Markovian
@@ -618,6 +619,7 @@ perceptron
 Patil
 PEFT
 perceiver
+PerformanceMode
 performant
 PersonaGPT
 PGI

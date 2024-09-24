@@ -252,7 +252,6 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
         print("✅ Input embedding model successfully converted")
 
     if not image_embed_path.exists() or not image_embed_merger_path.exists():
-
         print("⌛ Convert Image embedding model")
 
         vision_embed_tokens = model.visual
@@ -269,7 +268,6 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
             return self.merger(hidden_states)
 
         def sdpa_attn_forward(self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb: torch.Tensor = None) -> torch.Tensor:
-
             from transformers.models.qwen2_vl.modeling_qwen2_vl import apply_rotary_pos_emb_vision
 
             seq_length = hidden_states.shape[0]

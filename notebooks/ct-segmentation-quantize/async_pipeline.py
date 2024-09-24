@@ -24,6 +24,7 @@ from typing import Dict, Set, List, Optional, Callable
 
 import cv2
 
+import openvino.properties as props
 from custom_segmentation import Model
 
 
@@ -169,7 +170,7 @@ class AsyncPipeline:
         cache_path.mkdir(exist_ok=True)
         # Enable model caching for GPU devices
         if "GPU" in device and "GPU" in ie.available_devices:
-            ie.set_property(device_name="GPU", properties={"CACHE_DIR": str(cache_path)})
+            ie.set_property(device_name="GPU", properties={props.cache_dir(): str(cache_path)})
 
         self.model = model
         self.logger = logging.getLogger()
@@ -177,7 +178,7 @@ class AsyncPipeline:
         self.logger.info("Loading network to {} plugin...".format(device))
         self.exec_net = ie.compile_model(self.model.net, device, plugin_config)
         if max_num_requests == 0:
-            max_num_requests = self.exec_net.get_property("OPTIMAL_NUMBER_OF_INFER_REQUESTS") + 1
+            max_num_requests = self.exec_net.get_property(props.optimal_number_of_infer_requests) + 1
         self.requests = [self.exec_net.create_infer_request() for _ in range(max_num_requests)]
         self.empty_requests = deque(self.requests)
         self.completed_request_results = {}
