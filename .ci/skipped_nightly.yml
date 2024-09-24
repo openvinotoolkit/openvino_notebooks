@@ -9,7 +9,5 @@
         - cpu
 - notebook: notebooks/stable-fast-3d/stable-fast-3d.ipynb
   skips:
-    - python:
-      - '3.8'
     - os:
         - macos-12

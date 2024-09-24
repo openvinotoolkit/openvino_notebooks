@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04]
-        python: [3.8]
+        python: [3.9]
 
     runs-on: ${{ matrix.os }}
 

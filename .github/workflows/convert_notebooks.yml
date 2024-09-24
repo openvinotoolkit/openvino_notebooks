@@ -35,7 +35,7 @@ jobs:
       # Matrix is unnecessary here, but this allows easy copying of steps from treon.yml
       matrix:
         os: [ubuntu-22.04]
-        python: [3.8]
+        python: [3.9]
 
     runs-on: ${{ matrix.os }}
 
