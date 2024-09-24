@@ -4,13 +4,58 @@ import os
 from nncf import compress_weights, Dataset
 from nncf.parameters import CompressWeightsMode, SensitivityMetric
 import openvino as ov
-from transformers import AutoProcessor
 from pathlib import Path
 import gc
 
 
 from data_preprocessing import prepare_dataset_llm
-from ov_mllama_helper import OVMLlamaForConditionalGeneration, LANGUAGE_MODEL
+from ov_mllama_helper import LANGUAGE_MODEL
+
+def compression_widgets_helper():
+    from ipywidgets import Checkbox, VBox, RadioButtons, Accordion
+
+    radio_button = RadioButtons(options=["data-free", "data-aware"], value="data-aware")
+    data_aware_settings = Accordion()
+
+    awq = Checkbox(description='AWQ', value=True)
+    scale_estimation = Checkbox(description='Scale Estimation', value=True)
+    gptq = Checkbox(description='GPTQ', value=False)
+    lora = Checkbox(description="LoRA correction", value=False)
+    data_aware_approaches = VBox(children=[awq, scale_estimation, gptq, lora])
+    data_aware_settings = Accordion(children=[data_aware_approaches], titles=["Data-Aware settings"])
+
+    vb = VBox(children = [radio_button, data_aware_settings])
+
+    compression_settings = {"awq": awq, "gptq": gptq, "lora": lora, "scale_estimation": scale_estimation}
+
+    def remove_data_aware_settings(button):
+        if radio_button.value == "data-free":
+            vb.children = [radio_button]
+            awq.value = False
+            scale_estimation.value = False
+            gptq.value = False
+            lora.value = False
+        else:
+            vb.children = [radio_button, data_aware_settings]
+            awq.value = True
+            scale_estimation.value = True
+            gptq.value = False
+            lora.value = False
+
+    radio_button.observe(remove_data_aware_settings, names='value')
+    return vb, compression_settings
+
+
+def vision_encoder_selection_widget(device):
+    from ipywidgets import Dropdown
+
+    optimizations = ["FP16", "INT8 quantization", "INT8 weights compression"]
+
+    options = Dropdown(description="Vision Encoder", options=optimizations, value=optimizations[0] if "GPU" in device else optimizations[1], disabled="GPU" in device)
+
+    return options
+
+
 
 core = ov.Core()
 
