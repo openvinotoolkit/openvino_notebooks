@@ -591,3 +591,19 @@
   skips:
     - python:
       - '3.8'
+- notebook: notebooks/segment-anything/segment-anything-2-image.ipynb
+  skips:
+    - python:
+        - '3.8'
+        - '3.9'
+    - os:
+        - macos-12
+        - windows-2019
+- notebook: notebooks/segment-anything/segment-anything-2-video.ipynb
+  skips:
+    - python:
+        - '3.8'
+        - '3.9'
+    - os:
+        - macos-12
+        - windows-2019

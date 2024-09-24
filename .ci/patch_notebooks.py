@@ -32,8 +32,12 @@ def disable_skip_ext(nb, notebook_path, test_device=""):
     for cell in nb["cells"]:
         if test_device is not None and skip_for_device is None:
             if (
-                'skip_for_device = "{}" in device.value'.format(test_device) in cell["source"]
-                and "to_quantize = widgets.Checkbox(value=not skip_for_device" in cell["source"]
+                'skip_for_device = "{}" in device.value'.format(test_device.upper()) in cell["source"]
+                and (
+                    "to_quantize = widgets.Checkbox(value=not skip_for_device" in cell["source"]
+                    or "to_quantize = quantization_widget(not skip_for_device" in cell["source"]
+                )
+                or ("to_quantize = quantization_widget(False" in cell["source"])
             ):
                 skip_for_device = True
 
@@ -152,7 +156,11 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
                 if test_device and (DEVICE_WIDGET in cell["source"] or DEVICE_WIDGET_NEW in cell["source"]):
                     device_found = True
                     if not DEVICE_WIDGET_NEW in cell["source"]:
-                        cell["source"] = re.sub(r"value=.*,", f"value='{test_device.upper()}',", cell["source"])
+                        cell["source"] = re.sub(
+                            r"value=.*,",
+                            f"value='{test_device.upper()}',",
+                            cell["source"],
+                        )
                         cell["source"] = re.sub(
                             r"options=",
                             f"options=['{test_device.upper()}'] + ",
@@ -161,7 +169,9 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
                         print(f"Replaced testing device to {test_device}")
                     else:
                         cell["source"] = re.sub(
-                            r"device_widget\(.*\)", f"device_widget(default='{test_device.upper()}', added=['{test_device.upper()}'])", cell["source"]
+                            r"device_widget\(.*\)",
+                            f"device_widget(default='{test_device.upper()}', added=['{test_device.upper()}'])",
+                            cell["source"],
                         )
                 replace_dict = cell.get("metadata", {}).get("test_replace")
                 if replace_dict is not None:
