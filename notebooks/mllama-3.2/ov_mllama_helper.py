@@ -81,6 +81,7 @@ STR_TO_OV_TYPE = {
     "bf16": ov.Type.bf16,
 }
 
+
 def model_has_state(ov_model: ov.Model):
     return len(ov_model.get_sinks()) > 0
 
@@ -228,8 +229,11 @@ def make_stateful(
 
 
 def patch_stateful(ov_model):
-    key_value_input_names = [key.get_any_name() for key in ov_model.inputs[2:-1]]
-    key_value_output_names = [key.get_any_name() for key in ov_model.outputs[1:]]
+    key_value_input_names = [key_name for key in ov_model.inputs for key_name in key.get_names() if "past_key_values" in key_name]
+    key_value_output_names = [key_name for key in ov_model.outputs for key_name in key.get_names() if "present" in key_name]
+    not_kv_inputs = [input for input in ov_model.inputs if not any(name in key_value_input_names for name in input.get_names())]
+    if not key_value_input_names or not key_value_output_names:
+        return
     not_kv_inputs = [input for input in ov_model.inputs if not any(name in key_value_input_names for name in input.get_names())]
     if not key_value_input_names or not key_value_output_names:
         return
