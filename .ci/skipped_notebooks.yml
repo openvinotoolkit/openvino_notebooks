@@ -585,3 +585,10 @@
     - os:
         - macos-12
         - windows-2019
+- notebook: notebooks/whisper-asr-genai/whisper-asr-genai.ipynb
+  skips:
+    - python:
+        - '3.8'
+        - '3.9'
+    - os:
+        - macos-12
