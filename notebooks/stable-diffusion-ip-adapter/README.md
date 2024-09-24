@@ -3,7 +3,7 @@
 [IP-Adapter](https://hf.co/papers/2308.06721) is an effective and lightweight adapter that adds image prompting capabilities to a diffusion model. This adapter works by decoupling the cross-attention layers of the image and text features. All the other model components are frozen and only the embedded image features in the UNet are trained. As a result, IP-Adapter files are typically only ~100MBs.
 ![ip-adapter-pipe.png](https://huggingface.co/h94/IP-Adapter/resolve/main/fig1.png)
 
-In this tutorial, we will consider how to convert and run Stable Diffusion pipeline with loading IP-Adapter. We will use [stable-diffusion-v1.5](https://huggingface.co/runwayml/stable-diffusion-v1-5) as base model and apply official [IP-Adapter](https://huggingface.co/h94/IP-Adapter) weights. Also for speedup generation process we will use [LCM-LoRA](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5)
+In this tutorial, we will consider how to convert and run Stable Diffusion pipeline with loading IP-Adapter. We will use [stable-diffusion-v1.5](https://huggingface.co/botp/stable-diffusion-v1-5) as base model and apply official [IP-Adapter](https://huggingface.co/h94/IP-Adapter) weights. Also for speedup generation process we will use [LCM-LoRA](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5)
 
 We will use a pre-trained model from the [Hugging Face Diffusers](https://huggingface.co/docs/diffusers/index) library.
 

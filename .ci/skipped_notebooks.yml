@@ -64,11 +64,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/yolov7-optimization/yolov7-optimization.ipynb
-  skips:
-    - os:
-        - ubuntu-20.04
-        - ubuntu-22.04
 - notebook: notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb
   skips:
     - os:
@@ -565,3 +560,34 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/internvl2/internvl2.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/qwen2-vl/qwen2-vl.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/qwen2-audio/qwen2-audio.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/stable-fast-3d/stable-fast-3d.ipynb
+  skips:
+    - python:
+      - '3.8'
+    - os:
+        - macos-12
+- notebook: notebooks/llm-agent-react/llm-agent-react-langchain.ipynb
+  skips:
+    - python:
+      - '3.8'

@@ -10,7 +10,7 @@ from traitlets.config import Config
 EXCLUDED_NOTEBOOKS = ["data-preparation-ct-scan.ipynb", "pytorch-monai-training.ipynb"]
 
 DEVICE_WIDGET = "device = widgets.Dropdown("
-DEVICE_WIDGET_NEW = "device = device_widget("
+DEVICE_WIDGET_NEW = "device_widget("
 
 
 def disable_gradio_debug(nb, notebook_path):
@@ -52,20 +52,24 @@ def remove_ov_install(cell):
     updated_lines = []
 
     def has_additional_deps(str_part):
+        if "pip_install(" in str_part:
+            return False
         if "%pip" in str_part:
             return False
         if "install" in str_part:
             return False
-        if str_part.startswith("-"):
+        if str_part.startswith("-") or str_part.startswith('"-'):
             return False
-        if str_part.startswith("https://"):
+        if str_part.startswith("https://") or str_part.startswith('"https://'):
+            return False
+        if ")" == str_part:
             return False
         return True
 
-    lines = cell["source"].split("\n")
+    lines = cell["source"].replace("pip_instal(", "pip_install( ").split("\n")
     for line in lines:
         if "openvino" in line:
-            if "optimum-cli" in line or line.startswith("#"):
+            if "optimum-cli" in line or line.startswith("#") or "-openvino" in line:
                 updated_lines.append(line)
                 continue
             updated_line_content = []
@@ -73,18 +77,28 @@ def remove_ov_install(cell):
             package_found = False
             for part in line.split(" "):
                 if "openvino-dev" in part:
+                    if part.endswith(")"):
+                        updated_line_content.append(")")
                     package_found = True
                     continue
                 if "openvino-nightly" in part:
                     package_found = True
+                    if part.endswith(")"):
+                        updated_line_content.append(")")
                     continue
                 if "openvino-tokenizers" in part:
                     package_found = True
+                    if part.endswith(")"):
+                        updated_line_content.append(")")
                     continue
                 if "openvino-genai" in part:
                     package_found = True
+                    if part.endswith(")"):
+                        updated_line_content.append(")")
                     continue
                 if "openvino>" in part or "openvino=" in part or "openvino" == part:
+                    if part.endswith(")"):
+                        updated_line_content.append(")")
                     package_found = True
                     continue
                 if empty:
@@ -133,7 +147,7 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
             found = False
             device_found = False
             for cell in nb["cells"]:
-                if skip_ov_install and "%pip" in cell["source"]:
+                if skip_ov_install and ("%pip" in cell["source"] or "pip_install(" in cell["source"]):
                     remove_ov_install(cell)
                 if test_device and (DEVICE_WIDGET in cell["source"] or DEVICE_WIDGET_NEW in cell["source"]):
                     device_found = True

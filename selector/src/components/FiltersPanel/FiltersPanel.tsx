@@ -88,7 +88,11 @@ export const FiltersPanel = (): JSX.Element => {
   const [tagsSearch, setTagsSearch] = useState('');
 
   const filterTags = (tags: string[]): string[] =>
-    tags.filter((tag) => tag.toLowerCase().includes(tagsSearch.toLowerCase()));
+    tags.filter((tag) => {
+      const hasNotebooksForTag = notebooksService.allNotebooksTags.includes(tag);
+      const isTagSearched = tag.toLowerCase().includes(tagsSearch.toLowerCase());
+      return hasNotebooksForTag && isTagSearched;
+    });
 
   const handleTagClick = (tag: string, group: FilterGroupKey): void => {
     const tags = selectedTags[group] as string[];

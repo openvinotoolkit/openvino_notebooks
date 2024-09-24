@@ -38,6 +38,7 @@ async
 AsyncInferQueue
 Atrous
 audiobooks
+AudioForConditionalGeneration
 audioldm
 AudioLDM
 autoencoder
@@ -96,6 +97,7 @@ classname
 ClassProbabilityMap
 CLI
 cli
+ClipBasedHeadEstimator
 CLIP's
 codebase
 codebook
@@ -182,6 +184,7 @@ DepthAnything
 detections
 detokenization
 detokenizer
+detokenizers
 Dettmers
 dev
 detectron
@@ -194,6 +197,7 @@ diarization
 Diffusers
 diffusers
 dimensionality
+DINOv
 Distil
 distil
 DistilBERT
@@ -231,6 +235,7 @@ editability
 EfficientNet
 EfficientSAM
 EfficientSAMs
+embedder
 Embedder
 embeddings
 EnCodec
@@ -282,6 +287,7 @@ Gemma
 gemma
 genai
 genAI
+GenerationMixin
 Girshick
 Gitee
 GitHub
@@ -343,8 +349,10 @@ InceptionResNetV
 inferencing
 InferRequest
 InferRequests
+infographics
 Inpaint
 inpainting
+InternVL
 InsightFace
 installable
 InstantID
@@ -361,6 +369,7 @@ intervaling
 im
 img
 ip
+ir
 IRs
 iteratively
 JFLEG
@@ -417,6 +426,7 @@ LeViT
 LibriSpeech
 librispeech
 Lim
+LinearCameraEmbedder
 Liu
 LLama
 LLaMa
@@ -447,10 +457,13 @@ Mapillary
 Markovian
 Martyniuk
 maskrcnn
+MaterialMLP
+MaterialNet
 mathbf
 MathVista
 MatMul
 MBs
+md
 MediaPipe
 mel
 Mels
@@ -493,6 +506,8 @@ mpnet
 mpt
 MPT
 MRPC
+MTVQA
+multiarchitecture
 Multiclass
 multiclass
 MultiHeadAttention
@@ -526,6 +541,7 @@ notus
 nsamples
 nsfw
 NSFW
+NuExtract
 num
 numpy
 NumPy
@@ -541,6 +557,8 @@ odometry
 OMZ
 OneFormer
 oneformer
+oneAPI
+oneDNN
 ONNX
 onnx
 ontologies
@@ -566,12 +584,15 @@ Orca
 OVC
 overfitting
 overlayed
+ov
 OV
 OVC
 OVModel
+OVModelForCausalLM
 OVModelForXXX
 OVModelForXxx
 OVMS
+OVQwen
 OVStableDiffusionPipeline
 OVStableDiffusionInpaintPipeline
 OvStableDiffusionInpaintingPipeline
@@ -596,6 +617,7 @@ perceptron
 Patil
 PEFT
 perceiver
+PerformanceMode
 performant
 PersonaGPT
 PGI
@@ -606,11 +628,14 @@ Piotr
 Pipelining
 PixArt
 PIXART
+PixelShuffleUpsampleNetwork
 pixelwise
 PIL
 PNDM
+png
 Pointilism
 PointNet
+pos
 Postfuse
 postprocess
 postprocesses
@@ -670,6 +695,7 @@ quantizing
 QuartzNet
 qwen
 Qwen
+QwenVL
 Radiopaedia
 Radosavovic
 Raito
@@ -678,10 +704,12 @@ Ranftl
 RASPP
 rcnn
 ReAct
+README
 RealSense
 RealSR
 Realtime
 realtime
+RealWorldQA
 rebase
 ReciproCAM
 redistributable
@@ -769,6 +797,7 @@ softmax
 softvc
 SoftVC
 SOTA
+SoTA
 Sovits
 sparsity
 Sparisty
@@ -847,6 +876,7 @@ tokenizes
 tokenizing
 ToneColorConverter
 Tongyi
+toolkits
 TorchDynamo
 torchdynamo
 TorchMetrics
@@ -854,6 +884,9 @@ TorchScript
 torchvision
 TorchVision
 transformative
+triplane
+TriplaneLearnablePositionalEmbedding
+triplanes
 Tripo
 TripoSR
 TTS
@@ -861,6 +894,7 @@ Tsinghua
 TsinghuaNLP
 tunable
 tv
+TwoStreamInterleaveTransformer
 TypeScript
 Udnie
 UHD
@@ -912,6 +946,9 @@ VITReciproCAM
 vits
 VITS
 vitt
+VL
+vl
+VLModel
 VM
 Vladlen
 VOC

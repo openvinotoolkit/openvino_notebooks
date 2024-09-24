@@ -22,5 +22,5 @@ For details, please refer to [Installation Guide](../../README.md).
 
 * [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
 * [Model Conversion API](https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html)
-* [Image Processing Demo](https://docs.openvino.ai/2024/omz_demos_image_processing_demo_cpp.html)
+* [Image Processing Demo](https://github.com/openvinotoolkit/open_model_zoo/blob/master/demos/image_processing_demo/cpp/README.md)
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/style-transfer-webcam/README.md" />

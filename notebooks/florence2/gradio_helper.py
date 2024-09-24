@@ -1,6 +1,5 @@
 import io
 import copy
-import random
 import requests
 from pathlib import Path
 
@@ -64,12 +63,16 @@ def plot_bbox(image, data):
 
 
 def draw_polygons(image, prediction, fill_mask=False):
-
     draw = ImageDraw.Draw(image)
     scale = 1
     for polygons, label in zip(prediction["polygons"], prediction["labels"]):
-        color = random.choice(colormap)
-        fill_color = random.choice(colormap) if fill_mask else None
+        color_id = np.random.choice(len(colormap))
+        color = colormap[color_id]
+        if fill_mask:
+            fill_color_id = np.random.choice(len(colormap))
+            fill_color = colormap[fill_color_id]
+        else:
+            fill_color = None
         for _polygon in polygons:
             _polygon = np.array(_polygon).reshape(-1, 2)
             if len(_polygon) < 3:
@@ -96,7 +99,8 @@ def draw_ocr_bboxes(image, prediction):
     draw = ImageDraw.Draw(image)
     bboxes, labels = prediction["quad_boxes"], prediction["labels"]
     for box, label in zip(bboxes, labels):
-        color = random.choice(colormap)
+        color_id = np.random.choice(len(colormap))
+        color = colormap[color_id]
         new_box = (np.array(box) * scale).tolist()
         draw.polygon(new_box, width=3, outline=color)
         draw.text((new_box[0] + 8, new_box[1] + 2), "{}".format(label), align="right", fill=color)
