@@ -81,4 +81,5 @@ notebooks/internvl2/internvl2.ipynb
 notebooks/qwen2-vl/qwen2-vl.ipynb
 notebooks/qwen2-audio/qwen2-audio.ipynb
 notebooks/stable-fast-3d/stable-fast-3d.ipynb
+notebooks/mllama-3.2/mllama-3.2.ipynb
 notebooks/segment-anything/segment-anything-2-image.ipynb
