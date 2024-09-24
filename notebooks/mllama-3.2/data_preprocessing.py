@@ -11,11 +11,13 @@ from io import BytesIO
 import numpy as np
 from PIL import Image
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 from ov_mllama_helper import OVMLlamaForConditionalGeneration
 
 
 max_length = 4048
+
 
 def check_text_data(data):
     """
@@ -26,6 +28,7 @@ def check_text_data(data):
     if isinstance(data, list):
         return all(isinstance(x, str) for x in data)
     return False
+
 
 def get_pil_from_url(url):
     """
@@ -89,7 +92,7 @@ def prepare_calibration_data_vision(dataloader, init_steps):
                         {
                             "pixel_values": batch["pixel_values"].to("cpu"),
                             "aspect_ratio_ids": inputs.data["aspect_ratio_ids"].to("cpu"),
-                            "aspect_ratio_mask": inputs.data["aspect_ratio_mask"]
+                            "aspect_ratio_mask": inputs.data["aspect_ratio_mask"],
                         }
                     )
     return data
@@ -122,8 +125,13 @@ def prepare_dataset_vision(processor, opt_init_steps=50, max_train_samples=1000,
                 return None
         except Exception:
             return None
-        inputs = processor(text="<|image|><|begin_of_text|> Please describe image content based on information: "+example[text_column], images=image, return_tensors="pt", padding=True)
-        if inputs['input_ids'].shape[1] > max_length:
+        inputs = processor(
+            text="<|image|><|begin_of_text|> Please describe image content based on information: " + example[text_column],
+            images=image,
+            return_tensors="pt",
+            padding=True,
+        )
+        if inputs["input_ids"].shape[1] > max_length:
             return None
         return inputs
 
@@ -163,30 +171,24 @@ def prepare_calibration_data_llm(dataloader, init_steps, mllm, processor):
                 pbar.update(1)
                 with torch.no_grad():
                     cache_position = np.cumsum(batch.data["attention_mask"].to("cpu"), axis=1) - 1
-                    cache_position[batch.data['attention_mask'] == 0] = 1
-                    
+                    cache_position[batch.data["attention_mask"] == 0] = 1
+
                     vision_input = {
-                            "pixel_values": batch["pixel_values"].to("cpu"),
-                            "aspect_ratio_ids": batch.data["aspect_ratio_ids"].to("cpu"),
-                            "aspect_ratio_mask": batch.data["aspect_ratio_mask"].to("cpu"),
-                            "cross_attention_mask": batch.data["cross_attention_mask"].to("cpu"),
-                            "cache_position": cache_position[0, :]
+                        "pixel_values": batch["pixel_values"].to("cpu"),
+                        "aspect_ratio_ids": batch.data["aspect_ratio_ids"].to("cpu"),
+                        "aspect_ratio_mask": batch.data["aspect_ratio_mask"].to("cpu"),
+                        "cross_attention_mask": batch.data["cross_attention_mask"].to("cpu"),
+                        "cache_position": cache_position[0, :],
                     }
-                    
+
                     cross_attention_states = mllm.prepare_vision_outputs(**vision_input)
-                    res = {
-                            "input_ids": batch.data["input_ids"].to("cpu"),
-                            "attention_mask": batch.data["attention_mask"].to("cpu"),
-                            **cross_attention_states
-                        }
-                    position_ids = np.cumsum(res['attention_mask'], axis=1) - 1
-                    position_ids[res['attention_mask'] == 0] = 1
-                    res['position_ids'] = position_ids
+                    res = {"input_ids": batch.data["input_ids"].to("cpu"), "attention_mask": batch.data["attention_mask"].to("cpu"), **cross_attention_states}
+                    position_ids = np.cumsum(res["attention_mask"], axis=1) - 1
+                    position_ids[res["attention_mask"] == 0] = 1
+                    res["position_ids"] = position_ids
 
                     res = mllm.prepare_llm_inputs(**res)
-                    data.append(
-                        res
-                    )
+                    data.append(res)
     return data
 
 
@@ -226,8 +228,13 @@ def prepare_dataset_llm(mllm_id, opt_init_steps=50, max_train_samples=1000, file
                 return None
         except Exception:
             return None
-        inputs = processor(text="<|image|><|begin_of_text|> Please describe image content based on information: "+example[text_column], images=image, return_tensors="pt", padding=True)
-        if inputs['input_ids'].shape[1] > max_length:
+        inputs = processor(
+            text="<|image|><|begin_of_text|> Please describe image content based on information: " + example[text_column],
+            images=image,
+            return_tensors="pt",
+            padding=True,
+        )
+        if inputs["input_ids"].shape[1] > max_length:
             return None
         return inputs
 
@@ -240,7 +247,7 @@ def prepare_dataset_llm(mllm_id, opt_init_steps=50, max_train_samples=1000, file
         with open(file_path, "wb") as f:
             print(f"calibration data will be saved into {file_path}")
             pickle.dump(calibration_data, f)
-    
+
     del mllm
     gc.collect()
 

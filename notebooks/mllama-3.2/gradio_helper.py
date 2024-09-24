@@ -56,12 +56,14 @@ def make_demo(model, processor):
                 conversation.extend([{"role": "assistant", "content": [{"type": "text", "text": assistant}]}])
                 flag = False
                 continue
-            conversation.extend([{"role": "user", "content": [{"type": "text", "text": user}]}, {"role": "assistant", "content": [{"type": "text", "text": assistant}]}])
+            conversation.extend(
+                [{"role": "user", "content": [{"type": "text", "text": user}]}, {"role": "assistant", "content": [{"type": "text", "text": assistant}]}]
+            )
 
         if len(history) == 0:
             conversation.append({"role": "user", "content": [{"type": "text", "text": f"<|image|>\n{message_text}"}]})
         else:
-            conversation.append({"role": "user", "content":[{"type": "text", "text": message_text}]})
+            conversation.append({"role": "user", "content": [{"type": "text", "text": message_text}]})
         print(f"prompt is -\n{conversation}")
         prompt = processor.tokenizer.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
         print(f"prompt is -\n{prompt}")
