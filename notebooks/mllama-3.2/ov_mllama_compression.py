@@ -133,9 +133,3 @@ def compress(
     print(f"Model compression finished. Compressed model can be found in {saving_path}")
 
     return saving_path
-
-
-# model_id = "Llama-3.2-11B-Vision-Instruct/OV"
-# processor = AutoProcessor.from_pretrained(model_id)
-
-# compress(model_id, processor)
