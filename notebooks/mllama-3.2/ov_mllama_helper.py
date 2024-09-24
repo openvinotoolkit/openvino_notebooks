@@ -4,10 +4,6 @@ from transformers.cache_utils import DynamicCache, Cache
 from transformers.models.llama.modeling_llama import repeat_kv
 from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
 from typing import Optional, Union, List, Tuple, Dict
-<<<<<<< HEAD
-from optimum.exporters.openvino.stateful import patch_stateful
-=======
->>>>>>> add notebook (#2408)
 from transformers.generation import GenerationMixin
 from transformers.modeling_outputs import ModelOutput
 import openvino.runtime.opset13 as ops
@@ -85,8 +81,6 @@ STR_TO_OV_TYPE = {
     "bf16": ov.Type.bf16,
 }
 
-<<<<<<< HEAD
-=======
 def model_has_state(ov_model: ov.Model):
     return len(ov_model.get_sinks()) > 0
 
@@ -477,12 +471,7 @@ def convert_mllama(model_id, out_dir):
             output.get_tensor().set_names({output_name})
 
         ov_model.validate_nodes_and_infer_types()
-
-<<<<<<< HEAD
-        patch_stateful(model.config.text_config, ov_model)
-=======
         patch_stateful(ov_model)
->>>>>>> add notebook (#2408)
         ov.save_model(ov_model, lang_model_path)
         del ov_model
         cleanup_torchscript_cache()
