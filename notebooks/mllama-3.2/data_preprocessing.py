@@ -39,35 +39,6 @@ def get_pil_from_url(url):
     return image.convert("RGB")
 
 
-# def collate_fn_llm(example, image_column="image_url", text_column="caption"):
-#     """
-#     Preprocesses an example by loading and transforming image and text data.
-#     Checks if the text data in the example is valid by calling the `check_text_data` function.
-#     Downloads the image specified by the URL in the image_column by calling the `get_pil_from_url` function.
-#     If there is any error during the download process, returns None.
-#     Returns the preprocessed inputs with transformed image and text data.
-#     """
-#     assert len(example) == 1
-#     example = example[0]
-
-#     if not check_text_data(example[text_column]):
-#         raise ValueError("Text data is not valid")
-
-#     url = example[image_column]
-#     try:
-#         image = get_pil_from_url(url)
-#         h, w = image.size
-#         if h == 1 or w == 1:
-#             return None
-#     except Exception:
-#         return None
-
-#     inputs = processor(text="<|image|><|begin_of_text|>"+example[text_column], images=image, return_tensors="pt", padding=True)
-#     if inputs['input_ids'].shape[1] > max_length:
-#         return None
-#     return inputs
-
-
 def prepare_calibration_data_vision(dataloader, init_steps):
     """
     This function prepares calibration data from a dataloader for a specified number of initialization steps.
