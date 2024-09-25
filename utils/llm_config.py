@@ -89,6 +89,46 @@ SUPPORTED_LLM_MODELS = {
             Answer: </s>
             <|assistant|>""",
         },
+        "llama-3.2-1b-instruct": {
+            "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|eot_id|>"],
+            "has_chat_template": True,
+            "start_message": " <|start_header_id|>system<|end_header_id|>\n\n" + DEFAULT_SYSTEM_PROMPT + "<|eot_id|>",
+            "history_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>",
+            "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
+            "rag_prompt_template": f"<|start_header_id|>system<|end_header_id|>\n\n{DEFAULT_RAG_PROMPT}<|eot_id|>"
+            + """<|start_header_id|>user<|end_header_id|>
+            
+            
+            Question: {input}
+            Context: {context}
+            Answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+            
+            """,
+            "completion_to_prompt": llama3_completion_to_prompt,
+        },
+        "llama-3.2-3b-instruct": {
+            "model_id": "meta-llama/Llama-3.2-3B-Instruct",
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|eot_id|>"],
+            "has_chat_template": True,
+            "start_message": " <|start_header_id|>system<|end_header_id|>\n\n" + DEFAULT_SYSTEM_PROMPT + "<|eot_id|>",
+            "history_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>",
+            "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
+            "rag_prompt_template": f"<|start_header_id|>system<|end_header_id|>\n\n{DEFAULT_RAG_PROMPT}<|eot_id|>"
+            + """<|start_header_id|>user<|end_header_id|>
+            
+            
+            Question: {input}
+            Context: {context}
+            Answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+            
+            """,
+            "completion_to_prompt": llama3_completion_to_prompt,
+        },
         "qwen2-1.5b-instruct": {
             "model_id": "Qwen/Qwen2-1.5B-Instruct",
             "remote_code": False,
@@ -534,6 +574,8 @@ compression_configs = {
         "group_size": 128,
         "ratio": 0.5,
     },
+    "llama-3.2-3b-instruct": {"sym": False, "group_size": 64, "ratio": 1.0, "dataset": "wikitext2", "awq": True, "all_layers": True, "scale_estimation": True},
+    "llama-3.2-1b-instruct": {"sym": False, "group_size": 64, "ratio": 1.0, "dataset": "wikitext2", "awq": True, "all_layers": True, "scale_estimation": True},
     "default": {
         "sym": False,
         "group_size": 128,
@@ -549,8 +591,12 @@ def get_optimum_cli_command(model_id, weight_format, output_dir, compression_opt
         compression_args = " --group-size {} --ratio {}".format(compression_options["group_size"], compression_options["ratio"])
         if compression_options["sym"]:
             compression_args += " --sym"
-        if enable_awq:
+        if enable_awq or compression_options.get("awq", False):
             compression_args += " --awq --dataset wikitext2 --num-samples 128"
+            if compression_options.get("scale_estimation", False):
+                compression_args += " --scale-estimation"
+        if compression_options.get("all_layers", False):
+            compression_args += " --all-layers"
 
         command = command + compression_args
     if trust_remote_code:
