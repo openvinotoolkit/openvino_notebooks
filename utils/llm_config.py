@@ -90,7 +90,7 @@ SUPPORTED_LLM_MODELS = {
             <|assistant|>""",
         },
         "llama-3.2-1b-instruct": {
-            "model_id": "Llama-3.2-1B-Instruct",
+            "model_id": "meta-llama/Llama-3.2-1B-Instruct",
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|eot_id|>"],
             "has_chat_template": True,
@@ -110,7 +110,7 @@ SUPPORTED_LLM_MODELS = {
             "completion_to_prompt": llama3_completion_to_prompt,
         },
         "llama-3.2-3b-instruct": {
-            "model_id": "Llama-3.2-3B-Instruct",
+            "model_id": "meta-llama/Llama-3.2-3B-Instruct",
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|eot_id|>"],
             "has_chat_template": True,
