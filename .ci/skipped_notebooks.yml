@@ -585,3 +585,7 @@
     - os:
         - macos-12
         - windows-2019
+- notebook: notebooks/wav2lip/wav2lip.ipynb
+  skips:
+    - os:
+        - macos-12
