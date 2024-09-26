@@ -37,6 +37,8 @@ def download_and_convert_models(ov_face_detection_model_path, ov_wav2lip_model_p
     print("Convert Face Detection Model ...")
     if not os.path.isfile(path_to_detector):
         download_file(models_urls["s3fd"])
+        if not os.path.exists("checkpoints"):
+            os.mkdir("checkpoints")
         os.replace("s3fd-619a316812.pth", path_to_detector)
     model_weights = torch.load(path_to_detector)
 
