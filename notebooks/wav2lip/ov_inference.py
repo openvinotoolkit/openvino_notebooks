@@ -87,7 +87,6 @@ def batch_detect(net, imgs, device):
     imgs = torch.from_numpy(imgs).float().to(device)
     BB, CC, HH, WW = imgs.size()
 
-    print("imgs.shape: ", imgs.shape)
     results = net({"x": imgs.numpy()})
     olist = [torch.Tensor(results[i]) for i in range(12)]
 
@@ -334,8 +333,6 @@ class OVFaceAlignment:
 
     def get_detections_for_batch(self, images):
         images = images[..., ::-1]
-        print("OVFaceAlignment get_detections_for_batch called!")
-        print("images.shape: ", images.shape)
         detected_faces = self.face_detector.detect_from_batch(images.copy())
         results = []
 
@@ -553,3 +550,5 @@ def ov_inference(
 
     command = "ffmpeg -y -i {} -i {} -strict -2 -q:v 1 {}".format(audio_path, "Wav2Lip/temp/result.avi", outfile)
     subprocess.call(command, shell=platform.system() != "Windows")
+
+    return outfile
