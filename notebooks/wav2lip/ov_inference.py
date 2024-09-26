@@ -549,6 +549,6 @@ def ov_inference(
     out.release()
 
     command = "ffmpeg -y -i {} -i {} -strict -2 -q:v 1 {}".format(audio_path, "Wav2Lip/temp/result.avi", outfile)
-    subprocess.call(command, shell=platform.system() != "Windows")
+    subprocess.call(command, shell=True)
 
     return outfile
