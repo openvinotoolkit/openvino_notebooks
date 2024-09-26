@@ -253,7 +253,7 @@ class OVFaceDetector(object):
 
 
 class OVSFDDetector(OVFaceDetector):
-    def __init__(self, device, path_to_detector="checkpoints/face_detection.xml", verbose=False):
+    def __init__(self, device, path_to_detector="models/face_detection.xml", verbose=False):
         super(OVSFDDetector, self).__init__(device, verbose)
 
         core = ov.Core()
@@ -320,7 +320,9 @@ class NetworkSize(Enum):
 
 
 class OVFaceAlignment:
-    def __init__(self, landmarks_type, network_size=NetworkSize.LARGE, device="CPU", flip_input=False, verbose=False):
+    def __init__(
+        self, landmarks_type, network_size=NetworkSize.LARGE, device="CPU", flip_input=False, verbose=False, path_to_detector="models/face_detection.xml"
+    ):
         self.device = device
         self.flip_input = flip_input
         self.landmarks_type = landmarks_type
@@ -328,7 +330,7 @@ class OVFaceAlignment:
 
         network_size = int(network_size)
 
-        self.face_detector = OVSFDDetector(device=device, verbose=verbose)
+        self.face_detector = OVSFDDetector(device=device, path_to_detector=path_to_detector, verbose=verbose)
 
     def get_detections_for_batch(self, images):
         images = images[..., ::-1]
@@ -350,8 +352,8 @@ class OVFaceAlignment:
         return results
 
 
-def face_detect_ov(images, device, face_det_batch_size, pads, nosmooth):
-    detector = OVFaceAlignment(LandmarksType._2D, flip_input=False, device=device)
+def face_detect_ov(images, device, face_det_batch_size, pads, nosmooth, path_to_detector):
+    detector = OVFaceAlignment(LandmarksType._2D, flip_input=False, device=device, path_to_detector=path_to_detector)
 
     batch_size = face_det_batch_size
 
@@ -393,15 +395,15 @@ def face_detect_ov(images, device, face_det_batch_size, pads, nosmooth):
     return results
 
 
-def datagen(frames, mels, box, static, face_det_batch_size, pads, nosmooth, img_size, wav2lip_batch_size):
+def datagen(frames, mels, box, static, face_det_batch_size, pads, nosmooth, img_size, wav2lip_batch_size, path_to_detector):
     img_batch, mel_batch, frame_batch, coords_batch = [], [], [], []
 
     if box[0] == -1:
         if not static:
             # BGR2RGB for CNN face detection
-            face_det_results = face_detect_ov(frames, "CPU", face_det_batch_size, pads, nosmooth)
+            face_det_results = face_detect_ov(frames, "CPU", face_det_batch_size, pads, nosmooth, path_to_detector)
         else:
-            face_det_results = face_detect_ov([frames[0]], "CPU", face_det_batch_size, pads, nosmooth)
+            face_det_results = face_detect_ov([frames[0]], "CPU", face_det_batch_size, pads, nosmooth, path_to_detector)
     else:
         print("Using the specified bounding box instead of face detection...")
         y1, y2, x1, x2 = box
@@ -446,8 +448,8 @@ def datagen(frames, mels, box, static, face_det_batch_size, pads, nosmooth, img_
 def ov_inference(
     face_path,
     audio_path,
-    face_detection_path="checkpoints/face_detection.xml",
-    wav2lip_path="checkpoints/Wav2lip/wav2lip.xml",
+    face_detection_path="models/face_detection.xml",
+    wav2lip_path="models/wav2lip.xml",
     inference_device="CPU",
     wav2lip_batch_size=128,
     outfile="results/result_voice.mp4",
@@ -522,7 +524,7 @@ def ov_inference(
 
     full_frames = full_frames[: len(mel_chunks)]
     batch_size = wav2lip_batch_size
-    gen = datagen(full_frames.copy(), mel_chunks, box, static, face_det_batch_size, pads, nosmooth, img_size, wav2lip_batch_size)
+    gen = datagen(full_frames.copy(), mel_chunks, box, static, face_det_batch_size, pads, nosmooth, img_size, wav2lip_batch_size, face_detection_path)
     for i, (img_batch, mel_batch, frames, coords) in enumerate(tqdm(gen, total=int(np.ceil(float(len(mel_chunks)) / batch_size)))):
         if i == 0:
             img_batch = torch.FloatTensor(np.transpose(img_batch, (0, 3, 1, 2))).to(device)
