@@ -261,18 +261,19 @@ def convert_mllama(model_id, out_dir):
 
     requires_conversion = not all([img_encoder_path.exists(), lang_model_path.exists()])
     if not requires_conversion:
-        print(f"model already converted and can be found in {out_dir}")
+        print(f"✅ Model already converted and can be found in {out_dir}")
         return
-    print("Load original model")
+    print("⌛ Load original model")
     model = MllamaForConditionalGeneration.from_pretrained(model_id, torch_dtype=torch.float16)
     model.eval()
     model.config.save_pretrained(out_dir)
     model.generation_config.save_pretrained(out_dir)
+    __make_16bit_traceable(model)
     processor = AutoProcessor.from_pretrained(model_id)
     processor.save_pretrained(out_dir)
 
     if not img_encoder_path.exists():
-        print("Convert vision model...")
+        print("⌛ Convert vision model...")
 
         class VisionEncoder(torch.nn.Module):
             def __init__(self, model):
@@ -281,7 +282,7 @@ def convert_mllama(model_id, out_dir):
 
             def forward(self, pixel_values, aspect_ratio_ids, aspect_ratio_mask):
                 bsz = pixel_values.shape[0]
-                cross_attention_states = self.model.vision_model(pixel_values, aspect_ratio_ids, aspect_ratio_mask)
+                cross_attention_states = self.model.vision_model(pixel_values, aspect_ratio_ids, aspect_ratio_mask)[0]
                 cross_attention_states = self.model.multi_modal_projector(cross_attention_states).reshape(
                     -1, cross_attention_states.shape[-2], self.model.hidden_size
                 )
@@ -303,7 +304,6 @@ def convert_mllama(model_id, out_dir):
 
         image_encoder = VisionEncoder(model)
         image_encoder.eval()
-        __make_16bit_traceable(image_encoder)
 
         with torch.no_grad():
             ov_model = ov.convert_model(
@@ -329,9 +329,10 @@ def convert_mllama(model_id, out_dir):
         del image_encoder
         gc.collect()
 
-        print("Vision model successfully converted")
+        print("✅ Vision model successfully converted")
 
     if not lang_model_path.exists():
+        print("⌛ Convert language model...")
 
         def lm_forward_wrapper(
             self,
@@ -459,8 +460,6 @@ def convert_mllama(model_id, out_dir):
 
         example_inpit["past_key_values"] = past_key_values
         example_inpit["cross_attn_key_values"] = cross_attn_key_values
-
-        __make_16bit_traceable(model.language_model)
         model.language_model.eval()
 
         with torch.no_grad():
@@ -481,6 +480,8 @@ def convert_mllama(model_id, out_dir):
         cleanup_torchscript_cache()
         del model
         gc.collect()
+        print("✅ Language model successfully converted")
+    print(f"✅ Model sucessfully converted and can be found in {out_dir}")
 
 
 core = ov.Core()

@@ -97,17 +97,17 @@ def compress(
             shutil.rmtree(saving_path)
             shutil.rmtree(saving_path.with_suffix(".bin"))
         else:
-            print(f"Compressed model already exists and can be found in {saving_path}")
+            print(f"✅ Compressed model already exists and can be found in {saving_path}")
             return saving_path
     nncf_dataset = None
     if awq or lora or gptq or scale_estimation:
-        print("Dataset preparation started")
+        print("⌛ Dataset preparation started")
         dataset = prepare_dataset_llm(model_dir, dataset_size)
         nncf_dataset = Dataset(dataset)
         gc.collect()
-        print("Dataset preparation finished")
+        print("✅ Dataset preparation finished")
 
-    print("Model compression started")
+    print("⌛ Model compression started")
     print(
         f"Compression parameters:\n\t\n\talgorithm {algo}\n\tgroup size - {group_size}\n\tratio - {ratio}\n\tawq - {awq}\n\t\scale estimation - {scale_estimation}\n\tlora correction - {lora}\n\tgptq - {gptq}\n\tall_layers - {all_layers}"
     )
@@ -130,6 +130,6 @@ def compress(
     del lm_model
     gc.collect()
 
-    print(f"Model compression finished. Compressed model can be found in {saving_path}")
+    print(f"✅ Model compression finished. Compressed model can be found in {saving_path}")
 
     return saving_path
