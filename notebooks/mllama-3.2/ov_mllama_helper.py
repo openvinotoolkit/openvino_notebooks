@@ -482,7 +482,6 @@ def convert_mllama(model_id, out_dir):
         gc.collect()
         print("✅ Language model successfully converted")
     print(f"✅ Model sucessfully converted and can be found in {out_dir}")
-        
 
 
 core = ov.Core()
