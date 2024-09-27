@@ -1,13 +1,15 @@
+import argparse
+import datetime
+import math
 import os
 import sys
-import cv2
 import random
-import datetime
 import time
-import math
-import argparse
+
+import cv2
 import numpy as np
 import torch
+
 
 try:
     from iou import IOU
