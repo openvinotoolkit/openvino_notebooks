@@ -50,7 +50,7 @@ def detect(net, img, device):
     img = torch.from_numpy(img).float().to(device)
     BB, CC, HH, WW = img.size()
 
-    results = net({"x": img.numpy()})
+    results = net({"x": img})
     olist = [torch.Tensor(results[i]) for i in range(12)]
 
     bboxlist = []
