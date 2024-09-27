@@ -4,6 +4,8 @@ Lip sync technologies are widely used for digital human use cases, which enhance
 
 [Wav2Lip](https://github.com/Rudrabha/Wav2Lip) is a novel approach to generate accurate 2D lip-synced videos in the wild with only one video and an audio clip. Wav2Lip leverages an accurate lip-sync “expert" model and consecutive face frames for accurate, natural lip motion generation.
 
+![teaser](https://github.com/user-attachments/assets/11d2fb00-4b5a-45f3-b13b-49636b0d48b1)
+
 In this notebook, we introduce how to enable and optimize Wav2Lippipeline with OpenVINO. This is adaptation of the blog article [Enable 2D Lip Sync Wav2Lip Pipeline with OpenVINO Runtime](https://blog.openvino.ai/blog-posts/enable-2d-lip-sync-wav2lip-pipeline-with-openvino-runtime).
 
 Here is Wav2Lip pipeline overview:
