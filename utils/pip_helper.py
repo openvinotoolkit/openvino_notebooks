@@ -1,5 +1,4 @@
 import sys
-import platform
 
 
 def pip_install(*args):
@@ -8,4 +7,4 @@ def pip_install(*args):
     cli_args = []
     for arg in args:
         cli_args.extend(str(arg).split(" "))
-    subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], shell=(platform.system() == "Windows"), check=True)
+    subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], check=True)
