@@ -14,7 +14,10 @@ The tutorial consists of following steps:
 3. Convert the model using OpenVINO Integration with HuggingFace Optimum.
 4. Run the model using Generate API.
 5. Compare the performance of PyTorch and the OpenVINO model.
-6. Launch an interactive demo for speech recognition
+6. Quantize the OpenVINO model with NNCF.
+7. Check quantized model result for the demo video.
+8. Compare model size, performance and accuracy of original and quantized models.
+9. Launch an interactive demo for speech recognition
 
 
 ## Installation Instructions
