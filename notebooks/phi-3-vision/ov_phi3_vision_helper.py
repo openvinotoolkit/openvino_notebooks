@@ -214,6 +214,8 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
     print("⌛ Load Original model")
     model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True, _attn_implementation="eager")
     processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
+    if getattr(processor, "chat_template", None) is None:
+        processor.chat_template = processor.tokenizer.chat_template
     model.config.save_pretrained(output_dir)
     processor.save_pretrained(output_dir)
     print("✅ Original model successfully loaded")

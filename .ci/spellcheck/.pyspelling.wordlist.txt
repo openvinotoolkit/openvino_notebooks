@@ -976,6 +976,7 @@ wikitext
 WIKITQ
 Wofk
 WTQ
+WhisperPipeline
 wuerstchen
 WuerstchenDiffNeXt
 Würstchen
