@@ -10,13 +10,14 @@ chat_template = """
 """
 
 
-def resize_with_aspect_ratio(image:Image, dst_height=512, dst_width=512):
+def resize_with_aspect_ratio(image: Image, dst_height=512, dst_width=512):
     width, height = image.size
     if width > dst_width or height > dst_height:
         im_scale = min(dst_height / height, dst_width / width)
         resize_size = (int(width * im_scale), int(height * im_scale))
         return image.resize(resize_size)
     return image
+
 
 def make_demo(model, processor):
     model_name = Path(model.config._name_or_path).parent.name
