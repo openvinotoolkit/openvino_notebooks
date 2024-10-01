@@ -42,7 +42,7 @@ if __name__ == "__main__":
         trust_remote_code=True,
     )
 
-    streamer = TextIteratorStreamer(tokenizer, timeout=60.0, skip_prompt=True, skip_special_tokens=True)
+    streamer = TextIteratorStreamer(tokenizer, timeout=3600.0, skip_prompt=True, skip_special_tokens=True)
     stop_tokens = [151643, 151645]
     stop_tokens = [StopOnTokens(stop_tokens)]
 
