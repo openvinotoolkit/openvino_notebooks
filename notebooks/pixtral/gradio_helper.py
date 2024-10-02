@@ -67,19 +67,13 @@ def make_demo(model, processor):
                 conversation.extend([{"role": "user", "content": []}])
                 continue
             if flag == True:
-                conversation[0]["content"] = [{"type": "text", "content": f"{user}"}, {"type": "image"}]
-                conversation.extend([{"role": "assistant", "content": [{"type": "text", "text": assistant}]}])
+                conversation[0]["content"] = [{"type": "text", "content": f"{user}"}]
+                conversation.append({"role": "assistant", "content": assistant})
                 flag = False
                 continue
-            conversation.extend(
-                [{"role": "user", "content": [{"type": "text", "content": user}]}, {"role": "assistant", "content": [{"type": "text", "content": assistant}]}]
-            )
+            conversation.extend([{"role": "user", "content": [{"type": "text", "content": user}]}, {"role": "assistant", "content": assistant}])
 
-        if len(history) == 0:
-            conversation.append({"role": "user", "content": [{"type": "text", "content": f"{message_text}"}, {"type": "image"}]})
-        else:
-            conversation.append({"role": "user", "content": [{"type": "text", "content": message_text}]})
-        print(f"prompt is -\n{conversation}")
+        conversation.append({"role": "user", "content": [{"type": "text", "content": f"{message_text}"}, {"type": "image"}]})
         prompt = processor.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
         print(f"prompt is -\n{prompt}")
         image = Image.open(image)
