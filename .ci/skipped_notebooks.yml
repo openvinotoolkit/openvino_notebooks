@@ -571,17 +571,15 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/segment-anything/segment-anything-2-image.ipynb
+- notebook: notebooks/sam2-image-segmentation/segment-anything-2-image.ipynb
   skips:
     - python:
         - '3.9'
     - os:
         - macos-12
-        - windows-2019
-- notebook: notebooks/segment-anything/segment-anything-2-video.ipynb
+- notebook: notebooks/sam2-video-segmentation/segment-anything-2-video.ipynb
   skips:
     - python:
         - '3.9'
     - os:
         - macos-12
-        - windows-2019
