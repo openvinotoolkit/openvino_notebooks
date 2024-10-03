@@ -583,3 +583,10 @@
         - '3.9'
     - os:
         - macos-12
+- notebook: notebooks/pixtral/pixtral.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019

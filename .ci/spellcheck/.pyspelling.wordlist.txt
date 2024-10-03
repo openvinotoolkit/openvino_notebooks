@@ -527,6 +527,7 @@ nar
 NAS
 natively
 NCE
+Nemo
 NEOX
 NER
 NETP
@@ -633,6 +634,8 @@ PixArt
 PIXART
 PixelShuffleUpsampleNetwork
 pixelwise
+Pixtral
+pixtral
 PIL
 PNDM
 png
