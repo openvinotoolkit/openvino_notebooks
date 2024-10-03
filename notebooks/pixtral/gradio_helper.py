@@ -113,7 +113,9 @@ def make_demo(model, processor):
             {"text": "What does the chart display?", "files": ["./chart.png"]},
         ],
         description=f"{model_name} with OpenVINO. Upload an image and start chatting about it, or simply try one of the examples below. If you won't upload an image, you will receive an error.",
-        stop_btn="Stop Generation",
+        stop_btn=None,
+        retry_btn=None,
+        undo_btn=None,
         multimodal=True,
     )
 
