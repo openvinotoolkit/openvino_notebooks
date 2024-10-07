@@ -7,20 +7,57 @@ from PIL import Image
 from transformers import AutoModel, AutoTokenizer, AutoProcessor, TextIteratorStreamer
 from transformers.generation import GenerationMixin
 from transformers import AutoConfig, GenerationConfig
-from transformers.modeling_outputs import CausalLMOutputWithPast
+from transformers.modeling_outputs import CausalLMOutputWithPast, BaseModelOutputWithPooling
+from transformers.modeling_attn_mask_utils import _prepare_4d_attention_mask
 from pathlib import Path
 from huggingface_hub import snapshot_download
 import types
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Union
 from openvino.runtime import opset13
 import openvino as ov
 import numpy as np
 import gc
+from openvino.runtime.passes import Manager, MatcherPass, WrapType, Matcher
+import time
 
 text_emb_path = Path("language_model/embed_tokens.xml")
 image_emb_path = Path("image_encoder.xml")
 resampler_path = Path("resampler.xml")
 llm_path = Path("language_model/language_model.xml")
+
+
+class InsertSlice(MatcherPass):
+    def __init__(self):
+        MatcherPass.__init__(self)
+        self.model_changed = False
+
+        param = WrapType("opset10.Result")
+
+        def callback(matcher: Matcher) -> bool:
+            root = matcher.get_match_root()
+            if root is None:
+                return False
+            if len(root.get_output_partial_shape(0)) == 3:
+                parent = root.input_value(0).get_node()
+                grand_parent = parent.input_value(0).get_node()
+
+                grand_parent_output = parent.input(0).get_source_output()
+                consumers = grand_parent_output.get_target_inputs()
+                start = np.array([0, -1, 0], dtype=np.int32)
+                stop = np.array([1, -2, grand_parent_output.get_partial_shape()[-1].get_length()], dtype=np.int32)
+                step = np.array([1, -1, 1], dtype=np.int32)
+                axes = np.array([0, 1, 2], dtype=np.int32)
+                slice = opset13.slice(grand_parent, start, stop, step, axes, name="inserted_slice")
+                for consumer in consumers:
+                    consumer.replace_source_output(slice.output(0))
+                self.model_changed = True
+                # Use new operation for additional matching
+                self.register_new_node(slice)
+                print("applied slice for lm head")
+
+                return True
+
+        self.register_matcher(Matcher(param, "InsertSlice"), callback)
 
 
 def model_has_state(ov_model: ov.Model):
@@ -323,13 +360,154 @@ def convert_vision_encoder(model, model_dir):
     tgt_sizes = torch.tensor([[23, 45]])
     if not (model_dir / image_emb_path).exists():
         print("⌛ Convert Image embedding model")
+
+        def siglip_vis_embed_forward(
+            self,
+            pixel_values: torch.FloatTensor,
+            patch_attention_mask: torch.BoolTensor,
+            tgt_sizes: Optional[torch.IntTensor] = None,
+            position_ids: Optional[torch.FloatTensor] = None,
+        ) -> torch.Tensor:
+            patch_embeds = self.patch_embedding(pixel_values)
+            embeddings = patch_embeds.flatten(2).transpose(1, 2)
+
+            if position_ids is None:
+                batch_size = pixel_values.size(0)
+                max_im_h, max_im_w = pixel_values.size(2), pixel_values.size(3)
+                max_nb_patches_h, max_nb_patches_w = max_im_h // self.patch_size, max_im_w // self.patch_size
+                boundaries = torch.arange(1 / self.num_patches_per_side, 1.0, 1 / self.num_patches_per_side)
+                position_ids = torch.full(
+                    size=(
+                        batch_size,
+                        max_nb_patches_h * max_nb_patches_w,
+                    ),
+                    fill_value=0,
+                )
+
+                for batch_idx, p_attn_mask in enumerate(patch_attention_mask):
+                    if tgt_sizes is not None:
+                        nb_patches_h = tgt_sizes[batch_idx][0]
+                        nb_patches_w = tgt_sizes[batch_idx][1]
+                    else:
+                        nb_patches_h = p_attn_mask[:, 0].sum()
+                        nb_patches_w = p_attn_mask[0].sum()
+
+                    fractional_coords_h = torch.arange(0, 1 - 1e-6, 1 / nb_patches_h)
+                    fractional_coords_w = torch.arange(0, 1 - 1e-6, 1 / nb_patches_w)
+
+                    bucket_coords_h = torch.bucketize(fractional_coords_h, boundaries, right=True)
+                    bucket_coords_w = torch.bucketize(fractional_coords_w, boundaries, right=True)
+
+                    pos_ids = (bucket_coords_h[:, None] * self.num_patches_per_side + bucket_coords_w).flatten()
+                    position_ids[batch_idx][p_attn_mask.view(-1).cpu()] = pos_ids
+
+            position_ids = position_ids.to(self.position_embedding.weight.device)
+
+            embeddings = embeddings + self.position_embedding(position_ids)
+            return embeddings
+
+        def siglip_attn_forward(
+            self,
+            hidden_states: torch.Tensor,
+            attention_mask: Optional[torch.Tensor] = None,
+            output_attentions: Optional[bool] = False,
+        ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
+            """Input shape: Batch x Time x Channel"""
+
+            batch_size, q_len, _ = hidden_states.size()
+
+            query_states = self.q_proj(hidden_states)
+            key_states = self.k_proj(hidden_states)
+            value_states = self.v_proj(hidden_states)
+
+            query_states = query_states.view(batch_size, q_len, self.num_heads, self.head_dim).transpose(1, 2)
+            key_states = key_states.view(batch_size, q_len, self.num_heads, self.head_dim).transpose(1, 2)
+            value_states = value_states.view(batch_size, q_len, self.num_heads, self.head_dim).transpose(1, 2)
+
+            attn_output = torch.nn.functional.scaled_dot_product_attention(
+                query_states, key_states, value_states, attention_mask, is_causal=attention_mask is None
+            )
+
+            attn_output = attn_output.transpose(1, 2).contiguous()
+            attn_output = attn_output.reshape(batch_size, q_len, self.embed_dim)
+
+            attn_output = self.out_proj(attn_output)
+
+            return attn_output, None
+
+        def siglip_transformer_forward(
+            self,
+            pixel_values,
+            patch_attention_mask: Optional[torch.BoolTensor] = None,
+            tgt_sizes: Optional[torch.IntTensor] = None,
+            position_ids: Optional[torch.FloatTensor] = None,
+            output_attentions: Optional[bool] = None,
+            output_hidden_states: Optional[bool] = None,
+            return_dict: Optional[bool] = None,
+        ) -> Union[Tuple, BaseModelOutputWithPooling]:
+            output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
+            output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
+            return_dict = return_dict if return_dict is not None else self.config.use_return_dict
+
+            batch_size = pixel_values.size(0)
+            if patch_attention_mask is None:
+                patch_attention_mask = torch.ones(
+                    size=(
+                        batch_size,
+                        pixel_values.size(2) // self.config.patch_size,
+                        pixel_values.size(3) // self.config.patch_size,
+                    ),
+                    dtype=torch.bool,
+                    device=pixel_values.device,
+                )
+
+            hidden_states = self.embeddings(
+                pixel_values=pixel_values, patch_attention_mask=patch_attention_mask, tgt_sizes=tgt_sizes, position_ids=position_ids
+            )
+
+            patch_attention_mask = patch_attention_mask.view(batch_size, -1)
+            attention_mask = _prepare_4d_attention_mask(patch_attention_mask, hidden_states.dtype) if not self._use_flash_attention_2 else patch_attention_mask
+
+            encoder_outputs = self.encoder(
+                inputs_embeds=hidden_states,
+                attention_mask=attention_mask,
+                output_attentions=output_attentions,
+                output_hidden_states=output_hidden_states,
+                return_dict=return_dict,
+            )
+
+            last_hidden_state = encoder_outputs[0]
+            last_hidden_state = self.post_layernorm(last_hidden_state)
+
+            if not return_dict:
+                return (last_hidden_state, None) + encoder_outputs[1:]
+
+            return BaseModelOutputWithPooling(
+                last_hidden_state=last_hidden_state,
+                pooler_output=None,
+                hidden_states=encoder_outputs.hidden_states,
+                attentions=encoder_outputs.attentions,
+            )
+
+        vpm = model.vpm
+        vpm.embeddings.forward = types.MethodType(siglip_vis_embed_forward, vpm.embeddings)
+        for layer in vpm.encoder.layers:
+            layer.self_attn.forward = types.MethodType(siglip_attn_forward, layer.self_attn)
+        vpm.forward = types.MethodType(siglip_transformer_forward, vpm)
+
         pixel_values = torch.randn([1, 3, 14, 14490])
         patch_attn_mask = torch.zeros((1, 1, 1035), dtype=torch.bool)
         patch_attn_mask[0, 0, : tgt_sizes[0][0] * tgt_sizes[0][1]] = True
-        ov_model = ov.convert_model(model.vpm, example_input={"pixel_values": pixel_values, "tgt_sizes": tgt_sizes, "patch_attention_mask": patch_attn_mask})
+        position_ids = prepare_vis_position_ids(
+            pixel_values, patch_attn_mask, tgt_sizes, model.config.vision_config.patch_size, model.config.vision_config.image_size // model.config.patch_size
+        )
+        ov_model = ov.convert_model(vpm, example_input={"pixel_values": pixel_values, "position_ids": position_ids, "patch_attention_mask": patch_attn_mask})
         ov.save_model(ov_model, model_dir / image_emb_path)
         del ov_model
         cleanup_torchscript_cache()
+        # del vpm
+        # del model.vpm
+        gc.collect()
         print("✅ Image embedding model successfully converted")
 
     if not (model_dir / resampler_path).exists():
@@ -342,7 +520,9 @@ def convert_vision_encoder(model, model_dir):
 
             q = self.ln_q(self.query)  # Q * D
 
-            out = self.attn(self._repeat(q, bs), x + pos_embed, x, key_padding_mask=key_padding_mask)[0]  # Q * B * D  # L * B * D +  L * B * D
+            q_bs = q.unsqueeze(1).repeat(1, bs, 1)
+
+            out = self.attn(q_bs, x + pos_embed, x, key_padding_mask=key_padding_mask)[0]  # Q * B * D  # L * B * D +  L * B * D
             #  out: Q * B * D
             x = out.permute(1, 0, 2)  # B * Q * D
 
@@ -368,6 +548,8 @@ def convert_vision_encoder(model, model_dir):
         ov.save_model(ov_model, model_dir / resampler_path)
         del ov_model
         cleanup_torchscript_cache()
+        del model.resampler
+        gc.collect()
         print("✅ Resampler model successfully converted")
 
 
@@ -413,11 +595,38 @@ def copy_llm_files(model_dir, dst_dir):
     shutil.copy(model_dir / llm_path.parent / "modeling_navit_siglip.py", model_dir / dst_dir / "modeling_navit_siglip.py")
 
 
+def prepare_vis_position_ids(pixel_values, patch_attention_mask, tgt_sizes, patch_size, num_patches_per_side):
+    batch_size = pixel_values.size(0)
+    max_im_h, max_im_w = pixel_values.size(2), pixel_values.size(3)
+    max_nb_patches_h, max_nb_patches_w = max_im_h // patch_size, max_im_w // patch_size
+    boundaries = torch.arange(1 / num_patches_per_side, 1.0, 1 / num_patches_per_side)
+    position_ids = torch.full(size=(batch_size, max_nb_patches_h * max_nb_patches_w), fill_value=0)
+
+    for batch_idx, p_attn_mask in enumerate(patch_attention_mask):
+        if tgt_sizes is not None:
+            nb_patches_h = tgt_sizes[batch_idx][0]
+            nb_patches_w = tgt_sizes[batch_idx][1]
+        else:
+            nb_patches_h = p_attn_mask[:, 0].sum()
+            nb_patches_w = p_attn_mask[0].sum()
+
+        fractional_coords_h = torch.arange(0, 1 - 1e-6, 1 / nb_patches_h)
+        fractional_coords_w = torch.arange(0, 1 - 1e-6, 1 / nb_patches_w)
+
+        bucket_coords_h = torch.bucketize(fractional_coords_h, boundaries, right=True)
+        bucket_coords_w = torch.bucketize(fractional_coords_w, boundaries, right=True)
+
+        pos_ids = (bucket_coords_h[:, None] * num_patches_per_side + bucket_coords_w).flatten()
+        position_ids[batch_idx][p_attn_mask.view(-1).cpu()] = pos_ids
+
+    return position_ids
+
+
 core = ov.Core()
 
 
 class OvModelForCausalLMWithEmb(GenerationMixin):
-    def __init__(self, model_dir, device="CPU", ov_config=None, compile=True) -> None:
+    def __init__(self, model_dir, device="CPU", ov_config=None, compile=True, slice_lm_head=True) -> None:
         self._supports_cache_class = False
         self.config = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)
         self.config.is_decoder = True
@@ -426,6 +635,8 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         model_dir = Path(model_dir)
         self.model = core.read_model(model_dir / "language_model.xml")
         self.token_emb = core.read_model(model_dir / "embed_tokens.xml")
+        if slice_lm_head:
+            self.slice_lm_head()
         self.request = None
         self.token_emb_request = None
         self._device = device.upper()
@@ -435,8 +646,15 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         self._past_length = None
         self.input_names = [input_t.get_any_name() for input_t in self.model.inputs]
         self.main_input_name = "input_ids"
+        self.llm_times = []
         if compile:
             self.compile()
+
+    def slice_lm_head(self):
+        manager = Manager()
+        manager.register_pass(InsertSlice())
+        manager.run_passes(self.model)
+        self.model.validate_nodes_and_infer_types()
 
     def compile(self):
         if self.request is None:
@@ -479,6 +697,7 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         inputs = {}
         # past_key_values are not used explicitly, instead they are handled inside the model
         if past_key_values is None:
+            self.llm_times = []
             # This is the first iteration in a sequence, reset all states
             if self.request is not None:
                 self.request.reset_state()
@@ -541,9 +760,11 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
             **kwargs,
         )
 
+        start = time.perf_counter()
         # Run inference
         self.request.start_async(inputs, share_inputs=True)
         self.request.wait()
+        self.llm_times.append(time.perf_counter() - start)
         logits = self.request.get_tensor("logits").data
         logits = torch.from_numpy(logits).to(self.device)
         past_key_values = ((),)
@@ -623,6 +844,8 @@ class OvMiniCPMV:
         self.processor = processor
         self._pos_embeds = torch.from_numpy(get_2d_sincos_pos_embed(self.embed_dim, 70)).float()
         self.max_size = (70, 70)
+        self.vpm_times = []
+        self.resampler_times = []
 
         self.terminators = ["<|im_end|>", "<|endoftext|>"]
 
@@ -650,7 +873,9 @@ class OvMiniCPMV:
 
         pos_embed = torch.nn.utils.rnn.pad_sequence(pos_embed, batch_first=True, padding_value=0.0).permute(1, 0, 2)  # BLD => L * B * D
 
+        start = time.perf_counter()
         res = torch.from_numpy(self._resampler([x, pos_embed, key_padding_mask])[0])
+        self.resampler_times.append(time.perf_counter() - start)
         return res
 
     def _set_2d_pos_cache(self, max_size):
@@ -690,20 +915,39 @@ class OvMiniCPMV:
                 for i in range(B):
                     patch_attn_mask[i, 0, : tgt_sizes[i][0] * tgt_sizes[i][1]] = True
 
-                vision_batch_size = 1
+                vision_batch_size = 32
                 all_pixel_values = all_pixel_values
                 if B > vision_batch_size:
                     hs = []
                     for i in range(0, B, vision_batch_size):
                         start_idx = i
                         end_idx = i + vision_batch_size
-                        tmp_hs = torch.from_numpy(
-                            self.vpm([all_pixel_values[start_idx:end_idx], patch_attn_mask[start_idx:end_idx], tgt_sizes[start_idx:end_idx]])[0]
+                        block_pxl_values = all_pixel_values[start_idx:end_idx]
+                        block_patch_attn_mask = patch_attn_mask[start_idx:end_idx]
+                        block_tgt_sizes = tgt_sizes[start_idx:end_idx]
+                        block_position_ids = prepare_vis_position_ids(
+                            block_pxl_values,
+                            block_patch_attn_mask,
+                            block_tgt_sizes,
+                            self.config.vision_config.patch_size,
+                            self.config.vision_config.image_size // self.config.patch_size,
                         )
+                        start = time.perf_counter()
+                        tmp_hs = torch.from_numpy(self.vpm([block_pxl_values, block_patch_attn_mask, block_position_ids])[0])
+                        self.vpm_times.append(time.perf_counter() - start)
                         hs.append(tmp_hs)
                     vision_embedding = torch.cat(hs, dim=0)
                 else:
-                    vision_embedding = torch.from_numpy(self.vpm([all_pixel_values, patch_attn_mask, tgt_sizes])[0])
+                    position_ids = prepare_vis_position_ids(
+                        all_pixel_values,
+                        patch_attn_mask,
+                        tgt_sizes,
+                        self.config.vision_config.patch_size,
+                        self.config.vision_config.image_size // self.config.patch_size,
+                    )
+                    start = time.perf_counter()
+                    vision_embedding = torch.from_numpy(self.vpm([all_pixel_values, patch_attn_mask, position_ids])[0])
+                    self.vpm_times.append(time.perf_counter() - start)
                 vision_embedding = self.resampler(vision_embedding, tgt_sizes)
 
                 start = 0
@@ -834,6 +1078,8 @@ class OvMiniCPMV:
         use_image_id=None,
         **kwargs,
     ):
+        self.vpm_times = []
+        self.resampler_times = []
         if isinstance(msgs[0], list):
             batched = True
         else:
@@ -877,7 +1123,6 @@ class OvMiniCPMV:
             copy_msgs = deepcopy(msgs)
 
             assert len(msgs) > 0, "msgs is empty"
-            assert sampling or not stream, "if use stream mode, make sure sampling=True"
 
             if image is not None and isinstance(copy_msgs[0]["content"], str):
                 copy_msgs[0]["content"] = [image, copy_msgs[0]["content"]]
@@ -915,7 +1160,6 @@ class OvMiniCPMV:
             generation_config = {"top_p": 0.8, "top_k": 100, "temperature": 0.7, "do_sample": True, "repetition_penalty": 1.05}
         else:
             generation_config = {
-                "num_beams": 3,
                 "repetition_penalty": 1.2,
             }
 
