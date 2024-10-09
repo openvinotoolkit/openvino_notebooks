@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Type, Dict, Any, Tuple, Callable, Optional
 from transformers import MllamaForConditionalGeneration, AutoProcessor, AutoConfig, GenerationConfig, TextStreamer
 from transformers.cache_utils import DynamicCache, Cache
 from transformers.models.llama.modeling_llama import repeat_kv
@@ -17,6 +18,8 @@ import requests
 from PIL import Image
 from openvino.runtime.passes import Manager, MatcherPass, WrapType, Matcher
 import time
+import math
+import merge
 
 IMAGE_ENCODER = "openvino_vision_encoder.xml"
 LANGUAGE_MODEL = "openvino_language_model.xml"
@@ -252,6 +255,228 @@ def patch_stateful(ov_model):
     )
 
 
+def isinstance_str(x: object, cls_name: str):
+    """
+    Checks whether x has any class *named* cls_name in its ancestry.
+    Doesn't require access to the class's implementation.
+    
+    Useful for patching!
+    """
+
+    for _cls in x.__class__.__mro__:
+        if _cls.__name__ == cls_name:
+            return True
+    
+    return False
+
+
+def compute_merge(x: torch.Tensor, tome_info: Dict[str, Any]) -> Tuple[Callable, ...]:
+    original_tokens = tome_info["size"]
+    downsample = int(math.ceil(math.sqrt(original_tokens // x.shape[1])))
+
+    args = tome_info["args"]
+
+    if downsample <= args["max_downsample"]:
+        r = int(x.shape[1] * args["ratio"])
+        
+        # If the batch size is odd, then it's not possible for prompted and unprompted images to be in the same
+        # batch, which causes artifacts with use_rand, so force it to be off.
+        use_rand = False if x.shape[0] % 2 == 1 else args["use_rand"]
+        m, u = merge.bipartite_soft_matching_random2d(x, r) 
+    else:
+        m, u = (merge.do_nothing, merge.do_nothing)
+
+    m_a, u_a = (m, u) if args["merge_attn"]      else (merge.do_nothing, merge.do_nothing)
+    m_m, u_m = (m, u) if args["merge_mlp"]       else (merge.do_nothing, merge.do_nothing)
+
+    return m_a, m_m, u_a, u_m  # Okay this is probably not very good
+
+
+
+def merge_wavg(
+    merge: Callable, x: torch.Tensor
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    Applies the merge function by taking a weighted average based on token size.
+    Returns the merged tensor and the new token sizes.
+    """
+    #print("Merge")
+    size = torch.ones_like(x[..., 0, None])
+
+    x = merge(x * size, mode="sum")
+    size = merge(size, mode="sum")
+
+    x = x / size
+    return x
+
+
+def make_mllama_tome_block(block_class: Type[torch.nn.Module]) -> Type[torch.nn.Module]:
+    """
+    Make a patched class for a mllama model.
+    This patch applies ToMe to the forward function of the block.
+    """
+    class ToMeBlock(block_class):
+        # Save for unpatching later
+        _parent = block_class
+
+        def forward(
+            self,
+            hidden_state: torch.Tensor,
+            attention_mask: Optional[torch.Tensor] = None,
+            output_attentions: bool = None,
+        ) -> torch.Tensor:
+            m_a, m_m, u_a, u_m = compute_merge(hidden_state, self._tome_info)
+            # Self Attention
+            residual = hidden_state
+            hidden_state = self.input_layernorm(hidden_state)
+
+            hidden_state = merge_wavg(m_a, hidden_state)
+
+            hidden_state, attn_weights = self.self_attn(hidden_state) #, attention_mask=attention_mask)
+            if self.is_gated:
+                hidden_state = self.gate_attn.tanh() * hidden_state
+            hidden_state = residual + u_a(hidden_state)
+
+            # Feed forward
+            residual = hidden_state
+            hidden_state = self.post_attention_layernorm(hidden_state)
+            hidden_state = merge_wavg(m_m, hidden_state)
+            hidden_state = self.mlp(hidden_state)
+            if self.is_gated:
+                hidden_state = self.gate_ffn.tanh() * hidden_state
+
+            hidden_state = residual + u_m(hidden_state)
+
+            outputs = (hidden_state,)
+
+            if output_attentions:
+                outputs += (attn_weights,)
+
+            return outputs
+
+    return ToMeBlock
+
+
+def hook_tome_model(model: torch.nn.Module):
+    """ Adds a forward pre hook to get the image size. This hook can be removed with remove_patch. """
+    def hook(module, args):
+        module._tome_info["size"] = args[0].shape[1]
+        print("shape", args[0].shape)
+        return None
+
+    model._tome_info["hooks"].append(model.register_forward_pre_hook(hook))
+
+
+
+def patch_mmlama_vit(
+        model: torch.nn.Module,
+        ratio: float = 0.5,
+        max_downsample: int = 1,
+        sx: int = 2, sy: int = 2,
+        use_rand: bool = True,
+        merge_attn: bool = True,
+        merge_mlp: bool = False):
+    """
+    Patches a stable diffusion model with ToMe.
+    Apply this to the highest level stable diffusion object (i.e., it should have a .model.diffusion_model).
+
+    Important Args:
+     - model: A top level Stable Diffusion module to patch in place. Should have a ".model.diffusion_model"
+     - ratio: The ratio of tokens to merge. I.e., 0.4 would reduce the total number of tokens by 40%.
+              The maximum value for this is 1-(1/(sx*sy)). By default, the max is 0.75 (I recommend <= 0.5 though).
+              Higher values result in more speed-up, but with more visual quality loss.
+    
+    Args to tinker with if you want:
+     - max_downsample [1, 2, 4, or 8]: Apply ToMe to layers with at most this amount of downsampling.
+                                       E.g., 1 only applies to layers with no downsampling (4/15) while
+                                       8 applies to all layers (15/15). I recommend a value of 1 or 2.
+     - sx, sy: The stride for computing dst sets (see paper). A higher stride means you can merge more tokens,
+               but the default of (2, 2) works well in most cases. Doesn't have to divide image size.
+     - use_rand: Whether or not to allow random perturbations when computing dst sets (see paper). Usually
+                 you'd want to leave this on, but if you're having weird artifacts try turning this off.
+     - merge_attn: Whether or not to merge tokens for attention (recommended).
+     - merge_mlp: Whether or not to merge tokens for the mlp layers (very not recommended).
+    """
+
+    # Make sure the module is not currently patched
+    remove_patch(model)
+
+    is_mllama = isinstance_str(model, "MllamaVisionModel")
+
+    if not is_mllama:
+        raise RuntimeError("Provided model was not a Mllama model.")
+    else:
+        # Supports "pipe.unet" and "unet"
+        mmlama_vit1 = model.transformer
+        mmlama_vit2 = model.global_transformer
+
+    mmlama_vit1._tome_info = {
+        "size": None,
+        "hooks": [],
+        "args": {
+            "ratio": ratio,
+            "max_downsample": max_downsample,
+            "sx": sx, "sy": sy,
+            "use_rand": use_rand,
+            "generator": None,
+            "merge_attn": merge_attn,
+            "merge_mlp": merge_mlp
+        }
+    }
+    hook_tome_model(mmlama_vit1)
+
+    for _, module in mmlama_vit1.named_modules():
+        # If for some reason this has a different name, create an issue and I'll fix it
+        if isinstance_str(module, "MllamaVisionEncoderLayer"):
+            print("Patched module in transformer")
+            make_tome_block_fn = make_mllama_tome_block
+            module.__class__ = make_tome_block_fn(module.__class__)
+            module._tome_info = mmlama_vit1._tome_info
+
+
+    mmlama_vit2._tome_info = {
+        "size": None,
+        "hooks": [],
+        "args": {
+            "ratio": ratio,
+            "max_downsample": max_downsample,
+            "sx": sx, "sy": sy,
+            "use_rand": use_rand,
+            "generator": None,
+            "merge_attn": merge_attn,
+            "merge_mlp": merge_mlp
+        }
+    }
+    hook_tome_model(mmlama_vit2)
+
+    for _, module in mmlama_vit2.named_modules():
+        # If for some reason this has a different name, create an issue and I'll fix it
+        if isinstance_str(module, "MllamaVisionEncoderLayer"):
+            print("Patched module in global_transformer")
+            make_tome_block_fn = make_mllama_tome_block
+            module.__class__ = make_tome_block_fn(module.__class__)
+            module._tome_info = mmlama_vit2._tome_info
+
+    return model
+
+
+def remove_patch(model: torch.nn.Module):
+    """ Removes a patch from a ToMe Diffusion module if it was already patched. """
+    # For mllama
+    model = model.unet if hasattr(model, "unet") else model
+
+    for _, module in model.named_modules():
+        if hasattr(module, "_tome_info"):
+            for hook in module._tome_info["hooks"]:
+                hook.remove()
+            module._tome_info["hooks"].clear()
+
+        if module.__class__.__name__ == "ToMeBlock":
+            module.__class__ = module._parent
+    
+    return model
+
+
 def convert_mllama(model_id, out_dir):
 
     out_dir = Path(out_dir)
@@ -271,6 +496,8 @@ def convert_mllama(model_id, out_dir):
     __make_16bit_traceable(model)
     processor = AutoProcessor.from_pretrained(model_id)
     processor.save_pretrained(out_dir)
+
+    model.vision_model = patch_mmlama_vit(model.vision_model, ratio=0.5)
 
     if not img_encoder_path.exists():
         print("⌛ Convert vision model...")
