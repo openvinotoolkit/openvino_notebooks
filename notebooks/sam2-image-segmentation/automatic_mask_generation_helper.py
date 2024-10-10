@@ -27,7 +27,7 @@ import cv2
 import numpy as np
 
 
-from image_helper import preprocess_image, postprocess_masks
+from ov_sam2_helper import preprocess_image, postprocess_masks
 
 
 def draw_anns(image, anns):
