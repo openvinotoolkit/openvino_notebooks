@@ -68,7 +68,7 @@ def make_demo(model, processor):
         prompt = processor.tokenizer.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
         print(f"prompt is -\n{prompt}")
         image = Image.open(image)
-        inputs = processor(image, prompt, return_tensors="pt")
+        inputs = processor(images=image, text=prompt, return_tensors="pt")
 
         streamer = TextIteratorStreamer(
             processor,
