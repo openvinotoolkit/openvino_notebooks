@@ -52,7 +52,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 1. The notebooks work on Windows, macOS and Linux (see [supported operating
    systems](https://github.com/openvinotoolkit/openvino_notebooks#%EF%B8%8F-system-requirements))
-   with Python 3.8, 3.9, 3.10 and 3.11.
+   with Python 3.9, 3.10, 3.11 and 3.12.
 2. As a rule, the notebooks do not require installation of additional software that is not installable by
    `pip`. We do not assume that users have installed XCode Developer Tools, Visual C++ redistributable,
    `cmake`, etc. Please discuss if your notebook does need C++ - there are exceptions to this rule.

@@ -14,7 +14,7 @@ This notebook shows a person tracking scenario: it reads frames from an input vi
 ## Notebook Contents
 
 This tutorial uses the [Deep SORT](https://arxiv.org/abs/1703.07402) algorithm to perform object tracking.
-[person detection model]( https://docs.openvino.ai/2024/omz_models_model_person_detection_0202.html) is deployed to detect the person in each frame of the video, and [reidentification model]( https://docs.openvino.ai/2024/omz_models_model_person_reidentification_retail_0287.html) is used to output embedding vector to match a pair of images of a person by the cosine distance.
+[person detection model]( https://github.com/openvinotoolkit/open_model_zoo/blob/master/models/intel/person-detection-0202/README.md) is deployed to detect the person in each frame of the video, and [reidentification model]( https://github.com/openvinotoolkit/open_model_zoo/blob/master/models/intel/person-reidentification-retail-0287/README.md) is used to output embedding vector to match a pair of images of a person by the cosine distance.
 
 ## Installation Instructions
 
@@ -26,6 +26,6 @@ For details, please refer to [Installation Guide](../../README.md).
 
 * [OpenVINO notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
 * [Model Conversion API](https://docs.openvino.ai/2024/openvino-workflow/model-preparation/convert-model-to-ir.html)
-* [Pedestrian Tracker C++ Demo](https://docs.openvino.ai/2024/omz_demos_pedestrian_tracker_demo_cpp.html)
+* [Pedestrian Tracker C++ Demo](https://github.com/openvinotoolkit/open_model_zoo/blob/master/demos/pedestrian_tracker_demo/cpp/README.md)
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/person-tracking-webcam/README.md" />

@@ -46,14 +46,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
         with:
-          python-version: 3.8 # change cachepip step when changing this
+          python-version: "3.10" # change cachepip step when changing this
       - name: Cache OpenVINO Pip Packages
         id: cachepip
         uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
         with:
           path: |
             pipcache
-          key: ${{ env.PIP_CACHE_KEY }}-ubuntu-20.04-3.8
+          key: ${{ env.PIP_CACHE_KEY }}-ubuntu-20.04-3.10
       - name: Cache openvino packages
         if: steps.cachepip.outputs.cache-hit != 'true'
         run: |

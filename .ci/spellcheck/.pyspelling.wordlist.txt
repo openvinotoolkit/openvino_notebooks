@@ -41,6 +41,7 @@ async
 AsyncInferQueue
 Atrous
 audiobooks
+AudioForConditionalGeneration
 audioldm
 AudioLDM
 autoencoder
@@ -100,6 +101,7 @@ classname
 ClassProbabilityMap
 CLI
 cli
+ClipBasedHeadEstimator
 CLIP's
 codebase
 codebook
@@ -199,6 +201,7 @@ diarization
 Diffusers
 diffusers
 dimensionality
+DINOv
 Distil
 distil
 DistilBERT
@@ -236,6 +239,7 @@ editability
 EfficientNet
 EfficientSAM
 EfficientSAMs
+embedder
 Embedder
 embeddings
 EnCodec
@@ -287,6 +291,7 @@ Gemma
 gemma
 genai
 genAI
+GenerationMixin
 Girshick
 Gitee
 GitHub
@@ -368,6 +373,7 @@ intervaling
 im
 img
 ip
+ir
 IRs
 iteratively
 JFLEG
@@ -425,6 +431,8 @@ LeViT
 LibriSpeech
 librispeech
 Lim
+LinearCameraEmbedder
+Lippipeline
 Liu
 LLama
 LLaMa
@@ -434,6 +442,7 @@ llava
 llm
 LLM
 LLMs
+LM
 LMS
 LLMPipeline
 logits
@@ -450,15 +459,19 @@ LVLM
 Lyth
 macOS
 Magika
+masklet
 Mahalanobis
 Mapillary
 Markovian
 Martyniuk
 maskrcnn
+MaterialMLP
+MaterialNet
 mathbf
 MathVista
 MatMul
 MBs
+md
 MediaPipe
 mel
 Mels
@@ -501,6 +514,7 @@ mpnet
 mpt
 MPT
 MRPC
+MTVQA
 multiarchitecture
 Multiclass
 multiclass
@@ -518,6 +532,7 @@ nar
 NAS
 natively
 NCE
+Nemo
 NEOX
 NER
 NETP
@@ -579,12 +594,15 @@ Orca
 OVC
 overfitting
 overlayed
+ov
 OV
 OVC
 OVModel
+OVModelForCausalLM
 OVModelForXXX
 OVModelForXxx
 OVMS
+OVQwen
 OVStableDiffusionPipeline
 OVStableDiffusionInpaintPipeline
 OvStableDiffusionInpaintingPipeline
@@ -609,6 +627,7 @@ perceptron
 Patil
 PEFT
 perceiver
+PerformanceMode
 performant
 PersonaGPT
 PGI
@@ -619,11 +638,16 @@ Piotr
 Pipelining
 PixArt
 PIXART
+PixelShuffleUpsampleNetwork
 pixelwise
+Pixtral
+pixtral
 PIL
 PNDM
+png
 Pointilism
 PointNet
+pos
 Postfuse
 postprocess
 postprocesses
@@ -683,6 +707,7 @@ quantizing
 QuartzNet
 qwen
 Qwen
+QwenVL
 Radiopaedia
 Radosavovic
 Raito
@@ -691,10 +716,12 @@ Ranftl
 RASPP
 rcnn
 ReAct
+README
 RealSense
 RealSR
 Realtime
 realtime
+RealWorldQA
 rebase
 ReciproCAM
 redistributable
@@ -782,6 +809,7 @@ softmax
 softvc
 SoftVC
 SOTA
+SoTA
 Sovits
 sparsity
 Sparisty
@@ -868,6 +896,9 @@ TorchScript
 torchvision
 TorchVision
 transformative
+triplane
+TriplaneLearnablePositionalEmbedding
+triplanes
 Tripo
 TripoSR
 TTS
@@ -875,6 +906,7 @@ Tsinghua
 TsinghuaNLP
 tunable
 tv
+TwoStreamInterleaveTransformer
 TypeScript
 Udnie
 UHD
@@ -926,6 +958,9 @@ VITReciproCAM
 vits
 VITS
 vitt
+VL
+vl
+VLModel
 VM
 Vladlen
 VOC
@@ -951,6 +986,7 @@ wikitext
 WIKITQ
 Wofk
 WTQ
+WhisperPipeline
 wuerstchen
 WuerstchenDiffNeXt
 Würstchen

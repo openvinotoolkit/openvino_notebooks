@@ -192,6 +192,7 @@ def cleanup_torchscript_cache():
 
 
 def convert_phi3_model(model_id, output_dir, quantization_config):
+    model_name = Path(model_id).name
     output_dir = Path(output_dir)
 
     lang_model_path = output_dir / "language_model.xml"
@@ -207,12 +208,14 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
             embed_token_path.exists(),
         ]
     ):
-        print(f"✅ Phi-3-vision model already converted. You can find results in {output_dir}")
+        print(f"✅ {model_name} model already converted. You can find results in {output_dir}")
         return
-    print("⌛ Phi-3-vision conversion started. Be patient, it may takes some time.")
+    print(f"⌛ {model_name} conversion started. Be patient, it may takes some time.")
     print("⌛ Load Original model")
     model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True, _attn_implementation="eager")
     processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
+    if getattr(processor, "chat_template", None) is None:
+        processor.chat_template = processor.tokenizer.chat_template
     model.config.save_pretrained(output_dir)
     processor.save_pretrained(output_dir)
     print("✅ Original model successfully loaded")
@@ -313,7 +316,7 @@ def convert_phi3_model(model_id, output_dir, quantization_config):
         cleanup_torchscript_cache()
         del model
         gc.collect()
-        print(f"✅ Phi-3-vision model conversion finished. You can find results in {output_dir}")
+        print(f"✅ {model_name} model conversion finished. You can find results in {output_dir}")
 
 
 class OvPhi3Vision(GenerationMixin):
@@ -322,7 +325,7 @@ class OvPhi3Vision(GenerationMixin):
         self.model = core.read_model(model_dir / "language_model.xml")
         self.image_embed = core.compile_model(model_dir / "image_embed.xml", device)
         self.img_projection = core.compile_model(model_dir / "img_projection.xml", device)
-        self.embed_tokem = core.compile_model(model_dir / "embed_token.xml", device)
+        self.embed_token = core.compile_model(model_dir / "embed_token.xml", device)
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
         compiled_model = core.compile_model(self.model, device)
@@ -573,7 +576,7 @@ class OvPhi3Vision(GenerationMixin):
             select = True
             input_ids.clamp_min_(0).clamp_max_(self.config.vocab_size)
 
-        hidden_states = torch.from_numpy(self.embed_tokem(input_ids)[0])
+        hidden_states = torch.from_numpy(self.embed_token(input_ids)[0])
         if select:
             if hd_transform:
                 idx = 0

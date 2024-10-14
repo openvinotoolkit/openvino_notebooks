@@ -34,7 +34,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
         with:
-          python-version: 3.8 # change cachepip step when changing this
+          python-version: 3.9 # change cachepip step when changing this
 
       - name: Install dependencies
         run: |

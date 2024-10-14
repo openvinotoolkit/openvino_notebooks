@@ -63,7 +63,6 @@ def plot_bbox(image, data):
 
 
 def draw_polygons(image, prediction, fill_mask=False):
-
     draw = ImageDraw.Draw(image)
     scale = 1
     for polygons, label in zip(prediction["polygons"], prediction["labels"]):

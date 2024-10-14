@@ -51,7 +51,7 @@ OpenVINO Notebooks require Python and Git. To get started, select the guide for 
 
 Explore Jupyter notebooks using this [page](https://openvinotoolkit.github.io/openvino_notebooks/), select one related to your needs or give them all a try. Good Luck!
 
-**NOTE: The main branch of this repository was updated to support the new OpenVINO 2024.3 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous release version of OpenVINO, please checkout the [2024.2 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2024.2). If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2023.3 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.3).
+**NOTE: The main branch of this repository was updated to support the new OpenVINO 2024.4 release.** To upgrade to the new release version, please run `pip install --upgrade -r requirements.txt` in your `openvino_env` virtual environment. If you need to install for the first time, see the [Installation Guide](#-installation-guide) section below. If you wish to use the previous release version of OpenVINO, please checkout the [2024.3 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2024.2). If you wish to use the previous Long Term Support (LTS) version of OpenVINO check out the [2023.3 branch](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.3).
 
 If you need help, please start a GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions).  
 
@@ -69,13 +69,13 @@ The notebooks run almost anywhere &mdash; your laptop, a cloud VM, or even a Doc
 
 | Supported Operating System                                 | [Python Version (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- |:---------------------------------------------------|
-| Ubuntu 20.04 LTS, 64-bit                                   | 3.8 - 3.11                                         |
-| Ubuntu 22.04 LTS, 64-bit                                   | 3.8 - 3.11                                         |
-| Red Hat Enterprise Linux 8, 64-bit                         | 3.8 - 3.11                                         |
-| CentOS 7, 64-bit                                           | 3.8 - 3.11                                         |
-| macOS 10.15.x versions or higher                           | 3.8 - 3.11                                         |
-| Windows 10, 64-bit Pro, Enterprise or Education editions   | 3.8 - 3.11                                         |
-| Windows Server 2016 or higher                              | 3.8 - 3.11                                         |
+| Ubuntu 20.04 LTS, 64-bit                                   | 3.9 - 3.12                                         |
+| Ubuntu 22.04 LTS, 64-bit                                   | 3.9 - 3.12                                         |
+| Red Hat Enterprise Linux 8, 64-bit                         | 3.9 - 3.12                                         |
+| CentOS 7, 64-bit                                           | 3.9 - 3.12                                         |
+| macOS 10.15.x versions or higher                           | 3.9 - 3.12                                         |
+| Windows 10, 64-bit Pro, Enterprise or Education editions   | 3.9 - 3.12                                         |
+| Windows Server 2016 or higher                              | 3.9 - 3.12                                         |
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)
 <div id='-run-the-notebooks'></div>

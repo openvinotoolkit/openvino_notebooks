@@ -5,6 +5,10 @@ import torch
 from optimum.intel.openvino import OVModelForCausalLM
 from transformers import AutoTokenizer, AutoConfig, TextIteratorStreamer, StoppingCriteriaList, StoppingCriteria
 
+import openvino.properties as props
+import openvino.properties.hint as hints
+import openvino.properties.streams as streams
+
 
 class StopOnTokens(StoppingCriteria):
     def __init__(self, token_ids):
@@ -26,7 +30,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     model_dir = args.model_path
 
-    ov_config = {"PERFORMANCE_HINT": "LATENCY", "NUM_STREAMS": "1", "CACHE_DIR": ""}
+    ov_config = {hints.performance_mode(): hints.PerformanceMode.LATENCY, streams.num(): "1", props.cache_dir(): ""}
 
     tokenizer = AutoTokenizer.from_pretrained(model_dir)
     print("====Compiling model====")
@@ -38,7 +42,7 @@ if __name__ == "__main__":
         trust_remote_code=True,
     )
 
-    streamer = TextIteratorStreamer(tokenizer, timeout=60.0, skip_prompt=True, skip_special_tokens=True)
+    streamer = TextIteratorStreamer(tokenizer, timeout=3600.0, skip_prompt=True, skip_special_tokens=True)
     stop_tokens = [151643, 151645]
     stop_tokens = [StopOnTokens(stop_tokens)]
 

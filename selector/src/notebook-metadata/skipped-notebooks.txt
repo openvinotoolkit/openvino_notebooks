@@ -1,2 +1,1 @@
-ct-segmentation-quantize/data-preparation-ct-scan.ipynb
-ct-segmentation-quantize/pytorch-monai-training.ipynb
+

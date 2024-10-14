@@ -2347,16 +2347,16 @@
                 "sha256:db30ba9e8af7188436ff76ce79ad7a8a2a5204e3c4757d2728223270b6a73080",
                 "sha256:e941dfe7196b3a75364fcee4e0fe79cee63fa9d4e2a1852fb459048d7daa83f5",
                 "sha256:f31dfd3d793a787a799930568e9e1dc736bb3a7069b266f2d80b2ad623c29d84",
-                "sha256:0352b1e385cefb9dcc74baaa7b0f754a309a960344a1d39e5dec6ba8cb3eee3e",
-                "sha256:83023fa124b6da51a409d5b1d6950e4f4c4bf4b4e2925138bda8595f83b5cd4f"
+                "sha256:fb4781dd9691dc4cfbc6b69f56f724286699e309d4ddc7894fed3ee77b683e2f",
+                "sha256:74094f8ad81c2ae8500d3361ac087455316a6583016f693d7e1dd1500217ceec"
             ],
-            "version": "==2024.3.0"
+            "version": "==2024.4.0"
         },
         "openvino-dev": {
             "hashes": [
-                "sha256:8a1fd3cda47daca7b99b204475997abee3cb4f8c54ba468e1af3e0c2e1192df2"
+                "sha256:7f53620feaa3b5ba7eb9eea993d24406db3d5778864407a9f0f6e38ab3732b4f"
             ],
-            "version": "==2024.3.0"
+            "version": "==2024.4.0"
         },
         "openvino-telemetry": {
             "hashes": [
