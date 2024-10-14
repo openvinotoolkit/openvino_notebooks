@@ -3,92 +3,111 @@ from typing import Callable
 import gradio as gr
 
 
-def make_demo_llava(handle_user_message: Callable, run_chatbot: Callable, clear_history: Callable):
-    title_markdown = """
-    # 🌋 LLaVA: Large Language and Vision Assistant
-    """
+from PIL import Image
+from typing import Callable
+import gradio as gr
+import requests
+from threading import Thread
+from transformers import TextIteratorStreamer
 
-    tos_markdown = """
-    ### Terms of use
-    By using this service, users are required to agree to the following terms:
-    The service is a research preview intended for non-commercial use only. It only provides limited safety measures and may generate offensive content. It must not be used for any illegal, harmful, violent, racist, or sexual purposes. The service may collect user dialogue data for future research.
-    """
-    gr.close_all()
-    with gr.Blocks(title="LLaVA") as demo:
-        gr.Markdown(title_markdown)
+example_image_urls = [
+    (
+        "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/1d6a0188-5613-418d-a1fd-4560aae1d907",
+        "bee.jpg",
+    ),
+    (
+        "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/6cc7feeb-0721-4b5d-8791-2576ed9d2863",
+        "baklava.png",
+    ),
+]
+for url, file_name in example_image_urls:
+    Image.open(requests.get(url, stream=True).raw).save(file_name)
 
-        with gr.Row():
-            with gr.Column():
-                imagebox = gr.Image(type="pil")
-                with gr.Accordion("Parameters", open=False, visible=True) as parameter_row:
-                    temperature = gr.Slider(
-                        minimum=0.0,
-                        maximum=1.0,
-                        value=0.2,
-                        step=0.1,
-                        interactive=True,
-                        label="Temperature",
-                    )
-                    top_p = gr.Slider(
-                        minimum=0.0,
-                        maximum=1.0,
-                        value=0.7,
-                        step=0.1,
-                        interactive=True,
-                        label="Top P",
-                    )
-                    max_output_tokens = gr.Slider(
-                        minimum=0,
-                        maximum=1024,
-                        value=512,
-                        step=64,
-                        interactive=True,
-                        label="Max output tokens",
-                    )
 
-            with gr.Column(scale=3):
-                with gr.Column(scale=6):
-                    chatbot = gr.Chatbot(height=400)
-                    with gr.Row():
-                        with gr.Column(scale=8):
-                            textbox = gr.Textbox(
-                                show_label=False,
-                                placeholder="Enter text and press ENTER",
-                                visible=True,
-                                container=False,
-                            )
-                        with gr.Column(scale=1, min_width=60):
-                            submit_btn = gr.Button(value="Submit", visible=True)
-                    with gr.Row(visible=True) as button_row:
-                        clear_btn = gr.Button(value="🗑️  Clear history", interactive=True)
+def make_demo_llava(model, processor):
+    def bot_streaming(message, history):
+        print(f"message is - {message}")
+        print(f"history is - {history}")
+        files = message["files"] if isinstance(message, dict) else message.files
+        message_text = message["text"] if isinstance(message, dict) else message.text
+        if files:
+            # message["files"][-1] is a Dict or just a string
+            if isinstance(files[-1], dict):
+                image = files[-1]["path"]
+            else:
+                image = files[-1] if isinstance(files[-1], (list, tuple)) else files[-1].path
+        else:
+            # if there's no image uploaded for this turn, look for images in the past turns
+            # kept inside tuples, take the last one
+            for hist in history:
+                if type(hist[0]) == tuple:
+                    image = hist[0][0]
+        try:
+            if image is None:
+                # Handle the case where image is None
+                raise gr.Error("You need to upload an image for Llama-3.2-Vision to work. Close the error and try again with an Image.")
+        except NameError:
+            # Handle the case where 'image' is not defined at all
+            raise gr.Error("You need to upload an image for Llama-3.2-Vision to work. Close the error and try again with an Image.")
 
-        gr.Markdown(tos_markdown)
+        conversation = []
+        flag = False
+        for user, assistant in history:
+            if assistant is None:
+                # pass
+                flag = True
+                conversation.extend([{"role": "user", "content": []}])
+                continue
+            if flag == True:
+                conversation[0]["content"] = [{"type": "text", "text": f"{user}"}]
+                conversation.append({"role": "assistant", "text": assistant})
+                flag = False
+                continue
+            conversation.extend([{"role": "user", "content": [{"type": "text", "text": user}]}, {"role": "assistant", "text": assistant}])
 
-        submit_event = textbox.submit(
-            fn=handle_user_message,
-            inputs=[textbox, chatbot],
-            outputs=[textbox, chatbot],
-            queue=False,
-        ).then(
-            fn=run_chatbot,
-            inputs=[imagebox, chatbot, temperature, top_p, max_output_tokens],
-            outputs=chatbot,
-            queue=True,
+        conversation.append({"role": "user", "content": [{"type": "text", "text": f"{message_text}"}, {"type": "image"}]})
+        prompt = processor.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
+        print(f"prompt is -\n{prompt}")
+        image = Image.open(image)
+        inputs = processor(text=prompt, images=image, return_tensors="pt")
+
+        streamer = TextIteratorStreamer(
+            processor,
+            **{
+                "skip_special_tokens": True,
+                "skip_prompt": True,
+                "clean_up_tokenization_spaces": False,
+            },
         )
-        # Register listeners
-        clear_btn.click(fn=clear_history, inputs=[textbox, imagebox, chatbot], outputs=[chatbot, textbox, imagebox])
-        submit_click_event = submit_btn.click(
-            fn=handle_user_message,
-            inputs=[textbox, chatbot],
-            outputs=[textbox, chatbot],
-            queue=False,
-        ).then(
-            fn=run_chatbot,
-            inputs=[imagebox, chatbot, temperature, top_p, max_output_tokens],
-            outputs=chatbot,
-            queue=True,
+        generation_kwargs = dict(
+            inputs,
+            streamer=streamer,
+            max_new_tokens=1024,
+            do_sample=False,
+            temperature=0.0,
+            eos_token_id=processor.tokenizer.eos_token_id,
         )
+
+        thread = Thread(target=model.generate, kwargs=generation_kwargs)
+        thread.start()
+
+        buffer = ""
+        for new_text in streamer:
+            buffer += new_text
+            yield buffer
+    
+    demo = gr.ChatInterface(
+        fn=bot_streaming,
+        title="LLaVA OpenVINO Chatbot",
+        examples=[
+            {"text": "What is on the flower?", "files": ["./bee.jpg"]},
+            {"text": "How to make this pastry?", "files": ["./baklava.png"]},
+        ],
+        stop_btn=None,
+        multimodal=True,
+    )
     return demo
+
 
 
 def make_demo_videollava(fn: Callable):
