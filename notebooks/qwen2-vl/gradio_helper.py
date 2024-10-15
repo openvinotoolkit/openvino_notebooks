@@ -78,7 +78,7 @@ def make_demo(model, processor):
         inputs = processor(text=[text], images=image_inputs, videos=video_inputs, padding=True, return_tensors="pt").to(model.device)
 
         tokenizer = processor.tokenizer
-        streamer = TextIteratorStreamer(tokenizer, timeout=20.0, skip_prompt=True, skip_special_tokens=True)
+        streamer = TextIteratorStreamer(tokenizer, timeout=3600.0, skip_prompt=True, skip_special_tokens=True)
 
         gen_kwargs = {"max_new_tokens": 512, "streamer": streamer, **inputs}
 
