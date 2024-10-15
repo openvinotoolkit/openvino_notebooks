@@ -560,6 +560,10 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/stable-fast-3d/stable-fast-3d.ipynb
+  skips:
+    - os:
+        - macos-12
 - notebook: notebooks/mllama-3.2/mllama-3.2.ipynb
   skips:
     - os:
