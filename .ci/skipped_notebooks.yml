@@ -477,10 +477,6 @@
   skips:
     - os:
         - macos-12
-- notebook: notebooks/triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb
-  skips:
-    - os:
-        - macos-12
 - notebook: notebooks/nano-llava-multimodal-chatbot/nano-llava-multimodal-chatbot.ipynb
   skips:
     - os:
