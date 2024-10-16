@@ -681,6 +681,7 @@ px
 py
 pyannote
 pymodule
+pynim
 PyPI
 Pythia
 pytorch
