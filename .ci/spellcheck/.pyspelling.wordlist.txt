@@ -16,6 +16,9 @@ Agentic
 agentic
 ai
 al
+AISE
+AISEClassification
+AISEDetection
 Alibaba
 ALiBi
 AlpacaEval
@@ -76,6 +79,7 @@ bilinear
 biometrics
 BiT
 blockwise
+BLACKBOX
 boolean
 CentOS
 CFG
@@ -390,6 +394,7 @@ Kaiming
 Kalman
 kbps
 KD
+KDE
 keras
 KerasCV
 keypoint
@@ -531,6 +536,7 @@ Nemo
 NEOX
 NER
 NETP
+Netron
 NeuSpell
 NeXT
 NLP
@@ -971,6 +977,7 @@ WavLM
 WebGL
 WebUI
 WER
+WHITEBOX
 WIKISQL
 wikipedia
 WikiTable

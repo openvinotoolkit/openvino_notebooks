@@ -25,22 +25,25 @@ Example: Saliency map for `flat-coated retriever` class for MobileNetV3 classifi
 
 The tutorial consists of the following steps:
 
-- Run explainer in Auto-mode
+- Run `Explainer` in `AUTO` mode
 - Specify preprocess and postprocess functions
-- Run explainer in White-box mode
-  - Insert XAI branch to use updated model in own pipelines
-- Run explainer in Black-box mode
+- Run `Explainer` in `WHITEBOX` mode
+  - Insert XAI branch to IR or PyTorch model to use updated model in own pipelines
+- Run `Explainer` in `BLACKBOX` mode
 - Advanced: add label names and use them to save saliency maps instead of label indexes
 
-These are explainable AI algorithms supported by OpenVINO XAI :
+These are explainable AI algorithms supported by OpenVINO XAI:
 
 | Domain          | Task                 | Type      | Algorithm           | Links |
 |-----------------|----------------------|-----------|---------------------|-------|
-| Computer Vision | Image Classification | White-Box | ReciproCAM          | [arxiv](https://arxiv.org/abs/2209.14074) / [src](https://github.com/openvinotoolkit/openvino_xai/blob/releases/1.0.0/openvino_xai/methods/white_box/recipro_cam.py) |
-|                 |                      |           | VITReciproCAM  (for transformer models)     | [arxiv](https://arxiv.org/abs/2310.02588) / [src](https://github.com/openvinotoolkit/openvino_xai/blob/releases/1.0.0/openvino_xai/methods/white_box/recipro_cam.py) |
-|                 |                      |           | ActivationMap       | experimental / [src](https://github.com/openvinotoolkit/openvino_xai/blob/releases/1.0.0/openvino_xai/methods/white_box/activation_map.py) |
-|                   |                    | Black-Box | RISE                | [arxiv](https://arxiv.org/abs/1806.07421v3) / [src](https://github.com/openvinotoolkit/openvino_xai/blob/releases/1.0.0/openvino_xai/methods/black_box/rise.py) |
-|                 | Object Detection     |           | ClassProbabilityMap | experimental / [src](https://github.com/openvinotoolkit/openvino_xai/blob/releases/1.0.0/openvino_xai/methods/white_box/det_class_probability_map.py) |
+| Computer Vision | Image Classification | White-Box | ReciproCAM          | [arxiv](https://arxiv.org/abs/2209.14074) / [src](https://github.com/openvinotoolkit/openvino_xai/blob/develop/openvino_xai/methods/white_box/recipro_cam.py) |
+|                 |                      |           | VITReciproCAM       | [arxiv](https://arxiv.org/abs/2310.02588) / [src](https://github.com/openvinotoolkit/openvino_xai/blob/develop/openvino_xai/methods/white_box/recipro_cam.py) |
+|                 |                      |           | ActivationMap       | experimental / [src](https://github.com/openvinotoolkit/openvino_xai/blob/develop/openvino_xai/methods/white_box/activation_map.py)                           |
+|                 |                      | Black-Box | AISEClassification  | [src](https://github.com/openvinotoolkit/openvino_xai/blob/develop/openvino_xai/methods/black_box/aise/classification.py)                                     |
+|                 |                      |           | RISE                | [arxiv](https://arxiv.org/abs/1806.07421v3) / [src](https://github.com/openvinotoolkit/openvino_xai/blob/develop/openvino_xai/methods/black_box/rise.py)      |
+|                 | Object Detection     | White-Box | ClassProbabilityMap | experimental / [src](https://github.com/openvinotoolkit/openvino_xai/blob/develop/openvino_xai/methods/white_box/det_class_probability_map.py)                |
+|                 |                      | Black-Box | AISEDetection       | [src](https://github.com/openvinotoolkit/openvino_xai/blob/develop/openvino_xai/methods/black_box/aise/detection.py)                                          |
+
 
 ### Installation Instructions
 
