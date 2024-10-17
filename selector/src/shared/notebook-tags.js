@@ -19,6 +19,7 @@ export const TASKS = /** @type {const} */ ({
     TEXT_TO_AUDIO: 'Text-to-Audio',
     TEXT_TO_SPEECH: 'Text-to-Speech',
     AUDIO_TO_TEXT: 'Audio-to-Text',
+    AUDIO_TO_VIDEO: 'Audio-to-Video',
     VISUAL_QUESTION_ANSWERING: 'Visual Question Answering',
     IMAGE_CAPTIONING: 'Image Captioning',
     FEATURE_EXTRACTION: 'Feature Extraction',
@@ -27,6 +28,7 @@ export const TASKS = /** @type {const} */ ({
     TEXT_TO_VIDEO_RETRIEVAL: 'Text-to-Video Retrieval',
     IMAGE_TO_3D: 'Image-to-3D',
     IMAGE_TO_VIDEO: 'Image-to-Video',
+    LIP_SYNC: 'Lip-Sync'
   },
   CV: {
     IMAGE_CLASSIFICATION: 'Image Classification',

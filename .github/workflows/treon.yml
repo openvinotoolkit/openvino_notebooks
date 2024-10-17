@@ -25,18 +25,19 @@ jobs:
       fail-fast: false
       matrix:
         runs_on: [ubuntu-20.04, ubuntu-22.04, windows-2019, macos-12]
-        python: ['3.8', '3.9', '3.10', '3.11']
+        python: ['3.9', '3.10', '3.11', '3.12']
     uses: ./.github/workflows/build_treon_reusable.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
 
   build_treon_gpu:
+    if: ${{ false }} # TODO Enable when GPU runners will be available in GitHub Actions
     strategy:
       fail-fast: false
       matrix:
         runs_on: ['gpu']
-        python: ['3.8', '3.9', '3.10', '3.11']
+        python: ['3.9', '3.10', '3.11', '3.12']
         container: ['ubuntu:20.04', 'ubuntu:22.04'] # Windows and macOS are not available in machine pool with GPU
     uses: ./.github/workflows/build_treon_reusable.yml
     with:
@@ -54,7 +55,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
         with:
-          python-version: '3.8'
+          python-version: '3.9'
       - name: Collect artifacts with reports
         uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
         with:

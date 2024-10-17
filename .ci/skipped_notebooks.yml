@@ -64,11 +64,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/yolov7-optimization/yolov7-optimization.ipynb
-  skips:
-    - os:
-        - ubuntu-20.04
-        - ubuntu-22.04
 - notebook: notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb
   skips:
     - os:
@@ -363,8 +358,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-    - python:
-        - '3.8'
 - notebook: notebooks/kosmos2-multimodal-large-language-model/kosmos2-multimodal-large-language-model.ipynb
   skips:
     - os:
@@ -484,10 +477,6 @@
   skips:
     - os:
         - macos-12
-- notebook: notebooks/triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb
-  skips:
-    - os:
-        - macos-12
 - notebook: notebooks/nano-llava-multimodal-chatbot/nano-llava-multimodal-chatbot.ipynb
   skips:
     - os:
@@ -496,14 +485,6 @@
   skips:
     - os:
         - windows-2019
-- notebook: notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb
-  skips:
-    - python:
-        - '3.8'
-- notebook: notebooks/speechbrain-emotion-recognition/speechbrain-emotion-recognition.ipynb
-  skips:
-    - python:
-        - '3.8'
 - notebook: notebooks/s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb
   skips:
     - device:
@@ -520,17 +501,14 @@
 - notebook: notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb
   skips:
     - python:
-        - '3.8'
         - '3.9'
 - notebook: notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb
   skips:
     - python:
-        - '3.8'
         - '3.9'
 - notebook: notebooks/explainable-ai-3-map-interpretation/explainable-ai-3-map-interpretation.ipynb
   skips:
     - python:
-        - '3.8'
         - '3.9'
 - notebook: notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
   skips:
@@ -541,21 +519,13 @@
         - windows-2019
 - notebook: notebooks/stable-audio/stable-audio.ipynb
   skips:
-    - python:
-        - '3.8'
     - os:
         - macos-12
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb
-  skips:
-    - python:
-      - '3.8'
 - notebook: notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb
   skips:
-    - python:
-        - '3.8'
     - os:
       - macos-12
 - notebook: notebooks/phi-3-vision/phi-3-vision.ipynb
@@ -565,3 +535,58 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/internvl2/internvl2.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/qwen2-vl/qwen2-vl.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/qwen2-audio/qwen2-audio.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/stable-fast-3d/stable-fast-3d.ipynb
+  skips:
+    - os:
+        - macos-12
+- notebook: notebooks/mllama-3.2/mllama-3.2.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/sam2-image-segmentation/segment-anything-2-image.ipynb
+  skips:
+    - python:
+        - '3.9'
+    - os:
+        - macos-12
+- notebook: notebooks/sam2-video-segmentation/segment-anything-2-video.ipynb
+  skips:
+    - python:
+        - '3.9'
+    - os:
+        - macos-12
+- notebook: notebooks/pixtral/pixtral.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/llm-agent-react/llm-agent-react.ipynb
+  skips:
+    - os:
+        - macos-12

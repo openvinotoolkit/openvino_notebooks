@@ -58,13 +58,22 @@ def phi_completion_to_prompt(completion):
     return f"<|system|><|end|><|user|>{completion}<|end|><|assistant|>\n"
 
 
+def llama3_completion_to_prompt(completion):
+    return f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{completion}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+
+
+def qwen_completion_to_prompt(completion):
+    return f"<|im_start|>system\n<|im_end|>\n<|im_start|>user\n{completion}<|im_end|>\n<|im_start|>assistant\n"
+
+
 SUPPORTED_LLM_MODELS = {
     "English": {
-        "qwen2-0.5b-instruct": {
-            "model_id": "Qwen/Qwen2-0.5B-Instruct",
+        "qwen2.5-0.5b-instruct": {
+            "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "tiny-llama-1b-chat": {
             "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
@@ -80,14 +89,64 @@ SUPPORTED_LLM_MODELS = {
             Answer: </s>
             <|assistant|>""",
         },
-        "qwen2-1.5b-instruct": {
-            "model_id": "Qwen/Qwen2-1.5B-Instruct",
+        "llama-3.2-1b-instruct": {
+            "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|eot_id|>"],
+            "has_chat_template": True,
+            "start_message": " <|start_header_id|>system<|end_header_id|>\n\n" + DEFAULT_SYSTEM_PROMPT + "<|eot_id|>",
+            "history_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>",
+            "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
+            "rag_prompt_template": f"<|start_header_id|>system<|end_header_id|>\n\n{DEFAULT_RAG_PROMPT}<|eot_id|>"
+            + """<|start_header_id|>user<|end_header_id|>
+            
+            
+            Question: {input}
+            Context: {context}
+            Answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+            
+            """,
+            "completion_to_prompt": llama3_completion_to_prompt,
+        },
+        "llama-3.2-3b-instruct": {
+            "model_id": "meta-llama/Llama-3.2-3B-Instruct",
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|eot_id|>"],
+            "has_chat_template": True,
+            "start_message": " <|start_header_id|>system<|end_header_id|>\n\n" + DEFAULT_SYSTEM_PROMPT + "<|eot_id|>",
+            "history_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>",
+            "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
+            "rag_prompt_template": f"<|start_header_id|>system<|end_header_id|>\n\n{DEFAULT_RAG_PROMPT}<|eot_id|>"
+            + """<|start_header_id|>user<|end_header_id|>
+            
+            
+            Question: {input}
+            Context: {context}
+            Answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+            
+            """,
+            "completion_to_prompt": llama3_completion_to_prompt,
+        },
+        "qwen2.5-1.5b-instruct": {
+            "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "gemma-2b-it": {
             "model_id": "google/gemma-2b-it",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
+            "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
+            "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""
+            + """<start_of_turn>user{input}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model""",
+        },
+        "gemma-2-2b-it": {
+            "model_id": "google/gemma-2-2b-it",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
             "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
@@ -109,8 +168,8 @@ SUPPORTED_LLM_MODELS = {
             Context: {context} 
             Answer: <bot>""",
         },
-        "qwen2-7b-instruct": {
-            "model_id": "Qwen/Qwen2-7B-Instruct",
+        "qwen2.5-3b-instruct": {
+            "model_id": "Qwen/Qwen2.5-3B-Instruct",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
             "rag_prompt_template": f"""<|im_start|>system
@@ -122,9 +181,34 @@ SUPPORTED_LLM_MODELS = {
             Answer: <|im_end|>
             <|im_start|>assistant
             """,
+            "completion_to_prompt": qwen_completion_to_prompt,
+        },
+        "qwen2.5-7b-instruct": {
+            "model_id": "Qwen/Qwen2.5-7B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT }<|im_end|>"""
+            + """
+            <|im_start|>user
+            Question: {input} 
+            Context: {context} 
+            Answer: <|im_end|>
+            <|im_start|>assistant
+            """,
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "gemma-7b-it": {
             "model_id": "google/gemma-7b-it",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
+            "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
+            "current_message_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}",
+            "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT},"""
+            + """<start_of_turn>user{input}<end_of_turn><start_of_turn>context{context}<end_of_turn><start_of_turn>model""",
+        },
+        "gemma-2-9b-it": {
+            "model_id": "google/gemma-2-9b-it",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
             "history_template": "<start_of_turn>user{user}<end_of_turn><start_of_turn>model{assistant}<end_of_turn>",
@@ -165,6 +249,7 @@ SUPPORTED_LLM_MODELS = {
 
             
             """,
+            "completion_to_prompt": llama3_completion_to_prompt,
         },
         "llama-3.1-8b-instruct": {
             "model_id": "meta-llama/Meta-Llama-3.1-8B-Instruct",
@@ -185,6 +270,7 @@ SUPPORTED_LLM_MODELS = {
 
             
             """,
+            "completion_to_prompt": llama3_completion_to_prompt,
         },
         "mistral-7b-instruct": {
             "model_id": "mistralai/Mistral-7B-Instruct-v0.1",
@@ -258,22 +344,62 @@ SUPPORTED_LLM_MODELS = {
             <|assistant|>""",
             "completion_to_prompt": phi_completion_to_prompt,
         },
+        "phi-3.5-mini-instruct": {
+            "model_id": "microsoft/Phi-3.5-mini-instruct",
+            "remote_code": True,
+            "start_message": "<|system|>\n{DEFAULT_SYSTEM_PROMPT}<|end|>\n",
+            "history_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}<|end|>\n",
+            "current_message_template": "<|user|>\n{user}<|end|> \n<|assistant|>\n{assistant}",
+            "stop_tokens": ["<|end|>"],
+            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }<|end|>"""
+            + """
+            <|user|>
+            Question: {input} 
+            Context: {context} 
+            Answer: <|end|>
+            <|assistant|>""",
+            "completion_to_prompt": phi_completion_to_prompt,
+        },
+        "qwen2.5-14b-instruct": {
+            "model_id": "Qwen/Qwen2.5-14B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT + ", ",
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT }<|im_end|>"""
+            + """
+            <|im_start|>user
+            Question: {input} 
+            Context: {context} 
+            Answer: <|im_end|>
+            <|im_start|>assistant
+            """,
+            "completion_to_prompt": qwen_completion_to_prompt,
+        },
     },
     "Chinese": {
-        "qwen2-0.5b-instruct": {
-            "model_id": "Qwen/Qwen2-0.5B-Instruct",
+        "qwen2.5-0.5b-instruct": {
+            "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
-        "qwen2-1.5b-instruct": {
-            "model_id": "Qwen/Qwen2-1.5B-Instruct",
+        "qwen2.5-1.5b-instruct": {
+            "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
-        "qwen2-7b-instruct": {
-            "model_id": "Qwen/Qwen2-7B-Instruct",
+        "qwen2.5-3b-instruct": {
+            "model_id": "Qwen/Qwen2.5-3B-Instruct",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+        },
+        "qwen2.5-7b-instruct": {
+            "model_id": "Qwen/Qwen2.5-7B-Instruct",
             "remote_code": False,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
@@ -286,6 +412,23 @@ SUPPORTED_LLM_MODELS = {
             回答: <|im_end|>
             <|im_start|>assistant
             """,
+            "completion_to_prompt": qwen_completion_to_prompt,
+        },
+        "qwen2.5-14b-instruct": {
+            "model_id": "Qwen/Qwen2.5-14B-Instruct",
+            "remote_code": False,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "rag_prompt_template": f"""<|im_start|>system
+            {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
+            + """
+            <|im_start|>user
+            问题: {input} 
+            已知内容: {context} 
+            回答: <|im_end|>
+            <|im_start|>assistant
+            """,
+            "completion_to_prompt": qwen_completion_to_prompt,
         },
         "qwen-7b-chat": {
             "model_id": "Qwen/Qwen-7B-Chat",
@@ -479,11 +622,18 @@ compression_configs = {
         "ratio": 0.72,
     },
     "qwen-7b-chat": {"sym": True, "group_size": 128, "ratio": 0.6},
+    "qwen2.5-7b-instruct": {"sym": True, "group_size": 128, "ratio": 1.0},
+    "qwen2.5-3b-instruct": {"sym": True, "group_size": 128, "ratio": 1.0},
+    "qwen2.5-14b-instruct": {"sym": True, "group_size": 128, "ratio": 1.0},
+    "qwen2.5-1.5b-instruct": {"sym": True, "group_size": 128, "ratio": 1.0},
+    "qwen2.5-0.5b-instruct": {"sym": True, "group_size": 128, "ratio": 1.0},
     "red-pajama-3b-chat": {
         "sym": False,
         "group_size": 128,
         "ratio": 0.5,
     },
+    "llama-3.2-3b-instruct": {"sym": False, "group_size": 64, "ratio": 1.0, "dataset": "wikitext2", "awq": True, "all_layers": True, "scale_estimation": True},
+    "llama-3.2-1b-instruct": {"sym": False, "group_size": 64, "ratio": 1.0, "dataset": "wikitext2", "awq": True, "all_layers": True, "scale_estimation": True},
     "default": {
         "sym": False,
         "group_size": 128,
@@ -499,8 +649,12 @@ def get_optimum_cli_command(model_id, weight_format, output_dir, compression_opt
         compression_args = " --group-size {} --ratio {}".format(compression_options["group_size"], compression_options["ratio"])
         if compression_options["sym"]:
             compression_args += " --sym"
-        if enable_awq:
+        if enable_awq or compression_options.get("awq", False):
             compression_args += " --awq --dataset wikitext2 --num-samples 128"
+            if compression_options.get("scale_estimation", False):
+                compression_args += " --scale-estimation"
+        if compression_options.get("all_layers", False):
+            compression_args += " --all-layers"
 
         command = command + compression_args
     if trust_remote_code:
@@ -575,7 +729,7 @@ def convert_tokenizer(model_id, remote_code, model_dir):
 def convert_and_compress_model(model_id, model_config, precision, use_preconverted=True):
     from pathlib import Path
     from IPython.display import Markdown, display
-    import subprocess
+    import subprocess  # nosec - disable B404:import-subprocess check
     import platform
 
     pt_model_id = model_config["model_id"]

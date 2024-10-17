@@ -68,13 +68,13 @@ OpenVINO™ Notebooks需要预装Python和Git， 针对不同操作系统的安�
 
 | 支持的操作系统                                              | [Python Version (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- |:---------------------------------------------------|
-| Ubuntu 20.04 LTS, 64-bit                                   | 3.8 - 3.11                                         |
-| Ubuntu 22.04 LTS, 64-bit                                   | 3.8 - 3.11                                         |
-| Red Hat Enterprise Linux 8, 64-bit                         | 3.8 - 3.11                                         |
-| CentOS 7, 64-bit                                           | 3.8 - 3.11                                         |
-| macOS 10.15.x versions or higher                           | 3.8 - 3.11                                         |
-| Windows 10, 64-bit Pro, Enterprise or Education editions   | 3.8 - 3.11                                         |
-| Windows Server 2016 or higher                              | 3.8 - 3.11                                         |
+| Ubuntu 20.04 LTS, 64-bit                                   | 3.9 - 3.12                                         |
+| Ubuntu 22.04 LTS, 64-bit                                   | 3.9 - 3.12                                         |
+| Red Hat Enterprise Linux 8, 64-bit                         | 3.9 - 3.12                                         |
+| CentOS 7, 64-bit                                           | 3.9 - 3.12                                         |
+| macOS 10.15.x versions or higher                           | 3.9 - 3.12                                         |
+| Windows 10, 64-bit Pro, Enterprise or Education editions   | 3.9 - 3.12                                         |
+| Windows Server 2016 or higher                              | 3.9 - 3.12                                         |
 
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)

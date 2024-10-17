@@ -1,3 +1,4 @@
+import json
 import gradio as gr
 from typing import Callable
 
@@ -25,6 +26,18 @@ example_schema = """{
         "Licence": ""
     }
 }"""
+
+
+def handle_errors(fn: Callable):
+    def wrapped_fn(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except json.JSONDecodeError as e:
+            raise gr.Error(f"Invalid JSON Schema: {e}", duration=None)
+        except Exception as e:
+            raise gr.Error(e, duration=None)
+
+    return wrapped_fn
 
 
 def make_demo(fn: Callable):
@@ -57,8 +70,8 @@ def make_demo(fn: Callable):
             gr.Examples(examples=[[example_text, example_schema]], inputs=[text_textbox, schema_textbox])
 
         submit_button.click(
-            fn,
-            [text_textbox, schema_textbox],
-            [model_output_textbox],
+            fn=handle_errors(fn),
+            inputs=[text_textbox, schema_textbox],
+            outputs=[model_output_textbox],
         )
     return demo

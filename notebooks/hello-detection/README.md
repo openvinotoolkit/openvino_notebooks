@@ -12,7 +12,7 @@ This notebook demonstrates how to do inference with detection model.
 
 ## Notebook Contents
 
-In this basic introduction to detection with OpenVINO, the [horizontal-text-detection-0001](https://docs.openvino.ai/2024/omz_models_model_horizontal_text_detection_0001.html) model from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/) is used. It detects text in images and returns blob of data in shape of `[100, 5]`. For each detection, a description is in the `[x_min, y_min, x_max, y_max, conf]` format.
+In this basic introduction to detection with OpenVINO, the [horizontal-text-detection-0001](https://github.com/openvinotoolkit/open_model_zoo/blob/master/models/intel/horizontal-text-detection-0001/README.md) model from [Open Model Zoo](https://github.com/openvinotoolkit/open_model_zoo/) is used. It detects text in images and returns blob of data in shape of `[100, 5]`. For each detection, a description is in the `[x_min, y_min, x_max, y_max, conf]` format.
 
 ## Installation Instructions
 
