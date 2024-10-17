@@ -5,11 +5,11 @@ Virtual try-on methods based on diffusion models achieve realistic try-on effect
 It facilitates the seamless transfer of in-shop or worn garments of arbitrary categories to target persons by simply
 concatenating them in spatial dimensions as inputs. The efficiency of the model is demonstrated in three aspects: 
  1. Lightweight network. Only the original diffusion modules are used, without additional network modules. The text encoder and cross attentions for text injection in the backbone are removed, further reducing the parameters by 167.02M.
- 2. Parameter-efficient training. We identified the try-on relevant modules through experiments and achieved highquality try-on effects by training only 49.57M parameters (∼5.51% of the backbone network’s parameters). 
+ 2. Parameter-efficient training. We identified the try-on relevant modules through experiments and achieved high-quality try-on effects by training only 49.57M parameters (∼5.51% of the backbone network’s parameters). 
  3. Simplified inference. CatVTON eliminates all unnecessary conditions and preprocessing steps, including pose estimation, human parsing, and text input, requiring only garment reference, target person image, and mask for the virtual try-on process. Extensive experiments demonstrate that CatVTON achieves superior qualitative and quantitative results with fewer prerequisites and trainable parameters than baseline methods. Furthermore, CatVTON shows good generalization in in-the-wild scenarios despite using open-source datasets with only 73K samples.
 
 
-Teaser image from [CatVTON github](https://github.com/Zheng-Chong/CatVTON)
+Teaser image from [CatVTON GitHub](https://github.com/Zheng-Chong/CatVTON)
 ![teaser](https://github.com/Zheng-Chong/CatVTON/blob/edited/resource/img/teaser.jpg?raw=true)
 
 In this tutorial we consider how to convert, optimize and run this model using OpenVINO.
