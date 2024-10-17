@@ -4,13 +4,13 @@ from huggingface_hub import snapshot_download
 import torch
 from PIL import Image
 
+
 def download_original_model(model_id, model_local_dir):
     if not model_local_dir.exists():
         snapshot_download(repo_id=model_id, local_dir=model_local_dir)
 
     modeling_file = model_local_dir / "modeling_llava_qwen2.py"
     orig_modeling_file = model_local_dir / f"orig_{modeling_file.name}"
-
 
     # model code depends from flash_attn package that may be problematic to load. Patch model code for avoiding import of this package
     if not orig_modeling_file.exists():
@@ -34,7 +34,7 @@ def converted_model_exists(model_dir):
     for file_name in ["openvino_language_model.xml", "openvino_text_embeddings_model.xml", "openvino_vision_embeddings_model.xml"]:
         if not (Path(model_dir) / file_name).exists() or not (Path(model_dir) / file_name.replace(".bin")).exists():
             return False
-    
+
     return True
 
 
@@ -44,12 +44,11 @@ def copy_model_files(src_dir, dst_dir, ignore_llm=True, ignore_vision_encoder=Tr
         ignore_files.extend(["openvino_language_model.xml", "openvino_language_model.bin"])
     if ignore_vision_encoder:
         ignore_files.extend(["openvino_vision_embeddings_model.xml", "openvino_vision_embeddings_model.bin"])
-    
+
     for file_name in src_dir.glob("*"):
         if file_name.name in ignore_files:
             continue
         shutil.copy(file_name, dst_dir)
-
 
 
 def expand2square(pil_img, background_color):
@@ -86,5 +85,3 @@ def process_text_input(text, tokenizer):
     input_ids = torch.tensor(text_chunks[0] + [-200] + text_chunks[1], dtype=torch.long).unsqueeze(0)
     attention_mask = torch.ones_like(input_ids, dtype=torch.int64)
     return input_ids, attention_mask
-
-
