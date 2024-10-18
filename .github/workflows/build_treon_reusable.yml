@@ -76,16 +76,20 @@ jobs:
         uses: xom9ikk/dotenv@ac290ca23a42155a0cba1031d23afa46240116a9 # v2.3.0
         with:
           path: ./.github/workflows
-
+      # Packages that notebooks need to run in plain os
       - name: Install required packages
         if: ${{ !inputs.container }}
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt-get update -y
-            sudo apt-get install libsndfile1 -y
+            sudo apt-get install libsndfile1 ffmpeg -y
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install ffmpeg
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            choco install ffmpeg-full
           fi
-
+      # Packages that notebooks need to run in docker container
       - name: Install required packages (container)
         if: ${{ inputs.container }}
         shell: bash
@@ -95,7 +99,7 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             apt-get update -y
-            apt-get install git curl wget libsndfile1 libssl-dev unzip libsqlite3-dev libedit-dev libgl1 libgl1-mesa-glx libglib2.0-0 tk -y
+            apt-get install git curl wget libsndfile1 libssl-dev unzip libsqlite3-dev libedit-dev libgl1 libgl1-mesa-glx libglib2.0-0 ffmpeg tk -y
             wget https://raw.githubusercontent.com/openvinotoolkit/openvino/master/scripts/install_dependencies/install_openvino_dependencies.sh
             chmod +x ./install_openvino_dependencies.sh
             ./install_openvino_dependencies.sh -c=core -c=dev -c=gpu -y
