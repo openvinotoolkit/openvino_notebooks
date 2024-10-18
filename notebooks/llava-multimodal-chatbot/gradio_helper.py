@@ -8,8 +8,9 @@ from typing import Callable
 import numpy as np
 import requests
 from threading import Event, Thread
-from transformers import TextIteratorStreamer
 from queue import Queue
+
+is_gradio_5 = int(gr.__version__.split(".")[0]) > 4
 
 example_image_urls = [
     (
@@ -92,7 +93,7 @@ def make_demo_llava(model):
 
         def generate_and_signal_complete():
             """
-            genration function for single thread
+            generation function for single thread
             """
             streamer.reset()
             generation_kwargs = {"prompt": message_text, "generation_config": generation_config, "streamer": streamer}
@@ -110,6 +111,9 @@ def make_demo_llava(model):
             buffer += new_text
             yield buffer
 
+    additional_buttons = {}
+    if not is_gradio_5:
+        additional_buttons = {"undo_button": None, "retry_button": None}
     demo = gr.ChatInterface(
         fn=bot_streaming,
         title="LLaVA OpenVINO Chatbot",
@@ -118,9 +122,8 @@ def make_demo_llava(model):
             {"text": "How to make this pastry?", "files": ["./baklava.png"]},
         ],
         stop_btn=None,
-        undo_btn=None,
-        retry_btn=None,
         multimodal=True,
+        **additional_buttons,
     )
     return demo
 
