@@ -28,20 +28,20 @@ for url, file_name in example_image_urls:
 def make_demo_llava(model):
     import openvino_genai
     import openvino as ov
-    
+
     def read_image(path: str) -> ov.Tensor:
-        '''
+        """
 
         Args:
             path: The path to the image.
 
         Returns: the ov.Tensor containing the image.
 
-        '''
+        """
         pic = Image.open(path).convert("RGB")
         image_data = np.array(pic.getdata()).reshape(1, 3, pic.size[1], pic.size[0]).astype(np.byte)
         return ov.Tensor(image_data)
-    
+
     class TextQueue:
         def __init__(self) -> None:
             self.text_queue = Queue()
@@ -66,20 +66,18 @@ def make_demo_llava(model):
 
         def end(self):
             self.text_queue.put(self.stop_signal)
-    
-    
 
     def bot_streaming(message, history):
         print(f"message is - {message}")
         print(f"history is - {history}")
-        
+
         if not history:
             model.start_chat()
         generation_config = openvino_genai.GenerationConfig()
         generation_config.max_new_tokens = 128
         files = message["files"] if isinstance(message, dict) else message.files
         message_text = message["text"] if isinstance(message, dict) else message.text
-        
+
         image = None
         if files:
             # message["files"][-1] is a Dict or just a string
@@ -97,11 +95,7 @@ def make_demo_llava(model):
             genration function for single thread
             """
             streamer.reset()
-            generation_kwargs = {
-                "prompt": message_text,
-                "generation_config": generation_config,
-                "streamer": streamer
-            }
+            generation_kwargs = {"prompt": message_text, "generation_config": generation_config, "streamer": streamer}
             if image is not None:
                 generation_kwargs["image"] = image
             model.generate(**generation_kwargs)
@@ -115,7 +109,7 @@ def make_demo_llava(model):
         for new_text in streamer:
             buffer += new_text
             yield buffer
-    
+
     demo = gr.ChatInterface(
         fn=bot_streaming,
         title="LLaVA OpenVINO Chatbot",
@@ -129,7 +123,6 @@ def make_demo_llava(model):
         multimodal=True,
     )
     return demo
-
 
 
 def make_demo_videollava(fn: Callable):
