@@ -122,7 +122,6 @@ def make_demo(pipeline, mask_processor, automasker, output_dir):
                         )
 
                 submit = gr.Button("Submit")
-                gr.Markdown('<center><span style="color: #FF0000">!!! Click only Once, Wait for Delay !!!</span></center>')
 
                 gr.Markdown(
                     '<span style="color: #808080; font-size: small;">Advanced options can adjust details:<br>1. `Inference Step` may enhance details;<br>2. `CFG` is highly correlated with saturation;<br>3. `Random seed` may improve pseudo-shadow.</span>'
