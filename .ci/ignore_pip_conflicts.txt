@@ -6,9 +6,6 @@ notebooks/yolov8-optimization/yolov8-object-detection.ipynb  # ultralytics==8.0.
 notebooks/yolov8-optimization/yolov8-obb.ipynb  # ultralytics==8.1.24
 notebooks/llm-chatbot/llm-chatbot.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
 notebooks/llm-rag-langchain/llm-rag-langchain.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
-notebooks/bark-text-to-audio/bark-text-to-audio.ipynb  # torch==1.13
-notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb # transformers<4.35
-notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb # transformers<4.35
 notebooks/paint-by-example/paint-by-example.ipynb # gradio==3.44.1
 notebooks/mobilevlm-language-assistant/mobilevlm-language-assistant.ipynb # transformers<4.35
 notebooks/depth-anything/depth-anything.ipynb # install requirements.txt after clone repo
@@ -22,6 +19,5 @@ notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-back
 notebooks/sketch-to-image-pix2pix-turbo/sketch-to-image-pix2pix-turbo.ipynb
 notebooks/yolov10-optimization/yolov10-optimization.ipynb # nncf from git
 notebooks/person-counting-webcam/person-counting.ipynb # numpy should be installed first
-notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb # torchvision < 0.17.0
 notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb # torch >= 2.2
 notebooks/stable-diffusion-v3/stable-diffusion-v3.ipynb # diffusers from git

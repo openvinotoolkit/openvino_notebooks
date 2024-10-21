@@ -10,30 +10,14 @@ While LLaVA excels at image-based tasks, Video-LLaVA expands this fluency to the
 
 In the field of artificial intelligence, the goal is to create a versatile assistant capable of understanding and executing tasks based on both visual and language inputs. Current approaches often rely on large vision models that solve tasks independently, with language only used to describe image content. While effective, these models have fixed interfaces with limited interactivity and adaptability to user instructions. On the other hand, large language models (LLMs) have shown promise as a universal interface for general-purpose assistants. By explicitly representing various task instructions in language, these models can be guided to switch and solve different tasks. To extend this capability to the multimodal domain, the [LLaVA paper](https://arxiv.org/abs/2304.08485) introduces  `visual instruction-tuning`, a novel approach to building a general-purpose visual assistant. 
 
-In this tutorial series we consider how to use LLaVA and Video-LLaVA model to build multimodal chatbot with OpenVINO help.
+In this tutorial series we consider how to use LLaVA model to build multimodal chatbot with OpenVINO help.
 
-## LLaVA
-### Notebook contents
-The tutorial consists from following steps:
+## Visual-language assistant with LLaVA and OpenVINO Generative API
+This [notebook](./llava-multimodal-chatbot-genai.ipynb) demonstrate how to effectively build Visual-Language assistant using [OpenVINO Generative API](https://github.com/openvinotoolkit/openvino.genai).
 
-- Install prerequisites
-- Prepare input processor and tokenizer
-- Download original model
-- Compress model weights to 4 and 8 bits using NNCF
-- Convert model to OpenVINO Intermediate Representation (IR) format
-- Prepare OpenVINO-based inference pipeline
-- Run OpenVINO model
+## Visual-language assistant with LLaVA and Optimum Intel OpenVINO integration
+This [notebook](./llava-multimodal-chatbot-optimum.ipynb) demonstrate how to effectively build Visual-Language assistant using [Optimum Intel](https://huggingface.co/docs/optimum/main/intel/index) OpenVINO integration.
 
-## Video-LLaVA
-### Notebook contents
-The tutorial consists from following steps:
-
-- Install prerequisites
-- Download original model
-- Compress model weights to 4 and 8 bits using NNCF
-- Convert model to OpenVINO Intermediate Representation (IR) format
-- Prepare OpenVINO-based inference pipeline
-- Run OpenVINO model
 
 ## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>
