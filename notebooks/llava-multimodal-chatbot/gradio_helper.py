@@ -208,6 +208,7 @@ def make_demo_llava_optimum(model, processor):
         for new_text in streamer:
             buffer += new_text
             yield buffer
+
     additional_buttons = {}
     if has_additonal_buttons:
         additional_buttons = {"undo_button": None, "retry_button": None}
@@ -221,6 +222,6 @@ def make_demo_llava_optimum(model, processor):
         ],
         stop_btn=None,
         multimodal=True,
-        **additional_buttons
+        **additional_buttons,
     )
     return demo
