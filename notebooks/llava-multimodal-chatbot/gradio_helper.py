@@ -8,9 +8,8 @@ from typing import Callable
 import numpy as np
 import requests
 from threading import Event, Thread
+import inspect
 from queue import Queue
-
-is_gradio_5 = int(gr.__version__.split(".")[0]) > 4
 
 example_image_urls = [
     (
@@ -29,6 +28,8 @@ for url, file_name in example_image_urls:
 def make_demo_llava(model):
     import openvino_genai
     import openvino as ov
+
+    has_additonal_buttons = "undo_button" in inspect.signature(gr.ChatInterface.__init__).parameters
 
     def read_image(path: str) -> ov.Tensor:
         """
@@ -85,7 +86,10 @@ def make_demo_llava(model):
             if isinstance(files[-1], dict):
                 image = files[-1]["path"]
             else:
-                image = files[-1] if isinstance(files[-1], (list, tuple)) else files[-1].path
+                if isinstance(files[-1], (str, Path)):
+                    image = files[-1]
+                else:
+                    image = files[-1] if isinstance(files[-1], (list, tuple)) else files[-1].path
         if image is not None:
             image = read_image(image)
         streamer = TextQueue()
@@ -112,7 +116,7 @@ def make_demo_llava(model):
             yield buffer
 
     additional_buttons = {}
-    if not is_gradio_5:
+    if has_additonal_buttons:
         additional_buttons = {"undo_button": None, "retry_button": None}
     demo = gr.ChatInterface(
         fn=bot_streaming,
