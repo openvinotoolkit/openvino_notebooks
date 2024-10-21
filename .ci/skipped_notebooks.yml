@@ -218,7 +218,7 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb
+- notebook: notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-optimum.ipynb
   skips:
     - os:
         - macos-12
