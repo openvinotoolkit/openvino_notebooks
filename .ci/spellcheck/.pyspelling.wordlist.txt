@@ -523,6 +523,7 @@ MultiHeadAttention
 multilayer
 multimodal
 Multimodality
+multinomial
 MusicGen
 MuRAG
 Müller

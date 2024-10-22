@@ -1,160 +1,227 @@
 from pathlib import Path
-from typing import Callable
 import gradio as gr
 
 
-def make_demo_llava(handle_user_message: Callable, run_chatbot: Callable, clear_history: Callable):
-    title_markdown = """
-    # 🌋 LLaVA: Large Language and Vision Assistant
-    """
+from PIL import Image
+import numpy as np
+import requests
+from threading import Event, Thread
+import inspect
+from queue import Queue
 
-    tos_markdown = """
-    ### Terms of use
-    By using this service, users are required to agree to the following terms:
-    The service is a research preview intended for non-commercial use only. It only provides limited safety measures and may generate offensive content. It must not be used for any illegal, harmful, violent, racist, or sexual purposes. The service may collect user dialogue data for future research.
-    """
-    gr.close_all()
-    with gr.Blocks(title="LLaVA") as demo:
-        gr.Markdown(title_markdown)
+example_image_urls = [
+    (
+        "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/1d6a0188-5613-418d-a1fd-4560aae1d907",
+        "bee.jpg",
+    ),
+    (
+        "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/6cc7feeb-0721-4b5d-8791-2576ed9d2863",
+        "baklava.png",
+    ),
+]
+for url, file_name in example_image_urls:
+    Image.open(requests.get(url, stream=True).raw).save(file_name)
 
-        with gr.Row():
-            with gr.Column():
-                imagebox = gr.Image(type="pil")
-                with gr.Accordion("Parameters", open=False, visible=True) as parameter_row:
-                    temperature = gr.Slider(
-                        minimum=0.0,
-                        maximum=1.0,
-                        value=0.2,
-                        step=0.1,
-                        interactive=True,
-                        label="Temperature",
-                    )
-                    top_p = gr.Slider(
-                        minimum=0.0,
-                        maximum=1.0,
-                        value=0.7,
-                        step=0.1,
-                        interactive=True,
-                        label="Top P",
-                    )
-                    max_output_tokens = gr.Slider(
-                        minimum=0,
-                        maximum=1024,
-                        value=512,
-                        step=64,
-                        interactive=True,
-                        label="Max output tokens",
-                    )
 
-            with gr.Column(scale=3):
-                with gr.Column(scale=6):
-                    chatbot = gr.Chatbot(height=400)
-                    with gr.Row():
-                        with gr.Column(scale=8):
-                            textbox = gr.Textbox(
-                                show_label=False,
-                                placeholder="Enter text and press ENTER",
-                                visible=True,
-                                container=False,
-                            )
-                        with gr.Column(scale=1, min_width=60):
-                            submit_btn = gr.Button(value="Submit", visible=True)
-                    with gr.Row(visible=True) as button_row:
-                        clear_btn = gr.Button(value="🗑️  Clear history", interactive=True)
+def make_demo_llava(model):
+    import openvino_genai
+    import openvino as ov
 
-        gr.Markdown(tos_markdown)
+    has_additonal_buttons = "undo_button" in inspect.signature(gr.ChatInterface.__init__).parameters
 
-        submit_event = textbox.submit(
-            fn=handle_user_message,
-            inputs=[textbox, chatbot],
-            outputs=[textbox, chatbot],
-            queue=False,
-        ).then(
-            fn=run_chatbot,
-            inputs=[imagebox, chatbot, temperature, top_p, max_output_tokens],
-            outputs=chatbot,
-            queue=True,
-        )
-        # Register listeners
-        clear_btn.click(fn=clear_history, inputs=[textbox, imagebox, chatbot], outputs=[chatbot, textbox, imagebox])
-        submit_click_event = submit_btn.click(
-            fn=handle_user_message,
-            inputs=[textbox, chatbot],
-            outputs=[textbox, chatbot],
-            queue=False,
-        ).then(
-            fn=run_chatbot,
-            inputs=[imagebox, chatbot, temperature, top_p, max_output_tokens],
-            outputs=chatbot,
-            queue=True,
-        )
+    def read_image(path: str) -> ov.Tensor:
+        """
+
+        Args:
+            path: The path to the image.
+
+        Returns: the ov.Tensor containing the image.
+
+        """
+        pic = Image.open(path).convert("RGB")
+        image_data = np.array(pic.getdata()).reshape(1, 3, pic.size[1], pic.size[0]).astype(np.byte)
+        return ov.Tensor(image_data)
+
+    class TextQueue:
+        def __init__(self) -> None:
+            self.text_queue = Queue()
+            self.stop_signal = None
+            self.stop_tokens = []
+
+        def __call__(self, text):
+            self.text_queue.put(text)
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            value = self.text_queue.get()
+            if value == self.stop_signal or value in self.stop_tokens:
+                raise StopIteration()
+            else:
+                return value
+
+        def reset(self):
+            self.text_queue = Queue()
+
+        def end(self):
+            self.text_queue.put(self.stop_signal)
+
+    def bot_streaming(message, history):
+        print(f"message is - {message}")
+        print(f"history is - {history}")
+
+        if not history:
+            model.start_chat()
+        generation_config = openvino_genai.GenerationConfig()
+        generation_config.max_new_tokens = 128
+        files = message["files"] if isinstance(message, dict) else message.files
+        message_text = message["text"] if isinstance(message, dict) else message.text
+
+        image = None
+        if files:
+            # message["files"][-1] is a Dict or just a string
+            if isinstance(files[-1], dict):
+                image = files[-1]["path"]
+            else:
+                if isinstance(files[-1], (str, Path)):
+                    image = files[-1]
+                else:
+                    image = files[-1] if isinstance(files[-1], (list, tuple)) else files[-1].path
+        if image is not None:
+            image = read_image(image)
+        streamer = TextQueue()
+        stream_complete = Event()
+
+        def generate_and_signal_complete():
+            """
+            generation function for single thread
+            """
+            streamer.reset()
+            generation_kwargs = {"prompt": message_text, "generation_config": generation_config, "streamer": streamer}
+            if image is not None:
+                generation_kwargs["image"] = image
+            model.generate(**generation_kwargs)
+            stream_complete.set()
+            streamer.end()
+
+        t1 = Thread(target=generate_and_signal_complete)
+        t1.start()
+
+        buffer = ""
+        for new_text in streamer:
+            buffer += new_text
+            yield buffer
+
+    additional_buttons = {}
+    if has_additonal_buttons:
+        additional_buttons = {"undo_button": None, "retry_button": None}
+    demo = gr.ChatInterface(
+        fn=bot_streaming,
+        title="LLaVA OpenVINO Chatbot",
+        examples=[
+            {"text": "What is on the flower?", "files": ["./bee.jpg"]},
+            {"text": "How to make this pastry?", "files": ["./baklava.png"]},
+        ],
+        stop_btn=None,
+        multimodal=True,
+        **additional_buttons,
+    )
     return demo
 
 
-def make_demo_videollava(fn: Callable):
-    examples_dir = Path("Video-LLaVA/videollava/serve/examples")
-    gr.close_all()
-    demo = gr.Interface(
-        fn=fn,
-        inputs=[
-            gr.Image(label="Input Image", type="filepath"),
-            gr.Video(label="Input Video"),
-            gr.Textbox(label="Question"),
-        ],
-        outputs=gr.Textbox(lines=10),
+def make_demo_llava_optimum(model, processor):
+    from transformers import TextIteratorStreamer
+
+    has_additonal_buttons = "undo_button" in inspect.signature(gr.ChatInterface.__init__).parameters
+
+    def bot_streaming(message, history):
+        print(f"message is - {message}")
+        print(f"history is - {history}")
+        files = message["files"] if isinstance(message, dict) else message.files
+        message_text = message["text"] if isinstance(message, dict) else message.text
+        if files:
+            # message["files"][-1] is a Dict or just a string
+            if isinstance(files[-1], dict):
+                image = files[-1]["path"]
+            else:
+                if isinstance(files[-1], (str, Path)):
+                    image = files[-1]
+                else:
+                    image = files[-1] if isinstance(files[-1], (list, tuple)) else files[-1].path
+        else:
+            # if there's no image uploaded for this turn, look for images in the past turns
+            # kept inside tuples, take the last one
+            for hist in history:
+                if type(hist[0]) == tuple:
+                    image = hist[0][0]
+        try:
+            if image is None:
+                # Handle the case where image is None
+                raise gr.Error("You need to upload an image for Llama-3.2-Vision to work. Close the error and try again with an Image.")
+        except NameError:
+            # Handle the case where 'image' is not defined at all
+            raise gr.Error("You need to upload an image for Llama-3.2-Vision to work. Close the error and try again with an Image.")
+
+        conversation = []
+        flag = False
+        for user, assistant in history:
+            if assistant is None:
+                # pass
+                flag = True
+                conversation.extend([{"role": "user", "content": []}])
+                continue
+            if flag == True:
+                conversation[0]["content"] = [{"type": "text", "text": f"{user}"}]
+                conversation.append({"role": "assistant", "text": assistant})
+                flag = False
+                continue
+            conversation.extend([{"role": "user", "content": [{"type": "text", "text": user}]}, {"role": "assistant", "text": assistant}])
+
+        conversation.append({"role": "user", "content": [{"type": "text", "text": f"{message_text}"}, {"type": "image"}]})
+        prompt = processor.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
+        print(f"prompt is -\n{prompt}")
+        image = Image.open(image)
+        inputs = processor(text=prompt, images=image, return_tensors="pt")
+
+        streamer = TextIteratorStreamer(
+            processor,
+            **{
+                "skip_special_tokens": True,
+                "skip_prompt": True,
+                "clean_up_tokenization_spaces": False,
+            },
+        )
+        generation_kwargs = dict(
+            inputs,
+            streamer=streamer,
+            max_new_tokens=1024,
+            do_sample=False,
+            temperature=0.0,
+            eos_token_id=processor.tokenizer.eos_token_id,
+        )
+
+        thread = Thread(target=model.generate, kwargs=generation_kwargs)
+        thread.start()
+
+        buffer = ""
+        for new_text in streamer:
+            buffer += new_text
+            yield buffer
+
+    additional_buttons = {}
+    if has_additonal_buttons:
+        additional_buttons = {"undo_button": None, "retry_button": None}
+
+    demo = gr.ChatInterface(
+        fn=bot_streaming,
+        title="LLaVA OpenVINO Chatbot",
         examples=[
-            [
-                f"{examples_dir}/extreme_ironing.jpg",
-                None,
-                "What is unusual about this image?",
-            ],
-            [
-                f"{examples_dir}/waterview.jpg",
-                None,
-                "What are the things I should be cautious about when I visit here?",
-            ],
-            [
-                f"{examples_dir}/desert.jpg",
-                None,
-                "If there are factual errors in the questions, point it out; if not, proceed answering the question. What’s happening in the desert?",
-            ],
-            [
-                None,
-                f"{examples_dir}/sample_demo_1.mp4",
-                "Why is this video funny?",
-            ],
-            [
-                None,
-                f"{examples_dir}/sample_demo_3.mp4",
-                "Can you identify any safety hazards in this video?",
-            ],
-            [
-                None,
-                f"{examples_dir}/sample_demo_9.mp4",
-                "Describe the video.",
-            ],
-            [
-                None,
-                f"{examples_dir}/sample_demo_22.mp4",
-                "Describe the activity in the video.",
-            ],
-            [
-                f"{examples_dir}/sample_img_22.png",
-                f"{examples_dir}/sample_demo_22.mp4",
-                "Are the instruments in the pictures used in the video?",
-            ],
-            [
-                f"{examples_dir}/sample_img_13.png",
-                f"{examples_dir}/sample_demo_13.mp4",
-                "Does the flag in the image appear in the video?",
-            ],
-            [
-                f"{examples_dir}/sample_img_8.png",
-                f"{examples_dir}/sample_demo_8.mp4",
-                "Are the image and the video depicting the same place?",
-            ],
+            {"text": "What is on the flower?", "files": ["./bee.jpg"]},
+            {"text": "How to make this pastry?", "files": ["./baklava.png"]},
         ],
-        title="Video-LLaVA🚀",
-        allow_flagging="never",
+        stop_btn=None,
+        multimodal=True,
+        **additional_buttons,
     )
     return demo

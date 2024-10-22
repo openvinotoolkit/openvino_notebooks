@@ -32,8 +32,6 @@ The tutorial consists of the following steps:
 - Download the Stable Diffusion XL Base model from a public source using the [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
 - Run Text2Image generation pipeline using Stable Diffusion XL base
 - Run Image2Image generation pipeline using Stable Diffusion XL base
-- Download and convert the Stable Diffusion XL Refiner model from a public source using the [OpenVINO integration with Hugging Face Optimum](https://huggingface.co/blog/openvino).
-- Run 2-stages Stable Diffusion XL pipeline
 
 
 ## Segmind-VegaRT
