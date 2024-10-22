@@ -17,10 +17,8 @@ In this tutorial we consider how to convert, optimize and run this model using O
 ## Notebook contents
 This tutorial consists of the following steps:
 - Prerequisites
-- Load the original model
 - Convert the model to OpenVINO IR
 - Compiling models
-- Building the pipeline
 - Interactive inference
 
 ## Installation instructions
