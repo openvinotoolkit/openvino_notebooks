@@ -22,10 +22,6 @@ def image_grid(imgs, rows, cols):
     return grid
 
 
-def person_example_fn(image_path):
-    return image_path
-
-
 HEADER = """
 <h1 style="text-align: center;"> 🐈 CatVTON: Concatenation Is All You Need for Virtual Try-On with Diffusion Models </h1>
 """
@@ -101,11 +97,6 @@ def make_demo(pipeline, mask_processor, automasker, output_dir):
         with gr.Row():
             with gr.Column(scale=1, min_width=350):
                 with gr.Row():
-                    image_path = gr.Image(
-                        type="filepath",
-                        interactive=True,
-                        visible=False,
-                    )
                     person_image = gr.ImageEditor(interactive=True, label="Person Image", type="filepath")
 
                 with gr.Row():
@@ -147,13 +138,13 @@ def make_demo(pipeline, mask_processor, automasker, output_dir):
                         men_exm = gr.Examples(
                             examples=[os.path.join(root_path, "person", "men", _) for _ in os.listdir(os.path.join(root_path, "person", "men"))],
                             examples_per_page=4,
-                            inputs=image_path,
+                            inputs=person_image,
                             label="Person Examples ①",
                         )
                         women_exm = gr.Examples(
                             examples=[os.path.join(root_path, "person", "women", _) for _ in os.listdir(os.path.join(root_path, "person", "women"))],
                             examples_per_page=4,
-                            inputs=image_path,
+                            inputs=person_image,
                             label="Person Examples ②",
                         )
                         gr.Markdown(
@@ -179,8 +170,6 @@ def make_demo(pipeline, mask_processor, automasker, output_dir):
                             label="Condition Reference Person Examples",
                         )
                         gr.Markdown('<span style="color: #808080; font-size: small;">*Condition examples come from the Internet. </span>')
-
-            image_path.change(person_example_fn, inputs=image_path, outputs=person_image)
 
             submit.click(
                 submit_function,

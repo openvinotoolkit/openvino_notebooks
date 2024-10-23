@@ -3,9 +3,8 @@ from collections import namedtuple
 from pathlib import Path
 import warnings
 
-from detectron2.export import TracingAdapter
-from detectron2.structures import Instances, Boxes
 from diffusers.image_processor import VaeImageProcessor
+from diffusers.models.autoencoders.vae import DiagonalGaussianDistribution
 from huggingface_hub import snapshot_download
 import yaml
 import openvino as ov
@@ -36,7 +35,7 @@ class VaeEncoder(torch.nn.Module):
         self.vae = vae
 
     def forward(self, x):
-        return self.vae.encode(x).latent_dist.sample()
+        return {"latent_parameters": self.vae.encode(x)["latent_dist"].parameters}
 
 
 class VaeDecoder(torch.nn.Module):
@@ -58,10 +57,10 @@ class UNetWrapper(torch.nn.Module):
         return result
 
 
-def download_models():
+def download_models(model_dir):
     resume_path = "zhengchong/CatVTON"
     base_model_path = "booksforcharlie/stable-diffusion-inpainting"
-    repo_path = snapshot_download(repo_id=resume_path)
+    repo_path = snapshot_download(repo_id=resume_path, local_dir=model_dir)
 
     pipeline = CatVTONPipeline(base_ckpt=base_model_path, attn_ckpt=repo_path, attn_ckpt_version="mix", use_tf32=True, device="cpu")
 
@@ -96,6 +95,8 @@ def convert_pipeline_models(pipeline, vae_encoder_path, vae_decoder_path, unet_p
 
 
 def convert_automasker_models(automasker, densepose_processor_path, schp_processor_atr_path, schp_processor_lip_path):
+    from detectron2.export import TracingAdapter  # it's detectron2 from CatVTON repo
+
     def inference(model, inputs):
         # use do_postprocess=False so it returns ROI mask
         inst = model.inference(inputs, do_postprocess=False)[0]
@@ -121,9 +122,14 @@ class VAEWrapper(torch.nn.Module):
         self.config = config
 
     def encode(self, pixel_values):
-        outs = self.vae_enocder(pixel_values)
-        outs = torch.from_numpy(outs[0])
-        result = namedtuple("VAE", "latent_dist")(namedtuple("Sample", "sample")(lambda: outs))
+        ov_outputs = self.vae_enocder(pixel_values).to_dict()
+
+        model_outputs = {}
+        for key, value in ov_outputs.items():
+            model_outputs[next(iter(key.names))] = torch.from_numpy(value)
+
+        result = namedtuple("VAE", "latent_dist")(DiagonalGaussianDistribution(parameters=model_outputs.pop("latent_parameters")))
+
         return result
 
     def decode(self, latents):
@@ -154,6 +160,8 @@ class ConvDenseposeProcessorWrapper(torch.nn.Module):
         self.densepose_processor = densepose_processor
 
     def forward(self, sample, **kwargs):
+        from detectron2.structures import Instances, Boxes  # it's detectron2 from CatVTON repo
+
         outputs = self.densepose_processor(sample[0]["image"])
         boxes = outputs[0]
         classes = outputs[1]
