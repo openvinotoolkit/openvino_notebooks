@@ -55,5 +55,5 @@ def init_pipeline(models_dict, configs_dict):
     wrapped_models['text_encoder_2'] = wrap_model(models_dict['text_encoder_2'], CLIPTextModelWithProjection, configs_dict['text_encoder_2'])
     
     pipe = StableDiffusion3Pipeline.from_pretrained("stabilityai/stable-diffusion-3-medium-diffusers", text_encoder_3=None, tokenizer_3=None, **wrapped_models)
-    
+
     return pipe
