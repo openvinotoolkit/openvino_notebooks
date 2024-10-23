@@ -5,6 +5,11 @@ from transformers.models.clip import CLIPTextModelWithProjection
 from diffusers import StableDiffusion3Pipeline
 from diffusers import ModelMixin, ConfigMixin
 from diffusers.configuration_utils import ConfigMixin, register_to_config
+from diffusers import StableDiffusion3Pipeline
+
+def get_sd3_pipeline(model_id='stabilityai/stable-diffusion-3-medium-diffusers'):
+    pipe = StableDiffusion3Pipeline.from_pretrained(model_id, text_encoder_3=None, tokenizer_3=None)
+    return pipe
 
 # This function takes in the models of a SD3 pipeline in the torch fx representation and returns an SD3 pipeline with wrapped models.
 def init_pipeline(models_dict, configs_dict):
