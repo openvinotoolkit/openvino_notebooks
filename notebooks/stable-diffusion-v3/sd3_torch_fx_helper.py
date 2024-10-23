@@ -12,7 +12,7 @@ def get_sd3_pipeline(model_id='stabilityai/stable-diffusion-3-medium-diffusers')
     return pipe
 
 # This function takes in the models of a SD3 pipeline in the torch fx representation and returns an SD3 pipeline with wrapped models.
-def init_pipeline(models_dict, configs_dict):
+def init_pipeline(models_dict, configs_dict, model_id='stabilityai/stable-diffusion-3-medium-diffusers'):
     wrapped_models = {}
     def wrap_model(pipe_model, base_class, config):
         base_class = (base_class,) if not isinstance(base_class, tuple) else base_class
@@ -59,6 +59,6 @@ def init_pipeline(models_dict, configs_dict):
     wrapped_models['text_encoder'] = wrap_model(models_dict['text_encoder'], CLIPTextModelWithProjection, configs_dict['text_encoder'])
     wrapped_models['text_encoder_2'] = wrap_model(models_dict['text_encoder_2'], CLIPTextModelWithProjection, configs_dict['text_encoder_2'])
     
-    pipe = StableDiffusion3Pipeline.from_pretrained("stabilityai/stable-diffusion-3-medium-diffusers", text_encoder_3=None, tokenizer_3=None, **wrapped_models)
+    pipe = StableDiffusion3Pipeline.from_pretrained(model_id, text_encoder_3=None, tokenizer_3=None, **wrapped_models)
 
     return pipe
