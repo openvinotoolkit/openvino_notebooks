@@ -28,8 +28,8 @@ notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb
 notebooks/zeroscope-text2video/zeroscope-text2video.ipynb
 notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb
 notebooks/bark-text-to-audio/bark-text-to-audio.ipynb
-notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb
-notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb
+notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-genai.ipynb
+notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-optimum.ipynb
 notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb
 notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb
 notebooks/fast-segment-anything/fast-segment-anything.ipynb
@@ -74,7 +74,6 @@ notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb
 notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb
 notebooks/explainable-ai-3-map-interpretation/explainable-ai-3-map-interpretation.ipynb
 notebooks/phi-3-vision/phi-3-vision.ipynb
-notebooks/triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb
 notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb
 notebooks/stable-audio/stable-audio.ipynb
 notebooks/internvl2/internvl2.ipynb
@@ -82,6 +81,6 @@ notebooks/qwen2-vl/qwen2-vl.ipynb
 notebooks/qwen2-audio/qwen2-audio.ipynb
 notebooks/stable-fast-3d/stable-fast-3d.ipynb
 notebooks/mllama-3.2/mllama-3.2.ipynb
-notebooks/segment-anything/segment-anything-2-image.ipynb
+notebooks/sam2-image-segmentation/segment-anything-2-image.ipynb
 notebooks/pixtral/pixtral.ipynb
 notebooks/llm-agent-react/llm-agent-react.ipynb

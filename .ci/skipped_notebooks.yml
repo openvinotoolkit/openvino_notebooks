@@ -218,14 +218,14 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb
+- notebook: notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-optimum.ipynb
   skips:
     - os:
         - macos-12
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb
+- notebook: notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-genai.ipynb
   skips:
     - os:
         - macos-12
@@ -435,13 +435,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/whisper-subtitles-generation/whisper-subtitles-generation.ipynb
-  skips:
-    - os:
-        - macos-12
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb
   skips:
     - os:
@@ -474,10 +467,6 @@
     - os:
         - macos-12
 - notebook: notebooks/grounded-segment-anything/grounded-segment-anything.ipynb
-  skips:
-    - os:
-        - macos-12
-- notebook: notebooks/triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb
   skips:
     - os:
         - macos-12

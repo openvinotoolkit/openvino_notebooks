@@ -81,6 +81,7 @@ BiT
 blockwise
 BLACKBOX
 boolean
+CatVTON
 CentOS
 CFG
 charlist
@@ -522,6 +523,7 @@ MultiHeadAttention
 multilayer
 multimodal
 Multimodality
+multinomial
 MusicGen
 MuRAG
 Müller
