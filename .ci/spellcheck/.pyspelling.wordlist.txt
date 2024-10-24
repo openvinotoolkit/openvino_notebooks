@@ -98,6 +98,7 @@ CHW
 Cifar
 cityscape
 Cityscapes
+Civitai
 classname
 ClassProbabilityMap
 CLI
@@ -345,6 +346,7 @@ imagenet
 Imagenet
 ImageNet
 Imagenette
+ImagePipeline
 ImageWoof
 ImgPipeline
 impactful
