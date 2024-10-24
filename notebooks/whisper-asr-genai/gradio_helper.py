@@ -25,9 +25,10 @@ MAX_AUDIO_MINS = 30  # maximum audio input in minutes
 
 
 class GradioPipeline:
-    def __init__(self, ov_pipe, multilingual=False, quantized=False) -> None:
+    def __init__(self, ov_pipe, model_id, quantized=False) -> None:
         self.pipe = ov_pipe
-        self.multilingual = multilingual
+        self.model_id = model_id
+        self.multilingual = not model_id.endswith(".en")
         self.quantized = quantized
 
     def forward(self, inputs, task="transcribe", language="auto"):
@@ -73,12 +74,15 @@ def make_demo(gr_pipeline):
                     <div style="text-align: center; max-width: 700px; margin: 0 auto;">
                     <div
                         style="
-                        display: inline-flex; align-items: center; gap: 0.8rem; font-size: 1.75rem;
+                        display: grid; align-items: center; gap: 0.8rem; font-size: 1.75rem;
                         "
                     >
                         <h1 style="font-weight: 900; margin-bottom: 7px; line-height: normal;">
-                        OpenVINO Generate API Whisper demo {'with quantized model.' if gr_pipeline.quantized else ''}
+                            OpenVINO Generate API Whisper demo {'with quantized model.' if gr_pipeline.quantized else ''}
                         </h1>
+                        <div style="font-size: 12px; {'' if gr_pipeline.multilingual else 'display: none;'}">For task 'Translate', please, find the avalible languages
+                            <a href='https://huggingface.co/{gr_pipeline.model_id}/blob/main/generation_config.json'>in 'generation_config.json' of the model</a>
+                            or get 'generation_config' by ov_pipe.get_generation_config() and check the attribute 'lang_to_id'</div>
                     </div>
                     </div>
                 """
@@ -86,8 +90,9 @@ def make_demo(gr_pipeline):
         audio = gr.components.Audio(type="filepath", label="Audio input")
         language = gr.components.Textbox(
             label="Language.",
-            info="List of avalible language you can find in generation_config.lang_to_id dictionary. Example: <|en|>. 'auto' or empty string will mean autodetection",
-            value="auto",
+            info="List of avalible languages you can find in generation_config.lang_to_id dictionary. Example: <|en|>. Empty string will mean autodetection",
+            value="",
+            visible=gr_pipeline.multilingual,
         )
         with gr.Row():
             button_transcribe = gr.Button("Transcribe")
