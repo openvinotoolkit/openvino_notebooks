@@ -1,4 +1,5 @@
 from pathlib import Path
+import inspect
 import requests
 import gradio as gr
 from PIL import Image
@@ -105,6 +106,11 @@ def make_demo(model, processor):
             buffer += new_text
             yield buffer
 
+    has_additonal_buttons = "undo_button" in inspect.signature(gr.ChatInterface.__init__).parameters
+    additional_buttons = {}
+    if has_additonal_buttons:
+        additional_buttons = {"undo_button": None, "retry_button": None}
+
     demo = gr.ChatInterface(
         fn=bot_streaming,
         title=f"{model_name} with OpenVINO",
@@ -114,9 +120,8 @@ def make_demo(model, processor):
         ],
         description=f"{model_name} with OpenVINO. Upload an image and start chatting about it, or simply try one of the examples below. If you won't upload an image, you will receive an error.",
         stop_btn=None,
-        retry_btn=None,
-        undo_btn=None,
         multimodal=True,
+        **additional_buttons,
     )
 
     return demo
