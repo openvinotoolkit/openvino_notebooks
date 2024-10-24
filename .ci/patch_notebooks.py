@@ -90,12 +90,12 @@ def remove_ov_install(cell):
                     if part.endswith(")"):
                         updated_line_content.append(")")
                     continue
-                if "openvino-tokenizers" in part:
+                if "openvino-tokenizers" in part or "openvino_tokenizers" in part:
                     package_found = True
                     if part.endswith(")"):
                         updated_line_content.append(")")
                     continue
-                if "openvino-genai" in part:
+                if "openvino-genai" in part or "openvino_genai" in part:
                     package_found = True
                     if part.endswith(")"):
                         updated_line_content.append(")")

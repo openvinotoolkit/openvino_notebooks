@@ -187,15 +187,15 @@ def get_base_openvino_version() -> str:
     return version
 
 
-def get_pip_openvino_version(text_input: str) -> str:
+def get_pip_package_version(package, text_input: str, missing_return: str) -> str:
     try:
         from importlib import metadata
 
-        version = metadata.version("openvino")
+        version = metadata.version(package)
         print(f"{text_input}: {version}")
     except metadata.PackageNotFoundError:
-        print("OpenVINO is missing in validation environment.")
-        version = "OpenVINO is missing"
+        print(f"{package} is missing in validation environment.")
+        version = missing_return
     return version
 
 
@@ -215,7 +215,9 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
     with cd(notebook_path.parent):
         files_before_test = sorted(Path(".").iterdir())
-        ov_version_before = get_pip_openvino_version("OpenVINO before notebook execution")
+        ov_version_before = get_pip_package_version("openvino", "OpenVINO before notebook execution", "OpenVINO is missing")
+        get_pip_package_version("openvino_tokenizers", "OpenVINO Tokenizers before notebook execution", "OpenVINO Tokenizers is missing")
+        get_pip_package_version("openvino_genai", "OpenVINO GenAI before notebook execution", "OpenVINO GenAI is missing")
         patched_notebook = Path(f"test_{notebook_path.name}")
         if not patched_notebook.exists():
             print(f'Patched notebook "{patched_notebook}" does not exist.')
@@ -234,7 +236,9 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         except subprocess.TimeoutExpired:
             retcode = -42
         duration = time.perf_counter() - start
-        ov_version_after = get_pip_openvino_version("OpenVINO after notebook execution")
+        ov_version_after = get_pip_package_version("openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
+        get_pip_package_version("openvino_tokenizers", "OpenVINO Tokenizers after notebook execution", "OpenVINO Tokenizers is missing")
+        get_pip_package_version("openvino_genai", "OpenVINO GenAI after notebook execution", "OpenVINO GenAI is missing")
         result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after)
 
         if not keep_artifacts:
