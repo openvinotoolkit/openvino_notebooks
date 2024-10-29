@@ -1,6 +1,8 @@
 import gradio as gr
 import numpy as np
 
+import openvino_genai
+
 
 MAX_SEED = np.iinfo(np.int32).max
 MAX_IMAGE_SIZE = 832
@@ -21,8 +23,8 @@ css = """
 """
 
 
-def make_demo(pipeline, generator_cls):
-    def infer(prompt, negative_prompt, seed, randomize_seed, width, height, num_inference_steps, progress=gr.Progress(track_tqdm=True)):
+def make_demo(pipeline, generator_cls, adapter_config):
+    def infer(prompt, negative_prompt, seed, randomize_seed, width, height, num_inference_steps, use_lora, progress=gr.Progress(track_tqdm=True)):
         if randomize_seed:
             seed = np.random.randint(0, MAX_SEED)
 
@@ -35,8 +37,8 @@ def make_demo(pipeline, generator_cls):
             width=width,
             height=height,
             random_generator=generator,
+            adapters=adapter_config if use_lora else openvino_genai.AdapterConfig(),
         )
-        # image = Image.fromarray(image_tensor.data[0])
 
         return image_tensor.data[0]
 
@@ -60,6 +62,7 @@ def make_demo(pipeline, generator_cls):
                 run_button = gr.Button("Run", scale=0)
 
             result = gr.Image(label="Result", show_label=False)
+            use_lora = gr.Checkbox(label="Use LoRA", value=False)
 
             with gr.Accordion("Advanced Settings", open=False):
                 negative_prompt = gr.Text(
@@ -108,7 +111,7 @@ def make_demo(pipeline, generator_cls):
         gr.on(
             triggers=[run_button.click, prompt.submit, negative_prompt.submit],
             fn=infer,
-            inputs=[prompt, negative_prompt, seed, randomize_seed, width, height, num_inference_steps],
+            inputs=[prompt, negative_prompt, seed, randomize_seed, width, height, num_inference_steps, use_lora],
             outputs=[result],
         )
 
