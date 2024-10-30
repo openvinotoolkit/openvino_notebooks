@@ -4,6 +4,8 @@ from typing import Optional, Tuple, Union, List, Dict, Any
 import gc
 import openvino as ov
 from openvino.runtime import opset13
+from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
+import shutil
 import nncf
 import numpy as np
 import torch
@@ -233,87 +235,28 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
         return
     print(f"⌛ {model_id} conversion started. Be patient, it may takes some time.")
     print("⌛ Load Original model")
-    model = Qwen2VLForConditionalGeneration.from_pretrained(model_id)
+    model = Qwen2VLForConditionalGeneration.from_pretrained(model_id, torch_dtype=torch.bfloat16)
+    model.eval()
+    model.model.eval()
+    __make_16bit_traceable(model)
     processor = AutoProcessor.from_pretrained(model_id)
     model.config.save_pretrained(output_dir)
     processor.save_pretrained(output_dir)
     print("✅ Original model successfully loaded")
+    vision_embed_tokens = model.visual
 
     if not embed_token_path.exists():
         print("⌛ Convert Input embedding model")
-        ov_model = ov.convert_model(
-            model.model.embed_tokens,
-            example_input=torch.ones([2, 2], dtype=torch.int64),
-        )
+        with torch.no_grad():
+            ov_model = ov.convert_model(
+                model.model.embed_tokens,
+                example_input=torch.ones([2, 2], dtype=torch.int64),
+            )
         ov.save_model(ov_model, embed_token_path)
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
         print("✅ Input embedding model successfully converted")
-
-    if not image_embed_path.exists() or not image_embed_merger_path.exists():
-        print("⌛ Convert Image embedding model")
-
-        vision_embed_tokens = model.visual
-        if not image_embed_path.exists():
-            ov_model = ov.convert_model(vision_embed_tokens.patch_embed, example_input={"hidden_states": torch.randn([4988, 1176])})
-            ov.save_model(ov_model, image_embed_path)
-            del ov_model
-            cleanup_torchscript_cache()
-
-        def image_embed_forward(self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb: torch.Tensor) -> torch.Tensor:
-            for blk in self.blocks:
-                hidden_states = blk(hidden_states, attention_mask=attention_mask, rotary_pos_emb=rotary_pos_emb)
-
-            return self.merger(hidden_states)
-
-        def sdpa_attn_forward(self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb: torch.Tensor = None) -> torch.Tensor:
-            from transformers.models.qwen2_vl.modeling_qwen2_vl import apply_rotary_pos_emb_vision
-
-            seq_length = hidden_states.shape[0]
-            q, k, v = self.qkv(hidden_states).reshape(seq_length, 3, self.num_heads, -1).permute(1, 0, 2, 3).unbind(0)
-            q = apply_rotary_pos_emb_vision(q.unsqueeze(0), rotary_pos_emb).squeeze(0)
-            k = apply_rotary_pos_emb_vision(k.unsqueeze(0), rotary_pos_emb).squeeze(0)
-
-            q = q.transpose(0, 1)
-            k = k.transpose(0, 1)
-            v = v.transpose(0, 1)
-            attn_output = torch.nn.functional.scaled_dot_product_attention(q, k, v, attention_mask, dropout_p=0.0)
-            attn_output = attn_output.transpose(0, 1)
-            attn_output = attn_output.reshape(seq_length, -1)
-            attn_output = self.proj(attn_output)
-            return attn_output
-
-        def block_forward(self, hidden_states, attention_mask, rotary_pos_emb) -> torch.Tensor:
-            hidden_states = hidden_states + self.attn(self.norm1(hidden_states), attention_mask=attention_mask, rotary_pos_emb=rotary_pos_emb)
-            hidden_states = hidden_states + self.mlp(self.norm2(hidden_states))
-            return hidden_states
-
-        if not image_embed_merger_path.exists():
-            vision_embed_tokens.forward = types.MethodType(image_embed_forward, vision_embed_tokens)
-            for block in vision_embed_tokens.blocks:
-                block.forward = types.MethodType(block_forward, block)
-                block.attn.forward = types.MethodType(sdpa_attn_forward, block.attn)
-
-            ov_model = ov.convert_model(
-                vision_embed_tokens,
-                example_input={
-                    "hidden_states": torch.randn([4988, 1280]),
-                    "attention_mask": torch.ones([1, 4988, 4988]),
-                    "rotary_pos_emb": torch.randn([4988, 40]),
-                },
-            )
-            if quantization_config is not None:
-                print(f"⌛ Weights compression with {quantization_config['mode']} mode started")
-                ov_model = nncf.compress_weights(ov_model, **quantization_config)
-                print("✅ Weights compression finished")
-
-            ov.save_model(ov_model, image_embed_merger_path)
-            del ov_model
-            cleanup_torchscript_cache()
-        del vision_embed_tokens
-        gc.collect()
-        print("✅ Image embedding model successfully converted")
 
     if not lang_model_path.exists():
         print("⌛ Convert Language model")
@@ -360,10 +303,11 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
 
         example_input = {"inputs_embeds": input_embeds, "attention_mask": attention_mask, "position_ids": position_ids, "past_key_values": past_key_values}
 
-        ov_model = ov.convert_model(
-            model,
-            example_input=example_input,
-        )
+        with torch.no_grad():
+            ov_model = ov.convert_model(
+                model,
+                example_input=example_input,
+            )
 
         for input, input_name in zip(ov_model.inputs, input_names):
             input.get_tensor().set_names({input_name})
@@ -372,18 +316,98 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
             output.get_tensor().set_names({output_name})
         patch_stateful(ov_model)
         print("✅ Language model successfully converted")
-
-        if quantization_config is not None:
-            print(f"⌛ Weights compression with {quantization_config['mode']} mode started")
-            ov_model = nncf.compress_weights(ov_model, **quantization_config)
-            print("✅ Weights compression finished")
-
-        ov.save_model(ov_model, lang_model_path, False)
+        fp_lang_model_path = lang_model_path if quantization_config is None else lang_model_path.parent / ("fp_" + lang_model_path.name)
+        ov.save_model(ov_model, fp_lang_model_path)
         del ov_model
         cleanup_torchscript_cache()
         del model
         gc.collect()
-        print(f"✅ {model_id} model conversion finished. You can find results in {output_dir}")
+
+        if quantization_config is not None:
+            ov_model = core.read_model(fp_lang_model_path)
+            print(f"⌛ Weights compression with {quantization_config['mode']} mode started")
+            c_ov_model = nncf.compress_weights(ov_model, **quantization_config)
+            print("✅ Weights compression finished")
+            ov.save_model(c_ov_model, lang_model_path)
+            del c_ov_model
+            del ov_model
+            gc.collect()
+            fp_lang_model_path.unlink()
+            fp_lang_model_path.with_suffix(".bin").unlink()
+
+    if not image_embed_path.exists() or not image_embed_merger_path.exists():
+        print("⌛ Convert Image embedding model")
+        if not image_embed_path.exists():
+            with torch.no_grad():
+                ov_model = ov.convert_model(vision_embed_tokens.patch_embed, example_input={"hidden_states": torch.randn([900, 1176])})
+            ov.save_model(ov_model, image_embed_path)
+            del ov_model
+            cleanup_torchscript_cache()
+
+        def image_embed_forward(self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb: torch.Tensor) -> torch.Tensor:
+            for blk in self.blocks:
+                hidden_states = blk(hidden_states, attention_mask=attention_mask, rotary_pos_emb=rotary_pos_emb)
+
+            return self.merger(hidden_states)
+
+        def sdpa_attn_forward(self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb: torch.Tensor = None) -> torch.Tensor:
+            from transformers.models.qwen2_vl.modeling_qwen2_vl import apply_rotary_pos_emb_vision
+
+            seq_length = hidden_states.shape[0]
+            q, k, v = self.qkv(hidden_states).reshape(seq_length, 3, self.num_heads, -1).permute(1, 0, 2, 3).unbind(0)
+            q = apply_rotary_pos_emb_vision(q.unsqueeze(0), rotary_pos_emb).squeeze(0)
+            k = apply_rotary_pos_emb_vision(k.unsqueeze(0), rotary_pos_emb).squeeze(0)
+
+            q = q.transpose(0, 1)
+            k = k.transpose(0, 1)
+            v = v.transpose(0, 1)
+            attn_output = torch.nn.functional.scaled_dot_product_attention(q, k, v, attention_mask, dropout_p=0.0)
+            attn_output = attn_output.transpose(0, 1)
+            attn_output = attn_output.reshape(seq_length, -1)
+            attn_output = self.proj(attn_output)
+            return attn_output
+
+        def block_forward(self, hidden_states, attention_mask, rotary_pos_emb) -> torch.Tensor:
+            hidden_states = hidden_states + self.attn(self.norm1(hidden_states), attention_mask=attention_mask, rotary_pos_emb=rotary_pos_emb)
+            hidden_states = hidden_states + self.mlp(self.norm2(hidden_states))
+            return hidden_states
+
+        if not image_embed_merger_path.exists():
+            vision_embed_tokens.forward = types.MethodType(image_embed_forward, vision_embed_tokens)
+            for block in vision_embed_tokens.blocks:
+                block.forward = types.MethodType(block_forward, block)
+                block.attn.forward = types.MethodType(sdpa_attn_forward, block.attn)
+
+            with torch.no_grad():
+                ov_model = ov.convert_model(
+                    vision_embed_tokens,
+                    example_input={
+                        "hidden_states": torch.randn([900, 1280]),
+                        "attention_mask": torch.ones([1, 900, 900]),
+                        "rotary_pos_emb": torch.randn([900, 40]),
+                    },
+                )
+            fp_image_merger_path = image_embed_merger_path if quantization_config is None else image_embed_merger_path.parent / ("fp_" + image_embed_merger_path.name)
+            ov.save_model(ov_model, fp_image_merger_path)
+            del ov_model
+            cleanup_torchscript_cache()
+            del vision_embed_tokens
+            gc.collect()
+            if quantization_config is not None:
+                print(f"⌛ Weights compression with {quantization_config['mode']} mode started")
+                ov_model = core.read_model(fp_image_merger_path)
+                c_ov_model = nncf.compress_weights(ov_model, **quantization_config)
+                print("✅ Weights compression finished")
+                ov.save_model(c_ov_model, image_embed_merger_path)
+                del c_ov_model
+                del ov_model
+                gc.collect()
+                fp_image_merger_path.unlink()
+                fp_image_merger_path.with_suffix(".bin").unlink()
+        gc.collect()
+        print("✅ Image embedding model successfully converted")
+    gc.collect()
+    print(f"✅ {model_id} model conversion finished. You can find results in {output_dir}")
 
 
 class OVQwen2VLModel(GenerationMixin):
