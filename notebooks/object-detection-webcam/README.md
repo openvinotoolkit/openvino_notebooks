@@ -15,7 +15,7 @@ List of predefined objects available in this demo: person, bicycle, car, motorcy
 
 ## Notebook Contents
 
-This notebook demonstrates object detection with OpenVINO, using the [SSDLite MobileNetV2](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/ssdlite_mobilenet_v2) model from Open Model Zoo. The model was trained on [COCO dataset](https://cocodataset.org/#home).
+This notebook demonstrates object detection with OpenVINO, using the [Ultralytics YOLOv8](https://docs.ultralytics.com/models/yolov8/). The model was trained on [COCO dataset](https://cocodataset.org/#home).
 
 ## Installation Instructions
 
