@@ -387,7 +387,9 @@ def convert_qwen2vl_model(model_id, output_dir, quantization_config):
                         "rotary_pos_emb": torch.randn([900, 40]),
                     },
                 )
-            fp_image_merger_path = image_embed_merger_path if quantization_config is None else image_embed_merger_path.parent / ("fp_" + image_embed_merger_path.name)
+            fp_image_merger_path = (
+                image_embed_merger_path if quantization_config is None else image_embed_merger_path.parent / ("fp_" + image_embed_merger_path.name)
+            )
             ov.save_model(ov_model, fp_image_merger_path)
             del ov_model
             cleanup_torchscript_cache()
