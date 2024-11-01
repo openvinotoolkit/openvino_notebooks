@@ -36,7 +36,7 @@ def make_demo(pipeline, generator_cls, adapter_config):
             num_inference_steps=num_inference_steps,
             width=width,
             height=height,
-            random_generator=generator,
+            generator=generator,
             adapters=adapter_config if use_lora else openvino_genai.AdapterConfig(),
         )
 
