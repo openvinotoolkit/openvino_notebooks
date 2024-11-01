@@ -23,10 +23,10 @@ def clone_repo(repo_url: str, revision: str = None, add_to_sys_path: bool = True
     return repo_path
 
 
-def optimum_cli(model_id, output_dir, show_command=True, additionl_args: Dict[str, str] = None):
+def optimum_cli(model_id, output_dir, show_command=True, additional_args: Dict[str, str] = None):
     export_command = f"optimum-cli export openvino --model {model_id} {output_dir}"
-    if additionl_args is not None:
-        for arg, value in additionl_args.items():
+    if additional_args is not None:
+        for arg, value in additional_args.items():
             export_command += f" --{arg}"
             if value:
                 export_command += f" {value}"
