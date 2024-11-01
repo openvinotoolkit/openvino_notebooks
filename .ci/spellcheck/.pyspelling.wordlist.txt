@@ -424,6 +424,7 @@ LangChain
 langchain
 Lasinger
 latents
+lookahead
 LCMs
 LCMScheduler
 LDM
@@ -804,6 +805,7 @@ SigLIP
 SigLip
 siglip
 SISR
+SL
 SlimOrca
 SlowFast
 slowfast
