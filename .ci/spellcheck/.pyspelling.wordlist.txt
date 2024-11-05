@@ -98,6 +98,7 @@ CHW
 Cifar
 cityscape
 Cityscapes
+Civitai
 classname
 ClassProbabilityMap
 CLI
@@ -345,6 +346,7 @@ imagenet
 Imagenet
 ImageNet
 Imagenette
+ImagePipeline
 ImageWoof
 ImgPipeline
 impactful
@@ -422,6 +424,7 @@ LangChain
 langchain
 Lasinger
 latents
+lookahead
 LCMs
 LCMScheduler
 LDM
@@ -802,6 +805,7 @@ SigLIP
 SigLip
 siglip
 SISR
+SL
 SlimOrca
 SlowFast
 slowfast
