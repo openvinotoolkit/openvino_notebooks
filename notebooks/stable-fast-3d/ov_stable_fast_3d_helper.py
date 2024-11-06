@@ -241,10 +241,11 @@ class ImageEstimatorWrapper(torch.nn.Module):
 
 
 class DecoderWrapper(torch.nn.Module):
-    def __init__(self, include_decoder, exclude_decoder):
+    def __init__(self, include_decoder, exclude_decoder, heads):
         super().__init__()
         self.include_decoder = include_decoder
         self.exclude_decoder = exclude_decoder
+        self.head_names = {head.name for head in heads}
 
     def forward(self, x, include: Optional[List] = None, exclude: Optional[List] = None):
         if include is not None:
@@ -253,7 +254,9 @@ class DecoderWrapper(torch.nn.Module):
             outs = self.exclude_decoder(x)
         results = {}
         for k, v in outs.to_dict().items():
-            results[k.names.pop()] = torch.from_numpy(v)
+            for name in k.names:
+                if name in self.head_names:
+                    results[name] = torch.from_numpy(v)
         return results
 
 
@@ -286,6 +289,6 @@ def get_compiled_model(
     model.post_processor = PostProcessorWrapper(compiled_post_processor)
     model.camera_embedder = CameraEmbedderWrapper(compiled_camera_embedder)
     model.image_estimator = ImageEstimatorWrapper(compiled_image_estimator)
-    model.decoder = DecoderWrapper(compiled_include_decoder, compiled_exclude_decoder)
+    model.decoder = DecoderWrapper(compiled_include_decoder, compiled_exclude_decoder, model.decoder.cfg.heads)
 
     return model
