@@ -1,4 +1,4 @@
-# JAX ViT and Mixer and OpenVINO
+# Convert a JAX Model to OpenVINO™ IR
 
 [JAX](https://jax.readthedocs.io/en/latest) is a Python library for accelerator-oriented array computation and program transformation, designed for high-performance numerical computing and large-scale machine learning.
 JAX provides a familiar NumPy-style API for ease of adoption by researchers and engineers.
