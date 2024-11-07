@@ -80,8 +80,8 @@ def make_demo(ov_pipe):
                         minimum=1,
                         maximum=15,
                         step=0.1,
-                        value=3.5 if ov_pipe.transformer_config.get("guidance_embeds", False) else 0.0,
-                        visible=not ov_pipe.transformer_config.get("guidance_embeds", False),
+                        value=3.5 if ov_pipe.transformer.config.get("guidance_embeds", False) else 0.0,
+                        visible=not ov_pipe.transformer.config.get("guidance_embeds", False),
                     )
                     num_inference_steps = gr.Slider(
                         label="Number of inference steps",
