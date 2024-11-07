@@ -9,7 +9,7 @@ In this tutorial we will show how to convert JAX [ViT](https://github.com/google
 
 ### Vision Transformer
 <img src="https://github.com/google-research/vision_transformer/blob/main/vit_figure.png?raw=true" width="800"> 
-Overview of the model: authors split an image is splited into fixed-size patches, linearly embed each of them, add position embeddings, and feed the resulting sequence of vectors to a standard Transformer encoder. In order to perform classification, authors use the standard approach of adding an extra learnable "classification token" to the sequence.
+Overview of the model: authors split an image into fixed-size patches, linearly embed each of them, add position embeddings, and feed the resulting sequence of vectors to a standard Transformer encoder. In order to perform classification, authors use the standard approach of adding an extra learnable "classification token" to the sequence.
 
 ### MLP-Mixer
 <img src="https://github.com/google-research/vision_transformer/blob/main/mixer_figure.png?raw=true" width="800"> 
@@ -21,7 +21,7 @@ MLP-Mixer (Mixer for short) consists of per-patch linear embeddings, Mixer layer
 - Infer the original model
 - Convert the model to OpenVINO IR
 - Compiling models
-- InferenceRun OpenVINO model inference
+- Run OpenVINO model inference
 
 ## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>

@@ -379,6 +379,7 @@ ip
 ir
 IRs
 iteratively
+JAX
 JFLEG
 JIT
 Jina
@@ -551,6 +552,7 @@ NNCF
 nncf
 noncomparable
 NONINFRINGEMENT
+nonlinearity
 Notus
 notus
 nsamples
