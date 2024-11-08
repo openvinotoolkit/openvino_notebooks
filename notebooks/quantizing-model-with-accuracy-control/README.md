@@ -1,8 +1,8 @@
 # Quantization with accuracy control using NNCF
 
-These tutorials demonstrate how to apply 8-bit quantization with accuracy control to the speech recognition and YOLOv8 models::
+These tutorials demonstrate how to apply 8-bit quantization with accuracy control to the speech recognition and YOLOv11 models::
 * `speech-recognition-quantization-wav2vec2.ipynb` demonstrates how to apply post-training `INT8` quantization with accuracy control on a fine-tuned [Wav2Vec2-Base-960h](https://huggingface.co/facebook/wav2vec2-base-960h) [PyTorch](https://pytorch.org/) model, trained on the [LibriSpeech ASR corpus](https://www.openslr.org/12).
-* `yolov8-quantization-with-accuracy-control.ipynb` demonstrates how to apply post-training `INT8` quantization on the [YOLOv8](https://github.com/ultralytics/) PyTorch model
+* `yolov11-quantization-with-accuracy-control.ipynb` demonstrates how to apply post-training `INT8` quantization on the [YOLOv11](https://github.com/ultralytics/) PyTorch model
 
 The code of the tutorials is designed to be extendable to the same model types trained on custom datasets.
 

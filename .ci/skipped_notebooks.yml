@@ -31,7 +31,7 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb
+- notebook: notebooks/quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb
   skips:
     - os:
         - macos-12

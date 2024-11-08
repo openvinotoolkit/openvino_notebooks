@@ -2,7 +2,7 @@ notebooks/speech-recognition-quantization/speech-recognition-quantization-wav2ve
 notebooks/gpu-device/gpu-device.ipynb
 notebooks/model-server/model-server.ipynb
 notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb
-notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb
+notebooks/quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb
 notebooks/big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb
 notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb
 notebooks/stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb

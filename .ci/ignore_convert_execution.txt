@@ -1,7 +1,7 @@
 notebooks/gpu-device/gpu-device.ipynb
 notebooks/model-server/model-server.ipynb
 notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb
-notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb
+notebooks/quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb
 notebooks/grammar-correction/grammar-correction.ipynb
 notebooks/image-inpainting/image-inpainting.ipynb
 notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb

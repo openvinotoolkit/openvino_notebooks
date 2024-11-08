@@ -1,4 +1,4 @@
-notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb  # ultralytics==8.0.43
+notebooks/quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb  # ultralytics==8.3.0
 notebooks/detectron2-to-openvino/detectron2-to-openvino.ipynb # detectron2@https://github.com/facebookresearch/detectron2
 notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb  # ultralytics==8.0.43
 notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb  # ultralytics==8.0.159
