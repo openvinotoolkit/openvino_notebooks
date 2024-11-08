@@ -34,12 +34,5 @@ LORA = [
         "name": "Chalkboard drawing",
         "file_name": "SDXL_ChalkBoardDrawing_LoRA_r8.safetensors",
         "weight": 0.45,
-    },
-    {
-  	"model_id": "ProomptEngineer/pe-shitty-medieval-paintings",
-  	"prompt": "<subject> in the style of bad medieval art, PEBadMedivalArt",
-  	"weight": 1.0,
-  	"name": "Medieval style",
-    "file_name": "PE_BadMedivalArt.safetensors"
     }
 ]
