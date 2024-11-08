@@ -583,3 +583,10 @@
   skips:
     - os:
         - macos-12
+- notebook: notebooks/multilora-image-generation/multilora-image-generation.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019

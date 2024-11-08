@@ -64,3 +64,4 @@ notebooks/llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb
 notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb
 notebooks/mllama-3.2/mllama-3.2.ipynb
 notebooks/llm-agent-react/llm-agent-react.ipynb
+notebooks/multilora-image-generation/multilora-image-generation.ipynb
