@@ -9,8 +9,6 @@ The Hugging Face Optimum Intel API is a high-level API that enables us to conver
 
 ## Notebook Contents
 
-This notebook demonstrates how to perform automatic speech recognition (ASR) using the Whisper model and OpenVINO.
-
 The tutorial consists of following steps:
 - Prerequisites
 - Convert model using Optimum-CLI tool
