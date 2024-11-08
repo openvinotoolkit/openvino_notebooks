@@ -15,7 +15,6 @@ def make_demo(pipeline, generator_cls, adapters, adapters_meta):
         adapter_name = adapters_meta[idx]["name"]
         adapters_selection[adapter_name] = adapters_meta[idx]
         adapters_selection[adapter_name]["adapter"] = adapter
-    
 
     def infer(prompt, seed, randomize_seed, width, height, lora_id, progress=gr.Progress(track_tqdm=True)):
         if randomize_seed:
@@ -27,7 +26,7 @@ def make_demo(pipeline, generator_cls, adapters, adapters_meta):
             adapter_info = adapters_selection[lora_id]
             adapter = adapter_info["adapter"]
             prompt_template = adapter_info.get("prompt", "<subject>")
-            alpha =  adapter_info.get("weight", 1.0)
+            alpha = adapter_info.get("weight", 1.0)
             adapter_config.add(adapter, alpha)
             prompt = prompt_template.replace("<subject>", prompt)
 
@@ -46,7 +45,7 @@ def make_demo(pipeline, generator_cls, adapters, adapters_meta):
     with gr.Blocks() as demo:
         with gr.Column():
             gr.Markdown(
-            """
+                """
             # Image Generation with LoRA and OpenVINO GenAI
             1. Provide input generation prompt into prompt window
             2. Select one of the predefined adapters (use none for a generation without LoRA)
@@ -67,7 +66,6 @@ def make_demo(pipeline, generator_cls, adapters, adapters_meta):
                 run_button = gr.Button("Generate", scale=0)
 
             result = gr.Image(label="Result", show_label=False)
-
 
             with gr.Accordion("Advanced Settings", open=False):
                 seed = gr.Slider(
