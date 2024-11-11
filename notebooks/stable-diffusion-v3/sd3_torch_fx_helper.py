@@ -5,7 +5,6 @@ from transformers.models.clip import CLIPTextModelWithProjection
 from diffusers import StableDiffusion3Pipeline
 from diffusers import ModelMixin, ConfigMixin
 from diffusers.configuration_utils import ConfigMixin, register_to_config
-from diffusers import StableDiffusion3Pipeline
 
 def get_sd3_pipeline(model_id='stabilityai/stable-diffusion-3-medium-diffusers'):
     pipe = StableDiffusion3Pipeline.from_pretrained(model_id, text_encoder_3=None, tokenizer_3=None)
@@ -31,7 +30,6 @@ def init_pipeline(models_dict, configs_dict, model_id='stabilityai/stable-diffus
             def forward(self, *args, **kwargs):
                 return self.model(*args, **kwargs)
         class WrappedTransformer(*base_class):
-            ConfigMixin.ignore_for_config = []
             @register_to_config
             def __init__(self, model, 
                         sample_size, 
@@ -62,3 +60,32 @@ def init_pipeline(models_dict, configs_dict, model_id='stabilityai/stable-diffus
     pipe = StableDiffusion3Pipeline.from_pretrained(model_id, text_encoder_3=None, tokenizer_3=None, **wrapped_models)
 
     return pipe
+
+def visualize_results(orig_img, optimized_img):
+    """
+    Helper function for results visualization copied from sd3_quantization_helper.py due to import conflicts.
+
+    Parameters:
+       orig_img (Image.Image): generated image using FP16 models
+       optimized_img (Image.Image): generated image using quantized models
+    Returns:
+       fig (matplotlib.pyplot.Figure): matplotlib generated figure contains drawing result
+    """
+    orig_title = "FP16 pipeline"
+    control_title = "INT8 pipeline"
+    figsize = (20, 20)
+    fig, axs = plt.subplots(1, 2, figsize=figsize, sharex="all", sharey="all")
+    list_axes = list(axs.flat)
+    for a in list_axes:
+        a.set_xticklabels([])
+        a.set_yticklabels([])
+        a.get_xaxis().set_visible(False)
+        a.get_yaxis().set_visible(False)
+        a.grid(False)
+    list_axes[0].imshow(np.array(orig_img))
+    list_axes[1].imshow(np.array(optimized_img))
+    list_axes[0].set_title(orig_title, fontsize=15)
+    list_axes[1].set_title(control_title, fontsize=15)
+
+    fig.subplots_adjust(wspace=0.01, hspace=0.01)
+    fig.tight_layout()
