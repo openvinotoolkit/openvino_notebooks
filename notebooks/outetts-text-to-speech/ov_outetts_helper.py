@@ -5,13 +5,11 @@ from outetts.v0_1.model import HFModel
 import torch
 from optimum.intel.openvino import OVModelForCausalLM
 
+
 class OVHFModel(HFModel):
     def __init__(self, model_path, device):
         self.device = torch.device("cpu")
-        self.model = OVModelForCausalLM.from_pretrained(
-            model_path,
-            device=device
-        )
+        self.model = OVModelForCausalLM.from_pretrained(model_path, device=device)
 
 
 class InterfaceOV(InterfaceHF):
@@ -24,4 +22,3 @@ class InterfaceOV(InterfaceHF):
         self.audio_codec = AudioCodec(self.device)
         self.prompt_processor = PromptProcessor(model_path)
         self.model = OVHFModel(model_path, device)
-

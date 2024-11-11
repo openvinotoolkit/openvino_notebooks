@@ -600,6 +600,7 @@ OpenVoiceBaseClass
 opset
 optimizable
 Orca
+OuteTTS
 OVC
 overfitting
 overlayed
