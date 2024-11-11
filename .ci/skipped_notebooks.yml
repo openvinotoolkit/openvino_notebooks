@@ -590,3 +590,7 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/outetts-text-to-speech/outetts-text-to-speech.ipynb
+  skips:
+    - os:
+        - macos-12
