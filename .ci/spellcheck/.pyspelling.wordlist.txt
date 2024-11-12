@@ -247,6 +247,7 @@ Embedder
 embeddings
 EnCodec
 encodec
+english
 enum
 et
 Evol
@@ -354,6 +355,7 @@ impactful
 IMU
 IMUs
 InceptionResNetV
+intialization
 inferencing
 InferRequest
 InferRequests
@@ -464,6 +466,7 @@ LSTMs
 Luo
 LVLM
 Lyth
+MaaS
 macOS
 Magika
 masklet
@@ -511,6 +514,8 @@ MobileVLM
 modelled
 ModelBest
 Modelscope
+ModelScope
+modelscope
 Mody
 MONAI
 MONAI's
@@ -548,6 +553,7 @@ Netron
 NeuSpell
 NeXT
 NLP
+nlp
 NMS
 nn
 NNCF
@@ -890,6 +896,7 @@ th
 timestep
 timesteps
 TinyLlama
+tinynas
 Tokenization
 tokenization
 tokenize
