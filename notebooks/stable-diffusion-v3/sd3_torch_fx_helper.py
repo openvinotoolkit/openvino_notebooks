@@ -6,6 +6,7 @@ from diffusers import StableDiffusion3Pipeline
 from diffusers import ModelMixin, ConfigMixin
 from diffusers.configuration_utils import ConfigMixin, register_to_config
 import matplotlib.pyplot as plt
+import numpy as np
 
 def get_sd3_pipeline(model_id='stabilityai/stable-diffusion-3-medium-diffusers'):
     pipe = StableDiffusion3Pipeline.from_pretrained(model_id, text_encoder_3=None, tokenizer_3=None)
