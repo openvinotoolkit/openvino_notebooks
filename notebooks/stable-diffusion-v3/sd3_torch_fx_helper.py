@@ -8,62 +8,80 @@ from diffusers.configuration_utils import ConfigMixin, register_to_config
 import matplotlib.pyplot as plt
 import numpy as np
 
-def get_sd3_pipeline(model_id='stabilityai/stable-diffusion-3-medium-diffusers'):
+
+def get_sd3_pipeline(model_id="stabilityai/stable-diffusion-3-medium-diffusers"):
     pipe = StableDiffusion3Pipeline.from_pretrained(model_id, text_encoder_3=None, tokenizer_3=None)
     return pipe
 
+
 # This function takes in the models of a SD3 pipeline in the torch fx representation and returns an SD3 pipeline with wrapped models.
-def init_pipeline(models_dict, configs_dict, model_id='stabilityai/stable-diffusion-3-medium-diffusers'):
+def init_pipeline(models_dict, configs_dict, model_id="stabilityai/stable-diffusion-3-medium-diffusers"):
     wrapped_models = {}
+
     def wrap_model(pipe_model, base_class, config):
         base_class = (base_class,) if not isinstance(base_class, tuple) else base_class
+
         class WrappedModel(*base_class):
             def __init__(self, model, config):
                 cls_name = base_class[0].__name__
-                if(isinstance(config, dict)):
+                if isinstance(config, dict):
                     super().__init__(**config)
                 else:
                     super().__init__(config)
-                if(cls_name=='AutoencoderKL'):
+                if cls_name == "AutoencoderKL":
                     self.encoder = model.encoder
                     self.decoder = model.decoder
                 else:
                     self.model = model
+
             def forward(self, *args, **kwargs):
                 return self.model(*args, **kwargs)
+
         class WrappedTransformer(*base_class):
             @register_to_config
-            def __init__(self, model, 
-                        sample_size, 
-                        patch_size, 
-                        in_channels, 
-                        num_layers, 
-                        attention_head_dim, 
-                        num_attention_heads, 
-                        joint_attention_dim, 
-                        caption_projection_dim, 
-                        pooled_projection_dim, 
-                        out_channels, 
-                        pos_embed_max_size
-                        ):
+            def __init__(
+                self,
+                model,
+                sample_size,
+                patch_size,
+                in_channels,
+                num_layers,
+                attention_head_dim,
+                num_attention_heads,
+                joint_attention_dim,
+                caption_projection_dim,
+                pooled_projection_dim,
+                out_channels,
+                pos_embed_max_size,
+            ):
                 super().__init__()
                 self.model = model
+
             def forward(self, *args, **kwargs):
-                del kwargs['joint_attention_kwargs']
-                del kwargs['return_dict']
-                return self.model(*args, **kwargs)   
-        if len(base_class) > 1: 
+                del kwargs["joint_attention_kwargs"]
+                del kwargs["return_dict"]
+                return self.model(*args, **kwargs)
+
+        if len(base_class) > 1:
             return WrappedTransformer(pipe_model, **config)
         return WrappedModel(pipe_model, config)
 
-    wrapped_models['transformer'] = wrap_model(models_dict['transformer'], (ModelMixin, ConfigMixin,), configs_dict['transformer'])
-    wrapped_models['vae'] = wrap_model(models_dict['vae'], AutoencoderKL, configs_dict['vae'])
-    wrapped_models['text_encoder'] = wrap_model(models_dict['text_encoder'], CLIPTextModelWithProjection, configs_dict['text_encoder'])
-    wrapped_models['text_encoder_2'] = wrap_model(models_dict['text_encoder_2'], CLIPTextModelWithProjection, configs_dict['text_encoder_2'])
-    
+    wrapped_models["transformer"] = wrap_model(
+        models_dict["transformer"],
+        (
+            ModelMixin,
+            ConfigMixin,
+        ),
+        configs_dict["transformer"],
+    )
+    wrapped_models["vae"] = wrap_model(models_dict["vae"], AutoencoderKL, configs_dict["vae"])
+    wrapped_models["text_encoder"] = wrap_model(models_dict["text_encoder"], CLIPTextModelWithProjection, configs_dict["text_encoder"])
+    wrapped_models["text_encoder_2"] = wrap_model(models_dict["text_encoder_2"], CLIPTextModelWithProjection, configs_dict["text_encoder_2"])
+
     pipe = StableDiffusion3Pipeline.from_pretrained(model_id, text_encoder_3=None, tokenizer_3=None, **wrapped_models)
 
     return pipe
+
 
 def visualize_results(orig_img, optimized_img):
     """
