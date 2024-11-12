@@ -98,6 +98,7 @@ export const LIBRARIES = /** @type {const} */ ({
     ULTRALYTICS: 'Ultralytics',
     GRADIO: 'Gradio',
     JAX: 'JAX',
+    MODELSCOPE: 'ModelScope'
   },
 });
 
