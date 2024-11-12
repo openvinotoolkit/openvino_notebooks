@@ -51,7 +51,6 @@ def init_pipeline(models_dict, configs_dict, model_id='stabilityai/stable-diffus
             def forward(self, *args, **kwargs):
                 del kwargs['joint_attention_kwargs']
                 del kwargs['return_dict']
-                print(kwargs)
                 return self.model(*args, **kwargs)   
         if len(base_class) > 1: 
             return WrappedTransformer(pipe_model, **config)
