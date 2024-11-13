@@ -13,6 +13,14 @@ import torch
 from model.cloth_masker import AutoMasker
 from model.pipeline import CatVTONPipeline
 
+MODEL_DIR = Path("models")
+VAE_ENCODER_PATH = MODEL_DIR / "vae_encoder.xml"
+VAE_DECODER_PATH = MODEL_DIR / "vae_decoder.xml"
+UNET_PATH = MODEL_DIR / "unet.xml"
+DENSEPOSE_PROCESSOR_PATH = MODEL_DIR / "densepose_processor.xml"
+SCHP_PROCESSOR_ATR = MODEL_DIR / "schp_processor_atr.xml"
+SCHP_PROCESSOR_LIP = MODEL_DIR / "schp_processor_lip.xml"
+
 
 def convert(model: torch.nn.Module, xml_path: str, example_input):
     xml_path = Path(xml_path)
@@ -57,10 +65,10 @@ class UNetWrapper(torch.nn.Module):
         return result
 
 
-def download_models(model_dir):
+def download_models():
     resume_path = "zhengchong/CatVTON"
     base_model_path = "booksforcharlie/stable-diffusion-inpainting"
-    repo_path = snapshot_download(repo_id=resume_path, local_dir=model_dir)
+    repo_path = snapshot_download(repo_id=resume_path, local_dir=MODEL_DIR)
 
     pipeline = CatVTONPipeline(base_ckpt=base_model_path, attn_ckpt=repo_path, attn_ckpt_version="mix", use_tf32=True, device="cpu")
 
@@ -82,19 +90,19 @@ def download_models(model_dir):
     return pipeline, mask_processor, automasker
 
 
-def convert_pipeline_models(pipeline, vae_encoder_path, vae_decoder_path, unet_path):
-    convert(VaeEncoder(pipeline.vae), vae_encoder_path, torch.zeros(1, 3, 1024, 768))
-    convert(VaeDecoder(pipeline.vae), vae_decoder_path, torch.zeros(1, 4, 128, 96))
+def convert_pipeline_models(pipeline):
+    convert(VaeEncoder(pipeline.vae), VAE_ENCODER_PATH, torch.zeros(1, 3, 1024, 768))
+    convert(VaeDecoder(pipeline.vae), VAE_DECODER_PATH, torch.zeros(1, 4, 128, 96))
 
     inpainting_latent_model_input = torch.zeros(2, 9, 256, 96)
     timestep = torch.tensor(0)
     encoder_hidden_states = torch.zeros(2, 1, 768)
     example_input = (inpainting_latent_model_input, timestep, encoder_hidden_states)
 
-    convert(UNetWrapper(pipeline.unet), unet_path, example_input)
+    convert(UNetWrapper(pipeline.unet), UNET_PATH, example_input)
 
 
-def convert_automasker_models(automasker, densepose_processor_path, schp_processor_atr_path, schp_processor_lip_path):
+def convert_automasker_models(automasker):
     from detectron2.export import TracingAdapter  # it's detectron2 from CatVTON repo
 
     def inference(model, inputs):
@@ -106,10 +114,10 @@ def convert_automasker_models(automasker, densepose_processor_path, schp_process
     warnings.filterwarnings("ignore")
     traceable_model = TracingAdapter(automasker.densepose_processor.predictor.model, tracing_input, inference)
 
-    convert(traceable_model, densepose_processor_path, tracing_input[0]["image"])
+    convert(traceable_model, DENSEPOSE_PROCESSOR_PATH, tracing_input[0]["image"])
 
-    convert(automasker.schp_processor_atr.model, schp_processor_atr_path, torch.rand([1, 3, 512, 512], dtype=torch.float32))
-    convert(automasker.schp_processor_lip.model, schp_processor_lip_path, torch.rand([1, 3, 473, 473], dtype=torch.float32))
+    convert(automasker.schp_processor_atr.model, SCHP_PROCESSOR_ATR, torch.rand([1, 3, 512, 512], dtype=torch.float32))
+    convert(automasker.schp_processor_lip.model, SCHP_PROCESSOR_LIP, torch.rand([1, 3, 473, 473], dtype=torch.float32))
 
 
 class VAEWrapper(torch.nn.Module):
@@ -215,3 +223,15 @@ def get_compiled_automasker(automasker, core, device, densepose_processor_path, 
     automasker.schp_processor_lip.model = ConvSchpProcessorWrapper(compiled_schp_processor_lip)
 
     return automasker
+
+
+def get_pipeline_selection_option(optimized_pipe=None):
+    import ipywidgets as widgets
+
+    model_available = optimized_pipe is not None
+    use_quantized_models = widgets.Checkbox(
+        value=model_available,
+        description="Use quantized models",
+        disabled=not model_available,
+    )
+    return use_quantized_models

@@ -12,13 +12,14 @@ concatenating them in spatial dimensions as inputs. The efficiency of the model 
 Teaser image from [CatVTON GitHub](https://github.com/Zheng-Chong/CatVTON)
 ![teaser](https://github.com/Zheng-Chong/CatVTON/blob/edited/resource/img/teaser.jpg?raw=true)
 
-In this tutorial we consider how to convert, optimize and run this model using OpenVINO.
+In this tutorial we consider how to convert, optimize and run this model using OpenVINO. An additional part demonstrates how to run optimization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
 
 ## Notebook contents
 This tutorial consists of the following steps:
 - Prerequisites
 - Convert the model to OpenVINO IR
 - Compiling models
+- Optimizing the model using NNCF Post-Training Quantization API
 - Interactive inference
 
 ## Installation instructions

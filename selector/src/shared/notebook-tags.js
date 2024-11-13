@@ -97,6 +97,8 @@ export const LIBRARIES = /** @type {const} */ ({
     PADDLE: 'PaddlePaddle',
     ULTRALYTICS: 'Ultralytics',
     GRADIO: 'Gradio',
+    JAX: 'JAX',
+    MODELSCOPE: 'ModelScope'
   },
 });
 

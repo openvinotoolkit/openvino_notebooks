@@ -60,17 +60,20 @@ export const StatusTable = ({ status }: StatusTableProps) => {
   const osOptions = Object.keys(status) as (keyof typeof status)[];
   const cpuStatuses = osOptions.map((os) => Object.values(status[os]['cpu'])).flat();
   const gpuStatuses = osOptions.map((os) => Object.values(status[os]['gpu'])).flat();
+  const showGPU = false;
 
   return (
     <div className="status-table spark-font-75">
       <div className="cpu-device-header device-header">
         <div className="cell">CPU</div>
       </div>
-      <div className="gpu-device-header device-header">
-        <div className="cell">GPU</div>
-      </div>
+      {showGPU && (
+        <div className="gpu-device-header device-header">
+          <div className="cell">GPU</div>
+        </div>
+      )}
       <div className="cpu-python-versions python-versions">{pythonVersionsCells}</div>
-      <div className="gpu-python-versions python-versions">{pythonVersionsCells}</div>
+      {showGPU && <div className="gpu-python-versions python-versions">{pythonVersionsCells}</div>}
       <div className="os-header">
         <div className="cell">OS</div>
       </div>
@@ -88,13 +91,15 @@ export const StatusTable = ({ status }: StatusTableProps) => {
           </div>
         ))}
       </div>
-      <div className="gpu-statuses statuses">
-        {gpuStatuses.map((v, i) => (
-          <div key={`status-gpu-${i}`} className="cell">
-            {getStatusIcon(v)}
-          </div>
-        ))}
-      </div>
+      {showGPU && (
+        <div className="gpu-statuses statuses">
+          {gpuStatuses.map((v, i) => (
+            <div key={`status-gpu-${i}`} className="cell">
+              {getStatusIcon(v)}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

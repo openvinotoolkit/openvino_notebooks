@@ -9,7 +9,7 @@ notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ip
 notebooks/paint-by-example/paint-by-example.ipynb
 notebooks/qrcode-monster/qrcode-monster.ipynb
 notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb
-notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb
+notebooks/quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb
 notebooks/softvc-voice-conversion/softvc-voice-conversion.ipynb
 notebooks/speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb
 notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image.ipynb

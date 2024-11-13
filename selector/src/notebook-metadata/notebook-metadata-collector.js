@@ -171,7 +171,7 @@ const librariesPatterns = {
   'Model Server': ['import ovmsclient', 'from ovmsclient'],
   'Open Model Zoo': ['omz_downloader', 'omz_converter', 'omz_info_dumper'],
   'Benchmark Tool': ['benchmark_app'],
-  'Optimum Intel': ['import optimum.intel', 'from optimum.intel'],
+  'Optimum Intel': ['import optimum.intel', 'from optimum.intel', "optimum-cli export openvino", "optimum_cli"],
   Transformers: ['import transformers', 'from transformers'],
   Diffusers: ['import diffusers', 'from diffusers'],
   TensorFlow: ['import tensorflow', 'from tensorflow'],
@@ -184,4 +184,6 @@ const librariesPatterns = {
   'OpenVINO Tokenizers': ['import openvino_tokenizers', 'from openvino_tokenizers'],
   'OpenVINO GenAI': ['import openvino_genai', 'from openvino_genai'],
   'OpenVINO Explainable AI': ['import openvino_xai', 'from openvino_xai'],
+  JAX: ['import jax'],
+  'ModelScope': ['import modelscope','from modelscope', 'modelscope download']
 };

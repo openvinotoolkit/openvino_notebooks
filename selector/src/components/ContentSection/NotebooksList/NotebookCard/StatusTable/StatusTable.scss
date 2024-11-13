@@ -32,11 +32,12 @@
 
 .status-table {
   --table-border-color: var(--spark-color-theme-light-gray400);
+  --num-devices: 1;
 
   border: 1px solid var(--table-border-color);
   border-bottom: 0;
   display: grid;
-  grid-template-columns: auto repeat(8, auto);
+  grid-template-columns: auto repeat(calc(4 * var(--num-devices)), auto);
   grid-template-rows: repeat(6, 1fr);
   grid-auto-flow: row;
 

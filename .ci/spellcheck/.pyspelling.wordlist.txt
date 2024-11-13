@@ -98,6 +98,8 @@ CHW
 Cifar
 cityscape
 Cityscapes
+Civitai
+CivitAI
 classname
 ClassProbabilityMap
 CLI
@@ -245,6 +247,7 @@ Embedder
 embeddings
 EnCodec
 encodec
+english
 enum
 et
 Evol
@@ -346,12 +349,14 @@ imagenet
 Imagenet
 ImageNet
 Imagenette
+ImagePipeline
 ImageWoof
 ImgPipeline
 impactful
 IMU
 IMUs
 InceptionResNetV
+intialization
 inferencing
 InferRequest
 InferRequests
@@ -378,6 +383,8 @@ ip
 ir
 IRs
 iteratively
+JAX
+JAX's
 JFLEG
 JIT
 Jina
@@ -423,6 +430,7 @@ LangChain
 langchain
 Lasinger
 latents
+lookahead
 LCMs
 LCMScheduler
 LDM
@@ -459,6 +467,7 @@ LSTMs
 Luo
 LVLM
 Lyth
+MaaS
 macOS
 Magika
 masklet
@@ -506,6 +515,8 @@ MobileVLM
 modelled
 ModelBest
 Modelscope
+ModelScope
+modelscope
 Mody
 MONAI
 MONAI's
@@ -543,12 +554,14 @@ Netron
 NeuSpell
 NeXT
 NLP
+nlp
 NMS
 nn
 NNCF
 nncf
 noncomparable
 NONINFRINGEMENT
+nonlinearity
 Notus
 notus
 nsamples
@@ -594,6 +607,7 @@ OpenVoiceBaseClass
 opset
 optimizable
 Orca
+OuteTTS
 OVC
 overfitting
 overlayed
@@ -649,6 +663,7 @@ PIL
 PNDM
 png
 Pointilism
+pointillistic
 PointNet
 pos
 Postfuse
@@ -766,6 +781,7 @@ Ruizhongtai
 Runtime
 runtime
 runtimes
+Safetensors
 SageMaker
 sagittal
 SALICON
@@ -803,6 +819,7 @@ SigLIP
 SigLip
 siglip
 SISR
+SL
 SlimOrca
 SlowFast
 slowfast
@@ -880,6 +897,7 @@ th
 timestep
 timesteps
 TinyLlama
+tinynas
 Tokenization
 tokenization
 tokenize
