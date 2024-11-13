@@ -44,12 +44,6 @@ def prepare_calibration_data_vision(dataloader, init_steps):
     This function prepares calibration data from a dataloader for a specified number of initialization steps.
     It iterates over the dataloader, fetching batches and storing the relevant data.
     """
-    prompt = "<|image|><|begin_of_text|>If I had to write a haiku for this one"
-    url = "https://www.ilankelman.org/stopsigns/australia.jpg"
-    image = Image.open(requests.get(url, stream=True).raw)
-    model_id = "Llama-3.2-11B-Vision-Instruct/OV"
-    processor = AutoProcessor.from_pretrained(model_id)
-    inputs = processor(text=prompt, images=image, return_tensors="pt")
     data = []
     print(f"Fetching {init_steps} samples for the initialization...")
     with tqdm(total=init_steps) as pbar:
@@ -62,8 +56,8 @@ def prepare_calibration_data_vision(dataloader, init_steps):
                     data.append(
                         {
                             "pixel_values": batch["pixel_values"].to("cpu"),
-                            "aspect_ratio_ids": inputs.data["aspect_ratio_ids"].to("cpu"),
-                            "aspect_ratio_mask": inputs.data["aspect_ratio_mask"],
+                            "aspect_ratio_ids": batch.data["aspect_ratio_ids"].to("cpu"),
+                            "aspect_ratio_mask": batch.data["aspect_ratio_mask"].to("cpu"),
                         }
                     )
     return data
@@ -127,11 +121,6 @@ def prepare_calibration_data_llm(dataloader, init_steps, mllm, processor):
     It iterates over the dataloader, fetching batches and storing the relevant data.
     """
     data = []
-
-    prompt = "<|image|><|begin_of_text|>If I had to write a haiku for this one"
-    url = "https://www.ilankelman.org/stopsigns/australia.jpg"
-    image = Image.open(requests.get(url, stream=True).raw)
-    inputs = processor(text=prompt, images=image, return_tensors="pt")
 
     print(f"Fetching {init_steps} samples for the initialization...")
     with tqdm(total=init_steps) as pbar:
