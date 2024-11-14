@@ -1,7 +1,7 @@
 import gradio as gr
 import numpy as np
 
-import openvino_genai
+import openvino_genai as ov_genai
 
 
 MAX_SEED = np.iinfo(np.int32).max
@@ -40,7 +40,7 @@ def make_demo(pipeline, generator_cls, adapter_config):
             adapters=adapter_config if use_lora else openvino_genai.AdapterConfig(),
         )
 
-        return image_tensor.data[0]
+        return image_tensor.data[0], seed
 
     with gr.Blocks(css=css) as demo:
         with gr.Column(elem_id="col-container"):
@@ -112,7 +112,7 @@ def make_demo(pipeline, generator_cls, adapter_config):
             triggers=[run_button.click, prompt.submit, negative_prompt.submit],
             fn=infer,
             inputs=[prompt, negative_prompt, seed, randomize_seed, width, height, num_inference_steps, use_lora],
-            outputs=[result],
+            outputs=[result, seed],
         )
 
     return demo
