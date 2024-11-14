@@ -5,7 +5,7 @@ import numpy as np
 MAX_SEED = np.iinfo(np.int32).max
 
 
-def make_demo_lcm(fn: Callable, quantized: bool):
+def make_demo_lcm(fn: Callable):
     examples = [
         "portrait photo of a girl, photograph, highly detailed face, depth of field, moody light, golden hour,"
         "style by Dan Winters, Russell James, Steve McCurry, centered, extremely detailed, Nikon D850, award winning photography",
@@ -28,17 +28,10 @@ def make_demo_lcm(fn: Callable, quantized: bool):
             with gr.Row():
                 with gr.Column():
                     result = gr.Image(
-                        label="Result (Original)" if quantized else "Image",
+                        label="Result Image",
                         type="pil",
                     )
                     run_button = gr.Button("Run")
-                with gr.Column(visible=quantized):
-                    result_optimized = gr.Image(
-                        label="Result (Optimized)",
-                        type="pil",
-                        visible=quantized,
-                    )
-                    run_quantized_button = gr.Button(value="Run quantized", visible=quantized)
 
         with gr.Accordion("Advanced options", open=False):
             seed = gr.Slider(label="Seed", minimum=0, maximum=MAX_SEED, step=1, value=0, randomize=True)
@@ -98,25 +91,6 @@ def make_demo_lcm(fn: Callable, quantized: bool):
             ],
             outputs=[result, seed],
         )
-
-        if quantized:
-            gr.on(
-                triggers=[
-                    prompt.submit,
-                    run_quantized_button.click,
-                ],
-                fn=fn,
-                inputs=[
-                    prompt,
-                    seed,
-                    width,
-                    height,
-                    guidance_scale,
-                    num_inference_steps,
-                    randomize_seed,
-                ],
-                outputs=[result_optimized, seed],
-            )
     return demo
 
 

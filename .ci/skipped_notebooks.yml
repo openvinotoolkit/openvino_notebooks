@@ -594,3 +594,7 @@
   skips:
     - os:
         - macos-12
+- notebook: notebooks/mobileclip-video-search/mobileclip-video-search.ipynb
+  skips:
+    - os:
+        - macos-12
