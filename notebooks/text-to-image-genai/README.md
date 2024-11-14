@@ -1,6 +1,10 @@
 # Text to Image pipeline and OpenVINO with Generate API
 
-OpenVINO GenAI is a new flavor of OpenVINO, aiming to simplify running inference of generative AI models. It hides the complexity of the generation process and minimizes the amount of code required. You can now provide a model and input context directly to OpenVINO, which performs tokenization of the input text, executes the generation loop on the selected device, and returns the generated results. For a quick start guide, refer to the [GenAI API Guide](https://docs.openvino.ai/2024/learn-openvino/llm_inference_guide/genai-guide.html).
+[OpenVINO™ GenAI](https://github.com/openvinotoolkit/openvino.genai) is a library of the most popular Generative AI model pipelines, optimized execution methods, and samples that run on top of highly performant OpenVINO Runtime.
+
+This library is friendly to PC and laptop execution, and optimized for resource consumption. It requires no external dependencies to run generative models as it already includes all the core functionality (e.g. tokenization via openvino-tokenizers).
+
+In this tutorial we consider how to use OpenVINO GenAI for image generation scenario.
 
 ## Notebook Contents
 
