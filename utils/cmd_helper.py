@@ -17,8 +17,8 @@ def clone_repo(repo_url: str, revision: str = None, add_to_sys_path: bool = True
 
         if revision:
             subprocess.Popen(["git", "checkout", revision], cwd=str(repo_path))
-    if add_to_sys_path:
-        sys.path.insert(0, str(repo_path))
+    if add_to_sys_path and str(repo_path.resolve()) not in sys.path:
+            sys.path.insert(0, str(repo_path.resolve()))
 
     return repo_path
 
