@@ -53,6 +53,8 @@ def init_pipeline(models_dict, configs_dict, model_id="stabilityai/stable-diffus
                 pooled_projection_dim,
                 out_channels,
                 pos_embed_max_size,
+                dual_attention_layers,
+                qk_norm
             ):
                 super().__init__()
                 self.model = model
