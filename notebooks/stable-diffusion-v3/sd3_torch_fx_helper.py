@@ -54,7 +54,7 @@ def init_pipeline(models_dict, configs_dict, model_id="stabilityai/stable-diffus
                 out_channels,
                 pos_embed_max_size,
                 dual_attention_layers,
-                qk_norm
+                qk_norm,
             ):
                 super().__init__()
                 self.model = model
