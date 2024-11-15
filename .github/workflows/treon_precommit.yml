@@ -35,7 +35,7 @@ permissions:
 jobs:
   build_treon:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         runs_on: [ubuntu-20.04, windows-2019, macos-12]
         python: ['3.9', '3.10', '3.11', '3.12']
