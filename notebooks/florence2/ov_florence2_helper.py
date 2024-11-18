@@ -41,6 +41,7 @@ def cleanup_torchscript_cache():
     torch.jit._recursive.concrete_type_store = torch.jit._recursive.ConcreteTypeStore()
     torch.jit._state._clear_class_state()
 
+
 def download_original_model(model_id, orig_model_dir):
     hf_hub.snapshot_download(repo_id=model_id, local_dir=orig_model_dir)
     modeling_file = orig_model_dir / "modeling_florence2.py"
@@ -55,6 +56,7 @@ def download_original_model(model_id, orig_model_dir):
         content = content.replace("    from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input", "")
         with modeling_file.open("w") as out_f:
             out_f.write(content)
+
 
 def convert_florence2(model_id, output_dir, orig_model_dir=None):
     output_dir = Path(output_dir)
@@ -78,7 +80,6 @@ def convert_florence2(model_id, output_dir, orig_model_dir=None):
         orig_model_dir = output_dir / "chkpt"
     if not orig_model_dir.exists():
         download_original_model(model_id, orig_model_dir)
-
 
     model = AutoModelForCausalLM.from_pretrained(orig_model_dir, trust_remote_code=True)
     processor = AutoProcessor.from_pretrained(orig_model_dir, trust_remote_code=True)

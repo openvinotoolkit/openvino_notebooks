@@ -237,6 +237,7 @@ DreamBooth Tsinghua
 Dreamshaper
 dropdown
 DynamiCrafter
+EasyOCR
 ECCV
 editability
 EfficientNet
@@ -318,6 +319,7 @@ GroundedSAM
 GroundingDINO
 gRPC
 Gu
+GUIs
 Gutendex
 Hafner
 HugginFaceH
@@ -355,7 +357,6 @@ impactful
 IMU
 IMUs
 InceptionResNetV
-intialization
 inferencing
 InferRequest
 InferRequests
@@ -370,6 +371,7 @@ instantiation
 InstructGPT
 InstructPix
 intel
+interactable
 InternLM
 internlm
 Interpolative
@@ -579,6 +581,7 @@ ocr
 OCRBench
 OCRv
 odometry
+OmniParser
 OMZ
 OneFormer
 oneformer
