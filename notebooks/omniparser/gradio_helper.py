@@ -1,17 +1,27 @@
+from pathlib import Path
+import requests
+from PIL import Image
 import gradio as gr
 
 MARKDOWN = """
 # OpenVINO OmniParser for Pure Vision Based General GUI Agent 🔥
-<div>
-    <a href="https://arxiv.org/pdf/2408.00203">
-        <img src="https://img.shields.io/badge/arXiv-2408.00203-b31b1b.svg" alt="Arxiv" style="display:inline-block;">
-    </a>
-</div>
-
 OmniParser is a screen parsing tool to convert general GUI screen to structured elements. 
 """
 
+example_images = [
+    ("https://github.com/microsoft/OmniParser/blob/master/imgs/windows_home.png?raw=true", "examples/windows_home.png"),
+    ("https://github.com/microsoft/OmniParser/blob/master/imgs/logo.png?raw=true", "examples/logo.png"),
+    ("https://github.com/microsoft/OmniParser/blob/master/imgs/windows_multitab.png?raw=true", "examples/multitab.png")
+
+]
+
 def make_demo(process_fn):
+    examples_dir = Path("examples")
+    examples_dir.mkdir(exist_ok=True, parents=True)
+    for url, filename in example_images:
+        if not Path(filename).exists():
+            image = Image.open(requests.get(url, stream=True).raw)
+            image.save(filename)
 
     with gr.Blocks() as demo:
         gr.Markdown(MARKDOWN)
@@ -32,7 +42,11 @@ def make_demo(process_fn):
             with gr.Column():
                 image_output_component = gr.Image(type='pil', label='Image Output')
                 text_output_component = gr.Textbox(label='Parsed screen elements', placeholder='Text Output')
-
+        gr.Examples(
+            examples=list(Path("examples").glob("*.png")),
+            inputs=[image_input_component ],
+            label="Try examples",
+        )
         submit_button_component.click(
             fn=process_fn,
             inputs=[

@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from typing import List, Optional, Union, Tuple
+import types
 
 import cv2
 import numpy as np
@@ -9,6 +10,7 @@ from supervision.detection.core import Detections
 from supervision.draw.color import Color, ColorPalette
 import torch
 import numpy as np
+
 from ov_florence2_helper import download_original_model
 from huggingface_hub import hf_hub_download
 from PIL import Image
@@ -561,9 +563,41 @@ def process_image(
         'thickness': max(int(3 * box_overlay_ratio), 1),
     }
 
-    ocr_bbox_rslt, _ = check_ocr_box(reader, image_path, output_bb_format='xyxy', goal_filtering=None, easyocr_args={'paragraph': False, 'text_threshold':0.9})
+    ocr_bbox_rslt, _ = check_ocr_box(reader, str(image_path), output_bb_format='xyxy', goal_filtering=None, easyocr_args={'paragraph': False, 'text_threshold':0.9})
     text, ocr_bbox = ocr_bbox_rslt
-    dino_labled_img, _, parsed_content_list = get_som_labeled_img(image_path, icon_detector, BOX_TRESHOLD = box_threshold, output_coord_in_ratio=True, ocr_bbox=ocr_bbox,draw_bbox_config=draw_bbox_config, caption_model_processor=caption_model_processor, ocr_text=text,iou_threshold=iou_threshold, imgsz=imgsz)  
+    dino_labled_img, labels_coordinates, parsed_content_list = get_som_labeled_img(image_path, icon_detector, BOX_TRESHOLD = box_threshold, output_coord_in_ratio=True, ocr_bbox=ocr_bbox,draw_bbox_config=draw_bbox_config, caption_model_processor=caption_model_processor, ocr_text=text,iou_threshold=iou_threshold, imgsz=imgsz)  
     print('finish processing')
     parsed_content_list = '\n'.join(parsed_content_list)
-    return dino_labled_img,  str(parsed_content_list)
+    return dino_labled_img,  labels_coordinates, str(parsed_content_list)
+
+
+def easyocr_reader(models_dir, detector_device, recognizer_device):
+    import easyocr
+
+    reader = easyocr.Reader(['en'], quantize=False)
+    recognizer_path = Path(models_dir) / "recognizer.xml"
+    detector_path = Path(models_dir) / "detector.xml"
+
+    if not recognizer_path.exists():
+        ov_model = ov.convert_model(reader.recognizer, example_input=(torch.zeros([1, 1, 64, 320]), torch.zeros([1, 33], dtype=torch.long)))
+        ov.save_model(ov_model, recognizer_path)
+    
+    if not detector_path.exists():
+        ov_model = ov.convert_model(reader.detector, example_input=torch.zeros([1, 3, 1728, 2560]))
+        ov.save_model(ov_model, detector_path)
+    
+    ov_recognizer = core.compile_model(recognizer_path, recognizer_device)
+    ov_detector = core.compile_model(detector_path, detector_device)
+
+    def forward_detector(self, input):
+        result = ov_detector(input)
+        return torch.from_numpy(result[0]), torch.from_numpy(result[1])
+
+    def forward_recognizer(self, input, text):
+        result = ov_recognizer([input, text])[0]
+        return torch.from_numpy(result)
+
+    reader.detector.forward = types.MethodType(forward_detector, reader.detector)
+    reader.recognizer.forward = types.MethodType(forward_recognizer, reader.recognizer)
+
+    return reader
