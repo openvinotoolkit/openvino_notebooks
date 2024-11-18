@@ -42,7 +42,23 @@ def cleanup_torchscript_cache():
     torch.jit._state._clear_class_state()
 
 
-def convert_florence2(model_id, output_dir):
+def download_original_model(model_id, orig_model_dir):
+    hf_hub.snapshot_download(repo_id=model_id, local_dir=orig_model_dir)
+    modeling_file = orig_model_dir / "modeling_florence2.py"
+    orig_modeling_file = orig_model_dir / f"orig_{modeling_file.name}"
+    if not orig_modeling_file.exists():
+        modeling_file.rename(orig_modeling_file)
+    with orig_modeling_file.open("r") as f:
+        content = f.read()
+        content = content.replace("if is_flash_attn_2_available():", "")
+        content = content.replace("    from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input", "")
+        content = content.replace("    from flash_attn import flash_attn_func, flash_attn_varlen_func", "")
+        content = content.replace("    from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input", "")
+        with modeling_file.open("w") as out_f:
+            out_f.write(content)
+
+
+def convert_florence2(model_id, output_dir, orig_model_dir=None):
     output_dir = Path(output_dir)
 
     required_conversion = not all(
@@ -60,21 +76,10 @@ def convert_florence2(model_id, output_dir):
 
     print(f"⌛ {model_id} conversion started. Be patient, it may takes some time.")
     print("⌛ Load Original model")
-    orig_model_dir = output_dir / "chkpt"
+    if orig_model_dir is None:
+        orig_model_dir = output_dir / "chkpt"
     if not orig_model_dir.exists():
-        hf_hub.snapshot_download(repo_id=model_id, local_dir=orig_model_dir)
-        modeling_file = orig_model_dir / "modeling_florence2.py"
-        orig_modeling_file = orig_model_dir / f"orig_{modeling_file.name}"
-        if not orig_modeling_file.exists():
-            modeling_file.rename(orig_modeling_file)
-        with orig_modeling_file.open("r") as f:
-            content = f.read()
-            content = content.replace("if is_flash_attn_2_available():", "")
-            content = content.replace("    from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input", "")
-            content = content.replace("    from flash_attn import flash_attn_func, flash_attn_varlen_func", "")
-            content = content.replace("    from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input", "")
-            with modeling_file.open("w") as out_f:
-                out_f.write(content)
+        download_original_model(model_id, orig_model_dir)
 
     model = AutoModelForCausalLM.from_pretrained(orig_model_dir, trust_remote_code=True)
     processor = AutoProcessor.from_pretrained(orig_model_dir, trust_remote_code=True)
