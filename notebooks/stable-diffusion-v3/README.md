@@ -16,7 +16,7 @@ If you want to run previous Stable Diffusion versions, please check our other no
 * [Turbo SD](../sketch-to-image-pix2pix-turbo)
 
 
-The notebooks provides a simple interface that allows communication with a model using text instruction. In this demonstration user can provide input instructions and the model generates an image. An additional part demonstrates how to optimize model with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline and reduce memory consumption. The torch FX notebook also follows a similar approach but showcasing the capabilities of [NNCF](https://github.com/openvinotoolkit/nncf/) and torch compile with openvino backend in succesfully optimizing with the torch FX model representation.
+The notebooks provides a simple interface that allows communication with a model using text instruction. In this demonstration user can provide input instructions and the model generates an image. An additional part demonstrates how to optimize model with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline and reduce memory consumption. The torch FX notebook also follows a similar approach but showcasing the capabilities of [NNCF](https://github.com/openvinotoolkit/nncf/) and torch compile with openvino backend in successfully optimizing with the torch FX model representation.
 
 The image below illustrates the provided generated image example.
 
