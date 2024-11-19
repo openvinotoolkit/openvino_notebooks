@@ -27,7 +27,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -35,7 +35,7 @@ permissions:
 jobs:
   build_treon:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         runs_on: [ubuntu-20.04, windows-2019, macos-12]
         python: ['3.9', '3.10', '3.11', '3.12']
