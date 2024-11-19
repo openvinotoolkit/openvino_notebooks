@@ -283,6 +283,7 @@ freevc
 frisbee
 Frontend
 frontend
+FX
 GAN
 Gante
 Gaudi
@@ -919,6 +920,7 @@ TorchMetrics
 TorchScript
 torchvision
 TorchVision
+TorchFX
 transformative
 triplane
 TriplaneLearnablePositionalEmbedding
