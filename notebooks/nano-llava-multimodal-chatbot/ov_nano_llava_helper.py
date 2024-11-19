@@ -1,33 +1,7 @@
 from pathlib import Path
 import shutil
-from huggingface_hub import snapshot_download
 import torch
 from PIL import Image
-
-
-def download_original_model(model_id, model_local_dir):
-    if not model_local_dir.exists():
-        snapshot_download(repo_id=model_id, local_dir=model_local_dir)
-
-    modeling_file = model_local_dir / "modeling_llava_qwen2.py"
-    orig_modeling_file = model_local_dir / f"orig_{modeling_file.name}"
-
-    # model code depends from flash_attn package that may be problematic to load. Patch model code for avoiding import of this package
-    if not orig_modeling_file.exists():
-        modeling_file.rename(orig_modeling_file)
-    with orig_modeling_file.open("r") as f:
-        content = f.read()
-    replacement_lines = [
-        ("from flash_attn import flash_attn_func, flash_attn_varlen_func", ""),
-        ("from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input", ""),
-        (' _flash_supports_window_size = "window_size" in list(inspect.signature(flash_attn_func).parameters)', "pass"),
-    ]
-
-    for replace_pair in replacement_lines:
-        content = content.replace(*replace_pair)
-
-    with modeling_file.open("w") as f:
-        f.write(content)
 
 
 def converted_model_exists(model_dir):
