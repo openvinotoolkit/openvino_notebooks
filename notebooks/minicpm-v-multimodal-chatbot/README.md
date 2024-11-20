@@ -14,7 +14,7 @@ The tutorial consists from following steps:
 - Download PyTorch model
 - Convert model to OpenVINO Intermediate Representation (IR)
 - Compress Language Model weights
-- Prepare Inference Pipeline
+- Prepare Inference Pipeline using OpenVINO GenAI
 - Run OpenVINO model inference
 - Launch Interactive demo
 
