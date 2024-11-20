@@ -4,7 +4,7 @@ LLM are limited to the knowledge on which they have been trained and the additio
 
 The core idea of agents is to use a language model to choose a sequence of actions to take. In agents, a language model is used as a reasoning engine to determine which actions to take and in which order. Agents can be seen as applications powered by LLMs and integrated with a set of tools like search engines, databases, websites, and so on. Within an agent, the LLM is the reasoning engine that, based on the user input, is able to plan and execute a set of actions that are needed to fulfill the request.
 
-![agent ui](https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/2abb2389-e612-4599-82c6-64cdac259120)
+![image](https://github.com/user-attachments/assets/b656adab-a448-4784-a6df-a068e0cb45bb)
 
 This notebook explores how to create an ReAct Agent step by step using OpenVINO. [ReAct](https://arxiv.org/abs/2210.03629) is an approach to combine reasoning (e.g. chain-of-thought prompting) and acting. ReAct overcomes issues of hallucination and error propagation prevalent in chain-of-thought reasoning by interacting with a simple Wikipedia API, and generates human-like task-solving trajectories that are more interpretable than baselines without reasoning traces. 
 
