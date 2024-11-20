@@ -20,7 +20,8 @@ example_image_urls = [
     ),
 ]
 for url, file_name in example_image_urls:
-    Image.open(requests.get(url, stream=True).raw).save(file_name)
+    if not Path(file_name).exists():
+        Image.open(requests.get(url, stream=True).raw).save(file_name)
 
 
 def make_demo_llava(model):
