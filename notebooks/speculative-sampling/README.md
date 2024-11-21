@@ -43,24 +43,11 @@ For details, please refer to [Installation Guide](../../README.md).
 A numpy version of speculative sampling is available from Mody at https://jaykmody.com/blog/speculative-sampling/ - while our code was written from scratch, we did make use of this code as a validation point for the technique.
 
 ## References
-[1] Pope et al, *Efficiently Scaling Transformer Inference,* http://arxiv.org/abs/2211.05102
+[1] Leviathan et al, *Fast Inference from Transformers via Speculative Decoding,* https://arxiv.org/pdf/2211.17192 
+[2] Chen et al, *Accelerating Large Language Model Decoding with Speculative Sampling,* http://arxiv.org/abs/2302.01318
+[3] Gante, Joao, *Assisted Generation: a new direction toward low-latency text generation,* https://huggingface.co/blog/assisted-generation
+[4] Jonathan Mamou et al, *Dynamic Speculation Lookahead Accelerates Speculative Decoding of Large Language Models,* https://arxiv.org/abs/2405.04304
+[5] Zafrir et al, *FastDraft: How to Train Your Draft,* https://arxiv.org/abs/2411.11055
+[6] Kozlov Alexander et al, *Optimize and deploy models with Optimum-Intel and OpenVINO GenAI,* https://huggingface.co/blog/deploy-with-openvino
 
-[2] Shazeer, *Fast Transformer Decoding: One Write-Head is All You Need,* http://arxiv.org/abs/1911.02150
-
-[3] Schuster et al, *Confident Adaptive Language Modeling,* https://arxiv.org/abs/2207.07061
-
-[4] Belrose et al, *Eliciting Latent Predictions from Transformers with the Tuned Lens,* http://arxiv.org/abs/2303.08112
-
-[5] Chen et al, *Accelerating Large Language Model Decoding with Speculative Sampling,* http://arxiv.org/abs/2302.01318
-
-[6] Kim et al, *Big Little Transformer Decoder,*  http://arxiv.org/abs/2302.07863
-
-[7] Gante, Joao, *Assisted Generation: a new direction toward low-latency text generation,* https://huggingface.co/blog/assisted-generation
-
-[8] Stern et al, *Blockwise Parallel Decoding for Deep Autoregressive Models,* http://arxiv.org/abs/1811.03115
-
-[9] Lai et al, *Understanding Autoregressive Model for Time Series as a Deterministic Dynamic System,*  https://www.soa.org/globalassets/assets/library/newsletters/predictive-analytics-and-futurism/2017/june/2017-predictive-analytics-iss15-lai-lu.pdf
-
-
-[def]: SpeculativeSampling.png
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/speculative-sampling/README.md" />

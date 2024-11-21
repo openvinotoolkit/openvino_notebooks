@@ -419,6 +419,7 @@ Kosaraju
 kosmos
 Kosmos
 KOSMOS
+Kozlov
 KServe
 Kubernetes
 Kupyn
@@ -474,11 +475,12 @@ Lyth
 MaaS
 macOS
 Magika
-masklet
 Mahalanobis
+Mamou
 Mapillary
 Markovian
 Martyniuk
+masklet
 maskrcnn
 MaterialMLP
 MaterialNet
@@ -1022,6 +1024,7 @@ Würstchen
 XAI
 XCode
 Xeon
+xformers
 xl
 xt
 xvector
@@ -1033,10 +1036,10 @@ YOLOv
 yolov
 Youri
 youri
+Zafrir
 ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
 Zhipu
 zh
-xformers
