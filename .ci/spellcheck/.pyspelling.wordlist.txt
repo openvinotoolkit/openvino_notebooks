@@ -249,6 +249,7 @@ embeddings
 EnCodec
 encodec
 english
+ENLSP
 enum
 et
 Evol
@@ -259,6 +260,7 @@ Explainer
 facto
 fastcomposer
 FastComposer
+FastDraft
 FastSAM
 FC
 feedforward
@@ -553,6 +555,7 @@ NEOX
 NER
 NETP
 Netron
+NeurIPS
 NeuSpell
 NeXT
 NLP
