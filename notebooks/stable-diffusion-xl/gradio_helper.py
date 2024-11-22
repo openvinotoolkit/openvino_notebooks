@@ -2,6 +2,7 @@ import gradio as gr
 from diffusers.utils import load_image
 import numpy as np
 
+
 # TODO Consider reusing make_demo_segmind_vegart
 def make_demo_sd_xl_text2image(pipeline):
     def generate_from_text(text, seed, num_steps):

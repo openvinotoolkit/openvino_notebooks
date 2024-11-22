@@ -266,7 +266,6 @@
 - [Audio compression with EnCodec and OpenVINO](./encodec-audio-compression/encodec-audio-compression.ipynb)
 - [Object segmentations with EfficientSAM and OpenVINO](./efficient-sam/efficient-sam.ipynb)
 - [Animating Open-domain Images with DynamiCrafter and OpenVINO](./dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb)
-- [Sentiment Analysis with OpenVINO™](./distilbert-sequence-classification/distilbert-sequence-classification.ipynb)
 - [Automatic speech recognition using Distil-Whisper and OpenVINO](./distil-whisper-asr/distil-whisper-asr.ipynb)
 - [Depth estimation with DepthAnything and OpenVINO](./depth-anything/depth-anything.ipynb)
 - [Depth estimation with DepthAnythingV2 and OpenVINO](./depth-anything/depth-anything-v2.ipynb)
