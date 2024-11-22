@@ -178,7 +178,6 @@
 - [Monodepth Estimation with OpenVINO](./vision-monodepth/vision-monodepth.ipynb)
 - [Image Background Removal with U^2-Net and OpenVINO™](./vision-background-removal/vision-background-removal.ipynb)
 - [Vehicle Detection And Recognition with OpenVINO™](./vehicle-detection-and-recognition/vehicle-detection-and-recognition.ipynb)
-- [Typo Detector with OpenVINO™](./typo-detector/typo-detector.ipynb)
 - [Image Generation with Tiny-SD and OpenVINO™](./tiny-sd-image-generation/tiny-sd-image-generation.ipynb)
 - [Selfie Segmentation using TFLite and OpenVINO](./tflite-selfie-segmentation/tflite-selfie-segmentation.ipynb)
 - [Text to Image pipeline and OpenVINO with Generate API](./text-to-image-genai/text-to-image-genai.ipynb)
