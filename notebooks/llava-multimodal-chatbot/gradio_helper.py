@@ -20,11 +20,12 @@ example_image_urls = [
     ),
 ]
 for url, file_name in example_image_urls:
-    Image.open(requests.get(url, stream=True).raw).save(file_name)
+    if not Path(file_name).exists():
+        Image.open(requests.get(url, stream=True).raw).save(file_name)
 
 
 def make_demo_llava(model):
-    import openvino_genai
+    import openvino_genai as ov_genai
     import openvino as ov
 
     has_additonal_buttons = "undo_button" in inspect.signature(gr.ChatInterface.__init__).parameters
@@ -73,7 +74,7 @@ def make_demo_llava(model):
 
         if not history:
             model.start_chat()
-        generation_config = openvino_genai.GenerationConfig()
+        generation_config = ov_genai.GenerationConfig()
         generation_config.max_new_tokens = 128
         files = message["files"] if isinstance(message, dict) else message.files
         message_text = message["text"] if isinstance(message, dict) else message.text

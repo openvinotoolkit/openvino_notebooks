@@ -5,4 +5,3 @@ notebooks/knowledge-graphs-conve/knowledge-graphs-conve.ipynb
 notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb
 notebooks/qrcode-monster/qrcode-monster.ipynb
 notebooks/sdxl-turbo/sdxl-turbo.ipynb
-notebooks/wuerstchen-image-generation/wuerstchen-image-generation.ipynb

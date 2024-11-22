@@ -37,7 +37,7 @@ def make_demo(pipeline, generator_cls, adapter_config):
             width=width,
             height=height,
             generator=generator,
-            adapters=adapter_config if use_lora else openvino_genai.AdapterConfig(),
+            adapters=adapter_config if use_lora else ov_genai.AdapterConfig(),
         )
 
         return image_tensor.data[0], seed

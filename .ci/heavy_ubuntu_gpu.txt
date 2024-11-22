@@ -6,7 +6,6 @@ notebooks/knowledge-graphs-conve/knowledge-graphs-conve.ipynb
 notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb
 notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
 notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb
-notebooks/paint-by-example/paint-by-example.ipynb
 notebooks/qrcode-monster/qrcode-monster.ipynb
 notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb
 notebooks/quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb
@@ -15,5 +14,4 @@ notebooks/speech-recognition-quantization/speech-recognition-quantization-wav2ve
 notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image.ipynb
 notebooks/style-transfer-webcam/style-transfer.ipynb
 notebooks/whisper-subtitles-generation/whisper-subtitles-generation.ipynb
-notebooks/wuerstchen-image-generation/wuerstchen-image-generation.ipynb
 notebooks/zeroscope-text2video/zeroscope-text2video.ipynb

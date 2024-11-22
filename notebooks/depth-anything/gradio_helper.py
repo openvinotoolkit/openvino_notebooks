@@ -25,10 +25,10 @@ def make_demo(fn: Callable, examples_dir: str):
         with gr.Row():
             input_image = gr.Image(label="Input Image", type="numpy", elem_id="img-display-input")
             depth_image_slider = ImageSlider(label="Depth Map with Slider View", elem_id="img-display-output", position=0)
-        raw_file = gr.File(label="16-bit raw depth (can be considered as disparity)")
+        depth_image_file = gr.File(label="Depth Image")
         submit = gr.Button("Submit")
 
-        submit.click(fn=fn, inputs=[input_image], outputs=[depth_image_slider, raw_file])
+        submit.click(fn=fn, inputs=[input_image], outputs=[depth_image_slider, depth_image_file])
 
         if not Path(examples_dir).exists():
             gr.Error(f"Examples directory {examples_dir} does not exist.")
@@ -37,7 +37,7 @@ def make_demo(fn: Callable, examples_dir: str):
         examples = gr.Examples(
             examples=example_files,
             inputs=[input_image],
-            outputs=[depth_image_slider, raw_file],
+            outputs=[depth_image_slider, depth_image_file],
             fn=fn,
             cache_examples=False,
         )

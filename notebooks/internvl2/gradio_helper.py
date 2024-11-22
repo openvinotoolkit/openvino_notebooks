@@ -25,7 +25,7 @@ for url, file_name in example_image_urls:
 
 
 def make_demo(model):
-    import openvino_genai
+    import openvino_genai as ov_genai
     import openvino as ov
 
     has_additonal_buttons = "undo_button" in inspect.signature(gr.ChatInterface.__init__).parameters
@@ -74,7 +74,7 @@ def make_demo(model):
 
         if not history:
             model.start_chat()
-        generation_config = openvino_genai.GenerationConfig()
+        generation_config = ov_genai.GenerationConfig()
         generation_config.max_new_tokens = 128
         files = message["files"] if isinstance(message, dict) else message.files
         message_text = message["text"] if isinstance(message, dict) else message.text

@@ -31,7 +31,7 @@ def make_demo(run_fn: Callable, stop_fn: Callable):
         css=".disclaimer {font-variant-caps: all-small-caps;}",
     ) as demo:
         gr.Markdown(f"""<h1><center>AI Agent with OpenVINO and LangChain</center></h1>""")
-        chatbot = gr.Chatbot(height=500)
+        chatbot = gr.Chatbot(height=800)
         with gr.Row():
             with gr.Column():
                 msg = gr.Textbox(
