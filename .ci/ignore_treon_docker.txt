@@ -16,8 +16,6 @@ notebooks/stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.ipynb
 notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image-demo.ipynb
 notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image.ipynb
 notebooks/segment-anything/segment-anything.ipynb
-notebooks/image-bind/image-bind.ipynb
-notebooks/dolly-2-instruction-following/dolly-2-instruction-following.ipynb
 notebooks/riffusion-text-to-music/riffusion-text-to-music.ipynb
 notebooks/freevc-voice-conversion/freevc-voice-conversion.ipynb
 notebooks/stable-diffusion-xl/stable-diffusion-xl.ipynb
@@ -38,13 +36,11 @@ notebooks/latent-consistency-models-image-generation/latent-consistency-models-i
 notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb
 notebooks/latent-consistency-models-image-generation/latent-consistency-models-optimum-demo.ipynb
 notebooks/qrcode-monster/qrcode-monster.ipynb
-notebooks/wuerstchen-image-generation/wuerstchen-image-generation.ipynb
 notebooks/speculative-sampling/speculative-sampling.ipynb
 notebooks/distil-whisper-asr/distil-whisper-asr.ipynb
 notebooks/film-slowmo/film-slowmo.ipynb
 notebooks/sound-generation-audioldm2/sound-generation-audioldm2.ipynb
 notebooks/sdxl-turbo/sdxl-turbo.ipynb
-notebooks/paint-by-example/paint-by-example.ipynb
 notebooks/llm-question-answering/llm-question-answering.ipynb
 notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.ipynb
 notebooks/stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb

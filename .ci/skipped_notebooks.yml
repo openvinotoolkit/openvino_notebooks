@@ -138,20 +138,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/image-bind/image-bind.ipynb
-  skips:
-    - os:
-        - macos-12
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
-- notebook: notebooks/dolly-2-instruction-following/dolly-2-instruction-following.ipynb
-  skips:
-    - os:
-        - macos-12
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/riffusion-text-to-music/riffusion-text-to-music.ipynb
   skips:
     - os:
@@ -167,13 +153,6 @@
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-diffusion-xl/stable-diffusion-xl.ipynb
-  skips:
-    - os:
-        - macos-12
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
-- notebook: notebooks/stable-diffusion-xl/segmind-vegart.ipynb
   skips:
     - os:
         - macos-12
@@ -285,13 +264,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/wuerstchen-image-generation/wuerstchen-image-generation.ipynb
-  skips:
-    - os:
-        - macos-12
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/speculative-sampling/speculative-sampling.ipynb
   skips:
     - os:
@@ -321,13 +293,6 @@
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/sdxl-turbo/sdxl-turbo.ipynb
-  skips:
-    - os:
-        - macos-12
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
-- notebook: notebooks/paint-by-example/paint-by-example.ipynb
   skips:
     - os:
         - macos-12
@@ -466,10 +431,6 @@
         - macos-12
     - device:
         - gpu
-- notebook: notebooks/mobilevlm-language-assistant/mobilevlm-language-assistant.ipynb
-  skips:
-    - os:
-        - macos-12
 - notebook: notebooks/grounded-segment-anything/grounded-segment-anything.ipynb
   skips:
     - os:

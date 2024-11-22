@@ -4,7 +4,7 @@ In the rapidly evolving world of artificial intelligence (AI), chatbots have eme
 Large Language Models (LLMs) are artificial intelligence systems that can understand and generate human language. They use deep learning algorithms and massive amounts of data to learn the nuances of language and produce coherent and relevant responses.
 While a decent intent-based chatbot can answer basic, one-touch inquiries like order management, FAQs, and policy questions, LLM chatbots can tackle more complex, multi-touch questions. LLM enables chatbots to provide support in a conversational manner, similar to how humans do, through contextual memory. Leveraging the capabilities of Language Models, chatbots are becoming increasingly intelligent, capable of understanding and responding to human language with remarkable accuracy.
 
-Previously, we already discussed how to build instruction-following pipeline using OpenVINO and Optimum Intel, please check out [Dolly v2 example](../dolly-2-instruction-following) for reference.
+Previously, we already discussed how to build instruction-following pipeline using OpenVINO, please check out [LLM Question Answering example](../llm-question-answering) for reference.
 In this tutorial we consider how to use power of OpenVINO for running Large Language Models for both chat and QA over document. We will use a pre-trained model from the [Hugging Face Transformers](https://huggingface.co/docs/transformers/index) library.
 
 This notebook series includes demonstration of two different ways to create inference pipelines:
