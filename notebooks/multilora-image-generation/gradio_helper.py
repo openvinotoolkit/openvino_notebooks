@@ -1,7 +1,7 @@
 import gradio as gr
 import numpy as np
 
-import openvino_genai
+import openvino_genai as ov_genai
 
 
 MAX_SEED = np.iinfo(np.int32).max
@@ -21,7 +21,7 @@ def make_demo(pipeline, generator_cls, adapters, adapters_meta):
             seed = np.random.randint(0, MAX_SEED)
 
         generator = generator_cls(seed)
-        adapter_config = openvino_genai.AdapterConfig()
+        adapter_config = ov_genai.AdapterConfig()
         if lora_id != "none":
             adapter_info = adapters_selection[lora_id]
             adapter = adapter_info["adapter"]

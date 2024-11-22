@@ -249,6 +249,7 @@ embeddings
 EnCodec
 encodec
 english
+ENLSP
 enum
 et
 Evol
@@ -259,6 +260,7 @@ Explainer
 facto
 fastcomposer
 FastComposer
+FastDraft
 FastSAM
 FC
 feedforward
@@ -417,6 +419,7 @@ Kosaraju
 kosmos
 Kosmos
 KOSMOS
+Kozlov
 KServe
 Kubernetes
 Kupyn
@@ -472,11 +475,12 @@ Lyth
 MaaS
 macOS
 Magika
-masklet
 Mahalanobis
+Mamou
 Mapillary
 Markovian
 Martyniuk
+masklet
 maskrcnn
 MaterialMLP
 MaterialNet
@@ -553,6 +557,7 @@ NEOX
 NER
 NETP
 Netron
+NeurIPS
 NeuSpell
 NeXT
 NLP
@@ -1019,6 +1024,7 @@ Würstchen
 XAI
 XCode
 Xeon
+xformers
 xl
 xt
 xvector
@@ -1030,10 +1036,10 @@ YOLOv
 yolov
 Youri
 youri
+Zafrir
 ZavyChromaXL
 Zongyuan
 ZeroScope
 zeroscope
 Zhipu
 zh
-xformers

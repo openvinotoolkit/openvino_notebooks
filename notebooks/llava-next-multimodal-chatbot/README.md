@@ -8,12 +8,10 @@ In this tutorial we consider how to convert and optimize LLaVA-NeXT model from T
 The tutorial consists from following steps:
 
 - Install requirements
-- Download PyTorch model
-- Convert model to OpenVINO Intermediate Representation (IR)
-- Compress Language Model weights
-- Quantize Image Encoder
-- Prepare Inference Pipeline
-- Run OpenVINO model inference
+- Convert model to OpenVINO Intermediate Representation (IR) using Optimum CLI
+- Compress Language Model weights using NNCF
+- Prepare OpenVINO GenAI Inference Pipeline
+- Run OpenVINO GenAI model inference
 - Launch Interactive demo
 
 In this demonstration, you'll create interactive chatbot that can answer questions about provided image's content. Image bellow shows a result of model work.
