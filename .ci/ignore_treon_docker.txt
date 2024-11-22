@@ -85,3 +85,4 @@ notebooks/sam2-image-segmentation/segment-anything-2-image.ipynb
 notebooks/pixtral/pixtral.ipynb
 notebooks/llm-agent-react/llm-agent-react.ipynb
 notebooks/multilora-image-generation/multilora-image-generation.ipynb
+notebooks/llm-agent-react/llm-agent-react-langchain.ipynb

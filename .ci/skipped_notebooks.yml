@@ -595,3 +595,10 @@
   skips:
     - os:
         - macos-12
+- notebook: notebooks/llm-agent-react/llm-agent-react-langchain.ipynb
+  skips:
+    - os:
+        - macos-12
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
