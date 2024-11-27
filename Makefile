@@ -9,9 +9,9 @@ cache_openvino_packages:
 	@echo Cache openvino packages
 	@. $(ACTIVATE); python -m pip install --upgrade pip
 	mkdir pipcache
-	@. $(ACTIVATE); python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
+	@. $(ACTIVATE); python -m pip install --cache-dir pipcache --no-deps openvino nncf
 	cp -r pipcache pipcache_openvino
-	@. $(ACTIVATE); python -m pip uninstall -y openvino openvino-dev nncf
+	@. $(ACTIVATE); python -m pip uninstall -y openvino nncf
 
 install_dependencies:
 	@echo Installing dependencies

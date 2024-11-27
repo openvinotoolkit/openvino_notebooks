@@ -82,12 +82,6 @@ except ImportError:
     OPENVINO_IMPORT = False
 
 
-DEVTOOLS_INSTALLED = True
-try:
-    from openvino.tools.mo import mo  # OpenVINO 2022.1
-except ImportError:
-    DEVTOOLS_INSTALLED = False
-
 
 print("System information:")
 print(f"Python executable: {PYTHON_EXECUTABLE}")
@@ -103,7 +97,6 @@ if KERNEL_INSTALLED:
 print(f"Python version: {PYTHON_VERSION.major}.{PYTHON_VERSION.minor} " f"{show_supported(SUPPORTED_PYTHON_VERSION)}")
 print(f"OpenVINO pip package installed: {show_supported(PIP_OPENVINO_INSTALLED)}")
 print(f"OpenVINO import succeeds: {show_supported(OPENVINO_IMPORT)}")
-print(f"OpenVINO development tools installed: {show_supported(DEVTOOLS_INSTALLED)}")
 print(f"OpenVINO not installed globally: {show_supported(not GLOBAL_OPENVINO_INSTALLED)}")
 
 print(f"No broken requirements: {show_supported(NO_BROKEN_REQUIREMENTS)}")
@@ -185,7 +178,7 @@ if (not OPENVINO_IMPORT) and (OS == "win32" and PIP_OPENVINO_INSTALLED):
 if not DEVTOOLS_INSTALLED:
     print()
     print(
-        "OpenVINO development tools are not installed in this Python environment. \n" "Please follow the instructions in the README to install `openvino-dev`\n"
+        "OpenVINO development tools are not installed in this Python environment. \n" "Please follow the instructions in the README to install `openvino`\n"
     )
 
 if not NO_BROKEN_REQUIREMENTS:
@@ -198,7 +191,6 @@ if (
     IN_OPENVINO_ENV
     and PIP_OPENVINO_INSTALLED
     and OPENVINO_IMPORT
-    and DEVTOOLS_INSTALLED
     and SUPPORTED_PYTHON_VERSION
     and KERNEL_INSTALLED
     and CORRECT_KERNEL_PYTHON
