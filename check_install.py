@@ -82,7 +82,6 @@ except ImportError:
     OPENVINO_IMPORT = False
 
 
-
 print("System information:")
 print(f"Python executable: {PYTHON_EXECUTABLE}")
 print(f"Pip version: {PIP_VERSION}")
@@ -177,9 +176,7 @@ if (not OPENVINO_IMPORT) and (OS == "win32" and PIP_OPENVINO_INSTALLED):
 
 if not DEVTOOLS_INSTALLED:
     print()
-    print(
-        "OpenVINO development tools are not installed in this Python environment. \n" "Please follow the instructions in the README to install `openvino`\n"
-    )
+    print("OpenVINO development tools are not installed in this Python environment. \n" "Please follow the instructions in the README to install `openvino`\n")
 
 if not NO_BROKEN_REQUIREMENTS:
     print()

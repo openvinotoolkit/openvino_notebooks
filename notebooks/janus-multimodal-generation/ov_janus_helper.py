@@ -233,7 +233,7 @@ def convert_janus_model(model_id, output_dir, quantization_config):
     processor: VLChatProcessor = VLChatProcessor.from_pretrained(model_id)
     config = AutoConfig.from_pretrained(model_id, trust_remote_code=True)
     language_config = config.language_config
-    language_config._attn_implementation = 'sdpa'
+    language_config._attn_implementation = "sdpa"
     vl_gpt: MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(model_id, language_config=language_config, trust_remote_code=True)
     vl_gpt = vl_gpt.eval()
     vl_gpt.config.save_pretrained(output_dir)
