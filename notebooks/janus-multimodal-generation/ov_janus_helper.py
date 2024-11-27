@@ -1,6 +1,6 @@
 from pathlib import Path
 import types
-from typing import Optional, Tuple, Union, List
+from typing import Optional, Tuple, List
 import gc
 import openvino as ov
 from openvino.runtime import opset13
@@ -8,10 +8,10 @@ import nncf
 import numpy as np
 from tqdm.auto import tqdm
 import torch
-from transformers import AutoModelForCausalLM, AutoProcessor, AutoConfig, TextStreamer
+from transformers import AutoModelForCausalLM, AutoConfig
 from janus.models import MultiModalityCausalLM, VLChatProcessor
 from transformers.generation import GenerationConfig, GenerationMixin
-from transformers.modeling_outputs import CausalLMOutputWithPast, BaseModelOutputWithPast
+from transformers.modeling_outputs import CausalLMOutputWithPast
 from janus.utils.io import load_pil_images
 from PIL import Image
 
@@ -231,7 +231,10 @@ def convert_janus_model(model_id, output_dir, quantization_config):
     print(f"⌛ {model_name} conversion started. Be patient, it may takes some time.")
     print("⌛ Load Original model")
     processor: VLChatProcessor = VLChatProcessor.from_pretrained(model_id)
-    vl_gpt: MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True)
+    config = AutoConfig.from_pretrained(model_id, trust_remote_code=True)
+    language_config = config.language_config
+    language_config._attn_implementation = 'sdpa'
+    vl_gpt: MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(model_id, language_config=language_config, trust_remote_code=True)
     vl_gpt = vl_gpt.eval()
     vl_gpt.config.save_pretrained(output_dir)
     processor.save_pretrained(output_dir)
