@@ -1,4 +1,4 @@
-type ValidatedOS = 'ubuntu-20.04' | 'ubuntu-22.04' | 'windows-2019' | 'macos-12';
+type ValidatedOS = 'ubuntu-20.04' | 'ubuntu-22.04' | 'windows-2019' | 'macos-13';
 
 type ValidatedDevice = 'cpu' | 'gpu';
 

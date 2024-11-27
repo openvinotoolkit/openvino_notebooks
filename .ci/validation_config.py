@@ -4,7 +4,7 @@ from typing import List, Literal, Optional, TypedDict
 
 
 class ValidationMatrix:
-    os = ("ubuntu-20.04", "ubuntu-22.04", "windows-2019", "macos-12")
+    os = ("ubuntu-20.04", "ubuntu-22.04", "windows-2019", "macos-13")
     python = ("3.9", "3.10", "3.11", "3.12")
     device = ("cpu", "gpu")
 
