@@ -10,4 +10,4 @@
 - notebook: notebooks/stable-fast-3d/stable-fast-3d.ipynb
   skips:
     - os:
-        - macos-12
+        - macos-13
