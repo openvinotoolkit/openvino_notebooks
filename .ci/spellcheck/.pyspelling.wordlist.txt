@@ -435,6 +435,7 @@ LangChain
 langchain
 Lasinger
 latents
+LocalAI
 lookahead
 LCMs
 LCMScheduler
@@ -689,6 +690,7 @@ precomputed
 preconverted
 prefetching
 preformatted
+prem
 PrePostProcessing
 prepostprocessing
 prepostprocessor
