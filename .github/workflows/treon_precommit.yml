@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        runs_on: [ubuntu-20.04, windows-2019, macos-12]
+        runs_on: [ubuntu-20.04, windows-2019, macos-13]
         python: ['3.9', '3.10', '3.11', '3.12']
     uses: ./.github/workflows/build_treon_reusable.yml
     with:

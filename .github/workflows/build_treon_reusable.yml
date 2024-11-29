@@ -180,9 +180,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           mkdir pipcache
-          python -m pip install --cache-dir pipcache --no-deps openvino openvino-dev nncf
+          python -m pip install --cache-dir pipcache --no-deps openvino nncf
           cp -r pipcache pipcache_openvino
-          # python -m pip uninstall -y openvino openvino-dev nncf
+          # python -m pip uninstall -y openvino nncf
 
       # Download a small dataset to use for testing purposes in monai-kidney training notebook
       - name: Download CT files
