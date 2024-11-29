@@ -138,7 +138,7 @@ def download_file(
             "`filename` should refer to the name of the file, excluding the directory. "
             "Use the `directory` parameter to specify a target directory for the downloaded file."
         )
-    
+
     filepath = Path(directory) / Path(filename) if directory is not None else Path(directory)
     if filepath.exists():
         return filepath.resolve()
