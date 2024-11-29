@@ -1,12 +1,14 @@
 from typing import Any, List
-import torch
-import nncf
+from pathlib import Path
+import pickle
 
 from tqdm.notebook import tqdm
 from transformers import set_seed
 import numpy as np
 import openvino as ov
 from PIL import Image
+import torch
+import nncf
 
 from ov_catvton_helper import (
     MODEL_DIR,
@@ -49,34 +51,45 @@ class CompiledModelDecorator(ov.CompiledModel):
 
 
 def collect_calibration_data(pipeline, automasker, mask_processor, dataset, subset_size):
-    original_unet = pipeline.unet.unet
-    pipeline.unet.unet = CompiledModelDecorator(original_unet)
+    calibration_dataset_filepath = Path("calibration_data") / f"{subset_size}.pkl"
+    calibration_dataset_filepath.parent.mkdir(exist_ok=True, parents=True)
 
-    calibration_dataset = []
-    pbar = tqdm(total=subset_size, desc="Collecting calibration dataset")
-    for data in dataset:
-        person_image_path, cloth_image_path = data
-        person_image = Image.open(person_image_path)
-        cloth_image = Image.open(cloth_image_path)
-        cloth_type = "upper" if "upper" in person_image_path.as_posix() else "overall"
-        mask = automasker(person_image, cloth_type)["mask"]
-        mask = mask_processor.blur(mask, blur_factor=9)
+    if not calibration_dataset_filepath.exists():
+        original_unet = pipeline.unet.unet
+        pipeline.unet.unet = CompiledModelDecorator(original_unet)
 
-        pipeline(
-            image=person_image,
-            condition_image=cloth_image,
-            mask=mask,
-            num_inference_steps=NUM_INFERENCE_STEPS,
-            guidance_scale=GUIDANCE_SCALE,
-            generator=GENERATOR,
-        )
-        collected_subset_size = len(pipeline.unet.unet.data_cache)
-        pbar.update(NUM_INFERENCE_STEPS)
-        if collected_subset_size >= subset_size:
-            break
+        calibration_dataset = []
+        pbar = tqdm(total=subset_size, desc="Collecting calibration dataset")
+        for data in dataset:
+            person_image_path, cloth_image_path = data
+            person_image = Image.open(person_image_path)
+            cloth_image = Image.open(cloth_image_path)
+            cloth_type = "upper" if "upper" in person_image_path.as_posix() else "overall"
+            mask = automasker(person_image, cloth_type)["mask"]
+            mask = mask_processor.blur(mask, blur_factor=9)
 
-    calibration_dataset = pipeline.unet.unet.data_cache
-    pipeline.unet.unet = original_unet
+            pipeline(
+                image=person_image,
+                condition_image=cloth_image,
+                mask=mask,
+                num_inference_steps=NUM_INFERENCE_STEPS,
+                guidance_scale=GUIDANCE_SCALE,
+                generator=GENERATOR,
+            )
+            collected_subset_size = len(pipeline.unet.unet.data_cache)
+            pbar.update(NUM_INFERENCE_STEPS)
+            if collected_subset_size >= subset_size:
+                break
+
+        calibration_dataset = pipeline.unet.unet.data_cache
+        pipeline.unet.unet = original_unet
+
+        with open(calibration_dataset_filepath, "wb") as f:
+            pickle.dump(calibration_dataset, f)
+    else:
+        with open(calibration_dataset_filepath, "rb") as f:
+            calibration_dataset = pickle.load(f)
+
     return calibration_dataset
 
 

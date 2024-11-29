@@ -1,3 +1,4 @@
+import gc
 import os
 from collections import namedtuple
 from pathlib import Path
@@ -93,6 +94,7 @@ def download_models():
 def convert_pipeline_models(pipeline):
     convert(VaeEncoder(pipeline.vae), VAE_ENCODER_PATH, torch.zeros(1, 3, 1024, 768))
     convert(VaeDecoder(pipeline.vae), VAE_DECODER_PATH, torch.zeros(1, 4, 128, 96))
+    del pipeline.vae
 
     inpainting_latent_model_input = torch.zeros(2, 9, 256, 96)
     timestep = torch.tensor(0)
@@ -100,6 +102,8 @@ def convert_pipeline_models(pipeline):
     example_input = (inpainting_latent_model_input, timestep, encoder_hidden_states)
 
     convert(UNetWrapper(pipeline.unet), UNET_PATH, example_input)
+    del pipeline.unet
+    gc.collect()
 
 
 def convert_automasker_models(automasker):
@@ -115,19 +119,23 @@ def convert_automasker_models(automasker):
     traceable_model = TracingAdapter(automasker.densepose_processor.predictor.model, tracing_input, inference)
 
     convert(traceable_model, DENSEPOSE_PROCESSOR_PATH, tracing_input[0]["image"])
+    del automasker.densepose_processor.predictor.model
 
     convert(automasker.schp_processor_atr.model, SCHP_PROCESSOR_ATR, torch.rand([1, 3, 512, 512], dtype=torch.float32))
     convert(automasker.schp_processor_lip.model, SCHP_PROCESSOR_LIP, torch.rand([1, 3, 473, 473], dtype=torch.float32))
+    del automasker.schp_processor_atr.model
+    del automasker.schp_processor_lip.model
+    gc.collect()
 
 
 class VAEWrapper(torch.nn.Module):
-    def __init__(self, vae_encoder, vae_decoder, config):
+    def __init__(self, vae_encoder, vae_decoder, scaling_factor):
         super().__init__()
         self.vae_enocder = vae_encoder
         self.vae_decoder = vae_decoder
         self.device = "cpu"
         self.dtype = torch.float32
-        self.config = config
+        self.config = namedtuple("VAEConfig", ["scaling_factor"])(scaling_factor)
 
     def encode(self, pixel_values):
         ov_outputs = self.vae_enocder(pixel_values).to_dict()
@@ -202,12 +210,12 @@ class ConvSchpProcessorWrapper(torch.nn.Module):
         return torch.from_numpy(outputs[0])
 
 
-def get_compiled_pipeline(pipeline, core, device, vae_encoder_path, vae_decoder_path, unet_path):
+def get_compiled_pipeline(pipeline, core, device, vae_encoder_path, vae_decoder_path, unet_path, vae_scaling_factor):
     compiled_unet = core.compile_model(unet_path, device.value)
     compiled_vae_encoder = core.compile_model(vae_encoder_path, device.value)
     compiled_vae_decoder = core.compile_model(vae_decoder_path, device.value)
 
-    pipeline.vae = VAEWrapper(compiled_vae_encoder, compiled_vae_decoder, pipeline.vae.config)
+    pipeline.vae = VAEWrapper(compiled_vae_encoder, compiled_vae_decoder, vae_scaling_factor)
     pipeline.unet = ConvUnetWrapper(compiled_unet)
 
     return pipeline
