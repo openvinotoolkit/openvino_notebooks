@@ -468,13 +468,6 @@
   skips:
     - python:
         - '3.9'
-- notebook: notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/stable-audio/stable-audio.ipynb
   skips:
     - os:
