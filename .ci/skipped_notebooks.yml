@@ -556,6 +556,8 @@
   skips:
     - os:
         - macos-13
+    - python:
+        - '3.9'
 - notebook: notebooks/llm-agent-react/llm-agent-react-langchain.ipynb
   skips:
     - os:
