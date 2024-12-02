@@ -12,7 +12,6 @@ from transformers.cache_utils import Cache
 from transformers import (
     AutoModelForCausalLM,
     AutoImageProcessor,
-    AutoProcessor,
     AutoConfig,
     AutoTokenizer,
 )
@@ -43,19 +42,9 @@ def _glmv_transformer_forward(
     **loss_kwargs,
 ) -> Union[Tuple, BaseModelOutputWithPast]:
     """take care of image_encode, position_ids and (attention_mask = None is fine)"""
-    output_attentions = (
-        output_attentions
-        if output_attentions is not None
-        else self.config.output_attentions
-    )
-    output_hidden_states = (
-        output_hidden_states
-        if output_hidden_states is not None
-        else self.config.output_hidden_states
-    )
-    return_dict = (
-        return_dict if return_dict is not None else self.config.use_return_dict
-    )
+    output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
+    output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
+    return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
     outputs = self.model(
         input_ids=input_ids,
@@ -95,9 +84,7 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
     Returns:
       True if input or output with requested name exists else False
     """
-    return name in sum(
-        [list(t.get_names()) for t in ov_model.inputs + ov_model.outputs], []
-    )
+    return name in sum([list(t.get_names()) for t in ov_model.inputs + ov_model.outputs], [])
 
 
 def fuse_cache_reorder(
@@ -130,9 +117,7 @@ def fuse_cache_reorder(
     if model_has_input_output_name(ov_model, "beam_idx"):
         raise ValueError("Model already has fused cache")
     input_batch = ov_model.input("inputs_embeds").get_partial_shape()[0]
-    beam_idx = opset13.parameter(
-        name="beam_idx", dtype=ov.Type.i32, shape=ov.PartialShape([input_batch])
-    )
+    beam_idx = opset13.parameter(name="beam_idx", dtype=ov.Type.i32, shape=ov.PartialShape([input_batch]))
     beam_idx.output(0).get_tensor().add_names({"beam_idx"})  # why list is not accepted?
     ov_model.add_parameters([beam_idx])
     not_kv_inputs.append(ov_model.inputs[-1])
@@ -140,9 +125,7 @@ def fuse_cache_reorder(
     for input_name in key_value_input_names:
         parameter_output_port = ov_model.input(input_name)
         consumers = parameter_output_port.get_target_inputs()
-        gather = opset13.gather(
-            parameter_output_port, beam_idx, opset13.constant(gather_dim)
-        )
+        gather = opset13.gather(parameter_output_port, beam_idx, opset13.constant(gather_dim))
         for consumer in consumers:
             consumer.replace_source_output(gather.output(0))
     ov_model.validate_nodes_and_infer_types()
@@ -168,18 +151,9 @@ def build_state_initializer(ov_model: ov.Model, batch_dim: int):
         if op.get_type_name() == "ReadValue":
             dims = [dim.min_length for dim in list(op.get_output_partial_shape(0))]
             dims[batch_dim] = batch
-            dims = [
-                (
-                    opset13.constant(np.array([dim], dtype=np.int64))
-                    if isinstance(dim, int)
-                    else dim
-                )
-                for dim in dims
-            ]
+            dims = [(opset13.constant(np.array([dim], dtype=np.int64)) if isinstance(dim, int) else dim) for dim in dims]
             shape = opset13.concat(dims, axis=0)
-            broadcast = opset13.broadcast(
-                opset13.constant(0.0, dtype=op.get_output_element_type(0)), shape
-            )
+            broadcast = opset13.broadcast(opset13.constant(0.0, dtype=op.get_output_element_type(0)), shape)
             op.set_arguments([broadcast])
     ov_model.validate_nodes_and_infer_types()
 
@@ -243,11 +217,7 @@ def make_stateful(
 def patch_stateful(ov_model):
     key_value_input_names = [key.get_any_name() for key in ov_model.inputs[2:-1]]
     key_value_output_names = [key.get_any_name() for key in ov_model.outputs[1:]]
-    not_kv_inputs = [
-        input
-        for input in ov_model.inputs
-        if not any(name in key_value_input_names for name in input.get_names())
-    ]
+    not_kv_inputs = [input for input in ov_model.inputs if not any(name in key_value_input_names for name in input.get_names())]
     if not key_value_input_names or not key_value_output_names:
         return
     batch_dim = 0
@@ -296,9 +266,7 @@ def convert_glmv_model(model_id, output_dir, quantization_config):
             embed_token_path.exists(),
         ]
     ):
-        print(
-            f"✅ {model_name} model already converted. You can find results in {output_dir}"
-        )
+        print(f"✅ {model_name} model already converted. You can find results in {output_dir}")
         return
     print(f"⌛ {model_name} conversion started. Be patient, it may takes some time.")
     print("⌛ Load Original model")
@@ -332,9 +300,7 @@ def convert_glmv_model(model_id, output_dir, quantization_config):
     if not image_embed_path.exists():
         print("⌛ Convert Image embedding model")
         # vision_embed_tokens.forward = vision_embed_tokens.vit
-        ov_model = ov.convert_model(
-            model.model.vision, example_input=torch.ones([1, 3, image_size, image_size])
-        )
+        ov_model = ov.convert_model(model.model.vision, example_input=torch.ones([1, 3, image_size, image_size]))
         ov.save_model(ov_model, image_embed_path)
         del ov_model
         cleanup_torchscript_cache()
@@ -357,9 +323,7 @@ def convert_glmv_model(model_id, output_dir, quantization_config):
         model_inputs = ["attention_mask", "position_ids"]
         model_outputs = ["logits"]
         for idx in range(len(pkv)):
-            model_inputs.extend(
-                [f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"]
-            )
+            model_inputs.extend([f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"])
             model_outputs.extend([f"present.{idx}.key", f"present.{idx}.value"])
         model_inputs.append("inputs_embeds")
         position_ids = torch.tensor([[2, 3], [2, 3]])
@@ -382,9 +346,7 @@ def convert_glmv_model(model_id, output_dir, quantization_config):
         print("✅ Language model successfully converted")
 
         if quantization_config is not None:
-            print(
-                f"⌛ Weights compression with {quantization_config['mode']} mode started"
-            )
+            print(f"⌛ Weights compression with {quantization_config['mode']} mode started")
             ov_model = nncf.compress_weights(ov_model, **quantization_config)
             print("✅ Weights compression finished")
 
@@ -393,9 +355,7 @@ def convert_glmv_model(model_id, output_dir, quantization_config):
         cleanup_torchscript_cache()
         del model
         gc.collect()
-        print(
-            f"✅ {model_name} model conversion finished. You can find results in {output_dir}"
-        )
+        print(f"✅ {model_name} model conversion finished. You can find results in {output_dir}")
 
 
 def is_empty(images_list: Optional[List[List[torch.Tensor]]]):
@@ -413,12 +373,8 @@ class OvGLMv(GenerationMixin):
         self.model = core.read_model(model_dir / "openvino_language_model.xml")
         self.vision = core.compile_model(model_dir / "openvino_vision.xml", "CPU")
         self.embedding = core.compile_model(model_dir / "openvino_embedding.xml", "CPU")
-        self.input_names = {
-            key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)
-        }
-        self.output_names = {
-            key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)
-        }
+        self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
+        self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
         # compiled_model = core.compile_model(self.model, device, config={"GPU_ENABLE_SDPA_OPTIMIZATION": "NO", "INFERENCE_PRECISION_HINT": "FP32"})
         compiled_model = core.compile_model(self.model, device)
 
@@ -466,23 +422,16 @@ class OvGLMv(GenerationMixin):
         inputs_embeds: Optional[torch.Tensor] = None,
         return_dict: Optional[bool] = None,
     ) -> Union[Tuple, BaseModelOutputWithPast]:
-        batch_size, num_concurrent_media, num_tiles, num_channels, height, width = (
-            pixel_values.shape
-        )
-        pixel_values = pixel_values.reshape(
-            batch_size * num_concurrent_media * num_tiles, num_channels, height, width
-        )
+        batch_size, num_concurrent_media, num_tiles, num_channels, height, width = pixel_values.shape
+        pixel_values = pixel_values.reshape(batch_size * num_concurrent_media * num_tiles, num_channels, height, width)
         if not past_key_values:
+            self.request.reset_state()
+            self.next_beam_idx = np.arange(input_ids.shape[0], dtype=int)
             # not allow for inputs_embeds, because we want to process image feature
-            assert (
-                input_ids is not None and inputs_embeds is None
-            ), f"{input_ids} {inputs_embeds}"
+            assert input_ids is not None and inputs_embeds is None, f"{input_ids} {inputs_embeds}"
             inputs_embeds = torch.from_numpy(self.embedding(input_ids)[0])
             new_input_embeds = []
-            multi_flags = [
-                True if self.config.boi_token_id in input_id.tolist() else False
-                for input_id in input_ids
-            ]
+            multi_flags = [True if self.config.boi_token_id in input_id.tolist() else False for input_id in input_ids]
             images_features = None
             if not is_empty(pixel_values):
                 images_features = torch.from_numpy(self.vision(pixel_values)[0])
@@ -493,18 +442,13 @@ class OvGLMv(GenerationMixin):
                     boi_token_pos = input_id.index(self.config.boi_token_id)
                     assert boi_token_pos >= 0, "begin_of_image not found!"
                     num_image_padding_tokens = input_id.count(self.config.boi_token_id)
-                    assert (
-                        num_image_padding_tokens
-                        == images_features[image_count].shape[0]
-                    ), f"Wrong image padding token number: {num_image_padding_tokens}"
+                    assert num_image_padding_tokens == images_features[image_count].shape[0], f"Wrong image padding token number: {num_image_padding_tokens}"
                     new_input_embeds.append(
                         torch.cat(
                             (
                                 inputs_embeds[i, :boi_token_pos],
                                 images_features[image_count].to(inputs_embeds.device),
-                                inputs_embeds[
-                                    i, boi_token_pos + num_image_padding_tokens :
-                                ],
+                                inputs_embeds[i, boi_token_pos + num_image_padding_tokens :],
                             )
                         )
                     )
@@ -520,11 +464,7 @@ class OvGLMv(GenerationMixin):
         inputs["attention_mask"] = attention_mask
         inputs["position_ids"] = position_ids
         if "beam_idx" in self.input_names:
-            inputs["beam_idx"] = (
-                self.next_beam_idx
-                if self.next_beam_idx is not None
-                else np.arange(inputs_embeds.shape[0], dtype=int)
-            )
+            inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(inputs_embeds.shape[0], dtype=int)
         self.request.start_async(inputs, share_inputs=True)
         self.request.wait()
         logits = self.request.get_tensor("logits").data
@@ -533,17 +473,13 @@ class OvGLMv(GenerationMixin):
 
         return CausalLMOutputWithPast(logits=logits, past_key_values=past_key_values)
 
-    def _reorder_cache(
-        self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor
-    ) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
         [`~PreTrainedModel.beam_sample`] is called.
         This is required to match `past_key_values` with the correct beam_idx at every generation step.
         """
-        self.next_beam_idx = np.array(
-            beam_idx
-        )  # save beam_idx to be used as an input in the next iteration
+        self.next_beam_idx = np.array(beam_idx)  # save beam_idx to be used as an input in the next iteration
         return past_key_values
 
     def _update_model_kwargs_for_generation(
@@ -559,9 +495,7 @@ class OvGLMv(GenerationMixin):
             _, cache = self._extract_past_from_model_output(outputs)
             model_kwargs["past_key_values"] = cache
         else:
-            cache = self._extract_past_from_model_output(
-                outputs, standardize_cache_format
-            )
+            cache = self._extract_past_from_model_output(outputs, standardize_cache_format)
 
         # update attention mask
         if "attention_mask" in model_kwargs:
@@ -576,9 +510,7 @@ class OvGLMv(GenerationMixin):
             position_ids = model_kwargs["position_ids"]
             new_position_id = position_ids[..., -1:].clone()
             new_position_id += 1
-            model_kwargs["position_ids"] = torch.cat(
-                [position_ids, new_position_id], dim=-1
-            )
+            model_kwargs["position_ids"] = torch.cat([position_ids, new_position_id], dim=-1)
 
         model_kwargs["is_first_forward"] = False
         return model_kwargs
@@ -597,13 +529,9 @@ class OvGLMv(GenerationMixin):
         if position_ids is None:
             if attention_mask is None:
                 # Can only build sequential ids. Raise error right now
-                raise ValueError(
-                    "Cannot create position ids when attention mask is None"
-                )
+                raise ValueError("Cannot create position ids when attention mask is None")
             else:
-                position_ids = self._create_position_ids_from_attention_mask(
-                    attention_mask
-                )
+                position_ids = self._create_position_ids_from_attention_mask(attention_mask)
         if not is_first_forward:
             if past_key_values is not None:
                 position_ids = position_ids[..., -1:]
@@ -618,17 +546,11 @@ class OvGLMv(GenerationMixin):
 
     def _create_position_ids_from_attention_mask(self, attention_mask):
         # Initialize a tensor of the same shape as attention_mask to hold position IDs
-        position_ids = torch.zeros_like(
-            attention_mask, dtype=torch.long, device=attention_mask.device
-        )
+        position_ids = torch.zeros_like(attention_mask, dtype=torch.long, device=attention_mask.device)
         # Iterate over the batch
         for i, mask in enumerate(attention_mask):
             # Find the positions where the mask is 1
-            positions = (
-                torch.nonzero(mask, as_tuple=False).squeeze(1).to(attention_mask.device)
-            )
+            positions = torch.nonzero(mask, as_tuple=False).squeeze(1).to(attention_mask.device)
             # Assign position IDs to those positions
-            position_ids[i, positions] = torch.arange(
-                start=0, end=positions.size(0), dtype=torch.long
-            ).to(attention_mask.device)
+            position_ids[i, positions] = torch.arange(start=0, end=positions.size(0), dtype=torch.long).to(attention_mask.device)
         return position_ids

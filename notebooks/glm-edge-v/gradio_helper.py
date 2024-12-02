@@ -53,35 +53,28 @@ def make_demo(model, processor, tokenizer):
                 conversation.extend([{"role": "user", "content": ""}])
                 continue
             if flag == True:
-                conversation[0]["content"] = user
-                conversation.extend([{"role": "assistant", "content": assistant}])
+                conversation[0]["content"] = [{"type": "image"}, {"type": "text", "text": user}]
+                conversation.extend([{"role": "assistant", "content": [{"type": "text", "text": assistant}]}])
                 flag = False
                 continue
-            conversation.extend([{"role": "user", "content": user}, {"role": "assistant", "content": assistant}])
+            conversation.extend(
+                [{"role": "user", "content": [{"type": "text", "text": user}]}, {"role": "assistant", "content": [{"type": "text", "text": assistant}]}]
+            )
 
         if len(history) == 0:
-            conversation.append({"role": "user", "content": [{"type": "image"}, {"type": "text", "text": message}]})
+            conversation.append({"role": "user", "content": [{"type": "image"}, {"type": "text", "text": message_text}]})
         else:
-            conversation.append({"role": "user", "content": message_text})
+            conversation.append({"role": "user", "content": [{"type": "text", "text": message_text}]})
         print(f"prompt is -\n{conversation}")
-        inputs = tokenizer.apply_chat_template(
-            conversation, add_generation_prompt=True, return_dict=True, tokenize=True, return_tensors="pt"
-        ).to("cpu")
-        streamer = TextIteratorStreamer(
-            processor,
-            **{
-                "skip_special_tokens": True,
-                "skip_prompt": True,
-                "clean_up_tokenization_spaces": False,
-            },
-        )
+        inputs = tokenizer.apply_chat_template(conversation, add_generation_prompt=True, return_dict=True, tokenize=True, return_tensors="pt").to("cpu")
+        streamer = TextIteratorStreamer(tokenizer, timeout=60.0, skip_prompt=True, skip_special_tokens=True)
+        image = Image.open(image)
         generation_kwargs = dict(
             pixel_values=torch.tensor(processor(image).pixel_values).to("cpu"),
             streamer=streamer,
             max_new_tokens=1024,
             do_sample=False,
             temperature=0.0,
-            eos_token_id=processor.tokenizer.eos_token_id,
         )
         generation_kwargs.update(inputs)
 
