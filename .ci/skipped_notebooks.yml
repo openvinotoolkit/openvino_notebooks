@@ -558,3 +558,7 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/glm-edge-v/glm-edge-v.ipynb
+  skips:
+    - os:
+        - macos-13
