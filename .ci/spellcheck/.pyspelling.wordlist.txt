@@ -139,6 +139,7 @@ convolutional
 coreference
 CoSENT
 cpm
+cpp
 CPUs
 cpu
 CRNN
@@ -1033,6 +1034,7 @@ xt
 xvector
 xxl
 XYWH
+YAML
 Yiqin
 YOLO
 YOLOv
