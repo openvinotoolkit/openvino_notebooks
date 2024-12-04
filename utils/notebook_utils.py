@@ -79,29 +79,27 @@ def pip_install(*args):
     subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], shell=(platform.system() == "Windows"), check=True)
 
 
-def load_image(name: str, url: str = None) -> np.ndarray:
+def load_image(path: str) -> np.ndarray:
     """
-    Loads an image by `url` and returns it as BGR numpy array. The image is
-    stored to the filesystem with name `name`. If the image file already exists
-    loads the local image.
+    Loads an image from `path` and returns it as BGR numpy array. `path`
+    should point to an image file, either a local filename or a url. The image is
+    not stored to the filesystem. Use the `download_file` function to download and
+    store an image.
 
-    :param name: Local path name of the image.
-    :param url: url to the image
+    :param path: Local path name or URL to image.
     :return: image as BGR numpy array
     """
     import cv2
     import requests
 
-    if not Path(name).exists():
+    if path.startswith("http"):
         # Set User-Agent to Mozilla because some websites block
         # requests with User-Agent Python
-        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        response = requests.get(path, headers={"User-Agent": "Mozilla/5.0"})
         array = np.asarray(bytearray(response.content), dtype="uint8")
         image = cv2.imdecode(array, -1)  # Loads the image as BGR
-        cv2.imwrite(name, image)
     else:
-        image = cv2.imread(name)
-
+        image = cv2.imread(path)
     return image
 
 
@@ -110,6 +108,8 @@ def download_file(
     filename: PathLike = None,
     directory: PathLike = None,
     show_progress: bool = True,
+    silent: bool = False,
+    timeout: int = 10,
 ) -> PathLike:
     """
     Download a file from a url and save it to the local filesystem. The file is saved to the
@@ -139,10 +139,6 @@ def download_file(
             "Use the `directory` parameter to specify a target directory for the downloaded file."
         )
 
-    filepath = Path(directory) / Path(filename) if directory is not None else Path(directory)
-    if filepath.exists():
-        return filepath.resolve()
-
     # create the directory if it does not exist, and add the directory to the filename
     if directory is not None:
         directory = Path(directory)
@@ -164,9 +160,9 @@ def download_file(
     except requests.exceptions.RequestException as error:
         raise Exception(f"File downloading failed with error: {error}") from None
 
-    # download the file if it does not exist
+    # download the file if it does not exist, or if it exists with an incorrect file size
     filesize = int(response.headers.get("Content-length", 0))
-    if not filename.exists():
+    if not filename.exists() or (os.stat(filename).st_size != filesize):
         with tqdm_notebook(
             total=filesize,
             unit="B",
@@ -181,7 +177,8 @@ def download_file(
                     progress_bar.update(len(chunk))
                     progress_bar.refresh()
     else:
-        print(f"'{filename}' already exists.")
+        if not silent:
+            print(f"'{filename}' already exists.")
 
     response.close()
 
