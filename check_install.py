@@ -174,10 +174,6 @@ if (not OPENVINO_IMPORT) and (OS == "win32" and PIP_OPENVINO_INSTALLED):
             "See https://github.com/openvinotoolkit/openvino_notebooks/wiki/Windows"
         )
 
-if not DEVTOOLS_INSTALLED:
-    print()
-    print("OpenVINO development tools are not installed in this Python environment. \n" "Please follow the instructions in the README to install `openvino`\n")
-
 if not NO_BROKEN_REQUIREMENTS:
     print()
     print("`pip check` shows broken requirements:")
