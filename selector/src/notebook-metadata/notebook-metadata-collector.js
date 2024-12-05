@@ -112,15 +112,16 @@ export class NotebookMetadataCollector extends NotebookContentReader {
    * @returns {INotebookMetadata['tags']['libraries']}
    */
   _getLibrariesTags() {
-    const codeCells = this._getCodeCells();
-    const content = codeCells.map(({ source }) => source.join('\n')).join('\n');
+    const codeCells = this._getCodeCells().map(({ source }) => source.join('\n'));
     const tags = [];
-    for (const [tag, patterns] of Object.entries(librariesPatterns)) {
-      if (patterns.some((pattern) => content.includes(pattern))) {
-        tags.push(tag);
+    for (const cellContent of codeCells) {
+      for (const [tag, patterns] of Object.entries(librariesPatterns)) {
+        if (_hasLibraryPattern(cellContent, patterns)) {
+          tags.push(tag);
+        }
       }
     }
-    return tags;
+    return [...new Set(tags)];
   }
 
   /**
@@ -164,26 +165,60 @@ export class NotebookMetadataCollector extends NotebookContentReader {
 }
 
 /** @typedef {typeof import('../shared/notebook-tags.js').LIBRARIES_VALUES} LIBRARIES_VALUES */
-/** @type {Record<LIBRARIES_VALUES[number], string[]>} */
+/** @typedef {string | { pip: string }} LibraryPattern */
+/**
+ * A map of library tags to their corresponding patterns used to identify the presence of the library in notebook code cells.
+ * Patterns can be strings representing code snippets or objects with a `pip` property for pip install commands.
+ *
+ * @type {Record<LIBRARIES_VALUES[number], LibraryPattern[]>}
+ */
 const librariesPatterns = {
-  NNCF: ['import nncf', 'from nncf'],
+  NNCF: ['import nncf', 'from nncf', { pip: 'nncf' }],
   'Model Converter': ['ov.convert_model(', 'openvino.convert_model(', '! ovc'],
   'Model Server': ['import ovmsclient', 'from ovmsclient'],
   'Open Model Zoo': ['omz_downloader', 'omz_converter', 'omz_info_dumper'],
   'Benchmark Tool': ['benchmark_app'],
-  'Optimum Intel': ['import optimum.intel', 'from optimum.intel', "optimum-cli export openvino", "optimum_cli"],
-  Transformers: ['import transformers', 'from transformers'],
-  Diffusers: ['import diffusers', 'from diffusers'],
-  TensorFlow: ['import tensorflow', 'from tensorflow'],
+  'Optimum Intel': [
+    'import optimum.intel',
+    'from optimum.intel',
+    'optimum-cli export openvino',
+    'optimum_cli',
+    { pip: 'optimum-intel' },
+  ],
+  Transformers: ['import transformers', 'from transformers', { pip: 'transformers' }],
+  Diffusers: ['import diffusers', 'from diffusers', { pip: 'diffusers' }],
+  TensorFlow: ['import tensorflow', 'from tensorflow', { pip: 'tensorflow' }],
   'TF Lite': ['.tflite'],
-  PyTorch: ['import torch', 'from torch'],
+  PyTorch: ['import torch', 'from torch', { pip: 'torch' }],
   ONNX: ['.onnx'],
-  PaddlePaddle: ['import paddle', 'from paddle'],
-  Ultralytics: ['import ultralytics', 'from ultralytics'],
-  Gradio: ['import gradio', 'from gradio'],
-  'OpenVINO Tokenizers': ['import openvino_tokenizers', 'from openvino_tokenizers'],
-  'OpenVINO GenAI': ['import openvino_genai', 'from openvino_genai'],
-  'OpenVINO Explainable AI': ['import openvino_xai', 'from openvino_xai'],
-  JAX: ['import jax'],
-  'ModelScope': ['import modelscope','from modelscope', 'modelscope download']
+  PaddlePaddle: ['import paddle', 'from paddle', { pip: 'paddlepaddle' }],
+  Ultralytics: ['import ultralytics', 'from ultralytics', { pip: 'ultralytics' }],
+  Gradio: ['import gradio', 'from gradio', { pip: 'gradio' }],
+  'OpenVINO Tokenizers': ['import openvino_tokenizers', 'from openvino_tokenizers', { pip: 'openvino-tokenizers' }],
+  'OpenVINO GenAI': ['import openvino_genai', 'from openvino_genai', { pip: 'openvino-genai' }],
+  'OpenVINO Explainable AI': ['import openvino_xai', 'from openvino_xai', { pip: 'openvino-xai' }],
+  JAX: ['import jax', 'from jax', { pip: 'jax' }],
+  ModelScope: ['import modelscope', 'from modelscope', 'modelscope download'],
 };
+
+/**
+ * @private
+ * @param {string} content
+ * @param {LibraryPattern[]} patterns
+ * @returns {boolean}
+ */
+function _hasLibraryPattern(content, patterns) {
+  for (const pattern of patterns) {
+    if (typeof pattern === 'string' && content.includes(pattern)) {
+      return true;
+    }
+    if (typeof pattern === 'object') {
+      const pipInstallRegexp = new RegExp(`^\\s*?%pip\\s+install.*?${pattern.pip}`, 'm');
+      const pipInstallHelperRegexp = new RegExp(`^\\s*?pip_install\\([^]*?${pattern.pip}[^]*?\\)`, 'm');
+      if (pipInstallRegexp.test(content) || pipInstallHelperRegexp.test(content)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}

@@ -4,11 +4,11 @@ import gradio as gr
 css = """#input_img {max-width: 256px !important} #output_vid {max-width: 256px; max-height: 256px}"""
 
 i2v_examples_256 = [
-    ["dynamicrafter/prompts/256/art.png", "man fishing in a boat at sunset", 50, 7.5, 1.0, 3, 234],
-    ["dynamicrafter/prompts/256/boy.png", "boy walking on the street", 50, 7.5, 1.0, 3, 125],
-    ["dynamicrafter/prompts/256/dance1.jpeg", "two people dancing", 50, 7.5, 1.0, 3, 116],
-    ["dynamicrafter/prompts/256/fire_and_beach.jpg", "a campfire on the beach and the ocean waves in the background", 50, 7.5, 1.0, 3, 111],
-    ["dynamicrafter/prompts/256/guitar0.jpeg", "bear playing guitar happily, snowing", 50, 7.5, 1.0, 3, 122],
+    ["DynamiCrafter/prompts/256/art.png", "man fishing in a boat at sunset", 50, 7.5, 1.0, 3, 234],
+    ["DynamiCrafter/prompts/256/boy.png", "boy walking on the street", 50, 7.5, 1.0, 3, 125],
+    ["DynamiCrafter/prompts/256/dance1.jpeg", "two people dancing", 50, 7.5, 1.0, 3, 116],
+    ["DynamiCrafter/prompts/256/fire_and_beach.jpg", "a campfire on the beach and the ocean waves in the background", 50, 7.5, 1.0, 3, 111],
+    ["DynamiCrafter/prompts/256/guitar0.jpeg", "bear playing guitar happily, snowing", 50, 7.5, 1.0, 3, 122],
 ]
 
 

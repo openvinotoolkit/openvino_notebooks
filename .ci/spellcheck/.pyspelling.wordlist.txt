@@ -139,6 +139,7 @@ convolutional
 coreference
 CoSENT
 cpm
+cpp
 CPUs
 cpu
 CRNN
@@ -435,6 +436,7 @@ LangChain
 langchain
 Lasinger
 latents
+LocalAI
 lookahead
 LCMs
 LCMScheduler
@@ -690,6 +692,7 @@ precomputed
 preconverted
 prefetching
 preformatted
+prem
 PrePostProcessing
 prepostprocessing
 prepostprocessor
@@ -1031,6 +1034,7 @@ xt
 xvector
 xxl
 XYWH
+YAML
 Yiqin
 YOLO
 YOLOv

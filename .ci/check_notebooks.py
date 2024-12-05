@@ -18,6 +18,7 @@ EXPECTED_NO_DEVICE = [
     Path("notebooks/sparsity-optimization/sparsity-optimization.ipynb"),  # cpu expected to be used
     Path("notebooks/s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb"),  # only cpu
     Path("notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb"),  # device-agnostic
+    Path("notebooks/localai/localai.ipynb"),  # can not change device in docker configuration on the fly
 ]
 
 
