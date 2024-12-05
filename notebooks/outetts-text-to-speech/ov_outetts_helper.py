@@ -6,12 +6,14 @@ try:
     from outetts.version.v1.prompt_processor import PromptProcessor
     from outetts.version.v1.model import HFModel
     from outetts.wav_tokenizer.audio_codec import AudioCodec
+
     updated_version = True
 except ImportError:
     from outetts.v0_1.interface import InterfaceHF
     from outetts.v0_1.audio_codec import AudioCodec
     from outetts.v0_1.prompt_processor import PromptProcessor
     from outetts.v0_1.model import HFModel
+
     updated_version = False
 
 
