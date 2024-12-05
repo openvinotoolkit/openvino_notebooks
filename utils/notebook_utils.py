@@ -139,15 +139,13 @@ def download_file(
             "Use the `directory` parameter to specify a target directory for the downloaded file."
         )
 
-    filepath = Path(directory) / Path(filename) if directory is not None else Path(directory)
+    filepath = Path(directory) / filename if directory is not None else filename
     if filepath.exists():
         return filepath.resolve()
 
     # create the directory if it does not exist, and add the directory to the filename
     if directory is not None:
-        directory = Path(directory)
-        directory.mkdir(parents=True, exist_ok=True)
-        filename = directory / Path(filename)
+        Path(directory).mkdir(parents=True, exist_ok=True)
 
     try:
         response = requests.get(url=url, headers={"User-agent": "Mozilla/5.0"}, stream=True)
@@ -166,7 +164,7 @@ def download_file(
 
     # download the file if it does not exist
     filesize = int(response.headers.get("Content-length", 0))
-    if not filename.exists():
+    if not filepath.exists():
         with tqdm_notebook(
             total=filesize,
             unit="B",
@@ -175,17 +173,17 @@ def download_file(
             desc=str(filename),
             disable=not show_progress,
         ) as progress_bar:
-            with open(filename, "wb") as file_object:
+            with open(filepath, "wb") as file_object:
                 for chunk in response.iter_content(chunk_size):
                     file_object.write(chunk)
                     progress_bar.update(len(chunk))
                     progress_bar.refresh()
     else:
-        print(f"'{filename}' already exists.")
+        print(f"'{filepath}' already exists.")
 
     response.close()
 
-    return filename.resolve()
+    return filepath.resolve()
 
 
 def download_ir_model(model_xml_url: str, destination_folder: PathLike = None) -> PathLike:
