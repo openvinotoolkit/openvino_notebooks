@@ -233,13 +233,12 @@ def get_compiled_automasker(automasker, core, device, densepose_processor_path, 
     return automasker
 
 
-def get_pipeline_selection_option(optimized_pipe=None):
+def get_pipeline_selection_option(is_optimized_pipe_available=False):
     import ipywidgets as widgets
 
-    model_available = optimized_pipe is not None
     use_quantized_models = widgets.Checkbox(
-        value=model_available,
+        value=is_optimized_pipe_available,
         description="Use quantized models",
-        disabled=not model_available,
+        disabled=not is_optimized_pipe_available,
     )
     return use_quantized_models
