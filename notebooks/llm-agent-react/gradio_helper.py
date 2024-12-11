@@ -1,14 +1,5 @@
-from typing import Callable
+from typing import Callable, List
 import gradio as gr
-
-
-examples = [
-    ["Based on current weather in London, show me a picture of Big Ben through its URL"],
-    ["What is OpenVINO ?"],
-    ["Create an image of pink cat and return its URL"],
-    ["How many people live in Canada ?"],
-    ["What is the weather like in New York now ?"],
-]
 
 
 def handle_user_message(message, history):
@@ -25,12 +16,12 @@ def handle_user_message(message, history):
     return "", history + [[message, ""]]
 
 
-def make_demo(run_fn: Callable, stop_fn: Callable):
+def make_demo(run_fn: Callable, stop_fn: Callable, examples: List):
     with gr.Blocks(
         theme=gr.themes.Soft(),
         css=".disclaimer {font-variant-caps: all-small-caps;}",
     ) as demo:
-        gr.Markdown(f"""<h1><center>AI Agent with OpenVINO and LangChain</center></h1>""")
+        gr.Markdown(f"""<h1><center>AI Agent with OpenVINO</center></h1>""")
         chatbot = gr.Chatbot(height=800)
         with gr.Row():
             with gr.Column():
