@@ -243,7 +243,6 @@ def get_rotation_matrices(dim, end_x, end_y, theta=10000.0, device=None, dtype=N
 
 
 def apply_rotary_matenc(xq, xk, rotmats, repeat_freqs_k=False):
-
     bq, hq, nq, cq = xq.shape
     bk, hk, nk, ck = xk.shape
 
@@ -351,7 +350,6 @@ class OVSAM2VideoPredictor(SAM2VideoPredictor):
         clear_non_cond_mem_for_multi_obj=False,
         **kwargs,
     ) -> None:
-
         super().__init__(
             fill_hole_area=fill_hole_area,
             non_overlap_masks=non_overlap_masks,
