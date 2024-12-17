@@ -1,8 +1,8 @@
-from typing import Any
-from queue import Queue
 import openvino as ov
+import openvino_genai as ov_genai
 from uuid import uuid4
 from threading import Event, Thread
+import queue
 
 max_new_tokens = 256
 
@@ -62,33 +62,137 @@ def get_system_prompt(model_language):
     )
 
 
-class TextQueue:
-    def __init__(self) -> None:
-        self.text_queue = Queue()
-        self.stop_signal = None
-        self.stop_tokens = []
+class IterableStreamer(ov_genai.StreamerBase):
+    """
+    A custom streamer class for handling token streaming and detokenization with buffering.
 
-    def __call__(self, text) -> Any:
-        self.text_queue.put(text)
+    Attributes:
+        tokenizer (Tokenizer): The tokenizer used for encoding and decoding tokens.
+        tokens_cache (list): A buffer to accumulate tokens for detokenization.
+        text_queue (Queue): A synchronized queue for storing decoded text chunks.
+        print_len (int): The length of the printed text to manage incremental decoding.
+    """
+
+    def __init__(self, tokenizer):
+        """
+        Initializes the IterableStreamer with the given tokenizer.
+
+        Args:
+            tokenizer (Tokenizer): The tokenizer to use for encoding and decoding tokens.
+        """
+        super().__init__()
+        self.tokenizer = tokenizer
+        self.tokens_cache = []
+        self.text_queue = queue.Queue()
+        self.print_len = 0
 
     def __iter__(self):
+        """
+        Returns the iterator object itself.
+        """
         return self
 
     def __next__(self):
-        value = self.text_queue.get()
-        if value == self.stop_signal or value in self.stop_tokens:
-            raise StopIteration()
-        else:
-            return value
+        """
+        Returns the next value from the text queue.
 
-    def reset(self):
-        self.text_queue = Queue()
+        Returns:
+            str: The next decoded text chunk.
+
+        Raises:
+            StopIteration: If there are no more elements in the queue.
+        """
+        value = self.text_queue.get()  # get() will be blocked until a token is available.
+        if value is None:
+            raise StopIteration
+        return value
+
+    def get_stop_flag(self):
+        """
+        Checks whether the generation process should be stopped.
+
+        Returns:
+            bool: Always returns False in this implementation.
+        """
+        return False
+
+    def put_word(self, word: str):
+        """
+        Puts a word into the text queue.
+
+        Args:
+            word (str): The word to put into the queue.
+        """
+        self.text_queue.put(word)
+
+    def put(self, token_id: int) -> bool:
+        """
+        Processes a token and manages the decoding buffer. Adds decoded text to the queue.
+
+        Args:
+            token_id (int): The token_id to process.
+
+        Returns:
+            bool: True if generation should be stopped, False otherwise.
+        """
+        self.tokens_cache.append(token_id)
+        text = self.tokenizer.decode(self.tokens_cache)
+
+        word = ""
+        if len(text) > self.print_len and "\n" == text[-1]:
+            # Flush the cache after the new line symbol.
+            word = text[self.print_len :]
+            self.tokens_cache = []
+            self.print_len = 0
+        elif len(text) >= 3 and text[-3:] == chr(65533):
+            # Don't print incomplete text.
+            pass
+        elif len(text) > self.print_len:
+            # It is possible to have a shorter text after adding new token.
+            # Print to output only if text length is increaesed.
+            word = text[self.print_len :]
+            self.print_len = len(text)
+        self.put_word(word)
+
+        if self.get_stop_flag():
+            # When generation is stopped from streamer then end is not called, need to call it here manually.
+            self.end()
+            return True  # True means stop  generation
+        else:
+            return False  # False means continue generation
 
     def end(self):
-        self.text_queue.put(self.stop_signal)
+        """
+        Flushes residual tokens from the buffer and puts a None value in the queue to signal the end.
+        """
+        text = self.tokenizer.decode(self.tokens_cache)
+        if len(text) > self.print_len:
+            word = text[self.print_len :]
+            self.put_word(word)
+            self.tokens_cache = []
+            self.print_len = 0
+        self.put_word(None)
+
+    def reset(self):
+        self.tokens_cache = []
+        self.text_queue = queue.Queue()
+        self.print_len = 0
 
 
-def make_demo(pipe, model_configuration, model_id, model_language):
+class ChunkStreamer(IterableStreamer):
+
+    def __init__(self, tokenizer, tokens_len=4):
+        super().__init__(tokenizer)
+        self.tokens_len = tokens_len
+
+    def put(self, token_id: int) -> bool:
+        if (len(self.tokens_cache) + 1) % self.tokens_len != 0:
+            self.tokens_cache.append(token_id)
+            return False
+        return super().put(token_id)
+
+
+def make_demo(pipe, model_configuration, model_id, model_language, disable_advanced=False):
     import gradio as gr
 
     max_new_tokens = 256
@@ -135,14 +239,18 @@ def make_demo(pipe, model_configuration, model_id, model_language):
         history: updated history with message and answer from chatbot
         active_chat: if we are here, the chat is running or will be started, so return True
         """
-        streamer = TextQueue()
-        config = pipe.get_generation_config()
-        config.temperature = temperature
-        config.top_p = top_p
-        config.top_k = top_k
-        config.do_sample = temperature > 0.0
-        config.max_new_tokens = max_new_tokens
-        config.repetition_penalty = repetition_penalty
+        streamer = ChunkStreamer(pipe.get_tokenizer())
+        if not disable_advanced:
+            config = pipe.get_generation_config()
+            config.temperature = temperature
+            config.top_p = top_p
+            config.top_k = top_k
+            config.do_sample = temperature > 0.0
+            config.max_new_tokens = max_new_tokens
+            config.repetition_penalty = repetition_penalty
+        else:
+            config = ov_genai.GenerationConfig()
+            config.max_new_tokens = max_new_tokens
         history = history or []
         if not history:
             pipe.start_chat(system_message=start_message)
@@ -204,7 +312,7 @@ def make_demo(pipe, model_configuration, model_id, model_language):
                     submit = gr.Button("Submit")
                     stop = gr.Button("Stop")
                     clear = gr.Button("Clear")
-        with gr.Row():
+        with gr.Row(visible=not disable_advanced):
             with gr.Accordion("Advanced Options:", open=False):
                 with gr.Row():
                     with gr.Column():

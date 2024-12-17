@@ -183,11 +183,7 @@ SUPPORTED_LLM_MODELS = {
             """,
             "completion_to_prompt": qwen_completion_to_prompt,
         },
-        "minicpm3-4b": {
-            "model_id": "openbmb/MiniCPM3-4B",
-            "remote_code": True,
-            "start_message": DEFAULT_SYSTEM_PROMPT
-        },
+        "minicpm3-4b": {"model_id": "openbmb/MiniCPM3-4B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
         "qwen2.5-7b-instruct": {
             "model_id": "Qwen/Qwen2.5-7B-Instruct",
             "remote_code": False,
@@ -495,11 +491,7 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": True,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
         },
-        "minicpm3-4b": {
-            "model_id": "openbmb/MiniCPM3-4B",
-            "remote_code": True,
-            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE
-        },
+        "minicpm3-4b": {"model_id": "openbmb/MiniCPM3-4B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
         "internlm2-chat-1.8b": {
             "model_id": "internlm/internlm2-chat-1_8b",
             "remote_code": True,
@@ -676,10 +668,16 @@ def get_optimum_cli_command(model_id, weight_format, output_dir, compression_opt
 
 default_language = "English"
 
-SUPPORTED_OPTIMIZATIONS = ["INT4", "INT4-AWQ", "INT8", "FP16"]
+SUPPORTED_OPTIMIZATIONS = ["INT4", "INT4-AWQ", "INT4-NPU", "INT8", "FP16"]
+
+int4_npu_config = {
+    "sym": True,
+    "group_size": -1,
+    "ratio": 1.0,
+}
 
 
-def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True):
+def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True, device=None):
     import ipywidgets as widgets
 
     lang_dropdown = widgets.Dropdown(options=languages or [])
@@ -695,7 +693,7 @@ def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPOR
         model_dropdown.options = SUPPORTED_LLM_MODELS[change.new]
 
     lang_dropdown.observe(dropdown_handler, names="value")
-    compression_dropdown = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS)
+    compression_dropdown = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"])
     preconverted_checkbox = widgets.Checkbox(value=True)
 
     form_items = []
@@ -769,7 +767,7 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
 
     model_compression_params = {}
     if "INT4" in precision:
-        model_compression_params = compression_configs.get(model_id, compression_configs["default"])
+        model_compression_params = compression_configs.get(model_id, compression_configs["default"]) if not "NPU" in precision else int4_npu_config
     weight_format = precision.split("-")[0].lower()
     optimum_cli_command = get_optimum_cli_command(pt_model_id, weight_format, model_dir, model_compression_params, "AWQ" in precision, remote_code)
     print(f"⌛ {model_id} conversion to {precision} started. It may takes some time.")
@@ -785,10 +783,11 @@ def compare_model_size(model_dir):
     int8_weights = model_dir.parent / "INT8_compressed_weights" / "openvino_model.bin"
     int4_weights = model_dir.parent / "INT4_compressed_weights" / "openvino_model.bin"
     int4_awq_weights = model_dir.parent / "INT4-AWQ_compressed_weights" / "openvino_model.bin"
+    int4_npu_weights = model_dir.parent / "INT4-NPU_compressed_weights" / "openvino_model.bin"
 
     if fp16_weights.exists():
         print(f"Size of FP16 model is {fp16_weights.stat().st_size / 1024 / 1024:.2f} MB")
-    for precision, compressed_weights in zip(["INT8", "INT4", "INT4-AWQ"], [int8_weights, int4_weights, int4_awq_weights]):
+    for precision, compressed_weights in zip(["INT8", "INT4", "INT4-AWQ", "INT4-NPU"], [int8_weights, int4_weights, int4_awq_weights, int4_npu_weights]):
         if compressed_weights.exists():
             print(f"Size of model with {precision} compressed weights is {compressed_weights.stat().st_size / 1024 / 1024:.2f} MB")
         if compressed_weights.exists() and fp16_weights.exists():
