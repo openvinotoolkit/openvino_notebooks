@@ -502,6 +502,7 @@ microservices
 MiDaS
 MidasNet
 Midjourney
+minicpm
 MiniCPM
 MiniLM
 mistralai

@@ -183,6 +183,11 @@ SUPPORTED_LLM_MODELS = {
             """,
             "completion_to_prompt": qwen_completion_to_prompt,
         },
+        "minicpm3-4b": {
+            "model_id": "openbmb/MiniCPM3-4B",
+            "remote_code": True,
+            "start_message": DEFAULT_SYSTEM_PROMPT
+        },
         "qwen2.5-7b-instruct": {
             "model_id": "Qwen/Qwen2.5-7B-Instruct",
             "remote_code": False,
@@ -490,6 +495,11 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": True,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
         },
+        "minicpm3-4b": {
+            "model_id": "openbmb/MiniCPM3-4B",
+            "remote_code": True,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE
+        },
         "internlm2-chat-1.8b": {
             "model_id": "internlm/internlm2-chat-1_8b",
             "remote_code": True,
@@ -658,7 +668,7 @@ def get_optimum_cli_command(model_id, weight_format, output_dir, compression_opt
 
         command = command + compression_args
     if trust_remote_code:
-        command += "  --trust-remote-code"
+        command += " --trust-remote-code"
 
     command += " {}".format(output_dir)
     return command
