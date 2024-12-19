@@ -183,7 +183,16 @@ This data only indicates that the cell was executed and does **not** include any
 By default, anonymous telemetry data is collected, limited solely to the execution of the notebook.
 This telemetry does **not** extend to any Intel software, hardware, websites, or products.
 
-If you prefer to disable telemetry, you can do so at any time by commenting out the specific line responsible for data collection in the notebook.
+If you prefer to disable telemetry, you can do so at any time by commenting out the specific line responsible for data collection in the notebook:
+```python
+# collect_telemetry()
+```
+Also you can disable telemetry collection by settting `SCARF_NO_ANALYTICS` or `DO_NOT_TRACK` environment variable to `true`:
+```bash
+export SCARF_NO_ANALYTICS=true
+# or
+export DO_NOT_TRACK=true
+```
 
 Scarf is used for telemetry purposes. Refer to [Scarf documentation](https://docs.scarf.sh/) to understand how the data is collected and processed.
 
