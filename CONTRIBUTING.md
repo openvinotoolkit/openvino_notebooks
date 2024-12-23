@@ -132,7 +132,13 @@ To do this, there are a few requirements that all notebooks need to pass.
 5. Add **Table of content** to top of the Notebook, it helps to get quick fist understanding of content and ease of navigation in the dev environment. There is no need to think about it during development, it can be built or updated after changes with `.ci\table_of_content.py`. Just run the script with the parameter `-s/--source`, specifying a Notebook or a folder with several notebooks as value, the changes will be applied to all of them.
 6. Add **Installation Instructions** section to the top of the notebook (after "Table of content") and to the corresponding `README.md` file in the notebook directory. See existing notebooks for the reference.
 7. Add Scarf Pixel tag for analytics to the notebook (at the end of the first cell) and to the corresponding `README.md` file (to the end of the file). Add relative path to the notebook or `README.md` file as `path` URL query parameter. Example: `<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=<RELATIVE_FILE_PATH>" />`. You can use the following command to generate the tag and add it to the file: `python .ci/scarf_pixel.py -s <PATH>`.
-8. In case if notebook has specific requirements on python version or OS, it should be noted on top of notebook (before any code blocks) using
+8. Add telemetry snippet to the notebook file (e.g. to the cell with fetching notebook_utils file) for tracking notebook execution. Add notebook file name as a parameter to `collect_telemetry()` function. You can use the following command to generate the snippet and add it to the notebook file: `python .ci/telemetry_snippet.py -s <PATH>`. Snippet example:
+   ```python
+   # Read more about telemetry collection at https://github.com/openvinotoolkit/openvino_notebooks?tab=readme-ov-file#-telemetry
+   from notebook_utils import collect_telemetry
+   collect_telemetry("<NOTEBOOK_NAME>.ipynb")
+   ```
+1.  In case if notebook has specific requirements on python version or OS, it should be noted on top of notebook (before any code blocks) using
    following colored block:
    ```
    <div class="alert alert-block alert-danger"> <b>Important note:</b> This notebook requires python >= 3.9. Please make sure that your environment fulfill to this requirement  before running it </div>
