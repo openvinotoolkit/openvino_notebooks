@@ -177,7 +177,7 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 
 ## 📊 Telemetry
 
-When you execute a notebook cell, telemetry data is collected to help us improve your experience.
+When you execute a notebook cell that contains `collect_telemetry()` function, telemetry data is collected to help us improve your experience.
 This data only indicates that the cell was executed and does **not** include any personally identifiable information (PII).
 
 By default, anonymous telemetry data is collected, limited solely to the execution of the notebook.
@@ -185,13 +185,13 @@ This telemetry does **not** extend to any Intel software, hardware, websites, or
 
 If you prefer to disable telemetry, you can do so at any time by commenting out the specific line responsible for data collection in the notebook:
 ```python
-# collect_telemetry()
+# collect_telemetry(...)
 ```
-Also you can disable telemetry collection by settting `SCARF_NO_ANALYTICS` or `DO_NOT_TRACK` environment variable to `true`:
+Also you can disable telemetry collection by settting `SCARF_NO_ANALYTICS` or `DO_NOT_TRACK` environment variable to `1`:
 ```bash
-export SCARF_NO_ANALYTICS=true
+export SCARF_NO_ANALYTICS=1
 # or
-export DO_NOT_TRACK=true
+export DO_NOT_TRACK=1
 ```
 
 Scarf is used for telemetry purposes. Refer to [Scarf documentation](https://docs.scarf.sh/) to understand how the data is collected and processed.

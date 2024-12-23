@@ -716,7 +716,7 @@ def optimize_bge_embedding(model_path, output_model_path):
     ov.save_model(ov_model, output_model_path, compress_to_fp16=False)
 
 
-def collect_telemetry(filename: str = ""):
+def collect_telemetry(file: str = ""):
     """
     The function only tracks that the notebooks cell was executed and does not include any personally identifiable information (PII).
     """
@@ -726,7 +726,7 @@ def collect_telemetry(filename: str = ""):
         import platform
         from pathlib import Path
 
-        if os.getenv("SCARF_NO_ANALYTICS") == "true" or os.getenv("DO_NOT_TRACK") == "true":
+        if os.getenv("SCARF_NO_ANALYTICS") == "1" or os.getenv("DO_NOT_TRACK") == "1":
             return
         url = "https://openvino.gateway.scarf.sh/telemetry"
         params = {
@@ -735,8 +735,8 @@ def collect_telemetry(filename: str = ""):
             "arch": platform.machine(),
             "python_version": platform.python_version(),
         }
-        if filename:
-            params["file"] = filename
+        if file:
+            params["file"] = file
         requests.get(url, params=params)
     except Exception:
         pass
