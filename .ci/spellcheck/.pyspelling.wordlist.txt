@@ -629,6 +629,7 @@ OV
 OVC
 OVModel
 OVModelForCausalLM
+OVModelForVisualCausalLM
 OVModelForXXX
 OVModelForXxx
 OVMS
