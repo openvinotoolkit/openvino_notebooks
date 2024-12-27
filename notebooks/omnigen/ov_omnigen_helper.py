@@ -19,33 +19,33 @@ import json
 from tqdm.auto import tqdm
 from copy import deepcopy
 
+
 class OVOmniGenScheduler(OmniGenScheduler):
     def __call__(self, z, func, model_kwargs, model_config):
-        num_tokens_for_img = z.size(-1)*z.size(-2) // 4
-        if isinstance(model_kwargs['input_ids'], list):
-            cache = [OmniGenCacheWrapper(num_tokens_for_img, False, model_config=model_config) for _ in range(len(model_kwargs['input_ids']))]
+        num_tokens_for_img = z.size(-1) * z.size(-2) // 4
+        if isinstance(model_kwargs["input_ids"], list):
+            cache = [OmniGenCacheWrapper(num_tokens_for_img, False, model_config=model_config) for _ in range(len(model_kwargs["input_ids"]))]
         else:
             cache = OmniGenCache(num_tokens_for_img, False, model_config=model_config)
         for i in tqdm(range(self.num_steps)):
-            timesteps = torch.zeros(size=(len(z), )).to(z.device) + self.sigma[i]
+            timesteps = torch.zeros(size=(len(z),)).to(z.device) + self.sigma[i]
             pred, cache = func(z, timesteps, past_key_values=cache, **model_kwargs)
-            sigma_next = self.sigma[i+1]
+            sigma_next = self.sigma[i + 1]
             sigma = self.sigma[i]
             z = z + (sigma_next - sigma) * pred
             if i == 0:
-                num_tokens_for_img = z.size(-1)*z.size(-2) // 4
+                num_tokens_for_img = z.size(-1) * z.size(-2) // 4
                 if isinstance(cache, list):
-                    model_kwargs['input_ids'] = [None] * len(cache)
+                    model_kwargs["input_ids"] = [None] * len(cache)
                 else:
-                    model_kwargs['input_ids'] = None
+                    model_kwargs["input_ids"] = None
 
-                model_kwargs['position_ids'] = self.crop_position_ids_for_cache(model_kwargs['position_ids'], num_tokens_for_img)
-                model_kwargs['attention_mask'] = self.crop_attention_mask_for_cache(model_kwargs['attention_mask'], num_tokens_for_img)
+                model_kwargs["position_ids"] = self.crop_position_ids_for_cache(model_kwargs["position_ids"], num_tokens_for_img)
+                model_kwargs["attention_mask"] = self.crop_attention_mask_for_cache(model_kwargs["attention_mask"], num_tokens_for_img)
 
-        del cache  
+        del cache
         gc.collect()
         return z
-
 
 
 class OmniGenCacheWrapper(DynamicCache):
@@ -80,7 +80,7 @@ class OmniGenCacheWrapper(DynamicCache):
 
     def update(
         self,
-        key_states: torch.Tensor, 
+        key_states: torch.Tensor,
         value_states: torch.Tensor,
         layer_idx: int,
         cache_kwargs: Optional[Dict[str, Any]] = None,
@@ -104,13 +104,13 @@ class OmniGenCacheWrapper(DynamicCache):
             raise ValueError("OffloadedCache does not support model usage where layers are skipped. Use DynamicCache.")
         elif len(self.key_cache) == layer_idx:
             # only cache the states for condition tokens
-            key_states = key_states[..., :-(self.num_tokens_for_img+1), :]
-            value_states = value_states[..., :-(self.num_tokens_for_img+1), :]
+            key_states = key_states[..., : -(self.num_tokens_for_img + 1), :]
+            value_states = value_states[..., : -(self.num_tokens_for_img + 1), :]
 
-             # Update the number of seen tokens
+            # Update the number of seen tokens
             if layer_idx == 0:
                 self._seen_tokens += key_states.shape[-2]
-                
+
             self.key_cache.append(key_states)
             self.value_cache.append(value_states)
             return self.key_cache[layer_idx], self.value_cache[layer_idx]
@@ -136,6 +136,7 @@ class OmniGenCacheWrapper(DynamicCache):
 # model_id = "Shitao/OmniGen-v1"
 # model_path = Path("omnigen_ov")
 
+
 def cleanup_torchscript_cache():
     """
     Helper for removing cached model representation
@@ -146,7 +147,7 @@ def cleanup_torchscript_cache():
 
 
 def convert_omingen_model(model_id, model_path, quant_config=None):
-    vae_encoder_path  = model_path / "vae/vae_encoder.xml"
+    vae_encoder_path = model_path / "vae/vae_encoder.xml"
     vae_decoder_path = model_path / "vae/vae_decoder.xml"
     llm_embed_tokens_path = model_path / "llm/input_embed.xml"
     llm_embed_t_path = model_path / "llm/timestep_embed.xml"
@@ -155,23 +156,35 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
     llm_x_embedder_path = model_path / "llm/x_embedder.xml"
     llm_input_x_embedder_path = model_path / "llm/input_x_embedder.xml"
     llm_time_token_path = model_path / "llm/time_token.xml"
-    required_conversion = not all([
-        vae_encoder_path.exists(), 
-        vae_decoder_path.exists(), 
-        llm_embed_t_path.exists(), 
-        llm_path.exists(), 
-        llm_embed_tokens_path.exists(), 
-        llm_final_layer_path.exists(),
-        llm_input_x_embedder_path.exists(),
-        llm_x_embedder_path.exists(),
-        llm_time_token_path.exists()
-    ])
+    required_conversion = not all(
+        [
+            vae_encoder_path.exists(),
+            vae_decoder_path.exists(),
+            llm_embed_t_path.exists(),
+            llm_path.exists(),
+            llm_embed_tokens_path.exists(),
+            llm_final_layer_path.exists(),
+            llm_input_x_embedder_path.exists(),
+            llm_x_embedder_path.exists(),
+            llm_time_token_path.exists(),
+        ]
+    )
     if not required_conversion:
         print(f"Model already converted and can be found in {model_path}")
         return
     pipe = OmniGenPipeline.from_pretrained(model_id)
     pipe.processor.text_tokenizer.save_pretrained(model_path)
-    need_to_convert_llm = not all([llm_path.exists(), llm_embed_tokens_path.exists(), llm_embed_t_path.exists(), llm_final_layer_path.exists(), llm_input_x_embedder_path.exists(), llm_x_embedder_path.exists(), llm_time_token_path.exists()])
+    need_to_convert_llm = not all(
+        [
+            llm_path.exists(),
+            llm_embed_tokens_path.exists(),
+            llm_embed_t_path.exists(),
+            llm_final_layer_path.exists(),
+            llm_input_x_embedder_path.exists(),
+            llm_x_embedder_path.exists(),
+            llm_time_token_path.exists(),
+        ]
+    )
     if need_to_convert_llm:
         print("LLM conversion started...")
         pipe.model.llm.config.save_pretrained(model_path / "llm")
@@ -190,16 +203,13 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
             input_embeds = torch.randn([1, current_seq_len, hidden_size])
             attention_mask = torch.ones([1, current_seq_len, current_seq_len + pkv_seq_len], dtype=torch.long)
             position_ids = torch.range(pkv_seq_len, current_seq_len + pkv_seq_len - 1, dtype=torch.long).unsqueeze(0)
-            example_input = {
-                "inputs_embeds": input_embeds,
-                "attention_mask": attention_mask,
-                "position_ids": position_ids
-            }
+            example_input = {"inputs_embeds": input_embeds, "attention_mask": attention_mask, "position_ids": position_ids}
 
             pkv_shape = [1, num_key_value_heads, pkv_seq_len, hidden_size // num_attention_heads]
             input_names = ["attention_mask", "position_ids", "inputs_embeds"]
             output_names = ["last_hidden_state"]
             past_key_values = []
+
             def forward_wrap(
                 self,
                 attention_mask,
@@ -217,20 +227,25 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
                     position_ids=position_ids,
                     past_key_values=past_key_values,
                     inputs_embeds=inputs_embeds,
-                    use_cache=True
+                    use_cache=True,
                 )
                 result.past_key_values = result.past_key_values.to_legacy_cache()
                 return tuple(result.values())
-        
+
             @torch.jit.script
-            def select_ext_factor(seq_len: torch.Tensor,  max_pos_embeddings: torch.Tensor, short_factor: torch.Tensor, long_factor: torch.Tensor):
+            def select_ext_factor(seq_len: torch.Tensor, max_pos_embeddings: torch.Tensor, short_factor: torch.Tensor, long_factor: torch.Tensor):
                 if seq_len > max_pos_embeddings:
                     return long_factor
                 return short_factor
 
             def rope_fwd(self, x, position_ids, seq_len=None):
                 seq_len = torch.tensor(seq_len) or torch.max(position_ids) + 1
-                ext_factors = select_ext_factor(seq_len, torch.tensor(self.original_max_position_embeddings), torch.tensor(self.short_factor, dtype=torch.float32, device=x.device), torch.tensor(self.long_factor, dtype=torch.float32, device=x.device))
+                ext_factors = select_ext_factor(
+                    seq_len,
+                    torch.tensor(self.original_max_position_embeddings),
+                    torch.tensor(self.short_factor, dtype=torch.float32, device=x.device),
+                    torch.tensor(self.long_factor, dtype=torch.float32, device=x.device),
+                )
 
                 inv_freq_shape = torch.arange(0, self.dim, 2, dtype=torch.int64, device=x.device).float() / self.dim
                 inv_freq = 1.0 / (ext_factors * self.base**inv_freq_shape)
@@ -254,6 +269,7 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
                     cos = emb.cos() * scaling_factor
                     sin = emb.sin() * scaling_factor
                 return cos.to(dtype=x.dtype), sin.to(dtype=x.dtype)
+
             pipe.model.llm._orig_forward = pipe.model.llm.forward
             pipe.model.llm.forward = MethodType(forward_wrap, pipe.model.llm)
             for layer in pipe.model.llm.layers:
@@ -293,16 +309,16 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
             del ov_model
             cleanup_torchscript_cache()
             gc.collect()
-        
+
         if not llm_final_layer_path.exists():
             ov_model = ov.convert_model(pipe.model.final_layer, example_input=(torch.randn(1, 256, 3072), torch.randn(1, 3072)))
             ov.save_model(ov_model, llm_final_layer_path)
             del ov_model
             cleanup_torchscript_cache()
             gc.collect()
-        
+
         if not llm_x_embedder_path.exists():
-            ov_model =  ov.convert_model(pipe.model.x_embedder, example_input=torch.randn([1, 4, 32, 32]))
+            ov_model = ov.convert_model(pipe.model.x_embedder, example_input=torch.randn([1, 4, 32, 32]))
             ov.save_model(ov_model, llm_x_embedder_path)
             del ov_model
             cleanup_torchscript_cache()
@@ -336,17 +352,18 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
             cleanup_torchscript_cache()
             gc.collect()
         if not vae_decoder_path.exists():
-           pipe.vae.forward = pipe.vae.decode
-           ov_model = ov.convert_model(pipe.vae, example_input=torch.randn((1, 4, 32, 32)))
-           ov.save_model(ov_model, vae_decoder_path)
-           del ov_model
-           cleanup_torchscript_cache()
-           gc.collect() 
+            pipe.vae.forward = pipe.vae.decode
+            ov_model = ov.convert_model(pipe.vae, example_input=torch.randn((1, 4, 32, 32)))
+            ov.save_model(ov_model, vae_decoder_path)
+            del ov_model
+            cleanup_torchscript_cache()
+            gc.collect()
 
 
 # convert_model(model_id, model_path)
 
 core = ov.Core()
+
 
 class OVVaeModel:
     def __init__(self, model_dir, device, ov_config=None) -> None:
@@ -423,7 +440,6 @@ class OvModelForCausalLMWithEmb:
         inputs_embeds: Optional[torch.FloatTensor] = None,
         **kwargs,
     ):
-
         inputs = {}
         past = past_key_values.to_openvino_inputs()
         inputs.update(past)
@@ -466,7 +482,7 @@ class OvModelForCausalLMWithEmb:
         self.request.start_async(inputs, share_inputs=True)
         self.request.wait()
         last_hidden_state = self.request.get_tensor("last_hidden_state").data
-        if  past_key_values._seen_tokens == 0:
+        if past_key_values._seen_tokens == 0:
             for i in range(self.config.num_hidden_layers):
                 key_name = f"present.{i}.key"
                 value_name = f"present.{i}.value"
@@ -477,8 +493,18 @@ class OvModelForCausalLMWithEmb:
     def __call__(self, *args, **kwargs):
         return self.forward(*args, **kwargs)
 
+
 class OVOmniGenModel:
-    def __init__(self, model_dir, device, ov_config=None, patch_size=2, in_channels=4, pe_interpolation: float = 1.0, pos_embed_max_size: int = 192,) -> None:
+    def __init__(
+        self,
+        model_dir,
+        device,
+        ov_config=None,
+        patch_size=2,
+        in_channels=4,
+        pe_interpolation: float = 1.0,
+        pos_embed_max_size: int = 192,
+    ) -> None:
         self.x_embedder = core.compile_model(model_dir / "x_embedder.xml", device.upper(), ov_config)
         self.t_embedder = core.compile_model(model_dir / "timestep_embed.xml", device.upper(), ov_config)
         self.input_x_embedder = core.compile_model(model_dir / "input_x_embedder.xml", device.upper(), ov_config)
@@ -493,8 +519,12 @@ class OVOmniGenModel:
         self.pos_embed = get_2d_sincos_pos_embed(self.llm.config.hidden_size, pos_embed_max_size, interpolation_scale=self.pe_interpolation, base_size=64)
 
     @torch.no_grad()
-    def forward_with_cfg(self, x, timestep, input_ids, input_img_latents, input_image_sizes, attention_mask, position_ids, cfg_scale, use_img_cfg, img_cfg_scale, past_key_values):      
-        model_out, past_key_values = self.forward(x, timestep, input_ids, input_img_latents, input_image_sizes, attention_mask, position_ids, past_key_values=past_key_values)
+    def forward_with_cfg(
+        self, x, timestep, input_ids, input_img_latents, input_image_sizes, attention_mask, position_ids, cfg_scale, use_img_cfg, img_cfg_scale, past_key_values
+    ):
+        model_out, past_key_values = self.forward(
+            x, timestep, input_ids, input_img_latents, input_image_sizes, attention_mask, position_ids, past_key_values=past_key_values
+        )
         if use_img_cfg:
             cond, uncond, img_cond = torch.split(model_out, len(model_out) // 3, dim=0)
             cond = uncond + img_cfg_scale * (img_cond - uncond) + cfg_scale * (cond - img_cond)
@@ -503,12 +533,13 @@ class OVOmniGenModel:
             cond, uncond = torch.split(model_out, len(model_out) // 2, dim=0)
             cond = uncond + cfg_scale * (cond - uncond)
             model_out = [cond, cond]
-        
+
         return torch.cat(model_out, dim=0), past_key_values
 
-
     @torch.no_grad()
-    def forward_with_separate_cfg(self, x, timestep, input_ids, input_img_latents, input_image_sizes, attention_mask, position_ids, cfg_scale, use_img_cfg, img_cfg_scale, past_key_values):
+    def forward_with_separate_cfg(
+        self, x, timestep, input_ids, input_img_latents, input_image_sizes, attention_mask, position_ids, cfg_scale, use_img_cfg, img_cfg_scale, past_key_values
+    ):
         if past_key_values is None:
             past_key_values = [None] * len(attention_mask)
 
@@ -518,7 +549,16 @@ class OVOmniGenModel:
 
         model_out, pask_key_values = [], []
         for i in range(len(input_ids)):
-            temp_out, temp_pask_key_values = self.forward(x[i], timestep[i], input_ids[i], input_img_latents[i], input_image_sizes[i], attention_mask[i], position_ids[i], past_key_values=past_key_values[i])
+            temp_out, temp_pask_key_values = self.forward(
+                x[i],
+                timestep[i],
+                input_ids[i],
+                input_img_latents[i],
+                input_image_sizes[i],
+                attention_mask[i],
+                position_ids[i],
+                past_key_values=past_key_values[i],
+            )
             model_out.append(temp_out)
             pask_key_values.append(temp_pask_key_values)
 
@@ -532,7 +572,7 @@ class OVOmniGenModel:
             model_out = [cond, cond]
         else:
             return model_out[0]
-        
+
         return torch.cat(model_out, dim=0), pask_key_values
 
     def unpatchify(self, x, h, w):
@@ -542,11 +582,10 @@ class OVOmniGenModel:
         """
         c = self.out_channels
 
-        x = x.reshape(shape=(x.shape[0], h//self.patch_size, w//self.patch_size, self.patch_size, self.patch_size, c))
-        x = torch.einsum('nhwpqc->nchpwq', x)
+        x = x.reshape(shape=(x.shape[0], h // self.patch_size, w // self.patch_size, self.patch_size, self.patch_size, c))
+        x = torch.einsum("nhwpqc->nchpwq", x)
         imgs = x.reshape(shape=(x.shape[0], c, h, w))
         return imgs
-
 
     def cropped_pos_embed(self, height, width):
         """Crops positional embeddings for SD3 compatibility."""
@@ -556,13 +595,9 @@ class OVOmniGenModel:
         height = height // self.patch_size
         width = width // self.patch_size
         if height > self.pos_embed_max_size:
-            raise ValueError(
-                f"Height ({height}) cannot be greater than `pos_embed_max_size`: {self.pos_embed_max_size}."
-            )
+            raise ValueError(f"Height ({height}) cannot be greater than `pos_embed_max_size`: {self.pos_embed_max_size}.")
         if width > self.pos_embed_max_size:
-            raise ValueError(
-                f"Width ({width}) cannot be greater than `pos_embed_max_size`: {self.pos_embed_max_size}."
-            )
+            raise ValueError(f"Width ({width}) cannot be greater than `pos_embed_max_size`: {self.pos_embed_max_size}.")
 
         top = (self.pos_embed_max_size - height) // 2
         left = (self.pos_embed_max_size - width) // 2
@@ -572,8 +607,7 @@ class OVOmniGenModel:
         spatial_pos_embed = spatial_pos_embed.reshape(1, -1, spatial_pos_embed.shape[-1])
         return spatial_pos_embed
 
-
-    def patch_multiple_resolutions(self, latents, padding_latent=None, is_input_images:bool=False):
+    def patch_multiple_resolutions(self, latents, padding_latent=None, is_input_images: bool = False):
         if isinstance(latents, list):
             return_list = False
             if padding_latent is None:
@@ -586,7 +620,7 @@ class OVOmniGenModel:
                     latent = torch.from_numpy(self.input_x_embedder(latent)[0])
                 else:
                     latent = torch.from_numpy(self.x_embedder(latent)[0])
-                pos_embed = self.cropped_pos_embed(height, width)    
+                pos_embed = self.cropped_pos_embed(height, width)
                 latent = latent + pos_embed
                 if padding is not None:
                     latent = torch.cat([latent, padding], dim=-2)
@@ -604,18 +638,29 @@ class OVOmniGenModel:
                 latents = torch.from_numpy(self.input_x_embedder(latents)[0])
             else:
                 latents = torch.from_numpy(self.x_embedder(latents)[0])
-            pos_embed = self.cropped_pos_embed(height, width)  
+            pos_embed = self.cropped_pos_embed(height, width)
             latents = latents + pos_embed
             num_tokens = latents.shape[1]
             shapes = [height, width]
         return latents, num_tokens, shapes
 
-    
-    def forward(self, x, timestep, input_ids, input_img_latents, input_image_sizes, attention_mask, position_ids, padding_latent=None, past_key_values=None, return_past_key_values=True):
+    def forward(
+        self,
+        x,
+        timestep,
+        input_ids,
+        input_img_latents,
+        input_image_sizes,
+        attention_mask,
+        position_ids,
+        padding_latent=None,
+        past_key_values=None,
+        return_past_key_values=True,
+    ):
         input_is_list = isinstance(x, list)
         x, num_tokens, shapes = self.patch_multiple_resolutions(x, padding_latent)
-        time_token = torch.from_numpy(self.time_token(timestep)[0]).unsqueeze(1)   
-        
+        time_token = torch.from_numpy(self.time_token(timestep)[0]).unsqueeze(1)
+
         if input_img_latents is not None:
             input_latents, _, _ = self.patch_multiple_resolutions(input_img_latents, is_input_images=True)
         if input_ids is not None:
@@ -623,10 +668,10 @@ class OVOmniGenModel:
             input_img_inx = 0
             for b_inx in input_image_sizes.keys():
                 for start_inx, end_inx in input_image_sizes[b_inx]:
-                    condition_embeds[b_inx, start_inx: end_inx] = input_latents[input_img_inx]
+                    condition_embeds[b_inx, start_inx:end_inx] = input_latents[input_img_inx]
                     input_img_inx += 1
             if input_img_latents is not None:
-                assert input_img_inx == len(input_latents) 
+                assert input_img_inx == len(input_latents)
 
             input_emb = torch.cat([condition_embeds, time_token, x], dim=1)
         else:
@@ -634,12 +679,12 @@ class OVOmniGenModel:
         output = self.llm(inputs_embeds=input_emb, attention_mask=attention_mask, position_ids=position_ids, past_key_values=past_key_values)
         output, past_key_values = output.last_hidden_state, output.past_key_values
         if input_is_list:
-            image_embedding = output[:, -max(num_tokens):]
+            image_embedding = output[:, -max(num_tokens) :]
             time_emb = self.t_embedder(timestep)[0]
             x = self.final_layer([image_embedding, time_emb])[0]
             latents = []
             for i in range(x.shape[0]):
-                latent = x[i:i+1, :num_tokens[i]]
+                latent = x[i : i + 1, : num_tokens[i]]
                 latent = self.unpatchify(torch.from_numpy(latent), shapes[i][0], shapes[i][1])
                 latents.append(latent)
         else:
@@ -678,13 +723,13 @@ class OVOmniGenPipeline:
         dtype: torch.dtype = torch.float32,
         seed: int = None,
         output_type: str = "pil",
-        ):
+    ):
         r"""
         Function invoked when calling the pipeline for generation.
 
         Args:
             prompt (`str` or `List[str]`):return
-                The prompt or prompts to guide the image generation. 
+                The prompt or prompts to guide the image generation.
             input_images (`List[str]` or `List[List[str]]`, *optional*):
                 The list of input images. We will replace the "<|image_i|>" in prompt with the 1-th image in list.
             height (`int`, *optional*, defaults to 1024):
@@ -700,16 +745,16 @@ class OVOmniGenPipeline:
                 1`. Higher guidance scale encourages to generate images that are closely linked to the text `prompt`,
                 usually at the expense of lower image quality.
             use_img_guidance (`bool`, *optional*, defaults to True):
-                Defined as equation 3 in [Instrucpix2pix](https://arxiv.org/pdf/2211.09800). 
+                Defined as equation 3 in [Instrucpix2pix](https://arxiv.org/pdf/2211.09800).
             img_guidance_scale (`float`, *optional*, defaults to 1.6):
-                Defined as equation 3 in [Instrucpix2pix](https://arxiv.org/pdf/2211.09800). 
+                Defined as equation 3 in [Instrucpix2pix](https://arxiv.org/pdf/2211.09800).
             max_input_image_size (`int`, *optional*, defaults to 1024): the maximum size of input image, which will be used to crop the input image to the maximum size
             separate_cfg_infer (`bool`, *optional*, defaults to False):
                 Perform inference on images with different guidance separately; this can save memory when generating images of large size at the expense of slower inference.
             use_kv_cache (`bool`, *optional*, defaults to True): enable kv cache to speed up the inference
             use_input_image_size_as_output (bool, defaults to False): whether to use the input image size as the output image size, which can be used for single-image input, e.g., image editing task
             seed (`int`, *optional*):
-                A random seed for generating output. 
+                A random seed for generating output.
             dtype (`torch.dtype`, *optional*, defaults to `torch.bfloat16`):
                 data type for the model
             output_type (`str`, *optional*, defaults to "pil"):
@@ -721,58 +766,68 @@ class OVOmniGenPipeline:
         """
         # check inputs:
         if use_input_image_size_as_output:
-            assert isinstance(prompt, str) and len(input_images) == 1, "if you want to make sure the output image have the same size as the input image, please only input one image instead of multiple input images"
+            assert (
+                isinstance(prompt, str) and len(input_images) == 1
+            ), "if you want to make sure the output image have the same size as the input image, please only input one image instead of multiple input images"
         else:
-            assert height%16 == 0 and width%16 == 0, "The height and width must be a multiple of 16."
+            assert height % 16 == 0 and width % 16 == 0, "The height and width must be a multiple of 16."
         if input_images is None:
             use_img_guidance = False
         if isinstance(prompt, str):
             prompt = [prompt]
             input_images = [input_images] if input_images is not None else None
-        
 
         # set model and processor
         if max_input_image_size != self.processor.max_image_size:
             self.processor = OmniGenProcessor(self.processor.text_tokenizer, max_image_size=max_input_image_size)
 
-        input_data = self.processor(prompt, input_images, height=height, width=width, use_img_cfg=use_img_guidance, separate_cfg_input=separate_cfg_infer, use_input_image_size_as_output=use_input_image_size_as_output)
+        input_data = self.processor(
+            prompt,
+            input_images,
+            height=height,
+            width=width,
+            use_img_cfg=use_img_guidance,
+            separate_cfg_input=separate_cfg_infer,
+            use_input_image_size_as_output=use_input_image_size_as_output,
+        )
         num_prompt = len(prompt)
         num_cfg = 2 if use_img_guidance else 1
         if use_input_image_size_as_output:
             if separate_cfg_infer:
-                height, width = input_data['input_pixel_values'][0][0].shape[-2:]
+                height, width = input_data["input_pixel_values"][0][0].shape[-2:]
             else:
-                height, width = input_data['input_pixel_values'][0].shape[-2:]
-        latent_size_h, latent_size_w = height//8, width//8
+                height, width = input_data["input_pixel_values"][0].shape[-2:]
+        latent_size_h, latent_size_w = height // 8, width // 8
 
         if seed is not None:
             generator = torch.Generator(device=torch.device("cpu")).manual_seed(seed)
         else:
             generator = None
         latents = torch.randn(num_prompt, 4, latent_size_h, latent_size_w, device=torch.device("cpu"), generator=generator)
-        latents = torch.cat([latents]*(1+num_cfg), 0).to(dtype)
+        latents = torch.cat([latents] * (1 + num_cfg), 0).to(dtype)
         input_img_latents = []
         if separate_cfg_infer:
-            for temp_pixel_values in input_data['input_pixel_values']:
+            for temp_pixel_values in input_data["input_pixel_values"]:
                 temp_input_latents = []
                 for img in temp_pixel_values:
                     img = self.vae_encode(img, dtype)
                     temp_input_latents.append(img)
                 input_img_latents.append(temp_input_latents)
         else:
-            for img in input_data['input_pixel_values']:
+            for img in input_data["input_pixel_values"]:
                 img = self.vae_encode(img, dtype)
                 input_img_latents.append(img)
-        model_kwargs = dict(input_ids=input_data['input_ids'], 
-            input_img_latents=input_img_latents, 
-            input_image_sizes=input_data['input_image_sizes'], 
-            attention_mask=input_data["attention_mask"], 
-            position_ids=input_data["position_ids"], 
+        model_kwargs = dict(
+            input_ids=input_data["input_ids"],
+            input_img_latents=input_img_latents,
+            input_image_sizes=input_data["input_image_sizes"],
+            attention_mask=input_data["attention_mask"],
+            position_ids=input_data["position_ids"],
             cfg_scale=guidance_scale,
             img_cfg_scale=img_guidance_scale,
             use_img_cfg=use_img_guidance,
-            )
-        
+        )
+
         if separate_cfg_infer:
             func = self.model.forward_with_separate_cfg
         else:
@@ -780,14 +835,14 @@ class OVOmniGenPipeline:
 
         scheduler = OVOmniGenScheduler(num_steps=num_inference_steps)
         samples = scheduler(latents, func, model_kwargs, model_config=self.model.llm.config)
-        samples = samples.chunk((1+num_cfg), dim=0)[0]
+        samples = samples.chunk((1 + num_cfg), dim=0)[0]
         samples = samples.to(torch.float32)
         if self.vae.config.get("shift_factor") is not None:
             samples = samples / self.vae.config["scaling_factor"] + self.vae.config["shift_factor"]
         else:
-            samples = samples / self.vae.config["scaling_factor"] 
-        samples = self.vae.decode(samples).sample 
-        
+            samples = samples / self.vae.config["scaling_factor"]
+        samples = self.vae.decode(samples).sample
+
         samples = (samples * 0.5 + 0.5).clamp(0, 1)
 
         if output_type == "pt":
@@ -800,7 +855,6 @@ class OVOmniGenPipeline:
                 output_images.append(Image.fromarray(sample))
 
         return output_images
-
 
     def vae_encode(self, x, dtype):
         if self.vae.config.get("shift_factor") is not None:
@@ -817,9 +871,9 @@ class OVOmniGenPipeline:
 # print("T2I")
 
 # images = pipe(
-#     prompt="A curly-haired man in a red shirt is drinking tea.", 
-#     height=256, 
-#     width=256, 
+#     prompt="A curly-haired man in a red shirt is drinking tea.",
+#     height=256,
+#     width=256,
 #     guidance_scale=2.5,
 #     seed=0,
 #     offload_kv_cache=False,
@@ -833,13 +887,13 @@ class OVOmniGenPipeline:
 # images = pipe(
 #     prompt="A man in a black shirt is reading a book. The man is the right man in <img><|image_1|></img>.",
 #     input_images=["./imgs/test_cases/two_man.jpg"],
-#     height=256, 
+#     height=256,
 #     width=256,
-#     guidance_scale=2.5, 
+#     guidance_scale=2.5,
 #     img_guidance_scale=1.6,
 #     seed=0,
 #     offload_kv_cache=False,
 #     max_input_image_size=256,
 #     num_inference_steps=20
 # )
-# images[0].save("example_ti2i.png") 
+# images[0].save("example_ti2i.png")

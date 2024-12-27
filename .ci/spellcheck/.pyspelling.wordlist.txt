@@ -591,6 +591,8 @@ ocr
 OCRBench
 OCRv
 odometry
+OmniGen
+OmniGen's
 OmniParser
 OMZ
 OneFormer

@@ -1,14 +1,29 @@
 import gradio as gr
 import random
 
+
 def make_demo(pipe):
-    def generate_image(text, img1, img2, img3, height, width, guidance_scale, img_guidance_scale, inference_steps, seed, max_input_image_size, randomize_seed, _=gr.Progress(track_tqdm=True)):
+    def generate_image(
+        text,
+        img1,
+        img2,
+        img3,
+        height,
+        width,
+        guidance_scale,
+        img_guidance_scale,
+        inference_steps,
+        seed,
+        max_input_image_size,
+        randomize_seed,
+        _=gr.Progress(track_tqdm=True),
+    ):
         input_images = [img1, img2, img3]
         # Delete None
         input_images = [img for img in input_images if img is not None]
         if len(input_images) == 0:
             input_images = None
-        
+
         if randomize_seed:
             seed = random.randint(0, 10000000)
 
@@ -20,18 +35,14 @@ def make_demo(pipe):
             guidance_scale=guidance_scale,
             img_guidance_scale=img_guidance_scale,
             num_inference_steps=inference_steps,
-            separate_cfg_infer=True, 
+            separate_cfg_infer=True,
             seed=seed,
             max_input_image_size=max_input_image_size,
-            
         )
         img = output[0]
         return img
 
-
-
     def get_example():
-
         case = [
             [
                 "A curly-haired man in a red shirt is drinking tea.",
@@ -151,11 +162,10 @@ def make_demo(pipe):
                 2.5,
                 1.6,
                 12,
-                768
+                768,
             ],
         ]
         return case
-
 
     description = """
     OmniGen is a unified image generation model that you can use to perform various tasks, including but not limited to text-to-image generation, subject-driven generation, Identity-Preserving Generation, and image-conditioned generation.
@@ -172,8 +182,7 @@ def make_demo(pipe):
     - For image editing tasks, we recommend placing the image before the editing instruction. For example, use `<img><|image_1|></img> remove suit`, rather than `remove suit <img><|image_1|></img>`. 
     """
 
-
-    # Gradio 
+    # Gradio
     with gr.Blocks() as demo:
         gr.Markdown("# OmniGen: Unified Image Generation")
         gr.Markdown(description)
@@ -191,37 +200,22 @@ def make_demo(pipe):
                     image_input_3 = gr.Image(label="<img><|image_3|></img>", type="filepath")
 
                 # slider
-                height_input = gr.Slider(
-                    label="Height", minimum=128, maximum=2048, value=256, step=16
-                )
-                width_input = gr.Slider(
-                    label="Width", minimum=128, maximum=2048, value=256, step=16
-                )
+                height_input = gr.Slider(label="Height", minimum=128, maximum=2048, value=256, step=16)
+                width_input = gr.Slider(label="Width", minimum=128, maximum=2048, value=256, step=16)
 
-                guidance_scale_input = gr.Slider(
-                    label="Guidance Scale", minimum=1.0, maximum=5.0, value=2.5, step=0.1
-                )
+                guidance_scale_input = gr.Slider(label="Guidance Scale", minimum=1.0, maximum=5.0, value=2.5, step=0.1)
 
-                img_guidance_scale_input = gr.Slider(
-                    label="img_guidance_scale", minimum=1.0, maximum=2.0, value=1.6, step=0.1
-                )
+                img_guidance_scale_input = gr.Slider(label="img_guidance_scale", minimum=1.0, maximum=2.0, value=1.6, step=0.1)
 
-                num_inference_steps = gr.Slider(
-                    label="Inference Steps", minimum=1, maximum=100, value=20, step=1
-                )
+                num_inference_steps = gr.Slider(label="Inference Steps", minimum=1, maximum=100, value=20, step=1)
 
-                seed_input = gr.Slider(
-                    label="Seed", minimum=0, maximum=2147483647, value=42, step=1
-                )
+                seed_input = gr.Slider(label="Seed", minimum=0, maximum=2147483647, value=42, step=1)
                 randomize_seed = gr.Checkbox(label="Randomize seed", value=True)
 
-                max_input_image_size = gr.Slider(
-                    label="max_input_image_size", minimum=128, maximum=2048, value=256, step=16
-                )
+                max_input_image_size = gr.Slider(label="max_input_image_size", minimum=128, maximum=2048, value=256, step=16)
 
                 # generate
                 generate_button = gr.Button("Generate Image")
-                
 
             with gr.Column():
                 # output image
@@ -261,7 +255,7 @@ def make_demo(pipe):
                 seed_input,
                 max_input_image_size,
                 randomize_seed,
-            ]
+            ],
         )
-    
+
     return demo

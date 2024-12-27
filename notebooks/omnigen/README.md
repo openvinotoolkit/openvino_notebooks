@@ -1,4 +1,4 @@
-# Unified image generation using OmniGena and OpenVINO
+# Unified image generation using OmniGen and OpenVINO
 
 OmniGen is a unified image generation model that can generate a wide range of images from multi-modal prompts. It is designed to be simple, flexible, and easy to use. Existing image generation models often require loading several additional network modules (such as ControlNet, IP-Adapter, Reference-Net, etc.) and performing extra preprocessing steps (e.g., face detection, pose estimation, cropping, etc.) to generate a satisfactory image. OmniGen can generate various images directly through arbitrarily multi-modal instructions without additional plugins and operations.  it can automatically identify the features (e.g., required object, human pose, depth mapping) in input images according to the text prompt.
 
