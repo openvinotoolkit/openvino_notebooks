@@ -53,9 +53,9 @@ class OmniGenCacheWrapper(DynamicCache):
         super().__init__()
         self.num_tokens_for_img = num_tokens_for_img
         if key_states is not None:
-            self.key_cache = key_states
+            self.key_cache = key_states or []
         if value_states is not None:
-            self.value_cache = value_states
+            self.value_cache = value_states or []
         self.model_config = model_config
 
     def to_openvino_inputs(self):
@@ -145,7 +145,7 @@ def cleanup_torchscript_cache():
     torch.jit._state._clear_class_state()
 
 
-def convert_model(model_id, model_path, quant_config=None):
+def convert_omingen_model(model_id, model_path, quant_config=None):
     vae_encoder_path  = model_path / "vae/vae_encoder.xml"
     vae_decoder_path = model_path / "vae/vae_decoder.xml"
     llm_embed_tokens_path = model_path / "llm/input_embed.xml"
@@ -269,7 +269,7 @@ def convert_model(model_id, model_path, quant_config=None):
                 input_tensor.set_names({input_name})
             for out_name, out_tensor in zip(output_names, ov_model.outputs):
                 out_tensor.set_names({out_name})
-            llm_saving_path = llm_path if quant_config is None else llm_path.parent / "tmp_" + llm_path.name 
+            llm_saving_path = llm_path if quant_config is None else llm_path.parent / ("tmp_" + llm_path.name)
             ov.save_model(ov_model, llm_saving_path)
             del ov_model
             cleanup_torchscript_cache()
@@ -466,7 +466,7 @@ class OvModelForCausalLMWithEmb:
         self.request.start_async(inputs, share_inputs=True)
         self.request.wait()
         last_hidden_state = self.request.get_tensor("last_hidden_state").data
-        if  len(past_key_values.key_cache) == 0:
+        if  past_key_values._seen_tokens == 0:
             for i in range(self.config.num_hidden_layers):
                 key_name = f"present.{i}.key"
                 value_name = f"present.{i}.value"
