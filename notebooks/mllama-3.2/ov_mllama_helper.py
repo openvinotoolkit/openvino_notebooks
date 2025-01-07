@@ -336,7 +336,7 @@ def convert_mllama(model_id, out_dir):
         for output, output_name in zip(ov_model.outputs, output_names):
             output.get_tensor().set_names({output_name})
 
-         _add_runtime_options_to_rt_info(ov_model, {"ACTIVATIONS_SCALE_FACTOR": "8.0", "KV_CACHE_PRECISION": "f16"})
+        _add_runtime_options_to_rt_info(ov_model, {"ACTIVATIONS_SCALE_FACTOR": "8.0", "KV_CACHE_PRECISION": "f16"})
 
         ov.save_model(ov_model, img_encoder_path)
         del ov_model
