@@ -31,6 +31,19 @@ def cleanup_torchscript_cache():
     torch.jit._state._clear_class_state()
 
 
+
+def _add_runtime_options_to_rt_info(model: ov.Model, options: Dict):
+    """
+    Add runtime optinos
+    """
+    try:
+        for name, value in options.items():
+            model.set_rt_info(value, ["runtime_options", name])
+    except Exception:
+        pass
+
+    return model
+
 class InsertSlice(MatcherPass):
     def __init__(self):
         MatcherPass.__init__(self)
@@ -252,8 +265,8 @@ def patch_stateful(ov_model):
     )
 
 
-def convert_mllama(model_id, out_dir):
 
+def convert_mllama(model_id, out_dir):
     out_dir = Path(out_dir)
 
     img_encoder_path = out_dir / IMAGE_ENCODER
@@ -322,6 +335,8 @@ def convert_mllama(model_id, out_dir):
 
         for output, output_name in zip(ov_model.outputs, output_names):
             output.get_tensor().set_names({output_name})
+
+         _add_runtime_options_to_rt_info(ov_model, {"ACTIVATIONS_SCALE_FACTOR": "8.0", "KV_CACHE_PRECISION": "f16"}
 
         ov.save_model(ov_model, img_encoder_path)
         del ov_model
@@ -422,12 +437,80 @@ def convert_mllama(model_id, out_dir):
 
             return attn_output, attn_weights, past_key_value
 
+        def _lm_update_causal_mask(
+            self,
+            attention_mask: torch.Tensor,
+            input_tensor: torch.Tensor,
+            cache_position: torch.Tensor,
+            past_key_values: Cache,
+            output_attentions: bool,
+        ):
+
+            from transformers.modeling_attn_mask_utils import AttentionMaskConverter
+            from transformers.models.mllama.modeling_mllama import _prepare_4d_causal_attention_mask_with_cache_position
+            if self.config._attn_implementation == "flash_attention_2":
+                if attention_mask is not None and 0.0 in attention_mask:
+                    return attention_mask
+                return None
+    
+            # For SDPA, when possible, we will rely on its `is_causal` argument instead of its `attn_mask` argument, in
+            # order to dispatch on Flash Attention 2. This feature is not compatible with static cache, as SDPA will fail
+            # to infer the attention mask.
+            past_seen_tokens = past_key_values.get_seq_length() if past_key_values is not None else 0
+    
+            # When output attention is True, sdpa implementation's forward method calls the eager implementation's forward
+            # TODO: we have only SDPA currently and there's a bug when attn-bias is passed. Need to add eager attn and return the line
+            # self.config._attn_implementation == "sdpa" and
+            if self.config._attn_implementation == "sdpa" and not output_attentions:
+                if AttentionMaskConverter._ignore_causal_mask_sdpa(
+                    attention_mask,
+                    inputs_embeds=input_tensor,
+                    past_key_values_length=past_seen_tokens,
+                    is_training=self.training,
+                ):
+                    return None
+    
+            dtype, device = input_tensor.dtype, input_tensor.device
+            min_dtype = torch.finfo(torch.float16).min
+            sequence_length = input_tensor.shape[1]
+            target_length = (
+                attention_mask.shape[-1]
+                if isinstance(attention_mask, torch.Tensor)
+                else past_seen_tokens + sequence_length + 1
+            )
+    
+            # In case the provided `attention` mask is 2D, we generate a causal mask here (4D).
+            causal_mask = _prepare_4d_causal_attention_mask_with_cache_position(
+                attention_mask,
+                sequence_length=sequence_length,
+                target_length=target_length,
+                dtype=dtype,
+                device=device,
+                min_dtype=min_dtype,
+                cache_position=cache_position,
+                batch_size=input_tensor.shape[0],
+            )
+    
+            if (
+                self.config._attn_implementation == "sdpa"
+                and attention_mask is not None
+                and attention_mask.device.type == "cuda"
+                and not output_attentions
+            ):
+                # Attend to all tokens in fully masked rows in the causal_mask, for example, the relevant first rows when
+                # using left padding. This is required by F.scaled_dot_product_attention memory-efficient attention path.
+                # Details: https://github.com/pytorch/pytorch/issues/110213
+                causal_mask = AttentionMaskConverter._unmask_unattended(causal_mask, min_dtype)
+    
+            return causal_mask
+
         for layer_idx in model.language_model.model.cross_attention_layers:
             cross_attn = model.language_model.model.layers[layer_idx].cross_attn
             cross_attn.forward = types.MethodType(cross_attn_forward, cross_attn)
 
         model.language_model.orig_forward = model.language_model.forward
         model.language_model.forward = types.MethodType(lm_forward_wrapper, model.language_model)
+        model.language_model.model._update_causal_mask = types.MethodType(_lm_update_causal_mask, model.language_model.model)
         example_inpit = {
             "input_ids": torch.ones([1, 2], dtype=torch.int64),
             "attention_mask": torch.ones([1, 4], dtype=torch.int64),
@@ -475,13 +558,14 @@ def convert_mllama(model_id, out_dir):
 
         ov_model.validate_nodes_and_infer_types()
         patch_stateful(ov_model)
+        _add_runtime_options_to_rt_info(ov_model, {"ACTIVATIONS_SCALE_FACTOR": "8.0", "KV_CACHE_PRECISION": "f16"}
         ov.save_model(ov_model, lang_model_path)
         del ov_model
         cleanup_torchscript_cache()
         del model
         gc.collect()
         print("✅ Language model successfully converted")
-    print(f"✅ Model sucessfully converted and can be found in {out_dir}")
+    print(f"✅ Model successfully converted and can be found in {out_dir}")
 
 
 core = ov.Core()
