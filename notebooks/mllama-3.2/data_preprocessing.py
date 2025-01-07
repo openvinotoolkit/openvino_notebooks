@@ -163,7 +163,7 @@ def prepare_dataset_llm(mllm_id, opt_init_steps=50, max_train_samples=1000, file
             calibration_data = pickle.load(f)
         return calibration_data
 
-    mllm = OVMLlamaForConditionalGeneration(mllm_id, slice_lm_head=False)
+    mllm = OVMLlamaForConditionalGeneration(mllm_id, slice_lm_head=False, force_fp32_pkv=True)
     processor = AutoProcessor.from_pretrained(mllm_id)
 
     def collate_fn(example, image_column="image_url", text_column="caption"):
