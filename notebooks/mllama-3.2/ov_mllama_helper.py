@@ -31,7 +31,6 @@ def cleanup_torchscript_cache():
     torch.jit._state._clear_class_state()
 
 
-
 def _add_runtime_options_to_rt_info(model: ov.Model, options: Dict):
     """
     Add runtime optinos
@@ -43,6 +42,7 @@ def _add_runtime_options_to_rt_info(model: ov.Model, options: Dict):
         pass
 
     return model
+
 
 class InsertSlice(MatcherPass):
     def __init__(self):
@@ -265,7 +265,6 @@ def patch_stateful(ov_model):
     )
 
 
-
 def convert_mllama(model_id, out_dir):
     out_dir = Path(out_dir)
 
@@ -287,6 +286,7 @@ def convert_mllama(model_id, out_dir):
 
     if not img_encoder_path.exists():
         print("⌛ Convert vision model...")
+
         def _prepare_aspect_ratio_attention_mask(
             aspect_ratio_mask: torch.Tensor,
             num_patches: int,
@@ -324,9 +324,7 @@ def convert_mllama(model_id, out_dir):
         ) -> Union[BaseModelOutput, Tuple[torch.Tensor, ...]]:
 
             output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
-            output_hidden_states = (
-                output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
-            )
+            output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
             return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
             batch_size, num_concurrent_media, num_tiles, num_channels, height, width = pixel_values.shape
@@ -384,13 +382,9 @@ def convert_mllama(model_id, out_dir):
             hidden_state = self.layernorm_post(hidden_state)
 
             # Apply global encoder
-            hidden_state = hidden_state.reshape(
-                batch_size * num_concurrent_media, num_tiles, num_patches + num_padding_patches, dim
-            )
+            hidden_state = hidden_state.reshape(batch_size * num_concurrent_media, num_tiles, num_patches + num_padding_patches, dim)
             hidden_state = self.post_tile_positional_embedding(hidden_state, aspect_ratio_ids)
-            hidden_state = hidden_state.reshape(
-                batch_size * num_concurrent_media, num_tiles * (num_patches + num_padding_patches), dim
-            )
+            hidden_state = hidden_state.reshape(batch_size * num_concurrent_media, num_tiles * (num_patches + num_padding_patches), dim)
             global_output = self.global_transformer(
                 hidden_state,
                 attention_mask=attention_mask,
@@ -400,9 +394,7 @@ def convert_mllama(model_id, out_dir):
             hidden_state = global_output[0]
 
             # Remove padding form hidden state
-            hidden_state = hidden_state.reshape(
-                batch_size * num_concurrent_media, num_tiles, num_patches + num_padding_patches, dim
-            )
+            hidden_state = hidden_state.reshape(batch_size * num_concurrent_media, num_tiles, num_patches + num_padding_patches, dim)
             hidden_state = hidden_state[:, :, :slice_index]
             hidden_state = hidden_state.reshape(batch_size, num_concurrent_media, num_tiles, num_patches, dim)
 
@@ -411,13 +403,9 @@ def convert_mllama(model_id, out_dir):
             intermediate_hidden_states = torch.stack(all_intermediate_hidden_states, dim=-1)
 
             # Remove padding from intermediate hidden states
-            intermediate_hidden_states = intermediate_hidden_states.reshape(
-                batch_size * num_concurrent_media, num_tiles, num_patches + num_padding_patches, -1
-            )
+            intermediate_hidden_states = intermediate_hidden_states.reshape(batch_size * num_concurrent_media, num_tiles, num_patches + num_padding_patches, -1)
             intermediate_hidden_states = intermediate_hidden_states[:, :, :slice_index]
-            intermediate_hidden_states = intermediate_hidden_states.reshape(
-                batch_size, num_concurrent_media, num_tiles, num_patches, -1
-            )
+            intermediate_hidden_states = intermediate_hidden_states.reshape(batch_size, num_concurrent_media, num_tiles, num_patches, -1)
 
             # Concatenate final hidden state and intermediate hidden states
             hidden_state = torch.cat([hidden_state, intermediate_hidden_states], dim=-1)
@@ -442,7 +430,6 @@ def convert_mllama(model_id, out_dir):
                 hidden_states=hidden_states,
                 attentions=attentions,
             )
-
 
         class VisionEncoder(torch.nn.Module):
             def __init__(self, model):
@@ -640,9 +627,7 @@ def convert_mllama(model_id, out_dir):
                     mask_length = attention_mask.shape[-1]
                     padding_mask = causal_mask[:, :, :, :mask_length] + attention_mask[:, None, None, :]
                     padding_mask = padding_mask == 0
-                    causal_mask[:, :, :, :mask_length] = causal_mask[:, :, :, :mask_length].masked_fill(
-                        padding_mask, min_dtype
-                    )
+                    causal_mask[:, :, :, :mask_length] = causal_mask[:, :, :, :mask_length].masked_fill(padding_mask, min_dtype)
 
             return causal_mask
 
@@ -656,16 +641,17 @@ def convert_mllama(model_id, out_dir):
         ):
 
             from transformers.modeling_attn_mask_utils import AttentionMaskConverter
+
             if self.config._attn_implementation == "flash_attention_2":
                 if attention_mask is not None and 0.0 in attention_mask:
                     return attention_mask
                 return None
-    
+
             # For SDPA, when possible, we will rely on its `is_causal` argument instead of its `attn_mask` argument, in
             # order to dispatch on Flash Attention 2. This feature is not compatible with static cache, as SDPA will fail
             # to infer the attention mask.
             past_seen_tokens = past_key_values.get_seq_length() if past_key_values is not None else 0
-    
+
             # When output attention is True, sdpa implementation's forward method calls the eager implementation's forward
             # TODO: we have only SDPA currently and there's a bug when attn-bias is passed. Need to add eager attn and return the line
             # self.config._attn_implementation == "sdpa" and
@@ -677,16 +663,12 @@ def convert_mllama(model_id, out_dir):
                     is_training=self.training,
                 ):
                     return None
-    
+
             dtype, device = input_tensor.dtype, input_tensor.device
             min_dtype = torch.finfo(torch.float16).min
             sequence_length = input_tensor.shape[1]
-            target_length = (
-                attention_mask.shape[-1]
-                if isinstance(attention_mask, torch.Tensor)
-                else past_seen_tokens + sequence_length + 1
-            )
-    
+            target_length = attention_mask.shape[-1] if isinstance(attention_mask, torch.Tensor) else past_seen_tokens + sequence_length + 1
+
             # In case the provided `attention` mask is 2D, we generate a causal mask here (4D).
             causal_mask = _prepare_4d_causal_attention_mask_with_cache_position(
                 attention_mask,
@@ -698,18 +680,13 @@ def convert_mllama(model_id, out_dir):
                 cache_position=cache_position,
                 batch_size=input_tensor.shape[0],
             )
-    
-            if (
-                self.config._attn_implementation == "sdpa"
-                and attention_mask is not None
-                and attention_mask.device.type == "cuda"
-                and not output_attentions
-            ):
+
+            if self.config._attn_implementation == "sdpa" and attention_mask is not None and attention_mask.device.type == "cuda" and not output_attentions:
                 # Attend to all tokens in fully masked rows in the causal_mask, for example, the relevant first rows when
                 # using left padding. This is required by F.scaled_dot_product_attention memory-efficient attention path.
                 # Details: https://github.com/pytorch/pytorch/issues/110213
                 causal_mask = AttentionMaskConverter._unmask_unattended(causal_mask, min_dtype)
-    
+
             return causal_mask
 
         for layer_idx in model.language_model.model.cross_attention_layers:
@@ -800,7 +777,7 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         slice_lm_head=True,
         use_remote_tensors=True,
         dynamic_shape=False,
-        force_fp32_pkv=False
+        force_fp32_pkv=False,
     ):
         model_dir = Path(model_dir)
         self.config = AutoConfig.from_pretrained(model_dir)
