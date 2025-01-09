@@ -279,7 +279,6 @@
 - [Depth estimation with DepthAnything and OpenVINO](./depth-anything/depth-anything.ipynb)
 - [Depth estimation with DepthAnythingV2 and OpenVINO](./depth-anything/depth-anything-v2.ipynb)
 - [Colorize grayscale images using 🎨 DDColor and OpenVINO](./ddcolor-image-colorization/ddcolor-image-colorization.ipynb)
-- [Cross-lingual Books Alignment with Transformers and OpenVINO™](./cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb)
 - [Text-to-Image Generation with ControlNet Conditioning](./controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb)
 - [Zero-shot Image Classification with OpenAI CLIP and OpenVINO™](./clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb)
 - [Language-Visual Saliency with CLIP and OpenVINO™](./clip-language-saliency-map/clip-language-saliency-map.ipynb)

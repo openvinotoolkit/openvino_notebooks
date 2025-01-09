@@ -50,13 +50,6 @@
     - os:
         - ubuntu-20.04
         - ubuntu-22.04
-- notebook: notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb
   skips:
     - os:
