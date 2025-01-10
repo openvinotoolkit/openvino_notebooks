@@ -1,6 +1,5 @@
 from typing import Callable
 import gradio as gr
-from gradio_imageslider import ImageSlider
 from functools import partial
 
 
