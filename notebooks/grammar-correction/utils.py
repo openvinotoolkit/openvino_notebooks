@@ -10,6 +10,7 @@ from nncf.quantization.range_estimator import (
     StatisticsCollectorParameters,
     StatisticsType,
 )
+import torch
 from optimum.intel import OVModelForSeq2SeqLM
 from optimum.intel.openvino.quantization import InferRequestWrapper
 from pathlib import Path
@@ -96,9 +97,7 @@ def get_quantized_pipeline(
     grammar_corrector_model_int8.decoder_with_past.request = None
     grammar_corrector_model_int8.decoder_with_past._compile()
     grammar_corrector_pipe_int8 = pipeline(
-        "text2text-generation",
-        model=grammar_corrector_model_int8,
-        tokenizer=grammar_corrector_tokenizer,
+        "text2text-generation", model=grammar_corrector_model_int8, tokenizer=grammar_corrector_tokenizer, device=torch.device("cpu")
     )
 
     return grammar_corrector_pipe_int8

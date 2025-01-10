@@ -361,6 +361,7 @@ SUPPORTED_LLM_MODELS = {
             <|assistant|>""",
             "completion_to_prompt": phi_completion_to_prompt,
         },
+        "phi-4": {"model_id": "microsoft/phi-4", "remote_code": False, "start_message": DEFAULT_SYSTEM_PROMPT},
         "qwen2.5-14b-instruct": {
             "model_id": "Qwen/Qwen2.5-14B-Instruct",
             "remote_code": False,

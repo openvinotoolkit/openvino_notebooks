@@ -27,7 +27,7 @@ Qwen2VL is the latest addition to the QwenVL series of multimodal large language
 
 More details about model can be found in [model card](https://huggingface.co/Qwen/Qwen2-VL-7B-Instruct), [blog](https://qwenlm.github.io/blog/qwen2-vl/) and original [repo](https://github.com/QwenLM/Qwen2-VL).
 
-In this tutorial we consider how to convert and optimize Qwen2VL model for creating multimodal chatbot. Additionally, we demonstrate how to apply stateful transformation on LLM part and model optimization techniques like weights compression using [NNCF](https://github.com/openvinotoolkit/nncf)
+In this tutorial we consider how to convert and optimize Qwen2VL model for creating multimodal chatbot using [Optimum Intel](https://github.com/huggingface/optimum-intel). Additionally, we demonstrate how to apply model optimization techniques like weights compression using [NNCF](https://github.com/openvinotoolkit/nncf)
 
 ## Notebook contents
 The tutorial consists from following steps:

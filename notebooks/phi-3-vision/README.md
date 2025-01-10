@@ -2,7 +2,7 @@
 
 The [Phi-3-Vision-128K-Instruct](https://huggingface.co/microsoft/Phi-3-vision-128k-instruct) is a lightweight, state-of-the-art open multimodal model built upon datasets which include - synthetic data and filtered publicly available websites - with a focus on very high-quality, reasoning dense data both on text and vision. The model belongs to the Phi-3 model family, and the multimodal version comes with 128K context length (in tokens) it can support. The model underwent a rigorous enhancement process, incorporating both supervised fine-tuning and direct preference optimization to ensure precise instruction adherence and robust safety measures. More details about model can be found in [model blog post](https://azure.microsoft.com/en-us/blog/new-models-added-to-the-phi-3-family-available-on-microsoft-azure/), [technical report](https://aka.ms/phi3-tech-report), [Phi-3-cookbook](https://github.com/microsoft/Phi-3CookBook)
 
-In this tutorial we consider how to launch Phi-3-vision using OpenVINO for creation multimodal chatbot. Additionally, we optimize model to low precision using [NNCF](https://github.com/openvinotoolkit/nncf)
+In this tutorial we consider how to use Phi-3-Vision model to build multimodal chatbot using [Optimum Intel](https://github.com/huggingface/optimum-intel). Additionally, we optimize model to low precision using [NNCF](https://github.com/openvinotoolkit/nncf)
 
 ## Notebook contents
 The tutorial consists from following steps:

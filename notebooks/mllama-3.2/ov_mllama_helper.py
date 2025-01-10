@@ -5,7 +5,7 @@ from transformers.models.llama.modeling_llama import repeat_kv
 from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
 from typing import Optional, Union, List, Tuple, Dict
 from transformers.generation import GenerationMixin
-from transformers.modeling_outputs import ModelOutput
+from transformers.modeling_outputs import ModelOutput, BaseModelOutput
 import openvino.runtime.opset13 as ops
 import types
 import openvino as ov
@@ -29,6 +29,19 @@ def cleanup_torchscript_cache():
     torch._C._jit_clear_class_registry()
     torch.jit._recursive.concrete_type_store = torch.jit._recursive.ConcreteTypeStore()
     torch.jit._state._clear_class_state()
+
+
+def _add_runtime_options_to_rt_info(model: ov.Model, options: Dict):
+    """
+    Add runtime optinos
+    """
+    try:
+        for name, value in options.items():
+            model.set_rt_info(value, ["runtime_options", name])
+    except Exception:
+        pass
+
+    return model
 
 
 class InsertSlice(MatcherPass):
@@ -253,7 +266,6 @@ def patch_stateful(ov_model):
 
 
 def convert_mllama(model_id, out_dir):
-
     out_dir = Path(out_dir)
 
     img_encoder_path = out_dir / IMAGE_ENCODER
@@ -275,10 +287,155 @@ def convert_mllama(model_id, out_dir):
     if not img_encoder_path.exists():
         print("⌛ Convert vision model...")
 
+        def _prepare_aspect_ratio_attention_mask(
+            aspect_ratio_mask: torch.Tensor,
+            num_patches: int,
+            target_length: int,
+            dtype: torch.dtype,
+        ) -> torch.Tensor:
+            # Expand aspect ratio mask to target_length
+            batch_size, max_num_tiles = aspect_ratio_mask.shape
+            attention_mask = aspect_ratio_mask.view(batch_size, max_num_tiles, 1, 1).to(dtype)
+            attention_mask = attention_mask.repeat(1, 1, target_length, 1)
+
+            # Mask padding patches
+            pad_patches = target_length - num_patches
+            attention_mask[:, :, -pad_patches:] = 0
+
+            # Invert the mask (0 -> 1, 1 -> 0)
+            attention_mask = 1 - attention_mask
+
+            # Reshape to 2D and create 4D attention mask
+            # (batch_size, 1, max_num_tiles * target_length, max_num_tiles * target_length)
+            attention_mask = attention_mask.reshape(batch_size, max_num_tiles * target_length, 1)
+            attention_mask = attention_mask @ attention_mask.transpose(-1, -2) * torch.finfo(torch.float16).min
+            attention_mask = attention_mask.unsqueeze(1)
+
+            return attention_mask
+
+        def _img_encoder_forward(
+            self,
+            pixel_values: torch.Tensor,
+            aspect_ratio_ids: torch.Tensor,
+            aspect_ratio_mask: torch.Tensor,
+            output_attentions: Optional[bool] = None,
+            output_hidden_states: Optional[bool] = None,
+            return_dict: Optional[bool] = None,
+        ) -> Union[BaseModelOutput, Tuple[torch.Tensor, ...]]:
+
+            output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
+            output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
+            return_dict = return_dict if return_dict is not None else self.config.use_return_dict
+
+            batch_size, num_concurrent_media, num_tiles, num_channels, height, width = pixel_values.shape
+
+            pixel_values = pixel_values.reshape(batch_size * num_concurrent_media * num_tiles, num_channels, height, width)
+            aspect_ratio_ids = aspect_ratio_ids.reshape(batch_size * num_concurrent_media, -1)
+
+            # Patch embedding
+            patch_embeds = self.patch_embedding(pixel_values.to(self.dtype).to(self.device))
+            hidden_state = patch_embeds.flatten(2).transpose(1, 2)
+
+            # Tile embeddings
+            _, num_patches, dim = hidden_state.shape
+            hidden_state = hidden_state.reshape(batch_size * num_concurrent_media, num_tiles, -1, dim)
+            hidden_state = self.pre_tile_positional_embedding(hidden_state, aspect_ratio_ids)
+
+            # Add cls token
+            hidden_state = hidden_state.reshape(batch_size * num_concurrent_media * num_tiles, num_patches, dim)
+            hidden_state = self.apply_class_embedding(hidden_state)
+            num_patches += 1
+
+            # Position embeddings
+            hidden_state = hidden_state.reshape(batch_size * num_concurrent_media, num_tiles, num_patches, dim)
+            hidden_state = self.gated_positional_embedding(hidden_state, aspect_ratio_ids)
+
+            hidden_state = self.layernorm_pre(hidden_state)
+
+            # Compute the number of tokens to pad
+            num_padding_patches = (8 - (hidden_state.shape[-2] % 8)) % 8
+            # Compute padding tuple for pad function
+            padding = (0, 0, 0, num_padding_patches)  # (pad_left, pad_right, pad_left for dim -2, pad_right for dim -2)
+            # Pad the tensor
+            hidden_state = torch.nn.functional.pad(hidden_state, padding, mode="constant", value=0)
+            slice_index = -num_padding_patches if num_padding_patches > 0 else None
+
+            # Prepare attention mask
+            attention_mask = aspect_ratio_mask.reshape(batch_size * num_concurrent_media, -1)
+            attention_mask = _prepare_aspect_ratio_attention_mask(
+                aspect_ratio_mask=attention_mask,
+                num_patches=self.num_patches,
+                target_length=hidden_state.shape[2],
+                dtype=self.dtype,
+            )
+
+            # Apply encoder
+            hidden_state = hidden_state.view(batch_size * num_concurrent_media, -1, dim)
+            output = self.transformer(
+                hidden_state,
+                attention_mask=attention_mask,
+                output_hidden_states=True,
+                output_attentions=output_attentions,
+            )
+            hidden_state = output[0]
+
+            hidden_state = self.layernorm_post(hidden_state)
+
+            # Apply global encoder
+            hidden_state = hidden_state.reshape(batch_size * num_concurrent_media, num_tiles, num_patches + num_padding_patches, dim)
+            hidden_state = self.post_tile_positional_embedding(hidden_state, aspect_ratio_ids)
+            hidden_state = hidden_state.reshape(batch_size * num_concurrent_media, num_tiles * (num_patches + num_padding_patches), dim)
+            global_output = self.global_transformer(
+                hidden_state,
+                attention_mask=attention_mask,
+                output_hidden_states=output_hidden_states,
+                output_attentions=output_attentions,
+            )
+            hidden_state = global_output[0]
+
+            # Remove padding form hidden state
+            hidden_state = hidden_state.reshape(batch_size * num_concurrent_media, num_tiles, num_patches + num_padding_patches, dim)
+            hidden_state = hidden_state[:, :, :slice_index]
+            hidden_state = hidden_state.reshape(batch_size, num_concurrent_media, num_tiles, num_patches, dim)
+
+            # Collect intermediate layer outputs from encoder output
+            all_intermediate_hidden_states = [output[1][i] for i in self.intermediate_layers_indices]
+            intermediate_hidden_states = torch.stack(all_intermediate_hidden_states, dim=-1)
+
+            # Remove padding from intermediate hidden states
+            intermediate_hidden_states = intermediate_hidden_states.reshape(batch_size * num_concurrent_media, num_tiles, num_patches + num_padding_patches, -1)
+            intermediate_hidden_states = intermediate_hidden_states[:, :, :slice_index]
+            intermediate_hidden_states = intermediate_hidden_states.reshape(batch_size, num_concurrent_media, num_tiles, num_patches, -1)
+
+            # Concatenate final hidden state and intermediate hidden states
+            hidden_state = torch.cat([hidden_state, intermediate_hidden_states], dim=-1)
+
+            if output_hidden_states:
+                hidden_states = tuple(all_intermediate_hidden_states) + tuple(global_output[1])
+            else:
+                hidden_states = None
+
+            if output_attentions:
+                # global transformer in contrast to `self.transformer` doesn't always return hidden states so we might go index out-of-range
+                global_attn = tuple(global_output[2]) if output_hidden_states else tuple(global_output[1])
+                attentions = tuple(output[2]) + global_attn
+            else:
+                attentions = None
+
+            if not return_dict:
+                return tuple(v for v in [hidden_state, hidden_states, attentions] if v is not None)
+
+            return BaseModelOutput(
+                last_hidden_state=hidden_state,
+                hidden_states=hidden_states,
+                attentions=attentions,
+            )
+
         class VisionEncoder(torch.nn.Module):
             def __init__(self, model):
                 super().__init__()
                 self.model = model
+                self.model.vision_model.forward = types.MethodType(_img_encoder_forward, self.model.vision_model)
 
             def forward(self, pixel_values, aspect_ratio_ids, aspect_ratio_mask):
                 bsz = pixel_values.shape[0]
@@ -322,6 +479,8 @@ def convert_mllama(model_id, out_dir):
 
         for output, output_name in zip(ov_model.outputs, output_names):
             output.get_tensor().set_names({output_name})
+
+        _add_runtime_options_to_rt_info(ov_model, {"ACTIVATIONS_SCALE_FACTOR": "8.0", "KV_CACHE_PRECISION": "f16"})
 
         ov.save_model(ov_model, img_encoder_path)
         del ov_model
@@ -422,12 +581,121 @@ def convert_mllama(model_id, out_dir):
 
             return attn_output, attn_weights, past_key_value
 
+        def _prepare_4d_causal_attention_mask_with_cache_position(
+            attention_mask: torch.Tensor,
+            sequence_length: int,
+            target_length: int,
+            dtype: torch.dtype,
+            device: torch.device,
+            min_dtype: float,
+            cache_position: torch.Tensor,
+            batch_size: int,
+        ):
+            """
+            Creates a causal 4D mask of shape `(batch_size, 1, query_length, key_value_length)` from a 2D mask of shape
+            `(batch_size, key_value_length)`, or if the input `attention_mask` is already 4D, do nothing.
+
+            Args:
+                attention_mask (`torch.Tensor`):
+                    A 2D attention mask of shape `(batch_size, key_value_length)` or a 4D attention mask of shape `(batch_size, 1, query_length, key_value_length)`.
+                sequence_length (`int`):
+                    The sequence length being processed.
+                target_length (`int`):
+                    The target length: when generating with static cache, the mask should be as long as the static cache, to account for the 0 padding, the part of the cache that is not filled yet.
+                dtype (`torch.dtype`):
+                    The dtype to use for the 4D attention mask.
+                device (`torch.device`):
+                    The device to plcae the 4D attention mask on.
+                min_dtype (`float`):
+                    The minimum value representable with the dtype `dtype`.
+                cache_position (`torch.Tensor`):
+                    Indices depicting the position of the input sequence tokens in the sequence.
+                batch_size (`torch.Tensor`):
+                    Batch size.
+            """
+            if attention_mask is not None and attention_mask.dim() == 4:
+                # In this case we assume that the mask comes already in inverted form and requires no inversion or slicing.
+                causal_mask = attention_mask
+            else:
+                causal_mask = torch.full((sequence_length, target_length), fill_value=min_dtype, dtype=dtype, device=device)
+                if sequence_length != 1:
+                    causal_mask = torch.triu(causal_mask, diagonal=1)
+                causal_mask *= torch.arange(target_length, device=device) > cache_position.reshape(-1, 1)
+                causal_mask = causal_mask[None, None, :, :].expand(batch_size, 1, -1, -1)
+                if attention_mask is not None:
+                    causal_mask = causal_mask.clone()  # copy to contiguous memory for in-place edit
+                    mask_length = attention_mask.shape[-1]
+                    padding_mask = causal_mask[:, :, :, :mask_length] + attention_mask[:, None, None, :]
+                    padding_mask = padding_mask == 0
+                    causal_mask[:, :, :, :mask_length] = causal_mask[:, :, :, :mask_length].masked_fill(padding_mask, min_dtype)
+
+            return causal_mask
+
+        def _lm_update_causal_mask(
+            self,
+            attention_mask: torch.Tensor,
+            input_tensor: torch.Tensor,
+            cache_position: torch.Tensor,
+            past_key_values: Cache,
+            output_attentions: bool,
+        ):
+
+            from transformers.modeling_attn_mask_utils import AttentionMaskConverter
+
+            if self.config._attn_implementation == "flash_attention_2":
+                if attention_mask is not None and 0.0 in attention_mask:
+                    return attention_mask
+                return None
+
+            # For SDPA, when possible, we will rely on its `is_causal` argument instead of its `attn_mask` argument, in
+            # order to dispatch on Flash Attention 2. This feature is not compatible with static cache, as SDPA will fail
+            # to infer the attention mask.
+            past_seen_tokens = past_key_values.get_seq_length() if past_key_values is not None else 0
+
+            # When output attention is True, sdpa implementation's forward method calls the eager implementation's forward
+            # TODO: we have only SDPA currently and there's a bug when attn-bias is passed. Need to add eager attn and return the line
+            # self.config._attn_implementation == "sdpa" and
+            if self.config._attn_implementation == "sdpa" and not output_attentions:
+                if AttentionMaskConverter._ignore_causal_mask_sdpa(
+                    attention_mask,
+                    inputs_embeds=input_tensor,
+                    past_key_values_length=past_seen_tokens,
+                    is_training=self.training,
+                ):
+                    return None
+
+            dtype, device = input_tensor.dtype, input_tensor.device
+            min_dtype = torch.finfo(torch.float16).min
+            sequence_length = input_tensor.shape[1]
+            target_length = attention_mask.shape[-1] if isinstance(attention_mask, torch.Tensor) else past_seen_tokens + sequence_length + 1
+
+            # In case the provided `attention` mask is 2D, we generate a causal mask here (4D).
+            causal_mask = _prepare_4d_causal_attention_mask_with_cache_position(
+                attention_mask,
+                sequence_length=sequence_length,
+                target_length=target_length,
+                dtype=dtype,
+                device=device,
+                min_dtype=min_dtype,
+                cache_position=cache_position,
+                batch_size=input_tensor.shape[0],
+            )
+
+            if self.config._attn_implementation == "sdpa" and attention_mask is not None and attention_mask.device.type == "cuda" and not output_attentions:
+                # Attend to all tokens in fully masked rows in the causal_mask, for example, the relevant first rows when
+                # using left padding. This is required by F.scaled_dot_product_attention memory-efficient attention path.
+                # Details: https://github.com/pytorch/pytorch/issues/110213
+                causal_mask = AttentionMaskConverter._unmask_unattended(causal_mask, min_dtype)
+
+            return causal_mask
+
         for layer_idx in model.language_model.model.cross_attention_layers:
             cross_attn = model.language_model.model.layers[layer_idx].cross_attn
             cross_attn.forward = types.MethodType(cross_attn_forward, cross_attn)
 
         model.language_model.orig_forward = model.language_model.forward
         model.language_model.forward = types.MethodType(lm_forward_wrapper, model.language_model)
+        model.language_model.model._update_causal_mask = types.MethodType(_lm_update_causal_mask, model.language_model.model)
         example_inpit = {
             "input_ids": torch.ones([1, 2], dtype=torch.int64),
             "attention_mask": torch.ones([1, 4], dtype=torch.int64),
@@ -475,13 +743,14 @@ def convert_mllama(model_id, out_dir):
 
         ov_model.validate_nodes_and_infer_types()
         patch_stateful(ov_model)
+        _add_runtime_options_to_rt_info(ov_model, {"ACTIVATIONS_SCALE_FACTOR": "8.0", "KV_CACHE_PRECISION": "f16"})
         ov.save_model(ov_model, lang_model_path)
         del ov_model
         cleanup_torchscript_cache()
         del model
         gc.collect()
         print("✅ Language model successfully converted")
-    print(f"✅ Model sucessfully converted and can be found in {out_dir}")
+    print(f"✅ Model successfully converted and can be found in {out_dir}")
 
 
 core = ov.Core()
@@ -508,6 +777,7 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         slice_lm_head=True,
         use_remote_tensors=True,
         dynamic_shape=False,
+        force_fp32_pkv=False,
     ):
         model_dir = Path(model_dir)
         self.config = AutoConfig.from_pretrained(model_dir)
@@ -530,7 +800,7 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             self.vision_model = core.read_model(model_dir / IMAGE_ENCODER)
         if not dynamic_shape:
             self.reshape_vision_model()
-        self.update_pkv_precision()
+        self.update_pkv_precision(force_fp32=force_fp32_pkv)
         if slice_lm_head:
             self.slice_lm_head()
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}

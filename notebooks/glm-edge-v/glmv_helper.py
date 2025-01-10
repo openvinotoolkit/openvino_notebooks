@@ -313,10 +313,7 @@ def convert_glmv_model(model_id, output_dir, quantization_config):
         input_ids = torch.zeros([2, 2], dtype=torch.int64)
         inputs_embeds = torch.zeros([2, 2, config.hidden_size], dtype=torch.float32)
 
-        pkv = model.model(
-            input_ids=input_ids,
-            attention_mask=torch.ones((2, 2), dtype=torch.int64),
-        )[1]
+        pkv = model.model(input_ids=input_ids, attention_mask=torch.ones((2, 2), dtype=torch.int64), images=torch.zeros([1, 3, image_size, image_size]))[1]
         model.forward = types.MethodType(_glmv_transformer_forward, model)
 
         model.config.torchscript = True

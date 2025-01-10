@@ -591,6 +591,8 @@ ocr
 OCRBench
 OCRv
 odometry
+OmniGen
+OmniGen's
 OmniParser
 OMZ
 OneFormer
@@ -629,6 +631,7 @@ OV
 OVC
 OVModel
 OVModelForCausalLM
+OVModelForVisualCausalLM
 OVModelForXXX
 OVModelForXxx
 OVMS
