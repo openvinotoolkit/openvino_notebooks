@@ -47,14 +47,12 @@ def compression_widgets_helper():
     return vb, compression_settings
 
 
-def vision_encoder_selection_widget(device):
+def vision_encoder_selection_widget():
     from ipywidgets import Dropdown
 
     optimizations = ["FP16", "INT8 quantization", "INT8 weights compression"]
 
-    options = Dropdown(
-        description="Vision Encoder", options=optimizations, value=optimizations[0] if "GPU" in device else optimizations[1], disabled="GPU" in device
-    )
+    options = Dropdown(description="Vision Encoder", options=optimizations, value=optimizations[1])
 
     return options
 
