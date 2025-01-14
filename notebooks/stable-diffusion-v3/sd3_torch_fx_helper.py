@@ -17,6 +17,7 @@ def get_sd3_pipeline(model_id="stabilityai/stable-diffusion-3-medium-diffusers")
 # This function takes in the models of a SD3 pipeline in the torch fx representation and returns an SD3 pipeline with wrapped models.
 def init_pipeline(models_dict, configs_dict, model_id="stabilityai/stable-diffusion-3-medium-diffusers"):
     wrapped_models = {}
+
     def wrap_model(pipe_model, base_class, config):
         class ModelWrapper(base_class):
             def __init__(self, model, config):
@@ -35,9 +36,10 @@ def init_pipeline(models_dict, configs_dict, model_id="stabilityai/stable-diffus
                     self.decoder = model.decoder
                 else:
                     self.model = model
+
             def forward(self, *args, **kwargs):
-                kwargs.pop('joint_attention_kwargs', None)
-                kwargs.pop('return_dict', None)
+                kwargs.pop("joint_attention_kwargs", None)
+                kwargs.pop("return_dict", None)
                 return self.model(*args, **kwargs)
 
         return ModelWrapper(pipe_model, config)
