@@ -1579,15 +1579,6 @@
             "markers": "python_version >= '3.7'",
             "version": "==3.0.11"
         },
-        "keras": {
-            "hashes": [
-                "sha256:5ce5f706f779fa7330e63632f327b75ce38144a120376b2ae1917c00fa6136af",
-                "sha256:5df12cc241a015a11b65ddb452c0eeb2744fce21d9b54ba48db87492568ccc68"
-            ],
-            "index": "pypi",
-            "markers": "python_version >= '3.8'",
-            "version": "==2.13.1"
-        },
         "kiwisolver": {
             "hashes": [
                 "sha256:00bd361b903dc4bbf4eb165f24d1acbee754fce22ded24c3d56eec268658a5cf",
