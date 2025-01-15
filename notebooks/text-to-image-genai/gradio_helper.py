@@ -1,5 +1,7 @@
 import gradio as gr
 import numpy as np
+from tqdm.auto import tqdm
+import sys
 
 import openvino_genai as ov_genai
 
@@ -30,6 +32,13 @@ def make_demo(pipeline, generator_cls, adapter_config):
 
         generator = generator_cls(seed)
 
+        pbar = tqdm(total=num_inference_steps)
+
+        def callback(step, num_steps, latent):
+            pbar.update(1)
+            sys.stdout.flush()
+            return False
+
         image_tensor = pipeline.generate(
             prompt=prompt,
             negative_prompt=negative_prompt,
@@ -38,6 +47,7 @@ def make_demo(pipeline, generator_cls, adapter_config):
             height=height,
             generator=generator,
             adapters=adapter_config if use_lora else ov_genai.AdapterConfig(),
+            callback=callback,
         )
 
         return image_tensor.data[0], seed
