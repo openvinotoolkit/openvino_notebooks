@@ -22,7 +22,7 @@ OpenVINO GenAI supports popular diffusion models like Stable Diffusion or SDXL f
 
 ## Notebook Contents
 
-In this notebook we will demonstrate how to use Latent Diffusion models like Stable Diffusion 1.5, 2.1, LCM, SDXL for image to image generation using OpenVINO GenAI Image2ImagePipele. 
+In this notebook we will demonstrate how to use Latent Diffusion models like Stable Diffusion 1.5, 2.1, LCM, SDXL for image to image generation using OpenVINO GenAI Image2ImagePipeline. 
 All it takes is two steps: 
 1. Export OpenVINO IR format model using the [Hugging Face Optimum](https://huggingface.co/docs/optimum/installation) library accelerated by OpenVINO integration.
 The Hugging Face Optimum Intel API is a high-level API that enables us to convert and quantize models from the Hugging Face Transformers library to the OpenVINO™ IR format. For more details, refer to the [Hugging Face Optimum Intel documentation](https://huggingface.co/docs/optimum/intel/inference).
