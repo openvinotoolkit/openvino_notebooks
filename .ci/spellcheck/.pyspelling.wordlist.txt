@@ -447,6 +447,7 @@ learnable
 LeViT
 LibriSpeech
 librispeech
+LibriTTS
 Lim
 LinearCameraEmbedder
 Lippipeline
