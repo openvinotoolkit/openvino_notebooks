@@ -10,6 +10,7 @@ adas
 ADE
 adversarially
 AE
+AEs
 aeroplane
 affective
 Agentic
@@ -159,6 +160,7 @@ DataModule
 dataset
 datasets
 DaViT
+DCAE
 DDIM
 DDPMs
 dDPO
@@ -188,6 +190,7 @@ denoising
 denormalization
 denormalized
 depainting
+deployable
 DepthAnything
 detections
 detokenization
@@ -230,6 +233,7 @@ Downloader
 downloader
 downsample
 downsampled
+DPM
 DPO
 dpo
 dpredictor
@@ -584,6 +588,7 @@ numpy
 NumPy
 NPU
 NPUs
+NVLabs
 OASST
 OBB
 obb
