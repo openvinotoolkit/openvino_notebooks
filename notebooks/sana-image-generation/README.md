@@ -23,7 +23,8 @@ The tutorial consists of the following steps:
 
 - Install prerequisites
 - Collect Pytorch model pipeline
-- Convert model to OpenVINO intermediate representation (IR) format 
+- Convert model to OpenVINO intermediate representation (IR) format
+- Compress model weights using NNCF
 - Prepare OpenVINO Inference pipeline
 - Run Text-to-Image generation
 - Launch interactive demo
