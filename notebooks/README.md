@@ -37,6 +37,7 @@
 - [SoftVC VITS Singing Voice Conversion and OpenVINO™](./softvc-voice-conversion/softvc-voice-conversion.ipynb)
 - [Object masks from prompts with SAM and OpenVINO](./segment-anything/segment-anything.ipynb)
 - [Single step image generation using SDXL-turbo and OpenVINO](./sdxl-turbo/sdxl-turbo.ipynb)
+- [Image generation with Sana and OpenVINO](./sana-image-generation/sana-image-generation.ipynb)
 - [Object masks from prompts with SAM2 and OpenVINO](./sam2-video-segmentation/segment-anything-2-video.ipynb)
 - [Object masks from prompts with SAM2 and OpenVINO for Images](./sam2-image-segmentation/segment-anything-2-image.ipynb)
 - [Visual-language assistant with Qwen2VL and OpenVINO](./qwen2-vl/qwen2-vl.ipynb)
@@ -76,6 +77,7 @@
 - [Visual-language assistant with InternVL2 and OpenVINO](./internvl2/internvl2.ipynb)
 - [Image Editing with InstructPix2Pix and OpenVINO](./instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb)
 - [InstantID: Zero-shot Identity-Preserving Generation using OpenVINO](./instant-id/instant-id.ipynb)
+- [Image-to-image generation using OpenVINO GenAI](./image-to-image-genai/image-to-image-genai.ipynb)
 - [Image generation with HunyuanDIT and OpenVINO](./hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb)
 - [Object detection and masking from prompts with GroundedSAM (GroundingDINO + SAM) and OpenVINO](./grounded-segment-anything/grounded-segment-anything.ipynb)
 - [Visual-language assistant with GLM-Edge-V and OpenVINO](./glm-edge-v/glm-edge-v.ipynb)
@@ -97,6 +99,7 @@
 
 ## API Overview
 
+- [Text to Image pipeline and OpenVINO with Generate API](./text-to-image-genai/text-to-image-genai.ipynb)
 - [Quantize Speech Recognition Models with accuracy control using NNCF PTQ API](./quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb)
 - [Post-Training Quantization of PyTorch models with NNCF](./pytorch-post-training-quantization-nncf/pytorch-post-training-quantization-nncf.ipynb)
 - [Optimize Preprocessing](./optimize-preprocessing/optimize-preprocessing.ipynb)
@@ -106,6 +109,7 @@
 - [LocalAI and OpenVINO](./localai/localai.ipynb)
 - [Quantize NLP models with Post-Training Quantization ​in NNCF](./language-quantize-bert/language-quantize-bert.ipynb)
 - [Convert a JAX Model to OpenVINO™ IR](./jax-to-openvino/jax-classification-to-openvino.ipynb)
+- [Image-to-image generation using OpenVINO GenAI](./image-to-image-genai/image-to-image-genai.ipynb)
 - [Quantization of Image Classification Models](./image-classification-quantization/image-classification-quantization.ipynb)
 - [🤗 Hugging Face Model Hub with OpenVINO™](./hugging-face-hub/hugging-face-hub.ipynb)
 - [Hello NPU](./hello-npu/hello-npu.ipynb)
@@ -145,6 +149,7 @@
 ## First Steps
 
 - [OpenVINO™ Runtime API Tutorial](./openvino-api/openvino-api.ipynb)
+- [Image-to-image generation using OpenVINO GenAI](./image-to-image-genai/image-to-image-genai.ipynb)
 - [Hello Image Classification](./hello-world/hello-world.ipynb)
 - [Hello Image Segmentation](./hello-segmentation/hello-segmentation.ipynb)
 - [Hello Object Detection](./hello-detection/hello-detection.ipynb)
@@ -210,6 +215,7 @@
 - [Zero-shot Image Classification with SigLIP](./siglip-zero-shot-image-classification/siglip-zero-shot-image-classification.ipynb)
 - [Object masks from prompts with SAM and OpenVINO](./segment-anything/segment-anything.ipynb)
 - [Single step image generation using SDXL-turbo and OpenVINO](./sdxl-turbo/sdxl-turbo.ipynb)
+- [Image generation with Sana and OpenVINO](./sana-image-generation/sana-image-generation.ipynb)
 - [Object masks from prompts with SAM2 and OpenVINO](./sam2-video-segmentation/segment-anything-2-video.ipynb)
 - [Object masks from prompts with SAM2 and OpenVINO for Images](./sam2-image-segmentation/segment-anything-2-image.ipynb)
 - [Text-to-Video retrieval with S3D MIL-NCE and OpenVINO](./s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb)
@@ -262,6 +268,7 @@
 - [Visual-language assistant with InternVL2 and OpenVINO](./internvl2/internvl2.ipynb)
 - [Image Editing with InstructPix2Pix and OpenVINO](./instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb)
 - [InstantID: Zero-shot Identity-Preserving Generation using OpenVINO](./instant-id/instant-id.ipynb)
+- [Image-to-image generation using OpenVINO GenAI](./image-to-image-genai/image-to-image-genai.ipynb)
 - [Image generation with HunyuanDIT and OpenVINO](./hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb)
 - [Handwritten Chinese and Japanese OCR with OpenVINO™](./handwritten-ocr/handwritten-ocr.ipynb)
 - [Object detection and masking from prompts with GroundedSAM (GroundingDINO + SAM) and OpenVINO](./grounded-segment-anything/grounded-segment-anything.ipynb)

@@ -28,7 +28,8 @@ export const TASKS = /** @type {const} */ ({
     TEXT_TO_VIDEO_RETRIEVAL: 'Text-to-Video Retrieval',
     IMAGE_TO_3D: 'Image-to-3D',
     IMAGE_TO_VIDEO: 'Image-to-Video',
-    LIP_SYNC: 'Lip-Sync'
+    LIP_SYNC: 'Lip-Sync',
+    IMAGE_TO_IMAGE: 'Image-to-Image',
   },
   CV: {
     IMAGE_CLASSIFICATION: 'Image Classification',

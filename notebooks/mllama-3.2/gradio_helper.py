@@ -27,6 +27,8 @@ def make_demo(model, processor):
             # message["files"][-1] is a Dict or just a string
             if isinstance(files[-1], dict):
                 image = files[-1]["path"]
+            elif isinstance(files[-1], str):
+                image = files[-1]
             else:
                 image = files[-1] if isinstance(files[-1], (list, tuple)) else files[-1].path
         else:

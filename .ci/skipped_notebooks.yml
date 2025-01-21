@@ -559,3 +559,10 @@
   skips:
     - os:
         - macos-13
+- notebook: notebooks/llm-rag-langchain/llm-rag-langchain-genai.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019

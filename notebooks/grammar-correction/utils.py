@@ -23,7 +23,7 @@ CALIBRATION_DATASET_SIZE = 10
 
 def collect_calibration_data(grammar_corrector_pipe_fp32: Pipeline, calibration_dataset_size: int) -> List[Dict]:
     calibration_data = []
-    ov_decoder = grammar_corrector_pipe_fp32.model.decoder_with_past
+    ov_decoder = grammar_corrector_pipe_fp32.model.decoder
 
     # Wrap decoder inference for data collection
     ov_decoder.request = InferRequestWrapper(ov_decoder.request, calibration_data, apply_caching=True)
@@ -55,7 +55,7 @@ def quantize(
         quantized_model = core.read_model(model=quantized_model_path)
     else:
         calibration_data = collect_calibration_data(grammar_corrector_pipe_fp32, calibration_dataset_size)
-        ov_decoder = grammar_corrector_pipe_fp32.model.decoder_with_past
+        ov_decoder = grammar_corrector_pipe_fp32.model.decoder
         quantized_model = nncf.quantize(
             ov_decoder.model,
             calibration_dataset=nncf.Dataset(calibration_data),
@@ -93,9 +93,9 @@ def get_quantized_pipeline(
 
     # Load quantized model into grammar correction pipeline
     grammar_corrector_model_int8 = OVModelForSeq2SeqLM.from_pretrained(grammar_corrector_dir, device=device)
-    grammar_corrector_model_int8.decoder_with_past.model = quantized_model
-    grammar_corrector_model_int8.decoder_with_past.request = None
-    grammar_corrector_model_int8.decoder_with_past._compile()
+    grammar_corrector_model_int8.decoder.model = quantized_model
+    grammar_corrector_model_int8.decoder.request = None
+    grammar_corrector_model_int8.decoder._compile()
     grammar_corrector_pipe_int8 = pipeline(
         "text2text-generation", model=grammar_corrector_model_int8, tokenizer=grammar_corrector_tokenizer, device=torch.device("cpu")
     )

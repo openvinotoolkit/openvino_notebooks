@@ -5,7 +5,11 @@ from dataclasses import dataclass, field
 try:
     from outetts.version.v1.interface import InterfaceHF
     from outetts.version.v1.prompt_processor import PromptProcessor
-    from outetts.version.v1.model import HFModel
+
+    try:
+        from outetts.version.v1.model import HFModel
+    except ImportError:
+        from outetts.models.hf_model import HFModel
     from outetts.wav_tokenizer.audio_codec import AudioCodec
 
     updated_version = True
