@@ -370,7 +370,9 @@ InferRequest
 InferRequests
 infographics
 Inpaint
+inpaint
 inpainting
+InpaintingPipeline
 InternVL
 InsightFace
 installable
