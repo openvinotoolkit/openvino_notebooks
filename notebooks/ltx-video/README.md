@@ -1,6 +1,6 @@
 # Sound Generation with Stable Audio Open and OpenVINO™
 
-[LTX-Video](https://github.com/Lightricks/LTX-Video) is the first DiT-based video generation model capable of generating high-quality videos in real-time. It produces 24 FPS videos at a 768x512 resolution faster than they can be watched. Trained on a large-scale dataset of diverse videos, the model generates high-resolution videos with realistic and varied content. The model is provided for both text-to-video as well as image+text-to-video usecases. In this example we show how to convert text-to-video pipeline in OpenVINO format and run inference.
+[LTX-Video](https://github.com/Lightricks/LTX-Video) is the first DiT-based video generation model capable of generating high-quality videos in real-time. It produces 24 FPS videos at a 768x512 resolution faster than they can be watched. Trained on a large-scale dataset of diverse videos, the model generates high-resolution videos with realistic and varied content. The model is provided for both text-to-video as well as image+text-to-video use cases. In this example we show how to convert text-to-video pipeline in OpenVINO format and run inference.
 
 | | | | |
 |:---:|:---:|:---:|:---:|
