@@ -233,6 +233,7 @@ Downloader
 downloader
 downsample
 downsampled
+downscaling
 DPM
 DPO
 dpo
@@ -665,6 +666,7 @@ parameterization
 parametrize
 Parler
 parsers
+patchifying
 perceptron
 Patil
 PEFT
@@ -833,6 +835,7 @@ Segmenter
 segmenter
 Segmind
 segmind
+selfattention
 serializable
 sft
 ShapeNet
@@ -862,6 +865,7 @@ sparsity
 Sparisty
 sparsified
 sparsify
+spatiotemporal
 spectrogram
 spectrograms
 SpeechBrain
@@ -990,6 +994,7 @@ upscales
 upscaling
 utils
 VAE
+VAE’s
 Validator
 validator
 variational
