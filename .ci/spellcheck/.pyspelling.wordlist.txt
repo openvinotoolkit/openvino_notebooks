@@ -994,6 +994,7 @@ upscales
 upscaling
 utils
 VAE
+VAE's
 Validator
 validator
 variational
