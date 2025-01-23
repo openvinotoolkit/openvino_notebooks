@@ -323,6 +323,7 @@ GPUs
 Gradio
 gradio
 grayscale
+grey
 GroundedSAM
 GroundingDINO
 gRPC
@@ -476,6 +477,7 @@ LoRAs
 lraspp
 LRASPP
 LTS
+LTX
 LSTM
 LSTMs
 Luo
@@ -977,6 +979,7 @@ uparrow
 upcast
 upcasts
 Upcroft
+updo
 upsample
 upsampled
 upsamples
