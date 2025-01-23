@@ -18,7 +18,7 @@ In this tutorial, we consider how to use OpenVINO GenAI for performing image-to-
 
 This library is friendly to PC and laptop execution, and optimized for resource consumption. It requires no external dependencies to run generative models as it already includes all the core functionality (e.g. tokenization via openvino-tokenizers).
 
-OpenVINO GenAI supports popular diffusion models like Stable Diffusion or SDXL for performing image generation. You can find supported models list in [OpenVINO GenAI documentation](https://github.com/openvinotoolkit/openvino.genai/blob/master/SUPPORTED_MODELS.md#image-generation-models). Previously, we considered how to run text-to-image generation with OpenVINO GenAI and apply multiple LoRA adapters, mow is image-to-image. 
+OpenVINO GenAI supports popular diffusion models like Stable Diffusion or SDXL for performing image generation. You can find supported models list in [OpenVINO GenAI documentation](https://github.com/openvinotoolkit/openvino.genai/blob/master/SUPPORTED_MODELS.md#image-generation-models). Previously, we considered how to run [text-to-image](../text-to-image-genai/text-to-image-genai.ipynb) generation with OpenVINO GenAI and [apply multiple LoRA adapters](../multilora-image-generation/multilora-image-generation.ipynb), now is image-to-image turn.
 
 ## Notebook Contents
 

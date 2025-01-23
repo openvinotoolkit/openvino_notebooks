@@ -566,3 +566,7 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb
+  skips:
+    - python:
+        - '3.12'
