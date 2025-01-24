@@ -570,3 +570,10 @@
   skips:
     - python:
         - '3.12'
+- notebook: notebooks/ltx-video/ltx-video.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-20.04
+        - ubuntu-22.04
+        - windows-2019
