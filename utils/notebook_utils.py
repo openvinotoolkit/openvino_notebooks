@@ -714,3 +714,29 @@ def optimize_bge_embedding(model_path, output_model_path):
     manager.register_pass(ReplaceTensor(packed_layername_tensor_dict_list))
     manager.run_passes(ov_model)
     ov.save_model(ov_model, output_model_path, compress_to_fp16=False)
+
+
+def collect_telemetry(file: str = ""):
+    """
+    The function only tracks that the notebooks cell was executed and does not include any personally identifiable information (PII).
+    """
+    try:
+        import os
+        import requests
+        import platform
+        from pathlib import Path
+
+        if os.getenv("SCARF_NO_ANALYTICS") == "1" or os.getenv("DO_NOT_TRACK") == "1":
+            return
+        url = "https://openvino.gateway.scarf.sh/telemetry"
+        params = {
+            "notebook_dir": Path(__file__).parent.name,
+            "platform": platform.system(),
+            "arch": platform.machine(),
+            "python_version": platform.python_version(),
+        }
+        if file:
+            params["file"] = file
+        requests.get(url, params=params)
+    except Exception:
+        pass

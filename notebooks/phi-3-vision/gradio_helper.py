@@ -28,7 +28,7 @@ def make_demo(model, processor):
             if isinstance(files[-1], dict):
                 image = files[-1]["path"]
             else:
-                image = files[-1] if isinstance(files[-1], (list, tuple)) else files[-1].path
+                image = files[-1] if isinstance(files[-1], (list, tuple, str)) else files[-1].path
         else:
             # if there's no image uploaded for this turn, look for images in the past turns
             # kept inside tuples, take the last one
