@@ -55,7 +55,7 @@ DEFAULT_SYSTEM_PROMPT_JAPANESE = """\
 """
 
 
-def get_system_prompt(model_language, system_prompt = None):
+def get_system_prompt(model_language, system_prompt=None):
     if system_prompt is not None:
         return system_prompt
     return (
