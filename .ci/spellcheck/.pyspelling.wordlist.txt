@@ -183,6 +183,7 @@ DeciDiffusion's
 deduplicated
 DeepFloyd
 DeepLabV
+DeepSeek
 denoise
 denoised
 denoises
