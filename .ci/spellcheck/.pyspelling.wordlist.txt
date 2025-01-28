@@ -10,6 +10,7 @@ adas
 ADE
 adversarially
 AE
+AEs
 aeroplane
 affective
 Agentic
@@ -159,6 +160,7 @@ DataModule
 dataset
 datasets
 DaViT
+DCAE
 DDIM
 DDPMs
 dDPO
@@ -181,6 +183,7 @@ DeciDiffusion's
 deduplicated
 DeepFloyd
 DeepLabV
+DeepSeek
 denoise
 denoised
 denoises
@@ -188,6 +191,7 @@ denoising
 denormalization
 denormalized
 depainting
+deployable
 DepthAnything
 detections
 detokenization
@@ -230,6 +234,8 @@ Downloader
 downloader
 downsample
 downsampled
+downscaling
+DPM
 DPO
 dpo
 dpredictor
@@ -319,6 +325,7 @@ GPUs
 Gradio
 gradio
 grayscale
+grey
 GroundedSAM
 GroundingDINO
 gRPC
@@ -366,7 +373,9 @@ InferRequest
 InferRequests
 infographics
 Inpaint
+inpaint
 inpainting
+InpaintingPipeline
 InternVL
 InsightFace
 installable
@@ -470,6 +479,7 @@ LoRAs
 lraspp
 LRASPP
 LTS
+LTX
 LSTM
 LSTMs
 Luo
@@ -584,6 +594,7 @@ numpy
 NumPy
 NPU
 NPUs
+NVLabs
 OASST
 OBB
 obb
@@ -591,6 +602,8 @@ ocr
 OCRBench
 OCRv
 odometry
+OmniGen
+OmniGen's
 OmniParser
 OMZ
 OneFormer
@@ -613,6 +626,7 @@ OpenVINO
 openvino
 OpenVino
 OpenVINO's
+OpenVINOMultiModal
 openvoice
 OpenVoice
 OpenVoiceBaseClass
@@ -628,6 +642,7 @@ OV
 OVC
 OVModel
 OVModelForCausalLM
+OVModelForVisualCausalLM
 OVModelForXXX
 OVModelForXxx
 OVMS
@@ -652,6 +667,7 @@ parameterization
 parametrize
 Parler
 parsers
+patchifying
 perceptron
 Patil
 PEFT
@@ -821,6 +837,7 @@ Segmenter
 segmenter
 Segmind
 segmind
+selfattention
 serializable
 sft
 ShapeNet
@@ -850,6 +867,7 @@ sparsity
 Sparisty
 sparsified
 sparsify
+spatiotemporal
 spectrogram
 spectrograms
 SpeechBrain
@@ -967,6 +985,7 @@ uparrow
 upcast
 upcasts
 Upcroft
+updo
 upsample
 upsampled
 upsamples
@@ -977,6 +996,7 @@ upscales
 upscaling
 utils
 VAE
+VAE's
 Validator
 validator
 variational
@@ -997,6 +1017,7 @@ VITS
 vitt
 VL
 vl
+VLM
 VLModel
 VM
 Vladlen
@@ -1043,6 +1064,7 @@ YOLOv
 yolov
 Youri
 youri
+YouTube
 Zafrir
 ZavyChromaXL
 Zongyuan

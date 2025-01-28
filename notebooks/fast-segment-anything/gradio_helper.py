@@ -2,6 +2,8 @@ from typing import Callable, Tuple
 import gradio as gr
 from PIL import Image, ImageDraw
 import numpy as np
+from pathlib import Path
+import requests
 
 examples = [
     ["https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco_bike.jpg"],
@@ -9,7 +11,17 @@ examples = [
     ["https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/wall.jpg"],
 ]
 
-last_image = examples[0][0]
+# last_image = examples[0][0]
+
+example_images = []
+for example_image_url in examples:
+    image_name = example_image_url[0].split("/")[-1]
+    if not Path(image_name).exists():
+        image = Image.open(requests.get(example_image_url[0], stream=True).raw)
+        image.save(image_name)
+    example_images.append([image_name])
+
+last_image = example_images[0][0]
 
 
 def select_point(img: Image.Image, point_type: str, evt: gr.SelectData) -> Image.Image:
@@ -70,7 +82,7 @@ def save_last_picked_image(img: Image.Image) -> None:
 def make_demo(fn: Callable, quantized: bool):
     with gr.Blocks(title="Fast SAM") as demo:
         with gr.Row(variant="panel"):
-            original_img = gr.Image(label="Input", value=examples[0][0], type="pil")
+            original_img = gr.Image(label="Input", type="pil")
             segmented_img = gr.Image(label="Segmentation Map", type="pil")
         with gr.Row():
             point_type = gr.Radio(
@@ -87,7 +99,7 @@ def make_demo(fn: Callable, quantized: bool):
             segment_button = gr.Button("Segment", variant="primary")
             clear_button = gr.Button("Clear points", variant="secondary")
         gr.Examples(
-            examples,
+            example_images,
             inputs=original_img,
             fn=save_last_picked_image,
             run_on_click=True,

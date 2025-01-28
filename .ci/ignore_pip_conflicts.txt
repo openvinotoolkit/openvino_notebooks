@@ -19,3 +19,4 @@ notebooks/yolov10-optimization/yolov10-optimization.ipynb # nncf from git
 notebooks/person-counting-webcam/person-counting.ipynb # numpy should be installed first
 notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb # torch >= 2.2
 notebooks/stable-diffusion-v3/stable-diffusion-v3.ipynb # diffusers from git
+notebooks/llm-rag-langchain/llm-rag-langchain-genai.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280

@@ -598,7 +598,7 @@ def process_image(image_path, icon_detector, caption_model_processor, reader, bo
 def easyocr_reader(models_dir, detector_device, recognizer_device):
     import easyocr
 
-    reader = easyocr.Reader(["en"], quantize=False)
+    reader = easyocr.Reader(["en"], quantize=False, gpu=False)
     recognizer_path = Path(models_dir) / "recognizer.xml"
     detector_path = Path(models_dir) / "detector.xml"
 

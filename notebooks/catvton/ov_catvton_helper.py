@@ -96,9 +96,9 @@ def convert_pipeline_models(pipeline):
     convert(VaeDecoder(pipeline.vae), VAE_DECODER_PATH, torch.zeros(1, 4, 128, 96))
     del pipeline.vae
 
-    inpainting_latent_model_input = torch.zeros(2, 9, 256, 96)
+    inpainting_latent_model_input = torch.rand(2, 9, 256, 96)
     timestep = torch.tensor(0)
-    encoder_hidden_states = torch.zeros(2, 1, 768)
+    encoder_hidden_states = torch.Tensor(0)
     example_input = (inpainting_latent_model_input, timestep, encoder_hidden_states)
 
     convert(UNetWrapper(pipeline.unet), UNET_PATH, example_input)

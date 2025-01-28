@@ -3,6 +3,7 @@ import openvino_genai as ov_genai
 from uuid import uuid4
 from threading import Event, Thread
 import queue
+import sys
 
 max_new_tokens = 256
 
@@ -54,7 +55,9 @@ DEFAULT_SYSTEM_PROMPT_JAPANESE = """\
 """
 
 
-def get_system_prompt(model_language):
+def get_system_prompt(model_language, system_prompt=None):
+    if system_prompt is not None:
+        return system_prompt
     return (
         DEFAULT_SYSTEM_PROMPT_CHINESE
         if (model_language == "Chinese")
@@ -189,6 +192,7 @@ class ChunkStreamer(IterableStreamer):
         if (len(self.tokens_cache) + 1) % self.tokens_len != 0:
             self.tokens_cache.append(token_id)
             return False
+        sys.stdout.flush()
         return super().put(token_id)
 
 
@@ -197,7 +201,9 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
 
     max_new_tokens = 256
 
-    start_message = get_system_prompt(model_language)
+    start_message = get_system_prompt(model_language, model_configuration.get("system_prompt"))
+    if "genai_chat_template" in model_configuration:
+        pipe.get_tokenizer().set_chat_template(model_configuration["genai_chat_template"])
 
     def get_uuid():
         """

@@ -47,14 +47,12 @@ def compression_widgets_helper():
     return vb, compression_settings
 
 
-def vision_encoder_selection_widget(device):
+def vision_encoder_selection_widget():
     from ipywidgets import Dropdown
 
     optimizations = ["FP16", "INT8 quantization", "INT8 weights compression"]
 
-    options = Dropdown(
-        description="Vision Encoder", options=optimizations, value=optimizations[0] if "GPU" in device else optimizations[1], disabled="GPU" in device
-    )
+    options = Dropdown(description="Vision Encoder", options=optimizations, value=optimizations[1])
 
     return options
 
@@ -109,7 +107,7 @@ def compress(
 
     print("⌛ Model compression started")
     print(
-        f"Compression parameters:\n\t\n\talgorithm {algo}\n\tgroup size - {group_size}\n\tratio - {ratio}\n\tawq - {awq}\n\t\scale estimation - {scale_estimation}\n\tlora correction - {lora}\n\tgptq - {gptq}\n\tall_layers - {all_layers}"
+        f"Compression parameters:\n\t\n\talgorithm {algo}\n\tgroup size - {group_size}\n\tratio - {ratio}\n\tawq - {awq}\n\tscale estimation - {scale_estimation}\n\tlora correction - {lora}\n\tgptq - {gptq}\n\tall_layers - {all_layers}"
     )
     lm_model = core.read_model(model_dir / LANGUAGE_MODEL)
 

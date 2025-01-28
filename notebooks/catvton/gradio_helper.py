@@ -29,7 +29,7 @@ HEADER = """
 
 def make_demo(pipeline, mask_processor, automasker, output_dir):
     def submit_function(person_image, cloth_image, cloth_type, num_inference_steps, guidance_scale, seed, show_type):
-        width = 1024
+        width = 768
         height = 1024
         person_image, mask = person_image["background"], person_image["layers"][0]
         mask = Image.open(mask).convert("L")
