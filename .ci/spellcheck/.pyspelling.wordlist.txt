@@ -183,6 +183,7 @@ DeciDiffusion's
 deduplicated
 DeepFloyd
 DeepLabV
+DeepSeek
 denoise
 denoised
 denoises
@@ -233,6 +234,7 @@ Downloader
 downloader
 downsample
 downsampled
+downscaling
 DPM
 DPO
 dpo
@@ -323,6 +325,7 @@ GPUs
 Gradio
 gradio
 grayscale
+grey
 GroundedSAM
 GroundingDINO
 gRPC
@@ -476,6 +479,7 @@ LoRAs
 lraspp
 LRASPP
 LTS
+LTX
 LSTM
 LSTMs
 Luo
@@ -663,6 +667,7 @@ parameterization
 parametrize
 Parler
 parsers
+patchifying
 perceptron
 Patil
 PEFT
@@ -831,6 +836,7 @@ Segmenter
 segmenter
 Segmind
 segmind
+selfattention
 serializable
 sft
 ShapeNet
@@ -860,6 +866,7 @@ sparsity
 Sparisty
 sparsified
 sparsify
+spatiotemporal
 spectrogram
 spectrograms
 SpeechBrain
@@ -977,6 +984,7 @@ uparrow
 upcast
 upcasts
 Upcroft
+updo
 upsample
 upsampled
 upsamples
@@ -987,6 +995,7 @@ upscales
 upscaling
 utils
 VAE
+VAE's
 Validator
 validator
 variational
