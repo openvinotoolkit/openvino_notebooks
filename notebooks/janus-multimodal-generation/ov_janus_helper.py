@@ -276,14 +276,19 @@ def convert_janus_model(model_id, output_dir, quantization_config):
             past_key_values=None,
             inputs_embeds=None,
         ):
+            from transformers.cache_utils import DynamicCache
+
+            pkv = DynamicCache.from_legacy_cache(past_key_values)
+
             result = self._orig_forward(
                 input_ids=None,
                 attention_mask=attention_mask,
                 position_ids=position_ids,
-                past_key_values=past_key_values,
+                past_key_values=pkv,
                 inputs_embeds=inputs_embeds,
             )
-            return tuple(result.values())
+            key_values = result.past_key_values.to_legacy_cache()
+            return (result[0], key_values)
 
         language_model._orig_forward = language_model.forward
         language_model.forward = types.MethodType(forward_wrap, language_model)
