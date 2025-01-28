@@ -49,7 +49,9 @@ def get_examples():
     if not examples_dir.exists():
         examples_dir.mkdir()
         for img_id, img_url in enumerate(example_image_urls):
-            load_image(img_url).save(examples_dir / f"face_{img_id}.png")
+            out_path = examples_dir / f"face_{img_id}.png"
+            if not out_path.exists():
+                load_image(img_url).save(examples_dir / f"face_{img_id}.png")
 
     return [
         [examples_dir / "face_0.png", "A woman in red dress", "Film Noir", ""],

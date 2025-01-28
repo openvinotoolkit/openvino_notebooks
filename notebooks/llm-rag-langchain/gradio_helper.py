@@ -183,7 +183,7 @@ def make_demo(
                     with gr.Column():
                         with gr.Row():
                             submit = gr.Button("Submit", variant="primary")
-                            stop = gr.Button("Stop")
+                            stop = gr.Button("Stop", visible=stop_fn is not None)
                             clear = gr.Button("Clear")
                 gr.Examples(examples, inputs=msg, label="Click on any example and press the 'Submit' button")
                 retriever_argument = gr.Accordion("Retriever Configuration", open=True)
@@ -258,13 +258,14 @@ def make_demo(
             chatbot,
             queue=True,
         )
-        stop.click(
-            fn=stop_fn,
-            inputs=None,
-            outputs=None,
-            cancels=[submit_event, submit_click_event],
-            queue=False,
-        )
+        if stop_fn is not None:
+            stop.click(
+                fn=stop_fn,
+                inputs=None,
+                outputs=None,
+                cancels=[submit_event, submit_click_event],
+                queue=False,
+            )
         clear.click(lambda: None, None, chatbot, queue=False)
         vector_search_top_k.release(
             update_retriever_fn,

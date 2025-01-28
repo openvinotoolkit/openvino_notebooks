@@ -30,6 +30,11 @@ def red_pijama_partial_text_processor(partial_text, new_text):
     return partial_text.split("<bot>:")[-1]
 
 
+def deepseek_partial_text_processor(partial_text, new_text):
+    partial_text += new_text
+    return partial_text.split("</think>")[-1]
+
+
 def llama_partial_text_processor(partial_text, new_text):
     new_text = new_text.replace("[INST]", "").replace("[/INST]", "")
     partial_text += new_text
@@ -88,6 +93,24 @@ SUPPORTED_LLM_MODELS = {
             Context: {context} 
             Answer: </s>
             <|assistant|>""",
+        },
+        "DeepSeek-R1-Distill-Qwen-1.5B": {
+            "partial_text_processor": deepseek_partial_text_processor,
+            "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+            "genai_chat_template": "{% for message in messages %}{% if message['role'] == 'system' and message['content'] %}{{'<|System|>' + message['content'] }}{% elif message['role'] == 'user' %}{{'<|User|>' + message['content'] }}{% elif message['role'] == 'assistant' %}{{'<|Assistant|>' + message['content'] }}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '<|Assistant|>' }}{% else %}{{ eos_token }}{% endif %}",
+            "system_prompt": DEFAULT_SYSTEM_PROMPT + "Think briefly and provide informative answers.",
+        },
+        "DeepSeek-R1-Distill-Qwen-7B": {
+            "partial_text_processor": deepseek_partial_text_processor,
+            "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+            "genai_chat_template": "{% for message in messages %}{% if message['role'] == 'system' and message['content'] %}{{'<|System|>' + message['content'] }}{% elif message['role'] == 'user' %}{{'<|User|>' + message['content'] }}{% elif message['role'] == 'assistant' %}{{'<|Assistant|>' + message['content'] }}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '<|Assistant|>' }}{% else %}{{ eos_token }}{% endif %}",
+            "system_prompt": DEFAULT_SYSTEM_PROMPT + "Think briefly and provide informative answers.",
+        },
+        "DeepSeek-R1-Distill-Llama-8B": {
+            "partial_text_processor": deepseek_partial_text_processor,
+            "model_id": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+            "genai_chat_template": "{% for message in messages %}{% if message['role'] == 'system' and message['content'] %}{{'<|System|>' + message['content'] }}{% elif message['role'] == 'user' %}{{'<|User|>' + message['content'] }}{% elif message['role'] == 'assistant' %}{{'<|Assistant|>' + message['content'] }}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '<|Assistant|>' }}{% else %}{{ eos_token }}{% endif %}",
+            "system_prompt": DEFAULT_SYSTEM_PROMPT + "Think briefly and provide informative answers.",
         },
         "llama-3.2-1b-instruct": {
             "model_id": "meta-llama/Llama-3.2-1B-Instruct",
@@ -742,7 +765,7 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
     import platform
 
     pt_model_id = model_config["model_id"]
-    pt_model_name = model_id.split("-")[0]
+    pt_model_name = model_id.split("/")[-1]
     model_subdir = precision if precision == "FP16" else precision + "_compressed_weights"
     model_dir = Path(pt_model_name) / model_subdir
     remote_code = model_config.get("remote_code", False)
