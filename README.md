@@ -187,7 +187,7 @@ If you prefer to disable telemetry, you can do so at any time by commenting out 
 ```python
 # collect_telemetry(...)
 ```
-Also you can disable telemetry collection by settting `SCARF_NO_ANALYTICS` or `DO_NOT_TRACK` environment variable to `1`:
+Also you can disable telemetry collection by setting `SCARF_NO_ANALYTICS` or `DO_NOT_TRACK` environment variable to `1`:
 ```bash
 export SCARF_NO_ANALYTICS=1
 # or
