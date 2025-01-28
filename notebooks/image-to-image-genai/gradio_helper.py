@@ -11,8 +11,6 @@ import openvino_genai as ov_genai
 MAX_SEED = np.iinfo(np.int32).max
 MAX_IMAGE_SIZE = 1024
 
-url = "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/img2img-init.png"
-
 examples = [["astronauts.png", "Astronaut in a jungle, cold color palette, muted colors, detailed, 8k"], ["dog_drawing.png", "oil painting"]]
 
 

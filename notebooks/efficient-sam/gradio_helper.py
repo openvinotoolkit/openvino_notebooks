@@ -15,10 +15,11 @@ def get_examples():
     examples_dir = Path("examples")
     examples_dir.mkdir(exist_ok=True)
     for img_id, image_url in enumerate(example_images):
-        r = requests.get(image_url)
         img_path = examples_dir / f"example_{img_id}.jpg"
-        with img_path.open("wb") as f:
-            f.write(r.content)
+        if not img_path.exists():
+            r = requests.get(image_url)
+            with img_path.open("wb") as f:
+                f.write(r.content)
     return [[img] for img in examples_dir.glob("*.jpg")]
 
 

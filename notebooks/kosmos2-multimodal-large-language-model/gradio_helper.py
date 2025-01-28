@@ -1,6 +1,7 @@
 from PIL import Image
 from typing import Callable
 import gradio as gr
+from pathlib import Path
 import requests
 
 images = {
@@ -9,8 +10,9 @@ images = {
     "six_planes.png": "https://ydshieh-kosmos-2.hf.space/file=/home/user/app/images/six_planes.png",
 }
 for image_name, url in images.items():
-    image = Image.open(requests.get(url, stream=True).raw)
-    image.save(image_name)
+    if not Path(image_name).exists():
+        image = Image.open(requests.get(url, stream=True).raw)
+        image.save(image_name)
 
 
 def make_demo(fn: Callable):
