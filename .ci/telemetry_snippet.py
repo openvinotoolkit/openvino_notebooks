@@ -11,7 +11,7 @@ def _get_telemetry_snippet(notebook_path: Path) -> str:
     return "".join(
         [
             "# Read more about telemetry collection at https://github.com/openvinotoolkit/openvino_notebooks?tab=readme-ov-file#-telemetry\n",
-            "from notebook_utils import collect_telemetry\n",
+            "from notebook_utils import collect_telemetry\n\n",
             f'collect_telemetry("{notebook_path.name}")',
         ]
     )
