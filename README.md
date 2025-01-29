@@ -28,6 +28,7 @@ List of all notebooks is available in [index file](./notebooks/README.md).
 	- [To Launch all Notebooks](#to-launch-all-notebooks)
 - [🧹 Cleaning Up](#-cleaning-up)
 - [⚠️ Troubleshooting](#️-troubleshooting)
+- [📊 Telemetry](#-telemetry)
 - [📚 Additional Resources](#-additional-resources)
 - [🧑‍💻 Contributors](#-contributors)
 - [❓ FAQ](#-faq)
@@ -170,6 +171,30 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 - If you get an `ImportError`, double-check that you installed the Jupyter kernel. If necessary, choose the `openvino_env` kernel from the _Kernel->Change Kernel_ menu in Jupyter Lab or Jupyter Notebook.
 - If OpenVINO is installed globally, do not run installation commands in a terminal where `setupvars.bat` or `setupvars.sh` are sourced.
 - For Windows installation, it is recommended to use _Command Prompt (`cmd.exe`)_, not _PowerShell_.
+
+[![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
+<div id='-telemetry'></div>
+
+## 📊 Telemetry
+
+When you execute a notebook cell that contains `collect_telemetry()` function, telemetry data is collected to help us improve your experience.
+This data only indicates that the cell was executed and does **not** include any personally identifiable information (PII).
+
+By default, anonymous telemetry data is collected, limited solely to the execution of the notebook.
+This telemetry does **not** extend to any Intel software, hardware, websites, or products.
+
+If you prefer to disable telemetry, you can do so at any time by commenting out the specific line responsible for data collection in the notebook:
+```python
+# collect_telemetry(...)
+```
+Also you can disable telemetry collection by setting `SCARF_NO_ANALYTICS` or `DO_NOT_TRACK` environment variable to `1`:
+```bash
+export SCARF_NO_ANALYTICS=1
+# or
+export DO_NOT_TRACK=1
+```
+
+Scarf is used for telemetry purposes. Refer to [Scarf documentation](https://docs.scarf.sh/) to understand how the data is collected and processed.
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='-additional-resource'></div>

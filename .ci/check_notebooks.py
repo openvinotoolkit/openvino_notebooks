@@ -4,6 +4,7 @@ from table_of_content import find_tc_in_cell
 from patch_notebooks import DEVICE_WIDGET, DEVICE_WIDGET_NEW
 from install_instructions import check_install_instructions
 from scarf_pixel import check_scarf_tag
+from telemetry_snippet import check_telemetry_snippet
 from pathlib import Path
 
 NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +35,7 @@ def main():
     no_tocs = []
     no_device = []
     no_scarf_tag = []
+    no_telemetry_snippet = []
     no_install_instructions = []
 
     def complain(message):
@@ -73,6 +75,9 @@ def main():
             if not check_scarf_tag(nb_path):
                 no_scarf_tag.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
                 complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Scarf Pixel tag is not found")
+            if not check_telemetry_snippet(nb_path):
+                no_telemetry_snippet.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
+                complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: telemetry snippet is not found")
             if not check_install_instructions(nb_path):
                 no_install_instructions.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
                 complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Install Instructions section is not found")
@@ -93,6 +98,11 @@ def main():
             print("NO SCARF PIXEL TAG:")
             print("\n".join(no_scarf_tag))
             print("\nYou can generate Scarf Pixel tag with the following command:\n    python .ci/scarf_pixel.py -s <PATH>")
+            print("==================================")
+        if no_telemetry_snippet:
+            print("NO TELEMETRY SNIPPET:")
+            print("\n".join(no_telemetry_snippet))
+            print("\nYou can generate telemetry snippet with the following command:\n    python .ci/telemetry_snippet.py -s <PATH>")
             print("==================================")
         if no_install_instructions:
             print("NO INSTALL INSTRUCTIONS SECTION:")

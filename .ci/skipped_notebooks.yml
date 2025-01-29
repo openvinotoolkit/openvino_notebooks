@@ -570,3 +570,7 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/paddle-to-openvino/paddle-to-openvino-classification.ipynb
+  skips:
+    - python:
+        - '3.12'
