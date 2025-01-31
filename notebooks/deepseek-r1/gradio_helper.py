@@ -18,7 +18,7 @@ chinese_examples = [
     ["说出养猫的 5 个优点"],
     ["简化 (-k + 4) + (-2 + 3k)"],
     ["求半径为20的圆的面积"],
-    ["对未来5年AI趋势进行预测"]
+    ["对未来5年AI趋势进行预测"],
 ]
 
 english_examples = [
@@ -30,7 +30,7 @@ english_examples = [
     ["Name 5 advantages to be a cat"],
     ["Simplify (-k + 4) + (-2 + 3k)"],
     ["Find the area of ​​a circle with radius 20"],
-    ["Make a forecast about AI trends for next 5 years"]
+    ["Make a forecast about AI trends for next 5 years"],
 ]
 
 
@@ -48,9 +48,7 @@ DEFAULT_SYSTEM_PROMPT_CHINESE = """\
 def get_system_prompt(model_language, system_prompt=None):
     if system_prompt is not None:
         return system_prompt
-    return (
-        DEFAULT_SYSTEM_PROMPT_CHINESE if (model_language == "Chinese") else DEFAULT_SYSTEM_PROMPT
-    )
+    return DEFAULT_SYSTEM_PROMPT_CHINESE if (model_language == "Chinese") else DEFAULT_SYSTEM_PROMPT
 
 
 class IterableStreamer(ov_genai.StreamerBase):
@@ -187,8 +185,6 @@ class ChunkStreamer(IterableStreamer):
 def make_demo(pipe, model_configuration, model_id, model_language, disable_advanced=False):
     import gradio as gr
 
-    max_new_tokens = 512
-
     start_message = get_system_prompt(model_language, model_configuration.get("system_prompt"))
     if "genai_chat_template" in model_configuration:
         pipe.get_tokenizer().set_chat_template(model_configuration["genai_chat_template"])
@@ -283,6 +279,7 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
         if streamer is not None:
             streamer.end()
         pipe.finish_chat()
+        streamer.reset()
         return None, None
 
     examples = chinese_examples if (model_language == "Chinese") else english_examples
@@ -306,7 +303,6 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
             with gr.Column():
                 with gr.Row():
                     submit = gr.Button("Submit")
-                    stop = gr.Button("Stop")
                     clear = gr.Button("Clear")
         with gr.Row(visible=not disable_advanced):
             with gr.Accordion("Advanced Options:", open=False):
@@ -367,9 +363,7 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
                                 maximum=1024,
                                 step=32,
                                 interactive=True,
-                                info=(
-                                    "Maximum new tokens added to answer. Higher value can work for long response, but require more time to complete"
-                                ),
+                                info=("Maximum new tokens added to answer. Higher value can work for long response, but require more time to complete"),
                             )
         gr.Examples(examples, inputs=msg, label="Click on any example and press the 'Submit' button")
 
@@ -385,7 +379,6 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
             outputs=[msg, chatbot, streamer],
             queue=True,
         )
-        stop.click(fn=stop_chat, inputs=streamer, outputs=[streamer], queue=False)
         clear.click(fn=stop_chat_and_clear_history, inputs=streamer, outputs=[chatbot, streamer], queue=False)
 
         return demo

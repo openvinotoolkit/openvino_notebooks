@@ -20,53 +20,53 @@ SUPPORTED_LLM_MODELS = {
             "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
             "genai_chat_template": "{% for message in messages %}{% if loop.first %}{{ '<｜begin▁of▁sentence｜>' }}{% endif %}{% if message['role'] == 'system' and message['content'] %}{{ message['content'] }}{% elif message['role'] == 'user' %}{{  '<｜User｜>' +  message['content'] }}{% elif message['role'] == 'assistant' %}{{ '<｜Assistant｜>' +  message['content'] + '<｜end▁of▁sentence｜>' }}{% endif %}{% if loop.last and add_generation_prompt and message['role'] != 'assitant' %}{{ '<｜Assistant｜>' }}{% endif %}{% endfor %}",
             "system_prompt": DEFAULT_SYSTEM_PROMPT,
-            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"]
+            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"],
         },
         "DeepSeek-R1-Distill-Qwen-7B": {
             "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
             "genai_chat_template": "{% for message in messages %}{% if loop.first %}{{ '<｜begin▁of▁sentence｜>' }}{% endif %}{% if message['role'] == 'system' and message['content'] %}{{ message['content'] }}{% elif message['role'] == 'user' %}{{  '<｜User｜>' +  message['content'] }}{% elif message['role'] == 'assistant' %}{{ '<｜Assistant｜>' +  message['content'] + '<｜end▁of▁sentence｜>' }}{% endif %}{% if loop.last and add_generation_prompt and message['role'] != 'assitant' %}{{ '<｜Assistant｜>' }}{% endif %}{% endfor %}",
             "system_prompt": DEFAULT_SYSTEM_PROMPT,
-            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"]
+            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"],
         },
         "DeepSeek-R1-Distill-Llama-8B": {
             "model_id": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
             "genai_chat_template": "{% for message in messages %}{% if loop.first %}{{ '<｜begin▁of▁sentence｜>' }}{% endif %}{% if message['role'] == 'system' and message['content'] %}{{ message['content'] }}{% elif message['role'] == 'user' %}{{  '<｜User｜>' +  message['content'] }}{% elif message['role'] == 'assistant' %}{{ '<｜Assistant｜>' +  message['content'] + '<｜end▁of▁sentence｜>' }}{% endif %}{% if loop.last and add_generation_prompt and message['role'] != 'assitant' %}{{ '<｜Assistant｜>' }}{% endif %}{% endfor %}",
             "system_prompt": DEFAULT_SYSTEM_PROMPT,
-            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"]
+            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"],
         },
         "DeepSeek-R1-Distill-Qwen-14B": {
             "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
             "genai_chat_template": "{% for message in messages %}{% if loop.first %}{{ '<｜begin▁of▁sentence｜>' }}{% endif %}{% if message['role'] == 'system' and message['content'] %}{{ message['content'] }}{% elif message['role'] == 'user' %}{{  '<｜User｜>' +  message['content'] }}{% elif message['role'] == 'assistant' %}{{ '<｜Assistant｜>' +  message['content'] + '<｜end▁of▁sentence｜>' }}{% endif %}{% if loop.last and add_generation_prompt and message['role'] != 'assitant' %}{{ '<｜Assistant｜>' }}{% endif %}{% endfor %}",
             "system_prompt": DEFAULT_SYSTEM_PROMPT,
-            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>",  "</｜"]
-        }
+            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"],
+        },
     },
     "Chinese": {
         "DeepSeek-R1-Distill-Qwen-1.5B": {
             "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
             "genai_chat_template": "{% for message in messages %}{% if loop.first %}{{ '<｜begin▁of▁sentence｜>' }}{% endif %}{% if message['role'] == 'system' and message['content'] %}{{ message['content'] }}{% elif message['role'] == 'user' %}{{  '<｜User｜>' +  message['content'] }}{% elif message['role'] == 'assistant' %}{{ '<｜Assistant｜>' +  message['content'] + '<｜end▁of▁sentence｜>' }}{% endif %}{% if loop.last and add_generation_prompt and message['role'] != 'assitant' %}{{ '<｜Assistant｜>' }}{% endif %}{% endfor %}",
             "system_prompt": DEFAULT_SYSTEM_PROMPT_CHINESE,
-            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>",  "</｜"]
+            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"],
         },
         "DeepSeek-R1-Distill-Qwen-7B": {
             "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
             "genai_chat_template": "{% for message in messages %}{% if loop.first %}{{ '<｜begin▁of▁sentence｜>' }}{% endif %}{% if message['role'] == 'system' and message['content'] %}{{ message['content'] }}{% elif message['role'] == 'user' %}{{  '<｜User｜>' +  message['content'] }}{% elif message['role'] == 'assistant' %}{{ '<｜Assistant｜>' +  message['content'] + '<｜end▁of▁sentence｜>' }}{% endif %}{% if loop.last and add_generation_prompt and message['role'] != 'assitant' %}{{ '<｜Assistant｜>' }}{% endif %}{% endfor %}",
             "system_prompt": DEFAULT_SYSTEM_PROMPT_CHINESE,
-            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>",  "</｜"]
+            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"],
         },
         "DeepSeek-R1-Distill-Llama-8B": {
             "model_id": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
             "genai_chat_template": "{% for message in messages %}{% if loop.first %}{{ '<｜begin▁of▁sentence｜>' }}{% endif %}{% if message['role'] == 'system' and message['content'] %}{{ message['content'] }}{% elif message['role'] == 'user' %}{{  '<｜User｜>' +  message['content'] }}{% elif message['role'] == 'assistant' %}{{ '<｜Assistant｜>' +  message['content'] + '<｜end▁of▁sentence｜>' }}{% endif %}{% if loop.last and add_generation_prompt and message['role'] != 'assitant' %}{{ '<｜Assistant｜>' }}{% endif %}{% endfor %}",
             "system_prompt": DEFAULT_SYSTEM_PROMPT_CHINESE,
-            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>","</｜"]
+            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"],
         },
         "DeepSeek-R1-Distill-Qwen-14B": {
             "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
             "genai_chat_template": "{% for message in messages %}{% if loop.first %}{{ '<｜begin▁of▁sentence｜>' }}{% endif %}{% if message['role'] == 'system' and message['content'] %}{{ message['content'] }}{% elif message['role'] == 'user' %}{{  '<｜User｜>' +  message['content'] }}{% elif message['role'] == 'assistant' %}{{ '<｜Assistant｜>' +  message['content'] + '<｜end▁of▁sentence｜>' }}{% endif %}{% if loop.last and add_generation_prompt and message['role'] != 'assitant' %}{{ '<｜Assistant｜>' }}{% endif %}{% endfor %}",
             "system_prompt": DEFAULT_SYSTEM_PROMPT_CHINESE,
-            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>",  "</｜"]
-        }
-    }
+            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"],
+        },
+    },
 }
 
 
@@ -120,20 +120,23 @@ int4_npu_config = {
 }
 
 
-def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=False, device=None):
+def get_llm_selection_widget(
+    languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=False, device=None, default_model_idx=-2
+):
     import ipywidgets as widgets
 
     lang_dropdown = widgets.Dropdown(options=languages or [])
 
     # Define dependent drop down
 
-    model_dropdown = widgets.Dropdown(options=models)
+    model_dropdown = widgets.Dropdown(options=models, value=models[list(models)[default_model_idx]])
 
     def dropdown_handler(change):
         global default_language
         default_language = change.new
         # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
         model_dropdown.options = SUPPORTED_LLM_MODELS[change.new]
+        model_dropdown.value = SUPPORTED_LLM_MODELS[change.new][list(SUPPORTED_LLM_MODELS[change.new])[default_model_idx]]
 
     lang_dropdown.observe(dropdown_handler, names="value")
     compression_dropdown = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"])
@@ -166,17 +169,6 @@ def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPOR
     return form, lang_dropdown, model_dropdown, compression_dropdown, preconverted_checkbox
 
 
-def convert_tokenizer(model_id, remote_code, model_dir):
-    import openvino as ov
-    from transformers import AutoTokenizer
-    from openvino_tokenizers import convert_tokenizer
-
-    hf_tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=remote_code)
-    ov_tokenizer, ov_detokenizer = convert_tokenizer(hf_tokenizer, with_detokenizer=True)
-    ov.save_model(ov_tokenizer, model_dir / "openvino_tokenizer.xml")
-    ov.save_model(ov_detokenizer, model_dir / "openvino_detokenizer.xml")
-
-
 def convert_and_compress_model(model_id, model_config, precision, use_preconverted=False):
     from pathlib import Path
     from IPython.display import Markdown, display
@@ -190,9 +182,6 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
     remote_code = model_config.get("remote_code", False)
     if (model_dir / "openvino_model.xml").exists():
         print(f"✅ {precision} {model_id} model already converted and can be found in {model_dir}")
-
-        if not (model_dir / "openvino_tokenizer.xml").exists() or not (model_dir / "openvino_detokenizer.xml").exists():
-            convert_tokenizer(pt_model_id, remote_code, model_dir)
         return model_dir
     if use_preconverted:
         OV_ORG = "OpenVINO"
