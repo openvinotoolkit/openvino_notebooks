@@ -171,6 +171,7 @@ or create an [issue](https://github.com/openvinotoolkit/openvino_notebooks/issue
 - If you get an `ImportError`, double-check that you installed the Jupyter kernel. If necessary, choose the `openvino_env` kernel from the _Kernel->Change Kernel_ menu in Jupyter Lab or Jupyter Notebook.
 - If OpenVINO is installed globally, do not run installation commands in a terminal where `setupvars.bat` or `setupvars.sh` are sourced.
 - For Windows installation, it is recommended to use _Command Prompt (`cmd.exe`)_, not _PowerShell_.
+- If you get `ImportError: cannot import name 'collect_telemetry' from 'notebook_utils'`, make sure that you have the latest version of `notebook_utils.py` file downloaded in the notebook directory. Try removing outdated `notebook_utils.py` file and re-run the notebook - new utils file will be downloaded.
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)]()
 <div id='-telemetry'></div>
