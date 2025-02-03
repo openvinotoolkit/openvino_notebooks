@@ -461,7 +461,7 @@ def draw_ocr_box_txt(image, boxes, txts, scores=None, drop_score=0.5, font_path=
                 try:
                     char_size = font.getbox(c)
                     y_idx = -1
-                except AttributeError:
+                except Exception:
                     char_size = font.getsize(c)
                     y_idx = 1
 

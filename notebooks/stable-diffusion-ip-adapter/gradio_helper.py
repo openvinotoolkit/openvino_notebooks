@@ -1,8 +1,20 @@
 import gradio as gr
 import torch
+from diffusers.utils import load_image
+from pathlib import Path
+
+example_images = [
+    ("woman.png", "https://raw.githubusercontent.com/tencent-ailab/IP-Adapter/main/assets/images/woman.png"),
+    ("statue.png", "https://raw.githubusercontent.com/tencent-ailab/IP-Adapter/main/assets/images/statue.png"),
+    ("river.png", "https://raw.githubusercontent.com/tencent-ailab/IP-Adapter/main/assets/images/river.png"),
+]
 
 
 def make_demo(ov_pipe):
+    for img, url in example_images:
+        if not Path(img).exists():
+            load_image(url).save(img)
+
     def generate_from_text(
         positive_prompt,
         negative_prompt,
@@ -81,12 +93,12 @@ def make_demo(ov_pipe):
             gr.Examples(
                 [
                     [
-                        "https://raw.githubusercontent.com/tencent-ailab/IP-Adapter/main/assets/images/woman.png",
+                        "woman.png",
                         "best quality, high quality",
                         "low resolution",
                     ],
                     [
-                        "https://raw.githubusercontent.com/tencent-ailab/IP-Adapter/main/assets/images/statue.png",
+                        "statue.png",
                         "wearing a hat",
                         "",
                     ],
@@ -130,8 +142,8 @@ def make_demo(ov_pipe):
             gr.Examples(
                 [
                     [
-                        "https://raw.githubusercontent.com/tencent-ailab/IP-Adapter/main/assets/images/river.png",
-                        "https://raw.githubusercontent.com/tencent-ailab/IP-Adapter/main/assets/images/statue.png",
+                        "river.png",
+                        "statue.png",
                     ],
                 ],
                 [i2i_ip_adapter_input, i2i_input],
