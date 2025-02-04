@@ -3,12 +3,14 @@ from typing import Callable
 import gradio as gr
 import requests
 
-sample_image_name = "tower.jpg"
+sample_image_1 = ["tower.jpg", "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/tower.jpg"]
+sample_image_2 = ["picture.jpg", "https://user-images.githubusercontent.com/29454499/260418860-69cc443a-9ee6-493c-a393-3a97af080be7.jpg"]
 
-if not Path(sample_image_name).exists():
-    r = requests.get("https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/tower.jpg")
-    with open(sample_image_name, "wb") as f:
-        f.write(r.content)
+for sample_image in [sample_image_1, sample_image_2]:
+    if not Path(sample_image[0]).exists():
+        r = requests.get(sample_image[1])
+        with open(sample_image[0], "wb") as f:
+            f.write(r.content)
 
 
 def make_demo(text_to_text_fn: Callable, image_to_image_fn: Callable):
@@ -49,7 +51,6 @@ def make_demo(text_to_text_fn: Callable, image_to_image_fn: Callable):
                     strength_input = gr.Slider(0, 1, value=0.5, label="Strength")
                 i2i_output = gr.Image(label="Result", type="pil")
             i2i_btn = gr.Button()
-            sample_i2i_text = "amazing watercolor painting"
             i2i_btn.click(
                 fn=image_to_image_fn,
                 inputs=[
@@ -63,7 +64,17 @@ def make_demo(text_to_text_fn: Callable, image_to_image_fn: Callable):
                 outputs=i2i_output,
             )
             gr.Examples(
-                [[sample_image_name, sample_i2i_text, "", 6400023, 40, 0.3]],
+                [
+                    [
+                        sample_image_2[0],
+                        "professional photo portrait of woman, highly detailed, hyper realistic, cinematic effects, soft lighting",
+                        "blurry, poor quality, low res, worst quality, cropped, ugly, poorly drawn face, without eyes, mutation, unreal, animate, poorly drawn eyes",
+                        8098234,
+                        40,
+                        0.68,
+                    ],
+                    [sample_image_1[0], "amazing watercolor painting", "", 6400023, 40, 0.3],
+                ],
                 [
                     i2i_input,
                     i2i_text_input,
