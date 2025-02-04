@@ -203,6 +203,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["HF_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["TORCH_HOME"] = str(notebook_path.parent)
+    os.environ["DO_NOT_TRACK"] = "1"
     print(f"RUN {notebook_path.relative_to(root)}", flush=True)
     result = None
 
