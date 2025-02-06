@@ -2380,10 +2380,10 @@
                 "sha256:db30ba9e8af7188436ff76ce79ad7a8a2a5204e3c4757d2728223270b6a73080",
                 "sha256:e941dfe7196b3a75364fcee4e0fe79cee63fa9d4e2a1852fb459048d7daa83f5",
                 "sha256:f31dfd3d793a787a799930568e9e1dc736bb3a7069b266f2d80b2ad623c29d84",
-                "sha256:b1d2551c5d4f9e28d72e2f0d48ee091223082bf6ebb3a6d6e6712cbdbab60511",
-                "sha256:54411e20c90b42614ed02762e4fc038268f08c0c78d56a94b1f99a5d5a41d293"
+                "sha256:36f4094e8ec90984749434bec05cdca2cf07f0f0ef9d5b1e5afb931598fdf8eb",
+                "sha256:ea6344414b631043e6bae94698faae7fbcc9f3a007638bbc81871b6082ccec38"
             ],
-            "version": "==2024.5.0"
+            "version": "==2025.0.0"
         },
         "openvino-telemetry": {
             "hashes": [
