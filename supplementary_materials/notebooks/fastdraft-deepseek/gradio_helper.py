@@ -13,7 +13,7 @@ core = ov.Core()
 english_examples = [
     ["Which is bigger, 9.9 or 9.11?"],
     ["Classify the following numbers as 'prime' or 'composite' - 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16.?"],
-    ["What are the classifications of Academic Degrees?"], 
+    ["What are the classifications of Academic Degrees?"],
     ["Which word does not belong to the other: Hammer, Screwdriver, Nail, Wood"],
     ["Identify which instrument is string or percussion: Kpanlogo, Shamisen"],
     ["Which of the following are colors: red, black, yellow, orange, sun, sunflower, chips, book, white, pink, blue, keyboard."],
@@ -185,10 +185,16 @@ font-size: 14px;
 list-style-position: outside;
 margin: 0.5em 15px;
 padding: 0px 0px 10px 15px;"""
-        formatted_text = ''
-        splits = partial_text.split('</think>')
+        formatted_text = ""
+        splits = partial_text.split("</think>")
         for i, s in enumerate(splits):
-            formatted_text += s.replace('<think>', f'<details {"open" if i == (len(splits) - 1) else ""} style="margin:0px;padding:0px;"><summary style="{summary_style}">Thought</summary><blockquote style="{blockquote_style}"><p>') +'</p></blockquote></details>'
+            formatted_text += (
+                s.replace(
+                    "<think>",
+                    f'<details {"open" if i == (len(splits) - 1) else ""} style="margin:0px;padding:0px;"><summary style="{summary_style}">Thought</summary><blockquote style="{blockquote_style}"><p>',
+                )
+                + "</p></blockquote></details>"
+            )
         return formatted_text
 
     def is_partial_stop(output, stop_str):
