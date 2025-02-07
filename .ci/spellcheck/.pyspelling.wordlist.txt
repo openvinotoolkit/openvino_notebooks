@@ -306,6 +306,7 @@ Gemma
 gemma
 genai
 genAI
+GenerationConfig
 GenerationMixin
 Girshick
 Gitee
@@ -634,6 +635,7 @@ opset
 optimizable
 Orca
 OuteTTS
+outpainting
 OVC
 overfitting
 overlayed
@@ -1019,6 +1021,7 @@ VL
 vl
 VLM
 VLModel
+VLMPipeline
 VM
 Vladlen
 VOC

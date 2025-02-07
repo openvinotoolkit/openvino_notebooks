@@ -34,7 +34,8 @@ The tutorial consists from following steps:
 
 - Install requirements
 - Convert and Optimize model
-- Run OpenVINO model inference
+- Prepare OpenVINO GenAI Inference Pipeline
+- Run OpenVINO GenAI model inference
 - Launch Interactive demo
 
 In this demonstration, you'll create interactive chatbot that can answer questions about provided image's content.
