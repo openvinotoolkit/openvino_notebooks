@@ -21,12 +21,12 @@ def image_to_tensor(image) -> ov.Tensor:
     image_data = np.array(pic.getdata()).reshape(1, pic.size[1], pic.size[0], 3).astype(np.uint8)
     return ov.Tensor(image_data)
 
+
 def make_demo(pipeline):
     def generate_from_text(text, seed, num_steps, _=gr.Progress(track_tqdm=True)):
         random_generator = ov_genai.TorchGenerator(seed)
 
         pbar = tqdm(total=num_steps)
-
 
         def callback(step, num_steps, latent):
             if num_steps != pbar.total:
@@ -34,11 +34,11 @@ def make_demo(pipeline):
             pbar.update(1)
             sys.stdout.flush()
             return False
+
         result = pipeline.generate(text, num_inference_steps=num_steps, generator=random_generator, callback=callback)
 
         pbar.close()
         return Image.fromarray(result.data[0])
-
 
     with gr.Blocks() as demo:
         with gr.Tab("Text-to-Image generation"):
@@ -66,6 +66,7 @@ def make_demo_i2i(pipeline, default_image_path):
             pbar.update(1)
             sys.stdout.flush()
             return False
+
         random_generator = ov_genai.TorchGenerator(seed)
         result = pipeline.generate(text, img_tensor, num_inference_steps=num_steps, strength=strength, generator=random_generator, callaback=callback)
         pbar.close()
