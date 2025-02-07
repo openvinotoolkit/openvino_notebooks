@@ -306,6 +306,7 @@ Gemma
 gemma
 genai
 genAI
+GenerationConfig
 GenerationMixin
 Girshick
 Gitee
@@ -1020,6 +1021,7 @@ VL
 vl
 VLM
 VLModel
+VLMPipeline
 VM
 Vladlen
 VOC
