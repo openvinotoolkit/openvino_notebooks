@@ -1,16 +1,29 @@
 import gradio as gr
 import numpy as np
+from PIL import Image
+import sys
+from tqdm.auto import tqdm
 
 
 def make_demo(pipeline):
+    import openvino_genai as ov_genai
+
     def generate(prompt, negative_prompt, seed, num_steps, _=gr.Progress(track_tqdm=True)):
-        result = pipeline(
-            prompt,
-            negative_prompt=negative_prompt,
-            num_inference_steps=num_steps,
-            seed=seed,
+        pbar = tqdm(total=num_steps)
+
+        def callback(step, num_steps, latent):
+            if num_steps != pbar.total:
+                pbar.reset(num_steps)
+            pbar.update(1)
+            sys.stdout.flush()
+            return False
+
+        result = pipeline.generate(
+            prompt, negative_prompt=negative_prompt, num_inference_steps=num_steps, generator=ov_genai.TorchGenerator(seed), callback=callback
         )
-        return result["sample"][0]
+
+        pbar.close()
+        return Image.fromarray(result.data[0])
 
     gr.close_all()
 
