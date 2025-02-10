@@ -26,7 +26,7 @@ notebook = "<7.0.0"
 numpy = ">=1.21.0"
 onnx = ">=1.11.0"
 opencv-python = "*"
-openvino = {version = "==2024.5.0"}
+openvino = {version = "==2025.0.0"}
 openvino-telemetry = "==2023.2.1"
 ovmsclient = "*"
 Pillow = ">=8.3.2"

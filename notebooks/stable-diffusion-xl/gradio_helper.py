@@ -1,19 +1,25 @@
 import gradio as gr
 from diffusers.utils import load_image
 import numpy as np
+from PIL import Image
+
+import openvino as ov
+import openvino_genai as ov_genai
 
 
 # TODO Consider reusing make_demo_segmind_vegart
 def make_demo_sd_xl_text2image(pipeline):
     def generate_from_text(text, seed, num_steps):
-        result = pipeline(
+        image_tensor = pipeline.generate(
             text,
             num_inference_steps=num_steps,
-            generator=np.random.RandomState(seed),
             height=512,
             width=512,
-        ).images[0]
-        return result
+            generator=ov_genai.TorchGenerator(seed),
+        )
+        image = Image.fromarray(image_tensor.data[0])
+
+        return image
 
     with gr.Blocks() as demo:
         with gr.Column():
@@ -59,13 +65,21 @@ def make_demo_sd_xl_image2image(pipeline):
     )
 
     def generate_from_image(text, image, seed, num_steps):
-        result = pipeline(
+        def image_to_tensor(image: Image) -> ov.Tensor:
+            pic = image.convert("RGB")
+            image_data = np.array(pic.getdata()).reshape(1, pic.size[1], pic.size[0], 3).astype(np.uint8)
+            return ov.Tensor(image_data)
+
+        init_image = image_to_tensor(image)
+        photo_image_tensor = pipeline.generate(
             text,
-            image=image,
+            image=init_image,
             num_inference_steps=num_steps,
-            generator=np.random.RandomState(seed),
-        ).images[0]
-        return result
+            generator=ov_genai.TorchGenerator(seed),
+        )
+        photo_image = Image.fromarray(photo_image_tensor.data[0])
+
+        return photo_image
 
     with gr.Blocks() as demo:
         with gr.Column():

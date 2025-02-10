@@ -48,7 +48,7 @@ OpenVINO™ Notebooks需要预装Python和Git， 针对不同操作系统的安�
 
 使用这个 [页面](https://openvinotoolkit.github.io/openvino_notebooks/)来探索notebooks, 选择一个跟你需求相关的开始试试吧。祝你好运！
 
-**注意: 这个仓库的main分支已经升级了对于OpenVINO 2024.3 release的支持.** 请运行在你的 `openvino_env`虚拟环境中，运行 `pip install --upgrade -r requirements.txt` 升级到最新版本. 如果这是您第一次安装OpenVINO™ Notebooks，请参考以下的 [安装指南](#-installation-guide)。 如果您想使用上一个OpenVINO版本, 请切换至[2023.3 分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.3). 如果您想使用上一个长期维护 (LTS) 的OpenVINO版本，请切换到 [2022.3 分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2022.3)。
+**注意: 这个仓库的main分支已经升级了对于OpenVINO 2025.0 release的支持.** 请运行在你的 `openvino_env`虚拟环境中，运行 `pip install --upgrade -r requirements.txt` 升级到最新版本. 如果这是您第一次安装OpenVINO™ Notebooks，请参考以下的 [安装指南](#-installation-guide)。 如果您想使用上一个OpenVINO版本, 请切换至[2023.3 分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.3). 如果您想使用上一个长期维护 (LTS) 的OpenVINO版本，请切换到 [2022.3 分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2022.3)。
 
 如果您有任何问题，可以开启一个 GitHub [讨论](https://github.com/openvinotoolkit/openvino_notebooks/discussions)。
 

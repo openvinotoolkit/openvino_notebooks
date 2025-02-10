@@ -13,6 +13,7 @@ The tutorial supports different models, you can select one from the provided opt
 * **DeepSeek-R1-Distill-Qwen-7B** is a distilled model based on [Qwen-2.5-Math-7B](https://huggingface.co/Qwen/Qwen2.5-Math-7B). The model demonstrates a good balance between mathematical and factual reasoning and can be less suited for complex coding tasks. Check [model card](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B) for more info.
 * **DeepSeek-R1-Distil-Qwen-14B** is a distilled model based on [Qwen2.5-14B](https://huggingface.co/Qwen/Qwen2.5-14B) that has great competence in factual reasoning and solving complex mathematical tasks.  Check [model card](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-14B) for more info.
 
+Learn how to accelerate **DeepSeek-R1-Distill-Llama-8B** with **FastDraft** and OpenVINO GenAI speculative decoding pipeline in this [notebook](../../supplementary_materials/notebooks/fastdraft-deepseek/fastdraft_deepseek.ipynb)
 ## Notebook Contents
 
 The tutorial consists of the following steps:
