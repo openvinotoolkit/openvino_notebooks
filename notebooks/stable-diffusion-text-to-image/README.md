@@ -26,7 +26,7 @@ The following image shows an example of the input sequence and corresponding pre
 
 ## Notebook Contents
 
-This notebook demonstrates how to convert and run stable diffusion using OpenVINO.
+This notebook demonstrates how to convert and run stable diffusion using OpenVINO.  For user experience simplification, we will use  [Hugging Face Optimum](https://huggingface.co/docs/optimum/installation) library accelerated by OpenVINO integration for model conversion and [OpenVINO GenAI API](https://docs.openvino.ai/2024/learn-openvino/llm_inference_guide/genai-guide.html) for model inference.
 
 Notebook contains the following parts:
 1. Download the model from the Hugging Face Hub and converted to OpenVINO IR format with [Optimum Intel](https://huggingface.co/docs/optimum/intel/inference#stable-diffusion).

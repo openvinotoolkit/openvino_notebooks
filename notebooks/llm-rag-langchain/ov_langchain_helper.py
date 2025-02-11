@@ -62,8 +62,6 @@ class OpenVINOLLM(LLM):
         model_path: str,
         device: str = "CPU",
         tokenizer: Any = None,
-        draft_model_path: Optional[str] = None,
-        draft_model_device: Optional[str] = "CPU",
         **kwargs: Any,
     ) -> OpenVINOLLM:
         """Construct the oepnvino object from model_path"""
@@ -206,11 +204,7 @@ class OpenVINOLLM(LLM):
                     return False
                 return super().put(token_id)
 
-        if draft_model_path is not None:
-            draft_model = openvino_genai.draft_model(draft_model_path, draft_model_device)
-            pipe = openvino_genai.LLMPipeline(model_path, device, draft_model=draft_model)
-        else:
-            pipe = openvino_genai.LLMPipeline(model_path, device)
+        pipe = openvino_genai.LLMPipeline(model_path, device, **kwargs)
 
         config = pipe.get_generation_config()
         if tokenizer is None:
@@ -245,7 +239,7 @@ class OpenVINOLLM(LLM):
             input_ids = tokens["input_ids"]
             attention_mask = tokens["attention_mask"]
             prompt = openvino_genai.TokenizedInputs(ov.Tensor(input_ids), ov.Tensor(attention_mask))
-        output = self.pipe.generate(prompt, self.config)
+        output = self.pipe.generate(prompt, self.config, **kwargs)
         if not isinstance(self.tokenizer, openvino_genai.Tokenizer):
             output = self.tokenizer.batch_decode(output.tokens, skip_special_tokens=True)[0]
         return output
@@ -280,7 +274,7 @@ class OpenVINOLLM(LLM):
             genration function for single thread
             """
             self.streamer.reset()
-            self.pipe.generate(prompt, self.config, self.streamer)
+            self.pipe.generate(prompt, self.config, self.streamer, **kwargs)
             stream_complete.set()
             self.streamer.end()
 

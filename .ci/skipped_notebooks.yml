@@ -50,13 +50,6 @@
     - os:
         - ubuntu-20.04
         - ubuntu-22.04
-- notebook: notebooks/stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb
   skips:
     - os:

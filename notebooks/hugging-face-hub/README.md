@@ -5,7 +5,7 @@
 The Hugging Face (HF) Model Hub is a central repository for pre-trained deep learning models. It allows exploration and provides access to thousands of models for a wide range of tasks, including text classification, question answering, and image classification.
 Hugging Face provides Python packages that serve as APIs and tools to easily download and fine tune state-of-the-art pretrained models, namely [transformers] and [diffusers] packages.
 
-![](https://github.com/huggingface/optimum-intel/raw/main/readme_logo.png)
+![](https://huggingface.co/datasets/optimum/documentation-images/resolve/main/intel/logo/hf_intel_logo.png)
 
 ## Contents: 
 Throughout this notebook we will learn:
