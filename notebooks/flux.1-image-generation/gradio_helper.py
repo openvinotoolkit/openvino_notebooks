@@ -1,6 +1,6 @@
 import gradio as gr
 import numpy as np
-import torch
+import openvino_genai as ov_genai
 
 MAX_SEED = np.iinfo(np.int32).max
 MAX_IMAGE_SIZE = 2048
@@ -23,10 +23,10 @@ def make_demo(ov_pipe):
     def infer(prompt, seed=42, randomize_seed=False, width=1024, height=1024, num_inference_steps=4, guidance_scale=0, progress=gr.Progress(track_tqdm=True)):
         if randomize_seed:
             seed = np.random.randint(0, MAX_SEED)
-        generator = torch.Generator().manual_seed(seed)
-        image = ov_pipe(
+        generator = ov_genai.TorchGenerator(seed)
+        image = ov_pipe.generate(
             prompt=prompt, width=width, height=height, num_inference_steps=num_inference_steps, generator=generator, guidance_scale=guidance_scale
-        ).images[0]
+        ).data[0]
         return image, seed
 
     with gr.Blocks(css=css) as demo:
@@ -80,8 +80,8 @@ def make_demo(ov_pipe):
                         minimum=1,
                         maximum=15,
                         step=0.1,
-                        value=3.5 if ov_pipe.transformer.config.get("guidance_embeds", False) else 0.0,
-                        visible=not ov_pipe.transformer.config.get("guidance_embeds", False),
+                        value=ov_pipe.get_generation_config().guidance_scale,
+                        visible=bool(ov_pipe.get_generation_config().guidance_scale),
                     )
                     num_inference_steps = gr.Slider(
                         label="Number of inference steps",
