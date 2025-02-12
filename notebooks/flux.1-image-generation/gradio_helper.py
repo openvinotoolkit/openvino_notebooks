@@ -19,7 +19,9 @@ css = """
 """
 
 
-def make_demo(ov_pipe):
+def make_demo(ov_pipe, model_name):
+    is_guidance_scale_supported = model_name != "FLUX.1-schnell"
+
     def infer(prompt, seed=42, randomize_seed=False, width=1024, height=1024, num_inference_steps=4, guidance_scale=0, progress=gr.Progress(track_tqdm=True)):
         if randomize_seed:
             seed = np.random.randint(0, MAX_SEED)
@@ -80,8 +82,8 @@ def make_demo(ov_pipe):
                         minimum=1,
                         maximum=15,
                         step=0.1,
-                        value=ov_pipe.get_generation_config().guidance_scale,
-                        visible=bool(ov_pipe.get_generation_config().guidance_scale),
+                        value=3.5 if is_guidance_scale_supported else 0.0,
+                        visible=is_guidance_scale_supported,
                     )
                     num_inference_steps = gr.Slider(
                         label="Number of inference steps",
