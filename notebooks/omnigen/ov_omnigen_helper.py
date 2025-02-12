@@ -272,8 +272,11 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
 
             pipe.model.llm._orig_forward = pipe.model.llm.forward
             pipe.model.llm.forward = MethodType(forward_wrap, pipe.model.llm)
-            for layer in pipe.model.llm.layers:
-                layer.self_attn.rotary_emb.forward = MethodType(rope_fwd, layer.self_attn.rotary_emb)
+            if hasattr(pipe.model.llm, "rotary_emb"):
+                pipe.model.llm.rotary_emb.forward = MethodType(rope_fwd, pipe.model.llm.rotary_emb)
+            else:
+                for layer in pipe.model.llm.layers:
+                    layer.self_attn.rotary_emb.forward = MethodType(rope_fwd, layer.self_attn.rotary_emb)
             for i in range(num_hidden_layers):
                 past_key_values.append((torch.randn(pkv_shape), torch.randn(pkv_shape)))
                 input_names.extend([f"past_key_values.{i}.key", f"past_key_values.{i}.value"])

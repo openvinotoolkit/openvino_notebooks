@@ -273,14 +273,18 @@ def convert_qwen2audio_model(model_id, output_dir, quantization_config):
             past_key_values=None,
             inputs_embeds=None,
         ):
+            from transformers.cache_utils import DynamicCache
+
+            if past_key_values is not None:
+                pkv = DynamicCache.from_legacy_cache(past_key_values)
             result = self._orig_forward(
                 input_ids=None,
                 attention_mask=attention_mask,
                 position_ids=position_ids,
-                past_key_values=past_key_values,
+                past_key_values=pkv,
                 inputs_embeds=inputs_embeds,
             )
-            return tuple(result.values())
+            return (result.logits, result.past_key_values.to_legacy_cache())
 
         lang_model = model.language_model
         print(lang_model.config)

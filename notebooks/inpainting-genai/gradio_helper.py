@@ -26,10 +26,12 @@ def prepare_examples():
         "castle.jpg": "https://github.com/user-attachments/assets/80f0750d-8ec4-42e3-915c-e2cc8631830c",
         "dog.jpg": "https://github.com/user-attachments/assets/6b8dc877-28b3-42e0-9e7f-3ec383867cd5",
     }
+    composite_examples = []
     for file_name, url in data.items():
         if not Path(file_name).exists():
             Image.open(requests.get(url, stream=True).raw).resize((512, 512)).save(file_name)
-    return list(data)
+        composite_examples.append({"background": file_name, "layers": [], "composite": None})
+    return composite_examples
 
 
 def make_demo(pipe):
