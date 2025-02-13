@@ -4,6 +4,7 @@ from uuid import uuid4
 from threading import Event, Thread
 import queue
 import sys
+import re
 
 max_new_tokens = 256
 
@@ -206,6 +207,8 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
         updated text string
 
         """
+        new_text = re.sub(r'^<think>', '<em><small>I am thinking...', new_text)
+        new_text = re.sub('</think>', 'I think I know the answer</small></em>', new_text)
         partial_text += new_text
         return partial_text
 
