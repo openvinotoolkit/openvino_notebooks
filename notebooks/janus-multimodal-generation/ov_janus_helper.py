@@ -323,6 +323,8 @@ def convert_janus_model(model_id, output_dir, quantization_config):
         for output, output_name in zip(ov_model.outputs, output_names):
             output.get_tensor().set_names({output_name})
         patch_stateful(ov_model)
+        ov_model.set_rt_info("f16", ["runtime_options", "KV_CACHE_PRECISION"])
+
         print("✅ Language model successfully converted")
 
         if quantization_config is not None:
