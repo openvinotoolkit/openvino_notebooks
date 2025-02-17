@@ -240,7 +240,11 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
 
             def rope_fwd(self, x, position_ids, seq_len=None):
                 seq_len = torch.max(position_ids) + 1
-                original_max_position_embeddings = self.original_max_position_embeddings if hasattr(self, "original_max_positional_embeddings") else self.config.original_max_position_embeddings
+                original_max_position_embeddings = (
+                    self.original_max_position_embeddings
+                    if hasattr(self, "original_max_positional_embeddings")
+                    else self.config.original_max_position_embeddings
+                )
                 max_position_embeddings = self.max_position_embeddings if hasattr(self, "max_position_embeddings") else self.config.max_position_embeddings
                 short_factor = self.short_factor if hasattr(self, "short_factor") else self.config.rope_scaling["short_factor"]
                 long_factor = self.long_factor if hasattr(self, "long_factor") else self.config.rope_scaling["long_factor"]
@@ -281,7 +285,7 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
             if hasattr(pipe.model.llm, "rotary_emb"):
                 pipe.model.llm.rotary_emb.forward = MethodType(rope_fwd, pipe.model.llm.rotary_emb)
                 from transformers.cache_utils import Cache, DynamicCache
-                from transformers.modeling_outputs import BaseModelOutputWithPast 
+                from transformers.modeling_outputs import BaseModelOutputWithPast
 
                 def new_transformers_forward(
                     self,
@@ -298,9 +302,7 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
                     offload_model: Optional[bool] = False,
                 ) -> Union[Tuple, BaseModelOutputWithPast]:
                     output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
-                    output_hidden_states = (
-                        output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
-                    )
+                    output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
                     use_cache = use_cache if use_cache is not None else self.config.use_cache
 
                     return_dict = return_dict if return_dict is not None else self.config.use_return_dict
@@ -338,15 +340,15 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
                         if offload_model and not self.training:
                             self.get_offlaod_layer(layer_idx, device=inputs_embeds.device)
                         layer_outputs = decoder_layer(
-                                hidden_states,
-                                attention_mask=attention_mask,
-                                position_ids=position_ids,
-                                past_key_value=past_key_values,
-                                output_attentions=output_attentions,
-                                use_cache=use_cache,
-                                cache_position=cache_position,
-                                position_embeddings=position_embeddings
-                            )
+                            hidden_states,
+                            attention_mask=attention_mask,
+                            position_ids=position_ids,
+                            past_key_value=past_key_values,
+                            output_attentions=output_attentions,
+                            use_cache=use_cache,
+                            cache_position=cache_position,
+                            position_embeddings=position_embeddings,
+                        )
 
                         hidden_states = layer_outputs[0]
 
@@ -369,7 +371,7 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
                         hidden_states=all_hidden_states,
                         attentions=all_self_attns,
                     )
-                
+
                 pipe.model.llm._orig_forward = MethodType(new_transformers_forward, pipe.model.llm)
             else:
                 for layer in pipe.model.llm.layers:

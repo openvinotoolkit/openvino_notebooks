@@ -724,14 +724,11 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
                     n_audio_features = audio_features.shape[0]
 
                     if n_audio_tokens != n_audio_features:
-                        raise ValueError(
-                            f"Audio features and audio tokens do not match: tokens: {n_audio_tokens}, features {n_audio_features}"
-                        )
+                        raise ValueError(f"Audio features and audio tokens do not match: tokens: {n_audio_tokens}, features {n_audio_features}")
                     special_audio_mask = (input_ids == self.config.audio_token_index).to(inputs_embeds.device)
                     special_audio_mask = special_audio_mask.unsqueeze(-1).expand_as(inputs_embeds)
                     audio_features = torch.from_numpy(audio_features).to(inputs_embeds.device, inputs_embeds.dtype)
                     inputs_embeds = inputs_embeds.masked_scatter(special_audio_mask, audio_features)
-
 
         outputs = self.language_model(
             None, attention_mask=attention_mask, position_ids=position_ids, past_key_values=past_key_values, inputs_embeds=inputs_embeds, use_cache=True
