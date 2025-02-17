@@ -512,6 +512,21 @@ class OvGLMv(GenerationMixin):
         model_kwargs["is_first_forward"] = False
         return model_kwargs
 
+    def _extract_past_from_model_output(self, outputs: ModelOutput):
+        past_key_values = None
+        cache_name = "past_key_values"
+        if "past_key_values" in outputs:
+            past_key_values = outputs.past_key_values
+        elif "mems" in outputs:
+            past_key_values = outputs.mems
+        elif "past_buckets_states" in outputs:
+            past_key_values = outputs.past_buckets_states
+        elif "cache_params" in outputs:
+            past_key_values = outputs.cache_params
+            cache_name = "cache_params"
+
+        return cache_name, past_key_values
+
     def prepare_inputs_for_generation(
         self,
         input_ids: torch.LongTensor,
