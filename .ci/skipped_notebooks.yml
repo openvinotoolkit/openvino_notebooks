@@ -215,13 +215,6 @@
         - ubuntu-20.04
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/softvc-voice-conversion/softvc-voice-conversion.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-20.04
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/latent-consistency-models-image-generation/latent-consistency-models-image-generation.ipynb
   skips:
     - os:

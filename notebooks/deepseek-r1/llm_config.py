@@ -40,6 +40,12 @@ SUPPORTED_LLM_MODELS = {
             "system_prompt": DEFAULT_SYSTEM_PROMPT,
             "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"],
         },
+        "DeepSeek-R1-Distill-Qwen-32B": {
+            "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+            "genai_chat_template": "{% for message in messages %}{% if loop.first %}{{ '<｜begin▁of▁sentence｜>' }}{% endif %}{% if message['role'] == 'system' and message['content'] %}{{ message['content'] }}{% elif message['role'] == 'user' %}{{  '<｜User｜>' +  message['content'] }}{% elif message['role'] == 'assistant' %}{{ '<｜Assistant｜>' +  message['content'] + '<｜end▁of▁sentence｜>' }}{% endif %}{% if loop.last and add_generation_prompt and message['role'] != 'assitant' %}{{ '<｜Assistant｜>' }}{% endif %}{% endfor %}",
+            "system_prompt": DEFAULT_SYSTEM_PROMPT,
+            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"],
+        },
     },
     "Chinese": {
         "DeepSeek-R1-Distill-Qwen-1.5B": {
@@ -66,6 +72,12 @@ SUPPORTED_LLM_MODELS = {
             "system_prompt": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"],
         },
+        "DeepSeek-R1-Distill-Qwen-32B": {
+            "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+            "genai_chat_template": "{% for message in messages %}{% if loop.first %}{{ '<｜begin▁of▁sentence｜>' }}{% endif %}{% if message['role'] == 'system' and message['content'] %}{{ message['content'] }}{% elif message['role'] == 'user' %}{{  '<｜User｜>' +  message['content'] }}{% elif message['role'] == 'assistant' %}{{ '<｜Assistant｜>' +  message['content'] + '<｜end▁of▁sentence｜>' }}{% endif %}{% if loop.last and add_generation_prompt and message['role'] != 'assitant' %}{{ '<｜Assistant｜>' }}{% endif %}{% endfor %}",
+            "system_prompt": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_strings": ["<｜end▁of▁sentence｜>", "<｜User｜>", "</User|>", "<|User|>", "<|end_of_sentence|>", "</｜"],
+        },
     },
 }
 
@@ -79,6 +91,7 @@ compression_configs = {
     "DeepSeek-R1-Distill-Qwen-7B": {"sym": True, "group_size": 128, "ratio": 1.0},
     "DeepSeek-R1-Distill-Qwen-14B": {"sym": True, "group_size": 128, "ratio": 1.0},
     "DeepSeek-R1-Distill-Qwen-1.5B": {"sym": True, "group_size": 128, "ratio": 1.0},
+    "DeepSeek-R1-Distill-Qwen-32B": {"sym": True, "group_size": 128, "ratio": 1.0},
     "default": {
         "sym": False,
         "group_size": 128,

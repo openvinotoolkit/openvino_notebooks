@@ -239,16 +239,27 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
                 return short_factor
 
             def rope_fwd(self, x, position_ids, seq_len=None):
-                seq_len = torch.tensor(seq_len) or torch.max(position_ids) + 1
+                seq_len = torch.max(position_ids) + 1
+                original_max_position_embeddings = (
+                    self.original_max_position_embeddings
+                    if hasattr(self, "original_max_positional_embeddings")
+                    else self.config.original_max_position_embeddings
+                )
+                max_position_embeddings = self.max_position_embeddings if hasattr(self, "max_position_embeddings") else self.config.max_position_embeddings
+                short_factor = self.short_factor if hasattr(self, "short_factor") else self.config.rope_scaling["short_factor"]
+                long_factor = self.long_factor if hasattr(self, "long_factor") else self.config.rope_scaling["long_factor"]
                 ext_factors = select_ext_factor(
                     seq_len,
-                    torch.tensor(self.original_max_position_embeddings),
-                    torch.tensor(self.short_factor, dtype=torch.float32, device=x.device),
-                    torch.tensor(self.long_factor, dtype=torch.float32, device=x.device),
+                    torch.tensor(original_max_position_embeddings),
+                    torch.tensor(short_factor, dtype=torch.float32, device=x.device),
+                    torch.tensor(long_factor, dtype=torch.float32, device=x.device),
                 )
+                base = self.config.rope_theta if not hasattr(self, "base") else self.base
 
-                inv_freq_shape = torch.arange(0, self.dim, 2, dtype=torch.int64, device=x.device).float() / self.dim
-                inv_freq = 1.0 / (ext_factors * self.base**inv_freq_shape)
+                dim = self.dim if hasattr(self, "dim") else getattr(self.config, "head_dim", self.config.hidden_size // self.config.num_attention_heads)
+
+                inv_freq_shape = torch.arange(0, dim, 2, dtype=torch.int64, device=x.device).float() / dim
+                inv_freq = 1.0 / (ext_factors * base**inv_freq_shape)
 
                 inv_freq_expanded = inv_freq[None, :, None].float().expand(position_ids.shape[0], -1, 1)
                 position_ids_expanded = position_ids[:, None, :].float()
@@ -257,23 +268,114 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
                 # See https://github.com/huggingface/transformers/pull/29285
                 device_type = x.device.type
                 device_type = device_type if isinstance(device_type, str) and device_type != "mps" else "cpu"
-                with torch.autocast(device_type=device_type, enabled=False):
-                    freqs = (inv_freq_expanded.float() @ position_ids_expanded.float()).transpose(1, 2)
-                    emb = torch.cat((freqs, freqs), dim=-1)
+                freqs = (inv_freq_expanded.float() @ position_ids_expanded.float()).transpose(1, 2)
+                emb = torch.cat((freqs, freqs), dim=-1)
 
-                    scale = self.max_position_embeddings / self.original_max_position_embeddings
-                    if scale <= 1.0:
-                        scaling_factor = 1.0
-                    else:
-                        scaling_factor = math.sqrt(1 + math.log(scale) / math.log(self.original_max_position_embeddings))
-                    cos = emb.cos() * scaling_factor
-                    sin = emb.sin() * scaling_factor
-                return cos.to(dtype=x.dtype), sin.to(dtype=x.dtype)
+                scale = max_position_embeddings / original_max_position_embeddings
+                if scale <= 1.0:
+                    scaling_factor = 1.0
+                else:
+                    scaling_factor = math.sqrt(1 + math.log(scale) / math.log(original_max_position_embeddings))
+                cos = emb.cos() * scaling_factor
+                sin = emb.sin() * scaling_factor
+                return cos, sin
 
             pipe.model.llm._orig_forward = pipe.model.llm.forward
             pipe.model.llm.forward = MethodType(forward_wrap, pipe.model.llm)
-            for layer in pipe.model.llm.layers:
-                layer.self_attn.rotary_emb.forward = MethodType(rope_fwd, layer.self_attn.rotary_emb)
+            if hasattr(pipe.model.llm, "rotary_emb"):
+                pipe.model.llm.rotary_emb.forward = MethodType(rope_fwd, pipe.model.llm.rotary_emb)
+                from transformers.cache_utils import Cache, DynamicCache
+                from transformers.modeling_outputs import BaseModelOutputWithPast
+
+                def new_transformers_forward(
+                    self,
+                    input_ids: torch.LongTensor = None,
+                    attention_mask: Optional[torch.Tensor] = None,
+                    position_ids: Optional[torch.LongTensor] = None,
+                    past_key_values: Optional[List[torch.FloatTensor]] = None,
+                    inputs_embeds: Optional[torch.FloatTensor] = None,
+                    use_cache: Optional[bool] = None,
+                    output_attentions: Optional[bool] = None,
+                    output_hidden_states: Optional[bool] = None,
+                    return_dict: Optional[bool] = None,
+                    cache_position: Optional[torch.LongTensor] = None,
+                    offload_model: Optional[bool] = False,
+                ) -> Union[Tuple, BaseModelOutputWithPast]:
+                    output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
+                    output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
+                    use_cache = use_cache if use_cache is not None else self.config.use_cache
+
+                    return_dict = return_dict if return_dict is not None else self.config.use_return_dict
+
+                    if (input_ids is None) ^ (inputs_embeds is not None):
+                        raise ValueError("You must specify exactly one of input_ids or inputs_embeds")
+
+                    # kept for BC (non `Cache` `past_key_values` inputs)
+
+                    if attention_mask is not None and attention_mask.dim() == 3:
+                        dtype = inputs_embeds.dtype
+                        min_dtype = torch.finfo(dtype).min
+                        attention_mask = (1 - attention_mask) * min_dtype
+                        attention_mask = attention_mask.unsqueeze(1).to(inputs_embeds.dtype)
+                    else:
+                        raise Exception("attention_mask parameter was unavailable or invalid")
+                        # causal_mask = self._update_causal_mask(
+                        #     attention_mask, inputs_embeds, cache_position, past_key_values, output_attentions
+                        # )
+
+                    hidden_states = inputs_embeds
+                    position_embeddings = self.rotary_emb(hidden_states, position_ids)
+
+                    # decoder layers
+                    all_hidden_states = () if output_hidden_states else None
+                    all_self_attns = () if output_attentions else None
+
+                    layer_idx = -1
+                    for decoder_layer in self.layers:
+                        layer_idx += 1
+
+                        if output_hidden_states:
+                            all_hidden_states += (hidden_states,)
+
+                        if offload_model and not self.training:
+                            self.get_offlaod_layer(layer_idx, device=inputs_embeds.device)
+                        layer_outputs = decoder_layer(
+                            hidden_states,
+                            attention_mask=attention_mask,
+                            position_ids=position_ids,
+                            past_key_value=past_key_values,
+                            output_attentions=output_attentions,
+                            use_cache=use_cache,
+                            cache_position=cache_position,
+                            position_embeddings=position_embeddings,
+                        )
+
+                        hidden_states = layer_outputs[0]
+
+                        if output_attentions:
+                            all_self_attns += (layer_outputs[1],)
+
+                    hidden_states = self.norm(hidden_states)
+
+                    # add hidden states from the last decoder layer
+                    if output_hidden_states:
+                        all_hidden_states += (hidden_states,)
+
+                    next_cache = past_key_values if use_cache else None
+
+                    if not return_dict:
+                        return tuple(v for v in [hidden_states, next_cache, all_hidden_states, all_self_attns] if v is not None)
+                    return BaseModelOutputWithPast(
+                        last_hidden_state=hidden_states,
+                        past_key_values=next_cache,
+                        hidden_states=all_hidden_states,
+                        attentions=all_self_attns,
+                    )
+
+                pipe.model.llm._orig_forward = MethodType(new_transformers_forward, pipe.model.llm)
+            else:
+                for layer in pipe.model.llm.layers:
+                    layer.self_attn.rotary_emb.forward = MethodType(rope_fwd, layer.self_attn.rotary_emb)
             for i in range(num_hidden_layers):
                 past_key_values.append((torch.randn(pkv_shape), torch.randn(pkv_shape)))
                 input_names.extend([f"past_key_values.{i}.key", f"past_key_values.{i}.value"])
