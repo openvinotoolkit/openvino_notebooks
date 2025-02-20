@@ -1019,6 +1019,7 @@ VITS
 vitt
 VL
 vl
+vlm
 VLM
 VLModel
 VLMPipeline
