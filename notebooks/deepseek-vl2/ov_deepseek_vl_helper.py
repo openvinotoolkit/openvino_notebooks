@@ -1,21 +1,23 @@
-import sys
 import shutil
 import openvino as ov
 from transformers import GenerationMixin, AutoConfig, GenerationConfig
 from transformers.modeling_outputs import CausalLMOutputWithPast
+import nncf
 from pathlib import Path
 import torch
 import types
 from typing import Optional, Tuple, List
 import openvino.opset13 as opset13
+from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
+from openvino.frontend.pytorch.ts_decoder import TorchScriptPythonDecoder
 import numpy as np
 from einops import rearrange, repeat
+import gc
 
 
 model_ids = [
     "deepseek-ai/deepseek-vl2-tiny",
     "deepseek-ai/deepseek-vl2-small",
-    "deepseek-ai/deepseek-vl2"
 ]
 
 model_id = model_ids[0]
@@ -35,27 +37,26 @@ def prepare_model_repo():
     dst_modeling_helper = repo_path / "deepseek_vl2/models/modeling_helper.py"
     if not dst_modeling_helper.exists():
         shutil.copy(modeling_helper, dst_modeling_helper)
-    
+
     deepseek_modeling_path = repo_path / "deepseek_vl2/models/modeling_deepseek.py"
     orig_deepseek_modeling_path = repo_path / "deepseek_vl2/models/orig_modeling_deepseek.py"
     if not orig_deepseek_modeling_path.exists():
         shutil.move(deepseek_modeling_path, orig_deepseek_modeling_path)
-        with orig_deepseek_modeling_path.open("r") as f:
+        with orig_deepseek_modeling_path.open("r", encoding="utf-8") as f:
             text = f.read()
             updated_text = text.replace("from transformers.models.llama.modeling_llama", "from .modeling_helper")
-            with deepseek_modeling_path.open("w") as out_f:
+            with deepseek_modeling_path.open("w", encoding="utf-8") as out_f:
                 out_f.write(updated_text)
     orig_siglip_path = repo_path / "deepseek_vl2/models/orig_siglip_vit.py"
     siglip_path = repo_path / "deepseek_vl2/models/siglip_vit.py"
 
     if not orig_siglip_path.exists():
         shutil.move(siglip_path, orig_siglip_path)
-        with orig_siglip_path.open("r") as f:
+        with orig_siglip_path.open("r", encoding="utf-8") as f:
             text = f.read()
             updated_text = text.replace("from xformers.ops", "from .modeling_helper")
-            with siglip_path.open("w") as out_f:
+            with siglip_path.open("w", encoding="utf-8") as out_f:
                 out_f.write(updated_text)
-        
 
 
 def model_has_state(ov_model: ov.Model):
@@ -227,6 +228,7 @@ def patch_stateful(ov_model):
 
 core = ov.Core()
 
+
 def deepseek_v2_attn_forward(
     self,
     hidden_states: torch.Tensor,
@@ -280,11 +282,7 @@ def deepseek_v2_attn_forward(
     compressed_kv = self.kv_a_proj_with_mqa(hidden_states)
     compressed_kv, k_pe = torch.split(compressed_kv, [self.kv_lora_rank, self.qk_rope_head_dim], dim=-1)
     k_pe = k_pe.view(bsz, q_len, 1, self.qk_rope_head_dim).transpose(1, 2)
-    kv = (
-        self.kv_b_proj(self.kv_a_layernorm(compressed_kv))
-        .view(bsz, q_len, self.num_heads, self.qk_nope_head_dim + self.v_head_dim)
-        .transpose(1, 2)
-    )
+    kv = self.kv_b_proj(self.kv_a_layernorm(compressed_kv)).view(bsz, q_len, self.num_heads, self.qk_nope_head_dim + self.v_head_dim).transpose(1, 2)
 
     k_nope, value_states = torch.split(kv, [self.qk_nope_head_dim, self.v_head_dim], dim=-1)
     kv_seq_len = value_states.shape[-2]
@@ -315,15 +313,11 @@ def deepseek_v2_attn_forward(
 
     if attention_mask is not None:
         if attention_mask.size() != (bsz, 1, q_len, kv_seq_len):
-            raise ValueError(
-                f"Attention mask should be of size {(bsz, 1, q_len, kv_seq_len)}, but is {attention_mask.size()}"
-            )
+            raise ValueError(f"Attention mask should be of size {(bsz, 1, q_len, kv_seq_len)}, but is {attention_mask.size()}")
 
     if attention_mask is not None:
         if attention_mask.size() != (bsz, 1, q_len, kv_seq_len):
-            raise ValueError(
-                f"Attention mask should be of size {(bsz, 1, q_len, kv_seq_len)}, but is {attention_mask.size()}"
-            )
+            raise ValueError(f"Attention mask should be of size {(bsz, 1, q_len, kv_seq_len)}, but is {attention_mask.size()}")
     # SDPA with memory-efficient backend is currently (torch==2.1.2) bugged with non-contiguous inputs with custom attn_mask,
     # Reference: https://github.com/pytorch/pytorch/issues/112577.
     if query_states.device.type == "cuda" and attention_mask is not None:
@@ -373,24 +367,32 @@ def deepseek_moe_infer(self, x, topk_ids, topk_weight):
 
     new_x = torch.zeros_like(outs)
     new_x[idxs] = outs
-    final_out = (
-        new_x.view(*topk_ids.shape, -1)
-        .to(topk_weight.dtype)
-        .mul_(topk_weight.unsqueeze(dim=-1))
-        .sum(dim=1)
-        .to(new_x.dtype)
-    )
+    final_out = new_x.view(*topk_ids.shape, -1).to(topk_weight.dtype).mul_(topk_weight.unsqueeze(dim=-1)).sum(dim=1).to(new_x.dtype)
     return final_out
 
-def convert_deepseek_vl(model_id=model_id, model_path=None):
+
+def cleanup_torchscript_cache():
+    """
+    Helper for removing cached model representation
+    """
+    torch._C._jit_clear_class_registry()
+    torch.jit._recursive.concrete_type_store = torch.jit._recursive.ConcreteTypeStore()
+    torch.jit._state._clear_class_state()
+
+
+def convert_deepseek_vl(model_id=model_id, model_path=None, quantization_config=None):
     from deepseek_vl2.models import DeepseekVLV2Processor, DeepseekVLV2ForCausalLM
+
     if model_path is None:
         model_path = Path(model_id.split("/")[-1])
-    
+
     if all((model_path / model_name).exists() for model_name in [VISION_EMBEDDINGS_PATH, TEXT_EMBEDDINGS_PATH, LANGUAGE_MODEL_PATH]):
-        print(f"Model already converted and can be found in {model_path}")
+        print(f"✅ {model_id} model already converted. You can find results in {model_path}")
         return model_path
-    pt_model = DeepseekVLV2ForCausalLM.from_pretrained(model_id)
+    print(f"⌛ {model_id} conversion started. Be patient, it may takes some time.")
+    print("⌛ Load Original model")
+    pt_model = DeepseekVLV2ForCausalLM.from_pretrained(model_id, torch_dtype="auto")
+    pt_model.eval()
     processor = DeepseekVLV2Processor.from_pretrained(model_id)
     processor.save_pretrained(model_path)
     config = pt_model.config
@@ -400,22 +402,37 @@ def convert_deepseek_vl(model_id=model_id, model_path=None):
     else:
         config.tile_indicators = pt_model.tile_indicators.tolist()
     config.save_pretrained(model_path)
+    __make_16bit_traceable(pt_model)
+    print("✅ Original model successfully loaded")
+    if not (model_path / TEXT_EMBEDDINGS_PATH).exists():
+        print("⌛ Convert Input embedding model")
+        ov_model = ov.convert_model(pt_model.language.get_input_embeddings(), example_input=torch.ones([2, 2], dtype=torch.long))
+        ov.save_model(ov_model, model_path / TEXT_EMBEDDINGS_PATH)
+        del ov_model
+        cleanup_torchscript_cache()
+        gc.collect()
+        print("✅ Input embedding model successfully converted")
     if not (model_path / VISION_EMBEDDINGS_PATH).exists():
+        print("⌛ Convert Image embedding model")
+
         def vision_forward(self, pixel_values):
             images_feature = self.vision(pixel_values)
             # [batch_all_tiles, hw, D]
             images_embeds = self.projector(images_feature)
             return images_embeds
-        
+
         pt_model._orig_forward = pt_model.forward
         pt_model.forward = types.MethodType(vision_forward, pt_model)
 
         ov_model = ov.convert_model(pt_model, example_input=torch.zeros([2, 3, 384, 384]))
+
+        if quantization_config is not None and "vision" in quantization_config:
+            nncf.compress_weights(ov_model, **quantization_config["vision"])
         ov.save_model(ov_model, model_path / VISION_EMBEDDINGS_PATH)
-    
-    if not (model_path / TEXT_EMBEDDINGS_PATH).exists():
-        ov_model = ov.convert_model(pt_model.language.get_input_embeddings(), example_input=torch.ones([2, 2], dtype=torch.long))
-        ov.save_model(ov_model, model_path / TEXT_EMBEDDINGS_PATH)
+        del ov_model
+        cleanup_torchscript_cache()
+        gc.collect()
+        print("✅ Image embedding model successfully converted")
 
     if not (model_path / LANGUAGE_MODEL_PATH).exists():
         lm = pt_model.language
@@ -440,22 +457,36 @@ def convert_deepseek_vl(model_id=model_id, model_path=None):
             pkv_inputs.append((torch.randn(k_shape), torch.randn(v_shape)))
             pkv_input_names.extend([f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"])
             pkv_output_names.extend([f"present.{idx}.key", f"present.{idx}.value"])
-        
+
         model_inputs = ["attention_mask", "position_ids", *pkv_input_names, "inputs_embeds"]
         model_outputs = ["logits", *pkv_output_names]
 
         lm.config.torchscript = True
+        dummy_inputs = {"attention_mask": attention_mask, "position_ids": position_ids, "past_key_values": pkv_inputs, "inputs_embeds": inputs_embeds}
+        ts_decoder = TorchScriptPythonDecoder(lm, example_input=dummy_inputs, trace_kwargs={"check_trace": False})
 
-        ov_model = ov.convert_model(lm, example_input={"attention_mask": attention_mask, "position_ids": position_ids, "past_key_values": pkv_inputs, "inputs_embeds": inputs_embeds})
+        ov_model = ov.convert_model(ts_decoder, example_input=dummy_inputs)
         for input, input_name in zip(ov_model.inputs, model_inputs):
             input.get_tensor().set_names({input_name})
 
         for output, output_name in zip(ov_model.outputs, model_outputs):
             output.get_tensor().set_names({output_name})
         patch_stateful(ov_model)
+        print("✅ Language model successfully converted")
+        if quantization_config is not None and "llm" in quantization_config:
+            print(f"⌛ Weights compression with {quantization_config['llm']['mode']} mode started")
+            ov_model = nncf.compress_weights(ov_model, **quantization_config["llm"])
+            print("✅ Weights compression finished")
+        else:
+            ov_model.set_rt_info("f16", ["runtime_options", "KV_CACHE_PRECISION"])
         ov.save_model(ov_model, model_path / LANGUAGE_MODEL_PATH)
-
-#convert_deepseek_vl()
+        del ov_model
+        cleanup_torchscript_cache()
+        gc.collect()
+    del pt_model
+    gc.collect()
+    print(f"✅ {model_id} model conversion finished. You can find results in {model_path}")
+    return model_path
 
 
 class OvModelForCausalLMWithEmb(GenerationMixin):
@@ -622,7 +653,6 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
                 position_ids = position_ids[:, -input_ids.shape[1] :]
         cache_position = torch.arange(past_len, past_len + position_ids.shape[-1], device=position_ids.device)
 
-
         model_inputs = {
             "input_ids": input_ids,
             "past_key_values": past_key_values,
@@ -630,7 +660,7 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
             "position_ids": position_ids,
             "attention_mask": attention_mask,
             "inputs_embeds": inputs_embeds if past_key_values is None else None,
-            "cache_position": cache_position 
+            "cache_position": cache_position,
         }
 
         return model_inputs
@@ -658,11 +688,14 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
     def __call__(self, *args, **kwargs):
         return self.forward(*args, **kwargs)
 
+
 core = ov.Core()
 
+
 class OVDeepseekVLV2ForCausalLM(GenerationMixin):
-    def __init__(self, model_dir, device="CPU", ov_config=None) -> types.NoneType:
+    def __init__(self, model_dir, device="CPU", ov_config=None):
         from deepseek_vl2.models.modeling_deepseek_vl_v2 import DeepseekVLV2Config
+
         self.config = DeepseekVLV2Config.from_pretrained(model_dir)
         self.generation_config = GenerationConfig.from_model_config(self.config)
         self.language_model = OvModelForCausalLMWithEmb(model_dir, device, self.config.language_config, ov_config)
@@ -681,12 +714,12 @@ class OVDeepseekVLV2ForCausalLM(GenerationMixin):
             self.tile_indicators = torch.tensor(self.config.tile_indicators)
 
     def prepare_inputs_embeds(
-            self,
-            input_ids: torch.LongTensor,
-            images: Optional[torch.FloatTensor] = None,
-            images_seq_mask: Optional[torch.LongTensor] = None,
-            images_spatial_crop: Optional[torch.LongTensor] = None,
-            **ignore_kwargs
+        self,
+        input_ids: torch.LongTensor,
+        images: Optional[torch.FloatTensor] = None,
+        images_seq_mask: Optional[torch.LongTensor] = None,
+        images_spatial_crop: Optional[torch.LongTensor] = None,
+        **ignore_kwargs,
     ):
         """
 
@@ -711,9 +744,9 @@ class OVDeepseekVLV2ForCausalLM(GenerationMixin):
                 num_width_tiles, num_height_tiles = images_spatial_crop[idx, jdx]
                 if num_width_tiles == 0 or num_height_tiles == 0:
                     break
-                batch_num_tiles[idx] += (1 + num_width_tiles * num_height_tiles)
+                batch_num_tiles[idx] += 1 + num_width_tiles * num_height_tiles
 
-            total_tiles.append(images[idx, :batch_num_tiles[idx]])
+            total_tiles.append(images[idx, : batch_num_tiles[idx]])
 
         # [batch_all_tiles, 3, height, width]
         total_tiles = torch.cat(total_tiles, dim=0)
@@ -725,7 +758,7 @@ class OVDeepseekVLV2ForCausalLM(GenerationMixin):
         images_embeds = torch.from_numpy(self.vision_embeddings(total_tiles)[0])
 
         _, hw, n_dim = images_embeds.shape
-        h = w = int(hw ** 0.5)
+        h = w = int(hw**0.5)
 
         # put image tokens into the input_embeds, [b, T, D]
         input_embeds = torch.from_numpy(self.language_model.embed_tokens(input_ids))
@@ -747,7 +780,7 @@ class OVDeepseekVLV2ForCausalLM(GenerationMixin):
                 global_features = images_embeds[tile_index]
 
                 # [num_height_tiles * num_width_tiles, hw, D]
-                local_features = images_embeds[tile_index + 1: tile_index + 1 + num_tiles_in_image]
+                local_features = images_embeds[tile_index + 1 : tile_index + 1 + num_tiles_in_image]
 
                 tile_index += num_tiles_in_image + 1
 
@@ -766,22 +799,10 @@ class OVDeepseekVLV2ForCausalLM(GenerationMixin):
 
                     # ----------------- local view add newline -----------------
                     # [num_height_tiles * num_width_tiles, h * w, D] -> [num_height_tiles * h, num_width_tiles * w, D]
-                    local_features = rearrange(
-                        local_features,
-                        "(th tw) (h w) d -> (th h) (tw w) d",
-                        th=num_height_tiles,
-                        tw=num_width_tiles,
-                        h=h,
-                        w=w
-                    )
+                    local_features = rearrange(local_features, "(th tw) (h w) d -> (th h) (tw w) d", th=num_height_tiles, tw=num_width_tiles, h=h, w=w)
 
                     # [D] -> [num_height_tiles * h, 1, D]
-                    new_lines_in_local = repeat(
-                        self.image_newline,
-                        "d -> (th h) 1 d",
-                        th=num_height_tiles,
-                        h=h
-                    )
+                    new_lines_in_local = repeat(self.image_newline, "d -> (th h) 1 d", th=num_height_tiles, h=h)
 
                     # [num_height_tiles * h, num_width_tiles * w + 1, D]
                     local_features = torch.cat([local_features, new_lines_in_local], dim=1)
@@ -792,21 +813,15 @@ class OVDeepseekVLV2ForCausalLM(GenerationMixin):
 
                     # ----------------- merge global and local tiles -----------------
                     if self.config.global_view_pos == "head":
-                        global_local_features = torch.cat(
-                            [global_features, self.view_seperator[None, :], local_features], dim=0)
+                        global_local_features = torch.cat([global_features, self.view_seperator[None, :], local_features], dim=0)
                     else:
-                        global_local_features = torch.cat(
-                            [local_features, self.view_seperator[None, :], global_features], dim=0)
+                        global_local_features = torch.cat([local_features, self.view_seperator[None, :], global_features], dim=0)
 
                 else:
                     # abandoned，实际上不会走这个逻辑
-                    global_features = torch.cat(
-                        [self.tile_indicators[0:1], global_features], dim=0
-                    )
-                    local_features = torch.cat(
-                        [self.tile_indicators[1:num_tiles_in_image + 1].unsqueeze(1), local_features], dim=1
-                    )
-                    local_features = rearrange(local_features, 'crop_num hw d -> (crop_num hw) d')
+                    global_features = torch.cat([self.tile_indicators[0:1], global_features], dim=0)
+                    local_features = torch.cat([self.tile_indicators[1 : num_tiles_in_image + 1].unsqueeze(1), local_features], dim=1)
+                    local_features = rearrange(local_features, "crop_num hw d -> (crop_num hw) d")
 
                     if self.config.global_view_pos == "head":
                         global_local_features = torch.cat([global_features, local_features], dim=0)
@@ -822,24 +837,21 @@ class OVDeepseekVLV2ForCausalLM(GenerationMixin):
         return input_embeds
 
     def forward(
-            self,
-            input_ids: Optional[torch.LongTensor] = None,
-
-            attention_mask: Optional[torch.Tensor] = None,
-            position_ids: Optional[torch.LongTensor] = None,
-            past_key_values: Optional[List[torch.FloatTensor]] = None,
-            inputs_embeds: Optional[torch.FloatTensor] = None,
-
-            images: Optional[torch.FloatTensor] = None,
-            images_seq_mask: Optional[torch.LongTensor] = None,
-            images_spatial_crop: Optional[torch.LongTensor] = None,
-
-            labels: Optional[torch.LongTensor] = None,
-            use_cache: Optional[bool] = None,
-            output_attentions: Optional[bool] = None,
-            output_hidden_states: Optional[bool] = None,
-            return_dict: Optional[bool] = None,
-            cache_position: Optional[torch.LongTensor] = None,
+        self,
+        input_ids: Optional[torch.LongTensor] = None,
+        attention_mask: Optional[torch.Tensor] = None,
+        position_ids: Optional[torch.LongTensor] = None,
+        past_key_values: Optional[List[torch.FloatTensor]] = None,
+        inputs_embeds: Optional[torch.FloatTensor] = None,
+        images: Optional[torch.FloatTensor] = None,
+        images_seq_mask: Optional[torch.LongTensor] = None,
+        images_spatial_crop: Optional[torch.LongTensor] = None,
+        labels: Optional[torch.LongTensor] = None,
+        use_cache: Optional[bool] = None,
+        output_attentions: Optional[bool] = None,
+        output_hidden_states: Optional[bool] = None,
+        return_dict: Optional[bool] = None,
+        cache_position: Optional[torch.LongTensor] = None,
     ):
 
         if inputs_embeds is None:
@@ -850,8 +862,6 @@ class OVDeepseekVLV2ForCausalLM(GenerationMixin):
                 images_spatial_crop=images_spatial_crop,
             )
 
-
-        # print(inputs_embeds.shape)
         outputs = self.language_model.forward(
             input_ids=None,
             attention_mask=attention_mask,
@@ -859,28 +869,25 @@ class OVDeepseekVLV2ForCausalLM(GenerationMixin):
             past_key_values=past_key_values,
             inputs_embeds=inputs_embeds,
             use_cache=use_cache,
-            cache_position=cache_position
+            cache_position=cache_position,
         )
 
         return outputs
 
     def prepare_inputs_for_generation(
-            self,
-            input_ids,
-            past_key_values=None,
-            inputs_embeds=None,
-
-            images: Optional[torch.FloatTensor] = None,
-            images_seq_mask: Optional[torch.LongTensor] = None,
-            images_spatial_crop: Optional[torch.LongTensor] = None,
-
-            attention_mask=None,
-            cache_position=None,
-
-            pixel_values=None,
-            image_sizes=None,
-            num_logits_to_keep=None,
-            **kwargs,
+        self,
+        input_ids,
+        past_key_values=None,
+        inputs_embeds=None,
+        images: Optional[torch.FloatTensor] = None,
+        images_seq_mask: Optional[torch.LongTensor] = None,
+        images_spatial_crop: Optional[torch.LongTensor] = None,
+        attention_mask=None,
+        cache_position=None,
+        pixel_values=None,
+        image_sizes=None,
+        num_logits_to_keep=None,
+        **kwargs,
     ):
         # Overwritten -- in specific circumstances we don't want to forward image inputs to the model
         model_inputs = self.language_model.prepare_inputs_for_generation(
@@ -906,46 +913,7 @@ class OVDeepseekVLV2ForCausalLM(GenerationMixin):
     def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
         return self.language_model._reorder_cache(past_key_values, beam_idx)
 
-# ov_model = OVDeepseekVLV2ForCausalLM(model_path)
-# processor = DeepseekVLV2Processor.from_pretrained(model_path)
+    def can_generate(self):
+        """Returns True to validate the check that the model using `GenerationMixin.generate()` can indeed generate."""
 
-# conversation = [
-#     {
-#         "role": "<|User|>",
-#         "content": "<image>\n<|ref|>The giraffe at the back.<|/ref|>.",
-#         "images": ["./images/visual_grounding_1.jpeg"],
-#     },
-#     {"role": "<|Assistant|>", "content": ""},
-# ]
-
-# pil_images = load_pil_images(conversation)
-# prepare_inputs = processor(
-#     conversations=conversation,
-#     images=pil_images,
-#     force_batchify=True,
-#     system_prompt=""
-# )
-
-# inputs_embeds = ov_model.prepare_inputs_embeds(**prepare_inputs)
-# print(inputs_embeds.shape)
-
-# # run the model to get the response
-# outputs = ov_model.language_model.generate(
-#     inputs_embeds=inputs_embeds,
-#     attention_mask=None,
-#     pad_token_id=processor.tokenizer.eos_token_id,
-#     bos_token_id=processor.tokenizer.bos_token_id,
-#     eos_token_id=processor.tokenizer.eos_token_id,
-#     past_key_values=None,
-#     input_ids=None,
-#     max_new_tokens=512,
-#     do_sample=False,
-#     use_cache=True,
-#     streamer=TextStreamer(processor.tokenizer, skip_special_tokens=True)
-# )
-
-# answer = processor.tokenizer.batch_decode(outputs, skip_special_tokens=False)
-# print(answer)
-# vg_image = parse_ref_bbox(answer[0], image=pil_images[-1])
-# if vg_image is not None:
-#     vg_image.save("./vg.jpg", format="JPEG", quality=85)
+        return True

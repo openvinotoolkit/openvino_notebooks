@@ -10,6 +10,7 @@ from transformers.modeling_rope_utils import ROPE_INIT_FUNCTIONS
 from transformers.activations import ACT2FN
 from transformers.cache_utils import Cache, DynamicCache
 
+
 def repeat_kv(hidden_states: torch.Tensor, n_rep: int) -> torch.Tensor:
     """
     This is the equivalent of torch.repeat_interleave(x, dim=1, repeats=n_rep). The hidden states go from (batch,
@@ -21,11 +22,13 @@ def repeat_kv(hidden_states: torch.Tensor, n_rep: int) -> torch.Tensor:
     hidden_states = hidden_states[:, :, None, :, :].expand(batch, num_key_value_heads, n_rep, slen, head_dim)
     return hidden_states.reshape(batch, num_key_value_heads * n_rep, slen, head_dim)
 
+
 def rotate_half(x):
     """Rotates half the hidden dims of the input."""
     x1 = x[..., : x.shape[-1] // 2]
     x2 = x[..., x.shape[-1] // 2 :]
     return torch.cat((-x2, x1), dim=-1)
+
 
 def apply_rotary_pos_emb(q, k, cos, sin, position_ids=None, unsqueeze_dim=1):
     """Applies Rotary Position Embedding to the query and key tensors.
@@ -103,9 +106,7 @@ class LlamaRotaryEmbedding(torch.nn.Module):
         """
         seq_len = torch.max(position_ids) + 1
         if seq_len > self.max_seq_len_cached:  # growth
-            inv_freq, self.attention_scaling = self.rope_init_fn(
-                self.config, device, seq_len=seq_len, **self.rope_kwargs
-            )
+            inv_freq, self.attention_scaling = self.rope_init_fn(self.config, device, seq_len=seq_len, **self.rope_kwargs)
             self.register_buffer("inv_freq", inv_freq, persistent=False)  # TODO joao: may break with compilation
             self.max_seq_len_cached = seq_len
 
@@ -182,7 +183,7 @@ class _LlamaAttention(torch.nn.Module):
         **kwargs,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
         bsz, q_len, _ = hidden_states.size()
-        #print(q_len)
+        # print(q_len)
 
         query_states = self.q_proj(hidden_states)
         key_states = self.k_proj(hidden_states)
@@ -218,10 +219,7 @@ class _LlamaAttention(torch.nn.Module):
         attn_output = torch.matmul(attn_weights, value_states)
 
         if attn_output.size() != (bsz, self.num_heads, q_len, self.head_dim):
-            raise ValueError(
-                f"`attn_output` should be of size {(bsz, self.num_heads, q_len, self.head_dim)}, but is"
-                f" {attn_output.size()}"
-            )
+            raise ValueError(f"`attn_output` should be of size {(bsz, self.num_heads, q_len, self.head_dim)}, but is" f" {attn_output.size()}")
 
         attn_output = attn_output.transpose(1, 2).contiguous()
 
@@ -233,6 +231,7 @@ class _LlamaAttention(torch.nn.Module):
             attn_weights = None
 
         return attn_output, attn_weights, past_key_value
+
 
 class LlamaAttention(_LlamaAttention):
     """
@@ -323,18 +322,13 @@ class LlamaAttention(_LlamaAttention):
         return attn_output, None, past_key_value
 
 
-
 class LlamaFlashAttention2(LlamaAttention):
     pass
 
 
 def memory_efficient_attention(
-    query: torch.Tensor,
-    key: torch.Tensor,
-    value: torch.Tensor,
-    attn_bias: Optional[torch.Tensor] = None,
-    p: float = 0.0,
-    scale: Optional[float] = None):
+    query: torch.Tensor, key: torch.Tensor, value: torch.Tensor, attn_bias: Optional[torch.Tensor] = None, p: float = 0.0, scale: Optional[float] = None
+):
 
     attn_bias = None
     scale = 1.0 / query.shape[-1] ** 0.5

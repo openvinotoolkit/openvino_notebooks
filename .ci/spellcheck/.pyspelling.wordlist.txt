@@ -540,6 +540,7 @@ Modelscope
 ModelScope
 modelscope
 Mody
+MoE
 MONAI
 MONAI's
 Monodepth
