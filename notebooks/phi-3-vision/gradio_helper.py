@@ -93,6 +93,7 @@ def make_demo(pipe, processor, read_images, model_name):
         config = ov_genai.GenerationConfig()
         config.max_new_tokens = 200
         config.do_sample = False
+        config.set_eos_token_id(pipe.get_tokenizer().get_eos_token_id())
         prompt = processor.tokenizer.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
 
         streamer = TextIteratorStreamer(processor)
