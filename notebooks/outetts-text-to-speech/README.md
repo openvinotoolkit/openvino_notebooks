@@ -2,17 +2,19 @@
 
 [OuteTTS-0.1-350M](https://huggingface.co/OuteAI/OuteTTS-0.1-350M) is a novel text-to-speech synthesis model that leverages pure language modeling without external adapters or complex architectures, built upon the LLaMa architecture. It demonstrates that high-quality speech synthesis is achievable through a straightforward approach using crafted prompts and audio tokens.
 
-More details about model can be found in [original repo](https://github.com/edwko/OuteTTS).
+More details about the model can be found in [original repo](https://github.com/edwko/OuteTTS).
 
-In this tutorial we consider how to run OuteTTS pipeline using OpenVINO.
+In this tutorial, we consider how to run the OuteTTS pipeline using OpenVINO.
 
 ## Notebook Contents
 
 The tutorial consists of the following steps:
 
-* Convert model to OpenVINO format using Optimum Intel
-* Run Text-to-Speech synthesis using OpenVINO model
-* Run Text-to-Speech synthesis with Voice Cloning using OpenVINO model
+* Convert the model to OpenVINO format using Optimum Intel
+* Run Text-to-Speech synthesis using the OpenVINO model
+* Run Text-to-Speech synthesis with Voice Cloning using the OpenVINO model
+* Optimize model using OpenVINO and NNCF
+* Compare original and quantized model Text-to-Speech synthesis and performance
 * Interactive demo
 
 ## Installation Instructions
