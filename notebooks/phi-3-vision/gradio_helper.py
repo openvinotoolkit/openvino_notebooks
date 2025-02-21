@@ -3,7 +3,6 @@ import requests
 import gradio as gr
 from PIL import Image
 from threading import Event, Thread
-from transformers import TextIteratorStreamer
 from queue import Queue
 
 import openvino_genai as ov_genai
@@ -35,7 +34,7 @@ class TextQueue:
         self.text_queue.put(self.stop_signal)
 
 
-def make_demo(pipe, processor, read_images, model_name):
+def make_demo(pipe, read_images, model_name):
     example_image_urls = [
         ("https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/dd5105d6-6a64-4935-8a34-3058a82c8d5d", "small.png"),
         ("https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/1221e2a8-a6da-413a-9af6-f04d56af3754", "chart.png"),
@@ -70,44 +69,22 @@ def make_demo(pipe, processor, read_images, model_name):
             raise gr.Error("You need to upload an image for Phi3-Vision to work. Close the error and try again with an Image.")
         image = read_images(image)
 
-        conversation = []
-        flag = False
-        for user, assistant in history:
-            if assistant is None:
-                # pass
-                flag = True
-                conversation.extend([{"role": "user", "content": ""}])
-                continue
-            if flag == True:
-                conversation[0]["content"] = f"<|image_1|>\n{user}"
-                conversation.extend([{"role": "assistant", "content": assistant}])
-                flag = False
-                continue
-            conversation.extend([{"role": "user", "content": user}, {"role": "assistant", "content": assistant}])
-        if len(history) == 0:
-            conversation.append({"role": "user", "content": f"<|image_1|>\n{message_text}"})
-        else:
-            conversation.append({"role": "user", "content": message_text})
-        print(f"prompt is -\n{conversation}")
+        print(f"prompt is -\n{message_text}")
 
         config = ov_genai.GenerationConfig()
         config.max_new_tokens = 200
         config.do_sample = False
         config.set_eos_token_id(pipe.get_tokenizer().get_eos_token_id())
-        prompt = processor.tokenizer.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
 
-        streamer = TextIteratorStreamer(processor)
         streamer = TextQueue()
         stream_complete = Event()
-
-        generation_kwargs = dict(prompt=prompt, streamer=streamer, generation_config=config)
 
         def generate_and_signal_complete():
             """
             generation function for single thread
             """
             streamer.reset()
-            generation_kwargs = {"prompt": prompt, "generation_config": config, "streamer": streamer}
+            generation_kwargs = {"prompt": message_text, "generation_config": config, "streamer": streamer}
             if image is not None:
                 generation_kwargs["images"] = image
             pipe.generate(**generation_kwargs)
