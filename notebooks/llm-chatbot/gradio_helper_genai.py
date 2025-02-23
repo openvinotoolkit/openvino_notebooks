@@ -26,7 +26,9 @@ english_examples = [
     ["Can you explain to me briefly what is Python programming language?"],
     ["Explain the plot of Cinderella in a sentence."],
     ["What are some common mistakes to avoid when writing code?"],
-    ["Write a 100-word blog post on “Benefits of Artificial Intelligence and OpenVINO“"],
+    [
+        "Write a 100-word blog post on “Benefits of Artificial Intelligence and OpenVINO“"
+    ],
 ]
 
 japanese_examples = [
@@ -61,7 +63,11 @@ def get_system_prompt(model_language, system_prompt=None):
     return (
         DEFAULT_SYSTEM_PROMPT_CHINESE
         if (model_language == "Chinese")
-        else DEFAULT_SYSTEM_PROMPT_JAPANESE if (model_language == "Japanese") else DEFAULT_SYSTEM_PROMPT
+        else (
+            DEFAULT_SYSTEM_PROMPT_JAPANESE
+            if (model_language == "Japanese")
+            else DEFAULT_SYSTEM_PROMPT
+        )
     )
 
 
@@ -106,7 +112,9 @@ class IterableStreamer(ov_genai.StreamerBase):
         Raises:
             StopIteration: If there are no more elements in the queue.
         """
-        value = self.text_queue.get()  # get() will be blocked until a token is available.
+        value = (
+            self.text_queue.get()
+        )  # get() will be blocked until a token is available.
         if value is None:
             raise StopIteration
         return value
@@ -143,11 +151,11 @@ class IterableStreamer(ov_genai.StreamerBase):
         text = self.tokenizer.decode(self.tokens_cache)
         self.decoded_lengths.append(len(text))
 
-        word = ''
+        word = ""
         delay_n_tokens = 3
-        if len(text) > self.print_len and '\n' == text[-1]:
+        if len(text) > self.print_len and "\n" == text[-1]:
             # Flush the cache after the new line symbol.
-            word = text[self.print_len:]
+            word = text[self.print_len :]
             self.tokens_cache = []
             self.decoded_lengths = []
             self.print_len = 0
@@ -159,7 +167,7 @@ class IterableStreamer(ov_genai.StreamerBase):
             if print_until != -1 and print_until > self.print_len:
                 # It is possible to have a shorter text after adding new token.
                 # Print to output only if text length is increased and text is complete (print_until != -1).
-                word = text[self.print_len:print_until]
+                word = text[self.print_len : print_until]
                 self.print_len = print_until
         self.put_word(word)
 
@@ -176,7 +184,7 @@ class IterableStreamer(ov_genai.StreamerBase):
         """
         text = self.tokenizer.decode(self.tokens_cache)
         if len(text) > self.print_len:
-            word = text[self.print_len:]
+            word = text[self.print_len :]
             self.put_word(word)
             self.tokens_cache = []
             self.print_len = 0
@@ -197,14 +205,20 @@ class ChunkStreamer(IterableStreamer):
         return super().put(token_id)
 
 
-def make_demo(pipe, model_configuration, model_id, model_language, disable_advanced=False):
+def make_demo(
+    pipe, model_configuration, model_id, model_language, disable_advanced=False
+):
     import gradio as gr
 
     max_new_tokens = 256
 
-    start_message = get_system_prompt(model_language, model_configuration.get("system_prompt"))
+    start_message = get_system_prompt(
+        model_language, model_configuration.get("system_prompt")
+    )
     if "genai_chat_template" in model_configuration:
-        pipe.get_tokenizer().set_chat_template(model_configuration["genai_chat_template"])
+        pipe.get_tokenizer().set_chat_template(
+            model_configuration["genai_chat_template"]
+        )
 
     def get_uuid():
         """
@@ -226,7 +240,9 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
         partial_text += new_text
         return partial_text
 
-    text_processor = model_configuration.get("partial_text_processor", default_partial_text_processor)
+    text_processor = model_configuration.get(
+        "partial_text_processor", default_partial_text_processor
+    )
 
     def bot(message, history, temperature, top_p, top_k, repetition_penalty):
         """
@@ -296,7 +312,11 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
         pipe.finish_chat()
         return None, None
 
-    examples = chinese_examples if (model_language == "Chinese") else japanese_examples if (model_language == "Japanese") else english_examples
+    examples = (
+        chinese_examples
+        if (model_language == "Chinese")
+        else japanese_examples if (model_language == "Japanese") else english_examples
+    )
 
     with gr.Blocks(
         theme=gr.themes.Soft(),
@@ -369,7 +389,11 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
                                 interactive=True,
                                 info="Penalize repetition — 1.0 to disable.",
                             )
-        gr.Examples(examples, inputs=msg, label="Click on any example and press the 'Submit' button")
+        gr.Examples(
+            examples,
+            inputs=msg,
+            label="Click on any example and press the 'Submit' button",
+        )
 
         msg.submit(
             fn=bot,
@@ -384,6 +408,11 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
             queue=True,
         )
         stop.click(fn=stop_chat, inputs=streamer, outputs=[streamer], queue=False)
-        clear.click(fn=stop_chat_and_clear_history, inputs=streamer, outputs=[chatbot, streamer], queue=False)
+        clear.click(
+            fn=stop_chat_and_clear_history,
+            inputs=streamer,
+            outputs=[chatbot, streamer],
+            queue=False,
+        )
 
         return demo
