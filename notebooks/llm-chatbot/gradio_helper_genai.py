@@ -2,7 +2,7 @@ import openvino as ov
 import openvino_genai as ov_genai
 from uuid import uuid4
 from threading import Event, Thread
-from gena_helper import ChunkStreamer
+from genai_helper import ChunkStreamer
 
 max_new_tokens = 256
 
@@ -62,7 +62,6 @@ def get_system_prompt(model_language, system_prompt=None):
         if (model_language == "Chinese")
         else (DEFAULT_SYSTEM_PROMPT_JAPANESE if (model_language == "Japanese") else DEFAULT_SYSTEM_PROMPT)
     )
-
 
 
 def make_demo(pipe, model_configuration, model_id, model_language, disable_advanced=False):

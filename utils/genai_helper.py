@@ -2,6 +2,7 @@ import openvino_genai as ov_genai
 import queue
 import sys
 
+
 class IterableStreamer(ov_genai.StreamerBase):
     """
     A custom streamer class for handling token streaming and detokenization with buffering.
@@ -128,7 +129,6 @@ class IterableStreamer(ov_genai.StreamerBase):
         self.decoded_lengths = []
         self._stop_flag = False
         super().reset()
-
 
 
 class ChunkStreamer(IterableStreamer):
