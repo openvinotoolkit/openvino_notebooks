@@ -7,7 +7,7 @@
 **Key Enhancements of Qwen2.5VL:**
 * **Understand things visually**: Qwen2.5-VL is not only proficient in recognizing common objects such as flowers, birds, fish, and insects, but it is highly capable of analyzing texts, charts, icons, graphics, and layouts within images.
 * **Being agentic**: Qwen2.5-VL directly plays as a visual agent that can reason and dynamically direct tools, which is capable of computer use and phone use.
-* **Understanding long videos and capturing events**: Qwen2.5-VL can comprehend videos of over 1 hour, and this time it has a new ability of cpaturing event by pinpointing the relevant video segments
+* **Understanding long videos and capturing events**: Qwen2.5-VL can comprehend videos of over 1 hour, and this time it has a new ability of capturing event by pinpointing the relevant video segments
 * **Capable of visual localization in different formats**: Qwen2.5-VL can accurately localize objects in an image by generating bounding boxes or points, and it can provide stable JSON outputs for coordinates and attributes.
 * **Generating structured outputs**: for data like scans of invoices, forms, tables, etc. Qwen2.5-VL supports structured outputs of their contents, benefiting usages in finance, commerce, etc.
 
@@ -16,11 +16,11 @@
 * **Precise Object Grounding**. Qwen2.5-VL utilizes bounding boxes and point-based representations for grounding, enabling hierarchical positioning and standardized JSON output. This enhanced localization capability serves as a foundation for visual reasoning.
 * **Enhanced Text Recognition and Understanding**. Qwen2.5-VL has upgraded its OCR recognition capabilities to a new level, with enhanced multi-scenario, multi-language and multi-orientation text recognition and text localization performance. Furthermore, it has been significantly enhanced in information extraction to meet the growing digitalized and intelligent demands in areas such as qualification review and financial business.
 * **Powerful Document Parsing**. Qwen2.5-VL has designed a unique document parsing format called QwenVL HTML format, which extracts layout information based on HTML. QwenVL HTML can perform document parsing in various scenarios, such as magazines, research papers, web pages, and even mobile screenshots.
-* **Enhanced Video Comprehension Ability**. Qwen2.5-VL’s video comprehension capabilities have been comprehensively upgraded. In terms of temporal processing, we have introduced dynamic frame rate (FPS) training and absolute time encoding technology. As a result, the model can not only support the understanding of ultra-long videos on an hourly scale but also achieve second-level event localization. It is capable of accurately comprehending content from long videos spanning hours, searching for specific events within videos, and summarizing key points from different time segments. This allows users to quickly and efficiently extract crucial information embedded in the videos.
+* **Enhanced Video Comprehension Ability**. Qwen2.5-VL video comprehension capabilities have been comprehensively upgraded. In terms of temporal processing, we have introduced dynamic frame rate (FPS) training and absolute time encoding technology. As a result, the model can not only support the understanding of ultra-long videos on an hourly scale but also achieve second-level event localization. It is capable of accurately comprehending content from long videos spanning hours, searching for specific events within videos, and summarizing key points from different time segments. This allows users to quickly and efficiently extract crucial information embedded in the videos.
 
 **Model Architecture Details:**
 
-Comparing with Qwen2VL, Qwen2.5VL architicture recieves following updates:
+Comparing with Qwen2VL, Qwen2.5VL architecture receives following updates:
 * **Dynamic Resolution and Frame Rate Training for Video Understanding**
 Extended dynamic resolution to the temporal dimension by adopting dynamic FPS sampling, enabling the model to comprehend videos at various sampling rates. Accordingly, mRoPE was updated in the time dimension with IDs and absolute time alignment, enabling the model to learn temporal sequence and speed, and ultimately acquire the ability to pinpoint specific moments.
 ![](https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen2.5-VL/qwen2.5vl_arc.jpeg)

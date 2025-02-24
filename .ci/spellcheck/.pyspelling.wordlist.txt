@@ -206,6 +206,7 @@ dGPU
 dGPUs
 DialoGPT
 diarization
+digitalized
 Diffusers
 diffusers
 dimensionality
@@ -395,6 +396,7 @@ intervaling
 im
 img
 ip
+IPs
 ir
 IRs
 iteratively
@@ -550,6 +552,7 @@ mpnet
 mpt
 MPT
 MRPC
+mRoPE
 MTVQA
 multiarchitecture
 Multiclass
@@ -807,6 +810,7 @@ Rinna
 rinna
 RLHF
 RMBG
+RMSNorm
 RoBERTa
 roberta
 ROI
@@ -1020,6 +1024,7 @@ vits
 VITS
 vitt
 VL
+VL’s
 vl
 vlm
 VLM
