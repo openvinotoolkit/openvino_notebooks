@@ -15,7 +15,7 @@ examples = [["astronauts.png", "Astronaut in a jungle, cold color palette, muted
 
 
 def make_demo(pipeline, generator_cls, image_to_tensor):
-    def infer(input_image, prompt, negative_prompt, seed, strength, randomize_seed, num_inference_steps, progress=gr.Progress(track_tqdm=True)):
+    def infer(input_image, prompt, negative_prompt, seed, strength, randomize_seed, num_inference_steps, use_custom_size, height, width, progress=gr.Progress(track_tqdm=True)):
         if randomize_seed:
             seed = np.random.randint(0, MAX_SEED)
 
@@ -25,9 +25,16 @@ def make_demo(pipeline, generator_cls, image_to_tensor):
         pbar = tqdm(total=math.ceil((num_inference_steps + 1) * strength))
 
         def callback(step, num_steps, latent):
+            if pbar.total != num_steps:
+                pbar.reset(total=num_steps)
             pbar.update(1)
             sys.stdout.flush()
             return False
+        additional_args = {}
+
+        if use_custom_size:
+            additional_args = {"height": height, "width": width}
+
 
         image_tensor = pipeline.generate(
             prompt,
@@ -37,6 +44,7 @@ def make_demo(pipeline, generator_cls, image_to_tensor):
             generator=generator,
             strength=strength,
             callback=callback,
+            **additional_args
         )
 
         return image_tensor.data[0], seed
@@ -93,12 +101,14 @@ def make_demo(pipeline, generator_cls, image_to_tensor):
                 step=1,
                 value=20,
             )
-
+            use_custom_size = gr.Checkbox(label="Use custom height and width", value=False)
+            width = gr.Slider(label="Width", minimum=256, maximum=MAX_IMAGE_SIZE, step=64, value=512)
+            height = gr.Slider(label="Height", minimum=256, maximum=MAX_IMAGE_SIZE, step=64, value=512)
         gr.Examples(examples=examples, inputs=[input_image, prompt])
         gr.on(
             triggers=[run_button.click, prompt.submit, negative_prompt.submit],
             fn=infer,
-            inputs=[input_image, prompt, negative_prompt, seed, strength, randomize_seed, num_inference_steps],
+            inputs=[input_image, prompt, negative_prompt, seed, strength, randomize_seed, num_inference_steps, use_custom_size, height, width],
             outputs=[result, seed],
         )
 
