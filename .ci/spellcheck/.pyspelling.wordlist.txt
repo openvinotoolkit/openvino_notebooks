@@ -565,6 +565,7 @@ multinomial
 MusicGen
 MuRAG
 Müller
+naflex
 Nakayosi
 nano
 nanoLLaVA
@@ -1028,6 +1029,7 @@ VL’s
 vl
 vlm
 VLM
+VLMs
 VLModel
 VLMPipeline
 VM
