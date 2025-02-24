@@ -5,18 +5,15 @@ from pathlib import Path
 import torch
 
 import openvino as ov
-import nncf
 
 
-def convert(model: torch.nn.Module, xml_path: str, example_input, model_name: str, to_compress_weights):
+def convert(model: torch.nn.Module, xml_path: str, example_input, model_name: str):
     xml_path = Path(xml_path)
     if not xml_path.exists():
         print(f"⌛ {model_name} conversion started")
         xml_path.parent.mkdir(parents=True, exist_ok=True)
         with torch.no_grad():
             converted_model = ov.convert_model(model, example_input=example_input)
-        if to_compress_weights:
-            converted_model = nncf.compress_weights(converted_model, mode=nncf.CompressWeightsMode.INT8_ASYM)
         ov.save_model(converted_model, xml_path)
         del model
         gc.collect()
@@ -29,15 +26,15 @@ def convert(model: torch.nn.Module, xml_path: str, example_input, model_name: st
         print(f"✅ Found converted {model_name} model")
 
 
-def convert_text_encoder(text_encoder, output_dir, to_compress_weights=True):
+def convert_text_encoder(text_encoder, output_dir):
     example_input = {
         "input_ids": torch.zeros(1, 128, dtype=torch.int64),
     }
 
-    convert(text_encoder, output_dir, example_input, "text_encoder", to_compress_weights)
+    convert(text_encoder, output_dir, example_input, "text_encoder")
 
 
-def convert_transformer(transformer, output_dir, to_compress_weights=True):
+def convert_transformer(transformer, output_dir):
 
     example_input = {
         "hidden_states": torch.rand([2, 2310, 128], dtype=torch.float32),
@@ -49,10 +46,10 @@ def convert_transformer(transformer, output_dir, to_compress_weights=True):
         "width": torch.tensor(22),
         "rope_interpolation_scale": torch.tensor([0.32, 32, 32]),
     }
-    convert(transformer, output_dir, example_input, "transformer", to_compress_weights)
+    convert(transformer, output_dir, example_input, "transformer")
 
 
-def convert_vae_decoder(vae_decoder, output_dir, to_compress_weights=True):
+def convert_vae_decoder(vae_decoder, output_dir):
     class VAEDecoderWrapper(torch.nn.Module):
         def __init__(self, vae):
             super().__init__()
@@ -61,7 +58,7 @@ def convert_vae_decoder(vae_decoder, output_dir, to_compress_weights=True):
         def forward(self, latents, timestamp):
             return self.vae.decode(latents)
 
-    convert(VAEDecoderWrapper(vae_decoder), output_dir, (torch.rand([1, 128, 7, 15, 22], dtype=torch.float32), torch.tensor(0)), "vae", to_compress_weights)
+    convert(VAEDecoderWrapper(vae_decoder), output_dir, (torch.rand([1, 128, 7, 15, 22], dtype=torch.float32), torch.tensor(0)), "vae")
 
 
 class ConvTransformerWrapper(torch.nn.Module):
