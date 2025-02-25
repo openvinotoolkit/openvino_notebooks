@@ -15,7 +15,19 @@ examples = [["astronauts.png", "Astronaut in a jungle, cold color palette, muted
 
 
 def make_demo(pipeline, generator_cls, image_to_tensor):
-    def infer(input_image, prompt, negative_prompt, seed, strength, randomize_seed, num_inference_steps, use_custom_size, height, width, progress=gr.Progress(track_tqdm=True)):
+    def infer(
+        input_image,
+        prompt,
+        negative_prompt,
+        seed,
+        strength,
+        randomize_seed,
+        num_inference_steps,
+        use_custom_size,
+        height,
+        width,
+        progress=gr.Progress(track_tqdm=True),
+    ):
         if randomize_seed:
             seed = np.random.randint(0, MAX_SEED)
 
@@ -30,11 +42,11 @@ def make_demo(pipeline, generator_cls, image_to_tensor):
             pbar.update(1)
             sys.stdout.flush()
             return False
+
         additional_args = {}
 
         if use_custom_size:
             additional_args = {"height": height, "width": width}
-
 
         image_tensor = pipeline.generate(
             prompt,
