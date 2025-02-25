@@ -31,12 +31,9 @@ This folder contains notebooks that demonstrate the use of the Stable Diffusion 
 The OpenVINO tutorial consists of the following steps:
 
 - Install prerequisites
-- Collect Pytorch model pipeline
 - Convert model to OpenVINO intermediate representation (IR) format and compress weights using NNCF
 - Prepare OpenVINO Inference pipeline
 - Run Text-to-Image generation
-- Optimize pipeline with [NNCF](https://github.com/openvinotoolkit/nncf/)
-- Compare the results of the original and optimized pipelines
 - Launch interactive demo
 
 The Torch FX tutorial consists of the following steps:
