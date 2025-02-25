@@ -43,4 +43,4 @@ def optimum_cli(model_id, output_dir, show_command=True, additional_args: Dict[s
     except subprocess.CalledProcessError as exc:
         logger = logging.getLogger()
         logger.exception(exc.stderr)
-        raise
+        raise exc
