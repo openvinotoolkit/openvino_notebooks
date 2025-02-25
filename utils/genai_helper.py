@@ -101,6 +101,7 @@ class IterableStreamer(ov_genai.StreamerBase):
                 word = text[self.print_len : print_until]
                 self.print_len = print_until
         self.put_word(word)
+        sys.stdout.flush()
 
         if self.get_stop_flag():
             # When generation is stopped from streamer then end is not called, need to call it here manually.
@@ -128,12 +129,10 @@ class IterableStreamer(ov_genai.StreamerBase):
         self.print_len = 0
         self.decoded_lengths = []
         self._stop_flag = False
-        super().reset()
-
 
 class ChunkStreamer(IterableStreamer):
 
-    def __init__(self, tokenizer, tokens_len):
+    def __init__(self, tokenizer, tokens_len=2):
         super().__init__(tokenizer)
         self.tokens_len = tokens_len
 
