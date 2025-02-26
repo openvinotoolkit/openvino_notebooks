@@ -1,4 +1,3 @@
-
 from copy import deepcopy
 from typing import Dict, List
 from PIL import Image
@@ -10,8 +9,8 @@ import gradio as gr
 IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".webp")
 AUDIO_EXTENSIONS = (".mp3", ".wav", "flac", ".m4a", ".wma")
 
-IMAGE_SPECIAL = '<|endoftext10|>'
-AUDIO_SPECIAL = '<|endoftext11|>'
+IMAGE_SPECIAL = "<|endoftext10|>"
+AUDIO_SPECIAL = "<|endoftext11|>"
 
 DEFAULT_SAMPLING_PARAMS = {
     "top_p": 0.0,
@@ -22,7 +21,6 @@ DEFAULT_SAMPLING_PARAMS = {
     "repetition_penalty": 1.2,
 }
 MAX_NEW_TOKENS = 512
-
 
 
 def history2messages(history: List[Dict]) -> List[Dict]:
@@ -65,6 +63,7 @@ def history2messages(history: List[Dict]) -> List[Dict]:
         messages.append(cur_message)
     return messages, images, audios
 
+
 def check_messages(history, message, audio):
     has_text = message["text"] and message["text"].strip()
     has_files = len(message["files"]) > 0
@@ -72,7 +71,7 @@ def check_messages(history, message, audio):
 
     if not (has_text or has_files or has_audio):
         raise gr.Error("Message is empty")
-        
+
     audios = []
     images = []
 
@@ -110,8 +109,9 @@ def check_messages(history, message, audio):
 
     if message["text"]:
         history.append({"role": "user", "content": message["text"], "metadata": {}})
-        
+
     return history, gr.MultimodalTextbox(value=None, interactive=False), None
+
 
 def make_demo(ov_model, processor):
     def bot(
@@ -130,7 +130,7 @@ def make_demo(ov_model, processor):
 
         if not history:
             return history
-        
+
         msgs, images, audios = history2messages(history)
         audios = audios if len(audios) > 0 else None
         images = images if len(images) > 0 else None
@@ -146,14 +146,12 @@ def make_demo(ov_model, processor):
             "temperature": temperature,
             "repetition_penalty": repetition_penalty,
             "max_new_tokens": max_new_tokens,
-            "do_sample": temperature > 0, 
+            "do_sample": temperature > 0,
             "streamer": streamer,
-            **inputs
+            **inputs,
         }
 
         history.append({"role": "assistant", "content": ""})
-
-
 
         thread = Thread(target=ov_model.generate, kwargs=generation_params)
         thread.start()
@@ -169,13 +167,12 @@ def make_demo(ov_model, processor):
 
     def reset_user_input():
         return gr.update(value="")
-    
+
     with gr.Blocks(theme=gr.themes.Soft()) as demo:
         gr.Markdown("# 🪐 Chat with OpenVINO Phi-4-multimodal")
-        chatbot = gr.Chatbot(elem_id="chatbot", bubble_full_width=False, type="messages", height='48vh')
+        chatbot = gr.Chatbot(elem_id="chatbot", bubble_full_width=False, type="messages", height="48vh")
 
         sampling_params_group_hidden_state = gr.State(False)
-
 
         with gr.Row(equal_height=True):
             chat_input = gr.MultimodalTextbox(
@@ -188,12 +185,7 @@ def make_demo(ov_model, processor):
                 # stop_btn=True,
             )
         with gr.Row(equal_height=True):
-            audio_input = gr.Audio(
-                sources=["microphone", "upload"],
-                type="filepath",
-                scale=1,
-                max_length=30
-            )
+            audio_input = gr.Audio(sources=["microphone", "upload"], type="filepath", scale=1, max_length=30)
         with gr.Row(equal_height=True):
             with gr.Column(scale=1, min_width=150):
                 with gr.Row(equal_height=True):
@@ -205,9 +197,7 @@ def make_demo(ov_model, processor):
 
         with gr.Group(visible=False) as sampling_params_group:
             with gr.Row():
-                temperature = gr.Slider(
-                    minimum=0, maximum=1, value=DEFAULT_SAMPLING_PARAMS["temperature"], label="Temperature"
-                )
+                temperature = gr.Slider(minimum=0, maximum=1, value=DEFAULT_SAMPLING_PARAMS["temperature"], label="Temperature")
                 repetition_penalty = gr.Slider(
                     minimum=0,
                     maximum=2,
@@ -234,9 +224,9 @@ def make_demo(ov_model, processor):
             [sampling_params_group, sampling_params_group_hidden_state],
         )
         chat_msg = chat_input.submit(
-                check_messages,
-                [chatbot, chat_input, audio_input],
-                [chatbot, chat_input, audio_input],
+            check_messages,
+            [chatbot, chat_input, audio_input],
+            [chatbot, chat_input, audio_input],
         )
 
         bot_msg = chat_msg.then(

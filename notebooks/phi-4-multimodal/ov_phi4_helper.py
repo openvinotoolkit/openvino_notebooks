@@ -16,19 +16,20 @@ import shutil
 
 VISION_EMBEDDINGS_PATH = "openvino_vision_embeddings_model.xml"
 VISION_PROJECTOR_PATH = "openvino_vision_projection_model.xml"
-TEXT_EMBEDDINGS_PATH =  "openvino_text_embeddings_model.xml"
+TEXT_EMBEDDINGS_PATH = "openvino_text_embeddings_model.xml"
 LM_PATH = "openvino_language_model.xml"
-AUDIO_EMBEDDINGS_PATH =  "openvino_audio_embeddings_model.xml"
+AUDIO_EMBEDDINGS_PATH = "openvino_audio_embeddings_model.xml"
 AUDIO_FORWARD_EMBEDDINGS_PATH = "openvino_audio_forward_embeddings_model.xml"
 AUDIO_ENCODER_PATH = "openvino_audio_encoder_model.xml"
 AUDIO_VISION_PROJECTOR_PATH = "openvino_audio_vision_projection_model.xml"
 AUDIO_SPEECH_PROJECTOR_PATH = "openvino_audio_text_projection_model.xml"
 
-user_prompt = '<|user|>'
-assistant_prompt = '<|assistant|>'
-prompt_suffix = '<|end|>'
-IMAGE_SPECIAL = '<|endoftext10|>'
-AUDIO_SPECIAL = '<|endoftext11|>'
+user_prompt = "<|user|>"
+assistant_prompt = "<|assistant|>"
+prompt_suffix = "<|end|>"
+IMAGE_SPECIAL = "<|endoftext10|>"
+AUDIO_SPECIAL = "<|endoftext11|>"
+
 
 class InputMode(Enum):
     LANGUAGE = 0
@@ -36,16 +37,18 @@ class InputMode(Enum):
     SPEECH = 2
     VISION_SPEECH = 3
 
+
 _IMAGE_SPECIAL_TOKEN_ID = 200010  # '<|endoftext10|>', or we can better name it (in `tokenizer_config.json`)
 _AUDIO_SPECIAL_TOKEN_ID = 200011  # '<|endoftext11|>'
 _COMPATIBLE_IMAGE_SPECIAL_TOKEN_ID_RANGE = [-9999, -1]  # For backward compatibility
-_COMPATIBLE_AUDIO_SPECIAL_TOKEN_ID_RANGE = [float('-inf'), -10000]  # For backward compatibility
+_COMPATIBLE_AUDIO_SPECIAL_TOKEN_ID_RANGE = [float("-inf"), -10000]  # For backward compatibility
 
 quantization_config = {
-        "vision": {"mode": nncf.CompressWeightsMode.INT8_ASYM},
-        "llm": {"mode": nncf.CompressWeightsMode.INT4_SYM, "group_size": 64, "ratio": 1.0},
-        "audio": {"mode": nncf.CompressWeightsMode.INT8_ASYM}
-    }
+    "vision": {"mode": nncf.CompressWeightsMode.INT8_ASYM},
+    "llm": {"mode": nncf.CompressWeightsMode.INT4_SYM, "group_size": 64, "ratio": 1.0},
+    "audio": {"mode": nncf.CompressWeightsMode.INT8_ASYM},
+}
+
 
 def model_has_state(ov_model: ov.Model):
     return len(ov_model.get_sinks()) > 0
@@ -71,7 +74,13 @@ def get_vision_position_ids(pixel_values, patch_attention_mask, patch_size=14, n
     max_im_h, max_im_w = pixel_values.size(2), pixel_values.size(3)
     max_nb_patches_h, max_nb_patches_w = max_im_h // patch_size, max_im_w // patch_size
     boundaries = torch.arange(1 / num_patches_per_side, 1.0, 1 / num_patches_per_side)
-    position_ids = torch.full(size=(batch_size, max_nb_patches_h * max_nb_patches_w,), fill_value=0)
+    position_ids = torch.full(
+        size=(
+            batch_size,
+            max_nb_patches_h * max_nb_patches_w,
+        ),
+        fill_value=0,
+    )
 
     for batch_idx, p_attn_mask in enumerate(patch_attention_mask):
         nb_patches_h = p_attn_mask[:, 0].sum()
@@ -235,6 +244,7 @@ def patch_stateful(ov_model):
         None,
     )
 
+
 def unfold_tensor(xs_pad, max_seq_len):
     """
     For a given tensor with shape of (N, T, D), if sequence length T is longer than max_seq_len,
@@ -243,7 +253,7 @@ def unfold_tensor(xs_pad, max_seq_len):
         xs_pad: N, T, D
     """
     _, _, D = xs_pad.shape
-    xs_pad = xs_pad.transpose(-1, -2) # convert to N, D, T
+    xs_pad = xs_pad.transpose(-1, -2)  # convert to N, D, T
     # N x D x 1 x T => N x (D x max_seq_len) x T'
     xs_pad = torch.nn.functional.unfold(
         xs_pad[..., None, :],
@@ -260,12 +270,32 @@ def unfold_tensor(xs_pad, max_seq_len):
     xs_pad = xs_pad.view(-1, max_seq_len, D)
     return xs_pad
 
+
 def convert_phi4o(input_dir, output_dir, quantization_config=None):
     output_dir = Path(output_dir)
-    all_converted = all([(output_dir / submodel_path).exists() for submodel_path in [VISION_EMBEDDINGS_PATH, VISION_PROJECTOR_PATH, TEXT_EMBEDDINGS_PATH, LM_PATH, AUDIO_EMBEDDINGS_PATH, AUDIO_FORWARD_EMBEDDINGS_PATH, AUDIO_ENCODER_PATH,  AUDIO_SPEECH_PROJECTOR_PATH, AUDIO_VISION_PROJECTOR_PATH, AUDIO_ENCODER_PATH, AUDIO_FORWARD_EMBEDDINGS_PATH]])
+    all_converted = all(
+        [
+            (output_dir / submodel_path).exists()
+            for submodel_path in [
+                VISION_EMBEDDINGS_PATH,
+                VISION_PROJECTOR_PATH,
+                TEXT_EMBEDDINGS_PATH,
+                LM_PATH,
+                AUDIO_EMBEDDINGS_PATH,
+                AUDIO_FORWARD_EMBEDDINGS_PATH,
+                AUDIO_ENCODER_PATH,
+                AUDIO_SPEECH_PROJECTOR_PATH,
+                AUDIO_VISION_PROJECTOR_PATH,
+                AUDIO_ENCODER_PATH,
+                AUDIO_FORWARD_EMBEDDINGS_PATH,
+            ]
+        ]
+    )
     if all_converted:
-        print(f"Model already converted and can be found in {output_dir}")
+        print(f"✅ {input_dir} model already converted. You can find results in {output_dir}")
         return
+    print(f"⌛ {input_dir} conversion started. Be patient, it may takes some time.")
+    print("⌛ Load Original model")
     config = AutoConfig.from_pretrained(input_dir, trust_remote_code=True)
     if "activation_checkpointing" in config.audio_processor["config"]:
         config.audio_processor["config"]["activation_checkpointing"] = ""
@@ -287,22 +317,28 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
     model.config.image_dim_out = model.model.embed_tokens_extend.image_embed.image_dim_out
     model.config.hd_transform_order = model.model.embed_tokens_extend.image_embed.hd_transform_order
     model.config.save_pretrained(output_dir)
+    print("✅ Original model successfully loaded")
 
     if not (output_dir / TEXT_EMBEDDINGS_PATH).exists():
+        print("⌛ Convert Input embedding model")
         ov_model = ov.convert_model(model.model.embed_tokens, example_input=torch.ones([2, 2], dtype=torch.long))
         ov.save_model(ov_model, output_dir / TEXT_EMBEDDINGS_PATH)
-    
+        print("✅ Input embedding model successfully converted")
+
     if not (output_dir / LM_PATH).exists():
+        print("⌛ Convert Language model")
+
         def lm_forward(self, inputs_embeds, attention_mask, position_ids, past_key_values):
             num_logits_to_keep = 1
             from transformers.cache_utils import DynamicCache
+
             pkv = DynamicCache.from_legacy_cache(past_key_values)
             outputs = self.model(inputs_embeds=inputs_embeds, attention_mask=attention_mask, position_ids=position_ids, use_cache=True, past_key_values=pkv)
             hidden_states = outputs[0]
             # Only compute necessary logits, and do not upcast them to float if we are not computing the loss
             logits = self.lm_head(hidden_states[:, -num_logits_to_keep:, :])
             return (logits, outputs.past_key_values.to_legacy_cache())
-        
+
         model.forward = types.MethodType(lm_forward, model)
         inputs_embeds = torch.zeros([2, 2, model.config.hidden_size], dtype=torch.float32)
         attention_mask = torch.ones([2, 4], dtype=torch.long)
@@ -317,11 +353,11 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
             pkv_inputs.append((torch.randn(shape), torch.randn(shape)))
             pkv_input_names.extend([f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"])
             pkv_output_names.extend([f"present.{idx}.key", f"present.{idx}.value"])
-        
-        model_inputs = [ "inputs_embeds", "attention_mask", "position_ids", *pkv_input_names]
+
+        model_inputs = ["inputs_embeds", "attention_mask", "position_ids", *pkv_input_names]
         model_outputs = ["logits", *pkv_output_names]
 
-        dummy_inputs = { "inputs_embeds": inputs_embeds, "attention_mask": attention_mask, "position_ids": position_ids, "past_key_values": pkv_inputs}
+        dummy_inputs = {"inputs_embeds": inputs_embeds, "attention_mask": attention_mask, "position_ids": position_ids, "past_key_values": pkv_inputs}
         ov_model = ov.convert_model(model, example_input=dummy_inputs)
         for input, input_name in zip(ov_model.inputs, model_inputs):
             input.get_tensor().set_names({input_name})
@@ -333,28 +369,29 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
         if quantization_config is not None and "llm" in quantization_config:
             ov_model = nncf.compress_weights(ov_model, **quantization_config["llm"])
         ov.save_model(ov_model, output_dir / LM_PATH)
-    
+        print("✅ Language model successfully converted")
+
+    print("⌛ Convert Audio embedding model")
     if not (output_dir / AUDIO_EMBEDDINGS_PATH).exists():
         ov_model = ov.convert_model(model.model.embed_tokens_extend.audio_embed.encoder.encoder_embedding, example_input=torch.ones([1, 1233, 80]))
         ov.save_model(ov_model, output_dir / AUDIO_EMBEDDINGS_PATH)
     if not (output_dir / AUDIO_FORWARD_EMBEDDINGS_PATH).exists():
+
         def forward(self, input_tensor):
             input_tensor, masks = self._forward_embeddings_core(input_tensor, None)
             return input_tensor
-        
+
         model.model.embed_tokens_extend.audio_embed.encoder.forward = types.MethodType(forward, model.model.embed_tokens_extend.audio_embed.encoder)
 
         ov_model = ov.convert_model(model.model.embed_tokens_extend.audio_embed.encoder, example_input=torch.ones([1, 498, 80]))
         ov.save_model(ov_model, output_dir / AUDIO_FORWARD_EMBEDDINGS_PATH)
-    
+
     if not (output_dir / AUDIO_ENCODER_PATH).exists():
+
         def forward(self, input_tensor, hs_mask):
             relative_attention_bias = self.init_relative_attention_bias(input_tensor)
 
-            _simplified_path = (
-                self.extra_layer_output_idx == -1
-                and relative_attention_bias is None
-            )
+            _simplified_path = self.extra_layer_output_idx == -1 and relative_attention_bias is None
 
             if _simplified_path:
                 input_tensor, *_ = self.encoders(input_tensor, None, None, hs_mask)
@@ -371,10 +408,12 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
                     if i == self.extra_layer_output_idx:
                         layer_emb = input_tensor
             return input_tensor
-        
+
         model.model.embed_tokens_extend.audio_embed.encoder.forward = types.MethodType(forward, model.model.embed_tokens_extend.audio_embed.encoder)
 
-        ov_model = ov.convert_model(model.model.embed_tokens_extend.audio_embed.encoder, example_input=(torch.ones([1, 63, 1024]), torch.ones([1, 63, 63], dtype=torch.bool)))
+        ov_model = ov.convert_model(
+            model.model.embed_tokens_extend.audio_embed.encoder, example_input=(torch.ones([1, 63, 1024]), torch.ones([1, 63, 63], dtype=torch.bool))
+        )
 
         if quantization_config and "audio" in quantization_config:
             ov_model = nncf.compress_weights(ov_model, **quantization_config["audio"])
@@ -385,9 +424,12 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
     if not (output_dir / AUDIO_VISION_PROJECTOR_PATH).exists():
         ov_model = ov.convert_model(model.model.embed_tokens_extend.audio_embed.audio_projection["vision"], example_input=torch.ones([1, 155, 1024]))
         ov.save_model(ov_model, output_dir / AUDIO_VISION_PROJECTOR_PATH)
+
+    print("✅ Audio embedding model successfully converted")
+    print("⌛ Convert Image embedding model")
     vision_embed_model = model.model.embed_tokens_extend.image_embed
     if not (output_dir / VISION_EMBEDDINGS_PATH).exists():
-        prompt = f'{user_prompt}{IMAGE_SPECIAL}What is shown in this image?{prompt_suffix}{assistant_prompt}'
+        prompt = f"{user_prompt}{IMAGE_SPECIAL}What is shown in this image?{prompt_suffix}{assistant_prompt}"
         image_path = Path("cat.png")
 
         if not image_path.exists():
@@ -396,10 +438,11 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
             image.save(image_path)
         else:
             image = Image.open(image_path)
-        inputs = processor(text=prompt, images=image, return_tensors='pt')
+        inputs = processor(text=prompt, images=image, return_tensors="pt")
         pixel_values = inputs["input_image_embeds"].flatten(0, 1)
         attention_mask = inputs["image_attention_mask"].flatten(0, 1).to(torch.bool)
         position_ids = get_vision_position_ids(pixel_values, attention_mask)
+
         def get_img_features(self, img_embeds: torch.FloatTensor, attention_mask=None, position_ids=None) -> torch.FloatTensor:
             LAYER_IDX = self.layer_idx
             TYPE_FEATURE = self.type_feature
@@ -407,13 +450,17 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
             if self.freeze_img_processor:
                 with torch.no_grad():
                     if attention_mask is not None:
-                        img_processor_output = self.img_processor(img_embeds, output_hidden_states=True, patch_attention_mask=attention_mask, position_ids=position_ids)
+                        img_processor_output = self.img_processor(
+                            img_embeds, output_hidden_states=True, patch_attention_mask=attention_mask, position_ids=position_ids
+                        )
                     else:
                         img_processor_output = self.img_processor(img_embeds, output_hidden_states=True, position_ids=position_ids)
                     img_feature = img_processor_output.hidden_states[LAYER_IDX]
             else:
                 if attention_mask is not None:
-                    img_processor_output = self.img_processor(img_embeds, output_hidden_states=True, patch_attention_mask=attention_mask, position_ids=position_ids)
+                    img_processor_output = self.img_processor(
+                        img_embeds, output_hidden_states=True, patch_attention_mask=attention_mask, position_ids=position_ids
+                    )
                 else:
                     img_processor_output = self.img_processor(img_embeds, output_hidden_states=True, position_ids=position_ids)
                 img_feature = img_processor_output.hidden_states[LAYER_IDX]
@@ -426,13 +473,13 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
                     patch_feature = patch_feature.view(-1, width, width, patch_feature.size(-1))
                     # convert to NCHW
                     patch_feature = patch_feature.permute(0, 3, 1, 2)
-                    if getattr(self, 'img_processor_padding', None) is not None:
+                    if getattr(self, "img_processor_padding", None) is not None:
                         patch_feature = self.img_processor_padding(patch_feature)
                     patch_feature = self.image_token_compression(patch_feature)
                     # convert to NHWC
                     patch_feature = patch_feature.permute(0, 2, 3, 1)
                     patch_feature = patch_feature.view(-1, patch_feature.size(1) * patch_feature.size(2), patch_feature.size(-1))
-                elif getattr(self, 'img_processor_padding', None) is not None:
+                elif getattr(self, "img_processor_padding", None) is not None:
                     width = int(math.sqrt(patch_feature.size(1)))
                     patch_feature = patch_feature.view(-1, width, width, patch_feature.size(-1))
                     # convert to NCHW
@@ -454,8 +501,9 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
                     patch_feature = patch_feature.view(-1, patch_feature.size(-2) * patch_feature.size(-1))
                     img_feature = torch.cat([cls_feature, patch_feature], dim=1)
                 return img_feature
+
         vision_embed_model.forward = types.MethodType(get_img_features, vision_embed_model)
-        
+
         def transformer_fwd(
             self,
             pixel_values,
@@ -466,10 +514,9 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
             return_dict: Optional[bool] = None,
         ) -> Union[Tuple, BaseModelOutputWithPooling]:
             from transformers.modeling_attn_mask_utils import _prepare_4d_attention_mask
+
             output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
-            output_hidden_states = (
-                output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
-            )
+            output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
             return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
             batch_size = pixel_values.size(0)
@@ -491,7 +538,7 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
             # So when the `patch_attention_mask` is full of 1s (i.e. attending to the whole sequence),
             # avoiding passing the attention_mask, which is equivalent to attending to the full sequence
             if not torch.any(~patch_attention_mask):
-                attention_mask=None
+                attention_mask = None
             else:
                 attention_mask = _prepare_4d_attention_mask(patch_attention_mask, hidden_states.dtype)
 
@@ -521,14 +568,13 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
                 attentions=encoder_outputs.attentions,
             )
 
-
         def attn_forward(
             self,
             hidden_states: torch.Tensor,
             attention_mask: Optional[torch.Tensor] = None,
             output_attentions: Optional[bool] = False,
         ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
-    
+
             if output_attentions:
                 return super().forward(
                     hidden_states=hidden_states,
@@ -614,8 +660,9 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
         vision_embed_model.img_processor.forward = types.MethodType(transformer_fwd, vision_embed_model.img_processor)
         vision_embed_model.img_processor.embeddings.forward = types.MethodType(embd_forward, vision_embed_model.img_processor.embeddings)
 
-
-        ov_model = ov.convert_model(vision_embed_model, example_input={"img_embeds": pixel_values, "attention_mask": attention_mask, "position_ids": position_ids })
+        ov_model = ov.convert_model(
+            vision_embed_model, example_input={"img_embeds": pixel_values, "attention_mask": attention_mask, "position_ids": position_ids}
+        )
         if quantization_config and "vision" in quantization_config:
             ov_model = nncf.compress_weights(ov_model, **quantization_config["vision"])
         ov.save_model(ov_model, output_dir / VISION_EMBEDDINGS_PATH)
@@ -624,9 +671,9 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
         ov_model = ov.convert_model(vision_embed_model.img_projection, example_input=torch.zeros([1, 1841, 1152]))
         ov.save_model(ov_model, output_dir / VISION_PROJECTOR_PATH)
 
-    print(f"Model successfully converted and can be found in {output_dir}")
+    print("✅ Image embedding model successfully converted")
+    print(f"✅ Model successfully converted and can be found in {output_dir}")
 
-#convert_phi4o(Path("."), Path("./phi-4-mini-multimodal-instruct-int4-ov"), quantization_config=quantization_config)
 
 def adaptive_enc_mask(x_len, chunk_start_idx, left_window=0, right_window=0):
     """
@@ -647,21 +694,13 @@ def adaptive_enc_mask(x_len, chunk_start_idx, left_window=0, right_window=0):
                     [False., True., True., False.],
                     [False., False., True., True.]])
     """
-    chunk_start_idx = torch.Tensor(
-        chunk_start_idx
-    ).long()  # first idx of each chunk, such as [0,18,36,48].
-    start_pad = torch.nn.functional.pad(
-        chunk_start_idx, (1, 0)
-    )  # append 0 to the beginning, so it becomes [0, 0, 18, 36, 48]
-    end_pad = torch.nn.functional.pad(
-        chunk_start_idx, (0, 1), value=x_len
-    )  # append x_len to the end, so it becomes [0,18,36,48, x_len]
+    chunk_start_idx = torch.Tensor(chunk_start_idx).long()  # first idx of each chunk, such as [0,18,36,48].
+    start_pad = torch.nn.functional.pad(chunk_start_idx, (1, 0))  # append 0 to the beginning, so it becomes [0, 0, 18, 36, 48]
+    end_pad = torch.nn.functional.pad(chunk_start_idx, (0, 1), value=x_len)  # append x_len to the end, so it becomes [0,18,36,48, x_len]
     seq_range = torch.arange(0, x_len).unsqueeze(-1)  # seq_range size: [x_len, 1]
     idx = ((seq_range < end_pad) & (seq_range >= start_pad)).nonzero()[:, 1]  # idx size: [x_len]
     boundary = end_pad[idx]  # boundary size: [x_len]
-    seq_range_expand = (
-        torch.arange(0, x_len).unsqueeze(0).expand(x_len, -1)
-    )  # seq_range_expand size [x_len, x_len]
+    seq_range_expand = torch.arange(0, x_len).unsqueeze(0).expand(x_len, -1)  # seq_range_expand size [x_len, x_len]
     idx_left = idx - left_window
     idx_left[idx_left < 0] = 0
     boundary_left = start_pad[idx_left]
@@ -672,7 +711,9 @@ def adaptive_enc_mask(x_len, chunk_start_idx, left_window=0, right_window=0):
     mask_right = seq_range_expand < boundary_right.unsqueeze(-1)
     return mask_left & mask_right
 
+
 core = ov.Core()
+
 
 class OVModelForCausalLMWithEmb(GenerationMixin):
     def __init__(self, model_dir, device="CPU", config=None, ov_config=None, compile=True) -> None:
@@ -838,7 +879,6 @@ class OVModelForCausalLMWithEmb(GenerationMixin):
                 position_ids = position_ids[:, -input_ids.shape[1] :]
         cache_position = torch.arange(past_len, past_len + position_ids.shape[-1], device=position_ids.device)
 
-
         model_inputs = {
             "input_ids": input_ids,
             "past_key_values": past_key_values,
@@ -846,7 +886,7 @@ class OVModelForCausalLMWithEmb(GenerationMixin):
             "position_ids": position_ids,
             "attention_mask": attention_mask,
             "inputs_embeds": inputs_embeds if past_key_values is None else None,
-            "cache_position": cache_position 
+            "cache_position": cache_position,
         }
 
         return model_inputs
@@ -926,7 +966,7 @@ class OVPhioModelForCausalLM(GenerationMixin):
         input_mode=None,
         use_cache: Optional[bool] = None,
         cache_position: Optional[torch.LongTensor] = None,
-        return_dict: Optional[bool] = None
+        return_dict: Optional[bool] = None,
     ):
         audio_projection_mode = None
         if input_audio_embeds is not None:
@@ -936,14 +976,11 @@ class OVPhioModelForCausalLM(GenerationMixin):
             input_mode = InputMode(input_mode)
 
             if input_mode in [InputMode.VISION_SPEECH, InputMode.VISION]:
-                #self.set_lora_adapter('vision')
-                audio_projection_mode = 'vision'
+                audio_projection_mode = "vision"
             elif input_mode == InputMode.SPEECH:
-                #self.set_lora_adapter('speech')
-                audio_projection_mode = 'speech'
+                audio_projection_mode = "speech"
             elif input_mode == InputMode.LANGUAGE:
-                #self.unset_lora_adapter()
-                audio_projection_mode = 'speech'
+                audio_projection_mode = "speech"
             else:
                 raise ValueError(f"Invalid input_mode: {input_mode}")
         if inputs_embeds is None:
@@ -957,40 +994,42 @@ class OVPhioModelForCausalLM(GenerationMixin):
                 audio_embed_sizes=audio_embed_sizes,
                 audio_attention_mask=audio_attention_mask,
                 audio_projection_mode=audio_projection_mode,
-                past_key_values=past_key_values
+                past_key_values=past_key_values,
             )
-        return self.model.forward(input_ids=None, inputs_embeds=inputs_embeds, attention_mask=attention_mask, position_ids=position_ids, past_key_values=past_key_values)
+        return self.model.forward(
+            input_ids=None, inputs_embeds=inputs_embeds, attention_mask=attention_mask, position_ids=position_ids, past_key_values=past_key_values
+        )
 
-    def embed_tokens_extend(self, input_ids: torch.LongTensor,
+    def embed_tokens_extend(
+        self,
+        input_ids: torch.LongTensor,
         input_embeds,
-        input_image_embeds: torch.FloatTensor=None,
-        input_audio_embeds: torch.FloatTensor=None,
+        input_image_embeds: torch.FloatTensor = None,
+        input_audio_embeds: torch.FloatTensor = None,
         image_sizes=None,
         image_attention_mask=None,
         audio_embed_sizes=None,
         audio_attention_mask=None,
-        audio_projection_mode='speech',
-        past_key_values=None    
+        audio_projection_mode="speech",
+        past_key_values=None,
     ):
         if past_key_values is not None:
             return self.model.embed_tokens(input_ids)
-        
+
         MAX_INPUT_ID = int(1e9)
-        
+
         new_input_ids = input_ids.clone()
-        new_input_ids[
-            (input_ids >= _COMPATIBLE_IMAGE_SPECIAL_TOKEN_ID_RANGE[0]) & 
-            (input_ids <= _COMPATIBLE_IMAGE_SPECIAL_TOKEN_ID_RANGE[1])] = _IMAGE_SPECIAL_TOKEN_ID
-        new_input_ids[(input_ids >= _COMPATIBLE_AUDIO_SPECIAL_TOKEN_ID_RANGE[0]) &
-                      (input_ids <= _COMPATIBLE_AUDIO_SPECIAL_TOKEN_ID_RANGE[1])] = _AUDIO_SPECIAL_TOKEN_ID
+        new_input_ids[(input_ids >= _COMPATIBLE_IMAGE_SPECIAL_TOKEN_ID_RANGE[0]) & (input_ids <= _COMPATIBLE_IMAGE_SPECIAL_TOKEN_ID_RANGE[1])] = (
+            _IMAGE_SPECIAL_TOKEN_ID
+        )
+        new_input_ids[(input_ids >= _COMPATIBLE_AUDIO_SPECIAL_TOKEN_ID_RANGE[0]) & (input_ids <= _COMPATIBLE_AUDIO_SPECIAL_TOKEN_ID_RANGE[1])] = (
+            _AUDIO_SPECIAL_TOKEN_ID
+        )
         input_ids = new_input_ids
         image_position_mask = input_ids == _IMAGE_SPECIAL_TOKEN_ID
         non_image_position_mask = ~image_position_mask
         image_hidden_states = self.image_embed(
-            input_ids=input_ids,
-            input_embeds=input_image_embeds,
-            image_sizes=image_sizes,
-            image_attention_mask=image_attention_mask
+            input_ids=input_ids, input_embeds=input_image_embeds, image_sizes=image_sizes, image_attention_mask=image_attention_mask
         )
         audio_hidden_states = self.audio_embed(
             input_ids=input_ids,
@@ -1009,11 +1048,11 @@ class OVPhioModelForCausalLM(GenerationMixin):
             input_ids, input_embeds = input_ids
 
         img_embeds = input_embeds
-        if image_sizes is None and 'image_sizes' in kwargs:
-            image_sizes = kwargs['image_sizes']
+        if image_sizes is None and "image_sizes" in kwargs:
+            image_sizes = kwargs["image_sizes"]
         img_sizes = image_sizes
-        if 'image_attention_mask' in kwargs:
-            image_attention_mask = kwargs['image_attention_mask']
+        if "image_attention_mask" in kwargs:
+            image_attention_mask = kwargs["image_attention_mask"]
         else:
             image_attention_mask = None
         input_shape = input_ids.size()
@@ -1029,13 +1068,13 @@ class OVPhioModelForCausalLM(GenerationMixin):
         if len(positions.tolist()) > 0:
             if self.config.embd_layer["image_embd_layer"]["use_hd_transform"] and img_sizes is not None and len(img_sizes):
                 hd_transform = True
-                assert img_embeds.ndim == 5, f'(branch 1) img_embeds size: {img_embeds.size()}, expect 5D tensor for hd transform'
+                assert img_embeds.ndim == 5, f"(branch 1) img_embeds size: {img_embeds.size()}, expect 5D tensor for hd transform"
                 # img_embeds: (num_images, max_num_crops, 3, H, W)
                 # img_sizes: (num_images, 2).view(1, -1)
 
                 bs = img_embeds.shape[0]
                 pixel_values = img_embeds.flatten(0, 1)
-                patch_attn_mask = image_attention_mask.type(torch.BoolTensor).flatten(0,1)
+                patch_attn_mask = image_attention_mask.type(torch.BoolTensor).flatten(0, 1)
                 v_position_ids = get_vision_position_ids(pixel_values, patch_attn_mask)
                 # Nx(HW)xC
                 img_features = torch.from_numpy(self.vision_embedings([pixel_values, patch_attn_mask, v_position_ids])[0])
@@ -1046,7 +1085,9 @@ class OVPhioModelForCausalLM(GenerationMixin):
 
                 base_feat_height = base_feat_width = int(np.sqrt(img_features.shape[1]))
 
-                assert base_feat_height == base_feat_height_target and base_feat_width == base_feat_height_target, f'base_feat_height: {base_feat_height}, base_feat_width: {base_feat_width}, expect {base_feat_height_target} features for hd transform'
+                assert (
+                    base_feat_height == base_feat_height_target and base_feat_width == base_feat_height_target
+                ), f"base_feat_height: {base_feat_height}, base_feat_width: {base_feat_width}, expect {base_feat_height_target} features for hd transform"
 
                 # bs x max_num_crops x (24x24) x C
                 img_features = img_features.view(bs, -1, base_feat_height * base_feat_width, self.config.image_dim_out)
@@ -1068,11 +1109,20 @@ class OVPhioModelForCausalLM(GenerationMixin):
                     global_img_feature = img_features[_bs, :1]
 
                     # 1 x 12 x 12 x 4096
-                    glb_img = global_img_feature.reshape(1,H,H,C).reshape(1,H//base_feat_height_reduction,base_feat_height_reduction,H//base_feat_height_reduction,base_feat_height_reduction,C).contiguous().permute(0,1,3,2,4,5).reshape(1,H//base_feat_height_reduction,H//base_feat_height_reduction,base_feat_height_reduction*base_feat_height_reduction*C).contiguous()
-                    temp_glb_GN = self.sub_GN.repeat(1, H//base_feat_height_reduction, 1, 1)
+                    glb_img = (
+                        global_img_feature.reshape(1, H, H, C)
+                        .reshape(1, H // base_feat_height_reduction, base_feat_height_reduction, H // base_feat_height_reduction, base_feat_height_reduction, C)
+                        .contiguous()
+                        .permute(0, 1, 3, 2, 4, 5)
+                        .reshape(
+                            1, H // base_feat_height_reduction, H // base_feat_height_reduction, base_feat_height_reduction * base_feat_height_reduction * C
+                        )
+                        .contiguous()
+                    )
+                    temp_glb_GN = self.sub_GN.repeat(1, H // base_feat_height_reduction, 1, 1)
 
                     # 1 x 156 x 4096
-                    glb_img = torch.cat([glb_img, temp_glb_GN], dim=2).reshape(1,-1,base_feat_height_reduction*base_feat_height_reduction*C)
+                    glb_img = torch.cat([glb_img, temp_glb_GN], dim=2).reshape(1, -1, base_feat_height_reduction * base_feat_height_reduction * C)
 
                     # (max_num_crops-1) x (12x12) x C
                     sub_img = img_features[_bs, 1:]
@@ -1081,40 +1131,66 @@ class OVPhioModelForCausalLM(GenerationMixin):
                     sub_img = sub_img[:B_]
 
                     # (num_crops, 12, 2, 12, 2, 1024) -> (num_crops, 12, 12, 2, 2, 1024) -> (num_crops, 12*12, 4*1024)
-                    sub_img = sub_img.reshape(B_,H,H,C).reshape(B_,H//base_feat_height_reduction,base_feat_height_reduction,H//base_feat_height_reduction,base_feat_height_reduction,C).contiguous().permute(0,1,3,2,4,5).reshape(B_,-1,base_feat_height_reduction*base_feat_height_reduction*C).contiguous()
-                    sub_img = sub_img.reshape(1, h, w, base_feat_height // base_feat_height_reduction, base_feat_width // base_feat_height_reduction, -1).permute(0,1,3,2,4,5).reshape(1,h*base_feat_height//base_feat_height_reduction,w*base_feat_width//base_feat_height_reduction,base_feat_height_reduction*base_feat_height_reduction*C)
+                    sub_img = (
+                        sub_img.reshape(B_, H, H, C)
+                        .reshape(
+                            B_, H // base_feat_height_reduction, base_feat_height_reduction, H // base_feat_height_reduction, base_feat_height_reduction, C
+                        )
+                        .contiguous()
+                        .permute(0, 1, 3, 2, 4, 5)
+                        .reshape(B_, -1, base_feat_height_reduction * base_feat_height_reduction * C)
+                        .contiguous()
+                    )
+                    sub_img = (
+                        sub_img.reshape(1, h, w, base_feat_height // base_feat_height_reduction, base_feat_width // base_feat_height_reduction, -1)
+                        .permute(0, 1, 3, 2, 4, 5)
+                        .reshape(
+                            1,
+                            h * base_feat_height // base_feat_height_reduction,
+                            w * base_feat_width // base_feat_height_reduction,
+                            base_feat_height_reduction * base_feat_height_reduction * C,
+                        )
+                    )
 
                     if image_attention_mask is not None and len(image_attention_mask) > 0:
-                        reshaped_image_attention_mask = image_attention_mask[_bs,1:B_+1,0::2,0::2].reshape(1, h, w, base_feat_height // base_feat_height_reduction, base_feat_width // base_feat_height_reduction).permute(0,1,3,2,4).reshape(1,h*base_feat_height//base_feat_height_reduction,w*base_feat_width//base_feat_height_reduction)
-                        useful_height = int(reshaped_image_attention_mask[0,:,0].sum().item())
-                        useful_width = int(reshaped_image_attention_mask[0,0,:].sum().item())
-                        sub_img = sub_img[:,:useful_height, :useful_width]
+                        reshaped_image_attention_mask = (
+                            image_attention_mask[_bs, 1 : B_ + 1, 0::2, 0::2]
+                            .reshape(1, h, w, base_feat_height // base_feat_height_reduction, base_feat_width // base_feat_height_reduction)
+                            .permute(0, 1, 3, 2, 4)
+                            .reshape(1, h * base_feat_height // base_feat_height_reduction, w * base_feat_width // base_feat_height_reduction)
+                        )
+                        useful_height = int(reshaped_image_attention_mask[0, :, 0].sum().item())
+                        useful_width = int(reshaped_image_attention_mask[0, 0, :].sum().item())
+                        sub_img = sub_img[:, :useful_height, :useful_width]
                         temp_sub_GN = self.sub_GN.repeat(1, useful_height, 1, 1)
-                        temp_len = int(image_attention_mask[_bs,:B_+1,0::2,0::2].sum().item()) + (useful_height+1) + base_feat_height//base_feat_height_reduction
+                        temp_len = (
+                            int(image_attention_mask[_bs, : B_ + 1, 0::2, 0::2].sum().item())
+                            + (useful_height + 1)
+                            + base_feat_height // base_feat_height_reduction
+                        )
                     else:
-                        temp_sub_GN = self.sub_GN.repeat(1, h*base_feat_height//base_feat_height_reduction, 1, 1)
-                        temp_len = int((h*w+1)*self.num_img_tokens+ 1 + (h+1)*base_feat_height//base_feat_height_reduction)
+                        temp_sub_GN = self.sub_GN.repeat(1, h * base_feat_height // base_feat_height_reduction, 1, 1)
+                        temp_len = int((h * w + 1) * self.num_img_tokens + 1 + (h + 1) * base_feat_height // base_feat_height_reduction)
 
-                    sub_img = torch.cat([sub_img, temp_sub_GN], dim=2).reshape(1,-1,base_feat_height_reduction*base_feat_height_reduction*C)
+                    sub_img = torch.cat([sub_img, temp_sub_GN], dim=2).reshape(1, -1, base_feat_height_reduction * base_feat_height_reduction * C)
                     # (1, num_img_tokens, 1024*4)
 
                     # glb + sub
-                    if self.config.hd_transform_order == 'glb_sub':
+                    if self.config.hd_transform_order == "glb_sub":
                         output_imgs.append(torch.cat([glb_img, self.glb_GN, sub_img], dim=1))
-                    elif self.config.hd_transform_order == 'sub_glb':
+                    elif self.config.hd_transform_order == "sub_glb":
                         output_imgs.append(torch.cat([sub_img, self.glb_GN, glb_img], dim=1))
                     else:
-                        raise NotImplementedError(f'hd_transform_order = {self.hd_transform_order}, not implemented')
+                        raise NotImplementedError(f"hd_transform_order = {self.hd_transform_order}, not implemented")
 
-                    #temp_len = int((h*w+1)*144 + 1 + (h+1)*12)
-                    assert temp_len == output_imgs[-1].shape[1], f'temp_len: {temp_len}, output_imgs[-1].shape[1]: {output_imgs[-1].shape[1]}'
+                    # temp_len = int((h*w+1)*144 + 1 + (h+1)*12)
+                    assert temp_len == output_imgs[-1].shape[1], f"temp_len: {temp_len}, output_imgs[-1].shape[1]: {output_imgs[-1].shape[1]}"
                     output_len.append(temp_len)
 
                 img_set_tensor = torch.from_numpy(self.vision_projector(output_imgs)[0])
                 # for _output_img in output_imgs:
                 #     img_feature_proj = torch.from_numpy(self.vision_projector(_output_img)[0])
                 #     img_set_tensor.append(img_feature_proj)
-
 
             else:
                 raise NotImplementedError
@@ -1130,25 +1206,28 @@ class OVPhioModelForCausalLM(GenerationMixin):
                 # Ref: https://pytorch.org/docs/stable/generated/torch.Tensor.index_put.html
                 # Ref: https://pytorch.org/docs/stable/generated/torch.Tensor.index_put_.html#torch.Tensor.index_put_
                 # img_set_tensor: a list of tensors, each tensor has shape (1, N_tokens, C)
-                #assert all([_img_set_tensor.shape[0] == 1 for _img_set_tensor in img_set_tensor]), 'img_set_tensor should have shape (1, N_tokens, C)'
+                # assert all([_img_set_tensor.shape[0] == 1 for _img_set_tensor in img_set_tensor]), 'img_set_tensor should have shape (1, N_tokens, C)'
                 # Shape: (merged_N_tokens, C)
-                merged_img_set_tensor = img_set_tensor.squeeze(0)#torch.cat(img_set_tensor, dim=1).squeeze(0)
+                merged_img_set_tensor = img_set_tensor.squeeze(0)  # torch.cat(img_set_tensor, dim=1).squeeze(0)
                 merged_img_set_tensor = merged_img_set_tensor.to(hidden_states.dtype).to(hidden_states.device)
                 # Temporarily disable autocast to avoid issue on bf16 tensors
                 # Ref: https://github.com/pytorch/pytorch/issues/132715
-                new_hidden_states = hidden_states.index_put(
-                    indices=positions_tuple,
-                    values=merged_img_set_tensor,
-                    accumulate=False
-                )
+                new_hidden_states = hidden_states.index_put(indices=positions_tuple, values=merged_img_set_tensor, accumulate=False)
                 hidden_states = new_hidden_states
             else:
                 raise NotImplementedError
 
         return hidden_states
 
-
-    def audio_embed(self, input_ids: torch.LongTensor, input_embeds: torch.FloatTensor, audio_embed_sizes=None, audio_attention_mask=None, audio_projection_mode='speech', **kwargs):
+    def audio_embed(
+        self,
+        input_ids: torch.LongTensor,
+        input_embeds: torch.FloatTensor,
+        audio_embed_sizes=None,
+        audio_attention_mask=None,
+        audio_projection_mode="speech",
+        **kwargs,
+    ):
         input_shape = input_ids.size()
         input_ids = input_ids.view(-1, input_shape[-1])
 
@@ -1161,8 +1240,9 @@ class OVPhioModelForCausalLM(GenerationMixin):
 
         if len(positions.tolist()) > 0:
 
-            assert audio_embed_sizes.sum().item() == len(positions), \
-                f"please ensure the encoder outputs have the same length as defined in input_ids! \n audio_embed_sizes.sum().item(): {audio_embed_sizes.sum().item()} \n len(positions): {len(positions)} \n audio_embed_sizes: {audio_embed_sizes} \n positions: {positions} \n input_ids.shape \n {input_ids.shape}"
+            assert audio_embed_sizes.sum().item() == len(
+                positions
+            ), f"please ensure the encoder outputs have the same length as defined in input_ids! \n audio_embed_sizes.sum().item(): {audio_embed_sizes.sum().item()} \n len(positions): {len(positions)} \n audio_embed_sizes: {audio_embed_sizes} \n positions: {positions} \n input_ids.shape \n {input_ids.shape}"
 
             # new implementation without in-place operation
             # Ref: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/blob/4a0d683eba9f1d0cbfb6151705d1ee73c25a80ca/modeling_phi3_v.py#L233
@@ -1170,26 +1250,19 @@ class OVPhioModelForCausalLM(GenerationMixin):
             # Ref: https://pytorch.org/docs/stable/generated/torch.Tensor.index_put_.html#torch.Tensor.index_put_
             # audio_set_tensor: shape (N_audios, N_padded_tokens, C)
             # Shape: (merged_N_tokens, C)
-            merged_audio_set_tensor = torch.cat([
-                audio_set_tensor[i, :audio_embed_sizes[i], :]
-                for i in range(len(audio_embed_sizes))
-            ], dim=0)
-            new_hidden_states = hidden_states.index_put(
-                indices=positions_tuple,
-                values=merged_audio_set_tensor,
-                accumulate=False
-            )
+            merged_audio_set_tensor = torch.cat([audio_set_tensor[i, : audio_embed_sizes[i], :] for i in range(len(audio_embed_sizes))], dim=0)
+            new_hidden_states = hidden_states.index_put(indices=positions_tuple, values=merged_audio_set_tensor, accumulate=False)
             hidden_states = new_hidden_states
 
         return hidden_states
 
-    def get_audio_features(self, input_embeds: torch.FloatTensor, audio_attention_mask: torch.Tensor, audio_projection_mode: str='speech'):
-        xs_pad  = self.audio_embeddings(input_embeds)[0]
+    def get_audio_features(self, input_embeds: torch.FloatTensor, audio_attention_mask: torch.Tensor, audio_projection_mode: str = "speech"):
+        xs_pad = self.audio_embeddings(input_embeds)[0]
         input_tensor, pos_k, pos_v, hs_mask, masks = self.forward_embeddings(xs_pad)
 
         unfolded = False
         ori_bz, seq_len, D = input_tensor.shape
-        max_seq_len = 500 #maxium position for absolute positional encoding
+        max_seq_len = 500  # maxium position for absolute positional encoding
         masks_unfold = None
         if seq_len > max_seq_len:
             # audio sequence is longer than max_seq_len, unfold it into chunks of max_seq_len
@@ -1206,11 +1279,13 @@ class OVPhioModelForCausalLM(GenerationMixin):
             input_tensor = unfold_tensor(input_tensor, max_seq_len)
             if masks is not None:
                 # revise hs_mask here because the previous calculated hs_mask did not consider extra pad
-                subsampled_pad_mask = masks.squeeze(1) # [bz, subsampled_unmask_seq_len]
-                extra_padded_subsamlped_pad_mask = torch.nn.functional.pad(subsampled_pad_mask, (0, chunk_pad_size), "constant", False) # extra padding to the pad mask
+                subsampled_pad_mask = masks.squeeze(1)  # [bz, subsampled_unmask_seq_len]
+                extra_padded_subsamlped_pad_mask = torch.nn.functional.pad(
+                    subsampled_pad_mask, (0, chunk_pad_size), "constant", False
+                )  # extra padding to the pad mask
                 extra_padded_subsamlped_pad_mask = extra_padded_subsamlped_pad_mask.unsqueeze(-1).float()
-                masks_unfold = unfold_tensor(extra_padded_subsamlped_pad_mask, max_seq_len) # unfold the pad mask like we did to the input tensor
-                masks_unfold = masks_unfold.squeeze(-1).bool() # unfold op does not support bool tensor
+                masks_unfold = unfold_tensor(extra_padded_subsamlped_pad_mask, max_seq_len)  # unfold the pad mask like we did to the input tensor
+                masks_unfold = masks_unfold.squeeze(-1).bool()  # unfold op does not support bool tensor
             else:
                 masks_unfold = None
         hs_mask = self.calculate_hs_mask(input_tensor, masks_unfold)
@@ -1235,16 +1310,13 @@ class OVPhioModelForCausalLM(GenerationMixin):
             if not isinstance(left_chunk, list):
                 raise ValueError("Since chunk_size is a list, left_chunk must be a list")
             if len(left_chunk) != len(chunk_size):
-                raise ValueError(
-                    "The length of left_chunk must be the same as length of chunk_size."
-                )
+                raise ValueError("The length of left_chunk must be the same as length of chunk_size.")
             left_chunk_train_eff = left_chunk[chunk_size_index]
         else:
             chunk_size_train_eff = chunk_size
             left_chunk_train_eff = left_chunk
 
         return chunk_size_train_eff, left_chunk_train_eff
-
 
     def forward_embeddings(self, xs_pad, masks=None, chunk_size_nc=None, left_chunk_nc=None):
         """Forwarding the inputs through the top embedding layers
@@ -1269,9 +1341,7 @@ class OVPhioModelForCausalLM(GenerationMixin):
 
         batch_size = xs_pad.shape[0]
 
-        enc_streaming_mask = self._streaming_mask(
-            seq_len, batch_size, self.chunk_size, self.left_chunk
-        )
+        enc_streaming_mask = self._streaming_mask(seq_len, batch_size, self.chunk_size, self.left_chunk)
 
         input_tensor = xs_pad
 
@@ -1284,9 +1354,7 @@ class OVPhioModelForCausalLM(GenerationMixin):
             hs_mask = streaming_mask
 
         if chunk_size_nc is not None:
-            enc_streaming_mask_nc = self._streaming_mask(
-                seq_len, batch_size, chunk_size_nc, left_chunk_nc
-            )
+            enc_streaming_mask_nc = self._streaming_mask(seq_len, batch_size, chunk_size_nc, left_chunk_nc)
             if masks is not None:
                 hs_mask_nc = masks & enc_streaming_mask_nc
             else:
@@ -1299,22 +1367,15 @@ class OVPhioModelForCausalLM(GenerationMixin):
         return input_tensor, None, None, hs_mask, None, hs_mask_nc
 
     def _streaming_mask(self, seq_len, batch_size, chunk_size, left_chunk):
-        chunk_size_train_eff, left_chunk_train_eff = self._chunk_size_selection(
-            chunk_size, left_chunk
-        )
+        chunk_size_train_eff, left_chunk_train_eff = self._chunk_size_selection(chunk_size, left_chunk)
 
         # Create mask matrix for streaming
         # S stores start index. if chunksize is 18, s is [0,18,36,....]
         chunk_start_idx = np.arange(0, seq_len, chunk_size_train_eff)
         # avoid randomness when run evaluation or decoding
 
-        enc_streaming_mask = (
-            adaptive_enc_mask(seq_len, chunk_start_idx, left_window=left_chunk_train_eff)
-            .unsqueeze(0)
-            .expand([batch_size, -1, -1])
-        )
+        enc_streaming_mask = adaptive_enc_mask(seq_len, chunk_start_idx, left_window=left_chunk_train_eff).unsqueeze(0).expand([batch_size, -1, -1])
         return enc_streaming_mask
-
 
     def compute_lens_change(self, feature_lens):
         """feature_lens: int
@@ -1348,26 +1409,20 @@ class OVPhioModelForCausalLM(GenerationMixin):
                 return lens_change
             ceil_func = math.ceil if isinstance(feature_lens, int) else torch.ceil
             return ceil_func(feature_lens / self.time_reduction)
-    
+
     def calculate_hs_mask(self, xs_pad, mask):
         max_audio_length = xs_pad.shape[1]
         batch_size = xs_pad.shape[0]
-        enc_streaming_mask = self._streaming_mask(
-            max_audio_length, batch_size, self.chunk_size, self.left_chunk
-        )
+        enc_streaming_mask = self._streaming_mask(max_audio_length, batch_size, self.chunk_size, self.left_chunk)
         if mask is None:
             return enc_streaming_mask
 
         feature_lens = mask.sum(1)
         padding_length = feature_lens
-        pad_mask = (
-            torch.arange(0, max_audio_length).expand(padding_length.size(0), -1)
-            < padding_length.unsqueeze(1)
-        )
+        pad_mask = torch.arange(0, max_audio_length).expand(padding_length.size(0), -1) < padding_length.unsqueeze(1)
         pad_mask = pad_mask.unsqueeze(1)
         pad_mask = pad_mask & enc_streaming_mask
         return pad_mask
-
 
     def prepare_inputs_for_generation(
         self,
@@ -1386,7 +1441,7 @@ class OVPhioModelForCausalLM(GenerationMixin):
         position_ids=None,
         use_cache=True,
         num_logits_to_keep=None,
-        **kwargs
+        **kwargs,
     ):
         # Overwritten -- in specific circumstances we don't want to forward image inputs to the model
         model_inputs = self.model.prepare_inputs_for_generation(
@@ -1408,7 +1463,7 @@ class OVPhioModelForCausalLM(GenerationMixin):
                     "image_sizes": image_sizes,
                     "input_audio_embeds": input_audio_embeds,
                     "audio_embed_sizes": audio_embed_sizes,
-                    "input_mode": input_mode
+                    "input_mode": input_mode,
                 }
             )
 
