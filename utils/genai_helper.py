@@ -130,6 +130,7 @@ class IterableStreamer(ov_genai.StreamerBase):
         self.decoded_lengths = []
         self._stop_flag = False
 
+
 class ChunkStreamer(IterableStreamer):
 
     def __init__(self, tokenizer, tokens_len=2):
