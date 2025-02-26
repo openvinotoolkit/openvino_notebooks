@@ -13,6 +13,7 @@ import requests
 from PIL import Image
 import math
 import shutil
+from huggingface_hub import hf_hub_download
 
 VISION_EMBEDDINGS_PATH = "openvino_vision_embeddings_model.xml"
 VISION_PROJECTOR_PATH = "openvino_vision_projection_model.xml"
@@ -271,7 +272,7 @@ def unfold_tensor(xs_pad, max_seq_len):
     return xs_pad
 
 
-def convert_phi4o(input_dir, output_dir, quantization_config=None):
+def convert_phi4mm(input_dir, output_dir, quantization_config=None):
     output_dir = Path(output_dir)
     all_converted = all(
         [
@@ -307,6 +308,9 @@ def convert_phi4o(input_dir, output_dir, quantization_config=None):
     processor.save_pretrained(output_dir)
     if Path(input_dir).is_dir():
         shutil.copy(Path(input_dir) / "preprocessor_config.json", output_dir / "preprocessor_config.json")
+    else:
+        hf_hub_download(repo_id=input_dir, filename="preprocessor_config.json", local_dir=output_dir)
+
 
     model.config.glb_GN = model.model.embed_tokens_extend.image_embed.glb_GN.tolist()
     model.config.sub_GN = model.model.embed_tokens_extend.image_embed.sub_GN.tolist()
@@ -915,7 +919,7 @@ class OVModelForCausalLMWithEmb(GenerationMixin):
         return self.forward(*args, **kwargs)
 
 
-class OVPhioModelForCausalLM(GenerationMixin):
+class OVPhiMMModelForCausalLM(GenerationMixin):
     def __init__(self, model_dir, device="CPU", ov_config=None) -> types.NoneType:
         self._supports_cache_class = False
         self.config = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)

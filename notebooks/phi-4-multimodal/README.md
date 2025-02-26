@@ -1,7 +1,7 @@
-# Multimodal assistant with Phi-4-mini-multimodal and OpenVINO
+# Multimodal assistant with Phi-4-multimodal and OpenVINO
 
 Phi-4-multimodal-instruct is a lightweight open multimodal foundation model. The model processes text, image, and audio inputs, generating text outputs. Phi-4-multimodal-instruct has 5.6B parameters and is a multimodal transformer model. The model has the pretrained Phi-4-mini as the  backbone language model, and the advanced encoders and adapters of vision and speech.
-In this tutorial we will explore how to run Phi-4-mini-multimodal model using [OpenVINO](https://github.com/openvinotoolkit/openvino) and optimize it using [NNCF](https://github.com/openvinotoolkit/nncf).
+In this tutorial we will explore how to run Phi-4-multimodal model using [OpenVINO](https://github.com/openvinotoolkit/openvino) and optimize it using [NNCF](https://github.com/openvinotoolkit/nncf).
 
 ## Notebook contents
 The tutorial consists from following steps:
