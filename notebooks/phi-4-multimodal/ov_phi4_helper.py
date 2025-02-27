@@ -1,5 +1,5 @@
 import openvino as ov
-from transformers import AutoModelForCausalLM, AutoProcessor, GenerationMixin, GenerationConfig, AutoConfig
+from transformers import AutoModelForCausalLM, AutoProcessor, GenerationMixin, GenerationConfig, AutoConfig, AutoTokenizer
 from transformers.modeling_outputs import CausalLMOutputWithPast, BaseModelOutputWithPooling
 import types
 from pathlib import Path
@@ -303,13 +303,17 @@ def convert_phi4mm(input_dir, output_dir, quantization_config=None):
     config._attn_implementation = "sdpa"
     model = AutoModelForCausalLM.from_pretrained(input_dir, config=config, trust_remote_code=True)
     processor = AutoProcessor.from_pretrained(input_dir, trust_remote_code=True)
-    processor.chat_template = processor.tokenizer.chat_template
+    tokenizer = AutoTokenizer.from_pretrained(input_dir, trust_remote_code=True)
+    tokenizer.save_pretrained(output_dir)
     model.generation_config.save_pretrained(output_dir)
-    processor.save_pretrained(output_dir)
     if Path(input_dir).is_dir():
         shutil.copy(Path(input_dir) / "preprocessor_config.json", output_dir / "preprocessor_config.json")
+        shutil.copy(Path(input_dir) / "processing_phi4mm.py", output_dir / "processing_phi4mm.py")
+        shutil.copy(Path(input_dir) / "processor_config.json", output_dir / "processor_config.json")
     else:
         hf_hub_download(repo_id=input_dir, filename="preprocessor_config.json", local_dir=output_dir)
+        hf_hub_download(repo_id=input_dir, filename="processing_phi4mm.py", local_dir=output_dir)
+        hf_hub_download(repo_id=input_dir, filename="processor_config.json", local_dir=output_dir)
 
 
     model.config.glb_GN = model.model.embed_tokens_extend.image_embed.glb_GN.tolist()
