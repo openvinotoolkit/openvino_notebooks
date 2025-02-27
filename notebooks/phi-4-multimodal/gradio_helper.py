@@ -27,7 +27,6 @@ def history2messages(history: List[Dict]) -> List[Dict]:
     """
     Transform gradio history to chat messages.
     """
-    print(history)
     messages = []
     cur_message = dict()
     images = []
@@ -124,7 +123,6 @@ def make_demo(ov_model, processor):
         regenerate: bool = False,
     ):
 
-        print(history)
         if history and regenerate:
             history = history[:-1]
 
@@ -134,10 +132,7 @@ def make_demo(ov_model, processor):
         msgs, images, audios = history2messages(history)
         audios = audios if len(audios) > 0 else None
         images = images if len(images) > 0 else None
-
-        print(msgs)
         prompt = processor.tokenizer.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)
-        print(prompt)
         inputs = processor(text=prompt, audios=audios, images=images)
         streamer = TextIteratorStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=True)
         generation_params = {
