@@ -315,7 +315,6 @@ def convert_phi4mm(input_dir, output_dir, quantization_config=None):
         hf_hub_download(repo_id=input_dir, filename="processing_phi4mm.py", local_dir=output_dir)
         hf_hub_download(repo_id=input_dir, filename="processor_config.json", local_dir=output_dir)
 
-
     model.config.glb_GN = model.model.embed_tokens_extend.image_embed.glb_GN.tolist()
     model.config.sub_GN = model.model.embed_tokens_extend.image_embed.sub_GN.tolist()
     model.config.num_img_tokens = model.model.embed_tokens_extend.image_embed.num_img_tokens

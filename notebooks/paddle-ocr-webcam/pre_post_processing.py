@@ -458,12 +458,16 @@ def draw_ocr_box_txt(image, boxes, txts, scores=None, drop_score=0.5, font_path=
             font = ImageFont.truetype(font_path, font_size)
             cur_y = box[0][1]
             for c in txt:
-                if hasattr(font, "getbox"):
-                    char_size = font.getbox(c)
+                if hasattr(font, "getbbox"):
+                    char_size = font.getbbox(c)
                     y_idx = -1
                 else:
-                    char_size = font.getsize(c)
-                    y_idx = 1
+                    try:
+                        char_size = font.getbox(c)
+                        y_idx = -1
+                    except BaseException:
+                        char_size = font.getsize(c)
+                        y_idx = 1
 
                 draw_right.text((box[0][0] + 3, cur_y), c, fill=(0, 0, 0), font=font)
                 cur_y += char_size[y_idx]
