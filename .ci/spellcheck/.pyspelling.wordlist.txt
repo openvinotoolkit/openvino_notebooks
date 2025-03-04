@@ -466,6 +466,9 @@ Lippipeline
 Liu
 LLama
 LLaMa
+LLaMA
+LLaSA
+Llasa
 LlamaIndex
 LLaVA
 llava
@@ -1063,6 +1066,7 @@ WuerstchenDiffNeXt
 Würstchen
 XAI
 XCode
+XCodec
 Xeon
 xformers
 xl
