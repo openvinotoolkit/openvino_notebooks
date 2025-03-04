@@ -8,7 +8,7 @@ def make_demo(fn: Callable):
         inputs=[
             gr.Textbox(label="Prompt"),
             gr.Textbox(label="Negative prompt"),
-            gr.Slider(32, 1280, value=702, label="Width", step=32),
+            gr.Slider(32, 1280, value=704, label="Width", step=32),
             gr.Slider(32, 720, value=480, label="Height", step=32),
             gr.Slider(9, 257, value=25, label="Number of frames", step=8),
             gr.Slider(10, 50, value=30, label="Number of inference steps", step=1),

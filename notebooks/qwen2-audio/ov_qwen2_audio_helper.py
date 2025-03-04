@@ -707,9 +707,28 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
                 selected_audio_feature = audio_outputs[0]
                 audio_features = self.multi_modal_projector(selected_audio_feature)[0]
 
-                inputs_embeds, attention_mask, position_ids, _ = self._merge_input_ids_with_audio_features(
-                    torch.from_numpy(audio_features), audio_output_lengths, inputs_embeds, input_ids, attention_mask
-                )
+                audio_tokens = input_ids == self.config.audio_token_index
+                legacy_processing = (audio_tokens[:, :-1] & audio_tokens[:, 1:]).sum() == 0
+
+                if legacy_processing:
+                    inputs_embeds, attention_mask, position_ids, _ = self._merge_input_ids_with_audio_features(
+                        torch.from_numpy(audio_features), audio_output_lengths, inputs_embeds, input_ids, attention_mask
+                    )
+                else:
+                    num_audios, max_audio_tokens, embed_dim = audio_features.shape
+                    audio_features_mask = torch.arange(max_audio_tokens, device=audio_output_lengths.device)[None, :]
+                    audio_features_mask = audio_features_mask < audio_output_lengths[:, None]
+                    audio_features = audio_features[audio_features_mask]
+
+                    n_audio_tokens = (input_ids == self.config.audio_token_index).sum().item()
+                    n_audio_features = audio_features.shape[0]
+
+                    if n_audio_tokens != n_audio_features:
+                        raise ValueError(f"Audio features and audio tokens do not match: tokens: {n_audio_tokens}, features {n_audio_features}")
+                    special_audio_mask = (input_ids == self.config.audio_token_index).to(inputs_embeds.device)
+                    special_audio_mask = special_audio_mask.unsqueeze(-1).expand_as(inputs_embeds)
+                    audio_features = torch.from_numpy(audio_features).to(inputs_embeds.device, inputs_embeds.dtype)
+                    inputs_embeds = inputs_embeds.masked_scatter(special_audio_mask, audio_features)
 
         outputs = self.language_model(
             None, attention_mask=attention_mask, position_ids=position_ids, past_key_values=past_key_values, inputs_embeds=inputs_embeds, use_cache=True

@@ -206,6 +206,7 @@ dGPU
 dGPUs
 DialoGPT
 diarization
+digitalized
 Diffusers
 diffusers
 dimensionality
@@ -395,6 +396,7 @@ intervaling
 im
 img
 ip
+IPs
 ir
 IRs
 iteratively
@@ -457,12 +459,16 @@ learnable
 LeViT
 LibriSpeech
 librispeech
+LibriTTS
 Lim
 LinearCameraEmbedder
 Lippipeline
 Liu
 LLama
 LLaMa
+LLaMA
+LLaSA
+Llasa
 LlamaIndex
 LLaVA
 llava
@@ -539,6 +545,7 @@ Modelscope
 ModelScope
 modelscope
 Mody
+MoE
 MONAI
 MONAI's
 Monodepth
@@ -548,6 +555,7 @@ mpnet
 mpt
 MPT
 MRPC
+mRoPE
 MTVQA
 multiarchitecture
 Multiclass
@@ -560,6 +568,7 @@ multinomial
 MusicGen
 MuRAG
 Müller
+naflex
 Nakayosi
 nano
 nanoLLaVA
@@ -805,6 +814,7 @@ Rinna
 rinna
 RLHF
 RMBG
+RMSNorm
 RoBERTa
 roberta
 ROI
@@ -1018,8 +1028,11 @@ vits
 VITS
 vitt
 VL
+VL’s
 vl
+vlm
 VLM
+VLMs
 VLModel
 VLMPipeline
 VM
@@ -1053,6 +1066,7 @@ WuerstchenDiffNeXt
 Würstchen
 XAI
 XCode
+XCodec
 Xeon
 xformers
 xl

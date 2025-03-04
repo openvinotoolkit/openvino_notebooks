@@ -83,3 +83,4 @@ notebooks/multimodal-rag/multimodal-rag-llamaindex.ipynb
 notebooks/llm-rag-langchain/llm-rag-langchain-genai.ipynb
 notebooks/ltx-video/ltx-video.ipynb
 notebooks/outetts-text-to-speech/outetts-text-to-speech.ipynb
+notebooks/phi-4-multimodal/phi-4-multimodal.ipynb

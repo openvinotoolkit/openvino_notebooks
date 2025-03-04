@@ -1,6 +1,10 @@
 import torch
 import gradio as gr
 import numpy as np
+import sys
+import openvino_genai as ov_genai
+from tqdm.auto import tqdm
+from PIL import Image
 
 MAX_SEED = np.iinfo(np.int32).max
 MAX_IMAGE_SIZE = 1344
@@ -24,30 +28,44 @@ css = """
 """
 
 
-def make_demo(pipeline, use_flash_lora):
+def make_demo(pipeline, turbo):
     def infer(prompt, negative_prompt, seed, randomize_seed, width, height, guidance_scale, num_inference_steps, progress=gr.Progress(track_tqdm=True)):
         if randomize_seed:
             seed = np.random.randint(0, MAX_SEED)
 
-        generator = torch.Generator().manual_seed(seed)
+        generator = ov_genai.TorchGenerator(seed)
+        pbar = tqdm(total=num_inference_steps)
 
-        image = pipeline(
+        def callback(step, num_steps, latent):
+            if num_steps != pbar.total:
+                pbar.reset(num_steps)
+            pbar.update(1)
+            sys.stdout.flush()
+            return False
+
+        generate_kwargs = {}
+
+        if guidance_scale > 1:
+            generate_kwargs["negative_prompt"] = negative_prompt
+
+        image_tensor = pipeline.generate(
             prompt=prompt,
-            negative_prompt=negative_prompt,
             guidance_scale=guidance_scale,
             num_inference_steps=num_inference_steps,
             width=width,
             height=height,
             generator=generator,
-        ).images[0]
-
+            callback=callback,
+            **generate_kwargs
+        )
+        image = Image.fromarray(image_tensor.data[0])
         return image, seed
 
     with gr.Blocks(css=css) as demo:
         with gr.Column(elem_id="col-container"):
             gr.Markdown(
                 """
-            # Demo [Stable Diffusion 3 Medium](https://huggingface.co/stabilityai/stable-diffusion-3-medium) with OpenVINO
+            # Demo Stable Diffusion 3  with OpenVINO
             """
             )
 
@@ -102,9 +120,9 @@ def make_demo(pipeline, use_flash_lora):
                     guidance_scale = gr.Slider(
                         label="Guidance scale",
                         minimum=0.0,
-                        maximum=10.0 if not use_flash_lora else 2,
+                        maximum=10.0 if not turbo else 2,
                         step=0.1,
-                        value=5.0 if not use_flash_lora else 0,
+                        value=5.0 if not turbo else 1.5,
                     )
 
                     num_inference_steps = gr.Slider(
@@ -112,7 +130,7 @@ def make_demo(pipeline, use_flash_lora):
                         minimum=1,
                         maximum=50,
                         step=1,
-                        value=28 if not use_flash_lora else 4,
+                        value=28 if not turbo else 8,
                     )
 
             gr.Examples(examples=examples, inputs=[prompt])
