@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   build_assets:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
     outputs:
@@ -103,7 +103,7 @@ jobs:
           git push
 
   deploy_github_pages:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: build_assets
     if: ${{ needs.build_assets.outputs.should_deploy == 'true' }}
     permissions:

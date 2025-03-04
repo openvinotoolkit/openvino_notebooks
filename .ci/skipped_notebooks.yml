@@ -2,115 +2,115 @@
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/gpu-device/gpu-device.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/pytorch-post-training-quantization-nncf/pytorch-post-training-quantization-nncf.ipynb
   skips:
     - os:
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
 - notebook: notebooks/model-server/model-server.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/grammar-correction/grammar-correction.ipynb
   skips:
     - os:
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
 - notebook: notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/blip-visual-language-processing/blip-visual-language-processing.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/encodec-audio-compression/encodec-audio-compression.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image-demo.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-diffusion-v3/stable-diffusion-v3-torch-fx.ipynb
@@ -121,280 +121,280 @@
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/riffusion-text-to-music/riffusion-text-to-music.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/freevc-voice-conversion/freevc-voice-conversion.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-diffusion-xl/stable-diffusion-xl.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/oneformer-segmentation/oneformer-segmentation.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/music-generation/music-generation.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/zeroscope-text2video/zeroscope-text2video.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/bark-text-to-audio/bark-text-to-audio.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-optimum.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-genai.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/fast-segment-anything/fast-segment-anything.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/latent-consistency-models-image-generation/latent-consistency-models-image-generation.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/latent-consistency-models-image-generation/latent-consistency-models-optimum-demo.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/qrcode-monster/qrcode-monster.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/speculative-sampling/speculative-sampling.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/distil-whisper-asr/distil-whisper-asr.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/film-slowmo/film-slowmo.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/sound-generation-audioldm2/sound-generation-audioldm2.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/sdxl-turbo/sdxl-turbo.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/llm-question-answering/llm-question-answering.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/kosmos2-multimodal-large-language-model/kosmos2-multimodal-large-language-model.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/photo-maker/photo-maker.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/instant-id/instant-id.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/animate-anyone/animate-anyone.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/llm-rag-langchain/llm-rag-langchain.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-video-diffusion/stable-video-diffusion.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/yolov10-optimization/yolov10-optimization.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/llm-rag-llamaindex/llm-rag-llamaindex.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/pixart/pixart.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/openvino-tokenizers/openvino-tokenizers.ipynb
@@ -444,7 +444,7 @@
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb
@@ -455,21 +455,21 @@
   skips:
       - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/qwen2-vl/qwen2-vl.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/qwen2-audio/qwen2-audio.ipynb
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/stable-fast-3d/stable-fast-3d.ipynb
@@ -480,7 +480,7 @@
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/sam2-image-segmentation/segment-anything-2-image.ipynb
@@ -499,7 +499,7 @@
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/llm-agent-react/llm-agent-react.ipynb
@@ -510,7 +510,7 @@
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/outetts-text-to-speech/outetts-text-to-speech.ipynb
@@ -527,7 +527,7 @@
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/glm-edge-v/glm-edge-v.ipynb
@@ -542,7 +542,7 @@
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb
@@ -553,7 +553,7 @@
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019
 - notebook: notebooks/paddle-to-openvino/paddle-to-openvino-classification.ipynb
@@ -564,6 +564,6 @@
   skips:
     - os:
         - macos-13
-        - ubuntu-20.04
+        - ubuntu-22.04
         - ubuntu-22.04
         - windows-2019

@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   build_pip_conflicts_check:
-    runs-on: ubuntu-20.04 # change cachepip step when changing this
+    runs-on: ubuntu-22.04 # change cachepip step when changing this
     steps:
       - name: Checkout repository
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6

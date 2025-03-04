@@ -44,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Maximize build space
