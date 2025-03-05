@@ -423,6 +423,7 @@ KD
 KDE
 keras
 KerasCV
+KerasHub
 keypoint
 keypoints
 KiTS
