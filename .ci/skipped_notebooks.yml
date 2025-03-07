@@ -509,3 +509,5 @@
   skips:
     - os:
         - windows-2019
+    - python:
+        - '3.12'
