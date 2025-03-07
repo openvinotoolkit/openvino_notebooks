@@ -12,6 +12,7 @@ In this tutorial, we will show how to run inference of an end-to-end [BERT model
 ## Notebook contents
 - Prerequisites
 - Load the model with the OpenVINO backend and inference
+- Sentiment Classification Example
 
 
 ## Installation instructions
