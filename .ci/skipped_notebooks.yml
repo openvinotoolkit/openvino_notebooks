@@ -505,3 +505,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/keras-with-openvino-backend/keras-with-openvino-backend.ipynb
+  skips:
+    - os:
+        - windows-2019
