@@ -370,7 +370,7 @@ def convert_glm4v_model(model_dir, output_dir, quantization_config):
             "past_key_values": pkv,
         }
 
-        ts_decoder = TorchScriptPythonDecoder(vision_embed_tokens, example_input=example_input, trace_kwargs={"check_trace": False})
+        ts_decoder = TorchScriptPythonDecoder(model.transformer, example_input=example_input, trace_kwargs={"check_trace": False})
 
         ov_model = ov.convert_model(ts_decoder, example_input=example_input)
 

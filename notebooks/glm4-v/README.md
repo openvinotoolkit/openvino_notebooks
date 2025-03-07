@@ -1,4 +1,4 @@
-## Visual-language assistant with GLM-Edge-V and OpenVINO
+## Visual-language assistant with GLM4-V and OpenVINO
 
 [GLM-4V-9B](https://huggingface.co/THUDM/glm-4v-9b) is an open source multimodal version of the GLM-4 series launched by Zhipu AI. GLM-4V-9B has the ability to conduct multi-round conversations in Chinese and English at a high resolution of 1120 * 1120. In multimodal evaluations of comprehensive Chinese and English abilities, perceptual reasoning, text recognition, and chart understanding, GLM-4V-9B has shown superior performance many popular models.
 
