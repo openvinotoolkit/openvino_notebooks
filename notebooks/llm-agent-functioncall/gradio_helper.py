@@ -1,10 +1,11 @@
+import os
 from pathlib import Path
 import requests
 from PIL import Image
 from typing import List
 from qwen_agent.llm.schema import CONTENT, ROLE, USER, Message
 from qwen_agent.gui.utils import convert_history_to_chatbot
-from qwen_agent.gui.gradio import gr, mgr
+from qwen_agent.gui.gradio_dep import gr, mgr
 from qwen_agent.gui import WebUI
 
 
@@ -30,100 +31,157 @@ chatbot_config = {
 
 
 class OpenVINOUI(WebUI):
-    def request_cancel(self):
-        self.agent_list[0].llm.ov_model.request.cancel()
-
-    def clear_history(self):
-        return []
-
-    def add_text(self, _input, _chatbot, _history):
-        _history.append(
-            {
-                ROLE: USER,
-                CONTENT: [{"text": _input}],
-            }
-        )
-        _chatbot.append([_input, None])
-        yield gr.update(interactive=False, value=None), _chatbot, _history
-
-    def run(
-        self,
-        messages: List[Message] = None,
-        share: bool = False,
-        server_name: str = None,
-        server_port: int = None,
-        **kwargs,
-    ):
+    """A Common chatbot application for agent."""
+    
+    def run(self,
+            messages: List[Message] = None,
+            share: bool = False,
+            server_name: str = None,
+            server_port: int = None,
+            concurrency_limit: int = 10,
+            enable_mention: bool = False,
+            **kwargs):
         self.run_kwargs = kwargs
 
+        from qwen_agent.gui.gradio_dep import gr, mgr, ms
+
+        customTheme = gr.themes.Default(
+            primary_hue=gr.themes.utils.colors.blue,
+            radius_size=gr.themes.utils.sizes.radius_none,
+        )
+
         with gr.Blocks(
-            theme=gr.themes.Soft(),
-            css=".disclaimer {font-variant-caps: all-small-caps;}",
-        ) as self.demo:
-            gr.Markdown("""<h1><center>OpenVINO Qwen Agent </center></h1>""")
+                css=os.path.join(os.path.dirname(__file__), 'assets/appBot.css'),
+                theme=customTheme,
+        ) as demo:
             history = gr.State([])
+            with ms.Application():
+                with gr.Row(elem_classes='container'):
+                    with gr.Column(scale=4):
+                        chatbot = mgr.Chatbot(value=convert_history_to_chatbot(messages=messages),
+                                              avatar_images=[
+                                                  self.user_config,
+                                                  self.agent_config_list,
+                                              ],
+                                              height=900,
+                                              avatar_image_width=80,
+                                              flushing=False,
+                                              show_copy_button=True,
+                                              latex_delimiters=[{
+                                                  'left': '\\(',
+                                                  'right': '\\)',
+                                                  'display': True
+                                              }, {
+                                                  'left': '\\begin{equation}',
+                                                  'right': '\\end{equation}',
+                                                  'display': True
+                                              }, {
+                                                  'left': '\\begin{align}',
+                                                  'right': '\\end{align}',
+                                                  'display': True
+                                              }, {
+                                                  'left': '\\begin{alignat}',
+                                                  'right': '\\end{alignat}',
+                                                  'display': True
+                                              }, {
+                                                  'left': '\\begin{gather}',
+                                                  'right': '\\end{gather}',
+                                                  'display': True
+                                              }, {
+                                                  'left': '\\begin{CD}',
+                                                  'right': '\\end{CD}',
+                                                  'display': True
+                                              }, {
+                                                  'left': '\\[',
+                                                  'right': '\\]',
+                                                  'display': True
+                                              }])
 
-            with gr.Row():
-                with gr.Column(scale=4):
-                    chatbot = mgr.Chatbot(
-                        value=convert_history_to_chatbot(messages=messages),
-                        avatar_images=[
-                            self.user_config,
-                            self.agent_config_list,
-                        ],
-                        height=900,
-                        avatar_image_width=80,
-                        flushing=False,
-                        show_copy_button=True,
-                    )
-                    with gr.Column():
-                        input = gr.Textbox(
-                            label="Chat Message Box",
-                            placeholder="Chat Message Box",
-                            show_label=False,
-                            container=False,
+                        input = mgr.MultimodalInput(placeholder=self.input_placeholder,)
+
+                    with gr.Column(scale=1):
+                        if len(self.agent_list) > 1:
+                            agent_selector = gr.Dropdown(
+                                [(agent.name, i) for i, agent in enumerate(self.agent_list)],
+                                label='Agents',
+                                info='Select an Agent',
+                                value=0,
+                                interactive=True,
+                            )
+
+                        agent_info_block = self._create_agent_info_block()
+
+                        agent_plugins_block = self._create_agent_plugins_block()
+
+                        if self.prompt_suggestions:
+                            gr.Examples(
+                                label='Example questions',
+                                examples=self.prompt_suggestions,
+                                inputs=[input],
+                            )
+
+                    if len(self.agent_list) > 1:
+                        agent_selector.change(
+                            fn=self.change_agent,
+                            inputs=[agent_selector],
+                            outputs=[agent_selector, agent_info_block, agent_plugins_block],
+                            queue=False,
                         )
-                    with gr.Column():
-                        with gr.Row():
-                            submit = gr.Button("Submit", variant="primary")
-                            stop = gr.Button("Stop")
-                            clear = gr.Button("Clear")
-                with gr.Column(scale=1):
-                    agent_interactive = self.agent_list[0]
-                    capabilities = [key for key in agent_interactive.function_map.keys()]
-                    gr.CheckboxGroup(
-                        label="Tools",
-                        value=capabilities,
-                        choices=capabilities,
-                        interactive=False,
+
+                    input_promise = input.submit(
+                        fn=self.add_text,
+                        inputs=[input, chatbot, history],
+                        outputs=[input, chatbot, history],
+                        queue=False,
                     )
-            with gr.Row():
-                gr.Examples(self.prompt_suggestions, inputs=[input], label="Click on any example and press the 'Submit' button")
 
-            input_promise = submit.click(
-                fn=self.add_text,
-                inputs=[input, chatbot, history],
-                outputs=[input, chatbot, history],
-                queue=False,
-            )
-            input_promise = input_promise.then(
-                self.agent_run,
-                [chatbot, history],
-                [chatbot, history],
-            )
-            input_promise.then(self.flushed, None, [input])
-            stop.click(
-                fn=self.request_cancel,
-                inputs=None,
-                outputs=None,
-                cancels=[input_promise],
-                queue=False,
-            )
-            clear.click(lambda: None, None, chatbot, queue=False).then(self.clear_history, None, history)
+                    if len(self.agent_list) > 1 and enable_mention:
+                        input_promise = input_promise.then(
+                            self.add_mention,
+                            [chatbot, agent_selector],
+                            [chatbot, agent_selector],
+                        ).then(
+                            self.agent_run,
+                            [chatbot, history, agent_selector],
+                            [chatbot, history, agent_selector],
+                        )
+                    else:
+                        input_promise = input_promise.then(
+                            self.agent_run,
+                            [chatbot, history],
+                            [chatbot, history],
+                        )
 
-            self.demo.load(None)
+                    input_promise.then(self.flushed, None, [input])
 
-        self.demo.launch(share=share, server_name=server_name, server_port=server_port)
+            demo.load(None)
+
+        demo.queue(default_concurrency_limit=concurrency_limit).launch(share=share,
+                                                                       server_name=server_name,
+                                                                       server_port=server_port)
+
+
+    def _create_agent_plugins_block(self, agent_index=0):
+        from qwen_agent.gui.gradio_dep import gr
+
+        agent_interactive = self.agent_list[agent_index]
+
+        if agent_interactive.function_map:
+            capabilities = [key for key in agent_interactive.function_map.keys()]
+            return gr.CheckboxGroup(
+                label='Tools',
+                value=capabilities,
+                choices=capabilities,
+                interactive=False,
+            )
+
+        else:
+            return gr.CheckboxGroup(
+                label='Tools',
+                value=[],
+                choices=[],
+                interactive=False,
+            )
 
 
 def make_demo(bot):
