@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs_on: [ubuntu-20.04, ubuntu-22.04, windows-2019, macos-13]
+        runs_on: [ubuntu-22.04, windows-2019, macos-13]
         python: ['3.9', '3.10', '3.11', '3.12']
     uses: ./.github/workflows/build_treon_reusable.yml
     with:
@@ -47,7 +47,7 @@ jobs:
 
   aggregate_notebooks_reports:
     if: always()
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [build_treon_cpu, build_treon_gpu]
     steps:
       - name: Checkout repository
