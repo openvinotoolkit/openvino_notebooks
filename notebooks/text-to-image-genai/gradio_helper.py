@@ -40,19 +40,19 @@ def make_demo(pipeline, generator_cls, adapter_config, device):
             pbar.update(1)
             sys.stdout.flush()
             return False
-        
+
         generate_args = {
             "prompt": prompt,
             "num_inference_steps": num_inference_steps,
             "generator": generator,
             "callback": callback,
             "height": height,
-            "width": width
+            "width": width,
         }
 
         if use_negative_prompt:
             generate_args["negative_prompt"] = negative_prompt
-        
+
         if device != "NPU":
             generate_args["adapters"] = adapter_config if use_lora else ov_genai.AdapterConfig()
 
@@ -100,23 +100,9 @@ def make_demo(pipeline, generator_cls, adapter_config, device):
                 randomize_seed = gr.Checkbox(label="Randomize seed", value=True)
 
                 with gr.Row():
-                    width = gr.Slider(
-                        label="Width",
-                        minimum=256,
-                        maximum=MAX_IMAGE_SIZE,
-                        step=64,
-                        value=512,
-                        visible=device != "NPU"
-                    )
+                    width = gr.Slider(label="Width", minimum=256, maximum=MAX_IMAGE_SIZE, step=64, value=512, visible=device != "NPU")
 
-                    height = gr.Slider(
-                        label="Height",
-                        minimum=256,
-                        maximum=MAX_IMAGE_SIZE,
-                        step=64,
-                        value=512,
-                        visible=device != "NPU"
-                    )
+                    height = gr.Slider(label="Height", minimum=256, maximum=MAX_IMAGE_SIZE, step=64, value=512, visible=device != "NPU")
 
                 with gr.Row():
                     num_inference_steps = gr.Slider(

@@ -32,15 +32,17 @@ chatbot_config = {
 
 class OpenVINOUI(WebUI):
     """A Common chatbot application for agent."""
-    
-    def run(self,
-            messages: List[Message] = None,
-            share: bool = False,
-            server_name: str = None,
-            server_port: int = None,
-            concurrency_limit: int = 10,
-            enable_mention: bool = False,
-            **kwargs):
+
+    def run(
+        self,
+        messages: List[Message] = None,
+        share: bool = False,
+        server_name: str = None,
+        server_port: int = None,
+        concurrency_limit: int = 10,
+        enable_mention: bool = False,
+        **kwargs
+    ):
         self.run_kwargs = kwargs
 
         from qwen_agent.gui.gradio_dep import gr, mgr, ms
@@ -51,60 +53,44 @@ class OpenVINOUI(WebUI):
         )
 
         with gr.Blocks(
-                css=os.path.join(os.path.dirname(__file__), 'assets/appBot.css'),
-                theme=customTheme,
+            css=os.path.join(os.path.dirname(__file__), "assets/appBot.css"),
+            theme=customTheme,
         ) as demo:
             history = gr.State([])
             with ms.Application():
-                with gr.Row(elem_classes='container'):
+                with gr.Row(elem_classes="container"):
                     with gr.Column(scale=4):
-                        chatbot = mgr.Chatbot(value=convert_history_to_chatbot(messages=messages),
-                                              avatar_images=[
-                                                  self.user_config,
-                                                  self.agent_config_list,
-                                              ],
-                                              height=900,
-                                              avatar_image_width=80,
-                                              flushing=False,
-                                              show_copy_button=True,
-                                              latex_delimiters=[{
-                                                  'left': '\\(',
-                                                  'right': '\\)',
-                                                  'display': True
-                                              }, {
-                                                  'left': '\\begin{equation}',
-                                                  'right': '\\end{equation}',
-                                                  'display': True
-                                              }, {
-                                                  'left': '\\begin{align}',
-                                                  'right': '\\end{align}',
-                                                  'display': True
-                                              }, {
-                                                  'left': '\\begin{alignat}',
-                                                  'right': '\\end{alignat}',
-                                                  'display': True
-                                              }, {
-                                                  'left': '\\begin{gather}',
-                                                  'right': '\\end{gather}',
-                                                  'display': True
-                                              }, {
-                                                  'left': '\\begin{CD}',
-                                                  'right': '\\end{CD}',
-                                                  'display': True
-                                              }, {
-                                                  'left': '\\[',
-                                                  'right': '\\]',
-                                                  'display': True
-                                              }])
+                        chatbot = mgr.Chatbot(
+                            value=convert_history_to_chatbot(messages=messages),
+                            avatar_images=[
+                                self.user_config,
+                                self.agent_config_list,
+                            ],
+                            height=900,
+                            avatar_image_width=80,
+                            flushing=False,
+                            show_copy_button=True,
+                            latex_delimiters=[
+                                {"left": "\\(", "right": "\\)", "display": True},
+                                {"left": "\\begin{equation}", "right": "\\end{equation}", "display": True},
+                                {"left": "\\begin{align}", "right": "\\end{align}", "display": True},
+                                {"left": "\\begin{alignat}", "right": "\\end{alignat}", "display": True},
+                                {"left": "\\begin{gather}", "right": "\\end{gather}", "display": True},
+                                {"left": "\\begin{CD}", "right": "\\end{CD}", "display": True},
+                                {"left": "\\[", "right": "\\]", "display": True},
+                            ],
+                        )
 
-                        input = mgr.MultimodalInput(placeholder=self.input_placeholder,)
+                        input = mgr.MultimodalInput(
+                            placeholder=self.input_placeholder,
+                        )
 
                     with gr.Column(scale=1):
                         if len(self.agent_list) > 1:
                             agent_selector = gr.Dropdown(
                                 [(agent.name, i) for i, agent in enumerate(self.agent_list)],
-                                label='Agents',
-                                info='Select an Agent',
+                                label="Agents",
+                                info="Select an Agent",
                                 value=0,
                                 interactive=True,
                             )
@@ -115,7 +101,7 @@ class OpenVINOUI(WebUI):
 
                         if self.prompt_suggestions:
                             gr.Examples(
-                                label='Example questions',
+                                label="Example questions",
                                 examples=self.prompt_suggestions,
                                 inputs=[input],
                             )
@@ -156,10 +142,7 @@ class OpenVINOUI(WebUI):
 
             demo.load(None)
 
-        demo.queue(default_concurrency_limit=concurrency_limit).launch(share=share,
-                                                                       server_name=server_name,
-                                                                       server_port=server_port)
-
+        demo.queue(default_concurrency_limit=concurrency_limit).launch(share=share, server_name=server_name, server_port=server_port)
 
     def _create_agent_plugins_block(self, agent_index=0):
         from qwen_agent.gui.gradio_dep import gr
@@ -169,7 +152,7 @@ class OpenVINOUI(WebUI):
         if agent_interactive.function_map:
             capabilities = [key for key in agent_interactive.function_map.keys()]
             return gr.CheckboxGroup(
-                label='Tools',
+                label="Tools",
                 value=capabilities,
                 choices=capabilities,
                 interactive=False,
@@ -177,7 +160,7 @@ class OpenVINOUI(WebUI):
 
         else:
             return gr.CheckboxGroup(
-                label='Tools',
+                label="Tools",
                 value=[],
                 choices=[],
                 interactive=False,
