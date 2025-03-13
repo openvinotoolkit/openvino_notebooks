@@ -343,12 +343,11 @@ def convert_florence2(model_id, output_dir, orig_model_dir=None):
 
         model._orig_forward = model.forward
         model.forward = model._encode_image
+        image_size = processor.image_processor.crop_size
 
-        example_input = torch.zeros([1, 3, model.config.vision_config.projection_dim, model.config.vision_config.projection_dim])
+        example_input = torch.zeros([1, 3, image_size["height"], image_size["width"]])
 
-        ov_model = ov.convert_model(
-            model, example_input=example_input, input=[-1, 3, model.config.vision_config.projection_dim, model.config.vision_config.projection_dim]
-        )
+        ov_model = ov.convert_model(model, example_input=example_input, input=[-1, 3, image_size["height"], image_size["width"]])
         ov.save_model(ov_model, output_dir / IMAGE_EMBEDDING_NAME)
         del ov_model
         cleanup_torchscript_cache()
