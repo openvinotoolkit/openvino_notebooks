@@ -86,3 +86,4 @@ notebooks/outetts-text-to-speech/outetts-text-to-speech.ipynb
 notebooks/phi-4-multimodal/phi-4-multimodal.ipynb
 notebooks/llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb
 notebooks/glm4-v/glm4-v.ipynb
+notebooks/omniparser/omniparser.ipynb
