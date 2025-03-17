@@ -4,23 +4,13 @@
 # In[ ]:
 
 
-import os
 import platform
 import sys
 import threading
 import time
-import urllib.parse
 from os import PathLike
 from pathlib import Path
 from typing import List, NamedTuple, Optional, Tuple
-
-import numpy as np
-from openvino.runtime import Core, Type, get_version
-from IPython.display import HTML, Image, display
-
-import openvino as ov
-from openvino.runtime.passes import Manager, MatcherPass, WrapType, Matcher
-from openvino.runtime import opset10 as ops
 
 
 # ## Files
@@ -79,7 +69,7 @@ def pip_install(*args):
     subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], shell=(platform.system() == "Windows"), check=True)
 
 
-def load_image(name: str, url: str = None) -> np.ndarray:
+def load_image(name: str, url: str = None):
     """
     Loads an image by `url` and returns it as BGR numpy array. The image is
     stored to the filesystem with name `name`. If the image file already exists
@@ -90,6 +80,7 @@ def load_image(name: str, url: str = None) -> np.ndarray:
     :return: image as BGR numpy array
     """
     import cv2
+    import numpy as np
     import requests
 
     if not Path(name).exists():
@@ -128,6 +119,7 @@ def download_file(
     """
     from tqdm.notebook import tqdm_notebook
     import requests
+    import urllib.parse
 
     filename = filename or Path(urllib.parse.urlparse(url).path).name
     chunk_size = 16384  # make chunks bigger so that not too many updates are triggered for Jupyter front-end
@@ -220,7 +212,7 @@ def normalize_minmax(data):
     return (data - data.min()) / (data.max() - data.min())
 
 
-def to_rgb(image_data: np.ndarray) -> np.ndarray:
+def to_rgb(image_data):
     """
     Convert image_data from BGR to RGB
     """
@@ -229,7 +221,7 @@ def to_rgb(image_data: np.ndarray) -> np.ndarray:
     return cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
 
 
-def to_bgr(image_data: np.ndarray) -> np.ndarray:
+def to_bgr(image_data):
     """
     Convert image_data from RGB to BGR
     """
@@ -374,6 +366,7 @@ class SegmentationMap(NamedTuple):
     labels: List
 
     def get_colormap(self):
+        import numpy as np
         return np.array([label.color for label in self.labels])
 
     def get_labels(self):
@@ -423,7 +416,7 @@ BinarySegmentation = SegmentationMap(binary_labels)
 # In[ ]:
 
 
-def segmentation_map_to_image(result: np.ndarray, colormap: np.ndarray, remove_holes: bool = False) -> np.ndarray:
+def segmentation_map_to_image(result, colormap, remove_holes: bool = False):
     """
     Convert network result of floating point numbers to an RGB image with
     integer values from 0-255 by applying a colormap.
@@ -434,6 +427,7 @@ def segmentation_map_to_image(result: np.ndarray, colormap: np.ndarray, remove_h
     :return: An RGB image where each pixel is an int8 value according to colormap.
     """
     import cv2
+    import numpy as np
 
     if len(result.shape) != 2 and result.shape[0] != 1:
         raise ValueError(f"Expected result with shape (H,W) or (1,H,W), got result with shape {result.shape}")
@@ -466,7 +460,7 @@ def segmentation_map_to_image(result: np.ndarray, colormap: np.ndarray, remove_h
     return mask
 
 
-def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=False) -> np.ndarray:
+def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=False):
     """
     Returns a new image where a segmentation mask (created with colormap) is overlayed on
     the source image.
@@ -479,6 +473,7 @@ def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=Fal
     :return: An RGP image with segmentation mask overlayed on the source image.
     """
     import cv2
+    import numpy as np
 
     if len(image.shape) == 2:
         image = np.repeat(np.expand_dims(image, -1), 3, 2)
@@ -496,8 +491,8 @@ def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=Fal
 
 
 def viz_result_image(
-    result_image: np.ndarray,
-    source_image: np.ndarray = None,
+    result_image,
+    source_image = None,
     source_title: str = None,
     result_title: str = None,
     labels: List[Label] = None,
@@ -522,6 +517,7 @@ def viz_result_image(
     :return: Matplotlib figure with result image
     """
     import cv2
+    import numpy as np
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
 
@@ -571,7 +567,7 @@ def viz_result_image(
 # In[ ]:
 
 
-def show_array(frame: np.ndarray, display_handle=None):
+def show_array(frame, display_handle=None):
     """
     Display array `frame`. Replace information at `display_handle` with `frame`
     encoded as jpeg image. `frame` is expected to have data in BGR order.
@@ -579,6 +575,7 @@ def show_array(frame: np.ndarray, display_handle=None):
     Create a display_handle with: `display_handle = display(display_id=True)`
     """
     import cv2
+    from IPython.display import Image, display
 
     _, frame = cv2.imencode(ext=".jpeg", img=frame)
     if display_handle is None:
@@ -608,6 +605,7 @@ class NotebookAlert(Exception):
         self.show_message()
 
     def show_message(self):
+        from IPython.display import HTML, display
         display(HTML(f"""<div class="alert alert-{self.alert_class}">{self.message}"""))
 
 
@@ -622,14 +620,15 @@ class DeviceNotFoundAlert(NotebookAlert):
         :return: A formatted alert box with the message that `device` is not available, and a list
                  of devices that are available.
         """
-        ie = Core()
-        supported_devices = ie.available_devices
+        import openvino as ov
+        core = ov.Core()
+        supported_devices = core.available_devices
         self.message = f"Running this cell requires a {device} device, " "which is not available on this system. "
         self.alert_class = "warning"
         if len(supported_devices) == 1:
-            self.message += f"The following device is available: {ie.available_devices[0]}"
+            self.message += f"The following device is available: {core.available_devices[0]}"
         else:
-            self.message += "The following devices are available: " f"{', '.join(ie.available_devices)}"
+            self.message += "The following devices are available: " f"{', '.join(core.available_devices)}"
         super().__init__(self.message, self.alert_class)
 
 
@@ -641,8 +640,10 @@ def check_device(device: str) -> bool:
     :return: True if the device is available, False if not. If the device is not available,
              a DeviceNotFoundAlert will be shown.
     """
-    ie = Core()
-    if device not in ie.available_devices:
+    import openvino as ov
+
+    core = ov.Core()
+    if device not in core.available_devices:
         DeviceNotFoundAlert(device)
         return False
     else:
@@ -657,7 +658,9 @@ def check_openvino_version(version: str) -> bool:
     :return: True if the version is installed, False if not. If the version is not installed,
              an alert message will be shown.
     """
-    installed_version = get_version()
+    import openvino as ov
+
+    installed_version = ov.get_version()
     if version not in installed_version:
         NotebookAlert(
             f"This notebook requires OpenVINO {version}. "
@@ -673,33 +676,6 @@ def check_openvino_version(version: str) -> bool:
         return True
 
 
-packed_layername_tensor_dict_list = [{"name": "aten::mul/Multiply"}]
-
-
-class ReplaceTensor(MatcherPass):
-    def __init__(self, packed_layername_tensor_dict_list):
-        MatcherPass.__init__(self)
-        self.model_changed = False
-
-        param = WrapType("opset10.Multiply")
-
-        def callback(matcher: Matcher) -> bool:
-            root = matcher.get_match_root()
-            if root is None:
-                return False
-            for y in packed_layername_tensor_dict_list:
-                root_name = root.get_friendly_name()
-                if root_name.find(y["name"]) != -1:
-                    max_fp16 = np.array([[[[-np.finfo(np.float16).max]]]]).astype(np.float32)
-                    new_tenser = ops.constant(max_fp16, Type.f32, name="Constant_4431")
-                    root.set_arguments([root.input_value(0).node, new_tenser])
-                    packed_layername_tensor_dict_list.remove(y)
-
-            return True
-
-        self.register_matcher(Matcher(param, "ReplaceTensor"), callback)
-
-
 def optimize_bge_embedding(model_path, output_model_path):
     """
     optimize_bge_embedding used to optimize BGE model for NPU device
@@ -708,9 +684,42 @@ def optimize_bge_embedding(model_path, output_model_path):
         model_path {str} -- original BGE IR model path
         output_model_path {str} -- Converted BGE IR model path
     """
-    core = Core()
+    import openvino as ov
+    try:
+        from openvino.passes import Manager, MatcherPass, WrapType, Matcher
+        from openvino import opset10 as ops
+    except ImportError:
+        from openvino.runtime.passes import Manager, MatcherPass, WrapType, Matcher
+        from openvino.runtime import opset10 as ops
+    core = ov.Core()
     ov_model = core.read_model(model_path)
     manager = Manager()
+    packed_layername_tensor_dict_list = [{"name": "aten::mul/Multiply"}]
+
+
+    class ReplaceTensor(MatcherPass):
+        def __init__(self, packed_layername_tensor_dict_list):
+            MatcherPass.__init__(self)
+            self.model_changed = False
+
+            param = WrapType("opset10.Multiply")
+
+            def callback(matcher: Matcher) -> bool:
+                import numpy as np
+                root = matcher.get_match_root()
+                if root is None:
+                    return False
+                for y in packed_layername_tensor_dict_list:
+                    root_name = root.get_friendly_name()
+                    if root_name.find(y["name"]) != -1:
+                        max_fp16 = np.array([[[[-np.finfo(np.float16).max]]]]).astype(np.float32)
+                        new_tenser = ops.constant(max_fp16, ov.Type.f32, name="Constant_4431")
+                        root.set_arguments([root.input_value(0).node, new_tenser])
+                        packed_layername_tensor_dict_list.remove(y)
+
+                return True
+
+            self.register_matcher(Matcher(param, "ReplaceTensor"), callback)
     manager.register_pass(ReplaceTensor(packed_layername_tensor_dict_list))
     manager.run_passes(ov_model)
     ov.save_model(ov_model, output_model_path, compress_to_fp16=False)
