@@ -23,6 +23,8 @@ The tutorial consists from following steps:
 - Launch Interactive demo
 
 In this demonstration, you'll create interactive chatbot that can answer questions about provided image's content.
+The image bellow illustrates example of input prompt and model answer.
+![example.png](https://github.com/user-attachments/assets/7d886eb4-af78-4d3a-bfc3-8ae1c7147f31)
 
 ## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>

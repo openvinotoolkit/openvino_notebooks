@@ -20,7 +20,6 @@ example_images = {
     "sign.png": "https://github.com/user-attachments/assets/491c4af5-dc55-477b-9dc0-0960742980f2",
     "integral.png": "https://github.com/user-attachments/assets/8e9662f2-01fe-485d-8110-b5ce2d0d2b27",
     "house.png": "https://github.com/user-attachments/assets/a395f740-6e9a-4fa7-823b-e2862b910891",
-    "logo.png": "https://github.com/user-attachments/assets/2540a58e-c242-4439-b151-0fd1e6938af1",
 }
 
 
@@ -244,7 +243,6 @@ def make_demo(model, processor):
     ]
 
     DESCRIPTION = """\
-    <img src='logo.png' id='logo' />
     This is a demo of Gemma 3, a vision language model with outstanding performance on a wide range of tasks.
     You can upload images, interleaved images and videos. Note that video input only supports single-turn conversation and mp4 input.
     """
