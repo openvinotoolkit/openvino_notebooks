@@ -1,11 +1,11 @@
-# Screen Parsing with OmniParser and OpenVINO
+# Screen Parsing with OmniParser-v2.0 and OpenVINO
 
 Recent breakthrough in Visual Language Processing and Large Language models made significant strides in understanding and interacting with the world through text and images. However, accurately parsing and understanding complex graphical user interfaces (GUIs) remains a significant challenge.
 [OmniParser](https://microsoft.github.io/OmniParser/) is a comprehensive method for parsing user interface screenshots into structured and easy-to-understand elements. This enables more accurate and efficient interaction with GUIs, empowering AI agents to perform tasks across various platforms and applications.
 
 ![](https://microsoft.github.io/OmniParser/static/images/flow_merged0.png)
 
-More details about model can be found in [Microsoft blog post](https://www.microsoft.com/en-us/research/articles/omniparser-for-pure-vision-based-gui-agent/), [paper](https://arxiv.org/pdf/2408.00203), [original repo](https://github.com/microsoft/OmniParser) and [model card](https://huggingface.co/microsoft/OmniParser). 
+More details about model can be found in [Microsoft blog post](https://www.microsoft.com/en-us/research/articles/omniparser-for-pure-vision-based-gui-agent/), [paper](https://arxiv.org/pdf/2408.00203), [original repo](https://github.com/microsoft/OmniParser), [OmniParser V2 Blog Post](https://www.microsoft.com/en-us/research/articles/omniparser-v2-turning-any-llm-into-a-computer-use-agent/) and [model card](https://huggingface.co/microsoft/OmniParser-v2.0).
 
 In this tutorial we consider how to run OmniParser using OpenVINO.
 

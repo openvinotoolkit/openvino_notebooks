@@ -96,9 +96,7 @@ def get_quantized_pipeline(
     grammar_corrector_model_int8.decoder.model = quantized_model
     grammar_corrector_model_int8.decoder.request = None
     grammar_corrector_model_int8.decoder._compile()
-    grammar_corrector_pipe_int8 = pipeline(
-        "text2text-generation", model=grammar_corrector_model_int8, tokenizer=grammar_corrector_tokenizer, device=torch.device("cpu")
-    )
+    grammar_corrector_pipe_int8 = pipeline("text2text-generation", model=grammar_corrector_model_int8, tokenizer=grammar_corrector_tokenizer)
 
     return grammar_corrector_pipe_int8
 
