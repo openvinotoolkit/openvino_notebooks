@@ -1,17 +1,33 @@
-
 import os
 import re
 import tempfile
 from collections.abc import Iterator
 from threading import Thread
 
+from pathlib import Path
 import cv2
 import gradio as gr
-import torch
+import requests
 from PIL import Image
 from transformers import TextIteratorStreamer
 
 MAX_NUM_IMAGES = int(os.getenv("MAX_NUM_IMAGES", "5"))
+
+example_images = {
+    "barchart.png": "https://github.com/user-attachments/assets/7779e110-691a-40db-b7db-f226cd4d06bd",
+    "sunset.png": "https://github.com/user-attachments/assets/da3edb79-ae36-4973-9eaf-6ef712425faa",
+    "colors.png": "https://github.com/user-attachments/assets/d8e027f5-27d9-4d4d-9195-e89f8b972cb0",
+    "sign.png": "https://github.com/user-attachments/assets/491c4af5-dc55-477b-9dc0-0960742980f2",
+    "integral.png": "https://github.com/user-attachments/assets/8e9662f2-01fe-485d-8110-b5ce2d0d2b27",
+    "house.png": "https://github.com/user-attachments/assets/a395f740-6e9a-4fa7-823b-e2862b910891",
+    "logo.png": "https://github.com/user-attachments/assets/2540a58e-c242-4439-b151-0fd1e6938af1",
+}
+
+
+def download_example_images():
+    for file_name, url in example_images.items():
+        if not Path(file_name).exists():
+            Image.open(requests.get(url, stream=True).raw).save(file_name)
 
 
 def count_files_in_new_message(paths: list[str]) -> tuple[int, int]:
@@ -145,7 +161,10 @@ def process_history(history: list[dict]) -> list[dict]:
                 current_user_content.append({"type": "image", "url": content[0]})
     return messages
 
+
 def make_demo(model, processor):
+    download_example_images()
+
     def run(message: dict, history: list[dict], system_prompt: str = "", max_new_tokens: int = 512) -> Iterator[str]:
         if not validate_media_constraints(message, history):
             yield ""
@@ -179,7 +198,6 @@ def make_demo(model, processor):
             output += delta
             yield output
 
-
     examples = [
         [
             {
@@ -190,120 +208,43 @@ def make_demo(model, processor):
         [
             {
                 "text": "Write the matplotlib code to generate the same bar chart.",
-                "files": ["assets/additional-examples/barchart.png"],
-            }
-        ],
-        [
-            {
-                "text": "What is odd about this video?",
-                "files": ["assets/additional-examples/tmp.mp4"],
-            }
-        ],
-        [
-            {
-                "text": "I already have this supplement <image> and I want to buy this one <image>. Any warnings I should know about?",
-                "files": ["assets/additional-examples/pill1.png", "assets/additional-examples/pill2.png"],
-            }
-        ],
-        [
-            {
-                "text": "Write a poem inspired by the visual elements of the images.",
-                "files": ["assets/sample-images/06-1.png", "assets/sample-images/06-2.png"],
-            }
-        ],
-        [
-            {
-                "text": "Compose a short musical piece inspired by the visual elements of the images.",
-                "files": [
-                    "assets/sample-images/07-1.png",
-                    "assets/sample-images/07-2.png",
-                    "assets/sample-images/07-3.png",
-                    "assets/sample-images/07-4.png",
-                ],
+                "files": ["barchart.png"],
             }
         ],
         [
             {
                 "text": "Write a short story about what might have happened in this house.",
-                "files": ["assets/sample-images/08.png"],
-            }
-        ],
-        [
-            {
-                "text": "Create a short story based on the sequence of images.",
-                "files": [
-                    "assets/sample-images/09-1.png",
-                    "assets/sample-images/09-2.png",
-                    "assets/sample-images/09-3.png",
-                    "assets/sample-images/09-4.png",
-                    "assets/sample-images/09-5.png",
-                ],
-            }
-        ],
-        [
-            {
-                "text": "Describe the creatures that would live in this world.",
-                "files": ["assets/sample-images/10.png"],
-            }
-        ],
-        [
-            {
-                "text": "Read text in the image.",
-                "files": ["assets/additional-examples/1.png"],
-            }
-        ],
-        [
-            {
-                "text": "When is this ticket dated and how much did it cost?",
-                "files": ["assets/additional-examples/2.png"],
-            }
-        ],
-        [
-            {
-                "text": "Read the text in the image into markdown.",
-                "files": ["assets/additional-examples/3.png"],
+                "files": ["house.png"],
             }
         ],
         [
             {
                 "text": "Evaluate this integral.",
-                "files": ["assets/additional-examples/4.png"],
-            }
-        ],
-        [
-            {
-                "text": "caption this image",
-                "files": ["assets/sample-images/01.png"],
+                "files": ["integral.png"],
             }
         ],
         [
             {
                 "text": "What's the sign says?",
-                "files": ["assets/sample-images/02.png"],
-            }
-        ],
-        [
-            {
-                "text": "Compare and contrast the two images.",
-                "files": ["assets/sample-images/03.png"],
+                "files": ["sign.png"],
             }
         ],
         [
             {
                 "text": "List all the objects in the image and their colors.",
-                "files": ["assets/sample-images/04.png"],
+                "files": ["colors.png"],
             }
         ],
         [
             {
                 "text": "Describe the atmosphere of the scene.",
-                "files": ["assets/sample-images/05.png"],
+                "files": ["sunset.png"],
             }
         ],
     ]
 
     DESCRIPTION = """\
-    <img src='https://huggingface.co/spaces/huggingface-projects/gemma-3-12b-it/resolve/main/assets/logo.png' id='logo' />
+    <img src='logo.png' id='logo' />
     This is a demo of Gemma 3, a vision language model with outstanding performance on a wide range of tasks.
     You can upload images, interleaved images and videos. Note that video input only supports single-turn conversation and mp4 input.
     """
