@@ -367,6 +367,7 @@ class SegmentationMap(NamedTuple):
 
     def get_colormap(self):
         import numpy as np
+
         return np.array([label.color for label in self.labels])
 
     def get_labels(self):
@@ -492,7 +493,7 @@ def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=Fal
 
 def viz_result_image(
     result_image,
-    source_image = None,
+    source_image=None,
     source_title: str = None,
     result_title: str = None,
     labels: List[Label] = None,
@@ -606,6 +607,7 @@ class NotebookAlert(Exception):
 
     def show_message(self):
         from IPython.display import HTML, display
+
         display(HTML(f"""<div class="alert alert-{self.alert_class}">{self.message}"""))
 
 
@@ -621,6 +623,7 @@ class DeviceNotFoundAlert(NotebookAlert):
                  of devices that are available.
         """
         import openvino as ov
+
         core = ov.Core()
         supported_devices = core.available_devices
         self.message = f"Running this cell requires a {device} device, " "which is not available on this system. "
@@ -685,6 +688,7 @@ def optimize_bge_embedding(model_path, output_model_path):
         output_model_path {str} -- Converted BGE IR model path
     """
     import openvino as ov
+
     try:
         from openvino.passes import Manager, MatcherPass, WrapType, Matcher
         from openvino import opset10 as ops
@@ -696,7 +700,6 @@ def optimize_bge_embedding(model_path, output_model_path):
     manager = Manager()
     packed_layername_tensor_dict_list = [{"name": "aten::mul/Multiply"}]
 
-
     class ReplaceTensor(MatcherPass):
         def __init__(self, packed_layername_tensor_dict_list):
             MatcherPass.__init__(self)
@@ -706,6 +709,7 @@ def optimize_bge_embedding(model_path, output_model_path):
 
             def callback(matcher: Matcher) -> bool:
                 import numpy as np
+
                 root = matcher.get_match_root()
                 if root is None:
                     return False
@@ -720,6 +724,7 @@ def optimize_bge_embedding(model_path, output_model_path):
                 return True
 
             self.register_matcher(Matcher(param, "ReplaceTensor"), callback)
+
     manager.register_pass(ReplaceTensor(packed_layername_tensor_dict_list))
     manager.run_passes(ov_model)
     ov.save_model(ov_model, output_model_path, compress_to_fp16=False)
