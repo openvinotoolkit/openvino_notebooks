@@ -506,6 +506,8 @@ maskrcnn
 MaterialMLP
 MaterialNet
 mathbf
+mathpix
+matplotlib
 MathVista
 MatMul
 MBs
@@ -683,6 +685,7 @@ parsers
 patchifying
 perceptron
 Patil
+pdftex
 PEFT
 perceiver
 PerformanceMode
@@ -747,6 +750,7 @@ PTQ
 px
 py
 pyannote
+pyecharts
 pymodule
 pynim
 PyPI
@@ -940,6 +944,7 @@ tf
 TFLite
 tflite
 th
+tikz
 timestep
 timesteps
 TinyLlama
@@ -1019,6 +1024,7 @@ Vec
 VectorStore
 vec
 VegaRT
+verovio
 videpth
 VIO
 virtualenv
