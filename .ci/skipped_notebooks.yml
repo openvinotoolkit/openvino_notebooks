@@ -218,8 +218,6 @@
   skips:
     - os:
         - macos-13
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/distil-whisper-asr/distil-whisper-asr.ipynb
   skips:
     - os:
