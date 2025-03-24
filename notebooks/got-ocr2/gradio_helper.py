@@ -227,8 +227,6 @@ def make_demo(model, processor):
                         )
                 elif isinstance(img, np.ndarray):
                     cv2.imwrite(image_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
-                elif isinstance(img, str):
-                    shutil.copy(img, image_path)
                 else:
                     return "Error: Unsupported image format", None, None
 

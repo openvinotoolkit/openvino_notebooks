@@ -250,7 +250,7 @@ def make_demo(model, processor):
     demo = gr.ChatInterface(
         fn=run,
         type="messages",
-        chatbot=gr.Chatbot(type="messages", scale=1, allow_tags=["image"]),
+        chatbot=gr.Chatbot(type="messages", scale=1),
         textbox=gr.MultimodalTextbox(file_types=["image", ".mp4"], file_count="multiple", autofocus=True),
         multimodal=True,
         additional_inputs=[
