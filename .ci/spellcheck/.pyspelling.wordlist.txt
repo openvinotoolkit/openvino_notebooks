@@ -222,7 +222,13 @@ DiT’s
 DiT’s
 DL
 DocLayNet
+docling
+Docling
+Docling's
+DoclingDocument
+DoclingDocuments
 docstring
+DocTags
 DocVQA
 docvqa
 DocumentLoaders
@@ -355,6 +361,7 @@ ICIP
 ICPR
 IEMOCAP
 iGPU
+identation
 IdentityNet
 iGPUs
 Ilija
@@ -449,6 +456,8 @@ LangChain
 langchain
 Lasinger
 latents
+LaTeX
+Lysak
 LocalAI
 lookahead
 LCMs
@@ -480,6 +489,7 @@ lm
 LM
 LMS
 LLMPipeline
+loc
 logits
 LogSoftmax
 LoRA
@@ -492,6 +502,7 @@ LSTM
 LSTMs
 Luo
 LVLM
+Lysak
 Lyth
 MaaS
 macOS
@@ -648,6 +659,8 @@ OpenVoiceBaseClass
 opset
 optimizable
 Orca
+otsl
+OTSL
 OuteTTS
 outpainting
 OVC
@@ -876,6 +889,7 @@ slowfast
 slowmo
 SML
 sml
+SmolDocling
 SmolVLM
 softmax
 softvc
