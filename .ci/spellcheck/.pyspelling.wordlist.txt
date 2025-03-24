@@ -876,6 +876,7 @@ slowfast
 slowmo
 SML
 sml
+SmolVLM
 softmax
 softvc
 SoftVC
