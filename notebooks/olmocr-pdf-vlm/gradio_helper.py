@@ -1,16 +1,10 @@
-import os
-import torch
 import base64
-import urllib.request
-import tempfile
 import gradio as gr
-import shutil
 from io import BytesIO
 from pathlib import Path
 from PIL import Image
 import json
-
-from IPython.display import Markdown
+import requests
 
 import numpy as np
 import openvino as ov
@@ -31,8 +25,6 @@ if not sample_path.exists():
 def process_file_upload(
     file,
     page_number=1,
-    temperature=0.8,
-    max_new_tokens=300,
 ):
     image_base64 = render_pdf_to_base64png(file, page_number, target_longest_image_dim=1024)
 
