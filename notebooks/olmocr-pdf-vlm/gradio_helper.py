@@ -31,31 +31,22 @@ def process_file_upload(
     anchor_text = get_anchor_text(file, page_number, pdf_engine="pdfreport", target_length=4000)
     prompt = build_finetuning_prompt(anchor_text)
 
-    messages = [
-        {
-            "role": "user",
-            "content": [
-                {"type": "text", "text": prompt},
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_base64}"}},
-            ],
-        }
-    ]
     main_image = Image.open(BytesIO(base64.b64decode(image_base64)))
 
-    return messages, main_image
+    return prompt, main_image
 
 
-def make_demo(pipe, processor):
+def make_demo(pipe):
     def generate(file_input, page_number, temperature, max_new_tokens):
-        messages, image = process_file_upload(file_input, page_number=page_number)
-        text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        prompt, image = process_file_upload(file_input, page_number=page_number)
         image_data = np.array(image.getdata()).reshape(1, image.size[1], image.size[0], 3).astype(np.byte)
         output = pipe.generate(
-            prompt=text,
+            prompt=prompt,
             image=ov.Tensor(image_data),
             temperature=temperature,
             max_new_tokens=max_new_tokens,
             num_return_sequences=1,
+            stop_strings="<|im_end|>",
             do_sample=True,
         )
         try:
@@ -87,7 +78,7 @@ def make_demo(pipe, processor):
                             label="Max New Tokens",
                             minimum=10,
                             maximum=5000,
-                            value=500,
+                            value=4096,
                             step=10,
                         )
 
@@ -98,7 +89,7 @@ def make_demo(pipe, processor):
                             "./paper.pdf",
                             1,
                             0.8,
-                            500,
+                            4096,
                             None,
                         ],
                     ],
