@@ -535,10 +535,6 @@
         - windows-2019
 - notebook: notebooks/olmocr-pdf-vlm/olmocr-pdf-vlm.ipynb
   skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2019
     - python:
         - '3.9'
         - '3.10'
