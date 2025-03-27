@@ -503,7 +503,7 @@ class OpenVINOEmbeddings(BaseModel, Embeddings):
             model_kwargs = {'device': 'CPU'}
             encode_kwargs = {'normalize_embeddings': True}
             ov = OpenVINOEmbeddings(
-                model_name_or_path=model_name,
+                model_path=model_name,
                 model_kwargs=model_kwargs,
                 encode_kwargs=encode_kwargs
             )
@@ -544,10 +544,11 @@ class OpenVINOEmbeddings(BaseModel, Embeddings):
                 "pip install -U openvino_genai"
             ) from e
 
-        core = ov.Core()
-        self.ov_model = core.compile_model(
-            Path(self.model_path) / "openvino_model.xml", **self.model_kwargs
-        )
+        if self.ov_model is None:
+            core = ov.Core()
+            self.ov_model = core.compile_model(
+                Path(self.model_path) / "openvino_model.xml", **self.model_kwargs
+            )
         self.tokenizer = openvino_genai.Tokenizer(self.model_path)
 
     def _text_length(self, text: Any) -> int:
@@ -684,7 +685,7 @@ class OpenVINOEmbeddings(BaseModel, Embeddings):
             texts, show_progress_bar=self.show_progress, **self.encode_kwargs
         )
 
-        return embeddings.tolist()
+        return embeddings
 
     def embed_query(self, text: str) -> List[float]:
         """Compute query embeddings using a HuggingFace transformer model.
@@ -710,7 +711,7 @@ class OpenVINOBgeEmbeddings(OpenVINOEmbeddings):
             model_kwargs = {'device': 'CPU'}
             encode_kwargs = {'normalize_embeddings': True}
             ov = OpenVINOBgeEmbeddings(
-                model_name_or_path=model_name,
+                model_path=model_name,
                 model_kwargs=model_kwargs,
                 encode_kwargs=encode_kwargs
             )
@@ -739,7 +740,7 @@ class OpenVINOBgeEmbeddings(OpenVINOEmbeddings):
         """
         texts = [self.embed_instruction + t.replace("\n", " ") for t in texts]
         embeddings = self.encode(texts, **self.encode_kwargs)
-        return embeddings.tolist()
+        return embeddings
 
     def embed_query(self, text: str) -> List[float]:
         """Compute query embeddings using a HuggingFace transformer model.
@@ -752,7 +753,7 @@ class OpenVINOBgeEmbeddings(OpenVINOEmbeddings):
         """
         text = text.replace("\n", " ")
         embedding = self.encode(self.query_instruction + text, **self.encode_kwargs)
-        return embedding.tolist()
+        return embedding
 
 
 class RerankRequest:
@@ -799,19 +800,20 @@ class OpenVINOReranker(BaseDocumentCompressor):
                 "Please install it with: "
                 "pip install -U openvino_genai"
             ) from e
-
-        core = ov.Core()
-        self.ov_model = core.compile_model(
-            Path(self.model_path) / "openvino_model.xml", **self.model_kwargs
-        )
+        if self.ov_model is None:
+            core = ov.Core()
+            self.ov_model = core.compile_model(
+                Path(self.model_path) / "openvino_model.xml", **self.model_kwargs
+            )
         self.tokenizer = openvino_genai.Tokenizer(self.model_path)
 
     def rerank(self, request: Any) -> Any:
         query = request.query
         passages = request.passages
-
-        query_passage_pairs = [[query, passage["text"]] for passage in passages]
-        length = self.ov_model.inputs[0].get_partial_shape()[1]
+        # # openvino tokenizer can only support 1D list
+        query_passage_pairs = [query + "</s></s> " + passage["text"] for passage in passages]
+        # query_passage_pairs = [[query, passage["text"]] for passage in passages]
+        length = self.ov_model.inputs[0].get_partial_shape()[1]                                                                                          
         if length.is_dynamic:
             features = self.tokenizer.encode(query_passage_pairs)
         else:
@@ -820,19 +822,10 @@ class OpenVINOReranker(BaseDocumentCompressor):
                 pad_to_max_length=True,
                 max_length=length.get_length(),
             )
-        if "token_type_ids" in (input.any_name for input in self.ov_model.inputs):
-            token_type_ids = np.zeros(features.attention_mask.shape)
-            model_input = {
-                "input_ids": features.input_ids,
-                "attention_mask": features.attention_mask,
-                "token_type_ids": token_type_ids,
-            }
-        else:
-            model_input = {
-                "input_ids": features.input_ids,
-                "attention_mask": features.attention_mask,
-            }
-
+        model_input = {
+            "input_ids": features.input_ids,
+            "attention_mask": features.attention_mask,
+        }
         outputs = self.ov_model(model_input)
         if outputs[0].shape[1] > 1:
             scores = outputs[0][:, 1]
