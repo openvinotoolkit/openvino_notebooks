@@ -25,12 +25,14 @@ css = """
 """
 
 
-def make_demo(pipeline, generator_cls, adapter_config):
+def make_demo(pipeline, generator_cls, adapter_config, device):
     def infer(prompt, negative_prompt, seed, randomize_seed, width, height, num_inference_steps, use_lora, progress=gr.Progress(track_tqdm=True)):
         if randomize_seed:
             seed = np.random.randint(0, MAX_SEED)
 
         generator = generator_cls(seed)
+
+        use_negative_prompt = pipeline.get_generation_config().guidance_scale > 1
 
         pbar = tqdm(total=num_inference_steps)
 
@@ -39,16 +41,22 @@ def make_demo(pipeline, generator_cls, adapter_config):
             sys.stdout.flush()
             return False
 
-        image_tensor = pipeline.generate(
-            prompt=prompt,
-            negative_prompt=negative_prompt,
-            num_inference_steps=num_inference_steps,
-            width=width,
-            height=height,
-            generator=generator,
-            adapters=adapter_config if use_lora else ov_genai.AdapterConfig(),
-            callback=callback,
-        )
+        generate_args = {
+            "prompt": prompt,
+            "num_inference_steps": num_inference_steps,
+            "generator": generator,
+            "callback": callback,
+            "height": height,
+            "width": width,
+        }
+
+        if use_negative_prompt:
+            generate_args["negative_prompt"] = negative_prompt
+
+        if device != "NPU":
+            generate_args["adapters"] = adapter_config if use_lora else ov_genai.AdapterConfig()
+
+        image_tensor = pipeline.generate(**generate_args)
 
         return image_tensor.data[0], seed
 
@@ -72,7 +80,7 @@ def make_demo(pipeline, generator_cls, adapter_config):
                 run_button = gr.Button("Run", scale=0)
 
             result = gr.Image(label="Result", show_label=False)
-            use_lora = gr.Checkbox(label="Use LoRA", value=False)
+            use_lora = gr.Checkbox(label="Use LoRA", value=False, visible=device != "NPU")
 
             with gr.Accordion("Advanced Settings", open=False):
                 negative_prompt = gr.Text(
@@ -92,21 +100,9 @@ def make_demo(pipeline, generator_cls, adapter_config):
                 randomize_seed = gr.Checkbox(label="Randomize seed", value=True)
 
                 with gr.Row():
-                    width = gr.Slider(
-                        label="Width",
-                        minimum=256,
-                        maximum=MAX_IMAGE_SIZE,
-                        step=64,
-                        value=512,
-                    )
+                    width = gr.Slider(label="Width", minimum=256, maximum=MAX_IMAGE_SIZE, step=64, value=512, visible=device != "NPU")
 
-                    height = gr.Slider(
-                        label="Height",
-                        minimum=256,
-                        maximum=MAX_IMAGE_SIZE,
-                        step=64,
-                        value=512,
-                    )
+                    height = gr.Slider(label="Height", minimum=256, maximum=MAX_IMAGE_SIZE, step=64, value=512, visible=device != "NPU")
 
                 with gr.Row():
                     num_inference_steps = gr.Slider(

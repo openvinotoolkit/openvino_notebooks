@@ -127,7 +127,7 @@ jobs:
 
       - name: Cache Pip Packages
         id: cachepip
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
         with:
           path: |
             pipcache
@@ -136,7 +136,7 @@ jobs:
       # Cache specific files to reduce downloads or prevent network issues
       - name: Cache Files
         id: cachefiles
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
         with:
           path: |
             # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
@@ -167,7 +167,7 @@ jobs:
       # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
       - name: Cache PaddlePaddle cache directories
         id: cacheusercache
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
         with:
           path: |
             ${{ env.HUB_HOME }}

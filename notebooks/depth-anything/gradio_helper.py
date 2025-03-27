@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Callable
 import gradio as gr
-from gradio_imageslider import ImageSlider
 
 css = """
 #img-display-container {
@@ -24,7 +23,7 @@ def make_demo(fn: Callable, examples_dir: str):
 
         with gr.Row():
             input_image = gr.Image(label="Input Image", type="numpy", elem_id="img-display-input")
-            depth_image_slider = ImageSlider(label="Depth Map with Slider View", elem_id="img-display-output", position=0)
+            depth_image_slider = gr.Image(label="Depth Map", elem_id="img-display-output")
         depth_image_file = gr.File(label="Depth Image")
         submit = gr.Button("Submit")
 

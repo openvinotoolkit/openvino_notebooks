@@ -70,6 +70,16 @@ class SamVideoMaskPredictorModel(torch.nn.Module):
 
     def _embed_points(self, point_coords: torch.Tensor, point_labels: torch.Tensor, pad: bool = True) -> torch.Tensor:
         point_coords = point_coords + 0.5
+        # check SAM2 implementation
+        # https://github.com/facebookresearch/sam2/blob/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/sam/prompt_encoder.py#L87-L91
+        # to deal with point input when boxes is None
+        # https://github.com/facebookresearch/sam2/blob/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/sam/prompt_encoder.py#L189
+        if pad:
+            padding_point = torch.zeros((point_coords.shape[0], 1, 2), device=point_coords.device)
+            padding_label = -torch.ones((point_labels.shape[0], 1), device=point_labels.device)
+            point_coords = torch.cat([point_coords, padding_point], dim=1)
+            point_labels = torch.cat([point_labels, padding_label], dim=1)
+
         point_coords = point_coords / self.img_size
         point_embedding = self.prompt_encoder.pe_layer._pe_encoding(point_coords)
         point_labels = point_labels.unsqueeze(-1).expand_as(point_embedding)
@@ -116,7 +126,7 @@ class SamVideoMaskPredictorModel(torch.nn.Module):
         high_res_feats_128=None,
     ):
         mask_inputs = None
-        sparse_embeddings = self._embed_points(point_coords, point_labels)
+        sparse_embeddings = self._embed_points(point_coords, point_labels, pad=True)
         if mask_inputs is None:
             dense_embeddings = self.prompt_encoder.no_mask_embed.weight.reshape(1, -1, 1, 1).expand(point_coords.shape[0], -1, backbone_features.shape[0], 64)
         else:
@@ -753,6 +763,11 @@ class OVSAM2VideoPredictor(SAM2VideoPredictor):
             if point_inputs:
                 inputs["point_labels"] = point_inputs["point_labels"]
                 inputs["point_coords"] = point_inputs["point_coords"]
+            # after the conditional frames, point input should be treated as empty point
+            # https://github.com/facebookresearch/sam2/blob/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/sam2_video_predictor.py#L1059-L1062
+            else:
+                inputs["point_coords"] = torch.zeros(1, 1, 2)
+                inputs["point_labels"] = -torch.ones(1, 1, dtype=torch.int32)
 
             if mask_inputs:
                 inputs["mask_inputs"] = mask_inputs

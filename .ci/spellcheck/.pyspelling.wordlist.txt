@@ -206,6 +206,7 @@ dGPU
 dGPUs
 DialoGPT
 diarization
+digitalized
 Diffusers
 diffusers
 dimensionality
@@ -221,7 +222,13 @@ DiT’s
 DiT’s
 DL
 DocLayNet
+docling
+Docling
+Docling's
+DoclingDocument
+DoclingDocuments
 docstring
+DocTags
 DocVQA
 docvqa
 DocumentLoaders
@@ -354,6 +361,7 @@ ICIP
 ICPR
 IEMOCAP
 iGPU
+identation
 IdentityNet
 iGPUs
 Ilija
@@ -395,6 +403,7 @@ intervaling
 im
 img
 ip
+IPs
 ir
 IRs
 iteratively
@@ -421,6 +430,7 @@ KD
 KDE
 keras
 KerasCV
+KerasHub
 keypoint
 keypoints
 KiTS
@@ -446,6 +456,8 @@ LangChain
 langchain
 Lasinger
 latents
+LaTeX
+Lysak
 LocalAI
 lookahead
 LCMs
@@ -457,12 +469,16 @@ learnable
 LeViT
 LibriSpeech
 librispeech
+LibriTTS
 Lim
 LinearCameraEmbedder
 Lippipeline
 Liu
 LLama
 LLaMa
+LLaMA
+LLaSA
+Llasa
 LlamaIndex
 LLaVA
 llava
@@ -473,6 +489,7 @@ lm
 LM
 LMS
 LLMPipeline
+loc
 logits
 LogSoftmax
 LoRA
@@ -485,6 +502,7 @@ LSTM
 LSTMs
 Luo
 LVLM
+Lysak
 Lyth
 MaaS
 macOS
@@ -499,6 +517,8 @@ maskrcnn
 MaterialMLP
 MaterialNet
 mathbf
+mathpix
+matplotlib
 MathVista
 MatMul
 MBs
@@ -539,6 +559,7 @@ Modelscope
 ModelScope
 modelscope
 Mody
+MoE
 MONAI
 MONAI's
 Monodepth
@@ -548,18 +569,21 @@ mpnet
 mpt
 MPT
 MRPC
+mRoPE
 MTVQA
 multiarchitecture
 Multiclass
 multiclass
 MultiHeadAttention
 multilayer
+Multilinguality
 multimodal
 Multimodality
 multinomial
 MusicGen
 MuRAG
 Müller
+naflex
 Nakayosi
 nano
 nanoLLaVA
@@ -596,6 +620,7 @@ NumPy
 NPU
 NPUs
 NVLabs
+ngram
 OASST
 OBB
 obb
@@ -634,6 +659,8 @@ OpenVoiceBaseClass
 opset
 optimizable
 Orca
+otsl
+OTSL
 OuteTTS
 outpainting
 OVC
@@ -672,6 +699,7 @@ parsers
 patchifying
 perceptron
 Patil
+pdftex
 PEFT
 perceiver
 PerformanceMode
@@ -736,6 +764,7 @@ PTQ
 px
 py
 pyannote
+pyecharts
 pymodule
 pynim
 PyPI
@@ -805,6 +834,7 @@ Rinna
 rinna
 RLHF
 RMBG
+RMSNorm
 RoBERTa
 roberta
 ROI
@@ -859,6 +889,8 @@ slowfast
 slowmo
 SML
 sml
+SmolDocling
+SmolVLM
 softmax
 softvc
 SoftVC
@@ -928,6 +960,7 @@ tf
 TFLite
 tflite
 th
+tikz
 timestep
 timesteps
 TinyLlama
@@ -1007,6 +1040,7 @@ Vec
 VectorStore
 vec
 VegaRT
+verovio
 videpth
 VIO
 virtualenv
@@ -1018,8 +1052,11 @@ vits
 VITS
 vitt
 VL
+VL’s
 vl
+vlm
 VLM
+VLMs
 VLModel
 VLMPipeline
 VM
@@ -1053,6 +1090,7 @@ WuerstchenDiffNeXt
 Würstchen
 XAI
 XCode
+XCodec
 Xeon
 xformers
 xl

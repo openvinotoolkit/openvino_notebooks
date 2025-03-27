@@ -20,6 +20,7 @@ EXPECTED_NO_DEVICE = [
     Path("notebooks/s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb"),  # only cpu
     Path("notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb"),  # device-agnostic
     Path("notebooks/localai/localai.ipynb"),  # can not change device in docker configuration on the fly
+    Path("notebooks/keras-with-openvino-backend/keras-with-openvino-backend.ipynb"),  # only cpu
 ]
 
 

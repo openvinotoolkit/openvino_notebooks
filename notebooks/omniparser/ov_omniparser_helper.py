@@ -44,24 +44,24 @@ def load_ov_icon_detector(model_path, device):
 
 
 def download_omniparser_florence_model():
-    florence_caption_dir = Path("weights/icon_caption_florence")
+    florence_caption_dir = Path("weights/icon_caption")
 
     if not florence_caption_dir.exists():
-        download_original_model("microsoft/Florence-2-base-ft", florence_caption_dir)
+        download_original_model("microsoft/Florence-2-base", florence_caption_dir)
     pt_model = florence_caption_dir / "pytorch_model.bin"
 
     if pt_model.exists():
         pt_model.unlink()
         (pt_model.parent / "config.json").unlink()
-    hf_hub_download("microsoft/OmniParser", filename="icon_caption_florence/model.safetensors", local_dir="weights")
-    hf_hub_download("microsoft/OmniParser", filename="icon_caption_florence/config.json", local_dir="weights")
-    hf_hub_download("microsoft/OmniParser", filename="icon_caption_florence/generation_config.json", local_dir="weights")
+    hf_hub_download("microsoft/OmniParser-v2.0", filename="icon_caption/model.safetensors", local_dir="weights")
+    hf_hub_download("microsoft/OmniParser-v2.0", filename="icon_caption/config.json", local_dir="weights")
+    hf_hub_download("microsoft/OmniParser-v2.0", filename="icon_caption/generation_config.json", local_dir="weights")
 
     with (florence_caption_dir / "config.json").open("r") as f:
         config_data = json.load(f)
     class_mapping = config_data["auto_map"]
     for key, value in class_mapping.items():
-        class_mapping[key] = value.replace("microsoft/Florence-2-base-ft--", "")
+        class_mapping[key] = value.replace("microsoft/Florence-2-base--", "")
     config_data["auto_map"] = class_mapping
 
     with (florence_caption_dir / "config.json").open("w") as f:
@@ -74,8 +74,8 @@ def download_omniparser_icon_detector():
 
     icon_detector_dir = Path("weights/icon_detect")
 
-    download_file("https://huggingface.co/spaces/microsoft/OmniParser/resolve/main/weights/icon_detect/best.pt", directory="weights/icon_detect")
-    download_file("https://huggingface.co/spaces/microsoft/OmniParser/raw/main/weights/icon_detect/model.yaml", directory="weights/icon_detect")
+    download_file("https://huggingface.co/microsoft/OmniParser-v2.0/resolve/main/icon_detect/model.pt", directory="weights/icon_detect")
+    download_file("https://huggingface.co/microsoft/OmniParser-v2.0/resolve/main/icon_detect/model.yaml", directory="weights/icon_detect")
 
     return icon_detector_dir
 

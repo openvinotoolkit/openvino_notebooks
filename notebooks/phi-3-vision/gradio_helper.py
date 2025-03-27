@@ -2,13 +2,39 @@ from pathlib import Path
 import requests
 import gradio as gr
 from PIL import Image
-from threading import Thread
-from transformers import TextIteratorStreamer
+from threading import Event, Thread
+from queue import Queue
+
+import openvino_genai as ov_genai
 
 
-def make_demo(model, processor):
-    model_name = Path(model.config._name_or_path).parent.name
+class TextQueue:
+    def __init__(self) -> None:
+        self.text_queue = Queue()
+        self.stop_signal = None
+        self.stop_tokens = []
 
+    def __call__(self, text):
+        self.text_queue.put(text)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        value = self.text_queue.get()
+        if value == self.stop_signal or value in self.stop_tokens:
+            raise StopIteration()
+        else:
+            return value
+
+    def reset(self):
+        self.text_queue = Queue()
+
+    def end(self):
+        self.text_queue.put(self.stop_signal)
+
+
+def make_demo(pipe, read_images, model_name):
     example_image_urls = [
         ("https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/dd5105d6-6a64-4935-8a34-3058a82c8d5d", "small.png"),
         ("https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/1221e2a8-a6da-413a-9af6-f04d56af3754", "chart.png"),
@@ -23,18 +49,17 @@ def make_demo(model, processor):
         print(f"history is - {history}")
         files = message["files"] if isinstance(message, dict) else message.files
         message_text = message["text"] if isinstance(message, dict) else message.text
+
+        image = None
         if files:
             # message["files"][-1] is a Dict or just a string
             if isinstance(files[-1], dict):
                 image = files[-1]["path"]
             else:
-                image = files[-1] if isinstance(files[-1], (list, tuple, str)) else files[-1].path
-        else:
-            # if there's no image uploaded for this turn, look for images in the past turns
-            # kept inside tuples, take the last one
-            for hist in history:
-                if type(hist[0]) == tuple:
-                    image = hist[0][0]
+                if isinstance(files[-1], (str, Path)):
+                    image = files[-1]
+                else:
+                    image = files[-1] if isinstance(files[-1], (list, tuple)) else files[-1].path
         try:
             if image is None:
                 # Handle the case where image is None
@@ -42,50 +67,32 @@ def make_demo(model, processor):
         except NameError:
             # Handle the case where 'image' is not defined at all
             raise gr.Error("You need to upload an image for Phi3-Vision to work. Close the error and try again with an Image.")
+        image = read_images(image)
 
-        conversation = []
-        flag = False
-        for user, assistant in history:
-            if assistant is None:
-                # pass
-                flag = True
-                conversation.extend([{"role": "user", "content": ""}])
-                continue
-            if flag == True:
-                conversation[0]["content"] = f"<|image_1|>\n{user}"
-                conversation.extend([{"role": "assistant", "content": assistant}])
-                flag = False
-                continue
-            conversation.extend([{"role": "user", "content": user}, {"role": "assistant", "content": assistant}])
+        print(f"prompt is -\n{message_text}")
 
-        if len(history) == 0:
-            conversation.append({"role": "user", "content": f"<|image_1|>\n{message_text}"})
-        else:
-            conversation.append({"role": "user", "content": message_text})
-        print(f"prompt is -\n{conversation}")
-        prompt = processor.tokenizer.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
-        image = Image.open(image)
-        inputs = processor(prompt, image, return_tensors="pt")
+        config = ov_genai.GenerationConfig()
+        config.max_new_tokens = 200
+        config.do_sample = False
+        config.set_eos_token_id(pipe.get_tokenizer().get_eos_token_id())
 
-        streamer = TextIteratorStreamer(
-            processor,
-            **{
-                "skip_special_tokens": True,
-                "skip_prompt": True,
-                "clean_up_tokenization_spaces": False,
-            },
-        )
-        generation_kwargs = dict(
-            inputs,
-            streamer=streamer,
-            max_new_tokens=1024,
-            do_sample=False,
-            temperature=0.0,
-            eos_token_id=processor.tokenizer.eos_token_id,
-        )
+        streamer = TextQueue()
+        stream_complete = Event()
 
-        thread = Thread(target=model.generate, kwargs=generation_kwargs)
-        thread.start()
+        def generate_and_signal_complete():
+            """
+            generation function for single thread
+            """
+            streamer.reset()
+            generation_kwargs = {"prompt": message_text, "generation_config": config, "streamer": streamer}
+            if image is not None:
+                generation_kwargs["images"] = image
+            pipe.generate(**generation_kwargs)
+            stream_complete.set()
+            streamer.end()
+
+        t1 = Thread(target=generate_and_signal_complete)
+        t1.start()
 
         buffer = ""
         for new_text in streamer:
