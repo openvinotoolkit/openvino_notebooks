@@ -132,7 +132,6 @@
 - [Big Transfer Image Classification Model Quantization pipeline with NNCF](./big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb)
 - [Automatic Device Selection with OpenVINO™](./auto-device/auto-device.ipynb)
 - [Asynchronous Inference with OpenVINO™](./async-api/async-api.ipynb)
-- [Text Generation with LoRA via OpenVINO GenAI](./llm-lora/llm-lora.ipynb)
 
 ## Convert
 
