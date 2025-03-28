@@ -132,6 +132,7 @@
 - [Big Transfer Image Classification Model Quantization pipeline with NNCF](./big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb)
 - [Automatic Device Selection with OpenVINO™](./auto-device/auto-device.ipynb)
 - [Asynchronous Inference with OpenVINO™](./async-api/async-api.ipynb)
+- [Text Generation via Prompt Lookup Decoding using OpenVINO™](./prompt-lookup-decoding/prompt-lookup-decoding.ipynb)
 
 ## Convert
 
@@ -239,7 +240,6 @@
 - [Visual-language assistant with Qwen2VL and OpenVINO](./qwen2-vl/qwen2-vl.ipynb)
 - [Audio-language assistant with Qwen2Audio and OpenVINO](./qwen2-audio/qwen2-audio.ipynb)
 - [Generate creative QR codes with ControlNet QR Code Monster and OpenVINO™](./qrcode-monster/qrcode-monster.ipynb)
-- [Text Generation via Prompt Lookup Decoding using OpenVINO™](./prompt-lookup-decoding/prompt-lookup-decoding.ipynb)
 - [Visual-language assistant with Pixtral and OpenVINO](./pixtral/pixtral.ipynb)
 - [PixArt-α: Fast Training of Diffusion Transformer for Photorealistic Text-to-Image Synthesis with OpenVINO](./pixart/pixart.ipynb)
 - [Document Visual Question Answering Using Pix2Struct and OpenVINO™](./pix2struct-docvqa/pix2struct-docvqa.ipynb)
