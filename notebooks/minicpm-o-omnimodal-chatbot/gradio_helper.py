@@ -21,7 +21,6 @@ DEFAULT_SAMPLING_PARAMS = {
 MAX_NEW_TOKENS = 512
 
 
-
 def check_messages(history, message, audio):
     has_text = message["text"] and message["text"].strip()
     has_files = len(message["files"]) > 0
@@ -103,6 +102,7 @@ def history2messages(history: List[Dict]) -> List[Dict]:
     if len(cur_message) > 0:
         messages.append(cur_message)
     return messages
+
 
 def make_demo(ov_model, processor):
     def bot(

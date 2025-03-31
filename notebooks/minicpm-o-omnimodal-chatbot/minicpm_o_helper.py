@@ -349,7 +349,7 @@ def convert_llm(model, model_dir):
             inp.get_tensor().set_names({inp_name})
 
         patch_stateful(ov_model)
-        
+
         shutil.copy(model_dir / "ckpt" / "configuration_minicpm.py", model_dir / "language_model" / "configuration_minicpm.py")
         shutil.copy(model_dir / "ckpt" / "modeling_navit_siglip.py", model_dir / "language_model" / "modeling_navit_siglip.py")
         ov.save_model(ov_model, model_dir / llm_path)
@@ -514,7 +514,6 @@ def convert_vision_encoder(model, model_dir):
         gc.collect()
         print("✅ Image embedding model successfully converted")
 
-    
     if not (model_dir / resampler_path).exists():
         print("⌛ Convert Resamler model")
 
@@ -556,26 +555,25 @@ def convert_vision_encoder(model, model_dir):
         del model.resampler
         gc.collect()
         print("✅ Resampler model successfully converted")
-    
+
+
 def convert_audio_encoder(model, model_dir):
     if not (model_dir / audio_emb_path).exists():
+
         def forward_wrap(self, input_features, attention_mask):
-            audio_states = self._orig_forward(
-                    input_features, output_hidden_states=True, attention_mask=attention_mask
-                ).hidden_states[self.audio_encoder_layer]
+            audio_states = self._orig_forward(input_features, output_hidden_states=True, attention_mask=attention_mask).hidden_states[self.audio_encoder_layer]
             audio_embeds = self.audio_projection_layer(audio_states)
             audio_embeds = audio_embeds.transpose(1, 2)
             audio_embeds = self.audio_avg_pooler(audio_embeds)
             audio_embeds = audio_embeds.transpose(1, 2)
             return audio_embeds
-        
+
         model._orig_forward = model.apm.forward
         model.forward = types.MethodType(forward_wrap, model)
-    
-        
+
         print("⌛ Convert Audio embedding model")
         input_features = torch.randn([2, 80, 1515])
-        attention_mask =  torch.ones([2, 1, 758, 758])
+        attention_mask = torch.ones([2, 1, 758, 758])
         ov_model = ov.convert_model(model, example_input=[input_features, attention_mask])
         ov.save_model(ov_model, model_dir / audio_emb_path)
         del ov_model
@@ -602,7 +600,7 @@ def convert_minicpmo26(model_id, remove_checkpoint=False):
     model = AutoModel.from_pretrained(
         model_id,
         trust_remote_code=True,
-        attn_implementation='sdpa', # sdpa or flash_attention_2
+        attn_implementation="sdpa",  # sdpa or flash_attention_2
         torch_dtype=torch.float32,
         init_vision=True,
         init_audio=True,
@@ -971,13 +969,11 @@ class OvMiniCPMO:
         Computes the output length of the convolutional layers and the output length of the audio encoder
         """
         input_lengths_after_cnn = (input_lengths - 1) // 2 + 1
-        input_lengths_after_pooling = (
-            input_lengths_after_cnn - self.config.audio_pool_step
-        ) // self.config.audio_pool_step + 1
+        input_lengths_after_pooling = (input_lengths_after_cnn - self.config.audio_pool_step) // self.config.audio_pool_step + 1
         input_lengths_after_pooling = input_lengths_after_pooling.to(dtype=torch.int32)
 
         return input_lengths_after_cnn, input_lengths_after_pooling
-    
+
     def get_vllm_embedding(self, data):
         if "vision_hidden_states" not in data:
             tgt_sizes = data["tgt_sizes"]
@@ -1071,7 +1067,6 @@ class OvMiniCPMO:
 
                     cur_vllm_emb.scatter_(0, image_indices.view(-1, 1).repeat(1, cur_vllm_emb.shape[-1]), cur_vs_hs.view(-1, cur_vs_hs.shape[-1]))
         return vllm_embedding, vision_hidden_states
-    
 
     def get_audio_embedding(self, data, chunk_length=-1, dummy=True):
         r"""
@@ -1091,7 +1086,7 @@ class OvMiniCPMO:
         Returns:
             List[List[torch.Tensor]]: audio embeddings
         """
-        
+
         wavforms = data.get("audio_features", [])  # (bs, 80, frames) or [], multi audios need filled in advance
         audio_feature_lens_raw = data.get("audio_feature_lens", [])  # list, [[x1, x2], [y1], [z1]]
         # exist audio
@@ -1102,17 +1097,13 @@ class OvMiniCPMO:
 
             # Create a sequence tensor of shape (batch_size, max_seq_len)
             seq_range = (
-                torch.arange(0, max_seq_len, dtype=audio_feature_lens.dtype, device=audio_feature_lens.device)
-                .unsqueeze(0)
-                .expand(batch_size, max_seq_len)
+                torch.arange(0, max_seq_len, dtype=audio_feature_lens.dtype, device=audio_feature_lens.device).unsqueeze(0).expand(batch_size, max_seq_len)
             )
             lengths_expand = audio_feature_lens.unsqueeze(1).expand(batch_size, max_seq_len)
             # Create mask
             padding_mask = seq_range >= lengths_expand  # 1 for padded values
 
-            audio_attention_mask_ = padding_mask.view(batch_size, 1, 1, max_seq_len).expand(
-                batch_size, 1, max_seq_len, max_seq_len
-            )
+            audio_attention_mask_ = padding_mask.view(batch_size, 1, 1, max_seq_len).expand(batch_size, 1, max_seq_len, max_seq_len)
             audio_attention_mask = audio_attention_mask_.to(device="cpu")
 
             if chunk_length > 0:
@@ -1176,23 +1167,18 @@ class OvMiniCPMO:
                         audio_start_pos = 0
                         for bound in audio_bounds[i]:
                             audio_len = bound[1] - bound[0]
-                            input_embeddings[i, bound[0] : bound[1]] = audio_embs[
-                                audio_start_pos : audio_start_pos + audio_len, :
-                            ]
+                            input_embeddings[i, bound[0] : bound[1]] = audio_embs[audio_start_pos : audio_start_pos + audio_len, :]
                             audio_start_pos += audio_len
                 else:
                     for i in range(bs):
                         audio_embs = audio_embeddings[i]
                         bounds = audio_bounds[i]
                         for embs, bound in zip(audio_embs, bounds):
-                            audio_indices = torch.arange(bound[0], bound[1], dtype=torch.long).to(
-                                input_embeddings.device
-                            )
+                            audio_indices = torch.arange(bound[0], bound[1], dtype=torch.long).to(input_embeddings.device)
 
                             if embs.shape[0] != len(audio_indices):
                                 raise ValueError(
-                                    f"Shape mismatch: Trying to assign embeddings of shape {embs.shape} "
-                                    f"to input indices of length {len(audio_indices)}"
+                                    f"Shape mismatch: Trying to assign embeddings of shape {embs.shape} " f"to input indices of length {len(audio_indices)}"
                                 )
                             input_embeddings[i, audio_indices] = embs.to(input_embeddings.dtype)
 
@@ -1202,9 +1188,7 @@ class OvMiniCPMO:
         vllm_embedding, vision_hidden_states = self.get_vllm_embedding(data)
 
         if self.config.init_audio:
-            vllm_embedding = self.get_omni_embedding(
-                data, input_embeddings=vllm_embedding, chunk_length=self.config.audio_chunk_length
-            )
+            vllm_embedding = self.get_omni_embedding(data, input_embeddings=vllm_embedding, chunk_length=self.config.audio_chunk_length)
 
         position_ids = data["position_ids"]
         if position_ids.dtype != torch.int64:
@@ -1222,7 +1206,12 @@ class OvMiniCPMO:
         kwargs.pop("return_dict_in_generate", None)
         terminators = [tokenizer.convert_tokens_to_ids(i) for i in self.terminators]
         output = self.llm.generate(
-            inputs_embeds=torch.from_numpy(inputs_embeds), pad_token_id=0, eos_token_id=terminators, return_dict_in_generate=True, attention_mask=attention_mask, **kwargs
+            inputs_embeds=torch.from_numpy(inputs_embeds),
+            pad_token_id=0,
+            eos_token_id=terminators,
+            return_dict_in_generate=True,
+            attention_mask=attention_mask,
+            **kwargs,
         )
         return output
 
@@ -1248,7 +1237,7 @@ class OvMiniCPMO:
                 result = result[:-1]
             result_text.append(tokenizer.decode(result).strip())
         return result_text
-    
+
     def get_sys_prompt(self, ref_audio=None, mode="default", language="zh"):
         """
         Choose different system prompts according to different tasks
@@ -1297,9 +1286,7 @@ class OvMiniCPMO:
                 sys_msgs = {"role": "user", "content": [vc_prompt_prefix, ref_audio, vc_prompt_suffix]}
 
             else:
-                logger.warning(
-                    "Warning: ref_audio is None, speech generation will be performed based on the default voice."
-                )
+                logger.warning("Warning: ref_audio is None, speech generation will be performed based on the default voice.")
                 sys_msgs = {"role": "user", "content": ["Use the <reserved_53> voice.", vc_prompt_suffix]}
 
             return sys_msgs
@@ -1335,7 +1322,6 @@ class OvMiniCPMO:
             sys_msgs = {"role": "user", "content": [sys_prompt]}
 
             return sys_msgs
-    
 
     def generate(
         self,
@@ -1389,35 +1375,35 @@ class OvMiniCPMO:
                 outputs = self._decode(model_inputs["inputs_embeds"], tokenizer, attention_mask, **kwargs)
 
                 result = self._decode_text(outputs.sequences, tokenizer)
-                
+
         if decode_text is False:
             return outputs
-        
+
         return result, outputs
 
     def chat(
-            self,
-            image=None,
-            msgs=None,
-            tokenizer=None,
-            processor=None,
-            vision_hidden_states=None,
-            max_new_tokens=2048,
-            min_new_tokens=0,
-            sampling=True,
-            max_inp_length=32768,
-            stream=False,
-            chunk_input=True,
-            omni_input=False,
-            max_slice_nums=None,
-            use_image_id=None,
-            use_tts_template=False,
-            generate_audio=False,
-            return_spk_embed=False,
-            return_dict=False,
-            output_audio_path=None,
-            **kwargs,
-        ):
+        self,
+        image=None,
+        msgs=None,
+        tokenizer=None,
+        processor=None,
+        vision_hidden_states=None,
+        max_new_tokens=2048,
+        min_new_tokens=0,
+        sampling=True,
+        max_inp_length=32768,
+        stream=False,
+        chunk_input=True,
+        omni_input=False,
+        max_slice_nums=None,
+        use_image_id=None,
+        use_tts_template=False,
+        generate_audio=False,
+        return_spk_embed=False,
+        return_dict=False,
+        output_audio_path=None,
+        **kwargs,
+    ):
         """
         Unified chat function
 
@@ -1586,7 +1572,6 @@ class OvMiniCPMO:
                     for term in self.terminators:
                         text = text.replace(term, "")
                     yield text
-
 
             return stream_gen()
 
