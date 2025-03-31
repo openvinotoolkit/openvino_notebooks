@@ -134,7 +134,7 @@ int4_npu_config = {
 
 
 def get_llm_selection_widget(
-    languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=False, device=None, default_model_idx=-2
+    languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True, device=None, default_model_idx=0
 ):
     import ipywidgets as widgets
 
