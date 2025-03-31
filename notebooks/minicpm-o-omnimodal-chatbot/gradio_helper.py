@@ -7,9 +7,6 @@ import gradio as gr
 IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".webp")
 AUDIO_EXTENSIONS = (".mp3", ".wav", "flac", ".m4a", ".wma")
 
-IMAGE_SPECIAL = "<|endoftext10|>"
-AUDIO_SPECIAL = "<|endoftext11|>"
-
 DEFAULT_SAMPLING_PARAMS = {
     "top_p": 0.0,
     "top_k": 1,

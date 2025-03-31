@@ -93,6 +93,7 @@ chatbots
 chatglm
 ChatGLM
 ChatGPT
+ChatTTS
 chinese
 CIN
 ckpt
@@ -636,8 +637,12 @@ OCRBench
 OCRv
 odometry
 olmOCR
+Omni
+omni
 OmniGen
 OmniGen's
+Omnimodal
+omnimodal
 OmniParser
 OMZ
 OneFormer
