@@ -32,7 +32,7 @@
     "prettier": "3.1.0",
     "sass": "1.69.5",
     "typescript": "5.2.2",
-    "vite": "6.2.1",
+    "vite": "6.2.3",
     "vite-plugin-svgr": "4.3.0"
   }
 }

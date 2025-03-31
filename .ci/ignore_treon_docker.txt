@@ -88,3 +88,4 @@ notebooks/llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb
 notebooks/glm4-v/glm4-v.ipynb
 notebooks/gemma3/gemma3.ipynb
 notebooks/omniparser/omniparser.ipynb
+notebooks/olmocr-pdf-vlm/olmocr-pdf-vlm.ipynb

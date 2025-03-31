@@ -17,6 +17,7 @@ Agentic
 agentic
 ai
 al
+AdapterConfig
 AISE
 AISEClassification
 AISEDetection
@@ -222,7 +223,13 @@ DiT’s
 DiT’s
 DL
 DocLayNet
+docling
+Docling
+Docling's
+DoclingDocument
+DoclingDocuments
 docstring
+DocTags
 DocVQA
 docvqa
 DocumentLoaders
@@ -260,6 +267,7 @@ english
 ENLSP
 enum
 et
+emilykang
 Evol
 EVS
 eXplainable
@@ -355,6 +363,7 @@ ICIP
 ICPR
 IEMOCAP
 iGPU
+identation
 IdentityNet
 iGPUs
 Ilija
@@ -394,6 +403,7 @@ interpretable
 invertible
 intervaling
 im
+imageLink
 img
 ip
 IPs
@@ -402,6 +412,7 @@ IRs
 iteratively
 JAX
 JAX's
+Javascript
 JFLEG
 JIT
 Jina
@@ -449,6 +460,8 @@ LangChain
 langchain
 Lasinger
 latents
+LaTeX
+Lysak
 LocalAI
 lookahead
 LCMs
@@ -463,6 +476,7 @@ librispeech
 LibriTTS
 Lim
 LinearCameraEmbedder
+linearized
 Lippipeline
 Liu
 LLama
@@ -480,10 +494,12 @@ lm
 LM
 LMS
 LLMPipeline
+loc
 logits
 LogSoftmax
 LoRA
 LoRAs
+lora
 lraspp
 LRASPP
 LTS
@@ -492,6 +508,7 @@ LSTM
 LSTMs
 Luo
 LVLM
+Lysak
 Lyth
 MaaS
 macOS
@@ -559,6 +576,7 @@ mpt
 MPT
 MRPC
 mRoPE
+medprob
 MTVQA
 multiarchitecture
 Multiclass
@@ -609,6 +627,7 @@ NumPy
 NPU
 NPUs
 NVLabs
+ngram
 OASST
 OBB
 obb
@@ -616,6 +635,7 @@ ocr
 OCRBench
 OCRv
 odometry
+olmOCR
 OmniGen
 OmniGen's
 OmniParser
@@ -647,6 +667,8 @@ OpenVoiceBaseClass
 opset
 optimizable
 Orca
+otsl
+OTSL
 OuteTTS
 outpainting
 OVC
@@ -685,6 +707,7 @@ parsers
 patchifying
 perceptron
 Patil
+PDFs
 pdftex
 PEFT
 perceiver
@@ -875,6 +898,8 @@ slowfast
 slowmo
 SML
 sml
+SmolDocling
+SmolVLM
 softmax
 softvc
 SoftVC
@@ -934,6 +959,7 @@ Swin
 SwiGLU
 SwinV
 sym
+snshrivas
 TaskManager
 TartanAir
 tbb
@@ -982,6 +1008,8 @@ tunable
 tv
 TwoStreamInterleaveTransformer
 TypeScript
+tinyllama
+TinyLLama
 Udnie
 UHD
 UI

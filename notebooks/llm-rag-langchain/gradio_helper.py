@@ -203,7 +203,7 @@ def make_demo(
                         with gr.Row():
                             search_method = gr.Dropdown(
                                 ["similarity_score_threshold", "similarity", "mmr"],
-                                value="similarity_score_threshold",
+                                value="similarity",
                                 label="Searching Method",
                                 info="Method used to search vector store",
                                 multiselect=False,
@@ -233,7 +233,7 @@ def make_demo(
                             vector_search_top_k = gr.Slider(
                                 1,
                                 50,
-                                value=10,
+                                value=4,
                                 step=1,
                                 label="Search top k",
                                 info="Search top k must >= Rerank top n",
