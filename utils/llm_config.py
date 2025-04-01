@@ -307,6 +307,16 @@ SUPPORTED_LLM_MODELS = {
             Context: {context} 
             Answer: [/INST]""",
         },
+        "mistral-7B-Instruct-v0.3": {
+            "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+            "remote_code": False,
+            "start_message": f"<s>[INST] {DEFAULT_SYSTEM_PROMPT }\n\n",
+            "history_template": "{user}[/INST]{assistant}</s>[INST]",
+            "current_message_template": "{user} [/INST]{assistant}</s>",
+            "tokenizer_kwargs": {"add_special_tokens": False},
+            "partial_text_processor": llama_partial_text_processor,
+            "genai_chat_template": "{{ bos_token }}{% for message in messages %}{% if (message['role'] == 'user') != (loop.index0 % 2 == 0) %}{{ raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') }}{% endif %}{% if message['role'] == 'user' %}{% if (messages[0]['role'] == 'system' and messages|length == 2) %}{{ message['content'] + '[/INST]' }}{% else %}{{ '[INST] ' + message['content'] + ' [/INST]' }}{% endif %}{% elif message['role'] == 'assistant' %}{{ ' ' + message['content'] + eos_token + ' ' }}{% elif (message['role'] == 'system' and messages|length == 2) %}{{ '[INST] ' + message['content'] + ' \n\n' }}{% else %}{{ raise_exception('Only system, user and assistant roles are supported!') }}{% endif %}{% endfor %}",
+        },
         "zephyr-7b-beta": {
             "model_id": "HuggingFaceH4/zephyr-7b-beta",
             "remote_code": False,
