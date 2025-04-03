@@ -8,7 +8,7 @@ PDF documents offer a vast source of high-quality tokens for training language m
 * To build olmOCR, the authors curate olmOCR-mix-0225, a dataset of nearly 260,000 PDF pages from a diverse set of PDFs crawled from the web and public domain books. This corpus is used to fine-tune olmOCR-7B-0225-preview from Qwen2-VL-7B-Instruct. olmOCR-mix-0225 is released to facilitate further research in document extraction, and open source model weights and code as part of the toolkit.
 
 
-![image](https://github.com/user-attachments/assets/3c2bf1e0-cd1e-429d-98f6-be8aa37d82dd)
+![image](https://github.com/user-attachments/assets/2bc83cd4-894f-464f-8fd6-0ac9c9105c80)
   
 In this tutorial we consider how to convert and run olmOCR-7B-0225-preview model using OpenVINO [Optimum Intel](https://github.com/huggingface/optimum-intel). Additionally, we demonstrate how to apply model optimization techniques like weights compression using [NNCF](https://github.com/openvinotoolkit/nncf).
 
