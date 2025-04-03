@@ -510,6 +510,7 @@ Luo
 LVLM
 Lysak
 Lyth
+laion
 MaaS
 macOS
 Magika
