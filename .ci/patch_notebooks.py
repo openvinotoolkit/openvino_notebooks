@@ -18,7 +18,7 @@ def disable_gradio_debug(nb, notebook_path):
     for cell in nb["cells"]:
         if "gradio" in cell["source"] and "launch(" in cell["source"]:
             found = True
-            cell["source"]  = ""
+            cell["source"] = ""
 
     if found:
         print(f"Disabled gradio for {notebook_path}")
