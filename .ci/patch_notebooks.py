@@ -16,12 +16,12 @@ DEVICE_WIDGET_NEW = "device_widget("
 def disable_gradio_debug(nb, notebook_path):
     found = False
     for cell in nb["cells"]:
-        if "gradio" in cell["source"] and "debug" in cell["source"]:
+        if "gradio" in cell["source"] and "launch(" in cell["source"]:
             found = True
-            cell["source"] = cell["source"].replace("debug=True", "debug=False")
+            cell["source"]  = ""
 
     if found:
-        print(f"Disabled gradio debug mode for {notebook_path}")
+        print(f"Disabled gradio for {notebook_path}")
     return nb
 
 
