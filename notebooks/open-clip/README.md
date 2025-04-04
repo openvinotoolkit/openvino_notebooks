@@ -1,4 +1,4 @@
-# Zero-shot Image Classification with OpenCLIP and OpenVINO™
+# Running OpenCLIP models using OpenVINO™
 
 [OpenCLIP](https://github.com/mlfoundations/open_clip) is an open source implementation of OpenAI's [CLIP](https://arxiv.org/abs/2103.00020) (Contrastive Language-Image Pre-training).
 
