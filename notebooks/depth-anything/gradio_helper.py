@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Callable
 import gradio as gr
+from notebook_utils import download_file
 
 css = """
 #img-display-container {
@@ -13,6 +14,21 @@ css = """
     max-height: 80vh;
     }
 """
+
+
+def load_examples(examples_dir: str):
+    examples = [
+        ["https://raw.githubusercontent.com/LiheYoung/Depth-Anything/refs/heads/main/assets/examples/demo10.png", "flower.png"],
+        ["https://raw.githubusercontent.com/LiheYoung/Depth-Anything/refs/heads/main/assets/examples/demo11.png", "hause.png"],
+        ["https://raw.githubusercontent.com/LiheYoung/Depth-Anything/refs/heads/main/assets/examples/demo13.png", "town.png"],
+        ["https://raw.githubusercontent.com/LiheYoung/Depth-Anything/refs/heads/main/assets/examples/demo9.png", "impressionism.png"],
+        ["https://raw.githubusercontent.com/LiheYoung/Depth-Anything/refs/heads/main/assets/examples/demo7.png", "nature.png"],
+        ["https://raw.githubusercontent.com/LiheYoung/Depth-Anything/refs/heads/main/assets/examples/demo4.png", "building.png"],
+    ]
+
+    if not Path(examples_dir).exists():
+        for example in examples:
+            download_file(example[0], directory=examples_dir, filename=example[1], show_progress=False)
 
 
 def make_demo(fn: Callable, examples_dir: str):
