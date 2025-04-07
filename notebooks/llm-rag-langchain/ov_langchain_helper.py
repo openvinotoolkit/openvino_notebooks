@@ -85,7 +85,7 @@ class OpenVINOLLM(LLM):
         except ImportError:
             raise ImportError("Could not import OpenVINO GenAI package. " "Please install it with `pip install openvino-genai`.")
 
-        pipe = openvino_genai.LLMPipeline(model_path, device, **kwargs)
+        ov_pipe = openvino_genai.LLMPipeline(model_path, device, **kwargs)
 
         config = ov_pipe.get_generation_config()
         if tokenizer is None:
