@@ -89,3 +89,4 @@ notebooks/glm4-v/glm4-v.ipynb
 notebooks/gemma3/gemma3.ipynb
 notebooks/omniparser/omniparser.ipynb
 notebooks/olmocr-pdf-vlm/olmocr-pdf-vlm.ipynb
+notebooks/minicpm-o-omnimodal-chatbot/minicpm-o-omnimodal-chatbot.ipynb
