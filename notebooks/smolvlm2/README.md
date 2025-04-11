@@ -2,7 +2,7 @@
 
 SmolVLM2 represents a fundamental shift in how we think about video understanding - moving from massive models that require substantial computing resources to efficient models that can run anywhere.
 
-![](https://github.com/user-attachments/assets/0f5ab933-a0e9-4f64-a572-a230c50b5495)
+![](https://github.com/user-attachments/assets/0cae7146-cc79-4f1a-beca-eaa554e976cf)
 
 Its goal is simple: make video understanding accessible across all devices and use cases, from phones to servers.
 
