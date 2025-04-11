@@ -1,6 +1,7 @@
 import logging
 import subprocess  # nosec - disable B404:import-subprocess check
 import sys
+import os
 from pathlib import Path
 from typing import Dict
 import platform
@@ -38,12 +39,19 @@ def optimum_cli(model_id, output_dir, show_command=True, additional_args: Dict[s
         display(Markdown("**Export command:**"))
         display(Markdown(f"`{export_command}`"))
 
+    transofrmers_loglevel = None
     if debug_logs:
-        export_command = "TRANSFORMERS_VERBOSITY=debug " + export_command
+        transofrmers_loglevel = os.environ.pop("TRANSFORMERS_VERBOSITY", None)
+        os.environ["TRANSFORMERS_VERBOSITY"] = "debug"
 
     try:
         subprocess.run(export_command.split(" "), shell=(platform.system() == "Windows"), check=True, capture_output=True)
     except subprocess.CalledProcessError as exc:
         logger = logging.getLogger()
         logger.exception(exc.stderr)
+        if transofrmers_loglevel is not None:
+            os.environ["TRANSFORMERS_VERBOSITY"] = transofrmers_loglevel
         raise exc
+    finally:
+        if transofrmers_loglevel is not None:
+            os.environ["TRANSFORMERS_VERBOSITY"] = transofrmers_loglevel
