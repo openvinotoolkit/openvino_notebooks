@@ -1554,12 +1554,12 @@
         },
         "jupyterlab-git": {
             "hashes": [
-                "sha256:2f5984fb10216ffbcb3e25611a6bd296fc94b116bd0cb86dd921498bd297bf14",
-                "sha256:75eda44f84af96a7366d9a93eee9e69ca1bc5a534db40b4839aa4d503a299aa0"
+                "sha256:b7bce89795d5ce88c8aaf0d79eb7a93d0535622f9be6b019ca9ae4d3b9a9ca6a",
+                "sha256:928e9197bdcb51a61b021a9f87f849f1c356f114ff2a7bb5754dbdd0af2f741f"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.6' and python_version < '4'",
-            "version": "==0.30.0"
+            "version": "==0.51.1"
         },
         "jupyterlab-pygments": {
             "hashes": [
@@ -2395,10 +2395,10 @@
                 "sha256:db30ba9e8af7188436ff76ce79ad7a8a2a5204e3c4757d2728223270b6a73080",
                 "sha256:e941dfe7196b3a75364fcee4e0fe79cee63fa9d4e2a1852fb459048d7daa83f5",
                 "sha256:f31dfd3d793a787a799930568e9e1dc736bb3a7069b266f2d80b2ad623c29d84",
-                "sha256:36f4094e8ec90984749434bec05cdca2cf07f0f0ef9d5b1e5afb931598fdf8eb",
-                "sha256:ea6344414b631043e6bae94698faae7fbcc9f3a007638bbc81871b6082ccec38"
+                "sha256:79d1a8dfc75978aae03d061e054205f852e5b7a4b266fef03880cbfc528b527e",
+                "sha256:c3def67b544f90607f289640ed8375d782233323c2766c61b48a08489e18cced"
             ],
-            "version": "==2025.0.0"
+            "version": "==2025.1.0"
         },
         "openvino-telemetry": {
             "hashes": [
@@ -2945,12 +2945,12 @@
         },
         "pytorch-lightning": {
             "hashes": [
-                "sha256:4365e3f2874e223e63cb42628d24c88c2bdc8d1794453cac38c0619b31115fba",
-                "sha256:5f974015425af6873b5689246c5495ca12686b446751479273c154b73aeea843"
+                "sha256:0bfbbd3ad80281d3062f5d8029a759093bd969ff8162e7c1fe2918552b269f9e",
+                "sha256:ffbc8e4750662e7dd26f5d2b2e256f9415868d18cdfb0b6e7e6ba94f624c9f55"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==2.3.3"
+            "version": "==2.5.1"
         },
         "pytube": {
             "hashes": [
