@@ -37,9 +37,9 @@ def optimum_cli(model_id, output_dir, show_command=True, additional_args: Dict[s
 
         display(Markdown("**Export command:**"))
         display(Markdown(f"`{export_command}`"))
-    
+
     if debug_logs:
-        export_command = "TRANSFORMERS_VERBOSITY=debug " + export_command 
+        export_command = "TRANSFORMERS_VERBOSITY=debug " + export_command
 
     try:
         subprocess.run(export_command.split(" "), shell=(platform.system() == "Windows"), check=True, capture_output=True)
