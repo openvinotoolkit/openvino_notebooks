@@ -3,7 +3,12 @@ from optimum.intel.openvino import OVModelForCausalLM
 from dataclasses import dataclass, field
 
 try:
-    from outetts.version.v1.interface import InterfaceHF
+    try:
+        from outetts.version.interface import InterfaceHF
+        latest_version = True
+    except ImportError:
+        latest_version = False
+        from outetts.version.v1.interface import InterfaceHF
     from outetts.version.v1.prompt_processor import PromptProcessor
 
     try:
@@ -50,7 +55,7 @@ class InterfaceOV(InterfaceHF):
     ) -> None:
         self.device = torch.device("cpu")
         self.audio_codec = AudioCodec(self.device)
-        self.prompt_processor = PromptProcessor(model_path) if not updated_version else PromptProcessor(model_path, ["en"])
+        self.prompt_processor = PromptProcessor(model_path) if not updated_version or latest_version else PromptProcessor(model_path, ["en"]) 
         self.model = OVHFModel(model_path, device)
         self.language = "en"
         self.verbose = False

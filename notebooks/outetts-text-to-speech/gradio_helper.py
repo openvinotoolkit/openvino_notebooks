@@ -1,7 +1,8 @@
 import gradio as gr
+import outetts
 
 
-def make_demo(interface):
+def make_demo(interface, latest=True):
 
     def generate_tts(text, temperature, repetition_penalty, reference_audio, reference_text):
 
@@ -9,8 +10,14 @@ def make_demo(interface):
             speaker = interface.create_speaker(reference_audio, reference_text)
         else:
             speaker = None
+        inputs = {"text": text, "speaker": speaker, "temperature": temperature, "repetition_penalty": repetition_penalty}
 
-        output = interface.generate(text=text, speaker=speaker, temperature=temperature, repetition_penalty=repetition_penalty)
+        if latest:
+            inputs = {"config": outetts.GenerationConfig(**inputs, generation_type=outetts.GenerationType.REGULAR)}
+
+
+        
+        output = interface.generate(**inputs)
         output.save("output.wav")
         return "output.wav"
 
