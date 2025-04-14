@@ -1,7 +1,7 @@
 # Optical Character Recognition with GOT-OCR 2.0 and OpenVINO
  GOT-OCR2.0 is unified End-to-End model for recognition text on images.
 
-![](https://github.com/user-attachments/assets/b2c1f973-d835-43e4-a106-c3bd3b6d8b00)
+![](https://github.com/user-attachments/assets/9e5f3a32-9463-4a3a-8264-11dc579437bf)
 
 The GOT-OCR 2.0 model was introduced in the paper: [**General OCR Theory: Towards OCR-2.0 via a Unified End-to-end Model**](https://arxiv.org/abs/2409.01704)
 
