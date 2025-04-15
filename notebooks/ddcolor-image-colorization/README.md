@@ -1,6 +1,6 @@
 # Colorize grayscale images using 🎨 DDColor and OpenVINO
 
-![](https://github.com/piddnad/DDColor/raw/master/assets/teaser.png)
+![](https://raw.githubusercontent.com/piddnad/DDColor/refs/heads/master/assets/teaser.webp)
 
 Image colorization is the process of adding color to grayscale images. Initially captured in black and white, these images are transformed into vibrant, lifelike representations by estimating RGB colors. This technology enhances both aesthetic appeal and perceptual quality. Historically, artists manually applied colors to monochromatic photographs, a painstaking task that could take up to a month for a single image. However, with advancements in information technology and the rise of deep neural networks, automated image colorization has become increasingly important.
 
