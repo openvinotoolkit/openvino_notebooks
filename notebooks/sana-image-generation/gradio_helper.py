@@ -97,7 +97,7 @@ def apply_style(style_name: str, positive: str, negative: str = "") -> tuple[str
     return p.replace("{prompt}", positive), n + negative
 
 
-def make_demo(ov_pipe):
+def make_demo(ov_pipe, sprint=False):
     def infer(
         prompt,
         negative_prompt="",
@@ -115,14 +115,11 @@ def make_demo(ov_pipe):
         generator = torch.Generator().manual_seed(seed)
 
         prompt, negative_prompt = apply_style(style, prompt, negative_prompt)
+        kwargs = {}
+        if not sprint:
+            kwargs["nagative_prompt"] = negative_prompt
         image = ov_pipe(
-            prompt=prompt,
-            negative_prompt=negative_prompt,
-            width=width,
-            height=height,
-            num_inference_steps=num_inference_steps,
-            generator=generator,
-            guidance_scale=guidance_scale,
+            prompt=prompt, width=width, height=height, num_inference_steps=num_inference_steps, generator=generator, guidance_scale=guidance_scale, **kwargs
         ).images[0]
         return image, seed
 
@@ -159,6 +156,7 @@ def make_demo(ov_pipe):
                     show_label=False,
                     max_lines=1,
                     placeholder="Enter your negative prompt",
+                    visible=not sprint,
                     container=False,
                 )
 
@@ -188,11 +186,7 @@ def make_demo(ov_pipe):
                         value=5.0,
                     )
                     num_inference_steps = gr.Slider(
-                        label="Number of inference steps",
-                        minimum=1,
-                        maximum=50,
-                        step=1,
-                        value=18,
+                        label="Number of inference steps", minimum=1, maximum=50, step=1, value=18 if not sprint else 2, visible=not sprint
                     )
                 style_selection = gr.Radio(
                     show_label=True,

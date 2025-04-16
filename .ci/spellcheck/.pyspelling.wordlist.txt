@@ -109,6 +109,7 @@ CLI
 cli
 ClipBasedHeadEstimator
 CLIP's
+CMs
 codebase
 codebook
 codebooks
@@ -148,6 +149,7 @@ cpu
 CRNN
 CSV
 CTC
+CTM
 CUDA
 CustomEncoderWav
 CVF
@@ -455,6 +457,7 @@ Labelling
 labour
 labse
 LaBSE
+LADD
 Lai
 LAION
 LangChain
@@ -791,6 +794,7 @@ timm
 QFormer
 Qianwen
 Qi
+QK
 QKV
 qrcode
 quant
@@ -873,6 +877,7 @@ scalable
 ScaleMapLearner
 schnell
 Schuster
+sCM
 sd
 SDEdit
 SDXL
@@ -1002,6 +1007,7 @@ torchvision
 TorchVision
 TorchFX
 transformative
+TrigFlow
 triplane
 TriplaneLearnablePositionalEmbedding
 triplanes
