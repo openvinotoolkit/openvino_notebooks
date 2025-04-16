@@ -86,7 +86,7 @@ def make_demo(model, processor):
 
         tokenizer = processor.tokenizer
         gen_kwargs = {"thinker_max_new_tokens": 1024, "return_audio": False, **inputs}
-        streamer = TextIteratorStreamer(tokenizer, timeout=60.0, skip_prompt=True, skip_special_tokens=True)
+        streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
 
         gen_kwargs["stream_config"] = streamer
 
