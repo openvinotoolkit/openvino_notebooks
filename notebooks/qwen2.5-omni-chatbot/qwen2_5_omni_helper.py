@@ -270,7 +270,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
     ):
         print(f"✅ {model_id} model already converted. You can find results in {output_dir}")
         return
-    print("⌛ {model_id} conversion started. Be patient, it may takes some time.")
+    print(f"⌛ {model_id} conversion started. Be patient, it may takes some time.")
     print("⌛ Load Original model")
     model = Qwen2_5OmniForConditionalGeneration.from_pretrained(ckpt, torch_dtype=torch.float32, device_map="cpu")
     processor = AutoProcessor.from_pretrained(ckpt, trust_remote_code=True)
