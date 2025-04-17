@@ -264,13 +264,14 @@ EfficientSAMs
 embedder
 Embedder
 embeddings
+emilykang
 EnCodec
 encodec
 english
 ENLSP
 enum
+espeak
 et
-emilykang
 Evol
 EVS
 eXplainable
@@ -337,6 +338,7 @@ GPU's
 GPUs
 Gradio
 gradio
+graphemes
 grayscale
 grey
 GroundedSAM
@@ -441,6 +443,7 @@ KerasHub
 keypoint
 keypoints
 KiTS
+Kokoro
 Koltun
 Kondate
 Kosaraju
@@ -535,6 +538,7 @@ MatMul
 MBs
 md
 MediaPipe
+medprob
 mel
 Mels
 MERCHANTABILITY
@@ -581,7 +585,7 @@ mpt
 MPT
 MRPC
 mRoPE
-medprob
+msi
 MTVQA
 multiarchitecture
 Multiclass
@@ -611,6 +615,7 @@ Netron
 NeurIPS
 NeuSpell
 NeXT
+ng
 NLP
 nlp
 NMS

@@ -90,3 +90,4 @@ notebooks/gemma3/gemma3.ipynb
 notebooks/omniparser/omniparser.ipynb
 notebooks/olmocr-pdf-vlm/olmocr-pdf-vlm.ipynb
 notebooks/minicpm-o-omnimodal-chatbot/minicpm-o-omnimodal-chatbot.ipynb
+notebooks/kokoro/kokoro.ipynb
