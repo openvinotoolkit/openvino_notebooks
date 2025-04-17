@@ -359,7 +359,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
 
         vision_embed_tokens = model.thinker.visual
         if not thinker_patcher_path.exists():
-            ov_model = ov.convert_model(vision_embed_tokens.patch_embed, example_input={"hidden_states": torch.randn([4988, 1176])})
+            ov_model = ov.convert_model(vision_embed_tokens.patch_embed, example_input={"hidden_states": torch.randn([8, 1176])})
             ov.save_model(ov_model, thinker_patcher_path)
             del ov_model
             cleanup_torchscript_cache()
@@ -425,11 +425,11 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
             ov_model = ov.convert_model(
                 vision_embed_tokens,
                 example_input={
-                    "hidden_states": torch.randn([3456, 1280], dtype=torch.float32),
-                    "attention_mask": torch.ones([1, 3456, 3456]),
-                    "window_attention_mask": torch.ones([1, 3456, 3456]),
-                    "window_index": torch.ones([864], dtype=torch.int32),
-                    "rotary_pos_emb": torch.randn([3456, 40]),
+                    "hidden_states": torch.randn([8, 1280], dtype=torch.float32),
+                    "attention_mask": torch.ones([1, 8, 8]),
+                    "window_attention_mask": torch.ones([1, 8, 8]),
+                    "window_index": torch.ones([2], dtype=torch.int32),
+                    "rotary_pos_emb": torch.randn([8, 40]),
                 },
             )
             ov.save_model(ov_model, thinker_merger_path)
