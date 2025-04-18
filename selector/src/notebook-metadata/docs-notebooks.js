@@ -1,7 +1,7 @@
 // @ts-check
 
 import { execSync } from 'child_process';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { dirname, join, relative } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -11,7 +11,10 @@ import { fileURLToPath } from 'url';
 function getDocsIgnoredNotebooks() {
   const CURRENT_DIR_PATH = dirname(fileURLToPath(import.meta.url));
   const ignoreConvertFilePath = join(CURRENT_DIR_PATH, '..', '..', '..', '.ci', 'ignore_convert_full.txt');
-  return readFileSync(ignoreConvertFilePath, { encoding: 'utf8' }).split('\n');
+  if  (existsSync(ignoreConvertFilePath)) {
+    return readFileSync(ignoreConvertFilePath, { encoding: 'utf8' }).split('\n');
+  }
+  return []
 }
 
 /**
