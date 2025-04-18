@@ -4,7 +4,11 @@ from typing import Optional, Tuple, Union, List
 import gc
 
 import openvino as ov
-from openvino.runtime import opset13
+
+try:
+    from openvino import opset13
+except ImportError:
+    from openvino.runtime import opset13
 import nncf
 import numpy as np
 import torch

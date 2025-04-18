@@ -3,10 +3,17 @@ from dataclasses import dataclass
 from typing import List, Dict, Union
 
 import numpy as np
-from openvino.runtime import Model, Node
-from openvino.runtime.op import Parameter, Constant
-import openvino.runtime.opset12 as opset
-from openvino.runtime.utils.types import get_element_type
+
+try:
+    from openvino import Model, Node
+    from openvino.op import Parameter, Constant
+    from openvino.utils.types import get_element_type
+    import openvino.opset12 as opset
+except ImportError:
+    from openvino.runtime import Model, Node
+    from openvino.runtime.op import Parameter, Constant
+    import openvino.runtime.opset12 as opset
+    from openvino.runtime.utils.types import get_element_type
 
 import openvino as ov
 from tqdm.auto import tqdm

@@ -1,7 +1,11 @@
 from typing import Optional, Dict
 import numpy as np
 import cv2
-from openvino.runtime.utils.data_helpers import OVDict
+
+try:
+    from openvino.utils.data_helpers import OVDict
+except ImportError:
+    from openvino.runtime.utils.data_helpers import OVDict
 import matplotlib.pyplot as plt
 
 

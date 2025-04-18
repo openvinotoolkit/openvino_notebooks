@@ -73,9 +73,9 @@ except ImportError:
 
 try:
     import openvino
-    from openvino.runtime import Core
+    from openvino import Core
 
-    OPENVINO_IE_VERSION = openvino.runtime.get_version()
+    OPENVINO_IE_VERSION = openvino.get_version()
     OPENVINO_SOURCE_ROOT = str(Path(openvino.__file__).parent)
     OPENVINO_IMPORT = True
 except ImportError:

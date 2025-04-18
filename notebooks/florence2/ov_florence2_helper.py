@@ -9,7 +9,11 @@ import numpy as np
 import torch
 from transformers import AutoProcessor, AutoConfig, AutoModelForCausalLM, GenerationMixin, GenerationConfig
 from transformers.modeling_outputs import Seq2SeqLMOutput, BaseModelOutput
-import openvino.runtime.opset13 as opset13
+
+try:
+    import openvino.opset13 as opset13
+except ImportError:
+    import openvino.runtime.opset13 as opset13
 
 IMAGE_EMBEDDING_NAME = "image_embedding.xml"
 TEXT_EMBEDING_NAME = "text_embedding.xml"
@@ -467,10 +471,6 @@ def convert_florence2(model_id, output_dir, orig_model_dir=None):
 class OVEncoder:
     """
     Encoder model for OpenVINO inference.
-
-    Arguments:
-        request (`openvino.runtime.ie_api.InferRequest`):
-            The OpenVINO inference request associated to the encoder.
     """
 
     def __init__(self, model_dir, parent_model, device, ov_config):
@@ -523,11 +523,6 @@ class OVDecoder:
     """
     Decoder model for OpenVINO inference.
 
-    Arguments:
-        request (`openvino.runtime.ie_api.InferRequest`):
-            The OpenVINO inference request associated to the decoder.
-        device (`torch.device`):
-            The device type used by this process.
     """
 
     def __init__(self, model_path, parent_model, device, ov_config):

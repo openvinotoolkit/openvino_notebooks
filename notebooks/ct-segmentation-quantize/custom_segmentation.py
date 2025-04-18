@@ -5,7 +5,11 @@ import sys
 import cv2
 import numpy as np
 from os import PathLike
-from openvino.runtime import PartialShape
+
+try:
+    from openvino import PartialShape
+except ImportError:
+    from openvino.runtime import PartialShape
 import logging
 
 # Fetch `notebook_utils` module

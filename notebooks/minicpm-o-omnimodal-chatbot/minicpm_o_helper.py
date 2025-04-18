@@ -13,11 +13,19 @@ from pathlib import Path
 from huggingface_hub import snapshot_download
 import types
 from typing import Optional, Tuple, List, Union
-from openvino.runtime import opset13
+
+try:
+    from openvino import opset13
+except ImportError:
+    from openvino.runtime import opset13
 import openvino as ov
 import numpy as np
 import gc
-from openvino.runtime.passes import Manager, MatcherPass, WrapType, Matcher
+
+try:
+    from openvino.passes import Manager, MatcherPass, WrapType, Matcher
+except ImportError:
+    from openvino.runtime.passes import Manager, MatcherPass, WrapType, Matcher
 import time
 
 text_emb_path = Path("language_model/embed_tokens.xml")

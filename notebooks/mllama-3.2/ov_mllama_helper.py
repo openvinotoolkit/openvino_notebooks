@@ -6,7 +6,11 @@ from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
 from typing import Optional, Union, List, Tuple, Dict
 from transformers.generation import GenerationMixin
 from transformers.modeling_outputs import ModelOutput, BaseModelOutput
-import openvino.runtime.opset13 as ops
+
+try:
+    import openvino.opset13 as ops
+except ImportError:
+    import openvino.runtime.opset13 as ops
 import types
 import openvino as ov
 import gc
@@ -15,7 +19,11 @@ import numpy as np
 from dataclasses import dataclass
 import requests
 from PIL import Image
-from openvino.runtime.passes import Manager, MatcherPass, WrapType, Matcher
+
+try:
+    from openvino.passes import Manager, MatcherPass, WrapType, Matcher
+except ImportError:
+    from openvino.runtime.passes import Manager, MatcherPass, WrapType, Matcher
 import time
 
 IMAGE_ENCODER = "openvino_vision_encoder.xml"

@@ -4,7 +4,11 @@ import gc
 
 import openvino as ov
 import shutil
-from openvino.runtime import opset13
+
+try:
+    from openvino import opset13
+except ImportError:
+    from openvino.runtime import opset13
 from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
 import nncf
 import numpy as np
@@ -26,7 +30,6 @@ import types
 from typing import Optional, Tuple, Union, List
 from itertools import accumulate
 from transformers.cache_utils import DynamicCache
-from openvino.runtime import opset13
 from transformers.generation import GenerationConfig, GenerationMixin
 from transformers.modeling_outputs import (
     CausalLMOutputWithPast,
