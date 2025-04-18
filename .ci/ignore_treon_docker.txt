@@ -91,3 +91,4 @@ notebooks/omniparser/omniparser.ipynb
 notebooks/olmocr-pdf-vlm/olmocr-pdf-vlm.ipynb
 notebooks/minicpm-o-omnimodal-chatbot/minicpm-o-omnimodal-chatbot.ipynb
 notebooks/kokoro/kokoro.ipynb
+notebooks/qwen2.5-omni-chatbot/qwen2.5-omni-chatbot.ipynb

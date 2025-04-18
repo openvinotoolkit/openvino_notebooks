@@ -554,3 +554,9 @@
         - windows-2019
     - python:
         - "3.9"
+- notebook: notebooks/qwen2.5-omni-chatbot/qwen2.5-omni-chatbot.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2019
