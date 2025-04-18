@@ -141,8 +141,7 @@
 
 - [Classification with ConvNeXt and OpenVINO](./torchvision-zoo-to-openvino/convnext-classification.ipynb)
 - [Convert a Tensorflow Lite Model to OpenVINO™](./tflite-to-openvino/tflite-to-openvino.ipynb)
-- [Convert a TensorFlow Object Detection Model to OpenVINO™](./tensorflow-object-detection-to-openvino/tensorflow-object-detection-to-openvino.ipynb)
-- [Convert a TensorFlow Instance Segmentation Model to OpenVINO™](./tensorflow-object-detection-to-openvino/tensorflow-instance-segmentation-to-openvino.ipynb)
+- [Using TensorFlow Object Detection API with OpenVINO™](./tensorflow-object-detection-to-openvino/tensorflow-object-detection-api-with-openvino.ipynb)
 - [Convert of TensorFlow Hub models to OpenVINO Intermediate Representation (IR)](./tensorflow-hub/tensorflow-hub.ipynb)
 - [Convert a TensorFlow Model to OpenVINO™](./tensorflow-classification-to-openvino/tensorflow-classification-to-openvino.ipynb)
 - [Line-level text detection with Surya](./surya-line-level-text-detection/surya-line-level-text-detection.ipynb)
