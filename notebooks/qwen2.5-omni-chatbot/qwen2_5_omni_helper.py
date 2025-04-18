@@ -5,6 +5,7 @@ import gc
 import openvino as ov
 import shutil
 from openvino.runtime import opset13
+from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
 import nncf
 import numpy as np
 import operator
@@ -17,8 +18,6 @@ from transformers import Qwen2_5OmniForConditionalGeneration
 from transformers.models.qwen2_5_omni.modeling_qwen2_5_omni import (
     Qwen2_5OmniTalkerCausalLMOutputWithPast,
     Qwen2_5OmniThinkerCausalLMOutputWithPast,
-    DiTAttention,
-    DiTDecoderLayer,
     ALL_ATTENTION_FUNCTIONS,
     apply_rotary_pos_emb,
 )
@@ -34,8 +33,7 @@ from transformers.modeling_outputs import (
     BaseModelOutputWithPast,
 )
 from typing import Optional, Tuple, Union, List, Dict, Any
-from transformers import __version__ as transformers_version
-from huggingface_hub import snapshot_download
+from huggingface_hub import snapshot_download, hf_hub_download
 
 
 def model_has_state(ov_model: ov.Model):
@@ -226,14 +224,13 @@ THINKER_EMBEDDING_NAME = "openvino_thinker_embedding_model.xml"
 
 
 TALKER_LANGUAGE_NAME = "openvino_talker_language_model.xml"
-TALKER_EMBEDDING_1D_NAME = "openvino_talker_embedding_1d_model.xml"
-TALKER_EMBEDDING_2D_NAME = "openvino_talker_embedding_2d_model.xml"
+TALKER_EMBEDDING_NAME = "openvino_talker_embedding_model.xml"
 
 TOKEN2WAV_DIT_NAME = "openvino_token2wav_dit_model.xml"
 TOKEN2WAV_BIGVGAN_NAME = "openvino_token2wav_bigvgan_model.xml"
 
 
-def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
+def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, use_local_dir=False):
     thinker_output_dir = Path(output_dir) / "thinker"
     talker_output_dir = Path(output_dir) / "talker"
 
@@ -244,15 +241,10 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
     thinker_merger_path = thinker_output_dir / THINKER_MERGER_NAME
     thinker_embedding_path = thinker_output_dir / THINKER_EMBEDDING_NAME
     talker_lang_path = talker_output_dir / TALKER_LANGUAGE_NAME
-    talker_embedding_1d_path = talker_output_dir / TALKER_EMBEDDING_1D_NAME
-    talker_embedding_2d_path = talker_output_dir / TALKER_EMBEDDING_2D_NAME
+    talker_embedding_path = talker_output_dir / TALKER_EMBEDDING_NAME
 
     token2wav_dit_path = output_dir / TOKEN2WAV_DIT_NAME
     token2wav_bigvgan_path = output_dir / TOKEN2WAV_BIGVGAN_NAME
-    ckpt = Path(output_dir) / "ckpt"
-    if not ckpt.exists():
-        snapshot_download(model_id, local_dir=ckpt, force_download=True)
-        shutil.copy(ckpt / "spk_dict.pt", Path(output_dir) / "spk_dict.pt")
     if all(
         [
             thinker_lang_path.exists(),
@@ -262,8 +254,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
             thinker_patcher_path.exists(),
             thinker_merger_path.exists(),
             talker_lang_path.exists(),
-            talker_embedding_1d_path.exists(),
-            talker_embedding_2d_path.exists(),
+            talker_embedding_path.exists(),
             token2wav_dit_path.exists(),
             token2wav_bigvgan_path.exists(),
         ]
@@ -272,8 +263,20 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
         return
     print(f"⌛ {model_id} conversion started. Be patient, it may takes some time.")
     print("⌛ Load Original model")
-    model = Qwen2_5OmniForConditionalGeneration.from_pretrained(ckpt, torch_dtype=torch.float32, device_map="cpu")
-    processor = AutoProcessor.from_pretrained(ckpt, trust_remote_code=True)
+
+    if use_local_dir:
+        ckpt = Path(output_dir) / "ckpt"
+        if not ckpt.exists():
+            snapshot_download(model_id, local_dir=ckpt, force_download=True)
+            shutil.copy(ckpt / "spk_dict.pt", Path(output_dir) / "spk_dict.pt")
+    else:
+        ckpt = model_id
+        if not (Path(output_dir) / "spk_dict.pt").exists():
+            hf_hub_download(model_id, filename="spk_dict.pt", local_dir=output_dir)
+
+    model = Qwen2_5OmniForConditionalGeneration.from_pretrained(ckpt, torch_dtype=torch.float16)
+    model.eval()
+    processor = AutoProcessor.from_pretrained(ckpt)
 
     model.config.save_pretrained(output_dir)
     processor.save_pretrained(output_dir)
@@ -281,6 +284,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
 
     if not thinker_embedding_path.exists():
         print("⌛ Convert thinker embedding model")
+        __make_16bit_traceable(model.thinker.model.get_input_embeddings())
         ov_model = ov.convert_model(
             model.thinker.model.get_input_embeddings(),
             example_input=torch.ones([2, 2], dtype=torch.int64),
@@ -323,6 +327,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
     audio._orig_forward = audio.forward
     if not thinker_audio_path.exists():
         print("⌛ Convert thinker audio model")
+        __make_16bit_traceable(audio)
         audio.forward = types.MethodType(forward_wrap_audio, audio)
         ov_model = ov.convert_model(
             audio,
@@ -342,6 +347,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
         print("⌛ Convert thinker audio state model")
         audio.forward = audio._orig_forward
         audio.forward = types.MethodType(forward_wrap_audio_state, audio)
+        __make_16bit_traceable(audio)
         ov_model = ov.convert_model(
             audio,
             example_input={
@@ -359,6 +365,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
 
         vision_embed_tokens = model.thinker.visual
         if not thinker_patcher_path.exists():
+            __make_16bit_traceable(vision_embed_tokens.patch_embed)
             ov_model = ov.convert_model(vision_embed_tokens.patch_embed, example_input={"hidden_states": torch.randn([8, 1176])})
             ov.save_model(ov_model, thinker_patcher_path)
             del ov_model
@@ -422,6 +429,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
                 block.forward = types.MethodType(block_forward, block)
                 block.attn.forward = types.MethodType(sdpa_attn_forward, block.attn)
 
+            __make_16bit_traceable(vision_embed_tokens)
             ov_model = ov.convert_model(
                 vision_embed_tokens,
                 example_input={
@@ -440,7 +448,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
         print("✅ Image embedding model successfully converted")
 
     if not thinker_lang_path.exists():
-        print("⌛ Convert ✅Thinker Language model")
+        print("⌛ Convert Thinker Language model")
 
         def forward_wrap_thinker(
             self,
@@ -514,6 +522,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
             [ov.PartialShape([-1, lang_model.model.config.num_key_value_heads, -1, hidden_size // lang_model.model.config.num_attention_heads])] * 2 * num_pkv
         )
         input_shapes += [ov.PartialShape([-1, -1, input_embeds.shape[-1]])]
+        __make_16bit_traceable(lang_model)
         ov_model = ov.convert_model(lang_model, example_input=example_input, input=input_shapes)
         for input, input_name in zip(ov_model.inputs, input_names):
             input.get_tensor().set_names({input_name})
@@ -532,34 +541,23 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
-        print(f"✅ ✅Thinker model conversion finished. You can find results in {output_dir}")
+        print(f"✅ Thinker model conversion finished. You can find results in {output_dir}")
 
-    if not talker_embedding_1d_path.exists():
-        print("⌛ Convert talker 1D embedding model")
-        ov_model = ov.convert_model(
-            model.talker.model.get_input_embeddings(),
-            example_input=torch.ones([2], dtype=torch.int64),
-        )
-        ov.save_model(ov_model, talker_embedding_1d_path)
-        del ov_model
-        cleanup_torchscript_cache()
-        gc.collect()
-        print("✅ Talker 1D embedding model successfully converted")
-
-    if not talker_embedding_2d_path.exists():
-        print("⌛ Convert talker 2D embedding model")
+    if not talker_embedding_path.exists():
+        print("⌛ Convert talker embedding model")
+        __make_16bit_traceable(model.talker.model.get_input_embeddings())
         ov_model = ov.convert_model(
             model.talker.model.get_input_embeddings(),
             example_input=torch.ones([2, 2], dtype=torch.int64),
         )
-        ov.save_model(ov_model, talker_embedding_2d_path)
+        ov.save_model(ov_model, talker_embedding_path)
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
-        print("✅ Talker 2D embedding model successfully converted")
+        print("✅ Talker embedding model successfully converted")
 
     if not talker_lang_path.exists():
-        print("⌛ Convert ✅Talker Language model")
+        print("⌛ Convert Talker Language model")
 
         def forward_wrap_talker(
             self,
@@ -631,6 +629,8 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
         ]
         input_shapes += [ov.PartialShape([-1, lang_model.model.config.num_key_value_heads, -1, lang_model.model.config.head_dim])] * 2 * num_pkv
         input_shapes += [ov.PartialShape([-1, -1, input_embeds.shape[-1]])]
+        __make_16bit_traceable(lang_model)
+
         ov_model = ov.convert_model(lang_model, example_input=example_input, input=input_shapes)
         for input, input_name in zip(ov_model.inputs, input_names):
             input.get_tensor().set_names({input_name})
@@ -649,7 +649,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
-        print(f"✅ ✅Talker model conversion finished. You can find results in {output_dir}")
+        print(f"✅ Talker model conversion finished. You can find results in {output_dir}")
 
     if not token2wav_dit_path.exists():
         print("⌛ Convert token2wav DIT model")
@@ -705,6 +705,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
         for block in code2wav_dit.transformer_blocks:
             block.attn.forward = types.MethodType(forward_wrap_dit_attention, block.attn)
 
+        __make_16bit_traceable(code2wav_dit)
         ov_model = ov.convert_model(
             code2wav_dit,
             example_input={
@@ -745,6 +746,7 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None):
 
         code2wav_bigvgan = model.token2wav.code2wav_bigvgan_model
         code2wav_bigvgan.forward = types.MethodType(forward_wrap_bigvgan, code2wav_bigvgan)
+        __make_16bit_traceable(code2wav_bigvgan)
         ov_model = ov.convert_model(
             code2wav_bigvgan,
             example_input={
@@ -1011,12 +1013,12 @@ def get_rope_index(
 
 class OVQwen2_5OmniThinkerForConditionalGeneration(GenerationMixin):
     def __init__(self, model_dir, device, config):
-        self.model = core.read_model(model_dir / "openvino_thinker_language_model.xml")
-        self.audio = core.compile_model(model_dir / "openvino_thinker_audio_model.xml", "CPU")
-        self.audio_state = core.compile_model(model_dir / "openvino_thinker_audio_state_model.xml", "CPU")
-        self.visual_patcher = core.compile_model(model_dir / "openvino_thinker_patcher_model.xml", "CPU")
-        self.visual_merger = core.compile_model(model_dir / "openvino_thinker_merger_model.xml", "CPU")
-        self.embed_tokens = core.compile_model(model_dir / "openvino_thinker_embedding_model.xml", "CPU")
+        self.model = core.read_model(model_dir / THINKER_LANGUAGE_NAME)
+        self.audio = core.compile_model(model_dir / THINKER_AUDIO_NAME, device)
+        self.audio_state = core.compile_model(model_dir / THINKER_AUDIO_STATE_NAME, device)
+        self.visual_patcher = core.compile_model(model_dir / THINKER_PATCHER_NAME, device)
+        self.visual_merger = core.compile_model(model_dir / THINKER_MERGER_NAME, device)
+        self.embed_tokens = core.compile_model(model_dir / THINKER_EMBEDDING_NAME, device)
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
         compiled_model = core.compile_model(self.model, device)
@@ -1431,9 +1433,8 @@ class OVQwen2_5OmniThinkerForConditionalGeneration(GenerationMixin):
 
 class OVQwen2_5OmniTalkerForConditionalGeneration(GenerationMixin):
     def __init__(self, model_dir, device, config):
-        self.model = core.read_model(model_dir / "openvino_talker_language_model.xml")
-        self.embed_tokens_1d = core.compile_model(model_dir / "openvino_talker_embedding_1d_model.xml", "CPU")
-        self.embed_tokens_2d = core.compile_model(model_dir / "openvino_talker_embedding_2d_model.xml", "CPU")
+        self.model = core.read_model(model_dir / TALKER_LANGUAGE_NAME)
+        self.embed_tokens = core.compile_model(model_dir / TALKER_EMBEDDING_NAME, "CPU")
 
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
@@ -1524,10 +1525,10 @@ class OVQwen2_5OmniTalkerForConditionalGeneration(GenerationMixin):
                     video_second_per_grid,
                 )
                 inputs_embeds[:, -1, :] += torch.from_numpy(
-                    self.embed_tokens_1d(torch.tensor([self.codec_bos_token], dtype=torch.long, device=inputs_embeds.device))[0]
+                    self.embed_tokens(torch.tensor([[self.codec_bos_token]], dtype=torch.long, device=inputs_embeds.device))[0][0]
                 )
                 inputs_embeds[:, -2, :] += torch.from_numpy(
-                    self.embed_tokens_1d(torch.tensor([self.codec_pad_token], dtype=torch.long, device=inputs_embeds.device))[0]
+                    self.embed_tokens(torch.tensor([[self.codec_pad_token]], dtype=torch.long, device=inputs_embeds.device))[0][0]
                 )
 
             else:
@@ -1540,7 +1541,7 @@ class OVQwen2_5OmniTalkerForConditionalGeneration(GenerationMixin):
 
         if inputs_embeds is None:
             # 1. 推理第 2 个以及之后的 token
-            codec_embeds = torch.from_numpy(self.embed_tokens_2d(input_ids)[0])
+            codec_embeds = torch.from_numpy(self.embed_tokens(input_ids)[0])
             inputs_embeds = codec_embeds + thinker_reply_part[:, :1, :]
             if thinker_reply_part.shape[1] > 1:
                 thinker_reply_part = thinker_reply_part[:, 1:, :]
@@ -1708,23 +1709,25 @@ class RungeKutta4ODESolver:
 
 
 class OVQwen2_5OmniModel(GenerationMixin):
-    def __init__(self, model_dir, device):
+    def __init__(self, model_dir, thinker_device, talker_device, token2wav_device):
         self.config = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)
 
         self.has_talker = self.config.enable_audio_output
         model_path = Path(model_dir)
-        self.thinker = OVQwen2_5OmniThinkerForConditionalGeneration(model_path / "thinker", device, self.config)
+        self.thinker = OVQwen2_5OmniThinkerForConditionalGeneration(model_path / "thinker", thinker_device, self.config)
         self.speaker_map = {}
         if self.config.enable_audio_output:
-            self.enable_talker(model_path, device)
+            self.enable_talker(model_path, talker_device, token2wav_device)
         spk_path = model_path / "spk_dict.pt"
 
         self.load_speakers(spk_path)
 
-    def enable_talker(self, model_path, device):
+    def enable_talker(self, model_path, device, token2wav_device=None):
+        if token2wav_device is None:
+            token2wav_device = device
         self.talker = OVQwen2_5OmniTalkerForConditionalGeneration(model_path / "talker", device, self.config)
-        self.token2wav_dit = core.compile_model(model_path / "openvino_token2wav_dit_model.xml", device)
-        self.token2wav_bigvgan = core.compile_model(model_path / "openvino_token2wav_bigvgan_model.xml", device)
+        self.token2wav_dit = core.compile_model(model_path / TOKEN2WAV_DIT_NAME, token2wav_device)
+        self.token2wav_bigvgan = core.compile_model(model_path / TOKEN2WAV_BIGVGAN_NAME, token2wav_device)
         self.has_talker = True
 
     def load_speakers(self, path):
