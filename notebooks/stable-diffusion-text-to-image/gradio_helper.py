@@ -68,7 +68,7 @@ def make_demo_i2i(pipeline, default_image_path):
             return False
 
         random_generator = ov_genai.TorchGenerator(seed)
-        result = pipeline.generate(text, img_tensor, num_inference_steps=num_steps, strength=strength, generator=random_generator, callaback=callback)
+        result = pipeline.generate(text, img_tensor, num_inference_steps=num_steps, strength=strength, generator=random_generator, callback=callback)
         pbar.close()
         return Image.fromarray(result.data[0])
 
