@@ -8,9 +8,9 @@ More details about model can be found in [model card](https://huggingface.co/sta
 In this tutorial, we will consider how to convert Stable Diffusion v3 for running with OpenVINO. An additional part demonstrates how to run optimization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
 If you want to run previous Stable Diffusion versions, please check our other notebooks:
 
-* [Stable Diffusion v3 Torch Fx](../stable-diffusion-v3-torch-fx)
+* [Stable Diffusion V3 Torch.FX](../stable-diffusion-v3-torch-fx)
 * [Stable Diffusion](../stable-diffusion-text-to-image)
-* [Stable Diffusion v2](../stable-diffusion-v2)
+* [Stable Diffusion v2](../stable-diffusion-v2-infinite-zoom)
 * [Stable Diffusion XL](../stable-diffusion-xl)
 * [LCM Stable Diffusion](../latent-consistency-models-image-generation)
 * [Turbo SDXL](../sdxl-turbo)

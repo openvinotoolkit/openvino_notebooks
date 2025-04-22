@@ -1,4 +1,4 @@
-# Text-to-Image Generation and Infinite Zoom with Stable Diffusion v2 and OpenVINO™
+# Infinite Zoom with Stable Diffusion v2 and OpenVINO™
 
 
 Stable Diffusion v2 is the next generation of Stable Diffusion model a Text-to-Image latent diffusion model created by the researchers and engineers from [Stability AI](https://stability.ai/) and [LAION](https://laion.ai/). 
@@ -8,7 +8,7 @@ Diffusion models have been shown to achieve state-of-the-art results for generat
 
 In previous notebooks, we already discussed how to run [Text-to-Image generation and Image-to-Image generation using Stable Diffusion](../stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb) and [controlling its generation process using ControlNet](../controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb). Now, we have Stable Diffusion v2 as our latest showcase.
 
-[Text-guided Inpainting](./stable-diffusion-v2-infinite-zoom.ipynb) generation to create an image, using text description and masked image region, which should be part of the generated image.
+Text-guided Inpainting generation to create an image, using text description and masked image region, which should be part of the generated image.
 
 <p align="center">
     <img src="https://github.com/openvinotoolkit/openvino_notebooks/assets/22090501/9ac6de45-186f-4a3c-aa20-825825a337eb" />
@@ -25,10 +25,7 @@ The following image shows an example of the input text and corresponding video.
 </p>
 
 
-
-## For [Text-guided Inpainting](./stable-diffusion-v2-infinite-zoom.ipynb) Notebook
-
-Notebook demonstrate how to convert and run Stable Diffusion v2 models using OpenVINO.
+This notebook demonstrate how to convert and run Stable Diffusion v2 models using OpenVINO.
 
 Notebook contains the following steps:
 1. Create pipeline with PyTorch models using Diffusers library.
@@ -41,4 +38,4 @@ Notebook contains the following steps:
 This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/stable-diffusion-v2/README.md" />
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/stable-diffusion-v2-infinite-zoom/README.md" />

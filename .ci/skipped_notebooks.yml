@@ -72,31 +72,13 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.ipynb
+- notebook: notebooks/stable-diffusion-v2-infinite-zoom/stable-diffusion-v2-infinite-zoom.ipynb
   skips:
     - os:
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2019
-- notebook: notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image-demo.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2019
-- notebook: notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2019
-- notebook: notebooks/stable-diffusion-v3/stable-diffusion-v3-torch-fx.ipynb
+- notebook: notebooks/stable-diffusion-v3-torch-fx/stable-diffusion-v3-torch-fx.ipynb
   skips:
     - os:
         - macos-13

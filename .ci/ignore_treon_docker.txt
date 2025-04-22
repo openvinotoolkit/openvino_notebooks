@@ -9,10 +9,7 @@ notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb
 notebooks/blip-visual-language-processing/blip-visual-language-processing.ipynb
 notebooks/encodec-audio-compression/encodec-audio-compression.ipynb
 notebooks/controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb
-notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.ipynb
-notebooks/stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.ipynb
-notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image-demo.ipynb
-notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image.ipynb
+notebooks/stable-diffusion-v2-infinite-zoom/stable-diffusion-v2-infinite-zoom.ipynb
 notebooks/segment-anything/segment-anything.ipynb
 notebooks/riffusion-text-to-music/riffusion-text-to-music.ipynb
 notebooks/freevc-voice-conversion/freevc-voice-conversion.ipynb
