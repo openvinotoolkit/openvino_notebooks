@@ -678,6 +678,7 @@ OpenVINOMultiModal
 openvoice
 OpenVoice
 OpenVoiceBaseClass
+openjourney
 opset
 optimizable
 Orca
@@ -781,6 +782,7 @@ processings
 promptable
 proto
 protobuf
+prompthero
 PRs
 psychoacoustics
 PTQ
