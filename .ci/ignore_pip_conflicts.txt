@@ -1,9 +1,9 @@
 notebooks/quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb  # ultralytics==8.3.0
 notebooks/detectron2-to-openvino/detectron2-to-openvino.ipynb # detectron2@https://github.com/facebookresearch/detectron2
-notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb  # ultralytics==8.0.43
-notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb  # ultralytics==8.0.159
-notebooks/yolov8-optimization/yolov8-object-detection.ipynb  # ultralytics==8.0.43
-notebooks/yolov8-optimization/yolov8-obb.ipynb  # ultralytics==8.1.24
+notebooks/yolov8-instance-segmentation/yolov8-instance-segmentation.ipynb  # ultralytics==8.0.43
+notebooks/yolov8-keypoint-detection/yolov8-keypoint-detection.ipynb  # ultralytics==8.0.159
+notebooks/yolov8-object-detection/yolov8-object-detection.ipynb  # ultralytics==8.0.43
+notebooks/yolov8-obb/yolov8-obb.ipynb  # ultralytics==8.1.24
 notebooks/llm-chatbot/llm-chatbot.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
 notebooks/llm-rag-langchain/llm-rag-langchain.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
 notebooks/depth-anything/depth-anything.ipynb # install requirements.txt after clone repo

@@ -1,4 +1,4 @@
-# Convert and Optimize YOLOv8 with OpenVINO™
+# Convert and Optimize YOLOv8 real-time object detection with OpenVINO™
 
 <p align="center">
     <img src="https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png"/>
@@ -9,15 +9,9 @@ The [YOLOv8](https://github.com/ultralytics/ultralytics) algorithm developed by 
 YOLO stands for “You Only Look Once”, it is a popular family of real-time object detection algorithms. The original YOLO object detector was first released in 2016. Since then, different versions and variants of YOLO have been proposed, each providing a significant increase in performance and efficiency. YOLOv8 builds upon the success of previous YOLO versions and introduces new features and improvements to further boost performance and flexibility. More details about its realization can be found in the [Ultralytics YOLOv8 Tasks documentation](https://docs.ultralytics.com/tasks/).
 
 
-This tutorial explains how to convert and optimize the YOLOv8 PyTorch models with OpenVINO. These tutorials are considered object detection, instance segmentation and keypoint detection scenarios:
+This tutorial explains how to convert and optimize the YOLOv8 PyTorch models with OpenVINO Runtime for object detection scenarios.
 
-- [yolov8-object-detection](./yolov8-object-detection.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/yolov8-optimization/yolov8-object-detection.ipynb)
-- [yolov8-instance-segmentation](./yolov8-instance-segmentation.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb)
-- [yolov8-keypoint-detection](./yolov8-keypoint-detection.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb)
-- [yolov8-obb](./yolov8-obb.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/yolov8-optimization/yolov8-obb.ipynb)
-
-
-Each case tutorial consists of the following steps::
+The tutorial consists of the following steps:
 - Prepare the PyTorch model.
 - Download and prepare the dataset.
 - Validate the original model.
@@ -28,10 +22,16 @@ Each case tutorial consists of the following steps::
 - Compare performance of the FP32 and quantized models.
 
 
+You can also try tutorials that considered using instance segmentation, keypoint detection scenarios and oriented bounding boxes object detection with OpenVINO Runtime:
+
+- [yolov8-instance-segmentation](../yolov8-instance-segmentation/yolov8-instance-segmentation.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/yolov8-instance-segmentation/yolov8-instance-segmentation.ipynb)
+- [yolov8-keypoint-detection](../yolov8-keypoint-detection/yolov8-keypoint-detection.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/yolov8-keypoint-detection/yolov8-keypoint-detection.ipynb)
+- [yolov8-obb](../yolov8-obb/yolov8-obb.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/yolov8-obb/yolov8-obb.ipynb)
+
 ## Installation Instructions
 
 This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/yolov8-optimization/README.md" />
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/yolov8-object-detection/README.md" />

@@ -1,0 +1,41 @@
+# Convert and Optimize YOLOv8 instance segmentation model with OpenVINO™
+
+<p align="center">
+    <img src="https://learnopencv.com/wp-content/uploads/2023/01/yolov8-detection-segmentation.gif"/>
+</p>
+[**image source*](https://learnopencv.com/ultralytics-yolov8/)
+
+The [YOLOv8](https://github.com/ultralytics/ultralytics) algorithm developed by [Ultralytics](https://ultralytics.com) is a cutting-edge, state-of-the-art (SOTA) model that is designed to be fast, accurate, and easy to use, making it an excellent choice for a wide range of object detection, image segmentation, image classification and keypoint detection tasks.
+
+YOLO stands for “You Only Look Once”, it is a popular family of real-time object detection algorithms. The original YOLO object detector was first released in 2016. Since then, different versions and variants of YOLO have been proposed, each providing a significant increase in performance and efficiency. YOLOv8 builds upon the success of previous YOLO versions and introduces new features and improvements to further boost performance and flexibility. More details about its realization can be found in the [Ultralytics YOLOv8 Tasks documentation](https://docs.ultralytics.com/tasks/).
+
+
+This tutorial explains how to convert and optimize the YOLOv8 PyTorch models with OpenVINO for [instance segmentation](https://docs.ultralytics.com/tasks/segment/) scenarios. Instance segmentation goes a step further than object detection and involves identifying individual objects in an image and segmenting them from the rest of the image. Instance segmentation as an object detection are often used as key components in computer vision systems.
+Applications that use real-time instance segmentation models include video analytics, robotics, autonomous vehicles, multi-object tracking and object counting, medical image analysis, and many others.
+
+
+This tutorial consists of the following steps:
+- Prepare the PyTorch model.
+- Download and prepare the dataset.
+- Validate the original model.
+- Convert the PyTorch model to OpenVINO IR.
+- Validate the converted model.
+- Prepare and run NNCF post-training optimization pipeline.
+- Compare accuracy of the FP32 and quantized models.
+- Compare performance of the FP32 and quantized models.
+
+
+You can also try tutorials, which considered using object detection, keypoint detection and oriented bounding boxes object detection with OpenVINO Runtime scenarios with OpenVINO Runtime:
+
+- [yolov8-instance-segmentation](../yolov8-instance-segmentation/yolov8-instance-segmentation.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/yolov8-instance-segmentation/yolov8-instance-segmentation.ipynb)
+- [yolov8-keypoint-detection](../yolov8-keypoint-detection/yolov8-keypoint-detection.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/yolov8-keypoint-detection/yolov8-keypoint-detection.ipynb)
+- [yolov8-obb](../yolov8-obb/yolov8-obb.ipynb) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/yolov8-obb/yolov8-obb.ipynb)
+
+
+## Installation Instructions
+
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/yolov8-instance-segmentation/README.md" />
