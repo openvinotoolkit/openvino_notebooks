@@ -1,4 +1,4 @@
-- notebook: notebooks/speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb
+- notebook: notebooks/speech-recognition-post-training-quantization/speech-recognition-quantization-wav2vec2.ipynb
   skips:
     - os:
         - macos-13
@@ -20,13 +20,13 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb
+- notebook: notebooks/wav2vec2-quantization-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb
   skips:
     - os:
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb
+- notebook: notebooks/yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb
   skips:
     - os:
         - macos-13

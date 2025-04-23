@@ -114,7 +114,7 @@
 ## API Overview
 
 - [Text to Image pipeline and OpenVINO with Generate API](./text-to-image-genai/text-to-image-genai.ipynb)
-- [Quantize Speech Recognition Models with accuracy control using NNCF PTQ API](./quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb)
+- [Quantize Speech Recognition Models with accuracy control using NNCF PTQ API](./wav2vec2-quantization-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb)
 - [Post-Training Quantization of PyTorch models with NNCF](./pytorch-post-training-quantization-nncf/pytorch-post-training-quantization-nncf.ipynb)
 - [Text Generation via Prompt Lookup Decoding using OpenVINO™](./prompt-lookup-decoding/prompt-lookup-decoding.ipynb)
 - [Optimize Preprocessing](./optimize-preprocessing/optimize-preprocessing.ipynb)
@@ -145,9 +145,8 @@
 - [Convert of TensorFlow Hub models to OpenVINO Intermediate Representation (IR)](./tensorflow-hub/tensorflow-hub.ipynb)
 - [Convert a TensorFlow Model to OpenVINO™](./tensorflow-classification-to-openvino/tensorflow-classification-to-openvino.ipynb)
 - [Line-level text detection with Surya](./surya-line-level-text-detection/surya-line-level-text-detection.ipynb)
-- [Convert and Optimize YOLOv11 with OpenVINO™](./quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb)
+- [YOLOv11 quantization with accuracy control using NNCF](./yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb)
 - [Convert a PyTorch Model to OpenVINO™ IR](./pytorch-to-openvino/pytorch-to-openvino.ipynb)
-- [Convert a PyTorch Model to ONNX and OpenVINO™ IR](./pytorch-to-openvino/pytorch-onnx-to-openvino.ipynb)
 - [Convert a PaddlePaddle Model to OpenVINO™ IR](./paddle-to-openvino/paddle-to-openvino-classification.ipynb)
 - [Voice tone cloning with OpenVoice and OpenVINO](./openvoice/openvoice.ipynb)
 - [OpenVINO Tokenizers: Incorporate Text Processing Into OpenVINO Pipelines](./openvino-tokenizers/openvino-tokenizers.ipynb)
@@ -338,10 +337,10 @@
 
 - [Quantization Aware Training with NNCF, using TensorFlow Framework](./tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb)
 - [SpeechBrain Emotion Recognition with OpenVINO](./speechbrain-emotion-recognition/speechbrain-emotion-recognition.ipynb)
-- [Quantize Wav2Vec Speech Recognition Model using NNCF PTQ API](./speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb)
+- [Quantize Wav2Vec Speech Recognition Model using NNCF PTQ API](./speech-recognition-post-training-quantization/speech-recognition-quantization-wav2vec2.ipynb)
 - [Accelerate Inference of Sparse Transformer Models with OpenVINO™ and 4th Gen Intel&reg; Xeon&reg; Scalable Processors](./sparsity-optimization/sparsity-optimization.ipynb)
-- [Convert and Optimize YOLOv11 with OpenVINO™](./quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb)
-- [Quantize Speech Recognition Models with accuracy control using NNCF PTQ API](./quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb)
+- [YOLOv11 quantization with accuracy control using NNCF](./yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb)
+- [Quantize Speech Recognition Models with accuracy control using NNCF PTQ API](./wav2vec2-quantization-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb)
 - [Quantization-Sparsity Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb)
 - [Quantization Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-aware-training/pytorch-quantization-aware-training.ipynb)
 - [Post-Training Quantization of PyTorch models with NNCF](./pytorch-post-training-quantization-nncf/pytorch-post-training-quantization-nncf.ipynb)
