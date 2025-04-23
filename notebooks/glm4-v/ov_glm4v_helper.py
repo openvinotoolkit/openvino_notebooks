@@ -3,7 +3,11 @@ import types
 from typing import Optional, Tuple, Union, List
 import gc
 import openvino as ov
-from openvino import opset13
+
+try:
+    from openvino import opset13
+except ImportError:
+    from openvino.runtime import opset13
 import nncf
 import numpy as np
 import torch
@@ -297,10 +301,12 @@ def convert_glm4v_model(model_dir, output_dir, quantization_config):
 
     if not embed_token_path.exists():
         print("⌛ Convert Input embedding model")
-        ov_model = ov.convert_model(
-            model.transformer.embedding,
-            example_input=torch.ones([1, 10], dtype=torch.int64),
-        )
+        model.transformer.embedding.eval()
+        with torch.no_grad():
+            ov_model = ov.convert_model(
+                model.transformer.embedding,
+                example_input=torch.ones([1, 10], dtype=torch.int64),
+            )
         ov.save_model(ov_model, embed_token_path)
         del ov_model
         cleanup_torchscript_cache()
@@ -342,10 +348,14 @@ def convert_glm4v_model(model_dir, output_dir, quantization_config):
         input_ids = torch.zeros([2, 2], dtype=torch.int64)
         inputs_embeds = torch.zeros([2, 2, 4096], dtype=torch.float32)
 
-        pkv = model.transformer(
-            input_ids=input_ids,
-            attention_mask=torch.ones((2, 2), dtype=torch.int64),
-        )[1]
+        pkv = []
+        for _ in range(model.config.num_layers):
+            pkv.append(
+                (
+                    torch.rand([2, model.config.multi_query_group_num, 2, model.config.kv_channels]),
+                    torch.rand([2, model.config.multi_query_group_num, 2, model.config.kv_channels]),
+                )
+            )
 
         model.transformer._orig_forward = model.transformer.forward
         model.transformer.forward = types.MethodType(_chatglm_transformer_forward, model.transformer)
