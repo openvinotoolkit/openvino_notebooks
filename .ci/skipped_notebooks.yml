@@ -375,7 +375,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb
+- notebook: notebooks/llm-agent-rag-llamaindex/llm-agent-rag-llamaindex.ipynb
   skips:
     - os:
       - macos-13
@@ -425,7 +425,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/llm-agent-react/llm-agent-react.ipynb
+- notebook: notebooks/llm-native-agent-react/llm-native-agent-react.ipynb
   skips:
     - os:
         - macos-13
@@ -445,7 +445,7 @@
   skips:
     - os:
         - macos-13
-- notebook: notebooks/llm-agent-react/llm-agent-react-langchain.ipynb
+- notebook: notebooks/llm-agent-react-langchain/llm-agent-react-langchain.ipynb
   skips:
     - os:
         - macos-13
