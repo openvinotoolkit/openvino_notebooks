@@ -1,9 +1,3 @@
-- notebook: notebooks/speech-recognition-post-training-quantization/speech-recognition-quantization-wav2vec2.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/gpu-device/gpu-device.ipynb
   skips:
     - os:
@@ -20,7 +14,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/wav2vec2-quantization-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb
+- notebook: notebooks/speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb
   skips:
     - os:
         - macos-13

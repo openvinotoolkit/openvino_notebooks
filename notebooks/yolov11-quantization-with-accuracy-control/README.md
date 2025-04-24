@@ -1,7 +1,6 @@
 # YOLOv11 quantization with accuracy control using NNCF
 
-This tutorial demonstrate how to apply 8-bit quantization with accuracy control to the YOLOv11 model:
-* `yolov11-quantization-with-accuracy-control.ipynb` demonstrates how to apply post-training `INT8` quantization on the [YOLOv11](https://github.com/ultralytics/) PyTorch model
+This tutorial demonstrate how to apply 8-bit quantization with accuracy control to the YOLOv11 model. The notebook shows how to apply post-training `INT8` quantization on the [YOLOv11](https://github.com/ultralytics/) PyTorch model.
 
 The code of the tutorials is designed to be extendable to the same model types trained on custom datasets.
 

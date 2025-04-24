@@ -1,7 +1,6 @@
 # Quantize Speech Recognition Models with accuracy control using NNCF PTQ API
 
-This tutorial demonstrates how to apply 8-bit quantization with accuracy control to the speech recognition and YOLOv11 models::
-* `speech-recognition-quantization-wav2vec2.ipynb` demonstrates how to apply post-training `INT8` quantization with accuracy control on a fine-tuned [Wav2Vec2-Base-960h](https://huggingface.co/facebook/wav2vec2-base-960h) [PyTorch](https://pytorch.org/) model, trained on the [LibriSpeech ASR corpus](https://www.openslr.org/12).
+This tutorial demonstrates how to apply 8-bit quantization with accuracy control to the speech recognition model. The notebook shows how to apply post-training `INT8` quantization with accuracy control on a fine-tuned [Wav2Vec2-Base-960h](https://huggingface.co/facebook/wav2vec2-base-960h) [PyTorch](https://pytorch.org/) model, trained on the [LibriSpeech ASR corpus](https://www.openslr.org/12).
 
 The code of the tutorial is designed to be extendable to the same model types trained on custom datasets.
 
@@ -22,4 +21,4 @@ This is a self-contained example that relies solely on its own code.</br>
 We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/wav2vec2-quantization-with-accuracy-control/README.md" />
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/speech-recognition-quantization/README.md" />
