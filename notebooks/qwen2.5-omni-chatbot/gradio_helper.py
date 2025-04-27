@@ -185,7 +185,7 @@ def make_demo(model, processor):
     with gr.Blocks() as demo:
         gr.Markdown("""<center><font size=8>Qwen2.5-Omni OpenVINO demo</center>""")
 
-        chatbot = gr.Chatbot(label="Qwen2-VL", elem_classes="control-height", height=500)
+        chatbot = gr.Chatbot(label="Qwen2.5-Omni", elem_classes="control-height", height=500)
 
         query = gr.Textbox(lines=2, label="Input")
         task_history = gr.State([])

@@ -29,10 +29,10 @@ except ImportError:
 import time
 
 text_emb_path = Path("language_model/embed_tokens.xml")
-image_emb_path = Path("image_encoder.xml")
-resampler_path = Path("resampler.xml")
 llm_path = Path("language_model/language_model.xml")
-audio_emb_path = Path("audio_encoder.xml")
+image_encoder_path = Path("image_encoder.xml")
+resampler_path = Path("resampler.xml")
+audio_encoder_path = Path("audio_encoder.xml")
 proejector_path = Path("proejector.xml")
 
 
@@ -315,14 +315,14 @@ def patch_model_code(orig_model_dir):
 def convert_llm(model, model_dir):
     model.llm.config.save_pretrained(model_dir / text_emb_path.parent)
     if not (model_dir / text_emb_path).exists():
-        print("⌛ ConvertText embedding model")
+        print("⌛ Convert Text Embedding model")
         ov_model = ov.convert_model(model.llm.model.embed_tokens, example_input=torch.ones([1, 10], dtype=torch.long))
 
         ov.save_model(ov_model, model_dir / text_emb_path)
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
-        print("✅ Text embedding model successfully converted")
+        print("✅ Text Embedding model successfully converted")
 
     if not (model_dir / llm_path).exists():
         print("⌛ Convert Language model")
@@ -370,8 +370,8 @@ def convert_llm(model, model_dir):
 
 def convert_vision_encoder(model, model_dir):
     tgt_sizes = torch.tensor([[24, 43]])
-    if not (model_dir / image_emb_path).exists():
-        print("⌛ Convert Image embedding model")
+    if not (model_dir / image_encoder_path).exists():
+        print("⌛ Convert Image Encoder model")
 
         def siglip_vis_embed_forward(
             self,
@@ -514,13 +514,13 @@ def convert_vision_encoder(model, model_dir):
             pixel_values, patch_attn_mask, tgt_sizes, model.config.vision_config.patch_size, model.config.vision_config.image_size // model.config.patch_size
         )
         ov_model = ov.convert_model(vpm, example_input={"pixel_values": pixel_values, "position_ids": position_ids, "patch_attention_mask": patch_attn_mask})
-        ov.save_model(ov_model, model_dir / image_emb_path)
+        ov.save_model(ov_model, model_dir / image_encoder_path)
         del ov_model
         cleanup_torchscript_cache()
         # del vpm
         # del model.vpm
         gc.collect()
-        print("✅ Image embedding model successfully converted")
+        print("✅ Image Encoder model successfully converted")
 
     if not (model_dir / resampler_path).exists():
         print("⌛ Convert Resamler model")
@@ -566,7 +566,7 @@ def convert_vision_encoder(model, model_dir):
 
 
 def convert_audio_encoder(model, model_dir):
-    if not (model_dir / audio_emb_path).exists():
+    if not (model_dir / audio_encoder_path).exists():
 
         def forward_wrap(self, input_features, attention_mask):
             audio_states = self._orig_forward(input_features, output_hidden_states=True, attention_mask=attention_mask).hidden_states[self.audio_encoder_layer]
@@ -579,20 +579,20 @@ def convert_audio_encoder(model, model_dir):
         model._orig_forward = model.apm.forward
         model.forward = types.MethodType(forward_wrap, model)
 
-        print("⌛ Convert Audio embedding model")
+        print("⌛ Convert Audio Encoder model")
         input_features = torch.randn([2, 80, 1515])
         attention_mask = torch.ones([2, 1, 758, 758])
         ov_model = ov.convert_model(model, example_input=[input_features, attention_mask])
-        ov.save_model(ov_model, model_dir / audio_emb_path)
+        ov.save_model(ov_model, model_dir / audio_encoder_path)
         del ov_model
         cleanup_torchscript_cache()
-        print("✅ Audio embedding model successfully converted")
+        print("✅ Audio Encoder model successfully converted")
 
 
 def convert_minicpmo26(model_id, remove_checkpoint=False):
     model_dir = Path(model_id.split("/")[-1])
     requires_conversion = not all(
-        [(model_dir / text_emb_path).exists(), (model_dir / image_emb_path).exists(), (model_dir / resampler_path).exists(), (model_dir / llm_path).exists()]
+        [(model_dir / text_emb_path).exists(), (model_dir / image_encoder_path).exists(), (model_dir / resampler_path).exists(), (model_dir / llm_path).exists()]
     )
 
     if not requires_conversion:
@@ -630,14 +630,6 @@ def convert_minicpmo26(model_id, remove_checkpoint=False):
     return model_dir
 
 
-def copy_llm_files(model_dir, dst_dir):
-    shutil.copy(model_dir / text_emb_path, model_dir / dst_dir / text_emb_path.name)
-    shutil.copy(model_dir / text_emb_path.with_suffix(".bin"), model_dir / dst_dir / text_emb_path.with_suffix(".bin").name)
-    shutil.copy(model_dir / llm_path.parent / "config.json", model_dir / dst_dir / "config.json")
-    shutil.copy(model_dir / llm_path.parent / "configuration_minicpm.py", model_dir / dst_dir / "configuration_minicpm.py")
-    shutil.copy(model_dir / llm_path.parent / "modeling_navit_siglip.py", model_dir / dst_dir / "modeling_navit_siglip.py")
-
-
 def prepare_vis_position_ids(pixel_values, patch_attention_mask, tgt_sizes, patch_size, num_patches_per_side):
     batch_size = pixel_values.size(0)
     max_im_h, max_im_w = pixel_values.size(2), pixel_values.size(3)
@@ -668,7 +660,7 @@ def prepare_vis_position_ids(pixel_values, patch_attention_mask, tgt_sizes, patc
 core = ov.Core()
 
 
-class OvModelForCausalLMWithEmb(GenerationMixin):
+class OVModelForCausalLMWithEmb(GenerationMixin):
     def __init__(self, model_dir, device="CPU", ov_config=None, compile=True, slice_lm_head=True) -> None:
         self._supports_cache_class = False
         self.config = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)
@@ -877,7 +869,7 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         return self.forward(*args, **kwargs)
 
 
-class OvMiniCPMO:
+class OVMiniCPMO:
     def __init__(self, config, vpm, resampler, apm, llm, processor):
         self.config = config
         self.llm = llm
@@ -1608,13 +1600,13 @@ class OvMiniCPMO:
 
 def init_model(model_dir, llm_model_dir, device):
     config = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)
-    llm = OvModelForCausalLMWithEmb(model_dir / llm_model_dir, device)
-    img_emb = core.compile_model(model_dir / image_emb_path, device)
-    aud_emb = core.compile_model(model_dir / audio_emb_path, device)
+    llm = OVModelForCausalLMWithEmb(model_dir / llm_model_dir, device)
+    img_emb = core.compile_model(model_dir / image_encoder_path, device)
+    aud_emb = core.compile_model(model_dir / audio_encoder_path, device)
     resampler = core.compile_model(model_dir / resampler_path, device)
     processor = AutoProcessor.from_pretrained(model_dir, trust_remote_code=True)
 
-    ov_model = OvMiniCPMO(config, img_emb, resampler, aud_emb, llm, processor)
+    ov_model = OVMiniCPMO(config, img_emb, resampler, aud_emb, llm, processor)
     return ov_model
 
 
