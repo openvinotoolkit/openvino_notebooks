@@ -592,7 +592,12 @@ def convert_audio_encoder(model, model_dir):
 def convert_minicpmo26(model_id, remove_checkpoint=False):
     model_dir = Path(model_id.split("/")[-1])
     requires_conversion = not all(
-        [(model_dir / text_emb_path).exists(), (model_dir / image_encoder_path).exists(), (model_dir / resampler_path).exists(), (model_dir / llm_path).exists()]
+        [
+            (model_dir / text_emb_path).exists(),
+            (model_dir / image_encoder_path).exists(),
+            (model_dir / resampler_path).exists(),
+            (model_dir / llm_path).exists(),
+        ]
     )
 
     if not requires_conversion:
