@@ -73,6 +73,48 @@ def qwen_completion_to_prompt(completion):
 
 SUPPORTED_LLM_MODELS = {
     "English": {
+        "Qwen3-4B": {
+            "model_id": "Qwen/Qwen3-4B",
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+        },
+        "Qwen3-1.7B": {
+            "model_id": "Qwen/Qwen3-1.7B",
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+        },
+        "Qwen3-8B": {
+            "model_id": "Qwen/Qwen3-8B",
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+        },
+        "Qwen3-14B": {
+            "model_id": "Qwen/Qwen3-14B",
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+        },
+        "GLM-Z1-9B-0414": {
+            "model_id": "THUDM/GLM-Z1-9B-0414",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+        },
+        "GLM-4-9B-0414": {
+            "model_id": "THUDM/GLM-Z1-9B-0414",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+        },
         "qwen2.5-0.5b-instruct": {
             "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
             "remote_code": False,
@@ -410,6 +452,48 @@ SUPPORTED_LLM_MODELS = {
         },
     },
     "Chinese": {
+        "Qwen3-4B": {
+            "model_id": "Qwen/Qwen3-4B",
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+        },
+        "Qwen3-1.7B": {
+            "model_id": "Qwen/Qwen3-1.7B",
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+        },
+        "Qwen3-8B": {
+            "model_id": "Qwen/Qwen3-8B",
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+        },
+        "Qwen3-14B": {
+            "model_id": "Qwen/Qwen3-14B",
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+        },
+        "GLM-Z1-9B-0414": {
+            "model_id": "THUDM/GLM-Z1-9B-0414",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+        },
+        "GLM-4-9B-0414": {
+            "model_id": "THUDM/GLM-Z1-9B-0414",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+        },
         "qwen2.5-0.5b-instruct": {
             "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
             "remote_code": False,
