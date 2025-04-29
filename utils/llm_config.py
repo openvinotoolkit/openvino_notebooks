@@ -79,6 +79,7 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
         "Qwen3-1.7B": {
             "model_id": "Qwen/Qwen3-1.7B",
@@ -86,6 +87,7 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
         "Qwen3-8B": {
             "model_id": "Qwen/Qwen3-8B",
@@ -93,6 +95,7 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
         "Qwen3-14B": {
             "model_id": "Qwen/Qwen3-14B",
@@ -100,16 +103,18 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+        },
+        "GLM-4-9B-0414": {
+            "model_id": "THUDM/GLM-4-9B-0414",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
         },
         "GLM-Z1-9B-0414": {
             "model_id": "THUDM/GLM-Z1-9B-0414",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
-        },
-        "GLM-4-9B-0414": {
-            "model_id": "THUDM/GLM-Z1-9B-0414",
-            "remote_code": False,
-            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "genai_chat_template": "[gMASK]<sop>{%- if tools -%}<|system|>\n# 可用工具\n{% for tool in tools %}{%- set function = tool.function if tool.get(\"function\") else tool %}\n\n## {{ function.name }}\n\n{{ function | tojson(indent=4, ensure_ascii=False) }}\n在调用上述函数时，请使用 Json 格式表示调用的参数。{%- endfor %}{%- endif -%}{%- for msg in messages %}{%- if msg.role == 'system' %}<|system|>\n{{ msg.content }}{%- endif %}{%- endfor %}{%- for message in messages if message.role != 'system' %}{%- set role = message['role'] %}{%- set content = message['content'] %}{%- set meta = message.get(\"metadata\", \"\") %}{%- if role == 'user' %}<|user|>\n{{ content }}{%- elif role == 'assistant' and not meta %}<|assistant|>\n{{ content }}{%- elif role == 'assistant' and meta %}<|assistant|>{{ meta }} \n{{ content }}{%- elif role == 'observation' %}<|observation|>\n{{ content }}{%- endif %}{%- endfor %}{% if add_generation_prompt %}<|assistant|>{% endif %}",
         },
         "qwen2.5-0.5b-instruct": {
             "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
@@ -454,6 +459,7 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
         "Qwen3-1.7B": {
             "model_id": "Qwen/Qwen3-1.7B",
@@ -461,6 +467,7 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
         "Qwen3-8B": {
             "model_id": "Qwen/Qwen3-8B",
@@ -468,6 +475,7 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
         "Qwen3-14B": {
             "model_id": "Qwen/Qwen3-14B",
@@ -475,16 +483,18 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+        },
+        "GLM-4-9B-0414": {
+            "model_id": "THUDM/GLM-4-9B-0414",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
         },
         "GLM-Z1-9B-0414": {
             "model_id": "THUDM/GLM-Z1-9B-0414",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
-        },
-        "GLM-4-9B-0414": {
-            "model_id": "THUDM/GLM-Z1-9B-0414",
-            "remote_code": False,
-            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "genai_chat_template": "[gMASK]<sop>{%- if tools -%}<|system|>\n# 可用工具\n{% for tool in tools %}{%- set function = tool.function if tool.get(\"function\") else tool %}\n\n## {{ function.name }}\n\n{{ function | tojson(indent=4, ensure_ascii=False) }}\n在调用上述函数时，请使用 Json 格式表示调用的参数。{%- endfor %}{%- endif -%}{%- for msg in messages %}{%- if msg.role == 'system' %}<|system|>\n{{ msg.content }}{%- endif %}{%- endfor %}{%- for message in messages if message.role != 'system' %}{%- set role = message['role'] %}{%- set content = message['content'] %}{%- set meta = message.get(\"metadata\", \"\") %}{%- if role == 'user' %}<|user|>\n{{ content }}{%- elif role == 'assistant' and not meta %}<|assistant|>\n{{ content }}{%- elif role == 'assistant' and meta %}<|assistant|>{{ meta }} \n{{ content }}{%- elif role == 'observation' %}<|observation|>\n{{ content }}{%- endif %}{%- endfor %}{% if add_generation_prompt %}<|assistant|>{% endif %}",
         },
         "qwen2.5-0.5b-instruct": {
             "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
