@@ -3,8 +3,8 @@ import openvino_genai as ov_genai
 from uuid import uuid4
 from threading import Event, Thread
 from genai_helper import ChunkStreamer
-
-max_new_tokens = 256
+import re
+max_new_tokens = 2048
 
 core = ov.Core()
 
@@ -67,7 +67,7 @@ def get_system_prompt(model_language, system_prompt=None):
 def make_demo(pipe, model_configuration, model_id, model_language, disable_advanced=False):
     import gradio as gr
 
-    max_new_tokens = 256
+    max_new_tokens = 2048
 
     start_message = get_system_prompt(model_language, model_configuration.get("system_prompt"))
     if "genai_chat_template" in model_configuration:
@@ -90,6 +90,8 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
         updated text string
 
         """
+        new_text = re.sub(r"^<think>", "<em><small>I am thinking...", new_text)
+        new_text = re.sub("</think>", "I think I know the answer</small></em>", new_text)
         partial_text += new_text
         return partial_text
 
