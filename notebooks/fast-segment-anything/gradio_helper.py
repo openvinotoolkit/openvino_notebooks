@@ -1,4 +1,4 @@
-from typing import Callable, Tuple
+from typing import Callable
 import gradio as gr
 from PIL import Image, ImageDraw
 import numpy as np
@@ -58,7 +58,7 @@ def select_point(img: Image.Image, point_type: str, evt: gr.SelectData) -> Image
     return img
 
 
-def clear_points() -> Tuple[Image.Image, None]:
+def clear_points() -> tuple[Image.Image, None]:
     """Gradio clear points callback."""
     global object_points, background_points, bbox_points
     # global object_points; global background_points; global bbox_points

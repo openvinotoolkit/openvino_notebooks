@@ -1,7 +1,7 @@
 import gc
 import types
 from pathlib import Path
-from typing import Optional, Tuple, List
+from typing import Optional
 
 import huggingface_hub as hf_hub
 import openvino as ov
@@ -560,7 +560,7 @@ class OVDecoder:
         input_ids: torch.LongTensor,
         encoder_hidden_states: torch.FloatTensor,
         encoder_attention_mask: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
+        past_key_values: Optional[tuple[tuple[torch.FloatTensor]]] = None,
         decoder_attention_mask: Optional[torch.LongTensor] = None,
     ) -> Seq2SeqLMOutput:
         # Model inputs
@@ -637,7 +637,7 @@ class OVDecoder:
             return self._past_length
         return past_key_values[0][0].shape[-2]
 
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
         [`~PreTrainedModel.beam_sample`] is called.

@@ -1,6 +1,5 @@
 from pathlib import Path
 import types
-from typing import Optional, Tuple, Union, List
 import gc
 import openvino as ov
 
@@ -14,7 +13,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoConfig, AutoTokenizer
 from transformers.generation import GenerationConfig, GenerationMixin
 from transformers.modeling_outputs import CausalLMOutputWithPast, BaseModelOutputWithPast
-from typing import Optional, Tuple, Union, List, Dict, Any
+from typing import Optional, Union, Any
 from transformers import __version__ as transformers_version
 from transformers.generation.utils import GenerationConfig, ModelOutput
 import time
@@ -98,8 +97,8 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
 
 def fuse_cache_reorder(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
     gather_dim: int,
 ):
     """
@@ -115,9 +114,9 @@ def fuse_cache_reorder(
     Parameters:
       ov_model (`ov.Model`):
           openvino model for processing
-      not_kv_inputs (`List[str]`):
+      not_kv_inputs (`list[str]`):
           list of input nodes in model that not related to past key values
-      key_value_input_names (`List[str]`):
+      key_value_input_names (`list[str]`):
           list of names for key value input layers
       gather_dim (int):
           dimension for gathering cache during reorder pass
@@ -169,9 +168,9 @@ def build_state_initializer(ov_model: ov.Model, batch_dim: int):
 
 def make_stateful(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
-    key_value_output_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
+    key_value_output_names: list[str],
     batch_dim: int,
     num_attention_heads: int,
     num_beams_and_batch: int = None,
@@ -182,11 +181,11 @@ def make_stateful(
     Parameters:
         ov_model (ov.Model):
             openvino model
-        not_kv_inputs (`List[str]`):
+        not_kv_inputs (`list[str]`):
             list of input nodes in model that not related to past key values
-        key_value_input_names (`List[str]`):
+        key_value_input_names (`list[str]`):
             list of names for key value input layers
-        key_value_output_names (`List[str]`):
+        key_value_output_names (`list[str]`):
             list of names for key value input layers
         batch_dim (int):
             index of batch dimension in key value layers
@@ -405,7 +404,7 @@ def convert_glm4v_model(model_dir, output_dir, quantization_config):
     print(f"✅ {model_name} model conversion finished. You can find results in {output_dir}")
 
 
-def is_empty(images_list: Optional[List[List[torch.Tensor]]]):
+def is_empty(images_list: Optional[list[list[torch.Tensor]]]):
     if images_list is None or len(images_list) == 0:
         return True
     for image_list in images_list:
@@ -679,10 +678,10 @@ class OvGLM4v(GenerationMixin):
     def _update_model_kwargs_for_generation(
         self,
         outputs: ModelOutput,
-        model_kwargs: Dict[str, Any],
+        model_kwargs: dict[str, Any],
         is_encoder_decoder: bool = False,
         standardize_cache_format: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         # update past_key_values
         if int(transformers_version.split(".")[1]) >= 44:
             assert not standardize_cache_format

@@ -1,6 +1,6 @@
 from pathlib import Path
 from types import MethodType
-from typing import Union, List, Optional, Tuple, Dict, Any
+from typing import Union, Optional, Any
 from OmniGen import OmniGenPipeline, OmniGenProcessor
 from OmniGen.scheduler import OmniGenCache, OmniGenScheduler
 from OmniGen.model import get_2d_sincos_pos_embed
@@ -83,8 +83,8 @@ class OmniGenCacheWrapper(DynamicCache):
         key_states: torch.Tensor,
         value_states: torch.Tensor,
         layer_idx: int,
-        cache_kwargs: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        cache_kwargs: Optional[dict[str, Any]] = None,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         """
         Updates the cache with the new `key_states` and `value_states` for the layer `layer_idx`.
         Parameters:
@@ -94,7 +94,7 @@ class OmniGenCacheWrapper(DynamicCache):
                 The new value states to cache.
             layer_idx (`int`):
                 The index of the layer to cache the states for.
-            cache_kwargs (`Dict[str, Any]`, `optional`):
+            cache_kwargs (`dict[str, Any]`, `optional`):
                 Additional arguments for the cache subclass. No additional arguments are used in `OffloadedCache`.
         Return:
             A tuple containing the updated key and value states.
@@ -123,7 +123,7 @@ class OmniGenCacheWrapper(DynamicCache):
             self.value_cache[layer_idx] = v
             return k, v
 
-    def __getitem__(self, layer_idx: int) -> List[Tuple[torch.Tensor]]:
+    def __getitem__(self, layer_idx: int) -> list[tuple[torch.Tensor]]:
         "Gets the cache for this layer to the device. Prefetches the next and evicts the previous layer."
         if layer_idx < len(self):
             key_tensor = self.key_cache[layer_idx]
@@ -292,7 +292,7 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
                     input_ids: torch.LongTensor = None,
                     attention_mask: Optional[torch.Tensor] = None,
                     position_ids: Optional[torch.LongTensor] = None,
-                    past_key_values: Optional[List[torch.FloatTensor]] = None,
+                    past_key_values: Optional[list[torch.FloatTensor]] = None,
                     inputs_embeds: Optional[torch.FloatTensor] = None,
                     use_cache: Optional[bool] = None,
                     output_attentions: Optional[bool] = None,
@@ -300,7 +300,7 @@ def convert_omingen_model(model_id, model_path, quant_config=None):
                     return_dict: Optional[bool] = None,
                     cache_position: Optional[torch.LongTensor] = None,
                     offload_model: Optional[bool] = False,
-                ) -> Union[Tuple, BaseModelOutputWithPast]:
+                ) -> Union[tuple, BaseModelOutputWithPast]:
                     output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
                     output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
                     use_cache = use_cache if use_cache is not None else self.config.use_cache
@@ -537,7 +537,7 @@ class OvModelForCausalLMWithEmb:
         self,
         input_ids: torch.LongTensor,
         attention_mask: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
+        past_key_values: Optional[tuple[tuple[torch.FloatTensor]]] = None,
         position_ids: Optional[torch.LongTensor] = None,
         inputs_embeds: Optional[torch.FloatTensor] = None,
         **kwargs,
@@ -564,7 +564,7 @@ class OvModelForCausalLMWithEmb:
         self,
         input_ids: Optional[torch.LongTensor] = None,
         attention_mask: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
+        past_key_values: Optional[tuple[tuple[torch.FloatTensor]]] = None,
         position_ids: Optional[torch.LongTensor] = None,
         inputs_embeds: Optional[torch.LongTensor] = None,
         **kwargs,
@@ -808,8 +808,8 @@ class OVOmniGenPipeline:
 
     def __call__(
         self,
-        prompt: Union[str, List[str]],
-        input_images: Union[List[str], List[List[str]]] = None,
+        prompt: Union[str, list[str]],
+        input_images: Union[list[str], list[list[str]]] = None,
         height: int = 256,
         width: int = 256,
         num_inference_steps: int = 50,
@@ -830,9 +830,9 @@ class OVOmniGenPipeline:
         Function invoked when calling the pipeline for generation.
 
         Args:
-            prompt (`str` or `List[str]`):return
+            prompt (`str` or `list[str]`):return
                 The prompt or prompts to guide the image generation.
-            input_images (`List[str]` or `List[List[str]]`, *optional*):
+            input_images (`Llst[str]` or `list[list[str]]`, *optional*):
                 The list of input images. We will replace the "<|image_i|>" in prompt with the 1-th image in list.
             height (`int`, *optional*, defaults to 1024):
                 The height in pixels of the generated image. The number must be a multiple of 16.

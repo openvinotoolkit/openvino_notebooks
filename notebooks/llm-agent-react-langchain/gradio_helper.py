@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable
 import gradio as gr
 
 
@@ -16,7 +16,7 @@ def handle_user_message(message, history):
     return "", history + [[message, ""]]
 
 
-def make_demo(run_fn: Callable, stop_fn: Callable, examples: List):
+def make_demo(run_fn: Callable, stop_fn: Callable, examples: list):
     with gr.Blocks(
         theme=gr.themes.Soft(),
         css=".disclaimer {font-variant-caps: all-small-caps;}",

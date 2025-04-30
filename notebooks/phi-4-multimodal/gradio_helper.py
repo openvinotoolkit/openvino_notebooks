@@ -1,5 +1,4 @@
 from copy import deepcopy
-from typing import Dict, List
 from PIL import Image
 import librosa
 from transformers import TextIteratorStreamer
@@ -23,7 +22,7 @@ DEFAULT_SAMPLING_PARAMS = {
 MAX_NEW_TOKENS = 512
 
 
-def history2messages(history: List[Dict]) -> List[Dict]:
+def history2messages(history: list[dict]) -> list[dict]:
     """
     Transform gradio history to chat messages.
     """

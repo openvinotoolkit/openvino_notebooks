@@ -1,5 +1,4 @@
 import argparse
-from typing import List, Tuple
 from threading import Thread
 import torch
 from optimum.intel.openvino import OVModelForCausalLM
@@ -46,7 +45,7 @@ if __name__ == "__main__":
     stop_tokens = [151643, 151645]
     stop_tokens = [StopOnTokens(stop_tokens)]
 
-    def convert_history_to_token(history: List[Tuple[str, str]]):
+    def convert_history_to_token(history: list[tuple[str, str]]):
 
         messages = []
         for idx, (user_msg, model_msg) in enumerate(history):

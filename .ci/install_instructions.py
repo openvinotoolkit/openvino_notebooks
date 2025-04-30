@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional
 import nbformat
 
 
@@ -12,7 +12,7 @@ We recommend  running the notebook in a virtual environment. You only need a Jup
 For details, please refer to [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/README.md#-installation-guide)."""
 
 
-def find_toc_cell(nb_node: nbformat.NotebookNode) -> Tuple[Optional[str], Optional[int]]:
+def find_toc_cell(nb_node: nbformat.NotebookNode) -> tuple[Optional[str], Optional[int]]:
     for i, cell in enumerate(nb_node["cells"]):
         if "#### Table of contents:" in cell["source"]:
             return (cell["source"], i)

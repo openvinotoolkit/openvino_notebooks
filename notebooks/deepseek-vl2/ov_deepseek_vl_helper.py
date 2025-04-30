@@ -6,7 +6,7 @@ import nncf
 from pathlib import Path
 import torch
 import types
-from typing import Optional, Tuple, List
+from typing import Optional
 import openvino.opset13 as opset13
 from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
 from openvino.frontend.pytorch.ts_decoder import TorchScriptPythonDecoder
@@ -80,8 +80,8 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
 
 def fuse_cache_reorder(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
     gather_dim: int,
 ):
     """
@@ -97,9 +97,9 @@ def fuse_cache_reorder(
     Parameters:
       ov_model (`ov.Model`):
           openvino model for processing
-      not_kv_inputs (`List[str]`):
+      not_kv_inputs (`list[str]`):
           list of input nodes in model that not related to past key values
-      key_value_input_names (`List[str]`):
+      key_value_input_names (`list[str]`):
           list of names for key value input layers
       gather_dim (int):
           dimension for gathering cache during reorder pass
@@ -151,9 +151,9 @@ def build_state_initializer(ov_model: ov.Model, batch_dim: int):
 
 def make_stateful(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
-    key_value_output_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
+    key_value_output_names: list[str],
     batch_dim: int,
     num_attention_heads: int,
     num_beams_and_batch: int = None,
@@ -164,11 +164,11 @@ def make_stateful(
     Parameters:
         ov_model (ov.Model):
             openvino model
-        not_kv_inputs (`List[str]`):
+        not_kv_inputs (`list[str]`):
             list of input nodes in model that not related to past key values
-        key_value_input_names (`List[str]`):
+        key_value_input_names (`list[str]`):
             list of names for key value input layers
-        key_value_output_names (`List[str]`):
+        key_value_output_names (`list[str]`):
             list of names for key value input layers
         batch_dim (int):
             index of batch dimension in key value layers
@@ -238,7 +238,7 @@ def deepseek_v2_attn_forward(
     output_attentions: bool = False,
     use_cache: bool = False,
     **kwargs,
-) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
+) -> tuple[torch.Tensor, Optional[torch.Tensor], Optional[tuple[torch.Tensor]]]:
     # modified from https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite/blob/main/modeling_deepseek.py#L806
     def rotate_half(x):
         """Rotates half the hidden dims of the input."""
@@ -841,7 +841,7 @@ class OVDeepseekVLV2ForCausalLM(GenerationMixin):
         input_ids: Optional[torch.LongTensor] = None,
         attention_mask: Optional[torch.Tensor] = None,
         position_ids: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[List[torch.FloatTensor]] = None,
+        past_key_values: Optional[list[torch.FloatTensor]] = None,
         inputs_embeds: Optional[torch.FloatTensor] = None,
         images: Optional[torch.FloatTensor] = None,
         images_seq_mask: Optional[torch.LongTensor] = None,
@@ -910,7 +910,7 @@ class OVDeepseekVLV2ForCausalLM(GenerationMixin):
 
         return model_inputs
 
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
         return self.language_model._reorder_cache(past_key_values, beam_idx)
 
     def can_generate(self):

@@ -1,6 +1,6 @@
 from collections import defaultdict, OrderedDict
 from dataclasses import dataclass
-from typing import List, Dict, Union
+from typing import Union
 
 import numpy as np
 
@@ -31,9 +31,9 @@ class TrackedNodeInfo:
 
     node: Node  # Target node to track
     snr: float = None  # SNR of the target node
-    input_nodes: List[Node] = None  # Input nodes of the target node
+    input_nodes: list[Node] = None  # Input nodes of the target node
     result_node: Node = None  # Result node of the target node
-    input_result_nodes: Dict[Node, Node] = None  # Result nodes of non-const inputs of the target node
+    input_result_nodes: dict[Node, Node] = None  # Result nodes of non-const inputs of the target node
     node_value_full_precision: np.ndarray = None  # Result of the node in full precision
     node_value_half_precision: np.ndarray = None  # Result of the node in half precision
     input_values_full_precision: np.ndarray = None  # Results of the target node inputs in full precision
@@ -41,10 +41,10 @@ class TrackedNodeInfo:
 
 def partially_upcast_nodes_to_fp32(
     orig_model: Model,
-    example_input: Union[List, Dict],
+    example_input: Union[list, dict],
     half_type: str = "f16",
     batch_size: int = 50,
-    operation_types: List[str] = None,
+    operation_types: list[str] = None,
     upcast_ratio: float = 0.1,
     verbose: bool = False,
 ) -> Model:
@@ -176,7 +176,7 @@ def get_nodes_to_track(model: Model, operation_types: List[str]) -> List:
     return nodes_to_track
 
 
-def insert_outputs_for_tracked_ops(model: Model, nodes_to_track: List[TrackedNodeInfo]) -> None:
+def insert_outputs_for_tracked_ops(model: Model, nodes_to_track: list[TrackedNodeInfo]) -> None:
     node_to_output_map = OrderedDict()
     node_to_node_info_map = defaultdict(list)
     for node_info in nodes_to_track:
@@ -235,7 +235,7 @@ def is_constant_path(node: Node) -> bool:
     return False
 
 
-def infer_full_net(nodes_to_track: List[TrackedNodeInfo], orig_model: Model, example_inputs: List) -> None:
+def infer_full_net(nodes_to_track: list[TrackedNodeInfo], orig_model: Model, example_inputs: list) -> None:
     core = ov.Core()
     exec_net = core.compile_model(orig_model, "CPU", config={"INFERENCE_PRECISION_HINT": "f32"})
     request = exec_net.create_infer_request()
@@ -259,7 +259,7 @@ def infer_full_net(nodes_to_track: List[TrackedNodeInfo], orig_model: Model, exa
             node_info.input_values_full_precision.append(input_value)
 
 
-def infer_nodes(nodes_to_track: List[TrackedNodeInfo], device: str, precision: str) -> None:
+def infer_nodes(nodes_to_track: list[TrackedNodeInfo], device: str, precision: str) -> None:
     for node_info in nodes_to_track:
         infer_tracked_op(node_info, device, precision)
 
@@ -319,7 +319,7 @@ def is_model_partially_upcasted(model) -> bool:
     return False
 
 
-def mark_nodes_to_upcast_to_fp32(model: ov.Model, nodes_with_errors: List[str]) -> None:
+def mark_nodes_to_upcast_to_fp32(model: ov.Model, nodes_with_errors: list[str]) -> None:
     nodes_to_mark = set(nodes_with_errors)
     for node in model.get_ordered_ops():
         if node.get_friendly_name() in nodes_to_mark:

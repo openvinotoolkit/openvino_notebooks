@@ -10,7 +10,7 @@ import yaml
 
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, TypedDict
+from typing import Optional, TypedDict
 from validation_config import ValidationConfig, validation_config_arg, SkippedNotebook
 
 
@@ -36,7 +36,7 @@ class NotebookReport(TypedDict):
     duration: float = 0
 
 
-TestPlan = Dict[Path, NotebookReport]
+TestPlan = dict[Path, NotebookReport]
 
 
 def parse_arguments():
@@ -77,13 +77,13 @@ def collect_python_packages(output_file: Path):
         f.write(reqs)
 
 
-def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig, skip_config_file_path: Path) -> List[Path]:
-    ignored_notebooks: List[Path] = []
+def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig, skip_config_file_path: Path) -> list[Path]:
+    ignored_notebooks: list[Path] = []
     if not skip_config_file_path.exists():
         print(f"Skipped notebooks config yaml file does not exist at path '{str(skip_config_file_path)}'.")
         return ignored_notebooks
     with open(skip_config_file_path, "r") as f:
-        skipped_notebooks_config: List[SkippedNotebook] = yaml.safe_load(f)
+        skipped_notebooks_config: list[SkippedNotebook] = yaml.safe_load(f)
     for skipped_notebook in skipped_notebooks_config:
         skips = skipped_notebook["skips"]
         for skip in skips:
@@ -97,11 +97,11 @@ def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig, skip_co
 
 
 def prepare_test_plan(
-    validation_config: ValidationConfig, test_list: Optional[List[str]], ignore_config: str, ignore_list: Optional[List[str]], nb_dir: Optional[Path] = None
+    validation_config: ValidationConfig, test_list: Optional[list[str]], ignore_config: str, ignore_list: Optional[list[str]], nb_dir: Optional[Path] = None
 ) -> TestPlan:
     orig_nb_dir = ROOT / NOTEBOOKS_DIR
     notebooks_dir = nb_dir or orig_nb_dir
-    notebooks: List[Path] = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
+    notebooks: list[Path] = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
 
     test_plan: TestPlan = {notebook.relative_to(notebooks_dir): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
 
@@ -125,7 +125,7 @@ def prepare_test_plan(
     ignored_notebooks = sorted(ignored_notebooks)
     print(f"Ignored notebooks: {ignored_notebooks}")
 
-    testing_notebooks: List[Path] = []
+    testing_notebooks: list[Path] = []
     if not test_list:
         testing_notebooks = [Path(n) for n in test_plan.keys()]
     elif len(test_list) == 1 and test_list[0].endswith(".txt"):
@@ -162,7 +162,7 @@ def prepare_test_plan(
     return test_plan
 
 
-def clean_test_artifacts(before_test_files: List[Path], after_test_files: List[Path]):
+def clean_test_artifacts(before_test_files: list[Path], after_test_files: list[Path]):
     for file_path in after_test_files:
         if file_path in before_test_files or not file_path.exists():
             continue
@@ -199,7 +199,7 @@ def get_pip_package_version(package, text_input: str, missing_return: str) -> st
     return version
 
 
-def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[Tuple[str, int, float, str, str]]:
+def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["HF_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["TORCH_HOME"] = str(notebook_path.parent)
@@ -249,7 +249,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
     return result
 
 
-def finalize_status(failed_notebooks: List[str], timeout_notebooks: List[str], test_plan: TestPlan, report_dir: Path, root: Path) -> int:
+def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], test_plan: TestPlan, report_dir: Path, root: Path) -> int:
     return_status = 0
     if failed_notebooks:
         return_status = 1

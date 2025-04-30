@@ -27,7 +27,6 @@ from transformers.models.qwen2_5_omni.modeling_qwen2_5_omni import (
 )
 from pathlib import Path
 import types
-from typing import Optional, Tuple, Union, List
 from itertools import accumulate
 from transformers.cache_utils import DynamicCache
 from transformers.generation import GenerationConfig, GenerationMixin
@@ -35,7 +34,7 @@ from transformers.modeling_outputs import (
     CausalLMOutputWithPast,
     BaseModelOutputWithPast,
 )
-from typing import Optional, Tuple, Union, List, Dict, Any
+from typing import Optional, Union, Any
 from huggingface_hub import snapshot_download, hf_hub_download
 
 
@@ -60,8 +59,8 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
 
 def fuse_cache_reorder(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
     gather_dim: int,
 ):
     """
@@ -77,9 +76,9 @@ def fuse_cache_reorder(
     Parameters:
       ov_model (`ov.Model`):
           openvino model for processing
-      not_kv_inputs (`List[str]`):
+      not_kv_inputs (`list[str]`):
           list of input nodes in model that not related to past key values
-      key_value_input_names (`List[str]`):
+      key_value_input_names (`list[str]`):
           list of names for key value input layers
       gather_dim (int):
           dimension for gathering cache during reorder pass
@@ -131,9 +130,9 @@ def build_state_initializer(ov_model: ov.Model, batch_dim: int):
 
 def make_stateful(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
-    key_value_output_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
+    key_value_output_names: list[str],
     batch_dim: int,
     num_attention_heads: int,
     num_beams_and_batch: int = None,
@@ -144,11 +143,11 @@ def make_stateful(
     Parameters:
         ov_model (ov.Model):
             openvino model
-        not_kv_inputs (`List[str]`):
+        not_kv_inputs (`list[str]`):
             list of input nodes in model that not related to past key values
-        key_value_input_names (`List[str]`):
+        key_value_input_names (`list[str]`):
             list of names for key value input layers
-        key_value_output_names (`List[str]`):
+        key_value_output_names (`list[str]`):
             list of names for key value input layers
         batch_dim (int):
             index of batch dimension in key value layers
@@ -458,14 +457,14 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
             input_ids: Optional[torch.LongTensor] = None,
             attention_mask: Optional[torch.Tensor] = None,
             position_ids: Optional[torch.LongTensor] = None,
-            past_key_values: Optional[List[torch.FloatTensor]] = None,
+            past_key_values: Optional[list[torch.FloatTensor]] = None,
             inputs_embeds: Optional[torch.FloatTensor] = None,
             use_cache: Optional[bool] = None,
             output_attentions: Optional[bool] = None,
             output_hidden_states: Optional[bool] = None,
             return_dict: Optional[bool] = None,
             cache_position: Optional[torch.LongTensor] = None,
-        ) -> Union[Tuple, BaseModelOutputWithPast]:
+        ) -> Union[tuple, BaseModelOutputWithPast]:
             """take care of image_encode, position_ids and (attention_mask = None is fine)"""
             if past_key_values is not None:
                 past_key_values = DynamicCache.from_legacy_cache(past_key_values)
@@ -566,13 +565,13 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
             self,
             attention_mask: Optional[torch.Tensor] = None,
             position_ids: Optional[torch.LongTensor] = None,
-            past_key_values: Optional[List[torch.FloatTensor]] = None,
+            past_key_values: Optional[list[torch.FloatTensor]] = None,
             inputs_embeds: Optional[torch.FloatTensor] = None,
             use_cache: Optional[bool] = None,
             output_attentions: Optional[bool] = None,
             output_hidden_states: Optional[bool] = None,
             return_dict: Optional[bool] = None,
-        ) -> Union[Tuple, BaseModelOutputWithPast]:
+        ) -> Union[tuple, BaseModelOutputWithPast]:
             """take care of image_encode, position_ids and (attention_mask = None is fine)"""
             if past_key_values is not None:
                 past_key_values = DynamicCache.from_legacy_cache(past_key_values)
@@ -769,9 +768,9 @@ def get_llm_pos_ids_for_vision(
     start_idx: int,
     vision_idx: int,
     spatial_merge_size: int,
-    t_index: List[int],
-    grid_hs: List[int],
-    grid_ws: List[int],
+    t_index: list[int],
+    grid_hs: list[int],
+    grid_ws: list[int],
 ):
     llm_pos_ids_list = []
     llm_grid_h = grid_hs[vision_idx] // spatial_merge_size
@@ -810,7 +809,7 @@ def get_rope_index(
     use_audio_in_video: bool = False,
     audio_seqlens: Optional[torch.LongTensor] = None,
     second_per_grids: Optional[torch.Tensor] = None,
-) -> Tuple[torch.Tensor, torch.Tensor]:
+) -> tuple[torch.Tensor, torch.Tensor]:
     if hasattr(config, "vision_config"):
         spatial_merge_size = config.vision_config.spatial_merge_size
     else:
@@ -1214,7 +1213,7 @@ class OVQwen2_5OmniThinkerForConditionalGeneration(GenerationMixin):
         pixel_values: torch.Tensor = None,
         position_ids: Optional[torch.Tensor] = None,
         attention_mask: Optional[torch.BoolTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.Tensor, torch.Tensor], ...]] = None,
+        past_key_values: Optional[tuple[tuple[torch.Tensor, torch.Tensor], ...]] = None,
         inputs_embeds: Optional[torch.Tensor] = None,
         **kwargs,
     ) -> CausalLMOutputWithPast:
@@ -1282,7 +1281,7 @@ class OVQwen2_5OmniThinkerForConditionalGeneration(GenerationMixin):
         feature_attention_mask: Optional[torch.Tensor] = None,
         audio_feature_lengths: Optional[torch.LongTensor] = None,
         position_ids: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[List[torch.FloatTensor]] = None,
+        past_key_values: Optional[list[torch.FloatTensor]] = None,
         inputs_embeds: Optional[torch.FloatTensor] = None,
         rope_deltas: Optional[torch.LongTensor] = None,
         labels: Optional[torch.LongTensor] = None,
@@ -1293,7 +1292,7 @@ class OVQwen2_5OmniThinkerForConditionalGeneration(GenerationMixin):
         use_audio_in_video: Optional[bool] = None,
         cache_position: Optional[torch.LongTensor] = None,
         video_second_per_grid: Optional[torch.LongTensor] = None,
-    ) -> Union[Tuple, BaseModelOutputWithPast]:
+    ) -> Union[tuple, BaseModelOutputWithPast]:
         if feature_attention_mask is not None:
             audio_feature_lengths = torch.sum(feature_attention_mask, dim=1)
             input_features = input_features.permute(0, 2, 1)[feature_attention_mask.bool()].permute(1, 0)
@@ -1398,7 +1397,7 @@ class OVQwen2_5OmniThinkerForConditionalGeneration(GenerationMixin):
             logits=logits, past_key_values=past_key_values, rope_deltas=rope_deltas, hidden_states=(embeds_to_talker, hidden_states_output)
         )
 
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
         [`~PreTrainedModel.beam_sample`] is called.
@@ -1417,10 +1416,10 @@ class OVQwen2_5OmniThinkerForConditionalGeneration(GenerationMixin):
     def _update_model_kwargs_for_generation(
         self,
         outputs: ModelOutput,
-        model_kwargs: Dict[str, Any],
+        model_kwargs: dict[str, Any],
         is_encoder_decoder: bool = False,
         num_new_tokens: int = 1,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         model_kwargs = super()._update_model_kwargs_for_generation(
             outputs=outputs,
             model_kwargs=model_kwargs,
@@ -1479,7 +1478,7 @@ class OVQwen2_5OmniTalkerForConditionalGeneration(GenerationMixin):
         input_text_ids: Optional[torch.LongTensor] = None,
         position_ids: Optional[torch.Tensor] = None,
         attention_mask: Optional[torch.BoolTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.Tensor, torch.Tensor], ...]] = None,
+        past_key_values: Optional[tuple[tuple[torch.Tensor, torch.Tensor], ...]] = None,
         inputs_embeds: Optional[torch.Tensor] = None,
         **kwargs,
     ) -> CausalLMOutputWithPast:
@@ -1499,7 +1498,7 @@ class OVQwen2_5OmniTalkerForConditionalGeneration(GenerationMixin):
         input_ids: torch.LongTensor = None,
         attention_mask: Optional[torch.Tensor] = None,
         position_ids: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[List[torch.FloatTensor]] = None,
+        past_key_values: Optional[list[torch.FloatTensor]] = None,
         thinker_reply_part: Optional[torch.FloatTensor] = None,
         inputs_embeds: Optional[torch.FloatTensor] = None,
         rope_deltas: Optional[torch.LongTensor] = None,
@@ -1514,7 +1513,7 @@ class OVQwen2_5OmniTalkerForConditionalGeneration(GenerationMixin):
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
-    ) -> Union[Tuple, BaseModelOutputWithPast]:
+    ) -> Union[tuple, BaseModelOutputWithPast]:
         if attention_mask is not None and position_ids is None:
             if cache_position is None or (cache_position is not None and cache_position[0] == 0):
                 position_ids, rope_deltas = get_rope_index(
@@ -1623,7 +1622,7 @@ class OVQwen2_5OmniTalkerForConditionalGeneration(GenerationMixin):
 
         return model_inputs
 
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
         [`~PreTrainedModel.beam_sample`] is called.
@@ -1640,10 +1639,10 @@ class OVQwen2_5OmniTalkerForConditionalGeneration(GenerationMixin):
     def _update_model_kwargs_for_generation(
         self,
         outputs: ModelOutput,
-        model_kwargs: Dict[str, Any],
+        model_kwargs: dict[str, Any],
         is_encoder_decoder: bool = False,
         num_new_tokens: int = 1,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         # update attention_mask
         if getattr(outputs, "attention_mask", None) is not None:
             model_kwargs["attention_mask"] = outputs.attention_mask

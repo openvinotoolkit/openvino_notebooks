@@ -3,7 +3,6 @@ import subprocess  # nosec - disable B404:import-subprocess check
 import sys
 import os
 from pathlib import Path
-from typing import Dict
 import platform
 
 
@@ -25,7 +24,7 @@ def clone_repo(repo_url: str, revision: str = None, add_to_sys_path: bool = True
     return repo_path
 
 
-def optimum_cli(model_id, output_dir, show_command=True, additional_args: Dict[str, str] = None, debug_logs=False):
+def optimum_cli(model_id, output_dir, show_command=True, additional_args: dict[str, str] = None, debug_logs=False):
     export_command = f"optimum-cli export openvino --model {model_id} {output_dir}"
     if additional_args is not None:
         for arg, value in additional_args.items():

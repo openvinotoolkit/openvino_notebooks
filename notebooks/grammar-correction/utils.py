@@ -15,13 +15,12 @@ from optimum.intel import OVModelForSeq2SeqLM
 from optimum.intel.openvino.quantization import InferRequestWrapper
 from pathlib import Path
 from tqdm.auto import tqdm
-from typing import List, Dict
 from transformers import Pipeline, pipeline, PreTrainedTokenizer
 
 CALIBRATION_DATASET_SIZE = 10
 
 
-def collect_calibration_data(grammar_corrector_pipe_fp32: Pipeline, calibration_dataset_size: int) -> List[Dict]:
+def collect_calibration_data(grammar_corrector_pipe_fp32: Pipeline, calibration_dataset_size: int) -> list[dict]:
     calibration_data = []
     ov_decoder = grammar_corrector_pipe_fp32.model.decoder
 

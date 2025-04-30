@@ -1,11 +1,11 @@
 import torch
 import numpy as np
 import openvino as ov
-from typing import List, Dict
+from typing import list, dict
 from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
 
 
-def init_past_inputs(model_inputs: List):
+def init_past_inputs(model_inputs: list):
     """
     Helper function for initialization of past inputs on first inference step
     Parameters:
@@ -22,7 +22,7 @@ def init_past_inputs(model_inputs: List):
     return pkv
 
 
-def postprocess_text_decoder_outputs(output: Dict):
+def postprocess_text_decoder_outputs(output: dict):
     """
     Helper function for rearranging model outputs and wrapping to CausalLMOutputWithCrossAttentions
     Parameters:
@@ -46,7 +46,7 @@ def text_decoder_forward(
     ov_text_decoder_with_past: ov.CompiledModel,
     input_ids: torch.Tensor,
     attention_mask: torch.Tensor,
-    past_key_values: List[ov.Tensor],
+    past_key_values: list[ov.Tensor],
     encoder_hidden_states: torch.Tensor,
     encoder_attention_mask: torch.Tensor,
     **kwargs

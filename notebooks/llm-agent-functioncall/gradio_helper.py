@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 import requests
 from PIL import Image
-from typing import List
 from qwen_agent.llm.schema import CONTENT, ROLE, USER, Message
 from qwen_agent.gui.utils import convert_history_to_chatbot
 from qwen_agent.gui.gradio_dep import gr, mgr
@@ -35,7 +34,7 @@ class OpenVINOUI(WebUI):
 
     def run(
         self,
-        messages: List[Message] = None,
+        messages: list[Message] = None,
         share: bool = False,
         server_name: str = None,
         server_port: int = None,

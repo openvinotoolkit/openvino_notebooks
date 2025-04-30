@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 from collections import deque
 import numpy as np
 from pathlib import Path
@@ -43,7 +43,7 @@ prompts = [
 
 
 class CompiledModelDecorator(ov.CompiledModel):
-    def __init__(self, compiled_model: ov.CompiledModel, data_cache: List[Any] = None, config=None, keep_prob: float = 0.5):
+    def __init__(self, compiled_model: ov.CompiledModel, data_cache: list[Any] = None, config=None, keep_prob: float = 0.5):
         super().__init__(compiled_model)
         self.data_cache = data_cache if data_cache is not None else []
         self.keep_prob = keep_prob
@@ -59,7 +59,7 @@ class CompiledModelDecorator(ov.CompiledModel):
         return [torch.from_numpy(outputs[0])]
 
 
-def collect_calibration_data(ov_pipe, calibration_dataset_size: int, num_inference_steps: int, guidance_scale) -> List[Dict]:
+def collect_calibration_data(ov_pipe, calibration_dataset_size: int, num_inference_steps: int, guidance_scale) -> list[dict]:
     calibration_dataset_filepath = Path("calibration_data") / f"{calibration_dataset_size}.pkl"
     calibration_dataset_filepath.parent.mkdir(exist_ok=True, parents=True)
 

@@ -6,7 +6,7 @@ from diffusers.pipelines.pipeline_utils import DiffusionPipeline
 import PIL.Image
 from diffusers.image_processor import VaeImageProcessor
 from diffusers.utils.torch_utils import randn_tensor
-from typing import Callable, Dict, List, Optional, Union
+from typing import Callable, Optional, Union
 from diffusers.pipelines.stable_video_diffusion import (
     StableVideoDiffusionPipelineOutput,
 )
@@ -336,7 +336,7 @@ class OVStableVideoDiffusionPipeline(DiffusionPipeline):
 
     def check_inputs(self, image, height, width):
         if not isinstance(image, torch.Tensor) and not isinstance(image, PIL.Image.Image) and not isinstance(image, list):
-            raise ValueError("`image` has to be of type `torch.FloatTensor` or `PIL.Image.Image` or `List[PIL.Image.Image]` but is" f" {type(image)}")
+            raise ValueError("`image` has to be of type `torch.FloatTensor` or `PIL.Image.Image` or `list[PIL.Image.Image]` but is" f" {type(image)}")
 
         if height % 8 != 0 or width % 8 != 0:
             raise ValueError(f"`height` and `width` have to be divisible by 8 but are {height} and {width}.")
@@ -378,7 +378,7 @@ class OVStableVideoDiffusionPipeline(DiffusionPipeline):
     @torch.no_grad()
     def __call__(
         self,
-        image: Union[PIL.Image.Image, List[PIL.Image.Image], torch.FloatTensor],
+        image: Union[PIL.Image.Image, list[PIL.Image.Image], torch.FloatTensor],
         height: int = 320,
         width: int = 512,
         num_frames: Optional[int] = 8,
@@ -390,18 +390,18 @@ class OVStableVideoDiffusionPipeline(DiffusionPipeline):
         noise_aug_strength: int = 0.01,
         decode_chunk_size: Optional[int] = None,
         num_videos_per_prompt: Optional[int] = 1,
-        generator: Optional[Union[torch.Generator, List[torch.Generator]]] = None,
+        generator: Optional[Union[torch.Generator, list[torch.Generator]]] = None,
         latents: Optional[torch.FloatTensor] = None,
         output_type: Optional[str] = "pil",
-        callback_on_step_end: Optional[Callable[[int, int, Dict], None]] = None,
-        callback_on_step_end_tensor_inputs: List[str] = ["latents"],
+        callback_on_step_end: Optional[Callable[[int, int, dict], None]] = None,
+        callback_on_step_end_tensor_inputs: list[str] = ["latents"],
         return_dict: bool = True,
     ):
         r"""
         The call function to the pipeline for generation.
 
         Args:discussed
-            image (`PIL.Image.Image` or `List[PIL.Image.Image]` or `torch.FloatTensor`):
+            image (`PIL.Image.Image` or `list[PIL.Image.Image]` or `torch.FloatTensor`):
                 Image or images to guide image generation. If you provide a tensor, it needs to be compatible with
                 [`CLIPImageProcessor`](https://huggingface.co/lambdalabs/sd-image-variations-diffusers/blob/main/feature_extractor/preprocessor_config.json).
             height (`int`, *optional*, defaults to `self.unet.config.sample_size * self.vae_scale_factor`):
@@ -432,7 +432,7 @@ class OVStableVideoDiffusionPipeline(DiffusionPipeline):
                 for maximal quality. Reduce `decode_chunk_size` to reduce memory usage.
             num_videos_per_prompt (`int`, *optional*, defaults to 1):
                 The number of images to generate per prompt.
-            generator (`torch.Generator` or `List[torch.Generator]`, *optional*):
+            generator (`torch.Generator` or `list[torch.Generator]`, *optional*):
                 A [`torch.Generator`](https://pytorch.org/docs/stable/generated/torch.Generator.html) to make
                 generation deterministic.
             latents (`torch.FloatTensor`, *optional*):
@@ -444,9 +444,9 @@ class OVStableVideoDiffusionPipeline(DiffusionPipeline):
             callback_on_step_end (`Callable`, *optional*):
                 A function that calls at the end of each denoising steps during the inference. The function is called
                 with the following arguments: `callback_on_step_end(self: DiffusionPipeline, step: int, timestep: int,
-                callback_kwargs: Dict)`. `callback_kwargs` will include a list of all tensors as specified by
+                callback_kwargs: dict)`. `callback_kwargs` will include a list of all tensors as specified by
                 `callback_on_step_end_tensor_inputs`.
-            callback_on_step_end_tensor_inputs (`List`, *optional*):
+            callback_on_step_end_tensor_inputs (`list`, *optional*):
                 The list of tensor inputs for the `callback_on_step_end` function. The tensors specified in the list
                 will be passed as `callback_kwargs` argument. You will only be able to include variables listed in the
                 `._callback_tensor_inputs` attribute of your pipeline class.
