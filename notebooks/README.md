@@ -120,7 +120,6 @@
 - [Optimize Preprocessing](./optimize-preprocessing/optimize-preprocessing.ipynb)
 - [OpenVINO Tokenizers: Incorporate Text Processing Into OpenVINO Pipelines](./openvino-tokenizers/openvino-tokenizers.ipynb)
 - [Convert models from ModelScope to OpenVINO](./modelscope-to-openvino/modelscope-to-openvino.ipynb)
-- [Hello Model Server](./model-server/model-server.ipynb)
 - [LocalAI and OpenVINO](./localai/localai.ipynb)
 - [Text Generation with LoRA via OpenVINO GenAI](./llm-lora/llm-lora.ipynb)
 - [Quantize NLP models with Post-Training Quantization ​in NNCF](./language-quantize-bert/language-quantize-bert.ipynb)
