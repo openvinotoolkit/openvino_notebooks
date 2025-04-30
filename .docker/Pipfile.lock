@@ -3862,17 +3862,17 @@
         },
         "torch": {
             "hashes": [
-                "sha256:1e86e225e472392440ace378ba3165b5e87648e8b5fbf16adc41c0df881c38b8"
+                "sha256:b68274aeb4047ba8c73e903f0621e2a4adb54ad5282b0845689c3e1dcd2e2546"
             ],
             "index": "pytorch-wheels",
-            "version": "==2.3.0+cpu"
+            "version": "==2.6.0+cpu"
         },
         "torchaudio": {
             "hashes": [
-                "sha256:19e21c8eac310df3eeb55a930f726270cd71b8dd5ab9ae1f5a5915f5791fc9d3"
+                "sha256:6fc2b8ab4892b54daec92cd2ea6d0f5ae5782b805460b822c9971d78761e07fc"
             ],
             "index": "pytorch-wheels",
-            "version": "==2.3.0+cpu"
+            "version": "==2.6.0+cpu"
         },
         "torchmetrics": {
             "hashes": [
@@ -3885,10 +3885,10 @@
         },
         "torchvision": {
             "hashes": [
-                "sha256:0e764a15c69f51742b09ec17cc2dcd1eee445e87cfd93a9b13b1caa2037f154d"
+                "sha256:45736c703050019f158f34ab1d031a313fe91412aef00e3f0d242251ec32a7aa"
             ],
             "index": "pytorch-wheels",
-            "version": "==0.18.0+cpu"
+            "version": "==0.21.0+cpu"
         },
         "tornado": {
             "hashes": [
