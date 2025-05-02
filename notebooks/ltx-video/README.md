@@ -15,9 +15,8 @@ In this example we show how to convert text-to-video pipeline in OpenVINO format
 ## Notebook contents
 This tutorial consists of the following steps:
 - Prerequisites
-- Load the original model and inference
 - Convert the model to OpenVINO IR
-- Compiling models and inference
+- Run inference pipeline
 - Quantization
 - Interactive inference
 

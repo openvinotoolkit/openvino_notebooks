@@ -7,11 +7,6 @@ import openvino as ov
 import torch
 from tqdm.notebook import tqdm
 
-
-MODEL_DIR = Path("models")
-TRANSFORMER_INT8_PATH = MODEL_DIR / "transformer_int8_ir.xml"
-
-
 negative_prompts = [
     "blurry unreal occluded",
     "low contrast disfigured uncentered mangled",
@@ -50,23 +45,27 @@ class CompiledModelDecorator(ov.CompiledModel):
         self.config = config
 
     def __call__(self, *args, **kwargs):
-        kwargs["rope_interpolation_scale"] = torch.tensor(kwargs["rope_interpolation_scale"])
-        del kwargs["attention_kwargs"]
-        del kwargs["return_dict"]
+        input_dict = args[0]
         if np.random.rand() <= self.keep_prob:
-            self.data_cache.append(kwargs)
-        outputs = super().__call__(kwargs)
-        return [torch.from_numpy(outputs[0])]
+            self.data_cache.append(input_dict)
+        return super().__call__(*args, **kwargs)
 
+
+def disable_progress_bar(pipeline, disable=True):
+    if not hasattr(pipeline, "_progress_bar_config"):
+        pipeline._progress_bar_config = {"disable": disable}
+    else:
+        pipeline._progress_bar_config["disable"] = disable
 
 def collect_calibration_data(ov_pipe, calibration_dataset_size: int, num_inference_steps: int, guidance_scale) -> list[dict]:
     calibration_dataset_filepath = Path("calibration_data") / f"{calibration_dataset_size}.pkl"
     calibration_dataset_filepath.parent.mkdir(exist_ok=True, parents=True)
 
     if not calibration_dataset_filepath.exists():
-        original_model = ov_pipe.transformer.transformer
+        disable_progress_bar(ov_pipe)
+        original_model = ov_pipe.transformer.request
         calibration_data = []
-        ov_pipe.transformer = CompiledModelDecorator(original_model, calibration_data, config=ov_pipe.transformer.config, keep_prob=1)
+        ov_pipe.transformer.request = CompiledModelDecorator(original_model, calibration_data, config=ov_pipe.transformer.config, keep_prob=1)
 
         # Run inference for data collection
         pbar = tqdm(total=calibration_dataset_size)
@@ -87,7 +86,7 @@ def collect_calibration_data(ov_pipe, calibration_dataset_size: int, num_inferen
                 break
             pbar.update(len(calibration_data) - pbar.n)
 
-        ov_pipe.transformer = original_model
+        ov_pipe.transformer.request = original_model
 
         with open(calibration_dataset_filepath, "wb") as f:
             pickle.dump(calibration_data, f)
