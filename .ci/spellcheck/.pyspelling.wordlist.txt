@@ -511,6 +511,7 @@ lraspp
 LRASPP
 LTS
 LTX
+ltx
 LSTM
 LSTMs
 Luo

@@ -158,7 +158,6 @@ def make_demo(pipe):
 
         pbar = tqdm(total=num_inference_steps)
 
-
         def callback(step, num_steps, latent):
             if pbar.total != num_steps:
                 pbar.reset(num_steps)
@@ -176,7 +175,7 @@ def make_demo(pipe):
             mask_image=image_to_tensor(mask),
             num_inference_steps=num_inference_steps,
             guidance_scale=30,
-            callback=callback
+            callback=callback,
         )
         result_image = Image.fromarray(result.data[0])
 

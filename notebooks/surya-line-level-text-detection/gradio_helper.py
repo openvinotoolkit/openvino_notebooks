@@ -2,6 +2,7 @@ import gradio as gr
 from surya.detection import batch_text_detection
 from PIL import ImageDraw
 
+
 def make_demo(model, processor, test_image):
     def predict(image):
         predictions = batch_text_detection([image], model, processor)
@@ -13,7 +14,6 @@ def make_demo(model, processor, test_image):
             draw.rectangle(polygon_box.bbox, width=1, outline="red")
 
         return image
-
 
     demo = gr.Interface(
         predict,

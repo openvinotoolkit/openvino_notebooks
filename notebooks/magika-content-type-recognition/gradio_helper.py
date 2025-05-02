@@ -13,7 +13,6 @@ def make_demo(ov_magika):
 
         return {result.output.ct_label: float(result.score) for result in results}
 
-
     demo = gr.Interface(
         fn=classify,
         inputs=[

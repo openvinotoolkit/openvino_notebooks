@@ -18,7 +18,7 @@ def make_demo(ov_pipe):
         file_name = "output.mp4"
         export_to_video(video, file_name, fps=24)
         return file_name
-    
+
     demo = gr.Interface(
         fn=generate,
         inputs=[

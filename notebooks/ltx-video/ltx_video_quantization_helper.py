@@ -57,6 +57,7 @@ def disable_progress_bar(pipeline, disable=True):
     else:
         pipeline._progress_bar_config["disable"] = disable
 
+
 def collect_calibration_data(ov_pipe, calibration_dataset_size: int, num_inference_steps: int, guidance_scale) -> list[dict]:
     calibration_dataset_filepath = Path("calibration_data") / f"{calibration_dataset_size}.pkl"
     calibration_dataset_filepath.parent.mkdir(exist_ok=True, parents=True)

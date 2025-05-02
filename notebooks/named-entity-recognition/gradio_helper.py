@@ -1,11 +1,11 @@
 import gradio as gr
 
+
 def make_demo(ner_pipeline):
 
     def run_ner(text):
         output = ner_pipeline(text)
         return {"text": text, "entities": output}
-
 
     demo = gr.Interface(
         fn=run_ner,
