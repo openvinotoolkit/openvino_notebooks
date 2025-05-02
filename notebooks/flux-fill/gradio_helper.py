@@ -1,5 +1,15 @@
 import gradio as gr
 from PIL import Image, ImageDraw
+from tqdm.auto import tqdm
+import sys
+import openvino as ov
+import numpy as np
+
+
+def image_to_tensor(image: Image) -> ov.Tensor:
+    pic = image.convert("RGB")
+    image_data = np.array(pic.getdata()).reshape(1, pic.size[1], pic.size[0], 3).astype(np.uint8)
+    return ov.Tensor(image_data)
 
 
 def can_expand(source_width, source_height, target_width, target_height, alignment):
@@ -146,20 +156,32 @@ def make_demo(pipe):
 
         final_prompt = prompt_input
 
+        pbar = tqdm(total=num_inference_steps)
+
+
+        def callback(step, num_steps, latent):
+            if pbar.total != num_steps:
+                pbar.reset(num_steps)
+            pbar.update(1)
+            sys.stdout.flush()
+            return False
+
         # generator = torch.Generator(device="cuda").manual_seed(42)
 
-        result = pipe(
+        result = pipe.generate(
             prompt=final_prompt,
             height=height,
             width=width,
-            image=cnet_image,
-            mask_image=mask,
+            image=image_to_tensor(cnet_image),
+            mask_image=image_to_tensor(mask),
             num_inference_steps=num_inference_steps,
             guidance_scale=30,
-        ).images[0]
+            callback=callback
+        )
+        result_image = Image.fromarray(result.data[0])
 
-        result = result.convert("RGBA")
-        cnet_image.paste(result, (0, 0), mask)
+        result_image = result_image.convert("RGBA")
+        cnet_image.paste(result_image, (0, 0), mask)
 
         return cnet_image, background
 
