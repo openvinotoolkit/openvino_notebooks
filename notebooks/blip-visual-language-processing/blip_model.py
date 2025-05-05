@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 import openvino as ov
-from typing import list, dict
 from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
 
 

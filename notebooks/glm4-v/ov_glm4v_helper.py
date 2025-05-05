@@ -31,12 +31,12 @@ def _chatglm_transformer_forward(
     position_ids: Optional[torch.Tensor] = None,
     attention_mask: Optional[torch.BoolTensor] = None,
     full_attention_mask: Optional[torch.BoolTensor] = None,
-    past_key_values: Optional[Tuple[Tuple[torch.Tensor, torch.Tensor], ...]] = None,
+    past_key_values: Optional[tuple[tuple[torch.Tensor, torch.Tensor], ...]] = None,
     inputs_embeds: Optional[torch.Tensor] = None,
     use_cache: Optional[bool] = None,
     output_hidden_states: Optional[bool] = None,
     return_dict: Optional[bool] = None,
-) -> Union[Tuple, BaseModelOutputWithPast]:
+) -> Union[tuple, BaseModelOutputWithPast]:
     """take care of image_encode, position_ids and (attention_mask = None is fine)"""
 
     output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
@@ -569,7 +569,7 @@ class OvGLM4v(GenerationMixin):
         images: torch.Tensor = None,
         position_ids: Optional[torch.Tensor] = None,
         attention_mask: Optional[torch.BoolTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.Tensor, torch.Tensor], ...]] = None,
+        past_key_values: Optional[tuple[tuple[torch.Tensor, torch.Tensor], ...]] = None,
         inputs_embeds: Optional[torch.Tensor] = None,
         **kwargs,
     ) -> CausalLMOutputWithPast:
@@ -589,10 +589,10 @@ class OvGLM4v(GenerationMixin):
         images: torch.Tensor = None,
         position_ids: Optional[torch.Tensor] = None,
         attention_mask: Optional[torch.BoolTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.Tensor, torch.Tensor], ...]] = None,
+        past_key_values: Optional[tuple[tuple[torch.Tensor, torch.Tensor], ...]] = None,
         inputs_embeds: Optional[torch.Tensor] = None,
         return_dict: Optional[bool] = None,
-    ) -> Union[Tuple, BaseModelOutputWithPast]:
+    ) -> Union[tuple, BaseModelOutputWithPast]:
         """take care of image_encode, position_ids and (attention_mask = None is fine)"""
         # generate mode with past_key_values. the image features are already mapped
         if past_key_values is None:
@@ -646,7 +646,7 @@ class OvGLM4v(GenerationMixin):
 
         return CausalLMOutputWithPast(logits=logits, past_key_values=past_key_values)
 
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
         [`~PreTrainedModel.beam_sample`] is called.
