@@ -536,3 +536,9 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
+- notebook: "notebooks/deepseek-vl2/deepseek-vl2.ipynb"
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2019
