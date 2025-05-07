@@ -1,55 +1,55 @@
 import './Footer.scss';
 
+import { setIntelnavRenderSettingsFooter } from '@/shared/ighf/ighf';
+
 export const Footer = (): JSX.Element => {
+  setIntelnavRenderSettingsFooter();
   return (
     <footer>
-      <div className="footer-container">
-        <ul className="footer-list">
-          <li>© Intel Corporation</li>
-          <li>
-            <a
-              href="https://docs.openvino.ai/2024/about-openvino/additional-resources/terms-of-use.html"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Terms of Use
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://www.intel.com/content/www/us/en/privacy/intel-cookie-notice.html"
-              target="_blank"
-              data-cookie-notice="true"
-              rel="noreferrer"
-            >
-              Cookies
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://www.intel.com/content/www/us/en/privacy/intel-privacy-notice.html"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Privacy
-            </a>
-          </li>
-          <li data-wap_ref="dns" id="wap_dns">
-            <a href="/#" target="_parent">
-              Your Privacy Choices
-            </a>
-          </li>
-          <li id="footer_it_problem_fix_do_not_remove"></li>
-          <li data-wap_ref="nac" id="wap_nac">
-            <a
-              href="https://www.intel.com/content/www/us/en/privacy/privacy-residents-certain-states.html"
-              target="_parent"
-            >
-              Notice at Collection
-            </a>
-          </li>
-        </ul>
-      </div>
+      {/* <!--IGHF Footer-->  */}
+      {/* <!--GAATversion='50recode.2' date='09/11/2017 08:00:00' Version='2.0':CharacterEncoding:utf8-->  */}
+      <div id="recode50footer"></div>
+      <noscript>
+        <div id="smallfootprint-footer">
+          <ul>
+            <li>©Intel Corporation</li>
+            <li>
+              <a href="https://www.intel.com/content/www/us/en/legal/terms-of-use.html" target="">
+                Terms of Use
+              </a>
+            </li>
+            <li>
+              <a href="https://www.intel.com/content/www/us/en/legal/trademarks.html" target="">
+                *Trademarks
+              </a>
+            </li>
+            <li>
+              <a href="https://www.intel.com/content/www/us/en/privacy/intel-privacy-notice.html" target="">
+                Privacy
+              </a>
+            </li>
+            <li>
+              <a href="https://www.intel.com/content/www/us/en/privacy/intel-cookie-notice.html" target="">
+                Cookies
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://www.intel.com/content/www/us/en/policy/policy-human-trafficking-and-slavery.html"
+                target=""
+              >
+                Supply Chain Transparency
+              </a>
+            </li>
+            <li>
+              <a href="https://www.intel.com/content/www/us/en/siteindex.html" target="">
+                Site Map
+              </a>
+            </li>
+          </ul>
+        </div>
+      </noscript>
+      {/* <!--/IGHF Footer--> */}
     </footer>
   );
 };
