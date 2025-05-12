@@ -12,7 +12,7 @@ from transformers.modeling_attn_mask_utils import _prepare_4d_attention_mask
 from pathlib import Path
 from huggingface_hub import snapshot_download
 import types
-from typing import Optional, Tuple, List, Union
+from typing import Optional, Union
 
 try:
     from openvino import opset13
@@ -91,8 +91,8 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
 
 def fuse_cache_reorder(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
     gather_dim: int,
 ):
     """
@@ -108,9 +108,9 @@ def fuse_cache_reorder(
     Parameters:
       ov_model (`ov.Model`):
           openvino model for processing
-      not_kv_inputs (`List[str]`):
+      not_kv_inputs (`list[str]`):
           list of input nodes in model that not related to past key values
-      key_value_input_names (`List[str]`):
+      key_value_input_names (`list[str]`):
           list of names for key value input layers
       gather_dim (int):
           dimension for gathering cache during reorder pass
@@ -162,9 +162,9 @@ def build_state_initializer(ov_model: ov.Model, batch_dim: int):
 
 def make_stateful(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
-    key_value_output_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
+    key_value_output_names: list[str],
     batch_dim: int,
     num_attention_heads: int,
     num_beams_and_batch: int = None,
@@ -175,11 +175,11 @@ def make_stateful(
     Parameters:
         ov_model (ov.Model):
             openvino model
-        not_kv_inputs (`List[str]`):
+        not_kv_inputs (`list[str]`):
             list of input nodes in model that not related to past key values
-        key_value_input_names (`List[str]`):
+        key_value_input_names (`list[str]`):
             list of names for key value input layers
-        key_value_output_names (`List[str]`):
+        key_value_output_names (`list[str]`):
             list of names for key value input layers
         batch_dim (int):
             index of batch dimension in key value layers
@@ -305,10 +305,21 @@ def patch_model_code(orig_model_dir):
         with orig_model_file.open("r") as f:
             content = f.read()
             content = content.replace("if is_flash_attn_2_available():", "")
-            content = content.replace("from flash_attn import flash_attn_func, flash_attn_varlen_func", "")
-            content = content.replace("from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input", "")
+            content = content.replace("from flash_attn import flash_attn_func", "")
+            content = content.replace("from flash_attn.bert_padding import index_first_axis", "")
+            content = content.replace("from flash_attn.bert_padding import pad_input", "")
+            content = content.replace("ffrom flash_attn.bert_padding import unpad_input", "")
 
             with model_file.open("w") as out_f:
+                out_f.write(content)
+    resampler_file = orig_model_dir / "resampler.py"
+    orig_resampler_file = resampler_path.parent / ("orig_" + resampler_file.name)
+    if not orig_resampler_file.exists():
+        resampler_file.rename(orig_resampler_file)
+        with orig_resampler_file.open("r") as f:
+            content = f.read()
+            content = content.replace("from typing import Tuple", "from typing import Tuple, List")
+            with resampler_file.open("w") as out_f:
                 out_f.write(content)
 
 
@@ -423,7 +434,7 @@ def convert_vision_encoder(model, model_dir):
             hidden_states: torch.Tensor,
             attention_mask: Optional[torch.Tensor] = None,
             output_attentions: Optional[bool] = False,
-        ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
+        ) -> tuple[torch.Tensor, Optional[torch.Tensor], Optional[tuple[torch.Tensor]]]:
             """Input shape: Batch x Time x Channel"""
 
             batch_size, q_len, _ = hidden_states.size()
@@ -456,7 +467,7 @@ def convert_vision_encoder(model, model_dir):
             output_attentions: Optional[bool] = None,
             output_hidden_states: Optional[bool] = None,
             return_dict: Optional[bool] = None,
-        ) -> Union[Tuple, BaseModelOutputWithPooling]:
+        ) -> Union[tuple, BaseModelOutputWithPooling]:
             output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
             output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
             return_dict = return_dict if return_dict is not None else self.config.use_return_dict
@@ -609,7 +620,7 @@ def convert_minicpmo26(model_id, remove_checkpoint=False):
     ckpt = model_dir / "ckpt"
     if not ckpt.exists():
         snapshot_download(model_id, local_dir=ckpt, force_download=True)
-        # patch_model_code(ckpt)
+        patch_model_code(ckpt)
     model = AutoModel.from_pretrained(
         model_id,
         trust_remote_code=True,
@@ -727,7 +738,7 @@ class OVModelForCausalLMWithEmb(GenerationMixin):
         self,
         input_ids: torch.LongTensor,
         attention_mask: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
+        past_key_values: Optional[tuple[tuple[torch.FloatTensor]]] = None,
         position_ids: Optional[torch.LongTensor] = None,
         inputs_embeds: Optional[torch.FloatTensor] = None,
         **kwargs,
@@ -784,7 +795,7 @@ class OVModelForCausalLMWithEmb(GenerationMixin):
         self,
         input_ids: torch.LongTensor,
         attention_mask: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
+        past_key_values: Optional[tuple[tuple[torch.FloatTensor]]] = None,
         position_ids: Optional[torch.LongTensor] = None,
         inputs_embeds: Optional[torch.LongTensor] = None,
         **kwargs,
@@ -856,7 +867,7 @@ class OVModelForCausalLMWithEmb(GenerationMixin):
         return self._past_length
 
     # Adapted from transformers.models.gpt2.modeling_gpt2.GPT2LMHeadModel._reorder_cache
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
         [`~PreTrainedModel.beam_sample`] is called.
@@ -1084,12 +1095,12 @@ class OVMiniCPMO:
         Args:
             data (dict):
                 - **"audio_features"** (`torch.FloatTensor`): Input mel-spectrograms of shape `(batch_size, 80, frames)`.
-                - **"audio_feature_lens"** (List[List[int]]): Lengths of each audio segment for each item in the batch.
+                - **"audio_feature_lens"** (list[list[int]]): Lengths of each audio segment for each item in the batch.
             chunk_length (int, optional): Determines whether to use full attention (-1) or chunk-based
                 attention (>0) during embedding computation.
 
         Returns:
-            List[List[torch.Tensor]]: audio embeddings
+            list[list[torch.Tensor]]: audio embeddings
         """
 
         wavforms = data.get("audio_features", [])  # (bs, 80, frames) or [], multi audios need filled in advance
