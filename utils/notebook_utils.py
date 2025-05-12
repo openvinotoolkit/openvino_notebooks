@@ -48,6 +48,19 @@ def device_widget(default="AUTO", exclude=None, added=None, description="Device:
     return device
 
 
+def model_widget(default="Phi-4", description="Model:"):
+    import ipywidgets as widgets
+
+    supported_models = ["Phi-3","Phi-4"]
+
+    model = widgets.Dropdown(
+        options=supported_models,
+        value=default,
+        description=description,
+        disabled=False,
+    )
+    return model
+
 def quantization_widget(default=True):
     import ipywidgets as widgets
 
