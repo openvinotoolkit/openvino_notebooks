@@ -47,6 +47,7 @@ def device_widget(default="AUTO", exclude=None, added=None, description="Device:
     )
     return device
 
+
 def quantization_widget(default=True):
     import ipywidgets as widgets
 
