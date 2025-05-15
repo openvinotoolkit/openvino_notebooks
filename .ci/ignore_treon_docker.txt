@@ -26,8 +26,7 @@ notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb
 notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb
 notebooks/fast-segment-anything/fast-segment-anything.ipynb
 notebooks/latent-consistency-models-image-generation/latent-consistency-models-image-generation.ipynb
-notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb
-notebooks/latent-consistency-models-image-generation/latent-consistency-models-optimum-demo.ipynb
+notebooks/lcm-lora-controlnet/lcm-lora-controlnet.ipynb
 notebooks/qrcode-monster/qrcode-monster.ipynb
 notebooks/speculative-sampling/speculative-sampling.ipynb
 notebooks/distil-whisper-asr/distil-whisper-asr.ipynb
