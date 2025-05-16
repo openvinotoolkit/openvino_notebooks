@@ -601,8 +601,8 @@ class OpenVINOReranker(BaseDocumentCompressor):
         query = request.query
         passages = request.passages
         # # openvino tokenizer can only support 1D list
-        query_passage_pairs = [query + "</s></s> " + passage["text"] for passage in passages]
-        # query_passage_pairs = [[query, passage["text"]] for passage in passages]
+        # query_passage_pairs = [query + "</s></s> " + passage["text"] for passage in passages]
+        query_passage_pairs = [[query, passage["text"]] for passage in passages]
         length = self.ov_model.inputs[0].get_partial_shape()[1]
         if length.is_dynamic:
             features = self.tokenizer.encode(query_passage_pairs)
