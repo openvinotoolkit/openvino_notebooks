@@ -758,8 +758,6 @@ compression_configs = {
     "llama-3.2-1b-instruct": {"sym": False, "group_size": 64, "ratio": 1.0, "dataset": "wikitext2", "awq": True, "all_layers": True, "scale_estimation": True},
     "default": {
         "sym": False,
-        "group_size": 128,
-        "ratio": 0.8,
     },
 }
 
@@ -768,7 +766,11 @@ def get_optimum_cli_command(model_id, weight_format, output_dir, compression_opt
     base_command = "optimum-cli export openvino --model {} --task text-generation-with-past --weight-format {}"
     command = base_command.format(model_id, weight_format)
     if compression_options:
-        compression_args = " --group-size {} --ratio {}".format(compression_options["group_size"], compression_options["ratio"])
+        compression_args = ""
+        if "group_size" in compression_options:
+            compression_args += " --group-size {}".format(compression_options["group_size"])
+        if "ratio" in compression_options:
+            compression_args += " --ratio {}".fromat(compression_options["ratio"])
         if compression_options["sym"]:
             compression_args += " --sym"
         if enable_awq or compression_options.get("awq", False):
