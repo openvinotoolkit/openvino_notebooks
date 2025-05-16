@@ -73,16 +73,16 @@ def qwen_completion_to_prompt(completion):
 
 SUPPORTED_LLM_MODELS = {
     "English": {
-        "Qwen3-4B": {
-            "model_id": "Qwen/Qwen3-4B",
+        "Qwen3-1.7B": {
+            "model_id": "Qwen/Qwen3-1.7B",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": qwen_completion_to_prompt,
             "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
-        "Qwen3-1.7B": {
-            "model_id": "Qwen/Qwen3-1.7B",
+        "Qwen3-4B": {
+            "model_id": "Qwen/Qwen3-4B",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
@@ -436,6 +436,8 @@ SUPPORTED_LLM_MODELS = {
         },
         "phi-4-mini-instruct": {"model_id": "microsoft/phi-4-mini-instruct", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
         "phi-4": {"model_id": "microsoft/phi-4", "remote_code": False, "start_message": DEFAULT_SYSTEM_PROMPT},
+        "phi-4-mini-reasoning": {"model_id": "microsoft/Phi-4-mini-reasoning", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
+        "phi-4-reasoning": {"model_id": "microsoft/Phi-4-reasoning", "remote_code": False, "start_message": DEFAULT_SYSTEM_PROMPT},
         "qwen2.5-14b-instruct": {
             "model_id": "Qwen/Qwen2.5-14B-Instruct",
             "remote_code": False,
