@@ -36,6 +36,13 @@ audio_encoder_path = Path("audio_encoder.xml")
 proejector_path = Path("proejector.xml")
 
 
+def copy_llm_files(src_dir, dst_dir):
+    for f in src_dir.glob("*"):
+        if f.name in ("language_model.xml", "language_model.bin"):
+            continue
+        shutil.copy(f, dst_dir / f.name)
+
+
 class InsertSlice(MatcherPass):
     def __init__(self):
         MatcherPass.__init__(self)
@@ -357,7 +364,28 @@ def convert_llm(model, model_dir):
 
         example_input = {"inputs_embeds": input_embeds, "attention_mask": attention_mask, "position_ids": position_ids, "past_key_values": past_key_values}
 
-        model.llm.config.torchscript = True
+        def forward_wrap(
+            self,
+            attention_mask,
+            position_ids=None,
+            past_key_values=None,
+            inputs_embeds=None,
+        ):
+            from transformers.cache_utils import DynamicCache
+
+            if past_key_values is not None:
+                pkv = DynamicCache.from_legacy_cache(past_key_values)
+            result = self._orig_forward(
+                input_ids=None,
+                attention_mask=attention_mask,
+                position_ids=position_ids,
+                past_key_values=pkv,
+                inputs_embeds=inputs_embeds,
+            )
+            return (result.logits, result.past_key_values.to_legacy_cache())
+
+        model.llm._orig_forward = model.llm.forward
+        model.llm.forward = types.MethodType(forward_wrap, model.llm)
 
         ov_model = ov.convert_model(model.llm, example_input=example_input)
 
