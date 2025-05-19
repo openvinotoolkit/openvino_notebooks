@@ -154,6 +154,7 @@ CUDA
 CustomEncoderWav
 CVF
 CVPR
+CNNs
 Databricks
 databricks
 dataloader
@@ -163,6 +164,7 @@ DataLoaders
 DataModule
 dataset
 datasets
+DarkIR
 DaViT
 DCAE
 DDIM
@@ -434,6 +436,7 @@ Jupyter's
 JupyterLab
 Kaiming
 Kalman
+kagglehub
 kbps
 KD
 KDE
@@ -507,6 +510,10 @@ LogSoftmax
 LoRA
 LoRAs
 lora
+LOLBlur
+LOLv
+LOL
+LLIE
 lraspp
 LRASPP
 LTS
@@ -854,6 +861,7 @@ ResNet
 resnet
 RetinaFace
 RetroMAE
+Retinex
 RGB
 Riffusion
 riffusion
