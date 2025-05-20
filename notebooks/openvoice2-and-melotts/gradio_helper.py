@@ -14,9 +14,7 @@ content = """
 This online demo mainly supports <strong>English</strong>. The <em>default</em> style also supports <strong>Chinese</strong>. But OpenVoice can adapt to any other language as long as a base speaker is provided.
 </div>
 """
-wrapped_markdown_content = (
-    f"<div style='border: 1px solid #000; padding: 10px;'>{content}</div>"
-)
+wrapped_markdown_content = f"<div style='border: 1px solid #000; padding: 10px;'>{content}</div>"
 
 
 examples = [
