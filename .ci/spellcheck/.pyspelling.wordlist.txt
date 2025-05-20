@@ -85,6 +85,7 @@ BLACKBOX
 boolean
 CatVTON
 CentOS
+centric
 CFG
 charlist
 charlists
@@ -403,6 +404,7 @@ intel
 interactable
 InternLM
 internlm
+InternVideo
 Interpolative
 interpretable
 invertible
@@ -1074,6 +1076,7 @@ vec
 VegaRT
 verovio
 videpth
+ViFM
 VIO
 virtualenv
 VisCPM
