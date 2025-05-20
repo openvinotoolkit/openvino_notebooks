@@ -163,7 +163,7 @@ def partially_upcast_nodes_to_fp32(
     return new_model
 
 
-def get_nodes_to_track(model: Model, operation_types: List[str]) -> List:
+def get_nodes_to_track(model: Model, operation_types: list[str]) -> list:
     nodes_to_track = []
     for i, op in enumerate(model.get_ordered_ops()):
         if op.get_type_name() in operation_types and all(

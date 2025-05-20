@@ -166,13 +166,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2019
-- notebook: notebooks/latent-consistency-models-image-generation/latent-consistency-models-optimum-demo.ipynb
+- notebook: notebooks/lcm-lora-controlnet/lcm-lora-controlnet.ipynb
   skips:
     - os:
         - macos-13

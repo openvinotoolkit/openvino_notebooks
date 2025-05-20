@@ -443,7 +443,7 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         self,
         input_ids: torch.LongTensor,
         attention_mask: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
+        past_key_values: Optional[tuple[tuple[torch.FloatTensor]]] = None,
         position_ids: Optional[torch.LongTensor] = None,
         inputs_embeds: Optional[torch.LongTensor] = None,
         **kwargs,
@@ -513,7 +513,7 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         return self._past_length
 
     # Adapted from transformers.models.gpt2.modeling_gpt2.GPT2LMHeadModel._reorder_cache
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
         [`~PreTrainedModel.beam_sample`] is called.
@@ -808,6 +808,13 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
             }
         )
         return model_inputs
+
+    @staticmethod
+    def _extract_past_from_model_output(outputs: ModelOutput):
+        past_key_values = None
+        if "past_key_values" in outputs:
+            return "past_key_values", outputs.past_key_values
+        return "past_key_values", past_key_values
 
     def _update_model_kwargs_for_generation(
         self,
