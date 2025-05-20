@@ -44,6 +44,7 @@ export const TASKS = /** @type {const} */ ({
     POSE_ESTIMATION: 'Pose Estimation',
     ZERO_SHOT_IMAGE_CLASSIFICATION: 'Zero-Shot Image Classification',
     TEXT_DETECTION: 'Text Detection',
+    LOW_LIGHT_IMAGE_RESTORATION: 'Low-Light Image Restoration',
   },
   NLP: {
     TEXT_CLASSIFICATION: 'Text Classification',
