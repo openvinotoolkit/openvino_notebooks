@@ -88,3 +88,4 @@ notebooks/minicpm-o-omnimodal-chatbot/minicpm-o-omnimodal-chatbot.ipynb
 notebooks/kokoro/kokoro.ipynb
 notebooks/qwen2.5-omni-chatbot/qwen2.5-omni-chatbot.ipynb
 notebooks/intern-video2-classiciation/intern-video2-classification.ipynb
+notebooks/flex.2-image-generation/flex.2-image-generation.ipynb

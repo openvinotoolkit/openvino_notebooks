@@ -9,7 +9,19 @@ MAX_IMAGE_SIZE = 2048
 
 
 def make_demo(pipe):
-    def infer(edit_images, prompt, seed=42, randomize_seed=False, width=1024, height=1024, guidance_scale=3.5, control_strength=0.5, control_stop=0.33, num_inference_steps=50, progress=gr.Progress(track_tqdm=True)):
+    def infer(
+        edit_images,
+        prompt,
+        seed=42,
+        randomize_seed=False,
+        width=1024,
+        height=1024,
+        guidance_scale=3.5,
+        control_strength=0.5,
+        control_stop=0.33,
+        num_inference_steps=50,
+        progress=gr.Progress(track_tqdm=True),
+    ):
         image = edit_images["background"].convert("RGB")
         mask = Image.fromarray(np.array(edit_images["layers"][-1])[:, :, -1])
         if randomize_seed:
@@ -21,10 +33,10 @@ def make_demo(pipe):
             height=height,
             width=width,
             guidance_scale=guidance_scale,
-            control_strength=control_strength, 
+            control_strength=control_strength,
             control_stop=control_stop,
             num_inference_steps=num_inference_steps,
-            generator=torch.Generator("cpu").manual_seed(seed)
+            generator=torch.Generator("cpu").manual_seed(seed),
         ).images[0]
         return (image, out_image), seed
 
@@ -162,24 +174,26 @@ input[type="range"]::-webkit-slider-thumb {
         with gr.Column(elem_id="col-container"):
             # Header with gradient
             with gr.Column(elem_classes=["header-container"]):
-                gr.HTML("""
+                gr.HTML(
+                    """
                     <h1>Flex.2 Preview Inpainting OpenVINO Demo</h1>
-                """)
+                """
+                )
             # Main interface container
             with gr.Column(elem_classes=["container"]):
                 with gr.Row():
                     # Left column: Input
                     with gr.Column(scale=1):
                         edit_image = gr.ImageEditor(
-                            label='Upload and draw mask for inpainting',
-                            type='pil',
+                            label="Upload and draw mask for inpainting",
+                            type="pil",
                             sources=["upload", "webcam"],
-                            image_mode='RGB',
+                            image_mode="RGB",
                             layers=False,
                             brush=gr.Brush(colors=["#FFFFFF"], color_mode="fixed"),
-                            height=500
+                            height=500,
                         )
-                        
+
                         with gr.Column(elem_classes=["prompt-container"]):
                             prompt = gr.Text(
                                 label="Your creative prompt",
@@ -188,17 +202,12 @@ input[type="range"]::-webkit-slider-thumb {
                                 placeholder="Describe what you want to generate...",
                                 container=True,
                             )
-                            
+
                             run_button = gr.Button("✨ Generate", elem_classes=["btn-primary"])
                     # Right column: Output
                     with gr.Column(scale=1, elem_classes=["result-container"]):
-                        result = gr.ImageSlider(
-                            label="Before & After", 
-                            type="pil", 
-                            image_mode='RGB',
-                            elem_classes=["result-animation"]
-                        )
-            
+                        result = gr.ImageSlider(label="Before & After", type="pil", image_mode="RGB", elem_classes=["result-animation"])
+
             # Advanced settings in a nice container
             with gr.Column(elem_classes=["settings-container"]):
                 with gr.Accordion("Advanced Settings", open=False, elem_classes=["accordion-header"]):
@@ -212,30 +221,32 @@ input[type="range"]::-webkit-slider-thumb {
                                 value=0,
                             )
                             randomize_seed = gr.Checkbox(label="Randomize seed", value=True)
-                        
+
                         with gr.Row():
                             height = gr.Slider(64, 2048, value=512, step=64, label="Height")
                             width = gr.Slider(64, 2048, value=512, step=64, label="Width")
-                        
+
                         with gr.Row():
                             guidance_scale = gr.Slider(0.0, 20.0, value=3.5, step=0.1, label="Guidance Scale")
                             control_strength = gr.Slider(0.0, 1.0, value=0.5, step=0.05, label="Control Strength")
-                        
+
                         with gr.Row():
                             control_stop = gr.Slider(0.0, 1.0, value=0.33, step=0.05, label="Control Stop")
                             num_inference_steps = gr.Slider(1, 100, value=20, step=1, label="Inference Steps")
-            
+
             # Footer
-            gr.HTML("""
+            gr.HTML(
+                """
                 <div class="footer">
                     <p>Flex.2 Preview Inpainting OpenVINO Demo</p>
                 </div>
-            """)
+            """
+            )
 
         run_button.click(
             fn=infer,
             inputs=[edit_image, prompt, seed, randomize_seed, width, height, guidance_scale, control_strength, control_stop, num_inference_steps],
-            outputs=[result, seed]
+            outputs=[result, seed],
         )
-    
+
     return demo
