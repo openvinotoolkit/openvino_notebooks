@@ -295,6 +295,7 @@
 - [OpenVINO optimizations for Knowledge graphs](./knowledge-graphs-conve/knowledge-graphs-conve.ipynb)
 - [Multimodal understanding and generation with Janus-Pro and OpenVINO](./janus-multimodal-generation/janus-multimodal-generation.ipynb)
 - [Visual-language assistant with InternVL2 and OpenVINO](./internvl2/internvl2.ipynb)
+- [Video Classification with InternVideo2 and OpenVINO](./intern-video2-classiciation/intern-video2-classification.ipynb)
 - [Image Editing with InstructPix2Pix and OpenVINO](./instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb)
 - [InstantID: Zero-shot Identity-Preserving Generation using OpenVINO](./instant-id/instant-id.ipynb)
 - [Inpainting with OpenVINO GenAI](./inpainting-genai/inpainting-genai.ipynb)
