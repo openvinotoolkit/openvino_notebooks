@@ -17,11 +17,7 @@ The notebook contains the following steps:
 2. Prepare data and perform inference of the PyTorch model with image.
 3. Convert model to OpenVINO IR, using the model conversion API.
 4. Run inference with OpenVINO with image and video.
-5. Quantize the converted model with NNCF.
-6. Check the quantized model inference result.
-7. Compare model size of converted and quantized models.
-8. Compare performance of converted and quantized models.
-9. Launch interactive demo
+5. Launch interactive demo
 
 
 ## Installation Instructions
@@ -30,4 +26,4 @@ This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md)..
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/lol-image-restoration-darkir/README.md" />
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/darkir-image-restoration/README.md" />
