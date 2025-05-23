@@ -1,0 +1,456 @@
+diff --git a/src/smolagents/agents.py b/src/smolagents/agents.py
+index 3f40c5c..04316ec 100644
+--- a/src/smolagents/agents.py
++++ b/src/smolagents/agents.py
+@@ -1015,6 +1015,7 @@ class ToolCallingAgent(MultiStepAgent):
+                 memory_messages,
+                 tools_to_call_from=list(self.tools.values()),
+                 stop_sequences=["Observation:", "Calling tools:"],
++                prefix="Action:\n{\"",
+             )
+             memory_step.model_output_message = model_message
+         except Exception as e:
+@@ -1034,7 +1035,8 @@ class ToolCallingAgent(MultiStepAgent):
+         tool_call = model_message.tool_calls[0]
+         tool_name, tool_call_id = tool_call.function.name, tool_call.id
+         tool_arguments = tool_call.function.arguments
+-        memory_step.model_output = str(f"Called Tool: '{tool_name}' with arguments: {tool_arguments}")
++        # Comment this out since it duplicated the tool call in the prompt for the model
++        # memory_step.model_output = str(f"Called Tool: '{tool_name}' with arguments: {tool_arguments}")
+         memory_step.tool_calls = [ToolCall(name=tool_name, arguments=tool_arguments, id=tool_call_id)]
+ 
+         # Execute
+diff --git a/src/smolagents/gradio_ui.py b/src/smolagents/gradio_ui.py
+index c67361e..3300457 100644
+--- a/src/smolagents/gradio_ui.py
++++ b/src/smolagents/gradio_ui.py
+@@ -270,6 +270,12 @@ class GradioUI:
+             "",
+             gr.Button(interactive=False),
+         )
++    
++    def clear_agent_memory(self, session_state):
++        if "agent" not in session_state:
++            session_state["agent"] = self.agent
++        session_state["agent"].memory.reset()
++        session_state["agent"].monitor.reset()
+ 
+     def launch(self, share: bool = True, **kwargs):
+         self.create_app().launch(debug=True, share=share, **kwargs)
+@@ -299,6 +305,7 @@ class GradioUI:
+                         placeholder="Enter your prompt here and press Shift+Enter or press the button",
+                     )
+                     submit_btn = gr.Button("Submit", variant="primary")
++                    clear_btn = gr.ClearButton(variant="secondary")
+ 
+                 # If an upload folder is provided, enable the upload feature
+                 if self.file_upload_folder is not None:
+@@ -310,6 +317,15 @@ class GradioUI:
+                         [upload_status, file_uploads_log],
+                     )
+ 
++                gr.Examples([
++                        ["Write a python function for building a PowerPoint presentation according to a list of slides where each slide has a title and a body and a save path"],
++                        ["Prepare a presentation on the main innovations in Phi-4-mini model released by Microsoft"],
++                        ["Summarize the main innovations in Phi-4-mini model released by Microsoft"],
++                        ["What was the most significant statement Lip-Bu Tan made in https://www.youtube.com/watch?v=2IWeQr3KQyw"],
++                    ],
++                    inputs=[text_input],
++                )
++
+                 gr.HTML("<br><br><h4><center>Powered by:</center></h4>")
+                 with gr.Row():
+                     gr.HTML("""<div style="display: flex; align-items: center; gap: 8px; font-family: system-ui, -apple-system, sans-serif;">
+@@ -330,6 +346,9 @@ class GradioUI:
+             )
+ 
+             # Set up event handlers
++            clear_btn.add([text_input, chatbot])
++            clear_btn.click(self.clear_agent_memory, [session_state])
++
+             text_input.submit(
+                 self.log_user_message,
+                 [text_input, file_uploads_log],
+diff --git a/src/smolagents/memory.py b/src/smolagents/memory.py
+index 520e20a..bb08a44 100644
+--- a/src/smolagents/memory.py
++++ b/src/smolagents/memory.py
+@@ -1,6 +1,7 @@
+ from dataclasses import asdict, dataclass
+ from logging import getLogger
+ from typing import TYPE_CHECKING, Any, Dict, List, TypedDict, Union
++import json
+ 
+ from smolagents.models import ChatMessage, MessageRole
+ from smolagents.monitoring import AgentLogger, LogLevel
+@@ -89,13 +90,18 @@ class ActionStep(MemoryStep):
+             )
+ 
+         if self.tool_calls is not None:
++            if len(self.tool_calls) > 1:
++                logger.warning(
++                    "Multiple tool calls detected in a single step. This is not supported yet. Only the first one will be displayed." \
++                    f"Here are the tool calls: {self.tool_calls}"
++                )
+             messages.append(
+                 Message(
+                     role=MessageRole.TOOL_CALL,
+                     content=[
+                         {
+                             "type": "text",
+-                            "text": "Calling tools:\n" + str([tc.dict() for tc in self.tool_calls]),
++                            "text": f'Action:\n{json.dumps([tc.dict()["function"] for tc in self.tool_calls][0], default=str)}\n',
+                         }
+                     ],
+                 )
+@@ -122,7 +128,7 @@ class ActionStep(MemoryStep):
+                     content=[
+                         {
+                             "type": "text",
+-                            "text": f"Observation:\n{self.observations}",
++                            "text": f"Observation:\n{self.observations}ֿ\n\n",
+                         }
+                     ],
+                 )
+diff --git a/src/smolagents/models.py b/src/smolagents/models.py
+index 799f47e..8995746 100644
+--- a/src/smolagents/models.py
++++ b/src/smolagents/models.py
+@@ -149,7 +149,7 @@ class MessageRole(str, Enum):
+ 
+ tool_role_conversions = {
+     MessageRole.TOOL_CALL: MessageRole.ASSISTANT,
+-    MessageRole.TOOL_RESPONSE: MessageRole.USER,
++    MessageRole.TOOL_RESPONSE: MessageRole.ASSISTANT,
+ }
+ 
+ 
+@@ -175,11 +175,15 @@ def get_tool_json_schema(tool: Tool) -> Dict:
+     }
+ 
+ 
+-def remove_stop_sequences(content: str, stop_sequences: List[str]) -> str:
+-    for stop_seq in stop_sequences:
+-        if content[-len(stop_seq) :] == stop_seq:
+-            content = content[: -len(stop_seq)]
+-    return content
++def remove_stop_sequences(content: str, stop_sequences: list[str]) -> str:
++    """
++    Returns the part of the string `s` up to (but not including) the first occurrence 
++    of any substring in `substrings`. If none are found, returns the entire string.
++    """
++    indices = [content.find(sub) for sub in stop_sequences if sub in content]
++    if not indices:
++        return content
++    return content[:min(indices)]
+ 
+ 
+ def get_clean_message_list(
+@@ -659,6 +663,8 @@ class TransformersModel(Model):
+             The torch_dtype to initialize your model with.
+         trust_remote_code (bool, default `False`):
+             Some models on the Hub require running remote code: for this model, you would have to set this flag to True.
++        backend (`str`, default `"torch"`):
++            The backend to use for the model. Can be either `"torch"` or `"ov-optimum"`.
+         kwargs (dict, *optional*):
+             Any additional keyword arguments that you want to use in model.generate(), for instance `max_new_tokens` or `device`.
+         **kwargs:
+@@ -687,6 +693,7 @@ class TransformersModel(Model):
+         device_map: Optional[str] = None,
+         torch_dtype: Optional[str] = None,
+         trust_remote_code: bool = False,
++        backend="torch",
+         **kwargs,
+     ):
+         try:
+@@ -714,33 +721,45 @@ class TransformersModel(Model):
+             logger.warning(
+                 f"`max_new_tokens` not provided, using this default value for `max_new_tokens`: {default_max_tokens}"
+             )
+-
+-        if device_map is None:
+-            device_map = "cuda" if torch.cuda.is_available() else "cpu"
+-        logger.info(f"Using device: {device_map}")
++        self.processor = AutoTokenizer.from_pretrained(model_id)
+         self._is_vlm = False
+-        try:
+-            self.model = AutoModelForImageTextToText.from_pretrained(
+-                model_id,
+-                device_map=device_map,
+-                torch_dtype=torch_dtype,
+-                trust_remote_code=trust_remote_code,
+-            )
+-            self.processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=trust_remote_code)
+-            self._is_vlm = True
+-        except ValueError as e:
+-            if "Unrecognized configuration class" in str(e):
+-                self.model = AutoModelForCausalLM.from_pretrained(
++        if backend == "torch":
++            if device_map is None:
++                if torch.cuda.is_available():
++                    device_map = "cuda"
++                elif torch.xpu.is_available():
++                    device_map = "xpu"
++                else:
++                    device_map = "cpu"
++            logger.info(f"Using device: {device_map}")
++            try:
++                self.model = AutoModelForImageTextToText.from_pretrained(
+                     model_id,
+                     device_map=device_map,
+                     torch_dtype=torch_dtype,
+                     trust_remote_code=trust_remote_code,
+                 )
+-                self.tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=trust_remote_code)
++                self.processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=trust_remote_code)
++                self._is_vlm = True
++            except ValueError as e:
++                if "Unrecognized configuration class" in str(e):
++                    self.model = AutoModelForCausalLM.from_pretrained(
++                            model_id,
++                            device_map=device_map,
++                            torch_dtype=torch_dtype,
++                            trust_remote_code=trust_remote_code,
++                        )
++                    self.tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=trust_remote_code)
+             else:
+                 raise e
+-        except Exception as e:
+-            raise ValueError(f"Failed to load tokenizer and model for {model_id=}: {e}") from e
++        elif backend == "ov-optimum":
++            from optimum.intel import OVModelForCausalLM
++            device = kwargs.get("device", None)
++            if device is None:
++                import openvino as ov
++                device = "GPU" if "GPU" in ov.Core().get_available_devices() else "CPU"
++            self.model = OVModelForCausalLM.from_pretrained(model_id, device=device, export=False)
++            self.tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=trust_remote_code)
+         super().__init__(flatten_messages_as_text=not self._is_vlm, **kwargs)
+ 
+     def make_stopping_criteria(self, stop_sequences: List[str], tokenizer) -> "StoppingCriteriaList":
+@@ -758,7 +777,7 @@ class TransformersModel(Model):
+             def __call__(self, input_ids, scores, **kwargs):
+                 generated = self.tokenizer.decode(input_ids[0][-1], skip_special_tokens=True)
+                 self.stream += generated
+-                if any([self.stream.endswith(stop_string) for stop_string in self.stop_strings]):
++                if any([stop_string in self.stream for stop_string in self.stop_strings]):
+                     return True
+                 return False
+ 
+@@ -770,6 +789,7 @@ class TransformersModel(Model):
+         stop_sequences: Optional[List[str]] = None,
+         grammar: Optional[str] = None,
+         tools_to_call_from: Optional[List[Tool]] = None,
++        prefix='',
+         **kwargs,
+     ) -> ChatMessage:
+         completion_kwargs = self._prepare_completion_kwargs(
+@@ -791,32 +811,33 @@ class TransformersModel(Model):
+ 
+         if max_new_tokens:
+             completion_kwargs["max_new_tokens"] = max_new_tokens
+-
+-        if hasattr(self, "processor"):
+-            prompt_tensor = self.processor.apply_chat_template(
+-                messages,
+-                tools=[get_tool_json_schema(tool) for tool in tools_to_call_from] if tools_to_call_from else None,
+-                return_tensors="pt",
+-                tokenize=True,
+-                return_dict=True,
+-                add_generation_prompt=True if tools_to_call_from else False,
+-            )
++        
++        processor = getattr(self, "processor", self.tokenizer)
++
++        if messages[-1]["role"] == MessageRole.ASSISTANT:
++            try:
++                messages[-1]["content"]["text"] = messages[-1]["content"]["text"] + prefix
++            except TypeError:
++                messages[-1]["content"] = messages[-1]["content"] + prefix
+         else:
+-            prompt_tensor = self.tokenizer.apply_chat_template(
+-                messages,
+-                tools=[get_tool_json_schema(tool) for tool in tools_to_call_from] if tools_to_call_from else None,
+-                return_tensors="pt",
+-                return_dict=True,
+-                add_generation_prompt=True if tools_to_call_from else False,
+-            )
++            messages = messages + [{"role": MessageRole.ASSISTANT, "content": prefix}]
++        prompt_tensor = processor.apply_chat_template(
++            messages,
++            tools=[get_tool_json_schema(tool) for tool in tools_to_call_from] if tools_to_call_from else None,
++            tokenize=True,
++            return_tensors="pt",
++            return_dict=True,
++            add_generation_prompt=True
++        )
++        if messages[-1]['role'] == MessageRole.ASSISTANT:
++            for key in prompt_tensor.keys():
++                prompt_tensor[key] = prompt_tensor[key][:, :-2]
+ 
+         prompt_tensor = prompt_tensor.to(self.model.device)
+         count_prompt_tokens = prompt_tensor["input_ids"].shape[1]
+ 
+         if stop_sequences:
+-            stopping_criteria = self.make_stopping_criteria(
+-                stop_sequences, tokenizer=self.processor if hasattr(self, "processor") else self.tokenizer
+-            )
++            stopping_criteria = self.make_stopping_criteria(stop_sequences, tokenizer=self.processor)
+         else:
+             stopping_criteria = None
+ 
+@@ -824,12 +845,10 @@ class TransformersModel(Model):
+             **prompt_tensor,
+             stopping_criteria=stopping_criteria,
+             **completion_kwargs,
++            do_sample=False,
+         )
+         generated_tokens = out[0, count_prompt_tokens:]
+-        if hasattr(self, "processor"):
+-            output_text = self.processor.decode(generated_tokens, skip_special_tokens=True)
+-        else:
+-            output_text = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
++        output_text = prefix + processor.decode(generated_tokens, skip_special_tokens=True)
+         self.last_input_token_count = count_prompt_tokens
+         self.last_output_token_count = len(generated_tokens)
+ 
+diff --git a/src/smolagents/prompts/toolcalling_agent.yaml b/src/smolagents/prompts/toolcalling_agent.yaml
+index 3e99fb4..578434a 100644
+--- a/src/smolagents/prompts/toolcalling_agent.yaml
++++ b/src/smolagents/prompts/toolcalling_agent.yaml
+@@ -9,20 +9,15 @@ system_prompt: |-
+   The observation will always be a string: it can represent a file, like "image_1.jpg".
+   Then you can use it as input for the next action. You can do it for instance as follows:
+ 
+-  Observation: "image_1.jpg"
++  Observation:
++  "image_1.jpg"
+ 
+   Action:
+-  {
+-    "name": "image_transformer",
+-    "arguments": {"image": "image_1.jpg"}
+-  }
++  {"name": "image_transformer", "arguments": {"image": "image_1.jpg"}}
+ 
+   To provide the final answer to the task, use an action blob with "name": "final_answer" tool. It is the only way to complete the task, else you will be stuck on a loop. So your final output should look like this:
+   Action:
+-  {
+-    "name": "final_answer",
+-    "arguments": {"answer": "insert your final answer here"}
+-  }
++  {"name": "final_answer", "arguments": {"answer": "insert your final answer here"}}
+ 
+ 
+   Here are a few examples using notional tools:
+@@ -30,64 +25,34 @@ system_prompt: |-
+   Task: "Generate an image of the oldest person in this document."
+ 
+   Action:
+-  {
+-    "name": "document_qa",
+-    "arguments": {"document": "document.pdf", "question": "Who is the oldest person mentioned?"}
+-  }
+-  Observation: "The oldest person in the document is John Doe, a 55 year old lumberjack living in Newfoundland."
++  {"name": "document_qa", "arguments": {"document": "document.pdf", "question": "Who is the oldest person mentioned?"}}
++  Observation:
++  "The oldest person in the document is John Doe, a 55 year old lumberjack living in Newfoundland."
+ 
+   Action:
+-  {
+-    "name": "image_generator",
+-    "arguments": {"prompt": "A portrait of John Doe, a 55-year-old man living in Canada."}
+-  }
+-  Observation: "image.png"
++  {"name": "image_generator", "arguments": {"prompt": "A portrait of John Doe, a 55-year-old man living in Canada."}}
++  Observation:
++  "image.png"
+ 
+   Action:
+-  {
+-    "name": "final_answer",
+-    "arguments": "image.png"
+-  }
+-
+-  ---
+-  Task: "What is the result of the following operation: 5 + 3 + 1294.678?"
+-
+-  Action:
+-  {
+-      "name": "python_interpreter",
+-      "arguments": {"code": "5 + 3 + 1294.678"}
+-  }
+-  Observation: 1302.678
+-
+-  Action:
+-  {
+-    "name": "final_answer",
+-    "arguments": "1302.678"
+-  }
++  {"name": "final_answer", "arguments": {"answer": "image.png"}}
+ 
+   ---
+   Task: "Which city has the highest population , Guangzhou or Shanghai?"
+ 
+   Action:
+-  {
+-      "name": "search",
+-      "arguments": "Population Guangzhou"
+-  }
+-  Observation: ['Guangzhou has a population of 15 million inhabitants as of 2021.']
++  {"name": "search", "arguments": {"query": "Population Guangzhou"}}
++  Observation:
++  'Guangzhou has a population of 15 million inhabitants as of 2021.'
+ 
+ 
+   Action:
+-  {
+-      "name": "search",
+-      "arguments": "Population Shanghai"
+-  }
+-  Observation: '26 million (2019)'
++  {"name": "search", "arguments": {"query": "Population Shanghai"}}
++  Observation:
++  '26 million (2019)'
+ 
+   Action:
+-  {
+-    "name": "final_answer",
+-    "arguments": "Shanghai"
+-  }
++  {"name": "final_answer", "arguments": {"answer": "Shanghai"}}
+ 
+   Above example were using notional tools that might not exist for you. You only have access to these tools:
+   {%- for tool in tools.values() %}
+diff --git a/src/smolagents/utils.py b/src/smolagents/utils.py
+index f36c69c..5f90952 100644
+--- a/src/smolagents/utils.py
++++ b/src/smolagents/utils.py
+@@ -152,23 +152,22 @@ def make_json_serializable(obj: Any) -> Any:
+ def parse_json_blob(json_blob: str) -> Tuple[Dict[str, str], str]:
+     "Extracts the JSON blob from the input and returns the JSON data and the rest of the input."
+     try:
++        decoder = json.JSONDecoder(strict=False)
+         first_accolade_index = json_blob.find("{")
+-        last_accolade_index = [a.start() for a in list(re.finditer("}", json_blob))][-1]
+-        json_data = json_blob[first_accolade_index : last_accolade_index + 1]
+-        json_data = json.loads(json_data, strict=False)
++        json_data, _ = decoder.raw_decode(json_blob[first_accolade_index:])
+         return json_data, json_blob[:first_accolade_index]
+     except IndexError:
+         raise ValueError("The model output does not contain any JSON blob.")
+     except json.JSONDecodeError as e:
+         place = e.pos
+-        if json_blob[place - 1 : place + 2] == "},\n":
++        if json_data[place - 1 : place + 2] == "},\n":
+             raise ValueError(
+                 "JSON is invalid: you probably tried to provide multiple tool calls in one action. PROVIDE ONLY ONE TOOL CALL."
+             )
+         raise ValueError(
+             f"The JSON blob you used is invalid due to the following error: {e}.\n"
+             f"JSON blob was: {json_blob}, decoding failed on that specific part of the blob:\n"
+-            f"'{json_blob[place - 4 : place + 5]}'."
++            f"'{json_data[place - 4 : place + 5]}'."
+         )
+ 
+ 
