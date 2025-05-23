@@ -546,3 +546,7 @@
   skips:
     - python:
         - "3.9"
+- notebook: notebooks/openvoice2-and-melotts/openvoice2-and-melotts.ipynb
+  skips:
+    - os:
+        - macos-13

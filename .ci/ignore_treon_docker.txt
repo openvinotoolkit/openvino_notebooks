@@ -39,6 +39,7 @@ notebooks/stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb
 notebooks/kosmos2-multimodal-large-language-model/kosmos2-multimodal-large-language-model.ipynb
 notebooks/photo-maker/photo-maker.ipynb
 notebooks/openvoice/openvoice.ipynb
+notebooks/openvoice2-and-melotts/openvoice2-and-melotts.ipynb
 notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb
 notebooks/instant-id/instant-id.ipynb
 notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb
