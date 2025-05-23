@@ -634,6 +634,7 @@ NuExtract
 num
 numpy
 NumPy
+npu
 NPU
 NPUs
 NVLabs
