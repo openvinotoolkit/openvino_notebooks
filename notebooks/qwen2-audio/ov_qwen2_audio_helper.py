@@ -809,6 +809,13 @@ class OVQwen2AudioForConditionalGeneration(GenerationMixin):
         )
         return model_inputs
 
+    @staticmethod
+    def _extract_past_from_model_output(outputs: ModelOutput):
+        past_key_values = None
+        if "past_key_values" in outputs:
+            return "past_key_values", outputs.past_key_values
+        return "past_key_values", past_key_values
+
     def _update_model_kwargs_for_generation(
         self,
         outputs: ModelOutput,

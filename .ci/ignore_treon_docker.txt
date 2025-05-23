@@ -26,8 +26,7 @@ notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb
 notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb
 notebooks/fast-segment-anything/fast-segment-anything.ipynb
 notebooks/latent-consistency-models-image-generation/latent-consistency-models-image-generation.ipynb
-notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb
-notebooks/latent-consistency-models-image-generation/latent-consistency-models-optimum-demo.ipynb
+notebooks/lcm-lora-controlnet/lcm-lora-controlnet.ipynb
 notebooks/qrcode-monster/qrcode-monster.ipynb
 notebooks/speculative-sampling/speculative-sampling.ipynb
 notebooks/distil-whisper-asr/distil-whisper-asr.ipynb
@@ -40,6 +39,7 @@ notebooks/stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb
 notebooks/kosmos2-multimodal-large-language-model/kosmos2-multimodal-large-language-model.ipynb
 notebooks/photo-maker/photo-maker.ipynb
 notebooks/openvoice/openvoice.ipynb
+notebooks/openvoice2-and-melotts/openvoice2-and-melotts.ipynb
 notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb
 notebooks/instant-id/instant-id.ipynb
 notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb
@@ -88,3 +88,5 @@ notebooks/olmocr-pdf-vlm/olmocr-pdf-vlm.ipynb
 notebooks/minicpm-o-omnimodal-chatbot/minicpm-o-omnimodal-chatbot.ipynb
 notebooks/kokoro/kokoro.ipynb
 notebooks/qwen2.5-omni-chatbot/qwen2.5-omni-chatbot.ipynb
+notebooks/intern-video2-classiciation/intern-video2-classification.ipynb
+notebooks/flex.2-image-generation/flex.2-image-generation.ipynb

@@ -166,13 +166,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2019
-- notebook: notebooks/latent-consistency-models-image-generation/latent-consistency-models-optimum-demo.ipynb
+- notebook: notebooks/lcm-lora-controlnet/lcm-lora-controlnet.ipynb
   skips:
     - os:
         - macos-13
@@ -536,9 +530,23 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: "notebooks/deepseek-vl2/deepseek-vl2.ipynb"
+- notebook: notebooks/deepseek-vl2/deepseek-vl2.ipynb
   skips:
     - os:
         - macos-13
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/intern-video2-classiciation/intern-video2-classification.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/flex.2-image-generation/flex.2-image-generation.ipynb
+  skips:
+    - python:
+        - "3.9"
+- notebook: notebooks/openvoice2-and-melotts/openvoice2-and-melotts.ipynb
+  skips:
+    - os:
+        - macos-13
