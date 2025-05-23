@@ -1,16 +1,19 @@
 from pathlib import Path
 import types
-from typing import Optional, Tuple, Union, List
 import gc
 import openvino as ov
-from openvino import opset13
+
+try:
+    from openvino import opset13
+except ImportError:
+    from openvino.runtime import opset13
 import nncf
 import numpy as np
 import torch
 from transformers import AutoModelForCausalLM, AutoConfig, AutoTokenizer
 from transformers.generation import GenerationConfig, GenerationMixin
 from transformers.modeling_outputs import CausalLMOutputWithPast, BaseModelOutputWithPast
-from typing import Optional, Tuple, Union, List, Dict, Any
+from typing import Optional, Union, Any
 from transformers import __version__ as transformers_version
 from transformers.generation.utils import GenerationConfig, ModelOutput
 import time
@@ -28,12 +31,12 @@ def _chatglm_transformer_forward(
     position_ids: Optional[torch.Tensor] = None,
     attention_mask: Optional[torch.BoolTensor] = None,
     full_attention_mask: Optional[torch.BoolTensor] = None,
-    past_key_values: Optional[Tuple[Tuple[torch.Tensor, torch.Tensor], ...]] = None,
+    past_key_values: Optional[tuple[tuple[torch.Tensor, torch.Tensor], ...]] = None,
     inputs_embeds: Optional[torch.Tensor] = None,
     use_cache: Optional[bool] = None,
     output_hidden_states: Optional[bool] = None,
     return_dict: Optional[bool] = None,
-) -> Union[Tuple, BaseModelOutputWithPast]:
+) -> Union[tuple, BaseModelOutputWithPast]:
     """take care of image_encode, position_ids and (attention_mask = None is fine)"""
 
     output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
@@ -94,8 +97,8 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
 
 def fuse_cache_reorder(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
     gather_dim: int,
 ):
     """
@@ -111,9 +114,9 @@ def fuse_cache_reorder(
     Parameters:
       ov_model (`ov.Model`):
           openvino model for processing
-      not_kv_inputs (`List[str]`):
+      not_kv_inputs (`list[str]`):
           list of input nodes in model that not related to past key values
-      key_value_input_names (`List[str]`):
+      key_value_input_names (`list[str]`):
           list of names for key value input layers
       gather_dim (int):
           dimension for gathering cache during reorder pass
@@ -165,9 +168,9 @@ def build_state_initializer(ov_model: ov.Model, batch_dim: int):
 
 def make_stateful(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
-    key_value_output_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
+    key_value_output_names: list[str],
     batch_dim: int,
     num_attention_heads: int,
     num_beams_and_batch: int = None,
@@ -178,11 +181,11 @@ def make_stateful(
     Parameters:
         ov_model (ov.Model):
             openvino model
-        not_kv_inputs (`List[str]`):
+        not_kv_inputs (`list[str]`):
             list of input nodes in model that not related to past key values
-        key_value_input_names (`List[str]`):
+        key_value_input_names (`list[str]`):
             list of names for key value input layers
-        key_value_output_names (`List[str]`):
+        key_value_output_names (`list[str]`):
             list of names for key value input layers
         batch_dim (int):
             index of batch dimension in key value layers
@@ -297,10 +300,12 @@ def convert_glm4v_model(model_dir, output_dir, quantization_config):
 
     if not embed_token_path.exists():
         print("⌛ Convert Input embedding model")
-        ov_model = ov.convert_model(
-            model.transformer.embedding,
-            example_input=torch.ones([1, 10], dtype=torch.int64),
-        )
+        model.transformer.embedding.eval()
+        with torch.no_grad():
+            ov_model = ov.convert_model(
+                model.transformer.embedding,
+                example_input=torch.ones([1, 10], dtype=torch.int64),
+            )
         ov.save_model(ov_model, embed_token_path)
         del ov_model
         cleanup_torchscript_cache()
@@ -342,10 +347,14 @@ def convert_glm4v_model(model_dir, output_dir, quantization_config):
         input_ids = torch.zeros([2, 2], dtype=torch.int64)
         inputs_embeds = torch.zeros([2, 2, 4096], dtype=torch.float32)
 
-        pkv = model.transformer(
-            input_ids=input_ids,
-            attention_mask=torch.ones((2, 2), dtype=torch.int64),
-        )[1]
+        pkv = []
+        for _ in range(model.config.num_layers):
+            pkv.append(
+                (
+                    torch.rand([2, model.config.multi_query_group_num, 2, model.config.kv_channels]),
+                    torch.rand([2, model.config.multi_query_group_num, 2, model.config.kv_channels]),
+                )
+            )
 
         model.transformer._orig_forward = model.transformer.forward
         model.transformer.forward = types.MethodType(_chatglm_transformer_forward, model.transformer)
@@ -395,7 +404,7 @@ def convert_glm4v_model(model_dir, output_dir, quantization_config):
     print(f"✅ {model_name} model conversion finished. You can find results in {output_dir}")
 
 
-def is_empty(images_list: Optional[List[List[torch.Tensor]]]):
+def is_empty(images_list: Optional[list[list[torch.Tensor]]]):
     if images_list is None or len(images_list) == 0:
         return True
     for image_list in images_list:
@@ -560,7 +569,7 @@ class OvGLM4v(GenerationMixin):
         images: torch.Tensor = None,
         position_ids: Optional[torch.Tensor] = None,
         attention_mask: Optional[torch.BoolTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.Tensor, torch.Tensor], ...]] = None,
+        past_key_values: Optional[tuple[tuple[torch.Tensor, torch.Tensor], ...]] = None,
         inputs_embeds: Optional[torch.Tensor] = None,
         **kwargs,
     ) -> CausalLMOutputWithPast:
@@ -580,10 +589,10 @@ class OvGLM4v(GenerationMixin):
         images: torch.Tensor = None,
         position_ids: Optional[torch.Tensor] = None,
         attention_mask: Optional[torch.BoolTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.Tensor, torch.Tensor], ...]] = None,
+        past_key_values: Optional[tuple[tuple[torch.Tensor, torch.Tensor], ...]] = None,
         inputs_embeds: Optional[torch.Tensor] = None,
         return_dict: Optional[bool] = None,
-    ) -> Union[Tuple, BaseModelOutputWithPast]:
+    ) -> Union[tuple, BaseModelOutputWithPast]:
         """take care of image_encode, position_ids and (attention_mask = None is fine)"""
         # generate mode with past_key_values. the image features are already mapped
         if past_key_values is None:
@@ -637,7 +646,7 @@ class OvGLM4v(GenerationMixin):
 
         return CausalLMOutputWithPast(logits=logits, past_key_values=past_key_values)
 
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
         [`~PreTrainedModel.beam_sample`] is called.
@@ -669,10 +678,10 @@ class OvGLM4v(GenerationMixin):
     def _update_model_kwargs_for_generation(
         self,
         outputs: ModelOutput,
-        model_kwargs: Dict[str, Any],
+        model_kwargs: dict[str, Any],
         is_encoder_decoder: bool = False,
         standardize_cache_format: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         # update past_key_values
         if int(transformers_version.split(".")[1]) >= 44:
             assert not standardize_cache_format

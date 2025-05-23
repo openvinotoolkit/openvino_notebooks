@@ -16,7 +16,7 @@ from sam2.utils.amg import (
     area_from_rle,
 )
 from torchvision.ops.boxes import batched_nms, box_area
-from typing import Tuple, List, Dict, Any
+from typing import Any
 
 import torch
 
@@ -54,9 +54,9 @@ class AutomaticMaskGenerationHelper:
         high_res_feats_256: np.ndarray,
         high_res_feats_128: np.ndarray,
         points: np.ndarray,
-        im_size: Tuple[int, ...],
-        crop_box: List[int],
-        orig_size: Tuple[int, ...],
+        im_size: tuple[int, ...],
+        crop_box: list[int],
+        orig_size: tuple[int, ...],
         iou_thresh,
         mask_threshold,
         stability_score_offset,
@@ -123,9 +123,9 @@ class AutomaticMaskGenerationHelper:
         self,
         image: np.ndarray,
         point_grids,
-        crop_box: List[int],
+        crop_box: list[int],
         crop_layer_idx: int,
-        orig_size: Tuple[int, ...],
+        orig_size: tuple[int, ...],
         box_nms_thresh: float = 0.7,
         mask_threshold: float = 0.0,
         points_per_batch: int = 64,
@@ -264,7 +264,7 @@ class AutomaticMaskGenerationHelper:
         crop_overlap_ratio: float = 512 / 1500,
         box_nms_thresh: float = 0.7,
         crop_nms_thresh: float = 0.7,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Generates masks for the given image.
 

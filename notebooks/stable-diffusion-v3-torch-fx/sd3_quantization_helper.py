@@ -1,6 +1,6 @@
 import gc
 import time
-from typing import Any, Dict, List
+from typing import Any
 import datasets
 import matplotlib.pyplot as plt
 import nncf
@@ -42,7 +42,7 @@ def disable_progress_bar(pipeline, disable=True):
 
 
 class CompiledModelDecorator(ov.CompiledModel):
-    def __init__(self, compiled_model: ov.CompiledModel, data_cache: List[Any] = None, keep_prob: float = 0.5):
+    def __init__(self, compiled_model: ov.CompiledModel, data_cache: list[Any] = None, keep_prob: float = 0.5):
         super().__init__(compiled_model)
         self.data_cache = data_cache if data_cache is not None else []
         self.keep_prob = keep_prob
@@ -53,7 +53,7 @@ class CompiledModelDecorator(ov.CompiledModel):
         return super().__call__(*args, **kwargs)
 
 
-def collect_calibration_data(ov_pipe, calibration_dataset_size: int, num_inference_steps: int, guidance_scale) -> List[Dict]:
+def collect_calibration_data(ov_pipe, calibration_dataset_size: int, num_inference_steps: int, guidance_scale) -> list[dict]:
     original_model = ov_pipe.transformer
     calibration_data = []
     ov_pipe.transformer = CompiledModelDecorator(original_model, calibration_data, keep_prob=1)

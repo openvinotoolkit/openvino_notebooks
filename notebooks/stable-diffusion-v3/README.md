@@ -8,15 +8,16 @@ More details about model can be found in [model card](https://huggingface.co/sta
 In this tutorial, we will consider how to convert Stable Diffusion v3 for running with OpenVINO. An additional part demonstrates how to run optimization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
 If you want to run previous Stable Diffusion versions, please check our other notebooks:
 
+* [Stable Diffusion V3 Torch.FX](../stable-diffusion-v3-torch-fx)
 * [Stable Diffusion](../stable-diffusion-text-to-image)
-* [Stable Diffusion v2](../stable-diffusion-v2)
+* [Stable Diffusion v2](../stable-diffusion-v2-infinite-zoom)
 * [Stable Diffusion XL](../stable-diffusion-xl)
 * [LCM Stable Diffusion](../latent-consistency-models-image-generation)
 * [Turbo SDXL](../sdxl-turbo)
 * [Turbo SD](../sketch-to-image-pix2pix-turbo)
 
 
-The notebooks provides a simple interface that allows communication with a model using text instruction. In this demonstration user can provide input instructions and the model generates an image. An additional part demonstrates how to optimize model with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline and reduce memory consumption. The torch FX notebook also follows a similar approach but showcasing the capabilities of [NNCF](https://github.com/openvinotoolkit/nncf/) and torch compile with openvino backend in successfully optimizing with the torch FX model representation.
+The notebooks provides a simple interface that allows communication with a model using text instruction. In this demonstration user can provide input instructions and the model generates an image. An additional part demonstrates how to optimize model with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline and reduce memory consumption.
 
 The image below illustrates the provided generated image example.
 
@@ -34,16 +35,6 @@ The OpenVINO tutorial consists of the following steps:
 - Convert model to OpenVINO intermediate representation (IR) format and compress weights using NNCF
 - Prepare OpenVINO Inference pipeline
 - Run Text-to-Image generation
-- Launch interactive demo
-
-The Torch FX tutorial consists of the following steps:
-
-- Install prerequisites
-- Collect Pytorch model pipeline
-- Convert model to Torch FX representation format and compress weights using NNCF
-- Compile the model using torch.compile with backend openvino
-- Run Text-to-Image generation
-- Compare the results of the original and optimized pipelines
 - Launch interactive demo
 
 ## Installation Instructions

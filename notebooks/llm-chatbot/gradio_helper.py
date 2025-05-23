@@ -1,4 +1,4 @@
-from typing import Callable, Literal
+from typing import Callable
 import gradio as gr
 from uuid import uuid4
 
@@ -55,7 +55,7 @@ def handle_user_message(message, history):
     return "", history + [[message, ""]]
 
 
-def make_demo(run_fn: Callable, stop_fn: Callable, title: str = "OpenVINO Chatbot", language: Literal["English", "Chinese", "Japanese"] = "English"):
+def make_demo(run_fn: Callable, stop_fn: Callable, title: str = "OpenVINO Chatbot", language: str = "English"):
     examples = chinese_examples if (language == "Chinese") else japanese_examples if (language == "Japanese") else english_examples
 
     with gr.Blocks(

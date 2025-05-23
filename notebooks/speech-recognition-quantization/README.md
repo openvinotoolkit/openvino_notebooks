@@ -1,21 +1,19 @@
-# Quantize Speech Recognition Models using NNCF PTQ API
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb)
+# Quantize Speech Recognition Models with accuracy control using NNCF PTQ API
 
-This tutorial demonstrates how to apply `INT8` quantization to the speech recognition models,
-using post-training quantization with [NNCF](https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/quantizing-models-post-training.html) (Neural Network Compression Framework).
+This tutorial demonstrates how to apply 8-bit quantization with accuracy control to the speech recognition model. The notebook shows how to apply post-training `INT8` quantization with accuracy control on a fine-tuned [Wav2Vec2-Base-960h](https://huggingface.co/facebook/wav2vec2-base-960h) [PyTorch](https://pytorch.org/) model, trained on the [LibriSpeech ASR corpus](https://www.openslr.org/12).
 
-The code of the tutorial is designed to be extendable to custom models and datasets.
+The code of the tutorial is designed to be extendable to the same model types trained on custom datasets.
 
-## Notebook Contents
+The advanced quantization flow allows to apply 8-bit quantization to the model with control of accuracy metric. This is achieved by keeping the most impactful operations within the model in the original precision. The flow is based on the [Quantizing with Accuracy Control](https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/quantizing-models-post-training/quantizing-with-accuracy-control.html) and has the following specifics:
 
-The tutorial consists of the following steps:
+- Besides the calibration dataset, a validation dataset is required to compute the accuracy metric. Both datasets can refer to the same data in the simplest case.
+- Validation function, used to compute accuracy metric is required. It can be a function that is already available in the source framework or a custom function.
+- Since accuracy validation is run several times during the quantization process, quantization with accuracy control can take more time than the Basic 8-bit quantization flow.
+- The resulted model can provide smaller performance improvement than the Basic 8-bit quantization flow because some of the operations are kept in the original precision.
 
-* Downloading and preparing the model and dataset.
-* Defining data loading and accuracy validation functionality.
-* Preparing the model for quantization.
-* Running quantization.
-* Comparing performance of the original and quantized models.
-* Compare accuracy of the original and quantized models.
+> **NOTE**: Currently, 8-bit quantization with accuracy control in NNCF is available only for models in OpenVINO representation.
+
+> **NOTE**: Quantization with accuracy control can take a long time and requires a lot of RAM. See details in each of the examples.
 
 ## Installation Instructions
 

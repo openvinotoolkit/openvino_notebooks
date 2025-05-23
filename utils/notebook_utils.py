@@ -10,7 +10,7 @@ import threading
 import time
 from os import PathLike
 from pathlib import Path
-from typing import List, NamedTuple, Optional, Tuple
+from typing import NamedTuple, Optional
 
 
 # ## Files
@@ -355,7 +355,7 @@ class VideoPlayer:
 
 class Label(NamedTuple):
     index: int
-    color: Tuple
+    color: tuple
     name: Optional[str] = None
 
 
@@ -363,7 +363,7 @@ class Label(NamedTuple):
 
 
 class SegmentationMap(NamedTuple):
-    labels: List
+    labels: list
 
     def get_colormap(self):
         import numpy as np
@@ -496,7 +496,7 @@ def viz_result_image(
     source_image=None,
     source_title: str = None,
     result_title: str = None,
-    labels: List[Label] = None,
+    labels: list[Label] = None,
     resize: bool = False,
     bgr_to_rgb: bool = False,
     hide_axes: bool = False,
@@ -510,7 +510,7 @@ def viz_result_image(
                          Set bgr_to_rgb to True if source_image is in BGR format.
     :param source_title: Title to display for the source image.
     :param result_title: Title to display for the result image.
-    :param labels: List of labels. If provided, a legend will be shown with the given labels.
+    :param labels: list of labels. If provided, a legend will be shown with the given labels.
     :param resize: If true, resize the result image to the same shape as the source image.
     :param bgr_to_rgb: If true, convert the source image from BGR to RGB. Use this option if
                        source_image is a BGR image.

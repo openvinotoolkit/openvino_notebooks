@@ -1,4 +1,4 @@
-from typing import Callable, Literal
+from typing import Callable
 import gradio as gr
 
 
@@ -39,7 +39,7 @@ def make_demo(
     stop_fn: Callable,
     update_retriever_fn: Callable,
     model_name: str,
-    language: Literal["English", "Chinese"] = "English",
+    language: str = "English",
 ):
     examples = chinese_examples if (language == "Chinese") else english_examples
 

@@ -11,7 +11,7 @@ Additionally, FLUX.1 Fill supports outpainting, enabling the user to extend imag
 
 You can find more details about the model in [blog post](https://blackforestlabs.ai/flux-1-tools/) and [model card](https://huggingface.co/black-forest-labs/FLUX.1-Fill-dev)
 
-In this tutorial, we consider how to convert and optimize FLUX.1 Fill for performing image editing using text prompt and binary mask.
+In this tutorial, we consider how to convert and optimize FLUX.1 Fill for performing image editing using text prompt and binary mask. You will learn how to convert model using [Optimum Intel](https://github.com/huggingface/optimum-intel), optimize it using [NNCF](https://github.com/openvinotoolkit/nncf) and run with [OpenVINO GenAI](https://github.com/openvinotoolkit/openvino.genai)
 
 ### Notebook Contents
 

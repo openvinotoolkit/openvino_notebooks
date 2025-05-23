@@ -1,18 +1,34 @@
-from typing import Callable
 import gradio as gr
+import torch
+from diffusers.utils import export_to_video
 
 
-def make_demo(fn: Callable):
+def make_demo(ov_pipe):
+    def generate(prompt, negative_prompt, width, height, num_frames, num_inference_steps, seed, _=gr.Progress(track_tqdm=True)):
+        generator = torch.Generator().manual_seed(seed)
+        video = ov_pipe(
+            prompt=prompt,
+            negative_prompt=negative_prompt,
+            width=width,
+            height=height,
+            num_frames=num_frames,
+            num_inference_steps=num_inference_steps,
+            generator=generator,
+        ).frames[0]
+        file_name = "output.mp4"
+        export_to_video(video, file_name, fps=24)
+        return file_name
+
     demo = gr.Interface(
-        fn=fn,
+        fn=generate,
         inputs=[
             gr.Textbox(label="Prompt"),
             gr.Textbox(label="Negative prompt"),
-            gr.Slider(32, 1280, value=704, label="Width", step=32),
-            gr.Slider(32, 720, value=480, label="Height", step=32),
-            gr.Slider(9, 257, value=25, label="Number of frames", step=8),
-            gr.Slider(10, 50, value=30, label="Number of inference steps", step=1),
-            gr.Slider(0, 1000000, value=42, label="Seed", step=1),
+            gr.Slider(minimum=32, maximum=1280, value=704, label="Width", step=32),
+            gr.Slider(minimum=32, maximum=720, value=480, label="Height", step=32),
+            gr.Slider(minimum=9, maximum=257, value=25, label="Number of frames", step=8),
+            gr.Slider(minimum=10, maximum=250, value=30, label="Number of inference steps", step=1),
+            gr.Slider(minimum=0, maximum=21000000, value=42, label="Seed", step=1),
         ],
         outputs=gr.Video(label="Result"),
         examples=[
@@ -71,6 +87,6 @@ def make_demo(fn: Callable):
                 42,
             ],
         ],
-        allow_flagging="never",
+        flagging_mode="never",
     )
     return demo

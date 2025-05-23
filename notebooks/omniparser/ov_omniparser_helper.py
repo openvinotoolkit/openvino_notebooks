@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List, Optional, Union, Tuple
+from typing import Optional, Union
 import types
 
 import cv2
@@ -119,9 +119,9 @@ class BoxAnnotator:
         self,
         scene: np.ndarray,
         detections: Detections,
-        labels: Optional[List[str]] = None,
+        labels: Optional[list[str]] = None,
         skip_label: bool = False,
-        image_size: Optional[Tuple[int, int]] = None,
+        image_size: Optional[tuple[int, int]] = None,
     ) -> np.ndarray:
         """
         Draws bounding boxes on the frame using the detections provided.
@@ -130,7 +130,7 @@ class BoxAnnotator:
             scene (np.ndarray): The image on which the bounding boxes will be drawn
             detections (Detections): The detections for which the
                 bounding boxes will be drawn
-            labels (Optional[List[str]]): An optional list of labels
+            labels (Optional[list[str]]): An optional list of labels
                 corresponding to each detection. If `labels` are not provided,
                 corresponding `class_id` will be used as label.
             skip_label (bool): Is set to `True`, skips bounding box label annotation.
@@ -376,7 +376,7 @@ def predict_yolo(model, image_path, box_threshold, imgsz):
 
 
 def remove_overlap(boxes, iou_threshold, ocr_bbox=None):
-    assert ocr_bbox is None or isinstance(ocr_bbox, List)
+    assert ocr_bbox is None or isinstance(ocr_bbox, list)
 
     def box_area(box):
         return (box[2] - box[0]) * (box[3] - box[1])
@@ -460,7 +460,7 @@ def get_parsed_content_icon(filtered_boxes, ocr_bbox, image_source, caption_mode
 
 
 def annotate(
-    image_source: np.ndarray, boxes: torch.Tensor, logits: torch.Tensor, phrases: List[str], text_scale: float, text_padding=5, text_thickness=2, thickness=3
+    image_source: np.ndarray, boxes: torch.Tensor, logits: torch.Tensor, phrases: list[str], text_scale: float, text_padding=5, text_thickness=2, thickness=3
 ) -> np.ndarray:
     """
     This function annotates an image with bounding boxes and labels.
@@ -469,7 +469,7 @@ def annotate(
     image_source (np.ndarray): The source image to be annotated.
     boxes (torch.Tensor): A tensor containing bounding box coordinates. in cxcywh format, pixel scale
     logits (torch.Tensor): A tensor containing confidence scores for each bounding box.
-    phrases (List[str]): A list of labels for each bounding box.
+    phrases (list[str]): A list of labels for each bounding box.
     text_scale (float): The scale of the text to be displayed. 0.8 for mobile/web, 0.3 for desktop # 0.4 for mind2web
 
     Returns:

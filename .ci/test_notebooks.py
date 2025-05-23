@@ -1,6 +1,5 @@
 import requests
 from pathlib import Path
-from typing import Set
 import pytest
 from scarf_pixel import check_scarf_tag
 
@@ -8,7 +7,7 @@ import toml
 from pip._internal.req import parse_requirements
 
 
-def get_parsed_requirements(requirements_file: str) -> Set:
+def get_parsed_requirements(requirements_file: str) -> set:
     """
     Returns a set of requirements that are defined in `requirements_file`,
     without versions

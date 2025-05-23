@@ -1,8 +1,6 @@
-# Quantization with accuracy control using NNCF
+# YOLOv11 quantization with accuracy control using NNCF
 
-These tutorials demonstrate how to apply 8-bit quantization with accuracy control to the speech recognition and YOLOv11 models::
-* `speech-recognition-quantization-wav2vec2.ipynb` demonstrates how to apply post-training `INT8` quantization with accuracy control on a fine-tuned [Wav2Vec2-Base-960h](https://huggingface.co/facebook/wav2vec2-base-960h) [PyTorch](https://pytorch.org/) model, trained on the [LibriSpeech ASR corpus](https://www.openslr.org/12).
-* `yolov11-quantization-with-accuracy-control.ipynb` demonstrates how to apply post-training `INT8` quantization on the [YOLOv11](https://github.com/ultralytics/) PyTorch model
+This tutorial demonstrate how to apply 8-bit quantization with accuracy control to the YOLOv11 model. The notebook shows how to apply post-training `INT8` quantization on the [YOLOv11](https://github.com/ultralytics/) PyTorch model.
 
 The code of the tutorials is designed to be extendable to the same model types trained on custom datasets.
 
@@ -23,4 +21,4 @@ This is a self-contained example that relies solely on its own code.</br>
 We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/quantizing-model-with-accuracy-control/README.md" />
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/yolov11-quantization-with-accuracy-control/README.md" />
