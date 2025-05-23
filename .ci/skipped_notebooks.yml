@@ -1,9 +1,3 @@
-- notebook: notebooks/speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2019
 - notebook: notebooks/gpu-device/gpu-device.ipynb
   skips:
     - os:
@@ -20,13 +14,13 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb
+- notebook: notebooks/speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb
   skips:
     - os:
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb
+- notebook: notebooks/yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb
   skips:
     - os:
         - macos-13
@@ -72,31 +66,13 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.ipynb
+- notebook: notebooks/stable-diffusion-v2-infinite-zoom/stable-diffusion-v2-infinite-zoom.ipynb
   skips:
     - os:
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2019
-- notebook: notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image-demo.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2019
-- notebook: notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2019
-- notebook: notebooks/stable-diffusion-v3/stable-diffusion-v3-torch-fx.ipynb
+- notebook: notebooks/stable-diffusion-v3-torch-fx/stable-diffusion-v3-torch-fx.ipynb
   skips:
     - os:
         - macos-13
@@ -190,13 +166,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2019
-- notebook: notebooks/latent-consistency-models-image-generation/latent-consistency-models-optimum-demo.ipynb
+- notebook: notebooks/lcm-lora-controlnet/lcm-lora-controlnet.ipynb
   skips:
     - os:
         - macos-13
@@ -393,7 +363,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb
+- notebook: notebooks/llm-agent-rag-llamaindex/llm-agent-rag-llamaindex.ipynb
   skips:
     - os:
       - macos-13
@@ -443,7 +413,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
-- notebook: notebooks/llm-agent-react/llm-agent-react.ipynb
+- notebook: notebooks/llm-native-agent-react/llm-native-agent-react.ipynb
   skips:
     - os:
         - macos-13
@@ -463,7 +433,7 @@
   skips:
     - os:
         - macos-13
-- notebook: notebooks/llm-agent-react/llm-agent-react-langchain.ipynb
+- notebook: notebooks/llm-agent-react-langchain/llm-agent-react-langchain.ipynb
   skips:
     - os:
         - macos-13
@@ -560,3 +530,19 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/deepseek-vl2/deepseek-vl2.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/intern-video2-classiciation/intern-video2-classification.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2019
+- notebook: notebooks/openvoice2-and-melotts/openvoice2-and-melotts.ipynb
+  skips:
+    - os:
+        - macos-13

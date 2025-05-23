@@ -1,7 +1,6 @@
 import csv
 import json
 from pathlib import Path
-from typing import Dict
 from validation_config import ValidationMatrix
 
 REPORTS_DIR = "test_reports"
@@ -11,7 +10,7 @@ def get_report_file_path(device: str, os: str, python: str) -> Path:
     return Path(REPORTS_DIR) / f"{device}-{os}-{python}" / "test_report.csv"
 
 
-def get_default_status_dict(notebook_name: str) -> Dict:
+def get_default_status_dict(notebook_name: str) -> dict:
     default_status = None
 
     def _get_python_dict():
@@ -26,7 +25,7 @@ def get_default_status_dict(notebook_name: str) -> Dict:
     }
 
 
-def write_json_file(filename: str, data: Dict):
+def write_json_file(filename: str, data: dict):
     with open(filename, "w") as file:
         json.dump(data, file, indent=2)
 

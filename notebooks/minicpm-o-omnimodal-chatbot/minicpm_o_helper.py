@@ -12,7 +12,7 @@ from transformers.modeling_attn_mask_utils import _prepare_4d_attention_mask
 from pathlib import Path
 from huggingface_hub import snapshot_download
 import types
-from typing import Optional, Tuple, List, Union
+from typing import Optional, Union
 
 try:
     from openvino import opset13
@@ -29,11 +29,18 @@ except ImportError:
 import time
 
 text_emb_path = Path("language_model/embed_tokens.xml")
-image_emb_path = Path("image_encoder.xml")
-resampler_path = Path("resampler.xml")
 llm_path = Path("language_model/language_model.xml")
-audio_emb_path = Path("audio_encoder.xml")
+image_encoder_path = Path("image_encoder.xml")
+resampler_path = Path("resampler.xml")
+audio_encoder_path = Path("audio_encoder.xml")
 proejector_path = Path("proejector.xml")
+
+
+def copy_llm_files(src_dir, dst_dir):
+    for f in src_dir.glob("*"):
+        if f.name in ("language_model.xml", "language_model.bin"):
+            continue
+        shutil.copy(f, dst_dir / f.name)
 
 
 class InsertSlice(MatcherPass):
@@ -91,8 +98,8 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
 
 def fuse_cache_reorder(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
     gather_dim: int,
 ):
     """
@@ -108,9 +115,9 @@ def fuse_cache_reorder(
     Parameters:
       ov_model (`ov.Model`):
           openvino model for processing
-      not_kv_inputs (`List[str]`):
+      not_kv_inputs (`list[str]`):
           list of input nodes in model that not related to past key values
-      key_value_input_names (`List[str]`):
+      key_value_input_names (`list[str]`):
           list of names for key value input layers
       gather_dim (int):
           dimension for gathering cache during reorder pass
@@ -162,9 +169,9 @@ def build_state_initializer(ov_model: ov.Model, batch_dim: int):
 
 def make_stateful(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
-    key_value_output_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
+    key_value_output_names: list[str],
     batch_dim: int,
     num_attention_heads: int,
     num_beams_and_batch: int = None,
@@ -175,11 +182,11 @@ def make_stateful(
     Parameters:
         ov_model (ov.Model):
             openvino model
-        not_kv_inputs (`List[str]`):
+        not_kv_inputs (`list[str]`):
             list of input nodes in model that not related to past key values
-        key_value_input_names (`List[str]`):
+        key_value_input_names (`list[str]`):
             list of names for key value input layers
-        key_value_output_names (`List[str]`):
+        key_value_output_names (`list[str]`):
             list of names for key value input layers
         batch_dim (int):
             index of batch dimension in key value layers
@@ -305,24 +312,35 @@ def patch_model_code(orig_model_dir):
         with orig_model_file.open("r") as f:
             content = f.read()
             content = content.replace("if is_flash_attn_2_available():", "")
-            content = content.replace("from flash_attn import flash_attn_func, flash_attn_varlen_func", "")
-            content = content.replace("from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input", "")
+            content = content.replace("from flash_attn import flash_attn_func", "")
+            content = content.replace("from flash_attn.bert_padding import index_first_axis", "")
+            content = content.replace("from flash_attn.bert_padding import pad_input", "")
+            content = content.replace("ffrom flash_attn.bert_padding import unpad_input", "")
 
             with model_file.open("w") as out_f:
+                out_f.write(content)
+    resampler_file = orig_model_dir / "resampler.py"
+    orig_resampler_file = resampler_path.parent / ("orig_" + resampler_file.name)
+    if not orig_resampler_file.exists():
+        resampler_file.rename(orig_resampler_file)
+        with orig_resampler_file.open("r") as f:
+            content = f.read()
+            content = content.replace("from typing import Tuple", "from typing import Tuple, List")
+            with resampler_file.open("w") as out_f:
                 out_f.write(content)
 
 
 def convert_llm(model, model_dir):
     model.llm.config.save_pretrained(model_dir / text_emb_path.parent)
     if not (model_dir / text_emb_path).exists():
-        print("⌛ ConvertText embedding model")
+        print("⌛ Convert Text Embedding model")
         ov_model = ov.convert_model(model.llm.model.embed_tokens, example_input=torch.ones([1, 10], dtype=torch.long))
 
         ov.save_model(ov_model, model_dir / text_emb_path)
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
-        print("✅ Text embedding model successfully converted")
+        print("✅ Text Embedding model successfully converted")
 
     if not (model_dir / llm_path).exists():
         print("⌛ Convert Language model")
@@ -346,7 +364,28 @@ def convert_llm(model, model_dir):
 
         example_input = {"inputs_embeds": input_embeds, "attention_mask": attention_mask, "position_ids": position_ids, "past_key_values": past_key_values}
 
-        model.llm.config.torchscript = True
+        def forward_wrap(
+            self,
+            attention_mask,
+            position_ids=None,
+            past_key_values=None,
+            inputs_embeds=None,
+        ):
+            from transformers.cache_utils import DynamicCache
+
+            if past_key_values is not None:
+                pkv = DynamicCache.from_legacy_cache(past_key_values)
+            result = self._orig_forward(
+                input_ids=None,
+                attention_mask=attention_mask,
+                position_ids=position_ids,
+                past_key_values=pkv,
+                inputs_embeds=inputs_embeds,
+            )
+            return (result.logits, result.past_key_values.to_legacy_cache())
+
+        model.llm._orig_forward = model.llm.forward
+        model.llm.forward = types.MethodType(forward_wrap, model.llm)
 
         ov_model = ov.convert_model(model.llm, example_input=example_input)
 
@@ -370,8 +409,8 @@ def convert_llm(model, model_dir):
 
 def convert_vision_encoder(model, model_dir):
     tgt_sizes = torch.tensor([[24, 43]])
-    if not (model_dir / image_emb_path).exists():
-        print("⌛ Convert Image embedding model")
+    if not (model_dir / image_encoder_path).exists():
+        print("⌛ Convert Image Encoder model")
 
         def siglip_vis_embed_forward(
             self,
@@ -423,7 +462,7 @@ def convert_vision_encoder(model, model_dir):
             hidden_states: torch.Tensor,
             attention_mask: Optional[torch.Tensor] = None,
             output_attentions: Optional[bool] = False,
-        ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
+        ) -> tuple[torch.Tensor, Optional[torch.Tensor], Optional[tuple[torch.Tensor]]]:
             """Input shape: Batch x Time x Channel"""
 
             batch_size, q_len, _ = hidden_states.size()
@@ -456,7 +495,7 @@ def convert_vision_encoder(model, model_dir):
             output_attentions: Optional[bool] = None,
             output_hidden_states: Optional[bool] = None,
             return_dict: Optional[bool] = None,
-        ) -> Union[Tuple, BaseModelOutputWithPooling]:
+        ) -> Union[tuple, BaseModelOutputWithPooling]:
             output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
             output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
             return_dict = return_dict if return_dict is not None else self.config.use_return_dict
@@ -514,13 +553,13 @@ def convert_vision_encoder(model, model_dir):
             pixel_values, patch_attn_mask, tgt_sizes, model.config.vision_config.patch_size, model.config.vision_config.image_size // model.config.patch_size
         )
         ov_model = ov.convert_model(vpm, example_input={"pixel_values": pixel_values, "position_ids": position_ids, "patch_attention_mask": patch_attn_mask})
-        ov.save_model(ov_model, model_dir / image_emb_path)
+        ov.save_model(ov_model, model_dir / image_encoder_path)
         del ov_model
         cleanup_torchscript_cache()
         # del vpm
         # del model.vpm
         gc.collect()
-        print("✅ Image embedding model successfully converted")
+        print("✅ Image Encoder model successfully converted")
 
     if not (model_dir / resampler_path).exists():
         print("⌛ Convert Resamler model")
@@ -566,7 +605,7 @@ def convert_vision_encoder(model, model_dir):
 
 
 def convert_audio_encoder(model, model_dir):
-    if not (model_dir / audio_emb_path).exists():
+    if not (model_dir / audio_encoder_path).exists():
 
         def forward_wrap(self, input_features, attention_mask):
             audio_states = self._orig_forward(input_features, output_hidden_states=True, attention_mask=attention_mask).hidden_states[self.audio_encoder_layer]
@@ -579,20 +618,25 @@ def convert_audio_encoder(model, model_dir):
         model._orig_forward = model.apm.forward
         model.forward = types.MethodType(forward_wrap, model)
 
-        print("⌛ Convert Audio embedding model")
+        print("⌛ Convert Audio Encoder model")
         input_features = torch.randn([2, 80, 1515])
         attention_mask = torch.ones([2, 1, 758, 758])
         ov_model = ov.convert_model(model, example_input=[input_features, attention_mask])
-        ov.save_model(ov_model, model_dir / audio_emb_path)
+        ov.save_model(ov_model, model_dir / audio_encoder_path)
         del ov_model
         cleanup_torchscript_cache()
-        print("✅ Audio embedding model successfully converted")
+        print("✅ Audio Encoder model successfully converted")
 
 
 def convert_minicpmo26(model_id, remove_checkpoint=False):
     model_dir = Path(model_id.split("/")[-1])
     requires_conversion = not all(
-        [(model_dir / text_emb_path).exists(), (model_dir / image_emb_path).exists(), (model_dir / resampler_path).exists(), (model_dir / llm_path).exists()]
+        [
+            (model_dir / text_emb_path).exists(),
+            (model_dir / image_encoder_path).exists(),
+            (model_dir / resampler_path).exists(),
+            (model_dir / llm_path).exists(),
+        ]
     )
 
     if not requires_conversion:
@@ -604,7 +648,7 @@ def convert_minicpmo26(model_id, remove_checkpoint=False):
     ckpt = model_dir / "ckpt"
     if not ckpt.exists():
         snapshot_download(model_id, local_dir=ckpt, force_download=True)
-        # patch_model_code(ckpt)
+        patch_model_code(ckpt)
     model = AutoModel.from_pretrained(
         model_id,
         trust_remote_code=True,
@@ -628,14 +672,6 @@ def convert_minicpmo26(model_id, remove_checkpoint=False):
     convert_audio_encoder(model, model_dir)
     print(f"✅ {model_id} model sucessfully converted. You can find results in {model_dir}")
     return model_dir
-
-
-def copy_llm_files(model_dir, dst_dir):
-    shutil.copy(model_dir / text_emb_path, model_dir / dst_dir / text_emb_path.name)
-    shutil.copy(model_dir / text_emb_path.with_suffix(".bin"), model_dir / dst_dir / text_emb_path.with_suffix(".bin").name)
-    shutil.copy(model_dir / llm_path.parent / "config.json", model_dir / dst_dir / "config.json")
-    shutil.copy(model_dir / llm_path.parent / "configuration_minicpm.py", model_dir / dst_dir / "configuration_minicpm.py")
-    shutil.copy(model_dir / llm_path.parent / "modeling_navit_siglip.py", model_dir / dst_dir / "modeling_navit_siglip.py")
 
 
 def prepare_vis_position_ids(pixel_values, patch_attention_mask, tgt_sizes, patch_size, num_patches_per_side):
@@ -668,7 +704,7 @@ def prepare_vis_position_ids(pixel_values, patch_attention_mask, tgt_sizes, patc
 core = ov.Core()
 
 
-class OvModelForCausalLMWithEmb(GenerationMixin):
+class OVModelForCausalLMWithEmb(GenerationMixin):
     def __init__(self, model_dir, device="CPU", ov_config=None, compile=True, slice_lm_head=True) -> None:
         self._supports_cache_class = False
         self.config = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)
@@ -730,7 +766,7 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         self,
         input_ids: torch.LongTensor,
         attention_mask: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
+        past_key_values: Optional[tuple[tuple[torch.FloatTensor]]] = None,
         position_ids: Optional[torch.LongTensor] = None,
         inputs_embeds: Optional[torch.FloatTensor] = None,
         **kwargs,
@@ -787,7 +823,7 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         self,
         input_ids: torch.LongTensor,
         attention_mask: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
+        past_key_values: Optional[tuple[tuple[torch.FloatTensor]]] = None,
         position_ids: Optional[torch.LongTensor] = None,
         inputs_embeds: Optional[torch.LongTensor] = None,
         **kwargs,
@@ -859,7 +895,7 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         return self._past_length
 
     # Adapted from transformers.models.gpt2.modeling_gpt2.GPT2LMHeadModel._reorder_cache
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
         [`~PreTrainedModel.beam_sample`] is called.
@@ -877,7 +913,7 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         return self.forward(*args, **kwargs)
 
 
-class OvMiniCPMO:
+class OVMiniCPMO:
     def __init__(self, config, vpm, resampler, apm, llm, processor):
         self.config = config
         self.llm = llm
@@ -1087,12 +1123,12 @@ class OvMiniCPMO:
         Args:
             data (dict):
                 - **"audio_features"** (`torch.FloatTensor`): Input mel-spectrograms of shape `(batch_size, 80, frames)`.
-                - **"audio_feature_lens"** (List[List[int]]): Lengths of each audio segment for each item in the batch.
+                - **"audio_feature_lens"** (list[list[int]]): Lengths of each audio segment for each item in the batch.
             chunk_length (int, optional): Determines whether to use full attention (-1) or chunk-based
                 attention (>0) during embedding computation.
 
         Returns:
-            List[List[torch.Tensor]]: audio embeddings
+            list[list[torch.Tensor]]: audio embeddings
         """
 
         wavforms = data.get("audio_features", [])  # (bs, 80, frames) or [], multi audios need filled in advance
@@ -1608,13 +1644,13 @@ class OvMiniCPMO:
 
 def init_model(model_dir, llm_model_dir, device):
     config = AutoConfig.from_pretrained(model_dir, trust_remote_code=True)
-    llm = OvModelForCausalLMWithEmb(model_dir / llm_model_dir, device)
-    img_emb = core.compile_model(model_dir / image_emb_path, device)
-    aud_emb = core.compile_model(model_dir / audio_emb_path, device)
+    llm = OVModelForCausalLMWithEmb(model_dir / llm_model_dir, device)
+    img_emb = core.compile_model(model_dir / image_encoder_path, device)
+    aud_emb = core.compile_model(model_dir / audio_encoder_path, device)
     resampler = core.compile_model(model_dir / resampler_path, device)
     processor = AutoProcessor.from_pretrained(model_dir, trust_remote_code=True)
 
-    ov_model = OvMiniCPMO(config, img_emb, resampler, aud_emb, llm, processor)
+    ov_model = OVMiniCPMO(config, img_emb, resampler, aud_emb, llm, processor)
     return ov_model
 
 

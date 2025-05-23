@@ -1,12 +1,12 @@
 from pathlib import Path
-from typing import List, TypedDict
+from typing import TypedDict
 import gradio as gr
 
 sample_path = Path("data")
 
 
 class Option(TypedDict):
-    choices: List[str]
+    choices: list[str]
     value: str
 
 

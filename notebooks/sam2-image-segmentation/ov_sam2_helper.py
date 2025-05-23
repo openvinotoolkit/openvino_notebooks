@@ -1,12 +1,9 @@
 import matplotlib.pyplot as plt
 
-from typing import Tuple
-
 import torch
 
 
 from copy import deepcopy
-from typing import Tuple
 from torchvision.transforms.functional import resize, to_pil_image
 
 import numpy as np
@@ -82,7 +79,7 @@ class ResizeLongestSide:
         target_size = self.get_preprocess_shape(image.shape[0], image.shape[1], self.target_length)
         return np.array(resize(to_pil_image(image), target_size))
 
-    def apply_coords(self, coords: np.ndarray, original_size: Tuple[int, ...]) -> np.ndarray:
+    def apply_coords(self, coords: np.ndarray, original_size: tuple[int, ...]) -> np.ndarray:
         """
         Expects a numpy array of length 2 in the final dimension. Requires the
         original image size in (H, W) format.
@@ -94,7 +91,7 @@ class ResizeLongestSide:
         coords[..., 1] = coords[..., 1] * (new_h / old_h)
         return coords
 
-    def apply_boxes(self, boxes: np.ndarray, original_size: Tuple[int, ...]) -> np.ndarray:
+    def apply_boxes(self, boxes: np.ndarray, original_size: tuple[int, ...]) -> np.ndarray:
         """
         Expects a numpy array shape Bx4. Requires the original image size
         in (H, W) format.
@@ -103,7 +100,7 @@ class ResizeLongestSide:
         return boxes.reshape(-1, 4)
 
     @staticmethod
-    def get_preprocess_shape(oldh: int, oldw: int, long_side_length: int) -> Tuple[int, int]:
+    def get_preprocess_shape(oldh: int, oldw: int, long_side_length: int) -> tuple[int, int]:
         """
         Compute the output size given input size and target long side length.
         """

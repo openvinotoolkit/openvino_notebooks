@@ -20,7 +20,7 @@ import threading
 import time
 from collections import deque
 from pathlib import Path
-from typing import Dict, Set, List, Optional, Callable
+from typing import Optional, Callable
 
 import cv2
 
@@ -39,7 +39,7 @@ open("notebook_utils.py", "w").write(r.text)
 from notebook_utils import show_array
 
 
-def show_live_inference(ie, image_paths: List, model: Model, device: str, reader: Optional[Callable] = None):
+def show_live_inference(ie, image_paths: list, model: Model, device: str, reader: Optional[Callable] = None):
     """
     Do inference of images listed in `image_paths` on `model` on the given `device` and show
     the results in real time in a Jupyter Notebook
@@ -121,7 +121,7 @@ def parse_devices(device_string):
     return (device_string,)
 
 
-def parse_value_per_device(devices: Set[str], values_string: str) -> Dict[str, int]:
+def parse_value_per_device(devices: set[str], values_string: str) -> dict[str, int]:
     """Format: <device1>:<value1>,<device2>:<value2> or just <value>"""
     values_string_upper = values_string.upper()
     result = {}
@@ -139,7 +139,7 @@ def parse_value_per_device(devices: Set[str], values_string: str) -> Dict[str, i
     return result
 
 
-def get_user_config(flags_d: str, flags_nstreams: str, flags_nthreads: int) -> Dict[str, str]:
+def get_user_config(flags_d: str, flags_nstreams: str, flags_nthreads: int) -> dict[str, str]:
     config = {}
 
     devices = set(parse_devices(flags_d))

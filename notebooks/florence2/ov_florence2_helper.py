@@ -1,7 +1,7 @@
 import gc
 import types
 from pathlib import Path
-from typing import Optional, Tuple, List
+from typing import Optional
 
 import huggingface_hub as hf_hub
 import openvino as ov
@@ -71,8 +71,8 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
 
 def fuse_cache_reorder(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
     gather_dim: int,
 ):
     """
@@ -88,9 +88,9 @@ def fuse_cache_reorder(
     Parameters:
       ov_model (`ov.Model`):
           openvino model for processing
-      not_kv_inputs (`List[str]`):
+      not_kv_inputs (`list[str]`):
           list of input nodes in model that not related to past key values
-      key_value_input_names (`List[str]`):
+      key_value_input_names (`list[str]`):
           list of names for key value input layers
       gather_dim (int):
           dimension for gathering cache during reorder pass
@@ -140,9 +140,9 @@ def build_state_initializer(ov_model: ov.Model, batch_dim: int):
 
 def make_stateful(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
-    key_value_output_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
+    key_value_output_names: list[str],
     batch_dim: int,
     num_attention_heads: int,
     num_beams_and_batch: int = None,
@@ -153,11 +153,11 @@ def make_stateful(
     Parameters:
         ov_model (ov.Model):
             openvino model
-        not_kv_inputs (`List[str]`):
+        not_kv_inputs (`list[str]`):
             list of input nodes in model that not related to past key values
-        key_value_input_names (`List[str]`):
+        key_value_input_names (`list[str]`):
             list of names for key value input layers
-        key_value_output_names (`List[str]`):
+        key_value_output_names (`list[str]`):
             list of names for key value input layers
         batch_dim (int):
             index of batch dimension in key value layers
@@ -560,7 +560,7 @@ class OVDecoder:
         input_ids: torch.LongTensor,
         encoder_hidden_states: torch.FloatTensor,
         encoder_attention_mask: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
+        past_key_values: Optional[tuple[tuple[torch.FloatTensor]]] = None,
         decoder_attention_mask: Optional[torch.LongTensor] = None,
     ) -> Seq2SeqLMOutput:
         # Model inputs
@@ -637,7 +637,7 @@ class OVDecoder:
             return self._past_length
         return past_key_values[0][0].shape[-2]
 
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
         [`~PreTrainedModel.beam_sample`] is called.
@@ -734,8 +734,8 @@ class OVFlorence2LangModel(GenerationMixin):
         attention_mask: Optional[torch.Tensor] = None,
         decoder_input_ids: Optional[torch.LongTensor] = None,
         decoder_attention_mask: Optional[torch.LongTensor] = None,
-        encoder_outputs: Optional[List[torch.FloatTensor]] = None,
-        past_key_values: Optional[List[torch.FloatTensor]] = None,
+        encoder_outputs: Optional[list[torch.FloatTensor]] = None,
+        past_key_values: Optional[list[torch.FloatTensor]] = None,
         inputs_embeds: Optional[torch.FloatTensor] = None,
         **kwargs,
     ):

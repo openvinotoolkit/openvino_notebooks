@@ -3,7 +3,7 @@ from transformers import MllamaForConditionalGeneration, AutoProcessor, AutoConf
 from transformers.cache_utils import DynamicCache, Cache
 from transformers.models.llama.modeling_llama import repeat_kv
 from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
-from typing import Optional, Union, List, Tuple, Dict
+from typing import Optional, Union
 from transformers.generation import GenerationMixin
 from transformers.modeling_outputs import ModelOutput, BaseModelOutput
 
@@ -39,7 +39,7 @@ def cleanup_torchscript_cache():
     torch.jit._state._clear_class_state()
 
 
-def _add_runtime_options_to_rt_info(model: ov.Model, options: Dict):
+def _add_runtime_options_to_rt_info(model: ov.Model, options: dict):
     """
     Add runtime optinos
     """
@@ -124,8 +124,8 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
 
 def fuse_cache_reorder(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
     gather_dim: int,
 ):
     """
@@ -141,9 +141,9 @@ def fuse_cache_reorder(
     Parameters:
       ov_model (`ov.Model`):
           openvino model for processing
-      not_kv_inputs (`List[str]`):
+      not_kv_inputs (`list[str]`):
           list of input nodes in model that not related to past key values
-      key_value_input_names (`List[str]`):
+      key_value_input_names (`list[str]`):
           list of names for key value input layers
       gather_dim (int):
           dimension for gathering cache during reorder pass
@@ -195,9 +195,9 @@ def build_state_initializer(ov_model: ov.Model, batch_dim: int):
 
 def make_stateful(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
-    key_value_output_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
+    key_value_output_names: list[str],
     batch_dim: int,
     num_attention_heads: int,
     num_beams_and_batch: int = None,
@@ -208,11 +208,11 @@ def make_stateful(
     Parameters:
         ov_model (ov.Model):
             openvino model
-        not_kv_inputs (`List[str]`):
+        not_kv_inputs (`list[str]`):
             list of input nodes in model that not related to past key values
-        key_value_input_names (`List[str]`):
+        key_value_input_names (`list[str]`):
             list of names for key value input layers
-        key_value_output_names (`List[str]`):
+        key_value_output_names (`list[str]`):
             list of names for key value input layers
         batch_dim (int):
             index of batch dimension in key value layers
@@ -329,7 +329,7 @@ def convert_mllama(model_id, out_dir):
             output_attentions: Optional[bool] = None,
             output_hidden_states: Optional[bool] = None,
             return_dict: Optional[bool] = None,
-        ) -> Union[BaseModelOutput, Tuple[torch.Tensor, ...]]:
+        ) -> Union[BaseModelOutput, tuple[torch.Tensor, ...]]:
 
             output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
             output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
@@ -508,9 +508,9 @@ def convert_mllama(model_id, out_dir):
             position_ids: Optional[torch.LongTensor] = None,
             cross_attention_mask: Optional[torch.LongTensor] = None,
             cache_position: Optional[torch.LongTensor] = None,
-            full_text_row_masked_out_mask: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
-            past_key_values: Optional[List[torch.FloatTensor]] = None,
-            cross_attn_key_values: Optional[List[torch.FloatTensor]] = None,
+            full_text_row_masked_out_mask: Optional[tuple[torch.Tensor, torch.Tensor]] = None,
+            past_key_values: Optional[list[torch.FloatTensor]] = None,
+            cross_attn_key_values: Optional[list[torch.FloatTensor]] = None,
         ):
             common_cache = []
             self_cache_id = 0
@@ -546,7 +546,7 @@ def convert_mllama(model_id, out_dir):
             output_attentions: bool = False,
             use_cache: bool = None,
             cache_position: Optional[torch.LongTensor] = None,
-        ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
+        ) -> tuple[torch.Tensor, Optional[torch.Tensor], Optional[tuple[torch.Tensor]]]:
             """Input shape: Batch x Time x Channel"""
             bsz, q_len, _ = hidden_states.size()
             query_states = self.q_proj(hidden_states)
@@ -768,10 +768,10 @@ core = ov.Core()
 class MLlamaOutputWithPast(ModelOutput):
     loss: Optional[torch.FloatTensor] = None
     logits: torch.FloatTensor = None
-    past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
-    attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
-    cross_attn_key_values: Optional[List[torch.FloatTensor]] = None
+    past_key_values: Optional[tuple[tuple[torch.FloatTensor]]] = None
+    hidden_states: Optional[tuple[torch.FloatTensor, ...]] = None
+    attentions: Optional[tuple[torch.FloatTensor, ...]] = None
+    cross_attn_key_values: Optional[list[torch.FloatTensor]] = None
 
 
 class OVMLlamaForConditionalGeneration(GenerationMixin):
@@ -779,7 +779,7 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         self,
         model_dir: Union[str, Path],
         device: str = "CPU",
-        ov_config: Optional[Dict[str, str]] = None,
+        ov_config: Optional[dict[str, str]] = None,
         language_model_name=None,
         image_encoder_name=None,
         slice_lm_head=True,
@@ -882,13 +882,13 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         self,
         input_ids: torch.LongTensor = None,
         pixel_values: Optional[torch.FloatTensor] = None,
-        aspect_ratio_mask: Optional[List[List[int]]] = None,
+        aspect_ratio_mask: Optional[list[list[int]]] = None,
         aspect_ratio_ids: Optional[torch.Tensor] = None,
-        attention_mask: Optional[List[List[List[int]]]] = None,
+        attention_mask: Optional[list[list[list[int]]]] = None,
         cross_attention_mask: Optional[torch.Tensor] = None,
         cross_attention_states: Optional[torch.Tensor] = None,
         position_ids: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[List[torch.FloatTensor]] = None,
+        past_key_values: Optional[list[torch.FloatTensor]] = None,
         inputs_embeds: Optional[torch.FloatTensor] = None,
         labels: Optional[torch.LongTensor] = None,
         use_cache: Optional[bool] = None,
@@ -896,9 +896,9 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
         cache_position: Optional[torch.LongTensor] = None,
-        cross_attn_key_values: Optional[List[torch.Tensor]] = None,
+        cross_attn_key_values: Optional[list[torch.Tensor]] = None,
         num_logits_to_keep: int = 0,
-    ) -> Union[Tuple, MLlamaOutputWithPast]:
+    ) -> Union[tuple, MLlamaOutputWithPast]:
         r"""
         Args:
             labels (`torch.LongTensor` of shape `(batch_size, sequence_length)`, *optional*):
@@ -1027,7 +1027,7 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
             **kwargs,
         )
 
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
         [`~PreTrainedModel.beam_sample`] is called.
@@ -1114,13 +1114,13 @@ class OVMLlamaForConditionalGeneration(GenerationMixin):
     def _prepare_cross_attention_mask(
         self,
         cross_attention_mask: torch.Tensor,
-        past_key_values: Tuple,
+        past_key_values: tuple,
         num_vision_tokens: int,
         cross_attention_states: torch.Tensor,
-        cross_attention_layers: List[int],
+        cross_attention_layers: list[int],
         device: str,
         dtype: str,
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         if cross_attention_mask is None:
             # should we raise error or prepare a full attn mask with all ones?
             return None, None

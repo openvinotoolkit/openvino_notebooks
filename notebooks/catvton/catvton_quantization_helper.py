@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 from pathlib import Path
 import pickle
 
@@ -37,7 +37,7 @@ class CompiledModelDecorator(ov.CompiledModel):
     def __init__(
         self,
         compiled_model: ov.CompiledModel,
-        data_cache: List[Any] = None,
+        data_cache: list[Any] = None,
         keep_prob: float = 1.0,
     ):
         super().__init__(compiled_model)

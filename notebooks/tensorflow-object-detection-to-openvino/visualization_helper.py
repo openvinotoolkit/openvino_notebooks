@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Optional
 import numpy as np
 import cv2
 
@@ -124,7 +124,7 @@ def get_mask_frame(box, frame, mask):
 def visualize_inference_result(
     inference_result: OVDict,
     image: np.ndarray,
-    labels_map: Dict,
+    labels_map: dict,
     detections_limit: Optional[int] = None,
 ):
     """
@@ -136,7 +136,7 @@ def visualize_inference_result(
         Result of the compiled model inference on the test image
     image : np.ndarray
         Original image to use for visualization
-    labels_map : Dict
+    labels_map : dict
         Dictionary with mappings of detection classes numbers and its names
     detections_limit : int, optional
         Number of detections to show on the image, if not provided all detections will be shown (default is None)

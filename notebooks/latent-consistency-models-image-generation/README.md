@@ -42,37 +42,6 @@ The notebook also provides interactive interface for image generation based on u
     <img src="https://user-images.githubusercontent.com/29454499/284298771-708cc873-ccea-40b8-a681-de1ddc97ae94.gif"/>
 </p>
 
-## Using models prepared using LCM LoRA
-
-The LCM LoRA allows to training of just a small number of adapters, known as LoRA layers, instead of the full model. The resulting LoRAs can then be applied to any fine-tuned version of the model without having to distill them separately. The benefit of this LCM LoRA distillation process is that it can be integrated into the existing inference pipelines without changes to the main code, for example, into the ControlNet-guided Stable Diffusion pipeline. More details about LCM LoRA can be found in the [technical report](https://arxiv.org/abs/2311.05556) and [blog post](https://huggingface.co/blog/lcm_lora)
-
-
-### Notebook Contents
-
-This [notebook](./lcm-lora-controlnet.ipynb) explores how to speed up ControlNet pipeline using LCM LoRA and OpenVINO. It demonstrates how to apply [LCM LoRA](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5) and convert and run [stable-diffusion-1.5](https://huggingface.co/botp/stable-diffusion-v1-5) conditioned by [ConrolNet Normal Mapping](https://huggingface.co/lllyasviel/control_v11p_sd15_normalbae) using OpenVINO. An additional part demonstrates how to run quantization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
-
-The following image shows an example of the input sequence, input image, condition image and corresponding predicted image.
-
-
-
-**Input text:** A head full of roses
-
-<p align="center">
-    <img src="https://user-images.githubusercontent.com/29454499/284291731-9c4ee978-a934-43ea-9484-b6b91a9f9407.png"/>
-</p>
-
-1. Convert PyTorch models to OpenVINO Intermediate Representation using [OpenVINO Model Conversion API](https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html#convert-a-model-with-python-convert-model)
-2. Prepare Inference Pipeline.
-3. Run Inference pipeline with OpenVINO.
-4. Optimize `OVControlNetStableDiffusionPipeline` with [NNCF](https://github.com/openvinotoolkit/nncf/) quantization.
-5. Compare results of original and optimized pipelines.
-6. Run Interactive demo.
-
-The notebook also provides interactive interface for image generation based on user input.
-
-<p align="center">
-    <img src="https://user-images.githubusercontent.com/29454499/284299074-8ba6c6c4-d8fa-4e5a-9d5d-d76f430f5647.gif"/>
-</p>
 
 ## Installation Instructions
 

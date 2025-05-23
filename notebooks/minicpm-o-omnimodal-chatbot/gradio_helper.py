@@ -1,5 +1,4 @@
 from copy import deepcopy
-from typing import Dict, List
 from PIL import Image
 import librosa
 import gradio as gr
@@ -67,7 +66,7 @@ def check_messages(history, message, audio):
     return history, gr.MultimodalTextbox(value=None, interactive=False), None
 
 
-def history2messages(history: List[Dict]) -> List[Dict]:
+def history2messages(history: list[dict]) -> list[dict]:
     """
     Transform gradio history to chat messages.
     """

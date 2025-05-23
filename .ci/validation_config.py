@@ -1,6 +1,6 @@
 from argparse import ArgumentTypeError
 from itertools import product
-from typing import List, Literal, Optional, TypedDict
+from typing import Optional, TypedDict
 
 
 class ValidationMatrix:
@@ -19,7 +19,7 @@ class ValidationConfig(TypedDict):
     device: str
 
 
-def validation_config_arg(arg_name: Literal["os", "python", "device"]):
+def validation_config_arg(arg_name: str):
     available_options = getattr(ValidationMatrix, arg_name)
 
     def fn(value: str):
@@ -31,11 +31,11 @@ def validation_config_arg(arg_name: Literal["os", "python", "device"]):
 
 
 class SkipConfig(TypedDict):
-    os: Optional[List[str]]
-    python: Optional[List[str]]
-    device: Optional[List[str]]
+    os: Optional[list[str]]
+    python: Optional[list[str]]
+    device: Optional[list[str]]
 
 
 class SkippedNotebook(TypedDict):
     notebook: str
-    skips: List[SkipConfig]
+    skips: list[SkipConfig]

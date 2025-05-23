@@ -2,7 +2,7 @@ import torch
 from optimum.intel.openvino import OVModelForCausalLM
 from dataclasses import dataclass, field
 
-from outetts.version.interface import _InterfaceHF_v1
+from outetts.interface import _InterfaceHF_v1
 from outetts.version.v1.prompt_processor import PromptProcessor
 from outetts.models.hf_model import HFModel
 from outetts.wav_tokenizer.audio_codec import AudioCodec

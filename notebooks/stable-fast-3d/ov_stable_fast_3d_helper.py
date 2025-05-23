@@ -1,8 +1,7 @@
-from collections import namedtuple
 import math
 from pathlib import Path
 import types
-from typing import List, Optional
+from typing import Optional
 
 import torch
 from torch import nn
@@ -52,13 +51,6 @@ def convert_image_tokenizer(image_tokenizer, output_dir):
         height, width = height + 0.1, width + 0.1
         patch_pos_embed = patch_pos_embed.reshape(1, int(math.sqrt(num_positions)), int(math.sqrt(num_positions)), dim)
         patch_pos_embed = patch_pos_embed.permute(0, 3, 1, 2)
-
-        scale_factor = (
-            (
-                height / math.sqrt(num_positions),
-                width / math.sqrt(num_positions),
-            ),
-        )
         patch_pos_embed = nn.functional.interpolate(
             patch_pos_embed,
             scale_factor=(
@@ -247,7 +239,7 @@ class DecoderWrapper(torch.nn.Module):
         self.exclude_decoder = exclude_decoder
         self.head_names = {head.name for head in heads}
 
-    def forward(self, x, include: Optional[List] = None, exclude: Optional[List] = None):
+    def forward(self, x, include: Optional[list] = None, exclude: Optional[list] = None):
         if include is not None:
             outs = self.include_decoder(x)
         else:

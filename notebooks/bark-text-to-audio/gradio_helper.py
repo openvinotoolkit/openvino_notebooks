@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable
 import gradio as gr
 import numpy as np
 
@@ -94,7 +94,7 @@ MAN: Wow, that's expensive!
 """
 
 
-def make_demo(fn: Callable, available_prompts: List[str]):
+def make_demo(fn: Callable, available_prompts: list[str]):
     with gr.Blocks() as demo:
         gr.Markdown(title)
         gr.Markdown(description)

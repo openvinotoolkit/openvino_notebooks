@@ -1,6 +1,5 @@
 from pathlib import Path
 import types
-from typing import Optional, Tuple, Union, List
 import gc
 
 import openvino as ov
@@ -24,7 +23,7 @@ from transformers.modeling_outputs import (
     CausalLMOutputWithPast,
     BaseModelOutputWithPast,
 )
-from typing import Optional, Tuple, Union, List, Dict, Any
+from typing import Optional, Union, Any
 from transformers import __version__ as transformers_version
 from transformers.generation.utils import GenerationConfig, ModelOutput
 
@@ -34,7 +33,7 @@ def _glmv_transformer_forward(
     input_ids: torch.LongTensor = None,
     attention_mask: Optional[torch.Tensor] = None,
     position_ids: Optional[torch.LongTensor] = None,
-    past_key_values: Optional[Union[Cache, List[torch.FloatTensor]]] = None,
+    past_key_values: Optional[Union[Cache, list[torch.FloatTensor]]] = None,
     inputs_embeds: Optional[torch.FloatTensor] = None,
     labels: Optional[torch.LongTensor] = None,
     use_cache: Optional[bool] = None,
@@ -44,7 +43,7 @@ def _glmv_transformer_forward(
     cache_position: Optional[torch.LongTensor] = None,
     num_logits_to_keep: int = 0,
     **loss_kwargs,
-) -> Union[Tuple, BaseModelOutputWithPast]:
+) -> Union[tuple, BaseModelOutputWithPast]:
     """take care of image_encode, position_ids and (attention_mask = None is fine)"""
     output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
     output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
@@ -93,8 +92,8 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
 
 def fuse_cache_reorder(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
     gather_dim: int,
 ):
     """
@@ -110,9 +109,9 @@ def fuse_cache_reorder(
     Parameters:
       ov_model (`ov.Model`):
           openvino model for processing
-      not_kv_inputs (`List[str]`):
+      not_kv_inputs (`list[str]`):
           list of input nodes in model that not related to past key values
-      key_value_input_names (`List[str]`):
+      key_value_input_names (`list[str]`):
           list of names for key value input layers
       gather_dim (int):
           dimension for gathering cache during reorder pass
@@ -164,9 +163,9 @@ def build_state_initializer(ov_model: ov.Model, batch_dim: int):
 
 def make_stateful(
     ov_model: ov.Model,
-    not_kv_inputs: List[str],
-    key_value_input_names: List[str],
-    key_value_output_names: List[str],
+    not_kv_inputs: list[str],
+    key_value_input_names: list[str],
+    key_value_output_names: list[str],
     batch_dim: int,
     num_attention_heads: int,
     num_beams_and_batch: int = None,
@@ -177,11 +176,11 @@ def make_stateful(
     Parameters:
         ov_model (ov.Model):
             openvino model
-        not_kv_inputs (`List[str]`):
+        not_kv_inputs (`list[str]`):
             list of input nodes in model that not related to past key values
-        key_value_input_names (`List[str]`):
+        key_value_input_names (`list[str]`):
             list of names for key value input layers
-        key_value_output_names (`List[str]`):
+        key_value_output_names (`list[str]`):
             list of names for key value input layers
         batch_dim (int):
             index of batch dimension in key value layers
@@ -359,7 +358,7 @@ def convert_glmv_model(model_id, output_dir, quantization_config):
         print(f"✅ {model_name} model conversion finished. You can find results in {output_dir}")
 
 
-def is_empty(images_list: Optional[List[List[torch.Tensor]]]):
+def is_empty(images_list: Optional[list[list[torch.Tensor]]]):
     if images_list is None or len(images_list) == 0:
         return True
     for image_list in images_list:
@@ -399,7 +398,7 @@ class OvGLMv(GenerationMixin):
         pixel_values: torch.Tensor = None,
         position_ids: Optional[torch.Tensor] = None,
         attention_mask: Optional[torch.BoolTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.Tensor, torch.Tensor], ...]] = None,
+        past_key_values: Optional[tuple[tuple[torch.Tensor, torch.Tensor], ...]] = None,
         inputs_embeds: Optional[torch.Tensor] = None,
         **kwargs,
     ) -> CausalLMOutputWithPast:
@@ -419,10 +418,10 @@ class OvGLMv(GenerationMixin):
         pixel_values: torch.Tensor = None,
         position_ids: Optional[torch.Tensor] = None,
         attention_mask: Optional[torch.BoolTensor] = None,
-        past_key_values: Optional[Tuple[Tuple[torch.Tensor, torch.Tensor], ...]] = None,
+        past_key_values: Optional[tuple[tuple[torch.Tensor, torch.Tensor], ...]] = None,
         inputs_embeds: Optional[torch.Tensor] = None,
         return_dict: Optional[bool] = None,
-    ) -> Union[Tuple, BaseModelOutputWithPast]:
+    ) -> Union[tuple, BaseModelOutputWithPast]:
         batch_size, num_concurrent_media, num_tiles, num_channels, height, width = pixel_values.shape
         pixel_values = pixel_values.reshape(batch_size * num_concurrent_media * num_tiles, num_channels, height, width)
         if not past_key_values:
@@ -474,7 +473,7 @@ class OvGLMv(GenerationMixin):
 
         return CausalLMOutputWithPast(logits=logits, past_key_values=past_key_values)
 
-    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+    def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
         """
         This function is used to re-order the `past_key_values` cache if [`~PreTrainedModel.beam_search`] or
         [`~PreTrainedModel.beam_sample`] is called.
@@ -486,10 +485,10 @@ class OvGLMv(GenerationMixin):
     def _update_model_kwargs_for_generation(
         self,
         outputs: ModelOutput,
-        model_kwargs: Dict[str, Any],
+        model_kwargs: dict[str, Any],
         is_encoder_decoder: bool = False,
         standardize_cache_format: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         # update past_key_values
         if int(transformers_version.split(".")[1]) >= 44:
             assert not standardize_cache_format

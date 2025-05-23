@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import queue
-from typing import Any, Dict, Iterator, List, Optional, Sequence
+from typing import Any, Iterator, Optional, Sequence
 
 from langchain_core.callbacks.manager import CallbackManagerForLLMRun
 from langchain_core.language_models.llms import LLM
@@ -102,7 +102,7 @@ class OpenVINOLLM(LLM):
     def _call(
         self,
         prompt: str,
-        stop: Optional[List[str]] = None,
+        stop: Optional[list[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> str:
@@ -128,7 +128,7 @@ class OpenVINOLLM(LLM):
     def _stream(
         self,
         prompt: str,
-        stop: Optional[List[str]] = None,
+        stop: Optional[list[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> Iterator[GenerationChunk]:
@@ -239,8 +239,8 @@ class ChatOpenVINO(BaseChatModel):
 
     def _generate(
         self,
-        messages: List[BaseMessage],
-        stop: Optional[List[str]] = None,
+        messages: list[BaseMessage],
+        stop: Optional[list[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> ChatResult:
@@ -250,8 +250,8 @@ class ChatOpenVINO(BaseChatModel):
 
     def _stream(
         self,
-        messages: List[BaseMessage],
-        stop: Optional[List[str]] = None,
+        messages: list[BaseMessage],
+        stop: Optional[list[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
@@ -266,7 +266,7 @@ class ChatOpenVINO(BaseChatModel):
 
     def _to_chat_prompt(
         self,
-        messages: List[BaseMessage],
+        messages: list[BaseMessage],
     ) -> str:
         """Convert a list of messages into a prompt format expected by wrapped LLM."""
         try:
@@ -472,14 +472,14 @@ class OpenVINOEmbeddings(BaseModel, Embeddings):
 
     model_config = ConfigDict(extra="forbid", protected_namespaces=())
 
-    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
         """Compute doc embeddings using a HuggingFace transformer model.
 
         Args:
             texts: The list of texts to embed.
 
         Returns:
-            List of embeddings, one for each text.
+            list of embeddings, one for each text.
         """
 
         texts = list(map(lambda x: x.replace("\n", " "), texts))
@@ -487,7 +487,7 @@ class OpenVINOEmbeddings(BaseModel, Embeddings):
 
         return embeddings
 
-    def embed_query(self, text: str) -> List[float]:
+    def embed_query(self, text: str) -> list[float]:
         """Compute query embeddings using a HuggingFace transformer model.
 
         Args:
@@ -529,20 +529,20 @@ class OpenVINOBgeEmbeddings(OpenVINOEmbeddings):
         if "-zh" in self.model_path:
             self.query_instruction = DEFAULT_QUERY_BGE_INSTRUCTION_ZH
 
-    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
         """Compute doc embeddings using a HuggingFace transformer model.
 
         Args:
             texts: The list of texts to embed.
 
         Returns:
-            List of embeddings, one for each text.
+            list of embeddings, one for each text.
         """
         texts = [self.embed_instruction + t.replace("\n", " ") for t in texts]
         embeddings = self.encode(texts, **self.encode_kwargs)
         return embeddings
 
-    def embed_query(self, text: str) -> List[float]:
+    def embed_query(self, text: str) -> list[float]:
         """Compute query embeddings using a HuggingFace transformer model.
 
         Args:
