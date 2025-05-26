@@ -26,14 +26,9 @@ def add_arguments(parser):
 
 def main(model_path, backend="ov-optimum"):
     # Initialize the Phi-4-mini model
-    model = TransformersModel(
-        model_id=model_path, max_new_tokens=1024, backend=backend)
+    model = TransformersModel(model_id=model_path, max_new_tokens=1024, backend=backend)
 
-
-    server_params = StdioServerParameters(
-        command="python",
-        args=["-m", "duckduckgo_mcp_server.server"]
-    )
+    server_params = StdioServerParameters(command="python", args=["-m", "duckduckgo_mcp_server.server"])
     tools = [build_presentation, CodeCompletionTool(model.model, model.tokenizer, max_new_tokens=1024)]
 
     # We initialize the MCP in a try block to ensure we disconnect from the MCP servers if there's an error
@@ -42,7 +37,7 @@ def main(model_path, backend="ov-optimum"):
         mcp_client = MCPClient(server_params)
         tools.extend(mcp_client.get_tools())
         # Youtube tool also uses an MCP server
-        yt_transcript_retriever = YoutubeTranscriptRetriever(device='GPU')
+        yt_transcript_retriever = YoutubeTranscriptRetriever(device="GPU")
         tools.append(yt_transcript_retriever)
 
         # After initializing the tools, we can initialize our agent

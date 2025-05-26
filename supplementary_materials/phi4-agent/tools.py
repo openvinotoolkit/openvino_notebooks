@@ -4,6 +4,7 @@ This module contains various tools for different functionalities, including:
 - Building PowerPoint presentations from a list of slides.
 - Retrieving relevant passages from YouTube video transcripts based on a query.
 """
+
 from typing import Optional, Dict, List
 
 from pptx import Presentation
@@ -20,12 +21,9 @@ from smolagents import tool, Tool
 nltk.download("punkt_tab")
 
 
-
 class CodeCompletionTool(Tool):
     name = "code_generator"
-    description = (
-        "A tool that generates code based on function signatures."
-    )
+    description = "A tool that generates code based on function signatures."
     inputs = {
         "signature": {
             "type": "string",
@@ -42,7 +40,7 @@ class CodeCompletionTool(Tool):
 
     def forward(self, signature: str) -> str:
         inputs = self.tokenizer(signature, return_tensors="pt").to(self.model.device)
-        outputs = self.model.generate(**inputs, max_new_tokens=self.max_new_tokens, use_cache=True, cache_implementation='static')
+        outputs = self.model.generate(**inputs, max_new_tokens=self.max_new_tokens, use_cache=True, cache_implementation="static")
         code = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         return f"```python\n{code}\n```"
 
@@ -54,26 +52,26 @@ def build_presentation(slides: List[Dict[str, str]], save_path: str) -> None:
     Args:
         slides (List[Dict[str, str]]): A list of dictionaries where each dictionary represents a slide with 'title' and 'body' keys.
         save_path (str): The path where the PowerPoint presentation will be saved.
-    """    
+    """
     # Create a new PowerPoint presentation
     prs = Presentation()
-    
+
     # Add slides to the presentation
     for slide in slides:
-        slide_title = slide['title']
-        slide_body = slide['body']
-        
+        slide_title = slide["title"]
+        slide_body = slide["body"]
+
         # Create a new slide
         slide_layout = prs.slide_layouts[1]  # Using a blank layout
         slide = prs.slides.add_slide(slide_layout)
-        
+
         # Set the title and body for the slide
         title_placeholder = slide.shapes.title
         title_placeholder.text = slide_title
-        
+
         body_placeholder = slide.placeholders[1]
         body_placeholder.text = slide_body
-    
+
     # Save the presentation
     prs.save(save_path)
 
@@ -96,15 +94,14 @@ class YoutubeTranscriptRetriever(Tool):
             "description": "The number of results to return.",
             "nullable": True,
             "default": 3,
-        }
+        },
     }
     output_type = "string"
 
     def __init__(self, embeddings_model_id: str = "BAAI/bge-small-en-v1.5", device: str = "cpu"):
         super().__init__()
         server_params = StdioServerParameters(
-            command="mcp-youtube-transcript",
-            args=["--http-proxy", "http://proxy-dmz.intel.com:911", "--https-proxy", "http://proxy-dmz.intel.com:912"]
+            command="mcp-youtube-transcript", args=["--http-proxy", "http://proxy-dmz.intel.com:911", "--https-proxy", "http://proxy-dmz.intel.com:912"]
         )
         self.mcp_client = MCPClient(server_params)
         self.get_transcript = self.mcp_client.get_tools()[0]
@@ -137,11 +134,8 @@ class YoutubeTranscriptRetriever(Tool):
     def _group_sentences(text, n):
         sentences = nltk.sent_tokenize(text)
         # Use generator for efficiency
-        return [
-            ' '.join(sentences[i:i+n])
-            for i in range(0, len(sentences), n)
-        ]
-    
+        return [" ".join(sentences[i : i + n]) for i in range(0, len(sentences), n)]
+
     def forward(
         self,
         query: str,
@@ -163,7 +157,7 @@ class YoutubeTranscriptRetriever(Tool):
         if video_id not in self.video_ids_to_store_ids:
             # Get the transcript from the MCP server
             url = video_id if video_id.startswith("https") else f"https://www.youtube.com/watch?v={video_id}"
-            trasncript = self.get_transcript(url=url).split('\n', 1)[-1]
+            trasncript = self.get_transcript(url=url).split("\n", 1)[-1]
             ids = self.vector_store.add_texts(self._group_sentences(trasncript, 5))
             self.video_ids_to_store_ids[video_id] = ids
         res = self.retriever.invoke(query, k=k)
