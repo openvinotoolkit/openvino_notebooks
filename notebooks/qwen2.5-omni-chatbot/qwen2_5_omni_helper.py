@@ -1570,10 +1570,10 @@ class OVQwen2_5OmniTalkerForConditionalGeneration(GenerationMixin):
             thinker_reply_part=thinker_reply_part,
         )
 
-    def _get_initial_cache_position(self, input_ids, model_kwargs):
+    def _get_initial_cache_position(self, input_ids, device, model_kwargs):
         # Talker needs to calculate cache_position with input_ids, so pop inputs_embeds temporarily
         inputs_embeds = model_kwargs.pop("inputs_embeds")
-        model_kwargs = super()._get_initial_cache_position(input_ids, model_kwargs)
+        model_kwargs = super()._get_initial_cache_position(input_ids, device, model_kwargs)
         model_kwargs["inputs_embeds"] = inputs_embeds
         return model_kwargs
 
