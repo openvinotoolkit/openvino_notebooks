@@ -620,7 +620,7 @@ def patch_model_code(model_dir):
     orig_modeling_file = model_dir / "orig_modeling_internvideo2.py"
     if not orig_modeling_file.exists():
         modeling_file.rename(orig_modeling_file)
-        with orig_modeling_file.open("r") as in_f:
+        with orig_modeling_file.open("r", encoding="utf-8") as in_f:
             content = in_f.read()
             content = content.replace(
                 "self.tokenizer = BertTokenizer.from_pretrained(self._config.model.text_encoder.pretrained, local_files_only=True, use_safetensors=True)",
@@ -637,7 +637,7 @@ def patch_model_code(model_dir):
     config_file = model_dir / "config.json"
     if not orig_config_file.exists():
         config_file.rename(orig_config_file)
-        with orig_config_file.open("r") as in_f:
+        with orig_config_file.open("r", encoding="utf-8") as in_f:
             content = in_f.read()
             configs_dir = model_dir / "configs"
             content = content.replace('"configs/', f'"{configs_dir.absolute()}/')
