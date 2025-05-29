@@ -1,6 +1,5 @@
 import gradio as gr
-import random
-
+import numpy as np
 
 def make_demo(pipe):
     def generate_image(
@@ -25,7 +24,7 @@ def make_demo(pipe):
             input_images = None
 
         if randomize_seed:
-            seed = random.randint(0, 10000000)
+            seed = np.random.randint(0, 10000000)
 
         output = pipe(
             prompt=text,

@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import ast
 import html
-import random
+import numpy as np
 
 from PIL import ImageOps
 
@@ -36,8 +36,8 @@ def add_random_padding(image, min_percent=0.1, max_percent=0.10):
 
     width, height = image.size
 
-    pad_w_percent = random.uniform(min_percent, max_percent)
-    pad_h_percent = random.uniform(min_percent, max_percent)
+    pad_w_percent = np.random.uniform(min_percent, max_percent)
+    pad_h_percent = np.random.uniform(min_percent, max_percent)
 
     pad_w = int(width * pad_w_percent)
     pad_h = int(height * pad_h_percent)
