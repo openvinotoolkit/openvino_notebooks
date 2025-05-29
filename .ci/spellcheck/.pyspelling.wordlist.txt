@@ -84,6 +84,7 @@ blockwise
 BLACKBOX
 boolean
 CatVTON
+CausVid
 CentOS
 centric
 CFG
@@ -941,6 +942,7 @@ sparsity
 Sparisty
 sparsified
 sparsify
+spatio
 spatiotemporal
 spectrogram
 spectrograms
