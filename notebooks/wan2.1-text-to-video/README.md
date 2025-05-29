@@ -27,6 +27,15 @@ This tutorial consists of the following steps:
 - Run inference pipeline
 - Interactive inference
 
+in this demonstration you will learn how to build text-to-video generation pipeline using Wan2.1 and OpenVINO.
+
+Example of model input prompt and inference result are represented below:
+
+|       |                                     |
+|-------|-------------------------------------|
+|prompt:| A cat walks on the grass, realistic |
+|generated: | ![](https://github.com/user-attachments/assets/3d1b587c-4799-442a-ac0a-2a5c9832d56e)|
+
 ## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
