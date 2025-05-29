@@ -1,6 +1,7 @@
 import gradio as gr
 import numpy as np
 
+
 def make_demo(pipe):
     def generate_image(
         text,
