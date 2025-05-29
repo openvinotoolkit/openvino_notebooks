@@ -550,3 +550,9 @@
   skips:
     - os:
         - macos-13
+- notebook: notebooks/wan2.1-text-to-video/wan2.1-text-to-video.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2019
