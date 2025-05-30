@@ -112,6 +112,7 @@ cli
 ClipBasedHeadEstimator
 CLIP's
 CMs
+cmu
 codebase
 codebook
 codebooks
@@ -487,6 +488,7 @@ LeViT
 LibriSpeech
 librispeech
 LibriTTS
+librosa
 Lim
 LinearCameraEmbedder
 linearized
@@ -937,6 +939,7 @@ softvc
 SoftVC
 SOTA
 SoTA
+soundfile
 Sovits
 sparsity
 Sparisty
@@ -949,6 +952,8 @@ spectrograms
 SpeechBrain
 SpeechBrain's
 speechbrain
+SpeechPipeline
+SpeechT
 splitters
 SPS
 SQA
@@ -1021,6 +1026,7 @@ tokenizing
 ToneColorConverter
 Tongyi
 toolkits
+torchaudio
 TorchDynamo
 torchdynamo
 TorchMetrics
@@ -1110,6 +1116,7 @@ VM
 Vladlen
 VOC
 Vocoder
+vocoder
 VQ
 VQA
 VQGAN
@@ -1143,6 +1150,7 @@ xformers
 xl
 xt
 xvector
+xvectors
 xxl
 XYWH
 YAML
