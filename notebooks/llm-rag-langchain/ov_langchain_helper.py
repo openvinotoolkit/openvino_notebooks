@@ -592,7 +592,7 @@ class OpenVINOGenAIEmbeddings(BaseModel, Embeddings):
 
         except ImportError:
             raise ImportError("Could not import OpenVINO GenAI package. " "Please install it with `pip install openvino-genai`.")
-        
+
         config = openvino_genai.TextEmbeddingPipeline.Config()
         if "mean_pooling" in encode_kwargs and encode_kwargs["mean_pooling"]:
             config.pooling_type = openvino_genai.TextEmbeddingPipeline.PoolingType.MEAN

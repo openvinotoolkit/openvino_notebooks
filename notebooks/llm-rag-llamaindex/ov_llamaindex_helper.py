@@ -12,12 +12,8 @@ class OpenVINOGenAIEmbedding(BaseEmbedding):
     max_length: Optional[int] = Field(description="Maximum length of input.")
     pooling: str = Field(description="Pooling strategy. One of ['cls', 'mean'].")
     normalize: bool = Field(default=True, description="Normalize embeddings or not.")
-    query_instruction: Optional[str] = Field(
-        description="Instruction to prepend to query text."
-    )
-    text_instruction: Optional[str] = Field(
-        description="Instruction to prepend to text."
-    )
+    query_instruction: Optional[str] = Field(description="Instruction to prepend to query text.")
+    text_instruction: Optional[str] = Field(description="Instruction to prepend to text.")
 
     _ov_pipe: Any = PrivateAttr()
 
@@ -38,10 +34,7 @@ class OpenVINOGenAIEmbedding(BaseEmbedding):
             import openvino_genai
 
         except ImportError:
-            raise ImportError(
-                "Could not import OpenVINO GenAI package. "
-                "Please install it with `pip install openvino-genai`."
-            )
+            raise ImportError("Could not import OpenVINO GenAI package. " "Please install it with `pip install openvino-genai`.")
 
         if pooling not in ["cls", "mean"]:
             raise ValueError(f"Pooling {pooling} not supported.")
@@ -50,16 +43,12 @@ class OpenVINOGenAIEmbedding(BaseEmbedding):
         config.normalize = normalize
         config.max_length = max_length
         config.pooling_type = (
-            openvino_genai.TextEmbeddingPipeline.PoolingType.MEAN
-            if pooling == "mean"
-            else openvino_genai.TextEmbeddingPipeline.PoolingType.CLS
+            openvino_genai.TextEmbeddingPipeline.PoolingType.MEAN if pooling == "mean" else openvino_genai.TextEmbeddingPipeline.PoolingType.CLS
         )
         config.query_instruction = query_instruction
         config.query_instruction = text_instruction
 
-        ov_pipe = openvino_genai.TextEmbeddingPipeline(
-            model_path, device, config, **model_kwargs
-        )
+        ov_pipe = openvino_genai.TextEmbeddingPipeline(model_path, device, config, **model_kwargs)
 
         super().__init__(
             embed_batch_size=embed_batch_size,
