@@ -136,7 +136,7 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
         new_prompt = message
 
         stream_complete = Event()
-
+        print(new_prompt)
         def generate_and_signal_complete():
             """
             genration function for single thread
@@ -221,7 +221,7 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
                         with gr.Row():
                             top_k = gr.Slider(
                                 label="Top-k",
-                                value=50,
+                                value=1,
                                 minimum=0.0,
                                 maximum=200,
                                 step=1,

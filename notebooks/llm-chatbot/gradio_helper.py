@@ -110,7 +110,7 @@ def make_demo(run_fn: Callable, stop_fn: Callable, title: str = "OpenVINO Chatbo
                         with gr.Row():
                             top_k = gr.Slider(
                                 label="Top-k",
-                                value=50,
+                                value=1,
                                 minimum=0.0,
                                 maximum=200,
                                 step=1,
