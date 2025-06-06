@@ -136,7 +136,7 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
         new_prompt = message
 
         stream_complete = Event()
-        print(new_prompt)
+
         def generate_and_signal_complete():
             """
             genration function for single thread
