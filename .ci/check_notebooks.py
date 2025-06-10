@@ -21,8 +21,8 @@ EXPECTED_NO_DEVICE = [
     Path("notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb"),  # device-agnostic
     Path("notebooks/localai/localai.ipynb"),  # can not change device in docker configuration on the fly
     Path("notebooks/keras-with-openvino-backend/keras-with-openvino-backend.ipynb"),  # only cpu
+    Path("notebooks/llm-agent-mcp/llm-agent-mcp.ipynb"),  # launch from python file
 ]
-
 
 def find_device_in_cell(cell):
     for line_idx, line in enumerate(cell["source"]):

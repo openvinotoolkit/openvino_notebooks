@@ -4,11 +4,11 @@ MCP is an open protocol that standardizes how applications provide context to LL
 
 MCP helps you build agents and complex workflows on top of LLMs. LLMs frequently need to integrate with data and tools, and MCP provides:
 
-- A growing list of pre-built integrations that your LLM can directly plug into
+- A growing list of pre-built integration that your LLM can directly plug into
 - The flexibility to switch between LLM providers and vendors
 - Best practices for securing your data within your infrastructure
 
-![Image](https://github.com/user-attachments/assets/bdb1790a-b464-457b-ae57-a88b9f9bae43)
+![Image](https://github.com/user-attachments/assets/3ca63027-610c-4a21-b629-2548ae112f8c)
 
 [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent) is a framework for developing LLM applications based on the instruction following, tool usage, planning, and memory capabilities of Qwen. It also comes with example applications such as Browser Assistant, Code Interpreter, and Custom Assistant.
 
