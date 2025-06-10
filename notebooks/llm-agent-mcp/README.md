@@ -19,7 +19,7 @@ This notebook explores how to create a MCP Agent step by step using OpenVINO and
 The tutorial consists of the following steps:
 
 - Prerequisites
-- Download model
+- Convert model using Optimum-CLI tool
 - Create an Agent
 - Interactive Demo
 

@@ -116,3 +116,25 @@ class OpenVINOUI(WebUI):
             demo.load(None)
 
         demo.queue(default_concurrency_limit=concurrency_limit).launch(share=share, server_name=server_name, server_port=server_port)
+        
+    def _create_agent_plugins_block(self, agent_index=0):
+        from qwen_agent.gui.gradio_dep import gr
+
+        agent_interactive = self.agent_list[agent_index]
+
+        if agent_interactive.function_map:
+            capabilities = [key for key in agent_interactive.function_map.keys()]
+            return gr.CheckboxGroup(
+                label='Plugins',
+                value=capabilities,
+                choices=capabilities,
+                interactive=False,
+            )
+
+        else:
+            return gr.CheckboxGroup(
+                label='Plugins',
+                value=[],
+                choices=[],
+                interactive=False,
+            )
