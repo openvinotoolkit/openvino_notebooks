@@ -84,6 +84,7 @@ blockwise
 BLACKBOX
 boolean
 CatVTON
+CausVid
 CentOS
 centric
 CFG
@@ -111,6 +112,7 @@ cli
 ClipBasedHeadEstimator
 CLIP's
 CMs
+cmu
 codebase
 codebook
 codebooks
@@ -486,6 +488,7 @@ LeViT
 LibriSpeech
 librispeech
 LibriTTS
+librosa
 Lim
 LinearCameraEmbedder
 linearized
@@ -937,17 +940,21 @@ softvc
 SoftVC
 SOTA
 SoTA
+soundfile
 Sovits
 sparsity
 Sparisty
 sparsified
 sparsify
+spatio
 spatiotemporal
 spectrogram
 spectrograms
 SpeechBrain
 SpeechBrain's
 speechbrain
+SpeechPipeline
+SpeechT
 splitters
 SPS
 SQA
@@ -1020,6 +1027,7 @@ tokenizing
 ToneColorConverter
 Tongyi
 toolkits
+torchaudio
 TorchDynamo
 torchdynamo
 TorchMetrics
@@ -1109,6 +1117,7 @@ VM
 Vladlen
 VOC
 Vocoder
+vocoder
 VQ
 VQA
 VQGAN
@@ -1142,6 +1151,7 @@ xformers
 xl
 xt
 xvector
+xvectors
 xxl
 XYWH
 YAML

@@ -90,3 +90,4 @@ notebooks/kokoro/kokoro.ipynb
 notebooks/qwen2.5-omni-chatbot/qwen2.5-omni-chatbot.ipynb
 notebooks/intern-video2-classiciation/intern-video2-classification.ipynb
 notebooks/flex.2-image-generation/flex.2-image-generation.ipynb
+notebooks/wan2.1-text-to-video/wan2.1-text-to-video.ipynb

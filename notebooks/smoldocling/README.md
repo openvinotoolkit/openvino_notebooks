@@ -1,7 +1,7 @@
 # Document conversion with SmolDocling and OpenVINO
 
 <div style="display: flex; align-items: center;">
-<img src="https://github.com/user-attachments/assets/f37728b0-f702-4b59-8bbf-9598063282f2" alt="SmolDocling" style="width: 200px; height: auto; margin-right: 20px;">
+<img src="https://github.com/user-attachments/assets/52a86ee7-065c-4ca5-b0b3-2458a79a6c9d" alt="SmolDocling" style="width: 200px; height: auto; margin-right: 20px;">
 <div>
         <p>SmolDocling is a multimodal Image-Text-to-Text model designed for efficient document conversion. It retains Docling's most popular features while ensuring full compatibility with <a href=https://github.com/docling-project/docling> Docling </a> through seamless support for <strong>DoclingDocuments</strong> (The JSON that can be exported using Docling follows this schema. The DoclingDocument type also models the metadata that may be attached to the converted document.)
         </p>

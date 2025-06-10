@@ -2,7 +2,6 @@ from typing import Any
 from collections import deque
 import numpy as np
 from pathlib import Path
-import pickle
 import openvino as ov
 import torch
 from tqdm.notebook import tqdm
@@ -62,38 +61,31 @@ def collect_calibration_data(ov_pipe, calibration_dataset_size: int, num_inferen
     calibration_dataset_filepath = Path("calibration_data") / f"{calibration_dataset_size}.pkl"
     calibration_dataset_filepath.parent.mkdir(exist_ok=True, parents=True)
 
-    if not calibration_dataset_filepath.exists():
-        disable_progress_bar(ov_pipe)
-        original_model = ov_pipe.transformer.request
-        calibration_data = []
-        ov_pipe.transformer.request = CompiledModelDecorator(original_model, calibration_data, config=ov_pipe.transformer.config, keep_prob=1)
+    disable_progress_bar(ov_pipe)
+    original_model = ov_pipe.transformer.request
+    calibration_data = []
+    ov_pipe.transformer.request = CompiledModelDecorator(original_model, calibration_data, config=ov_pipe.transformer.config, keep_prob=1)
 
-        # Run inference for data collection
-        pbar = tqdm(total=calibration_dataset_size)
-        for _ in range(calibration_dataset_size):
-            negative_prompt = np.random.choice(negative_prompts)
-            prompt = np.random.choice(prompts)
-            ov_pipe(
-                prompt,
-                negative_prompt=negative_prompt,
-                num_inference_steps=num_inference_steps,
-                guidance_scale=guidance_scale,
-                height=480,
-                width=704,
-                num_frames=24,
-            )
-            if len(calibration_data) >= calibration_dataset_size:
-                pbar.update(calibration_dataset_size - pbar.n)
-                break
-            pbar.update(len(calibration_data) - pbar.n)
+    # Run inference for data collection
+    pbar = tqdm(total=calibration_dataset_size)
+    for _ in range(calibration_dataset_size):
+        negative_prompt = np.random.choice(negative_prompts)
+        prompt = np.random.choice(prompts)
+        ov_pipe(
+            prompt,
+            negative_prompt=negative_prompt,
+            num_inference_steps=num_inference_steps,
+            guidance_scale=guidance_scale,
+            height=480,
+            width=704,
+            num_frames=24,
+        )
+        if len(calibration_data) >= calibration_dataset_size:
+            pbar.update(calibration_dataset_size - pbar.n)
+            break
+        pbar.update(len(calibration_data) - pbar.n)
 
-        ov_pipe.transformer.request = original_model
-
-        with open(calibration_dataset_filepath, "wb") as f:
-            pickle.dump(calibration_data, f)
-    else:
-        with open(calibration_dataset_filepath, "rb") as f:
-            calibration_data = pickle.load(f)
+    ov_pipe.transformer.request = original_model
 
     return calibration_data
 

@@ -1,8 +1,8 @@
 import gradio as gr
 import requests
 from pathlib import Path
-import random
 import torch
+import numpy as np
 
 
 def make_demo(pipeline):
@@ -38,7 +38,7 @@ def make_demo(pipeline):
         random_quotes = [line.strip() for line in r]
 
     def get_random_quote():
-        return random.choice(random_quotes)
+        return str(np.random.choice(random_quotes))
 
     CHOICES = {
         "🇺🇸 🚺 Heart ❤️": "af_heart",
