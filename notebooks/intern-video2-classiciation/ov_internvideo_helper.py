@@ -631,7 +631,7 @@ def patch_model_code(model_dir):
                 "try:\n    from flash_attn.flash_attn_interface import flash_attn_varlen_qkvpacked_func\n    from flash_attn.bert_padding import unpad_input, pad_input\n    flash_attn_available=True\nexcept:\n    flash_attn_available = False",
             )
             content = content.replace("self.use_flash_attn = use_flash_attn", "self.use_flash_attn = use_flash_attn and flash_attn_available")
-            with modeling_file.open("w") as out_f:
+            with modeling_file.open("w", encoding="utf-8") as out_f:
                 out_f.write(content)
     orig_config_file = model_dir / "orig_config.json"
     config_file = model_dir / "config.json"
@@ -641,7 +641,7 @@ def patch_model_code(model_dir):
             content = in_f.read()
             configs_dir = model_dir / "configs"
             content = content.replace('"configs/', f'"{configs_dir.absolute()}/')
-            with config_file.open("w") as out_f:
+            with config_file.open("w", encoding="utf-8") as out_f:
                 out_f.write(content)
 
 
