@@ -757,6 +757,41 @@ compression_configs = {
     "qwen2.5-14b-instruct": {"sym": True, "group_size": 128, "ratio": 1.0},
     "qwen2.5-1.5b-instruct": {"sym": True, "group_size": 128, "ratio": 1.0},
     "qwen2.5-0.5b-instruct": {"sym": True, "group_size": 128, "ratio": 1.0},
+    "Qwen3-0.6B": {
+        "sym": False,
+        "group_size": 128,
+        "ratio": 1.0,
+        "dataset": "wikitext2",
+        "scale_estimation": True,
+    },
+    "Qwen3-1.7B": {
+        "sym": False,
+        "group_size": 128,
+        "ratio": 1.0,
+        "dataset": "wikitext2",
+        "scale_estimation": True,
+    },
+    "Qwen3-4B": {
+        "sym": False,
+        "group_size": 128,
+        "ratio": 1.0,
+        "dataset": "wikitext2",
+        "scale_estimation": True,
+    },
+    "Qwen3-8B": {
+        "sym": False,
+        "group_size": 128,
+        "ratio": 1.0,
+        "dataset": "wikitext2",
+        "scale_estimation": True,
+    },
+    "Qwen3-14B": {
+        "sym": False,
+        "group_size": 128,
+        "ratio": 1.0,
+        "dataset": "wikitext2",
+        "scale_estimation": True,
+    },
     "red-pajama-3b-chat": {
         "sym": False,
         "group_size": 128,
@@ -778,13 +813,18 @@ def get_optimum_cli_command(model_id, weight_format, output_dir, compression_opt
         if "group_size" in compression_options:
             compression_args += " --group-size {}".format(compression_options["group_size"])
         if "ratio" in compression_options:
-            compression_args += " --ratio {}".fromat(compression_options["ratio"])
+            compression_args += " --ratio {}".format(compression_options["ratio"])
         if compression_options["sym"]:
             compression_args += " --sym"
         if enable_awq or compression_options.get("awq", False):
             compression_args += " --awq --dataset wikitext2 --num-samples 128"
             if compression_options.get("scale_estimation", False):
                 compression_args += " --scale-estimation"
+        else:
+            if compression_options.get("scale_estimation", False):
+                compression_args += " --scale-estimation"
+            if "dataset" in compression_options:
+                compression_args += f" --dataset {compression_options['dataset']}"
         if compression_options.get("all_layers", False):
             compression_args += " --all-layers"
 
