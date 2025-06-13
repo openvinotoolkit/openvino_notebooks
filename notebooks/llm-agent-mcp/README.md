@@ -8,7 +8,7 @@ MCP helps you build agents and complex workflows on top of LLMs. LLMs frequently
 - The flexibility to switch between LLM providers and vendors
 - Best practices for securing your data within your infrastructure
 
-![Image](https://github.com/user-attachments/assets/3ca63027-610c-4a21-b629-2548ae112f8c)
+![Image](https://github.com/user-attachments/assets/dfe1aa42-cae9-4356-be81-f010462d78a8)
 
 [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent) is a framework for developing LLM applications based on the instruction following, tool usage, planning, and memory capabilities of Qwen. It also comes with example applications such as Browser Assistant, Code Interpreter, and Custom Assistant.
 

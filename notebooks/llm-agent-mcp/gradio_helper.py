@@ -4,6 +4,7 @@ from qwen_agent.gui.utils import convert_history_to_chatbot
 from qwen_agent.llm.schema import Message
 from qwen_agent.gui import WebUI
 
+
 class OpenVINOUI(WebUI):
     def run(
         self,
@@ -116,7 +117,7 @@ class OpenVINOUI(WebUI):
             demo.load(None)
 
         demo.queue(default_concurrency_limit=concurrency_limit).launch(share=share, server_name=server_name, server_port=server_port)
-        
+
     def _create_agent_plugins_block(self, agent_index=0):
         from qwen_agent.gui.gradio_dep import gr
 
@@ -125,7 +126,7 @@ class OpenVINOUI(WebUI):
         if agent_interactive.function_map:
             capabilities = [key for key in agent_interactive.function_map.keys()]
             return gr.CheckboxGroup(
-                label='Plugins',
+                label="Plugins",
                 value=capabilities,
                 choices=capabilities,
                 interactive=False,
@@ -133,7 +134,7 @@ class OpenVINOUI(WebUI):
 
         else:
             return gr.CheckboxGroup(
-                label='Plugins',
+                label="Plugins",
                 value=[],
                 choices=[],
                 interactive=False,
