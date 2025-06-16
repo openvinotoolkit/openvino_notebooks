@@ -91,8 +91,8 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
         updated text string
 
         """
-        new_text = re.sub(r"^<think>", "<em><small>I am thinking...", new_text)
-        new_text = re.sub("</think>", "I think I know the answer</small></em>", new_text)
+        # new_text = re.sub(r"^<think>", "<em><small>I am thinking...", new_text)
+        # new_text = re.sub("</think>", "I think I know the answer</small></em>", new_text)
         partial_text += new_text
         return partial_text
 
@@ -196,7 +196,7 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
                         with gr.Row():
                             temperature = gr.Slider(
                                 label="Temperature",
-                                value=0.1,
+                                value=0.0,
                                 minimum=0.0,
                                 maximum=1.0,
                                 step=0.1,
@@ -207,7 +207,7 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
                         with gr.Row():
                             top_p = gr.Slider(
                                 label="Top-p (nucleus sampling)",
-                                value=1.0,
+                                value=0.1,
                                 minimum=0.0,
                                 maximum=1,
                                 step=0.01,

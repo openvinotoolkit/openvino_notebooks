@@ -85,7 +85,7 @@ def make_demo(run_fn: Callable, stop_fn: Callable, title: str = "OpenVINO Chatbo
                         with gr.Row():
                             temperature = gr.Slider(
                                 label="Temperature",
-                                value=0.1,
+                                value=0.0,
                                 minimum=0.0,
                                 maximum=1.0,
                                 step=0.1,
@@ -96,7 +96,7 @@ def make_demo(run_fn: Callable, stop_fn: Callable, title: str = "OpenVINO Chatbo
                         with gr.Row():
                             top_p = gr.Slider(
                                 label="Top-p (nucleus sampling)",
-                                value=1.0,
+                                value=0.1,
                                 minimum=0.0,
                                 maximum=1,
                                 step=0.01,
