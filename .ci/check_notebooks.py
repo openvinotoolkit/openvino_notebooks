@@ -23,6 +23,7 @@ EXPECTED_NO_DEVICE = [
     Path("notebooks/keras-with-openvino-backend/keras-with-openvino-backend.ipynb"),  # only cpu
 ]
 
+
 def find_device_in_cell(cell):
     for line_idx, line in enumerate(cell["source"]):
         if DEVICE_WIDGET in line or DEVICE_WIDGET_NEW in line:
