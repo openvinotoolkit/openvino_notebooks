@@ -556,6 +556,92 @@ class OpenVINOBgeEmbeddings(OpenVINOEmbeddings):
         return embedding
 
 
+class OpenVINOGenAIEmbeddings(BaseModel, Embeddings):
+    """OpenVINO embedding models.
+
+    To use, you should have the ``openvino-genai`` python package installed.
+
+    Example:
+        .. code-block:: python
+
+            from langchain_community.embeddings import OpenVINOGenAIEmbeddings
+
+            model_path = "./sentence-transformers/all-mpnet-base-v2"
+            encode_kwargs = {'normalize_embeddings': True}
+            ov = OpenVINOEmbeddings.from_model_path(
+                model_path=model_path,
+                device="CPU",
+                encode_kwargs=encode_kwargs,
+            )
+    """
+
+    ov_pipe: Any = None
+    """OpenVINO pipeline object."""
+
+    @classmethod
+    def from_model_path(
+        cls,
+        model_path: str,
+        device: str = "CPU",
+        model_kwargs: Dict[str, Any] = {},
+        encode_kwargs: Dict[str, Any] = {},
+    ) -> OpenVINOGenAIEmbeddings:
+        """Construct the openvino text embedding pipeline from model_path"""
+        try:
+            import openvino_genai
+
+        except ImportError:
+            raise ImportError("Could not import OpenVINO GenAI package. " "Please install it with `pip install openvino-genai`.")
+
+        config = openvino_genai.TextEmbeddingPipeline.Config()
+        if "mean_pooling" in encode_kwargs and encode_kwargs["mean_pooling"]:
+            config.pooling_type = openvino_genai.TextEmbeddingPipeline.PoolingType.MEAN
+        if "normalize_embeddings" in encode_kwargs:
+            config.normalize = encode_kwargs["normalize_embeddings"]
+        if "max_length" in encode_kwargs:
+            config.max_length = encode_kwargs["max_length"]
+
+        config.query_instruction = DEFAULT_QUERY_BGE_INSTRUCTION_EN
+        if "-zh" in model_path:
+            config.query_instruction = DEFAULT_QUERY_BGE_INSTRUCTION_ZH
+
+        if "query_instruction" in encode_kwargs:
+            config.query_instruction = encode_kwargs["query_instruction"]
+        if "embed_instruction" in encode_kwargs:
+            config.embed_instruction = encode_kwargs["embed_instruction"]
+
+        ov_pipe = openvino_genai.TextEmbeddingPipeline(model_path, device, config, **model_kwargs)
+
+        return cls(ov_pipe=ov_pipe)
+
+    model_config = ConfigDict(extra="forbid", protected_namespaces=())
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """Compute doc embeddings.
+
+        Args:
+            texts: The list of texts to embed.
+
+        Returns:
+            List of embeddings, one for each text.
+        """
+
+        texts = list(map(lambda x: x.replace("\n", " "), texts))
+        return self.ov_pipe.embed_documents(texts)
+
+    def embed_query(self, text: str) -> List[float]:
+        """Compute query embeddings.
+
+        Args:
+            text: The text to embed.
+
+        Returns:
+            Embeddings for the text.
+        """
+
+        return self.ov_pipe.embed_query(text)
+
+
 class RerankRequest:
     """Request for reranking."""
 
