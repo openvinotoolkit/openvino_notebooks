@@ -12,9 +12,9 @@ def make_demo(fn: Callable):
         ],
         outputs=gr.Image(label="Result"),
         examples=[
-            ["An astronaut riding a horse.", 0, 25],
+            ["An astronaut riding a horse.", 11, 25],
             ["A panda eating bamboo on a rock.", 0, 25],
-            ["Spiderman is surfing.", 0, 25],
+            ["Spiderman is surfing.", 13, 25],
         ],
         allow_flagging="never",
     )
