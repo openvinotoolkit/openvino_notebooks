@@ -778,7 +778,7 @@ def get_optimum_cli_command(model_id, weight_format, output_dir, compression_opt
         if "group_size" in compression_options:
             compression_args += " --group-size {}".format(compression_options["group_size"])
         if "ratio" in compression_options:
-            compression_args += " --ratio {}".fromat(compression_options["ratio"])
+            compression_args += " --ratio {}".format(compression_options["ratio"])
         if compression_options["sym"]:
             compression_args += " --sym"
         if enable_awq or compression_options.get("awq", False):
