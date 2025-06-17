@@ -556,3 +556,9 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/llm-agent-mcp/llm-agent-mcp.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2019
