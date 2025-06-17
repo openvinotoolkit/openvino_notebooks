@@ -550,6 +550,7 @@ matplotlib
 MathVista
 MatMul
 MBs
+MCP
 md
 MediaPipe
 medprob
