@@ -96,8 +96,8 @@ def make_demo(run_fn: Callable, stop_fn: Callable, title: str = "OpenVINO Chatbo
                         with gr.Row():
                             top_p = gr.Slider(
                                 label="Top-p (nucleus sampling)",
-                                value=0.1,
-                                minimum=0.0,
+                                value=1.0,
+                                minimum=0.01,
                                 maximum=1,
                                 step=0.01,
                                 interactive=True,
