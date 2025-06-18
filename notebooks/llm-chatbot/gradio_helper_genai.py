@@ -196,7 +196,7 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
                         with gr.Row():
                             temperature = gr.Slider(
                                 label="Temperature",
-                                value=0.1,
+                                value=0.0,
                                 minimum=0.0,
                                 maximum=1.0,
                                 step=0.1,
@@ -208,7 +208,7 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
                             top_p = gr.Slider(
                                 label="Top-p (nucleus sampling)",
                                 value=1.0,
-                                minimum=0.0,
+                                minimum=0.01,
                                 maximum=1,
                                 step=0.01,
                                 interactive=True,
@@ -221,7 +221,7 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
                         with gr.Row():
                             top_k = gr.Slider(
                                 label="Top-k",
-                                value=50,
+                                value=1,
                                 minimum=0.0,
                                 maximum=200,
                                 step=1,
