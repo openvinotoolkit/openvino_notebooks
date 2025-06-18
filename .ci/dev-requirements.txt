@@ -12,5 +12,5 @@ nbval                       # pytest plugin for automatic notebook testing
 git+https://github.com/eaidova/treon.git@ea/cell_info # test framework for Jupyter Notebooks 
 toml                        # used for validating docker requirements
 mistune==2.0.4              # use for parsing README.md
-requests==2.32.0            # use for checking links
+requests==2.32.4            # use for checking links
 pyspelling                  # automating spell checking
