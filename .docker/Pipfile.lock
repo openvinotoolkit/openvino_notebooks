@@ -2399,7 +2399,7 @@
                 "sha256:fa839241a52f661f29362aea2bb3c6ae6f550dbafdac38d0b41cbca87d3f1f22",
                 "sha256:e89c4e6b23188ea0f96e3e633b41efe5cf8a45c91d2eb516ad4375747ee26e67"
             ],
-            "version": "==2025.1.0"
+            "version": "==2025.2.0"
         },
         "openvino-telemetry": {
             "hashes": [
