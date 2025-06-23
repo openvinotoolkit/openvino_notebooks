@@ -562,3 +562,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/modelscope-to-openvino/modelscope-to-openvino.ipynb
+  skips:
+    - os:
+        - macos-13
