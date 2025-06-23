@@ -562,3 +562,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2019
+- notebook: notebooks/magika-content-type-recognition/magika-content-type-recognition.ipynb
+  skips:
+    - os:
+        - windows-2019
