@@ -640,7 +640,8 @@ def patch_model_code(model_dir):
         with orig_config_file.open("r", encoding="utf-8") as in_f:
             content = in_f.read()
             configs_dir = model_dir / "configs"
-            content = content.replace('"configs/', f'"{configs_dir.absolute()}/')
+            abs_path = str(configs_dir.absolute()).replace("\\", "\\\\")
+            content = content.replace('"configs/', f'"{abs_path}/')
             with config_file.open("w", encoding="utf-8") as out_f:
                 out_f.write(content)
 
