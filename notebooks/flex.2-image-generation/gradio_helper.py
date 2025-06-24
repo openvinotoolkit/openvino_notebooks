@@ -1,8 +1,7 @@
 import gradio as gr
 import numpy as np
 import torch
-import random
-from PIL import Image, ImageFilter
+from PIL import Image
 
 MAX_SEED = np.iinfo(np.int32).max
 MAX_IMAGE_SIZE = 2048
@@ -25,7 +24,7 @@ def make_demo(pipe):
         image = edit_images["background"].convert("RGB")
         mask = Image.fromarray(np.array(edit_images["layers"][-1])[:, :, -1])
         if randomize_seed:
-            seed = random.randint(0, MAX_SEED)
+            seed = np.random.randint(0, MAX_SEED)
         out_image = pipe(
             prompt=prompt,
             inpaint_image=image,
