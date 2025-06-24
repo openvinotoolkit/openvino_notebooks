@@ -583,7 +583,6 @@ class OpenVINOGenAIEmbeddings(BaseModel, Embeddings):
         cls,
         model_path: str,
         device: str = "CPU",
-        model_kwargs: Dict[str, Any] = {},
         encode_kwargs: Dict[str, Any] = {},
     ) -> OpenVINOGenAIEmbeddings:
         """Construct the openvino text embedding pipeline from model_path"""
@@ -610,7 +609,7 @@ class OpenVINOGenAIEmbeddings(BaseModel, Embeddings):
         if "embed_instruction" in encode_kwargs:
             config.embed_instruction = encode_kwargs["embed_instruction"]
 
-        ov_pipe = openvino_genai.TextEmbeddingPipeline(model_path, device, config, **model_kwargs)
+        ov_pipe = openvino_genai.TextEmbeddingPipeline(model_path, device, config)
 
         return cls(ov_pipe=ov_pipe)
 
