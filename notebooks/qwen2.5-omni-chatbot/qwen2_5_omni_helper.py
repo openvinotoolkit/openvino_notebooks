@@ -25,6 +25,7 @@ from transformers.models.qwen2_5_omni.modeling_qwen2_5_omni import (
     ALL_ATTENTION_FUNCTIONS,
     apply_rotary_pos_emb,
 )
+from transformers.models.qwen2_5_omni.configuration_qwen2_5_omni import Qwen2_5OmniConfig
 from pathlib import Path
 import types
 from itertools import accumulate
@@ -275,8 +276,14 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
         ckpt = model_id
         if not (Path(output_dir) / "spk_dict.pt").exists():
             hf_hub_download(model_id, filename="spk_dict.pt", local_dir=output_dir)
-
-    model = Qwen2_5OmniForConditionalGeneration.from_pretrained(ckpt, torch_dtype=torch.float16)
+            
+            
+    config = Qwen2_5OmniConfig.from_pretrained(ckpt)
+    config.thinker_config._attn_implementation_autoset = False
+    config.thinker_config._attn_implementation = "sdpa"
+    config.talker_config._attn_implementation_autoset = False
+    config.talker_config._attn_implementation = "sdpa"
+    model = Qwen2_5OmniForConditionalGeneration.from_pretrained(ckpt, config=config, torch_dtype=torch.float16)
     model.eval()
     processor = AutoProcessor.from_pretrained(ckpt)
 
