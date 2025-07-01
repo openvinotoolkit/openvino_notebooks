@@ -334,9 +334,9 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
         ov_model = ov.convert_model(
             audio,
             example_input={
-                "padded_feature": torch.randn([1, 128, 9], dtype=torch.float32),
-                "padded_mask": torch.ones([1, 1, 9], dtype=torch.int32),
-                "padded_mask_after_cnn": torch.ones([1, 5], dtype=torch.bool),
+                "padded_feature": torch.randn([3, 128, 200], dtype=torch.float32),
+                "padded_mask": torch.ones([3, 1, 200], dtype=torch.int32),
+                "padded_mask_after_cnn": torch.ones([3, 100], dtype=torch.bool),
             },
         )
         ov.save_model(ov_model, thinker_audio_path)
