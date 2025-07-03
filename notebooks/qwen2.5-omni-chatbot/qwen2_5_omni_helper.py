@@ -25,6 +25,9 @@ from transformers.models.qwen2_5_omni.modeling_qwen2_5_omni import (
     ALL_ATTENTION_FUNCTIONS,
     apply_rotary_pos_emb,
 )
+from transformers.models.qwen2_5_omni.configuration_qwen2_5_omni import (
+    Qwen2_5OmniConfig,
+)
 from pathlib import Path
 import types
 from itertools import accumulate
@@ -276,7 +279,12 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
         if not (Path(output_dir) / "spk_dict.pt").exists():
             hf_hub_download(model_id, filename="spk_dict.pt", local_dir=output_dir)
 
-    model = Qwen2_5OmniForConditionalGeneration.from_pretrained(ckpt, torch_dtype=torch.float16)
+    config = Qwen2_5OmniConfig.from_pretrained(ckpt)
+    config.thinker_config._attn_implementation_autoset = False
+    config.thinker_config._attn_implementation = "sdpa"
+    config.talker_config._attn_implementation_autoset = False
+    config.talker_config._attn_implementation = "sdpa"
+    model = Qwen2_5OmniForConditionalGeneration.from_pretrained(ckpt, config=config, torch_dtype=torch.float16)
     model.eval()
     processor = AutoProcessor.from_pretrained(ckpt)
 
@@ -334,9 +342,9 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
         ov_model = ov.convert_model(
             audio,
             example_input={
-                "padded_feature": torch.randn([1, 128, 9], dtype=torch.float32),
-                "padded_mask": torch.ones([1, 1, 9], dtype=torch.int32),
-                "padded_mask_after_cnn": torch.ones([1, 5], dtype=torch.bool),
+                "padded_feature": torch.randn([3, 128, 200], dtype=torch.float32),
+                "padded_mask": torch.ones([3, 1, 200], dtype=torch.int32),
+                "padded_mask_after_cnn": torch.ones([3, 100], dtype=torch.bool),
             },
         )
         ov.save_model(ov_model, thinker_audio_path)
@@ -368,7 +376,10 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
         vision_embed_tokens = model.thinker.visual
         if not thinker_patcher_path.exists():
             __make_16bit_traceable(vision_embed_tokens.patch_embed)
-            ov_model = ov.convert_model(vision_embed_tokens.patch_embed, example_input={"hidden_states": torch.randn([8, 1176])})
+            ov_model = ov.convert_model(
+                vision_embed_tokens.patch_embed,
+                example_input={"hidden_states": torch.randn([8, 1176])},
+            )
             ov.save_model(ov_model, thinker_patcher_path)
             del ov_model
             cleanup_torchscript_cache()
@@ -393,7 +404,11 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
                     attention_mask_now = attention_mask
                 else:
                     attention_mask_now = window_attention_mask
-                hidden_states = blk(hidden_states, attention_mask=attention_mask_now, rotary_pos_emb=rotary_pos_emb)
+                hidden_states = blk(
+                    hidden_states,
+                    attention_mask=attention_mask_now,
+                    rotary_pos_emb=rotary_pos_emb,
+                )
 
             hidden_states = self.merger(hidden_states)
             reverse_indices = torch.argsort(window_index)
@@ -401,8 +416,15 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
 
             return hidden_states
 
-        def sdpa_attn_forward(self, hidden_states: torch.Tensor, attention_mask: torch.Tensor, rotary_pos_emb: torch.Tensor = None) -> torch.Tensor:
-            from transformers.models.qwen2_5_omni.modeling_qwen2_5_omni import apply_rotary_pos_emb_vision
+        def sdpa_attn_forward(
+            self,
+            hidden_states: torch.Tensor,
+            attention_mask: torch.Tensor,
+            rotary_pos_emb: torch.Tensor = None,
+        ) -> torch.Tensor:
+            from transformers.models.qwen2_5_omni.modeling_qwen2_5_omni import (
+                apply_rotary_pos_emb_vision,
+            )
 
             seq_length = hidden_states.shape[0]
             q = self.q(hidden_states).reshape(seq_length, self.num_heads, -1)
@@ -421,7 +443,11 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
             return attn_output
 
         def block_forward(self, hidden_states, attention_mask, rotary_pos_emb) -> torch.Tensor:
-            hidden_states = hidden_states + self.attn(self.norm1(hidden_states), attention_mask=attention_mask, rotary_pos_emb=rotary_pos_emb)
+            hidden_states = hidden_states + self.attn(
+                self.norm1(hidden_states),
+                attention_mask=attention_mask,
+                rotary_pos_emb=rotary_pos_emb,
+            )
             hidden_states = hidden_states + self.mlp(self.norm2(hidden_states))
             return hidden_states
 
@@ -498,7 +524,12 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
         lang_model.forward = types.MethodType(forward_wrap_thinker, lang_model)
 
         num_pkv = lang_model.model.config.num_hidden_layers
-        pkv_shape = (2, lang_model.model.config.num_key_value_heads, 2, hidden_size // lang_model.model.config.num_attention_heads)
+        pkv_shape = (
+            2,
+            lang_model.model.config.num_key_value_heads,
+            2,
+            hidden_size // lang_model.model.config.num_attention_heads,
+        )
         # input_embeds = torch.randn((1, 1, hidden_size))
         cache_position = torch.arange(2, 4)
         position_ids = cache_position.view(1, 1, -1).expand(3, 2, -1)
@@ -514,14 +545,30 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
             input_names.extend([f"past_key_values.{i}.key", f"past_key_values.{i}.value"])
             output_names.extend([f"present.{i}.key", f"present.{i}.value"])
         input_names.append("inputs_embeds")
-        example_input = {"inputs_embeds": input_embeds, "attention_mask": attention_mask, "position_ids": position_ids, "past_key_values": past_key_values}
+        example_input = {
+            "inputs_embeds": input_embeds,
+            "attention_mask": attention_mask,
+            "position_ids": position_ids,
+            "past_key_values": past_key_values,
+        }
 
         input_shapes = [
             ov.PartialShape([-1, -1]),
             ov.PartialShape([3, -1, -1]),
         ]
         input_shapes += (
-            [ov.PartialShape([-1, lang_model.model.config.num_key_value_heads, -1, hidden_size // lang_model.model.config.num_attention_heads])] * 2 * num_pkv
+            [
+                ov.PartialShape(
+                    [
+                        -1,
+                        lang_model.model.config.num_key_value_heads,
+                        -1,
+                        hidden_size // lang_model.model.config.num_attention_heads,
+                    ]
+                )
+            ]
+            * 2
+            * num_pkv
         )
         input_shapes += [ov.PartialShape([-1, -1, input_embeds.shape[-1]])]
         __make_16bit_traceable(lang_model)
@@ -607,7 +654,12 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
         lang_model.forward = types.MethodType(forward_wrap_talker, lang_model)
 
         num_pkv = lang_model.model.config.num_hidden_layers
-        pkv_shape = (2, lang_model.model.config.num_key_value_heads, 2, lang_model.model.config.head_dim)
+        pkv_shape = (
+            2,
+            lang_model.model.config.num_key_value_heads,
+            2,
+            lang_model.model.config.head_dim,
+        )
         # input_embeds = torch.randn((1, 1, hidden_size))
         cache_position = torch.arange(2, 4)
         position_ids = cache_position.view(1, 1, -1).expand(3, 2, -1)
@@ -623,13 +675,31 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
             input_names.extend([f"past_key_values.{i}.key", f"past_key_values.{i}.value"])
             output_names.extend([f"present.{i}.key", f"present.{i}.value"])
         input_names.append("inputs_embeds")
-        example_input = {"inputs_embeds": input_embeds, "attention_mask": attention_mask, "position_ids": position_ids, "past_key_values": past_key_values}
+        example_input = {
+            "inputs_embeds": input_embeds,
+            "attention_mask": attention_mask,
+            "position_ids": position_ids,
+            "past_key_values": past_key_values,
+        }
 
         input_shapes = [
             ov.PartialShape([-1, -1]),
             ov.PartialShape([3, -1, -1]),
         ]
-        input_shapes += [ov.PartialShape([-1, lang_model.model.config.num_key_value_heads, -1, lang_model.model.config.head_dim])] * 2 * num_pkv
+        input_shapes += (
+            [
+                ov.PartialShape(
+                    [
+                        -1,
+                        lang_model.model.config.num_key_value_heads,
+                        -1,
+                        lang_model.model.config.head_dim,
+                    ]
+                )
+            ]
+            * 2
+            * num_pkv
+        )
         input_shapes += [ov.PartialShape([-1, -1, input_embeds.shape[-1]])]
         __make_16bit_traceable(lang_model)
 
@@ -711,10 +781,20 @@ def convert_qwen2_5_omni_model(model_id, output_dir, quantization_config=None, u
         ov_model = ov.convert_model(
             code2wav_dit,
             example_input={
-                "hidden_states": torch.randn([1, 4, model.token2wav.code2wav_dit_model.config.mel_dim], dtype=torch.float32),
+                "hidden_states": torch.randn(
+                    [1, 4, model.token2wav.code2wav_dit_model.config.mel_dim],
+                    dtype=torch.float32,
+                ),
                 "quantized_code": torch.ones([1, 2], dtype=torch.int64),
-                "speaker_embedding": torch.randn([1, 4, model.token2wav.code2wav_dit_model.config.enc_emb_dim], dtype=torch.float32),
-                "condition_vector": torch.full((1, 400, model.token2wav.code2wav_dit_model.config.mel_dim), fill_value=-11.5129, dtype=torch.float32),
+                "speaker_embedding": torch.randn(
+                    [1, 4, model.token2wav.code2wav_dit_model.config.enc_emb_dim],
+                    dtype=torch.float32,
+                ),
+                "condition_vector": torch.full(
+                    (1, 400, model.token2wav.code2wav_dit_model.config.mel_dim),
+                    fill_value=-11.5129,
+                    dtype=torch.float32,
+                ),
                 "time_step": torch.tensor(0.0051, dtype=torch.float32),
             },
         )
@@ -847,7 +927,11 @@ def get_rope_index(
             input_tokens = input_ids.tolist()
             llm_pos_ids_list: list = []
             st = 0
-            remain_images, remain_videos, remain_audios = image_nums, video_nums, audio_nums
+            remain_images, remain_videos, remain_audios = (
+                image_nums,
+                video_nums,
+                audio_nums,
+            )
             multimodal_nums = image_nums + audio_nums if use_audio_in_video else image_nums + video_nums + audio_nums
             for _ in range(multimodal_nums):
                 st_idx = llm_pos_ids_list[-1].max() + 1 if len(llm_pos_ids_list) > 0 else 0
@@ -1193,18 +1277,34 @@ class OVQwen2_5OmniThinkerForConditionalGeneration(GenerationMixin):
         attention_mask = torch.zeros((1, hidden_states.shape[0], hidden_states.shape[0]), dtype=torch.bool)
         causal_mask = torch.zeros_like(attention_mask, dtype=torch.float32)
         for i in range(1, len(cu_seqlens)):
-            attention_mask[..., cu_seqlens[i - 1] : cu_seqlens[i], cu_seqlens[i - 1] : cu_seqlens[i]] = True
+            attention_mask[
+                ...,
+                cu_seqlens[i - 1] : cu_seqlens[i],
+                cu_seqlens[i - 1] : cu_seqlens[i],
+            ] = True
 
         causal_mask.masked_fill_(torch.logical_not(attention_mask), float("-inf"))
 
         window_attention_mask = torch.zeros((1, hidden_states.shape[0], hidden_states.shape[0]), dtype=torch.bool)
         window_causal_mask = torch.zeros_like(attention_mask, dtype=torch.float32)
         for i in range(1, len(cu_window_seqlens)):
-            window_attention_mask[..., cu_window_seqlens[i - 1] : cu_window_seqlens[i], cu_window_seqlens[i - 1] : cu_window_seqlens[i]] = True
+            window_attention_mask[
+                ...,
+                cu_window_seqlens[i - 1] : cu_window_seqlens[i],
+                cu_window_seqlens[i - 1] : cu_window_seqlens[i],
+            ] = True
 
         window_causal_mask.masked_fill_(torch.logical_not(window_attention_mask), float("-inf"))
 
-        res = self.visual_merger([hidden_states, causal_mask, window_causal_mask, window_index, rotary_pos_emb])[0]
+        res = self.visual_merger(
+            [
+                hidden_states,
+                causal_mask,
+                window_causal_mask,
+                window_index,
+                rotary_pos_emb,
+            ]
+        )[0]
         return torch.from_numpy(res)
 
     def __call__(
@@ -1325,9 +1425,10 @@ class OVQwen2_5OmniThinkerForConditionalGeneration(GenerationMixin):
             inputs_embeds = torch.from_numpy(self.embed_tokens(input_ids)[0])
         if input_ids is not None and input_ids.shape[1] != 1:  # Prefill stage
             if input_features is not None:
-                audio_feat_lengths, audio_output_lengths = self._get_feat_extract_output_lengths(
-                    audio_feature_lengths if audio_feature_lengths is not None else feature_attention_mask.sum(-1)
-                )
+                (
+                    audio_feat_lengths,
+                    audio_output_lengths,
+                ) = self._get_feat_extract_output_lengths(audio_feature_lengths if audio_feature_lengths is not None else feature_attention_mask.sum(-1))
                 feature_lens = audio_feature_lengths if audio_feature_lengths is not None else feature_attention_mask.sum(-1)
                 chunk_num = torch.ceil(feature_lens / (self.n_window * 2)).long()
 
@@ -1342,9 +1443,11 @@ class OVQwen2_5OmniThinkerForConditionalGeneration(GenerationMixin):
 
                 chunk_list = input_features.split(chunk_lengths.tolist(), dim=1)
 
-                padded_feature, padded_mask, padded_mask_after_cnn = self.padded_and_mask_function(
-                    chunk_list, chunk_lengths, padding_value=0, padding_side="right"
-                )
+                (
+                    padded_feature,
+                    padded_mask,
+                    padded_mask_after_cnn,
+                ) = self.padded_and_mask_function(chunk_list, chunk_lengths, padding_value=0, padding_side="right")
                 hidden_states = torch.from_numpy(self.audio([padded_feature, padded_mask, padded_mask_after_cnn])[0])
                 hidden_states_list = hidden_states.split(audio_feat_lengths.tolist(), dim=0)
                 token_audio_list = []
@@ -1394,7 +1497,10 @@ class OVQwen2_5OmniThinkerForConditionalGeneration(GenerationMixin):
         embeds_to_talker = inputs_embeds.clone()
         hidden_states_output = hidden_states.clone()
         return Qwen2_5OmniThinkerCausalLMOutputWithPast(
-            logits=logits, past_key_values=past_key_values, rope_deltas=rope_deltas, hidden_states=(embeds_to_talker, hidden_states_output)
+            logits=logits,
+            past_key_values=past_key_values,
+            rope_deltas=rope_deltas,
+            hidden_states=(embeds_to_talker, hidden_states_output),
         )
 
     def _reorder_cache(self, past_key_values: tuple[tuple[torch.Tensor]], beam_idx: torch.Tensor) -> tuple[tuple[torch.Tensor]]:
@@ -1527,10 +1633,26 @@ class OVQwen2_5OmniTalkerForConditionalGeneration(GenerationMixin):
                     video_second_per_grid,
                 )
                 inputs_embeds[:, -1, :] += torch.from_numpy(
-                    self.embed_tokens(torch.tensor([[self.codec_bos_token]], dtype=torch.long, device=inputs_embeds.device))[0][0]
+                    self.embed_tokens(
+                        torch.tensor(
+                            [[self.codec_bos_token]],
+                            dtype=torch.long,
+                            device=inputs_embeds.device,
+                        )
+                    )[
+                        0
+                    ][0]
                 )
                 inputs_embeds[:, -2, :] += torch.from_numpy(
-                    self.embed_tokens(torch.tensor([[self.codec_pad_token]], dtype=torch.long, device=inputs_embeds.device))[0][0]
+                    self.embed_tokens(
+                        torch.tensor(
+                            [[self.codec_pad_token]],
+                            dtype=torch.long,
+                            device=inputs_embeds.device,
+                        )
+                    )[
+                        0
+                    ][0]
                 )
 
             else:
@@ -1666,16 +1788,40 @@ class RungeKutta4ODESolver:
         self._one_third = 1 / 3
         self._two_thirds = 2 / 3
 
-    def _rk4_step(self, function, time_start, time_step, time_end, value_start, function_value_start=None):
+    def _rk4_step(
+        self,
+        function,
+        time_start,
+        time_step,
+        time_end,
+        value_start,
+        function_value_start=None,
+    ):
         k1 = function_value_start if function_value_start is not None else function(time_start, value_start)
-        k2 = function(time_start + time_step * self._one_third, value_start + time_step * k1 * self._one_third)
-        k3 = function(time_start + time_step * self._two_thirds, value_start + time_step * (k2 - k1 * self._one_third))
+        k2 = function(
+            time_start + time_step * self._one_third,
+            value_start + time_step * k1 * self._one_third,
+        )
+        k3 = function(
+            time_start + time_step * self._two_thirds,
+            value_start + time_step * (k2 - k1 * self._one_third),
+        )
         k4 = function(time_end, value_start + time_step * (k1 - k2 + k3))
         return (k1 + 3 * (k2 + k3) + k4) * time_step / 8
 
     def _compute_step(self, function, time_start, time_step, time_end, value_start):
         function_value_start = function(time_start, value_start)
-        return self._rk4_step(function, time_start, time_step, time_end, value_start, function_value_start=function_value_start), function_value_start
+        return (
+            self._rk4_step(
+                function,
+                time_start,
+                time_step,
+                time_end,
+                value_start,
+                function_value_start=function_value_start,
+            ),
+            function_value_start,
+        )
 
     def _linear_interpolation(self, time_start, time_end, value_start, value_end, time_point):
         if time_point == time_start:
@@ -1702,7 +1848,13 @@ class RungeKutta4ODESolver:
             next_value = current_value + delta_value
 
             while current_index < len(time_points) and time_end >= time_points[current_index]:
-                solution[current_index] = self._linear_interpolation(time_start, time_end, current_value, next_value, time_points[current_index])
+                solution[current_index] = self._linear_interpolation(
+                    time_start,
+                    time_end,
+                    current_value,
+                    next_value,
+                    time_points[current_index],
+                )
                 current_index += 1
 
             current_value = next_value
@@ -1860,7 +2012,11 @@ class OVQwen2_5OmniModel(GenerationMixin):
         talker_input_text_ids = torch.cat(
             [
                 input_ids.to(self.talker.device),
-                torch.tensor([[talker_text_bos_token]], dtype=torch.long, device=self.talker.device),
+                torch.tensor(
+                    [[talker_text_bos_token]],
+                    dtype=torch.long,
+                    device=self.talker.device,
+                ),
                 thinker_generate_ids[:, :1],
             ],
             dim=-1,
@@ -1868,9 +2024,21 @@ class OVQwen2_5OmniModel(GenerationMixin):
 
         talker_input_ids = torch.cat(
             [
-                torch.full_like(input_ids, fill_value=self.talker.codec_mask_token, device=self.talker.device),
-                torch.tensor([[self.talker.codec_pad_token]], dtype=torch.long, device=self.talker.device),
-                torch.tensor([[self.talker.codec_bos_token]], dtype=torch.long, device=self.talker.device),
+                torch.full_like(
+                    input_ids,
+                    fill_value=self.talker.codec_mask_token,
+                    device=self.talker.device,
+                ),
+                torch.tensor(
+                    [[self.talker.codec_pad_token]],
+                    dtype=torch.long,
+                    device=self.talker.device,
+                ),
+                torch.tensor(
+                    [[self.talker.codec_bos_token]],
+                    dtype=torch.long,
+                    device=self.talker.device,
+                ),
             ],
             dim=1,
         )
@@ -1890,11 +2058,23 @@ class OVQwen2_5OmniModel(GenerationMixin):
         )
 
         eos_embedding = torch.from_numpy(
-            self.thinker.embed_tokens(torch.tensor([[self.talker.text_eos_token]], dtype=torch.long, device=self.thinker.device))[0]
+            self.thinker.embed_tokens(
+                torch.tensor(
+                    [[self.talker.text_eos_token]],
+                    dtype=torch.long,
+                    device=self.thinker.device,
+                )
+            )[0]
         ).to(self.talker.device)
 
         pad_embedding = torch.from_numpy(
-            self.thinker.embed_tokens(torch.tensor([[self.talker.text_pad_token]], dtype=torch.long, device=self.thinker.device))[0]
+            self.thinker.embed_tokens(
+                torch.tensor(
+                    [[self.talker.text_pad_token]],
+                    dtype=torch.long,
+                    device=self.thinker.device,
+                )
+            )[0]
         ).to(self.talker.device)
 
         thinker_reply_part = torch.cat(
@@ -1908,7 +2088,10 @@ class OVQwen2_5OmniModel(GenerationMixin):
 
         talker_attention_mask = None
         if "attention_mask" in kwargs:
-            talker_attention_mask = torch.cat([kwargs["attention_mask"], kwargs["attention_mask"].new_ones((1, 2))], dim=1).to(self.talker.device)
+            talker_attention_mask = torch.cat(
+                [kwargs["attention_mask"], kwargs["attention_mask"].new_ones((1, 2))],
+                dim=1,
+            ).to(self.talker.device)
         print("[===start talker===]")
         talker_result = self.talker.generate(
             input_ids=talker_input_ids,
@@ -1925,7 +2108,10 @@ class OVQwen2_5OmniModel(GenerationMixin):
         # 3. Generate wavs from code
         reference_mel_spectrogram = speaker_params["ref_mel"].to(torch.device("cpu")).float()
         conditioning_vector = speaker_params["cond"].to(torch.device("cpu")).float()
-        noise_initialization = torch.randn([1, 30000, self.config.token2wav_config.dit_config.mel_dim], dtype=reference_mel_spectrogram.dtype)
+        noise_initialization = torch.randn(
+            [1, 30000, self.config.token2wav_config.dit_config.mel_dim],
+            dtype=reference_mel_spectrogram.dtype,
+        )
         maximum_duration = talker_generate_codes.shape[1] * self.config.token2wav_config.dit_config.repeats
         initial_state = noise_initialization[:, :maximum_duration].to(talker_generate_codes.device)
         batch_size = reference_mel_spectrogram.shape[0]
@@ -1937,14 +2123,28 @@ class OVQwen2_5OmniModel(GenerationMixin):
 
         def ode_function(time_step, hidden_states):
             model_output = torch.from_numpy(
-                self.token2wav_dit([hidden_states, reference_mel_spectrogram, conditioning_vector, talker_generate_codes, time_step])[0]
+                self.token2wav_dit(
+                    [
+                        hidden_states,
+                        reference_mel_spectrogram,
+                        conditioning_vector,
+                        talker_generate_codes,
+                        time_step,
+                    ]
+                )[0]
             )
             guided_prediction, null_prediction = torch.chunk(model_output, 2, dim=0)
 
             return guided_prediction + (guided_prediction - null_prediction) * guidance_scale
 
         initial_time = 0
-        time_embedding = torch.linspace(initial_time, 1, 10, device=talker_generate_codes.device, dtype=conditioning_vector.dtype)
+        time_embedding = torch.linspace(
+            initial_time,
+            1,
+            10,
+            device=talker_generate_codes.device,
+            dtype=conditioning_vector.dtype,
+        )
 
         if sway_coefficient is not None:
             time_embedding += sway_coefficient * (torch.cos(torch.pi / 2 * time_embedding) - 1 + time_embedding)
