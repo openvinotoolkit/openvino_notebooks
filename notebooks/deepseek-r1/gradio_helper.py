@@ -56,7 +56,7 @@ def get_system_prompt(model_language, system_prompt=None):
 def make_demo(pipe, model_configuration, model_id, model_language, disable_advanced=False):
     import gradio as gr
 
-    start_message = get_system_prompt(model_language, model_configuration.get("system_prompt"))
+    start_message = get_system_prompt(model_language, model_configuration.get("start_message"))
     if "genai_chat_template" in model_configuration:
         pipe.get_tokenizer().set_chat_template(model_configuration["genai_chat_template"])
 
