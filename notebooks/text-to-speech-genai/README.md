@@ -6,7 +6,7 @@ This library is friendly to PC and laptop execution, and optimized for resource 
 
 Text-to-speech (TTS) technology converts written text into spoken audio. It's a form of speech synthesis that allows users to listen to digital text being read aloud. This technology is used in various applications, including accessibility for those with visual impairments, voice assistants, and language learning tools.
 
-In this notebook we will demonstrate how to use OpenVINO GenAI capabilities for speech synthesis. You can find list of supported by OpenVINO GenAI in [SUPPORTED_MODELS.md](https://github.com/openvinotoolkit/openvino.genai/blob/master/SUPPORTED_MODELS.md#speech-generation-models). In this tutorial we will use [SpeechT5 TTS](https://huggingface.co/microsoft/speecht5_tts) model.
+In this notebook we will demonstrate how to use OpenVINO GenAI capabilities for speech synthesis. You can find list of supported by OpenVINO GenAI in [SUPPORTED_MODELS.md](https://openvinotoolkit.github.io/openvino.genai/docs/supported-models/#speech-generation-models). In this tutorial we will use [SpeechT5 TTS](https://huggingface.co/microsoft/speecht5_tts) model.
 
 ## Notebook Contents
 
