@@ -10,24 +10,16 @@ import gradio as gr
 import time
 import html
 import torch
-from transformers import AutoProcessor, Glm4vForConditionalGeneration, TextIteratorStreamer
-import spaces
+from transformers import TextIteratorStreamer
 
-MODEL_PATH = "THUDM/GLM-4.1V-9B-Thinking"
 stop_generation = False
-
-processor = AutoProcessor.from_pretrained(MODEL_PATH, use_fast=True)
-model = Glm4vForConditionalGeneration.from_pretrained(
-    MODEL_PATH,
-    torch_dtype=torch.bfloat16,
-    device_map="auto"
-)
 
 
 class GLM4VModel:
-    def __init__(self, model):
+    def __init__(self, model, processor):
         self.model = model
-        
+        self.processor = processor
+
     def _strip_html(self, text: str) -> str:
         return re.sub(r"<[^>]+>", "", text).strip()
 
@@ -78,19 +70,19 @@ class GLM4VModel:
                 if seg:
                     think_content = seg.group(1).strip().replace("\\n", "\n").replace("\n", "<br>")
                     think_html = (
-                            "<details open><summary style='cursor:pointer;font-weight:bold;color:#007acc;'>💭 Thinking</summary>"
-                            "<div style='color:#555555;line-height:1.6;padding:15px;border-left:4px solid #007acc;margin:10px 0;background-color:#f0f7ff;border-radius:4px;'>"
-                            + think_content
-                            + "</div></details>"
+                        "<details open><summary style='cursor:pointer;font-weight:bold;color:#007acc;'>💭 Thinking</summary>"
+                        "<div style='color:#555555;line-height:1.6;padding:15px;border-left:4px solid #007acc;margin:10px 0;background-color:#f0f7ff;border-radius:4px;'>"
+                        + think_content
+                        + "</div></details>"
                     )
             else:
                 part = buf.split("<think>", 1)[1]
                 think_content = part.replace("\\n", "\n").replace("\n", "<br>")
                 think_html = (
-                        "<details open><summary style='cursor:pointer;font-weight:bold;color:#007acc;'>💭 Thinking</summary>"
-                        "<div style='color:#555555;line-height:1.6;padding:15px;border-left:4px solid #007acc;margin:10px 0;background-color:#f0f7ff;border-radius:4px;'>"
-                        + think_content
-                        + "</div></details>"
+                    "<details open><summary style='cursor:pointer;font-weight:bold;color:#007acc;'>💭 Thinking</summary>"
+                    "<div style='color:#555555;line-height:1.6;padding:15px;border-left:4px solid #007acc;margin:10px 0;background-color:#f0f7ff;border-radius:4px;'>"
+                    + think_content
+                    + "</div></details>"
                 )
 
         answer_html = ""
@@ -104,7 +96,7 @@ class GLM4VModel:
 
         if answer_html:
             answer_html_raw = answer_html.replace("\\n", "\n")
-            if '<' in answer_html_raw and '>' in answer_html_raw:
+            if "<" in answer_html_raw and ">" in answer_html_raw:
                 escaped = html.escape(answer_html_raw)
                 answer_html = f"<pre class='code-block'><code class='language-html'>{escaped}</code></pre>"
             else:
@@ -127,12 +119,11 @@ class GLM4VModel:
                 msgs.append({"role": "assistant", "content": self._wrap_text(self._strip_html(raw).strip())})
         return msgs
 
-    @spaces.GPU(duration=120)
     def stream_generate(self, raw_hist, sys_prompt: str):
         global stop_generation
         stop_generation = False
         msgs = self._build_messages(raw_hist, sys_prompt)
-        inputs = processor.apply_chat_template(
+        inputs = self.processor.apply_chat_template(
             msgs,
             tokenize=True,
             add_generation_prompt=True,
@@ -140,7 +131,7 @@ class GLM4VModel:
             return_tensors="pt",
             padding=True,
         )
-        streamer = TextIteratorStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=False)
+        streamer = TextIteratorStreamer(self.processor.tokenizer, skip_prompt=True, skip_special_tokens=False)
         gen_kwargs = dict(
             inputs,
             max_new_tokens=8192,
@@ -188,9 +179,6 @@ def create_display_history(raw_hist):
     return display_hist
 
 
-glm4v = GLM4VModel()
-
-
 def check_files(files):
     vids = imgs = ppts = pdfs = 0
     for f in files or []:
@@ -212,16 +200,16 @@ def check_files(files):
     return True, ""
 
 
-
 def reset():
     global stop_generation
     stop_generation = True
     time.sleep(0.1)
     return [], [], None, ""
 
-def make_demo(ov_pipe):
-    glm4v = GLM4VModel(ov_pipe)
-    
+
+def make_demo(model, processor):
+    glm4v = GLM4VModel(model, processor)
+
     def chat(files, msg, raw_hist, sys_prompt):
         global stop_generation
         stop_generation = False
@@ -253,31 +241,16 @@ def make_demo(ov_pipe):
             yield display_hist, copy.deepcopy(raw_hist), None, ""
         display_hist = create_display_history(raw_hist)
         yield display_hist, copy.deepcopy(raw_hist), None, ""
-        
-    demo = gr.Blocks(title="GLM-4.1V-9B-Thinking", theme=gr.themes.Soft())
+
+    demo = gr.Blocks(title="GLM-4.1V-9B-Thinking-OpenVINO", theme=gr.themes.Soft())
 
     with demo:
-        gr.Markdown(
-            "<div style='text-align:center;font-size:32px;font-weight:bold;margin-bottom:20px;'>GLM-4.1V-9B-Thinking</div>"
-            "<div style='text-align:center;'><a href='https://huggingface.co/THUDM/GLM-4.1V-9B-Thinking'>Model Hub</a> | "
-            "<a href='https://github.com/THUDM/GLM-4.1V-Thinking'>Github</a> |"
-            "<a href='https://arxiv.org/abs/2507.01006'>Paper</a> |"
-            "<a href='https://www.bigmodel.cn/dev/api/visual-reasoning-model/GLM-4.1V-Thinking'>API</a> </div>"
-            "<div style='text-align:center;color:gray;font-size:14px;margin-top:10px;'>This demo runs on local GPU for faster experience. For the API version, visit <a href='https://huggingface.co/spaces/THUDM/GLM-4.1V-9B-Thinking-API-Demo' target='_blank'>this Space</a>.</div>"
-
-        )
+        gr.Markdown("<div style='text-align:center;font-size:32px;font-weight:bold;margin-bottom:20px;'>GLM-4.1V-9B-Thinking-OpenVINO</div>")
         raw_history = gr.State([])
 
         with gr.Row():
             with gr.Column(scale=7):
-                chatbox = gr.Chatbot(
-                    label="Chat",
-                    type="messages",
-                    height=600,
-                    elem_classes="chatbot-container",
-                    sanitize_html=False,
-                    line_breaks=True
-                )
+                chatbox = gr.Chatbot(label="Chat", type="messages", height=600, elem_classes="chatbot-container", sanitize_html=False, line_breaks=True)
                 textbox = gr.Textbox(label="Message", lines=3)
                 with gr.Row():
                     send = gr.Button("Send", variant="primary")
@@ -291,18 +264,7 @@ def make_demo(ov_pipe):
                 )
                 sys = gr.Textbox(label="System Prompt", lines=6)
 
-        send.click(
-            chat,
-            inputs=[up, textbox, raw_history, sys],
-            outputs=[chatbox, raw_history, up, textbox]
-        )
-        textbox.submit(
-            chat,
-            inputs=[up, textbox, raw_history, sys],
-            outputs=[chatbox, raw_history, up, textbox]
-        )
-        clear.click(
-            reset,
-            outputs=[chatbox, raw_history, up, textbox]
-        )
+        send.click(chat, inputs=[up, textbox, raw_history, sys], outputs=[chatbox, raw_history, up, textbox])
+        textbox.submit(chat, inputs=[up, textbox, raw_history, sys], outputs=[chatbox, raw_history, up, textbox])
+        clear.click(reset, outputs=[chatbox, raw_history, up, textbox])
     return demo

@@ -6,6 +6,8 @@ You can find more information in [model card](https://huggingface.co/THUDM/GLM-4
 
 In this tutorial we consider how to launch multimodal model GLM-4.1V-9B-Thinking using OpenVINO for creation multimodal chatbot. Additionally, we optimize model to low precision using [NNCF](https://github.com/openvinotoolkit/nncf).
 
+<img width="1938" height="924" alt="Image" src="https://github.com/user-attachments/assets/fd7287f2-d648-495c-84a3-f4cb8c4057bb" />
+
 ## Notebook contents
 The tutorial consists from following steps:
 
@@ -21,3 +23,4 @@ In this demonstration, you'll create interactive chatbot that can answer questio
 This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/glm4.1-v-thinking/README.md" />
