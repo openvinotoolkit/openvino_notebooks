@@ -570,3 +570,7 @@
   skips:
     - os:
         - windows-2022
+- notebook: notebooks/glm4.1-v-thinking/glm4.1-v-thinking.ipynb
+  skips:
+    - os:
+        - macos-13
