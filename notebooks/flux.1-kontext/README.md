@@ -12,11 +12,6 @@ In this tutorial, we consider how to convert and optimize Flux.1 Kontext model u
 
 In this demonstration, you will learn how to perform image-to-image generation using Flux.1 Kontext and OpenVINO. 
 
-Example of model work:
-
-**Input prompt**: *a tiny Yorkshire terrier astronaut hatching from an egg on the moon*
-![](https://github.com/user-attachments/assets/11733314-0b31-449c-9885-12ebf6365a58)
-
 The tutorial consists of the following steps:
 
 - Install prerequisites
