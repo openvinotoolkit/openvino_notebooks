@@ -1,8 +1,7 @@
-# Visual-language assistant with MiniCPM-V2 and OpenVINO
+# Visual-language assistant with MiniCPM-V and OpenVINO
 
-MiniCPM-V 2 is a strong multimodal large language model for efficient end-side deployment. MiniCPM-V 2.6 is the latest and most capable model in the MiniCPM-V series. The model is built on SigLip-400M and Qwen2-7B with a total of 8B parameters. It exhibits a significant performance improvement over previous versions, and introduces new features for multi-image and video understanding.
-
-More details about model can be found in [model card](https://huggingface.co/openbmb/MiniCPM-V-2_6) and original [repo](https://github.com/OpenBMB/MiniCPM-V).
+MiniCPM-V 4.0 is the latest efficient model in the MiniCPM-V series. The model is built based on SigLIP2-400M and MiniCPM4-3B with a total of 4.1B parameters. It inherits the strong single-image, multi-image and video understanding performance of MiniCPM-V 2.6 with largely improved efficiency. 
+More details about model can be found in [model card](https://huggingface.co/openbmb/MiniCPM-V-4) and original [repo](https://github.com/OpenBMB/MiniCPM-V).
 
 In this tutorial we consider how to convert and optimize MiniCPM-V2.6 model for creating multimodal chatbot. Additionally, we demonstrate how to apply stateful transformation on LLM part and model optimization techniques like weights compression using [NNCF](https://github.com/openvinotoolkit/nncf)
 
