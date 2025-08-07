@@ -461,6 +461,7 @@ kosmos
 Kosmos
 KOSMOS
 Kozlov
+Krea
 KServe
 Kubernetes
 Kupyn
