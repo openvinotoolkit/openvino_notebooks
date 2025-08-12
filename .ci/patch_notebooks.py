@@ -70,7 +70,7 @@ def remove_ov_install(cell):
             return False
         return True
 
-    lines = cell["source"].replace("pip_instal(", "pip_install( ").split("\n")
+    lines = cell["source"].replace("pip_install(", "pip_install( ").split("\n")
     for line in lines:
         if "openvino" in line:
             if "optimum-cli" in line or line.startswith("#") or "-openvino" in line:
