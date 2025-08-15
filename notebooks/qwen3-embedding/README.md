@@ -4,7 +4,7 @@ The Qwen3 Embedding model series is the latest proprietary model of the Qwen fam
 
 <img src="https://qianwen-res.oss-accelerate.aliyuncs.com/logo_qwen_embedding.png" width="400"/>
 
-In this tutorial we consider how to convert and optimize Qwen3 Embedding and Rereranker model using OpenVINO.
+In this tutorial we consider how to convert and optimize Qwen3 Embedding and Reranker model using OpenVINO.
 
 ### Notebook Contents
 
