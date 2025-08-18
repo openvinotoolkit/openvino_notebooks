@@ -574,3 +574,9 @@
   skips:
     - os:
         - macos-13
+- notebook: notebooks/ace-step-music-generation/ace-step-music-generation.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
