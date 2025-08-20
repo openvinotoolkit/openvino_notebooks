@@ -81,6 +81,7 @@ bicubic
 bilinear
 biometrics
 BiT
+bitext
 blockwise
 BLACKBOX
 boolean
@@ -602,6 +603,7 @@ MosaicPretrainedTransformer
 mpnet
 mpt
 MPT
+MRL
 MRPC
 mRoPE
 msi
@@ -863,6 +865,7 @@ repo
 reproducibility
 rerank
 Rerank
+reranking
 reranker
 resampler
 Resampler
