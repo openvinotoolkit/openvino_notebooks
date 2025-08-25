@@ -32,6 +32,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_ACTIONS_BOT_TOKEN }}
+          persist-credentials: true
 
       - name: Setup Node.js
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
@@ -98,6 +99,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_BOT_TOKEN }}
         run: |
+          git config --global --unset-all credential.helper
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
