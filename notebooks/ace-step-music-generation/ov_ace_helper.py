@@ -370,7 +370,6 @@ class OvWrapperACEStepTransformer2DModel(torch.nn.Module):
                     "tau": tau,
                 }
             )
-        print("ace_step_transformer after encode 1", torch.from_numpy(output[0]).size())
         return torch.from_numpy(output[0]), torch.from_numpy(output[1])
 
     def decode_with_temperature(
@@ -401,7 +400,6 @@ class OvWrapperACEStepTransformer2DModel(torch.nn.Module):
                 }
             )
 
-        print("ace_step_transformer after decode 1", torch.from_numpy(output[0]).size())
         sample = torch.from_numpy(output[0]) if output is not None else None
         return sample
 
@@ -474,10 +472,7 @@ class OvWrapperACEStepTransformer2DModel(torch.nn.Module):
             lyric_mask=lyric_mask,
         )
 
-        print("ace_step_transformer after encode", encoder_hidden_states.size())
-
         output_length = hidden_states.shape[-1]
-        print("ace_step_transformer output_length", output_length)
 
         output = self.decode(
             hidden_states=hidden_states,
@@ -491,7 +486,6 @@ class OvWrapperACEStepTransformer2DModel(torch.nn.Module):
             controlnet_scale=controlnet_scale,
             return_dict=return_dict,
         )
-        print("ace_step_transformer after decode", output.sample.size())
 
         return output
 

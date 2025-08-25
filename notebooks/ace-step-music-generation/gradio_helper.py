@@ -791,13 +791,7 @@ def make_demo(pipeline, data_sampler):
 
 def update_audio_widget():
     options = ["Retake", "Repainting", "Edit", "Extend"]
-    return widgets.ToggleButtons(
-        options=options,
-        description="Choose next operation with audio:",
-        disabled=False,
-        button_style="info",
-        value="Repainting"
-    )
+    return widgets.ToggleButtons(options=options, description="Choose next operation with audio:", disabled=False, button_style="info", value="Repainting")
 
 
 def setup_update_audio_widgets(update_audio_widget):
