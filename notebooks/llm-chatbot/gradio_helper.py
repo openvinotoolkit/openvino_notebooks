@@ -21,6 +21,7 @@ english_examples = [
     ["Explain the plot of Cinderella in a sentence."],
     ["What are some common mistakes to avoid when writing code?"],
     ["Write a 100-word blog post on “Benefits of Artificial Intelligence and OpenVINO“"],
+    ["write a quick sort algorithm."],
 ]
 
 japanese_examples = [
