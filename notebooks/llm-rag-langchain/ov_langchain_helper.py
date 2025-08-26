@@ -47,8 +47,8 @@ class OpenVINOLLM(LLM):
     Example using from_model_path:
         .. code-block:: python
 
-            from langchain_community.llms import OpenVINOLLM
-            ov = OpenVINOPipeline.from_model_path(
+            from ov_langchain_helper import OpenVINOLLM
+            ov = OpenVINOLLM.from_model_path(
                 model_path="./openvino_model_dir",
                 device="CPU",
             )
@@ -58,7 +58,7 @@ class OpenVINOLLM(LLM):
             import openvino_genai
             pipe = openvino_genai.LLMPipeline("./openvino_model_dir", "CPU")
             config = openvino_genai.GenerationConfig()
-            ov = OpenVINOPipeline.from_model_path(
+            ov = OpenVINOLLM.from_model_path(
                 ov_pipe=pipe,
                 config=config,
             )
@@ -323,7 +323,7 @@ class OpenVINOEmbeddings(BaseModel, Embeddings):
     Example:
         .. code-block:: python
 
-            from langchain_community.embeddings import OpenVINOEmbeddings
+            from ov_langchain_helper import OpenVINOEmbeddings
 
             model_name = "sentence-transformers/all-mpnet-base-v2"
             model_kwargs = {'device': 'CPU'}
@@ -505,7 +505,7 @@ class OpenVINOBgeEmbeddings(OpenVINOEmbeddings):
     Bge Example:
         .. code-block:: python
 
-            from langchain_community.embeddings import OpenVINOBgeEmbeddings
+            from ov_langchain_helper import OpenVINOBgeEmbeddings
 
             model_name = "BAAI/bge-large-en-v1.5"
             model_kwargs = {'device': 'CPU'}
@@ -564,11 +564,11 @@ class OpenVINOGenAIEmbeddings(BaseModel, Embeddings):
     Example:
         .. code-block:: python
 
-            from langchain_community.embeddings import OpenVINOGenAIEmbeddings
+            from ov_langchain_helper import OpenVINOGenAIEmbeddings
 
             model_path = "./sentence-transformers/all-mpnet-base-v2"
             encode_kwargs = {'normalize_embeddings': True}
-            ov = OpenVINOEmbeddings.from_model_path(
+            ov = OpenVINOGenAIEmbeddings.from_model_path(
                 model_path=model_path,
                 device="CPU",
                 encode_kwargs=encode_kwargs,
