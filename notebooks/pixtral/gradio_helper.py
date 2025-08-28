@@ -23,19 +23,19 @@ def resize_with_aspect_ratio(image: Image, dst_height=512, dst_width=512):
 def _resolve_file_path(file_obj):
     if file_obj is None:
         return None
-    
+
     if isinstance(file_obj, (list, tuple)) and file_obj:
         return _resolve_file_path(file_obj[-1])
-    
+
     if isinstance(file_obj, str):
         return file_obj
-    
+
     if isinstance(file_obj, dict) and ("path" in file_obj or "name" in file_obj):
         return file_obj.get("path") or file_obj.get("name")
-    
+
     if hasattr(file_obj, "path"):
         return file_obj.path
-    
+
     return str(file_obj)
 
 
