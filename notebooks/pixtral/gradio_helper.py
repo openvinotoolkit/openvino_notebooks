@@ -20,6 +20,25 @@ def resize_with_aspect_ratio(image: Image, dst_height=512, dst_width=512):
     return image
 
 
+def _resolve_file_path(file_obj):
+    if file_obj is None:
+        return None
+
+    if isinstance(file_obj, (list, tuple)) and file_obj:
+        return _resolve_file_path(file_obj[-1])
+
+    if isinstance(file_obj, str):
+        return file_obj
+
+    if isinstance(file_obj, dict) and ("path" in file_obj or "name" in file_obj):
+        return file_obj.get("path") or file_obj.get("name")
+
+    if hasattr(file_obj, "path"):
+        return file_obj.path
+
+    return str(file_obj)
+
+
 def make_demo(model, processor):
     model_name = Path(model.config._name_or_path).parent.name
 
@@ -40,11 +59,7 @@ def make_demo(model, processor):
         files = message["files"] if isinstance(message, dict) else message.files
         message_text = message["text"] if isinstance(message, dict) else message.text
         if files:
-            # message["files"][-1] is a Dict or just a string
-            if isinstance(files[-1], dict):
-                image = files[-1]["path"]
-            else:
-                image = files[-1] if isinstance(files[-1], (list, tuple)) else files[-1].path
+            image = _resolve_file_path(files)
         else:
             # if there's no image uploaded for this turn, look for images in the past turns
             # kept inside tuples, take the last one
