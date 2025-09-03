@@ -52,7 +52,7 @@ OpenVINOノートブックはPythonとGitを必要とします。始めるには
 
 この[ページ](https://openvinotoolkit.github.io/openvino_notebooks/)を使用してJupyterノートブックを探索し、あなたのニーズに関連するものを選択するか、すべて試してみてください。幸運を祈ります！
 
-**注意：このリポジトリのmainブランチは新しいOpenVINO 2025.2リリースをサポートするように更新されました。** 新しいリリースバージョンにアップグレードするには、`openvino_env`仮想環境で`pip install --upgrade -r requirements.txt`を実行してください。初めてインストールする場合は、以下の[インストールガイド](#-インストールガイド)セクションを参照してください。以前のリリースバージョンのOpenVINOを使用する場合は、[2025.1ブランチ](https://github.com/openvinotoolkit/openvino_notebooks/tree/2025.2)をチェックアウトしてください。以前の長期サポート（LTS）バージョンのOpenVINOを使用する場合は、[2023.3ブランチ](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.3)をチェックアウトしてください。
+**注意：このリポジトリのmainブランチは新しいOpenVINO 2025.3リリースをサポートするように更新されました。** 新しいリリースバージョンにアップグレードするには、`openvino_env`仮想環境で`pip install --upgrade -r requirements.txt`を実行してください。初めてインストールする場合は、以下の[インストールガイド](#-インストールガイド)セクションを参照してください。以前のリリースバージョンのOpenVINOを使用する場合は、[2025.2ブランチ](https://github.com/openvinotoolkit/openvino_notebooks/tree/2025.2)をチェックアウトしてください。以前の長期サポート（LTS）バージョンのOpenVINOを使用する場合は、[2023.3ブランチ](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.3)をチェックアウトしてください。
 
 助けが必要な場合は、GitHub [Discussion](https://github.com/openvinotoolkit/openvino_notebooks/discussions)を開始してください。  
 
