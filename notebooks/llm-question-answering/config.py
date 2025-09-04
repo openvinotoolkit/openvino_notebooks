@@ -8,19 +8,6 @@ SUPPORTED_LLM_MODELS = {
         "model_id": "susnato/phi-2",
         "prompt_template": "Instruct:{instruction}\nOutput:",
     },
-    "dolly-v2-3b": {
-        "model_id": "databricks/dolly-v2-3b",
-        "instriction_key": "### Instruction:",
-        "response_key": "### Response:",
-        "end_key": "### End",
-        "prompt_template": """Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-### Instruction:
-{instruction}
-
-### Response:
-""",
-    },
     "red-pajama-instruct-3b": {
         "model_id": "togethercomputer/RedPajama-INCITE-Instruct-3B-v1",
         "prompt_template": "Q: {instruction}\nA:",
