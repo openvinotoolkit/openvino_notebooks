@@ -9,7 +9,11 @@ import cv2
 import gradio as gr
 import requests
 from PIL import Image
-from transformers import TextIteratorStreamer
+import numpy as np
+import openvino as ov
+import openvino_genai as ov_genai
+from threading import Event, Thread
+import queue
 
 MAX_NUM_IMAGES = int(os.getenv("MAX_NUM_IMAGES", "5"))
 
@@ -161,7 +165,7 @@ def process_history(history: list[dict]) -> list[dict]:
     return messages
 
 
-def make_demo(model, processor):
+def make_demo(pipe):
     download_example_images()
 
     def run(message: dict, history: list[dict], system_prompt: str = "", max_new_tokens: int = 512) -> Iterator[str]:
@@ -174,28 +178,48 @@ def make_demo(model, processor):
             messages.append({"role": "system", "content": [{"type": "text", "text": system_prompt}]})
         messages.extend(process_history(history))
         messages.append({"role": "user", "content": process_new_user_message(message)})
-
-        inputs = processor.apply_chat_template(
-            messages,
-            add_generation_prompt=True,
-            tokenize=True,
-            return_dict=True,
-            return_tensors="pt",
-        ).to(device=model.device)
-
-        streamer = TextIteratorStreamer(processor, skip_prompt=True, skip_special_tokens=True)
-        generate_kwargs = dict(
-            inputs,
-            streamer=streamer,
-            max_new_tokens=max_new_tokens,
-        )
-        t = Thread(target=model.generate, kwargs=generate_kwargs)
-        t.start()
-
-        output = ""
-        for delta in streamer:
-            output += delta
-            yield output
+        
+        # Extract and convert images from files for OpenVINO GenAI
+        images = []
+        if message["files"]:
+            for file_path in message["files"]:
+                if not file_path.endswith(".mp4"):  # Skip videos
+                    # Convert image file to OpenVINO Tensor format
+                    pic = Image.open(file_path).convert("RGB")
+                    image_data = np.array(pic.getdata()).reshape(1, pic.size[1], pic.size[0], 3).astype(np.byte)
+                    images.append(ov.Tensor(image_data))
+        
+         # Create a queue to collect streaming output
+        output_queue = queue.Queue()
+        stream_complete = Event()
+        
+        def streamer(subword):
+            output_queue.put(subword)
+            return ov_genai.StreamingStatus.RUNNING
+        
+        def generate_in_thread():
+            if images:
+                pipe.generate(message["text"], images=images, max_new_tokens=max_new_tokens, streamer=streamer)
+            else:
+                pipe.generate(message["text"], max_new_tokens=max_new_tokens, streamer=streamer)
+            stream_complete.set()
+        
+        # Start generation in background thread
+        Thread(target=generate_in_thread).start()
+        
+        # Stream results as they come in
+        buffer = ""
+        while not stream_complete.is_set() or not output_queue.empty():
+            try:
+                # Get next token with timeout
+                subword = output_queue.get(timeout=0.1)
+                buffer += subword
+                yield buffer
+            except queue.Empty:
+                continue
+        
+        # Yield final result
+        yield buffer
 
     examples = [
         [
