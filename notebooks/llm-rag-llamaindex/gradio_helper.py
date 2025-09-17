@@ -39,6 +39,7 @@ def make_demo(
     update_retriever_fn: Callable,
     model_name: str,
     language: Literal["English", "Chinese"] = "English",
+    rerank_device: str = "auto",
 ):
     examples = chinese_examples if (language == "Chinese") else english_examples
 
@@ -189,8 +190,8 @@ def make_demo(
                                 value=2,
                                 step=1,
                                 label="Rerank top n",
-                                info="Number of rerank results",
-                                interactive=True,
+                                info="Number of rerank results(setted on creation step in GenAI pipeline).",
+                                interactive=(rerank_device == "NPU"),
                             )
                         with gr.Row():
                             vector_search_top_k = gr.Slider(
