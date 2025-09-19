@@ -784,29 +784,20 @@ class OpenVINOGenAIReranker(BaseDocumentCompressor):
 
         return cls(ov_pipe=ov_pipe)
 
-    def rerank(self, request: Any) -> Any:
-        passages = [passage["text"] for passage in request.passages]
-        output = self.ov_pipe.rerank(request.query, passages)
-        rerank_result = []
-        for index, score in output:
-            rerank_result.append({"text": passages[index], "score": score, "id": index})
-        return rerank_result
-
     def compress_documents(
         self,
         documents: Sequence[Document],
         query: str,
         callbacks: Optional[Callbacks] = None,
     ) -> Sequence[Document]:
-        passages = [{"id": i, "text": doc.page_content} for i, doc in enumerate(documents)]
-
-        rerank_request = RerankRequest(query=query, passages=passages)
-        rerank_response = self.rerank(rerank_request)[: self.top_n]
+        docs = [doc.page_content for doc in documents]
+        rerank_response = self.ov_pipe.rerank(query, docs)
         final_results = []
-        for r in rerank_response:
+        for index, score in rerank_response:
             doc = Document(
-                page_content=r["text"],
-                metadata={"id": r["id"], "relevance_score": r["score"]},
+                page_content=documents[index].page_content,
+                metadata={"id": index, "relevance_score": score},
             )
             final_results.append(doc)
+
         return final_results
