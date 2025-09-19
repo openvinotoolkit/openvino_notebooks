@@ -494,6 +494,11 @@ SUPPORTED_LLM_MODELS = {
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": qwen_completion_to_prompt,
         },
+        "afm-4.5b": {
+            "model_id": "arcee-ai/AFM-4.5B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+        },
     },
     "Chinese": {
         "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
