@@ -3,6 +3,7 @@ from typing import Union
 
 import openvino_genai
 
+
 class IterableStreamer(openvino_genai.StreamerBase):
     """
     A custom streamer class for handling token streaming and detokenization with buffering.
@@ -103,9 +104,7 @@ class IterableStreamer(openvino_genai.StreamerBase):
             # Don't print incomplete text.
             self.decoded_lengths[-1] = -1
         elif len(self.tokens_cache) >= delay_n_tokens:
-            self.compute_decoded_length_for_position(
-                len(self.decoded_lengths) - delay_n_tokens
-            )
+            self.compute_decoded_length_for_position(len(self.decoded_lengths) - delay_n_tokens)
             print_until = self.decoded_lengths[-delay_n_tokens]
             if print_until != -1 and print_until > self.print_len:
                 # It is possible to have a shorter text after adding new token.

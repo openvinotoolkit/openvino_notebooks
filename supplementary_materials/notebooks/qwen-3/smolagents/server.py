@@ -15,12 +15,7 @@ import openvino_genai as ovgenai
 
 from transformers import AutoTokenizer
 
-from openai.types.chat.chat_completion_chunk import (
-        ChatCompletionChunk,
-        Choice,
-        ChoiceDelta,
-        CompletionUsage
-    )
+from openai.types.chat.chat_completion_chunk import ChatCompletionChunk, Choice, ChoiceDelta, CompletionUsage
 
 from iterable_streamer import IterableStreamer
 
@@ -30,17 +25,17 @@ logger = logging.getLogger(__name__)
 
 class OVServer:
     def __init__(
-            self,
-            model_path,
-            draft_path=None,
-            num_assistant_tokens=3,
-            port=8000,
-            host="localhost",
-            device="GPU",
-            log_level="info",
-        ):
+        self,
+        model_path,
+        draft_path=None,
+        num_assistant_tokens=3,
+        port=8000,
+        host="localhost",
+        device="GPU",
+        log_level="info",
+    ):
         logger.info(f"Initializing OV Server with model: {model_path}, device: {device}, host: {host}, port: {port}")
-        
+
         self.model_path = model_path
         self.draft_path = draft_path
         self.num_assistant_tokens = num_assistant_tokens
@@ -48,7 +43,7 @@ class OVServer:
         self.host = host
         self.log_level = log_level
         self.device = device
-        
+
         try:
             scheduler_config = ovgenai.SchedulerConfig()
             scheduler_config.dynamic_split_fuse = False
@@ -68,12 +63,7 @@ class OVServer:
                     scheduler_config=draft_scheduler_config,
                 )
                 logger.info(f"Loading LLM pipeline from {self.model_path} on {self.device} with draft model")
-                self.model = ovgenai.LLMPipeline(
-                    self.model_path,
-                    self.device,
-                    draft_model=draft_model,
-                    scheduler_config=scheduler_config
-                )
+                self.model = ovgenai.LLMPipeline(self.model_path, self.device, draft_model=draft_model, scheduler_config=scheduler_config)
             else:
                 logger.info(f"Loading LLM pipeline from {self.model_path} on {self.device}")
                 self.model = ovgenai.LLMPipeline(
@@ -81,10 +71,10 @@ class OVServer:
                     self.device,
                     scheduler_config=scheduler_config,
                 )
-            
+
             logger.info(f"Loading tokenizer from {model_path}")
             self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-            
+
             logger.info("OV Server initialization completed successfully")
         except Exception as e:
             logger.error(f"Failed to initialize OV Server: {str(e)}")
@@ -118,7 +108,7 @@ class OVServer:
             clean_messages.append(parsed_message)
         logger.debug("Message processing completed")
         return clean_messages
-    
+
     def get_models(self):
         # Right now the server only handles a single model
         return [
@@ -160,26 +150,28 @@ class OVServer:
 
     def process_chat_completions(self, request: dict):
         request_id = request.get("request_id", "req_0")
-        
+
         messages = request.get("messages", [])
         if not messages or messages[-1]["role"] != "user":
             logger.error("Invalid request: Last message must be from the user")
             raise HTTPException(status_code=422, detail="The last message must be from the user.")
-        
+
         logger.debug(f"Request contains {len(messages)} messages")
         clean_messages = self.get_clean_messages(messages)
 
         try:
             logger.debug("Applying chat template and tokenizing input")
-            inputs = ov.Tensor(self.tokenizer.apply_chat_template(
-                clean_messages,
-                add_generation_prompt=True,
-                tools=request.get("tools"),
-                tokenize=True,
-                return_tensors='np',
-                **request.get("chat_template_kwargs", {}),
-            ))
-            
+            inputs = ov.Tensor(
+                self.tokenizer.apply_chat_template(
+                    clean_messages,
+                    add_generation_prompt=True,
+                    tools=request.get("tools"),
+                    tokenize=True,
+                    return_tensors="np",
+                    **request.get("chat_template_kwargs", {}),
+                )
+            )
+
             logger.debug(f"Input tensor shape: {inputs.shape}")
         except Exception as e:
             logger.error(f"Failed to process input for request {request_id}: {str(e)}")
@@ -197,7 +189,7 @@ class OVServer:
                 times.append(time.perf_counter())
                 thread.start()
                 yield self.build_chat_completion_chunk(_request_id, role="assistant", model=self.model_path)
-                
+
                 for result in streamer:
                     results += result
                     if result != "":
@@ -216,39 +208,32 @@ class OVServer:
                     logger.info(f" - {key}: {value:.4f} seconds")
                 usage = None
                 if request.get("stream_options", {}).get("include_usage"):
-                    usage = {
-                        "prompt_tokens": inputs.shape[1],
-                        "completion_tokens": token_count,
-                        "total_tokens": inputs.shape[1] + token_count
-                    }
+                    usage = {"prompt_tokens": inputs.shape[1], "completion_tokens": token_count, "total_tokens": inputs.shape[1] + token_count}
                 yield self.build_chat_completion_chunk(_request_id, finish_reason="stop", model=self.model_path, usage=usage)
 
                 thread.join()
             except Exception as e:
                 logger.error(f"Error during generation for request {_request_id}: {str(e)}")
                 yield f'data: {{"error": "{str(e)}"}}'
-        
+
         return stream_chat_completion(generation_streamer, request_id)
 
     def build_chat_completion_chunk(
-            self,
-            request_id="",
-            content=None,
-            model=None,
-            role=None,
-            finish_reason=None,
-            usage=None,
-        ):
+        self,
+        request_id="",
+        content=None,
+        model=None,
+        role=None,
+        finish_reason=None,
+        usage=None,
+    ):
         chunk = ChatCompletionChunk(
             id=request_id,
             created=int(time.time()),
             model=model,
             choices=[
                 Choice(
-                    delta=ChoiceDelta(
-                        role=role,
-                        content=content
-                    ),
+                    delta=ChoiceDelta(role=role, content=content),
                     index=0,
                     finish_reason=finish_reason,
                 )
@@ -269,7 +254,7 @@ class OVServer:
             # Speculative-specific parameters
             generation_config.num_assistant_tokens = self.num_assistant_tokens
             generation_config.assistant_confidence_threshold = 0
-                
+
             # Response-specific parameters
             if req.get("max_output_tokens") is not None:
                 generation_config.max_new_tokens = int(req["max_output_tokens"])
@@ -277,44 +262,43 @@ class OVServer:
             # Completion-specific parameters
             if req.get("max_tokens") is not None:
                 generation_config.max_new_tokens = int(req["max_tokens"])
-                
+
             if req.get("frequency_penalty") is not None:
                 generation_config.repetition_penalty = float(req["frequency_penalty"])
-                
+
             # if req.get("logit_bias") is not None:
             #     generation_config.sequence_bias = req["logit_bias"]
-            
+
             if req.get("stop") is not None:
                 generation_config.stop_strings = set(req["stop"])
-                
+
             if req.get("temperature") is not None:
                 generation_config.temperature = float(req["temperature"])
                 if float(req["temperature"]) == 0.0:
                     generation_config.do_sample = False
-                
+
             if req.get("top_p") is not None:
                 generation_config.top_p = float(req["top_p"])
-                
+
             return generation_config
-            
+
         except Exception as e:
             logger.error(f"Error creating generation config: {str(e)}")
             logger.warning("Falling back to default generation config")
             return model_generation_config
-        
 
 
 def main(
-        model_path,
-        draft_path=None,
-        num_assistant_tokens=3,
-        port=8000,
-        host="localhost",
-        device="GPU",
-        log_level="info",
-    ):
+    model_path,
+    draft_path=None,
+    num_assistant_tokens=3,
+    port=8000,
+    host="localhost",
+    device="GPU",
+    log_level="info",
+):
     """Main function to start the OpenVINO GenAI Server.
-    
+
     Args:
         model_path (str): Path to the model directory or model name
         draft_path (str, optional): Path to the draft model directory or model name
@@ -326,7 +310,7 @@ def main(
     """
     logger.info("Starting OpenVINO GenAI Server")
     logger.info(f"Model: {model_path}, Device: {device}, Host: {host}, Port: {port}")
-    
+
     try:
         server = OVServer(
             model_path=model_path,
@@ -345,15 +329,12 @@ def main(
         raise
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="OV Server")
     OVServer.add_server_arguments(parser)
     args = parser.parse_args()
-    
+
     # Configure logging
-    logging.basicConfig(
-        format="%(asctime)s %(levelname)s %(name)s %(message)s",
-        level=logging.INFO
-    )
-    
+    logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s %(message)s", level=logging.INFO)
+
     main(**vars(args))
