@@ -580,3 +580,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
+- notebook: notebooks/flux.1-kontext/flux.1-kontext.ipynb
+  skips:
+    - os:
+        - macos-13

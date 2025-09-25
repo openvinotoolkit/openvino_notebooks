@@ -19,6 +19,7 @@ EXCEPTIONS_URLs = [
     "https://openai.com/",
     "https://deci.ai/",
     "https://llama.meta.com/llama3",
+    "wikipedia.org",
 ]
 
 

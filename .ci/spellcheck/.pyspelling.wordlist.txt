@@ -13,6 +13,7 @@ AE
 AEs
 aeroplane
 affective
+AFM
 Agentic
 agentic
 ai
@@ -33,6 +34,7 @@ Antelopev
 api
 APIs
 Arcface
+Arcee
 argmax
 artstation
 arxiv
@@ -574,6 +576,7 @@ microservices
 MiDaS
 MidasNet
 Midjourney
+midtraining
 minicpm
 MiniCPM
 MiniLM

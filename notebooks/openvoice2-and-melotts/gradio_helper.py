@@ -1,6 +1,7 @@
 from typing import Callable
 import gradio as gr
-
+import os
+from pathlib import Path
 
 description = """
     # OpenVoice2 accelerated by OpenVINO:
@@ -33,7 +34,7 @@ examples = [
 ]
 
 
-def make_demo(fn: Callable):
+def make_demo(fn: Callable, output_dir: Path):
     with gr.Blocks(analytics_enabled=False) as demo:
         with gr.Row():
             gr.Markdown(description)
@@ -75,18 +76,43 @@ def make_demo(fn: Callable):
                 out_text_gr = gr.Text(label="Info")
                 audio_gr = gr.Audio(label="Synthesised Audio", autoplay=True)
                 ref_audio_gr = gr.Audio(label="Reference Audio Used")
+                stream_gr = gr.Checkbox(
+                    label="Streaming mode ON",
+                    value=False,
+                    info="If it is on, streaming is started. Since next conversion, text from 'Text Prompt' will be streamed to single file.",
+                )
+
+                def get_tmp_and_save_path(straming_mode):
+                    tts_step_path = f"{output_dir}/tmp{'_streamed' if straming_mode else ''}.wav"
+                    save_path = f"{output_dir}/output{'_streamed' if straming_mode else ''}.wav"
+                    return tts_step_path, save_path
+
+                def toggle_streaming_mode(is_checked):
+                    tts_step_path, save_path = get_tmp_and_save_path(True)
+                    if not is_checked:
+                        if os.path.exists(save_path):
+                            os.remove(save_path)
+                        if os.path.exists(tts_step_path):
+                            os.remove(tts_step_path)
+
+                stream_gr.change(fn=toggle_streaming_mode, inputs=[stream_gr], outputs=[])
+
+                def predict(input_text_gr, style_gr, ref_gr, tos_gr, stream_gr):
+                    tts_step_path, save_path = get_tmp_and_save_path(stream_gr)
+                    return fn(input_text_gr, style_gr, ref_gr, tos_gr, stream_gr, save_path, tts_step_path, output_dir)
 
                 gr.Examples(
                     examples,
                     label="Examples",
-                    inputs=[input_text_gr, style_gr, ref_gr, tos_gr],
+                    inputs=[input_text_gr, style_gr, ref_gr, tos_gr, stream_gr],
                     outputs=[out_text_gr, audio_gr, ref_audio_gr],
-                    fn=fn,
+                    fn=predict,
                     cache_examples=False,
                 )
                 tts_button.click(
-                    fn,
-                    [input_text_gr, style_gr, ref_gr, tos_gr],
+                    predict,
+                    [input_text_gr, style_gr, ref_gr, tos_gr, stream_gr],
                     outputs=[out_text_gr, audio_gr, ref_audio_gr],
                 )
+
     return demo
