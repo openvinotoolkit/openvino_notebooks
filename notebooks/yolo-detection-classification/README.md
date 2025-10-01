@@ -15,7 +15,7 @@ The notebook is organized into the following sections:
    Import necessary Python libraries and initialize OpenVINO.
 
 3. **Download Models**  
-   Download YOLOv11n for object detection and YOLOv11n-cls for classification.
+   Download YOLOv11n for object detection and YOLOv11n (classification variant) for classification.
 
 4. **Basic Inference without OpenVINO**  
    Run detection using the PyTorch model to establish a baseline.
