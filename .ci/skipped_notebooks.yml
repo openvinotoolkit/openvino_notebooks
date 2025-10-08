@@ -614,3 +614,7 @@
   skips:
     - python:
         - "3.12"
+- notebook: notebooks/text-to-image-genai/text-to-image-genai.ipynb
+  skips:
+    - os:
+        - macos-13
