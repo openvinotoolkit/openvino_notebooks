@@ -339,6 +339,7 @@ GenerationMixin
 Girshick
 Gitee
 GitHub
+GGUF
 GLA
 GLM
 glm
@@ -954,6 +955,7 @@ SML
 sml
 SmolDocling
 SmolVLM
+SmolLM
 softmax
 softvc
 SoftVC
