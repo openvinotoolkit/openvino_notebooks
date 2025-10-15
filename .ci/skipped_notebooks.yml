@@ -200,6 +200,8 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
+    - python:
+        - '3.12'
 - notebook: notebooks/sound-generation-audioldm2/sound-generation-audioldm2.ipynb
   skips:
     - os:
@@ -236,6 +238,8 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
+    - python:
+        - '3.12'
 - notebook: notebooks/kosmos2-multimodal-large-language-model/kosmos2-multimodal-large-language-model.ipynb
   skips:
     - os:
@@ -336,6 +340,8 @@
   skips:
     - device:
         - gpu
+    - python:
+        - '3.12'
 - notebook: notebooks/hello-npu/hello-npu.ipynb
   skips:
     - device:
@@ -581,6 +587,34 @@
         - ubuntu-22.04
         - windows-2022
 - notebook: notebooks/flux.1-kontext/flux.1-kontext.ipynb
+  skips:
+    - os:
+        - macos-13
+- notebook: notebooks/convert-to-openvino/convert-to-openvino.ipynb
+  skips:
+    - python:
+        - "3.12"
+- notebook: notebooks/jax-to-openvino/jax-classification-to-openvino.ipynb
+  skips:
+    - python:
+        - "3.12"
+- notebook: notebooks/optimize-preprocessing/optimize-preprocessing.ipynb
+  skips:
+    - python:
+        - "3.12"
+- notebook: notebooks/tensorflow-classification-to-openvino/tensorflow-classification-to-openvino.ipynb
+  skips:
+    - python:
+        - "3.12"
+- notebook: notebooks/tensorflow-hub/tensorflow-hub.ipynb
+  skips:
+    - python:
+        - "3.12"
+- notebook: notebooks/tensorflow-object-detection-to-openvino/tensorflow-object-detection-api-with-openvino.ipynb
+  skips:
+    - python:
+        - "3.12"
+- notebook: notebooks/text-to-image-genai/text-to-image-genai.ipynb
   skips:
     - os:
         - macos-13
