@@ -878,7 +878,8 @@ def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPOR
 
     # Define dependent drop down
 
-    model_dropdown = widgets.Dropdown(options=models)
+    default_model_key = list(models.keys())[0]
+    model_dropdown = widgets.Dropdown(options=models, value=models[default_model_key])
 
     def dropdown_handler(change):
         global default_language
