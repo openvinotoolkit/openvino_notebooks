@@ -877,8 +877,16 @@ def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPOR
     lang_dropdown = widgets.Dropdown(options=languages or [])
 
     # Define dependent drop down
-
-    default_model_key = list(models.keys())[0]
+    # Select first model WITHOUT remote_code=True to avoid incompatibility issues
+    default_model_key = None
+    for key, config in models.items():
+        if not config.get("remote_code", False):
+            default_model_key = key
+            break
+    # Fallback to first model if all require remote_code
+    if default_model_key is None:
+        default_model_key = list(models.keys())[0]
+    
     model_dropdown = widgets.Dropdown(options=models, value=models[default_model_key])
 
     def dropdown_handler(change):
@@ -886,7 +894,15 @@ def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPOR
         default_language = change.new
         new_models = SUPPORTED_LLM_MODELS[change.new]
         model_dropdown.options = new_models
-        default_key = list(new_models.keys())[0]
+        # Select first model WITHOUT remote_code=True
+        default_key = None
+        for key, config in new_models.items():
+            if not config.get("remote_code", False):
+                default_key = key
+                break
+        # Fallback to first model if all require remote_code
+        if default_key is None:
+            default_key = list(new_models.keys())[0]
         model_dropdown.value = new_models[default_key]
 
     lang_dropdown.observe(dropdown_handler, names="value")
