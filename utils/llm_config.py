@@ -73,6 +73,8 @@ def qwen_completion_to_prompt(completion):
 
 SUPPORTED_LLM_MODELS = {
     "English": {
+        "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
+        "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
         "Qwen3-0.6B": {
             "model_id": "Qwen/Qwen3-0.6B",
             "remote_code": False,
@@ -113,8 +115,6 @@ SUPPORTED_LLM_MODELS = {
             "completion_to_prompt": qwen_completion_to_prompt,
             "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
-        "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
-        "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
         "GLM-4-9B-0414": {
             "model_id": "THUDM/GLM-4-9B-0414",
             "remote_code": False,
@@ -366,20 +366,6 @@ SUPPORTED_LLM_MODELS = {
             "partial_text_processor": llama_partial_text_processor,
             "genai_chat_template": "{{ bos_token }}{% for message in messages %}{% if (message['role'] == 'user') != (loop.index0 % 2 == 0) %}{{ raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') }}{% endif %}{% if message['role'] == 'user' %}{% if (messages[0]['role'] == 'system' and messages|length == 2) %}{{ message['content'] + '[/INST]' }}{% else %}{{ '[INST] ' + message['content'] + ' [/INST]' }}{% endif %}{% elif message['role'] == 'assistant' %}{{ ' ' + message['content'] + eos_token + ' ' }}{% elif (message['role'] == 'system' and messages|length == 2) %}{{ '[INST] ' + message['content'] + ' \n\n' }}{% else %}{{ raise_exception('Only system, user and assistant roles are supported!') }}{% endif %}{% endfor %}",
         },
-        "mistral-small-24b-instruct-2501": {
-            "model_id": "mistralai/Mistral-Small-24B-Instruct-2501",
-            "remote_code": False,
-            "start_message": DEFAULT_SYSTEM_PROMPT,
-            "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
-            "current_message_template": "{user} [/INST]{assistant}",
-            "tokenizer_kwargs": {"add_special_tokens": False},
-            "partial_text_processor": llama_partial_text_processor,
-            "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
-            + """ 
-            [INST] Question: {input} 
-            Context: {context} 
-            Answer: [/INST]""",
-        },
         "zephyr-7b-beta": {
             "model_id": "HuggingFaceH4/zephyr-7b-beta",
             "remote_code": False,
@@ -515,6 +501,8 @@ SUPPORTED_LLM_MODELS = {
         },
     },
     "Chinese": {
+        "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
+        "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
         "Qwen3-4B": {
             "model_id": "Qwen/Qwen3-4B",
             "remote_code": False,
@@ -547,8 +535,6 @@ SUPPORTED_LLM_MODELS = {
             "completion_to_prompt": qwen_completion_to_prompt,
             "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
-        "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
-        "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
         "GLM-4-9B-0414": {
             "model_id": "THUDM/GLM-4-9B-0414",
             "remote_code": False,
@@ -765,11 +751,6 @@ compression_configs = {
         "group_size": 64,
         "ratio": 0.6,
     },
-    "mistral-small-24b-instruct-2501": {
-        "sym": True,
-        "group_size": 64,
-        "ratio": 0.6,
-    },
     "minicpm-2b-dpo": {
         "sym": True,
         "group_size": 64,
@@ -877,33 +858,14 @@ def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPOR
     lang_dropdown = widgets.Dropdown(options=languages or [])
 
     # Define dependent drop down
-    # Select first model WITHOUT remote_code=True to avoid incompatibility issues
-    default_model_key = None
-    for key, config in models.items():
-        if not config.get("remote_code", False):
-            default_model_key = key
-            break
-    # Fallback to first model if all require remote_code
-    if default_model_key is None:
-        default_model_key = list(models.keys())[0]
-    
-    model_dropdown = widgets.Dropdown(options=models, value=models[default_model_key])
+
+    model_dropdown = widgets.Dropdown(options=models)
 
     def dropdown_handler(change):
         global default_language
         default_language = change.new
-        new_models = SUPPORTED_LLM_MODELS[change.new]
-        model_dropdown.options = new_models
-        # Select first model WITHOUT remote_code=True
-        default_key = None
-        for key, config in new_models.items():
-            if not config.get("remote_code", False):
-                default_key = key
-                break
-        # Fallback to first model if all require remote_code
-        if default_key is None:
-            default_key = list(new_models.keys())[0]
-        model_dropdown.value = new_models[default_key]
+        # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
+        model_dropdown.options = SUPPORTED_LLM_MODELS[change.new]
 
     lang_dropdown.observe(dropdown_handler, names="value")
     compression_dropdown = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"])
