@@ -884,8 +884,10 @@ def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPOR
     def dropdown_handler(change):
         global default_language
         default_language = change.new
-        # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
-        model_dropdown.options = SUPPORTED_LLM_MODELS[change.new]
+        new_models = SUPPORTED_LLM_MODELS[change.new]
+        model_dropdown.options = new_models
+        default_key = list(new_models.keys())[0]
+        model_dropdown.value = new_models[default_key]
 
     lang_dropdown.observe(dropdown_handler, names="value")
     compression_dropdown = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"])
