@@ -618,3 +618,15 @@
   skips:
     - os:
         - macos-13
+- notebook: notebooks/llm-chatbot/llm-chatbot-generate-api.ipynb
+  skips:
+    - os:
+        - macos-13
+- notebook: notebooks/llm-chatbot/llm-chatbot.ipynb
+  skips:
+    - os:
+        - macos-13
+- notebook: notebooks/nuextract-structure-extraction/nuextract-structure-extraction.ipynb
+  skips:
+    - os:
+        - macos-13
