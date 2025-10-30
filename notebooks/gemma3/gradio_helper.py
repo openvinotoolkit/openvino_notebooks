@@ -178,7 +178,7 @@ def make_demo(pipe):
             messages.append({"role": "system", "content": [{"type": "text", "text": system_prompt}]})
         messages.extend(process_history(history))
         messages.append({"role": "user", "content": process_new_user_message(message)})
-        
+
         # Extract and convert images from files for OpenVINO GenAI
         images = []
         if message["files"]:
@@ -188,25 +188,25 @@ def make_demo(pipe):
                     pic = Image.open(file_path).convert("RGB")
                     image_data = np.array(pic.getdata()).reshape(1, pic.size[1], pic.size[0], 3).astype(np.byte)
                     images.append(ov.Tensor(image_data))
-        
-         # Create a queue to collect streaming output
+
+        # Create a queue to collect streaming output
         output_queue = queue.Queue()
         stream_complete = Event()
-        
+
         def streamer(subword):
             output_queue.put(subword)
             return ov_genai.StreamingStatus.RUNNING
-        
+
         def generate_in_thread():
             if images:
                 pipe.generate(message["text"], images=images, max_new_tokens=max_new_tokens, streamer=streamer)
             else:
                 pipe.generate(message["text"], max_new_tokens=max_new_tokens, streamer=streamer)
             stream_complete.set()
-        
+
         # Start generation in background thread
         Thread(target=generate_in_thread).start()
-        
+
         # Stream results as they come in
         buffer = ""
         while not stream_complete.is_set() or not output_queue.empty():
@@ -217,7 +217,7 @@ def make_demo(pipe):
                 yield buffer
             except queue.Empty:
                 continue
-        
+
         # Yield final result
         yield buffer
 
