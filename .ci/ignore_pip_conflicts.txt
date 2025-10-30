@@ -13,8 +13,6 @@ notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb # requires p
 notebooks/animate-anyone/animate-anyone.ipynb # diffusers<=0.24
 notebooks/whisper-subtitles-generation/whisper-convert.ipynb # pytube
 notebooks/grounded-segment-anything/grounded-segment-anything.ipynb # deprecated installer
-notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.ipynb
-notebooks/sketch-to-image-pix2pix-turbo/sketch-to-image-pix2pix-turbo.ipynb
 notebooks/yolov10-optimization/yolov10-optimization.ipynb # nncf from git
 notebooks/person-counting-webcam/person-counting.ipynb # numpy should be installed first
 notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb # torch >= 2.2

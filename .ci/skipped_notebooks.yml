@@ -42,19 +42,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/blip-visual-language-processing/blip-visual-language-processing.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/encodec-audio-compression/encodec-audio-compression.ipynb
   skips:
     - os:
         - macos-13
@@ -136,12 +124,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-optimum.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-genai.ipynb
   skips:
     - os:
@@ -166,18 +148,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/lcm-lora-controlnet/lcm-lora-controlnet.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/qrcode-monster/qrcode-monster.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/speculative-sampling/speculative-sampling.ipynb
   skips:
     - os:
@@ -194,14 +164,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/film-slowmo/film-slowmo.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-    - python:
-        - '3.12'
 - notebook: notebooks/sound-generation-audioldm2/sound-generation-audioldm2.ipynb
   skips:
     - os:
@@ -220,18 +182,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb
   skips:
     - os:
@@ -240,12 +190,6 @@
         - windows-2022
     - python:
         - '3.12'
-- notebook: notebooks/kosmos2-multimodal-large-language-model/kosmos2-multimodal-large-language-model.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/photo-maker/photo-maker.ipynb
   skips:
     - os:
@@ -312,12 +256,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/pixart/pixart.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/openvino-tokenizers/openvino-tokenizers.ipynb
   skips:
     - os:
@@ -363,12 +301,6 @@
   skips:
     - python:
         - '3.9'
-- notebook: notebooks/stable-audio/stable-audio.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/llm-agent-rag-llamaindex/llm-agent-rag-llamaindex.ipynb
   skips:
     - os:
@@ -603,10 +535,6 @@
     - python:
         - "3.12"
 - notebook: notebooks/tensorflow-classification-to-openvino/tensorflow-classification-to-openvino.ipynb
-  skips:
-    - python:
-        - "3.12"
-- notebook: notebooks/tensorflow-hub/tensorflow-hub.ipynb
   skips:
     - python:
         - "3.12"
