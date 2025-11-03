@@ -456,6 +456,10 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
+- notebook: notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
+  skips:
+    - python:
+        - '3.9'
 - notebook: notebooks/kokoro/kokoro.ipynb
   skips:
     - os:
