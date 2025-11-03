@@ -21,6 +21,7 @@ EXCEPTIONS_URLs = [
     "https://llama.meta.com/llama3",
     "wikipedia.org",
     "https://huggingface.co",
+    "https://monai.io/",
 ]
 
 
