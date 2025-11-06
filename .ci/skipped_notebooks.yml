@@ -460,7 +460,7 @@
   skips:
     - python:
         - '3.9'
-      - os:
+    - os:
         - macos-13
         - windows-2022
 - notebook: notebooks/kokoro/kokoro.ipynb
