@@ -499,6 +499,7 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
         },
+        "gpt-oss-20b": {"model_id": "openai/gpt-oss-20b", "remote_code": False, "start_message": DEFAULT_SYSTEM_PROMPT},
     },
     "Chinese": {
         "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
