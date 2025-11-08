@@ -118,9 +118,9 @@ openvino_ir_outputs/
     model_int8.xml          # Post-training quantized INT8 IR
     model_int8.bin
 
-figure_actions_comparison_direct_fp32.png
-figure_actions_comparison_direct_fp16.png
-figure_actions_comparison_mo_fp32.png
-figure_actions_comparison_int8.png
+actions_comparison_direct_fp32.png
+actions_comparison_direct_fp16.png
+actions_comparison_mo_fp32.png
+actions_comparison_int8.png
 
 ```
