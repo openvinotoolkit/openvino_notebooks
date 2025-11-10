@@ -1,4 +1,4 @@
-# Visual-language assistant with Gemma3 and OpenVINO
+# Visual-language assistant with Gemma3 and OpenVINO GenAI
 ![](https://github.com/user-attachments/assets/2540a58e-c242-4439-b151-0fd1e6938af1)
 
 Gemma 3 is Google's new iteration of open weight LLMs. It comes in four sizes, 1 billion, 4 billion, 12 billion, and 27 billion parameters with base (pre-trained) and instruction-tuned versions. The 4, 12, and 27 billion parameter models can process both images and text, while the 1B variant is text only.
@@ -19,7 +19,7 @@ The tutorial consists from following steps:
 
 - Install requirements
 - Convert and Optimize model
-- Run OpenVINO model inference
+- Run OpenVINO GenAI model inference
 - Launch Interactive demo
 
 In this demonstration, you'll create interactive chatbot that can answer questions about provided image's content.

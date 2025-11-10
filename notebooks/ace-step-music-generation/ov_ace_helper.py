@@ -522,7 +522,7 @@ class OVACEStepPipeline(ACEStepPipeline):
             self.text_encoder_model = self.core.compile_model(ov_text_encoder_model, device)
 
             ov_text_tokenizer_path = self.core.read_model(Path(ov_models_path, TOKENIZER_MODEL_NAME))
-            self.text_tokenizer = self.core.compile_model(ov_text_tokenizer_path, device)
+            self.text_tokenizer = self.core.compile_model(ov_text_tokenizer_path, "CPU")  # tokenizer can only be inferred on CPU
 
             self.music_dcae = MusicDCAEWrapper()
             self.music_dcae.dcae = OVWrapperAutoencoderDC.from_pretrained(self.core, ov_models_path, device)

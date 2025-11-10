@@ -15,7 +15,6 @@ If you want to run another Stable Diffusion versions, please check our other not
 * [Stable Diffusion XL](../stable-diffusion-xl)
 * [LCM Stable Diffusion](../latent-consistency-models-image-generation)
 * [Turbo SDXL](../sdxl-turbo)
-* [Turbo SD](../sketch-to-image-pix2pix-turbo)
 
 
 The image below illustrates the provided generated image example.

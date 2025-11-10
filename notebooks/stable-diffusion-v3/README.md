@@ -14,7 +14,6 @@ If you want to run previous Stable Diffusion versions, please check our other no
 * [Stable Diffusion XL](../stable-diffusion-xl)
 * [LCM Stable Diffusion](../latent-consistency-models-image-generation)
 * [Turbo SDXL](../sdxl-turbo)
-* [Turbo SD](../sketch-to-image-pix2pix-turbo)
 
 
 The notebooks provides a simple interface that allows communication with a model using text instruction. In this demonstration user can provide input instructions and the model generates an image. An additional part demonstrates how to optimize model with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline and reduce memory consumption.
