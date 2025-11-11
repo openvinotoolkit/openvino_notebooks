@@ -462,7 +462,6 @@
         - '3.9'
     - os:
         - macos-13
-        - windows-2022
 - notebook: notebooks/kokoro/kokoro.ipynb
   skips:
     - os:
