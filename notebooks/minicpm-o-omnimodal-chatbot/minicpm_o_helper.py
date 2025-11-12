@@ -651,7 +651,7 @@ def convert_minicpmo26(model_id, remove_checkpoint=False):
         snapshot_download(model_id, local_dir=ckpt, force_download=True)
         patch_model_code(ckpt)
     model = AutoModel.from_pretrained(
-        model_id,
+        ckpt,
         trust_remote_code=True,
         attn_implementation="sdpa",  # sdpa or flash_attention_2
         torch_dtype=torch.float32,
