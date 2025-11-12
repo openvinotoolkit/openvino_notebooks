@@ -149,7 +149,7 @@ main() {
   sanity_check
   log "Setup complete. Launch notebook with:"
   echo "    conda activate ${ENV_NAME}"
-  echo "    jupyter lab notebooks/lerobot_act/act_to_openvino.ipynb --NotebookApp.kernel_name=${ENV_NAME}"
+  echo "    jupyter lab notebooks/lerobot_act/lerobot-act.ipynb --NotebookApp.kernel_name=${ENV_NAME}"
 }
 
 main

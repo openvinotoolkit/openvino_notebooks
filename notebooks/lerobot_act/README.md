@@ -1,5 +1,5 @@
 # ACT Policy → OpenVINO IR Conversion (Notebook Guide)
-This README documents the current workflow implemented in `act_to_openvino.ipynb` for converting a LeRobot ACT (Action Chunking Transformer) PyTorch checkpoint into an OpenVINO IR (XML/BIN) model. The notebook presently performs FP32 export (Model Optimizer invoked with FP16 compression flag but output standardized to `act_model_fp32.xml/bin`).
+This README documents the current workflow implemented in `lerobot-act.ipynb` for converting a LeRobot ACT (Action Chunking Transformer) PyTorch checkpoint into an OpenVINO IR (XML/BIN) model. The notebook presently performs FP32 export (Model Optimizer invoked with FP16 compression flag but output standardized to `act_model_fp32.xml/bin`).
 
 
 ## Required Checkpoint Files (`act_checkpoint/`)
@@ -21,7 +21,7 @@ bash setup_unitree_lerobot_env.sh
 conda create -n unitree_lerobot python=3.10 -y
 conda activate unitree_lerobot
 # Launch notebook with correct kernel
-jupyter lab act_to_openvino.ipynb --NotebookApp.kernel_name=unitree_lerobot
+jupyter lerobot-act.ipynb --NotebookApp.kernel_name=unitree_lerobot
 ```
 
 If you skip creating a dedicated environment, the dependency cell will install core packages (torch, openvino, nncf, etc.) into the current kernel. You MUST still install `lerobot` manually; the notebook will not auto‑install it.
@@ -100,7 +100,7 @@ Evaluation pipeline steps:
 
 ## Directory Layout (Example After Conversion, FP16 & INT8 Quantization)
 ```
-act_to_openvino.ipynb
+lerobot-act.ipynb
 act_checkpoint/
   model.safetensors
   config.json
