@@ -313,6 +313,7 @@ def patch_model_code(orig_model_dir):
             content = f.read()
             content = content.replace("if is_flash_attn_2_available():", "")
             content = content.replace("from flash_attn import flash_attn_func", "")
+            content = content.replace("from flash_attn import flash_attn_varlen_func", "")
             content = content.replace("from flash_attn.bert_padding import index_first_axis", "")
             content = content.replace("from flash_attn.bert_padding import pad_input", "")
             content = content.replace("from flash_attn.bert_padding import unpad_input", "")
@@ -650,7 +651,7 @@ def convert_minicpmo26(model_id, remove_checkpoint=False):
         snapshot_download(model_id, local_dir=ckpt, force_download=True)
         patch_model_code(ckpt)
     model = AutoModel.from_pretrained(
-        model_id,
+        ckpt,
         trust_remote_code=True,
         attn_implementation="sdpa",  # sdpa or flash_attention_2
         torch_dtype=torch.float32,

@@ -456,6 +456,12 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
+- notebook: notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
+  skips:
+    - python:
+        - '3.9'
+    - os:
+        - macos-13
 - notebook: notebooks/kokoro/kokoro.ipynb
   skips:
     - os:
@@ -510,8 +516,11 @@
         - windows-2022
 - notebook: notebooks/glm4.1-v-thinking/glm4.1-v-thinking.ipynb
   skips:
+    - python:
+        - "3.9"
     - os:
         - macos-13
+        - windows-2022
 - notebook: notebooks/ace-step-music-generation/ace-step-music-generation.ipynb
   skips:
     - os:
