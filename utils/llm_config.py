@@ -499,6 +499,12 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
         },
+        "gpt-oss-20b": {
+            "model_id": "openai/gpt-oss-20b",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT + " You should not show your reasoning steps. Reasoning: low.",
+            "exclude_on_devices": ["GPU"],
+        },
     },
     "Chinese": {
         "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
@@ -857,15 +863,18 @@ def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPOR
 
     lang_dropdown = widgets.Dropdown(options=languages or [])
 
-    # Define dependent drop down
+    filter_models_by_device = lambda model_info: device not in model_info[1].get("exclude_on_devices", [])
 
-    model_dropdown = widgets.Dropdown(options=models)
+    # Define dependent drop down
+    supported_models = dict(filter(filter_models_by_device, models.items()))
+    model_dropdown = widgets.Dropdown(options=supported_models)
 
     def dropdown_handler(change):
         global default_language
         default_language = change.new
         # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
-        model_dropdown.options = SUPPORTED_LLM_MODELS[change.new]
+        supported_models = SUPPORTED_LLM_MODELS[change.new]
+        model_dropdown.options = dict(filter(filter_models_by_device, supported_models.items()))
 
     lang_dropdown.observe(dropdown_handler, names="value")
     compression_dropdown = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"])
