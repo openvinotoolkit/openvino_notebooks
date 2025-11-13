@@ -2,7 +2,7 @@ type ValidatedOS =  'ubuntu-22.04' | 'windows-2022' | 'macos-13';
 
 type ValidatedDevice = 'cpu' | 'gpu';
 
-export const VALIDATED_PYTHON_VERSIONS = ['3.9', '3.10', '3.11', '3.12'] as const;
+export const VALIDATED_PYTHON_VERSIONS = ['3.10', '3.11', '3.12', '3.13'] as const;
 
 type ValidatedPythonVersion = (typeof VALIDATED_PYTHON_VERSIONS)[number];
 

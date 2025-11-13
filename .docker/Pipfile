@@ -16,7 +16,7 @@ name = "downloadpytorch"
 [packages]
 boto3 = "*"
 gdown = "*"
-ipykernel = ">=5.0"
+ipykernel = "==6.31.0"
 ipython = ">=7.16.3"  # pin to avoid vulnerability
 ipywidgets = "*"
 jedi = ">=0.17.2"

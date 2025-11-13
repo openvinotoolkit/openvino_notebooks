@@ -70,13 +70,13 @@ OpenVINOノートブックはPythonとGitを必要とします。始めるには
 
 | サポートされているオペレーティングシステム                 | [Pythonバージョン (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- |:---------------------------------------------------|
-| Ubuntu 20.04 LTS, 64-bit                                   | 3.9 - 3.12                                         |
-| Ubuntu 22.04 LTS, 64-bit                                   | 3.9 - 3.12                                         |
-| Red Hat Enterprise Linux 8, 64-bit                         | 3.9 - 3.12                                         |
-| CentOS 7, 64-bit                                           | 3.9 - 3.12                                         |
-| macOS 10.15.x バージョン以上                               | 3.9 - 3.12                                         |
-| Windows 10, 64-bit Pro, Enterprise または Education エディション | 3.9 - 3.12                                         |
-| Windows Server 2016 以上                                   | 3.9 - 3.12                                         |
+| Ubuntu 20.04 LTS, 64-bit                                   | 3.10 - 3.13                                         |
+| Ubuntu 22.04 LTS, 64-bit                                   | 3.10 - 3.13                                         |
+| Red Hat Enterprise Linux 8, 64-bit                         | 3.10 - 3.13                                         |
+| CentOS 7, 64-bit                                           | 3.10 - 3.13                                         |
+| macOS 10.15.x バージョン以上                               | 3.10 - 3.13                                         |
+| Windows 10, 64-bit Pro, Enterprise または Education エディション | 3.10 - 3.13                                         |
+| Windows Server 2016 以上                                   | 3.10 - 3.13                                         |
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)
 <div id='-ノートブックの実行'></div>

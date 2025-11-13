@@ -339,6 +339,7 @@ GenerationMixin
 Girshick
 Gitee
 GitHub
+GGUF
 GLA
 GLM
 glm
@@ -348,6 +349,7 @@ Golang
 googlenet
 GOPRO
 GPT
+gpt
 gpu
 GPU's
 GPUs
@@ -716,6 +718,7 @@ optimizable
 Orca
 otsl
 OSNet
+oss
 OTSL
 OuteTTS
 outpainting
@@ -954,6 +957,7 @@ SML
 sml
 SmolDocling
 SmolVLM
+SmolLM
 softmax
 softvc
 SoftVC

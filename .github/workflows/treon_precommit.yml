@@ -38,7 +38,7 @@ jobs:
       fail-fast: true
       matrix:
         runs_on: [ubuntu-22.04, windows-2022, macos-13]
-        python: ['3.9', '3.10', '3.11', '3.12']
+        python: ['3.10', '3.11', '3.12', '3.13']
     uses: ./.github/workflows/build_treon_reusable.yml
     with:
       runs_on: ${{ matrix.runs_on }}
