@@ -289,18 +289,6 @@
   skips:
     - device:
         - cpu
-- notebook: notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb
-  skips:
-    - python:
-        - '3.9'
-- notebook: notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb
-  skips:
-    - python:
-        - '3.9'
-- notebook: notebooks/explainable-ai-3-map-interpretation/explainable-ai-3-map-interpretation.ipynb
-  skips:
-    - python:
-        - '3.9'
 - notebook: notebooks/llm-agent-rag-llamaindex/llm-agent-rag-llamaindex.ipynb
   skips:
     - os:
@@ -335,14 +323,10 @@
         - windows-2022
 - notebook: notebooks/sam2-image-segmentation/segment-anything-2-image.ipynb
   skips:
-    - python:
-        - '3.9'
     - os:
         - macos-13
 - notebook: notebooks/sam2-video-segmentation/segment-anything-2-video.ipynb
   skips:
-    - python:
-        - '3.9'
     - os:
         - macos-13
 - notebook: notebooks/pixtral/pixtral.ipynb
@@ -365,8 +349,6 @@
   skips:
     - os:
         - macos-13
-    - python:
-        - '3.9'
 - notebook: notebooks/mobileclip-video-search/mobileclip-video-search.ipynb
   skips:
     - os:
@@ -413,8 +395,6 @@
         - windows-2022
 - notebook: notebooks/llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb
   skips:
-    - python:
-        - '3.9'
     - os:
       - macos-13
 - notebook: notebooks/glm4-v/glm4-v.ipynb
@@ -448,7 +428,6 @@
         - ubuntu-22.04
         - windows-2022
     - python:
-        - '3.9'
         - '3.10'
 - notebook: notebooks/minicpm-o-omnimodal-chatbot/minicpm-o-omnimodal-chatbot.ipynb
   skips:
@@ -458,16 +437,12 @@
         - windows-2022
 - notebook: notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
   skips:
-    - python:
-        - '3.9'
     - os:
         - macos-13
 - notebook: notebooks/kokoro/kokoro.ipynb
   skips:
     - os:
         - windows-2022
-    - python:
-        - "3.9"
 - notebook: notebooks/qwen2.5-omni-chatbot/qwen2.5-omni-chatbot.ipynb
   skips:
     - os:
@@ -486,10 +461,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/flex.2-image-generation/flex.2-image-generation.ipynb
-  skips:
-    - python:
-        - "3.9"
 - notebook: notebooks/openvoice2-and-melotts/openvoice2-and-melotts.ipynb
   skips:
     - os:
@@ -516,8 +487,6 @@
         - windows-2022
 - notebook: notebooks/glm4.1-v-thinking/glm4.1-v-thinking.ipynb
   skips:
-    - python:
-        - "3.9"
     - os:
         - macos-13
         - windows-2022
