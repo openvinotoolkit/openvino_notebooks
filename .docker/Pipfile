@@ -34,6 +34,7 @@ openvino = {version = "==2025.3.0"}
 openvino-telemetry = "==2023.2.1"
 ovmsclient = "*"
 Pillow = ">=8.3.2"
+platformdirs = "*"
 psutil = "*"
 pyclipper = ">=1.2.1"
 pygments = ">=2.7.4"
