@@ -1,6 +1,6 @@
 FROM quay.io/opendatahub/workbench-images:runtime-minimal-ubi9-python-3.11
 
-LABEL name="odh-notebook-jupyter-intel-openvino-ubi9-python-3.9" \
+LABEL name="odh-notebook-jupyter-intel-openvino-ubi9-python-3.11" \
     maintainer="helena.kloosterman@intel.com" \
     vendor="Intel Corporation" \
     release="2024.2" \
