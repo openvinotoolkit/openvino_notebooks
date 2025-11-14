@@ -12,12 +12,12 @@ IMAGE_SPECIAL = "<|endoftext10|>"
 AUDIO_SPECIAL = "<|endoftext11|>"
 
 DEFAULT_SAMPLING_PARAMS = {
-    "top_p": 0.0,
-    "top_k": 1,
-    "temperature": 0.0,
+    "top_p": 0.95,
+    "top_k": 50,
+    "temperature": 0.8,
     "do_sample": True,
     "num_beams": 1,
-    "repetition_penalty": 1.2,
+    "repetition_penalty": 1.05,
 }
 MAX_NEW_TOKENS = 512
 

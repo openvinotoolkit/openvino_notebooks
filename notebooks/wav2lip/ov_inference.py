@@ -1,7 +1,7 @@
 from glob import glob
 from enum import Enum
 import math
-import subprocess
+import subprocess  # nosec - disable B404:import-subprocess check
 
 import cv2
 import numpy as np

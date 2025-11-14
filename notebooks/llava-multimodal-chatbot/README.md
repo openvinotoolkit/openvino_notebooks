@@ -15,9 +15,6 @@ In this tutorial series we consider how to use LLaVA model to build multimodal c
 ## Visual-language assistant with LLaVA and OpenVINO Generative API
 This [notebook](./llava-multimodal-chatbot-genai.ipynb) demonstrate how to effectively build Visual-Language assistant using [OpenVINO Generative API](https://github.com/openvinotoolkit/openvino.genai).
 
-## Visual-language assistant with LLaVA and Optimum Intel OpenVINO integration
-This [notebook](./llava-multimodal-chatbot-optimum.ipynb) demonstrate how to effectively build Visual-Language assistant using [Optimum Intel](https://huggingface.co/docs/optimum/main/intel/index) OpenVINO integration.
-
 
 ## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>

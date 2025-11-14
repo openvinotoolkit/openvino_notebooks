@@ -24,7 +24,7 @@ for url, file_name in example_image_urls:
         Image.open(requests.get(url, stream=True).raw).save(file_name)
 
 
-def make_demo(model):
+def make_demo(model, mode_name):
     import openvino_genai as ov_genai
     import openvino as ov
 
@@ -119,7 +119,7 @@ def make_demo(model):
         additional_buttons = {"undo_button": None, "retry_button": None}
     demo = gr.ChatInterface(
         fn=bot_streaming,
-        title="MiniCPMV2 OpenVINO Chatbot",
+        title=f"{mode_name} OpenVINO Chatbot",
         examples=[
             {"text": "What is on the flower?", "files": ["./bee.jpg"]},
             {"text": "How to make this pastry?", "files": ["./baklava.png"]},

@@ -45,6 +45,7 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-22.04
+    timeout-minutes: 205 # max + 3*std over the last 1660 successful runs
 
     steps:
       - name: Maximize build space

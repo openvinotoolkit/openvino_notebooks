@@ -8,25 +8,29 @@ url = "https://download.pytorch.org/whl/"
 verify_ssl = true
 name = "pytorch-wheels"
 
+[[source]]
+url = "https://download.pytorch.org/whl/cpu"
+verify_ssl = true
+name = "downloadpytorch"
+
 [packages]
 boto3 = "*"
 gdown = "*"
-ipykernel = ">=5.0"
+ipykernel = "==6.31.0"
 ipython = ">=7.16.3"  # pin to avoid vulnerability
 ipywidgets = "*"
 jedi = ">=0.17.2"
 jupyter-nbrequirements = "*"
 jupyterhub = ">=4.1.6"
-jupyterlab = "*"
+jupyterlab = ">=4.4.10"
 jupyterlab-git = ">=0.51"
 matplotlib = ">=3.4"
-monai = ">=0.9.1,<1.0.0"
 nbval = "*"
 notebook = "<7.0.0"
 numpy = ">=1.21.0"
 onnx = ">=1.11.0"
 opencv-python = "*"
-openvino = {version = "==2025.1.0"}
+openvino = {version = "==2025.3.0"}
 openvino-telemetry = "==2023.2.1"
 ovmsclient = "*"
 Pillow = ">=8.3.2"
@@ -42,13 +46,15 @@ setuptools = ">70.0.0"
 shapely = ">=1.7.1"
 supervisor = ">=4.1.0"
 treon = "*"
-torch = {index = "pytorch-wheels", version = "==2.6.0+cpu"}
-torchaudio = {index = "pytorch-wheels", version = "==2.6.0+cpu"}
 torchmetrics = ">=0.11.0"
-torchvision = {index = "pytorch-wheels", version = "==0.21.0+cpu"}
-transformers = ">=4.21.1"
+transformers = "==4.55.4"
+jupyter-core = "==5.8.1"
+torch = {version = "==2.7.1", index = "downloadpytorch"}
+torchaudio = {version = "==2.7.1", index = "downloadpytorch"}
+torchvision = {version = "==0.22.1", index = "downloadpytorch"}
+urllib3 = "==2.5.0"
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.10"

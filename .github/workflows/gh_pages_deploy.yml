@@ -32,6 +32,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_ACTIONS_BOT_TOKEN }}
+          persist-credentials: true
 
       - name: Setup Node.js
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
@@ -95,12 +96,15 @@ jobs:
       - name: Commit notebooks index
         if: ${{ steps.check_deploy.outputs.should_deploy == 'true' }}
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_BOT_TOKEN }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git add ./notebooks/README.md
           git commit -m "Update notebooks index readme file [skip ci]" || echo "Index file is not changed"
-          git push
+          git push origin HEAD:latest
 
   deploy_github_pages:
     runs-on: ubuntu-22.04

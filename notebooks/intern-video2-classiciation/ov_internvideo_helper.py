@@ -620,7 +620,7 @@ def patch_model_code(model_dir):
     orig_modeling_file = model_dir / "orig_modeling_internvideo2.py"
     if not orig_modeling_file.exists():
         modeling_file.rename(orig_modeling_file)
-        with orig_modeling_file.open("r") as in_f:
+        with orig_modeling_file.open("r", encoding="utf-8") as in_f:
             content = in_f.read()
             content = content.replace(
                 "self.tokenizer = BertTokenizer.from_pretrained(self._config.model.text_encoder.pretrained, local_files_only=True, use_safetensors=True)",
@@ -631,17 +631,18 @@ def patch_model_code(model_dir):
                 "try:\n    from flash_attn.flash_attn_interface import flash_attn_varlen_qkvpacked_func\n    from flash_attn.bert_padding import unpad_input, pad_input\n    flash_attn_available=True\nexcept:\n    flash_attn_available = False",
             )
             content = content.replace("self.use_flash_attn = use_flash_attn", "self.use_flash_attn = use_flash_attn and flash_attn_available")
-            with modeling_file.open("w") as out_f:
+            with modeling_file.open("w", encoding="utf-8") as out_f:
                 out_f.write(content)
     orig_config_file = model_dir / "orig_config.json"
     config_file = model_dir / "config.json"
     if not orig_config_file.exists():
         config_file.rename(orig_config_file)
-        with orig_config_file.open("r") as in_f:
+        with orig_config_file.open("r", encoding="utf-8") as in_f:
             content = in_f.read()
             configs_dir = model_dir / "configs"
-            content = content.replace('"configs/', f'"{configs_dir.absolute()}/')
-            with config_file.open("w") as out_f:
+            abs_path = str(configs_dir.absolute()).replace("\\", "\\\\")
+            content = content.replace('"configs/', f'"{abs_path}/')
+            with config_file.open("w", encoding="utf-8") as out_f:
                 out_f.write(content)
 
 

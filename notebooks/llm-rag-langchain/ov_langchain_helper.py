@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import queue
-from typing import Any, Iterator, Optional, Sequence
+from typing import Any, Dict, Iterator, List, Optional, Sequence
 
 from langchain_core.callbacks.manager import CallbackManagerForLLMRun
 from langchain_core.language_models.llms import LLM
@@ -47,8 +47,8 @@ class OpenVINOLLM(LLM):
     Example using from_model_path:
         .. code-block:: python
 
-            from langchain_community.llms import OpenVINOLLM
-            ov = OpenVINOPipeline.from_model_path(
+            from ov_langchain_helper import OpenVINOLLM
+            ov = OpenVINOLLM.from_model_path(
                 model_path="./openvino_model_dir",
                 device="CPU",
             )
@@ -58,7 +58,7 @@ class OpenVINOLLM(LLM):
             import openvino_genai
             pipe = openvino_genai.LLMPipeline("./openvino_model_dir", "CPU")
             config = openvino_genai.GenerationConfig()
-            ov = OpenVINOPipeline.from_model_path(
+            ov = OpenVINOLLM.from_model_path(
                 ov_pipe=pipe,
                 config=config,
             )
@@ -102,7 +102,7 @@ class OpenVINOLLM(LLM):
     def _call(
         self,
         prompt: str,
-        stop: Optional[list[str]] = None,
+        stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> str:
@@ -128,7 +128,7 @@ class OpenVINOLLM(LLM):
     def _stream(
         self,
         prompt: str,
-        stop: Optional[list[str]] = None,
+        stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> Iterator[GenerationChunk]:
@@ -239,8 +239,8 @@ class ChatOpenVINO(BaseChatModel):
 
     def _generate(
         self,
-        messages: list[BaseMessage],
-        stop: Optional[list[str]] = None,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> ChatResult:
@@ -250,8 +250,8 @@ class ChatOpenVINO(BaseChatModel):
 
     def _stream(
         self,
-        messages: list[BaseMessage],
-        stop: Optional[list[str]] = None,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
@@ -266,7 +266,7 @@ class ChatOpenVINO(BaseChatModel):
 
     def _to_chat_prompt(
         self,
-        messages: list[BaseMessage],
+        messages: List[BaseMessage],
     ) -> str:
         """Convert a list of messages into a prompt format expected by wrapped LLM."""
         try:
@@ -323,7 +323,7 @@ class OpenVINOEmbeddings(BaseModel, Embeddings):
     Example:
         .. code-block:: python
 
-            from langchain_community.embeddings import OpenVINOEmbeddings
+            from ov_langchain_helper import OpenVINOEmbeddings
 
             model_name = "sentence-transformers/all-mpnet-base-v2"
             model_kwargs = {'device': 'CPU'}
@@ -472,14 +472,14 @@ class OpenVINOEmbeddings(BaseModel, Embeddings):
 
     model_config = ConfigDict(extra="forbid", protected_namespaces=())
 
-    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """Compute doc embeddings using a HuggingFace transformer model.
 
         Args:
             texts: The list of texts to embed.
 
         Returns:
-            list of embeddings, one for each text.
+            List of embeddings, one for each text.
         """
 
         texts = list(map(lambda x: x.replace("\n", " "), texts))
@@ -487,7 +487,7 @@ class OpenVINOEmbeddings(BaseModel, Embeddings):
 
         return embeddings
 
-    def embed_query(self, text: str) -> list[float]:
+    def embed_query(self, text: str) -> List[float]:
         """Compute query embeddings using a HuggingFace transformer model.
 
         Args:
@@ -505,7 +505,7 @@ class OpenVINOBgeEmbeddings(OpenVINOEmbeddings):
     Bge Example:
         .. code-block:: python
 
-            from langchain_community.embeddings import OpenVINOBgeEmbeddings
+            from ov_langchain_helper import OpenVINOBgeEmbeddings
 
             model_name = "BAAI/bge-large-en-v1.5"
             model_kwargs = {'device': 'CPU'}
@@ -529,20 +529,20 @@ class OpenVINOBgeEmbeddings(OpenVINOEmbeddings):
         if "-zh" in self.model_path:
             self.query_instruction = DEFAULT_QUERY_BGE_INSTRUCTION_ZH
 
-    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """Compute doc embeddings using a HuggingFace transformer model.
 
         Args:
             texts: The list of texts to embed.
 
         Returns:
-            list of embeddings, one for each text.
+            List of embeddings, one for each text.
         """
         texts = [self.embed_instruction + t.replace("\n", " ") for t in texts]
         embeddings = self.encode(texts, **self.encode_kwargs)
         return embeddings
 
-    def embed_query(self, text: str) -> list[float]:
+    def embed_query(self, text: str) -> List[float]:
         """Compute query embeddings using a HuggingFace transformer model.
 
         Args:
@@ -554,6 +554,91 @@ class OpenVINOBgeEmbeddings(OpenVINOEmbeddings):
         text = text.replace("\n", " ")
         embedding = self.encode(self.query_instruction + text, **self.encode_kwargs)
         return embedding
+
+
+class OpenVINOGenAIEmbeddings(BaseModel, Embeddings):
+    """OpenVINO embedding models.
+
+    To use, you should have the ``openvino-genai`` python package installed.
+
+    Example:
+        .. code-block:: python
+
+            from ov_langchain_helper import OpenVINOGenAIEmbeddings
+
+            model_path = "./sentence-transformers/all-mpnet-base-v2"
+            encode_kwargs = {'normalize_embeddings': True}
+            ov = OpenVINOGenAIEmbeddings.from_model_path(
+                model_path=model_path,
+                device="CPU",
+                encode_kwargs=encode_kwargs,
+            )
+    """
+
+    ov_pipe: Any = None
+    """OpenVINO pipeline object."""
+
+    @classmethod
+    def from_model_path(
+        cls,
+        model_path: str,
+        device: str = "CPU",
+        encode_kwargs: Dict[str, Any] = {},
+    ) -> OpenVINOGenAIEmbeddings:
+        """Construct the openvino text embedding pipeline from model_path"""
+        try:
+            import openvino_genai
+
+        except ImportError:
+            raise ImportError("Could not import OpenVINO GenAI package. " "Please install it with `pip install openvino-genai`.")
+
+        config = openvino_genai.TextEmbeddingPipeline.Config()
+        if "mean_pooling" in encode_kwargs and encode_kwargs["mean_pooling"]:
+            config.pooling_type = openvino_genai.TextEmbeddingPipeline.PoolingType.MEAN
+        if "normalize_embeddings" in encode_kwargs:
+            config.normalize = encode_kwargs["normalize_embeddings"]
+        if "max_length" in encode_kwargs:
+            config.max_length = encode_kwargs["max_length"]
+
+        config.query_instruction = DEFAULT_QUERY_BGE_INSTRUCTION_EN
+        if "-zh" in model_path:
+            config.query_instruction = DEFAULT_QUERY_BGE_INSTRUCTION_ZH
+
+        if "query_instruction" in encode_kwargs:
+            config.query_instruction = encode_kwargs["query_instruction"]
+        if "embed_instruction" in encode_kwargs:
+            config.embed_instruction = encode_kwargs["embed_instruction"]
+
+        ov_pipe = openvino_genai.TextEmbeddingPipeline(model_path, device, config)
+
+        return cls(ov_pipe=ov_pipe)
+
+    model_config = ConfigDict(extra="forbid", protected_namespaces=())
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """Compute doc embeddings.
+
+        Args:
+            texts: The list of texts to embed.
+
+        Returns:
+            List of embeddings, one for each text.
+        """
+
+        texts = list(map(lambda x: x.replace("\n", " "), texts))
+        return self.ov_pipe.embed_documents(texts)
+
+    def embed_query(self, text: str) -> List[float]:
+        """Compute query embeddings.
+
+        Args:
+            text: The text to embed.
+
+        Returns:
+            Embeddings for the text.
+        """
+
+        return self.ov_pipe.embed_query(text)
 
 
 class RerankRequest:
@@ -650,4 +735,69 @@ class OpenVINOReranker(BaseDocumentCompressor):
                 metadata={"id": r["id"], "relevance_score": r["score"]},
             )
             final_results.append(doc)
+        return final_results
+
+
+class OpenVINOGenAIReranker(BaseDocumentCompressor):
+    """OpenVINO reranking models.
+
+    To use, you should have the ``openvino-genai`` python package installed.
+
+    Example:
+        .. code-block:: python
+
+            from ov_langchain_helper import OpenVINOGenAIReranker
+
+            model_path = "./sentence-transformers/all-mpnet-base-v2"
+            config_kwargs = {'top_n': 3}
+            ov = OpenVINOGenAIReranker.from_model_path(
+                model_path=model_path,
+                device='CPU',
+                config_kwargs=config_kwargs,
+            )
+    """
+
+    ov_pipe: Any = None
+    """OpenVINO pipeline object."""
+    top_n: int = 3
+    """return Top n texts. can not be updated after pipeline was created."""
+
+    model_config = ConfigDict(extra="forbid", protected_namespaces=())
+
+    @classmethod
+    def from_model_path(cls, model_path: str, device: str = "CPU", config_kwargs: Dict[str, Any] = {}) -> OpenVINOGenAIReranker:
+        """Construct the openvino text embedding pipeline from model_path"""
+        try:
+            import openvino_genai
+
+        except ImportError:
+            raise ImportError("Could not import OpenVINO GenAI package. " "Please install it with `pip install openvino-genai`.")
+
+        config = openvino_genai.TextRerankPipeline.Config()
+        if "top_n" in config_kwargs:
+            config.top_n = config_kwargs["top_n"]
+            top_n = config_kwargs["top_n"]
+        if "max_length" in config_kwargs:
+            config.max_length = config_kwargs["max_length"]
+
+        ov_pipe = openvino_genai.TextRerankPipeline(model_path, device, config)
+
+        return cls(ov_pipe=ov_pipe)
+
+    def compress_documents(
+        self,
+        documents: Sequence[Document],
+        query: str,
+        callbacks: Optional[Callbacks] = None,
+    ) -> Sequence[Document]:
+        docs = [doc.page_content for doc in documents]
+        rerank_response = self.ov_pipe.rerank(query, docs)
+        final_results = []
+        for index, score in rerank_response:
+            doc = Document(
+                page_content=documents[index].page_content,
+                metadata={"id": index, "relevance_score": score},
+            )
+            final_results.append(doc)
+
         return final_results

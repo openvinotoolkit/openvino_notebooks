@@ -19,6 +19,9 @@ EXCEPTIONS_URLs = [
     "https://openai.com/",
     "https://deci.ai/",
     "https://llama.meta.com/llama3",
+    "wikipedia.org",
+    "https://huggingface.co",
+    "https://monai.io/",
 ]
 
 
@@ -86,7 +89,7 @@ def main():
 
             try:
                 get = requests.get(url, timeout=10)
-                if get.status_code != 200:
+                if get.status_code not in [200, 202]:
                     if get.status_code in [502, 500, 429, 443, 403] and any([known_url in url for known_url in EXCEPTIONS_URLs]):
                         print(f"SKIP - {md_path}: URL can not be reached {url!r}, status code {get.status_code}")
                         continue

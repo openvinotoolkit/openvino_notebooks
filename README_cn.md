@@ -48,7 +48,7 @@ OpenVINO™ Notebooks需要预装Python和Git， 针对不同操作系统的安�
 
 使用这个 [页面](https://openvinotoolkit.github.io/openvino_notebooks/)来探索notebooks, 选择一个跟你需求相关的开始试试吧。祝你好运！
 
-**注意: 这个仓库的main分支已经升级了对于OpenVINO 2025.1 release的支持.** 请运行在你的 `openvino_env`虚拟环境中，运行 `pip install --upgrade -r requirements.txt` 升级到最新版本. 如果这是您第一次安装OpenVINO™ Notebooks，请参考以下的 [安装指南](#-installation-guide)。 如果您想使用上一个OpenVINO版本, 请切换至[2025.0 分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2025.0). 如果您想使用上一个长期维护 (LTS) 的OpenVINO版本，请切换到 [2023.3 分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.3)。
+**注意: 这个仓库的main分支已经升级了对于OpenVINO 2025.3 release的支持.** 请运行在你的 `openvino_env`虚拟环境中，运行 `pip install --upgrade -r requirements.txt` 升级到最新版本. 如果这是您第一次安装OpenVINO™ Notebooks，请参考以下的 [安装指南](#-installation-guide)。 如果您想使用上一个OpenVINO版本, 请切换至[2025.2 分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2025.2). 如果您想使用上一个长期维护 (LTS) 的OpenVINO版本，请切换到 [2023.3 分支](https://github.com/openvinotoolkit/openvino_notebooks/tree/2023.3)。
 
 如果您有任何问题，可以开启一个 GitHub [讨论](https://github.com/openvinotoolkit/openvino_notebooks/discussions)。
 
@@ -68,13 +68,13 @@ OpenVINO™ Notebooks需要预装Python和Git， 针对不同操作系统的安�
 
 | 支持的操作系统                                              | [Python Version (64-bit)](https://www.python.org/) |
 | :--------------------------------------------------------- |:---------------------------------------------------|
-| Ubuntu 20.04 LTS, 64-bit                                   | 3.9 - 3.12                                         |
-| Ubuntu 22.04 LTS, 64-bit                                   | 3.9 - 3.12                                         |
-| Red Hat Enterprise Linux 8, 64-bit                         | 3.9 - 3.12                                         |
-| CentOS 7, 64-bit                                           | 3.9 - 3.12                                         |
-| macOS 10.15.x versions or higher                           | 3.9 - 3.12                                         |
-| Windows 10, 64-bit Pro, Enterprise or Education editions   | 3.9 - 3.12                                         |
-| Windows Server 2016 or higher                              | 3.9 - 3.12                                         |
+| Ubuntu 20.04 LTS, 64-bit                                   | 3.10 - 3.13                                         |
+| Ubuntu 22.04 LTS, 64-bit                                   | 3.10 - 3.13                                         |
+| Red Hat Enterprise Linux 8, 64-bit                         | 3.10 - 3.13                                         |
+| CentOS 7, 64-bit                                           | 3.10 - 3.13                                         |
+| macOS 10.15.x versions or higher                           | 3.10 - 3.13                                         |
+| Windows 10, 64-bit Pro, Enterprise or Education editions   | 3.10 - 3.13                                         |
+| Windows Server 2016 or higher                              | 3.10 - 3.13                                         |
 
 
 [![-----------------------------------------------------](https://user-images.githubusercontent.com/10940214/155750931-fc094349-b6ec-4e1f-9f9a-113e67941119.jpg)](#)

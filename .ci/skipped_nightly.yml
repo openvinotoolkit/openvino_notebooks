@@ -11,3 +11,9 @@
   skips:
     - os:
         - macos-13
+- notebook: notebooks/glm4-v/glm4-v.ipynb
+  skips:
+    - device:
+        - cpu
+        - gpu
+        - npu

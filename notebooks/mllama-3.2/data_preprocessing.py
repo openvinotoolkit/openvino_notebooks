@@ -3,7 +3,6 @@ from datasets import load_dataset
 from transformers import AutoProcessor
 from tqdm.autonotebook import tqdm
 from pathlib import Path
-import pickle
 import gc
 
 import requests
@@ -100,17 +99,10 @@ def prepare_dataset_vision(processor, opt_init_steps=50, max_train_samples=1000,
             return None
         return inputs
 
-    if not Path(file_path).exists():
-        dataset = load_dataset("google-research-datasets/conceptual_captions", trust_remote_code=True)
-        train_dataset = dataset["train"].shuffle(seed=42)
-        dataloader = torch.utils.data.DataLoader(train_dataset, collate_fn=collate_fn, batch_size=1)
-        calibration_data = prepare_calibration_data_vision(dataloader, opt_init_steps)
-        print(f"calibration dataset will be saved in {file_path}")
-        with open(file_path, "wb") as f:
-            pickle.dump(calibration_data, f)
-    else:
-        with open(file_path, "rb") as f:
-            calibration_data = pickle.load(f)
+    dataset = load_dataset("google-research-datasets/conceptual_captions", trust_remote_code=True)
+    train_dataset = dataset["train"].shuffle(seed=42)
+    dataloader = torch.utils.data.DataLoader(train_dataset, collate_fn=collate_fn, batch_size=1)
+    calibration_data = prepare_calibration_data_vision(dataloader, opt_init_steps)
 
     return calibration_data
 
@@ -157,12 +149,6 @@ def prepare_dataset_llm(mllm_id, opt_init_steps=50, max_train_samples=1000, file
     Prepares a vision-text dataset for quantization.
     """
 
-    if Path(file_path).exists():
-        print(f"callibration dataset will be loaded from {file_path}")
-        with open(file_path, "rb") as f:
-            calibration_data = pickle.load(f)
-        return calibration_data
-
     mllm = OVMLlamaForConditionalGeneration(mllm_id, slice_lm_head=False, force_fp32_pkv=True)
     processor = AutoProcessor.from_pretrained(mllm_id)
 
@@ -202,11 +188,6 @@ def prepare_dataset_llm(mllm_id, opt_init_steps=50, max_train_samples=1000, file
     train_dataset = dataset["train"].shuffle(seed=42)
     dataloader = torch.utils.data.DataLoader(train_dataset, collate_fn=collate_fn, batch_size=1)
     calibration_data = prepare_calibration_data_llm(dataloader, opt_init_steps, mllm, processor)
-
-    if save_dataset:
-        with open(file_path, "wb") as f:
-            print(f"calibration data will be saved into {file_path}")
-            pickle.dump(calibration_data, f)
 
     del mllm
     gc.collect()
