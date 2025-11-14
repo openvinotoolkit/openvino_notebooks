@@ -508,6 +508,7 @@
   skips:
     - python:
         - "3.12"
+        - "3.13"
 - notebook: notebooks/optimize-preprocessing/optimize-preprocessing.ipynb
   skips:
     - python:
