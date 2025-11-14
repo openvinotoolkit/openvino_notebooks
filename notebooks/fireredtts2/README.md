@@ -4,7 +4,7 @@ FireRedTTS‑2 is a long-form streaming TTS system for multi-speaker dialogue ge
 - **Long Conversational Speech Generation**: It currently supports 3 minutes dialogues with 4 speakers and can be easily scaled to longer conversations
 with more speakers by extending training corpus.
 - **Multilingual Support**: It supports multiple languages including English, Chinese, Japanese, Korean, French, German, and Russian. Support zero-shot voice cloning for cross-lingual and code-switching scenarios.
-- **Ultra-Low Latency**: Building on the new **12.5Hz streaming** speech tokenizer, we employ a dual-transformer architecture that operates on a text–speech interleaved sequence, enabling flexible sentence-bysentence generation and reducing first-packet latency，Specifically, on an L20 GPU, our first-packet latency as low as 140ms while maintaining high-quality audio output.
+- **Ultra-Low Latency**: Building on the new **12.5Hz streaming** speech tokenizer, we employ a dual-transformer architecture that operates on a text–speech interleaved sequence, enabling flexible sentence-by-sentence generation and reducing first-packet latency，Specifically, on an L20 GPU, our first-packet latency as low as 140ms while maintaining high-quality audio output.
 - **Strong Stability**：Our model achieves high similarity and low WER/CER in both monologue and dialogue tests.
 - **Random Timbre Generation**:Useful for creating ASR/speech interaction data.
 
