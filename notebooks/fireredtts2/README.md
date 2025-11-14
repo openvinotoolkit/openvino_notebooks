@@ -24,6 +24,8 @@ In this demonstration, you'll create interactive assistant that can answer quest
 
 The images bellow illustrates example of voice cloning and dialogue generation.
 
+<img width="1862" height="1125" alt="image" src="https://github.com/user-attachments/assets/a7512db5-78cd-4379-956b-893c13534862" />
+
 ## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
