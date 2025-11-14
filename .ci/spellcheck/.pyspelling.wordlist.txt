@@ -91,6 +91,7 @@ BLACKBOX
 boolean
 CatVTON
 CausVid
+CER
 CentOS
 centric
 CFG
@@ -300,6 +301,7 @@ feedforward
 FeedForward
 FFN
 FFmpeg
+FireRedTTS
 FIL
 FEIL
 finetuned
