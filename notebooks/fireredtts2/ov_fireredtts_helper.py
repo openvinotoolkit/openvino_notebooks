@@ -25,6 +25,7 @@ from tqdm import tqdm
 import math
 import torch.nn.functional as F
 
+
 def patch_cos_sin_cached_fp32(model):
     if (
         hasattr(model, "layers")
@@ -42,6 +43,7 @@ def patch_cos_sin_cached_fp32(model):
                     device=layer.self_attn.rotary_emb.inv_freq.device,
                     dtype=torch.float32,
                 )
+
 
 SYMBOLS_MAPPING = {
     "\n": "",
@@ -82,9 +84,7 @@ SYMBOLS_MAPPING = {
     "*": "",
 }
 
-REPLACE_SYMBOL_REGEX = re.compile(
-    "|".join(re.escape(p) for p in SYMBOLS_MAPPING.keys())
-)
+REPLACE_SYMBOL_REGEX = re.compile("|".join(re.escape(p) for p in SYMBOLS_MAPPING.keys()))
 
 
 EMOJI_REGEX = re.compile(
@@ -330,15 +330,18 @@ def process_text_list(text_list):
             new_text_list.append(speaker + chunk)
     return new_text_list
 
+
 def _pad_and_chunk(audio: torch.Tensor, chunk_size: int) -> List[torch.Tensor]:
     pad_len = math.ceil(audio.shape[1] / chunk_size) * chunk_size - audio.shape[1]
     audio = F.pad(audio, (0, pad_len), mode="constant", value=0)
     audio_chunks = audio.split(chunk_size, dim=1)
     return audio_chunks
 
+
 def _multinomial_sample_one_no_sync(probs):
     q = torch.empty_like(probs).exponential_(1)
     return torch.argmax(probs / q, dim=-1, keepdim=True).to(dtype=torch.int)
+
 
 def sample_topk(logits: torch.Tensor, topk: int, temperature: float):
     logits = logits / temperature
@@ -352,15 +355,15 @@ def sample_topk(logits: torch.Tensor, topk: int, temperature: float):
     sample_token = _multinomial_sample_one_no_sync(probs)
     return sample_token
 
+
 def causal_mask_function(batch_idx: int, head_idx: int, q_idx: int, kv_idx: int) -> bool:
     """
     This creates a basic lower-diagonal causal mask.
     """
     return kv_idx <= q_idx
 
-def prepare_padding_mask(
-    attention_mask: Optional[torch.Tensor], kv_length: int, kv_offset: int, _slice: bool = True
-) -> Optional[torch.Tensor]:
+
+def prepare_padding_mask(attention_mask: Optional[torch.Tensor], kv_length: int, kv_offset: int, _slice: bool = True) -> Optional[torch.Tensor]:
     """
     From the 2D attention mask, prepare the correct padding mask to use by potentially padding it, and slicing
     according to the `kv_offset` if `_slice` is `True`.
@@ -379,6 +382,7 @@ def prepare_padding_mask(
             local_padding_mask = local_padding_mask[:, mask_indices]
     return local_padding_mask
 
+
 def and_masks(*mask_functions: list[Callable]) -> Callable:
     """Returns a mask function that is the intersection of provided mask functions"""
     if not all(callable(arg) for arg in mask_functions):
@@ -392,6 +396,7 @@ def and_masks(*mask_functions: list[Callable]) -> Callable:
 
     return and_mask
 
+
 def padding_mask_function(padding_mask: torch.Tensor) -> Callable:
     """
     This return the mask_function function corresponding to a 2D padding mask.
@@ -404,6 +409,7 @@ def padding_mask_function(padding_mask: torch.Tensor) -> Callable:
         return padding_mask[batch_idx, kv_idx]
 
     return inner_mask
+
 
 def _ignore_causal_mask_sdpa(
     padding_mask: Optional[torch.Tensor],
@@ -437,18 +443,12 @@ def _ignore_causal_mask_sdpa(
         # in this case we need to add special patterns to the mask so cannot be skipped otherwise
         and (local_attention_size is None or kv_length < local_attention_size)
         # In this case, we need to add padding to the mask, so cannot be skipped otherwise
-        and (
-            padding_mask is None
-            or (
-                padding_mask.all()
-                if not is_torch_xpu_available or query_length == 1
-                else padding_mask[:, :query_length].all()
-            )
-        )
+        and (padding_mask is None or (padding_mask.all() if not is_torch_xpu_available or query_length == 1 else padding_mask[:, :query_length].all()))
     ):
         return True
 
     return False
+
 
 def sdpa_mask_without_vmap(
     batch_size: int,
@@ -489,6 +489,7 @@ def sdpa_mask_without_vmap(
     causal_mask = causal_mask.expand(batch_size, -1, q_length, kv_length)
 
     return causal_mask
+
 
 # Adapted from https://github.com/huggingface/transformers/blob/v4.53.0/src/transformers/masking_utils.py#L433
 # Specifically for OpenVINO, we use torch.finfo(torch.float16).min instead of torch.finfo(dtype).min
@@ -636,7 +637,6 @@ def make_stateful(
     """
     from openvino._offline_transformations import apply_make_stateful_transformation
 
-
     input_output_map = {}
 
     if num_beams_and_batch is not None:
@@ -695,6 +695,7 @@ def cleanup_torchscript_cache():
     torch.jit._recursive.concrete_type_store = torch.jit._recursive.ConcreteTypeStore()
     torch.jit._state._clear_class_state()
 
+
 TEXT_EMBEDDINGS_PATH = "openvino_text_embeddings_model.xml"
 AUDIO_EMBEDDINGS_PATH = "openvino_audio_embeddings_model.xml"
 AUDIO_DECODER_PATH = "openvino_audio_decoder_model.xml"
@@ -703,14 +704,25 @@ AUDIO_ENCODER_PATH = "openvino_audio_encoder_model.xml"
 DECODER_MODEL_PATH = "openvino_decoder_model.xml"
 BACKBONE_MODEL_PATH = "openvino_backbone_model.xml"
 
+
 def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
-    
     if model_path is None:
         model_path = Path(model_id.split("/")[-1])
     else:
         model_path = Path(model_path)
 
-    if all((model_path / model_name).exists() for model_name in [TEXT_EMBEDDINGS_PATH, AUDIO_DECODER_PATH, AUDIO_ENCODER_PATH, AUDIO_EMBEDDINGS_PATH, DECODER_MODEL_PATH, BACKBONE_MODEL_PATH, AUDIO_UPSAMPLER_PATH]):
+    if all(
+        (model_path / model_name).exists()
+        for model_name in [
+            TEXT_EMBEDDINGS_PATH,
+            AUDIO_DECODER_PATH,
+            AUDIO_ENCODER_PATH,
+            AUDIO_EMBEDDINGS_PATH,
+            DECODER_MODEL_PATH,
+            BACKBONE_MODEL_PATH,
+            AUDIO_UPSAMPLER_PATH,
+        ]
+    ):
         print(f"✅ {model_id} model already converted. You can find results in {model_path}")
         return model_path
     print(f"⌛ {model_id} conversion started. Be patient, it may takes some time.")
@@ -727,8 +739,6 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
     pt_model._text_tokenizer.save_pretrained(model_path)
     for json_file in Path(model_id).glob("*.json"):
         shutil.copy(json_file, model_path / json_file.name)
-    
-    
 
     if not (model_path / TEXT_EMBEDDINGS_PATH).exists():
         print("⌛ Convert TEXT_EMBEDDINGS model")
@@ -739,7 +749,7 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
         cleanup_torchscript_cache()
         gc.collect()
         print("✅ TEXT_EMBEDDINGS model successfully converted")
-    
+
     if not (model_path / AUDIO_EMBEDDINGS_PATH).exists():
         print("⌛ Convert AUDIO_EMBEDDINGS model")
 
@@ -752,14 +762,13 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
 
     if not (model_path / AUDIO_UPSAMPLER_PATH).exists():
         print("⌛ Convert AUDIO_UPSAMPLER model")
+
         def forward_wrap_audio_upsampler(self, tokens: torch.Tensor):
             tokens = tokens.permute(1, 0, 2)  # (B, nq, L) -> (nq, B, L)
             vq_out_feats = self.rvq.decode_codes(tokens)
             vq_out_feats = vq_out_feats.transpose(1, 2)
             print(f"vq_out_feats shape: {vq_out_feats.shape[1]}")
-            vq_out_length = torch.tensor(
-                [vq_out_feats.size(1)], dtype=torch.long, device=vq_out_feats.device
-            )
+            vq_out_length = torch.tensor([vq_out_feats.size(1)], dtype=torch.long, device=vq_out_feats.device)
             vq_out_feats, vq_out_length = self.upsample(vq_out_feats, vq_out_length)
             return vq_out_feats, vq_out_length
 
@@ -774,8 +783,7 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
         cleanup_torchscript_cache()
         gc.collect()
         print("✅ AUDIO_UPSAMPLER model successfully converted")
-        
-        
+
     if not (model_path / AUDIO_DECODER_PATH).exists():
         print("⌛ Convert AUDIO_DECODER model")
         example_input = {
@@ -789,11 +797,13 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
         cleanup_torchscript_cache()
         gc.collect()
         print("✅ AUDIO_DECODER model successfully converted")
-        
+
     if not (model_path / AUDIO_ENCODER_PATH).exists():
         print("⌛ Convert AUDIO_ENCODER model")
+
         def forward_wrap_audio_encoder(self, audio16k: torch.Tensor):
             return self._encode_one_batch(audio16k)
+
         pt_model._audio_tokenizer._orig_forward = pt_model._audio_tokenizer.forward
         pt_model._audio_tokenizer.forward = types.MethodType(forward_wrap_audio_encoder, pt_model._audio_tokenizer)
 
@@ -806,19 +816,18 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
         gc.collect()
         print("✅ AUDIO_ENCODER model successfully converted")
 
-        
-
     if not (model_path / DECODER_MODEL_PATH).exists():
         print("⌛ Convert DECODER_MODEL model")
         patch_cos_sin_cached_fp32(pt_model._model.decoder)
         if hasattr(pt_model._model.decoder, "model"):
             patch_cos_sin_cached_fp32(pt_model._model.decoder.model)
+
         def forward_wrap_decoder(
             self,
             attention_mask: Optional[torch.Tensor] = None,
             position_ids: Optional[torch.LongTensor] = None,
             past_key_values: Optional[list[torch.FloatTensor]] = None,
-            inputs_embeds:  Optional[torch.Tensor] = None,
+            inputs_embeds: Optional[torch.Tensor] = None,
             step: Optional[torch.Tensor] = None,
         ):
             if past_key_values is not None:
@@ -826,19 +835,15 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
             inputs_embeds_proj = self.projection(inputs_embeds)
             # print(f"decoder inputs: {inputs_embeds}")
             outputs = self.decoder(
-                attention_mask=attention_mask,
-                position_ids=position_ids,
-                past_key_values=past_key_values,
-                inputs_embeds=inputs_embeds_proj,
-                use_cache=True
+                attention_mask=attention_mask, position_ids=position_ids, past_key_values=past_key_values, inputs_embeds=inputs_embeds_proj, use_cache=True
             )
-            
+
             if past_key_values is not None:
                 outputs["past_key_values"] = outputs["past_key_values"].to_legacy_cache()
             decoder_h = outputs.last_hidden_state
             ci_logits = torch.mm(decoder_h[:, -1, :], self.audio_head[step - 1])
             return (ci_logits, outputs.past_key_values)
-        
+
         num_pkv = pt_model._model.decoder.config.num_hidden_layers
         hidden_size = pt_model._model.decoder.config.hidden_size
 
@@ -855,7 +860,6 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
         inputs_embeds = torch.randn((2, 2, hidden_size))
         attention_mask = torch.ones([2, 4], dtype=torch.int64)
         position_ids = torch.arange(2).unsqueeze(0).expand(2, -1)
-        
 
         input_names = ["attention_mask", "position_ids"]
         output_names = ["logits"]
@@ -875,8 +879,8 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
         }
 
         input_shapes = [
-            ov.PartialShape([-1, -1]),          # attention_mask
-            ov.PartialShape([-1, -1]),          # position_ids (2D for code predictor)
+            ov.PartialShape([-1, -1]),  # attention_mask
+            ov.PartialShape([-1, -1]),  # position_ids (2D for code predictor)
         ]
         input_shapes += (
             [
@@ -916,16 +920,16 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
         cleanup_torchscript_cache()
         gc.collect()
 
-
     if not (model_path / BACKBONE_MODEL_PATH).exists():
         print("⌛ Convert BACKBONE_MODEL model")
-        
+
         patch_cos_sin_cached_fp32(pt_model._model.backbone)
         if hasattr(pt_model._model.backbone, "model"):
             patch_cos_sin_cached_fp32(pt_model._model.backbone.model)
 
         backbone_config = pt_model._model.backbone.config
         backbone_config.save_pretrained(model_path)
+
         def forward_wrap_backbone(
             self,
             attention_mask: Optional[torch.Tensor] = None,
@@ -936,11 +940,7 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
             if past_key_values is not None:
                 past_key_values = DynamicCache.from_legacy_cache(past_key_values)
             outputs = self.backbone(
-                inputs_embeds=inputs_embeds,
-                attention_mask=attention_mask,
-                position_ids=position_ids,
-                past_key_values=past_key_values,
-                use_cache=True
+                inputs_embeds=inputs_embeds, attention_mask=attention_mask, position_ids=position_ids, past_key_values=past_key_values, use_cache=True
             )
             if past_key_values is not None:
                 outputs["past_key_values"] = outputs["past_key_values"].to_legacy_cache()
@@ -960,7 +960,7 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
             2,
             pt_model._model.backbone.config.hidden_size // pt_model._model.backbone.config.num_attention_heads,
         )
-        
+
         input_embeds = torch.randn((2, 2, hidden_size))
         attention_mask = torch.ones([2, 4], dtype=torch.int64)
         position_ids = torch.arange(2).unsqueeze(0).expand(2, -1)
@@ -974,7 +974,7 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
             input_names.extend([f"past_key_values.{i}.key", f"past_key_values.{i}.value"])
             output_names.extend([f"present.{i}.key", f"present.{i}.value"])
         input_names.extend(["inputs_embeds"])
-        
+
         example_input = {
             "attention_mask": attention_mask,
             "position_ids": position_ids,
@@ -1032,7 +1032,8 @@ class Segment:
     speaker: str
     text: str
     audio: torch.Tensor
-    
+
+
 @dataclass
 class ModelArgs:
     backbone_flavor: str
@@ -1042,6 +1043,7 @@ class ModelArgs:
     audio_num_codebooks: int
     decoder_loss_weight: float
     use_text_loss: bool
+
 
 class OVFireRedTTS2:
     def __init__(self, pretrained_dir, gen_type, device, codec_device="CPU"):
@@ -1070,7 +1072,7 @@ class OVFireRedTTS2:
             decoder_loss_weight=llm_config["llm_models"]["decoder_loss_weight"],
             use_text_loss=True,
         )
-        
+
         model_dir = Path(pretrained_dir)
         self.backbone = core.compile_model(model_dir / BACKBONE_MODEL_PATH, self.device).create_infer_request()
         self.decoder = core.compile_model(model_dir / DECODER_MODEL_PATH, self.device).create_infer_request()
@@ -1084,7 +1086,7 @@ class OVFireRedTTS2:
         # ==== Load Qwen2.5 Text Tokenizer ====
         self._text_tokenizer = AutoTokenizer.from_pretrained(pretrained_dir)
         print("[INFO] Text Tokenizer Loaded...")
-        
+
     def encode(
         self,
         audio16k: torch.Tensor,
@@ -1101,9 +1103,7 @@ class OVFireRedTTS2:
         """
         if audio16k_length is None:
             assert audio16k.shape[0] == 1
-            audio16k_length = torch.tensor(
-                [audio16k.shape[1]], dtype=torch.long, device=audio16k.device
-            )
+            audio16k_length = torch.tensor([audio16k.shape[1]], dtype=torch.long, device=audio16k.device)
 
         CHUNK_SIZE = 6 * 16000
         B, T = audio16k.shape
@@ -1112,9 +1112,7 @@ class OVFireRedTTS2:
         batch_size_list = []
         for i in range(B):
             # Remove extra paddings
-            one_audio_chunks = _pad_and_chunk(
-                audio16k[i : (i + 1), : audio16k_length[i]], CHUNK_SIZE
-            )
+            one_audio_chunks = _pad_and_chunk(audio16k[i : (i + 1), : audio16k_length[i]], CHUNK_SIZE)
             audio16k_batch += one_audio_chunks
             batch_size_list.append(len(one_audio_chunks))
         audio16k_batch = torch.cat(audio16k_batch, dim=0)
@@ -1126,13 +1124,8 @@ class OVFireRedTTS2:
             token_batch.append(one_token_batch)
         token_batch = torch.cat(token_batch, dim=0)
         # Recover & concat
-        token_list = torch.split(
-            token_batch, batch_size_list, dim=0
-        )  # [(B=1, nq, l), (B=3, nq, l), ...]
-        token_list = [
-            torch.cat(token_ts.split(1, dim=0), dim=-1)  # (B=1, nq, l)
-            for token_ts in token_list
-        ]
+        token_list = torch.split(token_batch, batch_size_list, dim=0)  # [(B=1, nq, l), (B=3, nq, l), ...]
+        token_list = [torch.cat(token_ts.split(1, dim=0), dim=-1) for token_ts in token_list]  # (B=1, nq, l)
         # Pad tokens
         token = pad_sequence(
             [ts.squeeze(0).transpose(1, 0) for ts in token_list],
@@ -1142,11 +1135,9 @@ class OVFireRedTTS2:
             1, 2
         )  # (B, nq, L)
         token_length = (audio16k_length / 1280).ceil().long()
-        token = token[
-            ..., : token_length.max()
-        ]  # Remove extra paddings (we pad to multiples of 6s)
+        token = token[..., : token_length.max()]  # Remove extra paddings (we pad to multiples of 6s)
         return token, token_length
-    
+
     def load_prompt_audio(self, audio_path) -> torch.Tensor:
         audio, audio_sr = torchaudio.load(audio_path)
         # Audio must be single channel
@@ -1159,9 +1150,7 @@ class OVFireRedTTS2:
         audio_tensor = self.load_prompt_audio(audio_path)
         return Segment(text=text, speaker=speaker, audio=audio_tensor)
 
-    def _tokenize_text_segment(
-        self, text: str, speaker: str
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def _tokenize_text_segment(self, text: str, speaker: str) -> Tuple[torch.Tensor, torch.Tensor]:
         frame_tokens = []
         frame_masks = []
 
@@ -1209,15 +1198,11 @@ class OVFireRedTTS2:
         Returns:
             (seq_len,17), (seq_len, 17)
         """
-        text_tokens, text_masks = self._tokenize_text_segment(
-            segment.text, segment.speaker
-        )
+        text_tokens, text_masks = self._tokenize_text_segment(segment.text, segment.speaker)
         audio_tokens, audio_masks = self._tokenize_audio(segment.audio)
 
-        return torch.cat([text_tokens, audio_tokens], dim=0), torch.cat(
-            [text_masks, audio_masks], dim=0
-        )
-        
+        return torch.cat([text_tokens, audio_tokens], dim=0), torch.cat([text_masks, audio_masks], dim=0)
+
     def generate_frame(
         self,
         tokens: torch.Tensor,
@@ -1241,28 +1226,21 @@ class OVFireRedTTS2:
         embeds = self._embed_tokens(tokens)
         masked_embeds = embeds * tokens_mask.unsqueeze(-1)
         h = masked_embeds.sum(dim=2)
-        backbone_attention_mask = torch.ones(
-                tokens.size(0), tokens.size(1),
-                dtype=torch.long,
-                device=tokens.device
-            )  # [batch, curr_seq_len]
+        backbone_attention_mask = torch.ones(tokens.size(0), tokens.size(1), dtype=torch.long, device=tokens.device)  # [batch, curr_seq_len]
         backbone_position_ids = input_pos
         if self.backbone_past_len != 0:
-            backbone_attention_mask = torch.cat([
-                torch.ones(tokens.size(0), self.backbone_past_len, dtype=torch.long, device=tokens.device),
-                backbone_attention_mask
-            ], dim=1)
+            backbone_attention_mask = torch.cat(
+                [torch.ones(tokens.size(0), self.backbone_past_len, dtype=torch.long, device=tokens.device), backbone_attention_mask], dim=1
+            )
             backbone_position_ids = backbone_position_ids[:, -tokens.shape[1] :]
-            
+
         inputs = {
             "inputs_embeds": h,
             "attention_mask": backbone_attention_mask,
             "position_ids": backbone_position_ids,
-            "beam_idx": np.arange(h.shape[0], dtype=int)
+            "beam_idx": np.arange(h.shape[0], dtype=int),
         }
 
-            
-        
         self.backbone.start_async(inputs, share_inputs=True)
         self.backbone.wait()
         logits = self.backbone.get_tensor("logits").data
@@ -1274,28 +1252,19 @@ class OVFireRedTTS2:
         c0_embed = self._embed_audio(0, c0_sample)
         curr_h = torch.cat([last_h.unsqueeze(1), c0_embed], dim=1)
         curr_sample = c0_sample.clone()
-        curr_pos = (
-            torch.arange(0, curr_h.size(1), device=curr_h.device)
-            .unsqueeze(0)
-            .repeat(curr_h.size(0), 1)
-        )
+        curr_pos = torch.arange(0, curr_h.size(1), device=curr_h.device).unsqueeze(0).repeat(curr_h.size(0), 1)
 
         self.decoder.reset_state()
         # Set initial value for the next beam_idx input that will be used at the current iteration
         # and will be optionally updated by _reorder_cache at the next iterations if beam_search is used
         decoder_past_length = 0
         for i in range(1, self.config.audio_num_codebooks):
-            decoder_attention_mask = torch.ones(
-                curr_h.size(0), curr_h.size(1),
-                dtype=torch.long,
-                device=curr_h.device
-            )  # [batch, curr_seq_len]
+            decoder_attention_mask = torch.ones(curr_h.size(0), curr_h.size(1), dtype=torch.long, device=curr_h.device)  # [batch, curr_seq_len]
             decoder_position_ids = curr_pos  # [batch, curr_seq_len]
             if decoder_past_length != 0:
-                decoder_attention_mask = torch.cat([
-                    torch.ones(curr_h.size(0), decoder_past_length, dtype=torch.long, device=curr_h.device),
-                    decoder_attention_mask
-                ], dim=1)
+                decoder_attention_mask = torch.cat(
+                    [torch.ones(curr_h.size(0), decoder_past_length, dtype=torch.long, device=curr_h.device), decoder_attention_mask], dim=1
+                )
                 decoder_position_ids = decoder_position_ids[:, -curr_h.shape[1] :]
 
             inputs = {
@@ -1303,7 +1272,7 @@ class OVFireRedTTS2:
                 "attention_mask": decoder_attention_mask,
                 "position_ids": decoder_position_ids,
                 "beam_idx": np.arange(curr_h.shape[0], dtype=int),
-                "step": torch.tensor(i).to(dtype=torch.int32)
+                "step": torch.tensor(i).to(dtype=torch.int32),
             }
 
             self.decoder.start_async(inputs, share_inputs=True)
@@ -1329,10 +1298,7 @@ class OVFireRedTTS2:
     def _embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
         text_embeds = torch.from_numpy(self.text_embeddings(tokens[:, :, -1])[0]).unsqueeze(-2)
 
-        audio_tokens = tokens[:, :, :-1] + (
-            self.config.audio_vocab_size
-            * torch.arange(self.config.audio_num_codebooks, device=tokens.device)
-        )
+        audio_tokens = tokens[:, :, :-1] + (self.config.audio_vocab_size * torch.arange(self.config.audio_num_codebooks, device=tokens.device))
         audio_embeds = torch.from_numpy(self.audio_embeddings(audio_tokens.view(-1))[0]).reshape(
             tokens.size(0), tokens.size(1), self.config.audio_num_codebooks, -1
         )
@@ -1357,9 +1323,7 @@ class OVFireRedTTS2:
             tokens.append(segment_tokens)
             tokens_mask.append(segment_tokens_mask)
 
-        gen_segment_tokens, gen_segment_tokens_mask = self._tokenize_text_segment(
-            text, speaker
-        )
+        gen_segment_tokens, gen_segment_tokens_mask = self._tokenize_text_segment(text, speaker)
         tokens.append(gen_segment_tokens)
         tokens_mask.append(gen_segment_tokens_mask)
 
@@ -1369,30 +1333,22 @@ class OVFireRedTTS2:
         samples = []
         curr_tokens = prompt_tokens.unsqueeze(0)
         curr_tokens_mask = prompt_tokens_mask.unsqueeze(0)
-        curr_pos = (
-            torch.arange(0, prompt_tokens.size(0)).unsqueeze(0).long()
-        )
+        curr_pos = torch.arange(0, prompt_tokens.size(0)).unsqueeze(0).long()
 
         max_seq_len = 3100
         max_context_len = max_seq_len - max_generation_len
         if curr_tokens.size(1) >= max_context_len:
-            raise ValueError(
-                f"Inputs too long, must be below max_seq_len - max_generation_len: {max_context_len}"
-            )
+            raise ValueError(f"Inputs too long, must be below max_seq_len - max_generation_len: {max_context_len}")
 
         for _ in range(max_generation_len):
-            sample = self.generate_frame(
-                curr_tokens, curr_tokens_mask, curr_pos, temperature, topk
-            )
+            sample = self.generate_frame(curr_tokens, curr_tokens_mask, curr_pos, temperature, topk)
             # eos
             if torch.all(sample == 0):
                 break
 
             samples.append(sample)
 
-            curr_tokens = torch.cat(
-                [sample, torch.zeros(1, 1).long()], dim=1
-            ).unsqueeze(1)
+            curr_tokens = torch.cat([sample, torch.zeros(1, 1).long()], dim=1).unsqueeze(1)
             curr_tokens_mask = torch.cat(
                 [
                     torch.ones_like(sample).bool(),
@@ -1405,11 +1361,7 @@ class OVFireRedTTS2:
         vq_out_feats, _ = torch.from_numpy(vq_out[0]), torch.from_numpy(vq_out[1])
         vq_out_length = torch.tensor([vq_out_feats.shape[1]], dtype=torch.long)
         audio = torch.from_numpy(self.audio_decoder([vq_out_feats, vq_out_length])[0])
-        audio = (
-            audio
-            .squeeze(0)
-            .squeeze(0)
-        )
+        audio = audio.squeeze(0).squeeze(0)
 
         return audio
 
@@ -1434,11 +1386,7 @@ class OVFireRedTTS2:
                 prompt_text = prompt_text_list[i]
                 speaker = prompt_text[:4]
                 assert speaker in ["[S1]", "[S2]", "[S3]", "[S4]"]
-                prompt_segments.append(
-                    self.prepare_prompt(
-                        text=prompt_text, speaker=speaker, audio_path=prompt_wav
-                    )
-                )
+                prompt_segments.append(self.prepare_prompt(text=prompt_text, speaker=speaker, audio_path=prompt_wav))
 
         for text in tqdm(text_list):
             speaker = text[:4]
@@ -1457,16 +1405,10 @@ class OVFireRedTTS2:
             )
 
             # 做上下文管理的时候需要将audio 转到16k
-            audio_16k = torchaudio.functional.resample(
-                audio_tensor.unsqueeze(0), 24000, 16000
-            )
-            all_generated_segments.append(
-                Segment(text=text, speaker=speaker, audio=audio_16k)
-            )
+            audio_16k = torchaudio.functional.resample(audio_tensor.unsqueeze(0), 24000, 16000)
+            all_generated_segments.append(Segment(text=text, speaker=speaker, audio=audio_16k))
 
-            all_storage_segments.append(
-                Segment(text=text, speaker=speaker, audio=audio_tensor.unsqueeze(0))
-            )
+            all_storage_segments.append(Segment(text=text, speaker=speaker, audio=audio_tensor.unsqueeze(0)))
 
         # Concatenate all generations
         all_audio = torch.cat([seg.audio for seg in all_storage_segments], dim=1)

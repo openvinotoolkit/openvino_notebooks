@@ -22,13 +22,10 @@ The tutorial consists from following steps:
 
 In this demonstration, you'll create interactive assistant that can answer questions about provided image's content or generate images based on text instructions.
 
-The images bellow illustrates example of input prompt and model answer for image understanding and generation
-![example.png](https://github.com/user-attachments/assets/89a71be8-b472-4acd-a2e0-dbc97645fc1c)
-![example2.png](https://github.com/user-attachments/assets/5aca2b37-52d9-403d-a773-311ccf82b375)
+The images bellow illustrates example of voice cloning and dialogue generation.
 
 ## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
-
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/janus-multimodal-generation/README.md" />
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/fireredtts2/README.md" />

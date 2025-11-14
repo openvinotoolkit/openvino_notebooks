@@ -3,30 +3,27 @@ import gradio as gr
 from tqdm import tqdm
 from argparse import ArgumentParser
 from typing import Literal, List, Tuple
-from ov_firetts_helper import OVFireRedTTS2
 
-
-# ================================================
-#                   FireRedTTS2 Model
-# ================================================
-# Global model instance
-model: OVFireRedTTS2 = None
 
 examples = [
-    ["English", 
-    "examples\chat_prompt\en\S1.flac", 
-    "[S1]I think we should just talk about what happened and move on because there's going to be other jousts and Sir Saif isn't done yet. It's not, he's not, it's not done yet.", 
-    "examples\chat_prompt\en\S2.flac", 
-    "[S2]You know, maybe sorry, maybe maybe I pushed, maybe I pushed too hard. I was really excited. I didn't mean to make you snap.",
-    "[S1]It's alright, we'll take a breath and plan the next pass together.[S2]Yeah, thanks. We'll get it right this time.[S1]Let's review our signals tonight so we're in sync on the field tomorrow."
-     ]
-    ["中文", 
-    "examples\chat_prompt\zh\S1.flac", 
-    "[S1]啊，可能说更适合美国市场应该是什么样子。那这这个可能说当然如果说有有机会能亲身的去考察去了解一下，那当然是有更好的帮助。", 
-    "examples\chat_prompt\zh\S2.flac", 
-    "[S2]比如具体一点的，他觉得最大的一个跟他预想的不一样的是在什么地方。",  
-    "[S1]那可能说对对，没有去过美国来说去去看到美国线下。巴斯曼也好，沃尔玛也好，他们线下不管说，因为深圳出去的还是电子周边的会表达，会发现哇对这个价格真的是很高呀。都是卖三十五美金、四十美金，甚至一个手机壳，就是二十五美金开。[S2]对，没错，我每次都觉得不不可思议。我什么人会买三五十美金的手机壳？但是其实在在那个target啊，就塔吉特这种超级市场，大家都是这样的，定价也很多人买。"],
+    [
+        "English",
+        "FireRedTTS2\examples\chat_prompt\en\S1.flac",
+        "[S1]I think we should just talk about what happened and move on because there's going to be other jousts and Sir Saif isn't done yet. It's not, he's not, it's not done yet.",
+        "examples\chat_prompt\en\S2.flac",
+        "[S2]You know, maybe sorry, maybe maybe I pushed, maybe I pushed too hard. I was really excited. I didn't mean to make you snap.",
+        "[S1]It's alright, we'll take a breath and plan the next pass together.[S2]Yeah, thanks. We'll get it right this time.[S1]Let's review our signals tonight so we're in sync on the field tomorrow.",
+    ],
+    [
+        "中文",
+        "FireRedTTS2\examples\chat_prompt\zh\S1.flac",
+        "[S1]啊，可能说更适合美国市场应该是什么样子。那这这个可能说当然如果说有有机会能亲身的去考察去了解一下，那当然是有更好的帮助。",
+        "examples\chat_prompt\zh\S2.flac",
+        "[S2]比如具体一点的，他觉得最大的一个跟他预想的不一样的是在什么地方。",
+        "[S1]那可能说对对，没有去过美国来说去去看到美国线下。巴斯曼也好，沃尔玛也好，他们线下不管说，因为深圳出去的还是电子周边的会表达，会发现哇对这个价格真的是很高呀。都是卖三十五美金、四十美金，甚至一个手机壳，就是二十五美金开。[S2]对，没错，我每次都觉得不不可思议。我什么人会买三五十美金的手机壳？但是其实在在那个target啊，就塔吉特这种超级市场，大家都是这样的，定价也很多人买。",
+    ],
 ]
+
 
 def initiate_model(ov_model):
     global model
@@ -151,13 +148,11 @@ def check_dialogue_text(text_list: List[str]) -> bool:
         return False
     for text in text_list:
         if not (
-            check_monologue_text(text, "[S1]")
-            or check_monologue_text(text, "[S2]")
-            or check_monologue_text(text, "[S3]")
-            or check_monologue_text(text, "[S4]")
+            check_monologue_text(text, "[S1]") or check_monologue_text(text, "[S2]") or check_monologue_text(text, "[S3]") or check_monologue_text(text, "[S4]")
         ):
             return False
     return True
+
 
 def dialogue_synthesis_function(
     target_text: str,
@@ -193,9 +188,7 @@ def dialogue_synthesis_function(
 
     # Go synthesis
     progress_bar = gr.Progress(track_tqdm=True)
-    prompt_wav_list = (
-        None if voice_mode != 0 else [spk1_prompt_audio, spk2_prompt_audio]
-    )
+    prompt_wav_list = None if voice_mode != 0 else [spk1_prompt_audio, spk2_prompt_audio]
     prompt_text_list = None if voice_mode != 0 else [spk1_prompt_text, spk2_prompt_text]
     target_audio = model.generate_dialogue(
         text_list=target_text_list,
@@ -265,9 +258,7 @@ def render_interface() -> gr.Blocks:
                     lines=18,
                 )
         # Generate button
-        generate_btn = gr.Button(
-            value=i18n("generate_btn_label"), variant="primary", size="lg"
-        )
+        generate_btn = gr.Button(value=i18n("generate_btn_label"), variant="primary", size="lg")
         # Long output audio
         generate_audio = gr.Audio(
             label=i18n("generated_audio_label"),
