@@ -503,7 +503,6 @@
 - notebook: notebooks/convert-to-openvino/convert-to-openvino.ipynb
   skips:
     - python:
-        - "3.12"
         - "3.13"
 - notebook: notebooks/jax-to-openvino/jax-classification-to-openvino.ipynb
   skips:
