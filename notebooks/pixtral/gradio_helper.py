@@ -94,7 +94,7 @@ def make_demo(model, processor):
         print(f"prompt is -\n{prompt}")
         image = Image.open(image)
         image = resize_with_aspect_ratio(image)
-        inputs = processor(prompt, image, return_tensors="pt")
+        inputs = processor(text=prompt, images=[image], return_tensors="pt")
 
         streamer = TextIteratorStreamer(
             processor,
