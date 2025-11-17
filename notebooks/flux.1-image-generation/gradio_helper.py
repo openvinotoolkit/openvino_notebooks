@@ -79,7 +79,7 @@ def make_demo(ov_pipe, model_name):
                 with gr.Row():
                     guidance_scale = gr.Slider(
                         label="Guidance Scale",
-                        minimum=1,
+                        minimum=0,  # allow zero when CFG is unsupported
                         maximum=15,
                         step=0.1,
                         value=3.5 if is_guidance_scale_supported else 0.0,
