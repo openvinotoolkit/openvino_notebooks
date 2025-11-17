@@ -86,6 +86,7 @@ bilinear
 biometrics
 BiT
 bitext
+bitnet
 blockwise
 BLACKBOX
 boolean
@@ -575,6 +576,7 @@ MERCHANTABILITY
 MF
 MiB
 microservices
+microsoft
 MiDaS
 MidasNet
 Midjourney
