@@ -538,3 +538,7 @@
   skips:
     - os:
         - macos-13
+- notebook: notebooks/qwen3-vl/qwen3-vl.ipynb
+  skips:
+    - os:
+        - macos-13
