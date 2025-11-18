@@ -69,7 +69,7 @@ def transform_messages(original_messages):
     return transformed_messages
 
 
-def make_demo(model, processor):
+def make_demo(model, processor, model_name="Qwen2.5-VL"):
     def call_local_model(model, processor, messages):
         messages = transform_messages(messages)
 
@@ -173,9 +173,9 @@ def make_demo(model, processor):
         return []
 
     with gr.Blocks() as demo:
-        gr.Markdown("""<center><font size=8>Qwen2.5-VL OpenVINO demo</center>""")
+        gr.Markdown(f"""<center><font size=8>{model_name} OpenVINO demo</center>""")
 
-        chatbot = gr.Chatbot(label="Qwen2-VL", elem_classes="control-height", height=500)
+        chatbot = gr.Chatbot(label=model_name, elem_classes="control-height", height=500)
         query = gr.Textbox(lines=2, label="Input")
         task_history = gr.State([])
 
