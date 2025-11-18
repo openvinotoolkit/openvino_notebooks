@@ -505,6 +505,13 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT + " You should not show your reasoning steps. Reasoning: low.",
             "exclude_on_devices": ["GPU"],
         },
+        "bitnet-b1.58-2B-4T": {
+            "model_id": "microsoft/bitnet-b1.58-2B-4T",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "genai_chat_template": "{% set loop_messages = messages %}{% for message in loop_messages %}{% set content = message['role'].capitalize() + ': '+ message['content'].strip() + '<|eot_id|>' %}{{ content }}{% endfor %}{% if add_generation_prompt %}{{ 'Assistant: ' }}{% endif %}",
+            "exclude_compression": ["INT4", "INT4-AWQ", "INT4-NPU", "INT8"],
+        },
     },
     "Chinese": {
         "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
@@ -861,9 +868,10 @@ int4_npu_config = {
 def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True, device=None):
     import ipywidgets as widgets
 
-    lang_dropdown = widgets.Dropdown(options=languages or [])
-
     filter_models_by_device = lambda model_info: device not in model_info[1].get("exclude_on_devices", [])
+    available_optimumzations = SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"]
+
+    lang_dropdown = widgets.Dropdown(options=languages or [])
 
     # Define dependent drop down
     supported_models = dict(filter(filter_models_by_device, models.items()))
@@ -877,7 +885,15 @@ def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPOR
         model_dropdown.options = dict(filter(filter_models_by_device, supported_models.items()))
 
     lang_dropdown.observe(dropdown_handler, names="value")
-    compression_dropdown = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"])
+
+    def dropdown_model_handler(change):
+        global model_dropdown
+        model_dropdown = change.new
+        compression_dropdown.options = filter(lambda opt_type: opt_type not in change.new.get("exclude_compression", []), available_optimumzations)
+
+    model_dropdown.observe(dropdown_model_handler, names="value")
+
+    compression_dropdown = widgets.Dropdown(options=available_optimumzations)
     preconverted_checkbox = widgets.Checkbox(value=True)
 
     form_items = []
