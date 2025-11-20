@@ -536,3 +536,7 @@
   skips:
     - os:
         - macos-13
+- notebook: notebooks/fireredtts2/fireredtts2.ipynb
+  skips:
+    - os:
+        - macos-13
