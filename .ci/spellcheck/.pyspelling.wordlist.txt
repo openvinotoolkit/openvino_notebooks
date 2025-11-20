@@ -86,6 +86,7 @@ bilinear
 biometrics
 BiT
 bitext
+bitnet
 blockwise
 BLACKBOX
 boolean
@@ -200,6 +201,7 @@ deduplicated
 DeepFloyd
 DeepLabV
 DeepSeek
+DeepStack
 denoise
 denoised
 denoises
@@ -430,6 +432,7 @@ intervaling
 im
 imageLink
 img
+io
 ip
 IPs
 ir
@@ -577,6 +580,7 @@ MERCHANTABILITY
 MF
 MiB
 microservices
+microsoft
 MiDaS
 MidasNet
 Midjourney

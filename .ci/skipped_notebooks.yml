@@ -504,10 +504,12 @@
   skips:
     - python:
         - "3.12"
+        - "3.13"
 - notebook: notebooks/jax-to-openvino/jax-classification-to-openvino.ipynb
   skips:
     - python:
         - "3.12"
+        - "3.13"
 - notebook: notebooks/optimize-preprocessing/optimize-preprocessing.ipynb
   skips:
     - python:
@@ -537,6 +539,10 @@
     - os:
         - macos-13
 - notebook: notebooks/fireredtts2/fireredtts2.ipynb
+  skips:
+    - os:
+        - macos-13
+- notebook: notebooks/qwen3-vl/qwen3-vl.ipynb
   skips:
     - os:
         - macos-13
