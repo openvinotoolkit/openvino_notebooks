@@ -87,7 +87,7 @@ jobs:
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install ffmpeg espeak-ng
           elif [ "$RUNNER_OS" == "Windows" ]; then
-            choco install ffmpeg-full
+            choco install ffmpeg-full --version 7.1.1 -y
           fi
       # Packages that notebooks need to run in docker container
       - name: Install required packages (container)
