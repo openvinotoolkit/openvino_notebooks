@@ -6,7 +6,6 @@ import math
 
 from PIL import Image, ImageDraw, ImageFont
 import copy
-import imghdr
 from shapely.geometry import Polygon
 import pyclipper
 import string
