@@ -198,6 +198,37 @@ def get_pip_package_version(package, text_input: str, missing_return: str) -> st
         version = missing_return
     return version
 
+def get_dir_size(path: Path) -> int:
+    total = 0
+    try:
+        if not path.exists():
+            return 0
+        if path.is_file():
+            return path.stat().st_size
+        for entry in path.rglob('*'):
+            if entry.is_file():
+                total += entry.stat().st_size
+    except Exception:
+        pass
+    return total
+
+
+def print_disk_usage(label: str, notebook_dir: Path):
+    try:
+        # Free disk space
+        total, used, free = shutil.disk_usage(notebook_dir.absolute().anchor)
+        
+        # Notebook dir size
+        nb_dir_size = get_dir_size(notebook_dir)
+        
+        # Cache dir size
+        cache_dir = Path.home() / ".cache"
+        cache_size = get_dir_size(cache_dir)
+        
+        print(f"DEBUG [{label}] Free Space: {free} | Notebook Dir: {nb_dir_size} | ~/.cache: {cache_size}", flush=True)
+    except Exception as e:
+        print(f"Error checking disk usage: {e}")
+
 
 def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
@@ -215,6 +246,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         return result
 
     with cd(notebook_path.parent):
+        print_disk_usage("BEFORE", Path("."))
         files_before_test = sorted(Path(".").iterdir())
         ov_version_before = get_pip_package_version("openvino", "OpenVINO before notebook execution", "OpenVINO is missing")
         get_pip_package_version("openvino_tokenizers", "OpenVINO Tokenizers before notebook execution", "OpenVINO Tokenizers is missing")
@@ -237,6 +269,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         except subprocess.TimeoutExpired:
             retcode = -42
         duration = time.perf_counter() - start
+
         ov_version_after = get_pip_package_version("openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
         get_pip_package_version("openvino_tokenizers", "OpenVINO Tokenizers after notebook execution", "OpenVINO Tokenizers is missing")
         get_pip_package_version("openvino_genai", "OpenVINO GenAI after notebook execution", "OpenVINO GenAI is missing")
@@ -245,6 +278,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         if not keep_artifacts:
             clean_test_artifacts(files_before_test, sorted(Path(".").iterdir()))
         collect_python_packages(report_dir / (patched_notebook.stem + "_env_after.txt"))
+        print_disk_usage("AFTER", Path("."))
 
     return result
 
