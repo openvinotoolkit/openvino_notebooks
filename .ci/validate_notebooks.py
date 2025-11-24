@@ -262,10 +262,8 @@ def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], t
         test_report.append(
             {"name": notebook.as_posix(), "status": test_status, "full_path": str(status["path"].relative_to(root)), "duration": status["duration"]}
         )
-    with (report_dir / "test_report.csv").open("w") as f:
-        writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
-        writer.writeheader()
-        writer.writerows(test_report)
+    with (report_dir / "test_report.json").open("w") as f:
+        json.dump(test_report, f, indent=4)
     return return_status
 
 
