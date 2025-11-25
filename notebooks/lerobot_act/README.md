@@ -1,6 +1,8 @@
 # ACT Policy → OpenVINO IR Conversion (Notebook Guide)
-This README documents the current workflow implemented in `lerobot-act.ipynb` for converting a LeRobot ACT (Action Chunking Transformer) PyTorch checkpoint into an OpenVINO IR (XML/BIN) model. The notebook presently performs FP32 export (Model Optimizer invoked with FP16 compression flag but output standardized to `act_model_fp32.xml/bin`).
+This README documents the current workflow implemented in `lerobot-act.ipynb` for converting a LeRobot ACT (Action Chunking Transformer) PyTorch checkpoint into an OpenVINO IR (XML/BIN) model.
 
+# Run
+`jupyter lab lerobot-act.ipynb`
 
 ## Required Checkpoint Files (`act_checkpoint/`)
 Place these next to the notebook:
@@ -14,19 +16,6 @@ Download the G1_BlockStacking_Dataset from hugging face:
 https://huggingface.co/datasets/unitreerobotics/G1_Dex3_BlockStacking_Dataset
 
 
-## Minimal Installation & Launch
-Recommended (Conda environment):
-```bash
-bash setup_unitree_lerobot_env.sh
-conda create -n unitree_lerobot python=3.10 -y
-conda activate unitree_lerobot
-# Launch notebook with correct kernel
-jupyter lerobot-act.ipynb --NotebookApp.kernel_name=unitree_lerobot
-```
-
-If you skip creating a dedicated environment, the dependency cell will install core packages (torch, openvino, nncf, etc.) into the current kernel. You MUST still install `lerobot` manually; the notebook will not auto‑install it.
-
-
 ## Key Configuration Variables
 | Variable          | Meaning                                                  |
 |-------------------|----------------------------------------------------------|
@@ -37,20 +26,6 @@ If you skip creating a dedicated environment, the dependency cell will install c
 | `PRECISIONS`      | Currently `['FP32']`                                     |
 | `TARGET_DEVICE`   | Default runtime device                                   |
 
-## ONNX Export
-Wrapper (`ONNXWrapper`) mirrors ACT forward usage by constructing a batch dict. Input ordering:
-`observation.state`, each camera image (`observation.images.*`), `action_is_pad`, `action`, optional `observation.environment_state`.
-* Output name: `output`
-Exports only if `openvino_ir_outputs/model.onnx` does not already exist.
-
-## Model Optimizer Conversion
-Executed command:
-```
-mo --input_model openvino_ir_outputs/model.onnx --output_dir openvino_ir_outputs --compress_to_fp16=False
-```
-Artifacts are copied / renamed to:
-* `act_model_fp32.xml`
-* `act_model_fp32.bin`
 
 ## Direct PyTorch FX Conversion
 Instead of exporting full temporal tensors via ONNX you can generate a smaller IR directly from PyTorch using OpenVINO's FX path. The wrapper internally creates placeholder temporal inputs (`action`, `action_is_pad`, history) so the IR exposes only observation features:
@@ -79,7 +54,7 @@ Tips:
 
 
 ## Evaluation of Variants
-The notebook / helper script can compare PyTorch baseline vs IR variants (Direct FP32, FP16, MO FP32, INT8).
+The notebook / helper script can compare PyTorch baseline vs IR variants (Direct FP32, FP16, INT8).
 
 Environment variables (set before running evaluation cell):
 | Var | Purpose |
@@ -109,9 +84,6 @@ act_checkpoint/
 dataset/
   G1_BlockStacking_Dataset/
 openvino_ir_outputs/
-  model.onnx               # ONNX baseline export
-  act_model_fp32.xml       # MO baseline IR (full inputs)
-  act_model_fp32.bin
   act_model_direct_fp32.xml  # Direct minimal-input IR
   act_model_direct_fp32.bin
   int8/
@@ -120,7 +92,6 @@ openvino_ir_outputs/
 
 actions_comparison_direct_fp32.png
 actions_comparison_direct_fp16.png
-actions_comparison_mo_fp32.png
 actions_comparison_int8.png
 
 ```
