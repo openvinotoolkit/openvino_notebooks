@@ -7,6 +7,7 @@ import json
 import shutil
 import platform
 import yaml
+from clonevirtualenv import clone_virtualenv
 
 from argparse import ArgumentParser
 from pathlib import Path
@@ -15,10 +16,13 @@ from validation_config import ValidationConfig, validation_config_arg, SkippedNo
 
 
 ROOT = Path(__file__).parents[1]
+ROOT_ABSOLUTE = ROOT.absolute()
 
 NOTEBOOKS_DIR = Path("notebooks")
 
 SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
+
+SOURCE_VENV_DIR_NAME = "openvino_env"
 
 
 class NotebookStatus:
@@ -60,6 +64,10 @@ def parse_arguments():
         default=7200,
         help="Timeout for running single notebook in seconds",
     )
+    parser.add_argument(
+        "--common_venv", action="store_true",
+        help="Use common virtual environment to run full test set instead of creating separate virtual environment for each notebook",
+    )
     return parser.parse_args()
 
 
@@ -68,9 +76,9 @@ def move_notebooks(nb_dir):
     shutil.copytree(current_notebooks_dir, nb_dir)
 
 
-def collect_python_packages(output_file: Path):
+def collect_python_packages(python_executable: Path, output_file: Path):
     reqs = subprocess.check_output(
-        [sys.executable, "-m", "pip", "freeze"],
+        [str(python_executable), "-m", "pip", "freeze"],
         shell=(platform.system() == "Windows"),
     )
     with output_file.open("wb") as f:
@@ -187,16 +195,64 @@ def get_base_openvino_version() -> str:
     return version
 
 
-def get_pip_package_version(package, text_input: str, missing_return: str) -> str:
+def get_pip_package_version(python_executable: Path, package: str, text_input: str, missing_return: str) -> str:
+    command = [str(python_executable), "-m", "pip", "show", package]
     try:
-        from importlib import metadata
-
-        version = metadata.version(package)
-        print(f"{text_input}: {version}")
-    except metadata.PackageNotFoundError:
+        output = subprocess.check_output(
+            command,
+            shell=(platform.system() == "Windows"),
+            universal_newlines=True,
+        )
+        version_line = next(
+            (line for line in output.splitlines() if line.startswith("Version: ")), None
+        )
+        if version_line:
+            version = version_line.split("Version: ")[1].strip()
+            print(f"{text_input}: {version}")
+            return version
+        else:
+            print(f"{package} is missing in validation environment.")
+            return missing_return
+    except subprocess.CalledProcessError:
         print(f"{package} is missing in validation environment.")
-        version = missing_return
-    return version
+        return missing_return
+
+
+def create_venv(env_path: Path):
+    print("Creating virtual environment...", flush=True)
+    print(f"Virtual environment path: {env_path}", flush=True)
+    subprocess.run(
+        [sys.executable, "-m", "venv",
+            str(env_path), "--prompt", "notebook_validation_env", "--clear"],
+        shell=(platform.system() == "Windows"),
+        check=True,
+    )
+    if platform.system() == "Windows":
+        pip_executable = env_path / "Scripts" / "pip.exe"
+        python_exec = env_path / "Scripts" / "python.exe"
+    else:
+        pip_executable = env_path / "bin" / "pip"
+        python_exec = env_path / "bin" / "python"
+
+    subprocess.run(
+        [str(pip_executable.absolute()), "install", "--upgrade", "pip"],
+        shell=(platform.system() == "Windows"),
+        check=True,
+    )
+    subprocess.run(
+        [str(pip_executable.absolute()),
+         f"--python={python_exec}", "install", "treon"],
+        shell=(platform.system() == "Windows"),
+        check=True,
+    )
+
+    if env_path.exists():
+        print("Virtual environment created.", flush=True)
+    else:
+        print("Failed to create virtual environment.", flush=True)
+        raise RuntimeError("Failed to create virtual environment.")
+
+    return python_exec.absolute()
 
 
 def get_dir_size(path: Path) -> int:
@@ -231,7 +287,54 @@ def print_disk_usage(label: str, notebook_dir: Path):
         print(f"Error checking disk usage: {e}")
 
 
-def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[tuple[str, int, float, str, str]]:
+def clone_venv(source_env_path: Path, target_env_path: Path):
+    """
+    Clone existing virtual environment to a new location.
+
+    :param source_env_path: source virtual environment path
+    :type source_env_path: Path
+    :param target_env_path: target virtual environment path
+    :type target_env_path: Path
+    """
+
+    print(f"Cloning virtual environment from {source_env_path} to "
+          f"{target_env_path}...", flush=True)
+
+    if not source_env_path.exists():
+        raise FileNotFoundError(
+            f"Source virtual environment path '{source_env_path}' does not exist."
+        )
+    if target_env_path.exists():
+        print(
+            f"Target virtual environment path '{target_env_path}' already exists. Removing it first...",
+            flush=True,
+        )
+        remove_venv(target_env_path)
+
+    clone_virtualenv(str(source_env_path),
+                     str(target_env_path))
+
+    print("Virtual environment cloned.", flush=True)
+
+    if platform.system() == "Windows":
+        python_exec = target_env_path / "Scripts" / "python.exe"
+    else:
+        python_exec = target_env_path / "bin" / "python"
+
+    return python_exec.absolute()
+
+
+def remove_venv(env_path: Path):
+    """
+    Remove virtual environment at the specified path.
+
+    :param env_path: virtual environment path
+    :type env_path: Path
+    """
+    if env_path.exists() and env_path.is_dir():
+        shutil.rmtree(env_path, ignore_errors=True)
+
+def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".", separate_venv=True) -> Optional[tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["HF_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["TORCH_HOME"] = str(notebook_path.parent)
@@ -246,40 +349,70 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         print(f'Notebook path "{notebook_path}" should have "*.ipynb" extension.')
         return result
 
-    with cd(notebook_path.parent):
-        print_disk_usage("BEFORE", Path("."))
-        files_before_test = sorted(Path(".").iterdir())
-        ov_version_before = get_pip_package_version("openvino", "OpenVINO before notebook execution", "OpenVINO is missing")
-        get_pip_package_version("openvino_tokenizers", "OpenVINO Tokenizers before notebook execution", "OpenVINO Tokenizers is missing")
-        get_pip_package_version("openvino_genai", "OpenVINO GenAI before notebook execution", "OpenVINO GenAI is missing")
-        patched_notebook = Path(f"test_{notebook_path.name}")
-        if not patched_notebook.exists():
-            print(f'Patched notebook "{patched_notebook}" does not exist.')
-            return result
+    python_executable = sys.executable
 
-        collect_python_packages(report_dir / (patched_notebook.stem + "_env_before.txt"))
+    try:
+        with cd(notebook_path.parent):
+            print_disk_usage("BEFORE", Path("."))
+            files_before_test = sorted(Path(".").iterdir())
 
-        main_command = [sys.executable, "-m", "treon", "--verbose", str(patched_notebook)]
-        start = time.perf_counter()
-        try:
-            retcode = subprocess.run(
-                main_command,
-                shell=(platform.system() == "Windows"),
-                timeout=timeout,
-            ).returncode
-        except subprocess.TimeoutExpired:
-            retcode = -42
-        duration = time.perf_counter() - start
+            if separate_venv:
+                try:
+                    venv_path = Path(".notebook_validation_env").absolute()
+                    python_executable = clone_venv(ROOT_ABSOLUTE / SOURCE_VENV_DIR_NAME,
+                                                   venv_path)
+                    # os.environ["PYTHON_EXECUTABLE"] = str(python_executable)
+                except subprocess.CalledProcessError as e:
+                    print(f"Failed to create virtual environment for notebook {notebook_path}. Error: {e}")
+                    return result
 
-        ov_version_after = get_pip_package_version("openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
-        get_pip_package_version("openvino_tokenizers", "OpenVINO Tokenizers after notebook execution", "OpenVINO Tokenizers is missing")
-        get_pip_package_version("openvino_genai", "OpenVINO GenAI after notebook execution", "OpenVINO GenAI is missing")
-        result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after)
+            ov_version_before = get_pip_package_version(python_executable,
+                "openvino", "OpenVINO before notebook execution", "OpenVINO is missing")
+            get_pip_package_version(python_executable,
+                "openvino_tokenizers", "OpenVINO Tokenizers before notebook execution", "OpenVINO Tokenizers is missing")
+            get_pip_package_version(python_executable,
+                "openvino_genai", "OpenVINO GenAI before notebook execution", "OpenVINO GenAI is missing")
+            patched_notebook = Path(f"test_{notebook_path.name}")
+            if not patched_notebook.exists():
+                print(f'Patched notebook "{patched_notebook}" does not exist.')
+                return result
 
-        if not keep_artifacts:
-            clean_test_artifacts(files_before_test, sorted(Path(".").iterdir()))
-        collect_python_packages(report_dir / (patched_notebook.stem + "_env_after.txt"))
-        print_disk_usage("AFTER", Path("."))
+            collect_python_packages(python_executable,
+                                    report_dir / (patched_notebook.stem + "_env_before.txt"))
+
+            main_command = [python_executable, "-m",
+                            "treon", "--verbose", str(patched_notebook)]
+            print(f"Executing command: {main_command}", flush=True)
+            start = time.perf_counter()
+            try:
+                # retcode = 0
+                retcode = subprocess.run(
+                    main_command,
+                    shell=(platform.system() == "Windows"),
+                    timeout=timeout,
+                ).returncode
+            except subprocess.TimeoutExpired:
+                retcode = -42
+            duration = time.perf_counter() - start
+            ov_version_after = get_pip_package_version(python_executable,
+                "openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
+            get_pip_package_version(python_executable,
+                "openvino_tokenizers", "OpenVINO Tokenizers after notebook execution", "OpenVINO Tokenizers is missing")
+            get_pip_package_version(python_executable,
+                "openvino_genai", "OpenVINO GenAI after notebook execution", "OpenVINO GenAI is missing")
+            result = (str(patched_notebook), retcode, duration,
+                      ov_version_before, ov_version_after)
+
+            collect_python_packages(python_executable,
+                report_dir / (patched_notebook.stem + "_env_after.txt"))
+
+            if not keep_artifacts:
+                clean_test_artifacts(
+                    files_before_test, sorted(Path(".").iterdir()))
+
+    finally:
+        if separate_venv:
+            remove_venv(venv_path)
 
     return result
 
@@ -371,7 +504,7 @@ def main():
     for notebook, report in test_plan.items():
         if report["status"] == NotebookStatus.SKIPPED:
             continue
-        test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute())
+        test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute(), not args.common_venv)
         timing = 0
         if not test_result:
             print(f'Testing notebooks "{str(notebook)}" is not found.')

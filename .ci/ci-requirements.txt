@@ -1,3 +1,4 @@
 -r dev-requirements.txt
 
 pandoc
+virtualenv-clone
