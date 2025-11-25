@@ -198,6 +198,7 @@ def get_pip_package_version(package, text_input: str, missing_return: str) -> st
         version = missing_return
     return version
 
+
 def get_dir_size(path: Path) -> int:
     total = 0
     try:
@@ -205,7 +206,7 @@ def get_dir_size(path: Path) -> int:
             return 0
         if path.is_file():
             return path.stat().st_size
-        for entry in path.rglob('*'):
+        for entry in path.rglob("*"):
             if entry.is_file():
                 total += entry.stat().st_size
     except Exception:
@@ -217,14 +218,14 @@ def print_disk_usage(label: str, notebook_dir: Path):
     try:
         # Free disk space
         total, used, free = shutil.disk_usage(notebook_dir.absolute().anchor)
-        
+
         # Notebook dir size
         nb_dir_size = get_dir_size(notebook_dir)
-        
+
         # Cache dir size
         cache_dir = Path.home() / ".cache"
         cache_size = get_dir_size(cache_dir)
-        
+
         print(f"DEBUG [{label}] Free Space: {free} | Notebook Dir: {nb_dir_size} | ~/.cache: {cache_size}", flush=True)
     except Exception as e:
         print(f"Error checking disk usage: {e}")
