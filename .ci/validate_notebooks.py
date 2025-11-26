@@ -385,7 +385,6 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
             print(f"Executing command: {main_command}", flush=True)
             start = time.perf_counter()
             try:
-                # retcode = 0
                 retcode = subprocess.run(
                     main_command,
                     shell=(platform.system() == "Windows"),
@@ -504,7 +503,11 @@ def main():
     for notebook, report in test_plan.items():
         if report["status"] == NotebookStatus.SKIPPED:
             continue
-        test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute(), not args.common_venv)
+        try:
+            test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute(), not args.common_venv)
+        except Exception as e:
+            print(f"Error during testing notebook {str(notebook)}: {e}")
+            test_result = [report["path"], -1, 0.0, "N/A", "N/A"]
         timing = 0
         if not test_result:
             print(f'Testing notebooks "{str(notebook)}" is not found.')
