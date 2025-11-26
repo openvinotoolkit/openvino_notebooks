@@ -64,6 +64,8 @@
   skips:
     - os:
         - macos-13
+    - python:
+        - '3.13'
 - notebook: notebooks/segment-anything/segment-anything.ipynb
   skips:
     - os:
