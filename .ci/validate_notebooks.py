@@ -324,12 +324,41 @@ def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], t
         print("FAILED: \n{}".format("\n".join(failed_notebooks)))
     if timeout_notebooks:
         print("FAILED BY TIMEOUT: \n{}".format("\n".join(timeout_notebooks)))
+    
+    print(f"Building test report for {len(test_plan)} notebooks...", flush=True)
     test_report = []
+    
     for notebook, status in test_plan.items():
         test_status = status["status"] or NotebookStatus.NOT_RUN
-        test_report.append(
-            {"name": notebook.as_posix(), "status": test_status, "full_path": str(status["path"].relative_to(root)), "duration": status["duration"]}
-        )
+        try:
+            # Try to make path relative, fall back to absolute if it fails
+            try:
+                full_path_str = str(status["path"].relative_to(root))
+            except (ValueError, TypeError):
+                full_path_str = str(status["path"].absolute())
+            
+            test_report.append(
+                {
+                    "name": notebook.as_posix(), 
+                    "status": test_status, 
+                    "full_path": full_path_str, 
+                    "duration": status["duration"]
+                }
+            )
+        except Exception as e:
+            print(f"ERROR processing notebook {notebook}: {e}", flush=True)
+            # Add it anyway with minimal info
+            test_report.append(
+                {
+                    "name": notebook.as_posix(), 
+                    "status": test_status, 
+                    "full_path": str(notebook), 
+                    "duration": status.get("duration", 0)
+                }
+            )
+    
+    print(f"Test report built with {len(test_report)} entries", flush=True)
+    
     # Debug: print where we're writing
     csv_path = report_dir / "test_report.csv"
     print(f"Writing test report to: {csv_path.absolute()}", flush=True)
