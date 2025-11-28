@@ -405,11 +405,7 @@ def main():
                     dbprocess = None
                     try:
                         dbprocess = subprocess.Popen(
-                            cmd,
-                            shell=(platform.system() == "Windows"),
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT,
-                            universal_newlines=True
+                            cmd, shell=(platform.system() == "Windows"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
                         )
                         try:
                             stdout, _ = dbprocess.communicate(timeout=60)
