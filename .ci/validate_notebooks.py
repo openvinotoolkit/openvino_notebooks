@@ -413,25 +413,22 @@ def main():
                     )
                     try:
                         stdout, _ = dbprocess.communicate(timeout=60)
-                        print(stdout, flush=True)
+                        if stdout:
+                            print(stdout, flush=True)
                     except subprocess.TimeoutExpired:
                         print("Database upload process timed out after 60 seconds.")
                         dbprocess.kill()
-                        # Read any remaining output after kill
                         stdout, _ = dbprocess.communicate()
                         if stdout:
                             print(stdout, flush=True)
                 except Exception as e:
                     print(f"An error occurred during database upload: {e}")
-                finally:
-                    if dbprocess and dbprocess.poll() is None:
-                        print("Terminating database upload process...")
-                        dbprocess.terminate()
-                        try:
-                            dbprocess.wait(timeout=5)
-                        except subprocess.TimeoutExpired:
-                            print("Force killing database upload process...")
+                    try:
+                        if dbprocess and dbprocess.poll() is None:
                             dbprocess.kill()
+                            dbprocess.communicate(timeout=2)
+                    except Exception as cleanup_error:
+                        print(f"Failed to cleanup database upload process: {cleanup_error}")
 
             if args.early_stop:
                 break
