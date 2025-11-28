@@ -767,7 +767,6 @@ def convert_fireredtts2(model_id, model_path=None, quantization_config=None):
             tokens = tokens.permute(1, 0, 2)  # (B, nq, L) -> (nq, B, L)
             vq_out_feats = self.rvq.decode_codes(tokens)
             vq_out_feats = vq_out_feats.transpose(1, 2)
-            print(f"vq_out_feats shape: {vq_out_feats.shape[1]}")
             vq_out_length = torch.tensor([vq_out_feats.size(1)], dtype=torch.long, device=vq_out_feats.device)
             vq_out_feats, vq_out_length = self.upsample(vq_out_feats, vq_out_length)
             return vq_out_feats, vq_out_length
