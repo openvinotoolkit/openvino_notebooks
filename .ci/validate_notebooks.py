@@ -261,14 +261,46 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
         main_command = [sys.executable, "-m", "treon", "--verbose", str(patched_notebook)]
         start = time.perf_counter()
+        process = None
         try:
-            retcode = subprocess.run(
+            process = subprocess.Popen(
                 main_command,
                 shell=(platform.system() == "Windows"),
-                timeout=timeout,
-            ).returncode
-        except subprocess.TimeoutExpired:
-            retcode = -42
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                encoding="utf-8",
+                errors="replace",
+                bufsize=1
+            )
+            start_time = time.perf_counter()
+            while True:
+                if process.poll() is not None:
+                    for line in process.stdout:
+                        print(line, end='', flush=True)
+                    retcode = process.returncode
+                    break
+                if time.perf_counter() - start_time > timeout:
+                    print(f"\nTimeout reached ({timeout}s), killing process...", flush=True)
+                    process.kill()
+                    for line in process.stdout:
+                        print(line, end='', flush=True)
+                    process.wait()
+                    retcode = -42
+                    break
+                # If readline returns empty string, process closed stdout (EOF)
+                # poll() will catch this in next iteration
+                line = process.stdout.readline()
+                if line:
+                    print(line, end='', flush=True)
+        except Exception as e:
+            print(f"\nError running notebook: {e}", flush=True)
+            try:
+                if process.poll() is None:
+                    process.kill()
+                    process.wait()
+            except Exception:
+                pass
+            retcode = -1
         duration = time.perf_counter() - start
 
         ov_version_after = get_pip_package_version("openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
