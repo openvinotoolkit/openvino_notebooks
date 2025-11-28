@@ -318,16 +318,22 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
 
 def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], test_plan: TestPlan, report_dir: Path, root: Path) -> int:
+    print("DEBUG: Entered finalize_status", flush=True)
     return_status = 0
+    
+    print("DEBUG: Checking failed notebooks", flush=True)
     if failed_notebooks:
         return_status = 1
-        print("FAILED: \n{}".format("\n".join(failed_notebooks)))
-    if timeout_notebooks:
-        print("FAILED BY TIMEOUT: \n{}".format("\n".join(timeout_notebooks)))
+        print("FAILED: \n{}".format("\n".join(failed_notebooks)), flush=True)
     
-    print(f"Building test report for {len(test_plan)} notebooks...", flush=True)
+    print("DEBUG: Checking timeout notebooks", flush=True)
+    if timeout_notebooks:
+        print("FAILED BY TIMEOUT: \n{}".format("\n".join(timeout_notebooks)), flush=True)
+    
+    print("DEBUG: About to create test_report list", flush=True)
     test_report = []
     
+    print("DEBUG: Starting iteration over test_plan", flush=True)
     for notebook, status in test_plan.items():
         test_status = status["status"] or NotebookStatus.NOT_RUN
         try:
