@@ -330,10 +330,20 @@ def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], t
         test_report.append(
             {"name": notebook.as_posix(), "status": test_status, "full_path": str(status["path"].relative_to(root)), "duration": status["duration"]}
         )
-    with (report_dir / "test_report.csv").open("w") as f:
-        writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
-        writer.writeheader()
-        writer.writerows(test_report)
+    # Debug: print where we're writing
+    csv_path = report_dir / "test_report.csv"
+    print(f"Writing test report to: {csv_path.absolute()}", flush=True)
+    
+    try:
+        with csv_path.open("w") as f:
+            writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
+            writer.writeheader()
+            writer.writerows(test_report)
+        print(f"Test report written successfully", flush=True)
+    except Exception as e:
+        print(f"ERROR writing test report: {e}", flush=True)
+        raise
+
     return return_status
 
 
@@ -382,7 +392,7 @@ def main():
     failed_notebooks = []
     timeout_notebooks = []
     args = parse_arguments()
-    reports_dir = Path(args.report_dir)
+    reports_dir = Path(args.report_dir).absolute()
     reports_dir.mkdir(exist_ok=True, parents=True)
     notebooks_moving_dir = args.move_notebooks_dir
     root = ROOT
