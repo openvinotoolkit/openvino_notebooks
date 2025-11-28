@@ -21,6 +21,7 @@ permissions:
 
 jobs:
   build_treon_cpu:
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -30,7 +31,6 @@ jobs:
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      continue-on-error: ${{ matrix.runs_on }}
 
   build_treon_gpu:
     if: ${{ false }} # TODO Enable when GPU runners will be available in GitHub Actions
