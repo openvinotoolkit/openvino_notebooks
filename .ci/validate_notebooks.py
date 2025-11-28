@@ -270,20 +270,20 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
                 stderr=subprocess.STDOUT,
                 encoding="utf-8",
                 errors="replace",
-                bufsize=1
+                bufsize=1,
             )
             start_time = time.perf_counter()
             while True:
                 if process.poll() is not None:
                     for line in process.stdout:
-                        print(line, end='', flush=True)
+                        print(line, end="", flush=True)
                     retcode = process.returncode
                     break
                 if time.perf_counter() - start_time > timeout:
                     print(f"\nTimeout reached ({timeout}s), killing process...", flush=True)
                     process.kill()
                     for line in process.stdout:
-                        print(line, end='', flush=True)
+                        print(line, end="", flush=True)
                     process.wait()
                     retcode = -42
                     break
@@ -291,7 +291,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
                 # poll() will catch this in next iteration
                 line = process.stdout.readline()
                 if line:
-                    print(line, end='', flush=True)
+                    print(line, end="", flush=True)
         except Exception as e:
             print(f"\nError running notebook: {e}", flush=True)
             try:
