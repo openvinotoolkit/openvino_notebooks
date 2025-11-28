@@ -1,7 +1,5 @@
 import gradio as gr
-from transformers import AutoModel, AutoTokenizer
 import torch
-import spaces
 import os
 import sys
 import tempfile
@@ -13,6 +11,9 @@ import warnings
 import numpy as np
 import base64
 from io import StringIO, BytesIO
+from pathlib import Path
+import requests
+
 
 MODEL_CONFIGS = {
     "Gundam": {"base_size": 1024, "image_size": 640, "crop_mode": True},
@@ -42,10 +43,13 @@ example_image_urls = [
 ]
 for url, file_name in example_image_urls:
     if not Path(file_name).exists():
-        Image.open(requests.get(url, stream=True).raw).save(file_name)
+        img = Image.open(requests.get(url, stream=True).raw)
+        if img.mode in ('RGBA', 'LA', 'P'):
+            img = img.convert('RGB')
+        img.save(file_name)
 
 
-def make_demo(model, tokenzier):
+def make_demo(model, tokenizer):
     def extract_grounding_references(text):
         pattern = r'(<\|ref\|>(.*?)<\|/ref\|><\|det\|>(.*?)<\|/det\|>)'
         return re.findall(pattern, text, re.DOTALL)
@@ -56,7 +60,7 @@ def make_demo(model, tokenzier):
         draw = ImageDraw.Draw(img_draw)
         overlay = Image.new('RGBA', img_draw.size, (0, 0, 0, 0))
         draw2 = ImageDraw.Draw(overlay)
-        font = ImageFont.getfont(size=30)
+        font = ImageFont.load_default(size=30)
         crops = []
         
         color_map = {}
@@ -240,8 +244,8 @@ def make_demo(model, tokenzier):
         return gr.update(visible=False)
     with gr.Blocks(theme=gr.themes.Soft(), title="DeepSeek-OCR") as demo:
         gr.Markdown("""
-        # 🚀 DeepSeek-OCR Demo
-        **Convert documents to markdown, extract raw text, and locate specific content with bounding boxes. It takes 20~ sec for markdown and 3~ sec for locate task examples. Check the info at the bottom of the page for more information.**
+        # 🚀 DeepSeek-OCR Demo with OpenVINO
+        **Convert documents to markdown, extract raw text, and locate specific content with bounding boxes.**
         
         **Hope this tool was helpful! If so, a quick like ❤️ would mean a lot :)**
         """)
