@@ -399,40 +399,34 @@ def main():
                 report_path = write_single_notebook_report(
                     base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir
                 )
-                if args.upload_to_db:
-                    cmd = [sys.executable, args.upload_to_db, report_path]
-                    print(f"\nUploading {report_path} to database. CMD: {cmd}")
+            if args.upload_to_db:
+                cmd = [sys.executable, args.upload_to_db, report_path]
+                print(f"\nUploading {report_path} to database. CMD: {cmd}")
+                dbprocess = None
+                try:
+                    dbprocess = subprocess.Popen(
+                        cmd,
+                        shell=(platform.system() == "Windows"),
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        universal_newlines=True
+                    )
                     try:
-                        dbprocess = subprocess.Popen(
-                            cmd,
-                            shell=(platform.system() == "Windows"),
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT,
-                            universal_newlines=True
-                        )
-                        timeout = 60 # 60 seconds timeout for upload
-                        start_time = time.time()
-                        while True:
-                            if time.time() - start_time > timeout:
-                                dbprocess.kill()
-                                print(f"Uploading process timed out after {timeout} seconds.")
-                                break
-                            line = dbprocess.stdout.readline()
-                            if not line:
-                                break
-                            sys.stdout.write(line)
-                            sys.stdout.flush()
-                        dbprocess.wait(timeout=10)
+                        stdout, _ = dbprocess.communicate(timeout=60)
+                        print(stdout, flush=True)
                     except subprocess.TimeoutExpired:
-                        print("Database upload process timed out.")
-                    except subprocess.CalledProcessError as e:
-                        print(e.output)
-                    except Exception as e:
-                        print(f"An error occurred during database upload: {e}")
-                    finally:
-                        if dbprocess and dbprocess.poll() is None:
-                            print("Terminating database upload process...")
-                            dbprocess.terminate()
+                        print("Database upload process timed out after 60 seconds.")
+                        dbprocess.kill()
+                        # Read any remaining output after kill
+                        stdout, _ = dbprocess.communicate()
+                        if stdout:
+                            print(stdout, flush=True)
+                except Exception as e:
+                    print(f"An error occurred during database upload: {e}")
+                finally:
+                    if dbprocess and dbprocess.poll() is None:
+                        print("Terminating database upload process...")
+                        dbprocess.terminate()
                         try:
                             dbprocess.wait(timeout=5)
                         except subprocess.TimeoutExpired:
