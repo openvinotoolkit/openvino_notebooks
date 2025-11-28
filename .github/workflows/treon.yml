@@ -21,7 +21,6 @@ permissions:
 
 jobs:
   build_treon_cpu:
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
