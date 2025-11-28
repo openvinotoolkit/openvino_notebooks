@@ -404,13 +404,40 @@ def main():
                     print(f"\nUploading {report_path} to database. CMD: {cmd}")
                     try:
                         dbprocess = subprocess.Popen(
-                            cmd, shell=(platform.system() == "Windows"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
+                            cmd,
+                            shell=(platform.system() == "Windows"),
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT,
+                            universal_newlines=True
                         )
-                        for line in dbprocess.stdout:
+                        timeout = 60 # 60 seconds timeout for upload
+                        start_time = time.time()
+                        while True:
+                            if time.time() - start_time > timeout:
+                                dbprocess.kill()
+                                print(f"Uploading process timed out after {timeout} seconds.")
+                                break
+                            line = dbprocess.stdout.readline()
+                            if not line:
+                                break
                             sys.stdout.write(line)
                             sys.stdout.flush()
+                        dbprocess.wait(timeout=10)
+                    except subprocess.TimeoutExpired:
+                        print("Database upload process timed out.")
                     except subprocess.CalledProcessError as e:
                         print(e.output)
+                    except Exception as e:
+                        print(f"An error occurred during database upload: {e}")
+                    finally:
+                        if dbprocess and dbprocess.poll() is None:
+                            print("Terminating database upload process...")
+                            dbprocess.terminate()
+                        try:
+                            dbprocess.wait(timeout=5)
+                        except subprocess.TimeoutExpired:
+                            print("Force killing database upload process...")
+                            dbprocess.kill()
 
             if args.early_stop:
                 break
