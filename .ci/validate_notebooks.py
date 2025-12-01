@@ -257,6 +257,9 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
     Returns:
         tuple: (return_code, duration)
     """
+    # Convert all Path objects to strings in cmd list
+    if isinstance(cmd, list):
+        cmd = [str(item) for item in cmd]
     print(f"Running {description}: {' '.join(cmd) if isinstance(cmd, list) else cmd}", flush=True)
     start_time = time.perf_counter()
     process = None
