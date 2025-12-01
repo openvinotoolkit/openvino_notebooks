@@ -243,7 +243,8 @@ def read_output_thread(process, output_queue):
             if line:
                 output_queue.put(line)
         output_queue.put(None)  # Signal EOF
-    except Exception:
+    except Exception as e:
+        print(f"Exception during read_output_thread method: {e}", flush=True)
         output_queue.put(None)  # Signal error/EOF
 
 
