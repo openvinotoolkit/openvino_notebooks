@@ -350,6 +350,15 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
     return result
 
+def write_csv_report(csv_path, test_report, result_queue):
+    try:
+        with csv_path.open("w", newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
+            writer.writeheader()
+            writer.writerows(test_report)
+        result_queue.put(("success", None))
+    except Exception as e:
+        result_queue.put(("error", str(e)))
 
 def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], test_plan: TestPlan, report_dir: Path, root: Path) -> int:
     return_status = 0
@@ -362,8 +371,7 @@ def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], t
         print("FAILED BY TIMEOUT: \n{}".format("\n".join(timeout_notebooks)), flush=True)
 
     test_report = []
-    
-    print("DEBUG: Starting iteration over test_plan", flush=True)
+
     for notebook, status in test_plan.items():
         test_status = status["status"] or NotebookStatus.NOT_RUN
         try:
@@ -382,15 +390,29 @@ def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], t
     print(f"Test report built with {len(test_report)} entries", flush=True)
     csv_path = report_dir / "test_report.csv"
     print(f"Writing test report to: {csv_path.absolute()}", flush=True)
-    try:
-        with csv_path.open("w", newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
-            writer.writeheader()
-            writer.writerows(test_report)
-        print(f"Test report written successfully", flush=True)
-    except Exception as e:
-        print(f"ERROR writing test report: {e}", flush=True)
-        raise
+    result_queue = queue.Queue()
+    csv_writer_thread = threading.Thread(
+        target=write_csv_report,
+        args=(csv_path, test_report, result_queue),
+        daemon=True
+    )
+    csv_writer_thread.start()
+    csv_writer_thread.join(timeout=30)
+
+    if csv_writer_thread.is_alive():
+        print(f"ERROR: CSV write hung after 30s timeout", flush=True)
+        return_status = 1
+    else:
+        try:
+            status, error = result_queue.get_nowait()
+            if status == "error":
+                print(f"ERROR writing test report: {error}", flush=True)
+                return_status = 1
+            else:
+                print(f"Test report written successfully", flush=True)
+        except queue.Empty:
+            print(f"ERROR: CSV thread finished but produced no result", flush=True)
+            return_status = 1
 
     return return_status
 
