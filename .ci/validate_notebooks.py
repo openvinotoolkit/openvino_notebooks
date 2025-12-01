@@ -509,7 +509,7 @@ def main():
     for notebook, report in test_plan.items():
         if report["status"] == NotebookStatus.SKIPPED:
             continue
-        test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute())
+        test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir)
         timing = 0
         if not test_result:
             print(f'Testing notebooks "{str(notebook)}" is not found.')
