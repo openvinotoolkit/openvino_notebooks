@@ -232,6 +232,7 @@ def print_disk_usage(label: str, notebook_dir: Path):
     except Exception as e:
         print(f"Error checking disk usage: {e}")
 
+
 def read_output_thread(process, output_queue):
     """
     Thread target helper function to read subprocess output in real-time.
@@ -240,20 +241,21 @@ def read_output_thread(process, output_queue):
         for line in iter(process.stdout.readline, ""):
             if line:
                 output_queue.put(line)
-        output_queue.put(None) # Signal EOF
+        output_queue.put(None)  # Signal EOF
     except Exception:
-        output_queue.put(None) # Signal error/EOF
+        output_queue.put(None)  # Signal error/EOF
+
 
 def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"):
     """
     Run a subprocess with real-time output and timeout protection.
-    
+
     Args:
         cmd: Command to run (list or string)
         timeout: Timeout in seconds
         shell: Whether to use shell=True
         description: Description for logging purposes
-        
+
     Returns:
         tuple: (return_code, duration)
     """
@@ -264,7 +266,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
     start_time = time.perf_counter()
     process = None
     retcode = None
-    
+
     try:
         process = subprocess.Popen(
             cmd,
@@ -278,11 +280,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
 
         # Start output reading thread
         output_queue = queue.Queue()
-        reader_thread = threading.Thread(
-            target=read_output_thread,
-            args=(process, output_queue),
-            daemon=True
-        )
+        reader_thread = threading.Thread(target=read_output_thread, args=(process, output_queue), daemon=True)
         reader_thread.start()
 
         loop_start = time.perf_counter()
@@ -336,6 +334,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
     duration = time.perf_counter() - start_time
     return retcode, duration
 
+
 def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["HF_HUB_CACHE"] = str(notebook_path.parent)
@@ -385,15 +384,17 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
     return result
 
+
 def write_csv_report(csv_path, test_report, result_queue):
     try:
-        with csv_path.open("w", newline='', encoding='utf-8') as f:
+        with csv_path.open("w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
             writer.writeheader()
             writer.writerows(test_report)
         result_queue.put(("success", None))
     except Exception as e:
         result_queue.put(("error", str(e)))
+
 
 def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], test_plan: TestPlan, report_dir: Path, root: Path) -> int:
     return_status = 0
@@ -413,24 +414,13 @@ def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], t
             full_path_str = str(status["path"].relative_to(root))
         except (ValueError, TypeError):
             full_path_str = str(status["path"].absolute())
-            
-        test_report.append(
-            {
-                "name": notebook.as_posix(), 
-                "status": test_status, 
-                "full_path": full_path_str, 
-                "duration": status["duration"]
-            }
-        )
+
+        test_report.append({"name": notebook.as_posix(), "status": test_status, "full_path": full_path_str, "duration": status["duration"]})
     print(f"Test report built with {len(test_report)} entries", flush=True)
     csv_path = report_dir / "test_report.csv"
     print(f"Writing test report to: {csv_path.absolute()}", flush=True)
     result_queue = queue.Queue()
-    csv_writer_thread = threading.Thread(
-        target=write_csv_report,
-        args=(csv_path, test_report, result_queue),
-        daemon=True
-    )
+    csv_writer_thread = threading.Thread(target=write_csv_report, args=(csv_path, test_report, result_queue), daemon=True)
     csv_writer_thread.start()
     csv_writer_thread.join(timeout=30)
 
