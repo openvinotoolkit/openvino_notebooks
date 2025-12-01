@@ -246,6 +246,7 @@ def read_output_thread(process, output_queue):
     except Exception:
         output_queue.put(None)  # Signal error/EOF
 
+
 def kill_process_tree(pid):
     """Kill process tree using platform-specific methods."""
     try:
@@ -268,10 +269,12 @@ def kill_process_tree(pid):
         else:
             # On Unix, kill the entire process group
             import signal
+
             os.killpg(pid, signal.SIGKILL)
             print(f"Killed process group PID {pid}", flush=True)
     except Exception as e:
         print(f"Error killing process tree PID {pid}: {e}", flush=True)
+
 
 def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"):
     """
