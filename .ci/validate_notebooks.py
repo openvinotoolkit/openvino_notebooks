@@ -233,6 +233,9 @@ def print_disk_usage(label: str, notebook_dir: Path):
         print(f"Error checking disk usage: {e}")
 
 def read_output_thread(process, output_queue):
+    """
+    Thread target helper function to read subprocess output in real-time.
+    """
     try:
         for line in iter(process.stdout.readline, ""):
             if line:
@@ -240,6 +243,95 @@ def read_output_thread(process, output_queue):
         output_queue.put(None) # Signal EOF
     except Exception:
         output_queue.put(None) # Signal error/EOF
+
+def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"):
+    """
+    Run a subprocess with real-time output and timeout protection.
+    
+    Args:
+        cmd: Command to run (list or string)
+        timeout: Timeout in seconds
+        shell: Whether to use shell=True
+        description: Description for logging purposes
+        
+    Returns:
+        tuple: (return_code, duration)
+    """
+    print(f"Running {description}: {' '.join(cmd) if isinstance(cmd, list) else cmd}", flush=True)
+    start_time = time.perf_counter()
+    process = None
+    retcode = None
+    
+    try:
+        process = subprocess.Popen(
+            cmd,
+            shell=shell,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            encoding="utf-8",
+            errors="replace",
+            bufsize=1,
+        )
+
+        # Start output reading thread
+        output_queue = queue.Queue()
+        reader_thread = threading.Thread(
+            target=read_output_thread,
+            args=(process, output_queue),
+            daemon=True
+        )
+        reader_thread.start()
+
+        loop_start = time.perf_counter()
+        while True:
+            # Check timeout FIRST (before any potentially blocking operations)
+            if time.perf_counter() - loop_start > timeout:
+                print(f"\n{description} timeout reached ({timeout}s), killing process...", flush=True)
+                process.kill()
+                retcode = -42  # Special timeout exit code
+                break
+
+            # Check if process finished
+            if process.poll() is not None:
+                retcode = process.returncode
+                break
+
+            # Try to get output with short timeout (non-blocking check)
+            try:
+                line = output_queue.get(timeout=0.1)
+                if line is None:  # EOF signal
+                    break
+                print(line, end="", flush=True)
+            except queue.Empty:
+                # No output available, loop continues to check timeout
+                continue
+
+        # Drain any remaining output from the queue
+        while not output_queue.empty():
+            try:
+                line = output_queue.get_nowait()
+                if line:
+                    print(line, end="", flush=True)
+            except queue.Empty:
+                break
+
+        # Wait for process to finish if not already done
+        if retcode is None:
+            process.wait()
+            retcode = process.returncode
+
+    except Exception as e:
+        print(f"\nError running {description}: {e}", flush=True)
+        try:
+            if process and process.poll() is None:
+                process.kill()
+                process.wait()
+        except Exception:
+            pass
+        retcode = -1
+
+    duration = time.perf_counter() - start_time
+    return retcode, duration
 
 def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
@@ -270,72 +362,12 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
         collect_python_packages(report_dir / (patched_notebook.stem + "_env_before.txt"))
 
         main_command = [sys.executable, "-m", "treon", "--verbose", str(patched_notebook)]
-        start = time.perf_counter()
-        process = None
-        try:
-            process = subprocess.Popen(
-                main_command,
-                shell=(platform.system() == "Windows"),
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                encoding="utf-8",
-                errors="replace",
-                bufsize=1,
-            )
-
-            # Start output reading thread
-            output_queue = queue.Queue()
-            reader_thread = threading.Thread(
-                target=read_output_thread,
-                args=(process, output_queue),
-                daemon=True
-            )
-            reader_thread.start()
-
-            start_time = time.perf_counter()
-            retcode = None
-            while True:
-                # Check timeout FIRST (before any potentially blocking operations)
-                if time.perf_counter() - start_time > timeout:
-                    print(f"\nTimeout reached ({timeout}s), killing process...", flush=True)
-                    process.kill()
-                    retcode = -42
-                    break
-                # Check if process finished
-                if process.poll() is not None:
-                    retcode = process.returncode
-                    break
-                # Try to get output with short timeout (non-blocking check)
-                try:
-                    line = output_queue.get(timeout=0.1)
-                    if line is None: # EOF signal
-                        break
-                    print(line, end="", flush=True)
-                except queue.Empty:
-                    # No output available, loop continues to check timeout
-                    continue
-            # Drain any remaining output from the queue
-            while not output_queue.empty():
-                try:
-                    line = output_queue.get_nowait()
-                    if line:
-                        print(line, end="", flush=True)
-                except queue.Empty:
-                    break
-            # Wait for process to finish if not already done
-            if retcode is None:
-                process.wait()
-                retcode = process.returncode
-        except Exception as e:
-            print(f"\nError running notebook: {e}", flush=True)
-            try:
-                if process and process.poll() is None:
-                    process.kill()
-                    process.wait()
-            except Exception:
-                pass
-            retcode = -1
-        duration = time.perf_counter() - start
+        retcode, duration = run_subprocess_with_timeout(
+            main_command,
+            timeout,
+            shell=(platform.system() == "Windows"),
+            description=f"Notebook test [{patched_notebook.name}]",
+        )
 
         ov_version_after = get_pip_package_version("openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
         get_pip_package_version("openvino_tokenizers", "OpenVINO Tokenizers after notebook execution", "OpenVINO Tokenizers is missing")
@@ -514,29 +546,16 @@ def main():
                 if args.upload_to_db:
                     cmd = [sys.executable, args.upload_to_db, report_path]
                     print(f"\nUploading {report_path} to database. CMD: {cmd}")
-                    dbprocess = None
-                    try:
-                        dbprocess = subprocess.Popen(
-                            cmd, shell=(platform.system() == "Windows"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
-                        )
-                        try:
-                            stdout, _ = dbprocess.communicate(timeout=60)
-                            if stdout:
-                                print(stdout, flush=True)
-                        except subprocess.TimeoutExpired:
-                            print("Database upload process timed out after 60 seconds.")
-                            dbprocess.kill()
-                            stdout, _ = dbprocess.communicate()
-                            if stdout:
-                                print(stdout, flush=True)
-                    except Exception as e:
-                        print(f"An error occurred during database upload: {e}")
-                        try:
-                            if dbprocess and dbprocess.poll() is None:
-                                dbprocess.kill()
-                                dbprocess.communicate(timeout=2)
-                        except Exception as cleanup_error:
-                            print(f"Failed to cleanup database upload process: {cleanup_error}")
+                    retcode, duration = run_subprocess_with_timeout(
+                        cmd,
+                        timeout=15,
+                        shell=(platform.system() == "Windows"),
+                        description=f"Upload notebook report to DB [{patched_notebook}]",
+                    )
+                    if retcode != 0:
+                        print(f"Database upload failed with exit code {retcode}, duration: {duration:.2f} seconds", flush=True)
+                    else:
+                        print(f"Database upload succeeded, duration: {duration:.2f} seconds", flush=True)
 
             if args.early_stop:
                 break
