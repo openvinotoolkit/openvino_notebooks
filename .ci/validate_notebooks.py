@@ -6,6 +6,7 @@ import csv
 import json
 import shutil
 import platform
+import psutil
 import threading
 import queue
 import yaml
@@ -245,6 +246,32 @@ def read_output_thread(process, output_queue):
     except Exception:
         output_queue.put(None)  # Signal error/EOF
 
+def kill_process_tree(pid):
+    """Kill process tree using platform-specific methods."""
+    try:
+        if platform.system() == "Windows":
+            # On Windows, kill all children in the process group
+            parent = psutil.Process(pid)
+            children = parent.children(recursive=True)
+            print(f"Killing process tree: parent PID {pid} with {len(children)} children", flush=True)
+            for child in children:
+                try:
+                    print(f"Killing child process PID {child.pid}", flush=True)
+                    child.kill()
+                except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+                    print(f"Could not kill child PID {child.pid}: {e}", flush=True)
+            try:
+                parent.kill()
+                print(f"Killed parent process PID {pid}", flush=True)
+            except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+                print(f"Could not kill parent PID {pid}: {e}", flush=True)
+        else:
+            # On Unix, kill the entire process group
+            import signal
+            os.killpg(pid, signal.SIGKILL)
+            print(f"Killed process group PID {pid}", flush=True)
+    except Exception as e:
+        print(f"Error killing process tree PID {pid}: {e}", flush=True)
 
 def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"):
     """
@@ -267,16 +294,24 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
     process = None
     retcode = None
 
+    # Setup process group creation for proper child process management
+    popen_kwargs = {
+        "shell": shell,
+        "stdout": subprocess.PIPE,
+        "stderr": subprocess.STDOUT,
+        "encoding": "utf-8",
+        "errors": "replace",
+        "bufsize": 1,
+    }
+
+    if platform.system() == "Windows":
+        popen_kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+    else:
+        # Use start_new_session instead of preexec_fn to avoid thread-safety warning
+        popen_kwargs["start_new_session"] = True
+
     try:
-        process = subprocess.Popen(
-            cmd,
-            shell=shell,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            encoding="utf-8",
-            errors="replace",
-            bufsize=1,
-        )
+        process = subprocess.Popen(cmd, **popen_kwargs)
 
         # Start output reading thread
         output_queue = queue.Queue()
@@ -288,14 +323,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
             # Check timeout FIRST (before any potentially blocking operations)
             if time.perf_counter() - loop_start > timeout:
                 print(f"\n{description} timeout reached ({timeout}s), killing process...", flush=True)
-                process.terminate()
-                try:
-                    process.wait(timeout=5)
-                    print(f"{description} terminated gracefully after timeout.", flush=True)
-                except subprocess.TimeoutExpired:
-                    print(f"{description} didn't terminate gracefully, force killing...", flush=True)
-                    process.kill()
-                    process.wait()
+                kill_process_tree(process.pid)
                 retcode = -42  # Special timeout exit code
                 break
 
@@ -332,14 +360,9 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
         print(f"\nError running {description}: {e}", flush=True)
         try:
             if process and process.poll() is None:
-                process.terminate()
-                try:
-                    process.wait(timeout=5)
-                except subprocess.TimeoutExpired:
-                    process.kill()
-                    process.wait()
-        except Exception:
-            pass
+                kill_process_tree(process.pid)
+        except Exception as ex:
+            print(f"Error during cleanup: {ex}", flush=True)
         retcode = -1
 
     duration = time.perf_counter() - start_time
