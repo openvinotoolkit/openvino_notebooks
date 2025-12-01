@@ -288,7 +288,14 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
             # Check timeout FIRST (before any potentially blocking operations)
             if time.perf_counter() - loop_start > timeout:
                 print(f"\n{description} timeout reached ({timeout}s), killing process...", flush=True)
-                process.kill()
+                process.terminate()
+                try:
+                    process.wait(timeout=5)
+                    print(f"{description} terminated gracefully after timeout.", flush=True)
+                except subprocess.TimeoutExpired:
+                    print(f"{description} didn't terminate gracefully, force killing...", flush=True)
+                    process.kill()
+                    process.wait()
                 retcode = -42  # Special timeout exit code
                 break
 
@@ -325,8 +332,12 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
         print(f"\nError running {description}: {e}", flush=True)
         try:
             if process and process.poll() is None:
-                process.kill()
-                process.wait()
+                process.terminate()
+                try:
+                    process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
         except Exception:
             pass
         retcode = -1
