@@ -234,7 +234,6 @@
     - os:
         - macos-13
         - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb
   skips:
     - os:
