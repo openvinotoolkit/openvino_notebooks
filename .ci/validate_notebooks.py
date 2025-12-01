@@ -233,14 +233,13 @@ def print_disk_usage(label: str, notebook_dir: Path):
         print(f"Error checking disk usage: {e}")
 
 def read_output_thread(process, output_queue):
-    """Read output from process in a separate thread"""
     try:
-        for line in iter(process.stdout.readline, ''):
+        for line in iter(process.stdout.readline, ""):
             if line:
                 output_queue.put(line)
-        output_queue.put(None)  # Signal EOF
-    except Exception as e:
-        output_queue.put(None)  # Signal error/EOF
+        output_queue.put(None) # Signal EOF
+    except Exception:
+        output_queue.put(None) # Signal error/EOF
 
 def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
@@ -287,8 +286,8 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
             # Start output reading thread
             output_queue = queue.Queue()
             reader_thread = threading.Thread(
-                target=read_output_thread, 
-                args=(process, output_queue), 
+                target=read_output_thread,
+                args=(process, output_queue),
                 daemon=True
             )
             reader_thread.start()
@@ -302,22 +301,19 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
                     process.kill()
                     retcode = -42
                     break
-                
                 # Check if process finished
                 if process.poll() is not None:
                     retcode = process.returncode
                     break
-                
                 # Try to get output with short timeout (non-blocking check)
                 try:
                     line = output_queue.get(timeout=0.1)
-                    if line is None:  # EOF signal
+                    if line is None: # EOF signal
                         break
                     print(line, end="", flush=True)
                 except queue.Empty:
                     # No output available, loop continues to check timeout
                     continue
-            
             # Drain any remaining output from the queue
             while not output_queue.empty():
                 try:
@@ -326,12 +322,10 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
                         print(line, end="", flush=True)
                 except queue.Empty:
                     break
-            
             # Wait for process to finish if not already done
             if retcode is None:
                 process.wait()
                 retcode = process.returncode
-                
         except Exception as e:
             print(f"\nError running notebook: {e}", flush=True)
             try:
@@ -341,7 +335,6 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
             except Exception:
                 pass
             retcode = -1
-            
         duration = time.perf_counter() - start
 
         ov_version_after = get_pip_package_version("openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
@@ -359,57 +352,36 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
 
 def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], test_plan: TestPlan, report_dir: Path, root: Path) -> int:
-    print("DEBUG: Entered finalize_status", flush=True)
     return_status = 0
-    
-    print("DEBUG: Checking failed notebooks", flush=True)
+
     if failed_notebooks:
         return_status = 1
         print("FAILED: \n{}".format("\n".join(failed_notebooks)), flush=True)
-    
-    print("DEBUG: Checking timeout notebooks", flush=True)
+
     if timeout_notebooks:
         print("FAILED BY TIMEOUT: \n{}".format("\n".join(timeout_notebooks)), flush=True)
-    
-    print("DEBUG: About to create test_report list", flush=True)
+
     test_report = []
     
     print("DEBUG: Starting iteration over test_plan", flush=True)
     for notebook, status in test_plan.items():
         test_status = status["status"] or NotebookStatus.NOT_RUN
         try:
-            # Try to make path relative, fall back to absolute if it fails
-            try:
-                full_path_str = str(status["path"].relative_to(root))
-            except (ValueError, TypeError):
-                full_path_str = str(status["path"].absolute())
+            full_path_str = str(status["path"].relative_to(root))
+        except (ValueError, TypeError):
+            full_path_str = str(status["path"].absolute())
             
-            test_report.append(
-                {
-                    "name": notebook.as_posix(), 
-                    "status": test_status, 
-                    "full_path": full_path_str, 
-                    "duration": status["duration"]
-                }
-            )
-        except Exception as e:
-            print(f"ERROR processing notebook {notebook}: {e}", flush=True)
-            # Add it anyway with minimal info
-            test_report.append(
-                {
-                    "name": notebook.as_posix(), 
-                    "status": test_status, 
-                    "full_path": str(notebook), 
-                    "duration": status.get("duration", 0)
-                }
-            )
-    
+        test_report.append(
+            {
+                "name": notebook.as_posix(), 
+                "status": test_status, 
+                "full_path": full_path_str, 
+                "duration": status["duration"]
+            }
+        )
     print(f"Test report built with {len(test_report)} entries", flush=True)
-    
-    # Debug: print where we're writing
     csv_path = report_dir / "test_report.csv"
     print(f"Writing test report to: {csv_path.absolute()}", flush=True)
-    
     try:
         with csv_path.open("w") as f:
             writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
