@@ -406,8 +406,11 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
                 report_dir / (patched_notebook.stem + "_env_after.txt"))
 
             if not keep_artifacts:
-                clean_test_artifacts(
-                    files_before_test, sorted(Path(".").iterdir()))
+                clean_test_artifacts(files_before_test, sorted(Path(".").iterdir()))
+
+            collect_python_packages(report_dir / (patched_notebook.stem + "_env_after.txt"))
+            print_disk_usage("AFTER", Path("."))
+            print(f"TEST DURATION [{notebook_path.name}]: {duration:.2f} seconds", flush=True)
 
     finally:
         if separate_venv:
@@ -537,15 +540,29 @@ def main():
                 if args.upload_to_db:
                     cmd = [sys.executable, args.upload_to_db, report_path]
                     print(f"\nUploading {report_path} to database. CMD: {cmd}")
+                    dbprocess = None
                     try:
                         dbprocess = subprocess.Popen(
                             cmd, shell=(platform.system() == "Windows"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
                         )
-                        for line in dbprocess.stdout:
-                            sys.stdout.write(line)
-                            sys.stdout.flush()
-                    except subprocess.CalledProcessError as e:
-                        print(e.output)
+                        try:
+                            stdout, _ = dbprocess.communicate(timeout=60)
+                            if stdout:
+                                print(stdout, flush=True)
+                        except subprocess.TimeoutExpired:
+                            print("Database upload process timed out after 60 seconds.")
+                            dbprocess.kill()
+                            stdout, _ = dbprocess.communicate()
+                            if stdout:
+                                print(stdout, flush=True)
+                    except Exception as e:
+                        print(f"An error occurred during database upload: {e}")
+                        try:
+                            if dbprocess and dbprocess.poll() is None:
+                                dbprocess.kill()
+                                dbprocess.communicate(timeout=2)
+                        except Exception as cleanup_error:
+                            print(f"Failed to cleanup database upload process: {cleanup_error}")
 
             if args.early_stop:
                 break
