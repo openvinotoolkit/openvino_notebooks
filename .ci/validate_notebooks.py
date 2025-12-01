@@ -383,7 +383,7 @@ def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], t
     csv_path = report_dir / "test_report.csv"
     print(f"Writing test report to: {csv_path.absolute()}", flush=True)
     try:
-        with csv_path.open("w") as f:
+        with csv_path.open("w", newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
             writer.writeheader()
             writer.writerows(test_report)
