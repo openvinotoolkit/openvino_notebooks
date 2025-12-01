@@ -2,17 +2,16 @@ import sys
 import time
 import os
 import subprocess  # nosec - disable B404:import-subprocess check
+import csv
 import json
 import shutil
 import platform
 import yaml
+from clonevirtualenv import clone_virtualenv
 
 from argparse import ArgumentParser
 from pathlib import Path
 from typing import Optional, TypedDict
-
-from clonevirtualenv import clone_virtualenv
-import pandas
 from validation_config import ValidationConfig, validation_config_arg, SkippedNotebook
 
 
@@ -430,15 +429,10 @@ def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], t
         test_report.append(
             {"name": notebook.as_posix(), "status": test_status, "full_path": str(status["path"].relative_to(root)), "duration": status["duration"]}
         )
-    data = {"name": [t["name"] for t in test_report],
-            "status": [t["status"] for t in test_report],
-            "full_path": [t["full_path"] for t in test_report],
-            "duration": [t["duration"] for t in test_report]}
-    if not len(data["name"]) == len(data["status"]) == len(data["full_path"]) == len(data["duration"]):  # data integrity check
-        raise ValueError("Data integrity check failed: lengths of data lists are not equal.")
-    pd = pandas.DataFrame(data)
-    pd.to_csv(report_dir / "test_report.csv", index=False)
-
+    with (report_dir / "test_report.csv").open("w") as f:
+        writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
+        writer.writeheader()
+        writer.writerows(test_report)
     return return_status
 
 
