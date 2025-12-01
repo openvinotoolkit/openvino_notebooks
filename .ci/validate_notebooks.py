@@ -548,7 +548,6 @@ def main():
                 )
                 if args.upload_to_db:
                     cmd = [sys.executable, args.upload_to_db, report_path]
-                    print(f"\nUploading {report_path} to database. CMD: {cmd}")
                     retcode, duration = run_subprocess_with_timeout(
                         cmd,
                         timeout=15,
