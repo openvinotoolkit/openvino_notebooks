@@ -6,6 +6,8 @@ import csv
 import json
 import shutil
 import platform
+import threading
+import queue
 import yaml
 
 from argparse import ArgumentParser
@@ -230,6 +232,15 @@ def print_disk_usage(label: str, notebook_dir: Path):
     except Exception as e:
         print(f"Error checking disk usage: {e}")
 
+def read_output_thread(process, output_queue):
+    """Read output from process in a separate thread"""
+    try:
+        for line in iter(process.stdout.readline, ''):
+            if line:
+                output_queue.put(line)
+        output_queue.put(None)  # Signal EOF
+    except Exception as e:
+        output_queue.put(None)  # Signal error/EOF
 
 def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".") -> Optional[tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
@@ -272,35 +283,65 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
                 errors="replace",
                 bufsize=1,
             )
+
+            # Start output reading thread
+            output_queue = queue.Queue()
+            reader_thread = threading.Thread(
+                target=read_output_thread, 
+                args=(process, output_queue), 
+                daemon=True
+            )
+            reader_thread.start()
+
             start_time = time.perf_counter()
+            retcode = None
             while True:
-                if process.poll() is not None:
-                    for line in process.stdout:
-                        print(line, end="", flush=True)
-                    retcode = process.returncode
-                    break
+                # Check timeout FIRST (before any potentially blocking operations)
                 if time.perf_counter() - start_time > timeout:
                     print(f"\nTimeout reached ({timeout}s), killing process...", flush=True)
                     process.kill()
-                    for line in process.stdout:
-                        print(line, end="", flush=True)
-                    process.wait()
                     retcode = -42
                     break
-                # If readline returns empty string, process closed stdout (EOF)
-                # poll() will catch this in next iteration
-                line = process.stdout.readline()
-                if line:
+                
+                # Check if process finished
+                if process.poll() is not None:
+                    retcode = process.returncode
+                    break
+                
+                # Try to get output with short timeout (non-blocking check)
+                try:
+                    line = output_queue.get(timeout=0.1)
+                    if line is None:  # EOF signal
+                        break
                     print(line, end="", flush=True)
+                except queue.Empty:
+                    # No output available, loop continues to check timeout
+                    continue
+            
+            # Drain any remaining output from the queue
+            while not output_queue.empty():
+                try:
+                    line = output_queue.get_nowait()
+                    if line:
+                        print(line, end="", flush=True)
+                except queue.Empty:
+                    break
+            
+            # Wait for process to finish if not already done
+            if retcode is None:
+                process.wait()
+                retcode = process.returncode
+                
         except Exception as e:
             print(f"\nError running notebook: {e}", flush=True)
             try:
-                if process.poll() is None:
+                if process and process.poll() is None:
                     process.kill()
                     process.wait()
             except Exception:
                 pass
             retcode = -1
+            
         duration = time.perf_counter() - start
 
         ov_version_after = get_pip_package_version("openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
