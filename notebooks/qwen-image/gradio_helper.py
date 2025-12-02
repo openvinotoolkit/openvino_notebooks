@@ -18,11 +18,11 @@ def make_demo(ov_pipe):
 
     def polish_prompt_en(original_prompt):
         magic_prompt = "Ultra HD, 4K, cinematic composition"
-        return original_prompt + ', ' + magic_prompt
+        return original_prompt + ", " + magic_prompt
 
     def polish_prompt_zh(original_prompt):
         magic_prompt = "超清，4K，电影级构图"
-        return original_prompt + '，' + magic_prompt
+        return original_prompt + "，" + magic_prompt
 
     def rewrite(input_prompt):
         lang = get_caption_language(input_prompt)
