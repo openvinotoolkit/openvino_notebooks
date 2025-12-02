@@ -26,6 +26,7 @@ NOTEBOOKS_DIR = Path("notebooks")
 SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
 
 SOURCE_VENV_DIR_NAME = "openvino_env"
+SEPARATED_VENV_NAME = ".venv"
 
 
 class NotebookStatus:
@@ -224,30 +225,29 @@ def get_pip_package_version(python_executable: Path, package: str, text_input: s
 def create_venv(env_path: Path):
     print("Creating virtual environment...", flush=True)
     print(f"Virtual environment path: {env_path}", flush=True)
-    subprocess.run(
-        [sys.executable, "-m", "venv",
-            str(env_path), "--prompt", "notebook_validation_env", "--clear"],
-        shell=(platform.system() == "Windows"),
-        check=True,
-    )
+
+    popen_kwargs = {
+        "shell": (platform.system() == "Windows"),
+        "stdout": subprocess.PIPE,
+        "stderr": subprocess.STDOUT,
+        "encoding": "utf-8",
+        "errors": "replace",
+        "bufsize": 1,
+    }
+
     if platform.system() == "Windows":
-        pip_executable = env_path / "Scripts" / "pip.exe"
+        popen_kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+    else:
+        # Use start_new_session instead of preexec_fn to avoid thread-safety warning
+        popen_kwargs["start_new_session"] = True
+
+    subprocess.Popen([sys.executable, "-m", "venv", str(env_path), "--clear"],
+                     **popen_kwargs)
+
+    if platform.system() == "Windows":
         python_exec = env_path / "Scripts" / "python.exe"
     else:
-        pip_executable = env_path / "bin" / "pip"
         python_exec = env_path / "bin" / "python"
-
-    subprocess.run(
-        [str(pip_executable.absolute()), "install", "--upgrade", "pip"],
-        shell=(platform.system() == "Windows"),
-        check=True,
-    )
-    subprocess.run(
-        [str(pip_executable.absolute()),
-         f"--python={python_exec}", "install", "treon"],
-        shell=(platform.system() == "Windows"),
-        check=True,
-    )
 
     if env_path.exists():
         print("Virtual environment created.", flush=True)
@@ -503,7 +503,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
             if separate_venv:
                 try:
-                    venv_path = Path(".notebook_validation_env").absolute()
+                    venv_path = Path(SEPARATED_VENV_NAME).absolute()
                     python_executable = clone_venv(ROOT_ABSOLUTE / SOURCE_VENV_DIR_NAME,
                                                    venv_path)
                     # os.environ["PYTHON_EXECUTABLE"] = str(python_executable)
