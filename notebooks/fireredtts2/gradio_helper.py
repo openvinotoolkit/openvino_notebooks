@@ -8,17 +8,17 @@ from typing import Literal, List, Tuple
 examples = [
     [
         "English",
-        "FireRedTTS2\examples\chat_prompt\en\S1.flac",
+        "FireRedTTS2/examples/chat_prompt/en/S1.flac",
         "[S1]I think we should just talk about what happened and move on because there's going to be other jousts and Sir Saif isn't done yet. It's not, he's not, it's not done yet.",
-        "examples\chat_prompt\en\S2.flac",
+        "examples/chat_prompt/en/S2.flac",
         "[S2]You know, maybe sorry, maybe maybe I pushed, maybe I pushed too hard. I was really excited. I didn't mean to make you snap.",
         "[S1]It's alright, we'll take a breath and plan the next pass together.[S2]Yeah, thanks. We'll get it right this time.[S1]Let's review our signals tonight so we're in sync on the field tomorrow.",
     ],
     [
         "中文",
-        "FireRedTTS2\examples\chat_prompt\zh\S1.flac",
+        "FireRedTTS2/examples/chat_prompt/zh/S1.flac",
         "[S1]啊，可能说更适合美国市场应该是什么样子。那这这个可能说当然如果说有有机会能亲身的去考察去了解一下，那当然是有更好的帮助。",
-        "examples\chat_prompt\zh\S2.flac",
+        "examples/chat_prompt/zh/S2.flac",
         "[S2]比如具体一点的，他觉得最大的一个跟他预想的不一样的是在什么地方。",
         "[S1]那可能说对对，没有去过美国来说去去看到美国线下。巴斯曼也好，沃尔玛也好，他们线下不管说，因为深圳出去的还是电子周边的会表达，会发现哇对这个价格真的是很高呀。都是卖三十五美金、四十美金，甚至一个手机壳，就是二十五美金开。[S2]对，没错，我每次都觉得不不可思议。我什么人会买三五十美金的手机壳？但是其实在在那个target啊，就塔吉特这种超级市场，大家都是这样的，定价也很多人买。",
     ],
