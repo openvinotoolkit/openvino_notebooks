@@ -19,14 +19,14 @@ from validation_config import ValidationConfig, validation_config_arg, SkippedNo
 
 
 ROOT = Path(__file__).parents[1]
-ROOT_ABSOLUTE = ROOT.absolute()
+ROOT_ABSOLUTE = Path(os.path.abspath(ROOT))
 
 NOTEBOOKS_DIR = Path("notebooks")
 
 SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
 
 SEPARATED_VENV_NAME = ".venv"
-SOURCE_VENV_PATH = Path(sys.executable).absolute().parent.parent
+SOURCE_VENV_PATH = Path(os.path.abspath(sys.executable)).parent.parent
 
 
 class NotebookStatus:
@@ -497,9 +497,8 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
             if separate_venv:
                 try:
-                    venv_path = Path(SEPARATED_VENV_NAME).absolute()
+                    venv_path = Path(os.path.abspath(SEPARATED_VENV_NAME))
                     python_executable = clone_venv(SOURCE_VENV_PATH, venv_path)
-                    # os.environ["PYTHON_EXECUTABLE"] = str(python_executable)
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to create virtual environment for notebook {notebook_path}. Error: {e}")
                     return result
