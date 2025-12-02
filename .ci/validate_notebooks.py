@@ -492,6 +492,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
     try:
         with cd(notebook_path.parent):
+            print(f"Current working directory: {Path.cwd()}", flush=True)
             print_disk_usage("BEFORE", Path("."))
             files_before_test = sorted(Path(".").iterdir())
 
