@@ -1,0 +1,14 @@
+notebooks/big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb
+notebooks/convert-to-openvino/convert-to-openvino.ipynb
+notebooks/jax-to-openvino/jax-classification-to-openvino.ipynb
+notebooks/keras-with-openvino-backend/keras-with-openvino-backend.ipynb
+notebooks/optimize-preprocessing/optimize-preprocessing.ipynb
+notebooks/s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb
+notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb
+notebooks/tensorflow-classification-to-openvino/tensorflow-classification-to-openvino.ipynb
+notebooks/tensorflow-hub/tensorflow-hub.ipynb
+notebooks/tensorflow-object-detection-to-openvino/tensorflow-instance-segmentation-to-openvino.ipynb
+notebooks/tensorflow-object-detection-to-openvino/tensorflow-object-detection-to-openvino.ipynb
+notebooks/tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb
+notebooks/tflite-selfie-segmentation/tflite-selfie-segmentation.ipynb
+notebooks/tflite-to-openvino/tflite-to-openvino.ipynb
