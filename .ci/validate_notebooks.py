@@ -554,7 +554,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
             print(f"TEST DURATION [{notebook_path.name}]: {duration:.2f} seconds", flush=True)
 
     finally:
-        if separate_venv:
+        if separate_venv and not keep_artifacts:
             remove_venv(venv_path)
 
     return result
