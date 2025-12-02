@@ -664,10 +664,12 @@ def main():
 
     test_plan = prepare_test_plan(validation_config, args.test_list, args.ignore_config, args.ignore_list, notebooks_moving_dir)
 
+    print(f"Current working directory {Path.cwd()}", flush=True)
     for notebook, report in test_plan.items():
         if report["status"] == NotebookStatus.SKIPPED:
             continue
         try:
+            print("Testing notebook:", str(report["path"]), flush=True)
             test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute(), not args.common_venv)
         except Exception as e:
             print(f"Error during testing notebook {str(notebook)}: {e}")
