@@ -25,8 +25,8 @@ NOTEBOOKS_DIR = Path("notebooks")
 
 SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
 
-SOURCE_VENV_DIR_NAME = "openvino_env"
 SEPARATED_VENV_NAME = ".venv"
+SOURCE_VENV_PATH = Path(sys.executable).absolute().parent.parent
 
 
 class NotebookStatus:
@@ -498,7 +498,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
             if separate_venv:
                 try:
                     venv_path = Path(SEPARATED_VENV_NAME).absolute()
-                    python_executable = clone_venv(ROOT_ABSOLUTE / SOURCE_VENV_DIR_NAME, venv_path)
+                    python_executable = clone_venv(SOURCE_VENV_PATH, venv_path)
                     # os.environ["PYTHON_EXECUTABLE"] = str(python_executable)
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to create virtual environment for notebook {notebook_path}. Error: {e}")
