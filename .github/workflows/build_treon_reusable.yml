@@ -63,13 +63,30 @@ jobs:
         if: ${{ inputs.test_only_changed }}
         shell: bash
         run: |
-          touch test_notebooks.txt
           changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
           changed_files=$(echo $changed_files | tr '\\' '/')
+
+          # Check if any notebook files were changed
+          notebook_changed=false
           for file in $changed_files; do
-            echo "$file was changed"
-            echo $file >> test_notebooks.txt
+            if [[ $file == notebooks/* ]]; then
+              notebook_changed=true
+              break
+            fi
           done
+
+          if [ "$notebook_changed" = true ]; then
+            # If notebooks were changed, test those notebooks
+            touch test_notebooks.txt
+            for file in $changed_files; do
+              echo "$file was changed"
+              echo $file >> test_notebooks.txt
+            done
+          else
+            # If no notebooks were changed, use precommit list
+            echo "No notebook files changed, using precommit list"
+            cp .ci/precommit_list.txt test_notebooks.txt
+          fi
 
       - name: Dotenv Action
         id: dotenv

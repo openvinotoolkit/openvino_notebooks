@@ -30,8 +30,8 @@ notebook = "<7.0.0"
 numpy = ">=1.21.0"
 onnx = ">=1.11.0"
 opencv-python = "*"
-openvino = {version = "==2025.3.0"}
-openvino-telemetry = "==2023.2.1"
+openvino = {version = "==2025.4.0"}
+openvino-telemetry = "==2025.2.0"
 ovmsclient = "*"
 Pillow = ">=8.3.2"
 psutil = "*"
@@ -47,11 +47,11 @@ shapely = ">=1.7.1"
 supervisor = ">=4.1.0"
 treon = "*"
 torchmetrics = ">=0.11.0"
-transformers = "==4.55.4"
+transformers = "==4.53.3"
 jupyter-core = "==5.8.1"
-torch = {version = "==2.7.1", index = "downloadpytorch"}
-torchaudio = {version = "==2.7.1", index = "downloadpytorch"}
-torchvision = {version = "==0.22.1", index = "downloadpytorch"}
+torch = {version = "==2.8.0", index = "downloadpytorch"}
+torchaudio = {version = "==2.8.0", index = "downloadpytorch"}
+torchvision = {version = "==0.23.0", index = "downloadpytorch"}
 urllib3 = "==2.5.0"
 
 [dev-packages]
