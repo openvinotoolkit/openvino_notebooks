@@ -20,7 +20,7 @@ The tutorial consists from following steps:
 - Run OpenVINO model inference
 - Launch Interactive demo
 
-In this demonstration, you'll create interactive assistant that can answer questions about provided image's content or generate images based on text instructions.
+In this demonstration, you'll create an interactive assistant that can generate multi-speaker dialogues, perform voice cloning, and synthesize natural speech using FireRedTTS-2 and OpenVINO.
 
 The images bellow illustrates example of voice cloning and dialogue generation.
 
