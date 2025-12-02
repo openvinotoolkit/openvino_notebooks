@@ -69,7 +69,8 @@ def parse_arguments():
         help="Timeout for running single notebook in seconds",
     )
     parser.add_argument(
-        "--common_venv", action="store_true",
+        "--common_venv",
+        action="store_true",
         help="Use common virtual environment to run full test set instead of creating separate virtual environment for each notebook",
     )
     return parser.parse_args()
@@ -207,9 +208,7 @@ def get_pip_package_version(python_executable: Path, package: str, text_input: s
             shell=(platform.system() == "Windows"),
             universal_newlines=True,
         )
-        version_line = next(
-            (line for line in output.splitlines() if line.startswith("Version: ")), None
-        )
+        version_line = next((line for line in output.splitlines() if line.startswith("Version: ")), None)
         if version_line:
             version = version_line.split("Version: ")[1].strip()
             print(f"{text_input}: {version}")
@@ -241,8 +240,7 @@ def create_venv(env_path: Path):
         # Use start_new_session instead of preexec_fn to avoid thread-safety warning
         popen_kwargs["start_new_session"] = True
 
-    subprocess.Popen([sys.executable, "-m", "venv", str(env_path), "--clear"],
-                     **popen_kwargs)
+    subprocess.Popen([sys.executable, "-m", "venv", str(env_path), "--clear"], **popen_kwargs)
 
     if platform.system() == "Windows":
         python_exec = env_path / "Scripts" / "python.exe"
@@ -300,13 +298,10 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
     :type target_env_path: Path
     """
 
-    print(f"Cloning virtual environment from {source_env_path} to "
-          f"{target_env_path}...", flush=True)
+    print(f"Cloning virtual environment from {source_env_path} to " f"{target_env_path}...", flush=True)
 
     if not source_env_path.exists():
-        raise FileNotFoundError(
-            f"Source virtual environment path '{source_env_path}' does not exist."
-        )
+        raise FileNotFoundError(f"Source virtual environment path '{source_env_path}' does not exist.")
     if target_env_path.exists():
         print(
             f"Target virtual environment path '{target_env_path}' already exists. Removing it first...",
@@ -314,8 +309,7 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
         )
         remove_venv(target_env_path)
 
-    clone_virtualenv(str(source_env_path),
-                     str(target_env_path))
+    clone_virtualenv(str(source_env_path), str(target_env_path))
 
     print("Virtual environment cloned.", flush=True)
 
@@ -504,29 +498,23 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
             if separate_venv:
                 try:
                     venv_path = Path(SEPARATED_VENV_NAME).absolute()
-                    python_executable = clone_venv(ROOT_ABSOLUTE / SOURCE_VENV_DIR_NAME,
-                                                   venv_path)
+                    python_executable = clone_venv(ROOT_ABSOLUTE / SOURCE_VENV_DIR_NAME, venv_path)
                     # os.environ["PYTHON_EXECUTABLE"] = str(python_executable)
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to create virtual environment for notebook {notebook_path}. Error: {e}")
                     return result
 
-            ov_version_before = get_pip_package_version(python_executable,
-                "openvino", "OpenVINO before notebook execution", "OpenVINO is missing")
-            get_pip_package_version(python_executable,
-                "openvino_tokenizers", "OpenVINO Tokenizers before notebook execution", "OpenVINO Tokenizers is missing")
-            get_pip_package_version(python_executable,
-                "openvino_genai", "OpenVINO GenAI before notebook execution", "OpenVINO GenAI is missing")
+            ov_version_before = get_pip_package_version(python_executable, "openvino", "OpenVINO before notebook execution", "OpenVINO is missing")
+            get_pip_package_version(python_executable, "openvino_tokenizers", "OpenVINO Tokenizers before notebook execution", "OpenVINO Tokenizers is missing")
+            get_pip_package_version(python_executable, "openvino_genai", "OpenVINO GenAI before notebook execution", "OpenVINO GenAI is missing")
             patched_notebook = Path(f"test_{notebook_path.name}")
             if not patched_notebook.exists():
                 print(f'Patched notebook "{patched_notebook}" does not exist.')
                 return result
 
-            collect_python_packages(python_executable,
-                                    report_dir / (patched_notebook.stem + "_env_before.txt"))
+            collect_python_packages(python_executable, report_dir / (patched_notebook.stem + "_env_before.txt"))
 
-            main_command = [python_executable, "-m",
-                            "treon", "--verbose", str(patched_notebook)]
+            main_command = [python_executable, "-m", "treon", "--verbose", str(patched_notebook)]
 
             retcode, duration = run_subprocess_with_timeout(
                 main_command,
@@ -535,17 +523,12 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
                 description=f"Notebook test [{patched_notebook.name}]",
             )
 
-            ov_version_after = get_pip_package_version(python_executable,
-                "openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
-            get_pip_package_version(python_executable,
-                "openvino_tokenizers", "OpenVINO Tokenizers after notebook execution", "OpenVINO Tokenizers is missing")
-            get_pip_package_version(python_executable,
-                "openvino_genai", "OpenVINO GenAI after notebook execution", "OpenVINO GenAI is missing")
-            result = (str(patched_notebook), retcode, duration,
-                      ov_version_before, ov_version_after)
+            ov_version_after = get_pip_package_version(python_executable, "openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
+            get_pip_package_version(python_executable, "openvino_tokenizers", "OpenVINO Tokenizers after notebook execution", "OpenVINO Tokenizers is missing")
+            get_pip_package_version(python_executable, "openvino_genai", "OpenVINO GenAI after notebook execution", "OpenVINO GenAI is missing")
+            result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after)
 
-            collect_python_packages(python_executable,
-                report_dir / (patched_notebook.stem + "_env_after.txt"))
+            collect_python_packages(python_executable, report_dir / (patched_notebook.stem + "_env_after.txt"))
 
             if not keep_artifacts:
                 clean_test_artifacts(files_before_test, sorted(Path(".").iterdir()))
