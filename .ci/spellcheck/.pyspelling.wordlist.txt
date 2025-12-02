@@ -914,6 +914,7 @@ Ruizhongtai
 Runtime
 runtime
 runtimes
+RVQ
 Safetensors
 SageMaker
 sagittal
