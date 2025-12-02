@@ -11,7 +11,7 @@ In this tutorial we consider how to convert and optimize Qwen-Image model using 
 
 ### Notebook Contents
 
-In this demonstration, you will learn how to perform image-to-image generation using Qwen-Image and OpenVINO. 
+In this demonstration, you will learn how to perform text-to-image generation using Qwen-Image and OpenVINO. 
 
 The tutorial consists of the following steps:
 
