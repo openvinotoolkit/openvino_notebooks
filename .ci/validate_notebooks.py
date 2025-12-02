@@ -333,6 +333,9 @@ def remove_venv(env_path: Path):
     """
     if env_path.exists() and env_path.is_dir():
         shutil.rmtree(env_path, ignore_errors=True)
+        return True
+    return False
+
 
 def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".", separate_venv=True) -> Optional[tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
@@ -408,7 +411,6 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
             if not keep_artifacts:
                 clean_test_artifacts(files_before_test, sorted(Path(".").iterdir()))
 
-            collect_python_packages(report_dir / (patched_notebook.stem + "_env_after.txt"))
             print_disk_usage("AFTER", Path("."))
             print(f"TEST DURATION [{notebook_path.name}]: {duration:.2f} seconds", flush=True)
 
@@ -510,7 +512,7 @@ def main():
             test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute(), not args.common_venv)
         except Exception as e:
             print(f"Error during testing notebook {str(notebook)}: {e}")
-            test_result = [report["path"], -1, 0.0, "N/A", "N/A"]
+            test_result = [f"test_{report['path'].name}", -1, 0.0, "N/A", "N/A"]
         timing = 0
         if not test_result:
             print(f'Testing notebooks "{str(notebook)}" is not found.')
