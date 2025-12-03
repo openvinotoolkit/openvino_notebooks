@@ -160,8 +160,7 @@ def prepare_test_plan(
                 testing_notebook_path = notebook_path.relative_to(NOTEBOOKS_DIR)
             except ValueError:
                 raise ValueError(
-                    "Items in test list should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\n"
-                    f"Invalid notebook path: {notebook_path}"
+                    "Items in test list should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\n" f"Invalid notebook path: {notebook_path}"
                 )
             testing_notebooks.append(testing_notebook_path)
     else:
