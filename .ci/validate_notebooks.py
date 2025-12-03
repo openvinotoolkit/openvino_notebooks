@@ -149,9 +149,26 @@ def prepare_test_plan(
                         f"Invalid line: {changed_file_path}"
                     )
                 testing_notebooks.append(testing_notebook_path)
+    elif all(not item.endswith(".txt") for item in test_list):
+        # Handle direct notebooks paths passed as arguments
+        for notebook_path_str in test_list:
+            notebook_path = Path(notebook_path_str.strip())
+            if notebook_path.suffix != ".ipynb":
+                print(f"Warning: Skipping non-notebook file: {notebook_path}")
+                continue
+            try:
+                testing_notebook_path = notebook_path.relative_to(NOTEBOOKS_DIR)
+            except ValueError:
+                raise ValueError(
+                    "Items in test list should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\n" f"Invalid notebook path: {notebook_path}"
+                )
+            testing_notebooks.append(testing_notebook_path)
     else:
         raise ValueError(
-            "Testing notebooks should be provided to '--test_list' argument as a txt file or should be empty to test all notebooks.\n"
+            "Testing notebooks should be provided to '--test_list' argument as:\n"
+            "  1. A single txt file (e.g., '--test_list notebooks.txt'), OR\n"
+            "  2. Multiple notebook paths (e.g., '--test_list notebooks/a.ipynb notebooks/b.ipynb'), OR\n"
+            "  3. Empty to test all notebooks.\n"
             f"Received test list: {test_list}"
         )
     testing_notebooks = sorted(list(set(testing_notebooks)))

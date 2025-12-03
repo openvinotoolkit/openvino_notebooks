@@ -17,6 +17,10 @@ on:
         required: false
         type: boolean
         default: false
+      ignore_list:
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -270,12 +274,24 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: |
+          IGNORE_ARGS=""
+          if [[ -n "${{ inputs.ignore_list }}" ]]; then
+            IGNORE_ARGS="$IGNORE_ARGS ${{ inputs.ignore_list }}"
+          fi
+          if [[ "${{ env.TEST_DEVICE }}" == "gpu" ]]; then
+             IGNORE_ARGS="$IGNORE_ARGS .ci/heavy_win_gpu.txt"
+          fi
+          
+          if [[ -n "$IGNORE_ARGS" ]]; then
+            IGNORE_ARGS="--ignore_list $IGNORE_ARGS"
+          fi
+
           python .ci/validate_notebooks.py \
             --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            ${{ env.TEST_DEVICE == 'gpu' && '--ignore_list .ci/heavy_win_gpu.txt' || '' }} \
+            $IGNORE_ARGS \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --move_notebooks_dir c:/notebooks \
             --timeout 1200
@@ -283,12 +299,24 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
+          IGNORE_ARGS=""
+          if [[ -n "${{ inputs.ignore_list }}" ]]; then
+            IGNORE_ARGS="$IGNORE_ARGS ${{ inputs.ignore_list }}"
+          fi
+          if [[ "${{ env.TEST_DEVICE }}" == "gpu" ]]; then
+             IGNORE_ARGS="$IGNORE_ARGS .ci/heavy_ubuntu_gpu.txt"
+          fi
+          
+          if [[ -n "$IGNORE_ARGS" ]]; then
+            IGNORE_ARGS="--ignore_list $IGNORE_ARGS"
+          fi
+
           python .ci/validate_notebooks.py \
             --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            ${{ env.TEST_DEVICE == 'gpu' && '--ignore_list .ci/heavy_ubuntu_gpu.txt' || '' }} \
+            $IGNORE_ARGS \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --timeout 1200
       - name: Analysing with treon (MacOS)
