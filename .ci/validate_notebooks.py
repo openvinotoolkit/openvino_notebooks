@@ -32,25 +32,12 @@ def detect_source_venv_path() -> Path:
     """
     Detect the source virtual environment path based on the current Python executable.
 
-    Returns:
+    Returns: Path
     """
     # Detect source virtual environment path properly on both Windows and Unix
-    if platform.system() == "Windows":
-        # On Windows: python.exe is in Scripts/ folder
-        executable_parent = Path(os.path.abspath(sys.executable)).parent
-        if executable_parent.name == "Scripts":
-            source_venv_path = executable_parent.parent
-        else:
-            # Not in a virtual environment, use the python installation directory
-            source_venv_path = executable_parent.parent
-    else:
-        # On Unix: python is in bin/ folder
-        executable_parent = Path(os.path.abspath(sys.executable)).parent
-        if executable_parent.name == "bin":
-            source_venv_path = executable_parent.parent
-        else:
-            # Not in a virtual environment, use the python installation directory
-            source_venv_path = executable_parent
+    source_venv_path = Path(sys.executable).parent.parent
+
+    print(f"Detected source virtual environment path: {source_venv_path}", flush=True)
 
     return source_venv_path
 
