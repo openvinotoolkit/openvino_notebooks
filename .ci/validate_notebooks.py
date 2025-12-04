@@ -25,7 +25,7 @@ NOTEBOOKS_DIR = Path("notebooks")
 
 SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
 
-SEPARATED_VENV_NAME = ".venv"
+SEPARATED_VENV_NAME = Path(".venv")
 
 
 def detect_source_venv_path() -> Path:
@@ -558,7 +558,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
             if source_venv_path:
                 try:
-                    venv_path = Path(os.path.abspath(relative_path / SEPARATED_VENV_NAME))
+                    venv_path = Path(os.path.abspath(notebook_path.parent / SEPARATED_VENV_NAME))
                     python_executable = clone_venv(source_venv_path, venv_path)
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to create virtual environment for notebook {notebook_path}. Error: {e}")
