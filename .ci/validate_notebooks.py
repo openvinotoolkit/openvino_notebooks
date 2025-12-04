@@ -533,7 +533,12 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
     os.environ["HF_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["TORCH_HOME"] = str(notebook_path.parent)
     os.environ["DO_NOT_TRACK"] = "1"
-    print(f"RUN {notebook_path.relative_to(root)}", flush=True)
+    try:
+        relative_path = notebook_path.relative_to(root)
+    except ValueError:
+        # If notebook_path is not relative to root, use the notebook path as-is
+        relative_path = notebook_path
+    print(f"RUN {relative_path}", flush=True)
     result = None
 
     if notebook_path.is_dir():
@@ -714,9 +719,11 @@ def main():
             source_venv_path = detect_source_venv_path()
 
     if notebooks_moving_dir is not None:
-        notebooks_moving_dir = Path(notebooks_moving_dir)
-        root = notebooks_moving_dir.parent
+        notebooks_moving_dir = Path(notebooks_moving_dir).absolute()
         move_notebooks(notebooks_moving_dir)
+        root = notebooks_moving_dir
+    else:
+        notebooks_moving_dir = None
 
     keep_artifacts = False
     if args.keep_artifacts:
