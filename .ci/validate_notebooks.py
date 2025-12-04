@@ -558,7 +558,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
             if source_venv_path:
                 try:
-                    venv_path = Path(os.path.abspath(SEPARATED_VENV_NAME))
+                    venv_path = Path(os.path.abspath(relative_path / SEPARATED_VENV_NAME))
                     python_executable = clone_venv(source_venv_path, venv_path)
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to create virtual environment for notebook {notebook_path}. Error: {e}")
