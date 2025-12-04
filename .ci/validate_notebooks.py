@@ -26,7 +26,33 @@ NOTEBOOKS_DIR = Path("notebooks")
 SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
 
 SEPARATED_VENV_NAME = ".venv"
-SOURCE_VENV_PATH = Path(os.path.abspath(sys.executable)).parent.parent
+
+
+def detect_source_venv_path() -> Path:
+    """
+    Detect the source virtual environment path based on the current Python executable.
+
+    Returns:
+    """
+    # Detect source virtual environment path properly on both Windows and Unix
+    if platform.system() == "Windows":
+        # On Windows: python.exe is in Scripts/ folder
+        executable_parent = Path(os.path.abspath(sys.executable)).parent
+        if executable_parent.name == "Scripts":
+            source_venv_path = executable_parent.parent
+        else:
+            # Not in a virtual environment, use the python installation directory
+            source_venv_path = executable_parent.parent
+    else:
+        # On Unix: python is in bin/ folder
+        executable_parent = Path(os.path.abspath(sys.executable)).parent
+        if executable_parent.name == "bin":
+            source_venv_path = executable_parent.parent
+        else:
+            # Not in a virtual environment, use the python installation directory
+            source_venv_path = executable_parent
+
+    return source_venv_path
 
 
 class NotebookStatus:
@@ -72,6 +98,11 @@ def parse_arguments():
         "--common_venv",
         action="store_true",
         help="Use common virtual environment to run full test set instead of creating separate virtual environment for each notebook",
+    )
+    parser.add_argument(
+        "--source_venv_path",
+        type=Path,
+        help="Path to the source virtual environment to clone for running notebooks",
     )
     return parser.parse_args()
 
@@ -240,17 +271,25 @@ def create_venv(env_path: Path):
         # Use start_new_session instead of preexec_fn to avoid thread-safety warning
         popen_kwargs["start_new_session"] = True
 
-    subprocess.Popen([sys.executable, "-m", "venv", str(env_path), "--clear"], **popen_kwargs)
+    try:
+        process = subprocess.Popen([sys.executable, "-m", "venv", str(env_path), "--clear"], **popen_kwargs)
+        process.wait()  # Wait for venv creation to complete
+        if process.returncode != 0:
+            raise subprocess.CalledProcessError(process.returncode, "venv creation")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to create virtual environment. Return code: {e.returncode}", flush=True)
+        raise RuntimeError(f"Failed to create virtual environment: {e}")
 
     if platform.system() == "Windows":
         python_exec = env_path / "Scripts" / "python.exe"
     else:
         python_exec = env_path / "bin" / "python"
 
-    if env_path.exists():
+    # Verify the virtual environment was created successfully
+    if env_path.exists() and python_exec.exists():
         print("Virtual environment created.", flush=True)
     else:
-        print("Failed to create virtual environment.", flush=True)
+        print(f"Failed to create virtual environment. Path exists: {env_path.exists()}, Python executable exists: {python_exec.exists()}", flush=True)
         raise RuntimeError("Failed to create virtual environment.")
 
     return python_exec.absolute()
@@ -302,6 +341,17 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
 
     if not source_env_path.exists():
         raise FileNotFoundError(f"Source virtual environment path '{source_env_path}' does not exist.")
+
+    # Validate source environment structure
+    if platform.system() == "Windows":
+        expected_python = source_env_path / "Scripts" / "python.exe"
+        if not expected_python.exists():
+            print(f"Warning: Expected python executable not found at {expected_python}", flush=True)
+    else:
+        expected_python = source_env_path / "bin" / "python"
+        if not expected_python.exists():
+            print(f"Warning: Expected python executable not found at {expected_python}", flush=True)
+
     if target_env_path.exists():
         print(
             f"Target virtual environment path '{target_env_path}' already exists. Removing it first...",
@@ -309,7 +359,11 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
         )
         remove_venv(target_env_path)
 
-    clone_virtualenv(str(source_env_path), str(target_env_path))
+    try:
+        clone_virtualenv(str(source_env_path), str(target_env_path))
+    except Exception as e:
+        print(f"Error cloning virtual environment: {e}", flush=True)
+        raise
 
     print("Virtual environment cloned.", flush=True)
 
@@ -473,7 +527,8 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
     return retcode, duration
 
 
-def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".", separate_venv=True) -> Optional[tuple[str, int, float, str, str]]:
+def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".",
+             source_venv_path=None) -> Optional[tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["HF_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["TORCH_HOME"] = str(notebook_path.parent)
@@ -496,10 +551,10 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
             print_disk_usage("BEFORE", Path("."))
             files_before_test = sorted(Path(".").iterdir())
 
-            if separate_venv:
+            if source_venv_path:
                 try:
                     venv_path = Path(os.path.abspath(SEPARATED_VENV_NAME))
-                    python_executable = clone_venv(SOURCE_VENV_PATH, venv_path)
+                    python_executable = clone_venv(source_venv_path, venv_path)
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to create virtual environment for notebook {notebook_path}. Error: {e}")
                     return result
@@ -537,7 +592,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
             print(f"TEST DURATION [{notebook_path.name}]: {duration:.2f} seconds", flush=True)
 
     finally:
-        if separate_venv and not keep_artifacts:
+        if source_venv_path and not keep_artifacts:
             remove_venv(venv_path)
 
     return result
@@ -649,6 +704,15 @@ def main():
     reports_dir.mkdir(exist_ok=True, parents=True)
     notebooks_moving_dir = args.move_notebooks_dir
     root = ROOT
+
+    if args.common_venv:
+        source_venv_path = None
+    else:
+        if args.source_venv_path:
+            source_venv_path = args.source_venv_path
+        else:
+            source_venv_path = detect_source_venv_path()
+
     if notebooks_moving_dir is not None:
         notebooks_moving_dir = Path(notebooks_moving_dir)
         root = notebooks_moving_dir.parent
@@ -670,7 +734,7 @@ def main():
             continue
         try:
             print("Testing notebook:", str(report["path"]), flush=True)
-            test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute(), not args.common_venv)
+            test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute(), source_venv_path)
         except Exception as e:
             print(f"Error during testing notebook {str(notebook)}: {e}")
             test_result = [f"test_{report['path'].name}", -1, 0.0, "N/A", "N/A"]
