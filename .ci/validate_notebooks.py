@@ -527,8 +527,9 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
     return retcode, duration
 
 
-def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".",
-             source_venv_path=None) -> Optional[tuple[str, int, float, str, str]]:
+def run_test(
+    notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".", source_venv_path=None
+) -> Optional[tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["HF_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["TORCH_HOME"] = str(notebook_path.parent)
