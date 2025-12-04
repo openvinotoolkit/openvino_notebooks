@@ -8,7 +8,7 @@ notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb
 notebooks/tensorflow-classification-to-openvino/tensorflow-classification-to-openvino.ipynb
 notebooks/tensorflow-hub/tensorflow-hub.ipynb
 notebooks/tensorflow-object-detection-to-openvino/tensorflow-instance-segmentation-to-openvino.ipynb
-notebooks/tensorflow-object-detection-to-openvino/tensorflow-object-detection-to-openvino.ipynb
+notebooks/tensorflow-object-detection-to-openvino/tensorflow-object-detection-api-with-openvino.ipynb
 notebooks/tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb
 notebooks/tflite-selfie-segmentation/tflite-selfie-segmentation.ipynb
 notebooks/tflite-to-openvino/tflite-to-openvino.ipynb

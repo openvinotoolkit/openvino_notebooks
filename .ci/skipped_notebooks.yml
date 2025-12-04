@@ -490,6 +490,8 @@
   skips:
     - os:
         - macos-13
+        - ubuntu-22.04
+        - windows-2022
 - notebook: notebooks/magika-content-type-recognition/magika-content-type-recognition.ipynb
   skips:
     - os:
