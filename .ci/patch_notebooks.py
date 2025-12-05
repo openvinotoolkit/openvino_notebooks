@@ -80,6 +80,8 @@ def remove_ov_install(cell):
             empty = True
             package_found = False
             for part in line.split(" "):
+                # Strip quotes from the part before checking
+                part = part.strip('"').strip("'")
                 if "openvino-dev" in part and not "https://github.com/openvino-dev-samples/" in part:
                     if part.endswith(")"):
                         updated_line_content.append(")")
