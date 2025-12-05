@@ -1,10 +1,8 @@
 # Text-to-image generation with Z-Image-Turbo and OpenVINO
 
-Z-Image-Turbo is Alibaba’s production-ready, open-source 6B-parameter image generation model from the Z-Image family.
+Z-Image-Turbo is Alibaba's production-ready, open-source 6B-parameter image generation model from the Z-Image family.
 
-<p align="center">
-    <img src="https://github.com/Tongyi-MAI/Z-Image/blob/main/assets/showcase.jpg" width="90%"/>
-<p>
+<img width="2000" height="931" alt="image" src="https://github.com/user-attachments/assets/24e4ab2a-febe-4496-bd53-17e139cfc410" />
 
 **Highlights**
 
@@ -22,7 +20,7 @@ In this tutorial we consider how to convert and optimize Z-Image-Turbo model usi
 
 ### Notebook Contents
 
-In this demonstration, you will learn how to perform image-to-image generation using Flux.1 Kontext and OpenVINO. 
+In this demonstration, you will learn how to perform text-to-image generation using Z-Image-Turbo and OpenVINO. 
 
 The tutorial consists of the following steps:
 
@@ -40,4 +38,4 @@ This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For further details, please refer to [Installation Guide](../../README.md).
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/flux.1-kontext/README.md" />
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/z-image-turbo/README.md" />
