@@ -195,6 +195,13 @@ def clean_test_artifacts(before_test_files: list[Path], after_test_files: list[P
             shutil.rmtree(file_path, ignore_errors=True)
 
 
+def get_dir_state(dir_path: Path) -> list[Path]:
+    """Returns a list containing the directory itself (if exists) and all its contents."""
+    if not dir_path.exists():
+        return []
+    return [dir_path] + sorted(dir_path.rglob("*"))
+
+
 def get_base_openvino_version() -> str:
     try:
         import openvino as ov
@@ -397,6 +404,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
     os.environ["HF_HOME"] = str(notebook_path.parent)
     os.environ["XDG_CACHE_HOME"] = str(notebook_path.parent / "cache")
     os.environ["PIP_CACHE_DIR"] = str(notebook_path.parent / "pip_cache")
+    os.environ["MPLCONFIGDIR"] = str(notebook_path.parent / "mpl_config")
     os.environ["DO_NOT_TRACK"] = "1"
     print(f"RUN {notebook_path.relative_to(root)}", flush=True)
     result = None
@@ -411,6 +419,8 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
     with cd(notebook_path.parent):
         print_disk_usage("BEFORE", Path("."))
         files_before_test = sorted(Path(".").rglob("*"))
+        paddle_before = get_dir_state(Path.home() / ".paddleocr")
+        easyocr_before = get_dir_state(Path.home() / ".EasyOCR")
         ov_version_before = get_pip_package_version("openvino", "OpenVINO before notebook execution", "OpenVINO is missing")
         get_pip_package_version("openvino_tokenizers", "OpenVINO Tokenizers before notebook execution", "OpenVINO Tokenizers is missing")
         get_pip_package_version("openvino_genai", "OpenVINO GenAI before notebook execution", "OpenVINO GenAI is missing")
@@ -436,6 +446,9 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
 
         if not keep_artifacts:
             clean_test_artifacts(files_before_test, sorted(Path(".").rglob("*")))
+            clean_test_artifacts(paddle_before, get_dir_state(Path.home() / ".paddleocr"))
+            clean_test_artifacts(easyocr_before, get_dir_state(Path.home() / ".EasyOCR"))
+    
         collect_python_packages(report_dir / (patched_notebook.stem + "_env_after.txt"))
         print_disk_usage("AFTER", Path("."))
         print(f"TEST DURATION [{notebook_path.name}]: {duration:.2f} seconds", flush=True)
