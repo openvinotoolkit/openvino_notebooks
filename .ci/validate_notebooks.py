@@ -448,7 +448,7 @@ def run_test(notebook_path: Path, root, timeout=7200, keep_artifacts=False, repo
             clean_test_artifacts(files_before_test, sorted(Path(".").rglob("*")))
             clean_test_artifacts(paddle_before, get_dir_state(Path.home() / ".paddleocr"))
             clean_test_artifacts(easyocr_before, get_dir_state(Path.home() / ".EasyOCR"))
-    
+
         collect_python_packages(report_dir / (patched_notebook.stem + "_env_after.txt"))
         print_disk_usage("AFTER", Path("."))
         print(f"TEST DURATION [{notebook_path.name}]: {duration:.2f} seconds", flush=True)
