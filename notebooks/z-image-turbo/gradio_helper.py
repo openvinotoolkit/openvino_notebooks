@@ -1,4 +1,3 @@
-
 import random
 import re
 from diffusers import AutoencoderKL, FlowMatchEulerDiscreteScheduler
@@ -105,6 +104,7 @@ def generate_image(
 
     return image
 
+
 def get_resolution(resolution):
     match = re.search(r"(\d+)\s*[×x]\s*(\d+)", resolution)
     if match:
@@ -156,7 +156,6 @@ def make_demo(ov_pipe):
         except:
             resolution_str = "1024x1024"
 
-
         image = generate_image(
             pipe=ov_pipe,
             prompt=prompt,
@@ -170,9 +169,10 @@ def make_demo(ov_pipe):
         if gallery_images is None:
             gallery_images = []
         # gallery_images.append(image)
-        gallery_images = [image] + gallery_images # latest output to be at the top of the list
+        gallery_images = [image] + gallery_images  # latest output to be at the top of the list
 
         return gallery_images, str(new_seed), int(new_seed)
+
     with gr.Blocks(title="Z-Image Demo") as demo:
         gr.Markdown(f"""# Z-Image-Turbo - OpenVINO""")
         with gr.Row():
@@ -188,9 +188,7 @@ def make_demo(ov_pipe):
                     res_cat = gr.Dropdown(value=1024, choices=choices, label="Resolution Category")
 
                     initial_res_choices = RES_CHOICES["1024"]
-                    resolution = gr.Dropdown(
-                        value=initial_res_choices[0], choices=RESOLUTION_SET, label="Width x Height (Ratio)"
-                    )
+                    resolution = gr.Dropdown(value=initial_res_choices[0], choices=RESOLUTION_SET, label="Width x Height (Ratio)")
 
                 with gr.Row():
                     seed = gr.Number(label="Seed", value=42, precision=0)
@@ -240,4 +238,3 @@ def make_demo(ov_pipe):
             outputs=[output_gallery, used_seed, seed],
         )
         return demo
-

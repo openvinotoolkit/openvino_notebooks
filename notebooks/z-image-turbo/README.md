@@ -6,13 +6,12 @@ Z-Image-Turbo is Alibaba's production-ready, open-source 6B-parameter image gene
 
 **Highlights**
 
-- Sub-second inference (< 1 s) on a single consumer GPU (≤ 16 GB VRAM, e.g. RTX 4090)
 - Photorealistic quality + strong bilingual (Chinese & English) text rendering
 - Excellent instruction-following and in-context editing (supports bounding boxes, object-level control)
 - Uses Single-Stream Diffusion Transformer (S3-DiT): text and image tokens processed in one unified stream
 - Prompt Enhancer (PE) + Decoupled DMD/DMDR distillation for high-quality 1–8 step generation
 
-More details about model can be found in [blog post](https://bfl.ai/announcements/flux-1-kontext-dev) and [model card](https://huggingface.co/black-forest-labs/FLUX.1-Kontext-dev).
+More details about model can be found in [paper post](https://arxiv.org/pdf/2511.22699) and [model card](https://huggingface.co/Tongyi-MAI/Z-Image-Turbo).
 
 In this tutorial we consider how to convert and optimize Z-Image-Turbo model using OpenVINO.
 
