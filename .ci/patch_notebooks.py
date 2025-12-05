@@ -81,28 +81,29 @@ def remove_ov_install(cell):
             package_found = False
             for part in line.split(" "):
                 # Strip quotes from the part before checking
-                part = part.strip('"').strip("'")
-                if "openvino-dev" in part and not "https://github.com/openvino-dev-samples/" in part:
+                clean_part = part.strip('"').strip("'")
+
+                if "openvino-dev" in clean_part and not "https://github.com/openvino-dev-samples/" in clean_part:
                     if part.endswith(")"):
                         updated_line_content.append(")")
                     package_found = True
                     continue
-                if "openvino-nightly" in part:
+                if "openvino-nightly" in clean_part:
                     package_found = True
                     if part.endswith(")"):
                         updated_line_content.append(")")
                     continue
-                if "openvino-tokenizers" in part or "openvino_tokenizers" in part:
+                if "openvino-tokenizers" in clean_part or "openvino_tokenizers" in clean_part:
                     package_found = True
                     if part.endswith(")"):
                         updated_line_content.append(")")
                     continue
-                if "openvino-genai" in part or "openvino_genai" in part:
+                if "openvino-genai" in clean_part or "openvino_genai" in clean_part:
                     package_found = True
                     if part.endswith(")"):
                         updated_line_content.append(")")
                     continue
-                if "openvino>" in part or "openvino=" in part or "openvino" == part:
+                if "openvino>" in clean_part or "openvino=" in clean_part or "openvino" == clean_part:
                     if part.endswith(")"):
                         updated_line_content.append(")")
                     package_found = True
