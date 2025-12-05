@@ -23,6 +23,7 @@ AISE
 AISEClassification
 AISEDetection
 Alibaba
+Alibaba's
 ALiBi
 AlpacaEval
 aMUSEd
@@ -240,6 +241,7 @@ DiT’s
 DiT’s
 DiTs
 DL
+DMDR
 DocLayNet
 docling
 Docling
