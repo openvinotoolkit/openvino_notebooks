@@ -39,6 +39,7 @@
 - [Image generation with Sana and OpenVINO](./sana-image-generation/sana-image-generation.ipynb)
 - [Object masks from prompts with SAM2 and OpenVINO](./sam2-video-segmentation/segment-anything-2-video.ipynb)
 - [Object masks from prompts with SAM2 and OpenVINO for Images](./sam2-image-segmentation/segment-anything-2-image.ipynb)
+- [Visual-language assistant with Qwen3-VL and OpenVINO](./qwen3-vl/qwen3-vl.ipynb)
 - [Text Rerank with Qwen3 and OpenVINO](./qwen3-embedding/qwen3-reranker.ipynb)
 - [Text Embedding with Qwen3 and OpenVINO](./qwen3-embedding/qwen3-embedding.ipynb)
 - [Visual-language assistant with Qwen2.5VL and OpenVINO](./qwen2.5-vl/qwen2.5-vl.ipynb)
@@ -234,6 +235,7 @@
 - [Text-to-Video retrieval with S3D MIL-NCE and OpenVINO](./s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb)
 - [Background removal with RMBG v1.4 and OpenVINO](./rmbg-background-removal/rmbg-background-removal.ipynb)
 - [Text-to-Music generation using Riffusion and OpenVINO](./riffusion-text-to-music/riffusion-text-to-music.ipynb)
+- [Visual-language assistant with Qwen3-VL and OpenVINO](./qwen3-vl/qwen3-vl.ipynb)
 - [Text Rerank with Qwen3 and OpenVINO](./qwen3-embedding/qwen3-reranker.ipynb)
 - [Text Embedding with Qwen3 and OpenVINO](./qwen3-embedding/qwen3-embedding.ipynb)
 - [Visual-language assistant with Qwen2.5VL and OpenVINO](./qwen2.5-vl/qwen2.5-vl.ipynb)
@@ -348,3 +350,4 @@
 - [Object detection and masking from prompts with GroundedSAM (GroundingDINO + SAM) and OpenVINO](./grounded-segment-anything/grounded-segment-anything.ipynb)
 - [Quantize a Segmentation Model and Show Live Inference](./ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb)
 - [Big Transfer Image Classification Model Quantization pipeline with NNCF](./big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb)
+

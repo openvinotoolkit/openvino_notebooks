@@ -28,7 +28,7 @@ def make_demo(fn: Callable, quantized: bool):
             button = gr.Button(f"Run {model_type}")
             button.click(
                 fn=partial(fn, quantized=quantized),
-                inputs=[input_text, gr.Number(quantized, visible=False)],
+                inputs=[input_text],
                 outputs=[output_text, correction_time],
             )
     return demo
