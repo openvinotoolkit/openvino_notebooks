@@ -230,7 +230,6 @@ def get_dir_state(dir_path: Path) -> list[Path]:
     return [dir_path] + sorted(dir_path.rglob("*"))
 
 
-
 def get_base_openvino_version() -> str:
     try:
         import openvino as ov
@@ -576,7 +575,7 @@ def run_test(
             easyocr_before = get_dir_state(Path.home() / ".EasyOCR")
             if source_venv_path:
                 try:
-                    venv_path = Path(os.getcwd()) / SEPARATED_VENV_NAME   # Use current working directory to avoid issues with relative paths conversion in win
+                    venv_path = Path(os.getcwd()) / SEPARATED_VENV_NAME  # Use current working directory to avoid issues with relative paths conversion in win
                     python_executable = clone_venv(source_venv_path, venv_path)
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to create virtual environment for notebook {notebook_path}. Error: {e}")
