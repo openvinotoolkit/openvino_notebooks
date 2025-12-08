@@ -35,7 +35,14 @@ def detect_source_venv_path() -> Path:
     Returns: Path
     """
     # Detect source virtual environment path properly on both Windows and Unix
-    source_venv_path = Path(sys.executable).parent.parent
+    if sys.platform == "win32":
+        if Path(sys.executable).parent.name != "Scripts":
+            print("Warning: It looks like the current Python executable is not from a virtual environment.")
+            source_venv_path = Path(sys.executable).parent
+        else:
+            source_venv_path = Path(sys.executable).parent.parent
+    else:
+        source_venv_path = Path(sys.executable).parent.parent
 
     print(f"Detecting source virtual environment executable: {sys.executable}", flush=True)
     print(f"Detected source virtual environment path: {source_venv_path}", flush=True)
@@ -730,7 +737,7 @@ def fix_clonevenv_on_windows():
         if Path(sys.executable).parent.name != "Scripts":
             print("Warning: It looks like the current Python executable is not from a standard virtual environment directory.")
             print("Fixing path for clonevictualenv on Windows.")
-            clonevirtualenv.env_bin_dir = "x64"
+            clonevirtualenv.env_bin_dir = ""
 
 
 def main():
