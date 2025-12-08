@@ -3,7 +3,7 @@ import types
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Tuple, Union
-
+from torch.nn import functional as F
 import numpy as np
 import nncf
 import openvino as ov
@@ -33,6 +33,7 @@ from transformers.models.qwen3_omni_moe.modeling_qwen3_omni_moe import (
     Qwen3OmniMoeThinkerCausalLMOutputWithPast,
     Qwen3OmniMoeTalkerTextSparseMoeBlock,
     Qwen3OmniMoeVisionRotaryEmbedding,
+    Qwen3OmniMoeCausalConvNet,
 )
 from transformers.utils import is_torch_xpu_available
 
@@ -45,6 +46,15 @@ from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
 from transformers.masking_utils import ALL_MASK_ATTENTION_FUNCTIONS
 
 # logging.basicConfig(level=logging.DEBUG)
+
+def _new_get_extra_padding_for_conv1d(self, hidden_state: torch.Tensor) -> int:
+    length = hidden_state.shape[-1]
+    n_frames = (length - self.kernel_size + self.padding) / self.stride + 1
+    # original implementation with math.ceil
+    # ideal_length = (math.ceil(n_frames) - 1) * self.stride + (self.kernel_size - self.padding)
+    ideal_length = (torch.ceil(torch.tensor(n_frames)).to(torch.int64) - 1) * self.stride + (self.kernel_size - self.padding)
+
+    return ideal_length - length
 
 def patched_dynamic_layer_update(
     self, key_states: torch.Tensor, value_states: torch.Tensor, cache_kwargs: dict[str, Any] | None = None
@@ -690,6 +700,7 @@ def convert_qwen3_omni_moe_model(model_id, output_dir, quantization_config=None,
     # TO adapt the old implementation
     Qwen3OmniMoeThinkerTextSparseMoeBlock.forward = qwen3_moe_thinker_forward_patched
     Qwen3OmniMoeTalkerTextSparseMoeBlock.forward = qwen3_moe_talker_forward_patched
+    Qwen3OmniMoeCausalConvNet._get_extra_padding_for_conv1d = _new_get_extra_padding_for_conv1d
     # Qwen3OmniMoeThinkerTextExperts.forward = qwen3_moe_thinker_expert_forward_patched
     # Qwen3OmniMoeTalkerTextExperts.forward = qwen3_moe_talker_text_forward_patched
 
@@ -1304,23 +1315,10 @@ def convert_qwen3_omni_moe_model(model_id, output_dir, quantization_config=None,
         gc.collect()
         print(f"✅ Talker Code Predictor model conversion finished. You can find results in {output_dir}")
 
-
-    def _new_get_extra_padding_for_conv1d(self, hidden_state: torch.Tensor) -> int:
-        length = hidden_state.shape[-1]
-        n_frames = (length - self.kernel_size + self.padding) / self.stride + 1
-        # original implementation with math.ceil
-        # ideal_length = (math.ceil(n_frames) - 1) * self.stride + (self.kernel_size - self.padding)
-        ideal_length = (torch.ceil(torch.tensor(n_frames)).to(torch.int64) - 1) * self.stride + (self.kernel_size - self.padding)
-
-        return ideal_length - length
-
     # Convert Code2Wav model (new architecture for Qwen3OmniMoe)
     if not code2wav_path.exists():
         print("⌛ Convert code2wav model")
         __make_16bit_traceable(model.code2wav)
-        
-        for layer in model.code2wav.decoder:
-            layer._get_extra_padding_for_conv1d = types.MethodType(_new_get_extra_padding_for_conv1d, layer)
         
         input_shapes = [
             ov.PartialShape([-1, model.code2wav.config.num_quantizers, -1]),
@@ -1336,11 +1334,10 @@ def convert_qwen3_omni_moe_model(model_id, output_dir, quantization_config=None,
         ov.save_model(ov_model, code2wav_path)
         del ov_model
         cleanup_torchscript_cache()
-        del model
         gc.collect()
         print("✅ Code2Wav model successfully converted")
         print(f"✅ {model_id} model conversion finished. You can find results in {output_dir}")
-
+    del model
 
 def get_llm_pos_ids_for_vision(
     start_idx: int,
@@ -2296,7 +2293,7 @@ class OVQwen3OmniMoeTalkerCodePredictorModelForConditionalGeneration(GenerationM
         if "beam_idx" in self.input_names:
             inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(inputs_embeds.shape[0], dtype=int)
 
-        self.request.start_async(inputs, share_inputs=True)
+        self.request.start_async(inputs, share_inputs=False)
         self.request.wait()
         logits = self.request.get_tensor("logits").data
         mid_residual_hiddens = self.request.get_tensor("mid_residual_hiddens").data
@@ -2483,7 +2480,7 @@ class OVQwen3OmniMoeTalkerForConditionalGeneration(GenerationMixin):
         if "beam_idx" in self.input_names:
             inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(inputs_embeds.shape[0], dtype=int)
             
-        self.request.start_async(inputs, share_inputs=True)
+        self.request.start_async(inputs, share_inputs=False)
         self.request.wait()
         logits = self.request.get_tensor("logits").data
         hidden_states = self.request.get_tensor("hidden_states").data
@@ -2886,4 +2883,3 @@ class OVQwen3OmniMoeModel(GenerationMixin):
         talker_wavs = self.code2wav.chunked_decode(talker_codes, chunk_size=300, left_context_size=25)
 
         return thinker_result, talker_wavs.float()
-
