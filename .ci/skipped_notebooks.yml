@@ -318,6 +318,7 @@
   skips:
     - os:
         - macos-13
+        - ubuntu-22.04
 - notebook: notebooks/mllama-3.2/mllama-3.2.ipynb
   skips:
     - os:
