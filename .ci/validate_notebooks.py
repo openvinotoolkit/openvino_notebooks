@@ -724,7 +724,7 @@ def fix_clonevenv_on_windows():
     """
     Fix clonevirtualenv path issue on Windows when non standard Scripts directory is used.
     """
-    if sys.platform == 'win32':
+    if sys.platform == "win32":
         if Path(sys.executable).parent.name != "Scripts":
             print("Warning: It looks like the current Python executable is not from a standard virtual environment directory.")
             print("Fixing path for clonevictualenv on Windows.")
