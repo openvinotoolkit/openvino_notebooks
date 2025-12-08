@@ -10,7 +10,7 @@ import psutil
 import threading
 import queue
 import yaml
-from clonevirtualenv import clone_virtualenv
+import clonevirtualenv
 
 from argparse import ArgumentParser
 from pathlib import Path
@@ -371,7 +371,7 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
         remove_venv(target_env_path)
 
     try:
-        clone_virtualenv(str(source_env_path), str(target_env_path))
+        clonevirtualenv.clone_virtualenv(str(source_env_path), str(target_env_path))
     except Exception as e:
         print(f"Error cloning virtual environment: {e}", flush=True)
         raise
@@ -720,6 +720,17 @@ def write_single_notebook_report(
     return report_file
 
 
+def fix_clonevenv_on_windows():
+    """
+    Fix clonevirtualenv path issue on Windows when non standard Scripts directory is used.
+    """
+    if sys.platform == 'win32':
+        if Path(sys.executable).parent.name != "Scripts":
+            print("Warning: It looks like the current Python executable is not from a standard virtual environment directory.")
+            print("Fixing path for clonevictualenv on Windows.")
+            clonevirtualenv.env_bin_dir = ""
+
+
 def main():
     failed_notebooks = []
     timeout_notebooks = []
@@ -728,6 +739,8 @@ def main():
     reports_dir.mkdir(exist_ok=True, parents=True)
     notebooks_moving_dir = args.move_notebooks_dir
     root = ROOT
+
+    fix_clonevenv_on_windows()
 
     if args.common_venv:
         source_venv_path = None
