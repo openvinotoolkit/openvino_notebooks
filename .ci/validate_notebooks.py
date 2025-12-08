@@ -739,6 +739,13 @@ def fix_clonevenv_on_windows():
             print("Fixing path for clonevictualenv on Windows.")
             clonevirtualenv.env_bin_dir = ""
 
+            def clonevirtualenv._replace_symlink(filename, newtarget):
+                tmpfn = "%s.new" % filename
+                os.symlink(newtarget, tmpfn)
+                if Path(filename).exists():
+                    os.remove(filename)
+                os.rename(tmpfn, filename)
+
 
 def main():
     failed_notebooks = []
