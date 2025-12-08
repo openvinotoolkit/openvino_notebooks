@@ -11,6 +11,7 @@ import threading
 import queue
 import yaml
 import clonevirtualenv
+import traceback
 
 from argparse import ArgumentParser
 from pathlib import Path
@@ -374,6 +375,7 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
         clonevirtualenv.clone_virtualenv(str(source_env_path), str(target_env_path))
     except Exception as e:
         print(f"Error cloning virtual environment: {e}", flush=True)
+        print(traceback.format_exc(), flush=True)
         raise
 
     print("Virtual environment cloned.", flush=True)
