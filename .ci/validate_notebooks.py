@@ -757,7 +757,7 @@ def main():
         else:
             source_venv_path = detect_source_venv_path()
     else:
-         source_venv_path = None
+        source_venv_path = None
 
     if notebooks_moving_dir is not None:
         notebooks_moving_dir = Path(notebooks_moving_dir).absolute()
