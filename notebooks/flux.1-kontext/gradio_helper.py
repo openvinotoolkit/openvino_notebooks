@@ -52,7 +52,7 @@ def make_demo(ov_pipe):
             ... )
         """
         if randomize_seed:
-            seed = random.randint(0, MAX_SEED)
+            seed = np.random.randint(0, MAX_SEED)
 
         if input_image:
             input_image = input_image.convert("RGB")
