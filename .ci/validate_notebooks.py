@@ -90,9 +90,9 @@ def parse_arguments():
         help="Timeout for running single notebook in seconds",
     )
     parser.add_argument(
-        "--common_venv",
+        "--separate_venv",
         action="store_true",
-        help="Use common virtual environment to run full test set instead of creating separate virtual environment for each notebook",
+        help="Use separate virtual environment for each notebook test",
     )
     parser.add_argument(
         "--source_venv_path",
@@ -751,13 +751,13 @@ def main():
 
     fix_clonevenv_on_windows()
 
-    if args.common_venv:
-        source_venv_path = None
-    else:
+    if args.separate_venv:
         if args.source_venv_path:
             source_venv_path = args.source_venv_path
         else:
             source_venv_path = detect_source_venv_path()
+    else:
+         source_venv_path = None
 
     if notebooks_moving_dir is not None:
         notebooks_moving_dir = Path(notebooks_moving_dir).absolute()
