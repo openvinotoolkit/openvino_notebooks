@@ -1,7 +1,7 @@
 import copy
 import os
 import re
-import subprocess
+import subprocess  # nosec - disable B404:import-subprocess check
 import tempfile
 import threading
 from pathlib import Path
