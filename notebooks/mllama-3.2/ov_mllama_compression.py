@@ -104,7 +104,7 @@ def compress(
         nncf_dataset = Dataset(dataset)
         gc.collect()
         print("✅ Dataset preparation finished")
-    
+
     if nncf_dataset is None and sm != SensitivityMetric.WEIGHT_QUANTIZATION_ERROR:
         sm = SensitivityMetric.WEIGHT_QUANTIZATION_ERROR
 
