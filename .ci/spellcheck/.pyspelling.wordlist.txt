@@ -162,6 +162,7 @@ CTC
 CTM
 CUDA
 CustomEncoderWav
+customizable
 CVF
 CVPR
 CNNs
