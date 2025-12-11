@@ -3,10 +3,10 @@ import gc
 
 import torch
 import PIL.Image
-from diffusers import AutoencoderKLWan, WanImageToVideoPipeline, DiffusionPipeline, FlowMatchEulerDiscreteScheduler
+from diffusers import AutoencoderKLWan, WanImageToVideoPipeline, DiffusionPipeline, UniPCMultistepScheduler
 from diffusers.video_processor import VideoProcessor
 from diffusers.image_processor import PipelineImageInput
-from transformers import AutoTokenizer, CLIPImageProcessor, CLIPVisionModel
+from transformers import AutoTokenizer
 
 import nncf
 import openvino as ov
@@ -74,7 +74,11 @@ def convert_pipeline(model_id, output_dir, compression_config=None):
         print("⌛ Convert Text Encoder model")
         __make_16bit_traceable(text_encoder)
         with torch.no_grad():
-            ov_model = ov.convert_model(text_encoder, example_input=torch.ones((1, 512), dtype=torch.long))
+            text_encoder_inputs = {
+                "input_ids": torch.ones((1, 512), dtype=torch.long),
+                "attention_mask": torch.ones((1, 512), dtype=torch.long),
+            }
+            ov_model = ov.convert_model(text_encoder, example_input=text_encoder_inputs)
         if compression_config is not None:
             ov_model = nncf.compress_weights(ov_model, **compression_config)
         ov.save_model(ov_model, output_dir / TEXT_ENCODER_PATH)
@@ -88,7 +92,7 @@ def convert_pipeline(model_id, output_dir, compression_config=None):
         print("⌛ Convert VAE Encoder model")
         # Wrap encode to return tensor instead of AutoencoderKLOutput
         def vae_encode_wrapper(x):
-            return vae.encode(x, return_dict=False)[0].sample()
+            return vae.encode(x, return_dict=False)[0].mode()
         
         vae.forward = vae_encode_wrapper
         __make_16bit_traceable(vae)
@@ -108,7 +112,7 @@ def convert_pipeline(model_id, output_dir, compression_config=None):
             if up_block.upsampler is not None:
                 up_block.upsampler.resample[0].mode = "nearest"
         with torch.no_grad():
-            ov_model = ov.convert_model(vae, example_input=(torch.ones((1, 48, 1, 44, 34))))
+            ov_model = ov.convert_model(vae, example_input=(torch.ones((1, 48, 6, 44, 34))))
         if compression_config is not None:
             ov_model = nncf.compress_weights(ov_model, **compression_config)
         ov.save_model(ov_model, output_dir / VAE_DECODER_PATH)
@@ -122,8 +126,8 @@ def convert_pipeline(model_id, output_dir, compression_config=None):
     if not (output_dir / TRANSFORMER_PATH).exists():
         print("⌛ Convert Transformer model")
         transformer_inputs = {
-            "hidden_states": torch.ones([1, 48, 31, 44, 34]),
-            "timestep": torch.ones([1, 11594]),
+            "hidden_states": torch.ones([1, 48, 6, 44, 34]),
+            "timestep": torch.zeros([1, 2244]).to(torch.float32),
             "encoder_hidden_states": torch.ones([1, 512, 4096]),
         }
         transformer.eval()
@@ -174,19 +178,6 @@ def prompt_clean(text):
     return text
 
 
-def retrieve_latents(
-    encoder_output: torch.Tensor, generator: Optional[torch.Generator] = None, sample_mode: str = "sample"
-):
-    if hasattr(encoder_output, "latent_dist") and sample_mode == "sample":
-        return encoder_output.latent_dist.sample(generator)
-    elif hasattr(encoder_output, "latent_dist") and sample_mode == "argmax":
-        return encoder_output.latent_dist.mode()
-    elif hasattr(encoder_output, "latents"):
-        return encoder_output.latents
-    else:
-        raise AttributeError("Could not access latents of provided encoder_output")
-
-
 core = ov.Core()
 
 
@@ -194,7 +185,7 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
     def __init__(self, model_dir, device_map="CPU", ov_config=None):
         model_dir = Path(model_dir)
         tokenizer = AutoTokenizer.from_pretrained(model_dir / "tokenizer")
-        scheduler = FlowMatchEulerDiscreteScheduler.from_pretrained(model_dir / "scheduler")
+        scheduler = UniPCMultistepScheduler.from_pretrained(model_dir / "scheduler")
         
         if isinstance(device_map, str):
             device_map = {
@@ -223,7 +214,7 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
         )
 
         self.vae_scale_factor_temporal = 4
-        self.vae_scale_factor_spatial = 8
+        self.vae_scale_factor_spatial = 16
         self.video_processor = VideoProcessor(vae_scale_factor=self.vae_scale_factor_spatial)
         self.z_dim = 48
         self.patch_size = [
@@ -331,7 +322,7 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
             0.7468,
             0.7744
         ]
-        self.expand_timesteps = False
+        self.expand_timesteps = True
 
     def _get_t5_prompt_embeds(
         self,
@@ -354,8 +345,7 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
         )
         text_input_ids, mask = text_inputs.input_ids, text_inputs.attention_mask
         seq_lens = mask.gt(0).sum(dim=1).long()
-
-        prompt_embeds = torch.from_numpy(self.text_encoder(text_input_ids)[0])
+        prompt_embeds = torch.from_numpy(self.text_encoder([text_input_ids, mask])[0])
         prompt_embeds = [u[:v] for u, v in zip(prompt_embeds, seq_lens)]
         prompt_embeds = torch.stack([torch.cat([u, u.new_zeros(max_sequence_length - u.size(0), u.size(1))]) for u in prompt_embeds], dim=0)
 
@@ -482,14 +472,16 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
         self,
         image: PipelineImageInput,
         batch_size: int,
-        num_channels_latents: int = 16,
+        num_channels_latents: int = 48,
         height: int = 480,
         width: int = 832,
         num_frames: int = 81,
+        dtype: Optional[torch.dtype] = None,
+        device: Optional[torch.device] = None,
         generator: Optional[Union[torch.Generator, List[torch.Generator]]] = None,
         latents: Optional[torch.Tensor] = None,
         last_image: Optional[torch.Tensor] = None,
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         num_latent_frames = (num_frames - 1) // self.vae_scale_factor_temporal + 1
         latent_height = height // self.vae_scale_factor_spatial
         latent_width = width // self.vae_scale_factor_spatial
@@ -502,20 +494,25 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
             )
 
         if latents is None:
-            latents = randn_tensor(shape, generator=generator, device=torch.device("cpu"), dtype=torch.float32)
+            latents = randn_tensor(shape, generator=generator, device=device, dtype=dtype)
         else:
-            latents = latents.to(torch.float32)
+            latents = latents.to(device=device, dtype=dtype)
+
 
         image = image.unsqueeze(2)  # [batch_size, channels, 1, height, width]
-
         if self.expand_timesteps:
-            video_condition = image.repeat(1, 1, num_frames, 1, 1)
-        elif last_image is None:
             video_condition = image
+
+        elif last_image is None:
+            video_condition = torch.cat(
+                [image, image.new_zeros(image.shape[0], image.shape[1], num_frames - 1, height, width)], dim=2
+            )
         else:
             last_image = last_image.unsqueeze(2)
-            video_condition = torch.cat([image, last_image], dim=2)
-
+            video_condition = torch.cat(
+                [image, image.new_zeros(image.shape[0], image.shape[1], num_frames - 2, height, width), last_image],
+                dim=2,
+            )
         latents_mean = (
             torch.tensor(self.latents_mean)
             .view(1, self.z_dim, 1, 1, 1)
@@ -524,29 +521,32 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
         latents_std = 1.0 / torch.tensor(self.latents_std).view(1, self.z_dim, 1, 1, 1).to(
             latents.device, latents.dtype
         )
-
+        
         if isinstance(generator, list):
             latent_condition = [
-                retrieve_latents(torch.from_numpy(self.vae_encoder(video_condition[i : i + 1])[0]), generator=generator[i])
-                for i in range(batch_size)
+                torch.from_numpy(self.vae_encoder(video_condition)) for _ in generator
             ]
             latent_condition = torch.cat(latent_condition, dim=0)
         else:
-            latent_condition = retrieve_latents(torch.from_numpy(self.vae_encoder(video_condition)[0]), generator=generator)
+            latent_condition = torch.from_numpy(self.vae_encoder(video_condition)[0])
+            latent_condition = latent_condition.repeat(batch_size, 1, 1, 1, 1)
 
-        latent_condition = latent_condition.to(torch.float32)
+        latent_condition = latent_condition.to(dtype)
         latent_condition = (latent_condition - latents_mean) * latents_std
 
         if self.expand_timesteps:
-            mask_lat_size = torch.zeros(batch_size, 1, num_frames, latent_height, latent_width)
-        else:
-            mask_lat_size = torch.ones(batch_size, 1, num_frames, latent_height, latent_width)
+            first_frame_mask = torch.ones(
+                1, 1, num_latent_frames, latent_height, latent_width, dtype=dtype, device=device
+            )
+            first_frame_mask[:, :, 0] = 0
+            return latents, latent_condition, first_frame_mask
+
+        mask_lat_size = torch.ones(batch_size, 1, num_frames, latent_height, latent_width)
 
         if last_image is None:
-            mask_lat_size[:, :, 0] = 0
+            mask_lat_size[:, :, list(range(1, num_frames))] = 0
         else:
-            mask_lat_size[:, :, [0, -1]] = 0
-            
+            mask_lat_size[:, :, list(range(1, num_frames - 1))] = 0
         first_frame_mask = mask_lat_size[:, :, 0:1]
         first_frame_mask = torch.repeat_interleave(first_frame_mask, dim=2, repeats=self.vae_scale_factor_temporal)
         mask_lat_size = torch.concat([first_frame_mask, mask_lat_size[:, :, 1:, :]], dim=2)
@@ -554,7 +554,7 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
         mask_lat_size = mask_lat_size.transpose(1, 2)
         mask_lat_size = mask_lat_size.to(latent_condition.device)
 
-        return latents, latent_condition, mask_lat_size
+        return latents, torch.concat([mask_lat_size, latent_condition], dim=1)
 
     @property
     def guidance_scale(self):
@@ -690,20 +690,18 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
 
 
         # 5. Prepare timesteps
-        self.scheduler.set_timesteps(num_inference_steps)
+        self.scheduler.set_timesteps(num_inference_steps, device="cpu")
         timesteps = self.scheduler.timesteps
-        
         image = self.video_processor.preprocess(image, height=height, width=width).to("cpu", dtype=torch.float32)
         if last_image is not None:
             last_image = self.video_processor.preprocess(last_image, height=height, width=width).to(
                 "cpu", dtype=torch.float32
             )
-
         # 6. Prepare latent variables
-        latents, latent_condition, mask_lat_size = self.prepare_latents(
+        latents, condition, first_frame_mask = self.prepare_latents(
             image,
             batch_size * num_videos_per_prompt,
-            num_channels_latents=16,
+            num_channels_latents=self.z_dim,
             height=height,
             width=width,
             num_frames=num_frames,
@@ -711,11 +709,10 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
             latents=latents,
             last_image=last_image,
         )
-
+        
         # 7. Denoising loop
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         self._num_timesteps = len(timesteps)
-
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 if self.interrupt:
@@ -724,30 +721,26 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
                 self._current_timestep = t
                 
                 # Apply mask
-                latents = latents * mask_lat_size + latent_condition * (1 - mask_lat_size)
-                
-                latent_model_input = latents
-                timestep = t.expand(latents.shape[0])
-
+                latent_model_input = (1 - first_frame_mask) * condition + first_frame_mask * latents
+                temp_ts = (first_frame_mask[0][0][:, ::2, ::2] * t).flatten()
+                # batch_size, seq_len
+                timestep = temp_ts.unsqueeze(0).expand(latents.shape[0], -1)
                 noise_pred = torch.from_numpy(
-                    self.transformer([latent_model_input, timestep, prompt_embeds, image_embeds])[0]
+                    self.transformer([latent_model_input, timestep, prompt_embeds])[0]
                 )
-
                 if self.do_classifier_free_guidance:
                     noise_uncond = torch.from_numpy(
-                        self.transformer([latent_model_input, timestep, negative_prompt_embeds, image_embeds])[0]
+                        self.transformer([latent_model_input, timestep, negative_prompt_embeds])[0]
                     )
                     noise_pred = noise_uncond + guidance_scale * (noise_pred - noise_uncond)
 
-                # compute the previous noisy sample x_t -> x_t-1
-                latents = self.scheduler.step(noise_pred, t, latents, return_dict=False)[0]
-
+                latents = self.scheduler.step(noise_pred, t, latents, return_dict=False)[0]  
                 # call the callback, if provided
                 if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0):
                     progress_bar.update()
 
         self._current_timestep = None
-
+        latents = (1 - first_frame_mask) * condition + first_frame_mask * latents
         if not output_type == "latent":
             latents_mean = torch.tensor(self.latents_mean).view(1, self.z_dim, 1, 1, 1).to(latents.device, latents.dtype)
             latents_std = 1.0 / torch.tensor(self.latents_std).view(1, self.z_dim, 1, 1, 1).to(latents.device, latents.dtype)
