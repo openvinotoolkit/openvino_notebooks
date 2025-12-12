@@ -370,6 +370,7 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
         )
         remove_venv(target_env_path)
 
+    print(f"DEBUG: source_env_path listdir: {os.listdir(source_env_path)}", flush=True)
     try:
         clone_virtualenv(str(source_env_path), str(target_env_path))
     except Exception as e:
