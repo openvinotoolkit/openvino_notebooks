@@ -26,7 +26,7 @@ NOTEBOOKS_DIR = Path("notebooks")
 
 SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
 
-SEPARATED_VENV_NAME = Path(".venv")
+SEPARATED_VENV_NAME = Path("venv")
 
 
 def detect_source_venv_path() -> Path:
