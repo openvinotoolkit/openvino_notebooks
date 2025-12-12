@@ -39,7 +39,7 @@ def process_file_upload(
 def make_demo(pipe):
     def generate(file_input, page_number, temperature, max_new_tokens):
         prompt, image = process_file_upload(file_input, page_number=page_number)
-        image_data = np.array(image.getdata()).reshape(1, image.size[1], image.size[0], 3).astype(np.byte)
+        image_data = np.array(image.getdata()).reshape(1, image.size[1], image.size[0], 3).astype(np.uint8)
         output = pipe.generate(
             prompt=prompt,
             image=ov.Tensor(image_data),
