@@ -30,9 +30,9 @@ jobs:
     runs-on: ${{ inputs.runs_on }}
     container:
       image: ${{ inputs.container }}
-      options: --device /dev/dri:/dev/dri --group-add 109 --group-add 44
-      volumes:
-        - /dev/dri:/dev/dri
+      # options: --device /dev/dri:/dev/dri --group-add 109 --group-add 44
+      # volumes:
+      #   - /dev/dri:/dev/dri
     steps:
       - name: Set env variables
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
