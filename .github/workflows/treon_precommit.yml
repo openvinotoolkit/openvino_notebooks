@@ -35,7 +35,7 @@ permissions:
 jobs:
   build_treon:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         runs_on: [aks-linux-8-cores-32gb, aks-linux-16-cores-32gb, windows-2022]
         python: ['3.12']
