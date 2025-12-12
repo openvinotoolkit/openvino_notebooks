@@ -37,10 +37,11 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        runs_on: [ubuntu-22.04, windows-2022]
-        python: ['3.10', '3.11', '3.12', '3.13']
+        runs_on: [aks-linux-8-cores-32gb, aks-linux-16-cores-32gb, windows-2022]
+        python: ['3.12']
     uses: ./.github/workflows/build_treon_reusable.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      test_only_changed: true
+      test_only_changed: false
+      container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:pr-33079'
