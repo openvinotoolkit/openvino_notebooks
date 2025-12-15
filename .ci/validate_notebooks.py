@@ -12,7 +12,6 @@ import queue
 import yaml
 from clonevirtualenv import clone_virtualenv
 import traceback
-import logging
 
 from argparse import ArgumentParser
 from pathlib import Path
@@ -723,18 +722,7 @@ def write_single_notebook_report(
     return report_file
 
 
-def config_log():
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=[
-            logging.StreamHandler(sys.stdout),
-        ],
-    )
-
-
 def main():
-    config_log()
     failed_notebooks = []
     timeout_notebooks = []
     args = parse_arguments()
