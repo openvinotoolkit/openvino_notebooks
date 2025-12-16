@@ -3,7 +3,6 @@ import gradio as gr
 import numpy as np
 import sys
 import openvino_genai as ov_genai
-from tqdm.auto import tqdm
 from PIL import Image
 
 MAX_SEED = np.iinfo(np.int32).max
@@ -33,32 +32,22 @@ def make_demo(pipeline, turbo):
         if randomize_seed:
             seed = np.random.randint(0, MAX_SEED)
 
-        generator = ov_genai.TorchGenerator(seed)
-        pbar = tqdm(total=num_inference_steps)
-
-        def callback(step, num_steps, latent):
-            if num_steps != pbar.total:
-                pbar.reset(num_steps)
-            pbar.update(1)
-            sys.stdout.flush()
-            return False
-
+        generator = torch.Generator().manual_seed(seed)
         generate_kwargs = {}
 
         if guidance_scale > 1:
             generate_kwargs["negative_prompt"] = negative_prompt
 
-        image_tensor = pipeline.generate(
+        output = pipeline(
             prompt=prompt,
             guidance_scale=guidance_scale,
             num_inference_steps=num_inference_steps,
             width=width,
             height=height,
             generator=generator,
-            callback=callback,
             **generate_kwargs
         )
-        image = Image.fromarray(image_tensor.data[0])
+        image = output.images[0]
         return image, seed
 
     with gr.Blocks(css=css) as demo:

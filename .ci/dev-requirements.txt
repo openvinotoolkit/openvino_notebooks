@@ -13,4 +13,5 @@ git+https://github.com/eaidova/treon.git@ea/cell_info # test framework for Jupyt
 toml                        # used for validating docker requirements
 mistune==2.0.4              # use for parsing README.md
 requests==2.32.4            # use for checking links
+psutil                      # process management
 pyspelling                  # automating spell checking
