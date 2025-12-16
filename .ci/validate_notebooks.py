@@ -524,9 +524,9 @@ def run_test(
         return result
 
     python_executable = sys.executable
-    venv_path = None
 
     try:
+        venv_path = None
         with cd(notebook_path.parent):
             print_disk_usage("BEFORE", Path("."))
             files_before_test = sorted(Path(".").iterdir())
