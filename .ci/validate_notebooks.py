@@ -263,49 +263,6 @@ def get_pip_package_version(python_executable: Path, package: str, text_input: s
         return missing_return
 
 
-def create_venv(env_path: Path):
-    print("Creating virtual environment...", flush=True)
-    print(f"Virtual environment path: {env_path}", flush=True)
-
-    popen_kwargs = {
-        "shell": (platform.system() == "Windows"),
-        "stdout": subprocess.PIPE,
-        "stderr": subprocess.STDOUT,
-        "encoding": "utf-8",
-        "errors": "replace",
-        "bufsize": 1,
-    }
-
-    if platform.system() == "Windows":
-        popen_kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
-    else:
-        # Use start_new_session instead of preexec_fn to avoid thread-safety warning
-        popen_kwargs["start_new_session"] = True
-
-    try:
-        process = subprocess.Popen([sys.executable, "-m", "venv", str(env_path), "--clear"], **popen_kwargs)
-        process.wait()  # Wait for venv creation to complete
-        if process.returncode != 0:
-            raise subprocess.CalledProcessError(process.returncode, "venv creation")
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to create virtual environment. Return code: {e.returncode}", flush=True)
-        raise RuntimeError(f"Failed to create virtual environment: {e}")
-
-    if platform.system() == "Windows":
-        python_exec = env_path / "Scripts" / "python.exe"
-    else:
-        python_exec = env_path / "bin" / "python"
-
-    # Verify the virtual environment was created successfully
-    if env_path.exists() and python_exec.exists():
-        print("Virtual environment created.", flush=True)
-    else:
-        print(f"Failed to create virtual environment. Path exists: {env_path.exists()}, Python executable exists: {python_exec.exists()}", flush=True)
-        raise RuntimeError("Failed to create virtual environment.")
-
-    return python_exec.absolute()
-
-
 def get_dir_size(path: Path) -> int:
     total = 0
     try:
@@ -567,6 +524,7 @@ def run_test(
         return result
 
     python_executable = sys.executable
+    venv_path = None
 
     try:
         with cd(notebook_path.parent):
@@ -617,7 +575,7 @@ def run_test(
             print(f"TEST DURATION [{notebook_path.name}]: {duration:.2f} seconds", flush=True)
 
     finally:
-        if source_venv_path and not keep_artifacts:
+        if venv_path and source_venv_path and not keep_artifacts:
             remove_venv(venv_path)
 
     return result
