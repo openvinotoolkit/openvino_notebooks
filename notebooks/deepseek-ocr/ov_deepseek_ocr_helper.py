@@ -1267,7 +1267,7 @@ class OVDeepseekOCRForCausalLM(GenerationMixin):
     ):
 
         os.makedirs(output_path, exist_ok=True)
-        os.makedirs(f"{output_path}/images", exist_ok=True)
+        # os.makedirs(f"{output_path}/images", exist_ok=True)
 
         if prompt and image_file:
             conversation = [
