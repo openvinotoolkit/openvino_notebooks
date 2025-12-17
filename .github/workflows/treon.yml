@@ -30,6 +30,7 @@ jobs:
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
+      ignore_list: .ci/tensorflow.txt
 
   build_treon_gpu:
     if: ${{ false }} # TODO Enable when GPU runners will be available in GitHub Actions
@@ -44,6 +45,7 @@ jobs:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
       container: ${{ matrix.container }}
+      ignore_list: .ci/tensorflow.txt
 
   aggregate_notebooks_reports:
     if: always()

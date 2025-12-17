@@ -249,10 +249,10 @@ def insert_state_for_nodes(model: ov.Model, nodes):
         consumers = output.get_target_inputs()
         # FIXME: get_any_name is not reliable as tensor may not have any names
         variable_id = output.get_any_name()
-        read_value = ov.runtime.opset13.read_value(output, variable_id)
+        read_value = opset13.read_value(output, variable_id)
         for consumer in consumers:
             consumer.replace_source_output(read_value.output(0))
-        assign = ov.runtime.opset13.assign(read_value, variable_id)
+        assign = opset13.assign(read_value, variable_id)
         model.add_sinks([assign])
 
 

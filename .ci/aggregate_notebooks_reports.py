@@ -31,6 +31,8 @@ def write_json_file(filename: str, data: dict):
 
 
 def main():
+    ValidationMatrix.os = tuple(os for os in ValidationMatrix.os if "macos" not in os)
+
     NOTEBOOKS_STATUS_MAP = {}
     for device, os, python in ValidationMatrix.values():
         if device == "gpu" and not os.startswith("ubuntu"):
