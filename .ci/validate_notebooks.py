@@ -96,7 +96,7 @@ def parse_arguments():
         "--cleanup_temp",
         action="store_true",
         help="Cleanup temporary venv directories created during testing before test run is started."
-             "Useful when previous test run was interrupted and temporary directories were not removed.",
+        "Useful when previous test run was interrupted and temporary directories were not removed.",
     )
 
     return parser.parse_args()
