@@ -34,7 +34,7 @@ def make_demo(ov_pipe):
 
     # --- Model Loading ---
     dtype = torch.bfloat16
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cpu"
 
     # --- UI Constants and Helpers ---
     MAX_SEED = np.iinfo(np.int32).max
