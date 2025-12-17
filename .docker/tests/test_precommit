@@ -24,5 +24,8 @@ cd "/tmp"
 # Patch notebooks to speed up test execution
 python /tmp/scripts/patch_notebooks.py /tmp/notebooks
 
+# Install CI requirements
+pip install -r /opt/app-root/openvino_notebooks/.ci/ci-requirements.txt
+
 # Test notebooks
 python /tmp/scripts/validate_notebooks.py --ignore_list /tmp/scripts/ignore_treon_docker.txt --test_list /tmp/scripts/test_notebooks.txt
