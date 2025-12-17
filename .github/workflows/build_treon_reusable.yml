@@ -295,6 +295,7 @@ jobs:
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --move_notebooks_dir c:/notebooks \
             --timeout 1200
+      
       - name: Analysing with treon (Linux)
         if: runner.os == 'Linux'
         shell: bash
@@ -312,13 +313,14 @@ jobs:
           fi
 
           python .ci/validate_notebooks.py \
-            --os ${{ env.OS_NAME }} \
+            --os "ubuntu-22.04" \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
             $IGNORE_ARGS \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --timeout 1200
+      
       - name: Analysing with treon (MacOS)
         if: runner.os == 'MacOS'
         shell: bash
