@@ -12,6 +12,7 @@ import queue
 import yaml
 from clonevirtualenv import clone_virtualenv
 import traceback
+import tempfile
 
 from argparse import ArgumentParser
 from pathlib import Path
@@ -25,7 +26,7 @@ NOTEBOOKS_DIR = Path("notebooks")
 
 SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
 
-SEPARATED_VENV_NAME = Path("venv")
+SEPARATED_VENV_NAME = Path("openvino_venv")
 
 
 def detect_source_venv_path() -> Path:
@@ -91,7 +92,25 @@ def parse_arguments():
         type=Path,
         help="Path to the source virtual environment to clone for running notebooks",
     )
+    parser.add_argument(
+        "--cleanup_temp",
+        action="store_true",
+        help="Cleanup temporary venv directories created during testing before test run is started."
+             "Useful when previous test run was interrupted and temporary directories were not removed.",
+    )
+
     return parser.parse_args()
+
+
+def cleanup_temp_venv_dirs():
+    temp_dir = Path(tempfile.gettempdir())
+    for item in temp_dir.iterdir():
+        if item.is_dir() and item.name.startswith(str(SEPARATED_VENV_NAME)):
+            try:
+                shutil.rmtree(item)
+                print(f"Removed temporary venv directory: {item}", flush=True)
+            except Exception as e:
+                print(f"Failed to remove temporary venv directory {item}: {e}", flush=True)
 
 
 def move_notebooks(nb_dir):
@@ -525,8 +544,8 @@ def run_test(
 
     python_executable = sys.executable
 
-    try:
-        venv_path = None
+    with tempfile.TemporaryDirectory(prefix=str(SEPARATED_VENV_NAME) + "_") as venv_tmp:
+        venv_path = Path(venv_tmp) / SEPARATED_VENV_NAME
         with cd(notebook_path.parent):
             print_disk_usage("BEFORE", Path("."))
             files_before_test = sorted(Path(".").iterdir())
@@ -534,7 +553,6 @@ def run_test(
             easyocr_before = get_dir_state(Path.home() / ".EasyOCR")
             if source_venv_path:
                 try:
-                    venv_path = Path(os.getcwd()) / SEPARATED_VENV_NAME  # Use current working directory to avoid issues with relative paths conversion in win
                     python_executable = clone_venv(source_venv_path, venv_path)
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to create virtual environment for notebook {notebook_path}. Error: {e}")
@@ -573,10 +591,6 @@ def run_test(
 
             print_disk_usage("AFTER", Path("."))
             print(f"TEST DURATION [{notebook_path.name}]: {duration:.2f} seconds", flush=True)
-
-    finally:
-        if venv_path and source_venv_path and not keep_artifacts:
-            remove_venv(venv_path)
 
     return result
 
@@ -696,6 +710,9 @@ def main():
     else:
         source_venv_path = None
 
+    if args.cleanup_temp:
+        cleanup_temp_venv_dirs()
+
     if notebooks_moving_dir is not None:
         notebooks_moving_dir = Path(notebooks_moving_dir).absolute()
         root = notebooks_moving_dir.parent
@@ -721,6 +738,7 @@ def main():
             test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute(), source_venv_path)
         except Exception as e:
             print(f"Error during testing notebook {str(notebook)}: {e}")
+            print(traceback.format_exc(), flush=True)
             test_result = [f"test_{report['path'].name}", -1, 0.0, "N/A", "N/A"]
         timing = 0
         if not test_result:
