@@ -109,13 +109,8 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            if [ "$(id -u)" -eq 0 ]; then
-              apt-get update -y
-              apt-get install libsndfile1 ffmpeg espeak-ng -y
-            else
-              sudo apt-get update -y
-              sudo apt-get install libsndfile1 ffmpeg espeak-ng -y
-            fi
+            sudo apt-get update -y
+            sudo apt-get install libsndfile1 ffmpeg espeak-ng -y
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install ffmpeg espeak-ng
           elif [ "$RUNNER_OS" == "Windows" ]; then
