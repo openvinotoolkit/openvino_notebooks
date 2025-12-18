@@ -552,6 +552,12 @@
   skips:
     - os:
         - macos-13
+- notebook: notebooks/fireredtts2/fireredtts2.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
 - notebook: notebooks/qwen3-vl/qwen3-vl.ipynb
   skips:
     - os:
@@ -561,6 +567,12 @@
     - os:
         - ubuntu-22.04
 - notebook: notebooks/catvton/catvton.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/deepseek-ocr/deepseek-ocr.ipynb
   skips:
     - os:
         - macos-13
