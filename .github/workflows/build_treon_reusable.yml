@@ -42,7 +42,7 @@ jobs:
             const runsOn = "${{ inputs.runs_on }}";
             let osName = !container ? "${{ inputs.runs_on }}" : container.replace(':', '-');
             // Map custom runner names to standard OS names
-            if (osName.startsWith('aks-linux')) {
+            if (osName.startsWith('aks-linux') || runsOn.startsWith('aks-linux')) {
               osName = 'ubuntu-22.04';
             } else if (osName.startsWith('aks-win')) {
               osName = 'windows-2022';
