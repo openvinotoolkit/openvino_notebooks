@@ -1,0 +1,17 @@
+services:
+  pp-e2eov:
+    image: pointpillars:e2eOV
+    container_name: pointpillars-e2eOV
+    # environment:
+    #   - LIBVA_DRIVER_NAME=iHD
+    # devices:
+    #   - /dev/dri:/dev/dri
+    # volumes:
+    #   - ${DATA_ROOT}:/Datasets:ro
+    working_dir: /workspace
+    command: >
+      bash -c "python export_ov_e2e.py --checkpoint pretrained/epoch_160.pth --output pretrained/pointpillars_ov
+      && python test-e2eOV.py --device CPU"
+    # python test-e2eOV.py --device GPU
+    # python evaluate-e2eOV.py --data_root /Datasets --nsamples 10
+
