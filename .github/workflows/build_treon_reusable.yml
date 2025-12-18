@@ -40,7 +40,7 @@ jobs:
           script: |
             const container = "${{ inputs.container }}";
             const runsOn = "${{ inputs.runs_on }}";
-            const osName = !container ? "${{ inputs.runs_on }}" : container.replace(':', '-');
+            let osName = !container ? "${{ inputs.runs_on }}" : container.replace(':', '-');
             // Map custom runner names to standard OS names
             if (osName === 'aks-linux-4-cores-16gb') {
               osName = 'ubuntu-22.04';
