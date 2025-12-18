@@ -41,6 +41,12 @@ jobs:
             const container = "${{ inputs.container }}";
             const runsOn = "${{ inputs.runs_on }}";
             const osName = !container ? "${{ inputs.runs_on }}" : container.replace(':', '-');
+            // Map custom runner names to standard OS names
+            if (osName === 'aks-linux-4-cores-16gb') {
+              osName = 'ubuntu-22.04';
+            } else if (osName === 'aks-win-4-cores-16gb') {
+              osName = 'windows-2022';
+            }
             const testDevice = runsOn === 'gpu' ? 'gpu' : 'cpu';
             const testReportDir = `${testDevice}-${osName}-${{ inputs.python }}`;
             core.exportVariable('OS_NAME', osName);
