@@ -108,7 +108,8 @@ jobs:
         if: ${{ !inputs.container }}
         shell: bash
         run: |
-          if [ "$(id -u)" -eq 0 ]; then
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            if [ "$(id -u)" -eq 0 ]; then
               apt-get update -y
               apt-get install libsndfile1 ffmpeg espeak-ng -y
             else
