@@ -30,9 +30,9 @@ jobs:
     runs-on: ${{ inputs.runs_on }}
     container:
       image: ${{ inputs.container }}
-      options: --device /dev/dri:/dev/dri --group-add 109 --group-add 44
-      volumes:
-        - /dev/dri:/dev/dri
+      # options: --device /dev/dri:/dev/dri --group-add 109 --group-add 44
+      # volumes:
+      #   - /dev/dri:/dev/dri
     steps:
       - name: Set env variables
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
@@ -42,9 +42,9 @@ jobs:
             const runsOn = "${{ inputs.runs_on }}";
             let osName = !container ? "${{ inputs.runs_on }}" : container.replace(':', '-');
             // Map custom runner names to standard OS names
-            if (osName === 'aks-linux-4-cores-16gb') {
+            if (osName.startsWith('aks-linux')) {
               osName = 'ubuntu-22.04';
-            } else if (osName === 'aks-win-4-cores-16gb') {
+            } else if (osName.startsWith('aks-win')) {
               osName = 'windows-2022';
             }
             const testDevice = runsOn === 'gpu' ? 'gpu' : 'cpu';
@@ -108,9 +108,13 @@ jobs:
         if: ${{ !inputs.container }}
         shell: bash
         run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get update -y
-            sudo apt-get install libsndfile1 ffmpeg espeak-ng -y
+          if [ "$(id -u)" -eq 0 ]; then
+              apt-get update -y
+              apt-get install libsndfile1 ffmpeg espeak-ng -y
+            else
+              sudo apt-get update -y
+              sudo apt-get install libsndfile1 ffmpeg espeak-ng -y
+            fi
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install ffmpeg espeak-ng
           elif [ "$RUNNER_OS" == "Windows" ]; then
@@ -132,18 +136,18 @@ jobs:
             ./install_openvino_dependencies.sh -c=core -c=dev -c=gpu -y
           fi
 
-      - name: Install GPU Drivers
-        if: ${{ inputs.container }}
-        shell: bash
-        run: |
-          wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.15985.7/intel-igc-core_1.0.15985.7_amd64.deb
-          wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.15985.7/intel-igc-opencl_1.0.15985.7_amd64.deb
-          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-level-zero-gpu-dbgsym_1.3.28454.6_amd64.ddeb
-          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-level-zero-gpu_1.3.28454.6_amd64.deb
-          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-opencl-icd-dbgsym_24.05.28454.6_amd64.ddeb
-          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-opencl-icd_24.05.28454.6_amd64.deb
-          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/libigdgmm12_22.3.11_amd64.deb
-          dpkg -i *.deb
+      # - name: Install GPU Drivers
+      #   if: ${{ inputs.container }}
+      #   shell: bash
+      #   run: |
+      #     wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.15985.7/intel-igc-core_1.0.15985.7_amd64.deb
+      #     wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.15985.7/intel-igc-opencl_1.0.15985.7_amd64.deb
+      #     wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-level-zero-gpu-dbgsym_1.3.28454.6_amd64.ddeb
+      #     wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-level-zero-gpu_1.3.28454.6_amd64.deb
+      #     wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-opencl-icd-dbgsym_24.05.28454.6_amd64.ddeb
+      #     wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-opencl-icd_24.05.28454.6_amd64.deb
+      #     wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/libigdgmm12_22.3.11_amd64.deb
+      #     dpkg -i *.deb
 
       - name: Set up Python
         uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
@@ -250,25 +254,25 @@ jobs:
 
       # Create list of installed pip packages that can be downloaded as artifacts
       # to verify the exact environment of a specific test run
-      - name: pip freeze
-        run: |
-          python -m pip freeze
-          python -m pip freeze > pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
-      - name: Upload pip freeze artifact
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
-        with:
-          name: pip-freeze-${{ env.TEST_DEVICE }}-${{ env.OS_NAME }}-${{ inputs.python }}
-          path: pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
+      # - name: pip freeze
+      #   run: |
+      #     python -m pip freeze
+      #     python -m pip freeze > pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
+      # - name: Upload pip freeze artifact
+      #   uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+      #   with:
+      #     name: pip-freeze-${{ env.TEST_DEVICE }}-${{ env.OS_NAME }}-${{ inputs.python }}
+      #     path: pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
       #### End installation/preparation
 
       - name: Check install
         run: |
-          python check_install.py
+          python3 check_install.py
 
       # Patch long running cells to run faster
       - name: Patch notebooks
         run: |
-          python .ci/patch_notebooks.py . -td ${{ env.TEST_DEVICE }}
+          python3 .ci/patch_notebooks.py . -td ${{ env.TEST_DEVICE }}
 
       # Test that JupyterLab runs without errors
       - name: Test Jupyterlab
