@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs_on: [aks-linux-4-cores-16gb, aks-win-4-cores-16gb]
+        runs_on: [aks-linux-4-cores-16gb, aks-win-8-cores-16gb]
         python: ['3.13']
     uses: ./.github/workflows/build_treon_reusable.yml
     with:
