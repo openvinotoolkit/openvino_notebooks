@@ -31,8 +31,7 @@ jobs:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
       ignore_list: .ci/tensorflow.txt
-      container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:pr-33079'
-
+      container: ${{ startsWith(matrix.runs_on, 'aks-linux') && 'openvinogithubactions.azurecr.io/
   build_treon_gpu:
     if: ${{ false }} # TODO Enable when GPU runners will be available in GitHub Actions
     strategy:
