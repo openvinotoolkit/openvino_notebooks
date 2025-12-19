@@ -192,7 +192,7 @@
         - ubuntu-22.04
         - windows-2022
     - python:
-        - '3.12'
+        - '3.13'
 - notebook: notebooks/photo-maker/photo-maker.ipynb
   skips:
     - os:
@@ -282,7 +282,7 @@
     - device:
         - gpu
     - python:
-        - '3.12'
+        - '3.13'
 - notebook: notebooks/hello-npu/hello-npu.ipynb
   skips:
     - device:
@@ -381,6 +381,7 @@
   skips:
     - python:
         - '3.12'
+        - '3.13'
 - notebook: notebooks/ltx-video/ltx-video.ipynb
   skips:
     - os:
@@ -517,25 +518,24 @@
 - notebook: notebooks/convert-to-openvino/convert-to-openvino.ipynb
   skips:
     - python:
-        - "3.12"
         - "3.13"
 - notebook: notebooks/jax-to-openvino/jax-classification-to-openvino.ipynb
   skips:
     - python:
-        - "3.12"
         - "3.13"
 - notebook: notebooks/optimize-preprocessing/optimize-preprocessing.ipynb
   skips:
     - python:
-        - "3.12"
+        - "3.13"
 - notebook: notebooks/tensorflow-classification-to-openvino/tensorflow-classification-to-openvino.ipynb
   skips:
     - python:
-        - "3.12"
+        - "3.13"
 - notebook: notebooks/tensorflow-object-detection-to-openvino/tensorflow-object-detection-api-with-openvino.ipynb
   skips:
     - python:
         - "3.12"
+        - "3.13"
 - notebook: notebooks/text-to-image-genai/text-to-image-genai.ipynb
   skips:
     - os:
