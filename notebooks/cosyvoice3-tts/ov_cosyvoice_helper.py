@@ -1,11 +1,16 @@
 import sys
 sys.path.append('CosyVoice')
+sys.path.append('CosyVoice/third_party/Matcha-TTS')
+
+# Disable torchao to avoid version conflict with torch 2.3.1
+import os
+os.environ["TRANSFORMERS_NO_TORCHAO"] = "1"
+
 import openvino as ov
 import nncf  # type: ignore
 from pathlib import Path
 import torch
 import torch.nn.functional as F
-import os
 import random
 import re
 import time

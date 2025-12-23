@@ -35,6 +35,8 @@ tensorboard==2.14.0
 # tensorrt-cu12-libs==10.13.3.9; sys_platform == 'linux'
 torch==2.3.1
 torchaudio==2.3.1
+torchvision==0.18.1
+# torchao==0.4.0; python_version < "0"  # Disable torchao to avoid version conflict
 transformers==4.51.3
 x-transformers==2.11.24
 uvicorn==0.30.0
