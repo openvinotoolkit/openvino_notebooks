@@ -678,7 +678,7 @@ class OVModelForCausalLMWithEmbed(OVModelForCausalLM):
         
     def _compile_token_emb(self):
         if self.token_emb_request is None:
-            self.token_emb_request = core.compile_model(self.token_emb, "CPU" if self._device == "NPU" else self._device, self.ov_config)
+            self.token_emb_request = core.compile_model(self.token_emb, "CPU" if self._device == "NPU" else self._device)
 
     def to(self, device: str):
         if isinstance(device, str):
@@ -857,8 +857,8 @@ class OVFunASRNano:
 
         self.llm.set_token_emb(model_dir / TEXT_EMBEDDINGS_PATH)
         # Disable Snippets optimization to avoid internal error with certain model structures
-        encoder_config = {"SNIPPETS_MODE": "DISABLE"} if self.device == "CPU" else {}
-        self.audio_encoder = core.compile_model(model_dir / ENCODER_PATH, self.device if self.device is not "NPU" else "CPU", encoder_config)
+        encoder_config = {"SNIPPETS_MODE": "DISABLE"} if self.device == "CPU" or "NPU" else {}
+        self.audio_encoder = core.compile_model(model_dir / ENCODER_PATH, self.device if self.device != "NPU" else "CPU", encoder_config)
         
         # Load tokenizer from saved config
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
