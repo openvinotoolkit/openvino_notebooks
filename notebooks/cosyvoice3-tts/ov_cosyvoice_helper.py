@@ -1133,7 +1133,7 @@ class OVFlow():
         # Load OpenVINO flow embeddings model
         flow_emb_path = self.model_dir / FLOW_EMBEDDINGS_PATH
         print(f"⌛ Loading OpenVINO Flow embeddings model from {flow_emb_path}...")
-        self.flow_embeddings = core.compile_model(str(flow_emb_path), device)
+        self.flow_embeddings = core.compile_model(str(flow_emb_path), "CPU")
         print(f"✅ Flow embeddings model loaded")
         
         # Load OpenVINO flow estimator model (DiT)
