@@ -857,7 +857,7 @@ class OVFunASRNano:
 
         self.llm.set_token_emb(model_dir / TEXT_EMBEDDINGS_PATH)
         # Disable Snippets optimization to avoid internal error with certain model structures
-        encoder_config = {"SNIPPETS_MODE": "DISABLE"} if self.device == "CPU" or "NPU" else {}
+        encoder_config = {"SNIPPETS_MODE": "DISABLE"} if self.device == "CPU" else {}
         self.audio_encoder = core.compile_model(model_dir / ENCODER_PATH, self.device if self.device != "NPU" else "CPU", encoder_config)
         
         # Load tokenizer from saved config
