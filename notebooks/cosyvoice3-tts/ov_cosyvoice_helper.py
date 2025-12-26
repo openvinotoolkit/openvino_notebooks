@@ -1453,13 +1453,14 @@ class OVFlow():
 class OVHiFT():
     """OpenVINO-based HiFT vocoder for waveform generation."""
     
-    def __init__(self, model_path: str, device: str = "CPU", hift_input_len: int = 1000):
+    def __init__(self, model_path: str, device: str = "CPU", hift_input_len: int = 0):
         """
         Initialize OVHiFT with OpenVINO model.
         
         Args:
             model_path: Path to the OpenVINO hift model (.xml)
             device: OpenVINO device (CPU, GPU, etc.)
+            hift_input_len: Fixed input length for HiFT model. If > 0, model is reshaped to this length.
         """
         self.model_path = Path(model_path)
         self.ov_device = device
@@ -1467,7 +1468,8 @@ class OVHiFT():
         # Load OpenVINO model
         print(f"⌛ Loading OpenVINO HiFT model from {model_path}...")
         model = core.read_model(model_path)
-        model.reshape([1, 80, self.hift_input_len])
+        if self.hift_input_len > 0:
+            model.reshape([1, 80, self.hift_input_len])
         self.hift = core.compile_model(model, device)
         print(f"✅ HiFT model loaded")
         
@@ -1512,13 +1514,17 @@ class OVHiFT():
         else:
             mel_input = speech_feat
         
-        # Pad mel_input to fixed length (500) on the third dimension for NPU optimization
-        target_len = self.hift_input_len
-        original_len = mel_input.shape[2]
-        if original_len < target_len:
-            # Pad with zeros on the right
-            pad_len = target_len - original_len
-            mel_input = np.pad(mel_input, ((0, 0), (0, 0), (0, pad_len)), mode='constant', constant_values=0)
+        # Pad mel_input to fixed length on the third dimension for NPU optimization
+        if self.hift_input_len > 0:
+            target_len = self.hift_input_len
+            original_len = mel_input.shape[2]
+            if original_len < target_len:
+                # Pad with zeros on the right
+                pad_len = target_len - original_len
+                mel_input = np.pad(mel_input, ((0, 0), (0, 0), (0, pad_len)), mode='constant', constant_values=0)
+            else:
+                mel_input = mel_input[:, :, :target_len]
+                original_len = target_len
         
         # Run OpenVINO inference - output is (batch, n_fft+2, time)
         print(f"HiFT mel_input shape: {mel_input.shape} (original: {original_len})")
@@ -1536,9 +1542,12 @@ class OVHiFT():
         
         # Remove padding from output (restore original length)
         # HiFT upsamples mel by hop_size (480), so original_samples = original_len * 480
-        if original_len < target_len:
-            original_samples = original_len * 480  # hop_size from mel_spectrogram config
-            speech = speech[:, :original_samples]
+        if self.hift_input_len > 0:
+            if original_len < target_len:
+                original_samples = original_len * 480  # hop_size from mel_spectrogram config
+                speech = speech[:, :original_samples]
+            else:
+                speech = speech[:, :original_len * 480]
         
         return speech, None
 
@@ -1729,7 +1738,7 @@ class OVCosyVoice3():
     
     def __init__(self, model_dir: str, ov_model_dir: str = None, device: str = "CPU",
                  llm_device: str = None, flow_device: str = None, hift_device: str = None,
-                 frontend_device: str = None, npu_ov_config: dict = None, hift_input_len: int = 1000):
+                 frontend_device: str = None, npu_ov_config: dict = None, hift_input_len: int = 0):
         """
         Initialize OVCosyVoice3.
         
