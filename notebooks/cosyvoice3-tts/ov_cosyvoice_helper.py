@@ -1513,7 +1513,7 @@ class OVHiFT():
             mel_input = speech_feat
         
         # Pad mel_input to fixed length (500) on the third dimension for NPU optimization
-        target_len = 500
+        target_len = self.hift_input_len
         original_len = mel_input.shape[2]
         if original_len < target_len:
             # Pad with zeros on the right
