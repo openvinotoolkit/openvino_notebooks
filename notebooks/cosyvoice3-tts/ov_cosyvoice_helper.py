@@ -1453,7 +1453,7 @@ class OVFlow():
 class OVHiFT():
     """OpenVINO-based HiFT vocoder for waveform generation."""
     
-    def __init__(self, model_path: str, device: str = "CPU"):
+    def __init__(self, model_path: str, device: str = "CPU", hift_input_len: int = 1000):
         """
         Initialize OVHiFT with OpenVINO model.
         
@@ -1463,9 +1463,11 @@ class OVHiFT():
         """
         self.model_path = Path(model_path)
         self.ov_device = device
-        
+        self.hift_input_len = hift_input_len
         # Load OpenVINO model
         print(f"⌛ Loading OpenVINO HiFT model from {model_path}...")
+        model = core.read_model(model_path)
+        model.reshape([1, 80, self.hift_input_len])
         self.hift = core.compile_model(model_path, device)
         print(f"✅ HiFT model loaded")
         
@@ -1510,7 +1512,17 @@ class OVHiFT():
         else:
             mel_input = speech_feat
         
+        # Pad mel_input to fixed length (500) on the third dimension for NPU optimization
+        target_len = 500
+        original_len = mel_input.shape[2]
+        if original_len < target_len:
+            # Pad with zeros on the right
+            pad_len = target_len - original_len
+            mel_input = np.pad(mel_input, ((0, 0), (0, 0), (0, pad_len)), mode='constant', constant_values=0)
+        
         # Run OpenVINO inference - output is (batch, n_fft+2, time)
+        print(f"HiFT mel_input shape: {mel_input.shape} (original: {original_len})")
+        
         result = self.hift(mel_input)
         x = torch.from_numpy(result[0].copy())
         
@@ -1522,7 +1534,14 @@ class OVHiFT():
         speech = self._istft(magnitude, phase)
         speech = torch.clamp(speech, -self.audio_limit, self.audio_limit)
         
+        # Remove padding from output (restore original length)
+        # HiFT upsamples mel by hop_size (480), so original_samples = original_len * 480
+        if original_len < target_len:
+            original_samples = original_len * 480  # hop_size from mel_spectrogram config
+            speech = speech[:, :original_samples]
+        
         return speech, None
+
 
 
 class OVCosyVoice3Model():
@@ -1710,7 +1729,7 @@ class OVCosyVoice3():
     
     def __init__(self, model_dir: str, ov_model_dir: str = None, device: str = "CPU",
                  llm_device: str = None, flow_device: str = None, hift_device: str = None,
-                 frontend_device: str = None, npu_ov_config: dict = None):
+                 frontend_device: str = None, npu_ov_config: dict = None, hift_input_len: int = 1000):
         """
         Initialize OVCosyVoice3.
         
@@ -1854,7 +1873,8 @@ class OVCosyVoice3():
         print(f"⌛ Loading OpenVINO HiFT model on {self.hift_device}...")
         ov_hift = OVHiFT(
             model_path=f'{self.ov_model_dir}/{HIFT_PATH}',
-            device=self.hift_device
+            device=self.hift_device,
+            hift_input_len=hift_input_len
         )
         print(f"✅ OpenVINO HiFT loaded on {self.hift_device}")
         
