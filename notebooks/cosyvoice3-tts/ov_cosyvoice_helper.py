@@ -1468,7 +1468,7 @@ class OVHiFT():
         print(f"⌛ Loading OpenVINO HiFT model from {model_path}...")
         model = core.read_model(model_path)
         model.reshape([1, 80, self.hift_input_len])
-        self.hift = core.compile_model(model_path, device)
+        self.hift = core.compile_model(model, device)
         print(f"✅ HiFT model loaded")
         
         # ISTFT parameters (matching HiFTGenerator defaults)
