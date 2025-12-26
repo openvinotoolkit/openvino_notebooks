@@ -361,6 +361,120 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
         
     if not (model_path / FLOW_ESTIMATOR_PATH).exists():
         print("⌛ Convert FLOW estimator model")
+        
+        # Patch AttnProcessor to convert boolean mask to float mask for SDPA optimization
+        # This enables OpenVINO GPU to use fused SDPA kernel instead of decomposed attention
+        from cosyvoice.flow.DiT.modules import AttnProcessor, JointAttnProcessor
+        
+        _orig_attn_call = AttnProcessor.__call__
+        def patched_attn_call(self, attn, x, mask=None, rope=None):
+            batch_size = x.shape[0]
+            query = attn.to_q(x)
+            key = attn.to_k(x)
+            value = attn.to_v(x)
+            
+            if rope is not None:
+                from x_transformers.x_transformers import apply_rotary_pos_emb
+                freqs, xpos_scale = rope
+                q_xpos_scale, k_xpos_scale = (xpos_scale, xpos_scale**-1.0) if xpos_scale is not None else (1.0, 1.0)
+                query = apply_rotary_pos_emb(query, freqs, q_xpos_scale)
+                key = apply_rotary_pos_emb(key, freqs, k_xpos_scale)
+            
+            inner_dim = key.shape[-1]
+            head_dim = inner_dim // attn.heads
+            query = query.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
+            key = key.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
+            value = value.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
+            
+            if mask is not None:
+                attn_mask = mask
+                if attn_mask.dim() == 2:
+                    attn_mask = attn_mask.unsqueeze(1).unsqueeze(1)
+                    attn_mask = attn_mask.expand(batch_size, attn.heads, query.shape[-2], key.shape[-2])
+                # Convert boolean mask to float mask for SDPA optimization
+                if attn_mask.dtype == torch.bool:
+                    attn_mask = torch.zeros_like(attn_mask, dtype=query.dtype).masked_fill(~attn_mask, float('-inf'))
+            else:
+                attn_mask = None
+            
+            x = F.scaled_dot_product_attention(query, key, value, attn_mask=attn_mask, dropout_p=0.0, is_causal=False)
+            x = x.transpose(1, 2).reshape(batch_size, -1, attn.heads * head_dim)
+            x = x.to(query.dtype)
+            x = attn.to_out[0](x)
+            x = attn.to_out[1](x)
+            
+            if mask is not None:
+                if mask.dim() == 2:
+                    mask = mask.unsqueeze(-1)
+                else:
+                    mask = mask[:, 0, -1].unsqueeze(-1)
+                x = x.masked_fill(~mask, 0.0)
+            return x
+        
+        _orig_joint_call = JointAttnProcessor.__call__
+        def patched_joint_call(self, attn, x, c=None, mask=None, rope=None, c_rope=None):
+            from x_transformers.x_transformers import apply_rotary_pos_emb
+            residual = x
+            batch_size = c.shape[0]
+            
+            query = attn.to_q(x)
+            key = attn.to_k(x)
+            value = attn.to_v(x)
+            c_query = attn.to_q_c(c)
+            c_key = attn.to_k_c(c)
+            c_value = attn.to_v_c(c)
+            
+            if rope is not None:
+                freqs, xpos_scale = rope
+                q_xpos_scale, k_xpos_scale = (xpos_scale, xpos_scale**-1.0) if xpos_scale is not None else (1.0, 1.0)
+                query = apply_rotary_pos_emb(query, freqs, q_xpos_scale)
+                key = apply_rotary_pos_emb(key, freqs, k_xpos_scale)
+            if c_rope is not None:
+                freqs, xpos_scale = c_rope
+                q_xpos_scale, k_xpos_scale = (xpos_scale, xpos_scale**-1.0) if xpos_scale is not None else (1.0, 1.0)
+                c_query = apply_rotary_pos_emb(c_query, freqs, q_xpos_scale)
+                c_key = apply_rotary_pos_emb(c_key, freqs, k_xpos_scale)
+            
+            query = torch.cat([query, c_query], dim=1)
+            key = torch.cat([key, c_key], dim=1)
+            value = torch.cat([value, c_value], dim=1)
+            
+            inner_dim = key.shape[-1]
+            head_dim = inner_dim // attn.heads
+            query = query.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
+            key = key.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
+            value = value.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
+            
+            if mask is not None:
+                attn_mask = F.pad(mask, (0, c.shape[1]), value=True)
+                attn_mask = attn_mask.unsqueeze(1).unsqueeze(1)
+                attn_mask = attn_mask.expand(batch_size, attn.heads, query.shape[-2], key.shape[-2])
+                # Convert boolean mask to float mask for SDPA optimization
+                if attn_mask.dtype == torch.bool:
+                    attn_mask = torch.zeros_like(attn_mask, dtype=query.dtype).masked_fill(~attn_mask, float('-inf'))
+            else:
+                attn_mask = None
+            
+            x = F.scaled_dot_product_attention(query, key, value, attn_mask=attn_mask, dropout_p=0.0, is_causal=False)
+            x = x.transpose(1, 2).reshape(batch_size, -1, attn.heads * head_dim)
+            x = x.to(query.dtype)
+            
+            x, c = x[:, :residual.shape[1]], x[:, residual.shape[1]:]
+            x = attn.to_out[0](x)
+            x = attn.to_out[1](x)
+            if not attn.context_pre_only:
+                c = attn.to_out_c(c)
+            
+            if mask is not None:
+                mask = mask.unsqueeze(-1)
+                x = x.masked_fill(~mask, 0.0)
+            return x, c
+        
+        # Apply patches
+        AttnProcessor.__call__ = patched_attn_call
+        JointAttnProcessor.__call__ = patched_joint_call
+        print("  Applied SDPA optimization patch (bool mask -> float mask)")
+        
         example_input = {
             "x": torch.ones([2, 80, 634], dtype=torch.float32),
             "mask": torch.ones([2, 1, 634], dtype=torch.float32),
@@ -370,6 +484,10 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
             "cond": torch.ones([2, 80, 634], dtype=torch.float32),
         }
         ov_model = ov.convert_model(pt_model.model.flow.decoder.estimator, example_input=example_input)
+        
+        # Restore original methods
+        AttnProcessor.__call__ = _orig_attn_call
+        JointAttnProcessor.__call__ = _orig_joint_call
 
         ov.save_model(ov_model, model_path / FLOW_ESTIMATOR_PATH)
         del ov_model
