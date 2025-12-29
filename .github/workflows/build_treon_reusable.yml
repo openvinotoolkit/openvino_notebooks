@@ -114,7 +114,10 @@ jobs:
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install ffmpeg espeak-ng
           elif [ "$RUNNER_OS" == "Windows" ]; then
-            winget install ffmpeg --version 7.1.1
+            curl -L https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-full_build.zip -o ffmpeg.zip
+            unzip -q ffmpeg.zip
+            mv ffmpeg-7.1.1-full_build ffmpeg
+            echo "$PWD/ffmpeg/bin" >> $GITHUB_PATH
           fi
       
       # Packages that notebooks need to run in docker container
