@@ -21,6 +21,10 @@ DEFAULT_RAG_PROMPT_CHINESE = """\
 基于以下已知信息，请简洁并专业地回答用户的问题。如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。\
 """
 
+DEFAULT_RAG_PROMPT_JAPANESE = """\
+検索されたコンテキストを使用して、質問に答えてください。答えがわからない場合は、わからないと答えてください。簡潔に答えてください。\
+"""
+
 
 def red_pijama_partial_text_processor(partial_text, new_text):
     if new_text == "<":
@@ -705,6 +709,11 @@ SUPPORTED_LLM_MODELS = {
             "current_message_template": "ユーザー: {user}\nシステム: {assistant}",
             "tokenizer_kwargs": {"add_special_tokens": False},
             "partial_text_processor": youri_partial_text_processor,
+            "rag_prompt_template": f"設定: {DEFAULT_RAG_PROMPT_JAPANESE}\n"
+            + """
+            ユーザー: 質問: {input}
+            コンテキスト: {context}
+            システム: """,
         },
     },
 }
@@ -738,6 +747,13 @@ SUPPORTED_EMBEDDING_MODELS = {
             "mean_pooling": False,
             "normalize_embeddings": True,
         },
+        "bge-m3": {
+            "model_id": "BAAI/bge-m3",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
+    },
+    "Japanese": {
         "bge-m3": {
             "model_id": "BAAI/bge-m3",
             "mean_pooling": False,

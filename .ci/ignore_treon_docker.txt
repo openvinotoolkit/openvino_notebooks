@@ -81,3 +81,4 @@ notebooks/wan2.1-text-to-video/wan2.1-text-to-video.ipynb
 notebooks/ace-step-music-generation/ace-step-music-generation.ipynb
 notebooks/deepseek-ocr/deepseek-ocr.ipynb
 notebooks/fireredtts2/fireredtts2.ipynb
+notebooks/qwen-image/qwen-image.ipynb
