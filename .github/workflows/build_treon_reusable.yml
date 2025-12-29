@@ -27,7 +27,7 @@ permissions:
 
 env:
   PIP_CACHE_PATH_LINUX: /mount/caches/pip
-  PIP_CACHE_PATH_WIN: "C:\\mount\\caches\\pip\\win"
+  PIP_CACHE_PATH_WIN: "C:/mount/caches/pip/win"
 
 jobs:
   build_treon:
@@ -114,7 +114,7 @@ jobs:
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install ffmpeg espeak-ng
           elif [ "$RUNNER_OS" == "Windows" ]; then
-            choco install ffmpeg-full --version 7.1.1 -y
+            winget install ffmpeg --version 7.1.1
           fi
       
       # Packages that notebooks need to run in docker container
