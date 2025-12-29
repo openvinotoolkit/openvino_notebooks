@@ -25,6 +25,10 @@ on:
 permissions:
   contents: read
 
+env:
+  PIP_CACHE_PATH_LINUX: /mount/caches/pip
+  PIP_CACHE_PATH_WIN: "C:\\mount\\caches\\pip\\win"
+
 jobs:
   build_treon:
     runs-on: ${{ inputs.runs_on }}
@@ -40,13 +44,14 @@ jobs:
           script: |
             const container = "${{ inputs.container }}";
             const runsOn = "${{ inputs.runs_on }}";
-            const osName = !container ? "${{ inputs.runs_on }}" : container.replace(':', '-');
+            const osName = runsOn.includes('linux') ? 'ubuntu-22.04' : 'windows-2022';
             const testDevice = runsOn === 'gpu' ? 'gpu' : 'cpu';
             const testReportDir = `${testDevice}-${osName}-${{ inputs.python }}`;
             core.exportVariable('OS_NAME', osName);
             core.exportVariable('TEST_DEVICE', testDevice);
             core.exportVariable('TEST_REPORT_DIR', testReportDir);
             core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
+            core.exportVariable('PIP_CACHE_PATH', runsOn.includes('linux') ? "${{ env.PIP_CACHE_PATH_LINUX }}" : "${{ env.PIP_CACHE_PATH_WIN }}");
 
       #### Installation/preparation ####
       #
@@ -97,6 +102,7 @@ jobs:
         uses: xom9ikk/dotenv@ac290ca23a42155a0cba1031d23afa46240116a9 # v2.3.0
         with:
           path: ./.github/workflows
+      
       # Packages that notebooks need to run in plain os
       - name: Install required packages
         if: ${{ !inputs.container }}
@@ -110,6 +116,7 @@ jobs:
           elif [ "$RUNNER_OS" == "Windows" ]; then
             choco install ffmpeg-full --version 7.1.1 -y
           fi
+      
       # Packages that notebooks need to run in docker container
       - name: Install required packages (container)
         if: ${{ inputs.container }}
@@ -126,25 +133,26 @@ jobs:
             ./install_openvino_dependencies.sh -c=core -c=dev -c=gpu -y
           fi
 
-      # - name: Install GPU Drivers
-      #   if: ${{ inputs.container }}
-      #   shell: bash
-      #   run: |
-      #     wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.15985.7/intel-igc-core_1.0.15985.7_amd64.deb
-      #     wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.15985.7/intel-igc-opencl_1.0.15985.7_amd64.deb
-      #     wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-level-zero-gpu-dbgsym_1.3.28454.6_amd64.ddeb
-      #     wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-level-zero-gpu_1.3.28454.6_amd64.deb
-      #     wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-opencl-icd-dbgsym_24.05.28454.6_amd64.ddeb
-      #     wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-opencl-icd_24.05.28454.6_amd64.deb
-      #     wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/libigdgmm12_22.3.11_amd64.deb
-      #     dpkg -i *.deb
+      - name: Install GPU Drivers
+        if: ${{ env.TEST_DEVICE == 'gpu' && runner.os == 'Linux' }}
+        shell: bash
+        run: |
+          wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.15985.7/intel-igc-core_1.0.15985.7_amd64.deb
+          wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.15985.7/intel-igc-opencl_1.0.15985.7_amd64.deb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-level-zero-gpu-dbgsym_1.3.28454.6_amd64.ddeb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-level-zero-gpu_1.3.28454.6_amd64.deb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-opencl-icd-dbgsym_24.05.28454.6_amd64.ddeb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-opencl-icd_24.05.28454.6_amd64.deb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/libigdgmm12_22.3.11_amd64.deb
+          dpkg -i *.deb
 
-      - name: Set up Python
-        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
+      - name: Setup Python ${{ inputs.python }}
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@e4b65a0ab6c946c72d56240223620837e6d34bf8
         with:
-          python-version: '${{ inputs.python }}'
-        env:
-          AGENT_TOOLSDIRECTORY: ${{ inputs.container && '/opt/hostedtoolcache' || '' }}
+          version: ${{ inputs.python }}
+          pip-cache-path: ${{ env.PIP_CACHE_PATH }}
+          should-setup-pip-paths: 'true'
+          self-hosted-runner: 'true'
 
       - name: Cache Pip Packages
         id: cachepip
@@ -175,15 +183,14 @@ jobs:
       - name: Set CACHE_DIR
         shell: bash
         run: |
-          python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
+          python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
           # replace backslashes with forward slashes for Windows paths
-          python -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+          python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
 
       # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
       - name: Set HUB_HOME
         shell: bash
-        run: |
-          echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
+        run: echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
 
       # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
       - name: Cache PaddlePaddle cache directories
@@ -199,17 +206,18 @@ jobs:
       - name: Cache openvino packages
         if: steps.cachepip.outputs.cache-hit != 'true'
         run: |
-          python -m pip install --upgrade pip
+          python${{ inputs.python }} -m pip install --upgrade pip
           mkdir pipcache
-          python -m pip install --cache-dir pipcache --no-deps openvino nncf
+          python${{ inputs.python }} -m pip install --cache-dir pipcache --no-deps openvino nncf
           cp -r pipcache pipcache_openvino
-          # python -m pip uninstall -y openvino nncf
+          # python${{ inputs.python }} -m pip uninstall -y openvino nncf
 
       # Download a small dataset to use for testing purposes in monai-kidney training notebook
       - name: Download CT files
         if: steps.cachefiles.outputs.cache-hit != 'true'
         run: |
           curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
+      
       - name: Copy CT files
         run: |
           mkdir notebooks/ct-segmentation-quantize/kits19
@@ -231,9 +239,9 @@ jobs:
 
       - name: Install python dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
-          python -m ipykernel install --user --name openvino_env
+          python${{ inputs.python }} -m pip install --upgrade pip
+          python${{ inputs.python }} -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
+          python${{ inputs.python }} -m ipykernel install --user --name openvino_env
 
       # Cache OpenVINO packages (`mv` works cross-platform)
       - name: Make pipcache directory with OpenVINO packages
@@ -246,8 +254,8 @@ jobs:
       # to verify the exact environment of a specific test run
       # - name: pip freeze
       #   run: |
-      #     python -m pip freeze
-      #     python -m pip freeze > pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
+      #     python${{ inputs.python }} -m pip freeze
+      #     python${{ inputs.python }} -m pip freeze > pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
       # - name: Upload pip freeze artifact
       #   uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
       #   with:
@@ -256,18 +264,15 @@ jobs:
       #### End installation/preparation
 
       - name: Check install
-        run: |
-          python3 check_install.py
+        run: python${{ inputs.python }} check_install.py
 
       # Patch long running cells to run faster
       - name: Patch notebooks
-        run: |
-          python3 .ci/patch_notebooks.py . -td ${{ env.TEST_DEVICE }}
+        run: python${{ inputs.python }} .ci/patch_notebooks.py . -td ${{ env.TEST_DEVICE }}
 
       # Test that JupyterLab runs without errors
       - name: Test Jupyterlab
-        run: |
-          jupyter lab notebooks --help
+        run: jupyter lab notebooks --help
 
       # Main notebooks test. Verifies that all notebooks run without errors
       - name: Analysing with treon (Windows)
@@ -286,7 +291,7 @@ jobs:
             IGNORE_ARGS="--ignore_list $IGNORE_ARGS"
           fi
 
-          python .ci/validate_notebooks.py \
+          python${{ inputs.python }} .ci/validate_notebooks.py \
             --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
@@ -312,8 +317,8 @@ jobs:
             IGNORE_ARGS="--ignore_list $IGNORE_ARGS"
           fi
 
-          python .ci/validate_notebooks.py \
-            --os "ubuntu-22.04" \
+          python${{ inputs.python }} .ci/validate_notebooks.py \
+            --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
@@ -325,7 +330,7 @@ jobs:
         if: runner.os == 'MacOS'
         shell: bash
         run: |
-          python .ci/validate_notebooks.py \
+          python${{ inputs.python }} .ci/validate_notebooks.py \
             --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
