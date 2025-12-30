@@ -114,8 +114,12 @@ jobs:
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install ffmpeg espeak-ng
           elif [ "$RUNNER_OS" == "Windows" ]; then
-            curl -L https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-full_build.zip -o ffmpeg.zip
-            unzip -q ffmpeg.zip
+            # Download 7z standalone utility
+            curl -L https://www.7-zip.org/a/7zr.exe -o 7zr.exe
+            # Download ffmpeg
+            curl -L https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-full_build.7z -o ffmpeg.7z
+            # Extract ffmpeg using 7z
+            ./7zr.exe x ffmpeg.7z -y
             mv ffmpeg-7.1.1-full_build ffmpeg
             echo "$PWD/ffmpeg/bin" >> $GITHUB_PATH
           fi
