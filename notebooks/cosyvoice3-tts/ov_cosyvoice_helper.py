@@ -1,9 +1,11 @@
 import sys
-sys.path.append('CosyVoice')
-sys.path.append('CosyVoice/third_party/Matcha-TTS')
+
+sys.path.append("CosyVoice")
+sys.path.append("CosyVoice/third_party/Matcha-TTS")
 
 # Disable torchao to avoid version conflict with torch 2.3.1
 import os
+
 os.environ["TRANSFORMERS_NO_TORCHAO"] = "1"
 
 import openvino as ov
@@ -30,6 +32,7 @@ from cosyvoice.cli.cosyvoice import AutoModel  # type: ignore
 
 # OpenVINO core
 core = ov.Core()
+
 
 def patch_cos_sin_cached_fp32(model):
     if (
@@ -170,7 +173,6 @@ def make_stateful(
     """
     from openvino._offline_transformations import apply_make_stateful_transformation
 
-
     input_output_map = {}
 
     if num_beams_and_batch is not None:
@@ -217,6 +219,7 @@ def patch_stateful(ov_model, dim=1):
         None,
     )
 
+
 def make_pad_mask(lengths: torch.Tensor, max_len: int = 0) -> torch.Tensor:
     """Make mask tensor containing indices of padded part.
 
@@ -237,13 +240,10 @@ def make_pad_mask(lengths: torch.Tensor, max_len: int = 0) -> torch.Tensor:
     # Ethan
     # batch_size = lengths.size(0)
     # max_len = max_len if max_len > 0 else lengths.max().item()
-    
+
     batch_size = lengths.shape[0]
     max_len = max_len if max_len > 0 else lengths.max()
-    seq_range = torch.arange(0,
-                             max_len,
-                             dtype=torch.int64,
-                             device=lengths.device)
+    seq_range = torch.arange(0, max_len, dtype=torch.int64, device=lengths.device)
     seq_range_expand = seq_range.unsqueeze(0).expand(batch_size, max_len)
     seq_length_expand = lengths.unsqueeze(-1)
     mask = seq_range_expand >= seq_length_expand
@@ -260,6 +260,7 @@ def cleanup_torchscript_cache():
     torch._C._jit_clear_class_registry()
     torch.jit._recursive.concrete_type_store = torch.jit._recursive.ConcreteTypeStore()
     torch.jit._state._clear_class_state()
+
 
 TEXT_EMBEDDINGS_PATH = "openvino_text_embeddings_model.xml"
 SPEECH_EMBEDDINGS_PATH = "openvino_speech_embeddings_model.xml"
@@ -280,21 +281,32 @@ DEPENDENCY_DIRS = [
     "CosyVoice-BlankEN",  # Qwen tokenizer
 ]
 
+
 def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
-    
+
     if model_path is None:
         model_path = Path(model_id.split("/")[-1])
     else:
         model_path = Path(model_path)
 
-    if all((model_path / model_name).exists() for model_name in [SPEECH_EMBEDDINGS_PATH, TEXT_EMBEDDINGS_PATH, SPEECH_EMBEDDINGS_PATH, LANGUAGE_PATH, FLOW_EMBEDDINGS_PATH, FLOW_ESTIMATOR_PATH, HIFT_PATH]):
+    if all(
+        (model_path / model_name).exists()
+        for model_name in [
+            SPEECH_EMBEDDINGS_PATH,
+            TEXT_EMBEDDINGS_PATH,
+            SPEECH_EMBEDDINGS_PATH,
+            LANGUAGE_PATH,
+            FLOW_EMBEDDINGS_PATH,
+            FLOW_ESTIMATOR_PATH,
+            HIFT_PATH,
+        ]
+    ):
         print(f"✅ {model_id} model already converted. You can find results in {model_path}")
         return model_path
     print(f"⌛ {model_id} conversion started. Be patient, it may takes some time.")
     print("⌛ Load Original model")
     pt_model = AutoModel(model_dir=model_id)
     print("✅ Original model successfully loaded")
-    
 
     if not (model_path / TEXT_EMBEDDINGS_PATH).exists():
         print("⌛ Convert TEXT_EMBEDDINGS model")
@@ -305,7 +317,7 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
         cleanup_torchscript_cache()
         gc.collect()
         print("✅ TEXT_EMBEDDINGS model successfully converted")
-        
+
     if not (model_path / SPEECH_EMBEDDINGS_PATH).exists():
         print("⌛ Convert SPEECH_EMBEDDINGS model")
 
@@ -319,12 +331,15 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
     if not (model_path / FLOW_EMBEDDINGS_PATH).exists():
         print("⌛ Convert FLOW embeddings model")
 
-        def forward_wrap_flow_emb(self, token,
-                              token_len,
-                              prompt_token,
-                              prompt_token_len,
-                            #   prompt_feat,
-                              embedding,):
+        def forward_wrap_flow_emb(
+            self,
+            token,
+            token_len,
+            prompt_token,
+            prompt_token_len,
+            #   prompt_feat,
+            embedding,
+        ):
             # Normalize and project speaker embedding
             embedding = F.normalize(embedding, dim=1)
             spks = self.spk_embed_affine_layer(embedding)  # (batch, 80)
@@ -335,10 +350,10 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
             token = self.input_embedding(torch.clamp(token, min=0)) * mask
 
             h = self.pre_lookahead_layer(token)
-            
+
             # Return both h and projected speaker embedding
             return h, spks
-        
+
         pt_model.model.flow._orig_forward = pt_model.model.flow.forward
         pt_model.model.flow.forward = types.MethodType(forward_wrap_flow_emb, pt_model.model.flow)
         example_input = {
@@ -358,34 +373,36 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
         cleanup_torchscript_cache()
         gc.collect()
         print("✅ FLOW embeddings model successfully converted")
-        
+
     if not (model_path / FLOW_ESTIMATOR_PATH).exists():
         print("⌛ Convert FLOW estimator model")
-        
+
         # Patch AttnProcessor to convert boolean mask to float mask for SDPA optimization
         # This enables OpenVINO GPU to use fused SDPA kernel instead of decomposed attention
         from cosyvoice.flow.DiT.modules import AttnProcessor, JointAttnProcessor
-        
+
         _orig_attn_call = AttnProcessor.__call__
+
         def patched_attn_call(self, attn, x, mask=None, rope=None):
             batch_size = x.shape[0]
             query = attn.to_q(x)
             key = attn.to_k(x)
             value = attn.to_v(x)
-            
+
             if rope is not None:
                 from x_transformers.x_transformers import apply_rotary_pos_emb
+
                 freqs, xpos_scale = rope
                 q_xpos_scale, k_xpos_scale = (xpos_scale, xpos_scale**-1.0) if xpos_scale is not None else (1.0, 1.0)
                 query = apply_rotary_pos_emb(query, freqs, q_xpos_scale)
                 key = apply_rotary_pos_emb(key, freqs, k_xpos_scale)
-            
+
             inner_dim = key.shape[-1]
             head_dim = inner_dim // attn.heads
             query = query.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
             key = key.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
             value = value.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
-            
+
             if mask is not None:
                 attn_mask = mask
                 if attn_mask.dim() == 2:
@@ -393,16 +410,16 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
                     attn_mask = attn_mask.expand(batch_size, attn.heads, query.shape[-2], key.shape[-2])
                 # Convert boolean mask to float mask for SDPA optimization
                 if attn_mask.dtype == torch.bool:
-                    attn_mask = torch.zeros_like(attn_mask, dtype=query.dtype).masked_fill(~attn_mask, float('-inf'))
+                    attn_mask = torch.zeros_like(attn_mask, dtype=query.dtype).masked_fill(~attn_mask, float("-inf"))
             else:
                 attn_mask = None
-            
+
             x = F.scaled_dot_product_attention(query, key, value, attn_mask=attn_mask, dropout_p=0.0, is_causal=False)
             x = x.transpose(1, 2).reshape(batch_size, -1, attn.heads * head_dim)
             x = x.to(query.dtype)
             x = attn.to_out[0](x)
             x = attn.to_out[1](x)
-            
+
             if mask is not None:
                 if mask.dim() == 2:
                     mask = mask.unsqueeze(-1)
@@ -410,20 +427,22 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
                     mask = mask[:, 0, -1].unsqueeze(-1)
                 x = x.masked_fill(~mask, 0.0)
             return x
-        
+
         _orig_joint_call = JointAttnProcessor.__call__
+
         def patched_joint_call(self, attn, x, c=None, mask=None, rope=None, c_rope=None):
             from x_transformers.x_transformers import apply_rotary_pos_emb
+
             residual = x
             batch_size = c.shape[0]
-            
+
             query = attn.to_q(x)
             key = attn.to_k(x)
             value = attn.to_v(x)
             c_query = attn.to_q_c(c)
             c_key = attn.to_k_c(c)
             c_value = attn.to_v_c(c)
-            
+
             if rope is not None:
                 freqs, xpos_scale = rope
                 q_xpos_scale, k_xpos_scale = (xpos_scale, xpos_scale**-1.0) if xpos_scale is not None else (1.0, 1.0)
@@ -434,47 +453,47 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
                 q_xpos_scale, k_xpos_scale = (xpos_scale, xpos_scale**-1.0) if xpos_scale is not None else (1.0, 1.0)
                 c_query = apply_rotary_pos_emb(c_query, freqs, q_xpos_scale)
                 c_key = apply_rotary_pos_emb(c_key, freqs, k_xpos_scale)
-            
+
             query = torch.cat([query, c_query], dim=1)
             key = torch.cat([key, c_key], dim=1)
             value = torch.cat([value, c_value], dim=1)
-            
+
             inner_dim = key.shape[-1]
             head_dim = inner_dim // attn.heads
             query = query.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
             key = key.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
             value = value.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
-            
+
             if mask is not None:
                 attn_mask = F.pad(mask, (0, c.shape[1]), value=True)
                 attn_mask = attn_mask.unsqueeze(1).unsqueeze(1)
                 attn_mask = attn_mask.expand(batch_size, attn.heads, query.shape[-2], key.shape[-2])
                 # Convert boolean mask to float mask for SDPA optimization
                 if attn_mask.dtype == torch.bool:
-                    attn_mask = torch.zeros_like(attn_mask, dtype=query.dtype).masked_fill(~attn_mask, float('-inf'))
+                    attn_mask = torch.zeros_like(attn_mask, dtype=query.dtype).masked_fill(~attn_mask, float("-inf"))
             else:
                 attn_mask = None
-            
+
             x = F.scaled_dot_product_attention(query, key, value, attn_mask=attn_mask, dropout_p=0.0, is_causal=False)
             x = x.transpose(1, 2).reshape(batch_size, -1, attn.heads * head_dim)
             x = x.to(query.dtype)
-            
-            x, c = x[:, :residual.shape[1]], x[:, residual.shape[1]:]
+
+            x, c = x[:, : residual.shape[1]], x[:, residual.shape[1] :]
             x = attn.to_out[0](x)
             x = attn.to_out[1](x)
             if not attn.context_pre_only:
                 c = attn.to_out_c(c)
-            
+
             if mask is not None:
                 mask = mask.unsqueeze(-1)
                 x = x.masked_fill(~mask, 0.0)
             return x, c
-        
+
         # Apply patches
         AttnProcessor.__call__ = patched_attn_call
         JointAttnProcessor.__call__ = patched_joint_call
         print("  Applied SDPA optimization patch (bool mask -> float mask)")
-        
+
         example_input = {
             "x": torch.ones([2, 80, 634], dtype=torch.float32),
             "mask": torch.ones([2, 1, 634], dtype=torch.float32),
@@ -484,7 +503,7 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
             "cond": torch.ones([2, 80, 634], dtype=torch.float32),
         }
         ov_model = ov.convert_model(pt_model.model.flow.decoder.estimator, example_input=example_input)
-        
+
         # Restore original methods
         AttnProcessor.__call__ = _orig_attn_call
         JointAttnProcessor.__call__ = _orig_joint_call
@@ -494,10 +513,10 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
         cleanup_torchscript_cache()
         gc.collect()
         print("✅ FLOW_ESTIMATOR model successfully converted")
-        
+
     if not (model_path / HIFT_PATH).exists():
         print("⌛ Convert HIFT model (without istft post-processing)")
-        
+
         # Export only the neural network part, stop before istft
         # This removes: exp, sin, _istft, clamp operations
         # Output will be raw conv_post output of shape (batch, n_fft+2, time)
@@ -513,7 +532,7 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
             s = self.f0_upsamp(f0[:, None]).transpose(1, 2)  # bs,n,t
             s, _, _ = self.m_source(s)
             s = s.transpose(1, 2)
-            
+
             # Run decode up to conv_post only
             s_stft_real, s_stft_imag = self._stft(s.squeeze(1))
             s_stft = torch.cat([s_stft_real, s_stft_imag], dim=1)
@@ -543,7 +562,7 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
             x = self.conv_post(x)
             # Return here without exp, sin, istft, clamp
             return x
-        
+
         pt_model.model.hift._orig_forward = pt_model.model.hift.forward
         pt_model.model.hift.forward = types.MethodType(forward_wrap_hift_no_istft, pt_model.model.hift)
         ov_model = ov.convert_model(pt_model.model.hift, example_input=torch.ones([1, 80, 488], dtype=torch.float32))
@@ -561,8 +580,7 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
         patch_cos_sin_cached_fp32(pt_model.model.llm.llm)
         if hasattr(pt_model.model.llm.llm, "model"):
             patch_cos_sin_cached_fp32(pt_model.model.llm.llm.model)
-            
-            
+
         def forward_wrap(
             self,
             attention_mask,
@@ -585,14 +603,17 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
             new_cache = outs.past_key_values
             logp = self.llm_decoder(xs[:, -1])
             return (logp, new_cache.to_legacy_cache())
-        
 
         pt_model.model.llm._orig_forward = pt_model.model.llm.forward
         pt_model.model.llm.forward = types.MethodType(forward_wrap, pt_model.model.llm)
-        
+
         num_pkv = pt_model.model.llm.llm.model.config.num_hidden_layers
         hidden_size = pt_model.model.llm.llm.model.config.hidden_size
-        head_dim = pt_model.model.llm.llm.model.config.head_dim if hasattr(pt_model.model.llm.llm.model.config, 'head_dim') else (hidden_size // pt_model.model.llm.llm.model.config.num_attention_heads)
+        head_dim = (
+            pt_model.model.llm.llm.model.config.head_dim
+            if hasattr(pt_model.model.llm.llm.model.config, "head_dim")
+            else (hidden_size // pt_model.model.llm.llm.model.config.num_attention_heads)
+        )
         pkv_shape = (
             2,
             pt_model.model.llm.llm.model.config.num_key_value_heads,
@@ -603,7 +624,7 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
         inputs_embeds = torch.randn((2, 2, hidden_size))
         attention_mask = torch.ones([2, 4], dtype=torch.int64)
         position_ids = torch.arange(2).unsqueeze(0).expand(2, -1)
-        
+
         input_names = ["attention_mask", "position_ids"]
         output_names = ["logits"]
         past_key_values = []
@@ -621,8 +642,8 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
         }
 
         input_shapes = [
-            ov.PartialShape([-1, -1]),          # attention_mask
-            ov.PartialShape([-1, -1]),          # position_ids (2D for code predictor)
+            ov.PartialShape([-1, -1]),  # attention_mask
+            ov.PartialShape([-1, -1]),  # position_ids (2D for code predictor)
         ]
         input_shapes += (
             [
@@ -663,7 +684,7 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
     # Copy dependency files from original model directory
     model_id_path = Path(model_id)
     print("⌛ Copying dependency files...")
-    
+
     # Copy individual files
     for dep_file in DEPENDENCY_FILES:
         src_path = model_id_path / dep_file
@@ -671,18 +692,18 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
         if src_path.exists() and not dst_path.exists():
             print(f"  Copying {dep_file}...")
             shutil.copy2(src_path, dst_path)
-    
+
     # Copy directories (exclude .safetensors files)
     def ignore_safetensors(dir, files):
-        return [f for f in files if f.endswith('.safetensors')]
-    
+        return [f for f in files if f.endswith(".safetensors")]
+
     for dep_dir in DEPENDENCY_DIRS:
         src_dir = model_id_path / dep_dir
         dst_dir = model_path / dep_dir
         if src_dir.exists() and not dst_dir.exists():
             print(f"  Copying directory {dep_dir} (excluding .safetensors files)...")
             shutil.copytree(src_dir, dst_dir, ignore=ignore_safetensors)
-    
+
     print("✅ Dependency files copied")
 
     del pt_model
@@ -690,18 +711,19 @@ def convert_cosyvoice(model_id, model_path=None, quantization_config=None):
     print(f"✅ {model_id} model conversion finished. You can find results in {model_path}")
     return model_path
 
-class OVCosyVoice3LM():
+
+class OVCosyVoice3LM:
     def __init__(
-            self,
-            model_path: str,
-            device: str = "CPU",
-            speech_token_size: int = 6561,
-            llm_input_size: int = 896,
-            npu_ov_config: dict = None,
+        self,
+        model_path: str,
+        device: str = "CPU",
+        speech_token_size: int = 6561,
+        llm_input_size: int = 896,
+        npu_ov_config: dict = None,
     ):
         """
         Initialize OVCosyVoice3LM with OpenVINO models.
-        
+
         Args:
             model_path: Path to the directory containing converted OpenVINO models
             device: OpenVINO device (CPU, GPU, etc.)
@@ -712,76 +734,70 @@ class OVCosyVoice3LM():
         self.ov_device = device
         self.speech_token_size = speech_token_size
         self.llm_input_size = llm_input_size
-        
+
         # Token IDs (same as CosyVoice3LM)
         self.sos = speech_token_size + 0
         self.eos_token = speech_token_size + 1
         self.task_id = speech_token_size + 2
         self.fill_token = speech_token_size + 3
-        
+
         # Load OpenVINO models
         print("⌛ Loading OpenVINO models...")
-        
+
         # Text embeddings model
-        self.text_embeddings = core.compile_model(
-            self.model_path / TEXT_EMBEDDINGS_PATH, device if device != "NPU" else "GPU"
-        )
+        self.text_embeddings = core.compile_model(self.model_path / TEXT_EMBEDDINGS_PATH, device if device != "NPU" else "GPU")
         print(f"✅ Text embeddings model loaded")
-        
+
         # Speech embeddings model
-        self.speech_embeddings = core.compile_model(
-            self.model_path / SPEECH_EMBEDDINGS_PATH, device if device != "NPU" else "GPU"
-        )
+        self.speech_embeddings = core.compile_model(self.model_path / SPEECH_EMBEDDINGS_PATH, device if device != "NPU" else "GPU")
         print(f"✅ Speech embeddings model loaded")
-        
+
         # LLM model (stateful)
-        self.llm = core.compile_model(
-            self.model_path / LANGUAGE_PATH, device, npu_ov_config if device == "NPU" else {}
-        )
+        self.llm = core.compile_model(self.model_path / LANGUAGE_PATH, device, npu_ov_config if device == "NPU" else {})
         self.llm_request = self.llm.create_infer_request()
         print(f"✅ LLM model loaded")
-        
+
         # Stop token IDs for generation (same as CosyVoice3LM)
         self.stop_token_ids = [speech_token_size + i for i in range(200)]
-        
+
     def embed_text(self, text_tokens: torch.Tensor) -> torch.Tensor:
         """Embed text tokens using OpenVINO model."""
         result = self.text_embeddings(text_tokens.numpy() if isinstance(text_tokens, torch.Tensor) else text_tokens)
         return torch.from_numpy(result[0])
-    
+
     def embed_speech(self, speech_tokens: torch.Tensor) -> torch.Tensor:
         """Embed speech tokens using OpenVINO model."""
         result = self.speech_embeddings(speech_tokens.numpy() if isinstance(speech_tokens, torch.Tensor) else speech_tokens)
         return torch.from_numpy(result[0])
-    
+
     def get_sos_emb(self) -> torch.Tensor:
         """Get SOS embedding."""
         sos_token = torch.tensor([[self.sos]], dtype=torch.int32)
         return self.embed_speech(sos_token)
-    
+
     def get_task_id_emb(self) -> torch.Tensor:
         """Get task ID embedding."""
         task_id_token = torch.tensor([[self.task_id]], dtype=torch.int32)
         return self.embed_speech(task_id_token)
-    
+
     def reset_state(self):
         """Reset LLM state for new generation."""
         self.llm_request.reset_state()
-    
+
     def forward_one_step(
-            self,
-            inputs_embeds: torch.Tensor,
-            attention_mask: torch.Tensor,
-            position_ids: torch.Tensor,
+        self,
+        inputs_embeds: torch.Tensor,
+        attention_mask: torch.Tensor,
+        position_ids: torch.Tensor,
     ) -> torch.Tensor:
         """
         Run one step of LLM inference.
-        
+
         Args:
             inputs_embeds: Input embeddings (batch, seq_len, hidden_size)
             attention_mask: Attention mask (batch, total_seq) - 2D mask for NPU
             position_ids: Position IDs (batch, seq_len)
-            
+
         Returns:
             logits: Output logits for next token prediction
         """
@@ -790,22 +806,22 @@ class OVCosyVoice3LM():
             "attention_mask": attention_mask.numpy() if isinstance(attention_mask, torch.Tensor) else attention_mask,
             "position_ids": position_ids.numpy() if isinstance(position_ids, torch.Tensor) else position_ids,
         }
-        
+
         # Add beam_idx for stateful model
         batch_size = inputs_embeds.shape[0]
         if "beam_idx" in [inp.get_any_name() for inp in self.llm.inputs]:
             inputs["beam_idx"] = np.arange(batch_size, dtype=np.int32)
-        
+
         self.llm_request.infer(inputs)
         logits = torch.from_numpy(self.llm_request.get_tensor("logits").data.copy())
         return logits
 
     def sampling_ids(
-            self,
-            weighted_scores: torch.Tensor,
-            decoded_tokens: list,
-            sampling: int,
-            ignore_eos: bool = True,
+        self,
+        weighted_scores: torch.Tensor,
+        decoded_tokens: list,
+        sampling: int,
+        ignore_eos: bool = True,
     ):
         """Sample token IDs from logits (same as original CosyVoice3LM)."""
         while True:
@@ -817,27 +833,27 @@ class OVCosyVoice3LM():
 
     @torch.inference_mode()
     def inference(
-            self,
-            text: torch.Tensor,
-            text_len: torch.Tensor,
-            prompt_text: torch.Tensor,
-            prompt_text_len: torch.Tensor,
-            prompt_speech_token: torch.Tensor,
-            prompt_speech_token_len: torch.Tensor,
-            embedding: torch.Tensor,
-            sampling: int = 25,
-            max_token_text_ratio: float = 20,
-            min_token_text_ratio: float = 2,
-            uuid: str = '',
+        self,
+        text: torch.Tensor,
+        text_len: torch.Tensor,
+        prompt_text: torch.Tensor,
+        prompt_text_len: torch.Tensor,
+        prompt_speech_token: torch.Tensor,
+        prompt_speech_token_len: torch.Tensor,
+        embedding: torch.Tensor,
+        sampling: int = 25,
+        max_token_text_ratio: float = 20,
+        min_token_text_ratio: float = 2,
+        uuid: str = "",
     ):
         """
         Inference method matching CosyVoice3LM interface.
-        
+
         Args:
             text: Input text tokens (batch, seq_len)
             text_len: Length of text tokens
             prompt_text: Prompt text tokens
-            prompt_text_len: Length of prompt text tokens  
+            prompt_text_len: Length of prompt text tokens
             prompt_speech_token: Prompt speech tokens
             prompt_speech_token_len: Length of prompt speech tokens
             embedding: Speaker embedding (not used in OpenVINO version)
@@ -845,27 +861,27 @@ class OVCosyVoice3LM():
             max_token_text_ratio: Maximum ratio of generated tokens to text tokens
             min_token_text_ratio: Minimum ratio of generated tokens to text tokens
             uuid: Unique identifier for this generation
-            
+
         Yields:
             Generated speech tokens one by one
         """
         # Concatenate prompt_text and text
         text = torch.concat([prompt_text, text], dim=1)
         text_len = text_len + prompt_text_len
-        
+
         # Embed text tokens using OpenVINO model
         text_emb = self.embed_text(text.to(torch.int32))
 
         # Get special token embeddings
         sos_emb = self.get_sos_emb()
         task_id_emb = self.get_task_id_emb()
-        
+
         # Embed prompt speech tokens if provided
         if prompt_speech_token_len != 0:
             prompt_speech_token_emb = self.embed_speech(prompt_speech_token.to(torch.int32))
         else:
             prompt_speech_token_emb = torch.zeros(1, 0, self.llm_input_size, dtype=text_emb.dtype)
-        
+
         # Concatenate all inputs: [sos, text, task_id, prompt_speech]
         lm_input = torch.concat([sos_emb, text_emb, task_id_emb, prompt_speech_token_emb], dim=1)
 
@@ -877,27 +893,27 @@ class OVCosyVoice3LM():
             yield token
 
     @torch.inference_mode()
-    def inference_wrapper(self, lm_input: torch.Tensor, sampling: int, min_len: int, max_len: int, uuid: str = ''):
+    def inference_wrapper(self, lm_input: torch.Tensor, sampling: int, min_len: int, max_len: int, uuid: str = ""):
         """
         Wrapper for autoregressive generation using OpenVINO.
-        
+
         Args:
             lm_input: Initial input embeddings (batch, seq_len, hidden_size)
             sampling: Sampling parameter for token selection
             min_len: Minimum number of tokens to generate
             max_len: Maximum number of tokens to generate
             uuid: Unique identifier for this generation
-            
+
         Yields:
             Generated speech tokens one by one
         """
         # Reset state for new generation
         self.reset_state()
-        
+
         out_tokens = []
         seq_len = lm_input.shape[1]
         current_pos = 0  # Track current position for position_ids
-        
+
         for i in range(max_len):
             # Create attention mask and position_ids for current step
             # For NPU stateful model:
@@ -916,55 +932,54 @@ class OVCosyVoice3LM():
                 attention_mask = torch.ones((1, total_seq), dtype=torch.int64)
                 position_ids = torch.tensor([[current_pos]], dtype=torch.int64)
                 current_pos += 1
-            
+
             # Run one step of LLM
             logits = self.forward_one_step(lm_input, attention_mask, position_ids)
-            
+
             # Get log probabilities and sample
             # Check for NaN/Inf in logits
             if torch.isnan(logits).any() or torch.isinf(logits).any():
                 print(f"Warning: NaN or Inf in logits at step {i}")
                 break
-                
+
             logp = logits.log_softmax(dim=-1)
 
             top_ids = self.sampling_ids(logp.squeeze(dim=0).exp(), out_tokens, sampling, ignore_eos=True if i < min_len else False)
 
-            # print(f"top_ids: {top_ids}")
-
             # Check for stop tokens
             if top_ids in self.stop_token_ids:
                 break
-            
+
             # Yield token in stream mode
             yield top_ids
             out_tokens.append(top_ids)
-            
+
             # Prepare next input: embed the generated token
             next_token = torch.tensor([[top_ids]], dtype=torch.int32)
             lm_input = self.embed_speech(next_token)
-            # print(f"lm_input: {lm_input}")
 
 
 class OVCosyVoiceFrontEnd:
     """
     OpenVINO-based CosyVoice FrontEnd for text and speech preprocessing.
-    
+
     Uses OpenVINO for ONNX model inference (campplus, speech_tokenizer)
     instead of ONNX Runtime.
     """
 
-    def __init__(self,
-                 get_tokenizer: Callable,
-                 feat_extractor: Callable,
-                 campplus_model: str,
-                 speech_tokenizer_model: str,
-                 spk2info: str = '',
-                 allowed_special: str = 'all',
-                 device: str = 'CPU'):
+    def __init__(
+        self,
+        get_tokenizer: Callable,
+        feat_extractor: Callable,
+        campplus_model: str,
+        speech_tokenizer_model: str,
+        spk2info: str = "",
+        allowed_special: str = "all",
+        device: str = "CPU",
+    ):
         """
         Initialize OVCosyVoiceFrontEnd.
-        
+
         Args:
             get_tokenizer: Function to get the text tokenizer
             feat_extractor: Feature extractor for speech
@@ -977,53 +992,54 @@ class OVCosyVoiceFrontEnd:
         import whisper
         import torchaudio.compliance.kaldi as kaldi
         from cosyvoice.utils.file_utils import logging, load_wav
-        
+
         self.tokenizer = get_tokenizer()
         self.feat_extractor = feat_extractor
-        self.torch_device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.torch_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.ov_device = device
-        
+
         # Store utilities for later use
         self.whisper = whisper
         self.kaldi = kaldi
         self.load_wav = load_wav
         self.logging = logging
-        
+
         # Load campplus model with OpenVINO (directly from ONNX)
         print(f"⌛ Loading OpenVINO campplus model from {campplus_model}...")
         self.campplus_model = core.compile_model(campplus_model, device)
         self.campplus_input_name = self.campplus_model.inputs[0].get_any_name()
         print(f"✅ Campplus model loaded")
-        
+
         # Load speech tokenizer model with OpenVINO (directly from ONNX)
         print(f"⌛ Loading OpenVINO speech tokenizer model from {speech_tokenizer_model}...")
         self.speech_tokenizer_model = core.compile_model(speech_tokenizer_model, device)
         # Get input names for speech tokenizer
         self.speech_tokenizer_input_names = [inp.get_any_name() for inp in self.speech_tokenizer_model.inputs]
         print(f"✅ Speech tokenizer model loaded")
-        
+
         # Load speaker info
         if os.path.exists(spk2info):
             self.spk2info = torch.load(spk2info, map_location=self.torch_device)
         else:
             self.spk2info = {}
-        
+
         self.allowed_special = allowed_special
-        
+
         # Text normalization setup
         try:
             import ttsfrd
+
             self.use_ttsfrd = True
             self.frd = ttsfrd.TtsFrontendEngine()
             ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-            assert self.frd.initialize('{}/../../pretrained_models/CosyVoice-ttsfrd/resource'.format(ROOT_DIR)) is True, \
-                'failed to initialize ttsfrd resource'
-            self.frd.set_lang_type('pinyinvg')
+            assert self.frd.initialize("{}/../../pretrained_models/CosyVoice-ttsfrd/resource".format(ROOT_DIR)) is True, "failed to initialize ttsfrd resource"
+            self.frd.set_lang_type("pinyinvg")
         except ImportError:
             print("failed to import ttsfrd, use wetext instead")
             from wetext import Normalizer as ZhNormalizer
             from wetext import Normalizer as EnNormalizer
             import inflect
+
             self.use_ttsfrd = False
             self.zh_tn_model = ZhNormalizer(remove_erhua=False)
             self.en_tn_model = EnNormalizer()
@@ -1032,7 +1048,7 @@ class OVCosyVoiceFrontEnd:
     def _extract_text_token(self, text):
         """Extract text tokens using the tokenizer."""
         if isinstance(text, Generator):
-            self.logging.info('get tts_text generator, will return _extract_text_token_generator!')
+            self.logging.info("get tts_text generator, will return _extract_text_token_generator!")
             return self._extract_text_token_generator(text), torch.tensor([0], dtype=torch.int32).to(self.torch_device)
         else:
             text_token = self.tokenizer.encode(text, allowed_special=self.allowed_special)
@@ -1045,28 +1061,25 @@ class OVCosyVoiceFrontEnd:
         for text in text_generator:
             text_token, _ = self._extract_text_token(text)
             for i in range(text_token.shape[1]):
-                yield text_token[:, i: i + 1]
+                yield text_token[:, i : i + 1]
 
     def _extract_speech_token(self, prompt_wav):
         """Extract speech tokens using OpenVINO speech tokenizer."""
         speech = self.load_wav(prompt_wav, 16000)
-        assert speech.shape[1] / 16000 <= 30, 'do not support extract speech token for audio longer than 30s'
-        
+        assert speech.shape[1] / 16000 <= 30, "do not support extract speech token for audio longer than 30s"
+
         # Get mel spectrogram using whisper
         feat = self.whisper.log_mel_spectrogram(speech, n_mels=128)
-        
+
         # Prepare inputs for OpenVINO
         feat_np = feat.detach().cpu().numpy()
         feat_len_np = np.array([feat.shape[2]], dtype=np.int32)
-        
+
         # Run OpenVINO inference
-        inputs = {
-            self.speech_tokenizer_input_names[0]: feat_np,
-            self.speech_tokenizer_input_names[1]: feat_len_np
-        }
+        inputs = {self.speech_tokenizer_input_names[0]: feat_np, self.speech_tokenizer_input_names[1]: feat_len_np}
         result = self.speech_tokenizer_model(inputs)
         speech_token = result[0].flatten().tolist()
-        
+
         speech_token = torch.tensor([speech_token], dtype=torch.int32).to(self.torch_device)
         speech_token_len = torch.tensor([speech_token.shape[1]], dtype=torch.int32).to(self.torch_device)
         return speech_token, speech_token_len
@@ -1074,21 +1087,18 @@ class OVCosyVoiceFrontEnd:
     def _extract_spk_embedding(self, prompt_wav):
         """Extract speaker embedding using OpenVINO campplus model."""
         speech = self.load_wav(prompt_wav, 16000)
-        
+
         # Extract fbank features
-        feat = self.kaldi.fbank(speech,
-                                num_mel_bins=80,
-                                dither=0,
-                                sample_frequency=16000)
+        feat = self.kaldi.fbank(speech, num_mel_bins=80, dither=0, sample_frequency=16000)
         feat = feat - feat.mean(dim=0, keepdim=True)
-        
+
         # Prepare input for OpenVINO
         feat_np = feat.unsqueeze(dim=0).cpu().numpy()
-        
+
         # Run OpenVINO inference
         result = self.campplus_model({self.campplus_input_name: feat_np})
         embedding = result[0].flatten().tolist()
-        
+
         embedding = torch.tensor([embedding]).to(self.torch_device)
         return embedding
 
@@ -1103,22 +1113,30 @@ class OVCosyVoiceFrontEnd:
     def text_normalize(self, text, split=True, text_frontend=True):
         """Normalize text for TTS."""
         from functools import partial
-        from cosyvoice.utils.frontend_utils import contains_chinese, replace_blank, replace_corner_mark, remove_bracket, spell_out_number, split_paragraph, is_only_punctuation
-        
+        from cosyvoice.utils.frontend_utils import (
+            contains_chinese,
+            replace_blank,
+            replace_corner_mark,
+            remove_bracket,
+            spell_out_number,
+            split_paragraph,
+            is_only_punctuation,
+        )
+
         if isinstance(text, Generator):
-            self.logging.info('get tts_text generator, will skip text_normalize!')
+            self.logging.info("get tts_text generator, will skip text_normalize!")
             return [text]
-        
+
         # Skip text_frontend when ssml symbol in text
-        if '<|' in text and '|>' in text:
+        if "<|" in text and "|>" in text:
             text_frontend = False
-        if text_frontend is False or text == '':
+        if text_frontend is False or text == "":
             return [text] if split is True else text
-        
+
         text = text.strip()
         if self.use_ttsfrd:
             texts = [i["text"] for i in json.loads(self.frd.do_voicegen_frd(text))["sentences"]]
-            text = ''.join(texts)
+            text = "".join(texts)
         else:
             if contains_chinese(text):
                 text = self.zh_tn_model.normalize(text)
@@ -1128,74 +1146,99 @@ class OVCosyVoiceFrontEnd:
                 text = text.replace(".", "。")
                 text = text.replace(" - ", "，")
                 text = remove_bracket(text)
-                text = re.sub(r'[，,、]+$', '。', text)
-                texts = list(split_paragraph(text, partial(self.tokenizer.encode, allowed_special=self.allowed_special), "zh", token_max_n=80,
-                                             token_min_n=60, merge_len=20, comma_split=False))
+                text = re.sub(r"[，,、]+$", "。", text)
+                texts = list(
+                    split_paragraph(
+                        text,
+                        partial(self.tokenizer.encode, allowed_special=self.allowed_special),
+                        "zh",
+                        token_max_n=80,
+                        token_min_n=60,
+                        merge_len=20,
+                        comma_split=False,
+                    )
+                )
             else:
                 text = self.en_tn_model.normalize(text)
                 text = spell_out_number(text, self.inflect_parser)
-                texts = list(split_paragraph(text, partial(self.tokenizer.encode, allowed_special=self.allowed_special), "en", token_max_n=80,
-                                             token_min_n=60, merge_len=20, comma_split=False))
-        
+                texts = list(
+                    split_paragraph(
+                        text,
+                        partial(self.tokenizer.encode, allowed_special=self.allowed_special),
+                        "en",
+                        token_max_n=80,
+                        token_min_n=60,
+                        merge_len=20,
+                        comma_split=False,
+                    )
+                )
+
         texts = [i for i in texts if not is_only_punctuation(i)]
         return texts if split is True else text
 
     def frontend_sft(self, tts_text, spk_id):
         """Prepare model input for SFT inference."""
         tts_text_token, tts_text_token_len = self._extract_text_token(tts_text)
-        embedding = self.spk2info[spk_id]['embedding']
-        model_input = {'text': tts_text_token, 'text_len': tts_text_token_len, 'llm_embedding': embedding, 'flow_embedding': embedding}
+        embedding = self.spk2info[spk_id]["embedding"]
+        model_input = {"text": tts_text_token, "text_len": tts_text_token_len, "llm_embedding": embedding, "flow_embedding": embedding}
         return model_input
 
     def frontend_zero_shot(self, tts_text, prompt_text, prompt_wav, resample_rate, zero_shot_spk_id):
         """Prepare model input for zero-shot inference."""
         tts_text_token, tts_text_token_len = self._extract_text_token(tts_text)
-        if zero_shot_spk_id == '':
+        if zero_shot_spk_id == "":
             prompt_text_token, prompt_text_token_len = self._extract_text_token(prompt_text)
             speech_feat, speech_feat_len = self._extract_speech_feat(prompt_wav)
             speech_token, speech_token_len = self._extract_speech_token(prompt_wav)
             if resample_rate == 24000:
                 # cosyvoice2/3, force speech_feat % speech_token = 2
                 token_len = min(int(speech_feat.shape[1] / 2), speech_token.shape[1])
-                speech_feat, speech_feat_len[:] = speech_feat[:, :2 * token_len], 2 * token_len
+                speech_feat, speech_feat_len[:] = speech_feat[:, : 2 * token_len], 2 * token_len
                 speech_token, speech_token_len[:] = speech_token[:, :token_len], token_len
             embedding = self._extract_spk_embedding(prompt_wav)
-            model_input = {'prompt_text': prompt_text_token, 'prompt_text_len': prompt_text_token_len,
-                           'llm_prompt_speech_token': speech_token, 'llm_prompt_speech_token_len': speech_token_len,
-                           'flow_prompt_speech_token': speech_token, 'flow_prompt_speech_token_len': speech_token_len,
-                           'prompt_speech_feat': speech_feat, 'prompt_speech_feat_len': speech_feat_len,
-                           'llm_embedding': embedding, 'flow_embedding': embedding}
+            model_input = {
+                "prompt_text": prompt_text_token,
+                "prompt_text_len": prompt_text_token_len,
+                "llm_prompt_speech_token": speech_token,
+                "llm_prompt_speech_token_len": speech_token_len,
+                "flow_prompt_speech_token": speech_token,
+                "flow_prompt_speech_token_len": speech_token_len,
+                "prompt_speech_feat": speech_feat,
+                "prompt_speech_feat_len": speech_feat_len,
+                "llm_embedding": embedding,
+                "flow_embedding": embedding,
+            }
         else:
             model_input = self.spk2info[zero_shot_spk_id]
-        model_input['text'] = tts_text_token
-        model_input['text_len'] = tts_text_token_len
+        model_input["text"] = tts_text_token
+        model_input["text_len"] = tts_text_token_len
         return model_input
 
     def frontend_cross_lingual(self, tts_text, prompt_wav, resample_rate, zero_shot_spk_id):
         """Prepare model input for cross-lingual inference."""
-        model_input = self.frontend_zero_shot(tts_text, '', prompt_wav, resample_rate, zero_shot_spk_id)
+        model_input = self.frontend_zero_shot(tts_text, "", prompt_wav, resample_rate, zero_shot_spk_id)
         # in cross lingual mode, we remove prompt in llm
-        del model_input['prompt_text']
-        del model_input['prompt_text_len']
-        del model_input['llm_prompt_speech_token']
-        del model_input['llm_prompt_speech_token_len']
+        del model_input["prompt_text"]
+        del model_input["prompt_text_len"]
+        del model_input["llm_prompt_speech_token"]
+        del model_input["llm_prompt_speech_token_len"]
         return model_input
 
     def frontend_instruct(self, tts_text, spk_id, instruct_text):
         """Prepare model input for instruct inference."""
         model_input = self.frontend_sft(tts_text, spk_id)
         # in instruct mode, we remove spk_embedding in llm due to information leakage
-        del model_input['llm_embedding']
+        del model_input["llm_embedding"]
         instruct_text_token, instruct_text_token_len = self._extract_text_token(instruct_text)
-        model_input['prompt_text'] = instruct_text_token
-        model_input['prompt_text_len'] = instruct_text_token_len
+        model_input["prompt_text"] = instruct_text_token
+        model_input["prompt_text_len"] = instruct_text_token_len
         return model_input
 
     def frontend_instruct2(self, tts_text, instruct_text, prompt_wav, resample_rate, zero_shot_spk_id):
         """Prepare model input for instruct2 inference."""
         model_input = self.frontend_zero_shot(tts_text, instruct_text, prompt_wav, resample_rate, zero_shot_spk_id)
-        del model_input['llm_prompt_speech_token']
-        del model_input['llm_prompt_speech_token_len']
+        del model_input["llm_prompt_speech_token"]
+        del model_input["llm_prompt_speech_token_len"]
         return model_input
 
     def frontend_vc(self, source_speech_16k, prompt_wav, resample_rate):
@@ -1204,29 +1247,41 @@ class OVCosyVoiceFrontEnd:
         prompt_speech_feat, prompt_speech_feat_len = self._extract_speech_feat(prompt_wav)
         embedding = self._extract_spk_embedding(prompt_wav)
         source_speech_token, source_speech_token_len = self._extract_speech_token(source_speech_16k)
-        model_input = {'source_speech_token': source_speech_token, 'source_speech_token_len': source_speech_token_len,
-                       'flow_prompt_speech_token': prompt_speech_token, 'flow_prompt_speech_token_len': prompt_speech_token_len,
-                       'prompt_speech_feat': prompt_speech_feat, 'prompt_speech_feat_len': prompt_speech_feat_len,
-                       'flow_embedding': embedding}
+        model_input = {
+            "source_speech_token": source_speech_token,
+            "source_speech_token_len": source_speech_token_len,
+            "flow_prompt_speech_token": prompt_speech_token,
+            "flow_prompt_speech_token_len": prompt_speech_token_len,
+            "prompt_speech_feat": prompt_speech_feat,
+            "prompt_speech_feat_len": prompt_speech_feat_len,
+            "flow_embedding": embedding,
+        }
         return model_input
 
 
-class OVFlow():
+class OVFlow:
     """
     OpenVINO-based Flow model for mel spectrogram generation.
-    
+
     Uses two OpenVINO models:
     - flow_embeddings: Processes token embedding and pre_lookahead_layer
     - flow_estimator: DiT model for flow matching denoising
     """
-    
-    def __init__(self, model_dir: str, device: str = "CPU", 
-                 token_mel_ratio: int = 2, pre_lookahead_len: int = 3,
-                 output_size: int = 80, n_timesteps: int = 10,
-                 sigma_min: float = 1e-6, inference_cfg_rate: float = 0.7):
+
+    def __init__(
+        self,
+        model_dir: str,
+        device: str = "CPU",
+        token_mel_ratio: int = 2,
+        pre_lookahead_len: int = 3,
+        output_size: int = 80,
+        n_timesteps: int = 10,
+        sigma_min: float = 1e-6,
+        inference_cfg_rate: float = 0.7,
+    ):
         """
         Initialize OVFlow with OpenVINO models.
-        
+
         Args:
             model_dir: Path to the directory containing OpenVINO flow models
             device: OpenVINO device (CPU, GPU, etc.)
@@ -1239,7 +1294,7 @@ class OVFlow():
         """
         self.model_dir = Path(model_dir)
         self.ov_device = device
-        
+
         # Flow parameters
         self.token_mel_ratio = token_mel_ratio
         self.pre_lookahead_len = pre_lookahead_len
@@ -1247,38 +1302,38 @@ class OVFlow():
         self.n_timesteps = n_timesteps
         self.sigma_min = sigma_min
         self.inference_cfg_rate = inference_cfg_rate
-        
+
         # Load OpenVINO flow embeddings model
         flow_emb_path = self.model_dir / FLOW_EMBEDDINGS_PATH
         print(f"⌛ Loading OpenVINO Flow embeddings model from {flow_emb_path}...")
         self.flow_embeddings = core.compile_model(str(flow_emb_path), "CPU")
         print(f"✅ Flow embeddings model loaded")
-        
+
         # Load OpenVINO flow estimator model (DiT)
         flow_est_path = self.model_dir / FLOW_ESTIMATOR_PATH
         print(f"⌛ Loading OpenVINO Flow estimator model from {flow_est_path}...")
         self.flow_estimator = core.compile_model(str(flow_est_path), device)
         print(f"✅ Flow estimator model loaded")
-        
+
         # Pre-generate random noise for deterministic inference
         self._init_rand_noise()
-    
+
     def _init_rand_noise(self, max_len: int = 50 * 300):
         """Initialize random noise buffer for deterministic inference."""
         torch.manual_seed(0)
         self.rand_noise = torch.randn([1, self.output_size, max_len])
-    
+
     def _run_flow_embeddings(self, token, token_len, prompt_token, prompt_token_len, embedding):
         """
         Run flow embeddings model to get hidden states.
-        
+
         Args:
             token: Speech tokens (batch, seq_len)
             token_len: Token lengths
             prompt_token: Prompt speech tokens
             prompt_token_len: Prompt token lengths
             embedding: Speaker embedding (batch, 192)
-            
+
         Returns:
             h: Hidden states from pre_lookahead_layer (batch, seq_len, hidden_size)
             spks: Projected speaker embedding (batch, 80)
@@ -1294,11 +1349,11 @@ class OVFlow():
         h = torch.from_numpy(result[0].copy())
         spks = torch.from_numpy(result[1].copy())
         return h, spks
-    
+
     def _run_flow_estimator(self, x, mask, mu, t, spks, cond):
         """
         Run flow estimator (DiT) model for one denoising step.
-        
+
         Args:
             x: Noised input (batch, 80, mel_len)
             mask: Output mask (batch, 1, mel_len)
@@ -1306,7 +1361,7 @@ class OVFlow():
             t: Timestep (batch,)
             spks: Speaker embedding (batch, 80)
             cond: Conditioning (batch, 80, mel_len)
-            
+
         Returns:
             Estimated velocity field (batch, 80, mel_len)
         """
@@ -1320,39 +1375,39 @@ class OVFlow():
         }
         result = self.flow_estimator(inputs)
         return torch.from_numpy(result[0].copy())
-    
+
     def _solve_euler(self, z, t_span, mu, mask, spks, cond):
         """
         Euler ODE solver for flow matching.
-        
+
         Args:
             z: Initial noise (batch, 80, mel_len)
             t_span: Time steps (n_timesteps + 1,)
-            mu: Encoder output (batch, 80, mel_len) 
+            mu: Encoder output (batch, 80, mel_len)
             mask: Output mask (batch, 1, mel_len)
             spks: Speaker embedding (batch, 80)
             cond: Conditioning (batch, 80, mel_len)
-            
+
         Returns:
             Final sample (batch, 80, mel_len)
         """
         x = z
         t, dt = t_span[0], t_span[1] - t_span[0]
-        
+
         # Prepare batched inputs for CFG (classifier-free guidance)
         # Batch size 2: [with_condition, without_condition]
         batch_size = x.shape[0]
         mel_len = x.shape[2]
         dtype = spks.dtype
         device = x.device
-        
+
         x_in = torch.zeros([2, self.output_size, mel_len], device=device, dtype=dtype)
         mask_in = torch.zeros([2, 1, mel_len], device=device, dtype=dtype)
         mu_in = torch.zeros([2, self.output_size, mel_len], device=device, dtype=dtype)
         t_in = torch.zeros([2], device=device, dtype=dtype)
         spks_in = torch.zeros([2, self.output_size], device=device, dtype=dtype)
         cond_in = torch.zeros([2, self.output_size, mel_len], device=device, dtype=dtype)
-        
+
         for step in range(1, len(t_span)):
             # Fill in batched inputs for CFG
             x_in[:] = x
@@ -1364,31 +1419,30 @@ class OVFlow():
             spks_in[1] = 0  # No speaker for CFG
             cond_in[0] = cond
             cond_in[1] = 0  # No cond for CFG
-            
+
             # Run estimator
             dphi_dt = self._run_flow_estimator(x_in, mask_in, mu_in, t_in, spks_in, cond_in)
-            
+
             # Apply classifier-free guidance
             dphi_dt_cond, dphi_dt_uncond = dphi_dt[0:1], dphi_dt[1:2]
             dphi_dt = (1.0 + self.inference_cfg_rate) * dphi_dt_cond - self.inference_cfg_rate * dphi_dt_uncond
-            
+
             # Euler step
             x = x + dt * dphi_dt
             t = t + dt
-            
+
             if step < len(t_span) - 1:
                 dt = t_span[step + 1] - t
-        
+
         return x.float()
-    
-    def inference(self, token, token_len, prompt_token, prompt_token_len, 
-                  prompt_feat, prompt_feat_len, embedding, streaming=False, finalize=True):
+
+    def inference(self, token, token_len, prompt_token, prompt_token_len, prompt_feat, prompt_feat_len, embedding, streaming=False, finalize=True):
         """
         Run flow inference using OpenVINO.
-        
+
         Args:
             token: Speech tokens (batch, seq_len)
-            token_len: Token lengths  
+            token_len: Token lengths
             prompt_token: Prompt speech tokens
             prompt_token_len: Prompt token lengths
             prompt_feat: Prompt mel features (batch, seq_len, 80)
@@ -1396,7 +1450,7 @@ class OVFlow():
             embedding: Speaker embedding (batch, 192)
             streaming: Whether streaming mode (not used in OV version)
             finalize: Whether this is the final chunk (not used in OV version)
-            
+
         Returns:
             mel: Generated mel spectrogram (batch, 80, mel_len)
             None: Placeholder for cache
@@ -1404,59 +1458,55 @@ class OVFlow():
         # Step 1: Run flow embeddings to get hidden states and projected speaker embedding
         # This does: embedding normalization, token concat, input_embedding, pre_lookahead_layer
         h, spks = self._run_flow_embeddings(
-            token.to(torch.int32), 
-            token_len.to(torch.int32),
-            prompt_token.to(torch.int32), 
-            prompt_token_len.to(torch.int32),
-            embedding.to(torch.float32)
+            token.to(torch.int32), token_len.to(torch.int32), prompt_token.to(torch.int32), prompt_token_len.to(torch.int32), embedding.to(torch.float32)
         )
-        
+
         # Step 2: Repeat interleave for token_mel_ratio (2x upsampling)
         h = h.repeat_interleave(self.token_mel_ratio, dim=1)
-        
+
         # Calculate mel lengths
         mel_len1 = prompt_feat.shape[1]  # prompt mel length
         mel_len2 = h.shape[1] - mel_len1  # generated mel length
         total_mel_len = mel_len1 + mel_len2
-        
+
         # Step 3: Prepare conditions
         # conds: (batch, mel_len, 80) -> (batch, 80, mel_len)
         conds = torch.zeros([1, total_mel_len, self.output_size], device=h.device, dtype=h.dtype)
         conds[:, :mel_len1] = prompt_feat
         conds = conds.transpose(1, 2)  # (batch, 80, mel_len)
-        
+
         # Step 4: Prepare mask
         mask = torch.ones([1, 1, total_mel_len], dtype=h.dtype)
-        
+
         # Step 5: Prepare mu (encoder output)
         mu = h.transpose(1, 2).contiguous()  # (batch, 80, mel_len)
-        
+
         # Step 6: Speaker embedding is already projected by flow_embeddings (batch, 80)
         spks = spks.to(h.dtype)
-        
+
         # Step 7: Initialize noise
         z = self.rand_noise[:, :, :total_mel_len].to(h.device).to(h.dtype)
-        
+
         # Step 8: Create time span with cosine schedule
         t_span = torch.linspace(0, 1, self.n_timesteps + 1, dtype=h.dtype)
         t_span = 1 - torch.cos(t_span * 0.5 * torch.pi)  # Cosine schedule
-        
+
         # Step 9: Solve ODE with Euler method
         feat = self._solve_euler(z, t_span, mu, mask, spks, conds)
-        
+
         # Step 10: Return only the generated part (exclude prompt)
         feat = feat[:, :, mel_len1:]
-        
+
         return feat, None
 
 
-class OVHiFT():
+class OVHiFT:
     """OpenVINO-based HiFT vocoder for waveform generation."""
-    
+
     def __init__(self, model_path: str, device: str = "CPU", hift_input_len: int = 0):
         """
         Initialize OVHiFT with OpenVINO model.
-        
+
         Args:
             model_path: Path to the OpenVINO hift model (.xml)
             device: OpenVINO device (CPU, GPU, etc.)
@@ -1472,38 +1522,37 @@ class OVHiFT():
             model.reshape([1, 80, self.hift_input_len])
         self.hift = core.compile_model(model, device)
         print(f"✅ HiFT model loaded")
-        
+
         # ISTFT parameters (matching HiFTGenerator defaults)
         self.istft_params = {"n_fft": 16, "hop_len": 4}
         self.audio_limit = 0.99
         # Create hann window for istft
         from scipy.signal import get_window
-        self.stft_window = torch.from_numpy(
-            get_window("hann", self.istft_params["n_fft"], fftbins=True).astype(np.float32)
-        )
-    
+
+        self.stft_window = torch.from_numpy(get_window("hann", self.istft_params["n_fft"], fftbins=True).astype(np.float32))
+
     def _istft(self, magnitude: torch.Tensor, phase: torch.Tensor) -> torch.Tensor:
         """Inverse STFT to convert spectral features to waveform."""
         magnitude = torch.clip(magnitude, max=1e2)
         real = magnitude * torch.cos(phase)
         img = magnitude * torch.sin(phase)
         inverse_transform = torch.istft(
-            torch.complex(real, img), 
-            self.istft_params["n_fft"], 
+            torch.complex(real, img),
+            self.istft_params["n_fft"],
             self.istft_params["hop_len"],
-            self.istft_params["n_fft"], 
-            window=self.stft_window.to(magnitude.device)
+            self.istft_params["n_fft"],
+            window=self.stft_window.to(magnitude.device),
         )
         return inverse_transform
-    
+
     def inference(self, speech_feat, finalize=True):
         """
         Run HiFT inference using OpenVINO.
-        
+
         Args:
             speech_feat: Mel spectrogram (batch, 80, mel_len)
             finalize: Whether this is the final chunk (not used in OV version)
-            
+
         Returns:
             speech: Generated waveform (batch, samples)
             None: Placeholder for source
@@ -1513,7 +1562,7 @@ class OVHiFT():
             mel_input = speech_feat.cpu().numpy()
         else:
             mel_input = speech_feat
-        
+
         # Pad mel_input to fixed length on the third dimension for NPU optimization
         if self.hift_input_len > 0:
             target_len = self.hift_input_len
@@ -1521,25 +1570,24 @@ class OVHiFT():
             if original_len < target_len:
                 # Pad with zeros on the right
                 pad_len = target_len - original_len
-                mel_input = np.pad(mel_input, ((0, 0), (0, 0), (0, pad_len)), mode='constant', constant_values=0)
+                mel_input = np.pad(mel_input, ((0, 0), (0, 0), (0, pad_len)), mode="constant", constant_values=0)
             else:
                 mel_input = mel_input[:, :, :target_len]
                 original_len = target_len
-        
+
         # Run OpenVINO inference - output is (batch, n_fft+2, time)
-        print(f"HiFT mel_input shape: {mel_input.shape} (original: {original_len})")
-        
+
         result = self.hift(mel_input)
         x = torch.from_numpy(result[0].copy())
-        
+
         # Post-processing: exp, sin, istft, clamp (done in Python)
         n_fft = self.istft_params["n_fft"]
-        magnitude = torch.exp(x[:, :n_fft // 2 + 1, :])
-        phase = torch.sin(x[:, n_fft // 2 + 1:, :])  # sin is redundancy but kept for compatibility
-        
+        magnitude = torch.exp(x[:, : n_fft // 2 + 1, :])
+        phase = torch.sin(x[:, n_fft // 2 + 1 :, :])  # sin is redundancy but kept for compatibility
+
         speech = self._istft(magnitude, phase)
         speech = torch.clamp(speech, -self.audio_limit, self.audio_limit)
-        
+
         # Remove padding from output (restore original length)
         # HiFT upsamples mel by hop_size (480), so original_samples = original_len * 480
         if self.hift_input_len > 0:
@@ -1547,23 +1595,18 @@ class OVHiFT():
                 original_samples = original_len * 480  # hop_size from mel_spectrogram config
                 speech = speech[:, :original_samples]
             else:
-                speech = speech[:, :original_len * 480]
-        
+                speech = speech[:, : original_len * 480]
+
         return speech, None
 
 
-
-class OVCosyVoice3Model():
+class OVCosyVoice3Model:
     """
     OpenVINO-based CosyVoice3 Model for TTS inference.
     Uses OpenVINO models for LLM, Flow and HiFT.
     """
-    def __init__(self,
-                 llm: OVCosyVoice3LM,
-                 flow: OVFlow,
-                 hift: OVHiFT,
-                 token_mel_ratio: int = 2,
-                 pre_lookahead_len: int = 3):
+
+    def __init__(self, llm: OVCosyVoice3LM, flow: OVFlow, hift: OVHiFT, token_mel_ratio: int = 2, pre_lookahead_len: int = 3):
         self.llm = llm  # OVCosyVoice3LM instance
         self.flow = flow  # OVFlow instance
         self.hift = hift  # OVHiFT instance
@@ -1579,7 +1622,7 @@ class OVCosyVoice3Model():
         self.tts_speech_token_dict = {}
         self.llm_end_dict = {}
         self.hift_cache_dict = {}
-        
+
     def llm_job(self, text, prompt_text, llm_prompt_speech_token, llm_embedding, uuid):
         """Run LLM inference using OpenVINO model."""
         with self.llm_context:
@@ -1592,7 +1635,7 @@ class OVCosyVoice3Model():
                 prompt_speech_token=llm_prompt_speech_token,
                 prompt_speech_token_len=torch.tensor([llm_prompt_speech_token.shape[1]], dtype=torch.int32),
                 embedding=llm_embedding,
-                uuid=uuid
+                uuid=uuid,
             ):
                 self.tts_speech_token_dict[uuid].append(i)
         self.llm_end_dict[uuid] = True
@@ -1613,38 +1656,47 @@ class OVCosyVoice3Model():
             prompt_feat_len=torch.tensor([prompt_feat.shape[1]], dtype=torch.int32),
             embedding=embedding,
             streaming=stream,
-            finalize=finalize
+            finalize=finalize,
         )
-        
-        tts_mel = tts_mel[:, :, token_offset * self.token_mel_ratio:]
-        
+
+        tts_mel = tts_mel[:, :, token_offset * self.token_mel_ratio :]
+
         # append mel cache
         if self.hift_cache_dict[uuid] is not None:
-            hift_cache_mel = self.hift_cache_dict[uuid]['mel']
+            hift_cache_mel = self.hift_cache_dict[uuid]["mel"]
             tts_mel = torch.concat([hift_cache_mel, tts_mel], dim=2)
-            self.hift_cache_dict[uuid]['mel'] = tts_mel
+            self.hift_cache_dict[uuid]["mel"] = tts_mel
         else:
-            self.hift_cache_dict[uuid] = {'mel': tts_mel, 'speech_offset': 0}
-        
+            self.hift_cache_dict[uuid] = {"mel": tts_mel, "speech_offset": 0}
+
         if speed != 1.0:
-            assert token_offset == 0 and finalize is True, 'speed change only support non-stream inference mode'
-            tts_mel = F.interpolate(tts_mel, size=int(tts_mel.shape[2] / speed), mode='linear')
-        
+            assert token_offset == 0 and finalize is True, "speed change only support non-stream inference mode"
+            tts_mel = F.interpolate(tts_mel, size=int(tts_mel.shape[2] / speed), mode="linear")
+
         # Run HiFT inference with OpenVINO
         tts_speech, _ = self.hift.inference(speech_feat=tts_mel, finalize=finalize)
-        tts_speech = tts_speech[:, self.hift_cache_dict[uuid]['speech_offset']:]
-        self.hift_cache_dict[uuid]['speech_offset'] += tts_speech.shape[1]
-        
+        tts_speech = tts_speech[:, self.hift_cache_dict[uuid]["speech_offset"] :]
+        self.hift_cache_dict[uuid]["speech_offset"] += tts_speech.shape[1]
+
         return tts_speech
 
-    def tts(self, text=torch.zeros(1, 0, dtype=torch.int32), flow_embedding=torch.zeros(0, 192), llm_embedding=torch.zeros(0, 192),
-            prompt_text=torch.zeros(1, 0, dtype=torch.int32),
-            llm_prompt_speech_token=torch.zeros(1, 0, dtype=torch.int32),
-            flow_prompt_speech_token=torch.zeros(1, 0, dtype=torch.int32),
-            prompt_speech_feat=torch.zeros(1, 0, 80), source_speech_token=torch.zeros(1, 0, dtype=torch.int32), stream=False, speed=1.0, **kwargs):
+    def tts(
+        self,
+        text=torch.zeros(1, 0, dtype=torch.int32),
+        flow_embedding=torch.zeros(0, 192),
+        llm_embedding=torch.zeros(0, 192),
+        prompt_text=torch.zeros(1, 0, dtype=torch.int32),
+        llm_prompt_speech_token=torch.zeros(1, 0, dtype=torch.int32),
+        flow_prompt_speech_token=torch.zeros(1, 0, dtype=torch.int32),
+        prompt_speech_feat=torch.zeros(1, 0, 80),
+        source_speech_token=torch.zeros(1, 0, dtype=torch.int32),
+        stream=False,
+        speed=1.0,
+        **kwargs,
+    ):
         """
         Main TTS method - generate speech from text.
-        
+
         Args:
             text: Input text tokens
             flow_embedding: Speaker embedding for flow
@@ -1656,11 +1708,12 @@ class OVCosyVoice3Model():
             source_speech_token: Source speech tokens for voice conversion
             stream: Whether to use streaming mode
             speed: Speech speed multiplier
-            
+
         Yields:
             dict with 'tts_speech' tensor
         """
         import uuid as uuid_module
+
         # this_uuid is used to track variables related to this inference thread
         this_uuid = str(uuid_module.uuid1())
         with self.lock:
@@ -1678,70 +1731,90 @@ class OVCosyVoice3Model():
                 time.sleep(0.1)
                 this_token_hop_len = self.token_hop_len + prompt_token_pad if token_offset == 0 else self.token_hop_len
                 if len(self.tts_speech_token_dict[this_uuid]) - token_offset >= this_token_hop_len + self.pre_lookahead_len:
-                    this_tts_speech_token = torch.tensor(self.tts_speech_token_dict[this_uuid][:token_offset + this_token_hop_len + self.pre_lookahead_len]).unsqueeze(dim=0)
-                    this_tts_speech = self.token2wav(token=this_tts_speech_token,
-                                                     prompt_token=flow_prompt_speech_token,
-                                                     prompt_feat=prompt_speech_feat,
-                                                     embedding=flow_embedding,
-                                                     token_offset=token_offset,
-                                                     uuid=this_uuid,
-                                                     stream=stream,
-                                                     finalize=False)
+                    this_tts_speech_token = torch.tensor(
+                        self.tts_speech_token_dict[this_uuid][: token_offset + this_token_hop_len + self.pre_lookahead_len]
+                    ).unsqueeze(dim=0)
+                    this_tts_speech = self.token2wav(
+                        token=this_tts_speech_token,
+                        prompt_token=flow_prompt_speech_token,
+                        prompt_feat=prompt_speech_feat,
+                        embedding=flow_embedding,
+                        token_offset=token_offset,
+                        uuid=this_uuid,
+                        stream=stream,
+                        finalize=False,
+                    )
                     token_offset += this_token_hop_len
-                    yield {'tts_speech': this_tts_speech.cpu()}
-                if self.llm_end_dict[this_uuid] is True and len(self.tts_speech_token_dict[this_uuid]) - token_offset < this_token_hop_len + self.pre_lookahead_len:
+                    yield {"tts_speech": this_tts_speech.cpu()}
+                if (
+                    self.llm_end_dict[this_uuid] is True
+                    and len(self.tts_speech_token_dict[this_uuid]) - token_offset < this_token_hop_len + self.pre_lookahead_len
+                ):
                     break
             p.join()
             # deal with remain tokens, make sure inference remain token len equals token_hop_len when cache_speech is not None
             this_tts_speech_token = torch.tensor(self.tts_speech_token_dict[this_uuid]).unsqueeze(dim=0)
-            this_tts_speech = self.token2wav(token=this_tts_speech_token,
-                                             prompt_token=flow_prompt_speech_token,
-                                             prompt_feat=prompt_speech_feat,
-                                             embedding=flow_embedding,
-                                             token_offset=token_offset,
-                                             uuid=this_uuid,
-                                             finalize=True)
-            yield {'tts_speech': this_tts_speech.cpu()}
+            this_tts_speech = self.token2wav(
+                token=this_tts_speech_token,
+                prompt_token=flow_prompt_speech_token,
+                prompt_feat=prompt_speech_feat,
+                embedding=flow_embedding,
+                token_offset=token_offset,
+                uuid=this_uuid,
+                finalize=True,
+            )
+            yield {"tts_speech": this_tts_speech.cpu()}
         else:
             # deal with all tokens
             p.join()
             this_tts_speech_token = torch.tensor(self.tts_speech_token_dict[this_uuid]).unsqueeze(dim=0)
-            this_tts_speech = self.token2wav(token=this_tts_speech_token,
-                                             prompt_token=flow_prompt_speech_token,
-                                             prompt_feat=prompt_speech_feat,
-                                             embedding=flow_embedding,
-                                             token_offset=0,
-                                             uuid=this_uuid,
-                                             finalize=True,
-                                             speed=speed)
-            yield {'tts_speech': this_tts_speech.cpu()}
+            this_tts_speech = self.token2wav(
+                token=this_tts_speech_token,
+                prompt_token=flow_prompt_speech_token,
+                prompt_feat=prompt_speech_feat,
+                embedding=flow_embedding,
+                token_offset=0,
+                uuid=this_uuid,
+                finalize=True,
+                speed=speed,
+            )
+            yield {"tts_speech": this_tts_speech.cpu()}
         with self.lock:
             self.tts_speech_token_dict.pop(this_uuid)
             self.llm_end_dict.pop(this_uuid)
             self.hift_cache_dict.pop(this_uuid)
 
 
-class OVCosyVoice3():
+class OVCosyVoice3:
     """
     OpenVINO-based CosyVoice3 TTS system.
-    
+
     Uses OpenVINO models for all inference components:
     - LLM (text/speech embeddings + transformer)
     - Flow (mel spectrogram generation)
     - HiFT (vocoder for waveform synthesis)
-    
+
     Usage:
         ov_cosyvoice = OVCosyVoice3(model_dir, ov_model_dir)
         for output in ov_cosyvoice.inference_zero_shot(tts_text, prompt_text, prompt_wav):
             audio = output['tts_speech']
     """
-    
-    def __init__(self, model_dir: str, ov_model_dir: str = None, device: str = "CPU",
-                 llm_device: str = None, flow_device: str = None, hift_device: str = None,
-                 frontend_device: str = None, npu_ov_config: dict = None, hift_input_len: int = 0):
+
+    def __init__(
+        self,
+        model_dir: str,
+        ov_model_dir: str = None,
+        device: str = "CPU",
+        llm_device: str = None,
+        flow_device: str = None,
+        hift_device: str = None,
+        frontend_device: str = None,
+        npu_ov_config: dict = None,
+        hift_input_len: int = 0,
+    ):
         """
         Initialize OVCosyVoice3.
-        
+
         Args:
             model_dir: Path to OpenVINO model directory (contains all converted models and dependency files).
                        If dependency files (campplus.onnx, speech_tokenizer_v3.onnx, etc.) are not found here,
@@ -1762,43 +1835,44 @@ class OVCosyVoice3():
             # New behavior: model_dir is the OpenVINO model directory with all files
             self.model_dir = model_dir
             self.ov_model_dir = model_dir
-        
+
         self.ov_device = device
-        
+
         # Set device for each component (use default device if not specified)
         self.llm_device = llm_device if llm_device is not None else device
         self.flow_device = flow_device if flow_device is not None else device
         self.hift_device = hift_device if hift_device is not None else device
         self.frontend_device = frontend_device if frontend_device is not None else device
-        
+
         # Check model directory exists
         if not os.path.exists(self.ov_model_dir):
             raise ValueError(f"Model directory not found: {self.ov_model_dir}")
-        
+
         # Determine where to find config and dependency files
         # First try ov_model_dir, then fall back to model_dir
         config_dir = self.ov_model_dir
-        hyper_yaml_path = f'{config_dir}/cosyvoice3.yaml'
+        hyper_yaml_path = f"{config_dir}/cosyvoice3.yaml"
         if not os.path.exists(hyper_yaml_path):
             config_dir = self.model_dir
-            hyper_yaml_path = f'{config_dir}/cosyvoice3.yaml'
+            hyper_yaml_path = f"{config_dir}/cosyvoice3.yaml"
             if not os.path.exists(hyper_yaml_path):
-                raise ValueError(f'cosyvoice3.yaml not found in {self.ov_model_dir} or {self.model_dir}!')
-        
+                raise ValueError(f"cosyvoice3.yaml not found in {self.ov_model_dir} or {self.model_dir}!")
+
         # Determine qwen_pretrain_path
-        qwen_path = os.path.join(self.ov_model_dir, 'CosyVoice-BlankEN')
+        qwen_path = os.path.join(self.ov_model_dir, "CosyVoice-BlankEN")
         if not os.path.exists(qwen_path):
-            qwen_path = os.path.join(self.model_dir, 'CosyVoice-BlankEN')
-        
+            qwen_path = os.path.join(self.model_dir, "CosyVoice-BlankEN")
+
         # Extract config values directly from yaml file using regex (avoid loading PyTorch models)
         # hyperpyyaml's yaml contains special tags that yaml.safe_load cannot parse
-        with open(hyper_yaml_path, 'r') as f:
+        with open(hyper_yaml_path, "r") as f:
             yaml_content = f.read()
-        
+
         def extract_yaml_value(content, key, default):
             """Extract simple value from yaml content using regex."""
             import re
-            pattern = rf'^{key}:\s*(\S+)'
+
+            pattern = rf"^{key}:\s*(\S+)"
             match = re.search(pattern, content, re.MULTILINE)
             if match:
                 value = match.group(1)
@@ -1810,54 +1884,49 @@ class OVCosyVoice3():
                     except ValueError:
                         return value
             return default
-        
-        sample_rate = extract_yaml_value(yaml_content, 'sample_rate', 24000)
-        llm_input_size = extract_yaml_value(yaml_content, 'llm_input_size', 896)
+
+        sample_rate = extract_yaml_value(yaml_content, "sample_rate", 24000)
+        llm_input_size = extract_yaml_value(yaml_content, "llm_input_size", 896)
         speech_token_size = 6561  # Default value, defined in llm config
-        token_mel_ratio = extract_yaml_value(yaml_content, 'token_mel_ratio', 2)
+        token_mel_ratio = extract_yaml_value(yaml_content, "token_mel_ratio", 2)
         pre_lookahead_len = 3  # Default value
-        
+
         # Create tokenizer and feat_extractor without loading full hyperpyyaml config
         # This avoids initializing PyTorch models (llm, flow, hift)
         from cosyvoice.tokenizer.tokenizer import get_qwen_tokenizer
         from matcha.utils.audio import mel_spectrogram
         from functools import partial
-        
-        get_tokenizer = partial(get_qwen_tokenizer, token_path=qwen_path, skip_special_tokens=True, version='cosyvoice3')
-        feat_extractor = partial(mel_spectrogram, n_fft=1920, num_mels=80, sampling_rate=sample_rate, 
-                                  hop_size=480, win_size=1920, fmin=0, fmax=None, center=False)
-        allowed_special = 'all'
-        
+
+        get_tokenizer = partial(get_qwen_tokenizer, token_path=qwen_path, skip_special_tokens=True, version="cosyvoice3")
+        feat_extractor = partial(
+            mel_spectrogram, n_fft=1920, num_mels=80, sampling_rate=sample_rate, hop_size=480, win_size=1920, fmin=0, fmax=None, center=False
+        )
+        allowed_special = "all"
+
         # Determine paths for dependency files (try ov_model_dir first, then model_dir)
         def get_dep_path(filename, required=True):
-            ov_path = f'{self.ov_model_dir}/{filename}'
+            ov_path = f"{self.ov_model_dir}/{filename}"
             if os.path.exists(ov_path):
                 return ov_path
-            model_path = f'{self.model_dir}/{filename}'
+            model_path = f"{self.model_dir}/{filename}"
             if os.path.exists(model_path):
                 return model_path
             if required:
-                raise ValueError(f'{filename} not found in {self.ov_model_dir} or {self.model_dir}!')
-            return ''  # Return empty string for optional files
-        
-        campplus_path = get_dep_path('campplus.onnx')
-        speech_tokenizer_path = get_dep_path('speech_tokenizer_v3.onnx')
-        spk2info_path = get_dep_path('spk2info.pt', required=False)  # Optional file
-        
+                raise ValueError(f"{filename} not found in {self.ov_model_dir} or {self.model_dir}!")
+            return ""  # Return empty string for optional files
+
+        campplus_path = get_dep_path("campplus.onnx")
+        speech_tokenizer_path = get_dep_path("speech_tokenizer_v3.onnx")
+        spk2info_path = get_dep_path("spk2info.pt", required=False)  # Optional file
+
         # Initialize OpenVINO frontend (uses OpenVINO for ONNX inference)
         print(f"⌛ Loading OpenVINO frontend models on {self.frontend_device}...")
         self.frontend = OVCosyVoiceFrontEnd(
-            get_tokenizer,
-            feat_extractor,
-            campplus_path,
-            speech_tokenizer_path,
-            spk2info_path,
-            allowed_special,
-            device=self.frontend_device
+            get_tokenizer, feat_extractor, campplus_path, speech_tokenizer_path, spk2info_path, allowed_special, device=self.frontend_device
         )
         print(f"✅ OpenVINO frontend loaded on {self.frontend_device}")
         self.sample_rate = sample_rate
-        
+
         # Load OpenVINO LLM (use pre-extracted config values to avoid PyTorch model initialization)
         print(f"⌛ Loading OpenVINO LLM models on {self.llm_device}...")
         ov_llm = OVCosyVoice3LM(
@@ -1868,107 +1937,103 @@ class OVCosyVoice3():
             npu_ov_config=npu_ov_config,
         )
         print(f"✅ OpenVINO LLM loaded on {self.llm_device}")
-        
+
         # Load OpenVINO Flow and HiFT (use pre-extracted config values)
         print(f"⌛ Loading OpenVINO Flow model on {self.flow_device}...")
-        ov_flow = OVFlow(
-            model_dir=self.ov_model_dir,
-            device=self.flow_device,
-            token_mel_ratio=token_mel_ratio,
-            pre_lookahead_len=pre_lookahead_len
-        )
+        ov_flow = OVFlow(model_dir=self.ov_model_dir, device=self.flow_device, token_mel_ratio=token_mel_ratio, pre_lookahead_len=pre_lookahead_len)
         print(f"✅ OpenVINO Flow loaded on {self.flow_device}")
-        
+
         print(f"⌛ Loading OpenVINO HiFT model on {self.hift_device}...")
-        ov_hift = OVHiFT(
-            model_path=f'{self.ov_model_dir}/{HIFT_PATH}',
-            device=self.hift_device,
-            hift_input_len=hift_input_len
-        )
+        ov_hift = OVHiFT(model_path=f"{self.ov_model_dir}/{HIFT_PATH}", device=self.hift_device, hift_input_len=hift_input_len)
         print(f"✅ OpenVINO HiFT loaded on {self.hift_device}")
-        
+
         # Create OVCosyVoice3Model
         self.model = OVCosyVoice3Model(ov_llm, ov_flow, ov_hift, token_mel_ratio, pre_lookahead_len)
-        
+
     def list_available_spks(self):
         """List available speaker IDs."""
         return list(self.frontend.spk2info.keys())
-    
+
     def add_zero_shot_spk(self, prompt_text, prompt_wav, zero_shot_spk_id):
         """Add a new zero-shot speaker."""
-        assert zero_shot_spk_id != '', 'do not use empty zero_shot_spk_id'
-        model_input = self.frontend.frontend_zero_shot('', prompt_text, prompt_wav, self.sample_rate, '')
-        del model_input['text']
-        del model_input['text_len']
+        assert zero_shot_spk_id != "", "do not use empty zero_shot_spk_id"
+        model_input = self.frontend.frontend_zero_shot("", prompt_text, prompt_wav, self.sample_rate, "")
+        del model_input["text"]
+        del model_input["text_len"]
         self.frontend.spk2info[zero_shot_spk_id] = model_input
         return True
-    
+
     def save_spkinfo(self):
         """Save speaker info to file."""
-        torch.save(self.frontend.spk2info, f'{self.model_dir}/spk2info.pt')
-    
+        torch.save(self.frontend.spk2info, f"{self.model_dir}/spk2info.pt")
+
     def inference_sft(self, tts_text, spk_id, stream=False, speed=1.0, text_frontend=True):
         """Supervised fine-tuning inference."""
         from cosyvoice.utils.file_utils import logging
+
         for i in tqdm(self.frontend.text_normalize(tts_text, split=True, text_frontend=text_frontend)):
             model_input = self.frontend.frontend_sft(i, spk_id)
             start_time = time.time()
-            logging.info(f'synthesis text {i}')
+            logging.info(f"synthesis text {i}")
             for model_output in self.model.tts(**model_input, stream=stream, speed=speed):
-                speech_len = model_output['tts_speech'].shape[1] / self.sample_rate
-                logging.info(f'yield speech len {speech_len}, rtf {(time.time() - start_time) / speech_len}')
+                speech_len = model_output["tts_speech"].shape[1] / self.sample_rate
+                logging.info(f"yield speech len {speech_len}, rtf {(time.time() - start_time) / speech_len}")
                 yield model_output
                 start_time = time.time()
-    
-    def inference_zero_shot(self, tts_text, prompt_text, prompt_wav, zero_shot_spk_id='', stream=False, speed=1.0, text_frontend=True):
+
+    def inference_zero_shot(self, tts_text, prompt_text, prompt_wav, zero_shot_spk_id="", stream=False, speed=1.0, text_frontend=True):
         """Zero-shot TTS inference with voice cloning."""
         from cosyvoice.utils.file_utils import logging
+
         prompt_text = self.frontend.text_normalize(prompt_text, split=False, text_frontend=text_frontend)
         for i in tqdm(self.frontend.text_normalize(tts_text, split=True, text_frontend=text_frontend)):
             if (not isinstance(i, Generator)) and len(i) < 0.5 * len(prompt_text):
-                logging.warning(f'synthesis text {i} too short than prompt text {prompt_text}, this may lead to bad performance')
+                logging.warning(f"synthesis text {i} too short than prompt text {prompt_text}, this may lead to bad performance")
             model_input = self.frontend.frontend_zero_shot(i, prompt_text, prompt_wav, self.sample_rate, zero_shot_spk_id)
             start_time = time.time()
-            logging.info(f'synthesis text {i}')
+            logging.info(f"synthesis text {i}")
             for model_output in self.model.tts(**model_input, stream=stream, speed=speed):
-                speech_len = model_output['tts_speech'].shape[1] / self.sample_rate
-                logging.info(f'yield speech len {speech_len}, rtf {(time.time() - start_time) / speech_len}')
+                speech_len = model_output["tts_speech"].shape[1] / self.sample_rate
+                logging.info(f"yield speech len {speech_len}, rtf {(time.time() - start_time) / speech_len}")
                 yield model_output
                 start_time = time.time()
-    
-    def inference_cross_lingual(self, tts_text, prompt_wav, zero_shot_spk_id='', stream=False, speed=1.0, text_frontend=True):
+
+    def inference_cross_lingual(self, tts_text, prompt_wav, zero_shot_spk_id="", stream=False, speed=1.0, text_frontend=True):
         """Cross-lingual TTS inference."""
         from cosyvoice.utils.file_utils import logging
+
         for i in tqdm(self.frontend.text_normalize(tts_text, split=True, text_frontend=text_frontend)):
             model_input = self.frontend.frontend_cross_lingual(i, prompt_wav, self.sample_rate, zero_shot_spk_id)
             start_time = time.time()
-            logging.info(f'synthesis text {i}')
+            logging.info(f"synthesis text {i}")
             for model_output in self.model.tts(**model_input, stream=stream, speed=speed):
-                speech_len = model_output['tts_speech'].shape[1] / self.sample_rate
-                logging.info(f'yield speech len {speech_len}, rtf {(time.time() - start_time) / speech_len}')
+                speech_len = model_output["tts_speech"].shape[1] / self.sample_rate
+                logging.info(f"yield speech len {speech_len}, rtf {(time.time() - start_time) / speech_len}")
                 yield model_output
                 start_time = time.time()
-    
-    def inference_instruct2(self, tts_text, instruct_text, prompt_wav, zero_shot_spk_id='', stream=False, speed=1.0, text_frontend=True):
+
+    def inference_instruct2(self, tts_text, instruct_text, prompt_wav, zero_shot_spk_id="", stream=False, speed=1.0, text_frontend=True):
         """Instruct-based TTS inference."""
         from cosyvoice.utils.file_utils import logging
+
         for i in tqdm(self.frontend.text_normalize(tts_text, split=True, text_frontend=text_frontend)):
             model_input = self.frontend.frontend_instruct2(i, instruct_text, prompt_wav, self.sample_rate, zero_shot_spk_id)
             start_time = time.time()
-            logging.info(f'synthesis text {i}')
+            logging.info(f"synthesis text {i}")
             for model_output in self.model.tts(**model_input, stream=stream, speed=speed):
-                speech_len = model_output['tts_speech'].shape[1] / self.sample_rate
-                logging.info(f'yield speech len {speech_len}, rtf {(time.time() - start_time) / speech_len}')
+                speech_len = model_output["tts_speech"].shape[1] / self.sample_rate
+                logging.info(f"yield speech len {speech_len}, rtf {(time.time() - start_time) / speech_len}")
                 yield model_output
                 start_time = time.time()
-    
+
     def inference_vc(self, source_wav, prompt_wav, stream=False, speed=1.0):
         """Voice conversion inference."""
         from cosyvoice.utils.file_utils import logging
+
         model_input = self.frontend.frontend_vc(source_wav, prompt_wav, self.sample_rate)
         start_time = time.time()
         for model_output in self.model.tts(**model_input, stream=stream, speed=speed):
-            speech_len = model_output['tts_speech'].shape[1] / self.sample_rate
-            logging.info(f'yield speech len {speech_len}, rtf {(time.time() - start_time) / speech_len}')
+            speech_len = model_output["tts_speech"].shape[1] / self.sample_rate
+            logging.info(f"yield speech len {speech_len}, rtf {(time.time() - start_time) / speech_len}")
             yield model_output
             start_time = time.time()
