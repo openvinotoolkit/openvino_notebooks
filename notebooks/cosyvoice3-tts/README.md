@@ -4,6 +4,7 @@ Fun-CosyVoice 3.0 is an advanced text-to-speech (TTS) system based on large lang
 
 More details can be found in the original [repository](https://github.com/FunAudioLLM/CosyVoice.git) and [model card](https://huggingface.co/FunAudioLLM/Fun-CosyVoice3-0.5B-2512)
 
+<img width="1560" height="651" alt="image" src="https://github.com/user-attachments/assets/0dfdec7b-4d46-4a72-978c-020bc6a34764" />
 
 ### Notebook Contents
 
