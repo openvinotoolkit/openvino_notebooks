@@ -26,9 +26,6 @@ from funasr.utils.datadir_writer import DatadirWriter
 from funasr.utils.load_utils import extract_fbank, load_audio_text_image_video
 
 
-
-from model import FunASRNano
-
 def patched_dynamic_layer_update(
     self, key_states: torch.Tensor, value_states: torch.Tensor, cache_kwargs: dict[str, Any] | None = None
 ) -> tuple[torch.Tensor, torch.Tensor]:
@@ -43,7 +40,9 @@ def patched_dynamic_layer_update(
         self.values = torch.cat([self.values, value_states], dim=-2)
     return self.keys, self.values
 
+
 DynamicLayer.update = patched_dynamic_layer_update
+
 
 def patch_cos_sin_cached_fp32(model):
     if (
@@ -63,15 +62,15 @@ def patch_cos_sin_cached_fp32(model):
                     dtype=torch.float32,
                 )
 
+
 def causal_mask_function(batch_idx: int, head_idx: int, q_idx: int, kv_idx: int) -> bool:
     """
     This creates a basic lower-diagonal causal mask.
     """
     return kv_idx <= q_idx
 
-def prepare_padding_mask(
-    attention_mask: Optional[torch.Tensor], kv_length: int, kv_offset: int, _slice: bool = True
-) -> Optional[torch.Tensor]:
+
+def prepare_padding_mask(attention_mask: Optional[torch.Tensor], kv_length: int, kv_offset: int, _slice: bool = True) -> Optional[torch.Tensor]:
     """
     From the 2D attention mask, prepare the correct padding mask to use by potentially padding it, and slicing
     according to the `kv_offset` if `_slice` is `True`.
@@ -90,6 +89,7 @@ def prepare_padding_mask(
             local_padding_mask = local_padding_mask[:, mask_indices]
     return local_padding_mask
 
+
 def and_masks(*mask_functions: list[Callable]) -> Callable:
     """Returns a mask function that is the intersection of provided mask functions"""
     if not all(callable(arg) for arg in mask_functions):
@@ -103,6 +103,7 @@ def and_masks(*mask_functions: list[Callable]) -> Callable:
 
     return and_mask
 
+
 def padding_mask_function(padding_mask: torch.Tensor) -> Callable:
     """
     This return the mask_function function corresponding to a 2D padding mask.
@@ -115,6 +116,7 @@ def padding_mask_function(padding_mask: torch.Tensor) -> Callable:
         return padding_mask[batch_idx, kv_idx]
 
     return inner_mask
+
 
 def _ignore_causal_mask_sdpa(
     padding_mask: Optional[torch.Tensor],
@@ -148,18 +150,12 @@ def _ignore_causal_mask_sdpa(
         # in this case we need to add special patterns to the mask so cannot be skipped otherwise
         and (local_attention_size is None or kv_length < local_attention_size)
         # In this case, we need to add padding to the mask, so cannot be skipped otherwise
-        and (
-            padding_mask is None
-            or (
-                padding_mask.all()
-                if not is_torch_xpu_available or query_length == 1
-                else padding_mask[:, :query_length].all()
-            )
-        )
+        and (padding_mask is None or (padding_mask.all() if not is_torch_xpu_available or query_length == 1 else padding_mask[:, :query_length].all()))
     ):
         return True
 
     return False
+
 
 def sdpa_mask_without_vmap(
     batch_size: int,
@@ -200,6 +196,7 @@ def sdpa_mask_without_vmap(
     causal_mask = causal_mask.expand(batch_size, -1, q_length, kv_length)
 
     return causal_mask
+
 
 # Adapted from https://github.com/huggingface/transformers/blob/v4.53.0/src/transformers/masking_utils.py#L433
 # Specifically for OpenVINO, we use torch.finfo(torch.float16).min instead of torch.finfo(dtype).min
@@ -347,7 +344,6 @@ def make_stateful(
     """
     from openvino._offline_transformations import apply_make_stateful_transformation
 
-
     input_output_map = {}
 
     if num_beams_and_batch is not None:
@@ -406,13 +402,15 @@ def cleanup_torchscript_cache():
     torch.jit._recursive.concrete_type_store = torch.jit._recursive.ConcreteTypeStore()
     torch.jit._state._clear_class_state()
 
+
 TEXT_EMBEDDINGS_PATH = "openvino_text_embeddings_model.xml"
 ENCODER_PATH = "openvino_encoder_model.xml"
 LANGUAGE_PATH = "openvino_model.xml"
 FRONTEND_CONFIG_PATH = "frontend_config.json"
 
+
 def convert_funasr(model_id, model_path=None, quantization_config=None):
-    
+
     if model_path is None:
         model_path = Path(model_id.split("/")[-1])
     else:
@@ -423,6 +421,8 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
         return model_path
     print(f"⌛ {model_id} conversion started. Be patient, it may takes some time.")
     print("⌛ Load Original model")
+    from model import FunASRNano
+
     pt_model, kwargs = FunASRNano.from_pretrained(model=model_id, device="cpu")
     kwargs
     pt_model = pt_model.to(torch.float32)
@@ -431,7 +431,7 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
     kwargs["tokenizer"].save_pretrained(model_path)
     for json_file in Path(model_id + "/Qwen3-0.6B").glob("*.json"):
         shutil.copy(json_file, model_path / json_file.name)
-    
+
     # Export frontend config
     if kwargs.get("frontend") is not None:
         frontend = kwargs["frontend"]
@@ -458,8 +458,6 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
         with open(model_path / FRONTEND_CONFIG_PATH, "w") as f:
             json.dump(frontend_config, f, indent=2)
         print("✅ Frontend config exported")
-    
-    
 
     if not (model_path / TEXT_EMBEDDINGS_PATH).exists():
         print("⌛ Convert TEXT_EMBEDDINGS model")
@@ -473,15 +471,14 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
 
     if not (model_path / ENCODER_PATH).exists():
         print("⌛ Convert ENCODER_PATH model")
+
         def forward_wrap_encoder(self, speech: torch.Tensor, speech_lengths: torch.Tensor):
             encoder_out, encoder_out_lens = self.audio_encoder(speech, speech_lengths)
 
             # audio_adaptor
-            encoder_out, encoder_out_lens = self.audio_adaptor(
-                encoder_out, encoder_out_lens
-            )
+            encoder_out, encoder_out_lens = self.audio_adaptor(encoder_out, encoder_out_lens)
             return encoder_out, encoder_out_lens
-        
+
         pt_model._orig_forward = pt_model.forward
         pt_model.forward = types.MethodType(forward_wrap_encoder, pt_model)
         example_input = {
@@ -498,15 +495,12 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
         gc.collect()
         print("✅ ENCODER model successfully converted")
 
-        
-
     if not (model_path / LANGUAGE_PATH).exists():
         print("⌛ Convert LANGUAGE_MODEL model")
         patch_cos_sin_cached_fp32(pt_model.llm)
         if hasattr(pt_model.llm, "model"):
             patch_cos_sin_cached_fp32(pt_model.llm.model)
-            
-            
+
         def forward_wrap(
             self,
             attention_mask,
@@ -523,16 +517,15 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
                 past_key_values=pkv,
                 inputs_embeds=inputs_embeds,
                 use_cache=True,
-
             )
             return (outputs.logits, outputs.past_key_values.to_legacy_cache())
-        
+
         num_pkv = pt_model.llm.config.num_hidden_layers
         hidden_size = pt_model.llm.config.hidden_size
 
         pt_model.llm._orig_forward = pt_model.llm.forward
         pt_model.llm.forward = types.MethodType(forward_wrap, pt_model.llm)
-        
+
         num_pkv = pt_model.llm.config.num_hidden_layers
         hidden_size = pt_model.llm.config.hidden_size
 
@@ -564,8 +557,8 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
         }
 
         input_shapes = [
-            ov.PartialShape([-1, -1]),          # attention_mask
-            ov.PartialShape([-1, -1]),          # position_ids (2D for code predictor)
+            ov.PartialShape([-1, -1]),  # attention_mask
+            ov.PartialShape([-1, -1]),  # position_ids (2D for code predictor)
         ]
         input_shapes += (
             [
@@ -615,7 +608,8 @@ class Segment:
     speaker: str
     text: str
     audio: torch.Tensor
-    
+
+
 @dataclass
 class ModelArgs:
     backbone_flavor: str
@@ -625,8 +619,8 @@ class ModelArgs:
     audio_num_codebooks: int
     decoder_loss_weight: float
     use_text_loss: bool
-    
-    
+
+
 def to_device(x, device):
     """Send tensor or dict of tensors to device.
 
@@ -643,21 +637,22 @@ def to_device(x, device):
         return x.to(device)
     return x
 
+
 def load_frontend_from_config(config_path):
     """
     Load frontend from saved config file.
-    
+
     Args:
         config_path: Path to frontend_config.json
-    
+
     Returns:
         frontend object
     """
     from funasr.register import tables
-    
+
     with open(config_path, "r") as f:
         frontend_config = json.load(f)
-    
+
     frontend_type = frontend_config.pop("frontend_type", "WavFrontend")
     frontend_class = tables.frontend_classes.get(frontend_type)
     frontend = frontend_class(**frontend_config)
@@ -670,12 +665,12 @@ class OVModelForCausalLMWithEmbed(OVModelForCausalLM):
     This is needed for multimodal models where we need to pass pre-computed embeddings
     (e.g., audio embeddings merged with text embeddings).
     """
-    
+
     def set_token_emb(self, token_emb_path):
         """Set the token embedding model path after from_pretrained."""
         self.token_emb = core.read_model(token_emb_path)
         self.token_emb_request = None
-        
+
     def _compile_token_emb(self):
         if self.token_emb_request is None:
             self.token_emb_request = core.compile_model(self.token_emb, "CPU" if self._device == "NPU" else self._device)
@@ -697,7 +692,7 @@ class OVModelForCausalLMWithEmbed(OVModelForCausalLM):
         self._compile_token_emb()
         res = self.token_emb_request(input_ids, share_inputs=True)
         return res[0]
-    
+
     def prepare_inputs(
         self,
         input_ids: torch.LongTensor = None,
@@ -716,7 +711,7 @@ class OVModelForCausalLMWithEmbed(OVModelForCausalLM):
             seq_length = input_ids.shape[1]
 
         inputs = {}
-        
+
         # Handle stateful model state reset
         if self.stateful:
             if past_key_values is None:
@@ -724,9 +719,9 @@ class OVModelForCausalLMWithEmbed(OVModelForCausalLM):
                     self.request.reset_state()
                 self.next_beam_idx = np.arange(batch_size, dtype=int)
                 self._past_length = 0
-        
+
         past_len = self._get_past_length(past_key_values)
-        
+
         # Use inputs_embeds if provided, otherwise use input_ids
         if inputs_embeds is None:
             inputs_embeds = self.embed_tokens(input_ids if past_key_values is None else input_ids[:, -1:])
@@ -734,17 +729,17 @@ class OVModelForCausalLMWithEmbed(OVModelForCausalLM):
             if hasattr(self.config, "scale_emb"):
                 inputs_embeds = inputs_embeds * self.config.scale_emb
         inputs["inputs_embeds"] = inputs_embeds
-        
+
         # Handle attention_mask
         if "attention_mask" in self.input_names or "position_ids" in self.input_names:
             if attention_mask is not None:
                 attention_mask_np = attention_mask.cpu().numpy() if isinstance(attention_mask, torch.Tensor) else attention_mask
             else:
                 attention_mask_np = np.ones((batch_size, seq_length + past_len), dtype=np.int64)
-            
+
             if "attention_mask" in self.input_names:
                 inputs["attention_mask"] = attention_mask_np
-        
+
         # Handle position_ids
         if "position_ids" in self.input_names:
             if position_ids is not None:
@@ -755,12 +750,10 @@ class OVModelForCausalLMWithEmbed(OVModelForCausalLM):
                 if past_key_values:
                     position_ids_np = position_ids_np[:, -seq_length:]
             inputs["position_ids"] = position_ids_np
-        
+
         # Handle beam_idx for beam search
         if "beam_idx" in self.input_names:
-            inputs["beam_idx"] = (
-                self.next_beam_idx if self.next_beam_idx is not None else np.arange(batch_size, dtype=int)
-            )
+            inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(batch_size, dtype=int)
         return inputs
 
     def forward(
@@ -773,9 +766,9 @@ class OVModelForCausalLMWithEmbed(OVModelForCausalLM):
         **kwargs,
     ):
         from transformers.modeling_outputs import CausalLMOutputWithPast
-        
+
         self.compile()
-        
+
         inputs = self.prepare_inputs(
             input_ids=input_ids,
             attention_mask=attention_mask,
@@ -788,24 +781,20 @@ class OVModelForCausalLMWithEmbed(OVModelForCausalLM):
         self.request.start_async(inputs, share_inputs=True)
         self.request.wait()
         logits = torch.from_numpy(self.request.get_tensor("logits").data).clone().to(self.device)
-        
+
         # Determine sequence length for past_length update
         if inputs_embeds is not None:
             seq_length = inputs_embeds.shape[1]
         else:
             seq_length = input_ids.shape[1]
-        
+
         if self.stateful:
             past_key_values = ((),)
             self._past_length += seq_length
         else:
             if self.use_cache:
-                past_key_values = tuple(
-                    np.copy(self.request.get_tensor(key).data) for key in self.key_value_output_names
-                )
-                past_key_values = tuple(
-                    past_key_values[i : i + self.num_pkv] for i in range(0, len(past_key_values), self.num_pkv)
-                )
+                past_key_values = tuple(np.copy(self.request.get_tensor(key).data) for key in self.key_value_output_names)
+                past_key_values = tuple(past_key_values[i : i + self.num_pkv] for i in range(0, len(past_key_values), self.num_pkv))
             else:
                 past_key_values = None
 
@@ -819,18 +808,18 @@ class OVModelForCausalLMWithEmbed(OVModelForCausalLM):
         if past_key_values is not None:
             past_len = self._get_past_length(past_key_values)
             if attention_mask is not None and attention_mask.shape[1] > input_ids.shape[1]:
-                input_ids = input_ids[:, -(attention_mask.shape[1] - past_len):]
+                input_ids = input_ids[:, -(attention_mask.shape[1] - past_len) :]
             elif past_len < input_ids.shape[1]:
                 input_ids = input_ids[:, past_len:]
             # After first pass, don't use inputs_embeds
             inputs_embeds = None
-            
+
         position_ids = kwargs.get("position_ids", None)
         if attention_mask is not None and position_ids is None and "position_ids" in self.input_names:
             position_ids = attention_mask.long().cumsum(-1) - 1
             position_ids.masked_fill_(attention_mask == 0, 1)
             if past_key_values:
-                position_ids = position_ids[:, -input_ids.shape[1]:]
+                position_ids = position_ids[:, -input_ids.shape[1] :]
 
         model_inputs = {
             "input_ids": input_ids,
@@ -850,7 +839,7 @@ class OVFunASRNano:
         # Map OpenVINO device to torch device for tensor operations
         self.torch_device = "cpu"  # OpenVINO CPU/GPU models use CPU tensors for input
         self.feat_permute = True
-        
+
         model_dir = Path(pretrained_dir)
         # Use OVModelForCausalLMWithEmbed to support inputs_embeds for multimodal fusion
         self.llm = OVModelForCausalLMWithEmbed.from_pretrained(model_dir, device=self.device, ov_config=llm_ov_config)
@@ -859,11 +848,11 @@ class OVFunASRNano:
         # Disable Snippets optimization to avoid internal error with certain model structures
         encoder_config = {"SNIPPETS_MODE": "DISABLE"} if self.device == "CPU" else {}
         self.audio_encoder = core.compile_model(model_dir / ENCODER_PATH, self.device if self.device != "NPU" else "CPU", encoder_config)
-        
+
         # Load tokenizer from saved config
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
         print(f"✅ Tokenizer loaded from {model_dir}")
-        
+
         # Load frontend from saved config
         frontend_config_path = model_dir / FRONTEND_CONFIG_PATH
         if frontend_config_path.exists():
@@ -885,7 +874,7 @@ class OVFunASRNano:
             self.frontend = None
             self.inference_kwargs = {}
             print(f"⚠️ Frontend config not found at {frontend_config_path}, frontend will need to be provided manually")
-        
+
     def data_template(self, data):
         system, user, assistant = [], [], []
         for i, item in enumerate(data):
@@ -911,9 +900,7 @@ class OVFunASRNano:
 
         return contents
 
-    def data_load_speech(
-        self, contents: dict, tokenizer, frontend, meta_data={}, **kwargs
-    ):
+    def data_load_speech(self, contents: dict, tokenizer, frontend, meta_data={}, **kwargs):
         system = contents["system"]
         user = contents["user"]
         assistant = contents["assistant"]
@@ -934,9 +921,7 @@ class OVFunASRNano:
             [],
         )
         input_source_ids = []
-        for i, (system_prompt, user_prompt, target_out) in enumerate(
-            zip(system, user, assistant)
-        ):
+        for i, (system_prompt, user_prompt, target_out) in enumerate(zip(system, user, assistant)):
             if i >= kwargs.get("multiturn_num_max", 5):
                 break
             if len(input_ids) > kwargs.get("max_token_length", 1500):
@@ -972,24 +957,18 @@ class OVFunASRNano:
                     source_ids += sub_token
                     fbank_mask_i += [0] * len(sub_token)
                 else:
-                    sub_str = sub_str.replace("<|startofspeech|>", "").replace(
-                        "<|endofspeech|>", ""
-                    )
+                    sub_str = sub_str.replace("<|startofspeech|>", "").replace("<|endofspeech|>", "")
                     if sub_str.startswith("!"):
                         sub_str = sub_str[1:]
                         if sub_str.startswith("!"):  # !!: audio sample point
                             sub_str = audio
                         try:
                             time1 = time.perf_counter()
-                            data_src = load_audio_text_image_video(
-                                sub_str, fs=frontend.fs, **kwargs
-                            )
+                            data_src = load_audio_text_image_video(sub_str, fs=frontend.fs, **kwargs)
                             time2 = time.perf_counter()
                             meta_data["load_data"] = f"{time2 - time1:0.3f}"
                         except Exception as e:
-                            logging.error(
-                                f"Loading wav failed! {str(e)}, {traceback.format_exc()}"
-                            )
+                            logging.error(f"Loading wav failed! {str(e)}, {traceback.format_exc()}")
 
                         speech, speech_lengths = extract_fbank(
                             data_src,
@@ -1000,12 +979,7 @@ class OVFunASRNano:
 
                         time3 = time.perf_counter()
                         meta_data["extract_feat"] = f"{time3 - time2:0.3f}"
-                        meta_data["batch_data_time"] = (
-                            speech_lengths.sum().item()
-                            * frontend.frame_shift
-                            * frontend.lfr_n
-                            / 1000
-                        )
+                        meta_data["batch_data_time"] = speech_lengths.sum().item() * frontend.frame_shift * frontend.lfr_n / 1000
 
                         if self.feat_permute:
                             speech = speech.permute(0, 2, 1)
@@ -1031,9 +1005,7 @@ class OVFunASRNano:
                 fbank.append(speech[0, :, :])
                 fbank_lens.append(speech_lengths)
 
-        input_ids = torch.tensor(
-            input_ids, dtype=torch.int64
-        )  # [: self.max_token_length]
+        input_ids = torch.tensor(input_ids, dtype=torch.int64)  # [: self.max_token_length]
         attention_mask = torch.tensor([1] * len(input_ids), dtype=torch.int32)
         labels = torch.tensor(labels, dtype=torch.int64)  # [: self.max_token_length]
 
@@ -1044,12 +1016,8 @@ class OVFunASRNano:
         target_ids = torch.tensor(target_ids, dtype=torch.int64)
 
         if len(fbank) > 0:
-            speech = torch.nn.utils.rnn.pad_sequence(
-                fbank, batch_first=True, padding_value=0.0
-            )
-            speech_lengths = torch.nn.utils.rnn.pad_sequence(
-                fbank_lens, batch_first=True, padding_value=-1
-            )
+            speech = torch.nn.utils.rnn.pad_sequence(fbank, batch_first=True, padding_value=0.0)
+            speech_lengths = torch.nn.utils.rnn.pad_sequence(fbank_lens, batch_first=True, padding_value=-1)
         else:
             speech = []
             speech_lengths = []
@@ -1068,18 +1036,15 @@ class OVFunASRNano:
 
         return output
 
-
     def encode(self, speech, speech_lengths):
         # audio encoder
         if self.feat_permute:
             speech_permuted = speech.permute(0, 2, 1)
 
-            output = self.audio_encoder(
-                [speech_permuted, speech_lengths]
-            )
+            output = self.audio_encoder([speech_permuted, speech_lengths])
             encoder_out, encoder_out_lens = torch.from_numpy(output[0]), torch.from_numpy(output[1])
         else:
-            
+
             output = self.audio_encoder([speech, speech_lengths])
             encoder_out, encoder_out_lens = torch.from_numpy(output[0]), torch.from_numpy(output[1])
         return encoder_out, encoder_out_lens
@@ -1099,9 +1064,7 @@ class OVFunASRNano:
             raise NotImplementedError("batch decoding is not implemented")
 
         contents = self.data_template(data_in[0])
-        output = self.data_load_speech(
-            contents, tokenizer, frontend, meta_data=meta_data, **kwargs
-        )
+        output = self.data_load_speech(contents, tokenizer, frontend, meta_data=meta_data, **kwargs)
         batch = to_device(output, self.torch_device)
 
         # audio encoder
@@ -1119,7 +1082,7 @@ class OVFunASRNano:
                 elif kwargs.get("bf16", False):
                     speech = speech.to(torch.bfloat16)
                 # audio encoder
-                
+
                 encoder_out, encoder_out_lens = self.encode(speech, speech_lengths)
                 meta_data["audio_adaptor_out"] = encoder_out
                 meta_data["audio_adaptor_out_lens"] = encoder_out_lens
@@ -1133,7 +1096,7 @@ class OVFunASRNano:
             input_ids = source_ids
 
         input_ids[input_ids < 0] = 0
-        inputs_embeds = torch.from_numpy(self.llm.embed_tokens(input_ids))    
+        inputs_embeds = torch.from_numpy(self.llm.embed_tokens(input_ids))
         batch_size, token_num, dims = inputs_embeds.shape
 
         fake_token_len[fake_token_len < 0] = 0
@@ -1184,16 +1147,16 @@ class OVFunASRNano:
             frontend = self.frontend
         if frontend is None:
             raise ValueError("frontend is required but not provided and not loaded from config")
-        
+
         # Use class tokenizer if not provided
         if tokenizer is None:
             tokenizer = self.tokenizer
         if tokenizer is None:
             raise ValueError("tokenizer is required but not provided and not loaded from config")
-        
+
         # Merge saved inference_kwargs with provided kwargs (provided kwargs take precedence)
         merged_kwargs = {**self.inference_kwargs, **kwargs}
-        
+
         new_data_in = []
         for data in data_in:
             if isinstance(data, str):
@@ -1225,9 +1188,7 @@ class OVFunASRNano:
             key = []
             for _ in data_in:
                 chars = string.ascii_letters + string.digits
-                key.append(
-                    "rand_key_" + "".join(random.choice(chars) for _ in range(13))
-                )
+                key.append("rand_key_" + "".join(random.choice(chars) for _ in range(13)))
 
         return self.inference_llm(
             data_in,
@@ -1247,9 +1208,7 @@ class OVFunASRNano:
         frontend=None,
         **kwargs,
     ):
-        inputs_embeds, contents, batch, source_ids, meta_data = self.inference_prepare(
-            data_in, data_lengths, key, tokenizer, frontend, **kwargs
-        )
+        inputs_embeds, contents, batch, source_ids, meta_data = self.inference_prepare(data_in, data_lengths, key, tokenizer, frontend, **kwargs)
         llm_dtype = kwargs.get("llm_dtype", "fp32")
         if llm_dtype == "fp32":
             llm_dtype = "fp16" if kwargs.get("fp16", False) else llm_dtype
@@ -1300,7 +1259,7 @@ class OVFunASRNano:
         response_clean = re.sub(r"[^\w\s\u3000\u4e00-\u9fff]+", "", response)
         result_i = {
             "key": key[0],
-            "text": re.sub(r'\s+', ' ', response.replace("/sil", " ")),
+            "text": re.sub(r"\s+", " ", response.replace("/sil", " ")),
             "text_tn": response_clean,
             "label": label,
         }
