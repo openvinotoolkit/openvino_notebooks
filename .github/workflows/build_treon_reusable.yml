@@ -128,10 +128,13 @@ jobs:
         if: ${{ !inputs.container && runner.os == 'Windows' }}
         shell: pwsh
         run: |
-          # Download 7z standalone utility
-          Invoke-WebRequest -Uri 'https://www.7-zip.org/a/7zr.exe' -OutFile '7zr.exe' -UseBasicParsing
+          # Download 7z
+          $client = New-Object System.Net.WebClient
+          $client.DownloadFile('https://www.7-zip.org/a/7zr.exe', '7zr.exe')
+          
           # Download ffmpeg
-          Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-full_build.7z' -OutFile 'ffmpeg.7z' -UseBasicParsing
+          $client.DownloadFile('https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-full_build.7z', 'ffmpeg.7z')
+          
           # Extract ffmpeg using 7z
           .\7zr.exe x ffmpeg.7z -y
           Move-Item -Path ffmpeg-7.1.1-full_build -Destination ffmpeg
