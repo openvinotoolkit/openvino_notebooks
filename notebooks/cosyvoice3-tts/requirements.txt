@@ -42,3 +42,4 @@ x-transformers==2.11.24
 uvicorn==0.30.0
 wetext==0.0.4
 wget==3.2
+ruamel.yaml>=0.17,<0.19

@@ -96,6 +96,7 @@ CER
 CentOS
 centric
 CFG
+CFM
 charlist
 charlists
 chatbot
@@ -153,6 +154,7 @@ Convolutional
 convolutional
 coreference
 CoSENT
+CosyVoice
 cpm
 cpp
 CPUs
@@ -376,8 +378,11 @@ HandBrake
 heatmap
 HC
 HED
+HiFT
+HiFi
 HH
 hoc
+hotfix
 HuggingFace
 huggingfacehub
 Hunyuan
