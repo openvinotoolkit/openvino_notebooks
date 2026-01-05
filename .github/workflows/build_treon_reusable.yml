@@ -127,20 +127,9 @@ jobs:
       - name: Install required packages (Windows)
         if: ${{ !inputs.container && runner.os == 'Windows' }}
         shell: pwsh
-        run: |          
-          # Enable TLS 1.2 for secure connections
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          # Download 7z
-          $client = New-Object System.Net.WebClient
-          $client.DownloadFile('https://www.7-zip.org/a/7zr.exe', '7zr.exe')
-          
-          # Download ffmpeg
-          $client.DownloadFile('https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-full_build.7z', 'ffmpeg.7z')
-          
-          # Extract ffmpeg using 7z
-          .\7zr.exe x ffmpeg.7z -y
-          Move-Item -Path ffmpeg-7.1.1-full_build -Destination ffmpeg
-          "$PWD\ffmpeg\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))       
+          choco install ffmpeg
       
       # Packages that notebooks need to run in docker container
       - name: Install required packages (container)
