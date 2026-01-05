@@ -93,6 +93,7 @@ BLACKBOX
 boolean
 CatVTON
 CausVid
+CER
 CentOS
 centric
 CFG
@@ -198,6 +199,7 @@ Deci
 DeciDiffusion
 DeciDiffusion's
 deduplicated
+DeepEncoder
 DeepFloyd
 DeepLabV
 DeepSeek
@@ -304,6 +306,7 @@ feedforward
 FeedForward
 FFN
 FFmpeg
+FireRedTTS
 FIL
 FEIL
 finetuned
@@ -914,6 +917,7 @@ Ruizhongtai
 Runtime
 runtime
 runtimes
+RVQ
 Safetensors
 SageMaker
 sagittal
