@@ -127,7 +127,9 @@ jobs:
       - name: Install required packages (Windows)
         if: ${{ !inputs.container && runner.os == 'Windows' }}
         shell: pwsh
-        run: |
+        run: |          
+          # Enable TLS 1.2 for secure connections
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
           # Download 7z
           $client = New-Object System.Net.WebClient
           $client.DownloadFile('https://www.7-zip.org/a/7zr.exe', '7zr.exe')
