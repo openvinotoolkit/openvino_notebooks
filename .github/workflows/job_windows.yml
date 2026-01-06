@@ -239,7 +239,7 @@ jobs:
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} `
             --timeout 1200 `
             ${{ inputs.test_only_changed == 'true' && '--test_list test_notebooks.txt' || '' }} `
-            ${{ inputs.ignore_list && '--ignore_list ' + inputs.ignore_list || '' }}
+            ${{ inputs.ignore_list && join(['--ignore_list', inputs.ignore_list], ' ') || '' }}
 
       - name: Archive notebook test report
         if: always()

@@ -64,8 +64,8 @@ TestPlan = dict[Path, NotebookReport]
 def parse_arguments():
     parser = ArgumentParser()
     parser.add_argument("--ignore_config", required=False, default=SKIPPED_NOTEBOOKS_CONFIG_FILENAME)
-    parser.add_argument("--ignore_list", required=False, nargs="+")
-    parser.add_argument("--test_list", required=False, nargs="+")
+    parser.add_argument("--ignore_list", required=False, nargs="+", default=None)
+    parser.add_argument("--test_list", required=False, nargs="+", default=None)
     parser.add_argument("--os", type=validation_config_arg("os"))
     parser.add_argument("--python", type=validation_config_arg("python"))
     parser.add_argument("--device", type=validation_config_arg("device"))
