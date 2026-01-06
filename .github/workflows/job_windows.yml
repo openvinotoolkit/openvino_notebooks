@@ -232,23 +232,22 @@ jobs:
       - name: Analysing with treon
         shell: pwsh
         run: |
-          $IGNORE_ARGS = " "
+          $IGNORE_ARGS = ""
           if ("${{ inputs.ignore_list }}") {
-            $IGNORE_ARGS = "$IGNORE_ARGS ${{ inputs.ignore_list }}"
+            $IGNORE_ARGS = "--ignore_list ${{ inputs.ignore_list }}"
           }
           
-          if ($IGNORE_ARGS.Trim()) {
-            $IGNORE_ARGS = "--ignore_list $IGNORE_ARGS"
+          $testListArg = ""
+          if ("${{ inputs.test_only_changed }}" -eq "true") {
+            $testListArg = "--test_list test_notebooks.txt"
           }
-
-          $testListArg = if ("${{ inputs.test_only_changed }}" -eq "true") { "--test_list test_notebooks.txt" } else { " " }
           
           python3 .ci/validate_notebooks.py `
             --os ${{ env.OS_NAME }} `
             --python ${{ inputs.python }} `
-            --device ${{ env.TEST_DEVICE }} $testListArg $IGNORE_ARGS `
+            --device ${{ env.TEST_DEVICE }} `
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} `
-            --timeout 1200
+            --timeout 1200 $testListArg $IGNORE_ARGS
 
       - name: Archive notebook test report
         if: always()
