@@ -108,28 +108,21 @@ jobs:
         if: ${{ !inputs.container && runner.os == 'Linux' }}
         shell: bash
         run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get update -y
-            sudo apt-get install libsndfile1 ffmpeg espeak-ng -y
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-            brew install ffmpeg espeak-ng
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            # Download 7z standalone utility
-            curl -L https://www.7-zip.org/a/7zr.exe -o 7zr.exe
-            # Download ffmpeg
-            curl -L https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-full_build.7z -o ffmpeg.7z
-            # Extract ffmpeg using 7z
-            ./7zr.exe x ffmpeg.7z -y
-            mv ffmpeg-7.1.1-full_build ffmpeg
-            echo "$PWD/ffmpeg/bin" >> $GITHUB_PATH
-          fi
+          sudo apt-get update -y
+          sudo apt-get install libsndfile1 ffmpeg espeak-ng -y
       
       - name: Install required packages (Windows)
         if: ${{ !inputs.container && runner.os == 'Windows' }}
         shell: pwsh
         run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))       
-          choco install ffmpeg
+          # Download 7z standalone utility
+          Invoke-WebRequest -Uri 'https://www.7-zip.org/a/7zr.exe' -OutFile '7zr.exe' -UseBasicParsing
+          # Download ffmpeg
+          Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-full_build.7z' -OutFile 'ffmpeg.7z' -UseBasicParsing
+          # Extract ffmpeg using 7z
+          .\7zr.exe x ffmpeg.7z -y
+          Move-Item -Path ffmpeg-7.1.1-full_build -Destination ffmpeg
+          "$PWD\ffmpeg\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       
       # Packages that notebooks need to run in docker container
       - name: Install required packages (container)
