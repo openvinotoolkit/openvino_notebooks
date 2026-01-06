@@ -188,11 +188,7 @@ jobs:
 
       # PaddleGAN stores cache in ppgan directory in CACHE_DIR
       - name: Set CACHE_DIR
-        shell: bash
-        run: |
-          python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))'
-          # replace backslashes with forward slashes for Windows paths
-          python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+        run: python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
 
       # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
       - name: Set HUB_HOME
@@ -222,8 +218,7 @@ jobs:
       # Download a small dataset to use for testing purposes in monai-kidney training notebook
       - name: Download CT files
         if: steps.cachefiles.outputs.cache-hit != 'true'
-        run: |
-          curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
+        run: curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
       
       - name: Copy CT files
         run: |
@@ -284,28 +279,29 @@ jobs:
       # Main notebooks test. Verifies that all notebooks run without errors
       - name: Analysing with treon (Windows)
         if: runner.os == 'Windows'
-        shell: bash
+        shell: pwsh
         run: |
-          IGNORE_ARGS=""
-          if [[ -n "${{ inputs.ignore_list }}" ]]; then
-            IGNORE_ARGS="$IGNORE_ARGS ${{ inputs.ignore_list }}"
-          fi
-          if [[ "${{ env.TEST_DEVICE }}" == "gpu" ]]; then
-             IGNORE_ARGS="$IGNORE_ARGS .ci/heavy_win_gpu.txt"
-          fi
+          $IGNORE_ARGS = ""
+          if ("${{ inputs.ignore_list }}") {
+            $IGNORE_ARGS = "$IGNORE_ARGS ${{ inputs.ignore_list }}"
+          }
+          if ("${{ env.TEST_DEVICE }}" -eq "gpu") {
+            $IGNORE_ARGS = "$IGNORE_ARGS .ci/heavy_win_gpu.txt"
+          }
           
-          if [[ -n "$IGNORE_ARGS" ]]; then
-            IGNORE_ARGS="--ignore_list $IGNORE_ARGS"
-          fi
+          if ($IGNORE_ARGS.Trim()) {
+            $IGNORE_ARGS = "--ignore_list $IGNORE_ARGS"
+          }
 
-          python${{ inputs.python }} .ci/validate_notebooks.py \
-            --os ${{ env.OS_NAME }} \
-            --python ${{ inputs.python }} \
-            --device ${{ env.TEST_DEVICE }} \
-            ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            $IGNORE_ARGS \
-            --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
-            --move_notebooks_dir c:/notebooks \
+          $testListArg = if ("${{ inputs.test_only_changed }}" -eq "true") { "--test_list test_notebooks.txt" } else { "" }
+          
+          python${{ inputs.python }} .ci/validate_notebooks.py `
+            --os ${{ env.OS_NAME }} `
+            --python ${{ inputs.python }} `
+            --device ${{ env.TEST_DEVICE }} `
+            $testListArg `
+            $IGNORE_ARGS `
+            --report_dir test_report/${{ env.TEST_REPORT_DIR }} `
             --timeout 1200
       
       - name: Analysing with treon (Linux)
