@@ -1,0 +1,263 @@
+name: Windows Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      runs_on:
+        required: true
+        type: string
+      python:
+        required: true
+        type: string
+      test_only_changed:
+        required: false
+        type: boolean
+        default: false
+      ignore_list:
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+env:
+  PIP_CACHE_PATH_WIN: "C:/mount/caches/pip/win"
+
+jobs:
+  build_treon:
+    runs-on: ${{ inputs.runs_on }}
+    steps:
+      - name: Set env variables
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const container = "${{ inputs.container }}";
+            const runsOn = "${{ inputs.runs_on }}";
+            const osName = runsOn.includes('linux') ? 'ubuntu-22.04' : 'windows-2022';
+            const testDevice = runsOn === 'gpu' ? 'gpu' : 'cpu';
+            const testReportDir = `${testDevice}-${osName}-${{ inputs.python }}`;
+            core.exportVariable('OS_NAME', osName);
+            core.exportVariable('TEST_DEVICE', testDevice);
+            core.exportVariable('TEST_REPORT_DIR', testReportDir);
+            core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
+            core.exportVariable('PIP_CACHE_PATH', runsOn.includes('linux') ? "${{ env.PIP_CACHE_PATH_LINUX }}" : "${{ env.PIP_CACHE_PATH_WIN }}");
+
+      #### Installation/preparation ####
+      #
+      # These steps are also copied to convert_notebooks.yml
+      - name: Checkout repository
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+
+      - name: Get changed files
+        if: ${{ inputs.test_only_changed }}
+        id: changed-files
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
+        with:
+          files: |
+            notebooks/*/**
+            requirements.txt
+
+      - name: List all changed files
+        if: ${{ inputs.test_only_changed }}
+        shell: bash
+        run: |
+          changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+          changed_files=$(echo $changed_files | tr '\\' '/')
+
+          # Check if any notebook files were changed
+          notebook_changed=false
+          for file in $changed_files; do
+            if [[ $file == notebooks/* ]]; then
+              notebook_changed=true
+              break
+            fi
+          done
+
+          if [ "$notebook_changed" = true ]; then
+            # If notebooks were changed, test those notebooks
+            touch test_notebooks.txt
+            for file in $changed_files; do
+              echo "$file was changed"
+              echo $file >> test_notebooks.txt
+            done
+          else
+            # If no notebooks were changed, use precommit list
+            echo "No notebook files changed, using precommit list"
+            cp .ci/precommit_list.txt test_notebooks.txt
+          fi
+
+      - name: Dotenv Action
+        id: dotenv
+        uses: xom9ikk/dotenv@ac290ca23a42155a0cba1031d23afa46240116a9 # v2.3.0
+        with:
+          path: ./.github/workflows
+      
+      # Packages that notebooks need to run in plain os
+      - name: Install required packages
+        run: |
+          # Download 7z standalone utility
+          Invoke-WebRequest -Uri 'https://www.7-zip.org/a/7zr.exe' -OutFile '7zr.exe' -UseBasicParsing
+          # Download ffmpeg
+          Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-full_build.7z' -OutFile 'ffmpeg.7z' -UseBasicParsing
+          # Extract ffmpeg using 7z
+          .\7zr.exe x ffmpeg.7z -y
+          Move-Item -Path ffmpeg-7.1.1-full_build -Destination ffmpeg
+          "$PWD\ffmpeg\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Setup Python ${{ inputs.python }}
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@e4b65a0ab6c946c72d56240223620837e6d34bf8
+        with:
+          version: ${{ inputs.python }}
+          pip-cache-path: ${{ env.PIP_CACHE_PATH }}
+          should-setup-pip-paths: 'true'
+          self-hosted-runner: 'true'
+
+      - name: Cache Pip Packages
+        id: cachepip
+        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
+        with:
+          path: |
+            pipcache
+          key: ${{ env.PIP_CACHE_KEY }}-${{ env.OS_NAME }}-${{ inputs.python }}
+
+      # Cache specific files to reduce downloads or prevent network issues
+      - name: Cache Files
+        id: cachefiles
+        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
+        with:
+          path: |
+            # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
+            # and change cache paths in both treon.yml and convert_notebooks.yml
+            case_00030.zip
+            notebooks/ct-segmentation-quantize/kits19_frames_1
+            notebooks/pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
+            # omz cache location is set to this with test_replace
+            notebooks/optical-character-recognition/open_model_zoo_cache
+            notebooks/ct-scan-live-inference/kits19_frames_1
+            notebooks/pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
+          key: ${{ env.FILES_CACHE_KEY }}
+
+      # PaddleGAN stores cache in ppgan directory in CACHE_DIR
+      - name: Set CACHE_DIR
+        run: python3 -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+
+      # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
+      - name: Set HUB_HOME
+        shell: bash
+        run: echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
+
+      # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
+      - name: Cache PaddlePaddle cache directories
+        id: cacheusercache
+        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
+        with:
+          path: |
+            ${{ env.HUB_HOME }}
+            ${{ env.CACHE_DIR }}/paddle
+            ${{ env.CACHE_DIR }}/ppgan
+          key: ${{ env.USER_CACHE_KEY }}-${{ env.OS_NAME }}
+
+      - name: Cache openvino packages
+        if: steps.cachepip.outputs.cache-hit != 'true'
+        run: |
+          python3 -m pip install --upgrade pip
+          mkdir pipcache
+          python3 -m pip install --cache-dir pipcache --no-deps openvino nncf
+          cp -r pipcache pipcache_openvino
+          # python3 -m pip uninstall -y openvino nncf
+
+      # Download a small dataset to use for testing purposes in monai-kidney training notebook
+      - name: Download CT files
+        if: steps.cachefiles.outputs.cache-hit != 'true'
+        run: curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
+      
+      - name: Copy CT files
+        run: |
+          mkdir notebooks/ct-segmentation-quantize/kits19
+          mkdir notebooks/ct-segmentation-quantize/kits19/kits19_frames
+          unzip case_00030.zip
+          cp -r case_00030 case_00001
+          mv case_00030 notebooks/ct-segmentation-quantize/kits19/kits19_frames
+          mv case_00001 notebooks/ct-segmentation-quantize/kits19/kits19_frames
+
+      # Prevent test aborting by timeout for 'meter-reader' and 'paddle-ocr-webcam' notebooks
+      - name: Download long loading models for 'meter-reader' and 'paddle-ocr-webcam' notebooks
+        run: |
+          mkdir notebooks/meter-reader/model
+          curl -o notebooks/meter-reader/model/meter_det_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_det_model.tar.gz'
+          curl -o notebooks/meter-reader/model/meter_seg_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_seg_model.tar.gz'
+          mkdir notebooks/paddle-ocr-webcam/model
+          curl -o notebooks/paddle-ocr-webcam/model/ch_PP-OCRv3_det_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_det_infer.tar'
+          curl -o notebooks/paddle-ocr-webcam/model/ch_PP-OCRv3_rec_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_rec_infer.tar'
+
+      - name: Install python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
+          python3 -m ipykernel install --user --name openvino_env
+
+      # Cache OpenVINO packages (`mv` works cross-platform)
+      - name: Make pipcache directory with OpenVINO packages
+        if: steps.cachepip.outputs.cache-hit != 'true'
+        run: |
+          mv pipcache pipcache_full
+          mv pipcache_openvino pipcache
+
+      # Create list of installed pip packages that can be downloaded as artifacts
+      # to verify the exact environment of a specific test run
+      # - name: pip freeze
+      #   run: |
+      #     python${{ inputs.python }} -m pip freeze
+      #     python${{ inputs.python }} -m pip freeze > pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
+      # - name: Upload pip freeze artifact
+      #   uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+      #   with:
+      #     name: pip-freeze-${{ env.TEST_DEVICE }}-${{ env.OS_NAME }}-${{ inputs.python }}
+      #     path: pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
+      #### End installation/preparation
+
+      - name: Check install
+        run: python3 check_install.py
+
+      # Patch long running cells to run faster
+      - name: Patch notebooks
+        run: python3 .ci/patch_notebooks.py . -td ${{ env.TEST_DEVICE }}
+
+      # Test that JupyterLab runs without errors
+      - name: Test Jupyterlab
+        run: jupyter lab notebooks --help
+
+      # Main notebooks test. Verifies that all notebooks run without errors
+      - name: Analysing with treon
+        shell: pwsh
+        run: |
+          $IGNORE_ARGS = ""
+          if ("${{ inputs.ignore_list }}") {
+            $IGNORE_ARGS = "$IGNORE_ARGS ${{ inputs.ignore_list }}"
+          }
+          if ("${{ env.TEST_DEVICE }}" -eq "gpu") {
+            $IGNORE_ARGS = "$IGNORE_ARGS .ci/heavy_win_gpu.txt"
+          }
+          
+          if ($IGNORE_ARGS.Trim()) {
+            $IGNORE_ARGS = "--ignore_list $IGNORE_ARGS"
+          }
+
+          $testListArg = if ("${{ inputs.test_only_changed }}" -eq "true") { "--test_list test_notebooks.txt" } else { "" }
+          
+          python3 .ci/validate_notebooks.py `
+            --os ${{ env.OS_NAME }} `
+            --python ${{ inputs.python }} `
+            --device ${{ env.TEST_DEVICE }} `
+            $testListArg `
+            $IGNORE_ARGS `
+            --report_dir test_report/${{ env.TEST_REPORT_DIR }} `
+            --timeout 1200
+
+      - name: Archive notebook test report
+        if: always()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        with:
+          name: test_report-${{ env.TEST_REPORT_DIR }}
+          path: test_report/
