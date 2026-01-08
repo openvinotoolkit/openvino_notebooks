@@ -105,6 +105,9 @@ def compress(
         gc.collect()
         print("✅ Dataset preparation finished")
 
+    if nncf_dataset is None and sm != SensitivityMetric.WEIGHT_QUANTIZATION_ERROR:
+        sm = SensitivityMetric.WEIGHT_QUANTIZATION_ERROR
+
     print("⌛ Model compression started")
     print(
         f"Compression parameters:\n\t\n\talgorithm {algo}\n\tgroup size - {group_size}\n\tratio - {ratio}\n\tawq - {awq}\n\tscale estimation - {scale_estimation}\n\tlora correction - {lora}\n\tgptq - {gptq}\n\tall_layers - {all_layers}"

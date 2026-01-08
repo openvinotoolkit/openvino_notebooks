@@ -186,7 +186,7 @@ def make_demo(pipe):
                 if not file_path.endswith(".mp4"):  # Skip videos
                     # Convert image file to OpenVINO Tensor format
                     pic = Image.open(file_path).convert("RGB")
-                    image_data = np.array(pic.getdata()).reshape(1, pic.size[1], pic.size[0], 3).astype(np.byte)
+                    image_data = np.array(pic.getdata()).reshape(1, pic.size[1], pic.size[0], 3).astype(np.uint8)
                     images.append(ov.Tensor(image_data))
 
         # Create a queue to collect streaming output
