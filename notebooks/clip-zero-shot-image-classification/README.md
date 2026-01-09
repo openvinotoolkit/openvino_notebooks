@@ -13,15 +13,10 @@ You can find more information about this model in the [research paper](https://a
 This folder contains notebook that show how to convert and quantize model with OpenVINO and NNCF
 
 The notebook contains the following steps:
-1. Download the model.
-2. Instantiate the PyTorch model.
-3. Convert model to OpenVINO IR, using the model conversion API.
-4. Run CLIP with OpenVINO.
-5. Quantize the converted model with NNCF.
-6. Check the quantized model inference result.
-7. Compare model size of converted and quantized models.
-8. Compare performance of converted and quantized models.
-9. Launch interactive demo
+1. Instantiate model.
+2. Run PyTorch model inference.
+3. Convert model with OpenVINO.
+4. Launch interactive demo
 
 
 We will use CLIP model for zero-shot image classification. The result of model work demonstrated on the image below

@@ -21,6 +21,10 @@ DEFAULT_RAG_PROMPT_CHINESE = """\
 基于以下已知信息，请简洁并专业地回答用户的问题。如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。\
 """
 
+DEFAULT_RAG_PROMPT_JAPANESE = """\
+検索されたコンテキストを使用して、質問に答えてください。答えがわからない場合は、わからないと答えてください。簡潔に答えてください。\
+"""
+
 
 def red_pijama_partial_text_processor(partial_text, new_text):
     if new_text == "<":
@@ -73,8 +77,6 @@ def qwen_completion_to_prompt(completion):
 
 SUPPORTED_LLM_MODELS = {
     "English": {
-        "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
-        "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
         "Qwen3-0.6B": {
             "model_id": "Qwen/Qwen3-0.6B",
             "remote_code": False,
@@ -115,6 +117,8 @@ SUPPORTED_LLM_MODELS = {
             "completion_to_prompt": qwen_completion_to_prompt,
             "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
+        "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
+        "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
         "GLM-4-9B-0414": {
             "model_id": "THUDM/GLM-4-9B-0414",
             "remote_code": False,
@@ -494,6 +498,24 @@ SUPPORTED_LLM_MODELS = {
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": qwen_completion_to_prompt,
         },
+        "afm-4.5b": {
+            "model_id": "arcee-ai/AFM-4.5B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+        },
+        "gpt-oss-20b": {
+            "model_id": "openai/gpt-oss-20b",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT + " You should not show your reasoning steps. Reasoning: low.",
+            "exclude_on_devices": ["GPU"],
+        },
+        "bitnet-b1.58-2B-4T": {
+            "model_id": "microsoft/bitnet-b1.58-2B-4T",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "genai_chat_template": "{% set loop_messages = messages %}{% for message in loop_messages %}{% set content = message['role'].capitalize() + ': '+ message['content'].strip() + '<|eot_id|>' %}{{ content }}{% endfor %}{% if add_generation_prompt %}{{ 'Assistant: ' }}{% endif %}",
+            "exclude_compression": ["INT4", "INT4-AWQ", "INT4-NPU", "INT8"],
+        },
     },
     "Chinese": {
         "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
@@ -687,6 +709,11 @@ SUPPORTED_LLM_MODELS = {
             "current_message_template": "ユーザー: {user}\nシステム: {assistant}",
             "tokenizer_kwargs": {"add_special_tokens": False},
             "partial_text_processor": youri_partial_text_processor,
+            "rag_prompt_template": f"設定: {DEFAULT_RAG_PROMPT_JAPANESE}\n"
+            + """
+            ユーザー: 質問: {input}
+            コンテキスト: {context}
+            システム: """,
         },
     },
 }
@@ -720,6 +747,13 @@ SUPPORTED_EMBEDDING_MODELS = {
             "mean_pooling": False,
             "normalize_embeddings": True,
         },
+        "bge-m3": {
+            "model_id": "BAAI/bge-m3",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
+    },
+    "Japanese": {
         "bge-m3": {
             "model_id": "BAAI/bge-m3",
             "mean_pooling": False,
@@ -850,20 +884,32 @@ int4_npu_config = {
 def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True, device=None):
     import ipywidgets as widgets
 
+    filter_models_by_device = lambda model_info: device not in model_info[1].get("exclude_on_devices", [])
+    available_optimumzations = SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"]
+
     lang_dropdown = widgets.Dropdown(options=languages or [])
 
     # Define dependent drop down
-
-    model_dropdown = widgets.Dropdown(options=models)
+    supported_models = dict(filter(filter_models_by_device, models.items()))
+    model_dropdown = widgets.Dropdown(options=supported_models)
 
     def dropdown_handler(change):
         global default_language
         default_language = change.new
         # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
-        model_dropdown.options = SUPPORTED_LLM_MODELS[change.new]
+        supported_models = SUPPORTED_LLM_MODELS[change.new]
+        model_dropdown.options = dict(filter(filter_models_by_device, supported_models.items()))
 
     lang_dropdown.observe(dropdown_handler, names="value")
-    compression_dropdown = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"])
+
+    def dropdown_model_handler(change):
+        global model_dropdown
+        model_dropdown = change.new
+        compression_dropdown.options = filter(lambda opt_type: opt_type not in change.new.get("exclude_compression", []), available_optimumzations)
+
+    model_dropdown.observe(dropdown_model_handler, names="value")
+
+    compression_dropdown = widgets.Dropdown(options=available_optimumzations)
     preconverted_checkbox = widgets.Checkbox(value=True)
 
     form_items = []

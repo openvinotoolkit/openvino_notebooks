@@ -13,6 +13,7 @@ AE
 AEs
 aeroplane
 affective
+AFM
 Agentic
 agentic
 ai
@@ -33,6 +34,7 @@ Antelopev
 api
 APIs
 Arcface
+Arcee
 argmax
 artstation
 arxiv
@@ -84,11 +86,13 @@ bilinear
 biometrics
 BiT
 bitext
+bitnet
 blockwise
 BLACKBOX
 boolean
 CatVTON
 CausVid
+CER
 CentOS
 centric
 CFG
@@ -194,9 +198,11 @@ Deci
 DeciDiffusion
 DeciDiffusion's
 deduplicated
+DeepEncoder
 DeepFloyd
 DeepLabV
 DeepSeek
+DeepStack
 denoise
 denoised
 denoises
@@ -298,6 +304,7 @@ feedforward
 FeedForward
 FFN
 FFmpeg
+FireRedTTS
 FIL
 FEIL
 finetuned
@@ -337,6 +344,7 @@ GenerationMixin
 Girshick
 Gitee
 GitHub
+GGUF
 GLA
 GLM
 glm
@@ -346,6 +354,7 @@ Golang
 googlenet
 GOPRO
 GPT
+gpt
 gpu
 GPU's
 GPUs
@@ -424,6 +433,7 @@ intervaling
 im
 imageLink
 img
+io
 ip
 IPs
 ir
@@ -571,9 +581,11 @@ MERCHANTABILITY
 MF
 MiB
 microservices
+microsoft
 MiDaS
 MidasNet
 Midjourney
+midtraining
 minicpm
 MiniCPM
 MiniLM
@@ -713,6 +725,7 @@ optimizable
 Orca
 otsl
 OSNet
+oss
 OTSL
 OuteTTS
 outpainting
@@ -902,6 +915,7 @@ Ruizhongtai
 Runtime
 runtime
 runtimes
+RVQ
 Safetensors
 SageMaker
 sagittal
@@ -951,6 +965,7 @@ SML
 sml
 SmolDocling
 SmolVLM
+SmolLM
 softmax
 softvc
 SoftVC

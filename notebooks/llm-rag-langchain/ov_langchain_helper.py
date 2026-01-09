@@ -736,3 +736,68 @@ class OpenVINOReranker(BaseDocumentCompressor):
             )
             final_results.append(doc)
         return final_results
+
+
+class OpenVINOGenAIReranker(BaseDocumentCompressor):
+    """OpenVINO reranking models.
+
+    To use, you should have the ``openvino-genai`` python package installed.
+
+    Example:
+        .. code-block:: python
+
+            from ov_langchain_helper import OpenVINOGenAIReranker
+
+            model_path = "./sentence-transformers/all-mpnet-base-v2"
+            config_kwargs = {'top_n': 3}
+            ov = OpenVINOGenAIReranker.from_model_path(
+                model_path=model_path,
+                device='CPU',
+                config_kwargs=config_kwargs,
+            )
+    """
+
+    ov_pipe: Any = None
+    """OpenVINO pipeline object."""
+    top_n: int = 3
+    """return Top n texts. can not be updated after pipeline was created."""
+
+    model_config = ConfigDict(extra="forbid", protected_namespaces=())
+
+    @classmethod
+    def from_model_path(cls, model_path: str, device: str = "CPU", config_kwargs: Dict[str, Any] = {}) -> OpenVINOGenAIReranker:
+        """Construct the openvino text embedding pipeline from model_path"""
+        try:
+            import openvino_genai
+
+        except ImportError:
+            raise ImportError("Could not import OpenVINO GenAI package. " "Please install it with `pip install openvino-genai`.")
+
+        config = openvino_genai.TextRerankPipeline.Config()
+        if "top_n" in config_kwargs:
+            config.top_n = config_kwargs["top_n"]
+            top_n = config_kwargs["top_n"]
+        if "max_length" in config_kwargs:
+            config.max_length = config_kwargs["max_length"]
+
+        ov_pipe = openvino_genai.TextRerankPipeline(model_path, device, config)
+
+        return cls(ov_pipe=ov_pipe)
+
+    def compress_documents(
+        self,
+        documents: Sequence[Document],
+        query: str,
+        callbacks: Optional[Callbacks] = None,
+    ) -> Sequence[Document]:
+        docs = [doc.page_content for doc in documents]
+        rerank_response = self.ov_pipe.rerank(query, docs)
+        final_results = []
+        for index, score in rerank_response:
+            doc = Document(
+                page_content=documents[index].page_content,
+                metadata={"id": index, "relevance_score": score},
+            )
+            final_results.append(doc)
+
+        return final_results

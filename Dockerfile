@@ -1,13 +1,13 @@
-FROM quay.io/opendatahub/workbench-images:runtime-minimal-ubi9-python-3.9
+FROM quay.io/opendatahub/workbench-images:runtime-minimal-ubi9-python-3.11
 
-LABEL name="odh-notebook-jupyter-intel-openvino-ubi9-python-3.9" \
+LABEL name="odh-notebook-jupyter-intel-openvino-ubi9-python-3.11" \
     maintainer="helena.kloosterman@intel.com" \
     vendor="Intel Corporation" \
     release="2024.2" \
     summary="Jupyter Intel® OpenVINO notebook image for ODH notebooks." \
-    description="Jupyter Intel® OpenVINO notebook image with base Python 3.9 builder image based on UBI9 for ODH notebooks" \
+    description="Jupyter Intel® OpenVINO notebook image with base Python 3.11 builder image based on UBI9 for ODH notebooks" \
     io.k8s.display-name="Jupyter Intel® OpenVINO notebook image for ODH notebooks." \
-    io.k8s.description="Jupyter Intel® OpenVINO notebook image with base Python 3.9 builder image based on UBI9 for ODH notebooks" \
+    io.k8s.description="Jupyter Intel® OpenVINO notebook image with base Python 3.11 builder image based on UBI9 for ODH notebooks" \
     io.openshift.build.commit.ref="main"
 
 USER 0
@@ -39,7 +39,7 @@ RUN echo "Installing softwares and packages" && \
     rm -f ./Pipfile.lock && \
     # Disable announcement plugin of jupyterlab \
     jupyter labextension disable "@jupyterlab/apputils-extension:announcements" && \
-    chmod -R g+w /opt/app-root/lib/python3.9/site-packages && \
+    chmod -R g+w /opt/app-root/lib/python3.11/site-packages && \
     fix-permissions /opt/app-root -P
 
 COPY --chown=1001:0 .docker/start-notebook.sh /opt/app-root/bin
