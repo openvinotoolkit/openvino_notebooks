@@ -40,7 +40,7 @@ def make_demo(model):
 
         """
         pic = Image.open(path).convert("RGB")
-        image_data = np.array(pic.getdata()).reshape(1, pic.size[1], pic.size[0], 3).astype(np.byte)
+        image_data = np.array(pic.getdata()).reshape(1, pic.size[1], pic.size[0], 3).astype(np.uint8)
         return ov.Tensor(image_data)
 
     class TextQueue:
