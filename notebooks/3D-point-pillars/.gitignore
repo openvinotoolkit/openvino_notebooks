@@ -1,8 +1,0 @@
-__pycache__
-build/
-*.egg-info
-*.so
-*_logs*
-tmp/
-results/
-.idea
