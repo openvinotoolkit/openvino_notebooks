@@ -10,6 +10,7 @@ import psutil
 import threading
 import queue
 import yaml
+import venv
 from clonevirtualenv import clone_virtualenv
 import traceback
 import tempfile
@@ -330,10 +331,12 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
         raise FileNotFoundError(f"Source virtual environment path '{source_env_path}' does not exist.")
 
     # Validate source environment structure
+    is_standard_venv = True
     if platform.system() == "Windows":
         expected_python = source_env_path / "Scripts" / "python.exe"
         if not expected_python.exists():
             print(f"Warning: Expected python executable not found at {expected_python}", flush=True)
+            is_standard_venv = False
     else:
         expected_python = source_env_path / "bin" / "python"
         if not expected_python.exists():
@@ -347,7 +350,12 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
         remove_venv(target_env_path)
 
     try:
-        clone_virtualenv(str(source_env_path), str(target_env_path))
+        if is_standard_venv:
+            clone_virtualenv(str(source_env_path), str(target_env_path))
+        else:
+            print(f"Falling back to venv create from {sys.executable}")
+            builder = venv.EnvBuilder(with_pip=True)
+            builder.create(target_env_path)
     except Exception as e:
         print(f"Error cloning virtual environment: {e}", flush=True)
         print(traceback.format_exc(), flush=True)
