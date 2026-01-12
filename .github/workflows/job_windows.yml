@@ -240,7 +240,8 @@ jobs:
             "--python", "${{ inputs.python }}",
             "--device", "${{ env.TEST_DEVICE }}",
             "--report_dir", "test_report/${{ env.TEST_REPORT_DIR }}",
-            "--timeout", "1200"
+            "--timeout", "1200",
+            "--separate_venv"
           )
           
           if ("${{ inputs.test_only_changed }}" -eq "true") {
