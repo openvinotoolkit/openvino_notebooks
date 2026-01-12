@@ -557,7 +557,7 @@ def run_test(
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to create virtual environment for notebook {notebook_path}. Error: {e}")
                     return result
-            
+
             # Update PATH so subprocesses inside notebook can find venv executables (e.g. optimum-cli)
             original_path = os.environ.get("PATH", "")
             if source_venv_path:
@@ -565,7 +565,9 @@ def run_test(
 
             try:
                 ov_version_before = get_pip_package_version(python_executable, "openvino", "OpenVINO before notebook execution", "OpenVINO is missing")
-                get_pip_package_version(python_executable, "openvino_tokenizers", "OpenVINO Tokenizers before notebook execution", "OpenVINO Tokenizers is missing")
+                get_pip_package_version(
+                    python_executable, "openvino_tokenizers", "OpenVINO Tokenizers before notebook execution", "OpenVINO Tokenizers is missing"
+                )
                 get_pip_package_version(python_executable, "openvino_genai", "OpenVINO GenAI before notebook execution", "OpenVINO GenAI is missing")
                 patched_notebook = Path(f"test_{notebook_path.name}")
                 if not patched_notebook.exists():
@@ -584,7 +586,9 @@ def run_test(
                 )
 
                 ov_version_after = get_pip_package_version(python_executable, "openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
-                get_pip_package_version(python_executable, "openvino_tokenizers", "OpenVINO Tokenizers after notebook execution", "OpenVINO Tokenizers is missing")
+                get_pip_package_version(
+                    python_executable, "openvino_tokenizers", "OpenVINO Tokenizers after notebook execution", "OpenVINO Tokenizers is missing"
+                )
                 get_pip_package_version(python_executable, "openvino_genai", "OpenVINO GenAI after notebook execution", "OpenVINO GenAI is missing")
                 result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after)
 
