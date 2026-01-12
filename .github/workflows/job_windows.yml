@@ -228,6 +228,9 @@ jobs:
       - name: Test Jupyterlab
         run: jupyter lab notebooks --help
 
+      - name: Pre-install opencv
+        run: python3 -m pip install opencv-python 
+
       # Main notebooks test. Verifies that all notebooks run without errors
       - name: Analysing with treon
         shell: pwsh
