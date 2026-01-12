@@ -235,12 +235,15 @@ jobs:
       - name: Analysing with treon
         shell: pwsh
         run: |
+          python3 -m venv notebooks_source_venv
+          ./notebooks_source_venv/Scripts/python -m pip install --upgrade pip setuptools wheel
           $cmdArgs = @(
             "--os", "${{ env.OS_NAME }}",
             "--python", "${{ inputs.python }}",
             "--device", "${{ env.TEST_DEVICE }}",
             "--report_dir", "test_report/${{ env.TEST_REPORT_DIR }}",
             "--timeout", "1200",
+            "--source_venv_path", "./notebooks_source_venv",
             "--separate_venv"
           )
           
