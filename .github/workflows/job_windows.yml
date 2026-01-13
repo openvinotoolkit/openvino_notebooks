@@ -243,7 +243,6 @@ jobs:
             "--device", "${{ env.TEST_DEVICE }}",
             "--report_dir", "test_report/${{ env.TEST_REPORT_DIR }}",
             "--timeout", "1200",
-            "--source_venv_path", "${{ github.workspace }}/notebooks_source_venv",
             "--separate_venv"
           )
           
@@ -257,7 +256,7 @@ jobs:
             $cmdArgs += "${{ inputs.ignore_list }}"
           }
           
-          & python3 .ci/validate_notebooks.py @cmdArgs
+          & ./notebooks_source_venv/Scripts/python .ci/validate_notebooks.py @cmdArgs
 
       - name: Archive notebook test report
         if: always()
