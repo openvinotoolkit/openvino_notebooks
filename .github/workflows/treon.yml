@@ -31,6 +31,7 @@ jobs:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
       ignore_list: .ci/tensorflow.txt
+      separate_venv: true
 
   build_treon_gpu:
     if: ${{ false }} # TODO Enable when GPU runners will be available in GitHub Actions
@@ -46,6 +47,7 @@ jobs:
       python: ${{ matrix.python }}
       container: ${{ matrix.container }}
       ignore_list: .ci/tensorflow.txt
+      separate_venv: true
 
   aggregate_notebooks_reports:
     if: always()
