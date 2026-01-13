@@ -243,7 +243,7 @@ jobs:
             "--device", "${{ env.TEST_DEVICE }}",
             "--report_dir", "test_report/${{ env.TEST_REPORT_DIR }}",
             "--timeout", "1200",
-            "--source_venv_path", "./notebooks_source_venv",
+            "--source_venv_path", "${{ github.workspace }}/notebooks_source_venv",
             "--separate_venv"
           )
           
