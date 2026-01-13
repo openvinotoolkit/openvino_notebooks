@@ -21,6 +21,10 @@ on:
         required: false
         type: string
         default: ''
+      separate_venv:
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -294,6 +298,7 @@ jobs:
             $IGNORE_ARGS \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --move_notebooks_dir c:/notebooks \
+            ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --timeout 1200
       - name: Analysing with treon (Linux)
         if: runner.os == 'Linux'
@@ -318,6 +323,7 @@ jobs:
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
             $IGNORE_ARGS \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
+            ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --timeout 1200
       - name: Analysing with treon (MacOS)
         if: runner.os == 'MacOS'
@@ -329,6 +335,7 @@ jobs:
             --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
+            ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --timeout 1200
 
       - name: Archive notebook test report
