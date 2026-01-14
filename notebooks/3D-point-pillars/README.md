@@ -7,7 +7,7 @@ Instead of operating directly on raw points or dense 3D voxels, PointPillar grou
 Core stages:
 - Voxelization / Pillarization: group points into pillars and compute per-pillar statistics.
 - Pillar feature encoding: a small network encodes points in each pillar into a fixed-size feature vector.
-- Scatter to pseudo-image: place each pillar's feature into a 2D grid (pseudo-image) based on the pillar's XY location.
+- Scatter to pseudo-image: place each pillar's feature into a 2D grid (pseudo-image) based on the pillar's X-Y location.
 - 2D backbone + neck: apply 2D convolutions to produce multi-scale feature maps.
 - Detection head: predict class scores, bounding box regressions, and directions on the pseudo-image.
 - Post-processing: decode boxes, apply non-maximum suppression (NMS), and output final detections.
