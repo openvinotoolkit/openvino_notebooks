@@ -697,6 +697,7 @@ def write_single_notebook_report(
     job_name: str,
     device: str,
     saving_dir: Path,
+    notebook_content: str,
 ) -> Path:
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
     report = {
@@ -708,6 +709,7 @@ def write_single_notebook_report(
         "ov_version_after": ov_version_after,
         "job_name": job_name,
         "device_used": device,
+        "notebook_content": notebook_content
     }
     with report_file.open("w") as f:
         json.dump(report, f)
@@ -784,8 +786,9 @@ def main():
             if args.collect_reports:
                 job_name = args.job_name or "Unknown"
                 device = args.device or "Unknown"
+                notebook_content = report["path"].parent.joinpath(patched_notebook).read_text(encoding="utf-8")
                 report_path = write_single_notebook_report(
-                    base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir
+                    base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir, notebook_content=notebook_content
                 )
                 if args.upload_to_db:
                     cmd = [sys.executable, args.upload_to_db, report_path]

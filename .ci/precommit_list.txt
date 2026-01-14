@@ -1,1 +1,2 @@
 notebooks/hello-world/hello-world.ipynb
+notebooks/async-api/async-api.ipynb
