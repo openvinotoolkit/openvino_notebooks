@@ -655,8 +655,7 @@ def run_test(
                 # Execute notebook using nbconvert
                 retcode, duration = execute_notebook_with_nbconvert(
                     notebook_path,
-                    timeout,
-                    python_executable,
+                    timeout
                 )
 
                 ov_version_after = get_pip_package_version(python_executable, "openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
