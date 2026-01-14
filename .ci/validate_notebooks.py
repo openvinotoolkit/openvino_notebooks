@@ -442,11 +442,11 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
         tuple: (return_code, duration) where return_code is 0 for success,
                -42 for timeout, or 1 for other errors
     """
-    print(f"Executing notebook with nbconvert: {notebook_path}", flush=True)
     start_time = time.perf_counter()
     retcode = 0
     notebook_original_name = notebook_path.name
     test_notebook_path = notebook_path.parent / f"test_{notebook_original_name}"
+    print(f"Executing notebook with nbconvert: {test_notebook_path}", flush=True)
     try:
         # Read the notebook
         with open(test_notebook_path, 'r', encoding='utf-8') as f:
@@ -652,7 +652,6 @@ def run_test(
                 collect_python_packages(python_executable, report_dir / (patched_notebook.stem + "_env_before.txt"))
                 print(f'Python executable for notebook test: {python_executable}', flush=True)
 
-                # Execute notebook using nbconvert
                 retcode, duration = execute_notebook_with_nbconvert(
                     notebook_path,
                     timeout
@@ -851,6 +850,8 @@ def main():
             if args.collect_reports:
                 job_name = args.job_name or "Unknown"
                 device = args.device or "Unknown"
+                print(f'Notebook directory content: {list(report["path"].parent.iterdir())}', flush=True)
+                print(f'Executed path: {report["path"].parent.joinpath(f"executed_{report["path"].name}")}', flush=True)
                 notebook_content = report["path"].parent.joinpath(f'executed_{report["path"].name}').read_text(encoding="utf-8")
                 report_path = write_single_notebook_report(
                     base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir, notebook_content=notebook_content
