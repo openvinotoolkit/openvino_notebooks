@@ -430,15 +430,13 @@ def kill_process_tree(pid):
 
 
 def execute_notebook_with_nbconvert(notebook_path: Path, 
-                                    timeout: int, 
-                                    python_executable: Path) -> tuple[int, float]:
+                                    timeout: int) -> tuple[int, float]:
     """
     Execute a Jupyter notebook using nbconvert's ExecutePreprocessor.
 
     Args:
         notebook_path: Path to the notebook file to execute
         timeout: Timeout in seconds for cell execution
-        python_executable: Path to the Python executable to use for execution
 
     Returns:
         tuple: (return_code, duration) where return_code is 0 for success,
@@ -447,10 +445,11 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
     print(f"Executing notebook with nbconvert: {notebook_path}", flush=True)
     start_time = time.perf_counter()
     retcode = 0
-    notebook_original_name = notebook_path.name.replace("test_", "")
+    notebook_original_name = notebook_path.name
+    test_notebook_path = notebook_path.parent / f"test_{notebook_original_name}"
     try:
         # Read the notebook
-        with open(notebook_path, 'r', encoding='utf-8') as f:
+        with open(test_notebook_path, 'r', encoding='utf-8') as f:
             nb = nbformat.read(f, as_version=4)
 
         # Configure the ExecutePreprocessor
@@ -655,7 +654,7 @@ def run_test(
 
                 # Execute notebook using nbconvert
                 retcode, duration = execute_notebook_with_nbconvert(
-                    patched_notebook,
+                    notebook_path,
                     timeout,
                     python_executable,
                 )
