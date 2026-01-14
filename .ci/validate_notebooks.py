@@ -447,22 +447,16 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
     notebook_original_name = notebook_path.name
     test_notebook_path = notebook_path.parent / f"test_{notebook_original_name}"
     print(f"Executing notebook with nbconvert: {test_notebook_path}", flush=True)
+    with open(test_notebook_path, 'r', encoding='utf-8') as f:
+        nb = nbformat.read(f, as_version=4)
+    executed_notebook_path = notebook_path.parent / f"executed_{notebook_original_name}"
     try:
-        # Read the notebook
-        with open(test_notebook_path, 'r', encoding='utf-8') as f:
-            nb = nbformat.read(f, as_version=4)
-
-        # Configure the ExecutePreprocessor
         ep = ExecutePreprocessor(
             timeout=timeout,
         )
 
-        # Execute the notebook
-        # The 'metadata' path is set to the notebook's parent directory
         ep.preprocess(nb, {'metadata': {'path': str(notebook_path.parent)}})
 
-        # Save the executed notebook
-        executed_notebook_path = notebook_path.parent / f"executed_{notebook_original_name}"
         with open(executed_notebook_path, 'w', encoding='utf-8') as f:
             nbformat.write(nb, f)
 
@@ -474,7 +468,6 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
 
         # Still save the notebook with error outputs for debugging
         try:
-            executed_notebook_path = notebook_path.parent / f"executed_{notebook_original_name}"
             with open(executed_notebook_path, 'w', encoding='utf-8') as f:
                 nbformat.write(nb, f)
             print(f"Notebook with error saved to: {executed_notebook_path}", flush=True)
