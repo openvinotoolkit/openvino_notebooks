@@ -118,59 +118,59 @@ jobs:
         with:
           toolset: 14.42 # v2022
       
-      - name: Cache Pip Packages
-        id: cachepip
-        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
-        with:
-          path: |
-            pipcache
-          key: ${{ env.PIP_CACHE_KEY }}-${{ env.OS_NAME }}-${{ inputs.python }}
+      # - name: Cache Pip Packages
+      #   id: cachepip
+      #   uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
+      #   with:
+      #     path: |
+      #       pipcache
+      #     key: ${{ env.PIP_CACHE_KEY }}-${{ env.OS_NAME }}-${{ inputs.python }}
 
-      # Cache specific files to reduce downloads or prevent network issues
-      - name: Cache Files
-        id: cachefiles
-        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
-        with:
-          path: |
-            # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
-            # and change cache paths in both treon.yml and convert_notebooks.yml
-            case_00030.zip
-            notebooks/ct-segmentation-quantize/kits19_frames_1
-            notebooks/pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
-            # omz cache location is set to this with test_replace
-            notebooks/optical-character-recognition/open_model_zoo_cache
-            notebooks/ct-scan-live-inference/kits19_frames_1
-            notebooks/pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
-          key: ${{ env.FILES_CACHE_KEY }}
+      # # Cache specific files to reduce downloads or prevent network issues
+      # - name: Cache Files
+      #   id: cachefiles
+      #   uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
+      #   with:
+      #     path: |
+      #       # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
+      #       # and change cache paths in both treon.yml and convert_notebooks.yml
+      #       case_00030.zip
+      #       notebooks/ct-segmentation-quantize/kits19_frames_1
+      #       notebooks/pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
+      #       # omz cache location is set to this with test_replace
+      #       notebooks/optical-character-recognition/open_model_zoo_cache
+      #       notebooks/ct-scan-live-inference/kits19_frames_1
+      #       notebooks/pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
+      #     key: ${{ env.FILES_CACHE_KEY }}
 
-      # PaddleGAN stores cache in ppgan directory in CACHE_DIR
-      - name: Set CACHE_DIR
-        run: python3 -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+      # # PaddleGAN stores cache in ppgan directory in CACHE_DIR
+      # - name: Set CACHE_DIR
+      #   run: python3 -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
 
-      # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
-      - name: Set HUB_HOME
-        shell: bash
-        run: echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
+      # # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
+      # - name: Set HUB_HOME
+      #   shell: bash
+      #   run: echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
 
-      # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
-      - name: Cache PaddlePaddle cache directories
-        id: cacheusercache
-        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
-        with:
-          path: |
-            ${{ env.HUB_HOME }}
-            ${{ env.CACHE_DIR }}/paddle
-            ${{ env.CACHE_DIR }}/ppgan
-          key: ${{ env.USER_CACHE_KEY }}-${{ env.OS_NAME }}
+      # # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
+      # - name: Cache PaddlePaddle cache directories
+      #   id: cacheusercache
+      #   uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
+      #   with:
+      #     path: |
+      #       ${{ env.HUB_HOME }}
+      #       ${{ env.CACHE_DIR }}/paddle
+      #       ${{ env.CACHE_DIR }}/ppgan
+      #     key: ${{ env.USER_CACHE_KEY }}-${{ env.OS_NAME }}
 
-      - name: Cache openvino packages
-        if: steps.cachepip.outputs.cache-hit != 'true'
-        run: |
-          python3 -m pip install --upgrade pip
-          mkdir pipcache
-          python3 -m pip install --cache-dir pipcache --no-deps openvino nncf
-          cp -r pipcache pipcache_openvino
-          # python3 -m pip uninstall -y openvino nncf
+      # - name: Cache openvino packages
+      #   if: steps.cachepip.outputs.cache-hit != 'true'
+      #   run: |
+      #     python3 -m pip install --upgrade pip
+      #     mkdir pipcache
+      #     python3 -m pip install --cache-dir pipcache --no-deps openvino nncf
+      #     cp -r pipcache pipcache_openvino
+      #     # python3 -m pip uninstall -y openvino nncf
 
       # Download a small dataset to use for testing purposes in monai-kidney training notebook
       - name: Download CT files
@@ -202,12 +202,12 @@ jobs:
           python3 -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
           python3 -m ipykernel install --user --name openvino_env
 
-      # Cache OpenVINO packages (`mv` works cross-platform)
-      - name: Make pipcache directory with OpenVINO packages
-        if: steps.cachepip.outputs.cache-hit != 'true'
-        run: |
-          mv pipcache pipcache_full
-          mv pipcache_openvino pipcache
+      # # Cache OpenVINO packages (`mv` works cross-platform)
+      # - name: Make pipcache directory with OpenVINO packages
+      #   if: steps.cachepip.outputs.cache-hit != 'true'
+      #   run: |
+      #     mv pipcache pipcache_full
+      #     mv pipcache_openvino pipcache
 
       # Create list of installed pip packages that can be downloaded as artifacts
       # to verify the exact environment of a specific test run

@@ -56,4 +56,4 @@ jobs:
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      test_only_changed: false
+      test_only_changed: true
