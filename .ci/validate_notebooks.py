@@ -14,6 +14,8 @@ import venv
 from clonevirtualenv import clone_virtualenv
 import traceback
 import tempfile
+import nbformat
+from nbconvert.preprocessors import ExecutePreprocessor, CellExecutionError
 
 from argparse import ArgumentParser
 from pathlib import Path
@@ -427,6 +429,72 @@ def kill_process_tree(pid):
         print(f"Error killing process tree PID {pid}: {e}", flush=True)
 
 
+def execute_notebook_with_nbconvert(notebook_path: Path, 
+                                    timeout: int, 
+                                    python_executable: Path) -> tuple[int, float]:
+    """
+    Execute a Jupyter notebook using nbconvert's ExecutePreprocessor.
+
+    Args:
+        notebook_path: Path to the notebook file to execute
+        timeout: Timeout in seconds for cell execution
+        python_executable: Path to the Python executable to use for execution
+
+    Returns:
+        tuple: (return_code, duration) where return_code is 0 for success,
+               -42 for timeout, or 1 for other errors
+    """
+    print(f"Executing notebook with nbconvert: {notebook_path}", flush=True)
+    start_time = time.perf_counter()
+    retcode = 0
+
+    try:
+        # Read the notebook
+        with open(notebook_path, 'r', encoding='utf-8') as f:
+            nb = nbformat.read(f, as_version=4)
+
+        # Configure the ExecutePreprocessor
+        ep = ExecutePreprocessor(
+            timeout=timeout,
+        )
+
+        # Execute the notebook
+        # The 'metadata' path is set to the notebook's parent directory
+        ep.preprocess(nb, {'metadata': {'path': str(notebook_path.parent)}})
+
+        # Save the executed notebook
+        executed_notebook_path = notebook_path.parent / f"executed_{notebook_path.name}"
+        with open(executed_notebook_path, 'w', encoding='utf-8') as f:
+            nbformat.write(nb, f)
+
+        print(f"Notebook executed successfully. Saved to: {executed_notebook_path}", flush=True)
+
+    except CellExecutionError as e:
+        print(f"Notebook execution failed with cell error:\n{e}", flush=True)
+        retcode = 1
+
+        # Still save the notebook with error outputs for debugging
+        try:
+            executed_notebook_path = notebook_path.parent / f"executed_{notebook_path.name}"
+            with open(executed_notebook_path, 'w', encoding='utf-8') as f:
+                nbformat.write(nb, f)
+            print(f"Notebook with error saved to: {executed_notebook_path}", flush=True)
+        except Exception as save_error:
+            print(f"Failed to save notebook with error: {save_error}", flush=True)
+
+    except TimeoutError:
+        print(f"Notebook execution timed out after {timeout} seconds", flush=True)
+        retcode = -42  # Special timeout exit code
+
+    except Exception as e:
+        print(f"Notebook execution failed with error:\n{e}", flush=True)
+        print(traceback.format_exc(), flush=True)
+        retcode = 1
+
+    duration = time.perf_counter() - start_time
+    return retcode, duration
+
+
 def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"):
     """
     Run a subprocess with real-time output and timeout protection.
@@ -583,14 +651,13 @@ def run_test(
                     return result
 
                 collect_python_packages(python_executable, report_dir / (patched_notebook.stem + "_env_before.txt"))
+                print(f'Python executable for notebook test: {python_executable}', flush=True)
 
-                main_command = [python_executable, "-m", "treon", "--verbose", str(patched_notebook)]
-
-                retcode, duration = run_subprocess_with_timeout(
-                    main_command,
+                # Execute notebook using nbconvert
+                retcode, duration = execute_notebook_with_nbconvert(
+                    patched_notebook,
                     timeout,
-                    shell=(platform.system() == "Windows"),
-                    description=f"Notebook test [{patched_notebook.name}]",
+                    python_executable,
                 )
 
                 ov_version_after = get_pip_package_version(python_executable, "openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
@@ -786,7 +853,7 @@ def main():
             if args.collect_reports:
                 job_name = args.job_name or "Unknown"
                 device = args.device or "Unknown"
-                notebook_content = report["path"].parent.joinpath(patched_notebook).read_text(encoding="utf-8")
+                notebook_content = report["path"].parent.joinpath(f'executed_{report["path"].name}').read_text(encoding="utf-8")
                 report_path = write_single_notebook_report(
                     base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir, notebook_content=notebook_content
                 )

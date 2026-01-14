@@ -241,7 +241,7 @@ jobs:
           python3 -m venv notebooks_source_venv
           ./notebooks_source_venv/Scripts/python -m pip install --upgrade pip setuptools wheel
           ./notebooks_source_venv/Scripts/python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
-          ./notebooks_source_venv/Scripts/python -m pip install opencv-python --cache-dir pipcache
+          ./notebooks_source_venv/Scripts/python -m pip install opencv-python
           ./notebooks_source_venv/Scripts/python -m ipykernel install --user --name openvino_env
           $cmdArgs = @(
             "--os", "${{ env.OS_NAME }}",
