@@ -572,7 +572,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/wan2.2-text-image-to-video/wan2.2-text-image-to-video.ipynb
 - notebook: notebooks/deepseek-ocr/deepseek-ocr.ipynb
   skips:
     - os:
