@@ -463,7 +463,7 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
         ep.preprocess(nb, {'metadata': {'path': str(notebook_path.parent)}})
 
         # Save the executed notebook
-        executed_notebook_path = notebook_path.parent / f"executed_{notebook_path.name}"
+        executed_notebook_path = notebook_path.parent / f"executed_{notebook_path.name.replace('test_', '')}"
         with open(executed_notebook_path, 'w', encoding='utf-8') as f:
             nbformat.write(nb, f)
 
