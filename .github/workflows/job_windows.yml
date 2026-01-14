@@ -64,6 +64,7 @@ jobs:
         run: |
           changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
           changed_files=$(echo $changed_files | tr '\\' '/')
+          echo "Changed files: $changed_files"
 
           # Check if any notebook files were changed
           notebook_changed=false
@@ -240,6 +241,7 @@ jobs:
           python3 -m venv notebooks_source_venv
           ./notebooks_source_venv/Scripts/python -m pip install --upgrade pip setuptools wheel
           ./notebooks_source_venv/Scripts/python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
+          ./notebooks_source_venv/Scripts/python -m pip install opencv-python --cache-dir pipcache
           ./notebooks_source_venv/Scripts/python -m ipykernel install --user --name openvino_env
           $cmdArgs = @(
             "--os", "${{ env.OS_NAME }}",
@@ -247,7 +249,8 @@ jobs:
             "--device", "${{ env.TEST_DEVICE }}",
             "--report_dir", "test_report/${{ env.TEST_REPORT_DIR }}",
             "--timeout", "1200",
-            "--separate_venv"
+            "--separate_venv",
+            "--collect_reports"
           )
           
           if ("${{ inputs.test_only_changed }}" -eq "true") {
