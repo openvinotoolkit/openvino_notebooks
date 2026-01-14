@@ -844,7 +844,6 @@ def main():
                 job_name = args.job_name or "Unknown"
                 device = args.device or "Unknown"
                 print(f'Notebook directory content: {list(report["path"].parent.iterdir())}', flush=True)
-                print(f'Executed path: {report["path"].parent.joinpath(f"executed_{report["path"].name}")}', flush=True)
                 notebook_content = report["path"].parent.joinpath(f'executed_{report["path"].name}').read_text(encoding="utf-8")
                 report_path = write_single_notebook_report(
                     base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir, notebook_content=notebook_content
