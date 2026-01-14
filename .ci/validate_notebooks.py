@@ -447,7 +447,7 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
     print(f"Executing notebook with nbconvert: {notebook_path}", flush=True)
     start_time = time.perf_counter()
     retcode = 0
-
+    notebook_original_name = notebook_path.name.replace("test_", "")
     try:
         # Read the notebook
         with open(notebook_path, 'r', encoding='utf-8') as f:
@@ -463,7 +463,7 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
         ep.preprocess(nb, {'metadata': {'path': str(notebook_path.parent)}})
 
         # Save the executed notebook
-        executed_notebook_path = notebook_path.parent / f"executed_{notebook_path.name.replace('test_', '')}"
+        executed_notebook_path = notebook_path.parent / f"executed_{notebook_original_name}"
         with open(executed_notebook_path, 'w', encoding='utf-8') as f:
             nbformat.write(nb, f)
 
@@ -475,7 +475,7 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
 
         # Still save the notebook with error outputs for debugging
         try:
-            executed_notebook_path = notebook_path.parent / f"executed_{notebook_path.name}"
+            executed_notebook_path = notebook_path.parent / f"executed_{notebook_original_name}"
             with open(executed_notebook_path, 'w', encoding='utf-8') as f:
                 nbformat.write(nb, f)
             print(f"Notebook with error saved to: {executed_notebook_path}", flush=True)
