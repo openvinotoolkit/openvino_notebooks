@@ -83,3 +83,4 @@ notebooks/wan2.2-text-image-to-video/wan2.2-text-image-to-video.ipynb
 notebooks/deepseek-ocr/deepseek-ocr.ipynb
 notebooks/fireredtts2/fireredtts2.ipynb
 notebooks/qwen-image/qwen-image.ipynb
+notebooks/wan2.2-text-image-to-video/wan2.2-text-image-to-video.ipynb
