@@ -451,11 +451,19 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
         nb = nbformat.read(f, as_version=4)
     executed_notebook_path = notebook_path.parent / f"executed_{notebook_original_name}"
     try:
+        # Ensure environment variables (including PATH with MSVC DLLs) are passed to kernel
         ep = ExecutePreprocessor(
             timeout=timeout,
+            kernel_name='python3',
         )
 
-        ep.preprocess(nb, {'metadata': {'path': str(notebook_path.parent)}})
+        # Pass current environment to ensure DLL paths and other configs are available
+        resources = {
+            'metadata': {
+                'path': str(notebook_path.parent)
+            }
+        }
+        ep.preprocess(nb, resources)
 
         with open(executed_notebook_path, 'w', encoding='utf-8') as f:            
             try:
