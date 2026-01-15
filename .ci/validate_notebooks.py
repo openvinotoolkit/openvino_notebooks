@@ -458,6 +458,16 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
         ep.preprocess(nb, {'metadata': {'path': str(notebook_path.parent)}})
 
         with open(executed_notebook_path, 'w', encoding='utf-8') as f:
+            try:
+                print(f'Notebook content: {json.loads(nb)}', flush=True)
+            except Exception as e:
+                print(f"1. Error printing notebook as JSON: {e}", flush=True)
+            
+            try:
+                print(f'Notebook content: {json.dumps(nb)}', flush=True)
+            except Exception as e:
+                print(f"2. Error printing notebook as JSON: {e}", flush=True)
+            
             print(f'Notebook content: {nbformat.writes(nb)}', flush=True)
             nbformat.write(nb, f)
 
@@ -470,6 +480,8 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
         # Still save the notebook with error outputs for debugging
         try:
             with open(executed_notebook_path, 'w', encoding='utf-8') as f:
+                print(f'Notebook content: {json.loads(nb)}', flush=True)
+                print(f'Notebook content: {json.dumps(nb)}', flush=True)
                 print(f'Notebook content: {nbformat.writes(nb)}', flush=True)
                 nbformat.write(nb, f)
             print(f"Notebook with error saved to: {executed_notebook_path}", flush=True)
