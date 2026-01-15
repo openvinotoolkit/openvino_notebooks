@@ -458,8 +458,8 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
         ep.preprocess(nb, {'metadata': {'path': str(notebook_path.parent)}})
 
         with open(executed_notebook_path, 'w', encoding='utf-8') as f:
-            nbformat.write(nb, f)
             print(f'Notebook content: {nbformat.writes(nb)}', flush=True)
+            nbformat.write(nb, f)
 
         print(f"Notebook executed successfully. Saved to: {executed_notebook_path}", flush=True)
 
@@ -470,8 +470,8 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
         # Still save the notebook with error outputs for debugging
         try:
             with open(executed_notebook_path, 'w', encoding='utf-8') as f:
-                nbformat.write(nb, f)
                 print(f'Notebook content: {nbformat.writes(nb)}', flush=True)
+                nbformat.write(nb, f)
             print(f"Notebook with error saved to: {executed_notebook_path}", flush=True)
         except Exception as save_error:
             print(f"Failed to save notebook with error: {save_error}", flush=True)
