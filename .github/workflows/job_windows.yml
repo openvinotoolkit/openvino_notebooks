@@ -114,15 +114,6 @@ jobs:
           should-setup-pip-paths: 'true'
           self-hosted-runner: 'true'
 
-      - name: Install Visual C++ Redistributable
-        shell: pwsh
-        run: |
-          # Download and install Microsoft Visual C++ Redistributable
-          # This ensures opencv-python can find required DLLs
-          Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vc_redist.x64.exe' -OutFile 'vc_redist.x64.exe' -UseBasicParsing
-          Start-Process -FilePath '.\vc_redist.x64.exe' -ArgumentList '/install', '/quiet', '/norestart' -Wait
-          Write-Host "Visual C++ Redistributable installed"
-
       - name: Configure Developer Command Prompt for Microsoft Visual C++
         uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
         with:
