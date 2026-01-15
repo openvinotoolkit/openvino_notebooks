@@ -463,10 +463,11 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
             except Exception as e:
                 print(f"2. Error printing notebook as JSON: {e}", flush=True)
             
-            print(f'Notebook content: {nbformat.writes(nb)}', flush=True)
-            nbformat.write(nb, f)
-
-        print(f"Notebook executed successfully. Saved to: {executed_notebook_path}", flush=True)
+            # print(f'Notebook content: {nbformat.writes(nb)}', flush=True)
+            # nbformat.write(nb, f)
+            json.dump(nb, f)
+            
+            print(f"Notebook executed successfully. Saved to: {executed_notebook_path}", flush=True)
 
     except CellExecutionError as e:
         print(f"Notebook execution failed with cell error:\n{e}", flush=True)
@@ -480,8 +481,9 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
                 except Exception as e:
                     print(f"2. Error printing notebook as JSON: {e}", flush=True)
             
-                print(f'Notebook content: {nbformat.writes(nb)}', flush=True)
-                nbformat.write(nb, f)
+                # print(f'Notebook content: {nbformat.writes(nb)}', flush=True)
+                # nbformat.write(nb, f)
+                json.dump(nb, f)
                 print(f"Notebook with error saved to: {executed_notebook_path}", flush=True)
         except Exception as save_error:
             print(f"Failed to save notebook with error: {save_error}", flush=True)
