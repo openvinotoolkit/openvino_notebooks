@@ -32,17 +32,17 @@ LangChain for orchestration of document loading, chunking, embedding, retrieval,
 
 To run the notebook:
 
-Launch Jupyter: jupyter notebook
-Open the provided notebook - ov_rag_evaluator.ipynb
-Execute cells in order; each cell includes explanatory comments.
-Provide input sources (file paths or URLs) when prompted.
-Adjust parameters such as:
-- Chunk size / overlap
-- Embedding model name
-- Retrieval top-k
-- Reranker toggle
-- Generation temperature / max tokens
-Run evaluation cells to view metrics dashboard output.
+1. Launch Jupyter: `jupyter notebook`
+2. Open the provided notebook - `ov_rag_evaluator.ipynb`
+3. Execute cells in order; each cell includes explanatory comments.
+4. Provide input sources (file paths or URLs) when prompted.
+5. Adjust parameters such as:
+   - Chunk size / overlap
+   - Embedding model name
+   - Retrieval top-k
+   - Reranker toggle
+   - Generation temperature / max tokens
+6. Run evaluation cells to view metrics dashboard output.
 
 Supported Input
   Textual documents: .pdf, .txt, .docx, .json, .csv
