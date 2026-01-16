@@ -384,20 +384,6 @@ SUPPORTED_LLM_MODELS = {
             Answer: </s>
             <|assistant|>""",
         },
-        "notus-7b-v1": {
-            "model_id": "argilla/notus-7b-v1",
-            "remote_code": False,
-            "start_message": DEFAULT_SYSTEM_PROMPT,
-            "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
-            "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
-            + """
-            <|user|>
-            Question: {input} 
-            Context: {context} 
-            Answer: </s>
-            <|assistant|>""",
-        },
         "neural-chat-7b-v3-3": {
             "model_id": "Intel/neural-chat-7b-v3-3",
             "remote_code": False,
@@ -786,11 +772,6 @@ compression_configs = {
         "ratio": 0.6,
     },
     "gemma-2b-it": {
-        "sym": True,
-        "group_size": 64,
-        "ratio": 0.6,
-    },
-    "notus-7b-v1": {
         "sym": True,
         "group_size": 64,
         "ratio": 0.6,
