@@ -384,20 +384,6 @@ SUPPORTED_LLM_MODELS = {
             Answer: </s>
             <|assistant|>""",
         },
-        "notus-7b-v1": {
-            "model_id": "argilla/notus-7b-v1",
-            "remote_code": False,
-            "start_message": DEFAULT_SYSTEM_PROMPT,
-            "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
-            "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
-            + """
-            <|user|>
-            Question: {input} 
-            Context: {context} 
-            Answer: </s>
-            <|assistant|>""",
-        },
         "neural-chat-7b-v3-3": {
             "model_id": "Intel/neural-chat-7b-v3-3",
             "remote_code": False,
@@ -790,11 +776,6 @@ compression_configs = {
         "group_size": 64,
         "ratio": 0.6,
     },
-    "notus-7b-v1": {
-        "sym": True,
-        "group_size": 64,
-        "ratio": 0.6,
-    },
     "neural-chat-7b-v3-1": {
         "sym": True,
         "group_size": 64,
@@ -989,8 +970,22 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
     print(f"⌛ {model_id} conversion to {precision} started. It may takes some time.")
     display(Markdown("**Export command:**"))
     display(Markdown(f"`{optimum_cli_command}`"))
-    subprocess.run(optimum_cli_command.split(" "), shell=(platform.system() == "Windows"), check=True)
-    print(f"✅ {precision} {model_id} model converted and can be found in {model_dir}")
+
+    try:
+        result = subprocess.run(
+            optimum_cli_command.split(" "), shell=(platform.system() == "Windows"), check=False, capture_output=True, encoding="utf-8", errors="replace"
+        )
+        if result.stdout:
+            print(result.stdout.replace("\ufffd", "?"))
+        if result.stderr:
+            print(result.stderr.replace("\ufffd", "?"))
+        if result.returncode != 0:
+            raise subprocess.CalledProcessError(result.returncode, optimum_cli_command)
+    except Exception as e:
+        print(f"An error occurred during model export: {e}")
+        raise
+
+    print(f"SUCCESS: {precision} {model_id} model converted and can be found in {model_dir}")
     return model_dir
 
 
