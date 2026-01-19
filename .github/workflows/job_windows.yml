@@ -239,17 +239,6 @@ jobs:
       - name: Test Jupyterlab
         run: jupyter lab notebooks --help
 
-      # Build opencv-python from source
-      - name: Build opencv-python wheel from source
-        shell: pwsh
-        run: |
-          git clone --depth 1 --recurse-submodules https://github.com/opencv/opencv-python.git
-          cd opencv-python
-          $env:ENABLE_CONTRIB="0"
-          python3 -m pip install --upgrade pip setuptools wheel
-          python3 -m pip wheel . --no-deps -w ../opencv_wheels
-          cd ..
-
       # Main notebooks test. Verifies that all notebooks run without errors
       - name: Analysing with treon
         shell: pwsh
