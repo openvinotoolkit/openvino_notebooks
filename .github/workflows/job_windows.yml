@@ -239,6 +239,17 @@ jobs:
       - name: Test Jupyterlab
         run: jupyter lab notebooks --help
 
+      # Build opencv-python from source
+      - name: Build opencv-python wheel from source
+        shell: pwsh
+        run: |
+          git clone --depth 1 --recurse-submodules https://github.com/opencv/opencv-python.git
+          cd opencv-python
+          $env:ENABLE_CONTRIB="0"
+          python3 -m pip install --upgrade pip setuptools wheel
+          python3 -m pip wheel . --no-deps -w ../opencv_wheels
+          cd ..
+
       # Main notebooks test. Verifies that all notebooks run without errors
       - name: Analysing with treon
         shell: pwsh
@@ -246,7 +257,7 @@ jobs:
           python3 -m venv notebooks_source_venv
           ./notebooks_source_venv/Scripts/python -m pip install --upgrade pip setuptools wheel
           ./notebooks_source_venv/Scripts/python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
-          ./notebooks_source_venv/Scripts/python -m pip install opencv-python opencv-contrib-python
+          ./notebooks_source_venv/Scripts/python -m pip install opencv_wheels/*.whl
           ./notebooks_source_venv/Scripts/python -m ipykernel install --user --name openvino_env
           $cmdArgs = @(
             "--os", "${{ env.OS_NAME }}",
