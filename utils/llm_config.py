@@ -75,6 +75,12 @@ def qwen_completion_to_prompt(completion):
     return f"<|im_start|>system\n<|im_end|>\n<|im_start|>user\n{completion}<|im_end|>\n<|im_start|>assistant\n"
 
 
+SUPPORTED_VLM_MODELS = {
+    "Llava-Next-Video-7B": {"model_id": "llava-hf/LLaVA-NeXT-Video-7B-hf"},
+    "Qwen3-VL-VL-8B-Instruct": {"model_id": "Qwen/Qwen3-VL-8B-Instruct"},
+    "Qwen2.5-VL-3B-Instruct": {"model_id": "Qwen/Qwen2.5-VL-3B-Instruct"},
+}
+
 SUPPORTED_LLM_MODELS = {
     "English": {
         "Qwen3-0.6B": {
@@ -838,6 +844,35 @@ compression_configs = {
     },
 }
 
+def get_optimum_cli_command_vlm(model_id, weight_format, output_dir, compression_options=None, enable_awq=False, trust_remote_code=False):
+    base_command = "optimum-cli export openvino --model {} --task image-text-to-text --weight-format {}"
+    command = base_command.format(model_id, weight_format)
+    if compression_options:
+        compression_args = ""
+        if "group_size" in compression_options:
+            compression_args += " --group-size {}".format(compression_options["group_size"])
+        if "ratio" in compression_options:
+            compression_args += " --ratio {}".format(compression_options["ratio"])
+        if compression_options["sym"]:
+            compression_args += " --sym"
+        if enable_awq or compression_options.get("awq", False):
+            compression_args += " --awq --dataset wikitext2 --num-samples 128"
+            if compression_options.get("scale_estimation", False):
+                compression_args += " --scale-estimation"
+        else:
+            if compression_options.get("scale_estimation", False):
+                compression_args += " --scale-estimation"
+            if "dataset" in compression_options:
+                compression_args += f" --dataset {compression_options['dataset']}"
+        if compression_options.get("all_layers", False):
+            compression_args += " --all-layers"
+
+        command = command + compression_args
+    if trust_remote_code:
+        command += " --trust-remote-code"
+
+    command += " {}".format(output_dir)
+    return command
 
 def get_optimum_cli_command(model_id, weight_format, output_dir, compression_options=None, enable_awq=False, trust_remote_code=False):
     base_command = "optimum-cli export openvino --model {} --task text-generation-with-past --weight-format {}"
@@ -880,6 +915,35 @@ int4_npu_config = {
     "ratio": 1.0,
 }
 
+
+def get_vlm_selection_widget(models=None, device=None):
+    import ipywidgets as widgets
+
+    if models is None:
+        models = SUPPORTED_VLM_MODELS
+
+    model_dropdown = widgets.Dropdown(
+        options=[(name, cfg) for name, cfg in SUPPORTED_VLM_MODELS.items()],
+        description="Model:"
+    )
+
+    compression_dropdown = widgets.Dropdown(
+        options=SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"],
+        description="Compression:"
+    )
+
+    form = widgets.Box(
+        [model_dropdown, compression_dropdown],
+        layout=widgets.Layout(
+            display="flex",
+            flex_flow="column",
+            border="solid 1px",
+            width="30%",
+            padding="1%",
+        ),
+    )
+
+    return form, model_dropdown, compression_dropdown
 
 def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True, device=None):
     import ipywidgets as widgets
@@ -949,6 +1013,48 @@ def convert_tokenizer(model_id, remote_code, model_dir):
     ov.save_model(ov_tokenizer, model_dir / "openvino_tokenizer.xml")
     ov.save_model(ov_detokenizer, model_dir / "openvino_detokenizer.xml")
 
+def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted=True):
+    from pathlib import Path
+    from IPython.display import Markdown, display
+    import subprocess  # nosec - disable B404:import-subprocess check
+    import platform
+
+    pt_model_id = model_config["model_id"]
+    pt_model_name = model_id.split("/")[-1]
+    model_subdir = precision if precision == "FP16" else precision + "_compressed_weights"
+    model_dir = Path(pt_model_name) / model_subdir
+    remote_code = model_config.get("remote_code", False)
+    if (model_dir / "openvino_model.xml").exists():
+        print(f"✅ {precision} {model_id} VLM model already converted and can be found in {model_dir}")
+
+        if not (model_dir / "openvino_tokenizer.xml").exists() or not (model_dir / "openvino_detokenizer.xml").exists():
+            convert_tokenizer(pt_model_id, remote_code, model_dir)
+        return model_dir
+    if use_preconverted:
+        OV_ORG = "OpenVINO"
+        pt_model_name = pt_model_id.split("/")[-1]
+        ov_model_name = pt_model_name + f"-{precision.lower()}-ov"
+        ov_model_hub_id = f"{OV_ORG}/{ov_model_name}"
+        import huggingface_hub as hf_hub
+
+        hub_api = hf_hub.HfApi()
+        if hub_api.repo_exists(ov_model_hub_id):
+            print(f"⌛Found preconverted {precision} {model_id} VLM. Downloading model started. It may takes some time.")
+            hf_hub.snapshot_download(ov_model_hub_id, local_dir=model_dir)
+            print(f"✅ {precision} {model_id} VLM model downloaded and can be found in {model_dir}")
+            return model_dir
+
+    model_compression_params = {}
+    if "INT4" in precision:
+        model_compression_params = compression_configs.get(model_id, compression_configs["default"]) if not "NPU" in precision else int4_npu_config
+    weight_format = precision.split("-")[0].lower()
+    optimum_cli_command = get_optimum_cli_command_vlm(pt_model_id, weight_format, model_dir, model_compression_params, "AWQ" in precision, remote_code)
+    print(f"⌛ {model_id} VLM conversion to {precision} started. It may takes some time.")
+    display(Markdown("**Export command:**"))
+    display(Markdown(f"`{optimum_cli_command}`"))
+    subprocess.run(optimum_cli_command.split(" "), shell=(platform.system() == "Windows"), check=True)
+    print(f"✅ {precision} {model_id} VLM model converted and can be found in {model_dir}")
+    return model_dir
 
 def convert_and_compress_model(model_id, model_config, precision, use_preconverted=True):
     from pathlib import Path
