@@ -74,9 +74,7 @@ class RotaryEmbedding(nn.Module):
 
         # BC: "rope_type" was originally "type"
         if config.rope_scaling is not None:
-            self.rope_type = config.rope_scaling.get(
-                "rope_type", config.rope_scaling.get("type")
-            )
+            self.rope_type = config.rope_scaling.get("rope_type", config.rope_scaling.get("type"))
         else:
             self.rope_type = "default"
         self.max_seq_len_cached = config.max_position_embeddings
@@ -84,9 +82,7 @@ class RotaryEmbedding(nn.Module):
 
         # BC: "rope_type" was originally "type"
         if hasattr(config, "rope_scaling") and config.rope_scaling is not None:
-            self.rope_type = config.rope_scaling.get(
-                "rope_type", config.rope_scaling.get("type")
-            )
+            self.rope_type = config.rope_scaling.get("rope_type", config.rope_scaling.get("type"))
         else:
             self.rope_type = "default"
         self.max_seq_len_cached = config.max_position_embeddings
@@ -107,16 +103,11 @@ class RotaryEmbedding(nn.Module):
         """
         seq_len = torch.max(position_ids) + 1
         if seq_len > self.max_seq_len_cached:
-            inv_freq, self.attention_scaling = self.rope_init_fn(
-                self.config, device, seq_len=seq_len, **self.rope_kwargs
-            )
+            inv_freq, self.attention_scaling = self.rope_init_fn(self.config, device, seq_len=seq_len, **self.rope_kwargs)
             self.register_buffer("inv_freq", inv_freq, persistent=False)
             self.max_seq_len_cached = seq_len
 
-        if (
-            seq_len < self.original_max_seq_len
-            and self.max_seq_len_cached > self.original_max_seq_len
-        ):
+        if seq_len < self.original_max_seq_len and self.max_seq_len_cached > self.original_max_seq_len:
             self.register_buffer("inv_freq", self.original_inv_freq, persistent=False)
             self.max_seq_len_cached = self.original_max_seq_len
 
@@ -125,25 +116,13 @@ class RotaryEmbedding(nn.Module):
         if "dynamic" in self.rope_type:
             self._dynamic_frequency_update(position_ids, device=x.device)
 
-        inv_freq_expanded = (
-            self.inv_freq[None, None, :, None]
-            .float()
-            .expand(3, position_ids.shape[1], -1, 1)
-        )
-        position_ids_expanded = position_ids[
-            :, :, None, :
-        ].float()  # shape (3, bs, 1, positions)
+        inv_freq_expanded = self.inv_freq[None, None, :, None].float().expand(3, position_ids.shape[1], -1, 1)
+        position_ids_expanded = position_ids[:, :, None, :].float()  # shape (3, bs, 1, positions)
         # Force float32 (see https://github.com/huggingface/transformers/pull/29285)
         device_type = x.device.type
-        device_type = (
-            device_type
-            if isinstance(device_type, str) and device_type != "mps"
-            else "cpu"
-        )
+        device_type = device_type if isinstance(device_type, str) and device_type != "mps" else "cpu"
         with torch.autocast(device_type=device_type, enabled=False):
-            freqs = (
-                inv_freq_expanded.float() @ position_ids_expanded.float()
-            ).transpose(2, 3)
+            freqs = (inv_freq_expanded.float() @ position_ids_expanded.float()).transpose(2, 3)
             emb = torch.cat((freqs, freqs), dim=-1)
             cos = emb.cos()
             sin = emb.sin()
@@ -155,9 +134,7 @@ class RotaryEmbedding(nn.Module):
         return cos.to(dtype=x.dtype), sin.to(dtype=x.dtype)
 
     def rope_init(self):
-        inv_freq, self.attention_scaling = self.rope_init_fn(
-            self.config, device=None, **self.rope_kwargs
-        )
+        inv_freq, self.attention_scaling = self.rope_init_fn(self.config, device=None, **self.rope_kwargs)
         self.register_buffer("inv_freq", inv_freq, persistent=False)
         self.original_inv_freq = self.inv_freq
 
@@ -167,9 +144,7 @@ class Ernie4_5RotaryEmbedding(nn.Module):
         super().__init__()
         # BC: "rope_type" was originally "type"
         if hasattr(config, "rope_scaling") and isinstance(config.rope_scaling, dict):
-            self.rope_type = config.rope_scaling.get(
-                "rope_type", config.rope_scaling.get("type")
-            )
+            self.rope_type = config.rope_scaling.get("rope_type", config.rope_scaling.get("type"))
         else:
             self.rope_type = "default"
         self.max_seq_len_cached = config.max_position_embeddings
@@ -185,22 +160,11 @@ class Ernie4_5RotaryEmbedding(nn.Module):
     @torch.no_grad()
     @dynamic_rope_update  # power user: used with advanced RoPE types (e.g. dynamic rope)
     def forward(self, x, position_ids):
-        inv_freq_expanded = (
-            self.inv_freq[None, :, None]
-            .float()
-            .expand(position_ids.shape[0], -1, 1)
-            .to(x.device)
-        )
+        inv_freq_expanded = self.inv_freq[None, :, None].float().expand(position_ids.shape[0], -1, 1).to(x.device)
         position_ids_expanded = position_ids[:, None, :].float()
-        device_type = (
-            x.device.type
-            if isinstance(x.device.type, str) and x.device.type != "mps"
-            else "cpu"
-        )
+        device_type = x.device.type if isinstance(x.device.type, str) and x.device.type != "mps" else "cpu"
         with torch.autocast(device_type=device_type, enabled=False):  # Force float32
-            freqs = (
-                inv_freq_expanded.float() @ position_ids_expanded.float()
-            ).transpose(1, 2)
+            freqs = (inv_freq_expanded.float() @ position_ids_expanded.float()).transpose(1, 2)
             emb = torch.cat((freqs, freqs), dim=-1)
             cos = emb.cos() * self.attention_scaling
             sin = emb.sin() * self.attention_scaling
@@ -216,15 +180,9 @@ class Ernie4_5MLP(nn.Module):
         self.hidden_size = config.hidden_size
         self.intermediate_size = config.intermediate_size
 
-        self.gate_proj = nn.Linear(
-            self.hidden_size, self.intermediate_size, bias=config.use_bias
-        )
-        self.up_proj = nn.Linear(
-            self.hidden_size, self.intermediate_size, bias=config.use_bias
-        )
-        self.down_proj = nn.Linear(
-            self.intermediate_size, self.hidden_size, bias=config.use_bias
-        )
+        self.gate_proj = nn.Linear(self.hidden_size, self.intermediate_size, bias=config.use_bias)
+        self.up_proj = nn.Linear(self.hidden_size, self.intermediate_size, bias=config.use_bias)
+        self.down_proj = nn.Linear(self.intermediate_size, self.hidden_size, bias=config.use_bias)
         self.act_fn = ACT2FN[config.hidden_act]
 
     def forward(self, x):
@@ -240,9 +198,7 @@ def repeat_kv(hidden_states: torch.Tensor, n_rep: int) -> torch.Tensor:
     batch, num_key_value_heads, slen, head_dim = hidden_states.shape
     if n_rep == 1:
         return hidden_states
-    hidden_states = hidden_states[:, :, None, :, :].expand(
-        batch, num_key_value_heads, n_rep, slen, head_dim
-    )
+    hidden_states = hidden_states[:, :, None, :, :].expand(batch, num_key_value_heads, n_rep, slen, head_dim)
     return hidden_states.reshape(batch, num_key_value_heads * n_rep, slen, head_dim)
 
 
@@ -264,12 +220,8 @@ def eager_attention_forward_ernie(
         causal_mask = attention_mask[:, :, :, : key_states.shape[-2]]
         attn_weights = attn_weights + causal_mask
 
-    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(
-        query.dtype
-    )
-    attn_weights = nn.functional.dropout(
-        attn_weights, p=dropout, training=module.training
-    )
+    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query.dtype)
+    attn_weights = nn.functional.dropout(attn_weights, p=dropout, training=module.training)
     attn_output = torch.matmul(attn_weights, value_states)
     attn_output = attn_output.transpose(1, 2).contiguous()
 
@@ -341,12 +293,8 @@ def apply_multimodal_rotary_pos_emb(q, k, cos, sin, mrope_section, unsqueeze_dim
         `tuple(torch.Tensor)` comprising of the query and key tensors rotated using the Rotary Position Embedding.
     """
     mrope_section = mrope_section * 2
-    cos = torch.cat(
-        [m[i % 3] for i, m in enumerate(cos.split(mrope_section, dim=-1))], dim=-1
-    ).unsqueeze(unsqueeze_dim)
-    sin = torch.cat(
-        [m[i % 3] for i, m in enumerate(sin.split(mrope_section, dim=-1))], dim=-1
-    ).unsqueeze(unsqueeze_dim)
+    cos = torch.cat([m[i % 3] for i, m in enumerate(cos.split(mrope_section, dim=-1))], dim=-1).unsqueeze(unsqueeze_dim)
+    sin = torch.cat([m[i % 3] for i, m in enumerate(sin.split(mrope_section, dim=-1))], dim=-1).unsqueeze(unsqueeze_dim)
 
     q_embed = (q * cos) + (rotate_half(q) * sin)
     k_embed = (k * cos) + (rotate_half(k) * sin)
@@ -360,12 +308,8 @@ class Ernie4_5Attention(nn.Module):
         super().__init__()
         self.config = config
         self.layer_idx = layer_idx
-        self.head_dim = getattr(
-            config, "head_dim", config.hidden_size // config.num_attention_heads
-        )
-        self.num_key_value_groups = (
-            config.num_attention_heads // config.num_key_value_heads
-        )
+        self.head_dim = getattr(config, "head_dim", config.hidden_size // config.num_attention_heads)
+        self.num_key_value_groups = config.num_attention_heads // config.num_key_value_heads
         self.scaling = self.head_dim**-0.5
         self.rope_scaling = config.rope_scaling
         self.attention_dropout = 0.0
@@ -413,22 +357,16 @@ class Ernie4_5Attention(nn.Module):
                 kwargs["position_ids"] = position_ids[0:1]
 
         cos, sin = position_embeddings
-        query_states, key_states = apply_multimodal_rotary_pos_emb(
-            query_states, key_states, cos, sin, self.rope_scaling["mrope_section"]
-        )
+        query_states, key_states = apply_multimodal_rotary_pos_emb(query_states, key_states, cos, sin, self.rope_scaling["mrope_section"])
 
         if past_key_value is not None:
             # sin and cos are specific to RoPE models; cache_position needed for the static cache
             cache_kwargs = {"sin": sin, "cos": cos, "cache_position": cache_position}
-            key_states, value_states = past_key_value.update(
-                key_states, value_states, self.layer_idx, cache_kwargs
-            )
+            key_states, value_states = past_key_value.update(key_states, value_states, self.layer_idx, cache_kwargs)
 
         attention_interface: Callable = eager_attention_forward_ernie
         if self.config._attn_implementation != "eager":
-            attention_interface = ALL_ATTENTION_FUNCTIONS[
-                self.config._attn_implementation
-            ]
+            attention_interface = ALL_ATTENTION_FUNCTIONS[self.config._attn_implementation]
 
         attn_output, attn_weights = attention_interface(
             self,
@@ -475,12 +413,8 @@ class Ernie4_5DecoderLayer(GradientCheckpointingLayer):
         self.self_attn = Ernie4_5Attention(config=config, layer_idx=layer_idx)
 
         self.mlp = Ernie4_5MLP(config)
-        self.input_layernorm = Ernie4_5RMSNorm(
-            config.hidden_size, eps=config.rms_norm_eps
-        )
-        self.post_attention_layernorm = Ernie4_5RMSNorm(
-            config.hidden_size, eps=config.rms_norm_eps
-        )
+        self.input_layernorm = Ernie4_5RMSNorm(config.hidden_size, eps=config.rms_norm_eps)
+        self.post_attention_layernorm = Ernie4_5RMSNorm(config.hidden_size, eps=config.rms_norm_eps)
 
     def forward(
         self,
@@ -490,9 +424,7 @@ class Ernie4_5DecoderLayer(GradientCheckpointingLayer):
         past_key_value: Optional[Cache] = None,
         use_cache: Optional[bool] = False,
         cache_position: Optional[torch.LongTensor] = None,
-        position_embeddings: Optional[
-            tuple[torch.Tensor, torch.Tensor]
-        ] = None,  # necessary, but kept here for BC
+        position_embeddings: Optional[tuple[torch.Tensor, torch.Tensor]] = None,  # necessary, but kept here for BC
         **kwargs: Unpack[TransformersKwargs],
     ) -> tuple[torch.Tensor]:
         residual = hidden_states
@@ -544,15 +476,8 @@ class Ernie4_5Model(Ernie4_5PreTrainedModel):
         self.padding_idx = config.pad_token_id
         self.vocab_size = config.vocab_size
 
-        self.embed_tokens = nn.Embedding(
-            config.vocab_size, config.hidden_size, self.padding_idx
-        )
-        self.layers = nn.ModuleList(
-            [
-                Ernie4_5DecoderLayer(config, layer_idx)
-                for layer_idx in range(config.num_hidden_layers)
-            ]
-        )
+        self.embed_tokens = nn.Embedding(config.vocab_size, config.hidden_size, self.padding_idx)
+        self.layers = nn.ModuleList([Ernie4_5DecoderLayer(config, layer_idx) for layer_idx in range(config.num_hidden_layers)])
         self.norm = Ernie4_5RMSNorm(config.hidden_size, eps=config.rms_norm_eps)
         self.rotary_emb = RotaryEmbedding(config=config)
         self.gradient_checkpointing = False
@@ -593,9 +518,7 @@ class Ernie4_5Model(Ernie4_5PreTrainedModel):
             past_key_values = None
 
         if (input_ids is None) ^ (inputs_embeds is not None):
-            raise ValueError(
-                "You must specify exactly one of input_ids or inputs_embeds"
-            )
+            raise ValueError("You must specify exactly one of input_ids or inputs_embeds")
 
         if inputs_embeds is None:
             inputs_embeds: torch.Tensor = self.embed_tokens(input_ids)
@@ -604,9 +527,7 @@ class Ernie4_5Model(Ernie4_5PreTrainedModel):
         #     past_key_values = DynamicCache()
 
         if cache_position is None:
-            past_seen_tokens = (
-                past_key_values.get_seq_length() if past_key_values is not None else 0
-            )
+            past_seen_tokens = past_key_values.get_seq_length() if past_key_values is not None else 0
             cache_position: torch.Tensor = torch.arange(
                 past_seen_tokens,
                 past_seen_tokens + inputs_embeds.shape[1],
@@ -614,9 +535,7 @@ class Ernie4_5Model(Ernie4_5PreTrainedModel):
             )
 
         if position_ids is None:
-            position_ids = cache_position.view(1, 1, -1).expand(
-                3, inputs_embeds.shape[0], -1
-            )
+            position_ids = cache_position.view(1, 1, -1).expand(3, inputs_embeds.shape[0], -1)
         elif position_ids.dim() == 2:
             position_ids = position_ids[None, ...].expand(3, position_ids.shape[0], -1)
 
@@ -665,9 +584,7 @@ class Ernie4_5Model(Ernie4_5PreTrainedModel):
     ):
         if self.config._attn_implementation == "flash_attention_2":
             if attention_mask is not None and past_key_values is not None:
-                is_padding_right = (
-                    attention_mask[:, -1].sum().item() != input_tensor.size()[0]
-                )
+                is_padding_right = attention_mask[:, -1].sum().item() != input_tensor.size()[0]
                 if is_padding_right:
                     raise ValueError
             if attention_mask is not None and 0.0 in attention_mask:
@@ -677,18 +594,12 @@ class Ernie4_5Model(Ernie4_5PreTrainedModel):
         # For SDPA, when possible, we will rely on its `is_causal` argument instead of its `attn_mask` argument, in
         # order to dispatch on Flash Attention 2. This feature is not compatible with static cache, as SDPA will fail
         # to infer the attention mask.
-        past_seen_tokens = (
-            past_key_values.get_seq_length() if past_key_values is not None else 0
-        )
+        past_seen_tokens = past_key_values.get_seq_length() if past_key_values is not None else 0
         using_static_cache = isinstance(past_key_values, StaticCache)
         using_sliding_window_cache = isinstance(past_key_values, SlidingWindowCache)
 
         # When output attentions is True, sdpa implementation's forward method calls the eager implementation's forward
-        if (
-            self.config._attn_implementation == "sdpa"
-            and not (using_static_cache or using_sliding_window_cache)
-            and not output_attentions
-        ):
+        if self.config._attn_implementation == "sdpa" and not (using_static_cache or using_sliding_window_cache) and not output_attentions:
             if AttentionMaskConverter._ignore_causal_mask_sdpa(
                 attention_mask,
                 inputs_embeds=input_tensor,
@@ -706,11 +617,7 @@ class Ernie4_5Model(Ernie4_5PreTrainedModel):
             target_length = past_key_values.get_max_cache_shape()
         # DynamicCache or no cache
         else:
-            target_length = (
-                attention_mask.shape[-1]
-                if isinstance(attention_mask, torch.Tensor)
-                else past_seen_tokens + sequence_length + 1
-            )
+            target_length = attention_mask.shape[-1] if isinstance(attention_mask, torch.Tensor) else past_seen_tokens + sequence_length + 1
 
         # In case the provided `attention` mask is 2D, we generate a causal mask here (4D).
         causal_mask = self._prepare_4d_causal_attention_mask_with_cache_position(
@@ -734,9 +641,7 @@ class Ernie4_5Model(Ernie4_5PreTrainedModel):
             # Attend to all tokens in fully masked rows in the causal_mask, for example the relevant first rows when
             # using left padding. This is required by F.scaled_dot_product_attention memory-efficient attention path.
             # Details: https://github.com/pytorch/pytorch/issues/110213
-            causal_mask = AttentionMaskConverter._unmask_unattended(
-                causal_mask, min_dtype
-            )
+            causal_mask = AttentionMaskConverter._unmask_unattended(causal_mask, min_dtype)
 
         return causal_mask
 
@@ -786,36 +691,23 @@ class Ernie4_5Model(Ernie4_5PreTrainedModel):
                 dtype=dtype,
                 device=device,
             )
-            diagonal_attend_mask = torch.arange(
-                target_length, device=device
-            ) > cache_position.reshape(-1, 1)
+            diagonal_attend_mask = torch.arange(target_length, device=device) > cache_position.reshape(-1, 1)
             if config.sliding_window is not None:
                 # if we have sliding window, we should not attend to tokens beyond sliding window length, so we mask them out also
                 # the check is needed to verify is current checkpoint was trained with sliding window or not
-                if (
-                    not isinstance(past_key_values, SlidingWindowCache)
-                    or sequence_length > target_length
-                ):
-                    sliding_attend_mask = torch.arange(
-                        target_length, device=device
-                    ) <= (cache_position.reshape(-1, 1) - config.sliding_window)
+                if not isinstance(past_key_values, SlidingWindowCache) or sequence_length > target_length:
+                    sliding_attend_mask = torch.arange(target_length, device=device) <= (cache_position.reshape(-1, 1) - config.sliding_window)
                     diagonal_attend_mask.bitwise_or_(sliding_attend_mask)
             causal_mask *= diagonal_attend_mask
             causal_mask = causal_mask[None, None, :, :].expand(batch_size, 1, -1, -1)
             if attention_mask is not None:
-                causal_mask = (
-                    causal_mask.clone()
-                )  # copy to contiguous memory for in-place edit
+                causal_mask = causal_mask.clone()  # copy to contiguous memory for in-place edit
                 if attention_mask.shape[-1] > target_length:
                     attention_mask = attention_mask[:, :target_length]
                 mask_length = attention_mask.shape[-1]
-                padding_mask = causal_mask[:, :, :, :mask_length] + attention_mask[
-                    :, None, None, :
-                ].to(causal_mask.device)
+                padding_mask = causal_mask[:, :, :, :mask_length] + attention_mask[:, None, None, :].to(causal_mask.device)
                 padding_mask = padding_mask == 0
-                causal_mask[:, :, :, :mask_length] = causal_mask[
-                    :, :, :, :mask_length
-                ].masked_fill(padding_mask, min_dtype)
+                causal_mask[:, :, :, :mask_length] = causal_mask[:, :, :, :mask_length].masked_fill(padding_mask, min_dtype)
         return causal_mask
 
 
@@ -872,11 +764,7 @@ class Ernie4_5ForCausalLM(Ernie4_5PreTrainedModel, GenerationMixin):
 
         hidden_states = outputs.last_hidden_state
         # Only compute necessary logits, and do not upcast them to float if we are not computing the loss
-        slice_indices = (
-            slice(-logits_to_keep, None)
-            if isinstance(logits_to_keep, int)
-            else logits_to_keep
-        )
+        slice_indices = slice(-logits_to_keep, None) if isinstance(logits_to_keep, int) else logits_to_keep
         logits = self.lm_head(hidden_states[:, slice_indices, :])
 
         loss = None
@@ -906,8 +794,7 @@ def _trunc_normal_(tensor, mean, std, a, b):
 
     if (mean < a - 2 * std) or (mean > b + 2 * std):
         warnings.warn(
-            "mean is more than 2 std from [a, b] in nn.init.trunc_normal_. "
-            "The distribution of values may be incorrect.",
+            "mean is more than 2 std from [a, b] in nn.init.trunc_normal_. " "The distribution of values may be incorrect.",
             stacklevel=2,
         )
 
@@ -996,30 +883,20 @@ def default_flax_embed_init(tensor):
 
 class Projector(nn.Module):
 
-    def __init__(
-        self, text_config: PaddleOCRVLConfig, vision_config: PaddleOCRVisionConfig
-    ):
+    def __init__(self, text_config: PaddleOCRVLConfig, vision_config: PaddleOCRVisionConfig):
         super().__init__()
         self.text_config = text_config
         self.vision_config = vision_config
         self.merge_kernel_size = (2, 2)
 
-        self.hidden_size = (
-            self.vision_config.hidden_size
-            * self.merge_kernel_size[0]
-            * self.merge_kernel_size[1]
-        )
+        self.hidden_size = self.vision_config.hidden_size * self.merge_kernel_size[0] * self.merge_kernel_size[1]
 
         self.pre_norm = torch.nn.LayerNorm(self.vision_config.hidden_size, eps=1e-05)
         self.linear_1 = nn.Linear(self.hidden_size, self.hidden_size, bias=True)
         self.act = GELUActivation()
-        self.linear_2 = nn.Linear(
-            self.hidden_size, self.text_config.hidden_size, bias=True
-        )
+        self.linear_2 = nn.Linear(self.hidden_size, self.text_config.hidden_size, bias=True)
 
-    def forward(
-        self, image_features: torch.Tensor, image_grid_thw: List[Tuple[int, int, int]]
-    ) -> torch.Tensor:
+    def forward(self, image_features: torch.Tensor, image_grid_thw: List[Tuple[int, int, int]]) -> torch.Tensor:
         # breakpoint()
         m1, m2 = self.merge_kernel_size
         processed_features = list()
@@ -1112,9 +989,7 @@ class PaddleOCRVisionEmbeddings(nn.Module):
             new_width = width // self.patch_size
 
         sqrt_num_positions = torch_int(num_positions**0.5)
-        patch_pos_embed = patch_pos_embed.reshape(
-            1, sqrt_num_positions, sqrt_num_positions, dim
-        )
+        patch_pos_embed = patch_pos_embed.reshape(1, sqrt_num_positions, sqrt_num_positions, dim)
         patch_pos_embed = patch_pos_embed.permute(0, 3, 1, 2)
 
         patch_pos_embed = nn.functional.interpolate(
@@ -1144,9 +1019,7 @@ class PaddleOCRVisionEmbeddings(nn.Module):
             return self.cache_position_embedding[grid]
 
         if len(self.cache_position_embedding) >= max_cache:
-            min_hit_grid = min(
-                self.cache_position_count, key=self.cache_position_count.get
-            )
+            min_hit_grid = min(self.cache_position_count, key=self.cache_position_count.get)
             self.cache_position_count.pop(min_hit_grid)
             self.cache_position_embedding.pop(min_hit_grid)
 
@@ -1159,9 +1032,7 @@ class PaddleOCRVisionEmbeddings(nn.Module):
         self,
         pixel_values: torch.FloatTensor,
         position_ids: Optional[torch.Tensor] = None,
-        image_grid_thw: Optional[
-            torch.LongTensor
-        ] = None,  # shape: [num_images, 3], each row is (t, h, w)
+        image_grid_thw: Optional[torch.LongTensor] = None,  # shape: [num_images, 3], each row is (t, h, w)
         interpolate_pos_encoding=False,
     ) -> torch.Tensor:
         if pixel_values.dim() == 5:
@@ -1170,13 +1041,9 @@ class PaddleOCRVisionEmbeddings(nn.Module):
             batch_size, squence_len, channel, height, width = pixel_values.shape
             target_dtype = self.patch_embedding.weight.dtype
             pixel_values = rearrange(pixel_values, "b l c h w -> (b l) c h w")
-            patch_embeds = self.patch_embedding(
-                pixel_values.to(dtype=target_dtype)
-            )  # shape = [*, width, grid, grid]
+            patch_embeds = self.patch_embedding(pixel_values.to(dtype=target_dtype))  # shape = [*, width, grid, grid]
             embeddings = patch_embeds.flatten(-2).squeeze(-1)
-            embeddings = rearrange(
-                embeddings, "(b l) d -> b l d", b=batch_size, l=squence_len
-            )
+            embeddings = rearrange(embeddings, "(b l) d -> b l d", b=batch_size, l=squence_len)
 
             # todo: not dubug
             if interpolate_pos_encoding and image_grid_thw is not None:
@@ -1196,15 +1063,9 @@ class PaddleOCRVisionEmbeddings(nn.Module):
                     t, h, w = image_grid
                     end = start + t * h * w
                     image_embeddings = embeddings[start:end, :]
-                    position_embedding = (
-                        self.interpolate_pos_encoding(image_embeddings, h, w, True)
-                        .squeeze(0)
-                        .repeat(t, 1)
-                    )
+                    position_embedding = self.interpolate_pos_encoding(image_embeddings, h, w, True).squeeze(0).repeat(t, 1)
                     image_embeddings = image_embeddings + position_embedding
-                    tmp_embeddings = torch.concat(
-                        [tmp_embeddings, image_embeddings], dim=0
-                    )
+                    tmp_embeddings = torch.concat([tmp_embeddings, image_embeddings], dim=0)
                     start = end
                 embeddings = tmp_embeddings.unsqueeze(0)
             else:
@@ -1229,12 +1090,8 @@ def eager_attention_forward(
     if attention_mask is not None:
         attn_weights = attn_weights + attention_mask
 
-    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(
-        query.dtype
-    )
-    attn_weights = nn.functional.dropout(
-        attn_weights, p=dropout, training=module.training
-    )
+    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query.dtype)
+    attn_weights = nn.functional.dropout(attn_weights, p=dropout, training=module.training)
 
     attn_output = torch.matmul(attn_weights, value)
     attn_output = attn_output.transpose(1, 2).contiguous()
@@ -1252,10 +1109,7 @@ class PaddleOCRAttention(nn.Module):
         self.num_heads = config.num_attention_heads
         self.head_dim = self.embed_dim // self.num_heads
         if self.head_dim * self.num_heads != self.embed_dim:
-            raise ValueError(
-                f"embed_dim must be divisible by num_heads (got `embed_dim`: {self.embed_dim} and `num_heads`:"
-                f" {self.num_heads})."
-            )
+            raise ValueError(f"embed_dim must be divisible by num_heads (got `embed_dim`: {self.embed_dim} and `num_heads`:" f" {self.num_heads}).")
         self.scale = self.head_dim**-0.5
         self.dropout = config.attention_dropout
         self.is_causal = False
@@ -1275,9 +1129,7 @@ class PaddleOCRAttention(nn.Module):
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         """Input shape: Batch x Time x Channel"""
 
-        use_flash_attn = (
-            cu_seqlens is not None
-        ) and self.config._attn_implementation == "flash_attention_2"
+        use_flash_attn = (cu_seqlens is not None) and self.config._attn_implementation == "flash_attention_2"
 
         batch_size, seq_length, embed_dim = hidden_states.shape
 
@@ -1286,21 +1138,13 @@ class PaddleOCRAttention(nn.Module):
         values = self.v_proj(hidden_states)
 
         if rope_emb is None:
-            queries = queries.view(
-                batch_size, seq_length, self.num_heads, self.head_dim
-            ).transpose(1, 2)
-            keys = keys.view(
-                batch_size, seq_length, self.num_heads, self.head_dim
-            ).transpose(1, 2)
-            values = values.view(
-                batch_size, seq_length, self.num_heads, self.head_dim
-            ).transpose(1, 2)
+            queries = queries.view(batch_size, seq_length, self.num_heads, self.head_dim).transpose(1, 2)
+            keys = keys.view(batch_size, seq_length, self.num_heads, self.head_dim).transpose(1, 2)
+            values = values.view(batch_size, seq_length, self.num_heads, self.head_dim).transpose(1, 2)
         else:
             assert cu_seqlens is not None, "Rope support flash attn only."
             cos, sin = rope_emb
-            queries = queries.view(
-                batch_size, seq_length, self.num_heads, self.head_dim
-            )
+            queries = queries.view(batch_size, seq_length, self.num_heads, self.head_dim)
             keys = keys.view(batch_size, seq_length, self.num_heads, self.head_dim)
             if use_flash_attn:
                 queries, keys = apply_rotary_pos_emb_flashatt(queries, keys, cos, sin)
@@ -1308,9 +1152,7 @@ class PaddleOCRAttention(nn.Module):
                 queries, keys = apply_rotary_pos_emb_vision(queries, keys, cos, sin)
             queries = queries.transpose(1, 2)
             keys = keys.transpose(1, 2)
-            values = values.view(
-                batch_size, seq_length, self.num_heads, self.head_dim
-            ).transpose(1, 2)
+            values = values.view(batch_size, seq_length, self.num_heads, self.head_dim).transpose(1, 2)
 
         if not use_flash_attn:
             attention_interface: Callable = eager_attention_forward
@@ -1333,9 +1175,7 @@ class PaddleOCRAttention(nn.Module):
                 scaling=self.scale,
                 dropout=0.0 if not self.training else self.dropout,
             )
-            attn_output = attn_output.reshape(
-                batch_size, seq_length, embed_dim
-            ).contiguous()
+            attn_output = attn_output.reshape(batch_size, seq_length, embed_dim).contiguous()
         else:
             assert batch_size == 1, hidden_states.shape
             queries = queries.transpose(1, 2).squeeze(0)
@@ -1344,12 +1184,7 @@ class PaddleOCRAttention(nn.Module):
 
             max_seqlen_q = (cu_seqlens[1:] - cu_seqlens[:-1]).max().item()
             max_seqlen_k = (cu_seqlens[1:] - cu_seqlens[:-1]).max().item()
-            assert (
-                cu_seqlens[-1].item()
-                == queries.shape[0]
-                == keys.shape[0]
-                == values.shape[0]
-            ), (cu_seqlens, queries.shape, keys.shape, values.shape)
+            assert cu_seqlens[-1].item() == queries.shape[0] == keys.shape[0] == values.shape[0], (cu_seqlens, queries.shape, keys.shape, values.shape)
 
             attn_output = flash_attn_varlen_func(
                 queries,
@@ -1458,11 +1293,7 @@ class PaddleOCRPreTrainedModel(PreTrainedModel):
     def _init_weights(self, module):
         """Initialize the weights"""
         if isinstance(module, PaddleOCRVisionEmbeddings):
-            width = (
-                self.config.vision_config.hidden_size
-                if isinstance(self.config, PaddleOCRVLConfig)
-                else self.config.hidden_size
-            )
+            width = self.config.vision_config.hidden_size if isinstance(self.config, PaddleOCRVLConfig) else self.config.hidden_size
             nn.init.normal_(module.position_embedding.weight, std=1 / np.sqrt(width))
         elif isinstance(module, nn.Embedding):
             default_flax_embed_init(module.weight)
@@ -1508,9 +1339,7 @@ class PaddleOCREncoder(nn.Module):
         embed_dim = config.hidden_size
         num_heads = config.num_attention_heads
         head_dim = embed_dim // num_heads
-        self.layers = nn.ModuleList(
-            [PaddleOCREncoderLayer(config) for _ in range(config.num_hidden_layers)]
-        )
+        self.layers = nn.ModuleList([PaddleOCREncoderLayer(config) for _ in range(config.num_hidden_layers)])
         self.rotary_pos_emb = SigLIPRotaryEmbedding(head_dim // 2)
         self.gradient_checkpointing = False
 
@@ -1549,15 +1378,11 @@ class PaddleOCREncoder(nn.Module):
             window_index = window_index.reshape(-1)
             window_index = window_index[window_index != pad_values]
             window_indices.append(window_index + start_window_index)
-            cu_seqlens_within_windows.append(
-                window_seqlens.cumsum(0) + start_window_index
-            )
+            cu_seqlens_within_windows.append(window_seqlens.cumsum(0) + start_window_index)
             start_window_index += t * h * w
         window_indices = torch.concat(window_indices, dim=0)
         cu_seqlens_within_windows = torch.concat(cu_seqlens_within_windows, dim=0)
-        cu_seqlens_within_windows = F.pad(
-            cu_seqlens_within_windows, (1, 0), value=0
-        ).to(torch.int32)
+        cu_seqlens_within_windows = F.pad(cu_seqlens_within_windows, (1, 0), value=0).to(torch.int32)
         return window_indices, cu_seqlens_within_windows
 
     # Ignore copy
@@ -1601,27 +1426,15 @@ class PaddleOCREncoder(nn.Module):
         assert vision_or_text in ["vision", "text"]
         use_window_attn = window_size > 0 and vision_or_text == "vision"
         use_rope = (use_rope is True) and (vision_or_text == "vision")
-        output_attentions = (
-            output_attentions
-            if output_attentions is not None
-            else self.config.output_attentions
-        )
-        output_hidden_states = (
-            output_hidden_states
-            if output_hidden_states is not None
-            else self.config.output_hidden_states
-        )
+        output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
+        output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
 
         encoder_states = () if output_hidden_states else None
         all_attentions = () if output_attentions else None
 
         device = inputs_embeds.device
         hidden_states = inputs_embeds
-        attention_mask = (
-            attention_mask.to(inputs_embeds.dtype)
-            if attention_mask is not None
-            else None
-        )
+        attention_mask = attention_mask.to(inputs_embeds.dtype) if attention_mask is not None else None
         if use_rope is True:
             # breakpoint()
             if width_position_ids is None or height_position_ids is None:
@@ -1643,9 +1456,7 @@ class PaddleOCREncoder(nn.Module):
             window_indices, cu_seqlens_within_windows = None, None
 
             if use_window_attn:
-                window_indices, cu_seqlens_within_windows = self.build_window_index(
-                    flatten_image_grid_thw, window_size, device
-                )
+                window_indices, cu_seqlens_within_windows = self.build_window_index(flatten_image_grid_thw, window_size, device)
                 reversed_window_indices = window_indices.argsort()
                 height_position_ids = height_position_ids[window_indices]
                 width_position_ids = width_position_ids[window_indices]
@@ -1664,9 +1475,7 @@ class PaddleOCREncoder(nn.Module):
             if use_window_attn:
                 flatten_image_grid_thw = self.flatten_list(image_grid_thw)
 
-                window_indices, cu_seqlens_within_windows = self.build_window_index(
-                    flatten_image_grid_thw, window_size, device
-                )
+                window_indices, cu_seqlens_within_windows = self.build_window_index(flatten_image_grid_thw, window_size, device)
                 reversed_window_indices = window_indices.argsort()
 
         if use_window_attn:
@@ -1678,11 +1487,7 @@ class PaddleOCREncoder(nn.Module):
 
         for encoder_layer in self.layers:
             if output_hidden_states:
-                encoder_states = encoder_states + (
-                    (hidden_states[:, reversed_window_indices, :],)
-                    if use_window_attn
-                    else (hidden_states,)
-                )
+                encoder_states = encoder_states + ((hidden_states[:, reversed_window_indices, :],) if use_window_attn else (hidden_states,))
             if self.gradient_checkpointing and self.training:
                 layer_outputs = self._gradient_checkpointing_func(
                     encoder_layer.__call__,
@@ -1728,9 +1533,7 @@ class PaddleOCRVisionTransformer(nn.Module):
         self.embeddings = PaddleOCRVisionEmbeddings(config)
         self.encoder = PaddleOCREncoder(config)
         self.post_layernorm = nn.LayerNorm(embed_dim, eps=config.layer_norm_eps)
-        self.use_head = (
-            True if not hasattr(config, "vision_use_head") else config.vision_use_head
-        )
+        self.use_head = True if not hasattr(config, "vision_use_head") else config.vision_use_head
         if self.use_head:
             self.head = PaddleOCRMultiheadAttentionPoolingHead(config)
 
@@ -1750,9 +1553,7 @@ class PaddleOCRVisionTransformer(nn.Module):
         cu_seqlens: Optional[List[torch.Tensor]] = None,
         padding_mask: Optional[torch.Tensor] = None,
         vision_return_embed_list: Optional[bool] = True,
-        image_grid_thw: Optional[
-            torch.LongTensor
-        ] = None,  # shape: [num_images, 3], each row is (t, h, w)
+        image_grid_thw: Optional[torch.LongTensor] = None,  # shape: [num_images, 3], each row is (t, h, w)
         return_pooler_output: Optional[bool] = False,
         use_rope: Optional[bool] = True,
         window_size: Optional[bool] = -1,
@@ -1766,16 +1567,8 @@ class PaddleOCRVisionTransformer(nn.Module):
         r"""
         Returns:
         """
-        output_attentions = (
-            output_attentions
-            if output_attentions is not None
-            else self.config.output_attentions
-        )
-        output_hidden_states = (
-            output_hidden_states
-            if output_hidden_states is not None
-            else self.config.output_hidden_states
-        )
+        output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
+        output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
         hidden_states = self.embeddings(
             pixel_values,
             interpolate_pos_encoding=interpolate_pos_encoding,
@@ -1819,9 +1612,7 @@ class PaddleOCRVisionTransformer(nn.Module):
                     sample_hidden_state_list.append(sample_hidden_state)
 
                 if not vision_return_embed_list:
-                    max_length = max(
-                        [_state.shape[0] for _state in sample_hidden_state_list]
-                    )
+                    max_length = max([_state.shape[0] for _state in sample_hidden_state_list])
                     tmp_sample_hidden_state_list = list()
                     padding_mask = list()
                     for idx, _state in enumerate(sample_hidden_state_list):
@@ -1832,17 +1623,9 @@ class PaddleOCRVisionTransformer(nn.Module):
                         padding = _state.new_zeros(size=(padding_length, dim))
                         new_state = torch.concat([_state, padding], dim=0)
                         tmp_sample_hidden_state_list.append(new_state)
-                    sample_hidden_state = torch.stack(
-                        tmp_sample_hidden_state_list, dim=0
-                    )
-                    padding_mask = (
-                        torch.stack(padding_mask, dim=0)
-                        .float()
-                        .to(last_hidden_state.dtype)
-                    )
-                    pooler_output = self.head(
-                        sample_hidden_state, key_padding_mask=padding_mask
-                    )
+                    sample_hidden_state = torch.stack(tmp_sample_hidden_state_list, dim=0)
+                    padding_mask = torch.stack(padding_mask, dim=0).float().to(last_hidden_state.dtype)
+                    pooler_output = self.head(sample_hidden_state, key_padding_mask=padding_mask)
                 else:
                     pooler_output = list()
                     for state in sample_hidden_state_list:
@@ -1873,9 +1656,7 @@ class PaddleOCRVisionTransformer(nn.Module):
         batch_size = last_hidden_state.shape[0]
         hidden_dim = last_hidden_state.shape[-1]
 
-        sample_hidden_state = torch.empty(
-            batch_size, 0, hidden_dim, dtype=dtype, device=device
-        )
+        sample_hidden_state = torch.empty(batch_size, 0, hidden_dim, dtype=dtype, device=device)
 
         for i in range(cu_seqlens.shape[0] - 1):
             start = cu_seqlens[i]
@@ -1898,9 +1679,7 @@ class PaddleOCRMultiheadAttentionPoolingHead(nn.Module):
         super().__init__()
 
         self.probe = nn.Parameter(torch.randn(1, 1, config.hidden_size))
-        self.attention = torch.nn.MultiheadAttention(
-            config.hidden_size, config.num_attention_heads, batch_first=True
-        )
+        self.attention = torch.nn.MultiheadAttention(config.hidden_size, config.num_attention_heads, batch_first=True)
         self.layernorm = nn.LayerNorm(config.hidden_size, eps=config.layer_norm_eps)
         self.mlp = PaddleOCRMLP(config)
 
@@ -1908,9 +1687,7 @@ class PaddleOCRMultiheadAttentionPoolingHead(nn.Module):
         batch_size = hidden_state.shape[0]
         probe = self.probe.repeat(batch_size, 1, 1)
 
-        hidden_state = self.attention(
-            probe, hidden_state, hidden_state, key_padding_mask=key_padding_mask
-        )[0]
+        hidden_state = self.attention(probe, hidden_state, hidden_state, key_padding_mask=key_padding_mask)[0]
 
         residual = hidden_state
         hidden_state = self.layernorm(hidden_state)
@@ -1967,9 +1744,7 @@ class PaddleOCRVisionModel(PaddleOCRPreTrainedModel):
         )
 
 
-def apply_rotary_pos_emb_flashatt(
-    q: torch.Tensor, k: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor
-) -> Tuple[torch.Tensor, torch.Tensor]:
+def apply_rotary_pos_emb_flashatt(q: torch.Tensor, k: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
     cos = cos.chunk(2, dim=-1)[0].contiguous()
     sin = sin.chunk(2, dim=-1)[0].contiguous()
     q_embed = apply_rotary_emb(q.float(), cos.float(), sin.float()).type_as(q)
@@ -1984,9 +1759,7 @@ def rotate_half(x):
     return torch.cat((-x2, x1), dim=-1)
 
 
-def apply_rotary_pos_emb_vision(
-    q: torch.Tensor, k: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor
-) -> Tuple[torch.Tensor, torch.Tensor]:
+def apply_rotary_pos_emb_vision(q: torch.Tensor, k: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
     orig_q_dtype = q.dtype
     orig_k_dtype = k.dtype
     q, k = q.float(), k.float()
@@ -2006,15 +1779,11 @@ class SigLIPRotaryEmbedding(nn.Module):
         self.rope_init()
 
     def rope_init(self):
-        inv_freq = 1.0 / (
-            self.theta ** (torch.arange(0, self.dim, 2, dtype=torch.float) / self.dim)
-        )
+        inv_freq = 1.0 / (self.theta ** (torch.arange(0, self.dim, 2, dtype=torch.float) / self.dim))
         self.register_buffer("inv_freq", inv_freq, persistent=False)
 
     def forward(self, seqlen: int) -> torch.Tensor:
-        seq = torch.arange(
-            seqlen, device=self.inv_freq.device, dtype=self.inv_freq.dtype
-        )
+        seq = torch.arange(seqlen, device=self.inv_freq.device, dtype=self.inv_freq.dtype)
         freqs = torch.outer(seq, self.inv_freq)
         return freqs
 
@@ -2191,9 +1960,7 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
         video_token_id = self.config.video_token_id
         vision_start_token_id = self.config.vision_start_token_id
         mrope_position_deltas = []
-        if input_ids is not None and (
-            image_grid_thw is not None or video_grid_thw is not None
-        ):
+        if input_ids is not None and (image_grid_thw is not None or video_grid_thw is not None):
             total_input_ids = input_ids
             if attention_mask is None:
                 attention_mask = torch.ones_like(total_input_ids)
@@ -2209,9 +1976,7 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
             for i, input_ids in enumerate(total_input_ids):
                 input_ids = input_ids[attention_mask[i] == 1]
                 image_nums, video_nums = 0, 0
-                vision_start_indices = torch.argwhere(
-                    input_ids == vision_start_token_id
-                ).squeeze(1)
+                vision_start_indices = torch.argwhere(input_ids == vision_start_token_id).squeeze(1)
                 vision_tokens = input_ids[vision_start_indices + 1]
                 image_nums = (vision_tokens == image_token_id).sum()
                 video_nums = (vision_tokens == video_token_id).sum()
@@ -2259,87 +2024,43 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
                     )
                     text_len = ed - st
 
-                    st_idx = (
-                        llm_pos_ids_list[-1].max() + 1
-                        if len(llm_pos_ids_list) > 0
-                        else 0
-                    )
-                    llm_pos_ids_list.append(
-                        torch.arange(text_len).view(1, -1).expand(3, -1) + st_idx
-                    )
+                    st_idx = llm_pos_ids_list[-1].max() + 1 if len(llm_pos_ids_list) > 0 else 0
+                    llm_pos_ids_list.append(torch.arange(text_len).view(1, -1).expand(3, -1) + st_idx)
 
                     if torch.is_tensor(second_per_grid_t):
                         second_per_grid_t = second_per_grid_t.detach().item()
                     range_tensor = torch.arange(llm_grid_t).view(-1, 1)
                     expanded_range = range_tensor.expand(-1, llm_grid_h * llm_grid_w)
 
-                    time_tensor = (
-                        expanded_range
-                        * second_per_grid_t
-                        * self.config.vision_config.tokens_per_second
-                    )
+                    time_tensor = expanded_range * second_per_grid_t * self.config.vision_config.tokens_per_second
 
                     time_tensor_long = time_tensor.long()
                     t_index = time_tensor_long.flatten()
 
-                    h_index = (
-                        torch.arange(llm_grid_h)
-                        .view(1, -1, 1)
-                        .expand(llm_grid_t, -1, llm_grid_w)
-                        .flatten()
-                    )
-                    w_index = (
-                        torch.arange(llm_grid_w)
-                        .view(1, 1, -1)
-                        .expand(llm_grid_t, llm_grid_h, -1)
-                        .flatten()
-                    )
-                    llm_pos_ids_list.append(
-                        torch.stack([t_index, h_index, w_index]) + text_len + st_idx
-                    )
+                    h_index = torch.arange(llm_grid_h).view(1, -1, 1).expand(llm_grid_t, -1, llm_grid_w).flatten()
+                    w_index = torch.arange(llm_grid_w).view(1, 1, -1).expand(llm_grid_t, llm_grid_h, -1).flatten()
+                    llm_pos_ids_list.append(torch.stack([t_index, h_index, w_index]) + text_len + st_idx)
                     st = ed + llm_grid_t * llm_grid_h * llm_grid_w
 
                 if st < len(input_tokens):
-                    st_idx = (
-                        llm_pos_ids_list[-1].max() + 1
-                        if len(llm_pos_ids_list) > 0
-                        else 0
-                    )
+                    st_idx = llm_pos_ids_list[-1].max() + 1 if len(llm_pos_ids_list) > 0 else 0
                     text_len = len(input_tokens) - st
-                    llm_pos_ids_list.append(
-                        torch.arange(text_len).view(1, -1).expand(3, -1) + st_idx
-                    )
+                    llm_pos_ids_list.append(torch.arange(text_len).view(1, -1).expand(3, -1) + st_idx)
 
                 llm_positions = torch.cat(llm_pos_ids_list, dim=1).reshape(3, -1)
-                position_ids[..., i, attention_mask[i] == 1] = llm_positions.to(
-                    position_ids.device
-                )
-                mrope_position_deltas.append(
-                    llm_positions.max() + 1 - len(total_input_ids[i])
-                )
-            mrope_position_deltas = torch.tensor(
-                mrope_position_deltas, device=input_ids.device
-            ).unsqueeze(1)
+                position_ids[..., i, attention_mask[i] == 1] = llm_positions.to(position_ids.device)
+                mrope_position_deltas.append(llm_positions.max() + 1 - len(total_input_ids[i]))
+            mrope_position_deltas = torch.tensor(mrope_position_deltas, device=input_ids.device).unsqueeze(1)
             return position_ids, mrope_position_deltas
         else:
             if attention_mask is not None:
                 position_ids = attention_mask.long().cumsum(-1) - 1
                 position_ids.masked_fill_(attention_mask == 0, 1)
-                position_ids = (
-                    position_ids.unsqueeze(0)
-                    .expand(3, -1, -1)
-                    .to(attention_mask.device)
-                )
-                max_position_ids = position_ids.max(0, keepdim=False)[0].max(
-                    -1, keepdim=True
-                )[0]
+                position_ids = position_ids.unsqueeze(0).expand(3, -1, -1).to(attention_mask.device)
+                max_position_ids = position_ids.max(0, keepdim=False)[0].max(-1, keepdim=True)[0]
                 mrope_position_deltas = max_position_ids + 1 - attention_mask.shape[-1]
             else:
-                position_ids = (
-                    torch.arange(input_ids.shape[1], device=input_ids.device)
-                    .view(1, 1, -1)
-                    .expand(3, input_ids.shape[0], -1)
-                )
+                position_ids = torch.arange(input_ids.shape[1], device=input_ids.device).view(1, 1, -1).expand(3, input_ids.shape[0], -1)
                 mrope_position_deltas = torch.zeros(
                     [input_ids.shape[0], 1],
                     device=input_ids.device,
@@ -2372,19 +2093,9 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
         r"""
         Returns:
         """
-        output_attentions = (
-            output_attentions
-            if output_attentions is not None
-            else self.config.output_attentions
-        )
-        output_hidden_states = (
-            output_hidden_states
-            if output_hidden_states is not None
-            else self.config.output_hidden_states
-        )
-        return_dict = (
-            return_dict if return_dict is not None else self.config.use_return_dict
-        )
+        output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
+        output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
+        return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
         if inputs_embeds is None:
             inputs_embeds = self.model.embed_tokens(input_ids)
@@ -2407,15 +2118,9 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
                     sample_indices.append(torch.full((numel,), idx, dtype=torch.int64))
                     cu_seqlens.append(cu_seqlens[-1] + numel)
 
-                siglip_position_ids = torch.concat(siglip_position_ids, dim=0).to(
-                    pixel_values.device
-                )
-                cu_seqlens = torch.tensor(cu_seqlens, dtype=torch.int32).to(
-                    pixel_values.device
-                )
-                sample_indices = torch.concat(sample_indices, dim=0).to(
-                    pixel_values.device
-                )
+                siglip_position_ids = torch.concat(siglip_position_ids, dim=0).to(pixel_values.device)
+                cu_seqlens = torch.tensor(cu_seqlens, dtype=torch.int32).to(pixel_values.device)
+                sample_indices = torch.concat(sample_indices, dim=0).to(pixel_values.device)
                 image_grid_hws = torch.tensor(image_grid_hws, dtype=torch.int64)
                 # print("image_grid_hws: ", image_grid_hws)
                 # print("cu_seqlens: ", cu_seqlens)
@@ -2448,18 +2153,14 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
                     image_embeds = image_embeds.view(-1, image_embeds.shape[-1])
                 n_image_features = image_embeds.shape[0]
                 if n_image_tokens != n_image_features:
-                    raise ValueError(
-                        f"Image features and image tokens do not match: tokens: {n_image_tokens}, features {n_image_features}"
-                    )
+                    raise ValueError(f"Image features and image tokens do not match: tokens: {n_image_tokens}, features {n_image_features}")
 
                 mask = input_ids == self.config.image_token_id
                 mask_unsqueezed = mask.unsqueeze(-1)
                 mask_expanded = mask_unsqueezed.expand_as(inputs_embeds)
                 image_mask = mask_expanded.to(inputs_embeds.device)
 
-                image_embeds = image_embeds.to(
-                    inputs_embeds.device, inputs_embeds.dtype
-                )
+                image_embeds = image_embeds.to(inputs_embeds.device, inputs_embeds.dtype)
 
                 inputs_embeds = inputs_embeds.masked_scatter(image_mask, image_embeds)
 
@@ -2467,9 +2168,7 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
                 attention_mask = attention_mask.to(inputs_embeds.device)
         # position_ids = None
         # if we get 4D attention mask we cannot calculate rope deltas anymore. TODO @raushan fixme
-        if position_ids is None and (
-            attention_mask is None or attention_mask.ndim == 2
-        ):
+        if position_ids is None and (attention_mask is None or attention_mask.ndim == 2):
             # calculate RoPE index once per generation in the pre-fill stage only
             if (
                 (cache_position is not None and cache_position[0] == 0)
@@ -2490,11 +2189,7 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
                 # print("use_rope_index!!!!!!")
                 # print("cache_position: ", cache_position)
                 batch_size, seq_length, _ = inputs_embeds.shape
-                delta = (
-                    (cache_position[0] + self.rope_deltas).to(inputs_embeds.device)
-                    if cache_position is not None
-                    else 0
-                )
+                delta = (cache_position[0] + self.rope_deltas).to(inputs_embeds.device) if cache_position is not None else 0
                 # print("delta: ", delta)
                 # print("self.rope_deltas: ", self.rope_deltas)
                 position_ids = torch.arange(seq_length, device=inputs_embeds.device)
@@ -2626,9 +2321,7 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
             def _repeat_interleave_samples(x, lengths, repeat_times):
                 samples = torch.split(x, lengths)
                 repeat_args = [repeat_times] + [1] * (x.dim() - 1)
-                result = torch.cat(
-                    [sample.repeat(*repeat_args) for sample in samples], dim=0
-                )
+                result = torch.cat([sample.repeat(*repeat_args) for sample in samples], dim=0)
                 return result
 
             for key in dict_to_expand:
@@ -2637,50 +2330,31 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
                     samples = torch.split(image_grid_thw, list(image_nums))
                     # compute the sequence length of images for each sample
                     lengths = [torch.prod(sample, dim=1).sum() for sample in samples]
-                    dict_to_expand[key] = _repeat_interleave_samples(
-                        dict_to_expand[key], lengths=lengths, repeat_times=expand_size
-                    )
+                    dict_to_expand[key] = _repeat_interleave_samples(dict_to_expand[key], lengths=lengths, repeat_times=expand_size)
                 elif key == "image_grid_thw":
                     # get the num of images for each sample
                     lengths = list(image_nums)
-                    dict_to_expand[key] = _repeat_interleave_samples(
-                        dict_to_expand[key], lengths=lengths, repeat_times=expand_size
-                    )
+                    dict_to_expand[key] = _repeat_interleave_samples(dict_to_expand[key], lengths=lengths, repeat_times=expand_size)
                 elif key == "pixel_values_videos":
                     samples = torch.split(video_grid_thw, list(video_nums))
                     lengths = [torch.prod(sample, dim=1).sum() for sample in samples]
-                    dict_to_expand[key] = _repeat_interleave_samples(
-                        dict_to_expand[key], lengths=lengths, repeat_times=expand_size
-                    )
+                    dict_to_expand[key] = _repeat_interleave_samples(dict_to_expand[key], lengths=lengths, repeat_times=expand_size)
                 elif key == "video_grid_thw":
                     lengths = list(video_nums)
-                    dict_to_expand[key] = _repeat_interleave_samples(
-                        dict_to_expand[key], lengths=lengths, repeat_times=expand_size
-                    )
+                    dict_to_expand[key] = _repeat_interleave_samples(dict_to_expand[key], lengths=lengths, repeat_times=expand_size)
                 elif key == "second_per_grid_ts":
                     if not isinstance(dict_to_expand[key], list):
-                        raise TypeError(
-                            f"Expected value for key '{key}' to be a list, but got {type(dict_to_expand[key])} instead."
-                        )
+                        raise TypeError(f"Expected value for key '{key}' to be a list, but got {type(dict_to_expand[key])} instead.")
                     tensor = torch.tensor(dict_to_expand[key])
                     lengths = list(video_nums)
-                    tensor = _repeat_interleave_samples(
-                        tensor, lengths=lengths, repeat_times=expand_size
-                    )
+                    tensor = _repeat_interleave_samples(tensor, lengths=lengths, repeat_times=expand_size)
                     dict_to_expand[key] = tensor.tolist()
             return dict_to_expand
 
         def _expand_dict_for_generation(dict_to_expand):
             for key in dict_to_expand:
-                if (
-                    key != "cache_position"
-                    and dict_to_expand[key] is not None
-                    and isinstance(dict_to_expand[key], torch.Tensor)
-                    and key not in visual_keys
-                ):
-                    dict_to_expand[key] = dict_to_expand[key].repeat_interleave(
-                        expand_size, dim=0
-                    )
+                if key != "cache_position" and dict_to_expand[key] is not None and isinstance(dict_to_expand[key], torch.Tensor) and key not in visual_keys:
+                    dict_to_expand[key] = dict_to_expand[key].repeat_interleave(expand_size, dim=0)
             return dict_to_expand
 
         # input_ids is required for expanding visual inputs
@@ -2695,11 +2369,7 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
 
         if is_encoder_decoder:
             if model_kwargs.get("encoder_outputs") is None:
-                raise ValueError(
-                    "If `is_encoder_decoder` is True, make sure that `encoder_outputs` is defined."
-                )
-            model_kwargs["encoder_outputs"] = _expand_dict_for_generation(
-                model_kwargs["encoder_outputs"]
-            )
+                raise ValueError("If `is_encoder_decoder` is True, make sure that `encoder_outputs` is defined.")
+            model_kwargs["encoder_outputs"] = _expand_dict_for_generation(model_kwargs["encoder_outputs"])
 
         return input_ids, model_kwargs

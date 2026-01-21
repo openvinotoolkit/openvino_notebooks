@@ -57,9 +57,7 @@ def model_has_input_output_name(ov_model: ov.Model, name: str):
     Returns:
       True if input or output with requested name exists else False
     """
-    return name in sum(
-        [list(t.get_names()) for t in ov_model.inputs + ov_model.outputs], []
-    )
+    return name in sum([list(t.get_names()) for t in ov_model.inputs + ov_model.outputs], [])
 
 
 def fuse_cache_reorder(
@@ -92,9 +90,7 @@ def fuse_cache_reorder(
     if model_has_input_output_name(ov_model, "beam_idx"):
         raise ValueError("Model already has fused cache")
     input_batch = ov_model.input("inputs_embeds").get_partial_shape()[0]
-    beam_idx = opset13.parameter(
-        name="beam_idx", dtype=ov.Type.i32, shape=ov.PartialShape([input_batch])
-    )
+    beam_idx = opset13.parameter(name="beam_idx", dtype=ov.Type.i32, shape=ov.PartialShape([input_batch]))
     beam_idx.output(0).get_tensor().add_names({"beam_idx"})  # why list is not accepted?
     ov_model.add_parameters([beam_idx])
     not_kv_inputs.append(ov_model.inputs[-1])
@@ -102,9 +98,7 @@ def fuse_cache_reorder(
     for input_name in key_value_input_names:
         parameter_output_port = ov_model.input(input_name)
         consumers = parameter_output_port.get_target_inputs()
-        gather = opset13.gather(
-            parameter_output_port, beam_idx, opset13.constant(gather_dim)
-        )
+        gather = opset13.gather(parameter_output_port, beam_idx, opset13.constant(gather_dim))
         for consumer in consumers:
             consumer.replace_source_output(gather.output(0))
     ov_model.validate_nodes_and_infer_types()
@@ -130,18 +124,9 @@ def build_state_initializer(ov_model: ov.Model, batch_dim: int):
         if op.get_type_name() == "ReadValue":
             dims = [dim.min_length for dim in list(op.get_output_partial_shape(0))]
             dims[batch_dim] = batch
-            dims = [
-                (
-                    opset13.constant(np.array([dim], dtype=np.int64))
-                    if isinstance(dim, int)
-                    else dim
-                )
-                for dim in dims
-            ]
+            dims = [(opset13.constant(np.array([dim], dtype=np.int64)) if isinstance(dim, int) else dim) for dim in dims]
             shape = opset13.concat(dims, axis=0)
-            broadcast = opset13.broadcast(
-                opset13.constant(0.0, dtype=op.get_output_element_type(0)), shape
-            )
+            broadcast = opset13.broadcast(opset13.constant(0.0, dtype=op.get_output_element_type(0)), shape)
             op.set_arguments([broadcast])
     ov_model.validate_nodes_and_infer_types()
 
@@ -203,21 +188,9 @@ def make_stateful(
 
 
 def patch_stateful(ov_model):
-    key_value_input_names = [
-        key.get_any_name()
-        for key in ov_model.inputs
-        if any("key_values" in key_name for key_name in key.get_names())
-    ]
-    key_value_output_names = [
-        key.get_any_name()
-        for key in ov_model.outputs
-        if any("present" in key_name for key_name in key.get_names())
-    ]
-    not_kv_inputs = [
-        input
-        for input in ov_model.inputs
-        if not any(name in key_value_input_names for name in input.get_names())
-    ]
+    key_value_input_names = [key.get_any_name() for key in ov_model.inputs if any("key_values" in key_name for key_name in key.get_names())]
+    key_value_output_names = [key.get_any_name() for key in ov_model.outputs if any("present" in key_name for key_name in key.get_names())]
+    not_kv_inputs = [input for input in ov_model.inputs if not any(name in key_value_input_names for name in input.get_names())]
     if not key_value_input_names or not key_value_output_names:
         return
     batch_dim = 0
@@ -269,9 +242,7 @@ class InsertSlice(MatcherPass):
                 stop = np.array([-2], dtype=np.int32)
                 step = np.array([-1], dtype=np.int32)
                 axes = np.array([1], dtype=np.int32)
-                slice = ops.slice(
-                    grand_parent, start, stop, step, axes, name="inserted_slice"
-                )
+                slice = ops.slice(grand_parent, start, stop, step, axes, name="inserted_slice")
                 print(
                     "After insert slice node, output shape:",
                     slice.output(0).get_partial_shape(),
@@ -315,9 +286,7 @@ class LlmStatefulModel:
     def get_input_names(self):
         inputs = ["attention_mask", "position_ids"]
         for idx in range(len(self.model.lm_head_module.decoder.layers)):
-            inputs.extend(
-                [f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"]
-            )
+            inputs.extend([f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"])
         inputs.append("inputs_embeds")
         return inputs
 
@@ -1010,9 +979,7 @@ class LlmStatefulModel:
         attention_mask = torch.ones(1, 214)
         import numpy as np
 
-        position_ids = torch.tensor(
-            [[[33]], [[33]], [[33]]], dtype=torch.long
-        )  # shape: [3, 1, 1]
+        position_ids = torch.tensor([[[33]], [[33]], [[33]]], dtype=torch.long)  # shape: [3, 1, 1]
 
         llm_model.config.torchscript = True
         with torch.no_grad():
@@ -1047,16 +1014,12 @@ class LlmStatefulModel:
                 "group_size": 64,
                 "ratio": 0.9,
             }
-            ov_compressed_model_int4 = nncf.compress_weights(
-                ov_model, **compression_configuration
-            )
+            ov_compressed_model_int4 = nncf.compress_weights(ov_model, **compression_configuration)
             ov.save_model(
                 ov_compressed_model_int4,
                 Path(f"{self.ov_model_path}/llm_stateful_int4.xml"),
             )
-            print(
-                f"✅ INT4 compressed model saved to {self.ov_model_path}/llm_stateful_int4.xml"
-            )
+            print(f"✅ INT4 compressed model saved to {self.ov_model_path}/llm_stateful_int4.xml")
 
         if self.int8_compress:
             compression_configuration = {
@@ -1064,16 +1027,12 @@ class LlmStatefulModel:
                 # "group_size": 64,
                 # "ratio": 1,
             }
-            ov_compressed_model_int8 = nncf.compress_weights(
-                ov_model, **compression_configuration
-            )
+            ov_compressed_model_int8 = nncf.compress_weights(ov_model, **compression_configuration)
             ov.save_model(
                 ov_compressed_model_int8,
                 Path(f"{self.ov_model_path}/llm_stateful_int8.xml"),
             )
-            print(
-                f"✅ INT8 compressed model saved to {self.ov_model_path}/llm_stateful_int8.xml"
-            )
+            print(f"✅ INT8 compressed model saved to {self.ov_model_path}/llm_stateful_int8.xml")
 
 
 class LlmEmbdModel:
@@ -1288,57 +1247,33 @@ class VisionModel:
                     # Ensure pixel_values has batch dimension [1, N, 3, 14, 14]
                     original_shape = pixel_values.shape
                     if pixel_values.dim() == 4:  # Shape: (N, 3, 14, 14)
-                        pixel_values = pixel_values.unsqueeze(
-                            0
-                        )  # Add batch dimension: [1, N, 3, 14, 14]
+                        pixel_values = pixel_values.unsqueeze(0)  # Add batch dimension: [1, N, 3, 14, 14]
                     elif pixel_values.dim() == 5:
-                        if (
-                            pixel_values.shape[0] != 1
-                        ):  # Shape: (B, N, 3, 14, 14) where B != 1
-                            pixel_values = pixel_values[
-                                0:1
-                            ]  # Take only first batch: [1, N, 3, 14, 14]
+                        if pixel_values.shape[0] != 1:  # Shape: (B, N, 3, 14, 14) where B != 1
+                            pixel_values = pixel_values[0:1]  # Take only first batch: [1, N, 3, 14, 14]
                     else:
-                        raise ValueError(
-                            f"Unexpected pixel_values shape: {original_shape}, expected 4D or 5D tensor"
-                        )
+                        raise ValueError(f"Unexpected pixel_values shape: {original_shape}, expected 4D or 5D tensor")
 
                     # Verify pixel_values has correct shape [1, N, 3, 14, 14]
                     if pixel_values.dim() != 5 or pixel_values.shape[0] != 1:
-                        raise ValueError(
-                            f"pixel_values must have shape [1, N, 3, 14, 14], got {pixel_values.shape}"
-                        )
+                        raise ValueError(f"pixel_values must have shape [1, N, 3, 14, 14], got {pixel_values.shape}")
 
                     # Ensure image_grid_thw has batch dimension [1, 3]
                     original_grid_shape = image_grid_thw.shape
                     if image_grid_thw.dim() == 1:  # Shape: (3,)
-                        image_grid_thw = image_grid_thw.unsqueeze(
-                            0
-                        )  # Add batch dimension: [1, 3]
+                        image_grid_thw = image_grid_thw.unsqueeze(0)  # Add batch dimension: [1, 3]
                     elif image_grid_thw.dim() == 2:
                         if image_grid_thw.shape[0] != 1:  # Shape: (B, 3) where B != 1
-                            image_grid_thw = image_grid_thw[
-                                0:1
-                            ]  # Take only first batch: [1, 3]
+                            image_grid_thw = image_grid_thw[0:1]  # Take only first batch: [1, 3]
                     else:
-                        raise ValueError(
-                            f"Unexpected image_grid_thw shape: {original_grid_shape}, expected 1D or 2D tensor"
-                        )
+                        raise ValueError(f"Unexpected image_grid_thw shape: {original_grid_shape}, expected 1D or 2D tensor")
 
                     # Verify image_grid_thw has correct shape [1, 3]
-                    if (
-                        image_grid_thw.dim() != 2
-                        or image_grid_thw.shape[0] != 1
-                        or image_grid_thw.shape[1] != 3
-                    ):
-                        raise ValueError(
-                            f"image_grid_thw must have shape [1, 3], got {image_grid_thw.shape}"
-                        )
+                    if image_grid_thw.dim() != 2 or image_grid_thw.shape[0] != 1 or image_grid_thw.shape[1] != 3:
+                        raise ValueError(f"image_grid_thw must have shape [1, 3], got {image_grid_thw.shape}")
 
                     # Calculate actual sequence length from pixel_values
-                    actual_seq_len = pixel_values.shape[
-                        1
-                    ]  # Get N from [1, N, 3, 14, 14]
+                    actual_seq_len = pixel_values.shape[1]  # Get N from [1, N, 3, 14, 14]
                     cu_seqlens = torch.tensor([0, actual_seq_len], dtype=torch.int32)
 
                     # Convert to numpy arrays for NNCF (it expects numpy arrays)
@@ -1349,9 +1284,7 @@ class VisionModel:
 
                     # Final verification before adding to data
                     if pixel_values_np.shape[0] != 1:
-                        raise ValueError(
-                            f"pixel_values numpy array must have batch size 1, got shape {pixel_values_np.shape}"
-                        )
+                        raise ValueError(f"pixel_values numpy array must have batch size 1, got shape {pixel_values_np.shape}")
 
                     data.append(
                         {
@@ -1484,9 +1417,7 @@ class VisionModel:
                 return {"image_path": self.image_paths[idx]}
 
         dataset = LocalImageDataset(image_paths)
-        dataloader = torch.utils.data.DataLoader(
-            dataset, collate_fn=self.collate_fn, batch_size=1, pin_memory=True
-        )
+        dataloader = torch.utils.data.DataLoader(dataset, collate_fn=self.collate_fn, batch_size=1, pin_memory=True)
 
         calibration_data = self.prepare_calibration_data(dataloader, opt_init_steps)
         return calibration_data
@@ -1556,13 +1487,9 @@ class VisionModel:
                 model_type=nncf.ModelType.TRANSFORMER,
                 subset_size=len(calibration_data),
                 # Smooth Quant algorithm reduces activation quantization error; optimal alpha value was obtained through grid search
-                advanced_parameters=nncf.AdvancedQuantizationParameters(
-                    smooth_quant_alpha=0.6
-                ),
+                advanced_parameters=nncf.AdvancedQuantizationParameters(smooth_quant_alpha=0.6),
             )
-            ov.save_model(
-                quantized_model, Path(f"{self.ov_model_path}/vision_int8.xml")
-            )
+            ov.save_model(quantized_model, Path(f"{self.ov_model_path}/vision_int8.xml"))
 
 
 class PaddleOCR_VL_OV:
@@ -1579,12 +1506,8 @@ class PaddleOCR_VL_OV:
     ):
 
         if model is None and pretrained_model_path:
-            self.model = AutoModelForCausalLM.from_pretrained(
-                pretrained_model_path, trust_remote_code=True
-            )
-            self.tokenizer = AutoTokenizer.from_pretrained(
-                pretrained_model_path, trust_remote_code=True
-            )
+            self.model = AutoModelForCausalLM.from_pretrained(pretrained_model_path, trust_remote_code=True)
+            self.tokenizer = AutoTokenizer.from_pretrained(pretrained_model_path, trust_remote_code=True)
         elif model and tokenizer and pretrained_model_path is None:
             self.model = model
             self.tokenizer = tokenizer
@@ -1599,13 +1522,9 @@ class PaddleOCR_VL_OV:
             int8_quant=self.int8_quant,
             tokenizer=self.tokenizer,
         )
-        self.vision_mlp_model = VisionMlpModel(
-            model=self.model, ov_model_path=ov_model_path, device=device
-        )
+        self.vision_mlp_model = VisionMlpModel(model=self.model, ov_model_path=ov_model_path, device=device)
 
-        self.llm_embed_model = LlmEmbdModel(
-            model=self.model, ov_model_path=ov_model_path, device=device
-        )
+        self.llm_embed_model = LlmEmbdModel(model=self.model, ov_model_path=ov_model_path, device=device)
         self.llm_stateful_model = LlmStatefulModel(
             model=self.model,
             tokenizer=self.tokenizer,
@@ -1731,8 +1650,7 @@ class PaddleOCRVLPreprocessor:
             while "<|IMAGE_PLACEHOLDER|>" in text[i]:
                 text[i] = text[i].replace(
                     "<|IMAGE_PLACEHOLDER|>",
-                    "<|placeholder|>"
-                    * (images_info["image_grid_thw"][index].prod() // 2 // 2),
+                    "<|placeholder|>" * (images_info["image_grid_thw"][index].prod() // 2 // 2),
                     1,
                 )
                 index += 1
@@ -1785,27 +1703,15 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
         else:
             self.llm_model = Path(f"{ov_model_path}/llm_stateful.xml")
         if llm_int8_quant:
-            self.llm_compiled_model = core.compile_model(
-                self.llm_model, device, config=ov_config
-            )
+            self.llm_compiled_model = core.compile_model(self.llm_model, device, config=ov_config)
         else:
             self.llm_compiled_model = core.compile_model(self.llm_model, device)
 
         self.llm_request = self.llm_compiled_model.create_infer_request()
 
-        self.input_names = {
-            key.get_any_name(): idx
-            for idx, key in enumerate(self.llm_compiled_model.inputs)
-        }
-        self.output_names = {
-            idx: key for idx, key in enumerate(self.llm_compiled_model.outputs)
-        }
-        self.key_value_input_names = [
-            key
-            for key in list(self.input_names)
-            if key
-            not in ["beam_idx", "inputs_embeds", "attention_mask", "position_ids"]
-        ]
+        self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.llm_compiled_model.inputs)}
+        self.output_names = {idx: key for idx, key in enumerate(self.llm_compiled_model.outputs)}
+        self.key_value_input_names = [key for key in list(self.input_names) if key not in ["beam_idx", "inputs_embeds", "attention_mask", "position_ids"]]
         self.key_value_output_names = [key for key in list(self.output_names)[1:]]
         self.stateful = len(self.key_value_input_names) == 0
         # self.compiled_model = core.compile_model(self.model, device, config = {'INFERENCE_PRECISION_HINT': 'f32'})
@@ -1814,9 +1720,7 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
         self.generation_config = GenerationConfig.from_model_config(self.config)
         self.device = torch.device("cpu")
         self.next_beam_idx = None
-        self.pad_token_id = (
-            self.config.pad_token_id if self.config.pad_token_id is not None else -1
-        )
+        self.pad_token_id = self.config.pad_token_id if self.config.pad_token_id is not None else -1
         self.past_len = None
         self.main_input_name = "input_ids"
         self._supports_cache_class = False
@@ -1825,9 +1729,7 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
         self.llm_embd_compiled_model = core.compile_model(self.llm_embd, device)
         self.llm_embd_request = self.llm_embd_compiled_model.create_infer_request()
 
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            ov_model_path, trust_remote_code=True
-        )
+        self.tokenizer = AutoTokenizer.from_pretrained(ov_model_path, trust_remote_code=True)
 
         # Initialize preprocessor
         self.preprocessor = PaddleOCRVLPreprocessor(tokenizer=self.tokenizer)
@@ -1845,37 +1747,25 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
         else:
             self.vision_encoder_model = Path(f"{self.ov_model_path}/vision.xml")
         # self.vision_encoder_compiled_model = self.core.compile_model(self.vision_encoder_model, self.ov_device, config = {'INFERENCE_PRECISION_HINT': 'f32'})
-        self.vision_encoder_compiled_model = self.core.compile_model(
-            self.vision_encoder_model, self.ov_device
-        )
+        self.vision_encoder_compiled_model = self.core.compile_model(self.vision_encoder_model, self.ov_device)
 
-        self.vision_encoder_request = (
-            self.vision_encoder_compiled_model.create_infer_request()
-        )
+        self.vision_encoder_request = self.vision_encoder_compiled_model.create_infer_request()
 
-        self.vision_mlp_model = self.core.read_model(
-            Path(f"{self.ov_model_path}/vision_mlp.xml")
-        )
-        self.vision_mlp_compiled_model = self.core.compile_model(
-            self.vision_mlp_model, self.ov_device
-        )
+        self.vision_mlp_model = self.core.read_model(Path(f"{self.ov_model_path}/vision_mlp.xml"))
+        self.vision_mlp_compiled_model = self.core.compile_model(self.vision_mlp_model, self.ov_device)
         self.vision_mlp_request = self.vision_mlp_compiled_model.create_infer_request()
 
         # self.vision_pre_process = Preprocess()
         # self.vision_middle_process = Postprocess()
 
-    def vision_encoder_run(
-        self, pixel_values=None, image_grid_thw=None, cu_seqlens=None
-    ):
+    def vision_encoder_run(self, pixel_values=None, image_grid_thw=None, cu_seqlens=None):
         inputs_dict = {}
         inputs_dict["pixel_values"] = pixel_values
         inputs_dict["image_grid_thw"] = image_grid_thw
         inputs_dict["cu_seqlens"] = cu_seqlens
         self.vision_encoder_request.start_async(inputs_dict, share_inputs=True)
         self.vision_encoder_request.wait()
-        return torch.from_numpy(
-            self.vision_encoder_request.get_tensor("vision_output").data
-        )
+        return torch.from_numpy(self.vision_encoder_request.get_tensor("vision_output").data)
 
     def vision_mlp_run(self, image_features=None, image_grid_thw=None):
         inputs_dict = {}
@@ -1906,12 +1796,8 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
                 sample_indices.append(torch.full((numel,), idx, dtype=torch.int64))
                 cu_seqlens.append(cu_seqlens[-1] + numel)
 
-            siglip_position_ids = torch.concat(siglip_position_ids, dim=0).to(
-                pixel_values.device
-            )
-            cu_seqlens = torch.tensor(cu_seqlens, dtype=torch.int32).to(
-                pixel_values.device
-            )
+            siglip_position_ids = torch.concat(siglip_position_ids, dim=0).to(pixel_values.device)
+            cu_seqlens = torch.tensor(cu_seqlens, dtype=torch.int32).to(pixel_values.device)
             sample_indices = torch.concat(sample_indices, dim=0).to(pixel_values.device)
             image_grid_hws = torch.tensor(image_grid_hws, dtype=torch.int64)
 
@@ -1922,9 +1808,7 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
             )
             encoder_end = time.perf_counter()
             mlp_start = time.perf_counter()
-            vit_embeds = self.vision_mlp_run(
-                image_features=vision_output, image_grid_thw=image_grid_thw
-            )
+            vit_embeds = self.vision_mlp_run(image_features=vision_output, image_grid_thw=image_grid_thw)
             mlp_end = time.perf_counter()
             encoder_time = (encoder_end - encoder_start) * 1000
             mlp_time = (mlp_end - mlp_start) * 1000
@@ -1937,12 +1821,8 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
         """Returns True to validate the check that the model using `GenerationMixin.generate()` can indeed generate."""
         return True
 
-    def _reorder_cache(
-        self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor
-    ) -> Tuple[Tuple[torch.Tensor]]:
-        self.next_beam_idx = np.array(
-            beam_idx
-        )  # save beam_idx to be used as an input in the next iteration
+    def _reorder_cache(self, past_key_values: Tuple[Tuple[torch.Tensor]], beam_idx: torch.Tensor) -> Tuple[Tuple[torch.Tensor]]:
+        self.next_beam_idx = np.array(beam_idx)  # save beam_idx to be used as an input in the next iteration
         return past_key_values
 
     def llm_embd_run(self, input_ids):
@@ -1996,11 +1876,7 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
 
         batch_size = inputs_embeds.shape[0]
         if "beam_idx" in self.input_names:
-            inputs_dict["beam_idx"] = (
-                self.next_beam_idx
-                if self.next_beam_idx is not None
-                else np.arange(batch_size, dtype=int)
-            )
+            inputs_dict["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(batch_size, dtype=int)
 
         start = time.perf_counter()
         self.llm_request.start_async(inputs_dict, share_inputs=True)
@@ -2037,10 +1913,7 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
             # 1 - If the length of the attention_mask exceeds the length of input_ids, then we are in a setting where
             # some of the inputs are exclusively passed as part of the cache (e.g. when passing input_embeds as
             # input)
-            if (
-                attention_mask is not None
-                and attention_mask.shape[1] > input_ids.shape[1]
-            ):
+            if attention_mask is not None and attention_mask.shape[1] > input_ids.shape[1]:
                 input_ids = input_ids[:, -(attention_mask.shape[1] - self.past_len) :]
             # 2 - If the past_length is smaller than input_ids', then input_ids holds all input tokens. We can discard
             # input_ids based on the past_length.
@@ -2052,20 +1925,14 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
             # If the cache has seen more tokens than it can hold, then the cache has a size limit. Let's discard the
             # older attention values, as their corresponding values are not part of the input.
             if cache_length < past_length and attention_mask is not None:
-                attention_mask = attention_mask[
-                    :, -(cache_length + input_ids.shape[1]) :
-                ]
+                attention_mask = attention_mask[:, -(cache_length + input_ids.shape[1]) :]
         else:
             self.llm_infer_list.clear()
 
         if past_key_values is not None:
             position_ids = kwargs.get("position_ids", None)
             batch_size, seq_length = input_ids.shape
-            delta = (
-                (self.past_len + self.rope_deltas).to(input_ids.device)
-                if self.past_len is not None
-                else 0
-            )
+            delta = (self.past_len + self.rope_deltas).to(input_ids.device) if self.past_len is not None else 0
 
             position_ids = torch.arange(seq_length, device=input_ids.device)
             position_ids = position_ids.view(1, -1).expand(batch_size, -1)
@@ -2103,9 +1970,7 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
         video_token_id = self.config.video_token_id
         vision_start_token_id = self.config.vision_start_token_id
         mrope_position_deltas = []
-        if input_ids is not None and (
-            image_grid_thw is not None or video_grid_thw is not None
-        ):
+        if input_ids is not None and (image_grid_thw is not None or video_grid_thw is not None):
             total_input_ids = input_ids
             if attention_mask is None:
                 attention_mask = torch.ones_like(total_input_ids)
@@ -2121,9 +1986,7 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
             for i, input_ids in enumerate(total_input_ids):
                 input_ids = input_ids[attention_mask[i] == 1]
                 image_nums, video_nums = 0, 0
-                vision_start_indices = torch.argwhere(
-                    input_ids == vision_start_token_id
-                ).squeeze(1)
+                vision_start_indices = torch.argwhere(input_ids == vision_start_token_id).squeeze(1)
                 vision_tokens = input_ids[vision_start_indices + 1]
                 image_nums = (vision_tokens == image_token_id).sum()
                 video_nums = (vision_tokens == video_token_id).sum()
@@ -2171,87 +2034,43 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
                     )
                     text_len = ed - st
 
-                    st_idx = (
-                        llm_pos_ids_list[-1].max() + 1
-                        if len(llm_pos_ids_list) > 0
-                        else 0
-                    )
-                    llm_pos_ids_list.append(
-                        torch.arange(text_len).view(1, -1).expand(3, -1) + st_idx
-                    )
+                    st_idx = llm_pos_ids_list[-1].max() + 1 if len(llm_pos_ids_list) > 0 else 0
+                    llm_pos_ids_list.append(torch.arange(text_len).view(1, -1).expand(3, -1) + st_idx)
 
                     if torch.is_tensor(second_per_grid_t):
                         second_per_grid_t = second_per_grid_t.detach().item()
                     range_tensor = torch.arange(llm_grid_t).view(-1, 1)
                     expanded_range = range_tensor.expand(-1, llm_grid_h * llm_grid_w)
 
-                    time_tensor = (
-                        expanded_range
-                        * second_per_grid_t
-                        * self.config.vision_config.tokens_per_second
-                    )
+                    time_tensor = expanded_range * second_per_grid_t * self.config.vision_config.tokens_per_second
 
                     time_tensor_long = time_tensor.long()
                     t_index = time_tensor_long.flatten()
 
-                    h_index = (
-                        torch.arange(llm_grid_h)
-                        .view(1, -1, 1)
-                        .expand(llm_grid_t, -1, llm_grid_w)
-                        .flatten()
-                    )
-                    w_index = (
-                        torch.arange(llm_grid_w)
-                        .view(1, 1, -1)
-                        .expand(llm_grid_t, llm_grid_h, -1)
-                        .flatten()
-                    )
-                    llm_pos_ids_list.append(
-                        torch.stack([t_index, h_index, w_index]) + text_len + st_idx
-                    )
+                    h_index = torch.arange(llm_grid_h).view(1, -1, 1).expand(llm_grid_t, -1, llm_grid_w).flatten()
+                    w_index = torch.arange(llm_grid_w).view(1, 1, -1).expand(llm_grid_t, llm_grid_h, -1).flatten()
+                    llm_pos_ids_list.append(torch.stack([t_index, h_index, w_index]) + text_len + st_idx)
                     st = ed + llm_grid_t * llm_grid_h * llm_grid_w
 
                 if st < len(input_tokens):
-                    st_idx = (
-                        llm_pos_ids_list[-1].max() + 1
-                        if len(llm_pos_ids_list) > 0
-                        else 0
-                    )
+                    st_idx = llm_pos_ids_list[-1].max() + 1 if len(llm_pos_ids_list) > 0 else 0
                     text_len = len(input_tokens) - st
-                    llm_pos_ids_list.append(
-                        torch.arange(text_len).view(1, -1).expand(3, -1) + st_idx
-                    )
+                    llm_pos_ids_list.append(torch.arange(text_len).view(1, -1).expand(3, -1) + st_idx)
 
                 llm_positions = torch.cat(llm_pos_ids_list, dim=1).reshape(3, -1)
-                position_ids[..., i, attention_mask[i] == 1] = llm_positions.to(
-                    position_ids.device
-                )
-                mrope_position_deltas.append(
-                    llm_positions.max() + 1 - len(total_input_ids[i])
-                )
-            mrope_position_deltas = torch.tensor(
-                mrope_position_deltas, device=input_ids.device
-            ).unsqueeze(1)
+                position_ids[..., i, attention_mask[i] == 1] = llm_positions.to(position_ids.device)
+                mrope_position_deltas.append(llm_positions.max() + 1 - len(total_input_ids[i]))
+            mrope_position_deltas = torch.tensor(mrope_position_deltas, device=input_ids.device).unsqueeze(1)
             return position_ids, mrope_position_deltas
         else:
             if attention_mask is not None:
                 position_ids = attention_mask.long().cumsum(-1) - 1
                 position_ids.masked_fill_(attention_mask == 0, 1)
-                position_ids = (
-                    position_ids.unsqueeze(0)
-                    .expand(3, -1, -1)
-                    .to(attention_mask.device)
-                )
-                max_position_ids = position_ids.max(0, keepdim=False)[0].max(
-                    -1, keepdim=True
-                )[0]
+                position_ids = position_ids.unsqueeze(0).expand(3, -1, -1).to(attention_mask.device)
+                max_position_ids = position_ids.max(0, keepdim=False)[0].max(-1, keepdim=True)[0]
                 mrope_position_deltas = max_position_ids + 1 - attention_mask.shape[-1]
             else:
-                position_ids = (
-                    torch.arange(input_ids.shape[1], device=input_ids.device)
-                    .view(1, 1, -1)
-                    .expand(3, input_ids.shape[0], -1)
-                )
+                position_ids = torch.arange(input_ids.shape[1], device=input_ids.device).view(1, 1, -1).expand(3, input_ids.shape[0], -1)
                 mrope_position_deltas = torch.zeros(
                     [input_ids.shape[0], 1],
                     device=input_ids.device,
@@ -2299,9 +2118,7 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
             image_embeds = image_embeds.view(-1, image_embeds.shape[-1])
         n_image_features = image_embeds.shape[0]
         if n_image_tokens != n_image_features:
-            raise ValueError(
-                f"Image features and image tokens do not match: tokens: {n_image_tokens}, features {n_image_features}"
-            )
+            raise ValueError(f"Image features and image tokens do not match: tokens: {n_image_tokens}, features {n_image_features}")
 
         mask = input_ids == 100295
         mask_unsqueezed = mask.unsqueeze(-1)
@@ -2317,9 +2134,7 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
         else:
             valid_seq_len = attention_mask[0].sum().item()
 
-        cache_position = torch.arange(
-            0, valid_seq_len, device=self.device, dtype=torch.long
-        )
+        cache_position = torch.arange(0, valid_seq_len, device=self.device, dtype=torch.long)
 
         position_ids = None
         position_ids, rope_deltas = self.get_rope_index(
@@ -2337,7 +2152,5 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
             position_ids=position_ids,
             **generation_config,
         )
-        response = self.tokenizer.batch_decode(
-            generation_output, skip_special_tokens=True
-        )[0]
+        response = self.tokenizer.batch_decode(generation_output, skip_special_tokens=True)[0]
         return response, None

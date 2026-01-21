@@ -82,11 +82,7 @@ def make_batched_images(images) -> List[List[ImageInput]]:
     Returns:
         list: A list of images.
     """
-    if (
-        isinstance(images, (list, tuple))
-        and isinstance(images[0], (list, tuple))
-        and is_valid_image(images[0][0])
-    ):
+    if isinstance(images, (list, tuple)) and isinstance(images[0], (list, tuple)) and is_valid_image(images[0][0]):
         return [img for img_list in images for img in img_list]
 
     elif isinstance(images, (list, tuple)) and is_valid_image(images[0]):
@@ -106,11 +102,7 @@ def adjust_size(size, patch_size):
 
 
 def make_batched_videos(videos) -> List[VideoInput]:
-    if (
-        isinstance(videos, (list, tuple))
-        and isinstance(videos[0], (list, tuple))
-        and is_valid_image(videos[0][0])
-    ):
+    if isinstance(videos, (list, tuple)) and isinstance(videos[0], (list, tuple)) and is_valid_image(videos[0][0]):
         return videos
 
     elif isinstance(videos, (list, tuple)) and is_valid_image(videos[0]):
@@ -157,9 +149,7 @@ def smart_resize(
         width = factor
 
     if max(height, width) / min(height, width) > 200:
-        raise ValueError(
-            f"absolute aspect ratio must be smaller than 200, got {max(height, width) / min(height, width)}"
-        )
+        raise ValueError(f"absolute aspect ratio must be smaller than 200, got {max(height, width) / min(height, width)}")
     h_bar = round(height / factor) * factor
     w_bar = round(width / factor) * factor
     if h_bar * w_bar > max_pixels:
@@ -254,9 +244,7 @@ class PaddleOCRVLImageProcessor(BaseImageProcessor):
         patch_size = self.patch_size
 
         if (w // patch_size) * (h // patch_size) > self.in_token_limit:
-            scale = math.sqrt(
-                self.in_token_limit / ((w // patch_size) * (h // patch_size))
-            )
+            scale = math.sqrt(self.in_token_limit / ((w // patch_size) * (h // patch_size)))
             new_w, new_h = int(w * scale), int(h * scale)
 
             image = image.resize((new_w, new_h), Image.Resampling.BICUBIC)
@@ -374,9 +362,7 @@ class PaddleOCRVLImageProcessor(BaseImageProcessor):
                 )
 
             if do_rescale:
-                image = self.rescale(
-                    image, scale=rescale_factor, input_data_format=input_data_format
-                )
+                image = self.rescale(image, scale=rescale_factor, input_data_format=input_data_format)
 
             if do_normalize:
                 image = self.normalize(
@@ -385,9 +371,7 @@ class PaddleOCRVLImageProcessor(BaseImageProcessor):
                     std=image_std,
                     input_data_format=input_data_format,
                 )
-            image = to_channel_dimension_format(
-                image, data_format, input_channel_dim=input_data_format
-            )
+            image = to_channel_dimension_format(image, data_format, input_channel_dim=input_data_format)
             processed_images.append(image)
 
         patches = np.array(processed_images)
@@ -413,9 +397,7 @@ class PaddleOCRVLImageProcessor(BaseImageProcessor):
         )
         patches = patches.transpose(0, 3, 5, 2, 1, 4, 6)
         assert self.temporal_patch_size == 1
-        flatten_patches = patches.reshape(
-            grid_t * grid_h * grid_w, channel, self.patch_size, self.patch_size
-        )
+        flatten_patches = patches.reshape(grid_t * grid_h * grid_w, channel, self.patch_size, self.patch_size)
         return flatten_patches, (grid_t, grid_h, grid_w)
 
     def preprocess(
@@ -488,15 +470,11 @@ class PaddleOCRVLImageProcessor(BaseImageProcessor):
         size = size if size is not None else self.size
         resample = resample if resample is not None else self.resample
         do_rescale = do_rescale if do_rescale is not None else self.do_rescale
-        rescale_factor = (
-            rescale_factor if rescale_factor is not None else self.rescale_factor
-        )
+        rescale_factor = rescale_factor if rescale_factor is not None else self.rescale_factor
         do_normalize = do_normalize if do_normalize is not None else self.do_normalize
         image_mean = image_mean if image_mean is not None else self.image_mean
         image_std = image_std if image_std is not None else self.image_std
-        do_convert_rgb = (
-            do_convert_rgb if do_convert_rgb is not None else self.do_convert_rgb
-        )
+        do_convert_rgb = do_convert_rgb if do_convert_rgb is not None else self.do_convert_rgb
 
         if images is not None:
             images = make_batched_images(images)
@@ -504,10 +482,7 @@ class PaddleOCRVLImageProcessor(BaseImageProcessor):
             videos = make_batched_videos(videos)
 
         if images is not None and not valid_images(images):
-            raise ValueError(
-                "Invalid image type. Must be of type PIL.Image.Image, numpy.ndarray, "
-                "torch.Tensor, tf.Tensor or jax.ndarray."
-            )
+            raise ValueError("Invalid image type. Must be of type PIL.Image.Image, numpy.ndarray, " "torch.Tensor, tf.Tensor or jax.ndarray.")
 
         validate_preprocess_arguments(
             rescale_factor=rescale_factor,
