@@ -996,7 +996,9 @@ def default_flax_embed_init(tensor):
 
 class Projector(nn.Module):
 
-    def __init__(self, text_config: PaddleOCRVLConfig, vision_config: PaddleOCRVisionConfig):
+    def __init__(
+        self, text_config: PaddleOCRVLConfig, vision_config: PaddleOCRVisionConfig
+    ):
         super().__init__()
         self.text_config = text_config
         self.vision_config = vision_config
@@ -1157,7 +1159,9 @@ class PaddleOCRVisionEmbeddings(nn.Module):
         self,
         pixel_values: torch.FloatTensor,
         position_ids: Optional[torch.Tensor] = None,
-        image_grid_thw: Optional[torch.LongTensor] = None,  # shape: [num_images, 3], each row is (t, h, w)
+        image_grid_thw: Optional[
+            torch.LongTensor
+        ] = None,  # shape: [num_images, 3], each row is (t, h, w)
         interpolate_pos_encoding=False,
     ) -> torch.Tensor:
         if pixel_values.dim() == 5:
@@ -1182,7 +1186,12 @@ class PaddleOCRVisionEmbeddings(nn.Module):
                 assert batch_size == 1
                 start = 0
                 embeddings = embeddings.squeeze(0)
-                tmp_embeddings = torch.empty(0, embeddings.shape[-1], dtype=embeddings.dtype, device=embeddings.device)
+                tmp_embeddings = torch.empty(
+                    0,
+                    embeddings.shape[-1],
+                    dtype=embeddings.dtype,
+                    device=embeddings.device,
+                )
                 for image_grid in image_grid_thw:
                     t, h, w = image_grid
                     end = start + t * h * w
@@ -1193,7 +1202,9 @@ class PaddleOCRVisionEmbeddings(nn.Module):
                         .repeat(t, 1)
                     )
                     image_embeddings = image_embeddings + position_embedding
-                    tmp_embeddings = torch.concat([tmp_embeddings, image_embeddings], dim=0)
+                    tmp_embeddings = torch.concat(
+                        [tmp_embeddings, image_embeddings], dim=0
+                    )
                     start = end
                 embeddings = tmp_embeddings.unsqueeze(0)
             else:
@@ -1739,7 +1750,9 @@ class PaddleOCRVisionTransformer(nn.Module):
         cu_seqlens: Optional[List[torch.Tensor]] = None,
         padding_mask: Optional[torch.Tensor] = None,
         vision_return_embed_list: Optional[bool] = True,
-        image_grid_thw: Optional[torch.LongTensor] = None,  # shape: [num_images, 3], each row is (t, h, w)
+        image_grid_thw: Optional[
+            torch.LongTensor
+        ] = None,  # shape: [num_images, 3], each row is (t, h, w)
         return_pooler_output: Optional[bool] = False,
         use_rope: Optional[bool] = True,
         window_size: Optional[bool] = -1,
@@ -1859,15 +1872,17 @@ class PaddleOCRVisionTransformer(nn.Module):
         dtype = last_hidden_state.dtype
         batch_size = last_hidden_state.shape[0]
         hidden_dim = last_hidden_state.shape[-1]
-       
-        sample_hidden_state = torch.empty(batch_size, 0, hidden_dim, dtype=dtype, device=device)
-       
+
+        sample_hidden_state = torch.empty(
+            batch_size, 0, hidden_dim, dtype=dtype, device=device
+        )
+
         for i in range(cu_seqlens.shape[0] - 1):
             start = cu_seqlens[i]
             end = cu_seqlens[i + 1]
             tensor = last_hidden_state[:, start:end, :]
             sample_hidden_state = torch.concat([sample_hidden_state, tensor], dim=1)
- 
+
         return BaseModelOutputWithPooling(
             last_hidden_state=sample_hidden_state,
             pooler_output=None,
@@ -1929,7 +1944,7 @@ class PaddleOCRVisionModel(PaddleOCRPreTrainedModel):
         interpolate_pos_encoding: bool = True,
         position_ids: Optional[torch.Tensor] = None,
         vision_return_embed_list: Optional[bool] = True,
-        image_grid_thw: Optional[torch.LongTensor] = None, 
+        image_grid_thw: Optional[torch.LongTensor] = None,
         cu_seqlens: Optional[List[torch.Tensor]] = None,
         return_pooler_output: Optional[bool] = False,
         use_rope: Optional[bool] = True,
@@ -2038,8 +2053,14 @@ class PaddleOCRVLCausalLMOutputWithPast(ModelOutput):
     attentions: Optional[Tuple[torch.FloatTensor]] = None
     rope_deltas: Optional[torch.LongTensor] = None
 
+
 class PaddleOCRVLLMHead(nn.Module):
-    def __init__(self, decoder: Ernie4_5Model, lm_head: nn.Linear, config: Optional[PaddleOCRVLConfig] = None):
+    def __init__(
+        self,
+        decoder: Ernie4_5Model,
+        lm_head: nn.Linear,
+        config: Optional[PaddleOCRVLConfig] = None,
+    ):
         super().__init__()
         self.decoder = decoder
         self.lm_head = lm_head
@@ -2073,6 +2094,7 @@ class PaddleOCRVLLMHead(nn.Module):
 
         output = (logits,) + outputs[1:]
         return output
+
 
 class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMixin):
     _tied_weights_keys = ["lm_head.weight"]
