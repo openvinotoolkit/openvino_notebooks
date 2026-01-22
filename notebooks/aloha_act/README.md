@@ -2,6 +2,8 @@
 
 This notebook demonstrates how to use the ACT (Action Chunking Transformer) model for imitation learning tasks for Aloha Robot, with OpenVINO optimization for efficient inference.
 
+**Note:** This notebook currently supports **Ubuntu 22.04** only.
+
 ## Overview
 
 Imitation learning is a machine learning approach where a model learns to mimic expert behavior by observing and replicating demonstrations. ACT is an action chunking policy that uses Transformers for sequence modeling and is trained as a conditional VAE (CVAE) to capture variability in human data. It significantly outperforms previous imitation learning algorithms on various simulated and real-world fine manipulation tasks.
