@@ -22,4 +22,9 @@ The tutorial consists of the following steps:
 
 This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+
+⚠️ **EXPERIMENTAL NOTEBOOK**
+
+This notebook demonstrates a model that has not been fully validated with OpenVINO. It may be fully supported and validated in the future.
+
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/cosyvoice3-tts/README.md" />
