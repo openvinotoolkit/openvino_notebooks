@@ -1540,6 +1540,56 @@ class PaddleOCR_VL_OV:
         self.llm_embed_model.convert_sdpa_ov()
         self.llm_stateful_model.convert_sdpa_ov()
 
+    def close(self):
+        """
+        Release all resources held by this instance.
+        After calling this method, the instance should not be used anymore.
+        """
+        import gc
+        import torch
+
+        # Release sub-model instances (they may hold references to the main model)
+        if hasattr(self, "vision_model"):
+            if hasattr(self.vision_model, "model"):
+                del self.vision_model.model
+            if hasattr(self.vision_model, "tokenizer"):
+                del self.vision_model.tokenizer
+            if hasattr(self.vision_model, "vision_pre_process"):
+                del self.vision_model.vision_pre_process
+            del self.vision_model
+
+        if hasattr(self, "vision_mlp_model"):
+            if hasattr(self.vision_mlp_model, "model"):
+                del self.vision_mlp_model.model
+            del self.vision_mlp_model
+
+        if hasattr(self, "llm_embed_model"):
+            if hasattr(self.llm_embed_model, "model"):
+                del self.llm_embed_model.model
+            del self.llm_embed_model
+
+        if hasattr(self, "llm_stateful_model"):
+            if hasattr(self.llm_stateful_model, "model"):
+                del self.llm_stateful_model.model
+            if hasattr(self.llm_stateful_model, "tokenizer"):
+                del self.llm_stateful_model.tokenizer
+            if hasattr(self.llm_stateful_model, "vision_pre_process"):
+                del self.llm_stateful_model.vision_pre_process
+            del self.llm_stateful_model
+
+        # Release main model and tokenizer
+        if hasattr(self, "model"):
+            del self.model
+        if hasattr(self, "tokenizer"):
+            del self.tokenizer
+
+        # Clear CUDA cache if available
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+        # Force garbage collection to free memory immediately
+        gc.collect()
+
 
 class PaddleOCRVLPreprocessor:
     """
