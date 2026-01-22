@@ -332,6 +332,7 @@
 - [Image-to-Video synthesis with AnimateAnyone and OpenVINO](./animate-anyone/animate-anyone.ipynb)
 - [Music generation using ACE Step and OpenVINO](./ace-step-music-generation/ace-step-music-generation.ipynb)
 - [Part Segmentation of 3D Point Clouds with OpenVINO™](./3D-segmentation-point-clouds/3D-segmentation-point-clouds.ipynb)
+- [**PointPillar for 3D object detection**](./3D-point-pillars/pointpillars.ipynb)
 
 ## Model Training
 
