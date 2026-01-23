@@ -1,0 +1,10 @@
+openvino>=2025.0.0
+optimum-intel[openvino,nncf]>=1.22.0
+transformers>=4.48.0
+# allow newer versions compatible with Py3.13
+torch>=2.5.1
+psutil>=6.0.0
+pandas>=2.2.0
+seaborn>=0.13.0
+pyyaml>=6.0
+ipykernel
