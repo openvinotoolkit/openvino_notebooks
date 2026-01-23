@@ -299,6 +299,7 @@ fastcomposer
 FastComposer
 FastDraft
 FastSAM
+Fbank
 FC
 feedforward
 FeedForward
@@ -325,6 +326,7 @@ freevc
 frisbee
 Frontend
 frontend
+FunASR
 FX
 GAN
 Gante
@@ -1168,6 +1170,7 @@ VQGAN
 VQVAE
 Wav
 wav
+WavFrontend
 waveform
 waveforms
 WavLM
