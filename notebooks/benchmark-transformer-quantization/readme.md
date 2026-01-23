@@ -44,7 +44,7 @@ pip install -r requirements.txt
 
 
 2. Run the Benchmark Open the Jupyter Notebook and execute all cells.
-jupyter lab benchmark-transformer.ipynb
+jupyter lab benchmark-transformer-notebook.ipynb
 
 The notebook acts as a guided tutorial, explaining the "Heavy vs. Light" quantization concept with visuals.
 
