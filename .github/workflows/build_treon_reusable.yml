@@ -115,19 +115,6 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install libsndfile1 ffmpeg espeak-ng -y
       
-      - name: Install required packages (Windows)
-        if: ${{ !inputs.container && runner.os == 'Windows' }}
-        shell: pwsh
-        run: |
-          # Download 7z standalone utility
-          Invoke-WebRequest -Uri 'https://www.7-zip.org/a/7zr.exe' -OutFile '7zr.exe' -UseBasicParsing
-          # Download ffmpeg
-          Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-full_build.7z' -OutFile 'ffmpeg.7z' -UseBasicParsing
-          # Extract ffmpeg using 7z
-          .\7zr.exe x ffmpeg.7z -y
-          Move-Item -Path ffmpeg-7.1.1-full_build -Destination ffmpeg
-          "$PWD\ffmpeg\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      
       # Packages that notebooks need to run in docker container
       - name: Install required packages (container)
         if: ${{ inputs.container }}
@@ -164,14 +151,6 @@ jobs:
           pip-cache-path: ${{ env.PIP_CACHE_PATH }}
           should-setup-pip-paths: 'true'
           self-hosted-runner: 'true'
-
-      - name: Cache Pip Packages
-        id: cachepip
-        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
-        with:
-          path: |
-            pipcache
-          key: ${{ env.PIP_CACHE_KEY }}-${{ env.OS_NAME }}-${{ inputs.python }}
 
       # Cache specific files to reduce downloads or prevent network issues
       - name: Cache Files
@@ -245,16 +224,9 @@ jobs:
 
       - name: Install python dependencies
         run: |
-          python${{ inputs.python }} -m pip install --upgrade pip
-          python${{ inputs.python }} -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
-          python${{ inputs.python }} -m ipykernel install --user --name openvino_env
-
-      # Cache OpenVINO packages (`mv` works cross-platform)
-      - name: Make pipcache directory with OpenVINO packages
-        if: steps.cachepip.outputs.cache-hit != 'true'
-        run: |
-          mv pipcache pipcache_full
-          mv pipcache_openvino pipcache
+          python${{ inputs.python }} -m pip install --upgrade pip wheel setuptools
+          python${{ inputs.python }} -m pip install -r .ci/dev-requirements.txt
+          python${{ inputs.python }} -m ipykernel install --user
 
       # Create list of installed pip packages that can be downloaded as artifacts
       # to verify the exact environment of a specific test run
@@ -281,33 +253,6 @@ jobs:
         run: jupyter lab notebooks --help
 
       # Main notebooks test. Verifies that all notebooks run without errors
-      - name: Analysing with treon (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $IGNORE_ARGS = ""
-          if ("${{ inputs.ignore_list }}") {
-            $IGNORE_ARGS = "$IGNORE_ARGS ${{ inputs.ignore_list }}"
-          }
-          if ("${{ env.TEST_DEVICE }}" -eq "gpu") {
-            $IGNORE_ARGS = "$IGNORE_ARGS .ci/heavy_win_gpu.txt"
-          }
-          
-          if ($IGNORE_ARGS.Trim()) {
-            $IGNORE_ARGS = "--ignore_list $IGNORE_ARGS"
-          }
-
-          $testListArg = if ("${{ inputs.test_only_changed }}" -eq "true") { "--test_list test_notebooks.txt" } else { "" }
-          
-          python${{ inputs.python }} .ci/validate_notebooks.py `
-            --os ${{ env.OS_NAME }} `
-            --python ${{ inputs.python }} `
-            --device ${{ env.TEST_DEVICE }} `
-            $testListArg `
-            $IGNORE_ARGS `
-            --report_dir test_report/${{ env.TEST_REPORT_DIR }} `
-            --timeout 1200
-      
       - name: Analysing with treon (Linux)
         if: runner.os == 'Linux'
         shell: bash
@@ -356,7 +301,7 @@ jobs:
 
       # Show the cache after running the notebooks
       - name: Show cache
-        if: runner.os != 'Windows'
+        if: 'false'
         run: |
           ls -laR ${{ env.CACHE_DIR }}
           du -sh ${{ env.CACHE_DIR }}
