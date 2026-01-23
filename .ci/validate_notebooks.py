@@ -449,12 +449,10 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
     print(f"Executing notebook with nbconvert: {test_notebook_path}", flush=True)
     with open(test_notebook_path, 'r', encoding='utf-8') as f:
         nb = nbformat.read(f, as_version=4)
-    executed_notebook_path = notebook_path.parent / f"executed_{notebook_original_name}"
     try:
         # Ensure environment variables (including PATH with MSVC DLLs) are passed to kernel
         ep = ExecutePreprocessor(
             timeout=timeout,
-            kernel_name='python3',
         )
 
         # Pass current environment to ensure DLL paths and other configs are available
@@ -463,39 +461,12 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
                 'path': str(notebook_path.parent)
             }
         }
-        ep.preprocess(nb, resources)
-
-        with open(executed_notebook_path, 'w', encoding='utf-8') as f:            
-            try:
-                print(f'Notebook content: {json.dumps(nb)}', flush=True)
-            except Exception as e:
-                print(f"2. Error printing notebook as JSON: {e}", flush=True)
-            
-            # print(f'Notebook content: {nbformat.writes(nb)}', flush=True)
-            # nbformat.write(nb, f)
-            json.dump(nb, f)
-            
-            print(f"Notebook executed successfully. Saved to: {executed_notebook_path}", flush=True)
+        ep.preprocess(nb, resources)           
+        print(f"Notebook executed successfully", flush=True)
 
     except CellExecutionError as e:
         print(f"Notebook execution failed with cell error:\n{e}", flush=True)
         retcode = 1
-
-        # Still save the notebook with error outputs for debugging
-        try:
-            with open(executed_notebook_path, 'w', encoding='utf-8') as f:
-                try:
-                    print(f'Notebook content: {json.dumps(nb)}', flush=True)
-                except Exception as e:
-                    print(f"2. Error printing notebook as JSON: {e}", flush=True)
-            
-                # print(f'Notebook content: {nbformat.writes(nb)}', flush=True)
-                # nbformat.write(nb, f)
-                json.dump(nb, f)
-                print(f"Notebook with error saved to: {executed_notebook_path}", flush=True)
-        except Exception as save_error:
-            print(f"Failed to save notebook with error: {save_error}", flush=True)
-
     except TimeoutError:
         print(f"Notebook execution timed out after {timeout} seconds", flush=True)
         retcode = -42  # Special timeout exit code
@@ -866,7 +837,7 @@ def main():
                 job_name = args.job_name or "Unknown"
                 device = args.device or "Unknown"
                 print(f'Notebook directory content: {list(report["path"].parent.iterdir())}', flush=True)
-                notebook_content = report["path"].parent.joinpath(f'executed_{report["path"].name}').read_text(encoding="utf-8")
+                notebook_content = report["path"].parent.joinpath(f'test_{report["path"].name}').read_text(encoding="utf-8")
                 report_path = write_single_notebook_report(
                     base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir, notebook_content=notebook_content
                 )
