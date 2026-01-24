@@ -1,4 +1,4 @@
-experiment_name: "Qwen2.5_Benchmark_CPUBaseline"
+experiment_name: "Qwen2.5_Benchmark_CPUBaseline" #you can change it to any huggingface model id
 
 model:
   id: "Qwen/Qwen2.5-0.5B-Instruct"
@@ -13,3 +13,4 @@ benchmark:
 export:
   cache_dir: "./ov_cache"
   precision: "int4"  # Options: int4, int8, fp32
+

@@ -15,22 +15,24 @@ class ModelFactory:
         
         load_time = time.perf_counter() - start
         
-        # FIX: Return 4 values to match notebook expectations (Metric is None for PyTorch)
+        # Return 4 values to match notebook expectations (Metric is None for PyTorch)
         return model, tokenizer, load_time, None
 
     @staticmethod
-    def load_openvino(model_id, precision="int4", cache_dir="./ov_cache"):
+    def load_openvino(model_id, precision="int4", device="CPU", cache_dir="./ov_cache"):
         """
-        Loads an OpenVINO model. 
-        If precision is 'already_quantized', it downloads directly without export.
+        Loads an OpenVINO model with device selection.
         """
-        print(f" Loading OpenVINO Model: {model_id}...")
+        print(f" Loading OpenVINO Model: {model_id} on {device}...")
         start = time.perf_counter()
         
         # 1. Determine Cache Path vs Direct Download
         if precision == "already_quantized":
             # FAST PATH: Load pre-optimized model directly from HF
-            model = OVModelForCausalLM.from_pretrained(model_id)
+            model = OVModelForCausalLM.from_pretrained(
+                model_id,
+                device=device  # <--- UPDATED: Uses the widget selection
+            )
             cache_path = Path(cache_dir) / "pre_quantized_download"
         else:
             # SLOW PATH: Local Export & Compression
@@ -46,11 +48,15 @@ class ModelFactory:
                 model = OVModelForCausalLM.from_pretrained(
                     model_id, 
                     export=True,
+                    device=device,  # UPDATED: Uses the widget selection
                     **export_config
                 )
                 model.save_pretrained(cache_path)
             else:
-                model = OVModelForCausalLM.from_pretrained(cache_path)
+                model = OVModelForCausalLM.from_pretrained(
+                    cache_path,
+                    device=device   # UPDATED: Uses the widget selection
+                )
             
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         load_time = time.perf_counter() - start
