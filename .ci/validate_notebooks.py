@@ -643,9 +643,13 @@ def run_test(
                 collect_python_packages(python_executable, report_dir / (patched_notebook.stem + "_env_before.txt"))
                 print(f'Python executable for notebook test: {python_executable}', flush=True)
 
-                retcode, duration = execute_notebook_with_nbconvert(
-                    notebook_path,
-                    timeout
+                main_command = [python_executable, "-m", "treon", "--verbose", str(patched_notebook)]
+
+                retcode, duration = run_subprocess_with_timeout(
+                    main_command,
+                    timeout,
+                    shell=(platform.system() == "Windows"),
+                    description=f"Notebook test [{patched_notebook.name}]",
                 )
 
                 ov_version_after = get_pip_package_version(python_executable, "openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
@@ -842,7 +846,7 @@ def main():
                 job_name = args.job_name or "Unknown"
                 device = args.device or "Unknown"
                 print(f'Notebook directory content: {list(report["path"].parent.iterdir())}', flush=True)
-                notebook_content = json.loads(report["path"].parent.joinpath(f'executed_{report["path"].name}').read_text(encoding="utf-8"))
+                notebook_content = json.loads(report["path"].parent.joinpath(f'test_{report["path"].name}').read_text(encoding="utf-8"))
                 report_path = write_single_notebook_report(
                     base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir, notebook_content=notebook_content
                 )
