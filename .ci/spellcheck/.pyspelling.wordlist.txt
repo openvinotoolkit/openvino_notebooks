@@ -360,6 +360,7 @@ gpt
 gpu
 GPU's
 GPUs
+GQA
 Gradio
 gradio
 graphemes
@@ -508,6 +509,8 @@ LDMs
 LDP
 learnable
 LeViT
+LFM
+lfm
 LibriSpeech
 librispeech
 LibriTTS
