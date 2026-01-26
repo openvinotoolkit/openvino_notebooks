@@ -446,6 +446,7 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
     retcode = 0
     notebook_original_name = notebook_path.name
     test_notebook_path = notebook_path.parent / f"test_{notebook_original_name}"
+    executed_notebook_path = notebook_path.parent / f"executed_{notebook_original_name}"
     print(f"Executing notebook with nbconvert: {test_notebook_path}", flush=True)
     with open(test_notebook_path, 'r', encoding='utf-8') as f:
         nb = nbformat.read(f, as_version=4)
@@ -470,11 +471,15 @@ def execute_notebook_with_nbconvert(notebook_path: Path,
     except TimeoutError:
         print(f"Notebook execution timed out after {timeout} seconds", flush=True)
         retcode = -42  # Special timeout exit code
-
     except Exception as e:
         print(f"Notebook execution failed with error:\n{e}", flush=True)
         print(traceback.format_exc(), flush=True)
         retcode = 1
+    finally:
+        # Save the notebook with outputs
+        with open(executed_notebook_path, 'w', encoding='utf-8') as f:
+            nbformat.write(nb, f)
+            print(f"Executed notebook saved to: {executed_notebook_path}", flush=True)
 
     duration = time.perf_counter() - start_time
     return retcode, duration
@@ -837,7 +842,7 @@ def main():
                 job_name = args.job_name or "Unknown"
                 device = args.device or "Unknown"
                 print(f'Notebook directory content: {list(report["path"].parent.iterdir())}', flush=True)
-                notebook_content = json.loads(report["path"].parent.joinpath(f'test_{report["path"].name}').read_text(encoding="utf-8"))
+                notebook_content = json.loads(report["path"].parent.joinpath(f'executed_{report["path"].name}').read_text(encoding="utf-8"))
                 report_path = write_single_notebook_report(
                     base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir, notebook_content=notebook_content
                 )
