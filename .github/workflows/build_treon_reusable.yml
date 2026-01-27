@@ -105,12 +105,6 @@ jobs:
             echo "No notebook files changed, using precommit list"
             cp .ci/precommit_list.txt test_notebooks.txt
           fi
-
-      - name: Dotenv Action
-        id: dotenv
-        uses: xom9ikk/dotenv@ac290ca23a42155a0cba1031d23afa46240116a9 # v2.3.0
-        with:
-          path: ./.github/workflows
       
       # Packages that notebooks need to run in plain os
       - name: Install required packages (Linux)
@@ -157,23 +151,6 @@ jobs:
           should-setup-pip-paths: 'true'
           self-hosted-runner: 'true'
 
-      # Cache specific files to reduce downloads or prevent network issues
-      - name: Cache Files
-        id: cachefiles
-        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
-        with:
-          path: |
-            # NOTE: when modifying cache paths, update FILES_CACHE_KEY in .env
-            # and change cache paths in both treon.yml and convert_notebooks.yml
-            case_00030.zip
-            notebooks/ct-segmentation-quantize/kits19_frames_1
-            notebooks/pytorch-post-training-quantization-nncf/output/tiny-imagenet-200.zip
-            # omz cache location is set to this with test_replace
-            notebooks/optical-character-recognition/open_model_zoo_cache
-            notebooks/ct-scan-live-inference/kits19_frames_1
-            notebooks/pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
-          key: ${{ env.FILES_CACHE_KEY }}
-
       - name: Create cache directory
         run: mkdir -p ${{ env.MOUNT_CACHE }}
 
@@ -189,6 +166,8 @@ jobs:
       # Download a small dataset to use for testing purposes in monai-kidney training notebook
       - name: Download CT files
         run: |
+          ls -la /mount/caches
+          ls -laR ${{ env.MOUNT_CACHE }}
           if [[ ! -f ${{ env.MOUNT_CACHE }}/case_00030.zip ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/case_00030.zip https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
           fi
@@ -232,14 +211,7 @@ jobs:
 
       - name: Install python dependencies
         run: |
-          python${{ inputs.python }} -m pip cache dir
-          python${{ inputs.python }} -m pip cache info
-          python${{ inputs.python }} -m pip cache list
           python${{ inputs.python }} -m pip install --upgrade setuptools wheel
-          python${{ inputs.python }} -m pip cache dir
-          python${{ inputs.python }} -m pip cache info
-          python${{ inputs.python }} -m pip cache list
-          ls -laR ${{ env.MOUNT_CACHE }}
           python${{ inputs.python }} -m pip install -r .ci/dev-requirements.txt
           python${{ inputs.python }} -m ipykernel install --user
 
