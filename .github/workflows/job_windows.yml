@@ -87,12 +87,6 @@ jobs:
             echo "No notebook files changed, using precommit list"
             cp .ci/precommit_list.txt test_notebooks.txt
           fi
-
-      - name: Dotenv Action
-        id: dotenv
-        uses: xom9ikk/dotenv@ac290ca23a42155a0cba1031d23afa46240116a9 # v2.3.0
-        with:
-          path: ./.github/workflows
       
       # Packages that notebooks need to run in plain os
       - name: Install required packages
@@ -105,11 +99,6 @@ jobs:
           .\7zr.exe x ffmpeg.7z -y
           Move-Item -Path ffmpeg-7.1.1-full_build -Destination ffmpeg
           "$PWD\ffmpeg\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-      - name: Install Visual C++ Redistributable 2015
-        run: |
-          Invoke-WebRequest -Uri 'https://download.microsoft.com/download/6/A/A/6AA4EDFF-645B-48C5-81CC-ED5963AEAD48/vc_redist.x64.exe' -OutFile 'vc_redist.x64.exe' -UseBasicParsing
-          Start-Process -FilePath '.\vc_redist.x64.exe' -ArgumentList '/install', '/quiet', '/norestart' -Wait
 
       - name: Setup Python ${{ inputs.python }}
         uses: openvinotoolkit/openvino/.github/actions/setup_python@e4b65a0ab6c946c72d56240223620837e6d34bf8
@@ -204,8 +193,8 @@ jobs:
 
       - name: Install python dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
+          python3 -m pip install --upgrade setuptools wheel
+          python3 -m pip install -r .ci/dev-requirements.txt
           python3 -m ipykernel install --user --name openvino_env
 
       # # Cache OpenVINO packages (`mv` works cross-platform)
@@ -244,8 +233,8 @@ jobs:
         shell: pwsh
         run: |
           python3 -m venv notebooks_source_venv
-          ./notebooks_source_venv/Scripts/python -m pip install --upgrade pip setuptools wheel
-          ./notebooks_source_venv/Scripts/python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
+          ./notebooks_source_venv/Scripts/python -m pip install --upgrade setuptools wheel
+          ./notebooks_source_venv/Scripts/python -m pip install -r .ci/dev-requirements.txt
           ./notebooks_source_venv/Scripts/python -m pip install opencv_wheels/*.whl
           ./notebooks_source_venv/Scripts/python -m ipykernel install --user --name openvino_env
           $cmdArgs = @(

@@ -151,8 +151,10 @@ jobs:
           should-setup-pip-paths: 'true'
           self-hosted-runner: 'true'
 
-      - name: Create cache directory
-        run: mkdir -m 777 -p ${{ env.MOUNT_CACHE }}
+      - name: Create and check cache directory
+        run: |
+          mkdir -m 777 -p ${{ env.MOUNT_CACHE }}
+          ls -la ${{ env.MOUNT_CACHE }}
 
       # PaddleGAN stores cache in ppgan directory in CACHE_DIR
       - name: Set CACHE_DIR
@@ -166,9 +168,6 @@ jobs:
       # Download a small dataset to use for testing purposes in monai-kidney training notebook
       - name: Download CT files
         run: |
-          ls -la /mount
-          ls -la /mount/caches
-          ls -laR ${{ env.MOUNT_CACHE }}
           if [[ ! -f ${{ env.MOUNT_CACHE }}/case_00030.zip ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/case_00030.zip https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
           fi
@@ -182,14 +181,11 @@ jobs:
           cp -r case_00030 case_00001
           mv case_00030 notebooks/ct-segmentation-quantize/kits19/kits19_frames
           mv case_00001 notebooks/ct-segmentation-quantize/kits19/kits19_frames
-          ls -laR ${{ env.MOUNT_CACHE }}
 
       # Prevent test aborting by timeout for 'meter-reader' and 'paddle-ocr-webcam' notebooks
       - name: Download long loading models for 'meter-reader' and 'paddle-ocr-webcam' notebooks
         run: |
-          ls -laR ${{ env.MOUNT_CACHE }}
           if [[ ! -f "${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz" ]]; then
-            echo "Downloading meter_det_model.tar.gz"
             curl -o ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_det_model.tar.gz'
           fi
           if [[ ! -f "${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz" ]]; then
@@ -210,7 +206,6 @@ jobs:
           mkdir notebooks/paddle-ocr-webcam/model
           cp ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar notebooks/paddle-ocr-webcam/model/
           cp ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar notebooks/paddle-ocr-webcam/model/
-          ls -laR ${{ env.MOUNT_CACHE }}
 
       - name: Install python dependencies
         run: |
@@ -288,15 +283,3 @@ jobs:
         with:
           name: test_report-${{ env.TEST_REPORT_DIR }}
           path: test_report/
-
-      - name: Show notebooks cache
-        if: always()
-        run: ls -laR ${{ env.MOUNT_CACHE }}
-          
-
-      # Show the cache after running the notebooks
-      - name: Show cache
-        if: 'false'
-        run: |
-          ls -laR ${{ env.CACHE_DIR }}
-          du -sh ${{ env.CACHE_DIR }}
