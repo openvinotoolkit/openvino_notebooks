@@ -152,7 +152,7 @@ jobs:
           self-hosted-runner: 'true'
 
       - name: Create cache directory
-        run: mkdir -p ${{ env.MOUNT_CACHE }}
+        run: mkdir -m 777 -p ${{ env.MOUNT_CACHE }}
 
       # PaddleGAN stores cache in ppgan directory in CACHE_DIR
       - name: Set CACHE_DIR
@@ -181,6 +181,7 @@ jobs:
           cp -r case_00030 case_00001
           mv case_00030 notebooks/ct-segmentation-quantize/kits19/kits19_frames
           mv case_00001 notebooks/ct-segmentation-quantize/kits19/kits19_frames
+          ls -laR ${{ env.MOUNT_CACHE }}
 
       # Prevent test aborting by timeout for 'meter-reader' and 'paddle-ocr-webcam' notebooks
       - name: Download long loading models for 'meter-reader' and 'paddle-ocr-webcam' notebooks
@@ -208,6 +209,7 @@ jobs:
           mkdir notebooks/paddle-ocr-webcam/model
           cp ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar notebooks/paddle-ocr-webcam/model/
           cp ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar notebooks/paddle-ocr-webcam/model/
+          ls -laR ${{ env.MOUNT_CACHE }}
 
       - name: Install python dependencies
         run: |
@@ -285,6 +287,11 @@ jobs:
         with:
           name: test_report-${{ env.TEST_REPORT_DIR }}
           path: test_report/
+
+      - name: Show notebooks cache
+        if: always()
+        run: ls -laR ${{ env.MOUNT_CACHE }}
+          
 
       # Show the cache after running the notebooks
       - name: Show cache
