@@ -172,6 +172,9 @@ jobs:
             notebooks/pytorch-quantization-aware-training/data/tiny-imagenet-200.zip
           key: ${{ env.FILES_CACHE_KEY }}
 
+      - name: Create cache directory
+        run: mkdir -p ${{ env.MOUNT_CACHE }}
+
       # PaddleGAN stores cache in ppgan directory in CACHE_DIR
       - name: Set CACHE_DIR
         run: python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("${{ env.MOUNT_CACHE }}", "PaddleGAN"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
