@@ -41,7 +41,6 @@ jobs:
             core.exportVariable('TEST_DEVICE', testDevice);
             core.exportVariable('TEST_REPORT_DIR', testReportDir);
             core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
-            core.exportVariable('PIP_CACHE_PATH', runsOn.includes('linux') ? "${{ env.PIP_CACHE_PATH_LINUX }}" : "${{ env.PIP_CACHE_PATH_WIN }}");
 
       #### Installation/preparation ####
       #
