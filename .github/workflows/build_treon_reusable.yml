@@ -233,6 +233,9 @@ jobs:
           python${{ inputs.python }} -m pip cache dir
           python${{ inputs.python }} -m pip cache info
           python${{ inputs.python }} -m pip cache list
+          python${{ inputs.python }} -m pip install setuptools wheel
+          ls -laR ${{ env.PIP_CACHE_PATH }}
+          ls -laR ${{ env.MOUNT_CACHE }}
           python${{ inputs.python }} -m pip install -r .ci/dev-requirements.txt
           python${{ inputs.python }} -m ipykernel install --user
 
