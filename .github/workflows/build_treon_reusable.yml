@@ -31,7 +31,7 @@ permissions:
 
 env:
   PIP_CACHE_PATH: /mount/caches/pip
-  MOUNT_CACHE: /mount/caches/ov_notebooks
+  MOUNT_CACHE: /mount/testdata0/ov_notebooks
 
 
 jobs:
@@ -166,6 +166,7 @@ jobs:
       # Download a small dataset to use for testing purposes in monai-kidney training notebook
       - name: Download CT files
         run: |
+          ls -la /mount
           ls -la /mount/caches
           ls -laR ${{ env.MOUNT_CACHE }}
           if [[ ! -f ${{ env.MOUNT_CACHE }}/case_00030.zip ]]; then
