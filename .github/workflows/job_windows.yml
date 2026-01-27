@@ -22,7 +22,7 @@ permissions:
   contents: read
 
 env:
-  PIP_CACHE_PATH: "C:/mount/caches/pip/win"
+  PIP_CACHE_PATH: "C:\\mount\\caches\\pip\\win"
 
 jobs:
   build_treon:
