@@ -30,8 +30,9 @@ permissions:
   contents: read
 
 env:
-  PIP_CACHE_PATH_LINUX: /mount/caches/pip
-  PIP_CACHE_PATH_WIN: "C:/mount/caches/pip/win"
+  PIP_CACHE_PATH: /mount/caches/pip
+  MOUNT_CACHE: /mount/caches/ov_notebooks
+
 
 jobs:
   build_treon:
@@ -55,7 +56,6 @@ jobs:
             core.exportVariable('TEST_DEVICE', testDevice);
             core.exportVariable('TEST_REPORT_DIR', testReportDir);
             core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
-            core.exportVariable('PIP_CACHE_PATH', runsOn.includes('linux') ? "${{ env.PIP_CACHE_PATH_LINUX }}" : "${{ env.PIP_CACHE_PATH_WIN }}");
 
       #### Installation/preparation ####
       #
@@ -171,42 +171,25 @@ jobs:
 
       # PaddleGAN stores cache in ppgan directory in CACHE_DIR
       - name: Set CACHE_DIR
-        run: python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("~", ".cache"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+        run: python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("${{ env.MOUNT_CACHE }}", "PaddleGAN"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
 
       # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
       - name: Set HUB_HOME
         shell: bash
-        run: echo HUB_HOME=${{ env.CACHE_DIR }}/.paddlehub >> $GITHUB_ENV
-
-      # Cache PaddlePaddle cache directories to prevent CI failing due to network/download issues
-      - name: Cache PaddlePaddle cache directories
-        id: cacheusercache
-        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
-        with:
-          path: |
-            ${{ env.HUB_HOME }}
-            ${{ env.CACHE_DIR }}/paddle
-            ${{ env.CACHE_DIR }}/ppgan
-          key: ${{ env.USER_CACHE_KEY }}-${{ env.OS_NAME }}
-
-      - name: Cache openvino packages
-        if: steps.cachepip.outputs.cache-hit != 'true'
-        run: |
-          python${{ inputs.python }} -m pip install --upgrade pip
-          mkdir pipcache
-          python${{ inputs.python }} -m pip install --cache-dir pipcache --no-deps openvino nncf
-          cp -r pipcache pipcache_openvino
-          # python${{ inputs.python }} -m pip uninstall -y openvino nncf
+        run: echo HUB_HOME=${{ env.MOUNT_CACHE }}/.paddlehub >> $GITHUB_ENV
 
       # Download a small dataset to use for testing purposes in monai-kidney training notebook
       - name: Download CT files
-        if: steps.cachefiles.outputs.cache-hit != 'true'
-        run: curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
-      
+        run: |
+          if [[ ! -f ${{ env.MOUNT_CACHE }}/case_00030.zip ]]; then
+            curl -o ${{ env.MOUNT_CACHE }}/case_00030.zip https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
+          fi
+
       - name: Copy CT files
         run: |
           mkdir notebooks/ct-segmentation-quantize/kits19
           mkdir notebooks/ct-segmentation-quantize/kits19/kits19_frames
+          cp ${{ env.MOUNT_CACHE }}/case_00030.zip .
           unzip case_00030.zip
           cp -r case_00030 case_00001
           mv case_00030 notebooks/ct-segmentation-quantize/kits19/kits19_frames
@@ -215,12 +198,27 @@ jobs:
       # Prevent test aborting by timeout for 'meter-reader' and 'paddle-ocr-webcam' notebooks
       - name: Download long loading models for 'meter-reader' and 'paddle-ocr-webcam' notebooks
         run: |
+          if [[ ! -f ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz ]]; then
+            curl -o ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_det_model.tar.gz'
+          fi
+          if [[ ! -f ${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz ]]; then
+            curl -o ${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_seg_model.tar.gz'
+          fi
+          if [[ ! -f ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar ]]; then
+            curl -o ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_det_infer.tar'
+          fi
+          if [[ ! -f ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar ]]; then
+            curl -o ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_rec_infer.tar'
+          fi
+
+      - name: Copy model files
+        run: |
           mkdir notebooks/meter-reader/model
-          curl -o notebooks/meter-reader/model/meter_det_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_det_model.tar.gz'
-          curl -o notebooks/meter-reader/model/meter_seg_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_seg_model.tar.gz'
+          cp ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz notebooks/meter-reader/model/
+          cp ${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz notebooks/meter-reader/model/
           mkdir notebooks/paddle-ocr-webcam/model
-          curl -o notebooks/paddle-ocr-webcam/model/ch_PP-OCRv3_det_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_det_infer.tar'
-          curl -o notebooks/paddle-ocr-webcam/model/ch_PP-OCRv3_rec_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_rec_infer.tar'
+          cp ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar notebooks/paddle-ocr-webcam/model/
+          cp ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar notebooks/paddle-ocr-webcam/model/
 
       - name: Install python dependencies
         run: |
