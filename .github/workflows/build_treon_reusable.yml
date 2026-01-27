@@ -206,16 +206,18 @@ jobs:
       # Prevent test aborting by timeout for 'meter-reader' and 'paddle-ocr-webcam' notebooks
       - name: Download long loading models for 'meter-reader' and 'paddle-ocr-webcam' notebooks
         run: |
-          if [[ ! -f ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz ]]; then
+          ls -laR ${{ env.MOUNT_CACHE }}
+          if [[ ! -f "${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz" ]]; then
+            echo "Downloading meter_det_model.tar.gz"
             curl -o ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_det_model.tar.gz'
           fi
-          if [[ ! -f ${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz ]]; then
+          if [[ ! -f "${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz" ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_seg_model.tar.gz'
           fi
-          if [[ ! -f ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar ]]; then
+          if [[ ! -f "${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar" ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_det_infer.tar'
           fi
-          if [[ ! -f ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar ]]; then
+          if [[ ! -f "${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar" ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_rec_infer.tar'
           fi
 
@@ -233,8 +235,10 @@ jobs:
           python${{ inputs.python }} -m pip cache dir
           python${{ inputs.python }} -m pip cache info
           python${{ inputs.python }} -m pip cache list
-          python${{ inputs.python }} -m pip install setuptools wheel
-          ls -laR ${{ env.PIP_CACHE_PATH }}
+          python${{ inputs.python }} -m pip install --upgrade setuptools wheel
+          python${{ inputs.python }} -m pip cache dir
+          python${{ inputs.python }} -m pip cache info
+          python${{ inputs.python }} -m pip cache list
           ls -laR ${{ env.MOUNT_CACHE }}
           python${{ inputs.python }} -m pip install -r .ci/dev-requirements.txt
           python${{ inputs.python }} -m ipykernel install --user
