@@ -42,6 +42,8 @@ jobs:
         shell: bash
     container:
       image: ${{ inputs.container }}
+      volumes:
+        - /mount:/mount
       # options: --device /dev/dri:/dev/dri --group-add 109 --group-add 44
       # volumes:
       #   - /dev/dri:/dev/dri
