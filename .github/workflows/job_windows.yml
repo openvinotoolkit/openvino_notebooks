@@ -250,7 +250,7 @@ jobs:
             "--device", "${{ env.TEST_DEVICE }}",
             "--report_dir", "test_report/${{ env.TEST_REPORT_DIR }}",
             "--timeout", "1200",
-            "----parallel", "4",
+            "--parallel", "4",
             "--separate_venv",
             "--collect_reports"
           )
