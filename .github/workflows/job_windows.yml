@@ -195,6 +195,14 @@ jobs:
           python3 -m pip install --upgrade setuptools wheel
           python3 -m pip install -r .ci/dev-requirements.txt
           python3 -m ipykernel install --user --name openvino_env
+      
+      - name: Check OpenCV
+        run: |
+          python3 -m pip install "openvino>=2023.1.0"
+          python3 -m pip install opencv-python tqdm "matplotlib>=3.4"
+          python3 -c "import urllib.request; urllib.request.urlretrieve('https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/video/CEO%20Pat%20Gelsinger%20on%20Leading%20Intel.mp4', 'test_video.mp4')"
+          python3 -c "import cv2; cap = cv2.VideoCapture('test_video.mp4'); print(f'Video opened successfully: {cap.isOpened()}'); print(f'Frame count: {int(cap.get(cv2.CAP_PROP_FRAME_COUNT))}'); cap.release()"
+          
 
       # # Cache OpenVINO packages (`mv` works cross-platform)
       # - name: Make pipcache directory with OpenVINO packages
