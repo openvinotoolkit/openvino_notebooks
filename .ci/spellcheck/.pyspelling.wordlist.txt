@@ -23,6 +23,7 @@ AISEClassification
 AISEDetection
 al
 Alibaba
+Alibaba's
 ALiBi
 AlpacaEval
 aMUSEd
@@ -242,6 +243,7 @@ DiT
 DiTs
 DiT’s
 DL
+DMDR
 DocLayNet
 docling
 Docling
@@ -299,6 +301,7 @@ fastcomposer
 FastComposer
 FastDraft
 FastSAM
+Fbank
 FC
 feedforward
 FeedForward
@@ -325,6 +328,7 @@ freevc
 frisbee
 Frontend
 frontend
+FunASR
 FX
 GAN
 Gante
@@ -358,6 +362,7 @@ gpt
 gpu
 GPU's
 GPUs
+GQA
 Gradio
 gradio
 graphemes
@@ -506,6 +511,8 @@ LDMs
 LDP
 learnable
 LeViT
+LFM
+lfm
 LibriSpeech
 librispeech
 LibriTTS
@@ -1168,6 +1175,7 @@ VQGAN
 VQVAE
 Wav
 wav
+WavFrontend
 waveform
 waveforms
 WavLM

@@ -83,6 +83,7 @@ For more details, please refer to [model_card](https://huggingface.co/Qwen/Qwen2
 >**Note**: gpt-oss-20b model is not supported with OpenVINO GPU plugin.
 * **bitnet-b1.58-2B-4T** - bitnet-b1.58-2B-4T is an open-source, native 1-bit Large Language Model (LLM) at the 2-billion parameter scale, developed by Microsoft Research. Trained on a corpus of 4 trillion tokens, this model demonstrates that native 1-bit LLMs can achieve performance comparable to leading open-weight, full-precision models of similar size, while offering substantial advantages in computational efficiency (memory, energy, latency). You can find more info in [model card](https://huggingface.co/microsoft/bitnet-b1.58-2B-4T).
 >**Note**: bitnet-b1.58-2B-4T model doesn't currently support compression.
+* **lfm2-350m/lfm2-700m/lfm2-1.2b/lfm2-2.6b** - LFM2 is a series of hybrid language models from [Liquid AI](https://www.liquid.ai/), designed for edge and on-device deployment. The architecture combines convolutional layers with grouped query attention (GQA). LFM2 supports 8 languages: English, Arabic, Chinese, French, German, Japanese, Korean, and Spanish. You can find more info in [model card](https://huggingface.co/LiquidAI/LFM2-1.2B) and [technical report](https://arxiv.org/abs/2511.23404).
 
 The image below illustrates the provided user instruction and model answer examples.
 
