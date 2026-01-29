@@ -33,7 +33,7 @@ tensorboard==2.14.0
 # tensorrt-cu12==10.13.3.9; sys_platform == 'linux'
 # tensorrt-cu12-bindings==10.13.3.9; sys_platform == 'linux'
 # tensorrt-cu12-libs==10.13.3.9; sys_platform == 'linux'
-torch==2.3.1
+torch==2.7.1+cpu
 torchaudio==2.3.1
 torchvision==0.18.1
 # torchao==0.4.0; python_version < "0"  # Disable torchao to avoid version conflict
