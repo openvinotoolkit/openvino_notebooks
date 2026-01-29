@@ -5,6 +5,7 @@
 ## AI Trends
 
 - [Video generation with ZeroScope and OpenVINO](./zeroscope-text2video/zeroscope-text2video.ipynb)
+- [Text-to-image generation with Z-Image-Turbo and OpenVINO](./z-image-turbo/z-image-turbo.ipynb)
 - [Convert and Optimize YOLOv9 with OpenVINO™](./yolov9-optimization/yolov9-optimization.ipynb)
 - [Convert and Optimize YOLOv8 real-time object detection with OpenVINO™](./yolov8-optimization/yolov8-object-detection.ipynb)
 - [YOLOv8 Oriented Bounding Boxes Object Detection with OpenVINO™](./yolov8-optimization/yolov8-obb.ipynb)
@@ -94,6 +95,7 @@
 - [Visual-language assistant with GLM4-V and OpenVINO](./glm4-v/glm4-v.ipynb)
 - [Visual-language assistant with GLM-Edge-V and OpenVINO](./glm-edge-v/glm-edge-v.ipynb)
 - [Visual-language assistant with Gemma3 and OpenVINO](./gemma3/gemma3.ipynb)
+- [End-to-End Speech Recognition with Fun-ASR-Nano and OpenVINO](./funasr-nano/funasr-nano.ipynb)
 - [Image-to-image generation with Flux.1 Kontext and OpenVINO](./flux.1-kontext/flux.1-kontext.ipynb)
 - [Image generation with Flux.1 and OpenVINO](./flux.1-image-generation/flux.1-image-generation.ipynb)
 - [Image inpainting and outpainting with FLUX.1 Fill](./flux-fill/flux-fill.ipynb)
@@ -108,6 +110,7 @@
 - [Visual-language assistant using DeepSeek-VL2 and OpenVINO](./deepseek-vl2/deepseek-vl2.ipynb)
 - [LLM reasoning with DeepSeek-R1 distilled models](./deepseek-r1/deepseek-r1.ipynb)
 - [Document Parsing using DeepSeek-OCR and OpenVINO](./deepseek-ocr/deepseek-ocr.ipynb)
+- [Text-to-Speech (TTS) system Fun-CosyVoice 3.0 and OpenVINO](./cosyvoice3-tts/cosyvoice3-tts.ipynb)
 - [Text-to-Image Generation with ControlNet Conditioning](./controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb)
 - [Zero-shot Image Classification with OpenAI CLIP and OpenVINO™](./clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb)
 - [Virtual Try-On with CatVTON and OpenVINO](./catvton/catvton.ipynb)
@@ -194,6 +197,7 @@
 ## Model Demos
 
 - [Video generation with ZeroScope and OpenVINO](./zeroscope-text2video/zeroscope-text2video.ipynb)
+- [Text-to-image generation with Z-Image-Turbo and OpenVINO](./z-image-turbo/z-image-turbo.ipynb)
 - [Convert and Optimize YOLOv9 with OpenVINO™](./yolov9-optimization/yolov9-optimization.ipynb)
 - [Convert and Optimize YOLOv8 real-time object detection with OpenVINO™](./yolov8-optimization/yolov8-object-detection.ipynb)
 - [YOLOv8 Oriented Bounding Boxes Object Detection with OpenVINO™](./yolov8-optimization/yolov8-obb.ipynb)
@@ -306,6 +310,7 @@
 - [Visual-language assistant with GLM4-V and OpenVINO](./glm4-v/glm4-v.ipynb)
 - [Visual-language assistant with GLM-Edge-V and OpenVINO](./glm-edge-v/glm-edge-v.ipynb)
 - [Visual-language assistant with Gemma3 and OpenVINO](./gemma3/gemma3.ipynb)
+- [End-to-End Speech Recognition with Fun-ASR-Nano and OpenVINO](./funasr-nano/funasr-nano.ipynb)
 - [High-Quality Text-Free One-Shot Voice Conversion with FreeVC and OpenVINO™](./freevc-voice-conversion/freevc-voice-conversion.ipynb)
 - [Image-to-image generation with Flux.1 Kontext and OpenVINO](./flux.1-kontext/flux.1-kontext.ipynb)
 - [Image generation with Flux.1 and OpenVINO](./flux.1-image-generation/flux.1-image-generation.ipynb)
@@ -323,6 +328,7 @@
 - [Document Parsing using DeepSeek-OCR and OpenVINO](./deepseek-ocr/deepseek-ocr.ipynb)
 - [Colorize grayscale images using 🎨 DDColor and OpenVINO](./ddcolor-image-colorization/ddcolor-image-colorization.ipynb)
 - [Low-Light Image Restoration with DarkIR model using OpenVINO™](./darkir-image-restoration/darkir-image-restoration.ipynb)
+- [Text-to-Speech (TTS) system Fun-CosyVoice 3.0 and OpenVINO](./cosyvoice3-tts/cosyvoice3-tts.ipynb)
 - [Text-to-Image Generation with ControlNet Conditioning](./controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb)
 - [Zero-shot Image Classification with OpenAI CLIP and OpenVINO™](./clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb)
 - [Language-Visual Saliency with CLIP and OpenVINO™](./clip-language-saliency-map/clip-language-saliency-map.ipynb)

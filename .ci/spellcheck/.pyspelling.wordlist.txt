@@ -23,6 +23,7 @@ AISEClassification
 AISEDetection
 al
 Alibaba
+Alibaba's
 ALiBi
 AlpacaEval
 aMUSEd
@@ -96,6 +97,7 @@ CentOS
 centric
 CER
 CFG
+CFM
 charlist
 charlists
 chatbot
@@ -155,6 +157,7 @@ convolutional
 coors
 coreference
 CoSENT
+CosyVoice
 cpm
 cpp
 cpu
@@ -243,6 +246,7 @@ DiT
 DiTs
 DiT’s
 DL
+DMDR
 DocLayNet
 docling
 Docling
@@ -300,6 +304,7 @@ fastcomposer
 FastComposer
 FastDraft
 FastSAM
+Fbank
 FC
 feedforward
 FeedForward
@@ -326,6 +331,7 @@ freevc
 frisbee
 Frontend
 frontend
+FunASR
 FX
 GAN
 Gante
@@ -359,6 +365,7 @@ gpt
 gpu
 GPU's
 GPUs
+GQA
 Gradio
 gradio
 graphemes
@@ -376,8 +383,11 @@ HandBrake
 HC
 heatmap
 HED
+HiFT
+HiFi
 HH
 hoc
+hotfix
 HugginFaceH
 HuggingFace
 huggingfacehub
@@ -507,6 +517,8 @@ LDMs
 LDP
 learnable
 LeViT
+LFM
+lfm
 LibriSpeech
 librispeech
 LibriTTS
@@ -1169,6 +1181,7 @@ VQGAN
 VQVAE
 Wav
 wav
+WavFrontend
 waveform
 waveforms
 WavLM
