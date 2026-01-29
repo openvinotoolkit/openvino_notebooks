@@ -23,6 +23,7 @@ AISEClassification
 AISEDetection
 al
 Alibaba
+Alibaba's
 ALiBi
 AlpacaEval
 aMUSEd
@@ -96,6 +97,7 @@ CentOS
 centric
 CER
 CFG
+CFM
 charlist
 charlists
 chatbot
@@ -155,6 +157,7 @@ convolutional
 coors
 coreference
 CoSENT
+CosyVoice
 cpm
 cpp
 cpu
@@ -242,6 +245,7 @@ DiT
 DiTs
 DiT’s
 DL
+DMDR
 DocLayNet
 docling
 Docling
@@ -378,8 +382,11 @@ HandBrake
 HC
 heatmap
 HED
+HiFT
+HiFi
 HH
 hoc
+hotfix
 HugginFaceH
 HuggingFace
 huggingfacehub

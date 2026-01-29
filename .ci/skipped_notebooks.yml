@@ -578,6 +578,12 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
+- notebook: notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
 - notebook: notebooks/3D-point-pillars/pointpillars.ipynb
   skips:
     - os:
