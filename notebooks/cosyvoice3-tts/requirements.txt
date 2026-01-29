@@ -37,7 +37,7 @@ torch==2.3.1
 torchaudio==2.3.1
 torchvision==0.18.1
 # torchao==0.4.0; python_version < "0"  # Disable torchao to avoid version conflict
-transformers==4.51.3
+transformers==4.53.0
 x-transformers==2.11.24
 uvicorn==0.30.0
 wetext==0.0.4
