@@ -16,17 +16,17 @@ img.save("i2v_input.jpg")
 
 
 def make_demo(pipeline):
-    def generate_video(prompt, negative_prompt, image, guidance_scale=1.0, seed=42, progress=gr.Progress(track_tqdm=True)):
+    def generate_video(prompt, negative_prompt, image, guidance_scale=1.0, seed=42, height=832, width=480, num_inference_steps=4, progress=gr.Progress(track_tqdm=True)):
         image = load_image(image)
         output = pipeline(
             image=image,
             prompt=prompt,
             negative_prompt=negative_prompt,
-            height=832,
-            width=480,
+            height=height,
+            width=width,
             num_frames=20,
             guidance_scale=guidance_scale,
-            num_inference_steps=4,
+            num_inference_steps=num_inference_steps,
             generator=torch.Generator().manual_seed(seed),
         ).frames[0]
 
@@ -54,6 +54,27 @@ def make_demo(pipeline):
                 step=1,
                 value=42,
             ),
+            gr.Slider(
+                label="Height",
+                minimum=320,
+                maximum=1024,
+                step=32,
+                value=832,
+            ),
+            gr.Slider(
+                label="Width",
+                minimum=320,
+                maximum=1024,
+                step=32,
+                value=480,
+            ),
+            gr.Slider(
+                label="Inference Steps",
+                minimum=1,
+                maximum=50,
+                step=1,
+                value=4,
+            ),
         ],
         outputs=gr.Video(label="Generated Video"),
         title="Wan2.2-TI2V-5B OpenVINO Video Generator",
@@ -65,6 +86,9 @@ def make_demo(pipeline):
                 "i2v_input.jpg",
                 5.0,
                 42,
+                832,
+                480,
+                4,
             ],
         ],
     )
