@@ -16,7 +16,9 @@ img.save("i2v_input.jpg")
 
 
 def make_demo(pipeline):
-    def generate_video(prompt, negative_prompt, image, guidance_scale=1.0, seed=42, height=832, width=480, num_inference_steps=4, progress=gr.Progress(track_tqdm=True)):
+    def generate_video(
+        prompt, negative_prompt, image, guidance_scale=1.0, seed=42, height=832, width=480, num_inference_steps=4, progress=gr.Progress(track_tqdm=True)
+    ):
         image = load_image(image)
         output = pipeline(
             image=image,
