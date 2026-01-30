@@ -169,6 +169,7 @@ CTM
 CUDA
 CustomEncoderWav
 CVF
+CVAE
 CVPR
 DarkIR
 Databricks
@@ -188,6 +189,7 @@ DDColor's
 DDIM
 DDPMs
 dDPO
+DETR
 de
 Deblur
 deblur
@@ -650,6 +652,7 @@ Multilinguality
 multimodal
 Multimodality
 multinomial
+MuJoCo
 MuRAG
 MusicGen
 Müller
@@ -928,6 +931,7 @@ RoBERTa
 roberta
 ROI
 RoPE
+rollout
 Ruizhongtai
 Runtime
 runtime
