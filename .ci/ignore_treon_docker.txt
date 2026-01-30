@@ -83,4 +83,5 @@ notebooks/z-image-turbo/z-image-turbo.ipynb
 notebooks/deepseek-ocr/deepseek-ocr.ipynb
 notebooks/fireredtts2/fireredtts2.ipynb
 notebooks/qwen-image/qwen-image.ipynb
+notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb
 notebooks/funasr-nano/funasr-nano.ipynb
