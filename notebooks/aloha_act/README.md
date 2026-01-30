@@ -100,3 +100,5 @@ aloha_act/
 - [OpenVINO Toolkit](https://docs.openvino.ai/)
 - [Edge AI Suites](https://github.com/open-edge-platform/edge-ai-suites)
 - [Original ACT Implementation](https://github.com/tonyzhaozh/act)
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/aloha_act/README.md" />
