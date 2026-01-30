@@ -17,6 +17,10 @@ on:
         required: false
         type: string
         default: ''
+      separate_venv:
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -239,19 +243,12 @@ jobs:
       - name: Analysing with treon
         shell: pwsh
         run: |
-          python3 -m venv notebooks_source_venv
-          ./notebooks_source_venv/Scripts/python -m pip install --upgrade setuptools wheel
-          ./notebooks_source_venv/Scripts/python -m pip install -r .ci/dev-requirements.txt
-          ./notebooks_source_venv/Scripts/python -m pip install opencv_wheels/*.whl
-          ./notebooks_source_venv/Scripts/python -m ipykernel install --user --name openvino_env
           $cmdArgs = @(
             "--os", "${{ env.OS_NAME }}",
             "--python", "${{ inputs.python }}",
             "--device", "${{ env.TEST_DEVICE }}",
             "--report_dir", "test_report/${{ env.TEST_REPORT_DIR }}",
             "--timeout", "1200",
-            "--parallel", "1",
-            "--separate_venv",
             "--collect_reports"
           )
           
@@ -264,8 +261,13 @@ jobs:
             $cmdArgs += "--ignore_list"
             $cmdArgs += "${{ inputs.ignore_list }}"
           }
+
+          if ( "${{ inputs.separate_venv }}" -eq "true" )
+          {
+            $cmdArgs += "--separate_venv"
+          }
           
-          & ./notebooks_source_venv/Scripts/python .ci/validate_notebooks.py @cmdArgs
+          & python3 .ci/validate_notebooks.py @cmdArgs
 
       - name: Archive notebook test report
         if: always()

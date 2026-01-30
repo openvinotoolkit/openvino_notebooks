@@ -16,7 +16,6 @@ import traceback
 import tempfile
 import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor, CellExecutionError
-from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from argparse import ArgumentParser
 from pathlib import Path
@@ -101,12 +100,6 @@ def parse_arguments():
         action="store_true",
         help="Cleanup temporary venv directories created during testing before test run is started."
         "Useful when previous test run was interrupted and temporary directories were not removed.",
-    )
-    parser.add_argument(
-        "--parallel",
-        type=int,
-        default=1,
-        help="Number of notebooks to run in parallel. Default is 1 (sequential execution).",
     )
 
     return parser.parse_args()
@@ -693,30 +686,6 @@ def write_csv_report(csv_path, test_report, result_queue):
         result_queue.put(("error", str(e)))
 
 
-def run_test_worker(notebook_path: Path, root: Path, timeout: int, keep_artifacts: bool, 
-                    reports_dir: Path, source_venv_path: Optional[Path]) -> dict:
-    """
-    Worker function for parallel notebook execution.
-    Returns a dictionary with test results that can be safely passed between processes.
-    """
-    try:
-        print(f"[PARALLEL] Starting test for: {notebook_path.name}", flush=True)
-        test_result = run_test(notebook_path, root, timeout, keep_artifacts, reports_dir, source_venv_path)
-        return {
-            "notebook_path": str(notebook_path),
-            "test_result": test_result,
-            "error": None
-        }
-    except Exception as e:
-        print(f"[PARALLEL] Error during testing notebook {notebook_path}: {e}", flush=True)
-        print(traceback.format_exc(), flush=True)
-        return {
-            "notebook_path": str(notebook_path),
-            "test_result": [f"test_{notebook_path.name}", -1, 0.0, "N/A", "N/A"],
-            "error": str(e)
-        }
-
-
 def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], test_plan: TestPlan, report_dir: Path, root: Path) -> int:
     return_status = 0
 
@@ -843,9 +812,16 @@ def main():
 
     test_plan = prepare_test_plan(validation_config, args.test_list, args.ignore_config, args.ignore_list, notebooks_moving_dir)
 
-    def process_test_result(notebook: Path, report: NotebookReport, test_result):
-        """Process a single test result and update report status."""
-        nonlocal failed_notebooks, timeout_notebooks
+    for notebook, report in test_plan.items():
+        if report["status"] == NotebookStatus.SKIPPED:
+            continue
+        try:
+            print("Testing notebook:", str(report["path"]), flush=True)
+            test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute(), source_venv_path)
+        except Exception as e:
+            print(f"Error during testing notebook {str(notebook)}: {e}")
+            print(traceback.format_exc(), flush=True)
+            test_result = [f"test_{report['path'].name}", -1, 0.0, "N/A", "N/A"]
         timing = 0
         if not test_result:
             print(f'Testing notebooks "{str(notebook)}" is not found.')
@@ -887,66 +863,7 @@ def main():
                     else:
                         print(f"Database upload succeeded, duration: {duration:.2f} seconds", flush=True)
 
-    # Filter notebooks that need to be tested
-    notebooks_to_test = [(notebook, report) for notebook, report in test_plan.items() 
-                         if report["status"] != NotebookStatus.SKIPPED]
-
-    if args.parallel > 1 and len(notebooks_to_test) > 1:
-        # Parallel execution mode
-        print(f"\n{'='*60}", flush=True)
-        print(f"PARALLEL EXECUTION MODE: Running {len(notebooks_to_test)} notebooks with {args.parallel} workers", flush=True)
-        print(f"{'='*60}\n", flush=True)
-        
-        with ProcessPoolExecutor(max_workers=args.parallel) as executor:
-            # Submit all notebook tests
-            future_to_notebook = {}
-            for notebook, report in notebooks_to_test:
-                print(f"[PARALLEL] Submitting: {notebook}", flush=True)
-                future = executor.submit(
-                    run_test_worker,
-                    report["path"],
-                    root,
-                    args.timeout,
-                    keep_artifacts,
-                    reports_dir.absolute(),
-                    source_venv_path
-                )
-                future_to_notebook[future] = (notebook, report)
-            
-            # Collect results as they complete
-            for future in as_completed(future_to_notebook):
-                notebook, report = future_to_notebook[future]
-                try:
-                    result = future.result()
-                    test_result = result["test_result"]
-                    if result["error"]:
-                        print(f"[PARALLEL] Notebook {notebook} had error: {result['error']}", flush=True)
-                    process_test_result(notebook, report, test_result)
-                    print(f"[PARALLEL] Completed: {notebook} - Status: {report['status']}", flush=True)
-                except Exception as e:
-                    print(f"[PARALLEL] Exception for {notebook}: {e}", flush=True)
-                    print(traceback.format_exc(), flush=True)
-                    test_result = [f"test_{report['path'].name}", -1, 0.0, "N/A", "N/A"]
-                    process_test_result(notebook, report, test_result)
-                
-                if args.early_stop and (failed_notebooks or timeout_notebooks):
-                    print("[PARALLEL] Early stop triggered, cancelling remaining tasks...", flush=True)
-                    executor.shutdown(wait=False, cancel_futures=True)
-                    break
-    else:
-        # Sequential execution mode
-        for notebook, report in notebooks_to_test:
-            try:
-                print("Testing notebook:", str(report["path"]), flush=True)
-                test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute(), source_venv_path)
-            except Exception as e:
-                print(f"Error during testing notebook {str(notebook)}: {e}")
-                print(traceback.format_exc(), flush=True)
-                test_result = [f"test_{report['path'].name}", -1, 0.0, "N/A", "N/A"]
-            
-            process_test_result(notebook, report, test_result)
-
-            if args.early_stop and (failed_notebooks or timeout_notebooks):
+            if args.early_stop:
                 break
 
     exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)

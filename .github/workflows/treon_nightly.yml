@@ -20,18 +20,32 @@ permissions:
   contents: read
 
 jobs:
-  build_treon_cpu:
+  build_treon_linux:
     strategy:
       fail-fast: false
       matrix:
-        runs_on: [ubuntu-22.04, windows-2022]
+        runs_on: [aks-linux-8-cores-32gb]
         python: ['3.10', '3.11', '3.12', '3.13']
-    uses: ./.github/workflows/build_treon_reusable.yml
+    uses: ./.github/workflows/job_unix.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      ignore_list: .ci/tensorflow.txt
       separate_venv: true
+      ignore_list: .ci/tensorflow.txt
+      container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:pr-33079'
+  
+  build_treon_windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        runs_on: [aks-win-8-cores-16gb-test]
+        python: ['3.10', '3.11', '3.12', '3.13']
+    uses: ./.github/workflows/job_windows.yml
+    with:
+      runs_on: ${{ matrix.runs_on }}
+      python: ${{ matrix.python }}
+      separate_venv: true
+      ignore_list: .ci/tensorflow.txt
 
   build_treon_gpu:
     if: ${{ false }} # TODO Enable when GPU runners will be available in GitHub Actions
@@ -41,7 +55,7 @@ jobs:
         runs_on: ['gpu']
         python: ['3.10', '3.11', '3.12', '3.13']
         container: ['ubuntu:20.04', 'ubuntu:22.04'] # Windows and macOS are not available in machine pool with GPU
-    uses: ./.github/workflows/build_treon_reusable.yml
+    uses: ./.github/workflows/job_unix.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
@@ -52,7 +66,7 @@ jobs:
   aggregate_notebooks_reports:
     if: always()
     runs-on: ubuntu-22.04
-    needs: [build_treon_cpu, build_treon_gpu]
+    needs: [build_treon_linux, build_treon_windows, build_treon_gpu]
     steps:
       - name: Checkout repository
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
@@ -66,7 +80,7 @@ jobs:
           pattern: test_report-*
           merge-multiple: true
           path: './test_reports'
-      - name: Create agregated report
+      - name: Create aggregated report
         run: |
           python .ci/aggregate_notebooks_reports.py
       - name: Upload aggregated report
