@@ -1030,6 +1030,7 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
     from IPython.display import Markdown, display
     import subprocess  # nosec - disable B404:import-subprocess check
     import platform
+    import re
 
     pt_model_id = model_config["model_id"]
     pt_model_name = model_id.split("/")[-1]
