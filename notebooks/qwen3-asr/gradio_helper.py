@@ -319,13 +319,21 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                 )
 
                 # Add example audio selector
-                sample_path = Path(__file__).parent / "sample_en.wav"
-                if sample_path.exists():
-                    gr.Examples(
-                        examples=[[str(sample_path)]],
-                        inputs=[audio_in],
-                        label="Try Example Audio",
-                    )
+                if example_dir is not None:
+                    example_path = Path(example_dir)
+                    if example_path.exists() and example_path.is_dir():
+                        # Get all audio files from example_dir
+                        audio_files = sorted(
+                            [str(f) for f in example_path.glob("*.wav")]
+                            + [str(f) for f in example_path.glob("*.mp3")]
+                            + [str(f) for f in example_path.glob("*.flac")]
+                        )
+                        if audio_files:
+                            gr.Examples(
+                                examples=[[f] for f in audio_files],
+                                inputs=[audio_in],
+                                label="Try Example Audio",
+                            )
 
                 lang_in = gr.Dropdown(
                     label="Language (leave 'Auto' for automatic detection)",
