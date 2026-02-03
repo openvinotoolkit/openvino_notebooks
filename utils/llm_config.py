@@ -1033,6 +1033,7 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
 
     pt_model_id = model_config["model_id"]
     pt_model_name = model_id.split("/")[-1]
+    pt_model_name = re.sub(r'[<>:"/\\|?*]', '_', pt_model_name)
     model_subdir = precision if precision == "FP16" else precision + "_compressed_weights"
     model_dir = Path(pt_model_name) / model_subdir
     remote_code = model_config.get("remote_code", False)
