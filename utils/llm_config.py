@@ -844,34 +844,46 @@ compression_configs = {
     },
 }
 
-def get_optimum_cli_command_vlm(model_id, weight_format, output_dir, compression_options=None, enable_awq=False, trust_remote_code=False):
-    base_command = "optimum-cli export openvino --model {} --task image-text-to-text --weight-format {}"
-    command = base_command.format(model_id, weight_format)
+def get_optimum_cli_command_vlm(
+    model_id,
+    weight_format,
+    output_dir,
+    compression_options=None,
+    enable_awq=False,
+    trust_remote_code=False,
+):
+    command = [
+        "optimum-cli", "export", "openvino",
+        "--model", model_id,
+        "--task", "image-text-to-text",
+        "--weight-format", weight_format,
+    ]
+
     if compression_options:
-        compression_args = ""
         if "group_size" in compression_options:
-            compression_args += " --group-size {}".format(compression_options["group_size"])
+            command += ["--group-size", str(compression_options["group_size"])]
         if "ratio" in compression_options:
-            compression_args += " --ratio {}".format(compression_options["ratio"])
-        if compression_options["sym"]:
-            compression_args += " --sym"
+            command += ["--ratio", str(compression_options["ratio"])]
+        if compression_options.get("sym", False):
+            command.append("--sym")
+
         if enable_awq or compression_options.get("awq", False):
-            compression_args += " --awq --dataset wikitext2 --num-samples 128"
+            command += ["--awq", "--dataset", "wikitext2", "--num-samples", "128"]
             if compression_options.get("scale_estimation", False):
-                compression_args += " --scale-estimation"
+                command.append("--scale-estimation")
         else:
             if compression_options.get("scale_estimation", False):
-                compression_args += " --scale-estimation"
+                command.append("--scale-estimation")
             if "dataset" in compression_options:
-                compression_args += f" --dataset {compression_options['dataset']}"
+                command += ["--dataset", compression_options["dataset"]]
+
         if compression_options.get("all_layers", False):
-            compression_args += " --all-layers"
+            command.append("--all-layers")
 
-        command = command + compression_args
     if trust_remote_code:
-        command += " --trust-remote-code"
+        command.append("--trust-remote-code")
 
-    command += " {}".format(output_dir)
+    command.append(output_dir)
     return command
 
 def get_optimum_cli_command(model_id, weight_format, output_dir, compression_options=None, enable_awq=False, trust_remote_code=False):
@@ -916,91 +928,91 @@ int4_npu_config = {
 }
 
 
-def get_vlm_selection_widget(models=None, device=None):
+def get_vlm_llm_selection_widget(device=None):
     import ipywidgets as widgets
 
-    if models is None:
-        models = SUPPORTED_VLM_MODELS
+    # ----------------------------
+    # Build unified model registry
+    # ----------------------------
+    unified_models = {}
 
+    # LLMs
+    for lang, models in SUPPORTED_LLM_MODELS.items():
+        for name, cfg in models.items():
+            unified_models[f"LLM | {name}"] = {
+                **cfg,
+                "model_type": "LLM",
+                "language": lang,
+            }
+
+    # VLMs
+    for name, cfg in SUPPORTED_VLM_MODELS.items():
+        unified_models[f"VLM | {name}"] = {
+            **cfg,
+            "model_type": "VLM",
+        }
+
+    # ----------------------------
+    # Device filtering
+    # ----------------------------
+    def filter_by_device(item):
+        _, cfg = item
+        return device not in cfg.get("exclude_on_devices", [])
+
+    unified_models = dict(filter(filter_by_device, unified_models.items()))
+
+    # ----------------------------
+    # Widgets
+    # ----------------------------
     model_dropdown = widgets.Dropdown(
-        options=[(name, cfg) for name, cfg in SUPPORTED_VLM_MODELS.items()],
-        description="Model:"
+        options=unified_models,
+        description="Model:",
+        layout=widgets.Layout(width="100%"),
+    )
+
+    available_optimizations = (
+        ["INT4-NPU", "FP16"] if device == "NPU" else SUPPORTED_OPTIMIZATIONS
     )
 
     compression_dropdown = widgets.Dropdown(
-        options=SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"],
-        description="Compression:"
+        options=available_optimizations,
+        description="Compression:",
+        layout=widgets.Layout(width="100%"),
     )
 
+    # ----------------------------
+    # Reactive compression filtering
+    # ----------------------------
+    def on_model_change(change):
+        excluded = change.new.get("exclude_compression", [])
+        compression_dropdown.options = [
+            opt for opt in available_optimizations if opt not in excluded
+        ]
+
+    model_dropdown.observe(on_model_change, names="value")
+
+    # Trigger once for default selection
+    on_model_change(type("evt", (), {"new": model_dropdown.value}))
+
+    # ----------------------------
+    # Layout
+    # ----------------------------
     form = widgets.Box(
-        [model_dropdown, compression_dropdown],
+        [
+            widgets.Box([widgets.Label("Model"), model_dropdown]),
+            widgets.Box([widgets.Label("Compression"), compression_dropdown]),
+        ],
         layout=widgets.Layout(
             display="flex",
             flex_flow="column",
             border="solid 1px",
-            width="30%",
+            width="35%",
             padding="1%",
+            gap="6px",
         ),
     )
 
     return form, model_dropdown, compression_dropdown
-
-def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True, device=None):
-    import ipywidgets as widgets
-
-    filter_models_by_device = lambda model_info: device not in model_info[1].get("exclude_on_devices", [])
-    available_optimumzations = SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"]
-
-    lang_dropdown = widgets.Dropdown(options=languages or [])
-
-    # Define dependent drop down
-    supported_models = dict(filter(filter_models_by_device, models.items()))
-    model_dropdown = widgets.Dropdown(options=supported_models)
-
-    def dropdown_handler(change):
-        global default_language
-        default_language = change.new
-        # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
-        supported_models = SUPPORTED_LLM_MODELS[change.new]
-        model_dropdown.options = dict(filter(filter_models_by_device, supported_models.items()))
-
-    lang_dropdown.observe(dropdown_handler, names="value")
-
-    def dropdown_model_handler(change):
-        global model_dropdown
-        model_dropdown = change.new
-        compression_dropdown.options = filter(lambda opt_type: opt_type not in change.new.get("exclude_compression", []), available_optimumzations)
-
-    model_dropdown.observe(dropdown_model_handler, names="value")
-
-    compression_dropdown = widgets.Dropdown(options=available_optimumzations)
-    preconverted_checkbox = widgets.Checkbox(value=True)
-
-    form_items = []
-
-    if languages:
-        form_items.append(widgets.Box([widgets.Label(value="Language:"), lang_dropdown]))
-    form_items.extend(
-        [
-            widgets.Box([widgets.Label(value="Model:"), model_dropdown]),
-            widgets.Box([widgets.Label(value="Compression:"), compression_dropdown]),
-        ]
-    )
-    if show_preconverted_checkbox:
-        form_items.append(widgets.Box([widgets.Label(value="Use preconverted models:"), preconverted_checkbox]))
-
-    form = widgets.Box(
-        form_items,
-        layout=widgets.Layout(
-            display="flex",
-            flex_flow="column",
-            border="solid 1px",
-            # align_items='stretch',
-            width="30%",
-            padding="1%",
-        ),
-    )
-    return form, lang_dropdown, model_dropdown, compression_dropdown, preconverted_checkbox
 
 
 def convert_tokenizer(model_id, remote_code, model_dir):
