@@ -16,14 +16,10 @@ from scipy.io.wavfile import write as wav_write
 
 
 # Supported speakers for CustomVoice model
-SPEAKERS = [
-    "Aiden", "Dylan", "Eric", "Ono_anna", "Ryan", "Serena", "Sohee",
-    "Uncle_fu", "Vivian"
-]
+SPEAKERS = ["Aiden", "Dylan", "Eric", "Ono_anna", "Ryan", "Serena", "Sohee", "Uncle_fu", "Vivian"]
 
 # Supported languages
-LANGUAGES = ["Auto", "Chinese", "English", "Japanese", "Korean", "French", 
-             "German", "Spanish", "Portuguese", "Russian"]
+LANGUAGES = ["Auto", "Chinese", "English", "Japanese", "Korean", "French", "German", "Spanish", "Portuguese", "Russian"]
 
 
 def _normalize_audio(wav, eps=1e-12, clip=True):
@@ -82,25 +78,25 @@ def save_audio(audio_data: np.ndarray, sample_rate: int) -> str:
 def make_demo(ov_model, model_type: str = "custom_voice"):
     """
     Create Gradio demo for Qwen3-TTS with OpenVINO.
-    
+
     Args:
         ov_model: OVQwen3TTSModel instance
         model_type: Model type - "custom_voice", "base", or "voice_design"
-        
+
     Returns:
         Gradio Blocks demo
     """
-    
+
     def generate_custom_voice(text, language, speaker, instruct, progress=gr.Progress(track_tqdm=True)):
         """Generate speech using CustomVoice model."""
         if not text or not text.strip():
             return None, "Error: Text is required."
         if not speaker:
             return None, "Error: Speaker is required."
-        
+
         try:
             start_time = time.time()
-            
+
             wavs, sr = ov_model.generate_custom_voice(
                 text=text.strip(),
                 language=language if language != "Auto" else None,
@@ -109,37 +105,36 @@ def make_demo(ov_model, model_type: str = "custom_voice"):
                 non_streaming_mode=True,
                 max_new_tokens=2048,
             )
-            
+
             inference_time = time.time() - start_time
             audio_duration = len(wavs[0]) / sr
-            
+
             status = (
                 f"✓ Generation completed!\n"
                 f"Inference time: {inference_time:.2f}s | "
                 f"Audio duration: {audio_duration:.2f}s | "
                 f"RTF: {inference_time/max(audio_duration, 0.1):.3f}"
             )
-            
+
             return (sr, wavs[0]), status
         except Exception as e:
             return None, f"Error: {type(e).__name__}: {e}"
-    
-    def generate_voice_clone(ref_audio, ref_text, target_text, language, use_xvector_only, 
-                             progress=gr.Progress(track_tqdm=True)):
+
+    def generate_voice_clone(ref_audio, ref_text, target_text, language, use_xvector_only, progress=gr.Progress(track_tqdm=True)):
         """Generate speech using Base (Voice Clone) model."""
         if not target_text or not target_text.strip():
             return None, "Error: Target text is required."
-        
+
         audio_tuple = _audio_to_tuple(ref_audio)
         if audio_tuple is None:
             return None, "Error: Reference audio is required."
-        
+
         if not use_xvector_only and (not ref_text or not ref_text.strip()):
             return None, "Error: Reference text is required when 'Use x-vector only' is not enabled."
-        
+
         try:
             start_time = time.time()
-            
+
             wavs, sr = ov_model.generate_voice_clone(
                 text=target_text.strip(),
                 language=language if language != "Auto" else None,
@@ -148,31 +143,31 @@ def make_demo(ov_model, model_type: str = "custom_voice"):
                 x_vector_only_mode=use_xvector_only,
                 max_new_tokens=2048,
             )
-            
+
             inference_time = time.time() - start_time
             audio_duration = len(wavs[0]) / sr
-            
+
             status = (
                 f"✓ Voice clone completed!\n"
                 f"Inference time: {inference_time:.2f}s | "
                 f"Audio duration: {audio_duration:.2f}s | "
                 f"RTF: {inference_time/max(audio_duration, 0.1):.3f}"
             )
-            
+
             return (sr, wavs[0]), status
         except Exception as e:
             return None, f"Error: {type(e).__name__}: {e}"
-    
+
     def generate_voice_design(text, language, voice_description, progress=gr.Progress(track_tqdm=True)):
         """Generate speech using Voice Design model."""
         if not text or not text.strip():
             return None, "Error: Text is required."
         if not voice_description or not voice_description.strip():
             return None, "Error: Voice description is required."
-        
+
         try:
             start_time = time.time()
-            
+
             wavs, sr = ov_model.generate_voice_design(
                 text=text.strip(),
                 language=language if language != "Auto" else None,
@@ -180,31 +175,31 @@ def make_demo(ov_model, model_type: str = "custom_voice"):
                 non_streaming_mode=True,
                 max_new_tokens=2048,
             )
-            
+
             inference_time = time.time() - start_time
             audio_duration = len(wavs[0]) / sr
-            
+
             status = (
                 f"✓ Voice design completed!\n"
                 f"Inference time: {inference_time:.2f}s | "
                 f"Audio duration: {audio_duration:.2f}s | "
                 f"RTF: {inference_time/max(audio_duration, 0.1):.3f}"
             )
-            
+
             return (sr, wavs[0]), status
         except Exception as e:
             return None, f"Error: {type(e).__name__}: {e}"
-    
+
     # Build Gradio interface
     theme = gr.themes.Soft(
         font=[gr.themes.GoogleFont("Source Sans Pro"), "Arial", "sans-serif"],
     )
-    
+
     css = """
     .gradio-container {max-width: none !important;}
     .tab-content {padding: 20px;}
     """
-    
+
     with gr.Blocks(theme=theme, css=css, title="Qwen3-TTS with OpenVINO") as demo:
         gr.Markdown(
             """
@@ -222,7 +217,7 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
 - Hardware acceleration via OpenVINO
 """
         )
-        
+
         # Build UI based on model type
         if model_type == "custom_voice":
             # CustomVoice tab
@@ -233,7 +228,7 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                         label="Text to Synthesize",
                         lines=4,
                         placeholder="Enter the text you want to convert to speech...",
-                        value="Hello! Welcome to Text-to-Speech system. This is a demo of our TTS capabilities."
+                        value="Hello! Welcome to Text-to-Speech system. This is a demo of our TTS capabilities.",
                     )
                     with gr.Row():
                         tts_language = gr.Dropdown(
@@ -254,17 +249,17 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                         placeholder="e.g., Speak in a cheerful and energetic tone",
                     )
                     tts_btn = gr.Button("Generate Speech", variant="primary")
-                
+
                 with gr.Column(scale=2):
                     tts_audio_out = gr.Audio(label="Generated Audio", type="numpy")
                     tts_status = gr.Textbox(label="Status", lines=2, interactive=False)
-            
+
             tts_btn.click(
                 generate_custom_voice,
                 inputs=[tts_text, tts_language, tts_speaker, tts_instruct],
                 outputs=[tts_audio_out, tts_status],
             )
-        
+
         elif model_type == "base":
             # Base (Voice Clone) tab
             gr.Markdown("### Clone Voice from Reference Audio")
@@ -283,7 +278,7 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                         label="Use x-vector only (No reference text needed, but lower quality)",
                         value=False,
                     )
-                
+
                 with gr.Column(scale=2):
                     clone_target_text = gr.Textbox(
                         label="Target Text (Text to synthesize with cloned voice)",
@@ -297,17 +292,17 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                         interactive=True,
                     )
                     clone_btn = gr.Button("Clone & Generate", variant="primary")
-            
+
             with gr.Row():
                 clone_audio_out = gr.Audio(label="Generated Audio", type="numpy")
                 clone_status = gr.Textbox(label="Status", lines=2, interactive=False)
-            
+
             clone_btn.click(
                 generate_voice_clone,
                 inputs=[clone_ref_audio, clone_ref_text, clone_target_text, clone_language, clone_xvector],
                 outputs=[clone_audio_out, clone_status],
             )
-        
+
         elif model_type == "voice_design":
             # Voice Design tab
             gr.Markdown("### Create Custom Voice with Natural Language")
@@ -317,7 +312,7 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                         label="Text to Synthesize",
                         lines=4,
                         placeholder="Enter the text you want to convert to speech...",
-                        value="It's in the top drawer... wait, it's empty? No way, that's impossible! I'm sure I put it there!"
+                        value="It's in the top drawer... wait, it's empty? No way, that's impossible! I'm sure I put it there!",
                     )
                     design_language = gr.Dropdown(
                         label="Language",
@@ -329,25 +324,25 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                         label="Voice Description",
                         lines=3,
                         placeholder="Describe the voice characteristics you want...",
-                        value="Speak in an incredulous tone, but with a hint of panic beginning to creep into your voice."
+                        value="Speak in an incredulous tone, but with a hint of panic beginning to creep into your voice.",
                     )
                     design_btn = gr.Button("Generate with Custom Voice", variant="primary")
-                
+
                 with gr.Column(scale=2):
                     design_audio_out = gr.Audio(label="Generated Audio", type="numpy")
                     design_status = gr.Textbox(label="Status", lines=2, interactive=False)
-            
+
             design_btn.click(
                 generate_voice_design,
                 inputs=[design_text, design_language, design_instruct],
                 outputs=[design_audio_out, design_status],
             )
-        
+
         gr.Markdown(
             """
 ---
 **Links:** [Qwen3-TTS on Hugging Face](https://huggingface.co/collections/Qwen/qwen3-tts) | [OpenVINO Notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
 """
         )
-    
+
     return demo

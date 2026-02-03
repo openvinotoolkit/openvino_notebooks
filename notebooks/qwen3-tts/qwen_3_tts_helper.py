@@ -17,9 +17,11 @@ try:
     from transformers.cache_utils import DynamicCache
     from transformers.generation import GenerationMixin, GenerationConfig
     from transformers.modeling_outputs import ModelOutput
+
     # Try to import DynamicLayer
     try:
         from transformers.cache_utils import DynamicLayer
+
         DYNAMIC_LAYER_AVAILABLE = True
     except ImportError:
         DynamicLayer = None
@@ -33,6 +35,7 @@ except ImportError:
 # Try to import masking_utils (for patching torch.diff)
 try:
     from transformers.masking_utils import ALL_MASK_ATTENTION_FUNCTIONS
+
     MASKING_AVAILABLE = True
 except ImportError:
     ALL_MASK_ATTENTION_FUNCTIONS = {}
@@ -41,6 +44,7 @@ except ImportError:
 # Import nncf only when needed for compression
 try:
     import nncf
+
     NNCF_AVAILABLE = True
 except ImportError:
     NNCF_AVAILABLE = False
@@ -63,13 +67,13 @@ def patch_torch_diff_for_openvino():
     """
     if not TORCH_AVAILABLE or not MASKING_AVAILABLE:
         return
-    
+
     try:
         import transformers.masking_utils as masking_utils
-        
+
         # Save original function
         original_find_packed = masking_utils.find_packed_sequence_indices
-        
+
         def patched_find_packed_sequence_indices(position_ids):
             """
             OpenVINO-compatible version of find_packed_sequence_indices.
@@ -79,19 +83,19 @@ def patch_torch_diff_for_openvino():
             # first_dummy_value = position_ids[:, :1] - 1
             # position_diff = torch.diff(position_ids, prepend=first_dummy_value, dim=-1)
             # packed_sequence_mask = (position_diff != 1).cumsum(-1)
-            
+
             # OpenVINO-compatible replacement:
             # torch.diff(x, prepend=y, dim=-1) is equivalent to:
             # torch.cat([y, x], dim=-1)[:, 1:] - torch.cat([y, x], dim=-1)[:, :-1]
-            
+
             first_val = position_ids[:, :1] - 1
             # Manually compute diff: [first_val, pos[0], pos[1], ...] -> diff
             prepended = torch.cat([first_val, position_ids], dim=-1)
             position_diff = prepended[:, 1:] - prepended[:, :-1]
-            
+
             packed_sequence_mask = (position_diff != 1).cumsum(-1)
             return packed_sequence_mask
-        
+
         # Replace the function
         masking_utils.find_packed_sequence_indices = patched_find_packed_sequence_indices
         print("✅ Patched torch.diff in masking_utils.find_packed_sequence_indices for OpenVINO compatibility")
@@ -109,8 +113,6 @@ if TORCH_AVAILABLE:
     # Don't import the full qwen_tts package to avoid unnecessary dependencies
     # We'll import specific modules as needed in each conversion function
     pass
-
-
 
 
 def patched_dynamic_layer_update(
@@ -132,7 +134,6 @@ if TORCH_AVAILABLE:
     DynamicLayer.update = patched_dynamic_layer_update
 
 
-
 def patch_cos_sin_cached_fp32(model):
     if (
         hasattr(model, "layers")
@@ -150,6 +151,7 @@ def patch_cos_sin_cached_fp32(model):
                     device=layer.self_attn.rotary_emb.inv_freq.device,
                     dtype=torch.float32,
                 )
+
 
 def causal_mask_function(batch_idx: int, head_idx: int, q_idx: int, kv_idx: int) -> bool:
     """
@@ -460,7 +462,7 @@ SPEECH_TOKENIZER_DECODER_NAME = "openvino_speech_tokenizer_decoder_model.xml"
 def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_local_dir=False):
     """
     Convert Qwen3-TTS model to OpenVINO format.
-    
+
     Args:
         model_id: HuggingFace model ID or local path
         output_dir: Directory to save the converted models
@@ -471,9 +473,9 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
     from qwen_tts.core.models.modeling_qwen3_tts import Qwen3TTSForConditionalGeneration
     from qwen_tts.core.models.configuration_qwen3_tts import Qwen3TTSConfig
     from qwen_tts.core.models import Qwen3TTSProcessor
-    
+
     output_dir = Path(output_dir)
-    
+
     talker_lang_path = output_dir / TALKER_LANGUAGE_NAME
     talker_embedding_path = output_dir / TALKER_EMBEDDING_NAME
     talker_text_embedding_path = output_dir / TALKER_TEXT_EMBEDDING_NAME
@@ -482,14 +484,16 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
     talker_code_predictor_path = output_dir / TALKER_CODE_PREDICTOR_NAME
     speaker_encoder_path = output_dir / SPEAKER_ENCODER_NAME
 
-    if all([
-        talker_lang_path.exists(),
-        talker_embedding_path.exists(),
-        talker_text_embedding_path.exists(),
-        talker_text_projection_path.exists(),
-        talker_code_predictor_embedding_path.exists(),
-        talker_code_predictor_path.exists(),
-    ]):
+    if all(
+        [
+            talker_lang_path.exists(),
+            talker_embedding_path.exists(),
+            talker_text_embedding_path.exists(),
+            talker_text_projection_path.exists(),
+            talker_code_predictor_embedding_path.exists(),
+            talker_code_predictor_path.exists(),
+        ]
+    ):
         print(f"✅ {model_id} model already converted. You can find results in {output_dir}")
         return
 
@@ -508,25 +512,26 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
     config.talker_config._attn_implementation = "sdpa"
     config.talker_config.code_predictor_config._attn_implementation_autoset = False
     config.talker_config.code_predictor_config._attn_implementation = "sdpa"
-    
+
     model = Qwen3TTSForConditionalGeneration.from_pretrained(ckpt, config=config, torch_dtype=torch.float16)
     model.eval()
     processor = Qwen3TTSProcessor.from_pretrained(ckpt)
-    
+
     config.save_pretrained(output_dir)
     processor.save_pretrained(output_dir)
-    
+
     # Clean up config.json after saving to remove model_type from speaker_encoder_config
     # PretrainedConfig.to_dict() automatically adds model_type, but Qwen3TTSSpeakerEncoderConfig.__init__()
     # doesn't accept it, causing errors during loading. We need to remove it from the saved JSON file.
     import json
+
     config_path = output_dir / "config.json"
     if config_path.exists():
-        with open(config_path, 'r') as f:
+        with open(config_path, "r") as f:
             config_json = json.load(f)
-        if 'speaker_encoder_config' in config_json and 'model_type' in config_json['speaker_encoder_config']:
-            del config_json['speaker_encoder_config']['model_type']
-            with open(config_path, 'w') as f:
+        if "speaker_encoder_config" in config_json and "model_type" in config_json["speaker_encoder_config"]:
+            del config_json["speaker_encoder_config"]["model_type"]
+            with open(config_path, "w") as f:
                 json.dump(config_json, f, indent=2)
             print("✅ Cleaned up config.json (removed model_type from speaker_encoder_config)")
 
@@ -568,6 +573,7 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
         ov_model = ov.convert_model(
             model.talker.text_projection,
             example_input=torch.ones([1, 3, text_hidden_size], dtype=torch.float32),
+            input=[ov.PartialShape([1, -1, text_hidden_size])],
         )
         ov.save_model(ov_model, talker_text_projection_path)
         del ov_model
@@ -876,12 +882,13 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
         if not speaker_encoder_path.exists():
             print("⌛ Convert Speaker Encoder model")
             __make_16bit_traceable(model.speaker_encoder)
-            
+
             # Speaker encoder expects mel spectrogram input [batch, seq_len, mel_dim]
             mel_dim = config.speaker_encoder_config.mel_dim
             ov_model = ov.convert_model(
                 model.speaker_encoder,
                 example_input=torch.randn([1, 100, mel_dim], dtype=torch.float32),
+                input=[ov.PartialShape([1, -1, mel_dim])],
             )
             ov.save_model(ov_model, speaker_encoder_path)
             del ov_model
@@ -898,22 +905,18 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
         # ckpt is a HuggingFace model ID, need to get the cached path
         # Use snapshot_download to get or download the model to cache
         model_local_path = Path(
-            snapshot_download(
-                model_id, 
-                allow_patterns=["speech_tokenizer/**", "*.json", "*.txt"],
-                ignore_patterns=["*.safetensors", "*.bin"]
-            )
+            snapshot_download(model_id, allow_patterns=["speech_tokenizer/**", "*.json", "*.txt"], ignore_patterns=["*.safetensors", "*.bin"])
         )
-    
+
     speech_tokenizer_dir = model_local_path / "speech_tokenizer"
     speech_tokenizer_ov_dir = output_dir / "speech_tokenizer"
-    
+
     if speech_tokenizer_dir.exists():
         print(f"✓ Found speech tokenizer at {speech_tokenizer_dir}")
         convert_speech_tokenizer(str(speech_tokenizer_dir), speech_tokenizer_ov_dir, use_local_dir=use_local_dir)
     else:
         print(f"ℹ️ No speech tokenizer found in model. Using PyTorch version during inference.")
-    
+
     del model
     gc.collect()
 
@@ -921,7 +924,7 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
 def convert_speech_tokenizer(model_id, output_dir, use_local_dir=False):
     """
     Convert Qwen3-TTS speech tokenizer (encoder and decoder) to OpenVINO format.
-    
+
     Args:
         model_id: HuggingFace model ID or local path to speech_tokenizer
         output_dir: Directory to save the converted models
@@ -929,49 +932,49 @@ def convert_speech_tokenizer(model_id, output_dir, use_local_dir=False):
     """
     from qwen_tts.core import Qwen3TTSTokenizerV2Config, Qwen3TTSTokenizerV2Model
     from transformers import AutoConfig, AutoModel, AutoFeatureExtractor
-    
+
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     encoder_path = output_dir / SPEECH_TOKENIZER_ENCODER_NAME
     decoder_path = output_dir / SPEECH_TOKENIZER_DECODER_NAME
-    
+
     if encoder_path.exists() and decoder_path.exists():
         print(f"✅ Speech tokenizer already converted. You can find results in {output_dir}")
         return
-    
+
     print(f"⌛ Speech tokenizer conversion started. Be patient, it may take some time.")
     print("⌛ Load Speech tokenizer model")
-    
+
     # Register config and model
     AutoConfig.register("qwen3_tts_tokenizer_12hz", Qwen3TTSTokenizerV2Config)
     AutoModel.register(Qwen3TTSTokenizerV2Config, Qwen3TTSTokenizerV2Model)
-    
+
     if use_local_dir:
         ckpt = Path(output_dir) / "speech_tokenizer_ckpt"
         if not ckpt.exists():
             snapshot_download(model_id, local_dir=ckpt, force_download=True)
     else:
         ckpt = model_id
-    
+
     # Load model
     tokenizer_model = AutoModel.from_pretrained(ckpt, torch_dtype=torch.float32)
     tokenizer_model.eval()
-    
+
     # Save feature extractor
     feature_extractor = AutoFeatureExtractor.from_pretrained(ckpt)
     feature_extractor.save_pretrained(output_dir)
-    
+
     # Save config
     tokenizer_model.config.save_pretrained(output_dir)
-    
+
     print("✅ Speech tokenizer model successfully loaded")
-    
+
     # Convert encoder (MimiModel)
     if not encoder_path.exists():
         print("⌛ Convert speech tokenizer encoder")
         encoder = tokenizer_model.encoder
-        
+
         # Encoder forward: takes (input_values, padding_mask) and returns audio_codes
         # input_values: [batch, 1, seq_len] audio waveform
         # We need to trace the encode path
@@ -980,80 +983,81 @@ def convert_speech_tokenizer(model_id, output_dir, use_local_dir=False):
                 super().__init__()
                 self.encoder = encoder
                 self.valid_num_quantizers = valid_num_quantizers
-            
+
             def forward(self, input_values):
                 # input_values: [batch, 1, seq_len]
                 encoded = self.encoder.encode(input_values=input_values, return_dict=True)
                 # Return codes: [batch, num_quantizers, code_len]
-                audio_codes = encoded.audio_codes[:, :self.valid_num_quantizers]
+                audio_codes = encoded.audio_codes[:, : self.valid_num_quantizers]
                 return audio_codes
-        
+
         encoder_wrapper = EncoderWrapper(encoder, tokenizer_model.encoder_valid_num_quantizers)
-        
+
         # Example input: [batch=1, channels=1, seq_len=24000] (1 second at 24kHz)
         example_input = torch.randn([1, 1, 24000], dtype=torch.float32)
-        
+
         __make_16bit_traceable(encoder_wrapper)
         ov_model = ov.convert_model(
             encoder_wrapper,
             example_input=example_input,
             input=[ov.PartialShape([1, 1, -1])],  # dynamic sequence length
         )
-        
+
         # Set input/output names
         ov_model.inputs[0].get_tensor().set_names({"input_values"})
         ov_model.outputs[0].get_tensor().set_names({"audio_codes"})
-        
+
         ov.save_model(ov_model, encoder_path)
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
         print("✅ Speech tokenizer encoder successfully converted")
-    
+
     # Convert decoder
     if not decoder_path.exists():
         print("⌛ Convert speech tokenizer decoder")
         decoder = tokenizer_model.decoder
-        
+
         # Decoder forward: takes audio_codes [batch, num_quantizers, code_len] and returns waveform
         class DecoderWrapper(torch.nn.Module):
             def __init__(self, decoder):
                 super().__init__()
                 self.decoder = decoder
-            
+
             def forward(self, audio_codes):
                 # audio_codes: [batch, code_len, num_quantizers] -> transpose to [batch, num_quantizers, code_len]
                 codes_transposed = audio_codes.transpose(1, 2)
                 # Use chunked_decode for better memory efficiency
                 wav = self.decoder.chunked_decode(codes_transposed)
                 return wav.squeeze(1)  # Remove channel dimension
-        
+
         decoder_wrapper = DecoderWrapper(decoder)
-        
+
         num_quantizers = tokenizer_model.config.decoder_config.num_quantizers
         # Example input: [batch=1, code_len=100, num_quantizers]
         example_input = torch.randint(0, 2048, [1, 100, num_quantizers], dtype=torch.long)
-        
+
         __make_16bit_traceable(decoder_wrapper)
         ov_model = ov.convert_model(
             decoder_wrapper,
             example_input=example_input,
-            input=[ov.PartialShape([1, -1, num_quantizers])],  # dynamic code length
+            input=[ov.PartialShape([1, -1, num_quantizers])],
         )
-        
+
         # Set input/output names
         ov_model.inputs[0].get_tensor().set_names({"audio_codes"})
         ov_model.outputs[0].get_tensor().set_names({"audio_values"})
-        
+
         ov.save_model(ov_model, decoder_path)
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
         print("✅ Speech tokenizer decoder successfully converted")
-    
+
     del tokenizer_model
     gc.collect()
     print(f"✅ Speech tokenizer conversion finished. You can find results in {output_dir}")
+
 
 # ============================================================================
 # OVQwen3TTSModel - OpenVINO inference wrapper for Qwen3-TTS
@@ -1061,9 +1065,11 @@ def convert_speech_tokenizer(model_id, output_dir, use_local_dir=False):
 
 # Define output classes for TTS models (similar to Qwen3OmniMoe)
 
+
 @dataclass
 class Qwen3TTSTalkerCodePredictorOutputWithPast(ModelOutput):
     """Output class for Code Predictor model."""
+
     logits: Optional[torch.FloatTensor] = None
     past_key_values: Optional[tuple] = None
     hidden_states: Optional[torch.FloatTensor] = None
@@ -1073,6 +1079,7 @@ class Qwen3TTSTalkerCodePredictorOutputWithPast(ModelOutput):
 @dataclass
 class Qwen3TTSTalkerOutputWithPast(ModelOutput):
     """Output class for Talker model."""
+
     loss: Optional[torch.FloatTensor] = None
     logits: Optional[torch.FloatTensor] = None
     past_key_values: Optional[tuple] = None
@@ -1089,30 +1096,31 @@ class OVQwen3TTSTalkerCodePredictorModelForConditionalGeneration(GenerationMixin
     OpenVINO wrapper for Qwen3-TTS Code Predictor model with GenerationMixin support.
     This model generates residual codec codes (codebook 1..N-1) based on the first codec token.
     """
+
     _is_stateful = False
-    
+
     def __init__(self, model_dir: Path, device: str, config):
         self.model_dir = Path(model_dir)
         self.config = config
-        
+
         # Load code predictor embedding model
         self.code_predictor_embedding = core.compile_model(model_dir / TALKER_CODE_PREDICTOR_EMBEDDING_NAME, "CPU")
-        
+
         # Load code predictor model
         self.model = core.read_model(model_dir / TALKER_CODE_PREDICTOR_NAME)
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
         compiled_model = core.compile_model(self.model, device)
         self.request = compiled_model.create_infer_request()
-        
+
         # Create embedding wrapper
         self.get_input_embeddings = lambda: self._embedding_wrapper
         self._embedding_wrapper = self._create_embedding_wrapper()
-        
+
         # GenerationMixin required attributes
         self.main_input_name = "input_ids"
         self.device = torch.device("cpu")
-        self.generation_config = GenerationConfig.from_model_config(self.config) if hasattr(self.config, 'to_dict') else GenerationConfig()
+        self.generation_config = GenerationConfig.from_model_config(self.config) if hasattr(self.config, "to_dict") else GenerationConfig()
         self.num_pkv = 2
         self._past_length = None
         self.next_beam_idx = None
@@ -1122,24 +1130,28 @@ class OVQwen3TTSTalkerCodePredictorModelForConditionalGeneration(GenerationMixin
         self._supports_cache_class = True
         self._supports_static_cache = True
         self.dtype = torch.float16
-    
+
     def _create_embedding_wrapper(self):
         """Create a callable wrapper for embeddings that works with OpenVINO."""
+
         def embedding_fn(input_ids, generation_steps):
-            result = self.code_predictor_embedding({
-                "input_ids": input_ids.numpy() if isinstance(input_ids, torch.Tensor) else input_ids,
-                "generation_steps": np.array(generation_steps, dtype=np.int64),
-            })[0]
+            result = self.code_predictor_embedding(
+                {
+                    "input_ids": input_ids.numpy() if isinstance(input_ids, torch.Tensor) else input_ids,
+                    "generation_steps": np.array(generation_steps, dtype=np.int64),
+                }
+            )[0]
             return torch.from_numpy(result)
+
         return embedding_fn
-    
+
     def can_generate(self):
         """Returns True for GenerationMixin validation."""
         return True
-    
+
     def __call__(self, **kwargs):
         return self.forward(**kwargs)
-    
+
     def forward(
         self,
         input_ids=None,
@@ -1155,7 +1167,7 @@ class OVQwen3TTSTalkerCodePredictorModelForConditionalGeneration(GenerationMixin
     ) -> Qwen3TTSTalkerCodePredictorOutputWithPast:
         """
         Forward pass through code predictor model.
-        
+
         Args:
             generation_steps: Current generation step (0..num_code_groups-1)
         """
@@ -1165,13 +1177,13 @@ class OVQwen3TTSTalkerCodePredictorModelForConditionalGeneration(GenerationMixin
         # Generation stage
         else:
             inputs_embeds = self.get_input_embeddings()(input_ids, generation_steps - 1)
-        
+
         # Reset state if no past_key_values
         if past_key_values is None:
             self.request.reset_state()
             self.next_beam_idx = np.arange(inputs_embeds.shape[0], dtype=int)
             self._past_length = 0
-        
+
         # Prepare inputs
         inputs = {
             "inputs_embeds": inputs_embeds.numpy() if isinstance(inputs_embeds, torch.Tensor) else inputs_embeds,
@@ -1179,31 +1191,29 @@ class OVQwen3TTSTalkerCodePredictorModelForConditionalGeneration(GenerationMixin
             "position_ids": position_ids.numpy() if isinstance(position_ids, torch.Tensor) else position_ids,
             "generation_steps": np.array(generation_steps, dtype=np.int64),
         }
-        
+
         if "beam_idx" in self.input_names:
             inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(inputs_embeds.shape[0], dtype=int)
-        
+
         # Run inference
         self.request.start_async(inputs, share_inputs=False)
         self.request.wait()
-        
+
         logits = torch.from_numpy(self.request.get_tensor("logits").data.copy()).to(self.device)
         hidden_states = torch.from_numpy(self.request.get_tensor("mid_residual_hiddens").data.copy()).to(self.device)
-        
+
         return Qwen3TTSTalkerCodePredictorOutputWithPast(
             logits=logits,
             past_key_values=((),),
             hidden_states=hidden_states,
             generation_steps=generation_steps + 1,
         )
-    
+
     def _update_model_kwargs_for_generation(self, outputs, model_kwargs, is_encoder_decoder=False, num_new_tokens=1):
-        model_kwargs = super()._update_model_kwargs_for_generation(
-            outputs, model_kwargs, is_encoder_decoder, num_new_tokens
-        )
+        model_kwargs = super()._update_model_kwargs_for_generation(outputs, model_kwargs, is_encoder_decoder, num_new_tokens)
         model_kwargs["generation_steps"] = outputs.generation_steps
         return model_kwargs
-    
+
     def prepare_inputs_for_generation(
         self,
         input_ids: torch.LongTensor,
@@ -1224,11 +1234,11 @@ class OVQwen3TTSTalkerCodePredictorModelForConditionalGeneration(GenerationMixin
             **kwargs,
         )
         return model_inputs
-    
+
     def _reorder_cache(self, past_key_values, beam_idx):
         self.next_beam_idx = np.array(beam_idx)
         return past_key_values
-    
+
     def _get_past_length(self, past_key_values=None):
         return self._past_length if past_key_values else 0
 
@@ -1238,38 +1248,37 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
     OpenVINO wrapper for Qwen3-TTS Talker model with GenerationMixin support.
     This is the main language model that generates codec tokens.
     """
+
     _is_stateful = False
-    
+
     def __init__(self, model_dir: Path, device: str, config):
         self.model_dir = Path(model_dir)
         self.config = config
         self.device = torch.device("cpu")
         self.dtype = torch.float16
-        
+
         # Load talker language model (stateful)
         self.model = core.read_model(model_dir / TALKER_LANGUAGE_NAME)
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
         compiled_model = core.compile_model(self.model, device)
         self.request = compiled_model.create_infer_request()
-        
+
         # Load embedding models
         self.embed_tokens = core.compile_model(model_dir / TALKER_EMBEDDING_NAME, "CPU")
         self.text_embedding = core.compile_model(model_dir / TALKER_TEXT_EMBEDDING_NAME, "CPU")
         self.text_projection_model = core.compile_model(model_dir / TALKER_TEXT_PROJECTION_NAME, "CPU")
-        
+
         # Create embedding wrapper
         self._embedding_wrapper = self._create_embedding_wrapper()
         self._text_embedding_wrapper = self._create_text_embedding_wrapper()
-        
+
         # Load code predictor
-        self.code_predictor = OVQwen3TTSTalkerCodePredictorModelForConditionalGeneration(
-            model_dir, device, config.code_predictor_config
-        )
-        
+        self.code_predictor = OVQwen3TTSTalkerCodePredictorModelForConditionalGeneration(model_dir, device, config.code_predictor_config)
+
         # GenerationMixin required attributes
         self.main_input_name = "input_ids"
-        self.generation_config = GenerationConfig.from_model_config(self.config) if hasattr(self.config, 'to_dict') else GenerationConfig()
+        self.generation_config = GenerationConfig.from_model_config(self.config) if hasattr(self.config, "to_dict") else GenerationConfig()
         self.num_pkv = 2
         self._past_length = None
         self.next_beam_idx = None
@@ -1279,9 +1288,10 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
         self._supports_sdpa = True
         self._supports_cache_class = True
         self._supports_static_cache = True
-    
+
     def _create_embedding_wrapper(self):
         """Create a callable wrapper for codec embeddings."""
+
         def embedding_fn(input_ids):
             if isinstance(input_ids, torch.Tensor):
                 # Handle scalar tensor
@@ -1294,10 +1304,12 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
                 input_np = input_ids
             result = self.embed_tokens(input_np)[0]
             return torch.from_numpy(result)
+
         return embedding_fn
-    
+
     def _create_text_embedding_wrapper(self):
         """Create a callable wrapper for text embeddings."""
+
         def embedding_fn(input_ids):
             if isinstance(input_ids, torch.Tensor):
                 input_np = input_ids.numpy()
@@ -1305,28 +1317,29 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
                 input_np = input_ids
             result = self.text_embedding(input_np)[0]
             return torch.from_numpy(result)
+
         return embedding_fn
-    
+
     def get_input_embeddings(self):
         """Get codec input embeddings callable."""
         return self._embedding_wrapper
-    
+
     def get_text_embeddings(self):
         """Get text embeddings callable."""
         return self._text_embedding_wrapper
-    
+
     def text_projection(self, hidden_states: torch.Tensor) -> torch.Tensor:
         """Apply text projection."""
         result = self.text_projection_model(hidden_states.numpy())[0]
         return torch.from_numpy(result)
-    
+
     def can_generate(self):
         """Returns True for GenerationMixin validation."""
         return True
-    
+
     def __call__(self, **kwargs):
         return self.forward(**kwargs)
-    
+
     def get_rope_index(self, attention_mask):
         """Calculate mRoPE position IDs."""
         position_ids = attention_mask.float().cumsum(-1) - 1
@@ -1335,7 +1348,7 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
         max_position_ids = position_ids.max(0, keepdim=False)[0].max(-1, keepdim=True)[0]
         mrope_position_deltas = max_position_ids + 1 - torch.sum(attention_mask, dim=-1, keepdim=True)
         return position_ids, mrope_position_deltas
-    
+
     def forward(
         self,
         input_ids=None,
@@ -1360,7 +1373,7 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
     ) -> Qwen3TTSTalkerOutputWithPast:
         """
         Forward pass through talker model.
-        
+
         Follows the same logic as the original Qwen3TTSTalkerForConditionalGeneration.forward().
         """
         # Prefill stage
@@ -1370,7 +1383,7 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
         # Generation stage
         else:
             last_id_hidden = self.get_input_embeddings()(input_ids)
-            
+
             # Run code predictor to generate residual codes
             predictor_result = self.code_predictor.generate(
                 inputs_embeds=torch.cat((past_hidden, last_id_hidden), dim=1),
@@ -1382,27 +1395,26 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
                 output_hidden_states=True,
                 return_dict_in_generate=True,
             )
-            
+
             codec_ids = torch.cat((input_ids, predictor_result.sequences), dim=-1)
-            
+
             # Aggregate codec embeddings
             codec_hiddens = torch.cat(
-                [last_id_hidden] + 
-                [self.code_predictor.get_input_embeddings()(predictor_result.sequences[..., i:i+1], i) 
-                 for i in range(self.config.num_code_groups - 1)],
+                [last_id_hidden]
+                + [self.code_predictor.get_input_embeddings()(predictor_result.sequences[..., i : i + 1], i) for i in range(self.config.num_code_groups - 1)],
                 dim=1,
             )
             inputs_embeds = codec_hiddens.sum(1, keepdim=True)
-            
+
             # Add text hidden states
             if generation_step < trailing_text_hidden.shape[1]:
                 inputs_embeds = inputs_embeds + trailing_text_hidden[:, generation_step].unsqueeze(1)
             else:
                 inputs_embeds = inputs_embeds + tts_pad_embed
-        
+
         # Calculate position IDs
         if attention_mask is not None:
-            if (cache_position is None or (cache_position is not None and cache_position[0] == 0) or self.rope_deltas is None):
+            if cache_position is None or (cache_position is not None and cache_position[0] == 0) or self.rope_deltas is None:
                 delta0 = (1 - attention_mask).sum(dim=-1).unsqueeze(1)
                 position_ids, rope_deltas = self.get_rope_index(attention_mask)
                 rope_deltas = rope_deltas - delta0
@@ -1414,30 +1426,30 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
                 position_ids = position_ids.view(1, -1).expand(batch_size, -1)
                 position_ids = position_ids.add(delta)
                 position_ids = position_ids.unsqueeze(0).expand(3, -1, -1)
-        
+
         # Reset state if no past_key_values
         if past_key_values is None:
             self.request.reset_state()
             self.next_beam_idx = np.arange(inputs_embeds.shape[0], dtype=int)
             self._past_length = 0
-        
+
         # Prepare inputs
         inputs = {
             "inputs_embeds": inputs_embeds.numpy() if isinstance(inputs_embeds, torch.Tensor) else inputs_embeds,
             "attention_mask": attention_mask.numpy() if isinstance(attention_mask, torch.Tensor) else attention_mask,
             "position_ids": position_ids.numpy() if isinstance(position_ids, torch.Tensor) else position_ids,
         }
-        
+
         if "beam_idx" in self.input_names:
             inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(inputs_embeds.shape[0], dtype=int)
-        
+
         # Run inference
         self.request.start_async(inputs, share_inputs=False)
         self.request.wait()
-        
+
         logits = torch.from_numpy(self.request.get_tensor("logits").data.copy()).to(self.device)
         hidden_states = torch.from_numpy(self.request.get_tensor("hidden_states").data.copy()).to(self.device)
-        
+
         return Qwen3TTSTalkerOutputWithPast(
             loss=None,
             logits=logits,
@@ -1449,15 +1461,13 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
             trailing_text_hidden=trailing_text_hidden,
             tts_pad_embed=tts_pad_embed,
         )
-    
+
     def _update_model_kwargs_for_generation(self, outputs, model_kwargs, is_encoder_decoder=False, num_new_tokens=1):
-        model_kwargs = super()._update_model_kwargs_for_generation(
-            outputs, model_kwargs, is_encoder_decoder, num_new_tokens
-        )
+        model_kwargs = super()._update_model_kwargs_for_generation(outputs, model_kwargs, is_encoder_decoder, num_new_tokens)
         model_kwargs["hidden_states"] = outputs.hidden_states
         model_kwargs["generation_step"] = outputs.generation_step
         return model_kwargs
-    
+
     def prepare_inputs_for_generation(
         self,
         input_ids,
@@ -1470,10 +1480,8 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
         hidden_states = kwargs.pop("hidden_states", None)
         if past_key_values != ((),):
             past_key_values = None
-        inputs = super().prepare_inputs_for_generation(
-            input_ids, past_key_values, attention_mask, inputs_embeds, cache_position, **kwargs
-        )
-        
+        inputs = super().prepare_inputs_for_generation(input_ids, past_key_values, attention_mask, inputs_embeds, cache_position, **kwargs)
+
         # Decode stage
         if cache_position is not None and cache_position[0] != 0:
             generation_step = kwargs.get("generation_step", 0)
@@ -1483,7 +1491,7 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
             subtalker_top_k = kwargs.get("subtalker_top_k", 50)
             subtalker_top_p = kwargs.get("subtalker_top_p", 1.0)
             subtalker_temperature = kwargs.get("subtalker_temperature", 0.9)
-            
+
             inputs["past_hidden"] = hidden_states[0][:, -1:, :] if hidden_states else None
             inputs["trailing_text_hidden"] = trailing_text_hidden
             inputs["tts_pad_embed"] = tts_pad_embed
@@ -1492,13 +1500,13 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
             inputs["subtalker_top_k"] = subtalker_top_k
             inputs["subtalker_top_p"] = subtalker_top_p
             inputs["subtalker_temperature"] = subtalker_temperature
-        
+
         return inputs
-    
+
     def _reorder_cache(self, past_key_values, beam_idx):
         self.next_beam_idx = np.array(beam_idx)
         return past_key_values
-    
+
     def _get_past_length(self, past_key_values=None):
         return self._past_length if past_key_values else 0
 
@@ -1507,30 +1515,30 @@ class OVQwen3TTSSpeakerEncoder:
     """
     OpenVINO wrapper for Qwen3-TTS Speaker Encoder model (for Base model type).
     """
-    
+
     def __init__(self, model_dir: Path, device: str = "CPU"):
         self.model_dir = Path(model_dir)
         self.device = device
-        
+
         speaker_encoder_path = self.model_dir / SPEAKER_ENCODER_NAME
         if speaker_encoder_path.exists():
             self.model = core.compile_model(speaker_encoder_path, device)
         else:
             self.model = None
-    
+
     def __call__(self, mel_spectrogram: torch.Tensor) -> torch.Tensor:
         """
         Extract speaker embedding from mel spectrogram.
-        
+
         Args:
             mel_spectrogram: Input mel spectrogram [batch, seq_len, mel_dim]
-            
+
         Returns:
             Speaker embedding tensor
         """
         if self.model is None:
             raise RuntimeError("Speaker encoder model not found")
-        
+
         result = self.model(mel_spectrogram.numpy())[0]
         return torch.from_numpy(result)
 
@@ -1540,31 +1548,32 @@ class OVQwen3TTSSpeechTokenizer:
     OpenVINO wrapper for Qwen3-TTS Speech Tokenizer (12Hz).
     Provides encode() and decode() methods compatible with Qwen3TTSTokenizer.
     """
-    
+
     def __init__(self, model_dir: Path, device: str = "CPU"):
         self.model_dir = Path(model_dir)
         self.device = device
-        
+
         # Load encoder and decoder
         encoder_path = self.model_dir / SPEECH_TOKENIZER_ENCODER_NAME
         decoder_path = self.model_dir / SPEECH_TOKENIZER_DECODER_NAME
-        
+
         if encoder_path.exists():
             # Encoder always on CPU as GPU/NPU may not support it
             self.encoder_model = core.compile_model(encoder_path, "CPU")
         else:
             self.encoder_model = None
-            
+
         if decoder_path.exists():
             # Decoder always on CPU as GPU/NPU may not support it
             self.decoder_model = core.compile_model(decoder_path, "CPU")
         else:
             self.decoder_model = None
-        
+
         # Load config
         config_path = self.model_dir / "config.json"
         if config_path.exists():
             import json
+
             with open(config_path, "r") as f:
                 config_dict = json.load(f)
             self.input_sample_rate = config_dict.get("input_sample_rate", 24000)
@@ -1579,30 +1588,27 @@ class OVQwen3TTSSpeechTokenizer:
             self.encode_downsample_rate = 1920
             self.decode_upsample_rate = 1920
             self.num_quantizers = 16
-        
+
         # Load feature extractor if available
         try:
             from transformers import AutoFeatureExtractor
+
             self.feature_extractor = AutoFeatureExtractor.from_pretrained(model_dir)
         except Exception:
             self.feature_extractor = None
-    
+
     def _normalize_audio(self, audio: np.ndarray, sr: int) -> np.ndarray:
         """Normalize audio to target sample rate."""
         import librosa
-        
+
         if audio.ndim > 1:
             audio = np.mean(audio, axis=-1)
-        
+
         if sr != self.input_sample_rate:
-            audio = librosa.resample(
-                y=audio.astype(np.float32), 
-                orig_sr=sr, 
-                target_sr=self.input_sample_rate
-            )
-        
+            audio = librosa.resample(y=audio.astype(np.float32), orig_sr=sr, target_sr=self.input_sample_rate)
+
         return audio.astype(np.float32)
-    
+
     def encode(
         self,
         audios,
@@ -1611,7 +1617,7 @@ class OVQwen3TTSSpeechTokenizer:
     ):
         """
         Encode audio waveform(s) into discrete codes.
-        
+
         Args:
             audios: Audio input - can be:
                 - np.ndarray: single waveform (requires sr)
@@ -1620,19 +1626,19 @@ class OVQwen3TTSSpeechTokenizer:
                 - List[str]: list of audio file paths
             sr: Sample rate for numpy input
             return_dict: Whether to return a dict-like output
-            
+
         Returns:
             Object with audio_codes attribute containing list of code tensors
         """
         if self.encoder_model is None:
             raise RuntimeError("Speech tokenizer encoder not loaded")
-        
+
         import librosa
-        
+
         # Normalize inputs to list
         if isinstance(audios, (str, np.ndarray)):
             audios = [audios]
-        
+
         # Load and normalize audio
         audio_list = []
         for audio in audios:
@@ -1645,49 +1651,49 @@ class OVQwen3TTSSpeechTokenizer:
                     raise ValueError("Sample rate (sr) required for numpy input")
                 wav = self._normalize_audio(audio, sr)
             audio_list.append(wav)
-        
+
         # Encode each audio
         audio_codes = []
         for wav in audio_list:
             # Prepare input: [batch=1, channels=1, seq_len]
             input_values = wav.reshape(1, 1, -1)
-            
+
             # Run encoder
             result = self.encoder_model({"input_values": input_values})[0]
             codes = torch.from_numpy(result[0])  # [num_quantizers, code_len]
-            
+
             # Transpose to [code_len, num_quantizers] for compatibility
             codes = codes.transpose(0, 1)
             audio_codes.append(codes)
-        
+
         # Return in expected format
         class EncoderOutput:
             def __init__(self, codes):
                 self.audio_codes = codes
-        
+
         if return_dict:
             return EncoderOutput(audio_codes)
         return (audio_codes,)
-    
+
     def decode(
         self,
         encoded,
     ):
         """
         Decode audio codes back to waveform.
-        
+
         Args:
             encoded: Can be:
                 - Object with audio_codes attribute
                 - Dict with "audio_codes" key
                 - List of dicts with "audio_codes" key
-                
+
         Returns:
             Tuple of (wavs: List[np.ndarray], sample_rate: int)
         """
         if self.decoder_model is None:
             raise RuntimeError("Speech tokenizer decoder not loaded")
-        
+
         # Normalize input
         if hasattr(encoded, "audio_codes"):
             audio_codes_list = encoded.audio_codes
@@ -1697,43 +1703,43 @@ class OVQwen3TTSSpeechTokenizer:
             audio_codes_list = [e["audio_codes"] for e in encoded]
         else:
             raise TypeError("encoded must be encoder output, dict, or list of dicts")
-        
+
         # Decode each
         wavs = []
         for codes in audio_codes_list:
             if isinstance(codes, torch.Tensor):
                 codes = codes.numpy()
-            
+
             # Ensure shape is [batch=1, code_len, num_quantizers]
             if codes.ndim == 2:
                 codes = codes.reshape(1, codes.shape[0], codes.shape[1])
-            
+
             # Run decoder
             result = self.decoder_model({"audio_codes": codes.astype(np.int64)})[0]
             wav = result[0]  # [seq_len]
-            
+
             # Trim based on code length
             code_len = codes.shape[1]
             expected_len = code_len * self.decode_upsample_rate
             if wav.shape[0] > expected_len:
                 wav = wav[:expected_len]
-            
+
             wavs.append(wav.astype(np.float32))
-        
+
         return wavs, self.output_sample_rate
-    
+
     def get_model_type(self) -> str:
         return "qwen3_tts_tokenizer_12hz"
-    
+
     def get_input_sample_rate(self) -> int:
         return self.input_sample_rate
-    
+
     def get_output_sample_rate(self) -> int:
         return self.output_sample_rate
-    
+
     def get_encode_downsample_rate(self) -> int:
         return self.encode_downsample_rate
-    
+
     def get_decode_upsample_rate(self) -> int:
         return self.decode_upsample_rate
 
@@ -1741,12 +1747,12 @@ class OVQwen3TTSSpeechTokenizer:
 class OVQwen3TTSModel:
     """
     OpenVINO inference wrapper for Qwen3-TTS models.
-    
+
     Provides the same interface as Qwen3TTSModel for:
       - CustomVoice: generate_custom_voice()
-      - VoiceDesign: generate_voice_design()  
+      - VoiceDesign: generate_voice_design()
       - Base: generate_voice_clone() + create_voice_clone_prompt()
-    
+
     Usage:
         model = OVQwen3TTSModel.from_pretrained("/path/to/converted/model", device="CPU")
         wavs, sr = model.generate_custom_voice(
@@ -1755,7 +1761,7 @@ class OVQwen3TTSModel:
             speaker="Vivian",
         )
     """
-    
+
     def __init__(
         self,
         model_dir: Path,
@@ -1766,38 +1772,38 @@ class OVQwen3TTSModel:
     ):
         # Import here to avoid unnecessary dependencies at module load time
         from qwen_tts.core.models.configuration_qwen3_tts import Qwen3TTSConfig
-        
+
         self.model_dir = Path(model_dir)
         self.device = device
         self.processor = processor
         self.speech_tokenizer = speech_tokenizer
         self.generate_defaults = generate_defaults or {}
-        
+
         # Load config
         self.config = Qwen3TTSConfig.from_pretrained(model_dir)
-        
+
         # Initialize talker using GenerationMixin wrapper
         self.talker = OVQwen3TTSTalkerForConditionalGeneration(model_dir, device, self.config.talker_config)
-        
+
         # Initialize speaker encoder (for base model)
         if self.config.tts_model_type == "base":
             self.speaker_encoder = OVQwen3TTSSpeakerEncoder(model_dir, device)
         else:
             self.speaker_encoder = None
-        
+
         # Model properties
         self.tokenizer_type = self.config.tokenizer_type
         self.tts_model_size = self.config.tts_model_size
         self.tts_model_type = self.config.tts_model_type
         self.speaker_encoder_sample_rate = self.config.speaker_encoder_config.sample_rate
-        
+
         # Supported speakers and languages
         self.supported_speakers = set(self.config.talker_config.spk_id.keys())
         self.supported_languages = {"auto"}
         for language_id in self.config.talker_config.codec_language_id.keys():
             if "dialect" not in language_id:
                 self.supported_languages.add(language_id)
-    
+
     @classmethod
     def from_pretrained(
         cls,
@@ -1808,23 +1814,23 @@ class OVQwen3TTSModel:
     ) -> "OVQwen3TTSModel":
         """
         Load a converted Qwen3-TTS OpenVINO model.
-        
+
         Args:
             model_dir: Path to the converted OpenVINO model directory
             device: OpenVINO device to use (CPU, GPU, etc.)
             checkpoint_path: Path to the original PyTorch checkpoint (for loading processor/tokenizer).
                            If None, will try to load from model_dir or a saved checkpoint_path.txt
             **kwargs: Additional arguments
-            
+
         Returns:
             OVQwen3TTSModel instance
         """
         # Import here to avoid unnecessary dependencies at module load time
         from qwen_tts.core.models import Qwen3TTSProcessor
         import json
-        
+
         model_dir = Path(model_dir)
-        
+
         # Determine checkpoint path for loading processor
         if checkpoint_path is None:
             # Try to load from saved checkpoint_path.txt
@@ -1837,16 +1843,16 @@ class OVQwen3TTSModel:
                 # Fall back to model_dir
                 checkpoint_path = str(model_dir)
                 print(f"No checkpoint_path.txt found, trying to load processor from model_dir")
-        
+
         # Load processor
         processor = Qwen3TTSProcessor.from_pretrained(checkpoint_path, fix_mistral_regex=True)
-        
+
         # Load speech tokenizer - prefer OpenVINO version if available
         speech_tokenizer = None
         speech_tokenizer_ov_path = model_dir / "speech_tokenizer"
         encoder_path = speech_tokenizer_ov_path / SPEECH_TOKENIZER_ENCODER_NAME
         decoder_path = speech_tokenizer_ov_path / SPEECH_TOKENIZER_DECODER_NAME
-        
+
         if encoder_path.exists() and decoder_path.exists():
             # Use OpenVINO speech tokenizer
             print("Loading OpenVINO speech tokenizer")
@@ -1855,6 +1861,7 @@ class OVQwen3TTSModel:
             # Try PyTorch speech tokenizer
             try:
                 from qwen_tts.inference.qwen3_tts_tokenizer import Qwen3TTSTokenizer
+
                 if speech_tokenizer_ov_path.exists():
                     speech_tokenizer = Qwen3TTSTokenizer.from_pretrained(speech_tokenizer_ov_path)
                     print("Loaded PyTorch speech tokenizer from model_dir/speech_tokenizer")
@@ -1867,17 +1874,17 @@ class OVQwen3TTSModel:
                             break
             except ImportError:
                 pass
-            
+
             if speech_tokenizer is None:
                 print("Warning: Speech tokenizer not found. Voice synthesis will not work.")
-        
+
         # Load generation config
         generate_config_path = model_dir / "generation_config.json"
         generate_defaults = {}
         if generate_config_path.exists():
             with open(generate_config_path, "r", encoding="utf-8") as f:
                 generate_defaults = json.load(f)
-        
+
         return cls(
             model_dir=model_dir,
             processor=processor,
@@ -1885,43 +1892,43 @@ class OVQwen3TTSModel:
             generate_defaults=generate_defaults,
             device=device,
         )
-    
+
     def get_supported_speakers(self) -> list:
         """Get list of supported speaker names."""
         return sorted(self.supported_speakers)
-    
+
     def get_supported_languages(self) -> list:
         """Get list of supported languages."""
         return sorted(self.supported_languages)
-    
+
     def _validate_languages(self, languages: list) -> None:
         """Validate that requested languages are supported."""
         for lang in languages:
             if lang is not None and lang.lower() not in self.supported_languages:
                 raise ValueError(f"Unsupported language: {lang}. Supported: {sorted(self.supported_languages)}")
-    
+
     def _validate_speakers(self, speakers: list) -> None:
         """Validate that requested speakers are supported."""
         for spk in speakers:
             if spk is not None and spk != "" and spk.lower() not in self.supported_speakers:
                 raise ValueError(f"Unsupported speaker: {spk}. Supported: {sorted(self.supported_speakers)}")
-    
+
     def _ensure_list(self, x) -> list:
         """Ensure input is a list."""
         return x if isinstance(x, list) else [x]
-    
+
     def _build_assistant_text(self, text: str) -> str:
         """Build assistant text format."""
         return f"<|im_start|>assistant\n{text}<|im_end|>\n<|im_start|>assistant\n"
-    
+
     def _build_ref_text(self, text: str) -> str:
         """Build reference text format for voice clone."""
         return f"<|im_start|>assistant\n{text}<|im_end|>\n"
-    
+
     def _build_instruct_text(self, instruct: str) -> str:
         """Build instruction text format."""
         return f"<|im_start|>user\n{instruct}<|im_end|>\n"
-    
+
     def _tokenize_texts(self, texts: list) -> list:
         """Tokenize list of texts."""
         input_ids = []
@@ -1931,7 +1938,7 @@ class OVQwen3TTSModel:
             input_id = input_id.unsqueeze(0) if input_id.dim() == 1 else input_id
             input_ids.append(input_id)
         return input_ids
-    
+
     def _merge_generate_kwargs(
         self,
         do_sample: Optional[bool] = None,
@@ -1981,7 +1988,7 @@ class OVQwen3TTSModel:
             max_new_tokens=pick("max_new_tokens", max_new_tokens),
         )
         return merged
-    
+
     def _sample_next_token(
         self,
         logits: torch.Tensor,
@@ -1997,20 +2004,20 @@ class OVQwen3TTSModel:
         if generated_tokens is not None and repetition_penalty != 1.0:
             for token in set(generated_tokens):
                 logits[:, :, token] /= repetition_penalty
-        
+
         if not do_sample:
             return logits.argmax(dim=-1)
-        
+
         # Apply temperature
         if temperature != 1.0:
             logits = logits / temperature
-        
+
         # Apply top-k filtering
         if top_k > 0:
             top_k = min(top_k, logits.size(-1))
             indices_to_remove = logits < torch.topk(logits, top_k, dim=-1)[0][..., -1, None]
-            logits[indices_to_remove] = float('-inf')
-        
+            logits[indices_to_remove] = float("-inf")
+
         # Apply top-p filtering
         if top_p < 1.0:
             sorted_logits, sorted_indices = torch.sort(logits, descending=True, dim=-1)
@@ -2019,26 +2026,26 @@ class OVQwen3TTSModel:
             sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone()
             sorted_indices_to_remove[..., 0] = 0
             indices_to_remove = sorted_indices_to_remove.scatter(-1, sorted_indices, sorted_indices_to_remove)
-            logits[indices_to_remove] = float('-inf')
-        
+            logits[indices_to_remove] = float("-inf")
+
         # Sample from the distribution
         probs = torch.softmax(logits, dim=-1)
         next_token = torch.multinomial(probs.view(-1, probs.size(-1)), num_samples=1)
         return next_token.view(logits.shape[:-1])
-    
+
     @torch.inference_mode()
     def generate_custom_voice(
         self,
         text,
         speaker,
-        language = None,
-        instruct = None,
+        language=None,
+        instruct=None,
         non_streaming_mode: bool = True,
         **kwargs,
     ):
         """
         Generate speech with the CustomVoice model using a predefined speaker id.
-        
+
         Args:
             text: Text(s) to synthesize
             speaker: Speaker name(s)
@@ -2046,25 +2053,18 @@ class OVQwen3TTSModel:
             instruct: Optional instruction(s)
             non_streaming_mode: Whether to use non-streaming mode
             **kwargs: Generation parameters
-            
+
         Returns:
             Tuple of (wavs, sample_rate)
         """
         if self.tts_model_type != "custom_voice":
-            raise ValueError(
-                f"Model type {self.tts_model_type} does not support generate_custom_voice. "
-                "Please use a CustomVoice model."
-            )
-        
+            raise ValueError(f"Model type {self.tts_model_type} does not support generate_custom_voice. " "Please use a CustomVoice model.")
+
         texts = self._ensure_list(text)
-        languages = self._ensure_list(language) if isinstance(language, list) else (
-            [language] * len(texts) if language is not None else ["Auto"] * len(texts)
-        )
+        languages = self._ensure_list(language) if isinstance(language, list) else ([language] * len(texts) if language is not None else ["Auto"] * len(texts))
         speakers = self._ensure_list(speaker)
-        instructs = self._ensure_list(instruct) if isinstance(instruct, list) else (
-            [instruct] * len(texts) if instruct is not None else [""] * len(texts)
-        )
-        
+        instructs = self._ensure_list(instruct) if isinstance(instruct, list) else ([instruct] * len(texts) if instruct is not None else [""] * len(texts))
+
         # Expand single values to match batch size
         if len(languages) == 1 and len(texts) > 1:
             languages = languages * len(texts)
@@ -2072,20 +2072,17 @@ class OVQwen3TTSModel:
             speakers = speakers * len(texts)
         if len(instructs) == 1 and len(texts) > 1:
             instructs = instructs * len(texts)
-        
+
         # Validate batch sizes
         if not (len(texts) == len(languages) == len(speakers) == len(instructs)):
-            raise ValueError(
-                f"Batch size mismatch: text={len(texts)}, language={len(languages)}, "
-                f"speaker={len(speakers)}, instruct={len(instructs)}"
-            )
-        
+            raise ValueError(f"Batch size mismatch: text={len(texts)}, language={len(languages)}, " f"speaker={len(speakers)}, instruct={len(instructs)}")
+
         self._validate_languages(languages)
         self._validate_speakers(speakers)
-        
+
         # Tokenize texts
         input_ids = self._tokenize_texts([self._build_assistant_text(t) for t in texts])
-        
+
         # Tokenize instructions
         instruct_ids = []
         for ins in instructs:
@@ -2093,9 +2090,9 @@ class OVQwen3TTSModel:
                 instruct_ids.append(None)
             else:
                 instruct_ids.append(self._tokenize_texts([self._build_instruct_text(ins)])[0])
-        
+
         gen_kwargs = self._merge_generate_kwargs(**kwargs)
-        
+
         # Generate talker codes
         talker_codes_list = self._generate_talker_codes(
             input_ids=input_ids,
@@ -2105,68 +2102,58 @@ class OVQwen3TTSModel:
             non_streaming_mode=non_streaming_mode,
             **gen_kwargs,
         )
-        
+
         # Decode codes to waveforms
         if self.speech_tokenizer is None:
             raise RuntimeError("Speech tokenizer not loaded. Cannot decode audio.")
-        
+
         wavs, fs = self.speech_tokenizer.decode([{"audio_codes": c} for c in talker_codes_list])
         return wavs, fs
-    
+
     @torch.inference_mode()
     def generate_voice_design(
         self,
         text,
-        language = None,
-        instruct = None,
+        language=None,
+        instruct=None,
         non_streaming_mode: bool = True,
         **kwargs,
     ):
         """
         Generate speech with the VoiceDesign model using natural language instructions.
-        
+
         Args:
             text: Text(s) to synthesize
             language: Language(s) for each sample
             instruct: Voice design instruction(s) describing desired voice characteristics
             non_streaming_mode: Whether to use non-streaming mode
             **kwargs: Generation parameters
-            
+
         Returns:
             Tuple of (wavs, sample_rate)
         """
         if self.tts_model_type != "voice_design":
-            raise ValueError(
-                f"Model type {self.tts_model_type} does not support generate_voice_design. "
-                "Please use a VoiceDesign model."
-            )
-        
+            raise ValueError(f"Model type {self.tts_model_type} does not support generate_voice_design. " "Please use a VoiceDesign model.")
+
         texts = self._ensure_list(text)
-        languages = self._ensure_list(language) if isinstance(language, list) else (
-            [language] * len(texts) if language is not None else ["Auto"] * len(texts)
-        )
-        instructs = self._ensure_list(instruct) if isinstance(instruct, list) else (
-            [instruct] * len(texts) if instruct is not None else [""] * len(texts)
-        )
-        
+        languages = self._ensure_list(language) if isinstance(language, list) else ([language] * len(texts) if language is not None else ["Auto"] * len(texts))
+        instructs = self._ensure_list(instruct) if isinstance(instruct, list) else ([instruct] * len(texts) if instruct is not None else [""] * len(texts))
+
         # Expand single values to match batch size
         if len(languages) == 1 and len(texts) > 1:
             languages = languages * len(texts)
         if len(instructs) == 1 and len(texts) > 1:
             instructs = instructs * len(texts)
-        
+
         # Validate batch sizes
         if not (len(texts) == len(languages) == len(instructs)):
-            raise ValueError(
-                f"Batch size mismatch: text={len(texts)}, language={len(languages)}, "
-                f"instruct={len(instructs)}"
-            )
-        
+            raise ValueError(f"Batch size mismatch: text={len(texts)}, language={len(languages)}, " f"instruct={len(instructs)}")
+
         self._validate_languages(languages)
-        
+
         # Tokenize texts
         input_ids = self._tokenize_texts([self._build_assistant_text(t) for t in texts])
-        
+
         # Tokenize instructions
         instruct_ids = []
         for ins in instructs:
@@ -2174,9 +2161,9 @@ class OVQwen3TTSModel:
                 instruct_ids.append(None)
             else:
                 instruct_ids.append(self._tokenize_texts([self._build_instruct_text(ins)])[0])
-        
+
         gen_kwargs = self._merge_generate_kwargs(**kwargs)
-        
+
         # Generate talker codes (VoiceDesign doesn't use speaker parameter)
         talker_codes_list = self._generate_talker_codes(
             input_ids=input_ids,
@@ -2186,14 +2173,14 @@ class OVQwen3TTSModel:
             non_streaming_mode=non_streaming_mode,
             **gen_kwargs,
         )
-        
+
         # Decode codes to waveforms
         if self.speech_tokenizer is None:
             raise RuntimeError("Speech tokenizer not loaded. Cannot decode audio.")
-        
+
         wavs, fs = self.speech_tokenizer.decode([{"audio_codes": c} for c in talker_codes_list])
         return wavs, fs
-    
+
     def _load_audio_to_np(self, audio_path: str):
         """Load audio from file path or URL to numpy array."""
         import librosa
@@ -2201,29 +2188,31 @@ class OVQwen3TTSModel:
         import base64
         import urllib.request
         from urllib.parse import urlparse
-        
+
         def is_url(s):
             try:
                 u = urlparse(s)
                 return u.scheme in ("http", "https") and bool(u.netloc)
             except:
                 return False
-        
+
         def is_base64(s):
             if s.startswith("data:audio"):
                 return True
             if ("/" not in s and "\\" not in s) and len(s) > 256:
                 return True
             return False
-        
+
         if is_url(audio_path):
             import soundfile as sf
+
             with urllib.request.urlopen(audio_path) as resp:
                 audio_bytes = resp.read()
             with io.BytesIO(audio_bytes) as f:
                 audio, sr = sf.read(f, dtype="float32", always_2d=False)
         elif is_base64(audio_path):
             import soundfile as sf
+
             if "," in audio_path and audio_path.strip().startswith("data:"):
                 audio_path = audio_path.split(",", 1)[1]
             wav_bytes = base64.b64decode(audio_path)
@@ -2231,19 +2220,19 @@ class OVQwen3TTSModel:
                 audio, sr = sf.read(f, dtype="float32", always_2d=False)
         else:
             audio, sr = librosa.load(audio_path, sr=None, mono=True)
-        
+
         if audio.ndim > 1:
             audio = np.mean(audio, axis=-1)
-        
+
         return audio.astype(np.float32), int(sr)
-    
+
     def _normalize_audio_inputs(self, audios):
         """Normalize audio inputs to list of (waveform, sr) tuples."""
         if isinstance(audios, list):
             items = audios
         else:
             items = [audios]
-        
+
         out = []
         for a in items:
             if isinstance(a, str):
@@ -2254,40 +2243,36 @@ class OVQwen3TTSModel:
                 raise ValueError("For numpy waveform input, pass a tuple (audio, sr).")
             else:
                 raise TypeError(f"Unsupported audio input type: {type(a)}")
-        
+
         for i, (audio, sr) in enumerate(out):
             if audio.ndim > 1:
                 audio = np.mean(audio, axis=-1).astype(np.float32)
                 out[i] = (audio, sr)
-        
+
         return out
-    
+
     def extract_speaker_embedding(self, audio: np.ndarray, sr: int) -> torch.Tensor:
         """
         Extract speaker embedding from audio using the speaker encoder.
-        
+
         Args:
             audio: Audio waveform as numpy array (should be at 24kHz)
             sr: Sample rate of the audio (should be 24000)
-            
+
         Returns:
             Speaker embedding tensor
         """
         if self.speaker_encoder is None or self.speaker_encoder.model is None:
             raise RuntimeError("Speaker encoder not available for this model type")
-        
+
         import librosa
         from librosa.filters import mel as librosa_mel_fn
-        
+
         # Resample if necessary
         if sr != self.speaker_encoder_sample_rate:
-            audio = librosa.resample(
-                y=audio.astype(np.float32),
-                orig_sr=sr,
-                target_sr=self.speaker_encoder_sample_rate
-            )
+            audio = librosa.resample(y=audio.astype(np.float32), orig_sr=sr, target_sr=self.speaker_encoder_sample_rate)
             sr = self.speaker_encoder_sample_rate
-        
+
         # Compute mel spectrogram using the same parameters as the original model
         # Parameters from modeling_qwen3_tts.py extract_speaker_embedding:
         # n_fft=1024, num_mels=128, sampling_rate=24000, hop_size=256, win_size=1024, fmin=0, fmax=12000
@@ -2297,21 +2282,19 @@ class OVQwen3TTSModel:
         win_size = 1024
         fmin = 0
         fmax = 12000
-        
+
         # Convert to tensor
         y = torch.from_numpy(audio).unsqueeze(0).float()
-        
+
         # Get mel filterbank
-        mel_basis = librosa_mel_fn(
-            sr=sr, n_fft=n_fft, n_mels=num_mels, fmin=fmin, fmax=fmax
-        )
+        mel_basis = librosa_mel_fn(sr=sr, n_fft=n_fft, n_mels=num_mels, fmin=fmin, fmax=fmax)
         mel_basis = torch.from_numpy(mel_basis).float()
-        
+
         # Compute STFT
         hann_window = torch.hann_window(win_size)
         padding = (n_fft - hop_size) // 2
         y = torch.nn.functional.pad(y.unsqueeze(1), (padding, padding), mode="reflect").squeeze(1)
-        
+
         spec = torch.stft(
             y,
             n_fft,
@@ -2325,26 +2308,26 @@ class OVQwen3TTSModel:
             return_complex=True,
         )
         spec = torch.abs(spec)
-        
+
         # Apply mel filterbank
         spec = torch.matmul(mel_basis, spec)
-        
+
         # Dynamic range compression (log)
         spec = torch.log(torch.clamp(spec, min=1e-5))
-        
+
         # Transpose to [batch, time, mel_dim]
         mels = spec.transpose(1, 2)
-        
+
         # Extract embedding using OpenVINO model
         embedding = self.speaker_encoder(mels)
-        
+
         return embedding.squeeze(0)
-    
+
     def create_voice_clone_prompt(
         self,
         ref_audio,
-        ref_text = None,
-        x_vector_only_mode = False,
+        ref_text=None,
+        x_vector_only_mode=False,
     ):
         """
         Build voice-clone prompt items from reference audio (and optionally reference text) using Base model.
@@ -2367,29 +2350,24 @@ class OVQwen3TTSModel:
             List of VoiceClonePromptItem dicts
         """
         import librosa
-        
+
         if self.tts_model_type != "base":
-            raise ValueError(
-                f"Model type {self.tts_model_type} does not support create_voice_clone_prompt. "
-                "Please use a Base model."
-            )
-        
+            raise ValueError(f"Model type {self.tts_model_type} does not support create_voice_clone_prompt. " "Please use a Base model.")
+
         ref_audio_list = self._ensure_list(ref_audio)
         ref_text_list = self._ensure_list(ref_text) if isinstance(ref_text, list) else ([ref_text] * len(ref_audio_list))
         xvec_list = self._ensure_list(x_vector_only_mode) if isinstance(x_vector_only_mode, list) else ([x_vector_only_mode] * len(ref_audio_list))
-        
+
         if len(ref_text_list) != len(ref_audio_list) or len(xvec_list) != len(ref_audio_list):
-            raise ValueError(
-                f"Batch size mismatch: ref_audio={len(ref_audio_list)}, ref_text={len(ref_text_list)}, x_vector_only_mode={len(xvec_list)}"
-            )
-        
+            raise ValueError(f"Batch size mismatch: ref_audio={len(ref_audio_list)}, ref_text={len(ref_text_list)}, x_vector_only_mode={len(xvec_list)}")
+
         # Normalize audio inputs
         normalized = self._normalize_audio_inputs(ref_audio_list)
-        
+
         # Encode reference audio to codes
         ref_wavs = [wav for wav, sr in normalized]
         ref_srs = [sr for wav, sr in normalized]
-        
+
         if len(set(ref_srs)) == 1:
             enc = self.speech_tokenizer.encode(ref_wavs, sr=ref_srs[0])
             ref_codes = enc.audio_codes
@@ -2398,36 +2376,34 @@ class OVQwen3TTSModel:
             for wav, sr in normalized:
                 enc = self.speech_tokenizer.encode(wav, sr=sr)
                 ref_codes.append(enc.audio_codes[0])
-        
+
         # Build prompt items
         items = []
         for i, ((wav, sr), code, rtext, xvec_only) in enumerate(zip(normalized, ref_codes, ref_text_list, xvec_list)):
             if not xvec_only:
                 if rtext is None or rtext == "":
                     raise ValueError(f"ref_text is required when x_vector_only_mode=False (ICL mode). Bad index={i}")
-            
+
             # Resample for speaker encoder
             wav_resample = wav
             if sr != self.speaker_encoder_sample_rate:
-                wav_resample = librosa.resample(
-                    y=wav.astype(np.float32),
-                    orig_sr=int(sr),
-                    target_sr=self.speaker_encoder_sample_rate
-                )
-            
+                wav_resample = librosa.resample(y=wav.astype(np.float32), orig_sr=int(sr), target_sr=self.speaker_encoder_sample_rate)
+
             # Extract speaker embedding
             spk_emb = self.extract_speaker_embedding(wav_resample, self.speaker_encoder_sample_rate)
-            
-            items.append({
-                "ref_code": None if xvec_only else code,
-                "ref_spk_embedding": spk_emb,
-                "x_vector_only_mode": bool(xvec_only),
-                "icl_mode": bool(not xvec_only),
-                "ref_text": rtext,
-            })
-        
+
+            items.append(
+                {
+                    "ref_code": None if xvec_only else code,
+                    "ref_spk_embedding": spk_emb,
+                    "x_vector_only_mode": bool(xvec_only),
+                    "icl_mode": bool(not xvec_only),
+                    "ref_text": rtext,
+                }
+            )
+
         return items
-    
+
     def _prompt_items_to_voice_clone_prompt(self, items):
         """Convert list of prompt items to voice_clone_prompt dict."""
         return {
@@ -2436,15 +2412,15 @@ class OVQwen3TTSModel:
             "x_vector_only_mode": [it["x_vector_only_mode"] for it in items],
             "icl_mode": [it["icl_mode"] for it in items],
         }
-    
+
     def generate_voice_clone(
         self,
         text,
-        language = None,
-        ref_audio = None,
-        ref_text = None,
-        x_vector_only_mode = False,
-        voice_clone_prompt = None,
+        language=None,
+        ref_audio=None,
+        ref_text=None,
+        x_vector_only_mode=False,
+        voice_clone_prompt=None,
         non_streaming_mode: bool = False,
         **kwargs,
     ):
@@ -2469,32 +2445,23 @@ class OVQwen3TTSModel:
             Tuple of (wavs: List[np.ndarray], sample_rate: int)
         """
         if self.tts_model_type != "base":
-            raise ValueError(
-                f"Model type {self.tts_model_type} does not support generate_voice_clone. "
-                "Please use a Base model."
-            )
-        
+            raise ValueError(f"Model type {self.tts_model_type} does not support generate_voice_clone. " "Please use a Base model.")
+
         texts = self._ensure_list(text)
-        languages = self._ensure_list(language) if isinstance(language, list) else (
-            [language] * len(texts) if language is not None else ["Auto"] * len(texts)
-        )
-        
+        languages = self._ensure_list(language) if isinstance(language, list) else ([language] * len(texts) if language is not None else ["Auto"] * len(texts))
+
         if len(languages) == 1 and len(texts) > 1:
             languages = languages * len(texts)
         if len(texts) != len(languages):
             raise ValueError(f"Batch size mismatch: text={len(texts)}, language={len(languages)}")
-        
+
         self._validate_languages(languages)
-        
+
         # Build or use provided prompt
         if voice_clone_prompt is None:
             if ref_audio is None:
                 raise ValueError("Either voice_clone_prompt or ref_audio must be provided.")
-            prompt_items = self.create_voice_clone_prompt(
-                ref_audio=ref_audio,
-                ref_text=ref_text,
-                x_vector_only_mode=x_vector_only_mode
-            )
+            prompt_items = self.create_voice_clone_prompt(ref_audio=ref_audio, ref_text=ref_text, x_vector_only_mode=x_vector_only_mode)
             if len(prompt_items) == 1 and len(texts) > 1:
                 prompt_items = prompt_items * len(texts)
             if len(prompt_items) != len(texts):
@@ -2513,11 +2480,11 @@ class OVQwen3TTSModel:
             else:
                 voice_clone_prompt_dict = voice_clone_prompt
                 ref_texts_for_ids = None
-        
+
         # Tokenize texts
         input_texts = [self._build_assistant_text(t) for t in texts]
         input_ids = self._tokenize_texts(input_texts)
-        
+
         # Tokenize reference texts
         ref_ids = None
         if ref_texts_for_ids is not None:
@@ -2528,9 +2495,9 @@ class OVQwen3TTSModel:
                 else:
                     ref_tok = self._tokenize_texts([self._build_ref_text(rt)])[0]
                     ref_ids.append(ref_tok)
-        
+
         gen_kwargs = self._merge_generate_kwargs(**kwargs)
-        
+
         # Generate talker codes
         talker_codes_list = self._generate_talker_codes(
             input_ids=input_ids,
@@ -2540,7 +2507,7 @@ class OVQwen3TTSModel:
             non_streaming_mode=non_streaming_mode,
             **gen_kwargs,
         )
-        
+
         # Concatenate ref codes with generated codes for decoding
         codes_for_decode = []
         for i, codes in enumerate(talker_codes_list):
@@ -2553,27 +2520,27 @@ class OVQwen3TTSModel:
                     codes_for_decode.append(torch.cat([torch.from_numpy(ref_code), codes], dim=0))
             else:
                 codes_for_decode.append(codes)
-        
+
         # Decode codes to waveforms
         if self.speech_tokenizer is None:
             raise RuntimeError("Speech tokenizer not loaded. Cannot decode audio.")
-        
+
         wavs_all, fs = self.speech_tokenizer.decode([{"audio_codes": c} for c in codes_for_decode])
-        
+
         # Trim ref audio from output
         wavs_out = []
         for i, wav in enumerate(wavs_all):
             ref_code_list = voice_clone_prompt_dict.get("ref_code", None)
             if ref_code_list is not None and ref_code_list[i] is not None:
-                ref_len = int(ref_code_list[i].shape[0] if hasattr(ref_code_list[i], 'shape') else len(ref_code_list[i]))
+                ref_len = int(ref_code_list[i].shape[0] if hasattr(ref_code_list[i], "shape") else len(ref_code_list[i]))
                 total_len = int(codes_for_decode[i].shape[0])
                 cut = int(ref_len / max(total_len, 1) * wav.shape[0])
                 wavs_out.append(wav[cut:])
             else:
                 wavs_out.append(wav)
-        
+
         return wavs_out, fs
-    
+
     def _generate_talker_codes(
         self,
         input_ids: list,
@@ -2597,44 +2564,44 @@ class OVQwen3TTSModel:
     ) -> list:
         """
         Generate talker codes using OpenVINO models with GenerationMixin.
-        
+
         This method follows the original Qwen3TTSForConditionalGeneration.generate() flow,
         using self.talker.generate() instead of manual loop.
         """
         batch_size = len(input_ids)
         talker_codes_list = []
-        
+
         # Process each sample in batch
         for idx in range(batch_size):
             # Reset KV cache states
             self.talker.request.reset_state()
             self.talker.code_predictor.request.reset_state()
             self.talker.rope_deltas = None
-            
+
             input_id = input_ids[idx]
             language = languages[idx] if languages else "Auto"
             speaker = speakers[idx] if speakers else None
             instruct_id = instruct_ids[idx] if instruct_ids else None
             ref_id = ref_ids[idx] if ref_ids else None
-            
+
             # Check if this is a voice clone request
             is_voice_clone = voice_clone_prompt is not None
             ref_spk_embedding = None
             x_vector_only_mode = False
             icl_mode = False
-            
+
             if is_voice_clone:
                 ref_spk_embedding_list = voice_clone_prompt.get("ref_spk_embedding", [])
                 x_vector_only_mode_list = voice_clone_prompt.get("x_vector_only_mode", [])
                 icl_mode_list = voice_clone_prompt.get("icl_mode", [])
-                
+
                 if idx < len(ref_spk_embedding_list):
                     ref_spk_embedding = ref_spk_embedding_list[idx]
                 if idx < len(x_vector_only_mode_list):
                     x_vector_only_mode = x_vector_only_mode_list[idx]
                 if idx < len(icl_mode_list):
                     icl_mode = icl_mode_list[idx]
-            
+
             # Get special embeddings
             special_token_ids = torch.tensor(
                 [[self.config.tts_bos_token_id, self.config.tts_eos_token_id, self.config.tts_pad_token_id]],
@@ -2642,19 +2609,19 @@ class OVQwen3TTSModel:
             )
             special_embeds = self.talker.text_projection(self.talker.get_text_embeddings()(special_token_ids))
             tts_bos_embed, tts_eos_embed, tts_pad_embed = special_embeds.chunk(3, dim=1)
-            
+
             # Get language ID
             language_id = None
             if language.lower() != "auto":
                 if language.lower() in self.config.talker_config.codec_language_id:
                     language_id = self.config.talker_config.codec_language_id[language.lower()]
-            
+
             # Handle dialect
             if language.lower() in ["chinese", "auto"] and speaker and speaker.lower() in self.config.talker_config.spk_is_dialect:
                 dialect = self.config.talker_config.spk_is_dialect[speaker.lower()]
                 if dialect:
                     language_id = self.config.talker_config.codec_language_id[dialect]
-            
+
             # Get speaker embedding
             speaker_embed = None
             if ref_spk_embedding is not None:
@@ -2666,67 +2633,70 @@ class OVQwen3TTSModel:
             elif speaker and speaker != "" and speaker.lower() in self.config.talker_config.spk_id:
                 spk_id = self.config.talker_config.spk_id[speaker.lower()]
                 speaker_embed = self.talker.get_input_embeddings()(torch.tensor([[spk_id]], dtype=input_id.dtype))
-            
+
             # Build codec prefill
             if language_id is None:
-                codec_prefill_list = [[
-                    self.config.talker_config.codec_nothink_id,
-                    self.config.talker_config.codec_think_bos_id,
-                    self.config.talker_config.codec_think_eos_id,
-                ]]
+                codec_prefill_list = [
+                    [
+                        self.config.talker_config.codec_nothink_id,
+                        self.config.talker_config.codec_think_bos_id,
+                        self.config.talker_config.codec_think_eos_id,
+                    ]
+                ]
             else:
-                codec_prefill_list = [[
-                    self.config.talker_config.codec_think_id,
-                    self.config.talker_config.codec_think_bos_id,
-                    language_id,
-                    self.config.talker_config.codec_think_eos_id,
-                ]]
-            
-            codec_input_embedding_0 = self.talker.get_input_embeddings()(
-                torch.tensor(codec_prefill_list, dtype=input_id.dtype)
-            )
+                codec_prefill_list = [
+                    [
+                        self.config.talker_config.codec_think_id,
+                        self.config.talker_config.codec_think_bos_id,
+                        language_id,
+                        self.config.talker_config.codec_think_eos_id,
+                    ]
+                ]
+
+            codec_input_embedding_0 = self.talker.get_input_embeddings()(torch.tensor(codec_prefill_list, dtype=input_id.dtype))
             codec_input_embedding_1 = self.talker.get_input_embeddings()(
-                torch.tensor([[
-                    self.config.talker_config.codec_pad_id,
-                    self.config.talker_config.codec_bos_id,
-                ]], dtype=input_id.dtype)
+                torch.tensor(
+                    [
+                        [
+                            self.config.talker_config.codec_pad_id,
+                            self.config.talker_config.codec_bos_id,
+                        ]
+                    ],
+                    dtype=input_id.dtype,
+                )
             )
-            
+
             if speaker_embed is None:
                 codec_input_embedding = torch.cat([codec_input_embedding_0, codec_input_embedding_1], dim=1)
             else:
-                codec_input_embedding = torch.cat([
-                    codec_input_embedding_0,
-                    speaker_embed.view(1, 1, -1),
-                    codec_input_embedding_1
-                ], dim=1)
-            
+                codec_input_embedding = torch.cat([codec_input_embedding_0, speaker_embed.view(1, 1, -1), codec_input_embedding_1], dim=1)
+
             # Build talker input embeddings
             # Role embedding: <|im_start|>assistant\n
-            talker_input_embed_role = self.talker.text_projection(
-                self.talker.get_text_embeddings()(input_id[:, :3])
-            )
-            
+            talker_input_embed_role = self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, :3]))
+
             # TTS embeddings
-            talker_input_embed = torch.cat([
-                tts_pad_embed.expand(-1, codec_input_embedding.shape[1] - 2, -1),
-                tts_bos_embed,
-            ], dim=1) + codec_input_embedding[:, :-1]
-            
+            talker_input_embed = (
+                torch.cat(
+                    [
+                        tts_pad_embed.expand(-1, codec_input_embedding.shape[1] - 2, -1),
+                        tts_bos_embed,
+                    ],
+                    dim=1,
+                )
+                + codec_input_embedding[:, :-1]
+            )
+
             talker_input_embed = torch.cat([talker_input_embed_role, talker_input_embed], dim=1)
-            
+
             # Add instruct embeddings if provided
             if instruct_id is not None:
-                instruct_embed = self.talker.text_projection(
-                    self.talker.get_text_embeddings()(instruct_id)
-                )
+                instruct_embed = self.talker.text_projection(self.talker.get_text_embeddings()(instruct_id))
                 talker_input_embed = torch.cat([instruct_embed, talker_input_embed], dim=1)
-            
+
             # Add reference text embeddings for ICL mode (voice clone)
             if icl_mode and ref_id is not None:
-                ref_embed = self.talker.text_projection(
-                    self.talker.get_text_embeddings()(ref_id)
-                )
+                ref_embed = self.talker.text_projection(self.talker.get_text_embeddings()(ref_id))
                 # Get ref codes for embedding
                 ref_code_list = voice_clone_prompt.get("ref_code", [])
                 if idx < len(ref_code_list) and ref_code_list[idx] is not None:
@@ -2735,74 +2705,56 @@ class OVQwen3TTSModel:
                         ref_code_tensor = ref_code
                     else:
                         ref_code_tensor = torch.from_numpy(ref_code)
-                    
+
                     # Embed ref codes
                     ref_code_ids = ref_code_tensor[:, 0].long().view(1, -1)
                     ref_code_embed = self.talker.get_input_embeddings()(ref_code_ids)
-                    
+
                     ref_text_len = ref_embed.shape[1]
                     ref_code_len = ref_code_embed.shape[1]
-                    
+
                     if ref_text_len <= ref_code_len:
                         pad_len = ref_code_len - ref_text_len
-                        ref_embed_padded = torch.cat([
-                            ref_embed,
-                            tts_pad_embed.expand(-1, pad_len, -1)
-                        ], dim=1)
+                        ref_embed_padded = torch.cat([ref_embed, tts_pad_embed.expand(-1, pad_len, -1)], dim=1)
                         ref_prefill_embed = ref_embed_padded + ref_code_embed
                     else:
                         pad_len = ref_text_len - ref_code_len
-                        codec_pad_ids = torch.tensor(
-                            [[self.config.talker_config.codec_pad_id] * pad_len],
-                            dtype=ref_code_ids.dtype
-                        )
-                        ref_code_embed_padded = torch.cat([
-                            ref_code_embed,
-                            self.talker.get_input_embeddings()(codec_pad_ids)
-                        ], dim=1)
+                        codec_pad_ids = torch.tensor([[self.config.talker_config.codec_pad_id] * pad_len], dtype=ref_code_ids.dtype)
+                        ref_code_embed_padded = torch.cat([ref_code_embed, self.talker.get_input_embeddings()(codec_pad_ids)], dim=1)
                         ref_prefill_embed = ref_embed + ref_code_embed_padded
-                    
+
                     talker_input_embed = torch.cat([ref_prefill_embed, talker_input_embed], dim=1)
-            
+
             # Handle streaming vs non-streaming mode
             if non_streaming_mode:
                 # Add text embedding + trailing text
-                text_embed = self.talker.text_projection(
-                    self.talker.get_text_embeddings()(input_id[:, 3:-5])
-                )
+                text_embed = self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, 3:-5]))
                 text_embed_with_eos = torch.cat([text_embed, tts_eos_embed], dim=1)
                 codec_pad_embed = self.talker.get_input_embeddings()(
                     torch.tensor([[self.config.talker_config.codec_pad_id] * text_embed_with_eos.shape[1]], dtype=input_id.dtype)
                 )
-                codec_bos_embed = self.talker.get_input_embeddings()(
-                    torch.tensor([[self.config.talker_config.codec_bos_id]], dtype=input_id.dtype)
+                codec_bos_embed = self.talker.get_input_embeddings()(torch.tensor([[self.config.talker_config.codec_bos_id]], dtype=input_id.dtype))
+
+                talker_input_embed = torch.cat(
+                    [
+                        talker_input_embed,
+                        text_embed_with_eos + codec_pad_embed,
+                        tts_pad_embed + codec_bos_embed,
+                    ],
+                    dim=1,
                 )
-                
-                talker_input_embed = torch.cat([
-                    talker_input_embed,
-                    text_embed_with_eos + codec_pad_embed,
-                    tts_pad_embed + codec_bos_embed,
-                ], dim=1)
                 trailing_text_hidden = tts_pad_embed
             else:
                 # Streaming mode
-                first_text_embed = self.talker.text_projection(
-                    self.talker.get_text_embeddings()(input_id[:, 3:4])
-                )
-                talker_input_embed = torch.cat([
-                    talker_input_embed,
-                    first_text_embed + codec_input_embedding[:, -1:]
-                ], dim=1)
-                
-                trailing_text_hidden = torch.cat([
-                    self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, 4:-5])),
-                    tts_eos_embed
-                ], dim=1)
-            
+                first_text_embed = self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, 3:4]))
+                talker_input_embed = torch.cat([talker_input_embed, first_text_embed + codec_input_embedding[:, -1:]], dim=1)
+
+                trailing_text_hidden = torch.cat([self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, 4:-5])), tts_eos_embed], dim=1)
+
             # Build attention mask
             seq_len = talker_input_embed.shape[1]
             attention_mask = torch.ones([1, seq_len], dtype=torch.long)
-            
+
             # Setup generation kwargs for talker
             talker_kwargs = dict(
                 inputs_embeds=talker_input_embed,
@@ -2825,27 +2777,27 @@ class OVQwen3TTSModel:
                 return_dict_in_generate=True,
                 output_hidden_states=True,
             )
-            
+
             # Generate using GenerationMixin
             generation_output = self.talker.generate(**talker_kwargs)
-            
+
             # Extract talker codes from output
             # The hidden_states tuple contains (hidden_states, codec_ids) for each step
             # codec_ids has shape [batch, num_code_groups]
             generated_codes = []
-            if hasattr(generation_output, 'hidden_states') and generation_output.hidden_states:
+            if hasattr(generation_output, "hidden_states") and generation_output.hidden_states:
                 for step_hidden in generation_output.hidden_states:
                     if isinstance(step_hidden, tuple) and len(step_hidden) == 2:
                         codec_ids = step_hidden[1]
                         if codec_ids is not None:
                             generated_codes.append(codec_ids.squeeze(0))
-            
+
             if len(generated_codes) > 0:
                 talker_codes = torch.stack(generated_codes, dim=0)
             else:
                 # Fallback: use sequences if no codec_ids in hidden states
                 talker_codes = generation_output.sequences[:, 1:].T  # Remove first token, transpose
-            
+
             talker_codes_list.append(talker_codes)
-        
+
         return talker_codes_list
