@@ -16,17 +16,21 @@ try:
     from transformers.cache_utils import DynamicCache, DynamicLayer
     from torch._dynamo import is_compiling as is_torchdynamo_compiling
     from transformers.utils import is_torch_xpu_available
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
+
     # Define dummy functions for when torch is not available
     def is_torchdynamo_compiling():
         return False
+
     is_torch_xpu_available = False
 
 # Import nncf only when needed for compression
 try:
     import nncf
+
     NNCF_AVAILABLE = True
 except ImportError:
     NNCF_AVAILABLE = False
@@ -285,7 +289,7 @@ def fuse_cache_reorder(
     beam_idx.output(0).get_tensor().add_names({"beam_idx"})
     ov_model.add_parameters([beam_idx])
     not_kv_inputs.append(ov_model.inputs[-1])
-    
+
     for input_name in key_value_input_names:
         parameter_output_port = ov_model.input(input_name)
         consumers = parameter_output_port.get_target_inputs()
@@ -338,7 +342,7 @@ def make_stateful(
             if shape.rank.get_length() <= 2:
                 shape[0] = num_beams_and_batch
                 input.get_node().set_partial_shape(shape)
-                
+
     for kv_name_pair in zip(key_value_input_names, key_value_output_names):
         input_output_map[kv_name_pair[0]] = kv_name_pair[1]
         if num_beams_and_batch is not None:
@@ -407,7 +411,7 @@ def _get_feat_extract_output_lengths(input_lengths):
 def convert_qwen3_asr_model(model_id, output_dir, quantization_config=None, use_local_dir=False):
     """
     Convert Qwen3-ASR model to OpenVINO format.
-    
+
     Args:
         model_id: HuggingFace model ID or local path
         output_dir: Output directory for converted models
@@ -418,18 +422,20 @@ def convert_qwen3_asr_model(model_id, output_dir, quantization_config=None, use_
         raise ImportError("PyTorch is required for model conversion. Please install torch.")
 
     thinker_output_dir = Path(output_dir) / "thinker"
-    
+
     thinker_lang_path = thinker_output_dir / THINKER_LANGUAGE_NAME
     thinker_audio_path = thinker_output_dir / THINKER_AUDIO_NAME
     thinker_audio_encoder_path = thinker_output_dir / THINKER_AUDIO_ENCODER_NAME
     thinker_embedding_path = thinker_output_dir / THINKER_EMBEDDING_NAME
 
-    if all([
-        thinker_lang_path.exists(),
-        thinker_audio_path.exists(),
-        thinker_audio_encoder_path.exists(),
-        thinker_embedding_path.exists(),
-    ]):
+    if all(
+        [
+            thinker_lang_path.exists(),
+            thinker_audio_path.exists(),
+            thinker_audio_encoder_path.exists(),
+            thinker_embedding_path.exists(),
+        ]
+    ):
         print(f"✅ {model_id} model already converted. You can find results in {output_dir}")
         return
 
@@ -446,14 +452,10 @@ def convert_qwen3_asr_model(model_id, output_dir, quantization_config=None, use_
     config = Qwen3ASRConfig.from_pretrained(ckpt)
     config.thinker_config.text_config._attn_implementation_autoset = False
     config.thinker_config.text_config._attn_implementation = "sdpa"
-    
-    model = Qwen3ASRForConditionalGeneration.from_pretrained(
-        ckpt, 
-        config=config, 
-        torch_dtype=torch.float16
-    )
+
+    model = Qwen3ASRForConditionalGeneration.from_pretrained(ckpt, config=config, torch_dtype=torch.float16)
     model.eval()
-    
+
     # Try to load processor if available
     try:
         processor = AutoProcessor.from_pretrained(ckpt)
@@ -494,7 +496,7 @@ def convert_qwen3_asr_model(model_id, output_dir, quantization_config=None, use_
         b, c, f, t = padded_embed.size()
         padded_embed = self.conv_out(padded_embed.permute(0, 3, 1, 2).contiguous().view(b, t, c * f))
         return padded_embed
-    
+
     def forward_wrap_audio_encoder(self, hidden_states, cu_seqlens):
         """
         Audio encoder forward for transformer layers.
@@ -516,11 +518,11 @@ def convert_qwen3_asr_model(model_id, output_dir, quantization_config=None, use_
 
     audio = model.thinker.audio_tower
     audio._orig_forward = audio.forward
-    
+
     # Get dimensions from audio config
     num_mel_bins = audio.config.num_mel_bins
     d_model = audio.config.d_model
-    
+
     if not thinker_audio_path.exists():
         print("⌛ Convert thinker audio model (Conv2D part)")
         __make_16bit_traceable(audio)
@@ -530,6 +532,7 @@ def convert_qwen3_asr_model(model_id, output_dir, quantization_config=None, use_
             example_input={
                 "padded_feature": torch.randn([3, num_mel_bins, 100], dtype=torch.float32),
             },
+            input=[ov.PartialShape([-1, num_mel_bins, -1])],
         )
         ov.save_model(ov_model, thinker_audio_path)
         del ov_model
@@ -548,6 +551,10 @@ def convert_qwen3_asr_model(model_id, output_dir, quantization_config=None, use_
                 "hidden_states": torch.randn([5, d_model], dtype=torch.float32),
                 "cu_seqlens": torch.tensor([0, 5], dtype=torch.int32),
             },
+            input=[
+                ov.PartialShape([-1, d_model]),
+                ov.PartialShape([-1]),
+            ],
         )
         ov.save_model(ov_model, thinker_audio_encoder_path)
         del ov_model
@@ -610,7 +617,7 @@ def convert_qwen3_asr_model(model_id, output_dir, quantization_config=None, use_
             2,
             lang_model.model.config.head_dim,
         )
-        
+
         cache_position = torch.arange(2, 4)
         position_ids = cache_position.view(1, 1, -1).expand(3, 2, -1)
 
@@ -625,7 +632,7 @@ def convert_qwen3_asr_model(model_id, output_dir, quantization_config=None, use_
             input_names.extend([f"past_key_values.{i}.key", f"past_key_values.{i}.value"])
             output_names.extend([f"present.{i}.key", f"present.{i}.value"])
         input_names.append("inputs_embeds")
-        
+
         example_input = {
             "inputs_embeds": input_embeds,
             "attention_mask": attention_mask,
@@ -651,17 +658,17 @@ def convert_qwen3_asr_model(model_id, output_dir, quantization_config=None, use_
             * 2
             * num_pkv
         )
-        input_shapes += [ov.PartialShape([-1, -1, input_embeds.shape[-1]])]
-        
+        input_shapes += [ov.PartialShape([1, -1, hidden_size])]
+
         __make_16bit_traceable(lang_model)
         ov_model = ov.convert_model(lang_model, example_input=example_input, input=input_shapes)
-        
+
         for input, input_name in zip(ov_model.inputs, input_names):
             input.get_tensor().set_names({input_name})
 
         for output, output_name in zip(ov_model.outputs, output_names):
             output.get_tensor().set_names({output_name})
-        
+
         patch_stateful(ov_model, 1)
         print("✅ Thinker language model successfully converted")
 
@@ -692,6 +699,7 @@ from typing import List, Union
 try:
     from transformers.generation import GenerationMixin, GenerationConfig
     from transformers.modeling_outputs import BaseModelOutput, ModelOutput
+
     GENERATION_MIXIN_AVAILABLE = True
 except ImportError:
     GENERATION_MIXIN_AVAILABLE = False
@@ -714,6 +722,7 @@ try:
     )
     from qwen_asr.core.transformers_backend.configuration_qwen3_asr import Qwen3ASRConfig
     from qwen_asr.core.transformers_backend.processing_qwen3_asr import Qwen3ASRProcessor
+
     INFERENCE_UTILS_AVAILABLE = True
 except ImportError:
     INFERENCE_UTILS_AVAILABLE = False
@@ -732,6 +741,7 @@ class ASRTranscription:
         text (str): Transcribed text.
         time_stamps (Optional[Any]): Forced aligner output (not supported in OV version).
     """
+
     language: str
     text: str
     time_stamps: Optional[Any] = None
@@ -740,6 +750,7 @@ class ASRTranscription:
 @dataclass
 class Qwen3ASRThinkerCausalLMOutputWithPast(ModelOutput):
     """Output class for ASR Thinker model."""
+
     loss: Optional[torch.FloatTensor] = None
     logits: Optional[torch.FloatTensor] = None
     past_key_values: Optional[tuple] = None
@@ -750,11 +761,12 @@ class Qwen3ASRThinkerCausalLMOutputWithPast(ModelOutput):
 
 class SinusoidsPositionEmbedding:
     """Sinusoidal positional embeddings for audio encoder."""
+
     def __init__(self, max_position_embeddings: int, embed_dim: int):
         self.max_position_embeddings = max_position_embeddings
         self.embed_dim = embed_dim
         self.positional_embedding = self._create_sinusoidal_embeddings()
-    
+
     def _create_sinusoidal_embeddings(self) -> torch.Tensor:
         """Create sinusoidal position embeddings."""
         position = torch.arange(self.max_position_embeddings).unsqueeze(1)
@@ -763,7 +775,7 @@ class SinusoidsPositionEmbedding:
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
         return pe
-    
+
     def __getitem__(self, seqlen: int) -> torch.Tensor:
         return self.positional_embedding[:seqlen, :]
 
@@ -773,26 +785,27 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
     OpenVINO wrapper for Qwen3-ASR Thinker model with GenerationMixin support.
     This is the main ASR model that processes audio and generates text.
     """
+
     _is_stateful = False
-    
+
     def __init__(self, model_dir, device, config):
         self.model_dir = Path(model_dir)
         self.config = config
         self.device_str = device
         self.device = torch.device("cpu")
         self.dtype = torch.float16
-        
+
         # Load audio encoder components
         print(f"⌛ Loading audio conv model from {self.model_dir / THINKER_AUDIO_NAME}")
         self.audio_conv = ov.Core().compile_model(self.model_dir / THINKER_AUDIO_NAME, device)
-        
+
         print(f"⌛ Loading audio encoder model from {self.model_dir / THINKER_AUDIO_ENCODER_NAME}")
         self.audio_encoder = ov.Core().compile_model(self.model_dir / THINKER_AUDIO_ENCODER_NAME, device)
-        
+
         # Load embedding model
         print(f"⌛ Loading embedding model from {self.model_dir / THINKER_EMBEDDING_NAME}")
         self.embed_tokens_model = ov.Core().compile_model(self.model_dir / THINKER_EMBEDDING_NAME, device)
-        
+
         # Load language model (stateful)
         print(f"⌛ Loading language model from {self.model_dir / THINKER_LANGUAGE_NAME}")
         self.model = ov.Core().read_model(self.model_dir / THINKER_LANGUAGE_NAME)
@@ -800,24 +813,24 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
         compiled_model = ov.Core().compile_model(self.model, device)
         self.request = compiled_model.create_infer_request()
-        
+
         # Create embedding wrapper
         self._embedding_wrapper = self._create_embedding_wrapper()
         self.get_input_embeddings = lambda: self._embedding_wrapper
-        
+
         # Audio config
         audio_config = self.config.audio_config
         self.max_source_positions = audio_config.max_source_positions
         self.n_window = audio_config.n_window
-        self.n_window_infer = getattr(audio_config, 'n_window_infer', self.n_window * 2)
+        self.n_window_infer = getattr(audio_config, "n_window_infer", self.n_window * 2)
         embed_dim = audio_config.d_model
-        
+
         # Positional embeddings for audio
         self.positional_embedding = SinusoidsPositionEmbedding(self.max_source_positions, embed_dim)
-        
+
         # GenerationMixin required attributes
         self.main_input_name = "input_ids"
-        self.generation_config = GenerationConfig.from_model_config(self.config) if hasattr(self.config, 'to_dict') else GenerationConfig()
+        self.generation_config = GenerationConfig.from_model_config(self.config) if hasattr(self.config, "to_dict") else GenerationConfig()
         self.num_pkv = 2
         self._past_length = None
         self.next_beam_idx = None
@@ -827,13 +840,14 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
         self._supports_sdpa = True
         self._supports_cache_class = True
         self._supports_static_cache = True
-        
+
         # Token IDs
         self.audio_token_id = self.config.audio_token_id
         self.pad_token_id = self.config.pad_token_id if self.config.pad_token_id is not None else -1
-    
+
     def _create_embedding_wrapper(self):
         """Create a callable wrapper for embeddings that works with OpenVINO."""
+
         def embedding_fn(input_ids):
             if isinstance(input_ids, torch.Tensor):
                 input_np = input_ids.numpy()
@@ -841,15 +855,16 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
                 input_np = input_ids
             result = self.embed_tokens_model(input_np)[0]
             return torch.from_numpy(result)
+
         return embedding_fn
-    
+
     def can_generate(self):
         """Returns True for GenerationMixin validation."""
         return True
-    
+
     def __call__(self, **kwargs):
         return self.forward(**kwargs)
-    
+
     def audio_tower(
         self,
         input_features: torch.Tensor,
@@ -857,17 +872,17 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
     ) -> BaseModelOutput:
         """
         Process audio through conv layers and transformer encoder.
-        
+
         Args:
             input_features: Audio mel features [mel_bins, time]
             feature_lens: Length of audio features
-            
+
         Returns:
             BaseModelOutput with audio embeddings
         """
         aftercnn_lens = _get_feat_extract_output_lengths(feature_lens)
         chunk_num = torch.ceil(feature_lens / (self.n_window * 2)).long()
-        
+
         # Build chunk lengths
         chunk_lengths = torch.tensor(
             [self.n_window * 2] * chunk_num.sum().item(),
@@ -877,32 +892,28 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
         tail_chunk_index = torch.nn.functional.pad(chunk_num, (1, 0), value=-1).cumsum(0)[1:]
         chunk_lengths[tail_chunk_index] = feature_lens % (self.n_window * 2)
         chunk_lengths[chunk_lengths == 0] = self.n_window * 2
-        
+
         # Split and pad features
         chunk_list = input_features.T.split(chunk_lengths.tolist(), dim=0)
         padded_feature = torch.nn.utils.rnn.pad_sequence(chunk_list, batch_first=True).transpose(1, 2)
-        
+
         # Get feature lengths after CNN
         feature_lens_after_cnn = _get_feat_extract_output_lengths(chunk_lengths)
         padded_mask_after_cnn = torch.nn.utils.rnn.pad_sequence(
             [torch.ones(length, dtype=torch.bool, device=padded_feature.device) for length in feature_lens_after_cnn],
             batch_first=True,
         )
-        
+
         # Process through CNN
         padded_embed = torch.from_numpy(self.audio_conv(padded_feature.numpy())[0])
-        
+
         # Add positional embeddings
-        positional_embedding = (
-            self.positional_embedding[padded_embed.shape[1]]
-            .unsqueeze(0)
-            .to(padded_embed.dtype)
-        )
+        positional_embedding = self.positional_embedding[padded_embed.shape[1]].unsqueeze(0).to(padded_embed.dtype)
         padded_embed = padded_embed + positional_embedding
-        
+
         # Extract valid hidden states
         hidden_states = padded_embed[padded_mask_after_cnn]
-        
+
         # Build cu_seqlens for transformer
         cu_chunk_lens = [0]
         window_aftercnn = padded_mask_after_cnn.shape[-1] * (self.n_window_infer // (self.n_window * 2))
@@ -912,17 +923,19 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
             if remainder != 0:
                 cu_chunk_lens += [remainder]
         cu_seqlens = torch.tensor(cu_chunk_lens, device=aftercnn_lens.device).cumsum(-1, dtype=torch.int32)
-        
+
         # Process through encoder transformer
         hidden_states = torch.from_numpy(
-            self.audio_encoder({
-                "hidden_states": hidden_states.numpy().astype(np.float32),
-                "cu_seqlens": cu_seqlens.numpy(),
-            })[0]
+            self.audio_encoder(
+                {
+                    "hidden_states": hidden_states.numpy().astype(np.float32),
+                    "cu_seqlens": cu_seqlens.numpy(),
+                }
+            )[0]
         )
-        
+
         return BaseModelOutput(last_hidden_state=hidden_states)
-    
+
     def get_audio_features(
         self,
         input_features: torch.FloatTensor,
@@ -931,12 +944,12 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
     ) -> torch.Tensor:
         """
         Encodes audios into continuous embeddings that can be forwarded to the language model.
-        
+
         Args:
             input_features: Audio mel features [batch, mel_bins, time]
             feature_attention_mask: Mask for attention
             audio_feature_lengths: Length of each audio
-            
+
         Returns:
             Audio embeddings
         """
@@ -944,9 +957,9 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
             audio_feature_lengths = torch.sum(feature_attention_mask, dim=1)
         else:
             audio_feature_lengths = None
-        
+
         feature_lens = audio_feature_lengths if audio_feature_lengths is not None else feature_attention_mask.sum(-1)
-        
+
         # Process each audio separately (following original model)
         audio_features = []
         for input_feature, feature_len in zip(input_features, feature_lens):
@@ -956,10 +969,10 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
             )
             audio_feature = audio_output.last_hidden_state
             audio_features.append(audio_feature)
-        
+
         audio_features = torch.cat(audio_features, dim=0)
         return audio_features
-    
+
     def get_placeholder_mask(
         self,
         input_ids: torch.LongTensor,
@@ -970,17 +983,14 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
         """
         if input_ids is None:
             special_audio_mask = (
-                inputs_embeds
-                == self.get_input_embeddings()(
-                    torch.tensor(self.audio_token_id, dtype=torch.long, device=inputs_embeds.device)
-                )
+                inputs_embeds == self.get_input_embeddings()(torch.tensor(self.audio_token_id, dtype=torch.long, device=inputs_embeds.device))
             ).all(-1)
         else:
             special_audio_mask = input_ids == self.audio_token_id
-        
+
         special_audio_mask = special_audio_mask.unsqueeze(-1).expand_as(inputs_embeds).to(inputs_embeds.device)
         return special_audio_mask
-    
+
     def get_rope_index(self, attention_mask: torch.Tensor):
         """Calculate mRoPE position IDs for the model."""
         position_ids = attention_mask.float().cumsum(-1) - 1
@@ -989,7 +999,7 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
         max_position_ids = position_ids.max(0, keepdim=False)[0].max(-1, keepdim=True)[0]
         mrope_position_deltas = max_position_ids + 1 - torch.sum(attention_mask, dim=-1, keepdim=True)
         return position_ids, mrope_position_deltas
-    
+
     def forward(
         self,
         input_ids=None,
@@ -1012,7 +1022,7 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
         # Get input embeddings
         if inputs_embeds is None:
             inputs_embeds = self.get_input_embeddings()(input_ids)
-        
+
         # Process audio features
         if input_features is not None:
             audio_features = self.get_audio_features(
@@ -1023,20 +1033,16 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
             audio_features = audio_features.to(inputs_embeds.device, inputs_embeds.dtype)
             audio_mask = self.get_placeholder_mask(input_ids, inputs_embeds=inputs_embeds)
             inputs_embeds = inputs_embeds.masked_scatter(audio_mask, audio_features)
-        
+
         # Handle feature attention mask
         if feature_attention_mask is not None:
             audio_feature_lengths = torch.sum(feature_attention_mask, dim=1)
         else:
             audio_feature_lengths = None
-        
+
         # Calculate position IDs
         if attention_mask is not None and position_ids is None:
-            if (
-                cache_position is None
-                or (cache_position is not None and cache_position[0] == 0)
-                or self.rope_deltas is None
-            ):
+            if cache_position is None or (cache_position is not None and cache_position[0] == 0) or self.rope_deltas is None:
                 delta0 = (1 - attention_mask).sum(dim=-1).unsqueeze(1)
                 position_ids, rope_deltas = self.get_rope_index(attention_mask)
                 rope_deltas = rope_deltas - delta0
@@ -1048,29 +1054,29 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
                 position_ids = position_ids.view(1, -1).expand(batch_size, -1)
                 position_ids = position_ids.add(delta)
                 position_ids = position_ids.unsqueeze(0).expand(3, -1, -1)
-        
+
         # Reset state if no past_key_values
         if past_key_values is None:
             self.request.reset_state()
             self.next_beam_idx = np.arange(inputs_embeds.shape[0], dtype=int)
             self._past_length = 0
-        
+
         # Prepare inputs
         inputs = {
             "inputs_embeds": inputs_embeds.numpy() if isinstance(inputs_embeds, torch.Tensor) else inputs_embeds,
             "attention_mask": attention_mask.numpy() if isinstance(attention_mask, torch.Tensor) else attention_mask,
             "position_ids": position_ids.numpy() if isinstance(position_ids, torch.Tensor) else position_ids,
         }
-        
+
         if "beam_idx" in self.input_names:
             inputs["beam_idx"] = self.next_beam_idx if self.next_beam_idx is not None else np.arange(inputs_embeds.shape[0], dtype=int)
-        
+
         # Run inference
         self.request.start_async(inputs, share_inputs=False)
         self.request.wait()
-        
+
         logits = torch.from_numpy(self.request.get_tensor("logits").data.copy()).to(self.device)
-        
+
         return Qwen3ASRThinkerCausalLMOutputWithPast(
             loss=None,
             logits=logits,
@@ -1079,7 +1085,7 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
             attentions=None,
             rope_deltas=self.rope_deltas,
         )
-    
+
     def prepare_inputs_for_generation(
         self,
         input_ids,
@@ -1107,19 +1113,19 @@ class OVQwen3ASRThinkerForConditionalGeneration(GenerationMixin):
             feature_attention_mask=feature_attention_mask,
             **kwargs,
         )
-        
+
         model_inputs["position_ids"] = None
-        
+
         # Only pass input_features on first step
         if cache_position is not None and cache_position[0] != 0:
             model_inputs["input_features"] = None
-        
+
         return model_inputs
-    
+
     def _reorder_cache(self, past_key_values, beam_idx):
         self.next_beam_idx = np.array(beam_idx)
         return past_key_values
-    
+
     def _get_past_length(self, past_key_values=None):
         return self._past_length if past_key_values else 0
 
@@ -1128,12 +1134,12 @@ class OVQwen3ASRModel:
     """
     OpenVINO-based Qwen3-ASR model for inference.
     Provides the same API as Qwen3ASRModel.transcribe().
-    
+
     This class follows the original Qwen3ASRForConditionalGeneration structure:
     - Uses OVQwen3ASRThinkerForConditionalGeneration as self.thinker
     - generate() calls self.thinker.generate()
     """
-    
+
     def __init__(
         self,
         model_dir: str,
@@ -1143,7 +1149,7 @@ class OVQwen3ASRModel:
     ):
         """
         Initialize the OpenVINO Qwen3-ASR model.
-        
+
         Args:
             model_dir: Directory containing the converted OpenVINO models
             device: Device to run inference on (e.g., "CPU", "GPU", "NPU")
@@ -1152,24 +1158,22 @@ class OVQwen3ASRModel:
         """
         if not INFERENCE_UTILS_AVAILABLE:
             raise ImportError("Qwen3-ASR inference utilities not available. Please install qwen_asr package.")
-        
+
         if not GENERATION_MIXIN_AVAILABLE:
             raise ImportError("GenerationMixin not available. Please install transformers>=4.40.")
-        
+
         self.model_dir = Path(model_dir)
         self.device = device
         self.max_inference_batch_size = max_inference_batch_size
         self.max_new_tokens = max_new_tokens
-        
+
         # Load config
         self.config = Qwen3ASRConfig.from_pretrained(model_dir)
-        
+
         # Initialize thinker using GenerationMixin wrapper
         thinker_dir = self.model_dir / "thinker"
-        self.thinker = OVQwen3ASRThinkerForConditionalGeneration(
-            thinker_dir, device, self.config.thinker_config
-        )
-        
+        self.thinker = OVQwen3ASRThinkerForConditionalGeneration(thinker_dir, device, self.config.thinker_config)
+
         # Load processor
         try:
             self.processor = Qwen3ASRProcessor.from_pretrained(model_dir)
@@ -1177,9 +1181,9 @@ class OVQwen3ASRModel:
         except Exception as e:
             print(f"⚠️ Could not load processor: {e}")
             self.processor = None
-        
+
         print("✅ OVQwen3ASRModel initialized successfully")
-    
+
     @classmethod
     def from_pretrained(
         cls,
@@ -1191,13 +1195,13 @@ class OVQwen3ASRModel:
     ) -> "OVQwen3ASRModel":
         """
         Load OpenVINO Qwen3-ASR model from a directory.
-        
+
         Args:
             model_dir: Directory containing the converted OpenVINO models
             device: Device to run inference on
             max_inference_batch_size: Batch size limit for inference
             max_new_tokens: Maximum number of tokens to generate
-            
+
         Returns:
             OVQwen3ASRModel instance
         """
@@ -1207,15 +1211,15 @@ class OVQwen3ASRModel:
             max_inference_batch_size=max_inference_batch_size,
             max_new_tokens=max_new_tokens,
         )
-    
+
     def get_support_languages(self) -> List[str]:
         """Returns the supported language list (same as original model API)."""
-        return self.config.support_languages if hasattr(self.config, 'support_languages') else list(SUPPORTED_LANGUAGES)
-    
+        return self.config.support_languages if hasattr(self.config, "support_languages") else list(SUPPORTED_LANGUAGES)
+
     def get_supported_languages(self) -> List[str]:
         """Returns the supported language list."""
         return self.get_support_languages()
-    
+
     @torch.no_grad()
     def generate(
         self,
@@ -1226,15 +1230,15 @@ class OVQwen3ASRModel:
     ):
         """
         Generate text from audio input using the thinker model.
-        
+
         This method follows the original Qwen3ASRForConditionalGeneration.generate() exactly.
-        
+
         Args:
             input_ids: Input token IDs
             max_new_tokens: Maximum new tokens to generate
             eos_token_id: EOS token ID(s)
             **kwargs: Additional arguments passed to thinker.generate()
-            
+
         Returns:
             Generation output from thinker
         """
@@ -1243,7 +1247,7 @@ class OVQwen3ASRModel:
             "max_new_tokens": max_new_tokens,
             "eos_token_id": eos_token_id,
         }
-        
+
         for key, value in kwargs.items():
             # Process special input values
             if key == "feature_attention_mask":
@@ -1253,27 +1257,23 @@ class OVQwen3ASRModel:
             # Put other key to shared kwargs
             else:
                 shared_kwargs[key] = value
-        
+
         # Merge kwargs
         for key, value in shared_kwargs.items():
             if key not in thinker_kwargs:
                 thinker_kwargs[key] = value
-        
-        thinker_result = self.thinker.generate(
-            input_ids=input_ids,
-            return_dict_in_generate=True,
-            **thinker_kwargs
-        )
-        
+
+        thinker_result = self.thinker.generate(input_ids=input_ids, return_dict_in_generate=True, **thinker_kwargs)
+
         return thinker_result
-    
+
     def _build_messages(self, context: str, audio_payload: Any) -> List[dict]:
         """Build messages for chat template."""
         return [
             {"role": "system", "content": context or ""},
             {"role": "user", "content": [{"type": "audio", "audio": audio_payload}]},
         ]
-    
+
     def _build_text_prompt(self, context: str, force_language: Optional[str]) -> str:
         """
         Build the string prompt for one request.
@@ -1283,7 +1283,7 @@ class OVQwen3ASRModel:
         if force_language:
             base = base + f"language {force_language}{'<asr_text>'}"
         return base
-    
+
     def _infer_asr(
         self,
         contexts: List[str],
@@ -1292,39 +1292,39 @@ class OVQwen3ASRModel:
     ) -> List[str]:
         """
         Run ASR inference for chunk-level items using self.generate().
-        
+
         Args:
             contexts: List of context strings.
             wavs: List of mono waveforms (np.ndarray).
             languages: List of forced languages or None.
-            
+
         Returns:
             List[str]: Raw decoded strings (one per chunk).
         """
         outs: List[str] = []
-        
+
         texts = [self._build_text_prompt(context=c, force_language=fl) for c, fl in zip(contexts, languages)]
-        
+
         batch_size = self.max_inference_batch_size
         if batch_size is None or batch_size < 0:
             batch_size = len(texts)
-        
+
         for i in range(0, len(texts), batch_size):
-            sub_text = texts[i:i + batch_size]
-            sub_wavs = wavs[i:i + batch_size]
-            
+            sub_text = texts[i : i + batch_size]
+            sub_wavs = wavs[i : i + batch_size]
+
             # Process inputs using processor
             inputs = self.processor(text=sub_text, audio=sub_wavs, return_tensors="pt", padding=True)
-            
+
             # Get input tensors
             input_ids = inputs["input_ids"]
             attention_mask = inputs["attention_mask"]
             input_features = inputs["input_features"]
             feature_attention_mask = inputs["feature_attention_mask"]
-            
+
             # Reset thinker state
             self.thinker.rope_deltas = None
-            
+
             # Generate using self.generate() which calls self.thinker.generate()
             generation_output = self.generate(
                 input_ids=input_ids,
@@ -1333,10 +1333,10 @@ class OVQwen3ASRModel:
                 feature_attention_mask=feature_attention_mask,
                 max_new_tokens=self.max_new_tokens,
             )
-            
+
             # Extract generated sequences
             generated_ids = generation_output.sequences
-            
+
             # Decode
             decoded = self.processor.batch_decode(
                 generated_ids,
@@ -1344,9 +1344,9 @@ class OVQwen3ASRModel:
                 clean_up_tokenization_spaces=False,
             )
             outs.extend(decoded)
-        
+
         return outs
-    
+
     def transcribe(
         self,
         audio: Union[AudioLike, List[AudioLike]],
@@ -1356,7 +1356,7 @@ class OVQwen3ASRModel:
     ) -> List[ASRTranscription]:
         """
         Transcribe audio with optional context.
-        
+
         Args:
             audio: Audio input(s). Supported:
                 - str: local path / URL / base64 data url
@@ -1365,24 +1365,24 @@ class OVQwen3ASRModel:
             context: Context string(s). If scalar, broadcast to batch size.
             language: Optional language(s). If provided, force output to that language.
             return_time_stamps: Not supported in OpenVINO version.
-            
+
         Returns:
             List[ASRTranscription]: One result per input audio.
         """
         if return_time_stamps:
             raise ValueError("return_time_stamps is not supported in OpenVINO version")
-        
+
         # Normalize audio inputs
         wavs = normalize_audios(audio)
         n = len(wavs)
-        
+
         # Normalize contexts
         ctxs = context if isinstance(context, list) else [context]
         if len(ctxs) == 1 and n > 1:
             ctxs = ctxs * n
         if len(ctxs) != n:
             raise ValueError(f"Batch size mismatch: audio={n}, context={len(ctxs)}")
-        
+
         # Normalize languages
         langs_in: List[Optional[str]]
         if language is None:
@@ -1393,7 +1393,7 @@ class OVQwen3ASRModel:
                 langs_in = langs_in * n
             if len(langs_in) != n:
                 raise ValueError(f"Batch size mismatch: audio={n}, language={len(langs_in)}")
-        
+
         langs_norm: List[Optional[str]] = []
         for l in langs_in:
             if l is None or str(l).strip() == "":
@@ -1402,9 +1402,9 @@ class OVQwen3ASRModel:
                 ln = normalize_language_name(str(l))
                 validate_language(ln)
                 langs_norm.append(ln)
-        
+
         max_chunk_sec = MAX_ASR_INPUT_SECONDS
-        
+
         # Chunk audios and record mapping
         chunks: List[AudioChunk] = []
         for i, wav in enumerate(wavs):
@@ -1415,13 +1415,13 @@ class OVQwen3ASRModel:
             )
             for j, (cwav, offset_sec) in enumerate(parts):
                 chunks.append(AudioChunk(orig_index=i, chunk_index=j, wav=cwav, sr=SAMPLE_RATE, offset_sec=offset_sec))
-        
+
         # Run ASR on chunks
         chunk_ctx: List[str] = [ctxs[c.orig_index] for c in chunks]
         chunk_lang: List[Optional[str]] = [langs_norm[c.orig_index] for c in chunks]
         chunk_wavs: List[np.ndarray] = [c.wav for c in chunks]
         raw_outputs = self._infer_asr(chunk_ctx, chunk_wavs, chunk_lang)
-        
+
         # Parse outputs
         per_chunk_lang: List[str] = []
         per_chunk_text: List[str] = []
@@ -1429,19 +1429,19 @@ class OVQwen3ASRModel:
             lang, txt = parse_asr_output(out, user_language=forced_lang)
             per_chunk_lang.append(lang)
             per_chunk_text.append(txt)
-        
+
         # Merge chunks back to original samples
         out_langs: List[List[str]] = [[] for _ in range(n)]
         out_texts: List[List[str]] = [[] for _ in range(n)]
-        
+
         for c, lang, txt in zip(chunks, per_chunk_lang, per_chunk_text):
             out_langs[c.orig_index].append(lang)
             out_texts[c.orig_index].append(txt)
-        
+
         results: List[ASRTranscription] = []
         for i in range(n):
             merged_text = "".join([t for t in out_texts[i] if t is not None])
             merged_language = merge_languages(out_langs[i])
             results.append(ASRTranscription(language=merged_language, text=merged_text, time_stamps=None))
-        
+
         return results

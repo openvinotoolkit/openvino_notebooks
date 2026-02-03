@@ -18,11 +18,36 @@ from scipy.io.wavfile import write as wav_write
 
 # Supported languages (same as official Qwen3-ASR)
 SUPPORTED_LANGUAGES = [
-    "Chinese", "Cantonese", "English", "Arabic", "German", "French",
-    "Spanish", "Portuguese", "Indonesian", "Italian", "Korean", "Russian",
-    "Thai", "Vietnamese", "Japanese", "Turkish", "Hindi", "Malay",
-    "Dutch", "Swedish", "Danish", "Finnish", "Polish", "Czech",
-    "Filipino", "Persian", "Greek", "Romanian", "Hungarian", "Macedonian"
+    "Chinese",
+    "Cantonese",
+    "English",
+    "Arabic",
+    "German",
+    "French",
+    "Spanish",
+    "Portuguese",
+    "Indonesian",
+    "Italian",
+    "Korean",
+    "Russian",
+    "Thai",
+    "Vietnamese",
+    "Japanese",
+    "Turkish",
+    "Hindi",
+    "Malay",
+    "Dutch",
+    "Swedish",
+    "Danish",
+    "Finnish",
+    "Polish",
+    "Czech",
+    "Filipino",
+    "Persian",
+    "Greek",
+    "Romanian",
+    "Hungarian",
+    "Macedonian",
 ]
 
 
@@ -45,7 +70,7 @@ def _build_choices_and_map(items: Optional[List[str]]) -> Tuple[List[str], Dict[
 def _normalize_audio(wav, eps=1e-12, clip=True):
     """Normalize audio to float32 mono."""
     x = np.asarray(wav)
-    
+
     if np.issubdtype(x.dtype, np.integer):
         info = np.iinfo(x.dtype)
         if info.min < 0:
@@ -60,32 +85,32 @@ def _normalize_audio(wav, eps=1e-12, clip=True):
             y = y / (m + eps)
     else:
         raise TypeError(f"Unsupported dtype: {x.dtype}")
-    
+
     if clip:
         y = np.clip(y, -1.0, 1.0)
-    
+
     if y.ndim > 1:
         y = np.mean(y, axis=-1).astype(np.float32)
-    
+
     return y
 
 
 def _audio_to_tuple(audio: Any) -> Optional[Tuple[np.ndarray, int]]:
     """
     Accept gradio audio formats and convert to (wav_float32_mono, sr).
-    
+
     Supports:
         - {"sampling_rate": int, "data": np.ndarray}
         - (sr, np.ndarray) or (np.ndarray, sr)
     """
     if audio is None:
         return None
-    
+
     if isinstance(audio, dict) and "sampling_rate" in audio and "data" in audio:
         sr = int(audio["sampling_rate"])
         wav = _normalize_audio(audio["data"])
         return wav, sr
-    
+
     if isinstance(audio, tuple) and len(audio) == 2:
         a0, a1 = audio
         if isinstance(a0, int):
@@ -96,7 +121,7 @@ def _audio_to_tuple(audio: Any) -> Optional[Tuple[np.ndarray, int]]:
             wav = _normalize_audio(a0)
             sr = int(a1)
             return wav, sr
-    
+
     return None
 
 
@@ -118,12 +143,12 @@ def _make_timestamp_html(audio_upload: Any, timestamps: Any) -> str:
     if at is None:
         return "<div style='color:#666'>No audio available for visualization.</div>"
     audio, sr = at
-    
+
     if not timestamps:
         return "<div style='color:#666'>No timestamps to visualize.</div>"
     if not isinstance(timestamps, list):
         return "<div style='color:#666'>Invalid timestamp format.</div>"
-    
+
     html_content = """
     <style>
         .word-alignment-container { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -139,13 +164,13 @@ def _make_timestamp_html(audio_upload: Any, timestamps: Any) -> str:
         summary { font-weight: 700; cursor: pointer; }
     </style>
     """
-    
+
     html_content += """
     <details open>
         <summary>Timestamps Visualization (click each word to hear the audio segment)</summary>
         <div class="word-alignment-container" style="margin-top: 14px;">
     """
-    
+
     for item in timestamps:
         if not isinstance(item, dict):
             continue
@@ -154,26 +179,26 @@ def _make_timestamp_html(audio_upload: Any, timestamps: Any) -> str:
         end = item.get("end_time", None)
         if start is None or end is None:
             continue
-        
+
         start = float(start)
         end = float(end)
         if end <= start:
             continue
-        
+
         start_sample = max(0, int(start * sr))
         end_sample = min(len(audio), int(end * sr))
         if end_sample <= start_sample:
             continue
-        
+
         seg = audio[start_sample:end_sample]
         seg_i16 = (np.clip(seg, -1.0, 1.0) * 32767.0).astype(np.int16)
-        
+
         mem = io.BytesIO()
         wav_write(mem, sr, seg_i16)
         mem.seek(0)
         b64 = base64.b64encode(mem.read()).decode("utf-8")
         audio_src = f"data:audio/wav;base64,{b64}"
-        
+
         html_content += f"""
         <div class="word-box">
             <div class="word-text">{word}</div>
@@ -183,7 +208,7 @@ def _make_timestamp_html(audio_upload: Any, timestamps: Any) -> str:
             </div>
         </div>
         """
-    
+
     html_content += "</div></details>"
     return html_content
 
@@ -198,76 +223,76 @@ def save_transcription(transcription: str) -> str:
 def make_demo(ov_model, example_dir=None):
     """
     Create Gradio demo for Qwen3-ASR with OpenVINO.
-    
+
     Args:
         ov_model: OVQwen3ASRModel instance
         example_dir: Directory containing example audio files (optional)
-        
+
     Returns:
         Gradio Blocks demo
     """
     lang_choices_disp, lang_map = _build_choices_and_map(SUPPORTED_LANGUAGES)
     lang_choices = ["Auto"] + lang_choices_disp
-    
+
     def transcribe(audio_upload: Any, lang_disp: str, progress=gr.Progress(track_tqdm=True)):
         """
         Main transcription function.
         """
         if audio_upload is None:
             return "", "", None, ""
-        
+
         try:
             audio_obj = _parse_audio_any(audio_upload)
         except ValueError as e:
             return "", "", None, f"<div style='color:red'>Error: {str(e)}</div>"
-        
+
         language = None
         if lang_disp and lang_disp != "Auto":
             language = lang_map.get(lang_disp, lang_disp)
-        
+
         # Measure inference time
         start_time = time.time()
-        
+
         # Perform transcription
         results = ov_model.transcribe(
             audio=audio_obj,
             language=language,
             return_time_stamps=False,  # Not supported in OV version
         )
-        
+
         inference_time = time.time() - start_time
-        
+
         if not isinstance(results, list) or len(results) != 1:
             return "", "", None, "<div style='color:red'>Unexpected result format.</div>"
-        
+
         r = results[0]
-        
+
         # Calculate audio duration
         if isinstance(audio_obj, tuple):
             wav, sr = audio_obj
             audio_duration = len(wav) / sr
         else:
             audio_duration = 0
-        
+
         metrics = f"Inference time: {inference_time:.2f}s | Audio duration: {audio_duration:.2f}s | RTF: {inference_time/max(audio_duration, 0.1):.3f}"
-        
+
         return (
             getattr(r, "language", "") or "",
             getattr(r, "text", "") or "",
             None,  # No timestamps in OV version
             metrics,
         )
-    
+
     # Build Gradio interface
     theme = gr.themes.Soft(
         font=[gr.themes.GoogleFont("Source Sans Pro"), "Arial", "sans-serif"],
     )
-    
+
     css = """
     .gradio-container {max-width: none !important;}
     .main-title {text-align: center; margin-bottom: 20px;}
     """
-    
+
     with gr.Blocks(theme=theme, css=css, title="Qwen3-ASR with OpenVINO") as demo:
         gr.Markdown(
             """
@@ -284,7 +309,7 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
 - Optimized for Intel hardware
 """
         )
-        
+
         with gr.Row():
             with gr.Column(scale=2):
                 audio_in = gr.Audio(
@@ -292,7 +317,7 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                     type="numpy",
                     sources=["upload", "microphone"],
                 )
-                
+
                 # Add example audio selector
                 sample_path = Path(__file__).parent / "sample_en.wav"
                 if sample_path.exists():
@@ -301,7 +326,7 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                         inputs=[audio_in],
                         label="Try Example Audio",
                     )
-                
+
                 lang_in = gr.Dropdown(
                     label="Language (leave 'Auto' for automatic detection)",
                     choices=lang_choices,
@@ -309,27 +334,27 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                     interactive=True,
                 )
                 btn = gr.Button("Transcribe", variant="primary", size="lg")
-            
+
             with gr.Column(scale=3):
                 out_lang = gr.Textbox(label="Detected Language", lines=1, interactive=False)
                 out_text = gr.Textbox(label="Transcription Result", lines=10, interactive=False)
                 out_metrics = gr.Textbox(label="Inference Metrics", lines=1, interactive=False)
-        
+
         with gr.Row():
             out_ts = gr.JSON(label="Timestamps (JSON)", visible=False)
-        
+
         # Event handlers
         btn.click(
             transcribe,
             inputs=[audio_in, lang_in],
             outputs=[out_lang, out_text, out_ts, out_metrics],
         )
-        
+
         gr.Markdown(
             """
 ---
 **Links:** [Qwen3-ASR on Hugging Face](https://huggingface.co/collections/Qwen/qwen3-asr) | [OpenVINO Notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
 """
         )
-    
+
     return demo

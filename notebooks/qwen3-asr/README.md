@@ -37,3 +37,4 @@ For further details, please refer to [Installation Guide](../../README.md).
 ⚠️ **EXPERIMENTAL NOTEBOOK**
 
 This notebook demonstrates a model that has not been fully validated with OpenVINO. It may be fully supported and validated in the future.
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/qwen3-asr/README.md" />
