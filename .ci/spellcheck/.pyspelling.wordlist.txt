@@ -42,6 +42,7 @@ arxiv
 ASPP
 ASR
 asr
+ASRModel
 ASYM
 async
 AsyncInferQueue
@@ -158,6 +159,7 @@ coors
 coreference
 CoSENT
 CosyVoice
+Conv
 cpm
 cpp
 cpu
@@ -316,9 +318,11 @@ finetuned
 finetuning
 FireRedTTS
 FLAC
+flac
 FLD
 floyd
 fn
+ForcedAligner
 foley
 Formatter
 formatter
@@ -1162,6 +1166,7 @@ Vladlen
 vlm
 VLM
 VLModel
+vLLM
 VLMPipeline
 VLMs
 VL’s
