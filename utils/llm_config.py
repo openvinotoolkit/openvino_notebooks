@@ -1063,10 +1063,11 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
         model_compression_params = compression_configs.get(model_id, compression_configs["default"]) if not "NPU" in precision else int4_npu_config
     weight_format = precision.split("-")[0].lower()
     optimum_cli_command = get_optimum_cli_command_vlm(pt_model_id, weight_format, model_dir, model_compression_params, "AWQ" in precision, remote_code)
+    optimum_cli_command = [str(x) if isinstance(x, Path) else x for x in optimum_cli_command]
     print(f"⌛ {model_id} VLM conversion to {precision} started. It may takes some time.")
     display(Markdown("**Export command:**"))
     display(Markdown(f"`{optimum_cli_command}`"))
-    subprocess.run(optimum_cli_command.split(" "), shell=(platform.system() == "Windows"), check=True)
+    subprocess.run(optimum_cli_command, shell=(platform.system() == "Windows"), check=True)
     print(f"✅ {precision} {model_id} VLM model converted and can be found in {model_dir}")
     return model_dir
 
@@ -1106,10 +1107,11 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
         model_compression_params = compression_configs.get(model_id, compression_configs["default"]) if not "NPU" in precision else int4_npu_config
     weight_format = precision.split("-")[0].lower()
     optimum_cli_command = get_optimum_cli_command(pt_model_id, weight_format, model_dir, model_compression_params, "AWQ" in precision, remote_code)
+    optimum_cli_command = [str(x) if isinstance(x, Path) else x for x in optimum_cli_command]
     print(f"⌛ {model_id} conversion to {precision} started. It may takes some time.")
     display(Markdown("**Export command:**"))
     display(Markdown(f"`{optimum_cli_command}`"))
-    subprocess.run(optimum_cli_command.split(" "), shell=(platform.system() == "Windows"), check=True)
+    subprocess.run(optimum_cli_command, shell=(platform.system() == "Windows"), check=True)
     print(f"✅ {precision} {model_id} model converted and can be found in {model_dir}")
     return model_dir
 
