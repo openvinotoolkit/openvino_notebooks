@@ -75,6 +75,10 @@ def qwen_completion_to_prompt(completion):
     return f"<|im_start|>system\n<|im_end|>\n<|im_start|>user\n{completion}<|im_end|>\n<|im_start|>assistant\n"
 
 
+def lfm2_completion_to_prompt(completion):
+    return f"<|startoftext|><|im_start|>system\nYou are a helpful assistant trained by Liquid AI.<|im_end|>\n<|im_start|>user\n{completion}<|im_end|>\n<|im_start|>assistant\n"
+
+
 SUPPORTED_LLM_MODELS = {
     "English": {
         "Qwen3-0.6B": {
@@ -117,8 +121,48 @@ SUPPORTED_LLM_MODELS = {
             "completion_to_prompt": qwen_completion_to_prompt,
             "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
+        "Qwen3-30B-A3B": {
+            "model_id": "Qwen/Qwen3-30B-A3B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+        },
         "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
         "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
+        "lfm2-350m": {
+            "model_id": "LiquidAI/LFM2-350M",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-700m": {
+            "model_id": "LiquidAI/LFM2-700M",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-1.2b": {
+            "model_id": "LiquidAI/LFM2-1.2B",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-2.6b": {
+            "model_id": "LiquidAI/LFM2-2.6B",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
         "GLM-4-9B-0414": {
             "model_id": "THUDM/GLM-4-9B-0414",
             "remote_code": False,
@@ -506,6 +550,22 @@ SUPPORTED_LLM_MODELS = {
     "Chinese": {
         "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
         "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
+        "lfm2-1.2b": {
+            "model_id": "LiquidAI/LFM2-1.2B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-2.6b": {
+            "model_id": "LiquidAI/LFM2-2.6B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
         "Qwen3-4B": {
             "model_id": "Qwen/Qwen3-4B",
             "remote_code": False,
@@ -532,6 +592,14 @@ SUPPORTED_LLM_MODELS = {
         },
         "Qwen3-14B": {
             "model_id": "Qwen/Qwen3-14B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+        },
+        "Qwen3-30B-A3B": {
+            "model_id": "Qwen/Qwen3-30B-A3B",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
@@ -687,6 +755,22 @@ SUPPORTED_LLM_MODELS = {
         },
     },
     "Japanese": {
+        "lfm2-1.2b": {
+            "model_id": "LiquidAI/LFM2-1.2B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_JAPANESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-2.6b": {
+            "model_id": "LiquidAI/LFM2-2.6B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_JAPANESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
         "youri-7b-chat": {
             "model_id": "rinna/youri-7b-chat",
             "remote_code": False,
@@ -862,16 +946,24 @@ int4_npu_config = {
 }
 
 
-def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True, device=None):
+def get_llm_selection_widget(
+    languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True, device=None, genai=False
+):
     import ipywidgets as widgets
 
-    filter_models_by_device = lambda model_info: device not in model_info[1].get("exclude_on_devices", [])
+    def filter_models(model_info):
+        if device and device in model_info[1].get("exclude_on_devices", []):
+            return False
+        if genai and model_info[1].get("genai_supported") is False:
+            return False
+        return True
+
     available_optimumzations = SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"]
 
     lang_dropdown = widgets.Dropdown(options=languages or [])
 
     # Define dependent drop down
-    supported_models = dict(filter(filter_models_by_device, models.items()))
+    supported_models = dict(filter(filter_models, models.items()))
     model_dropdown = widgets.Dropdown(options=supported_models)
 
     def dropdown_handler(change):
@@ -879,7 +971,7 @@ def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPOR
         default_language = change.new
         # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
         supported_models = SUPPORTED_LLM_MODELS[change.new]
-        model_dropdown.options = dict(filter(filter_models_by_device, supported_models.items()))
+        model_dropdown.options = dict(filter(filter_models, supported_models.items()))
 
     lang_dropdown.observe(dropdown_handler, names="value")
 
