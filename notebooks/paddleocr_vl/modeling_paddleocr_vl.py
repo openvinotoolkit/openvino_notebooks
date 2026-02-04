@@ -1550,7 +1550,7 @@ class PaddleOCREncoder(nn.Module):
 
 
 class PaddleOCRVisionTransformer(nn.Module):
-    def __init__(self, config: PaddleOCRVisionConfig):
+    def __init__(self, config: PaddleOCRVisionConfig, projector: Optional[nn.Module] = None):
         super().__init__()
         self.config = config
         embed_dim = config.hidden_size
@@ -1561,6 +1561,9 @@ class PaddleOCRVisionTransformer(nn.Module):
         self.use_head = True if not hasattr(config, "vision_use_head") else config.vision_use_head
         if self.use_head:
             self.head = PaddleOCRMultiheadAttentionPoolingHead(config)
+        # 可选：注入 projector（例如 mlp_AR），用于把 vision 输出直接投影到 text hidden_size。
+        # 默认 None，不影响原始行为；导出 OpenVINO 时可开启 apply_projector。
+        self.projector = projector
 
     # @can_return_tuple
     def forward(
@@ -1582,6 +1585,8 @@ class PaddleOCRVisionTransformer(nn.Module):
         return_pooler_output: Optional[bool] = False,
         use_rope: Optional[bool] = True,
         window_size: Optional[bool] = -1,
+        projector: Optional[nn.Module] = None,
+        apply_projector: bool = True,
     ) -> BaseModelOutputWithPooling:
         # breakpoint()
         # print("interpolate_pos_encoding: ", interpolate_pos_encoding)
@@ -1688,6 +1693,10 @@ class PaddleOCRVisionTransformer(nn.Module):
             end = cu_seqlens[i + 1]
             tensor = last_hidden_state[:, start:end, :]
             sample_hidden_state = torch.concat([sample_hidden_state, tensor], dim=1)
+        
+        projector_module = projector if projector is not None else self.projector
+        if apply_projector and projector_module is not None:
+            sample_hidden_state = projector_module(sample_hidden_state, image_grid_thw)
 
         return BaseModelOutputWithPooling(
             last_hidden_state=sample_hidden_state,
@@ -1725,10 +1734,10 @@ class PaddleOCRVisionModel(PaddleOCRPreTrainedModel):
     config_class = PaddleOCRVisionConfig
     main_input_name = "pixel_values"
 
-    def __init__(self, config: PaddleOCRVisionConfig):
+    def __init__(self, config: PaddleOCRVisionConfig, projector: Optional[nn.Module] = None):
         super().__init__(config)
 
-        self.vision_model = PaddleOCRVisionTransformer(config)
+        self.vision_model = PaddleOCRVisionTransformer(config, projector=projector)
 
         # Initialize weights and apply final processing
         self.post_init()
@@ -1898,7 +1907,7 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
     def __init__(self, config):
         super().__init__(config)
         self.mlp_AR = Projector(config, config.vision_config)
-        self.visual = PaddleOCRVisionModel(config.vision_config)
+        self.visual = PaddleOCRVisionModel(config.vision_config, projector=self.mlp_AR)
         self.model = Ernie4_5Model(config)
         self.vocab_size = config.vocab_size
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
@@ -2166,8 +2175,8 @@ class PaddleOCRVLForConditionalGeneration(Ernie4_5PreTrainedModel, GenerationMix
                 image_embeds = vision_outputs.last_hidden_state
                 # image_embeds = list(image_embeds.unbind(0))
 
-                # breakpoint()
-                image_embeds = self.mlp_AR(image_embeds, image_grid_thw)
+                # # breakpoint()
+                # image_embeds = self.mlp_AR(image_embeds, image_grid_thw)
 
                 n_image_tokens = (input_ids == self.config.image_token_id).sum().item()
                 # image_embeds 可能是 list 或 tensor，需要统一处理

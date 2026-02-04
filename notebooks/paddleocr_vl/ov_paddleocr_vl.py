@@ -855,7 +855,6 @@ class PaddleOCR_VL_OV:
             int8_quant=self.int8_quant,
             tokenizer=self.tokenizer,
         )
-        self.vision_mlp_model = VisionMlpModel(model=self.model, ov_model_path=ov_model_path, device=device)
 
         self.llm_embed_model = LlmEmbdModel(model=self.model, ov_model_path=ov_model_path, device=device)
         self.llm_stateful_model = LlmStatefulModel(
@@ -869,7 +868,6 @@ class PaddleOCR_VL_OV:
 
     def export_paddleocr_vl_to_ov(self):
         self.vision_model.convert_sdpa_ov()
-        self.vision_mlp_model.convert_sdpa_ov()
         self.llm_embed_model.convert_sdpa_ov()
         self.llm_stateful_model.convert_sdpa_ov()
         print("✅ PaddleOCR-VL model has been successfully converted to OpenVINO format.")
@@ -891,11 +889,6 @@ class PaddleOCR_VL_OV:
             if hasattr(self.vision_model, "vision_pre_process"):
                 del self.vision_model.vision_pre_process
             del self.vision_model
-
-        if hasattr(self, "vision_mlp_model"):
-            if hasattr(self.vision_mlp_model, "model"):
-                del self.vision_mlp_model.model
-            del self.vision_mlp_model
 
         if hasattr(self, "llm_embed_model"):
             if hasattr(self.llm_embed_model, "model"):
@@ -1134,10 +1127,6 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
 
         self.vision_encoder_request = self.vision_encoder_compiled_model.create_infer_request()
 
-        self.vision_mlp_model = self.core.read_model(Path(f"{self.ov_model_path}/vision_mlp.xml"))
-        self.vision_mlp_compiled_model = self.core.compile_model(self.vision_mlp_model, self.ov_device)
-        self.vision_mlp_request = self.vision_mlp_compiled_model.create_infer_request()
-
         # self.vision_pre_process = Preprocess()
         # self.vision_middle_process = Postprocess()
 
@@ -1149,14 +1138,6 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
         self.vision_encoder_request.start_async(inputs_dict, share_inputs=True)
         self.vision_encoder_request.wait()
         return torch.from_numpy(self.vision_encoder_request.get_tensor("vision_output").data)
-
-    def vision_mlp_run(self, image_features=None, image_grid_thw=None):
-        inputs_dict = {}
-        inputs_dict["image_features"] = image_features
-        inputs_dict["image_grid_thw"] = image_grid_thw
-        self.vision_mlp_request.start_async(inputs_dict, share_inputs=True)
-        self.vision_mlp_request.wait()
-        return torch.from_numpy(self.vision_mlp_request.get_tensor("vit_mlp").data)
 
     def vision_model(self, pixel_values, image_grid_thw):
         encoder_start = time.perf_counter()
@@ -1184,19 +1165,14 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
             sample_indices = torch.concat(sample_indices, dim=0).to(pixel_values.device)
             image_grid_hws = torch.tensor(image_grid_hws, dtype=torch.int64)
 
-            vision_output = self.vision_encoder_run(
+            vit_embeds = self.vision_encoder_run(
                 pixel_values=pixel_values,
                 image_grid_thw=image_grid_thw,
                 cu_seqlens=cu_seqlens,
             )
             encoder_end = time.perf_counter()
-            mlp_start = time.perf_counter()
-            vit_embeds = self.vision_mlp_run(image_features=vision_output, image_grid_thw=image_grid_thw)
-            mlp_end = time.perf_counter()
             encoder_time = (encoder_end - encoder_start) * 1000
-            mlp_time = (mlp_end - mlp_start) * 1000
             self.vision_infer.append(encoder_time)
-            self.vision_infer.append(mlp_time)
 
             return vit_embeds
 
