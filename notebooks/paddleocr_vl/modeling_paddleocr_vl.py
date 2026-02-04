@@ -1438,20 +1438,45 @@ class PaddleOCREncoder(nn.Module):
         if use_rope is True:
             # breakpoint()
             if width_position_ids is None or height_position_ids is None:
-                # 使用 tensor 替代 list，初始化为空 tensor
-                split_hids = torch.empty(0, dtype=torch.int64, device=device)
-                split_wids = torch.empty(0, dtype=torch.int64, device=device)
-                for idx in range(image_grid_thw.shape[0]):
-                    t = image_grid_thw[idx, 0].item()
-                    h = image_grid_thw[idx, 1].item()
-                    w = image_grid_thw[idx, 2].item()
-                    image_pids = torch.arange(t * h * w, device=device) % (h * w)
-                    sample_hids = image_pids // w
-                    sample_wids = image_pids % w
-                    split_hids = torch.concat([split_hids, sample_hids], dim=0)
-                    split_wids = torch.concat([split_wids, sample_wids], dim=0)
-                width_position_ids = split_wids
-                height_position_ids = split_hids
+                # Vectorized, export-friendly computation of height/width position ids.
+                # For each image (t, h, w) we need positions 0..(t*h*w-1) and then map
+                # them to (height_idx, width_idx) via modulo/division. This avoids Python
+                # loops and repeated concatenation which cause export/static-shape issues.
+                grid = image_grid_thw.to(device)
+                num_images = grid.shape[0]
+                t_vec = grid[:, 0].to(torch.long)
+                h_vec = grid[:, 1].to(torch.long)
+                w_vec = grid[:, 2].to(torch.long)
+
+                counts = (t_vec * h_vec * w_vec).to(torch.long)
+
+                # If all counts are zero, return empty tensors (keeps dtype/device consistent)
+                total_count_tensor = counts.sum()
+                if total_count_tensor.eq(0).all():
+                    height_position_ids = torch.empty(0, dtype=torch.int64, device=device)
+                    width_position_ids = torch.empty(0, dtype=torch.int64, device=device)
+                else:
+                    # image_idx: for each position in the flat concatenation, which image it belongs to
+                    image_idx = torch.repeat_interleave(torch.arange(num_images, device=device, dtype=torch.long), counts)
+
+                    # start index of each image in the concatenated sequence
+                    starts = torch.cat([torch.tensor([0], device=device, dtype=torch.long), counts.cumsum(dim=0)[:-1]], dim=0)
+
+                    # position within its image for every concatenated position
+                    # Use tensor-based arange by building range from 0 to total_count_tensor
+                    pos_in_concat = torch.arange(total_count_tensor, device=device, dtype=torch.long)
+                    pos_in_image = pos_in_concat - torch.repeat_interleave(starts, counts)
+
+                    # per-position h,w
+                    h_per_pos = h_vec[image_idx]
+                    w_per_pos = w_vec[image_idx]
+
+                    hw_per_pos = h_per_pos * w_per_pos
+
+                    # map linear pos -> (height_idx, width_idx)
+                    pos_mod = pos_in_image % hw_per_pos
+                    height_position_ids = (pos_mod // w_per_pos).to(torch.int64)
+                    width_position_ids = (pos_mod % w_per_pos).to(torch.int64)
 
             window_indices, cu_seqlens_within_windows = None, None
 

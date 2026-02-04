@@ -1457,24 +1457,6 @@ class VisionModel:
         for output, output_name in zip(ov_model.outputs, self.get_output_names()):
             output.get_tensor().set_names({output_name})
 
-        shapes = {}
-        for input_layer in ov_model.inputs:
-            if input_layer.get_names().pop() == "pixel_values":
-                shapes[input_layer] = input_layer.partial_shape
-                shapes[input_layer][0] = 1
-                shapes[input_layer][1] = 4988
-                shapes[input_layer][2] = 3
-                shapes[input_layer][3] = 14
-                shapes[input_layer][4] = 14
-            if input_layer.get_names().pop() == "image_grid_thw":
-                shapes[input_layer] = input_layer.partial_shape
-                shapes[input_layer][0] = 1
-                shapes[input_layer][1] = 3
-            if input_layer.get_names().pop() == "cu_seqlens":
-                shapes[input_layer] = input_layer.partial_shape
-                shapes[input_layer][0] = 2
-        ov_model.reshape(shapes)
-
         ov.save_model(ov_model, Path(f"{self.ov_model_path}/vision.xml"))
 
         if self.int8_quant:
@@ -1539,6 +1521,7 @@ class PaddleOCR_VL_OV:
         self.vision_mlp_model.convert_sdpa_ov()
         self.llm_embed_model.convert_sdpa_ov()
         self.llm_stateful_model.convert_sdpa_ov()
+        print("✅ PaddleOCR-VL model has been successfully converted to OpenVINO format.")
 
     def close(self):
         """
@@ -1713,7 +1696,6 @@ class PaddleOCRVLPreprocessor:
             "text_inputs": text_inputs,
             "images_info": images_info,
         }
-
 
 class OVPaddleOCRVLForCausalLM(GenerationMixin):
     _is_stateful = True
