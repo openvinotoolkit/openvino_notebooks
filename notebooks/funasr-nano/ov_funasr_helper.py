@@ -19,9 +19,9 @@ from transformers.masking_utils import ALL_MASK_ATTENTION_FUNCTIONS
 import shutil
 import json
 from transformers import AutoTokenizer
+from optimum.intel.openvino import OVModelForCausalLM
 from dataclasses import dataclass
 from transformers.cache_utils import DynamicCache, DynamicLayer
-from optimum.intel import OVModelForCausalLM
 from funasr.utils.datadir_writer import DatadirWriter
 from funasr.utils.load_utils import extract_fbank, load_audio_text_image_video
 
