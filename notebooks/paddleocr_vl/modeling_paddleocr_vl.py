@@ -1561,8 +1561,6 @@ class PaddleOCRVisionTransformer(nn.Module):
         self.use_head = True if not hasattr(config, "vision_use_head") else config.vision_use_head
         if self.use_head:
             self.head = PaddleOCRMultiheadAttentionPoolingHead(config)
-        # 可选：注入 projector（例如 mlp_AR），用于把 vision 输出直接投影到 text hidden_size。
-        # 默认 None，不影响原始行为；导出 OpenVINO 时可开启 apply_projector。
         self.projector = projector
 
     # @can_return_tuple
