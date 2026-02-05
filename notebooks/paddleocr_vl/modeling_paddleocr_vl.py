@@ -1691,7 +1691,7 @@ class PaddleOCRVisionTransformer(nn.Module):
             end = cu_seqlens[i + 1]
             tensor = last_hidden_state[:, start:end, :]
             sample_hidden_state = torch.concat([sample_hidden_state, tensor], dim=1)
-        
+
         projector_module = projector if projector is not None else self.projector
         if apply_projector and projector_module is not None:
             sample_hidden_state = projector_module(sample_hidden_state, image_grid_thw)

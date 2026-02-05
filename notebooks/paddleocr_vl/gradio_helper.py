@@ -219,4 +219,3 @@ def _safe_serialize_messages(messages: list) -> list:
                 msg2["content"].append({"type": c.get("type"), "text": c.get("text", "")})
         safe.append(msg2)
     return safe
-

@@ -1041,6 +1041,7 @@ class PaddleOCRVLPreprocessor:
             "images_info": images_info,
         }
 
+
 class OVPaddleOCRVLForCausalLM(GenerationMixin):
     _is_stateful = True
 
