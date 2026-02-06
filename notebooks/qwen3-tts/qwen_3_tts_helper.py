@@ -898,11 +898,15 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
 
     # Convert Speech Tokenizer (if exists in model)
     # Get the local path of the model
-    if use_local_dir:
+    model_id_path = Path(model_id)
+    if model_id_path.exists() and model_id_path.is_dir():
+        # model_id is already a local path, use it directly
+        model_local_path = model_id_path
+    elif use_local_dir:
         # ckpt is already a local directory path
         model_local_path = Path(ckpt)
     else:
-        # ckpt is a HuggingFace model ID, need to get the cached path
+        # model_id is a HuggingFace model ID, need to get the cached path
         # Use snapshot_download to get or download the model to cache
         model_local_path = Path(
             snapshot_download(model_id, allow_patterns=["speech_tokenizer/**", "*.json", "*.txt"], ignore_patterns=["*.safetensors", "*.bin"])
