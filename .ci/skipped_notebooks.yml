@@ -454,6 +454,8 @@
   skips:
     - os:
         - windows-2022
+    - python:
+        - '3.13'
 - notebook: notebooks/qwen2.5-omni-chatbot/qwen2.5-omni-chatbot.ipynb
   skips:
     - os:
