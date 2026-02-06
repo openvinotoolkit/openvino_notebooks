@@ -67,7 +67,14 @@ def make_demo(pipe):
                 result = pipe.generate(text)
             speech = result.speeches[0]
 
-            return speech.data[0], 16000
+            try:
+                audio_data = speech.data[0]
+            except RuntimeError:
+                host_tensor = ov.Tensor(speech.element_type, speech.shape)
+                speech.copy_to(host_tensor)
+                audio_data = host_tensor.data[0]
+
+            return audio_data, 16000
         except Exception as e:
             print(f"Error in process_audio: {e}")
             return None, "Error in audio processing"
