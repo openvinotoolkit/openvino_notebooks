@@ -898,6 +898,7 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
 
     # Convert Speech Tokenizer (if exists in model)
     # Get the local path of the model
+    # Since we already loaded the model from 'ckpt' above, reuse the cached/local path
     model_id_path = Path(model_id)
     if model_id_path.exists() and model_id_path.is_dir():
         # model_id is already a local path, use it directly
@@ -906,11 +907,20 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
         # ckpt is already a local directory path
         model_local_path = Path(ckpt)
     else:
-        # model_id is a HuggingFace model ID, need to get the cached path
-        # Use snapshot_download to get or download the model to cache
-        model_local_path = Path(
-            snapshot_download(model_id, allow_patterns=["speech_tokenizer/**", "*.json", "*.txt"], ignore_patterns=["*.safetensors", "*.bin"])
-        )
+        # ckpt is a HuggingFace model ID, model was already loaded so it's in cache
+        # Use try_to_load_from_cache to get the cached path without re-downloading
+        from huggingface_hub import try_to_load_from_cache
+        # Try to find speech_tokenizer directory in cache
+        cached_config = try_to_load_from_cache(model_id, "speech_tokenizer/config.json")
+        if cached_config and cached_config != "_CACHED_NO_EXIST":
+            # Get parent directory (speech_tokenizer) and its parent (model root)
+            model_local_path = Path(cached_config).parent.parent
+        else:
+            # Fallback: download speech_tokenizer files if not in cache
+            model_local_path = Path(
+                snapshot_download(model_id, allow_patterns=["speech_tokenizer/**", "*.json", "*.txt"], 
+                                ignore_patterns=["*.safetensors", "*.bin"])
+            )
 
     speech_tokenizer_dir = model_local_path / "speech_tokenizer"
     speech_tokenizer_ov_dir = output_dir / "speech_tokenizer"
@@ -1108,13 +1118,13 @@ class OVQwen3TTSTalkerCodePredictorModelForConditionalGeneration(GenerationMixin
         self.config = config
 
         # Load code predictor embedding model
-        self.code_predictor_embedding = core.compile_model(model_dir / TALKER_CODE_PREDICTOR_EMBEDDING_NAME, "CPU")
+        self.code_predictor_embedding = core.compile_model(model_dir / TALKER_CODE_PREDICTOR_EMBEDDING_NAME, device)
 
         # Load code predictor model
         self.model = core.read_model(model_dir / TALKER_CODE_PREDICTOR_NAME)
         self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.inputs)}
         self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model.outputs)}
-        compiled_model = core.compile_model(self.model, device)
+        compiled_model = core.compile_model(self.model, device, config={"ACTIVATIONS_SCALE_FACTOR": "8.0"} if device == "GPU" else {})
         self.request = compiled_model.create_infer_request()
 
         # Create embedding wrapper
@@ -1269,9 +1279,9 @@ class OVQwen3TTSTalkerForConditionalGeneration(GenerationMixin):
         self.request = compiled_model.create_infer_request()
 
         # Load embedding models
-        self.embed_tokens = core.compile_model(model_dir / TALKER_EMBEDDING_NAME, "CPU")
-        self.text_embedding = core.compile_model(model_dir / TALKER_TEXT_EMBEDDING_NAME, "CPU")
-        self.text_projection_model = core.compile_model(model_dir / TALKER_TEXT_PROJECTION_NAME, "CPU")
+        self.embed_tokens = core.compile_model(model_dir / TALKER_EMBEDDING_NAME, device)
+        self.text_embedding = core.compile_model(model_dir / TALKER_TEXT_EMBEDDING_NAME, device)
+        self.text_projection_model = core.compile_model(model_dir / TALKER_TEXT_PROJECTION_NAME, device)
 
         # Create embedding wrapper
         self._embedding_wrapper = self._create_embedding_wrapper()
