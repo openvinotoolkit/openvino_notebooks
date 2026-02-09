@@ -47,7 +47,14 @@ def optimum_cli(model_id, output_dir, show_command=True, additional_args: dict[s
         subprocess.run(export_command.split(" "), shell=(platform.system() == "Windows"), check=True, capture_output=True)
     except subprocess.CalledProcessError as exc:
         logger = logging.getLogger()
-        logger.exception(exc.stderr)
+        logger.error(f"Command failed with exit code {exc.returncode}")
+
+        if exc.stdout:
+            logger.error(f"STDOUT:\n{exc.stdout.decode(errors='replace')}")
+
+        if exc.stderr:
+            logger.error(f"STDERR:\n{exc.stderr.decode(errors='replace')}")
+
         if transofrmers_loglevel is not None:
             os.environ["TRANSFORMERS_VERBOSITY"] = transofrmers_loglevel
         raise exc

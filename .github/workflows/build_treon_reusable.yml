@@ -17,6 +17,14 @@ on:
         required: false
         type: boolean
         default: false
+      ignore_list:
+        required: false
+        type: string
+        default: ''
+      separate_venv:
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -63,13 +71,30 @@ jobs:
         if: ${{ inputs.test_only_changed }}
         shell: bash
         run: |
-          touch test_notebooks.txt
           changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
           changed_files=$(echo $changed_files | tr '\\' '/')
+
+          # Check if any notebook files were changed
+          notebook_changed=false
           for file in $changed_files; do
-            echo "$file was changed"
-            echo $file >> test_notebooks.txt
+            if [[ $file == notebooks/* ]]; then
+              notebook_changed=true
+              break
+            fi
           done
+
+          if [ "$notebook_changed" = true ]; then
+            # If notebooks were changed, test those notebooks
+            touch test_notebooks.txt
+            for file in $changed_files; do
+              echo "$file was changed"
+              echo $file >> test_notebooks.txt
+            done
+          else
+            # If no notebooks were changed, use precommit list
+            echo "No notebook files changed, using precommit list"
+            cp .ci/precommit_list.txt test_notebooks.txt
+          fi
 
       - name: Dotenv Action
         id: dotenv
@@ -87,7 +112,7 @@ jobs:
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install ffmpeg espeak-ng
           elif [ "$RUNNER_OS" == "Windows" ]; then
-            choco install ffmpeg-full
+            choco install ffmpeg-full --version 7.1.1 -y
           fi
       # Packages that notebooks need to run in docker container
       - name: Install required packages (container)
@@ -253,26 +278,52 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: |
+          IGNORE_ARGS=""
+          if [[ -n "${{ inputs.ignore_list }}" ]]; then
+            IGNORE_ARGS="$IGNORE_ARGS ${{ inputs.ignore_list }}"
+          fi
+          if [[ "${{ env.TEST_DEVICE }}" == "gpu" ]]; then
+             IGNORE_ARGS="$IGNORE_ARGS .ci/heavy_win_gpu.txt"
+          fi
+          
+          if [[ -n "$IGNORE_ARGS" ]]; then
+            IGNORE_ARGS="--ignore_list $IGNORE_ARGS"
+          fi
+
           python .ci/validate_notebooks.py \
             --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            ${{ env.TEST_DEVICE == 'gpu' && '--ignore_list .ci/heavy_win_gpu.txt' || '' }} \
+            $IGNORE_ARGS \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             --move_notebooks_dir c:/notebooks \
+            ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --timeout 1200
       - name: Analysing with treon (Linux)
         if: runner.os == 'Linux'
         shell: bash
         run: |
+          IGNORE_ARGS=""
+          if [[ -n "${{ inputs.ignore_list }}" ]]; then
+            IGNORE_ARGS="$IGNORE_ARGS ${{ inputs.ignore_list }}"
+          fi
+          if [[ "${{ env.TEST_DEVICE }}" == "gpu" ]]; then
+             IGNORE_ARGS="$IGNORE_ARGS .ci/heavy_ubuntu_gpu.txt"
+          fi
+          
+          if [[ -n "$IGNORE_ARGS" ]]; then
+            IGNORE_ARGS="--ignore_list $IGNORE_ARGS"
+          fi
+
           python .ci/validate_notebooks.py \
             --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
-            ${{ env.TEST_DEVICE == 'gpu' && '--ignore_list .ci/heavy_ubuntu_gpu.txt' || '' }} \
+            $IGNORE_ARGS \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
+            ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --timeout 1200
       - name: Analysing with treon (MacOS)
         if: runner.os == 'MacOS'
@@ -284,6 +335,7 @@ jobs:
             --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
+            ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --timeout 1200
 
       - name: Archive notebook test report

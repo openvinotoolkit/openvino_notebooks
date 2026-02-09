@@ -64,6 +64,9 @@
   skips:
     - os:
         - macos-13
+        - windows-2022
+    - python:
+        - '3.13'
 - notebook: notebooks/segment-anything/segment-anything.ipynb
   skips:
     - os:
@@ -189,7 +192,7 @@
         - ubuntu-22.04
         - windows-2022
     - python:
-        - '3.12'
+        - '3.13'
 - notebook: notebooks/photo-maker/photo-maker.ipynb
   skips:
     - os:
@@ -279,7 +282,7 @@
     - device:
         - gpu
     - python:
-        - '3.12'
+        - '3.13'
 - notebook: notebooks/hello-npu/hello-npu.ipynb
   skips:
     - device:
@@ -289,18 +292,6 @@
   skips:
     - device:
         - cpu
-- notebook: notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb
-  skips:
-    - python:
-        - '3.9'
-- notebook: notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb
-  skips:
-    - python:
-        - '3.9'
-- notebook: notebooks/explainable-ai-3-map-interpretation/explainable-ai-3-map-interpretation.ipynb
-  skips:
-    - python:
-        - '3.9'
 - notebook: notebooks/llm-agent-rag-llamaindex/llm-agent-rag-llamaindex.ipynb
   skips:
     - os:
@@ -327,6 +318,7 @@
   skips:
     - os:
         - macos-13
+        - ubuntu-22.04
 - notebook: notebooks/mllama-3.2/mllama-3.2.ipynb
   skips:
     - os:
@@ -335,14 +327,10 @@
         - windows-2022
 - notebook: notebooks/sam2-image-segmentation/segment-anything-2-image.ipynb
   skips:
-    - python:
-        - '3.9'
     - os:
         - macos-13
 - notebook: notebooks/sam2-video-segmentation/segment-anything-2-video.ipynb
   skips:
-    - python:
-        - '3.9'
     - os:
         - macos-13
 - notebook: notebooks/pixtral/pixtral.ipynb
@@ -365,8 +353,6 @@
   skips:
     - os:
         - macos-13
-    - python:
-        - '3.9'
 - notebook: notebooks/mobileclip-video-search/mobileclip-video-search.ipynb
   skips:
     - os:
@@ -395,6 +381,7 @@
   skips:
     - python:
         - '3.12'
+        - '3.13'
 - notebook: notebooks/ltx-video/ltx-video.ipynb
   skips:
     - os:
@@ -413,8 +400,6 @@
         - windows-2022
 - notebook: notebooks/llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb
   skips:
-    - python:
-        - '3.9'
     - os:
       - macos-13
 - notebook: notebooks/glm4-v/glm4-v.ipynb
@@ -441,6 +426,12 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
+- notebook: notebooks/omnigen/omnigen.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
 - notebook: notebooks/olmocr-pdf-vlm/olmocr-pdf-vlm.ipynb
   skips:
     - os:
@@ -448,7 +439,6 @@
         - ubuntu-22.04
         - windows-2022
     - python:
-        - '3.9'
         - '3.10'
 - notebook: notebooks/minicpm-o-omnimodal-chatbot/minicpm-o-omnimodal-chatbot.ipynb
   skips:
@@ -458,8 +448,6 @@
         - windows-2022
 - notebook: notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
   skips:
-    - python:
-        - '3.9'
     - os:
         - macos-13
 - notebook: notebooks/kokoro/kokoro.ipynb
@@ -467,7 +455,7 @@
     - os:
         - windows-2022
     - python:
-        - "3.9"
+        - '3.13'
 - notebook: notebooks/qwen2.5-omni-chatbot/qwen2.5-omni-chatbot.ipynb
   skips:
     - os:
@@ -486,10 +474,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/flex.2-image-generation/flex.2-image-generation.ipynb
-  skips:
-    - python:
-        - "3.9"
 - notebook: notebooks/openvoice2-and-melotts/openvoice2-and-melotts.ipynb
   skips:
     - os:
@@ -510,14 +494,14 @@
   skips:
     - os:
         - macos-13
+        - ubuntu-22.04
+        - windows-2022
 - notebook: notebooks/magika-content-type-recognition/magika-content-type-recognition.ipynb
   skips:
     - os:
         - windows-2022
 - notebook: notebooks/glm4.1-v-thinking/glm4.1-v-thinking.ipynb
   skips:
-    - python:
-        - "3.9"
     - os:
         - macos-13
         - windows-2022
@@ -531,26 +515,29 @@
   skips:
     - os:
         - macos-13
+        - ubuntu-22.04
+        - windows-2022
 - notebook: notebooks/convert-to-openvino/convert-to-openvino.ipynb
   skips:
     - python:
-        - "3.12"
+        - "3.13"
 - notebook: notebooks/jax-to-openvino/jax-classification-to-openvino.ipynb
   skips:
     - python:
-        - "3.12"
+        - "3.13"
 - notebook: notebooks/optimize-preprocessing/optimize-preprocessing.ipynb
   skips:
     - python:
-        - "3.12"
+        - "3.13"
 - notebook: notebooks/tensorflow-classification-to-openvino/tensorflow-classification-to-openvino.ipynb
   skips:
     - python:
-        - "3.12"
+        - "3.13"
 - notebook: notebooks/tensorflow-object-detection-to-openvino/tensorflow-object-detection-api-with-openvino.ipynb
   skips:
     - python:
         - "3.12"
+        - "3.13"
 - notebook: notebooks/text-to-image-genai/text-to-image-genai.ipynb
   skips:
     - os:
@@ -567,3 +554,48 @@
   skips:
     - os:
         - macos-13
+- notebook: notebooks/fireredtts2/fireredtts2.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/qwen3-vl/qwen3-vl.ipynb
+  skips:
+    - os:
+        - macos-13
+- notebook: notebooks/qwen2.5-vl/qwen2.5-vl.ipynb
+  skips:
+    - os:
+        - ubuntu-22.04
+- notebook: notebooks/catvton/catvton.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/deepseek-ocr/deepseek-ocr.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/wan2.2-text-image-to-video/wan2.2-text-image-to-video.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/3D-point-pillars/pointpillars.ipynb
+  skips:
+    - os:
+        - macos-13
+        - windows-2022
+    - python:
+        - "3.13"

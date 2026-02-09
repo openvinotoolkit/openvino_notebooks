@@ -21,6 +21,10 @@ DEFAULT_RAG_PROMPT_CHINESE = """\
 基于以下已知信息，请简洁并专业地回答用户的问题。如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。\
 """
 
+DEFAULT_RAG_PROMPT_JAPANESE = """\
+検索されたコンテキストを使用して、質問に答えてください。答えがわからない場合は、わからないと答えてください。簡潔に答えてください。\
+"""
+
 
 def red_pijama_partial_text_processor(partial_text, new_text):
     if new_text == "<":
@@ -71,6 +75,10 @@ def qwen_completion_to_prompt(completion):
     return f"<|im_start|>system\n<|im_end|>\n<|im_start|>user\n{completion}<|im_end|>\n<|im_start|>assistant\n"
 
 
+def lfm2_completion_to_prompt(completion):
+    return f"<|startoftext|><|im_start|>system\nYou are a helpful assistant trained by Liquid AI.<|im_end|>\n<|im_start|>user\n{completion}<|im_end|>\n<|im_start|>assistant\n"
+
+
 SUPPORTED_LLM_MODELS = {
     "English": {
         "Qwen3-0.6B": {
@@ -113,8 +121,48 @@ SUPPORTED_LLM_MODELS = {
             "completion_to_prompt": qwen_completion_to_prompt,
             "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
+        "Qwen3-30B-A3B": {
+            "model_id": "Qwen/Qwen3-30B-A3B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+        },
         "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
         "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
+        "lfm2-350m": {
+            "model_id": "LiquidAI/LFM2-350M",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-700m": {
+            "model_id": "LiquidAI/LFM2-700M",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-1.2b": {
+            "model_id": "LiquidAI/LFM2-1.2B",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-2.6b": {
+            "model_id": "LiquidAI/LFM2-2.6B",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
         "GLM-4-9B-0414": {
             "model_id": "THUDM/GLM-4-9B-0414",
             "remote_code": False,
@@ -380,20 +428,6 @@ SUPPORTED_LLM_MODELS = {
             Answer: </s>
             <|assistant|>""",
         },
-        "notus-7b-v1": {
-            "model_id": "argilla/notus-7b-v1",
-            "remote_code": False,
-            "start_message": DEFAULT_SYSTEM_PROMPT,
-            "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
-            "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
-            + """
-            <|user|>
-            Question: {input} 
-            Context: {context} 
-            Answer: </s>
-            <|assistant|>""",
-        },
         "neural-chat-7b-v3-3": {
             "model_id": "Intel/neural-chat-7b-v3-3",
             "remote_code": False,
@@ -499,10 +533,39 @@ SUPPORTED_LLM_MODELS = {
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT,
         },
+        "gpt-oss-20b": {
+            "model_id": "openai/gpt-oss-20b",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT + " You should not show your reasoning steps. Reasoning: low.",
+            "exclude_on_devices": ["GPU"],
+        },
+        "bitnet-b1.58-2B-4T": {
+            "model_id": "microsoft/bitnet-b1.58-2B-4T",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "genai_chat_template": "{% set loop_messages = messages %}{% for message in loop_messages %}{% set content = message['role'].capitalize() + ': '+ message['content'].strip() + '<|eot_id|>' %}{{ content }}{% endfor %}{% if add_generation_prompt %}{{ 'Assistant: ' }}{% endif %}",
+            "exclude_compression": ["INT4", "INT4-AWQ", "INT4-NPU", "INT8"],
+        },
     },
     "Chinese": {
         "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
         "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
+        "lfm2-1.2b": {
+            "model_id": "LiquidAI/LFM2-1.2B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-2.6b": {
+            "model_id": "LiquidAI/LFM2-2.6B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
         "Qwen3-4B": {
             "model_id": "Qwen/Qwen3-4B",
             "remote_code": False,
@@ -529,6 +592,14 @@ SUPPORTED_LLM_MODELS = {
         },
         "Qwen3-14B": {
             "model_id": "Qwen/Qwen3-14B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+        },
+        "Qwen3-30B-A3B": {
+            "model_id": "Qwen/Qwen3-30B-A3B",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
@@ -684,6 +755,22 @@ SUPPORTED_LLM_MODELS = {
         },
     },
     "Japanese": {
+        "lfm2-1.2b": {
+            "model_id": "LiquidAI/LFM2-1.2B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_JAPANESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-2.6b": {
+            "model_id": "LiquidAI/LFM2-2.6B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_JAPANESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
         "youri-7b-chat": {
             "model_id": "rinna/youri-7b-chat",
             "remote_code": False,
@@ -692,6 +779,11 @@ SUPPORTED_LLM_MODELS = {
             "current_message_template": "ユーザー: {user}\nシステム: {assistant}",
             "tokenizer_kwargs": {"add_special_tokens": False},
             "partial_text_processor": youri_partial_text_processor,
+            "rag_prompt_template": f"設定: {DEFAULT_RAG_PROMPT_JAPANESE}\n"
+            + """
+            ユーザー: 質問: {input}
+            コンテキスト: {context}
+            システム: """,
         },
     },
 }
@@ -731,6 +823,13 @@ SUPPORTED_EMBEDDING_MODELS = {
             "normalize_embeddings": True,
         },
     },
+    "Japanese": {
+        "bge-m3": {
+            "model_id": "BAAI/bge-m3",
+            "mean_pooling": False,
+            "normalize_embeddings": True,
+        },
+    },
 }
 
 
@@ -757,11 +856,6 @@ compression_configs = {
         "ratio": 0.6,
     },
     "gemma-2b-it": {
-        "sym": True,
-        "group_size": 64,
-        "ratio": 0.6,
-    },
-    "notus-7b-v1": {
         "sym": True,
         "group_size": 64,
         "ratio": 0.6,
@@ -852,23 +946,43 @@ int4_npu_config = {
 }
 
 
-def get_llm_selection_widget(languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True, device=None):
+def get_llm_selection_widget(
+    languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True, device=None, genai=False
+):
     import ipywidgets as widgets
+
+    def filter_models(model_info):
+        if device and device in model_info[1].get("exclude_on_devices", []):
+            return False
+        if genai and model_info[1].get("genai_supported") is False:
+            return False
+        return True
+
+    available_optimumzations = SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"]
 
     lang_dropdown = widgets.Dropdown(options=languages or [])
 
     # Define dependent drop down
-
-    model_dropdown = widgets.Dropdown(options=models)
+    supported_models = dict(filter(filter_models, models.items()))
+    model_dropdown = widgets.Dropdown(options=supported_models)
 
     def dropdown_handler(change):
         global default_language
         default_language = change.new
         # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
-        model_dropdown.options = SUPPORTED_LLM_MODELS[change.new]
+        supported_models = SUPPORTED_LLM_MODELS[change.new]
+        model_dropdown.options = dict(filter(filter_models, supported_models.items()))
 
     lang_dropdown.observe(dropdown_handler, names="value")
-    compression_dropdown = widgets.Dropdown(options=SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"])
+
+    def dropdown_model_handler(change):
+        global model_dropdown
+        model_dropdown = change.new
+        compression_dropdown.options = filter(lambda opt_type: opt_type not in change.new.get("exclude_compression", []), available_optimumzations)
+
+    model_dropdown.observe(dropdown_model_handler, names="value")
+
+    compression_dropdown = widgets.Dropdown(options=available_optimumzations)
     preconverted_checkbox = widgets.Checkbox(value=True)
 
     form_items = []
@@ -948,8 +1062,22 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
     print(f"⌛ {model_id} conversion to {precision} started. It may takes some time.")
     display(Markdown("**Export command:**"))
     display(Markdown(f"`{optimum_cli_command}`"))
-    subprocess.run(optimum_cli_command.split(" "), shell=(platform.system() == "Windows"), check=True)
-    print(f"✅ {precision} {model_id} model converted and can be found in {model_dir}")
+
+    try:
+        result = subprocess.run(
+            optimum_cli_command.split(" "), shell=(platform.system() == "Windows"), check=False, capture_output=True, encoding="utf-8", errors="replace"
+        )
+        if result.stdout:
+            print(result.stdout.replace("\ufffd", "?"))
+        if result.stderr:
+            print(result.stderr.replace("\ufffd", "?"))
+        if result.returncode != 0:
+            raise subprocess.CalledProcessError(result.returncode, optimum_cli_command)
+    except Exception as e:
+        print(f"An error occurred during model export: {e}")
+        raise
+
+    print(f"SUCCESS: {precision} {model_id} model converted and can be found in {model_dir}")
     return model_dir
 
 

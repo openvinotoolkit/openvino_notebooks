@@ -108,7 +108,7 @@ def make_demo(fn: Callable):
                         step=1,
                         value=4,
                     )
-                    guidance_scale = gr.Slider(label="Guidance scale", minimum=0.1, maximum=10.0, step=0.1, value=0)
+                    guidance_scale = gr.Slider(label="Guidance scale", minimum=0.1, maximum=10.0, step=0.1, value=0.1)
                     seed = gr.Slider(
                         label="Seed",
                         minimum=0,
