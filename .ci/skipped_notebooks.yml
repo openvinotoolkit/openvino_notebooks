@@ -471,3 +471,10 @@
         - windows-2022
     - python:
         - "3.13"
+- notebook: notebooks/aloha-act/aloha-act.ipynb
+  skips:
+    - os:
+        - macos-13
+        - windows-2022
+    - python:
+        - '3.13'
