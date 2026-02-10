@@ -1,3 +1,2 @@
 notebooks/instant-id/instant-id.ipynb
 notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb
-notebooks/sdxl-turbo/sdxl-turbo.ipynb
