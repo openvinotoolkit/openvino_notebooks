@@ -2,7 +2,7 @@
 
 This notebook demonstrates how to use the ACT (Action Chunking Transformer) model for imitation learning tasks for Aloha Robot, with OpenVINO optimization for efficient inference.
 
-**Note:** This notebook currently supports **Ubuntu 22.04** only.
+**Note:** This notebook currently supports **Ubuntu 22.04**, Python 3.10-3.12 only.
 
 ## Overview
 

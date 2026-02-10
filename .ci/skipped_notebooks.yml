@@ -604,3 +604,5 @@
     - os:
         - macos-13
         - windows-2022
+    - python:
+        - '3.13'
