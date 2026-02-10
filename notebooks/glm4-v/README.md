@@ -4,7 +4,7 @@
 
 You can find more information in [model card](https://huggingface.co/THUDM/glm-4v-9b), [technical report](https://arxiv.org/pdf/2406.12793) and original [repository](https://github.com/THUDM/GLM-4).
 
-In this tutorial we consider how to launch multimodal model GLM-Edge-V using OpenVINO for creation multimodal chatbot. Additionally, we optimize model to low precision using [NNCF](https://github.com/openvinotoolkit/nncf).
+In this tutorial we consider how to launch multimodal model GLM-4V-9B using OpenVINO for creation multimodal chatbot. Additionally, we optimize model to low precision using [NNCF](https://github.com/openvinotoolkit/nncf).
 
 ## Notebook contents
 The tutorial consists from following steps:

@@ -1,4 +1,4 @@
-#  Text-to-Speech (TTS) system Fun-CosyVoice 3.0 and OpenVINO
+#  Text-to-Speech (TTS) system with Fun-CosyVoice 3.0 and OpenVINO
 
 Fun-CosyVoice 3.0 is an advanced text-to-speech (TTS) system based on large language models (LLM), surpassing its predecessor (CosyVoice 2.0) in content consistency, speaker similarity, and prosody naturalness. It is designed for zero-shot multilingual speech synthesis in the wild.
 
