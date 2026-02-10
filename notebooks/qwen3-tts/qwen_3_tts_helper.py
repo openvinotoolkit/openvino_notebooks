@@ -910,6 +910,7 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
         # ckpt is a HuggingFace model ID, model was already loaded so it's in cache
         # Use try_to_load_from_cache to get the cached path without re-downloading
         from huggingface_hub import try_to_load_from_cache
+
         # Try to find speech_tokenizer directory in cache
         cached_config = try_to_load_from_cache(model_id, "speech_tokenizer/config.json")
         if cached_config and cached_config != "_CACHED_NO_EXIST":
@@ -918,8 +919,7 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
         else:
             # Fallback: download speech_tokenizer files if not in cache
             model_local_path = Path(
-                snapshot_download(model_id, allow_patterns=["speech_tokenizer/**", "*.json", "*.txt"], 
-                                ignore_patterns=["*.safetensors", "*.bin"])
+                snapshot_download(model_id, allow_patterns=["speech_tokenizer/**", "*.json", "*.txt"], ignore_patterns=["*.safetensors", "*.bin"])
             )
 
     speech_tokenizer_dir = model_local_path / "speech_tokenizer"
