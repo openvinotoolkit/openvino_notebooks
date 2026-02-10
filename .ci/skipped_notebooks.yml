@@ -26,16 +26,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/grammar-correction/grammar-correction.ipynb
-  skips:
-    - os:
-        - ubuntu-22.04
 - notebook: notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb
   skips:
     - os:
@@ -73,12 +63,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/riffusion-text-to-music/riffusion-text-to-music.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/freevc-voice-conversion/freevc-voice-conversion.ipynb
   skips:
     - os:
@@ -98,12 +82,6 @@
         - ubuntu-22.04
         - windows-2022
 - notebook: notebooks/music-generation/music-generation.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb
   skips:
     - os:
         - macos-13
@@ -133,12 +111,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/fast-segment-anything/fast-segment-anything.ipynb
   skips:
     - os:
@@ -157,43 +129,13 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/prompt-lookup-decoding/prompt-lookup-decoding.ipynb
-  skips:
-    - os:
-        - macos-13
 - notebook: notebooks/distil-whisper-asr/distil-whisper-asr.ipynb
   skips:
     - os:
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/sound-generation-audioldm2/sound-generation-audioldm2.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/sdxl-turbo/sdxl-turbo.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/llm-question-answering/llm-question-answering.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-    - python:
-        - '3.13'
-- notebook: notebooks/photo-maker/photo-maker.ipynb
   skips:
     - os:
         - macos-13
@@ -229,18 +171,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/yolov10-optimization/yolov10-optimization.ipynb
   skips:
     - os:
@@ -269,20 +199,10 @@
   skips:
     - os:
         - macos-13
-- notebook: notebooks/nano-llava-multimodal-chatbot/nano-llava-multimodal-chatbot.ipynb
-  skips:
-    - os:
-        - macos-13
 - notebook: notebooks/text-prediction/text-prediction.ipynb
   skips:
     - os:
         - windows-2022
-- notebook: notebooks/s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb
-  skips:
-    - device:
-        - gpu
-    - python:
-        - '3.13'
 - notebook: notebooks/hello-npu/hello-npu.ipynb
   skips:
     - device:
@@ -314,11 +234,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/stable-fast-3d/stable-fast-3d.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
 - notebook: notebooks/mllama-3.2/mllama-3.2.ipynb
   skips:
     - os:
@@ -339,20 +254,12 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/llm-native-agent-react/llm-native-agent-react.ipynb
-  skips:
-    - os:
-        - macos-13
 - notebook: notebooks/multilora-image-generation/multilora-image-generation.ipynb
   skips:
     - os:
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/outetts-text-to-speech/outetts-text-to-speech.ipynb
-  skips:
-    - os:
-        - macos-13
 - notebook: notebooks/mobileclip-video-search/mobileclip-video-search.ipynb
   skips:
     - os:
@@ -363,10 +270,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/glm-edge-v/glm-edge-v.ipynb
-  skips:
-    - os:
-        - macos-13
 - notebook: notebooks/multimodal-rag/multimodal-rag-llamaindex.ipynb
   skips:
     - os:
@@ -377,11 +280,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb
-  skips:
-    - python:
-        - '3.12'
-        - '3.13'
 - notebook: notebooks/ltx-video/ltx-video.ipynb
   skips:
     - os:
@@ -408,12 +306,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/keras-with-openvino-backend/keras-with-openvino-backend.ipynb
-  skips:
-    - os:
-        - windows-2022
-    - python:
-        - '3.12'
 - notebook: notebooks/gemma3/gemma3.ipynb
   skips:
    - os:
@@ -421,12 +313,6 @@
         - ubuntu-22.04
         - windows-2022
 - notebook: notebooks/omniparser/omniparser.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/omnigen/omnigen.ipynb
   skips:
     - os:
         - macos-13
@@ -468,12 +354,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/intern-video2-classiciation/intern-video2-classification.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/openvoice2-and-melotts/openvoice2-and-melotts.ipynb
   skips:
     - os:
@@ -496,10 +376,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/magika-content-type-recognition/magika-content-type-recognition.ipynb
-  skips:
-    - os:
-        - windows-2022
 - notebook: notebooks/glm4.1-v-thinking/glm4.1-v-thinking.ipynb
   skips:
     - os:
@@ -518,10 +394,6 @@
         - ubuntu-22.04
         - windows-2022
 - notebook: notebooks/convert-to-openvino/convert-to-openvino.ipynb
-  skips:
-    - python:
-        - "3.13"
-- notebook: notebooks/jax-to-openvino/jax-classification-to-openvino.ipynb
   skips:
     - python:
         - "3.13"
