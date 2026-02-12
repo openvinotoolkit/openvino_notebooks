@@ -149,6 +149,16 @@ def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig, skip_co
     return list(set(ignored_notebooks))
 
 
+def get_existing_tests(test_list_to_check: list, test_plan: TestPlan) -> TestPlan:
+    existing_tests: Path = []
+    for test in test_list_to_check:
+        if test in test_plan:
+            existing_tests.append(test)
+        else:
+            print(f"WARNING: Notebook '{test}' is not found in notebooks directory '{str(ROOT / NOTEBOOKS_DIR)}'.")
+    return existing_tests
+
+
 def prepare_test_plan(
     validation_config: ValidationConfig, test_list: Optional[list[str]], ignore_config: str, ignore_list: Optional[list[str]], nb_dir: Optional[Path] = None
 ) -> TestPlan:
@@ -175,6 +185,8 @@ def prepare_test_plan(
         raise ValueError(
             f"Ignore list items should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\nInvalid ignored notebooks: {ignored_notebooks}"
         )
+
+    ignored_notebooks = get_existing_tests(ignored_notebooks, test_plan)
     ignored_notebooks = sorted(ignored_notebooks)
     print(f"Ignored notebooks: {ignored_notebooks}")
 
@@ -221,6 +233,8 @@ def prepare_test_plan(
             "  3. Empty to test all notebooks.\n"
             f"Received test list: {test_list}"
         )
+
+    testing_notebooks = get_existing_tests(testing_notebooks, test_plan)
     testing_notebooks = sorted(list(set(testing_notebooks)))
     print(f"Testing notebooks: {testing_notebooks}")
 
@@ -229,6 +243,7 @@ def prepare_test_plan(
             test_plan[notebook]["status"] = NotebookStatus.SKIPPED
         if notebook in ignored_notebooks:
             test_plan[notebook]["status"] = NotebookStatus.SKIPPED
+
     return test_plan
 
 
