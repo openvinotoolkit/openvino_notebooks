@@ -2,6 +2,15 @@
 
 This folder contains the `vlm-npu.ipynb` notebook for running vision-language models with OpenVINO. The models used in the notebook are specifically optimized to work on Intel NPU, though it may also work on CPU & GPU as well. This notebook is self-sufficient and install all the packages required to run the models within a virtual environment. The notebook downloads the models from HuggingFace (some models might require HF token), quantize and convert to OpenVINO IR format using optimum-cli and then pass an image and a prompt to generate the response using openvino-genai. 
 
+## Models included in this notebook
+1. Qwen2.5-VL-3B-Instruct
+2. Phi4-Multimodal-Instruct
+3. Phi3.5-Vision-Instruct
+4. Gemma3-4B-it
+5. MiniCPM-V2.6
+6. MiniCPM-V4.5
+
+
 The notebook is tested on Intel Core Ultra 3 (Panther Lake) NPU
 
 ## Prerequisites
