@@ -9,7 +9,6 @@ notebooks/llm-rag-langchain/llm-rag-langchain.ipynb # nncf@https://github.com/op
 notebooks/depth-anything/depth-anything.ipynb # install requirements.txt after clone repo
 notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb # requires python >=3.9
 notebooks/mobileclip-video-search/mobileclip-video-search.ipynb # install requirements.txt inside
-notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb # requires python >=3.9
 notebooks/animate-anyone/animate-anyone.ipynb # diffusers<=0.24
 notebooks/whisper-subtitles-generation/whisper-convert.ipynb # pytube
 notebooks/grounded-segment-anything/grounded-segment-anything.ipynb # deprecated installer
