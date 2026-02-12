@@ -256,7 +256,6 @@ jobs:
 
           python${{ inputs.python }} .ci/validate_notebooks.py \
             --os ${{ env.OS_NAME }} \
-            --parallel 4 \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
             ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
