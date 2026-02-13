@@ -34,9 +34,25 @@ def detect_source_venv_path() -> Path:
     """
     Detect the source virtual environment path based on the current Python executable.
 
+    On Unix, python is in bin/ subdirectory:  .../env_root/bin/python  -> .parent.parent
+    On Windows venv, python is in Scripts/:   ...\env_root\Scripts\python.exe -> .parent.parent
+    On Windows raw install, python is in root: ...\env_root\python.exe -> .parent
+
     Returns: Path
     """
-    source_venv_path = Path(sys.executable).parent.parent
+    python_path = Path(sys.executable)
+    parent_dir = python_path.parent
+
+    if platform.system() == "Windows":
+        # On Windows, if python.exe is in Scripts\ it's a standard venv -> go up 2 levels
+        # Otherwise (raw Python install, e.g. hostedtoolcache) python.exe is in root -> go up 1 level
+        if parent_dir.name.lower() == "scripts":
+            source_venv_path = parent_dir.parent
+        else:
+            source_venv_path = parent_dir
+    else:
+        # On Unix, python is always in bin/ -> go up 2 levels
+        source_venv_path = python_path.parent.parent
 
     print(f"Detecting source virtual environment executable: {sys.executable}", flush=True)
     print(f"Detected source virtual environment path: {source_venv_path}", flush=True)
@@ -368,8 +384,18 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
         if is_standard_venv:
             clone_virtualenv(str(source_env_path), str(target_env_path))
         else:
-            print(f"Falling back to venv create from {sys.executable}")
-            builder = venv.EnvBuilder(with_pip=True)
+            print(
+                f"Source at '{source_env_path}' is not a standard virtual environment "
+                f"(no '{expected_python}' found). "
+                f"Creating venv with system_site_packages=True from {sys.executable}",
+                flush=True,
+            )
+            # Use system_site_packages=True so the new venv inherits all packages
+            # installed in the parent Python (treon, openvino, etc.).
+            # This is necessary for raw Python installs (e.g. GitHub Actions
+            # hostedtoolcache on Windows) where clone_virtualenv cannot work
+            # because the source is not a standard venv.
+            builder = venv.EnvBuilder(system_site_packages=True, with_pip=True)
             builder.create(target_env_path)
     except Exception as e:
         print(f"Error cloning virtual environment: {e}", flush=True)

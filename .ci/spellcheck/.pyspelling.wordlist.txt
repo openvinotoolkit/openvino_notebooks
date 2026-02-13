@@ -42,6 +42,7 @@ arxiv
 ASPP
 ASR
 asr
+ASRModel
 ASYM
 async
 AsyncInferQueue
@@ -158,6 +159,7 @@ coors
 coreference
 CoSENT
 CosyVoice
+Conv
 cpm
 cpp
 cpu
@@ -169,7 +171,9 @@ CTM
 CUDA
 CustomEncoderWav
 customizable
+CustomVoice
 CVF
+CVAE
 CVPR
 DarkIR
 Databricks
@@ -189,6 +193,7 @@ DDColor's
 DDIM
 DDPMs
 dDPO
+DETR
 de
 Deblur
 deblur
@@ -316,9 +321,11 @@ finetuned
 finetuning
 FireRedTTS
 FLAC
+flac
 FLD
 floyd
 fn
+ForcedAligner
 foley
 Formatter
 formatter
@@ -651,6 +658,7 @@ Multilinguality
 multimodal
 Multimodality
 multinomial
+MuJoCo
 MuRAG
 MusicGen
 Müller
@@ -775,6 +783,7 @@ panoptic
 parallelized
 parameterization
 parametrize
+paralinguistic
 Parler
 parsers
 patchifying
@@ -929,6 +938,7 @@ RoBERTa
 roberta
 ROI
 RoPE
+rollout
 Ruizhongtai
 Runtime
 runtime
@@ -1098,6 +1108,7 @@ TripoSR
 Tsinghua
 TsinghuaNLP
 TTS
+TTSModel
 tunable
 tv
 TwoStreamInterleaveTransformer
@@ -1162,6 +1173,7 @@ Vladlen
 vlm
 VLM
 VLModel
+vLLM
 VLMPipeline
 VLMs
 VL’s
@@ -1170,6 +1182,7 @@ VOC
 Vocoder
 vocoder
 vocoding
+VoiceDesign
 voxel
 Voxelization
 voxelization
