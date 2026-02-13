@@ -358,6 +358,12 @@
   skips:
     - os:
         - macos-13
+- notebook: notebooks/wan2.1-text-to-video/wan2.1-text-to-video.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
 - notebook: notebooks/llm-agent-mcp/llm-agent-mcp.ipynb
   skips:
     - os:
@@ -441,6 +447,12 @@
         - ubuntu-22.04
         - windows-2022
 - notebook: notebooks/deepseek-ocr/deepseek-ocr.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/wan2.2-text-image-to-video/wan2.2-text-image-to-video.ipynb
   skips:
     - os:
         - macos-13
