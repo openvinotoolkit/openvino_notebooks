@@ -43,11 +43,11 @@ def load_image(image_path):
 
     try:
         image = Image.open(image_path)
-        
+
         corrected_image = ImageOps.exif_transpose(image)
-        
+
         return corrected_image
-        
+
     except Exception as e:
         print(f"error: {e}")
         try:
@@ -57,7 +57,7 @@ def load_image(image_path):
 
 
 def re_match(text):
-    pattern = r'(<\|ref\|>(.*?)<\|/ref\|><\|det\|>(.*?)<\|/det\|>)'
+    pattern = r"(<\|ref\|>(.*?)<\|/ref\|><\|det\|>(.*?)<\|/det\|>)"
     matches = re.findall(pattern, text, re.DOTALL)
 
     # pattern1 = r'<\|ref\|>.*?<\|/ref\|>\n'
@@ -66,7 +66,7 @@ def re_match(text):
     mathes_image = []
     mathes_other = []
     for a_match in matches:
-        if '<|ref|>image<|/ref|>' in a_match[0]:
+        if "<|ref|>image<|/ref|>" in a_match[0]:
             mathes_image.append(a_match[0])
         else:
             mathes_other.append(a_match[0])
@@ -88,31 +88,31 @@ def extract_coordinates_and_label(ref_text, image_width, image_height):
 def draw_bounding_boxes(image, refs, ouput_path):
 
     image_width, image_height = image.size
-    
+
     img_draw = image.copy()
     draw = ImageDraw.Draw(img_draw)
 
-    overlay = Image.new('RGBA', img_draw.size, (0, 0, 0, 0))
+    overlay = Image.new("RGBA", img_draw.size, (0, 0, 0, 0))
     draw2 = ImageDraw.Draw(overlay)
-    
+
     # try:
     # except IOError:
     #     try:
-    #         font = ImageFont.truetype("DejaVuSans.ttf", 20) 
+    #         font = ImageFont.truetype("DejaVuSans.ttf", 20)
     #     except IOError:
     font = ImageFont.load_default()
 
     img_idx = 0
-    
+
     for i, ref in enumerate(refs):
         try:
             result = extract_coordinates_and_label(ref, image_width, image_height)
             if result:
                 label_type, points_list = result
-                
+
                 color = (np.random.randint(0, 200), np.random.randint(0, 200), np.random.randint(0, 255))
 
-                color_a = color + (20, )
+                color_a = color + (20,)
                 for points in points_list:
                     x1, y1, x2, y2 = points
 
@@ -122,7 +122,7 @@ def draw_bounding_boxes(image, refs, ouput_path):
                     x2 = int(x2 / 999 * image_width)
                     y2 = int(y2 / 999 * image_height)
 
-                    if label_type == 'image':
+                    if label_type == "image":
                         try:
                             cropped = image.crop((x1, y1, x2, y2))
                             cropped.save(f"{ouput_path}/images/{img_idx}.jpg")
@@ -130,9 +130,9 @@ def draw_bounding_boxes(image, refs, ouput_path):
                             print(e)
                             pass
                         img_idx += 1
-                        
+
                     try:
-                        if label_type == 'title':
+                        if label_type == "title":
                             draw.rectangle([x1, y1, x2, y2], outline=color, width=4)
                             draw2.rectangle([x1, y1, x2, y2], fill=color_a, outline=(0, 0, 0, 0), width=1)
                         else:
@@ -140,14 +140,12 @@ def draw_bounding_boxes(image, refs, ouput_path):
                             draw2.rectangle([x1, y1, x2, y2], fill=color_a, outline=(0, 0, 0, 0), width=1)
                         text_x = x1
                         text_y = max(0, y1 - 15)
-                            
-                        
+
                         text_bbox = draw.textbbox((0, 0), label_type, font=font)
                         text_width = text_bbox[2] - text_bbox[0]
                         text_height = text_bbox[3] - text_bbox[1]
-                        draw.rectangle([text_x, text_y, text_x + text_width, text_y + text_height], 
-                                    fill=(255, 255, 255, 30))
-                        
+                        draw.rectangle([text_x, text_y, text_x + text_width, text_y + text_height], fill=(255, 255, 255, 30))
+
                         draw.text((text_x, text_y), label_type, font=font, fill=color)
                     except:
                         pass
@@ -160,15 +158,12 @@ def draw_bounding_boxes(image, refs, ouput_path):
 def process_image_with_refs(image, ref_texts, output_path):
 
     result_image = draw_bounding_boxes(image, ref_texts, output_path)
-    
+
     return result_image
 
 
-
-
-
 def find_closest_aspect_ratio(aspect_ratio, target_ratios, width, height, image_size):
-    best_ratio_diff = float('inf')
+    best_ratio_diff = float("inf")
     best_ratio = (1, 1)
     area = width * height
     for ratio in target_ratios:
@@ -189,15 +184,12 @@ def dynamic_preprocess(image, min_num=2, max_num=6, image_size=768, use_thumbnai
     aspect_ratio = orig_width / orig_height
 
     # calculate the existing image aspect ratio
-    target_ratios = set(
-        (i, j) for n in range(min_num, max_num + 1) for i in range(1, n + 1) for j in range(1, n + 1) if
-        i * j <= max_num and i * j >= min_num)
+    target_ratios = set((i, j) for n in range(min_num, max_num + 1) for i in range(1, n + 1) for j in range(1, n + 1) if i * j <= max_num and i * j >= min_num)
     # print(target_ratios)
     target_ratios = sorted(target_ratios, key=lambda x: x[0] * x[1])
 
     # find the closest aspect ratio to the target
-    target_aspect_ratio = find_closest_aspect_ratio(
-        aspect_ratio, target_ratios, orig_width, orig_height, image_size)
+    target_aspect_ratio = find_closest_aspect_ratio(aspect_ratio, target_ratios, orig_width, orig_height, image_size)
 
     # print(target_aspect_ratio)
     # calculate the target width and height
@@ -213,7 +205,7 @@ def dynamic_preprocess(image, min_num=2, max_num=6, image_size=768, use_thumbnai
             (i % (target_width // image_size)) * image_size,
             (i // (target_width // image_size)) * image_size,
             ((i % (target_width // image_size)) + 1) * image_size,
-            ((i // (target_width // image_size)) + 1) * image_size
+            ((i // (target_width // image_size)) + 1) * image_size,
         )
         # split the image
         split_img = resized_img.crop(box)
@@ -223,6 +215,7 @@ def dynamic_preprocess(image, min_num=2, max_num=6, image_size=768, use_thumbnai
         thumbnail_img = image.resize((image_size, image_size))
         processed_images.append(thumbnail_img)
     return processed_images, target_aspect_ratio
+
 
 def normalize_transform(mean, std):
     if mean is None and std is None:
@@ -307,7 +300,7 @@ def load_pil_images(conversations: List[Dict[str, str]]) -> List[Image.Image]:
             # print(image_path)
             # print('----------------')
             # exit()
-            
+
             # pil_img = Image.open(image_path)
             pil_img = load_image(image_path)
             pil_img = pil_img.convert("RGB")
@@ -331,24 +324,19 @@ class BaseTransform(ABC):
 
 class BasicImageTransform(BaseTransform):
     def __init__(
-        self, 
-        mean: Optional[Tuple[float, float, float]] = (0.5, 0.5, 0.5),
-        std: Optional[Tuple[float, float, float]] = (0.5, 0.5, 0.5),
-        normalize: bool = True
+        self, mean: Optional[Tuple[float, float, float]] = (0.5, 0.5, 0.5), std: Optional[Tuple[float, float, float]] = (0.5, 0.5, 0.5), normalize: bool = True
     ):
         self.mean = mean
         self.std = std
-    
-        transform_pipelines = [
-            transforms.ToTensor()
-        ]
+
+        transform_pipelines = [transforms.ToTensor()]
 
         normalize = normalize_transform(mean, std) if normalize else nn.Identity()
         if normalize is not None:
             transform_pipelines.append(normalize)
 
         self.transform = transforms.Compose(transform_pipelines)
-    
+
     def __call__(self, x):
         x = self.transform(x)
         return x
@@ -696,6 +684,7 @@ def cleanup_torchscript_cache():
     torch.jit._recursive.concrete_type_store = torch.jit._recursive.ConcreteTypeStore()
     torch.jit._state._clear_class_state()
 
+
 def patch_cos_sin_cached_fp32(model):
     if (
         hasattr(model, "layers")
@@ -750,9 +739,10 @@ def convert_deepseek_ocr2(model_id=model_id, model_path=None, quantization_confi
         print("⌛ Convert Qwen2 model")
 
         patch_cos_sin_cached_fp32(pt_model.model.qwen2_model.model.model)
+
         def vision_forward(self, x_combined, token_type_ids, n_query):
             y = self.qwen2_model.model(inputs_embeds=x_combined, token_type_ids=token_type_ids)[0]
-            y = y[:, n_query:, :] # causal flow query
+            y = y[:, n_query:, :]  # causal flow query
             features = self.projector(y)
             return features
 
@@ -764,11 +754,11 @@ def convert_deepseek_ocr2(model_id=model_id, model_path=None, quantization_confi
             "token_type_ids": torch.cat([torch.zeros(1, 256, dtype=torch.long), torch.ones(1, 256, dtype=torch.long)], dim=1),
             "n_query": torch.tensor(256, dtype=torch.long),
         }
-                
+
         input_shapes = [
-            ov.PartialShape([-1, -1, moe_intermediate_size]),          # x_combined
-            ov.PartialShape([-1, -1]),          # token_type_ids
-            ov.PartialShape([1]),          # n_query
+            ov.PartialShape([-1, -1, moe_intermediate_size]),  # x_combined
+            ov.PartialShape([-1, -1]),  # token_type_ids
+            ov.PartialShape([1]),  # n_query
         ]
         ov_model = ov.convert_model(pt_model.model, example_input=dummy_inputs, input=input_shapes)
 
@@ -781,7 +771,7 @@ def convert_deepseek_ocr2(model_id=model_id, model_path=None, quantization_confi
         cleanup_torchscript_cache()
         gc.collect()
         print("✅ Qwen2 model successfully converted")
-        
+
     if not (model_path / SAM_MODEL_PATH).exists():
         print("⌛ Convert SAM model")
         ov_model = ov.convert_model(pt_model.model.sam_model, example_input=torch.ones([1, 3, 1024, 1024]))
@@ -846,10 +836,10 @@ def convert_deepseek_ocr2(model_id=model_id, model_path=None, quantization_confi
 
         model_inputs = ["attention_mask", "position_ids", *pkv_input_names, "inputs_embeds"]
         model_outputs = ["logits", *pkv_output_names]
-        
+
         input_shapes = [
-            ov.PartialShape([-1, -1]),          # attention_mask
-            ov.PartialShape([-1, -1]),          # position_ids
+            ov.PartialShape([-1, -1]),  # attention_mask
+            ov.PartialShape([-1, -1]),  # position_ids
         ]
         input_shapes += (
             [
@@ -1119,16 +1109,12 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
         self.device = torch.device("cpu")
         if model_dir is not Path:
             model_dir = Path(model_dir)
-        self.qwen_2_model = core.compile_model(
-            model_dir / QWEN2_MODEL_PATH, device
-        )
-        self.sam_model = core.compile_model(
-            model_dir / SAM_MODEL_PATH, device
-        )
+        self.qwen_2_model = core.compile_model(model_dir / QWEN2_MODEL_PATH, device)
+        self.sam_model = core.compile_model(model_dir / SAM_MODEL_PATH, device)
         self.query_768 = torch.tensor(self.config.query_768)
         self.query_1024 = torch.tensor(self.config.query_1024)
         self.view_seperator = torch.tensor(self.config.view_seperator)
-        
+
     def extract_image_features(self, patches):
         x = torch.from_numpy(self.sam_model(patches)[0])
         x = x.flatten(2).transpose(1, 2)  # (bs, spatial, channels)
@@ -1145,10 +1131,13 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
         x_combined = torch.cat([x, batch_query_imgs], dim=1)
 
         # Create token type IDs (0 for image, 1 for query)
-        token_type_ids = torch.cat([
-            torch.zeros(bs, n_query, dtype=torch.long, device=x.device),
-            torch.ones(bs, n_query, dtype=torch.long, device=x.device),
-        ], dim=1)
+        token_type_ids = torch.cat(
+            [
+                torch.zeros(bs, n_query, dtype=torch.long, device=x.device),
+                torch.ones(bs, n_query, dtype=torch.long, device=x.device),
+            ],
+            dim=1,
+        )
         n_query = torch.tensor(n_query, dtype=torch.long)
         features = torch.from_numpy(self.qwen_2_model([x_combined, token_type_ids, n_query])[0])
         return features
@@ -1189,18 +1178,18 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
             image_ori = image[1]
 
             with torch.no_grad():
-            # with torch.inference_mode(): 
-                
+                # with torch.inference_mode():
+
                 if torch.sum(patches).item() != 0:
                     # P, C, H, W = patches.shape
                     crop_flag = 1
                     local_features = self.extract_image_features(patches)
                     global_features = self.extract_image_features(image_ori)
 
-                    print('=====================')
-                    print('BASE: ', global_features.shape)
-                    print('PATCHES: ', local_features.shape)
-                    print('=====================')
+                    print("=====================")
+                    print("BASE: ", global_features.shape)
+                    print("PATCHES: ", local_features.shape)
+                    print("=====================")
 
                     _, hw, n_dim = global_features.shape
                     # h = w = int(hw ** 0.5)
@@ -1208,9 +1197,7 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
                     _2, hw2, n_dim2 = local_features.shape
                     # h2 = w2 = int(hw2 ** 0.5)
 
-
                     global_features = global_features.view(-1, n_dim)
-
 
                     local_features = local_features.view(-1, n_dim2)
 
@@ -1223,16 +1210,15 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
                     # print('all: ', end_time - start_time)
 
                     # exit()
-                
+
                 else:
                     global_features = self.extract_image_features(image_ori)
-                    print('=====================')
-                    print('BASE: ', global_features.shape)
-                    print('NO PATCHES')
-                    print('=====================')
+                    print("=====================")
+                    print("BASE: ", global_features.shape)
+                    print("NO PATCHES")
+                    print("=====================")
                     _, hw, n_dim = global_features.shape
                     # h = w = int(hw ** 0.5)
-
 
                     # global_features = global_features.view(h, w, n_dim)
 
@@ -1374,32 +1360,44 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
 
         return True
 
-    def infer(self, tokenizer, prompt='', image_file='', output_path = '', base_size=1024, image_size=640, crop_mode=True, test_compress=False, save_results=False, eval_mode=False):
+    def infer(
+        self,
+        tokenizer,
+        prompt="",
+        image_file="",
+        output_path="",
+        base_size=1024,
+        image_size=640,
+        crop_mode=True,
+        test_compress=False,
+        save_results=False,
+        eval_mode=False,
+    ):
 
         os.makedirs(output_path, exist_ok=True)
-        os.makedirs(f'{output_path}/images', exist_ok=True)
+        os.makedirs(f"{output_path}/images", exist_ok=True)
 
         if prompt and image_file:
             conversation = [
                 {
                     "role": "<|User|>",
                     # "content": "<image>\n<|grounding|>Given the layout of the image. ",
-                    "content": f'{prompt}',
+                    "content": f"{prompt}",
                     # "content": "君不见黄河之水天上来的下一句是什么？",
                     # "content": "<image>\nFree OCR. ",
                     # "content": "<image>\nParse the figure. ",
                     # "content": "<image>\nExtract the text in the image. ",
-                    "images": [f'{image_file}'],
+                    "images": [f"{image_file}"],
                 },
                 {"role": "<|Assistant|>", "content": ""},
             ]
-        
+
         elif prompt:
             conversation = [
                 {
                     "role": "<|User|>",
                     # "content": "<image>\n<|grounding|>Given the layout of the image. ",
-                    "content": f'{prompt}',
+                    "content": f"{prompt}",
                     # "content": "君不见黄河之水天上来的下一句是什么？",
                     # "content": "<image>\nFree OCR. ",
                     # "content": "<image>\nParse the figure. ",
@@ -1409,9 +1407,9 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
                 {"role": "<|Assistant|>", "content": ""},
             ]
         else:
-            assert False, f'prompt is none!'
-        
-        prompt = format_messages(conversations=conversation, sft_format='plain', system_prompt='')
+            assert False, f"prompt is none!"
+
+        prompt = format_messages(conversations=conversation, sft_format="plain", system_prompt="")
 
         patch_size = 16
         downsample_ratio = 4
@@ -1422,15 +1420,14 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
 
         image_draw = images[0].copy()
 
-        w,h = image_draw.size
+        w, h = image_draw.size
         # print(w, h)
         ratio = 1 - ((max(w, h) - min(w, h)) / (max(w, h)))
-    
 
-        image_transform=BasicImageTransform(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5), normalize=True)
+        image_transform = BasicImageTransform(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5), normalize=True)
         images_seq_mask = []
 
-        image_token = '<image>'
+        image_token = "<image>"
         image_token_id = 128815
         text_splits = prompt.split(image_token)
 
@@ -1455,23 +1452,18 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
                     else:
                         # best_width, best_height = self.image_size, self.image_size
                         crop_ratio = [1, 1]
-                
+
                 """process the global view"""
                 # image = image.resize((base_size, base_size))
-                global_view = ImageOps.pad(image, (base_size, base_size),
-                                        color=tuple(int(x * 255) for x in image_transform.mean))
-                
+                global_view = ImageOps.pad(image, (base_size, base_size), color=tuple(int(x * 255) for x in image_transform.mean))
+
                 if base_size == 1024:
                     valid_img_tokens += int(256 * ratio)
                 elif base_size == 1280:
                     valid_img_tokens += int(400 * ratio)
                 # elif base_size == 640:
                 #     valid_img_tokens += int(100 * ratio)
-                
 
-
-
-                
                 images_list.append(image_transform(global_view))
 
                 # global_view_tensor = image_transform(global_view).to(torch.bfloat16)
@@ -1479,31 +1471,25 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
                 width_crop_num, height_crop_num = crop_ratio
 
                 images_spatial_crop.append([width_crop_num, height_crop_num])
-                
-                
+
                 if width_crop_num > 1 or height_crop_num > 1:
                     """process the local views"""
-                    
+
                     for i in range(len(images_crop_raw)):
                         images_crop_list.append(image_transform(images_crop_raw[i]))
-                
+
                 if image_size == 768:
                     valid_img_tokens += len(images_crop_list) * 144
 
                 num_queries = math.ceil((image_size // patch_size) / downsample_ratio)
                 num_queries_base = math.ceil((base_size // patch_size) / downsample_ratio)
 
-
-
                 """add image tokens"""
-
-                
 
                 tokenized_image = ([image_token_id] * num_queries_base) * num_queries_base
                 tokenized_image += [image_token_id]
                 if width_crop_num > 1 or height_crop_num > 1:
-                    tokenized_image += ([image_token_id] * (num_queries * width_crop_num)) * (
-                                num_queries * height_crop_num)
+                    tokenized_image += ([image_token_id] * (num_queries * width_crop_num)) * (num_queries * height_crop_num)
                 tokenized_str += tokenized_image
                 images_seq_mask += [True] * len(tokenized_image)
                 # num_image_tokens.append(len(tokenized_image))
@@ -1514,11 +1500,10 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
 
                 """process the global view"""
                 if image_size <= 768:
-                    print('directly resize')
+                    print("directly resize")
                     image = image.resize((image_size, image_size))
                 # else:
-                global_view = ImageOps.pad(image, (image_size, image_size),
-                                        color=tuple(int(x * 255) for x in image_transform.mean))
+                global_view = ImageOps.pad(image, (image_size, image_size), color=tuple(int(x * 255) for x in image_transform.mean))
                 images_list.append(image_transform(global_view))
 
                 if base_size == 1024:
@@ -1536,7 +1521,6 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
 
                 images_spatial_crop.append([width_crop_num, height_crop_num])
 
-
                 """add image tokens"""
                 num_queries = math.ceil((image_size // patch_size) / downsample_ratio)
 
@@ -1547,7 +1531,6 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
                 tokenized_str += tokenized_image
                 images_seq_mask += [True] * len(tokenized_image)
                 # num_image_tokens.append(len(tokenized_image))
-        
 
         """process the last text split"""
         tokenized_sep = text_encode(tokenizer, text_splits[-1], bos=False, eos=False)
@@ -1556,18 +1539,12 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
 
         """add the bos tokens"""
         bos_id = 0
-        tokenized_str = [bos_id] + tokenized_str 
+        tokenized_str = [bos_id] + tokenized_str
         images_seq_mask = [False] + images_seq_mask
-
-
 
         input_ids = torch.LongTensor(tokenized_str)
 
-
-        
-
         images_seq_mask = torch.tensor(images_seq_mask, dtype=torch.bool)
-
 
         if len(images_list) == 0:
             images_ori = torch.zeros((1, 3, image_size, image_size))
@@ -1582,129 +1559,122 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
             else:
                 images_crop = torch.zeros((1, 3, base_size, base_size))
 
-
-
         if not eval_mode:
             streamer = NoEOSTextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=False)
             with torch.no_grad():
                 output_ids = self.generate(
                     input_ids.unsqueeze(0),
                     images=[(images_crop, images_ori)],
-                    images_seq_mask = images_seq_mask.unsqueeze(0),
-                    images_spatial_crop = images_spatial_crop,
+                    images_seq_mask=images_seq_mask.unsqueeze(0),
+                    images_spatial_crop=images_spatial_crop,
                     # do_sample=False,
                     # num_beams = 1,
                     temperature=0.0,
                     eos_token_id=tokenizer.eos_token_id,
                     streamer=streamer,
                     max_new_tokens=8192,
-                    no_repeat_ngram_size = 20,
-                    use_cache = True
-                    )
+                    no_repeat_ngram_size=20,
+                    use_cache=True,
+                )
 
         else:
             with torch.no_grad():
                 output_ids = self.generate(
                     input_ids.unsqueeze(0),
                     images=[(images_crop, images_ori)],
-                    images_seq_mask = images_seq_mask.unsqueeze(0),
-                    images_spatial_crop = images_spatial_crop,
+                    images_seq_mask=images_seq_mask.unsqueeze(0),
+                    images_spatial_crop=images_spatial_crop,
                     # do_sample=False,
                     # num_beams = 1,
                     temperature=0.0,
                     eos_token_id=tokenizer.eos_token_id,
                     max_new_tokens=8192,
-                    no_repeat_ngram_size = 35,
-                    use_cache = True
-                    )
-                
+                    no_repeat_ngram_size=35,
+                    use_cache=True,
+                )
 
-        if '<image>' in conversation[0]['content'] and eval_mode:
-                outputs = tokenizer.decode(output_ids[0, input_ids.unsqueeze(0).shape[1]:])
-                stop_str = '<｜end▁of▁sentence｜>'
-                if outputs.endswith(stop_str):
-                    outputs = outputs[:-len(stop_str)]
-                # re_match
-                outputs = outputs.strip()
+        if "<image>" in conversation[0]["content"] and eval_mode:
+            outputs = tokenizer.decode(output_ids[0, input_ids.unsqueeze(0).shape[1] :])
+            stop_str = "<｜end▁of▁sentence｜>"
+            if outputs.endswith(stop_str):
+                outputs = outputs[: -len(stop_str)]
+            # re_match
+            outputs = outputs.strip()
 
-                return outputs
-        
-        if '<image>' in conversation[0]['content'] and test_compress:
-            outputs = tokenizer.decode(output_ids[0, input_ids.unsqueeze(0).shape[1]:])
+            return outputs
+
+        if "<image>" in conversation[0]["content"] and test_compress:
+            outputs = tokenizer.decode(output_ids[0, input_ids.unsqueeze(0).shape[1] :])
             pure_texts_outputs_token_length = len(text_encode(tokenizer, outputs, bos=False, eos=False))
-            print('='*50)
-            print('image size: ', (w, h))
-            print('valid image tokens: ', int(valid_img_tokens))
-            print('output texts tokens (valid): ', pure_texts_outputs_token_length)
-            print('compression ratio: ', round(pure_texts_outputs_token_length/valid_img_tokens, 2))
-            print('='*50)
+            print("=" * 50)
+            print("image size: ", (w, h))
+            print("valid image tokens: ", int(valid_img_tokens))
+            print("output texts tokens (valid): ", pure_texts_outputs_token_length)
+            print("compression ratio: ", round(pure_texts_outputs_token_length / valid_img_tokens, 2))
+            print("=" * 50)
 
+        if "<image>" in conversation[0]["content"] and save_results:
+            outputs = tokenizer.decode(output_ids[0, input_ids.unsqueeze(0).shape[1] :])
+            stop_str = "<｜end▁of▁sentence｜>"
 
-        if '<image>' in conversation[0]['content'] and save_results:
-            outputs = tokenizer.decode(output_ids[0, input_ids.unsqueeze(0).shape[1]:])
-            stop_str = '<｜end▁of▁sentence｜>'
+            print("=" * 15 + "save results:" + "=" * 15)
 
-            print('='*15 + 'save results:' + '='*15)
-            
             # # # # conv.messages[-1][-1] = outputs
             if outputs.endswith(stop_str):
-                outputs = outputs[:-len(stop_str)]
+                outputs = outputs[: -len(stop_str)]
             outputs = outputs.strip()
 
             matches_ref, matches_images, mathes_other = re_match(outputs)
             # print(matches_ref)
             result = process_image_with_refs(image_draw, matches_ref, output_path)
 
-
             for idx, a_match_image in enumerate(tqdm(matches_images, desc="image")):
-                outputs = outputs.replace(a_match_image, '![](images/' + str(idx) + '.jpg)\n')
-            
-            for idx, a_match_other in enumerate(tqdm(mathes_other, desc="other")):
-                outputs = outputs.replace(a_match_other, '').replace('\\coloneqq', ':=').replace('\\eqqcolon', '=:')
+                outputs = outputs.replace(a_match_image, "![](images/" + str(idx) + ".jpg)\n")
 
+            for idx, a_match_other in enumerate(tqdm(mathes_other, desc="other")):
+                outputs = outputs.replace(a_match_other, "").replace("\\coloneqq", ":=").replace("\\eqqcolon", "=:")
 
             # if 'structural formula' in conversation[0]['content']:
             #     outputs = '<smiles>' + outputs + '</smiles>'
-            with open(f'{output_path}/result.mmd', 'w', encoding = 'utf-8') as afile:
+            with open(f"{output_path}/result.mmd", "w", encoding="utf-8") as afile:
                 afile.write(outputs)
 
-            if 'line_type' in outputs:
+            if "line_type" in outputs:
                 import matplotlib.pyplot as plt
-                lines = eval(outputs)['Line']['line']
 
-                line_type = eval(outputs)['Line']['line_type']
+                lines = eval(outputs)["Line"]["line"]
+
+                line_type = eval(outputs)["Line"]["line_type"]
                 # print(lines)
 
-                endpoints = eval(outputs)['Line']['line_endpoint']
+                endpoints = eval(outputs)["Line"]["line_endpoint"]
 
-                fig, ax = plt.subplots(figsize=(3,3), dpi=200)
+                fig, ax = plt.subplots(figsize=(3, 3), dpi=200)
                 ax.set_xlim(-15, 15)
                 ax.set_ylim(-15, 15)
 
                 for idx, line in enumerate(lines):
                     try:
-                        p0 = eval(line.split(' -- ')[0])
-                        p1 = eval(line.split(' -- ')[-1])
+                        p0 = eval(line.split(" -- ")[0])
+                        p1 = eval(line.split(" -- ")[-1])
 
-                        if line_type[idx] == '--':
-                            ax.plot([p0[0], p1[0]], [p0[1], p1[1]], linewidth=0.8, color='k')
+                        if line_type[idx] == "--":
+                            ax.plot([p0[0], p1[0]], [p0[1], p1[1]], linewidth=0.8, color="k")
                         else:
-                            ax.plot([p0[0], p1[0]], [p0[1], p1[1]], linewidth = 0.8, color = 'k')
+                            ax.plot([p0[0], p1[0]], [p0[1], p1[1]], linewidth=0.8, color="k")
 
-                        ax.scatter(p0[0], p0[1], s=5, color = 'k')
-                        ax.scatter(p1[0], p1[1], s=5, color = 'k')
+                        ax.scatter(p0[0], p0[1], s=5, color="k")
+                        ax.scatter(p1[0], p1[1], s=5, color="k")
                     except:
                         pass
 
                 for endpoint in endpoints:
 
-                    label = endpoint.split(': ')[0]
-                    (x, y) = eval(endpoint.split(': ')[1])
-                    ax.annotate(label, (x, y), xytext=(1, 1), textcoords='offset points', 
-                                fontsize=5, fontweight='light')
-                
+                    label = endpoint.split(": ")[0]
+                    (x, y) = eval(endpoint.split(": ")[1])
+                    ax.annotate(label, (x, y), xytext=(1, 1), textcoords="offset points", fontsize=5, fontweight="light")
 
-                plt.savefig(f'{output_path}/geo.jpg')
+                plt.savefig(f"{output_path}/geo.jpg")
                 plt.close()
 
             result.save(f"{output_path}/result_with_boxes.jpg")

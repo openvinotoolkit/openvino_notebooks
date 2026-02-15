@@ -25,7 +25,7 @@ For details, please refer to [Installation Guide](../../README.md)
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/llm-rag-langchain/README.md" />
 
 ## Evaluating the RAG Pipeline
-The python notebook (ov_rag_evaluator.ipynb) enables developers to build, evaluate, and optimize Retrieval-Augmented Generation (RAG) applications with comprehensive quality metrics including accuracy, bias detection, and perplexity analysis plus a racial-bias indicator. This uses RAG pipeline optimized with Intel OpenVINO for enhanced performance on CPU, GPU, and NPU. The pipeline leverages:
+The python notebook (llm-rag-langchain-eval.ipynb) enables developers to build, evaluate, and optimize Retrieval-Augmented Generation (RAG) applications with comprehensive quality metrics including accuracy, bias detection, and perplexity analysis plus a racial-bias indicator. This uses RAG pipeline optimized with Intel OpenVINO for enhanced performance on CPU, GPU, and NPU. The pipeline leverages:
 
 Optimum-Intel’s OVModelForCausalLM with the OpenVINO backend for efficient inference.
 LangChain for orchestration of document loading, chunking, embedding, retrieval, reranking, and generation.
@@ -33,7 +33,7 @@ LangChain for orchestration of document loading, chunking, embedding, retrieval,
 To run the notebook:
 
 1. Launch Jupyter: `jupyter notebook`
-2. Open the provided notebook - `ov_rag_evaluator.ipynb`
+2. Open the provided notebook - `llm-rag-langchain-eval.ipynb`
 3. Execute cells in order; each cell includes explanatory comments.
 4. Provide input sources (file paths or URLs) when prompted.
 5. Adjust parameters such as:
@@ -71,4 +71,3 @@ Notes:
 - Provide one or more reference answers (gold annotations) for BLEU/ROUGE/BERTScore.
 - Perplexity may rely on a reference language model distinct from the generator.
 - Bias indicator may leverage word association tests or sentiment differentials; interpret conservatively.
-

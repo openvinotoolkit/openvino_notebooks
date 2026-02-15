@@ -943,6 +943,7 @@ roberta
 ROI
 RoPE
 rollout
+ROUGE
 Ruizhongtai
 Runtime
 runtime

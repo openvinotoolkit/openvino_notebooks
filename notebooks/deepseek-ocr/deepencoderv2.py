@@ -15,7 +15,6 @@ from typing import Optional, Tuple, Type
 from functools import partial
 
 
-
 class MlpProjector(nn.Module):
 
     def __init__(self, cfg):
@@ -37,13 +36,13 @@ class MlpProjector(nn.Module):
                 modules.append(nn.GELU())
                 modules.append(nn.Linear(cfg.n_embed, cfg.n_embed))
             modules = nn.Sequential(*modules)
-        
+
         elif cfg.projector_type == "normlayer_downsample_mlp_gelu":
             mlp_depth = cfg.get("depth", 1)
             mlp_ratio = cfg.get("mlp_ratio", 1)
             modules = [
                 nn.LayerNorm(cfg.input_dim * cfg.downsample_ratio * cfg.downsample_ratio),
-                nn.Linear(cfg.input_dim * cfg.downsample_ratio * cfg.downsample_ratio, cfg.n_embed * mlp_ratio)
+                nn.Linear(cfg.input_dim * cfg.downsample_ratio * cfg.downsample_ratio, cfg.n_embed * mlp_ratio),
             ]
             for _ in range(1, mlp_depth - 1):
                 modules.append(nn.GELU())
@@ -51,7 +50,7 @@ class MlpProjector(nn.Module):
             modules.append(nn.GELU())
             modules.append(nn.Linear(cfg.n_embed * mlp_ratio, cfg.n_embed))
             modules = nn.Sequential(*modules)
-        
+
         elif cfg.projector_type == "downsample_mlp_gelu":
             mlp_depth = cfg.get("depth", 1)
             mlp_ratio = cfg.get("mlp_ratio", 1)
@@ -123,31 +122,31 @@ class MlpProjector(nn.Module):
             patches = patches.view(batch_size, h_patches * w_patches, channels * 4)
 
             x = self.token_pooling_layer(patches)
-        
+
         if self.cfg.get("conv_fusion_high_low_features", False):
             x = self.fusion_layer(x[:, 0]) + x[:, 1]
 
-        if self.cfg.projector_type == 'low_high_hybrid_split_mlp_gelu':
+        if self.cfg.projector_type == "low_high_hybrid_split_mlp_gelu":
             high_x, low_x = x[0], x[1]
             high_x = self.high_up_proj(high_x)
             low_x = self.low_up_proj(low_x)
             x = torch.concat([high_x, low_x], dim=-1)
-        
-        if self.cfg.projector_type == 'hybrid_split_feature_mlp_gelu':
-            high_x = x[...,:self.cfg.input_dim[0]]
-            low_x = x[...,self.cfg.input_dim[0]:]
+
+        if self.cfg.projector_type == "hybrid_split_feature_mlp_gelu":
+            high_x = x[..., : self.cfg.input_dim[0]]
+            low_x = x[..., self.cfg.input_dim[0] :]
             high_x = self.high_up_proj(high_x)
             low_x = self.low_up_proj(low_x)
             x = torch.concat([high_x, low_x], dim=-1)
-        
-        if self.cfg.projector_type == 'low_high_split_mlp_gelu':
+
+        if self.cfg.projector_type == "low_high_split_mlp_gelu":
             high_x, low_x = x[0], x[1]
             high_x = self.high_layers(high_x)
             low_x = self.low_layers(low_x)
             x = torch.concat([high_x, low_x], dim=-1)
             return x
-        
-        if self.cfg.projector_type == 'downsample_mlp_gelu' or self.cfg.projector_type == 'normlayer_downsample_mlp_gelu':
+
+        if self.cfg.projector_type == "downsample_mlp_gelu" or self.cfg.projector_type == "normlayer_downsample_mlp_gelu":
             bs, hw, input_dim = x.shape
             h = w = torch.sqrt(torch.tensor(hw, dtype=torch.float32)).to(torch.int64)
 
@@ -162,9 +161,9 @@ class MlpProjector(nn.Module):
 
             """4 to 1 concat"""
             x = x.permute(0, 3, 1, 2)  # B, C, H, W
-            x = F.unfold(x, kernel_size=self.cfg.downsample_ratio, stride=self.cfg.downsample_ratio, padding=0) # B, C*4, HW // 4
+            x = F.unfold(x, kernel_size=self.cfg.downsample_ratio, stride=self.cfg.downsample_ratio, padding=0)  # B, C*4, HW // 4
             x = x.permute(0, 2, 1)
-            
+
         return self.layers(x)
 
     @staticmethod
@@ -172,7 +171,7 @@ class MlpProjector(nn.Module):
         if cfg.projector_type == "linear":
             fwd = 2 * cfg.input_dim * cfg.n_embed
 
-        elif "mlp_gelu" in cfg.projector_type :
+        elif "mlp_gelu" in cfg.projector_type:
             mlp_depth = cfg.get("depth", 1)
             downsample_ratio = cfg.get("downsample_ratio", 1)
             input_dim = sum(cfg.input_dim) if isinstance(cfg.input_dim, list) else cfg.input_dim
@@ -182,9 +181,10 @@ class MlpProjector(nn.Module):
             fwd = 0
 
         return fwd * 3
-    
 
-#===================qwen2================================
+
+# ===================qwen2================================
+
 
 class CustomQwen2Decoder(nn.Module):
     """
@@ -192,7 +192,7 @@ class CustomQwen2Decoder(nn.Module):
     non-causal attention + causal attention
     token_type_ids ：0=non-causal, 1=causal
     """
-    
+
     def __init__(
         self,
         decoder_layer: int = 24,
@@ -202,7 +202,7 @@ class CustomQwen2Decoder(nn.Module):
         num_key_value_heads: int = 2,
         intermediate_size: int = 4864,
         vocab_size: int = 151936,
-        attn_implementation: str = "sdpa",  # ⭐ 
+        attn_implementation: str = "sdpa",  # ⭐
         rms_norm_eps: float = 1e-06,
         rope_theta: float = 1000000.0,
         attention_dropout: float = 0.0,
@@ -210,18 +210,15 @@ class CustomQwen2Decoder(nn.Module):
         initializer_range: float = 0.02,
     ):
         super().__init__()
-        
+
         # attn_implementation check
         if attn_implementation == "flash_attention_2":
-            raise ValueError(
-                "CustomQwen2Decoder do not support flash_attention_2，"
-                "new attention mask needs 'sdpa' or 'eager'"
-            )
-        
+            raise ValueError("CustomQwen2Decoder do not support flash_attention_2，" "new attention mask needs 'sdpa' or 'eager'")
+
         # load
-        Qwen2Model = getattr(transformers.models.qwen2.modeling_qwen2, 'Qwen2Model')
-        Qwen2Config = getattr(transformers, 'Qwen2Config')
-        
+        Qwen2Model = getattr(transformers.models.qwen2.modeling_qwen2, "Qwen2Model")
+        Qwen2Config = getattr(transformers, "Qwen2Config")
+
         # config
         config = Qwen2Config(
             hidden_size=hidden_dimension,
@@ -236,20 +233,19 @@ class CustomQwen2Decoder(nn.Module):
             attention_dropout=attention_dropout,
             hidden_act=hidden_act,
             initializer_range=initializer_range,
-            _attn_implementation=attn_implementation,  # ⭐ 
+            _attn_implementation=attn_implementation,  # ⭐
         )
-        
-        # 
+
+        #
         self.model = self._create_custom_model(Qwen2Model, config)
 
-        del self.model.embed_tokens 
-    
+        del self.model.embed_tokens
+
     def _create_custom_model(self, Qwen2Model, config):
-        """ Qwen2Model """
-        
+        """Qwen2Model"""
+
         class CustomQwen2ModelInner(Qwen2Model):
 
-            
             def forward(
                 self,
                 input_ids=None,
@@ -266,7 +262,7 @@ class CustomQwen2Decoder(nn.Module):
             ):
                 # token_type_ids
                 self._current_token_type_ids = token_type_ids
-                
+
                 outputs = super().forward(
                     input_ids=input_ids,
                     attention_mask=attention_mask,
@@ -279,9 +275,9 @@ class CustomQwen2Decoder(nn.Module):
                     return_dict=return_dict,
                     cache_position=cache_position,
                 )
-                
+
                 return outputs
-            
+
             def _update_causal_mask(
                 self,
                 attention_mask,
@@ -293,9 +289,9 @@ class CustomQwen2Decoder(nn.Module):
                 dtype, device = input_tensor.dtype, input_tensor.device
                 min_dtype = torch.finfo(dtype).min
                 batch_size, sequence_length = input_tensor.shape[0], input_tensor.shape[1]
-                
+
                 token_type_ids = self._current_token_type_ids
-                
+
                 # attention mask
                 causal_mask = self._create_custom_4d_mask(
                     sequence_length=sequence_length,
@@ -304,15 +300,15 @@ class CustomQwen2Decoder(nn.Module):
                     batch_size=batch_size,
                     token_type_ids=token_type_ids,
                 )
-                
+
                 #  padding mask
                 if attention_mask is not None and attention_mask.dim() == 2:
                     padding_mask = attention_mask[:, None, None, :].to(dtype=dtype)
                     padding_mask = (1.0 - padding_mask) * min_dtype
                     causal_mask = causal_mask + padding_mask
-                
+
                 return causal_mask
-            
+
             def _create_custom_4d_mask(
                 self,
                 sequence_length,
@@ -322,73 +318,52 @@ class CustomQwen2Decoder(nn.Module):
                 token_type_ids,
             ):
                 min_dtype = torch.finfo(dtype).min
-                
+
                 masks = []
                 for b in range(batch_size):
-                    mask = torch.full(
-                        (sequence_length, sequence_length),
-                        fill_value=min_dtype,
-                        dtype=dtype,
-                        device=device
-                    )
-                    
+                    mask = torch.full((sequence_length, sequence_length), fill_value=min_dtype, dtype=dtype, device=device)
+
                     type_ids = token_type_ids[b]
-                    
+
                     image_positions = (type_ids == 0).nonzero(as_tuple=True)[0]
                     text_positions = (type_ids == 1).nonzero(as_tuple=True)[0]
-                    
+
                     # non-casual: image tokens can see each other
                     if len(image_positions) > 0:
                         mask[image_positions[:, None], image_positions] = 0.0
-                    
+
                     # causal: text tokens
                     # 1. text can see all images (vectorized)
                     if len(image_positions) > 0 and len(text_positions) > 0:
                         mask[text_positions[:, None], image_positions] = 0.0
-                    
+
                     # 2. text tokens have causal masking (lower triangular, vectorized)
                     if len(text_positions) > 0:
                         text_len = text_positions.shape[0]
                         # Create causal mask using broadcasting: i >= j
                         i_indices = torch.arange(text_len, device=device).unsqueeze(1)  # (text_len, 1)
                         j_indices = torch.arange(text_len, device=device).unsqueeze(0)  # (1, text_len)
-                        causal_mask = (i_indices >= j_indices)  # (text_len, text_len) lower triangular
+                        causal_mask = i_indices >= j_indices  # (text_len, text_len) lower triangular
                         # Apply to mask using advanced indexing
                         mask[text_positions.unsqueeze(1), text_positions.unsqueeze(0)] = torch.where(
-                            causal_mask,
-                            torch.tensor(0.0, dtype=dtype, device=device),
-                            mask[text_positions.unsqueeze(1), text_positions.unsqueeze(0)]
+                            causal_mask, torch.tensor(0.0, dtype=dtype, device=device), mask[text_positions.unsqueeze(1), text_positions.unsqueeze(0)]
                         )
-                    
+
                     masks.append(mask)
-                
+
                 mask = torch.stack(masks, dim=0).unsqueeze(1)
                 return mask
-        
+
         return CustomQwen2ModelInner(config)
-    
-    def forward(
-        self,
-        inputs_embeds,
-        token_type_ids,
-        attention_mask=None,
-        **kwargs
-    ):
+
+    def forward(self, inputs_embeds, token_type_ids, attention_mask=None, **kwargs):
         """
         Args:
             inputs_embeds: [batch_size, seq_len, hidden_dim]
             token_type_ids: [batch_size, seq_len], 0=non-causal, 1=causal
             attention_mask: [batch_size, seq_len], optional
         """
-        return self.model(
-            inputs_embeds=inputs_embeds,
-            token_type_ids=token_type_ids,
-            attention_mask=attention_mask,
-            **kwargs
-        )
-
-
-
+        return self.model(inputs_embeds=inputs_embeds, token_type_ids=token_type_ids, attention_mask=attention_mask, **kwargs)
 
 
 # batch_size = 2
@@ -405,7 +380,6 @@ class CustomQwen2Decoder(nn.Module):
 #     outputs_sdpa = decoder_sdpa(inputs_embeds, token_type_ids)
 #     print(outputs_sdpa[0].shape)
 # print(f"SDPA time: {time.time() - start:.4f}s")
-
 
 
 class Qwen2Decoder2Encoder(nn.Module):
@@ -432,21 +406,16 @@ class Qwen2Decoder2Encoder(nn.Module):
             num_attention_heads=num_attention_heads,
             num_key_value_heads=num_key_value_heads,
             intermediate_size=intermediate_size,
-            attn_implementation="sdpa", 
+            attn_implementation="sdpa",
         )
-
-
-
 
         self.query_768 = nn.Embedding(144, hidden_dimension)
         self.query_1024 = nn.Embedding(256, hidden_dimension)
 
-
         # self.query_refixation = nn.Embedding(int(math.sqrt(max_query)), hidden_dimension)
 
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x  = x.flatten(2).transpose(1, 2)
+        x = x.flatten(2).transpose(1, 2)
 
         bs, n_query, _ = x.shape
 
@@ -455,24 +424,21 @@ class Qwen2Decoder2Encoder(nn.Module):
         elif n_query == 256:
             param_img = self.query_1024.weight
 
-        batch_query_imgs = param_img.unsqueeze(0).expand(
-            bs, -1, -1
-        )  # (batch_size, num_queries, hidden_size)
-
-
+        batch_query_imgs = param_img.unsqueeze(0).expand(bs, -1, -1)  # (batch_size, num_queries, hidden_size)
 
         x_combined = torch.cat([x, batch_query_imgs], dim=1)
 
-        token_type_ids = torch.cat([
-            torch.zeros(bs, n_query, dtype=torch.long),
-            torch.ones(bs, n_query, dtype=torch.long),
-        ], dim=1)
+        token_type_ids = torch.cat(
+            [
+                torch.zeros(bs, n_query, dtype=torch.long),
+                torch.ones(bs, n_query, dtype=torch.long),
+            ],
+            dim=1,
+        )
 
         y = self.model(x_combined, token_type_ids)[0]
 
-
-        y = y[:, n_query:, :] # causal flow query
-
+        y = y[:, n_query:, :]  # causal flow query
 
         return y
 
@@ -483,22 +449,19 @@ def build_qwen2_decoder_as_encoder(
     num_attention_heads=14,
     num_key_value_heads=2,
     intermediate_size=4864,
-    max_query = 400,
+    max_query=400,
     checkpoint=None,
 ):
 
     decoder_as_encoder = Qwen2Decoder2Encoder(
-            decoder_layer=decoder_layer,
-            hidden_dimension = hidden_dimension,
-            num_attention_heads = num_attention_heads,
-            num_key_value_heads = num_key_value_heads,
-            intermediate_size = intermediate_size,
-            max_query = max_query
-        )
+        decoder_layer=decoder_layer,
+        hidden_dimension=hidden_dimension,
+        num_attention_heads=num_attention_heads,
+        num_key_value_heads=num_key_value_heads,
+        intermediate_size=intermediate_size,
+        max_query=max_query,
+    )
 
-
-
-    
     if checkpoint is not None:
         # with open(checkpoint, "rb") as f:
         state_dict = torch.load(checkpoint)
@@ -509,9 +472,7 @@ def build_qwen2_decoder_as_encoder(
     return decoder_as_encoder
 
 
-
-
-#=========================Sam-Vary=================================
+# =========================Sam-Vary=================================
 
 
 # Ethan
@@ -526,14 +487,12 @@ def get_abs_pos_sam(abs_pos, tgt_size):
     new_pos_embed = F.interpolate(
         old_pos_embed,
         size=(tgt_size, tgt_size),
-        mode='bicubic',
+        mode="bicubic",
         antialias=True,
         align_corners=False,
     ).to(dtype)
     new_pos_embed = new_pos_embed.permute(0, 2, 3, 1)
     return new_pos_embed
-
-
 
 
 class MLPBlock(nn.Module):
@@ -621,9 +580,7 @@ class ImageEncoderViT(nn.Module):
         self.pos_embed: Optional[nn.Parameter] = None
         if use_abs_pos:
             # Initialize absolute positional embedding with pretrain image size.
-            self.pos_embed = nn.Parameter(
-                torch.zeros(1, img_size // patch_size, img_size // patch_size, embed_dim)
-            )
+            self.pos_embed = nn.Parameter(torch.zeros(1, img_size // patch_size, img_size // patch_size, embed_dim))
 
         self.blocks = nn.ModuleList()
         for i in range(depth):
@@ -776,9 +733,7 @@ class Attention(nn.Module):
 
         self.use_rel_pos = use_rel_pos
         if self.use_rel_pos:
-            assert (
-                input_size is not None
-            ), "Input size must be provided if using relative positional encoding."
+            assert input_size is not None, "Input size must be provided if using relative positional encoding."
             # initialize relative positional embeddings
             self.rel_pos_h = nn.Parameter(torch.zeros(2 * input_size[0] - 1, head_dim))
             self.rel_pos_w = nn.Parameter(torch.zeros(2 * input_size[1] - 1, head_dim))
@@ -838,9 +793,7 @@ def window_partition(x: torch.Tensor, window_size: int) -> Tuple[torch.Tensor, T
     return windows, (Hp, Wp)
 
 
-def window_unpartition(
-    windows: torch.Tensor, window_size: int, pad_hw: Tuple[int, int], hw: Tuple[int, int]
-) -> torch.Tensor:
+def window_unpartition(windows: torch.Tensor, window_size: int, pad_hw: Tuple[int, int], hw: Tuple[int, int]) -> torch.Tensor:
     """
     Window unpartition into original sequences and removing padding.
     Args:
@@ -968,9 +921,7 @@ class PatchEmbed(nn.Module):
         """
         super().__init__()
 
-        self.proj = nn.Conv2d(
-            in_chans, embed_dim, kernel_size=kernel_size, stride=stride, padding=padding
-        )
+        self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=kernel_size, stride=stride, padding=padding)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.proj(x)
@@ -988,7 +939,8 @@ def build_sam_vit_b(checkpoint=None):
         checkpoint=checkpoint,
     )
 
-def build_sam_fast_vit_b(checkpoint=None, compile_mode='max-autotune', dtype=torch.bfloat16):
+
+def build_sam_fast_vit_b(checkpoint=None, compile_mode="max-autotune", dtype=torch.bfloat16):
     image_encoder = build_sam_vit_b(checkpoint).eval().to(dtype)
     # sam = _apply_eval_dtype_sam(sam, dtype)
     image_encoder = torch.compile(image_encoder, mode=compile_mode)
@@ -1006,20 +958,20 @@ def _build_sam(
     image_size = 1024
     vit_patch_size = 16
     image_embedding_size = image_size // vit_patch_size
-    image_encoder=ImageEncoderViT(
-            depth=encoder_depth,
-            embed_dim=encoder_embed_dim,
-            img_size=image_size,
-            mlp_ratio=4,
-            norm_layer=partial(torch.nn.LayerNorm, eps=1e-6),
-            num_heads=encoder_num_heads,
-            patch_size=vit_patch_size,
-            qkv_bias=True,
-            use_rel_pos=True,
-            global_attn_indexes=encoder_global_attn_indexes,
-            window_size=14,
-            out_chans=prompt_embed_dim,
-        )
+    image_encoder = ImageEncoderViT(
+        depth=encoder_depth,
+        embed_dim=encoder_embed_dim,
+        img_size=image_size,
+        mlp_ratio=4,
+        norm_layer=partial(torch.nn.LayerNorm, eps=1e-6),
+        num_heads=encoder_num_heads,
+        patch_size=vit_patch_size,
+        qkv_bias=True,
+        use_rel_pos=True,
+        global_attn_indexes=encoder_global_attn_indexes,
+        window_size=14,
+        out_chans=prompt_embed_dim,
+    )
     image_encoder.eval()
     if checkpoint is not None:
         # with open(checkpoint, "rb") as f:
@@ -1030,6 +982,6 @@ def _build_sam(
         # ocr-anyting
         # image_encoder.load_state_dict(state_dict, strict=True)
         # tob
-        image_encoder.load_state_dict({k[30:]: v for k, v in state_dict.items() if 'vision_tower_high' in k}, strict=True)
+        image_encoder.load_state_dict({k[30:]: v for k, v in state_dict.items() if "vision_tower_high" in k}, strict=True)
         print(checkpoint)
     return image_encoder
