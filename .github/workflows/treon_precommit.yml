@@ -44,6 +44,7 @@ jobs:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
       test_only_changed: false
+      separate_venv: true
       container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:pr-33079'
   
   build_treon_windows:
