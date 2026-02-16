@@ -88,7 +88,9 @@ biometrics
 BiT
 bitext
 bitnet
+BERTScore
 BLACKBOX
+BLEU
 blockwise
 BMP
 boolean
@@ -107,6 +109,7 @@ chatglm
 ChatGLM
 ChatGPT
 ChatTTS
+ChromaDB
 chinese
 CHW
 Cifar
@@ -513,6 +516,7 @@ Lai
 LAION
 laion
 LangChain
+LangChain's
 langchain
 Lasinger
 latents
@@ -939,6 +943,7 @@ roberta
 ROI
 RoPE
 rollout
+ROUGE
 Ruizhongtai
 Runtime
 runtime
@@ -1237,6 +1242,7 @@ YouTube
 Zafrir
 ZavyChromaXL
 ZeroScope
+Zerodha
 zeroscope
 zh
 Zhipu
