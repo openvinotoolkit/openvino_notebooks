@@ -62,7 +62,7 @@ jobs:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
       test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 || needs.collect_notebooks.outputs.batch_3 }}
-      batch_id: ${{ matrix.batch }}
+      batch: ${{ matrix.batch }}
       separate_venv: true
       container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:pr-33079'
   
@@ -80,4 +80,4 @@ jobs:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
       test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 || needs.collect_notebooks.outputs.batch_3 }}
-      batch_id: ${{ matrix.batch }}
+      batch: ${{ matrix.batch }}
