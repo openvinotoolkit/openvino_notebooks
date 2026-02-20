@@ -46,32 +46,7 @@ jobs:
 
       - name: Collect and split notebooks into batches
         id: split
-        run: |
-          # Collect all notebook paths (relative to repo root), excluding test_ prefixed
-          mapfile -t notebooks < <(find notebooks -name '*.ipynb' ! -name 'test_*' | sort)
-          total=${#notebooks[@]}
-          echo "Found $total notebooks"
-
-          # Shuffle randomly using a seed derived from the run id for reproducibility within a run
-          mapfile -t notebooks < <(printf '%s\n' "${notebooks[@]}" | shuf --random-source=<(echo "${{ github.run_id }}"))
-
-          num_batches=4
-          # Split into batches and output as newline-separated strings
-          for (( b=0; b<num_batches; b++ )); do
-            batch=""
-            for (( i=b; i<total; i+=num_batches )); do
-              if [[ -n "$batch" ]]; then
-                batch="${batch}\n${notebooks[$i]}"
-              else
-                batch="${notebooks[$i]}"
-              fi
-            done
-            echo "Batch $b: $(echo -e "$batch" | wc -l) notebooks"
-            # Use multiline output via delimiter
-            echo "batch_${b}<<BATCH_EOF" >> "$GITHUB_OUTPUT"
-            echo -e "$batch" >> "$GITHUB_OUTPUT"
-            echo "BATCH_EOF" >> "$GITHUB_OUTPUT"
-          done
+        run: python3 .ci/split_notebooks.py --num_batches 4 --seed "${{ github.run_id }}"
 
   build_treon_linux:
     needs: collect_notebooks
