@@ -33,28 +33,74 @@ permissions:
   contents: read
 
 jobs:
+  collect_notebooks:
+    runs-on: ubuntu-latest
+    outputs:
+      batch_0: ${{ steps.split.outputs.batch_0 }}
+      batch_1: ${{ steps.split.outputs.batch_1 }}
+      batch_2: ${{ steps.split.outputs.batch_2 }}
+      batch_3: ${{ steps.split.outputs.batch_3 }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+
+      - name: Collect and split notebooks into batches
+        id: split
+        run: |
+          # Collect all notebook paths (relative to repo root), excluding test_ prefixed
+          mapfile -t notebooks < <(find notebooks -name '*.ipynb' ! -name 'test_*' | sort)
+          total=${#notebooks[@]}
+          echo "Found $total notebooks"
+
+          # Shuffle randomly using a seed derived from the run id for reproducibility within a run
+          mapfile -t notebooks < <(printf '%s\n' "${notebooks[@]}" | shuf --random-source=<(echo "${{ github.run_id }}"))
+
+          num_batches=4
+          # Split into batches and output as newline-separated strings
+          for (( b=0; b<num_batches; b++ )); do
+            batch=""
+            for (( i=b; i<total; i+=num_batches )); do
+              if [[ -n "$batch" ]]; then
+                batch="${batch}\n${notebooks[$i]}"
+              else
+                batch="${notebooks[$i]}"
+              fi
+            done
+            echo "Batch $b: $(echo -e "$batch" | wc -l) notebooks"
+            # Use multiline output via delimiter
+            echo "batch_${b}<<BATCH_EOF" >> "$GITHUB_OUTPUT"
+            echo -e "$batch" >> "$GITHUB_OUTPUT"
+            echo "BATCH_EOF" >> "$GITHUB_OUTPUT"
+          done
+
   build_treon_linux:
+    needs: collect_notebooks
     strategy:
       fail-fast: false
       matrix:
         runs_on: [aks-linux-8-cores-32gb]
         python: ['3.10', '3.11', '3.12', '3.13']
+        batch: [0, 1, 2, 3]
     uses: ./.github/workflows/job_unix.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      test_only_changed: false
+      test_list: ${{ matrix.batch == 0 && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 1 && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 2 && needs.collect_notebooks.outputs.batch_2 || needs.collect_notebooks.outputs.batch_3 }}
+      batch_id: ${{ matrix.batch }}
       separate_venv: true
       container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:pr-33079'
   
   build_treon_windows:
+    needs: collect_notebooks
     strategy:
       fail-fast: false
       matrix:
         runs_on: [aks-win-8-cores-16gb-test]
         python: ['3.10', '3.11', '3.12', '3.13']
+        batch: [0, 1, 2, 3]
     uses: ./.github/workflows/job_windows.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      test_only_changed: false
+      test_list: ${{ matrix.batch == 0 && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 1 && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 2 && needs.collect_notebooks.outputs.batch_2 || needs.collect_notebooks.outputs.batch_3 }}
+      batch_id: ${{ matrix.batch }}

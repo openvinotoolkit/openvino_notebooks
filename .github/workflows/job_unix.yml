@@ -25,6 +25,16 @@ on:
         required: false
         type: boolean
         default: false
+      test_list:
+        description: 'Newline-separated list of notebook paths to test (relative to repo root)'
+        required: false
+        type: string
+        default: ''
+      batch_id:
+        description: 'Batch identifier for unique artifact naming when running parallel batches'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -105,6 +115,20 @@ jobs:
             echo "No notebook files changed, using precommit list"
             cp .ci/precommit_list.txt test_notebooks.txt
           fi
+
+      - name: Write test list from input
+        if: ${{ inputs.test_list != '' }}
+        shell: bash
+        run: |
+          cat << 'EOF' > test_notebooks.txt
+          ${{ inputs.test_list }}
+          EOF
+          # Remove leading whitespace added by heredoc indentation
+          sed -i 's/^[[:space:]]*//' test_notebooks.txt
+          # Remove empty lines
+          sed -i '/^$/d' test_notebooks.txt
+          echo "Notebooks to test ($(wc -l < test_notebooks.txt) total):"
+          cat test_notebooks.txt
       
       # Packages that notebooks need to run in plain os
       - name: Install required packages (Linux)
@@ -162,7 +186,6 @@ jobs:
 
       # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
       - name: Set HUB_HOME
-        shell: bash
         run: echo HUB_HOME=${{ env.MOUNT_CACHE }}/.paddlehub >> $GITHUB_ENV
 
       # Download a small dataset to use for testing purposes in monai-kidney training notebook
@@ -259,7 +282,7 @@ jobs:
             --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
-            ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
+            ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
             $IGNORE_ARGS \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             ${{ inputs.separate_venv && '--separate_venv' || '' }} \
@@ -273,7 +296,7 @@ jobs:
             --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
-            ${{ inputs.test_only_changed && '--test_list test_notebooks.txt' || '' }} \
+            ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --timeout 1200
@@ -282,5 +305,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
-          name: test_report-${{ env.TEST_REPORT_DIR }}
+          name: test_report-${{ env.TEST_REPORT_DIR }}${{ inputs.batch_id != '' && format('-batch{0}', inputs.batch_id) || '' }}
           path: test_report/

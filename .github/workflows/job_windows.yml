@@ -21,6 +21,16 @@ on:
         required: false
         type: boolean
         default: false
+      test_list:
+        description: 'Newline-separated list of notebook paths to test (relative to repo root)'
+        required: false
+        type: string
+        default: ''
+      batch_id:
+        description: 'Batch identifier for unique artifact naming when running parallel batches'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -90,6 +100,20 @@ jobs:
             echo "No notebook files changed, using precommit list"
             cp .ci/precommit_list.txt test_notebooks.txt
           fi
+
+      - name: Write test list from input
+        if: ${{ inputs.test_list != '' }}
+        shell: bash
+        run: |
+          cat << 'EOF' > test_notebooks.txt
+          ${{ inputs.test_list }}
+          EOF
+          # Remove leading whitespace added by heredoc indentation
+          sed -i 's/^[[:space:]]*//' test_notebooks.txt
+          # Remove empty lines
+          sed -i '/^$/d' test_notebooks.txt
+          echo "Notebooks to test ($(wc -l < test_notebooks.txt) total):"
+          cat test_notebooks.txt
       
       # Packages that notebooks need to run in plain os
       - name: Install required packages
@@ -252,7 +276,7 @@ jobs:
             "--collect_reports"
           )
           
-          if ("${{ inputs.test_only_changed }}" -eq "true") {
+          if ("${{ inputs.test_only_changed }}" -eq "true" -or "${{ inputs.test_list }}" -ne "") {
             $cmdArgs += "--test_list"
             $cmdArgs += "test_notebooks.txt"
           }
@@ -273,5 +297,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
-          name: test_report-${{ env.TEST_REPORT_DIR }}
+          name: test_report-${{ env.TEST_REPORT_DIR }}${{ inputs.batch_id != '' && format('-batch{0}', inputs.batch_id) || '' }}
           path: test_report/
