@@ -46,6 +46,7 @@ def write_github_output(batches: list[list[str]]) -> None:
     with open(output_file, "a") as fh:
         for i, batch in enumerate(batches):
             print(f"Batch {i}: {len(batch)} notebooks")
+            print(f'--- Batch {i} ---' + '\n'.join(batch))
             fh.write(f"batch_{i}<<BATCH_EOF\n")
             fh.write("\n".join(batch) + "\n")
             fh.write("BATCH_EOF\n")

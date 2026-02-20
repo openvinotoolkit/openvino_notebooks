@@ -26,7 +26,7 @@ on:
         required: false
         type: string
         default: ''
-      batch_id:
+      batch:
         description: 'Batch identifier for unique artifact naming when running parallel batches'
         required: false
         type: string
@@ -297,5 +297,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
-          name: test_report-${{ env.TEST_REPORT_DIR }}${{ inputs.batch_id != '' && format('-batch{0}', inputs.batch_id) || '' }}
+          name: test_report-${{ env.TEST_REPORT_DIR }}-${{ inputs.batch != '' && inputs.batch || '' }}
           path: test_report/

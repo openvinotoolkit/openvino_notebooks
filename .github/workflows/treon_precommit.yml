@@ -56,12 +56,12 @@ jobs:
         runs_on: [aks-linux-8-cores-32gb]
         # python: ['3.10', '3.11', '3.12', '3.13']
         python: ['3.12']
-        batch: [0, 1, 2, 3]
+        batch: ['batch_0', 'batch_1', 'batch_2', 'batch_3']
     uses: ./.github/workflows/job_unix.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      test_list: ${{ matrix.batch == 0 && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 1 && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 2 && needs.collect_notebooks.outputs.batch_2 || needs.collect_notebooks.outputs.batch_3 }}
+      test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 || needs.collect_notebooks.outputs.batch_3 }}
       batch_id: ${{ matrix.batch }}
       separate_venv: true
       container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:pr-33079'
@@ -74,10 +74,10 @@ jobs:
         runs_on: [aks-win-8-cores-16gb-test]
         # python: ['3.10', '3.11', '3.12', '3.13']
         python: ['3.12']
-        batch: [0, 1, 2, 3]
+        batch: ['batch_0', 'batch_1', 'batch_2', 'batch_3']
     uses: ./.github/workflows/job_windows.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      test_list: ${{ matrix.batch == 0 && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 1 && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 2 && needs.collect_notebooks.outputs.batch_2 || needs.collect_notebooks.outputs.batch_3 }}
+      test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 || needs.collect_notebooks.outputs.batch_3 }}
       batch_id: ${{ matrix.batch }}
