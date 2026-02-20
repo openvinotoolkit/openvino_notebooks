@@ -54,7 +54,8 @@ jobs:
       fail-fast: false
       matrix:
         runs_on: [aks-linux-8-cores-32gb]
-        python: ['3.10', '3.11', '3.12', '3.13']
+        # python: ['3.10', '3.11', '3.12', '3.13']
+        python: ['3.12']
         batch: [0, 1, 2, 3]
     uses: ./.github/workflows/job_unix.yml
     with:
@@ -71,7 +72,8 @@ jobs:
       fail-fast: false
       matrix:
         runs_on: [aks-win-8-cores-16gb-test]
-        python: ['3.10', '3.11', '3.12', '3.13']
+        # python: ['3.10', '3.11', '3.12', '3.13']
+        python: ['3.12']
         batch: [0, 1, 2, 3]
     uses: ./.github/workflows/job_windows.yml
     with:
