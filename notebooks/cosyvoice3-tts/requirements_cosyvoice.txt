@@ -19,7 +19,7 @@ modelscope==1.20.0
 networkx==3.1
 numpy==1.26.4
 omegaconf==2.3.0
-onnx==1.16.0
+onnx==1.17.0
 # onnxruntime-gpu==1.18.0; sys_platform == 'linux'
 onnxruntime==1.18.0
 openai-whisper==20231117
