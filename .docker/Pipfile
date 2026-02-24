@@ -32,6 +32,7 @@ onnx = ">=1.11.0"
 opencv-python = "*"
 openvino = {version = "==2026.0.0"}
 openvino-telemetry = "==2025.2.0"
+overrides = "*"
 ovmsclient = "*"
 Pillow = ">=12.1.1"
 psutil = "*"

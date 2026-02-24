@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8f6d5fe77f45075fbc2f170e120444a6e39f6cdfe823e4719d9d89ef7929fc40"
+            "sha256": "1b246c3e0f9ee5c7b209f9eb83e2dcaf1b419b07780d70c7c3e795f8a37822e0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -2627,6 +2627,15 @@
             ],
             "index": "pypi",
             "version": "==2025.2.0"
+        },
+        "overrides": {
+            "hashes": [
+                "sha256:55158fa3d93b98cc75299b1e67078ad9003ca27945c76162c1c0766d6f91820a",
+                "sha256:c7ed9d062f78b8e4c1a7b70bd8796b35ead4d9f510227ef9c5dc7626c60d7e49"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.6'",
+            "version": "==7.7.0"
         },
         "ovmsclient": {
             "hashes": [
