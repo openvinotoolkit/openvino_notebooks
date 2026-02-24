@@ -33,7 +33,7 @@ opencv-python = "*"
 openvino = {version = "==2026.0.0"}
 openvino-telemetry = "==2025.2.0"
 ovmsclient = "*"
-Pillow = ">=8.3.2"
+Pillow = ">=12.1.1"
 psutil = "*"
 pyclipper = ">=1.2.1"
 pygments = ">=2.7.4"
