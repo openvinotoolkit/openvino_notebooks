@@ -42,6 +42,7 @@ arxiv
 ASPP
 ASR
 asr
+ASRModel
 ASYM
 async
 AsyncInferQueue
@@ -87,7 +88,9 @@ biometrics
 BiT
 bitext
 bitnet
+BERTScore
 BLACKBOX
+BLEU
 blockwise
 BMP
 boolean
@@ -106,6 +109,7 @@ chatglm
 ChatGLM
 ChatGPT
 ChatTTS
+ChromaDB
 chinese
 CHW
 Cifar
@@ -158,6 +162,7 @@ coors
 coreference
 CoSENT
 CosyVoice
+Conv
 cpm
 cpp
 cpu
@@ -169,7 +174,9 @@ CTM
 CUDA
 CustomEncoderWav
 customizable
+CustomVoice
 CVF
+CVAE
 CVPR
 DarkIR
 Databricks
@@ -189,6 +196,7 @@ DDColor's
 DDIM
 DDPMs
 dDPO
+DETR
 de
 Deblur
 deblur
@@ -316,9 +324,11 @@ finetuned
 finetuning
 FireRedTTS
 FLAC
+flac
 FLD
 floyd
 fn
+ForcedAligner
 foley
 Formatter
 formatter
@@ -506,6 +516,7 @@ Lai
 LAION
 laion
 LangChain
+LangChain's
 langchain
 Lasinger
 latents
@@ -651,6 +662,7 @@ Multilinguality
 multimodal
 Multimodality
 multinomial
+MuJoCo
 MuRAG
 MusicGen
 Müller
@@ -775,6 +787,7 @@ panoptic
 parallelized
 parameterization
 parametrize
+paralinguistic
 Parler
 parsers
 patchifying
@@ -929,6 +942,8 @@ RoBERTa
 roberta
 ROI
 RoPE
+rollout
+ROUGE
 Ruizhongtai
 Runtime
 runtime
@@ -1098,6 +1113,7 @@ TripoSR
 Tsinghua
 TsinghuaNLP
 TTS
+TTSModel
 tunable
 tv
 TwoStreamInterleaveTransformer
@@ -1162,6 +1178,7 @@ Vladlen
 vlm
 VLM
 VLModel
+vLLM
 VLMPipeline
 VLMs
 VL’s
@@ -1170,6 +1187,7 @@ VOC
 Vocoder
 vocoder
 vocoding
+VoiceDesign
 voxel
 Voxelization
 voxelization
@@ -1224,6 +1242,7 @@ YouTube
 Zafrir
 ZavyChromaXL
 ZeroScope
+Zerodha
 zeroscope
 zh
 Zhipu

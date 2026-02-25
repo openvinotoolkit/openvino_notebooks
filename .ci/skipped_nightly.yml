@@ -7,10 +7,6 @@
   skips:
     - device:
         - cpu
-- notebook: notebooks/stable-fast-3d/stable-fast-3d.ipynb
-  skips:
-    - os:
-        - macos-13
 - notebook: notebooks/glm4-v/glm4-v.ipynb
   skips:
     - device:
