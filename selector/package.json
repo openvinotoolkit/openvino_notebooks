@@ -34,5 +34,9 @@
     "typescript": "5.2.2",
     "vite": "^6.4.1",
     "vite-plugin-svgr": "4.3.0"
+  },
+  "overrides": {
+    "minimatch@>=10.0.0": ">=10.2.1",
+    "ajv": "6.12.7"
   }
 }
