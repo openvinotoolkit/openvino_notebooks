@@ -1,0 +1,54 @@
+# MiniCPM-o 4.5 Multimodal Model with OpenVINO
+
+<p align="center">
+    <img src="https://raw.githubusercontent.com/OpenBMB/MiniCPM-o/main/assets/minicpm-o-45-framework.png" width="100%"/>
+</p>
+
+[MiniCPM-o 4.5](https://huggingface.co/openbmb/MiniCPM-o-4_5) is the latest and most capable model in the MiniCPM-o series — an end-to-end omnimodal model with **9B parameters** built on **SigLip2 + Whisper-medium + CosyVoice2 + Qwen3-8B**. It achieves Gemini 2.5 Flash level performance on vision-language benchmarks with only 9B parameters.
+
+## Key Features
+
+- **Leading Visual Capability** — 77.6 on OpenCompass, surpassing GPT-4o and Gemini 2.0 Pro
+- **Strong Speech Capability** — Bilingual (EN/ZH) real-time speech conversation with configurable voice cloning
+- **Full-Duplex Live Streaming** — See, listen, and speak simultaneously with real-time video + audio
+- **Proactive Interaction** — Initiates reminders/comments based on live scene understanding
+- **Strong OCR** — State-of-the-art end-to-end English document parsing
+
+## Architecture (15 Sub-models)
+
+The model comprises 15 interconnected sub-models converted to OpenVINO IR format:
+
+| Sub-model | Role | Quantization |
+|-----------|------|:------------:|
+| **LLM Embedding** | Token embeddings for Qwen3-8B backbone | — |
+| **LLM Language Model** | Main language model with stateful KV cache | INT4 |
+| **Vision Model** | SigLip2 vision encoder for image understanding | INT8 |
+| **Resampler** | Projects vision features to LLM hidden space | — |
+| **Audio Encoder** | Whisper-medium encoder for speech/audio understanding | — |
+| **Audio Projection** | Projects audio features to LLM hidden space | — |
+| **TTS Text Embedding** | Token embeddings for TTS LLaMA decoder | — |
+| **TTS Language Model** | LLaMA decoder for speech token generation | — |
+| **TTS Projector SPK** | Speaker embedding projector | — |
+| **TTS Projector Semantic** | Semantic feature projector for TTS conditioning | — |
+| **TTS Code Embedding** | Audio code token embeddings | — |
+| **TTS Code Head** | Audio code prediction head | — |
+| **Flow Embeddings** | CosyVoice2 flow-matching encoder + speaker projection | — |
+| **Flow Estimator** | DiT model for flow-matching denoising | — |
+| **HiFT** | Neural vocoder for mel-to-waveform synthesis | — |
+
+## Notebook Contents
+
+The notebook demonstrates:
+
+1. **Prerequisites** — Install dependencies
+2. **Convert & Quantize Model** — Export all 15 sub-models to OpenVINO IR with INT4/INT8 weight compression
+3. **Select Inference Device** — Choose CPU, GPU, or NPU for different model components
+4. **Run Inference** — Image understanding, audio understanding, omni-modal chat
+5. **Interactive Demo** — Gradio-based multimodal chatbot
+
+## Requirements
+
+- ~20 GB disk space for INT4-quantized models
+- ~16 GB RAM for CPU inference
+- Python 3.10+
+- OpenVINO 2025.1+
