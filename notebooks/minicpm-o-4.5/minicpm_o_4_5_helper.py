@@ -491,14 +491,30 @@ def convert_minicpmo_model(
         audio_tokenizer_path = model.config.audio_tokenizer_path
         print(f"⌛ Found audio_tokenizer_path in config: {audio_tokenizer_path}")
     elif model.config.init_tts:
-        # Try to find audio_tokenizer in model directory or common locations
-        model_dir = Path(model_id) if Path(model_id).exists() else None
-        if model_dir:
-            # Try model_dir/assets/token2wav
-            token2wav_dir = model_dir / "assets" / "token2wav"
+        # Try local path first
+        local_model_dir = Path(model_id) if Path(model_id).exists() else None
+        if local_model_dir:
+            token2wav_dir = local_model_dir / "assets" / "token2wav"
             if token2wav_dir.exists() and (token2wav_dir / "flow.yaml").exists():
                 audio_tokenizer_path = str(token2wav_dir)
                 print(f"⌛ Found audio_tokenizer at: {audio_tokenizer_path}")
+        else:
+            # model_id is a HuggingFace Hub repo ID — download only assets/token2wav/
+            try:
+                from huggingface_hub import snapshot_download
+                print(f"⌛ Downloading assets/token2wav from Hub repo: {model_id} ...")
+                hub_cache_dir = snapshot_download(
+                    repo_id=model_id,
+                    allow_patterns=["assets/token2wav/**"],
+                )
+                token2wav_dir = Path(hub_cache_dir) / "assets" / "token2wav"
+                if token2wav_dir.exists() and (token2wav_dir / "flow.yaml").exists():
+                    audio_tokenizer_path = str(token2wav_dir)
+                    print(f"⌛ Found audio_tokenizer at: {audio_tokenizer_path}")
+                else:
+                    print("⚠️ assets/token2wav not found in Hub repo snapshot")
+            except Exception as e:
+                print(f"⚠️ Warning: Could not download audio_tokenizer from Hub: {e}")
     
     if audio_tokenizer_path and model.config.init_tts:
         try:
@@ -2333,11 +2349,10 @@ class OVVisionModel:
             "patch_attention_mask": patch_attention_mask,
             "position_ids": position_ids,
         }
-        # 推理时间计时
         start_time = time.perf_counter()
         self.request.infer(inputs)
         infer_time = (time.perf_counter() - start_time) * 1000
-        print(f"[OVVisionModel] 推理时间: {infer_time:.2f}ms")
+        print(f"[OVVisionModel] Inference time: {infer_time:.2f}ms")
         return torch.from_numpy(self.request.get_output_tensor(0).data.copy())
 
 
@@ -2512,7 +2527,7 @@ class OVAudioEncoder:
         start_time = time.perf_counter()
         self.request.infer(inputs)
         infer_time = (time.perf_counter() - start_time) * 1000
-        print(f"[OVAudioEncoder-Stateful] 推理时间: {infer_time:.2f}ms")
+        print(f"[OVAudioEncoder-Stateful] Inference time: {infer_time:.2f}ms")
         
         hidden_states = torch.from_numpy(self.request.get_output_tensor(0).data.copy())
         
@@ -2553,7 +2568,7 @@ class OVAudioEncoder:
         start_time = time.perf_counter()
         self.request.infer(inputs)
         infer_time = (time.perf_counter() - start_time) * 1000
-        print(f"[OVAudioEncoder] 推理时间: {infer_time:.2f}ms")
+        print(f"[OVAudioEncoder] Inference time: {infer_time:.2f}ms")
         
         hidden_states = torch.from_numpy(self.request.get_output_tensor(0).data.copy())
         
@@ -2580,7 +2595,7 @@ class OVAudioEncoder:
         start_time = time.perf_counter()
         self.request.infer(inputs)
         infer_time = (time.perf_counter() - start_time) * 1000
-        print(f"[OVAudioEncoder-Standard] 推理时间: {infer_time:.2f}ms")
+        print(f"[OVAudioEncoder-Standard] Inference time: {infer_time:.2f}ms")
         return torch.from_numpy(self.request.get_output_tensor(0).data.copy())
 
 
@@ -3331,13 +3346,24 @@ class OVMiniCPMO:
         self.tts.audio_tokenizer = self.token2wav
         return self.token2wav
     
-    def init_token2wav_cache(self, prompt_wav_path: str):
-        """Initialize token2wav cache from prompt (aligned with original).
+    def init_token2wav_cache(self, prompt_speech_16k):
+        """Initialize token2wav cache from prompt audio (aligned with original).
         
         Args:
-            prompt_wav_path: Path to reference audio file
+            prompt_speech_16k: Path to reference audio file, or numpy array of 16kHz audio
         """
         if self.token2wav is not None:
+            import tempfile
+            import soundfile as sf
+            
+            # If input is ndarray, save to temp file first (aligned with original)
+            if isinstance(prompt_speech_16k, np.ndarray):
+                with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_wav:
+                    prompt_wav_path = tmp_wav.name
+                    sf.write(prompt_wav_path, prompt_speech_16k, 16000)
+            else:
+                prompt_wav_path = str(prompt_speech_16k)
+            
             self.token2wav.reset_cache()
             self.token2wav.cache = self.token2wav._prepare_prompt(prompt_wav_path)
     
@@ -3357,7 +3383,453 @@ class OVMiniCPMO:
             )
             self.processor.reset_streaming()
             self.audio_chunk_idx = 0
-    
+
+    @torch.no_grad()
+    def streaming_prefill(
+        self,
+        session_id,
+        msgs,
+        omni_mode=True,
+        max_slice_nums=None,
+        use_tts_template=True,
+        enable_thinking=False,
+        is_last_chunk=False,
+        tokenizer=None,
+        processor=None,
+        **kwargs,
+    ):
+        """Streaming prefill — process one message and extend KV cache.
+        
+        Aligned with original MiniCPMO.streaming_prefill().
+        
+        Args:
+            session_id: Session identifier (new session resets state)
+            msgs: List of ONE message dict (system/user/assistant)
+            omni_mode: Join content with "" (True) or "\\n" (False)
+            max_slice_nums: Max image slices
+            use_tts_template: Use TTS chat template
+            enable_thinking: Enable thinking/CoT
+            is_last_chunk: If True, marks the last audio chunk
+        """
+        from copy import deepcopy
+        from PIL import Image
+
+        assert session_id is not None, "session_id cannot be None"
+        self.is_first = self.session_id is None or session_id != self.session_id
+
+        if tokenizer is None:
+            tokenizer = self.tokenizer
+        if processor is None:
+            processor = self.processor
+        self.prepare_processor(processor=processor, tokenizer=tokenizer)
+
+        images = []
+        audios = []
+
+        assert len(msgs) == 1
+        copy_msgs = deepcopy(msgs)
+        msg = copy_msgs[0]
+
+        assert msg["role"] in ["system", "user", "assistant"]
+        is_not_system_prefill = msg["role"] != "system"
+
+        content = msg["content"]
+        if isinstance(content, str):
+            content = [content]
+        cur_msgs = []
+        for c in content:
+            if isinstance(c, Image.Image):
+                images.append(c)
+                cur_msgs.append("<image>./</image>")
+            elif isinstance(c, np.ndarray):
+                audios.append(c)
+                cur_msgs.append("<audio>./</audio>")
+            elif isinstance(c, str):
+                cur_msgs.append(c)
+
+        cur_contents = "".join(cur_msgs) if omni_mode else "\n".join(cur_msgs)
+
+        if msg["role"] in ["system", "assistant"]:
+            self.new_user_msg = True
+            self.audio_past_key_values = None
+
+        if self.is_first:
+            self.reset_session(reset_token2wav_cache=False)
+            self.session_id = session_id
+            self.init_streaming_processor()
+
+            if msg["role"] == "user":
+                prompt = "<|im_start|>user\n" + cur_contents
+                self.new_user_msg = False
+            else:
+                msg["content"] = cur_contents
+                prompt = processor.tokenizer.apply_chat_template(
+                    copy_msgs,
+                    tokenize=False,
+                    add_generation_prompt=False,
+                    use_tts_template=use_tts_template,
+                    enable_thinking=enable_thinking,
+                )
+            add_special_tokens = True
+        else:
+            if self.new_user_msg and msg["role"] == "user":
+                if self.llm_generated:
+                    if self.llm_generate_completed:
+                        prompt = "<|im_end|>\n<|im_start|>user\n" + cur_contents
+                    else:
+                        prompt = "<|tts_eos|><|im_end|>\n<|im_start|>user\n" + cur_contents
+                else:
+                    prompt = "<|im_start|>user\n" + cur_contents
+                self.new_user_msg = False
+            else:
+                prompt = cur_contents
+            add_special_tokens = False
+
+        # Pad first audio chunk if needed
+        if is_not_system_prefill and len(audios) > 0 and self.audio_chunk_idx == 0:
+            assert len(audios) == 1, f"streaming mode only supports single audio, currently {len(audios)}"
+            first_chunk_samples = int(self.FIRST_CHUNK_MS * self.SAMPLE_RATE / 1000)
+            if len(audios[0]) < first_chunk_samples:
+                pad_len = first_chunk_samples - len(audios[0])
+                audios[0] = np.concatenate([np.zeros(pad_len, dtype=audios[0].dtype), audios[0]])
+
+        model_inputs = processor(
+            [prompt],
+            [images],
+            [audios],
+            max_slice_nums=1 if max_slice_nums is None else max_slice_nums,
+            use_image_id=False,
+            chunk_input=True,
+            return_tensors="pt",
+            max_length=None,
+            sampling_rate=16000,
+            add_special_tokens=add_special_tokens,
+            online_streaming=is_not_system_prefill,
+            audio_chunk_idx=self.audio_chunk_idx,
+            is_last_chunk=is_last_chunk,
+        )
+
+        if len(audios) > 0 and is_not_system_prefill:
+            self.audio_chunk_idx += 1
+
+        # Get embeddings
+        model_inputs["inputs_embeds"], _ = self.get_vllm_embedding(model_inputs)
+        inputs_embeds = self.get_omni_embedding(
+            model_inputs,
+            input_embeddings=model_inputs["inputs_embeds"],
+            stream_input=is_not_system_prefill,
+        )
+
+        # Build attention mask for accumulated KV cache
+        seq_len = inputs_embeds.shape[1]
+        past_length = self.llm._past_length
+        attention_mask = torch.ones((1, past_length + seq_len), dtype=torch.long, device=self.device)
+
+        # Determine past_key_values sentinel
+        pkv = None if self.is_first else ((),)
+
+        # Run LLM forward (prefill only, no generation)
+        outputs = self.llm(
+            past_key_values=pkv,
+            inputs_embeds=inputs_embeds,
+            attention_mask=attention_mask,
+            use_cache=True,
+            return_dict=True,
+        )
+
+        # Store the sentinel for subsequent calls
+        self.llm_past_key_values = outputs.past_key_values
+
+        return prompt
+
+    @torch.inference_mode()
+    def streaming_generate(
+        self,
+        session_id,
+        generate_audio=True,
+        use_tts_template=True,
+        enable_thinking=False,
+        do_sample=True,
+        max_new_tokens=256,
+        tokenizer=None,
+        processor=None,
+        **kwargs,
+    ):
+        """Streaming generate — yield text/audio chunks from accumulated KV cache.
+        
+        Aligned with original MiniCPMO.streaming_generate().
+        
+        Args:
+            session_id: Session identifier
+            generate_audio: If True, yield (wav_chunk, text_chunk); if False, yield (text_chunk, is_finished)
+            use_tts_template: Use TTS template
+            enable_thinking: Enable thinking mode
+            do_sample: Use sampling
+            max_new_tokens: Max tokens to generate
+        
+        Yields:
+            If generate_audio: (wav_chunk: Tensor, text_chunk: str)
+            If not generate_audio: (text_chunk: str, is_finished: bool)
+        """
+        if tokenizer is None:
+            tokenizer = self.tokenizer
+        if processor is None:
+            processor = self.processor
+
+        self.new_user_msg = True
+        self.llm_generated = True
+        self.llm_generate_completed = False
+        self.audio_past_key_values = None
+
+        # Build BOS input for generation
+        think_str = getattr(self, 'think_str', '')
+        if think_str:
+            think_str = think_str.replace("\\n", "\n")
+        bos_input = "".join([
+            "<|im_end|>\n<|im_start|>assistant\n",
+            "" if enable_thinking else think_str,
+            "<|tts_bos|>" if use_tts_template else "",
+        ])
+
+        bos_input_ids = tokenizer.encode(bos_input)
+        bos_input_ids = torch.tensor(bos_input_ids, dtype=torch.long, device=self.device).unsqueeze(0)
+        bos_embeds = self.llm.get_input_embeddings()(bos_input_ids)
+
+        # Build attention mask
+        past_length = self.llm._past_length
+        attention_mask = torch.ones((1, past_length + bos_embeds.shape[1]), dtype=torch.long, device=self.device)
+
+        # Prefill BOS tokens
+        outputs = self.llm(
+            past_key_values=self.llm_past_key_values,
+            inputs_embeds=bos_embeds,
+            attention_mask=attention_mask,
+            use_cache=True,
+            return_dict=True,
+            output_hidden_states=True,
+        )
+        self.llm_past_key_values = outputs.past_key_values
+
+        terminators = [tokenizer.convert_tokens_to_ids(i) for i in self.terminators]
+
+        # Autoregressive generation
+        next_token_logits = outputs.logits[:, -1, :]
+        generated_text = ""
+        tts_token_ids = []
+        spk_hidden_states = None
+
+        # Get TTS related tokens
+        tts_bos_token_id = tokenizer.convert_tokens_to_ids("<|tts_bos|>")
+        tts_eos_token_id = tokenizer.convert_tokens_to_ids("<|tts_eos|>")
+
+        for step in range(max_new_tokens):
+            if do_sample:
+                top_p = kwargs.get("top_p", 0.8)
+                top_k_val = kwargs.get("top_k", 100)
+                temperature = kwargs.get("temperature", 0.7)
+                rep_penalty = kwargs.get("repetition_penalty", 1.05)
+
+                logits = next_token_logits / temperature
+                probs = torch.softmax(logits, dim=-1)
+                
+                # Top-k filtering
+                if top_k_val > 0:
+                    top_k_probs, top_k_indices = torch.topk(probs, min(top_k_val, probs.shape[-1]))
+                    mask = torch.zeros_like(probs)
+                    mask.scatter_(1, top_k_indices, top_k_probs)
+                    probs = mask
+                
+                # Top-p filtering
+                sorted_probs, sorted_indices = torch.sort(probs, descending=True)
+                cumulative_probs = torch.cumsum(sorted_probs, dim=-1)
+                sorted_indices_to_remove = cumulative_probs - sorted_probs > top_p
+                sorted_probs[sorted_indices_to_remove] = 0
+                probs.scatter_(1, sorted_indices, sorted_probs)
+                
+                probs = probs / probs.sum(dim=-1, keepdim=True)
+                next_token = torch.multinomial(probs, num_samples=1)
+            else:
+                next_token = torch.argmax(next_token_logits, dim=-1, keepdim=True)
+
+            token_id = next_token.item()
+
+            # Check termination
+            if token_id in terminators or token_id == tokenizer.eos_token_id:
+                self.llm_generate_completed = True
+                if not generate_audio:
+                    yield "", True
+                break
+
+            # Decode text token (skip TTS tokens)
+            if token_id not in [tts_bos_token_id, tts_eos_token_id]:
+                decoded = tokenizer.decode([token_id], skip_special_tokens=False)
+                # Filter out special tokens from decoded text
+                if not decoded.startswith("<|") and not decoded.startswith("<"):
+                    generated_text += decoded
+                    if not generate_audio:
+                        yield decoded, False
+
+            # Get next token embedding
+            next_embeds = self.llm.get_input_embeddings()(next_token)
+            past_length = self.llm._past_length
+            attention_mask = torch.ones((1, past_length + 1), dtype=torch.long, device=self.device)
+
+            outputs = self.llm(
+                past_key_values=self.llm_past_key_values,
+                inputs_embeds=next_embeds,
+                attention_mask=attention_mask,
+                use_cache=True,
+                return_dict=True,
+                output_hidden_states=generate_audio,
+            )
+            self.llm_past_key_values = outputs.past_key_values
+            next_token_logits = outputs.logits[:, -1, :]
+
+            # Collect hidden states for TTS
+            if generate_audio and outputs.hidden_states is not None:
+                last_hidden = outputs.hidden_states  # last layer hidden states
+                if isinstance(last_hidden, tuple):
+                    last_hidden = last_hidden[-1]  # last layer
+                tts_token_ids.append(token_id)
+                if spk_hidden_states is None:
+                    spk_hidden_states = last_hidden[:, -1:, :]
+                else:
+                    spk_hidden_states = torch.cat([spk_hidden_states, last_hidden[:, -1:, :]], dim=1)
+
+        # Generate audio from collected hidden states
+        if generate_audio and len(tts_token_ids) > 0 and self.token2wav is not None:
+            # Use TTS model to generate audio from the collected conditions
+            token_ids_tensor = torch.tensor([tts_token_ids], dtype=torch.long, device=self.device)
+            
+            try:
+                # Try using the TTS pipeline to generate audio
+                wav = self._tts_generate_audio(token_ids_tensor, spk_hidden_states)
+                if wav is not None:
+                    yield wav, generated_text
+                else:
+                    yield torch.zeros(1, 24000), generated_text
+            except Exception as e:
+                print(f"TTS error: {e}")
+                yield torch.zeros(1, 24000), generated_text
+
+        self.llm_generate_completed = True
+
+    def _tts_generate_audio(self, token_ids, hidden_states):
+        """Generate audio waveform from TTS tokens and hidden states.
+        
+        Args:
+            token_ids: Text token IDs [1, seq_len]
+            hidden_states: LLM hidden states for TTS condition [1, seq_len, hidden_dim]
+        
+        Returns:
+            Audio waveform tensor or None
+        """
+        if self.tts is None or self.token2wav is None:
+            return None
+
+        try:
+            # Project hidden states through TTS projector
+            tts_projector = getattr(self, '_ov_tts_projector_0', None)
+            if tts_projector is None:
+                # Try to find projector in the model
+                for name in ['_ov_tts_projector_0', 'tts_projector']:
+                    tts_projector = getattr(self, name, None)
+                    if tts_projector is not None:
+                        break
+            
+            if tts_projector is not None:
+                condition = tts_projector(hidden_states.to(self.dtype))
+            else:
+                condition = hidden_states
+
+            # Use TTS language model to generate audio codes
+            tts_config = self.tts.config
+            num_audio_tokens = getattr(tts_config, 'num_audio_tokens', 6562)
+            
+            # Reset TTS state
+            if hasattr(self.tts, '_ov_language'):
+                self.tts._ov_language.reset_state()
+            
+            # Generate audio tokens from condition
+            audio_tokens = self._generate_tts_tokens(condition, num_audio_tokens)
+            
+            if audio_tokens is not None and len(audio_tokens) > 0:
+                # Convert audio tokens to waveform using token2wav
+                wav = self.token2wav.offline_inference(audio_tokens)
+                return wav
+            
+            return None
+        except Exception as e:
+            print(f"TTS generation error: {e}")
+            return None
+
+    def _generate_tts_tokens(self, condition, num_audio_tokens, max_tokens=500):
+        """Generate TTS audio tokens from condition embeddings.
+        
+        Args:
+            condition: Condition embeddings from LLM hidden states
+            num_audio_tokens: Vocabulary size for audio tokens
+            max_tokens: Maximum audio tokens to generate
+        
+        Returns:
+            Audio token tensor or None
+        """
+        try:
+            tts_eos_token = num_audio_tokens - 1
+            
+            # Get TTS embedding and code embedding
+            tts_emb = getattr(self, '_ov_tts_embedding', None)
+            tts_code_emb = getattr(self, '_ov_tts_code_embedding', None)
+            tts_head = getattr(self, '_ov_tts_head', None)
+            
+            if tts_emb is None or tts_code_emb is None or tts_head is None:
+                return None
+            
+            # Prefill condition
+            cond_embeds = condition
+            if hasattr(self.tts, '_ov_language'):
+                self.tts._ov_language.reset_state()
+            
+            # Simple autoregressive TTS generation
+            audio_bos_id = getattr(self.tts.config, 'audio_bos_token_id', 151687)
+            bos_embed = tts_code_emb(torch.tensor([[audio_bos_id]], dtype=torch.long))
+            
+            # Concatenate condition + bos
+            inputs_embeds = torch.cat([cond_embeds, bos_embed], dim=1)
+            
+            generated_tokens = []
+            past_length = 0
+            
+            for step in range(max_tokens):
+                attention_mask = torch.ones((1, past_length + inputs_embeds.shape[1]), dtype=torch.long)
+                position_ids = torch.arange(past_length, past_length + inputs_embeds.shape[1], dtype=torch.long).unsqueeze(0)
+                
+                logits, _ = self.tts._ov_language(
+                    inputs_embeds.to(self.dtype),
+                    attention_mask,
+                    position_ids,
+                )
+                past_length += inputs_embeds.shape[1]
+                
+                # Get logits for audio tokens only
+                audio_logits = logits[:, -1, :num_audio_tokens]
+                next_token = torch.argmax(audio_logits, dim=-1)
+                token_id = next_token.item()
+                
+                if token_id == tts_eos_token:
+                    break
+                
+                generated_tokens.append(token_id)
+                inputs_embeds = tts_code_emb(next_token.unsqueeze(0))
+            
+            if generated_tokens:
+                return torch.tensor([generated_tokens], dtype=torch.long)
+            return None
+            
+        except Exception as e:
+            print(f"TTS token generation error: {e}")
+            return None
+
     def get_input_embeddings(self):
         """Get input embeddings (aligned with original MiniCPMO.get_input_embeddings).
         
@@ -3536,19 +4008,37 @@ class OVMiniCPMO:
             if len(audio_embeddings) > 0:
                 audio_bounds = data["audio_bounds"]
                 
-                for i in range(bs):
-                    audio_embs = audio_embeddings[i]
-                    bounds = audio_bounds[i]
-                    for embs, bound in zip(audio_embs, bounds):
-                        audio_indices = torch.arange(bound[0], bound[1], dtype=torch.long).to(
-                            input_embeddings.device
+                if getattr(self.config, 'stream_input', False):
+                    # Sequential distribution mode (aligned with original config.stream_input path):
+                    # Concatenate all audio embeddings and distribute across bounds sequentially.
+                    # This handles cases where the processor merges multiple audio segments into
+                    # fewer mel spectrograms (e.g., omni mode with multiple video audio chunks).
+                    assert bs == 1, "audio stream_input mode only support batch size 1"
+                    for i in range(bs):
+                        audio_embs = torch.cat(audio_embeddings[i], dim=0).to(
+                            device=input_embeddings.device, dtype=input_embeddings.dtype
                         )
-                        if embs.shape[0] != len(audio_indices):
-                            raise ValueError(
-                                f"Shape mismatch: Trying to assign embeddings of shape {embs.shape} "
-                                f"to input indices of length {len(audio_indices)}"
+                        audio_start_pos = 0
+                        for bound in audio_bounds[i]:
+                            audio_len = bound[1] - bound[0]
+                            input_embeddings[i, bound[0] : bound[1]] = audio_embs[
+                                audio_start_pos : audio_start_pos + audio_len, :
+                            ]
+                            audio_start_pos += audio_len
+                else:
+                    for i in range(bs):
+                        audio_embs = audio_embeddings[i]
+                        bounds = audio_bounds[i]
+                        for embs, bound in zip(audio_embs, bounds):
+                            audio_indices = torch.arange(bound[0], bound[1], dtype=torch.long).to(
+                                input_embeddings.device
                             )
-                        input_embeddings[i, audio_indices] = embs.to(input_embeddings.dtype)
+                            if embs.shape[0] != len(audio_indices):
+                                raise ValueError(
+                                    f"Shape mismatch: Trying to assign embeddings of shape {embs.shape} "
+                                    f"to input indices of length {len(audio_indices)}"
+                                )
+                            input_embeddings[i, audio_indices] = embs.to(input_embeddings.dtype)
         
         return input_embeddings
     
@@ -5025,6 +5515,20 @@ class OVMiniCPMODuplex:
     - Thread pool for concurrent audio/vision processing
     """
     
+    def __getattr__(self, name):
+        """Delegate attribute access to the underlying OVMiniCPMO model.
+        
+        This allows calling methods like init_tts(), chat(), get_sys_prompt(),
+        reset_session(), init_token2wav_cache() directly on the duplex object,
+        which forwards them to self.model (the wrapped OVMiniCPMO instance).
+        """
+        if name == "model":
+            raise AttributeError(name)
+        model = self.__dict__.get("model")
+        if model is not None:
+            return getattr(model, name)
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+
     # Default duplex parameters (aligned with original MiniCPMODuplex._default_duplex_params)
     _default_duplex_params = {
         "generate_audio": True,
@@ -5557,9 +6061,17 @@ class OVMiniCPMODuplex:
         text_list: Optional[List[str]] = None,
         max_slice_nums: Union[int, List[int]] = 1,
         batch_vision_feed: bool = False,
-    ) -> Dict[str, Any]:
+        # Simplex API parameters (dispatched to self.model.streaming_prefill)
+        session_id=None,
+        msgs=None,
+        **kwargs,
+    ):
         """
         Streaming prefill with multimodal input (aligned with original model).
+        
+        Supports two calling conventions:
+        - **Duplex API**: streaming_prefill(audio_waveform=..., frame_list=...)
+        - **Simplex API**: streaming_prefill(session_id=..., msgs=...) — delegates to self.model
         
         Args:
             audio_waveform: Audio waveform (16kHz mono)
@@ -5567,10 +6079,18 @@ class OVMiniCPMODuplex:
             text_list: List of text segments
             max_slice_nums: Max slices per image
             batch_vision_feed: Whether to batch vision embeddings
+            session_id: (Simplex API) Session identifier
+            msgs: (Simplex API) List of message dicts
         
         Returns:
-            Dict with success status and timing info
+            Dict with success status and timing info (duplex), or prompt string (simplex)
         """
+        # Dispatch simplex API calls to the underlying OVMiniCPMO model
+        if session_id is not None or msgs is not None:
+            return self.model.streaming_prefill(
+                session_id=session_id, msgs=msgs, max_slice_nums=max_slice_nums, **kwargs
+            )
+        
         start_time = time.time()
         
         def _make_result(success, reason=""):
@@ -5861,9 +6381,16 @@ class OVMiniCPMODuplex:
         listen_top_k: Optional[int] = None,
         text_repetition_penalty: float = 1.05,
         text_repetition_window_size: int = 512,
-    ) -> Dict[str, Any]:
+        # Simplex API parameters (dispatched to self.model.streaming_generate)
+        session_id=None,
+        **kwargs,
+    ):
         """
         Generate response in streaming mode (aligned with original model).
+        
+        Supports two calling conventions:
+        - **Duplex API**: streaming_generate(prompt_wav_path=..., decode_mode=...)
+        - **Simplex API**: streaming_generate(session_id=..., generate_audio=...) — delegates to self.model
         
         Args:
             prompt_wav_path: Path to reference audio for TTS
@@ -5875,10 +6402,21 @@ class OVMiniCPMODuplex:
             listen_top_k: Force listen if in top-k
             text_repetition_penalty: Repetition penalty
             text_repetition_window_size: Window for repetition penalty
+            session_id: (Simplex API) Session identifier
         
         Returns:
-            Dict with generation results
+            Dict with generation results (duplex), or generator (simplex)
         """
+        # Dispatch simplex API calls to the underlying OVMiniCPMO model
+        if session_id is not None:
+            return self.model.streaming_generate(
+                session_id=session_id,
+                temperature=temperature,
+                top_k=top_k,
+                top_p=top_p,
+                **kwargs,
+            )
+        
         start_time = time.time()
         
         if self.is_session_stop_set() or self.is_break_set():
