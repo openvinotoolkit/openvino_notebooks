@@ -2352,7 +2352,6 @@ class OVVisionModel:
         start_time = time.perf_counter()
         self.request.infer(inputs)
         infer_time = (time.perf_counter() - start_time) * 1000
-        print(f"[OVVisionModel] Inference time: {infer_time:.2f}ms")
         return torch.from_numpy(self.request.get_output_tensor(0).data.copy())
 
 
@@ -2527,7 +2526,6 @@ class OVAudioEncoder:
         start_time = time.perf_counter()
         self.request.infer(inputs)
         infer_time = (time.perf_counter() - start_time) * 1000
-        print(f"[OVAudioEncoder-Stateful] Inference time: {infer_time:.2f}ms")
         
         hidden_states = torch.from_numpy(self.request.get_output_tensor(0).data.copy())
         
@@ -2568,7 +2566,6 @@ class OVAudioEncoder:
         start_time = time.perf_counter()
         self.request.infer(inputs)
         infer_time = (time.perf_counter() - start_time) * 1000
-        print(f"[OVAudioEncoder] Inference time: {infer_time:.2f}ms")
         
         hidden_states = torch.from_numpy(self.request.get_output_tensor(0).data.copy())
         
@@ -2595,7 +2592,6 @@ class OVAudioEncoder:
         start_time = time.perf_counter()
         self.request.infer(inputs)
         infer_time = (time.perf_counter() - start_time) * 1000
-        print(f"[OVAudioEncoder-Standard] Inference time: {infer_time:.2f}ms")
         return torch.from_numpy(self.request.get_output_tensor(0).data.copy())
 
 
@@ -2963,9 +2959,10 @@ class OVLLMForCausalLM(GenerationMixin):
         if inputs_embeds is None:
             inputs_embeds = self.get_input_embeddings()(input_ids)
 
+        batch_size, seq_len = inputs_embeds.shape[:2]
+
         # Compute position_ids if not provided
         if position_ids is None:
-            batch_size, seq_len = inputs_embeds.shape[:2]
             if past_key_values is None:
                 position_ids = torch.arange(seq_len, dtype=torch.long).unsqueeze(0)
             else:
@@ -2976,6 +2973,11 @@ class OVLLMForCausalLM(GenerationMixin):
                     position_ids = torch.arange(
                         start_pos, start_pos + seq_len, dtype=torch.long
                     ).unsqueeze(0)
+
+        # Compute attention_mask if not provided
+        if attention_mask is None:
+            total_len = self._past_length + seq_len if past_key_values is not None else seq_len
+            attention_mask = torch.ones([batch_size, total_len], dtype=torch.int64)
 
         # Reset state on first call (no past_key_values)
         if past_key_values is None:
@@ -2999,7 +3001,9 @@ class OVLLMForCausalLM(GenerationMixin):
         return CausalLMOutputWithPast(
             logits=logits,
             past_key_values=past_key_values,
-            hidden_states=hidden_states,
+            # Wrap as tuple: (hidden_states,) so outputs.hidden_states[-1] returns
+            # the tensor, matching the original model's layer-tuple format.
+            hidden_states=(hidden_states,) if output_hidden_states else None,
         )
 
     def prepare_inputs_for_generation(
@@ -3339,15 +3343,20 @@ class OVMiniCPMO:
             device=self.tts_device,
             float16=enable_float16,
             n_timesteps=n_timesteps,
-            hift_input_len=50,
+            hift_input_len=0,  # dynamic shape for streaming mel+cache (50+8=58 frames)
             # flow_emb_token_len=50,
             # flow_emb_prompt_len=200,           
         )
         self.tts.audio_tokenizer = self.token2wav
+        # Force audio_tokenizer_type (aligned with original init_tts line 258)
+        self.tts.config.audio_tokenizer_type = "s3tokenizer_step_audio"
         return self.token2wav
     
     def init_token2wav_cache(self, prompt_speech_16k):
         """Initialize token2wav cache from prompt audio (aligned with original).
+        
+        Original (modeling_minicpmo.py line 1346): calls set_stream_cache() to initialize
+        streaming flow cache and hift cache, then stores deep copies as base caches.
         
         Args:
             prompt_speech_16k: Path to reference audio file, or numpy array of 16kHz audio
@@ -3364,8 +3373,28 @@ class OVMiniCPMO:
             else:
                 prompt_wav_path = str(prompt_speech_16k)
             
-            self.token2wav.reset_cache()
-            self.token2wav.cache = self.token2wav._prepare_prompt(prompt_wav_path)
+            # Aligned with original: use set_stream_cache to initialize streaming caches
+            self.token2wav.cache = None
+            flow_cache_base, hift_cache_base = self.token2wav.set_stream_cache(prompt_wav_path)
+            
+            def _clone_recursive(obj):
+                """Deep clone nested containers of torch.Tensors."""
+                if torch.is_tensor(obj):
+                    return obj.clone()
+                elif isinstance(obj, dict):
+                    return {k: _clone_recursive(v) for k, v in obj.items()}
+                elif isinstance(obj, list):
+                    return [_clone_recursive(v) for v in obj]
+                elif isinstance(obj, tuple):
+                    return tuple(_clone_recursive(v) for v in obj)
+                return obj
+            
+            self.token2wav_cache = {
+                "hift_cache_base": _clone_recursive(hift_cache_base),
+            }
+            # flow_cache_base is None for OV (not used), but store if available
+            if flow_cache_base is not None:
+                self.token2wav_cache["flow_cache_base"] = _clone_recursive(flow_cache_base)
     
     def init_streaming_processor(self):
         """Initialize streaming processor (aligned with original MiniCPMO.init_streaming_processor)."""
@@ -3557,7 +3586,12 @@ class OVMiniCPMO:
     ):
         """Streaming generate — yield text/audio chunks from accumulated KV cache.
         
-        Aligned with original MiniCPMO.streaming_generate().
+        Aligned with original MiniCPMO.streaming_generate():
+        - LLM generates text in chunks of 10 via ChunkPrefillChunkGenerate-like logic
+        - For each chunk, constructs TTS condition: emb_text(token_ids) + projector_semantic(F.normalize(hidden_states))
+        - TTS backbone generates audio tokens autoregressively (chunk_size=25)
+        - Audio tokens buffered and fed to token2wav.stream() for waveform synthesis
+        - Yields (waveform_chunk: Tensor, text_chunk: str) pairs
         
         Args:
             session_id: Session identifier
@@ -3595,122 +3629,451 @@ class OVMiniCPMO:
         bos_input_ids = torch.tensor(bos_input_ids, dtype=torch.long, device=self.device).unsqueeze(0)
         bos_embeds = self.llm.get_input_embeddings()(bos_input_ids)
 
-        # Build attention mask
-        past_length = self.llm._past_length
-        attention_mask = torch.ones((1, past_length + bos_embeds.shape[1]), dtype=torch.long, device=self.device)
+        # Terminators for text generation
+        terminators_str = getattr(self, 'terminators', ["<|tts_eos|>", "<|im_end|>", "</s>"])
+        terminators = [tokenizer.convert_tokens_to_ids(i) for i in terminators_str]
+        
+        # Forbidden tokens (aligned with original ChunkPrefillChunkGenerate)
+        forbidden_tokens = [
+            ":", "：", "；", "#", "\u201c", "\u201d", "\u2018", "\u2019",
+            "@", "*", "【", "】", "「", "」", "(", ")", "（", "）",
+            "[", "]", "&", "/", "$",
+        ]
+        forbidden_token_ids = [tokenizer.convert_tokens_to_ids(t) for t in forbidden_tokens]
+        bad_token_ids = getattr(tokenizer, "bad_token_ids", [])
+        if bad_token_ids:
+            forbidden_token_ids.extend(bad_token_ids)
+        
+        # Sampling parameters
+        temperature_llm = kwargs.get("temperature", 0.7)
+        top_p_llm = kwargs.get("top_p", 0.8)
+        top_k_llm = kwargs.get("top_k", 100)
+        rep_penalty_llm = kwargs.get("repetition_penalty", 1.05)
+        length_penalty = kwargs.get("length_penalty", 1.0)
 
-        # Prefill BOS tokens
-        outputs = self.llm(
-            past_key_values=self.llm_past_key_values,
-            inputs_embeds=bos_embeds,
-            attention_mask=attention_mask,
-            use_cache=True,
-            return_dict=True,
-            output_hidden_states=True,
-        )
-        self.llm_past_key_values = outputs.past_key_values
-
-        terminators = [tokenizer.convert_tokens_to_ids(i) for i in self.terminators]
-
-        # Autoregressive generation
-        next_token_logits = outputs.logits[:, -1, :]
-        generated_text = ""
-        tts_token_ids = []
-        spk_hidden_states = None
-
-        # Get TTS related tokens
-        tts_bos_token_id = tokenizer.convert_tokens_to_ids("<|tts_bos|>")
-        tts_eos_token_id = tokenizer.convert_tokens_to_ids("<|tts_eos|>")
-
-        for step in range(max_new_tokens):
-            if do_sample:
-                top_p = kwargs.get("top_p", 0.8)
-                top_k_val = kwargs.get("top_k", 100)
-                temperature = kwargs.get("temperature", 0.7)
-                rep_penalty = kwargs.get("repetition_penalty", 1.05)
-
-                logits = next_token_logits / temperature
-                probs = torch.softmax(logits, dim=-1)
-                
-                # Top-k filtering
-                if top_k_val > 0:
-                    top_k_probs, top_k_indices = torch.topk(probs, min(top_k_val, probs.shape[-1]))
-                    mask = torch.zeros_like(probs)
-                    mask.scatter_(1, top_k_indices, top_k_probs)
-                    probs = mask
-                
-                # Top-p filtering
-                sorted_probs, sorted_indices = torch.sort(probs, descending=True)
-                cumulative_probs = torch.cumsum(sorted_probs, dim=-1)
-                sorted_indices_to_remove = cumulative_probs - sorted_probs > top_p
-                sorted_probs[sorted_indices_to_remove] = 0
-                probs.scatter_(1, sorted_indices, sorted_probs)
-                
-                probs = probs / probs.sum(dim=-1, keepdim=True)
-                next_token = torch.multinomial(probs, num_samples=1)
-            else:
-                next_token = torch.argmax(next_token_logits, dim=-1, keepdim=True)
-
-            token_id = next_token.item()
-
-            # Check termination
-            if token_id in terminators or token_id == tokenizer.eos_token_id:
-                self.llm_generate_completed = True
-                if not generate_audio:
-                    yield "", True
-                break
-
-            # Decode text token (skip TTS tokens)
-            if token_id not in [tts_bos_token_id, tts_eos_token_id]:
-                decoded = tokenizer.decode([token_id], skip_special_tokens=False)
-                # Filter out special tokens from decoded text
-                if not decoded.startswith("<|") and not decoded.startswith("<"):
-                    generated_text += decoded
-                    if not generate_audio:
-                        yield decoded, False
-
-            # Get next token embedding
-            next_embeds = self.llm.get_input_embeddings()(next_token)
-            past_length = self.llm._past_length
-            attention_mask = torch.ones((1, past_length + 1), dtype=torch.long, device=self.device)
-
-            outputs = self.llm(
-                past_key_values=self.llm_past_key_values,
-                inputs_embeds=next_embeds,
-                attention_mask=attention_mask,
-                use_cache=True,
-                return_dict=True,
-                output_hidden_states=generate_audio,
-            )
-            self.llm_past_key_values = outputs.past_key_values
-            next_token_logits = outputs.logits[:, -1, :]
-
-            # Collect hidden states for TTS
-            if generate_audio and outputs.hidden_states is not None:
-                last_hidden = outputs.hidden_states  # last layer hidden states
-                if isinstance(last_hidden, tuple):
-                    last_hidden = last_hidden[-1]  # last layer
-                tts_token_ids.append(token_id)
-                if spk_hidden_states is None:
-                    spk_hidden_states = last_hidden[:, -1:, :]
-                else:
-                    spk_hidden_states = torch.cat([spk_hidden_states, last_hidden[:, -1:, :]], dim=1)
-
-        # Generate audio from collected hidden states
-        if generate_audio and len(tts_token_ids) > 0 and self.token2wav is not None:
-            # Use TTS model to generate audio from the collected conditions
-            token_ids_tensor = torch.tensor([tts_token_ids], dtype=torch.long, device=self.device)
+        # ============================================================
+        # Inner generator: chunk-based LLM text + TTS audio tokens
+        # Yields (audio_token_chunk, is_last_audio_chunk) pairs
+        # ============================================================
+        def audio_chunk_generator():
+            generate_chunk_size = 10
+            audio_token_chunk_size = 25  # s3tokenizer 1s = 25 tokens
             
-            try:
-                # Try using the TTS pipeline to generate audio
-                wav = self._tts_generate_audio(token_ids_tensor, spk_hidden_states)
-                if wav is not None:
-                    yield wav, generated_text
+            generation_inputs_embeds = bos_embeds
+            generated_ids = torch.empty((1, 0), dtype=torch.long, device=self.device)
+            num_chunks_decode = (max_new_tokens + generate_chunk_size - 1) // generate_chunk_size
+            
+            # Track generated token IDs on self for incremental text access (aligned with original)
+            self._streaming_generated_token_ids = []
+            
+            # ---- TTS state (for generate_audio) ----
+            if generate_audio:
+                tts = self.tts
+                num_audio_tokens = tts.config.num_audio_tokens
+                num_vq = getattr(tts.config, 'num_vq', 1)
+                tts_temperature = getattr(tts.config, 'temperature', 0.8)
+                tts_eos_token = num_audio_tokens - 1
+                
+                # TTS special token embeddings
+                audio_bos_token_id = tts.config.audio_bos_token_id
+                text_eos_token_id = getattr(tts.config, 'text_eos_token_id', 151692)
+                audio_bos_embed = tts.embedding(
+                    torch.tensor([audio_bos_token_id], dtype=torch.long)
+                ).unsqueeze(0)  # [1, 1, hidden]
+                text_eos_embed = tts.embedding(
+                    torch.tensor([text_eos_token_id], dtype=torch.long)
+                ).unsqueeze(0)  # [1, 1, hidden]
+                
+                # TTS LLM state
+                tts.llm.reset_state()
+                tts_past_length = 0
+                all_tts_generated_tokens = []  # all generated audio tokens across chunks
+                tts_token_buffer = []  # buffer for yielding in chunk_size batches
+                
+                # TTS logits processors (aligned with gen_logits in original)
+                from transformers import TopPLogitsWarper, TopKLogitsWarper
+                tts_top_p = getattr(tts.config, 'tts_top_p', 0.85)
+                tts_top_k = getattr(tts.config, 'tts_top_k', 25)
+                tts_rep_penalty = getattr(tts.config, 'tts_repetition_penalty', 1.05)
+                
+                # Build logits warpers / processors (aligned with gen_logits())
+                logits_warpers = []
+                logits_warpers.append(TopPLogitsWarper(tts_top_p, min_tokens_to_keep=3))
+                logits_warpers.append(TopKLogitsWarper(tts_top_k, min_tokens_to_keep=3))
+                
+                logits_processors = []
+                if tts_rep_penalty != 1.0:
+                    # Inline CustomRepetitionPenaltyLogitsProcessorRepeat
+                    class _RepPenaltyProcessor:
+                        def __init__(self, penalty, max_input_ids, past_window):
+                            self.penalty = penalty
+                            self.max_input_ids = max_input_ids
+                            self.past_window = past_window
+                        def __call__(self, input_ids, scores):
+                            if input_ids.size(1) > self.past_window:
+                                input_ids = input_ids.narrow(1, -self.past_window, self.past_window)
+                            freq = F.one_hot(input_ids, scores.size(1)).sum(1)
+                            if freq.size(0) > self.max_input_ids:
+                                freq.narrow(0, self.max_input_ids, freq.size(0) - self.max_input_ids).zero_()
+                            alpha = torch.pow(self.penalty, freq)
+                            scores = scores.contiguous()
+                            inp = scores.multiply(alpha)
+                            oth = scores.divide(alpha)
+                            con = scores < 0
+                            out = torch.where(con, inp, oth)
+                            return out
+                    logits_processors.append(_RepPenaltyProcessor(tts_rep_penalty, num_audio_tokens, 16))
+            
+            # ---- LLM chunk generation outer loop (aligned with original) ----
+            for chunk_idx in range(num_chunks_decode):
+                is_first_chunk = chunk_idx == 0
+                chunk_size = generate_chunk_size + (1 if is_first_chunk else 0)
+                
+                # Generate one chunk of text tokens
+                finished = False
+                current_inputs_embeds = generation_inputs_embeds.clone()
+                last_hidden_states_list = []
+                input_last_hidden_states_list = []
+                generated_tokens = []
+                PENALTY_WINDOW_SIZE = 128
+                
+                for token_idx in range(chunk_size):
+                    if is_first_chunk and token_idx == 0:
+                        # First chunk: prefill all bos embeddings
+                        model_inputs = {
+                            "inputs_embeds": current_inputs_embeds,
+                            "past_key_values": self.llm_past_key_values,
+                            "use_cache": True,
+                            "output_hidden_states": generate_audio,
+                        }
+                    else:
+                        # Subsequent: only the latest generated token
+                        model_inputs = {
+                            "inputs_embeds": current_inputs_embeds[:, -1:, :],
+                            "past_key_values": self.llm_past_key_values,
+                            "use_cache": True,
+                            "output_hidden_states": generate_audio,
+                        }
+                    
+                    outputs = self.llm(**model_inputs)
+                    self.llm_past_key_values = outputs.past_key_values
+                    
+                    logits = outputs.logits[:, -1, :].to(copy=True, dtype=torch.float32)
+                    
+                    # Forbid specific tokens
+                    if forbidden_token_ids:
+                        logits[:, forbidden_token_ids] = float("-inf")
+                    
+                    # Repetition penalty
+                    if rep_penalty_llm != 1.0:
+                        if generated_ids.shape[1] > 0 or len(generated_tokens) > 0:
+                            if len(generated_tokens) > 0:
+                                gen_tok_ids = torch.cat(generated_tokens, dim=1)
+                                current_seq = torch.cat([generated_ids[:, -PENALTY_WINDOW_SIZE:], gen_tok_ids], dim=1)
+                            else:
+                                current_seq = generated_ids[:, -PENALTY_WINDOW_SIZE:]
+                            unique_ids = torch.unique(current_seq.squeeze(0))
+                            for tid in unique_ids:
+                                if logits[0, tid] > 0:
+                                    logits[0, tid] = logits[0, tid] / rep_penalty_llm
+                                else:
+                                    logits[0, tid] = logits[0, tid] * rep_penalty_llm
+                    
+                    # Length penalty (aligned with original ChunkPrefillChunkGenerate)
+                    if length_penalty != 1.0:
+                        for eos_id in terminators:
+                            if logits[0, eos_id] > 0:
+                                logits[0, eos_id] = logits[0, eos_id] / length_penalty
+                            else:
+                                logits[0, eos_id] = logits[0, eos_id] * length_penalty
+                    
+                    # Temperature
+                    if temperature_llm != 1.0:
+                        logits = logits / temperature_llm
+                    
+                    if do_sample:
+                        # Top-k
+                        if top_k_llm > 0:
+                            tok_k_logits, tok_k_indices = torch.topk(logits, min(top_k_llm, logits.size(-1)))
+                            logits_filtered = torch.full_like(logits, float("-inf"))
+                            logits_filtered.scatter_(1, tok_k_indices, tok_k_logits)
+                            logits = logits_filtered
+                        # Top-p
+                        if top_p_llm < 1.0:
+                            sorted_logits, sorted_indices = torch.sort(logits, descending=True)
+                            cum_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1)
+                            sorted_remove = cum_probs > top_p_llm
+                            sorted_remove[..., 1:] = sorted_remove[..., :-1].clone()
+                            sorted_remove[..., 0] = 0
+                            remove = sorted_remove.scatter(1, sorted_indices, sorted_remove)
+                            logits[remove] = float("-inf")
+                        probs = F.softmax(logits, dim=-1)
+                        next_token = torch.multinomial(probs, num_samples=1)
+                    else:
+                        next_token = torch.argmax(logits, dim=-1, keepdim=True)
+                    
+                    # Collect hidden states for TTS
+                    if generate_audio and outputs.hidden_states is not None:
+                        hs = outputs.hidden_states[-1]  # Last layer hidden states [1, seq_len, hidden_dim]
+                        if is_first_chunk and token_idx == 0:
+                            input_last_hidden_states_list.append(hs)
+                        else:
+                            last_hidden_states_list.append(hs)
+                    
+                    # Check termination
+                    if next_token.item() in terminators:
+                        finished = True
+                        break
+                    
+                    generated_tokens.append(next_token)
+                    next_token_embed = self.llm.get_input_embeddings()(next_token)
+                    current_inputs_embeds = torch.cat([current_inputs_embeds, next_token_embed], dim=1)
+                
+                # Build chunk output (aligned with original ChunkPrefillChunkGenerate)
+                if len(generated_tokens) > 0:
+                    chunk_token_ids = torch.cat(generated_tokens, dim=1)
+                elif finished:
+                    chunk_token_ids = torch.zeros((1, 0), dtype=torch.long, device=self.device)
                 else:
-                    yield torch.zeros(1, 24000), generated_text
-            except Exception as e:
-                print(f"TTS error: {e}")
-                yield torch.zeros(1, 24000), generated_text
+                    break  # should not happen
+                
+                if len(last_hidden_states_list) > 0:
+                    last_hidden_states = torch.cat(last_hidden_states_list, dim=1)
+                elif finished:
+                    last_hidden_states = torch.empty((1, 0, bos_embeds.shape[-1]), device=self.device)
+                else:
+                    break
+                
+                if chunk_token_ids is None or (chunk_token_ids.shape[1] == 0 and not finished):
+                    break
+                
+                # Determine yield_chunk_token_ids (aligned with original streaming_generate)
+                if is_first_chunk:
+                    if finished:
+                        yield_chunk_token_ids = chunk_token_ids
+                    else:
+                        yield_chunk_token_ids = chunk_token_ids[:, :-1]
+                elif finished:
+                    yield_chunk_token_ids = torch.cat([generated_ids[:, -1:], chunk_token_ids], dim=1)
+                else:
+                    yield_chunk_token_ids = torch.cat([generated_ids[:, -1:], chunk_token_ids[:, :-1]], dim=1)
+                
+                if not generate_audio:
+                    # Text-only mode: yield (token_ids, finished)
+                    self._streaming_generated_token_ids.extend(yield_chunk_token_ids[0].tolist())
+                    yield yield_chunk_token_ids, finished
+                else:
+                    # Audio mode: construct TTS condition and generate audio tokens
+                    # Dense connection: emb_text(token_ids) + projector_semantic(F.normalize(hidden_states))
+                    if yield_chunk_token_ids.shape[1] > 0:
+                        llm_embeds = tts.embedding(yield_chunk_token_ids)
+                        hidden_embeds = tts.projector_semantic(last_hidden_states)
+                        if getattr(tts.config, 'normalize_projected_hidden', True):
+                            hidden_embeds = F.normalize(hidden_embeds, p=2, dim=-1)
+                        tts_embeds = llm_embeds + hidden_embeds
+                    else:
+                        tts_embeds = torch.empty((1, 0, getattr(tts.config, 'hidden_size', 768)), device=self.device)
+                    
+                    self._streaming_generated_token_ids.extend(yield_chunk_token_ids[0].tolist())
+                    
+                    # Add text_eos if text finished
+                    if finished:
+                        tts_embeds = torch.cat([tts_embeds, text_eos_embed], dim=1)
+                    
+                    # Always add audio_bos
+                    condition = torch.cat([tts_embeds, audio_bos_embed], dim=1)
+                    
+                    # ---- TTS autoregressive generation for this condition ----
+                    condition_length = condition.shape[1]
+                    tts_finished = False
+                    
+                    for t in range(500):  # max 500 audio tokens per condition
+                        if t == 0:
+                            tts_inputs_embeds = condition
+                            tts_pos_ids = torch.arange(
+                                tts_past_length, tts_past_length + condition_length,
+                                dtype=torch.long
+                            ).unsqueeze(0)
+                        else:
+                            last_tok = all_tts_generated_tokens[-1]  # [1, 1]
+                            tts_inputs_embeds = tts.code_embedding(last_tok.unsqueeze(-1))  # [1, 1, 1] → [1, 1, hidden]
+                            tts_pos_ids = torch.tensor(
+                                [[tts_past_length + condition_length + t - 1]],
+                                dtype=torch.long
+                            )
+                        
+                        # Attention mask: total past KV + current input
+                        # t=0: mask = tts_past_length + condition_length
+                        # t>0: mask = tts_past_length + condition_length + t
+                        tts_attn_mask = torch.ones(
+                            (1, tts_past_length + condition_length + t),
+                            dtype=torch.long
+                        )
+                        
+                        tts_hidden = tts.llm(tts_inputs_embeds, tts_attn_mask, tts_pos_ids)
+                        
+                        # Get audio token logits via code_head
+                        tts_logits = tts.code_head(tts_hidden)  # [1, seq_len, num_audio_tokens, num_vq]
+                        tts_logits = tts_logits[:, -1, :num_audio_tokens, 0].float()  # [1, num_audio_tokens]
+                        
+                        tts_logits = tts_logits / tts_temperature
+                        
+                        audio_bos = len(all_tts_generated_tokens) == 0 and t == 0
+                        
+                        if not audio_bos:
+                            # Apply logits processors and warpers
+                            all_gen_t = torch.cat(all_tts_generated_tokens, dim=1) if all_tts_generated_tokens else torch.empty((1, 0), dtype=torch.long)
+                            for proc in logits_processors:
+                                tts_logits = proc(all_gen_t, tts_logits)
+                            for warp in logits_warpers:
+                                tts_logits = warp(all_gen_t, tts_logits)
+                        
+                        scores = F.softmax(tts_logits, dim=-1)
+                        idx_next = torch.multinomial(scores, num_samples=1)  # [1, 1]
+                        next_id = idx_next[:, 0:1]  # [1, 1]
+                        
+                        if next_id.item() == tts_eos_token:
+                            tts_finished = True
+                        else:
+                            all_tts_generated_tokens.append(next_id)
+                            tts_token_buffer.append(next_id)
+                        
+                        # Buffer / yield logic (aligned with TTSStreamingGenerator)
+                        if len(tts_token_buffer) == 0:
+                            if finished:  # text finished
+                                yield torch.empty(1, 0, dtype=torch.long), True
+                                break
+                            else:
+                                break
+                        elif len(tts_token_buffer) >= audio_token_chunk_size:
+                            batch = torch.cat(tts_token_buffer[:audio_token_chunk_size], dim=1)
+                            yield batch, False
+                            tts_token_buffer = tts_token_buffer[audio_token_chunk_size:]
+                        else:
+                            if tts_finished:
+                                if finished:
+                                    batch = torch.cat(tts_token_buffer, dim=1)
+                                    yield batch, True
+                                    tts_token_buffer = []
+                                    break
+                                else:
+                                    break
+                            else:
+                                continue
+                    
+                    tts_past_length += condition_length + t
+                
+                # Update state for next chunk
+                generated_ids = torch.cat([generated_ids, chunk_token_ids], dim=1)
+                generation_inputs_embeds = current_inputs_embeds
+                
+                if finished:
+                    break
+            
+            # Flush remaining TTS buffer
+            if generate_audio and len(tts_token_buffer) > 0:
+                batch = torch.cat(tts_token_buffer, dim=1)
+                yield batch, True
+                tts_token_buffer = []
+            
+            if generate_audio:
+                yield None, None  # End signal
+        
+        # ============================================================
+        # Outer loop: token2wav streaming (aligned with original)
+        # ============================================================
+        audio_gen = audio_chunk_generator()
+        
+        if generate_audio:
+            # Initialize streaming caches (aligned with original)
+            def _clone_recursive(obj):
+                if torch.is_tensor(obj):
+                    return obj.clone()
+                elif isinstance(obj, dict):
+                    return {k: _clone_recursive(v) for k, v in obj.items()}
+                elif isinstance(obj, list):
+                    return [_clone_recursive(v) for v in obj]
+                elif isinstance(obj, tuple):
+                    return tuple(_clone_recursive(v) for v in obj)
+                return obj
+            
+            if self.token2wav_cache is not None:
+                self.token2wav.hift_cache_dict = _clone_recursive(self.token2wav_cache["hift_cache_base"])
+            
+            # Pre-insert silence tokens (aligned with original: 3 × 4218 silence tokens)
+            buffer = [4218] * 3
+            pre_lookahead = 3
+            CHUNK_SIZE = 25
+            prev_text_len = 0
+            
+            for audio_token_chunk, is_last_audio_chunk in audio_gen:
+                if audio_token_chunk is None:
+                    break
+                
+                buffer += audio_token_chunk.reshape(-1).tolist()
+                
+                if len(buffer) >= CHUNK_SIZE + pre_lookahead:
+                    waveform_chunk = self.token2wav.stream(
+                        buffer[:CHUNK_SIZE + pre_lookahead],
+                        prompt_wav=None,
+                        last_chunk=is_last_audio_chunk,
+                        return_waveform=True,
+                    )
+                    waveform_chunk = torch.from_numpy(waveform_chunk)
+                    
+                    # Get new text chunk
+                    new_text = ""
+                    if hasattr(self, '_streaming_generated_token_ids') and self._streaming_generated_token_ids:
+                        current_text = tokenizer.decode(self._streaming_generated_token_ids)
+                        safe_end = len(current_text)
+                        while safe_end > 0 and current_text[safe_end - 1] == "\ufffd":
+                            safe_end -= 1
+                        safe_text = current_text[:safe_end]
+                        new_text = safe_text[prev_text_len:]
+                        prev_text_len = len(safe_text)
+                    
+                    yield waveform_chunk, new_text
+                    buffer = buffer[CHUNK_SIZE:]
+            
+            # Flush remaining buffer
+            if len(buffer) > 0:
+                waveform_chunk = self.token2wav.stream(
+                    buffer,
+                    prompt_wav=None,
+                    last_chunk=True,
+                    return_waveform=True,
+                )
+                waveform_chunk = torch.from_numpy(waveform_chunk)
+                
+                new_text = ""
+                if hasattr(self, '_streaming_generated_token_ids') and self._streaming_generated_token_ids:
+                    current_text = tokenizer.decode(self._streaming_generated_token_ids)
+                    new_text = current_text[prev_text_len:]
+                
+                yield waveform_chunk, new_text
+        else:
+            # Text-only mode: decode tokens incrementally
+            accumulated_token_ids = []
+            yielded_text_len = 0
+            
+            for token_ids, is_finished in audio_gen:
+                if torch.is_tensor(token_ids):
+                    accumulated_token_ids.extend(token_ids.reshape(-1).tolist())
+                
+                full_decoded = tokenizer.decode(accumulated_token_ids, skip_special_tokens=False)
+                
+                if is_finished:
+                    new_text = full_decoded[yielded_text_len:]
+                    yield new_text, is_finished
+                else:
+                    new_text = full_decoded[yielded_text_len:]
+                    safe_end = len(new_text)
+                    while safe_end > 0 and new_text[safe_end - 1] == "\ufffd":
+                        safe_end -= 1
+                    safe_text = new_text[:safe_end]
+                    if safe_text:
+                        yielded_text_len += len(safe_text)
+                        yield safe_text, False
 
         self.llm_generate_completed = True
 
@@ -5788,6 +6151,8 @@ class OVMiniCPMODuplex:
         # Token2wav state
         self.token2wav_initialized = False
         self.token2wav_buffer = []
+        self.pre_lookahead = 3  # default from flow.yaml pre_lookahead_len
+        self.hift_cache_base = None  # base HiFT cache for turn resets
         
         # Turn state
         self.current_turn_ended = True
@@ -5812,9 +6177,18 @@ class OVMiniCPMODuplex:
         
         The original resets the flow stream cache and hift cache to
         base values, and prepends silence prefix tokens.
-        For OV, we just reset the token2wav_buffer with silence prefix.
+        For OV, we reset hift_cache_dict from base copies and reset the buffer.
         """
         if self.token2wav_initialized:
+            # Reset HiFT cache to base values (aligned with original)
+            if hasattr(self, 'hift_cache_base') and self.hift_cache_base is not None:
+                self.model.token2wav.hift_cache_dict = {k: v.clone() for k, v in self.hift_cache_base.items()}
+            else:
+                self.model.token2wav.hift_cache_dict = {
+                    'mel': torch.zeros(1, 80, 0),
+                    'source': torch.zeros(1, 1, 0),
+                    'speech': torch.zeros(1, 0),
+                }
             # Reset buffer with silence prefix (aligned with original: [4218] * 3)
             self.token2wav_buffer = [4218] * 3
     
@@ -5903,10 +6277,14 @@ class OVMiniCPMODuplex:
         
         # Reset flow/hift caches in token2wav
         if self.model.token2wav is not None:
-            if hasattr(self.model.token2wav, 'flow_cache'):
-                self.model.token2wav.flow_cache = None
-            if hasattr(self.model.token2wav, 'hift_cache'):
-                self.model.token2wav.hift_cache = None
+            if hasattr(self, 'hift_cache_base') and self.hift_cache_base is not None:
+                self.model.token2wav.hift_cache_dict = {k: v.clone() for k, v in self.hift_cache_base.items()}
+            else:
+                self.model.token2wav.hift_cache_dict = {
+                    'mel': torch.zeros(1, 80, 0),
+                    'source': torch.zeros(1, 1, 0),
+                    'speech': torch.zeros(1, 0),
+                }
         
         # 5. Allow the model to choose listen on next generate
         self.current_turn_ended = True
@@ -5976,13 +6354,15 @@ class OVMiniCPMODuplex:
             )
             self.processor.reset_streaming()
         
-        # Initialize token2wav cache (aligned with original)
+        # Initialize token2wav cache (aligned with original _init_token2wav_cache)
         if prompt_wav_path is not None and prompt_wav_path and generate_audio:
             if self.model.token2wav is not None:
-                # Reset the token2wav prompt cache so it re-processes the prompt
+                # Reset and initialize streaming cache (aligned with original)
                 self.model.token2wav.reset_cache()
-                # Warm up the cache by preparing prompt features
-                self.model.token2wav.cache = self.model.token2wav._prepare_prompt(prompt_wav_path)
+                _, hift_cache = self.model.token2wav.set_stream_cache(prompt_wav_path)
+                # Store base copies for turn reset (aligned with original)
+                self.hift_cache_base = {k: v.clone() for k, v in hift_cache.items()}
+                self.pre_lookahead = 3  # from flow.yaml pre_lookahead_len
                 self.token2wav_initialized = True
                 # Initialize token2wav buffer with silence prefix (aligned with original)
                 self.token2wav_buffer = [4218] * 3
@@ -6611,7 +6991,8 @@ class OVMiniCPMODuplex:
             inputs_embeds=tts_condition,
             max_new_token=max_token_per_chunk,
             min_new_tokens=min_token_per_chunk,
-            repetition_penalty=getattr(self, 'tts_repetition_penalty', 1.0),
+            temperature=self.tts_temperature.item() if isinstance(self.tts_temperature, torch.Tensor) else float(self.tts_temperature),
+            repetition_penalty=float(self.tts_repetition_penalty) if hasattr(self, 'tts_repetition_penalty') else 1.0,
         )
         tts_end_time = time.time()
         
@@ -6839,6 +7220,9 @@ class OVMiniCPMODuplex:
     ) -> Optional[np.ndarray]:
         """Convert TTS audio tokens to waveform (aligned with original model).
         
+        Uses Token2wav.stream() with pre_lookahead for cross-chunk context,
+        matching the original model's _generate_waveform_from_tokens exactly.
+        
         Args:
             new_tokens: Generated audio code tokens [1, num_tokens, num_vq]
             prompt_wav_path: Path to prompt wav for voice cloning
@@ -6864,72 +7248,61 @@ class OVMiniCPMODuplex:
         # Check for chunk terminator tokens
         has_chunk_eos = any(tid in self.chunk_terminator_token_ids for tid in token_ids)
         
-        wav_data_list = []
+        pcm_bytes_list = []
         
         try:
             token2wav = self.model.token2wav
             
-            # Process tokens with chunk buffering (aligned with original)
+            # Process tokens with chunk buffering + pre_lookahead (aligned with original)
             if has_chunk_eos or force_flush:
                 # When there is chunk_eos or force_flush, try to flush more content
-                while len(self.token2wav_buffer) >= 5:
-                    chunk_to_process = min(CHUNK_SIZE, len(self.token2wav_buffer))
-                    wav_bytes = token2wav(self.token2wav_buffer[:chunk_to_process], prompt_wav_path)
-                    if wav_bytes is not None:
-                        wav_data_list.append(wav_bytes)
-                    self.token2wav_buffer = self.token2wav_buffer[chunk_to_process:]
+                while len(self.token2wav_buffer) >= self.pre_lookahead + 5:
+                    chunk_to_process = min(CHUNK_SIZE + self.pre_lookahead, len(self.token2wav_buffer))
+                    pcm_bytes = token2wav.stream(
+                        self.token2wav_buffer[:chunk_to_process],
+                        prompt_wav=prompt_wav_path,
+                    )
+                    if pcm_bytes is not None:
+                        pcm_bytes_list.append(pcm_bytes)
+                    consumed = min(CHUNK_SIZE, chunk_to_process - self.pre_lookahead)
+                    self.token2wav_buffer = self.token2wav_buffer[consumed:]
             else:
-                while len(self.token2wav_buffer) >= CHUNK_SIZE:
-                    wav_bytes = token2wav(self.token2wav_buffer[:CHUNK_SIZE], prompt_wav_path)
-                    if wav_bytes is not None:
-                        wav_data_list.append(wav_bytes)
+                while len(self.token2wav_buffer) >= CHUNK_SIZE + self.pre_lookahead:
+                    pcm_bytes = token2wav.stream(
+                        self.token2wav_buffer[:CHUNK_SIZE + self.pre_lookahead],
+                        prompt_wav=prompt_wav_path,
+                    )
+                    if pcm_bytes is not None:
+                        pcm_bytes_list.append(pcm_bytes)
                     self.token2wav_buffer = self.token2wav_buffer[CHUNK_SIZE:]
             
             # Flush remaining tokens on last chunk
             if is_last_chunk and len(self.token2wav_buffer) > 0:
-                wav_bytes = token2wav(self.token2wav_buffer, prompt_wav_path)
-                if wav_bytes is not None:
-                    wav_data_list.append(wav_bytes)
+                pcm_bytes = token2wav.stream(
+                    self.token2wav_buffer,
+                    prompt_wav=prompt_wav_path,
+                    last_chunk=True,
+                )
+                if pcm_bytes is not None:
+                    pcm_bytes_list.append(pcm_bytes)
                 self.token2wav_buffer = []
         except Exception as e:
             print(f"Warning: Token2wav error: {e}")
+            import traceback
+            traceback.print_exc()
             return None
         
-        if not wav_data_list:
+        if not pcm_bytes_list:
             return None
         
-        # Decode WAV bytes to numpy arrays and concatenate
-        # OPTIMIZATION: Parse WAV header directly to extract PCM data instead of
-        # using torchaudio.load(BytesIO(wav_bytes)) which has significant overhead.
-        # The WAV format from token2wav is always: 24kHz mono float32 (IEEE 754).
-        pcm_arrays = []
-        for wav_bytes in wav_data_list:
-            if isinstance(wav_bytes, bytes):
-                try:
-                    # Fast WAV PCM extraction: find 'data' chunk and read raw samples
-                    # WAV header structure: RIFF + fmt chunk + data chunk
-                    # The 'data' chunk starts with b'data' followed by 4-byte size
-                    data_offset = wav_bytes.find(b'data')
-                    if data_offset >= 0:
-                        data_size = struct.unpack_from('<I', wav_bytes, data_offset + 4)[0]
-                        pcm_start = data_offset + 8
-                        pcm_data = wav_bytes[pcm_start:pcm_start + data_size]
-                        # float32 PCM: 4 bytes per sample
-                        audio_array = np.frombuffer(pcm_data, dtype=np.float32)
-                        pcm_arrays.append(audio_array)
-                    else:
-                        # Fallback: try as raw float32 PCM
-                        audio_array = np.frombuffer(wav_bytes, dtype=np.float32)
-                        pcm_arrays.append(audio_array)
-                except Exception:
-                    continue
-            elif isinstance(wav_bytes, np.ndarray):
-                pcm_arrays.append(wav_bytes)
-        
-        if not pcm_arrays:
+        # Merge PCM and convert to numpy array (24kHz, int16 -> float32)
+        # Aligned with original model's PCM processing
+        all_pcm = b"".join(pcm_bytes_list)
+        if len(all_pcm) == 0:
             return None
         
-        audio_waveform = np.concatenate(pcm_arrays)
+        pcm_np = np.frombuffer(all_pcm, dtype="<i2")
+        audio_waveform = pcm_np.astype(np.float32) / 32768.0
         
         # Left pad with zeros if audio is less than 1 second (24kHz), skip for last chunk
         # (aligned with original model)
@@ -7110,7 +7483,6 @@ class OVFlow:
         start_time = time.time()
         result = self.flow_embeddings(inputs)
         elapsed = time.time() - start_time
-        print(f"⌛ Flow embeddings inference time: {elapsed:.4f}s")
         h = torch.from_numpy(result[0].copy())
         spks = torch.from_numpy(result[1].copy())
         
@@ -7359,7 +7731,6 @@ class OVHiFT:
         start_time = time.time()
         result = self.hift(mel_input)
         elapsed = time.time() - start_time
-        print(f"⌛ HiFT inference time: {elapsed:.4f}s")
         x = torch.from_numpy(result[0].copy())
         
         # Post-processing: exp, sin, istft, clamp
@@ -7543,3 +7914,121 @@ class OVToken2wav:
         """Reset prompt cache."""
         self.cache = None
         self.hift_cache_dict = {}
+        self.stream_initialized = False
+
+    def set_stream_cache(self, prompt_wav):
+        """Initialize streaming cache (aligned with original Token2wav.set_stream_cache).
+        
+        Prepares prompt features and initializes HiFT cache for cross-chunk
+        speech continuity. Must be called before stream().
+        
+        Args:
+            prompt_wav: Path to prompt wav file
+            
+        Returns:
+            Tuple of (None, hift_cache_dict) — flow cache is not used in OV version
+        """
+        self.cache = self._prepare_prompt(prompt_wav)
+        self.hift_cache_dict = {
+            'mel': torch.zeros(1, 80, 0),
+            'source': torch.zeros(1, 1, 0),
+            'speech': torch.zeros(1, 0),
+        }
+        self.stream_initialized = True
+        return None, self.hift_cache_dict
+
+    def stream(self, tokens, prompt_wav, last_chunk=False, return_waveform=False):
+        """Streaming token2wav with HiFT mel/speech caching (aligned with original Token2wav.stream).
+        
+        Each call processes one chunk of speech tokens through flow → HiFT.
+        Uses mel caching and speech overlap smoothing (hamming window) for
+        cross-chunk audio continuity.
+        
+        Args:
+            tokens: List of speech token IDs for current chunk
+            prompt_wav: Path to prompt wav file
+            last_chunk: Whether this is the last chunk
+            return_waveform: If True, return float32 numpy array instead of int16 PCM bytes
+            
+        Returns:
+            If return_waveform=True: float32 numpy array (aligned with original Token2wav.stream return_waveform=True)
+            If return_waveform=False: int16 PCM bytes (default, matching original Token2wav.stream API)
+        """
+        import io
+        
+        if self.cache is None:
+            self.cache = self._prepare_prompt(prompt_wav)
+        prompt_speech_tokens, prompt_speech_tokens_lens, spk_emb, prompt_mels, prompt_mels_lens = self.cache
+        
+        generated = torch.tensor([tokens], dtype=torch.int32, device='cpu')
+        generated_lens = torch.tensor([generated.shape[1]], dtype=torch.int32, device='cpu')
+        
+        # Run flow inference for this chunk
+        mel = self.flow.inference(
+            generated, generated_lens,
+            prompt_speech_tokens, prompt_speech_tokens_lens,
+            prompt_mels, prompt_mels_lens, spk_emb, self.n_timesteps
+        )
+        
+        # HiFT with mel cache for cross-chunk continuity
+        hift_cache_mel = self.hift_cache_dict.get('mel', torch.zeros(1, 80, 0))
+        hift_cache_speech = self.hift_cache_dict.get('speech', torch.zeros(1, 0))
+        is_first_chunk = hift_cache_speech.shape[-1] == 0
+        
+        if hift_cache_mel.shape[2] > 0:
+            mel_combined = torch.cat([hift_cache_mel, mel], dim=2)
+        else:
+            mel_combined = mel
+        
+        # Run HiFT inference
+        speech = self.hift.inference(speech_feat=mel_combined)
+        
+        # Speech overlap smoothing with cached speech
+        if not is_first_chunk and hift_cache_speech.shape[-1] > 0:
+            # Fade overlap between cached tail and new speech head
+            overlap_len = min(self.source_cache_len, speech.shape[-1], hift_cache_speech.shape[-1])
+            if overlap_len > 0:
+                fade_window = self.speech_window[:2 * overlap_len] if 2 * overlap_len <= self.speech_window.shape[0] else torch.from_numpy(np.hamming(2 * overlap_len).astype(np.float32))
+                fade_in = fade_window[overlap_len:]  # second half: 0→1
+                fade_out = fade_window[:overlap_len]  # first half: 1→0
+                
+                overlap_new = speech[:, :overlap_len]
+                overlap_old = hift_cache_speech[:, -overlap_len:]
+                
+                blended = overlap_old * fade_out.unsqueeze(0) + overlap_new * fade_in.unsqueeze(0)
+                speech = torch.cat([blended, speech[:, overlap_len:]], dim=1)
+        
+        # Update HiFT cache
+        self.hift_cache_dict = {
+            'mel': mel_combined[:, :, -self.mel_cache_len:].clone() if mel_combined.shape[2] >= self.mel_cache_len else mel_combined.clone(),
+            'source': torch.zeros(1, 1, 0),
+            'speech': speech[:, -self.source_cache_len:].clone() if speech.shape[-1] >= self.source_cache_len else speech.clone(),
+        }
+        
+        # Trim output
+        if is_first_chunk and not last_chunk:
+            # First chunk: pad silence at start, trim tail for next overlap
+            silence = torch.zeros(1, self.source_cache_len)
+            if speech.shape[-1] > self.source_cache_len:
+                speech = torch.cat([silence, speech[:, :-self.source_cache_len]], dim=1)
+            else:
+                speech = silence
+        elif not last_chunk:
+            # Middle chunks: trim tail for next overlap
+            if speech.shape[-1] > self.source_cache_len:
+                speech = speech[:, :-self.source_cache_len]
+            else:
+                speech = torch.zeros(1, 0)
+        # Last chunk: output everything (no trimming)
+        
+        # Convert speech tensor to output format
+        wav_np = speech.squeeze(0).cpu().numpy()
+        wav_np = np.clip(wav_np, -1.0, 1.0)
+        
+        if return_waveform:
+            # Return float32 numpy array (aligned with original Token2wav.stream return_waveform=True)
+            return wav_np
+        
+        # Convert to int16 PCM bytes (default, aligned with original Token2wav.stream)
+        wav_int16 = (wav_np * 32767.0).astype('<i2')
+        return wav_int16.tobytes()
