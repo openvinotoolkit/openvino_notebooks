@@ -252,13 +252,8 @@ def eager_mask_without_vmap(*args, **kwargs) -> Optional[torch.Tensor]:
     return mask
 
 
-# for OpenVINO, we use torch.finfo(torch.float16).min instead of torch.finfo(dtype).min
-# Although I'm not sure this is the right way to handle this, we are basically pretending that -65,504 is -inf
 ALL_MASK_ATTENTION_FUNCTIONS.register("eager", eager_mask_without_vmap)
 
-# for decoder models, we use eager mask without vmap for sdpa as well
-# to avoid a nan output issue in OpenVINO that only happens in case of:
-# non-stateful models on cpu and stateful models on npu
 ALL_MASK_ATTENTION_FUNCTIONS.register("sdpa", sdpa_mask_without_vmap)
 
 
