@@ -217,36 +217,36 @@ class InsertSlice(MatcherPass):
 
         def callback(matcher: Matcher) -> bool:
             root = matcher.get_match_root()
-            print("root: ", root)
+            # print("root: ", root)
             if root is None:
                 return False
             root_output = matcher.get_match_value()
-            print("root_output", root_output)
+            # print("root_output", root_output)
             root_name = root.get_friendly_name()
             if len(root.get_output_partial_shape(0)) == 3:
-                print(f"Find target root node name: {root_name}")
+                # print(f"Find target root node name: {root_name}")
                 parent = root.input_value(0).get_node()
-                print(f"Find target parent node name: {parent.get_friendly_name()}")
+                # print(f"Find target parent node name: {parent.get_friendly_name()}")
                 grand_parent = parent.input_value(0).get_node()
-                print(f"Find grandparent node name: {grand_parent.get_friendly_name()}")
+                # print(f"Find grandparent node name: {grand_parent.get_friendly_name()}")
                 grand_parent_output = parent.input(0).get_source_output()
-                print("grand_parent_output: ", grand_parent_output)
+                # print("grand_parent_output: ", grand_parent_output)
                 consumers = grand_parent_output.get_target_inputs()
 
-                print(f"consumers: {consumers}")
-                print(
-                    "Original reshape node output shape:",
-                    grand_parent_output.get_partial_shape(),
-                )
+                # print(f"consumers: {consumers}")
+                # print(
+                #     "Original reshape node output shape:",
+                #     grand_parent_output.get_partial_shape(),
+                # )
                 start = np.array([-1], dtype=np.int32)
                 stop = np.array([-2], dtype=np.int32)
                 step = np.array([-1], dtype=np.int32)
                 axes = np.array([1], dtype=np.int32)
                 slice = ops.slice(grand_parent, start, stop, step, axes, name="inserted_slice")
-                print(
-                    "After insert slice node, output shape:",
-                    slice.output(0).get_partial_shape(),
-                )
+                # print(
+                #     "After insert slice node, output shape:",
+                #     slice.output(0).get_partial_shape(),
+                # )
 
                 for consumer in consumers:
                     consumer.replace_source_output(slice.output(0))
@@ -343,12 +343,12 @@ class LlmStatefulModel:
                     "past_key_values": pkv,
                 },
             )
-        print("stateful model inputs: ", ov_model.inputs)
+        # print("stateful model inputs: ", ov_model.inputs)
         for input, input_name in zip(ov_model.inputs, self.get_input_names()):
             input.get_tensor().set_names({input_name})
         for output, output_name in zip(ov_model.outputs, self.get_output_names()):
             output.get_tensor().set_names({output_name})
-        print("stateful model inputs: ", ov_model.inputs)
+        # print("stateful model inputs: ", ov_model.inputs)
 
         patch_stateful(ov_model)
         manager = Manager()

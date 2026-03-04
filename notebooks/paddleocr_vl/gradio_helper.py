@@ -142,7 +142,7 @@ def make_demo(paddleocr_vl_model: Any) -> gr.Blocks:
         return text, md, debug
 
     # Sample image (optional).
-    sample_path = _get_or_create_sample_image(Path(__file__).parent / "_sample.png")
+    sample_path = _get_or_create_sample_image(Path(__file__).parent / "test.png")
     examples = [[str(sample_path)]] if sample_path else []
 
     with gr.Blocks(title="PaddleOCR-VL (OpenVINO)") as demo:
@@ -156,7 +156,7 @@ def make_demo(paddleocr_vl_model: Any) -> gr.Blocks:
 
         with gr.Row():
             with gr.Column(scale=1):
-                image_in = gr.Image(label="Input Image", type="pil", height=320)
+                image_in = gr.Image(label="Input Image", type="pil", height=800)
                 task_in = gr.Dropdown(
                     choices=list(PROMPTS.keys()),
                     value="ocr",
