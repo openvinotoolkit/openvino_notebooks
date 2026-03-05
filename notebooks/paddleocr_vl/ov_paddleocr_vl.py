@@ -217,36 +217,21 @@ class InsertSlice(MatcherPass):
 
         def callback(matcher: Matcher) -> bool:
             root = matcher.get_match_root()
-            # print("root: ", root)
             if root is None:
                 return False
             root_output = matcher.get_match_value()
-            # print("root_output", root_output)
             root_name = root.get_friendly_name()
             if len(root.get_output_partial_shape(0)) == 3:
-                # print(f"Find target root node name: {root_name}")
                 parent = root.input_value(0).get_node()
-                # print(f"Find target parent node name: {parent.get_friendly_name()}")
                 grand_parent = parent.input_value(0).get_node()
-                # print(f"Find grandparent node name: {grand_parent.get_friendly_name()}")
                 grand_parent_output = parent.input(0).get_source_output()
-                # print("grand_parent_output: ", grand_parent_output)
                 consumers = grand_parent_output.get_target_inputs()
 
-                # print(f"consumers: {consumers}")
-                # print(
-                #     "Original reshape node output shape:",
-                #     grand_parent_output.get_partial_shape(),
-                # )
                 start = np.array([-1], dtype=np.int32)
                 stop = np.array([-2], dtype=np.int32)
                 step = np.array([-1], dtype=np.int32)
                 axes = np.array([1], dtype=np.int32)
                 slice = ops.slice(grand_parent, start, stop, step, axes, name="inserted_slice")
-                # print(
-                #     "After insert slice node, output shape:",
-                #     slice.output(0).get_partial_shape(),
-                # )
 
                 for consumer in consumers:
                     consumer.replace_source_output(slice.output(0))
@@ -343,12 +328,10 @@ class LlmStatefulModel:
                     "past_key_values": pkv,
                 },
             )
-        # print("stateful model inputs: ", ov_model.inputs)
         for input, input_name in zip(ov_model.inputs, self.get_input_names()):
             input.get_tensor().set_names({input_name})
         for output, output_name in zip(ov_model.outputs, self.get_output_names()):
             output.get_tensor().set_names({output_name})
-        # print("stateful model inputs: ", ov_model.inputs)
 
         patch_stateful(ov_model)
         manager = Manager()
@@ -774,28 +757,16 @@ class VisionModel:
         return calibration_data
 
     def convert_sdpa_ov(self):
-        vison_model = self.get_model()
-        vison_model.eval()
-
-        # pixel_values = torch.rand((1, 800, 3, 14, 14), dtype=torch.float32)
-        # image_grid_thw = torch.tensor([[1, 20, 40]], dtype=torch.int32)
-        # cu_seqlens = torch.tensor([0, 800], dtype=torch.int32)
-        # numel = 1 * 20 * 40  # 800
+        vision_model = self.get_model()
+        vision_model.eval()
 
         pixel_values = torch.rand((1, 4988, 3, 14, 14), dtype=torch.float32)
         image_grid_thw = torch.tensor([[1, 58, 86]], dtype=torch.int32)
         cu_seqlens = torch.tensor([0, 4988], dtype=torch.int32)
 
-        numel = 1 * 58 * 86  # 4988
-
-        ## config
-        # interpolate_pos_encoding: Optional[bool] = True,
-        # vision_return_embed_list: Optional[bool] = True,
-        # return_pooler_output: Optional[bool] = False,
-        # use_rope: Optional[bool] = True,
         with torch.no_grad():
             ov_model = ov.convert_model(
-                vison_model,
+                vision_model,
                 example_input={
                     "pixel_values": pixel_values,
                     "image_grid_thw": image_grid_thw,
@@ -1249,7 +1220,6 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
         past_key_values = ((),)
         self.past_len += inputs_dict["inputs_embeds"].shape[1]
 
-        # print('logits: ', self.request.get_tensor("logits").data)
         return CausalLMOutputWithPast(
             loss=None,
             logits=torch.from_numpy(self.llm_request.get_tensor("logits").data),
