@@ -1,481 +1,600 @@
 """
-Gradio helper for MiniCPM-o 4.5 OpenVINO notebook demo.
+Gradio helper for MiniCPM-o 4.5 OpenVINO notebook demo  (Gradio ≥ 6.0).
 
-Provides a rich multimodal chatbot UI supporting:
-  - Text, image, and audio inputs
-  - Streaming & non-streaming text generation
-  - Stop button for interrupting generation
-  - Thinking-mode toggle (<think>...</think> parsing)
-  - Few-shot learning tab
-  - Sampling parameter panel
-  - Regenerate / Clear History
+Features
+--------
+  • Multimodal chat — text, image, and audio input
+  • Streaming & non-streaming generation
+  • Native thinking-mode display (reasoning_tags)
+  • Few-shot learning tab
+  • Sampling-parameter controls
+  • Regenerate / Clear / Stop
 
-Inspired by: https://github.com/OpenSQZ/MiniCPM-V-CookBook (gradio client)
-Adapted for direct OpenVINO model calls (no client/server).
+Reference : https://github.com/OpenSQZ/MiniCPM-V-CookBook
+Adapted for direct OpenVINO model calls (no client / server split).
 """
 
-from copy import deepcopy
 import re
-from PIL import Image
+import threading
+import traceback
+from pathlib import Path
+
+import gradio as gr
 import librosa
 import numpy as np
-import gradio as gr
+import requests
+from gradio.data_classes import FileData
+from PIL import Image
 
-# ──────────────────── Constants ──────────────────────────────────────────
+# ───────────────────────────── Constants ─────────────────────────────────
 
 MODEL_NAME = "MiniCPM-o 4.5 (OpenVINO)"
-IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".webp")
-AUDIO_EXTENSIONS = (".mp3", ".wav", ".flac", ".m4a", ".wma", ".ogg")
-MAX_NEW_TOKENS = 2048
+IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".webp", ".gif"}
+AUDIO_EXTS = {".mp3", ".wav", ".flac", ".m4a", ".wma", ".ogg", ".aac"}
+ASSETS_DIR = Path(__file__).parent / "assets"
+
+# ── Download example assets at import time (like qwen2-vl pattern) ─────────
+_EXAMPLE_IMAGE_URLS = [
+    (
+        "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/1d6a0188-5613-418d-a1fd-4560aae1d907",
+        "example_bee.jpg",
+    ),
+    (
+        "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/6cc7feeb-0721-4b5d-8791-2576ed9d2863",
+        "example_baklava.png",
+    ),
+]
+for _url, _fname in _EXAMPLE_IMAGE_URLS:
+    _fp = Path(__file__).parent / _fname
+    if not _fp.exists():
+        try:
+            print(f"Downloading example image: {_fname} …")
+            Image.open(requests.get(_url, stream=True).raw).save(_fp)
+        except Exception as _e:
+            print(f"  Could not download {_fname}: {_e}")
+
+# Note: Gradio 6 does not accept custom CSS via gr.Blocks(css=…).
+
+# ───────────────────────────── Helpers ───────────────────────────────────
 
 
-# ──────────────────── Utility functions ─────────────────────────────────
-
-def parse_thinking_response(text: str):
-    """Parse <think>...</think> blocks from model output."""
-    pattern = r"<think>(.*?)</think>"
-    matches = re.findall(pattern, text, re.DOTALL)
-    thinking = "\n\n".join(m.strip() for m in matches) if matches else ""
-    answer = re.sub(pattern, "", text, flags=re.DOTALL).strip()
-    return thinking, answer
-
-
-def format_response(thinking: str, answer: str) -> str:
-    """Format response with optional thinking section (HTML)."""
-    if thinking:
-        return (
-            '<div class="response-container">'
-            '<details class="thinking-section" open>'
-            '<summary class="thinking-header">💭 Thinking</summary>'
-            f'<div class="thinking-content">{thinking}</div>'
-            '</details>'
-            f'<div class="answer-section">{answer}</div>'
-            '</div>'
-        )
-    return answer
-
-
-def classify_file(path: str):
-    """Return 'image' or 'audio' or None based on extension."""
-    if path.lower().endswith(IMAGE_EXTENSIONS):
+def _ftype(path: str) -> str:
+    """Classify a file path as ``'image'``, ``'audio'``, or ``'unknown'``."""
+    ext = Path(path).suffix.lower()
+    if ext in IMAGE_EXTS:
         return "image"
-    if path.lower().endswith(AUDIO_EXTENSIONS):
+    if ext in AUDIO_EXTS:
         return "audio"
+    return "unknown"
+
+
+def _load_img(path: str) -> Image.Image:
+    return Image.open(path).convert("RGB")
+
+
+def _load_audio(path: str) -> np.ndarray:
+    y, _ = librosa.load(path, sr=16000, mono=True)
+    return y
+
+
+def _strip_think(text: str) -> str:
+    """Remove ``<think>…</think>`` blocks (used when re-feeding history)."""
+    return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
+
+
+def _clean_tts(text: str) -> str:
+    """Strip TTS markers that may leak from the decoder."""
+    return text.replace("<|tts_eos|>", "").replace("<|tts_bos|>", "")
+
+
+def _reset(model) -> None:
+    """Best-effort reset of model / KV-cache state."""
+    for fn in ("reset_state", "reset_session"):
+        if hasattr(model, fn):
+            try:
+                getattr(model, fn)()
+            except Exception:
+                pass
+            return
+
+
+def _resolve_content_item(raw, role: str):
+    """Resolve a single content element into a model-ready item.
+
+    Handles all formats that Gradio 6 Chatbot may produce after its
+    postprocess → preprocess round-trip:
+
+    * Plain ``str``
+    * ``FileData`` object
+    * ``{'type': 'text', 'text': '...'}``  (TextMessage dict)
+    * ``{'type': 'file', 'file': {'path': '...'}}``  (FileMessage dict)
+    * A ``list`` of the above  (Gradio 6 wraps every content in a list)
+    """
+    # ── list of sub-items → recurse and collect ─────────────────────
+    if isinstance(raw, list):
+        items = []
+        for sub in raw:
+            r = _resolve_content_item(sub, role)
+            if r is not None:
+                items.append(r)
+        return items if items else None
+
+    # ── FileData object (from _user before round-trip) ─────────────
+    if isinstance(raw, FileData):
+        return _load_file(raw.path)
+
+    # ── plain string ───────────────────────────────────────────────
+    if isinstance(raw, str):
+        text = _strip_think(raw) if role == "assistant" else raw.strip()
+        return text if text else None
+
+    # ── dict produced by Gradio 6 chatbot preprocess ───────────────
+    if isinstance(raw, dict):
+        tp = raw.get("type", "")
+        if tp == "text":
+            text = (raw.get("text") or "").strip()
+            if role == "assistant":
+                text = _strip_think(text)
+            return text if text else None
+        if tp == "file":
+            finfo = raw.get("file") or {}
+            path = finfo.get("path") or finfo.get("url") or ""
+            if path:
+                return _load_file(path)
+        return None
+
     return None
 
 
-# ──────────────────── Message conversion ────────────────────────────────
+def _load_file(path: str):
+    """Load an image or audio file into the format expected by ``ov_model.chat()``."""
+    ft = _ftype(path)
+    if ft == "image":
+        return _load_img(path)
+    if ft == "audio":
+        return _load_audio(path)
+    return None
 
-def history_to_messages(history: list) -> list:
-    """Convert Gradio chat history (type='messages') to model message format."""
-    messages = []
-    cur = {}
-    for item in history:
-        role = item.get("role")
-        if role == "assistant":
-            if cur:
-                messages.append(deepcopy(cur))
-                cur = {}
-            messages.append({"role": "assistant", "content": item["content"]})
+
+def _history_to_msgs(
+    history: list[dict],
+    sys_prompt: str = "",
+) -> list[dict]:
+    """Convert Gradio 6 chatbot history → ``ov_model.chat()`` message list.
+
+    After the Chatbot postprocess→preprocess round-trip in Gradio 6 each
+    entry looks like::
+
+        {'role': 'user',
+         'content': [{'type': 'text', 'text': '...'}, ...],
+         'metadata': {...}, 'options': [...]}
+
+    This function normalises that back to the simple format that
+    ``ov_model.chat()`` expects.
+    """
+    msgs: list[dict] = []
+    if sys_prompt and sys_prompt.strip():
+        msgs.append({"role": "system", "content": sys_prompt.strip()})
+
+    for entry in history:
+        role = entry.get("role", "user")
+        raw = entry.get("content", "")
+
+        # Skip thinking-display entries produced by reasoning_tags
+        meta = entry.get("metadata")
+        if meta and isinstance(meta, dict) and meta.get("title"):
             continue
-        if "role" not in cur:
-            cur = {"role": "user", "content": []}
-        metadata = item.get("metadata", {})
-        title = metadata.get("title")
-        if title == "image":
-            cur["content"].append(Image.open(item["content"][0]).convert("RGB"))
-        elif title == "audio":
-            audio_data, _ = librosa.load(item["content"][0], sr=16000, mono=True)
-            cur["content"].append(audio_data)
-        elif title is None:
-            cur["content"].append(item["content"])
-    if cur:
-        messages.append(cur)
-    return messages
 
+        # Resolve content (may be str, FileData, dict, or list of those)
+        resolved = _resolve_content_item(raw, role)
+        if resolved is None:
+            continue
 
-# ──────────────────── Input validation ──────────────────────────────────
+        # Flatten single-element lists
+        if isinstance(resolved, list) and len(resolved) == 1:
+            resolved = resolved[0]
 
-def check_messages(history, message, audio):
-    """Validate & append user messages; return updated history."""
-    try:
-        has_text = message.get("text", "").strip() if isinstance(message, dict) else False
-        has_files = len(message.get("files", [])) > 0 if isinstance(message, dict) else False
-        has_audio = audio is not None
-
-        if not (has_text or has_files or has_audio):
-            raise gr.Error("Message is empty — please enter text, upload a file, or record audio.")
-
-        images, audios = [], []
-        for fpath in message.get("files", []):
-            ftype = classify_file(fpath)
-            if ftype == "image":
-                images.append(fpath)
-            elif ftype == "audio":
-                try:
-                    dur = librosa.get_duration(filename=fpath)
-                    if dur > 60:
-                        raise gr.Error("Audio too long (>60 s). Please use a shorter clip.")
-                except gr.Error:
-                    raise
-                except Exception as e:
-                    raise gr.Error(f"Failed to process audio file: {str(e)}")
-                audios.append(fpath)
+        # Merge consecutive same-role entries into a multimodal list
+        if msgs and msgs[-1]["role"] == role:
+            prev = msgs[-1]["content"]
+            if isinstance(resolved, list):
+                msgs[-1]["content"] = (
+                    [*prev, *resolved] if isinstance(prev, list) else [prev, *resolved]
+                )
             else:
-                raise gr.Error(f"Unsupported file type: {fpath.split('/')[-1]}")
+                msgs[-1]["content"] = (
+                    [*prev, resolved] if isinstance(prev, list) else [prev, resolved]
+                )
+        else:
+            msgs.append({"role": role, "content": resolved})
 
-        if len(audios) > 1:
-            raise gr.Error("Only one audio file per turn is supported.")
-        if audio is not None:
-            if audios:
-                raise gr.Error("Upload OR record audio — not both.")
-            audios.append(audio)
-
-        for img in images:
-            history.append({"role": "user", "content": (img,), "metadata": {"title": "image"}})
-        for aud in audios:
-            history.append({"role": "user", "content": (aud,), "metadata": {"title": "audio"}})
-        if has_text:
-            history.append({"role": "user", "content": message["text"], "metadata": {}})
-
-        return history, gr.MultimodalTextbox(value=None, interactive=False), None
-    except gr.Error:
-        raise
-    except Exception as e:
-        raise gr.Error(f"Error processing message: {str(e)}")
+    return msgs
 
 
-# ──────────────────── Few-shot helpers ──────────────────────────────────
+# ──────────────────────────── make_demo ──────────────────────────────────
 
-def add_fewshot_example(image, user_msg, assistant_msg, history):
-    """Add a user+assistant example pair to the few-shot context."""
-    if not user_msg and image is None:
-        raise gr.Error("Provide at least image or text for the example.")
-    if image is not None:
-        history.append({"role": "user", "content": (image,), "metadata": {"title": "image"}})
-    if user_msg:
-        history.append({"role": "user", "content": user_msg, "metadata": {}})
-    if assistant_msg:
-        history.append({"role": "assistant", "content": assistant_msg})
-    return None, "", "", history
-
-
-# ──────────────────── CSS ───────────────────────────────────────────────
-
-CSS = """
-.response-container { margin: 4px 0; }
-.thinking-section {
-    background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
-    border: 1px solid #c7d2fe; border-radius: 10px;
-    padding: 12px 16px; margin-bottom: 8px;
-}
-.thinking-header {
-    font-weight: 600; color: #4338ca; font-size: 13px;
-    cursor: pointer; list-style: none;
-}
-.thinking-header::-webkit-details-marker { display: none; }
-.thinking-content {
-    color: #6366f1; font-size: 13px; line-height: 1.55;
-    font-style: italic; padding: 8px 12px; margin-top: 6px;
-    background: rgba(255,255,255,0.5); border-radius: 6px;
-    border-left: 3px solid #818cf8; white-space: pre-wrap;
-}
-.answer-section {
-    font-size: 14px; line-height: 1.6; color: #1e293b; white-space: pre-wrap;
-}
-.gradio-container { max-width: 1400px !important; margin: 0 auto !important; }
-.header-banner {
-    text-align: center; padding: 18px 0 8px;
-    background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(34,211,238,0.04));
-    border-radius: 14px; margin-bottom: 6px;
-    border: 1px solid rgba(99,102,241,0.15);
-}
-.header-banner h1 {
-    font-size: 1.75rem; font-weight: 700;
-    background: linear-gradient(135deg, #6366f1, #06b6d4);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin: 0 0 2px;
-}
-.header-banner p { color: #64748b; font-size: 0.85rem; margin: 0; }
-"""
-
-
-# ──────────────────── make_demo ─────────────────────────────────────────
 
 def make_demo(ov_model):
-    """Create and return the Gradio Blocks demo."""
+    """Build and return a ``gr.Blocks`` demo wired to *ov_model*."""
 
-    stop_flag = {"value": False}
+    stop_ev = threading.Event()
 
-    def bot(
-        history, top_p, top_k, temperature, repetition_penalty,
-        max_tokens, thinking_mode, streaming_mode, regenerate=False,
-    ):
-        if history and regenerate:
-            while history and history[-1].get("role") == "assistant":
-                history.pop()
-        if not history:
-            return history
+    # ── Chat handlers ──────────────────────────────────────────────────
 
-        stop_flag["value"] = False
-        
-        try:
-            msgs = history_to_messages(history)
-        except Exception as e:
-            history.append({"role": "assistant", "content": f"❌ Error processing input: {str(e)}"})
-            yield history
+    def _user(msg, hist):
+        """Append user turn (files first, then text) to *hist*."""
+        print(f"[user] message={msg}")
+        if msg is None:
+            return hist, gr.MultimodalTextbox(value=None)
+        text = (msg.get("text") or "").strip()
+        files = msg.get("files") or []
+        if not text and not files:
+            return hist, gr.MultimodalTextbox(value=None)
+
+        for f in files:
+            if isinstance(f, str):
+                fp = f
+            elif isinstance(f, dict):
+                fp = f.get("path", "")
+            else:
+                fp = ""
+            if fp:
+                hist.append({"role": "user", "content": FileData(path=fp)})
+        if text:
+            hist.append({"role": "user", "content": text})
+
+        return hist, gr.MultimodalTextbox(value=None)
+
+    def _bot(hist, think, stream, max_tok, temp, tp, tk, rp, sys_prompt):
+        """Generate an assistant response (streaming or blocking)."""
+        print(f"[bot] history_len={len(hist)}, think={think}, stream={stream}")
+        if not hist:
+            print("[bot] empty history, skipping")
+            yield hist
             return
-        
-        has_audio = any(
-            isinstance(c, np.ndarray)
-            for m in msgs if m["role"] == "user"
-            for c in (m["content"] if isinstance(m["content"], list) else [])
-        )
 
-        gen_cfg = {
-            "top_p": top_p, "top_k": top_k,
-            "temperature": temperature, "repetition_penalty": repetition_penalty,
-            "do_sample": temperature > 0,
-        }
-        if thinking_mode:
-            gen_cfg["enable_thinking"] = True
+        stop_ev.clear()
 
-        # Safely reset model state
+        # Build model messages
         try:
-            if hasattr(ov_model, 'llm') and hasattr(ov_model.llm, '_ov_language'):
-                ov_model.llm._ov_language.reset_state()
-                if hasattr(ov_model.llm, '_past_length'):
-                    ov_model.llm._past_length = 0
-        except Exception as e:
-            print(f"Warning: Failed to reset model state: {e}")
-        
-        history.append({"role": "assistant", "content": ""})
-
-        if streaming_mode:
-            try:
-                res = ov_model.chat(
-                    msgs=msgs, max_new_tokens=max_tokens, stream=True,
-                    use_tts_template=has_audio, **gen_cfg,
-                )
-                raw = ""
-                for chunk in res:
-                    if stop_flag["value"]:
-                        break
-                    raw += chunk
-                    if thinking_mode:
-                        tk, ans = parse_thinking_response(raw)
-                        history[-1]["content"] = format_response(tk, ans)
-                    else:
-                        history[-1]["content"] = raw
-                    yield history
-            except Exception as e:
-                history[-1]["content"] = f"❌ Generation error: {str(e)}"
-                print(f"Error during streaming generation: {e}")
-                import traceback
-                traceback.print_exc()
-                yield history
-        else:
-            try:
-                answer = ov_model.chat(
-                    msgs=msgs, max_new_tokens=max_tokens, stream=False,
-                    use_tts_template=has_audio, **gen_cfg,
-                )
-                if thinking_mode:
-                    tk, ans = parse_thinking_response(answer)
-                    history[-1]["content"] = format_response(tk, ans)
-                else:
-                    history[-1]["content"] = answer
-                yield history
-            except Exception as e:
-                history[-1]["content"] = f"❌ Generation error: {str(e)}"
-                print(f"Error during non-streaming generation: {e}")
-                import traceback
-                traceback.print_exc()
-                yield history
-
-    def fewshot_generate(image, user_msg, history,
-                         top_p, top_k, temperature, rep_pen,
-                         max_tokens, thinking_mode, streaming_mode):
-        try:
-            if image is not None:
-                history.append({"role": "user", "content": (image,), "metadata": {"title": "image"}})
-            if user_msg:
-                history.append({"role": "user", "content": user_msg, "metadata": {}})
-            if not history:
-                yield None, "", history
-                return
-            for h in bot(history, top_p, top_k, temperature, rep_pen,
-                         max_tokens, thinking_mode, streaming_mode):
-                yield image, user_msg, h
-        except Exception as e:
-            print(f"Error in few-shot generation: {e}")
-            import traceback
+            msgs = _history_to_msgs(hist, sys_prompt)
+        except Exception as exc:
+            print(f"[bot] _history_to_msgs error: {exc}")
             traceback.print_exc()
-            history.append({"role": "assistant", "content": f"❌ Error: {str(e)}"})
-            yield image, user_msg, history
+            hist.append({"role": "assistant", "content": f"⚠️ {exc}"})
+            yield hist
+            return
 
-    def on_stop():
-        stop_flag["value"] = True
+        print(f"[bot] msgs count={len(msgs)}, last_role={msgs[-1].get('role') if msgs else 'N/A'}")
+        for i, m in enumerate(msgs):
+            c = m['content']
+            ctype = type(c).__name__ if not isinstance(c, list) else f"list[{len(c)}]"
+            preview = str(c)[:80] if isinstance(c, str) else ctype
+            print(f"  msg[{i}] role={m['role']} content={preview}")
 
-    # ──────────────────── UI ────────────────────────────────────────────
+        if not msgs or msgs[-1].get("role") != "user":
+            print("[bot] no user message found, skipping")
+            yield hist
+            return
 
-    with gr.Blocks(
-        title=f"Chat with {MODEL_NAME}",
-        theme=gr.themes.Soft(
-            primary_hue=gr.themes.colors.indigo,
-            secondary_hue=gr.themes.colors.cyan,
-            neutral_hue=gr.themes.colors.slate,
-        ),
-        css=CSS,
-    ) as demo:
-        gr.HTML(
-            '<div class="header-banner">'
-            f"<h1>🪐 {MODEL_NAME}</h1>"
-            "<p>Multimodal Chat — Text · Image · Audio | Streaming · Thinking Mode · Few-Shot</p>"
-            "</div>"
+        _reset(ov_model)
+
+        kw = dict(
+            msgs=msgs,
+            max_new_tokens=int(max_tok),
+            do_sample=(temp > 0),
+            temperature=max(float(temp), 0.01),
+            top_p=float(tp),
+            top_k=int(tk),
+            repetition_penalty=float(rp),
+            enable_thinking=bool(think),
+            stream=bool(stream),
         )
 
-        with gr.Tab("💬 Chat"):
-            with gr.Row(equal_height=True):
-                with gr.Column(scale=1, min_width=260):
-                    decode_type = gr.Radio(
-                        ["Sampling", "Beam Search"], value="Sampling", label="Decode Type",
-                    )
-                    thinking_toggle = gr.Checkbox(
-                        value=False, label="🧠 Enable Thinking Mode",
-                        info="Model shows its reasoning process",
-                    )
-                    streaming_toggle = gr.Checkbox(
-                        value=True, label="⚡ Enable Streaming",
-                        info="Real-time token output",
-                    )
-                    with gr.Group():
-                        gr.Markdown("#### 🎛️ Sampling Parameters")
-                        temperature = gr.Slider(0, 1, value=0.7, label="Temperature")
-                        top_p = gr.Slider(0, 1, value=0.8, label="Top-p")
-                        top_k = gr.Slider(0, 1000, value=100, step=1, label="Top-k")
-                        rep_penalty = gr.Slider(0.5, 2.0, value=1.05, step=0.01, label="Repetition Penalty")
-                        max_tokens = gr.Slider(64, 4096, value=MAX_NEW_TOKENS, step=64, label="Max New Tokens")
+        try:
+            if stream:
+                streamer = ov_model.chat(**kw)
+                hist.append({"role": "assistant", "content": ""})
+                for chunk in streamer:
+                    if stop_ev.is_set():
+                        break
+                    hist[-1]["content"] += _clean_tts(chunk)
+                    yield hist
+            else:
+                ans = ov_model.chat(**kw)
+                if isinstance(ans, str):
+                    ans = _clean_tts(ans)
+                hist.append({"role": "assistant", "content": ans})
+                yield hist
+        except Exception:
+            hist.append({
+                "role": "assistant",
+                "content": f"⚠️ Generation error:\n```\n{traceback.format_exc()}\n```",
+            })
+            yield hist
+
+    def _stop():
+        stop_ev.set()
+
+    def _regen(hist, *args):
+        """Drop last assistant turn, then re-generate."""
+        while hist and hist[-1].get("role") == "assistant":
+            hist.pop()
+        if not hist:
+            yield hist
+            return
+        yield from _bot(hist, *args)
+
+    def _clear():
+        _reset(ov_model)
+        return []
+
+    # ── Few-shot handlers ──────────────────────────────────────────────
+
+    def _fs_fmt(st):
+        if not st:
+            return "*No examples yet.*"
+        return "\n\n---\n\n".join(
+            f"**Example {i}** {'🖼️' if e.get('image') else ''}\n"
+            f"- **User:** {e['user']}\n- **Asst:** {e['assistant']}"
+            for i, e in enumerate(st, 1)
+        )
+
+    def _fs_add(st, img, utxt, atxt):
+        if not (utxt or "").strip():
+            gr.Warning("User text is required.")
+            return st, _fs_fmt(st)
+        st = list(st or [])
+        st.append({
+            "image": img,
+            "user": utxt.strip(),
+            "assistant": (atxt or "").strip(),
+        })
+        return st, _fs_fmt(st)
+
+    def _fs_clear():
+        return [], _fs_fmt([])
+
+    def _fs_gen(st, qi, qt, think, mt, tmp, tp, tk, rp):
+        if not (qt or "").strip():
+            return "Please enter a query first."
+        stop_ev.clear()
+
+        msgs: list[dict] = []
+        for e in (st or []):
+            c = [_load_img(e["image"]), e["user"]] if e.get("image") else e["user"]
+            msgs.append({"role": "user", "content": c})
+            if e.get("assistant"):
+                msgs.append({"role": "assistant", "content": e["assistant"]})
+
+        qc = [_load_img(qi), qt.strip()] if qi else qt.strip()
+        msgs.append({"role": "user", "content": qc})
+
+        _reset(ov_model)
+
+        try:
+            r = ov_model.chat(
+                msgs=msgs,
+                max_new_tokens=int(mt),
+                do_sample=(tmp > 0),
+                temperature=max(float(tmp), 0.01),
+                top_p=float(tp),
+                top_k=int(tk),
+                repetition_penalty=float(rp),
+                enable_thinking=bool(think),
+                stream=False,
+            )
+            return _clean_tts(r) if isinstance(r, str) else str(r)
+        except Exception:
+            return f"⚠️ Error:\n```\n{traceback.format_exc()}\n```"
+
+    # ── Chatbot example presets ────────────────────────────────────────
+
+    chat_examples = [
+        {"text": "Hello! What can you do?", "display_text": "👋 Say hello"},
+    ]
+    _audio = ASSETS_DIR / "system_ref_audio.wav"
+    if _audio.exists():
+        chat_examples.append({
+            "text": "Please describe what you hear in this audio.",
+            "files": [str(_audio)],
+            "display_text": "🎵 Describe audio",
+        })
+
+    # ── Build Blocks ───────────────────────────────────────────────────
+
+    with gr.Blocks(title=MODEL_NAME, fill_height=True) as demo:
+        gr.Markdown(f"# 🤖 {MODEL_NAME}")
+
+        with gr.Tabs():
+            # ═══════════════════ Chat ═══════════════════════════════════
+            with gr.Tab("💬 Chat"):
+                chatbot = gr.Chatbot(
+                    height=520,
+                    reasoning_tags=[("<think>", "</think>")],
+                    examples=chat_examples,
+                )
+
+                msg = gr.MultimodalTextbox(
+                    placeholder="Type a message or attach images / audio …",
+                    show_label=False,
+                    submit_btn="Send",
+                    stop_btn="Stop",
+                    file_count="multiple",
+                    sources=["upload", "microphone"],
+                )
+
+                with gr.Accordion("⚙️ Settings", open=False):
                     with gr.Row():
-                        regenerate_btn = gr.Button("🔄 Regenerate", variant="secondary")
-                        clear_btn = gr.Button("🗑️ Clear", variant="secondary")
-                    stop_btn = gr.Button("⏹ Stop Generation", variant="stop", visible=False)
-
-                with gr.Column(scale=3, min_width=500):
-                    chatbot = gr.Chatbot(
-                        label=f"Chat with {MODEL_NAME}",
-                        elem_id="chatbot", height="56vh",
-                        show_copy_button=True, sanitize_html=False,
-                        type="messages",
+                        c_think = gr.Checkbox(label="Thinking Mode", value=False)
+                        c_stream = gr.Checkbox(label="Streaming", value=True)
+                    with gr.Row():
+                        c_tok = gr.Slider(
+                            64, 4096, value=2048, step=64, label="Max Tokens",
+                        )
+                        c_temp = gr.Slider(
+                            0.0, 2.0, value=0.7, step=0.05, label="Temperature",
+                        )
+                    with gr.Row():
+                        c_tp = gr.Slider(
+                            0.0, 1.0, value=0.8, step=0.05, label="Top-P",
+                        )
+                        c_tk = gr.Slider(1, 200, value=100, step=1, label="Top-K")
+                    with gr.Row():
+                        c_rp = gr.Slider(
+                            1.0, 2.0, value=1.05, step=0.01,
+                            label="Repetition Penalty",
+                        )
+                    c_sys = gr.Textbox(
+                        label="System Prompt",
+                        placeholder="Optional system prompt …",
+                        lines=2,
                     )
-                    chat_input = gr.MultimodalTextbox(
-                        file_count="multiple",
-                        placeholder="Enter text or upload image/audio …",
-                        show_label=False, file_types=["image", "audio"],
-                        interactive=True,
+
+                # ── Clickable examples (image + text / audio + text) ─────
+                _ex_rows: list[list] = []
+                _img1 = Path(__file__).parent / "example_bee.jpg"
+                _img2 = Path(__file__).parent / "example_baklava.png"
+                _audio_ex = ASSETS_DIR / "system_ref_audio.wav"
+                if _img1.exists():
+                    _ex_rows.append(
+                        [{"text": "What is on the flower? Describe in detail.",
+                          "files": [str(_img1)]}]
                     )
-                    audio_input = gr.Audio(
-                        sources=["microphone", "upload"], type="filepath",
-                        max_length=30, label="🎤 Record or upload audio",
+                if _img2.exists():
+                    _ex_rows.append(
+                        [{"text": "How do you make this pastry?",
+                          "files": [str(_img2)]}]
                     )
-
-            def disable_streaming_on_beam(decode):
-                if decode == "Beam Search":
-                    return gr.update(value=False, interactive=False,
-                                     info="Beam Search does not support streaming")
-                return gr.update(value=True, interactive=True, info="Real-time token output")
-
-            decode_type.change(disable_streaming_on_beam, decode_type, streaming_toggle)
-
-            chat_msg = chat_input.submit(
-                check_messages, [chatbot, chat_input, audio_input],
-                [chatbot, chat_input, audio_input],
-            )
-            bot_gen = chat_msg.then(
-                lambda: gr.update(visible=True), None, stop_btn,
-            ).then(
-                bot,
-                [chatbot, top_p, top_k, temperature, rep_penalty,
-                 max_tokens, thinking_toggle, streaming_toggle],
-                chatbot,
-            ).then(
-                lambda: (gr.update(visible=False), gr.MultimodalTextbox(interactive=True)),
-                None, [stop_btn, chat_input],
-            )
-            stop_btn.click(on_stop, None, None, cancels=[bot_gen])
-
-            regenerate_btn.click(
-                lambda: gr.update(visible=True), None, stop_btn,
-            ).then(
-                bot,
-                [chatbot, top_p, top_k, temperature, rep_penalty,
-                 max_tokens, thinking_toggle, streaming_toggle, gr.State(True)],
-                chatbot,
-            ).then(lambda: gr.update(visible=False), None, stop_btn)
-
-            clear_btn.click(lambda: ([], None, None), None, [chatbot, chat_input, audio_input])
-
-        with gr.Tab("📚 Few-Shot Learning"):
-            gr.Markdown(
-                "Add example image+answer pairs, then ask a new question. "
-                "The model will learn the pattern and apply it."
-            )
-            with gr.Row():
-                with gr.Column(scale=3, min_width=500):
-                    fs_chatbot = gr.Chatbot(
-                        label="Few-Shot Conversation", type="messages",
-                        height="50vh",
-                        show_copy_button=True, sanitize_html=False,
+                if _audio_ex.exists():
+                    _ex_rows.append(
+                        [{"text": "Please describe what you hear in this audio.",
+                          "files": [str(_audio_ex)]}]
                     )
-                with gr.Column(scale=1, min_width=260):
-                    fs_image = gr.Image(type="filepath", sources=["upload"], label="Example Image")
-                    fs_user = gr.Textbox(label="User Message")
-                    fs_assistant = gr.Textbox(label="Assistant Answer")
-                    fs_add_btn = gr.Button("➕ Add Example")
-                    fs_gen_btn = gr.Button("🚀 Generate", variant="primary")
-                    fs_clear_btn = gr.Button("🗑️ Clear All")
+                _ex_rows.append([{"text": "Hello! What multimodal tasks can you handle?"}])
+                gr.Examples(
+                    examples=_ex_rows,
+                    inputs=[msg],
+                    label="✨ Quick examples — click to fill, then press Send",
+                )
 
-            fs_add_btn.click(
-                add_fewshot_example,
-                [fs_image, fs_user, fs_assistant, fs_chatbot],
-                [fs_image, fs_user, fs_assistant, fs_chatbot],
-            )
-            fs_gen_btn.click(
-                fewshot_generate,
-                [fs_image, fs_user, fs_chatbot, top_p, top_k, temperature,
-                 rep_penalty, max_tokens, thinking_toggle, streaming_toggle],
-                [fs_image, fs_user, fs_chatbot],
-            )
-            fs_clear_btn.click(lambda: (None, "", "", []), None,
-                               [fs_image, fs_user, fs_assistant, fs_chatbot])
+                with gr.Row():
+                    btn_regen = gr.Button("🔄 Regenerate", variant="secondary")
+                    btn_clear = gr.Button("🗑️ Clear", variant="secondary")
 
-        with gr.Tab("📖 How to Use"):
-            gr.Markdown(f"""
-### {MODEL_NAME} — Multimodal Chat
+                # Wire events
+                gen = [
+                    c_think, c_stream, c_tok, c_temp, c_tp, c_tk, c_rp, c_sys,
+                ]
+                msg.submit(
+                    _user, [msg, chatbot], [chatbot, msg],
+                ).then(
+                    _bot, [chatbot] + gen, chatbot,
+                )
+                # Stop button (built into MultimodalTextbox)
+                msg.stop(_stop, [], [])
 
-**Chat Tab**
-1. Type a question or upload an image / audio file in the input box.
-2. Press **Enter** to send. The model will stream its response in real-time.
-3. Toggle **🧠 Thinking Mode** to see the model's reasoning process.
-4. Use **⏹ Stop** to interrupt generation at any time.
-5. Adjust sampling parameters (Temperature, Top-p, etc.) on the left panel.
+                btn_regen.click(_regen, [chatbot] + gen, chatbot)
+                btn_clear.click(_clear, [], chatbot)
 
-**Few-Shot Learning Tab**
-1. Upload an example image + describe the expected answer.
-2. Click **➕ Add Example** to add it to context.
-3. Repeat to add more examples.
-4. Upload a new image with a question and click **🚀 Generate**.
-5. The model follows the pattern from your examples.
+            # ═══════════════════ Few-Shot ═══════════════════════════════
+            with gr.Tab("📚 Few-Shot"):
+                gr.Markdown(
+                    "### Few-Shot Prompting\n"
+                    "Add image + text examples, then query the model.",
+                )
+                fs_st = gr.State([])
+                with gr.Row():
+                    with gr.Column():
+                        fs_img = gr.Image(
+                            label="Example Image (optional)", type="filepath",
+                        )
+                        fs_utxt = gr.Textbox(label="User Text", lines=2)
+                        fs_atxt = gr.Textbox(label="Assistant Text", lines=2)
+                        with gr.Row():
+                            fs_add = gr.Button("➕ Add Example", variant="primary")
+                            fs_clr = gr.Button("🗑️ Clear All")
+                    with gr.Column():
+                        fs_disp = gr.Markdown("*No examples yet.*")
 
-**Supported Inputs**
-- 📷 Images: JPG, PNG, BMP, WebP, TIFF
-- 🎤 Audio: WAV, MP3, FLAC, M4A (< 60 s)
-- 📝 Text: Any language
+                gr.Markdown("---\n### Query")
+                with gr.Row():
+                    with gr.Column():
+                        fq_img = gr.Image(
+                            label="Query Image (optional)", type="filepath",
+                        )
+                        fq_txt = gr.Textbox(label="Query Text", lines=2)
+                    with gr.Column():
+                        fq_out = gr.Textbox(
+                            label="Model Response", lines=6, interactive=False,
+                        )
 
-**Tips**
-- For image understanding, ask specific questions about the image content.
-- For audio, the model can do ASR, speaker analysis, sound classification, etc.
-- Multi-turn conversations maintain context automatically.
+                with gr.Accordion("⚙️ Settings", open=False):
+                    with gr.Row():
+                        f_think = gr.Checkbox(label="Thinking", value=False)
+                        f_tok = gr.Slider(
+                            64, 4096, value=2048, step=64, label="Max Tokens",
+                        )
+                    with gr.Row():
+                        f_temp = gr.Slider(
+                            0.0, 2.0, value=0.7, step=0.05, label="Temperature",
+                        )
+                        f_tp = gr.Slider(
+                            0.0, 1.0, value=0.8, step=0.05, label="Top-P",
+                        )
+                    with gr.Row():
+                        f_tk = gr.Slider(1, 200, value=100, step=1, label="Top-K")
+                        f_rp = gr.Slider(
+                            1.0, 2.0, value=1.05, step=0.01,
+                            label="Repetition Penalty",
+                        )
+
+                fq_btn = gr.Button("🚀 Generate", variant="primary")
+
+                fs_add.click(
+                    _fs_add,
+                    [fs_st, fs_img, fs_utxt, fs_atxt],
+                    [fs_st, fs_disp],
+                )
+                fs_clr.click(_fs_clear, [], [fs_st, fs_disp])
+                fq_btn.click(
+                    _fs_gen,
+                    [fs_st, fq_img, fq_txt, f_think, f_tok,
+                     f_temp, f_tp, f_tk, f_rp],
+                    fq_out,
+                )
+
+            # ═══════════════════ How to Use ═════════════════════════════
+            with gr.Tab("ℹ️ How to Use"):
+                gr.Markdown("""
+## Usage Guide
+
+### 💬 Chat
+
+| Action | How |
+|--------|-----|
+| Text | Type your question and press **Send** |
+| Image | Click 📎 to upload JPG / PNG / BMP / WebP |
+| Audio | Click 📎 to upload WAV / MP3 / FLAC, or use 🎙️ microphone |
+| Stop | Click **Stop** to interrupt generation |
+| Thinking | Toggle **Thinking Mode** in ⚙️ Settings to see chain-of-thought |
+
+### 📚 Few-Shot
+
+1. Add one or more image + text examples with expected responses.
+2. Enter a query (optionally with an image).
+3. Click **Generate** — the model uses the examples as in-context demos.
+
+### ⚙️ Parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| Max Tokens | 2048 | Maximum output length |
+| Temperature | 0.7 | Randomness (0 = greedy) |
+| Top-P | 0.8 | Nucleus sampling threshold |
+| Top-K | 100 | Top-K filtering |
+| Repetition Penalty | 1.05 | Penalise repeated tokens |
+| System Prompt | — | Optional instruction prepended to conversation |
 """)
 
     return demo

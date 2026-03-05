@@ -46,9 +46,12 @@ The notebook demonstrates:
 4. **Run Inference** — Image understanding, audio understanding, omni-modal chat
 5. **Interactive Demo** — Gradio-based multimodal chatbot
 
-## Requirements
+In this demonstration, you'll create interactive chatbot that can answer questions about provided image's content.
 
-- ~20 GB disk space for INT4-quantized models
-- ~16 GB RAM for CPU inference
-- Python 3.10+
-- OpenVINO 2025.1+
+The image below illustrates example of input prompt and model answer.
+![example.png](https://github.com/user-attachments/assets/666a47f7-d21a-4971-955a-6a09efdb7283)
+
+## Installation instructions
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
