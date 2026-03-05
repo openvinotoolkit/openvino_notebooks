@@ -46,12 +46,12 @@ The notebook demonstrates:
 4. **Run Inference** — Image understanding, audio understanding, omni-modal chat
 5. **Interactive Demo** — Gradio-based multimodal chatbot
 
-In this demonstration, you'll create interactive chatbot that can answer questions about provided image's content.
+In this demonstration, you'll create an interactive chatbot that can answer questions about the provided image's content.
 
 The image below illustrates example of input prompt and model answer.
 ![example.png](https://github.com/user-attachments/assets/666a47f7-d21a-4971-955a-6a09efdb7283)
 
 ## Installation instructions
-This is a self-contained example that relies solely on its own code.</br>
+This is a self-contained example that relies solely on its own code.
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
