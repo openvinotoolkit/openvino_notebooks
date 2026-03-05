@@ -3837,12 +3837,13 @@ class OVMiniCPMO:
                 else:
                     break  # should not happen
                 
-                if len(last_hidden_states_list) > 0:
-                    last_hidden_states = torch.cat(last_hidden_states_list, dim=1)
-                elif finished:
-                    last_hidden_states = torch.empty((1, 0, bos_embeds.shape[-1]), device=self.device)
-                else:
-                    break
+                if generate_audio:
+                    if len(last_hidden_states_list) > 0:
+                        last_hidden_states = torch.cat(last_hidden_states_list, dim=1)
+                    elif finished:
+                        last_hidden_states = torch.empty((1, 0, bos_embeds.shape[-1]), device=self.device)
+                    else:
+                        break
                 
                 if chunk_token_ids is None or (chunk_token_ids.shape[1] == 0 and not finished):
                     break
@@ -4064,6 +4065,9 @@ class OVMiniCPMO:
                 
                 if is_finished:
                     new_text = full_decoded[yielded_text_len:]
+                    # Clean up TTS end-of-sequence marker
+                    if "<|tts_eos|>" in new_text:
+                        new_text = new_text.split("<|tts_eos|>")[0]
                     yield new_text, is_finished
                 else:
                     new_text = full_decoded[yielded_text_len:]
@@ -4071,6 +4075,9 @@ class OVMiniCPMO:
                     while safe_end > 0 and new_text[safe_end - 1] == "\ufffd":
                         safe_end -= 1
                     safe_text = new_text[:safe_end]
+                    # Clean up TTS end-of-sequence marker
+                    if "<|tts_eos|>" in safe_text:
+                        safe_text = safe_text.split("<|tts_eos|>")[0]
                     if safe_text:
                         yielded_text_len += len(safe_text)
                         yield safe_text, False
@@ -8026,8 +8033,8 @@ class OVToken2wav:
         wav_np = np.clip(wav_np, -1.0, 1.0)
         
         if return_waveform:
-            # Return float32 numpy array (aligned with original Token2wav.stream return_waveform=True)
-            return wav_np
+            # Return float32 numpy array with shape [1, samples] for torch.cat compatibility
+            return wav_np.reshape(1, -1)
         
         # Convert to int16 PCM bytes (default, aligned with original Token2wav.stream)
         wav_int16 = (wav_np * 32767.0).astype('<i2')

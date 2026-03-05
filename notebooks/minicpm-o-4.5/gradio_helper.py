@@ -98,41 +98,51 @@ def history_to_messages(history: list) -> list:
 
 def check_messages(history, message, audio):
     """Validate & append user messages; return updated history."""
-    has_text = message.get("text", "").strip() if isinstance(message, dict) else False
-    has_files = len(message.get("files", [])) > 0 if isinstance(message, dict) else False
-    has_audio = audio is not None
+    try:
+        has_text = message.get("text", "").strip() if isinstance(message, dict) else False
+        has_files = len(message.get("files", [])) > 0 if isinstance(message, dict) else False
+        has_audio = audio is not None
 
-    if not (has_text or has_files or has_audio):
-        raise gr.Error("Message is empty — please enter text, upload a file, or record audio.")
+        if not (has_text or has_files or has_audio):
+            raise gr.Error("Message is empty — please enter text, upload a file, or record audio.")
 
-    images, audios = [], []
-    for fpath in message.get("files", []):
-        ftype = classify_file(fpath)
-        if ftype == "image":
-            images.append(fpath)
-        elif ftype == "audio":
-            dur = librosa.get_duration(filename=fpath)
-            if dur > 60:
-                raise gr.Error("Audio too long (>60 s). Please use a shorter clip.")
-            audios.append(fpath)
-        else:
-            raise gr.Error(f"Unsupported file type: {fpath.split('/')[-1]}")
+        images, audios = [], []
+        for fpath in message.get("files", []):
+            ftype = classify_file(fpath)
+            if ftype == "image":
+                images.append(fpath)
+            elif ftype == "audio":
+                try:
+                    dur = librosa.get_duration(filename=fpath)
+                    if dur > 60:
+                        raise gr.Error("Audio too long (>60 s). Please use a shorter clip.")
+                except gr.Error:
+                    raise
+                except Exception as e:
+                    raise gr.Error(f"Failed to process audio file: {str(e)}")
+                audios.append(fpath)
+            else:
+                raise gr.Error(f"Unsupported file type: {fpath.split('/')[-1]}")
 
-    if len(audios) > 1:
-        raise gr.Error("Only one audio file per turn is supported.")
-    if audio is not None:
-        if audios:
-            raise gr.Error("Upload OR record audio — not both.")
-        audios.append(audio)
+        if len(audios) > 1:
+            raise gr.Error("Only one audio file per turn is supported.")
+        if audio is not None:
+            if audios:
+                raise gr.Error("Upload OR record audio — not both.")
+            audios.append(audio)
 
-    for img in images:
-        history.append({"role": "user", "content": (img,), "metadata": {"title": "image"}})
-    for aud in audios:
-        history.append({"role": "user", "content": (aud,), "metadata": {"title": "audio"}})
-    if has_text:
-        history.append({"role": "user", "content": message["text"], "metadata": {}})
+        for img in images:
+            history.append({"role": "user", "content": (img,), "metadata": {"title": "image"}})
+        for aud in audios:
+            history.append({"role": "user", "content": (aud,), "metadata": {"title": "audio"}})
+        if has_text:
+            history.append({"role": "user", "content": message["text"], "metadata": {}})
 
-    return history, gr.MultimodalTextbox(value=None, interactive=False), None
+        return history, gr.MultimodalTextbox(value=None, interactive=False), None
+    except gr.Error:
+        raise
+    except Exception as e:
+        raise gr.Error(f"Error processing message: {str(e)}")
 
 
 # ──────────────────── Few-shot helpers ──────────────────────────────────
@@ -208,7 +218,14 @@ def make_demo(ov_model):
             return history
 
         stop_flag["value"] = False
-        msgs = history_to_messages(history)
+        
+        try:
+            msgs = history_to_messages(history)
+        except Exception as e:
+            history.append({"role": "assistant", "content": f"❌ Error processing input: {str(e)}"})
+            yield history
+            return
+        
         has_audio = any(
             isinstance(c, np.ndarray)
             for m in msgs if m["role"] == "user"
@@ -223,51 +240,79 @@ def make_demo(ov_model):
         if thinking_mode:
             gen_cfg["enable_thinking"] = True
 
-        ov_model.llm._ov_language.reset_state()
-        ov_model.llm._past_length = 0
+        # Safely reset model state
+        try:
+            if hasattr(ov_model, 'llm') and hasattr(ov_model.llm, '_ov_language'):
+                ov_model.llm._ov_language.reset_state()
+                if hasattr(ov_model.llm, '_past_length'):
+                    ov_model.llm._past_length = 0
+        except Exception as e:
+            print(f"Warning: Failed to reset model state: {e}")
+        
         history.append({"role": "assistant", "content": ""})
 
         if streaming_mode:
-            res = ov_model.chat(
-                msgs=msgs, max_new_tokens=max_tokens, stream=True,
-                use_tts_template=has_audio, **gen_cfg,
-            )
-            raw = ""
-            for chunk in res:
-                if stop_flag["value"]:
-                    break
-                raw += chunk
-                if thinking_mode:
-                    tk, ans = parse_thinking_response(raw)
-                    history[-1]["content"] = format_response(tk, ans)
-                else:
-                    history[-1]["content"] = raw
+            try:
+                res = ov_model.chat(
+                    msgs=msgs, max_new_tokens=max_tokens, stream=True,
+                    use_tts_template=has_audio, **gen_cfg,
+                )
+                raw = ""
+                for chunk in res:
+                    if stop_flag["value"]:
+                        break
+                    raw += chunk
+                    if thinking_mode:
+                        tk, ans = parse_thinking_response(raw)
+                        history[-1]["content"] = format_response(tk, ans)
+                    else:
+                        history[-1]["content"] = raw
+                    yield history
+            except Exception as e:
+                history[-1]["content"] = f"❌ Generation error: {str(e)}"
+                print(f"Error during streaming generation: {e}")
+                import traceback
+                traceback.print_exc()
                 yield history
         else:
-            answer = ov_model.chat(
-                msgs=msgs, max_new_tokens=max_tokens, stream=False,
-                use_tts_template=has_audio, **gen_cfg,
-            )
-            if thinking_mode:
-                tk, ans = parse_thinking_response(answer)
-                history[-1]["content"] = format_response(tk, ans)
-            else:
-                history[-1]["content"] = answer
-            yield history
+            try:
+                answer = ov_model.chat(
+                    msgs=msgs, max_new_tokens=max_tokens, stream=False,
+                    use_tts_template=has_audio, **gen_cfg,
+                )
+                if thinking_mode:
+                    tk, ans = parse_thinking_response(answer)
+                    history[-1]["content"] = format_response(tk, ans)
+                else:
+                    history[-1]["content"] = answer
+                yield history
+            except Exception as e:
+                history[-1]["content"] = f"❌ Generation error: {str(e)}"
+                print(f"Error during non-streaming generation: {e}")
+                import traceback
+                traceback.print_exc()
+                yield history
 
     def fewshot_generate(image, user_msg, history,
                          top_p, top_k, temperature, rep_pen,
                          max_tokens, thinking_mode, streaming_mode):
-        if image is not None:
-            history.append({"role": "user", "content": (image,), "metadata": {"title": "image"}})
-        if user_msg:
-            history.append({"role": "user", "content": user_msg, "metadata": {}})
-        if not history:
-            yield None, "", history
-            return
-        for h in bot(history, top_p, top_k, temperature, rep_pen,
-                     max_tokens, thinking_mode, streaming_mode):
-            yield image, user_msg, h
+        try:
+            if image is not None:
+                history.append({"role": "user", "content": (image,), "metadata": {"title": "image"}})
+            if user_msg:
+                history.append({"role": "user", "content": user_msg, "metadata": {}})
+            if not history:
+                yield None, "", history
+                return
+            for h in bot(history, top_p, top_k, temperature, rep_pen,
+                         max_tokens, thinking_mode, streaming_mode):
+                yield image, user_msg, h
+        except Exception as e:
+            print(f"Error in few-shot generation: {e}")
+            import traceback
+            traceback.print_exc()
+            history.append({"role": "assistant", "content": f"❌ Error: {str(e)}"})
+            yield image, user_msg, history
 
     def on_stop():
         stop_flag["value"] = True
@@ -319,9 +364,9 @@ def make_demo(ov_model):
                 with gr.Column(scale=3, min_width=500):
                     chatbot = gr.Chatbot(
                         label=f"Chat with {MODEL_NAME}",
-                        elem_id="chatbot", bubble_full_width=False,
-                        type="messages", height="56vh",
+                        elem_id="chatbot", height="56vh",
                         show_copy_button=True, sanitize_html=False,
+                        type="messages",
                     )
                     chat_input = gr.MultimodalTextbox(
                         file_count="multiple",
@@ -379,7 +424,7 @@ def make_demo(ov_model):
                 with gr.Column(scale=3, min_width=500):
                     fs_chatbot = gr.Chatbot(
                         label="Few-Shot Conversation", type="messages",
-                        height="50vh", bubble_full_width=False,
+                        height="50vh",
                         show_copy_button=True, sanitize_html=False,
                     )
                 with gr.Column(scale=1, min_width=260):
