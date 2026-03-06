@@ -1,4 +1,4 @@
- import queue
+import queue
 import sys
 from typing import Union
 
