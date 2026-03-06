@@ -140,6 +140,98 @@ def cleanup_torchscript_cache():
     torch.jit._state._clear_class_state()
 
 
+def _strip_hf_repo_prefix(value: str) -> str:
+    """
+    Strip 'owner/repo--' prefix from a HuggingFace auto_map class reference.
+
+    E.g. 'openbmb/MiniCPM-o-4_5--processing_minicpmo.MiniCPMVImageProcessor'
+    becomes 'processing_minicpmo.MiniCPMVImageProcessor'.
+    Returns the original string unchanged if it doesn't match the pattern.
+    """
+    if isinstance(value, str) and '/' in value and '--' in value:
+        prefix, sep, module_class = value.partition('--')
+        if sep and '/' in prefix:  # looks like owner/repo
+            return module_class
+    return value
+
+
+def _patch_auto_map_in_dir(output_path: Path):
+    """
+    Strip HuggingFace repo prefix from auto_map entries in all JSON config files.
+
+    Saved configs like preprocessor_config.json, config.json, and tokenizer_config.json
+    may contain auto_map entries referencing the original HF repo, e.g.:
+        "AutoImageProcessor": "openbmb/MiniCPM-o-4_5--processing_minicpmo.MiniCPMVImageProcessor"
+    These are patched to local-only format:
+        "AutoImageProcessor": "processing_minicpmo.MiniCPMVImageProcessor"
+    so that transformers loads custom classes from local files without downloading from HF.
+    List values (e.g. AutoTokenizer) are handled element-by-element.
+    """
+    import json
+    for json_file in output_path.glob("*.json"):
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            if 'auto_map' not in data:
+                continue
+            patched = False
+            for key, value in data['auto_map'].items():
+                if isinstance(value, str):
+                    new_val = _strip_hf_repo_prefix(value)
+                    if new_val != value:
+                        data['auto_map'][key] = new_val
+                        patched = True
+                elif isinstance(value, list):
+                    new_list = [_strip_hf_repo_prefix(v) if isinstance(v, str) else v for v in value]
+                    if new_list != value:
+                        data['auto_map'][key] = new_list
+                        patched = True
+            if patched:
+                with open(json_file, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, indent=2, ensure_ascii=False)
+                print(f"✅ Patched auto_map in {json_file.name}")
+        except Exception as e:
+            print(f"⚠️ Warning: Failed to patch {json_file.name}: {e}")
+
+
+def _copy_custom_code_files(model_id: str, output_path: Path):
+    """
+    Copy custom Python code files to the output directory for fully offline use.
+
+    Transformers loads custom classes (AutoImageProcessor, AutoTokenizer, etc.)
+    from .py files referenced in auto_map. For offline operation these files must
+    reside in the model directory itself.
+
+    - Local model_id: copies all *.py directly from the source folder.
+    - HF Hub model_id: downloads only the *.py files via snapshot_download.
+    """
+    import shutil
+    src_path = Path(model_id)
+    if src_path.exists() and src_path.is_dir():
+        py_files = sorted(src_path.glob("*.py"))
+        copied = 0
+        for f in py_files:
+            dst = output_path / f.name
+            shutil.copy2(f, dst)
+            copied += 1
+        if copied:
+            print(f"✅ Copied {copied} custom code .py files")
+    else:
+        try:
+            from huggingface_hub import snapshot_download
+            cache_dir = Path(snapshot_download(model_id, allow_patterns=["*.py"]))
+            py_files = sorted(cache_dir.glob("*.py"))
+            copied = 0
+            for f in py_files:
+                dst = output_path / f.name
+                shutil.copy2(f, dst)
+                copied += 1
+            if copied:
+                print(f"✅ Copied {copied} custom code .py files from Hub cache")
+        except Exception as e:
+            print(f"⚠️ Warning: Failed to copy custom code files: {e}")
+
+
 def patch_cos_sin_cached_fp32(model):
     """Patch rotary embeddings to use FP32 for better accuracy."""
     if (
@@ -363,6 +455,17 @@ def convert_minicpmo_model(
     
     if all(p.exists() for p in all_paths):
         print(f"✅ {model_id} model already converted. You can find results in {output_dir}")
+        # Ensure generation_config.json exists in the output directory
+        if not (output_path / "generation_config.json").exists():
+            try:
+                GenerationConfig.from_pretrained(model_id, trust_remote_code=True).save_pretrained(str(output_path))
+                print("✅ generation_config.json saved")
+            except Exception as e:
+                print(f"⚠️ Warning: Failed to save generation_config: {e}")
+        # Copy custom .py code files for offline loading
+        _copy_custom_code_files(model_id, output_path)
+        # Patch auto_map to use local paths
+        _patch_auto_map_in_dir(output_path)
         return output_path
     
     print(f"⌛ {model_id} conversion started. Be patient, it may take some time.")
@@ -398,7 +501,22 @@ def convert_minicpmo_model(
         print("✅ Processor saved")
     except Exception as e:
         print(f"⚠️ Warning: Failed to save processor: {e}")
-    
+
+    # Save generation_config.json
+    try:
+        if hasattr(model, 'generation_config') and model.generation_config is not None:
+            model.generation_config.save_pretrained(output_dir)
+        else:
+            GenerationConfig.from_pretrained(model_id, trust_remote_code=True).save_pretrained(output_dir)
+        print("✅ generation_config.json saved")
+    except Exception as e:
+        print(f"⚠️ Warning: Failed to save generation_config: {e}")
+
+    # Copy custom .py code files needed for offline loading
+    _copy_custom_code_files(model_id, output_path)
+    # Patch auto_map in all saved JSON configs to use local paths (not HF repo refs)
+    _patch_auto_map_in_dir(output_path)
+
     print("✅ Original model successfully loaded")
     
     # 1. Convert LLM Embedding
@@ -534,35 +652,12 @@ def convert_minicpmo_model(
         print("   Example: python convert_token2wav.py --audio-tokenizer-path <path> --output-dir <output>")
     
     gc.collect()
-    
+
     total_models = 12
     if audio_tokenizer_path and model.config.init_tts:
         total_models = 15  # Include Flow Embeddings, Flow Estimator, HiFT
     del model
-    
-    # Copy additional config files from original model directory
-    try:
-        import shutil
-        
-        # Get model directory
-        if Path(model_id).exists():
-            model_dir = Path(model_id)
-        else:
-            # For HuggingFace models, try to get from cache
-            try:
-                model_dir = Path(AutoModel.from_pretrained(model_id, trust_remote_code=True).config.model_type).parent
-            except:
-                model_dir = None
-        
-        if model_dir:
-            # Copy generation_config.json
-            gen_config_src = model_dir / "generation_config.json"
-            if gen_config_src.exists():
-                shutil.copy2(gen_config_src, output_path / "generation_config.json")
-                print("✅ generation_config.json copied")
-    except Exception as e:
-        print(f"⚠️ Warning: Failed to copy additional config files: {e}")
-    
+
     print(f"✅ {model_id} model conversion finished ({total_models} models). Results in {output_dir}")
     return output_path
 
@@ -2907,10 +3002,9 @@ class OVLLMForCausalLM(GenerationMixin):
         self._supports_cache_class = False
         self._skip_keys_device_placement = "past_key_values"
 
-        # Load generation config
+        # Load generation config from model_path (saved during export)
         try:
-            original_model_path = str(model_path).replace("-OV", "")
-            self.generation_config = GenerationConfig.from_pretrained(original_model_path)
+            self.generation_config = GenerationConfig.from_pretrained(str(model_path))
         except Exception:
             self.generation_config = GenerationConfig()
 
