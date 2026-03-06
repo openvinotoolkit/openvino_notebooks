@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -eo pipefail
+
+set -x
+
+APP_ROOT=${APP_ROOT:-/opt/app-root}
+
+# Pre-clone repositories defined in JUPYTER_PRELOAD_REPOS
+if [ -n "${JUPYTER_PRELOAD_REPOS}" ]; then
+    for repo in `echo ${JUPYTER_PRELOAD_REPOS} | tr ',' ' '`; do
+        # Check for the presence of "@branch" in the repo string
+        REPO_BRANCH=$(echo ${repo} | cut -s -d'@' -f2)
+        if [[ -n ${REPO_BRANCH} ]]; then
+          # Remove the branch from the repo string and convert REPO_BRANCH to git clone arg
+          repo=$(echo ${repo} | cut -d'@' -f1)
+          REPO_BRANCH="-b ${REPO_BRANCH}"
+        fi
+        echo "Checking if repository $repo exists locally"
+        REPO_DIR=$(basename ${repo})
+        if [ -d "${REPO_DIR}" ]; then
+            pushd ${REPO_DIR}
+            # Do nothing if the repo already exists
+            echo "The ${repo} has already been cloned"
+            :
+            popd
+        else
+            GIT_SSL_NO_VERIFY=true git clone --depth 1 --single-branch ${repo} ${REPO_DIR} ${REPO_BRANCH}
+        fi
+    done
+fi
+
+${APP_ROOT}/bin/start-notebook.sh "$@"
