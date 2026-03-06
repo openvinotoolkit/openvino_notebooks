@@ -1250,7 +1250,7 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
             elif self.past_len < input_ids.shape[1]:
                 input_ids = input_ids[:, self.past_len :]
             # 3 - Otherwise (past_length >= input_ids.shape[1]), let's assume input_ids only has unprocessed tokens.
-            elif self.config.image_token_index in input_ids:
+            elif self.config.image_token_id in input_ids:
                 input_ids = input_ids[:, input_ids.shape[1] - 1 :]
             # If the cache has seen more tokens than it can hold, then the cache has a size limit. Let's discard the
             # older attention values, as their corresponding values are not part of the input.
@@ -1440,8 +1440,8 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
         inputs_embeds = self.llm_embd_run(input_ids)
         image_embeds = self.vision_model(pixel_values, image_grid_thw)
 
-        # image_token_id : 100295 video_token_id : 101307
-        n_image_tokens = (input_ids == 100295).sum().item()
+        image_token_id = self.config.image_token_id
+        n_image_tokens = (input_ids == image_token_id).sum().item()
         if isinstance(image_embeds, (list, tuple)):
             image_embeds = torch.cat(image_embeds, dim=0)
         elif isinstance(image_embeds, torch.Tensor):
@@ -1450,7 +1450,7 @@ class OVPaddleOCRVLForCausalLM(GenerationMixin):
         if n_image_tokens != n_image_features:
             raise ValueError(f"Image features and image tokens do not match: tokens: {n_image_tokens}, features {n_image_features}")
 
-        mask = input_ids == 100295
+        mask = input_ids == image_token_id
         mask_unsqueezed = mask.unsqueeze(-1)
         mask_expanded = mask_unsqueezed.expand_as(inputs_embeds)
         image_mask = mask_expanded.to(inputs_embeds.device)
