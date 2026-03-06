@@ -252,14 +252,9 @@ def eager_mask_without_vmap(*args, **kwargs) -> Optional[torch.Tensor]:
     return mask
 
 
-# for OpenVINO, we use torch.finfo(torch.float16).min instead of torch.finfo(dtype).min
-# Although I'm not sure this is the right way to handle this, we are basically pretending that -65,504 is -inf
 ALL_MASK_ATTENTION_FUNCTIONS.register("eager", eager_mask_without_vmap)
 
-# for decoder models, we use eager mask without vmap for sdpa as well
-# to avoid a nan output issue in OpenVINO that only happens in case of:
-# non-stateful models on cpu and stateful models on npu
-ALL_MASK_ATTENTION_FUNCTIONS.register("sdpa", eager_mask_without_vmap)
+ALL_MASK_ATTENTION_FUNCTIONS.register("sdpa", sdpa_mask_without_vmap)
 
 
 def model_has_state(ov_model: ov.Model):
@@ -458,7 +453,7 @@ def convert_qwen3_asr_model(model_id, output_dir, quantization_config=None, use_
 
     # Try to load processor if available
     try:
-        processor = AutoProcessor.from_pretrained(ckpt)
+        processor = AutoProcessor.from_pretrained(ckpt, fix_mistral_regex=True)
         processor.save_pretrained(output_dir)
     except Exception as e:
         print(f"⚠️ Could not load processor: {e}")
@@ -658,7 +653,7 @@ def convert_qwen3_asr_model(model_id, output_dir, quantization_config=None, use_
             * 2
             * num_pkv
         )
-        input_shapes += [ov.PartialShape([1, -1, hidden_size])]
+        input_shapes += [ov.PartialShape([-1, -1, hidden_size])]
 
         __make_16bit_traceable(lang_model)
         ov_model = ov.convert_model(lang_model, example_input=example_input, input=input_shapes)
@@ -760,21 +755,21 @@ class Qwen3ASRThinkerCausalLMOutputWithPast(ModelOutput):
 
 
 class SinusoidsPositionEmbedding:
-    """Sinusoidal positional embeddings for audio encoder."""
+    """Whisper-style sinusoidal positional embeddings for audio encoder.
 
-    def __init__(self, max_position_embeddings: int, embed_dim: int):
-        self.max_position_embeddings = max_position_embeddings
-        self.embed_dim = embed_dim
-        self.positional_embedding = self._create_sinusoidal_embeddings()
+    Matches the original Qwen3-ASR / Whisper formula exactly:
+      inv_timescales[i] = exp(-log(max_timescale) / (channels//2 - 1) * i)
+      pe = [sin(t * inv_timescales), cos(t * inv_timescales)]  (sins then cosines)
+    """
 
-    def _create_sinusoidal_embeddings(self) -> torch.Tensor:
-        """Create sinusoidal position embeddings."""
-        position = torch.arange(self.max_position_embeddings).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, self.embed_dim, 2) * (-np.log(10000.0) / self.embed_dim))
-        pe = torch.zeros(self.max_position_embeddings, self.embed_dim)
-        pe[:, 0::2] = torch.sin(position * div_term)
-        pe[:, 1::2] = torch.cos(position * div_term)
-        return pe
+    def __init__(self, length: int, channels: int, max_timescale: float = 10000.0):
+        if channels % 2 != 0:
+            raise ValueError("SinusoidsPositionEmbedding requires even number of channels")
+        log_timescale_increment = np.log(max_timescale) / (channels // 2 - 1)
+        inv_timescales = torch.exp(-log_timescale_increment * torch.arange(channels // 2).float())
+        scaled_time = torch.arange(length)[:, np.newaxis] * inv_timescales[np.newaxis, :]
+        # All sins first, then all cosines — matches original model layout
+        self.positional_embedding = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], dim=1)
 
     def __getitem__(self, seqlen: int) -> torch.Tensor:
         return self.positional_embedding[:seqlen, :]
@@ -1176,7 +1171,7 @@ class OVQwen3ASRModel:
 
         # Load processor
         try:
-            self.processor = Qwen3ASRProcessor.from_pretrained(model_dir)
+            self.processor = Qwen3ASRProcessor.from_pretrained(model_dir, fix_mistral_regex=True)
             print("✅ Processor loaded successfully")
         except Exception as e:
             print(f"⚠️ Could not load processor: {e}")
