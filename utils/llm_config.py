@@ -75,10 +75,45 @@ def qwen_completion_to_prompt(completion):
     return f"<|im_start|>system\n<|im_end|>\n<|im_start|>user\n{completion}<|im_end|>\n<|im_start|>assistant\n"
 
 
+def lfm2_completion_to_prompt(completion):
+    return f"<|startoftext|><|im_start|>system\nYou are a helpful assistant trained by Liquid AI.<|im_end|>\n<|im_start|>user\n{completion}<|im_end|>\n<|im_start|>assistant\n"
+
+
 SUPPORTED_VLM_MODELS = {
-    "Llava-Next-Video-7B": {"model_id": "llava-hf/LLaVA-NeXT-Video-7B-hf"},
-    "Qwen3-VL-VL-8B-Instruct": {"model_id": "Qwen/Qwen3-VL-8B-Instruct"},
-    "Qwen2.5-VL-3B-Instruct": {"model_id": "Qwen/Qwen2.5-VL-3B-Instruct"},
+     "English": {
+        "Llava-Next-Video-7B": {
+            "model_id": "llava-hf/LLaVA-NeXT-Video-7B-hf",
+            "exclude_on_devices": ["NPU"],
+            },
+        "Qwen3-VL-VL-8B-Instruct": {
+            "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen2.5-VL-3B-Instruct": {
+            "model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+            "exclude_on_devices": ["NPU"],
+        },
+    },
+    "Chinese": {
+        "Qwen3-VL-VL-8B-Instruct": {
+            "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen2.5-VL-3B-Instruct": {
+            "model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+            "exclude_on_devices": ["NPU"],
+        },
+    },
+    "Japanese": {
+        "Qwen3-VL-VL-8B-Instruct": {
+            "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen2.5-VL-3B-Instruct": {
+            "model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+            "exclude_on_devices": ["NPU"],
+        },
+    },
 }
 
 SUPPORTED_LLM_MODELS = {
@@ -123,8 +158,48 @@ SUPPORTED_LLM_MODELS = {
             "completion_to_prompt": qwen_completion_to_prompt,
             "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
         },
+        "Qwen3-30B-A3B": {
+            "model_id": "Qwen/Qwen3-30B-A3B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+        },
         "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
         "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT},
+        "lfm2-350m": {
+            "model_id": "LiquidAI/LFM2-350M",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-700m": {
+            "model_id": "LiquidAI/LFM2-700M",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-1.2b": {
+            "model_id": "LiquidAI/LFM2-1.2B",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-2.6b": {
+            "model_id": "LiquidAI/LFM2-2.6B",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
         "GLM-4-9B-0414": {
             "model_id": "THUDM/GLM-4-9B-0414",
             "remote_code": False,
@@ -390,20 +465,6 @@ SUPPORTED_LLM_MODELS = {
             Answer: </s>
             <|assistant|>""",
         },
-        "notus-7b-v1": {
-            "model_id": "argilla/notus-7b-v1",
-            "remote_code": False,
-            "start_message": DEFAULT_SYSTEM_PROMPT,
-            "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
-            "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
-            "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
-            + """
-            <|user|>
-            Question: {input} 
-            Context: {context} 
-            Answer: </s>
-            <|assistant|>""",
-        },
         "neural-chat-7b-v3-3": {
             "model_id": "Intel/neural-chat-7b-v3-3",
             "remote_code": False,
@@ -526,6 +587,22 @@ SUPPORTED_LLM_MODELS = {
     "Chinese": {
         "minicpm4-8b": {"model_id": "openbmb/MiniCPM4-8B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
         "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
+        "lfm2-1.2b": {
+            "model_id": "LiquidAI/LFM2-1.2B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-2.6b": {
+            "model_id": "LiquidAI/LFM2-2.6B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
         "Qwen3-4B": {
             "model_id": "Qwen/Qwen3-4B",
             "remote_code": False,
@@ -552,6 +629,14 @@ SUPPORTED_LLM_MODELS = {
         },
         "Qwen3-14B": {
             "model_id": "Qwen/Qwen3-14B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": qwen_completion_to_prompt,
+            "genai_chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
+        },
+        "Qwen3-30B-A3B": {
+            "model_id": "Qwen/Qwen3-30B-A3B",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
@@ -707,6 +792,22 @@ SUPPORTED_LLM_MODELS = {
         },
     },
     "Japanese": {
+        "lfm2-1.2b": {
+            "model_id": "LiquidAI/LFM2-1.2B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_JAPANESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
+        "lfm2-2.6b": {
+            "model_id": "LiquidAI/LFM2-2.6B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_JAPANESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+            "genai_supported": False,
+        },
         "youri-7b-chat": {
             "model_id": "rinna/youri-7b-chat",
             "remote_code": False,
@@ -796,11 +897,6 @@ compression_configs = {
         "group_size": 64,
         "ratio": 0.6,
     },
-    "notus-7b-v1": {
-        "sym": True,
-        "group_size": 64,
-        "ratio": 0.6,
-    },
     "neural-chat-7b-v3-1": {
         "sym": True,
         "group_size": 64,
@@ -852,39 +948,39 @@ def get_optimum_cli_command_vlm(
     enable_awq=False,
     trust_remote_code=False,
 ):
-    command = [
-        "optimum-cli", "export", "openvino",
-        "--model", model_id,
-        "--task", "image-text-to-text",
-        "--weight-format", weight_format,
-    ]
+    base_command = "optimum-cli export openvino --model {} --task image-text-to-text --weight-format {}"
+    command = base_command.format(model_id, weight_format)
 
     if compression_options:
+        compression_args = ""
         if "group_size" in compression_options:
-            command += ["--group-size", str(compression_options["group_size"])]
+            compression_args += " --group-size {}".format(compression_options["group_size"])
         if "ratio" in compression_options:
-            command += ["--ratio", str(compression_options["ratio"])]
-        if compression_options.get("sym", False):
-            command.append("--sym")
+            compression_args += " --ratio {}".format(compression_options["ratio"])
+        if compression_options["sym"]:
+            compression_args += " --sym"
 
         if enable_awq or compression_options.get("awq", False):
-            command += ["--awq", "--dataset", "wikitext2", "--num-samples", "128"]
+            compression_args += " --awq --dataset wikitext2 --num-samples 128"
             if compression_options.get("scale_estimation", False):
-                command.append("--scale-estimation")
+                compression_args += " --scale-estimation"
         else:
             if compression_options.get("scale_estimation", False):
-                command.append("--scale-estimation")
+                compression_args += " --scale-estimation"
             if "dataset" in compression_options:
-                command += ["--dataset", compression_options["dataset"]]
+                compression_args += f" --dataset {compression_options['dataset']}"
 
         if compression_options.get("all_layers", False):
-            command.append("--all-layers")
+            compression_args += " --all-layers"
+
+        command = command + compression_args
 
     if trust_remote_code:
-        command.append("--trust-remote-code")
+        command += " --trust-remote-code"
 
-    command.append(output_dir)
+    command += " {}".format(output_dir)
     return command
+
 
 def get_optimum_cli_command(model_id, weight_format, output_dir, compression_options=None, enable_awq=False, trust_remote_code=False):
     base_command = "optimum-cli export openvino --model {} --task text-generation-with-past --weight-format {}"
@@ -928,91 +1024,127 @@ int4_npu_config = {
 }
 
 
-def get_vlm_llm_selection_widget(device=None):
+def get_vlm_selection_widget(languages=list(SUPPORTED_VLM_MODELS), models=SUPPORTED_VLM_MODELS[default_language], show_preconverted_checkbox=True, device=None):
     import ipywidgets as widgets
 
-    # ----------------------------
-    # Build unified model registry
-    # ----------------------------
-    unified_models = {}
+    filter_models_by_device = lambda model_info: device not in model_info[1].get("exclude_on_devices", [])
+    available_optimumzations = SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"]
 
-    # LLMs
-    for lang, models in SUPPORTED_LLM_MODELS.items():
-        for name, cfg in models.items():
-            unified_models[f"LLM | {name}"] = {
-                **cfg,
-                "model_type": "LLM",
-                "language": lang,
-            }
+    lang_dropdown = widgets.Dropdown(options=languages or [])
 
-    # VLMs
-    for name, cfg in SUPPORTED_VLM_MODELS.items():
-        unified_models[f"VLM | {name}"] = {
-            **cfg,
-            "model_type": "VLM",
-        }
+    # Define dependent drop down
+    supported_models = dict(filter(filter_models_by_device, models.items()))
+    model_dropdown = widgets.Dropdown(options=supported_models)
 
-    # ----------------------------
-    # Device filtering
-    # ----------------------------
-    def filter_by_device(item):
-        _, cfg = item
-        return device not in cfg.get("exclude_on_devices", [])
+    def dropdown_handler(change):
+        global default_language
+        default_language = change.new
+        # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
+        supported_models = SUPPORTED_VLM_MODELS[change.new]
+        model_dropdown.options = dict(filter(filter_models_by_device, supported_models.items()))
 
-    unified_models = dict(filter(filter_by_device, unified_models.items()))
+    lang_dropdown.observe(dropdown_handler, names="value")
 
-    # ----------------------------
-    # Widgets
-    # ----------------------------
-    model_dropdown = widgets.Dropdown(
-        options=unified_models,
-        description="Model:",
-        layout=widgets.Layout(width="100%"),
-    )
+    def dropdown_model_handler(change):
+        global model_dropdown
+        model_dropdown = change.new
+        compression_dropdown.options = filter(lambda opt_type: opt_type not in change.new.get("exclude_compression", []), available_optimumzations)
 
-    available_optimizations = (
-        ["INT4-NPU", "FP16"] if device == "NPU" else SUPPORTED_OPTIMIZATIONS
-    )
+    model_dropdown.observe(dropdown_model_handler, names="value")
 
-    compression_dropdown = widgets.Dropdown(
-        options=available_optimizations,
-        description="Compression:",
-        layout=widgets.Layout(width="100%"),
-    )
+    compression_dropdown = widgets.Dropdown(options=available_optimumzations)
+    preconverted_checkbox = widgets.Checkbox(value=True)
 
-    # ----------------------------
-    # Reactive compression filtering
-    # ----------------------------
-    def on_model_change(change):
-        excluded = change.new.get("exclude_compression", [])
-        compression_dropdown.options = [
-            opt for opt in available_optimizations if opt not in excluded
-        ]
+    form_items = []
 
-    model_dropdown.observe(on_model_change, names="value")
-
-    # Trigger once for default selection
-    on_model_change(type("evt", (), {"new": model_dropdown.value}))
-
-    # ----------------------------
-    # Layout
-    # ----------------------------
-    form = widgets.Box(
+    if languages:
+        form_items.append(widgets.Box([widgets.Label(value="Language:"), lang_dropdown]))
+    form_items.extend(
         [
-            widgets.Box([widgets.Label("Model"), model_dropdown]),
-            widgets.Box([widgets.Label("Compression"), compression_dropdown]),
-        ],
+            widgets.Box([widgets.Label(value="Model:"), model_dropdown]),
+            widgets.Box([widgets.Label(value="Compression:"), compression_dropdown]),
+        ]
+    )
+    if show_preconverted_checkbox:
+        form_items.append(widgets.Box([widgets.Label(value="Use preconverted models:"), preconverted_checkbox]))
+
+    form = widgets.Box(
+        form_items,
         layout=widgets.Layout(
             display="flex",
             flex_flow="column",
             border="solid 1px",
-            width="35%",
+            # align_items='stretch',
+            width="30%",
             padding="1%",
-            gap="6px",
         ),
     )
+    return form, lang_dropdown, model_dropdown, compression_dropdown, preconverted_checkbox
 
-    return form, model_dropdown, compression_dropdown
+def get_llm_selection_widget(
+    languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True, device=None, genai=False
+):
+    import ipywidgets as widgets
+
+    def filter_models(model_info):
+        if device and device in model_info[1].get("exclude_on_devices", []):
+            return False
+        if genai and model_info[1].get("genai_supported") is False:
+            return False
+        return True
+
+    available_optimumzations = SUPPORTED_OPTIMIZATIONS if device != "NPU" else ["INT4-NPU", "FP16"]
+
+    lang_dropdown = widgets.Dropdown(options=languages or [])
+
+    # Define dependent drop down
+    supported_models = dict(filter(filter_models, models.items()))
+    model_dropdown = widgets.Dropdown(options=supported_models)
+
+    def dropdown_handler(change):
+        global default_language
+        default_language = change.new
+        # If statement checking on dropdown value and changing options of the dependent dropdown accordingly
+        supported_models = SUPPORTED_LLM_MODELS[change.new]
+        model_dropdown.options = dict(filter(filter_models, supported_models.items()))
+
+    lang_dropdown.observe(dropdown_handler, names="value")
+
+    def dropdown_model_handler(change):
+        global model_dropdown
+        model_dropdown = change.new
+        compression_dropdown.options = filter(lambda opt_type: opt_type not in change.new.get("exclude_compression", []), available_optimumzations)
+
+    model_dropdown.observe(dropdown_model_handler, names="value")
+
+    compression_dropdown = widgets.Dropdown(options=available_optimumzations)
+    preconverted_checkbox = widgets.Checkbox(value=True)
+
+    form_items = []
+
+    if languages:
+        form_items.append(widgets.Box([widgets.Label(value="Language:"), lang_dropdown]))
+    form_items.extend(
+        [
+            widgets.Box([widgets.Label(value="Model:"), model_dropdown]),
+            widgets.Box([widgets.Label(value="Compression:"), compression_dropdown]),
+        ]
+    )
+    if show_preconverted_checkbox:
+        form_items.append(widgets.Box([widgets.Label(value="Use preconverted models:"), preconverted_checkbox]))
+
+    form = widgets.Box(
+        form_items,
+        layout=widgets.Layout(
+            display="flex",
+            flex_flow="column",
+            border="solid 1px",
+            # align_items='stretch',
+            width="30%",
+            padding="1%",
+        ),
+    )
+    return form, lang_dropdown, model_dropdown, compression_dropdown, preconverted_checkbox
 
 
 def convert_tokenizer(model_id, remote_code, model_dir):
@@ -1063,11 +1195,13 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
         model_compression_params = compression_configs.get(model_id, compression_configs["default"]) if not "NPU" in precision else int4_npu_config
     weight_format = precision.split("-")[0].lower()
     optimum_cli_command = get_optimum_cli_command_vlm(pt_model_id, weight_format, model_dir, model_compression_params, "AWQ" in precision, remote_code)
-    optimum_cli_command = [str(x) if isinstance(x, Path) else x for x in optimum_cli_command]
     print(f"⌛ {model_id} VLM conversion to {precision} started. It may takes some time.")
     display(Markdown("**Export command:**"))
     display(Markdown(f"`{optimum_cli_command}`"))
-    subprocess.run(optimum_cli_command, shell=(platform.system() == "Windows"), check=True)
+    
+    import shlex
+    args = shlex.split(optimum_cli_command) if platform.system() != "Windows" else optimum_cli_command
+    subprocess.run(args, shell=(platform.system() == "Windows"), check=True)
     print(f"✅ {precision} {model_id} VLM model converted and can be found in {model_dir}")
     return model_dir
 
@@ -1107,12 +1241,25 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
         model_compression_params = compression_configs.get(model_id, compression_configs["default"]) if not "NPU" in precision else int4_npu_config
     weight_format = precision.split("-")[0].lower()
     optimum_cli_command = get_optimum_cli_command(pt_model_id, weight_format, model_dir, model_compression_params, "AWQ" in precision, remote_code)
-    optimum_cli_command = [str(x) if isinstance(x, Path) else x for x in optimum_cli_command]
     print(f"⌛ {model_id} conversion to {precision} started. It may takes some time.")
     display(Markdown("**Export command:**"))
     display(Markdown(f"`{optimum_cli_command}`"))
-    subprocess.run(optimum_cli_command, shell=(platform.system() == "Windows"), check=True)
-    print(f"✅ {precision} {model_id} model converted and can be found in {model_dir}")
+
+    try:
+        result = subprocess.run(
+            optimum_cli_command.split(" "), shell=(platform.system() == "Windows"), check=False, capture_output=True, encoding="utf-8", errors="replace"
+        )
+        if result.stdout:
+            print(result.stdout.replace("\ufffd", "?"))
+        if result.stderr:
+            print(result.stderr.replace("\ufffd", "?"))
+        if result.returncode != 0:
+            raise subprocess.CalledProcessError(result.returncode, optimum_cli_command)
+    except Exception as e:
+        print(f"An error occurred during model export: {e}")
+        raise
+
+    print(f"SUCCESS: {precision} {model_id} model converted and can be found in {model_dir}")
     return model_dir
 
 
