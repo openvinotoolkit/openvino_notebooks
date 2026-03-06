@@ -115,7 +115,6 @@ SUPPORTED_VLM_MODELS = {
         },
     },
 }
-
 SUPPORTED_LLM_MODELS = {
     "English": {
         "Qwen3-0.6B": {
@@ -1081,6 +1080,7 @@ def get_vlm_selection_widget(languages=list(SUPPORTED_VLM_MODELS), models=SUPPOR
     )
     return form, lang_dropdown, model_dropdown, compression_dropdown, preconverted_checkbox
 
+
 def get_llm_selection_widget(
     languages=list(SUPPORTED_LLM_MODELS), models=SUPPORTED_LLM_MODELS[default_language], show_preconverted_checkbox=True, device=None, genai=False
 ):
@@ -1145,8 +1145,6 @@ def get_llm_selection_widget(
         ),
     )
     return form, lang_dropdown, model_dropdown, compression_dropdown, preconverted_checkbox
-
-
 def convert_tokenizer(model_id, remote_code, model_dir):
     import openvino as ov
     from transformers import AutoTokenizer

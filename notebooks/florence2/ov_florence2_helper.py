@@ -48,7 +48,7 @@ def cleanup_torchscript_cache():
 
 
 def model_has_state(ov_model: ov.Model):
-    if isinstance(ov_model, ov.runtime.CompiledModel):
+    if isinstance(ov_model, ov.CompiledModel):
         return len(ov_model.query_state()) > 0
     # TODO: Provide a better way based on the variables availability, but OV Python API doesn't expose required methods
     return len(ov_model.get_sinks()) > 0
