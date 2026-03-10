@@ -1164,14 +1164,14 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
     import json
     
     # Patch missing chat_template (e.g. LLaVA-NeXT-Video tokenizer lacks it)
-    tokenizer_config_path = model_dir / "tokenizer_config.json"
+    tokenizer_config_path = Path(model_id) / "tokenizer_config.json"
     if tokenizer_config_path.exists():
         with open(tokenizer_config_path) as f:
             tok_config = json.load(f)
         if not tok_config.get("chat_template"):
             from huggingface_hub import hf_hub_download
             try:
-                ct_path = hf_hub_download(pt_model_id, "chat_template.json")
+                ct_path = hf_hub_download(model_id, "chat_template.json")
                 with open(ct_path) as f:
                     chat_template = json.load(f).get("chat_template")
                 if chat_template:
