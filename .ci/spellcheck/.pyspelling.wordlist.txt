@@ -178,6 +178,7 @@ CustomVoice
 CVF
 CVAE
 CVPR
+CWE
 DarkIR
 Databricks
 databricks
@@ -772,6 +773,7 @@ OVQwen
 OvStableDiffusionInpaintingPipeline
 OVStableDiffusionInpaintPipeline
 OVStableDiffusionPipeline
+OWASP
 PaddleClas
 PaddleGAN
 paddlegan
