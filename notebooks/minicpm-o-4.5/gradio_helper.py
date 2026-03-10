@@ -198,13 +198,9 @@ def _history_to_msgs(
         if msgs and msgs[-1]["role"] == role:
             prev = msgs[-1]["content"]
             if isinstance(resolved, list):
-                msgs[-1]["content"] = (
-                    [*prev, *resolved] if isinstance(prev, list) else [prev, *resolved]
-                )
+                msgs[-1]["content"] = [*prev, *resolved] if isinstance(prev, list) else [prev, *resolved]
             else:
-                msgs[-1]["content"] = (
-                    [*prev, resolved] if isinstance(prev, list) else [prev, resolved]
-                )
+                msgs[-1]["content"] = [*prev, resolved] if isinstance(prev, list) else [prev, resolved]
         else:
             msgs.append({"role": role, "content": resolved})
 
@@ -267,7 +263,7 @@ def make_demo(ov_model):
 
         print(f"[bot] msgs count={len(msgs)}, last_role={msgs[-1].get('role') if msgs else 'N/A'}")
         for i, m in enumerate(msgs):
-            c = m['content']
+            c = m["content"]
             ctype = type(c).__name__ if not isinstance(c, list) else f"list[{len(c)}]"
             preview = str(c)[:80] if isinstance(c, str) else ctype
             print(f"  msg[{i}] role={m['role']} content={preview}")
@@ -307,10 +303,12 @@ def make_demo(ov_model):
                 hist.append({"role": "assistant", "content": ans})
                 yield hist
         except Exception:
-            hist.append({
-                "role": "assistant",
-                "content": f"⚠️ Generation error:\n```\n{traceback.format_exc()}\n```",
-            })
+            hist.append(
+                {
+                    "role": "assistant",
+                    "content": f"⚠️ Generation error:\n```\n{traceback.format_exc()}\n```",
+                }
+            )
             yield hist
 
     def _stop():
@@ -335,9 +333,7 @@ def make_demo(ov_model):
         if not st:
             return "*No examples yet.*"
         return "\n\n---\n\n".join(
-            f"**Example {i}** {'🖼️' if e.get('image') else ''}\n"
-            f"- **User:** {e['user']}\n- **Asst:** {e['assistant']}"
-            for i, e in enumerate(st, 1)
+            f"**Example {i}** {'🖼️' if e.get('image') else ''}\n" f"- **User:** {e['user']}\n- **Asst:** {e['assistant']}" for i, e in enumerate(st, 1)
         )
 
     def _fs_add(st, img, utxt, atxt):
@@ -345,11 +341,13 @@ def make_demo(ov_model):
             gr.Warning("User text is required.")
             return st, _fs_fmt(st)
         st = list(st or [])
-        st.append({
-            "image": img,
-            "user": utxt.strip(),
-            "assistant": (atxt or "").strip(),
-        })
+        st.append(
+            {
+                "image": img,
+                "user": utxt.strip(),
+                "assistant": (atxt or "").strip(),
+            }
+        )
         return st, _fs_fmt(st)
 
     def _fs_clear():
@@ -361,7 +359,7 @@ def make_demo(ov_model):
         stop_ev.clear()
 
         msgs: list[dict] = []
-        for e in (st or []):
+        for e in st or []:
             c = [_load_img(e["image"]), e["user"]] if e.get("image") else e["user"]
             msgs.append({"role": "user", "content": c})
             if e.get("assistant"):
@@ -395,11 +393,13 @@ def make_demo(ov_model):
     ]
     _audio = ASSETS_DIR / "system_ref_audio.wav"
     if _audio.exists():
-        chat_examples.append({
-            "text": "Please describe what you hear in this audio.",
-            "files": [str(_audio)],
-            "display_text": "🎵 Describe audio",
-        })
+        chat_examples.append(
+            {
+                "text": "Please describe what you hear in this audio.",
+                "files": [str(_audio)],
+                "display_text": "🎵 Describe audio",
+            }
+        )
 
     # ── Build Blocks ───────────────────────────────────────────────────
 
@@ -430,19 +430,34 @@ def make_demo(ov_model):
                         c_stream = gr.Checkbox(label="Streaming", value=True)
                     with gr.Row():
                         c_tok = gr.Slider(
-                            64, 4096, value=2048, step=64, label="Max Tokens",
+                            64,
+                            4096,
+                            value=2048,
+                            step=64,
+                            label="Max Tokens",
                         )
                         c_temp = gr.Slider(
-                            0.0, 2.0, value=0.7, step=0.05, label="Temperature",
+                            0.0,
+                            2.0,
+                            value=0.7,
+                            step=0.05,
+                            label="Temperature",
                         )
                     with gr.Row():
                         c_tp = gr.Slider(
-                            0.0, 1.0, value=0.8, step=0.05, label="Top-P",
+                            0.0,
+                            1.0,
+                            value=0.8,
+                            step=0.05,
+                            label="Top-P",
                         )
                         c_tk = gr.Slider(1, 200, value=100, step=1, label="Top-K")
                     with gr.Row():
                         c_rp = gr.Slider(
-                            1.0, 2.0, value=1.05, step=0.01,
+                            1.0,
+                            2.0,
+                            value=1.05,
+                            step=0.01,
                             label="Repetition Penalty",
                         )
                     c_sys = gr.Textbox(
@@ -457,20 +472,11 @@ def make_demo(ov_model):
                 _img2 = Path(__file__).parent / "example_baklava.png"
                 _audio_ex = ASSETS_DIR / "system_ref_audio.wav"
                 if _img1.exists():
-                    _ex_rows.append(
-                        [{"text": "What is on the flower? Describe in detail.",
-                          "files": [str(_img1)]}]
-                    )
+                    _ex_rows.append([{"text": "What is on the flower? Describe in detail.", "files": [str(_img1)]}])
                 if _img2.exists():
-                    _ex_rows.append(
-                        [{"text": "How do you make this pastry?",
-                          "files": [str(_img2)]}]
-                    )
+                    _ex_rows.append([{"text": "How do you make this pastry?", "files": [str(_img2)]}])
                 if _audio_ex.exists():
-                    _ex_rows.append(
-                        [{"text": "Please describe what you hear in this audio.",
-                          "files": [str(_audio_ex)]}]
-                    )
+                    _ex_rows.append([{"text": "Please describe what you hear in this audio.", "files": [str(_audio_ex)]}])
                 _ex_rows.append([{"text": "Hello! What multimodal tasks can you handle?"}])
                 gr.Examples(
                     examples=_ex_rows,
@@ -484,12 +490,23 @@ def make_demo(ov_model):
 
                 # Wire events
                 gen = [
-                    c_think, c_stream, c_tok, c_temp, c_tp, c_tk, c_rp, c_sys,
+                    c_think,
+                    c_stream,
+                    c_tok,
+                    c_temp,
+                    c_tp,
+                    c_tk,
+                    c_rp,
+                    c_sys,
                 ]
                 msg.submit(
-                    _user, [msg, chatbot], [chatbot, msg],
+                    _user,
+                    [msg, chatbot],
+                    [chatbot, msg],
                 ).then(
-                    _bot, [chatbot] + gen, chatbot,
+                    _bot,
+                    [chatbot] + gen,
+                    chatbot,
                 )
                 # Stop button (built into MultimodalTextbox)
                 msg.stop(_stop, [], [])
@@ -500,14 +517,14 @@ def make_demo(ov_model):
             # ═══════════════════ Few-Shot ═══════════════════════════════
             with gr.Tab("📚 Few-Shot"):
                 gr.Markdown(
-                    "### Few-Shot Prompting\n"
-                    "Add image + text examples, then query the model.",
+                    "### Few-Shot Prompting\n" "Add image + text examples, then query the model.",
                 )
                 fs_st = gr.State([])
                 with gr.Row():
                     with gr.Column():
                         fs_img = gr.Image(
-                            label="Example Image (optional)", type="filepath",
+                            label="Example Image (optional)",
+                            type="filepath",
                         )
                         fs_utxt = gr.Textbox(label="User Text", lines=2)
                         fs_atxt = gr.Textbox(label="Assistant Text", lines=2)
@@ -521,31 +538,49 @@ def make_demo(ov_model):
                 with gr.Row():
                     with gr.Column():
                         fq_img = gr.Image(
-                            label="Query Image (optional)", type="filepath",
+                            label="Query Image (optional)",
+                            type="filepath",
                         )
                         fq_txt = gr.Textbox(label="Query Text", lines=2)
                     with gr.Column():
                         fq_out = gr.Textbox(
-                            label="Model Response", lines=6, interactive=False,
+                            label="Model Response",
+                            lines=6,
+                            interactive=False,
                         )
 
                 with gr.Accordion("⚙️ Settings", open=False):
                     with gr.Row():
                         f_think = gr.Checkbox(label="Thinking", value=False)
                         f_tok = gr.Slider(
-                            64, 4096, value=2048, step=64, label="Max Tokens",
+                            64,
+                            4096,
+                            value=2048,
+                            step=64,
+                            label="Max Tokens",
                         )
                     with gr.Row():
                         f_temp = gr.Slider(
-                            0.0, 2.0, value=0.7, step=0.05, label="Temperature",
+                            0.0,
+                            2.0,
+                            value=0.7,
+                            step=0.05,
+                            label="Temperature",
                         )
                         f_tp = gr.Slider(
-                            0.0, 1.0, value=0.8, step=0.05, label="Top-P",
+                            0.0,
+                            1.0,
+                            value=0.8,
+                            step=0.05,
+                            label="Top-P",
                         )
                     with gr.Row():
                         f_tk = gr.Slider(1, 200, value=100, step=1, label="Top-K")
                         f_rp = gr.Slider(
-                            1.0, 2.0, value=1.05, step=0.01,
+                            1.0,
+                            2.0,
+                            value=1.05,
+                            step=0.01,
                             label="Repetition Penalty",
                         )
 
@@ -559,14 +594,14 @@ def make_demo(ov_model):
                 fs_clr.click(_fs_clear, [], [fs_st, fs_disp])
                 fq_btn.click(
                     _fs_gen,
-                    [fs_st, fq_img, fq_txt, f_think, f_tok,
-                     f_temp, f_tp, f_tk, f_rp],
+                    [fs_st, fq_img, fq_txt, f_think, f_tok, f_temp, f_tp, f_tk, f_rp],
                     fq_out,
                 )
 
             # ═══════════════════ How to Use ═════════════════════════════
             with gr.Tab("ℹ️ How to Use"):
-                gr.Markdown("""
+                gr.Markdown(
+                    """
 ## Usage Guide
 
 ### 💬 Chat
@@ -595,6 +630,7 @@ def make_demo(ov_model):
 | Top-K | 100 | Top-K filtering |
 | Repetition Penalty | 1.05 | Penalise repeated tokens |
 | System Prompt | — | Optional instruction prepended to conversation |
-""")
+"""
+                )
 
     return demo
