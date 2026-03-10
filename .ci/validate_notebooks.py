@@ -501,11 +501,6 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
 
     if platform.system() == "Windows":
         popen_kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
-        # Enable Python UTF-8 Mode so the child process (treon) can write
-        # arbitrary Unicode (e.g. LLM-generated text) without 'charmap' errors.
-        child_env = os.environ.copy()
-        child_env["PYTHONUTF8"] = "1"
-        popen_kwargs["env"] = child_env
     else:
         # Use start_new_session instead of preexec_fn to avoid thread-safety warning
         popen_kwargs["start_new_session"] = True
