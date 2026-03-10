@@ -4,6 +4,9 @@ This notebook shows how to build a Vision-Language Model (VLM) chatbot with Open
 
 The example is focused on the OpenVINO Generate API workflow and demonstrates how to prepare a supported VLM, convert or download OpenVINO models, and run interactive multimodal inference.
 
+Check out the demo
+![demo](https://github.com/user-attachments/assets/62f8fbb7-7d5d-4924-90b8-02e1ba88be31)
+
 ## Notebook
 
 - [VLM chatbot with Generate API](./VLM-chatbot-generate-api.ipynb)
