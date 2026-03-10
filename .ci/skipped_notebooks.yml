@@ -478,3 +478,9 @@
         - windows-2022
     - python:
         - '3.13'
+- notebook: notebooks/minicpm-o-4.5/minicpm-o-4.5.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022

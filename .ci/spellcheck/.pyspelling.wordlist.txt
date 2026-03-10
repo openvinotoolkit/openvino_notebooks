@@ -43,6 +43,7 @@ ASPP
 ASR
 asr
 ASRModel
+AST
 ASYM
 async
 AsyncInferQueue
@@ -158,6 +159,7 @@ ConvNeXt
 ConvNeXts
 Convolutional
 convolutional
+CookBook
 coors
 coreference
 CoSENT
@@ -397,6 +399,7 @@ HiFT
 HiFi
 HH
 hoc
+Homebrew
 hotfix
 HugginFaceH
 HuggingFace
@@ -733,6 +736,7 @@ ontologies
 OpenAI
 openai
 OpenAI's
+OpenCompass
 OpenCL
 OpenCLIP
 OpenCLIP's
@@ -1022,6 +1026,7 @@ SpeechBrain's
 SpeechPipeline
 SpeechT
 splitters
+SPK
 SPS
 SQA
 SQuAD
