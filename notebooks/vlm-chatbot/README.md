@@ -9,7 +9,7 @@ Check out the demo
 
 ## Notebook
 
-- [VLM chatbot with Generate API](./VLM-chatbot-generate-api.ipynb)
+- [VLM chatbot with Generate API](./vlm-chatbot-generate-api.ipynb)
 
 ## Supported VLM Models
 
