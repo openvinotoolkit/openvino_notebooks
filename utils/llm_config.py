@@ -1161,6 +1161,26 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
     import subprocess  # nosec - disable B404:import-subprocess check
     import platform
     import re
+    import json
+    
+    # Patch missing chat_template (e.g. LLaVA-NeXT-Video tokenizer lacks it)
+    tokenizer_config_path = model_dir / "tokenizer_config.json"
+    if tokenizer_config_path.exists():
+        with open(tokenizer_config_path) as f:
+            tok_config = json.load(f)
+        if not tok_config.get("chat_template"):
+            from huggingface_hub import hf_hub_download
+            try:
+                ct_path = hf_hub_download(pt_model_id, "chat_template.json")
+                with open(ct_path) as f:
+                    chat_template = json.load(f).get("chat_template")
+                if chat_template:
+                    tok_config["chat_template"] = chat_template
+                    with open(tokenizer_config_path, "w") as f:
+                        json.dump(tok_config, f, indent=2, ensure_ascii=False)
+                    print("✅ Patched tokenizer_config.json with chat_template")
+            except Exception:
+                pass
 
     pt_model_id = model_config["model_id"]
     pt_model_name = model_id.split("/")[-1]
@@ -1168,7 +1188,7 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
     model_subdir = precision if precision == "FP16" else precision + "_compressed_weights"
     model_dir = Path(pt_model_name) / model_subdir
     remote_code = model_config.get("remote_code", False)
-    if (model_dir / "openvino_model.xml").exists():
+    if (model_dir / "openvino_language_model.xml").exists():
         print(f"✅ {precision} {model_id} VLM model already converted and can be found in {model_dir}")
 
         if not (model_dir / "openvino_tokenizer.xml").exists() or not (model_dir / "openvino_detokenizer.xml").exists():
@@ -1214,7 +1234,7 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
     model_subdir = precision if precision == "FP16" else precision + "_compressed_weights"
     model_dir = Path(pt_model_name) / model_subdir
     remote_code = model_config.get("remote_code", False)
-    if (model_dir / "openvino_model.xml").exists():
+    if (model_dir / "openvino_language_model.xml").exists():
         print(f"✅ {precision} {model_id} model already converted and can be found in {model_dir}")
 
         if not (model_dir / "openvino_tokenizer.xml").exists() or not (model_dir / "openvino_detokenizer.xml").exists():
