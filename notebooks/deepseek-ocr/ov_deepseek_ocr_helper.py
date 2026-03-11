@@ -1340,7 +1340,7 @@ class OVDeepseekOCRForCausalLM(GenerationMixin):
                 else:
                     if crop_mode:
                         # best_width, best_height = select_best_resolution(image.size, self.candidate_resolutions)
-                        images_crop_raw, crop_ratio = dynamic_preprocess(image)
+                        images_crop_raw, crop_ratio = dynamic_preprocess(image, image_size=image_size)
                     else:
                         # best_width, best_height = self.image_size, self.image_size
                         crop_ratio = [1, 1]
