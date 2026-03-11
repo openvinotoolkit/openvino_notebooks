@@ -80,11 +80,11 @@ def lfm2_completion_to_prompt(completion):
 
 
 SUPPORTED_VLM_MODELS = {
-     "English": {
+    "English": {
         "Llava-Next-Video-7B": {
             "model_id": "llava-hf/LLaVA-NeXT-Video-7B-hf",
             "exclude_on_devices": ["NPU"],
-            },
+        },
         "Qwen3-VL-8B-Instruct": {
             "model_id": "Qwen/Qwen3-VL-8B-Instruct",
             "exclude_on_devices": ["NPU"],
@@ -939,6 +939,7 @@ compression_configs = {
     },
 }
 
+
 def get_optimum_cli_command_vlm(
     model_id,
     weight_format,
@@ -1145,6 +1146,8 @@ def get_llm_selection_widget(
         ),
     )
     return form, lang_dropdown, model_dropdown, compression_dropdown, preconverted_checkbox
+
+
 def convert_tokenizer(model_id, remote_code, model_dir):
     import openvino as ov
     from transformers import AutoTokenizer
@@ -1154,6 +1157,7 @@ def convert_tokenizer(model_id, remote_code, model_dir):
     ov_tokenizer, ov_detokenizer = convert_tokenizer(hf_tokenizer, with_detokenizer=True)
     ov.save_model(ov_tokenizer, model_dir / "openvino_tokenizer.xml")
     ov.save_model(ov_detokenizer, model_dir / "openvino_detokenizer.xml")
+
 
 def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted=True):
     from pathlib import Path
@@ -1165,7 +1169,7 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
 
     pt_model_id = model_config["model_id"]
     pt_model_name = model_id.split("/")[-1]
-    pt_model_name = re.sub(r'[<>:"/\\|?*]', '_', pt_model_name)
+    pt_model_name = re.sub(r'[<>:"/\\|?*]', "_", pt_model_name)
     model_subdir = precision if precision == "FP16" else precision + "_compressed_weights"
     model_dir = Path(pt_model_name) / model_subdir
     remote_code = model_config.get("remote_code", False)
@@ -1175,7 +1179,7 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
         if not (model_dir / "openvino_tokenizer.xml").exists() or not (model_dir / "openvino_detokenizer.xml").exists():
             convert_tokenizer(pt_model_id, remote_code, model_dir)
         return model_dir
-    
+
     if use_preconverted:
         OV_ORG = "OpenVINO"
         pt_model_name = pt_model_id.split("/")[-1]
@@ -1198,12 +1202,13 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
     print(f"⌛ {model_id} VLM conversion to {precision} started. It may takes some time.")
     display(Markdown("**Export command:**"))
     display(Markdown(f"`{optimum_cli_command}`"))
-    
+
     import shlex
+
     args = shlex.split(optimum_cli_command) if platform.system() != "Windows" else optimum_cli_command
     subprocess.run(args, shell=(platform.system() == "Windows"), check=True)
     print(f"✅ {precision} {model_id} VLM model converted and can be found in {model_dir}")
-    
+
     # Patch missing chat_template (e.g. LLaVA-NeXT-Video tokenizer lacks it)
     tokenizer_config_path = model_dir / "tokenizer_config.json"
     if tokenizer_config_path.exists():
@@ -1211,6 +1216,7 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
             tok_config = json.load(f)
         if not tok_config.get("chat_template"):
             from huggingface_hub import hf_hub_download
+
             try:
                 ct_path = hf_hub_download(pt_model_id, "chat_template.json")
                 with open(ct_path) as f:
@@ -1224,6 +1230,7 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
                 pass
 
     return model_dir
+
 
 def convert_and_compress_model(model_id, model_config, precision, use_preconverted=True):
     from pathlib import Path

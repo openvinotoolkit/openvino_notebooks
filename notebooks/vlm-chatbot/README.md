@@ -50,3 +50,5 @@ The notebook exposes the VLM models currently defined in `SUPPORTED_VLM_MODELS` 
 This is a self-contained example that relies on the notebook-local helper code. We recommend running it in a dedicated virtual environment with Jupyter available.
 
 For general environment setup, see the main [Installation Guide](../../README.md).
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/vlm-chatbot/README.md" />
