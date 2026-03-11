@@ -1236,7 +1236,7 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
     model_subdir = precision if precision == "FP16" else precision + "_compressed_weights"
     model_dir = Path(pt_model_name) / model_subdir
     remote_code = model_config.get("remote_code", False)
-    if (model_dir / "openvino_language_model.xml").exists():
+    if (model_dir / "openvino_model.xml").exists():
         print(f"✅ {precision} {model_id} model already converted and can be found in {model_dir}")
 
         if not (model_dir / "openvino_tokenizer.xml").exists() or not (model_dir / "openvino_detokenizer.xml").exists():
