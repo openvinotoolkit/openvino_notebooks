@@ -18,17 +18,17 @@ The notebook exposes the VLM models currently defined in `SUPPORTED_VLM_MODELS` 
 ### English
 
 - `Llava-Next-Video-7B` - Hugging Face model: [`llava-hf/LLaVA-NeXT-Video-7B-hf`](https://huggingface.co/llava-hf/LLaVA-NeXT-Video-7B-hf)
-- `Qwen3-VL-VL-8B-Instruct` - Hugging Face model: [`Qwen/Qwen3-VL-8B-Instruct`](https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct)
+- `Qwen3-Vl-8B-Instruct` - Hugging Face model: [`Qwen/Qwen3-VL-8B-Instruct`](https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct)
 - `Qwen2.5-VL-3B-Instruct` - Hugging Face model: [`Qwen/Qwen2.5-VL-3B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct)
 
 ### Chinese
 
-- `Qwen3-VL-VL-8B-Instruct` - Hugging Face model: [`Qwen/Qwen3-VL-8B-Instruct`](https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct)
+- `Qwen3-VL-8B-Instruct` - Hugging Face model: [`Qwen/Qwen3-VL-8B-Instruct`](https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct)
 - `Qwen2.5-VL-3B-Instruct` - Hugging Face model: [`Qwen/Qwen2.5-VL-3B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct)
 
 ### Japanese
 
-- `Qwen3-VL-VL-8B-Instruct` - Hugging Face model: [`Qwen/Qwen3-VL-8B-Instruct`](https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct)
+- `Qwen3-VL-8B-Instruct` - Hugging Face model: [`Qwen/Qwen3-VL-8B-Instruct`](https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct)
 - `Qwen2.5-VL-3B-Instruct` - Hugging Face model: [`Qwen/Qwen2.5-VL-3B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct)
 
 ## Notes
