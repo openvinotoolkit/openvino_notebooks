@@ -45,18 +45,20 @@ def get_vit_rotation_matrices(
     angles_x = torch.outer(t_x, freqs)  # (end_x*end_y, dim//4)
     angles_y = torch.outer(t_y, freqs)  # (end_x*end_y, dim//4)
 
-    # Build 2x2 rotation matrices
+    # Build 2x2 rotation matrices: [[cos, -sin], [sin, cos]]
+    # Complex multiplication (a+bi)(cosθ+i·sinθ) = (a·cosθ-b·sinθ) + i(a·sinθ+b·cosθ)
+    # Equivalent to matrix: [[cos,-sin],[sin,cos]] @ [a,b]^T
+    # Use dim=-2 to stack row vectors as ROWS (not columns)
     rotmats_list = []
     for angles in (angles_x, angles_y):
         cos_a = torch.cos(angles)
         sin_a = torch.sin(angles)
-        # Each rotation matrix: [[cos, -sin], [sin, cos]]
         rotmat = torch.stack(
             [
-                torch.stack([cos_a, -sin_a], dim=-1),
-                torch.stack([sin_a, cos_a], dim=-1),
+                torch.stack([cos_a, -sin_a], dim=-1),  # row 0: [cos, -sin]
+                torch.stack([sin_a, cos_a], dim=-1),   # row 1: [sin, cos]
             ],
-            dim=-1,
+            dim=-2,
         )  # (N, dim//4, 2, 2)
         rotmats_list.append(rotmat)
 
@@ -158,13 +160,16 @@ def get_tracker_rotation_matrices(dim, end_x, end_y, theta=10000.0):
 
     rotmats_list = []
     for angles in angles_xy:
-        sterm, cterm = torch.sin(-angles), torch.cos(-angles)
+        cos_a = torch.cos(angles)
+        sin_a = torch.sin(angles)
+        # Same rotation matrix as ViT: [[cos, -sin], [sin, cos]]
+        # Use dim=-2 to stack row vectors as ROWS
         rotmat = torch.stack(
             [
-                torch.stack([cterm, -sterm], dim=-1),
-                torch.stack([sterm, cterm], dim=-1),
+                torch.stack([cos_a, -sin_a], dim=-1),  # row 0
+                torch.stack([sin_a, cos_a], dim=-1),   # row 1
             ],
-            dim=-1,
+            dim=-2,
         )
         rotmats_list.append(rotmat)
 
@@ -245,24 +250,33 @@ def patch_tracker_rope(tracker_model):
 class Sam3ImageEncoderModel(nn.Module):
     """
     Wraps SAM3 ViT+Neck (Sam3DualViTDetNeck) for OpenVINO conversion.
+    Pass model.backbone.vision_backbone (the Sam3DualViTDetNeck) directly.
     Input: (1, 3, 1008, 1008) float32
-    Output: backbone_fpn features + vision_pos_enc (3 levels after scalp=1)
+    Output: sam3_fpn + sam3_pos (3 levels after scalp=1) + sam2_fpn + sam2_pos (3 levels after scalp=1)
+    Total outputs: 12 tensors (6 sam3 + 6 sam2) when sam2 neck exists, else 6 sam3
     """
-    def __init__(self, backbone, scalp=1):
+    def __init__(self, neck, scalp=1):
         super().__init__()
-        self.vision_backbone = backbone
+        self.neck = neck
         self.scalp = scalp
+        self.has_sam2 = neck.sam2_convs is not None
 
     @torch.no_grad()
     def forward(self, image: Tensor):
-        sam3_features, sam3_pos, sam2_features, sam2_pos = self.vision_backbone.forward(image)
+        sam3_features, sam3_pos, sam2_features, sam2_pos = self.neck(image)
 
         if self.scalp > 0:
             sam3_features = sam3_features[:-self.scalp]
             sam3_pos = sam3_pos[:-self.scalp]
+            if sam2_features is not None:
+                sam2_features = sam2_features[:-self.scalp]
+                sam2_pos = sam2_pos[:-self.scalp]
 
-        # Return flattened: fpn0, fpn1, fpn2, pos0, pos1, pos2
-        return tuple(sam3_features) + tuple(sam3_pos)
+        # Return: sam3_fpn0..2, sam3_pos0..2, [sam2_fpn0..2, sam2_pos0..2]
+        result = tuple(sam3_features) + tuple(sam3_pos)
+        if sam2_features is not None:
+            result = result + tuple(sam2_features) + tuple(sam2_pos)
+        return result
 
 
 class Sam3TextEncoderModel(nn.Module):
@@ -292,30 +306,31 @@ class Sam3TextEncoderModel(nn.Module):
 class Sam3TransformerEncoderModel(nn.Module):
     """
     Wraps SAM3 TransformerEncoderFusion for OpenVINO conversion.
-    Inputs: image feature (NCHW), image pos enc (NCHW), prompt (S,B,C), prompt_mask (B,S)
+    Inputs: image feature (HW, B, C) seq-first, image pos enc (HW, B, C), prompt (S,B,C), prompt_mask (B,S)
+    Also takes feat_h, feat_w as scalar tensors to reconstruct feat_sizes.
     Output: memory, pos_embed, padding_mask, level_start_index, spatial_shapes, valid_ratios
     """
-    def __init__(self, encoder, add_pooled_text_to_img_feat=False):
+    def __init__(self, encoder, feat_h=72, feat_w=72):
         super().__init__()
         self.encoder = encoder
-        # Disable text pooling fusion to simplify tracing
-        self.encoder.add_pooled_text_to_img_feat = add_pooled_text_to_img_feat
+        self.feat_h = feat_h
+        self.feat_w = feat_w
 
     @torch.no_grad()
     def forward(
         self,
-        img_feat: Tensor,      # (B, C, H, W)
-        img_pos: Tensor,        # (B, C, H, W)
+        img_feat: Tensor,      # (HW, B, C) seq-first
+        img_pos: Tensor,        # (HW, B, C) seq-first
         prompt: Tensor,         # (S, B, C)
         prompt_mask: Tensor,    # (B, S)
     ):
-        # TransformerEncoderFusion expects lists for multi-level
+        feat_sizes = [(self.feat_h, self.feat_w)]
         result = self.encoder(
             src=[img_feat],
             src_pos=[img_pos],
             prompt=prompt,
             prompt_key_padding_mask=prompt_mask,
-            feat_sizes=None,  # Already in NCHW format
+            feat_sizes=feat_sizes,
         )
         return (
             result["memory"],
@@ -390,6 +405,63 @@ class Sam3ScoringModel(nn.Module):
     @torch.no_grad()
     def forward(self, hs: Tensor, prompt: Tensor, prompt_mask: Tensor):
         return self.scorer(hs, prompt, prompt_mask)
+
+
+class Sam3DecoderWithScoringModel(nn.Module):
+    """
+    Merged Transformer Decoder + Scoring Head for OpenVINO conversion.
+    Combines Sam3TransformerDecoderModel and Sam3ScoringModel into a single OV model,
+    eliminating the intermediate transpose and extra OV inference call.
+
+    Outputs: hs (batch-first), reference_boxes (batch-first), presence_logits, pred_logits
+    """
+    def __init__(self, decoder, dot_prod_scoring):
+        super().__init__()
+        self.decoder = decoder
+        self.scorer = dot_prod_scoring
+
+    @torch.no_grad()
+    def forward(
+        self,
+        memory: Tensor,            # (HW, B, C)
+        pos_embed: Tensor,          # (HW, B, C)
+        memory_mask: Tensor,        # dummy or actual
+        level_start_index: Tensor,
+        spatial_shapes: Tensor,
+        valid_ratios: Tensor,
+        prompt: Tensor,             # (S, B, C)
+        prompt_mask: Tensor,        # (B, S)
+    ):
+        bs = memory.shape[1]
+        query_embed = self.decoder.query_embed.weight
+        tgt = query_embed.unsqueeze(1).repeat(1, bs, 1)
+
+        hs, reference_boxes, presence_logits, _ = self.decoder(
+            tgt=tgt,
+            memory=memory,
+            memory_key_padding_mask=None,
+            pos=pos_embed,
+            reference_boxes=None,
+            level_start_index=level_start_index,
+            spatial_shapes=spatial_shapes,
+            valid_ratios=valid_ratios,
+            tgt_mask=None,
+            memory_text=prompt,
+            text_attention_mask=prompt_mask,
+            apply_dac=False,
+        )
+
+        if presence_logits is None:
+            presence_logits = torch.zeros(hs.shape[0], 1, bs)
+
+        # Transpose to batch-first for scoring (was done in Python glue code before)
+        hs_bf = hs.transpose(1, 2)           # (num_layers, bs, nq, C)
+        reference_boxes_bf = reference_boxes.transpose(1, 2)
+
+        # Run scoring (was a separate OV model before)
+        pred_logits = self.scorer(hs_bf, prompt, prompt_mask)
+
+        return hs_bf, reference_boxes_bf, presence_logits, pred_logits
 
 
 class Sam3SegmentationHeadModel(nn.Module):
@@ -472,7 +544,7 @@ class Sam3SAM2MaskDecoderModel(nn.Module):
     def __init__(self, model, multimask_output=True):
         super().__init__()
         self.mask_decoder = model.sam_mask_decoder
-        self.model = model
+        self.prompt_encoder = model.sam_prompt_encoder
         self.multimask_output = multimask_output
         self.img_size = model.image_size
 
@@ -485,9 +557,11 @@ class Sam3SAM2MaskDecoderModel(nn.Module):
         sparse_embeddings: Tensor,      # (B, N, C)
         dense_embeddings: Tensor,       # (B, C, H, W)
     ):
+        # pe_layer is on PromptEncoder, not MaskDecoder
+        image_pe = self.prompt_encoder.pe_layer(image_embeddings.shape[-2:]).unsqueeze(0)
         low_res_masks, iou_pred, _, _ = self.mask_decoder(
             image_embeddings=image_embeddings,
-            image_pe=self.mask_decoder.pe_layer.forward(image_embeddings.shape[-2:]).unsqueeze(0),
+            image_pe=image_pe,
             sparse_prompt_embeddings=sparse_embeddings,
             dense_prompt_embeddings=dense_embeddings,
             multimask_output=self.multimask_output,
@@ -588,8 +662,7 @@ class OVSam3Processor:
         ov_image_encoder,
         ov_text_encoder,
         ov_transformer_encoder,
-        ov_transformer_decoder,
-        ov_scoring,
+        ov_decoder_scoring,  # merged decoder + scoring model
         ov_seg_head,
         tokenizer,
         resolution=1008,
@@ -599,8 +672,7 @@ class OVSam3Processor:
         self.ov_image_encoder = ov_image_encoder
         self.ov_text_encoder = ov_text_encoder
         self.ov_transformer_encoder = ov_transformer_encoder
-        self.ov_transformer_decoder = ov_transformer_decoder
-        self.ov_scoring = ov_scoring
+        self.ov_decoder_scoring = ov_decoder_scoring
         self.ov_seg_head = ov_seg_head
         self.tokenizer = tokenizer
         self.resolution = resolution
@@ -649,17 +721,29 @@ class OVSam3Processor:
         # Run OV image encoder
         ov_result = self.ov_image_encoder(img_tensor.numpy())
 
-        # Parse outputs: fpn0, fpn1, fpn2, pos0, pos1, pos2
+        # Parse outputs: sam3_fpn[0..2], sam3_pos[0..2], [sam2_fpn[0..2], sam2_pos[0..2]]
         n_outputs = len(ov_result)
-        n_levels = n_outputs // 2
-        backbone_fpn = [torch.from_numpy(ov_result[i].data) for i in range(n_levels)]
-        vision_pos_enc = [torch.from_numpy(ov_result[n_levels + i].data) for i in range(n_levels)]
+        has_sam2 = n_outputs > 6  # 12 outputs if sam2 neck exists
+        n_levels = 3  # always 3 levels after scalp=1
+
+        backbone_fpn = [torch.from_numpy(np.array(ov_result[i])) for i in range(n_levels)]
+        vision_pos_enc = [torch.from_numpy(np.array(ov_result[n_levels + i])) for i in range(n_levels)]
 
         state["backbone_out"] = {
             "backbone_fpn": backbone_fpn,
             "vision_pos_enc": vision_pos_enc,
             "vision_features": backbone_fpn[-1],
         }
+
+        if has_sam2:
+            sam2_offset = 2 * n_levels
+            sam2_fpn = [torch.from_numpy(np.array(ov_result[sam2_offset + i])) for i in range(n_levels)]
+            sam2_pos = [torch.from_numpy(np.array(ov_result[sam2_offset + n_levels + i])) for i in range(n_levels)]
+            state["backbone_out"]["sam2_backbone_out"] = {
+                "backbone_fpn": sam2_fpn,
+                "vision_pos_enc": sam2_pos,
+                "vision_features": sam2_fpn[-1],
+            }
 
         return state
 
@@ -675,8 +759,8 @@ class OVSam3Processor:
 
         # Run OV text encoder
         ov_result = self.ov_text_encoder(token_ids)
-        text_memory_resized = torch.from_numpy(ov_result[0].data)
-        text_attention_mask = torch.from_numpy(ov_result[1].data)
+        text_memory_resized = torch.from_numpy(np.array(ov_result[0]))
+        text_attention_mask = torch.from_numpy(np.array(ov_result[1]))
 
         state["backbone_out"]["language_features"] = text_memory_resized
         state["backbone_out"]["language_mask"] = text_attention_mask
@@ -697,9 +781,9 @@ class OVSam3Processor:
             # Set dummy text
             tokenized = self.tokenizer(["visual"], context_length=32)
             ov_result = self.ov_text_encoder(tokenized.numpy())
-            state["backbone_out"]["language_features"] = torch.from_numpy(ov_result[0].data)
-            state["backbone_out"]["language_mask"] = torch.from_numpy(ov_result[1].data)
-            state["backbone_out"]["language_embeds"] = torch.from_numpy(ov_result[0].data)
+            state["backbone_out"]["language_features"] = torch.from_numpy(np.array(ov_result[0]))
+            state["backbone_out"]["language_mask"] = torch.from_numpy(np.array(ov_result[1]))
+            state["backbone_out"]["language_embeds"] = torch.from_numpy(np.array(ov_result[0]))
 
         if "geometric_prompt" not in state:
             state["geometric_prompt"] = self.original_model._get_dummy_prompt()
@@ -730,44 +814,27 @@ class OVSam3Processor:
             backbone_out, self.find_stage, geometric_prompt.clone()
         )
 
-        # Step 2: Get image features
+        # Step 2: Get image features (seq-first format: HW, B, C)
         feat_tuple = self.original_model._get_img_feats(backbone_out, self.find_stage.img_ids)
         backbone_out, img_feats, img_pos_embeds, vis_feat_sizes = feat_tuple
 
-        # Reshape image features from seq-first to NCHW for encoder
-        bs = img_feats[0].shape[1]
-        h, w = vis_feat_sizes[0]
-        img_feat_nchw = img_feats[0].reshape(h, w, bs, -1).permute(2, 3, 0, 1)
-        img_pos_nchw = img_pos_embeds[0].reshape(h, w, bs, -1).permute(2, 3, 0, 1)
-
-        # Handle text pooling fusion manually if needed
-        if self.original_model.transformer.encoder.add_pooled_text_to_img_feat:
-            from sam3.model.encoder import pool_text_feat
-            pooled = pool_text_feat(
-                prompt, prompt_mask,
-                self.original_model.transformer.encoder.pool_text_with_mask
-            )
-            pooled = self.original_model.transformer.encoder.text_pooling_proj(pooled)[..., None, None]
-            img_feat_nchw = img_feat_nchw + pooled
-
-        # Step 3: Run OV transformer encoder
-        prompt_bf = prompt.transpose(0, 1)  # batch-first for encoder internal
+        # Step 3: Run OV transformer encoder (seq-first input)
         enc_result = self.ov_transformer_encoder({
-            "img_feat": img_feat_nchw.numpy(),
-            "img_pos": img_pos_nchw.numpy(),
+            "img_feat": img_feats[0].numpy(),
+            "img_pos": img_pos_embeds[0].numpy(),
             "prompt": prompt.numpy(),
             "prompt_mask": prompt_mask.numpy(),
         })
 
-        memory = torch.from_numpy(enc_result[0].data)
-        pos_embed = torch.from_numpy(enc_result[1].data)
-        padding_mask = torch.from_numpy(enc_result[2].data) if enc_result[2].data.size > 1 else None
-        level_start_index = torch.from_numpy(enc_result[3].data)
-        spatial_shapes = torch.from_numpy(enc_result[4].data)
-        valid_ratios = torch.from_numpy(enc_result[5].data)
+        memory = torch.from_numpy(np.array(enc_result[0]))
+        pos_embed = torch.from_numpy(np.array(enc_result[1]))
+        padding_mask = torch.from_numpy(np.array(enc_result[2])) if np.array(enc_result[2]).size > 1 else None
+        level_start_index = torch.from_numpy(np.array(enc_result[3]))
+        spatial_shapes = torch.from_numpy(np.array(enc_result[4]))
+        valid_ratios = torch.from_numpy(np.array(enc_result[5]))
 
-        # Step 4: Run OV transformer decoder
-        dec_result = self.ov_transformer_decoder({
+        # Step 4: Run OV decoder + scoring (merged model)
+        dec_result = self.ov_decoder_scoring({
             "memory": memory.numpy(),
             "pos_embed": pos_embed.numpy(),
             "memory_mask": torch.zeros(1).numpy(),
@@ -778,21 +845,10 @@ class OVSam3Processor:
             "prompt_mask": prompt_mask.numpy(),
         })
 
-        hs = torch.from_numpy(dec_result[0].data)  # (num_layers, nq, bs, C)
-        reference_boxes = torch.from_numpy(dec_result[1].data)
-        presence_logits = torch.from_numpy(dec_result[2].data)
-
-        # Transpose to batch-first for scoring
-        hs_bf = hs.transpose(1, 2)  # (num_layers, bs, nq, C)
-        reference_boxes_bf = reference_boxes.transpose(1, 2)
-
-        # Step 5: Run OV scoring
-        score_result = self.ov_scoring({
-            "hs": hs_bf.numpy(),
-            "prompt": prompt.numpy(),
-            "prompt_mask": prompt_mask.numpy(),
-        })
-        pred_logits = torch.from_numpy(score_result[0].data)
+        hs_bf = torch.from_numpy(np.array(dec_result[0]))           # (num_layers, bs, nq, C)
+        reference_boxes_bf = torch.from_numpy(np.array(dec_result[1]))  # (num_layers+1, bs, nq, 4)
+        presence_logits = torch.from_numpy(np.array(dec_result[2]))
+        pred_logits = torch.from_numpy(np.array(dec_result[3]))
 
         # Step 6: Compute boxes from decoder output
         from sam3.model.model_misc import inverse_sigmoid
@@ -815,7 +871,7 @@ class OVSam3Processor:
             "prompt": prompt.numpy(),
             "prompt_mask": prompt_mask.numpy(),
         })
-        pred_masks = torch.from_numpy(seg_result[0].data)
+        pred_masks = torch.from_numpy(np.array(seg_result[0]))
 
         # Step 8: Post-process
         out_logits = pred_logits[-1]  # last layer
@@ -847,6 +903,59 @@ class OVSam3Processor:
         state["scores"] = out_probs
         return state
 
+    @torch.inference_mode()
+    def predict_inst(self, state, **kwargs):
+        """
+        SAM1-style point/box prompting using pre-computed sam2 features.
+        Mirrors Sam3Image.predict_inst() — reuses backbone features from set_image.
+        The prompt encoder and mask decoder run in PyTorch (kept for dynamic ops).
+        """
+        if "backbone_out" not in state or "sam2_backbone_out" not in state["backbone_out"]:
+            raise ValueError("No sam2 features. set_image must be called with sam2-enabled encoder.")
+
+        tracker_model = self.original_model.inst_interactive_predictor.model
+        predictor = self.original_model.inst_interactive_predictor
+
+        # Prepare features (same as predict_inst in sam3_image.py)
+        backbone_out = state["backbone_out"]["sam2_backbone_out"]
+        # Apply conv_s0/conv_s1
+        backbone_out = backbone_out.copy()
+        backbone_out["backbone_fpn"] = list(backbone_out["backbone_fpn"])
+        backbone_out["backbone_fpn"][0] = tracker_model.sam_mask_decoder.conv_s0(
+            backbone_out["backbone_fpn"][0]
+        )
+        backbone_out["backbone_fpn"][1] = tracker_model.sam_mask_decoder.conv_s1(
+            backbone_out["backbone_fpn"][1]
+        )
+
+        _, vision_feats, _, _ = tracker_model._prepare_backbone_features(backbone_out)
+        vision_feats[-1] = vision_feats[-1] + tracker_model.no_mem_embed
+
+        feats = [
+            feat.permute(1, 2, 0).view(1, -1, *feat_size)
+            for feat, feat_size in zip(
+                vision_feats[::-1], predictor._bb_feat_sizes[::-1]
+            )
+        ][::-1]
+
+        # Set up predictor state
+        predictor._features = {
+            "image_embed": feats[-1],
+            "high_res_feats": feats[:-1],
+        }
+        predictor._is_image_set = True
+        orig_h = state["original_height"]
+        orig_w = state["original_width"]
+        predictor._orig_hw = [(orig_h, orig_w)]
+
+        # Run prediction using OV prompt encoder + mask decoder
+        # We use the original predictor's predict method but with OV-backed features
+        res = predictor.predict(**kwargs)
+
+        predictor._features = None
+        predictor._is_image_set = False
+        return res
+
 
 class OVSam3InteractiveImagePredictor:
     """
@@ -874,7 +983,7 @@ class OVSam3InteractiveImagePredictor:
 
     @torch.no_grad()
     def set_image(self, image):
-        """Encode image for point/box prompting."""
+        """Encode image for point/box prompting using shared OV image encoder."""
         if isinstance(image, np.ndarray):
             self._orig_hw = [image.shape[:2]]
         else:
@@ -887,23 +996,46 @@ class OVSam3InteractiveImagePredictor:
         # Run OV image encoder (shared with detector)
         ov_result = self.ov_image_encoder(input_image.numpy())
         n_outputs = len(ov_result)
-        n_levels = n_outputs // 2
+        has_sam2 = n_outputs > 6
+        n_levels = 3
 
-        backbone_fpn = [torch.from_numpy(ov_result[i].data) for i in range(n_levels)]
-        vision_pos_enc = [torch.from_numpy(ov_result[n_levels + i].data) for i in range(n_levels)]
+        if has_sam2:
+            # Use sam2 features (outputs 6..11)
+            sam2_offset = 2 * n_levels
+            sam2_fpn = [torch.from_numpy(np.array(ov_result[sam2_offset + i])) for i in range(n_levels)]
+            sam2_pos = [torch.from_numpy(np.array(ov_result[sam2_offset + n_levels + i])) for i in range(n_levels)]
+        else:
+            # Fallback: use sam3 features
+            sam2_fpn = [torch.from_numpy(np.array(ov_result[i])) for i in range(n_levels)]
+            sam2_pos = [torch.from_numpy(np.array(ov_result[n_levels + i])) for i in range(n_levels)]
 
-        # Process through SAM2-style feature preparation
-        # Need to use conv_s0, conv_s1 from the original model's mask decoder
+        # Apply conv_s0/conv_s1 (same as forward_image in Sam3TrackerPredictor)
         model = self.original.model
-        if hasattr(model, 'sam_mask_decoder'):
-            if hasattr(model.sam_mask_decoder, 'conv_s0'):
-                backbone_fpn[0] = model.sam_mask_decoder.conv_s0(backbone_fpn[0])
-            if hasattr(model.sam_mask_decoder, 'conv_s1'):
-                backbone_fpn[1] = model.sam_mask_decoder.conv_s1(backbone_fpn[1])
+        sam2_fpn[0] = model.sam_mask_decoder.conv_s0(sam2_fpn[0])
+        sam2_fpn[1] = model.sam_mask_decoder.conv_s1(sam2_fpn[1])
+
+        # Build backbone_out dict and prepare features (same as predict_inst)
+        backbone_out = {
+            "backbone_fpn": sam2_fpn,
+            "vision_pos_enc": sam2_pos,
+            "vision_features": sam2_fpn[-1],
+        }
+        _, vision_feats, _, _ = model._prepare_backbone_features(backbone_out)
+
+        # Add no_mem_embed (same as predict_inst)
+        vision_feats[-1] = vision_feats[-1] + model.no_mem_embed
+
+        # Reshape to NCHW (same as predict_inst)
+        feats = [
+            feat.permute(1, 2, 0).view(1, -1, *feat_size)
+            for feat, feat_size in zip(
+                vision_feats[::-1], self._bb_feat_sizes[::-1]
+            )
+        ][::-1]
 
         self._features = {
-            "image_embed": backbone_fpn[-1],
-            "high_res_feats": backbone_fpn[:-1],
+            "image_embed": feats[-1],
+            "high_res_feats": feats[:-1],
         }
 
     @torch.no_grad()
@@ -969,8 +1101,8 @@ class OVSam3InteractiveImagePredictor:
             "point_labels": concat_labels.numpy(),
             "has_box": has_box.numpy(),
         })
-        sparse_embeddings = torch.from_numpy(enc_result[0].data)
-        dense_embeddings = torch.from_numpy(enc_result[1].data)
+        sparse_embeddings = torch.from_numpy(np.array(enc_result[0]))
+        dense_embeddings = torch.from_numpy(np.array(enc_result[1]))
 
         # Run OV mask decoder
         image_embed = self._features["image_embed"]
@@ -984,9 +1116,9 @@ class OVSam3InteractiveImagePredictor:
             "dense_embeddings": dense_embeddings,
         })
 
-        low_res_masks = torch.from_numpy(dec_result[0].data)
-        high_res_masks = torch.from_numpy(dec_result[1].data)
-        iou_pred = torch.from_numpy(dec_result[2].data)
+        low_res_masks = torch.from_numpy(np.array(dec_result[0]))
+        high_res_masks = torch.from_numpy(np.array(dec_result[1]))
+        iou_pred = torch.from_numpy(np.array(dec_result[2]))
 
         # Post-process to original image size
         orig_h, orig_w = self._orig_hw[0]
@@ -1059,16 +1191,20 @@ def compare_masks(pt_masks, ov_masks, title="Mask Comparison"):
     union = ((pt_binary + ov_binary) > 0).astype(np.float32).sum()
     iou = intersection / max(union, 1e-6)
 
+    # Combine all masks into single 2D image for visualization
+    pt_combined = pt_binary.max(axis=tuple(range(pt_binary.ndim - 2))) if pt_binary.ndim > 2 else pt_binary
+    ov_combined = ov_binary.max(axis=tuple(range(ov_binary.ndim - 2))) if ov_binary.ndim > 2 else ov_binary
+
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-    axes[0].imshow(pt_binary.squeeze(), cmap='gray')
+    axes[0].imshow(pt_combined, cmap='gray')
     axes[0].set_title("PyTorch")
     axes[0].axis("off")
 
-    axes[1].imshow(ov_binary.squeeze(), cmap='gray')
+    axes[1].imshow(ov_combined, cmap='gray')
     axes[1].set_title("OpenVINO")
     axes[1].axis("off")
 
-    diff = np.abs(pt_binary - ov_binary).squeeze()
+    diff = np.abs(pt_combined - ov_combined)
     axes[2].imshow(diff, cmap='hot')
     axes[2].set_title(f"Difference (IoU={iou:.4f})")
     axes[2].axis("off")
