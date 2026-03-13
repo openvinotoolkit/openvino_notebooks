@@ -30,10 +30,11 @@ notebook = "<7.0.0"
 numpy = ">=1.21.0"
 onnx = ">=1.11.0"
 opencv-python = "*"
-openvino = {version = "==2025.4.0"}
+openvino = {version = "==2026.0.0"}
 openvino-telemetry = "==2025.2.0"
+overrides = "*"
 ovmsclient = "*"
-Pillow = ">=8.3.2"
+Pillow = ">=12.1.1"
 psutil = "*"
 pyclipper = ">=1.2.1"
 pygments = ">=2.7.4"

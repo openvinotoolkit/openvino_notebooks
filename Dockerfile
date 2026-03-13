@@ -3,7 +3,7 @@ FROM quay.io/opendatahub/workbench-images:runtime-minimal-ubi9-python-3.11
 LABEL name="odh-notebook-jupyter-intel-openvino-ubi9-python-3.11" \
     maintainer="helena.kloosterman@intel.com" \
     vendor="Intel Corporation" \
-    release="2024.2" \
+    release="2026.0" \
     summary="Jupyter Intel® OpenVINO notebook image for ODH notebooks." \
     description="Jupyter Intel® OpenVINO notebook image with base Python 3.11 builder image based on UBI9 for ODH notebooks" \
     io.k8s.display-name="Jupyter Intel® OpenVINO notebook image for ODH notebooks." \
