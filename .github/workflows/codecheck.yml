@@ -104,7 +104,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          CHANGED=$(gh pr diff ${{ github.event.pull_request.number }} --name-only)
+          CHANGED=$(gh pr diff ${{ github.event.pull_request.number }} --name-only | tr '\n' ' ')
           echo "files<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGED" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
