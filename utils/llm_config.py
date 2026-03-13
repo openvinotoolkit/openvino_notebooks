@@ -93,6 +93,11 @@ SUPPORTED_VLM_MODELS = {
             "model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
             "exclude_on_devices": ["NPU"],
         },
+        "InternVL2-1B": {
+            "model_id": "OpenGVLab/InternVL2-1B",
+            "remote_code": True,
+            "exclude_on_devices": ["NPU"],
+        },
     },
     "Chinese": {
         "Qwen3-VL-8B-Instruct": {
@@ -1291,11 +1296,13 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
 
 
 def compare_model_size(model_dir):
-    fp16_weights = model_dir.parent / "FP16" / "openvino_model.bin"
-    int8_weights = model_dir.parent / "INT8_compressed_weights" / "openvino_model.bin"
-    int4_weights = model_dir.parent / "INT4_compressed_weights" / "openvino_model.bin"
-    int4_awq_weights = model_dir.parent / "INT4-AWQ_compressed_weights" / "openvino_model.bin"
-    int4_npu_weights = model_dir.parent / "INT4-NPU_compressed_weights" / "openvino_model.bin"
+    # VLM models use openvino_language_model.bin, LLMs use openvino_model.bin
+    weights_name = "openvino_language_model.bin" if (model_dir / "openvino_language_model.bin").exists() else "openvino_model.bin"
+    fp16_weights = model_dir.parent / "FP16" / weights_name
+    int8_weights = model_dir.parent / "INT8_compressed_weights" / weights_name
+    int4_weights = model_dir.parent / "INT4_compressed_weights" / weights_name
+    int4_awq_weights = model_dir.parent / "INT4-AWQ_compressed_weights" / weights_name
+    int4_npu_weights = model_dir.parent / "INT4-NPU_compressed_weights" / weights_name
 
     if fp16_weights.exists():
         print(f"Size of FP16 model is {fp16_weights.stat().st_size / 1024 / 1024:.2f} MB")
