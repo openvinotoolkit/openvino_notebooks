@@ -73,12 +73,25 @@ def collect_md_files(changed_paths=None):
         return list(NOTEBOOKS_ROOT.glob("**/*README*.md"))
 
     md_files = []
+    seen = set()
     for p in changed_paths:
         path = NOTEBOOKS_ROOT / p
         if path.is_dir():
-            md_files.extend(path.glob("**/*README*.md"))
+            for f in path.glob("**/*README*.md"):
+                if f not in seen:
+                    seen.add(f)
+                    md_files.append(f)
         elif path.is_file() and "README" in path.name and path.suffix == ".md":
-            md_files.append(path)
+            if path not in seen:
+                seen.add(path)
+                md_files.append(path)
+        # Also check READMEs in parent dir of changed files
+        # (catches broken relative links when files are renamed/deleted)
+        elif path.parent.is_dir():
+            for f in path.parent.glob("*README*.md"):
+                if f not in seen:
+                    seen.add(f)
+                    md_files.append(f)
     return md_files
 
 
