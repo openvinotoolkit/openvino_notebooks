@@ -40,6 +40,7 @@ argmax
 artstation
 arxiv
 ASPP
+AST
 ASR
 asr
 ASRModel
@@ -94,6 +95,7 @@ BLEU
 blockwise
 BMP
 boolean
+builtins
 CatVTON
 CausVid
 CentOS
@@ -178,6 +180,7 @@ CustomVoice
 CVF
 CVAE
 CVPR
+CWE
 DarkIR
 Databricks
 databricks
@@ -390,6 +393,7 @@ Gutendex
 Hafner
 HalBench
 HandBrake
+hardcoded
 HC
 heatmap
 HED
@@ -670,6 +674,7 @@ naflex
 Nakayosi
 nano
 nanoLLaVA
+namespace
 nar
 NAS
 natively
@@ -772,6 +777,7 @@ OVQwen
 OvStableDiffusionInpaintingPipeline
 OVStableDiffusionInpaintPipeline
 OVStableDiffusionPipeline
+OWASP
 PaddleClas
 PaddleGAN
 paddlegan
