@@ -2,6 +2,8 @@ name: code_check
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * *'  # nightly at 4:00 UTC
   pull_request:
     branches:
       - 'main'
@@ -96,10 +98,23 @@ jobs:
         if: always()
         run: |
           python -m pytest .ci/test_notebooks.py
+      - name: Get changed files
+        id: changed
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+            echo "files<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGED" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
       - name: Test links from READMEs
         if: always()
         run: |
-          python .ci/check_links.py
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            python .ci/check_links.py ${{ steps.changed.outputs.files }}
+          else
+            python .ci/check_links.py
+          fi
       - name: Test table of content and device widget
         if: always()
         run: |

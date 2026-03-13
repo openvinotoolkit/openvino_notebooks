@@ -12,7 +12,7 @@ Qwen3-TTS covers 10 major languages (Chinese, English, Japanese, Korean, German,
     <img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen3-TTS-Repo/overview.png" width="80%"/>
 <p>
 
-More details can be found in the original [repository](https://github.com/QwenLM/Qwen3-TTS) and [model card](https://huggingface.co/collections/Qwen/qwen3-tts-6840560df53539afc9a0401b)
+More details can be found in the original [repository](https://github.com/QwenLM/Qwen3-TTS) and [model card](https://huggingface.co/collections/Qwen/qwen3-tts)
 
 In this tutorial, we will:
 1. Install required dependencies
