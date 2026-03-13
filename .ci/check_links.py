@@ -12,6 +12,9 @@ from pathlib import Path
 
 NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
 
+MAX_RETRIES = 3
+RETRY_BACKOFF = 2.0  # seconds, doubles each retry
+
 EXCEPTIONS_URLs = [
     "medium.com",
     "https://www.paddlepaddle.org.cn/",
@@ -166,7 +169,7 @@ def main():
         try:
             status_code = None
             for attempt in range(MAX_RETRIES):
-                get = requests.get(url, timeout=10, headers=REQUEST_HEADERS)
+                get = requests.get(url, timeout=10)
                 status_code = get.status_code
                 if status_code != 429:
                     break

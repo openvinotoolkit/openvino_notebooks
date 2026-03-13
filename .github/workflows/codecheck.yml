@@ -100,13 +100,14 @@ jobs:
           python -m pytest .ci/test_notebooks.py
       - name: Get changed files
         id: changed
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
-            echo "files<<EOF" >> $GITHUB_OUTPUT
-            echo "$CHANGED" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-          fi
+          CHANGED=$(gh pr diff ${{ github.event.pull_request.number }} --name-only)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Test links from READMEs
         if: always()
         run: |
