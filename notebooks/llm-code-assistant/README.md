@@ -4,7 +4,7 @@ This notebook demonstrates how to use **code-specialized Large Language Models**
 
 ## Notebook Contents
 
-We use code-specialized models from the [Qwen2.5-Coder](https://huggingface.co/collections/Qwen/qwen25-coder-66eaa22e6f91e9e76f48917) (7B–14B) and [Qwen3-Coder](https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct) families with the high-performance [`openvino-genai`](https://github.com/openvinotoolkit/openvino.genai) inference library. Pre-converted OpenVINO models are downloaded from the [OpenVINO collection on HuggingFace](https://huggingface.co/OpenVINO) when available; otherwise, models are converted locally using [Optimum Intel](https://huggingface.co/docs/optimum/intel/index).
+We use code-specialized models from the [Qwen2.5-Coder](https://huggingface.co/collections/Qwen/qwen25-coder-66eaa22e6f91e9e76f48917d) (7B–14B) and [Qwen3-Coder](https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct) families with the high-performance [`openvino-genai`](https://github.com/openvinotoolkit/openvino.genai) inference library. Pre-converted OpenVINO models are downloaded from the [OpenVINO collection on HuggingFace](https://huggingface.co/OpenVINO) when available; otherwise, models are converted locally using [Optimum Intel](https://huggingface.co/docs/optimum/intel/index).
 
 **Demonstrations include:**
 - **Bug Detection & Code Correction** — fix multiple bugs in Python functions with automatic test verification.
