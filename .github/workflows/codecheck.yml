@@ -100,7 +100,7 @@ jobs:
           python -m pytest .ci/test_notebooks.py
       - name: Get changed files
         id: changed
-        if: github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

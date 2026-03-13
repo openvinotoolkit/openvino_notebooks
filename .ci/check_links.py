@@ -173,7 +173,7 @@ def main():
                 status_code = get.status_code
                 if status_code != 429:
                     break
-                time.sleep(RETRY_BACKOFF * (2 ** attempt))
+                time.sleep(RETRY_BACKOFF * (2**attempt))
 
             if status_code not in [200, 202]:
                 if status_code == 429:
