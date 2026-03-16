@@ -847,7 +847,6 @@ class OVSam3Processor:
         self,
         ov_image_encoder,
         ov_text_encoder,
-        ov_geometry_encoder,       # OV compiled geometry encoder OR PyTorch wrapper
         ov_transformer_encoder,
         ov_decoder,                # transformer decoder (separate from scoring)
         ov_scoring,                # scoring + bbox_embed + decoder_norm
@@ -858,15 +857,14 @@ class OVSam3Processor:
         ov_mask_decoder=None,      # OV compiled SAM2 mask decoder (for SAM1 task)
         resolution=1008,
         confidence_threshold=0.5,
-        max_boxes=10,              # must match the value used during OV conversion
-        pt_geometry_encoder=None,  # PyTorch geometry encoder wrapper (fallback for roi_align)
+        max_boxes=10,
+        pt_geometry_encoder=None,  # PyTorch geometry encoder (roi_align doesn't convert to OV)
     ):
         # All weighted PyTorch modules are now in OV models.
         # auxiliary is only needed to extract frozen weights for SAM1 task:
         #   conv_s0, conv_s1 (1x1 conv weights), no_mem_embed, and predictor config.
         self.ov_image_encoder = ov_image_encoder
         self.ov_text_encoder = ov_text_encoder
-        self.ov_geometry_encoder = ov_geometry_encoder
         self.pt_geometry_encoder = pt_geometry_encoder
         self.ov_transformer_encoder = ov_transformer_encoder
         self.ov_decoder = ov_decoder
@@ -1075,25 +1073,13 @@ class OVSam3Processor:
             box_mask       = raw_mask
             box_labels_t   = raw_labels
 
-        # Step 3: Run geometry encoder
-        # Use PyTorch wrapper if available (roi_align doesn't convert well to OV)
-        if self.pt_geometry_encoder is not None:
-            with torch.inference_mode():
-                geo_feats, geo_masks = self.pt_geometry_encoder(
-                    box_embeddings, box_mask, box_labels_t,
-                    img_feats[0], img_pos_embeds[0],
-                )
-            geo_masks = geo_masks.bool()
-        else:
-            geo_result = self.ov_geometry_encoder([
-                box_embeddings.numpy(),       # 0: box_embeddings
-                box_mask.numpy(),             # 1: box_mask
-                box_labels_t.numpy(),         # 2: box_labels
-                img_feats[0].numpy(),         # 3: img_feat
-                img_pos_embeds[0].numpy(),    # 4: img_pos
-            ])
-            geo_feats = torch.from_numpy(np.array(geo_result[0]))        # (max_boxes+1, B, C)
-            geo_masks = torch.from_numpy(np.array(geo_result[1])).bool()  # (B, max_boxes+1)
+        # Step 3: Run PyTorch geometry encoder (roi_align doesn't convert to OV IR)
+        with torch.inference_mode():
+            geo_feats, geo_masks = self.pt_geometry_encoder(
+                box_embeddings, box_mask, box_labels_t,
+                img_feats[0], img_pos_embeds[0],
+            )
+        geo_masks = geo_masks.bool()
 
         # Step 4: Assemble combined prompt for transformer encoder
         prompt      = torch.cat([txt_feats, geo_feats], dim=0)       # (S_text + max_boxes+1, B, C)
