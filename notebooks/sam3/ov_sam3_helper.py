@@ -394,17 +394,30 @@ class Sam3TransformerDecoderModel(nn.Module):
 
 class Sam3ScoringModel(nn.Module):
     """
-    Wraps DotProductScoring for OpenVINO conversion.
-    Input: hs (num_layers, B, nq, C), prompt (S, B, C), prompt_mask (B, S)
-    Output: pred_logits (num_layers, B, nq, 1)
+    Wraps DotProductScoring + bbox_embed + decoder_norm for OpenVINO conversion.
+    Input: hs (num_layers, B, nq, C) batch-first, reference_boxes (num_layers+1, B, nq, 4),
+           prompt (S, B, C), prompt_mask (B, S)
+    Output: pred_logits (num_layers, B, nq, 1), pred_boxes (B, nq, 4) cxcywh [0,1]
     """
-    def __init__(self, dot_prod_scoring):
+    def __init__(self, dot_prod_scoring, bbox_embed=None, decoder_norm=None):
         super().__init__()
         self.scorer = dot_prod_scoring
+        self.bbox_embed = bbox_embed
+        self.decoder_norm = decoder_norm
 
     @torch.no_grad()
-    def forward(self, hs: Tensor, prompt: Tensor, prompt_mask: Tensor):
-        return self.scorer(hs, prompt, prompt_mask)
+    def forward(self, hs: Tensor, reference_boxes: Tensor, prompt: Tensor, prompt_mask: Tensor):
+        pred_logits = self.scorer(hs, prompt, prompt_mask)
+
+        # Box refinement via bbox_embed + decoder_norm
+        last_hs = hs[-1]  # (bs, nq, C)
+        anchor_offsets = self.bbox_embed(self.decoder_norm(last_hs))  # (bs, nq, 4)
+        ref_last = reference_boxes[-1]  # (bs, nq, 4)
+        ref_clamped = ref_last.clamp(min=0, max=1)
+        ref_inv = torch.log(ref_clamped.clamp(min=1e-3) / (1 - ref_clamped).clamp(min=1e-3))
+        pred_boxes = (ref_inv + anchor_offsets).sigmoid()  # (bs, nq, 4) cxcywh [0,1]
+
+        return pred_logits, pred_boxes
 
 
 class Sam3DecoderWithScoringModel(nn.Module):
@@ -834,9 +847,10 @@ class OVSam3Processor:
         self,
         ov_image_encoder,
         ov_text_encoder,
-        ov_geometry_encoder,       # OV compiled geometry encoder (NEW)
+        ov_geometry_encoder,       # OV compiled geometry encoder OR PyTorch wrapper
         ov_transformer_encoder,
-        ov_decoder_scoring,        # merged decoder + scoring + bbox_embed + decoder_norm
+        ov_decoder,                # transformer decoder (separate from scoring)
+        ov_scoring,                # scoring + bbox_embed + decoder_norm
         ov_seg_head,
         tokenizer,
         auxiliary=None,            # kept for backward compat / SAM1 task (inst_predictor)
@@ -845,6 +859,7 @@ class OVSam3Processor:
         resolution=1008,
         confidence_threshold=0.5,
         max_boxes=10,              # must match the value used during OV conversion
+        pt_geometry_encoder=None,  # PyTorch geometry encoder wrapper (fallback for roi_align)
     ):
         # All weighted PyTorch modules are now in OV models.
         # auxiliary is only needed to extract frozen weights for SAM1 task:
@@ -852,8 +867,10 @@ class OVSam3Processor:
         self.ov_image_encoder = ov_image_encoder
         self.ov_text_encoder = ov_text_encoder
         self.ov_geometry_encoder = ov_geometry_encoder
+        self.pt_geometry_encoder = pt_geometry_encoder
         self.ov_transformer_encoder = ov_transformer_encoder
-        self.ov_decoder_scoring = ov_decoder_scoring
+        self.ov_decoder = ov_decoder
+        self.ov_scoring = ov_scoring
         self.ov_seg_head = ov_seg_head
         self.ov_prompt_encoder = ov_prompt_encoder
         self.ov_mask_decoder = ov_mask_decoder
@@ -1058,16 +1075,25 @@ class OVSam3Processor:
             box_mask       = raw_mask
             box_labels_t   = raw_labels
 
-        # Step 3: Run OV geometry encoder (positional inputs — names may be auto-generated)
-        geo_result = self.ov_geometry_encoder([
-            box_embeddings.numpy(),       # 0: box_embeddings
-            box_mask.numpy(),             # 1: box_mask
-            box_labels_t.numpy(),         # 2: box_labels
-            img_feats[0].numpy(),         # 3: img_feat
-            img_pos_embeds[0].numpy(),    # 4: img_pos
-        ])
-        geo_feats = torch.from_numpy(np.array(geo_result[0]))        # (max_boxes+1, B, C)
-        geo_masks = torch.from_numpy(np.array(geo_result[1])).bool()  # (B, max_boxes+1)
+        # Step 3: Run geometry encoder
+        # Use PyTorch wrapper if available (roi_align doesn't convert well to OV)
+        if self.pt_geometry_encoder is not None:
+            with torch.inference_mode():
+                geo_feats, geo_masks = self.pt_geometry_encoder(
+                    box_embeddings, box_mask, box_labels_t,
+                    img_feats[0], img_pos_embeds[0],
+                )
+            geo_masks = geo_masks.bool()
+        else:
+            geo_result = self.ov_geometry_encoder([
+                box_embeddings.numpy(),       # 0: box_embeddings
+                box_mask.numpy(),             # 1: box_mask
+                box_labels_t.numpy(),         # 2: box_labels
+                img_feats[0].numpy(),         # 3: img_feat
+                img_pos_embeds[0].numpy(),    # 4: img_pos
+            ])
+            geo_feats = torch.from_numpy(np.array(geo_result[0]))        # (max_boxes+1, B, C)
+            geo_masks = torch.from_numpy(np.array(geo_result[1])).bool()  # (B, max_boxes+1)
 
         # Step 4: Assemble combined prompt for transformer encoder
         prompt      = torch.cat([txt_feats, geo_feats], dim=0)       # (S_text + max_boxes+1, B, C)
@@ -1087,8 +1113,8 @@ class OVSam3Processor:
         spatial_shapes     = torch.from_numpy(np.array(enc_result[4]))
         valid_ratios       = torch.from_numpy(np.array(enc_result[5]))
 
-        # Step 6: Run OV decoder + scoring + box refinement (positional inputs)
-        dec_result = self.ov_decoder_scoring([
+        # Step 6a: Run OV transformer decoder
+        dec_result = self.ov_decoder([
             memory.numpy(),               # 0: memory
             pos_embed.numpy(),            # 1: pos_embed
             torch.zeros(1).numpy(),       # 2: memory_mask
@@ -1099,11 +1125,24 @@ class OVSam3Processor:
             prompt_mask.numpy(),          # 7: prompt_mask
         ])
 
-        hs_bf             = torch.from_numpy(np.array(dec_result[0]))  # (num_layers, bs, nq, C)
-        reference_boxes_bf= torch.from_numpy(np.array(dec_result[1]))  # (num_layers+1, bs, nq, 4)
-        presence_logits   = torch.from_numpy(np.array(dec_result[2]))
-        pred_logits       = torch.from_numpy(np.array(dec_result[3]))
-        pred_boxes        = torch.from_numpy(np.array(dec_result[4]))  # (bs, nq, 4) cxcywh [0,1]
+        hs              = torch.from_numpy(np.array(dec_result[0]))  # (num_layers, nq, bs, C) seq-first
+        reference_boxes = torch.from_numpy(np.array(dec_result[1]))  # (num_layers+1, nq, bs, 4) seq-first
+        presence_logits = torch.from_numpy(np.array(dec_result[2]))
+
+        # Transpose to batch-first for scoring
+        hs_bf = hs.transpose(1, 2)                          # (num_layers, bs, nq, C)
+        reference_boxes_bf = reference_boxes.transpose(1, 2)  # (num_layers+1, bs, nq, 4)
+
+        # Step 6b: Run OV scoring + box refinement
+        scoring_result = self.ov_scoring([
+            hs_bf.numpy(),                # 0: hs (batch-first)
+            reference_boxes_bf.numpy(),   # 1: reference_boxes (batch-first)
+            prompt.numpy(),               # 2: prompt
+            prompt_mask.numpy(),          # 3: prompt_mask
+        ])
+
+        pred_logits = torch.from_numpy(np.array(scoring_result[0]))
+        pred_boxes  = torch.from_numpy(np.array(scoring_result[1]))  # (bs, nq, 4) cxcywh [0,1]
 
         # Step 7: Run OV segmentation head (positional inputs)
         fpn = backbone_out["backbone_fpn"]
