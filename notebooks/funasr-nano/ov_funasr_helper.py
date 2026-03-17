@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import openvino as ov
 import nncf
 from pathlib import Path
@@ -417,7 +419,7 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
         model_path = Path(model_path)
 
     if all((model_path / model_name).exists() for model_name in [FRONTEND_CONFIG_PATH, TEXT_EMBEDDINGS_PATH, ENCODER_PATH, LANGUAGE_PATH]):
-        print(f"✅ {model_id} model already converted. You can find results in {model_path}")
+        print(f"[OK] {model_id} model already converted. You can find results in {model_path}")
         return model_path
     print(f"⌛ {model_id} conversion started. Be patient, it may takes some time.")
     print("⌛ Load Original model")
@@ -426,7 +428,7 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
     pt_model, kwargs = FunASRNano.from_pretrained(model=model_id, device="cpu")
     kwargs
     pt_model = pt_model.to(torch.float32)
-    print("✅ Original model successfully loaded")
+    print("[OK] Original model successfully loaded")
     print("⌛ Export tokenizer and config")
     kwargs["tokenizer"].save_pretrained(model_path)
     for json_file in Path(model_id + "/Qwen3-0.6B").glob("*.json"):
@@ -457,7 +459,7 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
         }
         with open(model_path / FRONTEND_CONFIG_PATH, "w") as f:
             json.dump(frontend_config, f, indent=2)
-        print("✅ Frontend config exported")
+        print("[OK] Frontend config exported")
 
     if not (model_path / TEXT_EMBEDDINGS_PATH).exists():
         print("⌛ Convert TEXT_EMBEDDINGS model")
@@ -467,7 +469,7 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
-        print("✅ TEXT_EMBEDDINGS model successfully converted")
+        print("[OK] TEXT_EMBEDDINGS model successfully converted")
 
     if not (model_path / ENCODER_PATH).exists():
         print("⌛ Convert ENCODER_PATH model")
@@ -493,7 +495,7 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
         del pt_model._orig_forward
         cleanup_torchscript_cache()
         gc.collect()
-        print("✅ ENCODER model successfully converted")
+        print("[OK] ENCODER model successfully converted")
 
     if not (model_path / LANGUAGE_PATH).exists():
         print("⌛ Convert LANGUAGE_MODEL model")
@@ -584,11 +586,11 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
         for output, output_name in zip(ov_model.outputs, output_names):
             output.get_tensor().set_names({output_name})
         patch_stateful(ov_model)
-        print("✅ Decoder model successfully converted")
+        print("[OK] Decoder model successfully converted")
         if quantization_config is not None and "llm" in quantization_config:
             print(f"⌛ Weights compression with {quantization_config['llm']['mode']} mode started")
             ov_model = nncf.compress_weights(ov_model, **quantization_config["llm"])
-            print("✅ Weights compression finished")
+            print("[OK] Weights compression finished")
         else:
             ov_model.set_rt_info("f16", ["runtime_options", "KV_CACHE_PRECISION"])
         ov_model.set_rt_info("8.0", ["runtime_options", "ACTIVATIONS_SCALE_FACTOR"])
@@ -599,7 +601,7 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
 
     del pt_model
     gc.collect()
-    print(f"✅ {model_id} model conversion finished. You can find results in {model_path}")
+    print(f"[OK] {model_id} model conversion finished. You can find results in {model_path}")
     return model_path
 
 
@@ -851,7 +853,7 @@ class OVFunASRNano:
 
         # Load tokenizer from saved config
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
-        print(f"✅ Tokenizer loaded from {model_dir}")
+        print(f"[OK] Tokenizer loaded from {model_dir}")
 
         # Load frontend from saved config
         frontend_config_path = model_dir / FRONTEND_CONFIG_PATH
@@ -869,11 +871,11 @@ class OVFunASRNano:
                 "max_length": config.get("max_length", 512),
                 "batch_size": config.get("batch_size", 1),
             }
-            print(f"✅ Frontend and inference config loaded from {frontend_config_path}")
+            print(f"[OK] Frontend and inference config loaded from {frontend_config_path}")
         else:
             self.frontend = None
             self.inference_kwargs = {}
-            print(f"⚠️ Frontend config not found at {frontend_config_path}, frontend will need to be provided manually")
+            print(f"[WARN] Frontend config not found at {frontend_config_path}, frontend will need to be provided manually")
 
     def data_template(self, data):
         system, user, assistant = [], [], []
