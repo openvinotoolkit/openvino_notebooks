@@ -258,6 +258,7 @@ DiTs
 DiT’s
 DL
 DMDR
+DFL
 DocLayNet
 docling
 Docling
@@ -495,6 +496,7 @@ keypoint
 keypoints
 KiTS
 KITTI
+Kimi
 Kokoro
 Koltun
 Kondate
@@ -531,6 +533,7 @@ LDM
 LDMs
 LDP
 learnable
+LetterBox
 LeViT
 LFM
 lfm
@@ -573,12 +576,14 @@ lora
 LoRAs
 lraspp
 LRASPP
+LRPC
 LSTM
 LSTMs
 LTS
 LTX
 ltx
 Luo
+LVIS
 LVLM
 Lysak
 Lyth
@@ -668,6 +673,8 @@ Multimodality
 multinomial
 MuJoCo
 MuRAG
+MuSGD
+Muon
 MusicGen
 Müller
 naflex
@@ -791,6 +798,7 @@ PAFs
 Panoptic
 panoptic
 parallelized
+parameterizable
 parameterization
 parametrize
 paralinguistic
@@ -861,6 +869,7 @@ pretrained
 Pretraining
 pretraining
 processings
+ProgLoss
 promptable
 prompthero
 proto
@@ -920,6 +929,7 @@ regressively
 reidentification
 ReLU
 René
+RepRTA
 repo
 reproducibility
 rerank
@@ -941,6 +951,7 @@ Riffusion
 riffusion
 Rinna
 rinna
+RLE
 RLHF
 RMBG
 RMSNorm
@@ -985,6 +996,7 @@ segmind
 selfattention
 serializable
 sft
+SGD
 ShapeNet
 ShareGPT
 Shazeer
@@ -1042,6 +1054,7 @@ StableDiffusionImg
 StableDiffusionImg2ImgPipeline
 StableDiffusionInpaintPipeline
 StableDiffusionPipeline
+STAL
 stateful
 STFT
 streamable
@@ -1242,6 +1255,7 @@ Yiqin
 YOLO
 YOLOv
 yolov
+YOLOE
 Youri
 youri
 YouTube
