@@ -1,7 +1,7 @@
 # Convert and Optimize YOLO26 with OpenVINO™
 
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png"/>
+    <img src="https://github.com/user-attachments/assets/25b9a208-3ea6-4918-b75d-d8c6f9bfdd78"/>
 </p>
 
 [YOLO26](https://docs.ultralytics.com/models/yolo26/) is the latest Ultralytics release (January 2026), engineered from the ground up for edge and low-power devices. It is the recommended model for production workloads, replacing both YOLO11 and YOLO12.
