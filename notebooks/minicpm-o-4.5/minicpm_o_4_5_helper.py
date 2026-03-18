@@ -3366,7 +3366,7 @@ class OVMiniCPMO:
 
         return tts
 
-    def init_tts(self, streaming=False, model_dir=None, enable_float16=False, n_timesteps=10):
+    def init_tts(self, streaming=False, model_dir=None, enable_float16=False, n_timesteps=10, hift_input_len=0):
         """Initialize TTS audio tokenizer (aligned with original MiniCPMO.init_tts).
 
         For OV, creates OVToken2wav instead of the original Token2wav/CosyVoice.
@@ -3400,7 +3400,7 @@ class OVMiniCPMO:
             device=self.tts_device,
             float16=enable_float16,
             n_timesteps=n_timesteps,
-            hift_input_len=0,  # dynamic shape for streaming mel+cache (50+8=58 frames)
+            hift_input_len=hift_input_len,  # dynamic shape for streaming mel+cache (50+8=58 frames)
             # flow_emb_token_len=50,
             # flow_emb_prompt_len=200,
         )
