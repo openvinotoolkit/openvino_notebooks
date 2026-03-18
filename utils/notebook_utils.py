@@ -10,7 +10,7 @@ import threading
 import time
 from os import PathLike
 from pathlib import Path
-from typing import NamedTuple, Optional
+from typing import List, NamedTuple, Optional
 
 
 # ## Files
@@ -496,7 +496,7 @@ def viz_result_image(
     source_image=None,
     source_title: str = None,
     result_title: str = None,
-    labels: list[Label] = None,
+    labels: Optional[List[Label]] = None,
     resize: bool = False,
     bgr_to_rgb: bool = False,
     hide_axes: bool = False,
