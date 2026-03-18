@@ -1278,6 +1278,7 @@ class OVSam3Processor:
 
         if point_coords.dim() == 2:
             point_coords = point_coords.unsqueeze(0)
+        if point_labels.dim() == 1:
             point_labels = point_labels.unsqueeze(0)
 
         # Add padding point
@@ -1317,6 +1318,15 @@ class OVSam3Processor:
         masks = (masks > self._mask_threshold).squeeze(0).numpy()
         scores = iou_pred.squeeze(0).numpy()
         logits = low_res_masks.squeeze(0).numpy()
+
+        # OV model was exported with multimask_output=True, so it always
+        # returns multiple masks.  When the caller requests single-mask
+        # output, select the best one by IoU score.
+        if not multimask_output and masks.shape[0] > 1:
+            best = np.argmax(scores.flatten())
+            masks = masks[best:best+1]
+            scores = scores.flatten()[best:best+1]
+            logits = logits[best:best+1]
 
         return masks, scores, logits
 
@@ -1460,6 +1470,7 @@ class OVSam3InteractiveImagePredictor:
 
         if point_coords.dim() == 2:
             point_coords = point_coords.unsqueeze(0)
+        if point_labels.dim() == 1:
             point_labels = point_labels.unsqueeze(0)
 
         # Add padding point
