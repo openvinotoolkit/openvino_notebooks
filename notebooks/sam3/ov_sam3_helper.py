@@ -643,6 +643,102 @@ class Sam3GeometryEncoderModel(nn.Module):
         return combined, combined_mask
 
 
+class Sam3GeometryEncoderForOV(nn.Module):
+    """
+    OV-conversion-friendly geometry encoder wrapper (batch_size=1 only).
+    Uses tensor-format roi_align (N,5) instead of list-format for clean OV tracing.
+    Otherwise identical logic to Sam3GeometryEncoderModel.
+    """
+
+    def __init__(self, geometry_encoder, feat_h=72, feat_w=72):
+        super().__init__()
+        self.geo = geometry_encoder
+        self.feat_h = feat_h
+        self.feat_w = feat_w
+
+    @torch.no_grad()
+    def forward(
+        self,
+        box_embeddings: Tensor,  # (N, 1, 4)
+        box_mask: Tensor,  # (1, N) bool
+        box_labels: Tensor,  # (N, 1) int64
+        img_feat: Tensor,  # (HW, 1, C)
+        img_pos: Tensor,  # (HW, 1, C)
+    ):
+        import torchvision.ops
+        from sam3.model.box_ops import box_cxcywh_to_xyxy
+
+        geo = self.geo
+        n_boxes = box_embeddings.shape[0]
+        bs = box_embeddings.shape[1]
+        H = self.feat_h
+        W = self.feat_w
+
+        boxes = box_embeddings
+        boxes_embed = None
+
+        if geo.boxes_direct_project is not None:
+            proj = geo.boxes_direct_project(boxes)
+            boxes_embed = proj
+
+        if geo.boxes_pool_project is not None:
+            img_normed = geo.img_pre_norm(img_feat)
+            img_nchw = img_normed.permute(1, 2, 0).view(bs, -1, H, W)
+
+            boxes_xyxy = box_cxcywh_to_xyxy(boxes)
+            scale = torch.tensor([W, H, W, H], dtype=boxes.dtype, device=boxes.device).view(1, 1, 4)
+            boxes_xyxy = boxes_xyxy * scale
+
+            # Tensor-format roi_align: (K, 5) = [batch_idx, x1, y1, x2, y2]
+            boxes_2d = boxes_xyxy[:, 0, :]  # (N, 4)
+            batch_idx = torch.zeros(n_boxes, 1, dtype=boxes.dtype, device=boxes.device)
+            boxes_with_batch = torch.cat([batch_idx, boxes_2d], dim=1)  # (N, 5)
+
+            sampled = torchvision.ops.roi_align(img_nchw, boxes_with_batch, geo.roi_size)
+            proj = geo.boxes_pool_project(sampled)
+            proj = proj.view(bs, n_boxes, -1).transpose(0, 1)
+
+            if boxes_embed is None:
+                boxes_embed = proj
+            else:
+                boxes_embed = boxes_embed + proj
+
+        if geo.boxes_pos_enc_project is not None:
+            cx, cy, w, h = boxes.unbind(-1)
+            enc = geo.pos_enc.encode_boxes(cx.flatten(), cy.flatten(), w.flatten(), h.flatten())
+            enc = enc.view(n_boxes, bs, enc.shape[-1])
+            proj = geo.boxes_pos_enc_project(enc)
+
+            if boxes_embed is None:
+                boxes_embed = proj
+            else:
+                boxes_embed = boxes_embed + proj
+
+        label_embed = geo.label_embed(box_labels.long())
+        boxes_embed = label_embed + boxes_embed
+
+        cls = geo.cls_embed.weight.view(1, 1, -1).expand(1, bs, -1)
+        cls_mask = torch.zeros(bs, 1, dtype=box_mask.dtype, device=box_mask.device)
+
+        combined = torch.cat([boxes_embed, cls], dim=0)
+        combined_mask = torch.cat([box_mask, cls_mask], dim=1)
+
+        if geo.final_proj is not None:
+            combined = geo.norm(geo.final_proj(combined))
+
+        if geo.encode is not None:
+            for lay in geo.encode:
+                combined = lay(
+                    tgt=combined,
+                    memory=img_feat,
+                    tgt_key_padding_mask=combined_mask,
+                    pos=img_pos,
+                )
+            combined = geo.encode_norm(combined)
+
+        return combined, combined_mask
+
+
 # ============================================================================
 # Part 2b: Tracker Wrapper Classes (SAM1 task / Video)
 # ============================================================================
@@ -766,6 +862,35 @@ class Sam3MemoryAttentionModel(nn.Module):
         )
 
 
+class Sam3SAM1FeaturePrepModel(nn.Module):
+    """
+    Wraps conv_s0, conv_s1, and no_mem_embed for OpenVINO conversion.
+
+    These are SAM1-task frozen weights used to prepare backbone features
+    before the SAM2 prompt encoder / mask decoder.  Converting to OV IR
+    eliminates the last torch weight ops from the inference pipeline.
+
+    Inputs:
+        fpn0: (B, C0, H0, W0)  — backbone FPN level 0
+        fpn1: (B, C1, H1, W1)  — backbone FPN level 1
+
+    Outputs:
+        out0: conv_s0(fpn0)   — (B, C_out, H0, W0)
+        out1: conv_s1(fpn1)   — (B, C_out, H1, W1)
+        no_mem_embed          — (1, 1, C) constant
+    """
+
+    def __init__(self, conv_s0, conv_s1, no_mem_embed):
+        super().__init__()
+        self.conv_s0 = conv_s0
+        self.conv_s1 = conv_s1
+        self.register_buffer("no_mem_embed", no_mem_embed)
+
+    @torch.no_grad()
+    def forward(self, fpn0: Tensor, fpn1: Tensor):
+        return self.conv_s0(fpn0), self.conv_s1(fpn1), self.no_mem_embed
+
+
 # ============================================================================
 # Part 3: Model Conversion Utilities
 # ============================================================================
@@ -779,7 +904,9 @@ def convert_and_save_model(
 ):
     """Convert a PyTorch model wrapper to OpenVINO IR and save."""
     import os
+    from pathlib import Path
 
+    save_path = str(Path(save_path).resolve())
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
     if os.path.exists(save_path):
@@ -802,33 +929,148 @@ def convert_and_save_model(
 # ============================================================================
 
 
-def save_sam3_auxiliary(model, path: str) -> None:
+def convert_geometry_encoder_to_ov(model, save_dir: str, max_boxes: int = 10) -> None:
     """
-    Save the geometry encoder PyTorch module needed for OV inference (~31 MB).
+    Convert the geometry encoder to OpenVINO IR.
 
-    bbox_embed and decoder_norm are now baked into decoder_scoring.xml, so they
-    no longer need to be saved here.
-
-    Note: inst_interactive_predictor (SAM1 task) contains torch.jit.script
-    modules that cannot be pickled. For SAM1 task, the full model is still
-    needed (pass the full model as auxiliary= to OVSam3Processor instead of
-    loading from this file).
+    The geometry encoder (Sam3GeometryEncoderForOV) is converted to OV IR
+    so the pipeline contains NO PyTorch modules with weights at inference.
     """
-    import copy, torch
+    import copy
+    from pathlib import Path
 
-    torch.save(
-        {
-            "geometry_encoder": copy.deepcopy(model.geometry_encoder).cpu(),
-        },
-        path,
+    save_dir = Path(save_dir)
+    ov_geo_path = save_dir / "geometry_encoder.xml"
+
+    if ov_geo_path.exists():
+        print(f"  [skip] Geometry Encoder already exists at {ov_geo_path}")
+        return ov.Core().read_model(str(ov_geo_path))
+
+    geo_encoder = copy.deepcopy(model.geometry_encoder).cpu()
+    geo_wrapper = Sam3GeometryEncoderForOV(geo_encoder)
+    geo_wrapper.eval()
+
+    # Dummy inputs: (max_boxes, 1, 4), (1, max_boxes), (max_boxes, 1), (HW, 1, C), (HW, 1, C)
+    C = 256
+    HW = 72 * 72  # 5184
+    dummy_box_emb = torch.zeros(max_boxes, 1, 4)
+    dummy_box_mask = torch.ones(1, max_boxes, dtype=torch.bool)
+    dummy_box_labels = torch.ones(max_boxes, 1, dtype=torch.long)
+    dummy_img_feat = torch.randn(HW, 1, C)
+    dummy_img_pos = torch.randn(HW, 1, C)
+
+    ov_model = convert_and_save_model(
+        wrapper_model=geo_wrapper,
+        example_input=(dummy_box_emb, dummy_box_mask, dummy_box_labels, dummy_img_feat, dummy_img_pos),
+        save_path=str(ov_geo_path),
+        model_name="Geometry Encoder",
     )
-    print(f"Saved geometry_encoder auxiliary to {path}")
+    return ov_model
+
+
+def convert_sam1_feature_prep_to_ov(model, save_dir: str):
+    """
+    Convert SAM1 feature-prep weights (conv_s0, conv_s1, no_mem_embed)
+    to a single OpenVINO IR model.  Also saves scalar/list config as JSON.
+
+    Returns the OV model, or None if the model has no SAM1 predictor.
+    """
+    import copy, json
+    from pathlib import Path
+
+    predictor = getattr(model, "inst_interactive_predictor", None)
+    if predictor is None:
+        print("  [skip] No SAM1 predictor found — skipping")
+        return None
+
+    save_dir = Path(save_dir)
+    ov_path = save_dir / "sam1_feature_prep.xml"
+    cfg_path = save_dir / "sam1_config.json"
+
+    # Save scalar/list config (no weights)
+    tracker_model = predictor.model
+    config = {
+        "bb_feat_sizes": predictor._bb_feat_sizes,
+        "mask_threshold": float(predictor.mask_threshold),
+        "image_size": int(tracker_model.image_size),
+        "num_feature_levels": int(tracker_model.num_feature_levels),
+    }
+    with open(cfg_path, "w") as f:
+        json.dump(config, f)
+    print(f"  Saved SAM1 config to {cfg_path}")
+
+    if ov_path.exists():
+        print(f"  [skip] SAM1 Feature Prep already exists at {ov_path}")
+        return ov.Core().read_model(str(ov_path))
+
+    # Build wrapper from original model's conv layers
+    wrapper = Sam3SAM1FeaturePrepModel(
+        conv_s0=copy.deepcopy(tracker_model.sam_mask_decoder.conv_s0).cpu(),
+        conv_s1=copy.deepcopy(tracker_model.sam_mask_decoder.conv_s1).cpu(),
+        no_mem_embed=tracker_model.no_mem_embed.detach().cpu().clone(),
+    )
+    wrapper.eval()
+
+    # Dummy inputs — spatial sizes from bb_feat_sizes (reversed: highest-res first)
+    bb = predictor._bb_feat_sizes  # e.g. [(72,72), (36,36), (18,18)] or similar
+    # conv_s0 is applied to fpn[0] (highest res), conv_s1 to fpn[1]
+    c0_in = tracker_model.sam_mask_decoder.conv_s0.in_channels
+    c1_in = tracker_model.sam_mask_decoder.conv_s1.in_channels
+    h0, w0 = bb[0]
+    h1, w1 = bb[1]
+    dummy_fpn0 = torch.randn(1, c0_in, h0, w0)
+    dummy_fpn1 = torch.randn(1, c1_in, h1, w1)
+
+    ov_model = convert_and_save_model(
+        wrapper_model=wrapper,
+        example_input=(dummy_fpn0, dummy_fpn1),
+        save_path=str(ov_path),
+        model_name="SAM1 Feature Prep",
+    )
+    return ov_model
+
+
+def load_sam1_config(path: str) -> dict:
+    """Load SAM1 scalar/list config from JSON (no weights — those are in OV IR)."""
+    import json
+
+    with open(path, "r") as f:
+        config = json.load(f)
+    # Restore list-of-tuples structure
+    config["bb_feat_sizes"] = [tuple(x) for x in config["bb_feat_sizes"]]
+    return config
+
+
+# ---- backward-compat aliases (deprecated) ----
+def save_sam3_auxiliary(model, path: str) -> None:
+    """Legacy helper — prefer convert_geometry_encoder_to_ov + save_sam1_weights."""
+    import copy
+
+    data = {
+        "geometry_encoder": copy.deepcopy(model.geometry_encoder).cpu(),
+    }
+
+    predictor = getattr(model, "inst_interactive_predictor", None)
+    if predictor is not None:
+        tracker_model = predictor.model
+        data["sam1_config"] = {
+            "conv_s0_weight": tracker_model.sam_mask_decoder.conv_s0.weight.detach().cpu().clone(),
+            "conv_s0_bias": tracker_model.sam_mask_decoder.conv_s0.bias.detach().cpu().clone(),
+            "conv_s1_weight": tracker_model.sam_mask_decoder.conv_s1.weight.detach().cpu().clone(),
+            "conv_s1_bias": tracker_model.sam_mask_decoder.conv_s1.bias.detach().cpu().clone(),
+            "no_mem_embed": tracker_model.no_mem_embed.detach().cpu().clone(),
+            "bb_feat_sizes": predictor._bb_feat_sizes,
+            "mask_threshold": predictor.mask_threshold,
+            "image_size": tracker_model.image_size,
+            "num_feature_levels": tracker_model.num_feature_levels,
+        }
+
+    torch.save(data, path)
+    print(f"Saved auxiliary to {path}")
 
 
 def load_sam3_auxiliary(path: str) -> dict:
-    """Load auxiliary modules saved by save_sam3_auxiliary()."""
-    import torch
-
+    """Legacy loader — prefer convert_sam1_feature_prep_to_ov."""
     return torch.load(path, map_location="cpu", weights_only=False)
 
 
@@ -871,63 +1113,61 @@ class OVSam3Processor:
         ov_scoring,  # scoring + bbox_embed + decoder_norm
         ov_seg_head,
         tokenizer,
-        auxiliary=None,  # kept for backward compat / SAM1 task (inst_predictor)
         ov_prompt_encoder=None,  # OV compiled SAM2 prompt encoder (for SAM1 task)
         ov_mask_decoder=None,  # OV compiled SAM2 mask decoder (for SAM1 task)
+        ov_geometry_encoder=None,  # OV compiled geometry encoder
+        ov_sam1_feature_prep=None,  # OV compiled SAM1 feature prep (conv_s0/s1 + no_mem_embed)
+        sam1_config_path=None,  # path to sam1_config.json (scalar config only)
         resolution=1008,
         confidence_threshold=0.5,
         max_boxes=10,
-        pt_geometry_encoder=None,  # PyTorch geometry encoder (roi_align doesn't convert to OV)
+        auxiliary_path=None,  # DEPRECATED: path to auxiliary.pt (legacy fallback)
+        sam1_config=None,  # DEPRECATED: dict with SAM1 frozen weights
     ):
-        # All weighted PyTorch modules are now in OV models.
-        # auxiliary is only needed to extract frozen weights for SAM1 task:
-        #   conv_s0, conv_s1 (1x1 conv weights), no_mem_embed, and predictor config.
         self.ov_image_encoder = ov_image_encoder
         self.ov_text_encoder = ov_text_encoder
-        self.pt_geometry_encoder = pt_geometry_encoder
         self.ov_transformer_encoder = ov_transformer_encoder
         self.ov_decoder = ov_decoder
         self.ov_scoring = ov_scoring
         self.ov_seg_head = ov_seg_head
         self.ov_prompt_encoder = ov_prompt_encoder
         self.ov_mask_decoder = ov_mask_decoder
+        self.ov_geometry_encoder = ov_geometry_encoder
+        self.ov_sam1_feature_prep = ov_sam1_feature_prep
         self.tokenizer = tokenizer
         self.resolution = resolution
         self.confidence_threshold = confidence_threshold
         self.max_boxes = max_boxes
 
-        # Extract frozen weights from auxiliary for SAM1 task (no nn.Module kept)
+        # Legacy fallback: load geometry encoder from auxiliary.pt as PyTorch module
+        self._pt_geometry_encoder = None
+        if ov_geometry_encoder is None and auxiliary_path is not None:
+            aux_data = load_sam3_auxiliary(auxiliary_path)
+            if "geometry_encoder" in aux_data:
+                self._pt_geometry_encoder = Sam3GeometryEncoderModel(
+                    geometry_encoder=aux_data["geometry_encoder"]
+                )
+                self._pt_geometry_encoder.eval()
+            if sam1_config is None and "sam1_config" in aux_data:
+                sam1_config = aux_data["sam1_config"]
+
+        # Load SAM1 config from JSON (preferred) or legacy sam1_config dict
+        if sam1_config_path is not None and sam1_config is None:
+            sam1_config = load_sam1_config(sam1_config_path)
+
+        # SAM1 task config (scalar/list values — weights are in ov_sam1_feature_prep)
         self._sam1_ready = False
-        self._conv_s0_weight = None
-        self._conv_s0_bias = None
-        self._conv_s1_weight = None
-        self._conv_s1_bias = None
-        self._no_mem_embed = None
         self._bb_feat_sizes = None
         self._mask_threshold = 0.0
         self._sam1_image_size = resolution
         self._sam1_num_feature_levels = 3
 
-        if auxiliary is not None:
-            predictor = None
-            if isinstance(auxiliary, dict):
-                predictor = auxiliary.get("inst_predictor", None)
-            else:
-                predictor = getattr(auxiliary, "inst_interactive_predictor", None)
-
-            if predictor is not None:
-                tracker_model = predictor.model
-                # Extract conv_s0/conv_s1 weights as frozen tensors
-                self._conv_s0_weight = tracker_model.sam_mask_decoder.conv_s0.weight.detach().clone()
-                self._conv_s0_bias = tracker_model.sam_mask_decoder.conv_s0.bias.detach().clone()
-                self._conv_s1_weight = tracker_model.sam_mask_decoder.conv_s1.weight.detach().clone()
-                self._conv_s1_bias = tracker_model.sam_mask_decoder.conv_s1.bias.detach().clone()
-                self._no_mem_embed = tracker_model.no_mem_embed.detach().clone()
-                self._bb_feat_sizes = predictor._bb_feat_sizes
-                self._mask_threshold = predictor.mask_threshold
-                self._sam1_image_size = tracker_model.image_size
-                self._sam1_num_feature_levels = tracker_model.num_feature_levels
-                self._sam1_ready = True
+        if sam1_config is not None:
+            self._bb_feat_sizes = sam1_config.get("bb_feat_sizes", sam1_config.get("bb_feat_sizes"))
+            self._mask_threshold = sam1_config.get("mask_threshold", 0.0)
+            self._sam1_image_size = sam1_config.get("image_size", resolution)
+            self._sam1_num_feature_levels = sam1_config.get("num_feature_levels", 3)
+            self._sam1_ready = True
 
         from torchvision.transforms import v2
 
@@ -1097,15 +1337,30 @@ class OVSam3Processor:
             box_mask = raw_mask
             box_labels_t = raw_labels
 
-        # Step 3: Run PyTorch geometry encoder (roi_align doesn't convert to OV IR)
-        with torch.inference_mode():
-            geo_feats, geo_masks = self.pt_geometry_encoder(
-                box_embeddings,
-                box_mask,
-                box_labels_t,
-                img_feats[0],
-                img_pos_embeds[0],
+        # Step 3: Run geometry encoder
+        if self.ov_geometry_encoder is not None:
+            # Pure OV path — no PyTorch weights
+            geo_result = self.ov_geometry_encoder(
+                [
+                    box_embeddings.numpy(),
+                    box_mask.numpy(),
+                    box_labels_t.numpy(),
+                    img_feats[0].numpy(),
+                    img_pos_embeds[0].numpy(),
+                ]
             )
+            geo_feats = torch.from_numpy(np.array(geo_result[0]))
+            geo_masks = torch.from_numpy(np.array(geo_result[1]))
+        else:
+            # Legacy fallback: PyTorch geometry encoder
+            with torch.inference_mode():
+                geo_feats, geo_masks = self._pt_geometry_encoder(
+                    box_embeddings,
+                    box_mask,
+                    box_labels_t,
+                    img_feats[0],
+                    img_pos_embeds[0],
+                )
         geo_masks = geo_masks.bool()
 
         # Step 4: Assemble combined prompt for transformer encoder
@@ -1222,26 +1477,24 @@ class OVSam3Processor:
             raise ValueError("No sam2 features. set_image must be called with sam2-enabled encoder.")
 
         if not self._sam1_ready:
-            raise RuntimeError("SAM1 task requires frozen weights from auxiliary model. " "Pass the full model as auxiliary= to OVSam3Processor.")
+            raise RuntimeError("SAM1 task requires config. Pass sam1_config_path= to OVSam3Processor.")
+        if self.ov_sam1_feature_prep is None:
+            raise RuntimeError("SAM1 task requires ov_sam1_feature_prep. Compile sam1_feature_prep.xml and pass it to OVSam3Processor.")
         if self.ov_prompt_encoder is None or self.ov_mask_decoder is None:
             raise RuntimeError("SAM1 task requires ov_prompt_encoder and ov_mask_decoder. " "Compile and pass them to OVSam3Processor.")
 
-        # Prepare features using extracted frozen weights (no nn.Module)
+        # Prepare features using OV sam1_feature_prep model (conv_s0/s1 + no_mem_embed)
         backbone_out = state["backbone_out"]["sam2_backbone_out"]
         backbone_out = backbone_out.copy()
         backbone_out["backbone_fpn"] = list(backbone_out["backbone_fpn"])
 
-        # Apply conv_s0/conv_s1 using frozen weights (F.conv2d, not nn.Module)
-        backbone_out["backbone_fpn"][0] = F.conv2d(
-            backbone_out["backbone_fpn"][0],
-            self._conv_s0_weight,
-            self._conv_s0_bias,
+        # Run OV feature prep: conv_s0(fpn0), conv_s1(fpn1), no_mem_embed
+        prep_result = self.ov_sam1_feature_prep(
+            [backbone_out["backbone_fpn"][0].numpy(), backbone_out["backbone_fpn"][1].numpy()]
         )
-        backbone_out["backbone_fpn"][1] = F.conv2d(
-            backbone_out["backbone_fpn"][1],
-            self._conv_s1_weight,
-            self._conv_s1_bias,
-        )
+        backbone_out["backbone_fpn"][0] = torch.from_numpy(np.array(prep_result[0]))
+        backbone_out["backbone_fpn"][1] = torch.from_numpy(np.array(prep_result[1]))
+        no_mem_embed = torch.from_numpy(np.array(prep_result[2]))
 
         # _prepare_backbone_features inline (no model dependency)
         feature_maps = backbone_out["backbone_fpn"][-self._sam1_num_feature_levels :]
@@ -1249,8 +1502,8 @@ class OVSam3Processor:
         feat_sizes = [(x.shape[-2], x.shape[-1]) for x in vision_pos_embeds]
         vision_feats = [x.flatten(2).permute(2, 0, 1) for x in feature_maps]
 
-        # Add no_mem_embed (frozen parameter)
-        vision_feats[-1] = vision_feats[-1] + self._no_mem_embed
+        # Add no_mem_embed (from OV model output)
+        vision_feats[-1] = vision_feats[-1] + no_mem_embed
 
         # Reshape to NCHW
         feats = [feat.permute(1, 2, 0).view(1, -1, *feat_size) for feat, feat_size in zip(vision_feats[::-1], self._bb_feat_sizes[::-1])][::-1]
@@ -1376,26 +1629,20 @@ class OVSam3InteractiveImagePredictor:
         ov_image_encoder,
         ov_prompt_encoder,
         ov_mask_decoder,
+        ov_sam1_feature_prep,  # OV compiled SAM1 feature prep model
         image_size=1008,
     ):
         self.ov_image_encoder = ov_image_encoder
         self.ov_prompt_encoder = ov_prompt_encoder
         self.ov_mask_decoder = ov_mask_decoder
+        self.ov_sam1_feature_prep = ov_sam1_feature_prep
         self.image_size = image_size
         self._transforms = original_predictor._transforms
         self._features = None
         self._orig_hw = None
         self._bb_feat_sizes = original_predictor._bb_feat_sizes
         self.mask_threshold = original_predictor.mask_threshold
-
-        # Extract frozen weights from original model (no nn.Module kept)
-        tracker_model = original_predictor.model
-        self._conv_s0_weight = tracker_model.sam_mask_decoder.conv_s0.weight.detach().clone()
-        self._conv_s0_bias = tracker_model.sam_mask_decoder.conv_s0.bias.detach().clone()
-        self._conv_s1_weight = tracker_model.sam_mask_decoder.conv_s1.weight.detach().clone()
-        self._conv_s1_bias = tracker_model.sam_mask_decoder.conv_s1.bias.detach().clone()
-        self._no_mem_embed = tracker_model.no_mem_embed.detach().clone()
-        self._num_feature_levels = tracker_model.num_feature_levels
+        self._num_feature_levels = original_predictor.model.num_feature_levels
 
     @torch.no_grad()
     def set_image(self, image):
@@ -1425,9 +1672,13 @@ class OVSam3InteractiveImagePredictor:
             sam2_fpn = [torch.from_numpy(np.array(ov_result[i])) for i in range(n_levels)]
             sam2_pos = [torch.from_numpy(np.array(ov_result[n_levels + i])) for i in range(n_levels)]
 
-        # Apply conv_s0/conv_s1 using frozen weights (F.conv2d, not nn.Module)
-        sam2_fpn[0] = F.conv2d(sam2_fpn[0], self._conv_s0_weight, self._conv_s0_bias)
-        sam2_fpn[1] = F.conv2d(sam2_fpn[1], self._conv_s1_weight, self._conv_s1_bias)
+        # Run OV feature prep: conv_s0(fpn0), conv_s1(fpn1), no_mem_embed
+        prep_result = self.ov_sam1_feature_prep(
+            [sam2_fpn[0].numpy(), sam2_fpn[1].numpy()]
+        )
+        sam2_fpn[0] = torch.from_numpy(np.array(prep_result[0]))
+        sam2_fpn[1] = torch.from_numpy(np.array(prep_result[1]))
+        no_mem_embed = torch.from_numpy(np.array(prep_result[2]))
 
         # _prepare_backbone_features inline (no model dependency)
         backbone_out = {
@@ -1439,8 +1690,8 @@ class OVSam3InteractiveImagePredictor:
         vision_pos_embeds = backbone_out["vision_pos_enc"][-self._num_feature_levels :]
         vision_feats = [x.flatten(2).permute(2, 0, 1) for x in feature_maps]
 
-        # Add no_mem_embed (frozen parameter)
-        vision_feats[-1] = vision_feats[-1] + self._no_mem_embed
+        # Add no_mem_embed (from OV model output)
+        vision_feats[-1] = vision_feats[-1] + no_mem_embed
 
         # Reshape to NCHW (same as predict_inst)
         feats = [feat.permute(1, 2, 0).view(1, -1, *feat_size) for feat, feat_size in zip(vision_feats[::-1], self._bb_feat_sizes[::-1])][::-1]
