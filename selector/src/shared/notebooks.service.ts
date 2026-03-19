@@ -118,7 +118,7 @@ class NotebooksService {
   ): Parameters<Array<IArchivedNotebookMetadata>['sort']>[0] {
     if (sort === SORT_OPTIONS.RECENTLY_ADDED || sort === SORT_OPTIONS.RECENTLY_UPDATED) {
       // Sort by lastBranch descending (newest release first)
-      return (a, b) => b.lastBranch.localeCompare(a.lastBranch);
+      return (a, b) => b.lastBranch.localeCompare(a.lastBranch, undefined, { numeric: true });
     }
     if (sort === SORT_OPTIONS.NAME_ASCENDING) {
       return (a, b) => a.title.toUpperCase().localeCompare(b.title.toUpperCase());
