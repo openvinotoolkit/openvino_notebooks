@@ -60,13 +60,7 @@ def list_notebooks(ref: str) -> list[str]:
         check=True,
     )
     output = result.stdout.decode("utf-8", errors="replace")
-    return [
-        f
-        for f in output.strip().split("\n")
-        if f.endswith(".ipynb")
-        and ".ipynb_checkpoints" not in f
-        and "notebook_utils.ipynb" not in f
-    ]
+    return [f for f in output.strip().split("\n") if f.endswith(".ipynb") and ".ipynb_checkpoints" not in f and "notebook_utils.ipynb" not in f]
 
 
 def get_notebook_json(ref: str, file_path: str) -> dict | None:
