@@ -75,12 +75,12 @@ def make_demo(model, processor):
             empty_bin = gr.Button("🧹 Clear History (清除历史)")
             regen_btn = gr.Button("🤔️ Regenerate (重试)")
 
-        submit_btn.click(
-            fn=add_text, inputs=[chatbot, task_history, text_input, audio_input], outputs=[chatbot, task_history, text_input, audio_input]
-        ).then(predict, [chatbot, task_history], [chatbot, task_history], show_progress=True)
-        text_input.submit(
-            fn=add_text, inputs=[chatbot, task_history, text_input, audio_input], outputs=[chatbot, task_history, text_input, audio_input]
-        ).then(predict, [chatbot, task_history], [chatbot, task_history], show_progress=True)
+        submit_btn.click(fn=add_text, inputs=[chatbot, task_history, text_input, audio_input], outputs=[chatbot, task_history, text_input, audio_input]).then(
+            predict, [chatbot, task_history], [chatbot, task_history], show_progress=True
+        )
+        text_input.submit(fn=add_text, inputs=[chatbot, task_history, text_input, audio_input], outputs=[chatbot, task_history, text_input, audio_input]).then(
+            predict, [chatbot, task_history], [chatbot, task_history], show_progress=True
+        )
         empty_bin.click(reset_state, outputs=[chatbot, task_history], show_progress=True)
         regen_btn.click(regenerate, [chatbot, task_history], [chatbot, task_history], show_progress=True)
 
