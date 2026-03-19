@@ -109,6 +109,9 @@ class NotebooksService {
   }: IArchivedNotebooksFilters): Promise<[IArchivedNotebookMetadata[], number, number]> {
     const archived = await this._getArchivedNotebooks();
     const filtered = archived.filter(({ title }) => title.toLowerCase().includes(searchValue.toLowerCase()));
+    if (limit === 0) {
+      return [[], filtered.length, archived.length];
+    }
     const sorted = filtered.sort(this._getArchivedCompareFn(sort)).slice(offset, offset + limit);
     return [sorted, filtered.length, archived.length];
   }
@@ -126,6 +129,7 @@ class NotebooksService {
     if (sort === SORT_OPTIONS.NAME_DESCENDING) {
       return (a, b) => b.title.toUpperCase().localeCompare(a.title.toUpperCase());
     }
+    return () => 0;
   }
 
   private _getCompareFn(sort: SortValues): Parameters<Array<INotebookMetadata>['sort']>[0] {

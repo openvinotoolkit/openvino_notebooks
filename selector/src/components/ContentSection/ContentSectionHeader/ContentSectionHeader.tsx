@@ -71,7 +71,9 @@ export const ContentSectionHeader = ({
             aria-selected={viewMode === 'archived'}
             onClick={() => onViewModeChange('archived')}
           >
-            <span className={sparkClassNames.tabContent}>Archived ({totalArchivedCount})</span>
+            <span className={sparkClassNames.tabContent}>
+              Archived ({isFiltered && viewMode === 'archived' ? `${filteredCount} of ${totalArchivedCount}` : totalArchivedCount})
+            </span>
           </button>
         </nav>
         {isFiltered && (

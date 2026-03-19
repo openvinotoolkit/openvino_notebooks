@@ -32,7 +32,7 @@ export const ArchivedNotebookCard = ({ item }: ArchivedNotebookCardProps): JSX.E
             <OpenvinoLogo></OpenvinoLogo>
             <span className={sparkClassNames.fontImagePlaceholder}>Notebooks</span>
           </div>
-          {item.imageUrl && <img src={item.imageUrl} className="card-image" />}
+          {item.imageUrl && <img src={item.imageUrl} alt={item.title} className="card-image" />}
         </div>
         <div className="card-content">
           <h6 className={sparkClassNames.cardTitle}>

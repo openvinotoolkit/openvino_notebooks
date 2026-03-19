@@ -7,7 +7,7 @@ import { isEmbedded } from '@/shared/iframe-detector';
 import { sendScrollMessage } from '@/shared/iframe-message-emitter';
 import { IArchivedNotebookMetadata, INotebookMetadata } from '@/shared/notebook-metadata';
 import { notebooksService } from '@/shared/notebooks.service';
-import { NotebooksContext, ViewMode } from '@/shared/notebooks-context';
+import { NotebooksContext } from '@/shared/notebooks-context';
 
 import { ContentSectionHeader } from './ContentSectionHeader/ContentSectionHeader';
 import { NotebooksList } from './NotebooksList/NotebooksList';
@@ -79,16 +79,13 @@ export const ContentSection = (): JSX.Element => {
     }
   }, [searchValue, sort, page, itemsPerPage, viewMode]);
 
-  // Also fetch total archived count when in active mode (for tab badge)
+  // Fetch total archived count once (for tab badge)
   useEffect(() => {
     void notebooksService
       .getArchivedNotebooks({ searchValue: '', sort, offset: 0, limit: 0 })
       .then(([, , total]) => setTotalArchivedCount(total));
-  }, [sort]);
-
-  const handleViewModeChange = (mode: ViewMode) => {
-    setViewMode(mode);
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const hasItems = viewMode === 'active' ? notebooks.length > 0 : archivedNotebooks.length > 0;
 
@@ -98,7 +95,7 @@ export const ContentSection = (): JSX.Element => {
         totalActiveCount={totalNotebooksCount}
         filteredCount={currentFilteredCount}
         viewMode={viewMode}
-        onViewModeChange={handleViewModeChange}
+        onViewModeChange={setViewMode}
         totalArchivedCount={totalArchivedCount}
       ></ContentSectionHeader>
       {viewMode === 'active' ? (
