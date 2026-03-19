@@ -1,5 +1,5 @@
-import { NOTEBOOKS_METADATA_FILE_NAME, NOTEBOOKS_STATUS_FILE_NAME } from './constants';
-import { INotebookMetadata } from './notebook-metadata';
+import { ARCHIVED_NOTEBOOKS_FILE_NAME, NOTEBOOKS_METADATA_FILE_NAME, NOTEBOOKS_STATUS_FILE_NAME } from './constants';
+import { IArchivedNotebookMetadata, INotebookMetadata } from './notebook-metadata';
 import { INotebookStatus } from './notebook-status';
 
 export const SORT_OPTIONS = {
@@ -19,6 +19,13 @@ interface INotebooksFilters {
   limit: number;
 }
 
+interface IArchivedNotebooksFilters {
+  searchValue: string;
+  sort: SortValues;
+  offset: number;
+  limit: number;
+}
+
 type NotebooksMap = Record<string, INotebookMetadata & { status?: INotebookStatus['status'] }>;
 
 export type NotebookItem = NotebooksMap[string];
@@ -26,6 +33,7 @@ export type NotebookItem = NotebooksMap[string];
 class NotebooksService {
   private _notebooksMap: NotebooksMap | null = null;
   private _allNotebooksTags: string[] = [];
+  private _archivedNotebooks: IArchivedNotebookMetadata[] | null = null;
 
   private async _getNotebooksMap(): Promise<NotebooksMap> {
     if (!this._notebooksMap) {
@@ -43,6 +51,16 @@ class NotebooksService {
       this._allNotebooksTags = this._getAllNotebooksTags(this._notebooksMap);
     }
     return this._notebooksMap;
+  }
+
+  private async _getArchivedNotebooks(): Promise<IArchivedNotebookMetadata[]> {
+    if (!this._archivedNotebooks) {
+      const { BASE_URL } = import.meta.env;
+      this._archivedNotebooks = await fetch(`${BASE_URL}${ARCHIVED_NOTEBOOKS_FILE_NAME}`)
+        .then((response) => (response.ok ? response.json() : []))
+        .catch(() => []) as IArchivedNotebookMetadata[];
+    }
+    return this._archivedNotebooks;
   }
 
   async getNotebooks({
@@ -81,6 +99,33 @@ class NotebooksService {
 
   get allNotebooksTags(): typeof this._allNotebooksTags {
     return this._allNotebooksTags;
+  }
+
+  async getArchivedNotebooks({
+    searchValue,
+    sort,
+    offset,
+    limit,
+  }: IArchivedNotebooksFilters): Promise<[IArchivedNotebookMetadata[], number, number]> {
+    const archived = await this._getArchivedNotebooks();
+    const filtered = archived.filter(({ title }) => title.toLowerCase().includes(searchValue.toLowerCase()));
+    const sorted = filtered.sort(this._getArchivedCompareFn(sort)).slice(offset, offset + limit);
+    return [sorted, filtered.length, archived.length];
+  }
+
+  private _getArchivedCompareFn(
+    sort: SortValues
+  ): Parameters<Array<IArchivedNotebookMetadata>['sort']>[0] {
+    if (sort === SORT_OPTIONS.RECENTLY_ADDED || sort === SORT_OPTIONS.RECENTLY_UPDATED) {
+      // Sort by lastBranch descending (newest release first)
+      return (a, b) => b.lastBranch.localeCompare(a.lastBranch);
+    }
+    if (sort === SORT_OPTIONS.NAME_ASCENDING) {
+      return (a, b) => a.title.toUpperCase().localeCompare(b.title.toUpperCase());
+    }
+    if (sort === SORT_OPTIONS.NAME_DESCENDING) {
+      return (a, b) => b.title.toUpperCase().localeCompare(a.title.toUpperCase());
+    }
   }
 
   private _getCompareFn(sort: SortValues): Parameters<Array<INotebookMetadata>['sort']>[0] {

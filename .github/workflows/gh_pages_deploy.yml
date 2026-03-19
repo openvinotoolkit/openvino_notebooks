@@ -44,6 +44,19 @@ jobs:
         shell: bash
         run: npm ci
 
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Update archived notebooks data
+        shell: bash
+        run: |
+          git fetch origin --no-tags
+          python selector/src/notebook-metadata/collect-archived-notebooks.py
+        env:
+          REMOTE: origin
+
       - name: Validate all notebooks metadata
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
@@ -103,7 +116,8 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git add ./notebooks/README.md
-          git commit -m "Update notebooks index readme file [skip ci]" || echo "Index file is not changed"
+          git add ./selector/src/notebook-metadata/archived-notebooks.json
+          git commit -m "Update notebooks index and archived notebooks data [skip ci]" || echo "Index files are not changed"
           git push origin HEAD:latest
 
   deploy_github_pages:
