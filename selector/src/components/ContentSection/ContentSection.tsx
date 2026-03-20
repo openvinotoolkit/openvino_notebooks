@@ -6,7 +6,7 @@ import { Pagination } from '@/components/shared/Pagination/Pagination';
 import { isEmbedded } from '@/shared/iframe-detector';
 import { sendScrollMessage } from '@/shared/iframe-message-emitter';
 import { IArchivedNotebookMetadata, INotebookMetadata } from '@/shared/notebook-metadata';
-import { notebooksService } from '@/shared/notebooks.service';
+import { notebooksService, SORT_OPTIONS } from '@/shared/notebooks.service';
 import { NotebooksContext } from '@/shared/notebooks-context';
 
 import { ContentSectionHeader } from './ContentSectionHeader/ContentSectionHeader';
@@ -82,9 +82,8 @@ export const ContentSection = (): JSX.Element => {
   // Fetch total archived count once (for tab badge)
   useEffect(() => {
     void notebooksService
-      .getArchivedNotebooks({ searchValue: '', sort, offset: 0, limit: 0 })
+      .getArchivedNotebooks({ searchValue: '', sort: SORT_OPTIONS.RECENTLY_ADDED, offset: 0, limit: 0 })
       .then(([, , total]) => setTotalArchivedCount(total));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const hasItems = viewMode === 'active' ? notebooks.length > 0 : archivedNotebooks.length > 0;
