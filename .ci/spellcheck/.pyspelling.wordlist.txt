@@ -126,6 +126,7 @@ CLI
 cli
 CLIP's
 ClipBasedHeadEstimator
+CLS
 CMs
 cmu
 CNNs
@@ -164,6 +165,7 @@ coreference
 CoSENT
 CosyVoice
 Conv
+conv
 cpm
 cpp
 cpu
@@ -522,6 +524,7 @@ langchain
 Lasinger
 latents
 LaTeX
+LayerNorm
 LCMs
 LCMScheduler
 LDM
@@ -604,6 +607,7 @@ medprob
 mel
 MeloTTS
 Mels
+mem
 MERCHANTABILITY
 Meta's
 MF
@@ -943,6 +947,7 @@ RMSNorm
 RoBERTa
 roberta
 ROI
+roi
 RoPE
 rollout
 ROUGE
