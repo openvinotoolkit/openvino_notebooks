@@ -1188,7 +1188,7 @@ class OVFunASRNano:
             key = []
             for _ in data_in:
                 chars = string.ascii_letters + string.digits
-                key.append("rand_key_" + "".join(random.choice(chars) for _ in range(13)))
+                key.append("rand_key_" + "".join(random.choice(chars) for _ in range(13)))  # nosec B311 - non-secret inference key
 
         return self.inference_llm(
             data_in,

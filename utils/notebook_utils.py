@@ -86,7 +86,7 @@ def load_image(name: str, url: str = None):
     if not Path(name).exists():
         # Set User-Agent to Mozilla because some websites block
         # requests with User-Agent Python
-        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
         array = np.asarray(bytearray(response.content), dtype="uint8")
         image = cv2.imdecode(array, -1)  # Loads the image as BGR
         cv2.imwrite(name, image)
@@ -140,7 +140,7 @@ def download_file(
         Path(directory).mkdir(parents=True, exist_ok=True)
 
     try:
-        response = requests.get(url=url, headers={"User-agent": "Mozilla/5.0"}, stream=True)
+        response = requests.get(url=url, headers={"User-agent": "Mozilla/5.0"}, stream=True, timeout=30)
         response.raise_for_status()
     except (
         requests.exceptions.HTTPError
@@ -751,6 +751,6 @@ def collect_telemetry(file: str = ""):
         }
         if file:
             params["file"] = file
-        requests.get(url, params=params)
-    except Exception:
+        requests.get(url, params=params, timeout=10)
+    except Exception:  # nosec B110 - telemetry is best-effort, must not break notebook
         pass

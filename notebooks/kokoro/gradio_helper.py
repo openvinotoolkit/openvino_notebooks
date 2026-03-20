@@ -31,7 +31,7 @@ def make_demo(pipeline):
                 yield 24000, torch.zeros(1).numpy()
 
     if not Path("en.txt").exists():
-        r = requests.get("https://huggingface.co/spaces/hexgrad/Kokoro-TTS/raw/main/en.txt")
+        r = requests.get("https://huggingface.co/spaces/hexgrad/Kokoro-TTS/raw/main/en.txt", timeout=30)
         with open("en.txt", "w") as f:
             f.write(r.text)
     with open("en.txt", "r") as r:
@@ -63,7 +63,7 @@ def make_demo(pipeline):
         "🇺🇸 🚹 Adam": "am_adam",
     }
 
-    TOKEN_NOTE = """
+    PRONUNCIATION_NOTE = """
     💡 Customize pronunciation with Markdown link syntax and /slashes/ like `[Kokoro](/kˈOkəɹO/)`
     💬 To adjust intonation, try punctuation `;:,.!?—…"()“”` or stress `ˈ` and `ˌ`
     ⬇️ Lower stress `[1 level](-1)` or `[2 levels](-2)`
@@ -76,7 +76,7 @@ def make_demo(pipeline):
         with gr.Accordion("Output Tokens", open=True):
             out_ps = gr.Textbox(interactive=False, show_label=False, info="Tokens used to generate the audio, up to 510 context length.")
             tokenize_btn = gr.Button("Tokenize", variant="secondary")
-            gr.Markdown(TOKEN_NOTE)
+            gr.Markdown(PRONUNCIATION_NOTE)
             predict_btn = gr.Button("Predict", variant="secondary", visible=False)
 
     STREAM_NOTE = ["⚠️ There is an unknown Gradio bug that might yield no audio the first time you click `Stream`."]

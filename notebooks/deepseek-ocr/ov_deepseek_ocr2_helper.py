@@ -147,9 +147,9 @@ def draw_bounding_boxes(image, refs, ouput_path):
                         draw.rectangle([text_x, text_y, text_x + text_width, text_y + text_height], fill=(255, 255, 255, 30))
 
                         draw.text((text_x, text_y), label_type, font=font, fill=color)
-                    except:
+                    except:  # nosec B110 - best-effort drawing, skip malformed elements
                         pass
-        except:
+        except:  # nosec B112 - skip malformed OCR entries, continue to next
             continue
     img_draw.paste(overlay, (0, 0), overlay)
     return img_draw
@@ -1427,7 +1427,7 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
         image_transform = BasicImageTransform(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5), normalize=True)
         images_seq_mask = []
 
-        image_token = "<image>"
+        image_token = "<image>"  # nosec B105 - model special token, not a password
         image_token_id = 128815
         text_splits = prompt.split(image_token)
 
@@ -1665,7 +1665,7 @@ class OVDeepseekOCR2ForCausalLM(GenerationMixin):
 
                         ax.scatter(p0[0], p0[1], s=5, color="k")
                         ax.scatter(p1[0], p1[1], s=5, color="k")
-                    except:
+                    except:  # nosec B110 - best-effort geometry parsing from model output
                         pass
 
                 for endpoint in endpoints:

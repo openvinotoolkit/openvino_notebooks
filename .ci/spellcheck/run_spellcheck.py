@@ -10,7 +10,7 @@ spellcheck_config_filename = ".pyspelling.yml"
 PYTHONPATH = ":".join([os.environ.get("PYTHONPATH") or "", str(spellcheck_dir)])
 
 # Run PySpelling tool
-result = subprocess.run(
+result = subprocess.run(  # nosec B603 - hardcoded pyspelling command, no user input
     args=["pyspelling", "--config", f"{spellcheck_dir / spellcheck_config_filename}"],
     universal_newlines=True,
     stdout=subprocess.PIPE,

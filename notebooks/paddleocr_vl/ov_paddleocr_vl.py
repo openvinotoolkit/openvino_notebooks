@@ -702,7 +702,7 @@ class VisionModel:
 
                 try:
                     im.save(out_path)
-                except Exception:
+                except Exception:  # nosec B110 - non-critical image save, caller validates results
                     # Ignore image write errors; the caller will raise if no images exist.
                     pass
 
@@ -737,7 +737,7 @@ class VisionModel:
 
         # Limit the number of samples
         if len(image_paths) > max_train_samples:
-            image_paths = random.sample(image_paths, max_train_samples)
+            image_paths = random.sample(image_paths, max_train_samples)  # nosec B311 - random subset for ML calibration, not security
 
         # Create a simple dataset with image paths
         class LocalImageDataset:
@@ -802,7 +802,7 @@ class PaddleOCR_VL_OV:
         pretrained_model_path=None,
         model=None,
         tokenizer=None,
-        ov_model_path="/tmp/paddleocr_vl_ov/",
+        ov_model_path="/tmp/paddleocr_vl_ov/",  # nosec B108 - overridable default for converted model cache
         device="CPU",
         llm_int4_compress=False,
         llm_int8_compress=False,

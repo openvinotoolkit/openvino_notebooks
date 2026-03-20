@@ -21,7 +21,7 @@ function App(): JSX.Element {
       <main className="flex-col flex-1">
         <div className="flex flex-1">
           <NotebooksContext.Provider value={notebooksSelector}>
-            <FiltersPanel />
+            {notebooksSelector.viewMode === 'active' && <FiltersPanel />}
             <ContentSection />
           </NotebooksContext.Provider>
         </div>

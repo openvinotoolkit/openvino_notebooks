@@ -34,7 +34,7 @@ def show_supported(supported):
 
 
 def pip_check():
-    result = subprocess.run(["pip", "check"], universal_newlines=True, stdout=subprocess.PIPE)
+    result = subprocess.run(["pip", "check"], universal_newlines=True, stdout=subprocess.PIPE)  # nosec B603 B607 - hardcoded pip check command
     if "No broken requirements found" in result.stdout:
         return True, ""
     else:

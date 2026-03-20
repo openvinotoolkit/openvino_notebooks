@@ -76,7 +76,7 @@ def make_demo(ov_pipe):
         negative_prompt = "text, watermark, copyright, blurry, low resolution"
 
         if randomize_seed:
-            seed = random.randint(0, MAX_SEED)
+            seed = random.randint(0, MAX_SEED)  # nosec B311 - UI seed for image generation, not security
 
         # Convert aspect ratio to width and height
         width, height = get_image_size(aspect_ratio)

@@ -18,7 +18,7 @@ def download_examples():
     }
     for file_name, url in example_images.items():
         if not Path(file_name).exists():
-            Image.open(requests.get(url, stream=True).raw).save(file_name)
+            Image.open(requests.get(url, stream=True, timeout=30).raw).save(file_name)
 
 
 def make_demo(model, processor):

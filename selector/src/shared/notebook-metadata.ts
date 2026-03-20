@@ -21,3 +21,17 @@ export interface INotebookMetadata {
     other: string[];
   };
 }
+
+export interface IArchivedNotebookMetadata {
+  title: string;
+  path: string;
+  imageUrl: string | null;
+  lastBranch: string;
+  githubUrl: string;
+  tags: {
+    categories: string[];
+    tasks: string[];
+    libraries: string[];
+    other: string[];
+  };
+}
