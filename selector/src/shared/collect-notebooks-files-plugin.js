@@ -31,8 +31,8 @@ export const collectNotebooksFilesPlugin = () => {
       if (config.command === 'build') {
         await generateNotebooksMetadataFile(distPath);
         await fetchNotebooksStatusFile(distPath);
-        await createBuildChecksumFile(distPath);
         copyArchivedNotebooksFile(distPath);
+        await createBuildChecksumFile(distPath);
       }
     },
     async configureServer(devServer) {

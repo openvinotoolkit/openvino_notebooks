@@ -58,16 +58,12 @@ class NotebooksService {
       const { BASE_URL } = import.meta.env;
       try {
         const response = await fetch(`${BASE_URL}${ARCHIVED_NOTEBOOKS_FILE_NAME}`);
-        if (response.ok) {
-          this._archivedNotebooks = (await response.json()) as IArchivedNotebookMetadata[];
-        } else {
-          return [];
-        }
+        this._archivedNotebooks = response.ok ? ((await response.json()) as IArchivedNotebookMetadata[]) : [];
       } catch {
-        return [];
+        this._archivedNotebooks = [];
       }
     }
-    return this._archivedNotebooks ?? [];
+    return this._archivedNotebooks;
   }
 
   async getNotebooks({
@@ -115,7 +111,9 @@ class NotebooksService {
     limit,
   }: IArchivedNotebooksFilters): Promise<[IArchivedNotebookMetadata[], number, number]> {
     const archived = await this._getArchivedNotebooks();
-    const filtered = archived.filter(({ title }) => title.toLowerCase().includes(searchValue.toLowerCase()));
+    const normalizedSearch = searchValue.trim().toLowerCase();
+    const filtered =
+      normalizedSearch === '' ? archived : archived.filter(({ title }) => title.toLowerCase().includes(normalizedSearch));
     if (limit === 0) {
       return [[], filtered.length, archived.length];
     }
