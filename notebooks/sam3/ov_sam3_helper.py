@@ -739,6 +739,113 @@ class Sam3GeometryEncoderForOV(nn.Module):
         return combined, combined_mask
 
 
+class Sam3GeoProjectionsForOV(nn.Module):
+    """
+    Merged weighted projection layers for SAM3 geometry encoder.
+    Contains boxes_direct_project, boxes_pos_enc_project, boxes_pool_project,
+    and label_embed — NO control flow, NO roi_align, NO sinusoidal pos_enc.
+
+    Non-weighted ops (roi_align, pos_enc.encode_boxes, img_pre_norm, CLS concat)
+    are handled in Python by OVSam3Processor.
+
+    Inputs:
+        boxes:         (N, 1, 4)  normalized cxcywh
+        pos_features:  (N, 1, d_pos)  sinusoidal pos encoding (computed in Python)
+        roi_features:  (N, C, roi_h, roi_w)  roi_align output (computed in Python)
+        labels:        (N, 1)  int64  0=neg, 1=pos
+
+    Output:
+        embed: (N, 1, d_model)  box embeddings (sum of all projections + label)
+    """
+
+    def __init__(self, geo):
+        super().__init__()
+        assert geo.boxes_direct_project is not None, "boxes_direct_project required"
+        assert geo.boxes_pool_project is not None, "boxes_pool_project required"
+        assert geo.boxes_pos_enc_project is not None, "boxes_pos_enc_project required"
+
+        self.direct_proj = geo.boxes_direct_project
+        self.pos_enc_proj = geo.boxes_pos_enc_project
+        self.pool_proj = geo.boxes_pool_project
+        self.label_embed = geo.label_embed
+
+    @torch.no_grad()
+    def forward(
+        self,
+        boxes: Tensor,         # (N, 1, 4)
+        pos_features: Tensor,  # (N, 1, d_pos)
+        roi_features: Tensor,  # (N, C, roi_h, roi_w)
+        labels: Tensor,        # (N, 1) int64
+    ):
+        direct = self.direct_proj(boxes)              # (N, 1, C)
+        pos = self.pos_enc_proj(pos_features)         # (N, 1, C)
+        pool = self.pool_proj(roi_features)           # (N, C, 1, 1)
+        pool = pool.squeeze(-1).squeeze(-1).unsqueeze(1)  # (N, 1, C)
+        lab = self.label_embed(labels.long())         # (N, 1, C)
+        return direct + pos + pool + lab
+
+
+class Sam3GeoCrossAttnForOV(nn.Module):
+    """
+    Cross-attention encoder for geometry features.
+    Contains cls_embed, final_proj, norm, encode transformer layers, encode_norm.
+    NO control flow — all modules are always present.
+
+    Inputs:
+        box_embed: (N, 1, C)    box embeddings from GeoProjections
+        box_mask:  (1, N) bool  True=padded
+        img_feat:  (HW, 1, C)  image features seq-first
+        img_pos:   (HW, 1, C)  image position encoding seq-first
+
+    Outputs:
+        encoded: (N+1, 1, C)    +1 for CLS token (always last)
+        mask:    (1, N+1) bool  CLS entry is always False (valid)
+    """
+
+    def __init__(self, geo):
+        super().__init__()
+        assert geo.cls_embed is not None, "cls_embed required"
+        assert geo.final_proj is not None, "final_proj required"
+        assert geo.encode is not None, "encode layers required"
+
+        self.cls_embed = geo.cls_embed
+        self.final_proj = geo.final_proj
+        self.norm = geo.norm
+        self.encode = geo.encode
+        self.encode_norm = geo.encode_norm
+
+    @torch.no_grad()
+    def forward(
+        self,
+        box_embed: Tensor,  # (N, 1, C)
+        box_mask: Tensor,   # (1, N) bool
+        img_feat: Tensor,   # (HW, 1, C)
+        img_pos: Tensor,    # (HW, 1, C)
+    ):
+        bs = box_embed.shape[1]
+
+        # Append CLS token
+        cls = self.cls_embed.weight.view(1, 1, -1).expand(1, bs, -1)
+        cls_mask = torch.zeros(bs, 1, dtype=box_mask.dtype, device=box_mask.device)
+        combined = torch.cat([box_embed, cls], dim=0)       # (N+1, 1, C)
+        combined_mask = torch.cat([box_mask, cls_mask], dim=1)  # (1, N+1)
+
+        # Final projection + norm
+        combined = self.norm(self.final_proj(combined))
+
+        # Cross-attention transformer (unrolled by trace)
+        for lay in self.encode:
+            combined = lay(
+                tgt=combined,
+                memory=img_feat,
+                tgt_key_padding_mask=combined_mask,
+                pos=img_pos,
+            )
+        combined = self.encode_norm(combined)
+
+        return combined, combined_mask
+
+
 # ============================================================================
 # Part 2b: Tracker Wrapper Classes (SAM1 task / Video)
 # ============================================================================
@@ -1041,6 +1148,94 @@ def load_sam1_config(path: str) -> dict:
     return config
 
 
+def save_geo_encoder_config(geo_encoder, save_dir: str):
+    """
+    Save geometry encoder constants needed by the split OV pipeline.
+
+    Saves geo_config.json containing:
+      - scalar config: roi_size, d_model, pos_enc params, flags
+      - img_pre_norm weight/bias as JSON lists
+
+    These are used by OVSam3Processor Python glue to run roi_align, sinusoidal
+    pos encoding, and img_pre_norm without any PyTorch nn.Module.
+    """
+    import json
+    from pathlib import Path
+
+    save_dir = Path(save_dir)
+    geo = geo_encoder
+
+    config = {
+        "roi_size": int(geo.roi_size),
+        "d_model": int(geo.d_model),
+        "has_direct": geo.boxes_direct_project is not None,
+        "has_pool": geo.boxes_pool_project is not None,
+        "has_pos_enc": geo.boxes_pos_enc_project is not None,
+        "pos_enc_scale": float(geo.pos_enc.scale),
+        "pos_enc_temperature": int(geo.pos_enc.temperature),
+        "pos_enc_num_feats": int(geo.pos_enc.num_pos_feats),
+    }
+
+    if geo.boxes_pool_project is not None and hasattr(geo.img_pre_norm, "weight"):
+        config["img_pre_norm_weight"] = geo.img_pre_norm.weight.detach().cpu().tolist()
+        config["img_pre_norm_bias"] = geo.img_pre_norm.bias.detach().cpu().tolist()
+
+    cfg_path = save_dir / "geo_config.json"
+    with open(cfg_path, "w") as f:
+        json.dump(config, f)
+    print(f"  Saved geo config to {cfg_path}")
+
+    return config
+
+
+def load_geo_encoder_config(save_dir: str):
+    """
+    Load geometry encoder config and constants from geo_config.json.
+    Returns (config_dict, constants_dict).
+    constants_dict contains torch tensors for img_pre_norm_weight/bias if present.
+    """
+    import json
+    from pathlib import Path
+
+    save_dir = Path(save_dir)
+
+    with open(save_dir, "r") as f:
+        config = json.load(f)
+
+    constants = {}
+    if "img_pre_norm_weight" in config:
+        constants["img_pre_norm_weight"] = torch.tensor(config.pop("img_pre_norm_weight"), dtype=torch.float32)
+        constants["img_pre_norm_bias"] = torch.tensor(config.pop("img_pre_norm_bias"), dtype=torch.float32)
+
+    return config, constants
+
+
+def compute_sinusoidal_pos_enc(cx, cy, w, h, scale, temperature, num_pos_feats):
+    """
+    Compute sinusoidal position encoding for boxes — pure math, no learned weights.
+    Replicates PositionEmbeddingSine.encode_boxes / _encode_xy.
+
+    Args:
+        cx, cy, w, h: (N,) tensors of normalized box coordinates
+        scale, temperature, num_pos_feats: pos_enc hyperparameters
+
+    Returns:
+        pos: (N, 2*num_pos_feats + 2) = (N, d_model+2) position features
+    """
+    x_embed = cx * scale
+    y_embed = cy * scale
+
+    dim_t = torch.arange(num_pos_feats, dtype=torch.float32, device=cx.device)
+    dim_t = temperature ** (2 * (dim_t // 2) / num_pos_feats)
+
+    pos_x = x_embed[:, None] / dim_t
+    pos_y = y_embed[:, None] / dim_t
+    pos_x = torch.stack((pos_x[:, 0::2].sin(), pos_x[:, 1::2].cos()), dim=2).flatten(1)
+    pos_y = torch.stack((pos_y[:, 0::2].sin(), pos_y[:, 1::2].cos()), dim=2).flatten(1)
+
+    return torch.cat((pos_y, pos_x, h[:, None], w[:, None]), dim=1)
+
+
 # ---- backward-compat aliases (deprecated) ----
 def save_sam3_auxiliary(model, path: str) -> None:
     """Legacy helper — prefer convert_geometry_encoder_to_ov + save_sam1_weights."""
@@ -1112,7 +1307,10 @@ class OVSam3Processor:
         tokenizer,
         ov_prompt_encoder=None,  # OV compiled SAM2 prompt encoder (for SAM1 task)
         ov_mask_decoder=None,  # OV compiled SAM2 mask decoder (for SAM1 task)
-        ov_geometry_encoder=None,  # OV compiled geometry encoder
+        ov_geometry_encoder=None,  # OV compiled geometry encoder (legacy single model)
+        ov_geo_projections=None,  # OV compiled geo projections (split model)
+        ov_geo_cross_attn=None,  # OV compiled geo cross-attention (split model)
+        geo_config_path=None,  # path to directory with geo_config.json + geo_constants.npz
         ov_sam1_feature_prep=None,  # OV compiled SAM1 feature prep (conv_s0/s1 + no_mem_embed)
         sam1_config_path=None,  # path to sam1_config.json (scalar config only)
         resolution=1008,
@@ -1130,15 +1328,28 @@ class OVSam3Processor:
         self.ov_prompt_encoder = ov_prompt_encoder
         self.ov_mask_decoder = ov_mask_decoder
         self.ov_geometry_encoder = ov_geometry_encoder
+        self.ov_geo_projections = ov_geo_projections
+        self.ov_geo_cross_attn = ov_geo_cross_attn
         self.ov_sam1_feature_prep = ov_sam1_feature_prep
         self.tokenizer = tokenizer
         self.resolution = resolution
         self.confidence_threshold = confidence_threshold
         self.max_boxes = max_boxes
 
+        # Split geometry encoder config (Python glue for non-weighted ops)
+        self._geo_split_ready = False
+        self._geo_config = None
+        self._geo_pre_norm_weight = None
+        self._geo_pre_norm_bias = None
+        if geo_config_path is not None and ov_geo_projections is not None:
+            self._geo_config, geo_constants = load_geo_encoder_config(geo_config_path)
+            self._geo_pre_norm_weight = geo_constants.get("img_pre_norm_weight")
+            self._geo_pre_norm_bias = geo_constants.get("img_pre_norm_bias")
+            self._geo_split_ready = True
+
         # Legacy fallback: load geometry encoder from auxiliary.pt as PyTorch module
         self._pt_geometry_encoder = None
-        if ov_geometry_encoder is None and auxiliary_path is not None:
+        if ov_geometry_encoder is None and ov_geo_projections is None and auxiliary_path is not None:
             aux_data = load_sam3_auxiliary(auxiliary_path)
             if "geometry_encoder" in aux_data:
                 self._pt_geometry_encoder = Sam3GeometryEncoderModel(
@@ -1335,8 +1546,14 @@ class OVSam3Processor:
             box_labels_t = raw_labels
 
         # Step 3: Run geometry encoder
-        if self.ov_geometry_encoder is not None:
-            # Pure OV path — no PyTorch weights
+        if self._geo_split_ready:
+            # Split OV path — weighted ops in OV, non-weighted ops in Python
+            geo_feats, geo_masks = self._run_geo_split(
+                box_embeddings, box_mask, box_labels_t,
+                img_feats[0], img_pos_embeds[0],
+            )
+        elif self.ov_geometry_encoder is not None:
+            # Legacy single OV model path
             geo_result = self.ov_geometry_encoder(
                 [
                     box_embeddings.numpy(),
@@ -1463,6 +1680,92 @@ class OVSam3Processor:
         state["boxes"] = boxes
         state["scores"] = out_probs
         return state
+
+    def _run_geo_split(self, box_embeddings, box_mask, box_labels_t, img_feat, img_pos):
+        """
+        Run split geometry encoder: Python glue for non-weighted ops +
+        two OV models for weighted ops.
+
+        Non-weighted ops in Python:
+          - sinusoidal position encoding (compute_sinusoidal_pos_enc)
+          - img_pre_norm via F.layer_norm with extracted weights
+          - roi_align via torchvision.ops (no learned weights)
+          - box_cxcywh_to_xyxy (pure math)
+
+        OV models:
+          - ov_geo_projections: Linear projections + Embedding (no control flow)
+          - ov_geo_cross_attn: CLS + final_proj + cross-attention layers (no control flow)
+        """
+        import torchvision.ops
+
+        cfg = self._geo_config
+        n_boxes = box_embeddings.shape[0]
+        bs = box_embeddings.shape[1]
+        d_model = cfg["d_model"]
+
+        # --- Python: sinusoidal position encoding (no weights) ---
+        cx = box_embeddings[:, :, 0].flatten()  # (N*B,)
+        cy = box_embeddings[:, :, 1].flatten()
+        w = box_embeddings[:, :, 2].flatten()
+        h = box_embeddings[:, :, 3].flatten()
+        pos_enc_feat = compute_sinusoidal_pos_enc(
+            cx, cy, w, h,
+            scale=cfg["pos_enc_scale"],
+            temperature=cfg["pos_enc_temperature"],
+            num_pos_feats=cfg["pos_enc_num_feats"],
+        )  # (N*B, d_model+2)
+        pos_features = pos_enc_feat.view(n_boxes, bs, -1)  # (N, 1, d_model+2)
+
+        # --- Python: img_pre_norm + roi_align (no learned weights in OV) ---
+        feat_h = feat_w = int(img_feat.shape[0] ** 0.5)  # 72
+        normed_img = F.layer_norm(
+            img_feat, [d_model],
+            self._geo_pre_norm_weight, self._geo_pre_norm_bias,
+        )  # (HW, 1, C)
+        img_nchw = normed_img.permute(1, 2, 0).view(bs, -1, feat_h, feat_w)  # (1, C, H, W)
+
+        # box_cxcywh_to_xyxy (pure math)
+        bcx, bcy, bw, bh = box_embeddings.unbind(-1)
+        boxes_xyxy = torch.stack([
+            bcx - 0.5 * bw, bcy - 0.5 * bh,
+            bcx + 0.5 * bw, bcy + 0.5 * bh,
+        ], dim=-1)  # (N, 1, 4)
+        scale = torch.tensor([feat_w, feat_h, feat_w, feat_h], dtype=boxes_xyxy.dtype).view(1, 1, 4)
+        boxes_xyxy_scaled = boxes_xyxy * scale
+
+        # Tensor-format roi_align: (K, 5) = [batch_idx, x1, y1, x2, y2]
+        boxes_2d = boxes_xyxy_scaled[:, 0, :]  # (N, 4)
+        batch_idx = torch.zeros(n_boxes, 1, dtype=boxes_xyxy.dtype)
+        boxes_with_batch = torch.cat([batch_idx, boxes_2d], dim=1)  # (N, 5)
+        roi_size = cfg["roi_size"]
+        roi_features = torchvision.ops.roi_align(
+            img_nchw, boxes_with_batch, roi_size,
+        )  # (N, C, roi_size, roi_size)
+
+        # --- OV: geo_projections (weighted ops only, no control flow) ---
+        proj_result = self.ov_geo_projections(
+            [
+                box_embeddings.numpy(),
+                pos_features.numpy(),
+                roi_features.detach().numpy(),
+                box_labels_t.numpy(),
+            ]
+        )
+        box_embed = torch.from_numpy(np.array(proj_result[0]))  # (N, 1, C)
+
+        # --- OV: geo_cross_attn (CLS + cross-attention, no control flow) ---
+        cross_result = self.ov_geo_cross_attn(
+            [
+                box_embed.numpy(),
+                box_mask.numpy(),
+                img_feat.numpy(),
+                img_pos.numpy(),
+            ]
+        )
+        geo_feats = torch.from_numpy(np.array(cross_result[0]))  # (N+1, 1, C)
+        geo_masks = torch.from_numpy(np.array(cross_result[1]))  # (1, N+1)
+
+        return geo_feats, geo_masks
 
     @torch.inference_mode()
     def predict_inst(self, state, **kwargs):
