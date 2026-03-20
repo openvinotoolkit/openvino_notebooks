@@ -772,16 +772,16 @@ class Sam3GeoProjectionsForOV(nn.Module):
     @torch.no_grad()
     def forward(
         self,
-        boxes: Tensor,         # (N, 1, 4)
+        boxes: Tensor,  # (N, 1, 4)
         pos_features: Tensor,  # (N, 1, d_pos)
         roi_features: Tensor,  # (N, C, roi_h, roi_w)
-        labels: Tensor,        # (N, 1) int64
+        labels: Tensor,  # (N, 1) int64
     ):
-        direct = self.direct_proj(boxes)              # (N, 1, C)
-        pos = self.pos_enc_proj(pos_features)         # (N, 1, C)
-        pool = self.pool_proj(roi_features)           # (N, C, 1, 1)
+        direct = self.direct_proj(boxes)  # (N, 1, C)
+        pos = self.pos_enc_proj(pos_features)  # (N, 1, C)
+        pool = self.pool_proj(roi_features)  # (N, C, 1, 1)
         pool = pool.squeeze(-1).squeeze(-1).unsqueeze(1)  # (N, 1, C)
-        lab = self.label_embed(labels.long())         # (N, 1, C)
+        lab = self.label_embed(labels.long())  # (N, 1, C)
         return direct + pos + pool + lab
 
 
@@ -818,16 +818,16 @@ class Sam3GeoCrossAttnForOV(nn.Module):
     def forward(
         self,
         box_embed: Tensor,  # (N, 1, C)
-        box_mask: Tensor,   # (1, N) bool
-        img_feat: Tensor,   # (HW, 1, C)
-        img_pos: Tensor,    # (HW, 1, C)
+        box_mask: Tensor,  # (1, N) bool
+        img_feat: Tensor,  # (HW, 1, C)
+        img_pos: Tensor,  # (HW, 1, C)
     ):
         bs = box_embed.shape[1]
 
         # Append CLS token
         cls = self.cls_embed.weight.view(1, 1, -1).expand(1, bs, -1)
         cls_mask = torch.zeros(bs, 1, dtype=box_mask.dtype, device=box_mask.device)
-        combined = torch.cat([box_embed, cls], dim=0)       # (N+1, 1, C)
+        combined = torch.cat([box_embed, cls], dim=0)  # (N+1, 1, C)
         combined_mask = torch.cat([box_mask, cls_mask], dim=1)  # (1, N+1)
 
         # Final projection + norm
@@ -1264,8 +1264,6 @@ def save_sam3_auxiliary(model, path: str) -> None:
     print(f"Saved auxiliary to {path}")
 
 
-
-
 def _get_dummy_prompt(device="cpu"):
     """Standalone version of Sam3Image._get_dummy_prompt() — no model needed."""
     import torch
@@ -1352,9 +1350,7 @@ class OVSam3Processor:
         if ov_geometry_encoder is None and ov_geo_projections is None and auxiliary_path is not None:
             aux_data = load_sam3_auxiliary(auxiliary_path)
             if "geometry_encoder" in aux_data:
-                self._pt_geometry_encoder = Sam3GeometryEncoderModel(
-                    geometry_encoder=aux_data["geometry_encoder"]
-                )
+                self._pt_geometry_encoder = Sam3GeometryEncoderModel(geometry_encoder=aux_data["geometry_encoder"])
                 self._pt_geometry_encoder.eval()
             if sam1_config is None and "sam1_config" in aux_data:
                 sam1_config = aux_data["sam1_config"]
@@ -1549,8 +1545,11 @@ class OVSam3Processor:
         if self._geo_split_ready:
             # Split OV path — weighted ops in OV, non-weighted ops in Python
             geo_feats, geo_masks = self._run_geo_split(
-                box_embeddings, box_mask, box_labels_t,
-                img_feats[0], img_pos_embeds[0],
+                box_embeddings,
+                box_mask,
+                box_labels_t,
+                img_feats[0],
+                img_pos_embeds[0],
             )
         elif self.ov_geometry_encoder is not None:
             # Legacy single OV model path
@@ -1709,7 +1708,10 @@ class OVSam3Processor:
         w = box_embeddings[:, :, 2].flatten()
         h = box_embeddings[:, :, 3].flatten()
         pos_enc_feat = compute_sinusoidal_pos_enc(
-            cx, cy, w, h,
+            cx,
+            cy,
+            w,
+            h,
             scale=cfg["pos_enc_scale"],
             temperature=cfg["pos_enc_temperature"],
             num_pos_feats=cfg["pos_enc_num_feats"],
@@ -1719,17 +1721,24 @@ class OVSam3Processor:
         # --- Python: img_pre_norm + roi_align (no learned weights in OV) ---
         feat_h = feat_w = int(img_feat.shape[0] ** 0.5)  # 72
         normed_img = F.layer_norm(
-            img_feat, [d_model],
-            self._geo_pre_norm_weight, self._geo_pre_norm_bias,
+            img_feat,
+            [d_model],
+            self._geo_pre_norm_weight,
+            self._geo_pre_norm_bias,
         )  # (HW, 1, C)
         img_nchw = normed_img.permute(1, 2, 0).view(bs, -1, feat_h, feat_w)  # (1, C, H, W)
 
         # box_cxcywh_to_xyxy (pure math)
         bcx, bcy, bw, bh = box_embeddings.unbind(-1)
-        boxes_xyxy = torch.stack([
-            bcx - 0.5 * bw, bcy - 0.5 * bh,
-            bcx + 0.5 * bw, bcy + 0.5 * bh,
-        ], dim=-1)  # (N, 1, 4)
+        boxes_xyxy = torch.stack(
+            [
+                bcx - 0.5 * bw,
+                bcy - 0.5 * bh,
+                bcx + 0.5 * bw,
+                bcy + 0.5 * bh,
+            ],
+            dim=-1,
+        )  # (N, 1, 4)
         scale = torch.tensor([feat_w, feat_h, feat_w, feat_h], dtype=boxes_xyxy.dtype).view(1, 1, 4)
         boxes_xyxy_scaled = boxes_xyxy * scale
 
@@ -1739,7 +1748,9 @@ class OVSam3Processor:
         boxes_with_batch = torch.cat([batch_idx, boxes_2d], dim=1)  # (N, 5)
         roi_size = cfg["roi_size"]
         roi_features = torchvision.ops.roi_align(
-            img_nchw, boxes_with_batch, roi_size,
+            img_nchw,
+            boxes_with_batch,
+            roi_size,
         )  # (N, C, roi_size, roi_size)
 
         # --- OV: geo_projections (weighted ops only, no control flow) ---
@@ -1789,9 +1800,7 @@ class OVSam3Processor:
         backbone_out["backbone_fpn"] = list(backbone_out["backbone_fpn"])
 
         # Run OV feature prep: conv_s0(fpn0), conv_s1(fpn1), no_mem_embed
-        prep_result = self.ov_sam1_feature_prep(
-            [backbone_out["backbone_fpn"][0].numpy(), backbone_out["backbone_fpn"][1].numpy()]
-        )
+        prep_result = self.ov_sam1_feature_prep([backbone_out["backbone_fpn"][0].numpy(), backbone_out["backbone_fpn"][1].numpy()])
         backbone_out["backbone_fpn"][0] = torch.from_numpy(np.array(prep_result[0]))
         backbone_out["backbone_fpn"][1] = torch.from_numpy(np.array(prep_result[1]))
         no_mem_embed = torch.from_numpy(np.array(prep_result[2]))
@@ -1973,9 +1982,7 @@ class OVSam3InteractiveImagePredictor:
             sam2_pos = [torch.from_numpy(np.array(ov_result[n_levels + i])) for i in range(n_levels)]
 
         # Run OV feature prep: conv_s0(fpn0), conv_s1(fpn1), no_mem_embed
-        prep_result = self.ov_sam1_feature_prep(
-            [sam2_fpn[0].numpy(), sam2_fpn[1].numpy()]
-        )
+        prep_result = self.ov_sam1_feature_prep([sam2_fpn[0].numpy(), sam2_fpn[1].numpy()])
         sam2_fpn[0] = torch.from_numpy(np.array(prep_result[0]))
         sam2_fpn[1] = torch.from_numpy(np.array(prep_result[1]))
         no_mem_embed = torch.from_numpy(np.array(prep_result[2]))
