@@ -1069,9 +1069,6 @@ def save_sam3_auxiliary(model, path: str) -> None:
     print(f"Saved auxiliary to {path}")
 
 
-def load_sam3_auxiliary(path: str) -> dict:
-    """Legacy loader — prefer convert_sam1_feature_prep_to_ov."""
-    return torch.load(path, map_location="cpu", weights_only=False)
 
 
 def _get_dummy_prompt(device="cpu"):
