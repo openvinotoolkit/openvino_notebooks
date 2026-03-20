@@ -23,6 +23,7 @@ numpy = ">=1.21.0"
 opencv-python = "*"
 Pillow = ">=12.1.1"
 matplotlib = ">=3.4"
+ovmsclient = "*"
 
 # Security pins
 setuptools = ">70.0.0"
