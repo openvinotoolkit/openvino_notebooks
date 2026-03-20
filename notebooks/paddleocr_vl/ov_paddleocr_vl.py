@@ -737,7 +737,7 @@ class VisionModel:
 
         # Limit the number of samples
         if len(image_paths) > max_train_samples:
-            image_paths = random.sample(image_paths, max_train_samples)
+            image_paths = random.sample(image_paths, max_train_samples)  # nosec B311 - random subset for ML calibration, not security
 
         # Create a simple dataset with image paths
         class LocalImageDataset:
