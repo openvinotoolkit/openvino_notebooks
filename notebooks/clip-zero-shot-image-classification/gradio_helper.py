@@ -7,7 +7,7 @@ sample_path = Path("data/coco.jpg")
 
 if not sample_path.exists():
     sample_path.parent.mkdir(parents=True, exist_ok=True)
-    r = requests.get("https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco.jpg")
+    r = requests.get("https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco.jpg", timeout=30)
     with sample_path.open("wb") as f:
         f.write(r.content)
 

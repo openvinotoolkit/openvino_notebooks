@@ -16,7 +16,7 @@ def make_demo(model, processor):
 
     for url, file_name in example_image_urls:
         if not Path(file_name).exists():
-            Image.open(requests.get(url, stream=True).raw).save(file_name)
+            Image.open(requests.get(url, stream=True, timeout=30).raw).save(file_name)
 
     def bot_streaming(message, history):
         print(f"message is - {message}")

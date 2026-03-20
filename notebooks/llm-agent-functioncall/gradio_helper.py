@@ -12,7 +12,7 @@ openvino_logo = "openvino_logo.png"
 openvino_logo_url = "https://cdn-avatars.huggingface.co/v1/production/uploads/1671615670447-6346651be2dcb5422bcd13dd.png"
 
 if not Path(openvino_logo).exists():
-    image = Image.open(requests.get(openvino_logo_url, stream=True).raw)
+    image = Image.open(requests.get(openvino_logo_url, stream=True, timeout=30).raw)
     image.save(openvino_logo)
 
 

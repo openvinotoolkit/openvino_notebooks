@@ -17,7 +17,7 @@ Output:
 import json
 import os
 import re
-import subprocess
+import subprocess  # nosec B404 - required for git CLI operations, no user input involved
 import sys
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -28,7 +28,7 @@ REMOTE = os.environ.get("REMOTE", "upstream")
 
 def discover_release_branches() -> list[str]:
     """Auto-discover release branches matching pattern YYYY.N from the remote."""
-    result = subprocess.run(
+    result = subprocess.run(  # nosec B603 B607 - hardcoded git command, no user-controlled input
         ["git", "branch", "-r", "--list", f"{REMOTE}/*"],
         capture_output=True,
         check=True,
@@ -55,7 +55,7 @@ def normalize_notebook_path(path: str) -> str:
 
 def list_notebooks(ref: str) -> list[str]:
     """List all .ipynb files in notebooks/ directory for a given git ref."""
-    result = subprocess.run(
+    result = subprocess.run(  # nosec B603 B607 - hardcoded git command, ref from internal branch list
         ["git", "ls-tree", "-r", "--name-only", ref, "--", "notebooks/"],
         capture_output=True,
         check=True,
@@ -67,7 +67,7 @@ def list_notebooks(ref: str) -> list[str]:
 def get_notebook_json(ref: str, file_path: str) -> dict | None:
     """Read and parse a notebook JSON from a given git ref."""
     try:
-        result = subprocess.run(
+        result = subprocess.run(  # nosec B603 B607 - hardcoded git command, ref/path from internal data
             ["git", "show", f"{ref}:{file_path}"],
             capture_output=True,
             check=True,

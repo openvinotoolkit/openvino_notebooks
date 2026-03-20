@@ -49,7 +49,7 @@ for _url, _fname in _EXAMPLE_IMAGE_URLS:
     if not _fp.exists():
         try:
             print(f"Downloading example image: {_fname} …")
-            Image.open(requests.get(_url, stream=True).raw).save(_fp)
+            Image.open(requests.get(_url, stream=True, timeout=30).raw).save(_fp)
         except Exception as _e:
             print(f"  Could not download {_fname}: {_e}")
 
@@ -93,7 +93,7 @@ def _reset(model) -> None:
         if hasattr(model, fn):
             try:
                 getattr(model, fn)()
-            except Exception:
+            except Exception:  # nosec B110 - best-effort KV-cache reset, non-critical
                 pass
             return
 

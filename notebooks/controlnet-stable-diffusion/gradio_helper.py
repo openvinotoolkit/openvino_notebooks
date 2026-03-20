@@ -9,7 +9,7 @@ example_url = "https://user-images.githubusercontent.com/29454499/224540208-c172
 img_path = Path("example.jpg")
 
 if not img_path.exists():
-    r = requests.get(example_url)
+    r = requests.get(example_url, timeout=30)
     with img_path.open("wb") as f:
         f.write(r.content)
 

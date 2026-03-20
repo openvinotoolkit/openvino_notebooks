@@ -1247,7 +1247,7 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
                     with open(tokenizer_config_path, "w") as f:
                         json.dump(tok_config, f, indent=2, ensure_ascii=False)
                     print("✅ Patched tokenizer_config.json with chat_template")
-            except Exception:
+            except Exception:  # nosec B110 - optional chat_template patch, model works without it
                 pass
 
     return model_dir

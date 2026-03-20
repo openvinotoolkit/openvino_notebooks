@@ -7,6 +7,7 @@ image_path = Path("test_image.jpg")
 if not image_path.exists():
     r = requests.get(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco.jpg",
+        timeout=30,
     )
     with image_path.open("wb") as f:
         f.write(r.content)

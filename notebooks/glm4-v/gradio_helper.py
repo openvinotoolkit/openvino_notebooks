@@ -41,7 +41,7 @@ def download_example_images():
 
     for path, url in example_images.items():
         if not Path(path).exists():
-            image = Image.open(requests.get(url, stream=True).raw)
+            image = Image.open(requests.get(url, stream=True, timeout=30).raw)
             image.save(path)
 
 

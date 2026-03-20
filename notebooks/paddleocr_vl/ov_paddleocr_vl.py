@@ -702,7 +702,7 @@ class VisionModel:
 
                 try:
                     im.save(out_path)
-                except Exception:
+                except Exception:  # nosec B110 - non-critical image save, caller validates results
                     # Ignore image write errors; the caller will raise if no images exist.
                     pass
 
@@ -802,7 +802,7 @@ class PaddleOCR_VL_OV:
         pretrained_model_path=None,
         model=None,
         tokenizer=None,
-        ov_model_path="/tmp/paddleocr_vl_ov/",
+        ov_model_path="/tmp/paddleocr_vl_ov/",  # nosec B108 - overridable default for converted model cache
         device="CPU",
         llm_int4_compress=False,
         llm_int8_compress=False,

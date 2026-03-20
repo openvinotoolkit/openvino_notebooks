@@ -17,7 +17,7 @@ example_images = []
 for example_image_url in examples:
     image_name = example_image_url[0].split("/")[-1]
     if not Path(image_name).exists():
-        image = Image.open(requests.get(example_image_url[0], stream=True).raw)
+        image = Image.open(requests.get(example_image_url[0], stream=True, timeout=30).raw)
         image.save(image_name)
     example_images.append([image_name])
 

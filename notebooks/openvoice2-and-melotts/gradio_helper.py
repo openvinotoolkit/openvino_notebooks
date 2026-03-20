@@ -83,7 +83,7 @@ def make_demo(fn: Callable, output_dir: Path):
                 )
 
                 def get_tmp_and_save_path(straming_mode):
-                    tts_step_path = f"{output_dir}/tmp{'_streamed' if straming_mode else ''}.wav"
+                    tts_step_path = f"{output_dir}/tmp{'_streamed' if straming_mode else ''}.wav"  # nosec B108 - filename "tmp.wav", not /tmp directory
                     save_path = f"{output_dir}/output{'_streamed' if straming_mode else ''}.wav"
                     return tts_step_path, save_path
 
