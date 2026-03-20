@@ -11,7 +11,9 @@ def clone_repo(repo_url: str, revision: str = None, add_to_sys_path: bool = True
 
     if not repo_path.exists():
         try:
-            subprocess.run(["git", "clone", repo_url], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)  # nosec B603 B607 - hardcoded git command
+            subprocess.run(
+                ["git", "clone", repo_url], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+            )  # nosec B603 B607 - hardcoded git command
         except Exception as exc:
             print(f"Failed to clone the repository: {exc.stderr}")
             raise
