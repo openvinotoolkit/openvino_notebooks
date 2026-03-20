@@ -56,11 +56,18 @@ class NotebooksService {
   private async _getArchivedNotebooks(): Promise<IArchivedNotebookMetadata[]> {
     if (!this._archivedNotebooks) {
       const { BASE_URL } = import.meta.env;
-      this._archivedNotebooks = await fetch(`${BASE_URL}${ARCHIVED_NOTEBOOKS_FILE_NAME}`)
-        .then((response) => (response.ok ? response.json() : []))
-        .catch(() => []) as IArchivedNotebookMetadata[];
+      try {
+        const response = await fetch(`${BASE_URL}${ARCHIVED_NOTEBOOKS_FILE_NAME}`);
+        if (response.ok) {
+          this._archivedNotebooks = (await response.json()) as IArchivedNotebookMetadata[];
+        } else {
+          return [];
+        }
+      } catch {
+        return [];
+      }
     }
-    return this._archivedNotebooks;
+    return this._archivedNotebooks ?? [];
   }
 
   async getNotebooks({

@@ -6,6 +6,7 @@ Usage:
     python selector/src/notebook-metadata/collect-archived-notebooks.py
 
 Prerequisites:
+    - Python >= 3.10 (uses `X | Y` union type syntax)
     - upstream remote must point to openvinotoolkit/openvino_notebooks
     - run `git fetch upstream` before running this script
 
