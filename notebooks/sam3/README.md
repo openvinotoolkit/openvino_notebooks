@@ -17,8 +17,11 @@ The model is decomposed into multiple sub-models for efficient conversion:
 4. **Transformer Decoder** — Object query decoding with box refinement
 5. **Scoring** — Dot-product scoring + final box prediction
 6. **Segmentation Head** — Pixel decoder + mask prediction
-7. **SAM2 Prompt Encoder** — Point/box prompt encoding (for SAM1/Tracker task)
-8. **SAM2 Mask Decoder** — Mask prediction from prompts (for SAM1/Tracker task)
+7. **Geometry Projections** — Box embedding projections (Linear/Conv2d/Embedding, no control flow)
+8. **Geometry Cross-Attention** — CLS token + cross-attention encoder (no control flow)
+9. **SAM1 Feature Prep** — conv_s0/s1 + no_mem_embed for SAM1 task features
+10. **SAM2 Prompt Encoder** — Point/box prompt encoding (for SAM1/Tracker task)
+11. **SAM2 Mask Decoder** — Mask prediction from prompts (for SAM1/Tracker task)
 
 
 ## Notebook Contents
@@ -32,4 +35,5 @@ Notebook contains the following steps:
 ⚠️ **EXPERIMENTAL NOTEBOOK**
 
 This notebook demonstrates a model that has not been fully validated with OpenVINO. It may be fully supported and validated in the future.
+
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks\sam3\README.md" />
