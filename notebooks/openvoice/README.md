@@ -19,7 +19,7 @@ This notebook demonstrates voice tone cloning with [OpenVoice](https://github.co
 The tutorial consists of following steps:
 - Install prerequisites
 - Load PyTorch model
-- Convert Model to Openvino Intermediate Representation format
+- Convert Model to OpenVINO Intermediate Representation format
 - Run OpenVINO model inference on a single example
 - Launch interactive demo
 

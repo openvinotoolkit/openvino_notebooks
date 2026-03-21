@@ -19,7 +19,7 @@ In these tutorials we will explore how to convert and run DepthAnything using Op
 Both tutorials consists of following steps:
 - Install prerequisites
 - Load and run PyTorch model inference
-- Convert Model to Openvino Intermediate Representation format
+- Convert Model to OpenVINO Intermediate Representation format
 - Run OpenVINO model inference on single image
 - Run OpenVINO model inference on video
 - Optimize Model
