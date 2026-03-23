@@ -1236,34 +1236,6 @@ def compute_sinusoidal_pos_enc(cx, cy, w, h, scale, temperature, num_pos_feats):
     return torch.cat((pos_y, pos_x, h[:, None], w[:, None]), dim=1)
 
 
-# ---- backward-compat aliases (deprecated) ----
-def save_sam3_auxiliary(model, path: str) -> None:
-    """Legacy helper — prefer convert_geometry_encoder_to_ov + save_sam1_weights."""
-    import copy
-
-    data = {
-        "geometry_encoder": copy.deepcopy(model.geometry_encoder).cpu(),
-    }
-
-    predictor = getattr(model, "inst_interactive_predictor", None)
-    if predictor is not None:
-        tracker_model = predictor.model
-        data["sam1_config"] = {
-            "conv_s0_weight": tracker_model.sam_mask_decoder.conv_s0.weight.detach().cpu().clone(),
-            "conv_s0_bias": tracker_model.sam_mask_decoder.conv_s0.bias.detach().cpu().clone(),
-            "conv_s1_weight": tracker_model.sam_mask_decoder.conv_s1.weight.detach().cpu().clone(),
-            "conv_s1_bias": tracker_model.sam_mask_decoder.conv_s1.bias.detach().cpu().clone(),
-            "no_mem_embed": tracker_model.no_mem_embed.detach().cpu().clone(),
-            "bb_feat_sizes": predictor._bb_feat_sizes,
-            "mask_threshold": predictor.mask_threshold,
-            "image_size": tracker_model.image_size,
-            "num_feature_levels": tracker_model.num_feature_levels,
-        }
-
-    torch.save(data, path)
-    print(f"Saved auxiliary to {path}")
-
-
 def _get_dummy_prompt(device="cpu"):
     """Standalone version of Sam3Image._get_dummy_prompt() — no model needed."""
     import torch
@@ -1314,8 +1286,6 @@ class OVSam3Processor:
         resolution=1008,
         confidence_threshold=0.5,
         max_boxes=10,
-        auxiliary_path=None,  # DEPRECATED: path to auxiliary.pt (legacy fallback)
-        sam1_config=None,  # DEPRECATED: dict with SAM1 frozen weights
     ):
         self.ov_image_encoder = ov_image_encoder
         self.ov_text_encoder = ov_text_encoder
