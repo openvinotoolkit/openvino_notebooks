@@ -146,7 +146,7 @@ def update_task_dropdown(choice):
 def make_demo(model, processor):
     for url, filename in example_images:
         if not Path(filename).exists():
-            image = Image.open(requests.get(url, stream=True).raw)
+            image = Image.open(requests.get(url, stream=True, timeout=30).raw)
             image.save(filename)
 
     def run_example(task_prompt, image, text_input=None):

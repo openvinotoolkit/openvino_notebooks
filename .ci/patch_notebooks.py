@@ -113,8 +113,8 @@ def remove_ov_install(cell):
                 if not empty:
                     updated_line = " ".join(updated_line_content)
                     if line.startswith(" "):
-                        for token in line:
-                            if token != " ":
+                        for char in line:
+                            if char != " ":
                                 break
                             # keep indention
                             updated_line = " " + updated_line

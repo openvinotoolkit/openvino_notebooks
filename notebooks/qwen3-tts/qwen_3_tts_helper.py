@@ -2220,7 +2220,7 @@ class OVQwen3TTSModel:
         if is_url(audio_path):
             import soundfile as sf
 
-            with urllib.request.urlopen(audio_path) as resp:
+            with urllib.request.urlopen(audio_path) as resp:  # nosec B310 - audio URL from internal pipeline input
                 audio_bytes = resp.read()
             with io.BytesIO(audio_bytes) as f:
                 audio, sr = sf.read(f, dtype="float32", always_2d=False)

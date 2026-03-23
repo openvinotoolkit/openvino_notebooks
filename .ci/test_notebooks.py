@@ -84,7 +84,7 @@ def test_urls_exist():
     ]
     headers = {"User-Agent": "Mozilla/5.0"}
     for url in urls:
-        response = requests.get(url=url, headers=headers)
+        response = requests.get(url=url, headers=headers, timeout=30)
         if not response.status_code == 200:
             print(f"Downloading {url} failed")
             raise

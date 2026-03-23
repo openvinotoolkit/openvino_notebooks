@@ -29,7 +29,7 @@ def prepare_examples():
     composite_examples = []
     for file_name, url in data.items():
         if not Path(file_name).exists():
-            Image.open(requests.get(url, stream=True).raw).resize((512, 512)).save(file_name)
+            Image.open(requests.get(url, stream=True, timeout=30).raw).resize((512, 512)).save(file_name)
         composite_examples.append({"background": file_name, "layers": [], "composite": None})
     return composite_examples
 

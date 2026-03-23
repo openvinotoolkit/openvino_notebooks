@@ -30,7 +30,7 @@ example_images = {
 def download_example_images():
     for file_name, url in example_images.items():
         if not Path(file_name).exists():
-            Image.open(requests.get(url, stream=True).raw).save(file_name)
+            Image.open(requests.get(url, stream=True, timeout=30).raw).save(file_name)
 
 
 def count_files_in_new_message(paths: list[str]) -> tuple[int, int]:

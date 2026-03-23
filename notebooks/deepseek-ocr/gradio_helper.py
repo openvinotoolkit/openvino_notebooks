@@ -43,7 +43,7 @@ example_image_urls = [
 ]
 for url, file_name in example_image_urls:
     if not Path(file_name).exists():
-        img = Image.open(requests.get(url, stream=True).raw)
+        img = Image.open(requests.get(url, stream=True, timeout=30).raw)
         if img.mode in ("RGBA", "LA", "P"):
             img = img.convert("RGB")
         img.save(file_name)

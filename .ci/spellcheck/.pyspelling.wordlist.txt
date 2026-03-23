@@ -40,9 +40,11 @@ argmax
 artstation
 arxiv
 ASPP
+AST
 ASR
 asr
 ASRModel
+AST
 ASYM
 async
 AsyncInferQueue
@@ -95,6 +97,7 @@ BLEU
 blockwise
 BMP
 boolean
+builtins
 CatVTON
 CausVid
 CentOS
@@ -160,6 +163,7 @@ ConvNeXt
 ConvNeXts
 Convolutional
 convolutional
+CookBook
 coors
 coreference
 CoSENT
@@ -181,6 +185,7 @@ CustomVoice
 CVF
 CVAE
 CVPR
+CWE
 DarkIR
 Databricks
 databricks
@@ -258,6 +263,7 @@ DiTs
 DiT’s
 DL
 DMDR
+DFL
 DocLayNet
 docling
 Docling
@@ -393,6 +399,7 @@ Gutendex
 Hafner
 HalBench
 HandBrake
+hardcoded
 HC
 heatmap
 HED
@@ -400,6 +407,7 @@ HiFT
 HiFi
 HH
 hoc
+Homebrew
 hotfix
 HugginFaceH
 HuggingFace
@@ -494,6 +502,7 @@ keypoint
 keypoints
 KiTS
 KITTI
+Kimi
 Kokoro
 Koltun
 Kondate
@@ -531,6 +540,7 @@ LDM
 LDMs
 LDP
 learnable
+LetterBox
 LeViT
 LFM
 lfm
@@ -573,12 +583,14 @@ lora
 LoRAs
 lraspp
 LRASPP
+LRPC
 LSTM
 LSTMs
 LTS
 LTX
 ltx
 Luo
+LVIS
 LVLM
 Lysak
 Lyth
@@ -670,12 +682,15 @@ Multimodality
 multinomial
 MuJoCo
 MuRAG
+MuSGD
+Muon
 MusicGen
 Müller
 naflex
 Nakayosi
 nano
 nanoLLaVA
+namespace
 nar
 NAS
 natively
@@ -739,6 +754,7 @@ ontologies
 OpenAI
 openai
 OpenAI's
+OpenCompass
 OpenCL
 OpenCLIP
 OpenCLIP's
@@ -778,6 +794,7 @@ OVQwen
 OvStableDiffusionInpaintingPipeline
 OVStableDiffusionInpaintPipeline
 OVStableDiffusionPipeline
+OWASP
 PaddleClas
 PaddleGAN
 paddlegan
@@ -791,6 +808,7 @@ PAFs
 Panoptic
 panoptic
 parallelized
+parameterizable
 parameterization
 parametrize
 paralinguistic
@@ -861,6 +879,7 @@ pretrained
 Pretraining
 pretraining
 processings
+ProgLoss
 promptable
 prompthero
 proto
@@ -920,6 +939,7 @@ regressively
 reidentification
 ReLU
 René
+RepRTA
 repo
 reproducibility
 rerank
@@ -941,6 +961,7 @@ Riffusion
 riffusion
 Rinna
 rinna
+RLE
 RLHF
 RMBG
 RMSNorm
@@ -986,6 +1007,7 @@ segmind
 selfattention
 serializable
 sft
+SGD
 ShapeNet
 ShareGPT
 Shazeer
@@ -1029,6 +1051,7 @@ SpeechBrain's
 SpeechPipeline
 SpeechT
 splitters
+SPK
 SPS
 SQA
 SQuAD
@@ -1043,6 +1066,7 @@ StableDiffusionImg
 StableDiffusionImg2ImgPipeline
 StableDiffusionInpaintPipeline
 StableDiffusionPipeline
+STAL
 stateful
 STFT
 streamable
@@ -1243,6 +1267,7 @@ Yiqin
 YOLO
 YOLOv
 yolov
+YOLOE
 Youri
 youri
 YouTube

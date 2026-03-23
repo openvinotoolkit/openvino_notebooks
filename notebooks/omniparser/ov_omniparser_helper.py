@@ -347,7 +347,8 @@ def get_xywh_yolo(input):
 
 
 def check_ocr_box(reader, image_path, output_bb_format="xywh", goal_filtering=None, easyocr_args=None):
-    result = reader.readtext(image_path, **easyocr_args)
+    img = cv2.imread(str(image_path))
+    result = reader.readtext(img, **easyocr_args)
     # print('goal filtering pred:', result[-5:])
     coord = [item[0] for item in result]
     text = [item[1] for item in result]

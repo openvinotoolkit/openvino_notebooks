@@ -479,6 +479,7 @@
     - python:
         - '3.13'
 - notebook: notebooks/sam3/sam3-segmentation.ipynb
+- notebook: notebooks/minicpm-o-4.5/minicpm-o-4.5.ipynb
   skips:
     - os:
         - macos-13

@@ -1,0 +1,2620 @@
+[
+  {
+    "title": "Animating Open-domain Images with DynamiCrafter and OpenVINO",
+    "path": "dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb",
+    "imageUrl": "https://github.com/Doubiiu/DynamiCrafter/blob/main/assets/showcase/guitar0.gif?raw=true",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Video"
+      ]
+    }
+  },
+  {
+    "title": "Big Transfer Image Classification Model Quantization pipeline with NNCF",
+    "path": "big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb",
+    "tags": {
+      "categories": [
+        "Optimize",
+        "API Overview"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Classification"
+      ]
+    }
+  },
+  {
+    "title": "Colorize grayscale images using 🎨 DDColor and OpenVINO",
+    "path": "ddcolor-image-colorization/ddcolor-image-colorization.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/25d3c2c5-c12f-48d2-b4cd-3161387a4448",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/ddcolor-image-colorization/ddcolor-image-colorization.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Convert a JAX Model to OpenVINO™ IR",
+    "path": "jax-to-openvino/jax-classification-to-openvino.ipynb",
+    "imageUrl": "https://raw.githubusercontent.com/jax-ml/jax/main/images/jax_logo_250px.png?raw=true",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/jax-to-openvino/jax-classification-to-openvino.ipynb",
+    "tags": {
+      "categories": [
+        "API Overview"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Classification"
+      ]
+    }
+  },
+  {
+    "title": "Create a native Agent with OpenVINO",
+    "path": "llm-native-agent-react/llm-native-agent-react.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/22fa5396-8381-400f-a78f-97e25d57d807",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/llm-native-agent-react/llm-native-agent-react.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "LLM"
+      ],
+      "tasks": [
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Document Visual Question Answering Using Pix2Struct and OpenVINO™",
+    "path": "pix2struct-docvqa/pix2struct-docvqa.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/276283074-df7464e6-8293-4c6c-8f77-8e95d8f94c11.png",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering"
+      ]
+    }
+  },
+  {
+    "title": "Grammatical Error Correction with OpenVINO",
+    "path": "grammar-correction/grammar-correction.ipynb",
+    "imageUrl": "https://cdn-images-1.medium.com/max/540/1*Voez5hEn5MU8Knde3fIZfw.png",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/grammar-correction/grammar-correction.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text Classification",
+        "Error Correction"
+      ]
+    }
+  },
+  {
+    "title": "Image generation with Sana and OpenVINO",
+    "path": "sana-image-generation/sana-image-generation.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/bacfcd2a-ac36-4421-9d1b-4e34aa0a9f62",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/sana-image-generation/sana-image-generation.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Image generation with Stable Cascade and OpenVINO",
+    "path": "stable-cascade-image-generation/stable-cascade-image-generation.ipynb",
+    "imageUrl": "https://huggingface.co/stabilityai/stable-cascade/resolve/main/figures/collage_1.jpg",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Image Generation with Tiny-SD and OpenVINO™",
+    "path": "tiny-sd-image-generation/tiny-sd-image-generation.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/tiny-sd-image-generation/tiny-sd-image-generation.png?raw=true",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image",
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Language-Visual Saliency with CLIP and OpenVINO™",
+    "path": "clip-language-saliency-map/clip-language-saliency-map.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/clip-language-saliency-map/clip-language-saliency-map.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "Explainable AI"
+      ],
+      "libraries": [],
+      "other": [
+        "CLIP"
+      ],
+      "tasks": [
+        "Feature Extraction"
+      ]
+    }
+  },
+  {
+    "title": "LocalAI and OpenVINO",
+    "path": "localai/localai.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/abd938b3-32c2-4e4e-b7b7-fb1a2f9315ce",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/localai/localai.ipynb",
+    "tags": {
+      "categories": [
+        "API Overview"
+      ],
+      "libraries": [],
+      "other": [
+        "LLM"
+      ],
+      "tasks": [
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Magika: AI powered fast and efficient file type identification using OpenVINO",
+    "path": "magika-content-type-recognition/magika-content-type-recognition.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/b99cb2c0-d9cb-47a7-ba17-1b4b2eed01da",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/magika-content-type-recognition/magika-content-type-recognition.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Bytes Classification"
+      ]
+    }
+  },
+  {
+    "title": "Named entity recognition with OpenVINO™",
+    "path": "named-entity-recognition/named-entity-recognition.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/named-entity-recognition/named-entity-recognition.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Named Entity Recognition",
+        "Token Classification"
+      ]
+    }
+  },
+  {
+    "title": "Optical Character Recognition with GOT-OCR 2.0 and OpenVINO",
+    "path": "got-ocr2/got-ocr2.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/a86cef5e-1dc0-433c-9fb5-05fbeb44759c",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/got-ocr2/got-ocr2.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Quantization Aware Training with NNCF, using PyTorch framework",
+    "path": "pytorch-quantization-aware-training/pytorch-quantization-aware-training.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/pytorch-quantization-aware-training/pytorch-quantization-aware-training.ipynb",
+    "tags": {
+      "categories": [
+        "Model Training",
+        "Optimize"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Classification"
+      ]
+    }
+  },
+  {
+    "title": "Quantization Aware Training with NNCF, using TensorFlow Framework",
+    "path": "tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb",
+    "tags": {
+      "categories": [
+        "Model Training",
+        "Optimize"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Classification"
+      ]
+    }
+  },
+  {
+    "title": "Run inference in Keras 3 with the OpenVINO™ IR backend",
+    "path": "keras-with-openvino-backend/keras-with-openvino-backend.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/f0f17c2e-0f00-49b5-8364-8d18f2cd06ff",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/keras-with-openvino-backend/keras-with-openvino-backend.ipynb",
+    "tags": {
+      "categories": [
+        "API Overview"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text Classification"
+      ]
+    }
+  },
+  {
+    "title": "Running OpenCLIP models using OpenVINO™",
+    "path": "open-clip/open-clip.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/6c13d438-8bdc-46d1-80e1-cbc4319012ee",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/open-clip/open-clip.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "CLIP"
+      ],
+      "tasks": [
+        "Zero-Shot Image Classification"
+      ]
+    }
+  },
+  {
+    "title": "Single step image generation using SDXL-turbo and OpenVINO",
+    "path": "sdxl-turbo/sdxl-turbo.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/sdxl-turbo/sdxl-turbo.png?raw=true",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/sdxl-turbo/sdxl-turbo.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image",
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Sound Generation with AudioLDM2 and OpenVINO™",
+    "path": "sound-generation-audioldm2/sound-generation-audioldm2.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/sound-generation-audioldm2/sound-generation-audioldm2.png?raw=true",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/sound-generation-audioldm2/sound-generation-audioldm2.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Audio"
+      ]
+    }
+  },
+  {
+    "title": "Stable Diffusion with KerasCV and OpenVINO",
+    "path": "stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/67365453/4dc86beb-cbdf-48da-8465-f9079d15a7fd",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Stable Fast 3D Mesh Reconstruction and OpenVINO",
+    "path": "stable-fast-3d/stable-fast-3d.ipynb",
+    "imageUrl": "https://github.com/Stability-AI/stable-fast-3d/blob/main/demo_files/teaser.gif?raw=true",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/stable-fast-3d/stable-fast-3d.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-3D"
+      ]
+    }
+  },
+  {
+    "title": "Text Generation via Prompt Lookup Decoding using OpenVINO™",
+    "path": "prompt-lookup-decoding/prompt-lookup-decoding.ipynb",
+    "imageUrl": "https://blog.vllm.ai/assets/figures/spec-decode/figure3.png",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/prompt-lookup-decoding/prompt-lookup-decoding.ipynb",
+    "tags": {
+      "categories": [
+        "API Overview"
+      ],
+      "libraries": [],
+      "other": [
+        "LLM"
+      ],
+      "tasks": [
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Text-to-image generation using PhotoMaker and OpenVINO",
+    "path": "photo-maker/photo-maker.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/photo-maker/photo-maker.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Image-to-Image",
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Text-to-Music generation using Riffusion and OpenVINO",
+    "path": "riffusion-text-to-music/riffusion-text-to-music.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/riffusion-text-to-music/riffusion-text-to-music.png?raw=true",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/riffusion-text-to-music/riffusion-text-to-music.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Audio Generation",
+        "Text-to-Audio"
+      ]
+    }
+  },
+  {
+    "title": "Text-to-Speech synthesis using Llasa and OpenVINO",
+    "path": "llasa-speech-synthesis/llasa-speech-synthesis.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/2c667441-c32b-4cb0-8c28-390120b917b3",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/llasa-speech-synthesis/llasa-speech-synthesis.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [
+        "Transformers"
+      ],
+      "tasks": [
+        "Text-to-Audio",
+        "Text-to-Speech"
+      ]
+    }
+  },
+  {
+    "title": "Text-to-Speech synthesis using OuteTTS and OpenVINO",
+    "path": "outetts-text-to-speech/outetts-text-to-speech.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/2c667441-c32b-4cb0-8c28-390120b917b3",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/outetts-text-to-speech/outetts-text-to-speech.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [
+        "Transformers"
+      ],
+      "tasks": [
+        "Text-to-Audio",
+        "Text-to-Speech"
+      ]
+    }
+  },
+  {
+    "title": "Text-to-Video retrieval with S3D MIL-NCE and OpenVINO",
+    "path": "s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/76171391/ba516a81-f6f7-4258-9e3b-931d6db7728c",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Video Retrieval"
+      ]
+    }
+  },
+  {
+    "title": "Unified image generation using OmniGen and OpenVINO",
+    "path": "omnigen/omnigen.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/ca0929af-f766-4e69-872f-95ceceeac634",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/omnigen/omnigen.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Video Classification with InternVideo2 and OpenVINO",
+    "path": "intern-video2-classiciation/intern-video2-classification.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/6720efe0-ab24-4d73-a22f-a8a0499558d8",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/intern-video2-classiciation/intern-video2-classification.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Video Retrieval"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with GLM-Edge-V and OpenVINO",
+    "path": "glm-edge-v/glm-edge-v.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/06c51867-0580-4434-962e-31b6068c2001",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/glm-edge-v/glm-edge-v.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with nanoLLaVA and OpenVINO",
+    "path": "nano-llava-multimodal-chatbot/nano-llava-multimodal-chatbot.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/8bf7d9f2-018a-4498-bec4-55f17c273ecc",
+    "lastBranch": "2025.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/nano-llava-multimodal-chatbot/nano-llava-multimodal-chatbot.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Accelerate Inference of Sparse Transformer Models with OpenVINO™ and 4th Gen Intel&reg; Xeon&reg; Scalable Processors",
+    "path": "sparsity-optimization/sparsity-optimization.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/sparsity-optimization/sparsity-optimization.ipynb",
+    "tags": {
+      "categories": [
+        "Optimize"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text Classification"
+      ]
+    }
+  },
+  {
+    "title": "Audio compression with EnCodec and OpenVINO",
+    "path": "encodec-audio-compression/encodec-audio-compression.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/encodec-audio-compression/encodec-audio-compression.png?raw=true",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/encodec-audio-compression/encodec-audio-compression.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Audio Compression"
+      ]
+    }
+  },
+  {
+    "title": "Convert of TensorFlow Hub models to OpenVINO Intermediate Representation (IR)",
+    "path": "tensorflow-hub/tensorflow-hub.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/tensorflow-hub/tensorflow-hub.ipynb",
+    "tags": {
+      "categories": [
+        "Convert"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Classification",
+        "Style Transfer"
+      ]
+    }
+  },
+  {
+    "title": "Frame interpolation using FILM and OpenVINO",
+    "path": "film-slowmo/film-slowmo.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/7e87e1a5-6197-4a15-9ced-44e21dd05b02",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/film-slowmo/film-slowmo.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Generate creative QR codes with ControlNet QR Code Monster and OpenVINO™",
+    "path": "qrcode-monster/qrcode-monster.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/qrcode-monster/qrcode-monster.png?raw=true",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/qrcode-monster/qrcode-monster.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Image Editing with InstructPix2Pix and OpenVINO",
+    "path": "instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.png?raw=true",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Image Generation with Stable Diffusion and IP-Adapter",
+    "path": "stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.png?raw=true",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Image-to-Image",
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Kosmos-2: Multimodal Large Language Model and OpenVINO",
+    "path": "kosmos2-multimodal-large-language-model/kosmos2-multimodal-large-language-model.ipynb",
+    "imageUrl": "https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/annotated_snowman.jpg",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/kosmos2-multimodal-large-language-model/kosmos2-multimodal-large-language-model.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Text",
+        "Visual Question Answering"
+      ]
+    }
+  },
+  {
+    "title": "One Step Sketch to Image translation with pix2pix-turbo and OpenVINO",
+    "path": "sketch-to-image-pix2pix-turbo/sketch-to-image-pix2pix-turbo.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/32c3b9a6-298e-44a5-8e50-60a56e6f1980",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/sketch-to-image-pix2pix-turbo/sketch-to-image-pix2pix-turbo.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "OpenVINO optimizations for Knowledge graphs",
+    "path": "knowledge-graphs-conve/knowledge-graphs-conve.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/210564312-82cda081-b2ed-4027-8251-ca57a97b4666.png",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/knowledge-graphs-conve/knowledge-graphs-conve.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "Optimize"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Knowledge Representation"
+      ]
+    }
+  },
+  {
+    "title": "PixArt-α: Fast Training of Diffusion Transformer for Photorealistic Text-to-Image Synthesis with OpenVINO",
+    "path": "pixart/pixart.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/76171391/7bf3705c-fdb2-4f20-b8f3-ef6755fa2bc0",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/pixart/pixart.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Sound Generation with Stable Audio Open and OpenVINO™",
+    "path": "stable-audio/stable-audio.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/76171391/ed4aa0f2-0501-4519-8b24-c1c3072b4ef2",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/stable-audio/stable-audio.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Audio"
+      ]
+    }
+  },
+  {
+    "title": "SpeechBrain Emotion Recognition with OpenVINO",
+    "path": "speechbrain-emotion-recognition/speechbrain-emotion-recognition.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/727848d6-02a9-4259-ad48-8492879867a1",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/speechbrain-emotion-recognition/speechbrain-emotion-recognition.ipynb",
+    "tags": {
+      "categories": [
+        "Optimize"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Audio Classification"
+      ]
+    }
+  },
+  {
+    "title": "Stable Diffusion v2.1 using OpenVINO TorchDynamo backend",
+    "path": "stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.png?raw=true",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Table Question Answering using TAPAS and OpenVINO™",
+    "path": "table-question-answering/table-question-answering.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cda2a126-ad66-40eb-b85f-3e9ceff05190",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/table-question-answering/table-question-answering.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Table Question Answering"
+      ]
+    }
+  },
+  {
+    "title": "Text-to-Image Generation with LCM LoRA and ControlNet Conditioning",
+    "path": "lcm-lora-controlnet/lcm-lora-controlnet.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/284291731-9c4ee978-a934-43ea-9484-b6b91a9f9407.png",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/lcm-lora-controlnet/lcm-lora-controlnet.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Image",
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with LLaVA and Optimum Intel OpenVINO integration",
+    "path": "llava-multimodal-chatbot/llava-multimodal-chatbot-optimum.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.png?raw=true",
+    "lastBranch": "2025.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-optimum.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Convert a PyTorch Model to ONNX and OpenVINO™ IR",
+    "path": "pytorch-to-openvino/pytorch-onnx-to-openvino.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/203723317-1716e3ca-b390-47e1-bb98-07b4d8d097a0.png",
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/pytorch-to-openvino/pytorch-onnx-to-openvino.ipynb",
+    "tags": {
+      "categories": [
+        "Convert"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Segmentation"
+      ]
+    }
+  },
+  {
+    "title": "Convert a TensorFlow Instance Segmentation Model to OpenVINO™",
+    "path": "tensorflow-object-detection-to-openvino/tensorflow-instance-segmentation-to-openvino.ipynb",
+    "imageUrl": "https://github.com/itrushkin/openvino_notebooks/assets/76161256/b0acc7bb-92c7-4c83-9484-84a8e1b798b7",
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/tensorflow-object-detection-to-openvino/tensorflow-instance-segmentation-to-openvino.ipynb",
+    "tags": {
+      "categories": [
+        "Convert"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Segmentation"
+      ]
+    }
+  },
+  {
+    "title": "Convert a TensorFlow Object Detection Model to OpenVINO™",
+    "path": "tensorflow-object-detection-to-openvino/tensorflow-object-detection-to-openvino.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/41733560/f9b59be1-1d2f-4e13-9678-67205be78841",
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/tensorflow-object-detection-to-openvino/tensorflow-object-detection-to-openvino.ipynb",
+    "tags": {
+      "categories": [
+        "Convert"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Object Detection"
+      ]
+    }
+  },
+  {
+    "title": "Convert and Optimize YOLOv11 with OpenVINO™",
+    "path": "quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb",
+    "tags": {
+      "categories": [
+        "Convert",
+        "Optimize"
+      ],
+      "libraries": [],
+      "other": [
+        "YOLO"
+      ],
+      "tasks": [
+        "Image Segmentation"
+      ]
+    }
+  },
+  {
+    "title": "Create a native Agent with OpenVINO",
+    "path": "llm-agent-react/llm-agent-react.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/22fa5396-8381-400f-a78f-97e25d57d807",
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/llm-agent-react/llm-agent-react.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "LLM"
+      ],
+      "tasks": [
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Create an Agentic RAG using OpenVINO and LlamaIndex",
+    "path": "llm-agent-react/llm-agent-rag-llamaindex.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/871cb90d-27fd-4a87-aa3c-f4cdb199a148",
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "LLM"
+      ],
+      "tasks": [
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Create ReAct Agent using OpenVINO and LangChain",
+    "path": "llm-agent-react/llm-agent-react-langchain.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/2abb2389-e612-4599-82c6-64cdac259120",
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/llm-agent-react/llm-agent-react-langchain.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "LLM"
+      ],
+      "tasks": [
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Hello Model Server",
+    "path": "model-server/model-server.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/91237924/215658767-0e0fc221-aed0-4db1-9a82-6be55f244dba.png",
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/model-server/model-server.ipynb",
+    "tags": {
+      "categories": [
+        "API Overview"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Object Detection"
+      ]
+    }
+  },
+  {
+    "title": "Image generation with Torch.FX Stable Diffusion v3 and OpenVINO",
+    "path": "stable-diffusion-v3/stable-diffusion-v3-torch-fx.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/ac99098c-66ec-4b7b-9e01-e80625f1dc3f",
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/stable-diffusion-v3/stable-diffusion-v3-torch-fx.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Infinite Zoom Stable Diffusion v2 and OpenVINO™",
+    "path": "stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.gif?raw=true",
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image",
+        "Image Inpainting",
+        "Text-to-Video"
+      ]
+    }
+  },
+  {
+    "title": "Quantize Speech Recognition Models with accuracy control using NNCF PTQ API",
+    "path": "quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb",
+    "tags": {
+      "categories": [
+        "Optimize",
+        "API Overview"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Speech Recognition"
+      ]
+    }
+  },
+  {
+    "title": "Text-to-Image Generation with LCM LoRA and ControlNet Conditioning",
+    "path": "latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/284291731-9c4ee978-a934-43ea-9484-b6b91a9f9407.png",
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Image",
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Text-to-Image Generation with Stable Diffusion v2 and OpenVINO™",
+    "path": "stable-diffusion-v2/stable-diffusion-v2-text-to-image.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/0801b0b6-f376-46b3-b874-c91aaf2c3695",
+    "lastBranch": "2025.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Depth estimation with DepthAnythingV2 and OpenVINO",
+    "path": "depth-anything/depth-anything-v2.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/depth-anything/depth-anything.gif?raw=true",
+    "lastBranch": "2025.0",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.0/notebooks/depth-anything/depth-anything-v2.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Depth Estimation"
+      ]
+    }
+  },
+  {
+    "title": "SoftVC VITS Singing Voice Conversion and OpenVINO™",
+    "path": "softvc-voice-conversion/softvc-voice-conversion.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/bb43bea1-6709-48e5-a928-b86061399849",
+    "lastBranch": "2025.0",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.0/notebooks/softvc-voice-conversion/softvc-voice-conversion.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Audio-to-Audio",
+        "Voice Conversion"
+      ]
+    }
+  },
+  {
+    "title": "Binding multimodal data using ImageBind and OpenVINO",
+    "path": "image-bind/image-bind.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png",
+    "lastBranch": "2024.5",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/image-bind/image-bind.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Feature Extraction",
+        "Zero-Shot Image Classification",
+        "Audio Classification"
+      ]
+    }
+  },
+  {
+    "title": "Cross-lingual Books Alignment with Transformers and OpenVINO™",
+    "path": "cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.png?raw=true",
+    "lastBranch": "2024.5",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Feature Extraction",
+        "Paraphrase Identification"
+      ]
+    }
+  },
+  {
+    "title": "High-resolution image generation with Segmind-VegaRT and OpenVINO",
+    "path": "stable-diffusion-xl/segmind-vegart.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-xl/stable-diffusion-xl.png?raw=true",
+    "lastBranch": "2024.5",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/stable-diffusion-xl/segmind-vegart.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Image generation with Würstchen and OpenVINO",
+    "path": "wuerstchen-image-generation/wuerstchen-image-generation.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/wuerstchen-image-generation/wuerstchen-image-generation.png?raw=true",
+    "lastBranch": "2024.5",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/wuerstchen-image-generation/wuerstchen-image-generation.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Instruction following using Databricks Dolly 2.0 and OpenVINO",
+    "path": "dolly-2-instruction-following/dolly-2-instruction-following.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png",
+    "lastBranch": "2024.5",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/dolly-2-instruction-following/dolly-2-instruction-following.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "LLM"
+      ],
+      "tasks": [
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Lightweight image generation with aMUSEd and OpenVINO",
+    "path": "amused-lightweight-text-to-image/amused-lightweight-text-to-image.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/amused-lightweight-text-to-image/amused-lightweight-text-to-image.png?raw=true",
+    "lastBranch": "2024.5",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/amused-lightweight-text-to-image/amused-lightweight-text-to-image.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Mobile language assistant with MobileVLM and OpenVINO",
+    "path": "mobilevlm-language-assistant/mobilevlm-language-assistant.ipynb",
+    "imageUrl": "https://github.com/Meituan-AutoML/MobileVLM/raw/main/assets/mobilevlm_arch.png",
+    "lastBranch": "2024.5",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/mobilevlm-language-assistant/mobilevlm-language-assistant.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Paint By Example: Exemplar-based Image Editing with Diffusion Models",
+    "path": "paint-by-example/paint-by-example.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/paint-by-example/paint-by-example.png?raw=true",
+    "lastBranch": "2024.5",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/paint-by-example/paint-by-example.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Image-to-Image",
+        "Image Inpainting"
+      ]
+    }
+  },
+  {
+    "title": "Sentiment Analysis with OpenVINO™",
+    "path": "distilbert-sequence-classification/distilbert-sequence-classification.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/distilbert-sequence-classification/distilbert-sequence-classification.png?raw=true",
+    "lastBranch": "2024.5",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/distilbert-sequence-classification/distilbert-sequence-classification.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text Classification"
+      ]
+    }
+  },
+  {
+    "title": "Stable Diffusion Text-to-Image Demo",
+    "path": "stable-diffusion-v2/stable-diffusion-v2-text-to-image-demo.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.png?raw=true",
+    "lastBranch": "2024.5",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image-demo.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Stable Diffusion v2.1 using Optimum-Intel OpenVINO and multiple Intel Hardware",
+    "path": "stable-diffusion-v2/stable-diffusion-v2-optimum-demo.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.png?raw=true",
+    "lastBranch": "2024.5",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Typo Detector with OpenVINO™",
+    "path": "typo-detector/typo-detector.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/typo-detector/typo-detector.png?raw=true",
+    "lastBranch": "2024.5",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/typo-detector/typo-detector.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Token Classification"
+      ]
+    }
+  },
+  {
+    "title": "Convert and Optimize YOLOv8 with OpenVINO™",
+    "path": "quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.4/notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb",
+    "tags": {
+      "categories": [
+        "Convert",
+        "Optimize"
+      ],
+      "libraries": [],
+      "other": [
+        "YOLO"
+      ],
+      "tasks": [
+        "Image Segmentation"
+      ]
+    }
+  },
+  {
+    "title": "Latent Consistency Model using Optimum-Intel OpenVINO",
+    "path": "latent-consistency-models-image-generation/latent-consistency-models-optimum-demo.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.png?raw=true",
+    "lastBranch": "2024.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.4/notebooks/latent-consistency-models-image-generation/latent-consistency-models-optimum-demo.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "TripoSR feedforward 3D reconstruction from a single image and OpenVINO",
+    "path": "triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb",
+    "imageUrl": "https://github.com/VAST-AI-Research/TripoSR/blob/main/figures/teaser800.gif?raw=true",
+    "lastBranch": "2024.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.4/notebooks/triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-3D"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with LLaVA and OpenVINO",
+    "path": "llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.png?raw=true",
+    "lastBranch": "2024.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.4/notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with Video-LLaVA and OpenVINO",
+    "path": "llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb",
+    "imageUrl": "https://camo.githubusercontent.com/ef232f43135222dc7cfc6e27ae26ac64edf6918512a8a4f78077e4f86c27883c/68747470733a2f2f7a312e617831782e636f6d2f323032332f31312f30372f70696c347371482e706e67",
+    "lastBranch": "2024.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.4/notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Video-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Convert and Optimize YOLOv7 with OpenVINO™",
+    "path": "yolov7-optimization/yolov7-optimization.ipynb",
+    "imageUrl": "https://raw.githubusercontent.com/WongKinYiu/yolov7/main/figure/horses_prediction.jpg",
+    "lastBranch": "2024.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.3/notebooks/yolov7-optimization/yolov7-optimization.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [
+        "YOLO"
+      ],
+      "tasks": [
+        "Object Detection"
+      ]
+    }
+  },
+  {
+    "title": "Create LLM Agent using OpenVINO",
+    "path": "llm-agent-langchain/llm-agent-langchain.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/2abb2389-e612-4599-82c6-64cdac259120",
+    "lastBranch": "2024.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/llm-agent-langchain/llm-agent-langchain.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "LLM"
+      ],
+      "tasks": [
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Image Colorization with OpenVINO",
+    "path": "vision-image-colorization/vision-image-colorization.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/18904157/180923280-9caefaf1-742b-4d2f-8943-5d4a6126e2fc.png",
+    "lastBranch": "2024.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/vision-image-colorization/vision-image-colorization.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Image generation with DeciDiffusion and OpenVINO",
+    "path": "decidiffusion-image-generation/decidiffusion-image-generation.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/decidiffusion-image-generation/decidiffusion-image-generation.png?raw=true",
+    "lastBranch": "2024.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Image-to-Image",
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "LLM-powered chatbot using Stable-Zephyr-3b and OpenVINO",
+    "path": "stable-zephyr-3b-chatbot/stable-zephyr-3b-chatbot.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cfac6ddb-6f22-4343-855c-e513269cf2bf",
+    "lastBranch": "2024.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/stable-zephyr-3b-chatbot/stable-zephyr-3b-chatbot.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "LLM"
+      ],
+      "tasks": [
+        "Text Generation",
+        "Conversational"
+      ]
+    }
+  },
+  {
+    "title": "OpenVINO™ model conversion API",
+    "path": "convert-to-openvino/legacy-mo-convert-to-openvino.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/convert-to-openvino/legacy-mo-convert-to-openvino.ipynb",
+    "tags": {
+      "categories": [
+        "Convert",
+        "API Overview"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Classification",
+        "Text Classification"
+      ]
+    }
+  },
+  {
+    "title": "Photos to Anime with PaddleGAN and OpenVINO",
+    "path": "vision-paddlegan-anime/vision-paddlegan-anime.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/15709723/123559130-04550100-d74f-11eb-819c-a02284654428.jpg",
+    "lastBranch": "2024.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/vision-paddlegan-anime/vision-paddlegan-anime.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Image",
+        "Style Transfer"
+      ]
+    }
+  },
+  {
+    "title": "Quantize Data2Vec Speech Recognition Model using NNCF PTQ API",
+    "path": "speech-recognition-quantization/speech-recognition-quantization-data2vec.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/speech-recognition-quantization/speech-recognition-quantization-data2vec.ipynb",
+    "tags": {
+      "categories": [
+        "Optimize"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Speech Recognition"
+      ]
+    }
+  },
+  {
+    "title": "Speaker diarization",
+    "path": "pyannote-speaker-diarization/pyannote-speaker-diarization.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/pyannote-speaker-diarization/pyannote-speaker-diarization.png?raw=true",
+    "lastBranch": "2024.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/pyannote-speaker-diarization/pyannote-speaker-diarization.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Voice Activity Detection"
+      ]
+    }
+  },
+  {
+    "title": "Speech to Text with OpenVINO™",
+    "path": "speech-to-text/speech-to-text.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/speech-to-text/speech-to-text.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Audio-to-Text",
+        "Speech Recognition"
+      ]
+    }
+  },
+  {
+    "title": "Super Resolution with PaddleGAN and OpenVINO™",
+    "path": "vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/vision-superresolution/vision-superresolution-image.png?raw=true",
+    "lastBranch": "2024.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Image",
+        "Super Resolution"
+      ]
+    }
+  },
+  {
+    "title": "Data Preparation for 2D Medical Imaging",
+    "path": "ct-segmentation-quantize/data-preparation-ct-scan.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/ct-segmentation-quantize/data-preparation-ct-scan.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "FastComposer: Tuning-Free Multi-Subject Image Generation with Localized Attention",
+    "path": "fastcomposer-image-generation/fastcomposer-image-generation.ipynb",
+    "imageUrl": "https://github.com/mit-han-lab/fastcomposer/raw/main/figures/multi-subject.png?raw=True",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/fastcomposer-image-generation/fastcomposer-image-generation.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Image",
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "From Training to Deployment with TensorFlow and OpenVINO™",
+    "path": "tensorflow-training-openvino/tensorflow-training-openvino.ipynb",
+    "imageUrl": "https://storage.googleapis.com/tfds-data/visualization/fig/tf_flowers-3.0.1.png",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/tensorflow-training-openvino/tensorflow-training-openvino.ipynb",
+    "tags": {
+      "categories": [
+        "Model Training",
+        "Convert"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Classification"
+      ]
+    }
+  },
+  {
+    "title": "Image generation with DeepFloyd IF and OpenVINO™",
+    "path": "deepfloyd-if/deep-floyd-if-convert.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/241643886-dfcf3c48-8d50-4730-ae28-a21595d9504f.png",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/deepfloyd-if/deep-floyd-if-convert.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Image generation with Segmind Stable Diffusion 1B (SSD-1B) model and OpenVINO",
+    "path": "stable-diffusion-xl/ssd-b1.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-xl/stable-diffusion-xl.png?raw=true",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/stable-diffusion-xl/ssd-b1.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Image In-painting with OpenVINO™",
+    "path": "image-inpainting/image-inpainting.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/4547501/167121084-ec58fbdb-b269-4de2-9d4c-253c5b95de1e.png",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/image-inpainting/image-inpainting.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Inpainting"
+      ]
+    }
+  },
+  {
+    "title": "Interactive question answering with OpenVINO™",
+    "path": "question-answering/question-answering.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/question-answering/question-answering.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Question Answering"
+      ]
+    }
+  },
+  {
+    "title": "Live Inference and Benchmark CT-scan Data with OpenVINO™",
+    "path": "ct-segmentation-quantize/ct-scan-live-inference.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/77325899/154279555-aaa47111-c976-4e77-8d23-aac96f45872f.gif",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/ct-segmentation-quantize/ct-scan-live-inference.ipynb",
+    "tags": {
+      "categories": [
+        "Live Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Segmentation"
+      ]
+    }
+  },
+  {
+    "title": "Machine translation demo",
+    "path": "machine-translation/machine-translation.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/machine-translation/machine-translation.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Translation"
+      ]
+    }
+  },
+  {
+    "title": "Monocular Visual-Inertial Depth Estimation using OpenVINO™",
+    "path": "depth-estimation-videpth/depth-estimation-videpth.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/depth-estimation-videpth/depth-estimation-videpth.png?raw=true",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/depth-estimation-videpth/depth-estimation-videpth.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Depth Estimation"
+      ]
+    }
+  },
+  {
+    "title": "Performance tricks in OpenVINO for latency mode",
+    "path": "performance-tricks/latency-tricks.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/performance-tricks/latency-tricks.ipynb",
+    "tags": {
+      "categories": [
+        "API Overview"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Object Detection"
+      ]
+    }
+  },
+  {
+    "title": "Performance tricks in OpenVINO for throughput mode",
+    "path": "performance-tricks/throughput-tricks.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/performance-tricks/throughput-tricks.ipynb",
+    "tags": {
+      "categories": [
+        "API Overview"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Object Detection"
+      ]
+    }
+  },
+  {
+    "title": "Post-Training Quantization and Weights Compression of DeepFloyd IF model with NNCF",
+    "path": "deepfloyd-if/deep-floyd-if-optimize.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/241643886-dfcf3c48-8d50-4730-ae28-a21595d9504f.png",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/deepfloyd-if/deep-floyd-if-optimize.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Post-Training Quantization of OpenAI Whisper model with NNCF",
+    "path": "whisper-subtitles-generation/whisper-nncf-quantize.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/whisper-subtitles-generation/whisper-nncf-quantize.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Speech Recognition"
+      ]
+    }
+  },
+  {
+    "title": "Post-Training Quantization with TensorFlow Classification Model",
+    "path": "tensorflow-training-openvino/tensorflow-training-openvino-nncf.ipynb",
+    "imageUrl": "https://storage.googleapis.com/tfds-data/visualization/fig/tf_flowers-3.0.1.png",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/tensorflow-training-openvino/tensorflow-training-openvino-nncf.ipynb",
+    "tags": {
+      "categories": [
+        "Optimize"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Classification"
+      ]
+    }
+  },
+  {
+    "title": "Programming Language Classification with OpenVINO",
+    "path": "code-language-id/code-language-id.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/code-language-id/code-language-id.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text Classification"
+      ]
+    }
+  },
+  {
+    "title": "Semantic segmentation with LRASPP MobileNet v3 and OpenVINO",
+    "path": "torchvision-zoo-to-openvino/lraspp-segmentation.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/torchvision-zoo-to-openvino/lraspp-segmentation.ipynb",
+    "tags": {
+      "categories": [
+        "Convert"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Segmentation"
+      ]
+    }
+  },
+  {
+    "title": "Semantic Segmentation with OpenVINO™ using Segmenter",
+    "path": "segmenter-semantic-segmentation/segmenter-semantic-segmentation.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/61357777/223854308-d1ac4a39-cc0c-4618-9e4f-d9d4d8b991e8.jpg",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/segmenter-semantic-segmentation/segmenter-semantic-segmentation.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Segmentation"
+      ]
+    }
+  },
+  {
+    "title": "Single Image Super Resolution with OpenVINO™",
+    "path": "vision-superresolution/vision-superresolution-image.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/vision-superresolution/vision-superresolution-image.png?raw=true",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/vision-superresolution/vision-superresolution-image.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Image",
+        "Super Resolution"
+      ]
+    }
+  },
+  {
+    "title": "Subject-driven image generation and editing using BLIP Diffusion and OpenVINO",
+    "path": "blip-diffusion-subject-generation/blip-diffusion-subject-generation.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/blip-diffusion-subject-generation/blip-diffusion-subject-generation.png?raw=true",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/blip-diffusion-subject-generation/blip-diffusion-subject-generation.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Image",
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Text Prediction with OpenVINO™",
+    "path": "text-prediction/text-prediction.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/95569637/229706278-2aa6a60d-02f4-45e2-9541-97529df8359d.png",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/text-prediction/text-prediction.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Conversational",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "The attention center model with OpenVINO™",
+    "path": "attention-center/attention-center.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/attention-center/attention-center.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Salient Object Detection"
+      ]
+    }
+  },
+  {
+    "title": "Train a Kidney Segmentation Model with MONAI and PyTorch Lightning",
+    "path": "ct-segmentation-quantize/pytorch-monai-training.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/ct-segmentation-quantize/pytorch-monai-training.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Video Recognition using SlowFast and OpenVINO™",
+    "path": "slowfast-video-recognition/slowfast-video-recognition.ipynb",
+    "imageUrl": "https://github.com/facebookresearch/SlowFast/raw/main/demo/ava_demo.gif",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/slowfast-video-recognition/slowfast-video-recognition.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Object Detection",
+        "Image Classification"
+      ]
+    }
+  },
+  {
+    "title": "Video Subtitle Generation using Whisper and OpenVINO™",
+    "path": "whisper-subtitles-generation/whisper-convert.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/whisper-subtitles-generation/whisper-convert.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Speech Recognition"
+      ]
+    }
+  },
+  {
+    "title": "Video Super Resolution with OpenVINO™",
+    "path": "vision-superresolution/vision-superresolution-video.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/vision-superresolution/vision-superresolution-video.gif?raw=true",
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/vision-superresolution/vision-superresolution-video.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Image",
+        "Super Resolution"
+      ]
+    }
+  },
+  {
+    "title": "Working with Open Model Zoo Models",
+    "path": "model-tools/model-tools.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2024.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/model-tools/model-tools.ipynb",
+    "tags": {
+      "categories": [
+        "API Overview",
+        "Convert"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Classification"
+      ]
+    }
+  },
+  {
+    "title": "Binding multimodal data using ImageBind and OpenVINO",
+    "path": "239-image-bind/239-image-bind-convert.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png",
+    "lastBranch": "2024.0",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.0/notebooks/239-image-bind/239-image-bind-convert.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Feature Extraction",
+        "Zero-Shot Image Classification",
+        "Audio Classification"
+      ]
+    }
+  },
+  {
+    "title": "Create an LLM-powered RAG system using OpenVINO",
+    "path": "254-llm-chatbot/254-rag-chatbot.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/304aa048-f10c-41c6-bb31-6d2bfdf49cf5",
+    "lastBranch": "2024.0",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.0/notebooks/254-llm-chatbot/254-rag-chatbot.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "OpenVINO Tokenizers: Incorporate Text Processing Into OpenVINO Pipelines",
+    "path": "128-openvino-tokenizers/128-opnevino-tokenizers.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/51917466/047f9167-a4ef-4d3d-a33b-d124541f9e2c",
+    "lastBranch": "2024.0",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.0/notebooks/128-openvino-tokenizers/128-opnevino-tokenizers.ipynb",
+    "tags": {
+      "categories": [
+        "First Steps",
+        "API Overview",
+        "Convert",
+        "Optimize"
+      ],
+      "libraries": [
+        "openvino_tokenizers",
+        "transformers"
+      ],
+      "other": [],
+      "tasks": [
+        "Text Classification",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Post-Training Quantization of ImageBind model with NNCF",
+    "path": "239-image-bind/239-image-bind-quantize.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png",
+    "lastBranch": "2024.0",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.0/notebooks/239-image-bind/239-image-bind-quantize.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Feature Extraction",
+        "Zero-Shot Image Classification",
+        "Audio Classification"
+      ]
+    }
+  },
+  {
+    "title": "Deblur Photos with DeblurGAN-v2 and OpenVINO™",
+    "path": "217-vision-deblur/217-vision-deblur.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2023.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/217-vision-deblur/217-vision-deblur.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Migrate quantization from POT API to NNCF API",
+    "path": "111-yolov5-quantization-migration/111-yolov5-quantization-migration.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2023.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/111-yolov5-quantization-migration/111-yolov5-quantization-migration.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Post-Training Quantization and Weights Compression of OpenAI BLIP model with NNCF",
+    "path": "233-blip-visual-language-processing/233-blip-optimize.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2023.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/233-blip-visual-language-processing/233-blip-optimize.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Post-Training Quantization of OpenAI CLIP model with NNCF",
+    "path": "228-clip-zero-shot-image-classification/228-clip-zero-shot-quantize.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2023.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/228-clip-zero-shot-image-classification/228-clip-zero-shot-quantize.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Stable Diffusion v2.1 using Optimum-Intel OpenVINO and multiple Intel Hardware",
+    "path": "236-stable-diffusion-v2/236-stable-diffusion-v2-optimum-demo-comparison.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2023.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-optimum-demo-comparison.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Visual Question Answering and Image Captioning using BLIP and OpenVINO",
+    "path": "233-blip-visual-language-processing/233-blip-convert.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2023.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/233-blip-visual-language-processing/233-blip-convert.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Zero-shot Image Classification with OpenAI CLIP and OpenVINO™",
+    "path": "228-clip-zero-shot-image-classification/228-clip-zero-shot-convert.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2023.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/228-clip-zero-shot-image-classification/228-clip-zero-shot-convert.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Image generation with DeepFloyd IF and OpenVINO™",
+    "path": "238-deeployd-if/238-deep-floyd-if.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2023.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.1/notebooks/238-deeployd-if/238-deep-floyd-if.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Convert and Optimize YOLOv8 with OpenVINO™",
+    "path": "230-yolov8-optimization/230-yolov8-optimization.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2023.0",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.0/notebooks/230-yolov8-optimization/230-yolov8-optimization.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Convert a PyTorch Model to ONNX and OpenVINO™ IR",
+    "path": "102-pytorch-onnx-to-openvino/102-pytorch-onnx-to-openvino.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.3/notebooks/102-pytorch-onnx-to-openvino/102-pytorch-onnx-to-openvino.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Convert a TensorFlow Model to OpenVINO™",
+    "path": "101-tensorflow-to-openvino/101-tensorflow-to-openvino.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.3/notebooks/101-tensorflow-to-openvino/101-tensorflow-to-openvino.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "INT8 Quantization with Post-training Optimization Tool (POT) in Simplified Mode tutorial",
+    "path": "114-quantization-simplified-mode/114-quantization-simplified-mode.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.3/notebooks/114-quantization-simplified-mode/114-quantization-simplified-mode.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Zero-shot Image Classification with OpenAI CLIP and OpenVINO™",
+    "path": "228-clip-zero-shot-image-classification/228-clip-zero-shot-image-classification.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.3/notebooks/228-clip-zero-shot-image-classification/228-clip-zero-shot-image-classification.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Convert and Optimize YOLOv7 with OpenVINO™",
+    "path": "225-yolov7-optimization/225-yolov7-optimiization.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/225-yolov7-optimization/225-yolov7-optimiization.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "GPT-2 Text Prediction with OpenVINO",
+    "path": "223-gpt2-text-prediction/223-gpt2-text-prediction.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/223-gpt2-text-prediction/223-gpt2-text-prediction.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "License Plate Recognition with OpenVINO™",
+    "path": "216-license-plate-recognition/216-license-plate-recognition.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/216-license-plate-recognition/216-license-plate-recognition.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Live Inference and Benchmark CT-scan Data with OpenVINO™",
+    "path": "210-ct-scan-live-inference/210-ct-scan-live-inference.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/210-ct-scan-live-inference/210-ct-scan-live-inference.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Object Detection Quantization",
+    "path": "111-detection-quantization/111-detection-quantization.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/111-detection-quantization/111-detection-quantization.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "PaddlePaddle Image Classification with OpenVINO™",
+    "path": "214-vision-paddle-classification/214-vision-paddle-classification.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/214-vision-paddle-classification/214-vision-paddle-classification.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Post-Training Quantization with TensorFlow Classification Model",
+    "path": "301-tensorflow-training-openvino/301-tensorflow-training-openvino-pot.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/301-tensorflow-training-openvino/301-tensorflow-training-openvino-pot.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Quantize a Segmentation Model and Show Live Inference",
+    "path": "110-ct-segmentation-quantize/110-ct-segmentation-quantize.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/110-ct-segmentation-quantize/110-ct-segmentation-quantize.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Quantize Speech Recognition Models with OpenVINO™ Post-Training Optimization Tool ​",
+    "path": "107-speech-recognition-quantization/107-speech-recognition-quantization.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/107-speech-recognition-quantization/107-speech-recognition-quantization.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Quantize the Ultralytics YOLOv5 model and check accuracy using the OpenVINO POT API",
+    "path": "220-yolov5-accuracy-check-and-quantization/220-yolov5-accuracy-check-and-quantization.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/220-yolov5-accuracy-check-and-quantization/220-yolov5-accuracy-check-and-quantization.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Style Transfer on ONNX Models with OpenVINO™",
+    "path": "212-onnx-style-transfer/212-onnx-style-transfer.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/212-onnx-style-transfer/212-onnx-style-transfer.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  },
+  {
+    "title": "Convert a PaddlePaddle Model to ONNX and OpenVINO™ IR",
+    "path": "103-paddle-onnx-to-openvino/103-paddle-onnx-to-openvino-classification.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2022.1",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.1/notebooks/103-paddle-onnx-to-openvino/103-paddle-onnx-to-openvino-classification.ipynb",
+    "tags": {
+      "categories": [],
+      "tasks": [],
+      "libraries": [],
+      "other": []
+    }
+  }
+]

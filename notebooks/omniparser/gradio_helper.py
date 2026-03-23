@@ -20,7 +20,7 @@ def make_demo(process_fn):
     examples_dir.mkdir(exist_ok=True, parents=True)
     for url, filename in example_images:
         if not Path(filename).exists():
-            image = Image.open(requests.get(url, stream=True).raw)
+            image = Image.open(requests.get(url, stream=True, timeout=30).raw)
             image.save(filename)
 
     with gr.Blocks() as demo:

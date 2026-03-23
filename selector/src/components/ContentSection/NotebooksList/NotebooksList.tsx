@@ -1,7 +1,8 @@
 import './NotebooksList.scss';
 
-import { INotebookMetadata } from '@/shared/notebook-metadata';
+import { IArchivedNotebookMetadata, INotebookMetadata } from '@/shared/notebook-metadata';
 
+import { ArchivedNotebookCard } from './ArchivedNotebookCard/ArchivedNotebookCard';
 import { NotebookCard } from './NotebookCard/NotebookCard';
 
 const EmptyNotebooksList = (): JSX.Element => (
@@ -12,13 +13,28 @@ const EmptyNotebooksList = (): JSX.Element => (
 );
 
 type NotebooksListProps = {
-  items: INotebookMetadata[];
+  items?: INotebookMetadata[];
+  archivedItems?: IArchivedNotebookMetadata[];
 };
 
-export const NotebooksList = ({ items }: NotebooksListProps): JSX.Element => {
+export const NotebooksList = ({ items, archivedItems }: NotebooksListProps): JSX.Element => {
+  if (archivedItems) {
+    return (
+      <div className="notebooks-container">
+        {archivedItems.length ? (
+          archivedItems.map((notebook) => (
+            <ArchivedNotebookCard key={notebook.path} item={notebook}></ArchivedNotebookCard>
+          ))
+        ) : (
+          <EmptyNotebooksList />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="notebooks-container">
-      {items.length ? (
+      {items?.length ? (
         items.map((notebook) => <NotebookCard key={notebook.path} item={notebook}></NotebookCard>)
       ) : (
         <EmptyNotebooksList />

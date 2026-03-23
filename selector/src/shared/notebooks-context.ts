@@ -3,6 +3,8 @@ import { createContext, Dispatch, SetStateAction, useState } from 'react';
 import { INotebookMetadata } from './notebook-metadata';
 import { SORT_OPTIONS, SortValues } from './notebooks.service';
 
+export type ViewMode = 'active' | 'archived';
+
 export interface INotebooksSelector {
   selectedTags: INotebookMetadata['tags'];
   setSelectedTags: Dispatch<SetStateAction<INotebooksSelector['selectedTags']>>;
@@ -13,6 +15,8 @@ export interface INotebooksSelector {
   setSort: Dispatch<SetStateAction<INotebooksSelector['sort']>>;
   page: number;
   setPage: Dispatch<SetStateAction<INotebooksSelector['page']>>;
+  viewMode: ViewMode;
+  setViewMode: Dispatch<SetStateAction<ViewMode>>;
 }
 
 export const defaultSelectedTags: INotebookMetadata['tags'] = {
@@ -32,6 +36,8 @@ export const NotebooksContext = createContext<INotebooksSelector>({
   setSort: () => {},
   page: 1,
   setPage: () => {},
+  viewMode: 'active',
+  setViewMode: () => {},
 });
 
 export function useNotebooksSelector(initialState: Partial<INotebooksSelector> | null): INotebooksSelector {
@@ -39,6 +45,7 @@ export function useNotebooksSelector(initialState: Partial<INotebooksSelector> |
   const [searchValue, setSearchValue] = useState(initialState?.searchValue || '');
   const [sort, setSort] = useState<SortValues>(SORT_OPTIONS.RECENTLY_ADDED);
   const [page, setPage] = useState<number>(1);
+  const [viewMode, setViewMode] = useState<ViewMode>('active');
 
   const resetFilters = () => {
     setSelectedTags(defaultSelectedTags);
@@ -55,5 +62,7 @@ export function useNotebooksSelector(initialState: Partial<INotebooksSelector> |
     setSort,
     page,
     setPage,
+    viewMode,
+    setViewMode,
   };
 }
