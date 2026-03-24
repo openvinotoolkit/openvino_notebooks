@@ -7,7 +7,7 @@ import openvino as ov
 try:
     from openvino import opset13
 except ImportError:
-    from openvino.runtime import opset13
+    from openvino import opset13
 import nncf
 import numpy as np
 import torch

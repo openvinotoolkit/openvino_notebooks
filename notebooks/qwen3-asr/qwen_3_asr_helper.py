@@ -38,7 +38,7 @@ except ImportError:
 try:
     from openvino import opset13
 except ImportError:
-    from openvino.runtime import opset13
+    from openvino import opset13
 
 from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
 

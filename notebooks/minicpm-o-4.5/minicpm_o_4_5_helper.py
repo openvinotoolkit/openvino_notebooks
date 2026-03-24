@@ -78,7 +78,7 @@ try:
     try:
         from openvino import opset13
     except ImportError:
-        from openvino.runtime import opset13
+        from openvino import opset13
 except ImportError:
     raise ImportError("Please install openvino: pip install openvino openvino-dev")
 

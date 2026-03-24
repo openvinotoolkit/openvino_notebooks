@@ -17,7 +17,7 @@ from typing import Optional, Union
 try:
     from openvino import opset13
 except ImportError:
-    from openvino.runtime import opset13
+    from openvino import opset13
 import openvino as ov
 import numpy as np
 import gc

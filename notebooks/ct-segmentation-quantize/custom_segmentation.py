@@ -9,7 +9,7 @@ from os import PathLike
 try:
     from openvino import PartialShape
 except ImportError:
-    from openvino.runtime import PartialShape
+    from openvino import PartialShape
 import logging
 
 # Fetch `notebook_utils` module
