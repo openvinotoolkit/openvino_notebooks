@@ -10,7 +10,7 @@ MAX_SEED = np.iinfo(np.int32).max
 
 # Use raw content URL for GitHub
 raw_url = "https://raw.githubusercontent.com/Wan-Video/Wan2.2/main/examples/i2v_input.JPG"
-response = requests.get(raw_url)
+response = requests.get(raw_url, timeout=30)
 img = Image.open(BytesIO(response.content))
 img.save("i2v_input.jpg")
 

@@ -17,7 +17,7 @@ from olmocr.prompts.anchor import get_anchor_text
 sample_path = Path("./paper.pdf")
 
 if not sample_path.exists():
-    r = requests.get("https://olmocr.allenai.org/papers/olmocr.pdf")
+    r = requests.get("https://olmocr.allenai.org/papers/olmocr.pdf", timeout=30)
     with sample_path.open("wb") as f:
         f.write(r.content)
 

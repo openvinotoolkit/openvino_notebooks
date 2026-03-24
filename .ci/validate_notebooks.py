@@ -34,9 +34,25 @@ def detect_source_venv_path() -> Path:
     """
     Detect the source virtual environment path based on the current Python executable.
 
+    On Unix, python is in bin/ subdirectory:  .../env_root/bin/python  -> .parent.parent
+    On Windows venv, python is in Scripts/:   ...\env_root\Scripts\python.exe -> .parent.parent
+    On Windows raw install, python is in root: ...\env_root\python.exe -> .parent
+
     Returns: Path
     """
-    source_venv_path = Path(sys.executable).parent.parent
+    python_path = Path(sys.executable)
+    parent_dir = python_path.parent
+
+    if platform.system() == "Windows":
+        # On Windows, if python.exe is in Scripts\ it's a standard venv -> go up 2 levels
+        # Otherwise (raw Python install, e.g. hostedtoolcache) python.exe is in root -> go up 1 level
+        if parent_dir.name.lower() == "scripts":
+            source_venv_path = parent_dir.parent
+        else:
+            source_venv_path = parent_dir
+    else:
+        # On Unix, python is always in bin/ -> go up 2 levels
+        source_venv_path = python_path.parent.parent
 
     print(f"Detecting source virtual environment executable: {sys.executable}", flush=True)
     print(f"Detected source virtual environment path: {source_venv_path}", flush=True)
@@ -252,7 +268,7 @@ def clean_test_artifacts(before_test_files: list[Path], after_test_files: list[P
         if file_path.is_file():
             try:
                 file_path.unlink()
-            except Exception:
+            except Exception:  # nosec B110 - best-effort cleanup of test artifacts
                 pass
         else:
             shutil.rmtree(file_path, ignore_errors=True)
@@ -308,7 +324,7 @@ def get_dir_size(path: Path) -> int:
         for entry in path.rglob("*"):
             if entry.is_file():
                 total += entry.stat().st_size
-    except Exception:
+    except Exception:  # nosec B110 - non-critical disk size estimation
         pass
     return total
 
@@ -368,8 +384,18 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
         if is_standard_venv:
             clone_virtualenv(str(source_env_path), str(target_env_path))
         else:
-            print(f"Falling back to venv create from {sys.executable}")
-            builder = venv.EnvBuilder(with_pip=True)
+            print(
+                f"Source at '{source_env_path}' is not a standard virtual environment "
+                f"(no '{expected_python}' found). "
+                f"Creating venv with system_site_packages=True from {sys.executable}",
+                flush=True,
+            )
+            # Use system_site_packages=True so the new venv inherits all packages
+            # installed in the parent Python (treon, openvino, etc.).
+            # This is necessary for raw Python installs (e.g. GitHub Actions
+            # hostedtoolcache on Windows) where clone_virtualenv cannot work
+            # because the source is not a standard venv.
+            builder = venv.EnvBuilder(system_site_packages=True, with_pip=True)
             builder.create(target_env_path)
     except Exception as e:
         print(f"Error cloning virtual environment: {e}", flush=True)
@@ -480,7 +506,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
         popen_kwargs["start_new_session"] = True
 
     try:
-        process = subprocess.Popen(cmd, **popen_kwargs)
+        process = subprocess.Popen(cmd, **popen_kwargs)  # nosec B603 - cmd built internally from trusted args
 
         # Start output reading thread
         output_queue = queue.Queue()
@@ -604,7 +630,7 @@ def run_test(
                 retcode, duration = run_subprocess_with_timeout(
                     main_command,
                     timeout,
-                    shell=(platform.system() == "Windows"),
+                    shell=(platform.system() == "Windows"),  # nosec B604 - shell only on Windows, cmd from internal args
                     description=f"Notebook test [{patched_notebook.name}]",
                 )
 
@@ -807,7 +833,7 @@ def main():
                     retcode, duration = run_subprocess_with_timeout(
                         cmd,
                         timeout=15,
-                        shell=(platform.system() == "Windows"),
+                        shell=(platform.system() == "Windows"),  # nosec B604 - shell only on Windows, cmd from internal args
                         description=f"Upload notebook report to DB [{patched_notebook}]",
                     )
                     if retcode != 0:

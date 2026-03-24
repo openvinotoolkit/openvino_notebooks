@@ -19,7 +19,7 @@ def download_example_images():
 
     for image_name, image_url in zip(image_names, image_urls):
         if not Path(image_name).exists():
-            response = requests.get(image_url)
+            response = requests.get(image_url, timeout=30)
             image = Image.open(BytesIO(response.content)).convert("RGB")
             image.save(image_name)
 

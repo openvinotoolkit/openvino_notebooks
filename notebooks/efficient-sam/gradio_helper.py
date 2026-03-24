@@ -17,7 +17,7 @@ def get_examples():
     for img_id, image_url in enumerate(example_images):
         img_path = examples_dir / f"example_{img_id}.jpg"
         if not img_path.exists():
-            r = requests.get(image_url)
+            r = requests.get(image_url, timeout=30)
             with img_path.open("wb") as f:
                 f.write(r.content)
     return [[img] for img in examples_dir.glob("*.jpg")]

@@ -1,12 +1,16 @@
 // @ts-check
 
-import { existsSync, readFileSync } from 'fs';
-import { join, resolve } from 'path';
+import { copyFileSync, existsSync, readFileSync } from 'fs';
+import { dirname, join, resolve } from 'path';
+import { fileURLToPath } from 'url';
 
 import { generateNotebooksMetadataFile } from '../notebook-metadata/generate-notebooks-map.js';
 import { createBuildChecksumFile } from './build-checksum.js';
-import { NOTEBOOKS_METADATA_FILE_NAME, NOTEBOOKS_STATUS_FILE_NAME } from './constants.js';
+import { ARCHIVED_NOTEBOOKS_FILE_NAME, NOTEBOOKS_METADATA_FILE_NAME, NOTEBOOKS_STATUS_FILE_NAME } from './constants.js';
 import { fetchNotebooksStatusFile } from './fetch-notebooks-status.js';
+
+const CURRENT_DIR = dirname(fileURLToPath(import.meta.url));
+const ARCHIVED_NOTEBOOKS_SOURCE = resolve(CURRENT_DIR, '..', 'notebook-metadata', 'archived-notebooks.json');
 
 /**
  *
@@ -27,6 +31,7 @@ export const collectNotebooksFilesPlugin = () => {
       if (config.command === 'build') {
         await generateNotebooksMetadataFile(distPath);
         await fetchNotebooksStatusFile(distPath);
+        copyArchivedNotebooksFile(distPath);
         await createBuildChecksumFile(distPath);
       }
     },
@@ -57,9 +62,28 @@ export const collectNotebooksFilesPlugin = () => {
 
       devServer.middlewares.use(...getFileMiddleware(NOTEBOOKS_METADATA_FILE_NAME, config.base, distPath));
       devServer.middlewares.use(...getFileMiddleware(NOTEBOOKS_STATUS_FILE_NAME, config.base, distPath));
+
+      // Serve archived notebooks JSON (copy to dist if not present)
+      copyArchivedNotebooksFile(distPath);
+      if (existsSync(join(distPath, ARCHIVED_NOTEBOOKS_FILE_NAME))) {
+        devServer.middlewares.use(...getFileMiddleware(ARCHIVED_NOTEBOOKS_FILE_NAME, config.base, distPath));
+      }
     },
   };
 };
+
+/**
+ * Copy archived-notebooks.json to the dist directory
+ * @param {string} targetDir
+ */
+function copyArchivedNotebooksFile(targetDir) {
+  if (existsSync(ARCHIVED_NOTEBOOKS_SOURCE)) {
+    copyFileSync(ARCHIVED_NOTEBOOKS_SOURCE, join(targetDir, ARCHIVED_NOTEBOOKS_FILE_NAME));
+    console.info(`Copied "${ARCHIVED_NOTEBOOKS_FILE_NAME}" to "${targetDir}".`);
+  } else {
+    console.warn(`"${ARCHIVED_NOTEBOOKS_FILE_NAME}" source not found at "${ARCHIVED_NOTEBOOKS_SOURCE}". Archived notebooks will not be available.`);
+  }
+}
 
 /**
  * @param {string} fileName

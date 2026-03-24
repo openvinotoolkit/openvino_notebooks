@@ -97,7 +97,7 @@ def parse_ref_bbox(response, image: PIL.Image.Image):
 
 
 DEPLOY_MODELS = dict()
-IMAGE_TOKEN = "<image>"
+IMAGE_TOKEN = "<image>"  # nosec B105 - model special token, not a password
 
 examples_list = [
     # visual grounding - 1
