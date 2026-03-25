@@ -1208,9 +1208,10 @@ def convert_tokenizer(model_id, remote_code, model_dir):
 def _patch_video_preprocessor_config(model_dir, source_model_id):
     """Copy video_preprocessor_config.json from the local HF cache if missing.
 
-    optimum-intel export does not copy this file (save_preprocessors() only calls
-    processor.save_pretrained() which is unaware of the non-standard config).
-    GenAI VideoProcessorConfig needs it for correct patch_size / temporal_patch_size."""
+    Qwen3VLProcessor uses AutoVideoProcessor which requires torchvision.
+    Without torchvision, transformers falls back to the slow image processor
+    and processor.save_pretrained() silently skips video_preprocessor_config.json.
+    GenAI VideoProcessorConfig needs this file for correct patch_size / temporal_patch_size."""
     from pathlib import Path
 
     model_dir = Path(model_dir)
