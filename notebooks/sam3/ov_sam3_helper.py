@@ -530,119 +530,6 @@ class Sam3SegmentationHeadModel(nn.Module):
         return result["pred_masks"]
 
 
-class Sam3GeometryEncoderModel(nn.Module):
-    """
-    Wrapper for SequenceGeometryEncoder (geometry_encoder) for OpenVINO conversion.
-    Handles box-only prompts (no points, no masks) — the common SAM3 detection use case.
-    Bypasses concat_padded_sequences entirely by using torch.cat on fixed-shape tensors.
-
-    The Python glue (OVSam3Processor._forward_grounding) pre-pads box tensors to max_boxes
-    and calls this OV model. The CLS token is appended inside this model via torch.cat.
-
-    Inputs (all padded to max_boxes):
-        box_embeddings: (max_boxes, B, 4)  — normalized cxcywh boxes; zeros for padded
-        box_mask:       (B, max_boxes) bool — True = padded/invalid token
-        box_labels:     (max_boxes, B) int64 — 0=neg, 1=pos; 1 for padded
-        img_feat:       (HW, B, C)           — image features seq-first
-        img_pos:        (HW, B, C)           — image pos enc seq-first
-
-    Outputs:
-        geo_feats: (max_boxes+1, B, C)   — +1 for CLS token; CLS is always last
-        geo_mask:  (B, max_boxes+1) bool — True = padded; CLS entry is always False
-    """
-
-    def __init__(self, geometry_encoder):
-        super().__init__()
-        self.geo = geometry_encoder
-
-    @torch.no_grad()
-    def forward(
-        self,
-        box_embeddings: Tensor,  # (N, B, 4)
-        box_mask: Tensor,  # (B, N) bool
-        box_labels: Tensor,  # (N, B) int64
-        img_feat: Tensor,  # (HW, B, C)
-        img_pos: Tensor,  # (HW, B, C)
-    ):
-        from sam3.model.box_ops import box_cxcywh_to_xyxy
-        import torchvision.ops
-
-        geo = self.geo
-        n_boxes = box_embeddings.shape[0]
-        bs = box_embeddings.shape[1]
-        HW = img_feat.shape[0]
-        H = W = int(HW**0.5)
-
-        boxes = box_embeddings  # (N, B, 4) normalized cxcywh
-        boxes_embed = None
-
-        # --- direct projection ---
-        if geo.boxes_direct_project is not None:
-            proj = geo.boxes_direct_project(boxes)  # (N, B, d_model)
-            boxes_embed = proj
-
-        # --- ROI-align pooling ---
-        if geo.boxes_pool_project is not None:
-            img_normed = geo.img_pre_norm(img_feat)  # LayerNorm (HW, B, C)
-            img_nchw = img_normed.permute(1, 2, 0).view(bs, -1, H, W)  # (B, C, H, W)
-
-            boxes_xyxy = box_cxcywh_to_xyxy(boxes)  # (N, B, 4)
-            scale = torch.tensor([W, H, W, H], dtype=boxes.dtype, device=boxes.device).view(1, 1, 4)
-            boxes_xyxy = boxes_xyxy * scale  # denormalize to pixel coordinates
-
-            # torchvision roi_align: list of (N_i, 4) per image in the batch
-            roi_list = list(boxes_xyxy.transpose(0, 1).unbind(0))  # list of B tensors (N, 4)
-            sampled = torchvision.ops.roi_align(img_nchw, roi_list, geo.roi_size)
-            # sampled: (B*N, C, roi_size, roi_size)
-            proj = geo.boxes_pool_project(sampled)  # (B*N, C, 1, 1)
-            proj = proj.view(bs, n_boxes, -1).transpose(0, 1)  # (N, B, C)
-
-            if boxes_embed is None:
-                boxes_embed = proj
-            else:
-                boxes_embed = boxes_embed + proj
-
-        # --- position encoding projection ---
-        if geo.boxes_pos_enc_project is not None:
-            cx, cy, w, h = boxes.unbind(-1)
-            enc = geo.pos_enc.encode_boxes(cx.flatten(), cy.flatten(), w.flatten(), h.flatten())  # (N*B, d_pos)
-            enc = enc.view(n_boxes, bs, enc.shape[-1])
-            proj = geo.boxes_pos_enc_project(enc)  # (N, B, d_model)
-
-            if boxes_embed is None:
-                boxes_embed = proj
-            else:
-                boxes_embed = boxes_embed + proj
-
-        # Add label embeddings
-        label_embed = geo.label_embed(box_labels.long())  # (N, B, d_model)
-        boxes_embed = label_embed + boxes_embed  # (N, B, d_model)
-
-        # Append CLS token using torch.cat (avoids concat_padded_sequences scatter ops)
-        cls = geo.cls_embed.weight.view(1, 1, -1).expand(1, bs, -1)  # (1, B, d_model)
-        cls_mask = torch.zeros(bs, 1, dtype=box_mask.dtype, device=box_mask.device)
-
-        combined = torch.cat([boxes_embed, cls], dim=0)  # (N+1, B, d_model)
-        combined_mask = torch.cat([box_mask, cls_mask], dim=1)  # (B, N+1)
-
-        # Apply final projection + norm
-        if geo.final_proj is not None:
-            combined = geo.norm(geo.final_proj(combined))
-
-        # Run 3-layer cross-attention transformer (no activation checkpointing at inference)
-        if geo.encode is not None:
-            for lay in geo.encode:
-                combined = lay(
-                    tgt=combined,
-                    memory=img_feat,
-                    tgt_key_padding_mask=combined_mask,
-                    pos=img_pos,
-                )
-            combined = geo.encode_norm(combined)
-
-        return combined, combined_mask
-
-
 class Sam3GeometryEncoderForOV(nn.Module):
     """
     OV-conversion-friendly geometry encoder wrapper (batch_size=1 only).
@@ -925,48 +812,6 @@ class Sam3SAM2MaskDecoderModel(nn.Module):
         high_res_masks = F.interpolate(low_res_masks, (self.img_size, self.img_size), mode="bilinear", align_corners=False)
 
         return low_res_masks, high_res_masks, iou_pred
-
-
-class Sam3MemoryEncoderModel(nn.Module):
-    """Wraps SimpleMaskEncoder for video memory encoding."""
-
-    def __init__(self, memory_encoder):
-        super().__init__()
-        self.memory_encoder = memory_encoder
-
-    @torch.no_grad()
-    def forward(self, pix_feat: Tensor, mask_for_mem: Tensor, skip_mask_sigmoid: Tensor):
-        maskmem_out = self.memory_encoder(
-            pix_feat,
-            mask_for_mem,
-            skip_mask_sigmoid=(skip_mask_sigmoid == 1),
-        )
-        return maskmem_out["vision_features"], maskmem_out["vision_pos_enc"]
-
-
-class Sam3MemoryAttentionModel(nn.Module):
-    """Wraps TransformerEncoderCrossAttention for video memory attention."""
-
-    def __init__(self, memory_attention):
-        super().__init__()
-        self.memory_attention = memory_attention
-
-    @torch.no_grad()
-    def forward(
-        self,
-        curr: Tensor,
-        memory: Tensor,
-        curr_pos: Tensor,
-        memory_pos: Tensor,
-        num_obj_ptr_tokens: Tensor,
-    ):
-        return self.memory_attention(
-            curr=curr,
-            curr_pos=curr_pos,
-            memory=memory,
-            memory_pos=memory_pos,
-            num_obj_ptr_tokens=int(num_obj_ptr_tokens.item()),
-        )
 
 
 class Sam3SAM1FeaturePrepModel(nn.Module):
@@ -1315,18 +1160,9 @@ class OVSam3Processor:
             self._geo_pre_norm_bias = geo_constants.get("img_pre_norm_bias")
             self._geo_split_ready = True
 
-        # Legacy fallback: load geometry encoder from auxiliary.pt as PyTorch module
-        self._pt_geometry_encoder = None
-        if ov_geometry_encoder is None and ov_geo_projections is None and auxiliary_path is not None:
-            aux_data = load_sam3_auxiliary(auxiliary_path)
-            if "geometry_encoder" in aux_data:
-                self._pt_geometry_encoder = Sam3GeometryEncoderModel(geometry_encoder=aux_data["geometry_encoder"])
-                self._pt_geometry_encoder.eval()
-            if sam1_config is None and "sam1_config" in aux_data:
-                sam1_config = aux_data["sam1_config"]
-
-        # Load SAM1 config from JSON (preferred) or legacy sam1_config dict
-        if sam1_config_path is not None and sam1_config is None:
+        # Load SAM1 config from JSON
+        sam1_config = None
+        if sam1_config_path is not None:
             sam1_config = load_sam1_config(sam1_config_path)
 
         # SAM1 task config (scalar/list values — weights are in ov_sam1_feature_prep)
@@ -1337,7 +1173,7 @@ class OVSam3Processor:
         self._sam1_num_feature_levels = 3
 
         if sam1_config is not None:
-            self._bb_feat_sizes = sam1_config.get("bb_feat_sizes", sam1_config.get("bb_feat_sizes"))
+            self._bb_feat_sizes = sam1_config.get("bb_feat_sizes")
             self._mask_threshold = sam1_config.get("mask_threshold", 0.0)
             self._sam1_image_size = sam1_config.get("image_size", resolution)
             self._sam1_num_feature_levels = sam1_config.get("num_feature_levels", 3)
@@ -1535,15 +1371,10 @@ class OVSam3Processor:
             geo_feats = torch.from_numpy(np.array(geo_result[0]))
             geo_masks = torch.from_numpy(np.array(geo_result[1]))
         else:
-            # Legacy fallback: PyTorch geometry encoder
-            with torch.inference_mode():
-                geo_feats, geo_masks = self._pt_geometry_encoder(
-                    box_embeddings,
-                    box_mask,
-                    box_labels_t,
-                    img_feats[0],
-                    img_pos_embeds[0],
-                )
+            raise RuntimeError(
+                "No geometry encoder configured. Pass ov_geo_projections + ov_geo_cross_attn + geo_config_path "
+                "(split pipeline) or ov_geometry_encoder (legacy single model) to OVSam3Processor."
+            )
         geo_masks = geo_masks.bool()
 
         # Step 4: Assemble combined prompt for transformer encoder
