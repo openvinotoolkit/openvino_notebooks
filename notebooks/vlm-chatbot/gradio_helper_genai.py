@@ -196,7 +196,6 @@ def make_demo(
         history.append({"role": "assistant", "content": ""})
 
         def generate_and_signal_complete():
-            streamer.reset()
             try:
                 image_tensors = [ov.Tensor(np.array(Image.open(p).convert("RGB"))) for p in images]
                 video_tensors = [load_video_frames(v) for v in videos]
@@ -449,14 +448,21 @@ def make_demo(
             label="Click on any example and press the 'Submit' button",
         )
 
-        submit_event = msg.submit(
-            fn=bot,
-            inputs=[msg, chatbot, temperature, top_p, top_k, repetition_penalty, enable_thinking],
-            outputs=[msg, chatbot, streamer],
-            queue=True,
-        )
         if show_model_selector:
+            # Chain: lock dropdown → run bot → unlock dropdown
+            disable_event = msg.submit(lambda: gr.Dropdown(interactive=False), outputs=[model_selector], queue=False)
+            submit_event = disable_event.then(
+                fn=bot,
+                inputs=[msg, chatbot, temperature, top_p, top_k, repetition_penalty, enable_thinking],
+                outputs=[msg, chatbot, streamer],
+            )
             submit_event.then(lambda: gr.Dropdown(interactive=True), outputs=[model_selector])
+        else:
+            msg.submit(
+                fn=bot,
+                inputs=[msg, chatbot, temperature, top_p, top_k, repetition_penalty, enable_thinking],
+                outputs=[msg, chatbot, streamer],
+            )
         stop.click(fn=stop_chat, inputs=streamer, outputs=[streamer], queue=False)
         clear.click(
             fn=stop_chat_and_clear_history,
@@ -465,7 +471,6 @@ def make_demo(
             queue=False,
         )
         if show_model_selector:
-            msg.submit(lambda: gr.Dropdown(interactive=False), outputs=[model_selector], queue=False)
             model_selector.change(
                 fn=switch_model,
                 inputs=[model_selector, streamer],
