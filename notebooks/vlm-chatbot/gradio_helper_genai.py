@@ -30,6 +30,7 @@ def _ensure_video_processor_config(model_dir):
     if image_cfg.exists():
         shutil.copy2(image_cfg, video_cfg)
 
+
 IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp")
 VIDEO_EXTENSIONS = (".mp4", ".avi", ".mov", ".mkv", ".webm")
 
@@ -91,8 +92,9 @@ def get_system_prompt(model_language, system_prompt=None):
     )
 
 
-def make_demo(pipe, model_configuration, model_id, model_language, disable_advanced=False,
-              sample_image=None, sample_video=None, available_models=None, device="CPU"):
+def make_demo(
+    pipe, model_configuration, model_id, model_language, disable_advanced=False, sample_image=None, sample_video=None, available_models=None, device="CPU"
+):
     import gradio as gr
     import gc
 
@@ -244,17 +246,15 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
 
     if any_video and sample_video and Path(sample_video).exists():
         vid_prompt = (
-            "描述视频中发生的事情。" if model_language == "Chinese"
-            else "このビデオで何が起きていますか？" if model_language == "Japanese"
-            else "Describe what is happening in this video."
+            "描述视频中发生的事情。"
+            if model_language == "Chinese"
+            else "このビデオで何が起きていますか？" if model_language == "Japanese" else "Describe what is happening in this video."
         )
         examples.append([{"text": vid_prompt, "files": [str(sample_video)]}])
 
     if sample_image and Path(sample_image).exists():
         img_prompt = (
-            "这张图片里有什么？" if model_language == "Chinese"
-            else "この画像には何がありますか？" if model_language == "Japanese"
-            else "What is on the image?"
+            "这张图片里有什么？" if model_language == "Chinese" else "この画像には何がありますか？" if model_language == "Japanese" else "What is on the image?"
         )
         examples.append([{"text": img_prompt, "files": [str(sample_image)]}])
 
