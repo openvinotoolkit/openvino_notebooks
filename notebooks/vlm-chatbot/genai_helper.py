@@ -1,5 +1,8 @@
+import json
 import queue
+import shutil
 import sys
+from pathlib import Path
 from typing import Union
 
 import cv2
@@ -140,6 +143,26 @@ class ChunkStreamer(IterableStreamer):
             self._current_length += 1
             return ov_genai.StreamingStatus.RUNNING
         return super().write(token)
+
+
+def ensure_video_processor_config(model_dir):
+    """Workaround: copy preprocessor_config.json → video_preprocessor_config.json
+    if missing, so GenAI picks up the correct patch_size for video.
+    Only needed for Qwen-VL family models (qwen2_vl, qwen2_5_vl, qwen3_vl)."""
+    model_dir = Path(model_dir)
+    video_cfg = model_dir / "video_preprocessor_config.json"
+    if video_cfg.exists():
+        return
+    config_path = model_dir / "config.json"
+    if not config_path.exists():
+        return
+    with open(config_path) as f:
+        model_type = json.load(f).get("model_type", "")
+    if "qwen" not in model_type:
+        return
+    image_cfg = model_dir / "preprocessor_config.json"
+    if image_cfg.exists():
+        shutil.copy2(image_cfg, video_cfg)
 
 
 def load_video_frames(source, max_frames=8):

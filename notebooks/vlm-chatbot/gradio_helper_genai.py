@@ -1,36 +1,13 @@
 import re
-import shutil
 import time
 
 import openvino as ov
 import openvino_genai as ov_genai
 from threading import Thread
 from pathlib import Path
-from genai_helper import ChunkStreamer, load_video_frames
+from genai_helper import ChunkStreamer, ensure_video_processor_config, load_video_frames
 import numpy as np
 from PIL import Image
-
-
-def _ensure_video_processor_config(model_dir):
-    """Workaround: copy preprocessor_config.json → video_preprocessor_config.json
-    if missing, so GenAI picks up the correct patch_size for video.
-    Only needed for Qwen-VL family models (qwen2_vl, qwen2_5_vl, qwen3_vl)."""
-    import json
-
-    model_dir = Path(model_dir)
-    video_cfg = model_dir / "video_preprocessor_config.json"
-    if video_cfg.exists():
-        return
-    config_path = model_dir / "config.json"
-    if not config_path.exists():
-        return
-    with open(config_path) as f:
-        model_type = json.load(f).get("model_type", "")
-    if "qwen" not in model_type:
-        return
-    image_cfg = model_dir / "preprocessor_config.json"
-    if image_cfg.exists():
-        shutil.copy2(image_cfg, video_cfg)
 
 
 def discover_available_models(model_id, model_dir, model_configuration, supported_vlm_models):
@@ -220,20 +197,24 @@ def make_demo(
 
         def generate_and_signal_complete():
             streamer.reset()
-            image_tensors = [ov.Tensor(np.array(Image.open(p).convert("RGB"))) for p in images]
-            video_tensors = [load_video_frames(v) for v in videos]
+            try:
+                image_tensors = [ov.Tensor(np.array(Image.open(p).convert("RGB"))) for p in images]
+                video_tensors = [load_video_frames(v) for v in videos]
 
-            if video_tensors and image_tensors:
-                current_pipe.generate(prompt_text, images=image_tensors, videos=video_tensors, generation_config=config, streamer=streamer)
-            elif video_tensors:
-                current_pipe.generate(prompt_text, videos=video_tensors, generation_config=config, streamer=streamer)
-            elif len(image_tensors) == 1:
-                current_pipe.generate(prompt_text, image=image_tensors[0], generation_config=config, streamer=streamer)
-            elif image_tensors:
-                current_pipe.generate(prompt_text, images=image_tensors, generation_config=config, streamer=streamer)
-            else:
-                current_pipe.generate(prompt_text, generation_config=config, streamer=streamer)
-            streamer.end()
+                if video_tensors and image_tensors:
+                    current_pipe.generate(prompt_text, images=image_tensors, videos=video_tensors, generation_config=config, streamer=streamer)
+                elif video_tensors:
+                    current_pipe.generate(prompt_text, videos=video_tensors, generation_config=config, streamer=streamer)
+                elif len(image_tensors) == 1:
+                    current_pipe.generate(prompt_text, image=image_tensors[0], generation_config=config, streamer=streamer)
+                elif image_tensors:
+                    current_pipe.generate(prompt_text, images=image_tensors, generation_config=config, streamer=streamer)
+                else:
+                    current_pipe.generate(prompt_text, generation_config=config, streamer=streamer)
+            except Exception as e:
+                print(f"Generation error: {e}")
+            finally:
+                streamer.end()
 
         t1 = Thread(target=generate_and_signal_complete)
         t1.start()
@@ -254,7 +235,6 @@ def make_demo(
             # immediately (no <think> tag in the streamed text).  We only
             # need to detect </think> as the boundary.  If the model
             # happens to emit <think> explicitly, we handle that too.
-            in_thinking = True
             thinking_started = time.time()
             thinking_msg = gr.ChatMessage(
                 role="assistant",
@@ -263,6 +243,7 @@ def make_demo(
             )
             history[-1] = thinking_msg
             think_done = False
+            answer_start_pos = 0  # cached position where answer text begins after </think>
 
             for new_text in streamer:
                 partial_text = text_processor(partial_text, new_text)
@@ -282,6 +263,7 @@ def make_demo(
                         thinking_msg.metadata["status"] = "done"
                         thinking_msg.metadata["duration"] = round(duration, 1)
                         answer_text = parts[1].strip() if len(parts) > 1 else ""
+                        answer_start_pos = len(parts[0]) + len("</think>")
                         if thinking_content and answer_text:
                             # Both thinking and answer present
                             thinking_msg.content = thinking_content
@@ -306,13 +288,12 @@ def make_demo(
                     thinking_msg.content = thinking_text
                     yield gr.MultimodalTextbox(value=None), history, streamer
                 else:
-                    # After </think> — streaming the answer
-                    answer_text = thinking_text.split("</think>", 1)[-1].strip()
-                    history[-1]["content"] = answer_text
+                    # After </think> — use cached position to extract answer
+                    history[-1]["content"] = thinking_text[answer_start_pos:].strip()
                     yield gr.MultimodalTextbox(value=None), history, streamer
 
             # End of stream: handle case where </think> never appeared
-            if in_thinking and not think_done and thinking_msg is not None:
+            if not think_done and thinking_msg is not None:
                 content = thinking_msg.content.strip() if thinking_msg.content else ""
                 if content:
                     # Model never closed </think> — the content IS the answer
@@ -348,7 +329,7 @@ def make_demo(
         gc.collect()
 
         gr.Info(f"Loading {selected_model}…")
-        _ensure_video_processor_config(info["model_dir"])
+        ensure_video_processor_config(info["model_dir"])
         new_pipe = ov_genai.VLMPipeline(str(info["model_dir"]), device)
         _init_pipe(new_pipe, new_config)
 
@@ -469,12 +450,14 @@ def make_demo(
             label="Click on any example and press the 'Submit' button",
         )
 
-        msg.submit(
+        submit_event = msg.submit(
             fn=bot,
             inputs=[msg, chatbot, temperature, top_p, top_k, repetition_penalty, enable_thinking],
             outputs=[msg, chatbot, streamer],
             queue=True,
         )
+        if show_model_selector:
+            submit_event.then(lambda: gr.Dropdown(interactive=True), outputs=[model_selector])
         stop.click(fn=stop_chat, inputs=streamer, outputs=[streamer], queue=False)
         clear.click(
             fn=stop_chat_and_clear_history,
@@ -483,6 +466,7 @@ def make_demo(
             queue=False,
         )
         if show_model_selector:
+            msg.submit(lambda: gr.Dropdown(interactive=False), outputs=[model_selector], queue=False)
             model_selector.change(
                 fn=switch_model,
                 inputs=[model_selector, streamer],
