@@ -1,8 +1,10 @@
+import re
 import shutil
+import time
 
 import openvino as ov
 import openvino_genai as ov_genai
-from threading import Event, Thread
+from threading import Thread
 from pathlib import Path
 from genai_helper import ChunkStreamer, load_video_frames
 import numpy as np
@@ -29,6 +31,38 @@ def _ensure_video_processor_config(model_dir):
     image_cfg = model_dir / "preprocessor_config.json"
     if image_cfg.exists():
         shutil.copy2(image_cfg, video_cfg)
+
+
+def discover_available_models(model_id, model_dir, model_configuration, supported_vlm_models):
+    """Discover all already-converted VLM models on disk.
+
+    Returns a dict of {display_key: {"model_dir": Path, "config": dict}}.
+    The currently loaded model is always included.
+    """
+    model_dir = Path(model_dir)
+    current_precision = model_dir.name.replace("_compressed_weights", "")
+    available = {
+        f"{model_id} ({current_precision})": {"model_dir": model_dir, "config": model_configuration},
+    }
+
+    dir_to_info = {}
+    for lang, models in supported_vlm_models.items():
+        for name, cfg in models.items():
+            dirname = re.sub(r'[<>:"/\\|?*]', "_", name)
+            if dirname not in dir_to_info:
+                dir_to_info[dirname] = (name, cfg)
+
+    for parent in Path(".").iterdir():
+        if parent.is_dir() and parent.name in dir_to_info:
+            name, cfg = dir_to_info[parent.name]
+            for sub in sorted(parent.iterdir()):
+                if sub.is_dir() and (sub / "openvino_language_model.xml").exists():
+                    precision = sub.name.replace("_compressed_weights", "")
+                    key = f"{name} ({precision})"
+                    if key not in available:
+                        available[key] = {"model_dir": sub, "config": cfg}
+
+    return available
 
 
 IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp")
@@ -124,14 +158,19 @@ def make_demo(
     file_types = ["image", ".mp4"] if any_video else ["image"]
     show_model_selector = available_models and len(available_models) > 1
 
-    def bot(message, history, temperature, top_p, top_k, repetition_penalty):
+    def _strip_think_tags(text):
+        """Remove <think> and </think> tags from text, keeping content."""
+        return text.replace("<think>", "").replace("</think>", "")
+
+    def bot(message, history, temperature, top_p, top_k, repetition_penalty, enable_thinking):
         current_pipe = state["pipe"]
         current_config = state["config"]
 
         text = (message.get("text") or "").strip()
         files = message.get("files") or []
 
-        # Build prompt — keep text as-is, thinking is controlled via GenerationConfig
+        model_supports_thinking = current_config.get("supports_thinking", False)
+        show_thinking = enable_thinking and model_supports_thinking
         prompt_text = text
 
         cur_supports_video = current_config.get("supports_video", False)
@@ -149,10 +188,17 @@ def make_demo(
         streamer = ChunkStreamer(current_pipe.get_tokenizer())
         if not disable_advanced:
             config = current_pipe.get_generation_config()
-            config.temperature = temperature
-            config.top_p = top_p
-            config.top_k = top_k
-            config.do_sample = temperature > 0.0
+            if show_thinking:
+                # Qwen3-VL-Thinking recommended params
+                config.temperature = 1.0
+                config.top_p = 0.95
+                config.top_k = 20
+                config.do_sample = True
+            else:
+                config.temperature = temperature
+                config.top_p = top_p
+                config.top_k = top_k
+                config.do_sample = temperature > 0.0
             config.max_new_tokens = max_new_tokens
             config.repetition_penalty = repetition_penalty
         else:
@@ -172,8 +218,6 @@ def make_demo(
             history.append({"role": "user", "content": text})
         history.append({"role": "assistant", "content": ""})
 
-        stream_complete = Event()
-
         def generate_and_signal_complete():
             streamer.reset()
             image_tensors = [ov.Tensor(np.array(Image.open(p).convert("RGB"))) for p in images]
@@ -189,17 +233,91 @@ def make_demo(
                 current_pipe.generate(prompt_text, images=image_tensors, generation_config=config, streamer=streamer)
             else:
                 current_pipe.generate(prompt_text, generation_config=config, streamer=streamer)
-            stream_complete.set()
             streamer.end()
 
         t1 = Thread(target=generate_and_signal_complete)
         t1.start()
 
         partial_text = ""
-        for new_text in streamer:
-            partial_text = text_processor(partial_text, new_text)
-            history[-1]["content"] = partial_text
-            yield gr.MultimodalTextbox(value=None), history, streamer
+
+        if not show_thinking:
+            # --- Non-thinking path (or checkbox off) ---
+            # Strip <think>/<​/think> tags, show content as plain text.
+            for new_text in streamer:
+                partial_text = text_processor(partial_text, new_text)
+                history[-1]["content"] = _strip_think_tags(partial_text)
+                yield gr.MultimodalTextbox(value=None), history, streamer
+        else:
+            # --- Thinking path: collapsible block via gr.ChatMessage ---
+            # The Thinking model's chat template injects <think>\n at the
+            # end of the prompt, so the model output starts with reasoning
+            # immediately (no <think> tag in the streamed text).  We only
+            # need to detect </think> as the boundary.  If the model
+            # happens to emit <think> explicitly, we handle that too.
+            in_thinking = True
+            thinking_started = time.time()
+            thinking_msg = gr.ChatMessage(
+                role="assistant",
+                content="",
+                metadata={"title": "\U0001f914 Thinking", "status": "pending"},
+            )
+            history[-1] = thinking_msg
+            think_done = False
+
+            for new_text in streamer:
+                partial_text = text_processor(partial_text, new_text)
+
+                # Strip leading <think> if model echoes it
+                thinking_text = partial_text
+                if thinking_text.startswith("<think>"):
+                    thinking_text = thinking_text[len("<think>") :]
+
+                if not think_done:
+                    if "</think>" in thinking_text:
+                        # Thinking finished — split reasoning from answer
+                        think_done = True
+                        parts = thinking_text.split("</think>", 1)
+                        duration = time.time() - thinking_started if thinking_started else 0
+                        thinking_content = parts[0].strip()
+                        thinking_msg.metadata["status"] = "done"
+                        thinking_msg.metadata["duration"] = round(duration, 1)
+                        answer_text = parts[1].strip() if len(parts) > 1 else ""
+                        if thinking_content and answer_text:
+                            # Both thinking and answer present
+                            thinking_msg.content = thinking_content
+                            history.append({"role": "assistant", "content": answer_text})
+                        elif thinking_content and not answer_text:
+                            # Thinking present, no answer yet — keep both;
+                            # answer will be streamed into history[-1] below
+                            thinking_msg.content = thinking_content
+                            history.append({"role": "assistant", "content": ""})
+                        elif not thinking_content and answer_text:
+                            # Empty thinking (model did <think></think>) — show answer only
+                            history[-1] = {"role": "assistant", "content": answer_text}
+                            thinking_msg = None
+                        else:
+                            # Both empty — just add empty answer slot
+                            history[-1] = {"role": "assistant", "content": ""}
+                            thinking_msg = None
+                        yield gr.MultimodalTextbox(value=None), history, streamer
+                        continue
+
+                    # Still accumulating thinking content
+                    thinking_msg.content = thinking_text
+                    yield gr.MultimodalTextbox(value=None), history, streamer
+                else:
+                    # After </think> — streaming the answer
+                    answer_text = thinking_text.split("</think>", 1)[-1].strip()
+                    history[-1]["content"] = answer_text
+                    yield gr.MultimodalTextbox(value=None), history, streamer
+
+            # End of stream: handle case where </think> never appeared
+            if in_thinking and not think_done and thinking_msg is not None:
+                content = thinking_msg.content.strip() if thinking_msg.content else ""
+                if content:
+                    # Model never closed </think> — the content IS the answer
+                    history[-1] = {"role": "assistant", "content": content}
+                    yield gr.MultimodalTextbox(value=None), history, streamer
 
     def stop_chat(streamer):
         if streamer is not None:
@@ -214,7 +332,7 @@ def make_demo(
 
     def switch_model(selected_model, current_streamer):
         if not available_models or selected_model not in available_models:
-            return gr.skip(), gr.skip(), gr.skip()
+            return gr.skip(), gr.skip(), gr.skip(), gr.skip()
 
         info = available_models[selected_model]
         new_config = info["config"]
@@ -239,7 +357,8 @@ def make_demo(
         state["model_id"] = selected_model
 
         new_title = f"""<h1><center>OpenVINO {selected_model} Chatbot</center></h1>"""
-        return new_title, [], None
+        thinks = new_config.get("supports_thinking", False)
+        return new_title, [], None, gr.Checkbox(value=False, visible=thinks)
 
     text_examples = chinese_examples if (model_language == "Chinese") else japanese_examples if (model_language == "Japanese") else english_examples
     examples = []
@@ -288,6 +407,12 @@ def make_demo(
         with gr.Row():
             stop = gr.Button("Stop")
             clear = gr.Button("Clear")
+        enable_thinking = gr.Checkbox(
+            label="Enable Thinking",
+            value=False,
+            visible=model_configuration.get("supports_thinking", False),
+            interactive=not disable_advanced,
+        )
         with gr.Row(visible=not disable_advanced):
             with gr.Accordion("Advanced Options:", open=False):
                 with gr.Row():
@@ -346,7 +471,7 @@ def make_demo(
 
         msg.submit(
             fn=bot,
-            inputs=[msg, chatbot, temperature, top_p, top_k, repetition_penalty],
+            inputs=[msg, chatbot, temperature, top_p, top_k, repetition_penalty, enable_thinking],
             outputs=[msg, chatbot, streamer],
             queue=True,
         )
@@ -361,7 +486,7 @@ def make_demo(
             model_selector.change(
                 fn=switch_model,
                 inputs=[model_selector, streamer],
-                outputs=[title_md, chatbot, streamer],
+                outputs=[title_md, chatbot, streamer, enable_thinking],
             )
 
         return demo

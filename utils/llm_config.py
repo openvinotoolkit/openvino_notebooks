@@ -89,6 +89,11 @@ SUPPORTED_VLM_MODELS = {
         "Qwen3-VL-8B-Instruct": {
             "model_id": "Qwen/Qwen3-VL-8B-Instruct",
             "supports_video": True,
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3-VL-8B-Thinking": {
+            "model_id": "Qwen/Qwen3-VL-8B-Thinking",
+            "supports_video": True,
             "supports_thinking": True,
             "exclude_on_devices": ["NPU"],
         },
@@ -107,6 +112,11 @@ SUPPORTED_VLM_MODELS = {
         "Qwen3-VL-8B-Instruct": {
             "model_id": "Qwen/Qwen3-VL-8B-Instruct",
             "supports_video": True,
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3-VL-8B-Thinking": {
+            "model_id": "Qwen/Qwen3-VL-8B-Thinking",
+            "supports_video": True,
             "supports_thinking": True,
             "exclude_on_devices": ["NPU"],
         },
@@ -119,6 +129,11 @@ SUPPORTED_VLM_MODELS = {
     "Japanese": {
         "Qwen3-VL-8B-Instruct": {
             "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+            "supports_video": True,
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3-VL-8B-Thinking": {
+            "model_id": "Qwen/Qwen3-VL-8B-Thinking",
             "supports_video": True,
             "supports_thinking": True,
             "exclude_on_devices": ["NPU"],
