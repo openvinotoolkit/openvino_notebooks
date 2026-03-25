@@ -83,14 +83,18 @@ SUPPORTED_VLM_MODELS = {
     "English": {
         "Llava-Next-Video-7B": {
             "model_id": "llava-hf/LLaVA-NeXT-Video-7B-hf",
+            "supports_video": True,
             "exclude_on_devices": ["NPU"],
         },
         "Qwen3-VL-8B-Instruct": {
             "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+            "supports_video": True,
+            "supports_thinking": True,
             "exclude_on_devices": ["NPU"],
         },
         "Qwen2.5-VL-3B-Instruct": {
             "model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+            "supports_video": True,
             "exclude_on_devices": ["NPU"],
         },
         "InternVL2-1B": {
@@ -102,20 +106,26 @@ SUPPORTED_VLM_MODELS = {
     "Chinese": {
         "Qwen3-VL-8B-Instruct": {
             "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+            "supports_video": True,
+            "supports_thinking": True,
             "exclude_on_devices": ["NPU"],
         },
         "Qwen2.5-VL-3B-Instruct": {
             "model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+            "supports_video": True,
             "exclude_on_devices": ["NPU"],
         },
     },
     "Japanese": {
         "Qwen3-VL-8B-Instruct": {
             "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+            "supports_video": True,
+            "supports_thinking": True,
             "exclude_on_devices": ["NPU"],
         },
         "Qwen2.5-VL-3B-Instruct": {
             "model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+            "supports_video": True,
             "exclude_on_devices": ["NPU"],
         },
     },

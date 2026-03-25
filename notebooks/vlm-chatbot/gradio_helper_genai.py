@@ -1,13 +1,39 @@
+import shutil
+
 import openvino as ov
 import openvino_genai as ov_genai
-from uuid import uuid4
 from threading import Event, Thread
-from genai_helper import ChunkStreamer
-import re
+from pathlib import Path
+from genai_helper import ChunkStreamer, load_video_frames
+import numpy as np
+from PIL import Image
+
+
+def _ensure_video_processor_config(model_dir):
+    """Workaround: copy preprocessor_config.json → video_preprocessor_config.json
+    if missing, so GenAI picks up the correct patch_size for video.
+    Only needed for Qwen-VL family models (qwen2_vl, qwen2_5_vl, qwen3_vl)."""
+    import json
+
+    model_dir = Path(model_dir)
+    video_cfg = model_dir / "video_preprocessor_config.json"
+    if video_cfg.exists():
+        return
+    config_path = model_dir / "config.json"
+    if not config_path.exists():
+        return
+    with open(config_path) as f:
+        model_type = json.load(f).get("model_type", "")
+    if "qwen" not in model_type:
+        return
+    image_cfg = model_dir / "preprocessor_config.json"
+    if image_cfg.exists():
+        shutil.copy2(image_cfg, video_cfg)
+
+IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp")
+VIDEO_EXTENSIONS = (".mp4", ".avi", ".mov", ".mkv", ".webm")
 
 max_new_tokens = 2048
-
-core = ov.Core()
 
 chinese_examples = [
     ["你好!"],
@@ -65,60 +91,62 @@ def get_system_prompt(model_language, system_prompt=None):
     )
 
 
-def make_demo(pipe, model_configuration, model_id, model_language, disable_advanced=False):
+def make_demo(pipe, model_configuration, model_id, model_language, disable_advanced=False,
+              sample_image=None, sample_video=None, available_models=None, device="CPU"):
     import gradio as gr
+    import gc
 
     max_new_tokens = 2048
 
-    start_message = get_system_prompt(model_language, model_configuration.get("start_message"))
-    if "genai_chat_template" in model_configuration:
-        pipe.get_tokenizer().set_chat_template(model_configuration["genai_chat_template"])
+    # Mutable state — allows model switching at runtime
+    state = {
+        "pipe": pipe,
+        "config": model_configuration,
+        "model_id": model_id,
+    }
 
-    def get_uuid():
-        """
-        universal unique identifier for thread
-        """
-        return str(uuid4())
+    def _init_pipe(p, cfg):
+        if "genai_chat_template" in cfg:
+            p.get_tokenizer().set_chat_template(cfg["genai_chat_template"])
 
-    def default_partial_text_processor(partial_text: str, new_text: str):
-        """
-        helper for updating partially generated answer, used by default
+    _init_pipe(pipe, model_configuration)
 
-        Params:
-        partial_text: text buffer for storing previosly generated text
-        new_text: text update for the current step
-        Returns:
-        updated text string
-
-        """
-        new_text = re.sub(r"^<think>", "<em><small>I am thinking...", new_text)
-        new_text = re.sub("</think>", "I think I know the answer</small></em>", new_text)
+    def default_partial_text_processor(partial_text, new_text):
         partial_text += new_text
         return partial_text
 
-    text_processor = model_configuration.get("partial_text_processor", default_partial_text_processor)
+    # Aggregate capabilities across all available models for UI setup
+    any_video = model_configuration.get("supports_video", False)
+    if available_models:
+        any_video = any_video or any(m["config"].get("supports_video", False) for m in available_models.values())
+    file_types = ["image", ".mp4"] if any_video else ["image"]
+    show_model_selector = available_models and len(available_models) > 1
 
-    def bot(image, message, history, temperature, top_p, top_k, repetition_penalty):
-        """
-        callback function for running chatbot on submit button click
+    def bot(message, history, temperature, top_p, top_k, repetition_penalty):
+        current_pipe = state["pipe"]
+        current_config = state["config"]
 
-        Params:
-        message: new message from user
-        history: conversation history
-        temperature:  parameter for control the level of creativity in AI-generated text.
-                        By adjusting the `temperature`, you can influence the AI model's probability distribution, making the text more focused or diverse.
-        top_p: parameter for control the range of tokens considered by the AI model based on their cumulative probability.
-        top_k: parameter for control the range of tokens considered by the AI model based on their cumulative probability, selecting number of tokens with highest probability.
-        repetition_penalty: parameter for penalizing tokens based on how frequently they occur in the text.
-        active_chat: chat state, if true then chat is running, if false then we should start it here.
-        Returns:
-        message: reset message and make it ""
-        history: updated history with message and answer from chatbot
-        active_chat: if we are here, the chat is running or will be started, so return True
-        """
-        streamer = ChunkStreamer(pipe.get_tokenizer())
+        text = (message.get("text") or "").strip()
+        files = message.get("files") or []
+
+        # Build prompt — keep text as-is, thinking is controlled via GenerationConfig
+        prompt_text = text
+
+        cur_supports_video = current_config.get("supports_video", False)
+        images, videos = [], []
+        for f in files:
+            fpath = f if isinstance(f, str) else f.get("path", "") if isinstance(f, dict) else ""
+            if fpath.lower().endswith(VIDEO_EXTENSIONS):
+                if cur_supports_video:
+                    videos.append(fpath)
+            elif fpath:
+                images.append(fpath)
+
+        text_processor = current_config.get("partial_text_processor", default_partial_text_processor)
+
+        streamer = ChunkStreamer(current_pipe.get_tokenizer())
         if not disable_advanced:
-            config = pipe.get_generation_config()
+            config = current_pipe.get_generation_config()
             config.temperature = temperature
             config.top_p = top_p
             config.top_k = top_k
@@ -128,24 +156,37 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
         else:
             config = ov_genai.GenerationConfig()
             config.max_new_tokens = max_new_tokens
+
         history = history or []
         if not history:
-            pipe.start_chat(system_message=start_message)
+            start_msg = get_system_prompt(model_language, current_config.get("start_message"))
+            current_pipe.start_chat(system_message=start_msg)
 
-        history.append([message, ""])
-        new_prompt = message
+        for fpath in images:
+            history.append({"role": "user", "content": gr.Image(fpath)})
+        for fpath in videos:
+            history.append({"role": "user", "content": gr.Video(fpath)})
+        if text:
+            history.append({"role": "user", "content": text})
+        history.append({"role": "assistant", "content": ""})
 
         stream_complete = Event()
 
         def generate_and_signal_complete():
-            """
-            genration function for single thread
-            """
             streamer.reset()
-            if image is not None:
-                pipe.generate(new_prompt, image=ov.Tensor(image), generation_config=config, streamer=streamer)
+            image_tensors = [ov.Tensor(np.array(Image.open(p).convert("RGB"))) for p in images]
+            video_tensors = [load_video_frames(v) for v in videos]
+
+            if video_tensors and image_tensors:
+                current_pipe.generate(prompt_text, images=image_tensors, videos=video_tensors, generation_config=config, streamer=streamer)
+            elif video_tensors:
+                current_pipe.generate(prompt_text, videos=video_tensors, generation_config=config, streamer=streamer)
+            elif len(image_tensors) == 1:
+                current_pipe.generate(prompt_text, image=image_tensors[0], generation_config=config, streamer=streamer)
+            elif image_tensors:
+                current_pipe.generate(prompt_text, images=image_tensors, generation_config=config, streamer=streamer)
             else:
-                pipe.generate(new_prompt, generation_config=config, streamer=streamer)
+                current_pipe.generate(prompt_text, generation_config=config, streamer=streamer)
             stream_complete.set()
             streamer.end()
 
@@ -155,8 +196,8 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
         partial_text = ""
         for new_text in streamer:
             partial_text = text_processor(partial_text, new_text)
-            history[-1][1] = partial_text
-            yield "", history, streamer
+            history[-1]["content"] = partial_text
+            yield gr.MultimodalTextbox(value=None), history, streamer
 
     def stop_chat(streamer):
         if streamer is not None:
@@ -166,39 +207,87 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
     def stop_chat_and_clear_history(streamer):
         if streamer is not None:
             streamer.end()
-        pipe.finish_chat()
-        return None, None
+        state["pipe"].finish_chat()
+        return [], None
 
-    examples = chinese_examples if (model_language == "Chinese") else japanese_examples if (model_language == "Japanese") else english_examples
+    def switch_model(selected_model, current_streamer):
+        if not available_models or selected_model not in available_models:
+            return gr.skip(), gr.skip(), gr.skip()
 
-    with gr.Blocks(
-        theme=gr.themes.Soft(),
-        css=".disclaimer {font-variant-caps: all-small-caps;}",
-    ) as demo:
+        info = available_models[selected_model]
+        new_config = info["config"]
+
+        if current_streamer is not None:
+            current_streamer.end()
+
+        try:
+            state["pipe"].finish_chat()
+        except Exception:
+            pass
+        del state["pipe"]
+        gc.collect()
+
+        gr.Info(f"Loading {selected_model}…")
+        _ensure_video_processor_config(info["model_dir"])
+        new_pipe = ov_genai.VLMPipeline(str(info["model_dir"]), device)
+        _init_pipe(new_pipe, new_config)
+
+        state["pipe"] = new_pipe
+        state["config"] = new_config
+        state["model_id"] = selected_model
+
+        new_title = f"""<h1><center>OpenVINO {selected_model} Chatbot</center></h1>"""
+        return new_title, [], None
+
+    text_examples = chinese_examples if (model_language == "Chinese") else japanese_examples if (model_language == "Japanese") else english_examples
+    examples = []
+
+    if any_video and sample_video and Path(sample_video).exists():
+        vid_prompt = (
+            "描述视频中发生的事情。" if model_language == "Chinese"
+            else "このビデオで何が起きていますか？" if model_language == "Japanese"
+            else "Describe what is happening in this video."
+        )
+        examples.append([{"text": vid_prompt, "files": [str(sample_video)]}])
+
+    if sample_image and Path(sample_image).exists():
+        img_prompt = (
+            "这张图片里有什么？" if model_language == "Chinese"
+            else "この画像には何がありますか？" if model_language == "Japanese"
+            else "What is on the image?"
+        )
+        examples.append([{"text": img_prompt, "files": [str(sample_image)]}])
+
+    for ex in text_examples:
+        examples.append([{"text": ex[0], "files": []}])
+
+    with gr.Blocks() as demo:
         streamer = gr.State(None)
-        conversation_id = gr.State(get_uuid)
-        gr.Markdown(f"""<h1><center>OpenVINO {model_id} Chatbot</center></h1>""")
-        with gr.Row(equal_height=True):
-            with gr.Column(scale=3):
-                chatbot = gr.Chatbot(height=500)
-            with gr.Column(scale=1, min_width=260):
-                image = gr.Image(
-                    label="Attach image",
-                    type="numpy",
-                    sources=["upload", "clipboard"],
-                )
+        title_md = gr.Markdown(f"""<h1><center>OpenVINO {model_id} Chatbot</center></h1>""")
+
+        if show_model_selector:
+            current_key = next(
+                (k for k in available_models if model_id in k),
+                list(available_models.keys())[0],
+            )
+            model_selector = gr.Dropdown(
+                choices=list(available_models.keys()),
+                value=current_key,
+                label="Model",
+            )
+
+        chatbot = gr.Chatbot(
+            height=500,
+        )
+        msg = gr.MultimodalTextbox(
+            file_types=file_types,
+            file_count="multiple",
+            placeholder="Ask a question — attach images or video if needed",
+            show_label=False,
+        )
         with gr.Row():
-            with gr.Column():
-                msg = gr.Textbox(
-                    label="Chat Message Box",
-                    placeholder="Ask a question about the image or chat normally",
-                    show_label=False,
-                    container=False,
-                )
-                with gr.Row():
-                    submit = gr.Button("Submit")
-                    stop = gr.Button("Stop")
-                    clear = gr.Button("Clear")
+            stop = gr.Button("Stop")
+            clear = gr.Button("Clear")
         with gr.Row(visible=not disable_advanced):
             with gr.Accordion("Advanced Options:", open=False):
                 with gr.Row():
@@ -251,19 +340,13 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
                             )
         gr.Examples(
             examples,
-            inputs=msg,
+            inputs=[msg],
             label="Click on any example and press the 'Submit' button",
         )
 
         msg.submit(
             fn=bot,
-            inputs=[image, msg, chatbot, temperature, top_p, top_k, repetition_penalty],
-            outputs=[msg, chatbot, streamer],
-            queue=True,
-        )
-        submit.click(
-            fn=bot,
-            inputs=[image, msg, chatbot, temperature, top_p, top_k, repetition_penalty],
+            inputs=[msg, chatbot, temperature, top_p, top_k, repetition_penalty],
             outputs=[msg, chatbot, streamer],
             queue=True,
         )
@@ -274,5 +357,11 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
             outputs=[chatbot, streamer],
             queue=False,
         )
+        if show_model_selector:
+            model_selector.change(
+                fn=switch_model,
+                inputs=[model_selector, streamer],
+                outputs=[title_md, chatbot, streamer],
+            )
 
         return demo
