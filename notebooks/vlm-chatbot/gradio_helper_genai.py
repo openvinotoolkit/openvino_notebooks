@@ -5,7 +5,7 @@ import openvino as ov
 import openvino_genai as ov_genai
 from threading import Thread
 from pathlib import Path
-from genai_helper import ChunkStreamer, ensure_video_processor_config, load_video_frames
+from genai_helper import ChunkStreamer, load_video_frames
 import numpy as np
 from PIL import Image
 
@@ -329,7 +329,6 @@ def make_demo(
         gc.collect()
 
         gr.Info(f"Loading {selected_model}…")
-        ensure_video_processor_config(info["model_dir"])
         new_pipe = ov_genai.VLMPipeline(str(info["model_dir"]), device)
         _init_pipe(new_pipe, new_config)
 
