@@ -321,15 +321,10 @@
 - [Part Segmentation of 3D Point Clouds with OpenVINO™](./3D-segmentation-point-clouds/3D-segmentation-point-clouds.ipynb)
 - [**PointPillar for 3D object detection**](./3D-point-pillars/pointpillars.ipynb)
 
-## Model Training
-
-- [Quantization-Sparsity Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb)
-
 ## Optimize
 
 - [YOLOv11 quantization with accuracy control using NNCF](./yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb)
 - [Quantize Speech Recognition Models with accuracy control using NNCF PTQ API](./speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb)
-- [Quantization-Sparsity Aware Training with NNCF, using PyTorch framework](./pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb)
 - [Post-Training Quantization of PyTorch models with NNCF](./pytorch-post-training-quantization-nncf/pytorch-post-training-quantization-nncf.ipynb)
 - [Optimize Preprocessing](./optimize-preprocessing/optimize-preprocessing.ipynb)
 - [Voice tone cloning with OpenVoice2 and MeloTTS for Text-to-Speech by OpenVINO](./openvoice2-and-melotts/openvoice2-and-melotts.ipynb)
