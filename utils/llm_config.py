@@ -83,14 +83,23 @@ SUPPORTED_VLM_MODELS = {
     "English": {
         "Llava-Next-Video-7B": {
             "model_id": "llava-hf/LLaVA-NeXT-Video-7B-hf",
+            "supports_video": True,
             "exclude_on_devices": ["NPU"],
         },
         "Qwen3-VL-8B-Instruct": {
             "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+            "supports_video": True,
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3-VL-8B-Thinking": {
+            "model_id": "Qwen/Qwen3-VL-8B-Thinking",
+            "supports_video": True,
+            "supports_thinking": True,
             "exclude_on_devices": ["NPU"],
         },
         "Qwen2.5-VL-3B-Instruct": {
             "model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+            "supports_video": True,
             "exclude_on_devices": ["NPU"],
         },
         "InternVL2-1B": {
@@ -102,20 +111,36 @@ SUPPORTED_VLM_MODELS = {
     "Chinese": {
         "Qwen3-VL-8B-Instruct": {
             "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+            "supports_video": True,
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3-VL-8B-Thinking": {
+            "model_id": "Qwen/Qwen3-VL-8B-Thinking",
+            "supports_video": True,
+            "supports_thinking": True,
             "exclude_on_devices": ["NPU"],
         },
         "Qwen2.5-VL-3B-Instruct": {
             "model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+            "supports_video": True,
             "exclude_on_devices": ["NPU"],
         },
     },
     "Japanese": {
         "Qwen3-VL-8B-Instruct": {
             "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+            "supports_video": True,
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3-VL-8B-Thinking": {
+            "model_id": "Qwen/Qwen3-VL-8B-Thinking",
+            "supports_video": True,
+            "supports_thinking": True,
             "exclude_on_devices": ["NPU"],
         },
         "Qwen2.5-VL-3B-Instruct": {
             "model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+            "supports_video": True,
             "exclude_on_devices": ["NPU"],
         },
     },
@@ -1180,6 +1205,29 @@ def convert_tokenizer(model_id, remote_code, model_dir):
     ov.save_model(ov_detokenizer, model_dir / "openvino_detokenizer.xml")
 
 
+def _patch_video_preprocessor_config(model_dir, source_model_id):
+    """Copy video_preprocessor_config.json from the local HF cache if missing.
+
+    Qwen3VLProcessor uses AutoVideoProcessor which requires torchvision.
+    Without torchvision, transformers falls back to the slow image processor
+    and processor.save_pretrained() silently skips video_preprocessor_config.json.
+    GenAI VideoProcessorConfig needs this file for correct patch_size / temporal_patch_size."""
+    from pathlib import Path
+
+    model_dir = Path(model_dir)
+    if (model_dir / "video_preprocessor_config.json").exists():
+        return
+    try:
+        from huggingface_hub import try_to_load_from_cache
+        import shutil
+
+        cached = try_to_load_from_cache(source_model_id, "video_preprocessor_config.json")
+        if cached and isinstance(cached, str):
+            shutil.copy2(cached, model_dir / "video_preprocessor_config.json")
+    except Exception:  # nosec B110 - file is optional, not all models have it
+        pass
+
+
 def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted=True):
     from pathlib import Path
     from IPython.display import Markdown, display
@@ -1213,6 +1261,7 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
             print(f"⌛Found preconverted {precision} {model_id} VLM. Downloading model started. It may takes some time.")
             hf_hub.snapshot_download(ov_model_hub_id, local_dir=model_dir)
             print(f"✅ {precision} {model_id} VLM model downloaded and can be found in {model_dir}")
+            _patch_video_preprocessor_config(model_dir, pt_model_id)
             return model_dir
 
     model_compression_params = {}
@@ -1250,6 +1299,7 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
             except Exception:  # nosec B110 - optional chat_template patch, model works without it
                 pass
 
+    _patch_video_preprocessor_config(model_dir, pt_model_id)
     return model_dir
 
 

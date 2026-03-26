@@ -1,7 +1,13 @@
+import json
 import queue
+import shutil
 import sys
+from pathlib import Path
 from typing import Union
 
+import cv2
+import numpy as np
+import openvino as ov
 import openvino_genai as ov_genai
 
 
@@ -137,3 +143,52 @@ class ChunkStreamer(IterableStreamer):
             self._current_length += 1
             return ov_genai.StreamingStatus.RUNNING
         return super().write(token)
+
+
+def load_video_frames(source, max_frames=8):
+    """
+    Load video frames from a file path or numpy array.
+
+    Follows the official ``video_to_text_chat.py`` sample from
+    openvino.genai (BGR uint8, uniform sampling).
+
+    Args:
+        source: Path to a video file (str/Path) or numpy array [H, W, C] or [N, H, W, C].
+        max_frames: Number of frames to sample uniformly (default 8, same as
+            the official GenAI sample).
+
+    Returns:
+        ov.Tensor with layout [Frame, H, W, C] (uint8).
+    """
+    if isinstance(source, np.ndarray):
+        if source.ndim == 3:
+            source = source[np.newaxis]
+        return ov.Tensor(source)
+
+    cap = cv2.VideoCapture(str(source))
+    if not cap.isOpened():
+        raise ValueError(f"Cannot open video: {source}")
+
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if total_frames <= 0:
+        raise ValueError(f"Cannot read frames from video: {source}")
+
+    # Uniform sampling – matches official GenAI video sample
+    sample_count = min(max_frames, total_frames)
+    indices = np.arange(0, total_frames, total_frames / sample_count).astype(int)
+
+    frames = []
+    idx = 0
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        if idx in indices:
+            frames.append(np.array(frame))
+        idx += 1
+    cap.release()
+
+    if not frames:
+        raise ValueError(f"No frames could be read from: {source}")
+
+    return ov.Tensor(frames)
