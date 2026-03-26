@@ -71,4 +71,5 @@ notebooks/qwen-image/qwen-image.ipynb
 notebooks/wan2.2-text-image-to-video/wan2.2-text-image-to-video.ipynb
 notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb
 notebooks/funasr-nano/funasr-nano.ipynb
+notebooks/sam3/sam3-segmentation.ipynb
 notebooks/minicpm-o-4.5/minicpm-o-4.5.ipynb
