@@ -7,7 +7,7 @@ import nncf
 import numpy as np
 import openvino as ov
 import torch
-from tqdm.notebook import tqdm
+from tqdm.auto import tqdm
 from transformers import set_seed
 from sd3_helper import MODEL_DIR, TRANSFORMER_PATH, TEXT_ENCODER_PATH, TEXT_ENCODER_2_PATH, TEXT_ENCODER_3_PATH, VAE_DECODER_PATH, init_pipeline
 

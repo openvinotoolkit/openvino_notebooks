@@ -20,7 +20,7 @@ from typing import Any
 
 import torch
 
-from tqdm.notebook import tqdm
+from tqdm.auto import tqdm
 
 import cv2
 

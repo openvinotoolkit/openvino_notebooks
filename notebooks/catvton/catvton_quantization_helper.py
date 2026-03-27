@@ -1,7 +1,7 @@
 from typing import Any
 from pathlib import Path
 
-from tqdm.notebook import tqdm
+from tqdm.auto import tqdm
 from transformers import set_seed
 import numpy as np
 import openvino as ov

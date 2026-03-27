@@ -4,7 +4,7 @@ import numpy as np
 from pathlib import Path
 import openvino as ov
 import torch
-from tqdm.notebook import tqdm
+from tqdm.auto import tqdm
 
 negative_prompts = [
     "blurry unreal occluded",
