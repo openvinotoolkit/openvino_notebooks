@@ -230,18 +230,24 @@ Made with [`contrib.rocks`](https://contrib.rocks).
 
 ## 🔍 Training Data Transparency
 
-This repository focuses on demonstrating inference workflows using the OpenVINO Toolkit with pre-trained models.
+This repository focuses on demonstrating **inference and model optimization workflows** using the OpenVINO™ Toolkit with pre-trained models.
 
-- The notebooks provided here do **not train models from scratch**.
-- Instead, they use models that are already trained on publicly available datasets (such as ImageNet, COCO, etc., depending on the model).
-- Training data details, dataset composition, and associated biases are defined by the original model providers.
+- The notebooks do **not perform model training, re-training, or fine-tuning**.
+- Instead, they leverage pre-trained models and showcase **efficient inference and deployment techniques** across different hardware backends.
+- In addition to inference, the notebooks demonstrate **model optimization workflows**, including:
+  - model conversion (e.g., FP32 → FP16 / INT8)
+  - quantization and compression techniques
+  - performance tuning for CPU, GPU, and other supported devices
+
+Training data details, dataset composition, and associated biases are defined by the **original model providers** and are not modified within this repository.
 
 Users are encouraged to:
-- Review the documentation of each model used in the notebooks
-- Verify dataset sources and limitations independently
-- Ensure compliance with applicable data and AI transparency guidelines
+- Review the original model documentation for dataset sources and training details
+- Understand potential biases and limitations of pre-trained models
+- Evaluate models appropriately for their specific use cases and deployment environments
+- Follow responsible AI and data governance practices when integrating these models into applications
 
-This section improves clarity regarding the scope of this repository.
+This section aims to clarify the scope of the repository and improve transparency regarding how models are used within OpenVINO notebooks.
 ---
 
 \* Other names and brands may be claimed as the property of others.
