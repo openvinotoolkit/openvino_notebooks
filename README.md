@@ -228,6 +228,20 @@ Made with [`contrib.rocks`](https://contrib.rocks).
 * [What is the first CPU generation you support with OpenVINO?](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/system-requirements.html)
 * [Are there any success stories about deploying real-world solutions with OpenVINO?](https://www.intel.com/content/www/us/en/internet-of-things/ai-in-production/success-stories.html)
 
+## 🔍 Training Data Transparency
+
+This repository focuses on demonstrating inference workflows using the OpenVINO Toolkit with pre-trained models.
+
+- The notebooks provided here do **not train models from scratch**.
+- Instead, they use models that are already trained on publicly available datasets (such as ImageNet, COCO, etc., depending on the model).
+- Training data details, dataset composition, and associated biases are defined by the original model providers.
+
+Users are encouraged to:
+- Review the documentation of each model used in the notebooks
+- Verify dataset sources and limitations independently
+- Ensure compliance with applicable data and AI transparency guidelines
+
+This section improves clarity regarding the scope of this repository.
 ---
 
 \* Other names and brands may be claimed as the property of others.
