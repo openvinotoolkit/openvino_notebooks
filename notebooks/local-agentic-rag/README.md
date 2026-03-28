@@ -44,7 +44,37 @@ In this setup, the system can:
 > The core RAG pipeline works independently without the agentic extension.
 
 ---
+---
 
+## 🔧 Recent Changes & Fixes
+
+### Added: Dependency Check (Before Agent Section)
+
+**Issue:** Running the LangGraph agent section (Section 7) would fail with `NameError: name 'ask_llm' is not defined` if prerequisite cells were not executed first.
+
+**Solution:** Added an automatic dependency check that:
+- ✅ Verifies all required functions are available before building the agent
+- ✅ Provides clear error messages if functions are missing
+- ✅ Shows exactly which sections to run and in what order
+
+**Impact:** Users can now run cells in any order—the dependency check catches missing prerequisites with helpful instructions.
+
+### Execution Order Requirements
+
+To run the full pipeline successfully, execute sections in this order:
+
+1. **Section 1:** Environment Setup (install packages)
+2. **Section 1** (Ollama): Configuration & model verification
+3. **Section 2:** Basic LLM Inference (`ask_llm` function)
+4. **Section 3:** Document Preparation (creates chunks)
+5. **Section 4:** ChromaDB Setup (vector store)
+6. **Section 5:** Retrieval (`retrieve_documents` function)
+7. **Section 6:** RAG Pipeline (`build_rag_prompt` function)
+8. **Section 7+:** Agentic workflow (now safe to run)
+
+> 💡 The dependency check will remind you if you skip steps!
+
+---
 ## ⚡ OpenVINO™ Integration
 
 OpenVINO™ is Intel’s toolkit for optimizing and deploying deep learning models.
