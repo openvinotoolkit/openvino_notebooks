@@ -7,7 +7,6 @@ import math
 
 import openvino_genai as ov_genai
 
-
 MAX_SEED = np.iinfo(np.int32).max
 MAX_IMAGE_SIZE = 1024
 
@@ -62,11 +61,9 @@ def make_demo(pipeline, generator_cls, image_to_tensor):
         return image_tensor.data[0], seed
 
     with gr.Blocks() as demo:
-        gr.Markdown(
-            """
+        gr.Markdown("""
         # Demo Image to Image with OpenVINO GenAI API
-        """
-        )
+        """)
         with gr.Row():
             with gr.Column():
                 prompt = gr.Text(

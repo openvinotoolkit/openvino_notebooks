@@ -17,7 +17,6 @@ from langchain_community.vectorstores import FAISS
 from smolagents.mcp_client import MCPClient
 from smolagents import tool, Tool
 
-
 nltk.download("punkt_tab")
 
 

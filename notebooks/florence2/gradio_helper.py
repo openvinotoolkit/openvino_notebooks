@@ -10,7 +10,6 @@ import numpy as np
 
 from PIL import Image, ImageDraw
 
-
 DESCRIPTION = "# Florence-2 OpenVINO Demo"
 
 colormap = [

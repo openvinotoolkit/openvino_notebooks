@@ -3,7 +3,6 @@ import numpy as np
 
 import openvino_genai as ov_genai
 
-
 MAX_SEED = np.iinfo(np.int32).max
 MAX_IMAGE_SIZE = 2048
 
@@ -44,14 +43,12 @@ def make_demo(pipeline, generator_cls, adapters, adapters_meta):
 
     with gr.Blocks() as demo:
         with gr.Column():
-            gr.Markdown(
-                """
+            gr.Markdown("""
             # Image Generation with LoRA and OpenVINO GenAI
             1. Provide input generation prompt into prompt window
             2. Select one of the predefined adapters (use none for a generation without LoRA)
             3. Click 'Generate' button for start image generation
-            """
-            )
+            """)
 
             with gr.Row():
                 prompt = gr.Text(

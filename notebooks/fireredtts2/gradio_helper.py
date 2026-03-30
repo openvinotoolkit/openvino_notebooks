@@ -2,7 +2,6 @@ import re
 import gradio as gr
 from typing import Literal, List
 
-
 examples = [
     [
         "English",

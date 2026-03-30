@@ -4,7 +4,6 @@ import copy
 from acestep.ui.components import GENRE_PRESETS, TAG_DEFAULT, update_tags_from_preset, create_output_ui
 import ipywidgets as widgets
 
-
 LYRIC_DEFAULT = """[verse]
 Neon lights they flicker bright
 City hums in dead of night
@@ -779,11 +778,9 @@ def make_demo(pipeline, data_sampler):
     with gr.Blocks(
         title="ACE-Step Model with OpenVINO DEMO",
     ) as demo:
-        gr.Markdown(
-            """
+        gr.Markdown("""
             <h1 style="text-align: center;">Music generation with ACE-Step model and OpenVINO</h1>
-        """
-        )
+        """)
         with gr.Tab("text2music"):
             create_text2music_ui(gr=gr, ov_pipeline=pipeline, sample_data_func=data_sampler.sample)
     return demo

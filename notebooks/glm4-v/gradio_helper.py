@@ -6,7 +6,6 @@ import gradio as gr
 from transformers import TextIteratorStreamer
 from threading import Thread
 
-
 MODEL_ID = "THUDM/glm-4v-9b"
 MODEL_NAME = MODEL_ID.split("/")[-1]
 

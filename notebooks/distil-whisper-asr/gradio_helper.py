@@ -13,8 +13,7 @@ if not audio_example_path.exists():
 
 def make_demo(fn: Callable, quantized: bool):
     with gr.Blocks() as demo:
-        gr.HTML(
-            """
+        gr.HTML("""
                     <div style="text-align: center; max-width: 700px; margin: 0 auto;">
                     <div
                         style="
@@ -26,8 +25,7 @@ def make_demo(fn: Callable, quantized: bool):
                         </h1>
                     </div>
                     </div>
-                """
-        )
+                """)
         audio = gr.components.Audio(type="filepath", label="Audio input")
         with gr.Row():
             button = gr.Button("Transcribe")

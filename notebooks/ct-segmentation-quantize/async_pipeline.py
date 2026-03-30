@@ -27,7 +27,6 @@ import cv2
 import openvino.properties as props
 from custom_segmentation import Model
 
-
 # Fetch `notebook_utils` module
 import requests
 

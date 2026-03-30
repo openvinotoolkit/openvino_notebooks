@@ -4,7 +4,6 @@ from diffusers import AutoencoderKL, FlowMatchEulerDiscreteScheduler
 import gradio as gr
 import torch
 
-
 RES_CHOICES = {
     "1024": [
         "1024x1024 ( 1:1 )",

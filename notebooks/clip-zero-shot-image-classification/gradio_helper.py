@@ -2,7 +2,6 @@ from pathlib import Path
 import gradio as gr
 import requests
 
-
 sample_path = Path("data/coco.jpg")
 
 if not sample_path.exists():
