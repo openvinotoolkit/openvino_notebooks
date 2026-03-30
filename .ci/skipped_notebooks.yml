@@ -216,6 +216,7 @@
   skips:
     - os:
       - macos-13
+      - windows-2022  # 14.4 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/phi-3-vision/phi-3-vision.ipynb
   skips:
       - os:
@@ -274,6 +275,7 @@
   skips:
     - os:
         - macos-13
+        - windows-2022  # 16.0 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/llm-rag-langchain/llm-rag-langchain-genai.ipynb
   skips:
     - os:
@@ -440,6 +442,7 @@
   skips:
     - os:
         - ubuntu-22.04
+        - windows-2022  # 9.5 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/catvton/catvton.ipynb
   skips:
     - os:
@@ -491,6 +494,41 @@
         - ubuntu-22.04
         - windows-2022
 - notebook: notebooks/paddleocr_vl/paddleocr_vl.ipynb
+  skips:
+    - os:
+        - windows-2022
+# 14.1 min on Win — too slow for 6h CI limit (2026-03-30)
+- notebook: notebooks/jina-clip/jina-clip.ipynb
+  skips:
+    - os:
+        - windows-2022
+# 11.5 min on Win (est) — too slow for 6h CI limit (2026-03-30)
+- notebook: notebooks/llm-rag-langchain/llm-rag-langchain-eval.ipynb
+  skips:
+    - os:
+        - windows-2022
+# 10.5 min on Win (est) — too slow for 6h CI limit (2026-03-30)
+- notebook: notebooks/whisper-asr-genai/whisper-asr-genai.ipynb
+  skips:
+    - os:
+        - windows-2022
+# 10.0 min on Win (est) — too slow for 6h CI limit (2026-03-30)
+- notebook: notebooks/flex.2-image-generation/flex.2-image-generation.ipynb
+  skips:
+    - os:
+        - windows-2022
+# 9.6 min on Win (est) — too slow for 6h CI limit (2026-03-30)
+- notebook: notebooks/wav2lip/wav2lip.ipynb
+  skips:
+    - os:
+        - windows-2022
+# 8.5 min on Win — too slow for 6h CI limit (2026-03-30)
+- notebook: notebooks/image-to-image-genai/image-to-image-genai.ipynb
+  skips:
+    - os:
+        - windows-2022
+# 8.0 min on Win — too slow for 6h CI limit (2026-03-30)
+- notebook: notebooks/internvl2/internvl2.ipynb
   skips:
     - os:
         - windows-2022
