@@ -1572,14 +1572,12 @@ class OVQwen3TTSSpeechTokenizer:
         decoder_path = self.model_dir / SPEECH_TOKENIZER_DECODER_NAME
 
         if encoder_path.exists():
-            # Encoder always on CPU as GPU/NPU may not support it
-            self.encoder_model = core.compile_model(encoder_path, "CPU")
+            self.encoder_model = core.compile_model(encoder_path, device)
         else:
             self.encoder_model = None
 
         if decoder_path.exists():
-            # Decoder always on CPU as GPU/NPU may not support it
-            self.decoder_model = core.compile_model(decoder_path, "CPU")
+            self.decoder_model = core.compile_model(decoder_path, device)
         else:
             self.decoder_model = None
 
