@@ -5,7 +5,6 @@ import nbformat
 import nbconvert
 from traitlets.config import Config
 
-
 # Notebooks that are excluded from the CI tests
 EXCLUDED_NOTEBOOKS = ["data-preparation-ct-scan.ipynb", "pytorch-monai-training.ipynb"]
 

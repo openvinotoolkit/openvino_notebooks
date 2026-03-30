@@ -5,7 +5,6 @@ from transformers import AutoTokenizer
 import openvino as ov
 import openvino_genai as ov_genai
 
-
 DecodedResults = namedtuple("DecodedResults", ["perf_metrics", "scores", "texts"])
 
 

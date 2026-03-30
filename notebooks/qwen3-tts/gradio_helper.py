@@ -14,7 +14,6 @@ import numpy as np
 import gradio as gr
 from scipy.io.wavfile import write as wav_write
 
-
 # Supported speakers for CustomVoice model
 SPEAKERS = ["Aiden", "Dylan", "Eric", "Ono_anna", "Ryan", "Serena", "Sohee", "Uncle_fu", "Vivian"]
 
@@ -201,8 +200,7 @@ def make_demo(ov_model, model_type: str = "custom_voice"):
     """
 
     with gr.Blocks(theme=theme, css=css, title="Qwen3-TTS with OpenVINO") as demo:
-        gr.Markdown(
-            """
+        gr.Markdown("""
 # Qwen3-TTS with OpenVINO
 
 **Accelerated by OpenVINO™ Runtime**
@@ -215,8 +213,7 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
 - Voice cloning from reference audio
 - Voice design with natural language descriptions
 - Hardware acceleration via OpenVINO
-"""
-        )
+""")
 
         # Build UI based on model type
         if model_type == "custom_voice":
@@ -338,11 +335,9 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                 outputs=[design_audio_out, design_status],
             )
 
-        gr.Markdown(
-            """
+        gr.Markdown("""
 ---
 **Links:** [Qwen3-TTS on Hugging Face](https://huggingface.co/collections/Qwen/qwen3-tts) | [OpenVINO Notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
-"""
-        )
+""")
 
     return demo

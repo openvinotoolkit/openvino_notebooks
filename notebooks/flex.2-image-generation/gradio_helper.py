@@ -173,11 +173,9 @@ input[type="range"]::-webkit-slider-thumb {
         with gr.Column(elem_id="col-container"):
             # Header with gradient
             with gr.Column(elem_classes=["header-container"]):
-                gr.HTML(
-                    """
+                gr.HTML("""
                     <h1>Flex.2 Preview Inpainting OpenVINO Demo</h1>
-                """
-                )
+                """)
             # Main interface container
             with gr.Column(elem_classes=["container"]):
                 with gr.Row():
@@ -234,13 +232,11 @@ input[type="range"]::-webkit-slider-thumb {
                             num_inference_steps = gr.Slider(1, 100, value=20, step=1, label="Inference Steps")
 
             # Footer
-            gr.HTML(
-                """
+            gr.HTML("""
                 <div class="footer">
                     <p>Flex.2 Preview Inpainting OpenVINO Demo</p>
                 </div>
-            """
-            )
+            """)
 
         run_button.click(
             fn=infer,
