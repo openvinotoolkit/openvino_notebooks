@@ -249,6 +249,7 @@
   skips:
     - os:
         - macos-13
+        - windows-2022  # 8.2 min on Win — too slow for 6h CI limit (2026-03-31)
 - notebook: notebooks/pixtral/pixtral.ipynb
   skips:
     - os:
@@ -302,6 +303,7 @@
   skips:
     - os:
       - macos-13
+      - windows-2022  # 8.3 min on Win — too slow for 6h CI limit (2026-03-31)
 - notebook: notebooks/glm4-v/glm4-v.ipynb
   skips:
     - os:
@@ -524,6 +526,11 @@
         - windows-2022
 # 8.5 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/image-to-image-genai/image-to-image-genai.ipynb
+  skips:
+    - os:
+        - windows-2022
+# 8.1 min on Win — too slow for 6h CI limit (2026-03-31)
+- notebook: notebooks/language-quantize-bert/language-quantize-bert.ipynb
   skips:
     - os:
         - windows-2022
