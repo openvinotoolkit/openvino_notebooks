@@ -1,6 +1,7 @@
 import gradio as gr
 import imageio
 import openvino_genai as ov_genai
+import uuid
 
 
 def make_demo(pipe):
@@ -17,12 +18,11 @@ def make_demo(pipe):
             guidance_scale=3,
             frame_rate=frame_rate,
         )
-        file_name = "output.mp4"
+        file_name = f"output_{uuid.uuid4().hex[:8]}.mp4"
         video_data = output.video.data
-        writer = imageio.get_writer(file_name, fps=frame_rate)
-        for i in range(video_data.shape[1]):
-            writer.append_data(video_data[0, i])
-        writer.close()
+        with imageio.get_writer(file_name, fps=frame_rate) as writer:
+            for i in range(video_data.shape[1]):
+                writer.append_data(video_data[0, i])
         return file_name
 
     demo = gr.Interface(
