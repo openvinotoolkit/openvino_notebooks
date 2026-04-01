@@ -1,5 +1,6 @@
+import queue
 import openvino_genai as ov_genai
-from threading import Event, Thread
+from threading import Thread
 
 max_new_tokens = 2048
 
@@ -67,7 +68,8 @@ def build_translation_prompt(source_text, source_lang, target_lang):
 
 def make_demo(pipe, model_name):
     import gradio as gr
-    from genai_helper import ChunkStreamer
+
+    _STOP = object()
 
     def translate(source_text, source_lang, target_lang, temperature, top_p, top_k, repetition_penalty):
         if not source_text.strip():
@@ -76,9 +78,7 @@ def make_demo(pipe, model_name):
 
         prompt = build_translation_prompt(source_text, source_lang, target_lang)
 
-        streamer = ChunkStreamer(pipe.get_tokenizer())
-
-        config = pipe.get_generation_config()
+        config = ov_genai.GenerationConfig()
         config.max_new_tokens = max_new_tokens
         config.temperature = temperature
         config.top_p = top_p
@@ -86,21 +86,28 @@ def make_demo(pipe, model_name):
         config.do_sample = temperature > 0.0
         config.repetition_penalty = repetition_penalty
 
-        stream_complete = Event()
+        text_queue = queue.Queue()
 
-        def generate_and_signal_complete():
-            streamer.reset()
-            pipe.generate(prompt, config, streamer)
-            stream_complete.set()
-            streamer.end()
+        def callback(subword):
+            text_queue.put(subword)
+            return False
 
-        t1 = Thread(target=generate_and_signal_complete)
+        def generate_in_thread():
+            pipe.generate(prompt, config, callback)
+            text_queue.put(_STOP)
+
+        t1 = Thread(target=generate_in_thread)
         t1.start()
 
         partial_text = ""
-        for new_text in streamer:
-            partial_text += new_text
+        while True:
+            item = text_queue.get()
+            if item is _STOP:
+                break
+            partial_text += item
             yield partial_text
+
+        t1.join(timeout=30)
 
     def swap_languages(source_lang, target_lang, source_text, target_text):
         return target_lang, source_lang, target_text, source_text
