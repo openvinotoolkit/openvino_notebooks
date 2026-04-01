@@ -63,11 +63,9 @@ def make_demo(pipeline, turbo):
 
     with gr.Blocks(css=css) as demo:
         with gr.Column(elem_id="col-container"):
-            gr.Markdown(
-                """
+            gr.Markdown("""
             # Demo Stable Diffusion 3  with OpenVINO
-            """
-            )
+            """)
 
             with gr.Row():
                 prompt = gr.Text(

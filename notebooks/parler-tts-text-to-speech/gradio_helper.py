@@ -2,7 +2,6 @@ from typing import Callable
 import gradio as gr
 import numpy as np
 
-
 title = "Text-to-speech (TTS) with Parler-TTS and OpenVINO"
 
 examples = [

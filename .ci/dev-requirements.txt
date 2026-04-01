@@ -1,9 +1,7 @@
 # Recommended packages for notebook developers
 
-# black==21.8 requires typing-extensions>3.10 which is incompatible
-# with other packages
 -r ../requirements.txt
-black[jupyter]==24.3.0               # format Python code
+black[jupyter]==26.3.1               # format Python code
 isort                       # sort imports
 jupyterlab-code-formatter   # format code in notebooks in Jupyter Lab
 jupyterlab-git              # checkout and commit code in Jupyter Lab

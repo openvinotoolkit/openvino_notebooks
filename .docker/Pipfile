@@ -27,7 +27,7 @@ ovmsclient = "*"
 
 # Security pins
 setuptools = ">70.0.0"
-pygments = ">=2.7.4"
+pygments = ">=2.20.0"
 urllib3 = "==2.6.3"
 
 [dev-packages]

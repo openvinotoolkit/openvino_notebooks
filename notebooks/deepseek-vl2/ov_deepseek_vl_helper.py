@@ -14,7 +14,6 @@ import numpy as np
 from einops import rearrange, repeat
 import gc
 
-
 model_ids = [
     "deepseek-ai/deepseek-vl2-tiny",
     "deepseek-ai/deepseek-vl2-small",

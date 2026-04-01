@@ -102,10 +102,8 @@ def make_demo(pipeline):
         return video_path, seed
 
     with gr.Blocks() as demo:
-        gr.Markdown(
-            """# Stable Video Diffusion: Image to Video Generation with OpenVINO.
-    """
-        )
+        gr.Markdown("""# Stable Video Diffusion: Image to Video Generation with OpenVINO.
+    """)
         with gr.Row():
             with gr.Column():
                 image_in = gr.Image(label="Upload your image", type="pil")

@@ -15,7 +15,6 @@ import gradio as gr
 import numpy as np
 from scipy.io.wavfile import write as wav_write
 
-
 # Supported languages (same as official Qwen3-ASR)
 SUPPORTED_LANGUAGES = [
     "Chinese",
@@ -294,8 +293,7 @@ def make_demo(ov_model, example_dir=None):
     """
 
     with gr.Blocks(theme=theme, css=css, title="Qwen3-ASR with OpenVINO") as demo:
-        gr.Markdown(
-            """
+        gr.Markdown("""
 # Qwen3-ASR with OpenVINO
 
 **Accelerated by OpenVINO™ Runtime**
@@ -307,8 +305,7 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
 - Multi-language ASR (Chinese, English, Japanese, Korean, and 52+ more languages)
 - Hardware acceleration via OpenVINO
 - Optimized for Intel hardware
-"""
-        )
+""")
 
         with gr.Row():
             with gr.Column(scale=2):
@@ -358,11 +355,9 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
             outputs=[out_lang, out_text, out_ts, out_metrics],
         )
 
-        gr.Markdown(
-            """
+        gr.Markdown("""
 ---
 **Links:** [Qwen3-ASR on Hugging Face](https://huggingface.co/collections/Qwen/qwen3-asr) | [OpenVINO Notebooks](https://github.com/openvinotoolkit/openvino_notebooks)
-"""
-        )
+""")
 
     return demo

@@ -19,7 +19,6 @@ from typing import Any, Dict, Optional, Tuple
 import gradio as gr
 from PIL import Image, ImageDraw, ImageOps
 
-
 # Keep prompts aligned with the notebook (Cell 13).
 PROMPTS: Dict[str, str] = {
     "ocr": "OCR:",
@@ -146,13 +145,11 @@ def make_demo(paddleocr_vl_model: Any) -> gr.Blocks:
     examples = [[str(sample_path)]] if sample_path else []
 
     with gr.Blocks(title="PaddleOCR-VL (OpenVINO)") as demo:
-        gr.Markdown(
-            """
+        gr.Markdown("""
 ## PaddleOCR-VL (OpenVINO) Interactive Demo
 
 - Supported tasks: OCR / Table / Formula / Chart 
-"""
-        )
+""")
 
         with gr.Row():
             with gr.Column(scale=1):
