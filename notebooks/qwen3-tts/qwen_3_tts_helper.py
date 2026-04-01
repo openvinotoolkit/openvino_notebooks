@@ -1073,6 +1073,7 @@ def convert_speech_tokenizer(model_id, output_dir, use_local_dir=False):
             _masking_utils.create_sliding_window_causal_mask = _simple_sliding_window_causal_mask
 
         try:
+
             class DecoderWrapper(torch.nn.Module):
                 def __init__(self, decoder):
                     super().__init__()
@@ -2802,9 +2803,7 @@ class OVQwen3TTSModel:
                     # 1. text_embed = ref_text + target_text + eos (concatenated)
                     text_id = input_id[:, 3:-5]  # strip <|im_start|>assistant\n ... <|im_end|>\n
                     ref_id_stripped = ref_id[:, 3:-2]  # strip <|im_start|>assistant\n ... \n
-                    text_embed = self.talker.text_projection(
-                        self.talker.get_text_embeddings()(torch.cat([ref_id_stripped, text_id], dim=-1))
-                    )
+                    text_embed = self.talker.text_projection(self.talker.get_text_embeddings()(torch.cat([ref_id_stripped, text_id], dim=-1)))
                     text_embed = torch.cat([text_embed, tts_eos_embed], dim=1)
 
                     # 2. codec_embed = sum of all code group embeddings + codec_bos prefix
@@ -2815,7 +2814,7 @@ class OVQwen3TTSModel:
                     num_code_groups = self.config.talker_config.num_code_groups
                     codec_embeds = []
                     for i in range(num_code_groups):
-                        code_slice = ref_code[:, i:i+1].long()  # [code_len, 1]
+                        code_slice = ref_code[:, i : i + 1].long()  # [code_len, 1]
                         if i == 0:
                             codec_embeds.append(self.talker.get_input_embeddings()(code_slice))
                         else:
@@ -2823,9 +2822,7 @@ class OVQwen3TTSModel:
                             codec_embeds.append(self.talker.code_predictor.get_input_embeddings()(code_slice, i - 1))
                     # Sum across code groups: each is [code_len, 1, D] -> cat on dim=1 -> [code_len, num_groups, D] -> sum -> [code_len, D]
                     codec_embed = torch.cat(codec_embeds, dim=1).sum(1).unsqueeze(0)  # [1, code_len, D]
-                    codec_bos_embed = self.talker.get_input_embeddings()(
-                        torch.tensor([[self.config.talker_config.codec_bos_id]], dtype=input_id.dtype)
-                    )
+                    codec_bos_embed = self.talker.get_input_embeddings()(torch.tensor([[self.config.talker_config.codec_bos_id]], dtype=input_id.dtype))
                     codec_embed = torch.cat([codec_bos_embed, codec_embed], dim=1)  # [1, 1+code_len, D]
 
                     # 3. Build ICL input embed based on streaming mode
@@ -2847,9 +2844,7 @@ class OVQwen3TTSModel:
                             icl_input_embed = text_embed[:, :codec_lens] + codec_embed
                             trailing_text_hidden = text_embed[:, codec_lens:]
                         else:
-                            text_embed_padded = torch.cat(
-                                [text_embed] + [tts_pad_embed] * (codec_lens - text_lens), dim=1
-                            )
+                            text_embed_padded = torch.cat([text_embed] + [tts_pad_embed] * (codec_lens - text_lens), dim=1)
                             icl_input_embed = text_embed_padded + codec_embed
                             trailing_text_hidden = tts_pad_embed
 
@@ -2862,8 +2857,7 @@ class OVQwen3TTSModel:
                 # Normal (non-ICL) text handling
                 # Add first text token + last codec embedding
                 talker_input_embed = torch.cat(
-                    [talker_input_embed,
-                     self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, 3:4])) + codec_input_embedding[:, -1:]],
+                    [talker_input_embed, self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, 3:4])) + codec_input_embedding[:, -1:]],
                     dim=1,
                 )
 
@@ -2874,9 +2868,7 @@ class OVQwen3TTSModel:
                     codec_pad_embed = self.talker.get_input_embeddings()(
                         torch.tensor([[self.config.talker_config.codec_pad_id] * text_embed_with_eos.shape[1]], dtype=input_id.dtype)
                     )
-                    codec_bos_embed = self.talker.get_input_embeddings()(
-                        torch.tensor([[self.config.talker_config.codec_bos_id]], dtype=input_id.dtype)
-                    )
+                    codec_bos_embed = self.talker.get_input_embeddings()(torch.tensor([[self.config.talker_config.codec_bos_id]], dtype=input_id.dtype))
                     talker_input_embed = torch.cat(
                         [
                             talker_input_embed,
