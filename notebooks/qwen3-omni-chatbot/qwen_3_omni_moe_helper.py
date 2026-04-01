@@ -35,7 +35,7 @@ from transformers.models.qwen3_omni_moe.modeling_qwen3_omni_moe import (
     Qwen3OmniMoeVisionRotaryEmbedding,
     Qwen3OmniMoeCausalConvNet,
 )
-from transformers.utils import is_torch_xpu_available
+from transformers.utils import is_torch_xpu_available, is_torchdynamo_compiling
 
 try:
     from openvino import opset13
@@ -46,6 +46,7 @@ from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
 from transformers.masking_utils import ALL_MASK_ATTENTION_FUNCTIONS
 
 # logging.basicConfig(level=logging.DEBUG)
+
 
 def _new_get_extra_padding_for_conv1d(self, hidden_state: torch.Tensor) -> int:
     length = hidden_state.shape[-1]
@@ -280,7 +281,7 @@ ALL_MASK_ATTENTION_FUNCTIONS.register("eager", eager_mask_without_vmap)
 # for decoder models, we use eager mask without vmap for sdpa as well
 # to avoid a nan output issue in OpenVINO that only happens in case of:
 # non-stateful models on cpu and stateful models on npu
-ALL_MASK_ATTENTION_FUNCTIONS.register("sdpa", eager_mask_without_vmap)
+ALL_MASK_ATTENTION_FUNCTIONS.register("sdpa", sdpa_mask_without_vmap)
 
 
 def model_has_state(ov_model: ov.Model):
@@ -463,26 +464,18 @@ def qwen3_moe_thinker_forward_patched(self, hidden_states: torch.Tensor) -> torc
         (batch_size * sequence_length, hidden_dim), dtype=hidden_states.dtype, device=hidden_states.device
     )
 
-    # One hot encode the selected experts to create an expert mask
-    # this will be used to easily index which expert is going to be sollicitated
+    # expert_mask: [num_experts, top_k, batch*seq_len]
     expert_mask = torch.nn.functional.one_hot(selected_experts, num_classes=self.num_experts).permute(2, 1, 0)
 
-    # TODO: we loop over all possible experts instead of hitted ones to avoid issues in graph execution.
-    # expert_hitted = torch.greater(expert_mask.sum(dim=(-1, -2)), 0).nonzero()
-    # Loop over all available experts in the model and perform the computation on each expert
+    # Use arithmetic masking instead of torch.where + index_add_ to avoid NonZero ops
+    # that produce data-dependent shapes and crash OpenVINO apply_moc_transformations.
     for expert_idx in range(self.num_experts):
         expert_layer = self.experts[expert_idx]
-        idx, top_x = torch.where(expert_mask[expert_idx].squeeze(0))
+        # token_weights: [batch*seq_len] — routing weight for this expert per token (0 if not routed here)
+        token_weights = (expert_mask[expert_idx].to(routing_weights.dtype) * routing_weights.T).sum(0)
+        current_hidden_states = expert_layer(hidden_states) * token_weights.unsqueeze(-1)
+        final_hidden_states = final_hidden_states + current_hidden_states.to(hidden_states.dtype)
 
-        # Index the correct hidden states and compute the expert hidden state for
-        # the current expert. We need to make sure to multiply the output hidden
-        # states by `routing_weights` on the corresponding tokens (top-1 and top-2)
-        current_state = hidden_states[None, top_x].reshape(-1, hidden_dim)
-        current_hidden_states = expert_layer(current_state) * routing_weights[top_x, idx, None]
-
-        # However `index_add_` only support torch tensors for indexing so we'll use
-        # the `top_x` tensor here.
-        final_hidden_states.index_add_(0, top_x, current_hidden_states.to(hidden_states.dtype))
     final_hidden_states = final_hidden_states.reshape(batch_size, sequence_length, hidden_dim)
     return final_hidden_states, router_logits
 
@@ -503,26 +496,18 @@ def qwen3_moe_talker_forward_patched(self, hidden_states: torch.Tensor) -> torch
         (batch_size * sequence_length, hidden_dim), dtype=hidden_states.dtype, device=hidden_states.device
     )
 
-    # One hot encode the selected experts to create an expert mask
-    # this will be used to easily index which expert is going to be sollicitated
+    # expert_mask: [num_experts, top_k, batch*seq_len]
     expert_mask = torch.nn.functional.one_hot(selected_experts, num_classes=self.num_experts).permute(2, 1, 0)
 
-    # TODO: we loop over all possible experts instead of hitted ones to avoid issues in graph execution.
-    # expert_hitted = torch.greater(expert_mask.sum(dim=(-1, -2)), 0).nonzero()
-    # Loop over all available experts in the model and perform the computation on each expert
+    # Use arithmetic masking instead of torch.where + index_add_ to avoid NonZero ops
+    # that produce data-dependent shapes and crash OpenVINO apply_moc_transformations.
     for expert_idx in range(self.num_experts):
         expert_layer = self.experts[expert_idx]
-        idx, top_x = torch.where(expert_mask[expert_idx].squeeze(0))
+        # token_weights: [batch*seq_len] — routing weight for this expert per token (0 if not routed here)
+        token_weights = (expert_mask[expert_idx].to(routing_weights.dtype) * routing_weights.T).sum(0)
+        current_hidden_states = expert_layer(hidden_states) * token_weights.unsqueeze(-1)
+        final_hidden_states = final_hidden_states + current_hidden_states.to(hidden_states.dtype)
 
-        # Index the correct hidden states and compute the expert hidden state for
-        # the current expert. We need to make sure to multiply the output hidden
-        # states by `routing_weights` on the corresponding tokens (top-1 and top-2)
-        current_state = hidden_states[None, top_x].reshape(-1, hidden_dim)
-        current_hidden_states = expert_layer(current_state) * routing_weights[top_x, idx, None]
-
-        # However `index_add_` only support torch tensors for indexing so we'll use
-        # the `top_x` tensor here.
-        final_hidden_states.index_add_(0, top_x, current_hidden_states.to(hidden_states.dtype))
     shared_expert_output = self.shared_expert(hidden_states)
     shared_expert_output = torch.nn.functional.sigmoid(self.shared_expert_gate(hidden_states)) * shared_expert_output
 
@@ -1055,7 +1040,7 @@ def convert_qwen3_omni_moe_model(model_id, output_dir, quantization_config=None,
             hidden_states = outputs[0]
             logits = self.codec_head(hidden_states)
             logits = logits.float()
-            output = (logits,) + outputs[:]
+            output = (logits, hidden_states, outputs.past_key_values)
 
             return output
 
