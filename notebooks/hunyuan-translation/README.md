@@ -24,10 +24,7 @@ The tutorial consists of the following steps:
 Chinese, English, French, Portuguese, Spanish, Japanese, Turkish, Russian, Arabic, Korean, Thai, Italian, German, Vietnamese, Malay, Indonesian, Filipino, Hindi, Traditional Chinese, Polish, Czech, Dutch, Khmer, Burmese, Persian, Gujarati, Urdu, Telugu, Marathi, Hebrew, Bengali, Tamil, Ukrainian, and more.
 
 ## Installation Instructions
-
-This is a self-contained example that relies solely on its own code.
-
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/hunyuan-translation/README.md" />
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks\hunyuan-translation\README.md" />
