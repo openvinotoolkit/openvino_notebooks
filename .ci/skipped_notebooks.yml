@@ -539,3 +539,8 @@
   skips:
     - os:
         - windows-2022
+- notebook: notebooks/qwen3-tts/qwen3-tts.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
