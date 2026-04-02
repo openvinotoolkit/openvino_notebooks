@@ -13,6 +13,14 @@ from transformers import TextIteratorStreamer
 
 MAX_NUM_IMAGES = int(os.getenv("MAX_NUM_IMAGES", "5"))
 
+
+def _get_file_path(file_item) -> str:
+    """Extract file path from Gradio 6 file object (dict or str)."""
+    if isinstance(file_item, dict):
+        return file_item.get("path", "") or file_item.get("url", "")
+    return str(file_item)
+
+
 example_images = {
     "barchart.png": "https://github.com/user-attachments/assets/7779e110-691a-40db-b7db-f226cd4d06bd",
     "sunset.png": "https://github.com/user-attachments/assets/da3edb79-ae36-4973-9eaf-6ef712425faa",
@@ -32,11 +40,11 @@ def download_example_images():
                 pass
 
 
-def count_files_in_new_message(paths: list[str]) -> tuple[int, int]:
+def count_files_in_new_message(paths: list) -> tuple[int, int]:
     image_count = 0
     video_count = 0
-    for path in paths:
-        if path.endswith(".mp4"):
+    for item in paths:
+        if _get_file_path(item).endswith(".mp4"):
             video_count += 1
         else:
             image_count += 1
@@ -125,7 +133,7 @@ def process_interleaved_images(message: dict) -> list[dict]:
     image_index = 0
     for part in parts:
         if part == "<image>":
-            content.append({"type": "image", "url": message["files"][image_index]})
+            content.append({"type": "image", "url": _get_file_path(message["files"][image_index])})
             image_index += 1
         elif part.strip():
             content.append({"type": "text", "text": part.strip()})
@@ -138,15 +146,16 @@ def process_new_user_message(message: dict) -> list[dict]:
     if not message["files"]:
         return [{"type": "text", "text": message["text"]}]
 
-    if message["files"][0].endswith(".mp4"):
-        return [{"type": "text", "text": message["text"]}, *process_video(message["files"][0])]
+    first_file = _get_file_path(message["files"][0])
+    if first_file.endswith(".mp4"):
+        return [{"type": "text", "text": message["text"]}, *process_video(first_file)]
 
     if "<image>" in message["text"]:
         return process_interleaved_images(message)
 
     return [
         {"type": "text", "text": message["text"]},
-        *[{"type": "image", "url": path} for path in message["files"]],
+        *[{"type": "image", "url": _get_file_path(f)} for f in message["files"]],
     ]
 
 
@@ -206,7 +215,8 @@ def make_demo(model, processor):
         user_content = []
         current_images = []
         if message["files"]:
-            for file_path in message["files"]:
+            for file_item in message["files"]:
+                file_path = _get_file_path(file_item)
                 if file_path.endswith(".mp4"):
                     # Process video frames as images
                     frames = downsample_video(file_path)
