@@ -116,8 +116,10 @@ def make_demo(pipe, model_name):
         theme=gr.themes.Soft(),
         title=f"Hunyuan Translation ({model_name})",
     ) as demo:
-        gr.Markdown(f"""<h1><center>OpenVINO Hunyuan Translation ({model_name})</center></h1>
-<p><center>Powered by <a href="https://huggingface.co/tencent/HY-MT1.5-1.8B">HY-MT1.5</a> and <a href="https://github.com/openvinotoolkit/openvino.genai">OpenVINO GenAI</a> | Supports 33+ languages</center></p>""")
+        gr.Markdown(
+            f"""<h1><center>OpenVINO Hunyuan Translation ({model_name})</center></h1>
+<p><center>Powered by <a href="https://huggingface.co/tencent/HY-MT1.5-1.8B">HY-MT1.5</a> and <a href="https://github.com/openvinotoolkit/openvino.genai">OpenVINO GenAI</a> | Supports 33+ languages</center></p>"""
+        )
 
         with gr.Row():
             source_lang = gr.Dropdown(
