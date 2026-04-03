@@ -25,7 +25,6 @@ import re
 from tqdm import tqdm
 import numpy as np
 
-
 model_ids = [
     "deepseek-ai/DeepSeek-OCR",
 ]
@@ -1561,7 +1560,7 @@ class OVDeepseekOCRForCausalLM(GenerationMixin):
                 for endpoint in endpoints:
 
                     label = endpoint.split(": ")[0]
-                    (x, y) = eval(endpoint.split(": ")[1])
+                    x, y = eval(endpoint.split(": ")[1])
                     ax.annotate(label, (x, y), xytext=(1, 1), textcoords="offset points", fontsize=5, fontweight="light")
 
                 plt.savefig(f"{output_path}/geo.jpg")

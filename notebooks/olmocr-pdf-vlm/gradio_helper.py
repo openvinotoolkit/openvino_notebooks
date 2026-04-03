@@ -13,7 +13,6 @@ from olmocr.data.renderpdf import render_pdf_to_base64png
 from olmocr.prompts import build_finetuning_prompt
 from olmocr.prompts.anchor import get_anchor_text
 
-
 sample_path = Path("./paper.pdf")
 
 if not sample_path.exists():

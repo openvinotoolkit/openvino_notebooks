@@ -20,7 +20,6 @@ from pathlib import Path
 from typing import Optional, TypedDict
 from validation_config import ValidationConfig, validation_config_arg, SkippedNotebook
 
-
 ROOT = Path(__file__).parents[1]
 
 NOTEBOOKS_DIR = Path("notebooks")

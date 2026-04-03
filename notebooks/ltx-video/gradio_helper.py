@@ -1,22 +1,28 @@
 import gradio as gr
-import torch
-from diffusers.utils import export_to_video
+import imageio
+import openvino_genai as ov_genai
+import uuid
 
 
-def make_demo(ov_pipe):
-    def generate(prompt, negative_prompt, width, height, num_frames, num_inference_steps, seed, _=gr.Progress(track_tqdm=True)):
-        generator = torch.Generator().manual_seed(seed)
-        video = ov_pipe(
-            prompt=prompt,
+def make_demo(pipe):
+    def generate(prompt, negative_prompt, width, height, num_frames, num_inference_steps, seed):
+        frame_rate = 25
+        output = pipe.generate(
+            prompt,
             negative_prompt=negative_prompt,
-            width=width,
-            height=height,
-            num_frames=num_frames,
-            num_inference_steps=num_inference_steps,
-            generator=generator,
-        ).frames[0]
-        file_name = "output.mp4"
-        export_to_video(video, file_name, fps=24)
+            width=int(width),
+            height=int(height),
+            num_frames=int(num_frames),
+            num_inference_steps=int(num_inference_steps),
+            generator=ov_genai.TorchGenerator(int(seed)),
+            guidance_scale=3,
+            frame_rate=frame_rate,
+        )
+        file_name = f"output_{uuid.uuid4().hex[:8]}.mp4"
+        video_data = output.video.data
+        with imageio.get_writer(file_name, fps=frame_rate) as writer:
+            for i in range(video_data.shape[1]):
+                writer.append_data(video_data[0, i])
         return file_name
 
     demo = gr.Interface(
@@ -32,15 +38,6 @@ def make_demo(ov_pipe):
         ],
         outputs=gr.Video(label="Result"),
         examples=[
-            [
-                "A woman with light skin, wearing a blue jacket and a black hat with a veil, looks down and to her right, then back up as she speaks; she has brown hair styled in an updo, light brown eyebrows, and is wearing a white collared shirt under her jacket; the camera remains stationary on her face as she speaks; the background is out of focus, but shows trees and people in period clothing; the scene is captured in real-life footage.",
-                "worst quality, inconsistent motion, blurry, jittery, distorted",
-                704,
-                480,
-                25,
-                30,
-                42,
-            ],
             [
                 """The camera pans over a snow-covered mountain range, revealing a vast expanse of snow-capped peaks and valleys.The mountains are covered in a thick layer of snow, with some areas appearing almost white while others have a slightly darker, almost grayish hue. The peaks are jagged and irregular, with some rising sharply into the sky while others are more rounded. The valleys are deep and narrow, with steep slopes that are also covered in snow. The trees in the foreground are mostly bare, with only a few leaves remaining on their branches. The sky is overcast, with thick clouds obscuring the sun. The overall impression is one of peace and tranquility, with the snow-covered mountains standing as a testament to the power and beauty of nature.""",
                 "worst quality, inconsistent motion, blurry, jittery, distorted",

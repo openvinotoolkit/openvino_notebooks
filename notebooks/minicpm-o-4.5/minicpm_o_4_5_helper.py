@@ -27,10 +27,10 @@ Conversion options:
     # Standard conversion (stateless APM)
     from minicpm_o_4_5_helper import convert_minicpmo_model
     convert_minicpmo_model("openbmb/MiniCPM-o-4_5", "./MiniCPM-o-4_5-OV")
-    
+
     # Streaming conversion (APM with KV cache support - experimental)
     convert_minicpmo_model(
-        "openbmb/MiniCPM-o-4_5", 
+        "openbmb/MiniCPM-o-4_5",
         "./MiniCPM-o-4_5-OV-streaming",
         use_streaming_apm=True
     )
@@ -43,7 +43,7 @@ Usage example:
         "/path/to/MiniCPM-o-4_5-OV",
         device="CPU"
     )
-    
+
     # For duplex streaming mode
     model = model.as_duplex()
     model.prepare(prefix_system_prompt="Streaming Omni Conversation.")

@@ -14,7 +14,6 @@ from io import StringIO, BytesIO
 from pathlib import Path
 import requests
 
-
 MODEL_CONFIGS = {
     "Gundam": {"base_size": 1024, "image_size": 640, "crop_mode": True},
     "Tiny": {"base_size": 512, "image_size": 512, "crop_mode": False},
@@ -251,14 +250,12 @@ def make_demo(model, tokenizer):
         return gr.update(visible=False)
 
     with gr.Blocks(theme=gr.themes.Soft(), title="DeepSeek-OCR") as demo:
-        gr.Markdown(
-            """
+        gr.Markdown("""
         # 🚀 DeepSeek-OCR Demo with OpenVINO
         **Convert documents to markdown, extract raw text, and locate specific content with bounding boxes.**
         
         **Hope this tool was helpful! If so, a quick like ❤️ would mean a lot :)**
-        """
-        )
+        """)
 
         with gr.Row():
             with gr.Column(scale=1):
@@ -290,8 +287,7 @@ def make_demo(model, tokenizer):
         )
 
         with gr.Accordion("ℹ️ Info", open=False):
-            gr.Markdown(
-                """
+            gr.Markdown("""
             ### Modes
             - **Gundam**: 1024 base + 640 tiles with cropping - Best balance
             - **Tiny**: 512×512, no crop - Fastest
@@ -305,8 +301,7 @@ def make_demo(model, tokenizer):
             - **Locate**: Find specific things in image (grounding ✅)
             - **Describe**: General image description
             - **Custom**: Your own prompt (add `<|grounding|>` for boxes)
-            """
-            )
+            """)
 
         file_in.change(load_image, [file_in, page_selector], [input_img])
         file_in.change(update_page_selector, [file_in], [page_selector])

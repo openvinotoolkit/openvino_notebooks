@@ -14,7 +14,6 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 from ov_mllama_helper import OVMLlamaForConditionalGeneration
 
-
 max_length = 4048
 
 

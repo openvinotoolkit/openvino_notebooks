@@ -69,8 +69,7 @@ def make_demo(gr_pipeline):
         examples.append([str(audio_ml_example_path), "<|fr|>"])
 
     with gr.Blocks() as demo:
-        gr.HTML(
-            f"""
+        gr.HTML(f"""
                     <div style="text-align: center; max-width: 700px; margin: 0 auto;">
                     <div
                         style="
@@ -85,8 +84,7 @@ def make_demo(gr_pipeline):
                             or get 'generation_config' by ov_pipe.get_generation_config() and check the attribute 'lang_to_id'</div>
                     </div>
                     </div>
-                """
-        )
+                """)
         audio = gr.components.Audio(type="filepath", label="Audio input")
         language = gr.components.Textbox(
             label="Language.",

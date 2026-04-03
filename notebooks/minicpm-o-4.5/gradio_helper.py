@@ -600,8 +600,7 @@ def make_demo(ov_model):
 
             # ═══════════════════ How to Use ═════════════════════════════
             with gr.Tab("ℹ️ How to Use"):
-                gr.Markdown(
-                    """
+                gr.Markdown("""
 ## Usage Guide
 
 ### 💬 Chat
@@ -630,7 +629,6 @@ def make_demo(ov_model):
 | Top-K | 100 | Top-K filtering |
 | Repetition Penalty | 1.05 | Penalise repeated tokens |
 | System Prompt | — | Optional instruction prepended to conversation |
-"""
-                )
+""")
 
     return demo

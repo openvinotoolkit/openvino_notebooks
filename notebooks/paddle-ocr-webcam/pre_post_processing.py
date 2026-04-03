@@ -200,10 +200,10 @@ def order_points_clockwise(pts):
     # y-coordinates so we can grab the top-left and bottom-left
     # points, respectively
     leftMost = leftMost[np.argsort(leftMost[:, 1]), :]
-    (tl, bl) = leftMost
+    tl, bl = leftMost
 
     rightMost = rightMost[np.argsort(rightMost[:, 1]), :]
-    (tr, br) = rightMost
+    tr, br = rightMost
 
     rect = np.array([tl, tr, br, bl], dtype="float32")
     return rect

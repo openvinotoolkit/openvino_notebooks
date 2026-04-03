@@ -7,5 +7,5 @@ nncf>=2.11.0
 optimum-intel>=1.17.0
 transformers>=4.40.0
 huggingface-hub>=0.21.3
-torch>=2.1
+torch>=2.8
 modelscope

@@ -1,7 +1,6 @@
 from typing import Callable
 import gradio as gr
 
-
 title = "MMS with Gradio"
 description = (
     'Gradio Demo for MMS and OpenVINO™. Upload a source audio, then click the "Submit" button to detect a language ID and a transcription. '

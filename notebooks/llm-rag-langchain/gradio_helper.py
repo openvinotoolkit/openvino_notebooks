@@ -1,7 +1,6 @@
 from typing import Callable
 import gradio as gr
 
-
 chinese_examples = [
     ["英特尔®酷睿™ Ultra处理器可以降低多少功耗？"],
     ["相比英特尔之前的移动处理器产品，英特尔®酷睿™ Ultra处理器的AI推理性能提升了多少？"],

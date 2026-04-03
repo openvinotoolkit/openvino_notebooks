@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Optional
 import nbformat
 
-
 INSTALL_INSTRUCTIONS_CONTENT = """### Installation Instructions
 
 This is a self-contained example that relies solely on its own code.

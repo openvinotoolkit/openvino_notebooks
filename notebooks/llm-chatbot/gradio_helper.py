@@ -2,7 +2,6 @@ from typing import Callable
 import gradio as gr
 from uuid import uuid4
 
-
 chinese_examples = [
     ["你好!"],
     ["你是谁?"],

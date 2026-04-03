@@ -1,5 +1,23 @@
 [
   {
+    "title": "Quantization-Sparsity Aware Training with NNCF, using PyTorch framework",
+    "path": "pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2026.0",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.0/notebooks/pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb",
+    "tags": {
+      "categories": [
+        "Model Training",
+        "Optimize"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image Classification"
+      ]
+    }
+  },
+  {
     "title": "Animating Open-domain Images with DynamiCrafter and OpenVINO",
     "path": "dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb",
     "imageUrl": "https://github.com/Doubiiu/DynamiCrafter/blob/main/assets/showcase/guitar0.gif?raw=true",

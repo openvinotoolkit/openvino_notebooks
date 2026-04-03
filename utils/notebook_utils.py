@@ -12,7 +12,6 @@ from os import PathLike
 from pathlib import Path
 from typing import List, NamedTuple, Optional
 
-
 # ## Files
 #
 # Load an image, download a file, download an IR model, and create a progress bar to show download progress.

@@ -4,13 +4,11 @@ import gradio as gr
 
 def make_demo(fn: Callable, quantized: bool):
     with gr.Blocks() as demo:
-        gr.HTML(
-            """
+        gr.HTML("""
         <h1 style='text-align: center'>
         YOLOv10: Real-Time End-to-End Object Detection using OpenVINO
         </h1>
-        """
-        )
+        """)
         with gr.Row():
             with gr.Column():
                 image = gr.Image(type="numpy", label="Image")
