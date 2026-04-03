@@ -539,3 +539,15 @@
   skips:
     - os:
         - windows-2022
+- notebook: notebooks/qwen3-tts/qwen3-tts.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+# OOM / timeout — model too heavy for CI runners (2026-04-03)
+- notebook: notebooks/gemma4/gemma4.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022

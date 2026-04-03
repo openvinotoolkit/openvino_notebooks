@@ -1032,41 +1032,83 @@ def convert_speech_tokenizer(model_id, output_dir, use_local_dir=False):
         print("⌛ Convert speech tokenizer decoder")
         decoder = tokenizer_model.decoder
 
-        # Decoder forward: takes audio_codes [batch, num_quantizers, code_len] and returns waveform
-        class DecoderWrapper(torch.nn.Module):
-            def __init__(self, decoder):
-                super().__init__()
-                self.decoder = decoder
+        # Patch masking_utils to use trace-compatible implementations.
+        # transformers 4.57+ uses torch.vmap in create_causal_mask / create_sliding_window_causal_mask
+        # which is incompatible with torch.jit.trace. We provide simple replacements that produce
+        # identical masks without vmap.
+        import transformers.masking_utils as _masking_utils
 
-            def forward(self, audio_codes):
-                # audio_codes: [batch, code_len, num_quantizers] -> transpose to [batch, num_quantizers, code_len]
-                codes_transposed = audio_codes.transpose(1, 2)
-                # Use chunked_decode for better memory efficiency
-                wav = self.decoder.chunked_decode(codes_transposed)
-                return wav.squeeze(1)  # Remove channel dimension
+        _orig_causal = _masking_utils.create_causal_mask
+        _orig_sliding = getattr(_masking_utils, "create_sliding_window_causal_mask", None)
 
-        decoder_wrapper = DecoderWrapper(decoder)
+        def _simple_causal_mask(**kwargs):
+            input_embeds = kwargs["input_embeds"]
+            batch_size, seq_len = input_embeds.shape[0], input_embeds.shape[1]
+            dtype = input_embeds.dtype
+            mask = torch.triu(
+                torch.full((seq_len, seq_len), torch.finfo(dtype).min, dtype=dtype, device=input_embeds.device),
+                diagonal=1,
+            )
+            return mask.unsqueeze(0).unsqueeze(0).expand(batch_size, 1, -1, -1)
 
-        num_quantizers = tokenizer_model.config.decoder_config.num_quantizers
-        # Example input: [batch=1, code_len=100, num_quantizers]
-        example_input = torch.randint(0, 2048, [1, 100, num_quantizers], dtype=torch.long)
+        def _simple_sliding_window_causal_mask(**kwargs):
+            config = kwargs["config"]
+            input_embeds = kwargs["input_embeds"]
+            batch_size, seq_len = input_embeds.shape[0], input_embeds.shape[1]
+            dtype = input_embeds.dtype
+            window_size = getattr(config, "sliding_window", None) or 72
+            mask = torch.triu(
+                torch.full((seq_len, seq_len), torch.finfo(dtype).min, dtype=dtype, device=input_embeds.device),
+                diagonal=1,
+            )
+            sliding_mask = torch.tril(
+                torch.full((seq_len, seq_len), torch.finfo(dtype).min, dtype=dtype, device=input_embeds.device),
+                diagonal=-(window_size),
+            )
+            mask = mask + sliding_mask
+            return mask.unsqueeze(0).unsqueeze(0).expand(batch_size, 1, -1, -1)
 
-        __make_16bit_traceable(decoder_wrapper)
-        ov_model = ov.convert_model(
-            decoder_wrapper,
-            example_input=example_input,
-            input=[ov.PartialShape([1, -1, num_quantizers])],
-        )
+        _masking_utils.create_causal_mask = _simple_causal_mask
+        if _orig_sliding:
+            _masking_utils.create_sliding_window_causal_mask = _simple_sliding_window_causal_mask
 
-        # Set input/output names
-        ov_model.inputs[0].get_tensor().set_names({"audio_codes"})
-        ov_model.outputs[0].get_tensor().set_names({"audio_values"})
+        try:
 
-        ov.save_model(ov_model, decoder_path)
-        del ov_model
-        cleanup_torchscript_cache()
-        gc.collect()
-        print("✅ Speech tokenizer decoder successfully converted")
+            class DecoderWrapper(torch.nn.Module):
+                def __init__(self, decoder):
+                    super().__init__()
+                    self.decoder = decoder
+
+                def forward(self, audio_codes):
+                    codes_transposed = audio_codes.transpose(1, 2)
+                    wav = self.decoder(codes_transposed)
+                    return wav.squeeze(1)
+
+            decoder_wrapper = DecoderWrapper(decoder)
+
+            num_quantizers = tokenizer_model.config.decoder_config.num_quantizers
+            # Trace at 325 tokens = chunk_size(300) + left_context(25), matching original chunked_decode
+            example_input = torch.randint(0, 2048, [1, 325, num_quantizers], dtype=torch.long)
+
+            traced = torch.jit.trace(decoder_wrapper, example_input)
+            ov_model = ov.convert_model(
+                traced,
+                example_input=example_input,
+                input=[ov.PartialShape([1, -1, num_quantizers])],
+            )
+
+            ov_model.inputs[0].get_tensor().set_names({"audio_codes"})
+            ov_model.outputs[0].get_tensor().set_names({"audio_values"})
+
+            ov.save_model(ov_model, decoder_path)
+            del ov_model, traced
+            cleanup_torchscript_cache()
+            gc.collect()
+            print("✅ Speech tokenizer decoder successfully converted")
+        finally:
+            _masking_utils.create_causal_mask = _orig_causal
+            if _orig_sliding:
+                _masking_utils.create_sliding_window_causal_mask = _orig_sliding
 
     del tokenizer_model
     gc.collect()
@@ -1561,25 +1603,33 @@ class OVQwen3TTSSpeechTokenizer:
     """
     OpenVINO wrapper for Qwen3-TTS Speech Tokenizer (12Hz).
     Provides encode() and decode() methods compatible with Qwen3TTSTokenizer.
+    Uses OV encoder + OV decoder with chunked decoding (no PyTorch models).
     """
+
+    # Decoder chunking parameters (matching original chunked_decode)
+    DECODER_TRACE_LEN = 325  # tokens the OV decoder was traced with
+    DECODER_CHUNK_SIZE = 300  # effective tokens per chunk
+    DECODER_LEFT_CONTEXT = 25  # overlap tokens from previous chunk
+    DECODER_UPSAMPLE = 1920  # samples per token
+    DECODER_OFFSET = 555  # causal conv edge effect offset
 
     def __init__(self, model_dir: Path, device: str = "CPU"):
         self.model_dir = Path(model_dir)
         self.device = device
 
-        # Load encoder and decoder
+        # Load encoder (OV)
         encoder_path = self.model_dir / SPEECH_TOKENIZER_ENCODER_NAME
-        decoder_path = self.model_dir / SPEECH_TOKENIZER_DECODER_NAME
 
         if encoder_path.exists():
             self.encoder_model = core.compile_model(encoder_path, device)
         else:
             self.encoder_model = None
 
+        # Load decoder (OV)
+        self.decoder_model = None
+        decoder_path = self.model_dir / SPEECH_TOKENIZER_DECODER_NAME
         if decoder_path.exists():
             self.decoder_model = core.compile_model(decoder_path, device)
-        else:
-            self.decoder_model = None
 
         # Load config
         config_path = self.model_dir / "config.json"
@@ -1687,6 +1737,46 @@ class OVQwen3TTSSpeechTokenizer:
             return EncoderOutput(audio_codes)
         return (audio_codes,)
 
+    def _chunked_ov_decode(self, codes_np):
+        """
+        Decode audio codes using OV decoder with chunking, matching the original
+        chunked_decode(chunk_size=300, left_context_size=25) behavior.
+
+        The OV decoder was traced at DECODER_TRACE_LEN=325 tokens. For longer sequences,
+        we split into chunks of DECODER_CHUNK_SIZE=300 effective tokens with
+        DECODER_LEFT_CONTEXT=25 overlap tokens from the previous chunk.
+
+        Args:
+            codes_np: [1, code_len, num_quantizers] int64 numpy array
+
+        Returns:
+            1D float32 numpy array of audio samples
+        """
+        code_len = codes_np.shape[1]
+        wavs = []
+        start = 0
+        while start < code_len:
+            end = min(start + self.DECODER_CHUNK_SIZE, code_len)
+            ctx = self.DECODER_LEFT_CONTEXT if start > self.DECODER_LEFT_CONTEXT else start
+            chunk = codes_np[:, start - ctx : end, :]
+            chunk_len = chunk.shape[1]
+
+            # Pad to DECODER_TRACE_LEN if chunk is shorter
+            if chunk_len < self.DECODER_TRACE_LEN:
+                pad = np.zeros((1, self.DECODER_TRACE_LEN - chunk_len, codes_np.shape[2]), dtype=np.int64)
+                chunk = np.concatenate([chunk, pad], axis=1)
+
+            ov_out = self.decoder_model({"audio_codes": chunk})[0].flatten()
+
+            # Valid output region: discard context portion and edge-effect tail
+            total_valid = chunk_len * self.DECODER_UPSAMPLE - self.DECODER_OFFSET
+            context_samples = ctx * self.DECODER_UPSAMPLE
+            wavs.append(ov_out[context_samples:total_valid])
+
+            start = end
+
+        return np.concatenate(wavs).astype(np.float32)
+
     def decode(
         self,
         encoded,
@@ -1716,27 +1806,23 @@ class OVQwen3TTSSpeechTokenizer:
         else:
             raise TypeError("encoded must be encoder output, dict, or list of dicts")
 
-        # Decode each
         wavs = []
         for codes in audio_codes_list:
             if isinstance(codes, torch.Tensor):
-                codes = codes.numpy()
+                codes_np = codes.numpy()
+            elif isinstance(codes, np.ndarray):
+                codes_np = codes
+            else:
+                codes_np = np.array(codes)
 
-            # Ensure shape is [batch=1, code_len, num_quantizers]
-            if codes.ndim == 2:
-                codes = codes.reshape(1, codes.shape[0], codes.shape[1])
+            # Ensure shape is [1, code_len, num_quantizers]
+            if codes_np.ndim == 2:
+                codes_np = codes_np[np.newaxis, ...]
+            elif codes_np.ndim == 3 and codes_np.shape[0] != 1:
+                codes_np = codes_np[:1]
 
-            # Run decoder
-            result = self.decoder_model({"audio_codes": codes.astype(np.int64)})[0]
-            wav = result[0]  # [seq_len]
-
-            # Trim based on code length
-            code_len = codes.shape[1]
-            expected_len = code_len * self.decode_upsample_rate
-            if wav.shape[0] > expected_len:
-                wav = wav[:expected_len]
-
-            wavs.append(wav.astype(np.float32))
+            wav = self._chunked_ov_decode(codes_np.astype(np.int64))
+            wavs.append(wav)
 
         return wavs, self.output_sample_rate
 
@@ -1976,7 +2062,7 @@ class OVQwen3TTSModel:
             subtalker_top_k=50,
             subtalker_top_p=1.0,
             subtalker_temperature=0.9,
-            max_new_tokens=2048,
+            max_new_tokens=4096,
         )
 
         def pick(name: str, user_val):
@@ -2706,66 +2792,110 @@ class OVQwen3TTSModel:
                 instruct_embed = self.talker.text_projection(self.talker.get_text_embeddings()(instruct_id))
                 talker_input_embed = torch.cat([instruct_embed, talker_input_embed], dim=1)
 
-            # Add reference text embeddings for ICL mode (voice clone)
+            # ICL mode (voice clone with ref audio + ref text) or normal mode
+            # These branches are MUTUALLY EXCLUSIVE — ICL mode handles both ref and target text
             if icl_mode and ref_id is not None:
-                ref_embed = self.talker.text_projection(self.talker.get_text_embeddings()(ref_id))
-                # Get ref codes for embedding
                 ref_code_list = voice_clone_prompt.get("ref_code", [])
-                if idx < len(ref_code_list) and ref_code_list[idx] is not None:
+                has_ref_code = idx < len(ref_code_list) and ref_code_list[idx] is not None
+
+                if has_ref_code:
+                    # Replicate original generate_icl_prompt():
+                    # 1. text_embed = ref_text + target_text + eos (concatenated)
+                    text_id = input_id[:, 3:-5]  # strip <|im_start|>assistant\n ... <|im_end|>\n
+                    ref_id_stripped = ref_id[:, 3:-2]  # strip <|im_start|>assistant\n ... \n
+                    text_embed = self.talker.text_projection(self.talker.get_text_embeddings()(torch.cat([ref_id_stripped, text_id], dim=-1)))
+                    text_embed = torch.cat([text_embed, tts_eos_embed], dim=1)
+
+                    # 2. codec_embed = sum of all code group embeddings + codec_bos prefix
                     ref_code = ref_code_list[idx]
-                    if isinstance(ref_code, torch.Tensor):
-                        ref_code_tensor = ref_code
+                    if not isinstance(ref_code, torch.Tensor):
+                        ref_code = torch.from_numpy(ref_code)
+                    # ref_code shape: [code_len, num_quantizers]
+                    num_code_groups = self.config.talker_config.num_code_groups
+                    codec_embeds = []
+                    for i in range(num_code_groups):
+                        code_slice = ref_code[:, i : i + 1].long()  # [code_len, 1]
+                        if i == 0:
+                            codec_embeds.append(self.talker.get_input_embeddings()(code_slice))
+                        else:
+                            # OV code_predictor embedding: callable(input_ids, generation_steps)
+                            codec_embeds.append(self.talker.code_predictor.get_input_embeddings()(code_slice, i - 1))
+                    # Sum across code groups: each is [code_len, 1, D] -> cat on dim=1 -> [code_len, num_groups, D] -> sum -> [code_len, D]
+                    codec_embed = torch.cat(codec_embeds, dim=1).sum(1).unsqueeze(0)  # [1, code_len, D]
+                    codec_bos_embed = self.talker.get_input_embeddings()(torch.tensor([[self.config.talker_config.codec_bos_id]], dtype=input_id.dtype))
+                    codec_embed = torch.cat([codec_bos_embed, codec_embed], dim=1)  # [1, 1+code_len, D]
+
+                    # 3. Build ICL input embed based on streaming mode
+                    text_lens = text_embed.shape[1]
+                    codec_lens = codec_embed.shape[1]
+
+                    if non_streaming_mode:
+                        # text side: text_embed + codec_pad for each position
+                        icl_text_part = text_embed + self.talker.get_input_embeddings()(
+                            torch.tensor([[self.config.talker_config.codec_pad_id] * text_lens], dtype=input_id.dtype)
+                        )
+                        # codec side: codec_embed + tts_pad for each position
+                        icl_codec_part = codec_embed + tts_pad_embed.expand(-1, codec_lens, -1)
+                        icl_input_embed = torch.cat([icl_text_part, icl_codec_part], dim=1)
+                        trailing_text_hidden = tts_pad_embed
                     else:
-                        ref_code_tensor = torch.from_numpy(ref_code)
+                        # Streaming mode: blend based on length
+                        if text_lens > codec_lens:
+                            icl_input_embed = text_embed[:, :codec_lens] + codec_embed
+                            trailing_text_hidden = text_embed[:, codec_lens:]
+                        else:
+                            text_embed_padded = torch.cat([text_embed] + [tts_pad_embed] * (codec_lens - text_lens), dim=1)
+                            icl_input_embed = text_embed_padded + codec_embed
+                            trailing_text_hidden = tts_pad_embed
 
-                    # Embed ref codes
-                    ref_code_ids = ref_code_tensor[:, 0].long().view(1, -1)
-                    ref_code_embed = self.talker.get_input_embeddings()(ref_code_ids)
+                    talker_input_embed = torch.cat([talker_input_embed, icl_input_embed], dim=1)
+                else:
+                    # ICL mode but no ref_code — fall through to normal handling
+                    icl_mode = False
 
-                    ref_text_len = ref_embed.shape[1]
-                    ref_code_len = ref_code_embed.shape[1]
-
-                    if ref_text_len <= ref_code_len:
-                        pad_len = ref_code_len - ref_text_len
-                        ref_embed_padded = torch.cat([ref_embed, tts_pad_embed.expand(-1, pad_len, -1)], dim=1)
-                        ref_prefill_embed = ref_embed_padded + ref_code_embed
-                    else:
-                        pad_len = ref_text_len - ref_code_len
-                        codec_pad_ids = torch.tensor([[self.config.talker_config.codec_pad_id] * pad_len], dtype=ref_code_ids.dtype)
-                        ref_code_embed_padded = torch.cat([ref_code_embed, self.talker.get_input_embeddings()(codec_pad_ids)], dim=1)
-                        ref_prefill_embed = ref_embed + ref_code_embed_padded
-
-                    talker_input_embed = torch.cat([ref_prefill_embed, talker_input_embed], dim=1)
-
-            # Handle streaming vs non-streaming mode
-            if non_streaming_mode:
-                # Add text embedding + trailing text
-                text_embed = self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, 3:-5]))
-                text_embed_with_eos = torch.cat([text_embed, tts_eos_embed], dim=1)
-                codec_pad_embed = self.talker.get_input_embeddings()(
-                    torch.tensor([[self.config.talker_config.codec_pad_id] * text_embed_with_eos.shape[1]], dtype=input_id.dtype)
-                )
-                codec_bos_embed = self.talker.get_input_embeddings()(torch.tensor([[self.config.talker_config.codec_bos_id]], dtype=input_id.dtype))
-
+            if not icl_mode or ref_id is None:
+                # Normal (non-ICL) text handling
+                # Add first text token + last codec embedding
                 talker_input_embed = torch.cat(
-                    [
-                        talker_input_embed,
-                        text_embed_with_eos + codec_pad_embed,
-                        tts_pad_embed + codec_bos_embed,
-                    ],
+                    [talker_input_embed, self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, 3:4])) + codec_input_embedding[:, -1:]],
                     dim=1,
                 )
-                trailing_text_hidden = tts_pad_embed
-            else:
-                # Streaming mode
-                first_text_embed = self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, 3:4]))
-                talker_input_embed = torch.cat([talker_input_embed, first_text_embed + codec_input_embedding[:, -1:]], dim=1)
 
-                trailing_text_hidden = torch.cat([self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, 4:-5])), tts_eos_embed], dim=1)
+                if non_streaming_mode:
+                    talker_input_embed = talker_input_embed[:, :-1]  # Remove the just-added text token
+                    text_embed = self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, 3:-5]))
+                    text_embed_with_eos = torch.cat([text_embed, tts_eos_embed], dim=1)
+                    codec_pad_embed = self.talker.get_input_embeddings()(
+                        torch.tensor([[self.config.talker_config.codec_pad_id] * text_embed_with_eos.shape[1]], dtype=input_id.dtype)
+                    )
+                    codec_bos_embed = self.talker.get_input_embeddings()(torch.tensor([[self.config.talker_config.codec_bos_id]], dtype=input_id.dtype))
+                    talker_input_embed = torch.cat(
+                        [
+                            talker_input_embed,
+                            text_embed_with_eos + codec_pad_embed,
+                            tts_pad_embed + codec_bos_embed,
+                        ],
+                        dim=1,
+                    )
+                    trailing_text_hidden = tts_pad_embed
+                else:
+                    # Streaming mode
+                    trailing_text_hidden = torch.cat(
+                        [self.talker.text_projection(self.talker.get_text_embeddings()(input_id[:, 4:-5])), tts_eos_embed],
+                        dim=1,
+                    )
 
             # Build attention mask
             seq_len = talker_input_embed.shape[1]
             attention_mask = torch.ones([1, seq_len], dtype=torch.long)
+
+            # Build suppress_tokens list: suppress top 1024 vocab IDs except EOS
+            # (matches original Qwen3TTSForConditionalGeneration.generate behavior)
+            suppress_tokens = [
+                i
+                for i in range(self.config.talker_config.vocab_size - 1024, self.config.talker_config.vocab_size)
+                if i not in (self.config.talker_config.codec_eos_token_id,)
+            ]
 
             # Setup generation kwargs for talker
             talker_kwargs = dict(
@@ -2779,6 +2909,7 @@ class OVQwen3TTSModel:
                 repetition_penalty=repetition_penalty,
                 eos_token_id=self.config.talker_config.codec_eos_token_id,
                 pad_token_id=self.config.talker_config.codec_pad_id,
+                suppress_tokens=suppress_tokens,
                 # Custom kwargs for forward
                 trailing_text_hidden=trailing_text_hidden,
                 tts_pad_embed=tts_pad_embed,
