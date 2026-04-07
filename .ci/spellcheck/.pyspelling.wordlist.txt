@@ -222,6 +222,7 @@ deduplicated
 DeepEncoder
 DeepFloyd
 DeepLabV
+DeepMind's
 DeepSeek
 DeepStack
 demucs
@@ -816,6 +817,7 @@ paralinguistic
 Parler
 parsers
 patchifying
+Params
 Patil
 PCD
 PDFs
@@ -841,6 +843,7 @@ PixelShuffleUpsampleNetwork
 pixelwise
 Pixtral
 pixtral
+PLE
 PLR
 PNDM
 png
