@@ -113,7 +113,6 @@ def make_demo(pipe, model_name):
         return target_lang, source_lang, target_text, source_text
 
     with gr.Blocks(
-        theme=gr.themes.Soft(),
         title=f"Hunyuan Translation ({model_name})",
     ) as demo:
         gr.Markdown(
