@@ -23,6 +23,10 @@ The tutorial consists of the following steps:
 
 Chinese, English, French, Portuguese, Spanish, Japanese, Turkish, Russian, Arabic, Korean, Thai, Italian, German, Vietnamese, Malay, Indonesian, Filipino, Hindi, Traditional Chinese, Polish, Czech, Dutch, Khmer, Burmese, Persian, Gujarati, Urdu, Telugu, Marathi, Hebrew, Bengali, Tamil, Ukrainian, and more.
 
+⚠️ **EXPERIMENTAL NOTEBOOK**
+
+This notebook demonstrates a model that has not been fully validated with OpenVINO. It may be fully supported and validated in the future.
+
 ## Installation Instructions
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
