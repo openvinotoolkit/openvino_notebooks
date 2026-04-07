@@ -74,4 +74,5 @@ notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb
 notebooks/funasr-nano/funasr-nano.ipynb
 notebooks/sam3/sam3-segmentation.ipynb
 notebooks/minicpm-o-4.5/minicpm-o-4.5.ipynb
+notebooks/hunyuan-translation/hunyuan-translation.ipynb
 notebooks/qwen3-tts/qwen3-tts.ipynb

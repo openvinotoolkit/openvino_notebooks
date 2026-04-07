@@ -407,6 +407,7 @@ HED
 HiFT
 HiFi
 HH
+HY
 hoc
 Homebrew
 hotfix
@@ -1101,6 +1102,7 @@ sym
 TartanAir
 TaskManager
 tbb
+Tencent
 TensorBoard
 tensorflow
 TextVQA
