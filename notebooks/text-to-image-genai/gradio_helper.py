@@ -5,7 +5,6 @@ import sys
 
 import openvino_genai as ov_genai
 
-
 MAX_SEED = np.iinfo(np.int32).max
 MAX_IMAGE_SIZE = 832
 
@@ -62,11 +61,9 @@ def make_demo(pipeline, generator_cls, adapter_config, device):
 
     with gr.Blocks(css=css) as demo:
         with gr.Column(elem_id="col-container"):
-            gr.Markdown(
-                """
+            gr.Markdown("""
             # Demo Text to Image with OpenVINO with Generate API
-            """
-            )
+            """)
 
             with gr.Row():
                 prompt = gr.Text(

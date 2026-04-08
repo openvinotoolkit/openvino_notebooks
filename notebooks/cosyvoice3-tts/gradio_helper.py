@@ -131,7 +131,7 @@ win_length = 440
 
 
 def generate_seed():
-    seed = random.randint(1, 100000000)
+    seed = random.randint(1, 100000000)  # nosec B311 - UI seed for reproducibility, not security
     return {"__type__": "update", "value": seed}
 
 

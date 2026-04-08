@@ -3,7 +3,7 @@
 [LTX-Video](https://github.com/Lightricks/LTX-Video) is a transformer-based latent diffusion model that adopts a holistic approach to video generation by seamlessly integrating the responsibilities of the Video-VAE and the denoising transformer. Unlike existing methods, which treat these components as independent, LTX-Video aims to optimize their interaction for improved efficiency and quality. At its core is a carefully designed Video-VAE that achieves a high compression ratio of 1:192, with spatiotemporal downscaling of 32×32×8 pixels per token, enabled by relocating the patchifying operation from the transformer’s input to the VAE's input. Operating in this highly compressed latent space enables the transformer to efficiently perform full spatiotemporal selfattention, which is essential for generating high-resolution videos with temporal consistency. However, the high compression inherently limits the representation of fine details. To address this, this VAE decoder is tasked with both latent-to-pixel conversion and the final denoising step, producing the clean result directly in pixel space. This approach preserves the ability to generate fine details without incurring the runtime cost of a separate upsampling module. The model supports diverse use cases, including text-to-video and image-to-video generation, with both capabilities
 trained simultaneously.
 
-In this example we show how to convert text-to-video pipeline in OpenVINO format and run inference. An additional part demonstrates how to run optimization with [NNCF](https://github.com/openvinotoolkit/nncf/) to speed up pipeline.
+In this example we show how to convert text-to-video pipeline to OpenVINO format with weight compression using [NNCF](https://github.com/openvinotoolkit/nncf/) and run inference using [OpenVINO GenAI](https://github.com/openvinotoolkit/openvino.genai) `Text2VideoPipeline`.
 
 | | | |
 |:---:|:---:|:---:|
@@ -14,9 +14,8 @@ In this example we show how to convert text-to-video pipeline in OpenVINO format
 ## Notebook contents
 This tutorial consists of the following steps:
 - Prerequisites
-- Convert the model to OpenVINO IR
-- Run inference pipeline
-- Quantization
+- Convert the model to OpenVINO IR with weight compression
+- Run OpenVINO GenAI model inference
 - Interactive inference
 
 ## Installation instructions

@@ -6,7 +6,6 @@ import gradio as gr
 from transformers import TextIteratorStreamer
 from threading import Thread
 
-
 MODEL_ID = "THUDM/glm-4v-9b"
 MODEL_NAME = MODEL_ID.split("/")[-1]
 
@@ -41,7 +40,7 @@ def download_example_images():
 
     for path, url in example_images.items():
         if not Path(path).exists():
-            image = Image.open(requests.get(url, stream=True).raw)
+            image = Image.open(requests.get(url, stream=True, timeout=30).raw)
             image.save(path)
 
 

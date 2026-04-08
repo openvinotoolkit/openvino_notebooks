@@ -27,12 +27,12 @@ import cv2
 import openvino.properties as props
 from custom_segmentation import Model
 
-
 # Fetch `notebook_utils` module
 import requests
 
 r = requests.get(
     url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
+    timeout=30,
 )
 open("notebook_utils.py", "w").write(r.text)
 

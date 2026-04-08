@@ -6,7 +6,6 @@ import queue
 import sys
 import time
 
-
 core = ov.Core()
 
 

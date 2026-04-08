@@ -39,7 +39,7 @@ class GLM4VModel:
 
     def _ppt_to_imgs(self, ppt_path):
         tmp = tempfile.mkdtemp()
-        subprocess.run(
+        subprocess.run(  # nosec B603 B607 - hardcoded libreoffice command for PDF conversion
             ["libreoffice", "--headless", "--convert-to", "pdf", "--outdir", tmp, ppt_path],
             check=True,
         )

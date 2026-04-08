@@ -10,13 +10,13 @@ audio_en_example_path = Path("en_example.wav")
 audio_ml_example_path = Path("ml_example.wav")
 
 if not audio_en_example_path.exists():
-    r = requests.get("https://huggingface.co/spaces/distil-whisper/whisper-vs-distil-whisper/resolve/main/assets/example_1.wav")
+    r = requests.get("https://huggingface.co/spaces/distil-whisper/whisper-vs-distil-whisper/resolve/main/assets/example_1.wav", timeout=30)
     with open(audio_en_example_path, "wb") as f:
         f.write(r.content)
 
 
 if not audio_ml_example_path.exists():
-    r = requests.get("https://huggingface.co/datasets/Xenova/transformers.js-docs/resolve/main/jeanNL.wav")
+    r = requests.get("https://huggingface.co/datasets/Xenova/transformers.js-docs/resolve/main/jeanNL.wav", timeout=30)
     with open(audio_ml_example_path, "wb") as f:
         f.write(r.content)
 
@@ -69,8 +69,7 @@ def make_demo(gr_pipeline):
         examples.append([str(audio_ml_example_path), "<|fr|>"])
 
     with gr.Blocks() as demo:
-        gr.HTML(
-            f"""
+        gr.HTML(f"""
                     <div style="text-align: center; max-width: 700px; margin: 0 auto;">
                     <div
                         style="
@@ -85,8 +84,7 @@ def make_demo(gr_pipeline):
                             or get 'generation_config' by ov_pipe.get_generation_config() and check the attribute 'lang_to_id'</div>
                     </div>
                     </div>
-                """
-        )
+                """)
         audio = gr.components.Audio(type="filepath", label="Audio input")
         language = gr.components.Textbox(
             label="Language.",

@@ -19,7 +19,6 @@ from openai.types.chat.chat_completion_chunk import ChatCompletionChunk, Choice,
 
 from iterable_streamer import IterableStreamer
 
-
 logger = logging.getLogger(__name__)
 
 

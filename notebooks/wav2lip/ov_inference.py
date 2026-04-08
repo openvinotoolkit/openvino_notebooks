@@ -12,7 +12,6 @@ import torch.nn.functional as F
 from Wav2Lip import audio
 import openvino as ov
 
-
 device = "cpu"
 
 
