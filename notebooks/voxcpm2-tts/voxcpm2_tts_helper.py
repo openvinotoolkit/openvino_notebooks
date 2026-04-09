@@ -49,9 +49,9 @@ if str(VOXCPM_SRC) not in sys.path:
 # ---------------------------------------------------------------------------
 EMBED_TOKENS_NAME = "openvino_embed_tokens.xml"
 FEAT_ENCODER_NAME = "openvino_feat_encoder.xml"
-BASE_LM_NAME = "openvino_base_lm.xml"          # includes FSQ
+BASE_LM_NAME = "openvino_base_lm.xml"  # includes FSQ
 RESIDUAL_LM_NAME = "openvino_residual_lm.xml"  # includes fusion_proj
-DECODE_HEADS_NAME = "openvino_decode_heads.xml" # dit_proj + stop_pred
+DECODE_HEADS_NAME = "openvino_decode_heads.xml"  # dit_proj + stop_pred
 DIT_ESTIMATOR_NAME = "openvino_dit_estimator.xml"
 AUDIO_VAE_ENCODER_NAME = "openvino_audio_vae_encoder.xml"
 AUDIO_VAE_DECODER_NAME = "openvino_audio_vae_decoder.xml"
@@ -62,6 +62,7 @@ core = ov.Core()
 # ═══════════════════════════════════════════════════════════════════════════
 # Part 1 — Stateful-model utilities (adapted from Qwen3-TTS helper)
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 def model_has_state(ov_model: ov.Model):
     return len(ov_model.get_sinks()) > 0
@@ -119,9 +120,7 @@ def patch_stateful(ov_model, num_main_outputs):
     """
     key_value_input_names = [key.get_any_name() for key in ov_model.inputs[2:-1]]
     key_value_output_names = [key.get_any_name() for key in ov_model.outputs[num_main_outputs:]]
-    not_kv_inputs = [
-        inp for inp in ov_model.inputs if not any(n in key_value_input_names for n in inp.get_names())
-    ]
+    not_kv_inputs = [inp for inp in ov_model.inputs if not any(n in key_value_input_names for n in inp.get_names())]
     if not key_value_input_names or not key_value_output_names:
         return
     fuse_cache_reorder(ov_model, not_kv_inputs, key_value_input_names, gather_dim=0)
@@ -325,6 +324,7 @@ if TORCH_AVAILABLE:
 # Part 3 — Conversion function
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 def convert_voxcpm2_model(model_path: str, output_dir: str, quantization_config=None):
     """Convert all VoxCPM2 sub-models to OpenVINO IR.
 
@@ -344,9 +344,14 @@ def convert_voxcpm2_model(model_path: str, output_dir: str, quantization_config=
 
     # Check if already converted
     all_xml = [
-        EMBED_TOKENS_NAME, FEAT_ENCODER_NAME, BASE_LM_NAME,
-        RESIDUAL_LM_NAME, DECODE_HEADS_NAME, DIT_ESTIMATOR_NAME,
-        AUDIO_VAE_ENCODER_NAME, AUDIO_VAE_DECODER_NAME,
+        EMBED_TOKENS_NAME,
+        FEAT_ENCODER_NAME,
+        BASE_LM_NAME,
+        RESIDUAL_LM_NAME,
+        DECODE_HEADS_NAME,
+        DIT_ESTIMATOR_NAME,
+        AUDIO_VAE_ENCODER_NAME,
+        AUDIO_VAE_DECODER_NAME,
     ]
     if all((output_dir / x).exists() for x in all_xml):
         print(f"✅ All models already converted in {output_dir}")
@@ -357,6 +362,7 @@ def convert_voxcpm2_model(model_path: str, output_dir: str, quantization_config=
     # Mock torchaudio to avoid ImportError from VoxCPM v1 import chain
     if "torchaudio" not in sys.modules:
         import importlib.machinery
+
         _mock = types.ModuleType("torchaudio")
         _mock.__spec__ = importlib.machinery.ModuleSpec("torchaudio", None)
         sys.modules["torchaudio"] = _mock
@@ -375,6 +381,7 @@ def convert_voxcpm2_model(model_path: str, output_dir: str, quantization_config=
 
     # Copy tokenizer + config
     import shutil
+
     for fn in ["config.json", "tokenizer.json", "tokenizer_config.json", "special_tokens_map.json"]:
         src = model_path / fn
         if src.exists():
@@ -411,6 +418,7 @@ def convert_voxcpm2_model(model_path: str, output_dir: str, quantization_config=
 
 # ── Individual conversion helpers ────────────────────────────────────────
 
+
 def _convert_embed_tokens(model, output_dir):
     path = output_dir / EMBED_TOKENS_NAME
     if path.exists():
@@ -423,7 +431,9 @@ def _convert_embed_tokens(model, output_dir):
     ov_model.inputs[0].get_tensor().set_names({"input_ids"})
     ov_model.outputs[0].get_tensor().set_names({"embeddings"})
     ov.save_model(ov_model, path)
-    del ov_model; cleanup_torchscript_cache(); gc.collect()
+    del ov_model
+    cleanup_torchscript_cache()
+    gc.collect()
     print(f"  ✅ embed_tokens done")
 
 
@@ -435,18 +445,21 @@ def _convert_feat_encoder(model, output_dir):
     print(f"  ⌛ Converting feat_encoder …")
     wrapper = FeatEncoderWrapper(model.feat_encoder, model.enc_to_lm_proj)
     wrapper.eval()
-    P = model.patch_size   # 4
-    D = model.feat_dim     # 64
+    P = model.patch_size  # 4
+    D = model.feat_dim  # 64
     example = torch.randn(1, 2, P, D)
     __make_16bit_traceable(wrapper)
     ov_model = ov.convert_model(
-        wrapper, example_input=example,
+        wrapper,
+        example_input=example,
         input=[ov.PartialShape([1, -1, P, D])],
     )
     ov_model.inputs[0].get_tensor().set_names({"audio_features"})
     ov_model.outputs[0].get_tensor().set_names({"encoded"})
     ov.save_model(ov_model, path)
-    del ov_model; cleanup_torchscript_cache(); gc.collect()
+    del ov_model
+    cleanup_torchscript_cache()
+    gc.collect()
     print(f"  ✅ feat_encoder done")
 
 
@@ -454,8 +467,7 @@ def _build_lm_example(num_layers, hidden, kv_heads, head_dim, embed_dim=None):
     """Build example inputs + names + shapes for a stateful LM conversion."""
     if embed_dim is None:
         embed_dim = hidden
-    pkv = [[torch.randn(1, kv_heads, 2, head_dim), torch.randn(1, kv_heads, 2, head_dim)]
-           for _ in range(num_layers)]
+    pkv = [[torch.randn(1, kv_heads, 2, head_dim), torch.randn(1, kv_heads, 2, head_dim)] for _ in range(num_layers)]
     example = {
         "attention_mask": torch.ones([1, 4], dtype=torch.long),
         "position_ids": torch.arange(2, 4, dtype=torch.long).view(1, -1),
@@ -512,7 +524,9 @@ def _convert_base_lm(model, output_dir, quant_config):
         print(f"  ✅ base_lm weights compressed")
 
     ov.save_model(ov_model, out_path)
-    del ov_model; cleanup_torchscript_cache(); gc.collect()
+    del ov_model
+    cleanup_torchscript_cache()
+    gc.collect()
 
 
 def _convert_residual_lm(model, output_dir, quant_config):
@@ -533,9 +547,7 @@ def _convert_residual_lm(model, output_dir, quant_config):
     num_layers = model.config.residual_lm_num_layers
 
     # Input is concatenated [enc_out, feat_embed] → shape [B, T, 2*H]
-    example, in_names, in_shapes = _build_lm_example(
-        num_layers, H, kv_heads, head_dim, embed_dim=H * 2
-    )
+    example, in_names, in_shapes = _build_lm_example(num_layers, H, kv_heads, head_dim, embed_dim=H * 2)
 
     out_names = ["hidden_states"]
     for i in range(num_layers):
@@ -558,7 +570,9 @@ def _convert_residual_lm(model, output_dir, quant_config):
         print(f"  ✅ residual_lm weights compressed")
 
     ov.save_model(ov_model, out_path)
-    del ov_model; cleanup_torchscript_cache(); gc.collect()
+    del ov_model
+    cleanup_torchscript_cache()
+    gc.collect()
 
 
 def _convert_decode_heads(model, output_dir):
@@ -570,8 +584,10 @@ def _convert_decode_heads(model, output_dir):
     print(f"  ⌛ Converting decode_heads …")
     H = model.config.lm_config.hidden_size
     wrapper = DecodeHeadsWrapper(
-        model.lm_to_dit_proj, model.res_to_dit_proj,
-        model.stop_proj, model.stop_head,
+        model.lm_to_dit_proj,
+        model.res_to_dit_proj,
+        model.stop_proj,
+        model.stop_head,
     )
     wrapper.eval()
     __make_16bit_traceable(wrapper)
@@ -585,7 +601,9 @@ def _convert_decode_heads(model, output_dir):
     ov_model.outputs[0].get_tensor().set_names({"dit_hidden"})
     ov_model.outputs[1].get_tensor().set_names({"stop_logits"})
     ov.save_model(ov_model, path)
-    del ov_model; cleanup_torchscript_cache(); gc.collect()
+    del ov_model
+    cleanup_torchscript_cache()
+    gc.collect()
     print(f"  ✅ decode_heads done")
 
 
@@ -597,10 +615,10 @@ def _convert_dit_estimator(model, output_dir):
     print(f"  ⌛ Converting dit_estimator …")
     estimator = model.feat_decoder.estimator
     estimator.eval()
-    D = model.feat_dim         # 64
-    P = model.patch_size       # 4
+    D = model.feat_dim  # 64
+    P = model.patch_size  # 4
     H_dit = model.config.dit_config.hidden_dim  # 1024
-    H_lm = model.config.lm_config.hidden_size   # 2048
+    H_lm = model.config.lm_config.hidden_size  # 2048
     # The mu input is [B, H_lm] (lm_to_dit_proj output1024 + res_to_dit_proj output1024 = 2048)
     # which gets reshaped inside the DiT as [B, H_lm//H_dit, H_dit] = [B, 2, 1024]
     __make_16bit_traceable(estimator)
@@ -612,7 +630,8 @@ def _convert_dit_estimator(model, output_dir):
         "dt": torch.zeros(2),
     }
     ov_model = ov.convert_model(
-        estimator, example_input=example,
+        estimator,
+        example_input=example,
         input=[
             ov.PartialShape([-1, D, P]),
             ov.PartialShape([-1, H_lm]),
@@ -625,7 +644,9 @@ def _convert_dit_estimator(model, output_dir):
         inp.get_tensor().set_names({name})
     ov_model.outputs[0].get_tensor().set_names({"output"})
     ov.save_model(ov_model, path)
-    del ov_model; cleanup_torchscript_cache(); gc.collect()
+    del ov_model
+    cleanup_torchscript_cache()
+    gc.collect()
     print(f"  ✅ dit_estimator done")
 
 
@@ -642,12 +663,13 @@ def _convert_audio_vae_encoder(model, output_dir):
     # Encoder runs at float32
     chunk = model.chunk_size  # prod(encoder_rates) = 640
     example = torch.randn(1, 1, chunk * 4)
-    ov_model = ov.convert_model(wrapper, example_input=example,
-                                input=[ov.PartialShape([1, 1, -1])])
+    ov_model = ov.convert_model(wrapper, example_input=example, input=[ov.PartialShape([1, 1, -1])])
     ov_model.inputs[0].get_tensor().set_names({"audio"})
     ov_model.outputs[0].get_tensor().set_names({"latent"})
     ov.save_model(ov_model, path)
-    del ov_model; cleanup_torchscript_cache(); gc.collect()
+    del ov_model
+    cleanup_torchscript_cache()
+    gc.collect()
     print(f"  ✅ audio_vae_encoder done")
 
 
@@ -674,20 +696,24 @@ def _convert_audio_vae_decoder(model, output_dir):
 
     example = (torch.randn(1, D, P * 2), sr_idx)
     ov_model = ov.convert_model(
-        wrapper, example_input=example,
+        wrapper,
+        example_input=example,
         input=[ov.PartialShape([1, D, -1]), ov.PartialShape([1])],
     )
     ov_model.inputs[0].get_tensor().set_names({"latent"})
     ov_model.inputs[1].get_tensor().set_names({"sr_idx"})
     ov_model.outputs[0].get_tensor().set_names({"audio"})
     ov.save_model(ov_model, path)
-    del ov_model; cleanup_torchscript_cache(); gc.collect()
+    del ov_model
+    cleanup_torchscript_cache()
+    gc.collect()
     print(f"  ✅ audio_vae_decoder done")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Part 4 — OpenVINO inference pipeline (no PyTorch dependency)
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 class OVVoxCPM2Model:
     """Pure-OpenVINO inference pipeline for VoxCPM2 TTS.
@@ -716,7 +742,7 @@ class OVVoxCPM2Model:
         self.sample_rate = self.out_sample_rate
         encoder_rates = vae_cfg.get("encoder_rates", [2, 5, 8, 8])
         decoder_rates = vae_cfg.get("decoder_rates", [8, 6, 5, 2, 2, 2])
-        self.chunk_size = math.prod(encoder_rates)      # 640
+        self.chunk_size = math.prod(encoder_rates)  # 640
         self.decode_chunk_size = math.prod(decoder_rates)  # 960
         sr_boundaries = vae_cfg.get("sr_bin_boundaries", [20000, 30000, 40000])
         # Pre-compute sr_idx for the output sample rate
@@ -734,10 +760,7 @@ class OVVoxCPM2Model:
         self._tokenizer = Tokenizer.from_file(str(self.model_dir / "tokenizer.json"))
         # Pre-compute multi-character Chinese token set for splitting
         vocab = self._tokenizer.get_vocab()
-        self._multichar_chinese = {
-            tok for tok in vocab
-            if len(tok) >= 2 and all("\u4e00" <= c <= "\u9fff" for c in tok)
-        }
+        self._multichar_chinese = {tok for tok in vocab if len(tok) >= 2 and all("\u4e00" <= c <= "\u9fff" for c in tok)}
 
         # Compile OV models
         self._load_models()
@@ -763,12 +786,14 @@ class OVVoxCPM2Model:
 
     def _infer_stateful(self, request, inputs_embeds, attention_mask, position_ids, n_out=1):
         """Run inference on a stateful LM model, returns list of output numpy arrays."""
-        request.infer({
-            "inputs_embeds": inputs_embeds.astype(np.float32),
-            "attention_mask": attention_mask,
-            "position_ids": position_ids,
-            "beam_idx": np.array([0], dtype=np.int32),
-        })
+        request.infer(
+            {
+                "inputs_embeds": inputs_embeds.astype(np.float32),
+                "attention_mask": attention_mask,
+                "position_ids": position_ids,
+                "beam_idx": np.array([0], dtype=np.int32),
+            }
+        )
         return [request.get_output_tensor(i).data.copy() for i in range(n_out)]
 
     # ── Tokenizer ─────────────────────────────────────────────────────
@@ -815,7 +840,7 @@ class OVVoxCPM2Model:
         T_latent = latent.shape[1]
         T_patch = T_latent // P
         # [D, T_latent] → [D, T_patch, P] → [T_patch, P, D]
-        latent = latent[:, :T_patch * P].reshape(D, T_patch, P).transpose(1, 2, 0)
+        latent = latent[:, : T_patch * P].reshape(D, T_patch, P).transpose(1, 2, 0)
         return latent  # [T_patch, P, D]
 
     def decode_latent(self, latent: np.ndarray) -> np.ndarray:
@@ -866,7 +891,7 @@ class OVVoxCPM2Model:
                 pos_flat = dphi_pos.reshape(B, -1)
                 neg_flat = dphi_neg.reshape(B, -1)
                 dot = np.sum(pos_flat * neg_flat, axis=1, keepdims=True)
-                sq = np.sum(neg_flat ** 2, axis=1, keepdims=True) + 1e-8
+                sq = np.sum(neg_flat**2, axis=1, keepdims=True) + 1e-8
                 st = (dot / sq).reshape(B, 1, 1)
 
                 dphi = dphi_neg * st + cfg_value * (dphi_pos - dphi_neg * st)
@@ -890,11 +915,13 @@ class OVVoxCPM2Model:
         P, D = self.patch_size, self.feat_dim
         z1 = np.zeros((1, P, D), dtype=np.float32)
 
-        tokens = np.concatenate([
-            np.array([self.ref_audio_start_token], dtype=np.int64),
-            np.zeros(T, dtype=np.int64),
-            np.array([self.ref_audio_end_token], dtype=np.int64),
-        ])
+        tokens = np.concatenate(
+            [
+                np.array([self.ref_audio_start_token], dtype=np.int64),
+                np.zeros(T, dtype=np.int64),
+                np.array([self.ref_audio_end_token], dtype=np.int64),
+            ]
+        )
         feats = np.concatenate([z1, ref_feat, z1], axis=0)
         t_mask = np.concatenate([np.ones(1, dtype=np.int32), np.zeros(T, dtype=np.int32), np.ones(1, dtype=np.int32)])
         a_mask = np.concatenate([np.zeros(1, dtype=np.int32), np.ones(T, dtype=np.int32), np.zeros(1, dtype=np.int32)])
@@ -927,7 +954,7 @@ class OVVoxCPM2Model:
         feat_embed = self._feat_encoder({"audio_features": audio_feat})[0]  # [1, T, H]
 
         # 2. Text embeddings (scale_emb=1.0 since use_mup=false)
-        text_embed = self._embed_tokens({"input_ids": text_token})[0]       # [1, T, H]
+        text_embed = self._embed_tokens({"input_ids": text_token})[0]  # [1, T, H]
 
         # 3. Combined embedding
         tm = text_mask[..., np.newaxis].astype(np.float32)
@@ -939,7 +966,10 @@ class OVVoxCPM2Model:
         pos_ids = np.arange(T, dtype=np.int64).reshape(1, -1)
         attn_mask = np.ones([1, T], dtype=np.int64)
         base_outs = self._infer_stateful(
-            self._base_lm, combined, attn_mask, pos_ids,
+            self._base_lm,
+            combined,
+            attn_mask,
+            pos_ids,
             n_out=self._base_lm_n_out,
         )
         raw_out, fsq_out = base_outs[0], base_outs[1]  # each [1, T, H]
@@ -953,7 +983,10 @@ class OVVoxCPM2Model:
 
         self._residual_lm.reset_state()
         res_outs = self._infer_stateful(
-            self._residual_lm, fusion_in, attn_mask, pos_ids,
+            self._residual_lm,
+            fusion_in,
+            attn_mask,
+            pos_ids,
             n_out=self._residual_lm_n_out,
         )
         res_hidden = res_outs[0][:, -1:, :]  # [1, 1, H]
@@ -969,7 +1002,7 @@ class OVVoxCPM2Model:
             context_len = min(streaming_prefix_len - 1, len(a_indices))
             last_idx = a_indices[-context_len:]
             for idx in last_idx:
-                pred_feat_seq.append(audio_feat[:, idx:idx+1, :, :])
+                pred_feat_seq.append(audio_feat[:, idx : idx + 1, :, :])
 
         position = T  # current position counter
 
@@ -979,7 +1012,7 @@ class OVVoxCPM2Model:
             lm_h = lm_hidden.reshape(1, self.hidden_size)
             res_h = res_hidden.reshape(1, self.hidden_size)
             heads_out = self._decode_heads({"lm_hidden": lm_h, "res_hidden": res_h})
-            dit_hidden = heads_out[0]   # [1, 2*H_dit]
+            dit_hidden = heads_out[0]  # [1, 2*H_dit]
             stop_logits = heads_out[1]  # [1, 2]
 
             # CFM Euler solve
@@ -1012,7 +1045,10 @@ class OVVoxCPM2Model:
             attn_decode = np.ones([1, position + 1], dtype=np.int64)
             pos_decode = np.array([[position]], dtype=np.int64)
             base_dec = self._infer_stateful(
-                self._base_lm, curr_embed[:, 0:1, :], attn_decode, pos_decode,
+                self._base_lm,
+                curr_embed[:, 0:1, :],
+                attn_decode,
+                pos_decode,
                 n_out=self._base_lm_n_out,
             )
             lm_hidden = base_dec[1]  # use FSQ'd output
@@ -1020,7 +1056,10 @@ class OVVoxCPM2Model:
             # Residual LM decode step (takes [1, 1, 2*H] concatenated)
             res_input = np.concatenate([lm_hidden, curr_embed[:, 0:1, :]], axis=-1)
             res_dec = self._infer_stateful(
-                self._residual_lm, res_input, attn_decode, pos_decode,
+                self._residual_lm,
+                res_input,
+                attn_decode,
+                pos_decode,
                 n_out=self._residual_lm_n_out,
             )
             res_hidden = res_dec[0]  # [1, 1, H]
@@ -1037,7 +1076,11 @@ class OVVoxCPM2Model:
     # ── Sequence building ────────────────────────────────────────────
 
     def _build_sequence(
-        self, text, reference_wav_path=None, prompt_wav_path=None, prompt_text=None,
+        self,
+        text,
+        reference_wav_path=None,
+        prompt_wav_path=None,
+        prompt_text=None,
     ):
         """Build text_token, text_mask, audio_feat, audio_mask arrays (with batch dim)."""
         P, D = self.patch_size, self.feat_dim
@@ -1128,20 +1171,29 @@ class OVVoxCPM2Model:
             (waveform, sample_rate) — waveform is 1-D float32 numpy array.
         """
         text_token, text_mask, audio_feat, audio_mask = self._build_sequence(
-            text, reference_wav_path, prompt_wav_path, prompt_text,
+            text,
+            reference_wav_path,
+            prompt_wav_path,
+            prompt_text,
         )
 
-        latent, _, context_len = next(self._inference(
-            text_token, text_mask, audio_feat, audio_mask,
-            min_len=min_len, max_len=max_len,
-            inference_timesteps=inference_timesteps,
-            cfg_value=cfg_value,
-        ))
+        latent, _, context_len = next(
+            self._inference(
+                text_token,
+                text_mask,
+                audio_feat,
+                audio_mask,
+                min_len=min_len,
+                max_len=max_len,
+                inference_timesteps=inference_timesteps,
+                cfg_value=cfg_value,
+            )
+        )
 
         audio = self.decode_latent(latent)
         decode_patch_len = self.patch_size * self.decode_chunk_size
         if context_len > 0:
-            audio = audio[..., decode_patch_len * context_len:]
+            audio = audio[..., decode_patch_len * context_len :]
 
         wav = audio.squeeze()
         return wav, self.sample_rate
@@ -1169,19 +1221,26 @@ class OVVoxCPM2Model:
             np.ndarray — 1-D float32 PCM waveform chunk.
         """
         text_token, text_mask, audio_feat, audio_mask = self._build_sequence(
-            text, reference_wav_path, prompt_wav_path, prompt_text,
+            text,
+            reference_wav_path,
+            prompt_wav_path,
+            prompt_text,
         )
 
         decode_patch_len = self.patch_size * self.decode_chunk_size
 
         for latent_chunk, _, _ctx in self._inference(
-            text_token, text_mask, audio_feat, audio_mask,
-            min_len=min_len, max_len=max_len,
+            text_token,
+            text_mask,
+            audio_feat,
+            audio_mask,
+            min_len=min_len,
+            max_len=max_len,
             inference_timesteps=inference_timesteps,
             cfg_value=cfg_value,
             streaming=True,
             streaming_prefix_len=streaming_prefix_len,
         ):
             audio = self.decode_latent(latent_chunk)  # [1, 1, audio_len]
-            audio = audio[..., -decode_patch_len:]     # last chunk only
+            audio = audio[..., -decode_patch_len:]  # last chunk only
             yield audio.squeeze()

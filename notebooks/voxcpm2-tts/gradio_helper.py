@@ -90,10 +90,7 @@ def make_demo(ov_model):
             elapsed = time.time() - start_time
             duration = len(wav) / sr
             rtf = elapsed / max(duration, 0.1)
-            status = (
-                f"✓ Generated {duration:.1f}s audio in {elapsed:.1f}s "
-                f"(RTF: {rtf:.3f})"
-            )
+            status = f"✓ Generated {duration:.1f}s audio in {elapsed:.1f}s " f"(RTF: {rtf:.3f})"
             return (sr, wav), status
         except Exception as e:
             return None, f"Error: {type(e).__name__}: {e}"

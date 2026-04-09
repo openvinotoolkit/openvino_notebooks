@@ -29,7 +29,11 @@ It generates highly realistic multilingual speech and supports voice cloning and
 | LocDiT | 12-layer diffusion transformer with Euler flow matching |
 | AudioVAE Decoder | Decodes latent to 48 kHz waveform (960× upsampling) |
 
-## Acknowledgments
+### Installation Instructions
 
-- [OpenBMB / VoxCPM2](https://github.com/OpenBMB/VoxCPM)
-- [OpenVINO™](https://github.com/openvinotoolkit/openvino)
+This is a self-contained example that relies solely on its own code.
+
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/README.md#-installation-guide).
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/voxcpm2-tts/README.md" />
