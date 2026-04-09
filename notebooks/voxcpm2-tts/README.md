@@ -22,7 +22,7 @@ It generates highly realistic multilingual speech and supports voice cloning and
 
 | Component | Description |
 |-----------|-------------|
-| AudioVAE Encoder | Compresses raw audio to 64-dim latent (640× downsampling) |
+| AudioVAE Encoder | Compresses raw audio to 64-dim latent (640× down sampling) |
 | Local Encoder | Encodes latent patches via 12-layer MiniCPM (non-causal) |
 | Base LM | 28-layer MiniCPM4 autoregressive language model |
 | Residual LM | 8-layer MiniCPM4 refinement model (no RoPE) |
