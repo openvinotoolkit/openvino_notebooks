@@ -33,8 +33,11 @@ The model comprises 15 interconnected sub-models converted to OpenVINO IR format
 | **TTS Code Embedding** | Audio code token embeddings | — |
 | **TTS Code Head** | Audio code prediction head | — |
 | **Flow Embeddings** | CosyVoice2 flow-matching encoder + speaker projection | — |
-| **Flow Estimator** | DiT model for flow-matching denoising | — |
+| **Flow Encoder Chunk** | Streaming conformer encoder with KV cache | — |
+| **Flow Estimator Chunk** | Unified DiT for flow-matching (streaming & non-streaming) | — |
 | **HiFT** | Neural vocoder for mel-to-waveform synthesis | — |
+
+> **Note:** The Flow Estimator Chunk model serves both streaming and non-streaming inference. In non-streaming mode it runs with empty KV caches (bit-identical to the legacy full estimator), while in streaming mode the KV caches enable temporally coherent cross-chunk mel generation — aligned with the original CosyVoice2 `flow.inference_chunk()` design. This unified approach saves ~220MB of memory.
 
 ## Notebook Contents
 
