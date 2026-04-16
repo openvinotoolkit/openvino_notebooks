@@ -2,6 +2,8 @@
 
 [ERNIE-Image-Turbo](https://huggingface.co/Baidu/ERNIE-Image-Turbo) is Baidu's production-ready, open-source image generation model based on the ERNIE family.
 
+<img width="1878" height="914" alt="image" src="https://github.com/user-attachments/assets/d691f512-4a5d-4bca-9620-835cd2d5502a" />
+
 **Highlights**
 
 - High-quality photorealistic image generation with strong bilingual (Chinese & English) support

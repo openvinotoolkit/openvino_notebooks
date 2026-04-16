@@ -100,12 +100,10 @@ def make_demo(ov_pipe, enable_pe=False):
         return image, revised_text, str(seed)
 
     with gr.Blocks(title="ERNIE-Image-Turbo — OpenVINO") as demo:
-        gr.Markdown(
-            """
+        gr.Markdown("""
             # 🎨 ERNIE-Image-Turbo — OpenVINO
             Generate high-quality images from text prompts using ERNIE-Image-Turbo accelerated by OpenVINO.
-            """
-        )
+            """)
 
         with gr.Row():
             with gr.Column(scale=1):
