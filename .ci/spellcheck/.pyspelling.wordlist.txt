@@ -223,6 +223,7 @@ deduplicated
 DeepEncoder
 DeepFloyd
 DeepLabV
+DeepMind's
 DeepSeek
 DeepStack
 demucs
@@ -409,6 +410,7 @@ HED
 HiFT
 HiFi
 HH
+HY
 hoc
 Homebrew
 hotfix
@@ -818,6 +820,7 @@ paralinguistic
 Parler
 parsers
 patchifying
+Params
 Patil
 PCD
 PDFs
@@ -843,6 +846,7 @@ PixelShuffleUpsampleNetwork
 pixelwise
 Pixtral
 pixtral
+PLE
 PLR
 PNDM
 png
@@ -1101,6 +1105,7 @@ sym
 TartanAir
 TaskManager
 tbb
+Tencent
 TensorBoard
 tensorflow
 TextVQA
