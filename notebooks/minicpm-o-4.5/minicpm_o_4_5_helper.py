@@ -663,7 +663,7 @@ def convert_minicpmo_model(
 
     total_models = 12
     if audio_tokenizer_path and model.config.init_tts:
-        total_models = 15  # Include Flow Embeddings, Flow Estimator, HiFT
+        total_models = 16  # Include Flow Embeddings, Flow Estimator, HiFT
     del model
 
     print(f"✅ {model_id} model conversion finished ({total_models} models). Results in {output_dir}")

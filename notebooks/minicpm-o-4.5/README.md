@@ -14,9 +14,9 @@
 - **Proactive Interaction** — Initiates reminders/comments based on live scene understanding
 - **Strong OCR** — State-of-the-art end-to-end English document parsing
 
-## Architecture (15 Sub-models)
+## Architecture (16 Sub-models)
 
-The model comprises 15 interconnected sub-models converted to OpenVINO IR format:
+The model comprises 16 interconnected sub-models converted to OpenVINO IR format:
 
 | Sub-model | Role | Quantization |
 |-----------|------|:------------:|
@@ -44,7 +44,7 @@ The model comprises 15 interconnected sub-models converted to OpenVINO IR format
 The notebook demonstrates:
 
 1. **Prerequisites** — Install dependencies
-2. **Convert & Quantize Model** — Export all 15 sub-models to OpenVINO IR with INT4/INT8 weight compression
+2. **Convert & Quantize Model** — Export all 16 sub-models to OpenVINO IR with INT4/INT8 weight compression
 3. **Select Inference Device** — Choose CPU, GPU, or NPU for different model components
 4. **Run Inference** — Image understanding, audio understanding, omni-modal chat
 5. **Interactive Demo** — Gradio-based multimodal chatbot
