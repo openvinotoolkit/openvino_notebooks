@@ -6,7 +6,7 @@ It generates highly realistic multilingual speech and supports voice cloning and
 ## Features
 
 - **Tokenizer-free** — operates directly on continuous audio latents (no discrete codec)
-- **Multilingual** — Chinese, English, and more
+- **Multilingual** — input text in any of the 30 supported languages and synthesize directly, no language tag needed
 - **Voice Design** — describe the desired voice in natural language
 - **Voice Cloning** — clone a voice from a reference audio clip
 - **Ultimate Cloning** — transcript-guided audio continuation for faithful reproduction
@@ -14,7 +14,7 @@ It generates highly realistic multilingual speech and supports voice cloning and
 ## Tutorial Objectives
 
 1. Install required dependencies
-2. Convert all VoxCPM2 sub-models to OpenVINO format (11 models)
+2. Convert all VoxCPM2 sub-models to OpenVINO format (8 models)
 3. Create a pure-OpenVINO inference pipeline independent of PyTorch
 4. Build an interactive Gradio demo for text-to-speech
 
