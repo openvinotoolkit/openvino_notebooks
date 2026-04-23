@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 from typing import Optional
+
 import nbformat
 
 INSTALL_INSTRUCTIONS_CONTENT = """### Installation Instructions
@@ -11,7 +12,9 @@ We recommend  running the notebook in a virtual environment. You only need a Jup
 For details, please refer to [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/README.md#-installation-guide)."""
 
 
-def find_toc_cell(nb_node: nbformat.NotebookNode) -> tuple[Optional[str], Optional[int]]:
+def find_toc_cell(
+    nb_node: nbformat.NotebookNode,
+) -> tuple[Optional[str], Optional[int]]:
     for i, cell in enumerate(nb_node["cells"]):
         if "#### Table of contents:" in cell["source"]:
             return (cell["source"], i)
@@ -19,7 +22,7 @@ def find_toc_cell(nb_node: nbformat.NotebookNode) -> tuple[Optional[str], Option
 
 
 def check_install_instructions(notebook_path: Path) -> bool:
-    with open(notebook_path, "r") as notebook_file:
+    with open(notebook_path, "r", encoding="utf-8") as notebook_file:
         nb_node: nbformat.NotebookNode = nbformat.read(notebook_file, as_version=4)
         cell_source, i = find_toc_cell(nb_node)
         if not cell_source:
@@ -29,7 +32,7 @@ def check_install_instructions(notebook_path: Path) -> bool:
 
 
 def add_install_instructions(notebook_path: Path):
-    with open(notebook_path, "r") as fr:
+    with open(notebook_path, "r", encoding="utf-8") as fr:
         nb_node: nbformat.NotebookNode = nbformat.read(fr, as_version=4)
         cell_source, i = find_toc_cell(nb_node)
         if not cell_source:

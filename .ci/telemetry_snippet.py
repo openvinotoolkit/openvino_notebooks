@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+
 import nbformat
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -19,10 +20,12 @@ def _get_telemetry_snippet(notebook_path: Path) -> str:
 
 def check_telemetry_snippet(notebook_path: Path) -> bool:
     if notebook_path.suffix != ".ipynb":
-        print(f'Invalid file extension at path "{str(notebook_path)}". Only .ipynb files are supported.')
+        print(
+            f'Invalid file extension at path "{str(notebook_path)}". Only .ipynb files are supported.'
+        )
         return False
     telemetry_snippet = _get_telemetry_snippet(notebook_path)
-    with open(notebook_path, "r") as notebook_file:
+    with open(notebook_path, "r", encoding="utf-8") as notebook_file:
         nb_node: nbformat.NotebookNode = nbformat.read(notebook_file, as_version=4)
     for cell in nb_node["cells"]:
         if cell["cell_type"] != "code":
@@ -35,8 +38,10 @@ def check_telemetry_snippet(notebook_path: Path) -> bool:
 
 def _add_telemetry_snippet(notebook_path: Path):
     if notebook_path.suffix != ".ipynb":
-        raise Exception(f'Invalid file extension at path "{str(notebook_path)}". Only .ipynb files are supported.')
-    with open(notebook_path, "r") as fr:
+        raise Exception(
+            f'Invalid file extension at path "{str(notebook_path)}". Only .ipynb files are supported.'
+        )
+    with open(notebook_path, "r", encoding="utf-8") as fr:
         nb_node: nbformat.NotebookNode = nbformat.read(fr, as_version=4)
         # Find cell with notebook_utils
         notebook_utils_url = "https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py"
@@ -45,7 +50,9 @@ def _add_telemetry_snippet(notebook_path: Path):
                 continue
             cell_content: str = cell["source"]
             if notebook_utils_url in cell_content:
-                nb_node["cells"][i]["source"] = cell_content + "\n\n" + _get_telemetry_snippet(notebook_path)
+                nb_node["cells"][i]["source"] = (
+                    cell_content + "\n\n" + _get_telemetry_snippet(notebook_path)
+                )
                 break
     with open(notebook_path, "w") as fw:
         nbformat.write(nb_node, fw)

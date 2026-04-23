@@ -1,8 +1,9 @@
 import argparse
 import re
 from pathlib import Path
-import nbformat
+
 import nbconvert
+import nbformat
 from traitlets.config import Config
 
 # Notebooks that are excluded from the CI tests
@@ -31,10 +32,13 @@ def disable_skip_ext(nb, notebook_path, test_device=""):
     for cell in nb["cells"]:
         if test_device is not None and skip_for_device is None:
             if (
-                'skip_for_device = "{}" in device.value'.format(test_device.upper()) in cell["source"]
+                'skip_for_device = "{}" in device.value'.format(test_device.upper())
+                in cell["source"]
                 and (
-                    "to_quantize = widgets.Checkbox(value=not skip_for_device" in cell["source"]
-                    or "to_quantize = quantization_widget(not skip_for_device" in cell["source"]
+                    "to_quantize = widgets.Checkbox(value=not skip_for_device"
+                    in cell["source"]
+                    or "to_quantize = quantization_widget(not skip_for_device"
+                    in cell["source"]
                 )
                 or ("to_quantize = quantization_widget(False" in cell["source"])
             ):
@@ -79,7 +83,10 @@ def remove_ov_install(cell):
             empty = True
             package_found = False
             for part in line.split(" "):
-                if "openvino-dev" in part and not "https://github.com/openvino-dev-samples/" in part:
+                if (
+                    "openvino-dev" in part
+                    and not "https://github.com/openvino-dev-samples/" in part
+                ):
                     if part.endswith(")"):
                         updated_line_content.append(")")
                     package_found = True
@@ -142,17 +149,28 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
     """
 
     nb_convert_config = Config()
-    nb_convert_config.NotebookExporter.preprocessors = ["nbconvert.preprocessors.ClearOutputPreprocessor"]
+    nb_convert_config.NotebookExporter.preprocessors = [
+        "nbconvert.preprocessors.ClearOutputPreprocessor"
+    ]
     output_remover = nbconvert.NotebookExporter(nb_convert_config)
     for notebookfile in Path(notebooks_dir).glob("**/*.ipynb"):
-        if not str(notebookfile.name).startswith("test_") and notebookfile.name not in EXCLUDED_NOTEBOOKS:
-            nb = nbformat.read(notebookfile, as_version=nbformat.NO_CONVERT)
+        if (
+            not str(notebookfile.name).startswith("test_")
+            and notebookfile.name not in EXCLUDED_NOTEBOOKS
+        ):
+            with open(notebookfile, "r", encoding="utf-8") as f:
+                nb = nbformat.read(f, as_version=nbformat.NO_CONVERT)
             found = False
             device_found = False
             for cell in nb["cells"]:
-                if skip_ov_install and ("%pip" in cell["source"] or "pip_install(" in cell["source"]):
+                if skip_ov_install and (
+                    "%pip" in cell["source"] or "pip_install(" in cell["source"]
+                ):
                     remove_ov_install(cell)
-                if test_device and (DEVICE_WIDGET in cell["source"] or DEVICE_WIDGET_NEW in cell["source"]):
+                if test_device and (
+                    DEVICE_WIDGET in cell["source"]
+                    or DEVICE_WIDGET_NEW in cell["source"]
+                ):
                     device_found = True
                     if not DEVICE_WIDGET_NEW in cell["source"]:
                         cell["source"] = re.sub(
@@ -177,10 +195,16 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
                     found = True
                     for source_value, target_value in replace_dict.items():
                         if source_value not in cell["source"]:
-                            raise ValueError(f"Processing {notebookfile} failed: {source_value} does not exist in cell")
-                        cell["source"] = cell["source"].replace(source_value, target_value)
+                            raise ValueError(
+                                f"Processing {notebookfile} failed: {source_value} does not exist in cell"
+                            )
+                        cell["source"] = cell["source"].replace(
+                            source_value, target_value
+                        )
                         cell["source"] = "# Modified for testing\n" + cell["source"]
-                        print(f"Processed {notebookfile}: {source_value} -> {target_value}")
+                        print(
+                            f"Processed {notebookfile}: {source_value} -> {target_value}"
+                        )
             if test_device and not device_found:
                 print(f"No device replacement found for {notebookfile}")
             if not found:
@@ -188,7 +212,9 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
             disable_gradio_debug(nb, notebookfile)
             disable_skip_ext(nb, notebookfile, args.test_device)
             nb_without_out, _ = output_remover.from_notebook_node(nb)
-            with notebookfile.with_name(f"test_{notebookfile.name}").open("w", encoding="utf-8") as out_file:
+            with notebookfile.with_name(f"test_{notebookfile.name}").open(
+                "w", encoding="utf-8"
+            ) as out_file:
                 out_file.write(nb_without_out)
 
 

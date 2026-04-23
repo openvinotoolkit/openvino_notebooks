@@ -1,11 +1,12 @@
-import sys
 import json
-from table_of_content import find_tc_in_cell
-from patch_notebooks import DEVICE_WIDGET, DEVICE_WIDGET_NEW
-from install_instructions import check_install_instructions
-from scarf_pixel import check_scarf_tag
-from telemetry_snippet import check_telemetry_snippet
+import sys
 from pathlib import Path
+
+from install_instructions import check_install_instructions
+from patch_notebooks import DEVICE_WIDGET, DEVICE_WIDGET_NEW
+from scarf_pixel import check_scarf_tag
+from table_of_content import find_tc_in_cell
+from telemetry_snippet import check_telemetry_snippet
 
 NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
 
@@ -14,9 +15,15 @@ EXPECTED_NO_DEVICE = [
     Path("notebooks/convert-to-openvino/convert-to-openvino.ipynb"),  # device-agnostic
     Path("notebooks/gpu-device/gpu-device.ipynb"),  # gpu device expected to be used
     Path("notebooks/hello-npu/hello-npu.ipynb"),  # npu device expected to be used
-    Path("notebooks/model-server/model-server.ipynb"),  # can not change device in docker configuration on the fly
-    Path("notebooks/openvino-tokenizers/openvino-tokenizers.ipynb"),  # cpu required for loading extensions
-    Path("notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb"),  # device-agnostic
+    Path(
+        "notebooks/model-server/model-server.ipynb"
+    ),  # can not change device in docker configuration on the fly
+    Path(
+        "notebooks/openvino-tokenizers/openvino-tokenizers.ipynb"
+    ),  # cpu required for loading extensions
+    Path(
+        "notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb"
+    ),  # device-agnostic
 ]
 
 
@@ -50,7 +57,9 @@ def main():
             toc_found = False
             device_found = False
             if nb_path.relative_to(NOTEBOOKS_ROOT) in EXPECTED_NO_DEVICE:
-                print(f"SKIPPED: {nb_path.relative_to(NOTEBOOKS_ROOT)} for device wdget check")
+                print(
+                    f"SKIPPED: {nb_path.relative_to(NOTEBOOKS_ROOT)} for device wdget check"
+                )
                 device_found = True
             for cell in notebook_json["cells"]:
                 if not toc_found and cell["cell_type"] == "markdown":
@@ -65,19 +74,29 @@ def main():
                     break
             if not toc_found:
                 no_tocs.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
-                complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: table of content is not found")
+                complain(
+                    f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: table of content is not found"
+                )
             if not device_found:
                 no_device.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
-                complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: device widget is not found")
+                complain(
+                    f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: device widget is not found"
+                )
             if not check_scarf_tag(nb_path):
                 no_scarf_tag.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
-                complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Scarf Pixel tag is not found")
+                complain(
+                    f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Scarf Pixel tag is not found"
+                )
             if not check_telemetry_snippet(nb_path):
                 no_telemetry_snippet.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
-                complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: telemetry snippet is not found")
+                complain(
+                    f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: telemetry snippet is not found"
+                )
             if not check_install_instructions(nb_path):
                 no_install_instructions.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
-                complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Install Instructions section is not found")
+                complain(
+                    f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Install Instructions section is not found"
+                )
 
     if not all_passed:
         print("\nSUMMARY:")
@@ -85,7 +104,9 @@ def main():
         if no_tocs:
             print("NO TABLE OF CONTENT:")
             print("\n".join(no_tocs))
-            print("\nYou can generate Table of content with the following command:\n    python .ci/table_of_content.py -s <PATH>")
+            print(
+                "\nYou can generate Table of content with the following command:\n    python .ci/table_of_content.py -s <PATH>"
+            )
             print("==================================")
         if no_device:
             print("NO DEVICE SELECTION:")
@@ -94,17 +115,23 @@ def main():
         if no_scarf_tag:
             print("NO SCARF PIXEL TAG:")
             print("\n".join(no_scarf_tag))
-            print("\nYou can generate Scarf Pixel tag with the following command:\n    python .ci/scarf_pixel.py -s <PATH>")
+            print(
+                "\nYou can generate Scarf Pixel tag with the following command:\n    python .ci/scarf_pixel.py -s <PATH>"
+            )
             print("==================================")
         if no_telemetry_snippet:
             print("NO TELEMETRY SNIPPET:")
             print("\n".join(no_telemetry_snippet))
-            print("\nYou can generate telemetry snippet with the following command:\n    python .ci/telemetry_snippet.py -s <PATH>")
+            print(
+                "\nYou can generate telemetry snippet with the following command:\n    python .ci/telemetry_snippet.py -s <PATH>"
+            )
             print("==================================")
         if no_install_instructions:
             print("NO INSTALL INSTRUCTIONS SECTION:")
             print("\n".join(no_install_instructions))
-            print("\nYou can generate Install Instructions with the following command:\n    python .ci/install_instructions.py -s <PATH>")
+            print(
+                "\nYou can generate Install Instructions with the following command:\n    python .ci/install_instructions.py -s <PATH>"
+            )
             print("==================================")
 
     sys.exit(0 if all_passed else 1)

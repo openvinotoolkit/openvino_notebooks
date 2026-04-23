@@ -3,12 +3,12 @@
 import argparse
 import sys
 import time
-import mistune
-import requests
 import urllib.parse
 from collections import defaultdict
-
 from pathlib import Path
+
+import mistune
+import requests
 
 NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
 

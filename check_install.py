@@ -34,7 +34,9 @@ def show_supported(supported):
 
 
 def pip_check():
-    result = subprocess.run(["pip", "check"], universal_newlines=True, stdout=subprocess.PIPE)  # nosec B603 B607 - hardcoded pip check command
+    result = subprocess.run(
+        ["pip", "check"], universal_newlines=True, stdout=subprocess.PIPE
+    )  # nosec B603 B607 - hardcoded pip check command
     if "No broken requirements found" in result.stdout:
         return True, ""
     else:
@@ -60,8 +62,12 @@ NO_BROKEN_REQUIREMENTS, PIP_CHECK_OUTPUT = pip_check()
 CORRECT_KERNEL_PYTHON = PYTHON_EXECUTABLE == KERNEL_PYTHON
 
 IN_OPENVINO_ENV = "openvino_env" in sys.executable
-SUPPORTED_PYTHON_VERSION = PYTHON_VERSION.major == 3 and (PYTHON_VERSION.minor >= 10 and PYTHON_VERSION.minor <= 13)
-GLOBAL_OPENVINO_INSTALLED = "openvino_202" in os.environ.get("LD_LIBRARY_PATH", "") + ":".join(sys.path)
+SUPPORTED_PYTHON_VERSION = PYTHON_VERSION.major == 3 and (
+    PYTHON_VERSION.minor >= 10 and PYTHON_VERSION.minor <= 13
+)
+GLOBAL_OPENVINO_INSTALLED = "openvino_202" in os.environ.get(
+    "LD_LIBRARY_PATH", ""
+) + ":".join(sys.path)
 
 
 try:
@@ -92,11 +98,19 @@ print(f"OpenVINO environment activated: {show_supported(IN_OPENVINO_ENV)}")
 print(f"Jupyter kernel installed for openvino_env: {show_supported(KERNEL_INSTALLED)}")
 if KERNEL_INSTALLED:
     print(f"Jupyter kernel Python executable: {KERNEL_PYTHON}")
-    print("Jupyter kernel Python and OpenVINO environment Python match: " f"{show_supported(CORRECT_KERNEL_PYTHON)}")
-print(f"Python version: {PYTHON_VERSION.major}.{PYTHON_VERSION.minor} " f"{show_supported(SUPPORTED_PYTHON_VERSION)}")
+    print(
+        "Jupyter kernel Python and OpenVINO environment Python match: "
+        f"{show_supported(CORRECT_KERNEL_PYTHON)}"
+    )
+print(
+    f"Python version: {PYTHON_VERSION.major}.{PYTHON_VERSION.minor} "
+    f"{show_supported(SUPPORTED_PYTHON_VERSION)}"
+)
 print(f"OpenVINO pip package installed: {show_supported(PIP_OPENVINO_INSTALLED)}")
 print(f"OpenVINO import succeeds: {show_supported(OPENVINO_IMPORT)}")
-print(f"OpenVINO not installed globally: {show_supported(not GLOBAL_OPENVINO_INSTALLED)}")
+print(
+    f"OpenVINO not installed globally: {show_supported(not GLOBAL_OPENVINO_INSTALLED)}"
+)
 
 print(f"No broken requirements: {show_supported(NO_BROKEN_REQUIREMENTS)}")
 print()
@@ -110,7 +124,10 @@ if not PIP_OPENVINO_INSTALLED:
     sys.exit(0)
 
 if not OPENVINO_IMPORT and OS != "win32" and not GLOBAL_OPENVINO_INSTALLED:
-    print("OpenVINO is installed, but importing fails. This is likely due to a missing\n" "libpython.so library for the Python version you are using.\n")
+    print(
+        "OpenVINO is installed, but importing fails. This is likely due to a missing\n"
+        "libpython.so library for the Python version you are using.\n"
+    )
     if OS == "linux":
         print(
             "If you have multiple Python version installed, use the full path to the Python\n"
@@ -192,8 +209,13 @@ if (
     if NO_BROKEN_REQUIREMENTS:
         print("Everything looks good!")
     else:
-        print("Summary: The installation looks good, but there are conflicting requirements.")
+        print(
+            "Summary: The installation looks good, but there are conflicting requirements."
+        )
 else:
-    print("The README.md file is located in the openvino_notebooks directory \n" "and at https://github.com/openvinotoolkit/openvino_notebooks")
+    print(
+        "The README.md file is located in the openvino_notebooks directory \n"
+        "and at https://github.com/openvinotoolkit/openvino_notebooks"
+    )
 if not NO_BROKEN_REQUIREMENTS:
     print("Broken requirements are often harmless, but could cause issues.")
