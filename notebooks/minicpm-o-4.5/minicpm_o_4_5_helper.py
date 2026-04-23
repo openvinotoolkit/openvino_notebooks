@@ -131,7 +131,8 @@ TTS_CODE_HEAD_NAME = "openvino_tts_code_head_model.xml"
 
 # Token2wav (audio_tokenizer) model names
 FLOW_EMBEDDINGS_NAME = "openvino_flow_embeddings_model.xml"
-FLOW_ESTIMATOR_NAME = "openvino_flow_estimator_model.xml"
+FLOW_ENCODER_CHUNK_NAME = "openvino_flow_encoder_chunk_model.xml"
+FLOW_ESTIMATOR_CHUNK_NAME = "openvino_flow_estimator_chunk_model.xml"
 HIFT_NAME = "openvino_hift_model.xml"
 
 
@@ -662,7 +663,7 @@ def convert_minicpmo_model(
 
     total_models = 12
     if audio_tokenizer_path and model.config.init_tts:
-        total_models = 15  # Include Flow Embeddings, Flow Estimator, HiFT
+        total_models = 16  # Include Flow Embeddings, Flow Estimator, HiFT
     del model
 
     print(f"✅ {model_id} model conversion finished ({total_models} models). Results in {output_dir}")
@@ -1868,77 +1869,210 @@ def convert_flow_embeddings(token2wav_model, output_path: Path):
     print(f"✅ Flow Embeddings model saved to {output_path}")
 
 
-def convert_flow_estimator(token2wav_model, output_path: Path):
+def convert_flow_encoder_chunk(token2wav_model, output_path: Path):
     """
-    Convert Flow Estimator (DiT decoder) model to OpenVINO.
+    Convert Flow Encoder for chunk-based streaming inference.
 
-    This is the diffusion transformer that performs flow matching denoising.
-
-    Args:
-        token2wav_model: Token2wav instance containing the flow model
-        output_path: Path to save the converted model
+    Wraps: spk_embed_affine_layer + input_embedding + encoder.forward_chunk + encoder_proj
+    This enables streaming flow with KV caches (conformer_cnn_cache, conformer_att_cache).
     """
-    flow = token2wav_model.flow
-    estimator = flow.decoder.estimator
-
-    # Patch F.scaled_dot_product_attention to convert bool masks to float masks
     import torch.nn.functional as F
 
+    flow = token2wav_model.flow
+    depth1 = len(flow.encoder.encoders)
+    depth2 = len(flow.encoder.up_encoders)
+
+    class FlowEncoderChunkWrapper(nn.Module):
+        def __init__(self, flow_model):
+            super().__init__()
+            self.input_embedding = flow_model.input_embedding
+            self.spk_embed_affine_layer = flow_model.spk_embed_affine_layer
+            self.encoder = flow_model.encoder
+            self.encoder_proj = flow_model.encoder_proj
+
+        def forward(self, token, embedding, cnn_cache, att_cache):
+            """
+            Args:
+                token: [1, chunk_token_len] int32 (includes pre_lookahead tokens)
+                embedding: [1, 192] float32 speaker embedding
+                cnn_cache: [1, 512, 6] float32 (fixed-size CNN buffer)
+                att_cache: [depth1+depth2, 1, 8, T, 128] float32 (growing KV cache)
+
+            Note: Always traced with last_chunk=False. For the actual last chunk,
+            the caller should pad the token with pre_lookahead_len extra dummy tokens.
+
+            Returns:
+                h: [1, mel_len, output_size] encoder output
+                spks: [1, output_size] projected speaker embedding
+                new_cnn_cache: [1, 512, 6]
+                new_att_cache: [depth1+depth2, 1, 8, T_new, 128]
+            """
+            embedding = F.normalize(embedding, dim=1)
+            spks = self.spk_embed_affine_layer(embedding)
+            token = self.input_embedding(torch.clamp(token, min=0))
+            h, new_cnn_cache, new_att_cache = self.encoder.forward_chunk(token, last_chunk=False, cnn_cache=cnn_cache, att_cache=att_cache)
+            h = self.encoder_proj(h)
+            return h, spks, new_cnn_cache, new_att_cache
+
+    wrapper = FlowEncoderChunkWrapper(flow)
+    wrapper.eval()
+    __make_16bit_traceable(wrapper)
+
+    # Example inputs
+    chunk_len = 28  # CHUNK_SIZE(25) + pre_lookahead(3)
+    att_t = 100  # example cache length
+    example_input = {
+        "token": torch.ones([1, chunk_len], dtype=torch.int32),
+        "embedding": torch.randn([1, 192], dtype=torch.float32),
+        "cnn_cache": torch.zeros([1, 512, 6], dtype=torch.float32),
+        "att_cache": torch.zeros([depth1 + depth2, 1, 8, att_t, 128], dtype=torch.float32),
+    }
+
+    input_shapes = [
+        ov.PartialShape([1, -1]),  # token: [1, chunk_len]
+        ov.PartialShape([1, 192]),  # embedding
+        ov.PartialShape([1, 512, 6]),  # cnn_cache (fixed)
+        ov.PartialShape([depth1 + depth2, 1, 8, -1, 128]),  # att_cache (dynamic T)
+    ]
+
+    with torch.no_grad():
+        ov_model = ov.convert_model(wrapper, example_input=example_input, input=input_shapes)
+
+    ov.save_model(ov_model, output_path)
+    del ov_model
+    cleanup_torchscript_cache()
+    gc.collect()
+    print(f"✅ Flow Encoder Chunk model saved to {output_path}")
+
+
+def convert_flow_estimator_chunk(token2wav_model, output_path: Path):
+    """
+    Convert Flow Estimator (DiT) for chunk-based streaming inference.
+
+    Wraps DiT.forward_chunk for one ODE step. Called n_timesteps times per chunk
+    in the Python ODE solver loop.
+    """
+    import torch.nn.functional as F
+
+    flow = token2wav_model.flow
+    estimator = flow.decoder.estimator
+    depth = len(estimator.blocks)
+    hidden_size = estimator.blocks[0].norm1.normalized_shape[0]  # 512
+    num_heads = estimator.blocks[0].attn.num_heads
+    head_dim = estimator.blocks[0].attn.head_dim
+
+    # Patch SDPA for OV compatibility
     original_sdpa = F.scaled_dot_product_attention
 
     def patched_sdpa(query, key, value, attn_mask=None, dropout_p=0.0, is_causal=False, scale=None):
-        """Patched SDPA that converts bool masks to float masks for OpenVINO compatibility."""
         if attn_mask is not None and attn_mask.dtype == torch.bool:
-            # Convert boolean mask to float mask with -inf for masked positions
             attn_mask = torch.zeros_like(attn_mask, dtype=query.dtype).masked_fill(~attn_mask, float("-inf"))
         return original_sdpa(query, key, value, attn_mask=attn_mask, dropout_p=dropout_p, is_causal=is_causal, scale=scale)
 
-    # Temporarily replace F.scaled_dot_product_attention
     F.scaled_dot_product_attention = patched_sdpa
 
-    # Get output_size from flow model
-    output_size = flow.output_size if hasattr(flow, "output_size") else 80
+    class DiTChunkWrapper(nn.Module):
+        """Wraps DiT block-by-block for a single ODE step, avoiding in-place buffer ops.
 
-    # Example inputs for estimator
-    # x: [batch*2, output_size, mel_len] - doubled for CFG
-    # mask: [batch*2, 1, mel_len]
-    # mu: [batch*2, output_size, mel_len]
-    # t: [batch*2]
-    # spks: [batch*2, output_size]
-    # cond: [batch*2, output_size, mel_len]
+        The original DiT.forward_chunk uses pre-allocated buffers with in-place
+        mutations (cnn_cache_buffer[i] = ..., att_cache_buffer[i][:, :, :T, :] = ...),
+        which cannot be traced by OV. This wrapper replicates the same logic
+        using functional operations (list + torch.stack).
+        """
+
+        def __init__(self, estimator):
+            super().__init__()
+            self.t_embedder = estimator.t_embedder
+            self.in_proj = estimator.in_proj
+            self.blocks = estimator.blocks
+            self.final_layer = estimator.final_layer
+
+        def forward(self, x, mu, t, spks, cond, cnn_cache, att_cache):
+            """
+            Args:
+                x: [2, 80, chunk_mel_len] (doubled for CFG)
+                mu: [2, 80, chunk_mel_len]
+                t: [2] timestep
+                spks: [2, 80]
+                cond: [2, 80, chunk_mel_len]
+                cnn_cache: [depth, 2, 1024, 2] (fixed CNN cache per layer)
+                att_cache: [depth, 2, 8, T, 128] (growing KV cache per layer)
+            Returns:
+                output: [2, 80, chunk_mel_len]
+                new_cnn_cache: [depth, 2, 1024, 2]
+                new_att_cache: [depth, 2, 8, T_new, 128]
+            """
+            from einops import pack, repeat
+
+            # Time embedding
+            t_emb = self.t_embedder(t).unsqueeze(1)  # [2, 1, hidden]
+
+            # Pack inputs: [x, mu, spks_expanded, cond] along channel dim
+            x = pack([x, mu], "b * t")[0]
+            spks_expanded = repeat(spks, "b c -> b c t", t=x.shape[-1])
+            x = pack([x, spks_expanded], "b * t")[0]
+            x = pack([x, cond], "b * t")[0]
+
+            # Process through blocks (functional, no in-place buffer writes)
+            x = x.transpose(1, 2)  # [2, c_in, t] -> [2, t, c_in]
+            x = self.in_proj(x)  # [2, t, hidden]
+
+            new_cnn_list = []
+            new_att_list = []
+            for b_idx, block in enumerate(self.blocks):
+                x, this_cnn, this_att = block.forward_chunk(
+                    x,
+                    t_emb,
+                    cnn_cache=cnn_cache[b_idx],
+                    att_cache=att_cache[b_idx],
+                    mask=None,
+                )
+                new_cnn_list.append(this_cnn)
+                new_att_list.append(this_att)
+
+            x = self.final_layer(x, t_emb)
+            x = x.transpose(1, 2)  # [2, t, c_out] -> [2, c_out, t]
+
+            new_cnn_cache = torch.stack(new_cnn_list, dim=0)
+            new_att_cache = torch.stack(new_att_list, dim=0)
+            return x, new_cnn_cache, new_att_cache
+
+    wrapper = DiTChunkWrapper(estimator)
+    wrapper.eval()
+    __make_16bit_traceable(wrapper)
+
+    mel_len = 56  # example chunk mel length
+    att_t = 100
     example_input = {
-        "x": torch.randn([2, output_size, 200], dtype=torch.float32),
-        "mask": torch.ones([2, 1, 200], dtype=torch.float32),
-        "mu": torch.randn([2, output_size, 200], dtype=torch.float32),
-        "t": torch.tensor([0.5, 0.5], dtype=torch.float32),
-        "spks": torch.randn([2, output_size], dtype=torch.float32),
-        "cond": torch.randn([2, output_size, 200], dtype=torch.float32),
+        "x": torch.randn([2, 80, mel_len]),
+        "mu": torch.randn([2, 80, mel_len]),
+        "t": torch.tensor([0.5, 0.5]),
+        "spks": torch.randn([2, 80]),
+        "cond": torch.zeros([2, 80, mel_len]),
+        "cnn_cache": torch.zeros([depth, 2, 1024, 2]),
+        "att_cache": torch.zeros([depth, 2, num_heads, att_t, head_dim * 2]),
     }
 
-    # Input shapes: fix output_size, allow dynamic mel_len
     input_shapes = [
-        ov.PartialShape([2, output_size, -1]),  # x: [2, output_size, mel_len]
-        ov.PartialShape([2, 1, -1]),  # mask: [2, 1, mel_len]
-        ov.PartialShape([2, output_size, -1]),  # mu: [2, output_size, mel_len]
-        ov.PartialShape([2]),  # t: [2]
-        ov.PartialShape([2, output_size]),  # spks: [2, output_size]
-        ov.PartialShape([2, output_size, -1]),  # cond: [2, output_size, mel_len]
+        ov.PartialShape([2, 80, -1]),  # x
+        ov.PartialShape([2, 80, -1]),  # mu
+        ov.PartialShape([2]),  # t
+        ov.PartialShape([2, 80]),  # spks
+        ov.PartialShape([2, 80, -1]),  # cond
+        ov.PartialShape([depth, 2, 1024, 2]),  # cnn_cache (fixed)
+        ov.PartialShape([depth, 2, num_heads, -1, head_dim * 2]),  # att_cache (dynamic T)
     ]
 
-    estimator.eval()
-    __make_16bit_traceable(estimator)
-
     with torch.no_grad():
-        ov_model = ov.convert_model(estimator, example_input=example_input, input=input_shapes)
+        ov_model = ov.convert_model(wrapper, example_input=example_input, input=input_shapes)
 
-    # Restore original F.scaled_dot_product_attention
     F.scaled_dot_product_attention = original_sdpa
 
     ov.save_model(ov_model, output_path)
     del ov_model
     cleanup_torchscript_cache()
     gc.collect()
-    print(f"✅ Flow Estimator model saved to {output_path}")
+    print(f"✅ Flow Estimator Chunk model saved to {output_path}")
 
 
 def convert_hift(token2wav_model, output_path: Path):
@@ -1956,10 +2090,21 @@ def convert_hift(token2wav_model, output_path: Path):
 
     hift = token2wav_model.hift
 
+    # source_cache_len: 8 mel frames * 480 samples/frame = 3840 samples
+    SOURCE_CACHE_LEN = 3840
+
     class HiFTWrapper(nn.Module):
         """
-        HiFT forward wrapper that outputs raw spectral features before istft.
-        This allows istft to be performed in Python with better compatibility.
+        HiFT forward wrapper that outputs raw spectral features before istft,
+        plus the excitation source signal for streaming cache continuity.
+
+        Inputs:
+            x:            mel spectrogram [B, 80, mel_len]
+            cache_source: cached excitation source [B, 1, SOURCE_CACHE_LEN] from previous chunk
+                          (pass zeros for first chunk)
+        Outputs:
+            spectral:     raw spectral features [B, n_fft+2, time] before istft
+            source:       excitation source signal [B, 1, T_source] for next chunk's cache
         """
 
         def __init__(self, hift_model):
@@ -1992,19 +2137,27 @@ def convert_hift(token2wav_model, output_path: Path):
             spec = torch.view_as_real(spec)  # [B, F, TT, 2]
             return spec[..., 0], spec[..., 1]
 
-        def forward(self, x: torch.Tensor) -> torch.Tensor:
+        def forward(self, x: torch.Tensor, cache_source: torch.Tensor) -> tuple:
             """
-            HiFT forward that outputs raw conv_post output before istft.
+            HiFT forward with source cache for streaming continuity.
 
-            Input: mel spectrogram (batch, 80, mel_len)
-            Output: raw spectral features (batch, n_fft+2, time) before istft
+            The cache_source from the previous chunk is spliced into the head of
+            the newly generated excitation source, maintaining phase continuity
+            across streaming chunks (matching the original PyTorch HiFTGenerator).
             """
             # mel -> f0
             f0 = self.f0_predictor(x)
-            # f0 -> source
-            s = self.f0_upsamp(f0[:, None]).transpose(1, 2)  # bs,n,t
+            # f0 -> source excitation signal
+            s = self.f0_upsamp(f0[:, None]).transpose(1, 2)  # [B, T, 1]
             s, _, _ = self.m_source(s)
-            s = s.transpose(1, 2)
+            s = s.transpose(1, 2)  # [B, 1, T_source]
+
+            # Splice cached source into head for phase continuity
+            # cache_source shape: [B, 1, SOURCE_CACHE_LEN]
+            # For first chunk, cache_source is zeros — the first 3840 audio samples
+            # are replaced with silence in stream() anyway, so this is harmless.
+            cache_len = cache_source.shape[2]
+            s[:, :, :cache_len] = cache_source
 
             # stft of source
             s_stft_real, s_stft_imag = self._stft(s.squeeze(1))
@@ -2034,21 +2187,24 @@ def convert_hift(token2wav_model, output_path: Path):
 
             x = F.leaky_relu(x)
             x = self.conv_post(x)
-            # Return here without exp, sin, istft, clamp
-            return x
+            # Return spectral features + source signal for next chunk's cache
+            return x, s
 
     hift_wrapper = HiFTWrapper(hift)
     hift_wrapper.eval()
 
     __make_16bit_traceable(hift_wrapper)
 
-    # Example input: mel spectrogram [batch, 80, mel_len]
+    # Example inputs: mel spectrogram + source cache
     mel_bins = 80
-    example_input = torch.randn([1, mel_bins, 200], dtype=torch.float32)
+    example_mel = torch.randn([1, mel_bins, 200], dtype=torch.float32)
+    example_cache = torch.zeros([1, 1, SOURCE_CACHE_LEN], dtype=torch.float32)
+    example_input = (example_mel, example_cache)
 
-    # Input shapes: fix mel_bins=80, allow dynamic batch and mel_len
+    # Input shapes: mel has dynamic length, cache_source is fixed size
     input_shapes = [
-        ov.PartialShape([-1, mel_bins, -1]),  # [batch, mel_bins=80, mel_len]
+        ov.PartialShape([-1, mel_bins, -1]),  # [batch, 80, mel_len]
+        ov.PartialShape([-1, 1, SOURCE_CACHE_LEN]),  # [batch, 1, 3840]
     ]
 
     with torch.no_grad():
@@ -2058,7 +2214,7 @@ def convert_hift(token2wav_model, output_path: Path):
     del ov_model
     cleanup_torchscript_cache()
     gc.collect()
-    print(f"✅ HiFT model saved to {output_path}")
+    print(f"✅ HiFT model saved to {output_path} (with source cache support)")
 
 
 def convert_token2wav(
@@ -2091,11 +2247,13 @@ def convert_token2wav(
     output_path.mkdir(parents=True, exist_ok=True)
 
     flow_emb_path = output_path / FLOW_EMBEDDINGS_NAME
-    flow_est_path = output_path / FLOW_ESTIMATOR_NAME
+    flow_enc_chunk_path = output_path / FLOW_ENCODER_CHUNK_NAME
+    flow_est_chunk_path = output_path / FLOW_ESTIMATOR_CHUNK_NAME
     hift_path = output_path / HIFT_NAME
 
     # Check if all models exist
-    if flow_emb_path.exists() and flow_est_path.exists() and hift_path.exists():
+    all_exist = flow_emb_path.exists() and hift_path.exists() and flow_enc_chunk_path.exists() and flow_est_chunk_path.exists()
+    if all_exist:
         print(f"✅ Token2wav models already converted. You can find results in {output_dir}")
         return output_path
 
@@ -2171,19 +2329,36 @@ def convert_token2wav(
     else:
         print(f"✅ Flow Embeddings model already exists at {flow_emb_path}")
 
-    # Convert Flow Estimator
-    if not flow_est_path.exists():
-        print("⌛ Converting Flow Estimator model...")
-        convert_flow_estimator(token2wav, flow_est_path)
-    else:
-        print(f"✅ Flow Estimator model already exists at {flow_est_path}")
-
-    # Convert HiFT
-    if not hift_path.exists():
+    # Convert HiFT (with cache_source support for streaming audio continuity)
+    _need_hift_export = True
+    if hift_path.exists():
+        try:
+            _hift_model = core.read_model(str(hift_path))
+            if any("cache_source" in inp.any_name for inp in _hift_model.inputs):
+                _need_hift_export = False
+                print(f"✅ HiFT model already exists at {hift_path} (with cache_source)")
+            else:
+                print(f"⚠️ Legacy HiFT model found (no cache_source), re-exporting...")
+            del _hift_model
+        except Exception:
+            pass
+    if _need_hift_export:
         print("⌛ Converting HiFT model...")
         convert_hift(token2wav, hift_path)
+
+    # Convert Flow Encoder Chunk (streaming with KV cache)
+    if not flow_enc_chunk_path.exists():
+        print("⌛ Converting Flow Encoder Chunk model (streaming)...")
+        convert_flow_encoder_chunk(token2wav, flow_enc_chunk_path)
     else:
-        print(f"✅ HiFT model already exists at {hift_path}")
+        print(f"✅ Flow Encoder Chunk model already exists at {flow_enc_chunk_path}")
+
+    # Convert Flow Estimator Chunk (streaming DiT per ODE step)
+    if not flow_est_chunk_path.exists():
+        print("⌛ Converting Flow Estimator Chunk model (streaming)...")
+        convert_flow_estimator_chunk(token2wav, flow_est_chunk_path)
+    else:
+        print(f"✅ Flow Estimator Chunk model already exists at {flow_est_chunk_path}")
 
     # Copy ONNX models (s3tokenizer and campplus)
     # These models are small and kept as ONNX for compatibility with s3tokenizer library
@@ -2262,22 +2437,7 @@ def get_1d_sincos_pos_embed_from_grid_new(embed_dim, pos):
     return emb
 
 
-def torch_clone_recursive(data, dtype=None):
-    """Recursively clone a nested list/tuple structure with tensors."""
-    if isinstance(data, torch.Tensor):
-        result = data.clone()
-        if dtype is not None:
-            result = result.to(dtype)
-        return result
-    elif isinstance(data, list):
-        return [torch_clone_recursive(item, dtype=dtype) for item in data]
-    elif isinstance(data, tuple):
-        return tuple(torch_clone_recursive(item, dtype=dtype) for item in data)
-    else:
-        return data
-
-
-# ==================== OpenVINO Model Wrappers ====================
+# ==================== OpenVINO Model Wrappers ==
 
 
 class OVLLMEmbedding:
@@ -3376,6 +3536,10 @@ class OVMiniCPMO:
             model_dir: Path to token2wav model directory
             enable_float16: Whether to use float16
             n_timesteps: Number of diffusion steps
+            hift_input_len: Fixed mel length for HiFT (0 = auto).
+                           When 0 and tts_device is GPU, auto-set to 64
+                           (25 tokens → 56 mel frames + 8 cache = 64) to avoid
+                           dynamic shape recompilation stalls.
 
         Returns:
             The audio tokenizer (OVToken2wav)
@@ -3395,12 +3559,18 @@ class OVMiniCPMO:
                     print(f"⚠️ token2wav model directory not found: {model_dir}")
                     return None
 
+        # Auto-enable fixed HiFT shape on GPU to prevent dynamic shape recompilation
+        # Streaming mel: 25 audio tokens → 56 mel frames + 8 mel cache = 64 max
+        if hift_input_len == 0 and self.tts_device.upper() not in ("CPU",):
+            hift_input_len = 64
+            print(f"  📐 Auto-setting hift_input_len={hift_input_len} for {self.tts_device} (avoids dynamic shape recompilation)")
+
         self.token2wav = OVToken2wav(
             model_dir=model_dir,
             device=self.tts_device,
             float16=enable_float16,
             n_timesteps=n_timesteps,
-            hift_input_len=hift_input_len,  # dynamic shape for streaming mel+cache (50+8=58 frames)
+            hift_input_len=hift_input_len,
             # flow_emb_token_len=50,
             # flow_emb_prompt_len=200,
         )
@@ -4069,6 +4239,13 @@ class OVMiniCPMO:
 
             if self.token2wav_cache is not None:
                 self.token2wav.hift_cache_dict = _clone_recursive(self.token2wav_cache["hift_cache_base"])
+                # Reset accumulated tokens for new streaming session
+                self.token2wav._accumulated_tokens = []
+                # Reset flow KV cache from base copy (for KV-cache streaming)
+                if "flow_cache_base" in self.token2wav_cache:
+                    self.token2wav.stream_cache = _clone_recursive(self.token2wav_cache["flow_cache_base"])
+                else:
+                    self.token2wav.stream_cache = None
 
             # Pre-insert silence tokens (aligned with original: 3 × 4218 silence tokens)
             buffer = [4218] * 3
@@ -4152,122 +4329,6 @@ class OVMiniCPMO:
                         yield safe_text, False
 
         self.llm_generate_completed = True
-
-    def _tts_generate_audio(self, token_ids, hidden_states):
-        """Generate audio waveform from TTS tokens and hidden states.
-
-        Args:
-            token_ids: Text token IDs [1, seq_len]
-            hidden_states: LLM hidden states for TTS condition [1, seq_len, hidden_dim]
-
-        Returns:
-            Audio waveform tensor or None
-        """
-        if self.tts is None or self.token2wav is None:
-            return None
-
-        try:
-            # Project hidden states through TTS projector
-            tts_projector = getattr(self, "_ov_tts_projector_0", None)
-            if tts_projector is None:
-                # Try to find projector in the model
-                for name in ["_ov_tts_projector_0", "tts_projector"]:
-                    tts_projector = getattr(self, name, None)
-                    if tts_projector is not None:
-                        break
-
-            if tts_projector is not None:
-                condition = tts_projector(hidden_states.to(self.dtype))
-            else:
-                condition = hidden_states
-
-            # Use TTS language model to generate audio codes
-            tts_config = self.tts.config
-            num_audio_tokens = getattr(tts_config, "num_audio_tokens", 6562)
-
-            # Reset TTS state
-            if hasattr(self.tts, "_ov_language"):
-                self.tts._ov_language.reset_state()
-
-            # Generate audio tokens from condition
-            audio_tokens = self._generate_tts_tokens(condition, num_audio_tokens)
-
-            if audio_tokens is not None and len(audio_tokens) > 0:
-                # Convert audio tokens to waveform using token2wav
-                wav = self.token2wav.offline_inference(audio_tokens)
-                return wav
-
-            return None
-        except Exception as e:
-            print(f"TTS generation error: {e}")
-            return None
-
-    def _generate_tts_tokens(self, condition, num_audio_tokens, max_tokens=500):
-        """Generate TTS audio tokens from condition embeddings.
-
-        Args:
-            condition: Condition embeddings from LLM hidden states
-            num_audio_tokens: Vocabulary size for audio tokens
-            max_tokens: Maximum audio tokens to generate
-
-        Returns:
-            Audio token tensor or None
-        """
-        try:
-            tts_eos_token = num_audio_tokens - 1
-
-            # Get TTS embedding and code embedding
-            tts_emb = getattr(self, "_ov_tts_embedding", None)
-            tts_code_emb = getattr(self, "_ov_tts_code_embedding", None)
-            tts_head = getattr(self, "_ov_tts_head", None)
-
-            if tts_emb is None or tts_code_emb is None or tts_head is None:
-                return None
-
-            # Prefill condition
-            cond_embeds = condition
-            if hasattr(self.tts, "_ov_language"):
-                self.tts._ov_language.reset_state()
-
-            # Simple autoregressive TTS generation
-            audio_bos_id = getattr(self.tts.config, "audio_bos_token_id", 151687)
-            bos_embed = tts_code_emb(torch.tensor([[audio_bos_id]], dtype=torch.long))
-
-            # Concatenate condition + bos
-            inputs_embeds = torch.cat([cond_embeds, bos_embed], dim=1)
-
-            generated_tokens = []
-            past_length = 0
-
-            for step in range(max_tokens):
-                attention_mask = torch.ones((1, past_length + inputs_embeds.shape[1]), dtype=torch.long)
-                position_ids = torch.arange(past_length, past_length + inputs_embeds.shape[1], dtype=torch.long).unsqueeze(0)
-
-                logits, _ = self.tts._ov_language(
-                    inputs_embeds.to(self.dtype),
-                    attention_mask,
-                    position_ids,
-                )
-                past_length += inputs_embeds.shape[1]
-
-                # Get logits for audio tokens only
-                audio_logits = logits[:, -1, :num_audio_tokens]
-                next_token = torch.argmax(audio_logits, dim=-1)
-                token_id = next_token.item()
-
-                if token_id == tts_eos_token:
-                    break
-
-                generated_tokens.append(token_id)
-                inputs_embeds = tts_code_emb(next_token.unsqueeze(0))
-
-            if generated_tokens:
-                return torch.tensor([generated_tokens], dtype=torch.long)
-            return None
-
-        except Exception as e:
-            print(f"TTS token generation error: {e}")
-            return None
 
     def get_input_embeddings(self):
         """Get input embeddings (aligned with original MiniCPMO.get_input_embeddings).
@@ -6216,6 +6277,7 @@ class OVMiniCPMODuplex:
         self.token2wav_buffer = []
         self.pre_lookahead = 3  # default from flow.yaml pre_lookahead_len
         self.hift_cache_base = None  # base HiFT cache for turn resets
+        self.flow_cache_base = None  # base flow KV cache for turn resets
 
         # Turn state
         self.current_turn_ended = True
@@ -6240,7 +6302,7 @@ class OVMiniCPMODuplex:
 
         The original resets the flow stream cache and hift cache to
         base values, and prepends silence prefix tokens.
-        For OV, we reset hift_cache_dict from base copies and reset the buffer.
+        For OV, we reset hift_cache_dict and stream_cache from base copies.
         """
         if self.token2wav_initialized:
             # Reset HiFT cache to base values (aligned with original)
@@ -6252,6 +6314,23 @@ class OVMiniCPMODuplex:
                     "source": torch.zeros(1, 1, 0),
                     "speech": torch.zeros(1, 0),
                 }
+            # Reset accumulated tokens for coherent streaming mel generation
+            self.model.token2wav._accumulated_tokens = []
+            # Reset flow stream_cache from base copy (for KV-cache streaming)
+            if hasattr(self, "flow_cache_base") and self.flow_cache_base is not None:
+
+                def _clone_recursive(obj):
+                    if torch.is_tensor(obj):
+                        return obj.clone()
+                    elif isinstance(obj, dict):
+                        return {k: _clone_recursive(v) for k, v in obj.items()}
+                    elif isinstance(obj, list):
+                        return [_clone_recursive(v) for v in obj]
+                    return obj
+
+                self.model.token2wav.stream_cache = _clone_recursive(self.flow_cache_base)
+            else:
+                self.model.token2wav.stream_cache = None
             # Reset buffer with silence prefix (aligned with original: [4218] * 3)
             self.token2wav_buffer = [4218] * 3
 
@@ -6348,6 +6427,9 @@ class OVMiniCPMODuplex:
                     "source": torch.zeros(1, 1, 0),
                     "speech": torch.zeros(1, 0),
                 }
+            # Reset accumulated tokens for coherent streaming mel generation
+            self.model.token2wav._accumulated_tokens = []
+            # stream_cache is reset in _reset_token2wav_for_new_turn above
 
         # 5. Allow the model to choose listen on next generate
         self.current_turn_ended = True
@@ -6422,9 +6504,24 @@ class OVMiniCPMODuplex:
             if self.model.token2wav is not None:
                 # Reset and initialize streaming cache (aligned with original)
                 self.model.token2wav.reset_cache()
-                _, hift_cache = self.model.token2wav.set_stream_cache(prompt_wav_path)
+                flow_cache, hift_cache = self.model.token2wav.set_stream_cache(prompt_wav_path)
                 # Store base copies for turn reset (aligned with original)
                 self.hift_cache_base = {k: v.clone() for k, v in hift_cache.items()}
+                # Store flow KV cache base for streaming reset (KV-cache streaming path)
+                if flow_cache is not None:
+
+                    def _clone_recursive(obj):
+                        if torch.is_tensor(obj):
+                            return obj.clone()
+                        elif isinstance(obj, dict):
+                            return {k: _clone_recursive(v) for k, v in obj.items()}
+                        elif isinstance(obj, list):
+                            return [_clone_recursive(v) for v in obj]
+                        return obj
+
+                    self.flow_cache_base = _clone_recursive(flow_cache)
+                else:
+                    self.flow_cache_base = None
                 self.pre_lookahead = 3  # from flow.yaml pre_lookahead_len
                 self.token2wav_initialized = True
                 # Initialize token2wav buffer with silence prefix (aligned with original)
@@ -7430,11 +7527,25 @@ class OVFlow:
         self.flow_embeddings = core.compile_model(str(flow_emb_path), "CPU")
         print(f"✅ Flow embeddings model loaded")
 
-        # Load OpenVINO flow estimator model (DiT)
-        flow_est_path = self.model_dir / FLOW_ESTIMATOR_NAME
-        print(f"⌛ Loading OpenVINO Flow estimator model from {flow_est_path}...")
-        self.flow_estimator = core.compile_model(str(flow_est_path), device)
+        # Load OpenVINO flow estimator chunk model (DiT with KV cache I/O)
+        # This unified model serves both streaming (with caches) and non-streaming
+        # (with empty caches) inference — verified to be bit-identical to the legacy
+        # full estimator when att_cache T=0, saving one model from memory.
+        flow_est_chunk_path = self.model_dir / FLOW_ESTIMATOR_CHUNK_NAME
+        print(f"⌛ Loading OpenVINO Flow estimator model from {flow_est_chunk_path}...")
+        self.flow_estimator_chunk = core.compile_model(str(flow_est_chunk_path), device)
         print(f"✅ Flow estimator model loaded")
+
+        # Load streaming encoder chunk model (if available)
+        self.flow_encoder_chunk = None
+        self.streaming_available = False
+
+        flow_enc_chunk_path = self.model_dir / FLOW_ENCODER_CHUNK_NAME
+        if flow_enc_chunk_path.exists():
+            print(f"⌛ Loading streaming flow encoder chunk model...")
+            self.flow_encoder_chunk = core.compile_model(str(flow_enc_chunk_path), "CPU")
+            self.streaming_available = True
+            print(f"✅ Streaming flow encoder chunk model loaded")
 
         # Pre-generate random noise for deterministic inference
         self._init_rand_noise()
@@ -7530,23 +7641,28 @@ class OVFlow:
 
         return h, spks
 
-    def _run_flow_estimator(self, x, mask, mu, t, spks, cond):
+    def _run_flow_estimator(self, x, mu, t, spks, cond):
         """
-        Run flow estimator (DiT) model for one denoising step.
+        Run flow estimator (DiT) model for one denoising step in non-streaming mode.
+
+        Uses the unified chunk estimator with empty caches (T=0), which produces
+        bit-identical output to the legacy full estimator.
 
         Returns:
             Estimated velocity field (batch, output_size, mel_len)
         """
-        # OpenVINO directly accepts torch.Tensor
+        cnn_cache = torch.zeros([16, 2, 1024, 2], dtype=torch.float32)
+        att_cache = torch.zeros([16, 2, 8, 0, 128], dtype=torch.float32)
         inputs = {
             "x": x,
-            "mask": mask,
             "mu": mu,
             "t": t,
             "spks": spks,
             "cond": cond,
+            "cnn_cache": cnn_cache,
+            "att_cache": att_cache,
         }
-        result = self.flow_estimator(inputs)
+        result = self.flow_estimator_chunk(inputs)
         return torch.from_numpy(result[0].copy())
 
     def _solve_euler(self, z, t_span, mu, mask, spks, cond):
@@ -7562,27 +7678,23 @@ class OVFlow:
         dtype = spks.dtype
         device = x.device
 
-        x_in = torch.zeros([2, self.output_size, mel_len], device=device, dtype=dtype)
-        mask_in = torch.zeros([2, 1, mel_len], device=device, dtype=dtype)
         mu_in = torch.zeros([2, self.output_size, mel_len], device=device, dtype=dtype)
-        t_in = torch.zeros([2], device=device, dtype=dtype)
         spks_in = torch.zeros([2, self.output_size], device=device, dtype=dtype)
         cond_in = torch.zeros([2, self.output_size, mel_len], device=device, dtype=dtype)
 
         for step in range(1, len(t_span)):
-            # Fill in batched inputs for CFG
-            x_in[:] = x
-            mask_in[:] = mask
+            # Build batched inputs for CFG
+            x_in = x.repeat(2, 1, 1)  # [2, 80, mel_len]
             mu_in[0] = mu
-            mu_in[1] = 0  # No condition for CFG
-            t_in[:] = t
+            mu_in[1] = 0
+            t_in = torch.tensor([t.item(), t.item()], dtype=dtype)
             spks_in[0] = spks
-            spks_in[1] = 0  # No speaker for CFG
+            spks_in[1] = 0
             cond_in[0] = cond
-            cond_in[1] = 0  # No cond for CFG
+            cond_in[1] = 0
 
             # Run estimator
-            dphi_dt = self._run_flow_estimator(x_in, mask_in, mu_in, t_in, spks_in, cond_in)
+            dphi_dt = self._run_flow_estimator(x_in, mu_in, t_in, spks_in, cond_in)
 
             # Apply classifier-free guidance
             dphi_dt_cond, dphi_dt_uncond = dphi_dt[0:1], dphi_dt[1:2]
@@ -7666,6 +7778,243 @@ class OVFlow:
 
         return feat
 
+    # ==================== Streaming (chunk-based) methods ====================
+
+    def setup_cache(self, prompt_token, prompt_mel, spk_emb, n_timesteps=None):
+        """Initialize streaming caches by processing prompt tokens through encoder + estimator.
+
+        Aligned with original flow.setup_cache(): processes the full prompt to
+        build conformer and estimator KV caches.
+
+        Args:
+            prompt_token: [1, prompt_token_len + pre_lookahead(3)] int32
+            prompt_mel: [1, prompt_mel_len, 80] float32
+            spk_emb: [1, 192] float32
+            n_timesteps: Number of ODE steps (default: self.n_timesteps)
+
+        Returns:
+            cache: dict with conformer_cnn_cache, conformer_att_cache,
+                   estimator_cnn_caches (list), estimator_att_caches (list)
+        """
+        if not self.streaming_available:
+            raise RuntimeError("Streaming chunk models not loaded. Re-export with convert_token2wav().")
+
+        if n_timesteps is None:
+            n_timesteps = self.n_timesteps
+
+        # Architecture constants (match CosyVoice2 model)
+        conformer_depth = 10  # 6 encoders + 4 up_encoders
+        dit_depth = 16
+        num_heads = 8
+        head_dim_x2 = 128  # head_dim(64) * 2 for KV packing
+
+        # Step 1: Run encoder_chunk on prompt (first call, empty caches)
+        # T=0 for att_cache since no previous context
+        cnn_cache_init = torch.zeros([1, 512, 6], dtype=torch.float32)
+        att_cache_init = torch.zeros([conformer_depth, 1, 8, 0, 128], dtype=torch.float32)
+
+        enc_result = self.flow_encoder_chunk(
+            {
+                "token": prompt_token.to(torch.int32),
+                "embedding": spk_emb.to(torch.float32),
+                "cnn_cache": cnn_cache_init,
+                "att_cache": att_cache_init,
+            }
+        )
+        h = torch.from_numpy(enc_result[0].copy())  # [1, mel_len, 80]
+        spks = torch.from_numpy(enc_result[1].copy())  # [1, 80]
+        new_cnn_cache = torch.from_numpy(enc_result[2].copy())
+        new_att_cache = torch.from_numpy(enc_result[3].copy())
+
+        # Step 2: Run estimator per ODE step (prompt mel as condition)
+        mu = h.transpose(1, 2).contiguous()  # [1, 80, mel_len]
+        mel_len = mu.shape[2]
+        cond = prompt_mel.transpose(1, 2).contiguous()  # [1, 80, mel_len]
+
+        z = self.rand_noise[:, :, :mel_len]
+        t_span = torch.linspace(0, 1, n_timesteps + 1, dtype=torch.float32)
+        t_span = 1 - torch.cos(t_span * 0.5 * torch.pi)
+
+        # CFG doubled inputs (cond | uncond)
+        mu_in = torch.cat([mu, torch.zeros_like(mu)], dim=0)
+        spks_in = torch.cat([spks, torch.zeros_like(spks)], dim=0)
+        cond_in = torch.cat([cond, torch.zeros_like(cond)], dim=0)
+
+        est_cnn_caches = [None] * n_timesteps
+        est_att_caches = [None] * n_timesteps
+
+        x = z
+        t, dt = t_span[0], t_span[1] - t_span[0]
+
+        for step in range(1, len(t_span)):
+            x_in = x.repeat(2, 1, 1)
+            t_val = torch.tensor([t.item(), t.item()], dtype=torch.float32)
+
+            # First call per step: empty caches (T=0)
+            step_cnn = torch.zeros([dit_depth, 2, 1024, 2], dtype=torch.float32)
+            step_att = torch.zeros([dit_depth, 2, num_heads, 0, head_dim_x2], dtype=torch.float32)
+
+            est_result = self.flow_estimator_chunk(
+                {
+                    "x": x_in,
+                    "mu": mu_in,
+                    "t": t_val,
+                    "spks": spks_in,
+                    "cond": cond_in,
+                    "cnn_cache": step_cnn,
+                    "att_cache": step_att,
+                }
+            )
+            dphi_dt = torch.from_numpy(est_result[0].copy())
+            est_cnn_caches[step - 1] = torch.from_numpy(est_result[1].copy())
+            est_att_caches[step - 1] = torch.from_numpy(est_result[2].copy())
+
+            dphi_dt_cond, dphi_dt_uncond = dphi_dt[0:1], dphi_dt[1:2]
+            dphi_dt = (1.0 + self.inference_cfg_rate) * dphi_dt_cond - self.inference_cfg_rate * dphi_dt_uncond
+
+            x = x + dt * dphi_dt
+            t = t + dt
+            if step < len(t_span) - 1:
+                dt = t_span[step + 1] - t
+
+        cache = {
+            "conformer_cnn_cache": new_cnn_cache,
+            "conformer_att_cache": new_att_cache,
+            "estimator_cnn_caches": est_cnn_caches,
+            "estimator_att_caches": est_att_caches,
+            "prompt_mel_len": prompt_mel.shape[1],
+        }
+        return cache
+
+    def inference_chunk(self, token, spk, cache, last_chunk=False, n_timesteps=None):
+        """Run streaming chunk inference with KV caches.
+
+        Aligned with original flow.inference_chunk(): runs encoder_chunk + ODE solver
+        with per-step estimator caches.
+
+        Args:
+            token: [1, chunk_token_len] int32 (includes pre_lookahead tokens)
+            spk: [1, 192] float32
+            cache: dict from setup_cache or previous inference_chunk
+            last_chunk: whether this is the last chunk
+            n_timesteps: ODE steps (default: self.n_timesteps)
+
+        Returns:
+            feat: [1, 80, chunk_mel_len] generated mel for this chunk
+            new_cache: updated cache dict
+        """
+        if not self.streaming_available:
+            raise RuntimeError("Streaming chunk models not loaded.")
+
+        if n_timesteps is None:
+            n_timesteps = self.n_timesteps
+
+        # Handle last_chunk: model was exported with last_chunk=False always.
+        # For last chunk, pad tokens with pre_lookahead_len(3) dummy tokens
+        # so the encoder can strip them normally.
+        pre_lookahead_len = 3  # CosyVoice2 constant
+        token_input = token.to(torch.int32)
+        if last_chunk:
+            pad_tokens = torch.ones([1, pre_lookahead_len], dtype=torch.int32) * 4218
+            token_input = torch.cat([token_input, pad_tokens], dim=1)
+
+        enc_result = self.flow_encoder_chunk(
+            {
+                "token": token_input,
+                "embedding": spk.to(torch.float32),
+                "cnn_cache": cache["conformer_cnn_cache"],
+                "att_cache": cache["conformer_att_cache"],
+            }
+        )
+        h = torch.from_numpy(enc_result[0].copy())
+        spks = torch.from_numpy(enc_result[1].copy())
+        new_cnn_cache = torch.from_numpy(enc_result[2].copy())
+        new_att_cache = torch.from_numpy(enc_result[3].copy())
+
+        # ODE solver with per-step estimator caches
+        mu = h.transpose(1, 2).contiguous()  # [1, 80, mel_len]
+        mel_len = mu.shape[2]
+        cond = torch.zeros_like(mu)  # No prompt condition for streaming chunks
+
+        # Noise offset from previous cache length
+        est_att_caches = cache["estimator_att_caches"]
+        offset = est_att_caches[0].shape[3] if est_att_caches[0] is not None else 0
+
+        z = self.rand_noise[:, :, offset : offset + mel_len]
+        t_span = torch.linspace(0, 1, n_timesteps + 1, dtype=torch.float32)
+        t_span = 1 - torch.cos(t_span * 0.5 * torch.pi)
+
+        mu_in = torch.cat([mu, torch.zeros_like(mu)], dim=0)
+        spks_in = torch.cat([spks, torch.zeros_like(spks)], dim=0)
+        cond_in = torch.cat([cond, torch.zeros_like(cond)], dim=0)
+
+        new_est_cnn_caches = [None] * n_timesteps
+        new_est_att_caches = [None] * n_timesteps
+
+        x = z
+        t, dt = t_span[0], t_span[1] - t_span[0]
+
+        for step in range(1, len(t_span)):
+            x_in = x.repeat(2, 1, 1)
+            t_val = torch.tensor([t.item(), t.item()], dtype=torch.float32)
+
+            est_result = self.flow_estimator_chunk(
+                {
+                    "x": x_in,
+                    "mu": mu_in,
+                    "t": t_val,
+                    "spks": spks_in,
+                    "cond": cond_in,
+                    "cnn_cache": cache["estimator_cnn_caches"][step - 1],
+                    "att_cache": cache["estimator_att_caches"][step - 1],
+                }
+            )
+            dphi_dt = torch.from_numpy(est_result[0].copy())
+            new_est_cnn_caches[step - 1] = torch.from_numpy(est_result[1].copy())
+            new_est_att_caches[step - 1] = torch.from_numpy(est_result[2].copy())
+
+            dphi_dt_cond, dphi_dt_uncond = dphi_dt[0:1], dphi_dt[1:2]
+            dphi_dt = (1.0 + self.inference_cfg_rate) * dphi_dt_cond - self.inference_cfg_rate * dphi_dt_uncond
+
+            x = x + dt * dphi_dt
+            t = t + dt
+            if step < len(t_span) - 1:
+                dt = t_span[step + 1] - t
+
+        feat = x.float()
+
+        # Truncate att caches to prevent unbounded growth
+        # Aligned with original Token2wav.stream() truncation logic
+        prompt_mel_len = cache.get("prompt_mel_len", 0)
+        max_att_len = prompt_mel_len + 100
+        for i in range(n_timesteps):
+            if new_est_att_caches[i] is not None and new_est_att_caches[i].shape[3] > max_att_len:
+                new_est_att_caches[i] = torch.cat(
+                    [
+                        new_est_att_caches[i][:, :, :, :prompt_mel_len, :],
+                        new_est_att_caches[i][:, :, :, -100:, :],
+                    ],
+                    dim=3,
+                )
+
+        if new_att_cache.shape[3] > max_att_len:
+            new_att_cache = torch.cat(
+                [
+                    new_att_cache[:, :, :, :prompt_mel_len, :],
+                    new_att_cache[:, :, :, -100:, :],
+                ],
+                dim=3,
+            )
+
+        new_cache = {
+            "conformer_cnn_cache": new_cnn_cache,
+            "conformer_att_cache": new_att_cache,
+            "estimator_cnn_caches": new_est_cnn_caches,
+            "estimator_att_caches": new_est_att_caches,
+            "prompt_mel_len": prompt_mel_len,
+        }
+        return feat, new_cache
+
 
 class OVHiFT:
     """OpenVINO-based HiFT vocoder for waveform generation.
@@ -7693,12 +8042,32 @@ class OVHiFT:
         self.ov_device = device
         self.hift_input_len = hift_input_len
 
+        # Source cache length (must match export-time SOURCE_CACHE_LEN)
+        self.source_cache_len_fixed = 3840
+
         # Load OpenVINO model with optional reshape
         print(f"⌛ Loading OpenVINO HiFT model from {model_path}...")
         model = core.read_model(str(model_path))
+
+        # Detect whether model has cache_source input (new) or not (legacy)
+        self._has_cache_source = len(model.inputs) >= 2 and any("cache_source" in inp.any_name for inp in model.inputs)
+
         if self.hift_input_len > 0:
-            model.reshape([1, 80, self.hift_input_len])
-            print(f"  📐 Reshaped HiFT to fixed input: [1, 80, {self.hift_input_len}]")
+            if self._has_cache_source:
+                # Reshape both inputs to fully static shapes for GPU efficiency
+                model.reshape(
+                    {
+                        model.inputs[0].any_name: [1, 80, self.hift_input_len],
+                        model.inputs[1].any_name: [1, 1, self.source_cache_len_fixed],
+                    }
+                )
+                print(f"  📐 Reshaped HiFT to fixed: mel=[1,80,{self.hift_input_len}], cache=[1,1,{self.source_cache_len_fixed}]")
+            else:
+                model.reshape([1, 80, self.hift_input_len])
+                print(f"  📐 Reshaped HiFT to fixed input: [1, 80, {self.hift_input_len}]")
+
+        if not self._has_cache_source:
+            print("  ⚠️ Legacy HiFT model (no cache_source). Re-export with reexport_hift.py for streaming audio continuity.")
         self.hift = core.compile_model(model, device)
         print(f"✅ HiFT model loaded on {device}")
 
@@ -7729,21 +8098,44 @@ class OVHiFT:
         )
         return inverse_transform
 
-    def inference(self, speech_feat: torch.Tensor) -> torch.Tensor:
+    def inference(self, speech_feat: torch.Tensor, cache_source: torch.Tensor = None):
         """
         Run HiFT inference using OpenVINO.
 
         Args:
             speech_feat: Mel spectrogram (batch, 80, mel_len)
+            cache_source: Cached excitation source from previous chunk [B, 1, 3840].
+                          Pass None or zeros for first chunk.
 
         Returns:
             speech: Generated waveform (batch, samples)
+            source_out: Excitation source signal [B, 1, T] for next chunk's cache
         """
-        # Convert to numpy for potential padding
+        # Convert mel to numpy for potential padding
         if isinstance(speech_feat, torch.Tensor):
             mel_input = speech_feat.cpu().numpy()
         else:
             mel_input = speech_feat
+
+        # Prepare cache_source input (fixed size: SOURCE_CACHE_LEN=3840)
+        source_cache_len = 3840
+        if cache_source is None:
+            cache_source_np = np.zeros((1, 1, source_cache_len), dtype=np.float32)
+        elif isinstance(cache_source, torch.Tensor):
+            cache_source_np = cache_source.cpu().numpy().astype(np.float32)
+            # Pad or trim to fixed size
+            cur_len = cache_source_np.shape[2]
+            if cur_len < source_cache_len:
+                cache_source_np = np.pad(
+                    cache_source_np,
+                    ((0, 0), (0, 0), (0, source_cache_len - cur_len)),
+                    mode="constant",
+                    constant_values=0,
+                )
+            elif cur_len > source_cache_len:
+                cache_source_np = cache_source_np[:, :, -source_cache_len:]
+        else:
+            cache_source_np = cache_source
 
         # Fixed shape mode: pad input to target length, trim output after
         original_len = mel_input.shape[2]
@@ -7758,11 +8150,19 @@ class OVHiFT:
                 mel_input = mel_input[:, :, :target_len]
                 original_len = target_len
 
-        # Run OpenVINO inference - output is (batch, n_fft+2, time)
+        # Run OpenVINO inference
         start_time = time.time()
-        result = self.hift(mel_input)
+        if self._has_cache_source:
+            # New model: 2 inputs (mel + cache_source), 2 outputs (spectral + source)
+            result = self.hift([mel_input, cache_source_np])
+            x = torch.from_numpy(result[0].copy())
+            source_out = torch.from_numpy(result[1].copy())
+        else:
+            # Legacy model: 1 input (mel), 1 output (spectral), no source cache
+            result = self.hift(mel_input)
+            x = torch.from_numpy(result[0].copy())
+            source_out = torch.zeros(1, 1, 0)
         elapsed = time.time() - start_time
-        x = torch.from_numpy(result[0].copy())
 
         # Post-processing: exp, sin, istft, clamp
         n_fft = self.istft_params["n_fft"]
@@ -7776,8 +8176,9 @@ class OVHiFT:
         if self.hift_input_len > 0 and original_len < self.hift_input_len:
             original_samples = original_len * self.mel_to_samples_ratio
             speech = speech[:, :original_samples]
+            source_out = source_out[:, :, :original_samples]
 
-        return speech
+        return speech, source_out
 
 
 class OVToken2wav:
@@ -7873,6 +8274,9 @@ class OVToken2wav:
         # HiFT cache
         self.hift_cache_dict = {}
 
+        # Accumulated tokens for coherent streaming mel generation
+        self._accumulated_tokens = []
+
     def _prepare_prompt(self, prompt_wav):
         """Prepare prompt data from audio file."""
         import s3tokenizer
@@ -7937,8 +8341,8 @@ class OVToken2wav:
             self.n_timesteps,
         )
 
-        # Run HiFT vocoder
-        wav = self.hift.inference(speech_feat=mel)
+        # Run HiFT vocoder (non-streaming: no source cache needed)
+        wav, _ = self.hift.inference(speech_feat=mel)
 
         output = io.BytesIO()
         torchaudio.save(output, wav.cpu(), sample_rate=24000, format="wav")
@@ -7949,7 +8353,8 @@ class OVToken2wav:
         """Reset prompt cache."""
         self.cache = None
         self.hift_cache_dict = {}
-        self.stream_initialized = False
+        self._accumulated_tokens = []
+        self.stream_cache = None
 
     def set_stream_cache(self, prompt_wav):
         """Initialize streaming cache (aligned with original Token2wav.set_stream_cache).
@@ -7957,11 +8362,14 @@ class OVToken2wav:
         Prepares prompt features and initializes HiFT cache for cross-chunk
         speech continuity. Must be called before stream().
 
+        When streaming chunk models are available, also initializes flow KV caches
+        via flow.setup_cache(), matching the original Token2wav behavior exactly.
+
         Args:
             prompt_wav: Path to prompt wav file
 
         Returns:
-            Tuple of (None, hift_cache_dict) — flow cache is not used in OV version
+            Tuple of (stream_cache, hift_cache_dict)
         """
         self.cache = self._prepare_prompt(prompt_wav)
         self.hift_cache_dict = {
@@ -7969,25 +8377,32 @@ class OVToken2wav:
             "source": torch.zeros(1, 1, 0),
             "speech": torch.zeros(1, 0),
         }
-        self.stream_initialized = True
-        return None, self.hift_cache_dict
+        self._accumulated_tokens = []
+
+        # Initialize flow KV caches for true streaming (if chunk models available)
+        self.stream_cache = None
+        if self.flow.streaming_available:
+            prompt_speech_tokens, _, spk_emb, prompt_mels, _ = self.cache
+            # Pad prompt tokens with pre_lookahead(3) dummy tokens (aligned with original)
+            right_pad = torch.ones(1, 3, dtype=prompt_speech_tokens.dtype) * 4218
+            prompt_with_pad = torch.cat([prompt_speech_tokens, right_pad], dim=1)
+            self.stream_cache = self.flow.setup_cache(prompt_with_pad, prompt_mels, spk_emb, n_timesteps=self.n_timesteps)
+
+        return self.stream_cache, self.hift_cache_dict
 
     def stream(self, tokens, prompt_wav, last_chunk=False, return_waveform=False):
-        """Streaming token2wav with HiFT mel/speech caching (aligned with original Token2wav.stream).
-
-        Each call processes one chunk of speech tokens through flow → HiFT.
-        Uses mel caching and speech overlap smoothing (hamming window) for
-        cross-chunk audio continuity.
+        """Streaming token2wav: uses flow.inference_chunk with KV caches when
+        chunk models are available, otherwise falls back to accumulated full-context inference.
 
         Args:
-            tokens: List of speech token IDs for current chunk
+            tokens: List of speech token IDs for current chunk (may include overlap with previous)
             prompt_wav: Path to prompt wav file
             last_chunk: Whether this is the last chunk
             return_waveform: If True, return float32 numpy array instead of int16 PCM bytes
 
         Returns:
-            If return_waveform=True: float32 numpy array (aligned with original Token2wav.stream return_waveform=True)
-            If return_waveform=False: int16 PCM bytes (default, matching original Token2wav.stream API)
+            If return_waveform=True: float32 numpy array
+            If return_waveform=False: int16 PCM bytes (default)
         """
         import io
 
@@ -7995,15 +8410,51 @@ class OVToken2wav:
             self.cache = self._prepare_prompt(prompt_wav)
         prompt_speech_tokens, prompt_speech_tokens_lens, spk_emb, prompt_mels, prompt_mels_lens = self.cache
 
-        generated = torch.tensor([tokens], dtype=torch.int32, device="cpu")
-        generated_lens = torch.tensor([generated.shape[1]], dtype=torch.int32, device="cpu")
+        # Choose mel generation path
+        if hasattr(self, "stream_cache") and self.stream_cache is not None:
+            # ===== KV-cache streaming path (aligned with original) =====
+            generated_speech_tokens = torch.tensor([tokens], dtype=torch.int32, device="cpu")
+            chunk_mel, self.stream_cache = self.flow.inference_chunk(
+                token=generated_speech_tokens,
+                spk=spk_emb,
+                cache=self.stream_cache,
+                last_chunk=last_chunk,
+                n_timesteps=self.n_timesteps,
+            )
+            mel = chunk_mel
+        else:
+            # ===== Accumulated context fallback =====
+            if not hasattr(self, "_accumulated_tokens"):
+                self._accumulated_tokens = []
 
-        # Run flow inference for this chunk
-        mel = self.flow.inference(
-            generated, generated_lens, prompt_speech_tokens, prompt_speech_tokens_lens, prompt_mels, prompt_mels_lens, spk_emb, self.n_timesteps
-        )
+            overlap = 0
+            if len(self._accumulated_tokens) > 0 and len(tokens) > 0:
+                max_check = min(len(tokens), len(self._accumulated_tokens), 10)
+                for check_len in range(max_check, 0, -1):
+                    if self._accumulated_tokens[-check_len:] == tokens[:check_len]:
+                        overlap = check_len
+                        break
 
-        # HiFT with mel cache for cross-chunk continuity
+            new_tokens = tokens[overlap:]
+            prev_token_count = len(self._accumulated_tokens)
+            self._accumulated_tokens.extend(new_tokens)
+
+            max_flow_tokens = self.flow.flow_emb_token_len if self.flow.flow_emb_token_len > 0 else 0
+            if max_flow_tokens > 0 and len(self._accumulated_tokens) > max_flow_tokens:
+                trim = len(self._accumulated_tokens) - max_flow_tokens
+                self._accumulated_tokens = self._accumulated_tokens[trim:]
+                prev_token_count = max(0, prev_token_count - trim)
+
+            all_tokens = torch.tensor([self._accumulated_tokens], dtype=torch.int32, device="cpu")
+            all_token_lens = torch.tensor([all_tokens.shape[1]], dtype=torch.int32, device="cpu")
+
+            full_mel = self.flow.inference(
+                all_tokens, all_token_lens, prompt_speech_tokens, prompt_speech_tokens_lens, prompt_mels, prompt_mels_lens, spk_emb, self.n_timesteps
+            )
+            prev_mel_len = prev_token_count * self.flow.up_rate
+            mel = full_mel[:, :, prev_mel_len:]
+
+        # ===== HiFT vocoder with mel/speech caching (common path) =====
         hift_cache_mel = self.hift_cache_dict.get("mel", torch.zeros(1, 80, 0))
         hift_cache_speech = self.hift_cache_dict.get("speech", torch.zeros(1, 0))
         is_first_chunk = hift_cache_speech.shape[-1] == 0
@@ -8013,12 +8464,11 @@ class OVToken2wav:
         else:
             mel_combined = mel
 
-        # Run HiFT inference
-        speech = self.hift.inference(speech_feat=mel_combined)
+        hift_cache_source = self.hift_cache_dict.get("source", None)
+        speech, source_out = self.hift.inference(speech_feat=mel_combined, cache_source=hift_cache_source)
 
-        # Speech overlap smoothing with cached speech
+        # Speech overlap smoothing
         if not is_first_chunk and hift_cache_speech.shape[-1] > 0:
-            # Fade overlap between cached tail and new speech head
             overlap_len = min(self.source_cache_len, speech.shape[-1], hift_cache_speech.shape[-1])
             if overlap_len > 0:
                 fade_window = (
@@ -8026,46 +8476,39 @@ class OVToken2wav:
                     if 2 * overlap_len <= self.speech_window.shape[0]
                     else torch.from_numpy(np.hamming(2 * overlap_len).astype(np.float32))
                 )
-                fade_in = fade_window[overlap_len:]  # second half: 0→1
-                fade_out = fade_window[:overlap_len]  # first half: 1→0
-
+                w_new = fade_window[:overlap_len]
+                w_old = fade_window[overlap_len:]
                 overlap_new = speech[:, :overlap_len]
                 overlap_old = hift_cache_speech[:, -overlap_len:]
-
-                blended = overlap_old * fade_out.unsqueeze(0) + overlap_new * fade_in.unsqueeze(0)
+                blended = overlap_new * w_new.unsqueeze(0) + overlap_old * w_old.unsqueeze(0)
                 speech = torch.cat([blended, speech[:, overlap_len:]], dim=1)
 
         # Update HiFT cache
         self.hift_cache_dict = {
             "mel": mel_combined[:, :, -self.mel_cache_len :].clone() if mel_combined.shape[2] >= self.mel_cache_len else mel_combined.clone(),
-            "source": torch.zeros(1, 1, 0),
+            "source": source_out[:, :, -self.source_cache_len :].clone() if source_out.shape[2] >= self.source_cache_len else source_out.clone(),
             "speech": speech[:, -self.source_cache_len :].clone() if speech.shape[-1] >= self.source_cache_len else speech.clone(),
         }
 
         # Trim output
         if is_first_chunk and not last_chunk:
-            # First chunk: pad silence at start, trim tail for next overlap
             silence = torch.zeros(1, self.source_cache_len)
             if speech.shape[-1] > self.source_cache_len:
                 speech = torch.cat([silence, speech[:, : -self.source_cache_len]], dim=1)
             else:
                 speech = silence
         elif not last_chunk:
-            # Middle chunks: trim tail for next overlap
             if speech.shape[-1] > self.source_cache_len:
                 speech = speech[:, : -self.source_cache_len]
             else:
                 speech = torch.zeros(1, 0)
-        # Last chunk: output everything (no trimming)
 
         # Convert speech tensor to output format
         wav_np = speech.squeeze(0).cpu().numpy()
         wav_np = np.clip(wav_np, -1.0, 1.0)
 
         if return_waveform:
-            # Return float32 numpy array with shape [1, samples] for torch.cat compatibility
             return wav_np.reshape(1, -1)
 
-        # Convert to int16 PCM bytes (default, aligned with original Token2wav.stream)
         wav_int16 = (wav_np * 32767.0).astype("<i2")
         return wav_int16.tobytes()

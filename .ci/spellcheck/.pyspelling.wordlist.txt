@@ -53,6 +53,7 @@ audiobooks
 AudioForConditionalGeneration
 audioldm
 AudioLDM
+AudioVAE
 autoencoder
 AutoEncoder
 AutoencoderKLFlux
@@ -355,6 +356,7 @@ frisbee
 Frontend
 frontend
 FunASR
+FSQ
 FX
 GAN
 Gante
@@ -575,8 +577,10 @@ LLMs
 lm
 LM
 LMS
+LMs
 loc
 LocalAI
+LocDiT
 logits
 LogSoftmax
 LOL
@@ -759,6 +763,7 @@ ontologies
 OpenAI
 openai
 OpenAI's
+OpenBMB
 OpenCompass
 OpenCL
 OpenCLIP
@@ -887,6 +892,7 @@ Pretraining
 pretraining
 processings
 ProgLoss
+proj
 promptable
 prompthero
 proto
@@ -1227,6 +1233,7 @@ Vocoder
 vocoder
 vocoding
 VoiceDesign
+VoxCPM
 voxel
 Voxelization
 voxelization
