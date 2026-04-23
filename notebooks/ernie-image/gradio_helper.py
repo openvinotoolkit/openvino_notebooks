@@ -159,12 +159,11 @@ def make_demo(ov_pipe, enable_pe=False):
         result_state = gr.State()
 
         generate_btn.click(
-            generate,
-            inputs=[prompt_input, size_dropdown, seed_number, random_seed, use_pe_checkbox],
-            outputs=[output_image, result_state]).then(
-                update_texts,
-                inputs=[result_state],
-                outputs=[revised_prompt_output, used_seed],  # instant, no progress
+            generate, inputs=[prompt_input, size_dropdown, seed_number, random_seed, use_pe_checkbox], outputs=[output_image, result_state]
+        ).then(
+            update_texts,
+            inputs=[result_state],
+            outputs=[revised_prompt_output, used_seed],  # instant, no progress
         )
 
     return demo
