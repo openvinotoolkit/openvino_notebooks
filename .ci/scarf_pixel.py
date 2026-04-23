@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+
 import nbformat
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -16,13 +17,15 @@ def check_scarf_tag(file_path: Path) -> bool:
         return check_scarf_tag_in_notebook(file_path)
     if file_path.suffix == ".md":
         return check_scarf_tag_in_readme(file_path)
-    print(f'Invalid file extension at path "{str(file_path)}". Only .ipynb and .md files are supported.')
+    print(
+        f'Invalid file extension at path "{str(file_path)}". Only .ipynb and .md files are supported.'
+    )
     return False
 
 
 def check_scarf_tag_in_notebook(notebook_path: Path) -> bool:
     expected_scarf_tag = get_scarf_tag(notebook_path)
-    with open(notebook_path, "r") as notebook_file:
+    with open(notebook_path, "r", encoding="utf-8") as notebook_file:
         nb_node: nbformat.NotebookNode = nbformat.read(notebook_file, as_version=4)
         first_cell_source: str = nb_node["cells"][0]["source"]
         first_cell_source_lines = first_cell_source.split("\n")
@@ -42,11 +45,13 @@ def add_scarf_tag(file_path: Path):
     elif file_path.suffix == ".md":
         add_scarf_tag_to_readme(file_path)
     else:
-        raise Exception(f'Invalid file extension at path "{str(file_path)}". Only .ipynb and .md files are supported.')
+        raise Exception(
+            f'Invalid file extension at path "{str(file_path)}". Only .ipynb and .md files are supported.'
+        )
 
 
 def add_scarf_tag_to_notebook(notebook_path: Path):
-    with open(notebook_path, "r") as fr:
+    with open(notebook_path, "r", encoding="utf-8") as fr:
         nb_node: nbformat.NotebookNode = nbformat.read(fr, as_version=4)
         first_cell_source: str = nb_node["cells"][0]["source"]
         first_cell_source_lines = first_cell_source.split("\n")
