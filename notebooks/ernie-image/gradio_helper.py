@@ -97,7 +97,10 @@ def make_demo(ov_pipe, enable_pe=False):
         if hasattr(result, "revised_prompts") and result.revised_prompts:
             revised_text = result.revised_prompts[0]
 
-        return image, revised_text, str(seed)
+        return image, {"revised_text": revised_text, "seed": str(seed)}
+
+    def update_texts(state):
+        return state["revised_text"], state["seed"]
 
     with gr.Blocks(title="ERNIE-Image-Turbo — OpenVINO") as demo:
         gr.Markdown("""
@@ -153,10 +156,15 @@ def make_demo(ov_pipe, enable_pe=False):
                 )
                 used_seed = gr.Textbox(label="Seed Used", interactive=False)
 
+        result_state = gr.State()
+
         generate_btn.click(
             generate,
             inputs=[prompt_input, size_dropdown, seed_number, random_seed, use_pe_checkbox],
-            outputs=[output_image, revised_prompt_output, used_seed],
+            outputs=[output_image, result_state]).then(
+                update_texts,
+                inputs=[result_state],
+                outputs=[revised_prompt_output, used_seed],  # instant, no progress
         )
 
     return demo
