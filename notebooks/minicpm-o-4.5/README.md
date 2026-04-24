@@ -14,9 +14,9 @@
 - **Proactive Interaction** — Initiates reminders/comments based on live scene understanding
 - **Strong OCR** — State-of-the-art end-to-end English document parsing
 
-## Architecture (15 Sub-models)
+## Architecture (16 Sub-models)
 
-The model comprises 15 interconnected sub-models converted to OpenVINO IR format:
+The model comprises 16 interconnected sub-models converted to OpenVINO IR format:
 
 | Sub-model | Role | Quantization |
 |-----------|------|:------------:|
@@ -33,15 +33,18 @@ The model comprises 15 interconnected sub-models converted to OpenVINO IR format
 | **TTS Code Embedding** | Audio code token embeddings | — |
 | **TTS Code Head** | Audio code prediction head | — |
 | **Flow Embeddings** | CosyVoice2 flow-matching encoder + speaker projection | — |
-| **Flow Estimator** | DiT model for flow-matching denoising | — |
+| **Flow Encoder Chunk** | Streaming conformer encoder with KV cache | — |
+| **Flow Estimator Chunk** | Unified DiT for flow-matching (streaming & non-streaming) | — |
 | **HiFT** | Neural vocoder for mel-to-waveform synthesis | — |
+
+> **Note:** The Flow Estimator Chunk model serves both streaming and non-streaming inference. In non-streaming mode it runs with empty KV caches (bit-identical to the legacy full estimator), while in streaming mode the KV caches enable temporally coherent cross-chunk mel generation — aligned with the original CosyVoice2 `flow.inference_chunk()` design. This unified approach saves ~220MB of memory.
 
 ## Notebook Contents
 
 The notebook demonstrates:
 
 1. **Prerequisites** — Install dependencies
-2. **Convert & Quantize Model** — Export all 15 sub-models to OpenVINO IR with INT4/INT8 weight compression
+2. **Convert & Quantize Model** — Export all 16 sub-models to OpenVINO IR with INT4/INT8 weight compression
 3. **Select Inference Device** — Choose CPU, GPU, or NPU for different model components
 4. **Run Inference** — Image understanding, audio understanding, omni-modal chat
 5. **Interactive Demo** — Gradio-based multimodal chatbot
@@ -58,6 +61,6 @@ For details, please refer to [Installation Guide](../../README.md).
 
 ⚠️ **EXPERIMENTAL NOTEBOOK**
 
-This notebook demonstrates a model that has not been fully validated with OpenVINO and is using a custom branch of optimum-intel. It may be fully supported and validated in the future.
+This notebook demonstrates a model that has not been fully validated with OpenVINO. It may be fully supported and validated in the future.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/minicpm-o-4.5/README.md" />
