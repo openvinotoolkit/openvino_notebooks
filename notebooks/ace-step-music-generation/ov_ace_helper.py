@@ -28,6 +28,37 @@ from acestep.music_dcae.music_dcae_pipeline import MusicDCAE
 from acestep.schedulers.scheduling_flow_match_heun_discrete import FlowMatchHeunDiscreteScheduler
 from acestep.schedulers.scheduling_flow_match_pingpong import FlowMatchPingPongScheduler
 from acestep.schedulers.scheduling_flow_match_euler_discrete import FlowMatchEulerDiscreteScheduler
+
+# torchaudio 2.10 delegates load/save to torchcodec, which requires FFmpeg shared
+# libraries (libavutil.so.*, libavcodec.so.*, ...). If they are not available,
+# fall back to the `soundfile` backend which is sufficient for WAV I/O used here.
+try:
+    import torchcodec.decoders  # noqa: F401
+    import torchcodec.encoders  # noqa: F401
+except Exception:
+    import soundfile as sf
+
+    def _save(uri, src, sample_rate, channels_first=True, **_):
+        data = src.numpy()
+        if channels_first and data.ndim > 1:
+            data = data.T
+        sf.write(str(uri), data, sample_rate)
+
+    def _load(uri, frame_offset=0, num_frames=-1, normalize=True, channels_first=True, **_):
+        data, sr = sf.read(
+            str(uri),
+            start=frame_offset,
+            frames=num_frames if num_frames > 0 else -1,
+            dtype="float32" if normalize else "int16",
+            always_2d=True,
+        )
+        tensor = torch.from_numpy(data)
+        return (tensor.T if channels_first else tensor), sr
+
+    torchaudio.save = _save
+    torchaudio.load = _load
+    print("FFmpeg shared libraries not found; using `soundfile` backend for audio I/O.")
+
 from acestep.apg_guidance import (
     apg_forward,
     MomentumBuffer,
