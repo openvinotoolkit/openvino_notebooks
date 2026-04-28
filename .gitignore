@@ -112,3 +112,6 @@ pipcache_openvino/
 
 # PySpelling generated dictionary
 .ci/spellcheck/dictionary
+
+# VSCode Local Settings
+/.vscode/
