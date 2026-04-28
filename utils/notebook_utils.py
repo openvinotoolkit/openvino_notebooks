@@ -783,5 +783,5 @@ def use_local_ultralytics_datasets(out_dir="datasets"):
 
     ultralytics.utils.DATASETS_DIR = out_dir
     ultralytics.data.utils.DATASETS_DIR = out_dir
-    
+
     return out_dir
