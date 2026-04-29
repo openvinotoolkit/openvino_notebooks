@@ -144,6 +144,7 @@ Codecs
 CoLA
 Colab
 colormap
+CogViT
 CompVis
 conditionings
 config
@@ -269,6 +270,8 @@ DMDR
 DFL
 DModel
 DocLayNet
+DocLayout
+DocLayoutV
 docling
 Docling
 Docling's
@@ -463,6 +466,7 @@ InstantID
 InstructGPT
 InstructPix
 intel
+intel's
 interactable
 InternLM
 internlm
@@ -747,6 +751,7 @@ odometry
 olmOCR
 Omni
 omni
+OmniDocBench
 OmniGen
 OmniGen's
 Omnimodal
@@ -811,6 +816,7 @@ paddlegan
 PaddleGAN's
 PaddleHub
 PaddleOCR
+PaddleOCR's
 PaddlePaddle
 PaddlePaddle's
 PAF
@@ -895,6 +901,7 @@ ProgLoss
 proj
 promptable
 prompthero
+prithivMLmods
 proto
 protobuf
 PRs
@@ -991,6 +998,7 @@ runtime
 runtimes
 RVQ
 Safetensors
+safetensors
 SageMaker
 sagittal
 SALICON
@@ -1010,6 +1018,7 @@ sd
 SDEdit
 SDXL
 sdxl
+SDK
 Segformer
 Segmentations
 segmentations
@@ -1054,6 +1063,7 @@ Sparisty
 sparsified
 sparsify
 sparsity
+specialised
 spatio
 spatiotemporal
 spectrogram
@@ -1090,6 +1100,7 @@ subchunk
 subchunks
 subdirectories
 subdirectory
+submodels
 subgraph
 subgraphs
 sublicense
@@ -1211,6 +1222,7 @@ ViFM
 VIO
 virtualenv
 VisCPM
+visualises
 ViT
 vit
 VITReciproCAM
