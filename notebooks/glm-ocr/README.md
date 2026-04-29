@@ -7,6 +7,8 @@ document-parsing tasks: **Text Recognition**, **Formula Recognition**, and
 **Table Recognition**. On OmniDocBench v1.5 it reaches 94.62 points, making
 it competitive with much larger commercial OCR systems.
 
+<img width="1071" height="405" alt="image" src="https://github.com/user-attachments/assets/3394dd11-cf7f-43d9-a77e-920169d0f099" />
+
 You can find more information in the
 [model card](https://huggingface.co/zai-org/GLM-OCR).
 
