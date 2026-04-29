@@ -17,6 +17,18 @@ TASK_PROMPTS = {
 }
 
 
+# Sample images are hosted as GitHub user-attachments; downloaded on first run
+# via :func:`download_example_assets` (the notebook calls it from its
+# prerequisites cell). Keeping these out of the repository avoids shipping
+# binary blobs in the PR.
+EXAMPLE_ASSET_URLS: dict[str, str] = {
+    "ocr_text_sample.png": "https://github.com/user-attachments/assets/fda2c6f6-bbba-4ece-b90b-c42bca60e525",
+    "ocr_formula_sample.png": "https://github.com/user-attachments/assets/c9407e8e-3f2a-4d74-807b-dcefa06a3741",
+    "ocr_table_sample.png": "https://github.com/user-attachments/assets/4c64fbf7-5181-4ccc-bb0a-92ea43b3dcc8",
+    "ocr_doc_sample.png": "https://github.com/user-attachments/assets/5b482249-ad47-4c32-8c89-302a60b3c71e",
+}
+
+
 example_files = [
     ("ocr_text_sample.png", "Text"),
     ("ocr_formula_sample.png", "Formula"),
@@ -170,18 +182,20 @@ def make_demo(model, processor, detector=None):
     return demo
 
 
-def download_example_assets(base_url: str | None = None):
-    """Download example images if they are not present locally.
+def download_example_assets(force: bool = False) -> list[Path]:
+    """Download example images from their canonical GitHub user-attachment URLs.
 
-    ``base_url`` can point at a CDN mirror of the bundled samples, but by
-    default the samples ship alongside the notebook so this is a no-op.
+    Files already present are left untouched unless ``force=True``. Returns the
+    list of paths available after the call.
     """
-    if base_url is None:
-        return
-    for file_name, _ in example_files:
-        if Path(file_name).exists():
+    paths: list[Path] = []
+    for name, url in EXAMPLE_ASSET_URLS.items():
+        dest = Path(name)
+        if dest.exists() and not force:
+            paths.append(dest)
             continue
-        url = f"{base_url.rstrip('/')}/{file_name}"
-        resp = requests.get(url, timeout=30)
+        resp = requests.get(url, timeout=60, allow_redirects=True)
         resp.raise_for_status()
-        Path(file_name).write_bytes(resp.content)
+        dest.write_bytes(resp.content)
+        paths.append(dest)
+    return paths
