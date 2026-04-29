@@ -5,7 +5,6 @@ from pathlib import Path
 from threading import Thread
 
 import gradio as gr
-import requests
 from PIL import Image, ImageOps
 from transformers import TextIteratorStreamer
 
@@ -182,20 +181,14 @@ def make_demo(model, processor, detector=None):
     return demo
 
 
-def download_example_assets(force: bool = False) -> list[Path]:
+def download_example_assets() -> list[Path]:
     """Download example images from their canonical GitHub user-attachment URLs.
 
-    Files already present are left untouched unless ``force=True``. Returns the
-    list of paths available after the call.
+    Uses :func:`notebook_utils.download_file`, which already handles the
+    existence check, progress bar, retries and User-Agent header. Must be
+    called from the notebook directory (where ``notebook_utils.py`` has been
+    fetched into).
     """
-    paths: list[Path] = []
-    for name, url in EXAMPLE_ASSET_URLS.items():
-        dest = Path(name)
-        if dest.exists() and not force:
-            paths.append(dest)
-            continue
-        resp = requests.get(url, timeout=60, allow_redirects=True)
-        resp.raise_for_status()
-        dest.write_bytes(resp.content)
-        paths.append(dest)
-    return paths
+    from notebook_utils import download_file
+
+    return [download_file(url, filename=name) for name, url in EXAMPLE_ASSET_URLS.items()]
