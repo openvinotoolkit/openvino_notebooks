@@ -753,3 +753,35 @@ def collect_telemetry(file: str = ""):
         requests.get(url, params=params, timeout=10)
     except Exception:  # nosec B110 - telemetry is best-effort, must not break notebook
         pass
+
+
+def use_local_ultralytics_datasets(out_dir="datasets"):
+    """
+    Make ultralytics use a local datasets directory next to the notebook
+    instead of the global one stored in `~/.config/Ultralytics/settings.json`.
+
+    Without this, every ultralytics-based notebook shares the same global
+    `DATASETS_DIR`. Datasets downloaded by one notebook then leak into other
+    notebooks, breaking validation pipelines (e.g. detection labels parsed as
+    keypoint labels) and making it unclear to the user where downloaded data
+    lives. This helper isolates each notebook's data into its own local
+    `datasets/` folder, so cleanup is obvious (`rm -rf datasets/`) and there is
+    no cross-contamination.
+
+    The user's global ultralytics settings file is NOT modified - the override
+    is applied in-memory only, for the current Python process.
+
+    :param out_dir: Directory to use as the local datasets root. Relative paths
+        are resolved against the current working directory.
+    :return: Absolute path to the local datasets directory.
+    """
+    out_dir = Path(out_dir).resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    import ultralytics.utils
+    import ultralytics.data.utils
+
+    ultralytics.utils.DATASETS_DIR = out_dir
+    ultralytics.data.utils.DATASETS_DIR = out_dir
+
+    return out_dir
