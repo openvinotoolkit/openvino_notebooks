@@ -105,6 +105,8 @@ def export_pp_doclayout_v3(
     Returns the directory holding ``pp_doclayout_v3.onnx`` plus any sidecar
     weight files (``.onnx.data`` when PyTorch emits external tensors).
     """
+    import inspect
+
     import torch
     from transformers import AutoModelForObjectDetection
 
@@ -128,21 +130,29 @@ def export_pp_doclayout_v3(
 
     wrapped = Wrapper(model).eval()
     dummy = torch.randn(1, 3, 800, 800)
+
+    # Force the legacy TorchScript exporter. torch>=2.5 routes through
+    # onnxscript by default, which on torch 2.11 emits modern Pad ops and
+    # then asks onnx.version_converter to downgrade them to ``opset_version``
+    # — the downgrader has no adapter for Pad, so the whole export aborts
+    # with ``No Adapter To Version $17 for Pad``. The legacy exporter does
+    # not trip this path.
+    export_kwargs = dict(
+        input_names=["pixel_values"],
+        output_names=["logits", "pred_boxes"],
+        dynamic_axes={
+            "pixel_values": {0: "batch"},
+            "logits": {0: "batch"},
+            "pred_boxes": {0: "batch"},
+        },
+        opset_version=opset_version,
+        do_constant_folding=False,
+    )
+    if "dynamo" in inspect.signature(torch.onnx.export).parameters:
+        export_kwargs["dynamo"] = False
+
     with torch.no_grad():
-        torch.onnx.export(
-            wrapped,
-            (dummy,),
-            onnx_path,
-            input_names=["pixel_values"],
-            output_names=["logits", "pred_boxes"],
-            dynamic_axes={
-                "pixel_values": {0: "batch"},
-                "logits": {0: "batch"},
-                "pred_boxes": {0: "batch"},
-            },
-            opset_version=opset_version,
-            do_constant_folding=False,
-        )
+        torch.onnx.export(wrapped, (dummy,), onnx_path, **export_kwargs)
 
     # Persist id2label for the detector so it does not need a second model
     # download at inference time.
@@ -205,16 +215,21 @@ class LayoutDetector:
     # -- preprocessing / postprocessing ------------------------------------
 
     def preprocess(self, image):
-        from PIL import Image as _Image
+        from PIL import Image as _Image, ImageOps
 
         if not isinstance(image, _Image.Image):
-            image = _Image.open(image).convert("RGB")
-        image = image.convert("RGB")
+            image = _Image.open(image)
+        # Apply EXIF orientation so the preprocessor and bbox post-scaling
+        # both see the image in its visual orientation. Without this,
+        # phone-camera JPEGs with an orientation tag produce detections
+        # computed on one orientation and scaled against the raw ``Image.size``
+        # of another — boxes land in the wrong place.
+        image = ImageOps.exif_transpose(image).convert("RGB")
         inputs = self.processor(images=image, return_tensors="np")
-        return inputs["pixel_values"], image.size  # (W, H)
+        return inputs["pixel_values"], image.size, image  # (W, H), corrected PIL
 
     def __call__(self, image, score_thr: float = 0.3) -> List[Dict[str, Any]]:
-        pixel_values, (w, h) = self.preprocess(image)
+        pixel_values, (w, h), _ = self.preprocess(image)
         result = self.model({self.input_name: pixel_values})
         logits = list(result.values())[0][0]  # (num_queries, num_classes)
         boxes = list(result.values())[1][0]  # (num_queries, 4) in cx,cy,w,h (0..1)
@@ -286,11 +301,11 @@ def draw_layout(image, detections: List[Dict[str, Any]], output_path: str | Path
 
     Returns the annotated PIL image (optionally also written to ``output_path``).
     """
-    from PIL import Image as _Image, ImageDraw, ImageFont
+    from PIL import Image as _Image, ImageDraw, ImageFont, ImageOps
 
     if not isinstance(image, _Image.Image):
         image = _Image.open(image)
-    image = image.convert("RGB").copy()
+    image = ImageOps.exif_transpose(image).convert("RGB").copy()
     draw = ImageDraw.Draw(image)
     try:
         font = ImageFont.truetype("arial.ttf", 14)
@@ -355,12 +370,12 @@ def iter_pipeline(
     """
     from threading import Thread
 
-    from PIL import Image as _Image
+    from PIL import Image as _Image, ImageOps
     from transformers import TextIteratorStreamer
 
     if not isinstance(image, _Image.Image):
-        image = _Image.open(image).convert("RGB")
-    image = image.convert("RGB")
+        image = _Image.open(image)
+    image = ImageOps.exif_transpose(image).convert("RGB")
 
     tokenizer = processor.tokenizer if hasattr(processor, "tokenizer") else processor
 
