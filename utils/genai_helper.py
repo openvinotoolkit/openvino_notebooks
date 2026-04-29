@@ -16,6 +16,12 @@ class IterableStreamer(ov_genai.StreamerBase):
     """
 
     def __init__(self, tokenizer):
+        """
+        Initializes the IterableStreamer with the given tokenizer.
+
+        Args:
+            tokenizer (Tokenizer): The tokenizer to use for encoding and decoding tokens.
+        """
         super().__init__()
         self.tokenizer = tokenizer
         self.tokens_cache = []
@@ -27,20 +33,43 @@ class IterableStreamer(ov_genai.StreamerBase):
         self._stop_flag = False
 
     def __iter__(self):
+        """
+        Returns the iterator object itself.
+        """
         return self
 
     def __next__(self):
+        """
+        Returns the next value from the text queue.
+
+        Returns:
+            str: The next decoded text chunk.
+
+        Raises:
+            StopIteration: If there are no more elements in the queue.
+        """
         value = self.text_queue.get()
         if value is None:
             raise StopIteration
         return value
 
     def get_stop_flag(self):
+        """
+        Checks if the stop flag has been set.
+        Returns:
+            StreamingStatus: CANCEL if the stop flag is set, otherwise RUNNING.
+        """
         if self._stop_flag:
             return ov_genai.StreamingStatus.CANCEL
         return ov_genai.StreamingStatus.RUNNING
 
     def write_word(self, word: str):
+        """
+        Adds a decoded word to the text queue.
+
+        Args:
+            word (str): The decoded word to add.
+        """
         self.text_queue.put(word)
 
     def write(self, token: Union[int, list[int]]) -> ov_genai.StreamingStatus:
@@ -88,7 +117,12 @@ class IterableStreamer(ov_genai.StreamerBase):
         return stop_flag
 
     def _compute_decoded_length(self, cache_position: int):
-        """Lazily compute decoded length for a position (needed when tokens arrive in batches)."""
+        """
+        Lazily compute decoded length for a position (needed when tokens arrive in batches).
+
+        Args:
+            cache_position (int): The position in the cache to compute the decoded length for.
+        """
         if self.decoded_lengths[cache_position] != -2:
             return
         cache_for_position = self.tokens_cache[: cache_position + 1]
@@ -99,6 +133,9 @@ class IterableStreamer(ov_genai.StreamerBase):
             self.decoded_lengths[cache_position] = len(text_for_position)
 
     def end(self):
+        """
+        Flushes residual tokens from the buffer and puts a None value in the queue to signal the end.
+        """
         text = self.tokenizer.decode(self.tokens_cache)
         if len(text) > self.print_len:
             word = text[self.print_len :]
@@ -111,6 +148,9 @@ class IterableStreamer(ov_genai.StreamerBase):
         self._stop_flag = True
 
     def reset(self):
+        """
+        Resets the streamer to its initial state, clearing all buffers and queues.
+        """
         self.tokens_cache = []
         self.text_queue = queue.Queue()
         self.print_len = 0
@@ -123,10 +163,22 @@ class IterableStreamer(ov_genai.StreamerBase):
 class ChunkStreamer(IterableStreamer):
 
     def __init__(self, tokenizer, tokens_len=2):
+        """
+        Initializes the ChunkStreamer with the given tokenizer and token length.
+
+        Args:
+            tokenizer (Tokenizer): The tokenizer to use for encoding and decoding tokens.
+            tokens_len (int): The number of tokens to accumulate before processing.
+        """
         super().__init__(tokenizer)
         self.tokens_len = tokens_len
 
     def write(self, token: Union[int, list[int]]) -> ov_genai.StreamingStatus:
+        """
+        Processes a token and manages the decoding buffer in chunks. Adds decoded text to the queue.
+        Args:
+            token (Union[int, list[int]]): The token(s) to process.
+        """
         if isinstance(token, list):
             return super().write(token)
         if (len(self.tokens_cache) + 1) % self.tokens_len != 0:
