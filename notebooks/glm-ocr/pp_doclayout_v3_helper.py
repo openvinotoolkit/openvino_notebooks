@@ -20,7 +20,6 @@ from typing import Any, Dict, List, Tuple
 
 import numpy as np
 
-
 MODEL_ID = "PaddlePaddle/PP-DocLayoutV3_safetensors"
 
 
@@ -159,9 +158,7 @@ def export_pp_doclayout_v3(
     import json
 
     id2label = {int(k): v for k, v in model.config.id2label.items()}
-    (output_dir / "id2label.json").write_text(
-        json.dumps(id2label, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    (output_dir / "id2label.json").write_text(json.dumps(id2label, ensure_ascii=False, indent=2), encoding="utf-8")
     return output_dir
 
 
@@ -196,9 +193,7 @@ class LayoutDetector:
         model_dir = Path(model_dir)
         onnx_path = model_dir / "pp_doclayout_v3.onnx"
         if not onnx_path.exists():
-            raise FileNotFoundError(
-                f"{onnx_path} not found. Run export_pp_doclayout_v3() first."
-            )
+            raise FileNotFoundError(f"{onnx_path} not found. Run export_pp_doclayout_v3() first.")
 
         self.model = ov.Core().compile_model(str(onnx_path), device)
         self.input_name = self.model.inputs[0].get_any_name()
@@ -247,9 +242,7 @@ class LayoutDetector:
 
         # Centre/size -> xyxy; scale to original image size
         cb = boxes[qry]
-        xyxy = np.concatenate(
-            [cb[:, :2] - 0.5 * cb[:, 2:], cb[:, :2] + 0.5 * cb[:, 2:]], axis=-1
-        )
+        xyxy = np.concatenate([cb[:, :2] - 0.5 * cb[:, 2:], cb[:, :2] + 0.5 * cb[:, 2:]], axis=-1)
         xyxy = xyxy * np.array([w, h, w, h], dtype=xyxy.dtype)
 
         keep = scr >= score_thr
@@ -442,8 +435,12 @@ def run_pipeline(
     """
     parts: List[str] = []
     for _det, _chunk, final in iter_pipeline(
-        detector, ocr_model, processor, image,
-        max_new_tokens=max_new_tokens, score_thr=score_thr,
+        detector,
+        ocr_model,
+        processor,
+        image,
+        max_new_tokens=max_new_tokens,
+        score_thr=score_thr,
     ):
         if final is not None:
             parts.append(final)
