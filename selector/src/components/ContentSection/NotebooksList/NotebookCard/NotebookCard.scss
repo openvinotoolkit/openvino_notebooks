@@ -52,6 +52,10 @@
       transition: transform 0.2s ease;
     }
 
+    &:has(.card-image) .card-image-placeholder {
+      display: none;
+    }
+
     .card-image-placeholder {
       background-color: var(--spark-color-carbon-tint2);
       height: 100%;
