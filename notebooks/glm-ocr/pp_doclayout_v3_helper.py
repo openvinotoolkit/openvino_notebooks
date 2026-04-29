@@ -323,36 +323,58 @@ def draw_layout(image, detections: List[Dict[str, Any]], output_path: str | Path
 # ---------------------------------------------------------------------------
 
 
-def run_pipeline(
+def _format_region_markdown(cls: str, text: str) -> str:
+    """Wrap ``text`` with the Markdown fencing appropriate for ``cls``."""
+    if cls == "doc_title":
+        return f"# {text}"
+    if cls in {"paragraph_title", "figure_title", "table_title", "chart_title"}:
+        return f"## {text}"
+    if cls in {"formula", "formula_number"}:
+        return f"$$\n{text}\n$$"
+    return text
+
+
+def iter_pipeline(
     detector: LayoutDetector,
     ocr_model,
     processor,
     image,
     max_new_tokens: int = 1024,
     score_thr: float = 0.3,
-) -> str:
-    """Run PP-DocLayoutV3 + GLM-OCR as a single document parser.
+):
+    """Stream PP-DocLayoutV3 + GLM-OCR recognition region-by-region.
 
-    Returns a Markdown string composed of per-region recognition outputs,
-    ordered by the layout reading-order heuristic in ``LayoutDetector``.
+    Yields ``(det, chunk, final_markdown)`` tuples:
+
+    - ``det`` is the current detection dict (``class`` / ``score`` / ``bbox``).
+    - ``chunk`` is the newly-decoded text fragment for this region (one item
+      per call to the underlying :class:`~transformers.TextIteratorStreamer`).
+      ``None`` when the region has no matching prompt.
+    - ``final_markdown`` is non-``None`` on the region's final yield and
+      contains the full Markdown-formatted recognition for that region.
     """
+    from threading import Thread
+
     from PIL import Image as _Image
+    from transformers import TextIteratorStreamer
 
     if not isinstance(image, _Image.Image):
         image = _Image.open(image).convert("RGB")
     image = image.convert("RGB")
 
+    tokenizer = processor.tokenizer if hasattr(processor, "tokenizer") else processor
+
     detections = detector(image, score_thr=score_thr)
-    parts: List[str] = []
     for det in detections:
         cls = det["class"]
         prompt = PROMPT_BY_CLASS.get(cls)
         x0, y0, x1, y1 = det["bbox"]
-        crop = image.crop((x0, y0, x1, y1))
         if prompt is None:
-            # Unknown / image-only regions are kept as placeholders.
-            parts.append(f"<!-- region: {cls} ({x0:.0f},{y0:.0f}-{x1:.0f},{y1:.0f}) -->")
+            placeholder = f"<!-- region: {cls} ({x0:.0f},{y0:.0f}-{x1:.0f},{y1:.0f}) -->"
+            yield det, None, placeholder
             continue
+
+        crop = image.crop((x0, y0, x1, y1))
         messages = [
             {
                 "role": "user",
@@ -370,16 +392,44 @@ def run_pipeline(
             return_tensors="pt",
         )
         inputs.pop("token_type_ids", None)
-        gen = ocr_model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=False)
-        text = processor.decode(
-            gen[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True
-        ).strip()
-        if cls == "doc_title":
-            parts.append(f"# {text}")
-        elif cls in {"paragraph_title", "figure_title", "table_title", "chart_title"}:
-            parts.append(f"## {text}")
-        elif cls in {"formula", "formula_number"}:
-            parts.append(f"$$\n{text}\n$$")
-        else:
-            parts.append(text)
+
+        streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+        gen_kwargs = dict(
+            inputs,
+            max_new_tokens=max_new_tokens,
+            do_sample=False,
+            streamer=streamer,
+        )
+        thread = Thread(target=ocr_model.generate, kwargs=gen_kwargs, daemon=True)
+        thread.start()
+
+        buf = ""
+        for piece in streamer:
+            buf += piece
+            yield det, piece, None
+        thread.join(timeout=1.0)
+
+        yield det, None, _format_region_markdown(cls, buf.strip())
+
+
+def run_pipeline(
+    detector: LayoutDetector,
+    ocr_model,
+    processor,
+    image,
+    max_new_tokens: int = 1024,
+    score_thr: float = 0.3,
+) -> str:
+    """Run PP-DocLayoutV3 + GLM-OCR as a single document parser.
+
+    Returns a Markdown string composed of per-region recognition outputs,
+    ordered by the layout reading-order heuristic in ``LayoutDetector``.
+    """
+    parts: List[str] = []
+    for _det, _chunk, final in iter_pipeline(
+        detector, ocr_model, processor, image,
+        max_new_tokens=max_new_tokens, score_thr=score_thr,
+    ):
+        if final is not None:
+            parts.append(final)
     return "\n\n".join(parts)
