@@ -270,6 +270,7 @@
 - [Omnimodal assistant with MiniCPM-o 2.6 and OpenVINO](./minicpm-o-omnimodal-chatbot/minicpm-o-omnimodal-chatbot.ipynb)
 - [MiniCPM-o 4.5 Multimodal Model with OpenVINO](./minicpm-o-4.5/minicpm-o-4.5.ipynb)
 - [Industrial Meter Reader](./meter-reader/meter-reader.ipynb)
+- [MedASR Medical Speech Recognition with OpenVINO](./medasr-medical-asr/medasr-medical-asr.ipynb)
 - [LTX Video and OpenVINO™](./ltx-video/ltx-video.ipynb)
 - [Create a RAG system using OpenVINO and LlamaIndex](./llm-rag-llamaindex/llm-rag-llamaindex.ipynb)
 - [Create a RAG system using OpenVINO and LangChain](./llm-rag-langchain/llm-rag-langchain.ipynb)
