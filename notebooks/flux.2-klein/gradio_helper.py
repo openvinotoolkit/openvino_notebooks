@@ -69,14 +69,7 @@ def make_demo(ov_pipe):
 
         return image, seed
 
-    css = """
-    #col-container {
-        margin: 0 auto;
-        max-width: 1200px;
-    }
-    """
-
-    with gr.Blocks(css=css, title="FLUX.2 Klein — OpenVINO") as demo:
+    with gr.Blocks(title="FLUX.2 Klein — OpenVINO") as demo:
         with gr.Column(elem_id="col-container"):
             gr.Markdown("""# FLUX.2 [Klein] — OpenVINO
 FLUX.2 [klein] is a fast, unified image generation and editing model accelerated by OpenVINO.
