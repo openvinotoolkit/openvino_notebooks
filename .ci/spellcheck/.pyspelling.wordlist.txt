@@ -510,6 +510,8 @@ keypoints
 KiTS
 KITTI
 Kimi
+klein
+KleinPipeline
 Kokoro
 Koltun
 Kondate
@@ -1243,6 +1245,7 @@ VQ
 VQA
 VQGAN
 VQVAE
+VRAM
 Wav
 wav
 WavFrontend
