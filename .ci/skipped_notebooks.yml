@@ -550,4 +550,11 @@
     - os:
         - macos-13
         - ubuntu-22.04
+# Gated model — requires HuggingFace authentication
+- notebook: notebooks/medasr-medical-asr/medasr-medical-asr.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
         - windows-2022

@@ -120,11 +120,21 @@ def build_state_initializer(ov_model: ov.Model, batch_dim: int):
         opset13.constant([0]),
         opset13.constant(0),
     )
+    var_id_to_shape = {}
+    for op in ov_model.get_ops():
+        if op.get_type_name() == "Assign":
+            var_id_to_shape[op.get_variable_id()] = op.input_value(0).get_partial_shape()
     for op in ov_model.get_ops():
         if op.get_type_name() == "ReadValue":
-            dims = [dim.min_length for dim in list(op.get_output_partial_shape(0))]
-            dims[batch_dim] = batch
-            dims = [(opset13.constant(np.array([dim], dtype=np.int64)) if isinstance(dim, int) else dim) for dim in dims]
+            ref_shape = var_id_to_shape.get(op.get_variable_id(), op.get_output_partial_shape(0))
+            dims = []
+            for i, dim in enumerate(ref_shape):
+                if i == batch_dim:
+                    dims.append(batch)
+                elif dim.is_static:
+                    dims.append(opset13.constant(np.array([dim.get_length()], dtype=np.int64)))
+                else:
+                    dims.append(opset13.constant(np.array([0], dtype=np.int64)))
             shape = opset13.concat(dims, axis=0)
             broadcast = opset13.broadcast(opset13.constant(0.0, dtype=op.get_output_element_type(0)), shape)
             op.set_arguments([broadcast])
