@@ -1,6 +1,7 @@
 import openvino_genai as ov_genai
 import queue
 import sys
+from typing import Union
 
 
 class IterableStreamer(ov_genai.StreamerBase):
@@ -27,6 +28,8 @@ class IterableStreamer(ov_genai.StreamerBase):
         self.text_queue = queue.Queue()
         self.print_len = 0
         self.decoded_lengths = []
+        self._current_length = 0
+        self.last_generated_length = 0
         self._stop_flag = False
 
     def __iter__(self):
@@ -45,70 +48,89 @@ class IterableStreamer(ov_genai.StreamerBase):
         Raises:
             StopIteration: If there are no more elements in the queue.
         """
-        value = self.text_queue.get()  # get() will be blocked until a token is available.
+        value = self.text_queue.get()
         if value is None:
             raise StopIteration
         return value
 
     def get_stop_flag(self):
         """
-        Checks whether the generation process should be stopped.
-
+        Checks if the stop flag has been set.
         Returns:
-            bool: Always returns False in this implementation.
+            StreamingStatus: CANCEL if the stop flag is set, otherwise RUNNING.
         """
-        return self._stop_flag
+        if self._stop_flag:
+            return ov_genai.StreamingStatus.CANCEL
+        return ov_genai.StreamingStatus.RUNNING
 
-    def put_word(self, word: str):
+    def write_word(self, word: str):
         """
-        Puts a word into the text queue.
+        Adds a decoded word to the text queue.
 
         Args:
-            word (str): The word to put into the queue.
+            word (str): The decoded word to add.
         """
         self.text_queue.put(word)
 
-    def put(self, token_id: int) -> bool:
+    def write(self, token: Union[int, list[int]]) -> ov_genai.StreamingStatus:
         """
         Processes a token and manages the decoding buffer. Adds decoded text to the queue.
 
         Args:
-            token_id (int): The token_id to process.
+            token (Union[int, list[int]]): The token(s) to process.
 
         Returns:
-            bool: True if generation should be stopped, False otherwise.
+            StreamingStatus: RUNNING to continue, CANCEL to stop generation.
         """
-        self.tokens_cache.append(token_id)
+        if isinstance(token, list):
+            self.tokens_cache += token
+            self.decoded_lengths += [-2 for _ in range(len(token) - 1)]
+            self._current_length += len(token)
+        else:
+            self.tokens_cache.append(token)
+            self._current_length += 1
+
         text = self.tokenizer.decode(self.tokens_cache)
         self.decoded_lengths.append(len(text))
 
         word = ""
         delay_n_tokens = 3
         if len(text) > self.print_len and "\n" == text[-1]:
-            # Flush the cache after the new line symbol.
             word = text[self.print_len :]
             self.tokens_cache = []
             self.decoded_lengths = []
             self.print_len = 0
         elif len(text) > 0 and text[-1] == chr(65533):
-            # Don't print incomplete text.
             self.decoded_lengths[-1] = -1
         elif len(self.tokens_cache) >= delay_n_tokens:
+            self._compute_decoded_length(len(self.decoded_lengths) - delay_n_tokens)
             print_until = self.decoded_lengths[-delay_n_tokens]
             if print_until != -1 and print_until > self.print_len:
-                # It is possible to have a shorter text after adding new token.
-                # Print to output only if text length is increased and text is complete (print_until != -1).
                 word = text[self.print_len : print_until]
                 self.print_len = print_until
-        self.put_word(word)
+        self.write_word(word)
         sys.stdout.flush()
 
-        if self.get_stop_flag():
-            # When generation is stopped from streamer then end is not called, need to call it here manually.
+        stop_flag = self.get_stop_flag()
+        if stop_flag != ov_genai.StreamingStatus.RUNNING:
             self.end()
-            return True  # True means stop generation
+        return stop_flag
+
+    def _compute_decoded_length(self, cache_position: int):
+        """
+        Lazily compute decoded length for a position (needed when tokens arrive in batches).
+
+        Args:
+            cache_position (int): The position in the cache to compute the decoded length for.
+        """
+        if self.decoded_lengths[cache_position] != -2:
+            return
+        cache_for_position = self.tokens_cache[: cache_position + 1]
+        text_for_position = self.tokenizer.decode(cache_for_position)
+        if len(text_for_position) > 0 and text_for_position[-1] == chr(65533):
+            self.decoded_lengths[cache_position] = -1
         else:
-            return False  # False means continue generation
+            self.decoded_lengths[cache_position] = len(text_for_position)
 
     def end(self):
         """
@@ -117,29 +139,51 @@ class IterableStreamer(ov_genai.StreamerBase):
         text = self.tokenizer.decode(self.tokens_cache)
         if len(text) > self.print_len:
             word = text[self.print_len :]
-            self.put_word(word)
+            self.write_word(word)
             self.tokens_cache = []
             self.print_len = 0
-        self.put_word(None)
+        self.last_generated_length = self._current_length
+        self._current_length = 0
+        self.text_queue.put(None)
         self._stop_flag = True
 
     def reset(self):
+        """
+        Resets the streamer to its initial state, clearing all buffers and queues.
+        """
         self.tokens_cache = []
         self.text_queue = queue.Queue()
         self.print_len = 0
         self.decoded_lengths = []
+        self._current_length = 0
+        self.last_generated_length = 0
         self._stop_flag = False
 
 
 class ChunkStreamer(IterableStreamer):
 
     def __init__(self, tokenizer, tokens_len=2):
+        """
+        Initializes the ChunkStreamer with the given tokenizer and token length.
+
+        Args:
+            tokenizer (Tokenizer): The tokenizer to use for encoding and decoding tokens.
+            tokens_len (int): The number of tokens to accumulate before processing.
+        """
         super().__init__(tokenizer)
         self.tokens_len = tokens_len
 
-    def put(self, token_id: int) -> bool:
+    def write(self, token: Union[int, list[int]]) -> ov_genai.StreamingStatus:
+        """
+        Processes a token and manages the decoding buffer in chunks. Adds decoded text to the queue.
+        Args:
+            token (Union[int, list[int]]): The token(s) to process.
+        """
+        if isinstance(token, list):
+            return super().write(token)
         if (len(self.tokens_cache) + 1) % self.tokens_len != 0:
-            self.tokens_cache.append(token_id)
-            self.decoded_lengths.append(-1)
-            return False
-        return super().put(token_id)
+            self.tokens_cache.append(token)
+            self.decoded_lengths.append(-2)
+            self._current_length += 1
+            return ov_genai.StreamingStatus.RUNNING
+        return super().write(token)

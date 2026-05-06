@@ -627,6 +627,7 @@ matplotlib
 MBs
 MCP
 md
+MedASR
 MediaPipe
 medprob
 mel
