@@ -756,6 +756,7 @@ OmniParser
 OMZ
 oneAPI
 oneDNN
+OpenGVLab
 OneFormer
 oneformer
 ONNX
