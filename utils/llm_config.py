@@ -81,11 +81,6 @@ def lfm2_completion_to_prompt(completion):
 
 SUPPORTED_VLM_MODELS = {
     "English": {
-        "Llava-Next-Video-7B": {
-            "model_id": "llava-hf/LLaVA-NeXT-Video-7B-hf",
-            "supports_video": True,
-            "exclude_on_devices": ["NPU"],
-        },
         "Qwen3-VL-2B-Instruct": {
             "model_id": "Qwen/Qwen3-VL-2B-Instruct",
             "supports_video": True,
@@ -144,6 +139,11 @@ SUPPORTED_VLM_MODELS = {
         },
         "Qwen2-VL-7B-Instruct": {
             "model_id": "Qwen/Qwen2-VL-7B-Instruct",
+            "supports_video": True,
+            "exclude_on_devices": ["NPU"],
+        },
+        "Llava-Next-Video-7B": {
+            "model_id": "llava-hf/LLaVA-NeXT-Video-7B-hf",
             "supports_video": True,
             "exclude_on_devices": ["NPU"],
         },
