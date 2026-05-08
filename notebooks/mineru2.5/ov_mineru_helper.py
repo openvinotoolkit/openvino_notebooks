@@ -49,7 +49,12 @@ ImageInput = Union[Image.Image, str, Path, bytes]
 # OpenVINO's compiled detokenizer therefore strips them from the decoded text,
 # which makes the layout output unparseable. We re-mark these tokens as
 # non-special before re-exporting the OpenVINO detokenizer.
+#
+# In addition to layout tokens, the model generates OTSL (Optimized Table
+# Structure Language) tokens for table content recognition. These are also
+# marked special and must be preserved for correct table parsing.
 MINERU_OUTPUT_TOKENS = (
+    # Layout detection tokens
     "<|box_start|>",
     "<|box_end|>",
     "<|ref_start|>",
@@ -58,6 +63,23 @@ MINERU_OUTPUT_TOKENS = (
     "<|rotate_right|>",
     "<|rotate_down|>",
     "<|rotate_left|>",
+    # OTSL table structure tokens
+    "<nl>",
+    "<fcel>",
+    "<ecel>",
+    "<lcel>",
+    "<ucel>",
+    "<xcel>",
+    "<ched>",
+    # Other content tokens
+    "<|md_start|>",
+    "<|md_end|>",
+    "<|object_ref_start|>",
+    "<|object_ref_end|>",
+    "<|quad_start|>",
+    "<|quad_end|>",
+    "<|paratext|>",
+    "<|txt_contd|>",
 )
 
 
@@ -191,6 +213,16 @@ class OVMinerUClient:
                     cfg.top_k = int(sp.top_k)
             if sp.repetition_penalty is not None:
                 cfg.repetition_penalty = float(sp.repetition_penalty)
+            if sp.presence_penalty is not None:
+                try:
+                    cfg.presence_penalty = float(sp.presence_penalty)
+                except AttributeError:
+                    pass
+            if sp.frequency_penalty is not None:
+                try:
+                    cfg.frequency_penalty = float(sp.frequency_penalty)
+                except AttributeError:
+                    pass
             if sp.no_repeat_ngram_size is not None:
                 # ``no_repeat_ngram_size`` is supported by OpenVINO GenAI ≥ 2025.0.
                 try:
