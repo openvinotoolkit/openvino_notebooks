@@ -796,12 +796,12 @@
         },
         "gitpython": {
             "hashes": [
-                "sha256:489f590edfd6d20571b2c0e72c6a6ac6915ee8b8cd04572330e3842207a78905",
-                "sha256:dba27f922bd2b42cb54c87a8ab3cb6beb6bf07f3d564e21ac848913a05a8a3cd"
+                "sha256:80da2d12504d52e1f998772dc5baf6e553f8d2fcfe1fcc226c9d9a2ee3372dcc",
+                "sha256:d352abe2908d07355014abdd21ddf798c2a961469239afec4962e9da884858f9"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.7'",
-            "version": "==3.1.47"
+            "version": "==3.1.50"
         },
         "greenlet": {
             "hashes": [
