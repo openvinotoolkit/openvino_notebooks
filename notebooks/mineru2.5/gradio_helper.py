@@ -16,10 +16,7 @@ import gradio as gr
 
 from ov_mineru_helper import OVMinerUClient, pdf_to_images
 
-
-_EXAMPLE_PDF_URL = (
-    "https://raw.githubusercontent.com/opendatalab/MinerU/master/demo/pdfs/demo1.pdf"
-)
+_EXAMPLE_PDF_URL = "https://raw.githubusercontent.com/opendatalab/MinerU/master/demo/pdfs/demo1.pdf"
 
 
 def _download_example(target_dir: Path) -> Optional[Path]:

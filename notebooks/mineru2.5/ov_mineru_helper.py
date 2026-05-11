@@ -102,9 +102,7 @@ def patch_detokenizer_for_mineru(
 
     tokenizer = AutoTokenizer.from_pretrained(str(hf_model_id_or_path))
     for tok in MINERU_OUTPUT_TOKENS:
-        tokenizer._tokenizer.add_tokens(
-            [AddedToken(tok, special=False, normalized=False)]
-        )
+        tokenizer._tokenizer.add_tokens([AddedToken(tok, special=False, normalized=False)])
     _, ov_detok = convert_tokenizer(tokenizer, with_detokenizer=True)
     ov.save_model(ov_detok, str(model_dir / "openvino_detokenizer.xml"))
     marker.write_text("ok")
@@ -199,7 +197,7 @@ class OVMinerUClient:
         cfg = ov_genai.GenerationConfig()
         # Default cap: keep generations bounded so a malformed layout output
         # cannot consume the whole context window.
-        cfg.max_new_tokens = (sp.max_new_tokens if sp and sp.max_new_tokens else 4096)
+        cfg.max_new_tokens = sp.max_new_tokens if sp and sp.max_new_tokens else 4096
 
         if sp is not None:
             do_sample = (sp.temperature or 0.0) > 0.0 and (sp.top_k or 1) > 1
