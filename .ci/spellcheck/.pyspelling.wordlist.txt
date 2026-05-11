@@ -511,6 +511,9 @@ keypoints
 Kimi
 KiTS
 KITTI
+Kimi
+klein
+KleinPipeline
 Kokoro
 Koltun
 Kondate
@@ -759,6 +762,7 @@ OmniParser
 OMZ
 oneAPI
 oneDNN
+OpenGVLab
 OneFormer
 oneformer
 ONNX
@@ -1253,6 +1257,7 @@ VQ
 VQA
 VQGAN
 VQVAE
+VRAM
 Wav
 wav
 waveform
