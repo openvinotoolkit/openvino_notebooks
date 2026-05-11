@@ -78,3 +78,4 @@ notebooks/ernie-image/ernie-image.ipynb
 notebooks/hunyuan-translation/hunyuan-translation.ipynb
 notebooks/qwen3-tts/qwen3-tts.ipynb
 notebooks/medasr-medical-asr/medasr-medical-asr.ipynb
+notebooks/mineru2.5/mineru2.5.ipynb
