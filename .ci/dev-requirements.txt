@@ -9,7 +9,7 @@ nbqa[toolchain]             # automatic code quality checking
 nbval                       # pytest plugin for automatic notebook testing
 git+https://github.com/eaidova/treon.git@ea/cell_info # test framework for Jupyter Notebooks 
 toml                        # used for validating docker requirements
-mistune==2.0.4              # use for parsing README.md
+mistune==3.2.1              # use for parsing README.md
 requests==2.33.0            # use for checking links
 psutil                      # process management
 pyspelling                  # automating spell checking
