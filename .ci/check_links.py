@@ -39,7 +39,7 @@ def get_all_ast_nodes(ast_nodes):
 
 
 def get_all_references_from_md(md_path):
-    parse_markdown = mistune.create_markdown(renderer=mistune.AstRenderer())
+    parse_markdown = mistune.create_markdown(renderer='ast')
     ast = parse_markdown(md_path.read_text(encoding="UTF-8"))
 
     for node in get_all_ast_nodes(ast):
