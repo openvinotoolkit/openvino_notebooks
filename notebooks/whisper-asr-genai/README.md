@@ -1,24 +1,27 @@
-# Automatic speech recognition using Whisper and OpenVINO with Generate API
+# Automatic Speech Recognition using Whisper and OpenVINO with Generate API
 
 [Whisper](https://openai.com/index/whisper/) is an automatic speech recognition (ASR) system trained on 680,000 hours of multilingual and multitask supervised data collected from the web.
 
-In this tutorial, we consider how to run Whisper using OpenVINO with Generate API. We will use the pre-trained model from the [Hugging Face Transformers](https://github.com/openvinotoolkit/openvino.genai) library. The [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index) library converts the models to OpenVINO™ IR format. To simplify the user experience, we will use [OpenVINO Generate API](https://github.com/openvinotoolkit/openvino.genai) for [Whisper automatic speech recognition scenarios](https://github.com/openvinotoolkit/openvino.genai/blob/master/samples/python/whisper_speech_recognition/README.md).
+In this tutorial, we consider how to run Whisper using OpenVINO with Generate API. We use pre-converted models from the [OpenVINO collection on HuggingFace](https://huggingface.co/collections/OpenVINO/speech-to-text) or convert models locally using [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index). To simplify the user experience, we use [OpenVINO Generate API](https://github.com/openvinotoolkit/openvino.genai) for [Whisper automatic speech recognition scenarios](https://github.com/openvinotoolkit/openvino.genai/blob/master/samples/python/whisper_speech_recognition/README.md).
 
 ## Notebook Contents
 
-This notebook demonstrates how to perform automatic speech recognition (ASR) using the Whisper model and OpenVINO.
+This notebook demonstrates how to perform automatic speech recognition (ASR) and video subtitle generation using the Whisper model and OpenVINO.
 
-The tutorial consists of following steps:
-1. Download PyTorch model
-2. Run PyTorch model inference
-3. Convert the model using OpenVINO Integration with HuggingFace Optimum.
-4. Run the model using Generate API.
-5. Compare the performance of PyTorch and the OpenVINO model.
-6. Quantize the OpenVINO model with NNCF.
-7. Check quantized model result for the demo video.
-8. Compare model size, performance and accuracy of original and quantized models.
-9. Launch an interactive demo for speech recognition
+The notebook supports:
+- **Whisper** multilingual models (large-v3-turbo, large-v3, large-v2, medium, small, base)
+- **Distil-Whisper** English-only models (distil-large-v3, distil-large-v2, distil-medium.en, distil-small.en)
+- **Pre-converted models** from the [OpenVINO HuggingFace collection](https://huggingface.co/collections/OpenVINO/speech-to-text) in FP16, INT8, and INT4 precisions
+- **Audio transcription** and **multilingual speech translation**
+- **Video subtitle generation** with `.srt` output
 
+The tutorial consists of the following steps:
+1. Select and download a pre-converted OpenVINO model (or convert locally)
+2. Run the Whisper pipeline with OpenVINO Generate API
+3. Perform audio transcription with timestamps
+4. Perform multilingual speech translation
+5. Generate video subtitles in SRT format
+6. Launch an interactive Gradio demo with Audio and Video tabs
 
 ## Installation Instructions
 
