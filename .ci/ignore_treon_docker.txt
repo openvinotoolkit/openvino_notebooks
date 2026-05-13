@@ -77,6 +77,7 @@ notebooks/minicpm-o-4.5/minicpm-o-4.5.ipynb
 notebooks/ernie-image/ernie-image.ipynb
 notebooks/hunyuan-translation/hunyuan-translation.ipynb
 notebooks/qwen3-tts/qwen3-tts.ipynb
+notebooks/glm-ocr/glm-ocr.ipynb
 notebooks/flux.2-klein/flux.2-klein.ipynb
 notebooks/medasr-medical-asr/medasr-medical-asr.ipynb
 notebooks/mineru2.5/mineru2.5.ipynb
