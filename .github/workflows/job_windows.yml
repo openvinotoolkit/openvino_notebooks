@@ -117,6 +117,7 @@ jobs:
       
       # Packages that notebooks need to run in plain os
       - name: Install required packages
+        if: ${{ false }}
         run: |
           # Download 7z standalone utility
           Invoke-WebRequest -Uri 'https://www.7-zip.org/a/7zr.exe' -OutFile '7zr.exe' -UseBasicParsing
