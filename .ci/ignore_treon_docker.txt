@@ -79,3 +79,4 @@ notebooks/hunyuan-translation/hunyuan-translation.ipynb
 notebooks/qwen3-tts/qwen3-tts.ipynb
 notebooks/flux.2-klein/flux.2-klein.ipynb
 notebooks/medasr-medical-asr/medasr-medical-asr.ipynb
+notebooks/minicpm-v-4.6/minicpm-v-4.6.ipynb

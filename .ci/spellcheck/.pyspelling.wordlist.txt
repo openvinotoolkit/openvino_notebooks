@@ -1299,3 +1299,8 @@ zeroscope
 zh
 Zhipu
 Zongyuan
+downsampler
+FLOPs
+HallusionBench
+HarmonyOS
+RefCOCO
