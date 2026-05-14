@@ -71,7 +71,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs_on: [aks-win-8-cores-16gb-test]
+        runs_on: [aks-win-16-cores-32gb-full-st]
         # python: ['3.10', '3.11', '3.12', '3.13']
         python: ['3.12']
         batch: ['batch_0', 'batch_1', 'batch_2', 'batch_3']
