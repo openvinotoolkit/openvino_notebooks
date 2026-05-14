@@ -79,6 +79,6 @@ notebooks/hunyuan-translation/hunyuan-translation.ipynb
 notebooks/qwen3-tts/qwen3-tts.ipynb
 notebooks/flux.2-klein/flux.2-klein.ipynb
 notebooks/medasr-medical-asr/medasr-medical-asr.ipynb
-notebooks\qwen3-vl-embedding\qwen3-vl-embedding.ipynb
-notebooks\qwen3-vl-embedding\qwen3-vl-reranker.ipynb
+notebooks/qwen3-vl-embedding/qwen3-vl-embedding.ipynb
+notebooks/qwen3-vl-embedding/qwen3-vl-reranker.ipynb
 
