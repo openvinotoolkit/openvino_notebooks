@@ -826,7 +826,7 @@ class OVCosyVoice3LM:
         """Sample token IDs from logits (same as original CosyVoice3LM)."""
         while True:
             top_ids = weighted_scores.multinomial(sampling, replacement=True)
-            top_id = top_ids[random.randint(0, sampling - 1)]
+            top_id = top_ids[random.randint(0, sampling - 1)]  # nosec B311 - ML sampling index, not security
             if (not ignore_eos) or (ignore_eos and top_id not in self.stop_token_ids):
                 break
         return top_id.item()

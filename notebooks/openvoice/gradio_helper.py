@@ -1,7 +1,6 @@
 from typing import Callable
 import gradio as gr
 
-
 description = """
     # OpenVoice accelerated by OpenVINO:
     

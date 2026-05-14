@@ -6,15 +6,14 @@ import requests
 audio_example_path = Path("example_1.wav")
 
 if not audio_example_path.exists():
-    r = requests.get("https://huggingface.co/spaces/distil-whisper/whisper-vs-distil-whisper/resolve/main/assets/example_1.wav")
+    r = requests.get("https://huggingface.co/spaces/distil-whisper/whisper-vs-distil-whisper/resolve/main/assets/example_1.wav", timeout=30)
     with open(audio_example_path, "wb") as f:
         f.write(r.content)
 
 
 def make_demo(fn: Callable, quantized: bool):
     with gr.Blocks() as demo:
-        gr.HTML(
-            """
+        gr.HTML("""
                     <div style="text-align: center; max-width: 700px; margin: 0 auto;">
                     <div
                         style="
@@ -26,8 +25,7 @@ def make_demo(fn: Callable, quantized: bool):
                         </h1>
                     </div>
                     </div>
-                """
-        )
+                """)
         audio = gr.components.Audio(type="filepath", label="Audio input")
         with gr.Row():
             button = gr.Button("Transcribe")

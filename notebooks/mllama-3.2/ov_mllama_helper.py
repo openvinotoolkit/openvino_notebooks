@@ -46,7 +46,7 @@ def _add_runtime_options_to_rt_info(model: ov.Model, options: dict):
     try:
         for name, value in options.items():
             model.set_rt_info(value, ["runtime_options", name])
-    except Exception:
+    except Exception:  # nosec B110 - optional runtime hints, model works without them
         pass
 
     return model
@@ -1238,14 +1238,14 @@ if __name__ == "__main__":
     ov_model = OVMLlamaForConditionalGeneration(model_id, device="CPU", language_model_name=LANGUAGE_MODEL_NAME, image_encoder_name=IMAGE_ENCODER_NAME)
     processor = AutoProcessor.from_pretrained(model_id)
     url = "https://llava-vl.github.io/static/images/view.jpg"
-    raw_image = Image.open(requests.get(url, stream=True).raw)
+    raw_image = Image.open(requests.get(url, stream=True, timeout=30).raw)
     messages = [
         {"role": "user", "content": [{"type": "image"}, {"type": "text", "text": "Describe image in two sentences"}]},
     ]
     text = processor.apply_chat_template(messages, add_generation_prompt=True)
 
     url = "https://llava-vl.github.io/static/images/view.jpg"
-    raw_image = Image.open(requests.get(url, stream=True).raw)
+    raw_image = Image.open(requests.get(url, stream=True, timeout=30).raw)
 
     inputs = processor(text=text, images=[raw_image], return_tensors="pt")
     streamer = TextStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=True)

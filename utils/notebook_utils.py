@@ -10,8 +10,7 @@ import threading
 import time
 from os import PathLike
 from pathlib import Path
-from typing import NamedTuple, Optional
-
+from typing import List, NamedTuple, Optional
 
 # ## Files
 #
@@ -86,7 +85,7 @@ def load_image(name: str, url: str = None):
     if not Path(name).exists():
         # Set User-Agent to Mozilla because some websites block
         # requests with User-Agent Python
-        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
         array = np.asarray(bytearray(response.content), dtype="uint8")
         image = cv2.imdecode(array, -1)  # Loads the image as BGR
         cv2.imwrite(name, image)
@@ -140,7 +139,7 @@ def download_file(
         Path(directory).mkdir(parents=True, exist_ok=True)
 
     try:
-        response = requests.get(url=url, headers={"User-agent": "Mozilla/5.0"}, stream=True)
+        response = requests.get(url=url, headers={"User-agent": "Mozilla/5.0"}, stream=True, timeout=30)
         response.raise_for_status()
     except (
         requests.exceptions.HTTPError
@@ -496,7 +495,7 @@ def viz_result_image(
     source_image=None,
     source_title: str = None,
     result_title: str = None,
-    labels: list[Label] = None,
+    labels: Optional[List[Label]] = None,
     resize: bool = False,
     bgr_to_rgb: bool = False,
     hide_axes: bool = False,
@@ -751,6 +750,38 @@ def collect_telemetry(file: str = ""):
         }
         if file:
             params["file"] = file
-        requests.get(url, params=params)
-    except Exception:
+        requests.get(url, params=params, timeout=10)
+    except Exception:  # nosec B110 - telemetry is best-effort, must not break notebook
         pass
+
+
+def use_local_ultralytics_datasets(out_dir="datasets"):
+    """
+    Make ultralytics use a local datasets directory next to the notebook
+    instead of the global one stored in `~/.config/Ultralytics/settings.json`.
+
+    Without this, every ultralytics-based notebook shares the same global
+    `DATASETS_DIR`. Datasets downloaded by one notebook then leak into other
+    notebooks, breaking validation pipelines (e.g. detection labels parsed as
+    keypoint labels) and making it unclear to the user where downloaded data
+    lives. This helper isolates each notebook's data into its own local
+    `datasets/` folder, so cleanup is obvious (`rm -rf datasets/`) and there is
+    no cross-contamination.
+
+    The user's global ultralytics settings file is NOT modified - the override
+    is applied in-memory only, for the current Python process.
+
+    :param out_dir: Directory to use as the local datasets root. Relative paths
+        are resolved against the current working directory.
+    :return: Absolute path to the local datasets directory.
+    """
+    out_dir = Path(out_dir).resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    import ultralytics.utils
+    import ultralytics.data.utils
+
+    ultralytics.utils.DATASETS_DIR = out_dir
+    ultralytics.data.utils.DATASETS_DIR = out_dir
+
+    return out_dir

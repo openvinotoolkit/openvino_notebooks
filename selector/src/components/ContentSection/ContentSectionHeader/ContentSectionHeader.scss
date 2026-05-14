@@ -10,19 +10,15 @@
   .title-container {
     display: flex;
     align-items: center;
-    flex-basis: 330px;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 
     .title {
       margin: 0 0.5rem 0 0;
     }
 
-    .counter {
-      color: var(--spark-color-carbon-tint1);
-      margin-right: 1rem;
-    }
-
     .reset-filters-button {
-      margin-right: 1rem;
+      flex-shrink: 0;
     }
   }
 

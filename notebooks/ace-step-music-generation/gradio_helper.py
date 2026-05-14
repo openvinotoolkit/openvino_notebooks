@@ -4,7 +4,6 @@ import copy
 from acestep.ui.components import GENRE_PRESETS, TAG_DEFAULT, update_tags_from_preset, create_output_ui
 import ipywidgets as widgets
 
-
 LYRIC_DEFAULT = """[verse]
 Neon lights they flicker bright
 City hums in dead of night
@@ -44,9 +43,7 @@ def create_text2music_ui(gr, ov_pipeline, sample_data_func=None, lora_path=None)
                     label="Enable Audio2Audio", value=False, info="Enable Audio-to-Audio generation using a reference audio.", elem_id="audio2audio_checkbox"
                 )
 
-            ref_audio_input = gr.Audio(
-                type="filepath", label="Reference Audio (for Audio2Audio task)", visible=False, elem_id="ref_audio_input", show_download_button=True
-            )
+            ref_audio_input = gr.Audio(type="filepath", label="Reference Audio (for Audio2Audio task)", visible=False, elem_id="ref_audio_input")
             ref_audio_strength = gr.Slider(
                 label="Refer audio strength",
                 minimum=0.0,
@@ -291,7 +288,6 @@ def create_text2music_ui(gr, ov_pipeline, sample_data_func=None, lora_path=None)
                     type="filepath",
                     visible=False,
                     elem_id="repaint_source_audio_upload",
-                    show_download_button=True,
                 )
                 repaint_source.change(
                     fn=lambda x: gr.update(visible=x == "upload", elem_id="repaint_source_audio_upload"),
@@ -451,7 +447,6 @@ def create_text2music_ui(gr, ov_pipeline, sample_data_func=None, lora_path=None)
                     type="filepath",
                     visible=False,
                     elem_id="edit_source_audio_upload",
-                    show_download_button=True,
                 )
                 edit_source.change(
                     fn=lambda x: gr.update(visible=x == "upload", elem_id="edit_source_audio_upload"),
@@ -594,7 +589,6 @@ def create_text2music_ui(gr, ov_pipeline, sample_data_func=None, lora_path=None)
                     type="filepath",
                     visible=False,
                     elem_id="extend_source_audio_upload",
-                    show_download_button=True,
                 )
                 extend_source.change(
                     fn=lambda x: gr.update(visible=x == "upload", elem_id="extend_source_audio_upload"),
@@ -779,11 +773,9 @@ def make_demo(pipeline, data_sampler):
     with gr.Blocks(
         title="ACE-Step Model with OpenVINO DEMO",
     ) as demo:
-        gr.Markdown(
-            """
+        gr.Markdown("""
             <h1 style="text-align: center;">Music generation with ACE-Step model and OpenVINO</h1>
-        """
-        )
+        """)
         with gr.Tab("text2music"):
             create_text2music_ui(gr=gr, ov_pipeline=pipeline, sample_data_func=data_sampler.sample)
     return demo

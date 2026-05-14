@@ -15,7 +15,6 @@ from llama_index.core.instrumentation.events.rerank import (
 from llama_index.core.schema import MetadataMode, NodeWithScore, QueryBundle
 from llama_index.core.instrumentation import get_dispatcher
 
-
 dispatcher = get_dispatcher(__name__)
 
 

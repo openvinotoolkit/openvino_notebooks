@@ -4,7 +4,8 @@
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true
   },
-  "include": ["vite.config.ts", "scripts/*"]
+  "include": ["vite.config.ts", "eslint.config.js", "scripts/*"]
 }

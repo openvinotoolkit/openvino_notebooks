@@ -25,7 +25,6 @@ import re
 from tqdm import tqdm
 import numpy as np
 
-
 model_ids = [
     "deepseek-ai/DeepSeek-OCR",
 ]
@@ -146,9 +145,9 @@ def draw_bounding_boxes(image, refs, ouput_path):
                         draw.rectangle([text_x, text_y, text_x + text_width, text_y + text_height], fill=(255, 255, 255, 30))
 
                         draw.text((text_x, text_y), label_type, font=font, fill=color)
-                    except:
+                    except:  # nosec B110 - best-effort drawing, skip malformed elements
                         pass
-        except:
+        except:  # nosec B112 - skip malformed OCR entries, continue to next
             continue
     img_draw.paste(overlay, (0, 0), overlay)
     return img_draw
@@ -1319,7 +1318,7 @@ class OVDeepseekOCRForCausalLM(GenerationMixin):
         image_transform = BasicImageTransform(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5), normalize=True)
         images_seq_mask = []
 
-        image_token = "<image>"
+        image_token = "<image>"  # nosec B105 - model special token, not a password
         image_token_id = 128815
         text_splits = prompt.split(image_token)
 
@@ -1340,7 +1339,7 @@ class OVDeepseekOCRForCausalLM(GenerationMixin):
                 else:
                     if crop_mode:
                         # best_width, best_height = select_best_resolution(image.size, self.candidate_resolutions)
-                        images_crop_raw, crop_ratio = dynamic_preprocess(image)
+                        images_crop_raw, crop_ratio = dynamic_preprocess(image, image_size=image_size)
                     else:
                         # best_width, best_height = self.image_size, self.image_size
                         crop_ratio = [1, 1]
@@ -1555,13 +1554,13 @@ class OVDeepseekOCRForCausalLM(GenerationMixin):
 
                         ax.scatter(p0[0], p0[1], s=5, color="k")
                         ax.scatter(p1[0], p1[1], s=5, color="k")
-                    except:
+                    except:  # nosec B110 - best-effort geometry parsing from model output
                         pass
 
                 for endpoint in endpoints:
 
                     label = endpoint.split(": ")[0]
-                    (x, y) = eval(endpoint.split(": ")[1])
+                    x, y = eval(endpoint.split(": ")[1])
                     ax.annotate(label, (x, y), xytext=(1, 1), textcoords="offset points", fontsize=5, fontweight="light")
 
                 plt.savefig(f"{output_path}/geo.jpg")

@@ -2,7 +2,6 @@ from typing import Callable
 import gradio as gr
 import numpy as np
 
-
 examples = [
     [
         "data_video_sun_5s.mp4",

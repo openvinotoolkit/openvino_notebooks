@@ -22,7 +22,6 @@ from pathlib import Path
 from typing import Optional, TypedDict
 from validation_config import ValidationConfig, validation_config_arg, SkippedNotebook
 
-
 ROOT = Path(__file__).parents[1]
 
 NOTEBOOKS_DIR = Path("notebooks")
@@ -33,7 +32,7 @@ SEPARATED_VENV_NAME = Path("openvino_venv")
 
 
 def detect_source_venv_path() -> Path:
-    """
+    r"""
     Detect the source virtual environment path based on the current Python executable.
 
     On Unix, python is in bin/ subdirectory:  .../env_root/bin/python  -> .parent.parent
@@ -182,6 +181,8 @@ def prepare_test_plan(
     notebooks_dir = nb_dir or orig_nb_dir
     notebooks: list[Path] = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
 
+    print(f"All notebooks: {notebooks}")
+
     test_plan: TestPlan = {notebook.relative_to(notebooks_dir): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
 
     skip_config_file_path = Path(__file__).parents[0] / ignore_config
@@ -270,7 +271,7 @@ def clean_test_artifacts(before_test_files: list[Path], after_test_files: list[P
         if file_path.is_file():
             try:
                 file_path.unlink()
-            except Exception:
+            except Exception:  # nosec B110 - best-effort cleanup of test artifacts
                 pass
         else:
             shutil.rmtree(file_path, ignore_errors=True)
@@ -326,7 +327,7 @@ def get_dir_size(path: Path) -> int:
         for entry in path.rglob("*"):
             if entry.is_file():
                 total += entry.stat().st_size
-    except Exception:
+    except Exception:  # nosec B110 - non-critical disk size estimation
         pass
     return total
 
@@ -564,7 +565,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
         popen_kwargs["start_new_session"] = True
 
     try:
-        process = subprocess.Popen(cmd, **popen_kwargs)
+        process = subprocess.Popen(cmd, **popen_kwargs)  # nosec B603 - cmd built internally from trusted args
 
         # Start output reading thread
         output_queue = queue.Queue()
@@ -689,7 +690,7 @@ def run_test(
                 retcode, duration = run_subprocess_with_timeout(
                     main_command,
                     timeout,
-                    shell=(platform.system() == "Windows"),
+                    shell=(platform.system() == "Windows"),  # nosec B604 - shell only on Windows, cmd from internal args
                     description=f"Notebook test [{patched_notebook.name}]",
                 )
 
@@ -896,7 +897,7 @@ def main():
                     retcode, duration = run_subprocess_with_timeout(
                         cmd,
                         timeout=15,
-                        shell=(platform.system() == "Windows"),
+                        shell=(platform.system() == "Windows"),  # nosec B604 - shell only on Windows, cmd from internal args
                         description=f"Upload notebook report to DB [{patched_notebook}]",
                     )
                     if retcode != 0:

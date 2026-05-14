@@ -11,13 +11,15 @@ def clone_repo(repo_url: str, revision: str = None, add_to_sys_path: bool = True
 
     if not repo_path.exists():
         try:
-            subprocess.run(["git", "clone", repo_url], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            subprocess.run(
+                ["git", "clone", repo_url], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+            )  # nosec B603 B607 - hardcoded git command
         except Exception as exc:
             print(f"Failed to clone the repository: {exc.stderr}")
             raise
 
         if revision:
-            subprocess.run(["git", "checkout", revision], cwd=str(repo_path), check=True)
+            subprocess.run(["git", "checkout", revision], cwd=str(repo_path), check=True)  # nosec B603 B607 - hardcoded git command
     if add_to_sys_path and str(repo_path.resolve()) not in sys.path:
         sys.path.insert(0, str(repo_path.resolve()))
 

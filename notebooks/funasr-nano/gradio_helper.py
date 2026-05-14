@@ -4,7 +4,6 @@ import sys
 import os
 import io
 import tempfile
-import subprocess
 import requests
 from urllib.parse import urlparse
 from pydub import AudioSegment

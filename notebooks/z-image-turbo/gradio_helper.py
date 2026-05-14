@@ -4,7 +4,6 @@ from diffusers import AutoencoderKL, FlowMatchEulerDiscreteScheduler
 import gradio as gr
 import torch
 
-
 RES_CHOICES = {
     "1024": [
         "1024x1024 ( 1:1 )",
@@ -148,9 +147,9 @@ def make_demo(ov_pipe):
         """
 
         if random_seed:
-            new_seed = random.randint(1, 1000000)
+            new_seed = random.randint(1, 1000000)  # nosec B311 - UI seed for image generation, not security
         else:
-            new_seed = seed if seed != -1 else random.randint(1, 1000000)
+            new_seed = seed if seed != -1 else random.randint(1, 1000000)  # nosec B311 - UI seed, not security
         try:
             resolution_str = resolution.split(" ")[0]
         except:
