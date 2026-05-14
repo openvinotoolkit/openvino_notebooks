@@ -39,7 +39,7 @@ def write_github_output(batches: list[list[str]]) -> None:
     if not output_file:
         # When running locally, just print to stdout
         for i, batch in enumerate(batches):
-            print(f"--- batch_{i} ({len(batch)} notebooks) ---")
+            print(f"--- batch_{i} ({len(batch)} notebooks) ---\n")
             print("\n".join(batch))
         return
 
