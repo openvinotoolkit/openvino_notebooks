@@ -35,8 +35,8 @@ on:
 permissions:
   contents: read
 
-env:
-  PIP_CACHE_PATH: "C:\\mount\\caches\\pip\\win"
+# env:
+#   PIP_CACHE_PATH: "C:\\mount\\caches\\pip\\win"
 
 jobs:
   build_treon:
@@ -132,8 +132,8 @@ jobs:
         uses: openvinotoolkit/openvino/.github/actions/setup_python@e4b65a0ab6c946c72d56240223620837e6d34bf8
         with:
           version: ${{ inputs.python }}
-          pip-cache-path: ${{ env.PIP_CACHE_PATH }}
-          should-setup-pip-paths: 'true'
+          # pip-cache-path: ${{ env.PIP_CACHE_PATH }}
+          # should-setup-pip-paths: 'true'
           self-hosted-runner: 'true'
 
       # - name: Configure Developer Command Prompt for Microsoft Visual C++

@@ -46,7 +46,8 @@ jobs:
 
       - name: Collect and split notebooks into batches
         id: split
-        run: python3 .ci/split_notebooks.py --num_batches 4 --seed "${{ github.run_id }}"
+        run: python3 .ci/split_notebooks.py --num_batches 4 --seed 12345
+        # run: python3 .ci/split_notebooks.py --num_batches 4 --seed "${{ github.run_id }}"
 
   build_treon_linux:
     needs: collect_notebooks
