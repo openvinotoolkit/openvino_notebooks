@@ -102,6 +102,11 @@ SUPPORTED_VLM_MODELS = {
             "experimental": True,
             "exclude_on_devices": ["NPU"],
         },
+        "Qwen3-VL-30B-A3B-Instruct": {
+            "model_id": "Qwen/Qwen3-VL-30B-A3B-Instruct",
+            "supports_video": True,
+            "exclude_on_devices": ["NPU"],
+        },
         "Qwen3-VL-2B-Thinking": {
             "model_id": "Qwen/Qwen3-VL-2B-Thinking",
             "supports_video": True,
@@ -217,6 +222,11 @@ SUPPORTED_VLM_MODELS = {
             "experimental": True,
             "exclude_on_devices": ["NPU"],
         },
+        "Qwen3-VL-30B-A3B-Instruct": {
+            "model_id": "Qwen/Qwen3-VL-30B-A3B-Instruct",
+            "supports_video": True,
+            "exclude_on_devices": ["NPU"],
+        },
         "Qwen3-VL-2B-Thinking": {
             "model_id": "Qwen/Qwen3-VL-2B-Thinking",
             "supports_video": True,
@@ -268,6 +278,11 @@ SUPPORTED_VLM_MODELS = {
             "model_id": "Qwen/Qwen3-VL-32B-Instruct",
             "supports_video": True,
             "experimental": True,
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3-VL-30B-A3B-Instruct": {
+            "model_id": "Qwen/Qwen3-VL-30B-A3B-Instruct",
+            "supports_video": True,
             "exclude_on_devices": ["NPU"],
         },
         "Qwen3-VL-2B-Thinking": {
