@@ -168,6 +168,7 @@ jobs:
       
       - name: Check Pillow
         run: |
+          python3 -m pip install pillow==12.2.0
           python3 -m pip list
           python3 -c "from PIL import Image; print('Pillow import successful:', Image.__module__)"
       
