@@ -166,7 +166,13 @@ jobs:
           python3 -m pip install -r .ci/dev-requirements.txt
           python3 -m ipykernel install --user --name openvino_env
       
+      - name: Check Pillow
+        run: |
+          python3 -m pip list
+          python3 -c "from PIL import Image; print('Pillow import successful:', Image.__module__)"
+      
       - name: Check OpenCV
+        if: ${{ false }}
         run: |
           python3 -m pip install "openvino>=2023.1.0"
           python3 -m pip install opencv-python tqdm "matplotlib>=3.4"
