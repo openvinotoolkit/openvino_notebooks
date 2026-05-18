@@ -39,14 +39,14 @@ def get_all_ast_nodes(ast_nodes):
 
 
 def get_all_references_from_md(md_path):
-    parse_markdown = mistune.create_markdown(renderer=mistune.AstRenderer())
+    parse_markdown = mistune.create_markdown(renderer="ast")
     ast = parse_markdown(md_path.read_text(encoding="UTF-8"))
 
     for node in get_all_ast_nodes(ast):
         if node["type"] == "image":
-            yield node["src"]
+            yield node["attrs"]["url"]
         elif node["type"] == "link":
-            yield node["link"]
+            yield node["attrs"]["url"]
 
 
 def validate_colab_url(url: str) -> bool:
