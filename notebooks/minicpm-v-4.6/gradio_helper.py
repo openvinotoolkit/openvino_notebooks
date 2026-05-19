@@ -1,91 +1,73 @@
+import threading
 from pathlib import Path
 
 import gradio as gr
 from PIL import Image
-import numpy as np
-import requests
-from threading import Event, Thread
-import inspect
-
-example_image_urls = [
-    (
-        "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/1d6a0188-5613-418d-a1fd-4560aae1d907",
-        "bee.jpg",
-    ),
-    (
-        "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/6cc7feeb-0721-4b5d-8791-2576ed9d2863",
-        "baklava.png",
-    ),
-]
-for url, file_name in example_image_urls:
-    if not Path(file_name).exists():
-        Image.open(requests.get(url, stream=True, timeout=30).raw).save(file_name)
 
 
 def make_demo(ov_model, processor):
-    from transformers import TextIteratorStreamer
-
-    has_additonal_buttons = "undo_button" in inspect.signature(gr.ChatInterface.__init__).parameters
-
-    tokenizer = processor.tokenizer
-
     def bot_streaming(message, history):
-        files = message["files"] if isinstance(message, dict) else message.files
-        message_text = message["text"] if isinstance(message, dict) else message.text
-
+        # Extract image from the message
         image = None
-        if files:
-            if isinstance(files[-1], dict):
-                image = files[-1]["path"]
-            else:
-                if isinstance(files[-1], (str, Path)):
-                    image = files[-1]
-                else:
-                    image = files[-1] if isinstance(files[-1], (list, tuple)) else files[-1].path
-            image = Image.open(image).convert("RGB")
+        if message.get("files"):
+            image = Image.open(message["files"][-1]).convert("RGB")
 
-        inputs = ov_model.preprocess_inputs(
-            text=message_text,
-            image=image,
-            processor=processor,
-            downsample_mode="16x",
+        text = message.get("text", "")
+        if not text:
+            yield "Please provide a text message."
+            return
+
+        # Build messages in the same format as the model card
+        content = []
+        if image is not None:
+            content.append({"type": "image", "image": image})
+        content.append({"type": "text", "text": text})
+        messages = [{"role": "user", "content": content}]
+
+        downsample_mode = "16x"
+
+        # Use processor.apply_chat_template directly (aligned with model card)
+        inputs = processor.apply_chat_template(
+            messages,
+            tokenize=True,
+            add_generation_prompt=True,
+            return_dict=True,
+            return_tensors="pt",
+            downsample_mode=downsample_mode,
             max_slice_nums=36,
         )
 
-        streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
-        stream_complete = Event()
+        from transformers import TextIteratorStreamer
+
+        streamer = TextIteratorStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=True)
+
+        generation_complete = threading.Event()
 
         def generate_and_signal_complete():
             generate_kwargs = dict(
                 **inputs,
-                downsample_mode="16x",
+                downsample_mode=downsample_mode,
                 max_new_tokens=512,
                 do_sample=False,
                 streamer=streamer,
             )
             ov_model.generate(**generate_kwargs)
-            stream_complete.set()
+            generation_complete.set()
 
-        t1 = Thread(target=generate_and_signal_complete)
-        t1.start()
+        t = threading.Thread(target=generate_and_signal_complete)
+        t.start()
 
         buffer = ""
         for new_text in streamer:
             buffer += new_text
             yield buffer
 
-    additional_buttons = {}
-    if has_additonal_buttons:
-        additional_buttons = {"undo_button": None, "retry_button": None}
     demo = gr.ChatInterface(
         fn=bot_streaming,
-        title="MiniCPM-V 4.6 OpenVINO Chatbot",
-        examples=[
-            {"text": "What is on the flower?", "files": ["./bee.jpg"]},
-            {"text": "How to make this pastry?", "files": ["./baklava.png"]},
-        ],
-        stop_btn=None,
+        title="MiniCPM-V 4.6 with OpenVINO",
+        description="Upload an image and ask questions about it.",
         multimodal=True,
-        **additional_buttons,
+        textbox=gr.MultimodalTextbox(placeholder="Type a message or upload an image...", scale=7),
     )
+
     return demo
