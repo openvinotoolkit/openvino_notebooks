@@ -509,11 +509,6 @@
   skips:
     - os:
         - windows-2022
-# 10.5 min on Win (est) — too slow for 6h CI limit (2026-03-30)
-- notebook: notebooks/whisper-asr-genai/whisper-asr-genai.ipynb
-  skips:
-    - os:
-        - windows-2022
 # 10.0 min on Win (est) — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/flex.2-image-generation/flex.2-image-generation.ipynb
   skips:
