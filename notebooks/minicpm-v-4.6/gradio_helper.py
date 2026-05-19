@@ -48,6 +48,8 @@ def make_demo(ov_model, processor):
             text=message_text,
             image=image,
             processor=processor,
+            downsample_mode="16x",
+            max_slice_nums=36,
         )
 
         streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
@@ -56,6 +58,7 @@ def make_demo(ov_model, processor):
         def generate_and_signal_complete():
             generate_kwargs = dict(
                 **inputs,
+                downsample_mode="16x",
                 max_new_tokens=512,
                 do_sample=False,
                 streamer=streamer,
