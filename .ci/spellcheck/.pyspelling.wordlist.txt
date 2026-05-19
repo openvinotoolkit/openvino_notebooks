@@ -336,6 +336,7 @@ feedforward
 FeedForward
 FEIL
 FFmpeg
+ffmpeg
 FFN
 FIL
 finetuned
@@ -920,6 +921,7 @@ PTQ
 px
 py
 pyannote
+PyAV
 pyecharts
 pymodule
 pynim
@@ -1096,6 +1098,7 @@ src
 SRT
 SSD
 SSDLite
+SSM
 sst
 stabilityai
 StableCascade
