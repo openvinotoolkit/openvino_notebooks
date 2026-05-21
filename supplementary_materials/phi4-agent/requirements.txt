@@ -3,7 +3,7 @@ python-pptx
 accelerate
 gradio
 duckduckgo-mcp-server
-transformers>=4.49.0
+transformers>=5.0.0
 git+https://github.com/jkawamoto/mcp-youtube-transcript
 optimum[openvino,nncf]
 faiss-cpu
