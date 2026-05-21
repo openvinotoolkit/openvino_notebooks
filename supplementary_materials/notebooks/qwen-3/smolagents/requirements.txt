@@ -10,7 +10,7 @@ uvicorn
 openai
 
 # smolagents demo requirements
-smolagents[openai,mcp,gradio]
+smolagents[openai,mcp,gradio]>=1.25.0
 ddgs
 markdownify
 requests
