@@ -102,6 +102,11 @@ SUPPORTED_VLM_MODELS = {
             "experimental": True,
             "exclude_on_devices": ["NPU"],
         },
+        "Qwen3-VL-30B-A3B-Instruct": {
+            "model_id": "Qwen/Qwen3-VL-30B-A3B-Instruct",
+            "supports_video": True,
+            "exclude_on_devices": ["NPU"],
+        },
         "Qwen3-VL-2B-Thinking": {
             "model_id": "Qwen/Qwen3-VL-2B-Thinking",
             "supports_video": True,
@@ -120,6 +125,38 @@ SUPPORTED_VLM_MODELS = {
             "model_id": "Qwen/Qwen3-VL-8B-Thinking",
             "supports_video": True,
             "supports_thinking": True,
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-0.8B": {
+            "model_id": "Qwen/Qwen3.5-0.8B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-2B": {
+            "model_id": "Qwen/Qwen3.5-2B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-4B": {
+            "model_id": "Qwen/Qwen3.5-4B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-9B": {
+            "model_id": "Qwen/Qwen3.5-9B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-27B": {
+            "model_id": "Qwen/Qwen3.5-27B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.6-27B": {
+            "model_id": "Qwen/Qwen3.6-27B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-35B-A3B": {
+            "model_id": "Qwen/Qwen3.5-35B-A3B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.6-35B-A3B": {
+            "model_id": "Qwen/Qwen3.6-35B-A3B",
             "exclude_on_devices": ["NPU"],
         },
         "Qwen2.5-VL-3B-Instruct": {
@@ -217,6 +254,11 @@ SUPPORTED_VLM_MODELS = {
             "experimental": True,
             "exclude_on_devices": ["NPU"],
         },
+        "Qwen3-VL-30B-A3B-Instruct": {
+            "model_id": "Qwen/Qwen3-VL-30B-A3B-Instruct",
+            "supports_video": True,
+            "exclude_on_devices": ["NPU"],
+        },
         "Qwen3-VL-2B-Thinking": {
             "model_id": "Qwen/Qwen3-VL-2B-Thinking",
             "supports_video": True,
@@ -235,6 +277,38 @@ SUPPORTED_VLM_MODELS = {
             "model_id": "Qwen/Qwen3-VL-8B-Thinking",
             "supports_video": True,
             "supports_thinking": True,
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-0.8B": {
+            "model_id": "Qwen/Qwen3.5-0.8B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-2B": {
+            "model_id": "Qwen/Qwen3.5-2B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-4B": {
+            "model_id": "Qwen/Qwen3.5-4B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-9B": {
+            "model_id": "Qwen/Qwen3.5-9B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-27B": {
+            "model_id": "Qwen/Qwen3.5-27B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.6-27B": {
+            "model_id": "Qwen/Qwen3.6-27B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-35B-A3B": {
+            "model_id": "Qwen/Qwen3.5-35B-A3B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.6-35B-A3B": {
+            "model_id": "Qwen/Qwen3.6-35B-A3B",
             "exclude_on_devices": ["NPU"],
         },
         "Qwen2.5-VL-3B-Instruct": {
@@ -270,6 +344,11 @@ SUPPORTED_VLM_MODELS = {
             "experimental": True,
             "exclude_on_devices": ["NPU"],
         },
+        "Qwen3-VL-30B-A3B-Instruct": {
+            "model_id": "Qwen/Qwen3-VL-30B-A3B-Instruct",
+            "supports_video": True,
+            "exclude_on_devices": ["NPU"],
+        },
         "Qwen3-VL-2B-Thinking": {
             "model_id": "Qwen/Qwen3-VL-2B-Thinking",
             "supports_video": True,
@@ -288,6 +367,38 @@ SUPPORTED_VLM_MODELS = {
             "model_id": "Qwen/Qwen3-VL-8B-Thinking",
             "supports_video": True,
             "supports_thinking": True,
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-0.8B": {
+            "model_id": "Qwen/Qwen3.5-0.8B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-2B": {
+            "model_id": "Qwen/Qwen3.5-2B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-4B": {
+            "model_id": "Qwen/Qwen3.5-4B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-9B": {
+            "model_id": "Qwen/Qwen3.5-9B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-27B": {
+            "model_id": "Qwen/Qwen3.5-27B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.6-27B": {
+            "model_id": "Qwen/Qwen3.6-27B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.5-35B-A3B": {
+            "model_id": "Qwen/Qwen3.5-35B-A3B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.6-35B-A3B": {
+            "model_id": "Qwen/Qwen3.6-35B-A3B",
             "exclude_on_devices": ["NPU"],
         },
         "Qwen2.5-VL-3B-Instruct": {
@@ -368,7 +479,6 @@ SUPPORTED_LLM_MODELS = {
             "start_message": "You are a helpful assistant trained by Liquid AI.",
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": lfm2_completion_to_prompt,
-            "genai_supported": False,
         },
         "lfm2-700m": {
             "model_id": "LiquidAI/LFM2-700M",
@@ -376,7 +486,6 @@ SUPPORTED_LLM_MODELS = {
             "start_message": "You are a helpful assistant trained by Liquid AI.",
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": lfm2_completion_to_prompt,
-            "genai_supported": False,
         },
         "lfm2-1.2b": {
             "model_id": "LiquidAI/LFM2-1.2B",
@@ -384,7 +493,6 @@ SUPPORTED_LLM_MODELS = {
             "start_message": "You are a helpful assistant trained by Liquid AI.",
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": lfm2_completion_to_prompt,
-            "genai_supported": False,
         },
         "lfm2-2.6b": {
             "model_id": "LiquidAI/LFM2-2.6B",
@@ -392,7 +500,20 @@ SUPPORTED_LLM_MODELS = {
             "start_message": "You are a helpful assistant trained by Liquid AI.",
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": lfm2_completion_to_prompt,
-            "genai_supported": False,
+        },
+        "lfm2-24b-a2b": {
+            "model_id": "LiquidAI/LFM2-24B-A2B",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
+        },
+        "lfm2.5-350m": {
+            "model_id": "LiquidAI/LFM2.5-350M",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
         },
         "GLM-4-9B-0414": {
             "model_id": "THUDM/GLM-4-9B-0414",
@@ -787,7 +908,6 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": lfm2_completion_to_prompt,
-            "genai_supported": False,
         },
         "lfm2-2.6b": {
             "model_id": "LiquidAI/LFM2-2.6B",
@@ -795,7 +915,13 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": lfm2_completion_to_prompt,
-            "genai_supported": False,
+        },
+        "lfm2-24b-a2b": {
+            "model_id": "LiquidAI/LFM2-24B-A2B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
         },
         "Qwen3-4B": {
             "model_id": "Qwen/Qwen3-4B",
@@ -1000,7 +1126,6 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT_JAPANESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": lfm2_completion_to_prompt,
-            "genai_supported": False,
         },
         "lfm2-2.6b": {
             "model_id": "LiquidAI/LFM2-2.6B",
@@ -1008,7 +1133,13 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT_JAPANESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": lfm2_completion_to_prompt,
-            "genai_supported": False,
+        },
+        "lfm2-24b-a2b": {
+            "model_id": "LiquidAI/LFM2-24B-A2B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_JAPANESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+            "completion_to_prompt": lfm2_completion_to_prompt,
         },
         "youri-7b-chat": {
             "model_id": "rinna/youri-7b-chat",
