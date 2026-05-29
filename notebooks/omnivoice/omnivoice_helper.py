@@ -294,133 +294,56 @@ def _convert_audio_tokenizer(
         print("✅ Audio decoder saved")
 
 
-def _convert_whisper(
-    asr_model_id: str, output_dir: Path, pt_cache_root: Path
-):
-    """Export Whisper to OpenVINO IR (encoder + decoder, both stateless).
+def _convert_whisper(asr_model_id: str, output_dir: Path):
+    """Fetch a pre-converted OpenVINO Whisper model.
 
-    We bypass ``optimum-intel`` (which currently does not work with
-    transformers>=5 due to removed ``transformers.onnx``) and trace the two
-    sub-graphs ourselves with ``ov.convert_model``. Greedy decoding lives in
-    Python at inference time, in :class:`_OVWhisperASR`.
+    We use Intel's pre-converted INT8 Whisper IR (e.g.
+    ``OpenVINO/whisper-large-v3-turbo-int8-ov``) instead of converting from
+    PyTorch. This avoids the transformers>=5 ``create_causal_mask`` /
+    ``sdpa_mask`` tracing bug and gives us a stateful decoder + bundled
+    OpenVINO tokenizer/detokenizer that ``openvino_genai.WhisperPipeline``
+    consumes natively.
 
-    Output layout::
+    Mapping:
+        ``openai/whisper-large-v3-turbo`` -> ``OpenVINO/whisper-large-v3-turbo-int8-ov``
+        ``openai/whisper-medium``         -> ``OpenVINO/whisper-medium-fp16-ov``
+        ...
 
-        output_dir/whisper/
-            openvino_encoder_model.{xml,bin}
-            openvino_decoder_model.{xml,bin}
-            (processor / config / tokenizer files via processor.save_pretrained)
+    Pass ``asr_model_id`` already in the ``OpenVINO/...`` form to use it
+    verbatim.
     """
-    import torch
-    from huggingface_hub import snapshot_download
-    from transformers import AutoProcessor, WhisperForConditionalGeneration
-    from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
-
     target = output_dir / WHISPER_DIR
     if (target / "openvino_encoder_model.xml").exists():
         print("✓ Whisper already converted")
         return
 
+    from huggingface_hub import snapshot_download
+
+    # If the user passed an openai/* id, swap in the equivalent INT8 OV repo.
+    ov_repo_id = _resolve_ov_whisper_id(asr_model_id)
+
     target.mkdir(parents=True, exist_ok=True)
-    print(f"⌛ Convert Whisper ASR ({asr_model_id})")
+    print(f"⌛ Downloading pre-converted OpenVINO Whisper: {ov_repo_id}")
+    snapshot_download(ov_repo_id, local_dir=str(target))
+    print("✅ OV Whisper saved to", target)
 
-    pt_cache = pt_cache_root / asr_model_id.split("/")[-1]
-    if not pt_cache.exists():
-        print(f"  ⌛ Downloading {asr_model_id} -> {pt_cache}")
-        pt_cache.parent.mkdir(parents=True, exist_ok=True)
-        snapshot_download(asr_model_id, local_dir=str(pt_cache))
 
-    pt_model = WhisperForConditionalGeneration.from_pretrained(
-        str(pt_cache), torch_dtype=torch.float32
-    )
-    pt_model.eval()
-    pt_model.config._attn_implementation = "eager"
-    if hasattr(pt_model.model, "encoder"):
-        pt_model.model.encoder.config._attn_implementation = "eager"
-    if hasattr(pt_model.model, "decoder"):
-        pt_model.model.decoder.config._attn_implementation = "eager"
+_OPENAI_TO_OV_WHISPER = {
+    "openai/whisper-large-v3-turbo": "OpenVINO/whisper-large-v3-turbo-int8-ov",
+    "openai/whisper-large-v3": "OpenVINO/whisper-large-v3-int8-ov",
+    "openai/whisper-medium": "OpenVINO/whisper-medium-fp16-ov",
+    "openai/whisper-small": "OpenVINO/whisper-small-fp16-ov",
+    "openai/whisper-base": "OpenVINO/whisper-base-fp16-ov",
+    "openai/whisper-tiny": "OpenVINO/whisper-tiny-fp16-ov",
+}
 
-    cfg = pt_model.config
-    n_mel = cfg.num_mel_bins
-    max_src = cfg.max_source_positions * 2  # mel frames
 
-    # Save processor + config so the runtime can rebuild the tokenizer.
-    AutoProcessor.from_pretrained(str(pt_cache)).save_pretrained(target)
-    pt_model.config.save_pretrained(target)
-    if pt_model.generation_config is not None:
-        pt_model.generation_config.save_pretrained(target)
-
-    # --- Encoder export ---
-    print("  ⌛ Encoder ...")
-
-    class _EncoderWrap(torch.nn.Module):
-        def __init__(self, m):
-            super().__init__()
-            self.m = m
-
-        def forward(self, input_features):
-            return self.m.model.encoder(input_features).last_hidden_state
-
-    enc_wrap = _EncoderWrap(pt_model)
-    enc_wrap.eval()
-    __make_16bit_traceable(enc_wrap)
-    example_mel = torch.zeros((1, n_mel, max_src), dtype=torch.float32)
-    with torch.no_grad():
-        ov_enc = ov.convert_model(
-            enc_wrap,
-            example_input=(example_mel,),
-            input=[ov.PartialShape([-1, n_mel, max_src])],
-        )
-    ov_enc.inputs[0].get_node().set_friendly_name("input_features")
-    ov.save_model(
-        ov_enc, str(target / "openvino_encoder_model.xml"), compress_to_fp16=True
-    )
-    del ov_enc, enc_wrap
-    gc.collect()
-
-    # --- Decoder export (no KV-cache; recompute every step. Whisper-turbo has
-    # only 4 decoder layers so this is fast enough for short ref-audio
-    # transcription.) ---
-    print("  ⌛ Decoder ...")
-    hidden = cfg.d_model
-
-    class _DecoderWrap(torch.nn.Module):
-        def __init__(self, m):
-            super().__init__()
-            self.m = m
-
-        def forward(self, decoder_input_ids, encoder_hidden_states):
-            outputs = self.m.model.decoder(
-                input_ids=decoder_input_ids,
-                encoder_hidden_states=encoder_hidden_states,
-                use_cache=False,
-                return_dict=True,
-            )
-            logits = self.m.proj_out(outputs.last_hidden_state)
-            return logits
-
-    dec_wrap = _DecoderWrap(pt_model)
-    dec_wrap.eval()
-    __make_16bit_traceable(dec_wrap)
-    example_dec_ids = torch.zeros((1, 4), dtype=torch.long)
-    example_enc_h = torch.zeros((1, cfg.max_source_positions, hidden), dtype=torch.float32)
-    with torch.no_grad():
-        ov_dec = ov.convert_model(
-            dec_wrap,
-            example_input=(example_dec_ids, example_enc_h),
-            input=[
-                ov.PartialShape([-1, -1]),
-                ov.PartialShape([-1, cfg.max_source_positions, hidden]),
-            ],
-        )
-    ov_dec.inputs[0].get_node().set_friendly_name("decoder_input_ids")
-    ov_dec.inputs[1].get_node().set_friendly_name("encoder_hidden_states")
-    ov.save_model(
-        ov_dec, str(target / "openvino_decoder_model.xml"), compress_to_fp16=True
-    )
-    del ov_dec, dec_wrap, pt_model
-    gc.collect()
-    print("✅ Whisper saved to", target)
+def _resolve_ov_whisper_id(asr_model_id: str) -> str:
+    """Map openai/* repo ids to OpenVINO/* equivalents. Pass-through for
+    ids that are already OpenVINO/* or local paths."""
+    if asr_model_id.startswith("OpenVINO/") or os.path.isdir(asr_model_id):
+        return asr_model_id
+    return _OPENAI_TO_OV_WHISPER.get(asr_model_id, asr_model_id)
 
 
 def convert_omnivoice(
@@ -429,7 +352,7 @@ def convert_omnivoice(
     pt_cache_dir: Union[str, Path, None] = None,
     llm_quantization_config: Optional[dict] = None,
     convert_whisper: bool = True,
-    asr_model_id: str = "openai/whisper-large-v3-turbo",
+    asr_model_id: str = "OpenVINO/whisper-large-v3-turbo-int8-ov",
     local_model_dir: Optional[Union[str, Path]] = None,
 ):
     """Convert OmniVoice (LLM + audio tokenizer + Whisper) to OpenVINO IR.
@@ -501,7 +424,7 @@ def convert_omnivoice(
         print("✓ LLM and audio tokenizer already converted")
 
     if needs_whisper:
-        _convert_whisper(asr_model_id, output_dir, pt_cache_dir.parent)
+        _convert_whisper(asr_model_id, output_dir)
     elif convert_whisper:
         print("✓ Whisper already converted")
 
@@ -628,83 +551,23 @@ class _OVAudioTokenizer:
 
 
 class _OVWhisperASR:
-    """OpenVINO Whisper inference: callable like a HuggingFace
-    ``pipeline("automatic-speech-recognition", ...)`` so it can drop into
-    ``OmniVoice.transcribe`` unchanged.
+    """OpenVINO Whisper inference, wrapping ``openvino_genai.WhisperPipeline``.
 
-    Greedy decoding only (good enough for short reference-audio transcripts).
+    Callable like a HuggingFace ``pipeline("automatic-speech-recognition", ...)``
+    so it drops into ``OmniVoice.transcribe`` unchanged. Returns a dict with a
+    ``"text"`` key.
     """
 
+    _WHISPER_SR = 16000
+
     def __init__(self, whisper_dir: Path, device: str = "CPU"):
-        from transformers import AutoProcessor, GenerationConfig
+        import openvino_genai
 
-        whisper_dir = Path(whisper_dir)
-        core = ov.Core()
-        self._enc = core.compile_model(
-            whisper_dir / "openvino_encoder_model.xml", device
-        ).create_infer_request()
-        self._dec = core.compile_model(
-            whisper_dir / "openvino_decoder_model.xml", device
-        ).create_infer_request()
-        self._processor = AutoProcessor.from_pretrained(str(whisper_dir))
-        try:
-            self._gen_cfg = GenerationConfig.from_pretrained(str(whisper_dir))
-        except Exception:
-            self._gen_cfg = None
-
-    def _decode_ids(self, mel: np.ndarray, max_new_tokens: int = 220) -> str:
-        # Encode mel -> hidden states.
-        enc_out = self._enc.infer({"input_features": mel.astype(np.float32)})
-        hidden = next(iter(enc_out.values()))
-
-        # Build initial decoder prompt from generation_config.
-        cfg = self._gen_cfg
-        if cfg is not None and getattr(cfg, "decoder_start_token_id", None) is not None:
-            ids = [cfg.decoder_start_token_id]
-        else:
-            ids = [self._processor.tokenizer.convert_tokens_to_ids("<|startoftranscript|>")]
-        # Add language/task tokens if available.
-        for attr in ("lang_to_id", "task_to_id"):
-            d = getattr(cfg, attr, None) if cfg is not None else None
-            if isinstance(d, dict) and len(d) == 1:
-                ids.append(next(iter(d.values())))
-        # If no language token was added, force <|en|>+<|transcribe|>+<|notimestamps|>
-        # as a sensible default.
-        tok = self._processor.tokenizer
-        if len(ids) == 1:
-            for special in ("<|en|>", "<|transcribe|>", "<|notimestamps|>"):
-                t = tok.convert_tokens_to_ids(special)
-                if t is not None and t != tok.unk_token_id:
-                    ids.append(t)
-
-        eos_id = (cfg.eos_token_id if cfg is not None else None) or tok.eos_token_id
-
-        # Greedy step-by-step decode (no KV cache; small turbo model).
-        for _ in range(max_new_tokens):
-            dec_inp = np.asarray([ids], dtype=np.int64)
-            out = self._dec.infer(
-                {
-                    "decoder_input_ids": dec_inp,
-                    "encoder_hidden_states": hidden,
-                }
-            )
-            logits = next(iter(out.values()))  # [1, S, V]
-            next_id = int(np.argmax(logits[0, -1]))
-            if next_id == eos_id:
-                break
-            ids.append(next_id)
-
-        # Decode skipping special tokens.
-        text = tok.decode(ids, skip_special_tokens=True).strip()
-        return text
+        self._pipe = openvino_genai.WhisperPipeline(str(Path(whisper_dir)), device)
 
     def __call__(self, audio):
-        """HF-pipeline-compatible call.
-
-        Accepts:
-        - a path string
-        - a dict ``{"array": np.ndarray, "sampling_rate": int}``
-        Returns ``{"text": str}``.
+        """Accepts a file path or ``{"array": np.ndarray, "sampling_rate": int}``.
+        Resamples to 16kHz and returns ``{"text": <str>}``.
         """
         if isinstance(audio, str):
             import soundfile as sf
@@ -716,24 +579,22 @@ class _OVWhisperASR:
             wav = np.asarray(audio["array"], dtype=np.float32).reshape(-1)
             sr = int(audio["sampling_rate"])
 
-        # Whisper expects 16kHz; resample if needed.
-        if sr != self._processor.feature_extractor.sampling_rate:
+        if sr != self._WHISPER_SR:
             import torch
             import torchaudio.functional as taF
 
             wav = taF.resample(
-                torch.from_numpy(wav),
+                torch.from_numpy(wav.astype(np.float32)),
                 orig_freq=sr,
-                new_freq=self._processor.feature_extractor.sampling_rate,
+                new_freq=self._WHISPER_SR,
             ).numpy()
 
-        feats = self._processor(
-            wav,
-            sampling_rate=self._processor.feature_extractor.sampling_rate,
-            return_tensors="np",
-        ).input_features
-        text = self._decode_ids(feats)
-        return {"text": text}
+        result = self._pipe.generate(wav.astype(np.float32))
+        # WhisperPipeline returns a DecodedResults object; .texts is a list.
+        texts = getattr(result, "texts", None)
+        if texts:
+            return {"text": str(texts[0])}
+        return {"text": str(result)}
 
 
 class _OmniVoiceStandIn(SimpleNamespace):

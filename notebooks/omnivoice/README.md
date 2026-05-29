@@ -5,10 +5,12 @@ text-to-speech model from the next-generation Kaldi team at Xiaomi AI Lab. It
 supports **600+ languages**, voice cloning from a short reference clip, and
 voice design via natural-language attribute prompts.
 
-In this tutorial we convert OmniVoice — including its 0.6B Qwen3 backbone, the
-HiggsAudio v2 audio tokenizer, and Whisper-large-v3-turbo (used for reference
-audio auto-transcription) — to OpenVINO Intermediate Representation and run the
-full pipeline on Intel CPU and GPU.
+In this tutorial we convert OmniVoice — including its 0.6B Qwen3 backbone and
+the HiggsAudio v2 audio tokenizer — to OpenVINO Intermediate Representation,
+and pull a pre-converted OpenVINO Whisper-large-v3-turbo
+([OpenVINO/whisper-large-v3-turbo-int8-ov](https://huggingface.co/OpenVINO/whisper-large-v3-turbo-int8-ov))
+for reference-audio auto-transcription. The full pipeline runs on Intel CPU
+and GPU.
 
 OmniVoice differs from typical TTS pipelines in that the LLM is invoked **once
 per diffusion step** (default 32 steps) on the *full* sequence — there is no
@@ -33,11 +35,11 @@ The converted pipeline contains four sub-models:
 | `openvino_llm_model.xml` | Qwen3-0.6B + audio embeddings + audio_heads (fused, INT8 optional) |
 | `openvino_audio_encoder.xml` | HiggsAudio v2 encoder (waveform → 8-codebook tokens) |
 | `openvino_audio_decoder.xml` | HiggsAudio v2 decoder (codes → waveform) |
-| `whisper/` | Whisper-large-v3-turbo (only used when ref_text is empty) |
+| `whisper/` | Pre-converted OpenVINO Whisper (only used when ref_text is empty) |
 
 Notebook outline:
 
-1. Install dependencies (`omnivoice`, `nncf`, `openvino`).
+1. Install dependencies (`omnivoice`, `nncf`, `openvino`, `openvino-genai`).
 2. Convert the model to OpenVINO IR with an INT8-quantization toggle.
 3. Choose CPU/GPU per sub-model.
 4. Run Voice Design and Voice Clone inference; compare against the original
@@ -58,13 +60,15 @@ notebooks/omnivoice/
     ├── openvino_llm_model.{xml,bin}
     ├── openvino_audio_encoder.{xml,bin}
     ├── openvino_audio_decoder.{xml,bin}
-    ├── whisper/openvino_{encoder,decoder}_model.{xml,bin}
+    ├── whisper/openvino_{encoder,decoder}_model.{xml,bin}    # downloaded from OpenVINO/whisper-large-v3-turbo-int8-ov
     └── (config.json, tokenizer.json, audio_tokenizer/, …)
 ```
 
 After conversion, `pt_models/` is safe to delete: the runtime
 `OVOmniVoice.from_pretrained(<ov_dir>)` reads only from the OV folder and
-allocates **zero PyTorch model weights**.
+allocates **zero PyTorch model weights**. The Whisper sub-model is loaded
+through `openvino_genai.WhisperPipeline`, which natively handles the stateful
+KV-cache decoder.
 
 ## Notes
 
