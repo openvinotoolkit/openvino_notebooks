@@ -37,12 +37,34 @@ The converted pipeline contains four sub-models:
 
 Notebook outline:
 
-1. Install dependencies (`omnivoice`, `optimum-intel`, `nncf`).
+1. Install dependencies (`omnivoice`, `nncf`, `openvino`).
 2. Convert the model to OpenVINO IR with an INT8-quantization toggle.
 3. Choose CPU/GPU per sub-model.
 4. Run Voice Design and Voice Clone inference; compare against the original
    PyTorch model.
 5. Launch the interactive Gradio demo (Voice Clone + Voice Design tabs).
+
+## Storage layout
+
+The original PyTorch checkpoints (used only during conversion) and the
+OpenVINO IR are kept in **separate** directories:
+
+```
+notebooks/omnivoice/
+├── pt_models/                      # original PT weights — only needed at convert time
+│   ├── OmniVoice/                  # k2-fsa/OmniVoice snapshot (~3 GB)
+│   └── whisper-large-v3-turbo/     # OpenAI Whisper snapshot (~3 GB)
+└── ov_model_int8/                  # self-contained OV runtime dir (~1.5 GB)
+    ├── openvino_llm_model.{xml,bin}
+    ├── openvino_audio_encoder.{xml,bin}
+    ├── openvino_audio_decoder.{xml,bin}
+    ├── whisper/openvino_{encoder,decoder}_model.{xml,bin}
+    └── (config.json, tokenizer.json, audio_tokenizer/, …)
+```
+
+After conversion, `pt_models/` is safe to delete: the runtime
+`OVOmniVoice.from_pretrained(<ov_dir>)` reads only from the OV folder and
+allocates **zero PyTorch model weights**.
 
 ## Notes
 

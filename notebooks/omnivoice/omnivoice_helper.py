@@ -40,7 +40,6 @@ LLM_FILE = "openvino_llm_model.xml"
 ENCODER_FILE = "openvino_audio_encoder.xml"
 DECODER_FILE = "openvino_audio_decoder.xml"
 WHISPER_DIR = "whisper"
-CKPT_DIR = "ckpt"
 
 
 def _bool_to_additive_mask(attention_mask, dtype):
@@ -295,44 +294,139 @@ def _convert_audio_tokenizer(
         print("✅ Audio decoder saved")
 
 
-def _convert_whisper(asr_model_id: str, output_dir: Path):
-    """Convert Whisper-large-v3-turbo via optimum-intel.
+def _convert_whisper(
+    asr_model_id: str, output_dir: Path, pt_cache_root: Path
+):
+    """Export Whisper to OpenVINO IR (encoder + decoder, both stateless).
 
-    On environments where optimum-intel doesn't yet ship a build compatible with
-    the installed transformers (e.g. transformers>=5 removed
-    ``transformers.onnx`` and ``is_offline_mode``), this conversion is skipped
-    and the runtime falls back to a PyTorch CPU pipeline at inference time.
+    We bypass ``optimum-intel`` (which currently does not work with
+    transformers>=5 due to removed ``transformers.onnx``) and trace the two
+    sub-graphs ourselves with ``ov.convert_model``. Greedy decoding lives in
+    Python at inference time, in :class:`_OVWhisperASR`.
+
+    Output layout::
+
+        output_dir/whisper/
+            openvino_encoder_model.{xml,bin}
+            openvino_decoder_model.{xml,bin}
+            (processor / config / tokenizer files via processor.save_pretrained)
     """
+    import torch
+    from huggingface_hub import snapshot_download
+    from transformers import AutoProcessor, WhisperForConditionalGeneration
+    from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
+
     target = output_dir / WHISPER_DIR
     if (target / "openvino_encoder_model.xml").exists():
         print("✓ Whisper already converted")
         return
 
+    target.mkdir(parents=True, exist_ok=True)
     print(f"⌛ Convert Whisper ASR ({asr_model_id})")
-    try:
-        from optimum.intel import OVModelForSpeechSeq2Seq
-        from transformers import AutoProcessor
 
-        ov_model = OVModelForSpeechSeq2Seq.from_pretrained(
-            asr_model_id, export=True, compile=False
+    pt_cache = pt_cache_root / asr_model_id.split("/")[-1]
+    if not pt_cache.exists():
+        print(f"  ⌛ Downloading {asr_model_id} -> {pt_cache}")
+        pt_cache.parent.mkdir(parents=True, exist_ok=True)
+        snapshot_download(asr_model_id, local_dir=str(pt_cache))
+
+    pt_model = WhisperForConditionalGeneration.from_pretrained(
+        str(pt_cache), torch_dtype=torch.float32
+    )
+    pt_model.eval()
+    pt_model.config._attn_implementation = "eager"
+    if hasattr(pt_model.model, "encoder"):
+        pt_model.model.encoder.config._attn_implementation = "eager"
+    if hasattr(pt_model.model, "decoder"):
+        pt_model.model.decoder.config._attn_implementation = "eager"
+
+    cfg = pt_model.config
+    n_mel = cfg.num_mel_bins
+    max_src = cfg.max_source_positions * 2  # mel frames
+
+    # Save processor + config so the runtime can rebuild the tokenizer.
+    AutoProcessor.from_pretrained(str(pt_cache)).save_pretrained(target)
+    pt_model.config.save_pretrained(target)
+    if pt_model.generation_config is not None:
+        pt_model.generation_config.save_pretrained(target)
+
+    # --- Encoder export ---
+    print("  ⌛ Encoder ...")
+
+    class _EncoderWrap(torch.nn.Module):
+        def __init__(self, m):
+            super().__init__()
+            self.m = m
+
+        def forward(self, input_features):
+            return self.m.model.encoder(input_features).last_hidden_state
+
+    enc_wrap = _EncoderWrap(pt_model)
+    enc_wrap.eval()
+    __make_16bit_traceable(enc_wrap)
+    example_mel = torch.zeros((1, n_mel, max_src), dtype=torch.float32)
+    with torch.no_grad():
+        ov_enc = ov.convert_model(
+            enc_wrap,
+            example_input=(example_mel,),
+            input=[ov.PartialShape([-1, n_mel, max_src])],
         )
-        ov_model.save_pretrained(target)
-        AutoProcessor.from_pretrained(asr_model_id).save_pretrained(target)
-        del ov_model
-        gc.collect()
-        print("✅ Whisper saved to", target)
-    except Exception as e:
-        print(
-            f"  optimum-intel Whisper export not available in this env "
-            f"({type(e).__name__}: {e}). The runtime will fall back to a "
-            f"PyTorch CPU Whisper pipeline when reference-text "
-            f"auto-transcription is needed."
+    ov_enc.inputs[0].get_node().set_friendly_name("input_features")
+    ov.save_model(
+        ov_enc, str(target / "openvino_encoder_model.xml"), compress_to_fp16=True
+    )
+    del ov_enc, enc_wrap
+    gc.collect()
+
+    # --- Decoder export (no KV-cache; recompute every step. Whisper-turbo has
+    # only 4 decoder layers so this is fast enough for short ref-audio
+    # transcription.) ---
+    print("  ⌛ Decoder ...")
+    hidden = cfg.d_model
+
+    class _DecoderWrap(torch.nn.Module):
+        def __init__(self, m):
+            super().__init__()
+            self.m = m
+
+        def forward(self, decoder_input_ids, encoder_hidden_states):
+            outputs = self.m.model.decoder(
+                input_ids=decoder_input_ids,
+                encoder_hidden_states=encoder_hidden_states,
+                use_cache=False,
+                return_dict=True,
+            )
+            logits = self.m.proj_out(outputs.last_hidden_state)
+            return logits
+
+    dec_wrap = _DecoderWrap(pt_model)
+    dec_wrap.eval()
+    __make_16bit_traceable(dec_wrap)
+    example_dec_ids = torch.zeros((1, 4), dtype=torch.long)
+    example_enc_h = torch.zeros((1, cfg.max_source_positions, hidden), dtype=torch.float32)
+    with torch.no_grad():
+        ov_dec = ov.convert_model(
+            dec_wrap,
+            example_input=(example_dec_ids, example_enc_h),
+            input=[
+                ov.PartialShape([-1, -1]),
+                ov.PartialShape([-1, cfg.max_source_positions, hidden]),
+            ],
         )
+    ov_dec.inputs[0].get_node().set_friendly_name("decoder_input_ids")
+    ov_dec.inputs[1].get_node().set_friendly_name("encoder_hidden_states")
+    ov.save_model(
+        ov_dec, str(target / "openvino_decoder_model.xml"), compress_to_fp16=True
+    )
+    del ov_dec, dec_wrap, pt_model
+    gc.collect()
+    print("✅ Whisper saved to", target)
 
 
 def convert_omnivoice(
     model_id: str = "k2-fsa/OmniVoice",
     output_dir: Union[str, Path] = "ov_model",
+    pt_cache_dir: Union[str, Path, None] = None,
     llm_quantization_config: Optional[dict] = None,
     convert_whisper: bool = True,
     asr_model_id: str = "openai/whisper-large-v3-turbo",
@@ -341,18 +435,17 @@ def convert_omnivoice(
     """Convert OmniVoice (LLM + audio tokenizer + Whisper) to OpenVINO IR.
 
     Args:
-        model_id: HF repo id of the OmniVoice model. The HF id is used in the
-            notebook by default.
-        output_dir: Where to write the converted IRs.
+        model_id: HF repo id of the OmniVoice model.
+        output_dir: Where to write the OpenVINO IR + small runtime assets.
+            This is the only directory the inference runtime needs.
+        pt_cache_dir: Where to cache the original PyTorch checkpoint while
+            tracing. Kept separate from ``output_dir`` so the OV folder is
+            self-contained. Default: ``./pt_models/<model_id_basename>``.
         llm_quantization_config: kwargs forwarded to ``nncf.compress_weights``.
-            Set to ``None`` to keep FP16 weights (default), or e.g.
-            ``{"mode": nncf.CompressWeightsMode.INT8_SYM}`` for INT8.
-        convert_whisper: Convert Whisper for reference-text auto-transcription.
-        asr_model_id: HF repo id of the Whisper variant to use.
-        local_model_dir: Optional local directory containing pre-downloaded
-            model weights (used as a faster fallback in environments where the
-            HF download is slow). When ``None``, weights are fetched from the
-            HF Hub.
+        convert_whisper: Convert Whisper for ref-text auto-transcription.
+        asr_model_id: HF repo id of the Whisper variant.
+        local_model_dir: Optional pre-downloaded checkpoint directory. If
+            given, files are copied (or symlinked) into ``pt_cache_dir``.
     """
     import torch
     from huggingface_hub import snapshot_download
@@ -360,19 +453,23 @@ def convert_omnivoice(
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    ckpt_dir = output_dir / CKPT_DIR
 
-    # 1) Resolve checkpoint -- copy from local dir if provided, else download.
+    # Resolve PyTorch checkpoint dir (separate from OV output_dir).
+    if pt_cache_dir is None:
+        pt_cache_dir = Path("pt_models") / model_id.split("/")[-1]
+    pt_cache_dir = Path(pt_cache_dir)
+
     if local_model_dir is not None and Path(local_model_dir).exists():
-        if not ckpt_dir.exists():
+        if not pt_cache_dir.exists():
             print(f"⌛ Copying local checkpoint from {local_model_dir}")
-            shutil.copytree(local_model_dir, ckpt_dir)
-        resolved = str(ckpt_dir)
+            pt_cache_dir.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(local_model_dir, pt_cache_dir)
+        resolved = str(pt_cache_dir)
     else:
-        if not ckpt_dir.exists():
-            print(f"⌛ Downloading {model_id} ...")
-            snapshot_download(model_id, local_dir=str(ckpt_dir))
-        resolved = str(ckpt_dir)
+        if not pt_cache_dir.exists():
+            print(f"⌛ Downloading {model_id} -> {pt_cache_dir}")
+            snapshot_download(model_id, local_dir=str(pt_cache_dir))
+        resolved = str(pt_cache_dir)
 
     needs_llm = not (output_dir / LLM_FILE).exists()
     needs_encoder = not (output_dir / ENCODER_FILE).exists()
@@ -404,13 +501,14 @@ def convert_omnivoice(
         print("✓ LLM and audio tokenizer already converted")
 
     if needs_whisper:
-        _convert_whisper(asr_model_id, output_dir)
+        _convert_whisper(asr_model_id, output_dir, pt_cache_dir.parent)
     elif convert_whisper:
         print("✓ Whisper already converted")
 
-    _copy_runtime_assets(ckpt_dir, output_dir)
+    _copy_runtime_assets(Path(resolved), output_dir)
 
-    print("✅ Conversion complete:", output_dir)
+    print("✅ Conversion complete. OV output:", output_dir)
+    print("   PyTorch checkpoint cache (safe to delete after conversion):", pt_cache_dir)
 
 
 def _copy_runtime_assets(ckpt_dir: Path, output_dir: Path):
@@ -527,6 +625,115 @@ class _OVAudioTokenizer:
 
     def decode(self, audio_codes, **_kw):
         return self._dec(audio_codes)
+
+
+class _OVWhisperASR:
+    """OpenVINO Whisper inference: callable like a HuggingFace
+    ``pipeline("automatic-speech-recognition", ...)`` so it can drop into
+    ``OmniVoice.transcribe`` unchanged.
+
+    Greedy decoding only (good enough for short reference-audio transcripts).
+    """
+
+    def __init__(self, whisper_dir: Path, device: str = "CPU"):
+        from transformers import AutoProcessor, GenerationConfig
+
+        whisper_dir = Path(whisper_dir)
+        core = ov.Core()
+        self._enc = core.compile_model(
+            whisper_dir / "openvino_encoder_model.xml", device
+        ).create_infer_request()
+        self._dec = core.compile_model(
+            whisper_dir / "openvino_decoder_model.xml", device
+        ).create_infer_request()
+        self._processor = AutoProcessor.from_pretrained(str(whisper_dir))
+        try:
+            self._gen_cfg = GenerationConfig.from_pretrained(str(whisper_dir))
+        except Exception:
+            self._gen_cfg = None
+
+    def _decode_ids(self, mel: np.ndarray, max_new_tokens: int = 220) -> str:
+        # Encode mel -> hidden states.
+        enc_out = self._enc.infer({"input_features": mel.astype(np.float32)})
+        hidden = next(iter(enc_out.values()))
+
+        # Build initial decoder prompt from generation_config.
+        cfg = self._gen_cfg
+        if cfg is not None and getattr(cfg, "decoder_start_token_id", None) is not None:
+            ids = [cfg.decoder_start_token_id]
+        else:
+            ids = [self._processor.tokenizer.convert_tokens_to_ids("<|startoftranscript|>")]
+        # Add language/task tokens if available.
+        for attr in ("lang_to_id", "task_to_id"):
+            d = getattr(cfg, attr, None) if cfg is not None else None
+            if isinstance(d, dict) and len(d) == 1:
+                ids.append(next(iter(d.values())))
+        # If no language token was added, force <|en|>+<|transcribe|>+<|notimestamps|>
+        # as a sensible default.
+        tok = self._processor.tokenizer
+        if len(ids) == 1:
+            for special in ("<|en|>", "<|transcribe|>", "<|notimestamps|>"):
+                t = tok.convert_tokens_to_ids(special)
+                if t is not None and t != tok.unk_token_id:
+                    ids.append(t)
+
+        eos_id = (cfg.eos_token_id if cfg is not None else None) or tok.eos_token_id
+
+        # Greedy step-by-step decode (no KV cache; small turbo model).
+        for _ in range(max_new_tokens):
+            dec_inp = np.asarray([ids], dtype=np.int64)
+            out = self._dec.infer(
+                {
+                    "decoder_input_ids": dec_inp,
+                    "encoder_hidden_states": hidden,
+                }
+            )
+            logits = next(iter(out.values()))  # [1, S, V]
+            next_id = int(np.argmax(logits[0, -1]))
+            if next_id == eos_id:
+                break
+            ids.append(next_id)
+
+        # Decode skipping special tokens.
+        text = tok.decode(ids, skip_special_tokens=True).strip()
+        return text
+
+    def __call__(self, audio):
+        """HF-pipeline-compatible call.
+
+        Accepts:
+        - a path string
+        - a dict ``{"array": np.ndarray, "sampling_rate": int}``
+        Returns ``{"text": str}``.
+        """
+        if isinstance(audio, str):
+            import soundfile as sf
+
+            wav, sr = sf.read(audio, dtype="float32", always_2d=False)
+            if wav.ndim > 1:
+                wav = wav.mean(axis=-1)
+        else:
+            wav = np.asarray(audio["array"], dtype=np.float32).reshape(-1)
+            sr = int(audio["sampling_rate"])
+
+        # Whisper expects 16kHz; resample if needed.
+        if sr != self._processor.feature_extractor.sampling_rate:
+            import torch
+            import torchaudio.functional as taF
+
+            wav = taF.resample(
+                torch.from_numpy(wav),
+                orig_freq=sr,
+                new_freq=self._processor.feature_extractor.sampling_rate,
+            ).numpy()
+
+        feats = self._processor(
+            wav,
+            sampling_rate=self._processor.feature_extractor.sampling_rate,
+            return_tensors="np",
+        ).input_features
+        text = self._decode_ids(feats)
+        return {"text": text}
 
 
 class _OmniVoiceStandIn(SimpleNamespace):
@@ -688,51 +895,24 @@ class OVOmniVoice:
         waveform = np.squeeze(waveform)
         return self._asr_pipe({"array": waveform, "sampling_rate": sr})["text"].strip()
 
-    def load_asr_model(self, asr_model_id: str = "openai/whisper-large-v3-turbo"):
-        """Load Whisper for reference-text auto-transcription.
+    def load_asr_model(self):
+        """Load the OpenVINO Whisper from ``model_dir/whisper``.
 
-        Tries the OpenVINO export first (if it exists in ``model_dir/whisper``);
-        falls back to a PyTorch CPU pipeline otherwise. Voice clone with an
-        explicit ``ref_text`` does NOT need this.
+        Voice clone with an explicit ``ref_text`` does NOT need this.
         """
         if self._asr_pipe is not None:
             return
-        from transformers import pipeline
-
-        ov_loaded = False
-        if self._ov_whisper_dir.exists() and not (
-            self._ov_whisper_dir / "manual_export.txt"
-        ).exists():
-            try:
-                from optimum.intel import OVModelForSpeechSeq2Seq
-                from transformers import AutoProcessor
-
-                print("⌛ Loading OV Whisper ASR on", self._asr_device, "...")
-                ov_whisper = OVModelForSpeechSeq2Seq.from_pretrained(
-                    self._ov_whisper_dir, device=self._asr_device, compile=False
-                )
-                ov_whisper.compile()
-                processor = AutoProcessor.from_pretrained(self._ov_whisper_dir)
-                self._asr_pipe = pipeline(
-                    "automatic-speech-recognition",
-                    model=ov_whisper,
-                    tokenizer=processor.tokenizer,
-                    feature_extractor=processor.feature_extractor,
-                )
-                ov_loaded = True
-                print("✅ OV Whisper ready on", self._asr_device)
-            except Exception as e:
-                print(f"  OV Whisper load failed ({e}); falling back to PyTorch CPU.")
-
-        if not ov_loaded:
-            print(f"⌛ Loading PyTorch Whisper ({asr_model_id}) on CPU ...")
-            self._asr_pipe = pipeline(
-                "automatic-speech-recognition", model=asr_model_id, device="cpu"
+        if not (self._ov_whisper_dir / "openvino_encoder_model.xml").exists():
+            raise FileNotFoundError(
+                f"OV Whisper not found at {self._ov_whisper_dir}. "
+                f"Re-run convert_omnivoice(convert_whisper=True) or pass "
+                f"ref_text explicitly to skip auto-transcription."
             )
-            print("✅ PyTorch Whisper ready (CPU)")
-
+        print("⌛ Loading OV Whisper ASR on", self._asr_device, "...")
+        self._asr_pipe = _OVWhisperASR(self._ov_whisper_dir, self._asr_device)
         # OmniVoice.create_voice_clone_prompt also reads self._asr_pipe directly.
         self._model._asr_pipe = self._asr_pipe
+        print("✅ OV Whisper ready on", self._asr_device)
 
     def generate(self, *args, **kwargs):
         # Lazy-load ASR if the caller passes ref_audio without ref_text -- the
