@@ -22,6 +22,7 @@ import math
 import os
 import shutil
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, List, Optional, Union
 
 import numpy as np
@@ -407,7 +408,41 @@ def convert_omnivoice(
     elif convert_whisper:
         print("✓ Whisper already converted")
 
+    _copy_runtime_assets(ckpt_dir, output_dir)
+
     print("✅ Conversion complete:", output_dir)
+
+
+def _copy_runtime_assets(ckpt_dir: Path, output_dir: Path):
+    """Copy the small JSON / tokenizer files needed at inference time from the
+    PyTorch ckpt into the OV output dir. After this, the runtime no longer
+    depends on ``ckpt/`` and the ckpt dir may be deleted."""
+    files = [
+        "config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "chat_template.jinja",
+        "special_tokens_map.json",
+        "generation_config.json",
+    ]
+    for name in files:
+        src = ckpt_dir / name
+        if src.exists():
+            dst = output_dir / name
+            if not dst.exists():
+                shutil.copy2(src, dst)
+
+    audio_files = ["config.json", "preprocessor_config.json"]
+    src_audio = ckpt_dir / "audio_tokenizer"
+    if src_audio.exists():
+        dst_audio = output_dir / "audio_tokenizer"
+        dst_audio.mkdir(parents=True, exist_ok=True)
+        for name in audio_files:
+            src = src_audio / name
+            if src.exists():
+                dst = dst_audio / name
+                if not dst.exists():
+                    shutil.copy2(src, dst)
 
 
 # ---------------------------------------------------------------------------
@@ -494,13 +529,26 @@ class _OVAudioTokenizer:
         return self._dec(audio_codes)
 
 
+class _OmniVoiceStandIn(SimpleNamespace):
+    """Lightweight drop-in for the OmniVoice nn.Module at inference time.
+
+    Holds only the small set of attributes the rebound generation methods need
+    (config, tokenizers, duration estimator, sampling rate, ASR pipe). The
+    LLM forward is dispatched to OpenVINO via ``__call__`` which is overridden
+    here so ``self(input_ids=..., audio_mask=..., attention_mask=...)`` works
+    inside the upstream ``_generate_iterative`` loop.
+    """
+
+    def __call__(self, **kwargs):
+        return self._ov_call(**kwargs)
+
+
 class OVOmniVoice:
     """OpenVINO-backed drop-in for ``omnivoice.OmniVoice``.
 
-    The class delegates all generation orchestration to the upstream
-    ``OmniVoice._generate_iterative`` / ``_generate_chunked`` / ``_preprocess_all``
-    helpers — we just monkey-patch the LLM forward and the audio tokenizer
-    encode/decode so they hit the OpenVINO compiled models instead of PyTorch.
+    Initialization loads only OpenVINO IR + small JSON / tokenizer assets from
+    the OV output dir. No PyTorch model weights are allocated; the original
+    ``ckpt/`` directory (used only during conversion) is not required.
     """
 
     def __init__(
@@ -513,43 +561,35 @@ class OVOmniVoice:
         load_asr: bool = False,
     ):
         import torch
-        from omnivoice import OmniVoice
-        from transformers import AutoTokenizer
+        import types
+        from omnivoice.models.omnivoice import OmniVoice as _OmniVoice, OmniVoiceConfig
+        from omnivoice.utils.duration import RuleDurationEstimator
+        from transformers import (
+            AutoFeatureExtractor,
+            AutoTokenizer,
+            HiggsAudioV2TokenizerConfig,
+        )
 
         self.model_dir = Path(model_dir)
-        ckpt_dir = self.model_dir / CKPT_DIR
-        if not ckpt_dir.exists():
-            raise FileNotFoundError(
-                f"Checkpoint dir {ckpt_dir} missing. Run convert_omnivoice() first."
-            )
+        for required in (LLM_FILE, ENCODER_FILE, DECODER_FILE, "config.json",
+                         "tokenizer.json", "audio_tokenizer/config.json"):
+            if not (self.model_dir / required).exists():
+                raise FileNotFoundError(
+                    f"Missing {required} in {self.model_dir}. "
+                    f"Run convert_omnivoice() first."
+                )
 
-        # We need an OmniVoice instance for its rich inference orchestration
-        # (preprocessing, chunking, sampling, post-processing). The PyTorch
-        # weights are NOT used at inference (we hijack model.__call__ to dispatch
-        # to OpenVINO) -- but instantiating from config keeps the buffers
-        # (codebook_layer_offsets) on real CPU memory which is needed by the
-        # _prepare_inference_inputs helper.
-        from omnivoice.models.omnivoice import OmniVoiceConfig
+        # Load configs + tokenizers from the OV output dir (NOT from ckpt/).
+        cfg = OmniVoiceConfig.from_pretrained(str(self.model_dir))
+        tokenizer = AutoTokenizer.from_pretrained(str(self.model_dir))
+        audio_cfg = HiggsAudioV2TokenizerConfig.from_pretrained(
+            str(self.model_dir / "audio_tokenizer")
+        )
+        feat_extractor = AutoFeatureExtractor.from_pretrained(
+            str(self.model_dir / "audio_tokenizer")
+        )
 
-        cfg = OmniVoiceConfig.from_pretrained(str(ckpt_dir))
-        model = OmniVoice(cfg)
-        model.text_tokenizer = AutoTokenizer.from_pretrained(str(ckpt_dir))
-
-        # Audio tokenizer config (we just need the .config object for hop_length etc.)
-        from transformers import AutoFeatureExtractor, HiggsAudioV2TokenizerConfig
-
-        audio_cfg_path = ckpt_dir / "audio_tokenizer"
-        if audio_cfg_path.exists():
-            audio_cfg = HiggsAudioV2TokenizerConfig.from_pretrained(audio_cfg_path)
-            feat_extractor = AutoFeatureExtractor.from_pretrained(audio_cfg_path)
-        else:
-            from huggingface_hub import snapshot_download
-
-            tok_dir = snapshot_download("eustlb/higgs-audio-v2-tokenizer")
-            audio_cfg = HiggsAudioV2TokenizerConfig.from_pretrained(tok_dir)
-            feat_extractor = AutoFeatureExtractor.from_pretrained(tok_dir)
-
-        # Compile sub-models.
+        # Compile OV sub-models.
         core = ov.Core()
         ov_config = ov_config or {}
         compiled_llm = core.compile_model(
@@ -561,42 +601,44 @@ class OVOmniVoice:
         compiled_dec = core.compile_model(
             self.model_dir / DECODER_FILE, audio_device, ov_config
         )
-
-        # Plug the OV-backed shims into the OmniVoice instance. Bypass
-        # nn.Module.__setattr__ for non-Module attributes.
         self._ov_llm = _OVTorchLLM(compiled_llm, llm_device)
-        # Drop the original module and replace with our shim (object.__setattr__
-        # avoids the nn.Module type check).
-        if hasattr(model, "audio_tokenizer"):
-            try:
-                del model.audio_tokenizer
-            except AttributeError:
-                pass
-        object.__setattr__(
-            model,
-            "audio_tokenizer",
-            _OVAudioTokenizer(compiled_enc, compiled_dec, audio_cfg),
-        )
-        object.__setattr__(model, "feature_extractor", feat_extractor)
+
+        # Build the lightweight stand-in. No nn.Module, no random weight init.
+        model = _OmniVoiceStandIn()
+        model.config = cfg
+        model.text_tokenizer = tokenizer
+        model.audio_tokenizer = _OVAudioTokenizer(compiled_enc, compiled_dec, audio_cfg)
+        model.feature_extractor = feat_extractor
         model.sampling_rate = feat_extractor.sampling_rate
-
-        from omnivoice.utils.duration import RuleDurationEstimator
-
+        model.device = torch.device("cpu")
         model.duration_estimator = RuleDurationEstimator()
+        model._asr_pipe = None
+        # generate() calls self.eval(); make it a no-op.
+        model.eval = lambda: None
+        # __call__ on the stand-in dispatches the LLM forward to OpenVINO.
+        ov_llm = self._ov_llm
+        model._ov_call = lambda input_ids, audio_mask, attention_mask: ov_llm(
+            input_ids, audio_mask, attention_mask
+        )
 
-        # Re-route OmniVoice.__call__ (it is invoked once per diffusion step) to
-        # the OpenVINO LLM. This sidesteps the meta weights since we never call
-        # the original Qwen3 forward.
-        def _ov_forward(self_, *, input_ids, audio_mask, attention_mask):
-            return self._ov_llm(input_ids, audio_mask, attention_mask)
-
-        # Bind as a method on the instance.
-        import types
-
-        model.forward = types.MethodType(_ov_forward, model)
-        # Some helpers do `model(...)`, which goes through nn.Module.__call__.
-        # We override that too so hooks/dispatch don't hit the meta weights.
-        model.__call__ = types.MethodType(_ov_forward, model)
+        # Bind the upstream OmniVoice generation methods to the stand-in.
+        # This reuses the entire diffusion / chunking / sampling / post-processing
+        # pipeline without instantiating an nn.Module.
+        for name in (
+            "generate",
+            "_preprocess_all",
+            "_generate_iterative",
+            "_generate_chunked",
+            "_prepare_inference_inputs",
+            "_decode_and_post_process",
+            "_post_process_audio",
+            "_estimate_target_tokens",
+            "_ensure_list",
+            "_predict_tokens_with_scoring",
+            "create_voice_clone_prompt",
+            "transcribe",
+        ):
+            setattr(model, name, types.MethodType(getattr(_OmniVoice, name), model))
 
         self._model = model
         self._asr_device = asr_device
@@ -693,6 +735,14 @@ class OVOmniVoice:
         self._model._asr_pipe = self._asr_pipe
 
     def generate(self, *args, **kwargs):
+        # Lazy-load ASR if the caller passes ref_audio without ref_text -- the
+        # upstream _preprocess_all path would otherwise call self.load_asr_model()
+        # on the stand-in, which we don't expose there.
+        ref_audio = kwargs.get("ref_audio")
+        ref_text = kwargs.get("ref_text")
+        if ref_audio is not None and ref_text is None and self._asr_pipe is None:
+            self.load_asr_model()
+            self._model._asr_pipe = self._asr_pipe
         return self._model.generate(*args, **kwargs)
 
     @classmethod
