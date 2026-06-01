@@ -79,6 +79,10 @@ KV-cache decoder.
   on CPU; audio fidelity is preserved because the convolutional codec stays in
   FP16.
 
+⚠️ **EXPERIMENTAL NOTEBOOK**
+
+This notebook demonstrates a model that has not been fully validated with OpenVINO. It may be fully supported and validated in the future.
+
 ## Installation
 
 This is a self-contained example that relies solely on its own code. We
