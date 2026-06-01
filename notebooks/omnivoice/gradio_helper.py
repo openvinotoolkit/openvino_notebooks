@@ -17,7 +17,6 @@ import numpy as np
 from omnivoice import OmniVoiceGenerationConfig
 from omnivoice.utils.lang_map import LANG_NAMES, lang_display_name
 
-
 _ALL_LANGUAGES = ["Auto"] + sorted(lang_display_name(n) for n in LANG_NAMES)
 
 
@@ -77,9 +76,9 @@ def make_demo(ov_model) -> gr.Blocks:
 
     sampling_rate = ov_model.sampling_rate
 
-    def _gen_core(text, language, ref_audio, instruct, num_step, guidance_scale,
-                  denoise, speed, duration, preprocess_prompt, postprocess_output,
-                  mode, ref_text=None):
+    def _gen_core(
+        text, language, ref_audio, instruct, num_step, guidance_scale, denoise, speed, duration, preprocess_prompt, postprocess_output, mode, ref_text=None
+    ):
         if not text or not text.strip():
             return None, "Please enter the text to synthesize."
 
@@ -93,9 +92,7 @@ def make_demo(ov_model) -> gr.Blocks:
 
         lang = language if (language and language != "Auto") else None
 
-        kw: Dict[str, Any] = dict(
-            text=text.strip(), language=lang, generation_config=gen_config
-        )
+        kw: Dict[str, Any] = dict(text=text.strip(), language=lang, generation_config=gen_config)
         if speed is not None and float(speed) != 1.0:
             kw["speed"] = float(speed)
         if duration is not None and float(duration) > 0:
@@ -104,9 +101,7 @@ def make_demo(ov_model) -> gr.Blocks:
         if mode == "clone":
             if not ref_audio:
                 return None, "Please upload a reference audio."
-            kw["voice_clone_prompt"] = ov_model.create_voice_clone_prompt(
-                ref_audio=ref_audio, ref_text=ref_text
-            )
+            kw["voice_clone_prompt"] = ov_model.create_voice_clone_prompt(ref_audio=ref_audio, ref_text=ref_text)
         if instruct and instruct.strip():
             kw["instruct"] = instruct.strip()
 
@@ -132,32 +127,27 @@ def make_demo(ov_model) -> gr.Blocks:
 
     def _lang_dropdown(label="Language (optional) / 语种 (可选)", value="Auto"):
         return gr.Dropdown(
-            label=label, choices=_ALL_LANGUAGES, value=value,
-            allow_custom_value=False, interactive=True,
+            label=label,
+            choices=_ALL_LANGUAGES,
+            value=value,
+            allow_custom_value=False,
+            interactive=True,
             info="Keep as Auto to auto-detect the language.",
         )
 
     def _gen_settings():
         with gr.Accordion("Generation Settings (optional)", open=False):
-            sp = gr.Slider(0.5, 1.5, value=1.0, step=0.05, label="Speed",
-                           info="1.0 = normal. >1 faster, <1 slower. Ignored if Duration is set.")
-            du = gr.Number(value=None, label="Duration (seconds)",
-                           info="Leave empty to use speed. Set a fixed duration to override speed.")
-            ns = gr.Slider(4, 64, value=32, step=1, label="Inference Steps",
-                           info="Default: 32. Lower = faster, higher = better quality.")
-            dn = gr.Checkbox(label="Denoise", value=True,
-                             info="Default: enabled. Uncheck to disable denoising.")
-            gs = gr.Slider(0.0, 4.0, value=2.0, step=0.1, label="Guidance Scale (CFG)",
-                           info="Default: 2.0.")
-            pp = gr.Checkbox(label="Preprocess Prompt", value=True,
-                             info="Apply silence removal/trimming to ref audio.")
-            po = gr.Checkbox(label="Postprocess Output", value=True,
-                             info="Remove long silences from generated audio.")
+            sp = gr.Slider(0.5, 1.5, value=1.0, step=0.05, label="Speed", info="1.0 = normal. >1 faster, <1 slower. Ignored if Duration is set.")
+            du = gr.Number(value=None, label="Duration (seconds)", info="Leave empty to use speed. Set a fixed duration to override speed.")
+            ns = gr.Slider(4, 64, value=32, step=1, label="Inference Steps", info="Default: 32. Lower = faster, higher = better quality.")
+            dn = gr.Checkbox(label="Denoise", value=True, info="Default: enabled. Uncheck to disable denoising.")
+            gs = gr.Slider(0.0, 4.0, value=2.0, step=0.1, label="Guidance Scale (CFG)", info="Default: 2.0.")
+            pp = gr.Checkbox(label="Preprocess Prompt", value=True, info="Apply silence removal/trimming to ref audio.")
+            po = gr.Checkbox(label="Postprocess Output", value=True, info="Remove long silences from generated audio.")
         return ns, gs, dn, sp, du, pp, po
 
     with gr.Blocks(theme=theme, css=css, title="OmniVoice OpenVINO Demo") as demo:
-        gr.Markdown(
-            """
+        gr.Markdown("""
 # OmniVoice — OpenVINO™ Demo
 
 State-of-the-art text-to-speech for **600+ languages**, accelerated with OpenVINO.
@@ -166,25 +156,23 @@ State-of-the-art text-to-speech for **600+ languages**, accelerated with OpenVIN
 - **Voice Design** — design custom voices via attribute selection
 
 Built on [OmniVoice](https://github.com/k2-fsa/OmniVoice).
-"""
-        )
+""")
 
         with gr.Tabs():
             with gr.TabItem("Voice Clone"):
                 with gr.Row():
                     with gr.Column(scale=1):
                         vc_text = gr.Textbox(
-                            label="Text to Synthesize / 待合成文本", lines=4,
+                            label="Text to Synthesize / 待合成文本",
+                            lines=4,
                             placeholder="Enter the text you want to synthesize...",
                         )
                         vc_ref_audio = gr.Audio(
-                            label="Reference Audio / 参考音频", type="filepath",
+                            label="Reference Audio / 参考音频",
+                            type="filepath",
                             elem_classes="compact-audio",
                         )
-                        gr.Markdown(
-                            "<span style='font-size:0.85em;color:#888;'>"
-                            "Recommended: 3–10 seconds audio.</span>"
-                        )
+                        gr.Markdown("<span style='font-size:0.85em;color:#888;'>" "Recommended: 3–10 seconds audio.</span>")
                         vc_ref_text = gr.Textbox(
                             label="Reference Text (optional) / 参考音频文本（可选）",
                             lines=2,
@@ -199,16 +187,12 @@ Built on [OmniVoice](https://github.com/k2-fsa/OmniVoice).
                         vc_audio = gr.Audio(label="Output Audio / 合成结果", type="numpy")
                         vc_status = gr.Textbox(label="Status / 状态", lines=2)
 
-                def _clone_fn(text, lang, ref_aud, ref_text, instruct,
-                              ns, gs, dn, sp, du, pp, po):
-                    return _gen_core(text, lang, ref_aud, instruct, ns, gs, dn,
-                                     sp, du, pp, po, mode="clone",
-                                     ref_text=ref_text or None)
+                def _clone_fn(text, lang, ref_aud, ref_text, instruct, ns, gs, dn, sp, du, pp, po):
+                    return _gen_core(text, lang, ref_aud, instruct, ns, gs, dn, sp, du, pp, po, mode="clone", ref_text=ref_text or None)
 
                 vc_btn.click(
                     _clone_fn,
-                    inputs=[vc_text, vc_lang, vc_ref_audio, vc_ref_text, vc_instruct,
-                            vc_ns, vc_gs, vc_dn, vc_sp, vc_du, vc_pp, vc_po],
+                    inputs=[vc_text, vc_lang, vc_ref_audio, vc_ref_text, vc_instruct, vc_ns, vc_gs, vc_dn, vc_sp, vc_du, vc_pp, vc_po],
                     outputs=[vc_audio, vc_status],
                 )
 
@@ -216,7 +200,8 @@ Built on [OmniVoice](https://github.com/k2-fsa/OmniVoice).
                 with gr.Row():
                     with gr.Column(scale=1):
                         vd_text = gr.Textbox(
-                            label="Text to Synthesize / 待合成文本", lines=4,
+                            label="Text to Synthesize / 待合成文本",
+                            lines=4,
                             placeholder="Enter the text you want to synthesize...",
                         )
                         vd_lang = _lang_dropdown()
@@ -226,8 +211,10 @@ Built on [OmniVoice](https://github.com/k2-fsa/OmniVoice).
                         for cat, choices in _CATEGORIES.items():
                             vd_groups.append(
                                 gr.Dropdown(
-                                    label=cat, choices=[_AUTO] + choices,
-                                    value=_AUTO, info=_ATTR_INFO.get(cat),
+                                    label=cat,
+                                    choices=[_AUTO] + choices,
+                                    value=_AUTO,
+                                    info=_ATTR_INFO.get(cat),
                                 )
                             )
 
@@ -254,13 +241,11 @@ Built on [OmniVoice](https://github.com/k2-fsa/OmniVoice).
                     return ", ".join(parts)
 
                 def _design_fn(text, lang, ns, gs, dn, sp, du, pp, po, *groups):
-                    return _gen_core(text, lang, None, _build_instruct(groups),
-                                     ns, gs, dn, sp, du, pp, po, mode="design")
+                    return _gen_core(text, lang, None, _build_instruct(groups), ns, gs, dn, sp, du, pp, po, mode="design")
 
                 vd_btn.click(
                     _design_fn,
-                    inputs=[vd_text, vd_lang, vd_ns, vd_gs, vd_dn, vd_sp, vd_du,
-                            vd_pp, vd_po] + vd_groups,
+                    inputs=[vd_text, vd_lang, vd_ns, vd_gs, vd_dn, vd_sp, vd_du, vd_pp, vd_po] + vd_groups,
                     outputs=[vd_audio, vd_status],
                 )
 

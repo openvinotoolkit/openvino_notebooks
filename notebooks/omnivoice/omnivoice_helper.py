@@ -80,13 +80,9 @@ class _OmniVoiceLLMWrapper:
                 # Mixed text+audio embedding (matches OmniVoice._prepare_embed_inputs).
                 m = self.m
                 text_embeds = m.get_input_embeddings()(input_ids[:, 0, :])
-                shifted_ids = (
-                    input_ids * audio_mask.unsqueeze(1).long()
-                ) + m.codebook_layer_offsets.view(1, -1, 1)
+                shifted_ids = (input_ids * audio_mask.unsqueeze(1).long()) + m.codebook_layer_offsets.view(1, -1, 1)
                 audio_embeds = m.audio_embeddings(shifted_ids).sum(dim=1)
-                inputs_embeds = torch.where(
-                    audio_mask.unsqueeze(-1), audio_embeds, text_embeds
-                )
+                inputs_embeds = torch.where(audio_mask.unsqueeze(-1), audio_embeds, text_embeds)
 
                 # Convert the bool 4D mask to additive form so eager attention
                 # can simply add it to the logits.
@@ -156,16 +152,12 @@ class _AudioEncoderWrapper:
 
                 # --- Semantic branch (HuBERT + SemanticEncoder) ---
                 with torch.no_grad():
-                    sem_out = t.semantic_model(
-                        input_values_16k_padded, output_hidden_states=True
-                    )
+                    sem_out = t.semantic_model(input_values_16k_padded, output_hidden_states=True)
                 hidden_states = sem_out.hidden_states
                 stacked = torch.stack(list(hidden_states), dim=1)
                 semantic_features = stacked.mean(dim=1)
                 if t.config.semantic_downsample_factor > 1:
-                    semantic_features = semantic_features[
-                        :, :: t.config.semantic_downsample_factor, :
-                    ]
+                    semantic_features = semantic_features[:, :: t.config.semantic_downsample_factor, :]
                 e_semantic = t.encoder_semantic(semantic_features.transpose(1, 2))
 
                 # --- Acoustic branch ---
@@ -317,9 +309,7 @@ def _convert_audio_tokenizer(
         example_wave_24k = torch.randn((1, 1, T), dtype=torch.float32)
         # 16k waveform pre-resampled in Python and padded (160, 160) on each side.
         T_16k = T * 16000 // 24000  # exact integer for hop-aligned T
-        example_wave_16k_padded = torch.zeros(
-            (1, T_16k + 320), dtype=torch.float32
-        )
+        example_wave_16k_padded = torch.zeros((1, T_16k + 320), dtype=torch.float32)
         with torch.no_grad():
             ov_enc = ov.convert_model(
                 enc,
@@ -345,9 +335,7 @@ def _convert_audio_tokenizer(
         # with this shape so the OV signature matches the original API.
         example_codes = torch.zeros((1, C, T // hop), dtype=torch.long)
         with torch.no_grad():
-            ov_dec = ov.convert_model(
-                dec, example_input=(example_codes,), input=[ov.PartialShape([1, C, -1])]
-            )
+            ov_dec = ov.convert_model(dec, example_input=(example_codes,), input=[ov.PartialShape([1, C, -1])])
         ov_dec.inputs[0].get_node().set_friendly_name("audio_codes")
         _save_ov(ov_dec, output_dir / DECODER_FILE)
         del ov_dec, dec
@@ -458,15 +446,11 @@ def convert_omnivoice(
     needs_llm = not (output_dir / LLM_FILE).exists()
     needs_encoder = not (output_dir / ENCODER_FILE).exists()
     needs_decoder = not (output_dir / DECODER_FILE).exists()
-    needs_whisper = convert_whisper and not (
-        output_dir / WHISPER_DIR / "openvino_encoder_model.xml"
-    ).exists()
+    needs_whisper = convert_whisper and not (output_dir / WHISPER_DIR / "openvino_encoder_model.xml").exists()
 
     if needs_llm or needs_encoder or needs_decoder:
         print("⌛ Loading PyTorch OmniVoice on CPU ...")
-        model = OmniVoice.from_pretrained(
-            resolved, dtype=torch.float32, device_map="cpu"
-        )
+        model = OmniVoice.from_pretrained(resolved, dtype=torch.float32, device_map="cpu")
         model.eval()
 
         if needs_llm:
@@ -730,36 +714,22 @@ class OVOmniVoice:
         )
 
         self.model_dir = Path(model_dir)
-        for required in (LLM_FILE, ENCODER_FILE, DECODER_FILE, "config.json",
-                         "tokenizer.json", "audio_tokenizer/config.json"):
+        for required in (LLM_FILE, ENCODER_FILE, DECODER_FILE, "config.json", "tokenizer.json", "audio_tokenizer/config.json"):
             if not (self.model_dir / required).exists():
-                raise FileNotFoundError(
-                    f"Missing {required} in {self.model_dir}. "
-                    f"Run convert_omnivoice() first."
-                )
+                raise FileNotFoundError(f"Missing {required} in {self.model_dir}. " f"Run convert_omnivoice() first.")
 
         # Load configs + tokenizers from the OV output dir (NOT from ckpt/).
         cfg = OmniVoiceConfig.from_pretrained(str(self.model_dir))
         tokenizer = AutoTokenizer.from_pretrained(str(self.model_dir))
-        audio_cfg = HiggsAudioV2TokenizerConfig.from_pretrained(
-            str(self.model_dir / "audio_tokenizer")
-        )
-        feat_extractor = AutoFeatureExtractor.from_pretrained(
-            str(self.model_dir / "audio_tokenizer")
-        )
+        audio_cfg = HiggsAudioV2TokenizerConfig.from_pretrained(str(self.model_dir / "audio_tokenizer"))
+        feat_extractor = AutoFeatureExtractor.from_pretrained(str(self.model_dir / "audio_tokenizer"))
 
         # Compile OV sub-models.
         core = ov.Core()
         ov_config = ov_config or {}
-        compiled_llm = core.compile_model(
-            self.model_dir / LLM_FILE, llm_device, ov_config
-        )
-        compiled_enc = core.compile_model(
-            self.model_dir / ENCODER_FILE, audio_device, ov_config
-        )
-        compiled_dec = core.compile_model(
-            self.model_dir / DECODER_FILE, audio_device, ov_config
-        )
+        compiled_llm = core.compile_model(self.model_dir / LLM_FILE, llm_device, ov_config)
+        compiled_enc = core.compile_model(self.model_dir / ENCODER_FILE, audio_device, ov_config)
+        compiled_dec = core.compile_model(self.model_dir / DECODER_FILE, audio_device, ov_config)
         self._ov_llm = _OVTorchLLM(compiled_llm, llm_device)
 
         # Build the lightweight stand-in. No nn.Module, no random weight init.
@@ -776,9 +746,7 @@ class OVOmniVoice:
         model.eval = lambda: None
         # __call__ on the stand-in dispatches the LLM forward to OpenVINO.
         ov_llm = self._ov_llm
-        model._ov_call = lambda input_ids, audio_mask, attention_mask: ov_llm(
-            input_ids, audio_mask, attention_mask
-        )
+        model._ov_call = lambda input_ids, audio_mask, attention_mask: ov_llm(input_ids, audio_mask, attention_mask)
 
         # Bind the upstream OmniVoice generation methods to the stand-in.
         # This reuses the entire diffusion / chunking / sampling / post-processing
@@ -830,9 +798,7 @@ class OVOmniVoice:
         if ref_text is None and self._asr_pipe is None:
             self.load_asr_model()
             self._model._asr_pipe = self._asr_pipe  # so OmniVoice.transcribe() works
-        return self._model.create_voice_clone_prompt(
-            ref_audio=ref_audio, ref_text=ref_text, preprocess_prompt=preprocess_prompt
-        )
+        return self._model.create_voice_clone_prompt(ref_audio=ref_audio, ref_text=ref_text, preprocess_prompt=preprocess_prompt)
 
     def transcribe(self, audio):
         if self._asr_pipe is None:

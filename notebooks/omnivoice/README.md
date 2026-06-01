@@ -89,3 +89,5 @@ This is a self-contained example that relies solely on its own code. We
 recommend running the notebook in a virtual environment. For details, please
 refer to the
 [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/README.md#-installation-guide).
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/omnivoice/README.md" />
