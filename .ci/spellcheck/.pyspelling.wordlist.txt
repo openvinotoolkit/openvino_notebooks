@@ -1327,7 +1327,13 @@ zh
 Zhipu
 Zongyuan
 downsampler
+dropdowns
 FLOPs
 HallusionBench
 HarmonyOS
+HiggsAudio
+Kaldi
+OmniVoice
+OmniVoice's
 RefCOCO
+Xiaomi
