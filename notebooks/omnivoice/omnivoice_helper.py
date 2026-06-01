@@ -117,12 +117,33 @@ class _OmniVoiceLLMWrapper:
 class _AudioEncoderWrapper:
     """Wraps the HiggsAudio v2 encoder so it can be traced as a single graph.
 
-    Input: ``[1, 1, T]`` waveform at 24kHz where T is a multiple of
-    ``hop_length`` (960).
-    Output: ``[8, 1, T/960]`` (long) — the layout returned by ``encode``.
+    The original ``encode`` does a 24k→16k ``torchaudio.functional.resample``
+    inside, plus an ``if/else`` based on shape comparison between acoustic and
+    semantic feature lengths. Both bake fixed-shape constants under
+    ``torch.jit.trace`` and break for input lengths different from the trace
+    example. We solve both problems by:
+
+    1. Doing the resample (and the constant-pad of 160 samples each side) in
+       Python BEFORE calling the OV graph, so the graph receives both the
+       24k input (for the acoustic branch) and the 16k+padded input (for the
+       semantic branch).
+    2. Always taking the no-pad branch (``input_length`` of acoustic equals
+       semantic frame count). Per inspection on every length we tested,
+       ``need_pad`` is always False; we hard-code that.
+
+    Inputs:
+        - ``input_values_24k``: ``[1, 1, T_24k]`` waveform at 24kHz, T multiple
+          of ``hop_length`` (960).
+        - ``input_values_16k_padded``: ``[1, T_16k_padded]`` waveform at 16kHz
+          padded ``(160, 160)`` on each side.
+
+    Output: ``[1, 8, T_24k/hop]`` codes (matches the public ``encode`` API
+    after the internal ``transpose(0, 1)``).
     """
 
     def __new__(cls, audio_tokenizer):
+        import torch
+        import torch.nn.functional as F
         from torch import nn
 
         class _Inner(nn.Module):
@@ -130,8 +151,36 @@ class _AudioEncoderWrapper:
                 super().__init__()
                 self.t = t
 
-            def forward(self, input_values):
-                return self.t.encode(input_values).audio_codes
+            def forward(self, input_values_24k, input_values_16k_padded):
+                t = self.t
+
+                # --- Semantic branch (HuBERT + SemanticEncoder) ---
+                with torch.no_grad():
+                    sem_out = t.semantic_model(
+                        input_values_16k_padded, output_hidden_states=True
+                    )
+                hidden_states = sem_out.hidden_states
+                stacked = torch.stack(list(hidden_states), dim=1)
+                semantic_features = stacked.mean(dim=1)
+                if t.config.semantic_downsample_factor > 1:
+                    semantic_features = semantic_features[
+                        :, :: t.config.semantic_downsample_factor, :
+                    ]
+                e_semantic = t.encoder_semantic(semantic_features.transpose(1, 2))
+
+                # --- Acoustic branch ---
+                # Always take the no-pad path: at every tested length the
+                # acoustic conv output length equals the semantic frame count.
+                e_acoustic = t.acoustic_encoder(input_values_24k)
+
+                # --- Concat + project + quantize ---
+                embeddings = torch.cat([e_acoustic, e_semantic], dim=1)
+                embeddings = t.fc(embeddings.transpose(1, 2)).transpose(1, 2)
+                bw = t.config.target_bandwidths[-1]
+                audio_codes = t.quantizer.encode(embeddings, bw)
+                # Original `encode` then transposes to `(B, C, T)`
+                audio_codes = audio_codes.transpose(0, 1)
+                return audio_codes
 
         return _Inner(audio_tokenizer)
 
@@ -264,12 +313,24 @@ def _convert_audio_tokenizer(
         enc = _AudioEncoderWrapper(audio_tokenizer)
         enc.eval()
         __make_16bit_traceable(enc)
-        example_wave = torch.randn((1, 1, T), dtype=torch.float32)
+        # 24k waveform: T_24k samples, multiple of hop (960).
+        example_wave_24k = torch.randn((1, 1, T), dtype=torch.float32)
+        # 16k waveform pre-resampled in Python and padded (160, 160) on each side.
+        T_16k = T * 16000 // 24000  # exact integer for hop-aligned T
+        example_wave_16k_padded = torch.zeros(
+            (1, T_16k + 320), dtype=torch.float32
+        )
         with torch.no_grad():
             ov_enc = ov.convert_model(
-                enc, example_input=(example_wave,), input=[ov.PartialShape([1, 1, -1])]
+                enc,
+                example_input=(example_wave_24k, example_wave_16k_padded),
+                input=[
+                    ov.PartialShape([1, 1, -1]),
+                    ov.PartialShape([1, -1]),
+                ],
             )
-        ov_enc.inputs[0].get_node().set_friendly_name("input_values")
+        ov_enc.inputs[0].get_node().set_friendly_name("input_values_24k")
+        ov_enc.inputs[1].get_node().set_friendly_name("input_values_16k_padded")
         _save_ov(ov_enc, output_dir / ENCODER_FILE)
         del ov_enc, enc
         gc.collect()
@@ -498,19 +559,45 @@ class _OVTorchLLM:
 
 
 class _OVAudioTokenizerEncode:
-    """Returns an object with ``.audio_codes`` like the HF tokenizer."""
+    """Returns an object with ``.audio_codes`` like the HF tokenizer.
+
+    The OV graph expects two inputs: 24kHz waveform and 16kHz pre-resampled +
+    padded waveform. We do the resample in Python here (using
+    ``torchaudio.functional.resample``, the same kernel the original PyTorch
+    ``_extract_semantic_features`` uses).
+    """
 
     class _Out:
         def __init__(self, audio_codes):
             self.audio_codes = audio_codes
 
-    def __init__(self, compiled):
+    def __init__(self, compiled, sample_rate: int = 24000, semantic_sample_rate: int = 16000):
         self.request = compiled.create_infer_request()
+        self.sample_rate = sample_rate
+        self.semantic_sample_rate = semantic_sample_rate
 
     def __call__(self, input_values):
         import torch
+        import torch.nn.functional as F
+        import torchaudio.functional as taF
 
-        result = self.request.infer({"input_values": input_values.cpu().numpy()})
+        # input_values: [1, 1, T_24k]
+        wav_24k = input_values
+        # Resample to 16k for the semantic branch and pad 160 each side
+        # (matches HiggsAudioV2TokenizerModel._extract_semantic_features).
+        wav_16k = taF.resample(
+            wav_24k[:, 0, :],
+            orig_freq=self.sample_rate,
+            new_freq=self.semantic_sample_rate,
+        )
+        wav_16k = F.pad(wav_16k, (160, 160))
+
+        result = self.request.infer(
+            {
+                "input_values_24k": wav_24k.cpu().numpy(),
+                "input_values_16k_padded": wav_16k.cpu().numpy(),
+            }
+        )
         return self._Out(torch.from_numpy(next(iter(result.values()))).long())
 
 
@@ -534,7 +621,11 @@ class _OVAudioTokenizer:
     (``encode`` + ``decode`` + ``config`` + ``device``)."""
 
     def __init__(self, encoder_compiled, decoder_compiled, config):
-        self._enc = _OVAudioTokenizerEncode(encoder_compiled)
+        self._enc = _OVAudioTokenizerEncode(
+            encoder_compiled,
+            sample_rate=config.sample_rate,
+            semantic_sample_rate=config.semantic_sample_rate,
+        )
         self._dec = _OVAudioTokenizerDecode(decoder_compiled)
         self.config = config
         # The upstream code calls .to(self.audio_tokenizer.device); we keep CPU
