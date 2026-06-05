@@ -35,8 +35,8 @@ on:
 permissions:
   contents: read
 
-# env:
-#   PIP_CACHE_PATH: "C:\\mount\\caches\\pip\\win"
+env:
+  PIP_CACHE_PATH: "C:\\mount\\caches\\pip\\win"
 
 jobs:
   build_treon:
@@ -46,9 +46,8 @@ jobs:
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
           script: |
-            const container = "${{ inputs.container }}";
             const runsOn = "${{ inputs.runs_on }}";
-            const osName = runsOn.includes('linux') ? 'ubuntu-22.04' : 'windows-2022';
+            const osName = runsOn.includes('linux') ? 'linux' : runsOn.includes('mac') ? 'mac' : 'windows';
             const testDevice = runsOn === 'gpu' ? 'gpu' : 'cpu';
             const testReportDir = `${testDevice}-${osName}-${{ inputs.python }}`;
             core.exportVariable('OS_NAME', osName);
@@ -56,9 +55,6 @@ jobs:
             core.exportVariable('TEST_REPORT_DIR', testReportDir);
             core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
 
-      #### Installation/preparation ####
-      #
-      # These steps are also copied to convert_notebooks.yml
       - name: Checkout repository
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
@@ -79,7 +75,6 @@ jobs:
           changed_files=$(echo $changed_files | tr '\\' '/')
           echo "Changed files: $changed_files"
 
-          # Check if any notebook files were changed
           notebook_changed=false
           for file in $changed_files; do
             if [[ $file == notebooks/* ]]; then
@@ -89,14 +84,12 @@ jobs:
           done
 
           if [ "$notebook_changed" = true ]; then
-            # If notebooks were changed, test those notebooks
             touch test_notebooks.txt
             for file in $changed_files; do
               echo "$file was changed"
               echo $file >> test_notebooks.txt
             done
           else
-            # If no notebooks were changed, use precommit list
             echo "No notebook files changed, using precommit list"
             cp .ci/precommit_list.txt test_notebooks.txt
           fi
@@ -114,49 +107,30 @@ jobs:
           sed -i '/^$/d' test_notebooks.txt
           echo "Notebooks to test ($(wc -l < test_notebooks.txt) total):"
           cat test_notebooks.txt
-      
-      # Packages that notebooks need to run in plain os
-      - name: Install required packages
-        if: ${{ false }}
-        run: |
-          # Download 7z standalone utility
-          Invoke-WebRequest -Uri 'https://www.7-zip.org/a/7zr.exe' -OutFile '7zr.exe' -UseBasicParsing
-          # Download ffmpeg
-          Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-full_build.7z' -OutFile 'ffmpeg.7z' -UseBasicParsing
-          # Extract ffmpeg using 7z
-          .\7zr.exe x ffmpeg.7z -y
-          Move-Item -Path ffmpeg-7.1.1-full_build -Destination ffmpeg
-          "$PWD\ffmpeg\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Setup Python ${{ inputs.python }}
         uses: openvinotoolkit/openvino/.github/actions/setup_python@e4b65a0ab6c946c72d56240223620837e6d34bf8
         with:
           version: ${{ inputs.python }}
-          # pip-cache-path: ${{ env.PIP_CACHE_PATH }}
-          # should-setup-pip-paths: 'true'
+          pip-cache-path: ${{ env.PIP_CACHE_PATH }}
+          should-setup-pip-paths: 'true'
           self-hosted-runner: 'true'
 
-      # Download a small dataset to use for testing purposes in monai-kidney training notebook
-      - name: Download CT files
-        if: steps.cachefiles.outputs.cache-hit != 'true'
-        run: curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
-      
-      - name: Copy CT files
+      - name: Prepare CT files for ct-segmentation-quantize
         run: |
-          mkdir notebooks/ct-segmentation-quantize/kits19
-          mkdir notebooks/ct-segmentation-quantize/kits19/kits19_frames
+          curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
+          mkdir -p notebooks/ct-segmentation-quantize/kits19/kits19_frames
           unzip case_00030.zip
           cp -r case_00030 case_00001
           mv case_00030 notebooks/ct-segmentation-quantize/kits19/kits19_frames
           mv case_00001 notebooks/ct-segmentation-quantize/kits19/kits19_frames
 
-      # Prevent test aborting by timeout for 'meter-reader' and 'paddle-ocr-webcam' notebooks
-      - name: Download long loading models for 'meter-reader' and 'paddle-ocr-webcam' notebooks
+      - name: Prepare models for meter-reader and paddle-ocr-webcam
         run: |
-          mkdir notebooks/meter-reader/model
+          mkdir -p notebooks/meter-reader/model
           curl -o notebooks/meter-reader/model/meter_det_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_det_model.tar.gz'
           curl -o notebooks/meter-reader/model/meter_seg_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_seg_model.tar.gz'
-          mkdir notebooks/paddle-ocr-webcam/model
+          mkdir -p notebooks/paddle-ocr-webcam/model
           curl -o notebooks/paddle-ocr-webcam/model/ch_PP-OCRv3_det_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_det_infer.tar'
           curl -o notebooks/paddle-ocr-webcam/model/ch_PP-OCRv3_rec_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_rec_infer.tar'
 
@@ -165,52 +139,16 @@ jobs:
           python3 -m pip install --upgrade setuptools wheel
           python3 -m pip install -r .ci/dev-requirements.txt
           python3 -m ipykernel install --user --name openvino_env
-      
-      - name: Check Pillow
-        run: |
-          python3 -m pip install pillow==12.2.0
-      
-      - name: Check OpenCV
-        if: ${{ false }}
-        run: |
-          python3 -m pip install "openvino>=2023.1.0"
-          python3 -m pip install opencv-python tqdm "matplotlib>=3.4"
-          python3 -c "import urllib.request; urllib.request.urlretrieve('https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/video/CEO%20Pat%20Gelsinger%20on%20Leading%20Intel.mp4', 'test_video.mp4')"
-          python3 -c "import cv2; cap = cv2.VideoCapture('test_video.mp4'); print(f'Video opened successfully: {cap.isOpened()}'); print(f'Frame count: {int(cap.get(cv2.CAP_PROP_FRAME_COUNT))}'); cap.release()"
-          
-
-      # # Cache OpenVINO packages (`mv` works cross-platform)
-      # - name: Make pipcache directory with OpenVINO packages
-      #   if: steps.cachepip.outputs.cache-hit != 'true'
-      #   run: |
-      #     mv pipcache pipcache_full
-      #     mv pipcache_openvino pipcache
-
-      # Create list of installed pip packages that can be downloaded as artifacts
-      # to verify the exact environment of a specific test run
-      # - name: pip freeze
-      #   run: |
-      #     python${{ inputs.python }} -m pip freeze
-      #     python${{ inputs.python }} -m pip freeze > pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
-      # - name: Upload pip freeze artifact
-      #   uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
-      #   with:
-      #     name: pip-freeze-${{ env.TEST_DEVICE }}-${{ env.OS_NAME }}-${{ inputs.python }}
-      #     path: pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
-      #### End installation/preparation
 
       - name: Check install
         run: python3 check_install.py
 
-      # Patch long running cells to run faster
       - name: Patch notebooks
         run: python3 .ci/patch_notebooks.py . -td ${{ env.TEST_DEVICE }}
 
-      # Test that JupyterLab runs without errors
       - name: Test Jupyterlab
         run: jupyter lab notebooks --help
 
-      # Main notebooks test. Verifies that all notebooks run without errors
       - name: Analysing with treon
         shell: pwsh
         run: |

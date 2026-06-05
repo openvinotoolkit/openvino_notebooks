@@ -1,208 +1,208 @@
 - notebook: notebooks/gpu-device/gpu-device.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/pytorch-post-training-quantization-nncf/pytorch-post-training-quantization-nncf.ipynb
   skips:
     - os:
-        - ubuntu-22.04
+        - linux
 - notebook: notebooks/model-server/model-server.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/blip-visual-language-processing/blip-visual-language-processing.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/stable-diffusion-v2-infinite-zoom/stable-diffusion-v2-infinite-zoom.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/stable-diffusion-v3-torch-fx/stable-diffusion-v3-torch-fx.ipynb
   skips:
     - os:
-        - macos-13
-        - windows-2022
+        - mac
+        - windows
     - python:
         - '3.13'
 - notebook: notebooks/segment-anything/segment-anything.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/freevc-voice-conversion/freevc-voice-conversion.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/stable-diffusion-xl/stable-diffusion-xl.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/oneformer-segmentation/oneformer-segmentation.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/music-generation/music-generation.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/zeroscope-text2video/zeroscope-text2video.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/bark-text-to-audio/bark-text-to-audio.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-genai.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/fast-segment-anything/fast-segment-anything.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/latent-consistency-models-image-generation/latent-consistency-models-image-generation.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/speculative-sampling/speculative-sampling.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/distil-whisper-asr/distil-whisper-asr.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/llm-question-answering/llm-question-answering.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/instant-id/instant-id.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/animate-anyone/animate-anyone.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/llm-rag-langchain/llm-rag-langchain.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/stable-video-diffusion/stable-video-diffusion.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/yolov10-optimization/yolov10-optimization.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/llm-rag-llamaindex/llm-rag-llamaindex.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/openvino-tokenizers/openvino-tokenizers.ipynb
   skips:
     - os:
-        - macos-13
+        - mac
     - device:
         - gpu
 - notebook: notebooks/grounded-segment-anything/grounded-segment-anything.ipynb
   skips:
     - os:
-        - macos-13
+        - mac
 - notebook: notebooks/text-prediction/text-prediction.ipynb
   skips:
     - os:
-        - windows-2022
+        - windows
 - notebook: notebooks/hello-npu/hello-npu.ipynb
   skips:
     - device:
@@ -215,80 +215,80 @@
 - notebook: notebooks/llm-agent-rag-llamaindex/llm-agent-rag-llamaindex.ipynb
   skips:
     - os:
-      - macos-13
-      - windows-2022  # 14.4 min on Win — too slow for 6h CI limit (2026-03-30)
+      - mac
+      - windows  # 14.4 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/phi-3-vision/phi-3-vision.ipynb
   skips:
       - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/qwen2-vl/qwen2-vl.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/qwen2-audio/qwen2-audio.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/mllama-3.2/mllama-3.2.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/sam2-image-segmentation/segment-anything-2-image.ipynb
   skips:
     - os:
-        - macos-13
+        - mac
 - notebook: notebooks/sam2-video-segmentation/segment-anything-2-video.ipynb
   skips:
     - os:
-        - macos-13
-        - windows-2022  # 8.2 min on Win — too slow for 6h CI limit (2026-03-31)
+        - mac
+        - windows  # 8.2 min on Win — too slow for 6h CI limit (2026-03-31)
 - notebook: notebooks/pixtral/pixtral.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/multilora-image-generation/multilora-image-generation.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/mobileclip-video-search/mobileclip-video-search.ipynb
   skips:
     - os:
-        - macos-13
+        - mac
 - notebook: notebooks/llm-agent-react-langchain/llm-agent-react-langchain.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/multimodal-rag/multimodal-rag-llamaindex.ipynb
   skips:
     - os:
-        - macos-13
-        - windows-2022  # 16.0 min on Win — too slow for 6h CI limit (2026-03-30)
+        - mac
+        - windows  # 16.0 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/llm-rag-langchain/llm-rag-langchain-genai.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/ltx-video/ltx-video.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/paddle-to-openvino/paddle-to-openvino-classification.ipynb
   skips:
     - python:
@@ -296,107 +296,107 @@
 - notebook: notebooks/phi-4-multimodal/phi-4-multimodal.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb
   skips:
     - os:
-      - macos-13
-      - windows-2022  # 8.3 min on Win — too slow for 6h CI limit (2026-03-31)
+      - mac
+      - windows  # 8.3 min on Win — too slow for 6h CI limit (2026-03-31)
 - notebook: notebooks/glm4-v/glm4-v.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/gemma3/gemma3.ipynb
   skips:
    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/omniparser/omniparser.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/olmocr-pdf-vlm/olmocr-pdf-vlm.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
     - python:
         - '3.10'
 - notebook: notebooks/minicpm-o-omnimodal-chatbot/minicpm-o-omnimodal-chatbot.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
   skips:
     - os:
-        - macos-13
+        - mac
 - notebook: notebooks/kokoro/kokoro.ipynb
   skips:
     - os:
-        - windows-2022
+        - windows
     - python:
         - '3.13'
 - notebook: notebooks/qwen2.5-omni-chatbot/qwen2.5-omni-chatbot.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/deepseek-vl2/deepseek-vl2.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/openvoice2-and-melotts/openvoice2-and-melotts.ipynb
   skips:
     - os:
-        - macos-13
+        - mac
 - notebook: notebooks/wan2.1-text-to-video/wan2.1-text-to-video.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/llm-agent-mcp/llm-agent-mcp.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/modelscope-to-openvino/modelscope-to-openvino.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/glm4.1-v-thinking/glm4.1-v-thinking.ipynb
   skips:
     - os:
-        - macos-13
-        - windows-2022
+        - mac
+        - windows
 - notebook: notebooks/ace-step-music-generation/ace-step-music-generation.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/flux.1-kontext/flux.1-kontext.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/convert-to-openvino/convert-to-openvino.ipynb
   skips:
     - python:
@@ -417,144 +417,144 @@
 - notebook: notebooks/text-to-image-genai/text-to-image-genai.ipynb
   skips:
     - os:
-        - macos-13
+        - mac
 - notebook: notebooks/llm-chatbot/llm-chatbot-generate-api.ipynb
   skips:
     - os:
-        - macos-13
+        - mac
 - notebook: notebooks/llm-chatbot/llm-chatbot.ipynb
   skips:
     - os:
-        - macos-13
+        - mac
 - notebook: notebooks/nuextract-structure-extraction/nuextract-structure-extraction.ipynb
   skips:
     - os:
-        - macos-13
+        - mac
 - notebook: notebooks/fireredtts2/fireredtts2.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/qwen3-vl/qwen3-vl.ipynb
   skips:
     - os:
-        - macos-13
+        - mac
 - notebook: notebooks/qwen2.5-vl/qwen2.5-vl.ipynb
   skips:
     - os:
-        - ubuntu-22.04
-        - windows-2022  # 9.5 min on Win — too slow for 6h CI limit (2026-03-30)
+        - linux
+        - windows  # 9.5 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/catvton/catvton.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/deepseek-ocr/deepseek-ocr.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/wan2.2-text-image-to-video/wan2.2-text-image-to-video.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/3D-point-pillars/pointpillars.ipynb
   skips:
     - os:
-        - macos-13
-        - windows-2022
+        - mac
+        - windows
     - python:
         - "3.13"
 - notebook: notebooks/aloha-act/aloha-act.ipynb
   skips:
     - os:
-        - macos-13
-        - windows-2022
+        - mac
+        - windows
     - python:
         - '3.13'
 - notebook: notebooks/sam3/sam3-segmentation.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/minicpm-o-4.5/minicpm-o-4.5.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
+        - mac
+        - linux
+        - windows
 - notebook: notebooks/paddleocr_vl/paddleocr_vl.ipynb
   skips:
     - os:
-        - windows-2022
+        - windows
 # 14.1 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/jina-clip/jina-clip.ipynb
   skips:
     - os:
-        - windows-2022
+        - windows
 # 11.5 min on Win (est) — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/llm-rag-langchain/llm-rag-langchain-eval.ipynb
   skips:
     - os:
-        - windows-2022
+        - windows
 # 10.0 min on Win (est) — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/flex.2-image-generation/flex.2-image-generation.ipynb
   skips:
     - os:
-        - windows-2022
+        - windows
 # 9.6 min on Win (est) — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/wav2lip/wav2lip.ipynb
   skips:
     - os:
-        - windows-2022
+        - windows
 # 8.5 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/image-to-image-genai/image-to-image-genai.ipynb
   skips:
     - os:
-        - windows-2022
+        - windows
 # 8.1 min on Win — too slow for 6h CI limit (2026-03-31)
 - notebook: notebooks/language-quantize-bert/language-quantize-bert.ipynb
   skips:
     - os:
-        - windows-2022
+        - windows
 # 8.0 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/internvl2/internvl2.ipynb
   skips:
     - os:
-        - windows-2022
+        - windows
 - notebook: notebooks/qwen3-tts/qwen3-tts.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
+        - mac
+        - linux
 # OOM / timeout — model too heavy for CI runners (2026-04-03)
 - notebook: notebooks/gemma4/gemma4.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
+        - mac
+        - linux
 # Gated model — requires HuggingFace authentication
 - notebook: notebooks/medasr-medical-asr/medasr-medical-asr.ipynb
   skips:
     - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-        - windows-2022
+        - mac
+        - linux
+        - windows
+        - windows
 - notebook: notebooks/minicpm-v-4.6/minicpm-v-4.6.ipynb
   skips:
     - os:
-        - macos-13
-        - windows-2022
+        - mac
+        - windows

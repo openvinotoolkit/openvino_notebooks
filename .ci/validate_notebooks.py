@@ -14,8 +14,6 @@ import venv
 from clonevirtualenv import clone_virtualenv
 import traceback
 import tempfile
-import nbformat
-from nbconvert.preprocessors import ExecutePreprocessor, CellExecutionError
 
 from argparse import ArgumentParser
 from pathlib import Path
@@ -469,62 +467,6 @@ def kill_process_tree(pid):
             print(f"Killed process group PID {pid}", flush=True)
     except Exception as e:
         print(f"Error killing process tree PID {pid}: {e}", flush=True)
-
-
-def execute_notebook_with_nbconvert(notebook_path: Path, 
-                                    timeout: int) -> tuple[int, float]:
-    """
-    Execute a Jupyter notebook using nbconvert's ExecutePreprocessor.
-
-    Args:
-        notebook_path: Path to the notebook file to execute
-        timeout: Timeout in seconds for cell execution
-
-    Returns:
-        tuple: (return_code, duration) where return_code is 0 for success,
-               -42 for timeout, or 1 for other errors
-    """
-    start_time = time.perf_counter()
-    retcode = 0
-    notebook_original_name = notebook_path.name
-    test_notebook_path = notebook_path.parent / f"test_{notebook_original_name}"
-    executed_notebook_path = notebook_path.parent / f"executed_{notebook_original_name}"
-    print(f"Executing notebook with nbconvert: {test_notebook_path}", flush=True)
-    with open(test_notebook_path, 'r', encoding='utf-8') as f:
-        nb = nbformat.read(f, as_version=4)
-    try:
-        # Ensure environment variables (including PATH with MSVC DLLs) are passed to kernel
-        ep = ExecutePreprocessor(
-            timeout=timeout,
-        )
-
-        # Pass current environment to ensure DLL paths and other configs are available
-        resources = {
-            'metadata': {
-                'path': str(notebook_path.parent)
-            }
-        }
-        ep.preprocess(nb, resources)           
-        print(f"Notebook executed successfully", flush=True)
-
-    except CellExecutionError as e:
-        print(f"Notebook execution failed with cell error:\n{e}", flush=True)
-        retcode = 1
-    except TimeoutError:
-        print(f"Notebook execution timed out after {timeout} seconds", flush=True)
-        retcode = -42  # Special timeout exit code
-    except Exception as e:
-        print(f"Notebook execution failed with error:\n{e}", flush=True)
-        print(traceback.format_exc(), flush=True)
-        retcode = 1
-    finally:
-        # Save the notebook with outputs
-        with open(executed_notebook_path, 'w', encoding='utf-8') as f:
-            nbformat.write(nb, f)
-            print(f"Executed notebook saved to: {executed_notebook_path}", flush=True)
-
-    duration = time.perf_counter() - start_time
-    return retcode, duration
 
 
 def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"):

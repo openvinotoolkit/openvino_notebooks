@@ -54,17 +54,13 @@ jobs:
       image: ${{ inputs.container }}
       volumes:
         - /mount:/mount
-      # options: --device /dev/dri:/dev/dri --group-add 109 --group-add 44
-      # volumes:
-      #   - /dev/dri:/dev/dri
     steps:
       - name: Set env variables
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
           script: |
-            const container = "${{ inputs.container }}";
             const runsOn = "${{ inputs.runs_on }}";
-            const osName = runsOn.includes('linux') ? 'ubuntu-22.04' : 'windows-2022';
+            const osName = runsOn.includes('linux') ? 'linux' : runsOn.includes('mac') ? 'mac' : 'windows';
             const testDevice = runsOn === 'gpu' ? 'gpu' : 'cpu';
             const testReportDir = `${testDevice}-${osName}-${{ inputs.python }}`;
             core.exportVariable('OS_NAME', osName);
@@ -72,9 +68,6 @@ jobs:
             core.exportVariable('TEST_REPORT_DIR', testReportDir);
             core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
 
-      #### Installation/preparation ####
-      #
-      # These steps are also copied to convert_notebooks.yml
       - name: Checkout repository
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
@@ -94,7 +87,6 @@ jobs:
           changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
           changed_files=$(echo $changed_files | tr '\\' '/')
 
-          # Check if any notebook files were changed
           notebook_changed=false
           for file in $changed_files; do
             if [[ $file == notebooks/* ]]; then
@@ -104,14 +96,12 @@ jobs:
           done
 
           if [ "$notebook_changed" = true ]; then
-            # If notebooks were changed, test those notebooks
             touch test_notebooks.txt
             for file in $changed_files; do
               echo "$file was changed"
               echo $file >> test_notebooks.txt
             done
           else
-            # If no notebooks were changed, use precommit list
             echo "No notebook files changed, using precommit list"
             cp .ci/precommit_list.txt test_notebooks.txt
           fi
@@ -130,7 +120,6 @@ jobs:
           echo "Notebooks to test ($(wc -l < test_notebooks.txt) total):"
           cat test_notebooks.txt
       
-      # Packages that notebooks need to run in plain os
       - name: Install required packages (Linux)
         if: ${{ !inputs.container && runner.os == 'Linux' }}
         shell: bash
@@ -138,7 +127,6 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install libsndfile1 ffmpeg espeak-ng -y
       
-      # Packages that notebooks need to run in docker container
       - name: Install required packages (container)
         if: ${{ inputs.container }}
         shell: bash
@@ -180,33 +168,24 @@ jobs:
           mkdir -m 777 -p ${{ env.MOUNT_CACHE }}
           ls -la ${{ env.MOUNT_CACHE }}
 
-      # PaddleGAN stores cache in ppgan directory in CACHE_DIR
-      - name: Set CACHE_DIR
-        run: python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("${{ env.MOUNT_CACHE }}", "PaddleGAN"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+      - name: Set cache environment variables
+        run: |
+          python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("${{ env.MOUNT_CACHE }}", "PaddleGAN"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+          echo HUB_HOME=${{ env.MOUNT_CACHE }}/.paddlehub >> $GITHUB_ENV
 
-      # PaddleHub stores cache in directory pointed to by HUB_HOME environment variable
-      - name: Set HUB_HOME
-        run: echo HUB_HOME=${{ env.MOUNT_CACHE }}/.paddlehub >> $GITHUB_ENV
-
-      # Download a small dataset to use for testing purposes in monai-kidney training notebook
-      - name: Download CT files
+      - name: Prepare CT files for ct-segmentation-quantize
         run: |
           if [[ ! -f ${{ env.MOUNT_CACHE }}/case_00030.zip ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/case_00030.zip https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
           fi
-
-      - name: Copy CT files
-        run: |
-          mkdir notebooks/ct-segmentation-quantize/kits19
-          mkdir notebooks/ct-segmentation-quantize/kits19/kits19_frames
+          mkdir -p notebooks/ct-segmentation-quantize/kits19/kits19_frames
           cp ${{ env.MOUNT_CACHE }}/case_00030.zip .
           unzip case_00030.zip
           cp -r case_00030 case_00001
           mv case_00030 notebooks/ct-segmentation-quantize/kits19/kits19_frames
           mv case_00001 notebooks/ct-segmentation-quantize/kits19/kits19_frames
 
-      # Prevent test aborting by timeout for 'meter-reader' and 'paddle-ocr-webcam' notebooks
-      - name: Download long loading models for 'meter-reader' and 'paddle-ocr-webcam' notebooks
+      - name: Prepare models for meter-reader and paddle-ocr-webcam
         run: |
           if [[ ! -f "${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz" ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_det_model.tar.gz'
@@ -220,13 +199,10 @@ jobs:
           if [[ ! -f "${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar" ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_rec_infer.tar'
           fi
-
-      - name: Copy model files
-        run: |
-          mkdir notebooks/meter-reader/model
+          mkdir -p notebooks/meter-reader/model
           cp ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz notebooks/meter-reader/model/
           cp ${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz notebooks/meter-reader/model/
-          mkdir notebooks/paddle-ocr-webcam/model
+          mkdir -p notebooks/paddle-ocr-webcam/model
           cp ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar notebooks/paddle-ocr-webcam/model/
           cp ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar notebooks/paddle-ocr-webcam/model/
 
@@ -237,31 +213,15 @@ jobs:
           .venv/bin/python3 -m pip install -r .ci/dev-requirements.txt
           .venv/bin/python3 -m ipykernel install --user
 
-      # Create list of installed pip packages that can be downloaded as artifacts
-      # to verify the exact environment of a specific test run
-      # - name: pip freeze
-      #   run: |
-      #     python${{ inputs.python }} -m pip freeze
-      #     python${{ inputs.python }} -m pip freeze > pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
-      # - name: Upload pip freeze artifact
-      #   uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
-      #   with:
-      #     name: pip-freeze-${{ env.TEST_DEVICE }}-${{ env.OS_NAME }}-${{ inputs.python }}
-      #     path: pip-freeze-${{ env.TEST_DEVICE }}-${{ github.sha }}-${{ env.OS_NAME }}-${{ inputs.python }}.txt
-      #### End installation/preparation
-
       - name: Check install
         run: .venv/bin/python3 check_install.py
 
-      # Patch long running cells to run faster
       - name: Patch notebooks
         run: .venv/bin/python3 .ci/patch_notebooks.py . -td ${{ env.TEST_DEVICE }}
 
-      # Test that JupyterLab runs without errors
       - name: Test Jupyterlab
         run: .venv/bin/python3 -m jupyter lab notebooks --help
 
-      # Main notebooks test. Verifies that all notebooks run without errors
       - name: Analysing with treon (Linux)
         if: runner.os == 'Linux'
         shell: bash

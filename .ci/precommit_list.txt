@@ -1,4 +1,1 @@
 notebooks/hello-world/hello-world.ipynb
-notebooks/async-api/async-api.ipynb
-notebooks/jax-to-openvino/jax-classification-to-openvino.ipynb
-notebooks/3D-segmentation-point-clouds/3D-segmentation-point-clouds.ipynb
