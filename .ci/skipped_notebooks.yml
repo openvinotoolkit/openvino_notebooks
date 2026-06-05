@@ -553,3 +553,8 @@
         - ubuntu-22.04
         - windows-2022
         - windows-2022
+- notebook: notebooks/minicpm-v-4.6/minicpm-v-4.6.ipynb
+  skips:
+    - os:
+        - macos-13
+        - windows-2022

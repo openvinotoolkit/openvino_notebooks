@@ -27,10 +27,6 @@ Key features: built-in chain-of-thought (thinking mode), native system prompt su
 - Demonstrate thinking mode (chain-of-thought reasoning)
 - Launch an interactive Gradio chat demo with image and video upload
 
-## ⚠️ Experimental
-
-This notebook demonstrates a model that has not been fully validated with OpenVINO. It may be fully supported and validated in the future.
-
 ## Installation Instructions
 
 This is a self-contained example that relies on the notebook-local helper code. We recommend running it in a dedicated virtual environment with Jupyter available.
