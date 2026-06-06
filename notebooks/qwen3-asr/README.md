@@ -18,14 +18,13 @@ More details can be found in the original [repository](https://github.com/QwenLM
 
 ### Notebook Contents
 
-In this tutorial we consider how to run and optimize Qwen3-ASR using OpenVINO.
+In this tutorial we consider how to run Qwen3-ASR using OpenVINO via [Optimum Intel](https://huggingface.co/docs/optimum/intel/index).
 
 The tutorial consists of the following steps:
 
 - Install prerequisites
-- Convert model to OpenVINO intermediate representation (IR) format 
-- Prepare OpenVINO Inference pipeline
-- Run Speech Recognition
+- Export model to OpenVINO format using Optimum Intel
+- Run inference with OpenVINO
 - Launch interactive demo
 
 ## Installation Instructions

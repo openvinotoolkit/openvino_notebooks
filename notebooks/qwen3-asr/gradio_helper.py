@@ -6,6 +6,7 @@ Based on the official Qwen3-ASR demo: https://huggingface.co/spaces/Qwen/Qwen3-A
 import base64
 import io
 import os
+import re
 import time
 import tempfile
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -219,12 +220,13 @@ def save_transcription(transcription: str) -> str:
         return f.name
 
 
-def make_demo(ov_model, example_dir=None):
+def make_demo(ov_model, processor, example_dir=None):
     """
     Create Gradio demo for Qwen3-ASR with OpenVINO.
 
     Args:
-        ov_model: OVQwen3ASRModel instance
+        ov_model: OVModelForSpeechSeq2Seq instance
+        processor: AutoProcessor instance
         example_dir: Directory containing example audio files (optional)
 
     Returns:
@@ -249,35 +251,70 @@ def make_demo(ov_model, example_dir=None):
         if lang_disp and lang_disp != "Auto":
             language = lang_map.get(lang_disp, lang_disp)
 
-        # Measure inference time
-        start_time = time.time()
-
-        # Perform transcription
-        results = ov_model.transcribe(
-            audio=audio_obj,
-            language=language,
-            return_time_stamps=False,  # Not supported in OV version
-        )
-
-        inference_time = time.time() - start_time
-
-        if not isinstance(results, list) or len(results) != 1:
-            return "", "", None, "<div style='color:red'>Unexpected result format.</div>"
-
-        r = results[0]
-
-        # Calculate audio duration
+        # Parse audio
         if isinstance(audio_obj, tuple):
             wav, sr = audio_obj
-            audio_duration = len(wav) / sr
         else:
-            audio_duration = 0
+            return "", "", None, "<div style='color:red'>Error: Unsupported audio format.</div>"
+
+        # Resample to 16kHz if needed
+        target_sr = 16000
+        if sr != target_sr:
+            import librosa
+            wav = librosa.resample(wav, orig_sr=sr, target_sr=target_sr)
+            sr = target_sr
+
+        audio_duration = len(wav) / sr
+
+        # Build text prompt
+        messages = [
+            {"role": "system", "content": ""},
+            {"role": "user", "content": [{"type": "audio", "audio": ""}]},
+        ]
+        text_prompt = processor.apply_chat_template(
+            messages, add_generation_prompt=True, tokenize=False,
+        )
+
+        # Add language forcing if specified
+        if language:
+            text_prompt = text_prompt + f"language {language}<asr_text>"
+
+        # Process inputs
+        inputs = processor(
+            text=text_prompt, audio=wav, sampling_rate=sr, return_tensors="pt",
+        )
+
+        # Generate
+        start_time = time.time()
+        generated_ids = ov_model.generate(
+            input_features=inputs["input_features"],
+            decoder_input_ids=inputs["input_ids"],
+            max_new_tokens=512,
+        )
+        inference_time = time.time() - start_time
+
+        # Decode - skip prompt tokens
+        prompt_len = inputs["input_ids"].shape[1]
+        generated_only = generated_ids[:, prompt_len:]
+        full_text = processor.batch_decode(generated_only, skip_special_tokens=False)[0]
+
+        # Parse transcription
+        match = re.search(r"<asr_text>(.*?)(?:<\|im_end\|>|<\||$)", full_text, re.DOTALL)
+        transcription = match.group(1).strip() if match else full_text.strip()
+
+        # Extract detected language
+        detected_lang = ""
+        lang_match = re.search(r"language\s+(\w+)", full_text)
+        if lang_match:
+            detected_lang = lang_match.group(1)
+        elif language:
+            detected_lang = language
 
         metrics = f"Inference time: {inference_time:.2f}s | Audio duration: {audio_duration:.2f}s | RTF: {inference_time/max(audio_duration, 0.1):.3f}"
 
         return (
-            getattr(r, "language", "") or "",
-            getattr(r, "text", "") or "",
+            detected_lang,
+            transcription,
             None,  # No timestamps in OV version
             metrics,
         )
