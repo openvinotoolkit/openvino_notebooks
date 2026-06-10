@@ -1,0 +1,37 @@
+# Unified image & video generation with Bernini-R-1.3B and OpenVINO
+
+[Bernini-R-1.3B](https://huggingface.co/ByteDance/Bernini-R-1.3B-Diffusers) is a unified, multi-task diffusion *renderer* from ByteDance. A single model handles text-to-image, image editing, text-to-video, video editing, and reference-image-to-video generation. It is fine-tuned from [Wan2.1-1.3B](https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B) and re-uses the Wan building blocks: a [`WanTransformer3DModel`](https://github.com/bytedance/Bernini) diffusion transformer (DiT), a `UMT5EncoderModel` text encoder, an `AutoencoderKLWan` spatio-temporal VAE, and a `UniPCMultistepScheduler` flow-matching scheduler.
+
+You can find more details in the [model card](https://huggingface.co/ByteDance/Bernini-R-1.3B-Diffusers) and the [original repository](https://github.com/bytedance/Bernini).
+
+In this tutorial we convert, optimize and run Bernini-R with OpenVINO.
+
+## How the pipeline is split for OpenVINO
+
+Bernini's generation logic lives in a python denoising loop (`bernini.models.wan_diffusion.GEN_Wanx22.sample`) that selects among **seven guidance modes**, builds source-id rotary embeddings, assembles a variable number of conditioning tokens per step, and steps the scheduler. Static OpenVINO graphs cannot express that data-dependent control flow, so only the heavy *leaf* compute is pushed into OpenVINO while every loop and branch stays in python:
+
+- **Text encoder** — a single static graph (token length fixed to 512).
+- **Transformer** — the patch-embedding (a small `Conv3d`) and rotary-embedding construction stay in torch (so `patch_vae_latent` runs exactly as in the reference); the condition-embedder + 30 transformer blocks + output projection are exported as one graph (`BlocksCore`) with a **dynamic packed-token axis**, so the same compiled model serves every guidance combination (uncond / V / VI / VTI ...). The variable-length attention reduces to ordinary attention for single-sample inference and is implemented with `scaled_dot_product_attention`; rotary embeddings are applied with real arithmetic to keep complex ops out of the graph.
+- **VAE encoder / decoder** — the Wan VAE walks the temporal axis with a python loop and a causal feature cache, so one graph is valid for a single temporal length. We export a graph per latent length (length `1` covers images / single frames; video lengths are also compiled lazily at run time).
+
+The original `bernini` pipeline and sampler methods are then re-used **verbatim** by injecting these OpenVINO-backed leaf modules, which keeps the OpenVINO pipeline numerically aligned with the reference across all tasks and lets you pick a different inference device (CPU / GPU) per component.
+
+> **GPU precision**: the UMT5 text encoder and the Wan VAE are prone to fp16 overflow (a black image for some prompts), so on GPU/NPU they run in `f32` while the compute-heavy transformer stays in fast `f16`. Both f32 components run only once per generation, so this keeps GPU generation fast (≈2× faster than running everything in f32) while matching the CPU output. This is handled automatically in `load_ov_pipeline`; pass `ov_config` to override.
+
+The helpers are integrated into a single file, [ov_bernini_helper.py](ov_bernini_helper.py): model conversion, the OpenVINO wrapper modules, and `load_ov_pipeline`.
+
+## Notebook contents
+This tutorial consists of the following steps:
+- Prerequisites
+- Convert and Optimize the model (FP16 / INT8 / INT4 weight compression)
+- Run the inference pipeline (text-to-image and text-to-video)
+- Interactive inference with Gradio
+
+## Installation instructions
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
+
+> **Note**: the reference Bernini implementation pins `diffusers==0.35.2` and `transformers==4.57.3`; the first notebook cell installs these and the `bernini` package. Restart the kernel after the install cell if these versions differ from your base environment.
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/bernini-r-image-video/README.md" />
