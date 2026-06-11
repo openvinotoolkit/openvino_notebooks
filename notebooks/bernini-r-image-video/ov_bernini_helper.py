@@ -744,12 +744,34 @@ def load_ov_pipeline(model_dir, ov_model_dir, device_map="CPU", ov_config=None,
     return pipe
 
 
-# Guidance mode for each task type exposed in the demo / notebook.
+# Guidance mode + system prompt + required inputs per task, matching the
+# reference testcases in github.com/bytedance/Bernini (assets/testcases/*.json
+# and bernini.prompt_enhancer.SYSTEM_PROMPTS). The system prompt is prefixed to
+# the user prompt by BerniniRendererPipeline.__call__.
 TASK_GUIDANCE = {
-    "t2i": "t2v",       # single frame, plain text CFG
-    "t2v": "t2v",
-    "i2i": "r2v_apg",   # reference image edit (single frame)
+    "t2i": "t2v_apg",   # text -> image (single frame)
+    "t2v": "t2v_apg",   # text -> video
+    "i2i": "v2v",       # image edit (reference image -> image)
+    "v2v": "v2v_apg",   # video edit (source video -> video)
     "r2v": "r2v_apg",   # reference image(s) -> video
-    "v2v": "v2v",       # source video edit
-    "rv2v": "rv2v",     # reference + source video
+    "rv2v": "rv2v",     # reference image(s) + source video -> video
+}
+
+TASK_SYSTEM_PROMPT = {
+    "t2i": "You are a helpful assistant specialized in text-to-image generation.",
+    "t2v": "You are a helpful assistant specialized in text-to-video generation.",
+    "i2i": "You are a helpful assistant specialized in image editing.",
+    "v2v": "You are a helpful assistant specialized in video editing.",
+    "r2v": "You are a helpful assistant specialized in subject-to-video generation.",
+    "rv2v": "You are a helpful assistant specialized in video editing with reference.",
+}
+
+# Which visual inputs each task consumes (drives the demo UI + notebook calls).
+TASK_INPUTS = {
+    "t2i": (),
+    "t2v": (),
+    "i2i": ("image",),
+    "v2v": ("video",),
+    "r2v": ("images",),
+    "rv2v": ("video", "images"),
 }

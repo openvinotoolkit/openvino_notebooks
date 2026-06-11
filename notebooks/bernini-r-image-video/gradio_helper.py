@@ -9,7 +9,7 @@ tasks that use them.
 import numpy as np
 import gradio as gr
 
-from ov_bernini_helper import TASK_GUIDANCE
+from ov_bernini_helper import TASK_GUIDANCE, TASK_SYSTEM_PROMPT, TASK_INPUTS
 
 MAX_SEED = np.iinfo(np.int32).max
 
@@ -38,10 +38,12 @@ def make_demo(pipeline):
                  seed, height, width, fps, progress=gr.Progress(track_tqdm=True)):
         is_image = task in IMAGE_TASKS
         out_path = "bernini_output.png" if is_image else "bernini_output.mp4"
+        needed = TASK_INPUTS[task]
         kwargs = dict(
             prompt=prompt,
             neg_prompt=neg_prompt,
             guidance_mode=TASK_GUIDANCE[task],
+            system_prompt=TASK_SYSTEM_PROMPT[task],
             num_frames=1 if is_image else int(num_frames),
             num_inference_steps=int(num_inference_steps),
             omega_TI=float(omega_TI),
@@ -53,14 +55,12 @@ def make_demo(pipeline):
             fps=int(fps),
             output_path=out_path,
         )
-        if task in ("i2i",) and image is not None:
+        if "image" in needed and image is not None:
             kwargs["image"] = image
-        if task in ("r2v",) and images:
+        if "images" in needed and images:
             kwargs["images"] = [im[0] if isinstance(im, (list, tuple)) else im for im in images]
-        if task in ("v2v", "rv2v") and video is not None:
+        if "video" in needed and video is not None:
             kwargs["video"] = video
-        if task == "rv2v" and images:
-            kwargs["images"] = [im[0] if isinstance(im, (list, tuple)) else im for im in images]
 
         result_path = pipeline(**kwargs)
         if is_image:
