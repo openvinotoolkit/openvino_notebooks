@@ -53,6 +53,8 @@ VAE_DECODER_DIR = "vae_decoder"          # holds vae_decoder_t{T}.xml
 VAE_ENCODER_DIR = "vae_encoder"          # holds vae_encoder_t{T}.xml
 PATCH_EMBED_PATH = "patch_embedding.pt"  # tiny Conv3d weights kept in torch
 TRANSFORMER_CONFIG_PATH = "transformer_config.json"
+VAE_CONFIG_PATH = "vae_config.json"
+BERNINI_CONFIG_PATH = "bernini_config.json"
 MAX_SEQ_LEN = 512
 
 
@@ -311,11 +313,16 @@ def convert_pipeline(model_dir, output_dir, compression_config=None, vae_latent_
     vae = pipe.vae
     vae.eval()
 
-    # tokenizer + scheduler are plain artifacts (kept in python at run time).
+    # Copy every config / tokenizer / scheduler artifact the run-time pipeline
+    # needs into the OpenVINO directory, so load_ov_pipeline never has to touch
+    # the original (PyTorch) model directory.
     pipe.tokenizer.save_pretrained(output_dir / "tokenizer")
     pipe.model.diff_dec.scheduler.save_pretrained(output_dir / "scheduler")
     with open(output_dir / TRANSFORMER_CONFIG_PATH, "w") as f:
         json.dump(dict(transformer.config), f)
+    with open(output_dir / VAE_CONFIG_PATH, "w") as f:
+        json.dump(dict(vae.config), f)
+    pipe.model.config.to_json_file(output_dir / BERNINI_CONFIG_PATH)
 
     # ---- transformer: patch-embedding (torch) + BlocksCore (OpenVINO) ----
     if not (output_dir / PATCH_EMBED_PATH).exists():
@@ -508,9 +515,9 @@ class _Out:
 
 
 class OVTextEncoderWrapper(torch.nn.Module):
-    def __init__(self, model_dir, device, ov_config=None):
+    def __init__(self, ov_model_dir, device, ov_config=None):
         super().__init__()
-        self._model = core.compile_model(Path(model_dir) / TEXT_ENCODER_PATH, device,
+        self._model = core.compile_model(Path(ov_model_dir) / TEXT_ENCODER_PATH, device,
                                           _device_config(device, ov_config, "text_encoder"))
         self.dtype = torch.float32
 
@@ -538,27 +545,31 @@ class OVTransformerWrapper(torch.nn.Module):
     block stack runs in OpenVINO via :class:`BlocksCore`.
     """
 
-    def __init__(self, model_dir, device, ov_config=None):
+    def __init__(self, ov_model_dir, device, ov_config=None):
         super().__init__()
         from bernini.models.transformer_wan import WanRotaryPosEmbed
         from diffusers.configuration_utils import FrozenDict
 
-        model_dir = Path(model_dir)
-        with open(model_dir / TRANSFORMER_CONFIG_PATH) as f:
+        ov_model_dir = Path(ov_model_dir)
+        with open(ov_model_dir / TRANSFORMER_CONFIG_PATH) as f:
             cfg = json.load(f)
         self.config = FrozenDict(cfg)
         self.dtype = torch.float32
 
+        # patch_embedding is a tiny Conv3d (a few KB) kept in torch so the
+        # data-dependent patchify + source-id rotary (``patch_vae_latent``) runs
+        # exactly as in the reference; its weights were saved next to the IR at
+        # convert time. This is the only torch tensor the run-time pipeline loads.
         inner_dim = cfg["num_attention_heads"] * cfg["attention_head_dim"]
         patch = tuple(cfg["patch_size"])
         self.patch_embedding = torch.nn.Conv3d(cfg["in_channels"], inner_dim, kernel_size=patch, stride=patch)
-        self.patch_embedding.load_state_dict(torch.load(model_dir / PATCH_EMBED_PATH, map_location="cpu"))
+        self.patch_embedding.load_state_dict(torch.load(ov_model_dir / PATCH_EMBED_PATH, map_location="cpu"))
         self.patch_embedding.eval()
         self.rope = WanRotaryPosEmbed(
             cfg["attention_head_dim"], patch, cfg["rope_max_seq_len"],
             use_src_id_rotary_emb=cfg["use_src_id_rotary_emb"],
         )
-        self._model = core.compile_model(model_dir / TRANSFORMER_PATH, device,
+        self._model = core.compile_model(ov_model_dir / TRANSFORMER_PATH, device,
                                           _device_config(device, ov_config, "transformer"))
 
     def patch_vae_latent(self, hidden_states, source_id=None):
@@ -693,17 +704,25 @@ class OVVAEWrapper(torch.nn.Module):
 # --------------------------------------------------------------------------- #
 # Assembled pipeline (re-uses bernini's sample / __call__ verbatim)
 # --------------------------------------------------------------------------- #
-def load_ov_pipeline(model_dir, ov_model_dir, device_map="CPU", ov_config=None,
-                     compression_config=None):
+def load_ov_pipeline(ov_model_dir, device_map="CPU", ov_config=None,
+                     compression_config=None, source_model_dir=None):
     """Build a ``BerniniRendererPipeline`` whose leaf modules run on OpenVINO.
 
-    ``device_map`` is a string or a dict with keys ``transformer`` /
-    ``text_encoder`` / ``vae``. All of the denoising / guidance / VAE
-    orchestration is the original ``bernini`` code -- only the three leaf modules
-    are replaced, so behaviour matches the reference across every task.
+    Everything is read from ``ov_model_dir`` (the output of ``convert_pipeline``):
+    the configs, tokenizer and scheduler were copied there at conversion time, so
+    this function **never touches the original PyTorch model directory and never
+    loads any PyTorch model weights** -- only OpenVINO IR is compiled. The three
+    leaf modules (text encoder / transformer / VAE) are replaced with OpenVINO
+    wrappers while bernini's own ``sample`` / ``__call__`` drive them unchanged.
 
-    ``compression_config`` (the same one used for ``convert_pipeline``) is reused
-    when a VAE graph for a new video length has to be converted on demand.
+    ``device_map`` is a string or a dict with keys ``transformer`` /
+    ``text_encoder`` / ``vae``.
+
+    ``source_model_dir`` is optional and used **only** if you ask for a video
+    length whose VAE graph was not pre-converted: then (and only then) the
+    original VAE is loaded to build+cache that one graph. Leave it ``None`` to
+    forbid any PyTorch-weight loading at run time (a clear error is raised
+    instead, telling you to re-run ``convert_pipeline`` for that length).
     """
     from transformers import AutoTokenizer
     from diffusers.schedulers.scheduling_unipc_multistep import UniPCMultistepScheduler
@@ -711,28 +730,27 @@ def load_ov_pipeline(model_dir, ov_model_dir, device_map="CPU", ov_config=None,
     from bernini.models.wan_diffusion import GEN_Wanx22
     from bernini.pipeline import BerniniRendererPipeline
 
-    model_dir = Path(model_dir)
     ov_model_dir = Path(ov_model_dir)
     if isinstance(device_map, str):
         device_map = {"transformer": device_map, "text_encoder": device_map, "vae": device_map}
 
-    config = BerniniRendererConfig.from_pretrained(model_dir)
-
-    with open(model_dir / "vae" / "config.json") as f:
+    # Configs come from the copies written into ov_model_dir at convert time.
+    config = BerniniRendererConfig.from_json_file(ov_model_dir / BERNINI_CONFIG_PATH)
+    with open(ov_model_dir / VAE_CONFIG_PATH) as f:
         vae_config = json.load(f)
 
     # OpenVINO-backed leaf modules.
     ov_text_encoder = OVTextEncoderWrapper(ov_model_dir, device_map["text_encoder"], ov_config)
     ov_transformer = OVTransformerWrapper(ov_model_dir, device_map["transformer"], ov_config)
     ov_vae = OVVAEWrapper(ov_model_dir, device_map["vae"], ov_config, original_config=vae_config,
-                          source_model_dir=model_dir, compression_config=compression_config)
+                          source_model_dir=source_model_dir, compression_config=compression_config)
 
     # Diffusion decoder -- re-use GEN_Wanx22's methods, skip its heavy __init__.
     diff_dec = GEN_Wanx22.__new__(GEN_Wanx22)
     torch.nn.Module.__init__(diff_dec)
     diff_dec.config = config
     diff_dec.switch_dit_boundary = config.switch_dit_boundary
-    diff_dec.model_id_or_path = str(model_dir)
+    diff_dec.model_id_or_path = None
     diff_dec.transformer = ov_transformer
     diff_dec.transformer_2 = None
     diff_dec.rope = ov_transformer.rope
