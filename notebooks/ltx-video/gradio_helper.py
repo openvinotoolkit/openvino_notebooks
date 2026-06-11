@@ -9,13 +9,12 @@ def make_demo(pipe):
         frame_rate = 25
         output = pipe.generate(
             prompt,
-            negative_prompt=negative_prompt,
             width=int(width),
             height=int(height),
             num_frames=int(num_frames),
             num_inference_steps=int(num_inference_steps),
             generator=ov_genai.TorchGenerator(int(seed)),
-            guidance_scale=3,
+            guidance_scale=1,
             frame_rate=frame_rate,
         )
         file_name = f"output_{uuid.uuid4().hex[:8]}.mp4"
