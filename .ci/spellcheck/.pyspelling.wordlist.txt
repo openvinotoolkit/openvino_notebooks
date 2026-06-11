@@ -116,6 +116,7 @@ chatbots
 chatglm
 ChatGLM
 ChatGPT
+ChatML
 ChatTTS
 chinese
 ChromaDB

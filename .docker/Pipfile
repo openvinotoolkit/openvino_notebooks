@@ -17,7 +17,7 @@ nbval = "*"
 treon = "*"
 
 # Core ML (used by majority of notebooks)
-openvino = {version = "==2026.1.0"}
+openvino = {version = "==2026.2.0"}
 openvino-telemetry = "==2025.2.0"
 numpy = ">=1.21.0"
 opencv-python = "*"
