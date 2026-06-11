@@ -92,7 +92,7 @@ def make_demo(pipeline):
                 with gr.Accordion("Advanced settings", open=False):
                     neg_prompt = gr.Textbox(label="Negative prompt", lines=2, value=DEFAULT_NEG)
                     num_inference_steps = gr.Slider(1, 60, value=40, step=1, label="Inference steps")
-                    num_frames = gr.Slider(5, 81, value=49, step=4, label="Frames (video)", visible=False)
+                    num_frames = gr.Slider(5, 81, value=20, step=4, label="Frames (video)", visible=False)
                     omega_TI = gr.Slider(1.0, 10.0, value=4.0, step=0.1, label="omega_TI (text guidance)")
                     omega_I = gr.Slider(1.0, 10.0, value=3.0, step=0.1, label="omega_I (image guidance)")
                     omega_V = gr.Slider(1.0, 10.0, value=3.0, step=0.1, label="omega_V (video guidance)")

@@ -18,6 +18,8 @@ The original `bernini` pipeline and sampler methods are then re-used **verbatim*
 
 > **GPU precision**: the UMT5 text encoder and the Wan VAE are prone to fp16 overflow (a black image for some prompts), so on GPU/NPU they run in `f32` while the compute-heavy transformer stays in fast `f16`. Both f32 components run only once per generation, so this keeps GPU generation fast (≈2× faster than running everything in f32) while matching the CPU output. This is handled automatically in `load_ov_pipeline`; pass `ov_config` to override.
 
+> **VAE device / memory**: decoding a multi-frame video allocates a large activation buffer (hundreds of MB) that can exhaust GPU memory, so the notebook places the VAE on **CPU** by default (it is one forward per generation, so the speed cost is small) while the transformer and text encoder run on GPU. For image-only workloads the VAE can also go on GPU.
+
 The helpers are integrated into a single file, [ov_bernini_helper.py](ov_bernini_helper.py): model conversion, the OpenVINO wrapper modules, and `load_ov_pipeline`.
 
 ## Notebook contents

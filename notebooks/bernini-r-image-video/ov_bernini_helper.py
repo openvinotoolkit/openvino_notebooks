@@ -56,6 +56,18 @@ TRANSFORMER_CONFIG_PATH = "transformer_config.json"
 MAX_SEQ_LEN = 512
 
 
+def num_frames_to_latent(num_frames):
+    """Latent temporal length the VAE uses for a requested ``num_frames``.
+
+    Bernini rounds the request to ``n = num_frames // 4 * 4 + 1`` and the Wan VAE
+    then operates on ``(n - 1) // 4 + 1`` latent frames. Use this to choose which
+    VAE graphs to pre-convert (``vae_latent_frames``). Examples: 1 -> 1, 20 -> 6,
+    49 -> 13, 81 -> 21.
+    """
+    n = max(num_frames // 4 * 4 + 1, 1)
+    return (n - 1) // 4 + 1
+
+
 def cleanup_torchscript_cache():
     """Drop TorchScript caches between conversions (see the Wan helper)."""
     torch._C._jit_clear_class_registry()
