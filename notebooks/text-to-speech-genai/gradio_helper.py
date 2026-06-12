@@ -1,5 +1,4 @@
 import gradio as gr
-import torchaudio
 import torch
 import torch.nn.functional as F
 from speechbrain.inference.speaker import EncoderClassifier
@@ -31,14 +30,11 @@ def make_demo(pipe):
         return embeddings
 
     def stereo_to_mono(wav_file):
+        if wav_file is None:
+            return None, None
         try:
-            signal, fs = torchaudio.load(wav_file)
-            signal_np = signal.numpy()
-            if signal_np.shape[0] == 2:  # If stereo
-                signal_mono = librosa.to_mono(signal_np)
-                signal_mono = torch.from_numpy(signal_mono).unsqueeze(0)
-            else:
-                signal_mono = signal  # Already mono
+            signal_np, fs = librosa.load(wav_file, sr=None, mono=True)
+            signal_mono = torch.from_numpy(signal_np).unsqueeze(0)
             print(f"Converted to mono: {signal_mono.shape}")
             return signal_mono, fs
         except Exception as e:
