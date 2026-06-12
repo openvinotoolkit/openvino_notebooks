@@ -75,3 +75,4 @@ notebooks/qwen3-vl-embedding/qwen3-vl-embedding.ipynb
 notebooks/qwen3-vl-embedding/qwen3-vl-reranker.ipynb
 notebooks/minicpm-v-4.6/minicpm-v-4.6.ipynb
 notebooks/mineru2.5/mineru2.5.ipynb
+notebooks/omnivoice/omnivoice.ipynb
