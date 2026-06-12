@@ -1,9 +1,5 @@
 notebooks/yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb  # ultralytics==8.3.0
 notebooks/detectron2-to-openvino/detectron2-to-openvino.ipynb # detectron2@https://github.com/facebookresearch/detectron2
-notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb  # ultralytics==8.0.43
-notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb  # ultralytics==8.0.159
-notebooks/yolov8-optimization/yolov8-object-detection.ipynb  # ultralytics==8.0.43
-notebooks/yolov8-optimization/yolov8-obb.ipynb  # ultralytics==8.1.24
 notebooks/llm-chatbot/llm-chatbot.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
 notebooks/llm-rag-langchain/llm-rag-langchain.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
 notebooks/depth-anything/depth-anything.ipynb # install requirements.txt after clone repo
@@ -12,7 +8,6 @@ notebooks/mobileclip-video-search/mobileclip-video-search.ipynb # install requir
 notebooks/animate-anyone/animate-anyone.ipynb # diffusers<=0.24
 notebooks/whisper-subtitles-generation/whisper-convert.ipynb # pytube
 notebooks/grounded-segment-anything/grounded-segment-anything.ipynb # deprecated installer
-notebooks/yolov10-optimization/yolov10-optimization.ipynb # nncf from git
 notebooks/person-counting-webcam/person-counting.ipynb # numpy should be installed first
 notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb # torch >= 2.2
 notebooks/stable-diffusion-v3/stable-diffusion-v3.ipynb # diffusers from git
