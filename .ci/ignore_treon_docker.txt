@@ -5,8 +5,6 @@ notebooks/yolov11-quantization-with-accuracy-control/yolov11-quantization-with-a
 notebooks/clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb
 notebooks/blip-visual-language-processing/blip-visual-language-processing.ipynb
 notebooks/controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb
-notebooks/stable-diffusion-v2-infinite-zoom/stable-diffusion-v2-infinite-zoom.ipynb
-notebooks/segment-anything/segment-anything.ipynb
 notebooks/freevc-voice-conversion/freevc-voice-conversion.ipynb
 notebooks/stable-diffusion-xl/stable-diffusion-xl.ipynb
 notebooks/oneformer-segmentation/oneformer-segmentation.ipynb
@@ -30,15 +28,10 @@ notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
 notebooks/llm-rag-langchain/llm-rag-langchain.ipynb
 notebooks/stable-video-diffusion/stable-video-diffusion.ipynb
 notebooks/hello-npu/hello-npu.ipynb
-notebooks/yolov10-optimization/yolov10-optimization.ipynb
 notebooks/whisper-subtitles-generation/whisper-subtitles-generation.ipynb
-notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb
 notebooks/stable-diffusion-v3/stable-diffusion-v3.ipynb
 notebooks/llm-rag-llamaindex/llm-rag-llamaindex.ipynb
 notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
-notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb
-notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb
-notebooks/explainable-ai-3-map-interpretation/explainable-ai-3-map-interpretation.ipynb
 notebooks/phi-3-vision/phi-3-vision.ipynb
 notebooks/llm-agent-rag-llamaindex/llm-agent-rag-llamaindex.ipynb
 notebooks/internvl2/internvl2.ipynb
@@ -46,7 +39,6 @@ notebooks/qwen2-vl/qwen2-vl.ipynb
 notebooks/qwen2-audio/qwen2-audio.ipynb
 notebooks/mllama-3.2/mllama-3.2.ipynb
 notebooks/sam2-image-segmentation/segment-anything-2-image.ipynb
-notebooks/pixtral/pixtral.ipynb
 notebooks/multilora-image-generation/multilora-image-generation.ipynb
 notebooks/llm-agent-react-langchain/llm-agent-react-langchain.ipynb
 notebooks/multimodal-rag/multimodal-rag-llamaindex.ipynb
@@ -54,7 +46,6 @@ notebooks/llm-rag-langchain/llm-rag-langchain-genai.ipynb
 notebooks/ltx-video/ltx-video.ipynb
 notebooks/phi-4-multimodal/phi-4-multimodal.ipynb
 notebooks/llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb
-notebooks/glm4-v/glm4-v.ipynb
 notebooks/gemma3/gemma3.ipynb
 notebooks/gemma4/gemma4.ipynb
 notebooks/omniparser/omniparser.ipynb

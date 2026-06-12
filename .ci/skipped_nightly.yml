@@ -7,9 +7,3 @@
   skips:
     - device:
         - cpu
-- notebook: notebooks/glm4-v/glm4-v.ipynb
-  skips:
-    - device:
-        - cpu
-        - gpu
-        - npu
