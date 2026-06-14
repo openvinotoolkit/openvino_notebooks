@@ -18,7 +18,7 @@
     "@types/node": "18.11.18",
     "@types/react": "18.2.37",
     "@types/react-dom": "18.2.15",
-    "@vitejs/plugin-react": "4.3.4",
+    "@vitejs/plugin-react": "6.0.2",
     "decompress": "4.2.1",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
@@ -32,7 +32,7 @@
     "sass": "1.69.5",
     "typescript": "5.2.2",
     "typescript-eslint": "^8.57.1",
-    "vite": "^6.4.2",
+    "vite": "^8.0.16",
     "vite-plugin-svgr": "4.3.0"
   }
 }
