@@ -472,27 +472,28 @@ def _convert_vae_encoder(vae, t_latent, output_dir, compression_config):
 core = ov.Core()
 
 
-# Per-component GPU/NPU precision. The UMT5 text encoder is prone to fp16
-# overflow (a well-known T5/UMT5 issue): for some prompts its fp16 activations
-# blow up, the cross-attention conditioning becomes garbage and the decoded image
-# collapses to black. The Wan VAE decoder (large ``WanRMS_norm`` scales) is also
-# overflow-prone. Both run once per generation, so forcing them to fp32 costs
-# almost nothing, while the expensive transformer (run several times per step,
-# every step) stays in fast fp16. This keeps the GPU fast and the output stable.
+# Per-component GPU/NPU precision. The transformer and the Wan VAE both run in
+# fast fp16 on GPU -- verified to match the CPU output (no black image / NaN);
+# the VAE's multi-frame video decode needs an OpenVINO build whose GPU plugin can
+# spill the large activation buffer to host (OpenVINO >= 2026.3 nightly), which
+# the notebook installs. The UMT5 text encoder is the one component that must run
+# in fp32: it overflows in fp16 (a well-known T5/UMT5 issue) and the cross-
+# attention conditioning collapses to a black image. It runs only twice per
+# generation, so fp32 there is cheap.
 DEFAULT_GPU_CONFIG = {
     "transformer": {"INFERENCE_PRECISION_HINT": "f16"},
     "text_encoder": {"INFERENCE_PRECISION_HINT": "f32"},
-    "vae": {"INFERENCE_PRECISION_HINT": "f32"},
+    "vae": {"INFERENCE_PRECISION_HINT": "f16"},
 }
 
 
 def _device_config(device, ov_config, component=None):
     """Per-device, per-component OpenVINO config.
 
-    On GPU/NPU we keep the transformer / text encoder in fast fp16 and force the
-    VAE to fp32 (see ``DEFAULT_GPU_CONFIG``) to avoid the fp16 overflow that turns
-    the decoded image black. ``ov_config`` (a flat dict applied to every
-    component) overrides the defaults.
+    On GPU/NPU the transformer and VAE run in fast fp16; only the UMT5 text
+    encoder is forced to fp32 (see ``DEFAULT_GPU_CONFIG``) to avoid the fp16
+    overflow that turns the decoded image black. ``ov_config`` (a flat dict
+    applied to every component) overrides the defaults.
     """
     cfg = {}
     dev = (device or "").upper()
