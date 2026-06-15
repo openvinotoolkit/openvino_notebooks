@@ -613,34 +613,19 @@ class _LatentDist:
         return self._t
 
 
-# Largest VAE latent temporal length we are willing to run on GPU/NPU. The Wan
-# VAE unrolls its causal-conv loop, so a multi-frame decode allocates a huge USM
-# buffer (~24 GB at 13 frames, ~34 GB at 21 frames on a 480x832 clip). On an
-# integrated GPU that shares system RAM this OOMs once the transformer is also
-# resident ("Can not allocate ... USM Device") -- confirmed on both stable and
-# nightly OpenVINO. A single-frame (image) decode is ~1 GB and ~6.7x faster on
-# GPU, so we run only image-length decodes on GPU and route longer (video)
-# lengths to CPU.
-VAE_GPU_MAX_LATENT_FRAMES = 1
-
-
 class OVVAEWrapper(torch.nn.Module):
     """OpenVINO-backed ``AutoencoderKLWan`` stand-in.
 
     The Wan VAE decodes / encodes the temporal axis with a python loop + causal
     feature cache, so a traced graph is valid for one temporal length only. We
     compile lazily per length and cache the compiled models, which keeps the
-    OpenVINO graphs free of data-dependent loops.
-
-    Device is chosen per call by temporal length: short (image-length) decodes
-    run on the requested device (GPU for the speed-up), while longer video
-    decodes fall back to CPU to avoid GPU out-of-memory -- see
-    :data:`VAE_GPU_MAX_LATENT_FRAMES`.
+    OpenVINO graphs free of data-dependent loops. The VAE runs on its assigned
+    device; an fp32 precision hint is applied on GPU/NPU (see ``_device_config``)
+    so the output matches CPU.
     """
 
     def __init__(self, ov_model_dir, device, ov_config=None, original_config=None,
-                 source_model_dir=None, compression_config=None,
-                 gpu_max_latent_frames=VAE_GPU_MAX_LATENT_FRAMES):
+                 source_model_dir=None, compression_config=None):
         super().__init__()
         from diffusers.configuration_utils import FrozenDict
 
@@ -648,26 +633,13 @@ class OVVAEWrapper(torch.nn.Module):
         self._source_model_dir = Path(source_model_dir) if source_model_dir else None
         self._compression_config = compression_config
         self._device = device
-        self._user_ov_config = ov_config
-        self._gpu_max_latent_frames = gpu_max_latent_frames
+        self._ov_config = _device_config(device, ov_config, "vae")
         self.config = FrozenDict(original_config)
         self.temperal_downsample = list(original_config["temperal_downsample"])
         self.dtype = torch.float32
-        self._dec_cache = {}   # keyed by (t_latent, device)
-        self._enc_cache = {}   # keyed by (t_latent, device)
-        self._logged = set()
+        self._dec_cache = {}
+        self._enc_cache = {}
         self._torch_vae = None  # loaded lazily only if a new length must be converted
-
-    def _pick_device(self, t_latent, kind):
-        """Requested device for short lengths, CPU for long (video) lengths."""
-        dev = self._device
-        if t_latent > self._gpu_max_latent_frames and ("GPU" in dev.upper() or "NPU" in dev.upper()):
-            dev = "CPU"
-        key = (kind, t_latent)
-        if key not in self._logged:
-            self._logged.add(key)
-            print(f"VAE {kind} T_latent={t_latent} -> {dev}")
-        return dev
 
     def _ensure_torch_vae(self):
         if self._torch_vae is None:
@@ -686,32 +658,26 @@ class OVVAEWrapper(torch.nn.Module):
         return self._torch_vae
 
     def _decoder(self, t_latent):
-        dev = self._pick_device(t_latent, "decode")
-        key = (t_latent, dev)
-        if key not in self._dec_cache:
+        if t_latent not in self._dec_cache:
             xml = self._ov_dir / VAE_DECODER_DIR / f"vae_decoder_t{t_latent}.xml"
             if not xml.exists():
                 print(f"⌛ converting VAE decoder on demand (T_latent={t_latent}) ...")
                 _convert_vae_decoder(self._ensure_torch_vae(), t_latent, self._ov_dir,
                                      self._compression_config)
-            self._dec_cache[key] = core.compile_model(
-                xml, dev, _device_config(dev, self._user_ov_config, "vae"))
-        return self._dec_cache[key]
+            self._dec_cache[t_latent] = core.compile_model(xml, self._device, self._ov_config)
+        return self._dec_cache[t_latent]
 
     def _encoder(self, t_pix):
         # map pixel frames -> latent frames -> graph key
         t_latent = (t_pix - 1) // 4 + 1
-        dev = self._pick_device(t_latent, "encode")
-        key = (t_latent, dev)
-        if key not in self._enc_cache:
+        if t_latent not in self._enc_cache:
             xml = self._ov_dir / VAE_ENCODER_DIR / f"vae_encoder_t{t_latent}.xml"
             if not xml.exists():
                 print(f"⌛ converting VAE encoder on demand (T_latent={t_latent}) ...")
                 _convert_vae_encoder(self._ensure_torch_vae(), t_latent, self._ov_dir,
                                      self._compression_config)
-            self._enc_cache[key] = core.compile_model(
-                xml, dev, _device_config(dev, self._user_ov_config, "vae"))
-        return self._enc_cache[key]
+            self._enc_cache[t_latent] = core.compile_model(xml, self._device, self._ov_config)
+        return self._enc_cache[t_latent]
 
     def decode(self, z, return_dict=True):
         t_latent = z.shape[2]
@@ -741,8 +707,7 @@ class OVVAEWrapper(torch.nn.Module):
 # Assembled pipeline (re-uses bernini's sample / __call__ verbatim)
 # --------------------------------------------------------------------------- #
 def load_ov_pipeline(ov_model_dir, device_map="CPU", ov_config=None,
-                     compression_config=None, source_model_dir=None,
-                     vae_gpu_max_latent_frames=VAE_GPU_MAX_LATENT_FRAMES):
+                     compression_config=None, source_model_dir=None):
     """Build a ``BerniniRendererPipeline`` whose leaf modules run on OpenVINO.
 
     Everything is read from ``ov_model_dir`` (the output of ``convert_pipeline``):
@@ -760,10 +725,6 @@ def load_ov_pipeline(ov_model_dir, device_map="CPU", ov_config=None,
     original VAE is loaded to build+cache that one graph. Leave it ``None`` to
     forbid any PyTorch-weight loading at run time (a clear error is raised
     instead, telling you to re-run ``convert_pipeline`` for that length).
-
-    ``vae_gpu_max_latent_frames`` caps the VAE latent temporal length that runs on
-    a GPU/NPU VAE device; longer (video) decodes fall back to CPU to avoid GPU
-    out-of-memory. Default 1 (images on GPU, video on CPU).
     """
     from transformers import AutoTokenizer
     from diffusers.schedulers.scheduling_unipc_multistep import UniPCMultistepScheduler
@@ -784,8 +745,7 @@ def load_ov_pipeline(ov_model_dir, device_map="CPU", ov_config=None,
     ov_text_encoder = OVTextEncoderWrapper(ov_model_dir, device_map["text_encoder"], ov_config)
     ov_transformer = OVTransformerWrapper(ov_model_dir, device_map["transformer"], ov_config)
     ov_vae = OVVAEWrapper(ov_model_dir, device_map["vae"], ov_config, original_config=vae_config,
-                          source_model_dir=source_model_dir, compression_config=compression_config,
-                          gpu_max_latent_frames=vae_gpu_max_latent_frames)
+                          source_model_dir=source_model_dir, compression_config=compression_config)
 
     # Diffusion decoder -- re-use GEN_Wanx22's methods, skip its heavy __init__.
     diff_dec = GEN_Wanx22.__new__(GEN_Wanx22)
