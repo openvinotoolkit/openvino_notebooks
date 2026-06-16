@@ -1,5 +1,365 @@
 [
   {
+    "title": "Convert and Optimize YOLOv10 with OpenVINO",
+    "path": "yolov10-optimization/yolov10-optimization.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/81ff3233-9c8d-4fe8-ab21-baf9ce530cff",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov10-optimization/yolov10-optimization.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "YOLO"
+      ],
+      "tasks": [
+        "Object Detection"
+      ]
+    }
+  },
+  {
+    "title": "Convert and Optimize YOLOv12 real-time object detection with OpenVINO™",
+    "path": "yolov12-optimization/yolov12-object-detection.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov12-optimization/yolov12-object-detection.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "YOLO"
+      ],
+      "tasks": [
+        "Object Detection"
+      ]
+    }
+  },
+  {
+    "title": "Convert and Optimize YOLOv8 instance segmentation model with OpenVINO™",
+    "path": "yolov8-optimization/yolov8-instance-segmentation.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/272966666-b4c05f7b-1b64-4335-a125-c20105da7cc4.png",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "YOLO"
+      ],
+      "tasks": [
+        "Object Detection",
+        "Image Segmentation"
+      ]
+    }
+  },
+  {
+    "title": "Convert and Optimize YOLOv8 keypoint detection model with OpenVINO™",
+    "path": "yolov8-optimization/yolov8-keypoint-detection.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/272967083-a36d1072-e2f6-4dd9-85ad-4b2b3b4341d5.png",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "YOLO"
+      ],
+      "tasks": [
+        "Pose Estimation"
+      ]
+    }
+  },
+  {
+    "title": "Convert and Optimize YOLOv8 real-time object detection with OpenVINO™",
+    "path": "yolov8-optimization/yolov8-object-detection.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov8-optimization/yolov8-object-detection.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "YOLO"
+      ],
+      "tasks": [
+        "Object Detection"
+      ]
+    }
+  },
+  {
+    "title": "Convert and Optimize YOLOv9 with OpenVINO™",
+    "path": "yolov9-optimization/yolov9-optimization.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/ae3a7653-eead-4c41-9cad-a7c95d3a4578",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov9-optimization/yolov9-optimization.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "YOLO"
+      ],
+      "tasks": [
+        "Object Detection"
+      ]
+    }
+  },
+  {
+    "title": "Image generation with HunyuanDIT and OpenVINO",
+    "path": "hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/b541d7d9-da82-4fe9-a98b-e744cb25c3c6",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "tasks": [
+        "Text-to-Image",
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Infinite Zoom Stable Diffusion v2 and OpenVINO™",
+    "path": "stable-diffusion-v2-infinite-zoom/stable-diffusion-v2-infinite-zoom.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.gif?raw=true",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/stable-diffusion-v2-infinite-zoom/stable-diffusion-v2-infinite-zoom.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Stable Diffusion"
+      ],
+      "tasks": [
+        "Text-to-Image",
+        "Image Inpainting",
+        "Text-to-Video"
+      ]
+    }
+  },
+  {
+    "title": "Multimodal understanding and generation with Janus-Pro and OpenVINO",
+    "path": "janus-multimodal-generation/janus-multimodal-generation.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/0d83b369-b8fc-423e-bc53-495022555e8c",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/janus-multimodal-generation/janus-multimodal-generation.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation",
+        "Text-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Object masks from prompts with SAM and OpenVINO",
+    "path": "segment-anything/segment-anything.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/segment-anything/segment-anything.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Segment Anything"
+      ],
+      "tasks": [
+        "Image Segmentation"
+      ]
+    }
+  },
+  {
+    "title": "Object segmentations with EfficientSAM and OpenVINO",
+    "path": "efficient-sam/efficient-sam.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/15d0a23a-0550-43c6-9ca9-f689e772a79a",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/efficient-sam/efficient-sam.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "Segment Anything"
+      ],
+      "tasks": [
+        "Image Segmentation"
+      ]
+    }
+  },
+  {
+    "title": "OpenVINO™ Explainable AI Toolkit (1/3): Basic",
+    "path": "explainable-ai-1-basic/explainable-ai-1-basic.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/5557d79d-2e9a-4784-aa17-fea2931a1435",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb",
+    "tags": {
+      "categories": [
+        "First Steps",
+        "Explainable AI"
+      ],
+      "libraries": [],
+      "other": [
+        "XAI"
+      ],
+      "tasks": [
+        "Image Classification",
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "OpenVINO™ Explainable AI Toolkit (2/3): Deep Dive",
+    "path": "explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/5557d79d-2e9a-4784-aa17-fea2931a1435",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb",
+    "tags": {
+      "categories": [
+        "Explainable AI"
+      ],
+      "libraries": [],
+      "other": [
+        "XAI"
+      ],
+      "tasks": [
+        "Image Classification",
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "OpenVINO™ Explainable AI Toolkit (3/3): Saliency map interpretation",
+    "path": "explainable-ai-3-map-interpretation/explainable-ai-3-map-interpretation.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/5557d79d-2e9a-4784-aa17-fea2931a1435",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/explainable-ai-3-map-interpretation/explainable-ai-3-map-interpretation.ipynb",
+    "tags": {
+      "categories": [
+        "Explainable AI"
+      ],
+      "libraries": [],
+      "other": [
+        "XAI"
+      ],
+      "tasks": [
+        "Image Classification",
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
+    "title": "Style Transfer with OpenVINO™",
+    "path": "style-transfer-webcam/style-transfer.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/style-transfer-webcam/style-transfer.gif?raw=true",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/style-transfer-webcam/style-transfer.ipynb",
+    "tags": {
+      "categories": [
+        "Live Demos"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Style Transfer"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with GLM4-V and OpenVINO",
+    "path": "glm4-v/glm4-v.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/06c51867-0580-4434-962e-31b6068c2001",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/glm4-v/glm4-v.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with Pixtral and OpenVINO",
+    "path": "pixtral/pixtral.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/63543487-c40d-4e29-a24b-d93eb7cf991e",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/pixtral/pixtral.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "YOLOv8 Oriented Bounding Boxes Object Detection with OpenVINO™",
+    "path": "yolov8-optimization/yolov8-obb.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/76171391/31b316f4-41fd-43c9-8113-71e7398324be",
+    "lastBranch": "2026.2",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov8-optimization/yolov8-obb.ipynb",
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [
+        "YOLO"
+      ],
+      "tasks": [
+        "Object Detection"
+      ]
+    }
+  },
+  {
     "title": "Quantization-Sparsity Aware Training with NNCF, using PyTorch framework",
     "path": "pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb",
     "imageUrl": null,

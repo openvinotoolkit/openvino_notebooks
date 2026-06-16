@@ -44,12 +44,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/stable-diffusion-v2-infinite-zoom/stable-diffusion-v2-infinite-zoom.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/stable-diffusion-v3-torch-fx/stable-diffusion-v3-torch-fx.ipynb
   skips:
     - os:
@@ -57,12 +51,6 @@
         - windows-2022
     - python:
         - '3.13'
-- notebook: notebooks/segment-anything/segment-anything.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/freevc-voice-conversion/freevc-voice-conversion.ipynb
   skips:
     - os:
@@ -171,18 +159,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/yolov10-optimization/yolov10-optimization.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/llm-rag-llamaindex/llm-rag-llamaindex.ipynb
   skips:
     - os:
@@ -250,12 +226,6 @@
     - os:
         - macos-13
         - windows-2022  # 8.2 min on Win — too slow for 6h CI limit (2026-03-31)
-- notebook: notebooks/pixtral/pixtral.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/multilora-image-generation/multilora-image-generation.ipynb
   skips:
     - os:
@@ -304,12 +274,6 @@
     - os:
       - macos-13
       - windows-2022  # 8.3 min on Win — too slow for 6h CI limit (2026-03-31)
-- notebook: notebooks/glm4-v/glm4-v.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/gemma3/gemma3.ipynb
   skips:
    - os:
