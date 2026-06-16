@@ -33,9 +33,24 @@ DEFAULT_NEG = (
 
 
 def make_demo(pipeline):
-    def generate(task, prompt, neg_prompt, image, images, video,
-                 num_frames, num_inference_steps, omega_TI, omega_I, omega_V,
-                 seed, height, width, fps, progress=gr.Progress(track_tqdm=True)):
+    def generate(
+        task,
+        prompt,
+        neg_prompt,
+        image,
+        images,
+        video,
+        num_frames,
+        num_inference_steps,
+        omega_TI,
+        omega_I,
+        omega_V,
+        seed,
+        height,
+        width,
+        fps,
+        progress=gr.Progress(track_tqdm=True),
+    ):
         is_image = task in IMAGE_TASKS
         out_path = "bernini_output.png" if is_image else "bernini_output.mp4"
         needed = TASK_INPUTS[task]
@@ -69,10 +84,10 @@ def make_demo(pipeline):
 
     def on_task_change(task):
         return (
-            gr.update(visible=task == "i2i"),                       # image input
-            gr.update(visible=task in ("r2v", "rv2v")),             # reference gallery
-            gr.update(visible=task in ("v2v", "rv2v")),             # source video
-            gr.update(visible=task not in IMAGE_TASKS),             # num_frames
+            gr.update(visible=task == "i2i"),  # image input
+            gr.update(visible=task in ("r2v", "rv2v")),  # reference gallery
+            gr.update(visible=task in ("v2v", "rv2v")),  # source video
+            gr.update(visible=task not in IMAGE_TASKS),  # num_frames
         )
 
     with gr.Blocks() as demo:
@@ -80,12 +95,13 @@ def make_demo(pipeline):
         with gr.Row():
             with gr.Column():
                 task = gr.Radio(
-                    choices=list(TASK_INFO.keys()), value="t2i", label="Task",
+                    choices=list(TASK_INFO.keys()),
+                    value="t2i",
+                    label="Task",
                     info="t2i / i2i return an image; the rest return a video.",
                 )
                 gr.Markdown("\n".join(f"- **{k}** — {v}" for k, v in TASK_INFO.items()))
-                prompt = gr.Textbox(label="Prompt", lines=3,
-                                    value="Astronaut in a jungle, cold color palette, muted colors, detailed, 8k")
+                prompt = gr.Textbox(label="Prompt", lines=3, value="Astronaut in a jungle, cold color palette, muted colors, detailed, 8k")
                 image_in = gr.Image(label="Source image (i2i)", type="pil", visible=False)
                 gallery_in = gr.Gallery(label="Reference image(s) (r2v / rv2v)", visible=False, type="pil")
                 video_in = gr.Video(label="Source video (v2v / rv2v)", visible=False)
@@ -107,13 +123,26 @@ def make_demo(pipeline):
                 out_image = gr.Image(label="Generated image", visible=True, interactive=False)
                 out_video = gr.Video(label="Generated video", visible=False)
 
-        task.change(on_task_change, inputs=task,
-                    outputs=[image_in, gallery_in, video_in, num_frames])
+        task.change(on_task_change, inputs=task, outputs=[image_in, gallery_in, video_in, num_frames])
         run.click(
             generate,
-            inputs=[task, prompt, neg_prompt, image_in, gallery_in, video_in,
-                    num_frames, num_inference_steps, omega_TI, omega_I, omega_V,
-                    seed, height, width, fps],
+            inputs=[
+                task,
+                prompt,
+                neg_prompt,
+                image_in,
+                gallery_in,
+                video_in,
+                num_frames,
+                num_inference_steps,
+                omega_TI,
+                omega_I,
+                omega_V,
+                seed,
+                height,
+                width,
+                fps,
+            ],
             outputs=[out_image, out_video],
         )
     return demo

@@ -29,6 +29,11 @@ This tutorial consists of the following steps:
 - Run the inference pipeline (text-to-image and text-to-video)
 - Interactive inference with Gradio
 
+⚠️ **EXPERIMENTAL NOTEBOOK**
+
+This notebook demonstrates a model that has not been fully validated with OpenVINO. It may be fully supported and validated in the future.
+
+
 ## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.

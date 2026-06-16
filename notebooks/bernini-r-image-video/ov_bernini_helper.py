@@ -43,14 +43,13 @@ import openvino as ov
 from openvino.frontend.pytorch.ts_decoder import TorchScriptPythonDecoder
 from openvino.frontend.pytorch.patch_model import __make_16bit_traceable
 
-
 # --------------------------------------------------------------------------- #
 # Saved artifact names
 # --------------------------------------------------------------------------- #
 TEXT_ENCODER_PATH = "text_encoder.xml"
 TRANSFORMER_PATH = "transformer_blocks.xml"
-VAE_DECODER_DIR = "vae_decoder"          # holds vae_decoder_t{T}.xml
-VAE_ENCODER_DIR = "vae_encoder"          # holds vae_encoder_t{T}.xml
+VAE_DECODER_DIR = "vae_decoder"  # holds vae_decoder_t{T}.xml
+VAE_ENCODER_DIR = "vae_encoder"  # holds vae_encoder_t{T}.xml
 PATCH_EMBED_PATH = "patch_embedding.pt"  # tiny Conv3d weights kept in torch
 TRANSFORMER_CONFIG_PATH = "transformer_config.json"
 VAE_CONFIG_PATH = "vae_config.json"
@@ -109,9 +108,7 @@ def repair_transformer_config(model_dir):
         with safe_open(key_to_file[key], framework="pt") as sf:
             return list(sf.get_slice(key).get_shape())
 
-    num_layers = 1 + max(
-        int(m.group(1)) for k in key_to_file if (m := re.search(r"blocks\.(\d+)\.", k))
-    )
+    num_layers = 1 + max(int(m.group(1)) for k in key_to_file if (m := re.search(r"blocks\.(\d+)\.", k)))
     inner_dim = shape_of("blocks.0.attn1.to_q.weight")[0]
     ffn_dim = shape_of("blocks.0.ffn.net.0.proj.weight")[0]
     head_dim = cfg["attention_head_dim"]
@@ -173,8 +170,7 @@ class _SDPAProcessor:
     cross-attention. All sequence-parallel kwargs are accepted and ignored.
     """
 
-    def __call__(self, attn, hidden_states, encoder_hidden_states=None,
-                 attention_mask=None, rotary_emb=None, **kwargs):
+    def __call__(self, attn, hidden_states, encoder_hidden_states=None, attention_mask=None, rotary_emb=None, **kwargs):
         is_cross = encoder_hidden_states is not None
         kv_input = encoder_hidden_states if is_cross else hidden_states
 
@@ -236,9 +232,7 @@ class BlocksCore(torch.nn.Module):
             block.attn2.processor = _SDPAProcessor()
 
     def forward(self, hidden_states, timestep, encoder_hidden_states, rope_cos, rope_sin):
-        temb, timestep_proj, encoder_hidden_states, _ = self.condition_embedder(
-            timestep, encoder_hidden_states, None
-        )
+        temb, timestep_proj, encoder_hidden_states, _ = self.condition_embedder(timestep, encoder_hidden_states, None)
         # [1, 6*dim] -> [1, 6, dim]; broadcasts over tokens (single sample).
         timestep_proj = timestep_proj.unflatten(1, (6, -1))
         temb = temb.unsqueeze(1)  # [1, 1, dim] -> broadcasts over tokens
@@ -246,15 +240,16 @@ class BlocksCore(torch.nn.Module):
         rotary = (rope_cos, rope_sin)
         for block in self.blocks:
             hidden_states = block(
-                hidden_states, encoder_hidden_states, timestep_proj, rotary,
+                hidden_states,
+                encoder_hidden_states,
+                timestep_proj,
+                rotary,
             )
 
         shift, scale = self.scale_shift_table.float().chunk(2, dim=1)  # [1,1,dim] each
         shift = shift + temb.float()
         scale = scale + temb.float()
-        hidden_states = (self.norm_out(hidden_states.float()) * (1 + scale) + shift).type_as(
-            hidden_states
-        )
+        hidden_states = (self.norm_out(hidden_states.float()) * (1 + scale) + shift).type_as(hidden_states)
         hidden_states = self.proj_out(hidden_states)
         return hidden_states
 
@@ -303,9 +298,7 @@ def convert_pipeline(model_dir, output_dir, compression_config=None, vae_latent_
     print("⌛ loading the original Bernini-R pipeline (this loads ~6 GB of weights) ...")
     # ``wan22_base`` in config.json points at a HF repo id; override it to the
     # local snapshot so tokenizer / scheduler / sub-models load offline.
-    pipe = BerniniRendererPipeline.from_pretrained(
-        model_dir, device="cpu", load_ckpt_weights=False, wan22_base=str(model_dir)
-    )
+    pipe = BerniniRendererPipeline.from_pretrained(model_dir, device="cpu", load_ckpt_weights=False, wan22_base=str(model_dir))
     transformer = pipe.model.diff_dec.transformer
     transformer.eval()
     text_encoder = pipe.model.t5_text_encoder
@@ -518,8 +511,7 @@ class _Out:
 class OVTextEncoderWrapper(torch.nn.Module):
     def __init__(self, ov_model_dir, device, ov_config=None):
         super().__init__()
-        self._model = core.compile_model(Path(ov_model_dir) / TEXT_ENCODER_PATH, device,
-                                          _device_config(device, ov_config, "text_encoder"))
+        self._model = core.compile_model(Path(ov_model_dir) / TEXT_ENCODER_PATH, device, _device_config(device, ov_config, "text_encoder"))
         self.dtype = torch.float32
 
     def forward(self, input_ids=None, attention_mask=None, **kwargs):
@@ -567,11 +559,12 @@ class OVTransformerWrapper(torch.nn.Module):
         self.patch_embedding.load_state_dict(torch.load(ov_model_dir / PATCH_EMBED_PATH, map_location="cpu"))
         self.patch_embedding.eval()
         self.rope = WanRotaryPosEmbed(
-            cfg["attention_head_dim"], patch, cfg["rope_max_seq_len"],
+            cfg["attention_head_dim"],
+            patch,
+            cfg["rope_max_seq_len"],
             use_src_id_rotary_emb=cfg["use_src_id_rotary_emb"],
         )
-        self._model = core.compile_model(ov_model_dir / TRANSFORMER_PATH, device,
-                                          _device_config(device, ov_config, "transformer"))
+        self._model = core.compile_model(ov_model_dir / TRANSFORMER_PATH, device, _device_config(device, ov_config, "transformer"))
 
     def patch_vae_latent(self, hidden_states, source_id=None):
         """Patch-embed a VAE latent ``[B,C,T,H,W]`` -> tokens + complex rotary."""
@@ -581,17 +574,19 @@ class OVTransformerWrapper(torch.nn.Module):
         hidden_states = hidden_states.flatten(2).transpose(1, 2)
         return hidden_states, rotary_emb
 
-    def forward(self, hidden_states, timestep, encoder_hidden_states=None,
-                rotary_emb=None, batch_image_vae_seqlen=None, text_features_length=None,
-                return_dict=True):
+    def forward(
+        self, hidden_states, timestep, encoder_hidden_states=None, rotary_emb=None, batch_image_vae_seqlen=None, text_features_length=None, return_dict=True
+    ):
         cos, sin = _rotary_to_cos_sin(rotary_emb)
-        res = self._model([
-            hidden_states.to(torch.float32),
-            timestep.to(torch.float32),
-            encoder_hidden_states.to(torch.float32),
-            cos.to(torch.float32),
-            sin.to(torch.float32),
-        ])[0]
+        res = self._model(
+            [
+                hidden_states.to(torch.float32),
+                timestep.to(torch.float32),
+                encoder_hidden_states.to(torch.float32),
+                cos.to(torch.float32),
+                sin.to(torch.float32),
+            ]
+        )[0]
         return _Out(torch.from_numpy(res))
 
     __call__ = forward
@@ -625,8 +620,7 @@ class OVVAEWrapper(torch.nn.Module):
     so the output matches CPU.
     """
 
-    def __init__(self, ov_model_dir, device, ov_config=None, original_config=None,
-                 source_model_dir=None, compression_config=None):
+    def __init__(self, ov_model_dir, device, ov_config=None, original_config=None, source_model_dir=None, compression_config=None):
         super().__init__()
         from diffusers.configuration_utils import FrozenDict
 
@@ -653,9 +647,7 @@ class OVVAEWrapper(torch.nn.Module):
             from diffusers.models import AutoencoderKLWan
 
             print("⌛ loading original VAE for on-demand graph conversion ...")
-            self._torch_vae = AutoencoderKLWan.from_pretrained(
-                self._source_model_dir, subfolder="vae", torch_dtype=torch.float32
-            ).eval()
+            self._torch_vae = AutoencoderKLWan.from_pretrained(self._source_model_dir, subfolder="vae", torch_dtype=torch.float32).eval()
         return self._torch_vae
 
     def _decoder(self, t_latent):
@@ -663,8 +655,7 @@ class OVVAEWrapper(torch.nn.Module):
             xml = self._ov_dir / VAE_DECODER_DIR / f"vae_decoder_t{t_latent}.xml"
             if not xml.exists():
                 print(f"⌛ converting VAE decoder on demand (T_latent={t_latent}) ...")
-                _convert_vae_decoder(self._ensure_torch_vae(), t_latent, self._ov_dir,
-                                     self._compression_config)
+                _convert_vae_decoder(self._ensure_torch_vae(), t_latent, self._ov_dir, self._compression_config)
             self._dec_cache[t_latent] = core.compile_model(xml, self._device, self._ov_config)
         return self._dec_cache[t_latent]
 
@@ -675,8 +666,7 @@ class OVVAEWrapper(torch.nn.Module):
             xml = self._ov_dir / VAE_ENCODER_DIR / f"vae_encoder_t{t_latent}.xml"
             if not xml.exists():
                 print(f"⌛ converting VAE encoder on demand (T_latent={t_latent}) ...")
-                _convert_vae_encoder(self._ensure_torch_vae(), t_latent, self._ov_dir,
-                                     self._compression_config)
+                _convert_vae_encoder(self._ensure_torch_vae(), t_latent, self._ov_dir, self._compression_config)
             self._enc_cache[t_latent] = core.compile_model(xml, self._device, self._ov_config)
         return self._enc_cache[t_latent]
 
@@ -707,8 +697,7 @@ class OVVAEWrapper(torch.nn.Module):
 # --------------------------------------------------------------------------- #
 # Assembled pipeline (re-uses bernini's sample / __call__ verbatim)
 # --------------------------------------------------------------------------- #
-def load_ov_pipeline(ov_model_dir, device_map="CPU", ov_config=None,
-                     compression_config=None, source_model_dir=None):
+def load_ov_pipeline(ov_model_dir, device_map="CPU", ov_config=None, compression_config=None, source_model_dir=None):
     """Build a ``BerniniRendererPipeline`` whose leaf modules run on OpenVINO.
 
     Everything is read from ``ov_model_dir`` (the output of ``convert_pipeline``):
@@ -745,8 +734,9 @@ def load_ov_pipeline(ov_model_dir, device_map="CPU", ov_config=None,
     # OpenVINO-backed leaf modules.
     ov_text_encoder = OVTextEncoderWrapper(ov_model_dir, device_map["text_encoder"], ov_config)
     ov_transformer = OVTransformerWrapper(ov_model_dir, device_map["transformer"], ov_config)
-    ov_vae = OVVAEWrapper(ov_model_dir, device_map["vae"], ov_config, original_config=vae_config,
-                          source_model_dir=source_model_dir, compression_config=compression_config)
+    ov_vae = OVVAEWrapper(
+        ov_model_dir, device_map["vae"], ov_config, original_config=vae_config, source_model_dir=source_model_dir, compression_config=compression_config
+    )
 
     # Diffusion decoder -- re-use GEN_Wanx22's methods, skip its heavy __init__.
     diff_dec = GEN_Wanx22.__new__(GEN_Wanx22)
@@ -758,9 +748,7 @@ def load_ov_pipeline(ov_model_dir, device_map="CPU", ov_config=None,
     diff_dec.transformer_2 = None
     diff_dec.rope = ov_transformer.rope
     diff_dec.use_unipc = config.use_unipc
-    diff_dec.scheduler = UniPCMultistepScheduler.from_pretrained(
-        ov_model_dir / "scheduler", flow_shift=config.shift
-    )
+    diff_dec.scheduler = UniPCMultistepScheduler.from_pretrained(ov_model_dir / "scheduler", flow_shift=config.shift)
     diff_dec.vae_scale_factor_temporal = 4
     diff_dec.vae_scale_factor_spatial = 8
 
@@ -782,12 +770,12 @@ def load_ov_pipeline(ov_model_dir, device_map="CPU", ov_config=None,
 # and bernini.prompt_enhancer.SYSTEM_PROMPTS). The system prompt is prefixed to
 # the user prompt by BerniniRendererPipeline.__call__.
 TASK_GUIDANCE = {
-    "t2i": "t2v_apg",   # text -> image (single frame)
-    "t2v": "t2v_apg",   # text -> video
-    "i2i": "v2v",       # image edit (reference image -> image)
-    "v2v": "v2v_apg",   # video edit (source video -> video)
-    "r2v": "r2v_apg",   # reference image(s) -> video
-    "rv2v": "rv2v",     # reference image(s) + source video -> video
+    "t2i": "t2v_apg",  # text -> image (single frame)
+    "t2v": "t2v_apg",  # text -> video
+    "i2i": "v2v",  # image edit (reference image -> image)
+    "v2v": "v2v_apg",  # video edit (source video -> video)
+    "r2v": "r2v_apg",  # reference image(s) -> video
+    "rv2v": "rv2v",  # reference image(s) + source video -> video
 }
 
 TASK_SYSTEM_PROMPT = {
