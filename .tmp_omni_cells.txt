@@ -1,0 +1,273 @@
+
+===== CELL 0 [markdown] =====
+# OmniVoice Text-to-Speech with OpenVINO™
+
+[OmniVoice](https://github.com/k2-fsa/OmniVoice) is a state-of-the-art zero-shot text-to-speech system from Xiaomi AI Lab's next-generation Kaldi team. It supports **600+ languages**, voice cloning from a short reference clip, and voice design via natural-language attribute prompts.
+
+Unlike typical TTS pipelines, OmniVoice is **diffusion-style**: the LLM is invoked once per timestep (32 steps by default) on the full sequence, with classifier-free guidance and confidence-driven token unmasking. There is no KV-cache to reuse — every step is a full bidirectional forward pass. The 32-step loop, sampling, and pre/post-processing all live in Python; the heavy weighted sub-models run on OpenVINO.
+
+In this tutorial we will:
+1. Convert the four weighted sub-models (Qwen3 LLM, HiggsAudio v2 encoder/decoder, Whisper-large-v3-turbo) to OpenVINO IR
+2. Optionally quantize the LLM to INT8 with NNCF
+3. Run inference on CPU and GPU
+4. Compare quality against the original PyTorch model on CPU
+5. Launch an interactive Gradio demo
+
+#### Table of contents:
+
+- [Prerequisites](#Prerequisites)
+- [Convert OmniVoice to OpenVINO](#Convert-OmniVoice-to-OpenVINO)
+- [Select Inference Devices](#Select-Inference-Devices)
+- [Run Inference](#Run-Inference)
+- [Compare with PyTorch CPU baseline](#Compare-with-PyTorch-CPU-baseline)
+- [Interactive Demo](#Interactive-Demo)
+
+⚠️ **EXPERIMENTAL NOTEBOOK**
+
+This notebook demonstrates a model that has not been fully validated with OpenVINO. It may be fully supported and validated in the future.
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/omnivoice/omnivoice.ipynb" />
+
+### Installation Instructions
+
+This is a self-contained example that relies solely on its own code.
+
+We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/README.md#-installation-guide).
+
+===== CELL 1 [markdown] =====
+## Prerequisites
+[back to top ⬆️](#Table-of-contents)
+
+===== CELL 2 [code] =====
+import requests
+from pathlib import Path
+
+for fname in ("notebook_utils.py", "cmd_helper.py", "pip_helper.py"):
+    if not Path(fname).exists():
+        r = requests.get(f"https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/{fname}")
+        Path(fname).write_text(r.text)
+
+
+# Read more about telemetry collection at https://github.com/openvinotoolkit/openvino_notebooks?tab=readme-ov-file#-telemetry
+from notebook_utils import collect_telemetry
+
+collect_telemetry("omnivoice.ipynb")
+
+===== CELL 3 [markdown] =====
+### Install dependencies
+[back to top ⬆️](#Table-of-contents)
+
+===== CELL 4 [code] =====
+from pip_helper import pip_install
+
+pip_install(
+    "-q",
+    "--extra-index-url",
+    "https://download.pytorch.org/whl/cpu",
+    "torch>=2.4",
+    "torchaudio>=2.4",
+    "transformers>=5.3",
+    "openvino>=2026.1",
+    "openvino-genai>=2026.1",
+    "nncf",
+    "omnivoice",
+    "gradio>=4.0",
+    "soundfile",
+    "librosa",
+    "huggingface_hub",
+)
+
+===== CELL 5 [markdown] =====
+## Convert OmniVoice to OpenVINO
+[back to top ⬆️](#Table-of-contents)
+
+The conversion produces four IR models:
+
+1. `openvino_llm_model.xml` — Qwen3-0.6B + audio embedding + `audio_heads` projection, fused into one graph (INT8 optional)
+2. `openvino_audio_encoder.xml` — HiggsAudio v2 encoder (waveform → 8-codebook tokens)
+3. `openvino_audio_decoder.xml` — HiggsAudio v2 decoder (codes → waveform)
+4. `whisper/` — Whisper-large-v3-turbo, used only when reference audio is supplied without a transcript
+
+Conversion is per-sub-model and is skipped if the IR already exists.
+
+===== CELL 6 [code] =====
+import ipywidgets as widgets
+
+to_quantize = widgets.Checkbox(
+    value=True,
+    description="INT8 LLM weights",
+    style={"description_width": "initial"},
+)
+
+convert_whisper = widgets.Checkbox(
+    value=True,
+    description="Convert Whisper for ref-audio auto-transcription (~3GB download)",
+    style={"description_width": "initial"},
+)
+
+display(to_quantize, convert_whisper)
+
+===== CELL 7 [code] =====
+from pathlib import Path
+import nncf
+
+from omnivoice_helper import convert_omnivoice
+
+MODEL_ID = "k2-fsa/OmniVoice"
+OV_MODEL_DIR = Path("ov_model_int8" if to_quantize.value else "ov_model")
+# PyTorch checkpoints (used only during conversion) are kept OUTSIDE the OV
+# output dir so the OV folder is fully self-contained and can be moved /
+# shipped on its own. After conversion, ``PT_CACHE_DIR`` may be deleted.
+PT_CACHE_DIR = Path("pt_models") / MODEL_ID.split("/")[-1]
+
+# Whisper ASR is fetched from a pre-converted OpenVINO IR repo (Intel's INT8
+# variant). No PyTorch tracing required.
+ASR_MODEL_ID = "OpenVINO/whisper-large-v3-turbo-int8-ov"
+
+convert_omnivoice(
+    model_id=MODEL_ID,
+    output_dir=OV_MODEL_DIR,
+    pt_cache_dir=PT_CACHE_DIR,
+    llm_quantization_config={"mode": nncf.CompressWeightsMode.INT8_SYM} if to_quantize.value else None,
+    convert_whisper=convert_whisper.value,
+    asr_model_id=ASR_MODEL_ID,
+)
+
+===== CELL 8 [markdown] =====
+## Select Inference Devices
+[back to top ⬆️](#Table-of-contents)
+
+Each sub-model can use a different device. NPU is excluded because OmniVoice's diffusion graph requires fully dynamic shapes.
+
+===== CELL 9 [code] =====
+from notebook_utils import device_widget
+
+llm_device = device_widget("CPU", exclude=["NPU"], description="LLM:")
+audio_device = device_widget("CPU", exclude=["NPU"], description="Audio tokenizer:")
+asr_device = device_widget("CPU", exclude=["NPU"], description="Whisper ASR:")
+
+display(llm_device, audio_device, asr_device)
+
+===== CELL 10 [code] =====
+from omnivoice_helper import OVOmniVoice
+
+ov_model = OVOmniVoice.from_pretrained(
+    OV_MODEL_DIR,
+    llm_device=llm_device.value,
+    audio_device=audio_device.value,
+    asr_device=asr_device.value,
+)
+print("✓ OVOmniVoice ready. sampling_rate =", ov_model.sampling_rate)
+
+===== CELL 11 [markdown] =====
+## Run Inference
+[back to top ⬆️](#Table-of-contents)
+
+OmniVoice supports three modes:
+
+- **Voice Design** — describe the voice with attributes (gender, age, pitch, accent, style)
+- **Voice Clone** — supply reference audio (and optionally its transcript)
+- **Auto** — supply nothing; the model picks a voice
+
+===== CELL 12 [code] =====
+import time
+import IPython.display as ipd
+
+text_en = "Hello! Welcome to the OmniVoice demo with OpenVINO acceleration."
+
+t0 = time.time()
+audios = ov_model.generate(
+    text=text_en,
+    language="English",
+    instruct="female, young adult, moderate pitch",
+)
+elapsed = time.time() - t0
+
+wav = audios[0]
+duration = len(wav) / ov_model.sampling_rate
+print(f"Inference: {elapsed:.2f}s | Audio: {duration:.2f}s | RTF: {elapsed/duration:.2f}")
+ipd.display(ipd.Audio(wav, rate=ov_model.sampling_rate))
+
+===== CELL 13 [code] =====
+text_zh = "你好，欢迎使用 OmniVoice 演示。这是 OpenVINO 加速后的中文语音合成。"
+
+t0 = time.time()
+audios = ov_model.generate(
+    text=text_zh,
+    language="Chinese",
+    instruct="男，青年",
+)
+elapsed = time.time() - t0
+wav = audios[0]
+duration = len(wav) / ov_model.sampling_rate
+print(f"Inference: {elapsed:.2f}s | Audio: {duration:.2f}s | RTF: {elapsed/duration:.2f}")
+ipd.display(ipd.Audio(wav, rate=ov_model.sampling_rate))
+
+===== CELL 14 [markdown] =====
+### Voice Clone Example
+[back to top ⬆️](#Table-of-contents)
+
+Clone the voice of a short reference clip and synthesize new text in the same voice. The cell below uses a sample we just generated above as the reference, but you can replace `ref_audio` with any 3–10 s `.wav`. If you leave `ref_text=None`, the OpenVINO Whisper model will auto-transcribe the reference audio.
+
+===== CELL 15 [code] =====
+import soundfile as sf
+
+# 1. Save a short reference clip from the previous Voice Design output. In
+#    practice you would supply your own recording.
+ref_path = "ref_voice.wav"
+sf.write(ref_path, audios[0], ov_model.sampling_rate)
+
+# 2. Clone the voice (with explicit reference text — fastest path).
+clone_text = "This sentence is being spoken in the cloned voice via OpenVINO."
+
+t0 = time.time()
+audios_clone = ov_model.generate(
+    text=clone_text,
+    language="English",
+    ref_audio=ref_path,
+    ref_text="你好，欢迎使用 OmniVoice 演示。这是 OpenVINO 加速后的中文语音合成。",
+)
+elapsed = time.time() - t0
+wav = audios_clone[0]
+duration = len(wav) / ov_model.sampling_rate
+print(f"Voice clone (with ref_text): {elapsed:.2f}s | {duration:.2f}s audio | RTF {elapsed/duration:.2f}")
+ipd.display(ipd.Audio(wav, rate=ov_model.sampling_rate))
+
+# 3. Optional: clone with auto-transcription (requires the OpenVINO Whisper
+#    model produced during conversion). The first call lazy-loads Whisper.
+if (OV_MODEL_DIR / "whisper" / "openvino_encoder_model.xml").exists():
+    t0 = time.time()
+    audios_auto = ov_model.generate(
+        text="And this one was cloned without providing reference text.",
+        language="English",
+        ref_audio=ref_path,
+        ref_text=None,  # auto-transcribed by OV Whisper
+    )
+    elapsed = time.time() - t0
+    wav = audios_auto[0]
+    duration = len(wav) / ov_model.sampling_rate
+    print(f"Voice clone (auto-transcribed): {elapsed:.2f}s | {duration:.2f}s audio | RTF {elapsed/duration:.2f}")
+    ipd.display(ipd.Audio(wav, rate=ov_model.sampling_rate))
+else:
+    print("(Skipping auto-transcribed clone: OV Whisper not converted.)")
+
+===== CELL 16 [markdown] =====
+## Interactive Demo
+[back to top ⬆️](#Table-of-contents)
+
+Two tabs (mirroring the [HuggingFace Space](https://huggingface.co/spaces/k2-fsa/OmniVoice)):
+
+- **Voice Clone** — upload a reference audio (3–10 s recommended) and synthesize new text in the same voice
+- **Voice Design** — select speaker attributes from dropdowns to generate a custom voice
+
+===== CELL 17 [code] =====
+from gradio_helper import make_demo
+
+demo = make_demo(ov_model)
+
+try:
+    demo.queue().launch(debug=True)
+except Exception:
+    demo.queue().launch(debug=True, share=True)
+# Use demo.launch(server_name=..., server_port=...) to bind to a remote address.
