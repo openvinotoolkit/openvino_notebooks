@@ -43,11 +43,6 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-    esbuild: {
-      supported: {
-        'top-level-await': true,
-      },
-    },
     envDir: ENV_DIR,
     experimental: {
       renderBuiltUrl(filename: string, { hostId }: { hostId: string }) {
