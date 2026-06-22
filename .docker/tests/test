@@ -25,4 +25,12 @@ cd "/tmp"
 python /tmp/scripts/patch_notebooks.py /tmp/notebooks
 
 # Test notebooks
-python /tmp/scripts/validate_notebooks.py --ignore_list /tmp/scripts/ignore_treon_docker.txt
+# Run every notebook in its own cloned virtual environment so that per-notebook
+# pip installs cannot leak into the shared image environment (which otherwise
+# leaves duplicated/incompatible distributions, e.g. multiple "optimum" copies
+# or transformers/diffusers version skew, breaking subsequent notebooks).
+python /tmp/scripts/validate_notebooks.py \
+    --ignore_list /tmp/scripts/ignore_treon_docker.txt \
+    --separate_venv \
+    --source_venv_path /opt/app-root \
+    --cleanup_temp
