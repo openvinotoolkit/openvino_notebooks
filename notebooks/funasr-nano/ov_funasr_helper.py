@@ -44,6 +44,27 @@ def patched_dynamic_layer_update(
 DynamicLayer.update = patched_dynamic_layer_update
 
 
+def dynamic_cache_from_legacy(past_key_values):
+    """Build a ``DynamicCache`` from a legacy tuple-of-tuples cache.
+
+    ``DynamicCache.from_legacy_cache`` was removed in recent ``transformers``
+    releases, so reconstruct the cache through the public ``update`` API.
+    """
+    if hasattr(DynamicCache, "from_legacy_cache"):
+        return DynamicCache.from_legacy_cache(past_key_values)
+    cache = DynamicCache()
+    for layer_idx, (key_states, value_states) in enumerate(past_key_values):
+        cache.update(key_states, value_states, layer_idx)
+    return cache
+
+
+def dynamic_cache_to_legacy(cache):
+    """Convert a ``DynamicCache`` back to the legacy tuple-of-tuples format."""
+    if hasattr(cache, "to_legacy_cache"):
+        return cache.to_legacy_cache()
+    return tuple((layer.keys, layer.values) for layer in cache.layers)
+
+
 def patch_cos_sin_cached_fp32(model):
     if (
         hasattr(model, "layers")
@@ -509,7 +530,7 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
             inputs_embeds=None,
         ):
             if past_key_values is not None:
-                pkv = DynamicCache.from_legacy_cache(past_key_values)
+                pkv = dynamic_cache_from_legacy(past_key_values)
             outputs = self._orig_forward(
                 input_ids=None,
                 attention_mask=attention_mask,
@@ -518,7 +539,7 @@ def convert_funasr(model_id, model_path=None, quantization_config=None):
                 inputs_embeds=inputs_embeds,
                 use_cache=True,
             )
-            return (outputs.logits, outputs.past_key_values.to_legacy_cache())
+            return (outputs.logits, dynamic_cache_to_legacy(outputs.past_key_values))
 
         num_pkv = pt_model.llm.config.num_hidden_layers
         hidden_size = pt_model.llm.config.hidden_size

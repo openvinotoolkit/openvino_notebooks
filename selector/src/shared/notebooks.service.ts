@@ -158,7 +158,7 @@ class NotebooksService {
     metadataMap: Record<string, INotebookMetadata>,
     statusMap: Record<string, INotebookStatus>
   ): NotebooksMap {
-    const result = { ...metadataMap } as NotebooksMap;
+    const result: NotebooksMap = { ...metadataMap };
     for (const [notebookPath, { status }] of Object.entries(statusMap)) {
       if (!result[notebookPath]) {
         console.warn(`Unknown notebook "${notebookPath}" found in status report.`);
