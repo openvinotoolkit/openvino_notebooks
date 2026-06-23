@@ -7,6 +7,17 @@ import re
 
 max_new_tokens = 2048
 
+
+def apply_genai_stop_strings(generation_config, model_config):
+    stop_strings = model_config.get("stop_strings")
+    if stop_strings is None:
+        stop_tokens = model_config.get("stop_tokens")
+        if stop_tokens and isinstance(stop_tokens[0], str):
+            stop_strings = stop_tokens
+    if stop_strings:
+        generation_config.stop_strings = set(stop_strings)
+
+
 core = ov.Core()
 
 chinese_examples = [
@@ -67,8 +78,6 @@ def get_system_prompt(model_language, system_prompt=None):
 
 def make_demo(pipe, model_configuration, model_id, model_language, disable_advanced=False):
     import gradio as gr
-
-    from llm_config import apply_genai_stop_strings
 
     max_new_tokens = 2048
 
