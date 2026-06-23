@@ -8,7 +8,6 @@ notebooks/bark-text-to-audio/bark-text-to-audio.ipynb
 notebooks/controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb
 notebooks/convert-to-openvino/convert-to-openvino.ipynb
 notebooks/ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb
-notebooks/deepseek-ocr/deepseek-ocr.ipynb
 notebooks/fast-segment-anything/fast-segment-anything.ipynb
 notebooks/funasr-nano/funasr-nano.ipynb
 notebooks/glm4.1-v-thinking/glm4.1-v-thinking.ipynb
