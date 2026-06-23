@@ -24,6 +24,15 @@ cd "/tmp"
 # Patch notebooks to speed up test execution
 python /tmp/scripts/patch_notebooks.py /tmp/notebooks
 
+# virtualenv-clone is required by validate_notebooks.py for --separate_venv
+pip install -q virtualenv-clone
+
+# The base workbench image may ship optimum/optimum-intel in /opt/app-root.
+# Purge them from the base venv BEFORE cloning so every per-notebook clone starts
+# clean and the only optimum present is the one the notebook installs itself.
+# This prevents duplicate dist-info ("conflicting subparser: openvino").
+pip uninstall -q -y optimum optimum-intel optimum-onnx || true
+
 # Test notebooks
 # Run every notebook in its own cloned virtual environment so that per-notebook
 # pip installs cannot leak into the shared image environment (which otherwise
