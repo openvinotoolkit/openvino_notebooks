@@ -24,6 +24,9 @@ cd "/tmp"
 # Patch notebooks to speed up test execution
 python /tmp/scripts/patch_notebooks.py /tmp/notebooks
 
+# virtualenv-clone is required by validate_notebooks.py for --separate_venv
+pip install -q virtualenv-clone
+
 # Test notebooks
 # Run every notebook in its own cloned virtual environment so that per-notebook
 # pip installs cannot leak into the shared image environment (which otherwise
