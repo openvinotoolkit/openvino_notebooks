@@ -68,6 +68,8 @@ def get_system_prompt(model_language, system_prompt=None):
 def make_demo(pipe, model_configuration, model_id, model_language, disable_advanced=False):
     import gradio as gr
 
+    from llm_config import apply_genai_stop_strings
+
     max_new_tokens = 2048
 
     start_message = get_system_prompt(model_language, model_configuration.get("start_message"))
@@ -125,9 +127,11 @@ def make_demo(pipe, model_configuration, model_id, model_language, disable_advan
             config.do_sample = temperature > 0.0
             config.max_new_tokens = max_new_tokens
             config.repetition_penalty = repetition_penalty
+            apply_genai_stop_strings(config, model_configuration)
         else:
             config = ov_genai.GenerationConfig()
             config.max_new_tokens = max_new_tokens
+            apply_genai_stop_strings(config, model_configuration)
         history = history or []
         if not history:
             pipe.start_chat(system_message=start_message)

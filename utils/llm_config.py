@@ -79,6 +79,16 @@ def lfm2_completion_to_prompt(completion):
     return f"<|startoftext|><|im_start|>system\nYou are a helpful assistant trained by Liquid AI.<|im_end|>\n<|im_start|>user\n{completion}<|im_end|>\n<|im_start|>assistant\n"
 
 
+def apply_genai_stop_strings(generation_config, model_config):
+    stop_strings = model_config.get("stop_strings")
+    if stop_strings is None:
+        stop_tokens = model_config.get("stop_tokens")
+        if stop_tokens and isinstance(stop_tokens[0], str):
+            stop_strings = stop_tokens
+    if stop_strings:
+        generation_config.stop_strings = set(stop_strings)
+
+
 SUPPORTED_VLM_MODELS = {
     "English": {
         "Qwen3-VL-2B-Instruct": {
