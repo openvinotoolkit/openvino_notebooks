@@ -1,0 +1,20 @@
+[project]
+name = "hello-npu"
+version = "0.1.0"
+description = "Hello NPU example notebook"
+readme = "README.md"
+requires-python = ">=3.12"
+
+# All runtime dependencies needed to run THIS notebook
+dependencies = [
+    "openvino>=2026.2",
+    "huggingface_hub",
+    "requests",
+    "jupyterlab",
+    "ipykernel",
+    "pillow>=12.2.0",
+    "pathlib"
+]
+
+[tool.uv]
+required-version = ">=0.5.0"
