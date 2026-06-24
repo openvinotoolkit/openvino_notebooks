@@ -1,0 +1,33 @@
+[project]
+name = "hello-npu"
+version = "0.1.0"
+description = "Isolated environment for the hello-npu notebook."
+requires-python = ">=3.12"
+
+dependencies = [
+    "openvino>=2026.2.0",
+    "opencv-python>=4.9.0",
+    "tqdm>=4.66",
+    "huggingface_hub>=0.23",
+
+    # Jupyter stack (missing in your file)
+    "jupyterlab>=4.2",
+    "jupyter_server>=2.14",
+    "notebook>=7.2",
+    "jupyter_client>=8.6",
+    "ipykernel>=6.29",
+    "ipywidgets>=8.1",
+
+    # WebSocket + kernel transport
+    "tornado==6.3.3",
+    "pyzmq>=25.1",
+    "websocket-client>=1.7",
+
+    # Utilities
+    "requests>=2.31",
+    "IPython>=8.20",
+    "numpy>=1.26"
+]
+
+[tool.uv]
+required-version = ">=0.5.0"
