@@ -24,11 +24,13 @@ MODEL_CONFIGS = {
     "Base": {"base_size": 1024, "image_size": 1024, "crop_mode": False},
 }
 
+# Unlimited-OCR expects the instruction directly after the <image> token with NO newline
+# and NO <|grounding|> token (those make the model emit an immediate EOS / empty output).
+# Document-parsing prompts already produce <|det|>...<|/det|> grounding boxes natively.
 TASK_PROMPTS = {
-    "📋 Markdown": {"prompt": "<image>\n<|grounding|>Convert the document to markdown.", "has_grounding": True},
-    "📝 Free OCR": {"prompt": "<image>\nFree OCR.", "has_grounding": False},
-    "📍 Locate": {"prompt": "<image>\nLocate <|ref|>text<|/ref|> in the image.", "has_grounding": True},
-    "🔍 Describe": {"prompt": "<image>\nDescribe this image in detail.", "has_grounding": False},
+    "📋 Document Parsing": {"prompt": "<image>document parsing.", "has_grounding": True},
+    "📝 Free OCR": {"prompt": "<image>Free OCR.", "has_grounding": True},
+    "📋 Markdown": {"prompt": "<image>Convert the document to markdown.", "has_grounding": True},
     "✏️ Custom": {"prompt": "", "has_grounding": False},
 }
 
@@ -55,8 +57,12 @@ for url, file_name in example_image_urls:
 
 def make_demo(model, tokenizer):
     def extract_grounding_references(text):
-        pattern = r"(<\|ref\|>(.*?)<\|/ref\|><\|det\|>(.*?)<\|/det\|>)"
-        return re.findall(pattern, text, re.DOTALL)
+        # Match both the paired <|ref|>label<|/ref|><|det|>box<|/det|> form and the
+        # standalone <|det|>label box<|/det|> form that Unlimited-OCR emits (aligned with
+        # the original model's re_match).
+        matches = re.findall(r"(<\|ref\|>(.*?)<\|/ref\|><\|det\|>(.*?)<\|/det\|>)", text, re.DOTALL)
+        matches += re.findall(r"(<\|det\|>\s*([A-Za-z_][\w-]*)\s*(\[[^\]]+\])\s*<\|/det\|>)", text, re.DOTALL)
+        return matches
 
     def draw_bounding_boxes(image, refs, extract_images=False):
         img_w, img_h = image.size
@@ -78,6 +84,9 @@ def make_demo(model, tokenizer):
                 coords = eval(ref[2])  # noqa: S307 - trusted model output
             except Exception:  # noqa: BLE001
                 continue
+            # standalone <|det|> form yields a flat [x1,y1,x2,y2]; wrap to a list of boxes
+            if coords and isinstance(coords[0], (int, float)):
+                coords = [coords]
             color_a = color + (60,)
             for box in coords:
                 x1, y1, x2, y2 = int(box[0] / 999 * img_w), int(box[1] / 999 * img_h), int(box[2] / 999 * img_w), int(box[3] / 999 * img_h)
@@ -98,11 +107,14 @@ def make_demo(model, tokenizer):
     def clean_output(text, include_images=False, remove_labels=False):
         if not text:
             return ""
-        pattern = r"(<\|ref\|>(.*?)<\|/ref\|><\|det\|>(.*?)<\|/det\|>)"
-        matches = re.findall(pattern, text, re.DOTALL)
+        # paired <|ref|>label<|/ref|><|det|>box<|/det|> form
+        matches = re.findall(r"(<\|ref\|>(.*?)<\|/ref\|><\|det\|>(.*?)<\|/det\|>)", text, re.DOTALL)
+        # standalone <|det|>label box<|/det|> form (label is the visible content to keep)
+        matches += re.findall(r"(<\|det\|>\s*([A-Za-z_][\w-]*)\s*\[[^\]]+\]\s*<\|/det\|>)", text, re.DOTALL)
         img_num = 0
         for match in matches:
-            if "<|ref|>image<|/ref|>" in match[0]:
+            is_image = "<|ref|>image<|/ref|>" in match[0] or match[1].strip() == "image"
+            if is_image:
                 if include_images:
                     text = text.replace(match[0], f"\n\n**[Figure {img_num + 1}]**\n\n", 1)
                     img_num += 1
@@ -128,7 +140,7 @@ def make_demo(model, tokenizer):
     def process_image(image, mode, task, custom_prompt):
         if image is None:
             return " Error Upload image", "", "", None, []
-        if task in ["✏️ Custom", "📍 Locate"] and not custom_prompt.strip():
+        if task == "✏️ Custom" and not custom_prompt.strip():
             return "Enter prompt", "", "", None, []
 
         if image.mode in ("RGBA", "LA", "P"):
@@ -136,11 +148,10 @@ def make_demo(model, tokenizer):
         image = ImageOps.exif_transpose(image)
         config = MODEL_CONFIGS[mode]
 
+        # NOTE: Unlimited-OCR wants the instruction directly after <image> (no newline,
+        # no <|grounding|>); otherwise it emits an immediate EOS (empty output).
         if task == "✏️ Custom":
-            prompt = f"<image>\n{custom_prompt.strip()}"
-            has_grounding = "<|grounding|>" in custom_prompt
-        elif task == "📍 Locate":
-            prompt = f"<image>\nLocate <|ref|>{custom_prompt.strip()}<|/ref|> in the image."
+            prompt = f"<image>{custom_prompt.strip()}"
             has_grounding = True
         else:
             prompt = TASK_PROMPTS[task]["prompt"]
@@ -151,9 +162,7 @@ def make_demo(model, tokenizer):
         tmp.close()
         out_dir = tempfile.mkdtemp()
 
-        stdout = sys.stdout
-        sys.stdout = StringIO()
-        model.infer(
+        result = model.infer(
             tokenizer=tokenizer,
             prompt=prompt,
             image_file=tmp.name,
@@ -161,11 +170,10 @@ def make_demo(model, tokenizer):
             base_size=config["base_size"],
             image_size=config["image_size"],
             crop_mode=config["crop_mode"],
+            no_repeat_ngram_size=35,
+            ngram_window=128,
+            eval_mode=True,
         )
-        result = "\n".join(
-            [l for l in sys.stdout.getvalue().split("\n") if not any(s in l for s in ["image:", "other:", "PATCHES", "====", "BASE:", "%|", "torch.Size", "[TPS]"])]
-        ).strip()
-        sys.stdout = stdout
 
         os.unlink(tmp.name)
         shutil.rmtree(out_dir, ignore_errors=True)
@@ -176,7 +184,8 @@ def make_demo(model, tokenizer):
         cleaned = clean_output(result, False, False)
         markdown = clean_output(result, True, True)
         img_out, crops = None, []
-        if has_grounding and "<|ref|>" in result:
+        # the model emits <|det|>...<|/det|> (and sometimes <|ref|>) grounding boxes
+        if has_grounding and ("<|det|>" in result or "<|ref|>" in result):
             refs = extract_grounding_references(result)
             if refs:
                 img_out, crops = draw_bounding_boxes(image, refs, True)
@@ -206,9 +215,7 @@ def make_demo(model, tokenizer):
 
     def toggle_prompt(task):
         if task == "✏️ Custom":
-            return gr.update(visible=True, label="Custom Prompt", placeholder="Add <|grounding|> for boxes")
-        if task == "📍 Locate":
-            return gr.update(visible=True, label="Text to Locate", placeholder="Enter text")
+            return gr.update(visible=True, label="Custom Prompt", placeholder="e.g. document parsing.  (no leading newline)")
         return gr.update(visible=False)
 
     def get_pdf_page_count(file_path):
@@ -254,7 +261,7 @@ def make_demo(model, tokenizer):
                 input_img = gr.Image(label="Input Image", type="pil", height=300)
                 page_selector = gr.Number(label="Select Page", value=1, minimum=1, step=1, visible=False)
                 mode = gr.Dropdown(list(MODEL_CONFIGS.keys()), value="Gundam", label="Mode")
-                task = gr.Dropdown(list(TASK_PROMPTS.keys()), value="📋 Markdown", label="Task")
+                task = gr.Dropdown(list(TASK_PROMPTS.keys()), value="📋 Document Parsing", label="Task")
                 prompt = gr.Textbox(label="Prompt", lines=2, visible=False)
                 btn = gr.Button("Extract", variant="primary", size="lg")
 
@@ -272,7 +279,7 @@ def make_demo(model, tokenizer):
                         raw_out = gr.Textbox(lines=20, show_copy_button=True, show_label=False)
 
         gr.Examples(
-            examples=[["ocr.jpg", "Gundam", "📋 Markdown", ""], ["reachy-mini.jpg", "Gundam", "📍 Locate", "Robot"]],
+            examples=[["ocr.jpg", "Gundam", "📋 Document Parsing", ""], ["reachy-mini.jpg", "Gundam", "📝 Free OCR", ""]],
             inputs=[input_img, mode, task, prompt],
             cache_examples=False,
         )
@@ -281,17 +288,17 @@ def make_demo(model, tokenizer):
             gr.Markdown("""
             ### Modes
             - **Gundam**: 1024 base + 640 tiles with cropping - Best balance
-            - **Tiny**: 512×512, no crop - Fastest
             - **Small**: 640×640, no crop - Quick
             - **Base**: 1024×1024, no crop - Standard
-            - **Large**: 1280×1280, no crop - Highest quality
 
             ### Tasks
-            - **Markdown**: Convert document to structured markdown (grounding ✅)
-            - **Free OCR**: Simple text extraction
-            - **Locate**: Find specific things in image (grounding ✅)
-            - **Describe**: General image description
-            - **Custom**: Your own prompt (add `<|grounding|>` for boxes)
+            - **Document Parsing**: Full document layout + text with `<|det|>` grounding boxes
+            - **Free OCR**: Text extraction (also emits grounding boxes)
+            - **Markdown**: Convert document to structured markdown
+            - **Custom**: Your own instruction — placed directly after `<image>` (no newline)
+
+            > Note: Unlimited-OCR expects the instruction **directly** after `<image>` with no
+            > leading newline and no `<|grounding|>` token, otherwise it returns empty output.
             """)
 
         file_in.change(load_image, [file_in, page_selector], [input_img])

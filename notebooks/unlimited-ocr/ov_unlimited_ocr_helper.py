@@ -285,6 +285,40 @@ class NoEOSTextStreamer(TextStreamer):
         print(text, flush=True, end="")
 
 
+class SlidingWindowNoRepeatNgramProcessor:
+    """Block n-gram repetitions within a sliding window.
+
+    Verbatim port of the original model's ``SlidingWindowNoRepeatNgramProcessor`` (aligned
+    with SGLang's ``DeepseekOCRNoRepeatNGramLogitProcessor``). The original ``infer`` uses
+    this instead of HuggingFace's plain ``no_repeat_ngram_size`` so we reproduce it exactly.
+    """
+
+    def __init__(self, ngram_size, window, whitelist_token_ids=None):
+        self.ngram_size = ngram_size
+        self.window = window
+        self.whitelist = set(whitelist_token_ids) if whitelist_token_ids else set()
+
+    def __call__(self, input_ids, scores):
+        for batch_idx in range(input_ids.shape[0]):
+            sequence = input_ids[batch_idx].tolist()
+            if len(sequence) < self.ngram_size:
+                continue
+            search_start = max(0, len(sequence) - self.window)
+            search_end = len(sequence) - self.ngram_size + 1
+            if search_end <= search_start:
+                continue
+            current_prefix = tuple(sequence[-(self.ngram_size - 1):]) if self.ngram_size > 1 else tuple()
+            banned = set()
+            for idx in range(search_start, search_end):
+                ngram = sequence[idx:idx + self.ngram_size]
+                if self.ngram_size == 1 or tuple(ngram[:-1]) == current_prefix:
+                    banned.add(ngram[-1])
+            banned.difference_update(self.whitelist)
+            for token_id in banned:
+                scores[batch_idx, token_id] = float("-inf")
+        return scores
+
+
 # --------------------------------------------------------------------------------------
 # Stateful-model helpers (verbatim from the OpenVINO stateful-LLM recipe)
 # --------------------------------------------------------------------------------------
@@ -916,7 +950,7 @@ class OVUnlimitedOCRForCausalLM(GenerationMixin):
 
     def infer(self, tokenizer, prompt="", image_file="", output_path="", base_size=1024, image_size=640,
               crop_mode=True, test_compress=False, save_results=False, eval_mode=False, max_new_tokens=8192,
-              no_repeat_ngram_size=20):
+              no_repeat_ngram_size=35, ngram_window=128, temperature=0.0):
         os.makedirs(output_path, exist_ok=True)
         os.makedirs(f"{output_path}/images", exist_ok=True)
 
@@ -1020,12 +1054,18 @@ class OVUnlimitedOCRForCausalLM(GenerationMixin):
             images=[(images_crop, images_ori)],
             images_seq_mask=images_seq_mask.unsqueeze(0),
             images_spatial_crop=images_spatial_crop,
-            temperature=0.0,
+            do_sample=temperature > 0,
+            temperature=temperature if temperature > 0 else None,
             eos_token_id=tokenizer.eos_token_id,
             max_new_tokens=max_new_tokens,
-            no_repeat_ngram_size=no_repeat_ngram_size,
             use_cache=True,
         )
+        # Match the original infer: use the sliding-window n-gram logits processor when a
+        # window is given, otherwise fall back to HuggingFace's plain no_repeat_ngram_size.
+        if no_repeat_ngram_size > 0 and ngram_window > 0:
+            gen_kwargs["logits_processor"] = [SlidingWindowNoRepeatNgramProcessor(no_repeat_ngram_size, ngram_window)]
+        elif no_repeat_ngram_size > 0:
+            gen_kwargs["no_repeat_ngram_size"] = no_repeat_ngram_size
         if not eval_mode:
             gen_kwargs["streamer"] = NoEOSTextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=False)
 
