@@ -124,11 +124,14 @@ def _load_image(src: ImageInput) -> Image.Image:
     return Image.open(str(src))
 
 
-def pdf_to_images(pdf: Union[str, Path, bytes], dpi: int = 200) -> List[Image.Image]:
+def pdf_to_images(pdf: Union[str, Path, bytes], dpi: int = 200, max_pages: Optional[int] = None) -> List[Image.Image]:
     """Render every page of a PDF to a PIL image using ``pypdfium2``.
 
     ``pypdfium2`` is a pure-Python wheel and does not require Poppler, which
     keeps the notebook installable on Windows out of the box.
+
+    ``max_pages`` optionally limits how many leading pages are rendered (useful
+    to keep CI execution time bounded).
     """
     import pypdfium2 as pdfium
 
@@ -138,8 +141,11 @@ def pdf_to_images(pdf: Union[str, Path, bytes], dpi: int = 200) -> List[Image.Im
         doc = pdfium.PdfDocument(pdf)
 
     scale = dpi / 72.0
+    num_pages = len(doc)
+    if max_pages is not None:
+        num_pages = min(num_pages, max_pages)
     pages: List[Image.Image] = []
-    for i in range(len(doc)):
+    for i in range(num_pages):
         page = doc[i]
         pil = page.render(scale=scale).to_pil().convert("RGB")
         pages.append(pil)
@@ -287,10 +293,14 @@ class OVMinerUClient:
         pdf: Union[str, Path, bytes],
         dpi: int = 200,
         progress_callback=None,
+        max_pages: Optional[int] = None,
         **kwargs,
     ) -> Tuple[str, List[ExtractResult]]:
-        """Convert every page of a PDF to Markdown, joined by horizontal rules."""
-        pages = pdf_to_images(pdf, dpi=dpi)
+        """Convert every page of a PDF to Markdown, joined by horizontal rules.
+
+        ``max_pages`` optionally limits how many leading pages are processed.
+        """
+        pages = pdf_to_images(pdf, dpi=dpi, max_pages=max_pages)
         md_pages: List[str] = []
         block_pages: List[ExtractResult] = []
         for i, page in enumerate(pages):

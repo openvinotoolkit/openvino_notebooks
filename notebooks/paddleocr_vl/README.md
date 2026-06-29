@@ -1,12 +1,12 @@
-# PaddleOCR-VL-1.5 with OpenVINO™
+# PaddleOCR-VL / PaddleOCR-VL-1.5 / PaddleOCR-VL-1.6 with OpenVINO™
 
 <p align="center" width="100%">
     <img width="90%" src="https://raw.githubusercontent.com/cuicheng01/PaddleX_doc_images/refs/heads/main/images/paddleocr_vl_1_5/PaddleOCR-VL-1.5.png">
 </p>
 
-This notebook shows an end-to-end workflow for **PaddleOCR-VL-1.5 → OpenVINO**:
+This notebook shows an end-to-end workflow for **PaddleOCR-VL → OpenVINO**:
 
-- Download the pretrained PaddleOCR-VL-1.5/PaddleOCR-VL model.
+- Select and download a pretrained model — PaddleOCR-VL-1.6, PaddleOCR-VL-1.5, or the base PaddleOCR-VL (they share the same architecture and preprocessing and differ only in their trained weights).
 - Patch `modeling_paddleocr_vl.py` locally (for `trust_remote_code`).
 - Convert/export the model to OpenVINO IR (optionally with INT4/INT8 weight compression).
 - Validate the OpenVINO inference pipeline on an input image.
