@@ -2,8 +2,6 @@
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/modelscope-to-openvino/modelscope-to-openvino.ipynb)
 
-![](https://camo.githubusercontent.com/bbda58b4f77b80d9206e3410b533ca5a2582b81070e7dd283ee12fd0d442bd2b/68747470733a2f2f6d6f64656c73636f70652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f6d6f64656c73636f70652e676966)
-
 [ModelScope](https://www.modelscope.cn/home) is a “Model-as-a-Service” (MaaS) platform that seeks to bring together most advanced machine learning models from the AI community, and to streamline the process of leveraging AI models in real applications. Hundreds of models are made publicly available on ModelScope (700+ and counting), covering the latest development in areas such as NLP, CV, Audio, Multi-modality, and AI for Science, etc. Many of these models represent the SOTA in their specific fields, and made their open-sourced debut on ModelScope.
 
 This tutorial covers how to use the modelscope ecosystem within OpenVINO.

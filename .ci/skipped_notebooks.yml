@@ -57,12 +57,6 @@
         - windows
     - python:
         - '3.13'
-- notebook: notebooks/segment-anything/segment-anything.ipynb
-  skips:
-    - os:
-        - mac
-        - linux
-        - windows
 - notebook: notebooks/freevc-voice-conversion/freevc-voice-conversion.ipynb
   skips:
     - os:

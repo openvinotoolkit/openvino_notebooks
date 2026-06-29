@@ -39,6 +39,7 @@ Arcface
 argmax
 artstation
 arxiv
+asym
 ASPP
 ASR
 asr
@@ -115,6 +116,7 @@ chatbots
 chatglm
 ChatGLM
 ChatGPT
+ChatML
 ChatTTS
 chinese
 ChromaDB
@@ -1327,7 +1329,13 @@ zh
 Zhipu
 Zongyuan
 downsampler
+dropdowns
 FLOPs
 HallusionBench
 HarmonyOS
+HiggsAudio
+Kaldi
+OmniVoice
+OmniVoice's
 RefCOCO
+Xiaomi
