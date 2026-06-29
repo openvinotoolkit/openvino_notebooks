@@ -522,3 +522,8 @@
     - os:
         - macos-13
         - windows-2022
+- notebook: notebooks/unlimited-ocr/unlimited-ocr.ipynb
+  skips:
+    - os:
+        - macos-13
+        - windows-2022
