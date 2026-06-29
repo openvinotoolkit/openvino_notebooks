@@ -184,13 +184,7 @@ def find_closest_aspect_ratio(aspect_ratio, target_ratios, width, height, image_
 def dynamic_preprocess(image, min_num=2, max_num=32, image_size=640, use_thumbnail=False):
     orig_width, orig_height = image.size
     aspect_ratio = orig_width / orig_height
-    target_ratios = set(
-        (i, j)
-        for n in range(min_num, max_num + 1)
-        for i in range(1, n + 1)
-        for j in range(1, n + 1)
-        if min_num <= i * j <= max_num
-    )
+    target_ratios = set((i, j) for n in range(min_num, max_num + 1) for i in range(1, n + 1) for j in range(1, n + 1) if min_num <= i * j <= max_num)
     target_ratios = sorted(target_ratios, key=lambda x: x[0] * x[1])
     target_aspect_ratio = find_closest_aspect_ratio(aspect_ratio, target_ratios, orig_width, orig_height, image_size)
     target_width = image_size * target_aspect_ratio[0]
@@ -307,10 +301,10 @@ class SlidingWindowNoRepeatNgramProcessor:
             search_end = len(sequence) - self.ngram_size + 1
             if search_end <= search_start:
                 continue
-            current_prefix = tuple(sequence[-(self.ngram_size - 1):]) if self.ngram_size > 1 else tuple()
+            current_prefix = tuple(sequence[-(self.ngram_size - 1) :]) if self.ngram_size > 1 else tuple()
             banned = set()
             for idx in range(search_start, search_end):
-                ngram = sequence[idx:idx + self.ngram_size]
+                ngram = sequence[idx : idx + self.ngram_size]
                 if self.ngram_size == 1 or tuple(ngram[:-1]) == current_prefix:
                     banned.add(ngram[-1])
             banned.difference_update(self.whitelist)
@@ -457,34 +451,77 @@ def llama_attn_forward(
 
 
 def moe_forward(self, hidden_states):
-    """Static MoE: loop over every expert with a one-hot mask + ``index_add_``.
+    """Vectorized MoE forward producing an IR graph that the OpenVINO GPU plugin can fuse
+    into a single ``MOE3GemmFusedCompressed`` kernel (softmax routing path).
 
-    Mirrors the original ``MoEGate`` numerics (softmax scoring, greedy top-k,
-    optional ``norm_topk_prob`` and ``routed_scaling_factor``) plus the shared experts.
+    The expert weights are pre-stacked into ``[E, N, K]`` buffers (``gate_projs`` /
+    ``up_projs`` / ``down_projs``, registered in ``convert_unlimited_ocr``) and the routing
+    subgraph is shaped to match ``FuseMOE3GemmCompressed``:
+        MatMul -> Softmax -> TopK -> ReduceSum(1 consumer) -> Divide -> Scatter -> ...
+    plus ``3x bmm + SwiGLU + routing-multiply + ReduceSum`` for the experts.
+
+    Numerically identical to the original ``DeepseekV2MoE`` routing: this model has
+    ``norm_topk_prob=False`` and ``routed_scaling_factor=1.0``, so normalize-then-correct
+    by ``topk_sum`` restores the un-normalized ``sum_i expert_i(x) * w_i`` exactly.
     """
-    identity = hidden_states
-    batch_size, sequence_length, hidden_dim = hidden_states.shape
-    hidden_states = hidden_states.view(-1, hidden_dim)
+    num_experts = self.config.n_routed_experts
+    top_k = self.config.num_experts_per_tok
+    norm_topk_prob = self.config.norm_topk_prob
+    scaling_factor = getattr(self.config, "routed_scaling_factor", 1.0)
+    batch_size, seq_len, hidden_dim = hidden_states.shape
 
-    router_logits = torch.nn.functional.linear(hidden_states.float(), self.gate.weight.float(), None)
-    scores = torch.nn.functional.softmax(router_logits, dim=-1, dtype=torch.float)
-    routing_weights, selected_experts = torch.topk(scores, self.gate.top_k, dim=-1, sorted=False)
-    if self.gate.top_k > 1 and self.gate.norm_topk_prob:
-        routing_weights = routing_weights / (routing_weights.sum(dim=-1, keepdim=True) + 1e-20)
-    routing_weights = routing_weights * self.gate.routed_scaling_factor
-    routing_weights = routing_weights.to(hidden_states.dtype)
+    # `hidden_state_reshape`: consumed by both the router MatMul and the expert Tile.
+    hidden_states_flat = hidden_states.view(-1, hidden_dim)
 
-    final_hidden_states = torch.zeros((batch_size * sequence_length, hidden_dim), dtype=hidden_states.dtype)
-    expert_mask = torch.nn.functional.one_hot(selected_experts, num_classes=len(self.experts)).permute(2, 1, 0)
-    for expert_idx in range(len(self.experts)):
-        idx, top_x = torch.where(expert_mask[expert_idx])
-        current_state = hidden_states[None, top_x].reshape(-1, hidden_dim)
-        current_hidden_states = self.experts[expert_idx](current_state) * routing_weights[top_x, idx, None]
-        final_hidden_states.index_add_(0, top_x, current_hidden_states.to(hidden_states.dtype))
-    final_hidden_states = final_hidden_states.reshape(batch_size, sequence_length, hidden_dim)
+    # ── Routing subgraph (must match FuseMOE3GemmCompressed softmax branch) ──
+    # Cast only the gate weight; a Convert between hidden_states and the router MatMul
+    # would break the pattern match.
+    logits = torch.nn.functional.linear(hidden_states_flat, self.gate.weight.float())
+    scores = logits.softmax(dim=-1)
+    topk_weights, topk_indices = torch.topk(scores, top_k, dim=-1, sorted=False)
+
+    # Normalization ReduceSum -> Divide. The ReduceSum MUST have exactly ONE consumer.
+    topk_sum = topk_weights.sum(dim=-1, keepdim=True)
+    topk_norm = topk_weights / topk_sum
+
+    # Scatter normalized weights into the full [tokens, num_experts] routing matrix.
+    new_routing_weights = torch.zeros(batch_size * seq_len, num_experts, dtype=topk_norm.dtype)
+    new_routing_weights.scatter_(dim=1, index=topk_indices, src=topk_norm)
+
+    # Correction factor via the CumSum trick (never a 2nd ReduceSum on topk_weights, which
+    # would CSE-merge with the normalization ReduceSum and break fusion).
+    #   norm_topk_prob=False -> undo normalization: multiply back by topk_sum
+    #   norm_topk_prob=True  -> keep normalized weights (correction = 1)
+    if norm_topk_prob:
+        correction = torch.ones(batch_size * seq_len, 1, dtype=topk_norm.dtype) * scaling_factor
+    else:
+        correction = topk_weights.cumsum(dim=-1)[:, -1:] * scaling_factor
+    correction = correction.view(batch_size, seq_len, 1)
+
+    # ── Shared experts (outside the fused pattern) ──
+    shared_output = None
     if self.config.n_shared_experts is not None:
-        final_hidden_states = final_hidden_states + self.shared_experts(identity)
-    return final_hidden_states
+        shared_output = self.shared_experts(hidden_states_flat)
+
+    # ── Expert computation (must match FuseVectorizedMOE3GEMM) ──
+    # Tile + Reshape; weights kept [E, N, K], transposed in the bmm so the Transpose is
+    # absorbed by TransposeMatMul -> MatMul(transpose_b=true), preserving [E,N,K] for NNCF.
+    hidden_rep = hidden_states_flat.repeat(num_experts, 1).view(num_experts, -1, hidden_dim)
+    gate = torch.bmm(hidden_rep, self.gate_projs.transpose(-1, -2))
+    up = torch.bmm(hidden_rep, self.up_projs.transpose(-1, -2))
+    gate_up = torch.nn.functional.silu(gate) * up
+    down = torch.bmm(gate_up, self.down_projs.transpose(-1, -2))
+
+    # Reshape(4D) -> Multiply(routing) -> ReduceSum(keep_dims=false).
+    down = down.view(num_experts, batch_size, -1, hidden_dim)
+    routing = new_routing_weights.transpose(0, 1).view(num_experts, batch_size, -1)[..., None]
+    result = (down * routing).sum(dim=0)
+
+    # Post-fusion correction, then shared experts.
+    result = result * correction
+    if shared_output is not None:
+        result = shared_output.view(batch_size, -1, hidden_dim) + result
+    return result.view(batch_size, seq_len, hidden_dim)
 
 
 def deepseek_model_forward(
@@ -545,9 +582,7 @@ def convert_unlimited_ocr(model_id=model_id, model_path=None, quantization_confi
     print(f"⌛ {model_id} conversion started. Be patient, it may take some time.")
     print("⌛ Load Original model")
     # eager attn_implementation -> decoder layers select SlidingWindowLlamaAttention (mha_eager)
-    pt_model = AutoModel.from_pretrained(
-        model_id, device_map="cpu", trust_remote_code=True, use_safetensors=True, attn_implementation="eager"
-    )
+    pt_model = AutoModel.from_pretrained(model_id, device_map="cpu", trust_remote_code=True, use_safetensors=True, attn_implementation="eager")
     pt_model = pt_model.eval().to(torch.float32)
     config = pt_model.config
     config.image_newline = pt_model.model.image_newline.tolist()
@@ -614,6 +649,14 @@ def convert_unlimited_ocr(model_id=model_id, model_path=None, quantization_confi
         for block in lm.model.layers:
             block.self_attn.forward = types.MethodType(llama_attn_forward, block.self_attn)
             if hasattr(block.mlp, "moe_infer"):
+                # Stack expert weights into [E, N, K] buffers (PyTorch nn.Linear weight is
+                # [N, K]); the fused moe_forward transposes them in its bmm so the Transpose
+                # is absorbed into MatMul(transpose_b=true) and NNCF quantizes [E,N,K] ->
+                # [E,N,K/G,G] — the layout ConvertMOEToMOECompressed expects.
+                experts = block.mlp.experts
+                block.mlp.register_buffer("gate_projs", torch.stack([e.gate_proj.weight for e in experts]).float())
+                block.mlp.register_buffer("up_projs", torch.stack([e.up_proj.weight for e in experts]).float())
+                block.mlp.register_buffer("down_projs", torch.stack([e.down_proj.weight for e in experts]).float())
                 block.mlp.forward = types.MethodType(moe_forward, block.mlp)
         lm.model._orig_forward = lm.model.forward
         lm.model.forward = types.MethodType(deepseek_model_forward, lm.model)
@@ -694,7 +737,9 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         self._past_length = None
         self._prefill_length = 0
         # sliding-window size (faithful: query sees all prefill + last W generated tokens)
-        self._ring_window = getattr(self.config, "ring_window", None) or getattr(self.config, "sliding_window_size", None) or getattr(self.config, "sliding_window", None)
+        self._ring_window = (
+            getattr(self.config, "ring_window", None) or getattr(self.config, "sliding_window_size", None) or getattr(self.config, "sliding_window", None)
+        )
         self.input_names = [t.get_any_name() for t in self.model.inputs]
         self.main_input_name = "input_ids"
         if compile:
@@ -799,7 +844,7 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
         if past_key_values is not None:
             past_len = self._get_past_length(past_key_values)
             if attention_mask is not None and input_ids is not None and attention_mask.shape[1] > input_ids.shape[1]:
-                input_ids = input_ids[:, -(attention_mask.shape[1] - past_len):]
+                input_ids = input_ids[:, -(attention_mask.shape[1] - past_len) :]
             elif input_ids is not None and past_len < input_ids.shape[1]:
                 input_ids = input_ids[:, past_len:]
         position_ids = kwargs.get("position_ids", None)
@@ -807,7 +852,7 @@ class OvModelForCausalLMWithEmb(GenerationMixin):
             position_ids = attention_mask.long().cumsum(-1) - 1
             position_ids.masked_fill_(attention_mask == 0, 1)
             if past_key_values and input_ids is not None:
-                position_ids = position_ids[:, -input_ids.shape[1]:]
+                position_ids = position_ids[:, -input_ids.shape[1] :]
         cache_position = torch.arange(past_len, past_len + position_ids.shape[-1], device=position_ids.device)
         return {
             "input_ids": input_ids,
@@ -912,8 +957,20 @@ class OVUnlimitedOCRForCausalLM(GenerationMixin):
             idx += 1
         return inputs_embeds
 
-    def forward(self, input_ids=None, attention_mask=None, position_ids=None, past_key_values=None, inputs_embeds=None,
-                images=None, images_seq_mask=None, images_spatial_crop=None, use_cache=None, cache_position=None, **kwargs):
+    def forward(
+        self,
+        input_ids=None,
+        attention_mask=None,
+        position_ids=None,
+        past_key_values=None,
+        inputs_embeds=None,
+        images=None,
+        images_seq_mask=None,
+        images_spatial_crop=None,
+        use_cache=None,
+        cache_position=None,
+        **kwargs,
+    ):
         if inputs_embeds is None:
             inputs_embeds = self.prepare_inputs_embeds(input_ids, images, images_seq_mask, images_spatial_crop)
         return self.language_model.forward(
@@ -929,12 +986,25 @@ class OVUnlimitedOCRForCausalLM(GenerationMixin):
     def __call__(self, **kwargs):
         return self.forward(**kwargs)
 
-    def prepare_inputs_for_generation(self, input_ids, past_key_values=None, inputs_embeds=None, images=None,
-                                      images_seq_mask=None, images_spatial_crop=None, attention_mask=None,
-                                      cache_position=None, **kwargs):
+    def prepare_inputs_for_generation(
+        self,
+        input_ids,
+        past_key_values=None,
+        inputs_embeds=None,
+        images=None,
+        images_seq_mask=None,
+        images_spatial_crop=None,
+        attention_mask=None,
+        cache_position=None,
+        **kwargs,
+    ):
         model_inputs = self.language_model.prepare_inputs_for_generation(
-            input_ids, past_key_values=past_key_values, inputs_embeds=inputs_embeds,
-            attention_mask=attention_mask, cache_position=cache_position, **kwargs,
+            input_ids,
+            past_key_values=past_key_values,
+            inputs_embeds=inputs_embeds,
+            attention_mask=attention_mask,
+            cache_position=cache_position,
+            **kwargs,
         )
         if cache_position is not None and cache_position[0] == 0:
             model_inputs["images"] = images
@@ -948,9 +1018,23 @@ class OVUnlimitedOCRForCausalLM(GenerationMixin):
     def can_generate(self):
         return True
 
-    def infer(self, tokenizer, prompt="", image_file="", output_path="", base_size=1024, image_size=640,
-              crop_mode=True, test_compress=False, save_results=False, eval_mode=False, max_new_tokens=8192,
-              no_repeat_ngram_size=35, ngram_window=128, temperature=0.0):
+    def infer(
+        self,
+        tokenizer,
+        prompt="",
+        image_file="",
+        output_path="",
+        base_size=1024,
+        image_size=640,
+        crop_mode=True,
+        test_compress=False,
+        save_results=False,
+        eval_mode=False,
+        max_new_tokens=8192,
+        no_repeat_ngram_size=35,
+        ngram_window=128,
+        temperature=0.0,
+    ):
         os.makedirs(output_path, exist_ok=True)
         os.makedirs(f"{output_path}/images", exist_ok=True)
 
@@ -1072,7 +1156,7 @@ class OVUnlimitedOCRForCausalLM(GenerationMixin):
         with torch.no_grad():
             output_ids = self.generate(input_ids.unsqueeze(0), **gen_kwargs)
 
-        outputs = tokenizer.decode(output_ids[0, input_ids.unsqueeze(0).shape[1]:])
+        outputs = tokenizer.decode(output_ids[0, input_ids.unsqueeze(0).shape[1] :])
         stop_str = "<｜end▁of▁sentence｜>"
         if outputs.endswith(stop_str):
             outputs = outputs[: -len(stop_str)]
