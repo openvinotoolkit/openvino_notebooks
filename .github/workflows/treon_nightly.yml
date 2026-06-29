@@ -11,6 +11,17 @@ on:
       - '.github/workflows/.env'
   schedule:
     - cron: '0 0 * * *'
+  pull_request:
+    branches:
+      - 'main'
+      - 'latest'
+    paths:
+      - 'notebooks/**.ipynb'
+      - 'notebooks/**.py'
+      - 'requirements.txt'
+      - '.ci/*'
+      - '.github/workflows/*.yml'
+      - '.github/workflows/.env'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}

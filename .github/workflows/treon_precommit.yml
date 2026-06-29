@@ -71,7 +71,6 @@ jobs:
       test_only_changed: true
   
   build_treon_windows:
-    needs: collect_notebooks
     strategy:
       fail-fast: false
       matrix:
