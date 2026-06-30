@@ -1,10 +1,8 @@
 notebooks/3D-pose-estimation-webcam/3D-pose-estimation.ipynb
-notebooks/ace-step-music-generation/ace-step-music-generation.ipynb
 notebooks/action-recognition-webcam/action-recognition-webcam.ipynb
 notebooks/aloha-act/aloha-act.ipynb
 notebooks/async-api/async-api.ipynb
 notebooks/auto-device/auto-device.ipynb
-notebooks/bark-text-to-audio/bark-text-to-audio.ipynb
 notebooks/controlnet-stable-diffusion/controlnet-stable-diffusion.ipynb
 notebooks/convert-to-openvino/convert-to-openvino.ipynb
 notebooks/ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb
@@ -22,7 +20,6 @@ notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
 notebooks/llm-chatbot/llm-chatbot-generate-api.ipynb
 notebooks/llm-lora/llm-lora.ipynb
 notebooks/llm-question-answering/llm-question-answering.ipynb
-notebooks/ltx-video/ltx-video.ipynb
 notebooks/multilora-image-generation/multilora-image-generation.ipynb
 notebooks/nuextract-structure-extraction/nuextract-structure-extraction.ipynb
 notebooks/object-detection-webcam/object-detection.ipynb
