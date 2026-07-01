@@ -295,16 +295,10 @@ def make_demo(asr_model, processor, aligner_model=None):
 
         audio_duration = len(wav) / sr
         metrics = (
-            f"Inference time: {inference_time:.2f}s | "
-            f"Audio duration: {audio_duration:.2f}s | "
-            f"RTF: {inference_time / max(audio_duration, 0.1):.3f}"
+            f"Inference time: {inference_time:.2f}s | " f"Audio duration: {audio_duration:.2f}s | " f"RTF: {inference_time / max(audio_duration, 0.1):.3f}"
         )
 
-        ts_update = (
-            gr.update(value=timestamps, visible=True)
-            if timestamps
-            else gr.update(value=None, visible=False)
-        )
+        ts_update = gr.update(value=timestamps, visible=True) if timestamps else gr.update(value=None, visible=False)
 
         return detected_language, transcription, ts_update, metrics
 
@@ -317,9 +311,7 @@ def make_demo(asr_model, processor, aligner_model=None):
     .main-title {text-align: center; margin-bottom: 20px;}
     """
 
-    timestamps_note = (
-        "- Word-level timestamps via Qwen3-ForcedAligner\n" if aligner_model is not None else ""
-    )
+    timestamps_note = "- Word-level timestamps via Qwen3-ForcedAligner\n" if aligner_model is not None else ""
 
     with gr.Blocks(theme=theme, css=css, title="Qwen3-ASR with OpenVINO") as demo:
         gr.Markdown(f"""

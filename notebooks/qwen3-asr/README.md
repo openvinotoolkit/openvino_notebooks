@@ -24,8 +24,8 @@ The tutorial consists of the following steps:
 
 - Install prerequisites
 - Convert model to OpenVINO intermediate representation (IR) format with Optimum Intel
-- Run Speech Recognition (`OVModelForSpeechSeq2Seq`)
-- Predict word-level timestamps with the forced aligner (`OVModelForQwen3ASRForcedAligner`)
+- Run Speech Recognition
+- Predict word-level timestamps with the forced aligner
 - Launch interactive demo
 
 ## Installation Instructions
