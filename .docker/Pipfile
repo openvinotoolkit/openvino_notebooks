@@ -8,16 +8,16 @@ name = "pypi"
 ipykernel = "==6.31.0"
 ipython = ">=7.16.3"
 ipywidgets = "*"
-jupyterhub = ">=4.1.6"
-jupyterlab = ">=4.4.10"
-jupyterlab-git = ">=0.51"
+jupyterhub = ">=5.4.5"
+jupyterlab = ">=4.5.9"
+jupyterlab-git = ">=0.54.0a1"
 jupyter-core = "==5.8.1"
 notebook = "<7.0.0"
 nbval = "*"
 treon = "*"
 
 # Core ML (used by majority of notebooks)
-openvino = {version = "==2026.1.0"}
+openvino = {version = "==2026.2.0"}
 openvino-telemetry = "==2025.2.0"
 numpy = ">=1.21.0"
 opencv-python = "*"
@@ -28,7 +28,8 @@ ovmsclient = "*"
 # Security pins
 setuptools = ">70.0.0"
 pygments = ">=2.20.0"
-urllib3 = "==2.6.3"
+urllib3 = "==2.7.0"
+gitpython = ">=3.1.50"
 
 [dev-packages]
 

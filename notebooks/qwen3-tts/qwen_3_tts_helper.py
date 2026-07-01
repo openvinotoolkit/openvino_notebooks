@@ -866,10 +866,10 @@ def convert_qwen3_tts_model(model_id, output_dir, quantization_config=None, use_
         patch_stateful(ov_model, 2)
         print("✅ Talker Code Predictor model successfully converted")
 
-        if quantization_config is not None:
-            print(f"⌛ Weights compression with {quantization_config['mode']} mode started")
-            ov_model = nncf.compress_weights(ov_model, **quantization_config)
-            print("✅ Weights compression finished")
+        # if quantization_config is not None:
+        #     print(f"⌛ Weights compression with {quantization_config['mode']} mode started")
+        #     ov_model = nncf.compress_weights(ov_model, **quantization_config)
+        #     print("✅ Weights compression finished")
 
         ov.save_model(ov_model, talker_code_predictor_path)
         del ov_model

@@ -5,10 +5,10 @@ This module contains various tools for different functionalities, including:
 - Retrieving relevant passages from YouTube video transcripts based on a query.
 """
 
+import re
 from typing import Optional, Dict, List
 
 from pptx import Presentation
-import nltk
 import faiss
 from mcp import StdioServerParameters
 from langchain_community.embeddings import OpenVINOBgeEmbeddings
@@ -16,8 +16,6 @@ from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
 from smolagents.mcp_client import MCPClient
 from smolagents import tool, Tool
-
-nltk.download("punkt_tab")
 
 
 class CodeCompletionTool(Tool):
@@ -130,9 +128,12 @@ class YoutubeTranscriptRetriever(Tool):
             self.vector_store.delete(ids)
 
     @staticmethod
+    def _split_sentences(text):
+        return [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+
+    @staticmethod
     def _group_sentences(text, n):
-        sentences = nltk.sent_tokenize(text)
-        # Use generator for efficiency
+        sentences = YoutubeTranscriptRetriever._split_sentences(text)
         return [" ".join(sentences[i : i + n]) for i in range(0, len(sentences), n)]
 
     def forward(
