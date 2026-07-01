@@ -30,7 +30,30 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  OV_BRANCH: 'master'
+
 jobs:
+  get_docker_tag:
+    runs-on: ubuntu-latest
+    outputs:
+      docker_tag: ${{ steps.get_docker_tag.outputs.docker_tag }}
+    steps:
+    - name: Clone docker tag from OpenVINO repo
+      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      with:
+        repository: 'openvinotoolkit/openvino'
+        path: 'openvino'
+        ref: ${{ env.OV_BRANCH }}
+        sparse-checkout: |
+          .github/dockerfiles/docker_tag
+
+    - name: Save docker tag to output
+      id: get_docker_tag
+      run: |
+        docker_tag=$(cat openvino/.github/dockerfiles/docker_tag)
+        echo "docker_tag=$docker_tag" >> $GITHUB_OUTPUT
+
   collect_notebooks:
     runs-on: ubuntu-latest
     outputs:
@@ -47,7 +70,7 @@ jobs:
         run: python3 .ci/split_notebooks.py --num_batches 4 --seed "${{ github.run_id }}"
 
   build_treon_linux:
-    needs: collect_notebooks
+    needs: [collect_notebooks, get_docker_tag]
     strategy:
       fail-fast: false
       matrix:
@@ -62,7 +85,7 @@ jobs:
       batch: ${{ matrix.batch }}
       separate_venv: true
       ignore_list: .ci/tensorflow.txt
-      container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:pr-33079'
+      container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:${{ needs.get_docker_tag.outputs.docker_tag }}'
   
   build_treon_windows:
     needs: collect_notebooks
