@@ -348,7 +348,12 @@ class LlmStatefulModel:
         manager.register_pass(InsertSlice())
         manager.run_passes(ov_model)
 
-        ov.save_model(ov_model, Path(f"{self.ov_model_path}/llm_stateful.xml"))
+        # Only persist the full-precision IR when no compressed variant is
+        # requested. When INT4/INT8 weight compression is selected (the loader
+        # picks the compressed model), writing the multi-GB FP32 IR to disk just
+        # wastes conversion time and storage, so skip it.
+        if not (self.int4_compress or self.int8_compress):
+            ov.save_model(ov_model, Path(f"{self.ov_model_path}/llm_stateful.xml"))
         self.save_tokenizer(self.tokenizer, self.ov_model_path)
         self.model.config.save_pretrained(self.ov_model_path)
 

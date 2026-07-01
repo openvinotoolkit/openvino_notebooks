@@ -10,7 +10,6 @@ If you want to run previous Stable Diffusion versions, please check our other no
 
 * [Stable Diffusion V3 Torch.FX](../stable-diffusion-v3-torch-fx)
 * [Stable Diffusion](../stable-diffusion-text-to-image)
-* [Stable Diffusion v2](../stable-diffusion-v2-infinite-zoom)
 * [Stable Diffusion XL](../stable-diffusion-xl)
 * [LCM Stable Diffusion](../latent-consistency-models-image-generation)
 

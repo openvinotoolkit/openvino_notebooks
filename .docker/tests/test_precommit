@@ -27,5 +27,20 @@ python /tmp/scripts/patch_notebooks.py /tmp/notebooks
 # Install CI requirements
 pip install -r /opt/app-root/openvino_notebooks/.ci/ci-requirements.txt
 
+# The base workbench image may ship optimum/optimum-intel in /opt/app-root.
+# Purge them from the base venv BEFORE cloning so every per-notebook clone starts
+# clean and the only optimum present is the one the notebook installs itself.
+# This prevents duplicate dist-info ("conflicting subparser: openvino").
+pip uninstall -q -y optimum optimum-intel optimum-onnx || true
+
 # Test notebooks
-python /tmp/scripts/validate_notebooks.py --ignore_list /tmp/scripts/ignore_treon_docker.txt --test_list /tmp/scripts/test_notebooks.txt
+# Run every notebook in its own cloned virtual environment so that per-notebook
+# pip installs cannot leak into the shared image environment (which otherwise
+# leaves duplicated/incompatible distributions, e.g. multiple "optimum" copies
+# or transformers/diffusers version skew, breaking subsequent notebooks).
+python /tmp/scripts/validate_notebooks.py \
+    --ignore_list /tmp/scripts/ignore_treon_docker.txt \
+    --test_list /tmp/scripts/test_notebooks.txt \
+    --separate_venv \
+    --source_venv_path /opt/app-root \
+    --cleanup_temp
