@@ -18,14 +18,14 @@ More details can be found in the original [repository](https://github.com/QwenLM
 
 ### Notebook Contents
 
-In this tutorial we consider how to run and optimize Qwen3-ASR using OpenVINO.
+In this tutorial we consider how to run and optimize Qwen3-ASR and the Qwen3-ForcedAligner using OpenVINO with [Optimum Intel](https://huggingface.co/docs/optimum/intel/index). The pipeline and usage are aligned with the original Hugging Face model cards.
 
 The tutorial consists of the following steps:
 
 - Install prerequisites
-- Convert model to OpenVINO intermediate representation (IR) format 
-- Prepare OpenVINO Inference pipeline
+- Convert model to OpenVINO intermediate representation (IR) format with Optimum Intel
 - Run Speech Recognition
+- Predict word-level timestamps with the forced aligner
 - Launch interactive demo
 
 ## Installation Instructions
