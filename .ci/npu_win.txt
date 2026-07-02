@@ -24,8 +24,6 @@ notebooks/multilora-image-generation/multilora-image-generation.ipynb
 notebooks/nuextract-structure-extraction/nuextract-structure-extraction.ipynb
 notebooks/object-detection-webcam/object-detection.ipynb
 notebooks/openvino-tokenizers/openvino-tokenizers.ipynb
-notebooks/openvoice/openvoice.ipynb
-notebooks/openvoice2-and-melotts/openvoice2-and-melotts.ipynb
 notebooks/optical-character-recognition/optical-character-recognition.ipynb
 notebooks/person-counting-webcam/person-counting.ipynb
 notebooks/person-tracking-webcam/person-tracking.ipynb
