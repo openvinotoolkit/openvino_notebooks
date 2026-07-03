@@ -60,14 +60,13 @@ jobs:
       batch_0: ${{ steps.split.outputs.batch_0 }}
       batch_1: ${{ steps.split.outputs.batch_1 }}
       batch_2: ${{ steps.split.outputs.batch_2 }}
-      batch_3: ${{ steps.split.outputs.batch_3 }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       - name: Collect and split notebooks into batches
         id: split
-        run: python3 .ci/split_notebooks.py --num_batches 4 --seed "${{ github.run_id }}"
+        run: python3 .ci/split_notebooks.py --num_batches 3 --seed "${{ github.run_id }}"
 
   build_treon_linux:
     needs: [collect_notebooks, get_docker_tag]
@@ -76,12 +75,12 @@ jobs:
       matrix:
         runs_on: [aks-linux-8-cores-32gb]
         python: ['3.10', '3.11', '3.12', '3.13']
-        batch: ['batch_0', 'batch_1', 'batch_2', 'batch_3']
+        batch: ['batch_0', 'batch_1', 'batch_2']
     uses: ./.github/workflows/job_unix.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 || needs.collect_notebooks.outputs.batch_3 }}
+      test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 }}
       batch: ${{ matrix.batch }}
       separate_venv: true
       ignore_list: .ci/tensorflow.txt
@@ -94,12 +93,12 @@ jobs:
       matrix:
         runs_on: [aks-win-16-cores-32gb-full]
         python: ['3.10', '3.11', '3.12', '3.13']
-        batch: ['batch_0', 'batch_1', 'batch_2', 'batch_3']
+        batch: ['batch_0', 'batch_1', 'batch_2']
     uses: ./.github/workflows/job_windows.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 || needs.collect_notebooks.outputs.batch_3 }}
+      test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 }}
       batch: ${{ matrix.batch }}
       separate_venv: true
       ignore_list: .ci/tensorflow.txt
