@@ -40,6 +40,7 @@ notebooks/vlm-chatbot/vlm-chatbot-generate-api.ipynb
 notebooks/yolov11-optimization/yolov11-instance-segmentation.ipynb
 notebooks/yolov11-optimization/yolov11-keypoint-detection.ipynb
 notebooks/yolov11-optimization/yolov11-object-detection.ipynb
+notebooks/yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb
 notebooks/yolov26-optimization/yolov26-instance-segmentation.ipynb
 notebooks/yolov26-optimization/yolov26-keypoint-detection.ipynb
 notebooks/yolov26-optimization/yolov26-obb.ipynb
