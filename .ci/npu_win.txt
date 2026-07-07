@@ -29,7 +29,6 @@ notebooks/person-counting-webcam/person-counting.ipynb
 notebooks/person-tracking-webcam/person-tracking.ipynb
 notebooks/pose-estimation-webcam/pose-estimation.ipynb
 notebooks/rmbg-background-removal/rmbg-background-removal.ipynb
-notebooks/style-transfer-webcam/style-transfer.ipynb
 notebooks/tensorflow-classification-to-openvino/tensorflow-classification-to-openvino.ipynb
 notebooks/text-to-image-genai/text-to-image-genai.ipynb
 notebooks/tflite-selfie-segmentation/tflite-selfie-segmentation.ipynb
@@ -38,6 +37,9 @@ notebooks/vehicle-detection-and-recognition/vehicle-detection-and-recognition.ip
 notebooks/vision-background-removal/vision-background-removal.ipynb
 notebooks/vision-monodepth/vision-monodepth.ipynb
 notebooks/vlm-chatbot/vlm-chatbot-generate-api.ipynb
+notebooks/yolov11-optimization/yolov11-instance-segmentation.ipynb
+notebooks/yolov11-optimization/yolov11-keypoint-detection.ipynb
+notebooks/yolov11-optimization/yolov11-object-detection.ipynb
 notebooks/yolov26-optimization/yolov26-instance-segmentation.ipynb
 notebooks/yolov26-optimization/yolov26-keypoint-detection.ipynb
 notebooks/yolov26-optimization/yolov26-obb.ipynb
