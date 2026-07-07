@@ -45,3 +45,7 @@ notebooks/yolov26-optimization/yolov26-instance-segmentation.ipynb
 notebooks/yolov26-optimization/yolov26-keypoint-detection.ipynb
 notebooks/yolov26-optimization/yolov26-obb.ipynb
 notebooks/yolov26-optimization/yolov26-object-detection.ipynb
+notebooks/deepseek-r1/deepseek-r1.ipynb
+notebooks/llm-agent-mcp/llm-agent-mcp.ipynb
+notebooks/llm-code-assistant/llm-code-assistant.ipynb
+notebooks/depth-anything/depth-anything.ipynb
