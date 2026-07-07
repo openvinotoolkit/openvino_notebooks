@@ -49,3 +49,4 @@ notebooks/deepseek-r1/deepseek-r1.ipynb
 notebooks/llm-agent-mcp/llm-agent-mcp.ipynb
 notebooks/llm-code-assistant/llm-code-assistant.ipynb
 notebooks/depth-anything/depth-anything.ipynb
+notebooks/whisper-asr-genai/whisper-asr-genai.ipynb
