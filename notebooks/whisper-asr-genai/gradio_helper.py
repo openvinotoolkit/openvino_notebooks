@@ -10,7 +10,7 @@ try:
     from moviepy import VideoFileClip
 except ImportError:
     from moviepy.editor import VideoFileClip
-from transformers.pipelines.audio_utils import ffmpeg_read
+import librosa
 
 audio_en_example_path = Path("en_example.wav")
 audio_ml_example_path = Path("ml_example.wav")
@@ -35,9 +35,9 @@ def get_audio(video_file):
     duration = input_video.duration
     audio_file = Path(video_file).stem + ".wav"
     input_video.audio.write_audiofile(audio_file, logger=None)
-    with open(audio_file, "rb") as f:
-        inputs = f.read()
-    audio = ffmpeg_read(inputs, 16000)
+    # Read the extracted WAV directly with librosa (resampling to 16 kHz) to avoid the
+    # dependency on a system-wide ffmpeg binary that transformers' ffmpeg_read requires.
+    audio = librosa.load(audio_file, sr=16000)[0]
     return {"raw": audio, "sampling_rate": 16000}, duration
 
 
@@ -82,10 +82,7 @@ def make_demo(ov_pipe, model_id: str, sample_video: Optional[Path] = None):
         if inputs is None:
             raise gr.Error("No audio file submitted! Please record or upload an audio file before submitting your request.")
 
-        with open(inputs, "rb") as f:
-            raw_inputs = f.read()
-
-        audio = ffmpeg_read(raw_inputs, 16000)
+        audio = librosa.load(inputs, sr=16000)[0]
         audio_length_mins = len(audio) / 16000 / 60
 
         if audio_length_mins > MAX_AUDIO_MINS:
