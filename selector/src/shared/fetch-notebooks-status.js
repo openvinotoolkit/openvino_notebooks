@@ -1,7 +1,7 @@
 // @ts-check
 
+import decompress from '@xhmikosr/decompress';
 import { execSync } from 'child_process';
-import decompress from 'decompress';
 import { parse } from 'path';
 
 import { NOTEBOOKS_STATUS_FILE_NAME } from './constants.js';
