@@ -6,6 +6,8 @@ The original model ships in Keras / TensorFlow 1.x, which no longer runs on mode
 
 You can find more information about this model in the [research paper](https://doi.org/10.1038/s41598-020-62484-z) and the original GitHub [repository](https://github.com/fengwang/MCNN).
 
+![MCNN denoising comparison](https://raw.githubusercontent.com/dhandhalyabhavik/MCNN-ov/master/ov/assets/comparison.png)
+
 ## Notebook Contents
 
 This notebook demonstrates STEM image denoising with the MCNN model using OpenVINO.
