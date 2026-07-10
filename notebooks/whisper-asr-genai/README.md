@@ -2,7 +2,7 @@
 
 [Whisper](https://openai.com/index/whisper/) is an automatic speech recognition (ASR) system trained on 680,000 hours of multilingual and multitask supervised data collected from the web.
 
-In this tutorial, we consider how to run Whisper using OpenVINO with Generate API. We use pre-converted models from the [OpenVINO collection on HuggingFace](https://huggingface.co/collections/OpenVINO/speech-to-text) or convert models locally using [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index). To simplify the user experience, we use [OpenVINO Generate API](https://github.com/openvinotoolkit/openvino.genai) for [Whisper automatic speech recognition scenarios](https://github.com/openvinotoolkit/openvino.genai/blob/master/samples/python/whisper_speech_recognition/README.md).
+In this tutorial, we consider how to run Whisper using OpenVINO with Generate API. We use pre-converted models from the [OpenVINO collection on HuggingFace](https://huggingface.co/collections/OpenVINO/speech-to-text) or convert models locally using [Hugging Face Optimum Intel](https://huggingface.co/docs/optimum/intel/index). To simplify the user experience, we use [OpenVINO Generate API](https://github.com/openvinotoolkit/openvino.genai) for Whisper automatic speech recognition scenarios.
 
 ## Notebook Contents
 
