@@ -2,7 +2,7 @@
 
 [HunyuanOCR](https://huggingface.co/tencent/HunyuanOCR) is a lightweight,
 end-to-end OCR-specialised vision-language model released by the Tencent Hunyuan
-team. It pairs a SigLIP-style vision encoder with a compact HunYuan text decoder
+team. It pairs a SigLIP-style vision encoder with a compact Hunyuan text decoder
 and unifies **document parsing, text spotting, information extraction, and
 text-image translation** in a single end-to-end VLM, while remaining small
 enough for on-device deployment.
