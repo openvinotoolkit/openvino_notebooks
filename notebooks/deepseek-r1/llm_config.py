@@ -218,8 +218,22 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
     print(f"⌛ {model_id} conversion to {precision} started. It may takes some time.")
     display(Markdown("**Export command:**"))
     display(Markdown(f"`{optimum_cli_command}`"))
-    subprocess.run(optimum_cli_command.split(" "), shell=(platform.system() == "Windows"), check=True)
-    print(f"✅ {precision} {model_id} model converted and can be found in {model_dir}")
+
+    try:
+        result = subprocess.run(
+            optimum_cli_command.split(" "), shell=(platform.system() == "Windows"), check=False, capture_output=True, encoding="utf-8", errors="replace"
+        )
+        if result.stdout:
+            print(result.stdout.replace("\ufffd", "?"))
+        if result.stderr:
+            print(result.stderr.replace("\ufffd", "?"))
+        if result.returncode != 0:
+            raise subprocess.CalledProcessError(result.returncode, optimum_cli_command)
+    except Exception as e:
+        print(f"An error occurred during model export: {e}")
+        raise
+
+    print(f"SUCCESS: {precision} {model_id} model converted and can be found in {model_dir}")
     return model_dir
 
 
