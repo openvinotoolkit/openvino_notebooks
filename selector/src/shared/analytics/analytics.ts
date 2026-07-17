@@ -8,14 +8,12 @@ const once = function <T extends (...args: any[]) => any>(fn: T) {
 
   return function (...args: Parameters<T>): ReturnType<T> {
     if (invoked) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return result;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     result = fn(args);
     invoked = true;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return result;
   };
 };
