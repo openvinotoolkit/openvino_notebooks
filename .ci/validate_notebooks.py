@@ -440,6 +440,13 @@ def read_output_thread(process, output_queue):
         output_queue.put(None)  # Signal error/EOF
 
 
+def print_subprocess_output(line):
+    """Print subprocess output without failing on the console encoding."""
+    output_encoding = getattr(sys.stdout, "encoding", None) or "utf-8"
+    safe_line = line.encode(output_encoding, errors="backslashreplace").decode(output_encoding)
+    print(safe_line, end="", flush=True)
+
+
 def kill_process_tree(pid):
     """Kill process tree using platform-specific methods."""
     try:
@@ -499,6 +506,9 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
         "errors": "replace",
         "bufsize": 1,
     }
+    subprocess_env = os.environ.copy()
+    subprocess_env.setdefault("PYTHONIOENCODING", "utf-8")
+    popen_kwargs["env"] = subprocess_env
 
     if platform.system() == "Windows":
         popen_kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
@@ -533,7 +543,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
                 line = output_queue.get(timeout=0.1)
                 if line is None:  # EOF signal
                     break
-                print(line, end="", flush=True)
+                print_subprocess_output(line)
             except queue.Empty:
                 # No output available, loop continues to check timeout
                 continue
@@ -543,7 +553,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
             try:
                 line = output_queue.get_nowait()
                 if line:
-                    print(line, end="", flush=True)
+                    print_subprocess_output(line)
             except queue.Empty:
                 break
 
