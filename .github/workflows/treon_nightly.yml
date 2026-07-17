@@ -2,13 +2,6 @@ name: treon_nightly
 
 on:
   workflow_dispatch:
-    paths:
-      - 'notebooks/**.ipynb'
-      - 'notebooks/**.py'
-      - 'requirements.txt'
-      - '.ci/*'
-      - '.github/workflows/*.yml'
-      - '.github/workflows/.env'
   schedule:
     - cron: '0 0 * * *'
   pull_request:

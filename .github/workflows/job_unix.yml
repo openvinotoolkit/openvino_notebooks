@@ -60,7 +60,7 @@ jobs:
         with:
           script: |
             const runsOn = "${{ inputs.runs_on }}";
-            const osName = runsOn.includes('linux') ? 'linux' : runsOn.includes('mac') ? 'mac' : 'windows';
+            const osName = runsOn.includes('linux') ? 'ubuntu-22.04' : runsOn.includes('mac') ? 'macos-13' : 'windows-2022';
             const testDevice = runsOn === 'gpu' ? 'gpu' : 'cpu';
             const testReportDir = `${testDevice}-${osName}-${{ inputs.python }}`;
             core.exportVariable('OS_NAME', osName);
@@ -259,6 +259,7 @@ jobs:
             ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
             ${{ inputs.separate_venv && '--separate_venv' || '' }} \
+            --collect_reports \
             --timeout 1200
 
       - name: Archive notebook test report

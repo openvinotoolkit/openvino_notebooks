@@ -47,7 +47,7 @@ jobs:
         with:
           script: |
             const runsOn = "${{ inputs.runs_on }}";
-            const osName = runsOn.includes('linux') ? 'linux' : runsOn.includes('mac') ? 'mac' : 'windows';
+            const osName = runsOn.includes('linux') ? 'ubuntu-22.04' : runsOn.includes('mac') ? 'macos-13' : 'windows-2022';
             const testDevice = runsOn === 'gpu' ? 'gpu' : 'cpu';
             const testReportDir = `${testDevice}-${osName}-${{ inputs.python }}`;
             core.exportVariable('OS_NAME', osName);
