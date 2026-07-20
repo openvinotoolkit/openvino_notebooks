@@ -1,0 +1,7 @@
+# Notebook run artifacts (downloaded model, converted IR, outputs)
+Bernini-R-1.3B-Diffusers/
+bernini_ov_*/
+notebook_utils.py
+*.png
+*.mp4
+.ipynb_checkpoints/

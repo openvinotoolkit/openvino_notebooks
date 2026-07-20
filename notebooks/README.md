@@ -109,6 +109,7 @@
 - [Zero-shot Image Classification with OpenAI CLIP and OpenVINO™](./clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb)
 - [Virtual Try-On with CatVTON and OpenVINO](./catvton/catvton.ipynb)
 - [Visual Question Answering and Image Captioning using BLIP and OpenVINO](./blip-visual-language-processing/blip-visual-language-processing.ipynb)
+- [Unified image & video generation with Bernini-R-1.3B and OpenVINO](./bernini-r-image-video/bernini-r-image-video.ipynb)
 - [Text-to-speech generation using Bark and OpenVINO](./bark-text-to-audio/bark-text-to-audio.ipynb)
 - [Image-to-Video synthesis with AnimateAnyone and OpenVINO](./animate-anyone/animate-anyone.ipynb)
 
@@ -301,6 +302,7 @@
 - [Zero-shot Image Classification with OpenAI CLIP and OpenVINO™](./clip-zero-shot-image-classification/clip-zero-shot-classification.ipynb)
 - [Virtual Try-On with CatVTON and OpenVINO](./catvton/catvton.ipynb)
 - [Visual Question Answering and Image Captioning using BLIP and OpenVINO](./blip-visual-language-processing/blip-visual-language-processing.ipynb)
+- [Unified image & video generation with Bernini-R-1.3B and OpenVINO](./bernini-r-image-video/bernini-r-image-video.ipynb)
 - [Text-to-speech generation using Bark and OpenVINO](./bark-text-to-audio/bark-text-to-audio.ipynb)
 - [Image-to-Video synthesis with AnimateAnyone and OpenVINO](./animate-anyone/animate-anyone.ipynb)
 - [Imitation Learning - ACT](./aloha-act/aloha-act.ipynb)

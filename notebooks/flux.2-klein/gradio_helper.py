@@ -2,7 +2,8 @@ import random
 
 import gradio as gr
 import numpy as np
-import torch
+import openvino as ov
+import openvino_genai as ov_genai
 
 MAX_SEED = np.iinfo(np.int32).max
 MAX_IMAGE_SIZE = 1024
@@ -15,12 +16,23 @@ EXAMPLE_PROMPTS = [
 ]
 
 
-def make_demo(ov_pipe):
-    """Build Gradio demo for FLUX.2 Klein with OpenVINO.
+def make_demo(ov_pipe, model_dir, device="CPU"):
+    """Build Gradio demo for FLUX.2 Klein with OpenVINO GenAI.
 
     Args:
-        ov_pipe: OVFlux2KleinPipeline instance.
+        ov_pipe: openvino_genai.Text2ImagePipeline instance.
+        model_dir: Path to the exported OpenVINO model (used to build the editing pipeline).
+        device: Inference device for the editing pipeline.
     """
+    from PIL import Image
+
+    # Image editing pipeline is created lazily from the exported model on first use.
+    edit_state = {"pipe": None}
+
+    def get_edit_pipe():
+        if edit_state["pipe"] is None:
+            edit_state["pipe"] = ov_genai.Image2ImagePipeline(str(model_dir), device)
+        return edit_state["pipe"]
 
     def generate(
         prompt,
@@ -39,33 +51,42 @@ def make_demo(ov_pipe):
         if randomize_seed:
             seed = random.randint(0, MAX_SEED)  # nosec B311 - UI seed, not security
 
-        generator = torch.Generator("cpu").manual_seed(int(seed))
+        generator = ov_genai.TorchGenerator(int(seed))
 
-        pipe_kwargs = {
-            "prompt": prompt,
-            "height": height,
-            "width": width,
-            "num_inference_steps": num_inference_steps,
-            "guidance_scale": guidance_scale,
-            "generator": generator,
-        }
-
-        # Add reference images if provided
+        # Collect reference image (if provided) for image editing
+        ref_image = None
         if input_images is not None and len(input_images) > 0:
-            from PIL import Image
+            item = input_images[0]
+            if isinstance(item, tuple):
+                ref_image = item[0]
+            elif isinstance(item, Image.Image):
+                ref_image = item
+            else:
+                ref_image = Image.open(item)
 
-            image_list = []
-            for item in input_images:
-                if isinstance(item, tuple):
-                    image_list.append(item[0])
-                elif isinstance(item, Image.Image):
-                    image_list.append(item)
-                else:
-                    image_list.append(Image.open(item))
-            pipe_kwargs["image"] = image_list
+        if ref_image is not None:
+            ref_tensor = ov.Tensor(np.array(ref_image.convert("RGB"))[None])
+            image_tensor = get_edit_pipe().generate(
+                prompt,
+                ref_tensor,
+                strength=0.9,
+                height=height,
+                width=width,
+                num_inference_steps=num_inference_steps,
+                guidance_scale=guidance_scale,
+                generator=generator,
+            )
+        else:
+            image_tensor = ov_pipe.generate(
+                prompt,
+                height=height,
+                width=width,
+                num_inference_steps=num_inference_steps,
+                guidance_scale=guidance_scale,
+                generator=generator,
+            )
 
-        result = ov_pipe(**pipe_kwargs)
-        image = result.images[0]
+        image = Image.fromarray(image_tensor.data[0])
 
         return image, seed
 
