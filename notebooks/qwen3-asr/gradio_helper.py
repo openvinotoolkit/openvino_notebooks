@@ -1,18 +1,18 @@
 """
-Gradio helper for Qwen3-ASR with OpenVINO.
+Gradio helper for Qwen3-ASR with OpenVINO (optimum-intel).
 Based on the official Qwen3-ASR demo: https://huggingface.co/spaces/Qwen/Qwen3-ASR
 """
 
 import base64
 import io
-import os
-import time
 import tempfile
-from typing import Any, Dict, List, Optional, Tuple, Union
+import time
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import gradio as gr
 import numpy as np
+import torch
 from scipy.io.wavfile import write as wav_write
 
 # Supported languages (same as official Qwen3-ASR)
@@ -136,7 +136,7 @@ def _parse_audio_any(audio: Any) -> Union[str, Tuple[np.ndarray, int]]:
 
 def _make_timestamp_html(audio_upload: Any, timestamps: Any) -> str:
     """
-    Build HTML with per-token audio slices, using base64 data URLs.
+    Build HTML with per-word audio slices, using base64 data URLs.
     """
     at = _audio_to_tuple(audio_upload)
     if at is None:
@@ -219,70 +219,89 @@ def save_transcription(transcription: str) -> str:
         return f.name
 
 
-def make_demo(ov_model, example_dir=None):
+def _resample(wav: np.ndarray, sr: int, target_sr: int = 16000) -> np.ndarray:
+    """Resample mono float32 audio to target_sr if needed."""
+    if sr == target_sr:
+        return wav
+    import librosa
+
+    return librosa.resample(wav.astype(np.float32), orig_sr=sr, target_sr=target_sr)
+
+
+def make_demo(asr_model, processor, aligner_model=None):
     """
-    Create Gradio demo for Qwen3-ASR with OpenVINO.
+    Create a Gradio demo for Qwen3-ASR with OpenVINO (optimum-intel).
 
     Args:
-        ov_model: OVQwen3ASRModel instance
-        example_dir: Directory containing example audio files (optional)
-
-    Returns:
-        Gradio Blocks demo
+        asr_model: an ``OVModelForSpeechSeq2Seq`` loaded from a Qwen3-ASR checkpoint.
+        processor: the ``AutoProcessor`` for the model (handles ``apply_transcription_request``,
+            ``decode`` and, for the aligner, ``prepare_forced_aligner_inputs`` / ``decode_forced_alignment``).
+        aligner_model: optional ``OVModelForQwen3ASRForcedAligner`` for word-level timestamps.
     """
     lang_choices_disp, lang_map = _build_choices_and_map(SUPPORTED_LANGUAGES)
     lang_choices = ["Auto"] + lang_choices_disp
 
     def transcribe(audio_upload: Any, lang_disp: str, progress=gr.Progress(track_tqdm=True)):
-        """
-        Main transcription function.
-        """
+        """Transcribe (and optionally align) the uploaded audio, mirroring the original model API."""
         if audio_upload is None:
-            return "", "", None, ""
+            return "", "", gr.update(value=None, visible=False), ""
 
         try:
-            audio_obj = _parse_audio_any(audio_upload)
+            wav, sr = _parse_audio_any(audio_upload)
         except ValueError as e:
-            return "", "", None, f"<div style='color:red'>Error: {str(e)}</div>"
+            return "", "", gr.update(value=None, visible=False), f"<div style='color:red'>Error: {str(e)}</div>"
+
+        wav = _resample(wav, sr, 16000)
+        sr = 16000
 
         language = None
         if lang_disp and lang_disp != "Auto":
             language = lang_map.get(lang_disp, lang_disp)
 
-        # Measure inference time
         start_time = time.time()
 
-        # Perform transcription
-        results = ov_model.transcribe(
-            audio=audio_obj,
-            language=language,
-            return_time_stamps=False,  # Not supported in OV version
-        )
+        # 1. Transcribe -- identical flow to the original transformers model.
+        inputs = processor.apply_transcription_request(audio=wav, sampling_rate=sr, language=language)
+        inputs = inputs.to(asr_model.device)
+        generated_ids = asr_model.generate(**inputs, max_new_tokens=256)
+        generated_ids = generated_ids[:, inputs["input_ids"].shape[1] :]
+        parsed = processor.decode(generated_ids, return_format="parsed")[0]
+        detected_language = parsed.get("language", "") or (language or "")
+        transcription = parsed.get("transcription", "") or ""
 
         inference_time = time.time() - start_time
 
-        if not isinstance(results, list) or len(results) != 1:
-            return "", "", None, "<div style='color:red'>Unexpected result format.</div>"
+        # 2. Optionally compute word-level timestamps with the forced aligner.
+        timestamps = None
+        if aligner_model is not None and transcription.strip():
+            try:
+                aligner_inputs, word_lists = processor.prepare_forced_aligner_inputs(
+                    audio=wav,
+                    transcript=transcription,
+                    language=detected_language or "English",
+                )
+                aligner_inputs = aligner_inputs.to(aligner_model.device)
+                with torch.inference_mode():
+                    outputs = aligner_model(**aligner_inputs)
+                timestamps = processor.decode_forced_alignment(
+                    logits=outputs.logits,
+                    input_ids=aligner_inputs["input_ids"],
+                    word_lists=word_lists,
+                    timestamp_token_id=aligner_model.config.timestamp_token_id,
+                )[0]
+            except Exception as e:
+                timestamps = None
+                print(f"Forced alignment failed: {e}")
 
-        r = results[0]
-
-        # Calculate audio duration
-        if isinstance(audio_obj, tuple):
-            wav, sr = audio_obj
-            audio_duration = len(wav) / sr
-        else:
-            audio_duration = 0
-
-        metrics = f"Inference time: {inference_time:.2f}s | Audio duration: {audio_duration:.2f}s | RTF: {inference_time/max(audio_duration, 0.1):.3f}"
-
-        return (
-            getattr(r, "language", "") or "",
-            getattr(r, "text", "") or "",
-            None,  # No timestamps in OV version
-            metrics,
+        audio_duration = len(wav) / sr
+        metrics = (
+            f"Inference time: {inference_time:.2f}s | " f"Audio duration: {audio_duration:.2f}s | " f"RTF: {inference_time / max(audio_duration, 0.1):.3f}"
         )
 
-    # Build Gradio interface
+        ts_update = gr.update(value=timestamps, visible=True) if timestamps else gr.update(value=None, visible=False)
+
+        return detected_language, transcription, ts_update, metrics
+
     theme = gr.themes.Soft(
         font=[gr.themes.GoogleFont("Source Sans Pro"), "Arial", "sans-serif"],
     )
@@ -292,19 +311,20 @@ def make_demo(ov_model, example_dir=None):
     .main-title {text-align: center; margin-bottom: 20px;}
     """
 
+    timestamps_note = "- Word-level timestamps via Qwen3-ForcedAligner\n" if aligner_model is not None else ""
+
     with gr.Blocks(theme=theme, css=css, title="Qwen3-ASR with OpenVINO") as demo:
-        gr.Markdown("""
+        gr.Markdown(f"""
 # Qwen3-ASR with OpenVINO
 
-**Accelerated by OpenVINO™ Runtime**
+**Accelerated by OpenVINO™ Runtime via Optimum Intel**
 
 Qwen3-ASR is a state-of-the-art automatic speech recognition model that supports **52+ languages and dialects** with high accuracy.
 This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
 
 **Features:**
 - Multi-language ASR (Chinese, English, Japanese, Korean, and 52+ more languages)
-- Hardware acceleration via OpenVINO
-- Optimized for Intel hardware
+{timestamps_note}- Hardware acceleration via OpenVINO
 """)
 
         with gr.Row():
@@ -314,23 +334,6 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                     type="numpy",
                     sources=["upload", "microphone"],
                 )
-
-                # Add example audio selector
-                if example_dir is not None:
-                    example_path = Path(example_dir)
-                    if example_path.exists() and example_path.is_dir():
-                        # Get all audio files from example_dir
-                        audio_files = sorted(
-                            [str(f) for f in example_path.glob("*.wav")]
-                            + [str(f) for f in example_path.glob("*.mp3")]
-                            + [str(f) for f in example_path.glob("*.flac")]
-                        )
-                        if audio_files:
-                            gr.Examples(
-                                examples=[[f] for f in audio_files],
-                                inputs=[audio_in],
-                                label="Try Example Audio",
-                            )
 
                 lang_in = gr.Dropdown(
                     label="Language (leave 'Auto' for automatic detection)",
@@ -345,14 +348,22 @@ This demo uses OpenVINO for accelerated inference on CPU, GPU, or NPU.
                 out_text = gr.Textbox(label="Transcription Result", lines=10, interactive=False)
                 out_metrics = gr.Textbox(label="Inference Metrics", lines=1, interactive=False)
 
-        with gr.Row():
-            out_ts = gr.JSON(label="Timestamps (JSON)", visible=False)
+        out_ts_html = gr.HTML(label="Word Timestamps", visible=False)
 
-        # Event handlers
+        def _on_transcribe(audio_upload, lang_disp):
+            detected_language, transcription, ts_update, metrics = transcribe(audio_upload, lang_disp)
+            # Render timestamp visualization (audio slices per word) when available.
+            if ts_update.get("visible") and ts_update.get("value"):
+                html = _make_timestamp_html(audio_upload, ts_update["value"])
+                ts_html_update = gr.update(value=html, visible=True)
+            else:
+                ts_html_update = gr.update(value="", visible=False)
+            return detected_language, transcription, metrics, ts_html_update
+
         btn.click(
-            transcribe,
+            _on_transcribe,
             inputs=[audio_in, lang_in],
-            outputs=[out_lang, out_text, out_ts, out_metrics],
+            outputs=[out_lang, out_text, out_metrics, out_ts_html],
         )
 
         gr.Markdown("""
