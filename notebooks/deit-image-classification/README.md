@@ -25,11 +25,11 @@ This notebook covers **DeiT Tiny** (`deit-tiny-patch16-224`, 5 M params), the sm
 
 | Input image | OpenVINO FP16 — Top-5 predictions |
 |---|---|
-| ![dogs](../../assets/preview/deit_dog_inference.jpg) | **1.** `golden retriever` — logit **5.31** |
-| | 2. `Saluki, gazelle hound` — logit 4.94 |
-| | 3. `Labrador retriever` — logit 4.72 |
-| | 4. `Weimaraner` — logit 3.41 |
-| | 5. `cocker spaniel` — logit 3.39 |
+| ![LeBron James](assets/test_images/getty_LeBron.jpg) | **1.** `basketball` — logit **14.13** |
+| | 2. `volleyball` — logit 7.38 |
+| | 3. `balance beam, beam` — logit 6.36 |
+| | 4. `unicycle, monocycle` — logit 5.41 |
+| | 5. `racket, racquet` — logit 5.19 |
 
 ---
 
