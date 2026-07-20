@@ -42,6 +42,7 @@ from transformers import GenerationConfig, GenerationMixin, PretrainedConfig, Te
 from transformers.cache_utils import Cache, DynamicCache
 from transformers.modeling_outputs import BaseModelOutputWithPast, CausalLMOutputWithPast
 from torchvision import transforms
+import ast
 
 # The original modeling code is downloaded from the HF Hub into this local folder by the
 # notebook (snapshot_download of "baidu/Unlimited-OCR").  We import a couple of utilities
@@ -105,7 +106,7 @@ def re_match(text):
 def extract_coordinates_and_label(ref_text, image_width, image_height):
     try:
         label_type = ref_text[1]
-        cor_list = eval(ref_text[2])  # noqa: S307 - trusted model output
+        cor_list = ast.literal_eval(ref_text[2])  # safer alternative to eval
         if cor_list and isinstance(cor_list[0], (int, float)):
             cor_list = [cor_list]
     except Exception as e:  # noqa: BLE001

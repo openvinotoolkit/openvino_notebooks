@@ -14,6 +14,7 @@ except ImportError:
 import gradio as gr
 import numpy as np
 import requests
+import ast
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 # Only the resolutions covered by the exported vision IRs (1024 global view, 640 crop
@@ -81,7 +82,7 @@ def make_demo(model, tokenizer):
                 color_map[label] = (np.random.randint(50, 255), np.random.randint(50, 255), np.random.randint(50, 255))
             color = color_map[label]
             try:
-                coords = eval(ref[2])  # noqa: S307 - trusted model output
+                coords = ast.literal_eval(ref[2])  # safer alternative to eval
             except Exception:  # noqa: BLE001
                 continue
             # standalone <|det|> form yields a flat [x1,y1,x2,y2]; wrap to a list of boxes
