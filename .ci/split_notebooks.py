@@ -18,9 +18,7 @@ from pathlib import Path
 def collect_notebooks(notebooks_dir: Path) -> list[str]:
     """Return sorted list of notebook paths (relative to repo root), excluding test_ prefixed files."""
     notebooks = sorted(
-        str(p)
-        for p in notebooks_dir.rglob("*.ipynb")
-        if not p.name.startswith("test_")
+        str(p) for p in notebooks_dir.rglob("*.ipynb") if not p.name.startswith("test_")
     )
     return notebooks
 
@@ -46,7 +44,7 @@ def write_github_output(batches: list[list[str]]) -> None:
     with open(output_file, "a") as fh:
         for i, batch in enumerate(batches):
             print(f"Batch {i}: {len(batch)} notebooks")
-            print(f'--- Batch {i} ---' + '\n'.join(batch))
+            print(f"--- Batch {i} ---" + "\n".join(batch))
             fh.write(f"batch_{i}<<BATCH_EOF\n")
             fh.write("\n".join(batch) + "\n")
             fh.write("BATCH_EOF\n")
