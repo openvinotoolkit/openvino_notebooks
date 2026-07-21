@@ -25,4 +25,4 @@ For illustration, the notebook uses a single test image from **ShanghaiTech Part
 
 ## Installation Instructions
 
-This is a self-contained example. The first code cell installs the required packages. If you have them already, run through the rest of the cells.
+This is a self-contained example. It is recommended to run the notebook in a virtual environment, it only needs a Jupyter server to start. For general environment setup, please refer to [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/README.md#-installation-guide).
