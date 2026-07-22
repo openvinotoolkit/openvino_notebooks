@@ -244,8 +244,9 @@ jobs:
             --device ${{ env.TEST_DEVICE }} \
             ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
             $IGNORE_ARGS \
-            --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
+            --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
             ${{ inputs.separate_venv && '--separate_venv' || '' }} \
+            --collect_reports \
             --timeout 1200
       
       - name: Analysing with treon (MacOS)
@@ -257,7 +258,7 @@ jobs:
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
             ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
-            --report_dir test_report/${{ env.TEST_REPORT_DIR }} \
+            --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
             ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --collect_reports \
             --timeout 1200

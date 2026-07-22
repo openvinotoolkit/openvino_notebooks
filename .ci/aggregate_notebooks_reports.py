@@ -6,8 +6,20 @@ from validation_config import ValidationMatrix
 REPORTS_DIR = "test_reports"
 
 
-def get_report_file_path(device: str, os: str, python: str) -> Path:
-    return Path(REPORTS_DIR) / f"{device}-{os}-{python}" / "test_report.csv"
+def find_report_files(device: str, os: str, python: str) -> list[Path]:
+    """Find all test_report.csv files for a given device/os/python combination.
+
+    Notebook tests are split into batches (batch_0, batch_1, ...) that run as
+    separate CI jobs, each writing its own test_report.csv nested under a
+    batch subdirectory (e.g. test_reports/<device>-<os>-<python>/batch_0/test_report.csv)
+    so that per-batch artifacts don't collide when merged. Non-batched runs still
+    write the report directly under the device-os-python directory, so both
+    layouts are searched for here.
+    """
+    report_dir = Path(REPORTS_DIR) / f"{device}-{os}-{python}"
+    if not report_dir.exists():
+        return []
+    return sorted(report_dir.rglob("test_report.csv"))
 
 
 def get_default_status_dict(notebook_name: str) -> dict:
@@ -33,23 +45,35 @@ def write_json_file(filename: str, data: dict):
 def main():
     ValidationMatrix.os = tuple(os for os in ValidationMatrix.os if "macos" not in os)
 
+    reports_dir = Path(REPORTS_DIR)
+    print(f'Recursive file structure of "{reports_dir}":')
+    if reports_dir.exists():
+        for path in sorted(reports_dir.rglob("*")):
+            print(f"  {path}")
+    else:
+        print(f'  "{reports_dir}" does not exist.')
+
     NOTEBOOKS_STATUS_MAP = {}
+    processed_reports_count = 0
     for device, os, python in ValidationMatrix.values():
         if device == "gpu" and not os.startswith("ubuntu"):
             print(f'Tests are not available for "{device}" device and "{os}".')
             continue
-        report_file_path = get_report_file_path(device, os, python)
-        if not report_file_path.exists():
-            print(f'Report file "{report_file_path}" does not exists.')
+        report_file_paths = find_report_files(device, os, python)
+        if not report_file_paths:
+            print(f'No report files found for "{device}-{os}-{python}".')
             continue
-        print(f'Processing report file "{report_file_path}".')
-        with open(report_file_path, "r") as report_file:
-            for row in csv.DictReader(report_file):
-                name = row["name"]
-                status = row["status"]
-                if name not in NOTEBOOKS_STATUS_MAP:
-                    NOTEBOOKS_STATUS_MAP[name] = get_default_status_dict(name)
-                NOTEBOOKS_STATUS_MAP[name]["status"][os][device][python] = status
+        for report_file_path in report_file_paths:
+            print(f'Processing report file "{report_file_path}".')
+            with open(report_file_path, "r") as report_file:
+                for row in csv.DictReader(report_file):
+                    name = row["name"]
+                    status = row["status"]
+                    if name not in NOTEBOOKS_STATUS_MAP:
+                        NOTEBOOKS_STATUS_MAP[name] = get_default_status_dict(name)
+                    NOTEBOOKS_STATUS_MAP[name]["status"][os][device][python] = status
+            processed_reports_count += 1
+    print(f"Processed {processed_reports_count} test report file(s).")
     write_json_file(Path(REPORTS_DIR) / "notebooks-status-map.json", NOTEBOOKS_STATUS_MAP)
 
 

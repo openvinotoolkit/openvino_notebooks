@@ -156,7 +156,7 @@ jobs:
             "--os", "${{ env.OS_NAME }}",
             "--python", "${{ inputs.python }}",
             "--device", "${{ env.TEST_DEVICE }}",
-            "--report_dir", "test_report/${{ env.TEST_REPORT_DIR }}",
+            "--report_dir", "test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }}",
             "--timeout", "1200",
             "--collect_reports"
           )
