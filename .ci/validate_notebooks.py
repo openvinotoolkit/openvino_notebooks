@@ -53,9 +53,7 @@ def detect_source_venv_path() -> Path:
         # On Unix, python is always in bin/ -> go up 2 levels
         source_venv_path = python_path.parent.parent
 
-    print(
-        f"Detecting source virtual environment executable: {sys.executable}", flush=True
-    )
+    print(f"Detecting source virtual environment executable: {sys.executable}", flush=True)
     print(f"Detected source virtual environment path: {source_venv_path}", flush=True)
 
     return source_venv_path
@@ -81,9 +79,7 @@ TestPlan = dict[Path, NotebookReport]
 
 def parse_arguments():
     parser = ArgumentParser()
-    parser.add_argument(
-        "--ignore_config", required=False, default=SKIPPED_NOTEBOOKS_CONFIG_FILENAME
-    )
+    parser.add_argument("--ignore_config", required=False, default=SKIPPED_NOTEBOOKS_CONFIG_FILENAME)
     parser.add_argument("--ignore_list", required=False, nargs="+", default=None)
     parser.add_argument("--test_list", required=False, nargs="+", default=None)
     parser.add_argument("--os", type=validation_config_arg("os"))
@@ -130,9 +126,7 @@ def cleanup_temp_venv_dirs():
                 shutil.rmtree(item)
                 print(f"Removed temporary venv directory: {item}", flush=True)
             except Exception as e:
-                print(
-                    f"Failed to remove temporary venv directory {item}: {e}", flush=True
-                )
+                print(f"Failed to remove temporary venv directory {item}: {e}", flush=True)
 
 
 def move_notebooks(nb_dir):
@@ -149,14 +143,10 @@ def collect_python_packages(python_executable: Path, output_file: Path):
         f.write(reqs)
 
 
-def get_ignored_notebooks_from_yaml(
-    validation_config: ValidationConfig, skip_config_file_path: Path
-) -> list[Path]:
+def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig, skip_config_file_path: Path) -> list[Path]:
     ignored_notebooks: list[Path] = []
     if not skip_config_file_path.exists():
-        print(
-            f"Skipped notebooks config yaml file does not exist at path '{str(skip_config_file_path)}'."
-        )
+        print(f"Skipped notebooks config yaml file does not exist at path '{str(skip_config_file_path)}'.")
         return ignored_notebooks
     with open(skip_config_file_path, "r") as f:
         skipped_notebooks_config: list[SkippedNotebook] = yaml.safe_load(f)
@@ -165,9 +155,7 @@ def get_ignored_notebooks_from_yaml(
         for skip in skips:
             for key in validation_config.keys():
                 if not validation_config[key]:
-                    print(
-                        f"Warning: validation config argument '{key}' is not provided."
-                    )
+                    print(f"Warning: validation config argument '{key}' is not provided.")
                 if validation_config[key] in skip.get(key, []):
                     ignored_notebooks.append(Path(skipped_notebook["notebook"]))
 
@@ -180,9 +168,7 @@ def get_existing_tests(test_list_to_check: list, test_plan: TestPlan) -> TestPla
         if test in test_plan:
             existing_tests.append(test)
         else:
-            print(
-                f"WARNING: Notebook '{test}' is not found in notebooks directory '{str(ROOT / NOTEBOOKS_DIR)}'."
-            )
+            print(f"WARNING: Notebook '{test}' is not found in notebooks directory '{str(ROOT / NOTEBOOKS_DIR)}'.")
     return existing_tests
 
 
@@ -195,44 +181,25 @@ def prepare_test_plan(
 ) -> TestPlan:
     orig_nb_dir = ROOT / NOTEBOOKS_DIR
     notebooks_dir = nb_dir or orig_nb_dir
-    notebooks: list[Path] = sorted(
-        list(
-            [
-                n
-                for n in notebooks_dir.rglob("**/*.ipynb")
-                if not n.name.startswith("test_")
-            ]
-        )
-    )
+    notebooks: list[Path] = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
 
     print(f"All notebooks: {notebooks}")
 
-    test_plan: TestPlan = {
-        notebook.relative_to(notebooks_dir): NotebookReport(
-            status="", path=notebook, duration=0
-        )
-        for notebook in notebooks
-    }
+    test_plan: TestPlan = {notebook.relative_to(notebooks_dir): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
 
     skip_config_file_path = Path(__file__).parents[0] / ignore_config
-    ignored_notebooks = get_ignored_notebooks_from_yaml(
-        validation_config, skip_config_file_path
-    )
+    ignored_notebooks = get_ignored_notebooks_from_yaml(validation_config, skip_config_file_path)
     if ignore_list is not None:
         for ignore_item in ignore_list:
             if ignore_item.endswith(".txt"):
                 # Paths to ignore files are provided to `--ignore_list` argument
                 with open(ignore_item, "r") as f:
-                    ignored_notebooks.extend(
-                        list(map(lambda line: Path(line.strip()), f.readlines()))
-                    )
+                    ignored_notebooks.extend(list(map(lambda line: Path(line.strip()), f.readlines())))
             else:
                 # Ignored notebooks are provided as several items to `--ignore_list` argument
                 ignored_notebooks.append(Path(ignore_item))
     try:
-        ignored_notebooks = list(
-            set(map(lambda n: n.relative_to(NOTEBOOKS_DIR), ignored_notebooks))
-        )
+        ignored_notebooks = list(set(map(lambda n: n.relative_to(NOTEBOOKS_DIR), ignored_notebooks)))
     except ValueError:
         raise ValueError(
             f"Ignore list items should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\nInvalid ignored notebooks: {ignored_notebooks}"
@@ -274,8 +241,7 @@ def prepare_test_plan(
                 testing_notebook_path = notebook_path.relative_to(NOTEBOOKS_DIR)
             except ValueError:
                 raise ValueError(
-                    "Items in test list should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\n"
-                    f"Invalid notebook path: {notebook_path}"
+                    "Items in test list should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\n" f"Invalid notebook path: {notebook_path}"
                 )
             testing_notebooks.append(testing_notebook_path)
     else:
@@ -332,9 +298,7 @@ def get_base_openvino_version() -> str:
     return version
 
 
-def get_pip_package_version(
-    python_executable: Path, package: str, text_input: str, missing_return: str
-) -> str:
+def get_pip_package_version(python_executable: Path, package: str, text_input: str, missing_return: str) -> str:
     command = [str(python_executable), "-m", "pip", "show", package]
     try:
         output = subprocess.check_output(
@@ -342,9 +306,7 @@ def get_pip_package_version(
             shell=(platform.system() == "Windows"),
             universal_newlines=True,
         )
-        version_line = next(
-            (line for line in output.splitlines() if line.startswith("Version: ")), None
-        )
+        version_line = next((line for line in output.splitlines() if line.startswith("Version: ")), None)
         if version_line:
             version = version_line.split("Version: ")[1].strip()
             print(f"{text_input}: {version}")
@@ -403,15 +365,12 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
     """
 
     print(
-        f"Cloning virtual environment from {source_env_path} to "
-        f"{target_env_path}...",
+        f"Cloning virtual environment from {source_env_path} to " f"{target_env_path}...",
         flush=True,
     )
 
     if not source_env_path.exists():
-        raise FileNotFoundError(
-            f"Source virtual environment path '{source_env_path}' does not exist."
-        )
+        raise FileNotFoundError(f"Source virtual environment path '{source_env_path}' does not exist.")
 
     # Validate source environment structure
     is_standard_venv = True
@@ -500,9 +459,7 @@ def read_output_thread(process, output_queue):
 def print_subprocess_output(line):
     """Print subprocess output without failing on the console encoding."""
     output_encoding = getattr(sys.stdout, "encoding", None) or "utf-8"
-    safe_line = line.encode(output_encoding, errors="backslashreplace").decode(
-        output_encoding
-    )
+    safe_line = line.encode(output_encoding, errors="backslashreplace").decode(output_encoding)
     print(safe_line, end="", flush=True)
 
 
@@ -582,15 +539,11 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
         popen_kwargs["start_new_session"] = True
 
     try:
-        process = subprocess.Popen(
-            cmd, **popen_kwargs
-        )  # nosec B603 - cmd built internally from trusted args
+        process = subprocess.Popen(cmd, **popen_kwargs)  # nosec B603 - cmd built internally from trusted args
 
         # Start output reading thread
         output_queue = queue.Queue()
-        reader_thread = threading.Thread(
-            target=read_output_thread, args=(process, output_queue), daemon=True
-        )
+        reader_thread = threading.Thread(target=read_output_thread, args=(process, output_queue), daemon=True)
         reader_thread.start()
 
         loop_start = time.perf_counter()
@@ -673,9 +626,7 @@ def run_test(
     result = None
 
     if notebook_path.is_dir():
-        print(
-            f'Notebook path "{notebook_path}" is a directory, but path to "*.ipynb" file was expected.'
-        )
+        print(f'Notebook path "{notebook_path}" is a directory, but path to "*.ipynb" file was expected.')
         return result
     if notebook_path.suffix != ".ipynb":
         print(f'Notebook path "{notebook_path}" should have "*.ipynb" extension.')
@@ -694,17 +645,13 @@ def run_test(
                 try:
                     python_executable = clone_venv(source_venv_path, venv_path)
                 except subprocess.CalledProcessError as e:
-                    print(
-                        f"Failed to create virtual environment for notebook {notebook_path}. Error: {e}"
-                    )
+                    print(f"Failed to create virtual environment for notebook {notebook_path}. Error: {e}")
                     return result
 
             # Update PATH so subprocesses inside notebook can find venv executables (e.g. optimum-cli)
             original_path = os.environ.get("PATH", "")
             if source_venv_path:
-                os.environ["PATH"] = (
-                    str(python_executable.parent) + os.pathsep + original_path
-                )
+                os.environ["PATH"] = str(python_executable.parent) + os.pathsep + original_path
 
             try:
                 ov_version_before = get_pip_package_version(
@@ -750,9 +697,7 @@ def run_test(
                 retcode, duration = run_subprocess_with_timeout(
                     main_command,
                     timeout,
-                    shell=(
-                        platform.system() == "Windows"
-                    ),  # nosec B604 - shell only on Windows, cmd from internal args
+                    shell=(platform.system() == "Windows"),  # nosec B604 - shell only on Windows, cmd from internal args
                     description=f"Notebook test [{patched_notebook.name}]",
                 )
 
@@ -789,12 +734,8 @@ def run_test(
 
                 if not keep_artifacts:
                     clean_test_artifacts(files_before_test, sorted(Path(".").iterdir()))
-                    clean_test_artifacts(
-                        paddle_before, get_dir_state(Path.home() / ".paddleocr")
-                    )
-                    clean_test_artifacts(
-                        easyocr_before, get_dir_state(Path.home() / ".EasyOCR")
-                    )
+                    clean_test_artifacts(paddle_before, get_dir_state(Path.home() / ".paddleocr"))
+                    clean_test_artifacts(easyocr_before, get_dir_state(Path.home() / ".EasyOCR"))
 
                 print_disk_usage("AFTER", Path("."))
                 print(
@@ -811,9 +752,7 @@ def run_test(
 def write_csv_report(csv_path, test_report, result_queue):
     try:
         with csv_path.open("w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(
-                f, fieldnames=["name", "status", "full_path", "duration"]
-            )
+            writer = csv.DictWriter(f, fieldnames=["name", "status", "full_path", "duration"])
             writer.writeheader()
             writer.writerows(test_report)
         result_queue.put(("success", None))
@@ -835,9 +774,7 @@ def finalize_status(
         print("FAILED: \n{}".format("\n".join(failed_notebooks)), flush=True)
 
     if timeout_notebooks:
-        print(
-            "FAILED BY TIMEOUT: \n{}".format("\n".join(timeout_notebooks)), flush=True
-        )
+        print("FAILED BY TIMEOUT: \n{}".format("\n".join(timeout_notebooks)), flush=True)
 
     test_report = []
 
@@ -860,9 +797,7 @@ def finalize_status(
     csv_path = report_dir / "test_report.csv"
     print(f"Writing test report to: {csv_path.absolute()}", flush=True)
     result_queue = queue.Queue()
-    csv_writer_thread = threading.Thread(
-        target=write_csv_report, args=(csv_path, test_report, result_queue), daemon=True
-    )
+    csv_writer_thread = threading.Thread(target=write_csv_report, args=(csv_path, test_report, result_queue), daemon=True)
     csv_writer_thread.start()
     csv_writer_thread.join(timeout=30)
 
@@ -960,9 +895,7 @@ def main():
 
     base_version = get_base_openvino_version()
 
-    validation_config = ValidationConfig(
-        os=args.os, python=args.python, device=args.device
-    )
+    validation_config = ValidationConfig(os=args.os, python=args.python, device=args.device)
 
     test_plan = prepare_test_plan(
         validation_config,
@@ -1011,12 +944,7 @@ def main():
                     failed_notebooks.append(patched_notebook)
                 report["status"] = status
             else:
-                report["status"] = (
-                    NotebookStatus.SUCCESS
-                    if not report["status"]
-                    in [NotebookStatus.TIMEOUT, NotebookStatus.FAILED]
-                    else report["status"]
-                )
+                report["status"] = NotebookStatus.SUCCESS if not report["status"] in [NotebookStatus.TIMEOUT, NotebookStatus.FAILED] else report["status"]
 
             timing += duration
             report["duration"] = timing
@@ -1027,11 +955,7 @@ def main():
                     f'Notebook directory content: {list(report["path"].parent.iterdir())}',
                     flush=True,
                 )
-                notebook_content = json.loads(
-                    report["path"]
-                    .parent.joinpath(f'test_{report["path"].name}')
-                    .read_text(encoding="utf-8")
-                )
+                notebook_content = json.loads(report["path"].parent.joinpath(f'test_{report["path"].name}').read_text(encoding="utf-8"))
                 report_path = write_single_notebook_report(
                     base_version,
                     patched_notebook,
@@ -1049,9 +973,7 @@ def main():
                     retcode, duration = run_subprocess_with_timeout(
                         cmd,
                         timeout=15,
-                        shell=(
-                            platform.system() == "Windows"
-                        ),  # nosec B604 - shell only on Windows, cmd from internal args
+                        shell=(platform.system() == "Windows"),  # nosec B604 - shell only on Windows, cmd from internal args
                         description=f"Upload notebook report to DB [{patched_notebook}]",
                     )
                     if retcode != 0:
@@ -1068,9 +990,7 @@ def main():
             if args.early_stop:
                 break
 
-    exit_status = finalize_status(
-        failed_notebooks, timeout_notebooks, test_plan, reports_dir, root
-    )
+    exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
     return exit_status
 
 

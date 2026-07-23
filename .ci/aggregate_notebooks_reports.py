@@ -45,10 +45,7 @@ def merge_report_files(report_file_paths: list[Path]) -> dict[str, str]:
                 name = row["name"]
                 status = row["status"]
                 existing = merged_statuses.get(name)
-                if existing is None or (
-                    existing in PLACEHOLDER_STATUSES
-                    and status not in PLACEHOLDER_STATUSES
-                ):
+                if existing is None or (existing in PLACEHOLDER_STATUSES and status not in PLACEHOLDER_STATUSES):
                     merged_statuses[name] = status
     return merged_statuses
 

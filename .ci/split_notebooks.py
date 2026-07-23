@@ -17,9 +17,7 @@ from pathlib import Path
 
 def collect_notebooks(notebooks_dir: Path) -> list[str]:
     """Return sorted list of notebook paths (relative to repo root), excluding test_ prefixed files."""
-    notebooks = sorted(
-        str(p) for p in notebooks_dir.rglob("*.ipynb") if not p.name.startswith("test_")
-    )
+    notebooks = sorted(str(p) for p in notebooks_dir.rglob("*.ipynb") if not p.name.startswith("test_"))
     return notebooks
 
 
