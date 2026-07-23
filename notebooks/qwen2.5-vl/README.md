@@ -1,4 +1,4 @@
-# Visual-language assistant with Qwen2VL and OpenVINO
+# Visual-language assistant with Qwen2.5VL and OpenVINO
 
  Qwen2.5-VL is the latest addition to the QwenVL series of multimodal large language models.
 
@@ -29,14 +29,15 @@ Qwen2.5VL enhances both training and inference speeds by strategically implement
 
 More details about model can be found in [model card](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct), [blog](https://qwenlm.github.io/blog/qwen2.5-vl/), [technical report](https://arxiv.org/abs/2502.13923) and original [repo](https://github.com/QwenLM/Qwen2.5-VL).
 
-In this tutorial we consider how to convert and optimize Qwen2.5VL model for creating multimodal chatbot using [Optimum Intel](https://github.com/huggingface/optimum-intel). Additionally, we demonstrate how to apply model optimization techniques like weights compression using [NNCF](https://github.com/openvinotoolkit/nncf
+In this tutorial we consider how to convert and optimize Qwen2.5VL model for creating multimodal chatbot using [Optimum Intel](https://github.com/huggingface/optimum-intel). Additionally, we demonstrate how to apply model optimization techniques like weights compression using [NNCF](https://github.com/openvinotoolkit/nncf) and how to run inference using [OpenVINO GenAI](https://github.com/openvinotoolkit/openvino.genai) `VLMPipeline`.
 
 ## Notebook contents
 The tutorial consists from following steps:
 
 - Install requirements
 - Convert and Optimize model
-- Run OpenVINO model inference
+- Prepare OpenVINO GenAI Inference Pipeline
+- Run OpenVINO GenAI model inference
 - Launch Interactive demo
 
 In this demonstration, you'll create interactive chatbot that can answer questions about provided image's content.
