@@ -81,3 +81,17 @@ jobs:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
       test_only_changed: true
+
+  Overall_Status:
+    name: ci/gha_overall_status_precommit
+    needs: [get_docker_tag, build_treon_linux, build_treon_windows]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check status of all jobs
+        if: >-
+          ${{
+            contains(needs.*.result, 'failure') ||
+            contains(needs.*.result, 'cancelled')
+          }}
+        run: exit 1
