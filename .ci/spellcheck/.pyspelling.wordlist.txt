@@ -80,6 +80,7 @@ BEiT
 Belrose
 Benchmarking
 benchmarking
+bernini
 bert
 BERT's
 BERTScore
@@ -102,6 +103,7 @@ blockwise
 BMP
 boolean
 builtins
+ByteDance
 CatVTON
 CausVid
 CentOS
@@ -408,6 +410,7 @@ GroundingDINO
 gRPC
 Gu
 GUIs
+Gundam
 Gutendex
 Hafner
 HalBench
@@ -750,6 +753,7 @@ nsfw
 NSFW
 NuExtract
 num
+numerics
 numpy
 NumPy
 NVLabs
@@ -845,6 +849,7 @@ parametrize
 Params
 Parler
 parsers
+patchify
 patchifying
 Patil
 PCD
@@ -896,6 +901,7 @@ precisions
 precomputed
 preconverted
 prefetching
+prefill
 preformatted
 prem
 PrePostProcessing
@@ -978,6 +984,7 @@ RegNetY
 regressively
 reidentification
 ReLU
+renderer
 René
 repo
 reproducibility
@@ -1016,6 +1023,7 @@ Ruizhongtai
 Runtime
 runtime
 runtimes
+rv
 RVQ
 Safetensors
 safetensors
@@ -1146,6 +1154,7 @@ tbb
 Tencent
 TensorBoard
 tensorflow
+testcases
 TextVQA
 tf
 TFLite
@@ -1202,10 +1211,12 @@ UINT
 UIs
 Ultralytics
 UMD
+UMT
 Uncheck
 unCLIP
 uncomment
 uncompressing
+uncond
 uncurated
 UNet
 Unet
@@ -1278,6 +1289,7 @@ VQA
 VQGAN
 VQVAE
 VRAM
+VTI
 Wav
 wav
 waveform

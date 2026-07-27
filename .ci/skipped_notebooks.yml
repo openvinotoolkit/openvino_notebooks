@@ -516,7 +516,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-        - windows-2022
 - notebook: notebooks/minicpm-v-4.6/minicpm-v-4.6.ipynb
   skips:
     - os:
@@ -524,6 +523,16 @@
         - windows-2022
 # Experimental — requires custom optimum-intel branch + transformers>=5.13; heavy VLM model
 - notebook: notebooks/hunyuan-ocr/hunyuan-ocr.ipynb
+  skips:
+    - os:
+        - macos-13
+- notebook: notebooks/unlimited-ocr/unlimited-ocr.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/bernini-r-image-video/bernini-r-image-video.ipynb
   skips:
     - os:
         - macos-13
