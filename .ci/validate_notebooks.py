@@ -48,6 +48,7 @@ NETWORK_ERROR_PATTERNS = [
     "Failed to establish a new connection",
     "RemoteDisconnected",
     "IncompleteRead",
+    "Too Many Requests for url"
 ]
 
 
