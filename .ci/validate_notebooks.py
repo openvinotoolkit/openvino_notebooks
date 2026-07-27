@@ -28,6 +28,37 @@ SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
 
 SEPARATED_VENV_NAME = Path("openvino_venv")
 
+NETWORK_ERROR_PATTERNS = [
+    "ConnectionError",
+    "TimeoutError",
+    "URLError",
+    "requests.exceptions",
+    "socket.timeout",
+    "Network is unreachable",
+    "ConnectionRefused",
+    "NewConnectionError",
+    "MaxRetryError",
+    "ConnectTimeout",
+    "ReadTimeout",
+    "SSLError",
+    "urllib3.exceptions",
+    "gaierror",
+    "No route to host",
+    "Connection timed out",
+    "Failed to establish a new connection",
+    "RemoteDisconnected",
+    "IncompleteRead",
+]
+
+
+def check_network_error(output_lines: list[str]) -> bool:
+    """Check if the subprocess output contains network-related error patterns."""
+    for line in output_lines:
+        for pattern in NETWORK_ERROR_PATTERNS:
+            if pattern in line:
+                return True
+    return False
+
 
 def detect_source_venv_path() -> Path:
     r"""
@@ -516,6 +547,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
         # Use start_new_session instead of preexec_fn to avoid thread-safety warning
         popen_kwargs["start_new_session"] = True
 
+    collected_output = []
     try:
         process = subprocess.Popen(cmd, **popen_kwargs)  # nosec B603 - cmd built internally from trusted args
 
@@ -544,6 +576,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
                 if line is None:  # EOF signal
                     break
                 print_subprocess_output(line)
+                collected_output.append(line)
             except queue.Empty:
                 # No output available, loop continues to check timeout
                 continue
@@ -554,6 +587,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
                 line = output_queue.get_nowait()
                 if line:
                     print_subprocess_output(line)
+                    collected_output.append(line)
             except queue.Empty:
                 break
 
@@ -572,7 +606,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
         retcode = -1
 
     duration = time.perf_counter() - start_time
-    return retcode, duration
+    return retcode, duration, collected_output
 
 
 def run_test(
@@ -638,19 +672,20 @@ def run_test(
 
                 main_command = [python_executable, "-m", "treon", "--verbose", str(patched_notebook)]
 
-                retcode, duration = run_subprocess_with_timeout(
+                retcode, duration, output_lines = run_subprocess_with_timeout(
                     main_command,
                     timeout,
                     shell=(platform.system() == "Windows"),  # nosec B604 - shell only on Windows, cmd from internal args
                     description=f"Notebook test [{patched_notebook.name}]",
                 )
+                is_net_error = check_network_error(output_lines) if retcode != 0 else False
 
                 ov_version_after = get_pip_package_version(python_executable, "openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
                 get_pip_package_version(
                     python_executable, "openvino_tokenizers", "OpenVINO Tokenizers after notebook execution", "OpenVINO Tokenizers is missing"
                 )
                 get_pip_package_version(python_executable, "openvino_genai", "OpenVINO GenAI after notebook execution", "OpenVINO GenAI is missing")
-                result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after)
+                result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after, is_net_error)
 
                 collect_python_packages(python_executable, report_dir / (patched_notebook.stem + "_env_after.txt"))
 
@@ -803,6 +838,7 @@ def main():
 
     test_plan = prepare_test_plan(validation_config, args.test_list, args.ignore_config, args.ignore_list, notebooks_moving_dir)
 
+    retest_list: dict[Path, NotebookReport] = {}
     for notebook, report in test_plan.items():
         if report["status"] == NotebookStatus.SKIPPED:
             continue
@@ -812,14 +848,14 @@ def main():
         except Exception as e:
             print(f"Error during testing notebook {str(notebook)}: {e}")
             print(traceback.format_exc(), flush=True)
-            test_result = [f"test_{report['path'].name}", -1, 0.0, "N/A", "N/A"]
+            test_result = [f"test_{report['path'].name}", -1, 0.0, "N/A", "N/A", False]
         timing = 0
         if not test_result:
             print(f'Testing notebooks "{str(notebook)}" is not found.')
             report["status"] = NotebookStatus.EMPTY
             report["duration"] = timing
         else:
-            patched_notebook, status_code, duration, ov_version_before, ov_version_after = test_result
+            patched_notebook, status_code, duration, ov_version_before, ov_version_after, is_net_error = test_result
             if status_code:
                 if status_code == -42:
                     status = NotebookStatus.TIMEOUT
@@ -827,6 +863,9 @@ def main():
                 else:
                     status = NotebookStatus.FAILED
                     failed_notebooks.append(patched_notebook)
+                    if is_net_error:
+                        retest_list[notebook] = report
+                        print(f"Network error detected in '{notebook}', queued for retest.", flush=True)
                 report["status"] = status
             else:
                 report["status"] = NotebookStatus.SUCCESS if not report["status"] in [NotebookStatus.TIMEOUT, NotebookStatus.FAILED] else report["status"]
@@ -841,7 +880,7 @@ def main():
                 )
                 if args.upload_to_db:
                     cmd = [sys.executable, args.upload_to_db, report_path]
-                    retcode, duration = run_subprocess_with_timeout(
+                    retcode, duration, _ = run_subprocess_with_timeout(
                         cmd,
                         timeout=15,
                         shell=(platform.system() == "Windows"),  # nosec B604 - shell only on Windows, cmd from internal args
@@ -854,6 +893,56 @@ def main():
 
             if args.early_stop:
                 break
+
+    # Retest notebooks that failed due to network errors
+    if retest_list:
+        print(f"\nRetesting {len(retest_list)} notebook(s) that failed due to network errors...", flush=True)
+        for notebook, report in retest_list.items():
+            patched_name = f"test_{report['path'].name}"
+            if patched_name in failed_notebooks:
+                failed_notebooks.remove(patched_name)
+            try:
+                print(f"Retesting notebook: {str(report['path'])}", flush=True)
+                test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute(), source_venv_path)
+            except Exception as e:
+                print(f"Error during retesting notebook {str(notebook)}: {e}")
+                print(traceback.format_exc(), flush=True)
+                test_result = [f"test_{report['path'].name}", -1, 0.0, "N/A", "N/A", False]
+            if not test_result:
+                print(f'Retesting notebook "{str(notebook)}" result not found.')
+                report["status"] = NotebookStatus.EMPTY
+            else:
+                patched_notebook, status_code, duration, ov_version_before, ov_version_after, _ = test_result
+                if status_code:
+                    if status_code == -42:
+                        status = NotebookStatus.TIMEOUT
+                        timeout_notebooks.append(patched_notebook)
+                    else:
+                        status = NotebookStatus.FAILED
+                        failed_notebooks.append(patched_notebook)
+                    report["status"] = status
+                else:
+                    report["status"] = NotebookStatus.SUCCESS
+                    print(f"Retest PASSED for notebook '{notebook}'", flush=True)
+                report["duration"] += duration
+                if args.collect_reports:
+                    job_name = args.job_name or "Unknown"
+                    device = args.device or "Unknown"
+                    report_path = write_single_notebook_report(
+                        base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir
+                    )
+                    if args.upload_to_db:
+                        cmd = [sys.executable, args.upload_to_db, report_path]
+                        retcode, duration, _ = run_subprocess_with_timeout(
+                            cmd,
+                            timeout=15,
+                            shell=(platform.system() == "Windows"),  # nosec B604 - shell only on Windows, cmd from internal args
+                            description=f"Upload retest report to DB [{patched_notebook}]",
+                        )
+                        if retcode != 0:
+                            print(f"Database upload failed with exit code {retcode}, duration: {duration:.2f} seconds", flush=True)
+                        else:
+                            print(f"Database upload succeeded, duration: {duration:.2f} seconds", flush=True)
 
     exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
     return exit_status
