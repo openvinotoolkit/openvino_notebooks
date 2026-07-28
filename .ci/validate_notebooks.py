@@ -48,7 +48,7 @@ NETWORK_ERROR_PATTERNS = [
     "Failed to establish a new connection",
     "RemoteDisconnected",
     "IncompleteRead",
-    "Too Many Requests for url"
+    "Too Many Requests for url",
 ]
 
 
@@ -755,14 +755,7 @@ def run_test(
                     "OpenVINO GenAI after notebook execution",
                     "OpenVINO GenAI is missing",
                 )
-                result = (
-                    str(patched_notebook),
-                    retcode,
-                    duration,
-                    ov_version_before,
-                    ov_version_after,
-                    is_net_error
-                )
+                result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after, is_net_error)
 
                 collect_python_packages(
                     python_executable,
@@ -966,14 +959,7 @@ def main():
             report["status"] = NotebookStatus.EMPTY
             report["duration"] = timing
         else:
-            (
-                patched_notebook,
-                status_code,
-                duration,
-                ov_version_before,
-                ov_version_after,
-                is_net_error
-            ) = test_result
+            patched_notebook, status_code, duration, ov_version_before, ov_version_after, is_net_error = test_result
             if status_code:
                 if status_code == -42:
                     status = NotebookStatus.TIMEOUT
