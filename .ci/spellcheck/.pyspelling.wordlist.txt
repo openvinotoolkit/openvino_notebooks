@@ -431,6 +431,7 @@ huggingfacehub
 Hunyuan
 hunyuan
 HunyuanDIT
+HunyuanOCR
 Husain
 HWC
 HY
