@@ -865,6 +865,7 @@ PGI
 PhotoMaker
 photorealism
 photorealistic
+physicalai
 PII
 PIL
 Pillarization
@@ -1151,6 +1152,7 @@ sym
 TartanAir
 TaskManager
 tbb
+teleoperation
 Tencent
 TensorBoard
 tensorflow
@@ -1256,6 +1258,7 @@ virtualenv
 VisCPM
 visualise
 visualises
+visuomotor
 ViT
 vit
 VITReciproCAM
