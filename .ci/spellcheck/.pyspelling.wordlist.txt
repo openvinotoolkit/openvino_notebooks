@@ -410,6 +410,7 @@ GroundingDINO
 gRPC
 Gu
 GUIs
+Gundam
 Gutendex
 Hafner
 HalBench
@@ -430,6 +431,7 @@ huggingfacehub
 Hunyuan
 hunyuan
 HunyuanDIT
+HunyuanOCR
 Husain
 HWC
 HY
@@ -751,6 +753,7 @@ nsfw
 NSFW
 NuExtract
 num
+numerics
 numpy
 NumPy
 NVLabs
@@ -898,6 +901,7 @@ precisions
 precomputed
 preconverted
 prefetching
+prefill
 preformatted
 prem
 PrePostProcessing
