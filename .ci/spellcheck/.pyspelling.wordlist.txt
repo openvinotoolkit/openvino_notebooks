@@ -489,6 +489,7 @@ io
 IoU
 ip
 IPs
+ipynb
 ir
 IRs
 iteratively
@@ -1293,6 +1294,7 @@ VQGAN
 VQVAE
 VRAM
 VTI
+walkthrough
 Wav
 wav
 waveform
