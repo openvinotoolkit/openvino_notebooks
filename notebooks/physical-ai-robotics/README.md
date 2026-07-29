@@ -6,10 +6,10 @@ This directory contains a **reference notebook** that points to the OpenVINO™ 
 
 ## Notebook Contents
 
-The tutorials live in the [physicalai](https://github.com/openvinotoolkit/physicalai) repository, and the reference notebook points to both published tutorial README pages:
+The tutorials live in the [physicalai](https://github.com/openvinotoolkit/physicalai) repository. The reference notebook points to both published tutorial pages:
 
-- **[`examples/tutorials` on the `main` branch](https://github.com/openvinotoolkit/physicalai/blob/main/examples/tutorials/README.md)** — a single end-to-end "Collect → Train → Deploy" walkthrough: data collection, visuomotor policy training, OpenVINO optimization, and deployment on a real robot.
-- **[`examples/tutorials` on the `docs/tutorials` branch](https://github.com/openvinotoolkit/physicalai/blob/docs/tutorials/examples/tutorials/README.md)** — a broader list of notebooks: an introduction, using Physical AI Studio, OpenVINO optimization, testing deployment without a robot, and a full data-collection-to-deployment workflow.
+- **[Collect → Train → Deploy walkthrough](https://github.com/openvinotoolkit/physicalai/blob/main/examples/tutorials/README.md)** — a single end-to-end tutorial: data collection, visuomotor policy training, OpenVINO optimization, and deployment on a real robot.
+- **[Full tutorial notebook collection](https://github.com/openvinotoolkit/physicalai/blob/docs/tutorials/examples/tutorials/README.md)** — a broader set of notebooks: an introduction, using Physical AI Studio, OpenVINO optimization, testing deployment without a robot, and a full data-collection-to-deployment workflow.
 
 ## Requirements
 
