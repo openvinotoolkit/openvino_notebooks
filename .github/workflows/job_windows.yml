@@ -61,8 +61,14 @@ jobs:
       - name: Install FFmpeg
         shell: pwsh
         run: |
-          winget install -e --id Gyan.FFmpeg.Shared --silent --accept-source-agreements --accept-package-agreements
-          "$env:LOCALAPPDATA\Microsoft\WinGet\Links" | Out-File -FilePath $env:GITHUB_PATH -Append
+          $build = "ffmpeg-8.1.2-full_build-shared"
+          curl.exe -fsSL -o ffmpeg.zip "https://github.com/GyanD/codexffmpeg/releases/download/8.1.2/$build.zip"
+          if ((Get-FileHash ffmpeg.zip -Algorithm SHA256).Hash -ne "274923c68904a9b76c73b908f57923dafba81155856cd742138515ded570d066") {
+            throw "FFmpeg archive checksum mismatch"
+          }
+          Expand-Archive ffmpeg.zip -DestinationPath C:\tools
+          "C:\tools\$build\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+          & "C:\tools\$build\bin\ffmpeg.exe" -version
 
       - name: Get changed files
         if: ${{ inputs.test_only_changed }}
