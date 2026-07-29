@@ -58,6 +58,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
+      - name: Install FFmpeg
+        shell: pwsh
+        run: |
+          choco install ffmpeg-full --yes --no-progress
+          ffmpeg -version
+
       - name: Get changed files
         if: ${{ inputs.test_only_changed }}
         id: changed-files
