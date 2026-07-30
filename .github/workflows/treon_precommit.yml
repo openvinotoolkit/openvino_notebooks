@@ -69,6 +69,7 @@ jobs:
       python: ${{ matrix.python }}
       container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:${{ needs.get_docker_tag.outputs.docker_tag }}'
       test_only_changed: true
+      separate_venv: true
   
   build_treon_windows:
     strategy:
@@ -81,6 +82,7 @@ jobs:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
       test_only_changed: true
+      separate_venv: true
 
   Overall_Status:
     name: ci/gha_overall_status_precommit
