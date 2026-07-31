@@ -152,6 +152,15 @@ jobs:
           python3 -m pip install -r .ci/dev-requirements.txt
           python3 -m ipykernel install --user --name openvino_env
 
+      # Needed for notebooks that download models from Hugging Face Hub
+      - name: Configure CA bundle (certifi)
+        run: |
+          python3 -m pip install --upgrade certifi
+          $CA_BUNDLE = python3 -c "import certifi; print(certifi.where())"
+          Write-Output "Using CA bundle: $CA_BUNDLE"
+          "SSL_CERT_FILE=$CA_BUNDLE" >> $env:GITHUB_ENV
+          "REQUESTS_CA_BUNDLE=$CA_BUNDLE" >> $env:GITHUB_ENV
+
       - name: Check install
         run: python3 check_install.py
 

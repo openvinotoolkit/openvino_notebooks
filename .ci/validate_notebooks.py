@@ -686,10 +686,10 @@ def run_test(
                     flush=True,
                 )
 
+                treon_runner = Path(__file__).parent / "treon_runner.py"
                 main_command = [
                     python_executable,
-                    "-m",
-                    "treon",
+                    str(treon_runner),
                     "--verbose",
                     str(patched_notebook),
                 ]
