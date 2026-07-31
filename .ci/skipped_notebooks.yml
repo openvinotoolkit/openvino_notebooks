@@ -192,7 +192,6 @@
   skips:
     - os:
       - macos-13
-      - windows-2022  # 14.4 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/phi-3-vision/phi-3-vision.ipynb
   skips:
       - os:
@@ -499,12 +498,6 @@
     - os:
         - windows-2022
 - notebook: notebooks/qwen3-tts/qwen3-tts.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-# OOM / timeout — model too heavy for CI runners (2026-04-03)
-- notebook: notebooks/gemma4/gemma4.ipynb
   skips:
     - os:
         - macos-13
