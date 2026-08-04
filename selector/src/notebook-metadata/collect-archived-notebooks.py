@@ -102,6 +102,47 @@ def extract_openvino_metadata(notebook_json: dict) -> dict:
     }
 
 
+# HuggingFace-style model ids: `org/model`, quoted single-slash tokens.
+_HF_ID_RE = re.compile(r"[\"']([A-Za-z0-9][\w.-]*/[\w.-]+)[\"']")
+# File-path-like tokens ending with a known media/asset extension, to exclude from model ids.
+_FILE_EXT_RE = re.compile(
+    r"\.(mp4|avi|mov|mkv|webm|png|jpe?g|gif|bmp|webp|svg|mp3|wav|flac|ogg|xml|bin|json|txt|"
+    r"pdf|csv|tsv|npy|npz|onnx|safetensors|pt|pth|md|yaml|yml|zip|tar|gz|html?)$",
+    re.IGNORECASE,
+)
+# Well-known model names written without an `org/` prefix (e.g. YOLO). Extend for new families.
+_KNOWN_MODEL_NAME_RES = [
+    re.compile(r"\byolo(?:v)?\d+[a-z]?(?:-(?:seg|pose|cls|obb))?\b", re.IGNORECASE),
+]
+
+
+def extract_models(notebook_json: dict) -> list[str]:
+    """Extract inline HuggingFace model ids from notebook code cells.
+
+    Only inline ids are collected (no shared `llm_config.py` resolution), since
+    that config differs across historical branches. For each `org/name` id the
+    short `name` is added as well.
+    """
+    code = "\n".join(
+        "".join(cell.get("source", []))
+        for cell in notebook_json.get("cells", [])
+        if cell.get("cell_type") == "code"
+    )
+    models: set[str] = set()
+    for match in _HF_ID_RE.finditer(code):
+        model_id = match.group(1)
+        if _FILE_EXT_RE.search(model_id):
+            continue
+        models.add(model_id)
+        short_name = model_id.split("/")[-1]
+        if short_name:
+            models.add(short_name)
+    for name_re in _KNOWN_MODEL_NAME_RES:
+        for match in name_re.finditer(code):
+            models.add(match.group(0).lower())
+    return sorted(models, key=str.lower)
+
+
 def main():
     release_branches = discover_release_branches()
     if not release_branches:
@@ -151,6 +192,7 @@ def main():
 
             title = extract_title(notebook_json)
             meta = extract_openvino_metadata(notebook_json)
+            models = extract_models(notebook_json)
 
             # Path relative to notebooks/ dir
             relative_path = nb_path.removeprefix("notebooks/")
@@ -162,6 +204,7 @@ def main():
                 "imageUrl": meta["imageUrl"],
                 "lastBranch": branch,
                 "githubUrl": f"https://github.com/openvinotoolkit/openvino_notebooks/blob/{branch}/{nb_path}",
+                "models": models,
                 "tags": meta["tags"],
             }
             added += 1
