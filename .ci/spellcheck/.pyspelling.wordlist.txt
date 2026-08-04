@@ -661,6 +661,7 @@ MinerU
 minicpm
 MiniCPM
 MiniLM
+Ministral
 mistralai
 MLLM
 MLLMs
@@ -878,6 +879,7 @@ PixelShuffleUpsampleNetwork
 pixelwise
 Pixtral
 pixtral
+PixtralVisionModel
 PLE
 PLR
 PNDM
@@ -1330,6 +1332,7 @@ xvectors
 xxl
 XYWH
 YAML
+YaRN
 Yiqin
 YOLO
 YOLOE
