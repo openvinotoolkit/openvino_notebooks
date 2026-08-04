@@ -489,6 +489,7 @@ io
 IoU
 ip
 IPs
+ipynb
 ir
 IRs
 iteratively
@@ -865,6 +866,7 @@ PGI
 PhotoMaker
 photorealism
 photorealistic
+physicalai
 PII
 PIL
 Pillarization
@@ -1151,6 +1153,7 @@ sym
 TartanAir
 TaskManager
 tbb
+teleoperation
 Tencent
 TensorBoard
 tensorflow
@@ -1256,6 +1259,7 @@ virtualenv
 VisCPM
 visualise
 visualises
+visuomotor
 ViT
 vit
 VITReciproCAM
@@ -1290,6 +1294,7 @@ VQGAN
 VQVAE
 VRAM
 VTI
+walkthrough
 Wav
 wav
 waveform
