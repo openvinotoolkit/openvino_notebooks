@@ -192,7 +192,6 @@
   skips:
     - os:
       - macos-13
-      - windows-2022  # 14.4 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/phi-3-vision/phi-3-vision.ipynb
   skips:
       - os:
@@ -503,12 +502,6 @@
     - os:
         - macos-13
         - ubuntu-22.04
-# OOM / timeout — model too heavy for CI runners (2026-04-03)
-- notebook: notebooks/gemma4/gemma4.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
 # Gated model — requires HuggingFace authentication
 - notebook: notebooks/medasr-medical-asr/medasr-medical-asr.ipynb
   skips:
@@ -521,6 +514,11 @@
     - os:
         - macos-13
         - windows-2022
+# Experimental — requires custom optimum-intel branch + transformers>=5.13; heavy VLM model
+- notebook: notebooks/hunyuan-ocr/hunyuan-ocr.ipynb
+  skips:
+    - os:
+        - macos-13
 - notebook: notebooks/unlimited-ocr/unlimited-ocr.ipynb
   skips:
     - os:

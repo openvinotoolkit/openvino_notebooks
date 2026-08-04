@@ -5,6 +5,13 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/81ff3233-9c8d-4fe8-ab21-baf9ce530cff",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov10-optimization/yolov10-optimization.ipynb",
+    "models": [
+      "coco/images",
+      "images",
+      "yolov10",
+      "yolov10n",
+      "yolov5"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -25,6 +32,17 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov12-optimization/yolov12-object-detection.ipynb",
+    "models": [
+      "coco/images",
+      "images",
+      "yolo12l",
+      "yolo12m",
+      "yolo12n",
+      "yolo12s",
+      "yolo12x",
+      "yolov12",
+      "yolov5"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -45,6 +63,13 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/272966666-b4c05f7b-1b64-4335-a125-c20105da7cc4.png",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov8-optimization/yolov8-instance-segmentation.ipynb",
+    "models": [
+      "coco/images",
+      "images",
+      "yolov5",
+      "yolov8",
+      "yolov8n-seg"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -66,6 +91,12 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/272967083-a36d1072-e2f6-4dd9-85ad-4b2b3b4341d5.png",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov8-optimization/yolov8-keypoint-detection.ipynb",
+    "models": [
+      "coco8-pose/labels",
+      "labels",
+      "yolov8",
+      "yolov8n-pose"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -86,6 +117,13 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/212105105-f61c8aab-c1ff-40af-a33f-d0ed1fccc72e.png",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov8-optimization/yolov8-object-detection.ipynb",
+    "models": [
+      "coco/images",
+      "images",
+      "yolov5",
+      "yolov8",
+      "yolov8n"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -106,6 +144,14 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/ae3a7653-eead-4c41-9cad-a7c95d3a4578",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov9-optimization/yolov9-optimization.ipynb",
+    "models": [
+      "coco/images",
+      "coco/labels",
+      "images",
+      "labels",
+      "yolov5",
+      "yolov9"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -126,6 +172,14 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/b541d7d9-da82-4fe9-a98b-e744cb25c3c6",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/hunyuan-dit-image-generation/hunyuan-dit-image-generation.ipynb",
+    "models": [
+      "Distillation",
+      "HunyuanDiT",
+      "model",
+      "t2i/model",
+      "Tencent-Hunyuan/Distillation",
+      "Tencent-Hunyuan/HunyuanDiT"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -144,6 +198,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.gif?raw=true",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/stable-diffusion-v2-infinite-zoom/stable-diffusion-v2-infinite-zoom.ipynb",
+    "models": [
+      "stabilityai/stable-diffusion-2-inpainting",
+      "stable-diffusion-2-inpainting"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -166,6 +224,14 @@
     "imageUrl": "https://github.com/user-attachments/assets/0d83b369-b8fc-423e-bc53-495022555e8c",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/janus-multimodal-generation/janus-multimodal-generation.ipynb",
+    "models": [
+      "deepseek-ai/Janus-1.3B",
+      "deepseek-ai/Janus-Pro-1B",
+      "deepseek-ai/Janus-Pro-7B",
+      "Janus-1.3B",
+      "Janus-Pro-1B",
+      "Janus-Pro-7B"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -187,6 +253,7 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/231468849-1cd11e68-21e2-44ed-8088-b792ef50c32d.png",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/segment-anything/segment-anything.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos",
@@ -207,6 +274,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/15d0a23a-0550-43c6-9ca9-f689e772a79a",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/efficient-sam/efficient-sam.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos",
@@ -227,6 +295,7 @@
     "imageUrl": "https://github.com/user-attachments/assets/5557d79d-2e9a-4784-aa17-fea2931a1435",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/explainable-ai-1-basic/explainable-ai-1-basic.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "First Steps",
@@ -248,6 +317,7 @@
     "imageUrl": "https://github.com/user-attachments/assets/5557d79d-2e9a-4784-aa17-fea2931a1435",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Explainable AI"
@@ -268,6 +338,7 @@
     "imageUrl": "https://github.com/user-attachments/assets/5557d79d-2e9a-4784-aa17-fea2931a1435",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/explainable-ai-3-map-interpretation/explainable-ai-3-map-interpretation.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Explainable AI"
@@ -288,6 +359,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/style-transfer-webcam/style-transfer.gif?raw=true",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/style-transfer-webcam/style-transfer.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Live Demos"
@@ -305,6 +377,10 @@
     "imageUrl": "https://github.com/user-attachments/assets/06c51867-0580-4434-962e-31b6068c2001",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/glm4-v/glm4-v.ipynb",
+    "models": [
+      "glm-4v-9b",
+      "THUDM/glm-4v-9b"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -325,6 +401,10 @@
     "imageUrl": "https://github.com/user-attachments/assets/63543487-c40d-4e29-a24b-d93eb7cf991e",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/pixtral/pixtral.ipynb",
+    "models": [
+      "mistral-community/pixtral-12b",
+      "pixtral-12b"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -345,6 +425,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/76171391/31b316f4-41fd-43c9-8113-71e7398324be",
     "lastBranch": "2026.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.2/notebooks/yolov8-optimization/yolov8-obb.ipynb",
+    "models": [
+      "yolov8-obb",
+      "yolov8l-obb"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -365,6 +449,7 @@
     "imageUrl": null,
     "lastBranch": "2026.0",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.0/notebooks/pytorch-quantization-sparsity-aware-training/pytorch-quantization-sparsity-aware-training.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Training",
@@ -383,6 +468,16 @@
     "imageUrl": "https://github.com/Doubiiu/DynamiCrafter/blob/main/assets/showcase/guitar0.gif?raw=true",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/dynamicrafter-animating-images/dynamicrafter-animating-images.ipynb",
+    "models": [
+      "conceptual_captions",
+      "Doubiiu/DynamiCrafter",
+      "DynamiCrafter",
+      "google-research-datasets/conceptual_captions",
+      "jovianzm/Pexels-400k",
+      "mp4",
+      "Pexels-400k",
+      "video/mp4"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -401,6 +496,10 @@
     "imageUrl": null,
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/big-transfer-quantization/tensorflow-bit-image-classification-nncf-quantization.ipynb",
+    "models": [
+      "160px",
+      "imagenette/160px"
+    ],
     "tags": {
       "categories": [
         "Optimize",
@@ -419,6 +518,12 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/25d3c2c5-c12f-48d2-b4cd-3161387a4448",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/ddcolor-image-colorization/ddcolor-image-colorization.ipynb",
+    "models": [
+      "colorization_dataset",
+      "DDColor/inference",
+      "inference",
+      "ummagumm-a/colorization_dataset"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -436,6 +541,7 @@
     "imageUrl": "https://raw.githubusercontent.com/jax-ml/jax/main/images/jax_logo_250px.png?raw=true",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/jax-to-openvino/jax-classification-to-openvino.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "API Overview"
@@ -453,6 +559,14 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/22fa5396-8381-400f-a78f-97e25d57d807",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/llm-native-agent-react/llm-native-agent-react.ipynb",
+    "models": [
+      "Qwen/qwen2.5-14b-instruct",
+      "Qwen/Qwen2.5-3B-Instruct",
+      "Qwen/Qwen2.5-7B-Instruct",
+      "qwen2.5-14b-instruct",
+      "Qwen2.5-3B-Instruct",
+      "Qwen2.5-7B-Instruct"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -473,6 +587,10 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/276283074-df7464e6-8293-4c6c-8f77-8e95d8f94c11.png",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/pix2struct-docvqa/pix2struct-docvqa.ipynb",
+    "models": [
+      "google/pix2struct-docvqa-base",
+      "pix2struct-docvqa-base"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -490,6 +608,12 @@
     "imageUrl": "https://cdn-images-1.medium.com/max/540/1*Voez5hEn5MU8Knde3fIZfw.png",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/grammar-correction/grammar-correction.ipynb",
+    "models": [
+      "flan-t5-large-grammar-synthesis",
+      "pszemraj/flan-t5-large-grammar-synthesis",
+      "roberta-base-CoLA",
+      "textattack/roberta-base-CoLA"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -508,6 +632,24 @@
     "imageUrl": "https://github.com/user-attachments/assets/bacfcd2a-ac36-4421-9d1b-4e34aa0a9f62",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/sana-image-generation/sana-image-generation.ipynb",
+    "models": [
+      "Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers",
+      "Efficient-Large-Model/Sana_1600M_1024px_BF16_diffusers",
+      "Efficient-Large-Model/Sana_1600M_2Kpx_BF16_diffusers",
+      "Efficient-Large-Model/Sana_1600M_4Kpx_BF16_diffusers",
+      "Efficient-Large-Model/Sana_600M_1024px_diffusers",
+      "Efficient-Large-Model/Sana_600M_512px_diffusers",
+      "Efficient-Large-Model/Sana_Sprint_0.6B_1024px_diffusers",
+      "Efficient-Large-Model/Sana_Sprint_1.6B_1024px_diffusers",
+      "SANA1.5_1.6B_1024px_diffusers",
+      "Sana_1600M_1024px_BF16_diffusers",
+      "Sana_1600M_2Kpx_BF16_diffusers",
+      "Sana_1600M_4Kpx_BF16_diffusers",
+      "Sana_600M_1024px_diffusers",
+      "Sana_600M_512px_diffusers",
+      "Sana_Sprint_0.6B_1024px_diffusers",
+      "Sana_Sprint_1.6B_1024px_diffusers"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -528,6 +670,12 @@
     "imageUrl": "https://huggingface.co/stabilityai/stable-cascade/resolve/main/figures/collage_1.jpg",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/stable-cascade-image-generation/stable-cascade-image-generation.ipynb",
+    "models": [
+      "stabilityai/stable-cascade",
+      "stabilityai/stable-cascade-prior",
+      "stable-cascade",
+      "stable-cascade-prior"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -546,6 +694,12 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/tiny-sd-image-generation/tiny-sd-image-generation.png?raw=true",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb",
+    "models": [
+      "clip-vit-large-patch14",
+      "openai/clip-vit-large-patch14",
+      "segmind/tiny-sd",
+      "tiny-sd"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -567,6 +721,10 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/clip-language-saliency-map/clip-language-saliency-map.ipynb",
+    "models": [
+      "clip-vit-base-patch16",
+      "openai/clip-vit-base-patch16"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -587,6 +745,7 @@
     "imageUrl": "https://github.com/user-attachments/assets/abd938b3-32c2-4e4e-b7b7-fb1a2f9315ce",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/localai/localai.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "API Overview"
@@ -606,6 +765,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/b99cb2c0-d9cb-47a7-ba17-1b4b2eed01da",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/magika-content-type-recognition/magika-content-type-recognition.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos",
@@ -624,6 +784,10 @@
     "imageUrl": null,
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/named-entity-recognition/named-entity-recognition.ipynb",
+    "models": [
+      "distilbert-base-cased-finetuned-conll03-english",
+      "elastic/distilbert-base-cased-finetuned-conll03-english"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -642,6 +806,10 @@
     "imageUrl": "https://github.com/user-attachments/assets/a86cef5e-1dc0-433c-9fb5-05fbeb44759c",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/got-ocr2/got-ocr2.ipynb",
+    "models": [
+      "GOT-OCR-2.0-hf",
+      "stepfun-ai/GOT-OCR-2.0-hf"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -661,6 +829,7 @@
     "imageUrl": null,
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/pytorch-quantization-aware-training/pytorch-quantization-aware-training.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Training",
@@ -679,6 +848,10 @@
     "imageUrl": null,
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/tensorflow-quantization-aware-training/tensorflow-quantization-aware-training.ipynb",
+    "models": [
+      "160px",
+      "imagenette/160px"
+    ],
     "tags": {
       "categories": [
         "Model Training",
@@ -697,6 +870,7 @@
     "imageUrl": "https://github.com/user-attachments/assets/f0f17c2e-0f00-49b5-8364-8d18f2cd06ff",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/keras-with-openvino-backend/keras-with-openvino-backend.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "API Overview"
@@ -714,6 +888,12 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/6c13d438-8bdc-46d1-80e1-cbc4319012ee",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/open-clip/open-clip.ipynb",
+    "models": [
+      "CLIP-ViT-B-32-laion2B-s34B-b79K",
+      "conceptual_captions",
+      "google-research-datasets/conceptual_captions",
+      "laion/CLIP-ViT-B-32-laion2B-s34B-b79K"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -734,6 +914,14 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/sdxl-turbo/sdxl-turbo.png?raw=true",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/sdxl-turbo/sdxl-turbo.ipynb",
+    "models": [
+      "conceptual_captions",
+      "google-research-datasets/conceptual_captions",
+      "madebyollin/taesdxl",
+      "sdxl-turbo",
+      "stabilityai/sdxl-turbo",
+      "taesdxl"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -755,6 +943,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/sound-generation-audioldm2/sound-generation-audioldm2.png?raw=true",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/sound-generation-audioldm2/sound-generation-audioldm2.ipynb",
+    "models": [
+      "audioldm2",
+      "cvssp/audioldm2"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -773,6 +965,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/67365453/4dc86beb-cbdf-48da-8465-f9079d15a7fd",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/stable-diffusion-keras-cv/stable-diffusion-keras-cv.ipynb",
+    "models": [
+      "conceptual_captions",
+      "google-research-datasets/conceptual_captions"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -793,6 +989,10 @@
     "imageUrl": "https://github.com/Stability-AI/stable-fast-3d/blob/main/demo_files/teaser.gif?raw=true",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/stable-fast-3d/stable-fast-3d.ipynb",
+    "models": [
+      "stabilityai/stable-fast-3d",
+      "stable-fast-3d"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -811,6 +1011,12 @@
     "imageUrl": "https://blog.vllm.ai/assets/figures/spec-decode/figure3.png",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/prompt-lookup-decoding/prompt-lookup-decoding.ipynb",
+    "models": [
+      "abisee/cnn_dailymail",
+      "cnn_dailymail",
+      "OpenVINO/TinyLlama-1.1B-Chat-v1.0-int4-ov",
+      "TinyLlama-1.1B-Chat-v1.0-int4-ov"
+    ],
     "tags": {
       "categories": [
         "API Overview"
@@ -830,6 +1036,12 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/88bccc4a-5789-42ca-8a68-f402c3e7c5a4",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/photo-maker/photo-maker.ipynb",
+    "models": [
+      "PhotoMaker",
+      "RealVisXL_V3.0",
+      "SG161222/RealVisXL_V3.0",
+      "TencentARC/PhotoMaker"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -851,6 +1063,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/riffusion-text-to-music/riffusion-text-to-music.png?raw=true",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/riffusion-text-to-music/riffusion-text-to-music.ipynb",
+    "models": [
+      "riffusion-model-v1",
+      "riffusion/riffusion-model-v1"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -871,6 +1087,18 @@
     "imageUrl": "https://github.com/user-attachments/assets/2c667441-c32b-4cb0-8c28-390120b917b3",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/llasa-speech-synthesis/llasa-speech-synthesis.ipynb",
+    "models": [
+      "HKUST-Audio/xcodec2",
+      "HKUSTAudio/Llasa-1B",
+      "HKUSTAudio/Llasa-1B-Multilingual",
+      "HKUSTAudio/Llasa-3B",
+      "HKUSTAudio/Llasa-8B",
+      "Llasa-1B",
+      "Llasa-1B-Multilingual",
+      "Llasa-3B",
+      "Llasa-8B",
+      "xcodec2"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -891,6 +1119,12 @@
     "imageUrl": "https://github.com/user-attachments/assets/2c667441-c32b-4cb0-8c28-390120b917b3",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/outetts-text-to-speech/outetts-text-to-speech.ipynb",
+    "models": [
+      "libritts_r_filtered",
+      "OuteAI/OuteTTS-0.1-350M",
+      "OuteTTS-0.1-350M",
+      "parler-tts/libritts_r_filtered"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -911,6 +1145,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/76171391/ba516a81-f6f7-4258-9e3b-931d6db7728c",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/s3d-mil-nce-text-to-video-retrieval/s3d-mil-nce-text-to-video-retrieval.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -928,6 +1163,10 @@
     "imageUrl": "https://github.com/user-attachments/assets/ca0929af-f766-4e69-872f-95ceceeac634",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/omnigen/omnigen.ipynb",
+    "models": [
+      "OmniGen-v1",
+      "Shitao/OmniGen-v1"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -945,6 +1184,10 @@
     "imageUrl": "https://github.com/user-attachments/assets/6720efe0-ab24-4d73-a22f-a8a0499558d8",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/intern-video2-classiciation/intern-video2-classification.ipynb",
+    "models": [
+      "InternVideo2-Stage2_6B",
+      "OpenGVLab/InternVideo2-Stage2_6B"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -962,6 +1205,12 @@
     "imageUrl": "https://github.com/user-attachments/assets/06c51867-0580-4434-962e-31b6068c2001",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/glm-edge-v/glm-edge-v.ipynb",
+    "models": [
+      "glm-edge-v-2b",
+      "glm-edge-v-5b",
+      "THUDM/glm-edge-v-2b",
+      "THUDM/glm-edge-v-5b"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -982,6 +1231,12 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/8bf7d9f2-018a-4498-bec4-55f17c273ecc",
     "lastBranch": "2025.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.4/notebooks/nano-llava-multimodal-chatbot/nano-llava-multimodal-chatbot.ipynb",
+    "models": [
+      "nanoLLaVA",
+      "nanoLLaVA-1.5",
+      "qnguyen3/nanoLLaVA",
+      "qnguyen3/nanoLLaVA-1.5"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1002,6 +1257,10 @@
     "imageUrl": null,
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/sparsity-optimization/sparsity-optimization.ipynb",
+    "models": [
+      "bert-base-uncased-sst2-int8-unstructured80",
+      "OpenVINO/bert-base-uncased-sst2-int8-unstructured80"
+    ],
     "tags": {
       "categories": [
         "Optimize"
@@ -1019,6 +1278,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/encodec-audio-compression/encodec-audio-compression.png?raw=true",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/encodec-audio-compression/encodec-audio-compression.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -1036,6 +1296,7 @@
     "imageUrl": null,
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/tensorflow-hub/tensorflow-hub.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Convert"
@@ -1054,6 +1315,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/7e87e1a5-6197-4a15-9ced-44e21dd05b02",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/film-slowmo/film-slowmo.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1072,6 +1334,14 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/qrcode-monster/qrcode-monster.png?raw=true",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/qrcode-monster/qrcode-monster.ipynb",
+    "models": [
+      "botp/stable-diffusion-v1-5",
+      "clip-vit-large-patch14",
+      "control_v1p_sd15_qrcode_monster",
+      "monster-labs/control_v1p_sd15_qrcode_monster",
+      "openai/clip-vit-large-patch14",
+      "stable-diffusion-v1-5"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1092,6 +1362,14 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.png?raw=true",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/instruct-pix2pix-image-editing/instruct-pix2pix-image-editing.ipynb",
+    "models": [
+      "clip-vit-large-patch14",
+      "fusing/instructpix2pix-1000-samples",
+      "instruct-pix2pix",
+      "instructpix2pix-1000-samples",
+      "openai/clip-vit-large-patch14",
+      "timbrooks/instruct-pix2pix"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1112,6 +1390,16 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.png?raw=true",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/stable-diffusion-ip-adapter/stable-diffusion-ip-adapter.ipynb",
+    "models": [
+      "botp/stable-diffusion-v1-5",
+      "h94/IP-Adapter",
+      "image_encoder",
+      "IP-Adapter",
+      "latent-consistency/lcm-lora-sdv1-5",
+      "lcm-lora-sdv1-5",
+      "models/image_encoder",
+      "stable-diffusion-v1-5"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1133,6 +1421,12 @@
     "imageUrl": "https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/annotated_snowman.jpg",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/kosmos2-multimodal-large-language-model/kosmos2-multimodal-large-language-model.ipynb",
+    "models": [
+      "KoalaAI/StockImages-CC0",
+      "kosmos-2-patch14-224",
+      "microsoft/kosmos-2-patch14-224",
+      "StockImages-CC0"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1152,6 +1446,14 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/32c3b9a6-298e-44a5-8e50-60a56e6f1980",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/sketch-to-image-pix2pix-turbo/sketch-to-image-pix2pix-turbo.ipynb",
+    "models": [
+      "model.py",
+      "pix2pix_turbo.py",
+      "sd-turbo",
+      "src/model.py",
+      "src/pix2pix_turbo.py",
+      "stabilityai/sd-turbo"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -1171,6 +1473,7 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/210564312-82cda081-b2ed-4027-8251-ca57a97b4666.png",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/knowledge-graphs-conve/knowledge-graphs-conve.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1189,6 +1492,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/76171391/7bf3705c-fdb2-4f20-b8f3-ef6755fa2bc0",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/pixart/pixart.ipynb",
+    "models": [
+      "PixArt-alpha/PixArt-LCM-XL-2-1024-MS",
+      "PixArt-LCM-XL-2-1024-MS"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -1206,6 +1513,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/76171391/ed4aa0f2-0501-4519-8b24-c1c3072b4ef2",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/stable-audio/stable-audio.ipynb",
+    "models": [
+      "stabilityai/stable-audio-open-1.0",
+      "stable-audio-open-1.0"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1224,6 +1535,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/727848d6-02a9-4259-ad48-8492879867a1",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/speechbrain-emotion-recognition/speechbrain-emotion-recognition.ipynb",
+    "models": [
+      "emotion-recognition-wav2vec2-IEMOCAP",
+      "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
+    ],
     "tags": {
       "categories": [
         "Optimize"
@@ -1241,6 +1556,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.png?raw=true",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/stable-diffusion-torchdynamo-backend/stable-diffusion-torchdynamo-backend.ipynb",
+    "models": [
+      "stabilityai/stable-diffusion-2-1-base",
+      "stable-diffusion-2-1-base"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -1260,6 +1579,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cda2a126-ad66-40eb-b85f-3e9ceff05190",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/table-question-answering/table-question-answering.ipynb",
+    "models": [
+      "google/tapas-large-finetuned-wtq",
+      "tapas-large-finetuned-wtq"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -1277,6 +1600,22 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/284291731-9c4ee978-a934-43ea-9484-b6b91a9f9407.png",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/lcm-lora-controlnet/lcm-lora-controlnet.ipynb",
+    "models": [
+      "Annotators",
+      "botp/stable-diffusion-v1-5",
+      "control_v11p_sd15_normalbae",
+      "fusing/instructpix2pix-1000-samples",
+      "instructpix2pix-1000-samples",
+      "latent-consistency/lcm-lora-sdv1-5",
+      "lcm-lora-sdv1-5",
+      "lllyasviel/Annotators",
+      "lllyasviel/control_v11p_sd15_normalbae",
+      "model/scheduler",
+      "model/tokenizer",
+      "scheduler",
+      "stable-diffusion-v1-5",
+      "tokenizer"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1296,6 +1635,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.png?raw=true",
     "lastBranch": "2025.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.3/notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-optimum.ipynb",
+    "models": [
+      "llava-1.5-7b-hf",
+      "llava-hf/llava-1.5-7b-hf"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1316,6 +1659,7 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/203723317-1716e3ca-b390-47e1-bb98-07b4d8d097a0.png",
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/pytorch-to-openvino/pytorch-onnx-to-openvino.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Convert"
@@ -1333,6 +1677,7 @@
     "imageUrl": "https://github.com/itrushkin/openvino_notebooks/assets/76161256/b0acc7bb-92c7-4c83-9484-84a8e1b798b7",
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/tensorflow-object-detection-to-openvino/tensorflow-instance-segmentation-to-openvino.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Convert"
@@ -1350,6 +1695,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/41733560/f9b59be1-1d2f-4e13-9678-67205be78841",
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/tensorflow-object-detection-to-openvino/tensorflow-object-detection-to-openvino.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Convert"
@@ -1367,6 +1713,12 @@
     "imageUrl": null,
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/quantizing-model-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb",
+    "models": [
+      "coco128/labels",
+      "labels",
+      "yolo11n-seg",
+      "yolov11"
+    ],
     "tags": {
       "categories": [
         "Convert",
@@ -1387,6 +1739,14 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/22fa5396-8381-400f-a78f-97e25d57d807",
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/llm-agent-react/llm-agent-react.ipynb",
+    "models": [
+      "Qwen/qwen2.5-14b-instruct",
+      "Qwen/Qwen2.5-3B-Instruct",
+      "Qwen/Qwen2.5-7B-Instruct",
+      "qwen2.5-14b-instruct",
+      "Qwen2.5-3B-Instruct",
+      "Qwen2.5-7B-Instruct"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1407,6 +1767,14 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/871cb90d-27fd-4a87-aa3c-f4cdb199a148",
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/llm-agent-react/llm-agent-rag-llamaindex.ipynb",
+    "models": [
+      "BAAI/bge-small-en-v1.5",
+      "bge-small-en-v1.5",
+      "Meta-Llama-3.1-8B-Instruct",
+      "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "OpenVINO/Phi-3-mini-4k-instruct-int4-ov",
+      "Phi-3-mini-4k-instruct-int4-ov"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1427,6 +1795,16 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/2abb2389-e612-4599-82c6-64cdac259120",
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/llm-agent-react/llm-agent-react-langchain.ipynb",
+    "models": [
+      "Meta-Llama-3.1-8B-Instruct",
+      "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "Qwen/qwen2.5-14b-instruct",
+      "Qwen/Qwen2.5-3B-Instruct",
+      "Qwen/Qwen2.5-7B-Instruct",
+      "qwen2.5-14b-instruct",
+      "Qwen2.5-3B-Instruct",
+      "Qwen2.5-7B-Instruct"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1447,6 +1825,7 @@
     "imageUrl": "https://user-images.githubusercontent.com/91237924/215658767-0e0fc221-aed0-4db1-9a82-6be55f244dba.png",
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/model-server/model-server.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "API Overview"
@@ -1464,6 +1843,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/ac99098c-66ec-4b7b-9e01-e80625f1dc3f",
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/stable-diffusion-v3/stable-diffusion-v3-torch-fx.ipynb",
+    "models": [
+      "conceptual_captions",
+      "google-research-datasets/conceptual_captions"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1484,6 +1867,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.gif?raw=true",
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/stable-diffusion-v2/stable-diffusion-v2-infinite-zoom.ipynb",
+    "models": [
+      "stabilityai/stable-diffusion-2-inpainting",
+      "stable-diffusion-2-inpainting"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1506,6 +1893,12 @@
     "imageUrl": null,
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization-wav2vec2.ipynb",
+    "models": [
+      "facebook/wav2vec2-base-960h",
+      "librispeech_asr_dummy",
+      "patrickvonplaten/librispeech_asr_dummy",
+      "wav2vec2-base-960h"
+    ],
     "tags": {
       "categories": [
         "Optimize",
@@ -1524,6 +1917,22 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/284291731-9c4ee978-a934-43ea-9484-b6b91a9f9407.png",
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb",
+    "models": [
+      "Annotators",
+      "botp/stable-diffusion-v1-5",
+      "control_v11p_sd15_normalbae",
+      "fusing/instructpix2pix-1000-samples",
+      "instructpix2pix-1000-samples",
+      "latent-consistency/lcm-lora-sdv1-5",
+      "lcm-lora-sdv1-5",
+      "lllyasviel/Annotators",
+      "lllyasviel/control_v11p_sd15_normalbae",
+      "model/scheduler",
+      "model/tokenizer",
+      "scheduler",
+      "stable-diffusion-v1-5",
+      "tokenizer"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1543,6 +1952,12 @@
     "imageUrl": "https://github.com/user-attachments/assets/0801b0b6-f376-46b3-b874-c91aaf2c3695",
     "lastBranch": "2025.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.1/notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image.ipynb",
+    "models": [
+      "conceptual_captions",
+      "google-research-datasets/conceptual_captions",
+      "stabilityai/stable-diffusion-2-1",
+      "stable-diffusion-2-1"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1563,6 +1978,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/depth-anything/depth-anything.gif?raw=true",
     "lastBranch": "2025.0",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.0/notebooks/depth-anything/depth-anything-v2.ipynb",
+    "models": [
+      "Nahrawy/VIDIT-Depth-ControlNet",
+      "VIDIT-Depth-ControlNet"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1581,6 +2000,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/bb43bea1-6709-48e5-a928-b86061399849",
     "lastBranch": "2025.0",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2025.0/notebooks/softvc-voice-conversion/softvc-voice-conversion.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1600,6 +2020,12 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png",
     "lastBranch": "2024.5",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/image-bind/image-bind.ipynb",
+    "models": [
+      "ashraq/esc50",
+      "conceptual_captions",
+      "esc50",
+      "google-research-datasets/conceptual_captions"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1620,6 +2046,12 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.png?raw=true",
     "lastBranch": "2024.5",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/cross-lingual-books-alignment/cross-lingual-books-alignment.ipynb",
+    "models": [
+      "LaBSE",
+      "plain",
+      "rasa/LaBSE",
+      "text/plain"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -1638,6 +2070,16 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-xl/stable-diffusion-xl.png?raw=true",
     "lastBranch": "2024.5",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/stable-diffusion-xl/segmind-vegart.ipynb",
+    "models": [
+      "conceptual_captions",
+      "google-research-datasets/conceptual_captions",
+      "madebyollin/taesdxl",
+      "Segmind-Vega",
+      "Segmind-VegaRT",
+      "segmind/Segmind-Vega",
+      "segmind/Segmind-VegaRT",
+      "taesdxl"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1658,6 +2100,12 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/wuerstchen-image-generation/wuerstchen-image-generation.png?raw=true",
     "lastBranch": "2024.5",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/wuerstchen-image-generation/wuerstchen-image-generation.ipynb",
+    "models": [
+      "conceptual_captions",
+      "google-research-datasets/conceptual_captions",
+      "warp-ai/wuerstchen",
+      "wuerstchen"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1676,6 +2124,10 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/237291423-022f07d2-966b-4be2-9a1c-98f1cf0691c2.png",
     "lastBranch": "2024.5",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/dolly-2-instruction-following/dolly-2-instruction-following.ipynb",
+    "models": [
+      "databricks/dolly-v2-3b",
+      "dolly-v2-3b"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1696,6 +2148,12 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/amused-lightweight-text-to-image/amused-lightweight-text-to-image.png?raw=true",
     "lastBranch": "2024.5",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/amused-lightweight-text-to-image/amused-lightweight-text-to-image.ipynb",
+    "models": [
+      "amused-256",
+      "amused/amused-256",
+      "conceptual_captions",
+      "google-research-datasets/conceptual_captions"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -1713,6 +2171,10 @@
     "imageUrl": "https://github.com/Meituan-AutoML/MobileVLM/raw/main/assets/mobilevlm_arch.png",
     "lastBranch": "2024.5",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/mobilevlm-language-assistant/mobilevlm-language-assistant.ipynb",
+    "models": [
+      "MobileVLM-1.7B",
+      "mtgv/MobileVLM-1.7B"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1732,6 +2194,16 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/paint-by-example/paint-by-example.png?raw=true",
     "lastBranch": "2024.5",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/paint-by-example/paint-by-example.ipynb",
+    "models": [
+      "data/image",
+      "data/reference",
+      "Fantasy-Studio/Paint-By-Example",
+      "image",
+      "model/paint_by_example",
+      "Paint-By-Example",
+      "paint_by_example",
+      "reference"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -1752,6 +2224,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/distilbert-sequence-classification/distilbert-sequence-classification.png?raw=true",
     "lastBranch": "2024.5",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/distilbert-sequence-classification/distilbert-sequence-classification.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -1769,6 +2242,12 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.png?raw=true",
     "lastBranch": "2024.5",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/stable-diffusion-v2/stable-diffusion-v2-text-to-image-demo.ipynb",
+    "models": [
+      "clip-vit-large-patch14",
+      "openai/clip-vit-large-patch14",
+      "stabilityai/stable-diffusion-2-1-base",
+      "stable-diffusion-2-1-base"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1789,6 +2268,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.png?raw=true",
     "lastBranch": "2024.5",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.ipynb",
+    "models": [
+      "stabilityai/stable-diffusion-2-1-base",
+      "stable-diffusion-2-1-base"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1809,6 +2292,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/typo-detector/typo-detector.png?raw=true",
     "lastBranch": "2024.5",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.5/notebooks/typo-detector/typo-detector.ipynb",
+    "models": [
+      "m3hrdadfi/typo-detector-distilbert-en",
+      "typo-detector-distilbert-en"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -1826,6 +2313,11 @@
     "imageUrl": null,
     "lastBranch": "2024.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.4/notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb",
+    "models": [
+      "coco128/labels",
+      "labels",
+      "yolov8n-seg"
+    ],
     "tags": {
       "categories": [
         "Convert",
@@ -1846,6 +2338,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-v2/stable-diffusion-v2-optimum-demo.png?raw=true",
     "lastBranch": "2024.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.4/notebooks/latent-consistency-models-image-generation/latent-consistency-models-optimum-demo.ipynb",
+    "models": [
+      "LCM_Dreamshaper_v7",
+      "SimianLuo/LCM_Dreamshaper_v7"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1864,6 +2360,10 @@
     "imageUrl": "https://github.com/VAST-AI-Research/TripoSR/blob/main/figures/teaser800.gif?raw=true",
     "lastBranch": "2024.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.4/notebooks/triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb",
+    "models": [
+      "stabilityai/TripoSR",
+      "TripoSR"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1882,6 +2382,14 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.png?raw=true",
     "lastBranch": "2024.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.4/notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb",
+    "models": [
+      "INT4_compressed_weights",
+      "INT8_compressed_weights",
+      "liuhaotian/LLaVA-Lightning-MPT-7B-preview",
+      "LLaVA-Lightning-MPT-7B-preview",
+      "llava-mpt/INT4_compressed_weights",
+      "llava-mpt/INT8_compressed_weights"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1902,6 +2410,18 @@
     "imageUrl": "https://camo.githubusercontent.com/ef232f43135222dc7cfc6e27ae26ac64edf6918512a8a4f78077e4f86c27883c/68747470733a2f2f7a312e617831782e636f6d2f323032332f31312f30372f70696c347371482e706e67",
     "lastBranch": "2024.4",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.4/notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb",
+    "models": [
+      "INT4_compressed_weights",
+      "INT8_compressed_weights",
+      "LanguageBind/LanguageBind_Image",
+      "LanguageBind/LanguageBind_Video_merge",
+      "LanguageBind/Video-LLaVA-7B",
+      "LanguageBind_Image",
+      "LanguageBind_Video_merge",
+      "Video-LLaVA-7B",
+      "videollava/INT4_compressed_weights",
+      "videollava/INT8_compressed_weights"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1922,6 +2442,14 @@
     "imageUrl": "https://raw.githubusercontent.com/WongKinYiu/yolov7/main/figure/horses_prediction.jpg",
     "lastBranch": "2024.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.3/notebooks/yolov7-optimization/yolov7-optimization.ipynb",
+    "models": [
+      "coco/images",
+      "coco/labels",
+      "images",
+      "labels",
+      "yolov5",
+      "yolov7"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -1941,6 +2469,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/91237924/2abb2389-e612-4599-82c6-64cdac259120",
     "lastBranch": "2024.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/llm-agent-langchain/llm-agent-langchain.ipynb",
+    "models": [
+      "Mistral-7B-Instruct-v0.3",
+      "mistralai/Mistral-7B-Instruct-v0.3"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1961,6 +2493,7 @@
     "imageUrl": "https://user-images.githubusercontent.com/18904157/180923280-9caefaf1-742b-4d2f-8943-5d4a6126e2fc.png",
     "lastBranch": "2024.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/vision-image-colorization/vision-image-colorization.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -1978,6 +2511,16 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/decidiffusion-image-generation/decidiffusion-image-generation.png?raw=true",
     "lastBranch": "2024.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/decidiffusion-image-generation/decidiffusion-image-generation.ipynb",
+    "models": [
+      "conceptual_captions",
+      "Deci/DeciDiffusion-v1-0",
+      "DeciDiffusion-v1-0",
+      "google-research-datasets/conceptual_captions",
+      "model/scheduler",
+      "model/tokenizer",
+      "scheduler",
+      "tokenizer"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -1999,6 +2542,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/cfac6ddb-6f22-4343-855c-e513269cf2bf",
     "lastBranch": "2024.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/stable-zephyr-3b-chatbot/stable-zephyr-3b-chatbot.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos",
@@ -2020,6 +2564,7 @@
     "imageUrl": null,
     "lastBranch": "2024.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/convert-to-openvino/legacy-mo-convert-to-openvino.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Convert",
@@ -2039,6 +2584,7 @@
     "imageUrl": "https://user-images.githubusercontent.com/15709723/123559130-04550100-d74f-11eb-819c-a02284654428.jpg",
     "lastBranch": "2024.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/vision-paddlegan-anime/vision-paddlegan-anime.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2057,6 +2603,12 @@
     "imageUrl": null,
     "lastBranch": "2024.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/speech-recognition-quantization/speech-recognition-quantization-data2vec.ipynb",
+    "models": [
+      "data2vec-audio-base-960h",
+      "facebook/data2vec-audio-base-960h",
+      "librispeech_asr_dummy",
+      "patrickvonplaten/librispeech_asr_dummy"
+    ],
     "tags": {
       "categories": [
         "Optimize"
@@ -2074,6 +2626,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/pyannote-speaker-diarization/pyannote-speaker-diarization.png?raw=true",
     "lastBranch": "2024.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/pyannote-speaker-diarization/pyannote-speaker-diarization.ipynb",
+    "models": [
+      "philschmid/pyannote-speaker-diarization-endpoint",
+      "pyannote-speaker-diarization-endpoint"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2091,6 +2647,7 @@
     "imageUrl": null,
     "lastBranch": "2024.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/speech-to-text/speech-to-text.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2109,6 +2666,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/vision-superresolution/vision-superresolution-image.png?raw=true",
     "lastBranch": "2024.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.2/notebooks/vision-paddlegan-superresolution/vision-paddlegan-superresolution.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2127,6 +2685,7 @@
     "imageUrl": null,
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/ct-segmentation-quantize/data-preparation-ct-scan.ipynb",
+    "models": [],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2140,6 +2699,14 @@
     "imageUrl": "https://github.com/mit-han-lab/fastcomposer/raw/main/figures/multi-subject.png?raw=True",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/fastcomposer-image-generation/fastcomposer-image-generation.ipynb",
+    "models": [
+      "clip-vit-large-patch14",
+      "fastcomposer",
+      "mit-han-lab/fastcomposer",
+      "openai/clip-vit-large-patch14",
+      "runwayml/stable-diffusion-v1-5",
+      "stable-diffusion-v1-5"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2158,6 +2725,10 @@
     "imageUrl": "https://storage.googleapis.com/tfds-data/visualization/fig/tf_flowers-3.0.1.png",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/tensorflow-training-openvino/tensorflow-training-openvino.ipynb",
+    "models": [
+      "flower",
+      "model/flower"
+    ],
     "tags": {
       "categories": [
         "Model Training",
@@ -2176,6 +2747,12 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/241643886-dfcf3c48-8d50-4730-ae28-a21595d9504f.png",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/deepfloyd-if/deep-floyd-if-convert.ipynb",
+    "models": [
+      "DeepFloyd/IF-I-M-v1.0",
+      "DeepFloyd/IF-II-M-v1.0",
+      "IF-I-M-v1.0",
+      "IF-II-M-v1.0"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -2194,6 +2771,12 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/stable-diffusion-xl/stable-diffusion-xl.png?raw=true",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/stable-diffusion-xl/ssd-b1.ipynb",
+    "models": [
+      "latent-consistency/lcm-ssd-1b",
+      "lcm-ssd-1b",
+      "segmind/SSD-1B",
+      "SSD-1B"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -2214,6 +2797,7 @@
     "imageUrl": "https://user-images.githubusercontent.com/4547501/167121084-ec58fbdb-b269-4de2-9d4c-253c5b95de1e.png",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/image-inpainting/image-inpainting.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2231,6 +2815,7 @@
     "imageUrl": "https://user-images.githubusercontent.com/4547501/152571639-ace628b2-e3d2-433e-8c28-9a5546d76a86.gif",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/question-answering/question-answering.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2248,6 +2833,7 @@
     "imageUrl": "https://user-images.githubusercontent.com/77325899/154279555-aaa47111-c976-4e77-8d23-aac96f45872f.gif",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/ct-segmentation-quantize/ct-scan-live-inference.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Live Demos"
@@ -2265,6 +2851,7 @@
     "imageUrl": null,
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/machine-translation/machine-translation.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2282,6 +2869,10 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/depth-estimation-videpth/depth-estimation-videpth.png?raw=true",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/depth-estimation-videpth/depth-estimation-videpth.ipynb",
+    "models": [
+      "intel-isl/MiDaS",
+      "MiDaS"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2299,6 +2890,11 @@
     "imageUrl": null,
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/performance-tricks/latency-tricks.ipynb",
+    "models": [
+      "ultralytics/yolov5",
+      "yolov5",
+      "yolov5n"
+    ],
     "tags": {
       "categories": [
         "API Overview"
@@ -2316,6 +2912,11 @@
     "imageUrl": null,
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/performance-tricks/throughput-tricks.ipynb",
+    "models": [
+      "ultralytics/yolov5",
+      "yolov5",
+      "yolov5n"
+    ],
     "tags": {
       "categories": [
         "API Overview"
@@ -2333,6 +2934,14 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/241643886-dfcf3c48-8d50-4730-ae28-a21595d9504f.png",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/deepfloyd-if/deep-floyd-if-optimize.ipynb",
+    "models": [
+      "DeepFloyd/IF-I-M-v1.0",
+      "DeepFloyd/IF-II-M-v1.0",
+      "IF-I-M-v1.0",
+      "IF-II-M-v1.0",
+      "laion/laion2B-en-aesthetic",
+      "laion2B-en-aesthetic"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -2351,6 +2960,10 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/whisper-subtitles-generation/whisper-nncf-quantize.ipynb",
+    "models": [
+      "openai/whisper-large",
+      "whisper-large"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -2369,6 +2982,10 @@
     "imageUrl": "https://storage.googleapis.com/tfds-data/visualization/fig/tf_flowers-3.0.1.png",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/tensorflow-training-openvino/tensorflow-training-openvino-nncf.ipynb",
+    "models": [
+      "model/optimized",
+      "optimized"
+    ],
     "tags": {
       "categories": [
         "Optimize"
@@ -2386,6 +3003,7 @@
     "imageUrl": null,
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/code-language-id/code-language-id.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2403,6 +3021,7 @@
     "imageUrl": null,
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/torchvision-zoo-to-openvino/lraspp-segmentation.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Convert"
@@ -2420,6 +3039,7 @@
     "imageUrl": "https://user-images.githubusercontent.com/61357777/223854308-d1ac4a39-cc0c-4618-9e4f-d9d4d8b991e8.jpg",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/segmenter-semantic-segmentation/segmenter-semantic-segmentation.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2437,6 +3057,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/vision-superresolution/vision-superresolution-image.png?raw=true",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/vision-superresolution/vision-superresolution-image.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2455,6 +3076,14 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/blip-diffusion-subject-generation/blip-diffusion-subject-generation.png?raw=true",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/blip-diffusion-subject-generation/blip-diffusion-subject-generation.ipynb",
+    "models": [
+      "Annotators",
+      "ayushtues/blipdiffusion",
+      "ayushtues/blipdiffusion-controlnet",
+      "blipdiffusion",
+      "blipdiffusion-controlnet",
+      "lllyasviel/Annotators"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -2474,6 +3103,12 @@
     "imageUrl": "https://user-images.githubusercontent.com/95569637/229706278-2aa6a60d-02f4-45e2-9541-97529df8359d.png",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/text-prediction/text-prediction.ipynb",
+    "models": [
+      "af1tang/personaGPT",
+      "EleutherAI/gpt-neo-125M",
+      "gpt-neo-125M",
+      "personaGPT"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2492,6 +3127,7 @@
     "imageUrl": null,
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/attention-center/attention-center.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2509,6 +3145,11 @@
     "imageUrl": null,
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/ct-segmentation-quantize/pytorch-monai-training.ipynb",
+    "models": [
+      "F1-score/Validation",
+      "Loss/Validation",
+      "Validation"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2522,6 +3163,10 @@
     "imageUrl": "https://github.com/facebookresearch/SlowFast/raw/main/demo/ava_demo.gif",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/slowfast-video-recognition/slowfast-video-recognition.ipynb",
+    "models": [
+      "facebookresearch/pytorchvideo",
+      "pytorchvideo"
+    ],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2540,6 +3185,7 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/whisper-subtitles-generation/whisper-convert.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos",
@@ -2558,6 +3204,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/vision-superresolution/vision-superresolution-video.gif?raw=true",
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/vision-superresolution/vision-superresolution-video.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos"
@@ -2576,6 +3223,7 @@
     "imageUrl": null,
     "lastBranch": "2024.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.1/notebooks/model-tools/model-tools.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "API Overview",
@@ -2594,6 +3242,7 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png",
     "lastBranch": "2024.0",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.0/notebooks/239-image-bind/239-image-bind-convert.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos",
@@ -2614,6 +3263,7 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/304aa048-f10c-41c6-bb31-6d2bfdf49cf5",
     "lastBranch": "2024.0",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.0/notebooks/254-llm-chatbot/254-rag-chatbot.ipynb",
+    "models": [],
     "tags": {
       "categories": [
         "Model Demos",
@@ -2632,6 +3282,13 @@
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/51917466/047f9167-a4ef-4d3d-a33b-d124541f9e2c",
     "lastBranch": "2024.0",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.0/notebooks/128-openvino-tokenizers/128-opnevino-tokenizers.ipynb",
+    "models": [
+      "bert-tiny-finetuned-sms-spam-detection",
+      "chgk13/TinyLlama-1.1B-intermediate-step-1431k-3T",
+      "mrm8488/bert-tiny-finetuned-sms-spam-detection",
+      "TinyLlama-1.1B-intermediate-step-1431k-3T",
+      "TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T"
+    ],
     "tags": {
       "categories": [
         "First Steps",
@@ -2656,6 +3313,10 @@
     "imageUrl": "https://user-images.githubusercontent.com/29454499/240364108-39868933-d221-41e6-9b2e-dac1b14ef32f.png",
     "lastBranch": "2024.0",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2024.0/notebooks/239-image-bind/239-image-bind-quantize.ipynb",
+    "models": [
+      "ashraq/esc50",
+      "esc50"
+    ],
     "tags": {
       "categories": [
         "Model Demos",
@@ -2676,6 +3337,7 @@
     "imageUrl": null,
     "lastBranch": "2023.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/217-vision-deblur/217-vision-deblur.ipynb",
+    "models": [],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2689,6 +3351,12 @@
     "imageUrl": null,
     "lastBranch": "2023.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/111-yolov5-quantization-migration/111-yolov5-quantization-migration.ipynb",
+    "models": [
+      "coco128",
+      "datasets/coco128",
+      "yolov5",
+      "yolov5m"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2702,6 +3370,12 @@
     "imageUrl": null,
     "lastBranch": "2023.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/233-blip-visual-language-processing/233-blip-optimize.ipynb",
+    "models": [
+      "blip-vqa-base",
+      "HuggingFaceM4/VQAv2",
+      "Salesforce/blip-vqa-base",
+      "VQAv2"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2715,6 +3389,10 @@
     "imageUrl": null,
     "lastBranch": "2023.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/228-clip-zero-shot-image-classification/228-clip-zero-shot-quantize.ipynb",
+    "models": [
+      "clip-vit-base-patch16",
+      "openai/clip-vit-base-patch16"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2728,6 +3406,10 @@
     "imageUrl": null,
     "lastBranch": "2023.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/236-stable-diffusion-v2/236-stable-diffusion-v2-optimum-demo-comparison.ipynb",
+    "models": [
+      "stabilityai/stable-diffusion-2-1-base",
+      "stable-diffusion-2-1-base"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2741,6 +3423,10 @@
     "imageUrl": null,
     "lastBranch": "2023.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/233-blip-visual-language-processing/233-blip-convert.ipynb",
+    "models": [
+      "blip-vqa-base",
+      "Salesforce/blip-vqa-base"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2754,6 +3440,10 @@
     "imageUrl": null,
     "lastBranch": "2023.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.3/notebooks/228-clip-zero-shot-image-classification/228-clip-zero-shot-convert.ipynb",
+    "models": [
+      "clip-vit-base-patch16",
+      "openai/clip-vit-base-patch16"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2767,6 +3457,12 @@
     "imageUrl": null,
     "lastBranch": "2023.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.1/notebooks/238-deeployd-if/238-deep-floyd-if.ipynb",
+    "models": [
+      "DeepFloyd/IF-I-M-v1.0",
+      "DeepFloyd/IF-II-M-v1.0",
+      "IF-I-M-v1.0",
+      "IF-II-M-v1.0"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2780,6 +3476,18 @@
     "imageUrl": null,
     "lastBranch": "2023.0",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2023.0/notebooks/230-yolov8-optimization/230-yolov8-optimization.ipynb",
+    "models": [
+      "coco",
+      "coco/images",
+      "coco/labels",
+      "datasets/coco",
+      "images",
+      "labels",
+      "yolov5",
+      "yolov8",
+      "yolov8n",
+      "yolov8n-seg"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2793,6 +3501,7 @@
     "imageUrl": null,
     "lastBranch": "2022.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.3/notebooks/102-pytorch-onnx-to-openvino/102-pytorch-onnx-to-openvino.ipynb",
+    "models": [],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2806,6 +3515,10 @@
     "imageUrl": null,
     "lastBranch": "2022.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.3/notebooks/101-tensorflow-to-openvino/101-tensorflow-to-openvino.ipynb",
+    "models": [
+      "model/v3-small_224_1.0_float",
+      "v3-small_224_1.0_float"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2819,6 +3532,12 @@
     "imageUrl": null,
     "lastBranch": "2022.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.3/notebooks/114-quantization-simplified-mode/114-quantization-simplified-mode.ipynb",
+    "models": [
+      "chenyaofo/pytorch-cifar-models",
+      "compressed/optimized",
+      "optimized",
+      "pytorch-cifar-models"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2832,6 +3551,10 @@
     "imageUrl": null,
     "lastBranch": "2022.3",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.3/notebooks/228-clip-zero-shot-image-classification/228-clip-zero-shot-image-classification.ipynb",
+    "models": [
+      "clip-vit-base-patch16",
+      "openai/clip-vit-base-patch16"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2845,6 +3568,12 @@
     "imageUrl": null,
     "lastBranch": "2022.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/225-yolov7-optimization/225-yolov7-optimiization.ipynb",
+    "models": [
+      "coco/images",
+      "images",
+      "yolov5",
+      "yolov7"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2858,6 +3587,7 @@
     "imageUrl": null,
     "lastBranch": "2022.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/223-gpt2-text-prediction/223-gpt2-text-prediction.ipynb",
+    "models": [],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2871,6 +3601,7 @@
     "imageUrl": null,
     "lastBranch": "2022.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/216-license-plate-recognition/216-license-plate-recognition.ipynb",
+    "models": [],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2884,6 +3615,7 @@
     "imageUrl": null,
     "lastBranch": "2022.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/210-ct-scan-live-inference/210-ct-scan-live-inference.ipynb",
+    "models": [],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2897,6 +3629,7 @@
     "imageUrl": null,
     "lastBranch": "2022.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/111-detection-quantization/111-detection-quantization.ipynb",
+    "models": [],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2910,6 +3643,7 @@
     "imageUrl": null,
     "lastBranch": "2022.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/214-vision-paddle-classification/214-vision-paddle-classification.ipynb",
+    "models": [],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2923,6 +3657,10 @@
     "imageUrl": null,
     "lastBranch": "2022.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/301-tensorflow-training-openvino/301-tensorflow-training-openvino-pot.ipynb",
+    "models": [
+      "model/optimized",
+      "optimized"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2936,6 +3674,7 @@
     "imageUrl": null,
     "lastBranch": "2022.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/110-ct-segmentation-quantize/110-ct-segmentation-quantize.ipynb",
+    "models": [],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2949,6 +3688,10 @@
     "imageUrl": null,
     "lastBranch": "2022.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/107-speech-recognition-quantization/107-speech-recognition-quantization.ipynb",
+    "models": [
+      "LibriSpeech/test-clean",
+      "test-clean"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2962,6 +3705,10 @@
     "imageUrl": null,
     "lastBranch": "2022.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/220-yolov5-accuracy-check-and-quantization/220-yolov5-accuracy-check-and-quantization.ipynb",
+    "models": [
+      "yolov5",
+      "yolov5m"
+    ],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2975,6 +3722,7 @@
     "imageUrl": null,
     "lastBranch": "2022.2",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.2/notebooks/212-onnx-style-transfer/212-onnx-style-transfer.ipynb",
+    "models": [],
     "tags": {
       "categories": [],
       "tasks": [],
@@ -2988,6 +3736,7 @@
     "imageUrl": null,
     "lastBranch": "2022.1",
     "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2022.1/notebooks/103-paddle-onnx-to-openvino/103-paddle-onnx-to-openvino-classification.ipynb",
+    "models": [],
     "tags": {
       "categories": [],
       "tasks": [],
