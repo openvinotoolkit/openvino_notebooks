@@ -230,6 +230,7 @@
 - [Visual-language assistant with Qwen2VL and OpenVINO](./qwen2-vl/qwen2-vl.ipynb)
 - [Audio-language assistant with Qwen2Audio and OpenVINO](./qwen2-audio/qwen2-audio.ipynb)
 - [Text-to-image generation with Qwen-Image and OpenVINO](./qwen-image/qwen-image.ipynb)
+- [Physical AI Robotics Tutorials with OpenVINO™](./physical-ai-robotics/physical-ai-robotics.ipynb)
 - [Multimodal assistant with Phi-4-multimodal and OpenVINO](./phi-4-multimodal/phi-4-multimodal.ipynb)
 - [Visual-language assistant with Phi3-Vision and OpenVINO](./phi-3-vision/phi-3-vision.ipynb)
 - [Text-to-speech (TTS) with Parler-TTS and OpenVINO](./parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb)
