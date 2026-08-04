@@ -6,7 +6,6 @@ import requests
 from PIL import Image
 from transformers import TextIteratorStreamer
 
-
 MAX_IMAGE_SIDE = 512
 
 
@@ -57,11 +56,7 @@ def get_text(content):
     if isinstance(content, dict):
         return content.get("text", "")
     if isinstance(content, list):
-        return " ".join(
-            item.get("text", "")
-            for item in content
-            if isinstance(item, dict) and item.get("type") == "text"
-        )
+        return " ".join(item.get("text", "") for item in content if isinstance(item, dict) and item.get("type") == "text")
     return ""
 
 
@@ -127,8 +122,7 @@ def make_demo(model, processor):
             messages.append(
                 {
                     "role": "user",
-                    "content": [{"type": "image"} for _ in turn_images]
-                    + [{"type": "text", "text": turn["text"]}],
+                    "content": [{"type": "image"} for _ in turn_images] + [{"type": "text", "text": turn["text"]}],
                 }
             )
             images.extend(turn_images)
