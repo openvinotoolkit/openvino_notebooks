@@ -123,11 +123,7 @@ def extract_models(notebook_json: dict) -> list[str]:
     that config differs across historical branches. For each `org/name` id the
     short `name` is added as well.
     """
-    code = "\n".join(
-        "".join(cell.get("source", []))
-        for cell in notebook_json.get("cells", [])
-        if cell.get("cell_type") == "code"
-    )
+    code = "\n".join("".join(cell.get("source", [])) for cell in notebook_json.get("cells", []) if cell.get("cell_type") == "code")
     models: set[str] = set()
     for match in _HF_ID_RE.finditer(code):
         model_id = match.group(1)
