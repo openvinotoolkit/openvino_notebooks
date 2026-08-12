@@ -49,6 +49,7 @@ AST
 ASYM
 async
 AsyncInferQueue
+ATEM
 Atrous
 audiobooks
 AudioForConditionalGeneration
@@ -100,6 +101,7 @@ bitnet
 BLACKBOX
 BLEU
 blockwise
+Breakout
 BMP
 boolean
 builtins
@@ -1143,6 +1145,7 @@ subpackage
 subtask
 summarization
 Suno
+Superintelligence
 superresolution
 superset
 Suraj
@@ -1326,6 +1329,7 @@ XCode
 XCodec
 Xeon
 xformers
+xhigh
 xl
 xml
 xt
