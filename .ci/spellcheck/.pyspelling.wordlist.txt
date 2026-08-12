@@ -445,6 +445,7 @@ ICPR
 identation
 IdentityNet
 IEMOCAP
+iframe
 iGPU
 iGPUs
 Ilija
@@ -682,6 +683,7 @@ MobileNet
 MobileNetV
 mobilevlm
 MobileVLM
+mockup
 ModelBest
 modelled
 Modelscope
@@ -797,6 +799,7 @@ OpenCLIP
 OpenCLIP's
 OpenCompass
 OpenCV
+OpenCV's
 OpenDataLab
 openjourney
 OpenPose
@@ -1041,6 +1044,7 @@ SALICON
 Saliency
 saliency
 sam
+sandboxed
 SAMI
 SavedModel
 scalability

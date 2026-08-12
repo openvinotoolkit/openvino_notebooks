@@ -12,7 +12,6 @@ import openvino as ov
 import openvino_genai as ov_genai
 from PIL import Image
 
-
 ANSWER_MARKERS = ("assistant to=user", "to=user")
 
 
@@ -42,10 +41,7 @@ def result_text(result) -> str:
 
 def generate_once(pipe, prompt, reasoning_strength="low", **kwargs) -> str:
     """Run one independent request with an explicit reasoning strength."""
-    system_message = (
-        "You are a helpful AI assistant. Answer the user's request accurately.\n\n"
-        f"Reasoning strength: {reasoning_strength}."
-    )
+    system_message = "You are a helpful AI assistant. Answer the user's request accurately.\n\n" f"Reasoning strength: {reasoning_strength}."
     pipe.start_chat(system_message=system_message)
     try:
         return result_text(pipe.generate(prompt, **kwargs))
@@ -61,9 +57,7 @@ def display_atem_response(text: str, show_answer=True):
     reasoning, answer, complete = split_atem_response(text)
 
     if reasoning:
-        reasoning_view = widgets.HTML(
-            f"<pre style='white-space:pre-wrap; margin:0'>{html.escape(reasoning)}</pre>"
-        )
+        reasoning_view = widgets.HTML(f"<pre style='white-space:pre-wrap; margin:0'>{html.escape(reasoning)}</pre>")
         accordion = widgets.Accordion(children=[reasoning_view])
         accordion.set_title(0, "Reasoning")
         accordion.selected_index = None
@@ -109,9 +103,7 @@ class ATEMDisplayStreamer:
 
         if complete:
             self.answer_started = True
-            self.reasoning_view.value = (
-                f"<pre style='white-space:pre-wrap; margin:0'>{html.escape(reasoning)}</pre>"
-            )
+            self.reasoning_view.value = f"<pre style='white-space:pre-wrap; margin:0'>{html.escape(reasoning)}</pre>"
             self.reasoning_accordion.set_title(0, "Reasoning")
             self.reasoning_accordion.selected_index = None
             self.status.value = f"<b>Generating answer…</b> {len(answer):,} characters"
@@ -119,12 +111,8 @@ class ATEMDisplayStreamer:
                 self.answer_handle.update(self._Markdown(answer))
         else:
             visible_reasoning = reasoning or self.raw_text
-            self.reasoning_view.value = (
-                f"<pre style='white-space:pre-wrap; margin:0'>{html.escape(visible_reasoning)}</pre>"
-            )
-            self.status.value = (
-                f"<b>Reasoning…</b> {len(visible_reasoning):,} characters generated"
-            )
+            self.reasoning_view.value = f"<pre style='white-space:pre-wrap; margin:0'>{html.escape(visible_reasoning)}</pre>"
+            self.status.value = f"<b>Reasoning…</b> {len(visible_reasoning):,} characters generated"
 
     def finish(self, final_text=None):
         if final_text and len(final_text) > len(self.raw_text):
@@ -135,10 +123,7 @@ class ATEMDisplayStreamer:
         if complete:
             self.status.value = "✅ <b>Generation complete</b>"
         elif reasoning:
-            self.status.value = (
-                "⚠️ <b>Generation stopped before the final answer.</b> "
-                "Increase <code>max_new_tokens</code> and retry."
-            )
+            self.status.value = "⚠️ <b>Generation stopped before the final answer.</b> " "Increase <code>max_new_tokens</code> and retry."
         else:
             self.status.value = "✅ <b>Generation complete</b>"
             if self.answer_handle is not None:
@@ -157,15 +142,9 @@ def generate_with_streaming(
     **kwargs,
 ) -> str:
     """Run one request while streaming reasoning and answer into notebook widgets."""
-    system_message = (
-        "You are a helpful AI assistant. Answer the user's request accurately.\n\n"
-        f"Reasoning strength: {reasoning_strength}."
-    )
+    system_message = "You are a helpful AI assistant. Answer the user's request accurately.\n\n" f"Reasoning strength: {reasoning_strength}."
     display_streamer = ATEMDisplayStreamer(show_answer=show_answer)
-    display_streamer.status.value = (
-        f"<b>Generating with {html.escape(reasoning_strength)} reasoning:</b> "
-        "waiting for the first token…"
-    )
+    display_streamer.status.value = f"<b>Generating with {html.escape(reasoning_strength)} reasoning:</b> " "waiting for the first token…"
     result = None
 
     pipe.start_chat(system_message=system_message)
@@ -291,10 +270,7 @@ def make_demo(pipe, sample_image=None, sample_video=None):
                 images.append(path)
 
         if not history:
-            system_message = (
-                "You are a helpful AI assistant. Answer the user's request accurately.\n\n"
-                f"Reasoning strength: {reasoning_strength}."
-            )
+            system_message = "You are a helpful AI assistant. Answer the user's request accurately.\n\n" f"Reasoning strength: {reasoning_strength}."
             current_pipe.start_chat(system_message=system_message)
 
         for path in images:
