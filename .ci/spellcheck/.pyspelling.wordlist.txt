@@ -49,6 +49,7 @@ AST
 ASYM
 async
 AsyncInferQueue
+ATEM
 Atrous
 audiobooks
 AudioForConditionalGeneration
@@ -100,6 +101,7 @@ bitnet
 BLACKBOX
 BLEU
 blockwise
+Breakout
 BMP
 boolean
 builtins
@@ -443,6 +445,7 @@ ICPR
 identation
 IdentityNet
 IEMOCAP
+iframe
 iGPU
 iGPUs
 Ilija
@@ -680,6 +683,7 @@ MobileNet
 MobileNetV
 mobilevlm
 MobileVLM
+mockup
 ModelBest
 modelled
 Modelscope
@@ -795,6 +799,7 @@ OpenCLIP
 OpenCLIP's
 OpenCompass
 OpenCV
+OpenCV's
 OpenDataLab
 openjourney
 OpenPose
@@ -1039,6 +1044,7 @@ SALICON
 Saliency
 saliency
 sam
+sandboxed
 SAMI
 SavedModel
 scalability
@@ -1143,6 +1149,7 @@ subpackage
 subtask
 summarization
 Suno
+Superintelligence
 superresolution
 superset
 Suraj
@@ -1326,6 +1333,7 @@ XCode
 XCodec
 Xeon
 xformers
+xhigh
 xl
 xml
 xt
