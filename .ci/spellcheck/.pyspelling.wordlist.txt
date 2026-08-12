@@ -385,6 +385,7 @@ GenerationMixin
 GGUF
 Girshick
 Gitee
+Glimmer
 GitHub
 GLA
 GLM
@@ -711,6 +712,7 @@ Multimodality
 multinomial
 Muon
 MuRAG
+Muse
 MuSGD
 MusicGen
 Müller
