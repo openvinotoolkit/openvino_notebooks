@@ -377,9 +377,9 @@ def make_demo(pipe, sample_image=None, sample_video=None):
     if sample_image and Path(sample_image).exists():
         examples.append([{"text": "Describe this image in detail.", "files": [str(sample_image)]}])
 
-    with gr.Blocks() as demo:
+    with gr.Blocks(fill_height=True) as demo:
         gr.Markdown("# Muse Glimmer-30B with OpenVINO")
-        chatbot = gr.Chatbot(height=550)
+        chatbot = gr.Chatbot(height="70vh")
         message = gr.MultimodalTextbox(
             file_types=["image", ".mp4"],
             file_count="multiple",
