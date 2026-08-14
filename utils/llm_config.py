@@ -151,6 +151,13 @@ SUPPORTED_VLM_MODELS = {
             "model_id": "Qwen/Qwen3.6-27B",
             "exclude_on_devices": ["NPU"],
         },
+        "Qwen3.8-27B": {
+            "model_id": "Qwen/Qwen3.8-27B",
+            "exclude_on_devices": ["NPU"],
+            "supports_video": True,
+            "supports_thinking": True,
+            "experimental": True,
+        },
         "Qwen3.5-35B-A3B": {
             "model_id": "Qwen/Qwen3.5-35B-A3B",
             "exclude_on_devices": ["NPU"],
@@ -309,6 +316,13 @@ SUPPORTED_VLM_MODELS = {
             "model_id": "Qwen/Qwen3.6-27B",
             "exclude_on_devices": ["NPU"],
         },
+        "Qwen3.8-27B": {
+            "model_id": "Qwen/Qwen3.8-27B",
+            "exclude_on_devices": ["NPU"],
+            "supports_video": True,
+            "supports_thinking": True,
+            "experimental": True,
+        },
         "Qwen3.5-35B-A3B": {
             "model_id": "Qwen/Qwen3.5-35B-A3B",
             "exclude_on_devices": ["NPU"],
@@ -398,6 +412,13 @@ SUPPORTED_VLM_MODELS = {
         "Qwen3.6-27B": {
             "model_id": "Qwen/Qwen3.6-27B",
             "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.8-27B": {
+            "model_id": "Qwen/Qwen3.8-27B",
+            "exclude_on_devices": ["NPU"],
+            "supports_video": True,
+            "supports_thinking": True,
+            "experimental": True,
         },
         "Qwen3.5-35B-A3B": {
             "model_id": "Qwen/Qwen3.5-35B-A3B",
