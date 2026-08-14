@@ -314,6 +314,80 @@ export class NotebookMetadataCollector extends NotebookContentReader {
   }
 
   /**
+   * Whether the notebook uses the *entire* shared model set for a symbol, i.e. it lists or
+   * iterates the set (or exposes it for selection via a widget), rather than picking a single
+   * fixed model. A single subscript `SYMBOL[...]` that is not immediately followed by another
+   * `[...]` (e.g. `list(SYMBOL[lang])`, `SYMBOL[lang].items()`, `all = SYMBOL["English"]`,
+   * `SYMBOL[widget.value]`) selects the whole (language) sub-dict. A double subscript
+   * `SYMBOL[lang][key]` selects a single model and does not count.
+   *
+   * @private
+   * @param {string} codeText
+   * @param {string} symbol
+   * @returns {boolean}
+   */
+  _referencesWholeConfigSet(codeText, symbol) {
+    const re = new RegExp(`${symbol}\\s*\\[[^\\]]*\\]`, 'g');
+    let match;
+    while ((match = re.exec(codeText)) !== null) {
+      const after = codeText.slice(match.index + match[0].length);
+      if (!/^\s*\[/.test(after)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Resolves the specific model(s) a notebook selects from a shared set via `SYMBOL[...][key]`,
+   * where `key` is a string literal or a variable assigned a string literal. Widget-driven
+   * selections (`...value`) are ignored, as they cover the whole set. Each resolved model name
+   * is looked up in the config block to return its `model_id` (and the name itself).
+   *
+   * @private
+   * @param {string} codeText
+   * @param {string} blockText
+   * @param {string} symbol
+   * @returns {string[]}
+   */
+  _extractSelectedConfigModelIds(codeText, blockText, symbol) {
+    const ids = [];
+    const selectionRe = new RegExp(`${symbol}\\s*\\[[^\\]]*\\]\\s*\\[\\s*([^\\]]+?)\\s*\\]`, 'g');
+    let match;
+    while ((match = selectionRe.exec(codeText)) !== null) {
+      const keyExpr = match[1].trim();
+      if (keyExpr.includes('.value')) {
+        continue;
+      }
+      let modelName = null;
+      const literalMatch = keyExpr.match(/^["']([^"']+)["']$/);
+      if (literalMatch) {
+        modelName = literalMatch[1];
+      } else if (/^[A-Za-z_]\w*$/.test(keyExpr)) {
+        const assignMatch = codeText.match(new RegExp(`\\b${keyExpr}\\s*=\\s*["']([^"']+)["']`));
+        if (assignMatch) {
+          modelName = assignMatch[1];
+        }
+      }
+      if (!modelName) {
+        continue;
+      }
+      ids.push(modelName);
+      const entryRe = new RegExp(`["']${_escapeRegExp(modelName)}["']\\s*:\\s*{`);
+      const entryMatch = entryRe.exec(blockText);
+      if (!entryMatch) {
+        continue;
+      }
+      const entryBlock = this._enclosingBraceBlock(blockText, blockText.indexOf('{', entryMatch.index));
+      const idMatch = entryBlock && /["']model_id["']\s*:\s*["']([^"']+)["']/.exec(entryBlock);
+      if (idMatch) {
+        ids.push(idMatch[1]);
+      }
+    }
+    return ids;
+  }
+
+  /**
    * Collects model names referenced by the notebook, both inline in code cells
    * and from the symbol-specific `SUPPORTED_*_MODELS` dictionaries.
    *
@@ -343,21 +417,30 @@ export class NotebookMetadataCollector extends NotebookContentReader {
     // Config-based ids: only include the model set(s) the notebook actually uses.
     // A local sibling config is preferred over the shared utils/llm_config.py.
     for (const { symbol, widgetFn } of MODEL_CONFIG_SYMBOLS) {
-      const isUsed = codeCellsText.includes(symbol) || (!!widgetFn && this._widgetUsesSharedSet(codeCellsText, widgetFn));
-      if (!isUsed) {
+      const symbolReferenced = codeCellsText.includes(symbol);
+      const widgetUsesShared = !!widgetFn && this._widgetUsesSharedSet(codeCellsText, widgetFn);
+      if (!symbolReferenced && !widgetUsesShared) {
         continue;
       }
       const block = this._extractDictBlock(siblingText, symbol) || this._extractDictBlock(sharedConfigText, symbol);
       if (!block) {
         continue;
       }
-      // RAG notebooks filter LLM models to those defining a `rag_prompt_template`.
-      const requiredKey =
-        symbol === 'SUPPORTED_LLM_MODELS' && codeCellsText.includes('rag_prompt_template')
-          ? 'rag_prompt_template'
-          : null;
-      for (const id of this._extractConfigModelIds(block, requiredKey)) {
-        models.add(id);
+      if (widgetUsesShared || this._referencesWholeConfigSet(codeCellsText, symbol)) {
+        // The notebook exposes the whole set (widget default, listing, or iteration).
+        // RAG notebooks filter LLM models to those defining a `rag_prompt_template`.
+        const requiredKey =
+          symbol === 'SUPPORTED_LLM_MODELS' && codeCellsText.includes('rag_prompt_template')
+            ? 'rag_prompt_template'
+            : null;
+        for (const id of this._extractConfigModelIds(block, requiredKey)) {
+          models.add(id);
+        }
+      } else {
+        // The notebook selects one specific model from the shared set (e.g. `SYMBOL[lang][key]`).
+        for (const id of this._extractSelectedConfigModelIds(codeCellsText, block, symbol)) {
+          models.add(id);
+        }
       }
     }
 
@@ -401,6 +484,16 @@ export class NotebookMetadataCollector extends NotebookContentReader {
 
 /** @typedef {typeof import('../shared/notebook-tags.js').LIBRARIES_VALUES} LIBRARIES_VALUES */
 /** @typedef {string | { pip: string }} LibraryPattern */
+
+/**
+ * Escapes a string so it can be used as a literal inside a `RegExp`.
+ *
+ * @param {string} value
+ * @returns {string}
+ */
+function _escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 /**
  * Matches file-path-like tokens ending with a known media/asset extension, to exclude them from model ids.
