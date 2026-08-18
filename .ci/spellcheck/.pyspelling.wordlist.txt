@@ -49,6 +49,7 @@ AST
 ASYM
 async
 AsyncInferQueue
+ATEM
 Atrous
 audiobooks
 AudioForConditionalGeneration
@@ -100,6 +101,7 @@ bitnet
 BLACKBOX
 BLEU
 blockwise
+Breakout
 BMP
 boolean
 builtins
@@ -385,6 +387,7 @@ GenerationMixin
 GGUF
 Girshick
 Gitee
+Glimmer
 GitHub
 GLA
 GLM
@@ -410,6 +413,7 @@ GroundingDINO
 gRPC
 Gu
 GUIs
+Gundam
 Gutendex
 Hafner
 HalBench
@@ -430,6 +434,7 @@ huggingfacehub
 Hunyuan
 hunyuan
 HunyuanDIT
+HunyuanOCR
 Husain
 HWC
 HY
@@ -440,6 +445,7 @@ ICPR
 identation
 IdentityNet
 IEMOCAP
+iframe
 iGPU
 iGPUs
 Ilija
@@ -487,6 +493,7 @@ io
 IoU
 ip
 IPs
+ipynb
 ir
 IRs
 iteratively
@@ -658,6 +665,7 @@ MinerU
 minicpm
 MiniCPM
 MiniLM
+Ministral
 mistralai
 MLLM
 MLLMs
@@ -675,6 +683,7 @@ MobileNet
 MobileNetV
 mobilevlm
 MobileVLM
+mockup
 ModelBest
 modelled
 Modelscope
@@ -708,6 +717,7 @@ Multimodality
 multinomial
 Muon
 MuRAG
+Muse
 MuSGD
 MusicGen
 Müller
@@ -751,6 +761,7 @@ nsfw
 NSFW
 NuExtract
 num
+numerics
 numpy
 NumPy
 NVLabs
@@ -788,6 +799,7 @@ OpenCLIP
 OpenCLIP's
 OpenCompass
 OpenCV
+OpenCV's
 OpenDataLab
 openjourney
 OpenPose
@@ -862,6 +874,7 @@ PGI
 PhotoMaker
 photorealism
 photorealistic
+physicalai
 PII
 PIL
 Pillarization
@@ -873,6 +886,7 @@ PixelShuffleUpsampleNetwork
 pixelwise
 Pixtral
 pixtral
+PixtralVisionModel
 PLE
 PLR
 PNDM
@@ -898,6 +912,7 @@ precisions
 precomputed
 preconverted
 prefetching
+prefill
 preformatted
 prem
 PrePostProcessing
@@ -1029,6 +1044,7 @@ SALICON
 Saliency
 saliency
 sam
+sandboxed
 SAMI
 SavedModel
 scalability
@@ -1133,6 +1149,7 @@ subpackage
 subtask
 summarization
 Suno
+Superintelligence
 superresolution
 superset
 Suraj
@@ -1147,6 +1164,7 @@ sym
 TartanAir
 TaskManager
 tbb
+teleoperation
 Tencent
 TensorBoard
 tensorflow
@@ -1252,6 +1270,7 @@ virtualenv
 VisCPM
 visualise
 visualises
+visuomotor
 ViT
 vit
 VITReciproCAM
@@ -1286,6 +1305,7 @@ VQGAN
 VQVAE
 VRAM
 VTI
+walkthrough
 Wav
 wav
 waveform
@@ -1313,6 +1333,7 @@ XCode
 XCodec
 Xeon
 xformers
+xhigh
 xl
 xml
 xt
@@ -1321,6 +1342,7 @@ xvectors
 xxl
 XYWH
 YAML
+YaRN
 Yiqin
 YOLO
 YOLOE

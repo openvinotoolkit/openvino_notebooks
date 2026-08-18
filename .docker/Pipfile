@@ -9,7 +9,7 @@ ipykernel = "==6.31.0"
 ipython = ">=7.16.3"
 ipywidgets = "*"
 jupyterhub = ">=5.4.5"
-jupyterlab = ">=4.5.9"
+jupyterlab = ">=4.5.10"
 jupyterlab-git = ">=0.54.0"
 jupyter-core = "==5.8.1"
 notebook = "<7.0.0"
@@ -17,19 +17,19 @@ nbval = "*"
 treon = "*"
 
 # Core ML (used by majority of notebooks)
-openvino = {version = "==2026.2.0"}
+openvino = {version = "==2026.3.0"}
 openvino-telemetry = "==2025.2.0"
 numpy = ">=1.21.0"
 opencv-python = "*"
-Pillow = ">=12.2.0"
+Pillow = ">=12.3.0"
 matplotlib = ">=3.4"
 ovmsclient = "*"
 
 # Security pins
-setuptools = ">70.0.0"
+setuptools = ">=83.0.0"
 pygments = ">=2.20.0"
 urllib3 = "==2.7.0"
-gitpython = ">=3.1.50"
+gitpython = ">=3.1.58"
 
 [dev-packages]
 
