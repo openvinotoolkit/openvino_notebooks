@@ -276,7 +276,7 @@
 - [Visual-language assistant with LLaVA Next and OpenVINO](./llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb)
 - [Visual-language assistant with LLaVA and OpenVINO Generative API](./llava-multimodal-chatbot/llava-multimodal-chatbot-genai.ipynb)
 - [Image generation with Latent Consistency Model and OpenVINO](./latent-consistency-models-image-generation/latent-consistency-models-image-generation.ipynb)
-- [Text-to-Speech synthesis using Kokoro and OpenVINO](./kokoro/kokoro.ipynb)
+- [Text-to-Speech synthesis using Kokoro and OpenVINO GenAI](./kokoro/kokoro.ipynb)
 - [Visual-language assistant with InternVL2 and OpenVINO](./internvl2/internvl2.ipynb)
 - [InstantID: Zero-shot Identity-Preserving Generation using OpenVINO](./instant-id/instant-id.ipynb)
 - [Inpainting with OpenVINO GenAI](./inpainting-genai/inpainting-genai.ipynb)
