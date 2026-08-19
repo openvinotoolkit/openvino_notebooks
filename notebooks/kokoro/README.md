@@ -23,6 +23,6 @@ This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
 
-The notebook installs `espeakng-loader` and configures its bundled `espeak-ng` library. OpenVINO GenAI uses it as a fallback for unknown English words and as the primary phonemizer for supported non-English languages.
+The notebook installs `espeakng-loader` and configures its bundled `espeak-ng` library. OpenVINO GenAI uses it as a fallback for unknown English words and as the primary text-to-phoneme engine for supported non-English languages.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/kokoro/README.md" />

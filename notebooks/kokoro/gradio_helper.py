@@ -15,10 +15,7 @@ def make_demo(pipeline, model_dir: Path):
         data = np.fromfile(voice_path, dtype=np.float32)
         expected_size = int(np.prod(speaker_embedding_shape))
         if data.size != expected_size:
-            raise ValueError(
-                f"Voice embedding has {data.size} values, but the model expects "
-                f"{expected_size} for shape {tuple(speaker_embedding_shape)}"
-            )
+            raise ValueError(f"Voice embedding has {data.size} values, but the model expects " f"{expected_size} for shape {tuple(speaker_embedding_shape)}")
         return ov.Tensor(data.reshape(speaker_embedding_shape))
 
     def get_audio_data(speech: ov.Tensor) -> np.ndarray:
