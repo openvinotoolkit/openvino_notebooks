@@ -140,6 +140,7 @@
 ## Convert
 
 - [YOLOv11 quantization with accuracy control using NNCF](./yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb)
+- [Prompt-based image segmentation with MobileSAM and OpenVINO](./mobilesam-segmentation/mobilesam-segmentation.ipynb)
 - [Classification with ConvNeXt and OpenVINO](./torchvision-zoo-to-openvino/convnext-classification.ipynb)
 - [Convert a Tensorflow Lite Model to OpenVINO™](./tflite-to-openvino/tflite-to-openvino.ipynb)
 - [Using TensorFlow Object Detection API with OpenVINO™](./tensorflow-object-detection-to-openvino/tensorflow-object-detection-api-with-openvino.ipynb)
@@ -217,6 +218,7 @@
 - [Document conversion with SmolDocling and OpenVINO](./smoldocling/smoldocling.ipynb)
 - [Zero-shot Image Classification with SigLIP2](./siglip-zero-shot-image-classification/siglip-zero-shot-image-classification.ipynb)
 - [SAM 3 Image Segmentation with OpenVINO](./sam3/sam3-segmentation.ipynb)
+- [Prompt-based image segmentation with MobileSAM and OpenVINO](./mobilesam-segmentation/mobilesam-segmentation.ipynb)
 - [Object masks from prompts with SAM2 and OpenVINO](./sam2-video-segmentation/segment-anything-2-video.ipynb)
 - [Object masks from prompts with SAM2 and OpenVINO for Images](./sam2-image-segmentation/segment-anything-2-image.ipynb)
 - [Background removal with RMBG v1.4 and OpenVINO](./rmbg-background-removal/rmbg-background-removal.ipynb)
