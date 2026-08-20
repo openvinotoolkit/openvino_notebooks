@@ -1,0 +1,52 @@
+# =============================================================================
+# SAM 3D Body — OpenVINO GPU notebook requirements
+# =============================================================================
+# Essential packages only. Install with:
+#
+#   conda activate sam3dbody
+#   pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/xpu
+#
+# The --extra-index-url is required ONLY for the Intel XPU build of PyTorch.
+# If you do not have an Intel Arc GPU / XPU, drop the flag and install plain
+# `torch`; the notebook will fall back to CPU for the PyTorch reference stage.
+# =============================================================================
+
+# --- Numerics & imaging -------------------------------------------------------
+numpy<2                    # OpenVINO + NNCF are not yet NumPy-2 clean
+opencv-python>=4.9
+scipy>=1.11
+Pillow>=10.0
+
+# --- PyTorch (reference model, Intel XPU accelerated) -------------------------
+torch>=2.6                 # 2.6+ ships native torch.xpu; 2.12+ adds sparse-COO on XPU
+                           # (SAM 3D Body's MHR head needs sparse ops on-device)
+
+# --- OpenVINO runtime + INT8 quantization ------------------------------------
+openvino>=2025.0           # GPU plugin, GridSample opset9, INFERENCE_PRECISION_HINT
+nncf>=2.14                 # weight-only INT8 compression used by ov_export.py
+
+# --- SAM 3D Body model dependencies ------------------------------------------
+timm>=1.0                  # DINOv3 ViT-H/16+ backbone blocks
+einops>=0.8
+omegaconf>=2.3             # model_config.yaml parsing
+hydra-core>=1.3
+pyrootutils>=1.0           # repo-root resolution used by the upstream code
+roma>=1.5                  # rotation utilities (6D <-> matrix <-> euler)
+yacs>=0.1.8
+torchvision>=0.21          # sam_3d_body_estimator.py: torchvision.transforms.ToTensor
+pytorch-lightning>=2.0     # sam_3d_body/utils/checkpoint.py, utils/logging.py
+termcolor>=2.0             # transitive: facebookresearch/dinov3 hub repo (via torch.hub.load)
+
+# --- Visualization ------------------------------------------------------------
+matplotlib>=3.8
+trimesh>=4.0
+pyrender>=0.1.45           # offscreen mesh rendering (uses EGL; set headlessly)
+
+# --- Utilities ----------------------------------------------------------------
+tqdm>=4.66
+huggingface_hub>=0.25      # downloads the reference checkpoint from HF
+braceexpand>=0.1.7         # used by sam3d_torch.py for MHR export
+
+# --- Notebook -----------------------------------------------------------------
+ipykernel>=6.29
+ipywidgets>=8.1
