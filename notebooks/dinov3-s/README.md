@@ -11,8 +11,9 @@ The notebook does the following --
    wraps it so it emits **dense per-patch features** `(B, D, h, w)` — the representation DINOv3
    uses for dense tasks (segmentation, correspondence, PCA).
 2. Converts it to **OpenVINO IR** at **FP32** and **FP16**.
-3. Compresses it to **INT8** with **NNCF weight-only quantization (WOQ)**, a data-free recipe
-   that needs no calibration set.
+3. Quantizes it to **INT8** with **NNCF post-training quantization (PTQ)** — a strided subset
+   of ImageNet-val images calibrates the quantizers (MIXED preset, GPU target, transformer-aware),
+   the same recipe the repository ships by default.
 4. Runs inference on CPU / GPU and visualizes the dense features as **PCA-RGB**, **KMeans
    segmentation** and a per-patch **cosine-similarity** map against the PyTorch reference.
 5. Evaluates each precision with **cosine similarity (mean and worst case per patch), MSE and
@@ -29,7 +30,7 @@ LVD-1689M self-supervised checkpoints published by the DINOv3 authors on the Hug
   and the paper-faithful validation transform (resize → center-crop → normalize).
 - Download the sample image into `data/`.
 - Compute the PyTorch dense-feature reference.
-- Convert to OpenVINO IR (FP32/FP16) and compress to INT8 with NNCF WOQ, into `ov_models/`.
+- Convert to OpenVINO IR (FP32/FP16) and quantize to INT8 with NNCF PTQ, into `ov_models/`.
 - Select a device (Intel GPU if present, else CPU) and run each precision on the same input.
 - Report mean / min cosine similarity, MSE and MAE against the PyTorch reference.
 - Benchmark median latency and throughput per engine.
