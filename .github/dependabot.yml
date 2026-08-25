@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
+      - "github_actions"
+    assignees:
+      - "akashchi"
+      - "aleksandr-mokrov"
+
+  - package-ecosystem: "npm"
+    directory: "/selector"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "npm"
+    labels:
+      - "dependencies"
+    assignees:
+      - "akashchi"
+      - "aleksandr-mokrov"
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
