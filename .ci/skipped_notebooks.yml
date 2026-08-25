@@ -307,8 +307,6 @@
   skips:
     - os:
         - windows-2022
-    - python:
-        - '3.13'
 - notebook: notebooks/qwen2.5-omni-chatbot/qwen2.5-omni-chatbot.ipynb
   skips:
     - os:
@@ -394,6 +392,12 @@
     - os:
         - macos-13
 - notebook: notebooks/fireredtts2/fireredtts2.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/muse-glimmer/muse-glimmer.ipynb
   skips:
     - os:
         - macos-13
