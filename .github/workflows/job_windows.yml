@@ -40,6 +40,8 @@ env:
   # Required by torch's C++ extension build (used by detectron2) when the MSVC
   # environment is already activated, otherwise the wheel build fails.
   DISTUTILS_USE_SDK: "1"
+  # Allow NLTK to download data through the configured proxy (SSRF opt-in).
+  NLTK_ALLOW_PROXIED_URLOPEN: "1"
 
 jobs:
   build_treon:
