@@ -42,6 +42,8 @@ permissions:
 env:
   PIP_CACHE_PATH: /mount/caches/pip
   MOUNT_CACHE: /mount/testdata0/ov_notebooks
+  # Allow NLTK to download data through the configured proxy (SSRF opt-in).
+  NLTK_ALLOW_PROXIED_URLOPEN: "1"
 
 
 jobs:
