@@ -1,0 +1,37 @@
+# Copyright (C) 2018-2026 Intel Corporation
+# SPDX-License-Identifier: MIT
+#
+# Conda environment for the full pyannote speaker-diarization pipeline
+# (pyannote/speaker-diarization-community-1) running on CPU with PyTorch.
+#
+# This is the WHOLE "who spoke when" pipeline (segmentation + embedding +
+# clustering), not just the embedding block. It runs on plain PyTorch CPU here;
+# OpenVINO acceleration can be added later.
+#
+# The pipeline is gated: accept the user conditions once and log in --
+#   https://hf.co/pyannote/speaker-diarization-community-1
+#   https://hf.co/pyannote/segmentation-3.0
+#   huggingface-cli login          # paste your HF access token
+#
+# Create with:
+#   conda env create -f diar_cpu.yaml
+#   conda activate diar_cpu
+
+name: diar_cpu
+channels:
+ - conda-forge
+dependencies:
+ - python==3.11.15
+ - pip
+ - pip:
+   # Core pipeline (segmentation + embedding + clustering)
+   - pyannote.audio==4.0.7
+   # PyTorch CPU build
+   - torch==2.12.1
+   - torchaudio==2.11.0
+   # Checkpoint loading (pyannote pickles omegaconf objects)
+   - omegaconf==2.3.1
+   # Audio I/O and resampling
+   - soundfile==0.14.0
+   - scipy==1.17.1
+   - numpy==2.4.6
