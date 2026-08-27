@@ -1,0 +1,48 @@
+# Copyright (C) 2018-2026 Intel Corporation
+# SPDX-License-Identifier: MIT
+#
+# Conda environment for the pyannote speaker-diarization pipeline
+# (pyannote/speaker-diarization-community-1) with PyTorch Intel XPU support.
+#
+# This env installs the Intel XPU build of PyTorch so run_diarization.py can run
+# the pipeline on a supported Intel GPU:
+#   python run_diarization.py audio.wav --device xpu
+#
+# Notes:
+# - torch/torchaudio come from the PyTorch XPU wheel index (--extra-index-url).
+# - XPU uses Level Zero and can expose Intel GPU devices when the driver/runtime
+#   stack supports them. On this machine, `torch.xpu` is available in
+#   `diar_xpu`.
+# - torchcodec is a pyannote dependency but is unused here (audio is loaded with
+#   soundfile). It pulls a CPU-linked build that can be removed after creation if
+#   you prefer a quieter env.
+#
+# The pipeline is gated: accept the user conditions once and log in --
+#   https://hf.co/pyannote/speaker-diarization-community-1
+#   https://hf.co/pyannote/segmentation-3.0
+#   huggingface-cli login          # paste your HF access token
+#
+# Create with:
+#   conda env create -f diar_xpu.yaml
+#   conda activate diar_xpu
+#   pip uninstall -y torchcodec   # optional: silence the unused-torchcodec notice
+
+name: diar_xpu
+channels:
+ - conda-forge
+dependencies:
+ - python==3.11.15
+ - pip
+ - pip:
+  # Intel XPU build of PyTorch
+   - --extra-index-url https://download.pytorch.org/whl/xpu
+   - torch==2.12.1+xpu
+   - torchaudio==2.11.0+xpu
+   # Core pipeline (segmentation + embedding + clustering)
+   - pyannote.audio==4.0.7
+   # Checkpoint loading (pyannote pickles omegaconf objects)
+   - omegaconf==2.3.1
+   # Audio I/O and resampling
+   - soundfile==0.14.0
+   - scipy==1.17.1
+   - numpy==2.4.6
