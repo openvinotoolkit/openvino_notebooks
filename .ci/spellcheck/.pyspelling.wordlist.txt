@@ -227,6 +227,7 @@ decidiffusion
 DeciDiffusion
 DeciDiffusion's
 deconvolution
+deformable
 deduplicated
 DeepEncoder
 DeepFloyd
