@@ -32,9 +32,7 @@ def run_object_detection(
         result["labels"],
         result["boxes"],
     ):
-        left, top, right, bottom = (
-            int(round(float(coordinate))) for coordinate in box
-        )
+        left, top, right, bottom = (int(round(float(coordinate))) for coordinate in box)
         left = max(0, min(left, image.width - 1))
         top = max(0, min(top, image.height - 1))
         right = max(left, min(right, image.width - 1))
