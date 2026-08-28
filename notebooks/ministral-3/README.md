@@ -14,6 +14,8 @@ More details can be found in the [Instruct model card](https://huggingface.co/mi
 
 In this tutorial we consider how to convert and optimize Ministral-3 model for creating a multimodal chatbot. We use [Optimum Intel](https://github.com/huggingface/optimum-intel) for model conversion with [NNCF](https://github.com/openvinotoolkit/nncf) weight compression, and `OVModelForVisualCausalLM` for efficient inference with OpenVINO.
 
+The `-BF16` suffix identifies the source checkpoint precision. The Instruct checkpoint without this suffix is FP8, while the Reasoning checkpoint is BF16 despite having no precision suffix. The notebook's FP16/INT4 selector controls the exported OpenVINO precision independently of the source checkpoint.
+
 ### Notebook Contents
 
 The tutorial consists of the following steps:
@@ -35,6 +37,6 @@ For further details, please refer to [Installation Guide](../../README.md).
 
 ⚠️ **EXPERIMENTAL NOTEBOOK**
 
-Mistral3 support was recently added to Optimum Intel. The Reasoning checkpoint and its INT4-compressed variant should be validated end to end before this tutorial is considered stable. Video, audio, and NPU inference are not supported in this example.
+The merged Optimum Intel PR #1627 supports the outer `mistral3` architecture, but Ministral-3 checkpoints use the newer internal language-model type `ministral3`. This notebook temporarily pins Optimum Intel PR #1659, which adds that missing export path. Video, audio, and NPU inference are not supported in this example.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/ministral-3/README.md" />
