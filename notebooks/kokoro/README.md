@@ -1,37 +1,28 @@
-# Text-to-Speech synthesis using Kokoro and OpenVINO
+# Text-to-Speech synthesis using Kokoro and OpenVINO GenAI
 
-Kokoro is an TTS model with 82 million parameters. Despite its lightweight architecture, it delivers comparable quality to larger models while being significantly faster and more cost-efficient. More details about model can be found in [model card](https://huggingface.co/hexgrad/Kokoro-82M) and [original repository](https://github.com/hexgrad/kokoro)
+[Kokoro](https://huggingface.co/hexgrad/Kokoro-82M) is an open-weight TTS model with 82 million parameters. Despite its lightweight architecture, it delivers high-quality speech while remaining fast and resource-efficient.
 
-In this tutorial, we consider how to run Kokoro using OpenVINO.
+This tutorial demonstrates end-to-end Kokoro inference with [`openvino_genai.Text2SpeechPipeline`](https://github.com/openvinotoolkit/openvino.genai). It supports FP16, INT8, and INT4 weights. The ready-to-run [OpenVINO/Kokoro-82M-int8-ov](https://huggingface.co/OpenVINO/Kokoro-82M-int8-ov) model is downloaded by default; formats unavailable on Hugging Face Hub are exported locally with Optimum Intel.
 
 ## Notebook Contents
 
 The tutorial consists of the following steps:
 
-* Download and run Kokoro pipeline
-* Convert model to OpenVINO Intermediate Representation (IR) format
-* Run Text-to-Speech synthesis using the OpenVINO model
+* Select FP16, INT8, or INT4 weights
+* Download a preconverted model when available or export Kokoro locally
+* Select an OpenVINO inference device
+* Load a Kokoro voice embedding
+* Run text-to-speech synthesis with OpenVINO GenAI
 * Interactive demo
+
+Inference with the preconverted model supports Python 3.10 and newer, including Python 3.13. Local export requires Python 3.10–3.12 because the `kokoro` and `misaki` packages currently require Python `<3.13`.
 
 ## Installation Instructions
 
 This is a self-contained example that relies solely on its own code.</br>
-We recommend  running the notebook in a virtual environment. You only need a Jupyter server to start.
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
 
-For running this notebook, please make sure that `espeak-ng` installed:
+The notebook installs `espeakng-loader` and configures its bundled `espeak-ng` library. OpenVINO GenAI uses it as a fallback for unknown English words and as the primary text-to-phoneme engine for supported non-English languages.
 
-**Linux**
-```bash
-apt-get -qq -y install espeak-ng > /dev/null 2>&1
-```
-**MacOS**
-```bash
-brew install espeak-ng
-```
-**Windows**
-1. Go to [espeak-ng releases](https://github.com/espeak-ng/espeak-ng/releases)
-2. Click on Latest release
-3. Download the appropriate *.msi file (e.g. espeak-ng-20191129-b702b03-x64.msi
-4. Run the downloaded installer
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/kokoro/README.md" />

@@ -96,8 +96,8 @@ To do this, there are a few requirements that all notebooks need to pass.
    - Add a `README.md` to the notebook subdirectory. Add a screenshot that gives an indication of what
      the notebook does if applicable.
    - Avoid adding any other files to the notebook's subdirectory. Instead, rely on models and data samples available online and fetch them within the notebook. Please refer to the [Notebook utils](#notebook-utils) section.
-3. In case you want to utilize one of the Open Model Zoo models, refer to the [Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/model-tools)
-   notebook.
+3. In case you want to utilize one of the Open Model Zoo models, refer to the [Model Tools](https://github.com/openvinotoolkit/open_model_zoo/tree/master/tools/model_tools)
+   documentation.
 4. The notebooks should provide an easy way to clean up the downloaded data, for example with a
    commented-out cell at the end of the notebook.
 
@@ -334,7 +334,7 @@ standard `diff` tool for `git`, with much more useful output than the regular `g
 
 #### JupyterLab Code Formatter
 
-[JupyterLab Code Formatter](https://ryantam626.github.io/jupyterlab_code_formatter/index.html) adds a
+[JupyterLab Code Formatter](https://jupyterlab-code-formatter.readthedocs.io/) adds a
 button to Jupyter Lab to automatically format the code in notebooks with `black` and `isort`. Please
 use either this extension or a different way to automatically format your notebook.
 

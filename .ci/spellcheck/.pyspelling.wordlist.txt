@@ -227,6 +227,7 @@ decidiffusion
 DeciDiffusion
 DeciDiffusion's
 deconvolution
+deformable
 deduplicated
 DeepEncoder
 DeepFloyd
@@ -405,6 +406,7 @@ GPUs
 GQA
 Gradio
 gradio
+grapheme
 graphemes
 grayscale
 grey

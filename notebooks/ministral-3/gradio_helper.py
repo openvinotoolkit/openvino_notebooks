@@ -7,6 +7,49 @@ from PIL import Image
 from transformers import TextIteratorStreamer
 
 MAX_IMAGE_SIDE = 512
+THINK_START = "[THINK]"
+THINK_END = "[/THINK]"
+DETAILS_PREFIX = "<details><summary>Reasoning</summary>\n\n"
+DETAILS_OPEN_PREFIX = "<details open><summary>Reasoning</summary>\n\n"
+DETAILS_SUFFIX = "\n\n</details>"
+
+
+def strip_terminal_tokens(text, tokenizer):
+    for token in (tokenizer.bos_token, tokenizer.eos_token, tokenizer.pad_token):
+        if token:
+            text = text.replace(token, "")
+    return text.strip()
+
+
+def split_reasoning_output(text, tokenizer, final=False):
+    end_pos = text.find(THINK_END)
+    if end_pos >= 0:
+        start_pos = text.find(THINK_START)
+        reasoning_start = start_pos + len(THINK_START) if start_pos >= 0 else 0
+        reasoning = strip_terminal_tokens(text[reasoning_start:end_pos], tokenizer)
+        answer = strip_terminal_tokens(text[end_pos + len(THINK_END) :], tokenizer)
+        return reasoning, answer, True
+
+    text = text.replace(THINK_START, "", 1)
+    if final:
+        return None, strip_terminal_tokens(text, tokenizer), True
+    return strip_terminal_tokens(text, tokenizer), "", False
+
+
+def format_reasoning_response(reasoning, answer, complete):
+    if not reasoning:
+        return answer
+    prefix = DETAILS_PREFIX if complete else DETAILS_OPEN_PREFIX
+    response = f"{prefix}{reasoning}{DETAILS_SUFFIX}"
+    return f"{response}\n\n{answer}" if answer else response
+
+
+def parse_display_response(text):
+    for prefix in (DETAILS_PREFIX, DETAILS_OPEN_PREFIX):
+        if text.startswith(prefix) and DETAILS_SUFFIX in text:
+            reasoning, answer = text[len(prefix) :].split(DETAILS_SUFFIX, 1)
+            return reasoning.strip(), answer.strip()
+    return None, text.strip()
 
 
 def download_examples():
@@ -86,11 +129,13 @@ def history_to_turns(history):
             if text:
                 pending_text.append(text)
         elif role == "assistant" and pending_text:
+            reasoning, answer = parse_display_response(get_text(content))
             turns.append(
                 {
                     "text": " ".join(pending_text),
                     "files": pending_files,
-                    "answer": get_text(content),
+                    "reasoning": reasoning,
+                    "answer": answer,
                 }
             )
             pending_text = []
@@ -99,7 +144,7 @@ def history_to_turns(history):
     return turns, pending_text, pending_files
 
 
-def make_demo(model, processor):
+def make_demo(model, processor, is_reasoning_model=False):
     download_examples()
 
     def bot_streaming(message, history):
@@ -113,7 +158,7 @@ def make_demo(model, processor):
         if pending_text:
             message_text = " ".join([*pending_text, message_text])
 
-        turns.append({"text": message_text, "files": current_files, "answer": None})
+        turns.append({"text": message_text, "files": current_files, "reasoning": None, "answer": None})
 
         messages = []
         images = []
@@ -126,11 +171,16 @@ def make_demo(model, processor):
                 }
             )
             images.extend(turn_images)
-            if turn["answer"]:
+            if turn["reasoning"] or turn["answer"]:
+                assistant_content = []
+                if turn["reasoning"]:
+                    assistant_content.append({"type": "thinking", "thinking": turn["reasoning"], "closed": True})
+                if turn["answer"]:
+                    assistant_content.append({"type": "text", "text": turn["answer"]})
                 messages.append(
                     {
                         "role": "assistant",
-                        "content": [{"type": "text", "text": turn["answer"]}],
+                        "content": assistant_content,
                     }
                 )
 
@@ -139,12 +189,21 @@ def make_demo(model, processor):
 
         prompt = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         inputs = processor(images=images, text=prompt, return_tensors="pt")
-        streamer = TextIteratorStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=True)
+        streamer = TextIteratorStreamer(
+            processor.tokenizer,
+            skip_prompt=True,
+            skip_special_tokens=not is_reasoning_model,
+        )
         generation_errors = []
 
         def generate():
             try:
-                model.generate(**inputs, streamer=streamer, max_new_tokens=128, do_sample=False)
+                generation_kwargs = (
+                    {"max_new_tokens": 1024, "do_sample": True, "temperature": 0.7, "top_p": 0.95}
+                    if is_reasoning_model
+                    else {"max_new_tokens": 128, "do_sample": False}
+                )
+                model.generate(**inputs, streamer=streamer, **generation_kwargs)
             except Exception as error:
                 generation_errors.append(error)
                 streamer.on_finalized_text("", stream_end=True)
@@ -152,25 +211,37 @@ def make_demo(model, processor):
         thread = Thread(target=generate, daemon=True)
         thread.start()
 
-        answer = ""
+        raw_output = ""
+        last_response = ""
         for new_text in streamer:
-            answer += new_text
-            yield answer
+            raw_output += new_text
+            if is_reasoning_model:
+                reasoning, answer, complete = split_reasoning_output(raw_output, processor.tokenizer)
+                last_response = format_reasoning_response(reasoning, answer, complete)
+            else:
+                last_response = raw_output
+            yield last_response
 
         thread.join()
         if generation_errors:
             raise gr.Error(f"Generation failed: {generation_errors[0]}")
+        if is_reasoning_model:
+            reasoning, answer, complete = split_reasoning_output(raw_output, processor.tokenizer, final=True)
+            final_response = format_reasoning_response(reasoning, answer, complete)
+            if final_response != last_response:
+                yield final_response
 
     return gr.ChatInterface(
         fn=bot_streaming,
-        type="messages",
         title="Ministral-3 OpenVINO Demo",
-        description="Upload one or more images and continue the conversation in subsequent turns.",
+        description=(
+            "Upload one or more images and continue the conversation in subsequent turns. "
+            "Reasoning traces are shown in a collapsible section and preserved in the model context."
+        ),
         examples=[
             [{"text": "What is on the flower?", "files": ["./bee.jpg"]}],
             [{"text": "How to make this pastry?", "files": ["./baklava.png"]}],
         ],
         textbox=gr.MultimodalTextbox(label="Message", file_types=["image"], file_count="multiple"),
-        stop_btn=None,
         multimodal=True,
     )
