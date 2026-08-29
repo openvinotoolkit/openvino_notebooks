@@ -233,7 +233,6 @@ def make_demo(model, processor, is_reasoning_model=False):
 
     return gr.ChatInterface(
         fn=bot_streaming,
-        type="messages",
         title="Ministral-3 OpenVINO Demo",
         description=(
             "Upload one or more images and continue the conversation in subsequent turns. "
@@ -244,6 +243,5 @@ def make_demo(model, processor, is_reasoning_model=False):
             [{"text": "How to make this pastry?", "files": ["./baklava.png"]}],
         ],
         textbox=gr.MultimodalTextbox(label="Message", file_types=["image"], file_count="multiple"),
-        stop_btn=None,
         multimodal=True,
     )
