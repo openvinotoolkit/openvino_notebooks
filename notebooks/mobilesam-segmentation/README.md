@@ -4,7 +4,7 @@
 
 The model and source code are available under the Apache License 2.0. The inference example reuses the `coco_bike.jpg` sample hosted by OpenVINO Notebooks.
 
-![MobileSAM point and box prompt segmentation](file.png)
+![MobileSAM point and box prompt segmentation](https://github.com/user-attachments/assets/cd5c38db-1360-4bb4-b84b-5366c0671d10)
 
 ## Notebook Contents
 
