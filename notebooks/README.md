@@ -69,6 +69,7 @@
 - [MiniCPM-o 4.5 Multimodal Model with OpenVINO](./minicpm-o-4.5/minicpm-o-4.5.ipynb)
 - [Document parsing with MinerU 2.5 and OpenVINO](./mineru2.5/mineru2.5.ipynb)
 - [LTX Video and OpenVINO™](./ltx-video/ltx-video.ipynb)
+- [LTX-Video 2.3 and OpenVINO™](./ltx-video-2.3/ltx-video-2.3.ipynb)
 - [Create a RAG system using OpenVINO and LlamaIndex](./llm-rag-llamaindex/llm-rag-llamaindex.ipynb)
 - [Create a RAG system using OpenVINO and LangChain](./llm-rag-langchain/llm-rag-langchain.ipynb)
 - [Create a RAG system using OpenVINO GenAI and LangChain](./llm-rag-langchain/llm-rag-langchain-genai.ipynb)
