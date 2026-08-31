@@ -227,6 +227,7 @@ decidiffusion
 DeciDiffusion
 DeciDiffusion's
 deconvolution
+deformable
 deduplicated
 DeepEncoder
 DeepFloyd
@@ -603,6 +604,7 @@ LMs
 loc
 LocalAI
 LocDiT
+logit
 logits
 LogSoftmax
 LOL
@@ -706,6 +708,7 @@ mRoPE
 MRPC
 msi
 mT
+MTP
 MTVQA
 MuJoCo
 multiarchitecture
@@ -1148,6 +1151,7 @@ subgraph
 subgraphs
 sublicense
 subpackage
+subprocesses
 subtask
 summarization
 Suno
@@ -1308,6 +1312,7 @@ VQVAE
 VRAM
 VTI
 walkthrough
+warmup
 Wav
 wav
 waveform

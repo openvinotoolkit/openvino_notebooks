@@ -79,3 +79,4 @@ notebooks/mineru2.5/mineru2.5.ipynb
 notebooks/bernini-r-image-video/bernini-r-image-video.ipynb
 notebooks/omnivoice/omnivoice.ipynb
 notebooks/unlimited-ocr/unlimited-ocr.ipynb
+notebooks/qwen3.8-mtp/qwen3.8-mtp.ipynb
