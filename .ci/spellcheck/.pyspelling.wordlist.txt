@@ -681,6 +681,7 @@ MMS
 MMVLM
 MobileCLIP
 MobileLLaMA
+MobileSAM
 mobilenet
 MobileNet
 MobileNetV
