@@ -1,0 +1,13 @@
+# Copyright (C) 2018-2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+faster-coco-eval==1.7.2
+PyYAML==6.0.3
+tensorboard==2.21.0
+scipy==1.18.0
+calflops==0.3.2
+transformers==5.13.0
+loguru==0.7.3
+matplotlib==3.11.0
+openvino==2026.3.1
+nncf==3.3.0
