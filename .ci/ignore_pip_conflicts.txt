@@ -13,3 +13,4 @@ notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb # torch >= 2
 notebooks/stable-diffusion-v3/stable-diffusion-v3.ipynb # diffusers from git
 notebooks/llm-rag-langchain/llm-rag-langchain-genai.ipynb # nncf@https://github.com/openvinotoolkit/nncf/tree/release_v280
 notebooks/qwen3.8-mtp/qwen3.8-mtp.ipynb # openvino-genai wheels from PR CI artifacts
+notebooks/d-fine/dfine.ipynb # install requirements.txt inside setup.sh

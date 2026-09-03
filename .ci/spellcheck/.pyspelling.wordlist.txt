@@ -246,6 +246,7 @@ depainting
 deployable
 DepthAnything
 DepthAnythingV
+DEtection
 detections
 detectron
 Detectron
@@ -253,8 +254,10 @@ detokenization
 detokenizer
 detokenizers
 DETR
+DETRs
 Dettmers
 dev
+dfine
 DFL
 dGPU
 dGPUs
@@ -346,6 +349,7 @@ FFmpeg
 ffmpeg
 FFN
 FIL
+FINE's
 finetuned
 finetuning
 FireRedTTS
@@ -906,6 +910,7 @@ postprocess
 postprocesses
 postprocessing
 Postprocessing
+postprocessor
 PowerShell
 PPYOLOv
 PR
@@ -966,6 +971,7 @@ quant
 quantized
 quantizer
 quantizers
+quantizes
 Quantizing
 quantizing
 QuartzNet
@@ -1136,6 +1142,7 @@ StableDiffusionInpaintPipeline
 StableDiffusionPipeline
 STAL
 stateful
+stdout
 STFT
 streamable
 Struct
@@ -1200,6 +1207,7 @@ tokenizing
 ToneColorConverter
 Tongyi
 toolkits
+TopK
 torchaudio
 TorchDynamo
 torchdynamo
@@ -1209,6 +1217,7 @@ TorchScript
 torchvision
 TorchVision
 transformative
+TRansformers
 TrigFlow
 triplane
 TriplaneLearnablePositionalEmbedding
@@ -1231,6 +1240,7 @@ UIs
 Ultralytics
 UMD
 UMT
+unbuffered
 Uncheck
 unCLIP
 uncomment
@@ -1342,12 +1352,14 @@ xformers
 xhigh
 xl
 xml
+XPU
 xt
 xvector
 xvectors
 xxl
 XYWH
 YAML
+yaml
 YaRN
 Yiqin
 YOLO
