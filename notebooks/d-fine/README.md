@@ -20,3 +20,5 @@ _This work depends on [D-FINE](https://github.com/Peterande/D-FINE) (commit 956d
 For further details about the model, please refer to the [D-FINE repository](https://github.com/Peterande/D-FINE).
 
 To run on Intel hardware, follow the step-by-step instructions as described in the [dfine.ipynb](dfine.ipynb) notebook.
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/d-fine/README.md" />
