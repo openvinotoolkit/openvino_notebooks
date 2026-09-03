@@ -322,7 +322,7 @@
 - [Imitation Learning - ACT](./aloha-act/aloha-act.ipynb)
 - [Music generation using ACE Step and OpenVINO](./ace-step-music-generation/ace-step-music-generation.ipynb)
 - [Part Segmentation of 3D Point Clouds with OpenVINO™](./3D-segmentation-point-clouds/3D-segmentation-point-clouds.ipynb)
-- [D-FINE: Fine-grained Distribution Refinement for DETRs](./d-fine/dfine.ipynb)
+- [D-FINE: Fine-grained Distribution Refinement for DEtection TRansformers (DETRs)](./d-fine/dfine.ipynb)
 - [**PointPillar for 3D object detection**](./3D-point-pillars/pointpillars.ipynb)
 
 ## Optimize

@@ -19,6 +19,7 @@ top-Q. With K=8 this holds in practice for D-FINE.
 Usage:
     python two_stage_topk.py IN.xml OUT.xml [K=8]
 """
+
 import sys
 import numpy as np
 import openvino as ov
@@ -57,9 +58,7 @@ def find_postproc(model):
 
     if len(found) != 1:
         names = [op.get_friendly_name() for op, _ in found]
-        raise RuntimeError(
-            "Expected exactly 1 postprocessor TopK (index output floor-divided by a "
-            f"constant class count); found {len(found)}: {names}")
+        raise RuntimeError("Expected exactly 1 postprocessor TopK (index output floor-divided by a " f"constant class count); found {len(found)}: {names}")
 
     topk, num_classes = found[0]
 
@@ -83,9 +82,11 @@ def rewrite_topk(in_xml, out_xml, K=8):
     tk, num_queries, num_classes, num_top_queries = find_postproc(model)
     if not 1 <= K <= num_classes:
         raise ValueError(f"K must be in [1, {num_classes}]; got {K}")
-    print(f"[two-stage-topk] target TopK: {tk.get_friendly_name()}  queries={num_queries} "
-          f"classes={num_classes} top={num_top_queries}  K(per-query)={K}  "
-          f"survivors={num_queries * K}")
+    print(
+        f"[two-stage-topk] target TopK: {tk.get_friendly_name()}  queries={num_queries} "
+        f"classes={num_classes} top={num_top_queries}  K(per-query)={K}  "
+        f"survivors={num_queries * K}"
+    )
 
     scores_flat = tk.input_value(TOPK_DATA_IN)  # [B, queries*classes], f32
 
@@ -104,8 +105,7 @@ def rewrite_topk(in_xml, out_xml, K=8):
     c1 = stage1.output(TOPK_INDICES_OUT)  # [B, queries, K] class indices
 
     # Global flat index = class + query*classes.
-    qoff = opset.constant(
-        (np.arange(num_queries, dtype=np.int64) * num_classes).reshape(1, num_queries, 1))
+    qoff = opset.constant((np.arange(num_queries, dtype=np.int64) * num_classes).reshape(1, num_queries, 1))
     flat1 = opset.add(c1, qoff)  # [B, queries, K]
 
     # Flatten survivors -> [B, queries*K].
