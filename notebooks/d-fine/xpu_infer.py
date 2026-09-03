@@ -37,8 +37,7 @@ def parse_args():
         "--model",
         choices=MODELS,
         default=None,
-        help="Model variant. Maps to configs/dfine/dfine_hgnetv2_<model>_coco.yml "
-        "and checkpoints/dfine_<model>_coco.pth.",
+        help="Model variant. Maps to configs/dfine/dfine_hgnetv2_<model>_coco.yml " "and checkpoints/dfine_<model>_coco.pth.",
     )
     parser.add_argument("-c", "--config", default=None, help="Explicit config yaml path.")
     parser.add_argument("-r", "--resume", default=None, help="Explicit checkpoint (.pth) path.")
@@ -92,10 +91,7 @@ def main():
 
     if args.device.startswith("xpu"):
         if not hasattr(torch, "xpu") or not torch.xpu.is_available():
-            raise RuntimeError(
-                "torch.xpu is not available. Ensure the torch XPU build and Intel GPU "
-                "runtime are installed and an Intel GPU is visible."
-            )
+            raise RuntimeError("torch.xpu is not available. Ensure the torch XPU build and Intel GPU " "runtime are installed and an Intel GPU is visible.")
         print(f"Using XPU device: {torch.xpu.get_device_name(0)}")
 
     device = torch.device(args.device)

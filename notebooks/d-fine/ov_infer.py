@@ -38,14 +38,12 @@ MODELS = ("n", "s", "m", "l", "x")
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description="D-FINE OpenVINO inference (COCO evaluation, f16 hint)")
+    parser = argparse.ArgumentParser(description="D-FINE OpenVINO inference (COCO evaluation, f16 hint)")
     parser.add_argument(
         "--model",
         choices=MODELS,
         default=None,
-        help="Model variant. Maps to configs/dfine/dfine_hgnetv2_<model>_coco.yml "
-        "and checkpoints/ov/dfine_<model>_coco<suffix>.xml.",
+        help="Model variant. Maps to configs/dfine/dfine_hgnetv2_<model>_coco.yml " "and checkpoints/ov/dfine_<model>_coco<suffix>.xml.",
     )
     parser.add_argument("-c", "--config", default=None, help="Explicit config yaml path.")
     parser.add_argument("--ir", default=None, help="Explicit OpenVINO IR .xml path.")
@@ -82,8 +80,7 @@ def parse_args():
     if args.ir is None:
         if args.model is None:
             parser.error("Provide either --model {n,s,m,l,x} or --ir.")
-        args.ir = os.path.join(
-            args.ir_dir, f"dfine_{args.model}_coco{SUFFIX[args.precision]}.xml")
+        args.ir = os.path.join(args.ir_dir, f"dfine_{args.model}_coco{SUFFIX[args.precision]}.xml")
 
     return args
 
@@ -91,17 +88,13 @@ def parse_args():
 def load_ov_model(args, core):
     """Read the exported IR, pin it to the eval batch, and compile it with the f16 hint."""
     if not os.path.isfile(args.ir):
-        raise FileNotFoundError(
-            f"IR '{args.ir}' not found; export it first with "
-            f"ov_export.py --precision {args.precision}."
-        )
+        raise FileNotFoundError(f"IR '{args.ir}' not found; export it first with " f"ov_export.py --precision {args.precision}.")
 
     print(f"IR             : {args.ir}")
     model = core.read_model(args.ir)
 
     model.reshape(input_shapes(args.batch_size, args.imgsz))
-    print(f"Input shape    : [{args.batch_size}, {IMAGE_CHANNELS}, "
-          f"{args.imgsz}, {args.imgsz}] (static)")
+    print(f"Input shape    : [{args.batch_size}, {IMAGE_CHANNELS}, " f"{args.imgsz}, {args.imgsz}] (static)")
 
     return core.compile_model(model, args.device, {"INFERENCE_PRECISION_HINT": "f16"})
 
@@ -123,9 +116,7 @@ def build_config(args):
 def remap_labels(labels):
     """Map contiguous model label indices (0..79) to COCO category ids."""
     flat = labels.reshape(-1)
-    mapped = np.fromiter(
-        (mscoco_label2category[int(x)] for x in flat), dtype=np.int64, count=flat.size
-    )
+    mapped = np.fromiter((mscoco_label2category[int(x)] for x in flat), dtype=np.int64, count=flat.size)
     return mapped.reshape(labels.shape)
 
 
@@ -137,9 +128,7 @@ def main():
 
     core = ov.Core()
     if args.device not in core.available_devices:
-        raise RuntimeError(
-            f"Device '{args.device}' not available. Present: {core.available_devices}"
-        )
+        raise RuntimeError(f"Device '{args.device}' not available. Present: {core.available_devices}")
     print(f"Device name      : {core.get_property(args.device, 'FULL_DEVICE_NAME')}")
 
     compiled = load_ov_model(args, core)
@@ -190,8 +179,7 @@ def main():
 
     print("\n=== Results ===")
     label = f"D-FINE-{args.model.upper()}" if args.model else os.path.basename(args.ir)
-    print(f"Model            : {label}   (device={args.device}, batch={args.batch_size}, "
-          f"precision={args.precision})")
+    print(f"Model            : {label}   (device={args.device}, batch={args.batch_size}, " f"precision={args.precision})")
     print(f"AP^val (0.50:0.95): {ap_val * 100:.1f}")
 
 

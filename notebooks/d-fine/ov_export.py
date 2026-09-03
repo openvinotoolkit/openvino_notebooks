@@ -47,23 +47,22 @@ DEC = r"__module\.model\.decoder"
 ENC = r"__module\.model\.encoder"
 
 REGION_PATTERNS = {
-    "backbone":       [r"__module\.model\.backbone"],
-    "enc_aifi":       [ENC + r"\.encoder\."],
+    "backbone": [r"__module\.model\.backbone"],
+    "enc_aifi": [ENC + r"\.encoder\."],
     "enc_input_proj": [ENC + r"\.input_proj"],
-    "enc_fpn":        [ENC + r"\.(fpn_blocks|lateral_convs)"],
-    "enc_pan":        [ENC + r"\.(pan_blocks|downsample_convs)"],
+    "enc_fpn": [ENC + r"\.(fpn_blocks|lateral_convs)"],
+    "enc_pan": [ENC + r"\.(pan_blocks|downsample_convs)"],
     "dec_input_proj": [DEC + r"\.input_proj"],
-    "dec_enc_output": [DEC + r"\.enc_output", DEC + r"\.enc_score_head",
-                       DEC + r"\.enc_bbox_head"],
-    "dec_query_pos":  [DEC + r"\.query_pos_head"],
-    "dec_self_attn":  [DEC + r"\.decoder\.layers\.\d+\.self_attn"],
+    "dec_enc_output": [DEC + r"\.enc_output", DEC + r"\.enc_score_head", DEC + r"\.enc_bbox_head"],
+    "dec_query_pos": [DEC + r"\.query_pos_head"],
+    "dec_self_attn": [DEC + r"\.decoder\.layers\.\d+\.self_attn"],
     "dec_cross_attn": [DEC + r"\.decoder\.layers\.\d+\.cross_attn"],
-    "dec_layer_ffn":  [DEC + r"\.decoder\.layers\.\d+\.(linear|norm|gateway|activation)"],
-    "dec_bbox_head":  [DEC + r"\.dec_bbox_head", DEC + r"\.pre_bbox_head"],
+    "dec_layer_ffn": [DEC + r"\.decoder\.layers\.\d+\.(linear|norm|gateway|activation)"],
+    "dec_bbox_head": [DEC + r"\.dec_bbox_head", DEC + r"\.pre_bbox_head"],
     "dec_score_head": [DEC + r"\.dec_score_head"],
-    "dec_lqe":        [DEC + r"\.decoder\.lqe_layers"],
-    "dec_integral":   [DEC + r"\.integral"],
-    "postprocessor":  [r"__module\.postprocessor"],
+    "dec_lqe": [DEC + r"\.decoder\.lqe_layers"],
+    "dec_integral": [DEC + r"\.integral"],
+    "postprocessor": [r"__module\.postprocessor"],
 }
 REGIONS = tuple(REGION_PATTERNS)
 
@@ -194,8 +193,7 @@ def nncf_enum(nncf_module, enum_cls, value):
         raise ValueError(f"Unsupported NNCF {enum_cls}: {value}")
 
 
-def quantize_int8(ov_model, calibration_dataset, subset_size, int8_regions,
-                  target_device, preset):
+def quantize_int8(ov_model, calibration_dataset, subset_size, int8_regions, target_device, preset):
     """Run NNCF INT8 PTQ over `int8_regions` only; regions elsewhere are ignored."""
     ignored_regions = tuple(r for r in REGIONS if r not in int8_regions)
     patterns = region_patterns(ignored_regions)
@@ -280,8 +278,7 @@ def build_auto_opt(ov_model, cfg, args):
     calib, calib_size = build_calibration_dataset(cfg, args.calib_images)
     print(f"  calibration  : {calib_size} images")
 
-    quantized = quantize_int8(
-        ov_model, calib, calib_size, INT8_REGIONS, args.device, "mixed")
+    quantized = quantize_int8(ov_model, calib, calib_size, INT8_REGIONS, args.device, "mixed")
     # NNCF returns a fresh model; re-apply the tensor names.
     name_io(quantized)
 
@@ -318,14 +315,14 @@ def get_real_sample(cfg, imgsz):
 
     orig_sizes = torch.stack([t["orig_size"] for t in targets], dim=0)
     if samples.shape[-1] != imgsz or samples.shape[-2] != imgsz:
-        print(f"  (val image is {tuple(samples.shape[-2:])}, expected "
-              f"{imgsz}x{imgsz}; using it anyway)")
+        print(f"  (val image is {tuple(samples.shape[-2:])}, expected " f"{imgsz}x{imgsz}; using it anyway)")
 
     return samples, orig_sizes
 
 
 def match_detections(pt_boxes, pt_labels, ov_boxes, ov_labels, iou_gate=0.5):
     """Greedy 1:1 match of PT to OV detections by box IoU (xyxy, absolute)."""
+
     def iou(a, b):
         ix1 = max(a[0], b[0])
         iy1 = max(a[1], b[1])
@@ -372,8 +369,7 @@ def verify(xml_path, torch_model, cfg, args):
     sample = get_real_sample(cfg, args.imgsz)
     if sample is None:
         torch.manual_seed(0)
-        sample = (torch.rand(1, IMAGE_CHANNELS, args.imgsz, args.imgsz),
-                  torch.tensor([[args.imgsz, args.imgsz]], dtype=torch.int64))
+        sample = (torch.rand(1, IMAGE_CHANNELS, args.imgsz, args.imgsz), torch.tensor([[args.imgsz, args.imgsz]], dtype=torch.int64))
     images, sizes = sample
 
     with torch.no_grad():
@@ -400,9 +396,7 @@ def verify(xml_path, torch_model, cfg, args):
         print("  (nothing confident enough to match)")
         return
 
-    ious, label_ok, unmatched = match_detections(
-        pt_boxes[keep_pt], pt_labels[keep_pt],
-        ov_boxes[keep_ov], ov_labels[keep_ov])
+    ious, label_ok, unmatched = match_detections(pt_boxes[keep_pt], pt_labels[keep_pt], ov_boxes[keep_ov], ov_labels[keep_ov])
     if not ious:
         print("  (no IoU>=0.5 matches)")
         return
@@ -440,18 +434,17 @@ def build_deploy_model(config, checkpoint_path):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description="Export D-FINE to an OpenVINO IR (FP16 or INT8+FP16)")
+    parser = argparse.ArgumentParser(description="Export D-FINE to an OpenVINO IR (FP16 or INT8+FP16)")
     parser.add_argument(
         "--model",
         choices=MODELS,
         default=None,
-        help="Model variant. Maps to configs/dfine/dfine_hgnetv2_<model>_coco.yml "
-        "and checkpoints/dfine_<model>_coco.pth.",
+        help="Model variant. Maps to configs/dfine/dfine_hgnetv2_<model>_coco.yml " "and checkpoints/dfine_<model>_coco.pth.",
     )
     parser.add_argument("-c", "--config", default=None, help="Explicit config yaml path.")
     parser.add_argument(
-        "-r", "--checkpoint-path",
+        "-r",
+        "--checkpoint-path",
         default=None,
         help="Explicit checkpoint (.pth) path.",
     )
@@ -492,8 +485,7 @@ def parse_args():
     parser.add_argument(
         "--device",
         default="GPU",
-        help="Device the INT8 scheme is tuned for, and the one --verify runs on "
-        "(default: GPU).",
+        help="Device the INT8 scheme is tuned for, and the one --verify runs on " "(default: GPU).",
     )
     parser.add_argument(
         "--verify",
