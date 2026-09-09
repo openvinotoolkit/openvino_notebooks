@@ -11,6 +11,7 @@ scipy==1.18.0; python_version >= "3.12"
 calflops==0.3.2
 transformers==5.13.0
 loguru==0.7.3
-matplotlib==3.11.0
+matplotlib==3.10.9; python_version < "3.11"
+matplotlib==3.11.0; python_version >= "3.11"
 openvino==2026.3.1
 nncf==3.3.0
