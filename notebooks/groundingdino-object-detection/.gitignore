@@ -1,0 +1,8 @@
+# OpenVINO IR models (generated at runtime)
+openvino_irs/
+# PyTorch checkpoint (~660 MB)
+checkpoints/
+# GroundingDINO Python repo (cloned at runtime)
+GroundingDINO/
+# Outputs
+outputs/
