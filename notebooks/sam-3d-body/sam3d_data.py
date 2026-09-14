@@ -8,10 +8,12 @@ This module is one of three helpers that back ``sam3dbody.ipynb``:
 ``sam3d_ov.py``      OpenVINO IR runtime (pure NumPy + OpenVINO)
 ===================  =========================================================
 
-**Fully standalone**: NumPy, OpenCV, Matplotlib, pyrender and trimesh only. The
-MHR-70 skeleton topology, the skeleton drawing and the mesh renderer are inlined
-here, so nothing outside this folder is imported. ``pyrender`` and ``trimesh``
-are loaded lazily, so importing this module stays cheap.
+**Standalone for data + metrics**: NumPy, OpenCV and Matplotlib. The MHR-70
+skeleton topology and the 2D skeleton drawing are inlined here. The 3D mesh
+renderer delegates to the ``sam_3d_body`` package's own ``Renderer`` (fetched at
+runtime by ``sam3d_torch``), so mesh rendering matches the reference
+implementation exactly; ``pyrender``/``trimesh`` are only needed when a mesh is
+actually rendered, so importing this module stays cheap.
 """
 
 from __future__ import annotations
@@ -301,31 +303,6 @@ def draw_2d_keypoints(
 LIGHT_BLUE = (0.65098039, 0.74117647, 0.85882353)
 
 
-def _raymond_lights():
-    """Three directional lights in the standard Raymond rig."""
-    import pyrender
-
-    thetas = np.pi * np.array([1.0 / 6.0, 1.0 / 6.0, 1.0 / 6.0])
-    phis = np.pi * np.array([0.0, 2.0 / 3.0, 4.0 / 3.0])
-
-    nodes = []
-    for phi, theta in zip(phis, thetas):
-        z = np.array([np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), np.cos(theta)])
-        z = z / np.linalg.norm(z)
-        x = np.array([-z[1], z[0], 0.0])
-        if np.linalg.norm(x) == 0:
-            x = np.array([1.0, 0.0, 0.0])
-        x = x / np.linalg.norm(x)
-        y = np.cross(z, x)
-
-        matrix = np.eye(4)
-        matrix[:3, :3] = np.c_[x, y, z]
-        nodes.append(pyrender.Node(
-            light=pyrender.DirectionalLight(color=np.ones(3), intensity=1.0), matrix=matrix
-        ))
-    return nodes
-
-
 def render_mesh(
     img_bgr: np.ndarray,
     vertices: np.ndarray,
@@ -339,47 +316,30 @@ def render_mesh(
 ) -> np.ndarray:
     """Composite the posed mesh over ``img_bgr`` with a pinhole camera.
 
-    Returns a BGR float image in ``[0, 1]``.
+    Delegates to the ``sam_3d_body`` package's own ``Renderer`` so the mesh
+    visualization matches the reference implementation exactly. Returns a BGR
+    float image in ``[0, 1]``.
     """
-    import pyrender
-    import trimesh
+    try:
+        from sam_3d_body.visualization.renderer import Renderer
+    except ModuleNotFoundError as exc:
+        raise RuntimeError(
+            "Mesh rendering needs the 'sam_3d_body' package, which is fetched at "
+            "runtime. Load the model first (sam3d_torch.Sam3DBodyTorch) so the "
+            "package is on the path, then render."
+        ) from exc
 
     vertices, cam_t, faces = to_numpy(vertices), to_numpy(cam_t), to_numpy(faces)
-    image = img_bgr.astype(np.float32) / 255.0
-    h, w = image.shape[:2]
-
-    mesh = trimesh.Trimesh(vertices.copy(), faces.copy())
-    if side_view:
-        mesh.apply_transform(trimesh.transformations.rotation_matrix(np.radians(rot_angle), [0, 1, 0]))
-    # The model's camera frame is y-down relative to pyrender's.
-    mesh.apply_transform(trimesh.transformations.rotation_matrix(np.radians(180), [1, 0, 0]))
-
-    material = pyrender.MetallicRoughnessMaterial(
-        metallicFactor=0.0,
-        alphaMode="OPAQUE",
-        baseColorFactor=(mesh_base_color[2], mesh_base_color[1], mesh_base_color[0], 1.0),
+    renderer = Renderer(focal_length=focal_length, faces=faces)
+    return renderer(
+        vertices,
+        cam_t,
+        img_bgr,
+        side_view=side_view,
+        rot_angle=rot_angle,
+        mesh_base_color=mesh_base_color,
+        scene_bg_color=scene_bg_color,
     )
-    scene = pyrender.Scene(bg_color=[*scene_bg_color, 0.0], ambient_light=(0.3, 0.3, 0.3))
-    scene.add(pyrender.Mesh.from_trimesh(mesh, material=material), "mesh")
-
-    camera_pose = np.eye(4)
-    camera_pose[:3, 3] = cam_t * np.array([-1.0, 1.0, 1.0])
-    scene.add(
-        pyrender.IntrinsicsCamera(fx=focal_length, fy=focal_length, cx=w / 2.0, cy=h / 2.0, zfar=1e12),
-        pose=camera_pose,
-    )
-    for node in _raymond_lights():
-        scene.add_node(node)
-
-    renderer = pyrender.OffscreenRenderer(viewport_height=h, viewport_width=w)
-    try:
-        color, _ = renderer.render(scene, flags=pyrender.RenderFlags.RGBA)
-    finally:
-        renderer.delete()
-
-    color = color.astype(np.float32) / 255.0
-    alpha = color[:, :, -1][:, :, None]
-    return color[:, :, :3] * alpha + (1 - alpha) * image
 
 
 def render_3d_mesh(img_bgr, vertices, cam_t, focal_length, faces) -> Tuple[np.ndarray, np.ndarray]:

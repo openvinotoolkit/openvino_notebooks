@@ -26,6 +26,8 @@ openvino>=2025.0           # GPU plugin, GridSample opset9, INFERENCE_PRECISION_
 nncf>=2.14                 # weight-only INT8 compression used by ov_export.py
 
 # --- SAM 3D Body model dependencies ------------------------------------------
+# These are imported by the `sam_3d_body` package, which is fetched at runtime
+# from the official GitHub repo (see sam3d_torch.model_source_root / NOTICE).
 timm>=1.0                  # DINOv3 ViT-H/16+ backbone blocks
 einops>=0.8
 omegaconf>=2.3             # model_config.yaml parsing

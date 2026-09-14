@@ -61,26 +61,39 @@ def rotmat_to_euler_zyx_np(rotmat: np.ndarray) -> np.ndarray:
 
 
 def batch_xyz_from_6d_np(rot6d: np.ndarray) -> np.ndarray:
-    """Batch of 6D rotations -> XYZ Euler angles (matches ``batchXYZfrom6D``)."""
-    x_raw = rot6d[..., :3]
-    y_raw = rot6d[..., 3:6]
-    x = x_raw / (np.linalg.norm(x_raw, axis=-1, keepdims=True) + 1e-8)
-    z = np.cross(x, y_raw, axis=-1)
-    z = z / (np.linalg.norm(z, axis=-1, keepdims=True) + 1e-8)
-    y = np.cross(z, x, axis=-1)
-    matrix = np.stack([x, y, z], axis=-1)  # [..., 3, 3]
-    sy = np.sqrt(matrix[..., 0, 0] ** 2 + matrix[..., 1, 0] ** 2)
-    singular = (sy < 1e-6).astype(np.float32)
-    ex = np.arctan2(matrix[..., 2, 1], matrix[..., 2, 2])
-    ey = np.arctan2(-matrix[..., 2, 0], sy)
-    ez = np.arctan2(matrix[..., 1, 0], matrix[..., 0, 0])
-    exs = np.arctan2(-matrix[..., 1, 2], matrix[..., 1, 1])
-    eys = np.arctan2(-matrix[..., 2, 0], sy)
-    ezs = np.zeros_like(ez)
+    """Batch of 6D rotations -> XYZ intrinsic Euler angles.
+
+    The 6D input is the first two columns of a rotation matrix (Zhou et al.,
+    "On the Continuity of Rotation Representations in Neural Networks", CVPR
+    2019). We recover the orthonormal basis via Gram-Schmidt, then extract the
+    ZYX intrinsic angles with a gimbal-lock fallback (papagina/RotationContinuity,
+    tools.py). Returns ``[..., 3]`` as ``(x, y, z)``.
+    """
+    col_a = rot6d[..., 0:3]
+    col_b = rot6d[..., 3:6]
+    # Gram-Schmidt: a = normalize(col_a); c = normalize(a x col_b); b = c x a
+    a = col_a / (np.linalg.norm(col_a, axis=-1, keepdims=True) + 1e-8)
+    c = np.cross(a, col_b, axis=-1)
+    c = c / (np.linalg.norm(c, axis=-1, keepdims=True) + 1e-8)
+    b = np.cross(c, a, axis=-1)
+    # R = [a b c] as columns, so R[i, j] = col_j[i]
+    r00, r10, r20 = a[..., 0], a[..., 1], a[..., 2]
+    r01, r11, r21 = b[..., 0], b[..., 1], b[..., 2]
+    r02, r12, r22 = c[..., 0], c[..., 1], c[..., 2]
+    # ZYX intrinsic: R = Rz(z) Ry(y) Rx(x)
+    cos_y = np.sqrt(r00 * r00 + r10 * r10)
+    sing = (cos_y < 1e-6).astype(np.float32)
+    ax = np.arctan2(r21, r22)
+    ay = np.arctan2(-r20, cos_y)
+    az = np.arctan2(r10, r00)
+    # Gimbal-lock fallback (y ~ +/-90deg): x and z are coupled; set z = 0
+    ax_s = np.arctan2(-r12, r11)
+    ay_s = np.arctan2(-r20, cos_y)
+    az_s = np.zeros_like(az)
     return np.stack([
-        ex * (1 - singular) + exs * singular,
-        ey * (1 - singular) + eys * singular,
-        ez * (1 - singular) + ezs * singular,
+        ax * (1 - sing) + ax_s * sing,
+        ay * (1 - sing) + ay_s * sing,
+        az * (1 - sing) + az_s * sing,
     ], axis=-1)
 
 
@@ -191,7 +204,7 @@ def camera_project_2d(
     img_h: int,
     focal_length: float,
 ) -> np.ndarray:
-    """Full-perspective 3D -> 2D projection (matches the PyTorch ``PerspectiveHead``).
+    """Full-perspective 3D -> 2D projection (CLIFF/CameraHMR camera model).
 
     Args:
         j3d: ``[B, N, 3]`` 3D keypoints from MHR.
@@ -203,12 +216,12 @@ def camera_project_2d(
     Returns:
         ``[B, N, 2]`` keypoints in original-image pixel coordinates.
     """
-    cam_t = camera_translation(camera_params, bbox_center, bbox_scale_w, img_w, img_h, focal_length)
-    j3d_cam = j3d + cam_t[:, None, :]
-    z = j3d_cam[:, :, 2:3]
-    kps_2d_x = focal_length * j3d_cam[:, :, 0:1] / z + img_w / 2.0
-    kps_2d_y = focal_length * j3d_cam[:, :, 1:2] / z + img_h / 2.0
-    return np.concatenate([kps_2d_x, kps_2d_y], axis=-1)
+    t = camera_translation(camera_params, bbox_center, bbox_scale_w, img_w, img_h, focal_length)
+    p = j3d + t[:, None, :]
+    z = p[..., 2:3]
+    u = focal_length * p[..., 0:1] / z + img_w * 0.5
+    v = focal_length * p[..., 1:2] / z + img_h * 0.5
+    return np.concatenate([u, v], axis=-1)
 
 
 def camera_translation(
@@ -219,44 +232,57 @@ def camera_translation(
     img_h: int,
     focal_length: float,
 ) -> np.ndarray:
-    """Decoder camera params ``(s, tx, ty)`` -> full-frame translation ``[B, 3]``."""
-    s = -camera_params[:, 0]
-    tx = camera_params[:, 1]
-    ty = -camera_params[:, 2]
-    bs = bbox_scale_w * s + 1e-8
-    tz = 2.0 * focal_length / bs
-    cx_offset = 2.0 * (bbox_center[:, 0] - img_w / 2.0) / bs
-    cy_offset = 2.0 * (bbox_center[:, 1] - img_h / 2.0) / bs
-    return np.stack([tx + cx_offset, ty + cy_offset, tz], axis=-1)
+    """Decoder camera params ``(s, tx, ty)`` -> full-frame translation ``[B, 3]``.
+
+    The decoder predicts a weak-perspective camera ``(scale, x, y)`` in a
+    normalized frame (CLIFF/CameraHMR). We convert it to a full-frame
+    translation by negating the axes that differ between the two conventions,
+    then mapping the normalized scale to a depth via the focal length.
+    """
+    scale = -camera_params[:, 0]
+    shift_x = camera_params[:, 1]
+    shift_y = -camera_params[:, 2]
+    eff_size = bbox_scale_w * scale + 1e-8
+    depth = 2.0 * focal_length / eff_size
+    off_x = 2.0 * (bbox_center[:, 0] - img_w * 0.5) / eff_size
+    off_y = 2.0 * (bbox_center[:, 1] - img_h * 0.5) / eff_size
+    return np.stack([shift_x + off_x, shift_y + off_y, depth], axis=-1)
 
 
 def _bbox_to_square_scale(bbox: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    """Bbox ``[x1,y1,x2,y2]`` -> ``(center[2], square_scale[2])`` (GetBBoxCenterScale)."""
+    """Bbox ``[x1,y1,x2,y2]`` -> ``(center[2], square_scale[2])``.
+
+    HRNet/TopDown convention: center is the midpoint, scale is the padded
+    extent, expanded to a fixed w/h aspect ratio (0.75) and then to a square.
+    """
     x1, y1, x2, y2 = bbox
-    center = np.array([(x1 + x2) / 2.0, (y1 + y2) / 2.0], dtype=np.float32)
-    scale = np.array([(x2 - x1) * BBOX_PADDING, (y2 - y1) * BBOX_PADDING], dtype=np.float32)
-    # Fix aspect ratio: first to 0.75 (w/h), then square.
-    w_s, h_s = scale[0], scale[1]
-    if w_s > h_s * 0.75:
-        scale = np.array([w_s, w_s / 0.75], dtype=np.float32)
+    center = np.array([(x1 + x2) * 0.5, (y1 + y2) * 0.5], dtype=np.float32)
+    w = (x2 - x1) * BBOX_PADDING
+    h = (y2 - y1) * BBOX_PADDING
+    # Expand to w/h = 0.75 (keep the larger dimension, grow the smaller).
+    if w > h * 0.75:
+        w2, h2 = w, w / 0.75
     else:
-        scale = np.array([h_s * 0.75, h_s], dtype=np.float32)
-    max_dim = max(scale[0], scale[1])
-    return center, np.array([max_dim, max_dim], dtype=np.float32)
+        w2, h2 = h * 0.75, h
+    m = max(w2, h2)
+    return center, np.array([m, m], dtype=np.float32)
 
 
 def _affine_warp_matrix(center: np.ndarray, scale: np.ndarray, input_size: int = INPUT_SIZE) -> np.ndarray:
-    """Affine matrix mapping the padded bbox onto an ``input_size`` square (TopdownAffine)."""
-    src_dir = np.array([0.0, scale[0] * -0.5], dtype=np.float32)
-    dst_dir = np.array([0.0, float(input_size) * -0.5], dtype=np.float32)
+    """Affine matrix mapping the padded bbox onto an ``input_size`` square.
+
+    TopDown (HRNet) convention: map the bbox center to the output center and
+    the bbox half-width to the output half-width, using three point pairs
+    (the third is the 90-degree rotation of the first two).
+    """
     src = np.zeros((3, 2), dtype=np.float32)
     src[0] = center
-    src[1] = center + src_dir
+    src[1] = center + np.array([0.0, -scale[0] * 0.5], dtype=np.float32)
     src[2] = np.array([src[0, 0] - (src[1, 1] - src[0, 1]),
                        src[0, 1] + (src[1, 0] - src[0, 0])], dtype=np.float32)
     dst = np.zeros((3, 2), dtype=np.float32)
     dst[0] = [input_size * 0.5, input_size * 0.5]
-    dst[1] = dst[0] + dst_dir
+    dst[1] = dst[0] + np.array([0.0, -input_size * 0.5], dtype=np.float32)
     dst[2] = np.array([dst[0, 0] - (dst[1, 1] - dst[0, 1]),
                        dst[0, 1] + (dst[1, 0] - dst[0, 0])], dtype=np.float32)
     return cv2.getAffineTransform(src, dst)

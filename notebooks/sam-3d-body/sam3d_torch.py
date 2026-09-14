@@ -10,10 +10,18 @@ map). Two responsibilities:
    re-implementation of the MHR head that *is* exportable.
 
 Both need the ``sam_3d_body`` package \u2014 the network definition the checkpoint's
-weights are loaded into. A copy ships in this folder, so nothing outside it is
-ever imported and the whole directory can be moved elsewhere as a unit.
-``sam3d_data.py`` and ``sam3d_ov.py`` do not touch it at all, so the OpenVINO
-half runs without the model source.
+weights are loaded into. That package is Meta's code under the SAM License, so it
+is *not* redistributed with these helpers: :func:`model_source_root` fetches it
+from the official GitHub repository at runtime (into the root folder, beside
+these helpers) and adds it to ``sys.path``. ``sam3d_data.py`` and ``sam3d_ov.py``
+do not touch it at
+all, so the OpenVINO half runs without the model source.
+
+The checkpoint's state dict intentionally omits a few parameters the model
+initialises from other sources (the MHR TorchScript weights, a derived hand
+matrix, and a DINOv3 mask token). :func:`load_sam_3d_body_with_injection`
+re-applies that reconciliation here so the pristine, unmodified package is used
+as-is.
 
 Inference and export target different devices, so the device shims are applied
 on demand rather than at import time. Run the export in a **separate process**:
@@ -53,13 +61,108 @@ DEFAULT_CHECKPOINT = str(CHECKPOINT_DIR / "model.ckpt")
 DEFAULT_MHR_PATH = str(CHECKPOINT_DIR / "assets" / "mhr_model.pt")
 DEFAULT_OUTPUT_DIR = str(HERE / "ov_models")
 
+#: The ``sam_3d_body`` package is Meta's network definition, distributed under
+#: the SAM License. It is *not* vendored with these helpers; it is fetched at
+#: runtime from the official repository into the root folder (``<here>``),
+#: directly beside these helpers, so ``<here>/sam_3d_body`` is importable.
+SAM3D_REPO_URL = "https://github.com/facebookresearch/sam-3d-body"
+SAM3D_TARBALL_URL = SAM3D_REPO_URL + "/archive/refs/heads/main.tar.gz"
 
-def model_source_root(start=None) -> Path:
+
+def _download_sam3d_package(root: Path) -> Path:
+    """Fetch the ``sam_3d_body`` package into ``root``; return ``root``.
+
+    The official repository is not pip-installable, so the source is fetched at
+    runtime. The primary path is a *sparse, shallow* git clone that downloads
+    only the ``sam_3d_body/`` package (~1 MB) rather than the whole repo
+    (~20 MB of demo ``assets/``, notebooks, and data). If git is unavailable or
+    the sparse clone fails, it falls back to the whole-repo tarball and
+    extracts only the package. The package is placed directly in ``root``
+    (beside these helpers) so ``<root>/sam_3d_body`` is importable, and the
+    download happens at most once per machine.
+    """
+    import shutil
+    import subprocess
+    import tempfile
+
+    pkg_dir = root / "sam_3d_body"
+
+    if shutil.which("git") is not None:
+        # Clone into an isolated temp dir (git refuses a non-empty destination),
+        # then move only the package into the root. This keeps the helper files
+        # in the root untouched.
+        tmp_dir = Path(tempfile.mkdtemp(prefix=".sam3d-clone-"))
+        try:
+            print(f"[sam3d_torch] Sparse-cloning sam_3d_body package from {SAM3D_REPO_URL}")
+            subprocess.run(
+                [
+                    "git", "clone", "--depth", "1", "--filter=blob:none", "--sparse",
+                    SAM3D_REPO_URL, str(tmp_dir),
+                ],
+                check=True, capture_output=True, text=True, timeout=300,
+            )
+            subprocess.run(
+                ["git", "-C", str(tmp_dir), "sparse-checkout", "set", "sam_3d_body"],
+                check=True, capture_output=True, text=True, timeout=120,
+            )
+            cloned_pkg = tmp_dir / "sam_3d_body"
+            if (cloned_pkg / "__init__.py").exists():
+                if pkg_dir.exists():
+                    shutil.rmtree(pkg_dir)
+                shutil.move(str(cloned_pkg), str(pkg_dir))
+                return root
+            print("[sam3d_torch] Sparse clone incomplete; falling back to tarball.")
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+            print(f"[sam3d_torch] Sparse clone failed ({exc}); falling back to tarball.")
+        finally:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    # Fallback: whole-repo tarball, extract only the package into the root.
+    import tarfile
+    import urllib.request
+
+    tarball = root / "sam-3d-body.tar.gz"
+    print(f"[sam3d_torch] Downloading sam_3d_body package from {SAM3D_TARBALL_URL}")
+    with urllib.request.urlopen(SAM3D_TARBALL_URL, timeout=180) as response, open(tarball, "wb") as handle:
+        handle.write(response.read())
+
+    with tarfile.open(tarball, "r:gz") as tar:
+        members = tar.getmembers()
+        # The tarball is rooted at a single top-level dir (e.g. "sam-3d-body-main");
+        # derive it from the first member so branch/tag tarballs both work.
+        prefix = members[0].name.split("/", 1)[0]
+        pkg_prefix = f"{prefix}/sam_3d_body"
+        pkg_members = [m for m in members if m.name == pkg_prefix or m.name.startswith(pkg_prefix + "/")]
+        if not pkg_members:
+            raise RuntimeError(f"Downloaded tarball did not contain a sam_3d_body package under {prefix}/")
+        # Re-root the package members at <root>/sam_3d_body/... so the package
+        # lands directly in the root folder.
+        for member in pkg_members:
+            member.name = "sam_3d_body" + member.name[len(pkg_prefix):]
+        try:
+            tar.extractall(root, members=pkg_members, filter="data")
+        except TypeError:  # Python < 3.11.4 has no `filter` argument
+            tar.extractall(root, members=pkg_members)
+
+    if tarball.exists():
+        tarball.unlink()  # keep only the extracted package, not the raw tarball
+
+    if not (pkg_dir / "__init__.py").exists():
+        raise RuntimeError(f"Downloaded package did not contain sam_3d_body under {root}")
+    return root
+
+
+def model_source_root(start=None, download: bool = True) -> Path:
     """Locate the ``sam_3d_body`` package and make it importable.
 
-    Prefers the copy vendored next to these helpers so the folder stays
-    portable, then falls back to a parent checkout. ``SAM3D_MODEL_SRC``
-    overrides both.
+    Resolution order:
+      1. ``SAM3D_MODEL_SRC`` env var (an explicit checkout).
+      2. A checkout next to these helpers or in a parent directory.
+      3. A copy fetched at runtime from the official GitHub repo, placed in
+         the root folder beside these helpers.
+
+    The package is Meta's code under the SAM License; it is fetched on demand
+    rather than redistributed with these helpers.
     """
     env_root = os.environ.get("SAM3D_MODEL_SRC")
     if env_root:
@@ -74,16 +177,116 @@ def model_source_root(start=None) -> Path:
                 sys.path.insert(0, str(candidate))
             return candidate
 
+    if download:
+        fetched = _download_sam3d_package(HERE)
+        if str(fetched) not in sys.path:
+            sys.path.insert(0, str(fetched))
+        return fetched
+
     raise RuntimeError(
-        "Could not locate the 'sam_3d_body' package. It normally ships beside these "
-        "helpers; set SAM3D_MODEL_SRC to point at a checkout instead."
+        "Could not locate the 'sam_3d_body' package and download was disabled. "
+        "Set SAM3D_MODEL_SRC to point at a checkout, or place a checkout beside "
+        "these helpers."
     )
 
 
 #: Kept so notebooks written against the earlier name keep working.
 find_repo_root = model_source_root
 
-MODEL_SRC = model_source_root()
+
+# ===========================================================================
+# Checkpoint loading (with key reconciliation)
+# ===========================================================================
+# The released checkpoint predates three parameters the model now initialises
+# from other sources, so a plain ``load_state_dict`` would report them missing:
+#
+#   1. ``*.mhr.*``                 MHR TorchScript weights, loaded from
+#                                  ``mhr_path`` inside ``MHRHead.__init__``.
+#   2. ``*.hand_pose_comps_ori``   a clone of ``hand_pose_comps`` made after MHR
+#                                  loads; the parameter was added after the
+#                                  checkpoint was saved.
+#   3. ``backbone.encoder.mask_token``
+#                                  added by the DINOv3 hub after the checkpoint
+#                                  was saved; the hub zeroes it in init.
+#
+# The values the model computes for these are already correct, so we copy them
+# into the state dict before loading. This lives here (not in the package) so
+# the fetched ``sam_3d_body`` source stays pristine and unmodified.
+
+_EXPECTED_MISSING_PATTERNS = (
+    ".mhr.",
+    ".hand_pose_comps_ori",
+    "backbone.encoder.mask_token",
+)
+
+
+def load_sam_3d_body_with_injection(checkpoint_path: str, device: str = "cpu", mhr_path: str = ""):
+    """Load the SAM 3D Body model, reconciling the checkpoint's missing keys.
+
+    Equivalent to the package's ``load_sam_3d_body`` plus the key-injection
+    step described above, so the unmodified package is used as-is.
+    """
+    model_source_root()
+    from sam_3d_body.models.meta_arch import SAM3DBody
+    from sam_3d_body.utils.config import get_config
+    from sam_3d_body.utils.checkpoint import load_state_dict
+
+    print("Loading SAM 3D Body model...")
+
+    # The model config lives next to the checkpoint (or one level up).
+    model_cfg = os.path.join(os.path.dirname(checkpoint_path), "model_config.yaml")
+    if not os.path.exists(model_cfg):
+        model_cfg = os.path.join(
+            os.path.dirname(os.path.dirname(checkpoint_path)), "model_config.yaml"
+        )
+    model_cfg = get_config(model_cfg)
+
+    model_cfg.defrost()
+    model_cfg.MODEL.MHR_HEAD.MHR_MODEL_PATH = mhr_path
+    model_cfg.freeze()
+
+    model = SAM3DBody(model_cfg)
+
+    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+    state_dict = checkpoint["state_dict"] if "state_dict" in checkpoint else checkpoint
+
+    model_init_state = model.state_dict()
+    injected_keys = []
+    for key, val in model_init_state.items():
+        if key not in state_dict and any(pat in key for pat in _EXPECTED_MISSING_PATTERNS):
+            state_dict[key] = val.clone()
+            injected_keys.append(key)
+
+    if injected_keys:
+        mhr_count = sum(1 for k in injected_keys if ".mhr." in k)
+        non_mhr = [k for k in injected_keys if ".mhr." not in k]
+        print(
+            f"[load_sam_3d_body] Injected {len(injected_keys)} model-initialised keys "
+            f"(not in main checkpoint by design):\n"
+            f"  - {mhr_count} MHR TorchScript params  (source: {mhr_path or 'mhr_path'})\n"
+            + "".join(f"  - {k}\n" for k in non_mhr)
+        )
+
+    load_state_dict(model, state_dict, strict=False)
+
+    # Flag any genuinely unexpected mismatch (should be none).
+    checkpoint_keys = set(state_dict.keys()) - set(injected_keys)
+    model_keys = set(model_init_state.keys())
+    unmatched_ckpt = checkpoint_keys - model_keys
+    unmatched_model = (model_keys - checkpoint_keys) - set(injected_keys)
+    if unmatched_ckpt:
+        print(f"[load_sam_3d_body] WARNING: {len(unmatched_ckpt)} unexpected checkpoint keys:\n  "
+              + "\n  ".join(sorted(unmatched_ckpt)))
+    if unmatched_model:
+        print(f"[load_sam_3d_body] WARNING: {len(unmatched_model)} model params not in checkpoint "
+              f"and not expected-missing:\n  " + "\n  ".join(sorted(unmatched_model)))
+    if not unmatched_ckpt and not unmatched_model:
+        print(f"[load_sam_3d_body] All {len(checkpoint_keys)} checkpoint keys matched model "
+              f"parameters ({len(injected_keys)} supplied by model initialisation).")
+
+    model = model.to(device)
+    model.eval()
+    return model, model_cfg
 
 
 # ===========================================================================
@@ -187,10 +390,10 @@ class Sam3DBodyTorch:
         self.device = resolve_device(device)
         enable_device_patches(self.device)
 
-        from sam_3d_body import load_sam_3d_body, SAM3DBodyEstimator
+        from sam_3d_body import SAM3DBodyEstimator
 
         print(f"[Sam3DBodyTorch] Device: {self.device}")
-        self.model, self.model_cfg = load_sam_3d_body(
+        self.model, self.model_cfg = load_sam_3d_body_with_injection(
             checkpoint_path, device=self.device, mhr_path=mhr_path
         )
         self.estimator = SAM3DBodyEstimator(
@@ -696,9 +899,9 @@ def _export(module: nn.Module, example_inputs, output_dir, name: str, precision:
 def load_reference_model(checkpoint_path: str, mhr_path: str):
     """Load the full SAM 3D Body model on CPU, ready for tracing."""
     enable_device_patches("cpu")
-    from sam_3d_body.build_models import load_sam_3d_body
-
-    model, _ = load_sam_3d_body(checkpoint_path=checkpoint_path, device="cpu", mhr_path=mhr_path)
+    model, _ = load_sam_3d_body_with_injection(
+        checkpoint_path=checkpoint_path, device="cpu", mhr_path=mhr_path
+    )
     return model.eval().float()
 
 

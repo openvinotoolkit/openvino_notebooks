@@ -1,6 +1,6 @@
 {
   "source": "COCO val2017 (person_keypoints_val2017.json)",
-  "licence": "COCO images are released under a CC BY 4.0 licence; see https://cocodataset.org/#termsofuse",
+  "licence": "COCO annotations are CC BY 4.0. The COCO Consortium does not own the image copyright; image use is governed by the Flickr Terms of Use (each image's individual Flickr licence). See https://cocodataset.org/#termsofuse",
   "image_url": "http://images.cocodataset.org/val2017/000000368212.jpg",
   "image_id": 368212,
   "file_name": "000000368212.jpg",

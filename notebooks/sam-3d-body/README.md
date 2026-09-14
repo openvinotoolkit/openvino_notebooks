@@ -29,6 +29,7 @@ DINOv3-H+ checkpoints published by the SAM 3D Body authors on the Hugging Face H
 
 - One-time conda environment setup (`sam3dbody-nb`), guarded so it never re-runs by default.
 - Device discovery for OpenVINO and PyTorch, plus a single configuration cell for all knobs.
+- Fetch the `sam_3d_body` package from the official GitHub repo into the root folder (skipped if present).
 - Download the gated SAM 3D Body checkpoint into `checkpoints/` (skipped if present).
 - Load the bundled COCO sample and draw the ground-truth box and keypoints.
 - Run the PyTorch reference on CPU or XPU and record PCK@0.05 and latency.
@@ -43,6 +44,7 @@ goes straight to inference and prints what it skipped:
 
 | folder           | contents                                                       | re-run behaviour              |
 | ---------------- | -------------------------------------------------------------- | ----------------------------- |
+| `sam_3d_body/` | the `sam_3d_body` package, fetched from the official GitHub repo | download skipped if present   |
 | `checkpoints/` | SAM 3D Body PyTorch weights (`model.ckpt`, `mhr_model.pt`) | download skipped if present   |
 | `sample_data/` | the demo image and its ground-truth annotation                 | download skipped if present   |
 | `ov_models/`   | `fp16/`, `int8/` OpenVINO IRs                              | conversion skipped if present |
@@ -65,7 +67,7 @@ conda activate sam3dbody-nb
 # CPU-only PyTorch (default):
 pip install -r requirements.txt
 
-# Intel XPU PyTorch (only if you have an Intel Arc GPU):
+# Intel XPU PyTorch (if you have an Intel Arc GPU):
 pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/xpu
 
 python -m ipykernel install --user --name sam3dbody-nb --display-name "Python (sam3dbody-nb)"
@@ -88,7 +90,7 @@ notebooks/
 ├── sam3d_ov.py            # OpenVINO IR runtime
 ├── sam3d_torch.py         # PyTorch reference inference + PyTorch → OpenVINO export
 ├── requirements.txt       # pinned dependencies
-├── sam_3d_body/           # model source (network definitions only)
+├── sam_3d_body/           # the sam_3d_body package (downloaded on first run)
 ├── checkpoints/           # reference checkpoint (downloaded on first run)
 │   └── sam-3d-body-dinov3/
 │       ├── model.ckpt     #   2.0 GB
@@ -108,8 +110,8 @@ All knobs live in the *Configuration* cell:
 | `TORCH_DEVICE`  | `"cpu"`            | PyTorch reference backend:`"cpu"` or `"xpu"` (needs a torch+xpu build) |
 | `OV_DEVICE`     | `"GPU"`            | OpenVINO target device; falls back to`"CPU"` if not found                |
 | `PRECISIONS`    | `["fp16", "int8"]` | IR precisions to export and evaluate                                       |
-| `PCK_THRESHOLD` | `0.05`             | PCK tolerance as a fraction of the GT bbox diagonal (paper protocol)       |
-| `FORCE_EXPORT`  | `False`            | `True` re-exports the IR even if it already exists (slow)                |
+| `PCK_THRESHOLD` | `0.05`             | PCK tolerance as a fraction of the GT bbox diagonal       |
+| `FORCE_EXPORT`  | `False`            | `True` re-exports the IR even if it already exists                |
 | `SAMPLE_NAME`   | `"000000368212"`   | Bundled sample to evaluate                                                 |
 
 ## Exporting the OpenVINO IR

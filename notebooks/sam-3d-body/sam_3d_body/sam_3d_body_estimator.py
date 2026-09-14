@@ -38,12 +38,12 @@ class SAM3DBodyEstimator:
         # For mesh visualization
         self.faces = self.model.head_pose.faces.cpu().numpy()
 
-        # if self.detector is None:
-        #     print("No human detector is used...")
-        # if self.sam is None:
-        #     print("Mask-condition inference is not supported...")
-        # if self.fov_estimator is None:
-        #     print("No FOV estimator... Using the default FOV!")
+        if self.detector is None:
+            print("No human detector is used...")
+        if self.sam is None:
+            print("Mask-condition inference is not supported...")
+        if self.fov_estimator is None:
+            print("No FOV estimator... Using the default FOV!")
 
         self.transform = Compose(
             [
