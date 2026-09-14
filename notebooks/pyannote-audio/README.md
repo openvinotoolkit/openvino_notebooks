@@ -1,58 +1,37 @@
-# Speaker Diarization Enablement (PyTorch + OpenVINO)
+# Speaker Diarization with pyannote and OpenVINO™
 
-This folder enables and benchmarks the pyannote speaker-diarization pipeline
-(`pyannote/speaker-diarization-community-1` with `pyannote/segmentation-3.0`)
-across CPU, Intel XPU, and OpenVINO (CPU/GPU) backends on the VoxConverse dataset.
+Speaker diarization answers the question *"who spoke when?"* by partitioning a recording into speech segments and assigning each segment to a speaker, without knowing the speakers in advance. It is a common building block for meeting transcription, call-center analytics, and preparing training data for speech models.
 
-## What was enabled
+This notebook uses the open-source [`pyannote/speaker-diarization-community-1`](https://huggingface.co/pyannote/speaker-diarization-community-1) pipeline and accelerates it with OpenVINO. It is a modern replacement for the speaker-diarization notebook that was deprecated in 2024, based on the newer `community-1` pipeline.
 
-- **PyTorch CPU** — baseline diarization on CPU (`diar_cpu`).
-- **PyTorch XPU** — diarization on Intel GPU via the XPU PyTorch build (`diar_xpu`).
-- **OpenVINO CPU** — diarization using exported OpenVINO IR on CPU (`diar_ov`).
-- **OpenVINO GPU** — same OpenVINO IR running on the Intel iGPU (`diar_ov`), in **FP16**.
+The pipeline has three stages:
 
-The two heavy neural blocks (segmentation and speaker embedding) are exported to
-OpenVINO IR (`.xml` / `.bin`); the runtime picks a dynamic/static shape strategy
-automatically per device.
+- **segmentation** ([`pyannote/segmentation-3.0`](https://huggingface.co/pyannote/segmentation-3.0), a PyanNet model) — detects speech and overlapped speech,
+- **speaker embedding** (a WeSpeaker ResNet34 model) — turns speech into speaker vectors,
+- **clustering** — groups the vectors into speakers.
 
-## Precision
+The two heavy neural blocks (segmentation and the embedding ResNet) are converted to OpenVINO IR and run on the OpenVINO device you select (CPU or GPU), while pyannote keeps orchestrating windowing and clustering in Python.
 
-- The exported IR weights are stored in **FP16** (`ov.save_model` default `compress_to_fp16=True`).
-- On **GPU**, inference runs in **FP16** (OpenVINO's default inference precision for Intel GPUs).
-- On **CPU**, inference runs in FP32 (weights are decompressed at load time).
+> **Note:** `pyannote/speaker-diarization-community-1` is a gated model. Before running the notebook, accept the user conditions for both [`pyannote/speaker-diarization-community-1`](https://huggingface.co/pyannote/speaker-diarization-community-1) and [`pyannote/segmentation-3.0`](https://huggingface.co/pyannote/segmentation-3.0) on Hugging Face and log in with a *Read* access token.
 
-## Accuracy
+## Notebook Contents
 
-- Full VoxConverse (test) DER: originally committed **11.2%**, currently observed **8.3%**.
+The [pyannote-audio](pyannote-audio.ipynb) notebook demonstrates the end-to-end enablement flow for the pyannote diarization pipeline with OpenVINO.
 
-## What this provides
+The tutorial consists of the following steps:
 
-- One-command diarization on a single file per backend.
-- Short 80–100 second per-file latency benchmarks.
-- Full VoxConverse DER (Diarization Error Rate) scoring per backend.
-- A consolidated notebook (`inference.ipynb`) that runs the full workflow:
-  environment setup, Hugging Face access, dataset download, IR export, smoke
-  tests, benchmarks, and DER scoring.
+- Install prerequisites and authenticate with Hugging Face
+- Load the diarization pipeline and run a PyTorch baseline on a sample audio file
+- Convert the segmentation and speaker-embedding blocks to OpenVINO IR
+- Select an inference device and run the OpenVINO-accelerated pipeline on CPU or GPU
+- *(Optional)* Run the pipeline on an Intel GPU through PyTorch's XPU backend
+- *(Optional)* Measure the Diarization Error Rate (DER) on the [VoxConverse](https://github.com/joonson/voxconverse) test set
 
-## Key files
+The optional Intel XPU and full VoxConverse benchmark sections are disabled by default and are skipped automatically on machines that do not have the required hardware, so the notebook stays cross-platform and CI-friendly.
 
-| File | Purpose |
-|---|---|
-| `inference.ipynb` | End-to-end notebook covering all backends |
-| `BKM_VOXCONVERSE_DIARIZATION.md` | Step-by-step runbook |
-| `export_pyann.py` | Exports the diarization models to OpenVINO IR |
-| `run_diarization.py` | PyTorch CPU/XPU single-file diarization |
-| `run_diarization_ov.py` | OpenVINO CPU/GPU single-file diarization |
-| `run_file_benchmark.sh` | Per-file latency benchmark helper |
-| `score_der.py` | DER scoring on Debug or VoxConverse |
-| `diar_cpu.yaml` / `diar_xpu.yaml` / `diar_ov.yaml` | Conda environments per backend |
+## Installation instructions
 
-## Environments
-
-| Backend | Conda env |
-|---|---|
-| `cpu` | `diar_cpu` |
-| `xpu` | `diar_xpu` |
-| `ov-cpu`, `ov-gpu` | `diar_ov` |
-
-See `BKM_VOXCONVERSE_DIARIZATION.md` for the full setup and run instructions.
+This is a self-contained example that relies solely on its own code.</br>
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/pyannote-audio/README.md" />
