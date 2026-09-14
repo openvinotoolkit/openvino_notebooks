@@ -197,11 +197,13 @@ jobs:
           ls -la ${{ env.MOUNT_CACHE }}
 
       - name: Set cache environment variables
+        if: ${{ env.TEST_DEVICE != 'gpu' }}
         run: |
           python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("${{ env.MOUNT_CACHE }}", "PaddleGAN"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
           echo HUB_HOME=${{ env.MOUNT_CACHE }}/.paddlehub >> $GITHUB_ENV
 
       - name: Prepare CT files for ct-segmentation-quantize
+        if: ${{ env.TEST_DEVICE != 'gpu' }}
         run: |
           if [[ ! -f ${{ env.MOUNT_CACHE }}/case_00030.zip ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/case_00030.zip https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
@@ -214,6 +216,7 @@ jobs:
           mv case_00001 notebooks/ct-segmentation-quantize/kits19/kits19_frames
 
       - name: Prepare models for meter-reader and paddle-ocr-webcam
+        if: ${{ env.TEST_DEVICE != 'gpu' }}
         run: |
           if [[ ! -f "${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz" ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_det_model.tar.gz'
