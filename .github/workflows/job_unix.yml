@@ -96,6 +96,12 @@ jobs:
         if: ${{ env.TEST_DEVICE == 'gpu' }}
         run: update-ca-certificates
 
+      - name: Configure Python CA bundle
+        if: ${{ env.TEST_DEVICE == 'gpu' }}
+        run: |
+          echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> "$GITHUB_ENV"
+          echo "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" >> "$GITHUB_ENV"
+
       - name: Checkout repository
         uses: ababushk/checkout@dd591a6a2ac25618db4eda86e7e0d938f88cf01b # cherry_pick_retries
 
