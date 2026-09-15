@@ -191,6 +191,18 @@ jobs:
           should-setup-pip-paths: 'true'
           self-hosted-runner: 'true'
 
+      # actions/setup-python provides a shared-library CPython whose libpython
+      # only lives in the interpreter's LIBDIR. Cloned venvs (validate_notebooks.py
+      # --separate_venv) copy the interpreter and lose its RPATH, so libpython must
+      # be discoverable via LD_LIBRARY_PATH.
+      - name: Expose Python LIBDIR for cloned virtual environments
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          PYTHON_LIBDIR=$(python${{ inputs.python }} -c 'import sysconfig; print(sysconfig.get_config_var("LIBDIR"))')
+          echo "Python LIBDIR: ${PYTHON_LIBDIR}"
+          echo "LD_LIBRARY_PATH=${PYTHON_LIBDIR}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" >> "$GITHUB_ENV"
+
       - name: Create and check cache directory
         run: |
           mkdir -m 777 -p ${{ env.MOUNT_CACHE }}
