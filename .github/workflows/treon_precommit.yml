@@ -57,7 +57,6 @@ jobs:
         echo "docker_tag=$docker_tag" >> $GITHUB_OUTPUT
 
   build_treon_linux:
-    needs: get_docker_tag
     strategy:
       fail-fast: false
       matrix:
@@ -66,12 +65,11 @@ jobs:
     with:
       runner: '["aks-linux-8-cores-32gb"]'
       python: ${{ matrix.python }}
-      container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:${{ needs.get_docker_tag.outputs.docker_tag }}'
+      container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:pr-37751'
       test_only_changed: true
       separate_venv: true
 
   build_treon_igpu:
-    needs: get_docker_tag
     strategy:
       fail-fast: false
       matrix:
@@ -81,13 +79,12 @@ jobs:
       runner: '["self-hosted", "igpu", "Linux"]'
       runner-group: 'Intel-GPU'
       python: ${{ matrix.python }}
-      container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:${{ needs.get_docker_tag.outputs.docker_tag }}'
+      container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:pr-37751'
       options: '--group-add 44 --group-add 993 --device /dev/dri/renderD128:/dev/dri/renderD128'
       test_only_changed: false
       separate_venv: true
 
   build_treon_dgpu:
-    needs: get_docker_tag
     strategy:
       fail-fast: false
       matrix:
@@ -97,7 +94,7 @@ jobs:
       runner: '["self-hosted", "dgpu"]'
       runner-group: 'Intel-GPU'
       python: ${{ matrix.python }}
-      container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:${{ needs.get_docker_tag.outputs.docker_tag }}'
+      container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:pr-37751'
       options: '--group-add 44 --group-add 993 --device /dev/dri/card2:/dev/dri/card2 --device /dev/dri/renderD129:/dev/dri/renderD129'
       test_only_changed: false
       separate_venv: true
