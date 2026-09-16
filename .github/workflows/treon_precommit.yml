@@ -84,7 +84,7 @@ jobs:
       container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:${{ needs.get_docker_tag.outputs.docker_tag }}'
       options: '--group-add 44 --group-add 993 --device /dev/dri/renderD128:/dev/dri/renderD128'
       test_only_changed: false
-      separate_venv: false
+      separate_venv: true
 
   build_treon_dgpu:
     needs: get_docker_tag
@@ -100,7 +100,7 @@ jobs:
       container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:${{ needs.get_docker_tag.outputs.docker_tag }}'
       options: '--group-add 44 --group-add 993 --device /dev/dri/card2:/dev/dri/card2 --device /dev/dri/renderD129:/dev/dri/renderD129'
       test_only_changed: false
-      separate_venv: false
+      separate_venv: true
   
   build_treon_windows:
     strategy:
