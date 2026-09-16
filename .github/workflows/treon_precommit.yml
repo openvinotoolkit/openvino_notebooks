@@ -73,7 +73,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ['3.13']
+        python: ['3.11']
     uses: ./.github/workflows/job_unix.yml
     with:
       runner: '["self-hosted", "igpu", "Linux"]'
@@ -88,7 +88,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ['3.13']
+        python: ['3.11']
     uses: ./.github/workflows/job_unix.yml
     with:
       runner: '["self-hosted", "dgpu"]'
