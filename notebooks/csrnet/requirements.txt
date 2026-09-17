@@ -1,0 +1,15 @@
+# PyTorch is pulled from the official CPU wheel index.
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+openvino>=2024.4.0
+nncf>=2.13.0
+torch>=2.1
+torchvision
+scikit-image>=0.21
+matplotlib
+scipy
+opencv-python
+tqdm
+ipywidgets>=8
+requests
+gdown>=5.1.0
