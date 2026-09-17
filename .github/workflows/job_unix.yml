@@ -3,9 +3,15 @@ name: Build Treon Reusable Workflow
 on:
   workflow_call:
     inputs:
-      runs_on:
+      runner:
+        description: 'Runner labels as a JSON array string, e.g. ''["self-hosted", "igpu", "Linux"]'''
         required: true
         type: string
+      runner-group:
+        description: 'Runner group to select the runner from (leave empty for label-only runners)'
+        required: false
+        type: string
+        default: ''
       python:
         required: true
         type: string
@@ -13,6 +19,11 @@ on:
         required: true
         type: string
         default: null
+      options:
+        description: 'Docker options to use for the container, e.g. GPU device passthrough'
+        required: false
+        type: string
+        default: ''
       test_only_changed:
         required: false
         type: boolean
@@ -44,34 +55,55 @@ env:
   MOUNT_CACHE: /mount/testdata0/ov_notebooks
   # Allow NLTK to download data through the configured proxy (SSRF opt-in).
   NLTK_ALLOW_PROXIED_URLOPEN: "1"
+  NODE_EXTRA_CA_CERTS: /usr/local/share/ca-certificates/IntelProxyRootCA-Base64.crt
 
 
 jobs:
   build_treon:
-    runs-on: ${{ inputs.runs_on }}
+    runs-on: ${{ inputs['runner-group'] != '' && fromJSON(format('{{"group":"{0}","labels":{1}}}', inputs['runner-group'], inputs.runner)) || fromJSON(inputs.runner) }}
     defaults:
       run:
         shell: bash
     container:
       image: ${{ inputs.container }}
+      options: ${{ inputs.options }}
       volumes:
         - /mount:/mount
+        # Proxy root CA needed so git can clone over HTTPS on self-hosted GPU runners
+        - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro
     steps:
       - name: Set env variables
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
           script: |
-            const runsOn = "${{ inputs.runs_on }}";
-            const osName = runsOn.includes('linux') ? 'ubuntu-22.04' : runsOn.includes('mac') ? 'macos-13' : 'windows-2022';
-            const testDevice = runsOn === 'gpu' ? 'gpu' : 'cpu';
-            const testReportDir = `${testDevice}-${osName}-${{ inputs.python }}`;
+            const runner = `${{ inputs.runner }}`.toLowerCase();
+            const osName = runner.includes('mac') ? 'macos-13' : 'ubuntu-22.04';
+            let deviceTag = 'cpu';
+            let testDevice = 'cpu';
+            if (runner.includes('igpu')) { deviceTag = 'igpu'; testDevice = 'gpu'; }
+            else if (runner.includes('dgpu')) { deviceTag = 'dgpu'; testDevice = 'gpu'; }
+            else if (runner.includes('gpu')) { deviceTag = 'gpu'; testDevice = 'gpu'; }
+            const testReportDir = `${deviceTag}-${osName}-${{ inputs.python }}`;
             core.exportVariable('OS_NAME', osName);
             core.exportVariable('TEST_DEVICE', testDevice);
             core.exportVariable('TEST_REPORT_DIR', testReportDir);
             core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
 
+      # Add the proxy root CA (mounted at
+      # /usr/local/share/ca-certificates) to it before cloning over HTTPS,
+      # otherwise git fails with "server certificate verification failed"
+      - name: Add proxy CA certificate to system trust store
+        if: ${{ env.TEST_DEVICE == 'gpu' }}
+        run: update-ca-certificates
+
+      - name: Configure Python CA bundle
+        if: ${{ env.TEST_DEVICE == 'gpu' }}
+        run: |
+          echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> "$GITHUB_ENV"
+          echo "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" >> "$GITHUB_ENV"
+
       - name: Checkout repository
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        uses: ababushk/checkout@dd591a6a2ac25618db4eda86e7e0d938f88cf01b # cherry_pick_retries
 
       - name: Get changed files
         if: ${{ inputs.test_only_changed }}
@@ -165,17 +197,31 @@ jobs:
           should-setup-pip-paths: 'true'
           self-hosted-runner: 'true'
 
+      # actions/setup-python provides a shared-library CPython whose libpython
+      # only lives in the interpreter's LIBDIR. Cloned venvs (validate_notebooks.py
+      # --separate_venv) copy the interpreter and lose its RPATH, so libpython must
+      # be discoverable via LD_LIBRARY_PATH.
+      - name: Expose Python LIBDIR for cloned virtual environments
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          PYTHON_LIBDIR=$(python${{ inputs.python }} -c 'import sysconfig; print(sysconfig.get_config_var("LIBDIR"))')
+          echo "Python LIBDIR: ${PYTHON_LIBDIR}"
+          echo "LD_LIBRARY_PATH=${PYTHON_LIBDIR}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" >> "$GITHUB_ENV"
+
       - name: Create and check cache directory
         run: |
           mkdir -m 777 -p ${{ env.MOUNT_CACHE }}
           ls -la ${{ env.MOUNT_CACHE }}
 
       - name: Set cache environment variables
+        if: ${{ env.TEST_DEVICE != 'gpu' }}
         run: |
           python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("${{ env.MOUNT_CACHE }}", "PaddleGAN"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
           echo HUB_HOME=${{ env.MOUNT_CACHE }}/.paddlehub >> $GITHUB_ENV
 
       - name: Prepare CT files for ct-segmentation-quantize
+        if: ${{ env.TEST_DEVICE != 'gpu' }}
         run: |
           if [[ ! -f ${{ env.MOUNT_CACHE }}/case_00030.zip ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/case_00030.zip https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
@@ -188,6 +234,7 @@ jobs:
           mv case_00001 notebooks/ct-segmentation-quantize/kits19/kits19_frames
 
       - name: Prepare models for meter-reader and paddle-ocr-webcam
+        if: ${{ env.TEST_DEVICE != 'gpu' }}
         run: |
           if [[ ! -f "${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz" ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_det_model.tar.gz'

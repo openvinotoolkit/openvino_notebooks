@@ -55,12 +55,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs_on: [aks-linux-8-cores-32gb]
         python: ['3.10', '3.11', '3.12', '3.13']
         batch: ['batch_0', 'batch_1', 'batch_2']
     uses: ./.github/workflows/job_unix.yml
     with:
-      runs_on: ${{ matrix.runs_on }}
+      runner: '["aks-linux-8-cores-32gb"]'
       python: ${{ matrix.python }}
       test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 }}
       batch: ${{ matrix.batch }}
@@ -90,12 +89,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs_on: ['gpu']
         python: ['3.10', '3.11', '3.12', '3.13']
         container: ['ubuntu:20.04', 'ubuntu:22.04'] # Windows and macOS are not available in machine pool with GPU
     uses: ./.github/workflows/job_unix.yml
     with:
-      runs_on: ${{ matrix.runs_on }}
+      runner: '["self-hosted", "igpu", "Linux"]'
+      runner-group: 'Intel-GPU'
       python: ${{ matrix.python }}
       container: ${{ matrix.container }}
       ignore_list: .ci/tensorflow.txt
