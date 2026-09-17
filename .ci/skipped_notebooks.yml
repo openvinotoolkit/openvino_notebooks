@@ -51,12 +51,6 @@
         - windows-2022
     - python:
         - '3.13'
-- notebook: notebooks/freevc-voice-conversion/freevc-voice-conversion.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/stable-diffusion-xl/stable-diffusion-xl.ipynb
   skips:
     - os:
@@ -154,12 +148,6 @@
         - ubuntu-22.04
         - windows-2022
 - notebook: notebooks/stable-video-diffusion/stable-video-diffusion.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/llm-rag-llamaindex/llm-rag-llamaindex.ipynb
   skips:
     - os:
         - macos-13
