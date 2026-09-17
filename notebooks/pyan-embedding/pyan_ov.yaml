@@ -1,0 +1,32 @@
+# Copyright (C) 2018-2026 Intel Corporation
+# SPDX-License-Identifier: MIT
+#
+# Conda environment for ov_pyannote-embedding (CPU + OpenVINO GPU path).
+#
+# PyTorch here is the default build (CPU on this machine; no XPU support).
+# Use OpenVINO for Intel GPU acceleration:
+#   python infer_openvino.py samples/speakerA.wav samples/speakerB.wav --device GPU.1
+# For the PyTorch-on-Arc (XPU) path, use pyan_xpu.yaml instead.
+#
+# Create with:
+#   conda env create -f pyan_ov.yaml
+#   conda activate ov_pyan
+
+name: pyan_ov
+channels:
+ - conda-forge
+dependencies:
+ - python==3.11.15
+ - pip
+ - pip:
+   # Core
+   - pyannote.audio==4.0.7
+   - torch==2.12.1
+   - torchaudio==2.11.0
+   - openvino==2026.2.1
+   # Checkpoint loading (pyannote pickles omegaconf objects)
+   - omegaconf==2.3.1
+   # Audio I/O and resampling
+   - soundfile==0.14.0
+   - scipy==1.17.1
+   - numpy==2.4.6
