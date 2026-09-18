@@ -90,6 +90,7 @@ def parse_arguments():
     parser.add_argument("--keep_artifacts", action="store_true")
     parser.add_argument("--collect_reports", action="store_true")
     parser.add_argument("--move_notebooks_dir")
+    parser.add_argument("--notebooks_dir", default=ROOT/NOTEBOOKS_DIR)
     parser.add_argument("--job_name")
     parser.add_argument("--upload_to_db")
     parser.add_argument(
@@ -177,15 +178,14 @@ def prepare_test_plan(
     test_list: Optional[list[str]],
     ignore_config: str,
     ignore_list: Optional[list[str]],
-    nb_dir: Optional[Path] = None,
+    notebooks_dir: Optional[Path] = ROOT / NOTEBOOKS_DIR,
 ) -> TestPlan:
-    orig_nb_dir = ROOT / NOTEBOOKS_DIR
-    notebooks_dir = nb_dir or orig_nb_dir
+    notebooks_dir = notebooks_dir or ROOT / NOTEBOOKS_DIR
     notebooks: list[Path] = sorted(list([n for n in notebooks_dir.rglob("**/*.ipynb") if not n.name.startswith("test_")]))
 
     print(f"All notebooks: {notebooks}")
 
-    test_plan: TestPlan = {notebook.relative_to(notebooks_dir): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
+    test_plan: TestPlan = {Path(os.path.relpath(notebook, notebooks_dir)): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
 
     skip_config_file_path = Path(__file__).parents[0] / ignore_config
     ignored_notebooks = get_ignored_notebooks_from_yaml(validation_config, skip_config_file_path)
@@ -199,7 +199,7 @@ def prepare_test_plan(
                 # Ignored notebooks are provided as several items to `--ignore_list` argument
                 ignored_notebooks.append(Path(ignore_item))
     try:
-        ignored_notebooks = list(set(map(lambda n: n.relative_to(NOTEBOOKS_DIR), ignored_notebooks)))
+        ignored_notebooks = list(set(map(lambda n: Path(os.path.relpath(n, NOTEBOOKS_DIR)), ignored_notebooks)))
     except ValueError:
         raise ValueError(
             f"Ignore list items should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\nInvalid ignored notebooks: {ignored_notebooks}"
@@ -223,7 +223,7 @@ def prepare_test_plan(
                 if changed_file_path.suffix != ".ipynb":
                     continue
                 try:
-                    testing_notebook_path = changed_file_path.relative_to(NOTEBOOKS_DIR)
+                    testing_notebook_path = Path(os.path.relpath(changed_file_path, NOTEBOOKS_DIR))
                 except ValueError:
                     raise ValueError(
                         "Items in test list file should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\n"
@@ -238,7 +238,7 @@ def prepare_test_plan(
                 print(f"Warning: Skipping non-notebook file: {notebook_path}")
                 continue
             try:
-                testing_notebook_path = notebook_path.relative_to(NOTEBOOKS_DIR)
+                testing_notebook_path = Path(os.path.relpath(notebook_path, NOTEBOOKS_DIR))
             except ValueError:
                 raise ValueError(
                     "Items in test list should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\n" f"Invalid notebook path: {notebook_path}"
@@ -616,9 +616,9 @@ def run_test(
     os.environ["PIP_CACHE_DIR"] = str(notebook_path.parent / "pip_cache")
     os.environ["MPLCONFIGDIR"] = str(notebook_path.parent / "mpl_config")
     os.environ["DO_NOT_TRACK"] = "1"
-    print(f"RUN {notebook_path.relative_to(root)}", flush=True)
+    print(f"RUN {os.path.relpath(notebook_path, root)}", flush=True)
     try:
-        relative_path = notebook_path.relative_to(root)
+        relative_path = Path(os.path.relpath(notebook_path, root))
     except ValueError:
         # If notebook_path is not relative to root, use the notebook path as-is
         relative_path = notebook_path
@@ -781,7 +781,7 @@ def finalize_status(
     for notebook, status in test_plan.items():
         test_status = status["status"] or NotebookStatus.NOT_RUN
         try:
-            full_path_str = str(status["path"].relative_to(root))
+            full_path_str = str(os.path.relpath(status["path"], root))
         except (ValueError, TypeError):
             full_path_str = str(status["path"].absolute())
 
@@ -883,11 +883,12 @@ def main():
         cleanup_temp_venv_dirs()
 
     if notebooks_moving_dir is not None:
-        notebooks_moving_dir = Path(notebooks_moving_dir).absolute()
-        root = notebooks_moving_dir.parent
+        notebooks_dir = Path(notebooks_moving_dir).absolute()
         move_notebooks(notebooks_moving_dir)
     else:
-        notebooks_moving_dir = None
+        notebooks_dir = Path(args.notebooks_dir).absolute()
+
+    root = notebooks_dir.parent
 
     keep_artifacts = False
     if args.keep_artifacts:
@@ -902,7 +903,7 @@ def main():
         args.test_list,
         args.ignore_config,
         args.ignore_list,
-        notebooks_moving_dir,
+        notebooks_dir,
     )
 
     for notebook, report in test_plan.items():
