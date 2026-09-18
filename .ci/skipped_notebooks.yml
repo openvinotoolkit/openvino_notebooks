@@ -179,6 +179,11 @@
   skips:
     - os:
         - windows-2022
+- notebook: notebooks/vlajepa/vla-jepa.ipynb
+  skips:
+    - os:
+        - macos-13
+        - windows-2022
 - notebook: notebooks/hello-npu/hello-npu.ipynb
   skips:
     - device:
