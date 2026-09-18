@@ -284,7 +284,8 @@ def _convert_audio_tokenizer(
             for layer in self_.layers:
                 if output_hidden_states:
                     all_hidden = all_hidden + (hidden_states,)
-                hidden_states = layer(hidden_states, attention_mask=None)[0]
+                # transformers>=5.17 HubertEncoderLayer returns a bare tensor, not a tuple
+                hidden_states = layer(hidden_states, attention_mask=None)
             if output_hidden_states:
                 all_hidden = all_hidden + (hidden_states,)
             return BaseModelOutput(
