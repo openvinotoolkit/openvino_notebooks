@@ -19,7 +19,7 @@ This notebook demonstrates a model that has not been fully validated with OpenVI
 
 ## Notebook contents
 
-1. Install dependencies from the upstream Diffusers and Optimum Intel branches and the OpenVINO nightly wheel index
+1. Install dependencies from the upstream Diffusers and Optimum Intel branches and OpenVINO nightly builds, with a temporary cross-platform fallback to cached or manually downloaded OpenVINO GenAI main-branch artifacts
 2. Authenticate with Hugging Face and select export options
 3. Convert the model to OpenVINO IR
 4. Run text-to-image generation
