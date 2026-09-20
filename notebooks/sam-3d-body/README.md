@@ -22,16 +22,17 @@ parametric body mesh (MHR). The notebook does the following --
 For illustration, the notebook uses a single image from **COCO val2017** — one person with all
 17 keypoints visible and a large bounding box, which makes for a clean comparison. The
 ground-truth box is fed to the model, so the pose accuracy is measured without a detector in the
-loop. The image and its annotation ship in `sample_data/`; the backbone weights are the
+loop. Nothing is bundled: the image is downloaded from the public COCO servers on first use and
+its ground-truth annotation is embedded in the notebook. The backbone weights are the
 DINOv3-H+ checkpoints published by the SAM 3D Body authors on the Hugging Face Hub.
 
 ## Notebook Contents
 
-- One-time conda environment setup (`sam3dbody-nb`), guarded so it never re-runs by default.
+- Kernel check plus a dependency-install cell — no environment file, no manual setup.
 - Device discovery for OpenVINO and PyTorch, plus a single configuration cell for all knobs.
 - Fetch the `sam_3d_body` package from the official GitHub repo into the root folder (skipped if present).
 - Download the gated SAM 3D Body checkpoint into `checkpoints/` (skipped if present).
-- Load the bundled COCO sample and draw the ground-truth box and keypoints.
+- Download the COCO sample image and draw the ground-truth box and keypoints.
 - Run the PyTorch reference on CPU or XPU and record PCK@0.05 and latency.
 - Convert to OpenVINO IR (FP16/INT8) into `ov_models/`, then report the on-disk footprint.
 - Compile each IR on the Intel GPU, warm up, and run inference on the same person.
@@ -46,7 +47,7 @@ goes straight to inference and prints what it skipped:
 | ---------------- | -------------------------------------------------------------- | ----------------------------- |
 | `sam_3d_body/` | the `sam_3d_body` package, fetched from the official GitHub repo | download skipped if present   |
 | `checkpoints/` | SAM 3D Body PyTorch weights (`model.ckpt`, `mhr_model.pt`) | download skipped if present   |
-| `sample_data/` | the demo image and its ground-truth annotation                 | download skipped if present   |
+| `sample_data/` | the demo image, downloaded from the COCO servers                | download skipped if present   |
 | `ov_models/`   | `fp16/`, `int8/` OpenVINO IRs                              | conversion skipped if present |
 
 Set `FORCE_EXPORT = True` in the configuration cell (or delete `ov_models/<precision>/`) to
@@ -54,28 +55,29 @@ force a fresh conversion.
 
 ## Installation Instructions
 
-This is a self-contained example. It is recommended to run the notebook in a virtual
-environment; it only needs a Jupyter server to start. For general environment setup, please
-refer to the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/README.md#-installation-guide).
-
-Create the environment, install the dependencies, and register it as a Jupyter kernel:
+This is a self-contained example that relies solely on its own code. There is **no
+`requirements.txt`** and no conda environment — everything runs from a plain **`venv`
+created inside this folder** (`.venv/`).
 
 ```bash
-conda create -n sam3dbody-nb python=3.11 -y
-conda activate sam3dbody-nb
+cd notebooks   # this folder
+python -m venv .venv
 
-# CPU-only PyTorch (default):
-pip install -r requirements.txt
-
-# Intel XPU PyTorch (if you have an Intel Arc GPU):
-pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/xpu
-
-python -m ipykernel install --user --name sam3dbody-nb --display-name "Python (sam3dbody-nb)"
+.venv/bin/pip install ipykernel
+.venv/bin/python -m ipykernel install --user --name sam3dbody-venv \
+    --display-name "Python (sam3d-body-nb .venv)"
 ```
 
-Then open [`sam3dbody.ipynb`](sam3dbody.ipynb) and select the **Python (sam3dbody-nb)** kernel
-from the kernel picker. The first cell verifies the active environment and installs anything
-still missing into it; set `FORCE_REINSTALL = True` there to force a full reinstall.
+Then open [`sam3dbody.ipynb`](sam3dbody.ipynb) and select the **Python (sam3d-body-nb
+.venv)** kernel from the kernel picker — the notebook's saved metadata already points at
+this kernel name, so most Jupyter front-ends preselect it automatically once it exists.
+The Prerequisites cells install every dependency into that same `.venv`; once installed,
+re-running the notebook does not reinstall anything.
+
+> Dependencies are installed with `sys.executable -m pip install`, so they always land in
+> the environment backing the selected kernel — never in the environment that launched the
+> Jupyter server, and never in the system Python. The first cell prints the interpreter it
+> will install into and warns if that interpreter is not an isolated environment.
 
 The SAM 3D Body repository on the Hugging Face Hub is **gated**: accept the licence on the
 [model page](https://huggingface.co/facebook/sam-3d-body-dinov3) and authenticate with
@@ -89,7 +91,9 @@ notebooks/
 ├── sam3d_data.py          # sample loading, PCK scoring, skeleton + mesh rendering
 ├── sam3d_ov.py            # OpenVINO IR runtime
 ├── sam3d_torch.py         # PyTorch reference inference + PyTorch → OpenVINO export
-├── requirements.txt       # pinned dependencies
+├── LICENSE                # the SAM License (governs the fetched package + weights)
+├── NOTICE                 # how this project relates to SAM 3D Body
+├── .venv/                 # local virtual environment (created by you, see above)
 ├── sam_3d_body/           # the sam_3d_body package (downloaded on first run)
 ├── checkpoints/           # reference checkpoint (downloaded on first run)
 │   └── sam-3d-body-dinov3/
@@ -98,7 +102,7 @@ notebooks/
 ├── ov_models/             # exported OpenVINO IR (created on first run)
 │   ├── fp16/
 │   └── int8/
-└── sample_data/           # demo image (COCO val2017) + ground-truth annotation
+└── sample_data/           # demo image cache (COCO val2017, downloaded on first run)
 ```
 
 ## Configuration
@@ -125,7 +129,7 @@ python sam3d_torch.py \
 ```
 
 Each precision writes to `ov_models/<precision>/`. The FP16 export uses OpenVINO's built-in
-`compress_to_fp16` flag and the INT8 export needs `nncf` (already in `requirements.txt`).
+`compress_to_fp16` flag and the INT8 export needs `nncf` (installed by the Prerequisites cell).
 
 ## Using the OpenVINO runtime on a sample image
 
@@ -138,7 +142,7 @@ pipe = Sam3DBodyOpenVINO("ov_models/fp16", device="GPU", precision="fp16")
 pipe.warmup()  # JIT-compile GPU kernels so the first inference is steady-state
 
 sample = data.make_sample(
-    cv2.imread("my_photo.jpg"),
+    cv2.imread("my_image.jpg"),
     {"bbox": [x, y, w, h], "keypoints": [0] * 51},  # COCO-style annotation
 )
 
@@ -188,7 +192,7 @@ Notes:
 - **Mesh rendering fails on a headless server** — ensure an EGL-capable OpenGL stack is
   installed (e.g. `libegl1-mesa`); the notebook already sets `PYOPENGL_PLATFORM=egl` before
   `pyrender` is imported.
-- **NumPy import errors in OpenVINO/NNCF** — keep `numpy<2` (pinned in `requirements.txt`);
+- **NumPy import errors in OpenVINO/NNCF** — keep `numpy<2` (pinned by the Prerequisites cell);
   OpenVINO and NNCF are not yet NumPy-2 clean.
 - **Slow first OpenVINO inference** — expected: the first call JIT-compiles GPU kernels. The
   notebook warms up before timing, and the kernel cache (`ov_models/<precision>/cache`) makes

@@ -62,11 +62,23 @@ NUM_MHR_KEYPOINTS = 70
 # Sample loading
 # ---------------------------------------------------------------------------
 
-def _download(url: str, dest: Path) -> None:
+def _download(url, dest: Path) -> None:
+    """Fetch ``url`` into ``dest``; ``url`` may be a single URL or a list of mirrors."""
+    urls = [url] if isinstance(url, str) else list(url)
     dest.parent.mkdir(parents=True, exist_ok=True)
-    print(f"Downloading {url} -> {dest}")
-    with urllib.request.urlopen(url, timeout=60) as response, open(dest, "wb") as handle:
-        handle.write(response.read())
+    failures = []
+    for candidate in urls:
+        print(f"Downloading {candidate} -> {dest}")
+        try:
+            # Some mirrors (GitHub attachments) reject the default urllib agent.
+            request = urllib.request.Request(candidate, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(request, timeout=60) as response, open(dest, "wb") as handle:
+                handle.write(response.read())
+            return
+        except Exception as exc:  # try the next mirror
+            print(f"  failed: {exc}")
+            failures.append(f"{candidate}: {exc}")
+    raise RuntimeError("Could not download " + dest.name + ":\n  " + "\n  ".join(failures))
 
 
 def make_sample(img_bgr: np.ndarray, annotation: dict, image_id=None, file_name=None) -> dict:
@@ -97,27 +109,31 @@ def make_sample(img_bgr: np.ndarray, annotation: dict, image_id=None, file_name=
     }
 
 
-def load_sample(name: str = DEFAULT_SAMPLE, sample_dir=SAMPLE_DIR, download: bool = True) -> dict:
-    """Load the bundled sample image together with its ground-truth annotation.
+def load_sample(name: str = DEFAULT_SAMPLE, sample_dir=SAMPLE_DIR, download: bool = True,
+                meta: dict = None) -> dict:
+    """Load the sample image together with its ground-truth annotation.
 
-    ``<sample_dir>/<name>.json`` ships with the notebook and carries the COCO
-    annotation. The matching ``.jpg`` is fetched from the COCO servers if it is
-    not already on disk.
+    ``meta`` carries the COCO annotation. Pass it directly (the notebook embeds
+    it inline) or leave it as ``None`` to read ``<sample_dir>/<name>.json``. The
+    image itself is never shipped: it is fetched from the COCO servers into
+    ``sample_dir`` on first use and reused afterwards.
     """
     sample_dir = Path(sample_dir)
-    meta_path = sample_dir / f"{name}.json"
-    if not meta_path.exists():
-        raise FileNotFoundError(
-            f"Sample metadata not found at {meta_path}. It ships with the notebook; "
-            "restore it or point `sample_dir` at the folder that contains it."
-        )
-    meta = json.loads(meta_path.read_text())
+    if meta is None:
+        meta_path = sample_dir / f"{name}.json"
+        if not meta_path.exists():
+            raise FileNotFoundError(
+                f"Sample metadata not found at {meta_path}. Pass `meta=...` instead, "
+                "or point `sample_dir` at the folder that contains it."
+            )
+        meta = json.loads(meta_path.read_text())
 
     img_path = sample_dir / meta["file_name"]
     if not img_path.exists():
         if not download:
             raise FileNotFoundError(f"Sample image not found at {img_path}")
-        _download(meta.get("image_url") or COCO_IMAGE_URL.format(**meta), img_path)
+        _download(meta.get("image_urls") or meta.get("image_url")
+                  or COCO_IMAGE_URL.format(**meta), img_path)
 
     img_bgr = cv2.imread(str(img_path))
     if img_bgr is None:
