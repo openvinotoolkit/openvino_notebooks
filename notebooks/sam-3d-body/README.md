@@ -55,23 +55,21 @@ force a fresh conversion.
 
 ## Installation Instructions
 
-This is a self-contained example that relies solely on its own code. There is **no
-`requirements.txt`** and no conda environment — everything runs from a plain **`venv`
-created inside this folder** (`.venv/`).
+This is a self-contained example that relies solely on its own code and everything runs from a plain **`venv`**
+created inside this folder (`.sam3dbody-nb-venv/`).
 
 ```bash
 cd notebooks   # this folder
-python -m venv .venv
+python -m venv .sam3dbody-nb-venv
 
-.venv/bin/pip install ipykernel
-.venv/bin/python -m ipykernel install --user --name sam3dbody-venv \
-    --display-name "Python (sam3d-body-nb .venv)"
+.sam3dbody-nb-venv/bin/pip install ipykernel
+.sam3dbody-nb-venv/bin/python -m ipykernel install --user --name sam3dbody-nb-venv \
+    --display-name "Python (sam3dbody-nb-venv)"
 ```
 
-Then open [`sam3dbody.ipynb`](sam3dbody.ipynb) and select the **Python (sam3d-body-nb
-.venv)** kernel from the kernel picker — the notebook's saved metadata already points at
+Then open [`sam3dbody.ipynb`](sam3dbody.ipynb) and select the **Python (sam3dbody-nb-venv)** kernel from the kernel picker — the notebook's saved metadata already points at
 this kernel name, so most Jupyter front-ends preselect it automatically once it exists.
-The Prerequisites cells install every dependency into that same `.venv`; once installed,
+The Prerequisites cells install every dependency into that same `.sam3dbody-nb-venv`; once installed,
 re-running the notebook does not reinstall anything.
 
 > Dependencies are installed with `sys.executable -m pip install`, so they always land in
@@ -91,9 +89,7 @@ notebooks/
 ├── sam3d_data.py          # sample loading, PCK scoring, skeleton + mesh rendering
 ├── sam3d_ov.py            # OpenVINO IR runtime
 ├── sam3d_torch.py         # PyTorch reference inference + PyTorch → OpenVINO export
-├── LICENSE                # the SAM License (governs the fetched package + weights)
-├── NOTICE                 # how this project relates to SAM 3D Body
-├── .venv/                 # local virtual environment (created by you, see above)
+├── .sam3dbody-nb-venv/    # local virtual environment (created)
 ├── sam_3d_body/           # the sam_3d_body package (downloaded on first run)
 ├── checkpoints/           # reference checkpoint (downloaded on first run)
 │   └── sam-3d-body-dinov3/
@@ -116,7 +112,6 @@ All knobs live in the *Configuration* cell:
 | `PRECISIONS`    | `["fp16", "int8"]` | IR precisions to export and evaluate                                       |
 | `PCK_THRESHOLD` | `0.05`             | PCK tolerance as a fraction of the GT bbox diagonal       |
 | `FORCE_EXPORT`  | `False`            | `True` re-exports the IR even if it already exists                |
-| `SAMPLE_NAME`   | `"000000368212"`   | Bundled sample to evaluate                                                 |
 
 ## Exporting the OpenVINO IR
 
@@ -192,8 +187,8 @@ Notes:
 - **Mesh rendering fails on a headless server** — ensure an EGL-capable OpenGL stack is
   installed (e.g. `libegl1-mesa`); the notebook already sets `PYOPENGL_PLATFORM=egl` before
   `pyrender` is imported.
-- **NumPy import errors in OpenVINO/NNCF** — keep `numpy<2` (pinned by the Prerequisites cell);
-  OpenVINO and NNCF are not yet NumPy-2 clean.
+- **NumPy import errors in OpenVINO/NNCF** — keep `numpy>=2.0,<2.5` (pinned by the
+  Prerequisites cell): NNCF caps NumPy below 2.5 while matplotlib's contourpy needs at least 2.0.
 - **Slow first OpenVINO inference** — expected: the first call JIT-compiles GPU kernels. The
   notebook warms up before timing, and the kernel cache (`ov_models/<precision>/cache`) makes
   subsequent runs fast.
