@@ -2,6 +2,8 @@
 
 Qwen-Image 2.1 is a unified image generation model that supports text-to-image generation and image-conditioned editing in one pipeline. The prompt and condition images are encoded together by Qwen3-VL and processed by a block-causal diffusion transformer.
 
+For model architecture and usage details, see the [`Qwen/Qwen-Image-2.1`](https://huggingface.co/Qwen/Qwen-Image-2.1) model card and the [Qwen-Image source repository](https://github.com/QwenLM/Qwen-Image).
+
 This tutorial demonstrates how to:
 
 - download and convert [`Qwen/Qwen-Image-2.1`](https://huggingface.co/Qwen/Qwen-Image-2.1) to OpenVINO IR;
@@ -17,17 +19,17 @@ This tutorial demonstrates how to:
 
 This notebook demonstrates a model that has not been fully validated with OpenVINO. It may be fully supported and validated in the future.
 
-## Notebook contents
+## Notebook Contents
 
-1. Install dependencies from the upstream Diffusers and Optimum Intel branches and OpenVINO nightly builds, with a temporary cross-platform fallback to cached or manually downloaded OpenVINO GenAI main-branch artifacts
-2. Authenticate with Hugging Face and select export options
+1. Install the latest stable Gradio, PyTorch, NNCF, and utility packages; upstream Diffusers and Optimum Intel branches; and OpenVINO nightly builds, with a temporary cross-platform fallback that automatically extracts cached or manually downloaded OpenVINO GenAI main-branch artifact ZIPs
+2. Select export options
 3. Convert the model to OpenVINO IR
 4. Run text-to-image generation
 5. Run image-conditioned editing
 6. Benchmark both scenarios
 7. Launch an interactive demo with dynamic pipeline, FP16/INT8/INT4, and device selection
 
-## Installation instructions
+## Installation Instructions
 
 This is a self-contained example that relies solely on its own code.
 
