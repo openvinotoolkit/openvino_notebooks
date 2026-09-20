@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import gc
 import random
 import threading
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import gradio as gr
 import numpy as np
@@ -19,7 +22,8 @@ PRECISIONS = ("FP16", "INT8", "INT4")
 EDITING_SAMPLE_PROMPT = "Put a tiny red top hat and a blue bow tie on the cat. " "Preserve the cat's identity, face, pose, and the original composition."
 
 
-def _output_to_image(output) -> Image.Image:
+def _output_to_image(output: Any) -> Image.Image:
+    """Convert an OpenVINO GenAI image output to a PIL image."""
     data = output.data if hasattr(output, "data") else output
     array = np.asarray(data)
     if array.ndim == 4:
@@ -28,28 +32,42 @@ def _output_to_image(output) -> Image.Image:
 
 
 def _image_to_tensor(image: Image.Image) -> ov.Tensor:
+    """Convert a PIL image to an NHWC OpenVINO tensor."""
     return ov.Tensor(np.asarray(image.convert("RGB"), dtype=np.uint8)[None])
 
 
 class PipelineManager:
-    def __init__(self, model_root: str | Path, output_dir: str | Path):
+    """Own the single OpenVINO GenAI pipeline used by the demo."""
+
+    def __init__(self, model_root: str | Path, output_dir: str | Path) -> None:
         self.model_root = Path(model_root)
         self.output_dir = Path(output_dir)
-        self.pipeline = None
-        self.pipeline_key = None
+        self.pipeline: Any | None = None
+        self.pipeline_key: tuple[str, str, str] | None = None
         self.lock = threading.Lock()
 
-    def _release(self):
+    def _release(self) -> None:
         self.pipeline = None
         self.pipeline_key = None
         gc.collect()
 
-    def release(self):
+    def release(self) -> str:
+        """Release the current pipeline.
+
+        :return: Status message for the demo.
+        """
         with self.lock:
             self._release()
         return "Configuration changed. The previous pipeline was released."
 
-    def _load(self, pipeline_type: str, precision: str, device: str):
+    def _load(self, pipeline_type: str, precision: str, device: str) -> tuple[Any, bool]:
+        """Load or reuse a pipeline for the selected configuration.
+
+        :param pipeline_type: Text-to-image or image-editing pipeline name.
+        :param precision: Exported model precision.
+        :param device: OpenVINO inference device.
+        :return: Pipeline instance and whether it was newly loaded.
+        """
         pipeline_key = (pipeline_type, precision, device)
         if self.pipeline is not None and self.pipeline_key == pipeline_key:
             return self.pipeline, False
@@ -64,7 +82,31 @@ class PipelineManager:
         self.pipeline_key = pipeline_key
         return self.pipeline, True
 
-    def generate(self, pipeline_type, precision, device, prompt, condition_image, seed, randomize_seed, steps, resolution):
+    def generate(
+        self,
+        pipeline_type: str,
+        precision: str,
+        device: str,
+        prompt: str,
+        condition_image: Image.Image | None,
+        seed: int,
+        randomize_seed: bool,
+        steps: int,
+        resolution: int,
+    ) -> tuple[Image.Image, int, str]:
+        """Generate and save an image.
+
+        :param pipeline_type: Text-to-image or image-editing pipeline name.
+        :param precision: Exported model precision.
+        :param device: OpenVINO inference device.
+        :param prompt: Generation or editing instruction.
+        :param condition_image: Optional image used by image editing.
+        :param seed: Random generator seed.
+        :param randomize_seed: Whether to replace the provided seed.
+        :param steps: Number of denoising steps.
+        :param resolution: Square output resolution used by text-to-image.
+        :return: Generated image, effective seed, and status message.
+        """
         if not prompt.strip():
             raise gr.Error("Enter a prompt or editing instruction.")
         if pipeline_type == "Image Editing" and condition_image is None:
@@ -98,8 +140,23 @@ class PipelineManager:
         return image, seed, status
 
 
-def make_demo(model_root, default_precision="FP16", default_device="CPU", output_dir="generated_images", editing_sample=None):
-    manager = PipelineManager(model_root, output_dir)
+def make_demo(
+    model_root: str | Path,
+    default_precision: str = "FP16",
+    default_device: str = "CPU",
+    output_dir: str | Path = "generated_images",
+    editing_sample: str | Path | None = None,
+) -> gr.Blocks:
+    """Create the interactive Qwen-Image 2.1 demo.
+
+    :param model_root: Directory containing exported precision subdirectories.
+    :param default_precision: Initially selected model precision.
+    :param default_device: Initially selected OpenVINO inference device.
+    :param output_dir: Directory used to save generated images.
+    :param editing_sample: Optional image used by the editing example.
+    :return: Configured Gradio Blocks application.
+    """
+    manager = PipelineManager(model_root=model_root, output_dir=output_dir)
     available_devices = list(dict.fromkeys(["AUTO", *ov.Core().available_devices]))
     if default_device not in available_devices:
         default_device = "CPU" if "CPU" in available_devices else available_devices[0]
@@ -163,12 +220,22 @@ def make_demo(model_root, default_precision="FP16", default_device="CPU", output
             )
 
         run.click(
-            manager.generate,
-            inputs=[pipeline_type, precision, device, prompt, condition_image, seed, randomize_seed, steps, resolution],
+            fn=manager.generate,
+            inputs=[
+                pipeline_type,
+                precision,
+                device,
+                prompt,
+                condition_image,
+                seed,
+                randomize_seed,
+                steps,
+                resolution,
+            ],
             outputs=[output, seed, status],
         )
         for selector in (pipeline_type, precision, device):
-            selector.change(manager.release, outputs=status, queue=False)
+            selector.change(fn=manager.release, outputs=status, queue=False)
 
     demo.queue(default_concurrency_limit=1)
     return demo
