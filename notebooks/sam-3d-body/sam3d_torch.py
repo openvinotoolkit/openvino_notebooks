@@ -347,8 +347,19 @@ def enable_device_patches(device: Union[str, torch.device]) -> None:
 
 
 def xpu_available() -> bool:
-    """True when this PyTorch build can reach an Intel XPU."""
-    return hasattr(torch, "xpu") and torch.xpu.is_available()
+    """True when this PyTorch build can reach an Intel XPU.
+
+    ``torch.xpu.is_available()`` calls ``torch._C._xpu_getDeviceCount()`` under
+    the hood, which *raises* (rather than returning False) on machines without
+    the Level Zero / oneAPI runtime — e.g. the openvino_notebooks CI container.
+    Treat any such failure as "no XPU" so the notebook degrades to CPU.
+    """
+    if not hasattr(torch, "xpu"):
+        return False
+    try:
+        return torch.xpu.is_available()
+    except Exception:
+        return False
 
 
 def resolve_device(device: Union[str, torch.device] = "cpu") -> torch.device:

@@ -417,5 +417,12 @@ def free_memory():
     """Release host + accelerator memory between backends (models are multi-GB)."""
     gc.collect()
     torch = sys.modules.get("torch")
-    if torch is not None and hasattr(torch, "xpu") and torch.xpu.is_available():
-        torch.xpu.empty_cache()
+    if torch is None or not hasattr(torch, "xpu"):
+        return
+    # ``torch.xpu.is_available()`` raises (not returns False) on machines without
+    # the Level Zero / oneAPI runtime, e.g. the openvino_notebooks CI container.
+    try:
+        if torch.xpu.is_available():
+            torch.xpu.empty_cache()
+    except Exception:
+        pass
