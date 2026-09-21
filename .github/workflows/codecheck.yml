@@ -49,27 +49,27 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
         with:
-          python-version: "3.10" # change cachepip step when changing this
+          python-version: "3.11" # change cachepip step when changing this
       - name: Cache OpenVINO Pip Packages
         id: cachepip
         uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
         with:
           path: |
             pipcache
-          key: ${{ env.PIP_CACHE_KEY }}-ubuntu-22.04-3.10
+          key: ${{ env.PIP_CACHE_KEY }}-ubuntu-22.04-3.11
       - name: Cache openvino packages
         if: steps.cachepip.outputs.cache-hit != 'true'
         run: |
-          python -m pip install --upgrade pip
+          python3 -m pip install --upgrade pip
           mkdir pipcache
-          python -m pip install --cache-dir pipcache --no-deps openvino nncf
+          python3 -m pip install --cache-dir pipcache --no-deps openvino nncf
           cp -r pipcache pipcache_openvino
-          python -m pip uninstall -y openvino nncf
+          python3 -m pip uninstall -y openvino nncf
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
-          python -m ipykernel install --user --name openvino_env
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r .ci/dev-requirements.txt --cache-dir pipcache
+          python3 -m ipykernel install --user --name openvino_env
       - name: Make pipcache directory with OpenVINO packages
         # Only cache OpenVINO packages. mv works cross-platform
         if: steps.cachepip.outputs.cache-hit != 'true'
@@ -78,11 +78,11 @@ jobs:
           mv pipcache_openvino pipcache
       - name: Pip freeze
         run: |
-          python -m pip freeze
+          python3 -m pip freeze
       - name: Check install
         if: always()
         run: |
-          python check_install.py
+          python3 check_install.py
       - name: Test Jupyterlab
         if: always()
         run: |
@@ -98,7 +98,7 @@ jobs:
       - name: Test READMEs and requirements
         if: always()
         run: |
-          python -m pytest .ci/test_notebooks.py
+          python3 -m pytest .ci/test_notebooks.py
       - name: Get changed files
         id: changed
         if: always() && github.event_name == 'pull_request'
@@ -111,11 +111,11 @@ jobs:
         if: always()
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            python .ci/check_links.py ${{ steps.changed.outputs.files }}
+            python3 .ci/check_links.py ${{ steps.changed.outputs.files }}
           else
-            python .ci/check_links.py
+            python3 .ci/check_links.py
           fi
       - name: Test table of content and device widget
         if: always()
         run: |
-          python .ci/check_notebooks.py
+          python3 .ci/check_notebooks.py
