@@ -539,3 +539,10 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
+# Experimental - requires development branches and OpenVINO nightly packages
+- notebook: notebooks/qwen-image-2.1/qwen-image-2.1.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
