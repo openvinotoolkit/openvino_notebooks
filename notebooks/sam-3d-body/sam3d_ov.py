@@ -38,6 +38,7 @@ PRECISIONS = ("fp16", "int8")
 # Rotation utilities
 # ===========================================================================
 
+
 def rot6d_to_rotmat_np(rot6d: np.ndarray) -> np.ndarray:
     """Convert a 6D rotation representation to a rotation matrix."""
     a1 = rot6d[..., :3]
@@ -90,16 +91,20 @@ def batch_xyz_from_6d_np(rot6d: np.ndarray) -> np.ndarray:
     ax_s = np.arctan2(-r12, r11)
     ay_s = np.arctan2(-r20, cos_y)
     az_s = np.zeros_like(az)
-    return np.stack([
-        ax * (1 - sing) + ax_s * sing,
-        ay * (1 - sing) + ay_s * sing,
-        az * (1 - sing) + az_s * sing,
-    ], axis=-1)
+    return np.stack(
+        [
+            ax * (1 - sing) + ax_s * sing,
+            ay * (1 - sing) + ay_s * sing,
+            az * (1 - sing) + az_s * sing,
+        ],
+        axis=-1,
+    )
 
 
 # ===========================================================================
 # Pose parameter conversion (519 raw decoder dims -> MHR inputs)
 # ===========================================================================
+
 
 class PoseParamConverter:
     """Converts the raw 519-dim decoder output into MHR-ready parameters.
@@ -109,21 +114,21 @@ class PoseParamConverter:
 
     def __init__(self, buffers_path: str):
         data = np.load(buffers_path, allow_pickle=True)
-        self.scale_mean = data["scale_mean"]                        # [68]
-        self.scale_comps = data["scale_comps"]                      # [28, 68]
-        self.hand_pose_mean = data["hand_pose_mean"]                # [54]
-        self.hand_pose_comps = data["hand_pose_comps"]              # [54, 54]
-        self.hand_joint_idxs_left = data["hand_joint_idxs_left"]    # [27]
+        self.scale_mean = data["scale_mean"]  # [68]
+        self.scale_comps = data["scale_comps"]  # [28, 68]
+        self.hand_pose_mean = data["hand_pose_mean"]  # [54]
+        self.hand_pose_comps = data["hand_pose_comps"]  # [54, 54]
+        self.hand_joint_idxs_left = data["hand_joint_idxs_left"]  # [27]
         self.hand_joint_idxs_right = data["hand_joint_idxs_right"]  # [27]
-        self.keypoint_mapping = data["keypoint_mapping"]            # [308, 18566]
-        self.mhr_param_hand_mask = data["mhr_param_hand_mask"]      # [133] bool
-        self.body_3dof_rot_idxs = data["body_3dof_rot_idxs"]        # [23, 3]
-        self.body_1dof_rot_idxs = data["body_1dof_rot_idxs"]        # [58]
-        self.body_1dof_trans_idxs = data["body_1dof_trans_idxs"]    # [6]
-        self.hand_mask_cont_3dof = data["hand_mask_cont_3dof"]      # [54] bool
-        self.hand_mask_cont_1dof = data["hand_mask_cont_1dof"]      # [54] bool
-        self.hand_mask_model_3dof = data["hand_mask_model_3dof"]    # [27] bool
-        self.hand_mask_model_1dof = data["hand_mask_model_1dof"]    # [27] bool
+        self.keypoint_mapping = data["keypoint_mapping"]  # [308, 18566]
+        self.mhr_param_hand_mask = data["mhr_param_hand_mask"]  # [133] bool
+        self.body_3dof_rot_idxs = data["body_3dof_rot_idxs"]  # [23, 3]
+        self.body_1dof_rot_idxs = data["body_1dof_rot_idxs"]  # [58]
+        self.body_1dof_trans_idxs = data["body_1dof_trans_idxs"]  # [6]
+        self.hand_mask_cont_3dof = data["hand_mask_cont_3dof"]  # [54] bool
+        self.hand_mask_cont_1dof = data["hand_mask_cont_1dof"]  # [54] bool
+        self.hand_mask_model_3dof = data["hand_mask_model_3dof"]  # [27] bool
+        self.hand_mask_model_1dof = data["hand_mask_model_1dof"]  # [27] bool
         self.faces = data["faces"] if "faces" in data else None
 
     def compact_cont_to_model_params_body(self, body_cont: np.ndarray) -> np.ndarray:
@@ -131,9 +136,9 @@ class PoseParamConverter:
         batch_size = body_cont.shape[0]
         num_3dof = 23 * 3  # 69
         num_1dof = 58
-        cont_3dofs = body_cont[:, :2 * num_3dof].reshape(batch_size, -1, 6)
-        cont_1dofs = body_cont[:, 2 * num_3dof:2 * num_3dof + 2 * num_1dof].reshape(batch_size, -1, 2)
-        cont_trans = body_cont[:, 2 * num_3dof + 2 * num_1dof:]
+        cont_3dofs = body_cont[:, : 2 * num_3dof].reshape(batch_size, -1, 6)
+        cont_1dofs = body_cont[:, 2 * num_3dof : 2 * num_3dof + 2 * num_1dof].reshape(batch_size, -1, 2)
+        cont_trans = body_cont[:, 2 * num_3dof + 2 * num_1dof :]
         params_3dofs = batch_xyz_from_6d_np(cont_3dofs).reshape(batch_size, -1)
         params_1dofs = np.arctan2(cont_1dofs[:, :, 0], cont_1dofs[:, :, 1])
         body_params = np.zeros((batch_size, 133), dtype=body_cont.dtype)
@@ -158,12 +163,17 @@ class PoseParamConverter:
         """Raw 519-dim decoder output -> ``(shape[B,45], model_params[B,204], face[B,72])``."""
         batch_size = pose_params.shape[0]
         count = 0
-        global_rot_6d = pose_params[:, count:count + 6]; count += 6
-        body_cont = pose_params[:, count:count + 260]; count += 260
-        shape_params = pose_params[:, count:count + 45]; count += 45
-        scale_params = pose_params[:, count:count + 28]; count += 28
-        hand_params_raw = pose_params[:, count:count + 108]; count += 108
-        face_params = pose_params[:, count:count + 72]
+        global_rot_6d = pose_params[:, count : count + 6]
+        count += 6
+        body_cont = pose_params[:, count : count + 260]
+        count += 260
+        shape_params = pose_params[:, count : count + 45]
+        count += 45
+        scale_params = pose_params[:, count : count + 28]
+        count += 28
+        hand_params_raw = pose_params[:, count : count + 108]
+        count += 108
+        face_params = pose_params[:, count : count + 72]
         face_expr = face_params * 0.0
         global_rot_euler = rotmat_to_euler_zyx_np(rot6d_to_rotmat_np(global_rot_6d))
         global_trans = np.zeros((batch_size, 3), dtype=pose_params.dtype)
@@ -194,6 +204,7 @@ class PoseParamConverter:
 # ===========================================================================
 # Geometry
 # ===========================================================================
+
 
 def camera_project_2d(
     j3d: np.ndarray,
@@ -278,13 +289,11 @@ def _affine_warp_matrix(center: np.ndarray, scale: np.ndarray, input_size: int =
     src = np.zeros((3, 2), dtype=np.float32)
     src[0] = center
     src[1] = center + np.array([0.0, -scale[0] * 0.5], dtype=np.float32)
-    src[2] = np.array([src[0, 0] - (src[1, 1] - src[0, 1]),
-                       src[0, 1] + (src[1, 0] - src[0, 0])], dtype=np.float32)
+    src[2] = np.array([src[0, 0] - (src[1, 1] - src[0, 1]), src[0, 1] + (src[1, 0] - src[0, 0])], dtype=np.float32)
     dst = np.zeros((3, 2), dtype=np.float32)
     dst[0] = [input_size * 0.5, input_size * 0.5]
     dst[1] = dst[0] + np.array([0.0, -input_size * 0.5], dtype=np.float32)
-    dst[2] = np.array([dst[0, 0] - (dst[1, 1] - dst[0, 1]),
-                       dst[0, 1] + (dst[1, 0] - dst[0, 0])], dtype=np.float32)
+    dst[2] = np.array([dst[0, 0] - (dst[1, 1] - dst[0, 1]), dst[0, 1] + (dst[1, 0] - dst[0, 0])], dtype=np.float32)
     return cv2.getAffineTransform(src, dst)
 
 
@@ -309,17 +318,20 @@ def preprocess_image(
     img_tensor = (cropped.astype(np.float32) / 255.0).transpose(2, 0, 1)[None]
 
     # CLIFF-style bbox conditioning.
-    focal_length = np.sqrt(float(img_h ** 2 + img_w ** 2))
-    condition_info = np.array([[
-        (bbox_center[0] - img_w / 2.0) / focal_length,
-        (bbox_center[1] - img_h / 2.0) / focal_length,
-        bbox_scale[0] / focal_length,
-    ]], dtype=np.float32)
+    focal_length = np.sqrt(float(img_h**2 + img_w**2))
+    condition_info = np.array(
+        [
+            [
+                (bbox_center[0] - img_w / 2.0) / focal_length,
+                (bbox_center[1] - img_h / 2.0) / focal_length,
+                bbox_scale[0] / focal_length,
+            ]
+        ],
+        dtype=np.float32,
+    )
 
     # Ray conditioning: per-pixel camera ray directions in original image space.
-    grid_x, grid_y = np.meshgrid(
-        np.arange(input_size, dtype=np.float32), np.arange(input_size, dtype=np.float32)
-    )
+    grid_x, grid_y = np.meshgrid(np.arange(input_size, dtype=np.float32), np.arange(input_size, dtype=np.float32))
     ax, ay = warp_mat[0, 0], warp_mat[1, 1]
     tx_w, ty_w = warp_mat[0, 2], warp_mat[1, 2]
     orig_x = grid_x / ax - tx_w / ax
@@ -412,6 +424,7 @@ def bilinear_grid_sample(features: np.ndarray, grid: np.ndarray, ov_model=None) 
 # Inference pipeline
 # ===========================================================================
 
+
 class Sam3DBodyOpenVINO:
     """SAM 3D Body inference on OpenVINO IR, with the full MHR feedback loop.
 
@@ -464,8 +477,7 @@ class Sam3DBodyOpenVINO:
         pose_buffers_path = iter_dir / "buffers" / "pose_head_buffers.npz"
         if not pose_buffers_path.exists():
             raise FileNotFoundError(
-                f"pose_head_buffers.npz not found at {pose_buffers_path}\n"
-                f"Export the IR first: python sam3d_torch.py --precision {self.precision}"
+                f"pose_head_buffers.npz not found at {pose_buffers_path}\n" f"Export the IR first: python sam3d_torch.py --precision {self.precision}"
             )
 
         self.core = ov.Core()
@@ -475,9 +487,7 @@ class Sam3DBodyOpenVINO:
         cache_dir = str(cache_dir or (model_dir / "cache"))
         os.makedirs(cache_dir, exist_ok=True)
         self.core.set_property({"CACHE_DIR": cache_dir})
-        self.inference_precision = apply_precision_hint(
-            self.core, device, self.precision, tag="Sam3DBodyOV"
-        )
+        self.inference_precision = apply_precision_hint(self.core, device, self.precision, tag="Sam3DBodyOV")
 
         def compile_ir(path, required: bool = True):
             path = Path(path)
@@ -494,9 +504,7 @@ class Sam3DBodyOpenVINO:
 
         print(f"[Sam3DBodyOV] Loading {NUM_DECODER_LAYERS} decoder layers and heads...")
         self.ray_cond_emb = compile_ir(iter_dir / "ray_cond_emb.xml")
-        self.decoder_layers = [
-            compile_ir(iter_dir / f"decoder_layer_{i}.xml") for i in range(NUM_DECODER_LAYERS)
-        ]
+        self.decoder_layers = [compile_ir(iter_dir / f"decoder_layer_{i}.xml") for i in range(NUM_DECODER_LAYERS)]
         self.decoder_norm = compile_ir(iter_dir / "decoder_norm.xml")
         self.pose_proj = compile_ir(iter_dir / "pose_proj.xml")
         self.camera_proj = compile_ir(iter_dir / "camera_proj.xml")
@@ -544,7 +552,8 @@ class Sam3DBodyOpenVINO:
         for _ in range(max(1, n)):
             try:
                 self.infer_single(
-                    dummy_img, dummy_bbox,
+                    dummy_img,
+                    dummy_bbox,
                     focal_length=float(np.sqrt(2.0) * INPUT_SIZE),
                 )
             except Exception as exc:
@@ -562,16 +571,29 @@ class Sam3DBodyOpenVINO:
         tok1 = _out(self.prev_to_token, _infer(self.prev_to_token, {0: prev_input}))
         tok2 = self.prompt_embed
 
-        tokens = np.concatenate([
-            tok0[:, None, :], tok1[:, None, :], tok2[:, None, :],
-            self.kp_embed[None, :, :], self.kp3d_embed[None, :, :],
-        ], axis=1).astype(np.float32)
+        tokens = np.concatenate(
+            [
+                tok0[:, None, :],
+                tok1[:, None, :],
+                tok2[:, None, :],
+                self.kp_embed[None, :, :],
+                self.kp3d_embed[None, :, :],
+            ],
+            axis=1,
+        ).astype(np.float32)
 
         zeros_1 = np.zeros((1, 1, 1024), dtype=np.float32)
         zeros_kp = np.zeros((1, NUM_KEYPOINTS, 1024), dtype=np.float32)
-        augment = np.concatenate([
-            zeros_1, tok1[:, None, :], tok2[:, None, :], zeros_kp, zeros_kp,
-        ], axis=1).astype(np.float32)
+        augment = np.concatenate(
+            [
+                zeros_1,
+                tok1[:, None, :],
+                tok2[:, None, :],
+                zeros_kp,
+                zeros_kp,
+            ],
+            axis=1,
+        ).astype(np.float32)
 
         return tokens, augment
 
@@ -585,11 +607,14 @@ class Sam3DBodyOpenVINO:
     def _run_mhr(self, pose_params: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """MHR mesh head -> ``(j3d[B,70,3], verts[B,V,3])`` (vertices in cm)."""
         shape, model_params, face_expr = self.converter.convert(pose_params)
-        result = _infer(self.mhr, {
-            "identity_coeffs": shape,
-            "model_params": model_params,
-            "face_expr_coeffs": face_expr,
-        })
+        result = _infer(
+            self.mhr,
+            {
+                "identity_coeffs": shape,
+                "model_params": model_params,
+                "face_expr_coeffs": face_expr,
+            },
+        )
         verts = _out(self.mhr, result, 0)
         skel_state = _out(self.mhr, result, 1)
         return self.converter.get_3d_keypoints(verts, skel_state), verts
@@ -616,28 +641,22 @@ class Sam3DBodyOpenVINO:
         augment = augment.copy()
 
         kps_01 = j2d_crop + 0.5
-        invalid = (
-            (kps_01[:, :, 0] < 0) | (kps_01[:, :, 0] > 1)
-            | (kps_01[:, :, 1] < 0) | (kps_01[:, :, 1] > 1)
-            | (depth < 1e-5)
-        )
+        invalid = (kps_01[:, :, 0] < 0) | (kps_01[:, :, 0] > 1) | (kps_01[:, :, 1] < 0) | (kps_01[:, :, 1] > 1) | (depth < 1e-5)
         valid_f = (~invalid[:, :, None]).astype(np.float32)
 
         posemb_2d = _out(self.kp_posemb_2d, _infer(self.kp_posemb_2d, {0: j2d_crop.astype(np.float32)}))
-        augment[:, KPS_START:KPS_START + NUM_KEYPOINTS, :] = posemb_2d * valid_f
+        augment[:, KPS_START : KPS_START + NUM_KEYPOINTS, :] = posemb_2d * valid_f
 
         grid = (j2d_crop * 2.0)[:, :, None, :].astype(np.float32)
         sampled = bilinear_grid_sample(features, grid, ov_model=self.grid_sample)
         sampled = sampled.squeeze(3).transpose(0, 2, 1) * valid_f
 
         feat_embed = _out(self.kp_feat_linear, _infer(self.kp_feat_linear, {0: sampled.astype(np.float32)}))
-        tokens[:, KPS_START:KPS_START + NUM_KEYPOINTS, :] += feat_embed
+        tokens[:, KPS_START : KPS_START + NUM_KEYPOINTS, :] += feat_embed
 
         pelvis_center = (j3d[:, [self.pelvis_idx[0]], :] + j3d[:, [self.pelvis_idx[1]], :]) / 2.0
-        posemb_3d = _out(
-            self.kp_posemb_3d, _infer(self.kp_posemb_3d, {0: (j3d - pelvis_center).astype(np.float32)})
-        )
-        augment[:, KPS3D_START:KPS3D_START + NUM_KEYPOINTS, :] = posemb_3d
+        posemb_3d = _out(self.kp_posemb_3d, _infer(self.kp_posemb_3d, {0: (j3d - pelvis_center).astype(np.float32)}))
+        augment[:, KPS3D_START : KPS3D_START + NUM_KEYPOINTS, :] = posemb_3d
 
         return tokens, augment
 
@@ -663,18 +682,23 @@ class Sam3DBodyOpenVINO:
         """
         img_h, img_w = img_rgb.shape[:2]
         if focal_length is None:
-            focal_length = float(np.sqrt(img_h ** 2 + img_w ** 2))
+            focal_length = float(np.sqrt(img_h**2 + img_w**2))
 
-        img_tensor, condition_info, bbox_center, bbox_scale_w, ray_cond, warp_mat = preprocess_image(
-            img_rgb, bbox
-        )
+        img_tensor, condition_info, bbox_center, bbox_scale_w, ray_cond, warp_mat = preprocess_image(img_rgb, bbox)
 
         features = _out(self.backbone, _infer(self.backbone, {0: img_tensor}))
 
         if self.ray_cond_emb is not None:
-            features = _out(self.ray_cond_emb, _infer(self.ray_cond_emb, {
-                0: features.astype(np.float32), 1: ray_cond.astype(np.float32),
-            }))
+            features = _out(
+                self.ray_cond_emb,
+                _infer(
+                    self.ray_cond_emb,
+                    {
+                        0: features.astype(np.float32),
+                        1: ray_cond.astype(np.float32),
+                    },
+                ),
+            )
         if mask_embedding is not None:
             features = features + mask_embedding.astype(np.float32)
 
@@ -684,18 +708,26 @@ class Sam3DBodyOpenVINO:
         tokens, augment = self._init_tokens(condition_info)
 
         project = lambda j3d, cam: camera_project_2d(
-            j3d, cam, bbox_center=bbox_center[None], bbox_scale_w=np.array([bbox_scale_w]),
-            img_w=img_w, img_h=img_h, focal_length=focal_length,
+            j3d,
+            cam,
+            bbox_center=bbox_center[None],
+            bbox_scale_w=np.array([bbox_scale_w]),
+            img_w=img_w,
+            img_h=img_h,
+            focal_length=focal_length,
         )
 
         for layer_idx in range(NUM_DECODER_LAYERS):
             layer = self.decoder_layers[layer_idx]
-            result = _infer(layer, {
-                0: tokens.astype(np.float32),
-                1: context.astype(np.float32),
-                2: augment.astype(np.float32),
-                3: image_augment.astype(np.float32),
-            })
+            result = _infer(
+                layer,
+                {
+                    0: tokens.astype(np.float32),
+                    1: context.astype(np.float32),
+                    2: augment.astype(np.float32),
+                    3: image_augment.astype(np.float32),
+                },
+            )
             tokens = _out(layer, result, 0)
             context = _out(layer, result, 1)
 
@@ -714,9 +746,7 @@ class Sam3DBodyOpenVINO:
         pose_params, camera_params = self._run_pose_head(tokens_normed)
         j3d, verts = self._run_mhr(pose_params)
         j2d = project(j3d, camera_params)
-        cam_t = camera_translation(
-            camera_params, bbox_center[None], np.array([bbox_scale_w]), img_w, img_h, focal_length
-        )
+        cam_t = camera_translation(camera_params, bbox_center[None], np.array([bbox_scale_w]), img_w, img_h, focal_length)
 
         # MHR emits centimeters in a y/z-flipped frame; PyTorch reports meters.
         vis_verts = verts / 100.0

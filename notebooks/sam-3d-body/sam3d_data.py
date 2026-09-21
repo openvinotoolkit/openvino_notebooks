@@ -49,10 +49,23 @@ COCO_IMAGE_URL = "http://images.cocodataset.org/val2017/{file_name}"
 COCO17_TO_MHR70 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 62, 41, 9, 10, 11, 12, 13, 14]
 
 COCO_KEYPOINT_NAMES = [
-    "nose", "left_eye", "right_eye", "left_ear", "right_ear",
-    "left_shoulder", "right_shoulder", "left_elbow", "right_elbow",
-    "left_wrist", "right_wrist", "left_hip", "right_hip",
-    "left_knee", "right_knee", "left_ankle", "right_ankle",
+    "nose",
+    "left_eye",
+    "right_eye",
+    "left_ear",
+    "right_ear",
+    "left_shoulder",
+    "right_shoulder",
+    "left_elbow",
+    "right_elbow",
+    "left_wrist",
+    "right_wrist",
+    "left_hip",
+    "right_hip",
+    "left_knee",
+    "right_knee",
+    "left_ankle",
+    "right_ankle",
 ]
 
 NUM_MHR_KEYPOINTS = 70
@@ -61,6 +74,7 @@ NUM_MHR_KEYPOINTS = 70
 # ---------------------------------------------------------------------------
 # Sample loading
 # ---------------------------------------------------------------------------
+
 
 def _download(url, dest: Path) -> None:
     """Fetch ``url`` into ``dest``; ``url`` may be a single URL or a list of mirrors."""
@@ -105,12 +119,11 @@ def make_sample(img_bgr: np.ndarray, annotation: dict, image_id=None, file_name=
         "bbox_xyxy": np.array([gx, gy, gx + gw, gy + gh], dtype=np.float32),
         "bbox_xywh": np.array([gx, gy, gw, gh], dtype=np.float32),
         "gt_keypoints": np.array(annotation["keypoints"], dtype=np.float32).reshape(17, 3),
-        "focal_length": float(np.sqrt(img_h ** 2 + img_w ** 2)),
+        "focal_length": float(np.sqrt(img_h**2 + img_w**2)),
     }
 
 
-def load_sample(name: str = DEFAULT_SAMPLE, sample_dir=SAMPLE_DIR, download: bool = True,
-                meta: dict = None) -> dict:
+def load_sample(name: str = DEFAULT_SAMPLE, sample_dir=SAMPLE_DIR, download: bool = True, meta: dict = None) -> dict:
     """Load the sample image together with its ground-truth annotation.
 
     ``meta`` carries the COCO annotation. Pass it directly (the notebook embeds
@@ -123,8 +136,7 @@ def load_sample(name: str = DEFAULT_SAMPLE, sample_dir=SAMPLE_DIR, download: boo
         meta_path = sample_dir / f"{name}.json"
         if not meta_path.exists():
             raise FileNotFoundError(
-                f"Sample metadata not found at {meta_path}. Pass `meta=...` instead, "
-                "or point `sample_dir` at the folder that contains it."
+                f"Sample metadata not found at {meta_path}. Pass `meta=...` instead, " "or point `sample_dir` at the folder that contains it."
             )
         meta = json.loads(meta_path.read_text())
 
@@ -132,8 +144,7 @@ def load_sample(name: str = DEFAULT_SAMPLE, sample_dir=SAMPLE_DIR, download: boo
     if not img_path.exists():
         if not download:
             raise FileNotFoundError(f"Sample image not found at {img_path}")
-        _download(meta.get("image_urls") or meta.get("image_url")
-                  or COCO_IMAGE_URL.format(**meta), img_path)
+        _download(meta.get("image_urls") or meta.get("image_url") or COCO_IMAGE_URL.format(**meta), img_path)
 
     img_bgr = cv2.imread(str(img_path))
     if img_bgr is None:
@@ -173,6 +184,7 @@ def load_coco_annotations(coco_dir: str):
 # PCK
 # ---------------------------------------------------------------------------
 
+
 def to_numpy(x) -> np.ndarray:
     """Tensor (any device / framework) or array-like -> NumPy array."""
     if hasattr(x, "detach"):
@@ -193,7 +205,7 @@ def compute_pck(pred_kpts, gt_kpts, gt_vis, bbox_xywh, threshold: float = 0.05):
         ``(correct[17], valid[17])`` boolean arrays.
     """
     _, _, bw, bh = bbox_xywh
-    norm = math.sqrt(bw ** 2 + bh ** 2)
+    norm = math.sqrt(bw**2 + bh**2)
     if norm <= 0:
         return np.zeros(17, dtype=bool), np.zeros(17, dtype=bool)
     valid = np.asarray(gt_vis) > 0
@@ -220,7 +232,7 @@ def compute_person_pck(keypoints_mhr70, annotation, threshold: float = 0.05):
 def pck_tolerance_px(bbox_xywh, threshold: float = 0.05) -> float:
     """Radius, in pixels, inside which a prediction still counts as correct."""
     _, _, bw, bh = bbox_xywh
-    return float(threshold * math.sqrt(bw ** 2 + bh ** 2))
+    return float(threshold * math.sqrt(bw**2 + bh**2))
 
 
 # ---------------------------------------------------------------------------
@@ -230,34 +242,82 @@ def pck_tolerance_px(bbox_xywh, threshold: float = 0.05) -> float:
 # Palette, then the 65 bones in draw order. Colours are passed straight to
 # OpenCV on a BGR image, matching the reference visualizer.
 _PALETTE = {
-    "T": (51, 153, 255),    # torso / head
-    "L": (0, 255, 0),       # left limb + left hand
-    "R": (255, 128, 0),     # right limb + right hand
-    "P": (255, 153, 255),   # index fingers
-    "S": (102, 178, 255),   # middle fingers
-    "D": (255, 51, 51),     # ring fingers
+    "T": (51, 153, 255),  # torso / head
+    "L": (0, 255, 0),  # left limb + left hand
+    "R": (255, 128, 0),  # right limb + right hand
+    "P": (255, 153, 255),  # index fingers
+    "S": (102, 178, 255),  # middle fingers
+    "D": (255, 51, 51),  # ring fingers
 }
 
 _BONES = [
-    (13, 11, "L"), (11, 9, "L"), (14, 12, "R"), (12, 10, "R"),
-    (9, 10, "T"), (5, 9, "T"), (6, 10, "T"), (5, 6, "T"),
-    (5, 7, "L"), (6, 8, "R"), (7, 62, "L"), (8, 41, "R"),
-    (1, 2, "T"), (0, 1, "T"), (0, 2, "T"), (1, 3, "T"), (2, 4, "T"),
-    (3, 5, "T"), (4, 6, "T"),
-    (13, 15, "L"), (13, 16, "L"), (13, 17, "L"),
-    (14, 18, "R"), (14, 19, "R"), (14, 20, "R"),
+    (13, 11, "L"),
+    (11, 9, "L"),
+    (14, 12, "R"),
+    (12, 10, "R"),
+    (9, 10, "T"),
+    (5, 9, "T"),
+    (6, 10, "T"),
+    (5, 6, "T"),
+    (5, 7, "L"),
+    (6, 8, "R"),
+    (7, 62, "L"),
+    (8, 41, "R"),
+    (1, 2, "T"),
+    (0, 1, "T"),
+    (0, 2, "T"),
+    (1, 3, "T"),
+    (2, 4, "T"),
+    (3, 5, "T"),
+    (4, 6, "T"),
+    (13, 15, "L"),
+    (13, 16, "L"),
+    (13, 17, "L"),
+    (14, 18, "R"),
+    (14, 19, "R"),
+    (14, 20, "R"),
     # Left hand: thumb, index, middle, ring, pinky chains hanging off joint 62.
-    (62, 45, "R"), (45, 44, "R"), (44, 43, "R"), (43, 42, "R"),
-    (62, 49, "P"), (49, 48, "P"), (48, 47, "P"), (47, 46, "P"),
-    (62, 53, "S"), (53, 52, "S"), (52, 51, "S"), (51, 50, "S"),
-    (62, 57, "D"), (57, 56, "D"), (56, 55, "D"), (55, 54, "D"),
-    (62, 61, "L"), (61, 60, "L"), (60, 59, "L"), (59, 58, "L"),
+    (62, 45, "R"),
+    (45, 44, "R"),
+    (44, 43, "R"),
+    (43, 42, "R"),
+    (62, 49, "P"),
+    (49, 48, "P"),
+    (48, 47, "P"),
+    (47, 46, "P"),
+    (62, 53, "S"),
+    (53, 52, "S"),
+    (52, 51, "S"),
+    (51, 50, "S"),
+    (62, 57, "D"),
+    (57, 56, "D"),
+    (56, 55, "D"),
+    (55, 54, "D"),
+    (62, 61, "L"),
+    (61, 60, "L"),
+    (60, 59, "L"),
+    (59, 58, "L"),
     # Right hand: same five chains hanging off joint 41.
-    (41, 24, "R"), (24, 23, "R"), (23, 22, "R"), (22, 21, "R"),
-    (41, 28, "P"), (28, 27, "P"), (27, 26, "P"), (26, 25, "P"),
-    (41, 32, "S"), (32, 31, "S"), (31, 30, "S"), (30, 29, "S"),
-    (41, 36, "D"), (36, 35, "D"), (35, 34, "D"), (34, 33, "D"),
-    (41, 40, "L"), (40, 39, "L"), (39, 38, "L"), (38, 37, "L"),
+    (41, 24, "R"),
+    (24, 23, "R"),
+    (23, 22, "R"),
+    (22, 21, "R"),
+    (41, 28, "P"),
+    (28, 27, "P"),
+    (27, 26, "P"),
+    (26, 25, "P"),
+    (41, 32, "S"),
+    (32, 31, "S"),
+    (31, 30, "S"),
+    (30, 29, "S"),
+    (41, 36, "D"),
+    (36, 35, "D"),
+    (35, 34, "D"),
+    (34, 33, "D"),
+    (41, 40, "L"),
+    (40, 39, "L"),
+    (39, 38, "L"),
+    (38, 37, "L"),
 ]
 
 #: ``[(joint_a, joint_b, bgr_colour), ...]`` for all 65 MHR-70 bones.
@@ -270,6 +330,7 @@ MHR70_KEYPOINT_COLOR = _PALETTE["T"]
 # ---------------------------------------------------------------------------
 # 2D skeleton rendering
 # ---------------------------------------------------------------------------
+
 
 def draw_2d_keypoints(
     img_bgr: np.ndarray,
@@ -306,8 +367,13 @@ def draw_2d_keypoints(
         x1, y1, x2, y2 = np.asarray(bbox)[:4].astype(int)
         cv2.rectangle(img_vis, (x1, y1), (x2, y2), (0, 255, 0), 2)
         cv2.putText(
-            img_vis, f"P{person_idx}", (x1, max(y1 - 8, 15)),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2,
+            img_vis,
+            f"P{person_idx}",
+            (x1, max(y1 - 8, 15)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.6,
+            (0, 255, 0),
+            2,
         )
     return img_vis
 
@@ -361,9 +427,7 @@ def render_mesh(
 def render_3d_mesh(img_bgr, vertices, cam_t, focal_length, faces) -> Tuple[np.ndarray, np.ndarray]:
     """Front-view overlay and a side view on white; both ``[H, W, 3]`` BGR uint8."""
     front = render_mesh(img_bgr, vertices, cam_t, focal_length, faces)
-    side = render_mesh(
-        np.ones_like(img_bgr) * 255, vertices, cam_t, focal_length, faces, side_view=True
-    )
+    side = render_mesh(np.ones_like(img_bgr) * 255, vertices, cam_t, focal_length, faces, side_view=True)
     return (front * 255).astype(np.uint8), (side * 255).astype(np.uint8)
 
 
@@ -373,21 +437,21 @@ def render_views(img_bgr: np.ndarray, person: dict, faces: Optional[np.ndarray])
     ``person`` needs ``keypoints_2d`` ``[70, 2]``; the mesh views additionally
     need ``vertices``, ``cam_t`` and ``focal_length`` and are ``None`` otherwise.
     """
+
     def _rgb(im):
         return None if im is None else cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
 
     skeleton = draw_2d_keypoints(img_bgr, person["keypoints_2d"], person.get("bbox"))
     front = side = None
     if person.get("vertices") is not None and faces is not None:
-        front, side = render_3d_mesh(
-            img_bgr, person["vertices"], person["cam_t"], float(person["focal_length"]), faces
-        )
+        front, side = render_3d_mesh(img_bgr, person["vertices"], person["cam_t"], float(person["focal_length"]), faces)
     return _rgb(skeleton), _rgb(front), _rgb(side)
 
 
 # ---------------------------------------------------------------------------
 # Plotting
 # ---------------------------------------------------------------------------
+
 
 def show_row(
     titled_images: Sequence[Tuple[str, Optional[np.ndarray]]],
@@ -412,6 +476,7 @@ def show_row(
 # ---------------------------------------------------------------------------
 # Misc
 # ---------------------------------------------------------------------------
+
 
 def free_memory():
     """Release host + accelerator memory between backends (models are multi-GB)."""

@@ -46,6 +46,7 @@ import openvino as ov
 
 try:
     import nncf
+
     HAS_NNCF = True
 except ImportError:  # INT8 export only
     HAS_NNCF = False
@@ -96,14 +97,26 @@ def _download_sam3d_package(root: Path) -> Path:
             print(f"[sam3d_torch] Sparse-cloning sam_3d_body package from {SAM3D_REPO_URL}")
             subprocess.run(
                 [
-                    "git", "clone", "--depth", "1", "--filter=blob:none", "--sparse",
-                    SAM3D_REPO_URL, str(tmp_dir),
+                    "git",
+                    "clone",
+                    "--depth",
+                    "1",
+                    "--filter=blob:none",
+                    "--sparse",
+                    SAM3D_REPO_URL,
+                    str(tmp_dir),
                 ],
-                check=True, capture_output=True, text=True, timeout=300,
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=300,
             )
             subprocess.run(
                 ["git", "-C", str(tmp_dir), "sparse-checkout", "set", "sam_3d_body"],
-                check=True, capture_output=True, text=True, timeout=120,
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=120,
             )
             cloned_pkg = tmp_dir / "sam_3d_body"
             if (cloned_pkg / "__init__.py").exists():
@@ -138,7 +151,7 @@ def _download_sam3d_package(root: Path) -> Path:
         # Re-root the package members at <root>/sam_3d_body/... so the package
         # lands directly in the root folder.
         for member in pkg_members:
-            member.name = "sam_3d_body" + member.name[len(pkg_prefix):]
+            member.name = "sam_3d_body" + member.name[len(pkg_prefix) :]
         try:
             tar.extractall(root, members=pkg_members, filter="data")
         except TypeError:  # Python < 3.11.4 has no `filter` argument
@@ -236,9 +249,7 @@ def load_sam_3d_body_with_injection(checkpoint_path: str, device: str = "cpu", m
     # The model config lives next to the checkpoint (or one level up).
     model_cfg = os.path.join(os.path.dirname(checkpoint_path), "model_config.yaml")
     if not os.path.exists(model_cfg):
-        model_cfg = os.path.join(
-            os.path.dirname(os.path.dirname(checkpoint_path)), "model_config.yaml"
-        )
+        model_cfg = os.path.join(os.path.dirname(os.path.dirname(checkpoint_path)), "model_config.yaml")
     model_cfg = get_config(model_cfg)
 
     model_cfg.defrost()
@@ -263,8 +274,7 @@ def load_sam_3d_body_with_injection(checkpoint_path: str, device: str = "cpu", m
         print(
             f"[load_sam_3d_body] Injected {len(injected_keys)} model-initialised keys "
             f"(not in main checkpoint by design):\n"
-            f"  - {mhr_count} MHR TorchScript params  (source: {mhr_path or 'mhr_path'})\n"
-            + "".join(f"  - {k}\n" for k in non_mhr)
+            f"  - {mhr_count} MHR TorchScript params  (source: {mhr_path or 'mhr_path'})\n" + "".join(f"  - {k}\n" for k in non_mhr)
         )
 
     load_state_dict(model, state_dict, strict=False)
@@ -275,14 +285,17 @@ def load_sam_3d_body_with_injection(checkpoint_path: str, device: str = "cpu", m
     unmatched_ckpt = checkpoint_keys - model_keys
     unmatched_model = (model_keys - checkpoint_keys) - set(injected_keys)
     if unmatched_ckpt:
-        print(f"[load_sam_3d_body] WARNING: {len(unmatched_ckpt)} unexpected checkpoint keys:\n  "
-              + "\n  ".join(sorted(unmatched_ckpt)))
+        print(f"[load_sam_3d_body] WARNING: {len(unmatched_ckpt)} unexpected checkpoint keys:\n  " + "\n  ".join(sorted(unmatched_ckpt)))
     if unmatched_model:
-        print(f"[load_sam_3d_body] WARNING: {len(unmatched_model)} model params not in checkpoint "
-              f"and not expected-missing:\n  " + "\n  ".join(sorted(unmatched_model)))
+        print(
+            f"[load_sam_3d_body] WARNING: {len(unmatched_model)} model params not in checkpoint "
+            f"and not expected-missing:\n  " + "\n  ".join(sorted(unmatched_model))
+        )
     if not unmatched_ckpt and not unmatched_model:
-        print(f"[load_sam_3d_body] All {len(checkpoint_keys)} checkpoint keys matched model "
-              f"parameters ({len(injected_keys)} supplied by model initialisation).")
+        print(
+            f"[load_sam_3d_body] All {len(checkpoint_keys)} checkpoint keys matched model "
+            f"parameters ({len(injected_keys)} supplied by model initialisation)."
+        )
 
     model = model.to(device)
     model.eval()
@@ -335,8 +348,7 @@ def enable_device_patches(device: Union[str, torch.device]) -> None:
     estimator_mod.recursive_to = recursive_to_device
     sam3d_mod.recursive_to = recursive_to_device
 
-    setattr(torch.Tensor, _LEGACY_TRANSFER_METHOD,
-            lambda self, *args, **kwargs: self.to(target))
+    setattr(torch.Tensor, _LEGACY_TRANSFER_METHOD, lambda self, *args, **kwargs: self.to(target))
 
     def jit_load_on_host(f, map_location=None, **kwargs):
         # TorchScript sub-models load on the host; load_sam_3d_body moves them after.
@@ -377,6 +389,7 @@ def resolve_device(device: Union[str, torch.device] = "cpu") -> torch.device:
 # Reference inference
 # ===========================================================================
 
+
 class Sam3DBodyTorch:
     """Reference SAM 3D Body inference on Intel XPU or CPU.
 
@@ -404,9 +417,7 @@ class Sam3DBodyTorch:
         from sam_3d_body import SAM3DBodyEstimator
 
         print(f"[Sam3DBodyTorch] Device: {self.device}")
-        self.model, self.model_cfg = load_sam_3d_body_with_injection(
-            checkpoint_path, device=self.device, mhr_path=mhr_path
-        )
+        self.model, self.model_cfg = load_sam_3d_body_with_injection(checkpoint_path, device=self.device, mhr_path=mhr_path)
         self.estimator = SAM3DBodyEstimator(
             sam_3d_body_model=self.model,
             model_cfg=self.model_cfg,
@@ -443,8 +454,12 @@ class Sam3DBodyTorch:
         t0 = time.perf_counter()
 
         results = self.estimator.process_one_image(
-            img, bboxes=bboxes, masks=masks, cam_int=cam_int,
-            bbox_thr=bbox_thr, use_mask=use_mask,
+            img,
+            bboxes=bboxes,
+            masks=masks,
+            cam_int=cam_int,
+            bbox_thr=bbox_thr,
+            use_mask=use_mask,
         )
 
         if self.device.type == "xpu":
@@ -480,6 +495,7 @@ class Sam3DBodyTorch:
 # and prim::unchecked_cast, none of which the OpenVINO frontend supports. The
 # math below is identical, expressed with dense ops only.
 # Quaternion convention: XYZW (x, y, z, w), matching pymomentum.
+
 
 def euler_xyz_to_quaternion(euler: torch.Tensor) -> torch.Tensor:
     """XYZ Euler angles ``[..., 3]`` (radians) -> quaternion ``[..., 4]`` XYZW."""
@@ -592,9 +608,7 @@ class DenseMHR(nn.Module):
 
         skinning_weights = torch.zeros(cls.N_VERTS, cls.N_JOINTS)
         valid = skin_indices >= 0
-        skinning_weights.index_put_(
-            (vert_indices[valid], skin_indices[valid]), skin_weights[valid], accumulate=True
-        )
+        skinning_weights.index_put_((vert_indices[valid], skin_indices[valid]), skin_weights[valid], accumulate=True)
         model.skinning_weights = skinning_weights
 
         # Pose correctives: COO -> dense [3000, 750].
@@ -693,9 +707,7 @@ class DenseMHR(nn.Module):
         # Compose "undo bind pose" with "apply current pose" into one transform.
         combined_quat = quaternion_multiply(g_quat, inv_quat.unsqueeze(0).expand(batch_size, -1, -1))
         combined_scale = g_scale * inv_scale.unsqueeze(0)
-        combined_pos = g_pos + quaternion_rotate_point(
-            g_quat, inv_pos.unsqueeze(0).expand(batch_size, -1, -1) * g_scale
-        )
+        combined_pos = g_pos + quaternion_rotate_point(g_quat, inv_pos.unsqueeze(0).expand(batch_size, -1, -1) * g_scale)
 
         x, y = combined_quat[..., 0:1], combined_quat[..., 1:2]
         z, w = combined_quat[..., 2:3], combined_quat[..., 3:4]
@@ -746,11 +758,7 @@ class DenseMHR(nn.Module):
         # Parameter limits are intentionally not applied: the TorchScript model skips them.
         global_state = self.forward_kinematics(self.joint_parameters_to_local_state(joint_params))
 
-        unposed_verts = (
-            rest_verts
-            + self.face_expressions(face_expr_coeffs)
-            + self.pose_correctives(joint_params)
-        )
+        unposed_verts = rest_verts + self.face_expressions(face_expr_coeffs) + self.pose_correctives(joint_params)
         return self.linear_blend_skinning(unposed_verts, global_state), global_state
 
     def verify(self, mhr_ts, n_samples: int = 5, atol: float = 1e-3) -> bool:
@@ -767,14 +775,14 @@ class DenseMHR(nn.Module):
             diff_s = (out_ts[1] - out_dense[1]).abs().max().item()
             ok = diff_v < atol and diff_s < atol
             all_pass &= ok
-            print(f"  Sample {i}: verts_diff={diff_v:.6e}, skel_diff={diff_s:.6e} "
-                  f"[{'PASS' if ok else 'FAIL'}]")
+            print(f"  Sample {i}: verts_diff={diff_v:.6e}, skel_diff={diff_s:.6e} " f"[{'PASS' if ok else 'FAIL'}]")
         return all_pass
 
 
 # ===========================================================================
 # Export wrappers
 # ===========================================================================
+
 
 class BackboneWrapper(nn.Module):
     """Backbone with ImageNet normalization baked in.
@@ -872,6 +880,7 @@ class FullToCrop(nn.Module):
 # Export helpers
 # ===========================================================================
 
+
 def save_ov_model(ov_model, output_path: str, precision: str) -> float:
     """Write an OV model at ``precision``; returns the ``.bin`` size in MB.
 
@@ -910,17 +919,14 @@ def _export(module: nn.Module, example_inputs, output_dir, name: str, precision:
 def load_reference_model(checkpoint_path: str, mhr_path: str):
     """Load the full SAM 3D Body model on CPU, ready for tracing."""
     enable_device_patches("cpu")
-    model, _ = load_sam_3d_body_with_injection(
-        checkpoint_path=checkpoint_path, device="cpu", mhr_path=mhr_path
-    )
+    model, _ = load_sam_3d_body_with_injection(checkpoint_path=checkpoint_path, device="cpu", mhr_path=mhr_path)
     return model.eval().float()
 
 
 def export_backbone(model, output_dir, precision: str) -> float:
     """DINOv3 ViT-H/16+ backbone, ``[1,3,512,512] -> [1,1280,32,32]``."""
     print(f"\n  [Backbone] {precision.upper()}")
-    return _export(BackboneWrapper(model), (torch.randn(1, 3, 512, 512),),
-                   output_dir, f"backbone_{precision}", precision)
+    return _export(BackboneWrapper(model), (torch.randn(1, 3, 512, 512),), output_dir, f"backbone_{precision}", precision)
 
 
 def export_mhr(mhr_path: str, output_dir, precision: str) -> float:
@@ -934,8 +940,7 @@ def export_mhr(mhr_path: str, output_dir, precision: str) -> float:
 def export_mask_encoder(model, output_dir, precision: str) -> float:
     """Mask conditioning CNN, ``[1,1,512,512] -> [1,1280,32,32]``, plus its no-mask buffer."""
     print(f"\n  [MaskEncoder] {precision.upper()}")
-    size = _export(model.prompt_encoder.mask_downscaling, (torch.randn(1, 1, 512, 512),),
-                   output_dir, f"mask_encoder_{precision}", precision)
+    size = _export(model.prompt_encoder.mask_downscaling, (torch.randn(1, 1, 512, 512),), output_dir, f"mask_encoder_{precision}", precision)
     os.makedirs(str(output_dir), exist_ok=True)
     np.savez(
         os.path.join(str(output_dir), "mask_buffers.npz"),
@@ -954,21 +959,26 @@ def export_iterative_components(model, output_dir, precision: str) -> dict:
     sizes["ray_cond_emb"] = _export(
         RayCondEmbWrapper(model.ray_cond_emb),
         (torch.randn(B, C_BACKBONE, 32, 32), torch.randn(B, 2, 512, 512)),
-        output_dir, "ray_cond_emb", precision,
+        output_dir,
+        "ray_cond_emb",
+        precision,
     )
 
     layer_example = (
-        torch.randn(B, N_TOKENS, C_DECODER), torch.randn(B, HW, C_BACKBONE),
-        torch.randn(B, N_TOKENS, C_DECODER), torch.randn(B, HW, C_BACKBONE),
+        torch.randn(B, N_TOKENS, C_DECODER),
+        torch.randn(B, HW, C_BACKBONE),
+        torch.randn(B, N_TOKENS, C_DECODER),
+        torch.randn(B, HW, C_BACKBONE),
     )
     for i, layer in enumerate(model.decoder.layers):
-        sizes[f"decoder_layer_{i}"] = _export(
-            DecoderLayerWrapper(layer), layer_example, output_dir, f"decoder_layer_{i}", precision
-        )
+        sizes[f"decoder_layer_{i}"] = _export(DecoderLayerWrapper(layer), layer_example, output_dir, f"decoder_layer_{i}", precision)
 
     sizes["decoder_norm"] = _export(
-        ModuleWrapper(model.decoder.norm_final), (torch.randn(B, N_TOKENS, C_DECODER),),
-        output_dir, "decoder_norm", precision,
+        ModuleWrapper(model.decoder.norm_final),
+        (torch.randn(B, N_TOKENS, C_DECODER),),
+        output_dir,
+        "decoder_norm",
+        precision,
     )
 
     for name, module, example in [
@@ -990,38 +1000,128 @@ def export_aux_ops(output_dir, precision: str) -> dict:
     print(f"\n  [Aux ops] {precision.upper()}")
     sizes = {}
     sizes["grid_sample"] = _export(
-        GridSampleModel(), (torch.randn(1, 1280, 32, 32), torch.randn(1, 70, 1, 2)),
-        output_dir, "grid_sample", precision,
+        GridSampleModel(),
+        (torch.randn(1, 1280, 32, 32), torch.randn(1, 70, 1, 2)),
+        output_dir,
+        "grid_sample",
+        precision,
     )
     sizes["camera_projection"] = _export(
         CameraProjection(),
         (
-            torch.randn(1, 70, 3), torch.randn(1, 3), torch.tensor([[320.0, 240.0]]),
-            torch.tensor([200.0]), torch.tensor([[640.0, 480.0]]), torch.tensor([800.0]),
+            torch.randn(1, 70, 3),
+            torch.randn(1, 3),
+            torch.tensor([[320.0, 240.0]]),
+            torch.tensor([200.0]),
+            torch.tensor([[640.0, 480.0]]),
+            torch.tensor([800.0]),
         ),
-        output_dir, "camera_projection", precision,
+        output_dir,
+        "camera_projection",
+        precision,
     )
     sizes["full_to_crop"] = _export(
-        FullToCrop(), (torch.randn(1, 70, 2), torch.randn(2, 3)),
-        output_dir, "full_to_crop", precision,
+        FullToCrop(),
+        (torch.randn(1, 70, 2), torch.randn(2, 3)),
+        output_dir,
+        "full_to_crop",
+        precision,
     )
     return sizes
 
 
 # Body pose conversion indices, mirroring mhr_utils.compact_cont_to_model_params_body.
-_BODY_3DOF_ROT_IDXS = np.array([
-    (0, 2, 4), (6, 8, 10), (12, 13, 14), (15, 16, 17), (18, 19, 20),
-    (21, 22, 23), (24, 25, 26), (27, 28, 29), (34, 35, 36), (37, 38, 39),
-    (44, 45, 46), (53, 54, 55), (64, 65, 66), (85, 69, 73), (86, 70, 79),
-    (87, 71, 82), (88, 72, 76), (91, 92, 93), (112, 96, 100), (113, 97, 106),
-    (114, 98, 109), (115, 99, 103), (130, 131, 132),
-], dtype=np.int64)
-_BODY_1DOF_ROT_IDXS = np.array([
-    1, 3, 5, 7, 9, 11, 30, 31, 32, 33, 40, 41, 42, 43, 47, 48, 49, 50,
-    51, 52, 56, 57, 58, 59, 60, 61, 62, 63, 67, 68, 74, 75, 77, 78, 80,
-    81, 83, 84, 89, 90, 94, 95, 101, 102, 104, 105, 107, 108, 110, 111,
-    116, 117, 118, 119, 120, 121, 122, 123,
-], dtype=np.int64)
+_BODY_3DOF_ROT_IDXS = np.array(
+    [
+        (0, 2, 4),
+        (6, 8, 10),
+        (12, 13, 14),
+        (15, 16, 17),
+        (18, 19, 20),
+        (21, 22, 23),
+        (24, 25, 26),
+        (27, 28, 29),
+        (34, 35, 36),
+        (37, 38, 39),
+        (44, 45, 46),
+        (53, 54, 55),
+        (64, 65, 66),
+        (85, 69, 73),
+        (86, 70, 79),
+        (87, 71, 82),
+        (88, 72, 76),
+        (91, 92, 93),
+        (112, 96, 100),
+        (113, 97, 106),
+        (114, 98, 109),
+        (115, 99, 103),
+        (130, 131, 132),
+    ],
+    dtype=np.int64,
+)
+_BODY_1DOF_ROT_IDXS = np.array(
+    [
+        1,
+        3,
+        5,
+        7,
+        9,
+        11,
+        30,
+        31,
+        32,
+        33,
+        40,
+        41,
+        42,
+        43,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        67,
+        68,
+        74,
+        75,
+        77,
+        78,
+        80,
+        81,
+        83,
+        84,
+        89,
+        90,
+        94,
+        95,
+        101,
+        102,
+        104,
+        105,
+        107,
+        108,
+        110,
+        111,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+    ],
+    dtype=np.int64,
+)
 _BODY_1DOF_TRANS_IDXS = np.array([124, 125, 126, 127, 128, 129], dtype=np.int64)
 _MHR_PARAM_HAND_IDXS = list(range(62, 116))
 #: Degrees of freedom per hand joint, in model-parameter order.
@@ -1061,9 +1161,7 @@ def export_buffers(model, output_dir) -> None:
     mhr_param_hand_mask[_MHR_PARAM_HAND_IDXS] = True
 
     def hand_mask(per_joint: int, dofs) -> np.ndarray:
-        return np.concatenate(
-            [np.ones(per_joint * k, dtype=bool) * (k in dofs) for k in _HAND_DOFS_IN_ORDER]
-        )
+        return np.concatenate([np.ones(per_joint * k, dtype=bool) * (k in dofs) for k in _HAND_DOFS_IN_ORDER])
 
     np.savez(
         buffers_dir / "pose_head_buffers.npz",
