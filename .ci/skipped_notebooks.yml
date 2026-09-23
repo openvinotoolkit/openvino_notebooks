@@ -93,12 +93,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-genai.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/fast-segment-anything/fast-segment-anything.ipynb
   skips:
     - os:
@@ -117,12 +111,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/distil-whisper-asr/distil-whisper-asr.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/llm-question-answering/llm-question-answering.ipynb
   skips:
     - os:
@@ -136,12 +124,6 @@
         - ubuntu-22.04
         - windows-2022
 - notebook: notebooks/animate-anyone/animate-anyone.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
   skips:
     - os:
         - macos-13
@@ -195,12 +177,6 @@
 - notebook: notebooks/phi-3-vision/phi-3-vision.ipynb
   skips:
       - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/qwen2-vl/qwen2-vl.ipynb
-  skips:
-    - os:
         - macos-13
         - ubuntu-22.04
         - windows-2022
@@ -273,12 +249,6 @@
     - os:
       - macos-13
       - windows-2022  # 8.3 min on Win — too slow for 6h CI limit (2026-03-31)
-- notebook: notebooks/gemma3/gemma3.ipynb
-  skips:
-   - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/omniparser/omniparser.ipynb
   skips:
     - os:
@@ -403,15 +373,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/qwen3-vl/qwen3-vl.ipynb
-  skips:
-    - os:
-        - macos-13
-- notebook: notebooks/qwen2.5-vl/qwen2.5-vl.ipynb
-  skips:
-    - os:
-        - ubuntu-22.04
-        - windows-2022  # 9.5 min on Win — too slow for 6h CI limit (2026-03-30)
 - notebook: notebooks/catvton/catvton.ipynb
   skips:
     - os:
@@ -497,10 +458,6 @@
     - os:
         - windows-2022
 # 8.0 min on Win — too slow for 6h CI limit (2026-03-30)
-- notebook: notebooks/internvl2/internvl2.ipynb
-  skips:
-    - os:
-        - windows-2022
 - notebook: notebooks/qwen3-tts/qwen3-tts.ipynb
   skips:
     - os:
