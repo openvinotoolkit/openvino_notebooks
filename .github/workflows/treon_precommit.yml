@@ -57,18 +57,46 @@ jobs:
         echo "docker_tag=$docker_tag" >> $GITHUB_OUTPUT
 
   build_treon_linux:
-    needs: get_docker_tag
     strategy:
       fail-fast: false
       matrix:
-        runs_on: [aks-linux-8-cores-32gb]
         python: ['3.10', '3.11', '3.12', '3.13']
     uses: ./.github/workflows/job_unix.yml
     with:
-      runs_on: ${{ matrix.runs_on }}
+      runner: '["aks-linux-8-cores-32gb"]'
       python: ${{ matrix.python }}
-      container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:${{ needs.get_docker_tag.outputs.docker_tag }}'
+      container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:pr-37751'
       test_only_changed: true
+      separate_venv: true
+
+  build_treon_igpu:
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11']
+    uses: ./.github/workflows/job_unix.yml
+    with:
+      runner: '["self-hosted", "igpu", "Linux"]'
+      runner-group: 'Intel-GPU'
+      python: ${{ matrix.python }}
+      container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:pr-37751'
+      options: '--group-add 44 --group-add 993 --device /dev/dri/renderD128:/dev/dri/renderD128'
+      test_only_changed: false
+      separate_venv: true
+
+  build_treon_dgpu:
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11']
+    uses: ./.github/workflows/job_unix.yml
+    with:
+      runner: '["self-hosted", "dgpu"]'
+      runner-group: 'Intel-GPU'
+      python: ${{ matrix.python }}
+      container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:pr-37751'
+      options: '--group-add 44 --group-add 993 --device /dev/dri/card2:/dev/dri/card2 --device /dev/dri/renderD129:/dev/dri/renderD129'
+      test_only_changed: false
       separate_venv: true
   
   build_treon_windows:
@@ -86,7 +114,7 @@ jobs:
 
   Overall_Status:
     name: ci/gha_overall_status_precommit
-    needs: [get_docker_tag, build_treon_linux, build_treon_windows]
+    needs: [get_docker_tag, build_treon_linux, build_treon_igpu, build_treon_dgpu, build_treon_windows]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
