@@ -531,3 +531,15 @@
   skips:
     - os:
         - macos-13
+- notebook: notebooks/csrnet/csrnet.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/dinov3s/dinov3s.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
