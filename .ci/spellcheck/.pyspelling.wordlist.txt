@@ -502,6 +502,8 @@ iteratively
 Javascript
 JAX
 JAX's
+JEPA
+JEPA's
 JFLEG
 Jina
 jina
@@ -1141,6 +1143,7 @@ STAL
 stateful
 STFT
 streamable
+strided
 Struct
 struct
 stylization
