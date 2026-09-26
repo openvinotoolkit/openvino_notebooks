@@ -1,0 +1,84 @@
+# See help here: https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/enabling-and-disabling-version-updates
+
+version: 2
+updates:
+  #
+  # Python dependencies (pip)
+  #
+
+  # Root notebook requirements
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      time: "09:00"
+      timezone: "Poland"
+    open-pull-requests-limit: 10
+    assignees:
+      - "akashchi"
+      - "aleksandr-mokrov"
+    versioning-strategy: increase-if-necessary
+
+  # Docker image Python dependencies (Pipfile)
+  - package-ecosystem: pip
+    directory: "/.docker"
+    schedule:
+      interval: "weekly"
+      time: "09:00"
+      timezone: "Poland"
+    open-pull-requests-limit: 10
+    assignees:
+      - "akashchi"
+      - "aleksandr-mokrov"
+    versioning-strategy: increase-if-necessary
+
+  #
+  # JavaScript dependencies (npm)
+  #
+
+  # Notebooks selector web app
+  - package-ecosystem: npm
+    directory: "/selector"
+    schedule:
+      interval: "weekly"
+      time: "09:00"
+      timezone: "Poland"
+    open-pull-requests-limit: 10
+    assignees:
+      - "akashchi"
+      - "aleksandr-mokrov"
+    versioning-strategy: increase-if-necessary
+    groups:
+      npm-packages:
+        patterns:
+          - "*"
+
+  #
+  # Docker base images
+  #
+
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      time: "09:00"
+      timezone: "Poland"
+    open-pull-requests-limit: 10
+    assignees:
+      - "akashchi"
+      - "aleksandr-mokrov"
+
+  #
+  # GitHub Actions - CI
+  #
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      time: "09:00"
+      timezone: "Poland"
+    open-pull-requests-limit: 10
+    assignees:
+      - "akashchi"
+      - "aleksandr-mokrov"
