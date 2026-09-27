@@ -153,9 +153,9 @@ def download_file(
     except requests.exceptions.RequestException as error:
         raise Exception(f"File downloading failed with error: {error}") from None
 
-    # download the file if it does not exist
     filesize = int(response.headers.get("Content-length", 0))
-    if not filepath.exists():
+    tmp_filepath = filepath.with_name(filepath.name + ".part")
+    try:
         with tqdm_notebook(
             total=filesize,
             unit="B",
@@ -164,15 +164,23 @@ def download_file(
             desc=str(filename),
             disable=not show_progress,
         ) as progress_bar:
-            with open(filepath, "wb") as file_object:
+            with open(tmp_filepath, "wb") as file_object:
+                downloaded = 0
                 for chunk in response.iter_content(chunk_size):
                     file_object.write(chunk)
+                    downloaded += len(chunk)
                     progress_bar.update(len(chunk))
                     progress_bar.refresh()
-    else:
-        print(f"'{filepath}' already exists.")
 
-    response.close()
+        if filesize and downloaded != filesize:
+            raise Exception(f"Downloaded {downloaded} of {filesize} bytes. The connection may have dropped.")
+
+        tmp_filepath.replace(filepath)
+    except BaseException:
+        tmp_filepath.unlink(missing_ok=True)
+        raise
+    finally:
+        response.close()
 
     return filepath.resolve()
 
