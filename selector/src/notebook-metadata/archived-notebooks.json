@@ -1,5 +1,301 @@
 [
   {
+    "title": "Automatic speech recognition using Distil-Whisper and OpenVINO",
+    "path": "distil-whisper-asr/distil-whisper-asr.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/52c58b58-7730-48d2-803d-4af0b6115499",
+    "lastBranch": "2026.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.4/notebooks/distil-whisper-asr/distil-whisper-asr.ipynb",
+    "models": [
+      "distil-large-v2",
+      "distil-large-v3",
+      "distil-medium.en",
+      "distil-small.en",
+      "distil-whisper/distil-large-v2",
+      "distil-whisper/distil-large-v3",
+      "distil-whisper/distil-medium.en",
+      "distil-whisper/distil-small.en",
+      "distil-whisper/librispeech_long",
+      "hf-internal-testing/librispeech_asr_dummy",
+      "librispeech_asr",
+      "librispeech_asr_dummy",
+      "librispeech_long",
+      "openai/whisper-base",
+      "openai/whisper-base.en",
+      "openai/whisper-large",
+      "openai/whisper-large-v2",
+      "openai/whisper-large-v3",
+      "openai/whisper-large-v3-turbo",
+      "openai/whisper-medium",
+      "openai/whisper-medium.en",
+      "openai/whisper-small",
+      "openai/whisper-small.en",
+      "openai/whisper-tiny.en",
+      "openslr/librispeech_asr",
+      "whisper-base",
+      "whisper-base.en",
+      "whisper-large",
+      "whisper-large-v2",
+      "whisper-large-v3",
+      "whisper-large-v3-turbo",
+      "whisper-medium",
+      "whisper-medium.en",
+      "whisper-small",
+      "whisper-small.en",
+      "whisper-tiny.en"
+    ],
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Speech Recognition"
+      ]
+    }
+  },
+  {
+    "title": "Video Subtitle Generation using Whisper and OpenVINO™",
+    "path": "whisper-subtitles-generation/whisper-subtitles-generation.ipynb",
+    "imageUrl": "https://user-images.githubusercontent.com/29454499/204548693-1304ef33-c790-490d-8a8b-d5766acb6254.png",
+    "lastBranch": "2026.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.4/notebooks/whisper-subtitles-generation/whisper-subtitles-generation.ipynb",
+    "models": [
+      "librispeech_asr",
+      "openai/whisper-base",
+      "openai/whisper-large",
+      "openai/whisper-large-v2",
+      "openai/whisper-large-v3",
+      "openai/whisper-large-v3-turbo",
+      "openai/whisper-medium",
+      "openai/whisper-small",
+      "openslr/librispeech_asr",
+      "whisper-base",
+      "whisper-large",
+      "whisper-large-v2",
+      "whisper-large-v3",
+      "whisper-large-v3-turbo",
+      "whisper-medium",
+      "whisper-small"
+    ],
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Speech Recognition"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with Gemma3 and OpenVINO",
+    "path": "gemma3/gemma3.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/2540a58e-c242-4439-b151-0fd1e6938af1",
+    "lastBranch": "2026.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.4/notebooks/gemma3/gemma3.ipynb",
+    "models": [
+      "gemma-3-12b-it",
+      "gemma-3-4b-it",
+      "google/gemma-3-12b-it",
+      "google/gemma-3-4b-it"
+    ],
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with InternVL2 and OpenVINO",
+    "path": "internvl2/internvl2.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/1c3cf42a-db40-4fa2-81e0-ead9bde7ace6",
+    "lastBranch": "2026.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.4/notebooks/internvl2/internvl2.ipynb",
+    "models": [
+      "InternVL2-1B",
+      "InternVL2-2B",
+      "InternVL2-4B",
+      "InternVL2-8B",
+      "InternVL2_5-1B",
+      "InternVL2_5-2B",
+      "InternVL2_5-4B",
+      "InternVL3-14B",
+      "InternVL3-1B",
+      "InternVL3-2B",
+      "InternVL3-8B",
+      "InternVL3-9B",
+      "OpenGVLab/InternVL2-1B",
+      "OpenGVLab/InternVL2-2B",
+      "OpenGVLab/InternVL2-4B",
+      "OpenGVLab/InternVL2-8B",
+      "OpenGVLab/InternVL2_5-1B",
+      "OpenGVLab/InternVL2_5-2B",
+      "OpenGVLab/InternVL2_5-4B",
+      "OpenGVLab/InternVL3-14B",
+      "OpenGVLab/InternVL3-1B",
+      "OpenGVLab/InternVL3-2B",
+      "OpenGVLab/InternVL3-8B",
+      "OpenGVLab/InternVL3-9B"
+    ],
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with LLaVA and OpenVINO Generative API",
+    "path": "llava-multimodal-chatbot/llava-multimodal-chatbot-genai.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.png?raw=true",
+    "lastBranch": "2026.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.4/notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot-genai.ipynb",
+    "models": [
+      "llava-1.5-7b-hf",
+      "llava-hf/llava-1.5-7b-hf"
+    ],
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with LLaVA Next and OpenVINO",
+    "path": "llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb",
+    "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/a562e9de-5b94-4e24-ac52-532019fc92d3",
+    "lastBranch": "2026.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.4/notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb",
+    "models": [
+      "llava-hf/llava-v1.6-mistral-7b-hf",
+      "llava-v1.6-mistral-7b-hf"
+    ],
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with Qwen2.5VL and OpenVINO",
+    "path": "qwen2.5-vl/qwen2.5-vl.ipynb",
+    "imageUrl": "https://qianwen-res.oss-accelerate-overseas.aliyuncs.com/Qwen2.5-vl-Capybara.png",
+    "lastBranch": "2026.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.4/notebooks/qwen2.5-vl/qwen2.5-vl.ipynb",
+    "models": [
+      "Qwen/Qwen2-VL-2B-Instruct",
+      "Qwen/Qwen2-VL-7B-Instruct",
+      "Qwen/Qwen2.5-VL-3B-Instruct",
+      "Qwen/Qwen2.5-VL-7B-Instruct",
+      "Qwen2-VL-2B-Instruct",
+      "Qwen2-VL-7B-Instruct",
+      "Qwen2.5-VL-3B-Instruct",
+      "Qwen2.5-VL-7B-Instruct"
+    ],
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with Qwen2VL and OpenVINO",
+    "path": "qwen2-vl/qwen2-vl.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/7e12ac6c-12f8-43d8-9c0a-b63d6ecaf20b",
+    "lastBranch": "2026.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.4/notebooks/qwen2-vl/qwen2-vl.ipynb",
+    "models": [
+      "Qwen/Qwen2-VL-2B-Instruct",
+      "Qwen/Qwen2-VL-7B-Instruct",
+      "Qwen2-VL-2B-Instruct",
+      "Qwen2-VL-7B-Instruct"
+    ],
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
+    "title": "Visual-language assistant with Qwen3-VL and OpenVINO",
+    "path": "qwen3-vl/qwen3-vl.ipynb",
+    "imageUrl": "https://qianwen-res.oss-accelerate.aliyuncs.com/Qwen3-VL/qwen3vl_arc.jpg",
+    "lastBranch": "2026.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.4/notebooks/qwen3-vl/qwen3-vl.ipynb",
+    "models": [
+      "Qwen/Qwen3-VL-2B-Instruct",
+      "Qwen/Qwen3-VL-4B-Instruct",
+      "Qwen/Qwen3-VL-8B-Instruct",
+      "Qwen3-VL-2B-Instruct",
+      "Qwen3-VL-4B-Instruct",
+      "Qwen3-VL-8B-Instruct"
+    ],
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Visual Question Answering",
+        "Image-to-Text",
+        "Text Generation"
+      ]
+    }
+  },
+  {
     "title": "Convert and Optimize YOLOv10 with OpenVINO",
     "path": "yolov10-optimization/yolov10-optimization.ipynb",
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/81ff3233-9c8d-4fe8-ab21-baf9ce530cff",
