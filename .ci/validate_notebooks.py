@@ -90,7 +90,7 @@ def parse_arguments():
     parser.add_argument("--keep_artifacts", action="store_true")
     parser.add_argument("--collect_reports", action="store_true")
     parser.add_argument("--move_notebooks_dir")
-    parser.add_argument("--notebooks_dir", default=ROOT/NOTEBOOKS_DIR)
+    parser.add_argument("--notebooks_dir", default=ROOT / NOTEBOOKS_DIR)
     parser.add_argument("--job_name")
     parser.add_argument("--upload_to_db")
     parser.add_argument(
