@@ -12,6 +12,102 @@ from os import PathLike
 from pathlib import Path
 from typing import List, NamedTuple, Optional
 
+# ## Virtual environment
+#
+# Create and activate a notebook-specific virtual environment, so that notebooks do not affect each other's requirements.
+
+# In[ ]:
+
+
+NOTEBOOK_VENV_DIR = ".venv"
+_PARENT_ENV_PTH = "_notebook_parent_env.pth"
+_venv_site_dirs = []
+_processed_pth_files = set()
+
+
+def _load_venv_pth_files(*_):
+    """
+    Process `.pth` files (e.g. editable installs) added to the active notebook virtual environment
+    after its activation. Registered as IPython `post_run_cell` callback by `setup_notebook_venv()`.
+    """
+    import importlib
+    import site
+
+    for site_dir in _venv_site_dirs:
+        for pth_file in sorted(Path(site_dir).glob("*.pth")):
+            if pth_file.name != _PARENT_ENV_PTH and pth_file not in _processed_pth_files:
+                _processed_pth_files.add(pth_file)
+                site.addpackage(site_dir, pth_file.name, None)
+    importlib.invalidate_caches()
+
+
+def setup_notebook_venv(venv_dir: PathLike = NOTEBOOK_VENV_DIR) -> Path:
+    """
+    Create (if missing) and activate a notebook-specific virtual environment for the running kernel.
+
+    After activation, packages installed with `%pip install`, `!pip install` or `pip_install()` go to
+    this environment and take precedence over the packages of the environment running the kernel.
+    Packages of the kernel environment stay visible with lower priority, both in the kernel and in the
+    virtual environment interpreter, which is also used by subprocesses and command-line tools.
+
+    :param venv_dir: Directory of the virtual environment. Relative paths are resolved against the current working directory.
+    :return: Absolute path to the virtual environment.
+    """
+    import os
+    import site
+    import subprocess  # nosec - disable B404:import-subprocess check
+    import sysconfig
+    import venv
+
+    venv_dir = Path(venv_dir).resolve()
+    bin_dir = venv_dir / ("Scripts" if os.name == "nt" else "bin")
+    venv_python = bin_dir / ("python.exe" if os.name == "nt" else "python")
+    if sys.executable == str(venv_python):
+        return venv_dir
+
+    def query_venv():
+        script = "import sys, sysconfig; print('%d.%d' % sys.version_info[:2]); print(sysconfig.get_path('purelib')); print(sysconfig.get_path('platlib'))"
+        output = subprocess.run([str(venv_python), "-c", script], check=True, capture_output=True, text=True).stdout.splitlines()  # nosec B603
+        return output[0], list(dict.fromkeys(output[1:]))
+
+    kernel_version = "%d.%d" % sys.version_info[:2]
+    venv_version = None
+    if venv_python.exists():
+        venv_version, venv_site_dirs = query_venv()
+    if venv_version != kernel_version:
+        print(f"Creating virtual environment in {venv_dir}")
+        venv.EnvBuilder(clear=True, with_pip=True).create(venv_dir)
+        venv_version, venv_site_dirs = query_venv()
+
+    # Unlike `system_site_packages`, this also exposes packages of a parent virtual environment running the kernel.
+    user_site_dirs = [site.getusersitepackages()] if site.ENABLE_USER_SITE else []
+    parent_site_dirs = [d for d in site.getsitepackages() + user_site_dirs if d in sys.path and d not in venv_site_dirs]
+    Path(venv_site_dirs[0], _PARENT_ENV_PTH).write_text(f"import site; list(map(site.addsitedir, {parent_site_dirs!r}))\n", encoding="utf-8")
+
+    insert_at = next((i for i, p in enumerate(sys.path) if p in parent_site_dirs), len(sys.path))
+    sys.path[insert_at:insert_at] = [d for d in venv_site_dirs if d not in sys.path]
+    _venv_site_dirs[:] = venv_site_dirs
+    _load_venv_pth_files()
+
+    # `%pip` and `pip_install()` install into `sys.executable`
+    sys.executable = str(venv_python)
+    os.environ["VIRTUAL_ENV"] = str(venv_dir)
+    path_dirs = [str(bin_dir), sysconfig.get_path("scripts")] + os.environ.get("PATH", "").split(os.pathsep)
+    os.environ["PATH"] = os.pathsep.join(dict.fromkeys(path_dirs))
+
+    try:
+        from IPython import get_ipython
+
+        ipython = get_ipython()
+    except ImportError:
+        ipython = None
+    if ipython is not None and _load_venv_pth_files not in ipython.events.callbacks["post_run_cell"]:
+        ipython.events.register("post_run_cell", _load_venv_pth_files)
+
+    print(f"Using virtual environment: {venv_dir}")
+    return venv_dir
+
+
 # ## Files
 #
 # Load an image, download a file, download an IR model, and create a progress bar to show download progress.
@@ -66,6 +162,7 @@ def pip_install(*args):
     for arg in args:
         cli_args.extend(str(arg).split(" "))
     subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], shell=(platform.system() == "Windows"), check=True)
+    _load_venv_pth_files()
 
 
 def load_image(name: str, url: str = None):

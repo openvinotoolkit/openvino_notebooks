@@ -17,10 +17,6 @@ on:
         required: false
         type: string
         default: ''
-      separate_venv:
-        required: false
-        type: boolean
-        default: false
       test_list:
         description: 'Newline-separated list of notebook paths to test (relative to repo root)'
         required: false
@@ -200,11 +196,6 @@ jobs:
           if ("${{ inputs.ignore_list }}" -ne "") {
             $cmdArgs += "--ignore_list"
             $cmdArgs += "${{ inputs.ignore_list }}"
-          }
-
-          if ( "${{ inputs.separate_venv }}" -eq "true" )
-          {
-            $cmdArgs += "--separate_venv"
           }
           
           & python3 .ci/validate_notebooks.py @cmdArgs
