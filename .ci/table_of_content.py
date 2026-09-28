@@ -164,4 +164,6 @@ if __name__ == "__main__":
         generate_table_of_content(path_to_source)
     elif path_to_source.is_dir():
         for notebook in path_to_source.glob("**/*.ipynb"):
+            if ".venv" in notebook.parts:
+                continue
             generate_table_of_content(notebook)
