@@ -58,7 +58,7 @@ jobs:
           REMOTE: origin
 
       - name: Validate all notebooks metadata
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const { NotebookMetadataHandler } = await import('${{ github.workspace }}/selector/src/notebook-metadata/notebook-metadata-handler.js');
@@ -79,7 +79,7 @@ jobs:
 
       - name: Check if deploy needed
         id: check_deploy
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const { readFile } = require('fs/promises');
@@ -100,7 +100,7 @@ jobs:
 
       - name: Generate new notebooks index
         if: ${{ steps.check_deploy.outputs.should_deploy == 'true' }}
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const { generateNotebooksIndex } = await import('${{ github.workspace }}/selector/src/shared/generate-notebooks-index.js');
