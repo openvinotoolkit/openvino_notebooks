@@ -64,7 +64,7 @@ jobs:
           python -m pip freeze
           python -m pip freeze > pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
       - name: Archive pip freeze
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pip-freeze-${{matrix.os}}-${{ matrix.python }}
           path: pip-freeze-${{ github.sha }}-${{matrix.os}}-${{ matrix.python }}.txt
