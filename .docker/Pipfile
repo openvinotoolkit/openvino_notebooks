@@ -28,7 +28,7 @@ ovmsclient = "*"
 # Security pins
 setuptools = ">=83.0.0"
 pygments = ">=2.20.0"
-urllib3 = "==2.7.0"
+urllib3 = "==2.8.0"
 gitpython = ">=3.1.59"
 
 [dev-packages]
