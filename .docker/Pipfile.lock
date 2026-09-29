@@ -1767,18 +1767,19 @@
         },
         "opencv-python": {
             "hashes": [
-                "sha256:0bc2596e68f972ca452d80f444bc404e08807d021fbba40df26b61b18e01838a",
-                "sha256:372fe164a3148ac1ca51e5f3ad0541a4a276452273f503441d718fab9c5e5f59",
-                "sha256:402033cddf9d294693094de5ef532339f14ce821da3ad7df7c9f6e8316da32cf",
-                "sha256:423d934c9fafb91aad38edf26efb46da91ffbc05f3f59c4b0c72e699720706f5",
-                "sha256:5868a8c028a0b37561579bfb8ac1875babdc69546d236249fff296a8c010ccf9",
-                "sha256:620d602b8f7d8b8dab5f4b99c6eb353e78d3fb8b0f53db1bd258bb1aa001c1d5",
-                "sha256:bccaabf9eb7f897ca61880ce2869dcd9b25b72129c28478e7f2a5e8dee945616",
-                "sha256:caf60c071ec391ba51ed00a4a920f996d0b64e3e46068aac1f646b5de0326a19"
+                "sha256:08d5d91d967b58d6db86073b2ad3eaef88ca4ebdfd45c9059bf59f5ded0c7ad2",
+                "sha256:198a75138241810206a17c829dbcc40a7cb1841cda538ca86cbbfc6c7d95f898",
+                "sha256:4b4b1a34c79bf8d3738e3cfe9a9e67b51a79663f6b692cbdad8c31f570da4157",
+                "sha256:66aac3e5b5faa48d4025816592f3af19e4bfc2c68dec067bae2dbb4ca10aa9e2",
+                "sha256:6bbc32f59e1b1a7db7b39c81f63d00625f041d333037fd8702f6da52cc39108b",
+                "sha256:c8de2dec111122a02e8beb28e16c31904992dfd6186560b142a92c71403c1039",
+                "sha256:e2b4272e736836f66c2d176e43ab8101f3a00d45654916399f52e150c58981ac",
+                "sha256:f8b6d0a212253dd26ad338c812f1f23ca118fdf05a9c8c6b9444f161aa8c5881",
+                "sha256:f90ba04b8f73bc5c3814037699739f0156f597338a98f05956c684e7c3ca10d2"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.6'",
-            "version": "==4.13.0.92"
+            "version": "==5.0.0.93"
         },
         "openvino": {
             "hashes": [
