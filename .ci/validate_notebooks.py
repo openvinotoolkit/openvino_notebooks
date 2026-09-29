@@ -616,6 +616,8 @@ def run_test(
     os.environ["PIP_CACHE_DIR"] = str(notebook_path.parent / "pip_cache")
     os.environ["MPLCONFIGDIR"] = str(notebook_path.parent / "mpl_config")
     os.environ["DO_NOT_TRACK"] = "1"
+    # Allow NLTK to download data through the configured proxy (SSRF opt-in).
+    os.environ["NLTK_ALLOW_PROXIED_URLOPEN"] = "1"
     print(f"RUN {notebook_path.relative_to(root)}", flush=True)
     try:
         relative_path = notebook_path.relative_to(root)
