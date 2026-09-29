@@ -868,12 +868,12 @@
         },
         "gitpython": {
             "hashes": [
-                "sha256:0a1475cfdc38a5bfba1a3e9a4a9da52a39749ecec322b772915c019f94e5b7e4",
-                "sha256:67a82f537384578643624c8b2c531938a9b82be431663e575dcf638526631d4c"
+                "sha256:1791de66309bc0c7cfca40bf8d2e3de7ca091cbf94e6051be1ad0722c61062af",
+                "sha256:7002251225e10e29d2e1f49e6532613fe5d5d9f0b6f1f02997a52b38fe56899e"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.7'",
-            "version": "==3.1.59"
+            "version": "==3.1.62"
         },
         "greenlet": {
             "hashes": [
@@ -1250,23 +1250,23 @@
         },
         "jupyterlab-git": {
             "hashes": [
-                "sha256:4d0b46d3d17376a5c610633a2191868f577f46341e112dc9dece1f501cd46b65",
-                "sha256:b33f96aef13d814a6c023d74d843f0d7d2e9d1fd8a283bc91f69921a68936d7d"
+                "sha256:c1a9bd469e05933501e541f63774b5a74db30aedb3344aafda0f0d0362878218",
+                "sha256:eb9adadf351c8e28f3a990952d294e30885768d636e88cdc72d3c6ac5c0e88b6"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.10'",
-            "version": "==0.54.0"
+            "version": "==0.54.1"
         },
         "jupyterlab-git-core": {
             "extras": [
                 "nbdime"
             ],
             "hashes": [
-                "sha256:5ce935fc0ac42d908f57def7e74df506c3a8049e1365d158721bd5ec2076fe87",
-                "sha256:a163c7b3748292a7e83f514ae9cd838aa4c538ceb6224530626b56771a55053e"
+                "sha256:e79900ec3623cdbefc260e9e90d912536266ca3f40f8332a0a9df0dd7ee77cbc",
+                "sha256:eac0e544e4e44985218413928f720de55f18fa520c2d9db5befcb8864090b148"
             ],
             "markers": "python_version >= '3.10'",
-            "version": "==0.54.0"
+            "version": "==0.54.1"
         },
         "jupyterlab-pygments": {
             "hashes": [
