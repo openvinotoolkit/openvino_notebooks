@@ -69,7 +69,7 @@ jobs:
             core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
 
       - name: Checkout repository
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Get changed files
         if: ${{ inputs.test_only_changed }}

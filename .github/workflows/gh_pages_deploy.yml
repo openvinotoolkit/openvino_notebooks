@@ -28,7 +28,7 @@ jobs:
       should_deploy: ${{ steps.check_deploy.outputs.should_deploy }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_ACTIONS_BOT_TOKEN }}
@@ -94,7 +94,7 @@ jobs:
 
       - name: Upload pages artifact
         if: ${{ steps.check_deploy.outputs.should_deploy == 'true' }}
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: ./selector/dist/openvino_notebooks
 
