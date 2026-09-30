@@ -37,7 +37,7 @@ jobs:
 
       - name: Dotenv Action
         id: dotenv
-        uses: xom9ikk/dotenv@ac290ca23a42155a0cba1031d23afa46240116a9 # v2.3.0
+        uses: xom9ikk/dotenv@d0a56edc74279820eabbe34477511327e710d0de # v2.4.0
         with:
           path: ./.github/workflows
 
