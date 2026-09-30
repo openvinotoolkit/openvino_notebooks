@@ -22,7 +22,7 @@ jobs:
       docker_tag: ${{ steps.get_docker_tag.outputs.docker_tag }}
     steps:
     - name: Clone docker tag from OpenVINO repo
-      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         repository: 'openvinotoolkit/openvino'
         path: 'openvino'
@@ -44,7 +44,7 @@ jobs:
       batch_2: ${{ steps.split.outputs.batch_2 }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Collect and split notebooks into batches
         id: split
@@ -107,7 +107,7 @@ jobs:
     needs: [build_treon_linux, build_treon_windows, build_treon_gpu]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
