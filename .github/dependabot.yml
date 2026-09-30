@@ -49,9 +49,20 @@ updates:
       - "aleksandr-mokrov"
     versioning-strategy: increase-if-necessary
     groups:
-      npm-packages:
+      react-major:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+        update-types:
+          - "major"
+      npm-non-major:
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   #
   # Docker base images
