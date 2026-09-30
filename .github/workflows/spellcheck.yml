@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-22.04 # change cachepip step when changing this
     steps:
       - name: Checkout repository
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Dotenv Action
         id: dotenv
