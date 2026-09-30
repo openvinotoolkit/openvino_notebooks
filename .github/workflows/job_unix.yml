@@ -156,7 +156,7 @@ jobs:
           dpkg -i *.deb
 
       - name: Setup Python ${{ inputs.python }}
-        uses: openvinotoolkit/openvino/.github/actions/setup_python@e4b65a0ab6c946c72d56240223620837e6d34bf8
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@b7439ee66fa264c04d7723bc7f0fb7abe865d399
         with:
           version: ${{ inputs.python }}
           pip-cache-path: ${{ env.PIP_CACHE_PATH }}
