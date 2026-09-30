@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0069b09e7665a58f8e1f22980f829e81160f41c188962e2e340127584f5ae53d"
+            "sha256": "921b9bdb7f82a6791221cb3f8e4c96b577ad798c9e9b44f620b2a8c24c5b6f3b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1352,12 +1352,12 @@
         },
         "ipykernel": {
             "hashes": [
-                "sha256:2372ce8bc1ff4f34e58cafed3a0feb2194b91fc7cad0fc72e79e47b45ee9e8f6",
-                "sha256:abe5386f6ced727a70e0eb0cf1da801fa7c5fa6ff82147747d5a0406cd8c94af"
+                "sha256:897eb64da762549ef610698fca5e9675195ec6ac8ec7f19d81ce1ca20c876057",
+                "sha256:9acaaaf97d16355166e4085afe9d225bfbdf2b7ef520f9df3be8f2b248275e09"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.9'",
-            "version": "==6.31.0"
+            "markers": "python_version >= '3.10'",
+            "version": "==7.3.0"
         },
         "ipython": {
             "hashes": [
@@ -2152,6 +2152,14 @@
             ],
             "markers": "python_version >= '3.5'",
             "version": "==1.6.0"
+        },
+        "nest-asyncio2": {
+            "hashes": [
+                "sha256:2bc87bdca654e719425145f5e84eaeb0080b013fdd47d65729a7d66243f4987c",
+                "sha256:2e9a84d5d1efe6d020c72988d21aec569bac42d98af2ff6b9de24640c5d22a34"
+            ],
+            "markers": "python_version >= '3.5'",
+            "version": "==1.7.3"
         },
         "notebook": {
             "hashes": [
