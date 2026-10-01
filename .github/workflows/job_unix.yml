@@ -160,7 +160,7 @@ jobs:
         with:
           version: ${{ inputs.python }}
           pip-cache-path: ${{ env.PIP_CACHE_PATH }}
-          should-setup-pip-paths: 'true'
+          set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
       - name: Create and check cache directory
