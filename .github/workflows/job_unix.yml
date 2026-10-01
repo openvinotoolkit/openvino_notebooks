@@ -56,7 +56,7 @@ jobs:
         - /mount:/mount
     steps:
       - name: Set env variables
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const runsOn = "${{ inputs.runs_on }}";
@@ -69,12 +69,12 @@ jobs:
             core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
 
       - name: Checkout repository
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Get changed files
         if: ${{ inputs.test_only_changed }}
         id: changed-files
-        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             notebooks/*/**
@@ -265,7 +265,7 @@ jobs:
 
       - name: Archive notebook test report
         if: always()
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: test_report-${{ env.TEST_REPORT_DIR }}-${{ inputs.batch != '' && inputs.batch || '' }}
           path: test_report/
