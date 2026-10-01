@@ -2,6 +2,7 @@ import '../NotebookCard/NotebookCard.scss';
 
 import GitHubIcon from '@assets/images/github.svg?react';
 import OpenvinoLogo from '@assets/images/openvino-logo-colored.svg?react';
+import { JSX } from 'react';
 
 import { Button } from '@/components/shared/Button/Button';
 import { Tag } from '@/components/shared/Tag/Tag';
