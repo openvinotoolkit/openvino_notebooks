@@ -1,5 +1,7 @@
 import './Footer.scss';
 
+import { JSX } from 'react';
+
 import { setIntelnavRenderSettingsFooter } from '@/shared/ighf/ighf';
 
 export const Footer = (): JSX.Element => {
