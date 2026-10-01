@@ -1,6 +1,6 @@
 import './FiltersPanel.scss';
 
-import { useContext, useState } from 'react';
+import { JSX, useContext, useState } from 'react';
 
 import CrossIcon from '@/assets/images/cross.svg?react';
 import { FilterSection } from '@/components/shared/FilterSection/FilterSection';
