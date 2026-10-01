@@ -77,7 +77,7 @@ The ±7.7% top-1 gap is within the expected natural variance for a 200-image sam
 
 ## Installation Instructions
 
-This is a self-contained example. We recommend running it in a dedicated virtual environment with Jupyter available.  
+This is a self-contained example. We recommend running it in a dedicated virtual environment with Jupyter available.
 For general environment setup, see the main [OpenVINO Notebooks Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/README.md).
 
 ```bash
