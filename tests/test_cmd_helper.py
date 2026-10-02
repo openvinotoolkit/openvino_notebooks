@@ -6,6 +6,7 @@
 Regression for #3665: paths, model IDs, or additional arg values containing
 spaces must be passed to subprocess as single arguments, not split on spaces.
 """
+
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -17,8 +18,7 @@ from utils.cmd_helper import optimum_cli
 @pytest.fixture
 def mock_subprocess():
     """Patch subprocess.run and platform.system to keep tests OS-independent."""
-    with patch("utils.cmd_helper.subprocess.run") as mock_run, \
-         patch("utils.cmd_helper.platform.system", return_value="Linux"):
+    with patch("utils.cmd_helper.subprocess.run") as mock_run, patch("utils.cmd_helper.platform.system", return_value="Linux"):
         mock_run.return_value = MagicMock()
         yield mock_run
 
@@ -55,10 +55,11 @@ class TestOptimumCliArguments:
 
     def test_path_model_id_is_stringified(self, mock_subprocess):
         """A pathlib.Path model_id must be converted to str in the arg list."""
-        optimum_cli(Path("my org/my model"), "./out", show_command=False)
+        model_id = Path("my org/my model")
+        optimum_cli(model_id, "./out", show_command=False)
 
         cmd = mock_subprocess.call_args[0][0]
-        assert cmd[4] == "my org/my model"
+        assert cmd[4] == str(model_id)
         assert isinstance(cmd[4], str)
 
     def test_additional_args_value_with_spaces_stays_single_argument(self, mock_subprocess):
@@ -97,10 +98,11 @@ class TestOptimumCliArguments:
 
     def test_show_command_with_path_model_id_does_not_crash(self, mock_subprocess):
         """Regression for the maintainer's review: Path model_id + show_command=True."""
+        model_id = Path("my org/my model")
         with patch("IPython.display.display"), patch("IPython.display.Markdown"):
-            optimum_cli(Path("my org/my model"), "./out", show_command=True)
+            optimum_cli(model_id, "./out", show_command=True)
         cmd = mock_subprocess.call_args[0][0]
-        assert cmd[4] == "my org/my model"
+        assert cmd[4] == str(model_id)
 
     def test_show_command_with_path_output_dir_does_not_crash(self, mock_subprocess):
         """Path output_dir + show_command=True must not crash either."""

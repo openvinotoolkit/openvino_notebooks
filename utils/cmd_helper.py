@@ -63,4 +63,3 @@ def optimum_cli(model_id, output_dir, show_command=True, additional_args: dict[s
     finally:
         if transofrmers_loglevel is not None:
             os.environ["TRANSFORMERS_VERBOSITY"] = transofrmers_loglevel
-            
