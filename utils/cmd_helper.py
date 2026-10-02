@@ -1,7 +1,6 @@
 import logging
 import subprocess  # nosec - disable B404:import-subprocess check
 import sys
-import sysconfig
 import os
 from pathlib import Path
 import platform
@@ -28,15 +27,7 @@ def clone_repo(repo_url: str, revision: str = None, add_to_sys_path: bool = True
 
 
 def optimum_cli(model_id, output_dir, show_command=True, additional_args: dict[str, str] = None, debug_logs=False):
-    cli_name = "optimum-cli.exe" if platform.system() == "Windows" else "optimum-cli"
-    export_command = [
-        str(Path(sysconfig.get_path("scripts")) / cli_name),
-        "export",
-        "openvino",
-        "--model",
-        str(model_id),
-        str(output_dir),
-    ]
+    export_command = ["optimum-cli", "export", "openvino", "--model", str(model_id), str(output_dir)]
     if additional_args is not None:
         for arg, value in additional_args.items():
             export_command.append(f"--{arg}")
@@ -55,7 +46,7 @@ def optimum_cli(model_id, output_dir, show_command=True, additional_args: dict[s
         os.environ["TRANSFORMERS_VERBOSITY"] = "debug"
 
     try:
-        subprocess.run(export_command, check=True, capture_output=True)
+        subprocess.run(export_command, shell=(platform.system() == "Windows"), check=True, capture_output=True)
     except subprocess.CalledProcessError as exc:
         logger = logging.getLogger()
         logger.error(f"Command failed with exit code {exc.returncode}")
