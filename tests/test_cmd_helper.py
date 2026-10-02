@@ -7,6 +7,7 @@ Regression for #3665: paths, model IDs, or additional arg values containing
 spaces must be passed to subprocess as single arguments, not split on spaces.
 """
 
+import sysconfig
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -24,13 +25,33 @@ def mock_subprocess():
 
 
 class TestOptimumCliArguments:
+    def test_cli_is_from_active_interpreter_environment(self, mock_subprocess):
+        optimum_cli("test-model", "./out", show_command=False)
+
+        assert mock_subprocess.call_args.args[0][0] == str(Path(sysconfig.get_path("scripts")) / "optimum-cli")
+        assert "shell" not in mock_subprocess.call_args.kwargs
+
+    def test_windows_cli_uses_active_environment(self, mock_subprocess):
+        with patch("utils.cmd_helper.platform.system", return_value="Windows"):
+            optimum_cli("test-model", "./out", show_command=False)
+
+        assert mock_subprocess.call_args.args[0][0] == str(Path(sysconfig.get_path("scripts")) / "optimum-cli.exe")
+        assert "shell" not in mock_subprocess.call_args.kwargs
+
+    def test_windows_cli_uses_python_scripts_directory(self, mock_subprocess):
+        scripts_dir = Path("C:\\Python312\\Scripts")
+        with patch("utils.cmd_helper.platform.system", return_value="Windows"), patch("utils.cmd_helper.sysconfig.get_path", return_value=str(scripts_dir)):
+            optimum_cli("test-model", "./out", show_command=False)
+
+        assert mock_subprocess.call_args.args[0][0] == str(scripts_dir / "optimum-cli.exe")
+
     def test_path_with_spaces_stays_single_argument(self, mock_subprocess):
         """A Windows-style output path with a space must stay one argument."""
         optimum_cli("test-model", "C:\\Users\\Jane Doe\\models", show_command=False)
 
         cmd = mock_subprocess.call_args[0][0]
         assert cmd == [
-            "optimum-cli",
+            str(Path(sysconfig.get_path("scripts")) / "optimum-cli"),
             "export",
             "openvino",
             "--model",
