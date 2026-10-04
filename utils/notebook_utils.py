@@ -154,6 +154,13 @@ def download_file(
         raise Exception(f"File downloading failed with error: {error}") from None
 
     filesize = int(response.headers.get("Content-length", 0))
+    # Let urllib3 verify we actually received as many bytes as the server
+    # declared, at the raw transport level, before any gzip/deflate decoding
+    # happens. iter_content() yields decompressed bytes, so counting those
+    # ourselves and comparing to Content-length breaks for compressed
+    # responses, since Content-length reflects the compressed size on the wire.
+    response.raw.enforce_content_length = True
+
     tmp_filepath = filepath.with_name(filepath.name + ".part")
     try:
         with tqdm_notebook(
@@ -165,15 +172,10 @@ def download_file(
             disable=not show_progress,
         ) as progress_bar:
             with open(tmp_filepath, "wb") as file_object:
-                downloaded = 0
                 for chunk in response.iter_content(chunk_size):
                     file_object.write(chunk)
-                    downloaded += len(chunk)
                     progress_bar.update(len(chunk))
                     progress_bar.refresh()
-
-        if filesize and downloaded != filesize:
-            raise Exception(f"Downloaded {downloaded} of {filesize} bytes. The connection may have dropped.")
 
         tmp_filepath.replace(filepath)
     except BaseException:
