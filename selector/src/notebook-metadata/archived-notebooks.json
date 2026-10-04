@@ -296,6 +296,31 @@
     }
   },
   {
+    "title": "Prompt-based image segmentation with MobileSAM and OpenVINO",
+    "path": "mobilesam-segmentation/mobilesam-segmentation.ipynb",
+    "imageUrl": "https://images.cocodataset.org/val2017/000000439180.jpg",
+    "lastBranch": "2026.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.3/notebooks/mobilesam-segmentation/mobilesam-segmentation.ipynb",
+    "models": [],
+    "tags": {
+      "categories": [
+        "Convert",
+        "Model Demos"
+      ],
+      "libraries": [
+        "Model Converter",
+        "PyTorch",
+        "Gradio"
+      ],
+      "other": [
+        "MobileSAM"
+      ],
+      "tasks": [
+        "Image Segmentation"
+      ]
+    }
+  },
+  {
     "title": "Convert and Optimize YOLOv10 with OpenVINO",
     "path": "yolov10-optimization/yolov10-optimization.ipynb",
     "imageUrl": "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/81ff3233-9c8d-4fe8-ab21-baf9ce530cff",
