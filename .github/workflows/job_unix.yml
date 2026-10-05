@@ -67,6 +67,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # Notebooks download notebook_utils.py at runtime only if it is missing next to them
+      - name: Copy notebook_utils.py into notebook folders
+        run: |
+          for dir in notebooks/*/; do
+            cp utils/notebook_utils.py "$dir"
+          done
+
       - name: Get changed files
         if: ${{ inputs.test_only_changed }}
         id: changed-files
