@@ -249,8 +249,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-    - python:
-        - '3.10'
 - notebook: notebooks/minicpm-o-omnimodal-chatbot/minicpm-o-omnimodal-chatbot.ipynb
   skips:
     - os:
