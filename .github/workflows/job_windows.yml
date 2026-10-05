@@ -36,15 +36,13 @@ env:
   # Required by torch's C++ extension build (used by detectron2) when the MSVC
   # environment is already activated, otherwise the wheel build fails.
   DISTUTILS_USE_SDK: "1"
-  # Allow NLTK to download data through the configured proxy (SSRF opt-in).
-  NLTK_ALLOW_PROXIED_URLOPEN: "1"
 
 jobs:
   build_treon:
     runs-on: ${{ inputs.runs_on }}
     steps:
       - name: Set env variables
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const runsOn = "${{ inputs.runs_on }}";
@@ -57,7 +55,7 @@ jobs:
             core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
 
       - name: Checkout repository
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Configure Developer Command Prompt for Microsoft Visual C++
         uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
@@ -79,7 +77,7 @@ jobs:
       - name: Get changed files
         if: ${{ inputs.test_only_changed }}
         id: changed-files
-        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             notebooks/*/**
@@ -127,11 +125,11 @@ jobs:
           cat test_notebooks.txt
 
       - name: Setup Python ${{ inputs.python }}
-        uses: openvinotoolkit/openvino/.github/actions/setup_python@e4b65a0ab6c946c72d56240223620837e6d34bf8
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@51c4794bfff5b501b5499740f071aa5b401be06b
         with:
           version: ${{ inputs.python }}
           pip-cache-path: ${{ env.PIP_CACHE_PATH }}
-          should-setup-pip-paths: 'true'
+          set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
       - name: Prepare CT files for ct-segmentation-quantize
@@ -153,15 +151,42 @@ jobs:
           curl -o notebooks/paddle-ocr-webcam/model/ch_PP-OCRv3_rec_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_rec_infer.tar'
 
       - name: Install python dependencies
+        shell: pwsh
+        env:
+          # Absorb transient network/proxy blips at the connection level.
+          PIP_RETRIES: "5"
+          PIP_DEFAULT_TIMEOUT: "60"
         run: |
-          python3 -m pip install --upgrade setuptools wheel
-          python3 -m pip install -r .ci/dev-requirements.txt
+          $ErrorActionPreference = "Stop"
+
+          function Invoke-Pip {
+            param([Parameter(ValueFromRemainingArguments = $true)] [string[]]$PipArgs)
+            $maxAttempts = 5
+            for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+              $log = & python3 -m pip @PipArgs 2>&1
+              $log | ForEach-Object { Write-Host $_ }
+              # A proxy returning an unexpected Content-Type makes pip skip the
+              # index page; that skip is not covered by PIP_RETRIES and can lead
+              # to a spurious resolution failure, so retry the whole command.
+              $skippedPage = ($log -match "Skipping page .* because the GET request got Content-Type").Count -gt 0
+              if ($LASTEXITCODE -eq 0 -and -not $skippedPage) {
+                return
+              }
+              if ($attempt -lt $maxAttempts) {
+                Write-Host "pip attempt $attempt failed (exit $LASTEXITCODE, skipped index page: $skippedPage); retrying in 15s..."
+                Start-Sleep -Seconds 15
+              }
+            }
+            throw "pip failed after $maxAttempts attempts"
+          }
+
+          Invoke-Pip install --upgrade setuptools wheel certifi
+          Invoke-Pip install -r .ci/dev-requirements.txt
           python3 -m ipykernel install --user --name openvino_env
 
       # Needed for notebooks that download models from Hugging Face Hub
-      - name: Configure CA bundle (certifi)
+      - name: Configure CA bundle (certifi) # certify is installed in the previous step
         run: |
-          python3 -m pip install --upgrade certifi
           $CA_BUNDLE = python3 -c "import certifi; print(certifi.where())"
           Write-Output "Using CA bundle: $CA_BUNDLE"
           "SSL_CERT_FILE=$CA_BUNDLE" >> $env:GITHUB_ENV
@@ -202,7 +227,7 @@ jobs:
 
       - name: Archive notebook test report
         if: always()
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: test_report-${{ env.TEST_REPORT_DIR }}-${{ inputs.batch != '' && inputs.batch || '' }}
           path: test_report/
