@@ -30,7 +30,8 @@ env:
 
 jobs:
   get_docker_tag:
-    if: ${{ github.event.pull_request.user.login != 'dependabot[bot]' }}
+    # Dependabot selector-only updates do not affect notebooks
+    if: ${{ !(github.event.pull_request.user.login == 'dependabot[bot]' && startsWith(github.head_ref, 'dependabot/npm_and_yarn/selector/')) }}
     runs-on: ubuntu-latest
     outputs:
       docker_tag: ${{ steps.get_docker_tag.outputs.docker_tag }}
@@ -66,7 +67,7 @@ jobs:
       separate_venv: true
   
   build_treon_windows:
-    if: ${{ github.event.pull_request.user.login != 'dependabot[bot]' }}
+    if: ${{ !(github.event.pull_request.user.login == 'dependabot[bot]' && startsWith(github.head_ref, 'dependabot/npm_and_yarn/selector/')) }}
     strategy:
       fail-fast: false
       matrix:
