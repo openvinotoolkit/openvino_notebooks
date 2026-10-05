@@ -470,6 +470,19 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
+# Gated pyannote models — require Hugging Face authentication
+- notebook: notebooks/pyannote-audio/pyannote-audio.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/pyannote-audio/pyannote-embedding.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
 - notebook: notebooks/minicpm-v-4.6/minicpm-v-4.6.ipynb
   skips:
     - os:
