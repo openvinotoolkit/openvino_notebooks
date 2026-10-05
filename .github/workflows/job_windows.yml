@@ -129,11 +129,11 @@ jobs:
           cat test_notebooks.txt
 
       - name: Setup Python ${{ inputs.python }}
-        uses: openvinotoolkit/openvino/.github/actions/setup_python@e4b65a0ab6c946c72d56240223620837e6d34bf8
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@51c4794bfff5b501b5499740f071aa5b401be06b
         with:
           version: ${{ inputs.python }}
           pip-cache-path: ${{ env.PIP_CACHE_PATH }}
-          should-setup-pip-paths: 'true'
+          set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
       - name: Prepare CT files for ct-segmentation-quantize
