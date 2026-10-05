@@ -66,18 +66,22 @@ def setup_notebook_venv(venv_dir: PathLike = NOTEBOOK_VENV_DIR) -> Path:
         return venv_dir
 
     def query_venv():
-        script = "import sys, sysconfig; print('%d.%d' % sys.version_info[:2]); print(sysconfig.get_path('purelib')); print(sysconfig.get_path('platlib'))"
+        script = (
+            "import os, sys, sysconfig; print('%d.%d' % sys.version_info[:2]); print(os.path.realpath(sys.base_prefix)); "
+            "print(sysconfig.get_path('purelib')); print(sysconfig.get_path('platlib'))"
+        )
         output = subprocess.run([str(venv_python), "-c", script], check=True, capture_output=True, text=True).stdout.splitlines()  # nosec B603
-        return output[0], list(dict.fromkeys(output[1:]))
+        return (output[0], output[1]), list(dict.fromkeys(output[2:]))
 
-    kernel_version = "%d.%d" % sys.version_info[:2]
-    venv_version = None
+    # The venv must be based on the same Python installation (e.g. conda env) as the kernel
+    kernel_base = ("%d.%d" % sys.version_info[:2], os.path.realpath(sys.base_prefix))
+    venv_base = None
     if venv_python.exists():
-        venv_version, venv_site_dirs = query_venv()
-    if venv_version != kernel_version:
-        print(f"Creating virtual environment in {venv_dir}")
+        venv_base, venv_site_dirs = query_venv()
+    if venv_base != kernel_base:
+        print(f"Creating virtual environment in {venv_dir} based on Python {kernel_base[0]} from {kernel_base[1]}")
         venv.EnvBuilder(clear=True, with_pip=True).create(venv_dir)
-        venv_version, venv_site_dirs = query_venv()
+        venv_base, venv_site_dirs = query_venv()
 
     # Unlike `system_site_packages`, this also exposes packages of a parent virtual environment running the kernel.
     user_site_dirs = [site.getusersitepackages()] if site.ENABLE_USER_SITE else []
