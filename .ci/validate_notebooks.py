@@ -199,7 +199,7 @@ def prepare_test_plan(
                 # Ignored notebooks are provided as several items to `--ignore_list` argument
                 ignored_notebooks.append(Path(ignore_item))
     try:
-        ignored_notebooks = list(set(map(lambda n: Path(os.path.relpath(n, NOTEBOOKS_DIR)), ignored_notebooks)))
+        ignored_notebooks = list(set(map(lambda n: Path(os.path.relpath(notebooks_dir.parent / n, notebooks_dir)), ignored_notebooks)))
     except ValueError:
         raise ValueError(
             f"Ignore list items should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\nInvalid ignored notebooks: {ignored_notebooks}"
