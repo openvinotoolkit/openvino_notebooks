@@ -582,6 +582,7 @@ librispeech
 LibriTTS
 librosa
 LiDAR
+lifecycles
 Lim
 LinearCameraEmbedder
 linearized
@@ -747,6 +748,7 @@ NeuSpell
 NeXT
 ng
 ngram
+nightlies
 NLP
 nlp
 NMS
@@ -994,6 +996,7 @@ RealWorldQA
 rebase
 ReciproCAM
 recognised
+reconversion
 redistributable
 RedPajama
 ReferenceNet
@@ -1369,6 +1372,7 @@ ZeroScope
 zeroscope
 zh
 Zhipu
+ZIPs
 Zongyuan
 downsampler
 dropdowns
