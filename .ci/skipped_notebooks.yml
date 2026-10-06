@@ -249,8 +249,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-    - python:
-        - '3.10'
 - notebook: notebooks/minicpm-o-omnimodal-chatbot/minicpm-o-omnimodal-chatbot.ipynb
   skips:
     - os:
@@ -453,6 +451,19 @@
         - ubuntu-22.04
 # Gated model — requires HuggingFace authentication
 - notebook: notebooks/medasr-medical-asr/medasr-medical-asr.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+# Gated pyannote models — require Hugging Face authentication
+- notebook: notebooks/pyannote-audio/pyannote-audio.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/pyannote-audio/pyannote-embedding.ipynb
   skips:
     - os:
         - macos-13
