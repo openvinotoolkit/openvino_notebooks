@@ -84,26 +84,42 @@ jobs:
       separate_venv: true
       ignore_list: .ci/tensorflow.txt
 
-  build_treon_gpu:
-    if: ${{ false }} # TODO Enable when GPU runners will be available in GitHub Actions
+  build_treon_igpu:
     strategy:
       fail-fast: false
       matrix:
-        python: ['3.10', '3.11', '3.12', '3.13']
-        container: ['ubuntu:20.04', 'ubuntu:22.04'] # Windows and macOS are not available in machine pool with GPU
+        python: ['3.11']
     uses: ./.github/workflows/job_unix.yml
     with:
       runner: '["self-hosted", "igpu", "Linux"]'
       runner-group: 'Intel-GPU'
       python: ${{ matrix.python }}
-      container: ${{ matrix.container }}
-      ignore_list: .ci/tensorflow.txt
+      container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:pr-37751'
+      options: '--group-add 44 --group-add 993 --device /dev/dri/renderD128:/dev/dri/renderD128'
       separate_venv: true
+      # Skip notebooks that download resources from not-allowed domains
+      ignore_list: .ci/third_party_resources.txt
+
+  build_treon_dgpu:
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11']
+    uses: ./.github/workflows/job_unix.yml
+    with:
+      runner: '["self-hosted", "dgpu"]'
+      runner-group: 'Intel-GPU'
+      python: ${{ matrix.python }}
+      container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:pr-37751'
+      options: '--group-add 44 --group-add 993 --device /dev/dri/card2:/dev/dri/card2 --device /dev/dri/renderD129:/dev/dri/renderD129'
+      separate_venv: true
+      # Skip notebooks that download resources from not-allowed domains
+      ignore_list: .ci/third_party_resources.txt
 
   aggregate_notebooks_reports:
     if: always()
     runs-on: ubuntu-22.04
-    needs: [build_treon_linux, build_treon_windows, build_treon_gpu]
+    needs: [build_treon_linux, build_treon_windows, build_treon_igpu, build_treon_dgpu]
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

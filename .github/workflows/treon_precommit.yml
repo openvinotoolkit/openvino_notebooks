@@ -83,6 +83,8 @@ jobs:
       options: '--group-add 44 --group-add 993 --device /dev/dri/renderD128:/dev/dri/renderD128'
       test_only_changed: false
       separate_venv: true
+      # Skip notebooks that download resources from not-allowed domains
+      ignore_list: .ci/third_party_resources.txt
 
   build_treon_dgpu:
     strategy:
@@ -98,6 +100,8 @@ jobs:
       options: '--group-add 44 --group-add 993 --device /dev/dri/card2:/dev/dri/card2 --device /dev/dri/renderD129:/dev/dri/renderD129'
       test_only_changed: false
       separate_venv: true
+      # Skip notebooks that download resources from not-allowed domains
+      ignore_list: .ci/third_party_resources.txt
   
   build_treon_windows:
     strategy:
