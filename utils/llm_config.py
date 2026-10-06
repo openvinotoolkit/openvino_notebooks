@@ -506,6 +506,12 @@ SUPPORTED_LLM_MODELS = {
             "start_message": DEFAULT_SYSTEM_PROMPT,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
         },
+        "minicpm5-2b": {
+            "model_id": "openbmb/MiniCPM5-2B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        },
         "lfm2-350m": {
             "model_id": "LiquidAI/LFM2-350M",
             "remote_code": False,
@@ -945,6 +951,12 @@ SUPPORTED_LLM_MODELS = {
         "minicpm4-0.5b": {"model_id": "openbmb/MiniCPM4-0.5B", "remote_code": True, "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE},
         "minicpm5-1b": {
             "model_id": "openbmb/MiniCPM5-1B",
+            "remote_code": False,
+            "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
+            "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
+        },
+        "minicpm5-2b": {
+            "model_id": "openbmb/MiniCPM5-2B",
             "remote_code": False,
             "start_message": DEFAULT_SYSTEM_PROMPT_CHINESE,
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
