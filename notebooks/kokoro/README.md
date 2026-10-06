@@ -15,7 +15,7 @@ The tutorial consists of the following steps:
 * Run text-to-speech synthesis with OpenVINO GenAI
 * Interactive demo
 
-Inference with the preconverted model supports Python 3.10 and newer, including Python 3.13. Local export requires Python 3.10–3.12 because the `kokoro` and `misaki` packages currently require Python `<3.13`.
+Inference with the preconverted model supports Python 3.11 and newer, including Python 3.13. Local export requires Python 3.11–3.12 because the `kokoro` and `misaki` packages currently require Python `<3.13`.
 
 ## Installation Instructions
 
