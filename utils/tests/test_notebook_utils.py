@@ -14,9 +14,7 @@ def test_download_file_accepts_gzip_response(tmp_path):
     response.iter_content.return_value = iter([content])
 
     with patch("requests.get", return_value=response), patch("tqdm.notebook.tqdm_notebook"):
-        path = download_file(
-            "https://example.com/model.bin", directory=tmp_path, show_progress=False
-        )
+        path = download_file("https://example.com/model.bin", directory=tmp_path, show_progress=False)
 
     assert path.read_bytes() == content
     assert not (tmp_path / "model.bin.part").exists()
