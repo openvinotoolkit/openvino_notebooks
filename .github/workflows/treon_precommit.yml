@@ -42,7 +42,7 @@ jobs:
       docker_tag: ${{ steps.get_docker_tag.outputs.docker_tag }}
     steps:
     - name: Clone docker tag from OpenVINO repo
-      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         repository: 'openvinotoolkit/openvino'
         path: 'openvino'
@@ -62,7 +62,7 @@ jobs:
       fail-fast: false
       matrix:
         runs_on: [aks-linux-8-cores-32gb]
-        python: ['3.10', '3.11', '3.12', '3.13']
+        python: ['3.11', '3.12', '3.13']
     uses: ./.github/workflows/job_unix.yml
     with:
       runs_on: ${{ matrix.runs_on }}
@@ -76,7 +76,7 @@ jobs:
       fail-fast: false
       matrix:
         runs_on: [aks-win-16-cores-32gb-full]
-        python: ['3.10', '3.11', '3.12', '3.13']
+        python: ['3.11', '3.12', '3.13']
     uses: ./.github/workflows/job_windows.yml
     with:
       runs_on: ${{ matrix.runs_on }}

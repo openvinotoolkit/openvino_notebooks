@@ -2,6 +2,7 @@ import { ContentSection } from '@components/ContentSection/ContentSection';
 import { FiltersPanel } from '@components/FiltersPanel/FiltersPanel';
 import { Footer } from '@components/Footer/Footer';
 import { Header } from '@components/Header/Header';
+import { JSX } from 'react';
 
 import { analytics } from '@/shared/analytics/analytics';
 import { isEmbedded } from '@/shared/iframe-detector';
