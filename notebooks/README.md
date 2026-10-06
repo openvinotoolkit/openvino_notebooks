@@ -226,6 +226,8 @@
 - [Audio-language assistant with Qwen2Audio and OpenVINO](./qwen2-audio/qwen2-audio.ipynb)
 - [Qwen-Image 2.1 image generation with OpenVINO](./qwen-image-2.1/qwen-image-2.1.ipynb)
 - [Text-to-image generation with Qwen-Image and OpenVINO](./qwen-image/qwen-image.ipynb)
+- [Speaker Embedding with pyannote and OpenVINO](./pyannote-audio/pyannote-embedding.ipynb)
+- [Speaker Diarization with pyannote and OpenVINO](./pyannote-audio/pyannote-audio.ipynb)
 - [Physical AI Robotics Tutorials with OpenVINO™](./physical-ai-robotics/physical-ai-robotics.ipynb)
 - [Multimodal assistant with Phi-4-multimodal and OpenVINO](./phi-4-multimodal/phi-4-multimodal.ipynb)
 - [Visual-language assistant with Phi3-Vision and OpenVINO](./phi-3-vision/phi-3-vision.ipynb)
