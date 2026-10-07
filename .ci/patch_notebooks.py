@@ -1,4 +1,5 @@
 import argparse
+import ast
 import re
 import shutil
 from pathlib import Path
@@ -125,6 +126,29 @@ def remove_ov_install(cell):
                 updated_lines.append(line)
         else:
             updated_lines.append(line)
+    call_start = None
+    for index, line in enumerate(updated_lines):
+        if line.lstrip().startswith("pip_install("):
+            call_start = index
+        elif call_start is not None and line.strip() == ")":
+            call_lines = updated_lines[call_start : index + 1]
+            if any("openvino" in part for part in call_lines if part.lstrip().startswith("#") or "\n#" in part):
+                indent = call_lines[0][: len(call_lines[0]) - len(call_lines[0].lstrip())]
+                call_source = "\n".join(part[len(indent) :] if part.startswith(indent) else part for part in call_lines)
+                call = ast.parse(call_source).body[0].value
+                if not call.keywords and all(isinstance(arg, ast.Constant) and isinstance(arg.value, str) for arg in call.args):
+                    option_value = False
+                    has_requirement = False
+                    for arg in call.args:
+                        if option_value:
+                            option_value = False
+                        elif arg.value in ("--extra-index-url", "--index-url", "--find-links", "-i", "-f"):
+                            option_value = True
+                        elif not arg.value.startswith("-"):
+                            has_requirement = True
+                    if not has_requirement and not option_value:
+                        updated_lines[call_start : index + 1] = [indent + "pass" if indent else ""] + [""] * (len(call_lines) - 1)
+            call_start = None
     cell["source"] = "\n".join(updated_lines)
 
 

@@ -6,13 +6,6 @@ on:
     branches:
       - 'main'
       - 'latest'
-    paths:
-      - 'notebooks/**.ipynb'
-      - 'notebooks/**.py'
-      - 'requirements.txt'
-      - '.ci/*'
-      - '.github/workflows/*.yml'
-      - '.github/workflows/.env'
   push:
     branches:
       - 'main'
@@ -37,6 +30,8 @@ env:
 
 jobs:
   get_docker_tag:
+    # Dependabot selector-only updates do not affect notebooks
+    if: ${{ !(github.event.pull_request.user.login == 'dependabot[bot]' && startsWith(github.head_ref, 'dependabot/npm_and_yarn/selector/')) }}
     runs-on: ubuntu-latest
     outputs:
       docker_tag: ${{ steps.get_docker_tag.outputs.docker_tag }}
@@ -62,7 +57,7 @@ jobs:
       fail-fast: false
       matrix:
         runs_on: [aks-linux-8-cores-32gb]
-        python: ['3.10', '3.11', '3.12', '3.13']
+        python: ['3.11', '3.12', '3.13']
     uses: ./.github/workflows/job_unix.yml
     with:
       runs_on: ${{ matrix.runs_on }}
@@ -71,11 +66,12 @@ jobs:
       test_only_changed: true
   
   build_treon_windows:
+    if: ${{ !(github.event.pull_request.user.login == 'dependabot[bot]' && startsWith(github.head_ref, 'dependabot/npm_and_yarn/selector/')) }}
     strategy:
       fail-fast: false
       matrix:
         runs_on: [aks-win-16-cores-32gb-full]
-        python: ['3.10', '3.11', '3.12', '3.13']
+        python: ['3.11', '3.12', '3.13']
     uses: ./.github/workflows/job_windows.yml
     with:
       runs_on: ${{ matrix.runs_on }}
