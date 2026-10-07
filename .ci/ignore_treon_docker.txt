@@ -69,6 +69,8 @@ notebooks/medasr-medical-asr/medasr-medical-asr.ipynb
 notebooks/qwen3-vl-embedding/qwen3-vl-embedding.ipynb
 notebooks/qwen3-vl-embedding/qwen3-vl-reranker.ipynb
 notebooks/minicpm-v-4.6/minicpm-v-4.6.ipynb
+notebooks/pyannote-audio/pyannote-audio.ipynb
+notebooks/pyannote-audio/pyannote-embedding.ipynb
 notebooks/mineru2.5/mineru2.5.ipynb
 notebooks/bernini-r-image-video/bernini-r-image-video.ipynb
 notebooks/omnivoice/omnivoice.ipynb
