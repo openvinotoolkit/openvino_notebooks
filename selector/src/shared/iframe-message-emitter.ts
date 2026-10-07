@@ -1,5 +1,6 @@
 import { type AdobeTrackFn } from './analytics/analytics';
 import { isEmbedded } from './iframe-detector';
+import { resolveTargetOrigin } from './target-origin';
 
 export interface IResizeMessage {
   type: 'resize';
@@ -15,27 +16,24 @@ export interface IAnalyticsMessage {
   args: Parameters<AdobeTrackFn>;
 }
 
+const postToParent = (message: IResizeMessage | IScrollMessage | IAnalyticsMessage): void => {
+  const targetOrigin = isEmbedded ? resolveTargetOrigin(document.referrer) : window.location.origin;
+  if (!targetOrigin) {
+    return; // Embedded by an untrusted page: don't leak data.
+  }
+  window.parent.postMessage(message, targetOrigin);
+};
+
 export const sendAnalyticsMessage = (...args: IAnalyticsMessage['args']): void => {
-  const message: IAnalyticsMessage = {
-    type: 'analytics',
-    args,
-  };
-  window.parent.postMessage(message, '*');
+  postToParent({ type: 'analytics', args });
 };
 
 export const sendScrollMessage = (): void => {
-  const message: IScrollMessage = {
-    type: 'scroll',
-  };
-  window.parent.postMessage(message, '*');
+  postToParent({ type: 'scroll' });
 };
 
 const report = () => {
-  const message: IResizeMessage = {
-    type: 'resize',
-    height: document.body.offsetHeight,
-  };
-  window.parent.postMessage(message, '*');
+  postToParent({ type: 'resize', height: document.body.offsetHeight });
 };
 
 new ResizeObserver(report).observe(document.body);
