@@ -25,9 +25,7 @@ def stream_generate(processor, model, inputs, *, max_new_tokens):
 
     streamer = TextIteratorStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=True, timeout=0.5)
     with ThreadPoolExecutor(max_workers=1) as executor:
-        generation = executor.submit(
-            model.generate, **inputs, max_new_tokens=max_new_tokens, do_sample=False, streamer=streamer
-        )
+        generation = executor.submit(model.generate, **inputs, max_new_tokens=max_new_tokens, do_sample=False, streamer=streamer)
         while True:
             try:
                 chunk = next(streamer)
@@ -145,9 +143,7 @@ def make_demo(export_root=Path("MiniCPM-V-4.7-ov")):
                     value=str(model_dirs[0]),
                     label="Exported model",
                 )
-                device_choice = gr.Dropdown(
-                    choices=devices, value="CPU" if "CPU" in devices else devices[0], label="Device"
-                )
+                device_choice = gr.Dropdown(choices=devices, value="CPU" if "CPU" in devices else devices[0], label="Device")
                 image_files = gr.File(label="Images", file_count="multiple", file_types=["image"], type="filepath")
                 question = gr.Textbox(label="Question")
                 enable_thinking = gr.Checkbox(label="Enable thinking", value=False)
