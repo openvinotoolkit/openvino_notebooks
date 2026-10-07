@@ -23,14 +23,21 @@ NOTEBOOKS_DIR = Path("notebooks")
 
 SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
 
-# Must match the default of `setup_notebook_venv()` in utils/notebook_utils.py
+# Must match `setup_notebook_venv()` in utils/notebook_utils.py: `.venv`, or `.venv/<notebook name without extension>`
+# when the notebook name is passed (notebooks sharing a directory)
 NOTEBOOK_VENV_DIR = Path(".venv")
 
 
-def get_notebook_venv_python() -> Path:
+def get_named_notebook_venv_dir(notebook_path: Path) -> Path:
+    return (notebook_path.parent / NOTEBOOK_VENV_DIR / notebook_path.stem).absolute()
+
+
+def get_notebook_venv_python(notebook_path: Path) -> Path:
+    named_venv_dir = get_named_notebook_venv_dir(notebook_path)
+    venv_dir = named_venv_dir if named_venv_dir.exists() else (notebook_path.parent / NOTEBOOK_VENV_DIR).absolute()
     if platform.system() == "Windows":
-        return (NOTEBOOK_VENV_DIR / "Scripts" / "python.exe").absolute()
-    return (NOTEBOOK_VENV_DIR / "bin" / "python").absolute()
+        return venv_dir / "Scripts" / "python.exe"
+    return venv_dir / "bin" / "python"
 
 
 class NotebookStatus:
@@ -508,6 +515,7 @@ def run_test(
     with cd(notebook_path.parent):
         print_disk_usage("BEFORE", Path("."))
         files_before_test = sorted(Path(".").iterdir())
+        named_venv_existed = get_named_notebook_venv_dir(notebook_path).exists()
         paddle_before = get_dir_state(Path.home() / ".paddleocr")
         easyocr_before = get_dir_state(Path.home() / ".EasyOCR")
 
@@ -559,7 +567,7 @@ def run_test(
         )
 
         # The notebook installs its requirements into its own virtual environment on top of the validation one
-        notebook_python = get_notebook_venv_python()
+        notebook_python = get_notebook_venv_python(notebook_path)
         if notebook_python.exists():
             print(f"Notebook virtual environment executable: {notebook_python}", flush=True)
             python_executable = notebook_python
@@ -598,6 +606,9 @@ def run_test(
         )
 
         if not keep_artifacts:
+            # `.venv` may already hold environments of sibling notebooks, so the top-level comparison below would keep it
+            if not named_venv_existed:
+                shutil.rmtree(get_named_notebook_venv_dir(notebook_path), ignore_errors=True)
             clean_test_artifacts(files_before_test, sorted(Path(".").iterdir()))
             clean_test_artifacts(paddle_before, get_dir_state(Path.home() / ".paddleocr"))
             clean_test_artifacts(easyocr_before, get_dir_state(Path.home() / ".EasyOCR"))

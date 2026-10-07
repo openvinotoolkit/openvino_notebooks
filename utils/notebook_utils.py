@@ -41,7 +41,7 @@ def _load_venv_pth_files(*_):
     importlib.invalidate_caches()
 
 
-def setup_notebook_venv(venv_dir: PathLike = NOTEBOOK_VENV_DIR) -> Path:
+def setup_notebook_venv(notebook_name: Optional[str] = None, venv_root: PathLike = NOTEBOOK_VENV_DIR) -> Path:
     """
     Create (if missing) and activate a notebook-specific virtual environment for the running kernel.
 
@@ -50,7 +50,10 @@ def setup_notebook_venv(venv_dir: PathLike = NOTEBOOK_VENV_DIR) -> Path:
     Packages of the kernel environment stay visible with lower priority, both in the kernel and in the
     virtual environment interpreter, which is also used by subprocesses and command-line tools.
 
-    :param venv_dir: Directory of the virtual environment. Relative paths are resolved against the current working directory.
+    :param notebook_name: File name of the notebook, e.g. "hello-world.ipynb". Required only when several notebooks share a directory:
+                          each of them then gets its own environment in `<venv_root>/<notebook name without extension>`.
+                          If not provided, `venv_root` itself is the environment.
+    :param venv_root: Directory with notebook virtual environments. Relative paths are resolved against the current working directory.
     :return: Absolute path to the virtual environment.
     """
     import os
@@ -59,7 +62,12 @@ def setup_notebook_venv(venv_dir: PathLike = NOTEBOOK_VENV_DIR) -> Path:
     import sysconfig
     import venv
 
-    venv_dir = Path(venv_dir).resolve()
+    if notebook_name is None:
+        venv_dir = Path(venv_root).resolve()
+    elif notebook_name and Path(notebook_name).name == notebook_name:
+        venv_dir = (Path(venv_root) / notebook_name.removesuffix(".ipynb")).resolve()
+    else:
+        raise ValueError(f"Expected a notebook file name without directories, got: {notebook_name!r}")
     bin_dir = venv_dir / ("Scripts" if os.name == "nt" else "bin")
     venv_python = bin_dir / ("python.exe" if os.name == "nt" else "python")
     if sys.executable == str(venv_python):

@@ -290,6 +290,11 @@ It creates the `.venv` folder next to the notebook (only once) and activates it 
 install packages into it, and the following imports, subprocesses and command-line tools (for example, `optimum-cli`) use it. Packages of the environment running Jupyter
 remain available with lower priority. To start from scratch, restart the kernel and delete the `.venv` folder.
 
+> **NOTE**: If a directory contains several notebooks, each of them must pass its own file name, for example `setup_notebook_venv("hello-world.ipynb")`.
+> Each notebook then gets a separate environment in `.venv/<notebook name>` (e.g. `.venv/hello-world`), so installing the requirements of one notebook
+> does not change what the other notebooks in the same directory import. When adding a notebook to a directory that already has one, update the existing notebook as well.
+> `.ci/check_notebooks.py` checks that every notebook uses the right form.
+
 Additional guidelines:
 1. Specify the widest compatible package version range. If your notebook has only a lower bound on some package version, consider specifying it with ">=" sign instead of "==". Specifying the exact version of package might lead to dependency conflict between notebooks. 
 2. Do not use spaces between package, version and comparison operator when specifying the package installed. Use "package==version" instead of "package == version".

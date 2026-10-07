@@ -36,9 +36,15 @@ def find_device_in_cell(cell):
     return None
 
 
-def has_venv_setup(notebook_json) -> bool:
+def expected_venv_setup_call(nb_path: Path) -> str:
+    # Notebooks sharing a directory need separate environments, which requires passing the notebook name
+    notebooks_in_dir = [p for p in nb_path.parent.glob("*.ipynb") if not p.name.startswith("test_")]
+    return f'setup_notebook_venv("{nb_path.name}")' if len(notebooks_in_dir) > 1 else "setup_notebook_venv()"
+
+
+def has_venv_setup(nb_path: Path, notebook_json) -> bool:
     code_cells = [cell for cell in notebook_json["cells"] if cell["cell_type"] == "code"]
-    return bool(code_cells) and "setup_notebook_venv()" in "".join(code_cells[0]["source"])
+    return bool(code_cells) and expected_venv_setup_call(nb_path) in "".join(code_cells[0]["source"])
 
 
 def main():
@@ -97,9 +103,9 @@ def main():
             elif not check_install_instructions(nb_path):
                 no_install_instructions.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
                 complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Install Instructions section is not found")
-            if nb_path.relative_to(NOTEBOOKS_ROOT) not in EXPECTED_NO_INSTALL and not has_venv_setup(notebook_json):
+            if nb_path.relative_to(NOTEBOOKS_ROOT) not in EXPECTED_NO_INSTALL and not has_venv_setup(nb_path, notebook_json):
                 no_venv_setup.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
-                complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: first code cell does not call setup_notebook_venv()")
+                complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: first code cell does not call {expected_venv_setup_call(nb_path)}")
 
     if not all_passed:
         print("\nSUMMARY:")
