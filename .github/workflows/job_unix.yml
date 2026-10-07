@@ -1,0 +1,271 @@
+name: Build Treon Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      runs_on:
+        required: true
+        type: string
+      python:
+        required: true
+        type: string
+      container:
+        required: true
+        type: string
+        default: null
+      test_only_changed:
+        required: false
+        type: boolean
+        default: false
+      ignore_list:
+        required: false
+        type: string
+        default: ''
+      separate_venv:
+        required: false
+        type: boolean
+        default: false
+      test_list:
+        description: 'Newline-separated list of notebook paths to test (relative to repo root)'
+        required: false
+        type: string
+        default: ''
+      batch:
+        description: 'Batch identifier for unique artifact naming when running parallel batches'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+env:
+  PIP_CACHE_PATH: /mount/caches/pip
+  MOUNT_CACHE: /mount/testdata0/ov_notebooks
+
+
+jobs:
+  build_treon:
+    runs-on: ${{ inputs.runs_on }}
+    defaults:
+      run:
+        shell: bash
+    container:
+      image: ${{ inputs.container }}
+      volumes:
+        - /mount:/mount
+    steps:
+      - name: Set env variables
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const runsOn = "${{ inputs.runs_on }}";
+            const osName = runsOn.includes('linux') ? 'ubuntu-22.04' : runsOn.includes('mac') ? 'macos-13' : 'windows-2022';
+            const testDevice = runsOn === 'gpu' ? 'gpu' : 'cpu';
+            const testReportDir = `${testDevice}-${osName}-${{ inputs.python }}`;
+            core.exportVariable('OS_NAME', osName);
+            core.exportVariable('TEST_DEVICE', testDevice);
+            core.exportVariable('TEST_REPORT_DIR', testReportDir);
+            core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
+
+      - name: Checkout repository
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+
+      - name: Get changed files
+        if: ${{ inputs.test_only_changed }}
+        id: changed-files
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
+        with:
+          files: |
+            notebooks/*/**
+            requirements.txt
+
+      - name: List all changed files
+        if: ${{ inputs.test_only_changed }}
+        shell: bash
+        run: |
+          changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+          changed_files=$(echo $changed_files | tr '\\' '/')
+
+          notebook_changed=false
+          for file in $changed_files; do
+            if [[ $file == notebooks/* ]]; then
+              notebook_changed=true
+              break
+            fi
+          done
+
+          if [ "$notebook_changed" = true ]; then
+            touch test_notebooks.txt
+            for file in $changed_files; do
+              echo "$file was changed"
+              echo $file >> test_notebooks.txt
+            done
+          else
+            echo "No notebook files changed, using precommit list"
+            cp .ci/precommit_list.txt test_notebooks.txt
+          fi
+
+      - name: Write test list from input
+        if: ${{ inputs.test_list != '' }}
+        shell: bash
+        run: |
+          cat << 'EOF' > test_notebooks.txt
+          ${{ inputs.test_list }}
+          EOF
+          # Remove leading whitespace added by heredoc indentation
+          sed -i 's/^[[:space:]]*//' test_notebooks.txt
+          # Remove empty lines
+          sed -i '/^$/d' test_notebooks.txt
+          echo "Notebooks to test ($(wc -l < test_notebooks.txt) total):"
+          cat test_notebooks.txt
+      
+      - name: Install required packages (Linux)
+        if: ${{ !inputs.container && runner.os == 'Linux' }}
+        shell: bash
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install libsndfile1 ffmpeg espeak-ng -y
+      
+      - name: Install required packages (container)
+        if: ${{ inputs.container }}
+        shell: bash
+        env:
+          DEBIAN_FRONTEND: noninteractive # to prevent apt-get from waiting user input
+          TZ: 'Europe/London' # to prevent tzdata from waiting user input
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            apt-get update -y
+            apt-get install git curl wget libsndfile1 libssl-dev unzip libsqlite3-dev libedit-dev libgl1 libgl1-mesa-glx libglib2.0-0 ffmpeg tk -y
+            wget https://raw.githubusercontent.com/openvinotoolkit/openvino/d9e6b4b29ab49e054fa602db1abae4ef9ace41da/scripts/install_dependencies/install_openvino_dependencies.sh
+            chmod +x ./install_openvino_dependencies.sh
+            ./install_openvino_dependencies.sh -c=core -c=dev -c=gpu -y
+          fi
+
+      - name: Install GPU Drivers
+        if: ${{ env.TEST_DEVICE == 'gpu' && runner.os == 'Linux' }}
+        shell: bash
+        run: |
+          wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.15985.7/intel-igc-core_1.0.15985.7_amd64.deb
+          wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.15985.7/intel-igc-opencl_1.0.15985.7_amd64.deb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-level-zero-gpu-dbgsym_1.3.28454.6_amd64.ddeb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-level-zero-gpu_1.3.28454.6_amd64.deb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-opencl-icd-dbgsym_24.05.28454.6_amd64.ddeb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/intel-opencl-icd_24.05.28454.6_amd64.deb
+          wget https://github.com/intel/compute-runtime/releases/download/24.05.28454.6/libigdgmm12_22.3.11_amd64.deb
+          dpkg -i *.deb
+
+      - name: Setup Python ${{ inputs.python }}
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@e4b65a0ab6c946c72d56240223620837e6d34bf8
+        with:
+          version: ${{ inputs.python }}
+          pip-cache-path: ${{ env.PIP_CACHE_PATH }}
+          should-setup-pip-paths: 'true'
+          self-hosted-runner: 'true'
+
+      - name: Create and check cache directory
+        run: |
+          mkdir -m 777 -p ${{ env.MOUNT_CACHE }}
+          ls -la ${{ env.MOUNT_CACHE }}
+
+      - name: Set cache environment variables
+        run: |
+          python${{ inputs.python }} -c 'import os;print("CACHE_DIR={0}".format(os.path.expanduser(os.path.join("${{ env.MOUNT_CACHE }}", "PaddleGAN"))))' | sed -e 's/\\/\//g' >> $GITHUB_ENV
+          echo HUB_HOME=${{ env.MOUNT_CACHE }}/.paddlehub >> $GITHUB_ENV
+
+      - name: Prepare CT files for ct-segmentation-quantize
+        run: |
+          if [[ ! -f ${{ env.MOUNT_CACHE }}/case_00030.zip ]]; then
+            curl -o ${{ env.MOUNT_CACHE }}/case_00030.zip https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
+          fi
+          mkdir -p notebooks/ct-segmentation-quantize/kits19/kits19_frames
+          cp ${{ env.MOUNT_CACHE }}/case_00030.zip .
+          unzip case_00030.zip
+          cp -r case_00030 case_00001
+          mv case_00030 notebooks/ct-segmentation-quantize/kits19/kits19_frames
+          mv case_00001 notebooks/ct-segmentation-quantize/kits19/kits19_frames
+
+      - name: Prepare models for meter-reader and paddle-ocr-webcam
+        run: |
+          if [[ ! -f "${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz" ]]; then
+            curl -o ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_det_model.tar.gz'
+          fi
+          if [[ ! -f "${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz" ]]; then
+            curl -o ${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_seg_model.tar.gz'
+          fi
+          if [[ ! -f "${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar" ]]; then
+            curl -o ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_det_infer.tar'
+          fi
+          if [[ ! -f "${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar" ]]; then
+            curl -o ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_rec_infer.tar'
+          fi
+          mkdir -p notebooks/meter-reader/model
+          cp ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz notebooks/meter-reader/model/
+          cp ${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz notebooks/meter-reader/model/
+          mkdir -p notebooks/paddle-ocr-webcam/model
+          cp ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar notebooks/paddle-ocr-webcam/model/
+          cp ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar notebooks/paddle-ocr-webcam/model/
+
+      - name: Create source virtual env & install python dependencies
+        run: |
+          python${{ inputs.python }} -m venv .venv
+          .venv/bin/python3 -m pip install --upgrade setuptools wheel
+          .venv/bin/python3 -m pip install -r .ci/dev-requirements.txt
+          .venv/bin/python3 -m ipykernel install --user
+
+      - name: Check install
+        run: .venv/bin/python3 check_install.py
+
+      - name: Patch notebooks
+        run: .venv/bin/python3 .ci/patch_notebooks.py . -td ${{ env.TEST_DEVICE }}
+
+      - name: Test Jupyterlab
+        run: .venv/bin/python3 -m jupyter lab notebooks --help
+
+      - name: Analysing with treon (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          IGNORE_ARGS=""
+          if [[ -n "${{ inputs.ignore_list }}" ]]; then
+            IGNORE_ARGS="$IGNORE_ARGS ${{ inputs.ignore_list }}"
+          fi
+          if [[ "${{ env.TEST_DEVICE }}" == "gpu" ]]; then
+             IGNORE_ARGS="$IGNORE_ARGS .ci/heavy_ubuntu_gpu.txt"
+          fi
+          
+          if [[ -n "$IGNORE_ARGS" ]]; then
+            IGNORE_ARGS="--ignore_list $IGNORE_ARGS"
+          fi
+
+          .venv/bin/python3 .ci/validate_notebooks.py \
+            --os ${{ env.OS_NAME }} \
+            --python ${{ inputs.python }} \
+            --device ${{ env.TEST_DEVICE }} \
+            ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
+            $IGNORE_ARGS \
+            --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
+            ${{ inputs.separate_venv && '--separate_venv' || '' }} \
+            --collect_reports \
+            --timeout 1200
+      
+      - name: Analysing with treon (MacOS)
+        if: runner.os == 'MacOS'
+        shell: bash
+        run: |
+          python${{ inputs.python }} .ci/validate_notebooks.py \
+            --os ${{ env.OS_NAME }} \
+            --python ${{ inputs.python }} \
+            --device ${{ env.TEST_DEVICE }} \
+            ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
+            --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
+            ${{ inputs.separate_venv && '--separate_venv' || '' }} \
+            --collect_reports \
+            --timeout 1200
+
+      - name: Archive notebook test report
+        if: always()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        with:
+          name: test_report-${{ env.TEST_REPORT_DIR }}-${{ inputs.batch != '' && inputs.batch || '' }}
+          path: test_report/

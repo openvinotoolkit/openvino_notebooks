@@ -151,12 +151,25 @@ SUPPORTED_VLM_MODELS = {
             "model_id": "Qwen/Qwen3.6-27B",
             "exclude_on_devices": ["NPU"],
         },
+        "Qwen3.8-27B": {
+            "model_id": "Qwen/Qwen3.8-27B",
+            "exclude_on_devices": ["NPU"],
+            "supports_video": True,
+            "supports_thinking": True,
+            "experimental": True,
+        },
         "Qwen3.5-35B-A3B": {
             "model_id": "Qwen/Qwen3.5-35B-A3B",
             "exclude_on_devices": ["NPU"],
         },
         "Qwen3.6-35B-A3B": {
             "model_id": "Qwen/Qwen3.6-35B-A3B",
+            "exclude_on_devices": ["NPU"],
+        },
+        "Muse-Glimmer-30B": {
+            "model_id": "meta-models/Muse-Glimmer-30B",
+            "supports_video": True,
+            "experimental": True,
             "exclude_on_devices": ["NPU"],
         },
         "Qwen2.5-VL-3B-Instruct": {
@@ -303,6 +316,13 @@ SUPPORTED_VLM_MODELS = {
             "model_id": "Qwen/Qwen3.6-27B",
             "exclude_on_devices": ["NPU"],
         },
+        "Qwen3.8-27B": {
+            "model_id": "Qwen/Qwen3.8-27B",
+            "exclude_on_devices": ["NPU"],
+            "supports_video": True,
+            "supports_thinking": True,
+            "experimental": True,
+        },
         "Qwen3.5-35B-A3B": {
             "model_id": "Qwen/Qwen3.5-35B-A3B",
             "exclude_on_devices": ["NPU"],
@@ -392,6 +412,13 @@ SUPPORTED_VLM_MODELS = {
         "Qwen3.6-27B": {
             "model_id": "Qwen/Qwen3.6-27B",
             "exclude_on_devices": ["NPU"],
+        },
+        "Qwen3.8-27B": {
+            "model_id": "Qwen/Qwen3.8-27B",
+            "exclude_on_devices": ["NPU"],
+            "supports_video": True,
+            "supports_thinking": True,
+            "experimental": True,
         },
         "Qwen3.5-35B-A3B": {
             "model_id": "Qwen/Qwen3.5-35B-A3B",
@@ -1277,6 +1304,11 @@ compression_configs = {
     "llama-3.2-3b-instruct": {"sym": False, "group_size": 64, "ratio": 1.0, "dataset": "wikitext2", "awq": True, "all_layers": True, "scale_estimation": True},
     "llama-3.2-1b-instruct": {"sym": False, "group_size": 64, "ratio": 1.0, "dataset": "wikitext2", "awq": True, "all_layers": True, "scale_estimation": True},
     "SmolLM3-3B": {"sym": True, "group_size": 128, "ratio": 1.0},
+    "Muse-Glimmer-30B": {
+        "sym": False,
+        "group_size": 64,
+        "group_size_fallback": "ignore",
+    },
     "default": {
         "sym": False,
     },
@@ -1298,6 +1330,8 @@ def get_optimum_cli_command_vlm(
         compression_args = ""
         if "group_size" in compression_options:
             compression_args += " --group-size {}".format(compression_options["group_size"])
+        if "group_size_fallback" in compression_options:
+            compression_args += " --group-size-fallback {}".format(compression_options["group_size_fallback"])
         if "ratio" in compression_options:
             compression_args += " --ratio {}".format(compression_options["ratio"])
         if compression_options["sym"]:

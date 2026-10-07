@@ -128,6 +128,7 @@ const NOTEBOOK_METADATA_VALIDATORS = {
   imageUrl: validate(Nullable(isUrl), { key: 'imageUrl', type: 'a valid URL or null' }),
   createdDate: validate(isDate, { key: 'createdDate', type: 'a valid Date string' }),
   modifiedDate: validate(isDate, { key: 'modifiedDate', type: 'a valid Date string' }),
+  models: validate(isStringArray, { key: 'models', type: 'a string array' }),
   links: linksValidator,
   tags: tagsValidator,
 };

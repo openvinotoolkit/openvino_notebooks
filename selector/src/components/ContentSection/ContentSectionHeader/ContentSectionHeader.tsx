@@ -98,7 +98,7 @@ export const ContentSectionHeader = ({
         )}
 
         <Search
-          placeholder="Filter notebooks by name"
+          placeholder="Filter notebooks by notebook or model name"
           className="notebooks-search"
           search={setSearchValue}
           value={searchValue}

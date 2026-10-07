@@ -80,8 +80,8 @@ TestPlan = dict[Path, NotebookReport]
 def parse_arguments():
     parser = ArgumentParser()
     parser.add_argument("--ignore_config", required=False, default=SKIPPED_NOTEBOOKS_CONFIG_FILENAME)
-    parser.add_argument("--ignore_list", required=False, nargs="+")
-    parser.add_argument("--test_list", required=False, nargs="+")
+    parser.add_argument("--ignore_list", required=False, nargs="+", default=None)
+    parser.add_argument("--test_list", required=False, nargs="+", default=None)
     parser.add_argument("--os", type=validation_config_arg("os"))
     parser.add_argument("--python", type=validation_config_arg("python"))
     parser.add_argument("--device", type=validation_config_arg("device"))
@@ -173,7 +173,11 @@ def get_existing_tests(test_list_to_check: list, test_plan: TestPlan) -> TestPla
 
 
 def prepare_test_plan(
-    validation_config: ValidationConfig, test_list: Optional[list[str]], ignore_config: str, ignore_list: Optional[list[str]], nb_dir: Optional[Path] = None
+    validation_config: ValidationConfig,
+    test_list: Optional[list[str]],
+    ignore_config: str,
+    ignore_list: Optional[list[str]],
+    nb_dir: Optional[Path] = None,
 ) -> TestPlan:
     orig_nb_dir = ROOT / NOTEBOOKS_DIR
     notebooks_dir = nb_dir or orig_nb_dir
@@ -342,7 +346,10 @@ def print_disk_usage(label: str, notebook_dir: Path):
         cache_dir = Path.home() / ".cache"
         cache_size = get_dir_size(cache_dir)
 
-        print(f"DEBUG [{label}] Free Space: {free} | Notebook Dir: {nb_dir_size} | ~/.cache: {cache_size}", flush=True)
+        print(
+            f"DEBUG [{label}] Free Space: {free} | Notebook Dir: {nb_dir_size} | ~/.cache: {cache_size}",
+            flush=True,
+        )
     except Exception as e:
         print(f"Error checking disk usage: {e}")
 
@@ -357,7 +364,10 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
     :type target_env_path: Path
     """
 
-    print(f"Cloning virtual environment from {source_env_path} to " f"{target_env_path}...", flush=True)
+    print(
+        f"Cloning virtual environment from {source_env_path} to " f"{target_env_path}...",
+        flush=True,
+    )
 
     if not source_env_path.exists():
         raise FileNotFoundError(f"Source virtual environment path '{source_env_path}' does not exist.")
@@ -367,12 +377,18 @@ def clone_venv(source_env_path: Path, target_env_path: Path):
     if platform.system() == "Windows":
         expected_python = source_env_path / "Scripts" / "python.exe"
         if not expected_python.exists():
-            print(f"Warning: Expected python executable not found at {expected_python}", flush=True)
+            print(
+                f"Warning: Expected python executable not found at {expected_python}",
+                flush=True,
+            )
             is_standard_venv = False
     else:
         expected_python = source_env_path / "bin" / "python"
         if not expected_python.exists():
-            print(f"Warning: Expected python executable not found at {expected_python}", flush=True)
+            print(
+                f"Warning: Expected python executable not found at {expected_python}",
+                flush=True,
+            )
 
     if target_env_path.exists():
         print(
@@ -454,7 +470,10 @@ def kill_process_tree(pid):
             # On Windows, kill all children in the process group
             parent = psutil.Process(pid)
             children = parent.children(recursive=True)
-            print(f"Killing process tree: parent PID {pid} with {len(children)} children", flush=True)
+            print(
+                f"Killing process tree: parent PID {pid} with {len(children)} children",
+                flush=True,
+            )
             for child in children:
                 try:
                     print(f"Killing child process PID {child.pid}", flush=True)
@@ -492,7 +511,10 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
     # Convert all Path objects to strings in cmd list
     if isinstance(cmd, list):
         cmd = [str(item) for item in cmd]
-    print(f"Running {description}: {' '.join(cmd) if isinstance(cmd, list) else cmd}", flush=True)
+    print(
+        f"Running {description}: {' '.join(cmd) if isinstance(cmd, list) else cmd}",
+        flush=True,
+    )
     start_time = time.perf_counter()
     process = None
     retcode = None
@@ -528,7 +550,10 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
         while True:
             # Check timeout FIRST (before any potentially blocking operations)
             if time.perf_counter() - loop_start > timeout:
-                print(f"\n{description} timeout reached ({timeout}s), killing process...", flush=True)
+                print(
+                    f"\n{description} timeout reached ({timeout}s), killing process...",
+                    flush=True,
+                )
                 kill_process_tree(process.pid)
                 retcode = -42  # Special timeout exit code
                 break
@@ -576,7 +601,12 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
 
 
 def run_test(
-    notebook_path: Path, root, timeout=7200, keep_artifacts=False, report_dir=".", source_venv_path=None
+    notebook_path: Path,
+    root,
+    timeout=7200,
+    keep_artifacts=False,
+    report_dir=".",
+    source_venv_path=None,
 ) -> Optional[tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["HF_HUB_CACHE"] = str(notebook_path.parent)
@@ -624,19 +654,45 @@ def run_test(
                 os.environ["PATH"] = str(python_executable.parent) + os.pathsep + original_path
 
             try:
-                ov_version_before = get_pip_package_version(python_executable, "openvino", "OpenVINO before notebook execution", "OpenVINO is missing")
-                get_pip_package_version(
-                    python_executable, "openvino_tokenizers", "OpenVINO Tokenizers before notebook execution", "OpenVINO Tokenizers is missing"
+                ov_version_before = get_pip_package_version(
+                    python_executable,
+                    "openvino",
+                    "OpenVINO before notebook execution",
+                    "OpenVINO is missing",
                 )
-                get_pip_package_version(python_executable, "openvino_genai", "OpenVINO GenAI before notebook execution", "OpenVINO GenAI is missing")
+                get_pip_package_version(
+                    python_executable,
+                    "openvino_tokenizers",
+                    "OpenVINO Tokenizers before notebook execution",
+                    "OpenVINO Tokenizers is missing",
+                )
+                get_pip_package_version(
+                    python_executable,
+                    "openvino_genai",
+                    "OpenVINO GenAI before notebook execution",
+                    "OpenVINO GenAI is missing",
+                )
                 patched_notebook = Path(f"test_{notebook_path.name}")
                 if not patched_notebook.exists():
                     print(f'Patched notebook "{patched_notebook}" does not exist.')
                     return result
 
-                collect_python_packages(python_executable, report_dir / (patched_notebook.stem + "_env_before.txt"))
+                collect_python_packages(
+                    python_executable,
+                    report_dir / (patched_notebook.stem + "_env_before.txt"),
+                )
+                print(
+                    f"Python executable for notebook test: {python_executable}",
+                    flush=True,
+                )
 
-                main_command = [python_executable, "-m", "treon", "--verbose", str(patched_notebook)]
+                main_command = [
+                    python_executable,
+                    "-m",
+                    "treon",
+                    "--verbose",
+                    str(patched_notebook),
+                ]
 
                 retcode, duration = run_subprocess_with_timeout(
                     main_command,
@@ -645,14 +701,36 @@ def run_test(
                     description=f"Notebook test [{patched_notebook.name}]",
                 )
 
-                ov_version_after = get_pip_package_version(python_executable, "openvino", "OpenVINO after notebook execution", "OpenVINO is missing")
-                get_pip_package_version(
-                    python_executable, "openvino_tokenizers", "OpenVINO Tokenizers after notebook execution", "OpenVINO Tokenizers is missing"
+                ov_version_after = get_pip_package_version(
+                    python_executable,
+                    "openvino",
+                    "OpenVINO after notebook execution",
+                    "OpenVINO is missing",
                 )
-                get_pip_package_version(python_executable, "openvino_genai", "OpenVINO GenAI after notebook execution", "OpenVINO GenAI is missing")
-                result = (str(patched_notebook), retcode, duration, ov_version_before, ov_version_after)
+                get_pip_package_version(
+                    python_executable,
+                    "openvino_tokenizers",
+                    "OpenVINO Tokenizers after notebook execution",
+                    "OpenVINO Tokenizers is missing",
+                )
+                get_pip_package_version(
+                    python_executable,
+                    "openvino_genai",
+                    "OpenVINO GenAI after notebook execution",
+                    "OpenVINO GenAI is missing",
+                )
+                result = (
+                    str(patched_notebook),
+                    retcode,
+                    duration,
+                    ov_version_before,
+                    ov_version_after,
+                )
 
-                collect_python_packages(python_executable, report_dir / (patched_notebook.stem + "_env_after.txt"))
+                collect_python_packages(
+                    python_executable,
+                    report_dir / (patched_notebook.stem + "_env_after.txt"),
+                )
 
                 if not keep_artifacts:
                     clean_test_artifacts(files_before_test, sorted(Path(".").iterdir()))
@@ -660,7 +738,10 @@ def run_test(
                     clean_test_artifacts(easyocr_before, get_dir_state(Path.home() / ".EasyOCR"))
 
                 print_disk_usage("AFTER", Path("."))
-                print(f"TEST DURATION [{notebook_path.name}]: {duration:.2f} seconds", flush=True)
+                print(
+                    f"TEST DURATION [{notebook_path.name}]: {duration:.2f} seconds",
+                    flush=True,
+                )
             finally:
                 if source_venv_path:
                     os.environ["PATH"] = original_path
@@ -679,7 +760,13 @@ def write_csv_report(csv_path, test_report, result_queue):
         result_queue.put(("error", str(e)))
 
 
-def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], test_plan: TestPlan, report_dir: Path, root: Path) -> int:
+def finalize_status(
+    failed_notebooks: list[str],
+    timeout_notebooks: list[str],
+    test_plan: TestPlan,
+    report_dir: Path,
+    root: Path,
+) -> int:
     return_status = 0
 
     if failed_notebooks:
@@ -698,7 +785,14 @@ def finalize_status(failed_notebooks: list[str], timeout_notebooks: list[str], t
         except (ValueError, TypeError):
             full_path_str = str(status["path"].absolute())
 
-        test_report.append({"name": notebook.as_posix(), "status": test_status, "full_path": full_path_str, "duration": status["duration"]})
+        test_report.append(
+            {
+                "name": notebook.as_posix(),
+                "status": test_status,
+                "full_path": full_path_str,
+                "duration": status["duration"],
+            }
+        )
     print(f"Test report built with {len(test_report)} entries", flush=True)
     csv_path = report_dir / "test_report.csv"
     print(f"Writing test report to: {csv_path.absolute()}", flush=True)
@@ -749,6 +843,7 @@ def write_single_notebook_report(
     job_name: str,
     device: str,
     saving_dir: Path,
+    notebook_content: str,
 ) -> Path:
     report_file = saving_dir / notebook_name.replace(".ipynb", ".json")
     report = {
@@ -760,6 +855,7 @@ def write_single_notebook_report(
         "ov_version_after": ov_version_after,
         "job_name": job_name,
         "device_used": device,
+        "notebook_content": notebook_content,
     }
     with report_file.open("w") as f:
         json.dump(report, f)
@@ -801,14 +897,27 @@ def main():
 
     validation_config = ValidationConfig(os=args.os, python=args.python, device=args.device)
 
-    test_plan = prepare_test_plan(validation_config, args.test_list, args.ignore_config, args.ignore_list, notebooks_moving_dir)
+    test_plan = prepare_test_plan(
+        validation_config,
+        args.test_list,
+        args.ignore_config,
+        args.ignore_list,
+        notebooks_moving_dir,
+    )
 
     for notebook, report in test_plan.items():
         if report["status"] == NotebookStatus.SKIPPED:
             continue
         try:
             print("Testing notebook:", str(report["path"]), flush=True)
-            test_result = run_test(report["path"], root, args.timeout, keep_artifacts, reports_dir.absolute(), source_venv_path)
+            test_result = run_test(
+                report["path"],
+                root,
+                args.timeout,
+                keep_artifacts,
+                reports_dir.absolute(),
+                source_venv_path,
+            )
         except Exception as e:
             print(f"Error during testing notebook {str(notebook)}: {e}")
             print(traceback.format_exc(), flush=True)
@@ -819,7 +928,13 @@ def main():
             report["status"] = NotebookStatus.EMPTY
             report["duration"] = timing
         else:
-            patched_notebook, status_code, duration, ov_version_before, ov_version_after = test_result
+            (
+                patched_notebook,
+                status_code,
+                duration,
+                ov_version_before,
+                ov_version_after,
+            ) = test_result
             if status_code:
                 if status_code == -42:
                     status = NotebookStatus.TIMEOUT
@@ -836,8 +951,22 @@ def main():
             if args.collect_reports:
                 job_name = args.job_name or "Unknown"
                 device = args.device or "Unknown"
+                print(
+                    f'Notebook directory content: {list(report["path"].parent.iterdir())}',
+                    flush=True,
+                )
+                notebook_content = json.loads(report["path"].parent.joinpath(f'test_{report["path"].name}').read_text(encoding="utf-8"))
                 report_path = write_single_notebook_report(
-                    base_version, patched_notebook, status_code, duration, ov_version_before, ov_version_after, job_name, device, reports_dir
+                    base_version,
+                    patched_notebook,
+                    status_code,
+                    duration,
+                    ov_version_before,
+                    ov_version_after,
+                    job_name,
+                    device,
+                    reports_dir,
+                    notebook_content=notebook_content,
                 )
                 if args.upload_to_db:
                     cmd = [sys.executable, args.upload_to_db, report_path]
@@ -848,9 +977,15 @@ def main():
                         description=f"Upload notebook report to DB [{patched_notebook}]",
                     )
                     if retcode != 0:
-                        print(f"Database upload failed with exit code {retcode}, duration: {duration:.2f} seconds", flush=True)
+                        print(
+                            f"Database upload failed with exit code {retcode}, duration: {duration:.2f} seconds",
+                            flush=True,
+                        )
                     else:
-                        print(f"Database upload succeeded, duration: {duration:.2f} seconds", flush=True)
+                        print(
+                            f"Database upload succeeded, duration: {duration:.2f} seconds",
+                            flush=True,
+                        )
 
             if args.early_stop:
                 break

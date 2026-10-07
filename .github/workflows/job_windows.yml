@@ -1,0 +1,207 @@
+name: Windows Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      runs_on:
+        required: true
+        type: string
+      python:
+        required: true
+        type: string
+      test_only_changed:
+        required: false
+        type: boolean
+        default: false
+      ignore_list:
+        required: false
+        type: string
+        default: ''
+      separate_venv:
+        required: false
+        type: boolean
+        default: false
+      test_list:
+        description: 'Newline-separated list of notebook paths to test (relative to repo root)'
+        required: false
+        type: string
+        default: ''
+      batch:
+        description: 'Batch identifier for unique artifact naming when running parallel batches'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+env:
+  PIP_CACHE_PATH: "C:\\mount\\caches\\pip\\win"
+
+jobs:
+  build_treon:
+    runs-on: ${{ inputs.runs_on }}
+    steps:
+      - name: Set env variables
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const runsOn = "${{ inputs.runs_on }}";
+            const osName = runsOn.includes('linux') ? 'ubuntu-22.04' : runsOn.includes('mac') ? 'macos-13' : 'windows-2022';
+            const testDevice = runsOn === 'gpu' ? 'gpu' : 'cpu';
+            const testReportDir = `${testDevice}-${osName}-${{ inputs.python }}`;
+            core.exportVariable('OS_NAME', osName);
+            core.exportVariable('TEST_DEVICE', testDevice);
+            core.exportVariable('TEST_REPORT_DIR', testReportDir);
+            core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
+
+      - name: Checkout repository
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+
+      - name: Install FFmpeg
+        shell: pwsh
+        run: |
+          $build = "ffmpeg-8.1.2-full_build-shared"
+          curl.exe -fsSL -o ffmpeg.zip "https://github.com/GyanD/codexffmpeg/releases/download/8.1.2/$build.zip"
+          if ((Get-FileHash ffmpeg.zip -Algorithm SHA256).Hash -ne "274923c68904a9b76c73b908f57923dafba81155856cd742138515ded570d066") {
+            throw "FFmpeg archive checksum mismatch"
+          }
+          Expand-Archive ffmpeg.zip -DestinationPath C:\tools
+          "C:\tools\$build\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+          & "C:\tools\$build\bin\ffmpeg.exe" -version
+
+      - name: Get changed files
+        if: ${{ inputs.test_only_changed }}
+        id: changed-files
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
+        with:
+          files: |
+            notebooks/*/**
+            requirements.txt
+
+      - name: List all changed files
+        if: ${{ inputs.test_only_changed }}
+        shell: bash
+        run: |
+          changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+          changed_files=$(echo $changed_files | tr '\\' '/')
+          echo "Changed files: $changed_files"
+
+          notebook_changed=false
+          for file in $changed_files; do
+            if [[ $file == notebooks/* ]]; then
+              notebook_changed=true
+              break
+            fi
+          done
+
+          if [ "$notebook_changed" = true ]; then
+            touch test_notebooks.txt
+            for file in $changed_files; do
+              echo "$file was changed"
+              echo $file >> test_notebooks.txt
+            done
+          else
+            echo "No notebook files changed, using precommit list"
+            cp .ci/precommit_list.txt test_notebooks.txt
+          fi
+
+      - name: Write test list from input
+        if: ${{ inputs.test_list != '' }}
+        shell: bash
+        run: |
+          cat << 'EOF' > test_notebooks.txt
+          ${{ inputs.test_list }}
+          EOF
+          # Remove leading whitespace added by heredoc indentation
+          sed -i 's/^[[:space:]]*//' test_notebooks.txt
+          # Remove empty lines
+          sed -i '/^$/d' test_notebooks.txt
+          echo "Notebooks to test ($(wc -l < test_notebooks.txt) total):"
+          cat test_notebooks.txt
+
+      - name: Setup Python ${{ inputs.python }}
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@e4b65a0ab6c946c72d56240223620837e6d34bf8
+        with:
+          version: ${{ inputs.python }}
+          pip-cache-path: ${{ env.PIP_CACHE_PATH }}
+          should-setup-pip-paths: 'true'
+          self-hosted-runner: 'true'
+
+      - name: Prepare CT files for ct-segmentation-quantize
+        run: |
+          curl -O https://storage.openvinotoolkit.org/data/test_data/openvino_notebooks/kits19/case_00030.zip
+          mkdir -p notebooks/ct-segmentation-quantize/kits19/kits19_frames
+          unzip case_00030.zip
+          cp -r case_00030 case_00001
+          mv case_00030 notebooks/ct-segmentation-quantize/kits19/kits19_frames
+          mv case_00001 notebooks/ct-segmentation-quantize/kits19/kits19_frames
+
+      - name: Prepare models for meter-reader and paddle-ocr-webcam
+        run: |
+          mkdir -p notebooks/meter-reader/model
+          curl -o notebooks/meter-reader/model/meter_det_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_det_model.tar.gz'
+          curl -o notebooks/meter-reader/model/meter_seg_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_seg_model.tar.gz'
+          mkdir -p notebooks/paddle-ocr-webcam/model
+          curl -o notebooks/paddle-ocr-webcam/model/ch_PP-OCRv3_det_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_det_infer.tar'
+          curl -o notebooks/paddle-ocr-webcam/model/ch_PP-OCRv3_rec_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_rec_infer.tar'
+
+      - name: Install python dependencies
+        run: |
+          python3 -m pip install --upgrade setuptools wheel
+          python3 -m pip install -r .ci/dev-requirements.txt
+          python3 -m ipykernel install --user --name openvino_env
+
+      # Needed for notebooks that download models from Hugging Face Hub
+      - name: Configure CA bundle (certifi)
+        run: |
+          python3 -m pip install --upgrade certifi
+          $CA_BUNDLE = python3 -c "import certifi; print(certifi.where())"
+          Write-Output "Using CA bundle: $CA_BUNDLE"
+          "SSL_CERT_FILE=$CA_BUNDLE" >> $env:GITHUB_ENV
+          "REQUESTS_CA_BUNDLE=$CA_BUNDLE" >> $env:GITHUB_ENV
+
+      - name: Check install
+        run: python3 check_install.py
+
+      - name: Patch notebooks
+        run: python3 .ci/patch_notebooks.py . -td ${{ env.TEST_DEVICE }}
+
+      - name: Test Jupyterlab
+        run: jupyter lab notebooks --help
+
+      - name: Analysing with treon
+        shell: pwsh
+        run: |
+          $cmdArgs = @(
+            "--os", "${{ env.OS_NAME }}",
+            "--python", "${{ inputs.python }}",
+            "--device", "${{ env.TEST_DEVICE }}",
+            "--report_dir", "test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }}",
+            "--timeout", "1200",
+            "--collect_reports"
+          )
+          
+          if ("${{ inputs.test_only_changed }}" -eq "true" -or "${{ inputs.test_list }}" -ne "") {
+            $cmdArgs += "--test_list"
+            $cmdArgs += "test_notebooks.txt"
+          }
+          
+          if ("${{ inputs.ignore_list }}" -ne "") {
+            $cmdArgs += "--ignore_list"
+            $cmdArgs += "${{ inputs.ignore_list }}"
+          }
+
+          if ( "${{ inputs.separate_venv }}" -eq "true" )
+          {
+            $cmdArgs += "--separate_venv"
+          }
+          
+          & python3 .ci/validate_notebooks.py @cmdArgs
+
+      - name: Archive notebook test report
+        if: always()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        with:
+          name: test_report-${{ env.TEST_REPORT_DIR }}-${{ inputs.batch != '' && inputs.batch || '' }}
+          path: test_report/

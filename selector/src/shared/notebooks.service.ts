@@ -81,7 +81,14 @@ class NotebooksService {
 
         return flatSelectedTags.every((tag) => flatNotebookTags.includes(tag));
       })
-      .filter(({ title }) => title.toLowerCase().includes(searchValue.toLowerCase()));
+      .filter(({ title, path, models }) => {
+        const search = searchValue.toLowerCase();
+        return (
+          title.toLowerCase().includes(search) ||
+          path.toLowerCase().includes(search) ||
+          models.some((model) => model.toLowerCase().includes(search))
+        );
+      });
     const sortedPaginatedNotebooks = filteredNotebooks.sort(this._getCompareFn(sort)).slice(offset, offset + limit);
     return [sortedPaginatedNotebooks, filteredNotebooks.length, notebooks.length];
   }
@@ -113,7 +120,13 @@ class NotebooksService {
     const archived = await this._getArchivedNotebooks();
     const normalizedSearch = searchValue.trim().toLowerCase();
     const filtered =
-      normalizedSearch === '' ? archived : archived.filter(({ title }) => title.toLowerCase().includes(normalizedSearch));
+      normalizedSearch === ''
+        ? archived
+        : archived.filter(
+            ({ title, models }) =>
+              title.toLowerCase().includes(normalizedSearch) ||
+              (models ?? []).some((model) => model.toLowerCase().includes(normalizedSearch))
+          );
     if (limit === 0) {
       return [[], filtered.length, archived.length];
     }

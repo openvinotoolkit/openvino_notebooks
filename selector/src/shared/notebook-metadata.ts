@@ -8,6 +8,7 @@ export interface INotebookMetadata {
   imageUrl: string | null;
   createdDate: string;
   modifiedDate: string;
+  models: string[];
   links: {
     github: string;
     docs: string | null;
@@ -28,6 +29,7 @@ export interface IArchivedNotebookMetadata {
   imageUrl: string | null;
   lastBranch: string;
   githubUrl: string;
+  models: string[];
   tags: {
     categories: string[];
     tasks: string[];
