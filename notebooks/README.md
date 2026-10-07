@@ -62,6 +62,7 @@
 - [Visual-language assistant with Ministral-3 and OpenVINO](./ministral-3/ministral-3.ipynb)
 - [Visual-language assistant with MiniCPM-V and OpenVINO](./minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb)
 - [Visual-language assistant with MiniCPM-V 4.6 and OpenVINO](./minicpm-v-4.6/minicpm-v-4.6.ipynb)
+- [Visual-language assistant with MiniCPM-V 4.7 and OpenVINO (experimental)](./minicpm-v-4.7/minicpm-v-4.7.ipynb)
 - [Omnimodal assistant with MiniCPM-o 2.6 and OpenVINO](./minicpm-o-omnimodal-chatbot/minicpm-o-omnimodal-chatbot.ipynb)
 - [MiniCPM-o 4.5 Multimodal Model with OpenVINO](./minicpm-o-4.5/minicpm-o-4.5.ipynb)
 - [Document parsing with MinerU 2.5 and OpenVINO](./mineru2.5/mineru2.5.ipynb)
@@ -323,4 +324,3 @@
 - [Quantization of Image Classification Models](./image-classification-quantization/image-classification-quantization.ipynb)
 - [Object detection and masking from prompts with GroundedSAM (GroundingDINO + SAM) and OpenVINO](./grounded-segment-anything/grounded-segment-anything.ipynb)
 - [Quantize a Segmentation Model and Show Live Inference](./ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb)
-
