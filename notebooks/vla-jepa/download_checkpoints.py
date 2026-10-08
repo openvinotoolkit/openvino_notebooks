@@ -15,7 +15,6 @@ Usage:
 """
 
 import argparse
-import shutil
 from pathlib import Path
 
 from huggingface_hub import snapshot_download
@@ -35,20 +34,12 @@ def download_qwen(output_dir: Path) -> None:
 def download_libero(output_dir: Path) -> None:
     dest = output_dir / "LIBERO"
     print(f"Downloading {VLA_JEPA_REPO}/LIBERO -> {dest}")
-    with_prefix = snapshot_download(
+    # local_dir avoids cache symlinks, which fail on Windows without privileges (WinError 1314).
+    snapshot_download(
         repo_id=VLA_JEPA_REPO,
         allow_patterns=["LIBERO/*", "LIBERO/**/*"],
+        local_dir=output_dir,
     )
-    src = Path(with_prefix) / "LIBERO"
-    dest.mkdir(parents=True, exist_ok=True)
-    for item in src.rglob("*"):
-        if item.is_dir():
-            continue
-        rel = item.relative_to(src)
-        target = dest / rel
-        target.parent.mkdir(parents=True, exist_ok=True)
-        if not target.exists():
-            shutil.copy2(item, target)
 
 
 DOWNLOADERS = {

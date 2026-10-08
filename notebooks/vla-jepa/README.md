@@ -30,7 +30,6 @@ The tutorial consists of the following steps:
 - Install requirements
 - Convert both components to OpenVINO IR
 - Run inference on a sample observation
-- Launch an interactive demo
 
 In this demonstration you provide two camera views and an instruction, and the policy returns a chunk
 of future robot actions.
