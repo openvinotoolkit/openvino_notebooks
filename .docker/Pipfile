@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 # Jupyter infrastructure
-ipykernel = "==7.3.0"
+ipykernel = "==7.4.0"
 ipython = ">=7.16.3"
 ipywidgets = "*"
 jupyterhub = ">=5.5.0"
@@ -17,7 +17,7 @@ nbval = "*"
 treon = "*"
 
 # Core ML (used by majority of notebooks)
-openvino = {version = "==2026.4.0"}
+openvino = {version = "==2026.4.1"}
 openvino-telemetry = "==2025.2.0"
 numpy = ">=1.21.0"
 opencv-python = "*"
