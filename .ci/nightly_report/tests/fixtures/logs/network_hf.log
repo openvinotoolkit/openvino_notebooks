@@ -1,0 +1,60 @@
+Running Notebook test [test_qwen2-vl.ipynb]: /home/runner/work/openvino_notebooks/openvino_notebooks/test_env/bin/python -m treon --verbose test_qwen2-vl.ipynb
+Executing treon version 0.1.4
+
+-----------------------------------------------------------------------
+Collected following Notebooks for testing
+-----------------------------------------------------------------------
+test_qwen2-vl.ipynb
+-----------------------------------------------------------------------
+
+Triggered test for test_qwen2-vl.ipynb
+0.00s - Debugger warning: It seems that frozen modules are being used, which may
+0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+0.00s - to python to disable frozen modules.
+Start executing cell 0
+Start executing cell 1
+Start executing cell 3
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
+ERROR in testing test_qwen2-vl.ipynb
+
+An error occurred while executing the following cell:
+------------------
+from huggingface_hub import snapshot_download
+
+model_dir = snapshot_download("OpenVINO/Qwen2.5-0.5B-Instruct-int4-ov", local_dir="model")
+------------------
+
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mConnectionError[0m                           Traceback (most recent call last)
+Cell [0;32mIn[3], line 3[0m
+[1;32m      1[0m [38;5;28;01mfrom[39;00m [38;5;21;01mhuggingface_hub[39;00m [38;5;28;01mimport[39;00m snapshot_download
+[0;32m----> 3[0m model_dir [38;5;241m=[39m snapshot_download([38;5;124m"OpenVINO/Qwen2.5-0.5B-Instruct-int4-ov"[39m)
+
+File [0;32m/home/runner/work/openvino_notebooks/openvino_notebooks/test_env/lib/python3.11/site-packages/huggingface_hub/utils/_validators.py:114[0m, in [0;36mvalidate_hf_hub_args.<locals>._inner_fn[0;34m(*args, **kwargs)[0m
+[1;32m    111[0m [38;5;28;01mif[39;00m check_use_auth_token:
+[0;32m----> 114[0m [38;5;28;01mreturn[39;00m fn([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs)
+
+File [0;32m/home/runner/work/openvino_notebooks/openvino_notebooks/test_env/lib/python3.11/site-packages/requests/adapters.py:700[0m, in [0;36mHTTPAdapter.send[0;34m(self, request, stream, timeout, verify, cert, proxies)[0m
+[1;32m    696[0m     [38;5;28;01mif[39;00m [38;5;28misinstance[39m(e[38;5;241m.[39mreason, _SSLError):
+[0;32m----> 700[0m     [38;5;28;01mraise[39;00m [38;5;167;01mConnectionError[39;00m(e, request[38;5;241m=[39mrequest)
+
+[0;31mConnectionError[0m: (MaxRetryError("HTTPSConnectionPool(host='huggingface.co', port=443): Max retries exceeded with url: /api/models/OpenVINO/Qwen2.5-0.5B-Instruct-int4-ov/revision/main (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f3c1a2b4d90>: Failed to establish a new connection: [Errno 101] Network is unreachable'))"), '(Request ID: 6f1c2d3e-4b5a-6978-8a9b-0c1d2e3f4a5b)')
+
+
+
+
+
+-----------------------------------------------------------------------
+TEST RESULT
+-----------------------------------------------------------------------
+test_qwen2-vl.ipynb       -- FAILED 
+-----------------------------------------------------------------------
+0 succeeded, 1 failed, out of 1 notebooks tested.
+-----------------------------------------------------------------------
+
+OpenVINO after notebook execution: 2026.4.1
+OpenVINO Tokenizers after notebook execution: 2026.4.1.0
+WARNING: Package(s) not found: openvino_genai
+openvino_genai is missing in validation environment.

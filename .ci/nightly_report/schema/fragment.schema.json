@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/openvinotoolkit/openvino_notebooks/.ci/nightly_report/schema/fragment.schema.json",
+  "title": "Nightly test job fragment",
+  "description": "Written by validate_notebooks.py (--dashboard_dir) in every nightly test job and rewritten after each notebook, so interrupted jobs still report partial results. Internal contract between test jobs and build_report.py; not consumed by the dashboard directly.",
+  "type": "object",
+  "required": ["schema_version", "job", "planned", "results"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^1\\.\\d+\\.\\d+$"},
+    "job": {
+      "type": "object",
+      "required": ["device", "os", "python", "timeout_s", "started_at", "updated_at", "complete"],
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {"type": ["integer", "null"], "description": "GitHub workflow run id."},
+        "run_attempt": {"type": ["integer", "null"]},
+        "job_id": {"type": ["integer", "null"], "description": "GitHub job id (job.check_run_id); used to link the fragment to the job."},
+        "batch": {"type": ["string", "null"], "description": "Batch identifier, e.g. 'batch_0'."},
+        "device": {"type": "string"},
+        "os": {"type": "string", "description": "Validation OS name, e.g. 'ubuntu-22.04'."},
+        "python": {"type": "string", "description": "Python minor version, e.g. '3.11'."},
+        "python_full_version": {"type": ["string", "null"], "description": "Full version of the interpreter running the validation script."},
+        "platform": {"type": ["string", "null"], "description": "platform.platform() of the runner."},
+        "runner_name": {"type": ["string", "null"]},
+        "runner_label": {"type": ["string", "null"], "description": "runs-on label of the job."},
+        "container_image": {"type": ["string", "null"]},
+        "timeout_s": {"type": "number", "description": "Per-notebook timeout in seconds."},
+        "separate_venv": {"type": "boolean"},
+        "openvino_base_version": {"type": ["string", "null"], "description": "OpenVINO version in the validation environment before tests start; null when missing."},
+        "started_at": {"type": "string", "format": "date-time"},
+        "updated_at": {"type": "string", "format": "date-time"},
+        "finished_at": {"type": ["string", "null"], "format": "date-time"},
+        "complete": {"type": "boolean", "description": "True once all planned notebooks were processed."}
+      }
+    },
+    "planned": {
+      "type": "array",
+      "description": "Notebooks (paths relative to the notebooks directory, posix separators) in scope of this job, including skipped ones, in execution order.",
+      "items": {"type": "string"}
+    },
+    "results": {
+      "type": "array",
+      "description": "Processed notebooks. Planned notebooks missing here were not processed (job interrupted).",
+      "items": {"$ref": "#/$defs/result"}
+    }
+  },
+  "$defs": {
+    "result": {
+      "type": "object",
+      "required": ["notebook", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "notebook": {"type": "string", "description": "Path relative to the notebooks directory, e.g. 'async-api/async-api.ipynb'."},
+        "status": {"enum": ["passed", "failed", "timeout", "error", "skipped"]},
+        "skip_reason": {"enum": ["skip_config", "ignore_list", null]},
+        "started_at": {"type": ["string", "null"], "format": "date-time"},
+        "finished_at": {"type": ["string", "null"], "format": "date-time"},
+        "duration_s": {"type": ["number", "null"], "description": "treon execution time in seconds."},
+        "return_code": {"type": ["integer", "null"], "description": "treon exit code; -42 means killed by timeout."},
+        "peak_rss_bytes": {"type": ["integer", "null"], "description": "Peak resident memory of the treon process tree (sampled)."},
+        "openvino_before": {"type": ["string", "null"], "description": "OpenVINO version in the notebook venv before execution; null when missing."},
+        "openvino_after": {"type": ["string", "null"], "description": "OpenVINO version in the notebook venv after execution; null when missing."},
+        "packages": {
+          "type": "object",
+          "description": "Versions of KEY_PACKAGES installed after execution (only packages that are present).",
+          "additionalProperties": {"type": "string"}
+        },
+        "env_id": {"type": ["string", "null"], "description": "Hash of the pip freeze after execution; file envs/<env_id>.txt in the fragment artifact."},
+        "log_file": {"type": ["string", "null"], "description": "Relative path of the captured notebook output inside the fragment artifact; kept only for non-passed notebooks."},
+        "error_hint": {"type": ["string", "null"], "description": "Harness error message for status 'error'."}
+      }
+    }
+  }
+}

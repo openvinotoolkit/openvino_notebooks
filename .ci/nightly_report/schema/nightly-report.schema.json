@@ -1,0 +1,349 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/openvinotoolkit/openvino_notebooks/.ci/nightly_report/schema/nightly-report.schema.json",
+  "title": "OpenVINO notebooks nightly report",
+  "description": "Produced once per nightly workflow run (artifact 'nightly-dashboard-data', file 'nightly-report.json') and ingested by the nightly dashboard. All timestamps are ISO 8601 UTC; durations are seconds; notebook paths are relative to the 'notebooks' directory with posix separators.",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "generator", "run", "configs", "jobs", "notebooks", "results", "failures", "error_groups", "summary"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^1\\.\\d+\\.\\d+$", "description": "Semantic version of this contract. Consumers must reject unknown major versions."},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "generator": {
+      "type": "object",
+      "required": ["script"],
+      "additionalProperties": false,
+      "properties": {
+        "script": {"type": "string"},
+        "warnings": {"type": "array", "items": {"type": "string"}, "description": "Non-fatal data problems met while building the report (e.g. missing fragments, API errors)."}
+      }
+    },
+    "run": {"$ref": "#/$defs/run"},
+    "configs": {"type": "array", "items": {"$ref": "#/$defs/config"}},
+    "jobs": {"type": "array", "description": "Notebook test jobs of the run (helper jobs are excluded). A record is identified by (id, config_id, batch): matrix jobs skipped or cancelled before they started share one GitHub job id.", "items": {"$ref": "#/$defs/job"}},
+    "notebooks": {"type": "array", "description": "Catalog of all notebooks in the repository at the tested commit.", "items": {"$ref": "#/$defs/notebook"}},
+    "results": {"type": "array", "description": "One row per planned (notebook, config) pair.", "items": {"$ref": "#/$defs/result"}},
+    "failures": {"type": "array", "description": "One entry per result with status failed, timeout or error.", "items": {"$ref": "#/$defs/failure"}},
+    "error_groups": {"type": "array", "description": "Failures grouped by signature, most frequent first.", "items": {"$ref": "#/$defs/error_group"}},
+    "summary": {"$ref": "#/$defs/summary"}
+  },
+  "$defs": {
+    "nullable_string": {"type": ["string", "null"]},
+    "nullable_number": {"type": ["number", "null"]},
+    "nullable_datetime": {"type": ["string", "null"], "format": "date-time"},
+    "rate": {"type": ["number", "null"], "minimum": 0, "maximum": 1, "description": "Ratio in [0, 1]; null when the denominator is zero."},
+    "status": {"enum": ["passed", "failed", "timeout", "error", "skipped", "not_run"]},
+    "commit": {
+      "type": "object",
+      "required": ["sha"],
+      "additionalProperties": false,
+      "properties": {
+        "sha": {"type": "string"},
+        "short_sha": {"$ref": "#/$defs/nullable_string"},
+        "message": {"$ref": "#/$defs/nullable_string", "description": "First line of the commit message."},
+        "author": {"$ref": "#/$defs/nullable_string"},
+        "date": {"$ref": "#/$defs/nullable_datetime"},
+        "url": {"$ref": "#/$defs/nullable_string"}
+      }
+    },
+    "run": {
+      "type": "object",
+      "required": ["id", "attempt", "repository", "event", "branch", "nightly_date", "url", "commit", "conclusion"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "integer"},
+        "attempt": {"type": "integer"},
+        "number": {"type": ["integer", "null"]},
+        "workflow": {"$ref": "#/$defs/nullable_string"},
+        "repository": {"type": "string", "description": "owner/name"},
+        "event": {"type": "string", "description": "Trigger event; the official nightly trend uses 'schedule' runs only."},
+        "branch": {"type": "string"},
+        "nightly_date": {"type": "string", "format": "date", "description": "UTC date of the run creation; x-axis of the dashboard."},
+        "created_at": {"$ref": "#/$defs/nullable_datetime"},
+        "started_at": {"$ref": "#/$defs/nullable_datetime"},
+        "finished_at": {"$ref": "#/$defs/nullable_datetime", "description": "Completion time of the last test job."},
+        "wall_clock_s": {"$ref": "#/$defs/nullable_number"},
+        "conclusion": {"enum": ["success", "failure", "cancelled", "unknown"], "description": "Derived from the conclusions of the test jobs and the jobs they depend on (notebook failures alone do not necessarily fail a job)."},
+        "url": {"type": "string"},
+        "commit": {"$ref": "#/$defs/commit"},
+        "inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ov_branch": {"$ref": "#/$defs/nullable_string"},
+            "docker_tag": {"$ref": "#/$defs/nullable_string"},
+            "timeout_s": {"$ref": "#/$defs/nullable_number"},
+            "num_batches": {"type": ["integer", "null"]},
+            "ignore_lists": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "required": ["id", "device", "os", "os_family", "python", "job_ids"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "description": "<device>-<os>-py<python>, e.g. 'cpu-ubuntu-22.04-py3.11'."},
+        "device": {"type": "string"},
+        "os": {"type": "string"},
+        "os_family": {"enum": ["linux", "windows", "macos", "unknown"]},
+        "python": {"type": "string"},
+        "runner_label": {"$ref": "#/$defs/nullable_string"},
+        "container_image": {"$ref": "#/$defs/nullable_string"},
+        "job_ids": {"type": "array", "items": {"type": "integer"}}
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": ["number", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "number": {"type": "integer"},
+        "name": {"type": "string"},
+        "url": {"$ref": "#/$defs/nullable_string"}
+      }
+    },
+    "job": {
+      "type": "object",
+      "required": ["id", "name", "config_id", "conclusion", "tests_started", "fragment_present", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "integer", "description": "GitHub job id; not unique for matrix jobs skipped or cancelled before they started (see jobs)."},
+        "name": {"type": "string"},
+        "config_id": {"type": "string"},
+        "batch": {"$ref": "#/$defs/nullable_string"},
+        "conclusion": {"type": "string", "description": "GitHub job conclusion: success, failure, cancelled, skipped, timed_out or unknown."},
+        "started_at": {"$ref": "#/$defs/nullable_datetime"},
+        "completed_at": {"$ref": "#/$defs/nullable_datetime"},
+        "duration_s": {"$ref": "#/$defs/nullable_number"},
+        "runner_name": {"$ref": "#/$defs/nullable_string"},
+        "python_full_version": {"$ref": "#/$defs/nullable_string"},
+        "url": {"type": "string"},
+        "treon_step_url": {"$ref": "#/$defs/nullable_string", "description": "Job log anchored at the notebook test step."},
+        "logs_artifact_url": {"$ref": "#/$defs/nullable_string", "description": "Fragment artifact with logs of non-passed notebooks."},
+        "failed_step": {"oneOf": [{"$ref": "#/$defs/step"}, {"type": "null"}]},
+        "tests_started": {"type": "boolean", "description": "False when the job failed or was cancelled before the notebook test step."},
+        "fragment_present": {"type": "boolean"},
+        "notebooks_planned": {"type": ["integer", "null"]},
+        "notebooks_completed": {"type": ["integer", "null"]}
+      }
+    },
+    "notebook": {
+      "type": "object",
+      "required": ["path", "dir", "title", "links"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {"type": "string"},
+        "dir": {"type": "string"},
+        "title": {"type": "string"},
+        "tags": {
+          "type": "object",
+          "description": "metadata.openvino_notebooks.tags of the notebook (categories, tasks, libraries, other).",
+          "additionalProperties": {"type": "array", "items": {"type": "string"}}
+        },
+        "dir_tree_sha": {"$ref": "#/$defs/nullable_string", "description": "Git tree hash of the notebook directory; changes iff its content changes."},
+        "last_modified": {"oneOf": [{"$ref": "#/$defs/commit"}, {"type": "null"}]},
+        "links": {
+          "type": "object",
+          "required": ["source"],
+          "additionalProperties": false,
+          "properties": {
+            "source": {"type": "string", "description": "Notebook at the tested commit."},
+            "latest": {"$ref": "#/$defs/nullable_string"},
+            "history": {"$ref": "#/$defs/nullable_string", "description": "Commits touching the notebook directory up to the tested commit."}
+          }
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "required": ["notebook", "config_id", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "notebook": {"type": "string"},
+        "config_id": {"type": "string"},
+        "batch": {"$ref": "#/$defs/nullable_string"},
+        "job_id": {"type": ["integer", "null"]},
+        "status": {"$ref": "#/$defs/status"},
+        "skip_reason": {"enum": ["skip_config", "ignore_list", null]},
+        "not_run_reason": {"$ref": "#/$defs/nullable_string", "description": "job_failed_before_tests:<step> | job_cancelled | job_skipped | job_interrupted | no_fragment"},
+        "started_at": {"$ref": "#/$defs/nullable_datetime"},
+        "duration_s": {"$ref": "#/$defs/nullable_number"},
+        "timeout_s": {"$ref": "#/$defs/nullable_number"},
+        "peak_rss_bytes": {"type": ["integer", "null"]},
+        "openvino_before": {"$ref": "#/$defs/nullable_string"},
+        "packages": {"type": "object", "additionalProperties": {"type": "string"}, "description": "Key package versions after execution."},
+        "env_id": {"$ref": "#/$defs/nullable_string", "description": "Key into environments.json."},
+        "failure_id": {"$ref": "#/$defs/nullable_string", "description": "Key into failures[] (failure.id)."}
+      }
+    },
+    "failure": {
+      "type": "object",
+      "required": ["id", "notebook", "config_id", "status", "category", "error_class", "signature", "links"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "description": "<config_id>/<notebook>"},
+        "notebook": {"type": "string"},
+        "config_id": {"type": "string"},
+        "job_id": {"type": ["integer", "null"]},
+        "status": {"enum": ["failed", "timeout", "error"]},
+        "category": {"enum": ["cell_error", "kernel_died", "timeout", "harness_error", "unknown"]},
+        "error_class": {"enum": ["timeout", "harness", "disk", "memory", "crash", "dependency", "network", "openvino", "assertion", "other"], "description": "Heuristic triage class."},
+        "signature": {"type": "string", "pattern": "^[0-9a-f]{12}$", "description": "Stable hash of category, exception type and normalized message; groups the same error across notebooks, configs and nights."},
+        "cell_index": {"type": ["integer", "null"], "description": "0-based index (among all cells of the patched notebook) of the cell being executed when the failure happened."},
+        "cell_source_excerpt": {"$ref": "#/$defs/nullable_string"},
+        "exception_type": {"$ref": "#/$defs/nullable_string"},
+        "exception_message": {"$ref": "#/$defs/nullable_string"},
+        "traceback_excerpt": {"$ref": "#/$defs/nullable_string"},
+        "log_tail": {"$ref": "#/$defs/nullable_string"},
+        "links": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "job": {"$ref": "#/$defs/nullable_string"},
+            "treon_step": {"$ref": "#/$defs/nullable_string"},
+            "logs_artifact": {"$ref": "#/$defs/nullable_string"},
+            "log_file": {"$ref": "#/$defs/nullable_string", "description": "Path of the full log inside the logs artifact."},
+            "notebook_source": {"$ref": "#/$defs/nullable_string"}
+          }
+        }
+      }
+    },
+    "error_group": {
+      "type": "object",
+      "required": ["signature", "category", "error_class", "occurrences", "notebooks", "configs"],
+      "additionalProperties": false,
+      "properties": {
+        "signature": {"type": "string"},
+        "category": {"type": "string"},
+        "error_class": {"type": "string"},
+        "exception_type": {"$ref": "#/$defs/nullable_string"},
+        "exception_message": {"$ref": "#/$defs/nullable_string"},
+        "occurrences": {"type": "integer", "minimum": 1},
+        "notebooks": {"type": "array", "items": {"type": "string"}},
+        "configs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": ["planned", "executed", "passed", "failed", "timeout", "error", "skipped", "not_run", "pass_rate"],
+      "properties": {
+        "planned": {"type": "integer"},
+        "executed": {"type": "integer", "description": "passed + failed + timeout + error"},
+        "passed": {"type": "integer"},
+        "failed": {"type": "integer"},
+        "timeout": {"type": "integer"},
+        "error": {"type": "integer"},
+        "skipped": {"type": "integer"},
+        "not_run": {"type": "integer"},
+        "pass_rate": {"$ref": "#/$defs/rate"},
+        "test_s": {"type": "number"},
+        "compute_s": {"type": "number"}
+      }
+    },
+    "duration_entry": {
+      "type": "object",
+      "required": ["notebook", "config_id", "duration_s"],
+      "additionalProperties": false,
+      "properties": {
+        "notebook": {"type": "string"},
+        "config_id": {"type": "string"},
+        "duration_s": {"type": "number"},
+        "timeout_s": {"$ref": "#/$defs/nullable_number"},
+        "ratio": {"$ref": "#/$defs/nullable_number"}
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["notebooks", "results", "pass_rate", "notebook_pass_rate", "coverage", "matrix_coverage", "by_config", "by_os", "by_python", "infra", "durations", "failures", "openvino_versions", "openvino_dev_share"],
+      "additionalProperties": false,
+      "properties": {
+        "notebooks": {
+          "type": "object",
+          "required": ["total", "tested", "untested", "passing_everywhere", "failing_somewhere", "failing_everywhere"],
+          "additionalProperties": false,
+          "properties": {
+            "total": {"type": "integer"},
+            "tested": {"type": "integer", "description": "Notebooks with at least one executed result."},
+            "untested": {"type": "integer"},
+            "untested_list": {"type": "array", "items": {"type": "string"}},
+            "passing_everywhere": {"type": "integer", "description": "Tested notebooks whose executed results all passed."},
+            "failing_somewhere": {"type": "integer", "description": "Tested notebooks with at least one failed/timeout/error result."},
+            "failing_everywhere": {"type": "integer", "description": "Tested notebooks with no passed result."},
+            "failing_list": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "results": {"$ref": "#/$defs/counts"},
+        "pass_rate": {"$ref": "#/$defs/rate", "description": "passed / executed"},
+        "notebook_pass_rate": {"$ref": "#/$defs/rate", "description": "passing_everywhere / tested"},
+        "coverage": {"$ref": "#/$defs/rate", "description": "executed / (planned - skipped): share of applicable tests that actually ran."},
+        "matrix_coverage": {"$ref": "#/$defs/rate", "description": "executed / (notebooks.total * number of configs)."},
+        "platform_specific_failures": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Notebooks failing only on one OS (or one Python version) while passing on the others.",
+          "properties": {
+            "os": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}},
+            "python": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}}
+          }
+        },
+        "by_config": {"type": "object", "additionalProperties": {"$ref": "#/$defs/counts"}},
+        "by_os": {"type": "object", "additionalProperties": {"$ref": "#/$defs/counts"}},
+        "by_python": {"type": "object", "additionalProperties": {"$ref": "#/$defs/counts"}},
+        "infra": {
+          "type": "object",
+          "required": ["jobs_total", "jobs_succeeded", "jobs_failed", "jobs_cancelled", "jobs_failed_before_tests", "notebooks_lost", "infra_failure_rate"],
+          "additionalProperties": false,
+          "properties": {
+            "jobs_total": {"type": "integer"},
+            "jobs_succeeded": {"type": "integer"},
+            "jobs_failed": {"type": "integer"},
+            "jobs_cancelled": {"type": "integer"},
+            "jobs_failed_before_tests": {"type": "integer"},
+            "notebooks_lost": {"type": "integer", "description": "Results with status not_run."},
+            "infra_failure_rate": {"$ref": "#/$defs/rate", "description": "jobs_failed_before_tests / jobs_total"}
+          }
+        },
+        "durations": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "run_wall_clock_s": {"$ref": "#/$defs/nullable_number"},
+            "compute_s": {"type": "number", "description": "Sum of test job durations."},
+            "test_s": {"type": "number", "description": "Sum of executed notebook durations."},
+            "setup_overhead_s": {"type": "number", "description": "compute_s - test_s"},
+            "notebook_median_s": {"$ref": "#/$defs/nullable_number", "description": "Over passed results."},
+            "notebook_p90_s": {"$ref": "#/$defs/nullable_number"},
+            "notebook_max_s": {"$ref": "#/$defs/nullable_number"},
+            "slowest": {"type": "array", "items": {"$ref": "#/$defs/duration_entry"}},
+            "near_timeout": {"type": "array", "description": "Passed results with duration >= 0.8 * timeout.", "items": {"$ref": "#/$defs/duration_entry"}}
+          }
+        },
+        "failures": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "by_category": {"type": "object", "additionalProperties": {"type": "integer"}},
+            "by_error_class": {"type": "object", "additionalProperties": {"type": "integer"}},
+            "top_error_groups": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "signature": {"type": "string"},
+                  "occurrences": {"type": "integer"},
+                  "exception_type": {"$ref": "#/$defs/nullable_string"},
+                  "exception_message": {"$ref": "#/$defs/nullable_string"}
+                }
+              }
+            }
+          }
+        },
+        "openvino_versions": {"type": "object", "description": "OpenVINO version after execution -> number of executed results ('unknown' when missing).", "additionalProperties": {"type": "integer"}},
+        "openvino_dev_share": {"$ref": "#/$defs/rate", "description": "Share of executed results that ran with a dev/nightly OpenVINO build."}
+      }
+    }
+  }
+}

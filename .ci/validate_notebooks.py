@@ -9,7 +9,6 @@ import platform
 import psutil
 import threading
 import queue
-import yaml
 import venv
 from clonevirtualenv import clone_virtualenv
 import traceback
@@ -17,8 +16,14 @@ import tempfile
 
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Optional, TypedDict
-from validation_config import ValidationConfig, validation_config_arg, SkippedNotebook
+from typing import TYPE_CHECKING, Optional, TypedDict
+from validation_config import ValidationConfig, validation_config_arg
+from skip_resolution import SKIP_CONFIG, resolve_skip_reasons
+from skip_resolution import get_skip_config_notebooks as get_ignored_notebooks_from_yaml  # noqa: F401 - backward compatible name
+
+if TYPE_CHECKING:
+    # nightly_report is imported lazily (only with --dashboard_dir): the Docker image ships this script without it
+    from nightly_report.fragment import FragmentWriter
 
 ROOT = Path(__file__).parents[1]
 
@@ -72,6 +77,7 @@ class NotebookReport(TypedDict):
     status: str
     path: Path
     duration: float = 0
+    skip_reason: Optional[str]  # skip_resolution.SKIP_CONFIG / IGNORE_LIST for notebooks of the testing list that are excluded
 
 
 TestPlan = dict[Path, NotebookReport]
@@ -115,8 +121,35 @@ def parse_arguments():
         help="Cleanup temporary venv directories created during testing before test run is started."
         "Useful when previous test run was interrupted and temporary directories were not removed.",
     )
+    parser.add_argument(
+        "--dashboard_dir",
+        type=Path,
+        default=None,
+        help="Opt-in: directory to write the nightly dashboard fragment (fragment.json, logs of non-passed notebooks, pip freezes) to",
+    )
+    # Dashboard fragment metadata; empty values (e.g. unset workflow expressions) are treated as missing
+    parser.add_argument("--run_id", type=optional_int_arg, default=None)
+    parser.add_argument("--run_attempt", type=optional_int_arg, default=None)
+    parser.add_argument("--job_id", type=optional_int_arg, default=None)
+    parser.add_argument("--batch", type=optional_str_arg, default=None)
+    parser.add_argument("--runner_name", type=optional_str_arg, default=None)
+    parser.add_argument("--runner_label", type=optional_str_arg, default=None)
+    parser.add_argument("--container_image", type=optional_str_arg, default=None)
 
     return parser.parse_args()
+
+
+def optional_int_arg(value: str) -> Optional[int]:
+    # Lenient on purpose: dashboard metadata must never break the test run
+    try:
+        return int(value) if value.strip() else None
+    except ValueError:
+        print(f"WARNING: ignoring non-integer argument value '{value}'", flush=True)
+        return None
+
+
+def optional_str_arg(value: str) -> Optional[str]:
+    return value if value.strip() else None
 
 
 def cleanup_temp_venv_dirs():
@@ -144,25 +177,6 @@ def collect_python_packages(python_executable: Path, output_file: Path):
         f.write(reqs)
 
 
-def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig, skip_config_file_path: Path) -> list[Path]:
-    ignored_notebooks: list[Path] = []
-    if not skip_config_file_path.exists():
-        print(f"Skipped notebooks config yaml file does not exist at path '{str(skip_config_file_path)}'.")
-        return ignored_notebooks
-    with open(skip_config_file_path, "r") as f:
-        skipped_notebooks_config: list[SkippedNotebook] = yaml.safe_load(f)
-    for skipped_notebook in skipped_notebooks_config:
-        skips = skipped_notebook["skips"]
-        for skip in skips:
-            for key in validation_config.keys():
-                if not validation_config[key]:
-                    print(f"Warning: validation config argument '{key}' is not provided.")
-                if validation_config[key] in skip.get(key, []):
-                    ignored_notebooks.append(Path(skipped_notebook["notebook"]))
-
-    return list(set(ignored_notebooks))
-
-
 def get_existing_tests(test_list_to_check: list, test_plan: TestPlan) -> TestPlan:
     existing_tests: Path = []
     for test in test_list_to_check:
@@ -185,30 +199,25 @@ def prepare_test_plan(
 
     print(f"All notebooks: {notebooks}")
 
-    test_plan: TestPlan = {Path(os.path.relpath(notebook, notebooks_dir)): NotebookReport(status="", path=notebook, duration=0) for notebook in notebooks}
+    test_plan: TestPlan = {
+        Path(os.path.relpath(notebook, notebooks_dir)): NotebookReport(status="", path=notebook, duration=0, skip_reason=None) for notebook in notebooks
+    }
 
     skip_config_file_path = Path(__file__).parents[0] / ignore_config
-    ignored_notebooks = get_ignored_notebooks_from_yaml(validation_config, skip_config_file_path)
-    if ignore_list is not None:
-        for ignore_item in ignore_list:
-            if ignore_item.endswith(".txt"):
-                # Paths to ignore files are provided to `--ignore_list` argument
-                with open(ignore_item, "r") as f:
-                    ignored_notebooks.extend(list(map(lambda line: Path(line.strip()), f.readlines())))
-            else:
-                # Ignored notebooks are provided as several items to `--ignore_list` argument
-                ignored_notebooks.append(Path(ignore_item))
+    # Repo-root-relative paths from the skip config yaml and from `--ignore_list` items (txt files or notebook paths)
+    raw_skip_reasons = resolve_skip_reasons(validation_config, skip_config_file_path, ignore_list)
+    ignored_notebooks = [Path(n) for n in raw_skip_reasons]
+    skip_reasons: dict[Path, str] = {}
     try:
-        ignored_notebooks = list(
-            {
-                (
-                    n.relative_to(notebooks_dir)
-                    if n.is_absolute() and n.is_relative_to(notebooks_dir)
-                    else Path(os.path.relpath(notebooks_dir.parent / n, notebooks_dir))
-                )
-                for n in ignored_notebooks
-            }
-        )
+        for n, reason in zip(ignored_notebooks, raw_skip_reasons.values()):
+            relative_notebook = (
+                n.relative_to(notebooks_dir)
+                if n.is_absolute() and n.is_relative_to(notebooks_dir)
+                else Path(os.path.relpath(notebooks_dir.parent / n, notebooks_dir))
+            )
+            if skip_reasons.get(relative_notebook) != SKIP_CONFIG:
+                skip_reasons[relative_notebook] = reason
+        ignored_notebooks = list(skip_reasons)
     except ValueError:
         raise ValueError(
             f"Ignore list items should be relative to repo root (e.g. 'notebooks/subdir/notebook.ipynb').\nInvalid ignored notebooks: {ignored_notebooks}"
@@ -271,6 +280,8 @@ def prepare_test_plan(
             test_plan[notebook]["status"] = NotebookStatus.SKIPPED
         if notebook in ignored_notebooks:
             test_plan[notebook]["status"] = NotebookStatus.SKIPPED
+            if notebook in testing_notebooks:
+                test_plan[notebook]["skip_reason"] = skip_reasons[notebook]
 
     return test_plan
 
@@ -504,7 +515,53 @@ def kill_process_tree(pid):
         print(f"Error killing process tree PID {pid}: {e}", flush=True)
 
 
-def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"):
+def process_tree_rss(pid: int) -> int:
+    """Resident memory of the process and all its descendants in bytes."""
+    process = psutil.Process(pid)
+    rss = process.memory_info().rss
+    for child in process.children(recursive=True):
+        try:
+            rss += child.memory_info().rss
+        except psutil.Error:
+            pass
+    return rss
+
+
+class SubprocessOutputLog:
+    """Best-effort copy of subprocess output to a file; I/O errors disable the copy instead of failing the run."""
+
+    def __init__(self, path: Optional[Path]):
+        self.file = None
+        if path is None:
+            return
+        try:
+            Path(path).parent.mkdir(parents=True, exist_ok=True)
+            self.file = open(path, "a", encoding="utf-8", errors="replace")
+        except Exception as e:
+            print(f"WARNING: cannot open output log file '{path}': {e}", flush=True)
+
+    def write(self, text: str):
+        if self.file is None:
+            return
+        try:
+            self.file.write(text)
+            # Flush every line so the log survives a crash of the job
+            self.file.flush()
+        except Exception as e:
+            print(f"WARNING: cannot write output log file: {e}", flush=True)
+            self.close()
+
+    def close(self):
+        if self.file is None:
+            return
+        try:
+            self.file.close()
+        except Exception as e:
+            print(f"WARNING: cannot close output log file: {e}", flush=True)
+        self.file = None
+
+
+def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process", log_file: Optional[Path] = None, stats: Optional[dict] = None):
     """
     Run a subprocess with real-time output and timeout protection.
 
@@ -513,6 +570,9 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
         timeout: Timeout in seconds
         shell: Whether to use shell=True
         description: Description for logging purposes
+        log_file: Optional file to append the process output to (in addition to printing it)
+        stats: Optional dict filled with "peak_rss_bytes" (sampled peak memory of the process tree)
+            and "harness_error" (exception raised while running the process)
 
     Returns:
         tuple: (return_code, duration)
@@ -527,6 +587,9 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
     start_time = time.perf_counter()
     process = None
     retcode = None
+    output_log = SubprocessOutputLog(log_file)
+    timed_out = False
+    last_rss_sample = None
 
     # Setup process group creation for proper child process management
     popen_kwargs = {
@@ -565,7 +628,15 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
                 )
                 kill_process_tree(process.pid)
                 retcode = -42  # Special timeout exit code
+                timed_out = True
                 break
+
+            if stats is not None and (last_rss_sample is None or time.perf_counter() - last_rss_sample >= 1.0):
+                last_rss_sample = time.perf_counter()
+                try:
+                    stats["peak_rss_bytes"] = max(stats.get("peak_rss_bytes") or 0, process_tree_rss(process.pid))
+                except Exception:  # nosec B110 - memory sampling is best effort
+                    pass
 
             # Check if process finished
             if process.poll() is not None:
@@ -578,9 +649,15 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
                 if line is None:  # EOF signal
                     break
                 print_subprocess_output(line)
+                output_log.write(line)
             except queue.Empty:
                 # No output available, loop continues to check timeout
                 continue
+
+        if log_file is not None:
+            # Let the reader thread consume the output tail (it is lost otherwise when the process exits between polls),
+            # bounded because descendants of the process may keep the pipe open
+            reader_thread.join(timeout=5)
 
         # Drain any remaining output from the queue
         while not output_queue.empty():
@@ -588,8 +665,12 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
                 line = output_queue.get_nowait()
                 if line:
                     print_subprocess_output(line)
+                    output_log.write(line)
             except queue.Empty:
                 break
+
+        if timed_out:
+            output_log.write(f"[validate_notebooks] Timeout reached ({timeout}s), process killed\n")
 
         # Wait for process to finish if not already done
         if retcode is None:
@@ -598,6 +679,8 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
 
     except Exception as e:
         print(f"\nError running {description}: {e}", flush=True)
+        if stats is not None:
+            stats["harness_error"] = f"{type(e).__name__}: {e}"
         try:
             if process and process.poll() is None:
                 kill_process_tree(process.pid)
@@ -605,6 +688,7 @@ def run_subprocess_with_timeout(cmd, timeout, shell=False, description="Process"
             print(f"Error during cleanup: {ex}", flush=True)
         retcode = -1
 
+    output_log.close()
     duration = time.perf_counter() - start_time
     return retcode, duration
 
@@ -616,6 +700,8 @@ def run_test(
     keep_artifacts=False,
     report_dir=".",
     source_venv_path=None,
+    log_file=None,
+    stats=None,
 ) -> Optional[tuple[str, int, float, str, str]]:
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(notebook_path.parent)
     os.environ["HF_HUB_CACHE"] = str(notebook_path.parent)
@@ -710,6 +796,8 @@ def run_test(
                     timeout,
                     shell=(platform.system() == "Windows"),  # nosec B604 - shell only on Windows, cmd from internal args
                     description=f"Notebook test [{patched_notebook.name}]",
+                    log_file=log_file,
+                    stats=stats,
                 )
 
                 ov_version_after = get_pip_package_version(
@@ -873,6 +961,106 @@ def write_single_notebook_report(
     return report_file
 
 
+def dashboard_call(fn, *args, **kwargs):
+    """Run a nightly dashboard fragment operation; failures only print a warning and never affect testing."""
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        print(f"WARNING: nightly dashboard fragment operation '{getattr(fn, '__name__', fn)}' failed: {type(e).__name__}: {e}", flush=True)
+        return None
+
+
+def dashboard_timestamp() -> str:
+    from nightly_report.fragment import utc_now_iso
+
+    return utc_now_iso()
+
+
+def create_fragment_writer(args, base_version: str, test_plan: TestPlan) -> "FragmentWriter":
+    from nightly_report.constants import Status
+    from nightly_report.fragment import FragmentWriter
+
+    job = {
+        "run_id": args.run_id,
+        "run_attempt": args.run_attempt,
+        "job_id": args.job_id,
+        "batch": args.batch,
+        "device": args.device or "unknown",
+        "os": args.os or "unknown",
+        "python": args.python or "unknown",
+        "python_full_version": platform.python_version(),
+        "platform": platform.platform(),
+        "runner_name": args.runner_name,
+        "runner_label": args.runner_label,
+        "container_image": args.container_image,
+        "timeout_s": args.timeout,
+        "separate_venv": bool(args.separate_venv),
+        "openvino_base_version": base_version,  # "missing" markers are stored as null by the writer
+    }
+    # Notebooks of this job's testing list (incl. skipped by skip config / ignore list), in execution order
+    planned = [notebook.as_posix() for notebook, report in test_plan.items() if report["status"] != NotebookStatus.SKIPPED or report.get("skip_reason")]
+    writer = FragmentWriter(Path(args.dashboard_dir).absolute(), job, planned)
+    for notebook, report in test_plan.items():
+        if report["status"] == NotebookStatus.SKIPPED and report.get("skip_reason"):
+            writer.add_result(notebook.as_posix(), Status.SKIPPED, skip_reason=report["skip_reason"])
+    return writer
+
+
+def prepare_notebook_log(writer: "FragmentWriter", notebook: Path) -> Path:
+    log_file = writer.log_path(notebook.as_posix())
+    # Remove a stale log of a previous run into the same dashboard directory (the output is appended)
+    log_file.unlink(missing_ok=True)
+    return log_file
+
+
+def record_fragment_result(
+    writer: "FragmentWriter",
+    notebook: Path,
+    notebook_path: Path,
+    test_result,
+    run_error: Optional[Exception],
+    stats: dict,
+    reports_dir: Path,
+    started_at: Optional[str],
+    finished_at: Optional[str],
+):
+    from nightly_report.constants import Status
+
+    status_code = duration = ov_version_before = ov_version_after = None
+    error_hint = None
+    if run_error is not None:
+        status = Status.ERROR
+        error_hint = f"{type(run_error).__name__}: {run_error}"
+    elif not test_result:
+        status = Status.ERROR
+        error_hint = "Patched notebook not found or invalid notebook path"
+    else:
+        _, status_code, duration, ov_version_before, ov_version_after = test_result
+        if stats.get("harness_error"):
+            status = Status.ERROR
+            error_hint = stats["harness_error"]
+        elif status_code == -42:
+            status = Status.TIMEOUT
+        elif status_code:
+            status = Status.FAILED
+        else:
+            status = Status.PASSED
+    writer.add_result(
+        notebook.as_posix(),
+        status,
+        started_at=started_at,
+        finished_at=finished_at,
+        duration_s=duration,
+        return_code=status_code,
+        peak_rss_bytes=stats.get("peak_rss_bytes"),
+        openvino_before=ov_version_before,
+        openvino_after=ov_version_after,
+        # Written by collect_python_packages() in run_test()
+        env_freeze_file=reports_dir / f"test_{Path(notebook_path).stem}_env_after.txt",
+        error_hint=error_hint,
+    )
+
+
 def main():
     failed_notebooks = []
     timeout_notebooks = []
@@ -917,9 +1105,15 @@ def main():
         notebooks_dir,
     )
 
+    fragment_writer = dashboard_call(create_fragment_writer, args, base_version, test_plan) if args.dashboard_dir else None
+
     for notebook, report in test_plan.items():
         if report["status"] == NotebookStatus.SKIPPED:
             continue
+        log_file = dashboard_call(prepare_notebook_log, fragment_writer, notebook) if fragment_writer else None
+        stats = {} if fragment_writer else None
+        started_at = dashboard_call(dashboard_timestamp) if fragment_writer else None
+        run_error = None
         try:
             print("Testing notebook:", str(report["path"]), flush=True)
             test_result = run_test(
@@ -929,11 +1123,27 @@ def main():
                 keep_artifacts,
                 reports_dir.absolute(),
                 source_venv_path,
+                log_file=log_file,
+                stats=stats,
             )
         except Exception as e:
+            run_error = e
             print(f"Error during testing notebook {str(notebook)}: {e}")
             print(traceback.format_exc(), flush=True)
             test_result = [f"test_{report['path'].name}", -1, 0.0, "N/A", "N/A"]
+        if fragment_writer:
+            dashboard_call(
+                record_fragment_result,
+                fragment_writer,
+                notebook,
+                report["path"],
+                test_result,
+                run_error,
+                stats,
+                reports_dir,
+                started_at,
+                dashboard_call(dashboard_timestamp),
+            )
         timing = 0
         if not test_result:
             print(f'Testing notebooks "{str(notebook)}" is not found.')
@@ -1001,6 +1211,9 @@ def main():
 
             if args.early_stop:
                 break
+
+    if fragment_writer:
+        dashboard_call(fragment_writer.finish)
 
     exit_status = finalize_status(failed_notebooks, timeout_notebooks, test_plan, reports_dir, root)
     return exit_status
