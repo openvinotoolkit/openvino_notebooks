@@ -193,6 +193,7 @@
 - [Text to Video generation with Wan2.1 and OpenVINO](./wan2.1-text-to-video/wan2.1-text-to-video.ipynb)
 - [VoxCPM2 Text-to-Speech with OpenVINO™](./voxcpm2-tts/voxcpm2-tts.ipynb)
 - [Create VLM-powered Chatbot using OpenVINO Generate API](./vlm-chatbot/vlm-chatbot-generate-api.ipynb)
+- [Video understanding with V-JEPA 2.1 and OpenVINO](./vjepa-2.1/vjepa2-video-embeddings.ipynb)
 - [Monodepth Estimation with OpenVINO](./vision-monodepth/vision-monodepth.ipynb)
 - [Image Background Removal with U^2-Net and OpenVINO™](./vision-background-removal/vision-background-removal.ipynb)
 - [Vehicle Detection And Recognition with OpenVINO™](./vehicle-detection-and-recognition/vehicle-detection-and-recognition.ipynb)
