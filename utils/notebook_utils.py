@@ -22,6 +22,7 @@ from typing import List, NamedTuple, Optional
 NOTEBOOK_VENV_DIR = ".venv"
 _PARENT_ENV_PTH = "_notebook_parent_env.pth"
 _venv_site_dirs = []
+_parent_site_dirs = []
 _processed_pth_files = set()
 
 
@@ -31,13 +32,28 @@ def _load_venv_pth_files(*_):
     after its activation. Registered as IPython `post_run_cell` callback by `setup_notebook_venv()`.
     """
     import importlib
+    import importlib.machinery
     import site
 
+    path_before, meta_path_before = list(sys.path), list(sys.meta_path)
     for site_dir in _venv_site_dirs:
         for pth_file in sorted(Path(site_dir).glob("*.pth")):
             if pth_file.name != _PARENT_ENV_PTH and pth_file not in _processed_pth_files:
                 _processed_pth_files.add(pth_file)
                 site.addpackage(site_dir, pth_file.name, None)
+
+    # `site.addpackage()` appends, so move new entries ahead of the parent environment to take precedence over it
+    new_paths = [p for p in sys.path if p not in path_before]
+    if new_paths:
+        sys.path[:] = [p for p in sys.path if p not in new_paths]
+        insert_at = next((i for i, p in enumerate(sys.path) if p in _parent_site_dirs), len(sys.path))
+        sys.path[insert_at:insert_at] = new_paths
+    # PEP 660 editable finders must run before `PathFinder`, which would find the parent environment copy first
+    new_finders = [f for f in sys.meta_path if f not in meta_path_before]
+    if new_finders:
+        sys.meta_path[:] = [f for f in sys.meta_path if f not in new_finders]
+        insert_at = next((i for i, f in enumerate(sys.meta_path) if f is importlib.machinery.PathFinder), len(sys.meta_path))
+        sys.meta_path[insert_at:insert_at] = new_finders
     importlib.invalidate_caches()
 
 
@@ -99,6 +115,7 @@ def setup_notebook_venv(notebook_name: Optional[str] = None, venv_root: PathLike
     insert_at = next((i for i, p in enumerate(sys.path) if p in parent_site_dirs), len(sys.path))
     sys.path[insert_at:insert_at] = [d for d in venv_site_dirs if d not in sys.path]
     _venv_site_dirs[:] = venv_site_dirs
+    _parent_site_dirs[:] = parent_site_dirs
     _load_venv_pth_files()
 
     # `%pip` and `pip_install()` install into `sys.executable`
