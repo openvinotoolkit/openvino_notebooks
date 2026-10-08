@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 # Jupyter infrastructure
-ipykernel = "==7.3.0"
+ipykernel = "==7.4.0"
 ipython = ">=7.16.3"
 ipywidgets = "*"
 jupyterhub = ">=5.5.0"
