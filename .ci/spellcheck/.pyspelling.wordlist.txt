@@ -581,6 +581,7 @@ librispeech
 LibriTTS
 librosa
 LiDAR
+lifecycles
 Lim
 LinearCameraEmbedder
 linearized
@@ -746,6 +747,7 @@ NeuSpell
 NeXT
 ng
 ngram
+nightlies
 NLP
 nlp
 NMS
@@ -993,6 +995,7 @@ RealWorldQA
 rebase
 ReciproCAM
 recognised
+reconversion
 redistributable
 RedPajama
 ReferenceNet
@@ -1367,6 +1370,7 @@ ZeroScope
 zeroscope
 zh
 Zhipu
+ZIPs
 Zongyuan
 downsampler
 dropdowns
@@ -1379,3 +1383,19 @@ OmniVoice
 OmniVoice's
 RefCOCO
 Xiaomi
+DER
+EER
+PLDA
+PyanNet
+ROC
+SincNet
+TDNN
+VAD
+VoxCeleb
+VoxConverse
+WeSpeaker
+XPU
+fbank
+RTTM
+UEM
+VGG

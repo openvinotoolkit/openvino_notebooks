@@ -60,7 +60,7 @@ NO_BROKEN_REQUIREMENTS, PIP_CHECK_OUTPUT = pip_check()
 CORRECT_KERNEL_PYTHON = PYTHON_EXECUTABLE == KERNEL_PYTHON
 
 IN_OPENVINO_ENV = "openvino_env" in sys.executable
-SUPPORTED_PYTHON_VERSION = PYTHON_VERSION.major == 3 and (PYTHON_VERSION.minor >= 10 and PYTHON_VERSION.minor <= 13)
+SUPPORTED_PYTHON_VERSION = PYTHON_VERSION.major == 3 and (PYTHON_VERSION.minor >= 11 and PYTHON_VERSION.minor <= 13)
 GLOBAL_OPENVINO_INSTALLED = "openvino_202" in os.environ.get("LD_LIBRARY_PATH", "") + ":".join(sys.path)
 
 
@@ -115,7 +115,7 @@ if not OPENVINO_IMPORT and OS != "win32" and not GLOBAL_OPENVINO_INSTALLED:
         print(
             "If you have multiple Python version installed, use the full path to the Python\n"
             "executable for creating the virtual environment with a specific Python version.\n"
-            "For example: `/usr/bin/python3.10 -m venv openvino_env`. Once you have activated\n"
+            "For example: `/usr/bin/python3.11 -m venv openvino_env`. Once you have activated\n"
             "the virtual environment you can type just `python` again.\n"
         )
 
