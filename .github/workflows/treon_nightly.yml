@@ -2,6 +2,10 @@ name: treon_nightly
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - 'main'
+      - 'latest'
   schedule:
     - cron: '0 0 * * *'
 
@@ -64,7 +68,6 @@ jobs:
       python: ${{ matrix.python }}
       test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 }}
       batch: ${{ matrix.batch }}
-      separate_venv: true
       ignore_list: .ci/tensorflow.txt
       container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:${{ needs.get_docker_tag.outputs.docker_tag }}'
   
@@ -82,7 +85,6 @@ jobs:
       python: ${{ matrix.python }}
       test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 }}
       batch: ${{ matrix.batch }}
-      separate_venv: true
       ignore_list: .ci/tensorflow.txt
 
   build_treon_gpu:
@@ -99,7 +101,6 @@ jobs:
       python: ${{ matrix.python }}
       container: ${{ matrix.container }}
       ignore_list: .ci/tensorflow.txt
-      separate_venv: true
 
   aggregate_notebooks_reports:
     if: always()

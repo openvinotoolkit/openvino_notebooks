@@ -13,4 +13,3 @@ mistune==3.3.3              # use for parsing README.md
 requests==2.33.0            # use for checking links
 psutil                      # process management
 pyspelling                  # automating spell checking
-virtualenv-clone            # clone virtual environments for validation script
