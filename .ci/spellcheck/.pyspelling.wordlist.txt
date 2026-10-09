@@ -276,6 +276,7 @@ DiTs
 DiT’s
 DL
 DMDR
+DoF
 DModel
 DocLayNet
 DocLayout
@@ -576,6 +577,7 @@ LetterBox
 LeViT
 LFM
 lfm
+LIBERO
 LibriSpeech
 librispeech
 LibriTTS
@@ -1031,6 +1033,7 @@ rinna
 RLE
 RLHF
 RMBG
+RMS
 RMSNorm
 RoBERTa
 roberta
@@ -1279,6 +1282,7 @@ ViFM
 VIO
 virtualenv
 VisCPM
+VLA
 visualise
 visualises
 visuomotor
