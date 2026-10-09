@@ -1391,6 +1391,12 @@ ROC
 SincNet
 TDNN
 VAD
+PagedAttention
+TorchCodec
+downsampling
+localhost
+resampling
+selectable
 VoxCeleb
 VoxConverse
 WeSpeaker
