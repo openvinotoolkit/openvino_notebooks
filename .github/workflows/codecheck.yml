@@ -14,6 +14,7 @@ on:
       - 'notebooks/**.md'
       - 'requirements.txt'
       - '.ci/*'
+      - '.ci/nightly_report/**'
       - '.github/workflows/*.yml'
       - '.github/workflows/.env'
   push:
@@ -26,6 +27,7 @@ on:
       - 'notebooks/**.md'
       - 'requirements.txt'
       - '.ci/*'
+      - '.ci/nightly_report/**'
       - '.github/workflows/*.yml'
       - '.github/workflows/.env'
 
@@ -99,6 +101,10 @@ jobs:
         if: always()
         run: |
           python -m pytest .ci/test_notebooks.py
+      - name: Test nightly dashboard data scripts
+        if: always()
+        run: |
+          python -m pytest .ci/nightly_report/tests
       - name: Get changed files
         id: changed
         if: always() && github.event_name == 'pull_request'

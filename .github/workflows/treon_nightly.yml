@@ -2,6 +2,10 @@ name: treon_nightly
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - 'main'
+      - 'latest'
   schedule:
     - cron: '0 0 * * *'
 
@@ -48,7 +52,20 @@ jobs:
 
       - name: Collect and split notebooks into batches
         id: split
-        run: python3 .ci/split_notebooks.py --num_batches 3 --seed "${{ github.run_id }}"
+        env:
+          # Pull request runs test a small sample of notebooks to check the pipeline quickly
+          NOTEBOOKS_LIST: ${{ github.event_name == 'pull_request' && '.ci/nightly_sample_notebooks.txt' || '' }}
+        run: |
+          python3 .ci/split_notebooks.py --num_batches 3 --seed "${{ github.run_id }}" --plan_file nightly_plan/plan.json \
+            ${NOTEBOOKS_LIST:+--notebooks_list "$NOTEBOOKS_LIST"}
+
+      - name: Upload batch plan for the nightly dashboard
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: nightly-plan
+          path: nightly_plan/plan.json
+          if-no-files-found: warn
+          overwrite: true
 
   build_treon_linux:
     needs: [collect_notebooks, get_docker_tag]
@@ -66,6 +83,7 @@ jobs:
       batch: ${{ matrix.batch }}
       separate_venv: true
       ignore_list: .ci/tensorflow.txt
+      dashboard_data: true
       container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:${{ needs.get_docker_tag.outputs.docker_tag }}'
   
   build_treon_windows:
@@ -84,6 +102,7 @@ jobs:
       batch: ${{ matrix.batch }}
       separate_venv: true
       ignore_list: .ci/tensorflow.txt
+      dashboard_data: true
 
   build_treon_gpu:
     if: ${{ false }} # TODO Enable when GPU runners will be available in GitHub Actions
@@ -122,8 +141,67 @@ jobs:
         run: |
           python .ci/aggregate_notebooks_reports.py
       - name: Upload aggregated report
+        # The selector (GitHub Pages) uses the latest artifact of this name, which must not come from a sample run
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: notebooks-status-map.json
           path: test_reports/notebooks-status-map.json
           if-no-files-found: error
+
+  # Builds the data consumed by the nightly dashboard (see .ci/nightly_report/README.md).
+  # The dashboard repository pulls the 'nightly-dashboard-data' artifact via the GitHub API.
+  build_dashboard_data:
+    if: always()
+    runs-on: ubuntu-22.04
+    needs: [get_docker_tag, collect_notebooks, build_treon_linux, build_treon_windows, build_treon_gpu]
+    permissions:
+      contents: read
+      actions: read # list jobs and artifacts of this run
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # history is needed for the last modification of notebooks
+          filter: blob:none
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: python -m pip install pyyaml jsonschema
+      - name: Download batch plan
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: nightly-plan
+          path: nightly_plan
+      - name: Download test job fragments
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: nightly-fragment-*
+          path: nightly_fragments
+      - name: Build dashboard data
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DOCKER_TAG: ${{ needs.get_docker_tag.outputs.docker_tag }}
+        run: |
+          python .ci/nightly_report/build_report.py \
+            --fragments_dir nightly_fragments \
+            --plan nightly_plan/plan.json \
+            --output_dir nightly_dashboard_data \
+            --ignore_list .ci/tensorflow.txt \
+            --workflow_file .github/workflows/treon_nightly.yml \
+            --ov_branch "$OV_BRANCH" \
+            --docker_tag "$DOCKER_TAG" \
+            --summary_file "$GITHUB_STEP_SUMMARY"
+      - name: Upload dashboard data
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: nightly-dashboard-data
+          path: nightly_dashboard_data/
+          if-no-files-found: warn
+          retention-days: 90
+          overwrite: true

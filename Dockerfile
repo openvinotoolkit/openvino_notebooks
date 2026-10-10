@@ -51,6 +51,7 @@ COPY --chown=1001:0 .docker/tests/test_precommit /tmp/scripts
 COPY --chown=1001:0 .ci/patch_notebooks.py /tmp/scripts
 COPY --chown=1001:0 .ci/validate_notebooks.py /tmp/scripts
 COPY --chown=1001:0 .ci/validation_config.py /tmp/scripts
+COPY --chown=1001:0 .ci/skip_resolution.py /tmp/scripts
 COPY --chown=1001:0 .ci/ignore_treon_docker.txt /tmp/scripts
 # workaround for coping file if it does not exists
 COPY --chown=1001:0 .ci/test_notebooks.* /tmp/scripts

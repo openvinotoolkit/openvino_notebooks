@@ -35,6 +35,11 @@ on:
         required: false
         type: string
         default: ''
+      dashboard_data:
+        description: 'Write a nightly dashboard data fragment (.ci/nightly_report) and upload it as an artifact'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -232,6 +237,13 @@ jobs:
       - name: Analysing with treon (Linux)
         if: runner.os == 'Linux'
         shell: bash
+        env:
+          DASHBOARD_DATA: ${{ inputs.dashboard_data }}
+          DASHBOARD_JOB_ID: ${{ job.check_run_id }}
+          DASHBOARD_BATCH: ${{ inputs.batch }}
+          DASHBOARD_RUNNER_NAME: ${{ runner.name }}
+          DASHBOARD_RUNNER_LABEL: ${{ inputs.runs_on }}
+          DASHBOARD_CONTAINER_IMAGE: ${{ inputs.container }}
         run: |
           IGNORE_ARGS=""
           if [[ -n "${{ inputs.ignore_list }}" ]]; then
@@ -245,6 +257,15 @@ jobs:
             IGNORE_ARGS="--ignore_list $IGNORE_ARGS"
           fi
 
+          DASHBOARD_ARGS=()
+          if [[ "$DASHBOARD_DATA" == "true" ]]; then
+            DASHBOARD_ARGS+=(--dashboard_dir dashboard_fragment --run_id "$GITHUB_RUN_ID" --run_attempt "$GITHUB_RUN_ATTEMPT")
+            for pair in "--job_id=$DASHBOARD_JOB_ID" "--batch=$DASHBOARD_BATCH" "--runner_name=$DASHBOARD_RUNNER_NAME" \
+                        "--runner_label=$DASHBOARD_RUNNER_LABEL" "--container_image=$DASHBOARD_CONTAINER_IMAGE"; do
+              if [[ -n "${pair#*=}" ]]; then DASHBOARD_ARGS+=("$pair"); fi
+            done
+          fi
+
           .venv/bin/python3 .ci/validate_notebooks.py \
             --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
@@ -254,12 +275,27 @@ jobs:
             --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
             ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --collect_reports \
-            --timeout 1200
+            --timeout 1200 \
+            "${DASHBOARD_ARGS[@]}"
       
       - name: Analysing with treon (MacOS)
         if: runner.os == 'MacOS'
         shell: bash
+        env:
+          DASHBOARD_DATA: ${{ inputs.dashboard_data }}
+          DASHBOARD_JOB_ID: ${{ job.check_run_id }}
+          DASHBOARD_BATCH: ${{ inputs.batch }}
+          DASHBOARD_RUNNER_NAME: ${{ runner.name }}
+          DASHBOARD_RUNNER_LABEL: ${{ inputs.runs_on }}
         run: |
+          DASHBOARD_ARGS=()
+          if [[ "$DASHBOARD_DATA" == "true" ]]; then
+            DASHBOARD_ARGS+=(--dashboard_dir dashboard_fragment --run_id "$GITHUB_RUN_ID" --run_attempt "$GITHUB_RUN_ATTEMPT")
+            for pair in "--job_id=$DASHBOARD_JOB_ID" "--batch=$DASHBOARD_BATCH" "--runner_name=$DASHBOARD_RUNNER_NAME" "--runner_label=$DASHBOARD_RUNNER_LABEL"; do
+              if [[ -n "${pair#*=}" ]]; then DASHBOARD_ARGS+=("$pair"); fi
+            done
+          fi
+
           python${{ inputs.python }} .ci/validate_notebooks.py \
             --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
@@ -268,7 +304,8 @@ jobs:
             --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
             ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --collect_reports \
-            --timeout 1200
+            --timeout 1200 \
+            "${DASHBOARD_ARGS[@]}"
 
       - name: Archive notebook test report
         if: always()
@@ -276,3 +313,12 @@ jobs:
         with:
           name: test_report-${{ env.TEST_REPORT_DIR }}-${{ inputs.batch != '' && inputs.batch || '' }}
           path: test_report/
+
+      - name: Archive nightly dashboard data fragment
+        if: ${{ always() && inputs.dashboard_data }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: nightly-fragment-${{ env.TEST_REPORT_DIR }}-${{ inputs.batch }}
+          path: dashboard_fragment/
+          if-no-files-found: ignore
+          overwrite: true

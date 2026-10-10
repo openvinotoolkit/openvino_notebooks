@@ -1,0 +1,18 @@
+# Sample of notebooks tested by treon_nightly.yml on pull_request runs (instead of all notebooks),
+# chosen to exercise every result type of the nightly dashboard data (.ci/nightly_report):
+notebooks/hello-world/hello-world.ipynb
+notebooks/hello-detection/hello-detection.ipynb
+notebooks/hello-segmentation/hello-segmentation.ipynb
+notebooks/vision-background-removal/vision-background-removal.ipynb
+# Fails on Python 3.13 (dead kernel) in recent nightlies: Python-specific failure.
+notebooks/async-api/async-api.ipynb
+# Downloads from Hugging Face; historically the most frequently failing notebook.
+notebooks/openvino-tokenizers/openvino-tokenizers.ipynb
+# Times out on Ubuntu, passes on Windows in recent nightlies: OS-specific timeout.
+notebooks/yolov26-optimization/yolov26-obb.ipynb
+# skipped_notebooks.yml: skipped on Windows and on Python 3.13.
+notebooks/stable-diffusion-v3-torch-fx/stable-diffusion-v3-torch-fx.ipynb
+# tensorflow.txt ignore list: always skipped.
+notebooks/tflite-to-openvino/tflite-to-openvino.ipynb
+# skipped_notebooks.yml: skipped on all OSes.
+notebooks/gpu-device/gpu-device.ipynb
