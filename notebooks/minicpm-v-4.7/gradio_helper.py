@@ -2,40 +2,37 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 from io import BytesIO
 from pathlib import Path
-from queue import Empty
+from queue import Empty, Queue
 
 import gradio as gr
+import numpy as np
 import openvino as ov
+import openvino_genai as ov_genai
 import requests
 from PIL import Image, ImageDraw, ImageOps
 
 
 @lru_cache(maxsize=1)
 def load_model(model_dir: str, device: str):
-    from optimum.intel import OVModelForVisualCausalLM
-    from transformers import AutoProcessor
-
-    processor = AutoProcessor.from_pretrained(model_dir)
-    model = OVModelForVisualCausalLM.from_pretrained(model_dir, device=device)
-    return processor, model
+    return ov_genai.VLMPipeline(model_dir, device)
 
 
-def stream_generate(processor, model, inputs, *, max_new_tokens):
-    from transformers import TextIteratorStreamer
+def stream_generate(pipe, history, images, *, max_new_tokens):
+    chunks = Queue()
+    config = ov_genai.GenerationConfig()
+    config.max_new_tokens = max_new_tokens
 
-    streamer = TextIteratorStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=True, timeout=0.5)
+    def streamer(chunk):
+        chunks.put(chunk)
+        return False
+
     with ThreadPoolExecutor(max_workers=1) as executor:
-        generation = executor.submit(model.generate, **inputs, max_new_tokens=max_new_tokens, do_sample=False, streamer=streamer)
-        while True:
+        generation = executor.submit(pipe.generate, history, images=images, generation_config=config, streamer=streamer)
+        while not generation.done() or not chunks.empty():
             try:
-                chunk = next(streamer)
+                chunk = chunks.get(timeout=0.1)
             except Empty:
-                if generation.done():
-                    generation.result()
-                    raise RuntimeError("Generation finished without closing the text stream.")
                 continue
-            except StopIteration:
-                break
             if chunk:
                 yield chunk
         generation.result()
@@ -110,23 +107,15 @@ def make_demo(export_root=Path("MiniCPM-V-4.7-ov")):
         if model_path not in model_dirs or selected_device not in devices:
             raise ValueError("Select an exported model and an available device.")
 
-        processor, model = load_model(str(model_path), selected_device)
-        content = []
+        pipe = load_model(str(model_path), selected_device)
+        images = []
         for image_file in image_files:
             with Image.open(image_file) as image:
-                content.append({"type": "image", "image": image.convert("RGB")})
-        content.append({"type": "text", "text": question})
-        inputs = processor.apply_chat_template(
-            [{"role": "user", "content": content}],
-            add_generation_prompt=True,
-            tokenize=True,
-            return_dict=True,
-            return_tensors="pt",
-            enable_thinking=enable_thinking,
-            processor_kwargs={"use_image_id": True},
-        )
+                images.append(ov.Tensor(np.asarray(image.convert("RGB"))))
+        history = ov_genai.ChatHistory([{"role": "user", "content": question}])
+        history.set_extra_context({"enable_thinking": enable_thinking})
         response = "<think>" if enable_thinking else ""
-        for chunk in stream_generate(processor, model, inputs, max_new_tokens=1024 if enable_thinking else 128):
+        for chunk in stream_generate(pipe, history, images, max_new_tokens=1024 if enable_thinking else 128):
             response += chunk
             yield [{"role": "assistant", "content": response}]
 
