@@ -72,9 +72,11 @@ def _example_images(export_root: Path):
     return sample_paths, preview_path
 
 
-def make_demo(export_root=Path("MiniCPM-V-4.7-ov")):
+def make_demo(export_root=Path(".")):
     export_root = Path(export_root).resolve()
-    model_dirs = sorted({path.parent for path in export_root.rglob("openvino_language_model.xml")})
+    model_dirs = sorted(
+        {path.parent for weight_format in ("int8", "int4", "fp16") for path in export_root.glob(f"*-ov/{weight_format}/openvino_language_model.xml")}
+    )
     if not model_dirs:
         raise FileNotFoundError(f"No exported MiniCPM-V 4.7 models found in {export_root}. Run the export cell first.")
 
