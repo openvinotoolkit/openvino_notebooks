@@ -149,6 +149,11 @@
   skips:
     - os:
         - windows-2022
+- notebook: notebooks/vla-jepa/vla-jepa.ipynb
+  skips:
+    - os:
+        - macos-13
+        - windows-2022
 - notebook: notebooks/hello-npu/hello-npu.ipynb
   skips:
     - device:
@@ -473,6 +478,12 @@
   skips:
     - os:
         - macos-13
+        - windows-2022
+- notebook: notebooks/minicpm-v-4.7/minicpm-v-4.7.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
         - windows-2022
 # Experimental — requires custom optimum-intel branch + transformers>=5.13; heavy VLM model
 - notebook: notebooks/hunyuan-ocr/hunyuan-ocr.ipynb
