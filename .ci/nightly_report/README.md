@@ -22,7 +22,8 @@ treon_nightly.yml
   Matrix jobs skipped or cancelled before they started are expanded from the workflow file (`--workflow_file`).
   Data problems never fail the build; they are listed in `generator.warnings`. The step exits non-zero only if the produced report
   violates the schema.
-* `summary.md` is also published as the job summary of the workflow run.
+* `summary.md` is also published as the job summary of the workflow run. Every table in it is followed by a short explanation of
+  its columns and of how the values are calculated.
 * `pull_request` runs of the workflow test only the notebooks of [`.ci/nightly_sample_notebooks.txt`](../nightly_sample_notebooks.txt)
   (`split_notebooks.py --notebooks_list`) and do not upload `notebooks-status-map.json`; their reports have `run.event == "pull_request"`.
 

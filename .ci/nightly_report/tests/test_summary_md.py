@@ -229,3 +229,41 @@ def test_html_like_text_is_escaped(report):
     failure(report, ASYNC_W10)["exception_message"] = "bad value <class 'int'>"
     row = table_row(render_markdown(report), "`async-api/async-api.ipynb` | cpu-windows-2022-py3.10")
     assert "bad value &lt;class 'int'&gt;" in row
+
+
+def legend(text):
+    """Column names explained below the tables of a section."""
+    return [line.split("**")[1] for line in text.splitlines() if line.startswith("- **")]
+
+
+def test_legends_follow_tables(markdown):
+    headline = markdown.split("\n## ", 1)[0]
+    assert legend(headline) == [
+        "Pass rate",
+        "Notebook pass rate",
+        "Coverage",
+        "Executed, Passed, Failed, Timeout, Error, Not run",
+        "Untested notebooks",
+        "Wall clock",
+    ]
+    assert "- **Pass rate**: passed ÷ executed, counting every notebook × configuration result." in headline
+    assert "per-notebook timeout (16m 40s)." in headline
+    assert legend(section(markdown, "By configuration")) == ["Config", "Executed, Passed, Failed, Timeout, Error, Not run", "Skipped", "Pass rate", "Test time"]
+    assert legend(section(markdown, "Failures (6)")) == ["Status", "Category / class", "Error", "Links"]
+    assert legend(section(markdown, "Error groups")) == ["Signature", "Occurrences", "Error", "Notebooks"]
+    assert legend(section(markdown, "Near timeout")) == ["Duration", "Timeout", "Of timeout"]
+    assert "used at least 80% of the timeout" in section(markdown, "Near timeout")
+    assert section(markdown, "Infrastructure").strip().startswith("Test jobs that stopped before running notebooks")
+    # Every table ends before its legend (a legend line glued to a table would be rendered as a table row).
+    lines = markdown.splitlines()
+    for index, line in enumerate(lines[1:], start=1):
+        if line.startswith("- **"):
+            assert not lines[index - 1].startswith("|")
+
+
+def test_legends_without_timeout_or_failures(report):
+    report["run"]["inputs"]["timeout_s"] = None
+    report["failures"] = []
+    markdown = render_markdown(report)
+    assert "after the per-notebook timeout. " in markdown
+    assert legend(section(markdown, "Failures (0)")) == []
