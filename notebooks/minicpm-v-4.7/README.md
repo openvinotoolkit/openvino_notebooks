@@ -10,9 +10,9 @@ The demo starts locally. Only if Gradio reports that localhost is inaccessible d
 
 ⚠️ **EXPERIMENTAL NOTEBOOK**
 
-This notebook demonstrates a model that has not been fully validated with OpenVINO and is using a custom branch of optimum-intel. It may be fully supported and validated in the future.
+This notebook demonstrates a model that has not been fully validated with OpenVINO and uses development builds. It may be fully supported and validated in the future.
 
-The notebook uses [Optimum Intel's merged 4.7 export support](https://github.com/huggingface/optimum-intel/pull/2033) and [GenAI's merged 4.7 inference support](https://github.com/openvinotoolkit/openvino.genai/pull/4591). Keep the exported model's visual downsampling configuration; do not override it with `4x`. The larger 35B-A3B MoE checkpoint needs considerably more resources; its INT4 GPU PagedAttention path requires [this OpenVINO fix](https://github.com/openvinotoolkit/openvino/pull/38631).
+The notebook uses [Optimum Intel](https://github.com/huggingface/optimum-intel/pull/2033) for export and [OpenVINO GenAI](https://github.com/openvinotoolkit/openvino.genai/pull/4591) for inference. Keep the exported model's visual downsampling configuration; do not override it with `4x`. The larger 35B-A3B MoE checkpoint needs considerably more resources; its INT4 GPU PagedAttention path requires [this OpenVINO fix](https://github.com/openvinotoolkit/openvino/pull/38631).
 
 The notebook installs Optimum Intel from main, Transformers 5.18.0 as used in the [4.7 export PR](https://github.com/huggingface/optimum-intel/pull/2033), and nightly OpenVINO, Tokenizers, and GenAI. These development builds can change; restart the kernel after installation. A full model run on each device is still required to validate results.
 
