@@ -102,6 +102,19 @@ jobs:
           echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> "$GITHUB_ENV"
           echo "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" >> "$GITHUB_ENV"
 
+      - name: GPU diagnostics
+        if: ${{ env.TEST_DEVICE == 'gpu' }}
+        continue-on-error: true
+        run: |
+          ls -la /dev/dri
+          for d in /sys/class/drm/renderD*; do
+            [[ -e "$d" ]] || { echo "No render nodes found"; break; }
+            driver=$(readlink "$d/device/driver" || echo none)
+            echo "$(basename "$d") vendor=$(cat "$d/device/vendor") device=$(cat "$d/device/device") driver=$(basename "$driver")"
+          done
+          dpkg -l | grep -E 'intel-(opencl-icd|igc-core|level-zero-gpu)' || true
+          clinfo -l || true
+
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
