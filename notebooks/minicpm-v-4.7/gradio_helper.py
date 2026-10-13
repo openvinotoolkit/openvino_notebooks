@@ -117,7 +117,7 @@ def make_demo(export_root=Path(".")):
         history = ov_genai.ChatHistory([{"role": "user", "content": question}])
         history.set_extra_context({"enable_thinking": enable_thinking})
         response = "<think>" if enable_thinking else ""
-        for chunk in stream_generate(pipe, history, images, max_new_tokens=1024 if enable_thinking else 128):
+        for chunk in stream_generate(pipe, history, images, max_new_tokens=1024 if enable_thinking else 512):
             response += chunk
             yield [{"role": "assistant", "content": response}]
 
