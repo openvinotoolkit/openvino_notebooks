@@ -54,7 +54,7 @@ after some weeks.
 | `jobs[]` | Test jobs: conclusion, timings, runner, links (job, notebook test step, logs artifact), failed step, whether tests started, fragment presence. Identified by (`id`, `config_id`, `batch`); results join on the same fields. |
 | `notebooks[]` | Catalog at the tested commit: path, title, tags, `dir_tree_sha` (changes iff the notebook directory changes), last modifying commit, links (source at commit, latest, history). |
 | `results[]` | One row per planned (notebook, config): status, skip/not-run reason, start time, duration, timeout, peak memory, OpenVINO version before the run, key package versions, environment id, failure id. |
-| `failures[]` | One per `failed`/`timeout`/`error` result: category, heuristic error class, signature, failing cell index and source excerpt, exception type and message, traceback excerpt, log tail, links (job, test step, logs artifact, log file, notebook source). |
+| `failures[]` | One per `failed`/`timeout`/`error` result: category, heuristic error class, signature, failing cell index and source excerpt, exception type and message, traceback excerpt, log tail, **log excerpt** (the piece of the job log around the failure, with its line numbers), links (job, test step, **log excerpt** — the job log opened at that piece, logs artifact, log file, notebook source). |
 | `error_groups[]` | Failures grouped by signature, with affected notebooks and configs. |
 | `summary` | Per-run metrics (see below). |
 
@@ -72,6 +72,20 @@ after some weeks.
 | `not_run` | Planned but never executed: `not_run_reason` is `job_failed_before_tests:<step>`, `job_cancelled`, `job_skipped`, `job_interrupted` or `no_fragment`. |
 
 Batches are reshuffled every night, so history must be keyed by **(`notebook`, `config_id`)**, never by batch or job.
+
+### Log excerpt of a failure
+
+`build_report.py` downloads the log of every test job with failures (GitHub API, `actions: read`) and finds the output of each
+failed notebook in it (from its `Testing notebook: <path>` line to the next notebook):
+
+* `log_excerpt`: from 5 lines before the first failure line (`ERROR in testing`, `Kernel died`, `Traceback`, `timeout reached`, harness
+  errors) to the end of the notebook output, at most 80 lines; without a failure line, the last 80 lines of the output.
+  Timestamps and ANSI codes are removed.
+* `log_excerpt_lines`: `{start, end, error_line}` line numbers in the notebook test step, as shown by the GitHub log viewer.
+* `links.log_excerpt`: `<job url>#step:<step>:<start>`, which opens the job log at the first line of the excerpt.
+
+If a job log is unavailable, the excerpt is taken from the captured notebook log in the fragment (`log_excerpt_source: fragment_log`,
+`log_excerpt_lines: null`) and `links.log_excerpt` opens the notebook test step. `summary.md` shows the excerpts in a *Failure logs* section.
 
 ### Failure classification
 

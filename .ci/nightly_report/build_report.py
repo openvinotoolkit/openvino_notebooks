@@ -46,6 +46,7 @@ from nightly_report.constants import (  # noqa: E402
     config_id as make_config_id,
 )
 from nightly_report.error_parser import analyze_failure, compute_signature  # noqa: E402
+from nightly_report.job_log import failure_excerpt, file_excerpt  # noqa: E402
 from nightly_report.fragment import parse_pip_freeze  # noqa: E402
 from nightly_report.metrics import compute_summary  # noqa: E402
 from nightly_report.summary_md import render_markdown  # noqa: E402
@@ -56,6 +57,7 @@ FRAGMENT_SCHEMA_PATH = SCHEMA_DIR / "fragment.schema.json"
 
 TEST_JOB_PREFIX = "build_treon"
 TREON_STEP_PREFIX = "Analysing with treon"
+JOB_LOG_MAX_BYTES = 64 * 1024 * 1024
 JOB_MATRIX_RE = re.compile(r"^(?P<prefix>[\w-]+)\s*\((?P<matrix>[^)]*)\)")
 
 
@@ -130,20 +132,25 @@ class GitHubApi:
         self.token = token
         self.warnings = warnings
 
-    def _get(self, path: str, params: Optional[dict] = None) -> Optional[dict]:
-        url = f"{self.api_url}/repos/{self.repository}/{path}"
-        if params:
-            url += "?" + urllib.parse.urlencode(params)
-        request = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"})
+    def _request(self, url: str, accept: str = "application/vnd.github+json") -> urllib.request.Request:
+        request = urllib.request.Request(url, headers={"Accept": accept, "X-GitHub-Api-Version": "2022-11-28"})
         if self.token:
-            request.add_header("Authorization", f"Bearer {self.token}")
+            # Not sent on redirects: job logs and artifacts redirect to storage URLs that reject foreign credentials.
+            request.add_unredirected_header("Authorization", f"Bearer {self.token}")
+        return request
+
+    def _fetch(self, url: str, accept: str = "application/vnd.github+json", max_bytes: Optional[int] = None) -> Optional[bytes]:
+        request = self._request(url, accept)
         last_error = None
         for attempt in range(3):
             try:
-                with urllib.request.urlopen(request, timeout=30) as response:  # nosec B310 - fixed https API URL
-                    return json.loads(response.read().decode("utf-8"))
+                with urllib.request.urlopen(request, timeout=60) as response:  # nosec B310 - fixed https API URL
+                    data = response.read(max_bytes + 1) if max_bytes else response.read()
+                    if max_bytes and len(data) > max_bytes:
+                        data = data[:max_bytes]
+                    return data
             # OSError covers URLError, timeouts and connection resets; HTTPException covers e.g. RemoteDisconnected, IncompleteRead.
-            except (OSError, http.client.HTTPException, ValueError) as error:
+            except (OSError, http.client.HTTPException) as error:
                 last_error = error
                 if isinstance(error, urllib.error.HTTPError) and error.code < 500 and error.code != 429:
                     break
@@ -151,6 +158,24 @@ class GitHubApi:
                     time.sleep(2**attempt)
         self.warnings.add(f"GitHub API request failed: {url}: {last_error}")
         return None
+
+    def _get(self, path: str, params: Optional[dict] = None) -> Optional[dict]:
+        url = f"{self.api_url}/repos/{self.repository}/{path}"
+        if params:
+            url += "?" + urllib.parse.urlencode(params)
+        data = self._fetch(url)
+        if data is None:
+            return None
+        try:
+            return json.loads(data.decode("utf-8"))
+        except ValueError as error:
+            self.warnings.add(f"GitHub API returned invalid JSON: {url}: {error}")
+            return None
+
+    def get_job_log(self, job_id: int) -> Optional[str]:
+        """Plain-text log of a completed job (with timestamps), truncated to JOB_LOG_MAX_BYTES."""
+        data = self._fetch(f"{self.api_url}/repos/{self.repository}/actions/jobs/{job_id}/logs", accept="*/*", max_bytes=JOB_LOG_MAX_BYTES)
+        return data.decode("utf-8", errors="replace") if data is not None else None
 
     def get_run(self, run_id: int) -> Optional[dict]:
         return self._get(f"actions/runs/{run_id}")
@@ -284,8 +309,8 @@ class Links:
     def job(self, job_id: int) -> str:
         return f"{self.run()}/job/{job_id}"
 
-    def step(self, job_url: str, number: int) -> str:
-        return f"{job_url}#step:{number}:1"
+    def step(self, job_url: str, number: int, line: int = 1) -> str:
+        return f"{job_url}#step:{number}:{line}"
 
     def artifact(self, artifact_id: int) -> str:
         return f"{self.run()}/artifacts/{artifact_id}"
@@ -542,6 +567,7 @@ class ReportBuilder:
             "_python": python,
             "_runner_label": fragment_job.get("runner_label") or (matrix or {}).get("runner_label"),
             "_container_image": fragment_job.get("container_image"),
+            "_treon_step_number": treon_step.get("number") if treon_step else None,
             "_fragment": fragment,
         }
 
@@ -653,6 +679,37 @@ class ReportBuilder:
         }
 
     # ---------------------------------------------------------------- failures
+    def _job_log(self, job: dict) -> Optional[str]:
+        """Log of a test job (cached); None when unavailable."""
+        cache = self.__dict__.setdefault("_job_logs", {})
+        if job["id"] in cache:
+            return cache[job["id"]]
+        text = None
+        if self.args.job_logs_dir is not None:
+            path = self.args.job_logs_dir / f"{job['id']}.log"
+            try:
+                text = path.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                text = None
+        elif self.api is not None and self.args.jobs_json is None and job["id"]:
+            text = self.api.get_job_log(job["id"])
+        cache[job["id"]] = text
+        return text
+
+    def _log_excerpt(self, job: dict, notebook: str, fragment_log: Optional[str]) -> dict:
+        """Piece of the failed notebook output and the link to it in the job log (fragment log as fallback)."""
+        step = job.get("_treon_step_number")
+        if step:
+            job_log = self._job_log(job)
+            piece = failure_excerpt(job_log, notebook) if job_log else None
+            if piece:
+                lines = {key: piece[key] for key in ("start", "end", "error_line")}
+                return {"text": piece["text"], "source": "job_log", "lines": lines, "url": self.links.step(job["url"], step, piece["start"])}
+            if job_log:
+                self.warnings.add(f"Output of {notebook} not found in the log of job {job['id']}.")
+        text = file_excerpt(fragment_log) if fragment_log else None
+        return {"text": text, "source": "fragment_log" if text else None, "lines": None, "url": job["treon_step_url"]}
+
     def collect_failures(self, failing: dict[str, tuple[dict, dict]], results: list[dict]) -> list[dict]:
         failures = []
         for row in results:
@@ -673,6 +730,11 @@ class ReportBuilder:
                 self.warnings.add(f"Log analysis failed for {row['failure_id']}: {error}")
                 category = "timeout" if row["status"] == Status.TIMEOUT else "harness_error" if row["status"] == Status.ERROR else "unknown"
                 analysis = {"category": category, "error_class": "other", "signature": compute_signature(category, None, None)}
+            try:
+                excerpt = self._log_excerpt(job, row["notebook"], text)
+            except Exception as error:  # the log excerpt must never break the report
+                self.warnings.add(f"Log excerpt failed for {row['failure_id']}: {error}")
+                excerpt = {"text": None, "source": None, "lines": None, "url": job["treon_step_url"]}
             failures.append(
                 {
                     "id": row["failure_id"],
@@ -689,9 +751,13 @@ class ReportBuilder:
                     "exception_message": analysis.get("exception_message"),
                     "traceback_excerpt": analysis.get("traceback_excerpt"),
                     "log_tail": analysis.get("log_tail"),
+                    "log_excerpt": excerpt["text"],
+                    "log_excerpt_source": excerpt["source"],
+                    "log_excerpt_lines": excerpt["lines"],
                     "links": {
                         "job": job["url"],
                         "treon_step": job["treon_step_url"],
+                        "log_excerpt": excerpt["url"],
                         "logs_artifact": job["logs_artifact_url"],
                         "log_file": log_file,
                         "notebook_source": self.links.blob(self.head_sha, f"{self.notebooks_dir}/{row['notebook']}"),
@@ -926,6 +992,7 @@ def parse_arguments(argv: Optional[list[str]] = None) -> argparse.Namespace:
     parser.add_argument("--run_json", type=Path, help="Use this file instead of GET /actions/runs/{id}.")
     parser.add_argument("--jobs_json", type=Path, help="Use this file ({'jobs': [...]}) instead of the jobs API.")
     parser.add_argument("--artifacts_json", type=Path, help="Use this file ({'artifacts': [...]}) instead of the artifacts API.")
+    parser.add_argument("--job_logs_dir", type=Path, help="Use <job id>.log files of this directory instead of the job logs API.")
     parser.add_argument("--summary_file", type=Path, help="Append the markdown summary to this file (e.g. $GITHUB_STEP_SUMMARY).")
     return parser.parse_args(argv)
 

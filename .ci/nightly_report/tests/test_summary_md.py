@@ -267,3 +267,36 @@ def test_legends_without_timeout_or_failures(report):
     markdown = render_markdown(report)
     assert "after the per-notebook timeout. " in markdown
     assert legend(section(markdown, "Failures (0)")) == []
+
+
+def test_failure_logs_section(report):
+    target = failure(report, ASYNC_W10)
+    url = "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/1/job/2#step:18:168"
+    target["log_excerpt"] = "Start executing cell 29\nKernel died while waiting for execute reply.\nTraceback (most recent call last):\n<module> | x"
+    target["log_excerpt_lines"] = {"start": 168, "end": 171, "error_line": 169}
+    target["links"]["log_excerpt"] = url
+    markdown = render_markdown(report)
+
+    row = table_row(markdown, "`async-api/async-api.ipynb` | cpu-windows-2022-py3.10")
+    assert f"[failure log]({url})" in row
+    text = section(markdown, "Failure logs")
+    assert "<details><summary>async-api/async-api.ipynb · cpu-windows-2022-py3.10 · failed (lines 168–171)</summary>" in text
+    assert f"[open in the job log]({url})" in text
+    assert "~~~text\nStart executing cell 29\nKernel died while waiting for execute reply.\nTraceback (most recent call last):\n<module> | x\n~~~" in text
+    assert text.count("<details>") == 1 and "</details>" in text
+    # The section comes right after the failures table.
+    assert markdown.index("## Failure logs") > markdown.index("## Failures (6)") and markdown.index("## Failure logs") < markdown.index("## Error groups")
+
+
+def test_failure_logs_are_capped_and_fenced(report):
+    target = failure(report, ASYNC_W10)
+    target["log_excerpt"] = "\n".join(["~~~~ fence-like line"] + [f"line {i}" for i in range(60)] + ["x" * 500])
+    text = section(render_markdown(report), "Failure logs")
+    assert "~~~~~text\n~~~~ fence-like line" in text
+    assert "line 38" in text and "line 39" not in text and "… 22 more lines in the job log" in text
+    # No line link: the summary has no line range and no "open" link.
+    assert "(lines " not in text and "[open in the job log](" not in text
+
+
+def test_failure_logs_omitted_without_excerpts(markdown):
+    assert "## Failure logs" not in markdown

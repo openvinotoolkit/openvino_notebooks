@@ -3,6 +3,7 @@
 Stdlib-only. Tolerates missing optional fields: anything absent or null is rendered as "n/a" or omitted.
 """
 
+import html
 import re
 from typing import Iterable, Optional
 
@@ -13,6 +14,9 @@ MAX_FAILURE_ROWS = 50
 MAX_ERROR_GROUPS = 10
 MAX_GROUP_NOTEBOOKS = 5
 ERROR_MAX_CHARS = 120
+MAX_LOG_EXCERPTS = 20
+LOG_EXCERPT_MAX_LINES = 40
+LOG_EXCERPT_LINE_MAX_CHARS = 300
 
 _NEWLINES = re.compile(r"\s*[\r\n]+\s*")
 
@@ -172,7 +176,12 @@ def _by_config(summary: dict) -> list:
 
 def _failure_links(failure: dict) -> str:
     links = failure.get("links") or {}
-    labeled = (("job", links.get("job")), ("logs", links.get("logs_artifact")), ("source", links.get("notebook_source")))
+    labeled = (
+        ("failure log", links.get("log_excerpt")),
+        ("job", links.get("job")),
+        ("logs", links.get("logs_artifact")),
+        ("source", links.get("notebook_source")),
+    )
     return " · ".join(_link(label, url) for label, url in labeled if url)
 
 
@@ -206,11 +215,44 @@ def _failures(report: dict) -> list:
         ("Error", f"exception type and message parsed from the notebook output (first {ERROR_MAX_CHARS} characters)."),
         (
             "Links",
+            "_failure log_: the job log opened at the failure of the notebook (the piece is shown under *Failure logs*); "
             "_job_: log of the test job; _logs_: artifact with the full output of the notebooks that did not pass; "
             "_source_: the notebook at the tested commit.",
         ),
     ]
     return lines + [""] + _legend(legend)
+
+
+def _fence(text: str) -> str:
+    """A code fence longer than any tilde run at the start of a line of the text."""
+    longest = max((len(match.group(0)) for match in re.finditer(r"(?m)^~+", text)), default=0)
+    return "~" * max(3, longest + 1)
+
+
+def _failure_logs(report: dict) -> list:
+    failures = sorted(report.get("failures") or [], key=lambda f: (f.get("notebook") or "", f.get("config_id") or ""))
+    failures = [f for f in failures if f.get("log_excerpt")]
+    if not failures:
+        return []
+    lines = ["## Failure logs", "", "The piece of the notebook output around each failure; _open in the job log_ shows it in the full log of the job.", ""]
+    for failure in failures[:MAX_LOG_EXCERPTS]:
+        excerpt_lines = str(failure["log_excerpt"]).splitlines()
+        shown = [_truncate(line, LOG_EXCERPT_LINE_MAX_CHARS) for line in excerpt_lines[:LOG_EXCERPT_MAX_LINES]]
+        if len(excerpt_lines) > LOG_EXCERPT_MAX_LINES:
+            shown.append(f"… {len(excerpt_lines) - LOG_EXCERPT_MAX_LINES} more lines in the job log")
+        text = "\n".join(shown)
+        numbers = failure.get("log_excerpt_lines") or {}
+        where = f" (lines {numbers['start']}–{numbers['end']})" if numbers.get("start") and numbers.get("end") else ""
+        summary = " · ".join(html.escape(str(part)) for part in (failure.get("notebook"), failure.get("config_id"), failure.get("status")) if part)
+        url = (failure.get("links") or {}).get("log_excerpt")
+        fence = _fence(text)
+        lines += [f"<details><summary>{summary}{where}</summary>", ""]
+        if url:
+            lines += [_link("open in the job log", url), ""]
+        lines += [fence + "text", text, fence, "", "</details>", ""]
+    if len(failures) > MAX_LOG_EXCERPTS:
+        lines += [f"…and {len(failures) - MAX_LOG_EXCERPTS} more in nightly-report.json", ""]
+    return lines
 
 
 def _error_groups(report: dict) -> list:
@@ -294,6 +336,7 @@ def render_markdown(report: dict) -> str:
     lines += _headline(report, summary)
     lines += _by_config(summary)
     lines += _failures(report)
+    lines += _failure_logs(report)
     lines += _error_groups(report)
     lines += _infrastructure(report, summary)
     lines += _near_timeout(summary)

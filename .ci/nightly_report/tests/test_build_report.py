@@ -1,4 +1,5 @@
 import http.client
+import io
 import json
 import re
 import shutil
@@ -41,6 +42,27 @@ TIMEOUT_LOG = """Start executing cell 0
 Start executing cell 7
 [validate_notebooks] Timeout reached (1200s), process killed
 """
+
+# Job log of job 101 (step 2 runs the notebooks; line numbers of the GitHub log viewer are given on the right).
+JOB_101_LOG = [
+    "Current runner version: '2.338.0'",
+    "##[group]Run echo setup",
+    "##[endgroup]",
+    '##[group]Run IGNORE_ARGS=""',  # 1
+    'IGNORE_ARGS=""',  # 2
+    "##[endgroup]",  # 3
+    "Testing notebook: /__w/repo/repo/notebooks/a/a.ipynb",  # 4
+    "TEST DURATION [a.ipynb]: 1000.00 seconds",  # 5
+    "Testing notebook: /__w/repo/repo/notebooks/b/b.ipynb",  # 6
+    "Start executing cell 0",  # 7
+    "Start executing cell 3",  # 8
+    "\x1b[0;31mERROR in testing test_b.ipynb\x1b[0m",  # 9
+    "FileNotFoundError: [Errno 2] No such file or directory: '/tmp/xyz/model.xml'",  # 10
+    "TEST DURATION [b.ipynb]: 60.00 seconds",  # 11
+    "FAILED: ",  # 12
+    "test_b.ipynb",
+    "##[error]Process completed with exit code 1.",
+]
 
 WORKFLOW = """
 jobs:
@@ -287,7 +309,12 @@ def inputs(tmp_path: Path, repo: Path) -> dict:
     for name, data in (("jobs", jobs), ("artifacts", artifacts), ("run", run)):
         paths[name] = tmp_path / f"{name}.json"
         paths[name].write_text(json.dumps(data), encoding="utf-8")
-    return {"repo": repo, "plan": plan_path, "fragments": fragments, "output": tmp_path / "out", "head_sha": head_sha, **paths}
+    job_logs = tmp_path / "job_logs"
+    job_logs.mkdir()
+    (job_logs / "101.log").write_text(
+        "\ufeff" + "".join(f"2026-10-08T01:00:{index:02d}.0000000Z {line}\r\n" for index, line in enumerate(JOB_101_LOG)), encoding="utf-8"
+    )
+    return {"repo": repo, "plan": plan_path, "fragments": fragments, "output": tmp_path / "out", "head_sha": head_sha, "job_logs": job_logs, **paths}
 
 
 def build_args(inputs: dict, *extra: str) -> list[str]:
@@ -336,6 +363,8 @@ def test_full_report(inputs: dict, tmp_path: Path):
         str(inputs["artifacts"]),
         "--summary_file",
         str(summary_file),
+        "--job_logs_dir",
+        str(inputs["job_logs"]),
     )
     assert build_report.main(args) == 0
 
@@ -380,9 +409,21 @@ def test_full_report(inputs: dict, tmp_path: Path):
     assert cell_error["category"] == "cell_error" and cell_error["exception_type"] == "FileNotFoundError" and cell_error["cell_index"] == 3
     assert cell_error["links"]["log_file"] == "logs/b__b.log"
     assert cell_error["links"]["notebook_source"] == f"https://github.com/owner/repo/blob/{inputs['head_sha']}/notebooks/b/b.ipynb"
+    # The piece of the job log around the failure and the link to it.
+    job_101 = f"https://github.com/owner/repo/actions/runs/{RUN_ID}/job/101"
+    assert cell_error["log_excerpt_source"] == "job_log" and cell_error["log_excerpt_lines"] == {"start": 6, "end": 11, "error_line": 9}
+    assert cell_error["links"]["log_excerpt"] == f"{job_101}#step:2:6"
+    assert cell_error["log_excerpt"].splitlines() == [line.replace("\x1b[0;31m", "").replace("\x1b[0m", "") for line in JOB_101_LOG[8:14]]
+    # Without a job log the piece comes from the captured notebook log and the link opens the notebook test step.
+    timeout = failures[f"{LINUX}/c/c.ipynb"]
+    assert timeout["log_excerpt_source"] == "fragment_log" and timeout["log_excerpt_lines"] is None
+    assert "Timeout reached (1200s)" in timeout["log_excerpt"]
+    assert timeout["links"]["log_excerpt"] == f"https://github.com/owner/repo/actions/runs/{RUN_ID}/job/102#step:2:1"
     assert failures[f"{LINUX}/c/c.ipynb"]["category"] == "timeout" and failures[f"{LINUX}/c/c.ipynb"]["cell_index"] == 7
     harness = failures[f"{WINDOWS}/b/b.ipynb"]
     assert harness["category"] == "harness_error" and harness["error_class"] == "harness" and harness["links"]["logs_artifact"] is None
+    assert harness["log_excerpt"] is None and harness["log_excerpt_source"] is None
+    assert harness["links"]["log_excerpt"] == f"https://github.com/owner/repo/actions/runs/{RUN_ID}/job/201#step:1:1"
     assert rows[(LINUX, "b/b.ipynb")]["failure_id"] == f"{LINUX}/b/b.ipynb"
     assert sum(group["occurrences"] for group in report["error_groups"]) == 3
 
@@ -578,3 +619,28 @@ def test_runner_mapping_and_os_family():
     assert runner_label_to_os_device("aks-linux-8-cores-32gb") == ("ubuntu-22.04", "cpu")
     assert runner_label_to_os_device("macos-latest") == ("macos-13", "cpu")
     assert os_family("ubuntu-22.04") == "linux" and os_family("windows-2022") == "windows" and os_family("macos-13") == "macos" and os_family("x") == "unknown"
+
+
+def test_job_log_download_does_not_forward_the_token(monkeypatch):
+    requests = []
+
+    class Response(io.BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    def urlopen(request, timeout):
+        requests.append(request)
+        return Response(b"2026-10-08T01:00:00.0000000Z line\n" * 10)
+
+    monkeypatch.setattr(build_report.urllib.request, "urlopen", urlopen)
+    monkeypatch.setattr(build_report, "JOB_LOG_MAX_BYTES", 100)
+    api = build_report.GitHubApi("https://api.example.com", "owner/repo", "secret", build_report.Warnings())
+    text = api.get_job_log(7)
+    assert text == ("2026-10-08T01:00:00.0000000Z line\n" * 10)[:100]
+    request = requests[0]
+    assert request.full_url == "https://api.example.com/repos/owner/repo/actions/jobs/7/logs"
+    # Unredirected headers are not sent to the storage URL the API redirects to.
+    assert request.unredirected_hdrs.get("Authorization") == "Bearer secret" and "Authorization" not in request.headers

@@ -197,12 +197,34 @@
         "exception_message": {"$ref": "#/$defs/nullable_string"},
         "traceback_excerpt": {"$ref": "#/$defs/nullable_string"},
         "log_tail": {"$ref": "#/$defs/nullable_string"},
+        "log_excerpt": {
+          "$ref": "#/$defs/nullable_string",
+          "description": "Piece of the notebook output around the failure (from 5 lines before the first failure line, at most 80 lines; timestamps and ANSI codes removed). links.log_excerpt opens it in the job log."
+        },
+        "log_excerpt_source": {"enum": ["job_log", "fragment_log", null], "description": "job_log: taken from the GitHub job log (log_excerpt_lines and links.log_excerpt point at it); fragment_log: taken from the captured notebook log (job log unavailable)."},
+        "log_excerpt_lines": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": ["start", "end"],
+              "additionalProperties": false,
+              "properties": {
+                "start": {"type": "integer", "minimum": 1},
+                "end": {"type": "integer", "minimum": 1},
+                "error_line": {"type": ["integer", "null"], "minimum": 1, "description": "First line of the failure; null if no failure marker was found (the excerpt is then the end of the notebook output)."}
+              }
+            },
+            {"type": "null"}
+          ],
+          "description": "Line numbers of the excerpt in the job log step that ran the notebook (as in the GitHub log viewer, '#step:<step>:<line>')."
+        },
         "links": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
             "job": {"$ref": "#/$defs/nullable_string"},
             "treon_step": {"$ref": "#/$defs/nullable_string"},
+            "log_excerpt": {"$ref": "#/$defs/nullable_string", "description": "The job log opened at the first line of log_excerpt; the notebook test step when the line is unknown."},
             "logs_artifact": {"$ref": "#/$defs/nullable_string"},
             "log_file": {"$ref": "#/$defs/nullable_string", "description": "Path of the full log inside the logs artifact."},
             "notebook_source": {"$ref": "#/$defs/nullable_string"}
