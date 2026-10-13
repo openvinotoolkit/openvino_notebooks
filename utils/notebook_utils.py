@@ -197,7 +197,10 @@ def download_ir_model(model_xml_url: str, destination_folder: PathLike = None) -
                                files are saved to the current directory
     :return: path to downloaded xml model file
     """
-    model_bin_url = model_xml_url[:-4] + ".bin"
+    from urllib.parse import urlsplit, urlunsplit
+
+    parsed_url = urlsplit(model_xml_url)
+    model_bin_url = urlunsplit(parsed_url._replace(path=parsed_url.path[:-4] + ".bin"))
     model_xml_path = download_file(model_xml_url, directory=destination_folder, show_progress=False)
     download_file(model_bin_url, directory=destination_folder)
     return model_xml_path
