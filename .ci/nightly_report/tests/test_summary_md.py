@@ -293,7 +293,9 @@ def test_failure_logs_are_capped_and_fenced(report):
     target["log_excerpt"] = "\n".join(["~~~~ fence-like line"] + [f"line {i}" for i in range(60)] + ["x" * 500])
     text = section(render_markdown(report), "Failure logs")
     assert "~~~~~text\n~~~~ fence-like line" in text
-    assert "line 38" in text and "line 39" not in text and "… 22 more lines in the job log" in text
+    # The first line (notebook start) and the tail (the failure) are kept.
+    assert "~~~~ fence-like line\n… 22 lines in the job log\nline 22\n" in text
+    assert "line 21\n" not in text and "line 59" in text
     # No line link: the summary has no line range and no "open" link.
     assert "(lines " not in text and "[open in the job log](" not in text
 

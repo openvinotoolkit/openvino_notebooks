@@ -76,11 +76,14 @@ Batches are reshuffled every night, so history must be keyed by **(`notebook`, `
 ### Log excerpt of a failure
 
 `build_report.py` downloads the log of every test job with failures (GitHub API, `actions: read`) and finds the output of each
-failed notebook in it (from its `Testing notebook: <path>` line to the next notebook):
+failed notebook in it (its section starts at `Testing notebook: <path>` and ends at the next notebook or step):
 
-* `log_excerpt`: from 5 lines before the first failure line (`ERROR in testing`, `Kernel died`, `Traceback`, `timeout reached`, harness
-  errors) to the end of the notebook output, at most 80 lines; without a failure line, the last 80 lines of the output.
-  Timestamps and ANSI codes are removed.
+* `log_excerpt`: the piece of the section between the treon markers:
+  * starts at `Triggered test for test_<notebook>.ipynb` (the whole section when the notebook did not start, e.g. venv errors);
+  * ends at `test_<notebook>.ipynb     -- FAILED` plus the output treon prints with it (up to its `-----` result table), or,
+    without a FAILED line (dead kernel, `ERROR in testing` cell error, timeout), where the notebook process exits
+    (`OpenVINO after notebook execution` / `TEST DURATION [...]`);
+  * longer pieces keep the last 120 lines, moved up to start 5 lines before the failure line if needed. Timestamps and ANSI codes are removed.
 * `log_excerpt_lines`: `{start, end, error_line}` line numbers in the notebook test step, as shown by the GitHub log viewer.
 * `links.log_excerpt`: `<job url>#step:<step>:<start>`, which opens the job log at the first line of the excerpt.
 

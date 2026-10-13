@@ -199,7 +199,7 @@
         "log_tail": {"$ref": "#/$defs/nullable_string"},
         "log_excerpt": {
           "$ref": "#/$defs/nullable_string",
-          "description": "Piece of the notebook output around the failure (from 5 lines before the first failure line, at most 80 lines; timestamps and ANSI codes removed). links.log_excerpt opens it in the job log."
+          "description": "Output of the failed notebook: from 'Triggered test for <notebook>' to '<notebook> -- FAILED' and the output printed with it, or to the end of the notebook process when treon prints no FAILED line (dead kernel, cell error, timeout). Longer pieces keep the last 120 lines (starting at most 5 lines before the failure line); timestamps and ANSI codes removed. links.log_excerpt opens it in the job log."
         },
         "log_excerpt_source": {"enum": ["job_log", "fragment_log", null], "description": "job_log: taken from the GitHub job log (log_excerpt_lines and links.log_excerpt point at it); fragment_log: taken from the captured notebook log (job log unavailable)."},
         "log_excerpt_lines": {
@@ -211,7 +211,7 @@
               "properties": {
                 "start": {"type": "integer", "minimum": 1},
                 "end": {"type": "integer", "minimum": 1},
-                "error_line": {"type": ["integer", "null"], "minimum": 1, "description": "First line of the failure; null if no failure marker was found (the excerpt is then the end of the notebook output)."}
+                "error_line": {"type": ["integer", "null"], "minimum": 1, "description": "First line of the failure; the '-- FAILED' line of treon, otherwise the first failure marker (ERROR in testing, Kernel died, Traceback, timeout reached, harness errors); null if none was found."}
               }
             },
             {"type": "null"}

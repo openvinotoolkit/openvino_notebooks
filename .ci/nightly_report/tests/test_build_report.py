@@ -54,8 +54,8 @@ JOB_101_LOG = [
     "Testing notebook: /__w/repo/repo/notebooks/a/a.ipynb",  # 4
     "TEST DURATION [a.ipynb]: 1000.00 seconds",  # 5
     "Testing notebook: /__w/repo/repo/notebooks/b/b.ipynb",  # 6
-    "Start executing cell 0",  # 7
-    "Start executing cell 3",  # 8
+    "Triggered test for test_b.ipynb",  # 7
+    "Start executing cell 0",  # 8
     "\x1b[0;31mERROR in testing test_b.ipynb\x1b[0m",  # 9
     "FileNotFoundError: [Errno 2] No such file or directory: '/tmp/xyz/model.xml'",  # 10
     "TEST DURATION [b.ipynb]: 60.00 seconds",  # 11
@@ -411,9 +411,9 @@ def test_full_report(inputs: dict, tmp_path: Path):
     assert cell_error["links"]["notebook_source"] == f"https://github.com/owner/repo/blob/{inputs['head_sha']}/notebooks/b/b.ipynb"
     # The piece of the job log around the failure and the link to it.
     job_101 = f"https://github.com/owner/repo/actions/runs/{RUN_ID}/job/101"
-    assert cell_error["log_excerpt_source"] == "job_log" and cell_error["log_excerpt_lines"] == {"start": 6, "end": 11, "error_line": 9}
-    assert cell_error["links"]["log_excerpt"] == f"{job_101}#step:2:6"
-    assert cell_error["log_excerpt"].splitlines() == [line.replace("\x1b[0;31m", "").replace("\x1b[0m", "") for line in JOB_101_LOG[8:14]]
+    assert cell_error["log_excerpt_source"] == "job_log" and cell_error["log_excerpt_lines"] == {"start": 7, "end": 10, "error_line": 9}
+    assert cell_error["links"]["log_excerpt"] == f"{job_101}#step:2:7"
+    assert cell_error["log_excerpt"].splitlines() == [line.replace("\x1b[0;31m", "").replace("\x1b[0m", "") for line in JOB_101_LOG[9:13]]
     # Without a job log the piece comes from the captured notebook log and the link opens the notebook test step.
     timeout = failures[f"{LINUX}/c/c.ipynb"]
     assert timeout["log_excerpt_source"] == "fragment_log" and timeout["log_excerpt_lines"] is None

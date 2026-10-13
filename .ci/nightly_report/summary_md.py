@@ -237,9 +237,11 @@ def _failure_logs(report: dict) -> list:
     lines = ["## Failure logs", "", "The piece of the notebook output around each failure; _open in the job log_ shows it in the full log of the job.", ""]
     for failure in failures[:MAX_LOG_EXCERPTS]:
         excerpt_lines = str(failure["log_excerpt"]).splitlines()
-        shown = [_truncate(line, LOG_EXCERPT_LINE_MAX_CHARS) for line in excerpt_lines[:LOG_EXCERPT_MAX_LINES]]
         if len(excerpt_lines) > LOG_EXCERPT_MAX_LINES:
-            shown.append(f"… {len(excerpt_lines) - LOG_EXCERPT_MAX_LINES} more lines in the job log")
+            # The failure is at the end of the piece: keep its first line (the notebook start) and its tail.
+            tail = LOG_EXCERPT_MAX_LINES - 1
+            excerpt_lines = [excerpt_lines[0], f"… {len(excerpt_lines) - 1 - tail} lines in the job log", *excerpt_lines[-tail:]]
+        shown = [_truncate(line, LOG_EXCERPT_LINE_MAX_CHARS) for line in excerpt_lines]
         text = "\n".join(shown)
         numbers = failure.get("log_excerpt_lines") or {}
         where = f" (lines {numbers['start']}–{numbers['end']})" if numbers.get("start") and numbers.get("end") else ""
