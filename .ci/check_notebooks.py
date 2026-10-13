@@ -12,19 +12,22 @@ NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_NO_DEVICE = [
     Path("notebooks/auto-device/auto-device.ipynb"),  # auto device expected to be used
     Path("notebooks/convert-to-openvino/convert-to-openvino.ipynb"),  # device-agnostic
+    Path("notebooks/d-fine/dfine.ipynb"),  # reference notebook, no device widget
+    Path("notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb"),  # device-agnostic
     Path("notebooks/gpu-device/gpu-device.ipynb"),  # gpu device expected to be used
     Path("notebooks/hello-npu/hello-npu.ipynb"),  # npu device expected to be used
     Path("notebooks/model-server/model-server.ipynb"),  # can not change device in docker configuration on the fly
     Path("notebooks/openvino-tokenizers/openvino-tokenizers.ipynb"),  # cpu required for loading extensions
-    Path("notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb"),  # device-agnostic
     Path("notebooks/physical-ai-robotics/physical-ai-robotics.ipynb"),  # reference notebook, no inference performed here
 ]
 
 EXPECTED_NO_TELEMETRY = [
+    Path("notebooks/d-fine/dfine.ipynb"),  # reference notebook, no runnable code cells
     Path("notebooks/physical-ai-robotics/physical-ai-robotics.ipynb"),  # reference notebook, contains no runnable code
 ]
 
 EXPECTED_NO_INSTALL = [
+    Path("notebooks/d-fine/dfine.ipynb"),  # reference notebook, nothing to install or run
     Path("notebooks/physical-ai-robotics/physical-ai-robotics.ipynb"),  # reference notebook, nothing to install or run
 ]
 
