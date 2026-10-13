@@ -196,6 +196,46 @@ jobs:
             ./install_openvino_dependencies.sh -c=core -c=dev -c=gpu -y
           fi
 
+      # Image's compute-runtime 24.05 can't see Arc B-series; 25.13 is the last release built for Ubuntu 22.04
+      - name: Install GPU driver
+        if: ${{ env.TEST_DEVICE == 'gpu' && runner.os == 'Linux' }}
+        run: |
+          NEO_URL=https://github.com/intel/compute-runtime/releases/download/25.13.33276.16
+          IGC_URL=https://github.com/intel/intel-graphics-compiler/releases/download/v2.10.8
+          mkdir -p /tmp/neo && cd /tmp/neo
+          wget -q \
+            "${IGC_URL}/intel-igc-core-2_2.10.8+18926_amd64.deb" \
+            "${IGC_URL}/intel-igc-opencl-2_2.10.8+18926_amd64.deb" \
+            "${NEO_URL}/intel-level-zero-gpu_1.6.33276.16_amd64.deb" \
+            "${NEO_URL}/intel-opencl-icd_25.13.33276.16_amd64.deb" \
+            "${NEO_URL}/libigdgmm12_22.7.0_amd64.deb"
+          # IGC 2.x packages have new names and would clash with the 1.x ones from the image
+          dpkg --purge intel-opencl-icd intel-level-zero-gpu intel-igc-opencl intel-igc-core
+          dpkg -i *.deb
+          cd / && rm -rf /tmp/neo
+          dpkg -l | grep -E 'intel-(opencl-icd|igc-core|level-zero-gpu)|libigdgmm'
+
+      - name: GPU diagnostics (OpenVINO devices)
+        if: ${{ env.TEST_DEVICE == 'gpu' && runner.os == 'Linux' }}
+        continue-on-error: true
+        run: |
+          clinfo -l || true
+          VENV=$(mktemp -d)/ov_devices_venv
+          trap 'rm -rf "$(dirname "$VENV")"' EXIT
+          python3 -m venv "$VENV"
+          "$VENV/bin/python" -m pip install -q --no-cache-dir openvino
+          "$VENV/bin/python" - <<'EOF'
+          import openvino as ov
+
+          core = ov.Core()
+          print(f"OpenVINO {ov.get_version()}")
+          print(f"Available devices: {core.available_devices}")
+          for device in core.available_devices:
+              name = core.get_property(device, "FULL_DEVICE_NAME")
+              kind = core.get_property(device, "DEVICE_TYPE") if device.startswith("GPU") else ""
+              print(f"  {device}: {name} {kind}")
+          EOF
+
       - name: Setup Python ${{ inputs.python }}
         uses: openvinotoolkit/openvino/.github/actions/setup_python@b006f55018555f304839d6550bc4a0f9953549de
         with:
