@@ -1,0 +1,86 @@
+# Configuration for the "Pull Request Labeler" workflow (.github/workflows/labeler.yml).
+# Syntax: https://github.com/actions/labeler#match-object
+#
+# Keys are existing repository labels. Labels are only ever added, never removed
+# (`sync-labels` is disabled), so labels set manually or by Dependabot are preserved.
+# Labels that cannot be derived from changed files (e.g. `bug`, `enhancement`,
+# `new notebook`, `wip`) are intentionally not listed here.
+
+# Repository-level docs, notebook READMEs (including the `notebooks/README.md` index),
+# or PRs that change only Markdown files.
+documentation:
+  - any:
+      - changed-files:
+          - any-glob-to-any-file:
+              - '*.md'
+              - 'notebooks/**/README.md'
+              - 'supplementary_materials/README.md'
+              - '.docker/README.md'
+              - '.github/ISSUE_TEMPLATE/**'
+      - changed-files:
+          - all-globs-to-all-files: '**/*.md'
+
+# Dependency manifests: repository-level ones (pip, Pipfile, Binder, npm) and requirements
+# files of individual notebooks.
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '*requirements*.txt'
+          - '.ci/*requirements*.txt'
+          - 'notebooks/**/*requirements*.txt'
+          - '.docker/Pipfile'
+          - '.docker/Pipfile.lock'
+          - '.binder/*.txt'
+          - 'selector/package.json'
+          - 'selector/package-lock.json'
+          - '.github/dependabot.yml'
+
+# CI code: workflows and the scripts they run. The per-notebook lists in `.ci/`
+# (spellcheck wordlist, skip/ignore lists) are excluded, as most notebook PRs touch them.
+github_actions:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/workflows/**'
+          - '.ci/**/*.{py,sh}'
+          - '.ci/spellcheck/.pyspelling.yml'
+
+python:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.py'
+          - '*requirements*.txt'
+          - '.ci/*requirements*.txt'
+          - '.docker/Pipfile'
+          - '.docker/Pipfile.lock'
+
+# The notebooks selector web app and any other JS/TS sources.
+javascript:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'selector/**'
+          - '**/*.{js,jsx,mjs,cjs,ts,tsx}'
+
+# Device-specific notebooks: the device name is a separate word in the notebook folder name
+# (e.g. `gpu-device`, `hello-npu`).
+'category: CPU':
+  - changed-files:
+      - any-glob-to-any-file: 'notebooks/{cpu,cpu-*,*-cpu,*-cpu-*}/**'
+
+'category: GPU':
+  - changed-files:
+      - any-glob-to-any-file: 'notebooks/{gpu,gpu-*,*-gpu,*-gpu-*}/**'
+
+'category: NPU':
+  - changed-files:
+      - any-glob-to-any-file: 'notebooks/{npu,npu-*,*-npu,*-npu-*}/**'
+
+'category: AUTO':
+  - changed-files:
+      - any-glob-to-any-file: 'notebooks/auto-device/**'
+
+# Quantization notebooks built around NNCF.
+'category: NNCF':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'notebooks/*quantiz*/**'
+          - 'notebooks/*nncf*/**'
