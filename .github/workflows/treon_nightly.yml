@@ -46,18 +46,15 @@ jobs:
       batch_0: ${{ steps.split.outputs.batch_0 }}
       batch_1: ${{ steps.split.outputs.batch_1 }}
       batch_2: ${{ steps.split.outputs.batch_2 }}
+      batch_3: ${{ steps.split.outputs.batch_3 }}
+      batch_4: ${{ steps.split.outputs.batch_4 }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Collect and split notebooks into batches
         id: split
-        env:
-          # Pull request runs test a small sample of notebooks to check the pipeline quickly
-          NOTEBOOKS_LIST: ${{ github.event_name == 'pull_request' && '.ci/nightly_sample_notebooks.txt' || '' }}
-        run: |
-          python3 .ci/split_notebooks.py --num_batches 3 --seed "${{ github.run_id }}" --plan_file nightly_plan/plan.json \
-            ${NOTEBOOKS_LIST:+--notebooks_list "$NOTEBOOKS_LIST"}
+        run: python3 .ci/split_notebooks.py --num_batches 5 --seed "${{ github.run_id }}" --plan_file nightly_plan/plan.json
 
       - name: Upload batch plan for the nightly dashboard
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -74,12 +71,12 @@ jobs:
       matrix:
         runs_on: [aks-linux-8-cores-32gb]
         python: ['3.11', '3.12', '3.13']
-        batch: ['batch_0', 'batch_1', 'batch_2']
+        batch: ['batch_0', 'batch_1', 'batch_2', 'batch_3', 'batch_4']
     uses: ./.github/workflows/job_unix.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 }}
+      test_list: ${{ needs.collect_notebooks.outputs[matrix.batch] }}
       batch: ${{ matrix.batch }}
       separate_venv: true
       ignore_list: .ci/tensorflow.txt
@@ -93,12 +90,12 @@ jobs:
       matrix:
         runs_on: [aks-win-16-cores-32gb-full]
         python: ['3.11', '3.12', '3.13']
-        batch: ['batch_0', 'batch_1', 'batch_2']
+        batch: ['batch_0', 'batch_1', 'batch_2', 'batch_3', 'batch_4']
     uses: ./.github/workflows/job_windows.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      test_list: ${{ matrix.batch == 'batch_0' && needs.collect_notebooks.outputs.batch_0 || matrix.batch == 'batch_1' && needs.collect_notebooks.outputs.batch_1 || matrix.batch == 'batch_2' && needs.collect_notebooks.outputs.batch_2 }}
+      test_list: ${{ needs.collect_notebooks.outputs[matrix.batch] }}
       batch: ${{ matrix.batch }}
       separate_venv: true
       ignore_list: .ci/tensorflow.txt
@@ -141,7 +138,7 @@ jobs:
         run: |
           python .ci/aggregate_notebooks_reports.py
       - name: Upload aggregated report
-        # The selector (GitHub Pages) uses the latest artifact of this name, which must not come from a sample run
+        # The selector (GitHub Pages) uses the latest artifact of this name, which must not come from a pull request run
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
