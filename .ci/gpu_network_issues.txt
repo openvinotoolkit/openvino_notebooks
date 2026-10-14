@@ -2,6 +2,7 @@ notebooks/3D-pose-estimation-webcam/3D-pose-estimation.ipynb
 notebooks/aloha-act/aloha-act.ipynb
 notebooks/async-api/async-api.ipynb
 notebooks/auto-device/auto-device.ipynb
+notebooks/bernini-r-image-video/bernini-r-image-video.ipynb
 notebooks/ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb
 notebooks/depth-anything/depth-anything.ipynb
 notebooks/freevc-voice-conversion/freevc-voice-conversion.ipynb
@@ -35,9 +36,11 @@ notebooks/tensorflow-classification-to-openvino/tensorflow-classification-to-ope
 notebooks/text-to-image-genai/text-to-image-genai.ipynb
 notebooks/text-to-speech-genai/text-to-speech-genai.ipynb
 notebooks/tflite-to-openvino/tflite-to-openvino.ipynb
+notebooks/torchvision-zoo-to-openvino/convnext-classification.ipynb
 notebooks/vehicle-detection-and-recognition/vehicle-detection-and-recognition.ipynb
 notebooks/vision-monodepth/vision-monodepth.ipynb
 notebooks/vjepa-2.1/vjepa2-video-embeddings.ipynb
 notebooks/wav2lip/wav2lip.ipynb
+notebooks/whisper-asr-genai/whisper-asr-genai.ipynb
 notebooks/yolov11-optimization/yolov11-instance-segmentation.ipynb
 notebooks/yolov11-optimization/yolov11-object-detection.ipynb
