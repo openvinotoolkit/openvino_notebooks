@@ -78,7 +78,7 @@ def test_split_log_strips_timestamps_bom_and_keeps_numbering():
 def test_cell_error_piece_runs_from_trigger_to_process_exit(newline):
     lines = lines_of(SETUP, STEP, PASSED, CELL_ERROR, AFTER)
     piece = failure_excerpt(job_log(lines, newline), "b/b.ipynb")
-    assert piece["start"] == line_of(lines, "Triggered test for test_b.ipynb")
+    assert piece["start"] == piece["test_start"] == line_of(lines, "Triggered test for test_b.ipynb")
     assert piece["error_line"] == line_of(lines, CELL_ERROR[8])
     assert piece["end"] == line_of(lines, "ValueError: boom")
     text = piece["text"].splitlines()
@@ -113,13 +113,14 @@ def test_notebook_that_did_not_start_shows_its_section():
     lines = lines_of(STEP, ["Testing notebook: /__w/r/r/notebooks/b/b.ipynb", "Failed to create virtual environment: boom"], AFTER)
     piece = failure_excerpt(job_log(lines), "b/b.ipynb")
     assert piece["start"] == line_of(lines, lines[len(STEP)]) and piece["error_line"] == piece["start"] + 1
+    assert piece["test_start"] is None
 
 
 def test_timeout_excerpt_of_nested_notebook_on_windows_paths():
     windows = [line.replace("/__w/r/r/notebooks/c/nested/c.ipynb", "C:\\runner\\_work\\r\\r\\notebooks\\c\\nested\\c.ipynb") for line in TIMEOUT]
     lines = lines_of(SETUP, STEP, windows, AFTER)
     piece = failure_excerpt(job_log(lines, "\r\n"), "c/nested/c.ipynb")
-    assert piece["start"] == line_of(lines, "Triggered test for test_c.ipynb")
+    assert piece["start"] == piece["test_start"] == line_of(lines, "Triggered test for test_c.ipynb")
     assert piece["error_line"] == line_of(lines, TIMEOUT[3])
     assert "timeout reached (1200s)" in piece["text"] and "TEST DURATION" not in piece["text"]
 
@@ -141,6 +142,8 @@ def test_long_output_keeps_the_end_and_the_failure_line():
     lines = lines_of(STEP, ["Testing notebook: /__w/r/r/notebooks/d/d.ipynb", "Triggered test for test_d.ipynb", *cells, *error], AFTER)
     piece = failure_excerpt(job_log(lines), "d/d.ipynb")
     assert piece["start"] == piece["error_line"] - CONTEXT_BEFORE and piece["end"] - piece["start"] + 1 == EXCERPT_MAX_LINES
+    # The excerpt is cut, but the test start still points at the trigger line.
+    assert piece["test_start"] == line_of(lines, "Triggered test for test_d.ipynb") < piece["start"]
 
 
 def test_section_ends_at_the_next_step():

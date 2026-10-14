@@ -177,6 +177,7 @@ def _by_config(summary: dict) -> list:
 def _failure_links(failure: dict) -> str:
     links = failure.get("links") or {}
     labeled = (
+        ("test start", links.get("test_start")),
         ("failure log", links.get("log_excerpt")),
         ("job", links.get("job")),
         ("logs", links.get("logs_artifact")),
@@ -215,6 +216,7 @@ def _failures(report: dict) -> list:
         ("Error", f"exception type and message parsed from the notebook output (first {ERROR_MAX_CHARS} characters)."),
         (
             "Links",
+            "_test start_: the job log opened at the line where the test of the notebook started (`Triggered test for …`); "
             "_failure log_: the job log opened at the failure of the notebook (the piece is shown under *Failure logs*); "
             "_job_: log of the test job; _logs_: artifact with the full output of the notebooks that did not pass; "
             "_source_: the notebook at the tested commit.",

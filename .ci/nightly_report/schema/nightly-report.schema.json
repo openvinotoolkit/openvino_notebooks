@@ -211,7 +211,8 @@
               "properties": {
                 "start": {"type": "integer", "minimum": 1},
                 "end": {"type": "integer", "minimum": 1},
-                "error_line": {"type": ["integer", "null"], "minimum": 1, "description": "First line of the failure; the '-- FAILED' line of treon, otherwise the first failure marker (ERROR in testing, Kernel died, Traceback, timeout reached, harness errors); null if none was found."}
+                "error_line": {"type": ["integer", "null"], "minimum": 1, "description": "First line of the failure; the '-- FAILED' line of treon, otherwise the first failure marker (ERROR in testing, Kernel died, Traceback, timeout reached, harness errors); null if none was found."},
+                "test_start": {"type": ["integer", "null"], "minimum": 1, "description": "The 'Triggered test for <notebook>' line where the test of the notebook started; null if the notebook did not start."}
               }
             },
             {"type": "null"}
@@ -225,6 +226,7 @@
             "job": {"$ref": "#/$defs/nullable_string"},
             "treon_step": {"$ref": "#/$defs/nullable_string"},
             "log_excerpt": {"$ref": "#/$defs/nullable_string", "description": "The job log opened at the first line of log_excerpt; the notebook test step when the line is unknown."},
+            "test_start": {"$ref": "#/$defs/nullable_string", "description": "The job log opened at the 'Triggered test for <notebook>' line where the test of the notebook started; null when the line is unknown."},
             "logs_artifact": {"$ref": "#/$defs/nullable_string"},
             "log_file": {"$ref": "#/$defs/nullable_string", "description": "Path of the full log inside the logs artifact."},
             "notebook_source": {"$ref": "#/$defs/nullable_string"}

@@ -703,12 +703,19 @@ class ReportBuilder:
             job_log = self._job_log(job)
             piece = failure_excerpt(job_log, notebook) if job_log else None
             if piece:
-                lines = {key: piece[key] for key in ("start", "end", "error_line")}
-                return {"text": piece["text"], "source": "job_log", "lines": lines, "url": self.links.step(job["url"], step, piece["start"])}
+                lines = {key: piece[key] for key in ("start", "end", "error_line", "test_start")}
+                test_start = self.links.step(job["url"], step, piece["test_start"]) if piece["test_start"] else None
+                return {
+                    "text": piece["text"],
+                    "source": "job_log",
+                    "lines": lines,
+                    "url": self.links.step(job["url"], step, piece["start"]),
+                    "test_start_url": test_start,
+                }
             if job_log:
                 self.warnings.add(f"Output of {notebook} not found in the log of job {job['id']}.")
         text = file_excerpt(fragment_log) if fragment_log else None
-        return {"text": text, "source": "fragment_log" if text else None, "lines": None, "url": job["treon_step_url"]}
+        return {"text": text, "source": "fragment_log" if text else None, "lines": None, "url": job["treon_step_url"], "test_start_url": None}
 
     def collect_failures(self, failing: dict[str, tuple[dict, dict]], results: list[dict]) -> list[dict]:
         failures = []
@@ -734,7 +741,7 @@ class ReportBuilder:
                 excerpt = self._log_excerpt(job, row["notebook"], text)
             except Exception as error:  # the log excerpt must never break the report
                 self.warnings.add(f"Log excerpt failed for {row['failure_id']}: {error}")
-                excerpt = {"text": None, "source": None, "lines": None, "url": job["treon_step_url"]}
+                excerpt = {"text": None, "source": None, "lines": None, "url": job["treon_step_url"], "test_start_url": None}
             failures.append(
                 {
                     "id": row["failure_id"],
@@ -758,6 +765,7 @@ class ReportBuilder:
                         "job": job["url"],
                         "treon_step": job["treon_step_url"],
                         "log_excerpt": excerpt["url"],
+                        "test_start": excerpt["test_start_url"],
                         "logs_artifact": job["logs_artifact_url"],
                         "log_file": log_file,
                         "notebook_source": self.links.blob(self.head_sha, f"{self.notebooks_dir}/{row['notebook']}"),

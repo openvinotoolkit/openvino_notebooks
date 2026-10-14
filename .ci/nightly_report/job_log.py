@@ -72,8 +72,8 @@ def _treon_start(lines: list[str], start: int, end: int, basename: str) -> tuple
     return None, None
 
 
-def _span(lines: list[str], notebook: str) -> Optional[tuple[int, int, int, Optional[int]]]:
-    """(step header, first, end (exclusive), FAILED line or None) of the output of the failed notebook.
+def _span(lines: list[str], notebook: str) -> Optional[tuple[int, int, int, Optional[int], Optional[int]]]:
+    """(step header, first, end (exclusive), FAILED line or None, 'Triggered test for' line or None) of the failed notebook output.
 
     The piece starts at 'Triggered test for <notebook>' and ends at '<notebook>     -- FAILED' followed by the output treon
     prints with it (up to its '-----' result table). Without a FAILED line (cell error, dead kernel, timeout), it ends where
@@ -83,12 +83,13 @@ def _span(lines: list[str], notebook: str) -> Optional[tuple[int, int, int, Opti
     section = _notebook_start(lines, notebook)
     if section is not None:
         section_end = next((i for i in range(section + 1, len(lines)) if lines[i].startswith(SECTION_END)), len(lines))
-        first, name = _treon_start(lines, section, section_end, basename)
-        first = section if first is None else first
+        trigger, name = _treon_start(lines, section, section_end, basename)
+        first = section if trigger is None else trigger
     else:  # a log without validate_notebooks.py sections: only treon output
-        first, name = _treon_start(lines, 0, len(lines), basename)
-        if first is None:
+        trigger, name = _treon_start(lines, 0, len(lines), basename)
+        if trigger is None:
             return None
+        first = trigger
         section_end = next(
             (i for i in range(first + 1, len(lines)) if lines[i].startswith(SECTION_END + (TREON_START,))), len(lines)
         )
@@ -105,7 +106,7 @@ def _span(lines: list[str], notebook: str) -> Optional[tuple[int, int, int, Opti
         end = next((i for i in range(first + 1, section_end) if lines[i].startswith(RUN_END)), section_end)
     while end > first + 1 and not lines[end - 1].strip():
         end -= 1
-    return step, first, end, failed
+    return step, first, end, failed, trigger
 
 
 def _excerpt(lines: list[str], start: int, end: int, anchor: Optional[int] = None) -> tuple[int, int, Optional[int], str]:
@@ -129,14 +130,15 @@ def _excerpt(lines: list[str], start: int, end: int, anchor: Optional[int] = Non
 def failure_excerpt(log_text: str, notebook: str) -> Optional[dict]:
     """The failure piece of `notebook` in a job log, or None when the notebook output is not found.
 
-    Returns {"text", "start", "end", "error_line"} with line numbers of the GitHub log viewer, relative to the step that
-    ran the notebook (error_line is None when no failure marker was found).
+    Returns {"text", "start", "end", "error_line", "test_start"} with line numbers of the GitHub log viewer, relative to the
+    step that ran the notebook (error_line is None when no failure marker was found; test_start, the 'Triggered test for'
+    line, is None when the notebook did not start).
     """
     lines = split_log(log_text or "")
     span = _span(lines, notebook)
     if span is None:
         return None
-    step, start, end, failed = span
+    step, start, end, failed, trigger = span
     first, last, anchor, text = _excerpt(lines, start, end, failed)
     if not text:
         return None
@@ -145,6 +147,7 @@ def failure_excerpt(log_text: str, notebook: str) -> Optional[dict]:
         "start": first - step + 1,
         "end": last - step + 1,
         "error_line": anchor - step + 1 if anchor is not None else None,
+        "test_start": trigger - step + 1 if trigger is not None else None,
     }
 
 

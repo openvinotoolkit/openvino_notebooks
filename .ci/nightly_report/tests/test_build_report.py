@@ -411,8 +411,8 @@ def test_full_report(inputs: dict, tmp_path: Path):
     assert cell_error["links"]["notebook_source"] == f"https://github.com/owner/repo/blob/{inputs['head_sha']}/notebooks/b/b.ipynb"
     # The piece of the job log around the failure and the link to it.
     job_101 = f"https://github.com/owner/repo/actions/runs/{RUN_ID}/job/101"
-    assert cell_error["log_excerpt_source"] == "job_log" and cell_error["log_excerpt_lines"] == {"start": 7, "end": 10, "error_line": 9}
-    assert cell_error["links"]["log_excerpt"] == f"{job_101}#step:2:7"
+    assert cell_error["log_excerpt_source"] == "job_log" and cell_error["log_excerpt_lines"] == {"start": 7, "end": 10, "error_line": 9, "test_start": 7}
+    assert cell_error["links"]["log_excerpt"] == cell_error["links"]["test_start"] == f"{job_101}#step:2:7"
     assert cell_error["log_excerpt"].splitlines() == [line.replace("\x1b[0;31m", "").replace("\x1b[0m", "") for line in JOB_101_LOG[9:13]]
     # Without a job log the piece comes from the captured notebook log and the link opens the notebook test step.
     timeout = failures[f"{LINUX}/c/c.ipynb"]
@@ -424,6 +424,7 @@ def test_full_report(inputs: dict, tmp_path: Path):
     assert harness["category"] == "harness_error" and harness["error_class"] == "harness" and harness["links"]["logs_artifact"] is None
     assert harness["log_excerpt"] is None and harness["log_excerpt_source"] is None
     assert harness["links"]["log_excerpt"] == f"https://github.com/owner/repo/actions/runs/{RUN_ID}/job/201#step:1:1"
+    assert harness["links"]["test_start"] is None
     assert rows[(LINUX, "b/b.ipynb")]["failure_id"] == f"{LINUX}/b/b.ipynb"
     assert sum(group["occurrences"] for group in report["error_groups"]) == 3
 

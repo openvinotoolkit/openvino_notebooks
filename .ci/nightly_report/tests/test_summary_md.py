@@ -275,10 +275,11 @@ def test_failure_logs_section(report):
     target["log_excerpt"] = "Start executing cell 29\nKernel died while waiting for execute reply.\nTraceback (most recent call last):\n<module> | x"
     target["log_excerpt_lines"] = {"start": 168, "end": 171, "error_line": 169}
     target["links"]["log_excerpt"] = url
+    target["links"]["test_start"] = start_url = url.replace(":168", ":140")
     markdown = render_markdown(report)
 
     row = table_row(markdown, "`async-api/async-api.ipynb` | cpu-windows-2022-py3.10")
-    assert f"[failure log]({url})" in row
+    assert f"[test start]({start_url}) · [failure log]({url})" in row
     text = section(markdown, "Failure logs")
     assert "<details><summary>async-api/async-api.ipynb · cpu-windows-2022-py3.10 · failed (lines 168–171)</summary>" in text
     assert f"[open in the job log]({url})" in text

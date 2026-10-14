@@ -84,8 +84,11 @@ failed notebook in it (its section starts at `Testing notebook: <path>` and ends
     without a FAILED line (dead kernel, `ERROR in testing` cell error, timeout), where the notebook process exits
     (`OpenVINO after notebook execution` / `TEST DURATION [...]`);
   * longer pieces keep the last 120 lines, moved up to start 5 lines before the failure line if needed. Timestamps and ANSI codes are removed.
-* `log_excerpt_lines`: `{start, end, error_line}` line numbers in the notebook test step, as shown by the GitHub log viewer.
+* `log_excerpt_lines`: `{start, end, error_line, test_start}` line numbers in the notebook test step, as shown by the GitHub log viewer
+  (`test_start`: the `Triggered test for` line, null if the notebook did not start).
 * `links.log_excerpt`: `<job url>#step:<step>:<start>`, which opens the job log at the first line of the excerpt.
+* `links.test_start`: `<job url>#step:<step>:<test_start>`, which opens the job log at the line where the test of the notebook
+  started (`Triggered test for test_<notebook>.ipynb`); null when the line is unknown.
 
 If a job log is unavailable, the excerpt is taken from the captured notebook log in the fragment (`log_excerpt_source: fragment_log`,
 `log_excerpt_lines: null`) and `links.log_excerpt` opens the notebook test step. `summary.md` shows the excerpts in a *Failure logs* section.

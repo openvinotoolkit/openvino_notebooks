@@ -16,3 +16,15 @@ notebooks/stable-diffusion-v3-torch-fx/stable-diffusion-v3-torch-fx.ipynb
 notebooks/tflite-to-openvino/tflite-to-openvino.ipynb
 # skipped_notebooks.yml: skipped on all OSes.
 notebooks/gpu-device/gpu-device.ipynb
+# Plain passing notebook (pure OpenVINO API, no model downloads from hubs).
+notebooks/openvino-api/openvino-api.ipynb
+# skipped_notebooks.yml: skipped by device (cpu, gpu): never run on CPU runners.
+notebooks/hello-npu/hello-npu.ipynb
+# Fails on every Ubuntu Python in recent nightlies (2026-10-13/14); skipped on Windows: consistent failure.
+notebooks/paddleocr_vl/paddleocr_vl.ipynb
+# Fails on Ubuntu 3.11/3.12 in recent nightlies; skipped on Windows and Python 3.13: failure mixed with skips.
+notebooks/aloha-act/aloha-act.ipynb
+# Failed once (Ubuntu 3.12, 2026-10-14) and passed otherwise: candidate flaky notebook.
+notebooks/mobileclip-video-search/mobileclip-video-search.ipynb
+# Second notebook of a multi-notebook directory; failed once (Ubuntu 3.12) and skipped on Windows.
+notebooks/llm-rag-langchain/llm-rag-langchain-eval.ipynb
