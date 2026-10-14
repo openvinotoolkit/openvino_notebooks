@@ -14,6 +14,7 @@ NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
 
 MAX_RETRIES = 3
 RETRY_BACKOFF = 2.0  # seconds, doubles each retry
+RETRY_STATUS_CODES = {429, 500, 502, 503, 504}  # rate limiting and temporary server errors
 
 EXCEPTIONS_URLs = [
     "medium.com",
@@ -182,11 +183,19 @@ def main():
         try:
             status_code = None
             for attempt in range(MAX_RETRIES):
-                get = requests.get(url, timeout=10)
+                try:
+                    get = requests.get(url, timeout=10)
+                except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+                    # temporary network problem, retry and only report it if it keeps failing
+                    if attempt == MAX_RETRIES - 1:
+                        raise
+                    time.sleep(RETRY_BACKOFF * (2**attempt))
+                    continue
                 status_code = get.status_code
-                if status_code != 429:
+                if status_code not in RETRY_STATUS_CODES:
                     break
-                time.sleep(RETRY_BACKOFF * (2**attempt))
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(RETRY_BACKOFF * (2**attempt))
 
             if status_code not in [200, 202]:
                 if status_code == 429:
