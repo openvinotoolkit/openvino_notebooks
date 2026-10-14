@@ -1,0 +1,2 @@
+notebooks/flux-fill/flux-fill.ipynb
+notebooks/flux.1-image-generation/flux.1-image-generation.ipynb

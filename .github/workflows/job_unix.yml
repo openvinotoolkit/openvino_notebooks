@@ -85,6 +85,7 @@ jobs:
             else if (runner.includes('gpu')) { deviceTag = 'gpu'; testDevice = 'gpu'; }
             const testReportDir = `${deviceTag}-${osName}-${{ inputs.python }}`;
             core.exportVariable('OS_NAME', osName);
+            core.exportVariable('DEVICE_TAG', deviceTag);
             core.exportVariable('TEST_DEVICE', testDevice);
             core.exportVariable('TEST_REPORT_DIR', testReportDir);
             core.exportVariable('GIT_CLONE_PROTECTION_ACTIVE', 'false');
@@ -217,7 +218,8 @@ jobs:
 
       - name: GPU diagnostics (OpenVINO devices)
         if: ${{ env.TEST_DEVICE == 'gpu' && runner.os == 'Linux' }}
-        continue-on-error: true
+        env:
+          EXPECTED_GPU_TYPE: ${{ env.DEVICE_TAG == 'dgpu' && 'DISCRETE' || env.DEVICE_TAG == 'igpu' && 'INTEGRATED' || '' }}
         run: |
           clinfo -l || true
           VENV=$(mktemp -d)/ov_devices_venv
@@ -225,15 +227,31 @@ jobs:
           python3 -m venv "$VENV"
           "$VENV/bin/python" -m pip install -q --no-cache-dir openvino
           "$VENV/bin/python" - <<'EOF'
+          import os
+          import sys
+
           import openvino as ov
 
           core = ov.Core()
           print(f"OpenVINO {ov.get_version()}")
           print(f"Available devices: {core.available_devices}")
+          gpu_types = {}
           for device in core.available_devices:
               name = core.get_property(device, "FULL_DEVICE_NAME")
-              kind = core.get_property(device, "DEVICE_TYPE") if device.startswith("GPU") else ""
+              kind = ""
+              if device.startswith("GPU"):
+                  kind = core.get_property(device, "DEVICE_TYPE")
+                  gpu_types[device] = kind
               print(f"  {device}: {name} {kind}")
+
+          expected = os.environ["EXPECTED_GPU_TYPE"]
+          if not gpu_types:
+              sys.exit("No GPU device is visible to OpenVINO")
+          if expected:
+              expected_type = getattr(ov.properties.device.Type, expected)
+              wrong = {d: t for d, t in gpu_types.items() if t != expected_type}
+              if wrong:
+                  sys.exit(f"Expected only {expected} GPUs, got: {wrong}")
           EOF
 
       - name: Setup Python ${{ inputs.python }}

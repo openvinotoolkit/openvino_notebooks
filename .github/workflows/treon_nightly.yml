@@ -110,8 +110,8 @@ jobs:
       container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:${{ needs.get_docker_tag.outputs.docker_tag }}'
       options: '--group-add 44 --group-add 993 --device /dev/dri/renderD128:/dev/dri/renderD128'
       separate_venv: true
-      # Skip notebooks that download resources from not-allowed domains or fail on network errors (e.g. 403)
-      ignore_list: .ci/third_party_resources.txt .ci/gpu_network_issues.txt
+      # Skip notebooks that download resources from not-allowed domains, fail on network errors (e.g. 403) or exceed iGPU memory
+      ignore_list: .ci/third_party_resources.txt .ci/gpu_network_issues.txt .ci/gpu_oom.txt
 
   build_treon_dgpu:
     needs: [collect_notebooks, get_docker_tag]
@@ -128,7 +128,8 @@ jobs:
       test_list: ${{ needs.collect_notebooks.outputs[matrix.batch] }}
       batch: ${{ matrix.batch }}
       container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:${{ needs.get_docker_tag.outputs.docker_tag }}'
-      options: '--group-add 44 --group-add 993 --device /dev/dri:/dev/dri'
+      # renderD128 is the integrated GPU on these hosts; pass only the discrete one so "GPU" maps to it
+      options: '--group-add 44 --group-add 993 --device /dev/dri/renderD129:/dev/dri/renderD129'
       separate_venv: true
       # Skip notebooks that download resources from not-allowed domains or fail on network errors (e.g. 403)
       ignore_list: .ci/third_party_resources.txt .ci/gpu_network_issues.txt

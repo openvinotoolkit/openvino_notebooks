@@ -26,6 +26,7 @@ notebooks/person-counting-webcam/person-counting.ipynb
 notebooks/person-tracking-webcam/person-tracking.ipynb
 notebooks/pose-estimation-webcam/pose-estimation.ipynb
 notebooks/rf-detr-object-detection/rf-detr-object-detection.ipynb
+notebooks/sam2-video-segmentation/segment-anything-2-video.ipynb
 notebooks/siglip-zero-shot-image-classification/siglip-zero-shot-image-classification.ipynb
 notebooks/smoldocling/smoldocling.ipynb
 notebooks/smolvlm2/smolvlm2.ipynb
