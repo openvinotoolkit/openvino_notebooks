@@ -25,8 +25,7 @@ treon_nightly.yml
 * `summary.md` is also published as the job summary of the workflow run. Every table in it is followed by a short explanation of
   its columns and of how the values are calculated.
 * `pull_request` runs of the workflow test all notebooks, like the scheduled nightly, but do not upload `notebooks-status-map.json`;
-  their reports have `run.event == "pull_request"`. A smaller set of notebooks can be tested with `split_notebooks.py --notebooks_list`,
-  e.g. [`.ci/nightly_sample_notebooks.txt`](../nightly_sample_notebooks.txt).
+  their reports have `run.event == "pull_request"`.
 
 The files are described by JSON Schemas in [`schema/`](./schema): `nightly-report.schema.json` (the dashboard contract),
 `fragment.schema.json` and `plan.schema.json` (internal).

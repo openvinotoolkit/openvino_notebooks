@@ -3,7 +3,6 @@
 Outputs newline-separated notebook paths for each batch as GitHub Actions
 multiline outputs (batch_0 … batch_N-1). With --plan_file, the split is also
 written as JSON for the nightly dashboard (nightly_report/schema/plan.schema.json).
-With --notebooks_list, only the listed notebooks are split instead of all of them.
 
 Usage (in a workflow step):
     python .ci/split_notebooks.py --notebooks_dir notebooks \
@@ -23,28 +22,6 @@ def collect_notebooks(notebooks_dir: Path) -> list[str]:
     """Return sorted list of notebook paths (relative to repo root), excluding test_ prefixed files."""
     notebooks = sorted(str(p) for p in notebooks_dir.rglob("*.ipynb") if not p.name.startswith("test_"))
     return notebooks
-
-
-def read_notebooks_list(list_file: Path, notebooks_dir: Path) -> list[str]:
-    """Return sorted notebook paths listed in *list_file*: one path relative to the repo root per line, '#' starts a comment.
-
-    Paths are returned in the format of collect_notebooks(). Raises ValueError for entries that are not notebooks inside *notebooks_dir*.
-    """
-    root = Path(notebooks_dir).resolve()
-    notebooks: set[str] = set()
-    invalid: list[str] = []
-    for raw_line in Path(list_file).read_text(encoding="utf-8").splitlines():
-        line = raw_line.split("#", 1)[0].strip()
-        if not line:
-            continue
-        path = Path(line).resolve()
-        if path.suffix != ".ipynb" or path.name.startswith("test_") or not path.is_file() or not path.is_relative_to(root):
-            invalid.append(line)
-            continue
-        notebooks.add(str(Path(notebooks_dir) / path.relative_to(root)))
-    if invalid:
-        raise ValueError(f"Invalid entries in notebooks list '{list_file}' (expected existing notebooks inside '{notebooks_dir}'): {invalid}")
-    return sorted(notebooks)
 
 
 def split_into_batches(items: list[str], num_batches: int) -> list[list[str]]:
@@ -118,26 +95,10 @@ def main() -> None:
         default=None,
         help="Optional path to write the batch plan JSON to (nightly dashboard data)",
     )
-    parser.add_argument(
-        "--notebooks_list",
-        type=Path,
-        default=None,
-        help="Optional file listing the notebooks to split (one repo-root relative path per line) instead of all notebooks",
-    )
     args = parser.parse_args()
 
-    if args.notebooks_list is not None:
-        try:
-            notebooks = read_notebooks_list(args.notebooks_list, args.notebooks_dir)
-        except (OSError, ValueError) as e:
-            parser.error(str(e))
-        # An empty batch would make its test job run all notebooks (no test list).
-        if len(notebooks) < args.num_batches:
-            parser.error(f"Notebooks list '{args.notebooks_list}' has {len(notebooks)} notebook(s), fewer than --num_batches {args.num_batches}.")
-        print(f"Using {len(notebooks)} notebooks from {args.notebooks_list}")
-    else:
-        notebooks = collect_notebooks(args.notebooks_dir)
-        print(f"Found {len(notebooks)} notebooks")
+    notebooks = collect_notebooks(args.notebooks_dir)
+    print(f"Found {len(notebooks)} notebooks")
 
     if args.seed is not None:
         random.seed(args.seed)
