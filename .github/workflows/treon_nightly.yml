@@ -105,7 +105,7 @@ jobs:
       options: '--group-add 44 --group-add 993 --device /dev/dri/renderD128:/dev/dri/renderD128'
       separate_venv: true
       # Skip notebooks with blocked resources, network errors, iGPU memory limits, or repeated timeouts
-      ignore_list: .ci/third_party_resources.txt .ci/gpu_network_issues.txt .ci/gpu_oom.txt .ci/igpu_timeouts.txt
+      ignore_list: .ci/not_allowed_resources.txt .ci/gpu_oom.txt .ci/igpu_timeouts.txt
 
   build_treon_dgpu:
     needs: [collect_notebooks, get_docker_tag]
@@ -126,7 +126,7 @@ jobs:
       options: '--group-add 44 --group-add 993 --device /dev/dri/renderD129:/dev/dri/renderD129'
       separate_venv: true
       # Skip notebooks that download resources from not-allowed domains or fail on network errors (e.g. 403)
-      ignore_list: .ci/third_party_resources.txt .ci/gpu_network_issues.txt
+      ignore_list: .ci/not_allowed_resources.txt
 
   aggregate_notebooks_reports:
     if: always()

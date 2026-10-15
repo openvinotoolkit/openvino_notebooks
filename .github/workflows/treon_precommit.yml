@@ -52,6 +52,7 @@ jobs:
         echo "docker_tag=$docker_tag" >> $GITHUB_OUTPUT
 
   build_treon_linux:
+    needs: get_docker_tag
     strategy:
       fail-fast: false
       matrix:
@@ -59,9 +60,9 @@ jobs:
         python: ['3.11', '3.12', '3.13']
     uses: ./.github/workflows/job_unix.yml
     with:
-      runner: '["aks-linux-8-cores-32gb"]'
+      runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:pr-37751'
+      container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:${{ needs.get_docker_tag.outputs.docker_tag }}'
       test_only_changed: true
       separate_venv: true
   
