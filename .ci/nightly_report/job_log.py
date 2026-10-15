@@ -90,9 +90,7 @@ def _span(lines: list[str], notebook: str) -> Optional[tuple[int, int, int, Opti
         if trigger is None:
             return None
         first = trigger
-        section_end = next(
-            (i for i in range(first + 1, len(lines)) if lines[i].startswith(SECTION_END + (TREON_START,))), len(lines)
-        )
+        section_end = next((i for i in range(first + 1, len(lines)) if lines[i].startswith(SECTION_END + (TREON_START,))), len(lines))
     step = next((i for i in range(first, -1, -1) if lines[i].startswith(STEP_HEADER)), None)
     if step is None:
         return None
