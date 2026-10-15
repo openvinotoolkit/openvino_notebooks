@@ -1,0 +1,29 @@
+name: Pull Request Labeler
+
+on:
+  # `pull_request_target` is required to label PRs opened from forks. It is safe here because
+  # the job never checks out or runs PR code: the labeler only reads the list of changed files
+  # via the GitHub API and uses the configuration from the base branch.
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions: read-all
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  label:
+    name: Label PR
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7.0.0
+        with:
+          configuration-path: .github/labeler.yml
+          # Keep labels added manually or by Dependabot.
+          sync-labels: false

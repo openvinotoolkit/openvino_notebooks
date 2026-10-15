@@ -83,11 +83,16 @@ def load_image(name: str, url: str = None):
     import requests
 
     if not Path(name).exists():
+        if url is None:
+            raise ValueError(f"'{name}' does not exist locally and no `url` was given to download it from.")
         # Set User-Agent to Mozilla because some websites block
         # requests with User-Agent Python
         response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+        response.raise_for_status()
         array = np.asarray(bytearray(response.content), dtype="uint8")
         image = cv2.imdecode(array, -1)  # Loads the image as BGR
+        if image is None:
+            raise ValueError(f"Could not decode an image from {url}. The URL may not point to a valid image file.")
         cv2.imwrite(name, image)
     else:
         image = cv2.imread(name)
@@ -197,7 +202,10 @@ def download_ir_model(model_xml_url: str, destination_folder: PathLike = None) -
                                files are saved to the current directory
     :return: path to downloaded xml model file
     """
-    model_bin_url = model_xml_url[:-4] + ".bin"
+    from urllib.parse import urlsplit, urlunsplit
+
+    parsed_url = urlsplit(model_xml_url)
+    model_bin_url = urlunsplit(parsed_url._replace(path=parsed_url.path[:-4] + ".bin"))
     model_xml_path = download_file(model_xml_url, directory=destination_folder, show_progress=False)
     download_file(model_bin_url, directory=destination_folder)
     return model_xml_path
