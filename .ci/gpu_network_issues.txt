@@ -16,6 +16,7 @@ notebooks/hello-world/hello-world.ipynb
 notebooks/image-classification-quantization/image-classification-quantization.ipynb
 notebooks/image-to-image-genai/image-to-image-genai.ipynb
 notebooks/jina-clip/jina-clip.ipynb
+notebooks/llm-agent-rag-llamaindex/llm-agent-rag-llamaindex.ipynb
 notebooks/meter-reader/meter-reader.ipynb
 notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
 notebooks/multimodal-rag/multimodal-rag-llamaindex.ipynb
