@@ -9,6 +9,7 @@ import platform
 import psutil
 import threading
 import queue
+import yaml
 import venv
 from clonevirtualenv import clone_virtualenv
 import traceback
@@ -17,9 +18,7 @@ import tempfile
 from argparse import ArgumentParser
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, TypedDict
-from validation_config import ValidationConfig, validation_config_arg
-from skip_resolution import SKIP_CONFIG, resolve_skip_reasons
-from skip_resolution import get_skip_config_notebooks as get_ignored_notebooks_from_yaml  # noqa: F401 - backward compatible name
+from validation_config import ValidationConfig, validation_config_arg, SkippedNotebook
 
 if TYPE_CHECKING:
     # nightly_report is imported lazily (only with --dashboard_dir): the Docker image ships this script without it
@@ -28,6 +27,11 @@ if TYPE_CHECKING:
 ROOT = Path(__file__).parents[1]
 
 NOTEBOOKS_DIR = Path("notebooks")
+
+# Reasons for excluding a notebook of the testing list; same values as nightly_report.constants.SkipReason
+# (kept local: the Docker image ships this script without the nightly_report package)
+SKIP_CONFIG = "skip_config"
+IGNORE_LIST = "ignore_list"
 
 SKIPPED_NOTEBOOKS_CONFIG_FILENAME = "skipped_notebooks.yml"
 
@@ -77,7 +81,7 @@ class NotebookReport(TypedDict):
     status: str
     path: Path
     duration: float = 0
-    skip_reason: Optional[str]  # skip_resolution.SKIP_CONFIG / IGNORE_LIST for notebooks of the testing list that are excluded
+    skip_reason: Optional[str]  # SKIP_CONFIG / IGNORE_LIST for notebooks of the testing list that are excluded
 
 
 TestPlan = dict[Path, NotebookReport]
@@ -175,6 +179,49 @@ def collect_python_packages(python_executable: Path, output_file: Path):
     )
     with output_file.open("wb") as f:
         f.write(reqs)
+
+
+def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig, skip_config_file_path: Path) -> list[Path]:
+    """Notebooks (repo-root-relative paths as written in the yaml) skipped for the given validation config."""
+    ignored_notebooks: list[Path] = []
+    if not skip_config_file_path.exists():
+        print(f"Skipped notebooks config yaml file does not exist at path '{str(skip_config_file_path)}'.")
+        return ignored_notebooks
+    with open(skip_config_file_path, "r") as f:
+        skipped_notebooks_config: list[SkippedNotebook] = yaml.safe_load(f)
+    for skipped_notebook in skipped_notebooks_config:
+        skips = skipped_notebook["skips"]
+        for skip in skips:
+            for key in validation_config.keys():
+                if not validation_config[key]:
+                    print(f"Warning: validation config argument '{key}' is not provided.")
+                if validation_config[key] in skip.get(key, []):
+                    ignored_notebooks.append(Path(skipped_notebook["notebook"]))
+
+    return list(set(ignored_notebooks))
+
+
+def get_ignore_list_notebooks(ignore_list: Optional[list[str]]) -> list[Path]:
+    """Notebooks from `--ignore_list` items: `*.txt` files (one repo-root-relative path per line) or notebook paths."""
+    ignored_notebooks: list[Path] = []
+    if ignore_list is None:
+        return ignored_notebooks
+    for ignore_item in ignore_list:
+        if ignore_item.endswith(".txt"):
+            with open(ignore_item, "r") as f:
+                ignored_notebooks.extend(Path(line.strip()) for line in f.readlines() if line.strip())
+        else:
+            ignored_notebooks.append(Path(ignore_item))
+    return ignored_notebooks
+
+
+def resolve_skip_reasons(validation_config: ValidationConfig, skip_config_file_path: Path, ignore_list: Optional[list[str]]) -> dict[str, str]:
+    """Posix repo-root-relative notebook path (as written) -> SKIP_CONFIG / IGNORE_LIST; the skip config takes precedence."""
+    skip_config_notebooks = get_ignored_notebooks_from_yaml(validation_config, skip_config_file_path)
+    ignore_list_notebooks = get_ignore_list_notebooks(ignore_list)
+    reasons: dict[str, str] = {notebook.as_posix(): IGNORE_LIST for notebook in ignore_list_notebooks}
+    reasons.update({notebook.as_posix(): SKIP_CONFIG for notebook in skip_config_notebooks})
+    return reasons
 
 
 def get_existing_tests(test_list_to_check: list, test_plan: TestPlan) -> TestPlan:

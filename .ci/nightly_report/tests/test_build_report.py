@@ -508,6 +508,7 @@ def test_jobs_skipped_before_matrix_expansion(inputs: dict):
     assert report["run"]["conclusion"] == "failure"
     assert report["summary"]["infra"]["jobs_failed_before_tests"] == 3
     assert not [warning for warning in report["generator"]["warnings"] if "matrix" in warning or "build_treon" in warning]
+    assert not [warning for warning in report["generator"]["warnings"] if "Skip resolution" in warning]
 
 
 def test_run_conclusion_ignores_jobs_running_in_parallel(inputs: dict):

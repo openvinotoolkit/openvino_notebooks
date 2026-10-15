@@ -583,7 +583,7 @@ class ReportBuilder:
 
     def _skip_reasons(self, job: dict) -> dict[str, str]:
         try:
-            from skip_resolution import resolve_skip_reasons
+            from validate_notebooks import resolve_skip_reasons
         except ImportError as error:
             self.warnings.add(f"Skip resolution is unavailable ({error}); skipped notebooks of crashed jobs are reported as not_run.")
             return {}

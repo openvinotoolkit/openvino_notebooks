@@ -397,7 +397,7 @@ def test_main_fragment_failures_do_not_affect_testing(main_setup, monkeypatch, c
 # --- standalone copy without nightly_report (as in the Docker image) ------------------------------------------------------
 
 # Mirrors the Dockerfile: only these scripts are copied to /tmp/scripts
-DOCKER_SCRIPTS = ("validate_notebooks.py", "validation_config.py", "skip_resolution.py")
+DOCKER_SCRIPTS = ("validate_notebooks.py", "validation_config.py")
 
 STANDALONE_MAIN = """
 import sys

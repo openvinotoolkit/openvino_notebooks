@@ -168,7 +168,8 @@ jobs:
           python-version: '3.11'
       
       - name: Install dependencies
-        run: python -m pip install pyyaml jsonschema
+        # psutil and virtualenv-clone are imported by validate_notebooks.py (skip resolution of crashed jobs)
+        run: python -m pip install pyyaml==6.0.3 jsonschema==4.26.0 psutil==7.2.2 virtualenv-clone==0.5.7
       
       - name: Download batch plan
         continue-on-error: true

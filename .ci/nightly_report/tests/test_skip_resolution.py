@@ -2,10 +2,9 @@ from pathlib import Path
 
 import pytest
 
-import skip_resolution
 import validate_notebooks
 from nightly_report.constants import SkipReason
-from skip_resolution import get_ignore_list_notebooks, get_skip_config_notebooks, resolve_skip_reasons
+from validate_notebooks import get_ignore_list_notebooks, get_ignored_notebooks_from_yaml, resolve_skip_reasons
 
 CI_DIR = Path(__file__).resolve().parents[2]
 
@@ -63,8 +62,8 @@ def config(os_name=None, python=None, device=None) -> dict:
         (config("windows-2022", "3.11", "npu"), {"notebooks/os-skip/os-skip.ipynb", "notebooks/multi-skip/multi-skip.ipynb"}),
     ],
 )
-def test_get_skip_config_notebooks(skip_config, validation_config, expected):
-    notebooks = get_skip_config_notebooks(validation_config, skip_config)
+def test_get_ignored_notebooks_from_yaml(skip_config, validation_config, expected):
+    notebooks = get_ignored_notebooks_from_yaml(validation_config, skip_config)
     assert all(isinstance(n, Path) for n in notebooks)
     assert len(notebooks) == len(set(notebooks))
     assert {n.as_posix() for n in notebooks} == expected
@@ -72,12 +71,12 @@ def test_get_skip_config_notebooks(skip_config, validation_config, expected):
 
 def test_get_skip_config_notebooks_missing_file(tmp_path, capsys):
     missing = tmp_path / "missing.yml"
-    assert get_skip_config_notebooks(config("ubuntu-22.04", "3.11", "cpu"), missing) == []
+    assert get_ignored_notebooks_from_yaml(config("ubuntu-22.04", "3.11", "cpu"), missing) == []
     assert f"Skipped notebooks config yaml file does not exist at path '{missing}'." in capsys.readouterr().out
 
 
 def test_get_skip_config_notebooks_warns_about_missing_config_values(skip_config, capsys):
-    notebooks = get_skip_config_notebooks(config("ubuntu-22.04", None, None), skip_config)
+    notebooks = get_ignored_notebooks_from_yaml(config("ubuntu-22.04", None, None), skip_config)
     assert {n.as_posix() for n in notebooks} == {"notebooks/os-skip/os-skip.ipynb", "notebooks/both/both.ipynb"}
     out = capsys.readouterr().out
     assert "Warning: validation config argument 'python' is not provided." in out
@@ -119,16 +118,13 @@ def test_resolve_skip_reasons_on_repository_configs():
     assert all(path.startswith("notebooks/") and path.endswith(".ipynb") for path in reasons)
 
 
-def test_validate_notebooks_keeps_backward_compatible_name():
-    assert validate_notebooks.get_ignored_notebooks_from_yaml is skip_resolution.get_skip_config_notebooks
-
-
 def test_skip_reason_constants_match_dashboard_contract():
-    assert skip_resolution.SKIP_CONFIG == SkipReason.SKIP_CONFIG
-    assert skip_resolution.IGNORE_LIST == SkipReason.IGNORE_LIST
-    assert set(SkipReason.ALL) == {skip_resolution.SKIP_CONFIG, skip_resolution.IGNORE_LIST}
+    assert validate_notebooks.SKIP_CONFIG == SkipReason.SKIP_CONFIG
+    assert validate_notebooks.IGNORE_LIST == SkipReason.IGNORE_LIST
+    assert set(SkipReason.ALL) == {validate_notebooks.SKIP_CONFIG, validate_notebooks.IGNORE_LIST}
 
 
-def test_skip_resolution_does_not_depend_on_nightly_report():
-    source = (CI_DIR / "skip_resolution.py").read_text(encoding="utf-8")
-    assert "import nightly_report" not in source and "from nightly_report" not in source
+def test_validate_notebooks_imports_nightly_report_lazily():
+    # The Docker image ships validate_notebooks.py without the nightly_report package
+    source = (CI_DIR / "validate_notebooks.py").read_text(encoding="utf-8")
+    assert not any(line.startswith(("import nightly_report", "from nightly_report")) for line in source.splitlines())
