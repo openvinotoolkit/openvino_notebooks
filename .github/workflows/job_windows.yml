@@ -31,6 +31,11 @@ on:
         required: false
         type: string
         default: ''
+      dashboard_data:
+        description: 'Write a nightly dashboard data fragment (.ci/nightly_report) and upload it as an artifact'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -215,6 +220,12 @@ jobs:
 
       - name: Analysing with treon
         shell: pwsh
+        env:
+          DASHBOARD_DATA: ${{ inputs.dashboard_data }}
+          DASHBOARD_JOB_ID: ${{ job.check_run_id }}
+          DASHBOARD_BATCH: ${{ inputs.batch }}
+          DASHBOARD_RUNNER_NAME: ${{ runner.name }}
+          DASHBOARD_RUNNER_LABEL: ${{ inputs.runs_on }}
         run: |
           $cmdArgs = @(
             "--os", "${{ env.OS_NAME }}",
@@ -239,6 +250,20 @@ jobs:
           {
             $cmdArgs += "--separate_venv"
           }
+
+          if ($env:DASHBOARD_DATA -eq "true") {
+            $cmdArgs += @("--dashboard_dir", "dashboard_fragment", "--run_id", $env:GITHUB_RUN_ID, "--run_attempt", $env:GITHUB_RUN_ATTEMPT)
+            # Empty values are not passed: older PowerShell versions drop empty native arguments.
+            $optionalArgs = [ordered]@{
+              "--job_id" = $env:DASHBOARD_JOB_ID
+              "--batch" = $env:DASHBOARD_BATCH
+              "--runner_name" = $env:DASHBOARD_RUNNER_NAME
+              "--runner_label" = $env:DASHBOARD_RUNNER_LABEL
+            }
+            foreach ($arg in $optionalArgs.GetEnumerator()) {
+              if ($arg.Value) { $cmdArgs += "$($arg.Key)=$($arg.Value)" }
+            }
+          }
           
           & python3 .ci/validate_notebooks.py @cmdArgs
 
@@ -248,3 +273,12 @@ jobs:
         with:
           name: test_report-${{ env.TEST_REPORT_DIR }}-${{ inputs.batch != '' && inputs.batch || '' }}
           path: test_report/
+
+      - name: Archive nightly dashboard data fragment
+        if: ${{ always() && inputs.dashboard_data }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: nightly-fragment-${{ env.TEST_REPORT_DIR }}-${{ inputs.batch }}
+          path: dashboard_fragment/
+          if-no-files-found: ignore
+          overwrite: true
