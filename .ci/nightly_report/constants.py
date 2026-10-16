@@ -3,7 +3,7 @@
 Stdlib-only: imported from test jobs (validate_notebooks.py) and from the aggregation job.
 """
 
-SCHEMA_VERSION = "1.1.0"
+SCHEMA_VERSION = "1.2.0"
 
 FRAGMENT_FILE_NAME = "fragment.json"
 PLAN_FILE_NAME = "plan.json"

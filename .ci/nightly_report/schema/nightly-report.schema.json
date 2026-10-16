@@ -84,13 +84,15 @@
       "required": ["id", "device", "os", "os_family", "python", "job_ids"],
       "additionalProperties": false,
       "properties": {
-        "id": {"type": "string", "description": "<device>-<os>-py<python>, e.g. 'cpu-ubuntu-22.04-py3.11'."},
-        "device": {"type": "string"},
+        "id": {"type": "string", "description": "<device>-<os>-py<python>, e.g. 'cpu-ubuntu-22.04-py3.11' or 'igpu-ubuntu-22.04-py3.11'."},
+        "device": {"type": "string", "description": "Device tag: 'cpu', 'igpu' (integrated GPU), 'dgpu' (discrete GPU) or 'gpu' (unspecified GPU)."},
+        "test_device": {"type": "string", "description": "Device the notebooks were validated for (validate_notebooks.py --device; skip config matching), e.g. 'gpu' for 'igpu' and 'dgpu'."},
         "os": {"type": "string"},
         "os_family": {"enum": ["linux", "windows", "macos", "unknown"]},
         "python": {"type": "string"},
         "runner_label": {"$ref": "#/$defs/nullable_string"},
         "container_image": {"$ref": "#/$defs/nullable_string"},
+        "ignore_lists": {"type": "array", "items": {"type": "string"}, "description": "Ignore lists (repo-root relative) applied by the test jobs of this config."},
         "job_ids": {"type": "array", "items": {"type": "integer"}}
       }
     },
@@ -167,6 +169,7 @@
         "job_id": {"type": ["integer", "null"]},
         "status": {"$ref": "#/$defs/status"},
         "skip_reason": {"enum": ["skip_config", "ignore_list", null]},
+        "skip_source": {"$ref": "#/$defs/nullable_string", "description": "File name of the ignore list that excluded the notebook (skip_reason 'ignore_list'), e.g. 'gpu_oom.txt'."},
         "not_run_reason": {"$ref": "#/$defs/nullable_string", "description": "job_failed_before_tests:<step> | job_cancelled | job_skipped | job_interrupted | no_fragment"},
         "started_at": {"$ref": "#/$defs/nullable_datetime"},
         "duration_s": {"$ref": "#/$defs/nullable_number"},
@@ -306,15 +309,18 @@
         "platform_specific_failures": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Notebooks failing only on one OS (or one Python version) while passing on the others.",
+          "description": "Notebooks failing only on one OS, Python version or device while passing on another one. OSes and Python versions are compared within the same device, devices within the same OS and Python version.",
           "properties": {
             "os": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}},
-            "python": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}}
+            "python": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}},
+            "device": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}, "description": "By device tag, e.g. 'igpu': fails on iGPU, passes on CPU or dGPU."},
+            "test_device": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}, "description": "By validated device, e.g. 'gpu': fails on a GPU, passes on CPU."}
           }
         },
         "by_config": {"type": "object", "additionalProperties": {"$ref": "#/$defs/counts"}},
         "by_os": {"type": "object", "additionalProperties": {"$ref": "#/$defs/counts"}},
         "by_python": {"type": "object", "additionalProperties": {"$ref": "#/$defs/counts"}},
+        "by_device": {"type": "object", "additionalProperties": {"$ref": "#/$defs/counts"}, "description": "By configs[].device (cpu, igpu, dgpu)."},
         "infra": {
           "type": "object",
           "required": ["jobs_total", "jobs_succeeded", "jobs_failed", "jobs_cancelled", "jobs_failed_before_tests", "notebooks_lost", "infra_failure_rate"],

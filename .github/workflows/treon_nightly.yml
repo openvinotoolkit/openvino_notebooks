@@ -2,6 +2,10 @@ name: treon_nightly
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - 'main'
+      - 'latest'
   schedule:
     - cron: '0 0 * * *'
 
@@ -53,13 +57,13 @@ jobs:
         run: python3 .ci/split_notebooks.py --num_batches 5 --seed "${{ github.run_id }}" --plan_file nightly_plan/plan.json
 
       - name: Upload batch plan for the nightly dashboard
+        continue-on-error: true
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: nightly-plan
           path: nightly_plan/plan.json
           if-no-files-found: warn
           overwrite: true
-        run: python3 .ci/split_notebooks.py --num_batches 5 --seed "${{ github.run_id }}"
 
   build_treon_linux:
     needs: [collect_notebooks, get_docker_tag]
@@ -117,6 +121,7 @@ jobs:
       separate_venv: true
       # Skip notebooks with blocked resources (195494), network errors, iGPU memory limits, or repeated timeouts
       ignore_list: .ci/not_allowed_resources.txt .ci/gpu_oom.txt .ci/igpu_timeouts.txt
+      dashboard_data: true
 
   build_treon_dgpu:
     needs: [collect_notebooks, get_docker_tag]
@@ -138,6 +143,7 @@ jobs:
       separate_venv: true
       # Skip notebooks that download resources from not-allowed domains (195494) or fail on network errors (e.g. 403)
       ignore_list: .ci/not_allowed_resources.txt
+      dashboard_data: true
 
   aggregate_notebooks_reports:
     if: always()
@@ -173,7 +179,7 @@ jobs:
   build_dashboard_data:
     if: always()
     runs-on: ubuntu-22.04
-    needs: [get_docker_tag, collect_notebooks, build_treon_linux, build_treon_windows, build_treon_gpu]
+    needs: [get_docker_tag, collect_notebooks, build_treon_linux, build_treon_windows, build_treon_igpu, build_treon_dgpu]
     permissions:
       contents: read
       actions: read # list jobs and artifacts of this run
@@ -216,7 +222,6 @@ jobs:
             --fragments_dir nightly_fragments \
             --plan nightly_plan/plan.json \
             --output_dir nightly_dashboard_data \
-            --ignore_list .ci/tensorflow.txt \
             --workflow_file .github/workflows/treon_nightly.yml \
             --ov_branch "$OV_BRANCH" \
             --docker_tag "$DOCKER_TAG" \

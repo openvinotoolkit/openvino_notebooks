@@ -165,9 +165,12 @@ def _by_config(summary: dict) -> list:
         for config_id, counts in by_config.items()
     ]
     legend = [
-        ("Config", "test configuration `<device>-<os>-py<python>`."),
+        ("Config", "test configuration `<device>-<os>-py<python>`; device is `cpu`, `igpu` (integrated GPU) or `dgpu` (discrete GPU)."),
         ("Executed, Passed, Failed, Timeout, Error, Not run", "as in the table above, for this configuration only."),
-        ("Skipped", "notebooks excluded on purpose for this configuration by `.ci/skipped_notebooks.yml` or an ignore list (e.g. `.ci/tensorflow.txt`)."),
+        (
+            "Skipped",
+            "notebooks excluded on purpose for this configuration by `.ci/skipped_notebooks.yml` or an ignore list of its test jobs (e.g. `.ci/tensorflow.txt`, `.ci/gpu_oom.txt`).",
+        ),
         ("Pass rate", "passed ÷ executed for this configuration."),
         ("Test time", "sum of the execution times of the executed notebooks of this configuration (without the setup of the test jobs)."),
     ]
@@ -325,12 +328,14 @@ def _near_timeout(summary: dict) -> list:
 def _platform_specific(summary: dict) -> list:
     specific = summary.get("platform_specific_failures") or {}
     items = []
-    for key, label in (("os", "OS"), ("python", "Python")):
+    for key, label in (("os", "OS"), ("python", "Python"), ("device", "Device"), ("test_device", "Device type")):
         for value, notebooks in (specific.get(key) or {}).items():
             items.append(f"- {label} {_code(value)}: " + ", ".join(_code(n) for n in notebooks))
-    return (
-        ["## Platform-specific failures", "", "Notebooks failing only on one OS or Python version while passing on others.", ""] + items + [""] if items else []
+    intro = (
+        "Notebooks failing only on one OS, Python version or device while passing on another one. OSes and Python versions are compared "
+        "within the same device, devices within the same OS and Python version; device type `gpu` covers both iGPU and dGPU."
     )
+    return ["## Platform-specific failures", "", intro, ""] + items + [""] if items else []
 
 
 def render_markdown(report: dict) -> str:

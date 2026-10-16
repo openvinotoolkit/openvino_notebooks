@@ -139,6 +139,12 @@ def parse_arguments():
     parser.add_argument("--runner_name", type=optional_str_arg, default=None)
     parser.add_argument("--runner_label", type=optional_str_arg, default=None)
     parser.add_argument("--container_image", type=optional_str_arg, default=None)
+    parser.add_argument(
+        "--device_tag",
+        type=optional_str_arg,
+        default=None,
+        help="Dashboard device label when --device is too coarse (e.g. 'igpu' or 'dgpu' for --device gpu); defaults to --device",
+    )
 
     return parser.parse_args()
 
@@ -213,6 +219,18 @@ def get_ignore_list_notebooks(ignore_list: Optional[list[str]]) -> list[Path]:
         else:
             ignored_notebooks.append(Path(ignore_item))
     return ignored_notebooks
+
+
+def get_ignore_list_sources(ignore_list: Optional[list[str]], notebooks_dir: Path = ROOT / NOTEBOOKS_DIR) -> dict[str, str]:
+    """Posix notebooks-dir-relative notebook path -> file name of the first `*.txt` ignore list containing it."""
+    sources: dict[str, str] = {}
+    for ignore_item in ignore_list or []:
+        if not ignore_item.endswith(".txt"):
+            continue
+        for notebook in get_ignore_list_notebooks([ignore_item]):
+            relative_notebook = Path(os.path.relpath(notebooks_dir.parent / notebook, notebooks_dir)).as_posix()
+            sources.setdefault(relative_notebook, Path(ignore_item).name)
+    return sources
 
 
 def resolve_skip_reasons(validation_config: ValidationConfig, skip_config_file_path: Path, ignore_list: Optional[list[str]]) -> dict[str, str]:
@@ -1032,7 +1050,8 @@ def create_fragment_writer(args, base_version: str, test_plan: TestPlan) -> "Fra
         "run_attempt": args.run_attempt,
         "job_id": args.job_id,
         "batch": args.batch,
-        "device": args.device or "unknown",
+        "device": args.device_tag or args.device or "unknown",
+        "test_device": args.device,
         "os": args.os or "unknown",
         "python": args.python or "unknown",
         "python_full_version": platform.python_version(),
@@ -1047,9 +1066,11 @@ def create_fragment_writer(args, base_version: str, test_plan: TestPlan) -> "Fra
     # Notebooks of this job's testing list (incl. skipped by skip config / ignore list), in execution order
     planned = [notebook.as_posix() for notebook, report in test_plan.items() if report["status"] != NotebookStatus.SKIPPED or report.get("skip_reason")]
     writer = FragmentWriter(Path(args.dashboard_dir).absolute(), job, planned)
+    skip_sources = get_ignore_list_sources(args.ignore_list, Path(args.notebooks_dir))
     for notebook, report in test_plan.items():
         if report["status"] == NotebookStatus.SKIPPED and report.get("skip_reason"):
-            writer.add_result(notebook.as_posix(), Status.SKIPPED, skip_reason=report["skip_reason"])
+            skip_source = skip_sources.get(notebook.as_posix()) if report["skip_reason"] == IGNORE_LIST else None
+            writer.add_result(notebook.as_posix(), Status.SKIPPED, skip_reason=report["skip_reason"], skip_source=skip_source)
     return writer
 
 

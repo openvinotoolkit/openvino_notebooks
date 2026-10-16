@@ -103,7 +103,7 @@ def test_notebooks(summary):
 
 
 def test_platform_specific_failures(summary):
-    assert summary["platform_specific_failures"] == {"os": {"windows-2022": [ASYNC]}, "python": {"3.12": [TFLITE]}}
+    assert summary["platform_specific_failures"] == {"os": {"windows-2022": [ASYNC]}, "python": {"3.12": [TFLITE]}, "device": {}, "test_device": {}}
 
 
 def test_by_config(summary):
@@ -113,6 +113,10 @@ def test_by_config(summary):
         W10: counts(6, 3, 2, 1, 0, 0, 1, 2, 0.6667, 345.0, 800.0),
         W12: counts(6, 4, 1, 2, 1, 0, 2, 0, 0.25, 1205.0, 2000.0),
     }
+
+
+def test_by_device(summary):
+    assert summary["by_device"] == {"cpu": summary["results"]}
 
 
 def test_by_os_and_python(summary):
@@ -213,7 +217,8 @@ def test_empty_report(schema, report):
     assert summary["results"] == counts(0, 0, 0, 0, 0, 0, 0, 0, None, 0.0, 0.0)
     assert summary["infra"]["infra_failure_rate"] is None
     assert summary["by_config"] == summary["by_os"] == summary["by_python"] == {}
-    assert summary["platform_specific_failures"] == {"os": {}, "python": {}}
+    assert summary["by_device"] == {}
+    assert summary["platform_specific_failures"] == {"os": {}, "python": {}, "device": {}, "test_device": {}}
     assert summary["durations"] == {
         "run_wall_clock_s": None,
         "compute_s": 0.0,
@@ -293,3 +298,46 @@ def test_openvino_dev_share_case_insensitive(report):
     summary = compute_summary(report)
     assert summary["openvino_versions"] == {"2026.0.0.DEV20261001": 15}
     assert summary["openvino_dev_share"] == 1.0
+
+
+def test_device_specific_failures(schema, report):
+    # Linux py3.10 on CPU, iGPU and dGPU; Windows py3.10 on CPU only.
+    gpu_configs = []
+    for device in ("igpu", "dgpu"):
+        gpu_configs.append({**report["configs"][0], "id": f"{device}-ubuntu-22.04-py3.10", "device": device, "test_device": "gpu", "job_ids": []})
+    for config in report["configs"]:
+        config["test_device"] = "cpu"
+    report["configs"] = [c for c in report["configs"] if c["id"] in (U10, W10)] + gpu_configs
+    template = {k: v for k, v in report["results"][0].items()}
+
+    def result(notebook, config_id, status):
+        return {**template, "notebook": notebook, "config_id": config_id, "status": status, "failure_id": None}
+
+    report["results"] = [
+        # Fails on iGPU only: device-specific, not GPU-specific and not OS-specific.
+        result(HELLO, U10, "passed"),
+        result(HELLO, "igpu-ubuntu-22.04-py3.10", "failed"),
+        result(HELLO, "dgpu-ubuntu-22.04-py3.10", "passed"),
+        result(HELLO, W10, "passed"),
+        # Fails on both GPUs: GPU-specific only.
+        result(ASYNC, U10, "passed"),
+        result(ASYNC, "igpu-ubuntu-22.04-py3.10", "failed"),
+        result(ASYNC, "dgpu-ubuntu-22.04-py3.10", "timeout"),
+        # Fails on Windows CPU: OS-specific; the passing Linux GPUs are not compared with it.
+        result(TFLITE, U10, "passed"),
+        result(TFLITE, W10, "failed"),
+        result(TFLITE, "igpu-ubuntu-22.04-py3.10", "passed"),
+    ]
+    report["jobs"] = []
+    report["failures"] = report["error_groups"] = []
+    summary = compute_summary(report)
+    assert summary["platform_specific_failures"] == {
+        "os": {"windows-2022": [TFLITE]},
+        "python": {},
+        "device": {"igpu": [HELLO]},
+        "test_device": {"gpu": sorted([HELLO, ASYNC])},
+    }
+    assert sorted(summary["by_device"]) == ["cpu", "dgpu", "igpu"]
+    assert summary["by_device"]["igpu"]["failed"] == 2
+    assert summary["by_device"]["dgpu"]["timeout"] == 1
+    assert_valid(schema, {**report, "summary": summary})

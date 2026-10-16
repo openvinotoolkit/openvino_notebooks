@@ -281,6 +281,27 @@ def read_csv(path: Path) -> list[dict]:
         return list(csv.DictReader(f))
 
 
+def test_main_device_tag(main_setup):
+    """GPU jobs validate for --device gpu; --device_tag (igpu / dgpu) only labels the fragment."""
+    run_main, _, tmp_path = main_setup
+    run_main("--dashboard_dir", str(tmp_path / "plain"), *DASHBOARD_ARGS, report_dir="report_plain")
+    run_main("--dashboard_dir", str(tmp_path / "tagged"), *DASHBOARD_ARGS, "--device_tag", "igpu", report_dir="report_tagged")
+    plain, tagged = (assert_valid_fragment(tmp_path / name / "fragment.json") for name in ("plain", "tagged"))
+    assert (plain["job"]["device"], plain["job"]["test_device"]) == ("cpu", "cpu")
+    assert (tagged["job"]["device"], tagged["job"]["test_device"]) == ("igpu", "cpu")
+    assert [(r["notebook"], r["status"]) for r in tagged["results"]] == [(r["notebook"], r["status"]) for r in plain["results"]]
+    assert read_csv(tmp_path / "report_tagged" / "test_report.csv") == read_csv(tmp_path / "report_plain" / "test_report.csv")
+
+
+def test_ignore_list_sources(tmp_path):
+    first, second = tmp_path / "first.txt", tmp_path / "second.txt"
+    first.write_text("notebooks/a/a.ipynb\n\nnotebooks/b/b.ipynb\n", encoding="utf-8")
+    second.write_text("notebooks/b/b.ipynb\nnotebooks/c/c.ipynb\n", encoding="utf-8")
+    sources = validate_notebooks.get_ignore_list_sources([str(first), "notebooks/d/d.ipynb", str(second)], tmp_path / "repo" / "notebooks")
+    assert sources == {"a/a.ipynb": "first.txt", "b/b.ipynb": "first.txt", "c/c.ipynb": "second.txt"}
+    assert validate_notebooks.get_ignore_list_sources(None) == {}
+
+
 def test_main_writes_fragment(main_setup, capsys):
     run_main, fake, tmp_path = main_setup
 
@@ -299,6 +320,7 @@ def test_main_writes_fragment(main_setup, capsys):
     assert job["run_id"] == 123 and job["run_attempt"] == 2 and job["job_id"] is None
     assert job["batch"] == "batch_1" and job["runner_name"] is None and job["runner_label"] == "ubuntu-22.04-8-cores"
     assert (job["device"], job["os"], job["python"], job["timeout_s"], job["separate_venv"]) == ("cpu", "ubuntu-22.04", "3.11", 1200, False)
+    assert job["test_device"] == "cpu"
     assert job["complete"] is True and job["finished_at"]
     assert job["python_full_version"] and job["platform"]
 
@@ -317,6 +339,8 @@ def test_main_writes_fragment(main_setup, capsys):
         "skipcfg/skipcfg.ipynb": ("skipped", "skip_config"),
         "ignored/ignored.ipynb": ("skipped", "ignore_list"),
     }
+    assert results["ignored/ignored.ipynb"]["skip_source"] == "ignore.txt"
+    assert results["skipcfg/skipcfg.ipynb"]["skip_source"] is None and results["pass/pass.ipynb"]["skip_source"] is None
     assert results["missing/missing.ipynb"]["error_hint"] == "Patched notebook not found or invalid notebook path"
     assert results["crash/crash.ipynb"]["error_hint"] == "RuntimeError: harness exploded"
     assert results["harness/harness.ipynb"]["error_hint"] == "OSError: cannot spawn"

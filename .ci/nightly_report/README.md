@@ -50,10 +50,10 @@ after some weeks.
 | Key | Content |
 |---|---|
 | `run` | Run id/attempt/number, event, branch, `nightly_date` (UTC date, x-axis), timings, conclusion, run URL, tested commit, inputs (OV branch, docker tag, timeout, batches, ignore lists). |
-| `configs[]` | Test configurations `<device>-<os>-py<python>` with runner label, container image, job ids. |
+| `configs[]` | Test configurations `<device>-<os>-py<python>` with runner label, container image, ignore lists, job ids. `device` is the dashboard device tag (`cpu`, `igpu`, `dgpu`; `DEVICE_TAG` of `job_unix.yml`), `test_device` the device notebooks were validated on (`gpu` for iGPU and dGPU, used to match `.ci/skipped_notebooks.yml`). |
 | `jobs[]` | Test jobs: conclusion, timings, runner, links (job, notebook test step, logs artifact), failed step, whether tests started, fragment presence. Identified by (`id`, `config_id`, `batch`); results join on the same fields. |
 | `notebooks[]` | Catalog at the tested commit: path, title, tags, `dir_tree_sha` (changes iff the notebook directory changes), last modifying commit, links (source at commit, latest, history). |
-| `results[]` | One row per planned (notebook, config): status, skip/not-run reason, start time, duration, timeout, peak memory, OpenVINO version before the run, key package versions, environment id, failure id. |
+| `results[]` | One row per planned (notebook, config): status, skip/not-run reason, skip source (the ignore list file), start time, duration, timeout, peak memory, OpenVINO version before the run, key package versions, environment id, failure id. |
 | `failures[]` | One per `failed`/`timeout`/`error` result: category, heuristic error class, signature, failing cell index and source excerpt, exception type and message, traceback excerpt, log tail, **log excerpt** (the piece of the job log around the failure, with its line numbers), links (job, test step, **log excerpt** — the job log opened at that piece, logs artifact, log file, notebook source). |
 | `error_groups[]` | Failures grouped by signature, with affected notebooks and configs. |
 | `summary` | Per-run metrics (see below). |
@@ -68,7 +68,7 @@ after some weeks.
 | `failed` | treon exited with a non-zero code (cell error, dead kernel, ...). |
 | `timeout` | The notebook was killed after the per-notebook timeout. |
 | `error` | Harness problem for this notebook (e.g. venv cloning failed, patched notebook missing). |
-| `skipped` | Intentionally not run for this config: `skip_reason` is `skip_config` (`.ci/skipped_notebooks.yml`) or `ignore_list` (e.g. `.ci/tensorflow.txt`). |
+| `skipped` | Intentionally not run for this config: `skip_reason` is `skip_config` (`.ci/skipped_notebooks.yml`) or `ignore_list`; `skip_source` names the list file (e.g. `tensorflow.txt`, `gpu_oom.txt`, `heavy_ubuntu_gpu.txt`). Ignore lists are per job: taken from the `ignore_list` input of each job in the workflow, plus `.ci/heavy_ubuntu_gpu.txt` for Linux GPU jobs. |
 | `not_run` | Planned but never executed: `not_run_reason` is `job_failed_before_tests:<step>`, `job_cancelled`, `job_skipped`, `job_interrupted` or `no_fragment`. |
 
 Batches are reshuffled every night, so history must be keyed by **(`notebook`, `config_id`)**, never by batch or job.
@@ -110,8 +110,8 @@ If a job log is unavailable, the excerpt is taken from the captured notebook log
 | `coverage` | executed / (planned − skipped) — share of applicable tests that actually ran (infrastructure health) |
 | `matrix_coverage` | executed / (catalog size × number of configs) |
 | `notebooks` | total, tested, untested (+ list), passing everywhere, failing somewhere (+ list), failing everywhere |
-| `platform_specific_failures` | notebooks failing only on one OS / one Python version while passing on others |
-| `by_config`, `by_os`, `by_python` | counts, pass rate, notebook time (`test_s`) and job time (`compute_s`) |
+| `platform_specific_failures` | notebooks failing only on one OS / Python version (compared within a device) or one device / device type (compared within an OS and Python version) while passing on another |
+| `by_config`, `by_os`, `by_python`, `by_device` | counts, pass rate, notebook time (`test_s`) and job time (`compute_s`) |
 | `infra` | jobs total/succeeded/failed/cancelled, jobs failed before tests, notebooks lost (`not_run`), `infra_failure_rate` |
 | `durations` | run wall clock, job time, notebook time, setup overhead, notebook median/p90/max, 10 slowest, results near the timeout (≥ 80 %) |
 | `failures` | counts by category and error class, top error groups |
@@ -142,8 +142,27 @@ neither break nor extend a streak).
 # Fragments are produced by validate_notebooks.py when --dashboard_dir is passed.
 python .ci/split_notebooks.py --num_batches 3 --seed 1 --plan_file plan/plan.json
 python .ci/nightly_report/build_report.py --fragments_dir <downloaded fragments> --plan plan/plan.json \
-    --output_dir out --ignore_list .ci/tensorflow.txt --workflow_file .github/workflows/treon_nightly.yml \
+    --output_dir out --workflow_file .github/workflows/treon_nightly.yml \
     --repository openvinotoolkit/openvino_notebooks --run_id <id>
+# Ignore lists are read per job from the workflow; --ignore_list is the fallback for jobs not found in it.
 # Without network access use --no_api (or --run_json/--jobs_json/--artifacts_json with saved API responses).
 python -m pytest .ci/nightly_report/tests
 ```
+
+## Code layout
+
+| Module | Content |
+|---|---|
+| `build_report.py` | CLI entry point: arguments, writing the output files, schema check. |
+| `report_builder.py` | `ReportBuilder`: loads the inputs, joins API jobs with fragments into job records, builds `run`, `configs`, `jobs` and the environments. |
+| `results.py` | Result rows: from fragments, else from the batch plan with skip and not-run reasons. |
+| `failures.py` | Failure records (log analysis, log excerpt, links) and error groups. |
+| `workflow.py` | Workflow parsing: test job names, runner labels, matrices, devices and per-job ignore lists. |
+| `repository.py` | Git metadata and the notebook catalog of the checkout. |
+| `github_api.py` | GitHub REST API client (run, jobs, artifacts, job logs). |
+| `report_inputs.py` | Schemas and fragment loading. |
+| `report_common.py` | Warnings, timestamps, links and JSON loading shared by the modules above. |
+| `fragment.py` | Fragment writer used by `validate_notebooks.py`. |
+| `error_parser.py`, `job_log.py` | Failure classification and log excerpt extraction. |
+| `metrics.py`, `summary_md.py` | The `summary` block and `summary.md`. |
+| `constants.py` | Statuses, reasons, file names and the schema version shared with `validate_notebooks.py`. |

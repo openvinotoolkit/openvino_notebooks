@@ -85,18 +85,21 @@ def _by_config(results: list, jobs: list, configs: dict) -> dict:
     return {config_id: _counts(results_by_id.get(config_id, []), jobs_by_id.get(config_id, [])) for config_id in ids}
 
 
-def _platform_specific(executed_by_notebook: dict, configs: dict, attribute: str) -> dict:
-    found = defaultdict(list)
+def _platform_specific(executed_by_notebook: dict, configs: dict, attribute: str, within: tuple = ()) -> dict:
+    """Notebooks failing for exactly one value of `attribute` while passing for another one; only configs with equal `within`
+    attributes are compared (e.g. OSes of the same device), so a GPU-only failure is not reported as an OS-specific one."""
+    found = defaultdict(set)
     for notebook, results in executed_by_notebook.items():
-        statuses = defaultdict(list)
+        statuses = defaultdict(lambda: defaultdict(list))
         for result in results:
             config = configs.get(result.get("config_id"))
             if config is not None and config.get(attribute) is not None:
-                statuses[config[attribute]].append(result["status"])
-        failing = [value for value, values in statuses.items() if any(s in Status.FAILING for s in values)]
-        passing = [value for value, values in statuses.items() if all(s == Status.PASSED for s in values)]
-        if len(failing) == 1 and passing:
-            found[failing[0]].append(notebook)
+                statuses[tuple(config.get(key) for key in within)][config[attribute]].append(result["status"])
+        for group in statuses.values():
+            failing = [value for value, values in group.items() if any(s in Status.FAILING for s in values)]
+            passing = [value for value, values in group.items() if all(s == Status.PASSED for s in values)]
+            if len(failing) == 1 and passing:
+                found[failing[0]].add(notebook)
     return {value: sorted(notebooks) for value, notebooks in sorted(found.items())}
 
 
@@ -225,12 +228,15 @@ def compute_summary(report: dict) -> dict:
         "coverage": _rate(totals["executed"], totals["planned"] - totals["skipped"]),
         "matrix_coverage": _rate(totals["executed"], len(catalog) * len(configs)),
         "platform_specific_failures": {
-            "os": _platform_specific(executed_by_notebook, configs, "os"),
-            "python": _platform_specific(executed_by_notebook, configs, "python"),
+            "os": _platform_specific(executed_by_notebook, configs, "os", within=("device",)),
+            "python": _platform_specific(executed_by_notebook, configs, "python", within=("device",)),
+            "device": _platform_specific(executed_by_notebook, configs, "device", within=("os", "python")),
+            "test_device": _platform_specific(executed_by_notebook, configs, "test_device", within=("os", "python")),
         },
         "by_config": _by_config(results, jobs, configs),
         "by_os": _grouped_counts(results, jobs, configs, lambda c: c.get("os"), dict.fromkeys(c.get("os") for c in config_list)),
         "by_python": _grouped_counts(results, jobs, configs, lambda c: c.get("python"), dict.fromkeys(c.get("python") for c in config_list)),
+        "by_device": _grouped_counts(results, jobs, configs, lambda c: c.get("device"), dict.fromkeys(c.get("device") for c in config_list)),
         "infra": _infra(jobs, results),
         "durations": _durations(run, jobs, executed),
         "failures": _failures(failures, error_groups),
