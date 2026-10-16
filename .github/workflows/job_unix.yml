@@ -21,10 +21,6 @@ on:
         required: false
         type: string
         default: ''
-      separate_venv:
-        required: false
-        type: boolean
-        default: false
       test_list:
         description: 'Newline-separated list of notebook paths to test (relative to repo root)'
         required: false
@@ -252,7 +248,6 @@ jobs:
             ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
             $IGNORE_ARGS \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
-            ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --collect_reports \
             --timeout 1200
       
@@ -266,7 +261,6 @@ jobs:
             --device ${{ env.TEST_DEVICE }} \
             ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
-            ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --collect_reports \
             --timeout 1200
 

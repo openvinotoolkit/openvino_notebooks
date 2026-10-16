@@ -269,6 +269,32 @@ Contributors are encouraged to install the required packages at the top of their
 `%pip install ...` commands. This allows the notebooks to be run independently as standalone examples. 
 To maintain package compatibility, contributors are expected to install the same versions of packages 
 as specified in the shared `requirements.txt` file located in the repository root folder.
+
+Each notebook installs its requirements into its own virtual environment, so notebooks do not affect each other.
+The first code cell of a notebook, placed before any installation, must fetch `notebook_utils.py` and call `setup_notebook_venv()`:
+
+```python
+import urllib.request
+from pathlib import Path
+
+if not Path("notebook_utils.py").exists():
+    urllib.request.urlretrieve("https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py", "notebook_utils.py")
+
+from notebook_utils import setup_notebook_venv
+
+# Requirements installed below go to a notebook-specific virtual environment in the `.venv` folder
+setup_notebook_venv()
+```
+
+It creates the `.venv` folder next to the notebook (only once) and activates it for the running kernel: `%pip install`, `!pip install` and `pip_install()`
+install packages into it, and the following imports, subprocesses and command-line tools (for example, `optimum-cli`) use it. Packages of the environment running Jupyter
+remain available with lower priority. To start from scratch, restart the kernel and delete the `.venv` folder.
+
+> **NOTE**: If a directory contains several notebooks, each of them must pass its own file name, for example `setup_notebook_venv("hello-world.ipynb")`.
+> Each notebook then gets a separate environment in `.venv/<notebook name>` (e.g. `.venv/hello-world`), so installing the requirements of one notebook
+> does not change what the other notebooks in the same directory import. When adding a notebook to a directory that already has one, update the existing notebook as well.
+> `.ci/check_notebooks.py` checks that every notebook uses the right form.
+
 Additional guidelines:
 1. Specify the widest compatible package version range. If your notebook has only a lower bound on some package version, consider specifying it with ">=" sign instead of "==". Specifying the exact version of package might lead to dependency conflict between notebooks. 
 2. Do not use spaces between package, version and comparison operator when specifying the package installed. Use "package==version" instead of "package == version".
