@@ -296,6 +296,29 @@
     }
   },
   {
+    "title": "D-FINE Object Detection with OpenVINO",
+    "path": "d-fine/dfine.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2026.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.3/notebooks/d-fine/dfine.ipynb",
+    "models": [],
+    "tags": {
+      "categories": [
+        "Model Demos"
+      ],
+      "libraries": [
+        "NNCF",
+        "PyTorch"
+      ],
+      "other": [
+        "D-FINE"
+      ],
+      "tasks": [
+        "Object Detection"
+      ]
+    }
+  },
+  {
     "title": "Prompt-based image segmentation with MobileSAM and OpenVINO",
     "path": "mobilesam-segmentation/mobilesam-segmentation.ipynb",
     "imageUrl": "https://images.cocodataset.org/val2017/000000439180.jpg",
