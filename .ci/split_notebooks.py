@@ -1,7 +1,8 @@
 """Discover notebooks in the repository, shuffle them, and split into batches.
 
 Outputs newline-separated notebook paths for each batch as GitHub Actions
-multiline outputs (batch_0 … batch_N-1).
+multiline outputs (batch_0 … batch_N-1). With --plan_file, the split is also
+written as JSON for the nightly dashboard (nightly_report/schema/plan.schema.json).
 
 Usage (in a workflow step):
     python .ci/split_notebooks.py --notebooks_dir notebooks \
@@ -10,9 +11,11 @@ Usage (in a workflow step):
 """
 
 import argparse
+import json
 import os
 import random
 from pathlib import Path
+from typing import Optional
 
 
 def collect_notebooks(notebooks_dir: Path) -> list[str]:
@@ -48,6 +51,24 @@ def write_github_output(batches: list[list[str]]) -> None:
             fh.write("BATCH_EOF\n")
 
 
+def write_plan_file(plan_file: Path, batches: list[list[str]], notebooks_dir: Path, seed: Optional[str]) -> None:
+    """Write the batch plan (nightly dashboard data, see nightly_report/schema/plan.schema.json)."""
+    from nightly_report.constants import SCHEMA_VERSION
+
+    plan = {
+        "schema_version": SCHEMA_VERSION,
+        "seed": seed,
+        "num_batches": len(batches),
+        "notebooks_dir": Path(notebooks_dir).as_posix(),
+        "notebooks_total": sum(len(batch) for batch in batches),
+        "batches": {f"batch_{i}": [Path(notebook).as_posix() for notebook in batch] for i, batch in enumerate(batches)},
+    }
+    plan_file = Path(plan_file)
+    plan_file.parent.mkdir(parents=True, exist_ok=True)
+    plan_file.write_text(json.dumps(plan, indent=1) + "\n", encoding="utf-8")
+    print(f"Batch plan written to {plan_file}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Split notebooks into batches for CI")
     parser.add_argument(
@@ -68,6 +89,12 @@ def main() -> None:
         default=None,
         help="Random seed for shuffling (e.g. github.run_id for reproducibility within a run)",
     )
+    parser.add_argument(
+        "--plan_file",
+        type=Path,
+        default=None,
+        help="Optional path to write the batch plan JSON to (nightly dashboard data)",
+    )
     args = parser.parse_args()
 
     notebooks = collect_notebooks(args.notebooks_dir)
@@ -79,6 +106,12 @@ def main() -> None:
 
     batches = split_into_batches(notebooks, args.num_batches)
     write_github_output(batches)
+    if args.plan_file is not None:
+        # Optional dashboard data: never fail the split (all nightly test jobs depend on its outputs)
+        try:
+            write_plan_file(args.plan_file, batches, args.notebooks_dir, args.seed)
+        except Exception as e:
+            print(f"WARNING: failed to write batch plan to {args.plan_file}: {type(e).__name__}: {e}")
 
 
 if __name__ == "__main__":

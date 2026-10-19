@@ -1,0 +1,48 @@
+Running Notebook test [test_text-generation-genai.ipynb]: /home/runner/work/openvino_notebooks/openvino_notebooks/test_env/bin/python -m treon --verbose test_text-generation-genai.ipynb
+Executing treon version 0.1.4
+
+-----------------------------------------------------------------------
+Collected following Notebooks for testing
+-----------------------------------------------------------------------
+test_text-generation-genai.ipynb
+-----------------------------------------------------------------------
+
+Triggered test for test_text-generation-genai.ipynb
+0.00s - Debugger warning: It seems that frozen modules are being used, which may
+0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+0.00s - to python to disable frozen modules.
+Start executing cell 1
+ERROR in testing test_text-generation-genai.ipynb
+
+An error occurred while executing the following cell:
+------------------
+import openvino_genai as ov_genai
+import huggingface_hub as hf_hub
+------------------
+
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+Cell [0;32mIn[1], line 1[0m
+[0;32m----> 1[0m [38;5;28;01mimport[39;00m [38;5;21;01mopenvino_genai[39;00m [38;5;28;01mas[39;00m [38;5;21;01mov_genai[39;00m
+[1;32m      2[0m [38;5;28;01mimport[39;00m [38;5;21;01mhuggingface_hub[39;00m [38;5;28;01mas[39;00m [38;5;21;01mhf_hub[39;00m
+
+[0;31mModuleNotFoundError[0m: No module named 'openvino_genai'
+
+
+
+
+
+-----------------------------------------------------------------------
+TEST RESULT
+-----------------------------------------------------------------------
+test_text-generation-genai.ipynb       -- FAILED 
+-----------------------------------------------------------------------
+0 succeeded, 1 failed, out of 1 notebooks tested.
+-----------------------------------------------------------------------
+
+OpenVINO after notebook execution: 2026.4.1
+OpenVINO Tokenizers after notebook execution: 2026.4.1.0
+WARNING: Package(s) not found: openvino_genai
+openvino_genai is missing in validation environment.

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/openvinotoolkit/openvino_notebooks/.ci/nightly_report/schema/plan.schema.json",
+  "title": "Nightly batch plan",
+  "description": "Written by split_notebooks.py (--plan_file): which notebooks were assigned to which batch in this run.",
+  "type": "object",
+  "required": ["schema_version", "num_batches", "notebooks_total", "batches"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^1\\.\\d+\\.\\d+$"},
+    "seed": {"type": ["string", "null"]},
+    "num_batches": {"type": "integer", "minimum": 1},
+    "notebooks_dir": {"type": "string", "description": "Notebooks directory relative to the repository root, e.g. 'notebooks'."},
+    "notebooks_total": {"type": "integer", "minimum": 0},
+    "batches": {
+      "type": "object",
+      "description": "batch_<i> -> notebook paths relative to the repository root (posix separators), e.g. 'notebooks/a/a.ipynb'.",
+      "additionalProperties": {"type": "array", "items": {"type": "string"}}
+    }
+  }
+}
