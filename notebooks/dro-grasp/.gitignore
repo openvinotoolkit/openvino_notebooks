@@ -1,5 +1,3 @@
 DRO-Grasp/
 *.zip
 notebook_utils.py
-*.executed.ipynb
-IMPLEMENTATION_REPORT.generated.md

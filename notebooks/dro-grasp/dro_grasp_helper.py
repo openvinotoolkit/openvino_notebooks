@@ -30,6 +30,56 @@ class DROGraspValidationWrapper(torch.nn.Module):
         return self.network(robot_pc=robot_pc, object_pc=object_pc, target_pc=None, latent=latent)["dro"]
 
 
+class DROGraspOptimizedValidationWrapper(torch.nn.Module):
+    """Assemble DRO-Grasp validation blocks with concatenation instead of slice mutation."""
+
+    def __init__(self, network: torch.nn.Module):
+        super().__init__()
+        if not network.cfg.block_computing:
+            raise ValueError("The optimized wrapper requires block_computing=True")
+        self.network = network
+
+    def forward(self, robot_pc: torch.Tensor, object_pc: torch.Tensor, latent: torch.Tensor) -> torch.Tensor:
+        network = self.network
+        if network.cfg.center_pc:
+            robot_pc = robot_pc - robot_pc.mean(dim=1, keepdim=True)
+
+        robot_embedding = network.encoder_robot(robot_pc)
+        object_embedding = network.encoder_object(object_pc)
+        if network.cfg.pretrain is not None:
+            robot_embedding = robot_embedding.detach()
+
+        transformer_robot_outputs = network.transformer_robot(robot_embedding, object_embedding)
+        transformer_object_outputs = network.transformer_object(object_embedding, robot_embedding)
+        robot_embedding = robot_embedding + transformer_robot_outputs["src_embedding"]
+        object_embedding = object_embedding + transformer_object_outputs["src_embedding"]
+
+        expected_shape = (robot_pc.shape[0], network.cfg.latent_dim)
+        if latent.shape != expected_shape:
+            raise ValueError(f"Expected latent shape {expected_shape}, received {tuple(latent.shape)}")
+        latent = latent.to(device=robot_pc.device, dtype=robot_pc.dtype)
+        latent = latent.unsqueeze(1).repeat(1, robot_embedding.shape[1], 1)
+        phi_robot = torch.cat([robot_embedding, latent], dim=-1)
+        phi_object = torch.cat([object_embedding, latent], dim=-1)
+
+        batch, point_count, feature_dim = phi_robot.shape
+        block_count = 4
+        block_size = point_count // block_count
+        assert point_count % block_size == 0, "Unable to perform block computation."
+
+        output_rows = []
+        for robot_index in range(block_count):
+            robot_block = phi_robot[:, robot_index * block_size : (robot_index + 1) * block_size, :]
+            output_row = []
+            for object_index in range(block_count):
+                object_block = phi_object[:, object_index * block_size : (object_index + 1) * block_size, :]
+                repeated_robot = robot_block.unsqueeze(2).repeat(1, 1, block_size, 1).reshape(batch * block_size * block_size, feature_dim)
+                repeated_object = object_block.unsqueeze(1).repeat(1, block_size, 1, 1).reshape(batch * block_size * block_size, feature_dim)
+                output_row.append(network.kernel(repeated_robot, repeated_object).reshape(batch, block_size, block_size))
+            output_rows.append(torch.cat(output_row, dim=2))
+        return torch.cat(output_rows, dim=1)
+
+
 def prepare_openvino_model(ov_model):
     """Assign stable names to the converted graph inputs and output."""
     for model_input, name in zip(ov_model.inputs, ("robot_pc", "object_pc", "latent")):
