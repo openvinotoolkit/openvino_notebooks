@@ -79,4 +79,3 @@ notebooks/bernini-r-image-video/bernini-r-image-video.ipynb
 notebooks/omnivoice/omnivoice.ipynb
 notebooks/unlimited-ocr/unlimited-ocr.ipynb
 notebooks/csrnet/csrnet.ipynb
-notebooks/dinov3s/dinov3s.ipynb
