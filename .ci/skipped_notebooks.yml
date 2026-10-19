@@ -497,7 +497,7 @@
         - ubuntu-22.04
         - windows-2022
 # Gated HF checkpoint (requires token) and ~2.7 GB download; not executable in CI
-- notebook: notebooks/sam-3d-body/sam3dbody.ipynb
+- notebook: notebooks/sam-3d-body/sam-3d-body.ipynb
   skips:
     - os:
         - macos-13
