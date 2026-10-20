@@ -68,7 +68,7 @@ after some weeks.
 | `failed` | treon exited with a non-zero code (cell error, dead kernel, ...). |
 | `timeout` | The notebook was killed after the per-notebook timeout. |
 | `error` | Harness problem for this notebook (e.g. venv cloning failed, patched notebook missing). |
-| `skipped` | Intentionally not run for this config: `skip_reason` is `skip_config` (`.ci/skipped_notebooks.yml`) or `ignore_list`; `skip_source` names the list file (e.g. `tensorflow.txt`, `gpu_oom.txt`, `heavy_ubuntu_gpu.txt`). Ignore lists are per job: taken from the `ignore_list` input of each job in the workflow, plus `.ci/heavy_ubuntu_gpu.txt` for Linux GPU jobs. |
+| `skipped` | Intentionally not run for this config: `skip_reason` is `skip_config` (`.ci/skipped_notebooks.yml`) or `ignore_list`; `skip_source` names the list file (e.g. `tensorflow.txt`, `gpu_oom.txt`, `heavy_ubuntu_gpu.txt`). Ignore lists are per job: taken from the `ignore_list` input of each job in the workflow, plus `.ci/heavy_ubuntu_gpu.txt` for Linux GPU jobs and `.ci/win_py313_flaky.txt` for Windows Python 3.13 jobs. |
 | `not_run` | Planned but never executed: `not_run_reason` is `job_failed_before_tests:<step>`, `job_cancelled`, `job_skipped`, `job_interrupted` or `no_fragment`. |
 
 Batches are reshuffled every night, so history must be keyed by **(`notebook`, `config_id`)**, never by batch or job.
