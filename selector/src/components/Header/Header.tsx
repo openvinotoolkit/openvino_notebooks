@@ -1,6 +1,7 @@
 import './Header.scss';
 
 import logo from '@assets/images/logo.svg';
+import { JSX } from 'react';
 
 import { setIntelnavRenderSettings } from '@/shared/ighf/ighf';
 

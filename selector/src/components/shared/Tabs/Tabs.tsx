@@ -1,7 +1,7 @@
 import './Tabs.scss';
 
 import { Badge } from '@components/shared/Badge/Badge';
-import { useState } from 'react';
+import { JSX, useState } from 'react';
 
 const sparkClassNames = {
   tab: 'spark-button spark-button-ghost spark-button-size-m spark-focus-visible spark-focus-visible-self spark-focus-visible-snap spark-tabs-tab',

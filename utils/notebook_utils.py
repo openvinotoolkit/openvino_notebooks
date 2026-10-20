@@ -4,7 +4,6 @@
 # In[ ]:
 
 
-import platform
 import sys
 import threading
 import time
@@ -64,8 +63,8 @@ def pip_install(*args):
 
     cli_args = []
     for arg in args:
-        cli_args.extend(str(arg).split(" "))
-    subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], shell=(platform.system() == "Windows"), check=True)
+        cli_args.extend(str(arg).split())
+    subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], check=True)  # nosec B603 - pip install via sys.executable
 
 
 def load_image(name: str, url: str = None):
@@ -83,11 +82,16 @@ def load_image(name: str, url: str = None):
     import requests
 
     if not Path(name).exists():
+        if url is None:
+            raise ValueError(f"'{name}' does not exist locally and no `url` was given to download it from.")
         # Set User-Agent to Mozilla because some websites block
         # requests with User-Agent Python
         response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+        response.raise_for_status()
         array = np.asarray(bytearray(response.content), dtype="uint8")
         image = cv2.imdecode(array, -1)  # Loads the image as BGR
+        if image is None:
+            raise ValueError(f"Could not decode an image from {url}. The URL may not point to a valid image file.")
         cv2.imwrite(name, image)
     else:
         image = cv2.imread(name)
@@ -153,9 +157,16 @@ def download_file(
     except requests.exceptions.RequestException as error:
         raise Exception(f"File downloading failed with error: {error}") from None
 
-    # download the file if it does not exist
     filesize = int(response.headers.get("Content-length", 0))
-    if not filepath.exists():
+    # Let urllib3 verify we actually received as many bytes as the server
+    # declared, at the raw transport level, before any gzip/deflate decoding
+    # happens. iter_content() yields decompressed bytes, so counting those
+    # ourselves and comparing to Content-length breaks for compressed
+    # responses, since Content-length reflects the compressed size on the wire.
+    response.raw.enforce_content_length = True
+
+    tmp_filepath = filepath.with_name(filepath.name + ".part")
+    try:
         with tqdm_notebook(
             total=filesize,
             unit="B",
@@ -164,15 +175,18 @@ def download_file(
             desc=str(filename),
             disable=not show_progress,
         ) as progress_bar:
-            with open(filepath, "wb") as file_object:
+            with open(tmp_filepath, "wb") as file_object:
                 for chunk in response.iter_content(chunk_size):
                     file_object.write(chunk)
                     progress_bar.update(len(chunk))
                     progress_bar.refresh()
-    else:
-        print(f"'{filepath}' already exists.")
 
-    response.close()
+        tmp_filepath.replace(filepath)
+    except BaseException:
+        tmp_filepath.unlink(missing_ok=True)
+        raise
+    finally:
+        response.close()
 
     return filepath.resolve()
 
@@ -187,7 +201,10 @@ def download_ir_model(model_xml_url: str, destination_folder: PathLike = None) -
                                files are saved to the current directory
     :return: path to downloaded xml model file
     """
-    model_bin_url = model_xml_url[:-4] + ".bin"
+    from urllib.parse import urlsplit, urlunsplit
+
+    parsed_url = urlsplit(model_xml_url)
+    model_bin_url = urlunsplit(parsed_url._replace(path=parsed_url.path[:-4] + ".bin"))
     model_xml_path = download_file(model_xml_url, directory=destination_folder, show_progress=False)
     download_file(model_bin_url, directory=destination_folder)
     return model_xml_path

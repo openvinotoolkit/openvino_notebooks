@@ -2,6 +2,7 @@ import './Search.scss';
 
 import CrossIcon from '@assets/images/cross.svg?react';
 import SearchIcon from '@assets/images/search.svg?react';
+import { JSX } from 'react';
 
 const sparkClassNames = {
   textFieldContainer: 'spark-text-field-container',
