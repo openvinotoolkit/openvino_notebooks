@@ -188,8 +188,8 @@ def pip_install(*args):
 
     cli_args = []
     for arg in args:
-        cli_args.extend(str(arg).split(" "))
-    subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], shell=(platform.system() == "Windows"), check=True)  # nosec B603 - pip install via sys.executable
+        cli_args.extend(str(arg).split())
+    subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], check=True)  # nosec B603 - pip install via sys.executable
     _load_venv_pth_files()
 
 
