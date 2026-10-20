@@ -21,8 +21,7 @@ parametric body mesh (MHR). The notebook does the following --
 
 For illustration, the notebook uses a single image from **COCO val2017** — one person with all
 17 keypoints visible and a large bounding box, which makes for a clean comparison. The
-ground-truth box is fed to the model, so the pose accuracy is measured without a detector in the
-loop. Nothing is bundled: the image is downloaded from the public COCO servers on first use and
+ground-truth box is fed to the model for estimating the pose accuracy. The image is downloaded from the public COCO servers on first use and
 its ground-truth annotation is embedded in the notebook. The backbone weights are the
 DINOv3-H+ checkpoints published by the SAM 3D Body authors on the Hugging Face Hub.
 
@@ -67,7 +66,7 @@ python -m venv .sam3dbody-nb-venv
     --display-name "Python (sam3dbody-nb-venv)"
 ```
 
-Then open [`sam3dbody.ipynb`](sam3dbody.ipynb) and select the **Python (sam3dbody-nb-venv)** kernel from the kernel picker — the notebook's saved metadata already points at
+Then open [`sam-3d-body.ipynb`](sam-3d-body.ipynb) and select the **Python (sam3dbody-nb-venv)** kernel from the kernel picker — the notebook's saved metadata already points at
 this kernel name, so most Jupyter front-ends preselect it automatically once it exists.
 The Prerequisites cells install every dependency into that same `.sam3dbody-nb-venv`; once installed,
 re-running the notebook does not reinstall anything.
@@ -84,8 +83,8 @@ The SAM 3D Body repository on the Hugging Face Hub is **gated**: accept the lice
 ## Repository layout
 
 ```
-notebooks/
-├── sam3dbody.ipynb        # the notebook (entry point)
+notebooks/sam-3d-body/
+├── sam-3d-body.ipynb        # the notebook (entry point)
 ├── sam3d_data.py          # sample loading, PCK scoring, skeleton + mesh rendering
 ├── sam3d_ov.py            # OpenVINO IR runtime
 ├── sam3d_torch.py         # PyTorch reference inference + PyTorch → OpenVINO export
