@@ -13,6 +13,8 @@ The family includes four sizes:
 | **26B‑A4B** | 25.2 B | 3.8 B | Text, Image | MoE |
 | **31B** | 30.7 B | 30.7 B | Text, Image | Dense |
 
+The notebook additionally supports **`gemma-4-12b-it`** (12 B dense), which is based on the newer **Gemma 4 Unified** (`gemma4_unified`) architecture with an encoder-free vision embedder. This variant requires `transformers>=5.10`, which the notebook installs by default; the classic models above remain compatible with the same environment.
+
 Key features: built-in chain-of-thought (thinking mode), native system prompt support, interleaved multi-image input, and MoE architecture for efficient inference.
 
 

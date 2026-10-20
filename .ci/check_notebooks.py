@@ -17,6 +17,15 @@ EXPECTED_NO_DEVICE = [
     Path("notebooks/model-server/model-server.ipynb"),  # can not change device in docker configuration on the fly
     Path("notebooks/openvino-tokenizers/openvino-tokenizers.ipynb"),  # cpu required for loading extensions
     Path("notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb"),  # device-agnostic
+    Path("notebooks/physical-ai-robotics/physical-ai-robotics.ipynb"),  # reference notebook, no inference performed here
+]
+
+EXPECTED_NO_TELEMETRY = [
+    Path("notebooks/physical-ai-robotics/physical-ai-robotics.ipynb"),  # reference notebook, contains no runnable code
+]
+
+EXPECTED_NO_INSTALL = [
+    Path("notebooks/physical-ai-robotics/physical-ai-robotics.ipynb"),  # reference notebook, nothing to install or run
 ]
 
 
@@ -72,10 +81,14 @@ def main():
             if not check_scarf_tag(nb_path):
                 no_scarf_tag.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
                 complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Scarf Pixel tag is not found")
-            if not check_telemetry_snippet(nb_path):
+            if nb_path.relative_to(NOTEBOOKS_ROOT) in EXPECTED_NO_TELEMETRY:
+                print(f"SKIPPED: {nb_path.relative_to(NOTEBOOKS_ROOT)} for telemetry snippet check")
+            elif not check_telemetry_snippet(nb_path):
                 no_telemetry_snippet.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
                 complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: telemetry snippet is not found")
-            if not check_install_instructions(nb_path):
+            if nb_path.relative_to(NOTEBOOKS_ROOT) in EXPECTED_NO_INSTALL:
+                print(f"SKIPPED: {nb_path.relative_to(NOTEBOOKS_ROOT)} for install instructions check")
+            elif not check_install_instructions(nb_path):
                 no_install_instructions.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
                 complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: Install Instructions section is not found")
 

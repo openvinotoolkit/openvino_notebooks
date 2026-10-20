@@ -1,6 +1,6 @@
 // @ts-check
 
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readdirSync, readFileSync } from 'fs';
 import { basename, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -88,6 +88,36 @@ export class NotebookContentReader {
    */
   _getReadmeContent() {
     return readFileSync(this._readmeFilePath, { encoding: 'utf8' });
+  }
+
+  /**
+   * Reads all sibling `.py` helper files located in the notebook directory.
+   *
+   * @protected
+   * @returns {string[]}
+   */
+  _getNotebookDirPyFilesContent() {
+    const notebookDir = dirname(this._absoluteNotebookPath);
+    if (!existsSync(notebookDir)) {
+      return [];
+    }
+    return readdirSync(notebookDir)
+      .filter((fileName) => fileName.endsWith('.py'))
+      .map((fileName) => readFileSync(join(notebookDir, fileName), { encoding: 'utf8' }));
+  }
+
+  /**
+   * Reads the shared `utils/llm_config.py` file used by LLM/VLM notebooks.
+   *
+   * @protected
+   * @returns {string | null}
+   */
+  _getSharedLlmConfigContent() {
+    const llmConfigPath = join(NOTEBOOKS_DIRECTORY_PATH, '..', 'utils', 'llm_config.py');
+    if (!existsSync(llmConfigPath)) {
+      return null;
+    }
+    return readFileSync(llmConfigPath, { encoding: 'utf8' });
   }
 
   /**

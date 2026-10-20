@@ -21,6 +21,7 @@ The notebook exposes the VLM models currently defined in `SUPPORTED_VLM_MODELS` 
 - `Llava-Next-Video-7B` - Hugging Face model: [`llava-hf/LLaVA-NeXT-Video-7B-hf`](https://huggingface.co/llava-hf/LLaVA-NeXT-Video-7B-hf)
 - `Qwen3-Vl-8B-Instruct` - Hugging Face model: [`Qwen/Qwen3-VL-8B-Instruct`](https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct)
 - `Qwen2.5-VL-3B-Instruct` - Hugging Face model: [`Qwen/Qwen2.5-VL-3B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct)
+- `Muse-Glimmer-30B` (experimental) - Hugging Face model: [`meta-models/Muse-Glimmer-30B`](https://huggingface.co/meta-models/Muse-Glimmer-30B). Select `transformers==5.15`; local conversion uses the latest Optimum Intel main branch, and inference requires an OpenVINO GenAI nightly containing [PR #4296](https://github.com/openvinotoolkit/openvino.genai/pull/4296).
 
 ### Chinese
 

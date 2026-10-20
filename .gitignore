@@ -79,6 +79,7 @@ env.bak/
 venv.bak/
 openvino_env/
 openvino_env*/
+*code-workspace*
 
 
 # Spyder project settings

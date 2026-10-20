@@ -1,7 +1,6 @@
 import sys
 import cv2
 import numpy as np
-import paddle
 import math
 
 from PIL import Image, ImageDraw, ImageFont
@@ -9,7 +8,6 @@ import copy
 from shapely.geometry import Polygon
 import pyclipper
 import string
-from paddle.nn import functional as F
 
 
 def DetResizeForTest(data):
@@ -284,7 +282,7 @@ def get_rotate_crop_image(img, points):
 postprocess_params = {
     "name": "CTCLabelDecode",
     "character_type": "ch",
-    "character_dict_path": "./fonts/ppocr_keys_v1.txt",
+    "character_dict_path": "./fonts/rec_char_dict.txt",
     "use_space_char": True,
 }
 
@@ -398,7 +396,7 @@ class CTCLabelDecode(BaseRecLabelDecode):
         super(CTCLabelDecode, self).__init__(character_dict_path, character_type, use_space_char)
 
     def __call__(self, preds, label=None, *args, **kwargs):
-        if isinstance(preds, paddle.Tensor):
+        if hasattr(preds, "numpy"):
             preds = preds.numpy()
         preds_idx = preds.argmax(axis=2)
         preds_prob = preds.max(axis=2)

@@ -9,7 +9,7 @@
  * @returns {string}
  */
 export function toMarkdown(metadata, hasError) {
-  const { title, imageUrl, path, createdDate, modifiedDate, links, tags } = metadata;
+  const { title, imageUrl, path, createdDate, modifiedDate, models, links, tags } = metadata;
   const markdownLinks = Object.entries(links)
     .filter(([, link]) => link)
     .map(([key, link]) => `[${key}](${link})`);
@@ -25,6 +25,7 @@ export function toMarkdown(metadata, hasError) {
   | Image | ${imageUrl ? `<img src="${imageUrl}" height="100">` : 'N/A'} |
   | Created Date | ${createdDate} |
   | Modified Date | ${modifiedDate} |
+  | Models | ${toTagsString(models)} |
   | Links | ${markdownLinks.join(', ')} |
   | **Tags:** | |
   | Categories | ${toTagsString(tags?.categories)} |

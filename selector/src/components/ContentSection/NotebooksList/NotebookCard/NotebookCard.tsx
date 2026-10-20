@@ -5,7 +5,7 @@ import ColabIcon from '@assets/images/colab.svg?react';
 import GitHubIcon from '@assets/images/github.svg?react';
 import LinkIcon from '@assets/images/link.svg?react';
 import OpenvinoLogo from '@assets/images/openvino-logo-colored.svg?react';
-import React, { CSSProperties, useRef, useState } from 'react';
+import React, { CSSProperties, useContext, useRef, useState } from 'react';
 
 import { Button } from '@/components/shared/Button/Button';
 import { Tag } from '@/components/shared/Tag/Tag';
@@ -16,6 +16,7 @@ import { isEmbedded } from '@/shared/iframe-detector';
 import { INotebookMetadata } from '@/shared/notebook-metadata';
 import { CATEGORIES } from '@/shared/notebook-tags';
 import { NotebookItem } from '@/shared/notebooks.service';
+import { NotebooksContext } from '@/shared/notebooks-context';
 import { getUrlParamsWithSearch } from '@/shared/selectorUrlPersist';
 
 import { StatusTable } from './StatusTable/StatusTable';
@@ -58,6 +59,21 @@ const sparkClassNames = {
   cardHorizontalLine: 'spark-card-horizontal-line',
 };
 
+const MAX_MATCHED_MODELS = 3;
+
+/**
+ * Returns the models matching the search, preferring the short name over the full `org/name` id.
+ */
+const getMatchedModels = (models: string[], searchValue: string): string[] => {
+  const search = searchValue.trim().toLowerCase();
+  if (!search) {
+    return [];
+  }
+  const matched = models.filter((model) => model.toLowerCase().includes(search));
+  const shortMatched = new Set(matched.filter((model) => !model.includes('/')));
+  return matched.filter((model) => !model.includes('/') || !shortMatched.has(model.split('/').pop()!));
+};
+
 type NotebookCardProps = {
   item: NotebookItem;
   showTasks?: boolean;
@@ -66,9 +82,15 @@ type NotebookCardProps = {
 export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX.Element => {
   const [isStatusVisible, showStatus] = useState(false);
   const [isLinkCopied, setLinkCopied] = useState(false);
+  const [areModelsExpanded, setModelsExpanded] = useState(false);
   const statusButtonRef = useRef<HTMLButtonElement>(null);
+  const { searchValue } = useContext(NotebooksContext);
   const { categories, tasks } = item.tags;
   const descriptionTags = [...categories.filter((v) => v !== CATEGORIES.AI_TRENDS), ...tasks];
+  const matchedModels = getMatchedModels(item.models, searchValue);
+  const titleMatchesSearch = htmlToText(item.title).toLowerCase().includes(searchValue.trim().toLowerCase());
+  const shownModels = areModelsExpanded ? matchedModels : matchedModels.slice(0, MAX_MATCHED_MODELS);
+  const hiddenModelsCount = matchedModels.length - shownModels.length;
   return (
     <div className={sparkClassNames.card}>
       <div className={`card-wrapper ${item.links.docs ? 'clickable' : ''}`} onClick={() => openNotebookInDocs(item)}>
@@ -89,6 +111,26 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
           {showTasks && (
             <div className={`${sparkClassNames.fontCardDescription} card-description`}>
               {descriptionTags.join(' • ')}
+            </div>
+          )}
+          {!titleMatchesSearch && shownModels.length > 0 && (
+            <div className="card-matched-models">
+              <span className={sparkClassNames.fontCardDescription}>Matched models:</span>
+              {shownModels.map((model) => (
+                <Tag key={model} text={model} theme="cobalt" variant="secondary"></Tag>
+              ))}
+              {(hiddenModelsCount > 0 || areModelsExpanded) && (
+                <button
+                  type="button"
+                  className="card-matched-models-toggle"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setModelsExpanded(!areModelsExpanded);
+                  }}
+                >
+                  {areModelsExpanded ? 'Show less' : `+${hiddenModelsCount} more`}
+                </button>
+              )}
             </div>
           )}
           <div className="card-footer">
