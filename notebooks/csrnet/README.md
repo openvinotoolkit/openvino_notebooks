@@ -28,4 +28,4 @@ For illustration, the notebook uses a single test image from **ShanghaiTech Part
 
 This is a self-contained example that relies solely on its own code. It is recommended to run the notebook in a dedicated virtual environment — you only need a Jupyter server to start. The *Install dependencies* cell documents how to create the **`.csrnet-nb-venv`** environment and register it as a Jupyter kernel. For general environment setup, please refer to [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/README.md#-installation-guide).
 
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/README.md" />
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/csrnet/README.md" />
