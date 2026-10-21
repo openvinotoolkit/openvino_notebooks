@@ -193,6 +193,18 @@ def test_precommit_missing_fallback(tmp_path, notebooks_dir):
         split_notebooks.select_precommit_notebooks(notebooks_dir, [], tmp_path / "missing.txt")
 
 
+def test_precommit_root_level_helper_selects_root_level_notebooks(tmp_path, notebooks_dir, monkeypatch):
+    notebook = notebooks_dir / "root-notebook.ipynb"
+    notebook.write_text("{}", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    fallback = tmp_path / "fallback.txt"
+    fallback.write_text("notebooks/a/a.ipynb\n", encoding="utf-8")
+
+    result = split_notebooks.select_precommit_notebooks(notebooks_dir, [str(notebooks_dir / "helper.py")], fallback)
+
+    assert result == [str(notebook)]
+
+
 def test_precommit_no_notebooks(tmp_path):
     root = tmp_path / "notebooks"
     root.mkdir()

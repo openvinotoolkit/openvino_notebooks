@@ -1,9 +1,43 @@
 import gzip
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from utils.notebook_utils import download_file, download_ir_model
+from utils import notebook_utils
+from utils.notebook_utils import download_file, download_ir_model, setup_notebook_venv
+
+
+@pytest.mark.parametrize("notebook_name", ["notebook", "notebook.py", "nested/notebook.ipynb"])
+def test_setup_notebook_venv_rejects_invalid_notebook_name(notebook_name, tmp_path):
+    with pytest.raises(ValueError, match="ending in .ipynb"):
+        setup_notebook_venv(notebook_name, venv_root=tmp_path)
+
+
+def test_load_venv_pth_files_skips_non_install_cells(monkeypatch, tmp_path):
+    monkeypatch.setattr(notebook_utils, "_venv_site_dirs", [str(tmp_path)])
+    monkeypatch.setattr(notebook_utils, "_processed_pth_files", set())
+    result = SimpleNamespace(info=SimpleNamespace(raw_cell="x = 1"))
+
+    with patch("pathlib.Path.glob", side_effect=AssertionError("unexpected .pth scan")):
+        notebook_utils._load_venv_pth_files(result)
+
+
+@pytest.mark.parametrize(
+    "cell",
+    ["%pip install package", "!pip install package", "!python -m pip install package", "pip_helper.pip_install('package')"],
+)
+def test_load_venv_pth_files_scans_install_cells(monkeypatch, tmp_path, cell):
+    (tmp_path / "editable.pth").write_text("/editable/source\n", encoding="utf-8")
+    monkeypatch.setattr(notebook_utils, "_venv_site_dirs", [str(tmp_path)])
+    monkeypatch.setattr(notebook_utils, "_parent_site_dirs", [])
+    monkeypatch.setattr(notebook_utils, "_processed_pth_files", set())
+    result = SimpleNamespace(info=SimpleNamespace(raw_cell=cell))
+
+    with patch("site.addpackage") as addpackage:
+        notebook_utils._load_venv_pth_files(result)
+
+    addpackage.assert_called_once_with(str(tmp_path), "editable.pth", None)
 
 
 def test_download_file_accepts_gzip_response(tmp_path):

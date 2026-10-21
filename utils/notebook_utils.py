@@ -25,11 +25,16 @@ _parent_site_dirs = []
 _processed_pth_files = set()
 
 
-def _load_venv_pth_files(*_):
+def _load_venv_pth_files(result=None, *_):
     """
     Process `.pth` files (e.g. editable installs) added to the active notebook virtual environment
-    after its activation. Registered as IPython `post_run_cell` callback by `setup_notebook_venv()`.
+    after install cells. Registered as IPython `post_run_cell` callback by `setup_notebook_venv()`.
     """
+    if result is not None:
+        raw_cell = getattr(getattr(result, "info", None), "raw_cell", "")
+        if not any(marker in raw_cell for marker in ("%pip", "!pip", "-m pip", "pip_install(")):
+            return
+
     import importlib
     import importlib.machinery
     import site
@@ -79,10 +84,10 @@ def setup_notebook_venv(notebook_name: Optional[str] = None, venv_root: PathLike
 
     if notebook_name is None:
         venv_dir = Path(venv_root).resolve()
-    elif notebook_name and Path(notebook_name).name == notebook_name:
+    elif isinstance(notebook_name, str) and Path(notebook_name).name == notebook_name and notebook_name.endswith(".ipynb"):
         venv_dir = (Path(venv_root) / notebook_name.removesuffix(".ipynb")).resolve()
     else:
-        raise ValueError(f"Expected a notebook file name without directories, got: {notebook_name!r}")
+        raise ValueError(f"Expected a notebook file name ending in .ipynb without directories, got: {notebook_name!r}")
     bin_dir = venv_dir / ("Scripts" if os.name == "nt" else "bin")
     venv_python = bin_dir / ("python.exe" if os.name == "nt" else "python")
     if sys.executable == str(venv_python):

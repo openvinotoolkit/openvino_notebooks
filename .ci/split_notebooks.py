@@ -44,10 +44,12 @@ def select_precommit_notebooks(notebooks_dir: Path, changed_files: list[str], fa
             selected.add(available[path])
         elif path.suffix == ".py":
             directory = path.parent
-            while directory != root:
+            while directory.is_relative_to(root):
                 siblings = [value for notebook, value in available.items() if notebook.parent == directory]
                 if siblings:
                     selected.update(siblings)
+                    break
+                if directory == root:
                     break
                 directory = directory.parent
     if selected:
