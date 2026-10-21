@@ -274,17 +274,29 @@ Each notebook installs its requirements into its own virtual environment, so not
 The first code cell of a notebook, placed before any installation, must fetch `notebook_utils.py` and call `setup_notebook_venv()`:
 
 ```python
+import importlib
 import urllib.request
 from pathlib import Path
 
-if not Path("notebook_utils.py").exists():
-    urllib.request.urlretrieve("https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py", "notebook_utils.py")
+utils_path = Path("notebook_utils.py")
+if not utils_path.exists() or "def setup_notebook_venv(" not in utils_path.read_text(encoding="utf-8"):
+    urllib.request.urlretrieve("https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py", utils_path)
+
+import notebook_utils
+
+if not hasattr(notebook_utils, "setup_notebook_venv"):
+    importlib.reload(notebook_utils)
 
 from notebook_utils import setup_notebook_venv
 
 # Requirements installed below go to a notebook-specific virtual environment in the `.venv` folder
 setup_notebook_venv()
 ```
+
+The bootstrap downloads `notebook_utils.py` if it is missing or does not contain the `setup_notebook_venv` definition; otherwise, it uses the existing file.
+If the kernel already imported an older module without the function, it reloads the module after updating the file.
+The download URL must serve a compatible utility version:
+when testing changes before they reach `latest`, copy `utils/notebook_utils.py` from the same checkout into the notebook folder.
 
 It creates the `.venv` folder next to the notebook (only once) and activates it for the running kernel: `%pip install`, `!pip install` and `pip_install()`
 install packages into it, and the following imports, subprocesses and command-line tools (for example, `optimum-cli`) use it. Packages of the environment running Jupyter
