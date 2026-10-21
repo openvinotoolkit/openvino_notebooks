@@ -49,6 +49,15 @@ The notebook demonstrates:
 4. **Run Inference** — Image understanding, audio understanding, omni-modal chat
 5. **Interactive Demo** — Gradio-based multimodal chatbot
 
+If an existing converted-model directory lacks a Token2wav model (for example,
+`openvino_flow_estimator_chunk_model.xml`), rerun the notebook's conversion cell
+before calling `as_duplex()`. It exports missing Token2wav models without
+reconverting the already exported LLM.
+
+The notebook installs `minicpmo-utils>=1.0.5,<=1.0.6`, matching the upstream
+model's supported dependency range. The conversion helper also handles an
+already-installed 1.0.7 by bypassing its TorchDynamo wrapper during export.
+
 In this demonstration, you'll create an interactive chatbot that can answer questions about the provided image's content.
 
 The image below illustrates example of input prompt and model answer.
