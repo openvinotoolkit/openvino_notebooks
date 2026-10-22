@@ -34,11 +34,12 @@ def show_supported(supported):
 
 
 def pip_check():
-    result = subprocess.run(["pip", "check"], universal_newlines=True, stdout=subprocess.PIPE)  # nosec B603 B607 - hardcoded pip check command
-    if "No broken requirements found" in result.stdout:
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "check"], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    )  # nosec B603 - pip check via sys.executable
+    if result.returncode == 0:
         return True, ""
-    else:
-        return False, result
+    return False, result.stdout
 
 
 def kernel_check():
