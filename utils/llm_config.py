@@ -581,8 +581,8 @@ SUPPORTED_LLM_MODELS = {
             "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
             + """
             <|user|>
-            Question: {input} 
-            Context: {context} 
+            Question: {input}
+            Context: {context}
             Answer: </s>
             <|assistant|>""",
         },
@@ -610,13 +610,13 @@ SUPPORTED_LLM_MODELS = {
             "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
             "rag_prompt_template": f"<|start_header_id|>system<|end_header_id|>\n\n{DEFAULT_RAG_PROMPT}<|eot_id|>"
             + """<|start_header_id|>user<|end_header_id|>
-            
-            
+
+
             Question: {input}
             Context: {context}
             Answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
-            
+
             """,
             "completion_to_prompt": llama3_completion_to_prompt,
         },
@@ -629,13 +629,13 @@ SUPPORTED_LLM_MODELS = {
             "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
             "rag_prompt_template": f"<|start_header_id|>system<|end_header_id|>\n\n{DEFAULT_RAG_PROMPT}<|eot_id|>"
             + """<|start_header_id|>user<|end_header_id|>
-            
-            
+
+
             Question: {input}
             Context: {context}
             Answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
-            
+
             """,
             "completion_to_prompt": llama3_completion_to_prompt,
         },
@@ -674,8 +674,8 @@ SUPPORTED_LLM_MODELS = {
             "current_message_template": "\n<human>:{user}\n<bot>:{assistant}",
             "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT }"""
             + """
-            <human>: Question: {input} 
-            Context: {context} 
+            <human>: Question: {input}
+            Context: {context}
             Answer: <bot>""",
         },
         "qwen2.5-3b-instruct": {
@@ -686,8 +686,8 @@ SUPPORTED_LLM_MODELS = {
             {DEFAULT_RAG_PROMPT }<|im_end|>"""
             + """
             <|im_start|>user
-            Question: {input} 
-            Context: {context} 
+            Question: {input}
+            Context: {context}
             Answer: <|im_end|>
             <|im_start|>assistant
             """,
@@ -702,8 +702,8 @@ SUPPORTED_LLM_MODELS = {
             {DEFAULT_RAG_PROMPT }<|im_end|>"""
             + """
             <|im_start|>user
-            Question: {input} 
-            Context: {context} 
+            Question: {input}
+            Context: {context}
             Answer: <|im_end|>
             <|im_start|>assistant
             """,
@@ -737,8 +737,8 @@ SUPPORTED_LLM_MODELS = {
             "partial_text_processor": llama_partial_text_processor,
             "rag_prompt_template": f"""[INST]Human: <<SYS>> {DEFAULT_RAG_PROMPT }<</SYS>>"""
             + """
-            Question: {input} 
-            Context: {context} 
+            Question: {input}
+            Context: {context}
             Answer: [/INST]""",
         },
         "llama-3-8b-instruct": {
@@ -751,13 +751,13 @@ SUPPORTED_LLM_MODELS = {
             "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
             "rag_prompt_template": f"<|start_header_id|>system<|end_header_id|>\n\n{DEFAULT_RAG_PROMPT}<|eot_id|>"
             + """<|start_header_id|>user<|end_header_id|>
-            
-            
+
+
             Question: {input}
             Context: {context}
             Answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
-            
+
             """,
             "completion_to_prompt": llama3_completion_to_prompt,
         },
@@ -771,13 +771,13 @@ SUPPORTED_LLM_MODELS = {
             "current_message_template": "<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}",
             "rag_prompt_template": f"<|start_header_id|>system<|end_header_id|>\n\n{DEFAULT_RAG_PROMPT}<|eot_id|>"
             + """<|start_header_id|>user<|end_header_id|>
-            
-            
+
+
             Question: {input}
             Context: {context}
             Answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
-            
+
             """,
             "completion_to_prompt": llama3_completion_to_prompt,
         },
@@ -790,9 +790,9 @@ SUPPORTED_LLM_MODELS = {
             "tokenizer_kwargs": {"add_special_tokens": False},
             "partial_text_processor": llama_partial_text_processor,
             "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
-            + """ 
-            [INST] Question: {input} 
-            Context: {context} 
+            + """
+            [INST] Question: {input}
+            Context: {context}
             Answer: [/INST]""",
         },
         "mistral-7B-Instruct-v0.3": {
@@ -812,10 +812,10 @@ SUPPORTED_LLM_MODELS = {
             "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
             "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
             "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
-            + """ 
+            + """
             <|user|>
-            Question: {input} 
-            Context: {context} 
+            Question: {input}
+            Context: {context}
             Answer: </s>
             <|assistant|>""",
         },
@@ -829,8 +829,8 @@ SUPPORTED_LLM_MODELS = {
             "partial_text_processor": llama_partial_text_processor,
             "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
             + """
-            [INST] Question: {input} 
-            Context: {context} 
+            [INST] Question: {input}
+            Context: {context}
             Answer: [/INST]""",
         },
         "phi-3-mini-instruct": {
@@ -843,8 +843,8 @@ SUPPORTED_LLM_MODELS = {
             "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }<|end|>"""
             + """
             <|user|>
-            Question: {input} 
-            Context: {context} 
+            Question: {input}
+            Context: {context}
             Answer: <|end|>
             <|assistant|>""",
             "completion_to_prompt": phi_completion_to_prompt,
@@ -859,8 +859,8 @@ SUPPORTED_LLM_MODELS = {
             "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }<|end|>"""
             + """
             <|user|>
-            Question: {input} 
-            Context: {context} 
+            Question: {input}
+            Context: {context}
             Answer: <|end|>
             <|assistant|>""",
             "completion_to_prompt": phi_completion_to_prompt,
@@ -877,8 +877,8 @@ SUPPORTED_LLM_MODELS = {
             {DEFAULT_RAG_PROMPT }<|im_end|>"""
             + """
             <|im_start|>user
-            Question: {input} 
-            Context: {context} 
+            Question: {input}
+            Context: {context}
             Answer: <|im_end|>
             <|im_start|>assistant
             """,
@@ -1071,8 +1071,8 @@ SUPPORTED_LLM_MODELS = {
             {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
             + """
             <|im_start|>user
-            问题: {input} 
-            已知内容: {context} 
+            问题: {input}
+            已知内容: {context}
             回答: <|im_end|>
             <|im_start|>assistant
             """,
@@ -1087,8 +1087,8 @@ SUPPORTED_LLM_MODELS = {
             {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
             + """
             <|im_start|>user
-            问题: {input} 
-            已知内容: {context} 
+            问题: {input}
+            已知内容: {context}
             回答: <|im_end|>
             <|im_start|>assistant
             """,
@@ -1106,8 +1106,8 @@ SUPPORTED_LLM_MODELS = {
             {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
             + """
             <|im_start|>user
-            问题: {input} 
-            已知内容: {context} 
+            问题: {input}
+            已知内容: {context}
             回答: <|im_end|>
             <|im_start|>assistant
             """,
@@ -1119,9 +1119,9 @@ SUPPORTED_LLM_MODELS = {
             "tokenizer_kwargs": {"add_special_tokens": False},
             "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
             + """
-            问题: {input} 
-            已知内容: {context} 
-            回答: 
+            问题: {input}
+            已知内容: {context}
+            回答:
             """,
         },
         "baichuan2-7b-chat": {
@@ -1132,9 +1132,9 @@ SUPPORTED_LLM_MODELS = {
             "stop_tokens": ["<unk>", "</s>"],
             "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT_CHINESE }"""
             + """
-            问题: {input} 
-            已知内容: {context} 
-            回答: 
+            问题: {input}
+            已知内容: {context}
+            回答:
             """,
         },
         "minicpm-2b-dpo": {
@@ -1159,8 +1159,8 @@ SUPPORTED_LLM_MODELS = {
             {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
             + """
             <|im_start|>user
-            问题: {input} 
-            已知内容: {context} 
+            问题: {input}
+            已知内容: {context}
             回答: <|im_end|>
             <|im_start|>assistant
             """,
@@ -1585,7 +1585,7 @@ def convert_and_compress_vlm(model_id, model_config, precision, use_preconverted
     model_subdir = precision if precision == "FP16" else precision + "_compressed_weights"
     model_dir = Path(pt_model_name) / model_subdir
     remote_code = model_config.get("remote_code", False)
-    if (model_dir / "openvino_language_model.xml").exists():
+    if (model_dir / "openvino_language_model.xml").exists() and (model_dir / "openvino_language_model.bin").exists():
         print(f"✅ {precision} {model_id} VLM model already converted and can be found in {model_dir}")
 
         if not (model_dir / "openvino_tokenizer.xml").exists() or not (model_dir / "openvino_detokenizer.xml").exists():
@@ -1657,7 +1657,7 @@ def convert_and_compress_model(model_id, model_config, precision, use_preconvert
     model_subdir = precision if precision == "FP16" else precision + "_compressed_weights"
     model_dir = Path(pt_model_name) / model_subdir
     remote_code = model_config.get("remote_code", False)
-    if (model_dir / "openvino_model.xml").exists():
+    if (model_dir / "openvino_model.xml").exists() and (model_dir / "openvino_model.bin").exists():
         print(f"✅ {precision} {model_id} model already converted and can be found in {model_dir}")
 
         if not (model_dir / "openvino_tokenizer.xml").exists() or not (model_dir / "openvino_detokenizer.xml").exists():
