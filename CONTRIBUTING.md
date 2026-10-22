@@ -281,19 +281,22 @@ from pathlib import Path
 helper_files = ["notebook_utils.py"]
 repo_utils = Path("../../utils")
 in_repo = (repo_utils / "notebook_utils.py").is_file()
-for helper_file in helper_files:
-    if in_repo:
-        content = (repo_utils / helper_file).read_bytes()
-    else:
-        try:
+if in_repo:
+   helper_contents = {helper_file: (repo_utils / helper_file).read_bytes() for helper_file in helper_files}
+else:
+    try:
+        helper_contents = {}
+        for helper_file in helper_files:
             url = f"https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/{helper_file}"
             with urllib.request.urlopen(url, timeout=10) as response:
-                content = response.read()
-        except OSError as error:
-            if not Path(helper_file).exists():
-                raise
-            print(f"Could not update {helper_file}, using the existing copy: {error}")
-            continue
+                helper_contents[helper_file] = response.read()
+    except OSError as error:
+        if any(not Path(helper_file).is_file() for helper_file in helper_files):
+            raise
+        print(f"Could not update helper files, using the existing copies: {error}")
+        helper_contents = {}
+
+for helper_file, content in helper_contents.items():
     Path(helper_file).write_bytes(content)
 
 from notebook_utils import setup_notebook_venv
@@ -306,7 +309,8 @@ setup_notebook_venv()
 `["notebook_utils.py", "cmd_helper.py", "pip_helper.py"]`. Do not fetch these files in other cells.
 When the notebook runs inside a clone of the repository, the files are copied from `utils` of that clone, so changes to them are
 tested together with the notebook; otherwise they are downloaded from the `latest` branch. Either way, the copies next to the notebook
-are overwritten, so do not edit them. If a download fails and a copy exists, the notebook continues with it.
+are overwritten only after all helper files have been fetched, so do not edit them. If a download fails, the notebook keeps the entire
+existing helper set if every file is present; otherwise, it raises the error without writing any fetched files.
 Do not list a helper whose name matches a file of the notebook itself (for example, a notebook-specific `llm_config.py`).
 Helpers updated by running the cell again in a kernel that already imported them are picked up after a kernel restart.
 

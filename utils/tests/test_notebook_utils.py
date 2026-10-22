@@ -94,6 +94,7 @@ def test_notebook_bootstrap_requires_listed_helpers_in_repository(notebook_boots
         run_bootstrap(notebook_bootstrap.source)
 
     notebook_bootstrap.download.assert_not_called()
+    assert not Path("notebook_utils.py").exists()
 
 
 DOWNLOAD_ERRORS = [
@@ -119,7 +120,38 @@ def test_notebook_bootstrap_keeps_existing_helpers_when_download_fails(notebook_
     assert Path("notebook_utils.py").read_bytes() == COMPATIBLE_UTILS
     assert Path("cmd_helper.py").read_bytes() == b"OLD_HELPER = True\n"
     assert sys.modules["notebook_utils"].SETUP_CALLS == 1
-    assert "Could not update cmd_helper.py, using the existing copy" in capsys.readouterr().out
+    assert "Could not update helper files, using the existing copies" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("missing_helper", [None, "notebook_utils.py", "cmd_helper.py"])
+@pytest.mark.parametrize("fails_on", ["open", "read"])
+def test_notebook_bootstrap_does_not_write_helpers_after_partial_fetch(notebook_bootstrap, missing_helper, fails_on):
+    original_utils = COMPATIBLE_UTILS + b"ORIGINAL = True\n"
+    originals = {"notebook_utils.py": original_utils, "cmd_helper.py": b"ORIGINAL_HELPER = True\n"}
+    for name, content in originals.items():
+        if name != missing_helper:
+            Path(name).write_bytes(content)
+    first_response = MagicMock()
+    first_response.__enter__.return_value.read.return_value = COMPATIBLE_UTILS
+    error = TimeoutError("second helper failed")
+    if fails_on == "open":
+        notebook_bootstrap.download.side_effect = [first_response, error]
+    else:
+        second_response = MagicMock()
+        second_response.__enter__.return_value.read.side_effect = error
+        notebook_bootstrap.download.side_effect = [first_response, second_response]
+
+    if missing_helper:
+        with pytest.raises(TimeoutError, match="second helper failed"):
+            run_bootstrap(notebook_bootstrap.source)
+    else:
+        run_bootstrap(notebook_bootstrap.source)
+
+    for name, content in originals.items():
+        if name == missing_helper:
+            assert not Path(name).exists()
+        else:
+            assert Path(name).read_bytes() == content
 
 
 @pytest.mark.parametrize("error", DOWNLOAD_ERRORS)
