@@ -384,7 +384,7 @@ jobs:
             --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
             ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --collect_reports \
-            --timeout 1200 \
+            --timeout ${{ inputs.dashboard_data && 3600 || 1200 }} \
             "${DASHBOARD_ARGS[@]}"
       
       - name: Analysing with treon (MacOS)
@@ -415,7 +415,7 @@ jobs:
             --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
             ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --collect_reports \
-            --timeout 1200 \
+            --timeout ${{ inputs.dashboard_data && 3600 || 1200 }} \
             "${DASHBOARD_ARGS[@]}"
 
       - name: Archive notebook test report
