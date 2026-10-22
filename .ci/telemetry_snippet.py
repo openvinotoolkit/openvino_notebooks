@@ -38,14 +38,12 @@ def _add_telemetry_snippet(notebook_path: Path):
         raise Exception(f'Invalid file extension at path "{str(notebook_path)}". Only .ipynb files are supported.')
     with open(notebook_path, "r") as fr:
         nb_node: nbformat.NotebookNode = nbformat.read(fr, as_version=4)
-        # Find cell with notebook_utils
-        notebook_utils_url = "https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py"
-        for i, cell in enumerate(nb_node["cells"]):
-            if cell["cell_type"] != "code":
-                continue
-            cell_content: str = cell["source"]
-            if notebook_utils_url in cell_content:
-                nb_node["cells"][i]["source"] = cell_content + "\n\n" + _get_telemetry_snippet(notebook_path)
+        # Add the snippet to the code cell following the one that fetches the helper files
+        code_cell_indices = [i for i, cell in enumerate(nb_node["cells"]) if cell["cell_type"] == "code"]
+        for position, i in enumerate(code_cell_indices):
+            if "helper_files = " in nb_node["cells"][i]["source"]:
+                target = code_cell_indices[position + 1] if position + 1 < len(code_cell_indices) else i
+                nb_node["cells"][target]["source"] += "\n\n" + _get_telemetry_snippet(notebook_path)
                 break
     with open(notebook_path, "w") as fw:
         nbformat.write(nb_node, fw)

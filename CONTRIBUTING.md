@@ -132,7 +132,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 5. Add **Table of content** to top of the Notebook, it helps to get quick fist understanding of content and ease of navigation in the dev environment. There is no need to think about it during development, it can be built or updated after changes with `.ci\table_of_content.py`. Just run the script with the parameter `-s/--source`, specifying a Notebook or a folder with several notebooks as value, the changes will be applied to all of them.
 6. Add **Installation Instructions** section to the top of the notebook (after "Table of content") and to the corresponding `README.md` file in the notebook directory. See existing notebooks for the reference.
 7. Add Scarf Pixel tag for analytics to the notebook (at the end of the first cell) and to the corresponding `README.md` file (to the end of the file). Add relative path to the notebook or `README.md` file as `path` URL query parameter. Example: `<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=<RELATIVE_FILE_PATH>" />`. You can use the following command to generate the tag and add it to the file: `python .ci/scarf_pixel.py -s <PATH>`.
-8. Add telemetry snippet to the notebook file (e.g. to the cell with fetching notebook_utils file) for tracking notebook execution. Add notebook file name as a parameter to `collect_telemetry()` function. You can use the following command to generate the snippet and add it to the notebook file: `python .ci/telemetry_snippet.py -s <PATH>`. Snippet example:
+8. Add telemetry snippet to the notebook file (e.g. to the cell following the one that fetches the helper files) for tracking notebook execution. Add notebook file name as a parameter to `collect_telemetry()` function. You can use the following command to generate the snippet and add it to the notebook file: `python .ci/telemetry_snippet.py -s <PATH>`. Snippet example:
    ```python
    # Read more about telemetry collection at https://github.com/openvinotoolkit/openvino_notebooks?tab=readme-ov-file#-telemetry
    from notebook_utils import collect_telemetry
@@ -271,21 +271,30 @@ To maintain package compatibility, contributors are expected to install the same
 as specified in the shared `requirements.txt` file located in the repository root folder.
 
 Each notebook installs its requirements into its own virtual environment, so notebooks do not affect each other.
-The first code cell of a notebook, placed before any installation, must fetch `notebook_utils.py` and call `setup_notebook_venv()`:
+The first code cell of a notebook, placed before any installation, must fetch the helper files from `utils` and call `setup_notebook_venv()`:
 
 ```python
-import importlib
 import urllib.request
 from pathlib import Path
 
-utils_path = Path("notebook_utils.py")
-if not utils_path.exists() or "def setup_notebook_venv(" not in utils_path.read_text(encoding="utf-8"):
-    urllib.request.urlretrieve("https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py", utils_path)
-
-import notebook_utils
-
-if not hasattr(notebook_utils, "setup_notebook_venv"):
-    importlib.reload(notebook_utils)
+# Helpers come from `utils` of the cloned repository, otherwise from GitHub; local copies are overwritten
+helper_files = ["notebook_utils.py"]
+repo_utils = Path("../../utils")
+in_repo = (repo_utils / "notebook_utils.py").is_file()
+for helper_file in helper_files:
+    if in_repo:
+        content = (repo_utils / helper_file).read_bytes()
+    else:
+        try:
+            url = f"https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/{helper_file}"
+            with urllib.request.urlopen(url, timeout=10) as response:
+                content = response.read()
+        except OSError as error:
+            if not Path(helper_file).exists():
+                raise
+            print(f"Could not update {helper_file}, using the existing copy: {error}")
+            continue
+    Path(helper_file).write_bytes(content)
 
 from notebook_utils import setup_notebook_venv
 
@@ -293,10 +302,13 @@ from notebook_utils import setup_notebook_venv
 setup_notebook_venv()
 ```
 
-The bootstrap downloads `notebook_utils.py` if it is missing or does not contain the `setup_notebook_venv` definition; otherwise, it uses the existing file.
-If the kernel already imported an older module without the function, it reloads the module after updating the file.
-The download URL must serve a compatible utility version:
-when testing changes before they reach `latest`, copy `utils/notebook_utils.py` from the same checkout into the notebook folder.
+`helper_files` lists every file from `utils` that the notebook (or a module next to it) imports, for example
+`["notebook_utils.py", "cmd_helper.py", "pip_helper.py"]`. Do not fetch these files in other cells.
+When the notebook runs inside a clone of the repository, the files are copied from `utils` of that clone, so changes to them are
+tested together with the notebook; otherwise they are downloaded from the `latest` branch. Either way, the copies next to the notebook
+are overwritten, so do not edit them. If a download fails and a copy exists, the notebook continues with it.
+Do not list a helper whose name matches a file of the notebook itself (for example, a notebook-specific `llm_config.py`).
+Helpers updated by running the cell again in a kernel that already imported them are picked up after a kernel restart.
 
 It creates the `.venv` folder next to the notebook (only once) and activates it for the running kernel: `%pip install`, `!pip install` and `pip_install()`
 install packages into it, and the following imports, subprocesses and command-line tools (for example, `optimum-cli`) use it. Packages of the environment running Jupyter
@@ -305,7 +317,7 @@ remain available with lower priority. To start from scratch, restart the kernel 
 > **NOTE**: If a directory contains several notebooks, each of them must pass its own file name, for example `setup_notebook_venv("hello-world.ipynb")`.
 > Each notebook then gets a separate environment in `.venv/<notebook name>` (e.g. `.venv/hello-world`), so installing the requirements of one notebook
 > does not change what the other notebooks in the same directory import. When adding a notebook to a directory that already has one, update the existing notebook as well.
-> `.ci/check_notebooks.py` checks that every notebook uses the right form.
+> `.ci/check_notebooks.py` checks that every notebook uses the right form and lists the helper files it needs.
 
 Additional guidelines:
 1. Specify the widest compatible package version range. If your notebook has only a lower bound on some package version, consider specifying it with ">=" sign instead of "==". Specifying the exact version of package might lead to dependency conflict between notebooks. 

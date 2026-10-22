@@ -1,13 +1,10 @@
 import argparse
 import ast
 import re
-import shutil
 from pathlib import Path
 import nbformat
 import nbconvert
 from traitlets.config import Config
-
-UTILS_DIR = Path(__file__).parents[1] / "utils"
 
 # Notebooks that are excluded from the CI tests
 EXCLUDED_NOTEBOOKS = ["data-preparation-ct-scan.ipynb", "pytorch-monai-training.ipynb"]
@@ -152,14 +149,6 @@ def remove_ov_install(cell):
     cell["source"] = "\n".join(updated_lines)
 
 
-def copy_utils(notebook_path):
-    # Notebooks download missing utils from the `latest` branch, so local copies make CI test the checked-out utils
-    for util_file in UTILS_DIR.glob("*.py"):
-        target = notebook_path.parent / util_file.name
-        if not target.exists():
-            shutil.copy(util_file, target)
-
-
 def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
     """
     Patch notebooks in notebooks directory with replacement values
@@ -224,7 +213,6 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
                 print(f"No replacements found for {notebookfile}")
             disable_gradio_debug(nb, notebookfile)
             disable_skip_ext(nb, notebookfile, args.test_device)
-            copy_utils(notebookfile)
             nb_without_out, _ = output_remover.from_notebook_node(nb)
             with notebookfile.with_name(f"test_{notebookfile.name}").open("w", encoding="utf-8") as out_file:
                 out_file.write(nb_without_out)

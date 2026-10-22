@@ -11,11 +11,8 @@ export HUB_HOME=/tmp
 
 # Move notebooks for validation
 cp -R /opt/app-root/openvino_notebooks/notebooks /tmp/
-# Notebooks download notebook_utils.py from the `latest` branch only if it is missing next to them;
-# use the one from this repository so they get the current helpers (e.g. setup_notebook_venv)
-for notebook_dir in /tmp/notebooks/*/; do
-    cp /opt/app-root/openvino_notebooks/utils/notebook_utils.py "$notebook_dir"
-done
+# Notebooks take helper files from `../../utils` when it exists, otherwise they download them from the `latest` branch
+cp -R /opt/app-root/openvino_notebooks/utils /tmp/
 # Download CT scan image for 110 training notebook
 mkdir -p /tmp/notebooks/110-ct-segmentation-quantize/kits19
 cd /tmp/notebooks/110-ct-segmentation-quantize/kits19

@@ -15,109 +15,128 @@ from utils.notebook_utils import download_file, download_ir_model, setup_noteboo
 
 BOOTSTRAP_NOTEBOOK = Path(__file__).resolve().parents[2] / "notebooks/hello-world/hello-world.ipynb"
 COMPATIBLE_UTILS = b"SETUP_CALLS = 0\ndef setup_notebook_venv(*args, **kwargs):\n    global SETUP_CALLS\n    SETUP_CALLS += 1\n"
+CMD_HELPER = b"CMD_HELPER = True\n"
+HELPER_URL = "https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/"
+
+
+def bootstrap_source(helper_files):
+    notebook = json.loads(BOOTSTRAP_NOTEBOOK.read_text(encoding="utf-8"))
+    source = next("".join(cell["source"]) for cell in notebook["cells"] if cell["cell_type"] == "code")
+    return source.replace('helper_files = ["notebook_utils.py"]', f"helper_files = {helper_files!r}".replace("'", '"'))
+
+
+def run_bootstrap(source):
+    exec(compile(source, str(BOOTSTRAP_NOTEBOOK), "exec"), {})
 
 
 @pytest.fixture
 def notebook_bootstrap(tmp_path, monkeypatch):
-    notebook = json.loads(BOOTSTRAP_NOTEBOOK.read_text(encoding="utf-8"))
-    source = next("".join(cell["source"]) for cell in notebook["cells"] if cell["cell_type"] == "code")
-    monkeypatch.chdir(tmp_path)
-    monkeypatch.syspath_prepend(str(tmp_path))
+    """Notebook folder at `<tmp>/notebooks/demo`, with `urlopen` serving the helpers from `served`."""
+    notebook_dir = tmp_path / "notebooks" / "demo"
+    notebook_dir.mkdir(parents=True)
+    monkeypatch.chdir(notebook_dir)
+    monkeypatch.syspath_prepend(str(notebook_dir))
     monkeypatch.delitem(sys.modules, "notebook_utils", raising=False)
     importlib.invalidate_caches()
+    served = {"notebook_utils.py": COMPATIBLE_UTILS, "cmd_helper.py": CMD_HELPER}
 
-    def retrieve(url, filename):
-        Path(filename).write_bytes(COMPATIBLE_UTILS)
-        return str(filename), None
+    def urlopen(url, timeout):
+        assert url.startswith(HELPER_URL) and timeout == 10
+        response = MagicMock()
+        response.__enter__.return_value.read.return_value = served[url[len(HELPER_URL) :]]
+        return response
 
-    with patch("urllib.request.urlretrieve", side_effect=retrieve) as download:
-        yield source, download
+    with patch("urllib.request.urlopen", side_effect=urlopen) as download:
+        yield SimpleNamespace(source=bootstrap_source(["notebook_utils.py", "cmd_helper.py"]), download=download, repo_utils=tmp_path / "utils")
     sys.modules.pop("notebook_utils", None)
 
 
-def test_notebook_bootstrap_refreshes_stale_utils(notebook_bootstrap):
-    source, download = notebook_bootstrap
+def test_notebook_bootstrap_downloads_missing_helpers(notebook_bootstrap):
+    run_bootstrap(notebook_bootstrap.source)
+
+    assert Path("notebook_utils.py").read_bytes() == COMPATIBLE_UTILS
+    assert Path("cmd_helper.py").read_bytes() == CMD_HELPER
+    assert sys.modules["notebook_utils"].SETUP_CALLS == 1
+    assert [c.args[0] for c in notebook_bootstrap.download.call_args_list] == [HELPER_URL + "notebook_utils.py", HELPER_URL + "cmd_helper.py"]
+
+
+def test_notebook_bootstrap_overwrites_downloaded_helpers(notebook_bootstrap):
     Path("notebook_utils.py").write_text("OLD_UTILS = True\n", encoding="utf-8")
+    Path("cmd_helper.py").write_text("OLD_HELPER = True\n", encoding="utf-8")
 
-    exec(compile(source, str(BOOTSTRAP_NOTEBOOK), "exec"), {})
+    run_bootstrap(notebook_bootstrap.source)
 
     assert Path("notebook_utils.py").read_bytes() == COMPATIBLE_UTILS
+    assert Path("cmd_helper.py").read_bytes() == CMD_HELPER
     assert sys.modules["notebook_utils"].SETUP_CALLS == 1
-    download.assert_called_once()
 
 
-def test_notebook_bootstrap_downloads_missing_utils(notebook_bootstrap):
-    source, download = notebook_bootstrap
+def test_notebook_bootstrap_copies_helpers_from_repository(notebook_bootstrap):
+    repo_utils = notebook_bootstrap.repo_utils
+    repo_utils.mkdir()
+    (repo_utils / "notebook_utils.py").write_bytes(COMPATIBLE_UTILS)
+    (repo_utils / "cmd_helper.py").write_bytes(b"REPO_HELPER = True\n")
+    Path("cmd_helper.py").write_text("OLD_HELPER = True\n", encoding="utf-8")
 
-    exec(compile(source, str(BOOTSTRAP_NOTEBOOK), "exec"), {})
+    run_bootstrap(notebook_bootstrap.source)
 
-    assert sys.modules["notebook_utils"].SETUP_CALLS == 1
+    notebook_bootstrap.download.assert_not_called()
     assert Path("notebook_utils.py").read_bytes() == COMPATIBLE_UTILS
-    download.assert_called_once()
+    assert Path("cmd_helper.py").read_bytes() == b"REPO_HELPER = True\n"
+    assert sys.modules["notebook_utils"].SETUP_CALLS == 1
 
 
-def test_notebook_bootstrap_keeps_compatible_utils(notebook_bootstrap):
-    source, download = notebook_bootstrap
+def test_notebook_bootstrap_requires_listed_helpers_in_repository(notebook_bootstrap):
+    notebook_bootstrap.repo_utils.mkdir()
+    (notebook_bootstrap.repo_utils / "notebook_utils.py").write_bytes(COMPATIBLE_UTILS)
+
+    with pytest.raises(FileNotFoundError):
+        run_bootstrap(notebook_bootstrap.source)
+
+    notebook_bootstrap.download.assert_not_called()
+
+
+DOWNLOAD_ERRORS = [
+    urllib.error.URLError("offline"),
+    urllib.error.HTTPError("https://example.com", 404, "Not Found", {}, None),
+    TimeoutError("timed out"),
+]
+
+
+@pytest.mark.parametrize("error", DOWNLOAD_ERRORS)
+@pytest.mark.parametrize("fails_on", ["open", "read"])
+def test_notebook_bootstrap_keeps_existing_helpers_when_download_fails(notebook_bootstrap, capsys, error, fails_on):
     Path("notebook_utils.py").write_bytes(COMPATIBLE_UTILS)
-    exec(compile(source, str(BOOTSTRAP_NOTEBOOK), "exec"), {})
-    module = sys.modules["notebook_utils"]
+    Path("cmd_helper.py").write_bytes(b"OLD_HELPER = True\n")
+    if fails_on == "open":
+        notebook_bootstrap.download.side_effect = error
+    else:
+        notebook_bootstrap.download.side_effect = None
+        notebook_bootstrap.download.return_value.__enter__.return_value.read.side_effect = error
 
-    with patch("importlib.reload", side_effect=AssertionError("compatible module must not be reloaded")):
-        exec(compile(source, str(BOOTSTRAP_NOTEBOOK), "exec"), {})
+    run_bootstrap(notebook_bootstrap.source)
 
-    download.assert_not_called()
-    assert sys.modules["notebook_utils"] is module
-    assert module.SETUP_CALLS == 2
-
-
-def test_notebook_bootstrap_refreshes_cached_stale_utils(notebook_bootstrap):
-    source, download = notebook_bootstrap
-    Path("notebook_utils.py").write_text("OLD_UTILS = True\n", encoding="utf-8")
-    module = importlib.import_module("notebook_utils")
-
-    exec(compile(source, str(BOOTSTRAP_NOTEBOOK), "exec"), {})
-
-    assert sys.modules["notebook_utils"] is module
-    assert module.SETUP_CALLS == 1
-    download.assert_called_once()
+    assert Path("notebook_utils.py").read_bytes() == COMPATIBLE_UTILS
+    assert Path("cmd_helper.py").read_bytes() == b"OLD_HELPER = True\n"
+    assert sys.modules["notebook_utils"].SETUP_CALLS == 1
+    assert "Could not update cmd_helper.py, using the existing copy" in capsys.readouterr().out
 
 
-def test_notebook_bootstrap_reloads_updated_disk_without_download(notebook_bootstrap):
-    source, download = notebook_bootstrap
-    utils_path = Path("notebook_utils.py")
-    utils_path.write_bytes(b"OLD_UTILS = True\n")
-    module = importlib.import_module("notebook_utils")
-    utils_path.write_bytes(COMPATIBLE_UTILS)
-
-    exec(compile(source, str(BOOTSTRAP_NOTEBOOK), "exec"), {})
-
-    download.assert_not_called()
-    assert sys.modules["notebook_utils"] is module
-    assert module.SETUP_CALLS == 1
-
-
-@pytest.mark.parametrize(
-    "error",
-    [urllib.error.URLError("offline"), urllib.error.HTTPError("https://example.com", 404, "Not Found", {}, None), TimeoutError("timed out")],
-)
-def test_notebook_bootstrap_propagates_download_failure(notebook_bootstrap, error):
-    source, download = notebook_bootstrap
-    original = b"OLD_UTILS = True\n"
-    Path("notebook_utils.py").write_bytes(original)
-    download.side_effect = error
+@pytest.mark.parametrize("error", DOWNLOAD_ERRORS)
+def test_notebook_bootstrap_propagates_download_failure_without_copy(notebook_bootstrap, error):
+    notebook_bootstrap.download.side_effect = error
 
     with pytest.raises(type(error)):
-        exec(compile(source, str(BOOTSTRAP_NOTEBOOK), "exec"), {})
+        run_bootstrap(notebook_bootstrap.source)
 
-    assert Path("notebook_utils.py").read_bytes() == original
-    assert sorted(path.name for path in Path.cwd().iterdir() if path.is_file()) == ["notebook_utils.py"]
+    assert list(Path.cwd().iterdir()) == []
 
 
 def test_notebook_bootstrap_is_consistent_across_notebooks():
     root = BOOTSTRAP_NOTEBOOK.parents[2]
     reference = json.loads(BOOTSTRAP_NOTEBOOK.read_text(encoding="utf-8"))
     reference_cell = next(cell for cell in reference["cells"] if cell["cell_type"] == "code")
-    reference_nodes = bootstrap_nodes("".join(reference_cell["source"]))
+    _, reference_nodes = bootstrap_nodes("".join(reference_cell["source"]))
     for path in (root / "notebooks").glob("*/*.ipynb"):
         if path.name.startswith("test_"):
             continue
@@ -125,25 +144,29 @@ def test_notebook_bootstrap_is_consistent_across_notebooks():
         cell = next((cell for cell in notebook["cells"] if cell["cell_type"] == "code"), None)
         if cell is None:
             continue
-        assert bootstrap_nodes("".join(cell["source"])) == reference_nodes, path
+        helper_files, nodes = bootstrap_nodes("".join(cell["source"]))
+        assert nodes == reference_nodes, path
+        assert helper_files[0] == "notebook_utils.py" and len(set(helper_files)) == len(helper_files), path
+        assert all((root / "utils" / name).is_file() for name in helper_files), path
 
 
 def bootstrap_nodes(source):
+    """Return the `helper_files` list and the dumped statements that follow it up to the `notebook_utils` import."""
     nodes = ast.parse(source).body
     start = next(
-        i for i, node in enumerate(nodes) if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "utils_path" for t in node.targets)
+        i for i, node in enumerate(nodes) if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "helper_files" for t in node.targets)
     )
     end = next(i for i, node in enumerate(nodes) if isinstance(node, ast.ImportFrom) and node.module == "notebook_utils")
-    return [ast.dump(node) for node in nodes[start : end + 1]]
+    return ast.literal_eval(nodes[start].value), [ast.dump(node) for node in nodes[start + 1 : end + 1]]
 
 
 def test_contributing_bootstrap_matches_notebook():
     root = BOOTSTRAP_NOTEBOOK.parents[2]
     guide = (root / "CONTRIBUTING.md").read_text(encoding="utf-8")
-    example = guide.split("```python\nimport importlib\n", 1)[1].split("```", 1)[0]
+    example = guide.split("```python\nimport urllib.request\n", 1)[1].split("```", 1)[0]
     notebook = json.loads(BOOTSTRAP_NOTEBOOK.read_text(encoding="utf-8"))
     source = "".join(next(cell for cell in notebook["cells"] if cell["cell_type"] == "code")["source"])
-    assert ast.dump(ast.parse("import importlib\n" + example)) == ast.dump(ast.parse(source))
+    assert ast.dump(ast.parse("import urllib.request\n" + example)) == ast.dump(ast.parse(source))
 
 
 @pytest.mark.parametrize("notebook_name", ["notebook", "notebook.py", "nested/notebook.ipynb"])
