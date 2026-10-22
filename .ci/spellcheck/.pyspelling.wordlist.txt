@@ -1140,6 +1140,7 @@ StableDiffusionPipeline
 STAL
 stateful
 STFT
+STG
 streamable
 Struct
 struct
@@ -1244,6 +1245,7 @@ UNet
 Unet
 UNets
 Unimodal
+Unsloth
 unsqueeze
 Uparrow
 uparrow
@@ -1335,6 +1337,7 @@ WIKITQ
 Wofk
 WTQ
 wuerstchen
+WWB
 WuerstchenDiffNeXt
 Würstchen
 XAI

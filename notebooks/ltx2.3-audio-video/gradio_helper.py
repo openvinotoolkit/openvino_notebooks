@@ -1,12 +1,13 @@
 import uuid
 
 import gradio as gr
+import numpy as np
 import torch
 from diffusers.pipelines.ltx2.utils import DEFAULT_NEGATIVE_PROMPT
 from diffusers.utils import encode_video
 
 
-def make_demo(pipe, generation_mode):
+def make_demo(pipe, generation_mode, use_genai=False):
     is_image_to_video = generation_mode == "image-to-video"
 
     def generate(prompt, negative_prompt, image, width, height, num_frames, num_inference_steps, seed):
@@ -15,7 +16,6 @@ def make_demo(pipe, generation_mode):
 
         frame_rate = 24.0
         generation_args = {
-            "prompt": prompt,
             "negative_prompt": negative_prompt,
             "width": int(width),
             "height": int(height),
@@ -23,22 +23,34 @@ def make_demo(pipe, generation_mode):
             "frame_rate": frame_rate,
             "num_inference_steps": int(num_inference_steps),
             "guidance_scale": 3.0,
-            "generator": torch.Generator("cpu").manual_seed(int(seed)),
-            "output_type": "np",
-            "return_dict": False,
         }
-        if is_image_to_video:
-            generation_args.update({"image": image, "image_crf": 0})
 
-        video, audio = pipe(**generation_args)
+        if use_genai:
+            import openvino_genai as ov_genai
+
+            result = pipe.generate(prompt, generator=ov_genai.TorchGenerator(int(seed)), **generation_args)
+            video = torch.from_numpy(np.array(result.video.data[0]))
+            audio = torch.from_numpy(np.array(result.audio.data[0]))
+            audio_sample_rate = result.audio_sample_rate
+        else:
+            generation_args.update(
+                {
+                    "prompt": prompt,
+                    "generator": torch.Generator("cpu").manual_seed(int(seed)),
+                    "output_type": "np",
+                    "return_dict": False,
+                }
+            )
+            if is_image_to_video:
+                generation_args.update({"image": image, "image_crf": 0})
+
+            videos, audios = pipe(**generation_args)
+            video = videos[0]
+            audio = audios[0].float().cpu()
+            audio_sample_rate = pipe.vocoder.config.output_sampling_rate
+
         output_path = f"ltx2.3_output_{uuid.uuid4().hex[:8]}.mp4"
-        encode_video(
-            video[0],
-            fps=frame_rate,
-            audio=audio[0].float().cpu(),
-            audio_sample_rate=pipe.vocoder.config.output_sampling_rate,
-            output_path=output_path,
-        )
+        encode_video(video, fps=frame_rate, audio=audio, audio_sample_rate=audio_sample_rate, output_path=output_path)
         return output_path
 
     with gr.Blocks() as demo:

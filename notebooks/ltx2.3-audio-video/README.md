@@ -2,20 +2,20 @@
 
 [LTX-2.3](https://huggingface.co/diffusers/LTX-2.3-Diffusers) is a diffusion transformer model that generates video and synchronized audio in a single pipeline. The prompt can describe both the visual scene and its soundtrack, including ambient sounds, music, and speech.
 
-This tutorial shows how to export LTX-2.3 to OpenVINO Intermediate Representation with [Optimum Intel](https://huggingface.co/docs/optimum/intel/index) and run one of two workflows:
+This tutorial shows how to export LTX-2.3 to OpenVINO Intermediate Representation with [Optimum Intel](https://huggingface.co/docs/optimum/intel/index), compress its weights with [NNCF](https://github.com/openvinotoolkit/nncf), and run one of two workflows:
 
-- **Text-to-audio-video** generates video and audio from a text prompt.
-- **Image-to-audio-video** uses an initial image together with a text prompt.
+- **Text-to-audio-video** generates video and audio from a text prompt with [OpenVINO GenAI](https://github.com/openvinotoolkit/openvino.genai) `Text2VideoPipeline` or with the Optimum Intel pipeline.
+- **Image-to-audio-video** uses an initial image together with a text prompt and runs with the Optimum Intel pipeline.
 
-Only the selected workflow is exported because image-to-video additionally requires a VAE encoder and therefore has a different IR layout.
+A single image-to-video export is reused by both workflows. The recommended INT8 model keeps the sensitive layers in FP16 and takes about half the disk space of the FP16 model.
 
-> **Resource notice:** LTX-2.3 is a large model. Download, export, and inference require substantial disk space and memory and may take a long time, especially on CPU.
+> **Resource notice:** LTX-2.3 is a large model. Download, export, compression, and inference require substantial disk space and memory and may take a long time, especially on CPU.
 
 ## Notebook contents
 
 - Prerequisites
-- Select generation mode
 - Convert the model to OpenVINO IR
+- Compress model weights
 - Run audio-video generation
 - Interactive inference
 - Limitations
