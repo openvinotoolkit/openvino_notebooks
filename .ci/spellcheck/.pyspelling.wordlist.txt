@@ -812,6 +812,7 @@ OpenCV
 OpenCV's
 OpenDataLab
 openjourney
+OpenMDW
 OpenPose
 OpenShift
 OpenVINO
@@ -947,6 +948,7 @@ prithivMLmods
 proto
 protobuf
 PRs
+PSNR
 psychoacoustics
 PTQ
 px
@@ -1250,6 +1252,7 @@ UNet
 Unet
 UNets
 Unimodal
+UniPC
 unsqueeze
 Uparrow
 uparrow
