@@ -141,6 +141,7 @@
 - [Using TensorFlow Object Detection API with OpenVINO™](./tensorflow-object-detection-to-openvino/tensorflow-object-detection-api-with-openvino.ipynb)
 - [Convert a TensorFlow Model to OpenVINO™](./tensorflow-classification-to-openvino/tensorflow-classification-to-openvino.ipynb)
 - [Line-level text detection with Surya](./surya-line-level-text-detection/surya-line-level-text-detection.ipynb)
+- [SAM 3D Body with OpenVINO on Intel GPU](./sam-3d-body/sam-3d-body.ipynb)
 - [RF-DETR Object Detection with OpenVINO](./rf-detr-object-detection/rf-detr-object-detection.ipynb)
 - [Convert a PyTorch Model to OpenVINO™ IR](./pytorch-to-openvino/pytorch-to-openvino.ipynb)
 - [Document Parsing using PaddleOCR-VL/PaddleOCR-VL-1.5/PaddleOCR-VL-1.6 and OpenVINO](./paddleocr_vl/paddleocr_vl.ipynb)
@@ -217,6 +218,7 @@
 - [SAM 3 Image Segmentation with OpenVINO](./sam3/sam3-segmentation.ipynb)
 - [Object masks from prompts with SAM2 and OpenVINO](./sam2-video-segmentation/segment-anything-2-video.ipynb)
 - [Object masks from prompts with SAM2 and OpenVINO for Images](./sam2-image-segmentation/segment-anything-2-image.ipynb)
+- [SAM 3D Body with OpenVINO on Intel GPU](./sam-3d-body/sam-3d-body.ipynb)
 - [Background removal with RMBG v1.4 and OpenVINO](./rmbg-background-removal/rmbg-background-removal.ipynb)
 - [RF-DETR Object Detection with OpenVINO](./rf-detr-object-detection/rf-detr-object-detection.ipynb)
 - [Qwen3.8 Multi-Token Prediction with OpenVINO™](./qwen3.8-mtp/qwen3.8-mtp.ipynb)
@@ -319,6 +321,7 @@
 
 - [YOLOv11 quantization with accuracy control using NNCF](./yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb)
 - [Quantize Speech Recognition Models with accuracy control using NNCF PTQ API](./speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb)
+- [SAM 3D Body with OpenVINO on Intel GPU](./sam-3d-body/sam-3d-body.ipynb)
 - [Post-Training Quantization of PyTorch models with NNCF](./pytorch-post-training-quantization-nncf/pytorch-post-training-quantization-nncf.ipynb)
 - [Optimize Preprocessing](./optimize-preprocessing/optimize-preprocessing.ipynb)
 - [Voice tone cloning with OpenVoice2 and MeloTTS for Text-to-Speech by OpenVINO](./openvoice2-and-melotts/openvoice2-and-melotts.ipynb)
