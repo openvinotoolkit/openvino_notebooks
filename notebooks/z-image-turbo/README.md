@@ -13,7 +13,7 @@ Z-Image-Turbo is Alibaba's production-ready, open-source 6B-parameter image gene
 
 More details about model can be found in [paper post](https://arxiv.org/pdf/2511.22699) and [model card](https://huggingface.co/Tongyi-MAI/Z-Image-Turbo).
 
-In this tutorial we consider how to convert and optimize Z-Image-Turbo model using OpenVINO.
+In this tutorial we consider how to convert and optimize Z-Image-Turbo using Optimum Intel and run it with OpenVINO GenAI.
 
 ### Notebook Contents
 
@@ -25,7 +25,7 @@ The tutorial consists of the following steps:
 - Collect Pytorch model pipeline
 - Convert model to OpenVINO intermediate representation (IR) format 
 - Compress weights using NNCF
-- Prepare OpenVINO Inference pipeline
+- Prepare OpenVINO GenAI inference pipeline
 - Run Text-to-Image generation
 - Launch interactive demo
 
@@ -35,8 +35,11 @@ This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For further details, please refer to [Installation Guide](../../README.md).
 
-⚠️ **EXPERIMENTAL NOTEBOOK**
+> [!WARNING]
+> ⚠️ **EXPERIMENTAL NOTEBOOK**
+>
+> This notebook demonstrates a model that has not been fully validated with OpenVINO. It may be fully supported and validated in the future.
 
-This notebook demonstrates a model that has not been fully validated with OpenVINO and is using a custom branch of optimum-intel. It may be fully supported and validated in the future.
+The notebook temporarily installs nightly OpenVINO packages and Optimum Intel from the main branch. Transformers 5.x is required during export so the resulting model directory includes the OpenVINO tokenizer models used by the GenAI pipeline.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/z-image-turbo/README.md" />

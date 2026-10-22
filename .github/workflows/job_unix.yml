@@ -249,7 +249,7 @@ jobs:
           EOF
 
       - name: Setup Python ${{ inputs.python }}
-        uses: openvinotoolkit/openvino/.github/actions/setup_python@accd915ec4637ece11672b9034194a036edce1ae
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@178d03e210433f32af080aab3e05562e238c5ee2
         with:
           version: ${{ inputs.python }}
           pip-cache-path: ${{ env.PIP_CACHE_PATH }}
@@ -372,7 +372,7 @@ jobs:
             $IGNORE_ARGS \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
             --collect_reports \
-            --timeout 2400 \
+            --timeout ${{ inputs.dashboard_data && 3600 || 1200 }} \
             "${DASHBOARD_ARGS[@]}"
       
       - name: Analysing with treon (MacOS)
@@ -402,7 +402,7 @@ jobs:
             ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
             --collect_reports \
-            --timeout 2400 \
+            --timeout ${{ inputs.dashboard_data && 3600 || 1200 }} \
             "${DASHBOARD_ARGS[@]}"
 
       - name: Archive notebook test report
@@ -414,7 +414,7 @@ jobs:
 
       - name: Archive nightly dashboard data fragment
         if: ${{ always() && inputs.dashboard_data }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: nightly-fragment-${{ env.TEST_REPORT_DIR }}-${{ inputs.batch }}
           path: dashboard_fragment/
