@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export InternVLA-N1 components to accuracy-first OpenVINO IRs."""
+"""Export InternVLA-N1 components to OpenVINO IRs."""
 
 from __future__ import annotations
 

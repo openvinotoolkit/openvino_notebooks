@@ -1,4 +1,4 @@
-"""Independent InternVLA-N1 System 1 modules used for OpenVINO export."""
+"""InternVLA-N1 System 1 modules used for OpenVINO export."""
 
 from __future__ import annotations
 

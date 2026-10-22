@@ -1,4 +1,4 @@
-"""Checkpoint loading utilities with no dependency on the InternNav source tree."""
+"""Checkpoint loading utilities."""
 
 from __future__ import annotations
 

@@ -1,12 +1,4 @@
-"""Inputs and a self-contained PyTorch reference for the InternVLA-N1 DualVLN notebook.
-
-The upstream project produces reference tensors with ``run_baseline.py``, which imports the
-InternNav source tree (and its Depth Anything / LongCLIP dependencies) and pins an older
-``transformers``. None of that is needed at inference time, so this module rebuilds the
-*inference* path straight from the checkpoint with the same ``internvla`` modules that
-``export.py`` converts. Comparing the two therefore measures exactly the cost of the
-conversion.
-"""
+"""Inputs and a self-contained PyTorch reference for the InternVLA-N1 DualVLN notebook."""
 
 from __future__ import annotations
 

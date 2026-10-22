@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Download the InternVLA-N1 DualVLN checkpoint the export/inference pipeline needs.
+"""Download the InternVLA-N1 DualVLN checkpoint.
 
 Fetches, from the Hugging Face Hub:
   - InternRobotics/InternVLA-N1-DualVLN  -> pretrained/InternVLA-N1-DualVLN/

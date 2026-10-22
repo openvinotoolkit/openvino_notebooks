@@ -1,4 +1,4 @@
-"""Independent OpenVINO inference orchestration for InternVLA-N1 DualVLN."""
+"""OpenVINO inference orchestration for InternVLA-N1 DualVLN."""
 
 from __future__ import annotations
 
