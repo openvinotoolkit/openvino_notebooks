@@ -43,9 +43,8 @@ def optimum_cli(model_id, output_dir, show_command=True, additional_args: dict[s
         display(Markdown("**Export command:**"))
         display(Markdown(f"`{' '.join(export_command)}`"))
 
-    transofrmers_loglevel = None
+    previous_verbosity = os.environ.get("TRANSFORMERS_VERBOSITY") if debug_logs else None
     if debug_logs:
-        transofrmers_loglevel = os.environ.pop("TRANSFORMERS_VERBOSITY", None)
         os.environ["TRANSFORMERS_VERBOSITY"] = "debug"
 
     try:
@@ -60,9 +59,10 @@ def optimum_cli(model_id, output_dir, show_command=True, additional_args: dict[s
         if exc.stderr:
             logger.error(f"STDERR:\n{exc.stderr.decode(errors='replace')}")
 
-        if transofrmers_loglevel is not None:
-            os.environ["TRANSFORMERS_VERBOSITY"] = transofrmers_loglevel
         raise exc
     finally:
-        if transofrmers_loglevel is not None:
-            os.environ["TRANSFORMERS_VERBOSITY"] = transofrmers_loglevel
+        if debug_logs:
+            if previous_verbosity is None:
+                os.environ.pop("TRANSFORMERS_VERBOSITY", None)
+            else:
+                os.environ["TRANSFORMERS_VERBOSITY"] = previous_verbosity
