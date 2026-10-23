@@ -17,7 +17,8 @@ if (NUM_FRAMES - 1) % TEMPORAL_COMPRESSION:
     raise ValueError("NUM_FRAMES must be 1 + a multiple of the temporal compression factor")
 LATENT_FRAMES = (NUM_FRAMES - 1) // TEMPORAL_COMPRESSION + 1
 LATENT_SHAPE = (1, 48, LATENT_FRAMES, 16, 16)
-INPUT_NAMES = ("vision_latents", "input_ids", "text_cos", "text_sin", "text_mask", "gen_cos", "gen_sin")
+TEXT_INPUT_NAMES = ("input_ids", "text_cos", "text_sin")
+DENOISER_INPUT_NAMES = ("vision_latents", "timestep", "text_k", "text_v", "text_mask", "gen_cos", "gen_sin")
 
 
 class PromptPreprocessor:
@@ -111,21 +112,31 @@ class PromptPreprocessor:
         }
 
 
-def fold_unipc(config: dict, steps: int) -> tuple[list[float], list[list[float]]]:
-    """Express each UniPC step as a fixed linear combination of the initial latent and past velocities."""
+def make_scheduler(config: dict, steps: int):
+    """UniPC scheduler with the native flow sigma schedule used by `Cosmos3OmniPipeline`."""
     from diffusers.schedulers.scheduling_unipc_multistep import UniPCMultistepScheduler
 
     scheduler = UniPCMultistepScheduler.from_config(config)
     scheduler.set_timesteps(steps, sigmas=np.linspace(1.0 - 1.0 / scheduler.config.num_train_timesteps, 0.0, steps + 1)[:-1])
-    state = torch.zeros(1, 1, steps + 1, dtype=torch.float64)
-    state[..., 0] = 1
-    coefficients = []
-    for k, timestep in enumerate(scheduler.timesteps):
-        velocity = torch.zeros_like(state)
-        velocity[..., k + 1] = 1
-        state = scheduler.step(velocity, timestep, state, return_dict=False)[0]
-        coefficients.append(state.flatten().tolist())
-    return [float(t) for t in scheduler.timesteps], coefficients
+    return scheduler
+
+
+def run_denoising(step_fn, latent: np.ndarray, scheduler_config: dict, steps: int) -> np.ndarray:
+    """
+    Denoise a latent with UniPC.
+
+    :param step_fn: maps (latent, timestep) as float32 arrays to the guided velocity
+    :param latent: initial noise of shape `LATENT_SHAPE`
+    :param scheduler_config: UniPC scheduler configuration
+    :param steps: number of denoising steps
+    :returns: denoised latent
+    """
+    scheduler = make_scheduler(config=scheduler_config, steps=steps)
+    x = torch.from_numpy(latent)
+    for t in scheduler.timesteps:
+        velocity = torch.from_numpy(np.asarray(step_fn(x.numpy(), np.array([float(t)], dtype=np.float32))))
+        x = scheduler.step(velocity, t, x, return_dict=False)[0]
+    return x.numpy()
 
 
 def rotate_half(x):
@@ -136,7 +147,7 @@ def rotate_half(x):
 class TextKV(nn.Module):
     """Causal text pathway for the conditional and unconditional rows; returns per-layer RoPE'd K and V."""
 
-    def __init__(self, transformer):
+    def __init__(self, transformer: nn.Module):
         super().__init__()
         self.tr = transformer
 
@@ -164,26 +175,23 @@ class TextKV(nn.Module):
         return torch.stack(keys), torch.stack(values)
 
 
-class CFGDenoiser(nn.Module):
-    """All denoising steps with classifier-free guidance; cond and uncond rows share one pass through the linears."""
+class DenoiseStep(nn.Module):
+    """One denoising step with classifier-free guidance; cond and uncond rows share one pass through the linears."""
 
-    def __init__(self, transformer, timesteps, coefficients, guidance_scale):
+    def __init__(self, transformer: nn.Module, guidance_scale: float):
         super().__init__()
         self.tr = transformer
-        self.coefficients = coefficients
         self.guidance_scale = guidance_scale
         latent_t, latent_h, latent_w = LATENT_SHAPE[2:]
         patch = transformer.config.latent_patch_size
         self.shapes = [(latent_t, latent_h // patch, latent_w // patch)]
         self.noisy = [torch.arange(latent_t)]
         self.num_tokens = latent_t * (latent_h // patch) * (latent_w // patch)
-        embeddings = [transformer.time_embedder(transformer.time_proj(torch.tensor([t * transformer.config.timestep_scale]))) for t in timesteps]
-        self.register_buffer("time_embeddings", torch.cat(embeddings, 0), persistent=False)
 
-    def velocity(self, x, step, text_k, text_v, text_mask, gen_cos, gen_sin):
+    def forward(self, x, timestep, text_k, text_v, text_mask, gen_cos, gen_sin):
         tr, n = self.tr, self.num_tokens
         vision, original = tr._patchify_and_pack_latents([x])
-        tokens = tr.proj_in(vision) + self.time_embeddings[step : step + 1]
+        tokens = tr.proj_in(vision) + tr.time_embedder(tr.time_proj(timestep * tr.config.timestep_scale))
         hidden = torch.cat([tokens, tokens], 0)
         zeros = torch.zeros(1, 1, 1, n, dtype=text_mask.dtype)
         masks = [torch.cat([text_mask[row : row + 1], zeros], -1) for row in range(2)]
@@ -214,28 +222,6 @@ class CFGDenoiser(nn.Module):
         unconditional = tr._unpatchify_and_unpack_latents(projected[n:], self.shapes, self.noisy, original)[0]
         return unconditional + self.guidance_scale * (conditional - unconditional)
 
-    def forward(self, vision_latents, text_k, text_v, text_mask, gen_cos, gen_sin):
-        x, history = vision_latents, []
-        for step, row in enumerate(self.coefficients):
-            history.append(self.velocity(x, step, text_k, text_v, text_mask, gen_cos, gen_sin))
-            x = row[0] * vision_latents
-            for j, velocity in enumerate(history):
-                x = x + row[j + 1] * velocity
-        return x
-
-
-class Cosmos3EdgeT2V(nn.Module):
-    """Prompt tensors + initial noise -> final latent: text tower and every CFG denoising step in one graph."""
-
-    def __init__(self, transformer: nn.Module, timesteps: list[float], coefficients: list[list[float]], guidance_scale: float):
-        super().__init__()
-        self.text = TextKV(transformer)
-        self.denoiser = CFGDenoiser(transformer, timesteps, coefficients, guidance_scale)
-
-    def forward(self, vision_latents, input_ids, text_cos, text_sin, text_mask, gen_cos, gen_sin):
-        text_k, text_v = self.text(input_ids, text_cos, text_sin)
-        return self.denoiser(vision_latents, text_k, text_v, text_mask, gen_cos, gen_sin)
-
 
 class VAEDecoder(nn.Module):
     """Latent -> video wrapper around the Wan VAE decoder."""
@@ -254,31 +240,6 @@ def use_nearest_upsampling(model: nn.Module) -> int:
     for module in upsamples:
         module.mode = "nearest"
     return len(upsamples)
-
-
-def unshare_fc_weights(model: ov.Model, pattern: str = "mlp_moe_gen.down_proj") -> int:
-    """Give every reuse of a shared FC weight its own byte-distinct, mathematically identical copy."""
-    count = 0
-    for op in model.get_ordered_ops():
-        name = op.get_friendly_name()
-        match = re.search(r"/MatMul_(\d+)$", name)
-        if op.get_type_name() != "MatMul" or pattern not in name or not match:
-            continue
-        reuse = int(match.group(1))
-        if reuse > 3:
-            raise ValueError("Only three byte-distinct variants (W^T, -W, -W^T) are available")
-        convert = op.input_value(1).get_node()
-        weight = convert.input_value(0).get_node().get_data()
-        transpose, negate = reuse in (1, 3), reuse in (2, 3)
-        variant = (weight.T if transpose else weight) * (-1 if negate else 1)
-        constant = ops.convert(ops.constant(np.ascontiguousarray(variant)), convert.get_output_element_type(0))
-        output = ops.matmul(op.input_value(0), constant, False, not transpose)
-        if negate:
-            output = ops.multiply(output, ops.constant(np.array(-1, np.float32)))
-        for target in list(op.output(0).get_target_inputs()):
-            target.replace_source_output(output.output(0))
-        count += 1
-    return count
 
 
 def _const(output):
