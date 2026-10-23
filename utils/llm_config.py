@@ -547,6 +547,12 @@ SUPPORTED_LLM_MODELS = {
             "stop_tokens": ["<|im_end|>", "<|endoftext|>"],
             "completion_to_prompt": lfm2_completion_to_prompt,
         },
+        "lfm2.5-24b-a2b": {
+            "model_id": "LiquidAI/LFM2.5-24B-A2B",
+            "remote_code": False,
+            "start_message": "You are a helpful assistant trained by Liquid AI.",
+            "stop_tokens": ["<|im_end|>"],
+        },
         "lfm2.5-350m": {
             "model_id": "LiquidAI/LFM2.5-350M",
             "remote_code": False,
