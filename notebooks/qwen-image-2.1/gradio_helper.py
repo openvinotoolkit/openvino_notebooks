@@ -19,7 +19,12 @@ PIPELINE_CLASSES = {
     "Image Editing": ov_genai.Image2ImagePipeline,
 }
 PRECISIONS = ("FP16", "INT8", "INT4")
+MAX_CONDITION_IMAGES = 3
 EDITING_SAMPLE_PROMPT = "Put a tiny red top hat and a blue bow tie on the cat. " "Preserve the cat's identity, face, pose, and the original composition."
+MULTI_IMAGE_SAMPLE_PROMPT = (
+    "Place the cat from Picture 1 next to the astronaut from Picture 2 on the lunar surface. "
+    "Preserve the cat's appearance, the astronaut's suit, and the moon landscape from Picture 2."
+)
 
 
 def _output_to_image(output: Any) -> Image.Image:
@@ -88,11 +93,11 @@ class PipelineManager:
         precision: str,
         device: str,
         prompt: str,
-        condition_image: Image.Image | None,
         seed: int,
         randomize_seed: bool,
         steps: int,
         resolution: int,
+        *condition_images: Image.Image | None,
     ) -> tuple[Image.Image, int, str]:
         """Generate and save an image.
 
@@ -100,17 +105,21 @@ class PipelineManager:
         :param precision: Exported model precision.
         :param device: OpenVINO inference device.
         :param prompt: Generation or editing instruction.
-        :param condition_image: Optional image used by image editing.
         :param seed: Random generator seed.
         :param randomize_seed: Whether to replace the provided seed.
         :param steps: Number of denoising steps.
         :param resolution: Square output resolution used by text-to-image.
+        :param condition_images: Optional Picture 1, Picture 2, ... slots used by image editing.
         :return: Generated image, effective seed, and status message.
         """
         if not prompt.strip():
             raise gr.Error("Enter a prompt or editing instruction.")
-        if pipeline_type == "Image Editing" and condition_image is None:
-            raise gr.Error("Select a condition image for Image Editing.")
+        images = [image for image in condition_images if image is not None]
+        if pipeline_type == "Image Editing":
+            if not images:
+                raise gr.Error("Select at least Picture 1 for Image Editing.")
+            if any(image is None for image in condition_images[: len(images)]):
+                raise gr.Error("Fill the picture slots in order: the prompt refers to them as Picture 1, Picture 2, and so on.")
         if randomize_seed:
             seed = random.randint(0, MAX_SEED)  # nosec B311 - UI seed, not security-sensitive
 
@@ -125,7 +134,7 @@ class PipelineManager:
                 generation_args.update(height=resolution, width=resolution)
                 output = pipeline.generate(prompt, **generation_args)
             else:
-                output = pipeline.generate(prompt, _image_to_tensor(condition_image), **generation_args)
+                output = pipeline.generate(prompt, [_image_to_tensor(image) for image in images], **generation_args)
 
         image = _output_to_image(output)
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -136,16 +145,18 @@ class PipelineManager:
         image.save(output_path)
 
         action = "Loaded" if loaded else "Reused"
-        status = f"{action} {pipeline_type} {precision} pipeline on {device}. Saved to {output_path.resolve()}."
+        conditioning = f" with {len(images)} condition image(s)" if pipeline_type == "Image Editing" else ""
+        status = f"{action} {pipeline_type} {precision} pipeline on {device}{conditioning}. Saved to {output_path.resolve()}."
         return image, seed, status
 
 
 def make_demo(
     model_root: str | Path,
-    default_precision: str = "FP16",
+    default_precision: str = "INT4",
     default_device: str = "CPU",
     output_dir: str | Path = "generated_images",
     editing_sample: str | Path | None = None,
+    reference_sample: str | Path | None = None,
 ) -> gr.Blocks:
     """Create the interactive Qwen-Image 2.1 demo.
 
@@ -153,7 +164,8 @@ def make_demo(
     :param default_precision: Initially selected model precision.
     :param default_device: Initially selected OpenVINO inference device.
     :param output_dir: Directory used to save generated images.
-    :param editing_sample: Optional image used by the editing example.
+    :param editing_sample: Optional image used by the editing examples as Picture 1.
+    :param reference_sample: Optional image used by the multi-image editing example as Picture 2.
     :return: Configured Gradio Blocks application.
     """
     manager = PipelineManager(model_root=model_root, output_dir=output_dir)
@@ -165,7 +177,8 @@ def make_demo(
         gr.Markdown("# Qwen-Image 2.1 with OpenVINO")
         gr.Markdown(
             "Select a pipeline, exported precision, and inference device. Only one pipeline is kept in memory. "
-            "Image editing is multimodal conditioning and does not use a strength parameter."
+            "Image editing is multimodal conditioning and does not use a strength parameter. "
+            "Up to three condition images can be passed; refer to them as Picture 1, Picture 2, and Picture 3 in the prompt."
         )
 
         with gr.Row():
@@ -190,10 +203,14 @@ def make_demo(
             value='A cozy coffee shop with a chalkboard sign reading "Qwen Coffee", cinematic lighting',
             lines=3,
         )
-        condition_image = gr.Image(
-            type="pil",
-            label="Condition image (required only for Image Editing)",
-        )
+        with gr.Row():
+            condition_images = [
+                gr.Image(
+                    type="pil",
+                    label=f"Picture {index + 1} ({'required' if index == 0 else 'optional'}, Image Editing only)",
+                )
+                for index in range(MAX_CONDITION_IMAGES)
+            ]
         with gr.Row():
             seed = gr.Slider(0, MAX_SEED, value=42, step=1, label="Seed")
             randomize_seed = gr.Checkbox(value=False, label="Randomize seed")
@@ -213,10 +230,16 @@ def make_demo(
             editing_sample = Path(editing_sample)
             if not editing_sample.is_file():
                 raise FileNotFoundError(f"Image editing sample was not found at {editing_sample}.")
+            examples = [["Image Editing", EDITING_SAMPLE_PROMPT, str(editing_sample), None]]
+            if reference_sample is not None:
+                reference_sample = Path(reference_sample)
+                if not reference_sample.is_file():
+                    raise FileNotFoundError(f"Multi-image editing sample was not found at {reference_sample}.")
+                examples.append(["Image Editing", MULTI_IMAGE_SAMPLE_PROMPT, str(editing_sample), str(reference_sample)])
             gr.Examples(
-                examples=[["Image Editing", EDITING_SAMPLE_PROMPT, str(editing_sample)]],
-                inputs=[pipeline_type, prompt, condition_image],
-                label="Image editing example",
+                examples=examples,
+                inputs=[pipeline_type, prompt, *condition_images[:2]],
+                label="Image editing examples",
             )
 
         run.click(
@@ -226,11 +249,11 @@ def make_demo(
                 precision,
                 device,
                 prompt,
-                condition_image,
                 seed,
                 randomize_seed,
                 steps,
                 resolution,
+                *condition_images,
             ],
             outputs=[output, seed, status],
         )
