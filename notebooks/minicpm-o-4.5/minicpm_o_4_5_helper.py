@@ -643,21 +643,15 @@ def convert_minicpmo_model(
                 print(f"⚠️ Warning: Could not download audio_tokenizer from Hub: {e}")
 
     if audio_tokenizer_path and model.config.init_tts:
-        try:
-            print("⌛ Converting Token2wav models (Flow Embeddings, Flow Estimator, HiFT)...")
-            convert_token2wav(
-                audio_tokenizer_path=audio_tokenizer_path,
-                output_dir=str(output_path),
-                float16=(torch_dtype == torch.float16),
-            )
-            print("✅ Token2wav models successfully converted")
-        except Exception as e:
-            print(f"⚠️ Warning: Failed to convert Token2wav models: {e}")
-            print("   You may need to convert Token2wav separately using convert_token2wav.py")
+        print("⌛ Converting Token2wav models (Flow Embeddings, Flow Estimator, HiFT)...")
+        convert_token2wav(
+            audio_tokenizer_path=audio_tokenizer_path,
+            output_dir=str(output_path),
+            float16=(torch_dtype == torch.float16),
+        )
+        print("✅ Token2wav models successfully converted")
     elif model.config.init_tts:
-        print("⚠️ Warning: TTS is enabled but audio_tokenizer_path not found")
-        print("   Please convert Token2wav separately using convert_token2wav.py")
-        print("   Example: python convert_token2wav.py --audio-tokenizer-path <path> --output-dir <output>")
+        raise FileNotFoundError("TTS is enabled but audio_tokenizer_path was not found; Token2wav models cannot be converted")
 
     gc.collect()
 
@@ -1910,7 +1904,11 @@ def convert_flow_encoder_chunk(token2wav_model, output_path: Path):
             embedding = F.normalize(embedding, dim=1)
             spks = self.spk_embed_affine_layer(embedding)
             token = self.input_embedding(torch.clamp(token, min=0))
-            h, new_cnn_cache, new_att_cache = self.encoder.forward_chunk(token, last_chunk=False, cnn_cache=cnn_cache, att_cache=att_cache)
+            forward_chunk = self.encoder.forward_chunk
+            if hasattr(forward_chunk, "__wrapped__"):
+                # TorchScript cannot trace a torch.compile-wrapped method.
+                forward_chunk = forward_chunk.__wrapped__.__get__(self.encoder, type(self.encoder))
+            h, new_cnn_cache, new_att_cache = forward_chunk(token, last_chunk=False, cnn_cache=cnn_cache, att_cache=att_cache)
             h = self.encoder_proj(h)
             return h, spks, new_cnn_cache, new_att_cache
 

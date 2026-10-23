@@ -83,7 +83,7 @@ def _download_sam3d_package(root: Path) -> Path:
     download happens at most once per machine.
     """
     import shutil
-    import subprocess
+    import subprocess  # nosec B404
     import tempfile
 
     pkg_dir = root / "sam_3d_body"
@@ -136,7 +136,7 @@ def _download_sam3d_package(root: Path) -> Path:
 
     tarball = root / "sam-3d-body.tar.gz"
     print(f"[sam3d_torch] Downloading sam_3d_body package from {SAM3D_TARBALL_URL}")
-    with urllib.request.urlopen(SAM3D_TARBALL_URL, timeout=180) as response, open(tarball, "wb") as handle:
+    with urllib.request.urlopen(SAM3D_TARBALL_URL, timeout=180) as response, open(tarball, "wb") as handle:  # nosec B310
         handle.write(response.read())
 
     with tarfile.open(tarball, "r:gz") as tar:

@@ -23,6 +23,7 @@ import json
 import math
 import os
 import sys
+import urllib.parse
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
@@ -82,11 +83,15 @@ def _download(url, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     failures = []
     for candidate in urls:
+        scheme = urllib.parse.urlparse(candidate).scheme.lower()
+        if scheme not in {"http", "https"}:
+            failures.append(f"{candidate}: unsupported URL scheme {scheme!r}")
+            continue
         print(f"Downloading {candidate} -> {dest}")
         try:
             # Some mirrors (GitHub attachments) reject the default urllib agent.
             request = urllib.request.Request(candidate, headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(request, timeout=60) as response, open(dest, "wb") as handle:
+            with urllib.request.urlopen(request, timeout=60) as response, open(dest, "wb") as handle:  # nosec B310
                 handle.write(response.read())
             return
         except Exception as exc:  # try the next mirror
