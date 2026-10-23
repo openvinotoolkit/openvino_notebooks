@@ -514,3 +514,10 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
+# Large model - 8 GB download and about 24 GB of host memory for conversion
+- notebook: notebooks/cosmos3-edge-text-to-video/cosmos3-edge-text-to-video.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
