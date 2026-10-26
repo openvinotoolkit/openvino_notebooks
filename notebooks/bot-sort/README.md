@@ -54,6 +54,11 @@ The bundled [JK_Standing_Next2U.mp4](JK_Standing_Next2U.mp4) is the first
 **30 seconds (900 frames at 30 FPS)** of the demonstration video, re-encoded
 at 1920x1080.
 
+The annotated outputs of the notebook run are in [results/video/](results/video):
+[OV_FP32_tracked.mp4](results/video/OV_FP32_tracked.mp4),
+[OV_FP16_tracked.mp4](results/video/OV_FP16_tracked.mp4) and
+[OV_INT8_tracked.mp4](results/video/OV_INT8_tracked.mp4). The notebook clips
+its own video runs to the first 20 seconds (600 frames, 960x536).
 MOT17 is not redistributed here. Provide the MOT17 FRCNN train sequences
 for the accuracy sections.
 
