@@ -10,7 +10,7 @@ so every backend / precision runs the identical host pipeline; it mirrors the of
 
 All paths are relative to this folder (``notebooks/``) and its parent; large inputs are looked up in the repository
 and its parent folder and can be overridden with environment variables:
-    BOTSORT_REPO, BOTSORT_DET_WEIGHTS, BOTSORT_REID_WEIGHTS, MOT17_TRAIN, VIDEO_1, VIDEO_2
+    BOTSORT_REPO, BOTSORT_DET_WEIGHTS, BOTSORT_REID_WEIGHTS, MOT17_TRAIN, VIDEO_1
 """
 
 import glob
@@ -80,7 +80,6 @@ DET_WEIGHTS = find_file("bytetrack_x_mot17.pth.tar", "BOTSORT_DET_WEIGHTS")
 REID_WEIGHTS = find_file("mot17_sbs_S50.pth", "BOTSORT_REID_WEIGHTS")
 MOT17_TRAIN = find_mot17()
 VIDEO_1 = find_file("JK_Standing_Next2U.mp4", "VIDEO_1")
-VIDEO_2 = find_file("Luka_Doncic.mp4", "VIDEO_2")
 
 # ----------------------------------------------------------------------------------------------------------- config
 # NOT in either weight file: needed identically by the PyTorch and the OpenVINO pipeline (tools/track.py,

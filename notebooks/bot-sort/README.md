@@ -52,8 +52,7 @@ show a complete run.
 
 The bundled [JK_Standing_Next2U.mp4](JK_Standing_Next2U.mp4) is the first
 **30 seconds (900 frames at 30 FPS)** of the demonstration video, re-encoded
-at 1920x1080. The notebook's second demonstration video, `Luka_Doncic.mp4`,
-is not bundled.
+at 1920x1080.
 
 MOT17 is not redistributed here. Provide the MOT17 FRCNN train sequences
 for the accuracy sections.
