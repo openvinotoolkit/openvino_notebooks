@@ -169,6 +169,7 @@
 
 - [Live Human Pose Estimation with OpenVINO™](./pose-estimation-webcam/pose-estimation.ipynb)
 - [Person Tracking with OpenVINO™](./person-tracking-webcam/person-tracking.ipynb)
+- [ByteTrack multi-object tracking with OpenVINO™](./byte-track/byte-track.ipynb)
 - [Person Counting System using YOLOV8 and OpenVINO™](./person-counting-webcam/person-counting.ipynb)
 - [PaddleOCR with OpenVINO™](./paddle-ocr-webcam/paddle-ocr-webcam.ipynb)
 - [Voice tone cloning with OpenVoice2 and MeloTTS for Text-to-Speech by OpenVINO](./openvoice2-and-melotts/openvoice2-and-melotts.ipynb)
