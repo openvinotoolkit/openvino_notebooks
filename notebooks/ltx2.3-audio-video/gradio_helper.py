@@ -5,12 +5,13 @@ import numpy as np
 import torch
 from diffusers.pipelines.ltx2.utils import DEFAULT_NEGATIVE_PROMPT
 from diffusers.utils import encode_video
+from tqdm.auto import tqdm
 
 
 def make_demo(pipe, generation_mode, use_genai=False):
     is_image_to_video = generation_mode == "image-to-video"
 
-    def generate(prompt, negative_prompt, image, width, height, num_frames, num_inference_steps, seed):
+    def generate(prompt, negative_prompt, image, width, height, num_frames, num_inference_steps, seed, progress=gr.Progress(track_tqdm=True)):
         if is_image_to_video and image is None:
             raise gr.Error("Provide an input image for image-to-audio-video generation.")
 
@@ -28,7 +29,13 @@ def make_demo(pipe, generation_mode, use_genai=False):
         if use_genai:
             import openvino_genai as ov_genai
 
-            result = pipe.generate(prompt, generator=ov_genai.TorchGenerator(int(seed)), **generation_args)
+            with tqdm(total=int(num_inference_steps), desc="Denoising") as progress_bar:
+
+                def callback(step, num_steps, latent):
+                    progress_bar.update(1)
+                    return False
+
+                result = pipe.generate(prompt, generator=ov_genai.TorchGenerator(int(seed)), callback=callback, **generation_args)
             video = torch.from_numpy(np.array(result.video.data[0]))
             audio = torch.from_numpy(np.array(result.audio.data[0]))
             audio_sample_rate = result.audio_sample_rate
@@ -65,7 +72,7 @@ def make_demo(pipe, generation_mode, use_genai=False):
         with gr.Row():
             width = gr.Slider(minimum=64, maximum=1280, value=768, step=32, label="Width")
             height = gr.Slider(minimum=64, maximum=720, value=512, step=32, label="Height")
-            num_frames = gr.Slider(minimum=9, maximum=257, value=121, step=8, label="Number of frames")
+            num_frames = gr.Slider(minimum=9, maximum=257, value=49, step=8, label="Number of frames")
         with gr.Row():
             num_inference_steps = gr.Slider(minimum=1, maximum=50, value=30, step=1, label="Inference steps")
             seed = gr.Slider(minimum=0, maximum=2**31 - 1, value=42, step=1, label="Seed")
