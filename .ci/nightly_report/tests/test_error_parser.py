@@ -482,7 +482,7 @@ def test_garbage_input_never_raises(text, status):
 
 
 def test_random_binary_input_never_raises():
-    rng = random.Random(0)
+    rng = random.Random(0)  # nosec B311
     data = bytes(rng.randrange(256) for _ in range(200_000))
     for text in (data.decode("latin-1"), data.decode("utf-8", "surrogateescape"), data.decode("utf-8", "replace")):
         for status in Status.FAILING:
@@ -610,7 +610,7 @@ def test_signature_format_and_formula():
     for args in [("cell_error", "ValueError", "boom"), ("timeout", None, None), (None, None, None), ("unknown", "", "x" * 10_000)]:
         signature = compute_signature(*args)
         assert SIGNATURE_RE.match(signature)
-    expected = hashlib.sha1("cell_error|ValueError|line <n>: <path>".encode()).hexdigest()[:12]
+    expected = hashlib.sha1("cell_error|ValueError|line <n>: <path>".encode(), usedforsecurity=False).hexdigest()[:12]
     assert compute_signature("cell_error", "ValueError", "line 3: /tmp/a") == expected
 
 

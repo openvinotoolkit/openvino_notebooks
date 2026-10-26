@@ -3,7 +3,7 @@ import io
 import json
 import re
 import shutil
-import subprocess
+import subprocess  # nosec B404
 import urllib.error
 from pathlib import Path
 
