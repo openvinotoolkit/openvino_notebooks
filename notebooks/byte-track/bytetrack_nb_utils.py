@@ -1,7 +1,11 @@
-"""Model conversion, host-side tracking and optional MOT17 evaluation for byte-track.ipynb.
+"""Shared helpers for the two ByteTrack enablement notebooks (role of openvino_notebooks' notebook_utils.py).
 
-The same preprocessing, postprocessing and BYTETracker run with every
-OpenVINO precision. The MOT17 protocol uses the bundled bt_common.py.
+  ByteTrack_PyTorch_Enablement.ipynb            -> PyTorch FP32 / FP16 (inference, accuracy, perf, video)
+  ByteTrack_OV_Enablement_Quantization.ipynb    -> OpenVINO IR FP32 / FP16, NNCF INT8, accuracy, video, benchmark_app
+
+Everything that is NOT the network (pre-processing, post-processing, BYTETracker, MOT17 protocol, video test) lives
+here, so every backend / precision goes through the identical host pipeline. The MOT17 protocol re-uses
+scripts/bt_common.py, i.e. exactly what scripts/eval_mot17.py uses (numbers are directly comparable).
 """
 import importlib.util
 import json
@@ -17,11 +21,12 @@ import numpy as np
 
 from pathlib import Path
 
-# Inputs and generated models are relative to the tutorial directory by default.
+# All paths are relative to this repository: <repo>/notebooks (this folder), <repo>/scripts, <repo>/ByteTrack_repo.
+# Large inputs (weights, MOT17, videos) are looked up in <repo> and its parent; override with environment variables.
 NB_DIR = Path(__file__).resolve().parent
-ROOT = Path(os.environ.get("BYTETRACK_PROJECT", NB_DIR)).expanduser().resolve()
-REPO = ROOT / "ByteTrack_repo" if (ROOT / "ByteTrack_repo").is_dir() else ROOT / "model" / "ByteTrack_repo"
-SCRIPTS = ROOT / "scripts" if (ROOT / "scripts" / "bt_common.py").is_file() else NB_DIR
+ROOT = NB_DIR.parent
+REPO = ROOT / "ByteTrack_repo"                       # git clone https://github.com/FoundationVision/ByteTrack ByteTrack_repo
+SCRIPTS = ROOT / "scripts"
 ARTIFACTS = NB_DIR / "artifacts"                      # hand-over PyTorch notebook -> OpenVINO notebook
 
 
@@ -34,8 +39,7 @@ def find_file(name, env=None, subdirs=("", "weights", "videos", "data")):
             p = base / sd / name
             if p.exists():
                 return p.resolve()
-    store = ROOT if ROOT != NB_DIR else NB_DIR / "model"
-    return store / subdirs[1 if len(subdirs) > 1 else 0] / name
+    return (ROOT / subdirs[1 if len(subdirs) > 1 else 0] / name)
 
 
 def rel(p):
@@ -48,12 +52,8 @@ def rel(p):
 
 WEIGHTS = find_file("bytetrack_x_mot17.pth.tar", "BYTETRACK_WEIGHTS")
 os.environ.setdefault("BYTETRACK_WEIGHTS", str(WEIGHTS))          # same weights for the scripts/ subprocesses
-MOT17_TRAIN = Path(os.environ.get(
-    "MOT17_TRAIN",
-    ROOT / "datasets" / "MOT17" / "train" if (ROOT / "datasets" / "MOT17" / "train").is_dir()
-    else NB_DIR / "data" / "MOT17" / "train",
-))
-VIDEO = find_file("pedestrians_cc0_30s.mp4", "VIDEO_1")
+MOT17_TRAIN = Path(os.environ.get("MOT17_TRAIN", ROOT / "datasets" / "MOT17" / "train"))   # scripts/fetch_mot17_subset.py
+VIDEO = find_file("JK_Standing_Next2U.mp4", "VIDEO_1")
 VIDEO_2 = find_file("Luka_Doncic.mp4", "VIDEO_2")
 
 # ------------------------------------------------------------------------------------------------ environment
@@ -64,23 +64,6 @@ if not hasattr(np, "float"):                         # numpy 2.x shims (ByteTrac
     np.float = float  # type: ignore[attr-defined]
 if not hasattr(np, "asfarray"):
     np.asfarray = lambda a, dtype=np.float64: np.asarray(a, dtype=dtype)  # type: ignore[attr-defined]
-if importlib.util.find_spec("cython_bbox") is None:
-    def bbox_overlaps(boxes, queries):
-        boxes, queries = np.asarray(boxes, np.float64), np.asarray(queries, np.float64)
-        if not len(boxes) or not len(queries):
-            return np.zeros((len(boxes), len(queries)))
-        area_b = (boxes[:, 2] - boxes[:, 0] + 1) * (boxes[:, 3] - boxes[:, 1] + 1)
-        area_q = (queries[:, 2] - queries[:, 0] + 1) * (queries[:, 3] - queries[:, 1] + 1)
-        iw = np.maximum(0, np.minimum(boxes[:, None, 2], queries[None, :, 2]) -
-                        np.maximum(boxes[:, None, 0], queries[None, :, 0]) + 1)
-        ih = np.maximum(0, np.minimum(boxes[:, None, 3], queries[None, :, 3]) -
-                        np.maximum(boxes[:, None, 1], queries[None, :, 1]) + 1)
-        intersection = iw * ih
-        return intersection / (area_b[:, None] + area_q[None, :] - intersection)
-
-    _bbox_module = types.ModuleType("cython_bbox")
-    _bbox_module.bbox_overlaps = bbox_overlaps
-    sys.modules["cython_bbox"] = _bbox_module
 if importlib.util.find_spec("loguru") is None:
     _m = types.ModuleType("loguru"); _m.logger = logging.getLogger("loguru-stub"); sys.modules["loguru"] = _m
 if importlib.util.find_spec("thop") is None:
@@ -94,10 +77,7 @@ import bt_common as BC  # noqa: E402
 VIDEO_TRACKER = dict(track_thresh=0.5, track_buffer=30, match_thresh=0.8, min_box_area=10, max_aspect_ratio_w_over_h=1.6, mot20=False)
 
 
-def load_config(path=None):
-    if path is None:
-        project_config = ROOT / "openvino_ir" / "bytetrack_tracker_config.json"
-        path = project_config if project_config.is_file() else NB_DIR / "bytetrack_tracker_config.json"
+def load_config(path=ROOT / "openvino_ir" / "bytetrack_tracker_config.json"):
     with open(path) as f:
         cfg = json.load(f)
     cfg.setdefault("video_tracker", VIDEO_TRACKER)
