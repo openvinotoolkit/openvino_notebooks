@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="760" viewBox="0 0 1600 760" font-family="DejaVu Sans, Arial, sans-serif">
+<defs><marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#455a64"/></marker><style>.pulse{animation:p 2.4s ease-in-out infinite}@keyframes p{0%,100%{opacity:1}50%{opacity:.55}}.flow{stroke-dasharray:8 6;animation:f 1.2s linear infinite}@keyframes f{to{stroke-dashoffset:-28}}</style></defs>
+<rect width="1600" height="760" fill="#ffffff"/>
+<text x="800.0" y="34" font-size="23" font-weight="bold" text-anchor="middle" fill="#0d47a1">BoT-SORT-ReID pipeline: YOLOX-X detector + FastReID SBS-S50 + BoT-SORT tracker (GMC + Kalman + IoU/ReID fusion)</text>
+<g class=""><rect x="20" y="80" width="165" height="120" rx="10" fill="#eceff1" stroke="#607d8b" stroke-width="2"/>
+<text x="102.5" y="103" font-size="15" font-weight="bold" text-anchor="middle" fill="#102027">Video frame</text>
+<text x="30" y="125" font-size="12" fill="#263238">BGR 1920x1080</text>
+<text x="30" y="142" font-size="12" fill="#263238">(MOT17 / any video)</text></g>
+<g class=""><rect x="215" y="80" width="200" height="120" rx="10" fill="#f1f8e9" stroke="#558b2f" stroke-width="2"/>
+<text x="315.0" y="103" font-size="15" font-weight="bold" text-anchor="middle" fill="#102027">Pre-processing</text>
+<text x="225" y="125" font-size="12" fill="#263238">letterbox 800x1440</text>
+<text x="225" y="142" font-size="12" fill="#263238">pad 114, BGR-&gt;RGB</text>
+<text x="225" y="159" font-size="12" fill="#263238">/255, ImageNet mean/std</text></g>
+<g class="pulse"><rect x="445" y="60" width="260" height="160" rx="10" fill="#e8eaf6" stroke="#3949ab" stroke-width="2"/>
+<text x="575.0" y="83" font-size="13.5" font-weight="bold" text-anchor="middle" fill="#102027">NETWORK 1: YOLOX-X detector</text>
+<text x="455" y="105" font-size="12" fill="#263238">98.9 M params, 790.6 GFLOP/frame</text>
+<text x="455" y="122" font-size="12" fill="#263238">Conv+BN fused, box decode in graph</text>
+<text x="455" y="139" font-size="12" fill="#263238">-&gt; [1, 23625, 6]</text>
+<text x="455" y="156" font-size="12" fill="#263238">PT FP32/FP16 | OV FP32/FP16/INT8</text></g>
+<g class=""><rect x="735" y="80" width="205" height="120" rx="10" fill="#f1f8e9" stroke="#558b2f" stroke-width="2"/>
+<text x="837.5" y="103" font-size="15" font-weight="bold" text-anchor="middle" fill="#102027">Post-processing</text>
+<text x="745" y="125" font-size="12" fill="#263238">score = obj x cls &gt;= 0.09</text>
+<text x="745" y="142" font-size="12" fill="#263238">class-aware NMS IoU 0.7</text>
+<text x="745" y="159" font-size="12" fill="#263238">/ letterbox ratio</text></g>
+<g class=""><rect x="970" y="60" width="230" height="160" rx="10" fill="#fff3e0" stroke="#ef6c00" stroke-width="2"/>
+<text x="1085.0" y="83" font-size="15" font-weight="bold" text-anchor="middle" fill="#102027">Split detections</text>
+<text x="980" y="105" font-size="12" fill="#263238">high: score &gt; 0.6 (1st assoc.)</text>
+<text x="980" y="122" font-size="12" fill="#263238">low: 0.1 &lt; score &lt;= 0.6</text>
+<text x="980" y="139" font-size="12" fill="#263238">  (2nd assoc., ByteTrack idea)</text>
+<text x="980" y="156" font-size="12" fill="#263238">new track: score &gt; 0.7</text></g>
+<g class="pulse"><rect x="445" y="290" width="260" height="175" rx="10" fill="#e8eaf6" stroke="#3949ab" stroke-width="2"/>
+<text x="575.0" y="313" font-size="13.5" font-weight="bold" text-anchor="middle" fill="#102027">NETWORK 2: FastReID SBS-S50</text>
+<text x="455" y="335" font-size="12" fill="#263238">ResNeSt-50 + non-local + GeM + BN</text>
+<text x="455" y="352" font-size="12" fill="#263238">crops of HIGH dets -&gt; 384x128</text>
+<text x="455" y="369" font-size="12" fill="#263238">batches of 8, 25.4 M params</text>
+<text x="455" y="386" font-size="12" fill="#263238">-&gt; 2048-d embedding (L2-norm)</text>
+<text x="455" y="403" font-size="12" fill="#263238">PT FP32/FP16 | OV FP32/FP16/INT8</text></g>
+<g class=""><rect x="735" y="290" width="230" height="175" rx="10" fill="#fce4ec" stroke="#ad1457" stroke-width="2"/>
+<text x="850.0" y="313" font-size="14" font-weight="bold" text-anchor="middle" fill="#102027">Camera motion comp. (GMC)</text>
+<text x="745" y="335" font-size="12" fill="#263238">MOT17 eval: official precomputed</text>
+<text x="745" y="352" font-size="12" fill="#263238">  GMC files (MOT17_ablation)</text>
+<text x="745" y="369" font-size="12" fill="#263238">video: ORB features + RANSAC</text>
+<text x="745" y="386" font-size="12" fill="#263238">-&gt; 2x3 affine applied to</text>
+<text x="745" y="403" font-size="12" fill="#263238">   Kalman mean / covariance</text></g>
+<g class=""><rect x="995" y="290" width="270" height="175" rx="10" fill="#fff3e0" stroke="#ef6c00" stroke-width="2"/>
+<text x="1130.0" y="313" font-size="15" font-weight="bold" text-anchor="middle" fill="#102027">Kalman predict + association</text>
+<text x="1005" y="335" font-size="12" fill="#263238">state (x, y, w, h, vx, vy, vw, vh)</text>
+<text x="1005" y="352" font-size="12" fill="#263238">IoU dist (fused w/ score)</text>
+<text x="1005" y="369" font-size="12" fill="#263238">emb dist = (1 - cos)/2, gated:</text>
+<text x="1005" y="386" font-size="12" fill="#263238">  &gt; 0.25 or IoU &lt; 0.5 -&gt; 1.0</text>
+<text x="1005" y="403" font-size="12" fill="#263238">cost = min(IoU, emb), Hungarian 0.8</text></g>
+<g class=""><rect x="1295" y="290" width="190" height="175" rx="10" fill="#fff3e0" stroke="#ef6c00" stroke-width="2"/>
+<text x="1390.0" y="313" font-size="15" font-weight="bold" text-anchor="middle" fill="#102027">Track management</text>
+<text x="1305" y="335" font-size="12" fill="#263238">2nd assoc. low dets (IoU)</text>
+<text x="1305" y="352" font-size="12" fill="#263238">unconfirmed -&gt; confirm</text>
+<text x="1305" y="369" font-size="12" fill="#263238">lost after 30 frames</text>
+<text x="1305" y="386" font-size="12" fill="#263238">(14/25 per-seq)</text>
+<text x="1305" y="403" font-size="12" fill="#263238">EMA appearance a=0.9</text></g>
+<g class=""><rect x="1295" y="80" width="190" height="120" rx="10" fill="#eceff1" stroke="#607d8b" stroke-width="2"/>
+<text x="1390.0" y="103" font-size="15" font-weight="bold" text-anchor="middle" fill="#102027">Tracks</text>
+<text x="1305" y="125" font-size="12" fill="#263238">(id, tlwh, score)</text>
+<text x="1305" y="142" font-size="12" fill="#263238">min area 10,</text>
+<text x="1305" y="159" font-size="12" fill="#263238">w/h &lt;= 1.6</text>
+<text x="1305" y="176" font-size="12" fill="#263238">-&gt; MOTA / IDF1</text></g>
+<line x1="185" y1="140" x2="215" y2="140" stroke="#455a64" stroke-width="2.5" marker-end="url(#a)" class="flow"/>
+<line x1="415" y1="140" x2="445" y2="140" stroke="#455a64" stroke-width="2.5" marker-end="url(#a)" class="flow"/>
+<line x1="705" y1="140" x2="735" y2="140" stroke="#455a64" stroke-width="2.5" marker-end="url(#a)" class="flow"/>
+<line x1="940" y1="140" x2="970" y2="140" stroke="#455a64" stroke-width="2.5" marker-end="url(#a)" class="flow"/>
+<line x1="1085" y1="220" x2="1085" y2="290" stroke="#455a64" stroke-width="2.5" marker-end="url(#a)" class="flow"/><text x="1091.0" y="249.0" font-size="11.5" fill="#455a64">high dets</text>
+<line x1="1000" y1="220" x2="640" y2="290" stroke="#3949ab" stroke-width="2.5" marker-end="url(#a)" class="flow"/><text x="826.0" y="249.0" font-size="11.5" fill="#3949ab">crops (high dets)</text>
+<line x1="705" y1="380" x2="735" y2="380" stroke="#3949ab" stroke-width="2.5" marker-end="url(#a)"/>
+<text x="707" y="400" font-size="11" fill="#3949ab">emb</text>
+<line x1="965" y1="380" x2="995" y2="380" stroke="#455a64" stroke-width="2.5" marker-end="url(#a)" class="flow"/>
+<line x1="1265" y1="380" x2="1295" y2="380" stroke="#455a64" stroke-width="2.5" marker-end="url(#a)" class="flow"/>
+<line x1="1390" y1="290" x2="1390" y2="200" stroke="#455a64" stroke-width="2.5" marker-end="url(#a)" class="flow"/>
+<line x1="100" y1="200" x2="800" y2="290" stroke="#ad1457" stroke-width="2.5" marker-end="url(#a)" stroke-dasharray="6,4"/><text x="456.0" y="239.0" font-size="11.5" fill="#ad1457">full frame (GMC)</text>
+<g class=""><rect x="215" y="530" width="1270" height="150" rx="10" fill="#fffde7" stroke="#f9a825" stroke-width="2"/>
+<text x="850.0" y="553" font-size="15" font-weight="bold" text-anchor="middle" fill="#102027">CONFIG - not in either weight file; needed identically by the PyTorch AND OpenVINO pipelines</text>
+<text x="225" y="575.0" font-size="12.5" fill="#263238">detector: conf 0.09 (= track_low - 0.01), NMS 0.7, 800x1440 letterbox | tracker: track_high 0.6, track_low 0.1, new_track 0.7, match 0.8, buffer 30,</text>
+<text x="225" y="592.5" font-size="12.5" fill="#263238">proximity 0.5, appearance 0.25, per-sequence overrides (MOT17-05 buffer 14, MOT17-13 buffer 25), CMC method + GMC files, min box area 10, w/h 1.6</text>
+<text x="225" y="610.0" font-size="12.5" fill="#263238">ReID: crop -&gt; RGB -&gt; resize 128x384 (no letterbox), 0..255 input (mean/std inside the graph), batch 8, inf -&gt; 1, L2 normalisation on the host</text>
+<text x="225" y="627.5" font-size="12.5" fill="#263238">Embedded in each IR's rt_info ('tracking_config') + openvino_ir/tracker_config.json; ReID IR variant follows the detector run (configure_backend).</text></g>
+<text x="800.0" y="725" font-size="13" text-anchor="middle" fill="#455a64">Weights: bytetrack_x_mot17.pth.tar (detector, 793 MB, shared with ByteTrack) + mot17_sbs_S50.pth (ReID, 318 MB). Two networks are optimised; GMC, Kalman, matching run on the CPU.</text>
+</svg>
