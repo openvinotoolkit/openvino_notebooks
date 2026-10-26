@@ -938,6 +938,7 @@ def finalize_status(
         print("FAILED: \n{}".format("\n".join(failed_notebooks)), flush=True)
 
     if timeout_notebooks:
+        return_status = 1
         print("FAILED BY TIMEOUT: \n{}".format("\n".join(timeout_notebooks)), flush=True)
 
     test_report = []
