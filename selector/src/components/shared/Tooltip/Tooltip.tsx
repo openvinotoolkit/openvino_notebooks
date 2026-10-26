@@ -1,6 +1,6 @@
 import './Tooltip.scss';
 
-import { ReactNode, useState } from 'react';
+import { JSX, ReactNode, useState } from 'react';
 
 const sparkClassNames = {
   tooltipToggle: 'spark-tooltip-toggle',

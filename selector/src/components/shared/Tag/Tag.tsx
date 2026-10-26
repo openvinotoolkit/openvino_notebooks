@@ -1,5 +1,7 @@
 import './Tag.scss';
 
+import { JSX } from 'react';
+
 const sparkClassNames = {
   tag: 'spark-tag spark-focus-visible spark-focus-visible-self spark-focus-visible-snap',
   tagSizePrefix: 'spark-tag-size-',

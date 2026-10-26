@@ -16,7 +16,6 @@ notebooks/hello-segmentation/hello-segmentation.ipynb
 notebooks/hello-world/hello-world.ipynb
 notebooks/image-classification-quantization/image-classification-quantization.ipynb
 notebooks/kokoro/kokoro.ipynb
-notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
 notebooks/llm-chatbot/llm-chatbot-generate-api.ipynb
 notebooks/llm-lora/llm-lora.ipynb
 notebooks/llm-question-answering/llm-question-answering.ipynb

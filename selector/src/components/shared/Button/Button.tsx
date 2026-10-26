@@ -1,6 +1,6 @@
 import './Button.scss';
 
-import { AnchorHTMLAttributes, ButtonHTMLAttributes, forwardRef, FunctionComponent, SVGProps } from 'react';
+import { AnchorHTMLAttributes, ButtonHTMLAttributes, forwardRef, FunctionComponent, JSX, SVGProps } from 'react';
 
 const sparkClassNames = {
   button: 'spark-button spark-focus-visible spark-focus-visible-self spark-focus-visible-snap',
@@ -32,7 +32,7 @@ type ButtonProps = {
 } & AsElementProps;
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { text, as = 'button', variant = 'primary', size = 'm', disabled = false, onClick, icon, className, ...props },
+  { text, as = 'button', variant = 'primary', size = 'm', disabled = false, onClick, icon: Icon, className, ...props },
   ref
 ): JSX.Element {
   const sizeClassName = `${sparkClassNames.buttonSizePrefix}${size}`;
@@ -43,7 +43,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     classNames.push(sparkClassNames.disabledButton);
   }
 
-  if (!text && icon) {
+  if (!text && Icon) {
     classNames.push(sparkClassNames.buttonOnly);
   }
 
@@ -53,7 +53,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 
   const buttonContent = (
     <>
-      {icon && <span className={sparkClassNames.buttonStartSlot}>{icon({ className: 'button-icon' })}</span>}
+      {Icon && (
+        <span className={sparkClassNames.buttonStartSlot}>
+          <Icon className="button-icon" />
+        </span>
+      )}
       <span className={sparkClassNames.buttonContent}>{text}</span>
     </>
   );

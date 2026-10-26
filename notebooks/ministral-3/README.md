@@ -37,6 +37,6 @@ For further details, please refer to [Installation Guide](../../README.md).
 
 ⚠️ **EXPERIMENTAL NOTEBOOK**
 
-The merged Optimum Intel PR #1627 supports the outer `mistral3` architecture, but Ministral-3 checkpoints use the newer internal language-model type `ministral3`. This notebook temporarily pins Optimum Intel PR #1659, which adds that missing export path. Video, audio, and NPU inference are not supported in this example.
+The merged Optimum Intel PR #1627 supports the outer `mistral3` architecture, but Ministral-3 checkpoints use the newer internal language-model type `ministral3`. This notebook temporarily pins [commit `9b7d504`](https://github.com/dhandhalyabhavik/optimum-intel/commit/9b7d50429944002124532bb23415c0b3bedcb790) from [Optimum Intel PR #1659](https://github.com/huggingface/optimum-intel/pull/1659), which adds that missing export path and depends on Optimum 2.3 rather than the incompatible latest development version. Video, audio, and NPU inference are not supported in this example.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/ministral-3/README.md" />

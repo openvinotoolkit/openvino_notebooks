@@ -1,7 +1,5 @@
 # Image generation with universal control using Flex.2 and OpenVINO
 
-<div class="alert alert-block alert-danger"> <b>Important note:</b> This notebook requires python >= 3.11. Please make sure that your environment fulfill to this requirement before running it </div>
-
 Flex.2 is flexible text-to-image diffusion model based on Flux model architecture with built in support inpainting and universal control - model accepts pose, line, and depth inputs.
 
 <img src="https://github.com/user-attachments/assets/6a9ab66a-387a-4538-8625-2bb3a16072b5" width="1024"> 

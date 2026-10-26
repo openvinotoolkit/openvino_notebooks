@@ -7,7 +7,7 @@
 
 A small post-processing layer fixes equation delimiters, normalises tables to HTML/OTSL, merges truncated paragraphs and finally renders Markdown via `json2md`.
 
-The model is a Qwen2-VL architecture under the hood, so it can be exported to OpenVINO IR exactly like in the [`qwen2-vl`](../qwen2-vl/qwen2-vl.ipynb) notebook. In this tutorial we:
+The model is a Qwen2-VL architecture under the hood, so it can be exported to OpenVINO IR as shown in the [VLM chatbot](../vlm-chatbot/vlm-chatbot-generate-api.ipynb) notebook. In this tutorial we:
 
 * convert and INT4 weight-compress `MinerU2.5-Pro-2604-1.2B` with [Optimum Intel](https://github.com/huggingface/optimum-intel),
 * run inference with [OpenVINO GenAI](https://github.com/openvinotoolkit/openvino.genai)'s `VLMPipeline`,

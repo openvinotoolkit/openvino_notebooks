@@ -14,7 +14,10 @@ def clone_repo(repo_url: str, revision: str = None, add_to_sys_path: bool = True
             subprocess.run(
                 ["git", "clone", repo_url], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
             )  # nosec B603 B607 - hardcoded git command
-        except Exception as exc:
+        except FileNotFoundError:
+            print("Failed to clone the repository: git was not found. Please install git and make sure it is available in PATH.")
+            raise
+        except subprocess.CalledProcessError as exc:
             print(f"Failed to clone the repository: {exc.stderr}")
             raise
 
@@ -27,18 +30,18 @@ def clone_repo(repo_url: str, revision: str = None, add_to_sys_path: bool = True
 
 
 def optimum_cli(model_id, output_dir, show_command=True, additional_args: dict[str, str] = None, debug_logs=False):
-    export_command = f"optimum-cli export openvino --model {model_id} {output_dir}"
+    export_command = ["optimum-cli", "export", "openvino", "--model", str(model_id), str(output_dir)]
     if additional_args is not None:
         for arg, value in additional_args.items():
-            export_command += f" --{arg}"
+            export_command.append(f"--{arg}")
             if value:
-                export_command += f" {value}"
+                export_command.append(str(value))
 
     if show_command:
         from IPython.display import Markdown, display
 
         display(Markdown("**Export command:**"))
-        display(Markdown(f"`{export_command}`"))
+        display(Markdown(f"`{' '.join(export_command)}`"))
 
     transofrmers_loglevel = None
     if debug_logs:
@@ -46,7 +49,7 @@ def optimum_cli(model_id, output_dir, show_command=True, additional_args: dict[s
         os.environ["TRANSFORMERS_VERBOSITY"] = "debug"
 
     try:
-        subprocess.run(export_command.split(" "), shell=(platform.system() == "Windows"), check=True, capture_output=True)
+        subprocess.run(export_command, shell=(platform.system() == "Windows"), check=True, capture_output=True)
     except subprocess.CalledProcessError as exc:
         logger = logging.getLogger()
         logger.error(f"Command failed with exit code {exc.returncode}")

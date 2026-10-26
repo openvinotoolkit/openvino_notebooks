@@ -6,7 +6,6 @@ notebooks/depth-anything/depth-anything.ipynb # install requirements.txt after c
 notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb # requires python >=3.9
 notebooks/mobileclip-video-search/mobileclip-video-search.ipynb # install requirements.txt inside
 notebooks/animate-anyone/animate-anyone.ipynb # diffusers<=0.24
-notebooks/whisper-subtitles-generation/whisper-convert.ipynb # pytube
 notebooks/grounded-segment-anything/grounded-segment-anything.ipynb # deprecated installer
 notebooks/person-counting-webcam/person-counting.ipynb # numpy should be installed first
 notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb # torch >= 2.2
