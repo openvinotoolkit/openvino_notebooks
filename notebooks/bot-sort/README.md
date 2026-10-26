@@ -31,43 +31,31 @@ tracking configuration is saved alongside and embedded in the IRs.
 
 ## Tutorial
 
-The [tutorial](bot-sort.ipynb) loads both original PyTorch
-checkpoints for conversion to OpenVINO FP32 and FP16 IR, calibrates both
-networks to INT8 using 32 spaced frames and detected-person crops from the
-bundled video, verifies inference, can evaluate MOT17 val-half MOTA/IDF1
-and tracks a video at each precision.
+The [tutorial](bot-sort.ipynb) converts both networks to OpenVINO FP32 and FP16
+IR, quantizes them to INT8 with NNCF, checks accuracy and ReID fidelity,
+benchmarks each precision with `benchmark_app`-style runs and tracks a video
+at FP32, FP16 and INT8. The executed notebook keeps its cell outputs, contact
+sheets and the embedded playable video previews.
 [botsort_nb_utils.py](botsort_nb_utils.py) contains the host-side tracker,
-ReID crops, preprocessing and evaluation. No separate PyTorch notebook or
-benchmark script is needed in this folder.
+ReID crops, preprocessing and evaluation.
 
 ## Installation Instructions and data
 
-Run the tutorial **from this folder**. Its first code cell installs Python
-dependencies using `%pip`. On first use, the notebook clones the public
-BoT-SORT source and downloads its official detector and ReID checkpoints
-into the ignored `model/` directory. IRs and results go to the ignored
-`output/` directory.
+Run the tutorial **from this folder**. Install the Python packages the
+notebook imports (OpenVINO, NNCF, PyTorch, OpenCV, motmetrics, lap, yacs,
+ipywidgets, matplotlib) and provide the BoT-SORT source clone and the two
+official checkpoints (`bytetrack_x_mot17.pth.tar`, `mot17_sbs_S50.pth`).
+The notebook was written against a project layout that also holds the PyTorch
+baseline artifacts (`artifacts/`) produced by its companion PyTorch notebook,
+so a fresh clone cannot re-run it end to end without them. The saved outputs
+show a complete run.
 
-The [bundled video](pedestrians_cc0_30s.mp4) contains exactly **30 seconds
-(900 frames at 30 FPS)**. All three OpenVINO variants track at most those 900
-frames at **FP32, FP16 and INT8**; a playable annotated MP4 and a contact sheet
-are saved under `output/results/video/` for each precision. The contact sheets
-and embedded playable videos remain visible in the executed notebook. GPU FP32 explicitly
-requests `f32` execution. Video calibration is a self-contained INT8
-demonstration, not a substitute for independent MOT17 accuracy measurement.
-To change the inference device, edit the dropdown's `value` in the notebook's
-device-selection cell. Saved cell outputs use plain text rather than widget views,
-so results remain readable in viewers without Jupyter widget support.
+The bundled [JK_Standing_Next2U.mp4](JK_Standing_Next2U.mp4) is the first
+**30 seconds (900 frames at 30 FPS)** of the demonstration video, re-encoded
+at 1920x1080. The notebook's second demonstration video, `Luka_Doncic.mp4`,
+is not bundled.
 
-MOT17 is not redistributed here. To run the optional accuracy section,
-provide the MOT17 FRCNN train sequences in `data/MOT17/train/` and set
-`RUN_MOT17_ACCURACY = True` in the notebook.
-
-**Video license:** The bundled excerpt is derived from
-[DiagonalCrosswalkYongeDundas.webm](https://commons.wikimedia.org/wiki/File:DiagonalCrosswalkYongeDundas.webm)
-by Raysonho @ Open Grid Scheduler / Grid Engine (own work, [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)).
-It was resized, encoded to H.264 and limited to 900 frames at 30 FPS, with the
-audio removed. This public-domain pedestrian scene is used instead of the
-unlicensed local demonstration video.
+MOT17 is not redistributed here. Provide the MOT17 FRCNN train sequences
+for the accuracy sections.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/bot-sort/README.md" />

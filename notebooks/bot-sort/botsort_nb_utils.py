@@ -1,10 +1,12 @@
-"""Detector/ReID conversion and host-side tracking for bot-sort.ipynb.
+"""Helpers for the BoT-SORT enablement notebooks (role of openvino_notebooks' ``notebook_utils.py``).
+
+    BoT-SORT_PyTorch_Enablement.ipynb            PyTorch FP32 / FP16 of both networks, accuracy, perf, video
+    BoT-SORT_OV_Enablement_Quantization.ipynb    OpenVINO IR FP32 -> FP16 -> NNCF INT8 of both networks, benchmark_app
 
 BoT-SORT (https://github.com/NirAharon/BoT-SORT, https://arxiv.org/abs/2206.14651) = YOLOX-X detector + FastReID
 SBS-S50 appearance network + BoT-SORT tracker (camera-motion compensation, Kalman filter, IoU + ReID fusion).
-Everything that is not a network (pre/post-processing, crops, GMC, tracker,
-MOT17 protocol and video test) lives here, so every OpenVINO precision runs
-the same host pipeline; it mirrors the official ``tools/track.py``.
+Everything that is not a network (pre/post-processing, crops, GMC, tracker, MOT17 protocol, video test) lives here,
+so every backend / precision runs the identical host pipeline; it mirrors the official ``tools/track.py`` exactly.
 
 All paths are relative to this folder (``notebooks/``) and its parent; large inputs are looked up in the repository
 and its parent folder and can be overridden with environment variables:
@@ -30,13 +32,10 @@ warnings.filterwarnings("ignore")  # torch.jit / .grad warnings print site-packa
 
 # ----------------------------------------------------------------------------------------------------------- paths
 NB_DIR = Path(__file__).resolve().parent
-ROOT = Path(os.environ.get("BOTSORT_PROJECT", NB_DIR)).expanduser().resolve()
+ROOT = NB_DIR.parent
 ARTIFACTS = NB_DIR / "artifacts"  # hand-over PyTorch notebook -> OpenVINO notebook
 REPO_URL = "https://github.com/NirAharon/BoT-SORT.git"
-REPO = Path(os.environ.get(
-    "BOTSORT_REPO",
-    ROOT / "BoT-SORT_repo" if (ROOT / "BoT-SORT_repo").is_dir() else ROOT / "model" / "BoT-SORT_repo",
-))
+REPO = Path(os.environ.get("BOTSORT_REPO", ROOT / "BoT-SORT_repo"))
 
 # official weights (Google Drive ids from the ByteTrack / BoT-SORT model zoos)
 DET_WEIGHTS_GDRIVE = "1P4mY0Yyd3PPTybgZkjMYhFri88nTmJX5"  # bytetrack_x_mot17.pth.tar (BoT-SORT uses ByteTrack's MOT17 YOLOX-X)
@@ -58,15 +57,15 @@ def find_file(name: str, env: Optional[str] = None, subdirs: Tuple[str, ...] = (
             p = base / sd / name
             if p.exists():
                 return p.resolve()
-    return (ROOT if ROOT != NB_DIR else NB_DIR / "model") / "weights" / name
+    return ROOT / "weights" / name
 
 
 def find_mot17() -> Path:
     """MOT17 ``train`` folder: $MOT17_TRAIN, ``<repo>/datasets/MOT17/train``, or any ``<parent>/*/datasets/MOT17/train``."""
     if os.environ.get("MOT17_TRAIN"):
         return Path(os.environ["MOT17_TRAIN"]).expanduser().resolve()
-    cands = [ROOT / "datasets/MOT17/train", NB_DIR / "data/MOT17/train"]
-    return next((p.resolve() for p in cands if p.exists()), NB_DIR / "data/MOT17/train")
+    cands = [ROOT / "datasets/MOT17/train", ROOT.parent / "datasets/MOT17/train"] + [Path(p) for p in sorted(glob.glob(str(ROOT.parent / "*/datasets/MOT17/train")))]
+    return next((p.resolve() for p in cands if p.exists()), ROOT / "datasets/MOT17/train")
 
 
 def rel(p) -> str:
@@ -80,7 +79,7 @@ def rel(p) -> str:
 DET_WEIGHTS = find_file("bytetrack_x_mot17.pth.tar", "BOTSORT_DET_WEIGHTS")
 REID_WEIGHTS = find_file("mot17_sbs_S50.pth", "BOTSORT_REID_WEIGHTS")
 MOT17_TRAIN = find_mot17()
-VIDEO_1 = find_file("pedestrians_cc0_30s.mp4", "VIDEO_1")
+VIDEO_1 = find_file("JK_Standing_Next2U.mp4", "VIDEO_1")
 VIDEO_2 = find_file("Luka_Doncic.mp4", "VIDEO_2")
 
 # ----------------------------------------------------------------------------------------------------------- config
