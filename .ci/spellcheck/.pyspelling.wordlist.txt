@@ -1261,6 +1261,7 @@ Upcroft
 updo
 upsample
 upsampled
+upsampler
 upsamples
 upsampling
 Upscaled
