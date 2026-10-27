@@ -24,6 +24,8 @@ The family covers several modalities:
 
 LFM3 support currently requires [Optimum Intel PR #2087](https://github.com/huggingface/optimum-intel/pull/2087). The notebook installs this public PR and Transformers 5.20.0.
 
+Video-file input requires [TorchCodec](https://github.com/pytorch/torchcodec#installing-torchcodec), included in the installation cell, and compatible FFmpeg shared libraries. PyAV (`av`) alone is not sufficient for the Transformers 5.20 video processor. After adding TorchCodec to an existing notebook environment, restart the kernel before reloading the processor.
+
 This is a self-contained example that relies solely on its own code.
 
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
