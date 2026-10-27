@@ -1,5 +1,9 @@
 # Multimodal AI with LFM3 and OpenVINO
 
+⚠️ **EXPERIMENTAL NOTEBOOK**
+
+This notebook demonstrates a model that has not been fully validated with OpenVINO and uses development builds of Optimum Intel and OpenVINO. It may be fully supported and validated in the future.
+
 [LFM3](https://www.liquid.ai/blog/lfm3) is a family of open-weight models from [Liquid AI](https://www.liquid.ai/) built on one shared backbone and designed for on-device use and domain-specific fine-tuning. The language model has a hybrid architecture that combines gated short convolutions with sliding-window and global attention layers.
 
 The family covers several modalities:
