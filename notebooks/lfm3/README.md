@@ -1,0 +1,44 @@
+# Multimodal AI with LFM3 and OpenVINO
+
+⚠️ **EXPERIMENTAL NOTEBOOK**
+
+This notebook demonstrates a model that has not been fully validated with OpenVINO and uses development builds of Optimum Intel and OpenVINO. It may be fully supported and validated in the future.
+
+[LFM3](https://www.liquid.ai/blog/lfm3) is a family of open-weight models from [Liquid AI](https://www.liquid.ai/) built on one shared backbone and designed for on-device use and domain-specific fine-tuning. The language model has a hybrid architecture that combines gated short convolutions with sliding-window and global attention layers.
+
+The family covers several modalities:
+
+| Model | Input | Output | Highlights |
+|---|---|---|---|
+| **LFM3-1.7B** | Text | Text | Reasoning on/off per request, tool calling, structured outputs, 256K context |
+| **LFM3-VL** | Text, images, video | Text | New in-house vision encoder, video understanding, thinking mode |
+| **LFM3-Omni** | Text, images, video, audio | Text, speech | First LFM omni model: speech recognition, text-to-speech, spoken chat |
+
+## What The Notebook Covers
+
+- Install prerequisites
+- Download preconverted OpenVINO models or convert them with [Optimum Intel](https://github.com/huggingface/optimum-intel) (FP16 / INT8 / INT4)
+- **LFM3-1.7B** with [OpenVINO GenAI](https://github.com/openvinotoolkit/openvino.genai) `LLMPipeline`: direct answers vs. reasoning, multi-turn chat, tool calling and structured JSON output
+- **LFM3-VL** with Optimum Intel `OVModelForVisualCausalLM`: image understanding, multi-image comparison, thinking mode and video understanding
+- **LFM3-Omni** with Optimum Intel `OVModelForMultimodalLM`: text-to-speech, speech recognition, spoken questions about images and spoken chat
+- Interactive Gradio demo with LFM3-Omni
+- Measure LFM3-1.7B performance with OpenVINO GenAI
+
+## Installation Instructions
+
+LFM3 support currently requires [Optimum Intel PR #2087](https://github.com/huggingface/optimum-intel/pull/2087). The notebook installs this public PR and Transformers 5.20.0.
+
+Video-file input requires [TorchCodec](https://github.com/pytorch/torchcodec#installing-torchcodec), included in the installation cell, and compatible FFmpeg shared libraries. PyAV (`av`) alone is not sufficient for the Transformers 5.20 video processor. After adding TorchCodec to an existing notebook environment, restart the kernel before reloading the processor.
+
+This is a self-contained example that relies solely on its own code.
+
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
+For details, please refer to [Installation Guide](../../README.md).
+
+## Local models and generation settings
+
+Set **Local IR root** to reuse converted models without downloading or converting them again. The folder should contain directories such as `LFM3-1.7B-int4-ov`, `LFM3-1.7B-int8-ov` and `LFM3-1.7B-fp16-ov`. A selected local model with missing files raises an error; leave the field empty to use the usual download/conversion path.
+
+Local INT4 conversion explicitly uses asymmetric compression with group size 64 and ratio 1.0. Text examples inherit the checkpoint's generation defaults; structured JSON generation and the benchmark use greedy decoding.
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/lfm3/README.md" />
