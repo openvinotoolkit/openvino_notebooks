@@ -22,9 +22,17 @@ The family covers several modalities:
 
 ## Installation Instructions
 
+LFM3 support currently requires [Optimum Intel PR #2087](https://github.com/huggingface/optimum-intel/pull/2087). The notebook installs this public PR and Transformers 5.20.0.
+
 This is a self-contained example that relies solely on its own code.
 
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md).
+
+## Local models and generation settings
+
+Set **Local IR root** to reuse converted models without downloading or converting them again. The folder should contain directories such as `LFM3-1.7B-int4-ov`, `LFM3-1.7B-int8-ov` and `LFM3-1.7B-fp16-ov`. A selected local model with missing files raises an error; leave the field empty to use the usual download/conversion path.
+
+Local INT4 conversion explicitly uses asymmetric compression with group size 64 and ratio 1.0. Text examples inherit the checkpoint's generation defaults; structured JSON generation and the benchmark use greedy decoding.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/lfm3/README.md" />
