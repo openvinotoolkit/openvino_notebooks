@@ -13,8 +13,8 @@ The tutorial consists of the following steps:
 - Install prerequisites
 - Convert the model to OpenVINO IR and compress its weights using Optimum Intel CLI
 - Load the model with `OVModelForVisualCausalLM` on CPU, GPU or, as a preview, with the language model on NPU
-- Transcribe a receipt, convert a page to Markdown, read Chinese text and answer a question about a document
-- Verify OCR results with the MiniCPM-OCR Jev reward model loaded with `OVModelForVisualSequenceClassification`
+- Recognize the text of a receipt, convert a page to Markdown, read Chinese text and extract key information from a document
+- Score OCR results with the MiniCPM-OCR Jev quality-decision model loaded with `OVModelForVisualSequenceClassification`
 - Measure accuracy against the original PyTorch model and generation performance
 - Launch an interactive Gradio demo with optional Jev verification
 
@@ -26,6 +26,6 @@ For further details, please refer to [Installation Guide](../../README.md).
 
 ⚠️ **EXPERIMENTAL NOTEBOOK**
 
-This notebook demonstrates a model that has not been fully validated with OpenVINO. It uses Optimum Intel from the [pull request branch](https://github.com/huggingface/optimum-intel/pull/2081), Transformers 5.21.0 and nightly OpenVINO builds. It may be fully supported and validated in the future.
+This notebook demonstrates a model that has not been fully validated with OpenVINO. It uses Optimum Intel from the main branch, Transformers 5.21.0 and nightly OpenVINO builds. It may be fully supported and validated in the future.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/minicpm-ocr/README.md" />

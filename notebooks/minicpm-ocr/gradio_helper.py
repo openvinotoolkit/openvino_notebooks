@@ -4,9 +4,14 @@ import gradio as gr
 from transformers import TextIteratorStreamer
 
 PROMPTS = {
-    "Transcribe text": "Transcribe all the text in this image.",
-    "Convert to Markdown": "Convert this page to markdown.",
-    "Ask a question": "",
+    "Text": "Text Recognition:",
+    "Table": "Table Recognition:",
+    "Formula": "Formula Recognition:",
+    "Seal": "Seal Recognition:",
+    "Chart": "Chart to Table:",
+    "Markdown": "Convert this page to markdown.",
+    "Key information": 'Extract the "field_1", "field_2". Format the output as a JSON object with keys: "field_1", "field_2". If an item is not in the image, use "###".',
+    "Custom": "",
 }
 
 
@@ -48,8 +53,8 @@ def make_demo(ov_model, processor, examples=(), verify=None):
         with gr.Row():
             with gr.Column():
                 image = gr.Image(type="pil", label="Image")
-                task = gr.Radio(list(PROMPTS), value="Transcribe text", label="Task")
-                prompt = gr.Textbox(value=PROMPTS["Transcribe text"], label="Prompt")
+                task = gr.Radio(list(PROMPTS), value="Text", label="Task")
+                prompt = gr.Textbox(value=PROMPTS["Text"], label="Prompt")
                 run_verify = gr.Checkbox(value=verify is not None, visible=verify is not None, label="Verify with Jev")
                 with gr.Accordion("Generation settings", open=False):
                     enable_thinking = gr.Checkbox(value=False, label="Enable thinking")
