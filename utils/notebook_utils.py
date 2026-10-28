@@ -449,11 +449,11 @@ def segmentation_map_to_image(result, colormap, remove_holes: bool = False):
     if len(result.shape) != 2 and result.shape[0] != 1:
         raise ValueError(f"Expected result with shape (H,W) or (1,H,W), got result with shape {result.shape}")
 
-    if len(np.unique(result)) > colormap.shape[0]:
+    if result.min() < 0 or result.max() >= colormap.shape[0]:
         raise ValueError(
-            f"Expected max {colormap[0]} classes in result, got {len(np.unique(result))} "
-            "different output values. Please make sure to convert the network output to "
-            "pixel values before calling this function."
+            f"Expected values in the range [0, {colormap.shape[0] - 1}] for a colormap with "
+            f"{colormap.shape[0]} classes, got values in range [{result.min()}, {result.max()}]. "
+            "Please make sure to convert the network output to pixel values before calling this function."
         )
     elif result.shape[0] == 1:
         result = result.squeeze(0)
