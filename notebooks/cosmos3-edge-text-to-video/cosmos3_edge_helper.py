@@ -176,7 +176,7 @@ class TextKV(nn.Module):
 
 
 class DenoiseStep(nn.Module):
-    """One denoising step with classifier-free guidance; cond and uncond rows share one pass through the linears."""
+    """One denoising step with classifier-free guidance; cond and uncond rows share one pass through the linears and one batched attention."""
 
     def __init__(self, transformer: nn.Module, guidance_scale: float):
         super().__init__()
@@ -193,8 +193,7 @@ class DenoiseStep(nn.Module):
         vision, original = tr._patchify_and_pack_latents([x])
         tokens = tr.proj_in(vision) + tr.time_embedder(tr.time_proj(timestep * tr.config.timestep_scale))
         hidden = torch.cat([tokens, tokens], 0)
-        zeros = torch.zeros(1, 1, 1, n, dtype=text_mask.dtype)
-        masks = [torch.cat([text_mask[row : row + 1], zeros], -1) for row in range(2)]
+        mask = torch.cat([text_mask, torch.zeros(2, 1, 1, n, dtype=text_mask.dtype)], -1)
         for index, layer in enumerate(tr.layers):
             attn = layer.self_attn
             normed = layer.input_layernorm_moe_gen(hidden)
@@ -203,19 +202,12 @@ class DenoiseStep(nn.Module):
             v = attn.add_v_proj(normed).view(-1, attn.num_key_value_heads, attn.head_dim)
             q = q * gen_cos + rotate_half(q) * gen_sin
             k = k * gen_cos + rotate_half(k) * gen_sin
-            q, k, v = (t.transpose(0, 1).unsqueeze(0) for t in (q, k, v))
-            outputs = []
-            for row in range(2):
-                rows = slice(row * n, (row + 1) * n)
-                out = F.scaled_dot_product_attention(
-                    q[:, :, rows],
-                    torch.cat([text_k[index, row : row + 1], k[:, :, rows]], 2),
-                    torch.cat([text_v[index, row : row + 1], v[:, :, rows]], 2),
-                    attn_mask=masks[row],
-                    enable_gqa=True,
-                )
-                outputs.append(out[0].transpose(0, 1).reshape(n, -1))
-            hidden = hidden + attn.to_add_out(torch.cat(outputs, 0))
+            # [2n, heads, dim] -> [2, heads, n, dim]: batch row 0 is conditional, row 1 unconditional
+            q, k, v = (t.view(2, n, t.shape[1], t.shape[2]).transpose(1, 2) for t in (q, k, v))
+            out = F.scaled_dot_product_attention(
+                q, torch.cat([text_k[index], k], 2), torch.cat([text_v[index], v], 2), attn_mask=mask, enable_gqa=True
+            )
+            hidden = hidden + attn.to_add_out(out.transpose(1, 2).reshape(2 * n, -1))
             hidden = hidden + layer.mlp_moe_gen(layer.post_attention_layernorm_moe_gen(hidden))
         projected = tr.proj_out(tr.norm_moe_gen(hidden))
         conditional = tr._unpatchify_and_unpack_latents(projected[:n], self.shapes, self.noisy, original)[0]
@@ -224,14 +216,86 @@ class DenoiseStep(nn.Module):
 
 
 class VAEDecoder(nn.Module):
-    """Latent -> video wrapper around the Wan VAE decoder."""
+    """
+    Latent -> video wrapper around the Wan VAE decoder.
+
+    Diffusers decodes one latent frame per pass. Frame 0 needs its own first-chunk pass, but latent frames 1..T-1 are
+    decoded together: each causal conv only looks back two frames, which the joint chunk supplies itself, so the result
+    is the same while the convolutions run on fewer, larger inputs.
+    """
 
     def __init__(self, vae: nn.Module):
         super().__init__()
         self.vae = vae
 
     def forward(self, z):
-        return self.vae.decode(z, return_dict=False)[0]
+        from diffusers.models.autoencoders.autoencoder_kl_wan import unpatchify
+
+        vae = self.vae
+        vae.clear_cache()
+        x = vae.post_quant_conv(z)
+        vae._conv_idx = [0]
+        first = vae.decoder(x[:, :, :1], feat_cache=vae._feat_map, feat_idx=vae._conv_idx, first_chunk=True)
+        vae._conv_idx = [0]
+        rest = vae.decoder(x[:, :, 1:], feat_cache=vae._feat_map, feat_idx=vae._conv_idx)
+        video = torch.cat([first, rest], 2)
+        if vae.config.patch_size is not None:
+            video = unpatchify(video, patch_size=vae.config.patch_size)
+        vae.clear_cache()
+        return torch.clamp(video, min=-1.0, max=1.0)
+
+
+def f16_text_kv(model: ov.Model) -> ov.Model:
+    """Pass text K/V between the text encoder and the denoiser in f16, the precision both models compute in."""
+    from openvino.preprocess import PrePostProcessor
+
+    ppp = PrePostProcessor(model)
+    for name in ("text_k", "text_v"):
+        if any(name in port.get_names() for port in model.inputs):
+            ppp.input(name).tensor().set_element_type(ov.Type.f16)
+        if any(name in port.get_names() for port in model.outputs):
+            ppp.output(name).tensor().set_element_type(ov.Type.f16)
+    return ppp.build()
+
+
+def write_timestep_embedding_f32(source_path: str | Path, target_path: str | Path) -> int:
+    """
+    Write a denoiser IR whose timestep embedding is marked precision-sensitive.
+
+    The embedding feeds every block and seeds the residual stream. Marking only its 14 ops keeps the 28 transformer
+    blocks in f16 while removing most of the denoiser error caused by GPU f16 inference.
+    """
+    import os
+    import shutil
+    import xml.etree.ElementTree as ET
+
+    source_path, target_path = Path(source_path), Path(target_path)
+    tree = ET.parse(source_path)
+    marked = 0
+    in_blocks = False
+    for layer in tree.getroot().find("layers"):
+        name, kind = layer.get("name", ""), layer.get("type")
+        in_blocks = in_blocks or re.search(r"layers\.\d+\.", name) is not None
+        if in_blocks or kind in ("Const", "Parameter", "Result", "Convert"):
+            continue
+        if "time_" not in name and name != "aten::add/Add_2":
+            continue
+        rt_info = layer.find("rt_info")
+        if rt_info is None:
+            rt_info = ET.Element("rt_info")
+            layer.insert(0, rt_info)
+        if not any(attribute.get("name") == "precise" for attribute in rt_info.findall("attribute")):
+            # OpenVINO's DisableFP16Compression attribute is serialized as "precise".
+            ET.SubElement(rt_info, "attribute", {"name": "precise", "version": "0"})
+        marked += 1
+    tree.write(target_path, encoding="utf-8", xml_declaration=True)
+    target_bin = target_path.with_suffix(".bin")
+    if not target_bin.exists():
+        try:
+            os.link(source_path.with_suffix(".bin"), target_bin)
+        except OSError:
+            shutil.copy2(source_path.with_suffix(".bin"), target_bin)
+    return marked
 
 
 def use_nearest_upsampling(model: nn.Module) -> int:
@@ -443,7 +507,12 @@ def dupup_shortcut(model):
 
 
 def fold_zero_pads(model):
-    """Fold constant zero Pads into the padding of the following Convolution."""
+    """Fold constant zero Pads into the padding of the following Convolution.
+
+    The GPU plugin already does this for a plain f16 graph, but the INT8 decoder inserts a FakeQuantize
+    between the Pad and the Convolution, which blocks the plugin's own folding: without this pass the
+    quantized decoder runs 575 ms instead of 467 ms.
+    """
     from openvino.passes import ConstantFolding, Manager
 
     manager = Manager()

@@ -10,7 +10,7 @@ The tutorial generates 17-frame, 256×256 videos from a text prompt and consists
 
 1. **Download the model** - Download the text tokenizer, transformer, VAE and scheduler configuration of the public [checkpoint](https://huggingface.co/nvidia/Cosmos3-Edge) from Hugging Face.
 2. **Load the PyTorch model** - Rebuild the text tower and one denoising step as static-shape PyTorch modules (`cosmos3_edge_helper.py`) and run a reference generation with the UniPC scheduler.
-3. **Convert the models to OpenVINO IR** - Convert the text tower, the denoising step and the VAE decoder with static input shapes, then apply graph optimizations and a mixed INT8 VAE decoder.
+3. **Convert the models to OpenVINO IR** - Convert the text tower, the denoising step and the VAE decoder with static input shapes, then apply graph optimizations and build an FP16 VAE decoder (default) and an optional mixed INT8 decoder. The default balanced accuracy mode uses an FP32 text encoder and an FP32 timestep embedding in the otherwise FP16 denoiser.
 4. **Run OpenVINO inference** - Generate a video from a prompt with 4, 8, 16 or 30 denoising steps on the selected device and save it as an MP4.
 5. **Verify the conversion** - Compare the OpenVINO generator, decoder and full video with the PyTorch reference.
 
