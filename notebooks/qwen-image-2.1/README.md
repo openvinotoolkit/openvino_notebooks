@@ -9,6 +9,7 @@ This tutorial demonstrates how to:
 - download and convert [`Qwen/Qwen-Image-2.1`](https://huggingface.co/Qwen/Qwen-Image-2.1) to OpenVINO IR;
 - run text-to-image generation with OpenVINO GenAI;
 - run image-conditioned editing with the same exported model;
+- run editing conditioned on several reference images;
 - save generated images with reproducible configuration details in their filenames;
 - measure pipeline loading, first-run, and warm-run latency;
 - launch an interactive demo with pipeline, precision, and device selection.
@@ -21,13 +22,13 @@ This notebook demonstrates a model that has not been fully validated with OpenVI
 
 ## Notebook Contents
 
-1. Install the latest stable Gradio, PyTorch, NNCF, and utility packages; upstream Diffusers and Optimum Intel branches; and OpenVINO nightly builds, with a temporary cross-platform fallback that automatically extracts cached or manually downloaded OpenVINO GenAI main-branch artifact ZIPs
+1. Install the latest stable Gradio, PyTorch, NNCF, and utility packages; Diffusers 0.41; the upstream Optimum Intel `main` branch; and OpenVINO nightly builds
 2. Select export options
 3. Convert the model to OpenVINO IR
 4. Run text-to-image generation
-5. Run image-conditioned editing
-6. Benchmark both scenarios
-7. Launch an interactive demo with dynamic pipeline, FP16/INT8/INT4, and device selection
+5. Run image-conditioned editing with one or several reference images
+6. Benchmark text-to-image and single-image editing
+7. Launch an interactive demo with dynamic pipeline, FP16/INT8/INT4, device, and up to three condition images selection
 
 ## Installation Instructions
 
