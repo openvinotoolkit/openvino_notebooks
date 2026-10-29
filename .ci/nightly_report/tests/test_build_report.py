@@ -732,7 +732,11 @@ def test_workflow_matrices_of_the_nightly_workflow():
     igpu_lists = builder._ignore_lists("build_treon_igpu", "igpu", "ubuntu-22.04", "3.11")
     assert igpu_lists[-1] == ".ci/heavy_ubuntu_gpu.txt" and ".ci/gpu_oom.txt" in igpu_lists
     assert builder._ignore_lists("build_treon_linux", "cpu", "ubuntu-22.04", "3.11") == [".ci/tensorflow.txt"]
-    for item in igpu_lists + builder._ignore_lists("build_treon_dgpu", "dgpu", "ubuntu-22.04", "3.11"):
+    windows_lists = builder._ignore_lists("build_treon_windows", "cpu", "windows-2022", "3.11")
+    assert windows_lists == [".ci/tensorflow.txt"]
+    windows_py313_lists = builder._ignore_lists("build_treon_windows", "cpu", "windows-2022", "3.13")
+    assert windows_py313_lists == [*windows_lists, ".ci/win_py313_flaky.txt"]
+    for item in igpu_lists + builder._ignore_lists("build_treon_dgpu", "dgpu", "ubuntu-22.04", "3.11") + windows_py313_lists:
         assert (repo_root / item).is_file(), item
 
 
