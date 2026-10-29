@@ -1,3 +1,4 @@
+import ast
 import shutil
 import openvino as ov
 from transformers import GenerationMixin, GenerationConfig, PretrainedConfig
@@ -75,7 +76,7 @@ def extract_coordinates_and_label(ref_text, image_width, image_height):
 
     try:
         label_type = ref_text[1]
-        cor_list = eval(ref_text[2])
+        cor_list = ast.literal_eval(ref_text[2])
     except Exception as e:
         print(e)
         return None
@@ -1531,12 +1532,12 @@ class OVDeepseekOCRForCausalLM(GenerationMixin):
             if "line_type" in outputs:
                 import matplotlib.pyplot as plt
 
-                lines = eval(outputs)["Line"]["line"]
+                lines = ast.literal_eval(outputs)["Line"]["line"]
 
-                line_type = eval(outputs)["Line"]["line_type"]
+                line_type = ast.literal_eval(outputs)["Line"]["line_type"]
                 # print(lines)
 
-                endpoints = eval(outputs)["Line"]["line_endpoint"]
+                endpoints = ast.literal_eval(outputs)["Line"]["line_endpoint"]
 
                 fig, ax = plt.subplots(figsize=(3, 3), dpi=200)
                 ax.set_xlim(-15, 15)
@@ -1544,8 +1545,8 @@ class OVDeepseekOCRForCausalLM(GenerationMixin):
 
                 for idx, line in enumerate(lines):
                     try:
-                        p0 = eval(line.split(" -- ")[0])
-                        p1 = eval(line.split(" -- ")[-1])
+                        p0 = ast.literal_eval(line.split(" -- ")[0])
+                        p1 = ast.literal_eval(line.split(" -- ")[-1])
 
                         if line_type[idx] == "--":
                             ax.plot([p0[0], p1[0]], [p0[1], p1[1]], linewidth=0.8, color="k")
@@ -1560,7 +1561,7 @@ class OVDeepseekOCRForCausalLM(GenerationMixin):
                 for endpoint in endpoints:
 
                     label = endpoint.split(": ")[0]
-                    x, y = eval(endpoint.split(": ")[1])
+                    x, y = ast.literal_eval(endpoint.split(": ")[1])
                     ax.annotate(label, (x, y), xytext=(1, 1), textcoords="offset points", fontsize=5, fontweight="light")
 
                 plt.savefig(f"{output_path}/geo.jpg")
