@@ -32,10 +32,6 @@ on:
         required: false
         type: string
         default: ''
-      separate_venv:
-        required: false
-        type: boolean
-        default: false
       test_list:
         description: 'Newline-separated list of notebook paths to test (relative to repo root)'
         required: false
@@ -123,13 +119,6 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      # Notebooks download notebook_utils.py at runtime only if it is missing next to them
-      - name: Copy notebook_utils.py into notebook folders
-        run: |
-          for dir in notebooks/*/; do
-            cp utils/notebook_utils.py "$dir"
-          done
 
       - name: Get changed files
         if: ${{ inputs.test_only_changed }}
@@ -260,7 +249,7 @@ jobs:
           EOF
 
       - name: Setup Python ${{ inputs.python }}
-        uses: openvinotoolkit/openvino/.github/actions/setup_python@178d03e210433f32af080aab3e05562e238c5ee2
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@3c203973be08baa7eea263d06dd2f006d6b607d8
         with:
           version: ${{ inputs.python }}
           pip-cache-path: ${{ env.PIP_CACHE_PATH }}
@@ -382,7 +371,6 @@ jobs:
             ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
             $IGNORE_ARGS \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
-            ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --collect_reports \
             --timeout ${{ inputs.dashboard_data && 3600 || 1200 }} \
             "${DASHBOARD_ARGS[@]}"
@@ -413,7 +401,6 @@ jobs:
             --device ${{ env.TEST_DEVICE }} \
             ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
-            ${{ inputs.separate_venv && '--separate_venv' || '' }} \
             --collect_reports \
             --timeout ${{ inputs.dashboard_data && 3600 || 1200 }} \
             "${DASHBOARD_ARGS[@]}"

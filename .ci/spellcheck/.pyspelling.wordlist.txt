@@ -397,6 +397,7 @@ GitHub
 GLA
 GLM
 glm
+glyphs
 GMCNN
 GNA
 Golang
@@ -509,6 +510,7 @@ JAX
 JAX's
 JEPA
 JEPA's
+Jev
 JFLEG
 Jina
 jina
@@ -772,6 +774,7 @@ npoints
 npu
 NPU
 NPUs
+NPUW
 nsamples
 nsfw
 NSFW
@@ -1272,6 +1275,7 @@ upsampled
 upsamples
 upsampling
 Upscaled
+upscaled
 upscaler
 upscales
 upscaling
