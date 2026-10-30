@@ -238,6 +238,7 @@ DeepStack
 demucs
 denoise
 denoised
+denoiser
 denoises
 denoising
 denormalization
@@ -815,6 +816,7 @@ OpenCV
 OpenCV's
 OpenDataLab
 openjourney
+OpenMDW
 OpenPose
 OpenShift
 OpenVINO
@@ -950,6 +952,7 @@ prithivMLmods
 proto
 protobuf
 PRs
+PSNR
 psychoacoustics
 PTQ
 px
@@ -975,6 +978,7 @@ quant
 quantized
 quantizer
 quantizers
+quantizes
 Quantizing
 quantizing
 QuartzNet
@@ -1253,6 +1257,7 @@ UNet
 Unet
 UNets
 Unimodal
+UniPC
 unsqueeze
 Uparrow
 uparrow
