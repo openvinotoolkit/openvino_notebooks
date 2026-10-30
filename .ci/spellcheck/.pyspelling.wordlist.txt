@@ -238,6 +238,7 @@ DeepStack
 demucs
 denoise
 denoised
+denoiser
 denoises
 denoising
 denormalization
@@ -977,6 +978,7 @@ quant
 quantized
 quantizer
 quantizers
+quantizes
 Quantizing
 quantizing
 QuartzNet

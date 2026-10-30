@@ -18,17 +18,39 @@ if (NUM_FRAMES - 1) % TEMPORAL_COMPRESSION:
 LATENT_FRAMES = (NUM_FRAMES - 1) // TEMPORAL_COMPRESSION + 1
 LATENT_SHAPE = (1, 48, LATENT_FRAMES, 16, 16)
 TEXT_INPUT_NAMES = ("input_ids", "text_cos", "text_sin")
-DENOISER_INPUT_NAMES = ("vision_latents", "timestep", "text_k", "text_v", "text_mask", "gen_cos", "gen_sin")
+DENOISER_INPUT_NAMES = (
+    "vision_latents",
+    "timestep",
+    "text_k",
+    "text_v",
+    "text_mask",
+    "gen_cos",
+    "gen_sin",
+)
 
 
 class PromptPreprocessor:
     """Tokenizes the conditional and unconditional prompts and builds the static text and 3D mRoPE tables."""
 
-    def __init__(self, checkpoint: str | Path, lmax: int = 256, num_frames: int = NUM_FRAMES, height: int = HEIGHT, width: int = WIDTH, fps: float = FPS):
+    def __init__(
+        self,
+        checkpoint: str | Path,
+        lmax: int = 256,
+        num_frames: int = NUM_FRAMES,
+        height: int = HEIGHT,
+        width: int = WIDTH,
+        fps: float = FPS,
+    ):
         from transformers import AutoTokenizer
 
         checkpoint = Path(checkpoint)
-        self.lmax, self.num_frames, self.height, self.width, self.fps = lmax, num_frames, height, width, fps
+        self.lmax, self.num_frames, self.height, self.width, self.fps = (
+            lmax,
+            num_frames,
+            height,
+            width,
+            fps,
+        )
         self.tokenizer = AutoTokenizer.from_pretrained(checkpoint / "text_tokenizer", local_files_only=True)
         config = json.loads((checkpoint / "transformer" / "config.json").read_text())
         self.head_dim = config["head_dim"]
@@ -117,7 +139,10 @@ def make_scheduler(config: dict, steps: int):
     from diffusers.schedulers.scheduling_unipc_multistep import UniPCMultistepScheduler
 
     scheduler = UniPCMultistepScheduler.from_config(config)
-    scheduler.set_timesteps(steps, sigmas=np.linspace(1.0 - 1.0 / scheduler.config.num_train_timesteps, 0.0, steps + 1)[:-1])
+    scheduler.set_timesteps(
+        steps,
+        sigmas=np.linspace(1.0 - 1.0 / scheduler.config.num_train_timesteps, 0.0, steps + 1)[:-1],
+    )
     return scheduler
 
 
@@ -169,7 +194,13 @@ class TextKV(nn.Module):
                 break
             q = attn.norm_q(attn.to_q(normed).view(batch, length, attn.num_attention_heads, attn.head_dim))
             q, k = q * cos + rotate_half(q) * sin, k * cos + rotate_half(k) * sin
-            out = F.scaled_dot_product_attention(q.transpose(1, 2), k.transpose(1, 2), v.transpose(1, 2), is_causal=True, enable_gqa=True)
+            out = F.scaled_dot_product_attention(
+                q.transpose(1, 2),
+                k.transpose(1, 2),
+                v.transpose(1, 2),
+                is_causal=True,
+                enable_gqa=True,
+            )
             hidden = hidden + attn.to_out(out.transpose(1, 2).reshape(batch, length, -1))
             hidden = hidden + layer.mlp(layer.post_attention_layernorm(hidden))
         return torch.stack(keys), torch.stack(values)
@@ -205,7 +236,11 @@ class DenoiseStep(nn.Module):
             # [2n, heads, dim] -> [2, heads, n, dim]: batch row 0 is conditional, row 1 unconditional
             q, k, v = (t.view(2, n, t.shape[1], t.shape[2]).transpose(1, 2) for t in (q, k, v))
             out = F.scaled_dot_product_attention(
-                q, torch.cat([text_k[index], k], 2), torch.cat([text_v[index], v], 2), attn_mask=mask, enable_gqa=True
+                q,
+                torch.cat([text_k[index], k], 2),
+                torch.cat([text_v[index], v], 2),
+                attn_mask=mask,
+                enable_gqa=True,
             )
             hidden = hidden + attn.to_add_out(out.transpose(1, 2).reshape(2 * n, -1))
             hidden = hidden + layer.mlp_moe_gen(layer.post_attention_layernorm_moe_gen(hidden))
@@ -235,7 +270,12 @@ class VAEDecoder(nn.Module):
         vae.clear_cache()
         x = vae.post_quant_conv(z)
         vae._conv_idx = [0]
-        first = vae.decoder(x[:, :, :1], feat_cache=vae._feat_map, feat_idx=vae._conv_idx, first_chunk=True)
+        first = vae.decoder(
+            x[:, :, :1],
+            feat_cache=vae._feat_map,
+            feat_idx=vae._conv_idx,
+            first_chunk=True,
+        )
         vae._conv_idx = [0]
         rest = vae.decoder(x[:, :, 1:], feat_cache=vae._feat_map, feat_idx=vae._conv_idx)
         video = torch.cat([first, rest], 2)
@@ -329,7 +369,12 @@ def sdpa_to_rank4(model: ov.Model) -> int:
         query = ops.reshape(sdpa.input_value(0), _const_i64([batch, heads, length, dim]), False)
         key, value = (
             ops.reshape(
-                ops.broadcast(sdpa.input_value(i), _const_i64([k_batch, groups, repeat, source, dim])), _const_i64([k_batch, heads, source, dim]), False
+                ops.broadcast(
+                    sdpa.input_value(i),
+                    _const_i64([k_batch, groups, repeat, source, dim]),
+                ),
+                _const_i64([k_batch, heads, source, dim]),
+                False,
             )
             for i in (1, 2)
         )
@@ -338,7 +383,13 @@ def sdpa_to_rank4(model: ov.Model) -> int:
             mask_shape = list(sdpa.get_input_shape(3))
             if len(mask_shape) != 5 or mask_shape[1] != 1 or mask_shape[2] != 1:
                 continue
-            extra.append(ops.reshape(sdpa.input_value(3), _const_i64(mask_shape[:2] + mask_shape[3:]), False))
+            extra.append(
+                ops.reshape(
+                    sdpa.input_value(3),
+                    _const_i64(mask_shape[:2] + mask_shape[3:]),
+                    False,
+                )
+            )
         if sdpa.get_input_size() > 4:
             extra.append(sdpa.input_value(4))
         attention = ops.scaled_dot_product_attention(query, key, value, *extra, causal=sdpa.get_attributes()["causal"])
@@ -387,7 +438,10 @@ def rmsnorm_f16(model):
             continue
         x = to_f32.input_value(0)
         norm = ops.convert(ops.reduce_l2(x, reduce.input_value(1), True), ov.Type.f32)
-        recip = ops.divide(ops.constant(np.ones([1] * eps.ndim, np.float32)), ops.maximum(norm, ops.constant(eps.astype(np.float32))))
+        recip = ops.divide(
+            ops.constant(np.ones([1] * eps.ndim, np.float32)),
+            ops.maximum(norm, ops.constant(eps.astype(np.float32))),
+        )
         recip = ops.minimum(recip, ops.constant(np.full([1] * eps.ndim, F16_MAX, np.float32)))
         out = ops.multiply(x, ops.convert(recip, ov.Type.f16))
         for target in list(to_f16.output(0).get_target_inputs()):
@@ -409,7 +463,13 @@ def upsampler_5d(model):
         if frames.get_type_name() != "Reshape":
             continue
         to_frames = frames.input_value(0).get_node()
-        if to_frames.get_type_name() != "Transpose" or _perm(to_frames) != [0, 2, 1, 3, 4]:
+        if to_frames.get_type_name() != "Transpose" or _perm(to_frames) != [
+            0,
+            2,
+            1,
+            3,
+            4,
+        ]:
             continue
         x5 = to_frames.input_value(0)
         bias = _single_consumer(conv, "Add")
@@ -421,7 +481,16 @@ def upsampler_5d(model):
         if to_5d is None or _perm(to_5d) != [0, 2, 1, 3, 4] or weight is None:
             continue
         attrs, conv_attrs = interp.get_attributes(), conv.get_attributes()
-        scales = np.array([o / i for o, i in zip(list(interp.get_output_shape(0))[2:], list(frames.get_output_shape(0))[2:])], np.float32)
+        scales = np.array(
+            [
+                o / i
+                for o, i in zip(
+                    list(interp.get_output_shape(0))[2:],
+                    list(frames.get_output_shape(0))[2:],
+                )
+            ],
+            np.float32,
+        )
         up = ops.interpolate(
             x5,
             ops.constant(scales),
@@ -577,7 +646,12 @@ def _fake_quantize(value, lo, hi, levels):
     return ops.fake_quantize(value, lo, hi, lo, hi, levels)
 
 
-def quantize_vae_decoder(model_path: str | Path, latent: np.ndarray, device: str = "GPU", keep_f16: str = INT8_KEEP_F16) -> tuple[ov.Model, int]:
+def quantize_vae_decoder(
+    model_path: str | Path,
+    latent: np.ndarray,
+    device: str = "GPU",
+    keep_f16: str = INT8_KEEP_F16,
+) -> tuple[ov.Model, int]:
     """Mixed INT8: symmetric per-tensor activations, per-channel weights; calibrated from one decoder run."""
     core = ov.Core()
     model = core.read_model(model_path)
@@ -586,7 +660,10 @@ def quantize_vae_decoder(model_path: str | Path, latent: np.ndarray, device: str
     for conv in convs:
         act = conv.input_value(0)
         axes = _const_i64(np.arange(len(act.get_shape())))
-        probes += [ops.reduce_min(act, axes, False).output(0), ops.reduce_max(act, axes, False).output(0)]
+        probes += [
+            ops.reduce_min(act, axes, False).output(0),
+            ops.reduce_max(act, axes, False).output(0),
+        ]
     model.add_outputs(probes)
     compiled = core.compile_model(model, device, {"INFERENCE_PRECISION_HINT": "f16"})
     result = compiled([latent.astype(np.float16)])
@@ -624,5 +701,12 @@ def save_video(video: np.ndarray, path: str | Path, fps: float = FPS) -> Path:
     """Write a [1, 3, T, H, W] video in [-1, 1] as an H.264 MP4."""
     import imageio.v2 as imageio
 
-    imageio.mimwrite(path, list(to_frames(video)), fps=fps, codec="libx264", quality=8, macro_block_size=1)
+    imageio.mimwrite(
+        path,
+        list(to_frames(video)),
+        fps=fps,
+        codec="libx264",
+        quality=8,
+        macro_block_size=1,
+    )
     return Path(path)
