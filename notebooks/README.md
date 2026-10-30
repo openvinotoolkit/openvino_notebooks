@@ -255,6 +255,7 @@
 - [Multi LoRA Image Generation](./multilora-image-generation/multilora-image-generation.ipynb)
 - [Visual Content Search using MobileCLIP and OpenVINO](./mobileclip-video-search/mobileclip-video-search.ipynb)
 - [MMS: Scaling Speech Technology to 1000+ languages with OpenVINO™](./mms-massively-multilingual-speech/mms-massively-multilingual-speech.ipynb)
+- [Moonshine Streaming automatic speech recognition with OpenVINO](./moonshine-streaming-asr/moonshine-streaming-asr.ipynb)
 - [Visual-language assistant with Llama-3.2-11B-Vision and OpenVINO](./mllama-3.2/mllama-3.2.ipynb)
 - [Visual-language assistant with Ministral-3 and OpenVINO](./ministral-3/ministral-3.ipynb)
 - [Visual-language assistant with MiniCPM-V and OpenVINO](./minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb)
@@ -335,4 +336,3 @@
 - [Quantization of Image Classification Models](./image-classification-quantization/image-classification-quantization.ipynb)
 - [Object detection and masking from prompts with GroundedSAM (GroundingDINO + SAM) and OpenVINO](./grounded-segment-anything/grounded-segment-anything.ipynb)
 - [Quantize a Segmentation Model and Show Live Inference](./ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb)
-
