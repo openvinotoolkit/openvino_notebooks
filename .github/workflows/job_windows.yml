@@ -17,10 +17,6 @@ on:
         required: false
         type: string
         default: ''
-      separate_venv:
-        required: false
-        type: boolean
-        default: false
       test_list:
         description: 'Newline-separated list of notebook paths to test (relative to repo root)'
         required: false
@@ -65,14 +61,6 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      # Notebooks download notebook_utils.py at runtime only if it is missing next to them
-      - name: Copy notebook_utils.py into notebook folders
-        shell: pwsh
-        run: |
-          Get-ChildItem -Path notebooks -Directory | ForEach-Object {
-            Copy-Item -Path utils/notebook_utils.py -Destination $_.FullName -Force
-          }
 
       - name: Configure Developer Command Prompt for Microsoft Visual C++
         uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
@@ -142,7 +130,7 @@ jobs:
           cat test_notebooks.txt
 
       - name: Setup Python ${{ inputs.python }}
-        uses: openvinotoolkit/openvino/.github/actions/setup_python@178d03e210433f32af080aab3e05562e238c5ee2
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@3c203973be08baa7eea263d06dd2f006d6b607d8
         with:
           version: ${{ inputs.python }}
           pip-cache-path: ${{ env.PIP_CACHE_PATH }}
@@ -241,14 +229,15 @@ jobs:
             $cmdArgs += "test_notebooks.txt"
           }
           
-          if ("${{ inputs.ignore_list }}" -ne "") {
-            $cmdArgs += "--ignore_list"
-            $cmdArgs += "${{ inputs.ignore_list }}"
+          # ignore_list may hold several space-separated files; pass each as a separate argument
+          $ignoreList = @("${{ inputs.ignore_list }}".Split(" ", [System.StringSplitOptions]::RemoveEmptyEntries))
+          # Notebooks that are flaky on Windows with Python 3.13 only
+          if ("${{ inputs.python }}" -eq "3.13") {
+            $ignoreList += ".ci/win_py313_flaky.txt"
           }
-
-          if ( "${{ inputs.separate_venv }}" -eq "true" )
-          {
-            $cmdArgs += "--separate_venv"
+          if ($ignoreList.Count -gt 0) {
+            $cmdArgs += "--ignore_list"
+            $cmdArgs += $ignoreList
           }
 
           if ($env:DASHBOARD_DATA -eq "true") {
