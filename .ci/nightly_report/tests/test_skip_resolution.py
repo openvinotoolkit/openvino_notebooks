@@ -4,6 +4,7 @@ import pytest
 
 import validate_notebooks
 from nightly_report.constants import SkipReason
+from split_notebooks import collect_notebooks
 from validate_notebooks import get_ignore_list_notebooks, get_ignored_notebooks_from_yaml, resolve_skip_reasons
 
 CI_DIR = Path(__file__).resolve().parents[2]
@@ -116,6 +117,34 @@ def test_resolve_skip_reasons_on_repository_configs():
     assert reasons
     assert set(reasons.values()) <= set(SkipReason.ALL)
     assert all(path.startswith("notebooks/") and path.endswith(".ipynb") for path in reasons)
+
+
+@pytest.mark.parametrize(
+    "os_name, python, device",
+    [
+        ("ubuntu-22.04", "3.11", "cpu"),
+        ("ubuntu-22.04", "3.12", "cpu"),
+        ("ubuntu-22.04", "3.13", "cpu"),
+        ("windows-2022", "3.11", "cpu"),
+        ("windows-2022", "3.12", "cpu"),
+        ("windows-2022", "3.13", "cpu"),
+        ("ubuntu-22.04", "3.11", "gpu"),
+    ],
+)
+def test_no_skips_config_runs_all_collected_notebooks(os_name, python, device):
+    repo_root = CI_DIR.parent
+    notebooks = collect_notebooks(repo_root / "notebooks")
+    assert notebooks
+    plan = validate_notebooks.prepare_test_plan(
+        config(os_name, python, device),
+        notebooks,
+        "no_skips.yml",
+        None,
+        repo_root / "notebooks",
+    )
+    selected = [report for report in plan.values() if report["status"] != validate_notebooks.NotebookStatus.SKIPPED]
+    assert {report["path"].as_posix() for report in selected} == set(notebooks)
+    assert all(report["skip_reason"] is None for report in selected)
 
 
 def test_skip_reason_constants_match_dashboard_contract():

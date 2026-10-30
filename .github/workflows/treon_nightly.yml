@@ -2,6 +2,10 @@ name: treon_nightly
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - 'main'
+      - 'latest'
   schedule:
     - cron: '0 0 * * *'
 
@@ -75,7 +79,7 @@ jobs:
       python: ${{ matrix.python }}
       test_list: ${{ needs.collect_notebooks.outputs[matrix.batch] }}
       batch: ${{ matrix.batch }}
-      ignore_list: .ci/tensorflow.txt
+      run_all_notebooks: true
       dashboard_data: true
       container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:${{ needs.get_docker_tag.outputs.docker_tag }}'
 
@@ -93,7 +97,7 @@ jobs:
       python: ${{ matrix.python }}
       test_list: ${{ needs.collect_notebooks.outputs[matrix.batch] }}
       batch: ${{ matrix.batch }}
-      ignore_list: .ci/tensorflow.txt
+      run_all_notebooks: true
       dashboard_data: true
 
   build_treon_igpu:
@@ -112,8 +116,7 @@ jobs:
       batch: ${{ matrix.batch }}
       container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:${{ needs.get_docker_tag.outputs.docker_tag }}'
       options: '--group-add 44 --group-add 993 --device /dev/dri/renderD128:/dev/dri/renderD128'
-      # Skip notebooks with blocked resources (195494), network errors, iGPU memory limits, or repeated timeouts
-      ignore_list: .ci/not_allowed_resources.txt .ci/gpu_oom.txt .ci/igpu_timeouts.txt
+      run_all_notebooks: true
       dashboard_data: true
 
   build_treon_dgpu:
@@ -133,8 +136,7 @@ jobs:
       container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:${{ needs.get_docker_tag.outputs.docker_tag }}'
       # renderD128 is the integrated GPU on these hosts; pass only the discrete one so "GPU" maps to it
       options: '--group-add 44 --group-add 993 --device /dev/dri/renderD129:/dev/dri/renderD129'
-      # Skip notebooks that download resources from not-allowed domains (195494) or fail on network errors (e.g. 403)
-      ignore_list: .ci/not_allowed_resources.txt
+      run_all_notebooks: true
       dashboard_data: true
 
   aggregate_notebooks_reports:
@@ -215,6 +217,7 @@ jobs:
             --plan nightly_plan/plan.json \
             --output_dir nightly_dashboard_data \
             --workflow_file .github/workflows/treon_nightly.yml \
+            --skip_config .ci/no_skips.yml \
             --ov_branch "$OV_BRANCH" \
             --docker_tag "$DOCKER_TAG" \
             --summary_file "$GITHUB_STEP_SUMMARY"
