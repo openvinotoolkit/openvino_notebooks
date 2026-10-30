@@ -1,6 +1,6 @@
 import ast
 import re
-import subprocess
+import subprocess  # nosec B404 - fixed git arguments, shell disabled
 import sys
 import json
 from table_of_content import find_tc_in_cell
