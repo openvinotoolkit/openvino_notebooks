@@ -29,6 +29,31 @@ env:
   OV_BRANCH: 'master'
 
 jobs:
+  collect_notebooks:
+    if: ${{ !(github.event.pull_request.user.login == 'dependabot[bot]' && startsWith(github.head_ref, 'dependabot/npm_and_yarn/selector/')) }}
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.split.outputs.matrix }}
+      has_tests: ${{ steps.split.outputs.has_tests }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
+        with:
+          files: |
+            notebooks/*/**
+            requirements.txt
+          json: true
+          escape_json: false
+      - name: Select and split notebooks into nonempty batches
+        id: split
+        env:
+          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+          RUN_ID: ${{ github.run_id }}
+        run: python3 .ci/split_notebooks.py --precommit --num_batches 5 --seed "$RUN_ID"
+
   get_docker_tag:
     # Dependabot selector-only updates do not affect notebooks
     if: ${{ !(github.event.pull_request.user.login == 'dependabot[bot]' && startsWith(github.head_ref, 'dependabot/npm_and_yarn/selector/')) }}
@@ -52,36 +77,40 @@ jobs:
         echo "docker_tag=$docker_tag" >> $GITHUB_OUTPUT
 
   build_treon_linux:
-    needs: get_docker_tag
+    needs: [get_docker_tag, collect_notebooks]
+    if: ${{ needs.collect_notebooks.outputs.has_tests == 'true' }}
     strategy:
       fail-fast: false
       matrix:
         python: ['3.11', '3.12', '3.13']
+        batch: ${{ fromJSON(needs.collect_notebooks.outputs.matrix) }}
     uses: ./.github/workflows/job_unix.yml
     with:
       runner: '["aks-linux-8-cores-32gb"]'
       python: ${{ matrix.python }}
       container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:${{ needs.get_docker_tag.outputs.docker_tag }}'
-      test_only_changed: true
-      separate_venv: true
+      test_list: ${{ matrix.batch.test_list }}
+      batch: ${{ matrix.batch.name }}
   
   build_treon_windows:
-    if: ${{ !(github.event.pull_request.user.login == 'dependabot[bot]' && startsWith(github.head_ref, 'dependabot/npm_and_yarn/selector/')) }}
+    needs: collect_notebooks
+    if: ${{ needs.collect_notebooks.outputs.has_tests == 'true' }}
     strategy:
       fail-fast: false
       matrix:
         runs_on: [aks-win-16-cores-32gb-full]
         python: ['3.11', '3.12', '3.13']
+        batch: ${{ fromJSON(needs.collect_notebooks.outputs.matrix) }}
     uses: ./.github/workflows/job_windows.yml
     with:
       runs_on: ${{ matrix.runs_on }}
       python: ${{ matrix.python }}
-      test_only_changed: true
-      separate_venv: true
+      test_list: ${{ matrix.batch.test_list }}
+      batch: ${{ matrix.batch.name }}
 
   Overall_Status:
     name: ci/gha_overall_status_precommit
-    needs: [get_docker_tag, build_treon_linux, build_treon_windows]
+    needs: [get_docker_tag, collect_notebooks, build_treon_linux, build_treon_windows]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:

@@ -22,6 +22,8 @@ WINDOWS_REUSABLE_WORKFLOW = "job_windows.yml"
 GPU_DEVICE_TAGS = ("igpu", "dgpu", "gpu")  # most specific first
 # job_unix.yml adds this ignore list to the job's ones on GPU
 UNIX_GPU_IGNORE_LIST = ".ci/heavy_ubuntu_gpu.txt"
+# job_windows.yml adds this ignore list to the job's ones on Python 3.13
+WINDOWS_PY313_IGNORE_LIST = ".ci/win_py313_flaky.txt"
 
 
 def os_family(os_name: str) -> str:
@@ -171,4 +173,6 @@ def job_ignore_lists(specs: dict[str, Optional[dict]], job_key: Optional[str], d
     ignore_lists = list(spec["ignore_list"])
     if spec["uses"].endswith(UNIX_REUSABLE_WORKFLOW) and validation_device(device) == "gpu" and os_family(os_name) == "linux":
         ignore_lists.append(UNIX_GPU_IGNORE_LIST)
+    if spec["uses"].endswith(WINDOWS_REUSABLE_WORKFLOW) and python == "3.13":
+        ignore_lists.append(WINDOWS_PY313_IGNORE_LIST)
     return ignore_lists
