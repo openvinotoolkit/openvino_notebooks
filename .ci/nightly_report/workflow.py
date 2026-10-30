@@ -80,6 +80,7 @@ def workflow_job_spec(job: dict) -> dict:
         "runner": str(runner) if runner is not None else None,
         "matrix": matrix,
         "ignore_list": str(inputs.get("ignore_list") or "").split(),
+        "run_all_notebooks": inputs.get("run_all_notebooks") is True,
     }
 
 
@@ -170,6 +171,8 @@ def job_ignore_lists(specs: dict[str, Optional[dict]], job_key: Optional[str], d
         )
     if spec is None:
         return list(default)
+    if spec.get("run_all_notebooks"):
+        return []
     ignore_lists = list(spec["ignore_list"])
     if spec["uses"].endswith(UNIX_REUSABLE_WORKFLOW) and validation_device(device) == "gpu" and os_family(os_name) == "linux":
         ignore_lists.append(UNIX_GPU_IGNORE_LIST)

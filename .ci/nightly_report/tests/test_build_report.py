@@ -14,7 +14,7 @@ from jsonschema import Draft202012Validator
 from nightly_report import build_report, github_api
 from nightly_report.report_common import Warnings
 from nightly_report.repository import get_last_modified
-from nightly_report.workflow import os_family, parse_job_name, runner_label_to_os_device, runner_label_text, workflow_job_spec
+from nightly_report.workflow import job_ignore_lists, os_family, parse_job_name, runner_label_to_os_device, runner_label_text, workflow_job_spec
 
 SCHEMA_DIR = Path(build_report.__file__).resolve().parent / "schema"
 
@@ -706,6 +706,23 @@ def test_github_api_errors_only_warn(monkeypatch):
     assert api.get_jobs(1) is None and len(calls) == 1
 
 
+@pytest.mark.parametrize("run_all_notebooks", [False, True])
+@pytest.mark.parametrize(
+    "uses, device, os_name, python, automatic_lists",
+    [
+        ("job_unix.yml", "cpu", "ubuntu-22.04", "3.11", []),
+        ("job_unix.yml", "igpu", "ubuntu-22.04", "3.11", [".ci/heavy_ubuntu_gpu.txt"]),
+        ("job_unix.yml", "dgpu", "ubuntu-22.04", "3.11", [".ci/heavy_ubuntu_gpu.txt"]),
+        ("job_windows.yml", "cpu", "windows-2022", "3.11", []),
+        ("job_windows.yml", "cpu", "windows-2022", "3.13", [".ci/win_py313_flaky.txt"]),
+    ],
+)
+def test_run_all_notebooks_disables_ignore_lists(run_all_notebooks, uses, device, os_name, python, automatic_lists):
+    spec = workflow_job_spec({"uses": uses, "with": {"ignore_list": ".ci/tensorflow.txt", "run_all_notebooks": run_all_notebooks}})
+    lists = job_ignore_lists({"build_treon": spec}, "build_treon", device, os_name, python, [])
+    assert lists == ([] if run_all_notebooks else [".ci/tensorflow.txt", *automatic_lists])
+
+
 def test_workflow_matrices_of_the_nightly_workflow():
     repo_root = Path(build_report.__file__).resolve().parents[2]
     args = build_report.parse_arguments(
@@ -729,15 +746,13 @@ def test_workflow_matrices_of_the_nightly_workflow():
     workflow = yaml.safe_load((repo_root / ".github/workflows/treon_nightly.yml").read_text(encoding="utf-8"))
     assert all(workflow["jobs"][job_key]["with"].get("dashboard_data") is True for job_key in expected)
     assert set(expected) <= set(workflow["jobs"]["build_dashboard_data"]["needs"])
-    igpu_lists = builder._ignore_lists("build_treon_igpu", "igpu", "ubuntu-22.04", "3.11")
-    assert igpu_lists[-1] == ".ci/heavy_ubuntu_gpu.txt" and ".ci/gpu_oom.txt" in igpu_lists
-    assert builder._ignore_lists("build_treon_linux", "cpu", "ubuntu-22.04", "3.11") == [".ci/tensorflow.txt"]
-    windows_lists = builder._ignore_lists("build_treon_windows", "cpu", "windows-2022", "3.11")
-    assert windows_lists == [".ci/tensorflow.txt"]
-    windows_py313_lists = builder._ignore_lists("build_treon_windows", "cpu", "windows-2022", "3.13")
-    assert windows_py313_lists == [*windows_lists, ".ci/win_py313_flaky.txt"]
-    for item in igpu_lists + builder._ignore_lists("build_treon_dgpu", "dgpu", "ubuntu-22.04", "3.11") + windows_py313_lists:
-        assert (repo_root / item).is_file(), item
+    for job_key in expected:
+        assert workflow["jobs"][job_key]["with"]["run_all_notebooks"] is True
+        assert "ignore_list" not in workflow["jobs"][job_key]["with"]
+        for combination in matrices[job_key]:
+            assert builder._ignore_lists(job_key, combination["device"], combination["os"], combination["python"]) == []
+    report_step = next(step for step in workflow["jobs"]["build_dashboard_data"]["steps"] if step["name"] == "Build dashboard data")
+    assert "--skip_config .ci/no_skips.yml" in report_step["run"]
 
 
 @pytest.mark.parametrize(

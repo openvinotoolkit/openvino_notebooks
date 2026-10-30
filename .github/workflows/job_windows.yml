@@ -17,6 +17,11 @@ on:
         required: false
         type: string
         default: ''
+      run_all_notebooks:
+        description: 'Disable skip configuration and ignore lists for all notebooks selected by test_list'
+        required: false
+        type: boolean
+        default: false
       test_list:
         description: 'Newline-separated list of notebook paths to test (relative to repo root)'
         required: false
@@ -232,8 +237,12 @@ jobs:
           # ignore_list may hold several space-separated files; pass each as a separate argument
           $ignoreList = @("${{ inputs.ignore_list }}".Split(" ", [System.StringSplitOptions]::RemoveEmptyEntries))
           # Notebooks that are flaky on Windows with Python 3.13 only
-          if ("${{ inputs.python }}" -eq "3.13") {
+          if ("${{ inputs.run_all_notebooks }}" -ne "true" -and "${{ inputs.python }}" -eq "3.13") {
             $ignoreList += ".ci/win_py313_flaky.txt"
+          }
+          if ("${{ inputs.run_all_notebooks }}" -eq "true") {
+            $ignoreList = @()
+            $cmdArgs += @("--ignore_config", "no_skips.yml")
           }
           if ($ignoreList.Count -gt 0) {
             $cmdArgs += "--ignore_list"

@@ -32,6 +32,11 @@ on:
         required: false
         type: string
         default: ''
+      run_all_notebooks:
+        description: 'Disable skip configuration and ignore lists for all notebooks selected by test_list'
+        required: false
+        type: boolean
+        default: false
       test_list:
         description: 'Newline-separated list of notebook paths to test (relative to repo root)'
         required: false
@@ -343,10 +348,10 @@ jobs:
           DASHBOARD_CONTAINER_IMAGE: ${{ inputs.container }}
         run: |
           IGNORE_ARGS=""
-          if [[ -n "${{ inputs.ignore_list }}" ]]; then
+          if [[ "${{ inputs.run_all_notebooks }}" != "true" && -n "${{ inputs.ignore_list }}" ]]; then
             IGNORE_ARGS="$IGNORE_ARGS ${{ inputs.ignore_list }}"
           fi
-          if [[ "${{ env.TEST_DEVICE }}" == "gpu" ]]; then
+          if [[ "${{ inputs.run_all_notebooks }}" != "true" && "${{ env.TEST_DEVICE }}" == "gpu" ]]; then
              IGNORE_ARGS="$IGNORE_ARGS .ci/heavy_ubuntu_gpu.txt"
           fi
           
@@ -368,6 +373,7 @@ jobs:
             --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
+            ${{ inputs.run_all_notebooks && '--ignore_config no_skips.yml' || '' }} \
             ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
             $IGNORE_ARGS \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
@@ -399,6 +405,7 @@ jobs:
             --os ${{ env.OS_NAME }} \
             --python ${{ inputs.python }} \
             --device ${{ env.TEST_DEVICE }} \
+            ${{ inputs.run_all_notebooks && '--ignore_config no_skips.yml' || '' }} \
             ${{ (inputs.test_only_changed || inputs.test_list != '') && '--test_list test_notebooks.txt' || '' }} \
             --report_dir test_report/${{ env.TEST_REPORT_DIR }}${{ inputs.batch != '' && '/' || '' }}${{ inputs.batch }} \
             --collect_reports \

@@ -26,6 +26,9 @@ treon_nightly.yml
   its columns and of how the values are calculated.
 * `pull_request` runs of the workflow test all notebooks, like the scheduled nightly, but do not upload `notebooks-status-map.json`;
   their reports have `run.event == "pull_request"`.
+* All nightly test jobs set `run_all_notebooks: true`: every discovered notebook is attempted in each configured OS/Python/device
+  combination, without skip-config or ignore-list exclusions. The validator and dashboard use [`.ci/no_skips.yml`](../no_skips.yml),
+  an empty skip configuration. Other callers of the reusable workflows retain their exclusions by default.
 
 The files are described by JSON Schemas in [`schema/`](./schema): `nightly-report.schema.json` (the dashboard contract),
 `fragment.schema.json` and `plan.schema.json` (internal).
@@ -68,7 +71,7 @@ after some weeks.
 | `failed` | treon exited with a non-zero code (cell error, dead kernel, ...). |
 | `timeout` | The notebook was killed after the per-notebook timeout. |
 | `error` | Harness problem for this notebook (e.g. venv cloning failed, patched notebook missing). |
-| `skipped` | Intentionally not run for this config: `skip_reason` is `skip_config` (`.ci/skipped_notebooks.yml`) or `ignore_list`; `skip_source` names the list file (e.g. `tensorflow.txt`, `gpu_oom.txt`, `heavy_ubuntu_gpu.txt`). Ignore lists are per job: taken from the `ignore_list` input of each job in the workflow, plus `.ci/heavy_ubuntu_gpu.txt` for Linux GPU jobs and `.ci/win_py313_flaky.txt` for Windows Python 3.13 jobs. |
+| `skipped` | Intentionally not run for this config: `skip_reason` is `skip_config` (`.ci/skipped_notebooks.yml`) or `ignore_list`; `skip_source` names the list file (e.g. `tensorflow.txt`, `gpu_oom.txt`, `heavy_ubuntu_gpu.txt`). When `run_all_notebooks` is false (the reusable-workflow default), ignore lists come from each job's `ignore_list` input, plus `.ci/heavy_ubuntu_gpu.txt` for Linux GPU jobs and `.ci/win_py313_flaky.txt` for Windows Python 3.13 jobs. Nightly jobs disable these exclusions. |
 | `not_run` | Planned but never executed: `not_run_reason` is `job_failed_before_tests:<step>`, `job_cancelled`, `job_skipped`, `job_interrupted` or `no_fragment`. |
 
 Batches are reshuffled every night, so history must be keyed by **(`notebook`, `config_id`)**, never by batch or job.
