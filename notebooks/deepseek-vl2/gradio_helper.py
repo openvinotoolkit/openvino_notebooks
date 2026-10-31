@@ -1,3 +1,4 @@
+import ast
 import io
 import sys
 import re
@@ -69,7 +70,7 @@ def parse_ref_bbox(response, image: PIL.Image.Image):
             label = label.replace("<|ref|>", "").replace("<|/ref|>", "")
             box = box[1:-1]
             for onebox in re.findall(r"\[.*?\]", box):
-                boxes.append(eval(onebox))
+                boxes.append(ast.literal_eval(onebox))
                 labels.append(label)
 
         for indice, (box, label) in enumerate(zip(boxes, labels)):
