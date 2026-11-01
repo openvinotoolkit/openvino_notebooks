@@ -26,7 +26,7 @@ mkdir -p $TMP_DIR
 trap "rm -rf $TMP_DIR" EXIT
 
 # Iterate over all `.ipynb` files in the current folder and subfolders
-find "$(pwd)" -type f -name "*.ipynb" -exec realpath --relative-to="$(pwd)" {} + | while read -r file; do
+find "$(pwd)" -type f -name "*.ipynb" -not -path "*/.venv/*" -exec realpath --relative-to="$(pwd)" {} + | while read -r file; do
   if [[ -v ignore_file ]]; then
     grep -qF "$file" "$ignore_file" && continue
   fi
