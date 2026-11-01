@@ -27,6 +27,7 @@ Key features: built-in chain-of-thought (thinking mode), native system prompt su
 - Demonstrate native system prompt support
 - Demonstrate interleaved multi-image input
 - Demonstrate thinking mode (chain-of-thought reasoning)
+- Run speculative decoding with a DFlash draft model (`gemma-4-26B-A4B-it`)
 - Launch an interactive Gradio chat demo with image and video upload
 
 ## Installation Instructions
