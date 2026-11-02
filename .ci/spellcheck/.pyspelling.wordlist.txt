@@ -355,6 +355,8 @@ FireRedTTS
 FLAC
 flac
 FLD
+FK
+fk
 floyd
 fn
 foley
@@ -802,6 +804,8 @@ OmniGen's
 Omnimodal
 omnimodal
 OmniParser
+OmniXtreme
+omnixtreme
 OMZ
 oneAPI
 oneDNN
@@ -1158,6 +1162,7 @@ StableDiffusionInpaintPipeline
 StableDiffusionPipeline
 STAL
 stateful
+stdout
 STFT
 streamable
 strided
@@ -1255,6 +1260,7 @@ Ultralytics
 UMD
 UMT
 Uncheck
+unbuffered
 unCLIP
 uncomment
 uncompressing
@@ -1264,6 +1270,7 @@ UNet
 Unet
 UNets
 Unimodal
+Unitree
 unsqueeze
 Uparrow
 uparrow
