@@ -257,6 +257,7 @@ DETR
 Dettmers
 dev
 DFL
+DFlash
 dGPU
 dGPUs
 DialoGPT
@@ -317,6 +318,7 @@ editability
 EfficientNet
 EfficientSAM
 EfficientSAMs
+Eggbox
 embedder
 Embedder
 embeddings
@@ -378,6 +380,8 @@ Gaudi
 gaussian
 Gb
 gcc
+GDRN
+GDRNPP
 GEC
 GELAN
 GELU
@@ -493,6 +497,7 @@ InternVL
 Interpolative
 interpretable
 intervaling
+intrinsics
 invertible
 io
 IoU
@@ -577,6 +582,7 @@ LDMs
 LDP
 learnable
 LetterBox
+letterboxed
 LeViT
 LFM
 lfm
@@ -590,6 +596,7 @@ lifecycles
 Lim
 LinearCameraEmbedder
 linearized
+Linemod
 Lippipeline
 Liu
 LLama
@@ -782,6 +789,7 @@ NVLabs
 OASST
 OBB
 obb
+objectness
 ocr
 OCRBench
 OCRv
@@ -906,6 +914,7 @@ PLE
 PLR
 PNDM
 png
+PnP
 Pointilism
 pointillistic
 PointNet
@@ -990,6 +999,7 @@ Radosavovic
 Raito
 Raj
 Ranftl
+RANSAC
 RASPP
 rasterised
 rasterises
@@ -1046,6 +1056,7 @@ RoBERTa
 roberta
 ROI
 roi
+ROIs
 rollout
 RoPE
 ROUGE
@@ -1366,6 +1377,7 @@ xvector
 xvectors
 xxl
 XYWH
+XYZ
 YAML
 YaRN
 Yiqin
@@ -1373,6 +1385,7 @@ YOLO
 YOLOE
 YOLOv
 yolov
+YOLOX
 Youri
 youri
 YouTube

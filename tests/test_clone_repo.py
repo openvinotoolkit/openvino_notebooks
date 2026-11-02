@@ -1,4 +1,4 @@
-import subprocess
+import subprocess  # nosec B404 - subprocess calls are mocked in these tests
 from unittest.mock import patch
 
 import pytest
