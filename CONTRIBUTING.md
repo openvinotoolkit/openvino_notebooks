@@ -25,6 +25,7 @@
       - [`PySpelling`](#pyspelling)
   - [Getting started](#getting-started)
     - [Pull Requests (PRs)](#pull-requests-prs)
+      - [On-demand submission review](#on-demand-submission-review)
   - [Help](#help)
 
 Thank you for being interested in contributing to the OpenVINO Notebooks repository! This guide
@@ -445,6 +446,28 @@ Once your notebook passes in the CI and you have verified that everything looks 
 3. Please create a description of what the notebook does with your PR. Screenshots are appreciated!
 4. On making or updating a Pull Request, the tests in the CI will run again. Please keep an
    eye on them. If the tests fail and you think the issue is not related to your PR, please make a comment on your PR.
+
+#### On-demand submission review
+
+Only `akashchi`, `aleksandr-mokrov`, and `dorloff` can invoke the
+`/review-submission` command on a pull request to request an advisory AI review of changes
+under `notebooks/`, including README and helper changes. The reviewer uses Claude
+Sonnet 5 through GitHub Copilot and the contribution guidelines from the PR's base
+revision. It checks model/task suitability and usefulness, correctness,
+portability, documentation, licensing, and available CI evidence. It does not
+execute submitted code, replace CI, or approve or merge the PR. Unverified runtime,
+hardware, or licensing claims are reported as limitations, not assumed to pass.
+Closed PRs and PRs without notebook-directory changes receive no review.
+Rerun the command after updates; a newer review hides the previous review comment.
+
+Maintainer setup: the
+[workflow source](.github/workflows/review-submission.md) and its generated
+`.lock.yml` must be on the repository's default branch for comment triggers to run. 
+To change the workflow, 
+install the [gh-aw CLI](https://github.github.com/gh-aw/setup/quick-start/), edit the
+Markdown source, run `gh aw compile review-submission`, and commit both source and
+generated lock file. Never edit the generated workflow directly. The reviewer
+has read-only tools; only gh-aw's safe-output job can publish the review comment.
 
 ## Help
 

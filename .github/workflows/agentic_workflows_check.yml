@@ -1,0 +1,57 @@
+name: Agentic Workflows Compilation Check
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/*.md'
+      - '.github/workflows/*.lock.yml'
+      - '.github/workflows/shared/**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: read-all
+
+jobs:
+  verify-compilation:
+    name: Verify agentic workflow compilation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        timeout-minutes: 15
+        with:
+          submodules: 'false'
+          persist-credentials: false
+
+      - name: Install gh-aw
+        uses: github/gh-aw/actions/setup-cli@57c8c22d3eefb88d996ec6e49a461944adfee625
+        with:
+          version: v0.93.5
+
+      - name: Compile and verify agentic workflows
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          failed=0
+          for md_file in .github/workflows/*.md; do
+            lock_file="${md_file%.md}.lock.yml"
+            if [ ! -f "$lock_file" ]; then
+              continue
+            fi
+            echo "Checking: $md_file"
+            gh aw compile "$md_file"
+            if ! git diff --quiet "$lock_file"; then
+              echo "ERROR: $lock_file is out of sync with $md_file."
+              echo "Run 'gh aw compile $md_file' and commit the updated .lock.yml."
+              echo ""
+              git diff "$lock_file"
+              failed=1
+            else
+              echo "OK: $lock_file is up to date."
+            fi
+          done
+          exit $failed
