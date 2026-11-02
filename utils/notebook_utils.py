@@ -95,6 +95,8 @@ def load_image(name: str, url: str = None):
         cv2.imwrite(name, image)
     else:
         image = cv2.imread(name)
+        if image is None:
+            raise ValueError(f"Could not decode an image from '{name}'. The file may not be a valid image file.")
 
     return image
 
