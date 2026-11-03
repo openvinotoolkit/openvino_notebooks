@@ -81,7 +81,6 @@
 - [Create an Agentic RAG using OpenVINO and LlamaIndex](./llm-agent-rag-llamaindex/llm-agent-rag-llamaindex.ipynb)
 - [Create MCP Agent using OpenVINO and Qwen-Agent](./llm-agent-mcp/llm-agent-mcp.ipynb)
 - [Create Function-calling Agent using OpenVINO and Qwen-Agent](./llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb)
-- [Laya Decision Models with OpenVINO™](./laya-decision-models/laya-decision-models.ipynb)
 - [Multimodal AI with LFM3 and OpenVINO](./lfm3/lfm3.ipynb)
 - [Image generation with Latent Consistency Model and OpenVINO](./latent-consistency-models-image-generation/latent-consistency-models-image-generation.ipynb)
 - [InstantID: Zero-shot Identity-Preserving Generation using OpenVINO](./instant-id/instant-id.ipynb)
@@ -280,7 +279,6 @@
 - [Create an Agentic RAG using OpenVINO and LlamaIndex](./llm-agent-rag-llamaindex/llm-agent-rag-llamaindex.ipynb)
 - [Create MCP Agent using OpenVINO and Qwen-Agent](./llm-agent-mcp/llm-agent-mcp.ipynb)
 - [Create Function-calling Agent using OpenVINO and Qwen-Agent](./llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb)
-- [Laya Decision Models with OpenVINO™](./laya-decision-models/laya-decision-models.ipynb)
 - [Multimodal AI with LFM3 and OpenVINO](./lfm3/lfm3.ipynb)
 - [Image generation with Latent Consistency Model and OpenVINO](./latent-consistency-models-image-generation/latent-consistency-models-image-generation.ipynb)
 - [Text-to-Speech synthesis using Kokoro and OpenVINO GenAI](./kokoro/kokoro.ipynb)
@@ -338,3 +336,4 @@
 - [Quantization of Image Classification Models](./image-classification-quantization/image-classification-quantization.ipynb)
 - [Object detection and masking from prompts with GroundedSAM (GroundingDINO + SAM) and OpenVINO](./grounded-segment-anything/grounded-segment-anything.ipynb)
 - [Quantize a Segmentation Model and Show Live Inference](./ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb)
+
