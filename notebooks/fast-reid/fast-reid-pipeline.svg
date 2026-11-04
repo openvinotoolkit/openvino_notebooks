@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1204 300" width="1204" height="300" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#455a64"/>
+    </marker>
+  </defs>
+  <rect width="1204" height="300" fill="#ffffff"/>
+  <text x="20" y="32" font-size="20" font-weight="bold" fill="#263238">FastReID SBS-R50: from a person crop to an embedding</text>
+
+  <!-- OpenVINO IR group -->
+  <rect x="306" y="52" width="740" height="148" rx="10" fill="#f1f8e9" stroke="#7cb342" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="326" y="76" font-size="14" font-weight="bold" fill="#33691e">OpenVINO IR (FP32 / FP16 / INT8): input [8, 3, 384, 128] -> output [8, 2048]</text>
+
+  <!-- host pre-processing -->
+  <rect x="20" y="96" width="128" height="76" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="84" y="128" font-size="15" font-weight="bold" text-anchor="middle" fill="#0d47a1">Person crop</text>
+  <text x="84" y="150" font-size="12" text-anchor="middle" fill="#37474f">any size, BGR</text>
+
+  <rect x="168" y="96" width="128" height="76" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="232" y="123" font-size="15" font-weight="bold" text-anchor="middle" fill="#0d47a1">Resize + RGB</text>
+  <text x="232" y="143" font-size="12" text-anchor="middle" fill="#37474f">384 x 128 (H x W)</text>
+  <text x="232" y="159" font-size="12" text-anchor="middle" fill="#37474f">raw 0..255</text>
+
+  <!-- network -->
+  <rect x="316" y="96" width="128" height="76" rx="8" fill="#ffffff" stroke="#7cb342" stroke-width="2"/>
+  <text x="380" y="123" font-size="15" font-weight="bold" text-anchor="middle" fill="#33691e">Normalize</text>
+  <text x="380" y="143" font-size="12" text-anchor="middle" fill="#37474f">(x - mean) / std</text>
+  <text x="380" y="159" font-size="12" text-anchor="middle" fill="#37474f">inside the graph</text>
+
+  <rect x="464" y="96" width="128" height="76" rx="8" fill="#ffffff" stroke="#7cb342" stroke-width="2"/>
+  <text x="528" y="123" font-size="15" font-weight="bold" text-anchor="middle" fill="#33691e">ResNet-50</text>
+  <text x="528" y="143" font-size="12" text-anchor="middle" fill="#37474f">backbone with</text>
+  <text x="528" y="159" font-size="12" text-anchor="middle" fill="#37474f">non-local blocks</text>
+
+  <rect x="612" y="96" width="128" height="76" rx="8" fill="#ffffff" stroke="#7cb342" stroke-width="2"/>
+  <text x="676" y="123" font-size="15" font-weight="bold" text-anchor="middle" fill="#33691e">GeM pooling</text>
+  <text x="676" y="143" font-size="12" text-anchor="middle" fill="#37474f">generalized mean</text>
+  <text x="676" y="159" font-size="12" text-anchor="middle" fill="#37474f">of the feature map</text>
+
+  <rect x="760" y="96" width="128" height="76" rx="8" fill="#ffffff" stroke="#7cb342" stroke-width="2"/>
+  <text x="824" y="123" font-size="15" font-weight="bold" text-anchor="middle" fill="#33691e">BN neck</text>
+  <text x="824" y="143" font-size="12" text-anchor="middle" fill="#37474f">batch normalization</text>
+
+  <rect x="908" y="96" width="128" height="76" rx="8" fill="#c5e1a5" stroke="#558b2f" stroke-width="2"/>
+  <text x="972" y="123" font-size="15" font-weight="bold" text-anchor="middle" fill="#1b5e20">Embedding</text>
+  <text x="972" y="143" font-size="12" text-anchor="middle" fill="#37474f">2048 numbers</text>
+  <text x="972" y="159" font-size="12" text-anchor="middle" fill="#37474f">not normalized</text>
+
+  <!-- host post-processing -->
+  <rect x="1056" y="96" width="128" height="76" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="1120" y="123" font-size="15" font-weight="bold" text-anchor="middle" fill="#0d47a1">L2 normalize</text>
+  <text x="1120" y="143" font-size="12" text-anchor="middle" fill="#37474f">cosine similarity</text>
+  <text x="1120" y="159" font-size="12" text-anchor="middle" fill="#37474f">= dot product</text>
+
+  <!-- arrows -->
+  <g stroke="#455a64" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <line x1="148" y1="134" x2="166" y2="134"/>
+    <line x1="296" y1="134" x2="314" y2="134"/>
+    <line x1="444" y1="134" x2="462" y2="134"/>
+    <line x1="592" y1="134" x2="610" y2="134"/>
+    <line x1="740" y1="134" x2="758" y2="134"/>
+    <line x1="888" y1="134" x2="906" y2="134"/>
+    <line x1="1036" y1="134" x2="1054" y2="134"/>
+  </g>
+
+  <!-- legend and notes -->
+  <rect x="20" y="226" width="16" height="16" rx="3" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="44" y="239" font-size="13" fill="#37474f">host (CPU): crop, resize, L2 normalization, similarity</text>
+  <rect x="400" y="226" width="16" height="16" rx="3" fill="#ffffff" stroke="#7cb342" stroke-width="2"/>
+  <text x="424" y="239" font-size="13" fill="#37474f">network: converted to OpenVINO IR</text>
+  <text x="20" y="272" font-size="13" fill="#37474f">The training-only classifier (751 Market-1501 identities) is not part of the IR. Use the normalized embeddings to search a gallery, verify identity with a threshold, or feed a tracker.</text>
+</svg>
