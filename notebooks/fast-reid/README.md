@@ -33,6 +33,14 @@ This folder contains a notebook that shows how to convert and optimize the model
 
 The FastReID code, the five sample crops (`tools/deploy/test_data`) and the checkpoint are downloaded from the [FastReID repository](https://github.com/JDAI-CV/fast-reid) when the notebook runs; nothing from it is stored here. The notebook is pinned to commit `c9bc3ce`. Market-1501 and MOT17 cannot be downloaded automatically: set `REID_DATA` in the quantization section to a MOT17 `train` folder or a Market-1501 folder to calibrate INT8 on real crops (and, with MOT17, to measure rank-1 and mAP). Without it, INT8 is calibrated on augmented copies of the sample crops, which lets the notebook run end to end but makes its INT8 accuracy not meaningful.
 
+### Licenses
+
+- FastReID code and model zoo: [Apache License 2.0](https://github.com/JDAI-CV/fast-reid/blob/master/LICENSE).
+- Market-1501 (training data of the checkpoint, source of the five sample crops): released for research use; check its terms before any commercial use.
+- MOT17 (optional, supplied by you): [CC BY-NC-SA 3.0](https://motchallenge.net/data/MOT17/), non-commercial.
+
+The notebook works on cropped images of whole bodies and does not perform face recognition or analyze demographics.
+
 ## Installation Instructions
 
 This is a self-contained example that relies solely on its own code.</br>
