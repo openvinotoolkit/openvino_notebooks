@@ -128,7 +128,7 @@ def make_demo(ov_pipe):
     with gr.Blocks(css=css) as demo:
         with gr.Column(elem_id="col-container"):
             gr.Markdown(
-                '<img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-Image/qwen_image_logo.png" alt="Qwen-Image Logo" width="400" style="display: block; margin: 0 auto;">'
+                '<img src="https://github.com/QwenLM/Qwen-Image-2.1/raw/main/assets/logo.png" alt="Qwen-Image Logo" width="400" style="display: block; margin: 0 auto;">'
             )
             with gr.Row():
                 prompt = gr.Text(

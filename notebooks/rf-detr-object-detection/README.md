@@ -14,7 +14,7 @@ The notebook provides a model selector for the Apache-2.0 RF-DETR Nano, Small, M
 
 ## Installation Instructions
 
-Follow the [OpenVINO Notebooks installation guide](https://github.com/openvinotoolkit/openvino_notebooks#-installation-guide). The notebook installs the official `rfdetr` package (version 1.11.0) with its OpenVINO export support, OpenVINO 2026.4 or newer, and Gradio 6.28.0. Model weights are downloaded automatically by `rfdetr` and are separate from the Hugging Face checkpoints used previously.
+Follow the [OpenVINO Notebooks installation guide](https://github.com/openvinotoolkit/openvino_notebooks#-installation-guide). The notebook installs the official `rfdetr` package (version 1.11.0) with its OpenVINO export support, OpenVINO 2026.4 or newer, and Gradio 6.28.0. The official RF-DETR checkpoints are downloaded from the [`nielsr/rf-detr-checkpoints`](https://huggingface.co/nielsr/rf-detr-checkpoints) Hugging Face repository and loaded by `rfdetr`.
 
 The exported IR is loaded through `openvino.Core` and run with preprocessing and postprocessing matching the RF-DETR object-detection pipeline.
 

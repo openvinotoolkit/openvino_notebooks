@@ -1,5 +1,7 @@
 import ast
+import base64
 import gzip
+import hashlib
 import importlib
 import json
 import sys
@@ -247,6 +249,79 @@ def test_download_file_accepts_gzip_response(tmp_path):
 
     assert path.read_bytes() == content
     assert not (tmp_path / "model.bin.part").exists()
+
+
+@pytest.fixture
+def notebook_example_response(monkeypatch):
+    content = b"example PNG data"
+    url = "https://example.com/notebook.ipynb"
+    monkeypatch.setitem(notebook_utils._NOTEBOOK_EXAMPLE_IMAGES, "test_image", (url, hashlib.sha256(content).hexdigest()))
+    response = MagicMock()
+    response.__enter__.return_value = response
+    response.json.return_value = {
+        "cells": [
+            {"outputs": [{"data": {"image/png": base64.b64encode(b"unrelated").decode()}}]},
+            {"outputs": [{"data": {"image/png": [base64.b64encode(content).decode()]}}]},
+        ]
+    }
+    return content, url, response
+
+
+def test_read_notebook_example_image_finds_verified_output(notebook_example_response):
+    content, url, response = notebook_example_response
+    with patch("requests.get", return_value=response) as get:
+        assert notebook_utils.read_notebook_example_image("test_image") == content
+    get.assert_called_once_with(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=60)
+    response.raise_for_status.assert_called_once()
+
+
+def test_download_notebook_example_image_reuses_existing_file(tmp_path, notebook_example_response):
+    content, _, response = notebook_example_response
+    target = tmp_path / "images" / "example.png"
+    with patch("requests.get", return_value=response) as get:
+        result = notebook_utils.download_notebook_example_image("test_image", target)
+        assert result == target.resolve()
+        assert target.read_bytes() == content
+        assert notebook_utils.download_notebook_example_image("test_image", target) == result
+    assert get.call_count == 1
+    assert not list(target.parent.glob(f".{target.name}.*.part"))
+
+
+def test_notebook_example_image_rejects_missing_hash(tmp_path, notebook_example_response):
+    _, _, response = notebook_example_response
+    response.json.return_value = {"cells": [{"outputs": [{"data": {"image/png": base64.b64encode(b"different").decode()}}]}]}
+    target = tmp_path / "example.png"
+    with patch("requests.get", return_value=response), pytest.raises(ValueError, match="was not found"):
+        notebook_utils.download_notebook_example_image("test_image", target)
+    assert not target.exists()
+
+
+def test_notebook_example_image_rejects_unknown_name_even_when_file_exists(tmp_path):
+    target = tmp_path / "example.png"
+    target.write_bytes(b"existing")
+    with pytest.raises(ValueError, match="Unknown notebook example image"):
+        notebook_utils.download_notebook_example_image("not-a-real-example", target)
+
+
+def test_notebook_example_image_propagates_http_errors(tmp_path, notebook_example_response):
+    import requests
+
+    _, _, response = notebook_example_response
+    response.raise_for_status.side_effect = requests.HTTPError("403 Forbidden")
+    target = tmp_path / "example.png"
+    with patch("requests.get", return_value=response), pytest.raises(requests.HTTPError, match="403"):
+        notebook_utils.download_notebook_example_image("test_image", target)
+    assert not target.exists()
+
+
+def test_notebook_example_image_cleans_up_failed_write(tmp_path, notebook_example_response):
+    _, _, response = notebook_example_response
+    target = tmp_path / "example.png"
+    with patch("requests.get", return_value=response), patch("pathlib.Path.replace", side_effect=OSError("disk error")):
+        with pytest.raises(OSError, match="disk error"):
+            notebook_utils.download_notebook_example_image("test_image", target)
+    assert not target.exists()
+    assert not list(target.parent.glob(f".{target.name}.*.part"))
 
 
 @pytest.mark.parametrize(
