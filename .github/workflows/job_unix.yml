@@ -249,7 +249,7 @@ jobs:
           EOF
 
       - name: Setup Python ${{ inputs.python }}
-        uses: openvinotoolkit/openvino/.github/actions/setup_python@3c203973be08baa7eea263d06dd2f006d6b607d8
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@97968ef66729ec25897e023ef3bc7222be157198
         with:
           version: ${{ inputs.python }}
           pip-cache-path: ${{ env.PIP_CACHE_PATH }}
