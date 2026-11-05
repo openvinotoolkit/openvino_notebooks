@@ -269,10 +269,20 @@ def split_qkv_weights(state_dict: dict, cfg: dict) -> dict:
 
 
 def load_encoder(checkpoint_path, verbose: bool = True):
-    """Build the encoder and load weights. Returns ``(model, cfg)``."""
-    sd = torch.load(str(checkpoint_path), weights_only=True, map_location="cpu")
-    key = "target_encoder" if "target_encoder" in sd else "encoder"
-    enc_sd = {k.replace("module.", "").replace("backbone.", ""): v for k, v in sd[key].items()}
+    """Build the encoder and load weights. Returns ``(model, cfg)``.
+
+    Accepts a full V-JEPA 2.1 ``.pt`` training checkpoint or a ``.safetensors``
+    file holding only the encoder state dict.
+    """
+    if Path(checkpoint_path).suffix == ".safetensors":
+        from safetensors.torch import load_file
+
+        raw_sd = load_file(str(checkpoint_path))
+    else:
+        sd = torch.load(str(checkpoint_path), weights_only=True, map_location="cpu")
+        key = "target_encoder" if "target_encoder" in sd else "encoder"
+        raw_sd = sd[key]
+    enc_sd = {k.replace("module.", "").replace("backbone.", ""): v for k, v in raw_sd.items()}
 
     cfg = detect_arch_from_state_dict(enc_sd, verbose=verbose)
     encoder = VJEPAEncoder(cfg)

@@ -11,6 +11,8 @@ This notebook shows how to convert [PaddlePaddle](https://www.paddlepaddle.org.c
 
 The notebook uses [model conversion API](https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html) to convert a MobileNet V3 [PaddleClas](https://github.com/PaddlePaddle/PaddleClas) model, pre-trained on the [ImageNet](https://www.image-net.org) dataset, to OpenVINO IR. It also shows how to perform classification inference on an image, using [OpenVINO Runtime](https://docs.openvino.ai/2024/openvino-workflow/running-inference.html) and compares the results of the PaddlePaddle model with the OpenVINO IR model.
 
+The default MobileNetV3 inference files are downloaded from OpenVINO storage. Other model names continue to use PaddlePaddle's model archives.
+
 ## Installation Instructions
 
 This is a self-contained example that relies solely on its own code.</br>

@@ -20,6 +20,8 @@ The tutorial consists from following steps:
 - Compiling models and prepare pipeline
 - Interactive inference
 
+The S3FD face-detection checkpoint is downloaded from a byte-identical [Hugging Face mirror](https://huggingface.co/camenduru/Wav2Lip/blob/bfcd9263d1ccb60ab724f074e7c1b3555f6cb162/checkpoints/s3fd-619a316812.pth).
+
 ## Installation instructions
 This is a self-contained example that relies solely on its own code.</br>
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.

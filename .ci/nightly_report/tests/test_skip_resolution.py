@@ -1,12 +1,20 @@
 from pathlib import Path
 
 import pytest
+import yaml
 
 import validate_notebooks
 from nightly_report.constants import SkipReason
-from validate_notebooks import get_ignore_list_notebooks, get_ignored_notebooks_from_yaml, resolve_skip_reasons
+from validate_notebooks import NotebookStatus, get_ignore_list_notebooks, get_ignored_notebooks_from_yaml, prepare_test_plan, resolve_skip_reasons
 
 CI_DIR = Path(__file__).resolve().parents[2]
+NOT_ALLOWED_NOTEBOOKS = {
+    Path("notebooks/aloha-act/aloha-act.ipynb"),
+    Path("notebooks/detectron2-to-openvino/detectron2-to-openvino.ipynb"),
+    Path("notebooks/gdrnpp-full-pipeline/gdrnpp-full-pipeline.ipynb"),
+    Path("notebooks/multimodal-rag/multimodal-rag-llamaindex.ipynb"),
+    Path("notebooks/tensorflow-object-detection-to-openvino/tensorflow-object-detection-api-with-openvino.ipynb"),
+}
 
 SKIP_CONFIG = """\
 - notebook: notebooks/os-skip/os-skip.ipynb
@@ -91,6 +99,35 @@ def test_get_ignore_list_notebooks(ignore_txt):
         Path("notebooks/both/both.ipynb"),
         Path("notebooks/direct/direct.ipynb"),
     ]
+
+
+@pytest.mark.parametrize("job_name", ["build_treon_igpu", "build_treon_dgpu"])
+def test_nightly_gpu_jobs_skip_not_allowed_resources(job_name, skip_config):
+    repo_root = CI_DIR.parent
+    workflow = yaml.safe_load((repo_root / ".github/workflows/treon_nightly.yml").read_text(encoding="utf-8"))
+    ignore_lists = workflow["jobs"][job_name]["with"]["ignore_list"].split()
+    assert ".ci/not_allowed_resources.txt" in ignore_lists
+    if job_name == "build_treon_igpu":
+        assert {".ci/gpu_oom.txt", ".ci/igpu_timeouts.txt"} <= set(ignore_lists)
+    assert NOT_ALLOWED_NOTEBOOKS <= set(get_ignore_list_notebooks([str(CI_DIR / "not_allowed_resources.txt")]))
+
+    test_plan = prepare_test_plan(
+        config("ubuntu-22.04", "3.11", "gpu"),
+        sorted(path.as_posix() for path in NOT_ALLOWED_NOTEBOOKS),
+        str(skip_config),
+        [str(repo_root / path) for path in ignore_lists],
+        repo_root / "notebooks",
+    )
+    for path in NOT_ALLOWED_NOTEBOOKS:
+        report = test_plan[path.relative_to("notebooks")]
+        assert report["status"] == NotebookStatus.SKIPPED
+        assert report["skip_reason"] == SkipReason.IGNORE_LIST
+
+
+def test_not_allowed_resources_list_only_used_by_nightly_gpu_jobs():
+    workflow = yaml.safe_load((CI_DIR.parent / ".github/workflows/treon_nightly.yml").read_text(encoding="utf-8"))
+    jobs = {name for name, job in workflow["jobs"].items() if ".ci/not_allowed_resources.txt" in job.get("with", {}).get("ignore_list", "").split()}
+    assert jobs == {"build_treon_igpu", "build_treon_dgpu"}
 
 
 def test_resolve_skip_reasons_precedence(skip_config, ignore_txt):
