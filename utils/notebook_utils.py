@@ -220,7 +220,7 @@ def load_image(name: str, url: str = None):
         response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
         response.raise_for_status()
         array = np.asarray(bytearray(response.content), dtype="uint8")
-        image = cv2.imdecode(array, -1)  # Loads the image as BGR
+        image = cv2.imdecode(array, cv2.IMREAD_COLOR)  # Match the cached image BGR format.
         if image is None:
             raise ValueError(f"Could not decode an image from {url}. The URL may not point to a valid image file.")
         cv2.imwrite(name, image)
