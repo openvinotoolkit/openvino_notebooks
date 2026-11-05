@@ -6,6 +6,7 @@ import importlib
 import json
 import sys
 import urllib.error
+from io import BytesIO
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
@@ -273,6 +274,61 @@ def test_read_notebook_example_image_finds_verified_output(notebook_example_resp
         assert notebook_utils.read_notebook_example_image("test_image") == content
     get.assert_called_once_with(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=60)
     response.raise_for_status.assert_called_once()
+
+
+@pytest.fixture
+def notebook_example_crop_response(monkeypatch):
+    from PIL import Image
+
+    source = Image.new("RGBA", (4, 3))
+    for y in range(source.height):
+        for x in range(source.width):
+            source.putpixel((x, y), (x * 40, y * 60, (x + y) * 25, x * 64))
+    with BytesIO() as buffer:
+        source.save(buffer, format="PNG")
+        content = buffer.getvalue()
+    url = "https://example.com/notebook-with-figure.ipynb"
+    monkeypatch.setitem(notebook_utils._NOTEBOOK_EXAMPLE_IMAGES, "test_crop", (url, hashlib.sha256(content).hexdigest()))
+    monkeypatch.setitem(notebook_utils._NOTEBOOK_EXAMPLE_IMAGE_CROPS, "test_crop", (1, 0, 3, 2))
+    response = MagicMock()
+    response.__enter__.return_value = response
+    response.json.return_value = {"cells": [{"outputs": [{"data": {"image/png": base64.b64encode(content).decode()}}]}]}
+    return source, url, response
+
+
+def test_download_notebook_example_image_crops_verified_output_and_reuses_file(tmp_path, notebook_example_crop_response):
+    from PIL import Image
+
+    source, _, response = notebook_example_crop_response
+    target = tmp_path / "example.png"
+    with patch("requests.get", return_value=response) as get:
+        result = notebook_utils.download_notebook_example_image("test_crop", target)
+        assert notebook_utils.download_notebook_example_image("test_crop", target) == result
+    with Image.open(result) as cropped:
+        assert cropped.mode == "RGB"
+        assert cropped.size == (2, 2)
+        assert cropped.tobytes() == source.convert("RGB").crop((1, 0, 3, 2)).tobytes()
+    assert get.call_count == 1
+    assert not list(target.parent.glob(f".{target.name}.*.part"))
+
+
+@pytest.mark.parametrize("crop", [(-1, 0, 2, 2), (0, 0, 5, 2), (0, 0, 2, 4), (2, 0, 1, 1), (0, 1, 1, 1)])
+def test_notebook_example_image_rejects_invalid_crop(tmp_path, monkeypatch, notebook_example_crop_response, crop):
+    _, _, response = notebook_example_crop_response
+    monkeypatch.setitem(notebook_utils._NOTEBOOK_EXAMPLE_IMAGE_CROPS, "test_crop", crop)
+    target = tmp_path / "example.png"
+    with patch("requests.get", return_value=response), pytest.raises(ValueError, match="Invalid crop"):
+        notebook_utils.download_notebook_example_image("test_crop", target)
+    assert not target.exists()
+
+
+def test_notebook_example_image_crop_requires_verified_source(tmp_path, monkeypatch, notebook_example_crop_response):
+    _, url, response = notebook_example_crop_response
+    monkeypatch.setitem(notebook_utils._NOTEBOOK_EXAMPLE_IMAGES, "test_crop", (url, "0" * 64))
+    target = tmp_path / "example.png"
+    with patch("requests.get", return_value=response), pytest.raises(ValueError, match="was not found"):
+        notebook_utils.download_notebook_example_image("test_crop", target)
+    assert not target.exists()
 
 
 def test_download_notebook_example_image_reuses_existing_file(tmp_path, notebook_example_response):

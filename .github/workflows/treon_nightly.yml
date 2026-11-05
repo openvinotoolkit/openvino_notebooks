@@ -119,7 +119,7 @@ jobs:
       container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:${{ needs.get_docker_tag.outputs.docker_tag }}'
       options: '--group-add 44 --group-add 993 --device /dev/dri/renderD128:/dev/dri/renderD128'
       # Skip notebooks with blocked resources (195494), network errors, iGPU memory limits, or repeated timeouts
-      ignore_list: .ci/gpu_oom.txt .ci/igpu_timeouts.txt
+      ignore_list: .ci/gpu_oom.txt .ci/igpu_timeouts.txt .ci/not_allowed_resources.txt
       dashboard_data: true
 
   build_treon_dgpu:
@@ -139,6 +139,7 @@ jobs:
       container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:${{ needs.get_docker_tag.outputs.docker_tag }}'
       # renderD128 is the integrated GPU on these hosts; pass only the discrete one so "GPU" maps to it
       options: '--group-add 44 --group-add 993 --device /dev/dri/renderD129:/dev/dri/renderD129'
+      ignore_list: .ci/not_allowed_resources.txt
       dashboard_data: true
 
   aggregate_notebooks_reports:

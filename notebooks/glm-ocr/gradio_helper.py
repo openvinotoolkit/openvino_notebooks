@@ -15,10 +15,9 @@ TASK_PROMPTS = {
 }
 
 
-# Sample images are downloaded on first run. The text example comes from a
-# pinned notebook output; the remaining examples use GitHub user-attachments.
+# Sample images are downloaded on first run. The text and formula examples
+# come from pinned notebook outputs; the remaining examples use GitHub user-attachments.
 EXAMPLE_ASSET_URLS: dict[str, str] = {
-    "ocr_formula_sample.png": "https://github.com/user-attachments/assets/c9407e8e-3f2a-4d74-807b-dcefa06a3741",
     "ocr_table_sample.png": "https://github.com/user-attachments/assets/4c64fbf7-5181-4ccc-bb0a-92ea43b3dcc8",
     "ocr_doc_sample.png": "https://github.com/user-attachments/assets/5b482249-ad47-4c32-8c89-302a60b3c71e",
 }
@@ -189,7 +188,7 @@ def make_demo(model, processor, detector=None):
 
 
 def download_example_assets() -> list[Path]:
-    """Download the text example and the remaining GitHub attachment images.
+    """Download the text and formula examples and remaining GitHub attachment images.
 
     Must be called from the notebook directory, where ``notebook_utils.py``
     has been fetched.
@@ -198,5 +197,6 @@ def download_example_assets() -> list[Path]:
 
     return [
         download_notebook_example_image("ocr_invoice", "ocr_text_sample.png"),
+        download_notebook_example_image("ocr_formula", "ocr_formula_sample.png"),
         *(download_file(url, filename=name) for name, url in EXAMPLE_ASSET_URLS.items()),
     ]
