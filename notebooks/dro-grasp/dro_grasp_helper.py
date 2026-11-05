@@ -14,6 +14,9 @@ class OpenVINODROGrasp:
     def __call__(self, robot_pc: np.ndarray, object_pc: np.ndarray, latent: np.ndarray) -> np.ndarray:
         if robot_pc.shape != object_pc.shape or robot_pc.ndim != 3 or robot_pc.shape[-1] != 3:
             raise ValueError("robot_pc and object_pc must have matching [batch, points, 3] shapes")
+        point_count = robot_pc.shape[1]
+        if point_count < 32 or point_count % 4:
+            raise ValueError("point count must be at least 32 and divisible by 4")
         if latent.ndim != 2 or latent.shape[0] != robot_pc.shape[0]:
             raise ValueError("latent must have shape [batch, latent_dim]")
         return self.compiled_model({"robot_pc": robot_pc, "object_pc": object_pc, "latent": latent})["dro"]
@@ -92,8 +95,13 @@ def comparison_metrics(reference: np.ndarray, result: np.ndarray) -> dict[str, f
     absolute_error = np.abs(reference - result)
     reference_flat = reference.reshape(-1).astype(np.float64)
     result_flat = result.reshape(-1).astype(np.float64)
-    denominator = np.linalg.norm(reference_flat) * np.linalg.norm(result_flat)
-    cosine_similarity = float(np.dot(reference_flat, result_flat) / denominator) if denominator else 1.0
+    reference_norm = np.linalg.norm(reference_flat)
+    result_norm = np.linalg.norm(result_flat)
+    denominator = reference_norm * result_norm
+    if denominator:
+        cosine_similarity = float(np.dot(reference_flat, result_flat) / denominator)
+    else:
+        cosine_similarity = 1.0 if reference_norm == result_norm else 0.0
     return {
         "max_absolute_error": float(absolute_error.max()),
         "mean_absolute_error": float(absolute_error.mean()),
