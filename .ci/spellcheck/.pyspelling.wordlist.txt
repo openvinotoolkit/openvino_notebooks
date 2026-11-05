@@ -238,6 +238,7 @@ DeepStack
 demucs
 denoise
 denoised
+denoiser
 denoises
 denoising
 denormalization
@@ -310,6 +311,7 @@ DreamBooth
 DreamBooth Tsinghua
 Dreamshaper
 dropdown
+DualVLN
 DynamiCrafter
 EasyOCR
 ECCV
@@ -491,8 +493,11 @@ intel's
 interactable
 InternLM
 internlm
+InternData
+InternNav
 InternVideo
 InternVL
+InternVLA
 Interpolative
 interpretable
 intervaling
@@ -624,6 +629,7 @@ LogSoftmax
 LOL
 LOLBlur
 LOLv
+LongCLIP
 lookahead
 LoRA
 lora
@@ -756,6 +762,7 @@ Netron
 NeurIPS
 NeuSpell
 NeXT
+NextDiT
 ng
 ngram
 nightlies
@@ -1316,6 +1323,7 @@ VLM
 VLModel
 VLMPipeline
 VLMs
+VLN
 VL’s
 VM
 VOC
@@ -1343,6 +1351,8 @@ waveform
 waveforms
 WavFrontend
 WavLM
+waypoint
+waypoints
 WebGL
 WebUI
 WER

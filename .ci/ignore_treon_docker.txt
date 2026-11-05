@@ -56,6 +56,7 @@ notebooks/qwen-image/qwen-image.ipynb
 notebooks/vla-jepa/vla-jepa.ipynb
 notebooks/wan2.2-text-image-to-video/wan2.2-text-image-to-video.ipynb
 notebooks/vjepa-2.1/vjepa2-video-embeddings.ipynb
+notebooks/internvla-n1-dualvln/internvla-n1-dualvln.ipynb
 notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb
 notebooks/funasr-nano/funasr-nano.ipynb
 notebooks/sam3/sam3-segmentation.ipynb
