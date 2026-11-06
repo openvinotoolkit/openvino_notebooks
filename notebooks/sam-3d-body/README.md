@@ -54,27 +54,8 @@ force a fresh conversion.
 
 ## Installation Instructions
 
-This is a self-contained example that relies solely on its own code and everything runs from a plain **`venv`**
-created inside this folder (`.sam3dbody-nb-venv/`).
-
-```bash
-cd notebooks   # this folder
-python -m venv .sam3dbody-nb-venv
-
-.sam3dbody-nb-venv/bin/pip install ipykernel
-.sam3dbody-nb-venv/bin/python -m ipykernel install --user --name sam3dbody-nb-venv \
-    --display-name "Python (sam3dbody-nb-venv)"
-```
-
-Then open [`sam-3d-body.ipynb`](sam-3d-body.ipynb) and select the **Python (sam3dbody-nb-venv)** kernel from the kernel picker — the notebook's saved metadata already points at
-this kernel name, so most Jupyter front-ends preselect it automatically once it exists.
-The Prerequisites cells install every dependency into that same `.sam3dbody-nb-venv`; once installed,
-re-running the notebook does not reinstall anything.
-
-> Dependencies are installed with `sys.executable -m pip install`, so they always land in
-> the environment backing the selected kernel — never in the environment that launched the
-> Jupyter server, and never in the system Python. The first cell prints the interpreter it
-> will install into and warns if that interpreter is not an isolated environment.
+This is a self-contained example. The first code cell creates a notebook-specific **`.venv/`** next to the notebook and activates it for the running kernel.
+No manual environment creation, package installation, or kernel registration is required. Later `pip_install()` calls install into `.venv/`, which takes precedence over packages from the Jupyter environment.
 
 The SAM 3D Body repository on the Hugging Face Hub is **gated**: accept the licence on the
 [model page](https://huggingface.co/facebook/sam-3d-body-dinov3) and authenticate with
@@ -88,7 +69,7 @@ notebooks/sam-3d-body/
 ├── sam3d_data.py          # sample loading, PCK scoring, skeleton + mesh rendering
 ├── sam3d_ov.py            # OpenVINO IR runtime
 ├── sam3d_torch.py         # PyTorch reference inference + PyTorch → OpenVINO export
-├── .sam3dbody-nb-venv/    # local virtual environment (created)
+├── .venv/                 # notebook-specific virtual environment (created)
 ├── sam_3d_body/           # the sam_3d_body package (downloaded on first run)
 ├── checkpoints/           # reference checkpoint (downloaded on first run)
 │   └── sam-3d-body-dinov3/

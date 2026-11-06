@@ -1,0 +1,2 @@
+notebooks/async-api/async-api.ipynb
+notebooks/qwen3-tts/qwen3-tts.ipynb

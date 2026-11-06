@@ -292,6 +292,7 @@
 - [Visual-language assistant with GLM-4.1V-9B-Thinking and OpenVINO](./glm4.1-v-thinking/glm4.1-v-thinking.ipynb)
 - [Document parsing with GLM-OCR and OpenVINO](./glm-ocr/glm-ocr.ipynb)
 - [Visual-language assistant with Gemma 4 and OpenVINO](./gemma4/gemma4.ipynb)
+- [6D Object Pose Estimation with GDRNPP and OpenVINO](./gdrnpp-full-pipeline/gdrnpp-full-pipeline.ipynb)
 - [End-to-End Speech Recognition with Fun-ASR-Nano and OpenVINO](./funasr-nano/funasr-nano.ipynb)
 - [High-Quality Text-Free One-Shot Voice Conversion with FreeVC and OpenVINO™](./freevc-voice-conversion/freevc-voice-conversion.ipynb)
 - [FLUX.2 Klein Image Generation with OpenVINO™](./flux.2-klein/flux.2-klein.ipynb)
