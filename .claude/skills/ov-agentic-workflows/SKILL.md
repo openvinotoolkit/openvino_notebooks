@@ -70,7 +70,9 @@ shell/Python blocks.
    quoted environment variables, not interpolated executable shell text.
 7. **Keep defaults and scope explicit.** Do not silently widen network access,
    protected-file exceptions, source-repository allowlists, or PR file/size limits.
-   Preserve the selected engine/model unless the task calls for changing it.
+   Preserve the selected engine, `engine.model-routing` settings, and any top-level
+   `models` policy unless the task calls for changing them; do not add a fixed
+   `model:` alongside routing, because routing overrides it.
 8. **Separate validation from publication.** Offline tests, compilation, and
    dispatch previews are not live workflow runs. Do not publish PRs/issues or
    consume inference credits merely to validate an authoring change.
@@ -204,6 +206,9 @@ python -m pytest .github/scripts/agentic-workflows/tests .ci/nightly_report/test
   its surrounding instructions. Use `{{#runtime-import? path}}` to keep the fragment in
   place, and add a test that the file exists because the optional form skips missing
   files silently.
+- **Routing versus model policy:** `engine.model-routing.allowed-models` shortlists
+  models for the main agent only. Top-level `models.allowed` and `models.blocked`
+  enforce restrictions on all model requests, including built-in agents and sub-agents.
 - **Compiler drift:** check `gh aw version` before compilation. The
   [agentic_workflows_check.yml](../../../.github/workflows/agentic_workflows_check.yml)
   pull request check installs gh-aw through its `version:` input, runs `gh aw compile`,

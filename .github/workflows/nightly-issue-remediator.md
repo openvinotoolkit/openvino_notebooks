@@ -27,9 +27,12 @@ concurrency:
 
 permissions: read-all
 
-model: claude-sonnet-5
 engine:
   id: copilot
+  model-routing:
+    goal: cost
+    mode: balanced
+    allowed-models: [gpt-6.1-terra, gpt-6-luna, claude-sonnet-5, claude-sonnet-5.5]
 
 network:
   allowed:

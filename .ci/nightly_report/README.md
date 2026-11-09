@@ -53,6 +53,11 @@ The GitHub Agentic Workflow in `.github/workflows/nightly-issue-remediator.md` r
 `tracked.json`, and per-signature group JSON/Markdown plus representative logs). It skips groups already covered by an open or
 recently rejected remediation, prioritizes likely-fixable groups, and caps each run at five groups and three draft PRs.
 
+The main agent uses Copilot model routing with `mode: balanced` and `goal: cost`, choosing from the
+`engine.model-routing.allowed-models` shortlist in the [workflow source](../../.github/workflows/nightly-issue-remediator.md).
+The shortlist does not restrict built-in agents or sub-agents and is not a workflow-wide model policy or spending limit.
+Review it as model availability changes; if none of the shortlisted models is available, the run fails.
+
 The agent creates one PR for a verified in-scope fix, or one issue when the cause is ambiguous, infrastructure-related, or cannot
 be safely fixed. PRs use the `nightly-remediator` and `automated-fix` labels; issues use `nightly-remediator` and
 `nightly-failure`. Every created item must contain the visible `Error signature: \`<12-hex-signature>\`` line, also include
