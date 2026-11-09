@@ -32,6 +32,13 @@ def test_load_image_raises_if_content_is_not_an_image(tmp_path, monkeypatch):
     assert not (tmp_path / "img.png").exists()
 
 
+def test_load_image_raises_if_local_file_is_not_an_image(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "img.png").write_bytes(b"not an image")
+    with pytest.raises(ValueError, match="decode"):
+        load_image("img.png")
+
+
 def test_load_image_requires_url_when_file_is_missing(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     with pytest.raises(ValueError, match="url"):
