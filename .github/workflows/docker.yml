@@ -24,13 +24,6 @@ on:
     branches:
       - 'main'
       - 'latest'
-    paths:
-      - 'Dockerfile'
-      - '.docker/**'
-      - '.github/workflows/*.yml'
-      - '.github/workflows/.env'
-      - 'notebooks/**.ipynb'
-      - 'notebooks/**.py'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -40,7 +33,23 @@ permissions:
   contents: read
 
 jobs:
-  build_docker:
+  changes:
+    uses: ./.github/workflows/job_detect_changes.yml
+    permissions:
+      contents: read
+      pull-requests: read
+    with:
+      files: |
+        Dockerfile
+        .docker/**
+        .github/workflows/*.yml
+        .github/workflows/.env
+        notebooks/**/*.ipynb
+        notebooks/**/*.py
+
+  test_docker:
+    needs: changes
+    if: ${{ needs.changes.outputs.relevant == 'true' }}
     strategy:
       fail-fast: false
 
@@ -79,3 +88,13 @@ jobs:
         run: |
           # Test script location: .docker/tests/test_precommit
           docker run -v ${PWD}:/opt/app-root/openvino_notebooks --entrypoint /tmp/scripts/test_precommit openvino_notebooks
+
+  # Keep the required check successful when no relevant files changed.
+  build_docker:
+    needs: [changes, test_docker]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check status of all jobs
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: exit 1

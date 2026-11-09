@@ -7,6 +7,7 @@ import platform
 
 
 def clone_repo(repo_url: str, revision: str = None, add_to_sys_path: bool = True) -> Path:
+    """Clone a repository if needed and check out the requested revision, including in an existing checkout."""
     repo_path = Path(repo_url.split("/")[-1].replace(".git", ""))
 
     if not repo_path.exists():
@@ -21,8 +22,8 @@ def clone_repo(repo_url: str, revision: str = None, add_to_sys_path: bool = True
             print(f"Failed to clone the repository: {exc.stderr}")
             raise
 
-        if revision:
-            subprocess.run(["git", "checkout", revision], cwd=str(repo_path), check=True)  # nosec B603 B607 - hardcoded git command
+    if revision:
+        subprocess.run(["git", "checkout", revision], cwd=str(repo_path), check=True)  # nosec B603 B607 - hardcoded git command
     if add_to_sys_path and str(repo_path.resolve()) not in sys.path:
         sys.path.insert(0, str(repo_path.resolve()))
 

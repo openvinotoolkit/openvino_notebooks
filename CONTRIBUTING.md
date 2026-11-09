@@ -351,6 +351,11 @@ and some style issues
   - In the rest of this guide, the automated tests in GitHub
 Actions will be referred to as CI (for Continuous Integration).
 
+Docker, code check, and spell check workflows report their required checks for every PR targeting `main` or `latest`.
+Their tests run only when the PR changes files matching the filters in each workflow's `changes` job,
+which uses the [`job_detect_changes.yml`](.github/workflows/job_detect_changes.yml) reusable workflow.
+Otherwise, the required checks pass without running the tests. Change detection or test failures still fail the required checks.
+
 If your notebook takes longer than a few minutes to execute, it may be possible to patch it in the CI, to make 
 it execute faster. As an example, if your notebook trains for 20 epochs, you can set it to train for
 1 epoch in the CI. If you do inference on 100 frames of a video, you can set it to do inference on only 1. See 
