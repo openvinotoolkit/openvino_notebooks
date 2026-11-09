@@ -2260,12 +2260,12 @@
         },
         "notebook": {
             "hashes": [
-                "sha256:ad7e0eb765fba836cd4a2ab0c7a3a26cde1d91665fbf6f533b6ae7b2de6d88d2",
-                "sha256:e2c08e469c0ae20bb0b3214f0ab77e79653317a2f8e5b34c10361c66874a5b50"
+                "sha256:15e8a5eefb01f198016f11616426db0486f24404bfa869ec276d5ff8311b533c",
+                "sha256:8aec433e08811af5c8d0e8cff23bf5079d85fd2912cee162894933f26f443d9e"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.10'",
-            "version": "==7.6.3"
+            "version": "==7.6.4"
         },
         "notebook-shim": {
             "hashes": [
