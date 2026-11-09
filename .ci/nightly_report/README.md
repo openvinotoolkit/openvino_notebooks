@@ -45,6 +45,26 @@ The files are described by JSON Schemas in [`schema/`](./schema): `nightly-repor
 Size: roughly 1 MB of JSON per night. Keep `results` (and `summary`) long-term; `failures` text and `environments.json` can be pruned
 after some weeks.
 
+## Consumer: nightly issue remediator
+
+The GitHub Agentic Workflow in `.github/workflows/nightly-issue-remediator.md` runs after a failed scheduled `treon_nightly` run on
+`latest`; it can also be started manually with a run ID and source repository. Its deterministic collector downloads
+`nightly-dashboard-data` before the agent starts and writes a bounded digest (`summary.md`, `status.json`, `run.json`,
+`tracked.json`, and per-signature group JSON/Markdown plus representative logs). It skips groups already covered by an open or
+recently rejected remediation, prioritizes likely-fixable groups, and caps each run at five groups and three draft PRs.
+
+The agent creates one PR for a verified in-scope fix, or one issue when the cause is ambiguous, infrastructure-related, or cannot
+be safely fixed. PRs use the `nightly-remediator` and `automated-fix` labels; issues use `nightly-remediator` and
+`nightly-failure`. Every created item must contain the visible `Error signature: \`<12-hex-signature>\`` line, also include
+`(sig <12-hex-signature>)` in its title, and list every affected notebook/config pair. These exact conventions are how later
+collector runs find and deduplicate existing work.
+
+For a manual test against the public nightly run:
+
+```bash
+gh aw run nightly-issue-remediator --raw-field run_id=42540244557 --raw-field source_repo=openvinotoolkit/openvino_notebooks
+```
+
 ## `nightly-report.json` overview
 
 | Key | Content |
