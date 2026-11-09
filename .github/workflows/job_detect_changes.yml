@@ -1,0 +1,49 @@
+name: Detect Changes Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      files:
+        description: 'Newline-separated glob patterns of files that make the change relevant'
+        required: true
+        type: string
+    outputs:
+      relevant:
+        description: "'true' if the event is not a pull request or the pull request modifies matching files, 'false' otherwise"
+        value: ${{ jobs.detect_changes.outputs.relevant }}
+
+permissions:
+  contents: read
+
+jobs:
+  detect_changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      relevant: ${{ steps.result.outputs.relevant }}
+    steps:
+      - name: Get changed files
+        id: changed_files
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
+        with:
+          use_rest_api: true
+          # Deleted and renamed files count as relevant, same as the `paths` trigger filter
+          output_renamed_files_as_deleted_and_added: true
+          files: ${{ inputs.files }}
+
+      - name: Set result
+        id: result
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          ANY_MODIFIED: ${{ steps.changed_files.outputs.any_modified }}
+        run: |
+          if [[ "$EVENT_NAME" != "pull_request" || "$ANY_MODIFIED" == "true" ]]; then
+            relevant=true
+          else
+            relevant=false
+          fi
+          echo "Relevant changes: $relevant"
+          echo "relevant=$relevant" >> "$GITHUB_OUTPUT"
