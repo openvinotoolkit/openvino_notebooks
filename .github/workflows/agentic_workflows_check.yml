@@ -1,0 +1,50 @@
+name: Agentic Workflows Compilation Check
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/*.md'
+      - '.github/workflows/*.lock.yml'
+      - '.github/workflows/shared/**/*.md'
+      - '.github/aw/actions-lock.json'
+      - '.github/workflows/agentic_workflows_check.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify_compilation:
+    name: Verify agentic workflow compilation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install gh-aw
+        uses: github/gh-aw/actions/setup-cli@0627fdbe4beb5f3b71aa569f8d97150b87f2111a # v1.0.1
+        with:
+          # Must equal the `gh aw version` that generated the committed .lock.yml files
+          version: v1.0.1
+
+      - name: Compile and verify agentic workflows
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh aw compile --no-check-update
+          # Modified or untracked generated files mean the committed ones are stale or missing
+          if [ -n "$(git status --porcelain -- .github)" ]; then
+            echo "::error::Generated agentic workflow files are out of sync with their sources. Run 'gh aw compile' and commit the result."
+            git status --short -- .github
+            echo "::group::Diff of regenerated files"
+            git --no-pager diff -- .github
+            echo "::endgroup::"
+            exit 1
+          fi
+          echo "All agentic workflow lock files are up to date."

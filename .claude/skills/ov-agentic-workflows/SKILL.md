@@ -37,12 +37,13 @@ for frontmatter keys, imports, tools, safe outputs, and compiler behavior. Check
 | [collect_nightly_failures.py](../../../.github/scripts/agentic-workflows/collect_nightly_failures.py) | CLI entry point and orchestration for pre-agent collection; tests import helpers from their owning modules. |
 | [collector_common.py](../../../.github/scripts/agentic-workflows/collector_common.py), [collector_github.py](../../../.github/scripts/agentic-workflows/collector_github.py), [collector_analysis.py](../../../.github/scripts/agentic-workflows/collector_analysis.py), [collector_evidence.py](../../../.github/scripts/agentic-workflows/collector_evidence.py), [collector_render.py](../../../.github/scripts/agentic-workflows/collector_render.py) | Focused collector modules for shared records, GitHub access, grouping/tracking, log evidence, and digest rendering. |
 | [collector tests](../../../.github/scripts/agentic-workflows/tests/) | Offline unit and end-to-end tests, including the workflow/collector contract. |
+| [agentic_workflows_check.yml](../../../.github/workflows/agentic_workflows_check.yml) | PR check that recompiles all agentic workflows with a pinned gh-aw version and fails when generated files drift. |
 | [codecheck.yml](../../../.github/workflows/codecheck.yml) | Python formatting and explicit pytest steps. |
 | [nightly report package](../../../.ci/nightly_report/) | Report producer, schemas, parsing, and tests shared with the dashboard. |
 
 The current workflow defines its custom collection job inline. Do not assume the
-upstream OpenVINO repository's CI Doctor workflows, Teams jobs, memory branches,
-`common.py`, or compiler-check workflow exist here. Introduce shared imports under
+upstream OpenVINO repository's CI Doctor workflows, Teams jobs, memory branches, or
+`common.py` exist here. Introduce shared imports under
 `.github/workflows/shared/agentic-workflows/` only when multiple consumers justify
 them; keep deterministic logic in the scripts directory rather than large inline
 shell/Python blocks.
@@ -203,9 +204,17 @@ python -m pytest .github/scripts/agentic-workflows/tests .ci/nightly_report/test
   its surrounding instructions. Use `{{#runtime-import? path}}` to keep the fragment in
   place, and add a test that the file exists because the optional form skips missing
   files silently.
-- **Compiler drift:** check `gh aw version` before compilation. If a compiler-version
-  CI check is added later, match its pinned version. Do not assume the upstream
-  repository's check exists or silently upgrade the CLI and unrelated action pins.
+- **Compiler drift:** check `gh aw version` before compilation. The
+  [agentic_workflows_check.yml](../../../.github/workflows/agentic_workflows_check.yml)
+  pull request check installs gh-aw through its `version:` input, runs `gh aw compile`,
+  and fails on any change under `.github` (modified or missing lock files, changed
+  `actions-lock.json`). Keep that input equal to the local `gh aw version`; upgrade gh-aw
+  by bumping it together with the regenerated lock files, and never silently upgrade the
+  CLI or unrelated action pins. Reproduce the check locally with
+  `gh aw compile && git status --porcelain -- .github` (any output means drift).
+- **Dependabot and lock files:** the `github-actions` Dependabot entry does not exclude
+  `*.lock.yml`, so its bumps of actions inside generated locks fail the check by design.
+  Refresh generated pins by regenerating with gh-aw instead of merging such edits.
 - **Read-only dry runs:** the collector's `--out` directory is recreated; use a
   disposable directory and keep downloaded artifacts outside the worktree.
 - **Live runs:** replace the placeholders and preview first:
