@@ -212,9 +212,14 @@ python -m pytest .github/scripts/agentic-workflows/tests .ci/nightly_report/test
   by bumping it together with the regenerated lock files, and never silently upgrade the
   CLI or unrelated action pins. Reproduce the check locally with
   `gh aw compile && git status --porcelain -- .github` (any output means drift).
-- **Dependabot and lock files:** the `github-actions` Dependabot entry does not exclude
-  `*.lock.yml`, so its bumps of actions inside generated locks fail the check by design.
-  Refresh generated pins by regenerating with gh-aw instead of merging such edits.
+- **Dependabot and generated files:** Dependabot scans every YAML file under
+  `.github/workflows/`, including `*.lock.yml`, and edits to generated locks fail the
+  compilation check. The `github-actions` entry in
+  [dependabot.yml](../../../.github/dependabot.yml) therefore lists `*.lock.yml`,
+  `actions-lock.json`, and the check workflow itself under `exclude-paths`. Refresh
+  generated pins by upgrading gh-aw and recompiling, not by merging action bumps. Update
+  the check's action refs (`checkout`, `setup-cli`) and its `version:` input by hand, in
+  the same change as the regenerated locks.
 - **Read-only dry runs:** the collector's `--out` directory is recreated; use a
   disposable directory and keep downloaded artifacts outside the worktree.
 - **Live runs:** replace the placeholders and preview first:
