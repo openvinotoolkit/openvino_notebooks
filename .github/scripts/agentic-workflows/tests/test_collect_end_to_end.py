@@ -1,5 +1,7 @@
 import json
 import re
+import subprocess
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -9,6 +11,7 @@ import collector_common as common
 import collector_github as github
 import collector_evidence as evidence
 import collect_nightly_failures as cnf
+import write_noop_when_idle as noop
 from nightly_builders import ENVIRONMENTS, NIGHTLY_ID, REPO, SIG_DEPENDENCY, SIG_OTHER, SIG_TIMEOUT, SIG_INFRA, FakeGh, make_report, nightly_world
 
 
@@ -79,7 +82,7 @@ def test_collect_writes_complete_digest_and_github_outputs(tmp_path, monkeypatch
     assert "\x1b" not in infra_log
     assert not re.search(r"\d{4}-\d\d-\d\dT\d\d:\d\d:", infra_log)
     assert len(report["failures"]) == status["failures_total"]
-    assert fake.count("--label nightly-remediator") == 2
+    assert fake.count("--raw-field label=nightly-remediator") == 4
 
 
 def test_no_failures_is_successful_no_work_without_tracking_queries(tmp_path, monkeypatch):
@@ -95,7 +98,13 @@ def test_no_failures_is_successful_no_work_without_tracking_queries(tmp_path, mo
     assert status["has_work"] is False
     assert "no failures" in status["reason"]
     assert not (out / "groups").exists()
-    assert fake.count("pr list") == 0
+    assert fake.count("api graphql") == 0
+    safe_outputs = tmp_path / "runner" / "safeoutputs" / "outputs.jsonl"
+    assert noop.write_noop_when_idle(out / "status.json", safe_outputs)
+    assert json.loads(safe_outputs.read_text(encoding="utf-8")) == {
+        "type": "noop",
+        "message": f"Nightly remediation skipped: {status['reason']}",
+    }
 
 
 def test_open_items_block_all_groups_without_using_slots(tmp_path, monkeypatch):
@@ -132,6 +141,116 @@ def test_disabled_issues_warns_but_open_pr_still_blocks(tmp_path, monkeypatch):
     assert any("issues are disabled" in warning for warning in status["warnings"])
     assert "Already tracked" in (out / "summary.md").read_text()
     assert not (out / f"groups/01-{SIG_DEPENDENCY}").exists()
+
+
+@pytest.mark.parametrize("kind", ["pr", "issue"])
+def test_tracking_finds_old_open_and_recently_rejected_items_beyond_completed_history(monkeypatch, kind):
+    now = datetime.now(timezone.utc)
+    closed_at = (now - timedelta(days=1)).isoformat()
+    noise = [
+        {
+            "number": number,
+            "title": "Completed remediation without a signature",
+            "body": "",
+            "state": "MERGED" if kind == "pr" else "CLOSED",
+            "stateReason": "COMPLETED",
+            "url": f"https://example.test/{number}",
+            "createdAt": "2026-01-01T00:00:00Z",
+            "updatedAt": now.isoformat(),
+            "closedAt": now.isoformat(),
+            "mergedAt": now.isoformat() if kind == "pr" else None,
+        }
+        for number in range(1, common.TRACKED_HISTORY_LIMIT + 1)
+    ]
+    opened = {**tracked_item(1001, SIG_DEPENDENCY), "createdAt": "2020-01-01T00:00:00Z", "updatedAt": "2020-01-01T00:00:00Z"}
+    rejected = {
+        **tracked_item(1002, SIG_OTHER),
+        "state": "CLOSED",
+        "stateReason": "NOT_PLANNED",
+        "createdAt": "2020-01-02T00:00:00Z",
+        "updatedAt": closed_at,
+        "closedAt": closed_at,
+    }
+    fake = FakeGh()
+    setattr(fake, "prs" if kind == "pr" else "issues", noise + [opened, rejected])
+    monkeypatch.setattr(github, "gh", fake)
+
+    tracked = analysis.fetch_tracked(REPO, lambda message: None)
+
+    assert analysis.decide_tracking(tracked[SIG_DEPENDENCY], now).reason == "open"
+    assert analysis.decide_tracking(tracked[SIG_OTHER], now).reason == "recently rejected"
+
+
+@pytest.mark.parametrize("kind", ["pr", "issue"])
+def test_tracking_paginates_all_open_items(monkeypatch, kind):
+    fake = FakeGh()
+    first = datetime(2020, 1, 1, tzinfo=timezone.utc)
+    noise = [
+        {
+            "number": number,
+            "title": "Open item without a signature",
+            "body": "",
+            "state": "OPEN",
+            "createdAt": (first + timedelta(days=number)).isoformat(),
+        }
+        for number in range(1, 202)
+    ]
+    opened = {**tracked_item(1001, SIG_DEPENDENCY), "createdAt": "2025-01-01T00:00:00Z"}
+    setattr(fake, "prs" if kind == "pr" else "issues", noise + [opened])
+    monkeypatch.setattr(github, "gh", fake)
+
+    tracked = analysis.fetch_tracked(REPO, lambda message: None)
+
+    assert analysis.decide_tracking(tracked[SIG_DEPENDENCY], datetime.now(timezone.utc)).reason == "open"
+    connection = "pullRequests(first:100" if kind == "pr" else "issues(first:100"
+    calls = [call for call in fake.calls if connection in " ".join(call) and "states:[OPEN]" in " ".join(call)]
+    assert len(calls) == 3
+
+
+def test_tracking_caps_old_completed_history(monkeypatch):
+    fake = FakeGh()
+    fake.prs = [
+        {
+            **tracked_item(number, SIG_DEPENDENCY),
+            "state": "MERGED",
+            "createdAt": "2020-01-01T00:00:00Z",
+            "updatedAt": "2020-01-02T00:00:00Z",
+            "closedAt": "2020-01-02T00:00:00Z",
+            "mergedAt": "2020-01-02T00:00:00Z",
+        }
+        for number in range(1, 701)
+    ]
+    monkeypatch.setattr(github, "gh", fake)
+
+    tracked = analysis.fetch_tracked(REPO, lambda message: None)
+
+    assert len(tracked[SIG_DEPENDENCY]) == common.TRACKED_HISTORY_LIMIT
+    calls = [call for call in fake.calls if "pullRequests(first:100" in " ".join(call) and "states:[CLOSED,MERGED]" in " ".join(call)]
+    assert len(calls) == 3
+
+
+@pytest.mark.parametrize("kind", ["pr", "issue"])
+def test_tracking_does_not_cap_recent_rejections(monkeypatch, kind):
+    now = datetime.now(timezone.utc)
+    rejected = [
+        {
+            **tracked_item(number, SIG_DEPENDENCY),
+            "state": "CLOSED",
+            "stateReason": "NOT_PLANNED",
+            "createdAt": "2020-01-01T00:00:00Z",
+            "updatedAt": (now - timedelta(seconds=number)).isoformat(),
+            "closedAt": (now - timedelta(seconds=number)).isoformat(),
+        }
+        for number in range(1, common.TRACKED_HISTORY_LIMIT + 16)
+    ]
+    fake = FakeGh()
+    setattr(fake, "prs" if kind == "pr" else "issues", rejected)
+    monkeypatch.setattr(github, "gh", fake)
+
+    tracked = analysis.fetch_tracked(REPO, lambda message: None, now)
+
+    assert len(tracked[SIG_DEPENDENCY]) == common.TRACKED_HISTORY_LIMIT + 15
+    assert analysis.decide_tracking(tracked[SIG_DEPENDENCY], now).reason == "recently rejected"
 
 
 @pytest.mark.parametrize(
@@ -205,15 +324,57 @@ def test_automatic_resolution_skips_newer_cancelled_run(tmp_path, monkeypatch):
 def test_workflow_contract_stays_aligned_with_collector_cli_and_tracking():
     repo_root = Path(__file__).resolve().parents[4]
     workflow = (repo_root / ".github/workflows/nightly-issue-remediator.md").read_text()
+    lock = (repo_root / ".github/workflows/nightly-issue-remediator.lock.yml").read_text()
     collector = (repo_root / ".github/scripts/agentic-workflows/collect_nightly_failures.py").read_text()
 
     assert "collect_nightly_failures.py" in workflow
     assert "TRACKING_LABEL" in workflow
     assert common.TRACKING_LABEL in workflow
     assert "Error signature: \\`<12-hex-signature>\\`" in workflow
+    assert "GH_AW_SAFE_OUTPUTS: ${{ steps.set-runtime-paths.outputs.GH_AW_SAFE_OUTPUTS }}" in workflow
+    assert "write_noop_when_idle.py" in workflow
+    assert "git rev-parse HEAD" in workflow
+    assert "git switch --detach <base-commit>" in workflow
+    assert "git switch -c <unique-branch> <base-commit>" in workflow
+    step_name = lock.index("name: Skip agent when there are no failure groups")
+    step = lock[lock.rindex("      - env:", 0, step_name) : lock.index("\n      - name:", step_name)]
+    assert "GH_AW_SAFE_OUTPUTS: ${{ steps.set-runtime-paths.outputs.GH_AW_SAFE_OUTPUTS }}" in step
+    assert "write_noop_when_idle.py" in step
+    assert "# --allow-tool shell(git rev-parse:*)" in lock
+    assert "# --allow-tool shell(git restore:*)" in lock
     for flag in ("--repo", "--source-repo", "--run-id", "--max-groups", "--max-prs", "--out"):
         assert flag in workflow
         assert flag in collector
+
+
+def test_group_branches_created_from_the_recorded_base_are_independent(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+
+    def git(*args):
+        return subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True, text=True).stdout.strip()
+
+    git("init", "-q")
+    git("config", "user.name", "Test")
+    git("config", "user.email", "test@example.invalid")
+    git("config", "commit.gpgsign", "false")
+    (repo / "first.txt").write_text("base\n", encoding="utf-8")
+    (repo / "second.txt").write_text("base\n", encoding="utf-8")
+    git("add", "first.txt", "second.txt")
+    git("commit", "-qm", "base")
+    base = git("rev-parse", "HEAD")
+
+    git("switch", "--detach", base)
+    git("switch", "-c", "first-fix", base)
+    (repo / "first.txt").write_text("first fix\n", encoding="utf-8")
+    git("commit", "-qam", "first fix")
+    git("switch", "--detach", base)
+    git("switch", "-c", "second-fix", base)
+    (repo / "second.txt").write_text("second fix\n", encoding="utf-8")
+    git("commit", "-qam", "second fix")
+
+    assert git("diff", "--name-only", f"{base}..first-fix") == "first.txt"
+    assert git("diff", "--name-only", f"{base}..second-fix") == "second.txt"
 
 
 @pytest.mark.parametrize(

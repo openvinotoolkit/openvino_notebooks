@@ -15,7 +15,7 @@ ENVIRONMENTS_FILE = "environments.json"
 SUPPORTED_SCHEMA_MAJOR = 1
 TRACKING_LABEL = "nightly-remediator"
 REJECTED_COOLDOWN = timedelta(days=30)
-TRACKED_LIST_LIMIT = 300
+TRACKED_HISTORY_LIMIT = 300
 INFRA_NOT_RUN_KINDS = ("job_failed_before_tests", "no_fragment", "job_interrupted")
 PR_CANDIDATE_CLASSES = ("dependency", "assertion", "openvino", "other")
 ALLOWED_SOURCE_REPOS = ("openvinotoolkit/openvino_notebooks",)

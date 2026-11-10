@@ -22,6 +22,7 @@ from nightly_builders import (
     INFRA_REASON,
     INFRA_STEP,
     REPO,
+    FakeGh,
     make_failure,
     make_job,
     make_report,
@@ -344,66 +345,115 @@ def test_item_state(kind, raw, expected):
 
 
 def test_fetch_tracked_reads_signatures_from_titles_and_bodies(monkeypatch):
-    calls = []
-
-    def fake_list_json(args):
-        calls.append(args)
-        if args[0] == "pr":
-            return [
-                {"number": 1, "title": "[nightly-fix] a (sig aaaaaaaaaaaa)", "body": "", "state": "OPEN", "url": "u1", "createdAt": "2026-01-02T00:00:00Z"},
-                {
-                    "number": 2,
-                    "title": "fix",
-                    "body": "Error signature: `aaaaaaaaaaaa`",
-                    "state": "MERGED",
-                    "url": "u2",
-                    "createdAt": "2026-01-03T00:00:00Z",
-                    "mergedAt": "2026-01-04T00:00:00Z",
-                },
-                {"number": 3, "title": "unrelated", "body": "", "state": "OPEN", "url": "u3", "createdAt": "2026-01-03T00:00:00Z"},
-            ]
-        return [
-            {
-                "number": 4,
-                "title": "[nightly] b",
-                "body": "Error signature: bbbbbbbbbbbb",
-                "state": "CLOSED",
-                "stateReason": "NOT_PLANNED",
-                "url": "u4",
-                "createdAt": "2026-01-05T00:00:00Z",
-            }
-        ]
-
-    monkeypatch.setattr(analysis, "list_json", fake_list_json)
+    fake = FakeGh()
+    fake.prs = [
+        {"number": 1, "title": "[nightly-fix] a (sig aaaaaaaaaaaa)", "body": "", "state": "OPEN", "url": "u1", "createdAt": "2026-01-02T00:00:00Z"},
+        {
+            "number": 2,
+            "title": "fix",
+            "body": "Error signature: `aaaaaaaaaaaa`",
+            "state": "MERGED",
+            "url": "u2",
+            "createdAt": "2026-01-03T00:00:00Z",
+            "updatedAt": "2026-01-04T00:00:00Z",
+            "mergedAt": "2026-01-04T00:00:00Z",
+        },
+        {"number": 3, "title": "unrelated", "body": "", "state": "OPEN", "url": "u3", "createdAt": "2026-01-03T00:00:00Z"},
+    ]
+    fake.issues = [
+        {
+            "number": 4,
+            "title": "[nightly] b",
+            "body": "Error signature: bbbbbbbbbbbb",
+            "state": "CLOSED",
+            "stateReason": "NOT_PLANNED",
+            "url": "u4",
+            "createdAt": "2026-01-05T00:00:00Z",
+            "updatedAt": "2026-01-06T00:00:00Z",
+            "closedAt": "2026-01-06T00:00:00Z",
+        }
+    ]
+    monkeypatch.setattr(github, "gh", fake)
     warnings = []
-    tracked = analysis.fetch_tracked(REPO, warnings.append)
+    tracked = analysis.fetch_tracked(REPO, warnings.append, NOW)
     assert set(tracked) == {"aaaaaaaaaaaa", "bbbbbbbbbbbb"}
     assert [(i.label, i.state) for i in tracked["aaaaaaaaaaaa"]] == [("PR #2", "merged"), ("PR #1", "open")]
     assert [(i.label, i.state) for i in tracked["bbbbbbbbbbbb"]] == [("issue #4", "not_planned")]
     assert warnings == []
-    assert all(call[call.index("--label") + 1] == common.TRACKING_LABEL == "nightly-remediator" for call in calls)
-    assert all(call[call.index("--state") + 1] == "all" and call[call.index("--repo") + 1] == REPO for call in calls)
+    assert fake.count("--raw-field label=nightly-remediator") == 4
+    assert fake.count("states:[OPEN]") == 2
+    assert fake.count("states:[CLOSED") == 2
 
 
 def test_fetch_tracked_tolerates_disabled_issues_only(monkeypatch):
-    def fake_list_json(args):
-        if args[0] == "issue":
-            raise common.GhError(args, 1, f"the '{REPO}' repository has disabled issues")
-        return [{"number": 1, "title": "x (sig aaaaaaaaaaaa)", "body": "", "state": "OPEN", "url": "u", "createdAt": "2026-01-02T00:00:00Z"}]
-
-    monkeypatch.setattr(analysis, "list_json", fake_list_json)
+    fake = FakeGh()
+    fake.prs = [{"number": 1, "title": "x (sig aaaaaaaaaaaa)", "body": "", "state": "OPEN", "url": "u", "createdAt": "2026-01-02T00:00:00Z"}]
+    fake.issues_disabled = True
+    monkeypatch.setattr(github, "gh", fake)
     warnings = []
     assert list(analysis.fetch_tracked(REPO, warnings.append)) == ["aaaaaaaaaaaa"]
     assert len(warnings) == 1 and "disabled" in warnings[0]
 
-    def broken_list_json(args):
-        if args[0] == "issue":
-            raise common.GhError(args, 1, "HTTP 403: forbidden")
-        return []
-
-    monkeypatch.setattr(analysis, "list_json", broken_list_json)
+    fake.issues_disabled = False
+    fake.fail_on = "issues(first:100"
     with pytest.raises(common.GhError):
         analysis.fetch_tracked(REPO, warnings.append)
+
+
+@pytest.mark.parametrize("cursors", [("same", "same"), ("first", "second", "first")])
+def test_tracking_rejects_repeated_pagination_cursors(monkeypatch, cursors):
+    item = {"number": 1, "title": "x", "body": "", "state": "OPEN", "createdAt": "2026-01-02T00:00:00Z"}
+    cursor_iter = iter(cursors)
+
+    def repeated_page(args):
+        return {
+            "data": {
+                "repository": {
+                    "hasIssuesEnabled": True,
+                    "pullRequests": {"nodes": [item], "pageInfo": {"hasNextPage": True, "endCursor": next(cursor_iter)}},
+                }
+            }
+        }
+
+    monkeypatch.setattr(analysis, "list_json", repeated_page)
+    with pytest.raises(common.CollectorError, match="invalid pr tracking cursor"):
+        analysis.fetch_tracked(REPO, lambda message: None, NOW)
+
+
+def test_tracking_rejects_an_invalid_item_state(monkeypatch):
+    def invalid_page(args):
+        return {
+            "data": {
+                "repository": {
+                    "hasIssuesEnabled": True,
+                    "pullRequests": {"nodes": [{"number": 1, "state": "UNKNOWN"}], "pageInfo": {"hasNextPage": False, "endCursor": None}},
+                }
+            }
+        }
+
+    monkeypatch.setattr(analysis, "list_json", invalid_page)
+    with pytest.raises(common.CollectorError, match="invalid pr tracking item"):
+        analysis.fetch_tracked(REPO, lambda message: None, NOW)
+
+
+@pytest.mark.parametrize("field", ["updatedAt", "closedAt"])
+def test_tracking_rejects_invalid_timestamps_on_rejected_items(monkeypatch, field):
+    fake = FakeGh()
+    item = {
+        "number": 1,
+        "title": "x (sig aaaaaaaaaaaa)",
+        "body": "",
+        "state": "CLOSED",
+        "createdAt": "2026-01-02T00:00:00Z",
+        "updatedAt": "2026-01-04T00:00:00Z",
+        "closedAt": "2026-01-04T00:00:00Z",
+    }
+    item[field] = "invalid"
+    fake.prs = [item]
+    monkeypatch.setattr(github, "gh", fake)
+
+    with pytest.raises(common.CollectorError, match=field):
+        analysis.fetch_tracked(REPO, lambda message: None, NOW)
 
 
 def test_open_items_block_a_group():
@@ -418,7 +468,9 @@ def test_recently_rejected_items_block_a_group(state):
     assert decision.skip and decision.reason == "recently rejected"
 
 
-@pytest.mark.parametrize("state, days_ago", [("closed", 31), ("not_planned", 90), ("merged", 1), ("completed", 1)])
+@pytest.mark.parametrize(
+    "state, days_ago", [("closed", 30), ("closed", 31), ("not_planned", 30), ("not_planned", 90), ("duplicate", 30), ("merged", 1), ("completed", 1)]
+)
 def test_old_rejections_and_finished_work_do_not_block_but_are_passed_on(state, days_ago):
     decision = analysis.decide_tracking([make_tracked(SIG, state, days_ago=days_ago)], NOW)
     assert not decision.skip and decision.blocking is None

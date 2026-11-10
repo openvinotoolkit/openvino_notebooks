@@ -185,7 +185,7 @@ def previous_nights():
 
 
 class FakeGh:
-    """Stands in for `github.gh`: answers the GitHub API and `gh pr|issue list` calls from memory and records them."""
+    """Stands in for `github.gh`: answers GitHub API calls from memory and records them."""
 
     def __init__(self):
         self.calls = []
@@ -224,12 +224,23 @@ class FakeGh:
         self.calls.append(list(args))
         if self.fail_on and self.fail_on in " ".join(args):
             raise common.GhError(args, 1, "HTTP 500: server error")
-        if args[:2] == ["pr", "list"]:
-            return json.dumps(self.prs).encode()
-        if args[:2] == ["issue", "list"]:
-            if self.issues_disabled:
-                raise common.GhError(args, 1, f"the '{REPO}' repository has disabled issues")
-            return json.dumps(self.issues).encode()
+        if args[:2] == ["api", "graphql"]:
+            fields = dict(args[index + 1].split("=", 1) for index, value in enumerate(args) if value == "--raw-field")
+            assert f"{fields['owner']}/{fields['name']}" == REPO
+            assert fields["label"] == common.TRACKING_LABEL
+            query = fields["query"]
+            is_pr = "pullRequests(first:100" in query
+            connection = "pullRequests" if is_pr else "issues"
+            is_open = "states:[OPEN]" in query
+            items = self.prs if is_pr else self.issues
+            items = [item for item in items if (item["state"].upper() == "OPEN") == is_open]
+            items = [dict(item, updatedAt=item.get("updatedAt") or item["createdAt"]) for item in items]
+            items.sort(key=lambda item: item["createdAt"] if is_open else item["updatedAt"], reverse=not is_open)
+            start = int(fields.get("cursor", "0"))
+            nodes = items[start : start + 100]
+            has_next = start + len(nodes) < len(items)
+            page = {"nodes": nodes, "pageInfo": {"hasNextPage": has_next, "endCursor": str(start + len(nodes)) if has_next else None}}
+            return json.dumps({"data": {"repository": {"hasIssuesEnabled": not self.issues_disabled, connection: page}}}).encode()
         assert args[0] == "api" and args[1].startswith(f"repos/{REPO}/"), args
         path = args[1].split("?")[0][len(f"repos/{REPO}/") :]
         if path == "actions/workflows/treon_nightly.yml/runs":

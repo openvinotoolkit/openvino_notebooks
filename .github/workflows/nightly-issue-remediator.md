@@ -48,7 +48,8 @@ tools:
     - "git status"
     - "git diff"
     - "git diff --check"
-    - "git restore"
+    - "git rev-parse:*"
+    - "git restore:*"
     - "python:*"
     - "grep"
     - "rg"
@@ -120,15 +121,8 @@ steps:
   - name: Skip agent when there are no failure groups
     env:
       DIGEST_DIR: /tmp/gh-aw/agent/nightly-remediator
-    run: |
-      status="$DIGEST_DIR/status.json"
-      if [ ! -s "$status" ]; then
-        echo "::error::nightly-remediator status.json is missing"
-        exit 1
-      fi
-      if [ "$(jq -r '.has_work // false' "$status")" != "true" ]; then
-        printf '%s\n' '{"type":"noop","message":"The nightly report has no untracked failure groups to remediate."}' >> "$GH_AW_SAFE_OUTPUTS"
-      fi
+      GH_AW_SAFE_OUTPUTS: ${{ steps.set-runtime-paths.outputs.GH_AW_SAFE_OUTPUTS }}
+    run: python3 .github/scripts/agentic-workflows/write_noop_when_idle.py
 
 max-turns: 250
 
@@ -185,13 +179,15 @@ If `status.json` says `has_work` is false, the pre-agent step already emitted a 
 
 ## Bounded protocol
 
-Process selected groups **one at a time in the order in `summary.md`**. For each group:
+Before processing groups, record the original checkout commit using `git rev-parse HEAD`. Process selected groups **one at a time in the order in `summary.md`**. Before investigating each group, verify your working tree is clean and return to that recorded commit with `git switch --detach <base-commit>`. If you cannot clean up only your own changes, report the investigation as incomplete rather than carrying them into another group.
+
+For each group:
 
 1. Read its complete `group.md` and `group.json`, then only the relevant failing notebook/helper and supporting source. Trace the reported failure start, exception, traceback, cell excerpt, job/log evidence, history, and package/environment differences. Treat line numbers and excerpts as clues, not proof.
 2. Search the repository and GitHub issues/PRs for the same symptom and any prior attempted fix. Do not duplicate an existing active remediation.
 3. Use a hard budget per group: **at most 15 file reads, 8 searches, 30 tool calls, and one attempted code fix**. Count reads/searches/tool calls explicitly. At about 8 calls, checkpoint the evidence and likely remedy; by about 20 calls, decide whether to prepare a draft PR or issue. Do not spend the remaining budget exploring unrelated code.
-4. Make at most one minimal change, directly addressing the root cause. Run the smallest relevant checks and inspect `git diff --check`. If the fix or self-check fails, do not try a second fix: restore that group’s changes and create an issue instead.
-5. Submit exactly one outcome for the group: one draft PR for a verified in-scope fix, or one issue when no safe verified fix is available. After submitting a PR, restore only your own working-tree edits before investigating the next group. Never mix groups in a PR.
+4. For a fix attempt, create its unique branch from the recorded original commit with `git switch -c <unique-branch> <base-commit>`, never from a previous group's branch. Make at most one minimal change, directly addressing the root cause. Run the smallest relevant checks and inspect `git diff --check`. If the fix or self-check fails, do not try a second fix: restore that group’s changes and create an issue instead.
+5. Submit exactly one outcome for the group: one draft PR for a verified in-scope fix, or one issue when no safe verified fix is available. Before investigating another group, restore only your own uncommitted edits and return to the recorded original commit. Never mix groups in a PR.
 
 The collector selects at most **5 groups per run** and prioritizes likely-fixable groups; the safe-output policy allows at most **3 PRs and 5 issues**. If the run-level budget is exhausted, create issues for the remaining groups rather than continuing investigation.
 

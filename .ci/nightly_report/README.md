@@ -51,7 +51,8 @@ The GitHub Agentic Workflow in `.github/workflows/nightly-issue-remediator.md` r
 `latest`; it can also be started manually with a run ID and source repository. Its deterministic collector downloads
 `nightly-dashboard-data` before the agent starts and writes a bounded digest (`summary.md`, `status.json`, `run.json`,
 `tracked.json`, and per-signature group JSON/Markdown plus representative logs). It skips groups already covered by an open or
-recently rejected remediation, prioritizes likely-fixable groups, and caps each run at five groups and three draft PRs.
+recently rejected remediation, prioritizes likely-fixable groups, and caps each run at five groups and three draft PRs. All open
+tracking items and recent rejections are paginated independently of the bounded completed-item history.
 
 The main agent uses Copilot model routing with `mode: balanced` and `goal: cost`, choosing from the
 `engine.model-routing.allowed-models` shortlist in the [workflow source](../../.github/workflows/nightly-issue-remediator.md).
@@ -63,6 +64,10 @@ be safely fixed. PRs use the `nightly-remediator` and `automated-fix` labels; is
 `nightly-failure`. Every created item must contain the visible `Error signature: \`<12-hex-signature>\`` line, also include
 `(sig <12-hex-signature>)` in its title, and list every affected notebook/config pair. These exact conventions are how later
 collector runs find and deduplicate existing work.
+
+The pinned gh-aw runtime instructs an agent to stop after calling `create_pull_request`. Consequently, the three-PR safe-output
+limit is a policy cap, not a guarantee that every selected group will receive an outcome in the same run; untracked groups can be
+selected again on a later run.
 
 For a manual test against the public nightly run:
 

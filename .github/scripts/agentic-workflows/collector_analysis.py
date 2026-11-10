@@ -7,17 +7,16 @@ import zipfile
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple
 
 from collector_common import (
     INFRA_NOT_RUN_KINDS,
     PR_CANDIDATE_CLASSES,
     REJECTED_COOLDOWN,
     SIGNATURE_RE,
-    TRACKED_LIST_LIMIT,
+    TRACKED_HISTORY_LIMIT,
     TRACKING_LABEL,
     CollectorError,
-    GhError,
     Group,
     Member,
     Night,
@@ -107,35 +106,116 @@ def item_state(kind: str, raw: dict) -> str:
     return {"NOT_PLANNED": "not_planned", "DUPLICATE": "duplicate"}.get(str(raw.get("stateReason") or "").upper(), "completed")
 
 
-def fetch_tracked(repo: str, warn: Callable[[str], None]) -> Dict[str, List[TrackedItem]]:
-    """Remediation PRs and issues of `repo` (label `nightly-remediator`) by the error signature printed in their title or body."""
-    limit = str(TRACKED_LIST_LIMIT)
-    common = ["--repo", repo, "--label", TRACKING_LABEL, "--state", "all", "--limit", limit]
-    prs = list_json(["pr", "list", *common, "--json", "number,title,body,state,url,createdAt,closedAt,mergedAt"])
-    try:
-        issues = list_json(["issue", "list", *common, "--json", "number,title,body,state,stateReason,url,createdAt,closedAt"])
-    except GhError as error:
-        if "disabled issues" not in error.stderr:
-            raise
-        warn(f"issues are disabled in {repo}; only pull requests are checked for already tracked errors")
-        issues = []
+def tracking_pages(repo: str, kind: str, closed: bool) -> Iterator[dict]:
+    """Fetch labeled items in cursor order without GitHub Search's result limit."""
+    owner, name = repo.split("/", 1)
+    connection = "pullRequests" if kind == "pr" else "issues"
+    states = "CLOSED,MERGED" if kind == "pr" and closed else "CLOSED" if closed else "OPEN"
+    order = "UPDATED_AT,direction:DESC" if closed else "CREATED_AT,direction:ASC"
+    extra = "mergedAt" if kind == "pr" else "stateReason"
+    query = (
+        "query($owner:String!,$name:String!,$label:String!,$cursor:String){"
+        "repository(owner:$owner,name:$name){hasIssuesEnabled "
+        f"{connection}(first:100,after:$cursor,labels:[$label],states:[{states}],orderBy:{{field:{order}}})"
+        f"{{nodes{{number title body state url createdAt updatedAt closedAt {extra}}} pageInfo{{hasNextPage endCursor}}}}"
+        "}}"
+    )
+    cursor: Optional[str] = None
+    seen_cursors: set[str] = set()
+    while True:
+        args = [
+            "api",
+            "graphql",
+            "--raw-field",
+            f"query={query}",
+            "--raw-field",
+            f"owner={owner}",
+            "--raw-field",
+            f"name={name}",
+            "--raw-field",
+            f"label={TRACKING_LABEL}",
+        ]
+        if cursor:
+            args.extend(["--raw-field", f"cursor={cursor}"])
+        response = list_json(args)
+        if not isinstance(response, dict):
+            raise CollectorError(f"GitHub returned an invalid tracking response for {repo}")
+        data = response.get("data")
+        repository = data.get("repository") if isinstance(data, dict) else None
+        if response.get("errors") or not isinstance(repository, dict):
+            raise CollectorError(f"GitHub returned an invalid tracking response for {repo}: {response.get('errors')}")
+        page = repository.get(connection)
+        if not isinstance(repository.get("hasIssuesEnabled"), bool) or not isinstance(page, dict):
+            raise CollectorError(f"GitHub returned an invalid {kind} tracking page for {repo}")
+        nodes, page_info = page.get("nodes"), page.get("pageInfo")
+        if not isinstance(nodes, list) or not isinstance(page_info, dict) or not isinstance(page_info.get("hasNextPage"), bool):
+            raise CollectorError(f"GitHub returned invalid {kind} tracking pagination for {repo}")
+        yield repository
+        if not page_info["hasNextPage"]:
+            return
+        next_cursor = page_info.get("endCursor")
+        if not nodes or not isinstance(next_cursor, str) or not next_cursor or next_cursor in seen_cursors:
+            raise CollectorError(f"GitHub returned an invalid {kind} tracking cursor for {repo}")
+        seen_cursors.add(next_cursor)
+        cursor = next_cursor
+
+
+def fetch_tracked(repo: str, warn: Callable[[str], None], now: Optional[datetime] = None) -> Dict[str, List[TrackedItem]]:
+    """Fetch every blocker and a bounded history of labeled remediations by signature."""
+    cutoff = (now or datetime.now(timezone.utc)) - REJECTED_COOLDOWN
     tracked: Dict[str, List[TrackedItem]] = defaultdict(list)
-    for kind, items in (("pr", prs), ("issue", issues)):
-        for raw in items:
-            signature = extract_signature(raw.get("title"), raw.get("body"))
-            if signature:
-                tracked[signature].append(
-                    TrackedItem(
-                        kind,
-                        raw["number"],
-                        raw.get("url", ""),
-                        raw.get("title", ""),
-                        item_state(kind, raw),
-                        signature,
-                        raw.get("createdAt", ""),
-                        raw.get("closedAt") or raw.get("mergedAt"),
-                    )
-                )
+    issues_enabled = True
+    seen: set[Tuple[str, int]] = set()
+    for kind, connection in (("pr", "pullRequests"), ("issue", "issues")):
+        if kind == "issue" and not issues_enabled:
+            warn(f"issues are disabled in {repo}; only pull requests are checked for already tracked errors")
+            continue
+        for closed in (False, True):
+            allowed_states = ("CLOSED", "MERGED") if closed and kind == "pr" else ("CLOSED",) if closed else ("OPEN",)
+            history_count = 0
+            for repository in tracking_pages(repo, kind, closed):
+                issues_enabled = repository["hasIssuesEnabled"]
+                nodes = repository[connection]["nodes"]
+                last_updated: Optional[datetime] = None
+                for raw in nodes:
+                    if not isinstance(raw, dict) or type(raw.get("number")) is not int or raw["number"] < 1 or raw.get("state") not in allowed_states:
+                        raise CollectorError(f"GitHub returned an invalid {kind} tracking item for {repo}")
+                    state = item_state(kind, raw)
+                    recent_rejection = False
+                    if closed:
+                        last_updated = parse_ts(raw.get("updatedAt"))
+                        if last_updated is None:
+                            raise CollectorError(f"closed {kind} #{raw.get('number')} has no valid updatedAt")
+                        if state in ("closed", "not_planned", "duplicate"):
+                            closed_at = parse_ts(raw.get("closedAt"))
+                            if closed_at is None:
+                                raise CollectorError(f"rejected {kind} #{raw.get('number')} has no valid closedAt")
+                            recent_rejection = closed_at > cutoff
+                        if not recent_rejection:
+                            history_count += 1
+                    if closed and not recent_rejection and history_count > TRACKED_HISTORY_LIMIT:
+                        continue
+                    key = (kind, raw["number"])
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    signature = extract_signature(raw.get("title"), raw.get("body"))
+                    if signature:
+                        tracked[signature].append(
+                            TrackedItem(
+                                kind,
+                                raw["number"],
+                                raw.get("url", ""),
+                                raw.get("title", ""),
+                                state,
+                                signature,
+                                raw.get("createdAt", ""),
+                                raw.get("closedAt") or raw.get("mergedAt"),
+                            )
+                        )
+                # A recent rejection must have an updatedAt after the cutoff.
+                if closed and history_count >= TRACKED_HISTORY_LIMIT and (last_updated is None or last_updated <= cutoff):
+                    break
     for items in tracked.values():
         items.sort(key=lambda item: item.created_at, reverse=True)
     return dict(tracked)

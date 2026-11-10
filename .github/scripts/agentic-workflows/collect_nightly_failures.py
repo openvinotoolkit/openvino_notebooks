@@ -119,7 +119,7 @@ def collect(args: argparse.Namespace, out: Path, warnings: List[str], now: Optio
             finish(out, status, render_summary(ctx, status, [], [], [], args))
             return status
 
-        tracked = fetch_tracked(args.repo, warn)
+        tracked = fetch_tracked(args.repo, warn, now)
         write_json(out / "tracked.json", {signature: [item.to_json() for item in items] for signature, items in tracked.items()})
         selected, skipped, deferred = select_groups(groups, tracked, args.max_groups, args.max_prs, now)
         status.update(groups_selected=len(selected), groups_tracked=len(skipped), groups_deferred=len(deferred))
