@@ -6,6 +6,7 @@ import collector_evidence as evidence
 import collector_github as github
 import collect_nightly_failures as cnf
 import knowledge_base as kb
+from collector_render import repo_path
 from nightly_builders import NIGHTLY_ID, REPO, SIG_DEPENDENCY, SIG_OTHER, FakeGh, make_report, nightly_world
 
 SIG_RELATED_TYPE = "dddddddddddd"
@@ -19,6 +20,7 @@ def isolate_github_files(monkeypatch):
 
 
 def make_group(signature, exception_type="ImportError", notebooks=("z/z.ipynb",)):
+    """A `group.json` as the collector writes it, so notebooks are repository paths."""
     return {
         "signature": signature,
         "kind": "error",
@@ -26,7 +28,7 @@ def make_group(signature, exception_type="ImportError", notebooks=("z/z.ipynb",)
         "error_class": "dependency",
         "exception_type": exception_type,
         "exception_message": "cannot import name",
-        "notebooks": list(notebooks),
+        "notebooks": [repo_path(notebook) for notebook in notebooks],
     }
 
 
@@ -79,7 +81,7 @@ def test_digest_shows_earlier_notes_and_related_signatures(tmp_path, monkeypatch
     assert "- Next step: check the next nightly" in group
     assert "### 2026-01-02: outcome `issue` ([nightly run](" in group
     assert "- Dead ends: pinning numpy" in group
-    assert f"| `{SIG_RELATED_NOTEBOOK}` | shares a/a.ipynb |" in group
+    assert f"| `{SIG_RELATED_NOTEBOOK}` | shares notebooks/a/a.ipynb |" in group
     assert f"| `{SIG_RELATED_TYPE}` | same exception type |" in group
     assert group.index(SIG_RELATED_NOTEBOOK) < group.index(SIG_RELATED_TYPE)
 

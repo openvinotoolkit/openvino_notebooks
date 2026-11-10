@@ -82,12 +82,15 @@ Its schema and limits live in [`knowledge_base.py`](../../.github/scripts/agenti
   related signatures (same exception type or shared notebook). The agent can also query the restored copy at
   `/tmp/gh-aw/repo-memory/default/knowledge.json` with `jq`.
 - **Save:** for each investigated group the agent writes a small note to `/tmp/gh-aw/agent/nightly-remediator/outcomes/<signature>.json`.
-  It never writes the persisted file: before the agent starts, `update_knowledge_base.py snapshot` freezes the digest and the cloned
-  knowledge base; after it, a pristine copy of the scripts from the checked-out commit runs `update_knowledge_base.py update`, which
-  rebuilds `knowledge.json` from the snapshots plus the validated notes (bounded single-line text, known enums, only signatures in the
-  digest). The result replaces the managed `repo-memory-default` artifact, and gh-aw's `push_repo_memory` job validates it again with the
-  `validation.script` in the workflow source before committing it to the branch. The update step is `continue-on-error`, so it can never
-  block the PRs and issues.
+  It never writes the persisted file: before the agent starts, `update_knowledge_base.py snapshot` copies the digest, the cloned
+  knowledge base, and the updater scripts themselves to `$RUNNER_TEMP`, which the agent's sandbox does not mount. After the agent,
+  that script copy runs `update_knowledge_base.py update` (with `python3 -E -s`, so the agent-writable user site-packages are ignored),
+  which rebuilds `knowledge.json` from the snapshots plus the validated notes (bounded single-line text, known enums, only signatures in
+  the digest) into a separate output directory. That directory always replaces the managed `repo-memory-default` artifact, which gh-aw
+  uploads from the agent-writable clone before post-steps; when there is no trusted result, it holds only a placeholder that the push
+  ignores, so the branch stays unchanged. gh-aw's `push_repo_memory` job validates the file again with the `validation.script` in the
+  workflow source before committing it to the branch. The snapshot and update steps are `continue-on-error`, so they can never block
+  the PRs and issues.
 - **Trust:** notes derive from CI output and agent text, so the prompt and digest present them as untrusted leads, never instructions.
 - **Operations:** the `push_repo_memory` job needs `contents: write`, and the repository rules must allow that job to push
   `memory/nightly-remediator`. To reset the knowledge, delete the branch. If the repository requires signed commits, the push uses the

@@ -181,14 +181,18 @@ workflows. Consult the source before changing them.
   Every outcome lists all affected notebooks/configs, not just the downloaded
   representative logs.
 - **Knowledge base:** `knowledge.json` on `memory/nightly-remediator` is written only
-  by `update_knowledge_base.py` (snapshot before the agent, update after it from a
-  `git archive` of the checked-out commit), never by the agent, and replaces the
-  managed `repo-memory-default` artifact because gh-aw uploads that artifact before
-  `post-steps`. Keep its schema in `knowledge_base.py` and the inline
-  `validation.script` in sync (the tests run the script with `node`), keep the update
-  step `continue-on-error`, and present its content as untrusted. The compiler rejects
-  post-steps that touch the safe-outputs file, and repo-memory deletions are not
-  propagated to the branch, so retention works by rewriting one bounded file.
+  by `update_knowledge_base.py`, never by the agent. `snapshot` copies the digest, the
+  cloned file, and the updater scripts to `$RUNNER_TEMP` before the agent (AWF mounts
+  only `$RUNNER_TEMP/gh-aw`, read-only, while the workspace, `.git`, `/tmp`, and
+  `~/.local` stay agent-writable); `update` runs that copy with `python3 -E -s` into a
+  separate directory that always replaces the managed `repo-memory-default` artifact,
+  because gh-aw uploads that artifact before `post-steps`. Without a trusted result the
+  replacement holds only an ineligible placeholder, which the push ignores. Keep its
+  schema in `knowledge_base.py` and the inline `validation.script` in sync (the tests
+  run the script with `node`), keep both steps `continue-on-error`, store notebooks as
+  `group.json` repository paths, and present its content as untrusted. The compiler
+  rejects post-steps that touch the safe-outputs file, and repo-memory deletions are
+  not propagated to the branch, so retention works by rewriting one bounded file.
 - **Remediation scope:** generated PRs are limited to notebook JSON/Python,
   `utils/**`, and root `requirements.txt`. Keep protected-file checks and patch
   caps. This restriction is for the remediator's outputs, not for authoring its

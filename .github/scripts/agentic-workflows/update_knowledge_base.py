@@ -1,8 +1,10 @@
 """Records what the nightly remediator learned into the knowledge base kept on the `repo-memory` branch.
 
-`snapshot` runs before the agent and freezes the inputs the update trusts: the digest and the knowledge base as cloned.
-`update` runs after the agent from a pristine copy of this directory. It rebuilds `knowledge.json` from those snapshots plus the agent's per-signature
-notes (`outcomes/<signature>.json`), so the agent never writes the persisted file itself and cannot change counts, dates, or other signatures' records.
+`snapshot` runs before the agent and freezes what the update trusts outside the agent's sandbox: the digest, the knowledge base as cloned, and
+the updater scripts themselves (copied last, so their presence marks a complete snapshot).
+`update` runs after the agent from that script copy. It rebuilds `knowledge.json` into a separate output directory from the snapshots plus the
+agent's per-signature notes (`outcomes/<signature>.json`), so the agent never writes the persisted file itself and cannot change counts, dates,
+or other signatures' records.
 """
 
 from __future__ import annotations
@@ -33,6 +35,8 @@ MAX_NOTE_BYTES = 16 * 1024
 MAX_JSON_BYTES = 8 * 1024 * 1024
 DIGEST_SNAPSHOT = "digest"
 MEMORY_SNAPSHOT = "memory"
+SCRIPTS_SNAPSHOT = "scripts"
+SCRIPT_FILES = ("knowledge_base.py", "update_knowledge_base.py")
 
 
 def read_json(path: Path) -> dict:
@@ -61,6 +65,10 @@ def snapshot(digest_dir: Path, memory_dir: Path, trusted_dir: Path, notes_dir: P
         (trusted_dir / MEMORY_SNAPSHOT).mkdir()
         shutil.copy2(baseline, trusted_dir / MEMORY_SNAPSHOT / KNOWLEDGE_FILE)
     notes_dir.mkdir(parents=True, exist_ok=True)
+    scripts = trusted_dir / SCRIPTS_SNAPSHOT
+    scripts.mkdir()
+    for name in SCRIPT_FILES:
+        shutil.copy2(Path(__file__).resolve().parent / name, scripts / name)
 
 
 def read_notes(notes_dir: Path, signatures: List[str], warn=print) -> Dict[str, dict]:
@@ -93,7 +101,7 @@ def nightly_date(run: dict, today: str) -> str:
     return today
 
 
-def update(trusted_dir: Path, notes_dir: Path, memory_dir: Path, remediator_run_url: str, today: str, warn=print) -> dict:
+def update(trusted_dir: Path, notes_dir: Path, out_dir: Path, remediator_run_url: str, today: str, warn=print) -> dict:
     digest = trusted_dir / DIGEST_SNAPSHOT
     if not read_json(digest / "status.json").get("has_work"):
         return {"investigated": 0, "evicted": [], "signatures": None}
@@ -118,8 +126,8 @@ def update(trusted_dir: Path, notes_dir: Path, memory_dir: Path, remediator_run_
 
     text = dump_knowledge(knowledge)
     parse_knowledge(text)
-    memory_dir.mkdir(parents=True, exist_ok=True)
-    (memory_dir / KNOWLEDGE_FILE).write_text(text, encoding="utf-8")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / KNOWLEDGE_FILE).write_text(text, encoding="utf-8")
     return {"investigated": len(signatures), "evicted": evicted, "signatures": len(knowledge["signatures"])}
 
 
@@ -130,10 +138,11 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         command = sub.add_parser(name)
         command.add_argument("--trusted-dir", type=Path, required=True)
         command.add_argument("--notes-dir", type=Path, required=True)
-        command.add_argument("--memory-dir", type=Path, required=True)
         if name == "snapshot":
             command.add_argument("--digest-dir", type=Path, required=True)
+            command.add_argument("--memory-dir", type=Path, required=True)
         else:
+            command.add_argument("--out-dir", type=Path, required=True)
             command.add_argument("--remediator-run-url", default="")
     return parser.parse_args(argv)
 
@@ -147,7 +156,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         else:
             today = datetime.now(timezone.utc).date().isoformat()
             result = update(
-                args.trusted_dir, args.notes_dir, args.memory_dir, args.remediator_run_url, today, warn=lambda m: print(f"::warning::{clean_text(m, 300)}")
+                args.trusted_dir, args.notes_dir, args.out_dir, args.remediator_run_url, today, warn=lambda m: print(f"::warning::{clean_text(m, 300)}")
             )
             if result["signatures"] is None:
                 print("No failure groups were investigated; the knowledge base is unchanged")

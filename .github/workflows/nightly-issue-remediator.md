@@ -184,6 +184,9 @@ steps:
     run: python3 .github/scripts/agentic-workflows/write_noop_when_idle.py
 
   - name: Snapshot trusted inputs for the knowledge base update
+    # Outside the agent's sandbox: it can neither read nor write $RUNNER_TEMP (only its gh-aw subdirectory is mounted, read-only).
+    # Best effort like the update: without a complete snapshot the knowledge base is left unchanged.
+    continue-on-error: true
     env:
       DIGEST_DIR: /tmp/gh-aw/agent/nightly-remediator
     run: |
@@ -201,32 +204,35 @@ post-steps:
     env:
       REMEDIATOR_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     run: |
-      memory=/tmp/gh-aw/repo-memory/default
       trusted="$RUNNER_TEMP/nightly-remediator-trusted"
-      scripts="$RUNNER_TEMP/nightly-remediator-scripts"
-      # The agent only reads the persisted file: drop any edit of it, restore the clone's version, then let a pristine copy of the scripts
-      # (from the checked-out commit, not the possibly modified working tree) add this run's records.
-      rm -f "$memory/knowledge.json"
-      if [ -f "$trusted/memory/knowledge.json" ]; then cp "$trusted/memory/knowledge.json" "$memory/knowledge.json"; fi
-      rm -rf "$scripts"
-      mkdir -p "$scripts"
-      git -C "$GITHUB_WORKSPACE" archive --format=tar -o "$scripts/scripts.tar" "$GITHUB_SHA" .github/scripts/agentic-workflows
-      tar -xf "$scripts/scripts.tar" -C "$scripts"
-      python3 "$scripts/.github/scripts/agentic-workflows/update_knowledge_base.py" update \
+      out="$RUNNER_TEMP/nightly-remediator-memory"
+      rm -rf "$out"
+      mkdir -p "$out"
+      # The replacement artifact must never be empty, or the managed one (which may hold agent edits) would be kept. Without a trusted
+      # knowledge.json, the push ignores this ineligible placeholder and leaves the branch unchanged.
+      echo "This run did not update the knowledge base." > "$out/unchanged.txt"
+      if [ ! -f "$trusted/scripts/update_knowledge_base.py" ]; then
+        echo "::warning::The trusted snapshot is incomplete, so the knowledge base is left unchanged"
+        exit 1
+      fi
+      # The scripts were copied before the agent ran; -E -s ignores PYTHON* variables and the agent-writable user site-packages.
+      python3 -E -s "$trusted/scripts/update_knowledge_base.py" update \
         --trusted-dir "$trusted" \
         --notes-dir /tmp/gh-aw/agent/nightly-remediator/outcomes \
-        --memory-dir "$memory" \
+        --out-dir "$out" \
         --remediator-run-url "$REMEDIATOR_RUN_URL"
+      if [ -f "$out/knowledge.json" ]; then rm "$out/unchanged.txt"; fi
 
-  # The managed upload of the memory directory has already run by now (before post-steps), so it is replaced with the trusted result.
+  # The managed upload of the agent-writable memory directory has already run by now (before post-steps), so it is replaced with the
+  # trusted result.
   - name: Replace the repo-memory artifact with the trusted knowledge base
     if: always()
     uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
     with:
       name: repo-memory-default
-      path: /tmp/gh-aw/repo-memory/default
+      path: ${{ runner.temp }}/nightly-remediator-memory
       overwrite: true
-      if-no-files-found: ignore
+      if-no-files-found: error
       retention-days: 1
 
 max-turns: 250

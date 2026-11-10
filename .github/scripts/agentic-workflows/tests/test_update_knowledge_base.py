@@ -1,5 +1,7 @@
 import json
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -51,6 +53,7 @@ class World:
         self.memory = tmp_path / "memory"
         self.memory.mkdir()
         self.trusted = tmp_path / "trusted"
+        self.out = tmp_path / "out"
         self.notes = self.digest / "outcomes"
         self.warnings = []
 
@@ -61,10 +64,10 @@ class World:
         write_json(self.notes / f"{signature}.json", fields)
 
     def update(self):
-        return ukb.update(self.trusted, self.notes, self.memory, REMEDIATOR_URL, "2026-03-01", warn=self.warnings.append)
+        return ukb.update(self.trusted, self.notes, self.out, REMEDIATOR_URL, "2026-03-01", warn=self.warnings.append)
 
     def stored(self):
-        return kb.parse_knowledge((self.memory / kb.KNOWLEDGE_FILE).read_text(encoding="utf-8"))
+        return kb.parse_knowledge((self.out / kb.KNOWLEDGE_FILE).read_text(encoding="utf-8"))
 
 
 @pytest.fixture
@@ -82,6 +85,8 @@ def test_snapshot_copies_only_what_the_update_needs(world):
         "digest/run.json",
         "digest/status.json",
         "memory/knowledge.json",
+        "scripts/knowledge_base.py",
+        "scripts/update_knowledge_base.py",
     ]
     assert world.notes.is_dir()
 
@@ -94,6 +99,19 @@ def test_snapshot_without_a_baseline_and_with_a_stale_snapshot(world):
     (world.digest / "status.json").unlink()
     with pytest.raises(kb.KnowledgeError):
         world.snapshot()
+    # The workflow only runs the update from a complete snapshot, which the script copy marks.
+    assert not (world.trusted / ukb.SCRIPTS_SNAPSHOT).exists()
+
+
+def test_snapshot_scripts_run_on_their_own_isolated_from_user_site_packages(world, tmp_path):
+    world.snapshot()
+    world.note(SIG_A, outcome="issue", root_cause="from the copy")
+    scripts = world.trusted / ukb.SCRIPTS_SNAPSHOT
+    command = [sys.executable, "-E", "-s", str(scripts / "update_knowledge_base.py"), "update"]
+    command += ["--trusted-dir", str(world.trusted), "--notes-dir", str(world.notes), "--out-dir", str(world.out)]
+    result = subprocess.run(command, cwd=tmp_path, capture_output=True, text=True, timeout=60)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert world.stored()["signatures"][SIG_A]["attempts"][0]["root_cause"] == "from the copy"
 
 
 def test_update_records_every_investigated_group_with_the_agents_notes(world):
@@ -166,6 +184,8 @@ def test_update_ignores_everything_the_agent_changes_after_the_snapshot(world):
     assert set(stored["signatures"]) == {SIG_A, SIG_B}
     assert [a["root_cause"] for a in stored["signatures"][SIG_A]["attempts"]] == ["honest note", "trusted"]
     assert any("dddddddddddd.json" in warning for warning in world.warnings)
+    # The result goes to a separate directory; the agent-writable memory directory is never read or written by the update.
+    assert (world.memory / kb.KNOWLEDGE_FILE).read_text(encoding="utf-8") == '{"forged": true}'
 
 
 def test_update_does_nothing_when_no_group_was_selected(tmp_path):
@@ -173,7 +193,7 @@ def test_update_does_nothing_when_no_group_was_selected(tmp_path):
     make_digest(world.digest, groups=[], has_work=False)
     world.snapshot()
     assert world.update() == {"investigated": 0, "evicted": [], "signatures": None}
-    assert not (world.memory / kb.KNOWLEDGE_FILE).exists()
+    assert not (world.out / kb.KNOWLEDGE_FILE).exists()
 
 
 @pytest.mark.parametrize("content", ["{", "[]", json.dumps({"root_cause": "x" * ukb.MAX_NOTE_BYTES})])
@@ -202,12 +222,12 @@ def test_a_directory_named_like_a_note_is_ignored(world):
     assert any(f"{SIG_A}.json" in warning for warning in world.warnings)
 
 
-def test_corrupt_baseline_fails_without_touching_the_memory_directory(world):
+def test_corrupt_baseline_fails_without_writing_a_result(world):
     (world.memory / kb.KNOWLEDGE_FILE).write_text("{", encoding="utf-8")
     world.snapshot()
     with pytest.raises(kb.KnowledgeError):
         world.update()
-    assert (world.memory / kb.KNOWLEDGE_FILE).read_text(encoding="utf-8") == "{"
+    assert not (world.out / kb.KNOWLEDGE_FILE).exists()
 
 
 def test_update_evicts_the_least_recently_seen_signatures_beyond_the_cap(world, monkeypatch):
@@ -244,10 +264,10 @@ def test_update_requires_a_numeric_run_id(world):
 
 
 def cli(world, command):
-    common = ["--trusted-dir", str(world.trusted), "--notes-dir", str(world.notes), "--memory-dir", str(world.memory)]
+    common = ["--trusted-dir", str(world.trusted), "--notes-dir", str(world.notes)]
     if command == "snapshot":
-        return ukb.main(["snapshot", "--digest-dir", str(world.digest), *common])
-    return ukb.main(["update", "--remediator-run-url", REMEDIATOR_URL, *common])
+        return ukb.main(["snapshot", "--digest-dir", str(world.digest), "--memory-dir", str(world.memory), *common])
+    return ukb.main(["update", "--out-dir", str(world.out), "--remediator-run-url", REMEDIATOR_URL, *common])
 
 
 def test_cli_snapshot_then_update(world, capsys):
@@ -268,4 +288,4 @@ def test_cli_reports_failures_as_errors_and_no_work_as_unchanged(world, capsys):
     (world.memory / kb.KNOWLEDGE_FILE).unlink()
     assert cli(world, "snapshot") == 0 and cli(world, "update") == 0
     assert "knowledge base is unchanged" in capsys.readouterr().out
-    assert Path(world.memory / kb.KNOWLEDGE_FILE).exists() is False
+    assert Path(world.out / kb.KNOWLEDGE_FILE).exists() is False

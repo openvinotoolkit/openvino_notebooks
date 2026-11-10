@@ -91,30 +91,36 @@ def step_position(name):
 
 def test_knowledge_updates_run_in_the_expected_order_and_cannot_block_outputs():
     managed_upload = step_position("Upload repo-memory artifact (default)")
+    snapshot = step_position("Snapshot trusted inputs for the knowledge base update")
     record = step_position("Record this run in the knowledge base")
     replace = step_position("Replace the repo-memory artifact with the trusted knowledge base")
-    assert (
-        step_position("Download nightly failure digest")
-        < step_position("Snapshot trusted inputs for the knowledge base update")
-        < step_position("Execute GitHub Copilot CLI")
-    )
+    assert step_position("Clone repo-memory branch (default)") < step_position("Download nightly failure digest") < snapshot
+    assert snapshot < step_position("Execute GitHub Copilot CLI")
     # The managed upload runs before post-steps, so the trusted result has to replace it.
     assert managed_upload < record < replace
+
+    snapshot_step = LOCK[LOCK.rindex("      - ", 0, snapshot) : LOCK.index("\n      - ", snapshot)]
+    assert "continue-on-error: true" in snapshot_step and '--trusted-dir \\"$RUNNER_TEMP/nightly-remediator-trusted\\"' in snapshot_step
 
     record_step = LOCK[LOCK.rindex("      - ", 0, record) : replace]
     assert "continue-on-error: true" in record_step and "if: always()" in record_step
     assert "GH_AW_SAFE_OUTPUTS" not in record_step and "safeoutputs" not in record_step
-    assert "archive --format=tar" in record_step and "GITHUB_SHA" in record_step
-    assert re.search(r'\$scripts/\.github/scripts/agentic-workflows/update_knowledge_base\.py\\?" update', record_step)
+    # Runs the script copy taken before the agent, never code from the agent-writable workspace, and never reads the agent-writable memory clone.
+    assert 'python3 -E -s \\"$trusted/scripts/update_knowledge_base.py\\" update' in record_step
+    assert "GITHUB_WORKSPACE" not in record_step and ".github/scripts" not in record_step and "/tmp/gh-aw/repo-memory" not in record_step
+    assert 'out=\\"$RUNNER_TEMP/nightly-remediator-memory\\"' in record_step and '--out-dir \\"$out\\"' in record_step
+    # The placeholder that keeps the replacement artifact non-empty must be ignored by the push.
+    placeholder = re.search(r'> \\"\$out/([^"\\]+)\\"', record_step).group(1)
+    assert placeholder != kb.KNOWLEDGE_FILE and not placeholder.endswith(".json")
     replace_step = LOCK[LOCK.rindex("      - ", 0, replace) : LOCK.index("\n      # Small dedicated copy", replace)]
     assert "if: always()" in replace_step and "name: repo-memory-default" in replace_step and "overwrite: true" in replace_step
-    assert "path: /tmp/gh-aw/repo-memory/default" in replace_step
+    assert "path: ${{ runner.temp }}/nightly-remediator-memory" in replace_step and "if-no-files-found: error" in replace_step
 
 
 def test_workflow_steps_and_prompt_use_the_updater_cli_consistently():
     assert ukb.parse_args(["snapshot", "--digest-dir", "d", "--memory-dir", "m", "--trusted-dir", "t", "--notes-dir", "n"]).command == "snapshot"
-    assert ukb.parse_args(["update", "--memory-dir", "m", "--trusted-dir", "t", "--notes-dir", "n", "--remediator-run-url", "u"]).command == "update"
-    for flag in ("--digest-dir", "--memory-dir", "--trusted-dir", "--notes-dir", "--remediator-run-url"):
+    assert ukb.parse_args(["update", "--out-dir", "o", "--trusted-dir", "t", "--notes-dir", "n", "--remediator-run-url", "u"]).command == "update"
+    for flag in ("--digest-dir", "--memory-dir", "--trusted-dir", "--notes-dir", "--out-dir", "--remediator-run-url"):
         assert flag in WORKFLOW
     notes_dir = "/tmp/gh-aw/agent/nightly-remediator/outcomes"
     assert f"--notes-dir {notes_dir}" in WORKFLOW and f"{notes_dir}/<12-hex-signature>.json" in WORKFLOW
