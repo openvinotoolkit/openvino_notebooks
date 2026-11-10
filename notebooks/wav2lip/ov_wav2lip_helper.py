@@ -31,7 +31,12 @@ def load_model(path):
 
 
 def download_and_convert_models(ov_face_detection_model_path, ov_wav2lip_model_path):
-    models_urls = {"s3fd": "https://www.adrianbulat.com/downloads/python-fan/s3fd-619a316812.pth"}
+    models_urls = {
+        "s3fd": (
+            "https://huggingface.co/camenduru/Wav2Lip/resolve/"
+            "bfcd9263d1ccb60ab724f074e7c1b3555f6cb162/checkpoints/s3fd-619a316812.pth"
+        )
+    }
     path_to_detector = "checkpoints/face_detection.pth"
     # Convert Face Detection Model
     print("Convert Face Detection Model ...")

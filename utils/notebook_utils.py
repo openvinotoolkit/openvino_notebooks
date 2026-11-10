@@ -322,6 +322,112 @@ def download_file(
     return filepath.resolve()
 
 
+_NOTEBOOK_EXAMPLE_IMAGES = {
+    "cat": (
+        "https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/b9f35268d6f0856954af58e21a3b83f6525e47fc/notebooks/gemma4/gemma4.ipynb",
+        "c715d8adee4bf7519690de20b57ef2edaa2f914c86a64d107f99a919dcdad218",
+    ),
+    "openvino_docs": (
+        "https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/"
+        "c0ec1fc08d01f1537b249e5000fffdf7ae152eef/notebooks/smoldocling/smoldocling.ipynb",
+        "a9fa291a981591490c2e4b97a709e750c1eb7fc734dd8645888bdb97ccb935a6",
+    ),
+    "ocr_invoice": (
+        "https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/c0ec1fc08d01f1537b249e5000fffdf7ae152eef/notebooks/glm-ocr/glm-ocr.ipynb",
+        "31b05c0e13d44406d3fe9ccf9e10876ff3597342002177f83c6fd2c20510e00c",
+    ),
+    "dog_drawing": (
+        "https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/"
+        "c0ec1fc08d01f1537b249e5000fffdf7ae152eef/notebooks/image-to-image-genai/image-to-image-genai.ipynb",
+        "42da89d4df5e34914216247418a257b3a930a4655e8e302a65c65e4819125c4b",
+    ),
+    "fur_seal": (
+        "https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/c0ec1fc08d01f1537b249e5000fffdf7ae152eef/notebooks/jina-clip/jina-clip.ipynb",
+        "d9f9b48328cd55cda4d3f6b15f082746996c5deacb02c01d3e50b6ffc8b28408",
+    ),
+    "mobileclip_cat": (
+        "https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/"
+        "c0ec1fc08d01f1537b249e5000fffdf7ae152eef/notebooks/mobileclip-video-search/mobileclip-video-search.ipynb",
+        "1da16a568017a5b7968aa0bba55d2d6b0880a564d9e072754d31c27cd591e075",
+    ),
+    "ocr_formula": (
+        "https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/c0ec1fc08d01f1537b249e5000fffdf7ae152eef/notebooks/glm-ocr/glm-ocr.ipynb",
+        "4c3a5710168f567ba520c37b0206c9f7daa0744920a3f7d2aa6284a1eb3bc567",
+    ),
+}
+
+_NOTEBOOK_EXAMPLE_IMAGE_CROPS = {
+    "fur_seal": (10, 71, 538, 472),
+    "mobileclip_cat": (415, 143, 751, 363),
+}
+
+
+def read_notebook_example_image(image_name: str) -> bytes:
+    """Read a verified PNG example, or a crop of one, from a pinned notebook output.
+
+    Available examples are ``cat``, ``openvino_docs``, ``ocr_invoice``,
+    ``dog_drawing``, ``fur_seal``, ``mobileclip_cat``, and ``ocr_formula``.
+    An error is raised if the requested output cannot be found, its bytes do
+    not match the recorded hash, or its crop falls outside the image.
+    """
+    import base64
+    import hashlib
+    import requests
+
+    if image_name not in _NOTEBOOK_EXAMPLE_IMAGES:
+        raise ValueError(f"Unknown notebook example image: {image_name!r}")
+    url, expected_sha256 = _NOTEBOOK_EXAMPLE_IMAGES[image_name]
+    with requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=60) as response:
+        response.raise_for_status()
+        notebook = response.json()
+
+    for cell in notebook["cells"]:
+        for output in cell.get("outputs", []):
+            payload = output.get("data", {}).get("image/png")
+            if payload is None:
+                continue
+            image = base64.b64decode("".join(payload) if isinstance(payload, list) else payload, validate=True)
+            if hashlib.sha256(image).hexdigest() == expected_sha256:
+                crop = _NOTEBOOK_EXAMPLE_IMAGE_CROPS.get(image_name)
+                if crop is not None:
+                    from io import BytesIO
+
+                    from PIL import Image
+
+                    with Image.open(BytesIO(image)) as source:
+                        left, top, right, bottom = crop
+                        if not (0 <= left < right <= source.width and 0 <= top < bottom <= source.height):
+                            raise ValueError(f"Invalid crop for notebook example image {image_name!r}")
+                        with BytesIO() as cropped:
+                            source.convert("RGB").crop(crop).save(cropped, format="PNG")
+                            return cropped.getvalue()
+                return image
+    raise ValueError(f"Verified example image {image_name!r} was not found in {url}")
+
+
+def download_notebook_example_image(image_name: str, filename: str | PathLike[str]) -> Path:
+    """Save an embedded notebook example as PNG, reusing an existing file."""
+    import tempfile
+
+    if image_name not in _NOTEBOOK_EXAMPLE_IMAGES:
+        raise ValueError(f"Unknown notebook example image: {image_name!r}")
+    filepath = Path(filename)
+    if filepath.exists():
+        return filepath.resolve()
+
+    image = read_notebook_example_image(image_name)
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    tmp_file = tempfile.NamedTemporaryFile(dir=filepath.parent, prefix=f".{filepath.name}.", suffix=".part", delete=False)
+    tmp_filepath = Path(tmp_file.name)
+    try:
+        with tmp_file:
+            tmp_file.write(image)
+        tmp_filepath.replace(filepath)
+    finally:
+        tmp_filepath.unlink(missing_ok=True)
+    return filepath.resolve()
+
+
 def download_ir_model(model_xml_url: str, destination_folder: PathLike = None) -> PathLike:
     """
     Download IR model from `model_xml_url`. Downloads model xml and bin file; the weights file is
