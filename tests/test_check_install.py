@@ -1,5 +1,5 @@
 import ast
-import subprocess
+import subprocess  # nosec B404 - subprocess calls are mocked in these tests
 import sys
 from pathlib import Path
 from unittest.mock import patch

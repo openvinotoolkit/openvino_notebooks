@@ -8,15 +8,6 @@ on:
     branches:
       - 'main'
       - 'latest'
-    paths:
-      - '**.py'
-      - 'notebooks/**.ipynb'
-      - 'notebooks/**.md'
-      - 'requirements.txt'
-      - '.ci/*'
-      - '.ci/nightly_report/**'
-      - '.github/workflows/*.yml'
-      - '.github/workflows/.env'
   push:
     branches:
       - 'main'
@@ -36,7 +27,25 @@ permissions:
   pull-requests: read
 
 jobs:
-  build_codecheck:
+  changes:
+    uses: ./.github/workflows/job_detect_changes.yml
+    permissions:
+      contents: read
+      pull-requests: read
+    with:
+      files: |
+        **/*.py
+        notebooks/**/*.ipynb
+        notebooks/**/*.md
+        requirements.txt
+        .ci/*
+        .ci/nightly_report/**
+        .github/workflows/*.yml
+        .github/workflows/.env
+
+  test_codecheck:
+    needs: changes
+    if: ${{ needs.changes.outputs.relevant == 'true' }}
     strategy:
       fail-fast: false
     runs-on: ubuntu-22.04 # change cachepip step when changing this
@@ -49,7 +58,7 @@ jobs:
         with:
           path: ./.github/workflows
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.11" # change cachepip step when changing this
       - name: Cache OpenVINO Pip Packages
@@ -125,3 +134,13 @@ jobs:
         if: always()
         run: |
           python .ci/check_notebooks.py
+
+  # Keep the required check successful when no relevant files changed.
+  build_codecheck:
+    needs: [changes, test_codecheck]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check status of all jobs
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: exit 1
