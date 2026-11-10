@@ -42,8 +42,9 @@ for frontmatter keys, imports, tools, safe outputs, and compiler behavior. Check
 | [nightly report package](../../../.ci/nightly_report/) | Report producer, schemas, parsing, and tests shared with the dashboard. |
 
 The current workflow defines its custom collection job inline. Do not assume the
-upstream OpenVINO repository's CI Doctor workflows, Teams jobs, memory branches, or
-`common.py` exist here. Introduce shared imports under
+upstream OpenVINO repository's CI Doctor workflows, Teams jobs, or `common.py` exist
+here; the only memory branch is the remediator's knowledge base (see the nightly
+remediator invariants). Introduce shared imports under
 `.github/workflows/shared/agentic-workflows/` only when multiple consumers justify
 them; keep deterministic logic in the scripts directory rather than large inline
 shell/Python blocks.
@@ -143,9 +144,11 @@ and agent prompt together before changing a field's meaning.
   [compute_signature](../../../.ci/nightly_report/error_parser.py), not notebook
   names, run IDs, or job IDs. The collector separately groups infrastructure
   failures by normalized reason.
-- Current cross-run remediation tracking uses labeled PRs/issues, not a
-  `repo-memory` branch. If a future workflow adds persisted state, define and test
-  its schema, ownership, and read/write boundaries explicitly.
+- Cross-run remediation tracking uses labeled PRs/issues. Separately, the remediator
+  keeps a knowledge base of per-signature notes on the `memory/nightly-remediator`
+  `repo-memory` branch (see the nightly remediator invariants). If a future workflow
+  adds persisted state, define and test its schema, ownership, and read/write
+  boundaries explicitly.
 
 ## Nightly remediator invariants
 
@@ -177,6 +180,15 @@ workflows. Consult the source before changing them.
   ```
   Every outcome lists all affected notebooks/configs, not just the downloaded
   representative logs.
+- **Knowledge base:** `knowledge.json` on `memory/nightly-remediator` is written only
+  by `update_knowledge_base.py` (snapshot before the agent, update after it from a
+  `git archive` of the checked-out commit), never by the agent, and replaces the
+  managed `repo-memory-default` artifact because gh-aw uploads that artifact before
+  `post-steps`. Keep its schema in `knowledge_base.py` and the inline
+  `validation.script` in sync (the tests run the script with `node`), keep the update
+  step `continue-on-error`, and present its content as untrusted. The compiler rejects
+  post-steps that touch the safe-outputs file, and repo-memory deletions are not
+  propagated to the branch, so retention works by rewriting one bounded file.
 - **Remediation scope:** generated PRs are limited to notebook JSON/Python,
   `utils/**`, and root `requirements.txt`. Keep protected-file checks and patch
   caps. This restriction is for the remediator's outputs, not for authoring its
@@ -200,7 +212,13 @@ python -m pytest .github/scripts/agentic-workflows/tests .ci/nightly_report/test
 ```
 
 - **CI wiring:** new Python test directories need an explicit pytest step in
-  `codecheck.yml`. Existing collector tests are already wired there.
+  `codecheck.yml`. Existing collector tests are already wired there. The knowledge
+  base contract tests run the repo-memory validation script with `node` and skip
+  without it (it is preinstalled on GitHub-hosted runners).
+- **Compiler approval:** adding or changing a `repo-memory` `validation.script` makes
+  `gh aw compile` warn about "unapproved changes" until it is run once with
+  `--approve` after reviewing the script; the warning persists locally until the
+  lock file is committed.
 - **Inline prompt fragments:** the required `{{#runtime-import path}}` form nested in
   the body is hoisted by the compiler to the start of the prompt, separating it from
   its surrounding instructions. Use `{{#runtime-import? path}}` to keep the fragment in

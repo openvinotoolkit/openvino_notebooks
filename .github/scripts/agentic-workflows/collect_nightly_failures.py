@@ -13,7 +13,7 @@ Digest layout (`--out`):
   summary.md     entry point: run, ranked groups, already tracked and deferred groups
   run.json       run metadata from the report
   tracked.json   remediation PRs/issues found per error signature
-  groups/NN-<signature>/group.md    evidence of one error group: where it starts, affected notebooks, history, versions, excerpts
+  groups/NN-<signature>/group.md    evidence of one error group: where it starts, earlier knowledge base notes, affected notebooks, history, versions, excerpts
   groups/NN-<signature>/group.json  the same in machine-readable form
   groups/NN-<signature>/logs/       raw treon logs of representative failures (or job log extracts for infra groups)
 """
@@ -36,6 +36,7 @@ from collector_common import ALLOWED_SOURCE_REPOS, REPO_RE, GroupDigest, NoWork
 from collector_github import check_schema, download_report, resolve_run
 from collector_analysis import build_groups, fetch_history, fetch_tracked, night_from_report, select_groups
 from collector_evidence import make_context
+from collector_knowledge import attach_knowledge, fetch_knowledge
 from collector_render import build_digest, group_to_json, render_group, render_summary
 
 
@@ -130,16 +131,20 @@ def collect(args: argparse.Namespace, out: Path, warnings: List[str], now: Optio
 
         current = night_from_report(report)
         previous = fetch_history(args.source_repo, run, args.history_nights, workdir, warn)
+        knowledge = fetch_knowledge(args.repo, warn)
         digests: List[GroupDigest] = []
         used_bytes = [0]
         for index, (group, decision) in enumerate(selected, start=1):
             group_dir = out / "groups" / f"{index:02d}-{group.signature}"
             group_dir.mkdir(parents=True)
             digest = build_digest(ctx, index, group, decision, current, previous, args, group_dir, workdir, used_bytes, warn)
+            attach_knowledge(digest, knowledge)
             (group_dir / "group.md").write_text(render_group(ctx, digest, previous), encoding="utf-8")
             write_json(group_dir / "group.json", group_to_json(ctx, digest))
             digests.append(digest)
 
+        status["knowledge_signatures"] = len(knowledge["signatures"])
+        status["groups_with_knowledge"] = sum(1 for digest in digests if digest.knowledge)
         status["has_work"] = True
         status["reason"] = f"{len(selected)} failure groups selected for remediation, {len(skipped)} already tracked, {len(deferred)} deferred"
         finish(out, status, render_summary(ctx, status, digests, skipped, deferred, args))

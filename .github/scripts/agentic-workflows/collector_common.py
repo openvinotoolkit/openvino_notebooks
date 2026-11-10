@@ -174,6 +174,8 @@ class GroupDigest:
     package_reference: Optional[str]
     env_diff: List[Tuple[str, str, str]]
     env_diff_total: int
+    knowledge: Optional[dict] = None
+    related_knowledge: List[dict] = field(default_factory=list)
 
     @property
     def dir_name(self) -> str:

@@ -197,6 +197,7 @@ class FakeGh:
         self.issues = []
         self.issues_disabled = False
         self.fail_on = None
+        self.knowledge = None  # raw text of knowledge.json on the memory branch; None means the branch has no such file
 
     def add_night(self, report, artifact_id, environments=None):
         run = report["run"]
@@ -261,6 +262,11 @@ class FakeGh:
             if int(match.group(1)) not in self.job_logs:
                 raise common.GhError(args, 1, "HTTP 404: Not Found")
             return self.job_logs[int(match.group(1))].encode()
+        if path == "contents/knowledge.json":
+            assert "ref=memory%2Fnightly-remediator" in args[1] and "Accept: application/vnd.github.raw" in args, args
+            if self.knowledge is None:
+                raise common.GhError(args, 1, "HTTP 404: Not Found")
+            return self.knowledge.encode()
         raise AssertionError(f"unexpected gh call: {args}")
 
 

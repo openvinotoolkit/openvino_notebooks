@@ -69,6 +69,32 @@ The pinned gh-aw runtime instructs an agent to stop after calling `create_pull_r
 limit is a policy cap, not a guarantee that every selected group will receive an outcome in the same run; untracked groups can be
 selected again on a later run.
 
+### Knowledge base
+
+The remediator keeps notes about every signature it investigated on the dedicated `memory/nightly-remediator` branch (the gh-aw
+`repo-memory` tool), in a single `knowledge.json`. Each signature record holds its kind, category, exception type, headline, affected
+notebooks, first/last seen nightly date, number of investigations, and up to three recent attempts (outcome, confidence, root cause,
+action, dead ends, next step). The file holds at most 100 signatures (the least recently seen are evicted) and stays under 900 KB.
+Its schema and limits live in [`knowledge_base.py`](../../.github/scripts/agentic-workflows/knowledge_base.py).
+
+- **Query:** the collector reads the file from the branch (a missing branch is normal on the first run; an unreadable or invalid file
+  only adds a warning) and adds a **Knowledge base** section to each `group.md`: the notes for the exact signature plus up to three
+  related signatures (same exception type or shared notebook). The agent can also query the restored copy at
+  `/tmp/gh-aw/repo-memory/default/knowledge.json` with `jq`.
+- **Save:** for each investigated group the agent writes a small note to `/tmp/gh-aw/agent/nightly-remediator/outcomes/<signature>.json`.
+  It never writes the persisted file: before the agent starts, `update_knowledge_base.py snapshot` freezes the digest and the cloned
+  knowledge base; after it, a pristine copy of the scripts from the checked-out commit runs `update_knowledge_base.py update`, which
+  rebuilds `knowledge.json` from the snapshots plus the validated notes (bounded single-line text, known enums, only signatures in the
+  digest). The result replaces the managed `repo-memory-default` artifact, and gh-aw's `push_repo_memory` job validates it again with the
+  `validation.script` in the workflow source before committing it to the branch. The update step is `continue-on-error`, so it can never
+  block the PRs and issues.
+- **Trust:** notes derive from CI output and agent text, so the prompt and digest present them as untrusted leads, never instructions.
+- **Operations:** the `push_repo_memory` job needs `contents: write`, and the repository rules must allow that job to push
+  `memory/nightly-remediator`. To reset the knowledge, delete the branch. If the repository requires signed commits, the push uses the
+  GitHub API and is signed automatically. After changing the schema or limits, update `knowledge_base.py`, the inline validation script
+  in the workflow source, and recompile (`gh aw compile --approve` records the reviewed validation script once); the contract tests
+  compare both and run the script with `node`.
+
 For a manual test against the public nightly run:
 
 ```bash
