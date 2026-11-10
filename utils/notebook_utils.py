@@ -9,7 +9,7 @@ import threading
 import time
 from os import PathLike
 from pathlib import Path
-from typing import List, NamedTuple, Optional
+from typing import List, NamedTuple, Optional, Union
 
 # ## Virtual environment
 #
@@ -572,22 +572,33 @@ def segmentation_map_to_image(result, colormap, remove_holes: bool = False):
     :param result: A single network result after converting to pixel values in H,W or 1,H,W shape.
     :param colormap: A numpy array of shape (num_classes, 3) with an RGB value per class.
     :param remove_holes: If True, remove holes in the segmentation result.
-    :return: An RGB image where each pixel is an int8 value according to colormap.
+    :return: An RGB image where each pixel is an uint8 value according to colormap.
     """
     import cv2
     import numpy as np
 
-    if len(result.shape) != 2 and result.shape[0] != 1:
+    if not isinstance(result, np.ndarray):
+        result = np.asarray(result)
+
+    if result.ndim == 3 and result.shape[0] == 1:
+        result = result.squeeze(0)
+    elif result.ndim != 2:
         raise ValueError(f"Expected result with shape (H,W) or (1,H,W), got result with shape {result.shape}")
 
-    if len(np.unique(result)) > colormap.shape[0]:
+    num_classes = colormap.shape[0]
+    unique_values = np.unique(result)
+    if len(unique_values) > num_classes:
         raise ValueError(
-            f"Expected max {colormap[0]} classes in result, got {len(np.unique(result))} "
+            f"Expected max {num_classes} classes in result, got {len(unique_values)} "
             "different output values. Please make sure to convert the network output to "
             "pixel values before calling this function."
         )
-    elif result.shape[0] == 1:
-        result = result.squeeze(0)
+
+    if np.any(unique_values < 0) or np.any(unique_values >= num_classes):
+        raise ValueError(
+            f"Result contains class indices outside the colormap range [0, {num_classes - 1}]: "
+            f"min index {int(unique_values.min())}, max index {int(unique_values.max())}."
+        )
 
     result = result.astype(np.uint8)
 
@@ -595,6 +606,8 @@ def segmentation_map_to_image(result, colormap, remove_holes: bool = False):
     mask = np.zeros((result.shape[0], result.shape[1], 3), dtype=np.uint8)
     for label_index, color in enumerate(colormap):
         label_index_map = result == label_index
+        if not np.any(label_index_map):
+            continue
         label_index_map = label_index_map.astype(np.uint8) * 255
         contours, hierarchies = cv2.findContours(label_index_map, contour_mode, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(
@@ -608,23 +621,39 @@ def segmentation_map_to_image(result, colormap, remove_holes: bool = False):
     return mask
 
 
-def segmentation_map_to_overlay(image, result, alpha, colormap, remove_holes=False):
+def segmentation_map_to_overlay(image, result, alpha: float, colormap, remove_holes: bool = False):
     """
     Returns a new image where a segmentation mask (created with colormap) is overlayed on
     the source image.
 
     :param image: Source image.
     :param result: A single network result after converting to pixel values in H,W or 1,H,W shape.
-    :param alpha: Alpha transparency value for the overlay image.
+    :param alpha: Alpha transparency value for the overlay image (between 0.0 and 1.0).
     :param colormap: A numpy array of shape (num_classes, 3) with an RGB value per class.
     :param remove_holes: If True, remove holes in the segmentation result.
-    :return: An RGP image with segmentation mask overlayed on the source image.
+    :return: An RGB image with segmentation mask overlayed on the source image.
     """
     import cv2
     import numpy as np
 
-    if len(image.shape) == 2:
-        image = np.repeat(np.expand_dims(image, -1), 3, 2)
+    if not (0.0 <= alpha <= 1.0):
+        raise ValueError(f"Expected alpha to be between 0.0 and 1.0, got {alpha}")
+
+    if not isinstance(image, np.ndarray):
+        image = np.asarray(image)
+
+    if image.ndim == 2:
+        image = np.repeat(np.expand_dims(image, -1), 3, axis=-1)
+    elif image.ndim == 3:
+        if image.shape[2] == 1:
+            image = np.repeat(image, 3, axis=-1)
+        elif image.shape[2] == 4:
+            image = image[:, :, :3]
+        elif image.shape[2] != 3:
+            raise ValueError(f"Expected image with 1, 3, or 4 channels, got shape {image.shape}")
+    else:
+        raise ValueError(f"Expected image with shape (H,W) or (H,W,C), got shape {image.shape}")
+
     mask = segmentation_map_to_image(result, colormap, remove_holes)
     image_height, image_width = image.shape[:2]
     mask = cv2.resize(src=mask, dsize=(image_width, image_height))
@@ -643,7 +672,7 @@ def viz_result_image(
     source_image=None,
     source_title: str = None,
     result_title: str = None,
-    labels: Optional[List[Label]] = None,
+    labels: Optional[Union[SegmentationMap, List[Label]]] = None,
     resize: bool = False,
     bgr_to_rgb: bool = False,
     hide_axes: bool = False,
@@ -657,7 +686,7 @@ def viz_result_image(
                          Set bgr_to_rgb to True if source_image is in BGR format.
     :param source_title: Title to display for the source image.
     :param result_title: Title to display for the result image.
-    :param labels: list of labels. If provided, a legend will be shown with the given labels.
+    :param labels: SegmentationMap or list of labels. If provided, a legend will be shown with the given labels.
     :param resize: If true, resize the result image to the same shape as the source image.
     :param bgr_to_rgb: If true, convert the source image from BGR to RGB. Use this option if
                        source_image is a BGR image.
@@ -672,6 +701,8 @@ def viz_result_image(
     if bgr_to_rgb:
         source_image = to_rgb(source_image)
     if resize:
+        if source_image is None:
+            raise ValueError("`resize` requires `source_image` to be provided")
         result_image = cv2.resize(result_image, (source_image.shape[1], source_image.shape[0]))
 
     num_images = 1 if source_image is None else 2
@@ -688,7 +719,15 @@ def viz_result_image(
         for a in ax.ravel():
             a.axis("off")
     if labels:
-        colors = labels.get_colormap()
+        if hasattr(labels, "get_colormap") and hasattr(labels, "get_labels"):
+            colors = labels.get_colormap()
+            label_names = labels.get_labels()
+        elif isinstance(labels, (list, tuple)):
+            colors = np.array([label.color for label in labels])
+            label_names = [label.name for label in labels] if any(label.name for label in labels) else None
+        else:
+            raise TypeError(f"Expected SegmentationMap or list of Labels, got {type(labels).__name__}")
+
         lines = [
             Line2D(
                 [0],
@@ -699,9 +738,9 @@ def viz_result_image(
             )
             for c in colors
         ]
-        plt.legend(
+        ax[0, num_images - 1].legend(
             lines,
-            labels.get_labels(),
+            label_names,
             bbox_to_anchor=(1, 1),
             loc="upper left",
             prop={"size": 12},
