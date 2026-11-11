@@ -235,7 +235,7 @@ safe-outputs:
     protected-files:
       policy: blocked
       exclude: ["/requirements.txt"]
-    max-patch-size: 200
+    max-patch-size: 5000
     max-patch-files: 8
   create-issue:
     max: 5
