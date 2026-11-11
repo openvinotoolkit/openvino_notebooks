@@ -280,6 +280,7 @@
 - [Create MCP Agent using OpenVINO and Qwen-Agent](./llm-agent-mcp/llm-agent-mcp.ipynb)
 - [Create Function-calling Agent using OpenVINO and Qwen-Agent](./llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb)
 - [Multimodal AI with LFM3 and OpenVINO](./lfm3/lfm3.ipynb)
+- [Laya Decision Models with OpenVINO™](./laya-decision-models/laya-decision-models.ipynb)
 - [Image generation with Latent Consistency Model and OpenVINO](./latent-consistency-models-image-generation/latent-consistency-models-image-generation.ipynb)
 - [Text-to-Speech synthesis using Kokoro and OpenVINO GenAI](./kokoro/kokoro.ipynb)
 - [InstantID: Zero-shot Identity-Preserving Generation using OpenVINO](./instant-id/instant-id.ipynb)
