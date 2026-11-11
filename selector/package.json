@@ -14,7 +14,7 @@
     "react-dom": "19.3.1"
   },
   "overrides": {
-    "minimatch": "10.2.5"
+    "minimatch": "11.0.5"
   },
   "devDependencies": {
     "@types/node": "^26.6.3",
@@ -28,7 +28,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "eslint-plugin-simple-import-sort": "^14.0.0",
-    "glob": "14.0.3",
+    "glob": "14.0.4",
     "globals": "^17.4.0",
     "prettier": "3.9.10",
     "sass": "^1.70.0",

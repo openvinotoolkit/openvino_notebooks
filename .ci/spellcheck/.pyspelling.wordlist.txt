@@ -502,6 +502,7 @@ invertible
 io
 IoU
 ip
+IPEX
 IPs
 ipynb
 ir
@@ -1101,6 +1102,7 @@ segmenter
 Segmind
 segmind
 selfattention
+SentencePiece
 serializable
 sft
 SGD
