@@ -17,3 +17,5 @@ In this tutorial, we will:
 4. Run an email-triage example with the official `system_one` API on CPU or Intel GPU, measure inference latency and triage custom emails interactively
 
 The notebook installs `optimum-intel` from the [fork branch](https://github.com/xiangfuxwang/optimum-intel-dev/tree/laya) that adds Laya export and inference support, until it is upstreamed.
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/laya-decision-models/README.md" />
