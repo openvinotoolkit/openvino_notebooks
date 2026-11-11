@@ -85,6 +85,21 @@ def test_repo_memory_configuration_matches_the_knowledge_base_module():
         assert limit in validation_script(), limit
 
 
+def test_job_level_env_does_not_use_the_runner_context():
+    # GitHub rejects the whole workflow ("Unrecognized named-value: 'runner'") when a job-level `env` uses `runner.*`; step-level `env` and `with` may.
+    offenders = []
+    in_job_env = False
+    for number, line in enumerate(LOCK.splitlines(), start=1):
+        if line == "    env:":
+            in_job_env = True
+        elif in_job_env and (not line.strip() or len(line) - len(line.lstrip()) > 4):
+            if "runner." in line and "${{" in line:
+                offenders.append(number)
+        else:
+            in_job_env = False
+    assert offenders == []
+
+
 def step_position(name):
     return LOCK.index(f"name: {name}")
 

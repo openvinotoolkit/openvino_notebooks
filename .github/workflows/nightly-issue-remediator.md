@@ -138,7 +138,6 @@ jobs:
       REPO: ${{ github.repository }}
       SOURCE_REPO: ${{ inputs.source_repo || github.repository }}
       RUN_ID: ${{ github.event.workflow_run.id || inputs.run_id }}
-      DIGEST_DIR: ${{ runner.temp }}/nightly-remediator
     outputs:
       has_work: ${{ steps.collect.outputs.has_work }}
       groups_selected: ${{ steps.collect.outputs.groups_selected }}
@@ -149,7 +148,8 @@ jobs:
       - name: Collect failure groups and logs
         id: collect
         run: |
-          args=(--repo "$REPO" --source-repo "$SOURCE_REPO" --max-groups 5 --max-prs 3 --out "$DIGEST_DIR")
+          # The `runner` context is not available in job-level `env`, so the digest directory is derived here.
+          args=(--repo "$REPO" --source-repo "$SOURCE_REPO" --max-groups 5 --max-prs 3 --out "$RUNNER_TEMP/nightly-remediator")
           if [ -n "$RUN_ID" ]; then
             args+=(--run-id "$RUN_ID")
           fi
