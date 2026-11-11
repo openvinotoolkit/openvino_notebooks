@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 import knowledge_base as kb
+from nightly_builders import shell_command_allowed
 from test_knowledge_base import boundary_documents, invalid_documents
 import update_knowledge_base as ukb
 
@@ -143,4 +144,4 @@ def test_workflow_steps_and_prompt_use_the_updater_cli_consistently():
     assert "untrusted data" in WORKFLOW.split("## Knowledge base", 1)[1]
     for name in kb.NOTE_FIELDS:
         assert f'"{name}"' in WORKFLOW.split("**Writing.**", 1)[1]
-    assert "jq -r" in WORKFLOW and '- "jq"' in WORKFLOW
+    assert "jq -r" in WORKFLOW and shell_command_allowed(LOCK, "jq")

@@ -12,7 +12,19 @@ import collector_github as github
 import collector_evidence as evidence
 import collect_nightly_failures as cnf
 import write_noop_when_idle as noop
-from nightly_builders import ENVIRONMENTS, NIGHTLY_ID, REPO, SIG_DEPENDENCY, SIG_OTHER, SIG_TIMEOUT, SIG_INFRA, FakeGh, make_report, nightly_world
+from nightly_builders import (
+    ENVIRONMENTS,
+    NIGHTLY_ID,
+    REPO,
+    SIG_DEPENDENCY,
+    SIG_OTHER,
+    SIG_TIMEOUT,
+    SIG_INFRA,
+    FakeGh,
+    make_report,
+    nightly_world,
+    shell_command_allowed,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -340,8 +352,9 @@ def test_workflow_contract_stays_aligned_with_collector_cli_and_tracking():
     step = lock[lock.rindex("      - env:", 0, step_name) : lock.index("\n      - name:", step_name)]
     assert "GH_AW_SAFE_OUTPUTS: ${{ steps.set-runtime-paths.outputs.GH_AW_SAFE_OUTPUTS }}" in step
     assert "write_noop_when_idle.py" in step
-    assert "# --allow-tool shell(git rev-parse:*)" in lock
-    assert "# --allow-tool shell(git restore:*)" in lock
+    # The protocol runs these git commands; the agent must be allowed to (unrestricted shell or an explicit allowlist entry).
+    for command in ("git rev-parse:*", "git restore:*", "git switch:*", "git status", "git diff --check"):
+        assert shell_command_allowed(lock, command), command
     for flag in ("--repo", "--source-repo", "--run-id", "--max-groups", "--max-prs", "--out"):
         assert flag in workflow
         assert flag in collector

@@ -120,6 +120,11 @@ def make_report(failures=(), results=(), run=None, jobs=(), error_groups=(), sch
     }
 
 
+def shell_command_allowed(lock, command):
+    """Whether the compiled agent step may run `command`: all shell commands are allowed, or this exact one is on the allowlist."""
+    return re.search(r"^\s*# --allow-tool shell$", lock, re.M) is not None or f"# --allow-tool shell({command})" in lock
+
+
 def make_zip(members):
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w") as archive:
