@@ -103,24 +103,6 @@ tools:
             }
           }
         }
-  bash:
-    - "git status"
-    - "git diff"
-    - "git diff --check"
-    - "git rev-parse:*"
-    - "git restore:*"
-    - "python:*"
-    - "grep"
-    - "rg"
-    - "jq"
-    - "cat"
-    - "sed"
-    - "find"
-    - "head"
-    - "tail"
-    - "ls"
-    - "wc"
-    - "black:*"
 
 jobs:
   collect_nightly_failures:
