@@ -381,12 +381,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/3D-point-pillars/pointpillars.ipynb
   skips:
     - os:
@@ -494,13 +488,6 @@
     - os:
         - macos-13
 - notebook: notebooks/qwen3.8-mtp/qwen3.8-mtp.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-# Gated HF checkpoint (requires token) and ~2.7 GB download; not executable in CI
-- notebook: notebooks/sam-3d-body/sam-3d-body.ipynb
   skips:
     - os:
         - macos-13
