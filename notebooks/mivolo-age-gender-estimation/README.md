@@ -27,7 +27,8 @@ model estimates, not verified personal attributes.
 
 MiVOLO v2 consumes 384 x 384 crops. In this notebook, a YOLOv8 person/face
 detector first locates subjects, and the associated face and body crops are
-normalized and concatenated into a six-channel model input. OpenVINO runs the
+resized without stretching, centered with black padding, normalized and
+concatenated into a six-channel model input. OpenVINO runs the
 converted estimator, while NNCF provides accuracy-controlled INT8 quantization
 for comparison with the FP16-weight baseline.
 
@@ -52,7 +53,7 @@ Research references:
 
 ## Example result
 
-![MiVOLO demo showing detected face/body boxes and predicted age and gender](screenshot.png)
+![MiVOLO demo showing detected face/body boxes and predicted age and gender](https://github.com/user-attachments/assets/2153539e-ba11-4fe6-9dcd-f68f5dbf76d4)
 
 Representative output from the OpenVINO INT8 demo on CPU. Labels are model
 predictions, not verified attributes; results may vary with device and precision.
@@ -64,7 +65,25 @@ directory, so you can regenerate this example after running the demo.
 ## Installation instructions
 
 This is a self-contained example. We recommend running it in a dedicated virtual
-environment with Jupyter available.
+environment with Jupyter available. Use **Python 3.12** with the notebook's pinned
+packages. This is the supported combination for this example: pandas 3.0.5
+requires Python 3.11 or newer, while NumPy 1.26.4 has no Python 3.13 wheels.
+Other Python versions are not validated by this notebook.
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install jupyterlab ipykernel
+python -m ipykernel install --user --name mivolo-py312 --display-name "MiVOLO (Python 3.12)"
+jupyter lab
+```
+
+Select the **MiVOLO (Python 3.12)** kernel. The first cell verifies the Python
+version before installing the pinned packages.
+
+Verified in a fresh CPython 3.12.3 virtual environment on Linux with OpenVINO
+2026.4.0: installation and `pip check` passed, followed by conversion,
+recalibration, accuracy checks, CPU demo inference and all four benchmarks.
 
 For general environment setup, see the main
 [OpenVINO Notebooks Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/README.md).
@@ -76,6 +95,8 @@ MiVOLO loads reviewed remote code and the detector checkpoint uses pickle: only
 use trusted revisions. The first run needs network access and downloads large
 weights/data. `FORCE_MIVOLO_EXPORT=1` rebuilds the MiVOLO export.
 Conversion metadata prevents reuse of previously optimized MiVOLO FP16/INT8 IRs.
+The INT8 preprocessing revision also rejects models calibrated with square
+stretching, so existing caches are rebuilt with the original letterboxing.
 
 ## Outputs
 
@@ -98,6 +119,9 @@ accuracy-controlled quantization remain part of the conversion workflow.
 
 ## Visualization and benchmarking
 
+Conversion and validation use CPU by default, so no GPU is required before the
+device selector. Set `MIVOLO_DEVICE` to an available device or AUTO before running
+to override the default; unsupported selections raise OpenVINO errors.
 After conversion/validation, select an available device (CPU, GPU, NPU or AUTO)
 and FP16/INT8 estimator precision, then execute the demo cells. It downloads a
 sample portrait; replace `image_path` with your own image to use another input.
@@ -117,6 +141,16 @@ they are not full-pipeline latency or an accuracy measurement.
 - NNCF calibration: first 300 usable FairFace training samples.
 - Accuracy control: next 150 training samples (disjoint from calibration).
 - Final evaluation: 250 samples from the separate validation split.
+- All calibration, conversion-check, validation and demo crops reuse
+  `mivolo.data.misc.prepare_classification_images` from the pinned original
+  package: aspect-ratio-preserving resize, centered black padding, BGR-to-RGB,
+  ImageNet normalization and float32 NCHW output.
+- The PyTorch/IR comparison alone cannot detect incorrect shared preprocessing.
+  Preprocessing regression tests cover non-square crops and padding independently.
+- FP16 and INT8 validation runs sequentially on the same slice, with one
+  compiled validation model resident at a time. After a GPU resource error,
+  restart the kernel before retrying to release previous allocations. Persistent
+  errors require single-model GPU/driver investigation; no CPU retry is hidden.
 - MiVOLO original PyTorch vs exported IR: three validation samples, raw outputs,
   `atol=0.02`, `rtol=0.02` (device floating-point tolerance).
 - YOLO: deterministic synthetic-input raw-output smoke check, `atol=0.5`,
@@ -124,6 +158,18 @@ they are not full-pipeline latency or an accuracy measurement.
 - Final INT8 checks fail above 2 percentage points of gender-accuracy loss or
   0.75 years of additional age MAE. NNCF controls age MAE only; the final check
   independently enforces both budgets. Failure is not silently accepted.
+
+  With original aspect-ratio-preserving preprocessing and fresh INT8 calibration,
+  the CPU run on the 250-sample validation slice produced:
+
+  | Metric | FP16 | INT8 |
+  | --- | ---: | ---: |
+  | Gender accuracy | 90.80% | 90.80% |
+  | Age bucket-midpoint MAE (years) | 6.968 | 6.932 |
+
+  The maximum MiVOLO PyTorch/FP16 raw-output difference was 0.003972, within the
+  configured conversion tolerance. These results supersede checks made with
+  square-stretched crops; they are not directly comparable to those older results.
 
 FairFace age labels are buckets; midpoint MAE is only a proxy for exact-age MAE.
 The notebook uses fixed face regions and whole-image body crops, not a labeled
