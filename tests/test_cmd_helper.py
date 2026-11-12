@@ -7,6 +7,8 @@ Regression for #3665: paths, model IDs, or additional arg values containing
 spaces must be passed to subprocess as single arguments, not split on spaces.
 """
 
+import os
+import subprocess
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -110,3 +112,29 @@ class TestOptimumCliArguments:
             optimum_cli("test-model", Path("./my out"), show_command=True)
         cmd = mock_subprocess.call_args[0][0]
         assert cmd[-1] == "my out"
+
+
+def test_debug_logs_removes_verbosity_when_it_was_not_set(mock_subprocess, monkeypatch):
+    monkeypatch.delenv("TRANSFORMERS_VERBOSITY", raising=False)
+
+    optimum_cli("test-model", "./out", show_command=False, debug_logs=True)
+
+    assert "TRANSFORMERS_VERBOSITY" not in os.environ
+
+
+def test_debug_logs_restores_previous_verbosity(mock_subprocess, monkeypatch):
+    monkeypatch.setenv("TRANSFORMERS_VERBOSITY", "info")
+
+    optimum_cli("test-model", "./out", show_command=False, debug_logs=True)
+
+    assert os.environ["TRANSFORMERS_VERBOSITY"] == "info"
+
+
+def test_debug_logs_removes_verbosity_after_export_failure(mock_subprocess, monkeypatch):
+    monkeypatch.delenv("TRANSFORMERS_VERBOSITY", raising=False)
+    mock_subprocess.side_effect = subprocess.CalledProcessError(1, ["optimum-cli"], output=b"", stderr=b"failed")
+
+    with pytest.raises(subprocess.CalledProcessError):
+        optimum_cli("test-model", "./out", show_command=False, debug_logs=True)
+
+    assert "TRANSFORMERS_VERBOSITY" not in os.environ
