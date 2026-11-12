@@ -114,6 +114,10 @@ jobs:
         if: always()
         run: |
           python -m pytest .ci/nightly_report/tests
+      - name: Test nightly issue remediator collector
+        if: always()
+        run: |
+          python -m pytest .github/scripts/agentic-workflows/tests
       - name: Get changed files
         id: changed
         if: always() && github.event_name == 'pull_request'
