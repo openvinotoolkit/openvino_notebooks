@@ -1,4 +1,5 @@
-import subprocess
+# Required for shell-free Git test commands and CalledProcessError assertions.
+import subprocess  # nosec B404
 
 import pytest
 
