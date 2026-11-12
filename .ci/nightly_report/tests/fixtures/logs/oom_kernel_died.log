@@ -1,0 +1,56 @@
+Running Notebook test [test_llm-chatbot.ipynb]: /home/runner/work/openvino_notebooks/openvino_notebooks/test_env/bin/python -m treon --verbose test_llm-chatbot.ipynb
+Executing treon version 0.1.4
+
+-----------------------------------------------------------------------
+Collected following Notebooks for testing
+-----------------------------------------------------------------------
+test_llm-chatbot.ipynb
+-----------------------------------------------------------------------
+
+Triggered test for test_llm-chatbot.ipynb
+0.00s - Debugger warning: It seems that frozen modules are being used, which may
+0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+0.00s - to python to disable frozen modules.
+Start executing cell 0
+Start executing cell 2
+Start executing cell 4
+Start executing cell 6
+Start executing cell 9
+Compiling the model to CPU ...
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+Kernel died while waiting for execute reply.
+Traceback (most recent call last):
+  File "/usr/lib/python3.11/runpy.py", line 198, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/runpy.py", line 88, in _run_code
+    exec(code, run_globals)
+  File "/home/runner/work/openvino_notebooks/openvino_notebooks/test_env/lib/python3.11/site-packages/treon/__main__.py", line 3, in <module>
+    main()
+  File "/home/runner/work/openvino_notebooks/openvino_notebooks/test_env/lib/python3.11/site-packages/treon/treon.py", line 51, in main
+    trigger_tasks(tasks, thread_count)
+  File "/home/runner/work/openvino_notebooks/openvino_notebooks/test_env/lib/python3.11/site-packages/treon/treon.py", line 70, in trigger_tasks
+    pool.map(Task.run_tests, tasks)
+  File "/usr/lib/python3.11/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "/usr/lib/python3.11/multiprocessing/pool.py", line 125, in worker
+    result = (True, func(*args, **kwds))
+                    ^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/openvino_notebooks/openvino_notebooks/test_env/lib/python3.11/site-packages/treon/task.py", line 25, in run_tests
+    self.is_successful, console_output = execute_notebook(self.file_path, _is_verbose())
+  File "/home/runner/work/openvino_notebooks/openvino_notebooks/test_env/lib/python3.11/site-packages/nbclient/client.py", line 1005, in async_execute_cell
+    exec_reply = await self.task_poll_for_reply
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/openvino_notebooks/openvino_notebooks/test_env/lib/python3.11/site-packages/nbclient/client.py", line 806, in _async_poll_for_reply
+    await self._async_check_alive()
+  File "/home/runner/work/openvino_notebooks/openvino_notebooks/test_env/lib/python3.11/site-packages/nbclient/client.py", line 1185, in _async_check_alive
+    raise DeadKernelError("Kernel died")
+nbclient.exceptions.DeadKernelError: Kernel died
+OpenVINO after notebook execution: 2026.4.1
+OpenVINO Tokenizers after notebook execution: 2026.4.1.0
+WARNING: Package(s) not found: openvino_genai
+openvino_genai is missing in validation environment.

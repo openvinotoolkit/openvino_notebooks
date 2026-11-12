@@ -1,0 +1,58 @@
+Running Notebook test [test_hello-detection.ipynb]: /home/runner/work/openvino_notebooks/openvino_notebooks/test_env/bin/python -m treon --verbose test_hello-detection.ipynb
+Executing treon version 0.1.4
+
+-----------------------------------------------------------------------
+Collected following Notebooks for testing
+-----------------------------------------------------------------------
+test_hello-detection.ipynb
+-----------------------------------------------------------------------
+
+Triggered test for test_hello-detection.ipynb
+0.00s - Debugger warning: It seems that frozen modules are being used, which may
+0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+0.00s - to python to disable frozen modules.
+Start executing cell 1
+Start executing cell 2
+Start executing cell 4
+Start executing cell 6
+ERROR in testing test_hello-detection.ipynb
+
+An error occurred while executing the following cell:
+------------------
+compiled_model = core.compile_model(model, device.value)
+------------------
+
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mRuntimeError[0m                              Traceback (most recent call last)
+Cell [0;32mIn[5], line 1[0m
+[0;32m----> 1[0m compiled_model [38;5;241m=[39m core[38;5;241m.[39mcompile_model(model, device[38;5;241m.[39mvalue)
+
+File [0;32m/home/runner/work/openvino_notebooks/openvino_notebooks/test_env/lib/python3.11/site-packages/openvino/_ov_api.py:610[0m, in [0;36mCore.compile_model[0;34m(self, model, device_name, config, weights)[0m
+[1;32m    606[0m     [38;5;28;01mif[39;00m device_name [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m:
+[0;32m----> 610[0m     [38;5;28;01mreturn[39;00m CompiledModel(
+[1;32m    611[0m         [38;5;28msuper[39m()[38;5;241m.[39mcompile_model(model, device_name, {} [38;5;28;01mif[39;00m config [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m [38;5;28;01melse[39;00m config),
+
+[0;31mRuntimeError[0m: Exception from src/inference/src/cpp/core.cpp:112:
+Exception from src/inference/src/dev/plugin.cpp:53:
+Exception from src/plugins/intel_gpu/src/plugin/program_builder.cpp:225:
+[ GENERAL_ERROR ] Check 'false' failed at src/plugins/intel_gpu/src/graph/impls/ocl/kernel_selector_helper.cpp:1243:
+[GPU] Unsupported layout for reorder: bfyx f16 -> b_fs_yx_fsv16 u8
+
+
+
+
+
+-----------------------------------------------------------------------
+TEST RESULT
+-----------------------------------------------------------------------
+test_hello-detection.ipynb       -- FAILED 
+-----------------------------------------------------------------------
+0 succeeded, 1 failed, out of 1 notebooks tested.
+-----------------------------------------------------------------------
+
+OpenVINO after notebook execution: 2026.4.1
+OpenVINO Tokenizers after notebook execution: 2026.4.1.0
+WARNING: Package(s) not found: openvino_genai
+openvino_genai is missing in validation environment.

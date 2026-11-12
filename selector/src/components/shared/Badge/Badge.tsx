@@ -1,5 +1,7 @@
 import './Badge.scss';
 
+import { JSX } from 'react';
+
 const sparkClassNames = {
   badge: 'spark-badge spark-badge-variant-info spark-badge-shape-circle',
   badgeSizePrefix: 'spark-badge-text-size-',

@@ -1,0 +1,48 @@
+Running Notebook test [test_unittest-demo.ipynb]: /home/runner/work/openvino_notebooks/openvino_notebooks/test_env/bin/python -m treon --verbose test_unittest-demo.ipynb
+Executing treon version 0.1.4
+
+-----------------------------------------------------------------------
+Collected following Notebooks for testing
+-----------------------------------------------------------------------
+test_unittest-demo.ipynb
+-----------------------------------------------------------------------
+
+Triggered test for test_unittest-demo.ipynb
+0.00s - Debugger warning: It seems that frozen modules are being used, which may
+0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+0.00s - to python to disable frozen modules.
+Start executing cell 0
+Start executing cell 1
+Start executing cell 2
+Start executing cell 3
+Start executing cell 4
+
+test_unittest-demo.ipynb     -- FAILED 
+test_accuracy (__main__.TestModel.test_accuracy) ... FAIL
+
+======================================================================
+FAIL: test_accuracy (__main__.TestModel.test_accuracy)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/ipykernel_4321/2718281828.py", line 8, in test_accuracy
+    self.assertGreaterEqual(accuracy, 0.5, "accuracy too low")
+AssertionError: 0.42 not greater than or equal to 0.5 : accuracy too low
+
+----------------------------------------------------------------------
+Ran 1 test in 0.012s
+
+FAILED (failures=1)
+
+
+-----------------------------------------------------------------------
+TEST RESULT
+-----------------------------------------------------------------------
+test_unittest-demo.ipynb       -- FAILED 
+-----------------------------------------------------------------------
+0 succeeded, 1 failed, out of 1 notebooks tested.
+-----------------------------------------------------------------------
+
+OpenVINO after notebook execution: 2026.4.1
+OpenVINO Tokenizers after notebook execution: 2026.4.1.0
+WARNING: Package(s) not found: openvino_genai
+openvino_genai is missing in validation environment.

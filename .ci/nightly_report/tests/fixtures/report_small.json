@@ -1,0 +1,1099 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-10-07T07:05:12Z",
+  "generator": {
+    "script": ".ci/nightly_report/build_report.py",
+    "warnings": [
+      "No fragment for job 31000000002 (failed before tests)"
+    ]
+  },
+  "run": {
+    "id": 18234567890,
+    "attempt": 1,
+    "number": 412,
+    "workflow": "Nightly notebooks",
+    "repository": "openvinotoolkit/openvino_notebooks",
+    "event": "schedule",
+    "branch": "latest",
+    "nightly_date": "2026-10-07",
+    "created_at": "2026-10-07T02:00:03Z",
+    "started_at": "2026-10-07T02:00:10Z",
+    "finished_at": "2026-10-07T06:53:10Z",
+    "wall_clock_s": 17580,
+    "conclusion": "failure",
+    "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890",
+    "commit": {
+      "sha": "4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6",
+      "short_sha": "4288ef6",
+      "message": "Bump gitpython from 3.1.62 to 3.2.0 in /.docker (#3731)",
+      "author": "dependabot[bot]",
+      "date": "2026-10-06T21:14:00Z",
+      "url": "https://github.com/openvinotoolkit/openvino_notebooks/commit/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6"
+    },
+    "inputs": {
+      "ov_branch": null,
+      "docker_tag": null,
+      "timeout_s": 1000,
+      "num_batches": 2,
+      "ignore_lists": []
+    }
+  },
+  "configs": [
+    {
+      "id": "cpu-ubuntu-22.04-py3.10",
+      "device": "cpu",
+      "os": "ubuntu-22.04",
+      "os_family": "linux",
+      "python": "3.10",
+      "runner_label": "ubuntu-22.04",
+      "container_image": "ubuntu:22.04",
+      "job_ids": [
+        31000000001,
+        31000000002
+      ]
+    },
+    {
+      "id": "cpu-ubuntu-22.04-py3.12",
+      "device": "cpu",
+      "os": "ubuntu-22.04",
+      "os_family": "linux",
+      "python": "3.12",
+      "runner_label": "ubuntu-22.04",
+      "container_image": "ubuntu:22.04",
+      "job_ids": [
+        31000000003,
+        31000000004
+      ]
+    },
+    {
+      "id": "cpu-windows-2022-py3.10",
+      "device": "cpu",
+      "os": "windows-2022",
+      "os_family": "windows",
+      "python": "3.10",
+      "runner_label": "windows-2022",
+      "container_image": null,
+      "job_ids": [
+        31000000005,
+        31000000006
+      ]
+    },
+    {
+      "id": "cpu-windows-2022-py3.12",
+      "device": "cpu",
+      "os": "windows-2022",
+      "os_family": "windows",
+      "python": "3.12",
+      "runner_label": "windows-2022",
+      "container_image": null,
+      "job_ids": [
+        31000000007,
+        31000000008
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": 31000000001,
+      "name": "ubuntu-22.04 / python 3.10 / cpu (batch_0)",
+      "config_id": "cpu-ubuntu-22.04-py3.10",
+      "batch": "batch_0",
+      "conclusion": "success",
+      "started_at": "2026-10-07T02:00:00Z",
+      "completed_at": "2026-10-07T02:15:00Z",
+      "duration_s": 900,
+      "runner_name": "GitHub Actions 1",
+      "python_full_version": "3.10.18",
+      "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000001",
+      "treon_step_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000001#step:9:1",
+      "logs_artifact_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/artifacts/31000001001",
+      "failed_step": null,
+      "tests_started": true,
+      "fragment_present": true,
+      "notebooks_planned": 3,
+      "notebooks_completed": 3
+    },
+    {
+      "id": 31000000002,
+      "name": "ubuntu-22.04 / python 3.10 / cpu (batch_1)",
+      "config_id": "cpu-ubuntu-22.04-py3.10",
+      "batch": "batch_1",
+      "conclusion": "failure",
+      "started_at": "2026-10-07T02:05:00Z",
+      "completed_at": "2026-10-07T02:07:00Z",
+      "duration_s": 120,
+      "runner_name": "GitHub Actions 2",
+      "python_full_version": "3.10.18",
+      "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000002",
+      "treon_step_url": null,
+      "logs_artifact_url": null,
+      "failed_step": {
+        "number": 5,
+        "name": "Install python dependencies",
+        "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000002#step:5:1"
+      },
+      "tests_started": false,
+      "fragment_present": false,
+      "notebooks_planned": null,
+      "notebooks_completed": null
+    },
+    {
+      "id": 31000000003,
+      "name": "ubuntu-22.04 / python 3.12 / cpu (batch_0)",
+      "config_id": "cpu-ubuntu-22.04-py3.12",
+      "batch": "batch_0",
+      "conclusion": "success",
+      "started_at": "2026-10-07T03:00:00Z",
+      "completed_at": "2026-10-07T03:25:00Z",
+      "duration_s": 1500,
+      "runner_name": "GitHub Actions 3",
+      "python_full_version": "3.12.11",
+      "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000003",
+      "treon_step_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000003#step:9:1",
+      "logs_artifact_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/artifacts/31000001003",
+      "failed_step": null,
+      "tests_started": true,
+      "fragment_present": true,
+      "notebooks_planned": 3,
+      "notebooks_completed": 3
+    },
+    {
+      "id": 31000000004,
+      "name": "ubuntu-22.04 / python 3.12 / cpu (batch_1)",
+      "config_id": "cpu-ubuntu-22.04-py3.12",
+      "batch": "batch_1",
+      "conclusion": "timed_out",
+      "started_at": "2026-10-07T03:05:00Z",
+      "completed_at": "2026-10-07T03:26:40Z",
+      "duration_s": 1300,
+      "runner_name": "GitHub Actions 4",
+      "python_full_version": "3.12.11",
+      "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000004",
+      "treon_step_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000004#step:9:1",
+      "logs_artifact_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/artifacts/31000001004",
+      "failed_step": {
+        "number": 9,
+        "name": "Test notebooks",
+        "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000004#step:9:1"
+      },
+      "tests_started": true,
+      "fragment_present": true,
+      "notebooks_planned": 3,
+      "notebooks_completed": 3
+    },
+    {
+      "id": 31000000005,
+      "name": "windows-2022 / python 3.10 / cpu (batch_0)",
+      "config_id": "cpu-windows-2022-py3.10",
+      "batch": "batch_0",
+      "conclusion": "failure",
+      "started_at": "2026-10-07T04:00:00Z",
+      "completed_at": "2026-10-07T04:13:20Z",
+      "duration_s": 800,
+      "runner_name": "GitHub Actions 5",
+      "python_full_version": "3.10.18",
+      "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000005",
+      "treon_step_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000005#step:9:1",
+      "logs_artifact_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/artifacts/31000001005",
+      "failed_step": {
+        "number": 9,
+        "name": "Test notebooks",
+        "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000005#step:9:1"
+      },
+      "tests_started": true,
+      "fragment_present": true,
+      "notebooks_planned": 3,
+      "notebooks_completed": 3
+    },
+    {
+      "id": 31000000006,
+      "name": "windows-2022 / python 3.10 / cpu (batch_1)",
+      "config_id": "cpu-windows-2022-py3.10",
+      "batch": "batch_1",
+      "conclusion": "cancelled",
+      "started_at": "2026-10-07T04:05:00Z",
+      "completed_at": null,
+      "duration_s": null,
+      "runner_name": "GitHub Actions 6",
+      "python_full_version": "3.10.18",
+      "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000006",
+      "treon_step_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000006#step:9:1",
+      "logs_artifact_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/artifacts/31000001006",
+      "failed_step": {
+        "number": 9,
+        "name": "Test notebooks",
+        "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000006#step:9:1"
+      },
+      "tests_started": true,
+      "fragment_present": true,
+      "notebooks_planned": 3,
+      "notebooks_completed": 1
+    },
+    {
+      "id": 31000000007,
+      "name": "windows-2022 / python 3.12 / cpu (batch_0)",
+      "config_id": "cpu-windows-2022-py3.12",
+      "batch": "batch_0",
+      "conclusion": "failure",
+      "started_at": "2026-10-07T05:00:00Z",
+      "completed_at": "2026-10-07T05:26:40Z",
+      "duration_s": 1600,
+      "runner_name": "GitHub Actions 7",
+      "python_full_version": "3.12.11",
+      "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000007",
+      "treon_step_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000007#step:9:1",
+      "logs_artifact_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/artifacts/31000001007",
+      "failed_step": {
+        "number": 9,
+        "name": "Test notebooks",
+        "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000007#step:9:1"
+      },
+      "tests_started": true,
+      "fragment_present": true,
+      "notebooks_planned": 3,
+      "notebooks_completed": 3
+    },
+    {
+      "id": 31000000008,
+      "name": "windows-2022 / python 3.12 / cpu (batch_1)",
+      "config_id": "cpu-windows-2022-py3.12",
+      "batch": "batch_1",
+      "conclusion": "success",
+      "started_at": "2026-10-07T05:05:00Z",
+      "completed_at": "2026-10-07T05:11:40Z",
+      "duration_s": 400,
+      "runner_name": "GitHub Actions 8",
+      "python_full_version": "3.12.11",
+      "url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000008",
+      "treon_step_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000008#step:9:1",
+      "logs_artifact_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/artifacts/31000001008",
+      "failed_step": null,
+      "tests_started": true,
+      "fragment_present": true,
+      "notebooks_planned": 3,
+      "notebooks_completed": 3
+    }
+  ],
+  "notebooks": [
+    {
+      "path": "hello-world/hello-world.ipynb",
+      "dir": "hello-world",
+      "title": "Hello Image Classification",
+      "tags": {
+        "categories": [
+          "API Overview"
+        ],
+        "tasks": [
+          "Image Classification"
+        ],
+        "libraries": [],
+        "other": []
+      },
+      "dir_tree_sha": "fbb969117edfa916b86dfb67fd11decf1e336df0",
+      "last_modified": {
+        "sha": "4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6",
+        "short_sha": "4288ef6",
+        "message": "Update hello-world",
+        "author": "OpenVINO Bot",
+        "date": "2026-09-30T12:00:00Z",
+        "url": "https://github.com/openvinotoolkit/openvino_notebooks/commit/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6"
+      },
+      "links": {
+        "source": "https://github.com/openvinotoolkit/openvino_notebooks/blob/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/hello-world/hello-world.ipynb",
+        "latest": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/hello-world/hello-world.ipynb",
+        "history": "https://github.com/openvinotoolkit/openvino_notebooks/commits/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/hello-world"
+      }
+    },
+    {
+      "path": "async-api/async-api.ipynb",
+      "dir": "async-api",
+      "title": "Asynchronous Inference with OpenVINO",
+      "tags": {
+        "categories": [
+          "API Overview"
+        ],
+        "tasks": [
+          "Image Classification"
+        ],
+        "libraries": [],
+        "other": []
+      },
+      "dir_tree_sha": "dbcf77d5452be53841e57fc2c76c49c5bf8e7d09",
+      "last_modified": {
+        "sha": "4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6",
+        "short_sha": "4288ef6",
+        "message": "Update async-api",
+        "author": "OpenVINO Bot",
+        "date": "2026-09-30T12:00:00Z",
+        "url": "https://github.com/openvinotoolkit/openvino_notebooks/commit/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6"
+      },
+      "links": {
+        "source": "https://github.com/openvinotoolkit/openvino_notebooks/blob/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/async-api/async-api.ipynb",
+        "latest": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/async-api/async-api.ipynb",
+        "history": "https://github.com/openvinotoolkit/openvino_notebooks/commits/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/async-api"
+      }
+    },
+    {
+      "path": "tflite-to-openvino/tflite-to-openvino.ipynb",
+      "dir": "tflite-to-openvino",
+      "title": "Convert a TensorFlow Lite Model to OpenVINO",
+      "tags": {
+        "categories": [
+          "Model Demos"
+        ],
+        "tasks": [
+          "Image Classification"
+        ],
+        "libraries": [],
+        "other": []
+      },
+      "dir_tree_sha": "4d96eec8ac044aefb369bcf617daa175173b3243",
+      "last_modified": {
+        "sha": "4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6",
+        "short_sha": "4288ef6",
+        "message": "Update tflite-to-openvino",
+        "author": "OpenVINO Bot",
+        "date": "2026-09-30T12:00:00Z",
+        "url": "https://github.com/openvinotoolkit/openvino_notebooks/commit/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6"
+      },
+      "links": {
+        "source": "https://github.com/openvinotoolkit/openvino_notebooks/blob/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/tflite-to-openvino/tflite-to-openvino.ipynb",
+        "latest": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/tflite-to-openvino/tflite-to-openvino.ipynb",
+        "history": "https://github.com/openvinotoolkit/openvino_notebooks/commits/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/tflite-to-openvino"
+      }
+    },
+    {
+      "path": "llm-chatbot/llm-chatbot.ipynb",
+      "dir": "llm-chatbot",
+      "title": "Create an LLM-powered Chatbot using OpenVINO",
+      "tags": {
+        "categories": [
+          "Model Demos"
+        ],
+        "tasks": [
+          "Text Generation"
+        ],
+        "libraries": [],
+        "other": []
+      },
+      "dir_tree_sha": "e31a79119ac14a74048821051159f4043bb3fe44",
+      "last_modified": {
+        "sha": "4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6",
+        "short_sha": "4288ef6",
+        "message": "Update llm-chatbot",
+        "author": "OpenVINO Bot",
+        "date": "2026-09-30T12:00:00Z",
+        "url": "https://github.com/openvinotoolkit/openvino_notebooks/commit/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6"
+      },
+      "links": {
+        "source": "https://github.com/openvinotoolkit/openvino_notebooks/blob/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/llm-chatbot/llm-chatbot.ipynb",
+        "latest": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/llm-chatbot/llm-chatbot.ipynb",
+        "history": "https://github.com/openvinotoolkit/openvino_notebooks/commits/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/llm-chatbot"
+      }
+    },
+    {
+      "path": "whisper-asr/whisper-asr.ipynb",
+      "dir": "whisper-asr",
+      "title": "Speech recognition with Whisper and OpenVINO",
+      "tags": {
+        "categories": [
+          "Model Demos"
+        ],
+        "tasks": [
+          "Speech Recognition"
+        ],
+        "libraries": [],
+        "other": []
+      },
+      "dir_tree_sha": "fcc2c9d7162aef7253f4d3294443cecfbef80597",
+      "last_modified": {
+        "sha": "4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6",
+        "short_sha": "4288ef6",
+        "message": "Update whisper-asr",
+        "author": "OpenVINO Bot",
+        "date": "2026-09-30T12:00:00Z",
+        "url": "https://github.com/openvinotoolkit/openvino_notebooks/commit/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6"
+      },
+      "links": {
+        "source": "https://github.com/openvinotoolkit/openvino_notebooks/blob/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/whisper-asr/whisper-asr.ipynb",
+        "latest": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/whisper-asr/whisper-asr.ipynb",
+        "history": "https://github.com/openvinotoolkit/openvino_notebooks/commits/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/whisper-asr"
+      }
+    },
+    {
+      "path": "gpu-plugin/gpu-plugin.ipynb",
+      "dir": "gpu-plugin",
+      "title": "Working with GPUs in OpenVINO",
+      "tags": {
+        "categories": [
+          "API Overview"
+        ],
+        "tasks": [
+          "Image Classification"
+        ],
+        "libraries": [],
+        "other": []
+      },
+      "dir_tree_sha": "600c1d6ae357661952bb3a07a99f664e36fd5d83",
+      "last_modified": null,
+      "links": {
+        "source": "https://github.com/openvinotoolkit/openvino_notebooks/blob/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/gpu-plugin/gpu-plugin.ipynb",
+        "latest": "https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/gpu-plugin/gpu-plugin.ipynb",
+        "history": "https://github.com/openvinotoolkit/openvino_notebooks/commits/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/gpu-plugin"
+      }
+    }
+  ],
+  "results": [
+    {
+      "notebook": "hello-world/hello-world.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.10",
+      "batch": "batch_0",
+      "job_id": 31000000001,
+      "status": "passed",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:03:00Z",
+      "duration_s": 30.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1503000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "000000000003",
+      "failure_id": null
+    },
+    {
+      "notebook": "async-api/async-api.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.10",
+      "batch": "batch_0",
+      "job_id": 31000000001,
+      "status": "passed",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:06:00Z",
+      "duration_s": 120.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1506000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "000000000006",
+      "failure_id": null
+    },
+    {
+      "notebook": "tflite-to-openvino/tflite-to-openvino.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.10",
+      "batch": "batch_0",
+      "job_id": 31000000001,
+      "status": "passed",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:09:00Z",
+      "duration_s": 200.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1509000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "000000000009",
+      "failure_id": null
+    },
+    {
+      "notebook": "llm-chatbot/llm-chatbot.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.10",
+      "batch": "batch_1",
+      "job_id": 31000000002,
+      "status": "not_run",
+      "skip_reason": null,
+      "not_run_reason": "job_failed_before_tests:Install python dependencies",
+      "started_at": null,
+      "duration_s": null,
+      "timeout_s": null,
+      "peak_rss_bytes": null,
+      "openvino_before": null,
+      "packages": {},
+      "env_id": null,
+      "failure_id": null
+    },
+    {
+      "notebook": "whisper-asr/whisper-asr.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.10",
+      "batch": "batch_1",
+      "job_id": 31000000002,
+      "status": "not_run",
+      "skip_reason": null,
+      "not_run_reason": "job_failed_before_tests:Install python dependencies",
+      "started_at": null,
+      "duration_s": null,
+      "timeout_s": null,
+      "peak_rss_bytes": null,
+      "openvino_before": null,
+      "packages": {},
+      "env_id": null,
+      "failure_id": null
+    },
+    {
+      "notebook": "gpu-plugin/gpu-plugin.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.10",
+      "batch": "batch_1",
+      "job_id": 31000000002,
+      "status": "not_run",
+      "skip_reason": null,
+      "not_run_reason": "job_failed_before_tests:Install python dependencies",
+      "started_at": null,
+      "duration_s": null,
+      "timeout_s": null,
+      "peak_rss_bytes": null,
+      "openvino_before": null,
+      "packages": {},
+      "env_id": null,
+      "failure_id": null
+    },
+    {
+      "notebook": "hello-world/hello-world.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.12",
+      "batch": "batch_0",
+      "job_id": 31000000003,
+      "status": "passed",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:12:00Z",
+      "duration_s": 32.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1512000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "00000000000c",
+      "failure_id": null
+    },
+    {
+      "notebook": "async-api/async-api.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.12",
+      "batch": "batch_0",
+      "job_id": 31000000003,
+      "status": "passed",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:15:00Z",
+      "duration_s": 130.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1515000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "00000000000f",
+      "failure_id": null
+    },
+    {
+      "notebook": "tflite-to-openvino/tflite-to-openvino.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.12",
+      "batch": "batch_0",
+      "job_id": 31000000003,
+      "status": "timeout",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:18:00Z",
+      "duration_s": 1000.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1518000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "000000000012",
+      "failure_id": "cpu-ubuntu-22.04-py3.12/tflite-to-openvino/tflite-to-openvino.ipynb"
+    },
+    {
+      "notebook": "llm-chatbot/llm-chatbot.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.12",
+      "batch": "batch_1",
+      "job_id": 31000000004,
+      "status": "passed",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:21:00Z",
+      "duration_s": 850.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1521000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.4.0.dev20251007",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "000000000015",
+      "failure_id": null
+    },
+    {
+      "notebook": "whisper-asr/whisper-asr.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.12",
+      "batch": "batch_1",
+      "job_id": 31000000004,
+      "status": "error",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:24:00Z",
+      "duration_s": null,
+      "timeout_s": 1000,
+      "peak_rss_bytes": null,
+      "openvino_before": "2025.3.0",
+      "packages": {},
+      "env_id": null,
+      "failure_id": "cpu-ubuntu-22.04-py3.12/whisper-asr/whisper-asr.ipynb"
+    },
+    {
+      "notebook": "gpu-plugin/gpu-plugin.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.12",
+      "batch": "batch_1",
+      "job_id": 31000000004,
+      "status": "skipped",
+      "skip_reason": "skip_config",
+      "not_run_reason": null,
+      "started_at": null,
+      "duration_s": null,
+      "timeout_s": null,
+      "peak_rss_bytes": null,
+      "openvino_before": null,
+      "packages": {},
+      "env_id": null,
+      "failure_id": null
+    },
+    {
+      "notebook": "hello-world/hello-world.ipynb",
+      "config_id": "cpu-windows-2022-py3.10",
+      "batch": "batch_0",
+      "job_id": 31000000005,
+      "status": "passed",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:27:00Z",
+      "duration_s": 45.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1527000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "00000000001b",
+      "failure_id": null
+    },
+    {
+      "notebook": "async-api/async-api.ipynb",
+      "config_id": "cpu-windows-2022-py3.10",
+      "batch": "batch_0",
+      "job_id": 31000000005,
+      "status": "failed",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:30:00Z",
+      "duration_s": 60.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1530000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "00000000001e",
+      "failure_id": "cpu-windows-2022-py3.10/async-api/async-api.ipynb"
+    },
+    {
+      "notebook": "tflite-to-openvino/tflite-to-openvino.ipynb",
+      "config_id": "cpu-windows-2022-py3.10",
+      "batch": "batch_0",
+      "job_id": 31000000005,
+      "status": "passed",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:33:00Z",
+      "duration_s": 240.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1533000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "000000000021",
+      "failure_id": null
+    },
+    {
+      "notebook": "llm-chatbot/llm-chatbot.ipynb",
+      "config_id": "cpu-windows-2022-py3.10",
+      "batch": "batch_1",
+      "job_id": 31000000006,
+      "status": "skipped",
+      "skip_reason": "skip_config",
+      "not_run_reason": null,
+      "started_at": null,
+      "duration_s": null,
+      "timeout_s": null,
+      "peak_rss_bytes": null,
+      "openvino_before": null,
+      "packages": {},
+      "env_id": null,
+      "failure_id": null
+    },
+    {
+      "notebook": "whisper-asr/whisper-asr.ipynb",
+      "config_id": "cpu-windows-2022-py3.10",
+      "batch": "batch_1",
+      "job_id": 31000000006,
+      "status": "not_run",
+      "skip_reason": null,
+      "not_run_reason": "job_cancelled",
+      "started_at": null,
+      "duration_s": null,
+      "timeout_s": null,
+      "peak_rss_bytes": null,
+      "openvino_before": null,
+      "packages": {},
+      "env_id": null,
+      "failure_id": null
+    },
+    {
+      "notebook": "gpu-plugin/gpu-plugin.ipynb",
+      "config_id": "cpu-windows-2022-py3.10",
+      "batch": "batch_1",
+      "job_id": 31000000006,
+      "status": "not_run",
+      "skip_reason": null,
+      "not_run_reason": "job_cancelled",
+      "started_at": null,
+      "duration_s": null,
+      "timeout_s": null,
+      "peak_rss_bytes": null,
+      "openvino_before": null,
+      "packages": {},
+      "env_id": null,
+      "failure_id": null
+    },
+    {
+      "notebook": "hello-world/hello-world.ipynb",
+      "config_id": "cpu-windows-2022-py3.12",
+      "batch": "batch_0",
+      "job_id": 31000000007,
+      "status": "passed",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:36:00Z",
+      "duration_s": 50.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1536000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "000000000024",
+      "failure_id": null
+    },
+    {
+      "notebook": "async-api/async-api.ipynb",
+      "config_id": "cpu-windows-2022-py3.12",
+      "batch": "batch_0",
+      "job_id": 31000000007,
+      "status": "failed",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:39:00Z",
+      "duration_s": 65.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1539000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "000000000027",
+      "failure_id": "cpu-windows-2022-py3.12/async-api/async-api.ipynb"
+    },
+    {
+      "notebook": "tflite-to-openvino/tflite-to-openvino.ipynb",
+      "config_id": "cpu-windows-2022-py3.12",
+      "batch": "batch_0",
+      "job_id": 31000000007,
+      "status": "timeout",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:42:00Z",
+      "duration_s": 1000.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1542000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "00000000002a",
+      "failure_id": "cpu-windows-2022-py3.12/tflite-to-openvino/tflite-to-openvino.ipynb"
+    },
+    {
+      "notebook": "llm-chatbot/llm-chatbot.ipynb",
+      "config_id": "cpu-windows-2022-py3.12",
+      "batch": "batch_1",
+      "job_id": 31000000008,
+      "status": "skipped",
+      "skip_reason": "skip_config",
+      "not_run_reason": null,
+      "started_at": null,
+      "duration_s": null,
+      "timeout_s": null,
+      "peak_rss_bytes": null,
+      "openvino_before": null,
+      "packages": {},
+      "env_id": null,
+      "failure_id": null
+    },
+    {
+      "notebook": "whisper-asr/whisper-asr.ipynb",
+      "config_id": "cpu-windows-2022-py3.12",
+      "batch": "batch_1",
+      "job_id": 31000000008,
+      "status": "failed",
+      "skip_reason": null,
+      "not_run_reason": null,
+      "started_at": "2026-10-07T03:45:00Z",
+      "duration_s": 90.0,
+      "timeout_s": 1000,
+      "peak_rss_bytes": 1545000000,
+      "openvino_before": "2025.3.0",
+      "packages": {
+        "openvino": "2025.3.0",
+        "numpy": "1.26.4",
+        "torch": "2.8.0+cpu"
+      },
+      "env_id": "00000000002d",
+      "failure_id": "cpu-windows-2022-py3.12/whisper-asr/whisper-asr.ipynb"
+    },
+    {
+      "notebook": "gpu-plugin/gpu-plugin.ipynb",
+      "config_id": "cpu-windows-2022-py3.12",
+      "batch": "batch_1",
+      "job_id": 31000000008,
+      "status": "skipped",
+      "skip_reason": "skip_config",
+      "not_run_reason": null,
+      "started_at": null,
+      "duration_s": null,
+      "timeout_s": null,
+      "peak_rss_bytes": null,
+      "openvino_before": null,
+      "packages": {},
+      "env_id": null,
+      "failure_id": null
+    }
+  ],
+  "failures": [
+    {
+      "id": "cpu-ubuntu-22.04-py3.12/tflite-to-openvino/tflite-to-openvino.ipynb",
+      "notebook": "tflite-to-openvino/tflite-to-openvino.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.12",
+      "job_id": 31000000003,
+      "status": "timeout",
+      "category": "timeout",
+      "error_class": "timeout",
+      "signature": "9b8c7d6e5f40",
+      "cell_index": 12,
+      "cell_source_excerpt": "model.generate(**inputs)",
+      "exception_type": null,
+      "exception_message": "Notebook execution exceeded the timeout of 1000 s",
+      "traceback_excerpt": null,
+      "log_tail": "...\nNotebook execution exceeded the timeout of 1000 s",
+      "links": {
+        "job": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000003",
+        "treon_step": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000003#step:9:1",
+        "logs_artifact": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/artifacts/31000001003",
+        "log_file": "logs/tflite-to-openvino__tflite-to-openvino.log",
+        "notebook_source": "https://github.com/openvinotoolkit/openvino_notebooks/blob/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/tflite-to-openvino/tflite-to-openvino.ipynb"
+      }
+    },
+    {
+      "id": "cpu-ubuntu-22.04-py3.12/whisper-asr/whisper-asr.ipynb",
+      "notebook": "whisper-asr/whisper-asr.ipynb",
+      "config_id": "cpu-ubuntu-22.04-py3.12",
+      "job_id": 31000000004,
+      "status": "error",
+      "category": "harness_error",
+      "error_class": "harness",
+      "signature": "0a1b2c3d4e5f",
+      "cell_index": null,
+      "cell_source_excerpt": null,
+      "exception_type": "HarnessError",
+      "exception_message": "Failed to create notebook venv:\npip install exited with code 1 | retries disabled",
+      "traceback_excerpt": null,
+      "log_tail": "...\nFailed to create notebook venv:\npip install exited with code 1 | retries disabled",
+      "links": {
+        "job": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000004",
+        "treon_step": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000004#step:9:1",
+        "logs_artifact": null,
+        "log_file": null,
+        "notebook_source": "https://github.com/openvinotoolkit/openvino_notebooks/blob/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/whisper-asr/whisper-asr.ipynb"
+      }
+    },
+    {
+      "id": "cpu-windows-2022-py3.10/async-api/async-api.ipynb",
+      "notebook": "async-api/async-api.ipynb",
+      "config_id": "cpu-windows-2022-py3.10",
+      "job_id": 31000000005,
+      "status": "failed",
+      "category": "cell_error",
+      "error_class": "dependency",
+      "signature": "3f2a9c1b7d4e",
+      "cell_index": 7,
+      "cell_source_excerpt": "import _speedups",
+      "exception_type": "ImportError",
+      "exception_message": "DLL load failed while importing _speedups: The specified module could not be found.",
+      "traceback_excerpt": "Traceback (most recent call last):\n  File \"<cell>\", line 1, in <module>\nImportError: DLL load failed while importing _speedups: The specified module could not be found.",
+      "log_tail": "...\nDLL load failed while importing _speedups: The specified module could not be found.",
+      "links": {
+        "job": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000005",
+        "treon_step": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000005#step:9:1",
+        "logs_artifact": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/artifacts/31000001005",
+        "log_file": "logs/async-api__async-api.log",
+        "notebook_source": "https://github.com/openvinotoolkit/openvino_notebooks/blob/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/async-api/async-api.ipynb"
+      }
+    },
+    {
+      "id": "cpu-windows-2022-py3.12/async-api/async-api.ipynb",
+      "notebook": "async-api/async-api.ipynb",
+      "config_id": "cpu-windows-2022-py3.12",
+      "job_id": 31000000007,
+      "status": "failed",
+      "category": "cell_error",
+      "error_class": "dependency",
+      "signature": "3f2a9c1b7d4e",
+      "cell_index": 7,
+      "cell_source_excerpt": "import _speedups",
+      "exception_type": "ImportError",
+      "exception_message": "DLL load failed while importing _speedups: The specified module could not be found.",
+      "traceback_excerpt": "Traceback (most recent call last):\n  File \"<cell>\", line 1, in <module>\nImportError: DLL load failed while importing _speedups: The specified module could not be found.",
+      "log_tail": "...\nDLL load failed while importing _speedups: The specified module could not be found.",
+      "links": {
+        "job": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000007",
+        "treon_step": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000007#step:9:1",
+        "logs_artifact": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/artifacts/31000001007",
+        "log_file": "logs/async-api__async-api.log",
+        "notebook_source": "https://github.com/openvinotoolkit/openvino_notebooks/blob/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/async-api/async-api.ipynb"
+      }
+    },
+    {
+      "id": "cpu-windows-2022-py3.12/tflite-to-openvino/tflite-to-openvino.ipynb",
+      "notebook": "tflite-to-openvino/tflite-to-openvino.ipynb",
+      "config_id": "cpu-windows-2022-py3.12",
+      "job_id": 31000000007,
+      "status": "timeout",
+      "category": "timeout",
+      "error_class": "timeout",
+      "signature": "9b8c7d6e5f40",
+      "cell_index": 12,
+      "cell_source_excerpt": "model.generate(**inputs)",
+      "exception_type": null,
+      "exception_message": "Notebook execution exceeded the timeout of 1000 s",
+      "traceback_excerpt": null,
+      "log_tail": "...\nNotebook execution exceeded the timeout of 1000 s",
+      "links": {
+        "job": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000007",
+        "treon_step": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000007#step:9:1",
+        "logs_artifact": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/artifacts/31000001007",
+        "log_file": "logs/tflite-to-openvino__tflite-to-openvino.log",
+        "notebook_source": "https://github.com/openvinotoolkit/openvino_notebooks/blob/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/tflite-to-openvino/tflite-to-openvino.ipynb"
+      }
+    },
+    {
+      "id": "cpu-windows-2022-py3.12/whisper-asr/whisper-asr.ipynb",
+      "notebook": "whisper-asr/whisper-asr.ipynb",
+      "config_id": "cpu-windows-2022-py3.12",
+      "job_id": 31000000008,
+      "status": "failed",
+      "category": "cell_error",
+      "error_class": "dependency",
+      "signature": "3f2a9c1b7d4e",
+      "cell_index": 3,
+      "cell_source_excerpt": "import _speedups",
+      "exception_type": "ImportError",
+      "exception_message": "DLL load failed while importing _speedups: The specified module could not be found.",
+      "traceback_excerpt": "Traceback (most recent call last):\n  File \"<cell>\", line 1, in <module>\nImportError: DLL load failed while importing _speedups: The specified module could not be found.",
+      "log_tail": "...\nDLL load failed while importing _speedups: The specified module could not be found.",
+      "links": {
+        "job": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000008",
+        "treon_step": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/job/31000000008#step:9:1",
+        "logs_artifact": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/18234567890/artifacts/31000001008",
+        "log_file": "logs/whisper-asr__whisper-asr.log",
+        "notebook_source": "https://github.com/openvinotoolkit/openvino_notebooks/blob/4288ef68a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/notebooks/whisper-asr/whisper-asr.ipynb"
+      }
+    }
+  ],
+  "error_groups": [
+    {
+      "signature": "3f2a9c1b7d4e",
+      "category": "cell_error",
+      "error_class": "dependency",
+      "exception_type": "ImportError",
+      "exception_message": "DLL load failed while importing _speedups: The specified module could not be found.",
+      "occurrences": 3,
+      "notebooks": [
+        "async-api/async-api.ipynb",
+        "whisper-asr/whisper-asr.ipynb"
+      ],
+      "configs": [
+        "cpu-windows-2022-py3.10",
+        "cpu-windows-2022-py3.12"
+      ]
+    },
+    {
+      "signature": "9b8c7d6e5f40",
+      "category": "timeout",
+      "error_class": "timeout",
+      "exception_type": null,
+      "exception_message": "Notebook execution exceeded the timeout of 1000 s",
+      "occurrences": 2,
+      "notebooks": [
+        "tflite-to-openvino/tflite-to-openvino.ipynb"
+      ],
+      "configs": [
+        "cpu-ubuntu-22.04-py3.12",
+        "cpu-windows-2022-py3.12"
+      ]
+    },
+    {
+      "signature": "0a1b2c3d4e5f",
+      "category": "harness_error",
+      "error_class": "harness",
+      "exception_type": "HarnessError",
+      "exception_message": "Failed to create notebook venv:\npip install exited with code 1 | retries disabled",
+      "occurrences": 1,
+      "notebooks": [
+        "whisper-asr/whisper-asr.ipynb"
+      ],
+      "configs": [
+        "cpu-ubuntu-22.04-py3.12"
+      ]
+    }
+  ]
+}

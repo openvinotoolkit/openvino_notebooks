@@ -1,7 +1,7 @@
 import './Dropdown.scss';
 
 import ChevronIcon from '@assets/images/chevron.svg?react';
-import { ForwardedRef, forwardRef, useEffect, useRef, useState } from 'react';
+import { ForwardedRef, forwardRef, JSX, useEffect, useRef, useState } from 'react';
 
 const useIsOpened = () => {
   const [isOpened, setIsOpened] = useState<boolean>(false);

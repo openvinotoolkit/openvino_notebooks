@@ -4,6 +4,7 @@ import gc
 import torch
 import PIL.Image
 from diffusers import AutoencoderKLWan, WanImageToVideoPipeline, DiffusionPipeline, UniPCMultistepScheduler
+from diffusers.models.autoencoders.autoencoder_kl_wan import CACHE_T, WanResample, unpatchify
 from diffusers.video_processor import VideoProcessor
 from diffusers.image_processor import PipelineImageInput
 from transformers import AutoTokenizer
@@ -34,14 +35,75 @@ def cleanup_torchscript_cache():
 TEXT_ENCODER_PATH = "text_encoder.xml"
 # IMAGE_ENCODER_PATH = "image_encoder.xml"
 VAE_ENCODER_PATH = "vae_encoder.xml"
-VAE_DECODER_PATH = "vae_decoder.xml"
+VAE_DECODER_FIRST_FRAME_PATH = "vae_decoder_first_frame.xml"
+VAE_DECODER_NEXT_FRAME_PATH = "vae_decoder_next_frame.xml"
 TRANSFORMER_PATH = "transformer.xml"
+
+
+class WanVAEFirstFrameDecoder(torch.nn.Module):
+    """Decodes latent frame 0 and returns the causal-conv caches for the following frames."""
+
+    def __init__(self, vae):
+        super().__init__()
+        self.vae = vae
+
+    def forward(self, z):
+        feat_cache = [None] * self.vae._cached_conv_counts["decoder"]
+        feat_idx = [0]
+        rep_inputs = {}
+
+        def remember_upsample_input(module, args, kwargs):
+            idx = kwargs.get("feat_idx", args[2] if len(args) > 2 else None)[0]
+            if module.mode == "upsample3d" and feat_cache[idx] is None:
+                rep_inputs[idx] = args[0]
+
+        hooks = [m.register_forward_pre_hook(remember_upsample_input, with_kwargs=True) for m in self.vae.decoder.modules() if isinstance(m, WanResample)]
+        try:
+            out = self.vae.decoder(self.vae.post_quant_conv(z), feat_cache=feat_cache, feat_idx=feat_idx, first_chunk=True)
+        finally:
+            for hook in hooks:
+                hook.remove()
+
+        caches = []
+        for idx in range(feat_idx[0]):
+            cache = feat_cache[idx]
+            if isinstance(cache, str):
+                cache = torch.zeros_like(rep_inputs[idx][:, :, -1:])
+            # a missing history frame is equivalent to the causal zero padding
+            while cache.shape[2] < CACHE_T:
+                cache = torch.cat([torch.zeros_like(cache[:, :, :1]), cache], dim=2)
+            caches.append(cache)
+        return (self._postprocess(out), *caches)
+
+    def _postprocess(self, out):
+        if self.vae.config.patch_size is not None:
+            out = unpatchify(out, patch_size=self.vae.config.patch_size)
+        return torch.clamp(out, min=-1.0, max=1.0)
+
+
+class WanVAENextFrameDecoder(WanVAEFirstFrameDecoder):
+    """Decodes latent frame i > 0 from the caches produced by the previous frame."""
+
+    def forward(self, z, *caches):
+        feat_cache = list(caches)
+        out = self.vae.decoder(self.vae.post_quant_conv(z), feat_cache=feat_cache, feat_idx=[0])
+        return (self._postprocess(out), *feat_cache)
+
+
+def make_vae_decoder_stateful(ov_model):
+    """Keeps the causal-conv caches of the next-frame decoder inside OpenVINO as model states."""
+    from openvino._offline_transformations import apply_make_stateful_transformation
+
+    for i, (cache_input, cache_output) in enumerate(zip(ov_model.inputs[1:], ov_model.outputs[1:])):
+        cache_input.get_tensor().set_names({f"cache.{i}"})
+        cache_output.get_tensor().set_names({f"present_cache.{i}"})
+    apply_make_stateful_transformation(ov_model, {f"cache.{i}": f"present_cache.{i}" for i in range(len(ov_model.inputs) - 1)})
 
 
 def convert_pipeline(model_id, output_dir, compression_config=None):
     output_dir = Path(output_dir)
 
-    required_paths = [TEXT_ENCODER_PATH, VAE_ENCODER_PATH, VAE_DECODER_PATH, TRANSFORMER_PATH]
+    required_paths = [TEXT_ENCODER_PATH, VAE_ENCODER_PATH, VAE_DECODER_FIRST_FRAME_PATH, VAE_DECODER_NEXT_FRAME_PATH, TRANSFORMER_PATH]
     if all([(output_dir / model_path).exists() for model_path in required_paths]):
         print(f"✅ {model_id} model already converted. You can find results in {output_dir}")
         return
@@ -105,19 +167,30 @@ def convert_pipeline(model_id, output_dir, compression_config=None):
         cleanup_torchscript_cache()
         print(f"✅ VAE Encoder successfully converted")
 
-    if not (output_dir / VAE_DECODER_PATH).exists():
+    if not (output_dir / VAE_DECODER_FIRST_FRAME_PATH).exists() or not (output_dir / VAE_DECODER_NEXT_FRAME_PATH).exists():
         print("⌛ Convert VAE Decoder model")
-        vae.forward = vae.decode
         __make_16bit_traceable(vae)
         for up_block in vae.decoder.up_blocks:
             if up_block.upsampler is not None:
                 up_block.upsampler.resample[0].mode = "nearest"
+        first_frame_decoder = WanVAEFirstFrameDecoder(vae).eval()
+        next_frame_decoder = WanVAENextFrameDecoder(vae).eval()
         with torch.no_grad():
-            ov_model = ov.convert_model(vae, example_input=(torch.ones((1, 48, 6, 44, 34))))
-        if compression_config is not None:
-            ov_model = nncf.compress_weights(ov_model, **compression_config)
-        ov.save_model(ov_model, output_dir / VAE_DECODER_PATH)
-        cleanup_torchscript_cache()
+            example_latent = torch.ones((1, 48, 1, 44, 34))
+            example_caches = first_frame_decoder(example_latent)[1:]
+            for decoder, example_input, model_path in [
+                (first_frame_decoder, (example_latent,), VAE_DECODER_FIRST_FRAME_PATH),
+                (next_frame_decoder, (example_latent, *example_caches), VAE_DECODER_NEXT_FRAME_PATH),
+            ]:
+                ov_model = ov.convert_model(decoder, example_input=example_input)
+                if decoder is next_frame_decoder:
+                    make_vae_decoder_stateful(ov_model)
+                if compression_config is not None:
+                    ov_model = nncf.compress_weights(ov_model, **compression_config)
+                ov.save_model(ov_model, output_dir / model_path)
+                del ov_model
+                cleanup_torchscript_cache()
+        del example_caches
         print(f"✅ VAE Decoder successfully converted")
     del vae
     gc.collect()
@@ -200,13 +273,16 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
         text_encoder_model = core.read_model(model_dir / TEXT_ENCODER_PATH)
         text_encoder = core.compile_model(text_encoder_model, device_map["text_encoder"], ov_config)
         vae_encoder = core.compile_model(model_dir / VAE_ENCODER_PATH, device_map["vae_encoder"], ov_config)
-        vae_decoder = core.compile_model(model_dir / VAE_DECODER_PATH, device_map["vae_decoder"], ov_config)
+        vae_decoder_first_frame = core.compile_model(model_dir / VAE_DECODER_FIRST_FRAME_PATH, device_map["vae_decoder"], ov_config)
+        # AUTO detects stateful models only from ov.Model, a model path gets an infer request without query_state()
+        vae_decoder_next_frame = core.compile_model(core.read_model(model_dir / VAE_DECODER_NEXT_FRAME_PATH), device_map["vae_decoder"], ov_config)
 
         super().__init__()
 
         self.register_modules(
             vae_encoder=vae_encoder,
-            vae_decoder=vae_decoder,
+            vae_decoder_first_frame=vae_decoder_first_frame,
+            vae_decoder_next_frame=vae_decoder_next_frame,
             text_encoder=text_encoder,
             tokenizer=tokenizer,
             transformer=transformer,
@@ -541,6 +617,19 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
 
         return latents, torch.concat([mask_lat_size, latent_condition], dim=1)
 
+    def decode_latents(self, latents):
+        first_frame_request = self.vae_decoder_first_frame.create_infer_request()
+        first_frame_request.infer({0: latents[:, :, :1]}, share_outputs=True)
+        frames = [torch.from_numpy(first_frame_request.get_output_tensor(0).data.copy())]
+        next_frame_request = self.vae_decoder_next_frame.create_infer_request()
+        for state in next_frame_request.query_state():
+            # state names are "cache.{i}present_cache.{i}", see make_vae_decoder_stateful
+            state.state = first_frame_request.get_output_tensor(int(state.name.rsplit(".", 1)[-1]) + 1)
+        del first_frame_request
+        for i in range(1, latents.shape[2]):
+            frames.append(torch.from_numpy(next_frame_request.infer({0: latents[:, :, i : i + 1]})[0]))
+        return torch.cat(frames, dim=2)
+
     @property
     def guidance_scale(self):
         return self._guidance_scale
@@ -723,7 +812,7 @@ class OVWanImageToVideoPipeline(DiffusionPipeline):
             latents_mean = torch.tensor(self.latents_mean).view(1, self.z_dim, 1, 1, 1).to(latents.device, latents.dtype)
             latents_std = 1.0 / torch.tensor(self.latents_std).view(1, self.z_dim, 1, 1, 1).to(latents.device, latents.dtype)
             latents = latents / latents_std + latents_mean
-            video = torch.from_numpy(self.vae_decoder(latents)[0])
+            video = self.decode_latents(latents)
             video = self.video_processor.postprocess_video(video, output_type=output_type)
         else:
             video = latents

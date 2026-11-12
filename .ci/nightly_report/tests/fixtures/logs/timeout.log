@@ -1,0 +1,26 @@
+Running Notebook test [test_whisper-asr-genai.ipynb]: /home/runner/work/openvino_notebooks/openvino_notebooks/test_env/bin/python -m treon --verbose test_whisper-asr-genai.ipynb
+Executing treon version 0.1.4
+
+-----------------------------------------------------------------------
+Collected following Notebooks for testing
+-----------------------------------------------------------------------
+test_whisper-asr-genai.ipynb
+-----------------------------------------------------------------------
+
+Triggered test for test_whisper-asr-genai.ipynb
+0.00s - Debugger warning: It seems that frozen modules are being used, which may
+0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+0.00s - to python to disable frozen modules.
+Start executing cell 0
+Start executing cell 1
+Start executing cell 2
+Start executing cell 4
+Start executing cell 6
+Start executing cell 8
+Start executing cell 10
+[32mINFO[0m:nncf:Statistics collection: 100%|##########| 300/300
+model.safetensors:   0%|          | 0M/1.50G [00:00<01:00, 30.0MB/s]model.safetensors:  20%|##        | 300M/1.50G [00:10<01:00, 30.0MB/s]model.safetensors:  40%|####      | 600M/1.50G [00:20<01:00, 30.0MB/s]model.safetensors:  60%|######    | 900M/1.50G [00:30<01:00, 30.0MB/s]model.safetensors:  80%|########  | 1200M/1.50G [00:40<01:00, 30.0MB/s]model.safetensors: 100%|##########| 1500M/1.50G [00:50<01:00, 30.0MB/s]
+Start executing cell 12
+Generating transcription...
+
+[validate_notebooks] Timeout reached (7200s), process killed

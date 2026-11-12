@@ -1,7 +1,7 @@
 # Recommended packages for notebook developers
 
 -r ../requirements.txt
-black[jupyter]==26.3.1               # format Python code
+black[jupyter]==26.10.1               # format Python code
 isort                       # sort imports
 jupyterlab-code-formatter   # format code in notebooks in Jupyter Lab
 jupyterlab-git              # checkout and commit code in Jupyter Lab
@@ -9,8 +9,7 @@ nbqa[toolchain]             # automatic code quality checking
 nbval                       # pytest plugin for automatic notebook testing
 git+https://github.com/eaidova/treon.git@ea/cell_info # test framework for Jupyter Notebooks 
 toml                        # used for validating docker requirements
-mistune==3.3.0              # use for parsing README.md
+mistune==3.3.3              # use for parsing README.md
 requests==2.33.0            # use for checking links
 psutil                      # process management
 pyspelling                  # automating spell checking
-virtualenv-clone            # clone virtual environments for validation script

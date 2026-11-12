@@ -22,6 +22,8 @@ export function initializeSelectorUrlPersist(): UrlPersistState | null {
 }
 
 export function useSelectorUrlPersist(notebooksSelector: INotebooksSelector): void {
+  const { setSearchValue, setSelectedTags } = notebooksSelector;
+
   useEffect(() => {
     if (isEmbedded) {
       return;
@@ -47,21 +49,22 @@ export function useSelectorUrlPersist(notebooksSelector: INotebooksSelector): vo
     parent.history.pushState(null, '', url);
   });
 
-  if (isEmbedded) {
-    return;
-  }
-
-  // listen for parent history state change
-  // on each change set selector state according to url search params
-  parent.onpopstate = () => {
-    const state = getUrlState();
-    console.log(state);
-
-    if (state) {
-      notebooksSelector.setSearchValue(state.searchValue);
-      notebooksSelector.setSelectedTags(state.selectedTags);
+  useEffect(() => {
+    if (isEmbedded) {
+      return;
     }
-  };
+    const parent = window.parent;
+    const restoreUrlState = () => {
+      const state = getUrlState();
+      if (state) {
+        setSearchValue(state.searchValue);
+        setSelectedTags(state.selectedTags);
+      }
+    };
+
+    parent.addEventListener('popstate', restoreUrlState);
+    return () => parent.removeEventListener('popstate', restoreUrlState);
+  }, [setSearchValue, setSelectedTags]);
 }
 
 export function getUrlState(): UrlPersistState | null {

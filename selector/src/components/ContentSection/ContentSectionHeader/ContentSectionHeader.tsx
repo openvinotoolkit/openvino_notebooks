@@ -1,6 +1,6 @@
 import './ContentSectionHeader.scss';
 
-import { useContext, useEffect } from 'react';
+import { JSX, useContext, useEffect } from 'react';
 
 import { openFiltersPanel } from '@/components/FiltersPanel/filters-panel-handlers';
 import { Button } from '@/components/shared/Button/Button';

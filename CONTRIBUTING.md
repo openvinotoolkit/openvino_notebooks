@@ -25,6 +25,7 @@
       - [`PySpelling`](#pyspelling)
   - [Getting started](#getting-started)
     - [Pull Requests (PRs)](#pull-requests-prs)
+      - [Copilot submission review](#copilot-submission-review)
   - [Help](#help)
 
 Thank you for being interested in contributing to the OpenVINO Notebooks repository! This guide
@@ -52,7 +53,7 @@ To do this, there are a few requirements that all notebooks need to pass.
 
 1. The notebooks work on Windows, macOS and Linux (see [supported operating
    systems](https://github.com/openvinotoolkit/openvino_notebooks#%EF%B8%8F-system-requirements))
-   with Python 3.10, 3.11, 3.12 and 3.13.
+   with Python 3.11, 3.12 and 3.13.
 2. As a rule, the notebooks do not require installation of additional software that is not installable by
    `pip`. We do not assume that users have installed XCode Developer Tools, Visual C++ redistributable,
    `cmake`, etc. Please discuss if your notebook does need C++ - there are exceptions to this rule.
@@ -96,8 +97,8 @@ To do this, there are a few requirements that all notebooks need to pass.
    - Add a `README.md` to the notebook subdirectory. Add a screenshot that gives an indication of what
      the notebook does if applicable.
    - Avoid adding any other files to the notebook's subdirectory. Instead, rely on models and data samples available online and fetch them within the notebook. Please refer to the [Notebook utils](#notebook-utils) section.
-3. In case you want to utilize one of the Open Model Zoo models, refer to the [Model Tools](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/model-tools)
-   notebook.
+3. In case you want to utilize one of the Open Model Zoo models, refer to the [Model Tools](https://github.com/openvinotoolkit/open_model_zoo/tree/master/tools/model_tools)
+   documentation.
 4. The notebooks should provide an easy way to clean up the downloaded data, for example with a
    commented-out cell at the end of the notebook.
 
@@ -132,16 +133,16 @@ To do this, there are a few requirements that all notebooks need to pass.
 5. Add **Table of content** to top of the Notebook, it helps to get quick fist understanding of content and ease of navigation in the dev environment. There is no need to think about it during development, it can be built or updated after changes with `.ci\table_of_content.py`. Just run the script with the parameter `-s/--source`, specifying a Notebook or a folder with several notebooks as value, the changes will be applied to all of them.
 6. Add **Installation Instructions** section to the top of the notebook (after "Table of content") and to the corresponding `README.md` file in the notebook directory. See existing notebooks for the reference.
 7. Add Scarf Pixel tag for analytics to the notebook (at the end of the first cell) and to the corresponding `README.md` file (to the end of the file). Add relative path to the notebook or `README.md` file as `path` URL query parameter. Example: `<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=<RELATIVE_FILE_PATH>" />`. You can use the following command to generate the tag and add it to the file: `python .ci/scarf_pixel.py -s <PATH>`.
-8. Add telemetry snippet to the notebook file (e.g. to the cell with fetching notebook_utils file) for tracking notebook execution. Add notebook file name as a parameter to `collect_telemetry()` function. You can use the following command to generate the snippet and add it to the notebook file: `python .ci/telemetry_snippet.py -s <PATH>`. Snippet example:
+8. Add telemetry snippet to the notebook file (e.g. to the cell following the one that fetches the helper files) for tracking notebook execution. Add notebook file name as a parameter to `collect_telemetry()` function. You can use the following command to generate the snippet and add it to the notebook file: `python .ci/telemetry_snippet.py -s <PATH>`. Snippet example:
    ```python
    # Read more about telemetry collection at https://github.com/openvinotoolkit/openvino_notebooks?tab=readme-ov-file#-telemetry
    from notebook_utils import collect_telemetry
    collect_telemetry("<NOTEBOOK_NAME>.ipynb")
    ```
-1.  In case if notebook has specific requirements on python version or OS, it should be noted on top of notebook (before any code blocks) using
+1.  In case if a notebook requires a newer Python version than the project's minimum or has specific OS requirements, it should be noted on top of the notebook (before any code blocks) using
    following colored block:
    ```
-   <div class="alert alert-block alert-danger"> <b>Important note:</b> This notebook requires python >= 3.10. Please make sure that your environment fulfill to this requirement  before running it </div>
+   <div class="alert alert-block alert-danger"> <b>Important note:</b> This notebook requires python >= 3.12. Please make sure that your environment fulfill to this requirement before running it </div>
    ```
 
 ### Notebook naming
@@ -269,6 +270,60 @@ Contributors are encouraged to install the required packages at the top of their
 `%pip install ...` commands. This allows the notebooks to be run independently as standalone examples. 
 To maintain package compatibility, contributors are expected to install the same versions of packages 
 as specified in the shared `requirements.txt` file located in the repository root folder.
+
+Each notebook installs its requirements into its own virtual environment, so notebooks do not affect each other.
+The first code cell of a notebook, placed before any installation, must fetch the helper files from `utils` and call `setup_notebook_venv()`:
+
+```python
+import urllib.request
+from pathlib import Path
+
+# Helpers come from `utils` of the cloned repository, otherwise from GitHub; local copies are overwritten
+helper_files = ["notebook_utils.py"]
+repo_utils = Path("../../utils")
+in_repo = (repo_utils / "notebook_utils.py").is_file()
+if in_repo:
+   helper_contents = {helper_file: (repo_utils / helper_file).read_bytes() for helper_file in helper_files}
+else:
+    try:
+        helper_contents = {}
+        for helper_file in helper_files:
+            url = f"https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/{helper_file}"
+            with urllib.request.urlopen(url, timeout=10) as response:
+                helper_contents[helper_file] = response.read()
+    except OSError as error:
+        if any(not Path(helper_file).is_file() for helper_file in helper_files):
+            raise
+        print(f"Could not update helper files, using the existing copies: {error}")
+        helper_contents = {}
+
+for helper_file, content in helper_contents.items():
+    Path(helper_file).write_bytes(content)
+
+from notebook_utils import setup_notebook_venv
+
+# Requirements installed below go to a notebook-specific virtual environment in the `.venv` folder
+setup_notebook_venv()
+```
+
+`helper_files` lists every file from `utils` that the notebook (or a module next to it) imports, for example
+`["notebook_utils.py", "cmd_helper.py", "pip_helper.py"]`. Do not fetch these files in other cells.
+When the notebook runs inside a clone of the repository, the files are copied from `utils` of that clone, so changes to them are
+tested together with the notebook; otherwise they are downloaded from the `latest` branch. Either way, the copies next to the notebook
+are overwritten only after all helper files have been fetched, so do not edit them. If a download fails, the notebook keeps the entire
+existing helper set if every file is present; otherwise, it raises the error without writing any fetched files.
+Do not list a helper whose name matches a file of the notebook itself (for example, a notebook-specific `llm_config.py`).
+Helpers updated by running the cell again in a kernel that already imported them are picked up after a kernel restart.
+
+It creates the `.venv` folder next to the notebook (only once) and activates it for the running kernel: `%pip install`, `!pip install` and `pip_install()`
+install packages into it, and the following imports, subprocesses and command-line tools (for example, `optimum-cli`) use it. Packages of the environment running Jupyter
+remain available with lower priority. To start from scratch, restart the kernel and delete the `.venv` folder.
+
+> **NOTE**: If a directory contains several notebooks, each of them must pass its own file name, for example `setup_notebook_venv("hello-world.ipynb")`.
+> Each notebook then gets a separate environment in `.venv/<notebook name>` (e.g. `.venv/hello-world`), so installing the requirements of one notebook
+> does not change what the other notebooks in the same directory import. When adding a notebook to a directory that already has one, update the existing notebook as well.
+> `.ci/check_notebooks.py` checks that every notebook uses the right form and lists the helper files it needs.
+
 Additional guidelines:
 1. Specify the widest compatible package version range. If your notebook has only a lower bound on some package version, consider specifying it with ">=" sign instead of "==". Specifying the exact version of package might lead to dependency conflict between notebooks. 
 2. Do not use spaces between package, version and comparison operator when specifying the package installed. Use "package==version" instead of "package == version".
@@ -295,6 +350,11 @@ and some style issues
 
   - In the rest of this guide, the automated tests in GitHub
 Actions will be referred to as CI (for Continuous Integration).
+
+Docker, code check, and spell check workflows report their required checks for every PR targeting `main` or `latest`.
+Their tests run only when the PR changes files matching the filters in each workflow's `changes` job,
+which uses the [`job_detect_changes.yml`](.github/workflows/job_detect_changes.yml) reusable workflow.
+Otherwise, the required checks pass without running the tests. Change detection or test failures still fail the required checks.
 
 If your notebook takes longer than a few minutes to execute, it may be possible to patch it in the CI, to make 
 it execute faster. As an example, if your notebook trains for 20 epochs, you can set it to train for
@@ -334,7 +394,7 @@ standard `diff` tool for `git`, with much more useful output than the regular `g
 
 #### JupyterLab Code Formatter
 
-[JupyterLab Code Formatter](https://ryantam626.github.io/jupyterlab_code_formatter/index.html) adds a
+[JupyterLab Code Formatter](https://jupyterlab-code-formatter.readthedocs.io/) adds a
 button to Jupyter Lab to automatically format the code in notebooks with `black` and `isort`. Please
 use either this extension or a different way to automatically format your notebook.
 
@@ -391,6 +451,30 @@ Once your notebook passes in the CI and you have verified that everything looks 
 3. Please create a description of what the notebook does with your PR. Screenshots are appreciated!
 4. On making or updating a Pull Request, the tests in the CI will run again. Please keep an
    eye on them. If the tests fail and you think the issue is not related to your PR, please make a comment on your PR.
+
+#### Copilot submission review
+
+Request a review from **Copilot** in the **Reviewers** section of a pull request,
+as described in [Using GitHub Copilot code review](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-code-review).
+For changes under `notebooks/`, the
+[notebook review instructions](.github/instructions/notebook-review.instructions.md)
+direct Copilot to the
+[notebook code review skill](.github/skills/notebook-code-review/SKILL.md).
+The skill guides a thorough assessment of model/task suitability and usefulness,
+correctness, portability, documentation, licensing, and available CI evidence
+against this contribution guide. It includes a review summary template.
+
+Keep repository custom instructions enabled in the Copilot code review settings.
+Copilot reads instructions and skills from the head branch, so changes to them
+can be tested in the same pull request. Check skill attributions on review
+comments or the linked review session to confirm which guidance was used.
+Request a fresh review after changing the submission.
+
+The review is advisory: it does not replace CI or maintainer judgment. The skill
+instructs the reviewer not to execute submitted code or assume unverified claims
+pass. It does not select a model or enforce a user access list; review access is
+controlled by GitHub permissions and Copilot settings. No Actions workflow,
+token secret, or `/review-submission` comment is required.
 
 ## Help
 

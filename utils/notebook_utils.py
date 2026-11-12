@@ -4,13 +4,162 @@
 # In[ ]:
 
 
-import platform
 import sys
 import threading
 import time
 from os import PathLike
 from pathlib import Path
 from typing import List, NamedTuple, Optional
+
+# ## Virtual environment
+#
+# Create and activate a notebook-specific virtual environment, so that notebooks do not affect each other's requirements.
+
+# In[ ]:
+
+
+NOTEBOOK_VENV_DIR = ".venv"
+_PARENT_ENV_PTH = "_notebook_parent_env.pth"
+_venv_site_dirs = []
+_parent_site_dirs = []
+_processed_pth_files = set()
+_venv_dll_directories = {}
+
+
+def _add_venv_dll_directory(venv_dir: Path) -> str:
+    """
+    Add `<venv_dir>/Library/bin` to the DLL search path of the running kernel (Windows only) and return it.
+
+    Wheels like `mkl`, `intel-openmp` or `intel-sycl-rt` (dependencies of PyTorch) install DLLs there, and packages loading them
+    look in `sys.exec_prefix`, which in the kernel still points to the environment running it, not the notebook virtual environment.
+    The directory is created in advance, because `os.add_dll_directory()` requires an existing one.
+    """
+    import os
+
+    dll_dir = venv_dir / "Library" / "bin"
+    dll_dir.mkdir(parents=True, exist_ok=True)
+    if str(dll_dir) not in _venv_dll_directories:
+        _venv_dll_directories[str(dll_dir)] = os.add_dll_directory(str(dll_dir))
+    return str(dll_dir)
+
+
+def _load_venv_pth_files(result=None, *_):
+    """
+    Process `.pth` files (e.g. editable installs) added to the active notebook virtual environment
+    after install cells. Registered as IPython `post_run_cell` callback by `setup_notebook_venv()`.
+    """
+    if result is not None:
+        raw_cell = getattr(getattr(result, "info", None), "raw_cell", "")
+        if not any(marker in raw_cell for marker in ("%pip", "!pip", "-m pip", "pip_install(")):
+            return
+
+    import importlib
+    import importlib.machinery
+    import site
+
+    path_before, meta_path_before = list(sys.path), list(sys.meta_path)
+    for site_dir in _venv_site_dirs:
+        for pth_file in sorted(Path(site_dir).glob("*.pth")):
+            if pth_file.name != _PARENT_ENV_PTH and pth_file not in _processed_pth_files:
+                _processed_pth_files.add(pth_file)
+                site.addpackage(site_dir, pth_file.name, None)
+
+    # `site.addpackage()` appends, so move new entries ahead of the parent environment to take precedence over it
+    new_paths = [p for p in sys.path if p not in path_before]
+    if new_paths:
+        sys.path[:] = [p for p in sys.path if p not in new_paths]
+        insert_at = next((i for i, p in enumerate(sys.path) if p in _parent_site_dirs), len(sys.path))
+        sys.path[insert_at:insert_at] = new_paths
+    # PEP 660 editable finders must run before `PathFinder`, which would find the parent environment copy first
+    new_finders = [f for f in sys.meta_path if f not in meta_path_before]
+    if new_finders:
+        sys.meta_path[:] = [f for f in sys.meta_path if f not in new_finders]
+        insert_at = next((i for i, f in enumerate(sys.meta_path) if f is importlib.machinery.PathFinder), len(sys.meta_path))
+        sys.meta_path[insert_at:insert_at] = new_finders
+    importlib.invalidate_caches()
+
+
+def setup_notebook_venv(notebook_name: Optional[str] = None, venv_root: PathLike = NOTEBOOK_VENV_DIR) -> Path:
+    """
+    Create (if missing) and activate a notebook-specific virtual environment for the running kernel.
+
+    After activation, packages installed with `%pip install`, `!pip install` or `pip_install()` go to
+    this environment and take precedence over the packages of the environment running the kernel.
+    Packages of the kernel environment stay visible with lower priority, both in the kernel and in the
+    virtual environment interpreter, which is also used by subprocesses and command-line tools.
+
+    :param notebook_name: File name of the notebook, e.g. "hello-world.ipynb". Required only when several notebooks share a directory:
+                          each of them then gets its own environment in `<venv_root>/<notebook name without extension>`.
+                          If not provided, `venv_root` itself is the environment.
+    :param venv_root: Directory with notebook virtual environments. Relative paths are resolved against the current working directory.
+    :return: Absolute path to the virtual environment.
+    """
+    import os
+    import site
+    import subprocess  # nosec - disable B404:import-subprocess check
+    import sysconfig
+    import venv
+
+    if notebook_name is None:
+        venv_dir = Path(venv_root).resolve()
+    elif isinstance(notebook_name, str) and Path(notebook_name).name == notebook_name and notebook_name.endswith(".ipynb"):
+        venv_dir = (Path(venv_root) / notebook_name.removesuffix(".ipynb")).resolve()
+    else:
+        raise ValueError(f"Expected a notebook file name ending in .ipynb without directories, got: {notebook_name!r}")
+    bin_dir = venv_dir / ("Scripts" if os.name == "nt" else "bin")
+    venv_python = bin_dir / ("python.exe" if os.name == "nt" else "python")
+    if sys.executable == str(venv_python):
+        return venv_dir
+
+    def query_venv():
+        script = (
+            "import os, sys, sysconfig; print('%d.%d' % sys.version_info[:2]); print(os.path.realpath(sys.base_prefix)); "
+            "print(sysconfig.get_path('purelib')); print(sysconfig.get_path('platlib'))"
+        )
+        output = subprocess.run([str(venv_python), "-c", script], check=True, capture_output=True, text=True).stdout.splitlines()  # nosec B603
+        return (output[0], output[1]), list(dict.fromkeys(output[2:]))
+
+    # The venv must be based on the same Python installation (e.g. conda env) as the kernel
+    kernel_base = ("%d.%d" % sys.version_info[:2], os.path.realpath(sys.base_prefix))
+    venv_base = None
+    if venv_python.exists():
+        venv_base, venv_site_dirs = query_venv()
+    if venv_base != kernel_base:
+        print(f"Creating virtual environment in {venv_dir} based on Python {kernel_base[0]} from {kernel_base[1]}")
+        venv.EnvBuilder(clear=True, with_pip=True).create(venv_dir)
+        venv_base, venv_site_dirs = query_venv()
+
+    # Unlike `system_site_packages`, this also exposes packages of a parent virtual environment running the kernel.
+    user_site_dirs = [site.getusersitepackages()] if site.ENABLE_USER_SITE else []
+    parent_site_dirs = [d for d in site.getsitepackages() + user_site_dirs if d in sys.path and d not in venv_site_dirs]
+    Path(venv_site_dirs[0], _PARENT_ENV_PTH).write_text(f"import site; list(map(site.addsitedir, {parent_site_dirs!r}))\n", encoding="utf-8")
+
+    insert_at = next((i for i, p in enumerate(sys.path) if p in parent_site_dirs), len(sys.path))
+    sys.path[insert_at:insert_at] = [d for d in venv_site_dirs if d not in sys.path]
+    _venv_site_dirs[:] = venv_site_dirs
+    _parent_site_dirs[:] = parent_site_dirs
+    _load_venv_pth_files()
+
+    # `%pip` and `pip_install()` install into `sys.executable`
+    sys.executable = str(venv_python)
+    os.environ["VIRTUAL_ENV"] = str(venv_dir)
+    path_dirs = [str(bin_dir), sysconfig.get_path("scripts")] + os.environ.get("PATH", "").split(os.pathsep)
+    if os.name == "nt":
+        path_dirs.insert(1, _add_venv_dll_directory(venv_dir))
+    os.environ["PATH"] = os.pathsep.join(dict.fromkeys(path_dirs))
+
+    try:
+        from IPython import get_ipython
+
+        ipython = get_ipython()
+    except ImportError:
+        ipython = None
+    if ipython is not None and _load_venv_pth_files not in ipython.events.callbacks["post_run_cell"]:
+        ipython.events.register("post_run_cell", _load_venv_pth_files)
+
+    print(f"Using virtual environment: {venv_dir}")
+    return venv_dir
+
 
 # ## Files
 #
@@ -64,8 +213,9 @@ def pip_install(*args):
 
     cli_args = []
     for arg in args:
-        cli_args.extend(str(arg).split(" "))
-    subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], shell=(platform.system() == "Windows"), check=True)
+        cli_args.extend(str(arg).split())
+    subprocess.run([sys.executable, "-m", "pip", "install", *cli_args], check=True)  # nosec B603 - pip install via sys.executable
+    _load_venv_pth_files()
 
 
 def load_image(name: str, url: str = None):
@@ -83,11 +233,16 @@ def load_image(name: str, url: str = None):
     import requests
 
     if not Path(name).exists():
+        if url is None:
+            raise ValueError(f"'{name}' does not exist locally and no `url` was given to download it from.")
         # Set User-Agent to Mozilla because some websites block
         # requests with User-Agent Python
         response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+        response.raise_for_status()
         array = np.asarray(bytearray(response.content), dtype="uint8")
         image = cv2.imdecode(array, -1)  # Loads the image as BGR
+        if image is None:
+            raise ValueError(f"Could not decode an image from {url}. The URL may not point to a valid image file.")
         cv2.imwrite(name, image)
     else:
         image = cv2.imread(name)
@@ -153,9 +308,16 @@ def download_file(
     except requests.exceptions.RequestException as error:
         raise Exception(f"File downloading failed with error: {error}") from None
 
-    # download the file if it does not exist
     filesize = int(response.headers.get("Content-length", 0))
-    if not filepath.exists():
+    # Let urllib3 verify we actually received as many bytes as the server
+    # declared, at the raw transport level, before any gzip/deflate decoding
+    # happens. iter_content() yields decompressed bytes, so counting those
+    # ourselves and comparing to Content-length breaks for compressed
+    # responses, since Content-length reflects the compressed size on the wire.
+    response.raw.enforce_content_length = True
+
+    tmp_filepath = filepath.with_name(filepath.name + ".part")
+    try:
         with tqdm_notebook(
             total=filesize,
             unit="B",
@@ -164,15 +326,18 @@ def download_file(
             desc=str(filename),
             disable=not show_progress,
         ) as progress_bar:
-            with open(filepath, "wb") as file_object:
+            with open(tmp_filepath, "wb") as file_object:
                 for chunk in response.iter_content(chunk_size):
                     file_object.write(chunk)
                     progress_bar.update(len(chunk))
                     progress_bar.refresh()
-    else:
-        print(f"'{filepath}' already exists.")
 
-    response.close()
+        tmp_filepath.replace(filepath)
+    except BaseException:
+        tmp_filepath.unlink(missing_ok=True)
+        raise
+    finally:
+        response.close()
 
     return filepath.resolve()
 
@@ -187,7 +352,10 @@ def download_ir_model(model_xml_url: str, destination_folder: PathLike = None) -
                                files are saved to the current directory
     :return: path to downloaded xml model file
     """
-    model_bin_url = model_xml_url[:-4] + ".bin"
+    from urllib.parse import urlsplit, urlunsplit
+
+    parsed_url = urlsplit(model_xml_url)
+    model_bin_url = urlunsplit(parsed_url._replace(path=parsed_url.path[:-4] + ".bin"))
     model_xml_path = download_file(model_xml_url, directory=destination_folder, show_progress=False)
     download_file(model_bin_url, directory=destination_folder)
     return model_xml_path

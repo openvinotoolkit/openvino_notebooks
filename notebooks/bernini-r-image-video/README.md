@@ -41,4 +41,6 @@ For details, please refer to [Installation Guide](../../README.md).
 
 > **Note**: the reference Bernini implementation pins `diffusers==0.35.2` and `transformers==4.57.3`; the first notebook cell installs these and the `bernini` package. Restart the kernel after the install cell if these versions differ from your base environment.
 
+> **macOS**: the notebook installs `decord2==3.4.0` instead of `decord` to provide Apple Silicon wheels; these require macOS 14 or newer. The `decord` import and video-reader API stay unchanged. Bernini is installed with `--no-deps` because its metadata still requires the original `decord` distribution.
+
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/bernini-r-image-video/README.md" />

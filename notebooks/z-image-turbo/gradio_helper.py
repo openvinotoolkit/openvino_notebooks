@@ -1,8 +1,10 @@
 import random
 import re
-from diffusers import AutoencoderKL, FlowMatchEulerDiscreteScheduler
+
 import gradio as gr
-import torch
+import numpy as np
+import openvino_genai as ov_genai
+from PIL import Image
 
 RES_CHOICES = {
     "1024": [
@@ -80,28 +82,22 @@ def generate_image(
     seed=42,
     guidance_scale=5.0,
     num_inference_steps=50,
-    shift=3.0,
     max_sequence_length=512,
     progress=gr.Progress(track_tqdm=True),
 ):
     width, height = get_resolution(resolution)
 
-    generator = torch.Generator("cpu").manual_seed(seed)
-
-    scheduler = FlowMatchEulerDiscreteScheduler(num_train_timesteps=1000, shift=shift)
-    pipe.scheduler = scheduler
-
-    image = pipe(
-        prompt=prompt,
+    image_tensor = pipe.generate(
+        prompt,
         height=height,
         width=width,
         guidance_scale=guidance_scale,
         num_inference_steps=num_inference_steps,
-        generator=generator,
+        generator=ov_genai.TorchGenerator(seed),
         max_sequence_length=max_sequence_length,
-    ).images[0]
+    )
 
-    return image
+    return Image.fromarray(np.asarray(image_tensor.data[0])).convert("RGB")
 
 
 def get_resolution(resolution):
@@ -118,7 +114,6 @@ def make_demo(ov_pipe):
         resolution="1024x1024 ( 1:1 )",
         seed=42,
         steps=9,
-        shift=3.0,
         random_seed=True,
         gallery_images=None,
         enhance=False,
@@ -134,7 +129,6 @@ def make_demo(ov_pipe):
             resolution (str): Output resolution in format "WIDTHxHEIGHT ( RATIO )" (e.g., "1024x1024 ( 1:1 )")
             seed (int): Seed for reproducible generation
             steps (int): Number of inference steps for the diffusion process
-            shift (float): Time shift parameter for the flow matching scheduler
             random_seed (bool): Whether to generate a new random seed, if True will ignore the seed input
             gallery_images (list): List of previously generated images to append to (only needed for the Gradio UI)
             enhance (bool): This was Whether to enhance the prompt (DISABLED! Do not use)
@@ -162,7 +156,6 @@ def make_demo(ov_pipe):
             seed=new_seed,
             guidance_scale=0.0,
             num_inference_steps=int(steps + 1),
-            shift=shift,
         )
 
         if gallery_images is None:
@@ -195,7 +188,6 @@ def make_demo(ov_pipe):
 
                 with gr.Row():
                     steps = gr.Slider(label="Steps", minimum=1, maximum=100, value=8, step=1, interactive=False)
-                    shift = gr.Slider(label="Time Shift", minimum=1.0, maximum=10.0, value=3.0, step=0.1)
 
                 generate_btn = gr.Button("Generate", variant="primary")
 
@@ -233,7 +225,7 @@ def make_demo(ov_pipe):
 
         generate_btn.click(
             generate,
-            inputs=[prompt_input, resolution, seed, steps, shift, random_seed, output_gallery],
+            inputs=[prompt_input, resolution, seed, steps, random_seed, output_gallery],
             outputs=[output_gallery, used_seed, seed],
         )
         return demo

@@ -1,5 +1,7 @@
 import './FilterSection.scss';
 
+import { JSX } from 'react';
+
 import { Button } from '../Button/Button';
 
 const sparkClassNames = {

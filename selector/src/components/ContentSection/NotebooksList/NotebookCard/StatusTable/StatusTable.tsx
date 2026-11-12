@@ -1,5 +1,7 @@
 import './StatusTable.scss';
 
+import { JSX } from 'react';
+
 import CheckIcon from '@/assets/images/check.svg?react';
 import CrossIcon from '@/assets/images/cross.svg?react';
 import DenyIcon from '@/assets/images/deny.svg?react';

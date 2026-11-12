@@ -1,0 +1,65 @@
+Running Notebook test [test_stream-demo.ipynb]: /home/runner/work/openvino_notebooks/openvino_notebooks/test_env/bin/python -m treon --verbose test_stream-demo.ipynb
+Executing treon version 0.1.4
+
+-----------------------------------------------------------------------
+Collected following Notebooks for testing
+-----------------------------------------------------------------------
+test_stream-demo.ipynb
+-----------------------------------------------------------------------
+
+Triggered test for test_stream-demo.ipynb
+0.00s - Debugger warning: It seems that frozen modules are being used, which may
+0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+0.00s - to python to disable frozen modules.
+Start executing cell 0
+Start executing cell 2
+Start executing cell 5
+Start executing cell 7
+ERROR in testing test_stream-demo.ipynb
+
+An error occurred while executing the following cell:
+------------------
+print("Loading model...")
+print("RuntimeError: this line is only printed output, not the real exception")
+results = run_inference(model, inputs)
+print("-" * 18)
+print("Done: 3 items")
+logits = results["logits"]
+------------------
+
+
+----- stdout -----
+Loading model...
+RuntimeError: this line is only printed output, not the real exception
+------------------
+Done: 3 items
+----- stderr -----
+/home/runner/work/openvino_notebooks/openvino_notebooks/notebooks/stream-demo/utils.py:12: UserWarning: run_inference() is deprecated
+  warnings.warn("run_inference() is deprecated")
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mKeyError[0m                                  Traceback (most recent call last)
+Cell [0;32mIn[6], line 6[0m
+[1;32m      4[0m [38;5;28mprint[39m([38;5;124m"-"[39m * 18)
+[1;32m      5[0m [38;5;28mprint[39m([38;5;124m"Done: 3 items"[39m)
+[0;32m----> 6[0m logits = results[[38;5;124m"logits"[39m]
+
+[0;31mKeyError[0m: 'logits'
+
+
+
+
+
+-----------------------------------------------------------------------
+TEST RESULT
+-----------------------------------------------------------------------
+test_stream-demo.ipynb       -- FAILED 
+-----------------------------------------------------------------------
+0 succeeded, 1 failed, out of 1 notebooks tested.
+-----------------------------------------------------------------------
+
+OpenVINO after notebook execution: 2026.4.1
+OpenVINO Tokenizers after notebook execution: 2026.4.1.0
+WARNING: Package(s) not found: openvino_genai
+openvino_genai is missing in validation environment.

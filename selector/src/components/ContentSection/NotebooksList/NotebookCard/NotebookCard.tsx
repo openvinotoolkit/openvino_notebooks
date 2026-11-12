@@ -5,7 +5,7 @@ import ColabIcon from '@assets/images/colab.svg?react';
 import GitHubIcon from '@assets/images/github.svg?react';
 import LinkIcon from '@assets/images/link.svg?react';
 import OpenvinoLogo from '@assets/images/openvino-logo-colored.svg?react';
-import React, { CSSProperties, useContext, useRef, useState } from 'react';
+import { JSX, useContext, useLayoutEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/shared/Button/Button';
 import { Tag } from '@/components/shared/Tag/Tag';
@@ -39,15 +39,6 @@ const copyNotebookShareUrl = ({ title }: INotebookMetadata): void => {
   const shareUrl = new URL(window.location.toString());
   shareUrl.search = getUrlParamsWithSearch(title).toString();
   void copyToClipboard(shareUrl.toString());
-};
-
-const getPointerLeftOffset = (buttonRef: React.RefObject<HTMLButtonElement>): string => {
-  if (!buttonRef.current) {
-    return '1rem';
-  }
-  const { offsetLeft, offsetWidth } = buttonRef.current;
-  const pointerSize = 10;
-  return `${offsetLeft + offsetWidth / 2 - pointerSize}px`;
 };
 
 const sparkClassNames = {
@@ -84,6 +75,7 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
   const [isLinkCopied, setLinkCopied] = useState(false);
   const [areModelsExpanded, setModelsExpanded] = useState(false);
   const statusButtonRef = useRef<HTMLButtonElement>(null);
+  const statusPanelRef = useRef<HTMLDivElement>(null);
   const { searchValue } = useContext(NotebooksContext);
   const { categories, tasks } = item.tags;
   const descriptionTags = [...categories.filter((v) => v !== CATEGORIES.AI_TRENDS), ...tasks];
@@ -91,6 +83,18 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
   const titleMatchesSearch = htmlToText(item.title).toLowerCase().includes(searchValue.trim().toLowerCase());
   const shownModels = areModelsExpanded ? matchedModels : matchedModels.slice(0, MAX_MATCHED_MODELS);
   const hiddenModelsCount = matchedModels.length - shownModels.length;
+
+  // Measure after each commit so button labels and the action layout are up to date.
+  useLayoutEffect(() => {
+    const button = statusButtonRef.current;
+    const panel = statusPanelRef.current;
+    if (!button || !panel) {
+      return;
+    }
+    const pointerSize = 10;
+    panel.style.setProperty('--pointer-left-offset', `${button.offsetLeft + button.offsetWidth / 2 - pointerSize}px`);
+  });
+
   return (
     <div className={sparkClassNames.card}>
       <div className={`card-wrapper ${item.links.docs ? 'clickable' : ''}`} onClick={() => openNotebookInDocs(item)}>
@@ -202,14 +206,7 @@ export const NotebookCard = ({ item, showTasks = true }: NotebookCardProps): JSX
         </div>
       </div>
       {isStatusVisible && (
-        <div
-          className="card-footer-panel"
-          style={
-            {
-              '--pointer-left-offset': getPointerLeftOffset(statusButtonRef),
-            } as CSSProperties
-          }
-        >
+        <div ref={statusPanelRef} className="card-footer-panel">
           <StatusTable status={item.status!} />
         </div>
       )}

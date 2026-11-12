@@ -2,7 +2,7 @@ import './Pagination.scss';
 
 import ChevronIcon from '@assets/images/chevron.svg?react';
 import ChevronDoubleIcon from '@assets/images/chevron-double.svg?react';
-import { FunctionComponent, HTMLProps } from 'react';
+import { FunctionComponent, HTMLProps, JSX } from 'react';
 
 import { Button } from '../Button/Button';
 import { Dropdown } from '../Dropdown/Dropdown';

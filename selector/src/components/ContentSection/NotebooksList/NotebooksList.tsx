@@ -1,5 +1,7 @@
 import './NotebooksList.scss';
 
+import { JSX } from 'react';
+
 import { IArchivedNotebookMetadata, INotebookMetadata } from '@/shared/notebook-metadata';
 
 import { ArchivedNotebookCard } from './ArchivedNotebookCard/ArchivedNotebookCard';

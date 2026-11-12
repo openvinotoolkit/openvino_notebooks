@@ -82,7 +82,7 @@ class NotebooksService {
         return flatSelectedTags.every((tag) => flatNotebookTags.includes(tag));
       })
       .filter(({ title, path, models }) => {
-        const search = searchValue.toLowerCase();
+        const search = searchValue.trim().toLowerCase();
         return (
           title.toLowerCase().includes(search) ||
           path.toLowerCase().includes(search) ||

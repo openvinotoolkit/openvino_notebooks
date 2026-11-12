@@ -1,6 +1,6 @@
 import './ContentSection.scss';
 
-import { useContext, useEffect, useState } from 'react';
+import { JSX, useContext, useEffect, useState } from 'react';
 
 import { Pagination } from '@/components/shared/Pagination/Pagination';
 import { isEmbedded } from '@/shared/iframe-detector';

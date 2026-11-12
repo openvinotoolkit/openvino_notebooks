@@ -2,7 +2,7 @@
 
 This notebook demonstrates how to use the ACT (Action Chunking Transformer) model for imitation learning tasks for Aloha Robot, with OpenVINO optimization for efficient inference.
 
-**Note:** This notebook currently supports **Ubuntu 22.04**, Python 3.10-3.12 only.
+**Note:** This notebook currently supports **Ubuntu 22.04**, Python 3.11-3.12 only.
 
 ## Overview
 
@@ -36,11 +36,16 @@ Pre-trained weights for the `sim_insertion_scripted` task are required. The note
 
 The notebook handles all installation automatically, including:
 
-- Cloning the edge-ai-suites repository (sparse checkout)
+- Cloning the edge-ai-suites repository at revision `95113c44e2636f57a54ffefd3cc5622fc3f55f92` (sparse checkout)
 - Setting up the ACT pipeline from the robotics-ai-suite
 - Installing DETR (Detection Transformer) dependencies
 - Applying OpenVINO-specific patches
 - Installing all required Python packages
+
+The source revision is pinned because the suites have since moved to separate repositories.
+Only the OpenVINO patch series is applied; the IPEX series is an alternative implementation.
+Setup stops if the required patches cannot be applied or the conversion script is missing.
+Re-running setup recognizes an already applied OpenVINO patch series.
 
 ## Usage
 
