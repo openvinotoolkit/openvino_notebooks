@@ -206,6 +206,21 @@ def test_prepare_test_plan_without_test_list(tmp_path, skip_files):
     }
 
 
+# --- finalize_status -----------------------------------------------------------------------------------------------------
+
+
+def test_finalize_status_marks_timeout_as_failure(tmp_path):
+    test_plan = {
+        Path("slow/slow.ipynb"): {
+            "status": NotebookStatus.TIMEOUT,
+            "path": tmp_path / "notebooks" / "slow" / "slow.ipynb",
+            "duration": 2.5,
+            "skip_reason": None,
+        }
+    }
+    assert validate_notebooks.finalize_status([], ["test_slow.ipynb"], test_plan, tmp_path, tmp_path) == 1
+
+
 # --- main() with a fake run_test -------------------------------------------------------------------------------------------
 
 
