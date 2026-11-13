@@ -138,6 +138,7 @@
 
 ## Convert
 
+- [Convert and Run DRO-Grasp with OpenVINO™](./dro-grasp/dro-grasp.ipynb)
 - [YOLOv11 quantization with accuracy control using NNCF](./yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb)
 - [Prompt-based image segmentation with MobileSAM and OpenVINO](./mobilesam-segmentation/mobilesam-segmentation.ipynb)
 - [Classification with ConvNeXt and OpenVINO](./torchvision-zoo-to-openvino/convnext-classification.ipynb)
@@ -182,6 +183,7 @@
 
 ## Model Demos
 
+- [Convert and Run DRO-Grasp with OpenVINO™](./dro-grasp/dro-grasp.ipynb)
 - [Video generation with ZeroScope and OpenVINO](./zeroscope-text2video/zeroscope-text2video.ipynb)
 - [Text-to-image generation with Z-Image-Turbo and OpenVINO](./z-image-turbo/z-image-turbo.ipynb)
 - [Convert and Optimize YOLO26 real-time object detection with OpenVINO™](./yolov26-optimization/yolov26-object-detection.ipynb)
