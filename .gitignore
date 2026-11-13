@@ -107,6 +107,11 @@ notebooks/*/data/**
 notebooks/*/cache/**
 notebooks/*/.cache/**
 
+# fasterWAM tutorial: caches the notebook derives itself (its artifacts/ are generated on first use,
+# see notebooks/fasterWAM/.gitignore)
+notebooks/fasterWAM/artifacts/torch_ref_pack.npz
+notebooks/fasterWAM/*.bak-*
+
 # Local pip cache directories
 pipcache/
 pipcache_openvino/
