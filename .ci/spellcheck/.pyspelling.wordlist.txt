@@ -311,10 +311,12 @@ DreamBooth
 DreamBooth Tsinghua
 Dreamshaper
 dropdown
+dtype
 DynamiCrafter
 EasyOCR
 ECCV
 editability
+effector
 EfficientNet
 EfficientSAM
 EfficientSAMs
@@ -340,6 +342,7 @@ facto
 fastcomposer
 FastComposer
 FastDraft
+FasterWAM
 FastSAM
 Fbank
 FC
@@ -392,6 +395,7 @@ genAI
 GenerationConfig
 GenerationMixin
 GGUF
+GiB
 Girshick
 Gitee
 Glimmer
@@ -400,6 +404,7 @@ GLA
 GLM
 glm
 glyphs
+GMAC
 GMCNN
 GNA
 Golang
@@ -445,6 +450,7 @@ hunyuan
 HunyuanDIT
 HunyuanOCR
 Husain
+hustvl
 HWC
 HY
 Hy
@@ -663,6 +669,7 @@ MathVista
 MatMul
 matplotlib
 MBs
+McNemar
 MCP
 md
 MedASR
@@ -716,6 +723,7 @@ Mody
 MoE
 MONAI
 MONAI's
+monkeypatch
 Monodepth
 monodepth
 MosaicPretrainedTransformer
@@ -756,6 +764,7 @@ natively
 NCE
 Nemo
 NEOX
+NeoX
 NER
 NETP
 Netron
@@ -963,6 +972,9 @@ proj
 promptable
 prompthero
 prithivMLmods
+proprio
+proprioception
+proprioceptive
 proto
 protobuf
 PRs
@@ -1184,6 +1196,7 @@ subgraphs
 subfolder
 sublicense
 subpackage
+subprocess
 subprocesses
 subtask
 summarization
@@ -1265,6 +1278,7 @@ UIs
 Ultralytics
 UMD
 UMT
+umT
 Uncheck
 unCLIP
 uncomment
@@ -1348,6 +1362,7 @@ VQVAE
 VRAM
 VTI
 walkthrough
+WAM
 warmup
 Wav
 wav

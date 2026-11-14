@@ -338,3 +338,4 @@
 - [Object detection and masking from prompts with GroundedSAM (GroundingDINO + SAM) and OpenVINO](./grounded-segment-anything/grounded-segment-anything.ipynb)
 - [Quantize a Segmentation Model and Show Live Inference](./ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb)
 
+- [FasterWAM: convert and run a world-action model with OpenVINO](./fasterWAM/fasterWAM.ipynb)

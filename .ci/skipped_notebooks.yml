@@ -489,3 +489,9 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
+- notebook: notebooks/fasterWAM/fasterWAM.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
