@@ -207,6 +207,20 @@ def test_setup_notebook_venv_rejects_invalid_notebook_name(notebook_name, tmp_pa
         setup_notebook_venv(notebook_name, venv_root=tmp_path)
 
 
+def test_add_venv_dll_directory_registers_library_bin_once(monkeypatch, tmp_path):
+    monkeypatch.setattr(notebook_utils, "_venv_dll_directories", {})
+    add_dll_directory = MagicMock()
+    monkeypatch.setattr("os.add_dll_directory", add_dll_directory, raising=False)
+    dll_dir = tmp_path / "Library" / "bin"
+
+    assert notebook_utils._add_venv_dll_directory(tmp_path) == str(dll_dir)
+    assert notebook_utils._add_venv_dll_directory(tmp_path) == str(dll_dir)
+
+    assert dll_dir.is_dir()
+    add_dll_directory.assert_called_once_with(str(dll_dir))
+    assert notebook_utils._venv_dll_directories == {str(dll_dir): add_dll_directory.return_value}
+
+
 def test_load_venv_pth_files_skips_non_install_cells(monkeypatch, tmp_path):
     monkeypatch.setattr(notebook_utils, "_venv_site_dirs", [str(tmp_path)])
     monkeypatch.setattr(notebook_utils, "_processed_pth_files", set())

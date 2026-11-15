@@ -130,7 +130,7 @@ jobs:
           cat test_notebooks.txt
 
       - name: Setup Python ${{ inputs.python }}
-        uses: openvinotoolkit/openvino/.github/actions/setup_python@97968ef66729ec25897e023ef3bc7222be157198
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@7e11265ea54dfaf319ff57770a65fa7e896d83f3
         with:
           version: ${{ inputs.python }}
           pip-cache-path: ${{ env.PIP_CACHE_PATH }}
