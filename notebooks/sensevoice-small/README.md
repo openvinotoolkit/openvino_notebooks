@@ -2,7 +2,7 @@
 
 [SenseVoiceSmall](https://huggingface.co/FunAudioLLM/SenseVoiceSmall) is a non-autoregressive speech understanding model from FunAudioLLM. One encoder/CTC model produces a transcript, language identification and emotion/audio-event tags. The released Small checkpoint supports Mandarin, Cantonese, English, Japanese and Korean.
 
-This tutorial exports the model with Optimum Intel and runs it with OpenVINO GenAI `ASRPipeline`. See the [original repository](https://github.com/FunAudioLLM/SenseVoice) and [paper](https://arxiv.org/abs/2407.04051).
+This tutorial exports the model with the Optimum Intel Python API and runs it with OpenVINO GenAI `ASRPipeline`. The `OVModelForSpeechSeq2Seq` export entry point also handles the SenseVoice CTC architecture. See the [original repository](https://github.com/FunAudioLLM/SenseVoice) and [paper](https://arxiv.org/abs/2407.04051).
 
 This notebook offers CPU/GPU inference with FP16 or INT8 weights; NPU and INT4 are not included.
 
