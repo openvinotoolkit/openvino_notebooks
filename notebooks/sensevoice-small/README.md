@@ -27,7 +27,7 @@ The checkpoint uses the [custom FunASR model license](https://github.com/modelsc
 
 This is a self-contained example that relies solely on its own code.
 
-The notebook targets OpenVINO/Tokenizers/GenAI 2026.5 or later and Optimum Intel 2.3 or later for SenseVoice ASR, metadata and batching support. It uses compatible version ranges rather than fixing all package versions. Transformers is limited to 4.57.x, Gradio to 5.x, and matching CPU PyTorch/TorchAudio 2.8.x wheels are used for export. Dependencies are resolved together to preserve compatibility constraints. OpenVINO GPU inference does not require PyTorch GPU wheels.
+The notebook targets OpenVINO 2026.5. It installs pre-release OpenVINO/Tokenizers/GenAI packages from the nightly index with `--pre` and Optimum Intel from `main` for SenseVoice export, ASR, metadata and batching support. It uses compatible version ranges rather than fixing all package versions. Transformers is limited to 4.57.x, Gradio to 5.x, and matching CPU PyTorch/TorchAudio 2.8.x wheels are used for export. Dependencies are resolved together to preserve compatibility constraints. OpenVINO GPU inference does not require PyTorch GPU wheels.
 
 GPU inference explicitly requests FP32 runtime precision to avoid empty transcripts with the FP16 graph. Weight compression and runtime inference precision are separate settings.
 
