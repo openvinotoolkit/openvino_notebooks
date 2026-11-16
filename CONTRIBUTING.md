@@ -25,6 +25,7 @@
       - [`PySpelling`](#pyspelling)
   - [Getting started](#getting-started)
     - [Pull Requests (PRs)](#pull-requests-prs)
+      - [Copilot submission review](#copilot-submission-review)
   - [Help](#help)
 
 Thank you for being interested in contributing to the OpenVINO Notebooks repository! This guide
@@ -350,6 +351,11 @@ and some style issues
   - In the rest of this guide, the automated tests in GitHub
 Actions will be referred to as CI (for Continuous Integration).
 
+Docker, code check, and spell check workflows report their required checks for every PR targeting `main` or `latest`.
+Their tests run only when the PR changes files matching the filters in each workflow's `changes` job,
+which uses the [`job_detect_changes.yml`](.github/workflows/job_detect_changes.yml) reusable workflow.
+Otherwise, the required checks pass without running the tests. Change detection or test failures still fail the required checks.
+
 If your notebook takes longer than a few minutes to execute, it may be possible to patch it in the CI, to make 
 it execute faster. As an example, if your notebook trains for 20 epochs, you can set it to train for
 1 epoch in the CI. If you do inference on 100 frames of a video, you can set it to do inference on only 1. See 
@@ -445,6 +451,30 @@ Once your notebook passes in the CI and you have verified that everything looks 
 3. Please create a description of what the notebook does with your PR. Screenshots are appreciated!
 4. On making or updating a Pull Request, the tests in the CI will run again. Please keep an
    eye on them. If the tests fail and you think the issue is not related to your PR, please make a comment on your PR.
+
+#### Copilot submission review
+
+Request a review from **Copilot** in the **Reviewers** section of a pull request,
+as described in [Using GitHub Copilot code review](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-code-review).
+For changes under `notebooks/`, the
+[notebook review instructions](.github/instructions/notebook-review.instructions.md)
+direct Copilot to the
+[notebook code review skill](.github/skills/notebook-code-review/SKILL.md).
+The skill guides a thorough assessment of model/task suitability and usefulness,
+correctness, portability, documentation, licensing, and available CI evidence
+against this contribution guide. It includes a review summary template.
+
+Keep repository custom instructions enabled in the Copilot code review settings.
+Copilot reads instructions and skills from the head branch, so changes to them
+can be tested in the same pull request. Check skill attributions on review
+comments or the linked review session to confirm which guidance was used.
+Request a fresh review after changing the submission.
+
+The review is advisory: it does not replace CI or maintainer judgment. The skill
+instructs the reviewer not to execute submitted code or assume unverified claims
+pass. It does not select a model or enforce a user access list; review access is
+controlled by GitHub permissions and Copilot settings. No Actions workflow,
+token secret, or `/review-submission` comment is required.
 
 ## Help
 

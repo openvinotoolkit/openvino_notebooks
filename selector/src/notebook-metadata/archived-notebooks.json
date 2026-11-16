@@ -296,6 +296,29 @@
     }
   },
   {
+    "title": "Convert and Run DRO-Grasp with OpenVINO™",
+    "path": "dro-grasp/dro-grasp.ipynb",
+    "imageUrl": null,
+    "lastBranch": "2026.3",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.3/notebooks/dro-grasp/dro-grasp.ipynb",
+    "models": [],
+    "tags": {
+      "categories": [
+        "Convert",
+        "Model Demos"
+      ],
+      "libraries": [
+        "PyTorch"
+      ],
+      "other": [
+        "Robotics"
+      ],
+      "tasks": [
+        "Grasp Prediction"
+      ]
+    }
+  },
+  {
     "title": "D-FINE Object Detection with OpenVINO",
     "path": "d-fine/dfine.ipynb",
     "imageUrl": null,

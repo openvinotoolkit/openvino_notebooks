@@ -45,6 +45,65 @@ The files are described by JSON Schemas in [`schema/`](./schema): `nightly-repor
 Size: roughly 1 MB of JSON per night. Keep `results` (and `summary`) long-term; `failures` text and `environments.json` can be pruned
 after some weeks.
 
+## Consumer: nightly issue remediator
+
+The GitHub Agentic Workflow in `.github/workflows/nightly-issue-remediator.md` runs after a failed scheduled `treon_nightly` run on
+`latest`; it can also be started manually with a run ID and source repository. Its deterministic collector downloads
+`nightly-dashboard-data` before the agent starts and writes a bounded digest (`summary.md`, `status.json`, `run.json`,
+`tracked.json`, and per-signature group JSON/Markdown plus representative logs). It skips groups already covered by an open or
+recently rejected remediation, prioritizes likely-fixable groups, and caps each run at five groups and three draft PRs. All open
+tracking items and recent rejections are paginated independently of the bounded completed-item history.
+
+The main agent uses Copilot model routing with `mode: balanced` and `goal: cost`, choosing from the
+`engine.model-routing.allowed-models` shortlist in the [workflow source](../../.github/workflows/nightly-issue-remediator.md).
+The shortlist does not restrict built-in agents or sub-agents and is not a workflow-wide model policy or spending limit.
+Review it as model availability changes; if none of the shortlisted models is available, the run fails.
+
+The agent creates one PR for a verified in-scope fix, or one issue when the cause is ambiguous, infrastructure-related, or cannot
+be safely fixed. PRs use the `nightly-remediator` and `automated-fix` labels; issues use `nightly-remediator` and
+`nightly-failure`. Every created item must contain the visible `Error signature: \`<12-hex-signature>\`` line, also include
+`(sig <12-hex-signature>)` in its title, and list every affected notebook/config pair. These exact conventions are how later
+collector runs find and deduplicate existing work.
+
+The pinned gh-aw runtime instructs an agent to stop after calling `create_pull_request`. Consequently, the three-PR safe-output
+limit is a policy cap, not a guarantee that every selected group will receive an outcome in the same run; untracked groups can be
+selected again on a later run.
+
+### Knowledge base
+
+The remediator keeps notes about every signature it investigated on the dedicated `memory/nightly-remediator` branch (the gh-aw
+`repo-memory` tool), in a single `knowledge.json`. Each signature record holds its kind, category, exception type, headline, affected
+notebooks, first/last seen nightly date, number of investigations, and up to three recent attempts (outcome, confidence, root cause,
+action, dead ends, next step). The file holds at most 100 signatures (the least recently seen are evicted) and stays under 900 KB.
+Its schema and limits live in [`knowledge_base.py`](../../.github/scripts/agentic-workflows/knowledge_base.py).
+
+- **Query:** the collector reads the file from the branch (a missing branch is normal on the first run; an unreadable or invalid file
+  only adds a warning) and adds a **Knowledge base** section to each `group.md`: the notes for the exact signature plus up to three
+  related signatures (same exception type or shared notebook). The agent can also query the restored copy at
+  `/tmp/gh-aw/repo-memory/default/knowledge.json` with `jq`.
+- **Save:** for each investigated group the agent writes a small note to `/tmp/gh-aw/agent/nightly-remediator/outcomes/<signature>.json`.
+  It never writes the persisted file: before the agent starts, `update_knowledge_base.py snapshot` copies the digest, the cloned
+  knowledge base, and the updater scripts themselves to `$RUNNER_TEMP`, which the agent's sandbox does not mount. After the agent,
+  that script copy runs `update_knowledge_base.py update` (with `python3 -E -s`, so the agent-writable user site-packages are ignored),
+  which rebuilds `knowledge.json` from the snapshots plus the validated notes (bounded single-line text, known enums, only signatures in
+  the digest) into a separate output directory. That directory always replaces the managed `repo-memory-default` artifact, which gh-aw
+  uploads from the agent-writable clone before post-steps; when there is no trusted result, it holds only a placeholder that the push
+  ignores, so the branch stays unchanged. gh-aw's `push_repo_memory` job validates the file again with the `validation.script` in the
+  workflow source before committing it to the branch. The snapshot and update steps are `continue-on-error`, so they can never block
+  the PRs and issues.
+- **Trust:** notes derive from CI output and agent text, so the prompt and digest present them as untrusted leads, never instructions.
+- **Operations:** the `push_repo_memory` job needs `contents: write`, and the repository rules must allow that job to push
+  `memory/nightly-remediator`. To reset the knowledge, delete the branch. If the repository requires signed commits, the push uses the
+  GitHub API and is signed automatically. After changing the schema or limits, update `knowledge_base.py`, the inline validation script
+  in the workflow source, and recompile (`gh aw compile --approve` records the reviewed validation script once); the contract tests
+  compare both and run the script with `node`.
+
+For a manual test against the public nightly run:
+
+```bash
+gh aw run nightly-issue-remediator --raw-field run_id=42540244557 --raw-field source_repo=openvinotoolkit/openvino_notebooks
+```
+
 ## `nightly-report.json` overview
 
 | Key | Content |

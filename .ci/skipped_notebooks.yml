@@ -366,10 +366,9 @@
         - windows-2022
 - notebook: notebooks/catvton/catvton.ipynb
   skips:
+    # PyTorch 2.8 does not provide wheels for Intel macOS runners.
     - os:
         - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/deepseek-ocr/deepseek-ocr.ipynb
   skips:
     - os:
@@ -377,12 +376,6 @@
         - ubuntu-22.04
         - windows-2022
 - notebook: notebooks/wan2.2-text-image-to-video/wan2.2-text-image-to-video.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb
   skips:
     - os:
         - macos-13
@@ -490,18 +483,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/bernini-r-image-video/bernini-r-image-video.ipynb
-  skips:
-    - os:
-        - macos-13
 - notebook: notebooks/qwen3.8-mtp/qwen3.8-mtp.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-# Gated HF checkpoint (requires token) and ~2.7 GB download; not executable in CI
-- notebook: notebooks/sam-3d-body/sam-3d-body.ipynb
   skips:
     - os:
         - macos-13
