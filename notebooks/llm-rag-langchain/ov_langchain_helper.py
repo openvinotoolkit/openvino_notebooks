@@ -133,7 +133,7 @@ class OpenVINOLLM(LLM):
         **kwargs: Any,
     ) -> Iterator[GenerationChunk]:
         """Output OpenVINO's generation Stream"""
-        from threading import Event, Thread
+        from threading import Thread
 
         if stop is not None:
             self.config.stop_strings = set(stop)
@@ -148,26 +148,36 @@ class OpenVINOLLM(LLM):
             input_ids = tokens["input_ids"]
             attention_mask = tokens["attention_mask"]
             prompt = openvino_genai.TokenizedInputs(ov.Tensor(input_ids), ov.Tensor(attention_mask))
-        stream_complete = Event()
+        # Reset before starting the worker, so the consumer never waits on an old queue.
+        self.streamer.reset()
+        generation_errors = queue.Queue()
 
         def generate_and_signal_complete() -> None:
-            """
-            genration function for single thread
-            """
-            self.streamer.reset()
-            self.ov_pipe.generate(prompt, self.config, self.streamer, **kwargs)
-            stream_complete.set()
-            self.streamer.end()
+            try:
+                self.ov_pipe.generate(prompt, self.config, self.streamer, **kwargs)
+                self.streamer.end()
+            except Exception as error:
+                generation_errors.put(error)
+                # Do not decode again after a failure: decoding itself may have failed.
+                self.streamer.text_queue.put(None)
 
         t1 = Thread(target=generate_and_signal_complete)
         t1.start()
 
-        for char in self.streamer:
-            chunk = GenerationChunk(text=char)
-            if run_manager:
-                run_manager.on_llm_new_token(chunk.text, chunk=chunk)
+        try:
+            for char in self.streamer:
+                chunk = GenerationChunk(text=char)
+                if run_manager:
+                    run_manager.on_llm_new_token(chunk.text, chunk=chunk)
 
-            yield chunk
+                yield chunk
+        finally:
+            # Stop generation if the consumer closes the iterator or a callback fails.
+            self.streamer._stop_flag = True
+            t1.join()
+
+        if not generation_errors.empty():
+            raise generation_errors.get()
 
     @property
     def _identifying_params(self) -> Dict[str, Any]:
