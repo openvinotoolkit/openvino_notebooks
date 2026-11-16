@@ -259,6 +259,7 @@ Dettmers
 dev
 DFL
 DFlash
+DSpark
 dGPU
 dGPUs
 DialoGPT
@@ -413,6 +414,7 @@ gpu
 GPU's
 GPUs
 GQA
+GSM
 Gradio
 gradio
 grapheme
