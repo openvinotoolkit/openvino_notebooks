@@ -154,6 +154,11 @@
     - os:
         - macos-13
         - windows-2022
+# NPU compilation cannot compute output bounds for SenseVoice's dynamic Unsqueeze.
+- notebook: notebooks/sensevoice-small/sensevoice-small.ipynb
+  skips:
+    - device:
+        - npu
 - notebook: notebooks/hello-npu/hello-npu.ipynb
   skips:
     - device:
