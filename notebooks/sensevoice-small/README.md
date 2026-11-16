@@ -29,6 +29,8 @@ This is a self-contained example that relies solely on its own code.
 
 The notebook targets OpenVINO 2026.5. It installs pre-release OpenVINO/Tokenizers/GenAI packages from the nightly index with `--pre` and Optimum Intel from `main` for SenseVoice export, ASR, metadata and batching support. It uses compatible version ranges rather than fixing all package versions. Transformers is limited to 4.57.x, Gradio to 5.x, and matching CPU PyTorch/TorchAudio 2.8.x wheels are used for export. Dependencies are resolved together to preserve compatibility constraints. OpenVINO GPU inference does not require PyTorch GPU wheels.
 
+The `protobuf` lower bound keeps its runtime compatible with the generated `sentencepiece` model definitions used for detokenizer conversion.
+
 GPU inference explicitly requests FP32 runtime precision to avoid empty transcripts with the FP16 graph. Weight compression and runtime inference precision are separate settings.
 
 The source checkpoint is approximately 0.94 GB, plus exported models and installed packages. A microphone is optional; file uploads work without one. Standard audio formats supported by SoundFile do not require a separate system FFmpeg installation.
