@@ -168,6 +168,7 @@ Conv
 conv
 ConvE
 conve
+Convai
 ConvNet
 ConvNets
 ConvNext
@@ -257,6 +258,7 @@ DETR
 Dettmers
 dev
 DFL
+DFlash
 dGPU
 dGPUs
 DialoGPT
@@ -318,6 +320,7 @@ editability
 EfficientNet
 EfficientSAM
 EfficientSAMs
+Eggbox
 embedder
 Embedder
 embeddings
@@ -379,6 +382,8 @@ Gaudi
 gaussian
 Gb
 gcc
+GDRN
+GDRNPP
 GEC
 GELAN
 GELU
@@ -396,6 +401,7 @@ GitHub
 GLA
 GLM
 glm
+glyphs
 GMCNN
 GNA
 Golang
@@ -496,10 +502,12 @@ InternVLA
 Interpolative
 interpretable
 intervaling
+intrinsics
 invertible
 io
 IoU
 ip
+IPEX
 IPs
 ipynb
 ir
@@ -510,6 +518,7 @@ JAX
 JAX's
 JEPA
 JEPA's
+Jev
 JFLEG
 Jina
 jina
@@ -568,6 +577,8 @@ laion
 LangChain
 langchain
 LangChain's
+Laya
+laya
 Lasinger
 latents
 LaTeX
@@ -579,6 +590,7 @@ LDMs
 LDP
 learnable
 LetterBox
+letterboxed
 LeViT
 LFM
 lfm
@@ -592,6 +604,7 @@ lifecycles
 Lim
 LinearCameraEmbedder
 linearized
+Linemod
 Lippipeline
 Liu
 LLama
@@ -686,6 +699,8 @@ MLLMs
 MLP
 MLS
 MMB
+mmBERT
+ModernBERT
 MMDiT
 mms
 MMS
@@ -769,10 +784,12 @@ nonlinearity
 normalises
 Notus
 notus
+noul
 npoints
 npu
 NPU
 NPUs
+NPUW
 nsamples
 nsfw
 NSFW
@@ -785,6 +802,7 @@ NVLabs
 OASST
 OBB
 obb
+objectness
 ocr
 OCRBench
 OCRv
@@ -908,6 +926,7 @@ PLE
 PLR
 PNDM
 png
+PnP
 Pointilism
 pointillistic
 PointNet
@@ -990,6 +1009,7 @@ Radosavovic
 Raito
 Raj
 Ranftl
+RANSAC
 RASPP
 rasterised
 rasterises
@@ -1038,6 +1058,8 @@ riffusion
 Rinna
 rinna
 RLE
+RL
+RLCD
 RLHF
 RMBG
 RMS
@@ -1046,6 +1068,7 @@ RoBERTa
 roberta
 ROI
 roi
+ROIs
 rollout
 RoPE
 ROUGE
@@ -1086,6 +1109,7 @@ segmenter
 Segmind
 segmind
 selfattention
+SentencePiece
 serializable
 sft
 SGD
@@ -1164,6 +1188,7 @@ subdirectory
 submodels
 subgraph
 subgraphs
+subfolder
 sublicense
 subpackage
 subprocesses
@@ -1268,7 +1293,9 @@ upsample
 upsampled
 upsamples
 upsampling
+upstreamed
 Upscaled
+upscaled
 upscaler
 upscales
 upscaling
@@ -1367,6 +1394,7 @@ xvector
 xvectors
 xxl
 XYWH
+XYZ
 YAML
 YaRN
 Yiqin
@@ -1374,6 +1402,7 @@ YOLO
 YOLOE
 YOLOv
 yolov
+YOLOX
 Youri
 youri
 YouTube
