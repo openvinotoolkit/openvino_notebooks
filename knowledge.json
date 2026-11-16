@@ -1,0 +1,160 @@
+{
+ "schema_version": 1,
+ "signatures": {
+  "10b5fae3267c": {
+   "attempts": [
+    {
+     "action": "Filed one issue listing all 10 notebook/config pairs with per-notebook stalled cells and suggested checks; no code change.",
+     "confidence": "low",
+     "date": "2026-11-16",
+     "dead_ends": "No single cause or code fix possible; CI timeout and skip-list edits are out of scope; the notebooks were not run so slow inference versus hang is undetermined.",
+     "next_step": "Fix the catvton clone first (sig 6e2e945195ed, fail fast on Windows), then time the yolov26-obb quantization cell and the gemma4/minicpm py3.13 generation cells to separate hangs from slow CPU runs.",
+     "nightly_run_id": 43780752266,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43780752266",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43806356935",
+     "root_cause": "unknown; generic 3600s timeout signature spanning five unrelated notebooks stalling in different cells (git clone, nncf quantize, gemma4/minicpm generation, laya inference) with no traceback; catvton Windows timeouts relate to the missing CatVTON repo."
+    }
+   ],
+   "category": "timeout",
+   "error_class": "timeout",
+   "exception_type": "",
+   "first_seen": "2026-11-16",
+   "headline": "Timeout reached (3600s), process killed",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-16",
+   "notebooks": [
+    "notebooks/catvton/catvton.ipynb",
+    "notebooks/gemma4/gemma4.ipynb",
+    "notebooks/laya-decision-models/laya-decision-models.ipynb",
+    "notebooks/minicpm-v-4.7/minicpm-v-4.7.ipynb",
+    "notebooks/yolov26-optimization/yolov26-obb.ipynb"
+   ]
+  },
+  "698affd5ea98": {
+   "attempts": [
+    {
+     "action": "Draft PR setting ipywidgets>=8.0.0 in requirements.txt; verified with a local index proxy simulating the glitch and a dry-run resolution.",
+     "confidence": "medium",
+     "date": "2026-11-16",
+     "dead_ends": "Notebook edits and per-notebook pip pins ruled out because the cause is the shared environment; CI workflow edits are out of scope.",
+     "next_step": "If the failure recurs after merge, investigate the Windows runner PyPI proxy returning Content-Type Unknown, or harden the Invoke-Pip retry to reinstall requirements with --force-reinstall.",
+     "nightly_run_id": 43780752266,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43780752266",
+     "outcome": "pr",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43806356935",
+     "root_cause": "A transient PyPI index glitch (skipped widgetsnbextension page) made pip backtrack to ipywidgets 4.1.1 on the Windows py3.11 job; the install retry kept it because requirements.txt had no lower bound; 4.1.1 imports the missing ipython_genutils."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "dependency",
+   "exception_type": "ModuleNotFoundError",
+   "first_seen": "2026-11-16",
+   "headline": "ModuleNotFoundError: No module named 'ipython_genutils'",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-16",
+   "notebooks": [
+    "notebooks/flux-fill/flux-fill.ipynb",
+    "notebooks/gemma4/gemma4.ipynb",
+    "notebooks/hunyuan-ocr/hunyuan-ocr.ipynb",
+    "notebooks/image-classification-quantization/image-classification-quantization.ipynb",
+    "notebooks/llm-chatbot/llm-chatbot.ipynb",
+    "notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb",
+    "notebooks/mobileclip-video-search/mobileclip-video-search.ipynb",
+    "notebooks/nuextract-structure-extraction/nuextract-structure-extraction.ipynb",
+    "notebooks/qwen3-embedding/qwen3-reranker.ipynb",
+    "notebooks/stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb",
+    "notebooks/vjepa-2.1/vjepa2-video-embeddings.ipynb"
+   ]
+  },
+  "6e2e945195ed": {
+   "attempts": [
+    {
+     "action": "Filed an issue with the availability evidence and options; no code change because repointing to an unvetted fork is a provenance and licensing decision.",
+     "confidence": "high",
+     "date": "2026-11-16",
+     "dead_ends": "Switching clone_repo to a fork rejected as unsafe without maintainer approval; retry logic cannot help because the repository is gone; a code-only cause was ruled out.",
+     "next_step": "Maintainers check whether CatVTON moved or was removed on purpose, then update the URL and revision, vendor the needed code, or skip the notebook.",
+     "nightly_run_id": 43780752266,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43780752266",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43806356935",
+     "root_cause": "Upstream repository Zheng-Chong/CatVTON returns 404 to unauthenticated git clone and API requests, so clone_repo fails on every config; the pinned commit still exists only in third-party forks."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "other",
+   "exception_type": "CalledProcessError",
+   "first_seen": "2026-11-16",
+   "headline": "CalledProcessError: Command '['git', 'clone', 'https://github.com/Zheng-Chong/CatVTON.git']' returned non-zero exit status 128.",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-16",
+   "notebooks": [
+    "notebooks/catvton/catvton.ipynb"
+   ]
+  },
+  "db0467f22081": {
+   "attempts": [
+    {
+     "action": "Filed an issue with the stalled cells, history and diagnostic steps; no code change since the logs show no deterministic notebook defect.",
+     "confidence": "low",
+     "date": "2026-11-16",
+     "dead_ends": "Notebook edits ruled out because there is no Python exception; CI list edits are out of scope; not reproduced because the sandbox has no GPU or OpenVINO build.",
+     "next_step": "Rerun async-api on py3.13 with PYTHONFAULTHANDLER=1 and check OOM kill records, then check dGPU memory use at the omnivoice voice-cloning cell.",
+     "nightly_run_id": 43780752266,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43780752266",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43806356935",
+     "root_cause": "unknown; kernel dies with no Python traceback during inference-heavy cells in async-api on Ubuntu py3.13 CPU (4 of 4 nights) and omnivoice on dGPU py3.11 (first failure), suggesting a native crash, OOM kill, or Python 3.13 related fault."
+    }
+   ],
+   "category": "kernel_died",
+   "error_class": "crash",
+   "exception_type": "DeadKernelError",
+   "first_seen": "2026-11-16",
+   "headline": "DeadKernelError: Kernel died",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-16",
+   "notebooks": [
+    "notebooks/async-api/async-api.ipynb",
+    "notebooks/omnivoice/omnivoice.ipynb"
+   ]
+  },
+  "fd463e9ad754": {
+   "attempts": [
+    {
+     "action": "Draft PR setting ipywidgets>=8.0.0 in requirements.txt (identical to the PR for 698affd5ea98).",
+     "confidence": "medium",
+     "date": "2026-11-16",
+     "dead_ends": "Editing notebook_utils download_file or notebooks to avoid tqdm_notebook ruled out; the cause is the shared environment, not the helper.",
+     "next_step": "After the sibling PR merges, confirm both signatures vanish in the next nightly; otherwise investigate the Windows runner PyPI proxy Content-Type Unknown responses.",
+     "nightly_run_id": 43780752266,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43780752266",
+     "outcome": "pr",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43806356935",
+     "root_cause": "Same environment fault as signature 698affd5ea98: a transient PyPI index glitch led pip to install ipywidgets 4.1.1 on the Windows py3.11 job, so tqdm.notebook could not import IProgress."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "dependency",
+   "exception_type": "ImportError",
+   "first_seen": "2026-11-16",
+   "headline": "ImportError: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-16",
+   "notebooks": [
+    "notebooks/async-api/async-api.ipynb",
+    "notebooks/auto-device/auto-device.ipynb",
+    "notebooks/handwritten-ocr/handwritten-ocr.ipynb",
+    "notebooks/hello-world/hello-world.ipynb",
+    "notebooks/optical-character-recognition/optical-character-recognition.ipynb",
+    "notebooks/paddle-to-openvino/paddle-to-openvino-classification.ipynb"
+   ]
+  }
+ }
+}
