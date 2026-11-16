@@ -9,11 +9,25 @@ from validate_notebooks import NotebookStatus, get_ignore_list_notebooks, get_ig
 
 CI_DIR = Path(__file__).resolve().parents[2]
 NOT_ALLOWED_NOTEBOOKS = {
+    Path("notebooks/3D-segmentation-point-clouds/3D-segmentation-point-clouds.ipynb"),
     Path("notebooks/aloha-act/aloha-act.ipynb"),
+    Path("notebooks/convert-to-openvino/convert-to-openvino.ipynb"),
     Path("notebooks/detectron2-to-openvino/detectron2-to-openvino.ipynb"),
     Path("notebooks/gdrnpp-full-pipeline/gdrnpp-full-pipeline.ipynb"),
     Path("notebooks/multimodal-rag/multimodal-rag-llamaindex.ipynb"),
+    Path("notebooks/openvino-api/openvino-api.ipynb"),
+    Path("notebooks/optimize-preprocessing/optimize-preprocessing.ipynb"),
+    Path("notebooks/paddle-to-openvino/paddle-to-openvino-classification.ipynb"),
+    Path("notebooks/rf-detr-object-detection/rf-detr-object-detection.ipynb"),
+    Path("notebooks/tensorflow-classification-to-openvino/tensorflow-classification-to-openvino.ipynb"),
     Path("notebooks/tensorflow-object-detection-to-openvino/tensorflow-object-detection-api-with-openvino.ipynb"),
+    Path("notebooks/text-to-image-genai/text-to-image-genai.ipynb"),
+    Path("notebooks/tflite-selfie-segmentation/tflite-selfie-segmentation.ipynb"),
+    Path("notebooks/tflite-to-openvino/tflite-to-openvino.ipynb"),
+    Path("notebooks/vision-background-removal/vision-background-removal.ipynb"),
+    Path("notebooks/vjepa-2.1/vjepa2-video-embeddings.ipynb"),
+    Path("notebooks/wav2lip/wav2lip.ipynb"),
+    Path("notebooks/yolov26-optimization/yoloe-26-open-vocabulary.ipynb"),
 }
 
 SKIP_CONFIG = """\
@@ -110,6 +124,8 @@ def test_nightly_gpu_jobs_skip_not_allowed_resources(job_name, skip_config):
     if job_name == "build_treon_igpu":
         assert {".ci/gpu_oom.txt", ".ci/igpu_timeouts.txt"} <= set(ignore_lists)
     assert NOT_ALLOWED_NOTEBOOKS <= set(get_ignore_list_notebooks([str(CI_DIR / "not_allowed_resources.txt")]))
+    missing = {path for path in NOT_ALLOWED_NOTEBOOKS if not (repo_root / path).is_file()}
+    assert not missing
 
     test_plan = prepare_test_plan(
         config("ubuntu-22.04", "3.11", "gpu"),
