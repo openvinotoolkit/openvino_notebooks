@@ -1,5 +1,7 @@
 # Virtual Try-On with CatVTON and OpenVINO
 
+> **Note:** The source repository [Zheng-Chong/CatVTON](https://github.com/Zheng-Chong/CatVTON) has been removed. This notebook will be removed in subsequent versions as well.
+
 ### Abstract
 Virtual try-on methods based on diffusion models achieve realistic try-on effects but replicate the backbone network as a ReferenceNet or leverage additional image encoders to process condition inputs, resulting in high training and inference costs. [In this work](http://arxiv.org/abs/2407.15886), authors rethink the necessity of ReferenceNet and image encoders and innovate the interaction between garment and person, proposing CatVTON, a simple and efficient virtual try-on diffusion model.
 It facilitates the seamless transfer of in-shop or worn garments of arbitrary categories to target persons by simply
