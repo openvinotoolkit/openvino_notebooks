@@ -216,6 +216,7 @@
 - [Visual-Language Assistant with SmolVLM2 and OpenVINO](./smolvlm2/smolvlm2.ipynb)
 - [Document conversion with SmolDocling and OpenVINO](./smoldocling/smoldocling.ipynb)
 - [Zero-shot Image Classification with SigLIP2](./siglip-zero-shot-image-classification/siglip-zero-shot-image-classification.ipynb)
+- [Speech Understanding with SenseVoiceSmall and OpenVINO](./sensevoice-small/sensevoice-small.ipynb)
 - [SAM 3 Image Segmentation with OpenVINO](./sam3/sam3-segmentation.ipynb)
 - [Object masks from prompts with SAM2 and OpenVINO](./sam2-video-segmentation/segment-anything-2-video.ipynb)
 - [Object masks from prompts with SAM2 and OpenVINO for Images](./sam2-image-segmentation/segment-anything-2-image.ipynb)
