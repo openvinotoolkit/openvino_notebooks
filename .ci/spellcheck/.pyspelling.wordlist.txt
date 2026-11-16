@@ -107,7 +107,6 @@ BMP
 boolean
 builtins
 ByteDance
-CatVTON
 CausVid
 CentOS
 centric
