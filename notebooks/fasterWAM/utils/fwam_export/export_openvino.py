@@ -1395,6 +1395,28 @@ def _vae_fold_lib():
     raise SystemExit("[ov] --vae-fold: cannot find fold_vae.py (looked in " f"{[c for c in cands if c]}); pass --no-vae-fold to export the unfolded graph")
 
 
+def _vae_4d_lib():
+    """Import `to_4d.py` (the torch-level 4-D encoder rewrite) from wherever it lives on this box."""
+    import importlib.util
+
+    here = Path(__file__).resolve().parent
+    cands = [
+        os.environ.get("VAE_4D_LIB"),
+        str(here / "to_4d.py"),
+        str(here / "vae_opt" / "to_4d.py"),
+        str(here.parent / "vae_opt" / "to_4d.py"),
+        str(SCRIPTS / "to_4d.py"),
+        str(SCRIPTS.parent / "vae_opt" / "to_4d.py"),
+    ]
+    for cand in cands:
+        if cand and Path(cand).is_file():
+            spec = importlib.util.spec_from_file_location("vae_to_4d", cand)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            return mod, Path(cand)
+    raise SystemExit("[ov] --vae-4d: cannot find to_4d.py (looked in " f"{[c for c in cands if c]}); drop the flag to export the 5-D graph")
+
+
 def apply_vae_fold(info: dict, compress: bool = True) -> tuple:
     """Fold the VAE encoder's dead depth taps into the freshly converted IR, in place.
 
@@ -2046,6 +2068,22 @@ def main() -> None:
         "--no-vae-fold reproduces the pre-promotion (unfolded) graph",
     )
     p.add_argument(
+        "--vae-4d",
+        dest="vae_4d",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="--unit vae only: export the encoder with 4-D internals (the T == 1 axis is squeezed "
+        "after the input and re-inserted before the output, so the graph interface and every "
+        "harness stay 5-D).  Same weights, bit-equal at fp32; removes the 5-D-only plugin "
+        "fallbacks (permute_ref / border_gpu_ref / reduce_ref / one f32 Convert).  DEFAULT ON: "
+        "an Arc B580 VAE unit goes 3.34 -> 3.19 ms once the rank-4 RMS fusion is in the GPU "
+        "plugin (L2NormChannelToRMS + its rank-4 relaxation), and an iGPU is -15.6 % even on a "
+        "stock plugin; without those plugin patches a B580 is ~5 % slower on this unit (+0.2 ms "
+        "of a ~129 ms chunk).  --no-vae-4d selects the promoted 5-D folded graph. "
+        "The transform is imported from vae_opt/to_4d.py (this flag is the only wiring) and it "
+        "replaces --vae-fold, which is a no-op on a 4-D graph",
+    )
+    p.add_argument(
         "--action-int8",
         dest="action_int8",
         action=argparse.BooleanOptionalAction,
@@ -2211,7 +2249,13 @@ def main() -> None:
         emit("slice_cond_layers", cond)
         emit("slice_inputs", {k: list(v.shape) for k, v in zip(names["in"], sample)})
     else:
-        wrapper = VaeEncode1(model.vae)
+        if args.vae_4d:
+            lib, lib_path = _vae_4d_lib()
+            lib.patch_4d()
+            wrapper = lib.VaeEncode1_4D(model.vae)
+            emit("vae_4d", {"lib": str(lib_path), "interface": list(ref["x"].shape)})
+        else:
+            wrapper = VaeEncode1(model.vae)
         names = {"in": ["image"], "out": ["latent"]}
         sample = (ref["x"],)
         reference = ref["z"]
@@ -2299,9 +2343,11 @@ def main() -> None:
         "ir", f"{ir['xml']}  ops={ir['n_ops']}  bin={ir['bin_mb']:.1f} MB  " f"read={ir['read_s']:.1f}s save={ir['save_s']:.1f}s reload={ir['read_ir_s']:.1f}s"
     )
     emit("fp16_io", ir["fp16_io"] if ir["fp16_io"] is not None else "off (f32 interface)")
-    if args.unit == "vae" and not args.vae_fold:
+    if args.unit == "vae" and args.vae_4d:
+        emit("vae_fold", "SKIPPED (--vae-4d): the 4-D encoder has no kernel-depth-3 taps to fold")
+    elif args.unit == "vae" and not args.vae_fold:
         emit("vae_fold", "DISABLED (--no-vae-fold): unfolded pre-promotion VAE graph")
-    if args.unit == "vae" and args.vae_fold:
+    if args.unit == "vae" and args.vae_fold and not args.vae_4d:
         # depth-tap fold, applied to the IR just written (same filenames) and re-verified
         ir, fmeta = apply_vae_fold(ir, compress=compress)
         emit(
