@@ -82,7 +82,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ['3.11', '3.12', '3.13']
+        python: ['3.11', '3.12', '3.13', '3.14']
         batch: ${{ fromJSON(needs.collect_notebooks.outputs.matrix) }}
     uses: ./.github/workflows/job_unix.yml
     with:
@@ -99,7 +99,7 @@ jobs:
       fail-fast: false
       matrix:
         runs_on: [aks-win-16-cores-32gb-full]
-        python: ['3.11', '3.12', '3.13']
+        python: ['3.11', '3.12', '3.13', '3.14']
         batch: ${{ fromJSON(needs.collect_notebooks.outputs.matrix) }}
     uses: ./.github/workflows/job_windows.yml
     with:

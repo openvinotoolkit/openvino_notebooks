@@ -281,6 +281,18 @@ def read_csv(path: Path) -> list[dict]:
         return list(csv.DictReader(f))
 
 
+def test_main_accepts_python_314_and_rejects_unsupported_version(main_setup):
+    run_main, _, tmp_path = main_setup
+    dashboard_dir = tmp_path / "dashboard_314"
+    run_main("--python", "3.14", "--dashboard_dir", str(dashboard_dir), *DASHBOARD_ARGS, report_dir="report_314")
+    data = assert_valid_fragment(dashboard_dir / "fragment.json")
+    assert data["job"]["python"] == "3.14"
+    assert {row["name"]: row["status"] for row in read_csv(tmp_path / "report_314" / "test_report.csv")}["pass/pass.ipynb"] == "SUCCESS"
+    with pytest.raises(SystemExit) as exc:
+        run_main("--python", "3.15")
+    assert exc.value.code == 2
+
+
 def test_main_device_tag(main_setup):
     """GPU jobs validate for --device gpu; --device_tag (igpu / dgpu) only labels the fragment."""
     run_main, _, tmp_path = main_setup
@@ -522,7 +534,7 @@ def test_main_end_to_end_with_treon(tmp_path, monkeypatch, restore_environ):
         "--os",
         "ubuntu-22.04",
         "--python",
-        "3.11",
+        f"{sys.version_info.major}.{sys.version_info.minor}",
         "--device",
         "cpu",
         "--timeout",
@@ -556,4 +568,4 @@ def test_main_end_to_end_with_treon(tmp_path, monkeypatch, restore_environ):
     for result in results.values():
         assert result["peak_rss_bytes"] and result["peak_rss_bytes"] > 0
         assert result["env_id"] and (dashboard_dir / "envs" / f"{result['env_id']}.txt").is_file()
-        assert result["openvino_before"] is None and result["duration_s"] > 0
+        assert result["openvino_before"] == result["packages"].get("openvino") and result["duration_s"] > 0

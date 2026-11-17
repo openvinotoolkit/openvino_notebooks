@@ -503,6 +503,50 @@ def test_report_without_api(inputs: dict):
     assert by_key(report)[(LINUX, "e/e.ipynb")]["status"] == "not_run"
 
 
+def test_python_314_results_and_missing_fragment(inputs: dict):
+    workflow_path = inputs["repo"] / ".github/workflows/nightly.yml"
+    workflow_path.write_text(WORKFLOW.replace("python: ['3.11']", "python: ['3.11', '3.14']", 2), encoding="utf-8")
+    linux_314 = "cpu-ubuntu-22.04-py3.14"
+    windows_314 = "cpu-windows-2022-py3.14"
+    data = fragment(
+        "ubuntu-22.04",
+        "batch_0",
+        314,
+        ["a/a.ipynb", "b/b.ipynb", "tf/tf.ipynb"],
+        [result("a/a.ipynb", "passed"), result("b/b.ipynb", "failed"), skipped("tf/tf.ipynb", "ignore_list")],
+    )
+    data["job"].update(python="3.14", python_full_version="3.14.0")
+    write_fragment(inputs["fragments"], "nightly-fragment-cpu-ubuntu-22.04-3.14-batch_0", data)
+    jobs = json.loads(inputs["jobs"].read_text(encoding="utf-8"))["jobs"] + [
+        api_job(314, "build_treon_linux (aks-linux-8-cores-32gb, 3.14, batch_0) / build_treon", "failure", [("Analysing with treon (Linux)", "failure")]),
+        api_job(
+            315,
+            "build_treon_windows (aks-win-16-cores-32gb-full, 3.14, batch_1) / build_treon",
+            "failure",
+            [("Install python dependencies", "failure")],
+        ),
+    ]
+    artifacts = json.loads(inputs["artifacts"].read_text(encoding="utf-8"))
+    artifacts["artifacts"].append({"id": 9314, "name": "nightly-fragment-cpu-ubuntu-22.04-3.14-batch_0", "expired": False})
+    inputs["artifacts"].write_text(json.dumps(artifacts), encoding="utf-8")
+    assert build_report.main(mocked_api_args(inputs, jobs)) == 0
+    report = load_report(inputs)
+    assert not list(Draft202012Validator(json.loads((SCHEMA_DIR / "nightly-report.schema.json").read_text(encoding="utf-8"))).iter_errors(report))
+    configs = {config["id"]: config for config in report["configs"]}
+    assert configs[linux_314]["python"] == configs[windows_314]["python"] == "3.14"
+    assert configs[windows_314]["ignore_lists"] == [".ci/tensorflow.txt"]
+    rows = by_key(report)
+    assert rows[(linux_314, "a/a.ipynb")]["status"] == "passed"
+    assert rows[(linux_314, "b/b.ipynb")]["status"] == "failed"
+    assert rows[(windows_314, "e/e.ipynb")]["skip_reason"] == "skip_config"
+    assert rows[(windows_314, "c/c.ipynb")]["not_run_reason"] == "job_failed_before_tests:Install python dependencies"
+    assert rows[(LINUX, "a/a.ipynb")]["status"] == "passed"
+    counts = report["summary"]["by_python"]["3.14"]
+    assert (counts["planned"], counts["executed"], counts["passed"], counts["failed"], counts["skipped"], counts["not_run"]) == (6, 2, 1, 1, 2, 2)
+    job = next(job for job in report["jobs"] if job["id"] == 314)
+    assert job["python_full_version"] == "3.14.0" and job["logs_artifact_url"].endswith("/artifacts/9314")
+
+
 def test_report_without_inputs(tmp_path: Path, repo: Path):
     output = tmp_path / "out"
     args = ["--fragments_dir", str(tmp_path / "missing"), "--output_dir", str(output), "--repo_root", str(repo), "--no_api", "--run_id", "1"]
@@ -725,6 +769,9 @@ def test_workflow_matrices_of_the_nightly_workflow():
         for combination in matrices[job_key]:
             assert (combination["os"], combination["device"], combination["runner_label"]) == (os_name, device, runner_label)
             assert re.fullmatch(r"\d+\.\d+", combination["python"]) and re.fullmatch(r"batch_\d+", combination["batch"])
+        versions = {"3.11", "3.12", "3.13", "3.14"} if device == "cpu" else {"3.11"}
+        assert {(item["python"], item["batch"]) for item in matrices[job_key]} == {(version, f"batch_{batch}") for version in versions for batch in range(5)}
+    assert sum(len(matrices[job_key]) for job_key in expected) == 50
     # Every test job uploads a dashboard fragment and the report job waits for all of them
     workflow = yaml.safe_load((repo_root / ".github/workflows/treon_nightly.yml").read_text(encoding="utf-8"))
     assert all(workflow["jobs"][job_key]["with"].get("dashboard_data") is True for job_key in expected)
@@ -736,8 +783,23 @@ def test_workflow_matrices_of_the_nightly_workflow():
     assert windows_lists == [".ci/tensorflow.txt"]
     windows_py313_lists = builder._ignore_lists("build_treon_windows", "cpu", "windows-2022", "3.13")
     assert windows_py313_lists == [*windows_lists, ".ci/win_py313_flaky.txt"]
+    assert builder._ignore_lists("build_treon_windows", "cpu", "windows-2022", "3.14") == windows_lists
     for item in igpu_lists + builder._ignore_lists("build_treon_dgpu", "dgpu", "ubuntu-22.04", "3.11") + windows_py313_lists:
         assert (repo_root / item).is_file(), item
+
+
+def test_precommit_and_install_matrices_cover_python_314():
+    repo_root = Path(build_report.__file__).resolve().parents[2]
+    workflow_dir = repo_root / ".github/workflows"
+    precommit = yaml.safe_load((workflow_dir / "treon_precommit.yml").read_text(encoding="utf-8"))["jobs"]
+    versions = ["3.11", "3.12", "3.13", "3.14"]
+    for job in ("build_treon_linux", "build_treon_windows"):
+        assert precommit[job]["strategy"]["matrix"]["python"] == versions
+    install = yaml.safe_load((workflow_dir / "install_requirements.yml").read_text(encoding="utf-8"))["jobs"]["build_install_requirements"]["strategy"][
+        "matrix"
+    ]
+    assert install["os"] == ["ubuntu-22.04", "windows-2022"]
+    assert install["python"] == versions
 
 
 @pytest.mark.parametrize(
