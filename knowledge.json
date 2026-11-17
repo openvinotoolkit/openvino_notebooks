@@ -1,6 +1,33 @@
 {
  "schema_version": 1,
  "signatures": {
+  "06076a94bfde": {
+   "attempts": [
+    {
+     "action": "Filed one issue; no code change since a fix needs CI token plumbing or a skip-list edit, both out of scope.",
+     "confidence": "medium",
+     "date": "2026-11-17",
+     "dead_ends": "Notebook code is correct as documented; no token or skip handling for this notebook in CI config; swapping the model source would be speculative.",
+     "next_step": "Grant the CI Hugging Face account access and pass HF_TOKEN to the iGPU job, or skip the notebook on nightly iGPU like sam3; handle the other GatedRepoError groups of the same night together.",
+     "nightly_run_id": 43987461301,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43987461301",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44010912666",
+     "root_cause": "snapshot_download of the gated Hugging Face repo facebook/sam-3d-body-dinov3 gets 401 GatedRepoError because the CI runner has no access or token; the notebook already documents the gating requirement."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "other",
+   "exception_type": "GatedRepoError",
+   "first_seen": "2026-11-17",
+   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6afbad9f-612f16aa48ad441d2668bd0e;eb28f67e-738b-49c3-867f-838261478eb4)",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-17",
+   "notebooks": [
+    "notebooks/sam-3d-body/sam-3d-body.ipynb"
+   ]
+  },
   "10b5fae3267c": {
    "attempts": [
     {
@@ -30,6 +57,33 @@
     "notebooks/laya-decision-models/laya-decision-models.ipynb",
     "notebooks/minicpm-v-4.7/minicpm-v-4.7.ipynb",
     "notebooks/yolov26-optimization/yolov26-obb.ipynb"
+   ]
+  },
+  "53783afa3cdf": {
+   "attempts": [
+    {
+     "action": "Filed one issue with affected pairs, evidence and suggested mirroring or runner network check; no code change.",
+     "confidence": "medium",
+     "date": "2026-11-17",
+     "dead_ends": "No code, dependency or version difference exists between passing CPU and failing GPU runs; the checkpoint URL cannot be verified or replaced safely from the notebook; CI skip lists are out of scope.",
+     "next_step": "Compare curl against the ModelScope URL from a GPU runner versus a CPU runner, then either mirror the checkpoints to a reachable host and update cell 7 or ask maintainers to skip it on GPU configs.",
+     "nightly_run_id": 43987461301,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43987461301",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44010912666",
+     "root_cause": "ModelScope returns HTTP 403 for checkpoint downloads only on dGPU and iGPU runners; the CPU config passed with identical packages, so the cause looks like runner egress or IP blocking rather than a notebook defect."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "other",
+   "exception_type": "Exception",
+   "first_seen": "2026-11-17",
+   "headline": "Exception: 403 Client Error: Forbidden for url: https://www.modelscope.cn/models/wangg12/GDRNPP/resolve/master/yolox/bop_pbr/yolox_x_640_augCozyAAEhsv_ranger_30_epochs_lmo_pbr_lmo_bop_test/model_final.pth",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-17",
+   "notebooks": [
+    "notebooks/gdrnpp-full-pipeline/gdrnpp-full-pipeline.ipynb"
    ]
   },
   "698affd5ea98": {
@@ -96,6 +150,84 @@
     "notebooks/catvton/catvton.ipynb"
    ]
   },
+  "6ec2d7ed9f19": {
+   "attempts": [
+    {
+     "action": "Filed one issue covering both 3.13 configs with reproduction, wheel availability findings and options; no code change.",
+     "confidence": "high",
+     "date": "2026-11-17",
+     "dead_ends": "Bumping only openai-whisper to 20250625 builds on 3.13 but later pins (torch, torchvision, numpy 1.26.4) would fail next; 20240930 still fails; CI skip-list edits are out of scope.",
+     "next_step": "Decide whether the notebook should support Python 3.13; if yes, move whisper to >=20250625 and re-pin the torch stack, then run the notebook end to end on 3.13, otherwise skip it for 3.13 in CI.",
+     "nightly_run_id": 43987461301,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43987461301",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44010912666",
+     "root_cause": "openai-whisper 20231117 setup.py reads locals() after exec, which fails with KeyError on Python 3.13 (PEP 667); reproduced locally. The same cell also pins torch 2.3.1 and torchvision 0.18.1, which have no Python 3.13 wheels, so fixing whisper alone is insufficient."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "dependency",
+   "exception_type": "CalledProcessError",
+   "first_seen": "2026-11-17",
+   "headline": "CalledProcessError: Command '['/__w/openvino_notebooks/openvino_notebooks/notebooks/cosyvoice3-tts/.venv/bin/python', '-m', 'pip', 'install', '-q', '--no-build-isolation', 'openai-whisper==20231117']' returned non-zero exit status 1.",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-17",
+   "notebooks": [
+    "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
+   ]
+  },
+  "71fea93268f9": {
+   "attempts": [
+    {
+     "action": "Filed one issue listing all 55 not-run pairs, the six jobs and suggested rerun plus apt retry hardening; no code change.",
+     "confidence": "high",
+     "date": "2026-11-17",
+     "dead_ends": "No repository change touches the step; the nightly commit is a notebook change; workflow and CI files are out of scope; only two of six job log extracts were read.",
+     "next_step": "Rerun the six failed jobs; if the failure recurs on the same runners, check the mirror proxy and consider apt retries in the install step.",
+     "nightly_run_id": 43987461301,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43987461301",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44010912666",
+     "root_cause": "apt-get update on six dGPU and iGPU nightly jobs got 504 Gateway Timeout from the internal Ubuntu mirror proxy, so tk and libedit-dev had no installation candidate and the install step exited 100 before any notebook ran; looks transient."
+    }
+   ],
+   "category": "infra",
+   "error_class": "job_failed_before_tests",
+   "exception_type": "",
+   "first_seen": "2026-11-17",
+   "headline": "job_failed_before_tests: Install required packages (container)",
+   "investigations": 1,
+   "kind": "infra",
+   "last_seen": "2026-11-17",
+   "notebooks": [
+    "notebooks/3D-point-pillars/pointpillars.ipynb",
+    "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb",
+    "notebooks/deepseek-r1/deepseek-r1.ipynb",
+    "notebooks/florence2/florence2.ipynb",
+    "notebooks/funasr-nano/funasr-nano.ipynb",
+    "notebooks/hugging-face-hub/hugging-face-hub.ipynb",
+    "notebooks/hunyuan-ocr/hunyuan-ocr.ipynb",
+    "notebooks/hunyuan-translation/hunyuan-translation.ipynb",
+    "notebooks/inpainting-genai/inpainting-genai.ipynb",
+    "notebooks/kokoro/kokoro.ipynb",
+    "notebooks/language-quantize-bert/language-quantize-bert.ipynb",
+    "notebooks/laya-decision-models/laya-decision-models.ipynb",
+    "notebooks/lfm3/lfm3.ipynb",
+    "notebooks/llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb",
+    "notebooks/llm-chatbot/llm-chatbot.ipynb",
+    "notebooks/llm-rag-llamaindex/llm-rag-llamaindex.ipynb",
+    "notebooks/minicpm-ocr/minicpm-ocr.ipynb",
+    "notebooks/nuextract-structure-extraction/nuextract-structure-extraction.ipynb",
+    "notebooks/omnivoice/omnivoice.ipynb",
+    "notebooks/openvoice/openvoice.ipynb",
+    "notebooks/openvoice2-and-melotts/openvoice2-and-melotts.ipynb",
+    "notebooks/paddle-ocr-webcam/paddle-ocr-webcam.ipynb",
+    "notebooks/paddleocr_vl/paddleocr_vl.ipynb",
+    "notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb",
+    "notebooks/qwen-image-2.1/qwen-image-2.1.ipynb"
+   ]
+  },
   "db0467f22081": {
    "attempts": [
     {
@@ -122,6 +254,33 @@
    "notebooks": [
     "notebooks/async-api/async-api.ipynb",
     "notebooks/omnivoice/omnivoice.ipynb"
+   ]
+  },
+  "f30731155e82": {
+   "attempts": [
+    {
+     "action": "Opened a draft PR adding wetext==0.2.1 to the last pip_install call in the cosyvoice3-tts install cell; checked JSON, check_notebooks.py and normalizer use on CPython 3.11 and 3.12.",
+     "confidence": "medium",
+     "date": "2026-11-17",
+     "dead_ends": "Notebook snapshot_download targets Hugging Face and succeeded, so it is not the source; full end-to-end notebook run was not possible; py3.13 failures are a separate whisper build issue.",
+     "next_step": "Run the notebook on py3.12 after merge and check later cells (conversion, inference) for new failures, including normalization output differences in wetext 0.2.1.",
+     "nightly_run_id": 43987461301,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/43987461301",
+     "outcome": "pr",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44010912666",
+     "root_cause": "wetext 0.0.4 pinned by CosyVoice calls modelscope snapshot_download for its FSTs when the frontend is created, and ModelScope returns Authentication token does not exist; wetext 0.2.1 bundles the FSTs."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "network",
+   "exception_type": "HTTPError",
+   "first_seen": "2026-11-17",
+   "headline": "HTTPError: Authentication token does not exist,",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-17",
+   "notebooks": [
+    "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
    ]
   },
   "fd463e9ad754": {
