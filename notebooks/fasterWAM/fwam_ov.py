@@ -72,6 +72,7 @@ DEFAULT_EXPORT_FLAGS = {
     "tmod2": 1,  # video t_mod from its 2 distinct timesteps (M=2) instead of all 294
     "modg": 1,  # t_mod as one row per latent frame; needs tmod2; deletes 28 per-block adds
     "vae_fold": True,  # fold the VAE encoder's 22 dead Conv3D depth taps (233 -> 81 GMAC)
+    "vae_4d": True,  # export the VAE encoder with 4-D internals (5-D interface; replaces vae_fold)
 }
 EXPORT_FLAGS = dict(DEFAULT_EXPORT_FLAGS)
 
@@ -604,6 +605,12 @@ def _export_cmd(unit: str, precision: str, out_dir: Path, ref_dump: Path) -> lis
         str(EXPORT_FLAGS["modg"]),
     ]
     cmd += ["--vae-fold"] if EXPORT_FLAGS["vae_fold"] else ["--no-vae-fold"]
+    # The 4-D encoder replaces the depth-tap fold: the encoder's T == 1 axis is squeezed after the
+    # input and re-inserted before the output, so the graph interface stays 5-D and every harness
+    # feeds the same tensors, while the 25 Conv3D(kd=1) become Conv2D and the 5-D-only plugin
+    # fallbacks (permute_ref / border_gpu_ref / reduce_ref) disappear.  Ask in both directions so
+    # the printed command says what it means.
+    cmd += ["--vae-4d"] if EXPORT_FLAGS["vae_4d"] else ["--no-vae-4d"]
     # The INT8 weight-compression switches default to ON in the exporter for `video` and `action`;
     # ask for them explicitly in both directions so the command says what it means.
     want_int8 = precision == "int8"
