@@ -18,6 +18,7 @@ The notebook contains the following steps:
 3. Convert model with OpenVINO.
 4. Launch interactive demo
 
+Inference supports CPU, GPU and NPU. The NPU path fixes input shapes before compilation and compiles the model again when the number of labels changes.
 
 We will use CLIP model for zero-shot image classification. The result of model work demonstrated on the image below
 ![image](https://user-images.githubusercontent.com/29454499/207795060-437b42f9-e801-4332-a91f-cc26471e5ba2.png)
@@ -25,6 +26,7 @@ We will use CLIP model for zero-shot image classification. The result of model w
 ## Installation Instructions
 
 This is a self-contained example that relies solely on its own code.</br>
+The notebook installs the OpenVINO 2026.5 RC2 packages from the nightly wheel index and Optimum Intel from GitHub.
 We recommend running the notebook in a virtual environment. You only need a Jupyter server to start.
 For details, please refer to [Installation Guide](../../README.md)..
 
