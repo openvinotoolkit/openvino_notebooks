@@ -4,13 +4,15 @@ Replace placeholders with evidence-backed content. Keep applicable sections and
 use `Not applicable` or `Unverified` explicitly. Repeat the model/task row for
 each new or materially changed pairing. If findings are posted inline, reference
 them rather than duplicating their full text. If there are no actionable findings,
-say so and omit the empty findings table.
+say so and omit the empty findings table. Assign severity with the guidance in
+[the project checklist](./notebook-checklist.md#severity).
 
 ```markdown
 ## Submission review
 
 - **Verdict:** <Ready for maintainer review / Changes recommended / Incomplete - verification needed>
 - **Reviewed head:** `<head SHA>`
+- **Base branch:** `<latest / release branch: showcase, not maintained or tested in CI>`
 - **Scope:** <notebooks and related files reviewed>
 - **Summary:** <brief description of the submission>
 
@@ -38,7 +40,7 @@ say so and omit the empty findings table.
 | Documentation | <Pass / Fail / Not applicable / Unverified> | <evidence> |
 | Metadata and integration | <Pass / Fail / Not applicable / Unverified> | <evidence> |
 | Licensing and responsible use | <Pass / Fail / Not applicable / Unverified> | <evidence> |
-| CI | <Pass / Fail / Not applicable / Unverified> | <evidence for the reviewed head SHA> |
+| CI | <Pass / Fail / Not applicable / Unverified> | <evidence for the reviewed head SHA; release branches run metadata validation only> |
 
 ## Validation and limitations
 
