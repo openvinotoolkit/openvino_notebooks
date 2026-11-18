@@ -164,6 +164,11 @@
   skips:
     - device:
         - npu
+# Granite 4.0-1B currently targets CPU/GPU; its exact-checkpoint NPU path is unvalidated.
+- notebook: notebooks/granite-4.0/granite-4.0.ipynb
+  skips:
+    - device:
+        - npu
 - notebook: notebooks/hello-npu/hello-npu.ipynb
   skips:
     - device:
