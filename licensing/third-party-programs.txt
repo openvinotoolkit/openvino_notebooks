@@ -3023,7 +3023,8 @@ Copyright (c) 2014-2021 Megvii Inc. All rights reserved.
    See the License for the specific language governing permissions and
    limitations under the License.
 
-----------------------------------------------------------------------------
+-------------------------------------------------------------
+
 15. Polyglot-Lion (https://github.com/knoveleng/polyglot-lion)
 
 MIT License
@@ -3048,7 +3049,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-----------------------------------------------------------------------------
+-------------------------------------------------------------
+
 16. Qwen3-ASR (https://github.com/QwenLM/Qwen3-ASR)
 
 The full-context encoder wrapper follows the original Qwen3-ASR implementation.
@@ -3069,4 +3071,4 @@ limitations under the License.
 
 The Apache License, Version 2.0 text is reproduced earlier in this file.
 
-----------------------------------------------------------------------------
+-------------------------------------------------------------

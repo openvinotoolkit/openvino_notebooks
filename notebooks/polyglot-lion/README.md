@@ -25,6 +25,7 @@ We recommend running the notebook in a dedicated Python 3.12 virtual environment
 on Linux. For details, refer to the [Installation Guide](../../README.md).
 Open [polyglot-lion.ipynb](./polyglot-lion.ipynb), keep
 [polyglot_helper.py](./polyglot_helper.py) beside it, and execute the cells in order.
+The first cell activates a notebook-specific `.venv` for dependency isolation.
 Enable `INSTALL_PACKAGES` for the setup cell, then restart the kernel and disable
 it before continuing. Git is required for the pinned Optimum Intel dependency.
 Allow about 16 GB for the checkpoint and all optional model variants, plus
