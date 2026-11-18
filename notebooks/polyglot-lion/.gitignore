@@ -1,0 +1,6 @@
+model/
+data/
+output/
+__pycache__/
+.ipynb_checkpoints/
+notebook_utils.py
