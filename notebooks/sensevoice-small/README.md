@@ -31,7 +31,7 @@ The notebook targets OpenVINO 2026.5. It installs pre-release OpenVINO/Tokenizer
 
 The `protobuf` lower bound keeps its runtime compatible with the generated `sentencepiece` model definitions used for detokenizer conversion.
 
-GPU inference explicitly requests FP32 runtime precision to avoid empty transcripts with the FP16 graph. Weight compression and runtime inference precision are separate settings.
+Inference uses the device's default runtime precision. Optimum Intel [sets `ACTIVATIONS_SCALE_FACTOR=4.0` during export](https://github.com/huggingface/optimum-intel/pull/2118) to prevent FP16 activation overflow on GPU. The notebook uses a new `asf4` export subdirectory so older IRs without this setting are not reused; upgrading the package alone does not update an existing IR. Weight compression and runtime inference precision are separate settings.
 
 The source checkpoint is approximately 0.94 GB, plus exported models and installed packages. A microphone is optional; file uploads work without one. Standard audio formats supported by SoundFile do not require a separate system FFmpeg installation.
 
