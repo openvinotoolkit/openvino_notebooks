@@ -59,6 +59,87 @@
     "notebooks/yolov26-optimization/yolov26-obb.ipynb"
    ]
   },
+  "10d9ce7a9f03": {
+   "attempts": [
+    {
+     "action": "Filed one issue; no code change since a fix needs a skip-list edit or an unverifiable surya-ocr upgrade.",
+     "confidence": "medium",
+     "date": "2026-11-18",
+     "dead_ends": "Pinning in the notebook cannot help because surya-ocr hard-pins transformers; the actual pip error was not observed because the nightly log has no pip output.",
+     "next_step": "Skip the notebook on Windows Python 3.13 (win_py313_flaky.txt or skipped_notebooks.yml) or move to a surya-ocr release that supports Python 3.13 and revalidate.",
+     "nightly_run_id": 44207691771,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44207691771",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44234028205",
+     "root_cause": "surya-ocr 0.4.0 pins transformers 4.36.2 which needs tokenizers below 0.19; tokenizers 0.15.x has no Windows cp313 wheel (pip simulation fails) and its sdist uses pyo3 0.20, so the install cell installs nothing on Windows Python 3.13 and datasets is missing."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "dependency",
+   "exception_type": "ModuleNotFoundError",
+   "first_seen": "2026-11-18",
+   "headline": "ModuleNotFoundError: No module named 'datasets'",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-18",
+   "notebooks": [
+    "notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb"
+   ]
+  },
+  "4038789163d9": {
+   "attempts": [
+    {
+     "action": "Filed one issue pointing to PR 3881 rather than a duplicate PR.",
+     "confidence": "high",
+     "date": "2026-11-18",
+     "dead_ends": "A second PR for the same wetext pin would duplicate an active remediation; the ModelScope 403 itself is external.",
+     "next_step": "Merge PR 3881 and re-check the next nightly; if ModelScope is still contacted, look for other modelscope calls in the CosyVoice clone.",
+     "nightly_run_id": 44207691771,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44207691771",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44234028205",
+     "root_cause": "wetext 0.0.4 downloads its FSTs from ModelScope at Normalizer creation and ModelScope answers 403 for de/tn/tagger_nondeterministic.fst; the wetext 0.2.1 wheel bundles the FSTs and has no modelscope reference, which is the fix in open PR 3881 (sig f30731155e82)."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "network",
+   "exception_type": "MaxRetryError",
+   "first_seen": "2026-11-18",
+   "headline": "MaxRetryError: None: Max retries exceeded with url: https://www.modelscope.cn/api/v1/models/pengzhendong/wetext/repo?Revision=master&FilePath=de%2Ftn%2Ftagger_nondeterministic.fst (Caused by HTTPError('403 Client Error: Forbidden for url: https://www.modelscope.cn/api/v1/models/pengzhendong/wetext/\u2026",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-18",
+   "notebooks": [
+    "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
+   ]
+  },
+  "4c5e06c97fec": {
+   "attempts": [
+    {
+     "action": "Filed one issue; no code change since a fix needs CI token plumbing, a skip-list edit or a nightly report normalization change, all out of scope.",
+     "confidence": "high",
+     "date": "2026-11-18",
+     "dead_ends": "Notebook code already documents gating; swapping the model source would be speculative; no HF_TOKEN in the nightly workflows.",
+     "next_step": "Grant CI Hugging Face access and pass HF_TOKEN, or skip sam-3d-body on all nightly configs like sam3; mask the Request ID in normalize_message of error_parser.py.",
+     "nightly_run_id": 44207691771,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44207691771",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44234028205",
+     "root_cause": "snapshot_download of the gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 because CI has no access or token; same cause as issue 3879 (sig 06076a94bfde). The HF Request ID in the message changes the signature every night."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "other",
+   "exception_type": "GatedRepoError",
+   "first_seen": "2026-11-18",
+   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6afd0854-44a0271e1adbc1ea00807378;e8dd4e08-9c3c-4186-b60f-f0a38a0176e7)",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-18",
+   "notebooks": [
+    "notebooks/sam-3d-body/sam-3d-body.ipynb"
+   ]
+  },
   "53783afa3cdf": {
    "attempts": [
     {
@@ -84,6 +165,33 @@
    "last_seen": "2026-11-17",
    "notebooks": [
     "notebooks/gdrnpp-full-pipeline/gdrnpp-full-pipeline.ipynb"
+   ]
+  },
+  "5b12bfcacbb0": {
+   "attempts": [
+    {
+     "action": "Filed one issue; no code change since a hardening change could not be verified to fix the failure.",
+     "confidence": "low",
+     "date": "2026-11-18",
+     "dead_ends": "Could not fetch the asset from the agent sandbox (S3 redirect blocked); the same URL is used by about ten other notebooks, none with GPU-run evidence in this digest.",
+     "next_step": "Add raise_for_status and logging of status and content type to load_image, or use notebook_utils.download_file, and check the GPU runners' egress to the GitHub asset host.",
+     "nightly_run_id": 44207691771,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44207691771",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44234028205",
+     "root_cause": "unknown; the lfm3 load_image helper writes the response body of the GitHub asset URL to cat.png without a status check and PIL cannot decode it, but only the dGPU and iGPU runners fail and the logs do not show the response."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "other",
+   "exception_type": "UnidentifiedImageError",
+   "first_seen": "2026-11-18",
+   "headline": "UnidentifiedImageError: cannot identify image file 'cat.png'",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-18",
+   "notebooks": [
+    "notebooks/lfm3/lfm3.ipynb"
    ]
   },
   "698affd5ea98": {
@@ -226,6 +334,33 @@
     "notebooks/paddleocr_vl/paddleocr_vl.ipynb",
     "notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb",
     "notebooks/qwen-image-2.1/qwen-image-2.1.ipynb"
+   ]
+  },
+  "a055acee5cc0": {
+   "attempts": [
+    {
+     "action": "Filed one issue pointing to PR 3881 rather than a duplicate PR.",
+     "confidence": "high",
+     "date": "2026-11-18",
+     "dead_ends": "A second PR for the same wetext pin would duplicate an active remediation; the ModelScope 403 itself is external.",
+     "next_step": "Merge PR 3881 and re-check the next nightly on both Python 3.12 configs; Python 3.13 configs fail earlier for sig 6ec2d7ed9f19.",
+     "nightly_run_id": 44207691771,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44207691771",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44234028205",
+     "root_cause": "wetext 0.0.4 downloads its FSTs from ModelScope at Normalizer creation and ModelScope answers 403 for de/tn/verbalizer.fst; the wetext 0.2.1 wheel bundles the FSTs, which is the fix in open PR 3881 (sig f30731155e82). Same cause as sibling sig 4038789163d9."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "network",
+   "exception_type": "MaxRetryError",
+   "first_seen": "2026-11-18",
+   "headline": "MaxRetryError: None: Max retries exceeded with url: https://www.modelscope.cn/api/v1/models/pengzhendong/wetext/repo?Revision=master&FilePath=de%2Ftn%2Fverbalizer.fst (Caused by HTTPError('403 Client Error: Forbidden for url: https://www.modelscope.cn/api/v1/models/pengzhendong/wetext/repo?Revision\u2026",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-18",
+   "notebooks": [
+    "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
    ]
   },
   "db0467f22081": {
