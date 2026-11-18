@@ -13,6 +13,9 @@ from pathlib import Path
 NOTEBOOKS_ROOT = Path(__file__).resolve().parents[1]
 UTILS_DIR = NOTEBOOKS_ROOT / "utils"
 HELPER_DOWNLOAD_RE = re.compile(r"openvino_notebooks/\w+/utils/|\.\./\.\./utils")
+# `open("<file>.py", "w")` without `encoding` uses the locale encoding (cp1252 on Windows),
+# which cannot write the non-ASCII characters many downloaded helpers contain
+UNENCODED_PY_WRITE_RE = re.compile(r"""open\(\s*f?["'][^"']+\.py["']\s*,\s*["']w["']\s*\)""")
 
 EXPECTED_NO_DEVICE = [
     Path("notebooks/auto-device/auto-device.ipynb"),  # auto device expected to be used
@@ -89,6 +92,16 @@ def helper_files_issues(nb_path: Path, notebook_json, tracked: set) -> list:
     return issues
 
 
+def unencoded_py_write_issues(notebook_json) -> list:
+    """Find code cells that write a `.py` file in text mode without an explicit encoding."""
+    sources = ["".join(cell["source"]) for cell in notebook_json["cells"] if cell["cell_type"] == "code"]
+    issues = []
+    for idx, source in enumerate(sources, start=1):
+        for match in UNENCODED_PY_WRITE_RE.finditer(source):
+            issues.append(f'code cell {idx} uses `{match.group(0)}` without encoding="utf-8", which fails on Windows for non-ASCII content')
+    return issues
+
+
 def main():
     all_passed = True
     no_tocs = []
@@ -98,6 +111,7 @@ def main():
     no_install_instructions = []
     no_venv_setup = []
     bad_helper_files = []
+    unencoded_writes = []
     tracked = tracked_files()
 
     def complain(message):
@@ -154,6 +168,9 @@ def main():
                 for issue in helper_files_issues(nb_path, notebook_json, tracked):
                     bad_helper_files.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
                     complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: {issue}")
+            for issue in unencoded_py_write_issues(notebook_json):
+                unencoded_writes.append(str(nb_path.relative_to(NOTEBOOKS_ROOT)))
+                complain(f"FAILED: {nb_path.relative_to(NOTEBOOKS_ROOT)}: {issue}")
 
     if not all_passed:
         print("\nSUMMARY:")
@@ -191,6 +208,11 @@ def main():
             print("INCORRECT HELPER FILES SETUP:")
             print("\n".join(sorted(set(bad_helper_files))))
             print("\nList every helper from utils/ the notebook uses in `helper_files` of the first code cell, see CONTRIBUTING.md")
+            print("==================================")
+        if unencoded_writes:
+            print("WRITES .py FILES WITHOUT ENCODING:")
+            print("\n".join(sorted(set(unencoded_writes))))
+            print('\nPass encoding="utf-8" when writing downloaded files, e.g. open("gradio_helper.py", "w", encoding="utf-8")')
             print("==================================")
 
     sys.exit(0 if all_passed else 1)

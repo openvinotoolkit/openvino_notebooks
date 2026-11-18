@@ -1,7 +1,9 @@
+import json
 import requests
 from pathlib import Path
 import pytest
 from scarf_pixel import check_scarf_tag
+from check_notebooks import NOTEBOOKS_ROOT, unencoded_py_write_issues
 
 import toml
 from pip._internal.req import parse_requirements
@@ -88,3 +90,46 @@ def test_urls_exist():
         if not response.status_code == 200:
             print(f"Downloading {url} failed")
             raise
+
+
+def _notebook(*code_cells):
+    return {"cells": [{"cell_type": "markdown", "source": ["# Title"]}] + [{"cell_type": "code", "source": [cell]} for cell in code_cells]}
+
+
+@pytest.mark.parametrize(
+    "code",
+    [
+        'open("gradio_helper.py", "w").write(r.text)',
+        "open('gradio_helper.py', 'w').write(r.text)",
+        'with open("ov_helper.py", "w") as f:\n    f.write(r.text)',
+        'open(f"{name}_helper.py", "w").write(r.text)',
+    ],
+)
+def test_unencoded_py_write_is_reported(code):
+    issues = unencoded_py_write_issues(_notebook("import requests", code))
+    assert len(issues) == 1
+    assert "code cell 2" in issues[0]
+
+
+@pytest.mark.parametrize(
+    "code",
+    [
+        'open("gradio_helper.py", "w", encoding="utf-8").write(r.text)',
+        'open("gradio_helper.py", "wb").write(r.content)',
+        'open("gradio_helper.py").read()',
+        'open("result.txt", "w").write("ok")',
+    ],
+)
+def test_encoded_or_unrelated_write_is_not_reported(code):
+    assert unencoded_py_write_issues(_notebook(code)) == []
+
+
+def test_notebooks_write_py_files_with_explicit_encoding():
+    """Downloaded helpers must be written as UTF-8, otherwise non-ASCII content fails on Windows (cp1252)."""
+    failures = []
+    for nb_path in sorted(NOTEBOOKS_ROOT.glob("notebooks/**/*.ipynb")):
+        if ".ipynb_checkpoints" in nb_path.parts or ".venv" in nb_path.parts:
+            continue
+        notebook_json = json.loads(nb_path.read_text(encoding="utf-8"))
+        failures += [f"{nb_path.relative_to(NOTEBOOKS_ROOT)}: {issue}" for issue in unencoded_py_write_issues(notebook_json)]
+    assert not failures, "\n".join(failures)
