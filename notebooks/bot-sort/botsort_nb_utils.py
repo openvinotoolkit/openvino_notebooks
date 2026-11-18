@@ -41,6 +41,10 @@ REPO = Path(os.environ.get("BOTSORT_REPO", ROOT / "BoT-SORT_repo"))
 DET_WEIGHTS_GDRIVE = "1P4mY0Yyd3PPTybgZkjMYhFri88nTmJX5"  # bytetrack_x_mot17.pth.tar (BoT-SORT uses ByteTrack's MOT17 YOLOX-X)
 REID_WEIGHTS_GDRIVE = "1QZFWpoa80rqo7O-HXmlss8J8CnS7IUsN"  # mot17_sbs_S50.pth (FastReID SBS-S50 trained on MOT17)
 
+# free-license sample video (Wikimedia Commons, CC BY-SA 4.0, "Pro dog walker - Tokyo - 2024 Nov 1" by User:Nesnad)
+VIDEO_URL = "https://upload.wikimedia.org/wikipedia/commons/0/0c/Pro_dog_walker_-_Tokyo_-_2024_Nov_1.webm"
+VIDEO_ATTRIBUTION = 'CC BY-SA 4.0, "Pro dog walker - Tokyo - 2024 Nov 1" by User:Nesnad, Wikimedia Commons'
+
 
 def find_file(name: str, env: Optional[str] = None, subdirs: Tuple[str, ...] = ("", "weights", "pretrained", "videos", "data")) -> Path:
     """First existing ``<base>/<subdir>/<name>`` for base in (notebooks/, repo root, repo parent); ``env`` overrides.
@@ -79,7 +83,99 @@ def rel(p) -> str:
 DET_WEIGHTS = find_file("bytetrack_x_mot17.pth.tar", "BOTSORT_DET_WEIGHTS")
 REID_WEIGHTS = find_file("mot17_sbs_S50.pth", "BOTSORT_REID_WEIGHTS")
 MOT17_TRAIN = find_mot17()
-VIDEO_1 = find_file("JK_Standing_Next2U.mp4", "VIDEO_1")
+VIDEO_1 = find_file("dog_walker_tokyo.mp4", "VIDEO_1")
+
+
+def mot17_available() -> bool:
+    """True when MOT17 train FRCNN sequences are present (accuracy sections need them)."""
+    return any(MOT17_TRAIN.glob("MOT17-*-FRCNN"))
+
+
+def ensure_repo(repo: Path = REPO) -> Path:
+    """Shallow-clone the unmodified BoT-SORT repo (the tracker and FastReID are vendored under ``fast_reid/``)."""
+    if not (repo / "tracker" / "bot_sort.py").exists():
+        import subprocess
+
+        repo.parent.mkdir(parents=True, exist_ok=True)
+        print(f"cloning {REPO_URL} -> {rel(repo)}")
+        subprocess.run(["git", "clone", "--depth", "1", REPO_URL, str(repo)], check=True)
+    return repo
+
+
+def download_weights() -> None:
+    """Fetch the two official checkpoints from the ByteTrack / FastReID model zoos when missing."""
+    import gdown
+
+    for path, gid in ((DET_WEIGHTS, DET_WEIGHTS_GDRIVE), (REID_WEIGHTS, REID_WEIGHTS_GDRIVE)):
+        if not path.exists():
+            path.parent.mkdir(parents=True, exist_ok=True)
+            print(f"downloading {path.name} from Google Drive ({gid})")
+            gdown.download(id=gid, output=str(path), quiet=False)
+            if not path.exists():
+                raise RuntimeError(f"could not download {path.name}; provide it via BOTSORT_DET_WEIGHTS / BOTSORT_REID_WEIGHTS")
+
+
+def ensure_video(name: str = "dog_walker_tokyo.mp4") -> Path:
+    """Download the free-license sample clip and transcode it to H.264 MP4 (OpenCV-friendly).
+
+    Source: Wikimedia Commons, CC BY-SA 4.0 (see ``VIDEO_ATTRIBUTION``).
+    """
+    global VIDEO_1
+    out = NB_DIR / name
+    if out.exists():
+        VIDEO_1 = out
+        return out
+    import subprocess
+    import urllib.request
+
+    import imageio_ffmpeg
+
+    webm = NB_DIR / name.rsplit(".", 1)[0] + ".webm"
+    if not webm.exists():
+        print(f"downloading free-license sample video ({VIDEO_ATTRIBUTION})")
+        urllib.request.urlretrieve(VIDEO_URL, webm)
+    print(f"transcoding {webm.name} -> {out.name} (H.264)")
+    subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-v", "error", "-i", str(webm),
+                    "-c:v", "libx264", "-preset", "medium", "-crf", "23", "-pix_fmt", "yuv420p",
+                    "-movflags", "+faststart", "-an", str(out)], check=True)
+    VIDEO_1 = out
+    return out
+
+
+def video_frames(video: Path, n: int, max_frames: Optional[int] = None) -> List[np.ndarray]:
+    """``n`` evenly spaced BGR frames from a video (fallback calibration/validation data)."""
+    cap = cv2.VideoCapture(str(video))
+    total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if max_frames:
+        total = min(total, max_frames)
+    idx = sorted(set(np.linspace(0, total - 1, min(n, total)).round().astype(int)))
+    frames = []
+    for i in idx:
+        cap.set(cv2.CAP_PROP_POS_FRAMES, int(i))
+        ok, f = cap.read()
+        if ok:
+            frames.append(f)
+    cap.release()
+    return frames
+
+
+def reid_det_crops(frames: Iterable[np.ndarray], det_run: Callable, batch: int = 8,
+                   size_hw=(384, 128), thr: float = 0.6, cfg: Optional[dict] = None):
+    """Batches of ``batch`` detector crops (no ground truth needed) - ReID calibration/validation
+    fallback when MOT17 is absent."""
+    cfg = cfg or DEFAULT_CONFIG
+    crops = []
+    for img in frames:
+        x, r = preprocess(img, cfg)
+        d = postprocess(det_run(x), r, cfg)
+        d = d[d[:, 4] > thr]
+        if len(d) == 0:
+            continue
+        crops.append(reid_crops(img, d[:, :4], size_hw))
+        while sum(len(c) for c in crops) >= batch:
+            flat = np.concatenate(crops)
+            yield np.ascontiguousarray(flat[:batch], np.float32)
+            crops = [flat[batch:]] if len(flat) > batch else []
 
 # ----------------------------------------------------------------------------------------------------------- config
 # NOT in either weight file: needed identically by the PyTorch and the OpenVINO pipeline (tools/track.py,
@@ -488,7 +584,11 @@ def train_half_frames() -> List[Path]:
 
 
 def write_gt_val_half(seq: dict, dst: Path) -> None:
+    """MOT17 evaluation rules: keep ground-truth pedestrians only (conf==1, class==1, which drops
+    ignore regions) with visibility >= 0.25 (distractor handling), as in the ByteTrack / BoT-SORT
+    val-half protocol."""
     gt = np.loadtxt(seq["dir"] / "gt" / "gt.txt", delimiter=",", dtype=np.float32)
+    gt = gt[(gt[:, 6] == 1) & (gt[:, 7] == 1) & (gt[:, 8] >= 0.25)]
     lo, hi = seq["start"], seq["start"] + len(seq["frames"]) - 1
     gt = gt[(gt[:, 0] - 1 >= lo) & (gt[:, 0] - 1 <= hi)]
     gt[:, 0] -= lo

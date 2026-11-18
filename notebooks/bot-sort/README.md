@@ -7,14 +7,7 @@ The tracker (camera-motion compensation, Kalman filtering, IoU and appearance
 association) runs on the host. Tracking thresholds and MOT17 per-sequence
 overrides are kept in the configuration, separate from network weights and IRs.
 
-## Model architecture
-
-![Animated BoT-SORT detector, ReID and tracker pipeline](./botsort_pipeline_animated.svg)
-
-[Open the animated architecture diagram](./botsort_pipeline_animated.svg)
-to follow the detector, appearance and motion branches. This original project
-drawing also labels INT8 experiments; this tutorial exports **FP32, FP16
-and INT8**.
+## Pipeline
 
 | Stage | Execution | Role |
 |---|---|---|
@@ -31,11 +24,12 @@ tracking configuration is saved alongside and embedded in the IRs.
 
 ## Tutorial
 
-The [tutorial](bot-sort.ipynb) converts both networks to OpenVINO FP32 and FP16
-IR, quantizes them to INT8 with NNCF, checks accuracy and ReID fidelity,
-benchmarks each precision with `benchmark_app`-style runs and tracks a video
-at FP32, FP16 and INT8. The executed notebook keeps its cell outputs, contact
-sheets and the embedded playable video previews.
+The [tutorial](bot-sort.ipynb) is self-contained: it clones the BoT-SORT
+repository, downloads the two official checkpoints, builds the PyTorch FP32
+networks, converts both to OpenVINO FP32 and FP16 IR, quantizes them to INT8
+with NNCF, benchmarks each precision with `benchmark_app`-style runs and
+tracks a video at FP32, FP16 and INT8, scoring every precision against
+PyTorch FP32 reference tracks computed in the notebook.
 [botsort_nb_utils.py](botsort_nb_utils.py) contains the host-side tracker,
 ReID crops, preprocessing and evaluation.
 
@@ -43,23 +37,26 @@ ReID crops, preprocessing and evaluation.
 
 Run the tutorial **from this folder**. Install the Python packages the
 notebook imports (OpenVINO, NNCF, PyTorch, OpenCV, motmetrics, lap, yacs,
-ipywidgets, matplotlib) and provide the BoT-SORT source clone and the two
-official checkpoints (`bytetrack_x_mot17.pth.tar`, `mot17_sbs_S50.pth`).
-The notebook was written against a project layout that also holds the PyTorch
-baseline artifacts (`artifacts/`) produced by its companion PyTorch notebook,
-so a fresh clone cannot re-run it end to end without them. The saved outputs
-show a complete run.
+ipywidgets, matplotlib, gdown, imageio-ffmpeg). The BoT-SORT source clone and
+the two official checkpoints (`bytetrack_x_mot17.pth.tar`,
+`mot17_sbs_S50.pth`) are downloaded automatically on first run; set
+`BOTSORT_REPO`, `BOTSORT_DET_WEIGHTS` or `BOTSORT_REID_WEIGHTS` to reuse
+local copies.
 
-The bundled [JK_Standing_Next2U.mp4](JK_Standing_Next2U.mp4) is the first
-**30 seconds (900 frames at 30 FPS)** of the demonstration video, re-encoded
-at 1920x1080.
+The sample video is downloaded from Wikimedia Commons:
+["Pro dog walker - Tokyo - 2024 Nov 1"](https://commons.wikimedia.org/wiki/File:Pro_dog_walker_-_Tokyo_-_2024_Nov_1.webm)
+by User:Nesnad, licensed **CC BY-SA 4.0** (commercial use allowed with
+attribution; derivatives must carry the same license). The notebook transcodes
+it to H.264 MP4 (`dog_walker_tokyo.mp4`) for OpenCV.
 
-The annotated outputs of the notebook run are in [results/video/](results/video):
-[OV_FP32_tracked.mp4](results/video/OV_FP32_tracked.mp4),
-[OV_FP16_tracked.mp4](results/video/OV_FP16_tracked.mp4) and
-[OV_INT8_tracked.mp4](results/video/OV_INT8_tracked.mp4). The notebook clips
-its own video runs to the first 20 seconds (600 frames, 960x536).
-MOT17 is not redistributed here. Provide the MOT17 FRCNN train sequences
-for the accuracy sections.
+The MOT17 dataset is **optional** and not redistributed here. Provide the
+MOT17 FRCNN train sequences (set `MOT17_TRAIN`) to enable the MOTA / IDF1
+accuracy sections; the video demo, quantization and benchmarks run without it.
+
+Tracking output videos from a notebook run are written to
+[artifacts/video/](artifacts/video) (`OV_FP32_tracked.mp4`,
+`OV_FP16_tracked.mp4`, `OV_INT8_tracked.mp4`); the notebook clips its video
+runs to the first 20 seconds. These files are generated locally and not
+committed.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/bot-sort/README.md" />
