@@ -8,11 +8,13 @@ See licensing/third-party-programs.txt in the repository root.
 import hashlib
 import json
 import re
+from collections.abc import Callable, Iterator
 from pathlib import Path
 import statistics
 import time
 import unicodedata
 from types import MethodType
+from typing import TYPE_CHECKING
 
 import librosa
 import numpy as np
@@ -21,6 +23,11 @@ import torch.nn.functional as F
 import openvino as ov
 from datasets import Audio, load_dataset
 from qwen_asr.inference.utils import parse_asr_output
+
+if TYPE_CHECKING:
+    from optimum.intel import OVModelForSpeechSeq2Seq
+    from transformers import ProcessorMixin
+    from transformers.generation.utils import GenerateOutput
 
 MODEL_ID = "knoveleng/polyglot-lion-1.7b"
 MODEL_REVISION = "9ef388b498182f50a5a7909e6e7a4e2d89a840c4"
@@ -60,11 +67,11 @@ def restore_decoder_projections(compressed: ov.Model, reference: ov.Model) -> li
 class FullContextAudioEncoder(torch.nn.Module):
     """Export full-utterance eager/SDPA attention after removing CNN padding."""
 
-    def __init__(self, encoder):
+    def __init__(self, encoder: torch.nn.Module) -> None:
         super().__init__()
         self.encoder = encoder
 
-    def forward(self, input_features, valid_mask):
+    def forward(self, input_features: torch.Tensor, valid_mask: torch.Tensor) -> torch.Tensor:
         encoder = self.encoder
         x = F.gelu(encoder.conv2d1(input_features.unsqueeze(1)))
         x = F.gelu(encoder.conv2d2(x))
@@ -80,7 +87,7 @@ class FullContextAudioEncoder(torch.nn.Module):
         return encoder.proj2(encoder.act(encoder.proj1(hidden))).unsqueeze(0)
 
 
-def export_audio_encoder(encoder, path: Path):
+def export_audio_encoder(encoder: torch.nn.Module, path: Path) -> None:
     """Convert the original eager/SDPA Qwen encoder with full-utterance attention."""
     if encoder.n_window != 50:
         raise ValueError("This export requires the pinned model's 100-frame CNN chunks")
@@ -103,7 +110,9 @@ def export_audio_encoder(encoder, path: Path):
         encoder.config._attn_implementation = original_attention
 
 
-def audio_windows(input_features, feature_mask, chunk_length: int, window_length: int):
+def audio_windows(
+    input_features: torch.Tensor, feature_mask: torch.Tensor | None, chunk_length: int, window_length: int
+) -> Iterator[tuple[torch.Tensor, torch.Tensor]]:
     """Match original per-utterance CNN padding and attention-window boundaries."""
     if input_features.ndim != 2 or chunk_length < 1 or window_length % chunk_length:
         raise ValueError("Expected one mel spectrogram and integral chunks per attention window")
@@ -130,7 +139,7 @@ def audio_windows(input_features, feature_mask, chunk_length: int, window_length
         yield padded[start : start + per_window], valid[start : start + per_window]
 
 
-def configure_audio_encoder(model):
+def configure_audio_encoder(model: "OVModelForSpeechSeq2Seq") -> None:
     """Install the runtime adapter only for explicitly corrected encoder artifacts."""
     names = {port.get_any_name() for port in model.encoder.model.inputs}
     if names != {"input_features", "valid_mask"}:
@@ -140,12 +149,12 @@ def configure_audio_encoder(model):
     if model.encoder.request is not None:
         raise ValueError("Load with compile=False before configuring the corrected encoder")
 
-    def chunked_forward(part, input_features, feature_mask, n_window, n_window_infer):
+    def chunked_forward(part, input_features: torch.Tensor, feature_mask: torch.Tensor | None, n_window: int, n_window_infer: int) -> torch.Tensor:
         outputs = []
         # The pinned reference's eager/SDPA attention ignores cu_seqlens; it is global.
         chunk_length = n_window * 2
         utterance_window = ((input_features.shape[-1] + chunk_length - 1) // chunk_length) * chunk_length
-        for chunks, valid in audio_windows(input_features, feature_mask, chunk_length, utterance_window):
+        for chunks, valid in audio_windows(input_features=input_features, feature_mask=feature_mask, chunk_length=chunk_length, window_length=utterance_window):
             result = part.request({"input_features": chunks, "valid_mask": valid})
             outputs.append(torch.from_numpy(result["last_hidden_state"].copy()).to(part.device))
         return torch.cat(outputs, dim=1)
@@ -250,7 +259,7 @@ def load_samples(configs: tuple[str, ...], count: int, directory: Path, start: i
     return samples
 
 
-def prepare_inputs(processor, audio_path: Path) -> tuple[dict, float]:
+def prepare_inputs(processor: "ProcessorMixin", audio_path: Path) -> tuple[dict, float]:
     """Load/resample audio and build the original empty-system ASR prompt."""
     audio, rate = librosa.load(audio_path, sr=16000, mono=True)
     if audio.ndim != 1 or not audio.size or not np.isfinite(audio).all():
@@ -267,7 +276,9 @@ def prepare_inputs(processor, audio_path: Path) -> tuple[dict, float]:
     return inputs, len(audio) / rate
 
 
-def generate(model, inputs: dict, backend: str, max_new_tokens: int = 512, **kwargs):
+def generate(
+    model: "torch.nn.Module | OVModelForSpeechSeq2Seq", inputs: dict, backend: str, max_new_tokens: int = 512, **kwargs
+) -> "torch.Tensor | GenerateOutput":
     """Generate greedily using identical masks/features for the two backends."""
     if backend not in ("pytorch", "openvino") or max_new_tokens < 1:
         raise ValueError("Select pytorch/openvino and a positive generation budget")
@@ -285,7 +296,7 @@ def generate(model, inputs: dict, backend: str, max_new_tokens: int = 512, **kwa
         )
 
 
-def transcribe(model, processor, inputs: dict, backend: str, max_new_tokens: int = 512) -> dict:
+def transcribe(model: "torch.nn.Module | OVModelForSpeechSeq2Seq", processor: "ProcessorMixin", inputs: dict, backend: str, max_new_tokens: int = 512) -> dict:
     """Decode only newly generated tokens and record EOS completion."""
     start = time.perf_counter()
     output = generate(model, inputs=inputs, backend=backend, max_new_tokens=max_new_tokens)
@@ -356,7 +367,7 @@ def logit_metrics(expected: np.ndarray, actual: np.ndarray) -> dict:
     }
 
 
-def benchmark(infer, iterations: int = 3, warmup: int = 1) -> dict:
+def benchmark(infer: Callable[[], dict], iterations: int = 3, warmup: int = 1) -> dict:
     """Time complete greedy generation, excluding model load/compile and audio I/O."""
     if iterations < 1 or warmup < 0:
         raise ValueError("Expected positive iterations and nonnegative warmup")

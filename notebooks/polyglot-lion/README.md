@@ -26,8 +26,8 @@ on Linux. For details, refer to the [Installation Guide](../../README.md).
 Open [polyglot-lion.ipynb](./polyglot-lion.ipynb), keep
 [polyglot_helper.py](./polyglot_helper.py) beside it, and execute the cells in order.
 The first cell activates a notebook-specific `.venv` for dependency isolation.
-Enable `INSTALL_PACKAGES` for the setup cell, then restart the kernel and disable
-it before continuing. Git is required for the pinned Optimum Intel dependency.
+Dependencies install automatically; set `INSTALL_PACKAGES=False` only when
+reusing a prepared environment. Git is required for the pinned Optimum Intel dependency.
 Allow about 16 GB for the checkpoint and all optional model variants, plus
 environment and download caches.
 
