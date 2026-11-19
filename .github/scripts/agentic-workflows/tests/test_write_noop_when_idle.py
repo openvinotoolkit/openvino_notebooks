@@ -1,6 +1,6 @@
 import json
 import os
-import subprocess
+import subprocess  # nosec B404 - test runs CLI script via sys.executable
 import sys
 from pathlib import Path
 
@@ -57,8 +57,8 @@ def test_cli_creates_parent_and_appends_to_the_bound_safe_output(tmp_path):
     env = {**os.environ, "DIGEST_DIR": str(digest_dir), "GH_AW_SAFE_OUTPUTS": str(output_path)}
     script = Path(noop.__file__)
 
-    subprocess.run([sys.executable, str(script)], env=env, check=True, capture_output=True, text=True)
-    subprocess.run([sys.executable, str(script)], env=env, check=True, capture_output=True, text=True)
+    subprocess.run([sys.executable, str(script)], env=env, check=True, capture_output=True, text=True)  # nosec B603 - sys.executable in test
+    subprocess.run([sys.executable, str(script)], env=env, check=True, capture_output=True, text=True)  # nosec B603 - sys.executable in test
 
     entries = [json.loads(line) for line in output_path.read_text(encoding="utf-8").splitlines()]
     assert entries == [{"type": "noop", "message": "Nightly remediation skipped: nothing selected"}] * 2
