@@ -318,6 +318,8 @@ Helpers updated by running the cell again in a kernel that already imported them
 It creates the `.venv` folder next to the notebook (only once) and activates it for the running kernel: `%pip install`, `!pip install` and `pip_install()`
 install packages into it, and the following imports, subprocesses and command-line tools (for example, `optimum-cli`) use it. Packages of the environment running Jupyter
 remain available with lower priority. To start from scratch, restart the kernel and delete the `.venv` folder.
+On Windows without [long path support](https://learn.microsoft.com/windows/win32/fileio/maximum-file-path-limitation#enable-long-paths-in-windows-10-version-1607-and-later),
+a `.venv` path too long for packages with deeply nested files (such as TensorFlow) is replaced by a folder in `%LOCALAPPDATA%\ov_venvs`, unless the `.venv` folder already exists; the notebook prints which one.
 
 > **NOTE**: If a directory contains several notebooks, each of them must pass its own file name, for example `setup_notebook_venv("hello-world.ipynb")`.
 > Each notebook then gets a separate environment in `.venv/<notebook name>` (e.g. `.venv/hello-world`), so installing the requirements of one notebook
