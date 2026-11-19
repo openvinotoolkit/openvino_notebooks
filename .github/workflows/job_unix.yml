@@ -249,7 +249,7 @@ jobs:
           EOF
 
       - name: Setup Python ${{ inputs.python }}
-        uses: openvinotoolkit/openvino/.github/actions/setup_python@7e11265ea54dfaf319ff57770a65fa7e896d83f3
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@154c1eecbad6a481cae9a110cd28dbe6842f2322
         with:
           version: ${{ inputs.python }}
           pip-cache-path: ${{ env.PIP_CACHE_PATH }}
@@ -292,7 +292,7 @@ jobs:
           mv case_00030 notebooks/ct-segmentation-quantize/kits19/kits19_frames
           mv case_00001 notebooks/ct-segmentation-quantize/kits19/kits19_frames
 
-      - name: Prepare models for meter-reader and paddle-ocr-webcam
+      - name: Prepare models for meter-reader
         if: ${{ env.TEST_DEVICE != 'gpu' }}
         run: |
           if [[ ! -f "${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz" ]]; then
@@ -301,18 +301,9 @@ jobs:
           if [[ ! -f "${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz" ]]; then
             curl -o ${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_seg_model.tar.gz'
           fi
-          if [[ ! -f "${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar" ]]; then
-            curl -o ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_det_infer.tar'
-          fi
-          if [[ ! -f "${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar" ]]; then
-            curl -o ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_rec_infer.tar'
-          fi
           mkdir -p notebooks/meter-reader/model
           cp ${{ env.MOUNT_CACHE }}/meter_det_model.tar.gz notebooks/meter-reader/model/
           cp ${{ env.MOUNT_CACHE }}/meter_seg_model.tar.gz notebooks/meter-reader/model/
-          mkdir -p notebooks/paddle-ocr-webcam/model
-          cp ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_det_infer.tar notebooks/paddle-ocr-webcam/model/
-          cp ${{ env.MOUNT_CACHE }}/ch_PP-OCRv3_rec_infer.tar notebooks/paddle-ocr-webcam/model/
 
       - name: Create source virtual env & install python dependencies
         run: |
