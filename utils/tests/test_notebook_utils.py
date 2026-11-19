@@ -232,6 +232,7 @@ def test_fit_venv_dir_keeps_existing_long_venv_dir(monkeypatch, tmp_path):
     assert notebook_utils._fit_venv_dir_to_windows_path_limit(venv_dir) == venv_dir
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="builds Windows paths")
 def test_fit_venv_dir_shortens_long_venv_dir_without_long_paths(monkeypatch, capsys):
     monkeypatch.setattr("os.name", "nt")
     monkeypatch.setattr(notebook_utils, "_windows_long_paths_enabled", lambda: False)
