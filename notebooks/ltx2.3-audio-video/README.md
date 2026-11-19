@@ -20,7 +20,7 @@ Model weights are subject to the [LTX-2 Community License Agreement](https://git
 ## Component support
 
 - **Optimum Intel:** the notebook pins a `main` revision with [external RoPE inputs](https://github.com/huggingface/optimum-intel/pull/2070), the [group-wise INT8 recipe](https://github.com/huggingface/optimum-intel/pull/2076), and the [updated INT4 recipe](https://github.com/huggingface/optimum-intel/pull/2127). These updates are not in PyPI 2.2.0.
-- **OpenVINO GenAI:** nightly [LTX-2.3 text-to-audio-video](https://github.com/openvinotoolkit/openvino.genai/pull/4559) and [external RoPE support](https://github.com/openvinotoolkit/openvino.genai/pull/4692) are required; PyPI 2026.4.1 does not include them. Image-to-audio-video still uses Optimum Intel.
+- **OpenVINO GenAI:** [LTX-2.3 text-to-audio-video](https://github.com/openvinotoolkit/openvino.genai/pull/4559) and [external RoPE support](https://github.com/openvinotoolkit/openvino.genai/pull/4692) are required; PyPI 2026.4.1 does not include them. The requirements stay within the 2026.5 series (`>=2026.5.0.dev20261116,<2026.6`), accepting a future stable 2026.5.0 release but excluding 2027.0 nightlies. Image-to-audio-video still uses Optimum Intel.
 - **OpenVINO and OpenVINO Tokenizers:** installed together with GenAI from the nightly index for compatible runtime, frontend, device plugins, and tokenizer extension. CPU and GPU are selectable; NPU is not exposed.
 - **NNCF:** the notebook pins the [merged group-wise INT8 implementation](https://github.com/openvinotoolkit/nncf/pull/4278), which is not in PyPI 3.4.0. The source build uses explicitly installed `setuptools>=77.0` and `wheel` without build isolation. Direct NNCF compression avoids the CLI fallback to per-channel INT8 when the installed version is below the future 3.5.0 release, including development builds.
 - **Diffusers / Transformers:** kept at 0.40.0 / 5.10.4 for the API used by this notebook.
@@ -35,8 +35,22 @@ The notebook covers the full `diffusers/LTX-2.3-Diffusers` checkpoint only. Dist
 - Convert the model to OpenVINO IR
 - Compress model weights
 - Run audio-video generation
+- Split GenAI stages across CPU/GPU, optionally with a denoising precision hint
+- Optional reshape-before-compile and compiled-model caching with either backend
+- Video/audio CFG controls and fast CFG-only generation
+- GenAI cancellation and stage timings in the interactive demo
 - Interactive inference
 - Limitations
+
+CPU is selected by default and AUTO is excluded. In the GenAI split-device mode, the text encoder and connectors, transformer, and video/audio decoders have separate device selectors; CPU / GPU / CPU keeps text encoding and decoding off the GPU.
+
+Static shapes fix the clip dimensions, frame rate, and CFG batch size, including in the demo; reload the pipeline to change them. Optimum Intel retains some dynamic token dimensions and requires CFG on its static path. `CACHE_DIR` is enabled by default for both backends. Fast mode disables STG and modality-isolation passes but retains CFG; it can change output quality. GenAI cancellation is checked between denoising steps and leaves the pipeline available for the next request.
+
+Existing model directories are reused. Regenerate INT8 output created with an earlier notebook revision from the preserved FP16 export to apply the serialization that retains sensitive FP32 constants.
+
+## Validation scope
+
+Notebook execution is currently skipped in public CI on all three operating systems; passing metadata and code checks do not prove inference. The patched tiny-model copy uses per-channel INT8 without the full-model ignored scope because its layer dimensions do not support the group-size-32 recipe. That smoke path does not validate the full checkpoint's compression quality.
 
 ## Installation Instructions
 
