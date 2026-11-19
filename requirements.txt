@@ -1,5 +1,5 @@
 # jupyter
 jupyterlab
-ipywidgets
+ipywidgets>=8.0.0
 ipykernel==7.4.0
 ipython>=7.16.3
