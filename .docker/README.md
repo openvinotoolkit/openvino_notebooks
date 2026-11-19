@@ -22,6 +22,8 @@ docker run -it -v $(pwd):/workspace -u $(id -u) -p 8080:8080 -e NOTEBOOK_PORT=80
 docker run -it  --entrypoint /tmp/scripts/test -v ${PWD}:/opt/app-root/openvino_notebooks openvino_notebooks
 ```
 
+The PR workflow uses `.docker/tests/test_precommit`. It temporarily installs a Python startup hook in the test container that deduplicates resolved import paths only for `optimum-cli`, avoiding duplicate command registration through UBI's `lib`/`lib64` aliases. The hook is inherited by notebook virtual environments; it does not patch Optimum or shared notebook helpers and is not installed when building or normally starting the image. Remove this workaround once Optimum CLI handles aliased namespace paths.
+
 # Updating Pipfile.lock
 
 ```bash

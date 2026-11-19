@@ -23,6 +23,24 @@ _PARENT_ENV_PTH = "_notebook_parent_env.pth"
 _venv_site_dirs = []
 _parent_site_dirs = []
 _processed_pth_files = set()
+_venv_dll_directories = {}
+
+
+def _add_venv_dll_directory(venv_dir: Path) -> str:
+    """
+    Add `<venv_dir>/Library/bin` to the DLL search path of the running kernel (Windows only) and return it.
+
+    Wheels like `mkl`, `intel-openmp` or `intel-sycl-rt` (dependencies of PyTorch) install DLLs there, and packages loading them
+    look in `sys.exec_prefix`, which in the kernel still points to the environment running it, not the notebook virtual environment.
+    The directory is created in advance, because `os.add_dll_directory()` requires an existing one.
+    """
+    import os
+
+    dll_dir = venv_dir / "Library" / "bin"
+    dll_dir.mkdir(parents=True, exist_ok=True)
+    if str(dll_dir) not in _venv_dll_directories:
+        _venv_dll_directories[str(dll_dir)] = os.add_dll_directory(str(dll_dir))
+    return str(dll_dir)
 
 
 def _load_venv_pth_files(result=None, *_):
@@ -126,6 +144,8 @@ def setup_notebook_venv(notebook_name: Optional[str] = None, venv_root: PathLike
     sys.executable = str(venv_python)
     os.environ["VIRTUAL_ENV"] = str(venv_dir)
     path_dirs = [str(bin_dir), sysconfig.get_path("scripts")] + os.environ.get("PATH", "").split(os.pathsep)
+    if os.name == "nt":
+        path_dirs.insert(1, _add_venv_dll_directory(venv_dir))
     os.environ["PATH"] = os.pathsep.join(dict.fromkeys(path_dirs))
 
     try:
