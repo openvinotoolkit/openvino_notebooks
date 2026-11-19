@@ -2,7 +2,7 @@ import base64
 import json
 import re
 import shutil
-import subprocess
+import subprocess  # nosec B404 - test runs node validator on tmp_path
 from pathlib import Path
 
 import pytest
@@ -45,7 +45,7 @@ def run_validation_script(tmp_path, document):
     )
     script = tmp_path / "validator.cjs"
     script.write_text(wrapper, encoding="utf-8")
-    return subprocess.run(["node", str(script)], cwd=memory, capture_output=True, text=True, timeout=60)
+    return subprocess.run(["node", str(script)], cwd=memory, capture_output=True, text=True, timeout=60)  # nosec B603 B607 - hardcoded node CLI in test
 
 
 needs_node = pytest.mark.skipif(shutil.which("node") is None, reason="node is not installed")
@@ -123,7 +123,7 @@ def test_knowledge_updates_run_in_the_expected_order_and_cannot_block_outputs():
     assert "GH_AW_SAFE_OUTPUTS" not in record_step and "safeoutputs" not in record_step
     # Runs the script copy taken before the agent, never code from the agent-writable workspace, and never reads the agent-writable memory clone.
     assert 'python3 -E -s \\"$trusted/scripts/update_knowledge_base.py\\" update' in record_step
-    assert "GITHUB_WORKSPACE" not in record_step and ".github/scripts" not in record_step and "/tmp/gh-aw/repo-memory" not in record_step
+    assert "GITHUB_WORKSPACE" not in record_step and ".github/scripts" not in record_step and "/tmp/gh-aw/repo-memory" not in record_step  # nosec B108 - workflow contract assertion
     assert 'out=\\"$RUNNER_TEMP/nightly-remediator-memory\\"' in record_step and '--out-dir \\"$out\\"' in record_step
     # The placeholder that keeps the replacement artifact non-empty must be ignored by the push.
     placeholder = re.search(r'> \\"\$out/([^"\\]+)\\"', record_step).group(1)
@@ -138,9 +138,9 @@ def test_workflow_steps_and_prompt_use_the_updater_cli_consistently():
     assert ukb.parse_args(["update", "--out-dir", "o", "--trusted-dir", "t", "--notes-dir", "n", "--remediator-run-url", "u"]).command == "update"
     for flag in ("--digest-dir", "--memory-dir", "--trusted-dir", "--notes-dir", "--out-dir", "--remediator-run-url"):
         assert flag in WORKFLOW
-    notes_dir = "/tmp/gh-aw/agent/nightly-remediator/outcomes"
+    notes_dir = "/tmp/gh-aw/agent/nightly-remediator/outcomes"  # nosec B108 - workflow contract assertion
     assert f"--notes-dir {notes_dir}" in WORKFLOW and f"{notes_dir}/<12-hex-signature>.json" in WORKFLOW
-    assert "/tmp/gh-aw/repo-memory/default/knowledge.json" in WORKFLOW
+    assert "/tmp/gh-aw/repo-memory/default/knowledge.json" in WORKFLOW  # nosec B108 - workflow contract assertion
     assert "untrusted data" in WORKFLOW.split("## Knowledge base", 1)[1]
     for name in kb.NOTE_FIELDS:
         assert f'"{name}"' in WORKFLOW.split("**Writing.**", 1)[1]

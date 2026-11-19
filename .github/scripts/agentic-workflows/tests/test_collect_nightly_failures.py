@@ -1,7 +1,7 @@
 """Unit tests of the nightly failure collector (pre-agent step of the nightly issue remediator); no network, no real `gh`."""
 
 import argparse
-import subprocess
+import subprocess  # nosec B404 - only used for TimeoutExpired/PIPE in mocks
 import types
 import zipfile
 from datetime import datetime, timedelta, timezone
@@ -60,7 +60,7 @@ def make_night(number, signatures=None, statuses=None):
 
 
 def make_args(**overrides):
-    values = dict(repo=REPO, source_repo=REPO, run_id="", max_groups=5, max_prs=3, history_nights=3, logs_per_group=3, out="/tmp/nightly/digest")
+    values = dict(repo=REPO, source_repo=REPO, run_id="", max_groups=5, max_prs=3, history_nights=3, logs_per_group=3, out="/tmp/nightly/digest")  # nosec B108 - test CLI arg only
     values.update(overrides)
     return argparse.Namespace(**values)
 
@@ -806,10 +806,10 @@ def test_invalid_args_are_rejected(overrides):
 
 
 def test_parse_args_defaults_and_trimming():
-    args = cnf.parse_args(["--repo", "a/b", "--out", "/tmp/nightly/digest", "--run-id", " 42 "])
+    args = cnf.parse_args(["--repo", "a/b", "--out", "/tmp/nightly/digest", "--run-id", " 42 "])  # nosec B108 - test CLI arg only
     assert (args.source_repo, args.run_id, args.max_groups, args.max_prs, args.history_nights, args.logs_per_group) == ("a/b", "42", 5, 3, 3, 3)
     with pytest.raises(SystemExit):
-        cnf.parse_args(["--repo", "a/b", "--source-repo", "evil/repo", "--out", "/tmp/nightly/digest"])
+        cnf.parse_args(["--repo", "a/b", "--source-repo", "evil/repo", "--out", "/tmp/nightly/digest"])  # nosec B108 - test CLI arg only
 
 
 def test_prepare_out_dir_recreates_the_directory_and_refuses_risky_paths(tmp_path):
@@ -818,7 +818,7 @@ def test_prepare_out_dir_recreates_the_directory_and_refuses_risky_paths(tmp_pat
     (target / "stale.txt").write_text("old")
     assert cnf.prepare_out_dir(str(target)) == target.resolve()
     assert list(target.iterdir()) == []
-    for risky in ("/", "/tmp", str(Path.home()), str(Path.cwd())):
+    for risky in ("/", "/tmp", str(Path.home()), str(Path.cwd())):  # nosec B108 - testing rejection of /tmp
         with pytest.raises(SystemExit, match="refusing"):
             cnf.prepare_out_dir(risky)
 

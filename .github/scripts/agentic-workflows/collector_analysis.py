@@ -46,7 +46,7 @@ def to_int(value: Any) -> Optional[int]:
 
 
 def infra_signature(reason: str) -> str:
-    return hashlib.sha1(f"infra|{reason}".encode("utf-8")).hexdigest()[:12]
+    return hashlib.sha1(f"infra|{reason}".encode("utf-8"), usedforsecurity=False).hexdigest()[:12]
 
 
 def build_groups(report: dict) -> List[Group]:

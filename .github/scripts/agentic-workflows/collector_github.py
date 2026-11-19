@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-import subprocess
+import subprocess  # nosec B404 - invokes gh CLI with fixed argument list
 import time
 import zipfile
 from pathlib import Path
@@ -31,11 +31,11 @@ def gh(args: List[str], stdout_path: Optional[Path] = None, retries: int = 3, ti
     for attempt in range(1, retries + 1):
         try:
             if stdout_path is None:
-                proc = subprocess.run(["gh", *args], capture_output=True, timeout=timeout, check=False)
+                proc = subprocess.run(["gh", *args], capture_output=True, timeout=timeout, check=False)  # nosec B603 B607 - hardcoded gh CLI
                 output = proc.stdout
             else:
                 with open(stdout_path, "wb") as handle:
-                    proc = subprocess.run(["gh", *args], stdout=handle, stderr=subprocess.PIPE, timeout=timeout, check=False)
+                    proc = subprocess.run(["gh", *args], stdout=handle, stderr=subprocess.PIPE, timeout=timeout, check=False)  # nosec B603 B607 - hardcoded gh CLI
                 output = b""
             if proc.returncode == 0:
                 return output
