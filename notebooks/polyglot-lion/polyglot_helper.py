@@ -7,6 +7,7 @@ See licensing/third-party-programs.txt in the repository root.
 
 import hashlib
 import json
+import math
 import re
 from collections.abc import Callable, Iterator
 from pathlib import Path
@@ -18,6 +19,7 @@ from typing import TYPE_CHECKING
 
 import librosa
 import numpy as np
+import soundfile as sf
 import torch
 import torch.nn.functional as F
 import openvino as ov
@@ -29,11 +31,10 @@ if TYPE_CHECKING:
     from transformers import ProcessorMixin
     from transformers.generation.utils import GenerateOutput
 
-MODEL_ID = "knoveleng/polyglot-lion-1.7b"
-MODEL_REVISION = "9ef388b498182f50a5a7909e6e7a4e2d89a840c4"
 DATASET_ID = "google/fleurs"
 DATASET_REVISION = "70bb2e84b976b7e960aa89f1c648e09c59f894dd"
 LANGUAGES = {"en_us": "English", "cmn_hans_cn": "Mandarin", "ta_in": "Tamil", "ms_my": "Malay"}
+MAX_AUDIO_SECONDS = 60.0
 IR_FILES = (
     "config.json",
     "generation_config.json",
@@ -46,14 +47,24 @@ IR_FILES = (
 AUDIO_ENCODER_FIX = "eager-sdpa-full-utterance-valid-cnn-v1"
 
 
-def restore_decoder_projections(compressed: ov.Model, reference: ov.Model) -> list[str]:
-    """Keep attention and first-eight-layer decoder projection weights in FP16."""
-    pattern = r"layers\.[0-7]\.|layers\.\d+\.self_attn\.[qkvo]_proj/"
+def restore_decoder_projections(compressed: ov.Model, reference: ov.Model, first_n_layers: int = 8) -> list[str]:
+    """Keep attention and early decoder projection weights in FP16.
+
+    :param compressed: Decoder after NNCF weight compression.
+    :param reference: Original, uncompressed decoder.
+    :param first_n_layers: Number of leading decoder layers to restore.
+    :returns: Names of restored projection operations.
+    """
+    if first_n_layers < 0:
+        raise ValueError("first_n_layers must be nonnegative")
     originals = {node.get_friendly_name(): node for node in reference.get_ordered_ops() if node.get_type_name() == "MatMul"}
     restored = []
     for node in compressed.get_ordered_ops():
         name = node.get_friendly_name()
-        if node.get_type_name() == "MatMul" and re.search(pattern, name):
+        layer_match = re.search(r"layers\.(\d+)\.", name)
+        first_layer = layer_match is not None and int(layer_match.group(1)) < first_n_layers
+        attention_projection = re.search(r"layers\.\d+\.self_attn\.[qkvo]_proj/", name) is not None
+        if node.get_type_name() == "MatMul" and (first_layer or attention_projection):
             if name not in originals:
                 raise ValueError(f"Missing original decoder projection: {name}")
             node.input(1).replace_source_output(originals[name].input_value(1))
@@ -259,11 +270,27 @@ def load_samples(configs: tuple[str, ...], count: int, directory: Path, start: i
     return samples
 
 
-def prepare_inputs(processor: "ProcessorMixin", audio_path: Path) -> tuple[dict, float]:
-    """Load/resample audio and build the original empty-system ASR prompt."""
+def prepare_inputs(processor: "ProcessorMixin", audio_path: Path, max_duration_seconds: float = MAX_AUDIO_SECONDS) -> tuple[dict, float]:
+    """Load/resample bounded audio and build the original empty-system ASR prompt.
+
+    :param processor: Model processor used to tokenize and encode audio.
+    :param audio_path: Path to the source recording.
+    :param max_duration_seconds: Maximum accepted recording duration.
+    :returns: Processor inputs and audio duration in seconds.
+    """
+    if not math.isfinite(max_duration_seconds) or max_duration_seconds <= 0:
+        raise ValueError("max_duration_seconds must be finite and positive")
+    duration = sf.info(audio_path).duration
+    if not math.isfinite(duration) or duration <= 0:
+        raise ValueError(f"Expected a nonempty audio file: {audio_path}")
+    if duration > max_duration_seconds:
+        raise ValueError(f"Audio duration {duration:.1f}s exceeds the {max_duration_seconds:.0f}s limit: {audio_path}")
     audio, rate = librosa.load(audio_path, sr=16000, mono=True)
     if audio.ndim != 1 or not audio.size or not np.isfinite(audio).all():
         raise ValueError("Expected nonempty finite mono audio after resampling to 16000 Hz")
+    actual_duration = len(audio) / rate
+    if actual_duration > max_duration_seconds:
+        raise ValueError(f"Resampled audio exceeds the {max_duration_seconds:.0f}s limit: {audio_path}")
     prompt = processor.apply_chat_template(
         [
             {"role": "system", "content": ""},
@@ -273,7 +300,7 @@ def prepare_inputs(processor: "ProcessorMixin", audio_path: Path) -> tuple[dict,
         tokenize=False,
     )
     inputs = processor(text=prompt, audio=audio, sampling_rate=rate, return_tensors="pt")
-    return inputs, len(audio) / rate
+    return inputs, actual_duration
 
 
 def generate(

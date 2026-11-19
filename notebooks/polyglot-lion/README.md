@@ -1,19 +1,20 @@
 # Convert and Run Polyglot-Lion with OpenVINO
 
-[Polyglot-Lion 1.7B](https://huggingface.co/knoveleng/polyglot-lion-1.7b) is a
+[Polyglot-Lion](https://huggingface.co/knoveleng/polyglot-lion-0.6b) is a
 multilingual speech-recognition model based on
 [Qwen3-ASR](https://github.com/QwenLM/Qwen3-ASR).
 This tutorial converts the original PyTorch model to stateful OpenVINO IR,
 compares recognition accuracy on the same audio, and runs inference on Intel
-CPU and optional GPU.
+CPU and optional GPU. The compact 0.6B model is the default; the larger
+[1.7B model](https://huggingface.co/knoveleng/polyglot-lion-1.7b) is optional.
 
 ## Notebook Contents
 
 The tutorial consists of the following steps:
 
 - Install prerequisites and prepare FLEURS audio samples
-- Run the original PyTorch model on CPU
-- Convert the audio encoder and stateful decoder to OpenVINO IR
+- Export the stateful OpenVINO model
+- Run the original PyTorch model on CPU and re-export the audio encoder
 - Explore optional INT8 and mixed INT8/FP16 weight compression
 - Compare transcripts, WER/CER and numerical outputs with PyTorch
 - Benchmark complete-generation latency
@@ -21,25 +22,30 @@ The tutorial consists of the following steps:
 
 ## Installation Instructions
 
-We recommend running the notebook in a dedicated Python 3.12 virtual environment
-on Linux. For details, refer to the [Installation Guide](../../README.md).
-Open [polyglot-lion.ipynb](./polyglot-lion.ipynb), keep
-[polyglot_helper.py](./polyglot_helper.py) beside it, and execute the cells in order.
-The first cell activates a notebook-specific `.venv` for dependency isolation.
-Dependencies install automatically; set `INSTALL_PACKAGES=False` only when
-reusing a prepared environment. Git is required for the pinned Optimum Intel dependency.
-Allow about 16 GB for the checkpoint and all optional model variants, plus
-environment and download caches.
+Use Python 3.11–3.13 with pip and Git. Open
+[polyglot-lion.ipynb](./polyglot-lion.ipynb) and execute the cells in order.
+The first cell activates a notebook-specific `.venv`; dependencies install
+automatically. For an unmerged revision, open the notebook from a checkout or
+keep the matching `polyglot_helper.py` beside it. Plan for about 8 GB of system
+RAM for the default 0.6B model, or 16 GB for the optional 1.7B model. These
+are planning estimates, not measured peaks. The model weights occupy about 1.58 GB or
+4.08 GB, respectively, in addition to the environment, converted IR and caches.
+Local WAV files longer than 60 seconds are rejected to bound full-context
+encoder memory use.
 
 **Experimental notebook:** the default run uses CPU and one English clip.
 GPU inference, compression and multilingual evaluation are optional. The notebook
-includes encoder and GPU precision corrections; full INT8 remains experimental
-because it failed broader GPU accuracy testing. See the notebook's
-[Conclusions](./polyglot-lion.ipynb#Conclusions) for validation results and limitations.
+includes encoder and GPU precision corrections; full INT8 remains experimental.
+The 1.7B option remains pinned to the checkpoint used for the encoder and
+compression validation; newer checkpoint releases are not substituted without
+rechecking those results. See the notebook's
+[Conclusions](./polyglot-lion.ipynb#Conclusions) for results and limitations.
 
 Polyglot-Lion declares MIT; Qwen3-ASR and Optimum Intel use Apache-2.0.
 [FLEURS](https://huggingface.co/datasets/google/fleurs) is CC-BY-4.0
 (Google / Conneau et al., 2022). Preserve applicable attribution and
 [third-party notices](../../licensing/third-party-programs.txt).
+See the [Polyglot-Lion paper](https://arxiv.org/abs/2603.16184) and the
+[model project](https://github.com/knoveleng/polyglot-lion) for model details.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/polyglot-lion/README.md" />
