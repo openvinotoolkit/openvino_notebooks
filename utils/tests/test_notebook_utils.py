@@ -207,6 +207,47 @@ def test_setup_notebook_venv_rejects_invalid_notebook_name(notebook_name, tmp_pa
         setup_notebook_venv(notebook_name, venv_root=tmp_path)
 
 
+LONG_VENV_DIR = Path("C:/Users/user/Documents/openvino_notebooks/notebooks/tensorflow-classification-to-openvino/.venv")
+SHORT_VENV_DIR = Path("C:/Users/user/openvino_notebooks/notebooks/hello-world/.venv")
+
+
+@pytest.mark.parametrize(
+    "os_name, venv_dir, long_paths_enabled",
+    [("posix", LONG_VENV_DIR, False), ("nt", SHORT_VENV_DIR, False), ("nt", LONG_VENV_DIR, True)],
+)
+def test_fit_venv_dir_keeps_venv_dir_without_path_limit_risk(monkeypatch, os_name, venv_dir, long_paths_enabled):
+    monkeypatch.setattr("os.name", os_name)
+    monkeypatch.setattr(notebook_utils, "_windows_long_paths_enabled", lambda: long_paths_enabled)
+
+    assert notebook_utils._fit_venv_dir_to_windows_path_limit(venv_dir) == venv_dir
+
+
+def test_fit_venv_dir_keeps_existing_long_venv_dir(monkeypatch, tmp_path):
+    monkeypatch.setattr("os.name", "nt")
+    monkeypatch.setattr(notebook_utils, "_windows_long_paths_enabled", lambda: False)
+    venv_dir = tmp_path / ("long-notebook-name" * 5) / ".venv"
+    (venv_dir / "Scripts").mkdir(parents=True)
+    (venv_dir / "Scripts" / "python.exe").touch()
+
+    assert notebook_utils._fit_venv_dir_to_windows_path_limit(venv_dir) == venv_dir
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="builds Windows paths")
+def test_fit_venv_dir_shortens_long_venv_dir_without_long_paths(monkeypatch, capsys):
+    monkeypatch.setattr("os.name", "nt")
+    monkeypatch.setattr(notebook_utils, "_windows_long_paths_enabled", lambda: False)
+    monkeypatch.setenv("LOCALAPPDATA", "C:/Users/user/AppData/Local")
+    other_venv_dir = LONG_VENV_DIR.parent.parent / "tensorflow-object-detection-to-openvino" / ".venv"
+
+    short_dir = notebook_utils._fit_venv_dir_to_windows_path_limit(LONG_VENV_DIR)
+
+    assert short_dir.parent == Path("C:/Users/user/AppData/Local", notebook_utils._WINDOWS_SHORT_VENV_ROOT)
+    assert len(str(short_dir)) + notebook_utils._VENV_FILE_PATH_RESERVE <= notebook_utils._WINDOWS_MAX_PATH
+    assert notebook_utils._fit_venv_dir_to_windows_path_limit(LONG_VENV_DIR) == short_dir
+    assert notebook_utils._fit_venv_dir_to_windows_path_limit(other_venv_dir) != short_dir
+    assert f"Using {short_dir} instead" in capsys.readouterr().out
+
+
 def test_add_venv_dll_directory_registers_library_bin_once(monkeypatch, tmp_path):
     monkeypatch.setattr(notebook_utils, "_venv_dll_directories", {})
     add_dll_directory = MagicMock()
