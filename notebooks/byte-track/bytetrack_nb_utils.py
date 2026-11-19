@@ -1,11 +1,11 @@
-"""Shared helpers for the two ByteTrack enablement notebooks (role of openvino_notebooks' notebook_utils.py).
+"""Shared helpers for the ByteTrack enablement notebook (role of openvino_notebooks' notebook_utils.py).
 
-  ByteTrack_PyTorch_Enablement.ipynb            -> PyTorch FP32 / FP16 (inference, accuracy, perf, video)
-  ByteTrack_OV_Enablement_Quantization.ipynb    -> OpenVINO IR FP32 / FP16, NNCF INT8, accuracy, video, benchmark_app
+The notebook is self-contained: it clones the unmodified ByteTrack repository, downloads the official MOT17
+checkpoint, builds the PyTorch FP32 model and computes every reference (accuracy, video tracks, latency) in-notebook.
 
 Everything that is NOT the network (pre-processing, post-processing, BYTETracker, MOT17 protocol, video test) lives
 here, so every backend / precision goes through the identical host pipeline. The MOT17 protocol re-uses
-scripts/bt_common.py, i.e. exactly what scripts/eval_mot17.py uses (numbers are directly comparable).
+bt_common.py, i.e. exactly what scripts/eval_mot17.py uses (numbers are directly comparable).
 """
 import importlib.util
 import json
@@ -21,13 +21,18 @@ import numpy as np
 
 from pathlib import Path
 
-# All paths are relative to this repository: <repo>/notebooks (this folder), <repo>/scripts, <repo>/ByteTrack_repo.
-# Large inputs (weights, MOT17, videos) are looked up in <repo> and its parent; override with environment variables.
+# All paths are relative to this notebook folder. Large inputs (weights, MOT17, videos) are looked up next to the
+# notebook, in the repo and its parent; override with environment variables.
 NB_DIR = Path(__file__).resolve().parent
 ROOT = NB_DIR.parent
-REPO = ROOT / "ByteTrack_repo"                       # git clone https://github.com/FoundationVision/ByteTrack ByteTrack_repo
-SCRIPTS = ROOT / "scripts"
-ARTIFACTS = NB_DIR / "artifacts"                      # hand-over PyTorch notebook -> OpenVINO notebook
+REPO = ROOT / "ByteTrack_repo"                       # cloned by ensure_repo()
+REPO_URL = "https://github.com/FoundationVision/ByteTrack"
+SCRIPTS = NB_DIR                                       # bt_common.py lives next to this file
+WEIGHTS_GDRIVE = "1P4mY0Yyd3PPTybgZkjMYhFri88nTmJX5"  # bytetrack_x_mot17.pth.tar (ByteTrack model zoo)
+
+# Free-license sample video (Wikimedia Commons). Transcoded to H.264 MP4 by ensure_video().
+VIDEO_URL = "https://upload.wikimedia.org/wikipedia/commons/0/0c/Pro_dog_walker_-_Tokyo_-_2024_Nov_1.webm"
+VIDEO_ATTRIBUTION = 'CC BY-SA 4.0, "Pro dog walker - Tokyo - 2024 Nov 1" by User:Nesnad, Wikimedia Commons'
 
 
 def find_file(name, env=None, subdirs=("", "weights", "videos", "data")):
@@ -52,9 +57,95 @@ def rel(p):
 
 WEIGHTS = find_file("bytetrack_x_mot17.pth.tar", "BYTETRACK_WEIGHTS")
 os.environ.setdefault("BYTETRACK_WEIGHTS", str(WEIGHTS))          # same weights for the scripts/ subprocesses
-MOT17_TRAIN = Path(os.environ.get("MOT17_TRAIN", ROOT / "datasets" / "MOT17" / "train"))   # scripts/fetch_mot17_subset.py
-VIDEO = find_file("JK_Standing_Next2U.mp4", "VIDEO_1")
-VIDEO_2 = find_file("Luka_Doncic.mp4", "VIDEO_2")
+
+
+def find_mot17():
+    """MOT17 ``train`` folder: ``MOT17_TRAIN`` env var, or the usual locations next to / above the notebook."""
+    env = os.environ.get("MOT17_TRAIN")
+    if env:
+        return Path(env).expanduser().resolve()
+    for base in (NB_DIR, ROOT, ROOT.parent, Path.home()):
+        for cand in (base / "datasets" / "MOT17" / "train", base / "MOT17" / "train", base / "MOT17"):
+            if cand.is_dir() and any(cand.glob("MOT17-*-FRCNN")):
+                return cand.resolve()
+    return (ROOT / "datasets" / "MOT17" / "train")
+
+
+MOT17_TRAIN = find_mot17()
+VIDEO = find_file("dog_walker_tokyo.mp4", "VIDEO_1")
+
+
+def mot17_available() -> bool:
+    """True when MOT17 train FRCNN sequences are present (accuracy sections need them)."""
+    return MOT17_TRAIN.is_dir() and any(MOT17_TRAIN.glob("MOT17-*-FRCNN"))
+
+
+def ensure_repo(repo: Path = REPO) -> Path:
+    """Shallow-clone the unmodified ByteTrack repository (yolox package: model, NMS postprocess, BYTETracker)."""
+    if not (repo / "yolox" / "tracker" / "byte_tracker.py").exists():
+        import subprocess
+
+        repo.parent.mkdir(parents=True, exist_ok=True)
+        print(f"cloning {REPO_URL} -> {rel(repo)}")
+        subprocess.run(["git", "clone", "--depth", "1", REPO_URL, str(repo)], check=True)
+    return repo
+
+
+def download_weights() -> Path:
+    """Fetch the official ByteTrack MOT17 checkpoint (YOLOX-X, ByteTrack model zoo) when missing."""
+    if not WEIGHTS.exists():
+        import gdown
+
+        WEIGHTS.parent.mkdir(parents=True, exist_ok=True)
+        print(f"downloading {WEIGHTS.name} from Google Drive ({WEIGHTS_GDRIVE})")
+        gdown.download(id=WEIGHTS_GDRIVE, output=str(WEIGHTS), quiet=False)
+        if not WEIGHTS.exists():
+            raise RuntimeError(f"could not download {WEIGHTS.name}; provide it via BYTETRACK_WEIGHTS")
+    return WEIGHTS
+
+
+def ensure_video(name: str = "dog_walker_tokyo.mp4") -> Path:
+    """Download the free-license sample clip and transcode it to H.264 MP4 (OpenCV-friendly).
+
+    Source: Wikimedia Commons, CC BY-SA 4.0 (see ``VIDEO_ATTRIBUTION``).
+    """
+    global VIDEO
+    out = NB_DIR / name
+    if out.exists():
+        VIDEO = out
+        return out
+    import subprocess
+    import urllib.request
+
+    import imageio_ffmpeg
+
+    webm = NB_DIR / name.rsplit(".", 1)[0] + ".webm"
+    if not webm.exists():
+        print(f"downloading free-license sample video ({VIDEO_ATTRIBUTION})")
+        urllib.request.urlretrieve(VIDEO_URL, webm)
+    print(f"transcoding {webm.name} -> {out.name} (H.264)")
+    subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-v", "error", "-i", str(webm),
+                    "-c:v", "libx264", "-preset", "medium", "-crf", "23", "-pix_fmt", "yuv420p",
+                    "-movflags", "+faststart", "-an", str(out)], check=True)
+    VIDEO = out
+    return out
+
+
+def video_frames(video, n: int, max_frames=None):
+    """``n`` evenly spaced BGR frames from a video (fallback calibration/validation data)."""
+    cap = cv2.VideoCapture(str(video))
+    total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if max_frames:
+        total = min(total, max_frames)
+    idx = sorted(set(np.linspace(0, total - 1, min(n, total)).round().astype(int)))
+    frames = []
+    for i in idx:
+        cap.set(cv2.CAP_PROP_POS_FRAMES, int(i))
+        ok, f = cap.read()
+        if ok:
+            frames.append(f)
+    cap.release()
+    return frames
 
 # ------------------------------------------------------------------------------------------------ environment
 for _p in (str(SCRIPTS), str(REPO)):
@@ -77,10 +168,9 @@ import bt_common as BC  # noqa: E402
 VIDEO_TRACKER = dict(track_thresh=0.5, track_buffer=30, match_thresh=0.8, min_box_area=10, max_aspect_ratio_w_over_h=1.6, mot20=False)
 
 
-def load_config(path=ROOT / "openvino_ir" / "bytetrack_tracker_config.json"):
-    with open(path) as f:
-        cfg = json.load(f)
-    cfg.setdefault("video_tracker", VIDEO_TRACKER)
+def load_config(path=NB_DIR / "bytetrack_tracker_config.json"):
+    cfg = json.loads(Path(path).read_text())
+    cfg.setdefault("video_tracker", dict(VIDEO_TRACKER))
     return cfg
 
 
@@ -247,8 +337,8 @@ def track_sequence(run, seq, cfg, max_frames=None):
         x, _ = preprocess(img, cfg)
         t0 = time.perf_counter(); pred = run(x); t_det += time.perf_counter() - t0
         dets = postprocess(pred, cfg)
-        if dets is None:
-            continue
+        if dets is None:  # keep the tracker clock moving so stale tracks expire
+            dets = torch.zeros((0, 7), dtype=torch.float32)
         tlwhs, ids, scores = [], [], []
         for t in tracker.update(dets, img.shape[:2], input_hw):
             tlwh = t.tlwh
@@ -297,7 +387,7 @@ def mot_eval(run, cfg, tag, seqs=None, max_frames=None, out_root=f"{NB_DIR}/resu
 
 
 # ------------------------------------------------------------------------------------------------ video sanity
-def track_video(run, cfg, tag, video=VIDEO, out_dir=f"{NB_DIR}/results/video", max_frames=None, write_mp4=True, cut_thresh=35.0):
+def track_video(run, cfg, tag, video=None, out_dir=f"{NB_DIR}/results/video", max_frames=None, write_mp4=True, cut_thresh=35.0):
     """Track a real video (no GT) with ByteTrack's generic-video parameters; writes an annotated half-res MP4.
 
     Returns {tracks: [{id: tlwh}], cuts: [frame ids], stats}. Shot cuts = mean |grey diff| of 160x90 thumbnails > cut_thresh.
@@ -305,6 +395,7 @@ def track_video(run, cfg, tag, video=VIDEO, out_dir=f"{NB_DIR}/results/video", m
     from yolox.tracker.basetrack import BaseTrack
     from yolox.tracker.byte_tracker import BYTETracker
 
+    video = Path(video) if video else VIDEO
     vt = cfg["video_tracker"]
     BaseTrack._count = 0                              # IDs come from a global counter -> reset for comparable runs
     cap = cv2.VideoCapture(video)

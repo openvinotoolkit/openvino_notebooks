@@ -143,7 +143,10 @@ def mot17_val_half(root=MOT17_TRAIN, seqs=None):
 
 
 def write_gt_val_half(seq, dst):
+    """MOT17 evaluation rules: keep ground-truth pedestrians only (class==1, conf==1, which drops
+    ignore regions) with visibility >= 0.25, as in the ByteTrack val-half protocol."""
     gt = np.loadtxt(os.path.join(seq["dir"], "gt", "gt.txt"), delimiter=",", dtype=np.float32)
+    gt = gt[(gt[:, 6] == 1) & (gt[:, 7] == 1) & (gt[:, 8] >= 0.25)]
     lo, hi = seq["start"], seq["start"] + len(seq["frames"]) - 1
     keep = (gt[:, 0] - 1 >= lo) & (gt[:, 0] - 1 <= hi)
     gt = gt[keep]

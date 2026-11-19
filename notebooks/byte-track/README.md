@@ -1,63 +1,48 @@
-# ByteTrack multi-object tracking with OpenVINO
+# Convert and Optimize ByteTrack (YOLOX-X + BYTETracker) multi-object tracking with OpenVINO™
 
-[ByteTrack](https://github.com/FoundationVision/ByteTrack) combines a YOLOX-X
-person detector (MOT17 checkpoint `bytetrack_x_mot17.pth.tar`, input
-`1×3×800×1440`) with a host-side BYTETracker. Detection decoding is included
-in the exported network; filtering, association, Kalman filtering and
-per-sequence tracking thresholds are **not** in the weights or the IR. The
-tracker settings accompany the IR as `bytetrack_config.json` and model metadata.
+<p align="center" width="100%">
+    <img width="60%" src="byte-track.gif">
+</p>
 
-## Model architecture
+[ByteTrack](https://github.com/FoundationVision/ByteTrack) ([paper](https://arxiv.org/abs/2004.01888)) is a
+tracking-by-detection pipeline built from **one neural network** plus a host-side tracker: a YOLOX-X person detector
+(`bytetrack_x_mot17`, `1×3×800×1440`) and a BYTETracker that associates detections over time with Kalman filtering and
+IoU matching — high-score boxes first, then low-score boxes to recover occluded objects. There is **no ReID network**.
+OpenVINO replaces the detector; the tracking thresholds and per-sequence overrides live in a configuration that is
+embedded into the IRs' `rt_info` and saved next to them.
 
-![Animated ByteTrack detector and tracker pipeline](./bytetrack_pipeline_animated.svg)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/byte-track/byte-track.ipynb)
 
-[Open the animated architecture diagram](./bytetrack_pipeline_animated.svg)
-to see the per-frame flow and the track-state feedback loop. The drawing was
-made for the broader ByteTrack study, so the asset paths illustrated there
-are examples rather than additional tutorial requirements.
+## Notebook Contents
 
-| Stage | Execution | Role |
-|---|---|---|
-| Image preparation | Host | Resize and letterbox a video/MOT17 frame to `800×1440`, retaining the scale factor needed to map boxes back to the original frame. |
-| YOLOX-X | PyTorch for export; OpenVINO for inference | Run the single-class person detector. Anchor-free grid decoding is folded into the network; output boxes, objectness and class scores feed the tracker. |
-| Detection filtering | Host | Apply confidence filtering and non-maximum suppression (NMS); restore image coordinates. |
-| BYTETracker | Host | Predict existing tracks with a Kalman filter, associate high-confidence detections first and then low-confidence detections by IoU/Hungarian matching. Create, retain or retire track IDs according to the tracker thresholds and buffer. |
+The [byte-track.ipynb](byte-track.ipynb) notebook is self-contained — it clones the ByteTrack repository, downloads
+the official MOT17 checkpoint and builds the PyTorch FP32 detector with the box decode folded into the graph — and
+follows these steps:
 
-**Model assets:** `bytetrack_x_mot17.pth.tar` contains the YOLOX-X detector
-weights; it does not contain BYTETracker parameters. The tutorial creates
-FP32, then FP16 and NNCF INT8 OpenVINO `.xml`/`.bin` detector IRs. It stores
-`bytetrack_config.json` alongside each IR and embeds the same configuration
-in the IR metadata. There is **no ReID network** in ByteTrack.
+- Install prerequisites
+- Clone ByteTrack, download the checkpoint and build the PyTorch FP32 detector
+- Convert the detector to OpenVINO FP32 and FP16 IR
+- Validate the converted models against PyTorch (single-frame parity)
+- Track a video and score every precision against PyTorch FP32 reference tracks
+- Optimize the detector to INT8 with NNCF (with accuracy control when needed)
+- Compare accuracy (MOTA / IDF1 on optional MOT17) and latency of all precisions
 
-## Tutorial
+[bytetrack_nb_utils.py](bytetrack_nb_utils.py) and [bt_common.py](bt_common.py) contain the host-side
+pre/post-processing, tracker and evaluation helpers; [bytetrack_tracker_config.json](bytetrack_tracker_config.json)
+holds the tracking configuration that is not in the weights.
 
-The [tutorial](byte-track.ipynb) converts the YOLOX-X detector to OpenVINO
-FP32 and FP16 IR, quantizes it to INT8 with NNCF, checks accuracy against the
-PyTorch reference on MOT17 val-half, benchmarks each precision with
-`benchmark_app` and tracks a video at FP32, FP16 and INT8. The executed
-notebook keeps its cell outputs.
-[bytetrack_nb_utils.py](bytetrack_nb_utils.py) and [bt_common.py](bt_common.py)
-contain the host-side pre/postprocessing, tracker and evaluation shared by all
-three OpenVINO precisions.
+## Installation Instructions
 
-## Installation Instructions and data
+We recommend running the notebook in a virtual environment. You only need a Jupyter server to start. For details,
+please refer to the [Installation Guide](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/README.md).
 
-Run the tutorial **from this folder**. Install the Python packages the
-notebook imports (OpenVINO, NNCF, PyTorch, OpenCV, motmetrics, lap, yacs,
-ipywidgets, matplotlib) and provide the ByteTrack source clone, the official
-MOT17 detector checkpoint (`bytetrack_x_mot17.pth.tar`) and the MOT17 FRCNN
-train sequences. The notebook was written against a project layout that also
-holds the PyTorch baseline artifacts (`artifacts/`) produced by its companion
-PyTorch notebook, so a fresh clone cannot re-run it end to end without them.
-The saved outputs show a complete run.
+The ByteTrack source clone and the official checkpoint (`bytetrack_x_mot17.pth.tar`) are downloaded automatically on
+first run; set `BYTETRACK_WEIGHTS` to reuse a local copy.
 
-The bundled [JK_Standing_Next2U.mp4](JK_Standing_Next2U.mp4) is the first
-**30 seconds (900 frames at 30 FPS)** of the demonstration video, re-encoded
-at 1920x1080. The annotated outputs of the notebook run are in
-[results/video/](results/video):
-[OV_FP32_tracked.mp4](results/video/OV_FP32_tracked.mp4),
-[OV_FP16_tracked.mp4](results/video/OV_FP16_tracked.mp4) and
-[OV_INT8_tracked.mp4](results/video/OV_INT8_tracked.mp4)
-(900 frames, 960x536).
+The sample video is downloaded at runtime from Wikimedia Commons:
+["Pro dog walker - Tokyo - 2024 Nov 1"](https://commons.wikimedia.org/wiki/File:Pro_dog_walker_-_Tokyo_-_2024_Nov_1.webm)
+by User:Nesnad, licensed **CC BY-SA 4.0**. The MOT17 dataset is **optional** and not redistributed here — provide the
+MOT17 FRCNN train sequences (set `MOT17_TRAIN`) to enable the MOTA / IDF1 accuracy sections; the video demo,
+quantization and benchmarks run without it. Tracking output videos are written to a local `results/video/` folder.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/byte-track/README.md" />
