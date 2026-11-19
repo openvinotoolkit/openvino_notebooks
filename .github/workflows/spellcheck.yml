@@ -6,12 +6,6 @@ on:
     branches:
       - 'main'
       - 'latest'
-    paths:
-      - '.ci/spellcheck/*'
-      - 'README.md'
-      - 'CONTRIBUTING.md'
-      - 'notebooks/**.md'
-      - 'notebooks/**.ipynb'
   push:
     branches:
       - 'main'
@@ -27,7 +21,22 @@ permissions:
   contents: read
 
 jobs:
-  build_spellcheck:
+  changes:
+    uses: ./.github/workflows/job_detect_changes.yml
+    permissions:
+      contents: read
+      pull-requests: read
+    with:
+      files: |
+        .ci/spellcheck/*
+        README.md
+        CONTRIBUTING.md
+        notebooks/**/*.md
+        notebooks/**/*.ipynb
+
+  test_spellcheck:
+    needs: changes
+    if: ${{ needs.changes.outputs.relevant == 'true' }}
     strategy:
       fail-fast: false
     runs-on: ubuntu-22.04 # change cachepip step when changing this
@@ -42,7 +51,7 @@ jobs:
           path: ./.github/workflows
 
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.11' # change cachepip step when changing this
 
@@ -67,3 +76,13 @@ jobs:
       - name: Run spell check
         run: |
           python .ci/spellcheck/run_spellcheck.py
+
+  # Keep the required check successful when no relevant files changed.
+  build_spellcheck:
+    needs: [changes, test_spellcheck]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check status of all jobs
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: exit 1

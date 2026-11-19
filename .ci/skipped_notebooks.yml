@@ -154,6 +154,21 @@
     - os:
         - macos-13
         - windows-2022
+# Qwen3Guard multi-head NPUW support is still open: openvinotoolkit/openvino#39353.
+- notebook: notebooks/qwen3guard-stream/qwen3guard-stream.ipynb
+  skips:
+    - device:
+        - npu
+# NPU compilation cannot compute output bounds for SenseVoice's dynamic Unsqueeze.
+- notebook: notebooks/sensevoice-small/sensevoice-small.ipynb
+  skips:
+    - device:
+        - npu
+# Granite 4.0-1B currently targets CPU/GPU; its exact-checkpoint NPU path is unvalidated.
+- notebook: notebooks/granite-4.0/granite-4.0.ipynb
+  skips:
+    - device:
+        - npu
 - notebook: notebooks/hello-npu/hello-npu.ipynb
   skips:
     - device:
@@ -364,12 +379,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/catvton/catvton.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
 - notebook: notebooks/deepseek-ocr/deepseek-ocr.ipynb
   skips:
     - os:
@@ -377,12 +386,6 @@
         - ubuntu-22.04
         - windows-2022
 - notebook: notebooks/wan2.2-text-image-to-video/wan2.2-text-image-to-video.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-- notebook: notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb
   skips:
     - os:
         - macos-13
@@ -490,18 +493,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/bernini-r-image-video/bernini-r-image-video.ipynb
-  skips:
-    - os:
-        - macos-13
 - notebook: notebooks/qwen3.8-mtp/qwen3.8-mtp.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-# Gated HF checkpoint (requires token) and ~2.7 GB download; not executable in CI
-- notebook: notebooks/sam-3d-body/sam-3d-body.ipynb
   skips:
     - os:
         - macos-13

@@ -73,7 +73,9 @@ def remove_ov_install(cell):
     lines = cell["source"].replace("pip_install(", "pip_install( ").split("\n")
     for line in lines:
         if "openvino" in line:
-            if "optimum-cli" in line or line.startswith("#") or "-openvino" in line:
+            # A %pip cell may also contain imports. Only package specs should be stripped.
+            stripped = line.lstrip()
+            if stripped.startswith(("import ", "from ")) or "optimum-cli" in line or line.startswith("#") or "-openvino" in line:
                 updated_lines.append(line)
                 continue
             updated_line_content = []
@@ -169,6 +171,8 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
     nb_convert_config.NotebookExporter.preprocessors = ["nbconvert.preprocessors.ClearOutputPreprocessor"]
     output_remover = nbconvert.NotebookExporter(nb_convert_config)
     for notebookfile in Path(notebooks_dir).glob("**/*.ipynb"):
+        if ".venv" in notebookfile.parts:
+            continue
         if not str(notebookfile.name).startswith("test_") and notebookfile.name not in EXCLUDED_NOTEBOOKS:
             nb = nbformat.read(notebookfile, as_version=nbformat.NO_CONVERT)
             found = False
