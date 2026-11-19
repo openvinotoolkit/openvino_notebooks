@@ -6,6 +6,7 @@
 
 Error signature: `<12-hex-signature>`
 Nightly run: <nightly run URL>
+Related signatures: <comma-separated backtick-quoted covered signatures, or none>
 
 ## Affected notebooks
 
@@ -43,3 +44,15 @@ Nightly run: <nightly run URL>
 ## Suggested next step
 
 <A concrete action for a maintainer, such as a specific file and change to try, an upstream component to report to, or a command to reproduce the failure.>
+
+## AI self-improvement
+
+### Before investigation
+
+- **Prior feedback:** <Source PR/issue URLs or memory runs, observed outcomes and uncertainty; or none available with reason.>
+- **Applied learning:** <The applicable lesson and how it changed this investigation, or why prior advice did not apply.>
+
+### After investigation
+
+- **Self-assessment:** <What the investigation established, ruled out or could not verify, including why no safe fix was possible.>
+- **Reusable lesson:** <One conditional evidence-backed observation for future investigations, including its limitations.>

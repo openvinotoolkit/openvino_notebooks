@@ -42,7 +42,7 @@ def test_make_attempt_accepts_only_known_enums_and_bounds_every_note_field():
     assert result["outcome"] == "none" and result["confidence"] == ""
     assert result["root_cause"] == "r" * 399 + "…" and result["action"] == "a b"
     assert result["dead_ends"] == result["next_step"] == ""
-    assert set(result) == kb.ATTEMPT_KEYS
+    assert set(result) == kb.ATTEMPT_KEYS | set(kb.LEARNING_FIELDS)
     assert kb.make_attempt(1, "x", "y", "2026-01-01", None)["outcome"] == "none"
 
 
@@ -164,6 +164,9 @@ def invalid_documents():
         "control character": mutate(lambda d: record(d)["attempts"][0].update(action="a\x85b")),
         "non-string text": mutate(lambda d: record(d)["attempts"][0].update(next_step=5)),
         "extra attempt field": mutate(lambda d: record(d)["attempts"][0].update(extra="x")),
+        "invalid learning type": mutate(lambda d: record(d)["attempts"][0].update(lesson=[])),
+        "multiline learning": mutate(lambda d: record(d)["attempts"][0].update(prior_feedback="a\nb")),
+        "unbounded learning": mutate(lambda d: record(d)["attempts"][0].update(self_assessment="x" * (kb.TEXT_LIMIT + 1))),
         "bad run id": mutate(lambda d: record(d)["attempts"][0].update(nightly_run_id="1")),
         "too many signatures": json.dumps(
             {"schema_version": 1, "signatures": {f"{n:012x}": json.loads(text)["signatures"][SIG_A] for n in range(kb.MAX_SIGNATURES + 1)}}
@@ -181,7 +184,30 @@ def boundary_documents():
     full = kb.empty_knowledge()
     for number in range(kb.MAX_SIGNATURES):
         full["signatures"][f"{number:012x}"] = record
-    return {"empty": kb.dump_knowledge(kb.empty_knowledge()), "typical": kb.dump_knowledge(valid_knowledge()), "limits": kb.dump_knowledge(full)}
+    legacy = valid_knowledge()
+    for name in kb.LEARNING_FIELDS:
+        del legacy["signatures"][SIG_A]["attempts"][0][name]
+    return {
+        "empty": kb.dump_knowledge(kb.empty_knowledge()),
+        "legacy": kb.dump_knowledge(legacy),
+        "typical": kb.dump_knowledge(valid_knowledge()),
+        "limits": kb.dump_knowledge(full),
+    }
+
+
+def test_learning_fields_roundtrip_with_provenance_and_are_bounded():
+    knowledge = kb.empty_knowledge()
+    source = "https://github.com/o/r/pull/42"
+    kb.record_group(
+        knowledge,
+        group(),
+        attempt(prior_feedback=f"{source}: duplicate patch", applied_learning="checked sibling signatures", self_assessment="not validated", lesson="x" * 800),
+    )
+    stored = kb.parse_knowledge(kb.dump_knowledge(knowledge))["signatures"][SIG_A]["attempts"][0]
+    assert source in stored["prior_feedback"]
+    assert stored["applied_learning"] == "checked sibling signatures"
+    assert stored["self_assessment"] == "not validated"
+    assert len(stored["lesson"]) == kb.TEXT_LIMIT
 
 
 def test_parse_knowledge_roundtrips_and_rejects_every_schema_deviation():

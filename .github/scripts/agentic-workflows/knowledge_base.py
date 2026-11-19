@@ -26,6 +26,7 @@ URL_PREFIX = "https://github.com/"
 OUTCOMES = ("pr", "issue", "none")
 CONFIDENCES = ("", "low", "medium", "high")
 NOTE_FIELDS = ("root_cause", "action", "dead_ends", "next_step")
+LEARNING_FIELDS = ("prior_feedback", "applied_learning", "self_assessment", "lesson")
 RECORD_KEYS = {"kind", "category", "error_class", "exception_type", "headline", "first_seen", "last_seen", "investigations", "notebooks", "attempts"}
 ATTEMPT_KEYS = {"nightly_run_id", "nightly_run_url", "remediator_run_url", "date", "outcome", "confidence", *NOTE_FIELDS}
 
@@ -79,7 +80,10 @@ def validate_record(signature: str, record: Any) -> None:
     attempts = record["attempts"]
     _require(isinstance(attempts, list) and 1 <= len(attempts) <= MAX_ATTEMPTS, f"{where} has an invalid number of attempts")
     for attempt in attempts:
-        _require(isinstance(attempt, dict) and set(attempt) == ATTEMPT_KEYS, f"{where} has an attempt with unexpected fields")
+        _require(
+            isinstance(attempt, dict) and ATTEMPT_KEYS <= set(attempt) <= ATTEMPT_KEYS | set(LEARNING_FIELDS),
+            f"{where} has an attempt with unexpected fields",
+        )
         _require(type(attempt["nightly_run_id"]) is int and attempt["nightly_run_id"] >= 0, f"{where} has an invalid nightly run id")
         for name in ("nightly_run_url", "remediator_run_url"):
             _require(attempt[name] == clean_url(attempt[name]), f"{where} has an invalid {name}")
@@ -88,6 +92,9 @@ def validate_record(signature: str, record: Any) -> None:
         _require(attempt["confidence"] in CONFIDENCES, f"{where} has an invalid confidence")
         for name in NOTE_FIELDS:
             _check_text(attempt[name], f"{where} {name}")
+        for name in LEARNING_FIELDS:
+            if name in attempt:
+                _check_text(attempt[name], f"{where} {name}")
 
 
 def parse_knowledge(text: str) -> dict:
@@ -111,7 +118,7 @@ def dump_knowledge(knowledge: dict) -> str:
 
 
 def make_attempt(run_id: int, nightly_run_url: str, remediator_run_url: str, date: str, note: Optional[dict]) -> dict:
-    """One investigation; the agent's note supplies the outcome it submitted, its confidence and the free-text fields."""
+    """One investigation; the agent's note supplies the requested output (not publication proof), confidence and reflection."""
     note = note or {}
     confidence = note.get("confidence")
     outcome = note.get("outcome")
@@ -123,7 +130,7 @@ def make_attempt(run_id: int, nightly_run_url: str, remediator_run_url: str, dat
         "outcome": outcome if outcome in OUTCOMES else "none",
         "confidence": confidence if confidence in CONFIDENCES else "",
     }
-    for name in NOTE_FIELDS:
+    for name in (*NOTE_FIELDS, *LEARNING_FIELDS):
         attempt[name] = clean_text(note.get(name))
     return attempt
 
