@@ -15,13 +15,9 @@ TASK_PROMPTS = {
 }
 
 
-# Sample images are hosted as GitHub user-attachments; downloaded on first run
-# via :func:`download_example_assets` (the notebook calls it from its
-# prerequisites cell). Keeping these out of the repository avoids shipping
-# binary blobs in the PR.
+# Sample images are downloaded on first run. The text and formula examples
+# come from pinned notebook outputs; the remaining examples use GitHub user-attachments.
 EXAMPLE_ASSET_URLS: dict[str, str] = {
-    "ocr_text_sample.png": "https://github.com/user-attachments/assets/fda2c6f6-bbba-4ece-b90b-c42bca60e525",
-    "ocr_formula_sample.png": "https://github.com/user-attachments/assets/c9407e8e-3f2a-4d74-807b-dcefa06a3741",
     "ocr_table_sample.png": "https://github.com/user-attachments/assets/4c64fbf7-5181-4ccc-bb0a-92ea43b3dcc8",
     "ocr_doc_sample.png": "https://github.com/user-attachments/assets/5b482249-ad47-4c32-8c89-302a60b3c71e",
 }
@@ -192,13 +188,15 @@ def make_demo(model, processor, detector=None):
 
 
 def download_example_assets() -> list[Path]:
-    """Download example images from their canonical GitHub user-attachment URLs.
+    """Download the text and formula examples and remaining GitHub attachment images.
 
-    Uses :func:`notebook_utils.download_file`, which already handles the
-    existence check, progress bar, retries and User-Agent header. Must be
-    called from the notebook directory (where ``notebook_utils.py`` has been
-    fetched into).
+    Must be called from the notebook directory, where ``notebook_utils.py``
+    has been fetched.
     """
-    from notebook_utils import download_file
+    from notebook_utils import download_file, download_notebook_example_image
 
-    return [download_file(url, filename=name) for name, url in EXAMPLE_ASSET_URLS.items()]
+    return [
+        download_notebook_example_image("ocr_invoice", "ocr_text_sample.png"),
+        download_notebook_example_image("ocr_formula", "ocr_formula_sample.png"),
+        *(download_file(url, filename=name) for name, url in EXAMPLE_ASSET_URLS.items()),
+    ]

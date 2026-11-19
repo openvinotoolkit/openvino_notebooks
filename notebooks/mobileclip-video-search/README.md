@@ -10,6 +10,8 @@ Historically, building a robust search engine for images was difficult. One coul
 
 In this tutorial, we consider how to use [MobileCLIP](https://arxiv.org/pdf/2311.17049.pdf) for implementing a visual content search engine for finding relevant frames in video
 
+The red-panda gallery image is a [CC0 photograph by Mathias Appel](https://commons.wikimedia.org/wiki/File:Red_Panda_(24986761703).jpg), downloaded from a GitHub mirror.
+
 ## Notebook Contents
 
 This tutorial demonstrates step-by-step instructions on how to run PyTorch MobileCLIP  with OpenVINO. It also provides an interactive user interface for search frames in video that are the most relevant to text or image requests.

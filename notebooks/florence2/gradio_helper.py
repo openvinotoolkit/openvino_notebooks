@@ -37,7 +37,7 @@ colormap = [
 
 example_images = [
     ("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg?download=true", "car.jpg"),
-    ("https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/d5fbbd1a-d484-415c-88cb-9986625b7b11", "cat.png"),
+    ("cat", "cat.png"),
     ("https://github.com/user-attachments/assets/8c9ae017-7837-4abc-ae92-c1054c9ec350", "hand-written.png"),
 ]
 
@@ -143,9 +143,13 @@ def update_task_dropdown(choice):
 
 
 def make_demo(model, processor):
-    for url, filename in example_images:
-        if not Path(filename).exists():
-            image = Image.open(requests.get(url, stream=True, timeout=30).raw)
+    from notebook_utils import download_notebook_example_image
+
+    for source, filename in example_images:
+        if source == "cat":
+            download_notebook_example_image(source, filename)
+        elif not Path(filename).exists():
+            image = Image.open(requests.get(source, stream=True, timeout=30).raw)
             image.save(filename)
 
     def run_example(task_prompt, image, text_input=None):
