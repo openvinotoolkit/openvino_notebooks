@@ -1472,3 +1472,10 @@ fbank
 RTTM
 UEM
 VGG
+Conneau
+EOS
+FLEURS
+PTL
+RMSE
+roofline
+SDPA
