@@ -29,23 +29,15 @@ Surgery performed by monkeypatching (module-level in fasterwam.models.wan22.wan_
   * rope_apply           -> real-valued rotation (kills torch.view_as_complex + float64)
   * flash_attention      -> bool attn_mask converted to additive float (-1e4) before SDPA
   * sinusoidal_embedding_1d -> fp32 or fp64 accumulation (flag --sin64)
+RoPE needs no export switch: the plain packed-pair rotation the model traces (`rope_apply` above --
+`out[..., 2i] = x[..., 2i]*cos_i - x[..., 2i+1]*sin_i`, `out[..., 2i+1] = x[..., 2i]*sin_i + x[..., 2i+1]*cos_i`
+with cos/sin read from the packed `[end, dim//2, 2]` table) is exactly what OpenVINO's `RoPEFusion`
+transformation matches (`RoPEFusionPackedPairs`, registered in the `RoPEFusion` container), so the IR
+comes out as ONE fused `ocl::rope::opt` kernel with bit-identical output instead of the gather/stack/
+eltwise sequence it traces to.  No export-time graph surgery and no change of basis is used, and the
+exported K/V interface keeps the basis the repo itself stores.
 Latency flags (all **default 1** since the 29 Oct promotion, which is what `ir/` and `ir_robotwin/` were
 exported with; pass `0` to reproduce the pre-promotion graphs exactly; each is bit-identical in fp16):
-  * --rope2 1 -> `rope_apply` without pair gathering: out = x*cos + flip(x)*(-sin,+sin) with widened
-    constant tables; 3 GPU kernels per RoPE application instead of 9.  -1.5 ms/chunk.
-  * --rope3 1 -> **default 1 since the 30 Oct promotion** (overrides --rope2, which stays default 1 as the
-    control path `--rope3 0`): the SAME rotation written in the
-    half-major (GPT-NeOX) `rotate_half` form on the last axis of a rank-4 [B,S,N,head_dim] tensor,
-    which is the only traced form whose OpenVINO pattern matchers fire `RoPEFusionGPTNEOX` (exec:
-    one tuned `ocl::rope::opt` kernel instead of `strided_slice_ref` + 2 `generic_eltwise_ref`).
-    Math-preserving, not bit-identical: the pair-major -> half-major change of basis `P` is folded
-    into the ROWS of `self_attn.q/k` (weight + bias) and of `norm_q/norm_k.weight` (`_perm_qk` /
-    `apply_rope3_basis`), so q/k leave the GEMM already in the rotated basis, `P` cancels in q.k^T,
-    V is untouched, and the 1024/3072-wide RMS reduction is permutation-invariant.  CAVEAT: the
-    exported video K/V INTERFACE is then in the permuted basis too -> a `--rope3` video IR and a
-    `--rope3` action IR are a matched pair and must be promoted together.  Shipping since 30 Oct:
-    -1.5 ms video prefill + -0.24 ms action loop = ~134.5 ms/chunk LIBERO (40.1x), 145.2 RoboTwin;
-    accuracy unchanged (LIBERO rmse 0.05533, RoboTwin 0.02341/0.1137, cos_min >= 0.99999 both).
   * --tmod2 1 -> the video expert's `t_mod` producer runs on the 2 distinct token timesteps (M=2)
     instead of all 294, then gathers back (`pre_dit_tmod2` + `_RowDedup`).  -0.5 ms/chunk.
   * --txtp N  -> EXPERIMENTAL (default 0 = untouched shipping graph): re-lay-out the text-context
@@ -69,10 +61,12 @@ exported with; pass `0` to reproduce the pre-promotion graphs exactly; each is b
     `FullyConnectedCompressed` primitive (iGPU: `FullyConnected` 287 x 125.62 -> 0, `FCC`
     287 x 66.89 + `DynamicQuantize` 175 x 4.29; layer count 2622 -> 2770).  video prefill
     -50.1 ms iGPU / -16.9 ms B580 per chunk, compile 16.6 -> 4.8 s, peak RSS 18.7 -> 9.7 GB.
-    The scope is declared and asserted, not assumed: the 148 OTHER weight-bearing nodes (147
-    int64 `Gather` index/frequency tables + 1 fp16 `Convolution` filter) are named in NNCF's
-    `ignored_scope` and must come out UNCOMPRESSED (`_weight_nodes`; they are not fp16 weights to
-    begin with, they are simply none of the quantiser's business).  ORDER CONTRACT -- the video
+    The scope is declared and asserted, not assumed: the OTHER weight-bearing nodes (261
+    int64 `Gather` index/frequency tables + 1 fp16 `Convolution` filter on the shipping graph) are
+    named in NNCF's `ignored_scope` and must come out UNCOMPRESSED (`_weight_nodes`; they are not
+    fp16 weights to begin with, they are simply none of the quantiser's business).  Their COUNT is
+    derived from the IR (`_derive_ignored`) because it moves with the graph -- 2 scalar-index
+    `Gather`s per RoPE site -- while the 399 MatMuls / 287 targets are still asserted literally.  ORDER CONTRACT -- the video
     unit has NO split step, so it is export -> compress -> `os.replace` under the SAME filenames
     (the fp16 original is parked by rename next to itself and DELETED once the INT8 bytes verify;
     no extra disk, no archive -- `FWAM_KEEP_FP16_ARCHIVE=1` keeps it instead).
@@ -163,8 +157,7 @@ def _tmod_idx(n: int, tpf: int, device) -> torch.Tensor:
     """Constant gather index [0]*tpf + [1]*(n - tpf): frame-0 tokens -> row 0, all others -> row 1.
 
     Built from a python list so it lands in the graph as a plain ONNX Constant.  Do NOT build it
-    with `repeat_interleave`: int-repeats crash torch.onnx.export's constant folder (see
-    `rope_apply_v2`).
+    with `repeat_interleave`: int-repeats crash torch.onnx.export's constant folder.
     """
     return torch.tensor([0] * tpf + [1] * (n - tpf), dtype=torch.long, device=device)
 
@@ -178,7 +171,7 @@ def _tmod_frame_idx(f: int, device) -> torch.Tensor:
     exactly the bug that made the first A1 export cost nothing (scripts/tmod2_test.py now asserts
     t_mod.shape == (1, f, 6, C), and `ov_profile.py find --shape 1,294,6,3072` must print nothing).
     Built from a python list so it lands in the graph as a plain ONNX Constant -- `repeat_interleave`
-    crashes torch.onnx.export's constant folder (see `rope_apply_v2`).
+    crashes torch.onnx.export's constant folder.
     """
     return torch.tensor([0] + [1] * (f - 1), dtype=torch.long, device=device)
 
@@ -374,7 +367,7 @@ def _ctxpad_pair(ctx, msk, align: int):
 
     Constants are built with `torch.zeros` / `torch.full` on a python-list-free, static shape, so
     they fold to ONNX `Const` nodes; nothing here uses `repeat_interleave` (which crashes
-    torch.onnx.export's constant folder, see `rope_apply_v2`).
+    torch.onnx.export's constant folder).
     """
     align = int(align)
     if align < 2 or not isinstance(ctx, torch.Tensor) or ctx.dim() != 3 or not msk_is_padgable(msk, ctx):
@@ -478,135 +471,15 @@ def _pre_dit_ctxpad(align: int = CTXPAD_ALIGN_DEFAULT, cls: type | None = None):
     return pre_dit_ctxpad
 
 
-# ---------------------------------------------------- rope3: pair-major -> half-major basis change
-ROPE3: dict = {}  # filled by apply_rope3_basis(); {"head_dim": int, "n_modules": int, ...}
-
-
-def head_halfmajor_perm(hd: int) -> torch.Tensor:
-    """Gather index for the pair-major -> half-major (GPT-NeOX) reordering of ONE head.
-
-    `perm[j]` is the SOURCE pair-major coordinate of half-major slot j:
-        y = x[..., perm]  =>  y[0:hd/2] = x[0], x[2], ... x[hd-2]   (first element of each pair)
-                              y[hd/2:] = x[1], x[3], ... x[hd-1]   (second element of each pair)
-    In `y` the two elements of every rotation pair sit hd/2 apart, which is exactly what
-    `rotate_half` (and therefore OV's `RoPEFusionGPTNEOX`) expects:
-        rotate_half(y)[j]      = -y[j+hd/2] = -x[2j+1]   -> needs  cos_j / sin_j
-        rotate_half(y)[j+hd/2] =  y[j]      =  x[2j]
-    i.e. half-major RoPE with the doubled table `cat([c, c])` IS the shipped interleaved rotation
-    written in the basis P:  rope_pair = P^-1 . rope_half . P.  Scripts/rope_v3_test.py pins this
-    against an fp64 reference (and against a deliberately wrong permutation) before anything ships.
-    """
-    if hd < 4 or hd % 2:
-        raise ValueError(f"head_dim {hd} cannot be re-laid-out in half-major form")
-    return torch.tensor([2 * j if j < hd // 2 else 2 * (j - hd // 2) + 1 for j in range(hd)], dtype=torch.long)
-
-
-def rope3_perm(d: int, hd: int) -> torch.Tensor:
-    """Flat `[..., d]` gather index for a head-major layout of d//hd heads, each reordered by P."""
-    if d % hd:
-        raise ValueError(f"last dim {d} is not a whole number of {hd}-wide heads")
-    p = head_halfmajor_perm(hd)
-    return torch.cat([i * hd + p for i in range(d // hd)])
-
-
-def rope3_permute(t: torch.Tensor, hd: int, inverse: bool = False) -> torch.Tensor:
-    """Apply P (or P^-1) to the last axis of `t`, head-major with head width `hd`."""
-    idx = rope3_perm(int(t.shape[-1]), hd)
-    if inverse:
-        idx = torch.argsort(idx)
-    return t.index_select(-1, idx.to(t.device))
-
-
-def _rope3_group_check(q, num_heads) -> None:
-    """Prove the rope3 basis change cancels; called from the patched `flash_attention` at trace time.
-
-    P cancels in q.k^T only if the attention groups the last axis into chunks that are whole
-    multiples of the RoPE head width.  The repo has two call styles (`block.num_heads`, and
-    `MoT.num_heads` where an action layer reads cached video K), so record the group sizes actually
-    seen while tracing the real graph and refuse to export an unsupported one.  Pure python: runs
-    once per call at trace time, never enters the graph.
-    """
-    if not num_heads:
-        return
-    group = int(q.shape[-1]) // int(num_heads)
-    ROPE3.setdefault("attn_group_sizes", set()).add(group)
-    hd = ROPE3.get("head_dim")
-    if hd and group % int(hd):
-        raise RuntimeError(
-            f"--rope3: an attention groups the last axis into {group}, which is not a "
-            f"multiple of the RoPE head width {hd}: the basis change P would NOT cancel "
-            f"in q.k^T.  Refusing to export."
-        )
-
-
-def apply_rope3_basis(model) -> dict:
-    """Fold P into the q/k projections + their RMSNorm gammas of every self-attention (`--rope3`).
-
-    For a `SelfAttention` m:  q = norm_q(m.q(x))  and  k = norm_k(m.k(x))  are the ONLY tensors that
-    RoPE touches (wan_video_dit.py:189-193, mot.py:201-205), so replacing
-        W_q -> P W_q,  b_q -> P b_q,  gamma_q -> P gamma_q   (same for k)
-    makes q/k arrive in the half-major basis for free: (P W)x + Pb = P(Wx + b) exactly, the RMSNorm
-    denominator is a mean over the WHOLE attn_hidden_dim (permutation invariant), and its gamma is
-    permuted with the rows.  P then cancels in q.k^T (both operands carry the same P), V and `o` are
-    untouched, and no kernel is added anywhere.  Requires the attention to group the last axis into
-    heads of exactly `hd` (else P would not cancel) -- asserted from the modules' own attributes.
-    """
-    if not hasattr(wvd, "SelfAttention"):
-        raise RuntimeError("wan_video_dit.SelfAttention not available")
-    reps, seen = [], set()
-    for name, m in model.named_modules():
-        if not isinstance(m, wvd.SelfAttention):
-            continue
-        hd, nh = int(m.attn_head_dim), int(m.num_heads)
-        d = int(m.attn_hidden_dim)
-        if d != hd * nh:
-            raise RuntimeError(f"{name}: attn_hidden_dim {d} != num_heads {nh} * head_dim {hd}")
-        idx = rope3_perm(d, hd)
-        if int(idx.numel()) != d or torch.equal(idx, torch.arange(d)):
-            raise RuntimeError(f"{name}: degenerate rope3 permutation")
-        with torch.no_grad():
-            for lin, gamma in ((m.q, m.norm_q.weight), (m.k, m.norm_k.weight)):
-                lin.weight.data = lin.weight.data.index_select(0, idx).clone()
-                if lin.bias is not None:
-                    lin.bias.data = lin.bias.data.index_select(0, idx).clone()
-                gamma.data = gamma.data.index_select(0, idx.to(gamma.device)).clone()
-        seen.add(name)
-        reps.append((name, nh, hd))
-    if not reps:
-        raise RuntimeError("apply_rope3_basis found no SelfAttention to re-base")
-    # every module that is somebody's `self_attn` must have been re-based, or that attention would
-    # get a permuted q against an unpermuted k (silent garbage, not a crash)
-    missed = [n for n, mm in model.named_modules() if n.endswith("self_attn") and n not in seen]
-    hds = sorted({r[2] for r in reps})
-    if len(hds) != 1:
-        raise RuntimeError(f"rope3 needs ONE head width across the model, got {hds}")
-    ROPE3.clear()
-    ROPE3.update(
-        {
-            "head_dim": hds[0],
-            "n_modules": len(reps),
-            "heads": sorted({r[1] for r in reps}),
-            "missed_self_attn": missed,
-            "first": reps[0][0],
-            "last": reps[-1][0],
-        }
-    )
-    return ROPE3
-
-
 # ----------------------------------------------------------------------------- monkeypatches
-def patch_all(sin64: bool = True, rope2: bool = False, tmod2: bool = False, modg: bool = False, txtp: int = 0, ctxpad: int = 0, rope3: bool = False) -> None:
+def patch_all(sin64: bool = True, tmod2: bool = False, modg: bool = False, txtp: int = 0, ctxpad: int = 0) -> None:
     """Real-valued RoPE + additive float masks + optional fp64 sinusoidal embedding.
 
-    `rope2=True` swaps in the pair-swap-free RoPE (see `rope_apply_v2`): same math, 3 GPU kernels
-    per application instead of 9.  `rope3=True` (takes precedence over `rope2`; must be paired with
-    `apply_rope3_basis(model)`, see `rope_apply_v3`): the same rotation in the half-major basis OV
-    fuses into one kernel.  `tmod2=True` computes the video expert's per-token `t_mod` from
-    its 2 distinct timesteps instead of all 294 (see `pre_dit_tmod2`).  `modg=True` (= A1, needs
-    `tmod2`) additionally keeps `t_mod` as one row per *latent frame* and broadcasts it against the
-    tokens reshaped to (B, f, tpf, C), which deletes the 28 per-block `modulation + t_mod` adds and
-    the per-token scale/shift/gate reads behind them.  All default off so existing validated
-    exports are unchanged.
+    `tmod2=True` computes the video expert's per-token `t_mod` from its 2 distinct timesteps instead
+    of all 294 (see `pre_dit_tmod2`).  `modg=True` (= A1, needs `tmod2`) additionally keeps `t_mod` as
+    one row per *latent frame* and broadcasts it against the tokens reshaped to (B, f, tpf, C), which
+    deletes the 28 per-block `modulation + t_mod` adds and the per-token scale/shift/gate reads behind
+    them.  All default off so existing validated exports are unchanged.
     """
     if modg and not tmod2:
         raise ValueError("modg (A1) needs tmod2 (A2): the 2-row timestep producer comes first")
@@ -649,6 +522,13 @@ def patch_all(sin64: bool = True, rope2: bool = False, tmod2: bool = False, modg
         return torch.stack([torch.cos(ang), torch.sin(ang)], dim=-1).to(torch.float32)
 
     def rope_apply(x, freqs, num_heads):
+        """The repo's packed-pair rotation, made real-valued -- the ONE RoPE form this exporter emits.
+
+        `cos`/`sin` come from the packed `[end, dim//2, 2]` table above and the two elements of every
+        rotation pair stay adjacent in the head, which is the trace OpenVINO's `RoPEFusion` matches
+        (`RoPEFusionPackedPairs`) and turns into one `ocl::rope::opt` kernel.  Do not reshape or
+        re-order the head layout here: the fused kernel is only selected for this form.
+        """
         b, s = x.shape[0], x.shape[1]
         hd = x.shape[-1] // num_heads
         xr = x.reshape(b, s, num_heads, hd // 2, 2)
@@ -658,69 +538,7 @@ def patch_all(sin64: bool = True, rope2: bool = False, tmod2: bool = False, modg
         out = torch.stack([x0 * c - x1 * sn, x0 * sn + x1 * c], dim=-1)
         return out.reshape(b, s, -1)
 
-    def rope_apply_v2(x, freqs, num_heads):
-        """Same rotation as `rope_apply`, written so the exporter emits 3 kernels, not 9.
-
-        The pair-indexing of v1 (`xr[..., 0]`, `xr[..., 1]`, `cs[..., 0]`, `cs[..., 1]` and the
-        `torch.stack`) traces to 4 Gathers + 4 muls + sub + add + 2 Unsqueeze + Concat.  Here the
-        pair swap is one flip on the (size-2) pair axis and cos/sin are widened to full head width,
-        so out = x*cos + swap(x)*(-sin,+sin) traces to Gather/Flip + Mul + Mul-Add:
-            out[2i]   = x[2i]*cos_i   - x[2i+1]*sin_i
-            out[2i+1] = x[2i+1]*cos_i + x[2i]*sin_i
-        The two tables come from `freqs` (a constant), so they are built once per graph and shared
-        by every block; only the flip + 2 eltwise ops are per (q, k) application.
-
-        The widened tables are built with slice+cat, NOT `repeat_interleave`: an int-repeats
-        `repeat_interleave` on the constant-folded table makes torch.onnx.export's
-        `_jit_pass_onnx_constant_fold` die on the *upstream* traced-int
-        `self.freqs[0][:f].view(f, 1, 1, -1)` of the RoPE table with
-        "RuntimeError: shape '[3, 1, 1, 2]' is invalid for input of size 132" (repro: 2-block
-        `--unit video_slice --rope2 1`).  slice+cat yields bit-identical values in fp32 and fp16
-        (checked vs the shipping `rope_apply` on the real 3-D table, 294 tokens x 24 heads).
-        """
-        b, s = x.shape[0], x.shape[1]
-        hd = x.shape[-1] // num_heads
-        cs = freqs.reshape(s, 1, hd // 2, 2).to(x.dtype)  # [s,1,hd/2,2] = (cos,sin)
-        c = torch.cat([cs[..., 0:1], cs[..., 0:1]], dim=-1)  # cos on both pair slots
-        sgn_sin = torch.cat([-cs[..., 1:2], cs[..., 1:2]], dim=-1)  # (-sin,+sin)
-        xp = x.reshape(b, s, num_heads, hd // 2, 2)  # packed pairs
-        return (xp * c + torch.flip(xp, dims=(-1,)) * sgn_sin).reshape(b, s, -1)
-
-    def rope_apply_v3(x, freqs, num_heads):
-        """`rope_apply_v2`'s rotation in the HALF-MAJOR head basis -- one fused GPU kernel.
-
-        `x` must already be in the basis P (see `apply_rope3_basis`), i.e. its head coordinates are
-        ordered [all first elements of a rotation pair, all second elements].  Then the rotation is
-        GPT-NeOX `rotate_half` on the LAST axis of a rank-4 tensor with [1,S,1,head_dim] tables:
-            out[..., j]       = x[j]*cos_j     - x[j+hd/2]*sin_j
-            out[..., j+hd/2]  = x[j+hd/2]*cos_j + x[j]*sin_j
-        This is the one traced shape (rank-4, rotation on the last axis, table broadcast over the
-        head axis) for which OpenVINO's `RoPEFusionGPTNEOX` fires: the micro in
-        /tmp/fuse/micro2.py shows `rms` + `RoPE (ocl::rope::opt)` for it, versus `rms` +
-        `strided_slice_ref` + 2 `generic_eltwise_ref` for the shipped v2 form.  Values are the
-        shipped rotation expressed in a permuted basis (rope_v3_test.py), so the IR is equivalent --
-        not bit-identical -- to `--rope2 1`.
-        """
-        b, s = x.shape[0], x.shape[1]
-        hd = x.shape[-1] // num_heads
-        half = hd // 2
-        cs = freqs.reshape(s, 1, hd // 2, 2).to(x.dtype)  # (cos,sin) per pair
-        cos, sin = cs[..., 0], cs[..., 1]  # [s,1,hd/2]
-        # NOTE both details below, each of which the test in scripts/rope_v3_test.py has a negative
-        # control for: (a) the tables are duplicated along the PAIR axis (`cat` of two [s,1,hd/2] ->
-        # [s,1,hd]), NOT by stacking on the packed dim, which would interleave them into the pair-
-        # major layout again; (b) `rotate_half` already carries the minus sign, so the sin table is
-        # plain +sin duplicated (HF convention) -- reusing v2's `cat([-sin, +sin])` trick here double-
-        # negates and rotates the wrong way.
-        c = torch.cat([cos, cos], dim=-1).reshape(1, s, 1, hd)
-        sn = torch.cat([sin, sin], dim=-1).reshape(1, s, 1, hd)
-        x4 = x.reshape(b, s, num_heads, hd)  # half-major pairs
-        rot = torch.cat([-x4.narrow(-1, half, half), x4.narrow(-1, 0, half)], dim=-1)
-        return (x4 * c + rot * sn).reshape(b, s, -1)
-
     def flash_attention(q, k, v, num_heads, ctx_mask=None, compatibility_mode=True):
-        if rope3:  # record/validate the q grouping (see _rope3_group_check)
-            _rope3_group_check(q, num_heads)
         from einops import rearrange
 
         q = rearrange(q, "b s (n d) -> b n s d", n=num_heads)
@@ -736,8 +554,6 @@ def patch_all(sin64: bool = True, rope2: bool = False, tmod2: bool = False, modg
         sinusoid = torch.outer(pos, torch.pow(torch.tensor(10000.0, dtype=acc), -torch.arange(dim // 2, dtype=acc, device=pos.device).div(dim // 2)))
         x = torch.cat([torch.cos(sinusoid), torch.sin(sinusoid)], dim=1)
         return x.to(position.dtype)
-
-    rope_impl = rope_apply_v3 if rope3 else (rope_apply_v2 if rope2 else rope_apply)
 
     # --- A2: video-expert `t_mod` from 2 distinct timesteps instead of all 294 ----------------
     # `pre_dit` (wan_video_dit.py:536-550) builds token_timesteps = ones(B, f, tpf) * t and then
@@ -808,7 +624,7 @@ def patch_all(sin64: bool = True, rope2: bool = False, tmod2: bool = False, modg
                     self.__dict__.pop(name, None)  # look up through to _modules again
 
     wvd.precompute_freqs_cis = precompute_freqs_cis
-    wvd.rope_apply = rope_impl
+    wvd.rope_apply = rope_apply
     wvd.flash_attention = flash_attention
     wvd.sinusoidal_embedding_1d = sinusoidal_embedding_1d
     wvv.AvgDown3D.forward = avgdown3d_forward
@@ -894,7 +710,7 @@ def patch_all(sin64: bool = True, rope2: bool = False, tmod2: bool = False, modg
 
     for mod in (mot_mod, smot_mod):
         if hasattr(mod, "rope_apply"):
-            mod.rope_apply = rope_impl
+            mod.rope_apply = rope_apply
         if hasattr(mod, "flash_attention"):
             mod.flash_attention = flash_attention
     if hasattr(sad_mod, "sinusoidal_embedding_1d"):
@@ -938,7 +754,6 @@ def unpatch_all() -> None:
         if ORIG.get("gate") is not None:
             wvd.GateModule.forward = ORIG["gate"]
         TMOD.clear()
-        ROPE3.clear()
         if "avgdown" in ORIG:
             wvv.AvgDown3D.forward = ORIG["avgdown"]
         # rebuild module-level freqs tables so the unpatched path is pristine
@@ -1570,8 +1385,10 @@ _WEIGHTY_OPS = {
 # graph verifies.  `FWAM_KEEP_FP16_ARCHIVE=1` keeps them (in (c)) as the pre-promotion control.
 #   ACTION: NNCF leaves action's handful of non-2-D constants alone by itself, so `ignored_scope`
 #           stays None -- that is what the promoted 1 Nov bytes were built with.  Do not "improve" it.
-#   VIDEO : 435 weight-bearing nodes, 287 of them MatMul targets and 148 (147 Gather tables + 1 Conv)
-#           that NNCF WOULD compress if they were not named explicitly.
+#   VIDEO : 435 weight-bearing nodes, 287 of them MatMul targets and 262 (261 Gather index/frequency
+#           tables + 1 Conv) that NNCF WOULD compress if they were not named explicitly.  That count
+#           is GRAPH-DEPENDENT and is therefore derived from the IR, never hard-coded -- see
+#           `_derive_ignored`.
 PROFILE_ACTION = {
     "name": "action",
     "flag": "--action-int8",
@@ -1591,15 +1408,23 @@ PROFILE_VIDEO = {
     # 228 x 3072^2 + 28 x 3072->14336 + 28 x 14336->3072 + 3072->18432 + 4096->3072 + 256->3072
     "expect_targets": 287,
     "expect_matmuls": 399,  # the 112 dynamic-B (attention / q.k^T) MatMuls stay MatMuls
-    "expect_ignored": 148,  # 147 Gather tables + 1 Convolution, must stay fp16
+    # NB: no `expect_ignored` literal.  How many weight nodes fall OUTSIDE the 287 targets depends on
+    # the graph (the packed-pair RoPE the exporter emits adds 2 scalar-index `Gather`s per RoPE site,
+    # so 57 sites take 147 -> 261), so the count is derived from the IR being compressed
+    # (`_derive_ignored`) and only the ROLE set is asserted (`_IGNORED_ROLES`).  An explicit
+    # `VIDEO_INT8_EXPECT="287,399,<n>"` still overrides it, as a documented escape hatch.
+    "expect_ignored": None,
+    "ignored_roles": ("Gather", "Convolution", "GroupConvolution"),
 }
 
 
 def _profile_expect(profile: dict) -> tuple:
     """`(targets, matmuls, ignored)` expected for this profile; overridable for a fresh config.
 
-    `VIDEO_INT8_EXPECT="287,399,148"` exists so an intentional `--unit video` export with a different
-    flag set (e.g. `--rope3 0`) can still ship; it prints what it overrode.
+    `VIDEO_INT8_EXPECT="287,399,262"` exists so an intentional `--unit video` export with a different
+    flag set can still ship; it prints what it overrode.  The third value is only needed when the
+    DERIVED ignored count is wrong -- the normal path asserts the role set of the ignored nodes and
+    the two graph-independent counts (287 targets, 399 MatMuls) instead.
     """
     exp = (profile["expect_targets"], profile["expect_matmuls"], profile["expect_ignored"])
     raw = os.environ.get("VIDEO_INT8_EXPECT")
@@ -1632,6 +1457,155 @@ def _weight_nodes(model) -> list:
     return out
 
 
+# The op types that may legitimately appear in the video unit's `ignored_scope`, i.e. the weight
+# holders NNCF must leave in fp16: `Gather` (the RoPE index/frequency tables -- int64 INDEX data, not
+# weights; quantising one corrupts the model, which is why they have to be named at all) and
+# `(Group)Convolution` (the video unit's single fp16 VAE-side conv filter).  This role SET is the
+# graph-independent half of the scope guard; the COUNT is derived from the IR (`_derive_ignored`).
+_IGNORED_ROLES = ("Gather", "Convolution", "GroupConvolution")
+
+_ET_SHORT = {
+    "int64_t": "int64",
+    "int32_t": "int32",
+    "float16": "f16",
+    "float32": "f32",
+    "uint8_t": "u8",
+    "int8_t": "i8",
+}
+
+
+def _et_short(et) -> str:
+    """Short, build-independent name for an element type (`<Type: 'int64_t'>` -> `int64`).
+
+    NB `str(ov.Type)` spells `<Type: 'uint8_t'>` on the 2026.5 build and `uint8` elsewhere, so the
+    quoted spelling is unwrapped before mapping.
+    """
+    s = str(et)
+    if "'" in s:
+        s = s.split("'")[1]
+    return _ET_SHORT.get(s, s)
+
+
+def _ignored_role(type_name: str, et) -> str:
+    """Role label of an ignored weight node, e.g. `Gather(int64)` or `Convolution(f16)`."""
+    return f"{type_name}({_et_short(et)})"
+
+
+def _role_allowed(role: str, profile: dict) -> bool:
+    """True when this ignored-node role may legitimately stay uncompressed.
+
+    A `Gather` table must be INDEX data (int64): a floating-point Gather table would be a real weight
+    table, and excluding it from compression would be a silent accuracy/scope regression rather than
+    the intended "do not quantise the RoPE tables".  Convolutions are allowed by role, not by count:
+    the video unit's one fp16 filter is out of the INT8 recipe by design.
+    """
+    tn, _, et = role.partition("(")
+    if tn not in profile.get("ignored_roles", ()):
+        return False
+    return et.startswith("int64") if tn == "Gather" else True
+
+
+def _derive_ignored(model, target_names) -> dict:
+    """`{role: count}` of the weight nodes that must stay uncompressed, DERIVED from the IR.
+
+    Walks exactly the same `_weight_nodes` enumeration the `ignored_scope` is built from and keeps
+    the nodes that are not compression targets, bucketed by role (`_ignored_role`).
+
+    Why derived and not a literal: the count is a property of the GRAPH, not of the INT8 recipe.
+    The packed-pair RoPE the exporter emits appends 2 scalar-index `Gather`s per RoPE site, so 57
+    sites turned the previous 147 tables into 261 and a literal `expect_ignored=148` aborted every
+    default INT8 export with "262 weight nodes would be ignored, expected 148".  The
+    two facts that really are graph-independent (399 MatMuls, 287 constant-B targets) stay hard-
+    coded in `PROFILE_VIDEO` and are still asserted.
+    """
+    roles = {}
+    for name, tn, pi, shape, et in _weight_nodes(model):
+        if name in target_names:
+            continue
+        role = _ignored_role(tn, et)
+        roles[role] = roles.get(role, 0) + 1
+    return roles
+
+
+def finalize_ir_names(xml: Path, unit: str, precision: str, bin_before: float | None = None) -> dict:
+    """Give a finished IR the precision's own file names -- atomically, and always.
+
+    The exporter traces and saves as `<unit>_fp16.{xml,bin}` whatever the weights are; the rename to
+    `<unit>_int8.*` used to be left to the caller, which only renamed when the destination did not
+    exist yet.  After a failed INT8 attempt the stale `<unit>_int8.*` pair then survived while the
+    freshly compressed bytes stayed under `*_fp16.*`, so an uncompressed 9381.8 MB
+    `video_int8.bin` could be presented as the INT8 set.  Doing the rename here, where it is known
+    what the bytes are, fixes that:
+
+      * `os.replace` -- atomic (no half-renamed pair) and it OVERWRITES, so a stale destination can
+        never outlive the bytes that should replace it;
+      * the other precision's pair in the SAME directory is removed, so a directory holds exactly
+        one version of the unit's graph;
+      * asserts the xml and bin exist and are non-empty, and -- for INT8, when the pre-compression
+        size is known -- that the bin is ~half of it (0.40..0.62 x the fp16 bin).
+
+    Args:
+        xml: the IR as the export/compression left it (usually `<unit>_fp16.xml`).
+        unit: the file stem prefix the exporter used (`vae`, `video`, `action`, `video_slice3`).
+        precision: `int8` for a compressed graph, `fp16`/`fp32` when nothing was compressed (then
+            only the existence/emptiness checks and the stale-pair cleanup run -- no rename).
+        bin_before: `.bin` size in bytes before compression; when omitted a stale fp16/fp32 sibling
+            still on disk is used (that is the case the old code got wrong), else the ratio check
+            is skipped.
+
+    Returns:
+        `{"xml", "bin_mb", "fp16_bin_mb", "ratio", "removed"}` -- sizes in MB, ratio bin/fp16bin.
+    """
+    xml = Path(xml)
+    bin_path = xml.with_suffix(".bin")
+    want_xml = xml.with_name(f"{unit}_{precision}.xml")
+    want_bin = want_xml.with_suffix(".bin")
+    # every OTHER precision's pair for this unit in this directory is a stale version of the graph
+    stale = [xml.with_name(f"{unit}_{p}{ext}") for p in ("fp16", "fp32", "int8") if p != precision for ext in (".xml", ".bin")]
+    assert xml.is_file(), f"{xml}: the export did not produce this IR"
+    assert bin_path.is_file(), f"{bin_path}: the export did not produce the weights of {xml.name}"
+    src_bytes = bin_path.stat().st_size
+    assert src_bytes > 0, f"{bin_path}: 0-byte weights -- the IR was not written"
+    if bin_before is None:  # an uncompressed pair still on disk is the honest reference
+        for p in [xml.with_name(f"{unit}_{q}.bin") for q in ("fp16", "fp32")]:
+            if p.is_file() and p.stat().st_size:
+                bin_before = float(p.stat().st_size)
+                break
+    renamed = xml.name != want_xml.name
+    if renamed:
+        print(f"[ov] {unit}: IR {xml.name} -> {want_xml.name} (bin {src_bytes / 1e6:.1f} MB, xml {xml.stat().st_size / 1e6:.1f} MB)", flush=True)
+        os.replace(str(xml), str(want_xml))  # atomic AND overwriting: no stale pair can survive
+        os.replace(str(bin_path), str(want_bin))
+    removed = []
+    for p in stale:
+        if p.is_file() and p != want_xml and p != want_bin:
+            removed.append((p.name, p.stat().st_size))
+            p.unlink()
+    for name, size in removed:
+        print(f"[ov] {unit}: removed the stale counterpart {name} ({size / 1e6:.1f} MB -- not this graph)", flush=True)
+    assert want_xml.is_file() and want_bin.is_file(), f"{want_xml}: rename left no IR on disk"
+    new_bytes = want_bin.stat().st_size
+    assert new_bytes > 0 and want_xml.stat().st_size > 0, f"{want_xml}: empty IR on disk"
+    # the bin may only wear an INT8 name when it really is ~half of the fp16 bin.  No ratio for an
+    # uncompressed graph (fp16/fp32): there is nothing to compare it against.
+    ratio = (new_bytes / bin_before) if (bin_before and precision not in ("fp16", "fp32")) else None
+    if ratio is not None:
+        assert 0.40 <= ratio <= 0.62, (
+            f"{want_bin}: {new_bytes / 1e6:.1f} MB INT8 bin is {ratio:.3f} x the {bin_before / 1e6:.1f} MB "
+            f"fp16 bin -- that is not a compressed graph, so the bytes under the '{precision}' name "
+            "are not the INT8 graph (a leftover fp16/partial file survived an earlier attempt)"
+        )
+    tail = f"" if ratio is None else f" (x{ratio:.3f} of fp16 {bin_before / 1e6:.1f} MB)"
+    print(f"[ov] {unit}: {want_xml.name} in place: bin {src_bytes / 1e6:.1f} -> {new_bytes / 1e6:.1f} MB{tail}", flush=True)
+    return {
+        "xml": str(want_xml),
+        "bin_mb": round(new_bytes / 1e6, 1),
+        "fp16_bin_mb": round(bin_before / 1e6, 1) if bin_before else None,
+        "ratio": None if ratio is None else round(ratio, 4),
+        "removed": [n for n, _ in removed],
+    }
+
+
 def _keep_fp16_archive() -> bool:
     """True when the caller asked for the pre-promotion fp16 IRs to be KEPT (default: no).
 
@@ -1653,8 +1627,9 @@ def _compress_action_ir(xml: Path, archive_dir: Path | None, compress: bool, nnc
     Returns stats (`"archive": None` when the fp16 bytes were dropped).  Asserts afterwards that
     (a) the bin shrank to ~half, (b) every constant-B MatMul weight is now a dequant chain (no
     MatMul keeps a 2-D `Constant` B -- that is the one the plugin would NOT fuse), (c) the reloaded
-    graph still has all its MatMuls, and (d, video profile only) the 148 explicitly ignored
-    Gather/Conv weight nodes are still uncompressed (no u8/i8 weight).  NB a failure in those
+    graph still has all its MatMuls, and (d, video profile only) the explicitly ignored
+    Gather/Conv weight nodes are still uncompressed (no u8/i8 weight) and that their count matches
+    the one DERIVED from the graph before compression (`_derive_ignored`) -- never a literal.  NB a failure in those
     POST-write asserts leaves the fp16 pair as `<stem>.fp16tmp.*` next to the IR (the error is
     raised, so nothing pretends otherwise); `rm */*.fp16tmp.*` then re-export.
     """
@@ -1676,24 +1651,46 @@ def _compress_action_ir(xml: Path, archive_dir: Path | None, compress: bool, nnc
     n_mm_before = sum(1 for o in model.get_ordered_ops() if o.get_type_name() == "MatMul")
     # ---- the declared scope, checked BEFORE anything is written --------------------------
     exp_targets, exp_matmuls, exp_ignored = _profile_expect(profile)
-    ignored = []
+    ignored, derived = [], {}
+    n_derived = 0
     if profile["ignore_by_name"]:
         target_names = {n for n, _ in cands}
         wn = _weight_nodes(model)
         ignored = [n for n, tn, pi, sh, et in wn if n not in target_names]
-        print(f"[ov] {flag}: {len(wn)} weight-bearing nodes -> {len(cands)} targets, " f"{len(ignored)} explicitly ignored (Gather/Conv/non-2-D)", flush=True)
+        # the ignored SET is asserted by ROLE; its SIZE is derived from this very graph, because it
+        # moves with the graph (2 scalar-index Gathers per RoPE site) -- see `_derive_ignored`
+        derived = _derive_ignored(model, target_names)
+        n_derived = sum(derived.values())
+        roles = ", ".join(f"{r}={c}" for r, c in sorted(derived.items()))
+        print(
+            f"[ov] {flag}: {len(wn)} weight-bearing nodes -> {len(cands)} targets, {len(ignored)} explicitly ignored "
+            f"[{roles}] (derived from the IR, not a literal)",
+            flush=True,
+        )
+        unexpected = sorted(r for r in derived if not _role_allowed(r, profile))
+        assert not unexpected, (
+            f"{xml.name}: the INT8 scope would ignore weight-node role(s) {unexpected}, which is not "
+            f"in {list(profile.get('ignored_roles', ()))}\n"
+            f"    derived roles: {derived}"
+            "\n    Only int64 Gather index/frequency tables (RoPE) and (Group)Convolution filters may "
+            "stay uncompressed: an ignored MatMul is a weight the INT8 arm would silently lose."
+        )
+        assert len(ignored) == n_derived, f"{xml.name}: {len(ignored)} ignored nodes but roles sum to {n_derived} ({derived})"
         if exp_targets is not None:
             assert len(cands) == exp_targets, (
                 f"{xml.name}: {len(cands)} constant-B MatMuls, expected {exp_targets} for the "
                 f"{profile['name']} profile (this is the promoted scope; set "
                 f'VIDEO_INT8_EXPECT="targets,matmuls,ignored" if this export really is a '
                 "different graph)"
+                f"\n    observed: targets={len(cands)} matmuls={n_mm_before} ignored={len(ignored)} "
+                f"(derived {n_derived}: {derived})"
             )
-        if exp_ignored is not None:
+        if exp_ignored is not None:  # explicit VIDEO_INT8_EXPECT escape hatch
             assert len(ignored) == exp_ignored, (
-                f"{xml.name}: {len(ignored)} weight nodes would be ignored, expected "
-                f"{exp_ignored} (147 Gather tables + 1 Convolution) -- NNCF would compress the "
-                "rest, so the scope has to be re-declared, not guessed"
+                f"{xml.name}: VIDEO_INT8_EXPECT wants {exp_ignored} ignored weight nodes, observed "
+                f"{len(ignored)} (derived from the IR: {n_derived} {derived}).  Either the override is "
+                "stale or the graph is not the one it was calibrated for -- drop the override to use "
+                "the derived scope, or recompute the roles above"
             )
     if exp_matmuls is not None:
         assert n_mm_before == exp_matmuls, f"{xml.name}: {n_mm_before} MatMuls, expected {exp_matmuls} for the " f"{profile['name']} profile"
@@ -1752,8 +1749,8 @@ def _compress_action_ir(xml: Path, archive_dir: Path | None, compress: bool, nnc
     assert n_mm == n_mm_before, f"{xml.name}: MatMul count {n_mm_before} -> {n_mm}"
     # what the GPU plugin matches: B is no longer a Constant but the tail of a dequant chain.
     # NB this count is a FLOOR, not the target count: on the video unit it reads 343 = 287
-    # compressed + 56 MatMuls whose B was already a `Multiply` (the rope3 basis folded into the
-    # q/k weights), so assert `>=` targets, never `==`.
+    # compressed + the 56 q/k projection MatMuls whose B was already a `Multiply`, so assert
+    # `>=` targets, never `==`.
     n_dq = 0
     for o in om.get_ordered_ops():
         if o.get_type_name() != "MatMul":
@@ -1774,8 +1771,9 @@ def _compress_action_ir(xml: Path, archive_dir: Path | None, compress: bool, nnc
     )
     # ---- (d) the EXPLICITLY IGNORED weight holders must be untouched ---------------------
     # After compression a target MatMul has no Constant input left, so `_weight_nodes` now returns
-    # exactly the ignored ones: for the video unit 147 int64 `Gather` index/frequency tables + 1
-    # fp16 `Convolution` filter.  They must still be uncompressed -- a quantised Gather table or
+    # exactly the ignored ones: for the video unit the int64 `Gather` index/frequency tables + the
+    # fp16 `Convolution` filter (count: whatever `_derive_ignored` found in this graph).  They must
+    # still be uncompressed -- a quantised Gather table or
     # Conv filter would be out-of-scope weight loss the latency measurement could not explain.
     n_kept, kept_types = 0, {}
     if profile["ignore_by_name"]:
@@ -1787,12 +1785,19 @@ def _compress_action_ir(xml: Path, archive_dir: Path | None, compress: bool, nnc
         )
         for n, tn, pi, sh, et in wn_after:
             kept_types[str(et)] = kept_types.get(str(et), 0) + 1
-        if exp_ignored is not None:
+        # observed vs DERIVED -- the message prints both, so a graph change is diagnosable
+        assert n_kept == n_derived, (
+            f"{xml.name}: {n_kept} weight-bearing nodes still hold a Constant weight, but the IR had "
+            f"{n_derived} non-target weight nodes before compression ({derived}) -- either a node that "
+            f"should have been compressed was skipped, or one that should have been kept was folded "
+            f"away; the other {len(cands)} MatMul weights are u8 dequant chains now"
+        )
+        if exp_ignored is not None:  # explicit VIDEO_INT8_EXPECT escape hatch
             assert n_kept == exp_ignored, (
-                f"{xml.name}: {n_kept} weight-bearing nodes left with a Constant weight, expected "
-                f"{exp_ignored}; the other {len(cands)} MatMul weights are u8 dequant chains now"
+                f"{xml.name}: VIDEO_INT8_EXPECT wants {exp_ignored} kept weight nodes, observed "
+                f"{n_kept} (derived {n_derived}: {derived})"
             )
-        print(f"[ov] {flag}: {n_kept} ignored weight nodes left uncompressed {kept_types}", flush=True)
+        print(f"[ov] {flag}: ignored weight nodes kept uncompressed: observed {n_kept} / derived {n_derived} {derived}", flush=True)
     assert 0.40 <= ratio <= 0.62, f"{xml.name}: bin {bin_before/1e6:.1f} -> {bin_after/1e6:.1f} MB " f"(ratio {ratio:.3f}) is not the expected ~0.50"
     if not keep_fp16:
         # the parked fp16 bytes are an intermediate: the INT8 graph is written and verified
@@ -1810,6 +1815,7 @@ def _compress_action_ir(xml: Path, archive_dir: Path | None, compress: bool, nnc
         "matmuls_before": n_mm_before,
         "matmuls_after": n_mm,
         "ignored_nodes": len(ignored),
+        "ignored_derived": dict(derived),
         "kept_weights": n_kept,
         "kept_types": kept_types,
         "archive": str(park_xml) if park_xml else None,
@@ -1823,7 +1829,7 @@ def apply_action_int8(info: dict, compress: bool = True, out_root: Path | None =
     """B1 split FIRST, then INT8 both action graphs, in place, same filenames.
 
     `info` is the `to_ir` dict of the freshly exported action unit (fp16).  Writes
-      <unit>/action_fp16.{xml,bin}            -- INT8 (replaces the fp16 bytes)
+      <unit>/action_int8.{xml,bin}            -- INT8 (renamed from the exported `action_fp16.*`)
       <unit>/action_b1/action_b1.{xml,bin}    -- INT8
       <unit>/action_b1/action_ctx.{xml,bin}   -- fp16 (outside the loop, already hidden)
 
@@ -1879,6 +1885,11 @@ def apply_action_int8(info: dict, compress: bool = True, out_root: Path | None =
     # ---- (2) compress both graphs in place (fp16 bytes parked, then dropped unless archived)
     st_src = _compress_action_ir(src_xml, archive_dir, compress, nncf)
     st_b1 = _compress_action_ir(b1_xml, (archive_dir / "action_b1") if archive_dir else None, compress, nncf)
+    # ---- (3) name the compressed graph for what it is: `action_fp16.*` -> `action_int8.*`
+    # (`action_b1/action_b1.*` and `action_ctx.*` keep the names `split_action.py` gives them: neither
+    # carries an fp16 claim the caller could confuse, and the runtime opens them by name.)
+    fin = finalize_ir_names(xml, "action", "int8", bin_before=st_src["bin_mb_before"] * 1e6)
+    xml = Path(fin["xml"])
     meta = {
         "nncf": getattr(nncf, "__version__", "?"),
         "split_lib": str(lib_path),
@@ -1887,6 +1898,7 @@ def apply_action_int8(info: dict, compress: bool = True, out_root: Path | None =
         "action_b1": st_b1,
         "action_ctx_fp16_mb": round(ctx_xml.with_suffix(".bin").stat().st_size / 1e6, 1),
         "archive_dir": str(archive_dir) if archive_dir else None,
+        "names": fin,
     }
     out = dict(info, model=None, bin_mb=st_src["bin_mb_after"], n_ops=None, action_int8=meta, xml=xml)
     return out, meta
@@ -1897,8 +1909,8 @@ def apply_video_int8(info: dict, compress: bool = True, out_root: Path | None = 
 
     ORDER CONTRACT: the video unit has no split (unlike the action unit, where `split_action.py`
     parses the fp16 graph and must run BEFORE compression), so this is simply
-    export -> compress -> `os.replace`.  Writes
-      <unit>/video_fp16.{xml,bin}          -- INT8 (replaces the fp16 bytes)
+    export -> compress -> `os.replace` -> `finalize_ir_names`.  Writes
+      <unit>/video_int8.{xml,bin}          -- INT8 (renamed from the exported `video_fp16.*`)
 
     No fp16 copy is kept: the fp16 pair is parked as `video_fp16.fp16tmp.*` beside itself (a
     rename, no extra disk) and deleted once the INT8 graph verifies -- it is an intermediate of the
@@ -1919,10 +1931,16 @@ def apply_video_int8(info: dict, compress: bool = True, out_root: Path | None = 
         archive_dir = Path(out_root).resolve().parent.parent / PROFILE_VIDEO["archive"]
     t0 = time.perf_counter()
     st = _compress_action_ir(xml, archive_dir, compress, nncf, PROFILE_VIDEO)
+    # name the compressed graph for what it is: `video_fp16.*` -> `video_int8.*`.  This is the step
+    # that used to be left to the caller and silently kept a stale `video_int8.*` (9381.8 MB,
+    # uncompressed) beside the fresh bytes: see `finalize_ir_names`.
+    fin = finalize_ir_names(xml, "video", "int8", bin_before=st["bin_mb_before"] * 1e6)
+    xml = Path(fin["xml"])
     meta = {
         "nncf": getattr(nncf, "__version__", "?"),
         "video_fp16": st,
         "archive_dir": str(archive_dir) if archive_dir else None,
+        "names": fin,
         "total_s": round(time.perf_counter() - t0, 2),
     }
     out = dict(info, model=None, bin_mb=st["bin_mb_after"], n_ops=None, video_int8=meta, xml=xml)
@@ -2005,24 +2023,6 @@ def main() -> None:
     p.add_argument("--steps", type=int, default=10)
     p.add_argument("--layers", type=int, default=3, help="--unit video_slice: number of leading video-expert blocks to export")
     p.add_argument(
-        "--rope2",
-        type=int,
-        default=1,
-        help="1 (default since the 29 Oct promotion) = pair-swap-free RoPE (3 kernels per "
-        "application instead of 9, bit-identical); 0 = the pre-promotion shipping form",
-    )
-    p.add_argument(
-        "--rope3",
-        type=int,
-        default=1,
-        help="1 (default since the 30 Oct promotion) = RoPE in the half-major (GPT-NeOX) basis "
-        "so OpenVINO fuses it to ONE "
-        "ocl::rope::opt kernel.  Takes precedence over "
-        "--rope2 and additionally RE-BASES the q/k weights of every self-attention "
-        "(apply_rope3_basis), so the exported video K/V interface is in that basis "
-        "too: a rope3 video IR and a rope3 action IR must be used together.",
-    )
-    p.add_argument(
         "--tmod2",
         type=int,
         default=1,
@@ -2077,8 +2077,8 @@ def main() -> None:
         "harness stay 5-D).  Same weights, bit-equal at fp32; removes the 5-D-only plugin "
         "fallbacks (permute_ref / border_gpu_ref / reduce_ref / one f32 Convert).  DEFAULT ON: "
         "an Arc B580 VAE unit goes 3.34 -> 3.19 ms once the rank-4 RMS fusion is in the GPU "
-        "plugin (L2NormChannelToRMS + its rank-4 relaxation), and an iGPU is -15.6 % even on a "
-        "stock plugin; without those plugin patches a B580 is ~5 % slower on this unit (+0.2 ms "
+        "plugin (L2NormChannelToRMS + its rank-4 relaxation), and an iGPU is -15.6 %% even on a "
+        "stock plugin; without those plugin patches a B580 is ~5 %% slower on this unit (+0.2 ms "
         "of a ~129 ms chunk).  --no-vae-4d selects the promoted 5-D folded graph. "
         "The transform is imported from vae_opt/to_4d.py (this flag is the only wiring) and it "
         "replaces --vae-fold, which is a no-op on a 4-D graph",
@@ -2161,8 +2161,6 @@ def main() -> None:
         "dtype": args.dtype,
         "trace_half": int(args.trace_half),
         "prec": prec,
-        "rope2": int(args.rope2),
-        "rope3": int(args.rope3),
         "ts": time.strftime("%F %T"),
     }
 
@@ -2206,30 +2204,18 @@ def main() -> None:
     # ---- build wrapper (patched rope/masks), check it against the unpatched ref ---
     patch_all(
         sin64=bool(args.sin64),
-        rope2=bool(args.rope2),
         tmod2=bool(args.tmod2),
         modg=bool(args.modg),
         txtp=int(args.txtp),
         ctxpad=int(args.ctxpad),
-        rope3=bool(args.rope3),
     )
     rebuild_freqs(model)
-    if int(args.rope3):
-        # weights (not just the rope function) must move to the half-major basis; the reference above
-        # was derived on the UNPATCHED path, so it stays in the pair-major basis by construction
-        emit("rope3_basis", apply_rope3_basis(model))
     ref_outputs = None
     if args.unit == "action":
         cond = ref["cond_layers"]
         wrapper = ActionStep(model, ref["masks"], ref["ctx_mask"], ref["video_seq_len"], cond)
         names = {"in": ["latents_action", "t", "context"] + [f"kv{i}_{c}" for i in range(len(cond)) for c in ("k", "v")], "out": ["pred"]}
-        # `--rope3`: the reference K/V were produced by the UNPATCHED (pair-major) path, but a rope3
-        # action graph expects them in the half-major basis -- P is part of the interface, so re-base
-        # the inputs before feeding the wrapper (V is not part of the rotation, so it stays).
-        kvk = [rope3_permute(t, ROPE3["head_dim"]) for t in ref["kv_k"]] if int(args.rope3) else list(ref["kv_k"])
-        if int(args.rope3):
-            emit("rope3_kv_rebased", [list(t.shape) for t in kvk[:1]])
-        sample = (ref["latents_action"], ref["t"], ref["context"], *[t for pair in zip(kvk, ref["kv_v"]) for t in pair])
+        sample = (ref["latents_action"], ref["t"], ref["context"], *[t for pair in zip(ref["kv_k"], ref["kv_v"]) for t in pair])
         reference = ref["pred"]
     elif args.unit in ("video_slice", "video"):
         full = args.unit == "video"
@@ -2266,29 +2252,12 @@ def main() -> None:
         emit("action_row_masks_all_true", arow)
         emit("ctx_mask_all_true", bool(ref["ctx_mask"].all()))
 
-    n_kv_out = 2 * len(cond) if args.unit in ("video_slice", "video") else 0
-
-    def rope3_cmp(i, g):
-        """`--rope3`: a video K leaves the graph in the HALF-MAJOR basis; compare in the ref's basis.
-
-        Every gate that compares a K output against the unpatched reference has to undo P first -- the
-        torch fp32 pass, the fp16-trace pass and `--verify` on the compiled IR.  Skipping one makes a
-        perfectly good rope3 graph report cos ~0.03-0.09 on its K outputs (V never needs it).
-        """
-        if int(args.rope3) and i < n_kv_out and i % 2 == 0:
-            return rope3_permute(g, ROPE3["head_dim"], inverse=True)
-        return g
-
     with torch.no_grad():
         got = wrapper(*sample)
-    if int(args.rope3):
-        # every attention the traced graph actually contains (see _rope3_group_check)
-        emit("rope3_attn_group_sizes", sorted(ROPE3.get("attn_group_sizes", set())))
     if ref_outputs is not None:
         outs = list(got) if isinstance(got, tuple) else [got]
         worst = {"max_abs": 0.0, "max_rel": 0.0, "rel_to_range": 0.0}
         for i, (r, g) in enumerate(zip(ref_outputs, outs)):
-            g = rope3_cmp(i, g)
             m = metrics(r, g)
             emit(f"torch_slice_out{i}_vs_ref", fmt(m))
             for kk in worst:
@@ -2323,7 +2292,6 @@ def main() -> None:
         outs_h = list(got_h) if isinstance(got_h, tuple) else [got_h]
         worst = {"max_abs": 0.0, "max_rel": 0.0, "rel_to_range": 0.0}
         for i, (r, g) in enumerate(zip(ref_outputs if ref_outputs is not None else [reference], outs_h)):
-            g = rope3_cmp(i, g)
             m = metrics(r, g)
             emit(f"torch_half_out{i}_vs_ref", fmt(m))
             for kk in worst:
@@ -2420,6 +2388,15 @@ def main() -> None:
         ir = dict(ir, model=ir["core"].read_model(str(ir["xml"])))  # further checks reload INT8
     elif args.unit == "video":
         emit("video_int8", "DISABLED (--no-video-int8): fp16 video graph, 9381.8 MB bin")
+    # ---- the bytes on disk are final: give them the precision's own names (atomic, idempotent,
+    # stale-proof -- `finalize_ir_names`).  A compressed unit was already renamed by apply_*_int8;
+    # everything else (the vae, and any unit exported with `--no-*-int8`) keeps its fp16 name, and a
+    # `<unit>_int8.*` pair left in the SAME directory by an earlier attempt is stale relative to
+    # these bytes, so it is removed instead of being presented as the INT8 set.
+    if not (args.unit == "action" and args.action_int8) and not (args.unit == "video" and args.video_int8):
+        ir_prec = "fp16" if fp16 else "fp32"  # the exporter's own name for these bytes (`to_ir` stem)
+        fin = finalize_ir_names(ir["xml"], tag, ir_prec)
+        emit("ir_names", f"{Path(fin['xml']).name}  bin {fin['bin_mb']:.1f} MB" + (f"  removed stale {fin['removed']}" if fin["removed"] else ""))
 
     ordered = [t.contiguous().to(inp_dtype).numpy() for t in sample]  # order == names["in"]
     ordered = feed_arrays(ir["model"], [torch.from_numpy(a) for a in ordered])  # follow the DECLARED input element types
@@ -2432,7 +2409,7 @@ def main() -> None:
                 res = cm(ordered)
                 outs = [torch.from_numpy(np.asarray(res[j]).copy()).float() for j in range(len(refs))]
                 for j, (r, g) in enumerate(zip(refs, outs)):
-                    m = metrics(r, rope3_cmp(j, g))
+                    m = metrics(r, g)
                     emit(f"numerics_{dev}_{prec}_out{j}", fmt(m))
                     log.setdefault(f"_max_{dev}", []).append(m)
                 if dev == "CPU":

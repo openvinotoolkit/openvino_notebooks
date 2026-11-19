@@ -60,15 +60,14 @@ PRECISIONS = ("fp16", "int8")
 # --------------------------------------------------------------- export switches
 # Graph-shaping export switches: a different flag set is a different graph, hence a different cache
 # entry (see ir_root_for).  The notebook always exports the fully promoted graph below - there is no
-# switch panel - but every optimization keeps its own exporter flag (``--rope3``, ``--rope2``,
-# ``--tmod2``, ``--modg``, ``--no-vae-fold``), so the code that applies it can be read, re-measured
-# and rolled back from outside the notebook.  ``dtype`` is always fp16; the precision dropdown only
-# decides the INT8 weight-compression switches, and for int8 adds ``--trace-half`` to the video and
-# action units (see _export_cmd).
+# switch panel - but every optimization keeps its own exporter flag (``--tmod2``, ``--modg``,
+# ``--no-vae-fold``, ...), so the code that applies it can be read, re-measured and rolled back from
+# outside the notebook.  RoPE is the one thing with no flag: the exporter always emits the plain
+# packed-pair rotation the model traces, which OpenVINO's ``RoPEFusion`` fuses into one kernel.
+# ``dtype`` is always fp16; the precision dropdown only decides the INT8 weight-compression switches,
+# and for int8 adds ``--trace-half`` to the video and action units (see _export_cmd).
 DEFAULT_EXPORT_FLAGS = {
     "dtype": "fp16",
-    "rope2": 1,  # pair-swap-free RoPE: 3 kernels per application instead of 9 (bit-identical)
-    "rope3": 1,  # half-major RoPE basis -> one fused kernel; takes precedence over rope2
     "tmod2": 1,  # video t_mod from its 2 distinct timesteps (M=2) instead of all 294
     "modg": 1,  # t_mod as one row per latent frame; needs tmod2; deletes 28 per-block adds
     "vae_fold": True,  # fold the VAE encoder's 22 dead Conv3D depth taps (233 -> 81 GMAC)
@@ -595,10 +594,6 @@ def _export_cmd(unit: str, precision: str, out_dir: Path, ref_dump: Path) -> lis
         EXPORT_FLAGS["dtype"],
         "--out-dir",
         str(out_dir),
-        "--rope2",
-        str(EXPORT_FLAGS["rope2"]),
-        "--rope3",
-        str(EXPORT_FLAGS["rope3"]),
         "--tmod2",
         str(EXPORT_FLAGS["tmod2"]),
         "--modg",
