@@ -116,19 +116,21 @@ def update(trusted_dir: Path, notes_dir: Path, out_dir: Path, remediator_run_url
     baseline = trusted_dir / MEMORY_SNAPSHOT / KNOWLEDGE_FILE
     knowledge = parse_knowledge(baseline.read_text(encoding="utf-8")) if baseline.is_file() else empty_knowledge()
     notes = read_notes(notes_dir, signatures, warn)
+    if not notes:
+        return {"investigated": 0, "evicted": [], "signatures": None}
     for group in groups:
         signature = group.get("signature")
-        if signature not in signatures:
+        if signature not in notes:
             continue
         attempt = make_attempt(run_id, str(run.get("url") or ""), remediator_run_url, date, notes.get(signature))
         record_group(knowledge, group, attempt)
-    evicted = evict_oldest(knowledge, set(signatures))
+    evicted = evict_oldest(knowledge, set(notes))
 
     text = dump_knowledge(knowledge)
     parse_knowledge(text)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / KNOWLEDGE_FILE).write_text(text, encoding="utf-8")
-    return {"investigated": len(signatures), "evicted": evicted, "signatures": len(knowledge["signatures"])}
+    return {"investigated": len(notes), "evicted": evicted, "signatures": len(knowledge["signatures"])}
 
 
 def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
@@ -159,7 +161,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                 args.trusted_dir, args.notes_dir, args.out_dir, args.remediator_run_url, today, warn=lambda m: print(f"::warning::{clean_text(m, 300)}")
             )
             if result["signatures"] is None:
-                print("No failure groups were investigated; the knowledge base is unchanged")
+                print("No investigation notes were recorded; the knowledge base is unchanged")
             else:
                 print(
                     f"Recorded {result['investigated']} investigated signatures; the knowledge base holds {result['signatures']} (evicted {len(result['evicted'])})"

@@ -267,6 +267,14 @@ def test_network_fixture_signature_ignores_addresses_and_request_ids():
     assert first["signature"] == second["signature"]
 
 
+def test_signature_ignores_xray_request_id():
+    first = "Cannot access gated repo (Request ID: Root=1-673c1a2b-3f4e5d6c7b8a9f0e1d2c3b4a)"
+    second = "Cannot access gated repo (Request ID: Root=1-673d9e0f-0a1b2c3d4e5f60718293a4b5)"
+
+    assert normalize_message(first) == "Cannot access gated repo (Request ID: <request-id>)"
+    assert compute_signature("cell_error", "HfHubHTTPError", first) == compute_signature("cell_error", "HfHubHTTPError", second)
+
+
 def test_unknown_fixture_traceback_block():
     result = parse_log(read_log("unknown.log"), Status.FAILED)
 
