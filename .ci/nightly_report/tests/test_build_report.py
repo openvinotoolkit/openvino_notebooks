@@ -14,7 +14,7 @@ from jsonschema import Draft202012Validator
 from nightly_report import build_report, github_api
 from nightly_report.report_common import Warnings
 from nightly_report.repository import get_last_modified
-from nightly_report.workflow import os_family, parse_job_name, runner_label_to_os_device, runner_label_text, workflow_job_spec
+from nightly_report.workflow import job_ignore_lists, os_family, parse_job_name, runner_label_to_os_device, runner_label_text, workflow_job_spec
 
 SCHEMA_DIR = Path(build_report.__file__).resolve().parent / "schema"
 
@@ -505,7 +505,14 @@ def test_report_without_api(inputs: dict):
 
 def test_python_314_results_and_missing_fragment(inputs: dict):
     workflow_path = inputs["repo"] / ".github/workflows/nightly.yml"
-    workflow_path.write_text(WORKFLOW.replace("python: ['3.11']", "python: ['3.11', '3.14']", 2), encoding="utf-8")
+    workflow = WORKFLOW.replace("python: ['3.11']", "python: ['3.11', '3.14']", 2)
+    workflow = workflow.replace(
+        "ignore_list: .ci/tensorflow.txt",
+        "ignore_list: .ci/tensorflow.txt ${{ matrix.python == '3.14' && '.ci/nightly_py314_pytorch.txt' || '' }}",
+        2,
+    )
+    workflow_path.write_text(workflow, encoding="utf-8")
+    (inputs["repo"] / ".ci/nightly_py314_pytorch.txt").write_text("# PyTorch has no matching wheel\nnotebooks/c/c.ipynb\n", encoding="utf-8")
     linux_314 = "cpu-ubuntu-22.04-py3.14"
     windows_314 = "cpu-windows-2022-py3.14"
     data = fragment(
@@ -534,15 +541,19 @@ def test_python_314_results_and_missing_fragment(inputs: dict):
     assert not list(Draft202012Validator(json.loads((SCHEMA_DIR / "nightly-report.schema.json").read_text(encoding="utf-8"))).iter_errors(report))
     configs = {config["id"]: config for config in report["configs"]}
     assert configs[linux_314]["python"] == configs[windows_314]["python"] == "3.14"
-    assert configs[windows_314]["ignore_lists"] == [".ci/tensorflow.txt"]
+    assert configs[linux_314]["ignore_lists"] == configs[windows_314]["ignore_lists"] == [".ci/tensorflow.txt", ".ci/nightly_py314_pytorch.txt"]
+    assert configs[LINUX]["ignore_lists"] == [".ci/tensorflow.txt"]
     rows = by_key(report)
     assert rows[(linux_314, "a/a.ipynb")]["status"] == "passed"
     assert rows[(linux_314, "b/b.ipynb")]["status"] == "failed"
     assert rows[(windows_314, "e/e.ipynb")]["skip_reason"] == "skip_config"
-    assert rows[(windows_314, "c/c.ipynb")]["not_run_reason"] == "job_failed_before_tests:Install python dependencies"
+    assert rows[(windows_314, "c/c.ipynb")]["status"] == "skipped"
+    assert rows[(windows_314, "c/c.ipynb")]["skip_reason"] == "ignore_list"
+    assert rows[(windows_314, "c/c.ipynb")]["skip_source"] == "nightly_py314_pytorch.txt"
+    assert rows[(WINDOWS, "c/c.ipynb")]["not_run_reason"] == "job_failed_before_tests:Install python dependencies"
     assert rows[(LINUX, "a/a.ipynb")]["status"] == "passed"
     counts = report["summary"]["by_python"]["3.14"]
-    assert (counts["planned"], counts["executed"], counts["passed"], counts["failed"], counts["skipped"], counts["not_run"]) == (6, 2, 1, 1, 2, 2)
+    assert (counts["planned"], counts["executed"], counts["passed"], counts["failed"], counts["skipped"], counts["not_run"]) == (6, 2, 1, 1, 3, 1)
     job = next(job for job in report["jobs"] if job["id"] == 314)
     assert job["python_full_version"] == "3.14.0" and job["logs_artifact_url"].endswith("/artifacts/9314")
 
@@ -783,7 +794,8 @@ def test_workflow_matrices_of_the_nightly_workflow():
     assert windows_lists == [".ci/tensorflow.txt"]
     windows_py313_lists = builder._ignore_lists("build_treon_windows", "cpu", "windows-2022", "3.13")
     assert windows_py313_lists == [*windows_lists, ".ci/win_py313_flaky.txt"]
-    assert builder._ignore_lists("build_treon_windows", "cpu", "windows-2022", "3.14") == windows_lists
+    assert builder._ignore_lists("build_treon_linux", "cpu", "ubuntu-22.04", "3.14") == [".ci/tensorflow.txt", ".ci/nightly_py314_pytorch.txt"]
+    assert builder._ignore_lists("build_treon_windows", "cpu", "windows-2022", "3.14") == [*windows_lists, ".ci/nightly_py314_pytorch.txt"]
     for item in igpu_lists + builder._ignore_lists("build_treon_dgpu", "dgpu", "ubuntu-22.04", "3.11") + windows_py313_lists:
         assert (repo_root / item).is_file(), item
 
@@ -800,6 +812,16 @@ def test_precommit_and_install_matrices_cover_python_314():
     ]
     assert install["os"] == ["ubuntu-22.04", "windows-2022"]
     assert install["python"] == versions
+
+
+@pytest.mark.parametrize(
+    "expression",
+    ["${{ matrix.python }}", "${{ matrix.python == '3.14' && '' || '.ci/example.txt' }}"],
+)
+def test_unrecognized_ignore_list_expression_is_rejected(expression):
+    spec = workflow_job_spec({"with": {"ignore_list": expression}})
+    with pytest.raises(ValueError, match="Unsupported ignore_list expression"):
+        job_ignore_lists({"build_treon_linux": spec}, "build_treon_linux", "cpu", "ubuntu-22.04", "3.14", [])
 
 
 @pytest.mark.parametrize(

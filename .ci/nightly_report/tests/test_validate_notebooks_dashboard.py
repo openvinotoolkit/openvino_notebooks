@@ -7,12 +7,14 @@ import sys
 from pathlib import Path
 
 import pytest
+import yaml
 from jsonschema import Draft202012Validator
 
 import validate_notebooks
 from nightly_report import fragment as fragment_module
 from nightly_report.constants import SkipReason
 from nightly_report.fragment import env_id_for, parse_pip_freeze
+from nightly_report.workflow import job_ignore_lists, workflow_job_spec
 from validate_notebooks import NotebookStatus, prepare_test_plan, run_subprocess_with_timeout
 
 CI_DIR = Path(__file__).resolve().parents[2]
@@ -162,7 +164,11 @@ def skip_files(tmp_path):
     skip_config = tmp_path / "skipped.yml"
     skip_config.write_text(SKIP_CONFIG, encoding="utf-8")
     ignore_txt = tmp_path / "ignore.txt"
-    ignore_txt.write_text("notebooks/ignored/ignored.ipynb\nnotebooks/skipcfg/skipcfg.ipynb\nnotebooks/outofscope/outofscope.ipynb\n", encoding="utf-8")
+    ignore_txt.write_text(
+        "# Missing wheel\nnotebooks/ignored/ignored.ipynb\n# Also in the skip config\nnotebooks/skipcfg/skipcfg.ipynb\n"
+        "# Outside this batch\nnotebooks/outofscope/outofscope.ipynb\n",
+        encoding="utf-8",
+    )
     return skip_config, ignore_txt
 
 
@@ -204,6 +210,58 @@ def test_prepare_test_plan_without_test_list(tmp_path, skip_files):
         "a/a.ipynb": (NotebookStatus.SKIPPED, SkipReason.IGNORE_LIST),
         "skipcfg/skipcfg.ipynb": (NotebookStatus.SKIPPED, SkipReason.SKIP_CONFIG),
     }
+
+
+@pytest.mark.parametrize(
+    "job_key, os_name, device",
+    [
+        ("build_treon_linux", "ubuntu-22.04", "cpu"),
+        ("build_treon_windows", "windows-2022", "cpu"),
+        ("build_treon_igpu", "ubuntu-22.04", "igpu"),
+        ("build_treon_dgpu", "ubuntu-22.04", "dgpu"),
+    ],
+)
+@pytest.mark.parametrize("python_version, expected_skip", [("3.11", False), ("3.12", False), ("3.13", False), ("3.14", True)])
+def test_nightly_torch_skip_list_filters_only_python_314(tmp_path, job_key, os_name, device, python_version, expected_skip):
+    repo_root = CI_DIR.parent
+    jobs = yaml.safe_load((repo_root / ".github/workflows/treon_nightly.yml").read_text(encoding="utf-8"))["jobs"]
+    spec = workflow_job_spec(jobs[job_key])
+    ignore_lists = job_ignore_lists({job_key: spec}, job_key, device, os_name, python_version, [])
+    assert (".ci/nightly_py314_pytorch.txt" in ignore_lists) is expected_skip
+
+    names = ["llm-code-assistant", "qwen3guard-stream", "unrelated"]
+    notebooks_dir = make_notebooks(tmp_path, names, patched=False)
+    skip_config = tmp_path / "empty.yml"
+    skip_config.write_text("[]\n", encoding="utf-8")
+    validation_config = {"os": os_name, "python": python_version, "device": "gpu" if device in ("igpu", "dgpu") else device}
+    test_plan = prepare_test_plan(validation_config, None, str(skip_config), [str(repo_root / item) for item in ignore_lists], notebooks_dir)
+    for name in names[:2]:
+        report = test_plan[Path(name) / f"{name}.ipynb"]
+        assert (report["status"], report["skip_reason"]) == ((NotebookStatus.SKIPPED, SkipReason.IGNORE_LIST) if expected_skip else ("", None))
+    assert (test_plan[Path("unrelated/unrelated.ipynb")]["status"], test_plan[Path("unrelated/unrelated.ipynb")]["skip_reason"]) == ("", None)
+
+
+@pytest.mark.parametrize(
+    "job_key, os_name",
+    [("build_treon_linux", "ubuntu-22.04"), ("build_treon_windows", "windows-2022")],
+)
+def test_precommit_python_314_does_not_use_nightly_torch_skip_list(tmp_path, job_key, os_name):
+    repo_root = CI_DIR.parent
+    jobs = yaml.safe_load((repo_root / ".github/workflows/treon_precommit.yml").read_text(encoding="utf-8"))["jobs"]
+    spec = workflow_job_spec(jobs[job_key])
+    ignore_lists = job_ignore_lists({job_key: spec}, job_key, "cpu", os_name, "3.14", [])
+    assert ".ci/nightly_py314_pytorch.txt" not in ignore_lists
+    notebooks_dir = make_notebooks(tmp_path, ["llm-code-assistant"], patched=False)
+    skip_config = tmp_path / "empty.yml"
+    skip_config.write_text("[]\n", encoding="utf-8")
+    test_plan = prepare_test_plan(
+        {"os": os_name, "python": "3.14", "device": "cpu"},
+        None,
+        str(skip_config),
+        [str(repo_root / item) for item in ignore_lists],
+        notebooks_dir,
+    )
+    assert test_plan[Path("llm-code-assistant/llm-code-assistant.ipynb")]["status"] == ""
 
 
 # --- main() with a fake run_test -------------------------------------------------------------------------------------------

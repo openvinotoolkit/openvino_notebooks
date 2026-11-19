@@ -80,7 +80,7 @@ jobs:
       python: ${{ matrix.python }}
       test_list: ${{ needs.collect_notebooks.outputs[matrix.batch] }}
       batch: ${{ matrix.batch }}
-      ignore_list: .ci/tensorflow.txt
+      ignore_list: .ci/tensorflow.txt ${{ matrix.python == '3.14' && '.ci/nightly_py314_pytorch.txt' || '' }}
       dashboard_data: true
       container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:${{ needs.get_docker_tag.outputs.docker_tag }}'
 
@@ -99,7 +99,7 @@ jobs:
       python: ${{ matrix.python }}
       test_list: ${{ needs.collect_notebooks.outputs[matrix.batch] }}
       batch: ${{ matrix.batch }}
-      ignore_list: .ci/tensorflow.txt
+      ignore_list: .ci/tensorflow.txt ${{ matrix.python == '3.14' && '.ci/nightly_py314_pytorch.txt' || '' }}
       dashboard_data: true
 
   build_treon_igpu:
@@ -120,7 +120,7 @@ jobs:
       container: 'openvinogithubactions.azurecr.io/ov_test/ubuntu_22_04_x64_igpu:${{ needs.get_docker_tag.outputs.docker_tag }}'
       options: '--group-add 44 --group-add 993 --device /dev/dri/renderD128:/dev/dri/renderD128'
       # Skip notebooks with blocked resources (195494), network errors, iGPU memory limits, or repeated timeouts
-      ignore_list: .ci/not_allowed_resources.txt .ci/gpu_oom.txt .ci/igpu_timeouts.txt
+      ignore_list: .ci/not_allowed_resources.txt .ci/gpu_oom.txt .ci/igpu_timeouts.txt ${{ matrix.python == '3.14' && '.ci/nightly_py314_pytorch.txt' || '' }}
       dashboard_data: true
 
   build_treon_dgpu:
@@ -142,7 +142,7 @@ jobs:
       # renderD128 is the integrated GPU on these hosts; pass only the discrete one so "GPU" maps to it
       options: '--group-add 44 --group-add 993 --device /dev/dri/renderD129:/dev/dri/renderD129'
       # Skip notebooks that download resources from not-allowed domains (195494) or fail on network errors (e.g. 403)
-      ignore_list: .ci/not_allowed_resources.txt
+      ignore_list: .ci/not_allowed_resources.txt ${{ matrix.python == '3.14' && '.ci/nightly_py314_pytorch.txt' || '' }}
       dashboard_data: true
 
   aggregate_notebooks_reports:

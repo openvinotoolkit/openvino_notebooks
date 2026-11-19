@@ -134,6 +134,9 @@ gh aw run nightly-issue-remediator --raw-field run_id=42540244557 --raw-field so
 | `skipped` | Intentionally not run for this config: `skip_reason` is `skip_config` (`.ci/skipped_notebooks.yml`) or `ignore_list`; `skip_source` names the list file (e.g. `tensorflow.txt`, `gpu_oom.txt`, `heavy_ubuntu_gpu.txt`). Ignore lists are per job: taken from the `ignore_list` input of each job in the workflow, plus `.ci/heavy_ubuntu_gpu.txt` for Linux GPU jobs and `.ci/win_py313_flaky.txt` for Windows Python 3.13 jobs. |
 | `not_run` | Planned but never executed: `not_run_reason` is `job_failed_before_tests:<step>`, `job_cancelled`, `job_skipped`, `job_interrupted` or `no_fragment`. |
 
+Nightly jobs also use `.ci/nightly_py314_pytorch.txt` only for Python 3.14; its comments document each dependency constraint.
+The report resolves this condition from the workflow even when a job does not produce a fragment.
+
 Batches are reshuffled every night, so history must be keyed by **(`notebook`, `config_id`)**, never by batch or job.
 
 ### Log excerpt of a failure
