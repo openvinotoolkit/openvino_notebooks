@@ -29,11 +29,20 @@ python /tmp/scripts/patch_notebooks.py /tmp/notebooks
 # Install CI requirements
 pip install -r /opt/app-root/openvino_notebooks/.ci/ci-requirements.txt
 
-# The base workbench image may ship optimum/optimum-intel in /opt/app-root.
-# Notebook virtual environments still see the base packages, so purge them to keep
-# the optimum installed by the notebook the only one present.
-# This prevents duplicate dist-info ("conflicting subparser: openvino").
-pip uninstall -q -y optimum optimum-intel optimum-onnx || true
+# Temporary UBI lib/lib64 workaround, inherited by notebook virtual environments.
+# Remove once Optimum CLI deduplicates resolved namespace paths.
+python - <<'PY'
+from pathlib import Path
+import sysconfig
+
+hook_path = Path(sysconfig.get_path("purelib")) / "_openvino_notebooks_docker_optimum.pth"
+hook_path.write_text(
+    "import os, sys; sys.path[:] = list(dict.fromkeys(os.path.realpath(p) for p in sys.path)) "
+    "if os.path.basename(sys.argv[0]) == 'optimum-cli' else sys.path\n",
+    encoding="utf-8",
+)
+print(f"Docker CI Optimum path workaround installed: {hook_path}")
+PY
 
 # Test notebooks
 # Every notebook installs its requirements into its own virtual environment (setup_notebook_venv())
