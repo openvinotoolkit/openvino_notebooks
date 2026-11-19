@@ -35,7 +35,9 @@ def gh(args: List[str], stdout_path: Optional[Path] = None, retries: int = 3, ti
                 output = proc.stdout
             else:
                 with open(stdout_path, "wb") as handle:
-                    proc = subprocess.run(["gh", *args], stdout=handle, stderr=subprocess.PIPE, timeout=timeout, check=False)  # nosec B603 B607 - hardcoded gh CLI
+                    proc = subprocess.run(
+                        ["gh", *args], stdout=handle, stderr=subprocess.PIPE, timeout=timeout, check=False
+                    )  # nosec B603 B607 - hardcoded gh CLI
                 output = b""
             if proc.returncode == 0:
                 return output

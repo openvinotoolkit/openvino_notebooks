@@ -123,7 +123,8 @@ def test_knowledge_updates_run_in_the_expected_order_and_cannot_block_outputs():
     assert "GH_AW_SAFE_OUTPUTS" not in record_step and "safeoutputs" not in record_step
     # Runs the script copy taken before the agent, never code from the agent-writable workspace, and never reads the agent-writable memory clone.
     assert 'python3 -E -s \\"$trusted/scripts/update_knowledge_base.py\\" update' in record_step
-    assert "GITHUB_WORKSPACE" not in record_step and ".github/scripts" not in record_step and "/tmp/gh-aw/repo-memory" not in record_step  # nosec B108 - workflow contract assertion
+    assert "GITHUB_WORKSPACE" not in record_step and ".github/scripts" not in record_step
+    assert "/tmp/gh-aw/repo-memory" not in record_step  # nosec B108
     assert 'out=\\"$RUNNER_TEMP/nightly-remediator-memory\\"' in record_step and '--out-dir \\"$out\\"' in record_step
     # The placeholder that keeps the replacement artifact non-empty must be ignored by the push.
     placeholder = re.search(r'> \\"\$out/([^"\\]+)\\"', record_step).group(1)

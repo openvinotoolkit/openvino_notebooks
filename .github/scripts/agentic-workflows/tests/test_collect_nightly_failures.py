@@ -60,7 +60,8 @@ def make_night(number, signatures=None, statuses=None):
 
 
 def make_args(**overrides):
-    values = dict(repo=REPO, source_repo=REPO, run_id="", max_groups=5, max_prs=3, history_nights=3, logs_per_group=3, out="/tmp/nightly/digest")  # nosec B108 - test CLI arg only
+    out = "/tmp/nightly/digest"  # nosec B108
+    values = dict(repo=REPO, source_repo=REPO, run_id="", max_groups=5, max_prs=3, history_nights=3, logs_per_group=3, out=out)
     values.update(overrides)
     return argparse.Namespace(**values)
 

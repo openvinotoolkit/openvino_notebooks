@@ -365,7 +365,9 @@ def test_group_branches_created_from_the_recorded_base_are_independent(tmp_path)
     repo.mkdir()
 
     def git(*args):
-        return subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True, text=True).stdout.strip()  # nosec B603 B607 - hardcoded git CLI in test
+        return subprocess.run(
+            ["git", "-C", str(repo), *args], check=True, capture_output=True, text=True
+        ).stdout.strip()  # nosec B603 B607 - hardcoded git CLI in test
 
     git("init", "-q")
     git("config", "user.name", "Test")
