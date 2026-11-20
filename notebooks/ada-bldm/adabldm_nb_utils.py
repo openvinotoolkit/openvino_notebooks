@@ -12,15 +12,44 @@ Diffusion v1.5 weights (the same initialization ``tool_add_control.py`` performs
 graph - and therefore the latency, throughput and model size OpenVINO optimizes - is identical to
 a fine-tuned AdaBLDM; only the weight values differ.
 """
+import contextlib
 import importlib.util
 import json
+import logging
 import os
 import sys
 import types
+import warnings
+from io import StringIO
 from pathlib import Path
 
 import numpy as np
 import torch
+
+
+@contextlib.contextmanager
+def quiet():
+    """Silence third-party import/loading chatter (xformers print, torchao loader messages,
+    transformers load reports and progress bars, torch warnings) so notebook outputs stay clean."""
+    out = StringIO()
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    saved = {fd: os.dup(fd) for fd in (1, 2)}
+    for fd in (1, 2):
+        os.dup2(devnull, fd)
+    try:
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out), warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            prev_level = logging.root.manager.disable
+            logging.disable(logging.WARNING)
+            try:
+                yield
+            finally:
+                logging.disable(prev_level)
+    finally:
+        for fd, s in saved.items():
+            os.dup2(s, fd)
+            os.close(s)
+        os.close(devnull)
 
 NB_DIR = Path(__file__).resolve().parent
 ROOT = NB_DIR.parent
@@ -57,8 +86,9 @@ def ensure_repo(repo=REPO):
         import subprocess
 
         repo.parent.mkdir(parents=True, exist_ok=True)
-        print(f"cloning {REPO_URL} -> {repo}")
-        subprocess.run(["git", "clone", "--depth", "1", REPO_URL, str(repo)], check=True)
+        print(f"cloning {REPO_URL} -> {repo.name}/")
+        subprocess.run(["git", "clone", "--quiet", "--depth", "1", REPO_URL, str(repo)],
+                       check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if str(repo) not in sys.path:
         sys.path.insert(0, str(repo))
     return repo
@@ -83,7 +113,8 @@ def download_base() -> Path:
 
         BASE_CKPT.parent.mkdir(parents=True, exist_ok=True)
         print(f"downloading {BASE_FILE} from huggingface.co/{BASE_REPO}")
-        p = hf_hub_download(repo_id=BASE_REPO, filename=BASE_FILE, local_dir=str(BASE_CKPT.parent))
+        with quiet():  # silence the download progress bars
+            p = hf_hub_download(repo_id=BASE_REPO, filename=BASE_FILE, local_dir=str(BASE_CKPT.parent))
         return Path(p)
     return BASE_CKPT
 
@@ -100,32 +131,34 @@ def build_denoiser(base_ckpt=BASE_CKPT, verbose=True):
     zero convolutions, ``middle_block_out`` and ``input_hint_block`` are newly initialized (zero),
     exactly as in the upstream pretrain stage.
     """
-    from omegaconf import OmegaConf
+    with quiet():  # silence the cldm/xformers import chatter and the checkpoint loaders
+        from omegaconf import OmegaConf
 
-    from cldm.cldm import ControlNet, ControlledUnetModel
+        from cldm.cldm import ControlNet, ControlledUnetModel
 
-    cfg = OmegaConf.load(str(REPO / MODEL_YAML))
-    p = cfg.model.params
-    unet = ControlledUnetModel(**{k: v for k, v in p.unet_config.params.items() if k != "use_checkpoint"}).eval().float()
-    cnet = ControlNet(**{k: v for k, v in p.control_stage_config.params.items() if k != "use_checkpoint"}).eval().float()
+        cfg = OmegaConf.load(str(REPO / MODEL_YAML))
+        p = cfg.model.params
+        unet = ControlledUnetModel(**{k: v for k, v in p.unet_config.params.items() if k != "use_checkpoint"}).eval().float()
+        cnet = ControlNet(**{k: v for k, v in p.control_stage_config.params.items() if k != "use_checkpoint"}).eval().float()
 
-    ckpt = torch.load(base_ckpt, map_location="cpu", weights_only=False)
-    sd = ckpt.get("state_dict", ckpt)
+        ckpt = torch.load(base_ckpt, map_location="cpu", weights_only=False)
+        sd = ckpt.get("state_dict", ckpt)
 
-    unet_sd = {}
-    for k, v in unet.state_dict().items():
-        src = "model.diffusion_model." + k
-        unet_sd[k] = sd[src].clone() if src in sd else v.clone()
-    unet.load_state_dict(unet_sd, strict=True)
+        unet_sd = {}
+        for k, v in unet.state_dict().items():
+            src = "model.diffusion_model." + k
+            unet_sd[k] = sd[src].clone() if src in sd else v.clone()
+        unet.load_state_dict(unet_sd, strict=True)
 
-    cnet_sd, copied = {}, 0
-    for k, v in cnet.state_dict().items():
-        src = "model.diffusion_model." + k if k.startswith(("input_blocks.", "middle_block.", "time_embed.")) else None
-        if src and src in sd:
-            cnet_sd[k] = sd[src].clone(); copied += 1
-        else:
-            cnet_sd[k] = v.clone()
-    cnet.load_state_dict(cnet_sd, strict=True)
+        cnet_sd, copied = {}, 0
+        for k, v in cnet.state_dict().items():
+            src = "model.diffusion_model." + k if k.startswith(("input_blocks.", "middle_block.", "time_embed.")) else None
+            if src and src in sd:
+                cnet_sd[k] = sd[src].clone(); copied += 1
+            else:
+                cnet_sd[k] = v.clone()
+        cnet.load_state_dict(cnet_sd, strict=True)
+        del ckpt, sd
     if verbose:
         print(f"SD v1.5 init: UNet {sum(x.numel() for x in unet.parameters()) / 1e6:.1f}M, "
               f"ControlNet {sum(x.numel() for x in cnet.parameters()) / 1e6:.1f}M "
@@ -150,13 +183,14 @@ def build_denoiser(base_ckpt=BASE_CKPT, verbose=True):
 
 def encode_prompt(text, device="cpu"):
     """CLIP text embedding [1, 77, 768] for a prompt (the model's cross-attention conditioning)."""
-    from transformers import CLIPTokenizer, CLIPTextModel
+    with quiet():  # silence the transformers load report and weight-loading progress bars
+        from transformers import CLIPTokenizer, CLIPTextModel
 
-    tok = CLIPTokenizer.from_pretrained(CLIP_ID)
-    enc = CLIPTextModel.from_pretrained(CLIP_ID).eval()
-    tokens = tok(text, padding="max_length", max_length=CONTEXT_LEN, truncation=True, return_tensors="pt")
-    with torch.no_grad():
-        return enc(**tokens).last_hidden_state.to(device).float()
+        tok = CLIPTokenizer.from_pretrained(CLIP_ID)
+        enc = CLIPTextModel.from_pretrained(CLIP_ID).eval()
+        tokens = tok(text, padding="max_length", max_length=CONTEXT_LEN, truncation=True, return_tensors="pt")
+        with torch.no_grad():
+            return enc(**tokens).last_hidden_state.to(device).float()
 
 
 def build_vae(base_ckpt=BASE_CKPT):
