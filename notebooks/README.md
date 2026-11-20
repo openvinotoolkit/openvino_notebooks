@@ -317,6 +317,7 @@
 - [Text-to-speech generation using Bark and OpenVINO](./bark-text-to-audio/bark-text-to-audio.ipynb)
 - [Image-to-Video synthesis with AnimateAnyone and OpenVINO](./animate-anyone/animate-anyone.ipynb)
 - [Imitation Learning - ACT](./aloha-act/aloha-act.ipynb)
+- [Convert and Optimize AdaBLDM defect generation with OpenVINO™](./ada-bldm/ada-bldm.ipynb)
 - [Music generation using ACE Step and OpenVINO](./ace-step-music-generation/ace-step-music-generation.ipynb)
 - [Part Segmentation of 3D Point Clouds with OpenVINO™](./3D-segmentation-point-clouds/3D-segmentation-point-clouds.ipynb)
 - [D-FINE: Fine-grained Distribution Refinement for DEtection TRansformers (DETRs)](./d-fine/dfine.ipynb)
