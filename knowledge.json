@@ -86,6 +86,60 @@
     "notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb"
    ]
   },
+  "1eb4d15e2af4": {
+   "attempts": [
+    {
+     "action": "Opened a draft PR adding kaldifst<1.9.1 to the first pip_install call of the cosyvoice3-tts install cell; verified win_amd64 wheel resolution for py3.11 and py3.12 with pip download, JSON, check_notebooks.py.",
+     "confidence": "medium",
+     "date": "2026-11-20",
+     "dead_ends": "none; full notebook run on Windows not possible, so later cells are unverified. Open PR 3881 (wetext 0.2.1) touches the same cell but a different problem.",
+     "next_step": "After merge re-check the Windows py3.11 and py3.12 configs for later-cell failures and drop the pin once kaldifst publishes win_amd64 wheels again.",
+     "nightly_run_id": 44645335676,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44645335676",
+     "outcome": "pr",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44671706089",
+     "root_cause": "kaldifst 1.9.1 (PyPI 2026-11-19) has no win_amd64 wheels, so pip builds the sdist on Windows and the bundled OpenFst fails under MSVC (__builtin_ctzll); kaldifst is pulled in via wetext from CosyVoice requirements."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "dependency",
+   "exception_type": "CalledProcessError",
+   "first_seen": "2026-11-20",
+   "headline": "CalledProcessError: Command '['C:\\\\actions-runner\\\\_work\\\\openvino_notebooks\\\\openvino_notebooks\\\\notebooks\\\\cosyvoice3-tts\\\\.venv\\\\Scripts\\\\python.exe', '-m', 'pip', 'install', '-q', '--extra-index-url', 'https://download.pytorch.org/whl/cpu', '-r', 'CosyVoice\\\\requirements.txt']' returned non-zer\u2026",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-20",
+   "notebooks": [
+    "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
+   ]
+  },
+  "2caa7c293830": {
+   "attempts": [
+    {
+     "action": "Filed one issue pointing to open issue 3879 and the sibling py3.13 signature; no code change since the fix is CI token plumbing or a skip-list edit, both out of scope.",
+     "confidence": "high",
+     "date": "2026-11-20",
+     "dead_ends": "Notebook code is correct as documented; swapping the model source would be speculative; HF Request ID in the message changes the signature every night.",
+     "next_step": "Grant CI Hugging Face access and pass HF_TOKEN, or skip sam-3d-body in skipped_nightly.yml like sam3; mask the Request ID in the report message normalization.",
+     "nightly_run_id": 44645335676,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44645335676",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44671706089",
+     "root_cause": "snapshot_download of the gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 GatedRepoError because the CI runner has no access or token; notebook already documents the gating and is only in ignore_treon_docker.txt, not the nightly skip lists."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "other",
+   "exception_type": "GatedRepoError",
+   "first_seen": "2026-11-20",
+   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6affa663-795a3597608d6b087f9e69d3;15250147-4c44-4a4f-b534-74f4cfe2baaa)",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-20",
+   "notebooks": [
+    "notebooks/sam-3d-body/sam-3d-body.ipynb"
+   ]
+  },
   "4038789163d9": {
    "attempts": [
     {
@@ -111,6 +165,42 @@
    "last_seen": "2026-11-18",
    "notebooks": [
     "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
+   ]
+  },
+  "4524f9f8537b": {
+   "attempts": [
+    {
+     "action": "Filed one issue listing all 10 not-run notebooks with a runner inspection as next step; no code change since fixes are runner repair or workflow edits, out of scope.",
+     "confidence": "medium",
+     "date": "2026-11-20",
+     "dead_ends": "The diagnostics step is correct to fail without a GPU, loosening it would hide a broken runner; clinfo output was not in the extract so the OS-level GPU state is unknown; suspected-transient label does not exist in the repo.",
+     "next_step": "Check ov-dmz-19 with clinfo, /dev/dri and the Intel compute runtime packages and remove it from the pool or repair it, then re-run batch_2.",
+     "nightly_run_id": 44645335676,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44645335676",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44671706089",
+     "root_cause": "The strict GPU diagnostics step found only the CPU device in OpenVINO on dGPU runner ov-dmz-19 while the other four dGPU batches got a GPU, pointing to a runner or driver problem on that host."
+    }
+   ],
+   "category": "infra",
+   "error_class": "job_failed_before_tests",
+   "exception_type": "",
+   "first_seen": "2026-11-20",
+   "headline": "job_failed_before_tests: GPU diagnostics (OpenVINO devices)",
+   "investigations": 1,
+   "kind": "infra",
+   "last_seen": "2026-11-20",
+   "notebooks": [
+    "notebooks/granite-4.0/granite-4.0.ipynb",
+    "notebooks/kokoro/kokoro.ipynb",
+    "notebooks/laya-decision-models/laya-decision-models.ipynb",
+    "notebooks/llm-chatbot/llm-chatbot-generate-api.ipynb",
+    "notebooks/minicpm-v-4.7/minicpm-v-4.7.ipynb",
+    "notebooks/nuextract-structure-extraction/nuextract-structure-extraction.ipynb",
+    "notebooks/physical-ai-robotics/physical-ai-robotics.ipynb",
+    "notebooks/qwen3guard-stream/qwen3guard-stream.ipynb",
+    "notebooks/sam-3d-body/sam-3d-body.ipynb",
+    "notebooks/voxcpm2-tts/voxcpm2-tts.ipynb"
    ]
   },
   "4c5e06c97fec": {
@@ -336,6 +426,33 @@
     "notebooks/qwen-image-2.1/qwen-image-2.1.ipynb"
    ]
   },
+  "8103d70a7a65": {
+   "attempts": [
+    {
+     "action": "Filed one issue referencing issue 3879 and the sibling signature; no code change since the fix is CI token plumbing or a skip-list edit, both out of scope.",
+     "confidence": "high",
+     "date": "2026-11-20",
+     "dead_ends": "Notebook code is correct as documented; swapping the model source would be speculative; the Request ID in the message changes the signature every night.",
+     "next_step": "Grant CI Hugging Face access and pass HF_TOKEN, or skip sam-3d-body in skipped_nightly.yml; then check the other deferred GatedRepoError groups of this night for the same cause.",
+     "nightly_run_id": 44645335676,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44645335676",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44671706089",
+     "root_cause": "snapshot_download of the gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 GatedRepoError on the Ubuntu py3.13 config because the CI runner has no access or token; same cause as the Windows py3.12 sibling and issue 3879."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "other",
+   "exception_type": "GatedRepoError",
+   "first_seen": "2026-11-20",
+   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6aff9d33-40e8416463be82240ec56543;a0556d93-209c-4e34-8a8b-1c2ee9f8991e)",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-20",
+   "notebooks": [
+    "notebooks/sam-3d-body/sam-3d-body.ipynb"
+   ]
+  },
   "a055acee5cc0": {
    "attempts": [
     {
@@ -361,6 +478,52 @@
    "last_seen": "2026-11-18",
    "notebooks": [
     "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
+   ]
+  },
+  "be39ef793842": {
+   "attempts": [
+    {
+     "action": "Filed one issue listing all 20 not-run notebooks with a runner check and re-run as next step; no code change since the fix is runner cleanup or a workflow edit, out of scope.",
+     "confidence": "medium",
+     "date": "2026-11-20",
+     "dead_ends": "nbconvert and jinja2 are not pinned in the repo requirements so there is no pin to correct; current nbconvert on PyPI does not use contextfilter; suspected-transient label does not exist in the repo.",
+     "next_step": "Inspect nbconvert and jinja2 versions on runner aks-win-16-cores-32gb-full-cn42f-runner-rzsdk and re-run batch_2; if it recurs on other runners install nbconvert explicitly in job_windows.yml.",
+     "nightly_run_id": 44645335676,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44645335676",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44671706089",
+     "root_cause": "Patch notebooks failed on one Windows py3.11 runner with ImportError for jinja2.contextfilter inside a preinstalled old nbconvert; the other four Windows py3.11 batches passed the step, which points to a stale Python environment on that runner."
+    }
+   ],
+   "category": "infra",
+   "error_class": "job_failed_before_tests",
+   "exception_type": "",
+   "first_seen": "2026-11-20",
+   "headline": "job_failed_before_tests: Patch notebooks",
+   "investigations": 1,
+   "kind": "infra",
+   "last_seen": "2026-11-20",
+   "notebooks": [
+    "notebooks/3D-pose-estimation-webcam/3D-pose-estimation.ipynb",
+    "notebooks/ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb",
+    "notebooks/glm-ocr/glm-ocr.ipynb",
+    "notebooks/granite-4.0/granite-4.0.ipynb",
+    "notebooks/hello-detection/hello-detection.ipynb",
+    "notebooks/hello-segmentation/hello-segmentation.ipynb",
+    "notebooks/laya-decision-models/laya-decision-models.ipynb",
+    "notebooks/llm-chatbot/llm-chatbot-generate-api.ipynb",
+    "notebooks/minicpm-v-4.7/minicpm-v-4.7.ipynb",
+    "notebooks/nuextract-structure-extraction/nuextract-structure-extraction.ipynb",
+    "notebooks/openvino-tokenizers/openvino-tokenizers.ipynb",
+    "notebooks/physical-ai-robotics/physical-ai-robotics.ipynb",
+    "notebooks/pose-estimation-webcam/pose-estimation.ipynb",
+    "notebooks/qwen-image/qwen-image.ipynb",
+    "notebooks/qwen3guard-stream/qwen3guard-stream.ipynb",
+    "notebooks/sam-3d-body/sam-3d-body.ipynb",
+    "notebooks/vision-monodepth/vision-monodepth.ipynb",
+    "notebooks/voxcpm2-tts/voxcpm2-tts.ipynb",
+    "notebooks/yolov11-optimization/yolov11-instance-segmentation.ipynb",
+    "notebooks/yolov26-optimization/yolov26-keypoint-detection.ipynb"
    ]
   },
   "db0467f22081": {
