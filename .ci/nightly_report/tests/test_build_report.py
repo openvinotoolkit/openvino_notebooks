@@ -508,11 +508,23 @@ def test_python_314_results_and_missing_fragment(inputs: dict):
     workflow = WORKFLOW.replace("python: ['3.11']", "python: ['3.11', '3.14']", 2)
     workflow = workflow.replace(
         "ignore_list: .ci/tensorflow.txt",
-        "ignore_list: .ci/tensorflow.txt ${{ matrix.python == '3.14' && '.ci/nightly_py314_pytorch.txt' || '' }}",
+        "ignore_list: .ci/tensorflow.txt ${{ matrix.python == '3.14' && '.ci/py314_incompatible.txt' || '' }}",
         2,
     )
     workflow_path.write_text(workflow, encoding="utf-8")
-    (inputs["repo"] / ".ci/nightly_py314_pytorch.txt").write_text("# PyTorch has no matching wheel\nnotebooks/c/c.ipynb\n", encoding="utf-8")
+    (inputs["repo"] / ".ci/py314_incompatible.txt").write_text(
+        "# PyTorch has no matching wheel\nnotebooks/c/c.ipynb\n"
+        "# Missing dependency\nnotebooks/d/d.ipynb\n"
+        "# NormalizedConfig failure\nnotebooks/f/f.ipynb\n"
+        "# Datasets pickler failure\nnotebooks/g/g.ipynb\n",
+        encoding="utf-8",
+    )
+    write_notebook(inputs["repo"] / "notebooks/f/f.ipynb", "Notebook F", {})
+    write_notebook(inputs["repo"] / "notebooks/g/g.ipynb", "Notebook G", {})
+    plan = json.loads(inputs["plan"].read_text(encoding="utf-8"))
+    plan["batches"]["batch_1"].extend(["notebooks/f/f.ipynb", "notebooks/g/g.ipynb"])
+    plan["notebooks_total"] += 2
+    inputs["plan"].write_text(json.dumps(plan), encoding="utf-8")
     linux_314 = "cpu-ubuntu-22.04-py3.14"
     windows_314 = "cpu-windows-2022-py3.14"
     data = fragment(
@@ -541,19 +553,21 @@ def test_python_314_results_and_missing_fragment(inputs: dict):
     assert not list(Draft202012Validator(json.loads((SCHEMA_DIR / "nightly-report.schema.json").read_text(encoding="utf-8"))).iter_errors(report))
     configs = {config["id"]: config for config in report["configs"]}
     assert configs[linux_314]["python"] == configs[windows_314]["python"] == "3.14"
-    assert configs[linux_314]["ignore_lists"] == configs[windows_314]["ignore_lists"] == [".ci/tensorflow.txt", ".ci/nightly_py314_pytorch.txt"]
+    assert configs[linux_314]["ignore_lists"] == configs[windows_314]["ignore_lists"] == [".ci/tensorflow.txt", ".ci/py314_incompatible.txt"]
     assert configs[LINUX]["ignore_lists"] == [".ci/tensorflow.txt"]
     rows = by_key(report)
     assert rows[(linux_314, "a/a.ipynb")]["status"] == "passed"
     assert rows[(linux_314, "b/b.ipynb")]["status"] == "failed"
     assert rows[(windows_314, "e/e.ipynb")]["skip_reason"] == "skip_config"
-    assert rows[(windows_314, "c/c.ipynb")]["status"] == "skipped"
-    assert rows[(windows_314, "c/c.ipynb")]["skip_reason"] == "ignore_list"
-    assert rows[(windows_314, "c/c.ipynb")]["skip_source"] == "nightly_py314_pytorch.txt"
+    for name in ("c", "d", "f", "g"):
+        row = rows[(windows_314, f"{name}/{name}.ipynb")]
+        assert (row["status"], row["skip_reason"], row["skip_source"]) == ("skipped", "ignore_list", "py314_incompatible.txt")
     assert rows[(WINDOWS, "c/c.ipynb")]["not_run_reason"] == "job_failed_before_tests:Install python dependencies"
+    assert rows[(WINDOWS, "f/f.ipynb")]["not_run_reason"] == "job_failed_before_tests:Install python dependencies"
+    assert rows[(WINDOWS, "g/g.ipynb")]["not_run_reason"] == "job_failed_before_tests:Install python dependencies"
     assert rows[(LINUX, "a/a.ipynb")]["status"] == "passed"
     counts = report["summary"]["by_python"]["3.14"]
-    assert (counts["planned"], counts["executed"], counts["passed"], counts["failed"], counts["skipped"], counts["not_run"]) == (6, 2, 1, 1, 3, 1)
+    assert (counts["planned"], counts["executed"], counts["passed"], counts["failed"], counts["skipped"], counts["not_run"]) == (8, 2, 1, 1, 6, 0)
     job = next(job for job in report["jobs"] if job["id"] == 314)
     assert job["python_full_version"] == "3.14.0" and job["logs_artifact_url"].endswith("/artifacts/9314")
 
@@ -794,8 +808,9 @@ def test_workflow_matrices_of_the_nightly_workflow():
     assert windows_lists == [".ci/tensorflow.txt"]
     windows_py313_lists = builder._ignore_lists("build_treon_windows", "cpu", "windows-2022", "3.13")
     assert windows_py313_lists == [*windows_lists, ".ci/win_py313_flaky.txt"]
-    assert builder._ignore_lists("build_treon_linux", "cpu", "ubuntu-22.04", "3.14") == [".ci/tensorflow.txt", ".ci/nightly_py314_pytorch.txt"]
-    assert builder._ignore_lists("build_treon_windows", "cpu", "windows-2022", "3.14") == [*windows_lists, ".ci/nightly_py314_pytorch.txt"]
+    py314_list = ".ci/py314_incompatible.txt"
+    assert builder._ignore_lists("build_treon_linux", "cpu", "ubuntu-22.04", "3.14") == [".ci/tensorflow.txt", py314_list]
+    assert builder._ignore_lists("build_treon_windows", "cpu", "windows-2022", "3.14") == [*windows_lists, py314_list]
     for item in igpu_lists + builder._ignore_lists("build_treon_dgpu", "dgpu", "ubuntu-22.04", "3.11") + windows_py313_lists:
         assert (repo_root / item).is_file(), item
 

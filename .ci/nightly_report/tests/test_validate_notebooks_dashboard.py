@@ -14,6 +14,8 @@ import validate_notebooks
 from nightly_report import fragment as fragment_module
 from nightly_report.constants import SkipReason
 from nightly_report.fragment import env_id_for, parse_pip_freeze
+from nightly_report.report_common import Warnings
+from nightly_report.results import ResultCollector
 from nightly_report.workflow import job_ignore_lists, workflow_job_spec
 from validate_notebooks import NotebookStatus, prepare_test_plan, run_subprocess_with_timeout
 
@@ -213,55 +215,69 @@ def test_prepare_test_plan_without_test_list(tmp_path, skip_files):
 
 
 @pytest.mark.parametrize(
-    "job_key, os_name, device",
+    "workflow, job_key, os_name, device",
     [
-        ("build_treon_linux", "ubuntu-22.04", "cpu"),
-        ("build_treon_windows", "windows-2022", "cpu"),
-        ("build_treon_igpu", "ubuntu-22.04", "igpu"),
-        ("build_treon_dgpu", "ubuntu-22.04", "dgpu"),
+        ("treon_nightly.yml", "build_treon_linux", "ubuntu-22.04", "cpu"),
+        ("treon_nightly.yml", "build_treon_windows", "windows-2022", "cpu"),
+        ("treon_nightly.yml", "build_treon_igpu", "ubuntu-22.04", "igpu"),
+        ("treon_nightly.yml", "build_treon_dgpu", "ubuntu-22.04", "dgpu"),
+        ("treon_precommit.yml", "build_treon_linux", "ubuntu-22.04", "cpu"),
+        ("treon_precommit.yml", "build_treon_windows", "windows-2022", "cpu"),
     ],
 )
 @pytest.mark.parametrize("python_version, expected_skip", [("3.11", False), ("3.12", False), ("3.13", False), ("3.14", True)])
-def test_nightly_torch_skip_list_filters_only_python_314(tmp_path, job_key, os_name, device, python_version, expected_skip):
+def test_python_314_skip_list_filters_both_workflows(tmp_path, workflow, job_key, os_name, device, python_version, expected_skip):
     repo_root = CI_DIR.parent
-    jobs = yaml.safe_load((repo_root / ".github/workflows/treon_nightly.yml").read_text(encoding="utf-8"))["jobs"]
+    jobs = yaml.safe_load((repo_root / ".github/workflows" / workflow).read_text(encoding="utf-8"))["jobs"]
     spec = workflow_job_spec(jobs[job_key])
     ignore_lists = job_ignore_lists({job_key: spec}, job_key, device, os_name, python_version, [])
-    assert (".ci/nightly_py314_pytorch.txt" in ignore_lists) is expected_skip
+    assert (".ci/py314_incompatible.txt" in ignore_lists) is expected_skip
 
-    names = ["llm-code-assistant", "qwen3guard-stream", "unrelated"]
+    normalized_names = ["ernie-image", "flux.2-klein", "qwen-image-2.1"]
+    pickle_names = ["language-quantize-bert"]
+    if device == "cpu":
+        # These notebooks already have separate GPU exclusions.
+        normalized_names += ["ministral-3", "qwen3-asr", "text-to-speech-genai"]
+        pickle_names += ["depth-anything", "siglip-zero-shot-image-classification", "whisper-asr-genai"]
+    names = ["llm-code-assistant", "qwen3guard-stream", "inpainting-genai", "deepseek-r1", *normalized_names, *pickle_names, "unrelated"]
     notebooks_dir = make_notebooks(tmp_path, names, patched=False)
     skip_config = tmp_path / "empty.yml"
     skip_config.write_text("[]\n", encoding="utf-8")
     validation_config = {"os": os_name, "python": python_version, "device": "gpu" if device in ("igpu", "dgpu") else device}
-    test_plan = prepare_test_plan(validation_config, None, str(skip_config), [str(repo_root / item) for item in ignore_lists], notebooks_dir)
-    for name in names[:2]:
+    ignore_list_paths = [str(repo_root / item) for item in ignore_lists]
+    test_plan = prepare_test_plan(validation_config, None, str(skip_config), ignore_list_paths, notebooks_dir)
+    for name in names[:-1]:
         report = test_plan[Path(name) / f"{name}.ipynb"]
         assert (report["status"], report["skip_reason"]) == ((NotebookStatus.SKIPPED, SkipReason.IGNORE_LIST) if expected_skip else ("", None))
     assert (test_plan[Path("unrelated/unrelated.ipynb")]["status"], test_plan[Path("unrelated/unrelated.ipynb")]["skip_reason"]) == ("", None)
+    sources = validate_notebooks.get_ignore_list_sources(ignore_list_paths, notebooks_dir)
+    for name in names[:-1]:
+        assert sources.get(f"{name}/{name}.ipynb") == ("py314_incompatible.txt" if expected_skip else None)
 
 
 @pytest.mark.parametrize(
-    "job_key, os_name",
-    [("build_treon_linux", "ubuntu-22.04"), ("build_treon_windows", "windows-2022")],
+    "job_key, os_name, device, name, reason, source",
+    [
+        ("build_treon_linux", "ubuntu-22.04", "cpu", "language-quantize-bert", SkipReason.IGNORE_LIST, "py314_incompatible.txt"),
+        ("build_treon_windows", "windows-2022", "cpu", "language-quantize-bert", SkipReason.SKIP_CONFIG, None),
+        ("build_treon_igpu", "ubuntu-22.04", "igpu", "depth-anything", SkipReason.IGNORE_LIST, "not_allowed_resources.txt"),
+        ("build_treon_dgpu", "ubuntu-22.04", "dgpu", "siglip-zero-shot-image-classification", SkipReason.IGNORE_LIST, "not_allowed_resources.txt"),
+    ],
 )
-def test_precommit_python_314_does_not_use_nightly_torch_skip_list(tmp_path, job_key, os_name):
+def test_nightly_python_314_skip_preserves_existing_precedence(job_key, os_name, device, name, reason, source):
     repo_root = CI_DIR.parent
-    jobs = yaml.safe_load((repo_root / ".github/workflows/treon_precommit.yml").read_text(encoding="utf-8"))["jobs"]
+    jobs = yaml.safe_load((repo_root / ".github/workflows/treon_nightly.yml").read_text(encoding="utf-8"))["jobs"]
     spec = workflow_job_spec(jobs[job_key])
-    ignore_lists = job_ignore_lists({job_key: spec}, job_key, "cpu", os_name, "3.14", [])
-    assert ".ci/nightly_py314_pytorch.txt" not in ignore_lists
-    notebooks_dir = make_notebooks(tmp_path, ["llm-code-assistant"], patched=False)
-    skip_config = tmp_path / "empty.yml"
-    skip_config.write_text("[]\n", encoding="utf-8")
-    test_plan = prepare_test_plan(
-        {"os": os_name, "python": "3.14", "device": "cpu"},
-        None,
-        str(skip_config),
-        [str(repo_root / item) for item in ignore_lists],
-        notebooks_dir,
-    )
-    assert test_plan[Path("llm-code-assistant/llm-code-assistant.ipynb")]["status"] == ""
+    ignore_lists = job_ignore_lists({job_key: spec}, job_key, device, os_name, "3.14", [])
+    collector = ResultCollector(None, "notebooks", None, repo_root, ".ci/skipped_notebooks.yml", Warnings())
+    job = {
+        "_os": os_name,
+        "_python": "3.14",
+        "_test_device": "gpu" if device in ("igpu", "dgpu") else device,
+        "_ignore_lists": ignore_lists,
+        "config_id": job_key,
+    }
+    assert collector._skip_reasons(job)[f"{name}/{name}.ipynb"] == (reason, source)
 
 
 # --- main() with a fake run_test -------------------------------------------------------------------------------------------
