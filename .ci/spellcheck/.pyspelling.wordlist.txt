@@ -7,6 +7,9 @@ ActivationMap
 activations
 AdapterConfig
 adaptively
+ada
+adabldm
+AdaBLDM
 adas
 ADE
 adversarially
@@ -99,6 +102,7 @@ bitext
 bitnet
 BLACKBOX
 BLEU
+bldm
 blockwise
 BMP
 boolean
@@ -160,6 +164,7 @@ Contrastive
 contrastive
 controllability
 ControlNet
+ControlNet's
 controlnet
 ControlNets
 Conv
@@ -182,6 +187,7 @@ cpm
 cpp
 cpu
 CPUs
+CreativeML
 CRNN
 CSV
 CTC
@@ -237,6 +243,7 @@ denoise
 denoised
 denoises
 denoising
+denoiser
 denormalization
 denormalized
 depainting
@@ -387,6 +394,7 @@ genAI
 GenerationConfig
 GenerationMixin
 GGUF
+GiB
 Girshick
 Gitee
 GitHub
@@ -801,6 +809,7 @@ OpenCV
 OpenDataLab
 openjourney
 OpenPose
+OpenRAIL
 OpenShift
 OpenVINO
 openvino
@@ -1236,6 +1245,7 @@ uncond
 uncurated
 UNet
 Unet
+UNet's
 UNets
 Unimodal
 unsqueeze
