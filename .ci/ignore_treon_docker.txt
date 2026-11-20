@@ -79,3 +79,4 @@ notebooks/unlimited-ocr/unlimited-ocr.ipynb
 notebooks/qwen3.8-mtp/qwen3.8-mtp.ipynb
 notebooks/sam-3d-body/sam-3d-body.ipynb
 notebooks/laya-decision-models/laya-decision-models.ipynb
+notebooks/fasterWAM/fasterWAM.ipynb
