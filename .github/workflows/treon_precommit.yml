@@ -2,10 +2,10 @@ name: treon
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - 'main'
-      - 'latest'
+  # pull_request:
+  #   branches:
+  #     - 'main'
+  #     - 'latest'
   push:
     branches:
       - 'main'
@@ -82,7 +82,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ['3.11', '3.12', '3.13']
+        python: ['3.11', '3.12', '3.13', '3.14']
         batch: ${{ fromJSON(needs.collect_notebooks.outputs.matrix) }}
     uses: ./.github/workflows/job_unix.yml
     with:
@@ -91,6 +91,7 @@ jobs:
       container: 'openvinogithubactions.azurecr.io/ov_build/ubuntu_22_04_x64:${{ needs.get_docker_tag.outputs.docker_tag }}'
       test_list: ${{ matrix.batch.test_list }}
       batch: ${{ matrix.batch.name }}
+      ignore_list: ${{ matrix.python == '3.14' && '.ci/py314_incompatible.txt' || '' }}
   
   build_treon_windows:
     needs: collect_notebooks
@@ -99,7 +100,7 @@ jobs:
       fail-fast: false
       matrix:
         runs_on: [aks-win-16-cores-32gb-full]
-        python: ['3.11', '3.12', '3.13']
+        python: ['3.11', '3.12', '3.13', '3.14']
         batch: ${{ fromJSON(needs.collect_notebooks.outputs.matrix) }}
     uses: ./.github/workflows/job_windows.yml
     with:
@@ -107,6 +108,7 @@ jobs:
       python: ${{ matrix.python }}
       test_list: ${{ matrix.batch.test_list }}
       batch: ${{ matrix.batch.name }}
+      ignore_list: ${{ matrix.python == '3.14' && '.ci/py314_incompatible.txt' || '' }}
 
   Overall_Status:
     name: ci/gha_overall_status_precommit
