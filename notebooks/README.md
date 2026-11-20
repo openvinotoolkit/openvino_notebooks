@@ -184,6 +184,7 @@
 ## Model Demos
 
 - [Convert and Run DRO-Grasp with OpenVINO™](./dro-grasp/dro-grasp.ipynb)
+- [Convert and Optimize FastReID person re-identification with OpenVINO™](./fast-reid/fast-reid.ipynb)
 - [Video generation with ZeroScope and OpenVINO](./zeroscope-text2video/zeroscope-text2video.ipynb)
 - [Text-to-image generation with Z-Image-Turbo and OpenVINO](./z-image-turbo/z-image-turbo.ipynb)
 - [Convert and Optimize YOLO26 real-time object detection with OpenVINO™](./yolov26-optimization/yolov26-object-detection.ipynb)

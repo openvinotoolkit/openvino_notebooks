@@ -102,6 +102,7 @@ BLEU
 blockwise
 BMP
 boolean
+BoT
 builtins
 ByteDance
 CatVTON
@@ -308,6 +309,7 @@ DreamBooth
 DreamBooth Tsinghua
 Dreamshaper
 dropdown
+DukeMTMC
 DynamiCrafter
 EasyOCR
 ECCV
@@ -336,6 +338,7 @@ facto
 fastcomposer
 FastComposer
 FastDraft
+FastReID
 FastSAM
 Fbank
 FC
@@ -380,6 +383,7 @@ gcc
 GEC
 GELAN
 GELU
+GeM
 Gemma
 gemma
 genai
@@ -441,6 +445,7 @@ HWC
 HY
 Hy
 hyperparameters
+ibn
 ICIP
 ICPR
 identation
@@ -629,6 +634,7 @@ macOS
 Magika
 Mahalanobis
 Mamou
+mAP
 Mapillary
 Markovian
 Martyniuk
@@ -703,6 +709,7 @@ MRL
 mRoPE
 MRPC
 msi
+MSMT
 mT
 MTVQA
 MuJoCo
@@ -729,6 +736,7 @@ nar
 NAS
 natively
 NCE
+NCHW
 Nemo
 NEOX
 NER
@@ -993,6 +1001,7 @@ ReferenceNet
 RegNet
 RegNetY
 regressively
+ReID
 reidentification
 ReLU
 renderer
@@ -1046,6 +1055,7 @@ saliency
 sam
 SAMI
 SavedModel
+SBS
 scalability
 Scalable
 scalable
