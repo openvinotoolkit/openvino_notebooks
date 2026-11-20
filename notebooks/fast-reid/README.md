@@ -1,7 +1,7 @@
 # Convert and Optimize FastReID person re-identification with OpenVINO™
 
 <p align="center" width="100%">
-    <img width="80%" src="fast-reid-pipeline.svg">
+    <img width="80%" src="fast-reid.png">
 </p>
 
 Person re-identification (ReID) answers the question "have I seen this person before?". A ReID network turns a cropped
