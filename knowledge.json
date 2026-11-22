@@ -140,6 +140,33 @@
     "notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb"
    ]
   },
+  "1c152ab4554f": {
+   "attempts": [
+    {
+     "action": "No issue or PR filed: open issue 3879 already tracks this cause and maintainers closed earlier per-signature copies (3912, 3913) as duplicates of it.",
+     "confidence": "high",
+     "date": "2026-11-22",
+     "dead_ends": "Notebook code behaves as documented (markdown says the repo is gated); replacing the model source or editing skip lists or CI token plumbing is out of scope; the Request ID in the message makes the signature change nightly.",
+     "next_step": "Maintainers decide on 3879: grant CI Hugging Face access via HF_TOKEN or skip sam-3d-body on the nightly configs; masking the Request ID in the report message normalization would stop new signatures every night.",
+     "nightly_run_id": 44966633482,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44966633482",
+     "outcome": "none",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44995427845",
+     "root_cause": "snapshot_download of the gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 GatedRepoError on the Ubuntu py3.12 config because the CI runner has no access or token; same cause as open issue 3879 and the sibling signatures of this night."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "other",
+   "exception_type": "GatedRepoError",
+   "first_seen": "2026-11-22",
+   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6b024a2c-1b2753ef3cb545be386fb727;5ad9d95d-b924-46f8-9d81-5521f7c4c65b)",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-22",
+   "notebooks": [
+    "notebooks/sam-3d-body/sam-3d-body.ipynb"
+   ]
+  },
   "1eb4d15e2af4": {
    "attempts": [
     {
@@ -217,6 +244,60 @@
    "investigations": 1,
    "kind": "error",
    "last_seen": "2026-11-21",
+   "notebooks": [
+    "notebooks/sam-3d-body/sam-3d-body.ipynb"
+   ]
+  },
+  "3714f26c066a": {
+   "attempts": [
+    {
+     "action": "No issue or PR filed: open issue 3879 already tracks this cause and maintainers closed earlier per-signature copies (3912, 3913) as duplicates of it.",
+     "confidence": "high",
+     "date": "2026-11-22",
+     "dead_ends": "Notebook code behaves as documented (markdown says the repo is gated); replacing the model source or editing skip lists or CI token plumbing is out of scope; the Request ID in the message makes the signature change nightly.",
+     "next_step": "Maintainers decide on 3879: grant CI Hugging Face access via HF_TOKEN or skip sam-3d-body on the nightly configs; masking the Request ID in the report message normalization would stop new signatures every night.",
+     "nightly_run_id": 44966633482,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44966633482",
+     "outcome": "none",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44995427845",
+     "root_cause": "snapshot_download of the gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 GatedRepoError on the Windows py3.13 config because the CI runner has no access or token; same cause as open issue 3879 and the sibling signatures of this night."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "other",
+   "exception_type": "GatedRepoError",
+   "first_seen": "2026-11-22",
+   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6b026b8d-3fd25aa74eda8e3c25c65f49;12a71a0b-cb17-4a82-96ed-03924008f668)",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-22",
+   "notebooks": [
+    "notebooks/sam-3d-body/sam-3d-body.ipynb"
+   ]
+  },
+  "3f6d63265ddf": {
+   "attempts": [
+    {
+     "action": "No issue or PR filed: open issue 3879 already tracks this cause and maintainers closed earlier per-signature copies (3912, 3913) as duplicates of it.",
+     "confidence": "high",
+     "date": "2026-11-22",
+     "dead_ends": "Notebook code behaves as documented (markdown says the repo is gated); replacing the model source or editing skip lists or CI token plumbing is out of scope; the Request ID in the message makes the signature change nightly.",
+     "next_step": "Maintainers decide on 3879: grant CI Hugging Face access via HF_TOKEN or skip sam-3d-body on the nightly configs; masking the Request ID in the report message normalization would stop new signatures every night.",
+     "nightly_run_id": 44966633482,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44966633482",
+     "outcome": "none",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44995427845",
+     "root_cause": "snapshot_download of the gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 GatedRepoError on the Windows py3.11 config because the CI runner has no access or token; same cause as open issue 3879 and the sibling signatures of this night."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "other",
+   "exception_type": "GatedRepoError",
+   "first_seen": "2026-11-22",
+   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6b0251f7-30319162575c442b5e296643;f7a6a02f-a6c1-408a-84ef-7103b2fa63df)",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-22",
    "notebooks": [
     "notebooks/sam-3d-body/sam-3d-body.ipynb"
    ]
@@ -307,6 +388,33 @@
    "investigations": 1,
    "kind": "error",
    "last_seen": "2026-11-18",
+   "notebooks": [
+    "notebooks/sam-3d-body/sam-3d-body.ipynb"
+   ]
+  },
+  "4ecfc899d4b0": {
+   "attempts": [
+    {
+     "action": "No issue or PR filed: open issue 3879 already tracks this cause and maintainers closed earlier per-signature copies (3912, 3913) as duplicates of it.",
+     "confidence": "high",
+     "date": "2026-11-22",
+     "dead_ends": "Notebook code behaves as documented (markdown says the repo is gated); replacing the model source or editing skip lists or CI token plumbing is out of scope; the Request ID in the message makes the signature change nightly.",
+     "next_step": "Maintainers decide on 3879: grant CI Hugging Face access via HF_TOKEN or skip sam-3d-body on the nightly configs; masking the Request ID in the report message normalization would stop new signatures every night.",
+     "nightly_run_id": 44966633482,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44966633482",
+     "outcome": "none",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44995427845",
+     "root_cause": "snapshot_download of the gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 GatedRepoError on the Ubuntu py3.13 config because the CI runner has no access or token; same cause as open issue 3879 and the sibling signatures of this night."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "other",
+   "exception_type": "GatedRepoError",
+   "first_seen": "2026-11-22",
+   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6b026501-5df5954a4a5ddfec75ef8d7c;4db61082-fd2c-4a8e-acb2-1477c797532d)",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-22",
    "notebooks": [
     "notebooks/sam-3d-body/sam-3d-body.ipynb"
    ]
@@ -586,6 +694,33 @@
    "last_seen": "2026-11-18",
    "notebooks": [
     "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
+   ]
+  },
+  "a5c3fb90c901": {
+   "attempts": [
+    {
+     "action": "Filed one issue labelled by policy; no code change since download_file has no retry but changing the shared helper on a single occurrence would be speculative.",
+     "confidence": "medium",
+     "date": "2026-11-22",
+     "dead_ends": "Notebook code and pinned packages unchanged and passing before; no other pair in the digest shows this host failing; no nightly skip-list entry applies.",
+     "next_step": "If the resolution failure recurs, check DNS and egress on the cpu-windows-2022 runners and storage.openvinotoolkit.org availability; then consider connection-error retries in utils/notebook_utils.py download_file as a separate change.",
+     "nightly_run_id": 44966633482,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44966633482",
+     "outcome": "issue",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44995427845",
+     "root_cause": "NameResolutionError (getaddrinfo failed) for storage.openvinotoolkit.org during download_file on the Windows py3.12 runner; the same notebook and config passed the three previous nights with unchanged code, so it looks like a transient runner DNS or network problem."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "network",
+   "exception_type": "Exception",
+   "first_seen": "2026-11-22",
+   "headline": "Exception: File downloading failed with error: HTTPSConnectionPool(host='storage.openvinotoolkit.org', port=443): Max retries exceeded with url: /repositories/openvino_notebooks/data/data/video/Sheldon%20Cooper%20Jim%20Parsons%20at%20Intels%20Lab.mp4 (Caused by NameResolutionError(\"HTTPSConnection(\u2026",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-22",
+   "notebooks": [
+    "notebooks/whisper-asr-genai/whisper-asr-genai.ipynb"
    ]
   },
   "be39ef793842": {
