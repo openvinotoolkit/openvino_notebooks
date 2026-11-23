@@ -162,14 +162,17 @@ def get_ignored_notebooks_from_yaml(validation_config: ValidationConfig, skip_co
 
 
 def get_ignore_list_notebooks(ignore_list: Optional[list[str]]) -> list[Path]:
-    """Notebooks from `--ignore_list` items: `*.txt` files (one repo-root-relative path per line) or notebook paths."""
+    """Notebooks from `--ignore_list` items: `*.txt` files (repo-root-relative paths or comments) or notebook paths."""
     ignored_notebooks: list[Path] = []
     if ignore_list is None:
         return ignored_notebooks
     for ignore_item in ignore_list:
         if ignore_item.endswith(".txt"):
-            with open(ignore_item, "r") as f:
-                ignored_notebooks.extend(Path(line.strip()) for line in f.readlines() if line.strip())
+            with open(ignore_item, "r", encoding="utf-8") as f:
+                for line in f:
+                    item = line.strip()
+                    if item and not item.startswith("#"):
+                        ignored_notebooks.append(Path(item))
         else:
             ignored_notebooks.append(Path(ignore_item))
     return ignored_notebooks
