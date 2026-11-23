@@ -25,8 +25,10 @@ The tutorial consists of the following steps:
 - Install prerequisites
 - Convert model to OpenVINO intermediate representation (IR) format with Optimum Intel
 - Run Speech Recognition
-- Predict word-level timestamps with the forced aligner
+- Predict word-level timestamps with the forced aligner, optimized with NNCF weight compression (FP16 / INT8 / INT4) and decoder graph optimizations (causal attention, precomputed RoPE tables, fused Q/K/V projections, batched encoder windows)
 - Launch interactive demo
+
+The forced aligner is also supported by [OpenVINO GenAI](https://github.com/openvinotoolkit/openvino.genai) (`openvino_genai.ASRForcedAligner`), planned for the 2026.5 release and currently available in nightly builds. It uses a different model export; see the [forced aligner sample](https://github.com/openvinotoolkit/openvino.genai/blob/master/samples/python/automatic_speech_recognition/forced_aligner_timestamps_generation.py).
 
 ## Installation Instructions
 
