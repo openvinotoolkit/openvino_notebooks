@@ -92,6 +92,25 @@
     }
   },
   {
+    "title": "Virtual Try-On with CatVTON and OpenVINO",
+    "path": "catvton/catvton.ipynb",
+    "imageUrl": "https://github.com/user-attachments/assets/55319c63-f01c-4591-ac1e-3bb4e57dda35",
+    "lastBranch": "2026.4",
+    "githubUrl": "https://github.com/openvinotoolkit/openvino_notebooks/blob/2026.4/notebooks/catvton/catvton.ipynb",
+    "models": [],
+    "tags": {
+      "categories": [
+        "Model Demos",
+        "AI Trends"
+      ],
+      "libraries": [],
+      "other": [],
+      "tasks": [
+        "Image-to-Image"
+      ]
+    }
+  },
+  {
     "title": "Visual-language assistant with Gemma3 and OpenVINO",
     "path": "gemma3/gemma3.ipynb",
     "imageUrl": "https://github.com/user-attachments/assets/2540a58e-c242-4439-b151-0fd1e6938af1",

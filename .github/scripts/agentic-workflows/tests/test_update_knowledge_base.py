@@ -1,6 +1,6 @@
 import json
 import shutil
-import subprocess
+import subprocess  # nosec B404 - test runs snapshot script via sys.executable
 import sys
 from pathlib import Path
 
@@ -109,7 +109,7 @@ def test_snapshot_scripts_run_on_their_own_isolated_from_user_site_packages(worl
     scripts = world.trusted / ukb.SCRIPTS_SNAPSHOT
     command = [sys.executable, "-E", "-s", str(scripts / "update_knowledge_base.py"), "update"]
     command += ["--trusted-dir", str(world.trusted), "--notes-dir", str(world.notes), "--out-dir", str(world.out)]
-    result = subprocess.run(command, cwd=tmp_path, capture_output=True, text=True, timeout=60)
+    result = subprocess.run(command, cwd=tmp_path, capture_output=True, text=True, timeout=60)  # nosec B603 - sys.executable in test
     assert result.returncode == 0, result.stdout + result.stderr
     assert world.stored()["signatures"][SIG_A]["attempts"][0]["root_cause"] == "from the copy"
 
