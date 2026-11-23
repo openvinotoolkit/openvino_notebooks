@@ -17,14 +17,13 @@ import unicodedata
 from types import MethodType
 from typing import TYPE_CHECKING
 
-import librosa
 import numpy as np
 import soundfile as sf
 import torch
 import torch.nn.functional as F
 import openvino as ov
 from datasets import Audio, load_dataset
-from qwen_asr.inference.utils import parse_asr_output
+from qwen_asr.inference.utils import normalize_audio_input, parse_asr_output
 
 if TYPE_CHECKING:
     from optimum.intel import OVModelForSpeechSeq2Seq
@@ -271,7 +270,7 @@ def load_samples(configs: tuple[str, ...], count: int, directory: Path, start: i
 
 
 def prepare_inputs(processor: "ProcessorMixin", audio_path: Path, max_duration_seconds: float = MAX_AUDIO_SECONDS) -> tuple[dict, float]:
-    """Load/resample bounded audio and build the original empty-system ASR prompt.
+    """Normalize bounded audio with the reference API and build its empty-system ASR prompt.
 
     :param processor: Model processor used to tokenize and encode audio.
     :param audio_path: Path to the source recording.
@@ -285,10 +284,10 @@ def prepare_inputs(processor: "ProcessorMixin", audio_path: Path, max_duration_s
         raise ValueError(f"Expected a nonempty audio file: {audio_path}")
     if duration > max_duration_seconds:
         raise ValueError(f"Audio duration {duration:.1f}s exceeds the {max_duration_seconds:.0f}s limit: {audio_path}")
-    audio, rate = librosa.load(audio_path, sr=16000, mono=True)
+    audio = normalize_audio_input(str(audio_path))
     if audio.ndim != 1 or not audio.size or not np.isfinite(audio).all():
         raise ValueError("Expected nonempty finite mono audio after resampling to 16000 Hz")
-    actual_duration = len(audio) / rate
+    actual_duration = len(audio) / 16000
     if actual_duration > max_duration_seconds:
         raise ValueError(f"Resampled audio exceeds the {max_duration_seconds:.0f}s limit: {audio_path}")
     prompt = processor.apply_chat_template(
@@ -299,7 +298,7 @@ def prepare_inputs(processor: "ProcessorMixin", audio_path: Path, max_duration_s
         add_generation_prompt=True,
         tokenize=False,
     )
-    inputs = processor(text=prompt, audio=audio, sampling_rate=rate, return_tensors="pt")
+    inputs = processor(text=prompt, audio=audio, sampling_rate=16000, return_tensors="pt")
     return inputs, actual_duration
 
 

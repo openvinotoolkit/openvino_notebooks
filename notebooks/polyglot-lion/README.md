@@ -25,7 +25,7 @@ The tutorial consists of the following steps:
 Use Python 3.11–3.13 with pip and Git. Open
 [polyglot-lion.ipynb](./polyglot-lion.ipynb) and execute the cells in order.
 The first cell activates a notebook-specific `.venv`; dependencies install
-automatically. For an unmerged revision, open the notebook from a checkout or
+automatically. When testing a pull-request branch, open the notebook from a checkout or
 keep the matching `polyglot_helper.py` beside it. Plan for about 8 GB of system
 RAM for the default 0.6B model, or 16 GB for the optional 1.7B model. These
 are planning estimates, not measured peaks. The model weights occupy about 1.58 GB or
@@ -36,6 +36,7 @@ encoder memory use.
 **Experimental notebook:** the default run uses CPU and one English clip.
 GPU inference, compression and multilingual evaluation are optional. The notebook
 includes encoder and GPU precision corrections; full INT8 remains experimental.
+An earlier 1.7B GPU full-INT8 evaluation exceeded the Mandarin accuracy budget.
 The 1.7B option remains pinned to the checkpoint used for the encoder and
 compression validation; newer checkpoint releases are not substituted without
 rechecking those results. See the notebook's
