@@ -147,3 +147,32 @@ notebooks/siglip-zero-shot-image-classification/siglip-zero-shot-image-classific
 
 # Streaming FLEURS fails with the Pickler._batch_setitems signature mismatch.
 notebooks/whisper-asr-genai/whisper-asr-genai.ipynb
+
+# Python 3.14 failures in run 44715418820: https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44715418820
+
+# Torch 2.8 and torchvision 0.23 have no Python 3.14 wheels; the failed install leaves optimum-cli unavailable.
+notebooks/hunyuan-translation/hunyuan-translation.ipynb
+
+# Torch 2.8 and torchvision 0.23 have no Python 3.14 wheels; the failed install leaves optimum-cli unavailable.
+notebooks/nuextract-structure-extraction/nuextract-structure-extraction.ipynb
+
+# Torch 2.8 and torchvision 0.23 have no Python 3.14 wheels; the failed install leaves optimum-cli unavailable.
+notebooks/stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb
+
+# Python 3.14 cannot install pinned Torch 2.8; resolved Torch 2.15 moved ONNX symbols imported by Optimum.
+notebooks/glm4.1-v-thinking/glm4.1-v-thinking.ipynb
+
+# Python 3.14 cannot install pinned Torch 2.8; resolved Torch 2.15 moved ONNX symbols imported by Optimum.
+notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
+
+# openai-whisper==20231117 metadata generation fails on Python 3.13+ with KeyError: '__version__'.
+notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb
+
+# transformers==4.46.1 selects tokenizers 0.20.3, which lacks Python 3.14 wheels and needs maturin unavailable with --no-build-isolation.
+notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb
+
+# The pinned openvino_contrib requirements install numba==0.62.1, which rejects Python 3.14.
+notebooks/3D-point-pillars/pointpillars.ipynb
+
+# Torch 2.8 has no Python 3.14 wheel, leaving Diffusers absent and Flux fill task detection unavailable.
+notebooks/flux-fill/flux-fill.ipynb
