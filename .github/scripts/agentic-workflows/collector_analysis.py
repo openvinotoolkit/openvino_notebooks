@@ -28,6 +28,7 @@ from collector_common import (
     Key,
 )
 from collector_github import check_schema, download_report, list_json, list_nightly_runs
+from collector_feedback import extract_self_improvement
 
 _REQUEST_ID_RE = re.compile(r"\bRequest ID:\s*[A-Za-z0-9][A-Za-z0-9;=_.:/+-]{0,255}(?=[)\s]|$)")
 _ACCESS_STATUS_RE = re.compile(r"\b(401|403) Client Error\b")
@@ -260,6 +261,7 @@ def fetch_tracked(repo: str, warn: Callable[[str], None], now: Optional[datetime
                     if key in seen:
                         continue
                     seen.add(key)
+                    learning, learning_truncated = extract_self_improvement(raw.get("body") or "")
                     for signature in extract_signatures(raw.get("title"), raw.get("body")):
                         tracked[signature].append(
                             TrackedItem(
@@ -272,6 +274,8 @@ def fetch_tracked(repo: str, warn: Callable[[str], None], now: Optional[datetime
                                 raw.get("createdAt", ""),
                                 raw.get("closedAt") or raw.get("mergedAt"),
                                 raw.get("updatedAt", ""),
+                                self_improvement=learning,
+                                self_improvement_truncated=learning_truncated,
                             )
                         )
                 # A recent rejection must have an updatedAt after the cutoff.

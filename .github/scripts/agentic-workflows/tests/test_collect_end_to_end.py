@@ -86,7 +86,7 @@ def test_collect_writes_complete_digest_and_github_outputs(tmp_path, monkeypatch
     assert "| `2026.1.0` | 2 | 0 | 0 |" in group
     assert (out / f"groups/01-{SIG_DEPENDENCY}/group.json").exists()
     assert "Previous remediation feedback" in (out / "feedback.md").read_text()
-    assert json.loads((out / "feedback.json").read_text()) == {"items": [], "lessons": [], "unavailable": []}
+    assert json.loads((out / "feedback.json").read_text()) == {"items": [], "self_improvements": [], "lessons": [], "unavailable": []}
     assert (out / f"groups/01-{SIG_DEPENDENCY}/logs/a-a.ipynb__cpu-ubuntu-22.04-py3.11.log").exists()
 
     raw_log = (out / f"groups/01-{SIG_DEPENDENCY}/logs/a-a.ipynb__cpu-ubuntu-22.04-py3.11.log").read_text()
@@ -442,7 +442,6 @@ def test_group_branches_created_from_the_recorded_base_are_independent(tmp_path)
                 "Fix",
                 "Verification and limits",
                 "History",
-                "AI self-improvement",
             ],
         ),
         (
@@ -456,7 +455,6 @@ def test_group_branches_created_from_the_recorded_base_are_independent(tmp_path)
                 "Investigation",
                 "Why no automated fix",
                 "Suggested next step",
-                "AI self-improvement",
             ],
         ),
     ],
@@ -475,6 +473,9 @@ def test_output_templates_are_imported_and_keep_tracking_contract(template, head
     filled = body.replace("<12-hex-signature>", SIG_DEPENDENCY)
     assert analysis.extract_signature(filled) == SIG_DEPENDENCY
     assert "Related signatures: " in body
+    details = re.search(r"<details>\s*<summary>AI self-improvement</summary>(.*?)</details>", body, re.DOTALL)
+    assert details is not None, "the learning section must be collapsed by default, without an open attribute"
+    assert "**Future-run improvements:**" in details.group(1)
     assert "### Before investigation" in body and "### After investigation" in body
     for field in ("Prior feedback", "Applied learning", "Self-assessment", "Reusable lesson"):
         assert f"**{field}:**" in body

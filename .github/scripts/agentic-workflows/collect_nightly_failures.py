@@ -13,7 +13,7 @@ Digest layout (`--out`):
   summary.md     entry point: run, ranked groups, already tracked and deferred groups
   run.json       run metadata from the report
   tracked.json   remediation PRs/issues found per error signature
-  feedback.md / feedback.json  bounded prior outcome feedback, head checks and cross-signature learning
+  feedback.md / feedback.json  learning sections from all fetched tracked outcomes, bounded rich feedback/head checks, memory lessons
   groups/NN-<signature>/group.md    evidence of one error group: where it starts, earlier knowledge base notes, affected notebooks, history, versions, excerpts
   groups/NN-<signature>/group.json  the same in machine-readable form
   groups/NN-<signature>/logs/       raw treon logs of representative failures (or job log extracts for infra groups)

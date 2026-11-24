@@ -120,6 +120,8 @@ class TrackedItem:
     created_at: str
     closed_at: Optional[str] = None
     updated_at: str = ""
+    self_improvement: str = ""
+    self_improvement_truncated: bool = False
 
     @property
     def label(self) -> str:
@@ -135,6 +137,8 @@ class TrackedItem:
             "created_at": self.created_at,
             "closed_at": self.closed_at,
             "updated_at": self.updated_at,
+            "self_improvement": self.self_improvement,
+            "self_improvement_truncated": self.self_improvement_truncated,
         }
 
 

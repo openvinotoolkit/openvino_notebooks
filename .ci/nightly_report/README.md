@@ -122,15 +122,24 @@ Its schema and limits live in [`knowledge_base.py`](../../.github/scripts/agenti
 
 ### AI self-improvement
 
-- **Before investigation:** the collector refreshes the most recently updated four PRs and eight issues from labeled tracking history, including the
+- **Before investigation:** the collector extracts the **AI self-improvement** section from every unique PR/issue in fetched labeled
+  tracking history, reusing the tracking bodies without extra per-item API calls. Both collapsed `<details>` sections and legacy
+  Markdown headings are supported. `self_improvements` in `feedback.md`/`feedback.json` retains source URLs/signatures, flags sections
+  truncated at 2000 characters, and includes empty entries when older items have no learning section. The existing tracking
+  bounds apply (all open/recently rejected outcomes, plus bounded completed history); this is not limited to the rich-feedback sample.
+  The agent ingests these suggestions before investigating new groups.
+  Separately, the collector refreshes the most recently updated four PRs and eight issues from labeled tracking history, including the
   last three comments/reviews and inline threads (three comments each), first eight changed paths and first twenty checks on the recorded PR head. Excerpts, truncation,
   missing checks and unavailable feedback are explicit in `feedback.md`/`feedback.json`. It also includes the ten newest reusable
   lessons across memory signatures. This sample supplements, not replaces, the complete open/recent-rejection index in `tracked.json`.
   The agent spends at most eight preflight tool calls (four reads, three searches) comparing prior claims with observed results,
   then records at most three evidence-linked, conditional lessons in `learning-plan.json` before new investigation.
-- **After investigation:** both output templates require an **AI self-improvement** section: prior feedback, applied learning,
+- **After investigation:** both output templates require an **AI self-improvement** section in a closed-by-default `<details>` block.
+  It includes one to three concrete, conditional suggestions derived from the failure and proposed remedy or blocker (better evidence,
+  detection/grouping, verification, or avoiding demonstrated dead ends), plus prior feedback, applied learning,
   self-assessment and a reusable lesson. The agent mirrors those conclusions into four bounded note fields (`prior_feedback`,
   `applied_learning`, `self_assessment`, `lesson`) before publication; the trusted post-agent updater persists them in `knowledge.json`.
+  The `lesson` field retains the highest-value future-run improvement with evidence and applicability limits.
   Older records without these additive fields remain valid. Notes with `outcome: pr` or `issue` describe the requested output,
   not confirmed publication or success; later runs refresh the actual GitHub state and checks.
 - **Algorithm:** correlate symptoms across signatures before preparing a patch, avoid identical PRs, and do not create an issue just

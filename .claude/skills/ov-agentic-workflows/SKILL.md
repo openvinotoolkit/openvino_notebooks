@@ -190,6 +190,14 @@ workflows. Consult the source before changing them.
   ```
   Every outcome lists all affected notebooks/configs, not just the downloaded
   representative logs. A single `Related signatures: \`<signature>\`, \`<signature>\``
+- **Learning sections:** both output templates use a closed-by-default `<details>`
+  block titled `AI self-improvement`, with concrete, conditional suggestions
+  derived from that investigation and its remedy or blocker. Extract these sections
+  from every fetched tracked outcome before the rich-feedback sample is selected;
+  support legacy Markdown headings, retain provenance and truncation/missing
+  markers, and ingest `self_improvements` before new investigation. Reuse tracking
+  bodies rather than adding per-item API calls. Keep the highest-value proposal in
+  the memory note's `lesson`; recommendations cannot relax workflow safeguards. A single `Related signatures: \`<signature>\`, \`<signature>\``
   line declares additional covered signatures; the collector indexes only explicit
   aliases, not incidental hashes elsewhere in the body.
 - **Knowledge base:** `knowledge.json` on `memory/nightly-remediator` is written only

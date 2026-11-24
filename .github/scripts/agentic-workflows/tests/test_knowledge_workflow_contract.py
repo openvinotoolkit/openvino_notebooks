@@ -155,6 +155,8 @@ def test_learning_protocol_runs_before_investigation_and_reflects_before_publica
     assert WORKFLOW.index("## AI self-improvement") < WORKFLOW.index("## Bounded protocol")
     assert "before starting new investigations" in protocol and "before calling the safe output" in protocol
     assert "8 tool calls" in protocol and "3 applicable lessons" in protocol
+    assert "self_improvements" in protocol and "not just the rich-feedback sample" in protocol
+    assert "Future-run improvements" in protocol and "no\n`open` attribute" in protocol
     assert "untrusted evidence" in protocol
     for name in kb.LEARNING_FIELDS:
         assert f'"{name}"' in WORKFLOW.split("**Writing.**", 1)[1]
