@@ -27,6 +27,10 @@ treon_nightly.yml
 * `pull_request` runs of the workflow test all notebooks, like the scheduled nightly, but do not upload `notebooks-status-map.json`;
   their reports have `run.event == "pull_request"`.
 
+The nightly matrix tests Python 3.11–3.14 on Linux and Windows CPU, and Python 3.11 on iGPU and dGPU.
+With five batches this produces 50 test jobs across 10 configurations. Python 3.14 adds two CPU configurations;
+their results use distinct config IDs and older nights have no history for them.
+
 The files are described by JSON Schemas in [`schema/`](./schema): `nightly-report.schema.json` (the dashboard contract),
 `fragment.schema.json` and `plan.schema.json` (internal).
 
@@ -156,6 +160,10 @@ gh aw run nightly-issue-remediator --raw-field run_id=42540244557 --raw-field so
 | `skipped` | Intentionally not run for this config: `skip_reason` is `skip_config` (`.ci/skipped_notebooks.yml`) or `ignore_list`; `skip_source` names the list file (e.g. `tensorflow.txt`, `gpu_oom.txt`, `heavy_ubuntu_gpu.txt`). Ignore lists are per job: taken from the `ignore_list` input of each job in the workflow, plus `.ci/heavy_ubuntu_gpu.txt` for Linux GPU jobs and `.ci/win_py313_flaky.txt` for Windows Python 3.13 jobs. |
 | `not_run` | Planned but never executed: `not_run_reason` is `job_failed_before_tests:<step>`, `job_cancelled`, `job_skipped`, `job_interrupted` or `no_fragment`. |
 
+Nightly and pre-commit jobs use `.ci/py314_incompatible.txt` only for Python 3.14;
+its comments document each dependency issue.
+The report resolves this condition from the workflow even when a job does not produce a fragment.
+
 Batches are reshuffled every night, so history must be keyed by **(`notebook`, `config_id`)**, never by batch or job.
 
 ### Log excerpt of a failure
@@ -205,12 +213,16 @@ If a job log is unavailable, the excerpt is taken from the captured notebook log
 ## Cross-run metrics (computed by the dashboard)
 
 Use only `run.event == "schedule"` runs of the `latest` branch for trends, deduplicated by `run.id` (highest `run.attempt`).
-Key results by (`notebook`, `config_id`); "executed" means status in `passed|failed|timeout|error` (`skipped`/`not_run` nights
-neither break nor extend a streak).
+Key results by (`notebook`, `config_id`). The dashboard converts producer `not_run` rows to infrastructure errors;
+its "executed" counts include those errors, while the producer's counts do not. New configurations have no earlier results:
+their first failures count as new when an earlier baseline night exists, without implying a regression from a prior pass.
+Matrix changes can also shift aggregate rates and counts independently of changes in existing configurations.
+The dashboard's headline notebook pass rate is passed execution rows / executed rows, unlike the per-notebook
+`notebook_pass_rate` in the producer summary.
 
 | Metric | Definition |
 |---|---|
-| New failure (regression) | failing now, last executed result `passed` |
+| New failure | failing now, last executed result `passed` or no earlier executed result |
 | Fixed | `passed` now, last executed result failing |
 | Failing since / streak | first run of the current consecutive failing streak (date, run, commit) and its length in nights; last passing run and commit; suspect range `https://github.com/openvinotoolkit/openvino_notebooks/compare/<last_pass_sha>...<first_fail_sha>` |
 | Probable cause (at first failure) | `notebook_changed` (`notebooks[].dir_tree_sha` differs from the last pass), `openvino_changed` (`packages.openvino`), `packages_changed` (other key packages or `env_id`), otherwise `external_or_flaky` |

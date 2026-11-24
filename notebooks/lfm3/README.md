@@ -19,16 +19,20 @@ The family covers several modalities:
 - Install prerequisites
 - Download preconverted OpenVINO models or convert them with [Optimum Intel](https://github.com/huggingface/optimum-intel) (FP16 / INT8 / INT4)
 - **LFM3-1.7B** with [OpenVINO GenAI](https://github.com/openvinotoolkit/openvino.genai) `LLMPipeline`: direct answers vs. reasoning, multi-turn chat, tool calling and structured JSON output
-- **LFM3-VL** with Optimum Intel `OVModelForVisualCausalLM`: image understanding, multi-image comparison, thinking mode and video understanding
-- **LFM3-Omni** with Optimum Intel `OVModelForMultimodalLM`: text-to-speech, speech recognition, spoken questions about images and spoken chat
+- **LFM3-VL** with OpenVINO GenAI `VLMPipeline`: image understanding, multi-image comparison, thinking mode and video understanding
+- **LFM3-Omni** with OpenVINO GenAI `OmniPipeline`: text-to-speech, speech recognition, spoken questions about images and spoken chat
 - Interactive Gradio demo with LFM3-Omni
 - Measure LFM3-1.7B performance with OpenVINO GenAI
 
 ## Installation Instructions
 
-LFM3 support currently requires [Optimum Intel PR #2087](https://github.com/huggingface/optimum-intel/pull/2087). The notebook installs this public PR and Transformers 5.20.0.
+LFM3 [export support](https://github.com/huggingface/optimum-intel/pull/2087) is merged into `main`, but is not in the latest Optimum Intel release, 2.2.0. The notebook installs `main` and Transformers 5.20.0. This Transformers version overrides Optimum Intel's `<5.16` constraint, so a pip dependency warning is expected.
 
-Video frames are decoded with PyAV (`av`), which bundles FFmpeg. The notebook does not use TorchCodec: its Windows build fails to load when FFmpeg shared libraries are not installed on the system.
+GenAI support for [VL](https://github.com/openvinotoolkit/openvino.genai/pull/4738) and [Omni](https://github.com/openvinotoolkit/openvino.genai/pull/4772) is also merged, but is not in the latest released GenAI, 2026.4.1.0. The notebook selects `openvino-genai==2027.0.0.0.dev20261119` from the nightly index with OpenVINO and tokenizers pinned to the same date.
+
+Video frames are decoded with PyAV (`av`), which bundles FFmpeg, and passed to GenAI as RGB tensors with frame-rate metadata. TorchCodec and system FFmpeg shared libraries are not required.
+
+Omni speech uses `ATTENTION_BACKEND="SDPA"`. [Speech output on paged attention](https://github.com/openvinotoolkit/openvino.genai/pull/4886) is still pending. Text-only, speech-only and interleaved text/speech responses are selected through `OmniTalkerSpeechConfig`; audio input is 16 kHz mono and speech output is 24 kHz. Optimum Intel remains an alternative inference backend.
 
 This is a self-contained example that relies solely on its own code.
 
@@ -38,6 +42,8 @@ For details, please refer to [Installation Guide](../../README.md).
 ## Local models and generation settings
 
 Set **Local IR root** to reuse converted models without downloading or converting them again. The folder should contain directories such as `LFM3-1.7B-int4-ov`, `LFM3-1.7B-int8-ov` and `LFM3-1.7B-fp16-ov`. A selected local model with missing files raises an error; leave the field empty to use the usual download/conversion path.
+
+All three GenAI pipelines require exported OpenVINO tokenizers and detokenizers alongside the model IR. LFM3-Omni currently has no published OpenVINO IR in the OpenVINO collection, so its first preparation exports the model locally.
 
 Local INT4 conversion explicitly uses asymmetric compression with group size 64 and ratio 1.0. Text examples inherit the checkpoint's generation defaults; structured JSON generation and the benchmark use greedy decoding.
 
