@@ -25,6 +25,7 @@ from nightly_builders import (
     nightly_world,
     shell_command_allowed,
 )
+from test_collect_nightly_failures import gated_failure
 
 
 @pytest.fixture(autouse=True)
@@ -97,6 +98,39 @@ def test_collect_writes_complete_digest_and_github_outputs(tmp_path, monkeypatch
     assert not re.search(r"\d{4}-\d\d-\d\dT\d\d:\d\d:", infra_log)
     assert len(report["failures"]) == status["failures_total"]
     assert fake.count("--raw-field label=nightly-remediator") == 4
+
+
+def test_collect_consolidates_gated_access_without_losing_evidence_or_tracking(tmp_path, monkeypatch):
+    fake = FakeGh()
+    report = nightly_world(fake)
+    failures = [gated_failure(f"{i:012x}", config=f"cfg{i}") for i in range(12)]
+    report["failures"].extend(failures)
+    fake.add_night(report, 55, ENVIRONMENTS)
+    fake.add_fragment(77, report)
+    monkeypatch.setattr(github, "gh", fake)
+    monkeypatch.setattr(evidence, "gh", fake)
+    out = tmp_path / "digest"
+
+    assert cnf.main(["--repo", REPO, "--run-id", str(NIGHTLY_ID), "--out", str(out)]) == 0
+
+    status = json.loads((out / "status.json").read_text())
+    assert status["report_error_groups_total"] == 15
+    assert status["error_groups_total"] == 4
+    assert status["groups_selected"] == 5 and status["groups_deferred"] == 0
+    groups = [json.loads(p.read_text()) for p in (out / "groups").glob("*/group.json")]
+    gate = next(g for g in groups if g["exception_type"] == "GatedRepoError")
+    assert len(gate["members"]) == 12
+    assert gate["source_signatures"] == [f["signature"] for f in failures]
+    assert gate["related_signatures"] == gate["source_signatures"]
+    assert {m["signature"] for m in gate["members"]} == set(gate["source_signatures"])
+    declaration = "Related signatures: " + ", ".join(f"`{s}`" for s in gate["related_signatures"])
+    assert analysis.extract_signatures(f"Fix (sig {gate['signature']})", declaration) == [gate["signature"], *gate["related_signatures"]]
+    markdown = (out / f"groups/{gate['index']:02d}-{gate['signature']}/group.md").read_text()
+    assert gate["grouping_reason"] in markdown
+    assert all(f["signature"] in markdown for f in failures)
+    summary = (out / "summary.md").read_text()
+    assert "15 original report signatures consolidated into 4 remediation groups" in summary
+    assert summary.count("GatedRepoError") == 1
 
 
 def test_no_failures_is_successful_no_work_without_tracking_queries(tmp_path, monkeypatch):

@@ -86,6 +86,12 @@ class Group:
     exception_type: str
     exception_message: str
     members: List[Member] = field(default_factory=list)
+    related_signatures: List[str] = field(default_factory=list)
+    grouping_reason: str = ""
+
+    @property
+    def source_signatures(self) -> List[str]:
+        return sorted({m.failure["signature"] for m in self.members if m.failure and m.failure.get("signature")})
 
     @property
     def notebooks(self) -> List[str]:

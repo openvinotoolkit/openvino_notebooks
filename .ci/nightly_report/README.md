@@ -58,6 +58,19 @@ The GitHub Agentic Workflow in `.github/workflows/nightly-issue-remediator.md` r
 recently rejected remediation, prioritizes likely-fixable groups, and caps each run at five groups and three draft PRs. All open
 tracking items and recent rejections are paginated independently of the bounded completed-item history.
 
+Before ranking, the collector consolidates gated Hugging Face access failures with the same HTTP status (401 or 403) and explicitly
+identified repository (including model/dataset/space type), even when request IDs, revisions, filenames or notebooks differ.
+When the target is missing, request-ID-only variants can share a group only if their remaining message, exception, category,
+notebook, cell index and cell source match. Missing or conflicting evidence does not justify merging unrelated report signatures.
+Gated access failures are normally issue candidates, not privileged over likely notebook/dependency fixes.
+
+These groups have a stable, collector-specific remediation signature; the producer's report and signature algorithm are unchanged.
+`grouping_reason` explains the heuristic, `source_signatures` and each member's `signature` preserve the original report hashes,
+and every affected notebook/config pair is retained. `related_signatures` contains original hashes that unambiguously belong to
+that remediation group in the report; a hash shared by distinct groups is not an alias. Tracking checks both the remediation
+signature and those aliases, and history uses the same grouping across previous reports. `status.json` distinguishes
+`report_error_groups_total` (original signatures) from `error_groups_total` (remediation groups).
+
 The main agent uses Copilot model routing with `mode: balanced` and `goal: cost`, choosing from the
 `engine.model-routing.allowed-models` shortlist in the [workflow source](../../.github/workflows/nightly-issue-remediator.md).
 The shortlist does not restrict built-in agents or sub-agents and is not a workflow-wide model policy or spending limit.
@@ -67,7 +80,7 @@ The agent creates one PR for a verified in-scope fix, or one issue when the caus
 be safely fixed. PRs use the `nightly-remediator` and `automated-fix` labels; issues use `nightly-remediator` and
 `nightly-failure`. Every created item must contain the visible `Error signature: \`<12-hex-signature>\`` line, also include
 `(sig <12-hex-signature>)` in its title, and list every affected notebook/config pair. These exact conventions are how later
-collector runs find and deduplicate existing work. When several selected signatures demonstrably share one root cause and remedy,
+collector runs find and deduplicate existing work. Include the collector's `related_signatures` as aliases. When several selected signatures demonstrably share one root cause and remedy,
 one outcome can cover them all, with the additional hashes on a visible `Related signatures: \`<signature>\`, \`<signature>\`` line.
 The collector indexes those aliases too, without treating incidental hashes in history/logs as covered signatures. Independent errors
 must remain separate; sharing an exception type or notebook is not proof of a shared cause.
