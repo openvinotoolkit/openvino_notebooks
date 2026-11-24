@@ -1,6 +1,6 @@
 import './StatusTable.scss';
 
-import { JSX } from 'react';
+import { CSSProperties, JSX } from 'react';
 
 import CheckIcon from '@/assets/images/check.svg?react';
 import CrossIcon from '@/assets/images/cross.svg?react';
@@ -11,7 +11,7 @@ import { Tooltip } from '@/components/shared/Tooltip/Tooltip';
 import { VALIDATED_PYTHON_VERSIONS, ValidationStatus } from '@/shared/notebook-status';
 import { NotebookItem } from '@/shared/notebooks.service';
 
-const getStatusIcon = (status: ValidationStatus | null): JSX.Element => {
+const getStatusIcon = (status: ValidationStatus | null | undefined): JSX.Element => {
   if (status === ValidationStatus.SUCCESS) {
     return (
       <Tooltip content="Passed">
@@ -60,12 +60,16 @@ type StatusTableProps = {
 
 export const StatusTable = ({ status }: StatusTableProps) => {
   const osOptions = Object.keys(status) as (keyof typeof status)[];
-  const cpuStatuses = osOptions.map((os) => Object.values(status[os]['cpu'])).flat();
-  const gpuStatuses = osOptions.map((os) => Object.values(status[os]['gpu'])).flat();
+  const cpuStatuses = osOptions.flatMap((os) => VALIDATED_PYTHON_VERSIONS.map((version) => status[os]['cpu'][version]));
+  const gpuStatuses = osOptions.flatMap((os) => VALIDATED_PYTHON_VERSIONS.map((version) => status[os]['gpu'][version]));
   const showGPU = false;
+  const tableStyle: CSSProperties & { '--num-python-versions': number; '--num-devices': number } = {
+    '--num-python-versions': VALIDATED_PYTHON_VERSIONS.length,
+    '--num-devices': showGPU ? 2 : 1,
+  };
 
   return (
-    <div className="status-table spark-font-75">
+    <div className="status-table spark-font-75" style={tableStyle}>
       <div className="cpu-device-header device-header">
         <div className="cell">CPU</div>
       </div>

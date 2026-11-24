@@ -1,85 +1,112 @@
-import sys
+import math
+from pathlib import Path
+
 import cv2
 import numpy as np
-import math
-
-from PIL import Image, ImageDraw, ImageFont
-import copy
-from shapely.geometry import Polygon
 import pyclipper
-import string
+import yaml
+from PIL import Image, ImageDraw, ImageFont
+from shapely.geometry import Polygon
 
 
-def DetResizeForTest(data):
-    img = data["image"]
-    src_h, src_w, _ = img.shape
+def _read_yaml(config_path):
+    return yaml.safe_load(Path(config_path).read_text(encoding="utf-8"))
 
-    ####resize image to a size multiple of 32 which is required by the network args:
-    ###img(array): array with shape [h, w, c]
 
-    limit_side_len = 960
-    h, w, c = img.shape
+def _transform_op(config, name):
+    for op in config["PreProcess"]["transform_ops"]:
+        if name in op:
+            return op[name] or {}
+    return {}
 
-    # limit the max side
-    if max(h, w) > limit_side_len:
-        if h > w:
-            ratio = float(limit_side_len) / h
-        else:
-            ratio = float(limit_side_len) / w
+
+def load_det_config(config_path):
+    """
+    Read text detection pre- and post-processing parameters from the model's inference.yml.
+
+    `DetResizeForTest` is empty in the PP-OCRv6 inference.yml, so its PaddleOCR defaults are used
+    (limit_side_len=736, limit_type="min", max_side_limit=4000).
+    """
+    config = _read_yaml(config_path)
+    normalize = _transform_op(config, "NormalizeImage")
+    resize = _transform_op(config, "DetResizeForTest")
+    scale = normalize.get("scale", 1.0 / 255.0)
+    if isinstance(scale, str):
+        numerator, denominator = scale.split("/")
+        scale = float(numerator) / float(denominator)
+    post = config["PostProcess"]
+    return {
+        "mean": np.array(normalize.get("mean", [0.485, 0.456, 0.406]), dtype=np.float32),
+        "std": np.array(normalize.get("std", [0.229, 0.224, 0.225]), dtype=np.float32),
+        "scale": float(scale),
+        "limit_side_len": resize.get("limit_side_len", 736),
+        "limit_type": resize.get("limit_type", "min"),
+        "max_side_limit": resize.get("max_side_limit", 4000),
+        "thresh": post.get("thresh", 0.3),
+        "box_thresh": post.get("box_thresh", 0.6),
+        "unclip_ratio": post.get("unclip_ratio", 1.5),
+        "max_candidates": post.get("max_candidates", 1000),
+    }
+
+
+def load_rec_config(config_path):
+    """
+    Read the text recognition input shape and the CTC character list from the model's inference.yml.
+    The character list starts with the CTC blank token and ends with a space.
+    """
+    config = _read_yaml(config_path)
+    image_shape = _transform_op(config, "RecResizeImg").get("image_shape", [3, 48, 320])
+    characters = [str(character) for character in config["PostProcess"]["character_dict"]]
+    if " " not in characters:
+        characters.append(" ")
+    return {"image_shape": list(image_shape), "character_list": ["blank"] + characters}
+
+
+def DetResizeForTest(img, limit_side_len=736, limit_type="min", max_side_limit=4000):
+    """
+    Resize an image for text detection, keeping the aspect ratio. Both sides become multiples of 32.
+
+    Returns the resized image and the [src_h, src_w, ratio_h, ratio_w] shape array.
+    """
+    h, w = img.shape[:2]
+    if limit_type == "max":
+        ratio = float(limit_side_len) / max(h, w) if max(h, w) > limit_side_len else 1.0
     else:
-        ratio = 1.0
-
-    resize_h = int(h * ratio)
-    resize_w = int(w * ratio)
-
+        ratio = float(limit_side_len) / min(h, w) if min(h, w) < limit_side_len else 1.0
+    resize_h, resize_w = int(h * ratio), int(w * ratio)
+    if max_side_limit is not None and max(resize_h, resize_w) > max_side_limit:
+        ratio = float(max_side_limit) / max(resize_h, resize_w)
+        resize_h, resize_w = int(resize_h * ratio), int(resize_w * ratio)
     resize_h = max(int(round(resize_h / 32) * 32), 32)
     resize_w = max(int(round(resize_w / 32) * 32), 32)
-
-    try:
-        if int(resize_w) <= 0 or int(resize_h) <= 0:
-            return None, (None, None)
-        img = cv2.resize(img, (int(resize_w), int(resize_h)))
-    except:
-        print(img.shape, resize_w, resize_h)
-        sys.exit(0)
-    ratio_h = resize_h / float(h)
-    ratio_w = resize_w / float(w)
-
-    data["image"] = img
-    data["shape"] = np.array([src_h, src_w, ratio_h, ratio_w])
-    return data
+    img = cv2.resize(img, (resize_w, resize_h))
+    return img, np.array([h, w, resize_h / float(h), resize_w / float(w)])
 
 
-def NormalizeImage(data):
-    """normalize image such as substract mean, divide std"""
+def letterbox(img, size):
+    """
+    Resize an image into a fixed `size` x `size` canvas, keeping the aspect ratio (static input shape).
+    The image is placed in the top-left corner.
 
-    scale = 1.0 / 255.0
-    mean = [0.485, 0.456, 0.406]
-    std = [0.229, 0.224, 0.225]
-
-    shape = (1, 1, 3)
-    mean = np.array(mean).reshape(shape).astype("float32")
-    std = np.array(std).reshape(shape).astype("float32")
-
-    img = data["image"]
-    from PIL import Image
-
-    if isinstance(img, Image.Image):
-        img = np.array(img)
-
-    assert isinstance(img, np.ndarray), "invalid input 'img' in NormalizeImage"
-    data["image"] = (img.astype("float32") * scale - mean) / std
-    return data
+    Returns the resized image and its (height, width) inside the canvas.
+    """
+    h, w = img.shape[:2]
+    scale = size / max(h, w)
+    resize_h, resize_w = max(1, int(round(h * scale))), max(1, int(round(w * scale)))
+    return cv2.resize(img, (resize_w, resize_h)), (resize_h, resize_w)
 
 
-def unclip(box):
-    unclip_ratio = 2.0
+def NormalizeImage(img, mean, std, scale=1.0 / 255.0):
+    """Normalize an HWC image: (img * scale - mean) / std."""
+    return (img.astype(np.float32) * scale - mean) / std
+
+
+def unclip(box, unclip_ratio):
     poly = Polygon(box)
     distance = poly.area * unclip_ratio / poly.length
     offset = pyclipper.PyclipperOffset()
     offset.AddPath(box, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
-    expanded = np.array(offset.Execute(distance))
-    return expanded
+    return offset.Execute(distance)
 
 
 def get_mini_boxes(contour):
@@ -122,23 +149,21 @@ def box_score_fast(bitmap, _box):
     return cv2.mean(bitmap[ymin : ymax + 1, xmin : xmax + 1], mask)[0]
 
 
-def boxes_from_bitmap(pred, _bitmap, dest_width, dest_height):
+def boxes_from_bitmap(pred, _bitmap, dest_width, dest_height, box_thresh=0.6, unclip_ratio=1.5, max_candidates=1000):
     """
-    _bitmap: single map with shape (1, H, W),
-            whose values are binarized as {0, 1}
+    DBPostProcess: convert the binarized probability map into text boxes in source image coordinates.
+
+    pred: probability map with shape (H, W)
+    _bitmap: binarized map with shape (H, W), values {0, 1}
     """
 
     bitmap = _bitmap
     height, width = bitmap.shape
 
     outs = cv2.findContours((bitmap * 255).astype(np.uint8), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    if len(outs) == 3:
-        img, contours, _ = outs[0], outs[1], outs[2]
-    elif len(outs) == 2:
-        contours, _ = outs[0], outs[1]
+    contours = outs[1] if len(outs) == 3 else outs[0]
 
-    num_contours = min(len(contours), 1000)
-    score_mode = "fast"
+    num_contours = min(len(contours), max_candidates)
 
     boxes = []
     scores = []
@@ -148,23 +173,22 @@ def boxes_from_bitmap(pred, _bitmap, dest_width, dest_height):
         if sside < 3:
             continue
         points = np.array(points)
-        if score_mode == "fast":
-            score = box_score_fast(pred, points.reshape(-1, 2))
-        else:
-            score = box_score_slow(pred, contour)
-        if 0.7 > score:
+        score = box_score_fast(pred, points.reshape(-1, 2))
+        if box_thresh > score:
             continue
 
-        box = unclip(points).reshape(-1, 1, 2)
-        box, sside = get_mini_boxes(box)
+        expanded = unclip(points, unclip_ratio)
+        if len(expanded) != 1:
+            continue
+        box, sside = get_mini_boxes(np.array(expanded[0]).reshape(-1, 1, 2))
         if sside < 3 + 2:
             continue
         box = np.array(box)
         box[:, 0] = np.clip(np.round(box[:, 0] / width * dest_width), 0, dest_width)
         box[:, 1] = np.clip(np.round(box[:, 1] / height * dest_height), 0, dest_height)
-        boxes.append(box.astype(np.int16))
+        boxes.append(box.astype(np.int32))
         scores.append(score)
-    return np.array(boxes, dtype=np.int16), scores
+    return np.array(boxes, dtype=np.int32).reshape(-1, 4, 2), scores
 
 
 def filter_tag_det_res(dt_boxes, image_shape):
@@ -274,148 +298,31 @@ def get_rotate_crop_image(img, points):
     )
     dst_img_height, dst_img_width = dst_img.shape[0:2]
     if dst_img_height * 1.0 / dst_img_width >= 1.5:
-        dst_img = np.rot90(dst_img)
+        dst_img = np.ascontiguousarray(np.rot90(dst_img))
     return dst_img
 
 
-## Postprocessing for recognition
-postprocess_params = {
-    "name": "CTCLabelDecode",
-    "character_type": "ch",
-    "character_dict_path": "./fonts/rec_char_dict.txt",
-    "use_space_char": True,
-}
+class CTCLabelDecode:
+    """Convert CTC recognition model output into text and confidence."""
 
+    def __init__(self, character_list):
+        # character_list[0] is the CTC blank token
+        self.character = character_list
 
-class BaseRecLabelDecode(object):
-    """Convert between text-label and text-index"""
-
-    def __init__(self, character_dict_path=None, character_type="ch", use_space_char=False):
-        support_character_type = [
-            "ch",
-            "en",
-            "EN_symbol",
-            "french",
-            "german",
-            "japan",
-            "korean",
-            "it",
-            "xi",
-            "pu",
-            "ru",
-            "ar",
-            "ta",
-            "ug",
-            "fa",
-            "ur",
-            "rs",
-            "oc",
-            "rsc",
-            "bg",
-            "uk",
-            "be",
-            "te",
-            "ka",
-            "chinese_cht",
-            "hi",
-            "mr",
-            "ne",
-            "EN",
-            "latin",
-            "arabic",
-            "cyrillic",
-            "devanagari",
-        ]
-        assert character_type in support_character_type, "Only {} are supported now but get {}".format(support_character_type, character_type)
-
-        self.beg_str = "sos"
-        self.end_str = "eos"
-
-        if character_type == "en":
-            self.character_str = "0123456789abcdefghijklmnopqrstuvwxyz"
-            dict_character = list(self.character_str)
-        elif character_type == "EN_symbol":
-            # same with ASTER setting (use 94 char).
-            self.character_str = string.printable[:-6]
-            dict_character = list(self.character_str)
-        elif character_type in support_character_type:
-            self.character_str = []
-            assert character_dict_path is not None, "character_dict_path should not be None when character_type is {}".format(character_type)
-            with open(character_dict_path, "rb") as fin:
-                lines = fin.readlines()
-                for line in lines:
-                    line = line.decode("utf-8").strip("\n").strip("\r\n")
-                    self.character_str.append(line)
-            if use_space_char:
-                self.character_str.append(" ")
-            dict_character = list(self.character_str)
-        else:
-            raise NotImplementedError
-        self.character_type = character_type
-        dict_character = self.add_special_char(dict_character)
-        self.dict = {}
-        for i, char in enumerate(dict_character):
-            self.dict[char] = i
-        self.character = dict_character
-
-    def add_special_char(self, dict_character):
-        return dict_character
-
-    def decode(self, text_index, text_prob=None, is_remove_duplicate=False):
-        """convert text-index into text-label."""
-        result_list = []
-        ignored_tokens = self.get_ignored_tokens()
-        batch_size = len(text_index)
-        for batch_idx in range(batch_size):
-            char_list = []
-            conf_list = []
-            for idx in range(len(text_index[batch_idx])):
-                if text_index[batch_idx][idx] in ignored_tokens:
-                    continue
-                if is_remove_duplicate:
-                    # only for predict
-                    if idx > 0 and text_index[batch_idx][idx - 1] == text_index[batch_idx][idx]:
-                        continue
-                char_list.append(self.character[int(text_index[batch_idx][idx])])
-                if text_prob is not None:
-                    conf_list.append(text_prob[batch_idx][idx])
-                else:
-                    conf_list.append(1)
-            text = "".join(char_list)
-            result_list.append((text, np.mean(conf_list)))
-        return result_list
-
-    def get_ignored_tokens(self):
-        return [0]  # for ctc blank
-
-
-class CTCLabelDecode(BaseRecLabelDecode):
-    """Convert between text-label and text-index"""
-
-    def __init__(self, character_dict_path=None, character_type="ch", use_space_char=False, **kwargs):
-        super(CTCLabelDecode, self).__init__(character_dict_path, character_type, use_space_char)
-
-    def __call__(self, preds, label=None, *args, **kwargs):
-        if hasattr(preds, "numpy"):
-            preds = preds.numpy()
+    def __call__(self, preds):
         preds_idx = preds.argmax(axis=2)
         preds_prob = preds.max(axis=2)
-        text = self.decode(preds_idx, preds_prob, is_remove_duplicate=True)
-        if label is None:
-            return text
-        label = self.decode(label)
-        return text, label
-
-    def add_special_char(self, dict_character):
-        dict_character = ["blank"] + dict_character
-        return dict_character
-
-
-def build_post_process(config):
-    config = copy.deepcopy(config)
-    module_name = config.pop("name")
-    module_class = eval(module_name)(**config)
-    return module_class
+        result_list = []
+        for text_index, text_prob in zip(preds_idx, preds_prob):
+            # remove repeated tokens and the blank token
+            selection = np.ones(len(text_index), dtype=bool)
+            selection[1:] = text_index[1:] != text_index[:-1]
+            selection &= text_index != 0
+            char_list = [self.character[int(index)] for index in text_index[selection]]
+            conf_list = text_prob[selection]
+            text = "".join(char_list)
+            result_list.append((text, float(np.mean(conf_list)) if len(conf_list) else 0.0))
+        return result_list
 
 
 def draw_ocr_box_txt(image, boxes, txts, scores=None, drop_score=0.5, font_path="./fonts/simfang.ttf"):
@@ -429,6 +336,7 @@ def draw_ocr_box_txt(image, boxes, txts, scores=None, drop_score=0.5, font_path=
     for idx, (box, txt) in enumerate(zip(boxes, txts)):
         if scores is not None and scores[idx] < drop_score:
             continue
+        box = [tuple(int(value) for value in point) for point in box]
         color = (
             np.random.randint(0, 255),
             np.random.randint(0, 255),

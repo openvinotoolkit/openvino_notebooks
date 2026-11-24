@@ -44,6 +44,7 @@ ASPP
 ASR
 asr
 ASRModel
+ASRPipeline
 AST
 AST
 ASYM
@@ -107,7 +108,6 @@ BMP
 boolean
 builtins
 ByteDance
-CatVTON
 CausVid
 CentOS
 centric
@@ -141,6 +141,7 @@ CLIP's
 ClipBasedHeadEstimator
 CLS
 CMs
+CMVN
 cmu
 CNNs
 codebase
@@ -169,6 +170,7 @@ Conv
 conv
 ConvE
 conve
+Convai
 ConvNet
 ConvNets
 ConvNext
@@ -258,6 +260,7 @@ Dettmers
 dev
 DFL
 DFlash
+DSpark
 dGPU
 dGPUs
 DialoGPT
@@ -373,6 +376,7 @@ Frontend
 frontend
 FSQ
 FunASR
+FunAudioLLM
 FX
 GAN
 Gante
@@ -412,6 +416,7 @@ gpu
 GPU's
 GPUs
 GQA
+GSM
 Gradio
 gradio
 grapheme
@@ -503,10 +508,12 @@ invertible
 io
 IoU
 ip
+IPEX
 IPs
 ipynb
 ir
 IRs
+ITN
 iteratively
 Javascript
 JAX
@@ -572,6 +579,8 @@ laion
 LangChain
 langchain
 LangChain's
+Laya
+laya
 Lasinger
 latents
 LaTeX
@@ -692,6 +701,8 @@ MLLMs
 MLP
 MLS
 MMB
+mmBERT
+ModernBERT
 MMDiT
 mms
 MMS
@@ -774,6 +785,7 @@ nonlinearity
 normalises
 Notus
 notus
+noul
 npoints
 npu
 NPU
@@ -1047,6 +1059,8 @@ riffusion
 Rinna
 rinna
 RLE
+RL
+RLCD
 RLHF
 RMBG
 RMS
@@ -1098,6 +1112,9 @@ segmenter
 Segmind
 segmind
 selfattention
+SentencePiece
+SenseVoice
+SenseVoiceSmall
 serializable
 sft
 SGD
@@ -1129,6 +1146,7 @@ SongGen
 SOTA
 SoTA
 soundfile
+SoundFile
 Sovits
 Sparisty
 sparsified
@@ -1176,6 +1194,7 @@ subdirectory
 submodels
 subgraph
 subgraphs
+subfolder
 sublicense
 subpackage
 subprocesses
@@ -1230,6 +1249,7 @@ Tongyi
 toolkits
 torchaudio
 TorchDynamo
+TorchAudio
 torchdynamo
 TorchFX
 TorchMetrics
@@ -1280,6 +1300,7 @@ upsample
 upsampled
 upsamples
 upsampling
+upstreamed
 Upscaled
 upscaled
 upscaler
