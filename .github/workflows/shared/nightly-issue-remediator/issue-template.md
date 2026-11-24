@@ -45,7 +45,12 @@ Related signatures: <comma-separated backtick-quoted covered signatures, or none
 
 <A concrete action for a maintainer, such as a specific file and change to try, an upstream component to report to, or a command to reproduce the failure.>
 
-## AI self-improvement
+<details>
+<summary>AI self-improvement</summary>
+
+### Suggestions for future runs
+
+- **Future-run improvements:** <One to three concrete, conditional improvements derived from this investigation and the suggested remedy or blocker: which evidence to collect first, detection/grouping signal to use, check to add or prioritize, or ineffective approach to avoid. Cite supporting evidence and state when each suggestion applies and what remains unverified. These are proposals for later runs, not permission to change workflow safeguards.>
 
 ### Before investigation
 
@@ -55,4 +60,6 @@ Related signatures: <comma-separated backtick-quoted covered signatures, or none
 ### After investigation
 
 - **Self-assessment:** <What the investigation established, ruled out or could not verify, including why no safe fix was possible.>
-- **Reusable lesson:** <One conditional evidence-backed observation for future investigations, including its limitations.>
+- **Reusable lesson:** <The highest-value future-run improvement to retain in memory, with its applicability condition, supporting evidence and limitations.>
+
+</details>

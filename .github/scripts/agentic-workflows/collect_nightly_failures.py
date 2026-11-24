@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pre-agent step of the nightly issue remediator (no AI, stdlib + the `gh` CLI).
 
-Downloads the `nightly-dashboard-data` report of a `treon_nightly` run, groups the failures by error signature, drops groups that already
+Downloads the `nightly-dashboard-data` report of a `treon_nightly` run, groups evidence-equivalent failures for remediation, drops groups that already
 have an open (or recently rejected) remediation PR/issue, ranks the rest, downloads the raw logs of the most representative failures
 and writes a digest that the agent reads instead of calling GitHub itself.
 
@@ -13,7 +13,7 @@ Digest layout (`--out`):
   summary.md     entry point: run, ranked groups, already tracked and deferred groups
   run.json       run metadata from the report
   tracked.json   remediation PRs/issues found per error signature
-  feedback.md / feedback.json  bounded prior outcome feedback, head checks and cross-signature learning
+  feedback.md / feedback.json  learning sections from all fetched tracked outcomes, bounded rich feedback/head checks, memory lessons
   groups/NN-<signature>/group.md    evidence of one error group: where it starts, earlier knowledge base notes, affected notebooks, history, versions, excerpts
   groups/NN-<signature>/group.json  the same in machine-readable form
   groups/NN-<signature>/logs/       raw treon logs of representative failures (or job log extracts for infra groups)
@@ -110,6 +110,7 @@ def collect(args: argparse.Namespace, out: Path, warnings: List[str], now: Optio
             "run_url": ctx.run.get("url"),
             "failures_total": len(report.get("failures") or []),
             "error_groups_total": sum(1 for g in groups if g.kind == "error"),
+            "report_error_groups_total": len({f["signature"] for f in report.get("failures") or [] if f.get("signature")}),
             "infra_groups_total": sum(1 for g in groups if g.kind == "infra"),
             "infra_notebooks_not_run": sum(len(g.members) for g in groups if g.kind == "infra"),
             "groups_selected": 0,

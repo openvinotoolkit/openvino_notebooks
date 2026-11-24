@@ -139,6 +139,10 @@ def render_group(ctx: Context, digest: GroupDigest, previous: List[Night]) -> st
     add("| Field | Value |")
     add("|---|---|")
     add(f"| Error signature | `{group.signature}` |")
+    if group.grouping_reason:
+        add(f"| Grouping evidence | {cell(group.grouping_reason, 400)} |")
+        add(f"| Original report signatures | {', '.join(f'`{s}`' for s in group.source_signatures)} |")
+        add(f"| Related signatures for tracking | {', '.join(f'`{s}`' for s in group.related_signatures) or 'none (original signatures are ambiguous)'} |")
     add(f"| Kind / category / class | {group.kind} / {group.category} / {group.error_class} |")
     add(f"| Error | {cell(group.headline, 300)} |")
     add(f"| Size | {len(group.members)} failing (notebook, config) pairs, {len(group.notebooks)} notebooks, {len(group.configs)} configs |")
@@ -175,7 +179,7 @@ def render_group(ctx: Context, digest: GroupDigest, previous: List[Night]) -> st
     add("## History")
     add("")
     if len(digest.history) > 1:
-        add("Counts are (notebook, config) pairs of this group. `Same error` = failed with this signature that night.")
+        add("Counts are (notebook, config) pairs of this group. `Same error` = failed with this remediation identity that night.")
         add("")
         add("| Night | Run | Conclusion | Same error | Passed | Other failure | Not run / absent | Commit | Docker tag |")
         add("|---|---|---|---|---|---|---|---|---|")
@@ -278,12 +282,12 @@ def render_error_start(ctx: Context, digest: GroupDigest, out: List[str]) -> Non
     if others > 0 or len(digest.group.members) > 1:
         add("### All failing pairs")
         add("")
-        add("| Notebook | Config | Status | Cell | Job |")
-        add("|---|---|---|---|---|")
+        add("| Notebook | Config | Report signature | Status | Cell | Job |")
+        add("|---|---|---|---|---|---|")
         for member in sorted(digest.group.members, key=lambda m: (m.notebook, m.config_id)):
             failure = member.failure or {}
             add(
-                f"| `{repo_path(member.notebook)}` | `{member.config_id}` | {member.status} | {failure.get('cell_index', '')} | {link(str(member.job_id), (failure.get('links') or {}).get('job'))} |"
+                f"| `{repo_path(member.notebook)}` | `{member.config_id}` | `{failure.get('signature', '')}` | {member.status} | {failure.get('cell_index', '')} | {link(str(member.job_id), (failure.get('links') or {}).get('job'))} |"
             )
         add("")
 
@@ -332,12 +336,16 @@ def group_to_json(ctx: Context, digest: GroupDigest) -> dict:
                 "job_id": member.job_id,
                 "not_run_reason": member.not_run_reason,
                 "cell_index": failure.get("cell_index"),
+                "signature": failure.get("signature"),
                 "links": failure.get("links"),
             }
         )
     return {
         "index": digest.index,
         "signature": group.signature,
+        "related_signatures": group.related_signatures,
+        "source_signatures": group.source_signatures,
+        "grouping_reason": group.grouping_reason,
         "kind": group.kind,
         "category": group.category,
         "error_class": group.error_class,
@@ -432,6 +440,12 @@ def render_summary(
         + (f" (jobs failed before tests: {infra.get('jobs_failed_before_tests')}, infra failure rate: {infra.get('infra_failure_rate')})" if infra else "")
     )
     add(f"- Result: {status['reason']}")
+    if status.get("report_error_groups_total") != status["error_groups_total"] and "report_error_groups_total" in status:
+        add(
+            f"- Grouping: {status['report_error_groups_total']} original report signatures consolidated into {status['error_groups_total']} remediation groups."
+        )
+    if any(d.group.grouping_reason for d in digests):
+        add("- Grouping evidence and original report signatures are in each `group.md`/`group.json`; all affected pairs are retained.")
     add("")
     if digests:
         add("Before investigating, read `feedback.md`: bounded prior PR/issue feedback and cross-signature memory lessons.")

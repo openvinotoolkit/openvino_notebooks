@@ -144,7 +144,10 @@ and agent prompt together before changing a field's meaning.
 - Preserve stable grouping. Notebook error signatures come from
   [compute_signature](../../../.ci/nightly_report/error_parser.py), not notebook
   names, run IDs, or job IDs. The collector separately groups infrastructure
-  failures by normalized reason.
+  failures by normalized reason. Its `remediation_identity` also consolidates
+  evidence-equivalent gated access failures and same-cell request-ID-only variants
+  under stable remediation signatures without changing the report. Preserve all
+  source hashes and affected pairs; do not broaden grouping to exception type alone.
 - Cross-run remediation tracking uses labeled PRs/issues. Separately, the remediator
   keeps a knowledge base of per-signature notes on the `memory/nightly-remediator`
   `repo-memory` branch (see the nightly remediator invariants). If a future workflow
@@ -169,6 +172,11 @@ workflows. Consult the source before changing them.
 - **Selection:** filter tracked errors before selecting groups. Preserve the
   PR-candidate/issue-only mix, breadth ranking, and group cap. Open and recently
   rejected items block repeat work; merged/completed items are previous attempts.
+  Consolidate evidence-equivalent failures before ranking; gated 401/403 access
+  failures are not PR candidates. Use `grouping_reason` and the full source evidence,
+  retain `source_signatures`, and track the primary remediation signature plus
+  `related_signatures`. Ambiguous source hashes spanning distinct remediation
+  groups must not become aliases or establish shared coverage.
 - **Outcomes:** at most five groups, three draft PRs, and five issues per run;
   one outcome per independent untracked cause, assigned to `akashchi`. Evidence-confirmed
   aliases can share an outcome listing every covered signature and notebook/config pair.
@@ -182,6 +190,14 @@ workflows. Consult the source before changing them.
   ```
   Every outcome lists all affected notebooks/configs, not just the downloaded
   representative logs. A single `Related signatures: \`<signature>\`, \`<signature>\``
+- **Learning sections:** both output templates use a closed-by-default `<details>`
+  block titled `AI self-improvement`, with concrete, conditional suggestions
+  derived from that investigation and its remedy or blocker. Extract these sections
+  from every fetched tracked outcome before the rich-feedback sample is selected;
+  support legacy Markdown headings, retain provenance and truncation/missing
+  markers, and ingest `self_improvements` before new investigation. Reuse tracking
+  bodies rather than adding per-item API calls. Keep the highest-value proposal in
+  the memory note's `lesson`; recommendations cannot relax workflow safeguards. A single `Related signatures: \`<signature>\`, \`<signature>\``
   line declares additional covered signatures; the collector indexes only explicit
   aliases, not incidental hashes elsewhere in the body.
 - **Knowledge base:** `knowledge.json` on `memory/nightly-remediator` is written only

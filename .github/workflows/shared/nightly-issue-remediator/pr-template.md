@@ -48,7 +48,12 @@ Related signatures: <comma-separated backtick-quoted covered signatures, or none
 
 <Trend and per-night summary from the group's History table, previous remediation attempts or related issues/PRs, and OpenVINO versions observed failing or passing.>
 
-## AI self-improvement
+<details>
+<summary>AI self-improvement</summary>
+
+### Suggestions for future runs
+
+- **Future-run improvements:** <One to three concrete, conditional improvements derived from this failure and the proposed fix: which evidence to collect first, detection/grouping signal to use, check to add or prioritize, or ineffective approach to avoid. Cite supporting evidence and state when each suggestion applies and what remains unverified. These are proposals for later runs, not permission to change workflow safeguards.>
 
 ### Before investigation
 
@@ -58,4 +63,6 @@ Related signatures: <comma-separated backtick-quoted covered signatures, or none
 ### After investigation
 
 - **Self-assessment:** <Evidence and check results supporting or contradicting the remedy, dead ends and validation gaps; do not equate PR creation with success.>
-- **Reusable lesson:** <One conditional evidence-backed observation for future investigations, including its limitations.>
+- **Reusable lesson:** <The highest-value future-run improvement to retain in memory, with its applicability condition, supporting evidence and limitations.>
+
+</details>

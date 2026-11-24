@@ -1,14 +1,21 @@
 ### Before new investigations
 
 Read `feedback.md`, `tracked.json`, and the selected-group summaries before
-investigating new failures. The deterministic collector refreshes a bounded sample
-of earlier labeled PRs/issues, comments, reviews, changed paths and head checks, and
-includes recent lessons from memory. Spend at most **8 tool calls, including
+investigating new failures. Ingest the `self_improvements` collection in
+`feedback.md` / `feedback.json`: it contains the learning section from every unique
+PR/issue in fetched labeled tracking history, not just the rich-feedback sample.
+The collector reads both collapsed `<details><summary>AI self-improvement</summary>`
+sections and legacy Markdown headings, retaining source URLs and flagging missing
+or truncated sections. Its existing completed-history bounds still apply.
+The collector also refreshes a bounded sample of comments, reviews, changed paths
+and head checks, and includes recent lessons from memory. Spend at most **8 tool calls, including
 4 file reads and 3 searches**, on this run-wide preflight. It is not a second
 investigation of every historical item. Relevant follow-ups count against the
 normal per-group budget.
 
-1. Compare previous claims with observed outcomes. Distinguish useful evidence,
+1. Read the prior future-run suggestions before starting new investigations, and
+   compare their claims with observed outcomes. Do not rely only on `items`, the
+   smaller rich-feedback sample. Distinguish useful evidence,
    ineffective or duplicate actions, and unknown results. Open/unreviewed means
    unvalidated; merged/closed alone does not mean fixed. Attribute maintainer
    feedback using its source URL and association, and check whether it still
@@ -35,16 +42,25 @@ normal per-group budget.
 Reassess the investigation when its evidence gathering and any permitted fix
 attempt are complete. Fill the **AI self-improvement** section of the PR/issue
 body and write the matching knowledge note **before calling the safe output**;
-the runtime can terminate after `create_pull_request`. Record:
+the runtime can terminate after `create_pull_request`. Keep the section inside the
+template's `<details>` block with `<summary>AI self-improvement</summary>` and no
+`open` attribute, so it is hidden by default and expandable. Record:
 
+- **Future-run improvements:** one to three concrete suggestions derived from this
+  failure, the investigation, and the proposed fix or reason it was blocked. Give
+  an applicability condition, supporting evidence, and a specific improvement to
+  evidence collection, detection/grouping, check selection, or avoidance of a
+  demonstrated dead end. Explain unresolved validation rather than presenting a
+  proposed fix as proven. Do not write generic advice disconnected from this case.
 - **Prior feedback:** source URLs and observed results, or the evidence gap.
 - **Applied learning:** which lesson changed this investigation and why, or why
   prior advice was rejected as stale/inapplicable.
 - **Self-assessment:** what was supported, contradicted, or left unverified;
   actual checks and their scope, dead ends, and whether the remedy addresses the
   failure or merely improves diagnostics. A requested PR is not a proven fix.
-- **Reusable lesson:** one conditional, evidence-backed observation useful across
-  signatures, with remaining uncertainty; no unsupported generalizations.
+- **Reusable lesson:** the highest-value conditional future-run improvement,
+  with supporting evidence and remaining uncertainty; mirror this conclusion in
+  the knowledge note's `lesson` field for persistence on the memory branch.
 
 Preserve strong prior practice: trace secondary import errors to earlier install
 failures, check the entire pinned dependency chain across the affected OS/Python

@@ -86,6 +86,12 @@ class Group:
     exception_type: str
     exception_message: str
     members: List[Member] = field(default_factory=list)
+    related_signatures: List[str] = field(default_factory=list)
+    grouping_reason: str = ""
+
+    @property
+    def source_signatures(self) -> List[str]:
+        return sorted({m.failure["signature"] for m in self.members if m.failure and m.failure.get("signature")})
 
     @property
     def notebooks(self) -> List[str]:
@@ -114,6 +120,8 @@ class TrackedItem:
     created_at: str
     closed_at: Optional[str] = None
     updated_at: str = ""
+    self_improvement: str = ""
+    self_improvement_truncated: bool = False
 
     @property
     def label(self) -> str:
@@ -129,6 +137,8 @@ class TrackedItem:
             "created_at": self.created_at,
             "closed_at": self.closed_at,
             "updated_at": self.updated_at,
+            "self_improvement": self.self_improvement,
+            "self_improvement_truncated": self.self_improvement_truncated,
         }
 
 
