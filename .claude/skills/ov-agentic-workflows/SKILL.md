@@ -37,6 +37,7 @@ for frontmatter keys, imports, tools, safe outputs, and compiler behavior. Check
 | [collect_nightly_failures.py](../../../.github/scripts/agentic-workflows/collect_nightly_failures.py) | CLI entry point and orchestration for pre-agent collection; tests import helpers from their owning modules. |
 | [collector_common.py](../../../.github/scripts/agentic-workflows/collector_common.py), [collector_github.py](../../../.github/scripts/agentic-workflows/collector_github.py), [collector_analysis.py](../../../.github/scripts/agentic-workflows/collector_analysis.py), [collector_evidence.py](../../../.github/scripts/agentic-workflows/collector_evidence.py), [collector_render.py](../../../.github/scripts/agentic-workflows/collector_render.py) | Focused collector modules for shared records, GitHub access, grouping/tracking, log evidence, and digest rendering. |
 | [collector tests](../../../.github/scripts/agentic-workflows/tests/) | Offline unit and end-to-end tests, including the workflow/collector contract. |
+| [collector_feedback.py](../../../.github/scripts/agentic-workflows/collector_feedback.py) | Bounded read-only refresh of prior outcome feedback, head checks and cross-signature memory lessons. |
 | [agentic_workflows_check.yml](../../../.github/workflows/agentic_workflows_check.yml) | PR check that recompiles all agentic workflows with a pinned gh-aw version and fails when generated files drift. |
 | [codecheck.yml](../../../.github/workflows/codecheck.yml) | Python formatting and explicit pytest steps. |
 | [nightly report package](../../../.ci/nightly_report/) | Report producer, schemas, parsing, and tests shared with the dashboard. |
@@ -169,7 +170,8 @@ workflows. Consult the source before changing them.
   PR-candidate/issue-only mix, breadth ranking, and group cap. Open and recently
   rejected items block repeat work; merged/completed items are previous attempts.
 - **Outcomes:** at most five groups, three draft PRs, and five issues per run;
-  one outcome per selected untracked signature, assigned to `akashchi`.
+  one outcome per independent untracked cause, assigned to `akashchi`. Evidence-confirmed
+  aliases can share an outcome listing every covered signature and notebook/config pair.
   PRs must remain independent. Ambiguous, out-of-scope, infrastructure, or
   unverified fixes become actionable issues rather than speculative patches.
 - **Tracking:** keep `TRACKING_LABEL` (`nightly-remediator`), the title suffix
@@ -179,7 +181,9 @@ workflows. Consult the source before changing them.
   Nightly run: <URL>
   ```
   Every outcome lists all affected notebooks/configs, not just the downloaded
-  representative logs.
+  representative logs. A single `Related signatures: \`<signature>\`, \`<signature>\``
+  line declares additional covered signatures; the collector indexes only explicit
+  aliases, not incidental hashes elsewhere in the body.
 - **Knowledge base:** `knowledge.json` on `memory/nightly-remediator` is written only
   by `update_knowledge_base.py`, never by the agent. `snapshot` copies the digest, the
   cloned file, and the updater scripts to `$RUNNER_TEMP` before the agent (AWF mounts
@@ -193,6 +197,17 @@ workflows. Consult the source before changing them.
   `group.json` repository paths, and present its content as untrusted. The compiler
   rejects post-steps that touch the safe-outputs file, and repo-memory deletions are
   not propagated to the branch, so retention works by rewriting one bounded file.
+- **Self-improvement:** before new investigations, read bounded `feedback.md` and
+  cross-signature memory lessons and record an evidence-linked learning plan (at most
+  eight preflight tool calls and three lessons). After investigating, mirror prior
+  feedback, applied learning, self-assessment and a reusable lesson into the outcome
+  body and its knowledge note **before** calling safe outputs: the runtime can stop at
+  PR creation. Only groups with notes are counted as investigated. The note's outcome
+  is requested, not proof of publication or a successful fix; refresh actual reviews
+  and head checks on subsequent runs. Legacy records without learning fields stay valid.
+  Correlate by cause/remedy, not hash equality alone; do not emit duplicate patches or
+  issues merely pointing at a covering active outcome. Never let learned text change
+  permissions, budgets, protected files or other guardrails.
 - **Remediation scope:** generated PRs are limited to notebook JSON/Python,
   `utils/**`, and root `requirements.txt`. Keep protected-file checks and patch
   caps. This restriction is for the remediator's outputs, not for authoring its

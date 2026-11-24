@@ -13,6 +13,7 @@ Digest layout (`--out`):
   summary.md     entry point: run, ranked groups, already tracked and deferred groups
   run.json       run metadata from the report
   tracked.json   remediation PRs/issues found per error signature
+  feedback.md / feedback.json  bounded prior outcome feedback, head checks and cross-signature learning
   groups/NN-<signature>/group.md    evidence of one error group: where it starts, earlier knowledge base notes, affected notebooks, history, versions, excerpts
   groups/NN-<signature>/group.json  the same in machine-readable form
   groups/NN-<signature>/logs/       raw treon logs of representative failures (or job log extracts for infra groups)
@@ -37,6 +38,7 @@ from collector_github import check_schema, download_report, resolve_run
 from collector_analysis import build_groups, fetch_history, fetch_tracked, night_from_report, select_groups
 from collector_evidence import make_context
 from collector_knowledge import attach_knowledge, fetch_knowledge
+from collector_feedback import fetch_feedback, render_feedback
 from collector_render import build_digest, group_to_json, render_group, render_summary
 
 
@@ -132,6 +134,9 @@ def collect(args: argparse.Namespace, out: Path, warnings: List[str], now: Optio
         current = night_from_report(report)
         previous = fetch_history(args.source_repo, run, args.history_nights, workdir, warn)
         knowledge = fetch_knowledge(args.repo, warn)
+        feedback = fetch_feedback(args.repo, tracked, knowledge, warn)
+        write_json(out / "feedback.json", feedback)
+        (out / "feedback.md").write_text(render_feedback(feedback), encoding="utf-8")
         digests: List[GroupDigest] = []
         used_bytes = [0]
         for index, (group, decision) in enumerate(selected, start=1):

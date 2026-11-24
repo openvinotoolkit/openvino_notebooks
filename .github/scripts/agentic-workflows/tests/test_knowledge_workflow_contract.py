@@ -146,3 +146,15 @@ def test_workflow_steps_and_prompt_use_the_updater_cli_consistently():
     for name in kb.NOTE_FIELDS:
         assert f'"{name}"' in WORKFLOW.split("**Writing.**", 1)[1]
     assert "jq -r" in WORKFLOW and shell_command_allowed(LOCK, "jq")
+
+
+def test_learning_protocol_runs_before_investigation_and_reflects_before_publication():
+    relative = ".github/workflows/shared/nightly-issue-remediator/self-improvement.md"
+    assert f"{{{{#runtime-import? {relative}}}}}" in WORKFLOW
+    protocol = (REPO_ROOT / relative).read_text(encoding="utf-8")
+    assert WORKFLOW.index("## AI self-improvement") < WORKFLOW.index("## Bounded protocol")
+    assert "before starting new investigations" in protocol and "before calling the safe output" in protocol
+    assert "8 tool calls" in protocol and "3 applicable lessons" in protocol
+    assert "untrusted evidence" in protocol
+    for name in kb.LEARNING_FIELDS:
+        assert f'"{name}"' in WORKFLOW.split("**Writing.**", 1)[1]

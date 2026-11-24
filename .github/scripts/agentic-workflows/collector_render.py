@@ -102,8 +102,17 @@ def render_knowledge(digest: GroupDigest, out: List[str]) -> None:
             )
             confidence = f", confidence {attempt['confidence']}" if attempt["confidence"] else ""
             add(f"### {attempt['date']}: outcome `{attempt['outcome']}`{confidence}" + (f" ({links})" if links else ""))
-            fields = (("Root cause", "root_cause"), ("Action", "action"), ("Dead ends", "dead_ends"), ("Next step", "next_step"))
-            notes = [f"- {title}: {cell(attempt[name], 400)}" for title, name in fields if attempt[name]]
+            fields = (
+                ("Root cause", "root_cause"),
+                ("Action", "action"),
+                ("Dead ends", "dead_ends"),
+                ("Next step", "next_step"),
+                ("Prior feedback", "prior_feedback"),
+                ("Applied learning", "applied_learning"),
+                ("Self-assessment", "self_assessment"),
+                ("Reusable lesson", "lesson"),
+            )
+            notes = [f"- {title}: {cell(attempt[name], 400)}" for title, name in fields if attempt.get(name)]
             out.extend(notes or ["- No notes were recorded for this attempt."])
     if digest.related_knowledge:
         add("")
@@ -425,6 +434,8 @@ def render_summary(
     add(f"- Result: {status['reason']}")
     add("")
     if digests:
+        add("Before investigating, read `feedback.md`: bounded prior PR/issue feedback and cross-signature memory lessons.")
+        add("")
         add(f"## Selected for remediation (at most {args.max_groups} groups per run; groups a PR can plausibly fix come first; handle them in this order)")
         add("")
         add("| # | Signature | Kind | Class | Hint | Error | Notebooks | Pairs | Trend | Earlier notes | Evidence |")

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import zipfile
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
@@ -95,6 +96,18 @@ def extract_signature(*texts: Optional[str]) -> Optional[str]:
         if match:
             return match.group(1).lower()
     return None
+
+
+def extract_signatures(title: Optional[str], body: Optional[str]) -> List[str]:
+    """The primary signature plus explicitly declared aliases, never incidental hashes in history or logs."""
+    primary = extract_signature(title, body)
+    signatures = [primary] if primary else []
+    declarations = [line.removeprefix("Related signatures: ") for line in (body or "").splitlines() if line.startswith("Related signatures: ")]
+    if len(declarations) == 1:
+        aliases = declarations[0].strip().split(",")
+        if len(aliases) <= 9 and all(re.fullmatch(r"`?[0-9a-f]{12}`?", alias.strip()) for alias in aliases):
+            signatures.extend(alias.strip().strip("`") for alias in aliases)
+    return list(dict.fromkeys(signatures)) if primary else []
 
 
 def item_state(kind: str, raw: dict) -> str:
@@ -199,8 +212,7 @@ def fetch_tracked(repo: str, warn: Callable[[str], None], now: Optional[datetime
                     if key in seen:
                         continue
                     seen.add(key)
-                    signature = extract_signature(raw.get("title"), raw.get("body"))
-                    if signature:
+                    for signature in extract_signatures(raw.get("title"), raw.get("body")):
                         tracked[signature].append(
                             TrackedItem(
                                 kind,
@@ -211,6 +223,7 @@ def fetch_tracked(repo: str, warn: Callable[[str], None], now: Optional[datetime
                                 signature,
                                 raw.get("createdAt", ""),
                                 raw.get("closedAt") or raw.get("mergedAt"),
+                                raw.get("updatedAt", ""),
                             )
                         )
                 # A recent rejection must have an updatedAt after the cutoff.
