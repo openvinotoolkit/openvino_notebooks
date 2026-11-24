@@ -777,6 +777,37 @@
     "notebooks/qwen-image-2.1/qwen-image-2.1.ipynb"
    ]
   },
+  "946ce8bb354c": {
+   "attempts": [
+    {
+     "action": "Filed one issue with evidence and a reproduction plan; no code change because no deterministic local defect was found and a pin could not be verified.",
+     "applied_learning": "Applied the dependency-chain check across configs: compared failing win py3.11 with passing win py3.12 package sets before deciding.",
+     "confidence": "low",
+     "date": "2026-11-24",
+     "dead_ends": "A version pin does not help: nncf 3.4.0 supports Python 3.10+ and dependency wheels exist for win cp311; the report log omits pip stderr so the install error is not observed.",
+     "lesson": "When a dependency is missing but the install cell ran, compare package sets with the passing sibling config and capture %pip stderr before pinning; silent %pip failures need log capture in the nightly report.",
+     "next_step": "Re-run on windows py3.11 and capture the output of the %pip install cell; if it recurs, check pip output for the nncf dependency set (scikit-learn, scipy, ninja).",
+     "nightly_run_id": 45296700602,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45296700602",
+     "outcome": "issue",
+     "prior_feedback": "none available: no earlier outcome for this signature and feedback self_improvements are empty.",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45382753995",
+     "root_cause": "unknown: nncf (3.4.0 has py3-none-any wheel and win cp311 wheels for its deps) is absent from the Windows py3.11 venv although the install cell ran; the same notebook passed on win py3.12 and passed py3.11 on previous nights; a failing %pip cell does not raise in a notebook, so a silent or transient install failure is suspected.",
+     "self_assessment": "Supported: nncf missing in failing env only. Unverified: why the install did not land; no end-to-end execution possible here (no Windows runner)."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "dependency",
+   "exception_type": "ModuleNotFoundError",
+   "first_seen": "2026-11-24",
+   "headline": "ModuleNotFoundError: No module named 'nncf'",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-24",
+   "notebooks": [
+    "notebooks/yolov11-optimization/yolov11-keypoint-detection.ipynb"
+   ]
+  },
   "a055acee5cc0": {
    "attempts": [
     {
@@ -800,6 +831,37 @@
    "investigations": 1,
    "kind": "error",
    "last_seen": "2026-11-18",
+   "notebooks": [
+    "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
+   ]
+  },
+  "a46c3c663220": {
+   "attempts": [
+    {
+     "action": "No new PR or issue: open PR https://github.com/openvinotoolkit/openvino_notebooks/pull/3881 (sig f30731155e82) already covers this failure; the refused file name changes the signature nightly.",
+     "applied_learning": "Applied the memory lesson that PR 3881 covers wetext 403 variants and avoided a duplicate ticket.",
+     "confidence": "medium",
+     "date": "2026-11-24",
+     "dead_ends": "A second wetext pin would duplicate PR 3881; the ModelScope 403 itself is external.",
+     "lesson": "ModelScope wetext 403 signatures vary by refused filename; alias them by the wetext/modelscope URL path to PR 3881 to avoid new tickets.",
+     "next_step": "Merge PR 3881 and re-check the next nightly on Linux py3.11 and Windows configs.",
+     "nightly_run_id": 45296700602,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45296700602",
+     "outcome": "none",
+     "prior_feedback": "Memory notes c92015b5a395 and a055acee5cc0 (issue 3891 closed as duplicate) recorded the same coverage by PR 3881; PR 3881 still open and unreviewed here.",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45382753995",
+     "root_cause": "wetext 0.0.4 installed by CosyVoice requirements downloads its FSTs from ModelScope, which answers 403; the wetext 0.2.1 wheel bundles them, which is the change in open PR 3881.",
+     "self_assessment": "Supported by the log (modelscope 403, wetext 0.0.4). PR 3881 content could not be read (integrity filter) so coverage rests on its title and prior notes."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "network",
+   "exception_type": "MaxRetryError",
+   "first_seen": "2026-11-24",
+   "headline": "MaxRetryError: None: Max retries exceeded with url: https://www.modelscope.cn/api/v1/models/pengzhendong/wetext/repo?Revision=master&FilePath=ar%2Ftn%2Ftagger.fst (Caused by HTTPError('403 Client Error: Forbidden for url: https://www.modelscope.cn/api/v1/models/pengzhendong/wetext/repo?Revision=mas\u2026",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-24",
    "notebooks": [
     "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
    ]
@@ -959,6 +1021,37 @@
     "notebooks/omnivoice/omnivoice.ipynb"
    ]
   },
+  "e7fc7694f403": {
+   "attempts": [
+    {
+     "action": "Filed one issue; no PR because the setuptools upgrade could not be confirmed and the pip resolution could not be reproduced offline for the Windows config.",
+     "applied_learning": "Used cross-signature note that this notebook has several stacked failures and that each OS fails at a different stage, so checked Linux log for the same import path.",
+     "confidence": "medium",
+     "date": "2026-11-24",
+     "dead_ends": "Local dry-run of CosyVoice requirements was ResolutionImpossible without the notebook's exact filtering and could not reproduce Windows; Linux py3.11 passes this import and fails later in wetext so this is Windows specific.",
+     "lesson": "For pkg_resources errors in a venv with setuptools<82 pinned, record the final setuptools version after every pip_install call; a later unconstrained install can undo the pin.",
+     "next_step": "Run pip list in the Windows py3.11 venv after the install cell to see the setuptools version; if it is 82+, add setuptools<82 to the last pip_install call in the install cell (or a constraint) and retest.",
+     "nightly_run_id": 45296700602,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45296700602",
+     "outcome": "issue",
+     "prior_feedback": "none available for this signature; related notes: wetext/kaldifst entries for the same notebook (PR 3881 open, 1eb4d15e2af4 PR).",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45382753995",
+     "root_cause": "lightning 2.2.4 (CosyVoice requirement, imported via Matcha-TTS) calls __import__('pkg_resources') in lightning/fabric/__init__.py; pkg_resources is missing from the Windows py3.11 venv although the notebook installs setuptools<82; a later unconstrained install may have upgraded setuptools to 82+ (no pkg_resources), unverified as pip output is not in the log.",
+     "self_assessment": "Supported: failing import chain from lightning. Unverified: which package removed or never installed pkg_resources on Windows. Remedy not attempted."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "dependency",
+   "exception_type": "ModuleNotFoundError",
+   "first_seen": "2026-11-24",
+   "headline": "ModuleNotFoundError: No module named 'pkg_resources'",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-24",
+   "notebooks": [
+    "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
+   ]
+  },
   "f30731155e82": {
    "attempts": [
     {
@@ -984,6 +1077,37 @@
    "last_seen": "2026-11-17",
    "notebooks": [
     "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
+   ]
+  },
+  "f5a035f89961": {
+   "attempts": [
+    {
+     "action": "No new issue or PR: open issue https://github.com/openvinotoolkit/openvino_notebooks/issues/3879 already tracks it; per-signature duplicates 3912 and 3913 were closed.",
+     "applied_learning": "Applied the memory lesson to check issue 3879 first instead of filing a duplicate.",
+     "confidence": "high",
+     "date": "2026-11-24",
+     "dead_ends": "Replacing the model source or CI token or skip-list edits are out of scope; the changing Request ID makes a new signature each night.",
+     "lesson": "Gated-repo 401 groups whose signature carries a Request ID should be aliased to the tracked issue by repo name; the collector grouping did not link this group to 3879.",
+     "next_step": "Maintainers decide on issue 3879 (grant HF access or skip the notebook); masking the Request ID in report normalization would stop new signatures.",
+     "nightly_run_id": 45296700602,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45296700602",
+     "outcome": "none",
+     "prior_feedback": "Memory notes adb6d1303d57, 7b1e41b98bf7, 26505d4cf1c3 (2026-11-23) reached the same none outcome; issue 3879 still open.",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45382753995",
+     "root_cause": "snapshot_download of gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 on all configs because the CI runner has no access or token; same cause as open issue 3879 (sig 06076a94bfde).",
+     "self_assessment": "Supported by log (401 on gated repo) and tracked issue 3879; no code change attempted and none appropriate."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "other",
+   "exception_type": "GatedRepoError",
+   "first_seen": "2026-11-24",
+   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6b04e460-476fef5a5835e24e2a48bd4e;5985d60f-aa06-4b6d-8de7-5978eb8474d0) Cannot access gated repo for url https://huggingface.co/facebook/sam-3d-body-dinov3/resolve/11aaa346c7204874a1cbafe3d39a979080b2c55a/assets/mhr_model.pt. Access to model fac\u2026",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-24",
+   "notebooks": [
+    "notebooks/sam-3d-body/sam-3d-body.ipynb"
    ]
   },
   "fd463e9ad754": {
@@ -1016,6 +1140,37 @@
     "notebooks/hello-world/hello-world.ipynb",
     "notebooks/optical-character-recognition/optical-character-recognition.ipynb",
     "notebooks/paddle-to-openvino/paddle-to-openvino-classification.ipynb"
+   ]
+  },
+  "ff0173f79666": {
+   "attempts": [
+    {
+     "action": "Filed one issue marked as a suspected GPU plugin/runtime or runner resource problem; no code change.",
+     "applied_learning": "Compared exact GPU error and device with the 3919 note and kept this separate.",
+     "confidence": "low",
+     "date": "2026-11-24",
+     "dead_ends": "Related issue 3919 covers a different error (Reshape shape inference on iGPU), so it does not cover this one; no local notebook defect found since the cell is unchanged and passes on other nights.",
+     "lesson": "For intermittent GPU errors, record device name, driver and concurrent GPU jobs in the report; CL_OUT_OF_RESOURCES and Reshape errors on different runners should be separate signatures.",
+     "next_step": "Reproduce on the dGPU host and report to openvino or openvino.genai with the plugin log if it recurs; consider checking device memory use by other notebooks running on the same GPU runner.",
+     "nightly_run_id": 45296700602,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45296700602",
+     "outcome": "issue",
+     "prior_feedback": "Memory note for 89ab5082fc4c (issue 3919): different GPU failure on iGPU, low confidence, still open.",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45382753995",
+     "root_cause": "unknown: Text2ImagePipeline.generate at 128x128 fails with GPU CL_OUT_OF_RESOURCES (clFinish) on the dGPU runner with an OpenVINO nightly 2026.5.0.dev20261020; no package differences to the passing CPU run; intermittent (2 of 4 nights), passed the previous two nights.",
+     "self_assessment": "Supported: failure is inside the GPU plugin and intermittent. Unverified: root cause; no GPU available here to reproduce."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "openvino",
+   "exception_type": "RuntimeError",
+   "first_seen": "2026-11-24",
+   "headline": "RuntimeError: Exception from src/inference/src/cpp/infer_request.cpp:224:",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-24",
+   "notebooks": [
+    "notebooks/z-image-turbo/z-image-turbo.ipynb"
    ]
   }
  }
