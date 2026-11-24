@@ -6,6 +6,7 @@
 
 Error signature: `<12-hex-signature>`
 Nightly run: <nightly run URL>
+Related signatures: <comma-separated backtick-quoted covered signatures, or none>
 
 ## Affected notebooks
 
@@ -46,3 +47,15 @@ Nightly run: <nightly run URL>
 ## History
 
 <Trend and per-night summary from the group's History table, previous remediation attempts or related issues/PRs, and OpenVINO versions observed failing or passing.>
+
+## AI self-improvement
+
+### Before investigation
+
+- **Prior feedback:** <Source PR/issue URLs or memory runs, observed outcomes and uncertainty; or none available with reason.>
+- **Applied learning:** <The applicable lesson and how it changed this investigation, or why prior advice did not apply.>
+
+### After investigation
+
+- **Self-assessment:** <Evidence and check results supporting or contradicting the remedy, dead ends and validation gaps; do not equate PR creation with success.>
+- **Reusable lesson:** <One conditional evidence-backed observation for future investigations, including its limitations.>

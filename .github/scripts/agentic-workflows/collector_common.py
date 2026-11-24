@@ -113,6 +113,7 @@ class TrackedItem:
     signature: str
     created_at: str
     closed_at: Optional[str] = None
+    updated_at: str = ""
 
     @property
     def label(self) -> str:
@@ -127,6 +128,7 @@ class TrackedItem:
             "state": self.state,
             "created_at": self.created_at,
             "closed_at": self.closed_at,
+            "updated_at": self.updated_at,
         }
 
 
