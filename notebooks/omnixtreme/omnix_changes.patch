@@ -1,0 +1,569 @@
+# Copyright (C) 2018-2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+#
+--- a/deploy_mujoco.py
++++ b/deploy_mujoco.py
+@@ -1,6 +1,8 @@
++import argparse
+ import sys
+ import os
+ import time
++import warnings
+ import torch
+ import mujoco
+ import mujoco.viewer
+@@ -8,10 +10,15 @@
+ import faulthandler
+ from omegaconf import OmegaConf
+ 
+-from residual_policy import OnnxResidualPolicyWrapper, OnnxBasePolicyWrapper  
++from residual_policy import OnnxResidualPolicyWrapper, OnnxBasePolicyWrapper
+ from scipy.spatial.transform import Rotation as R
+-from isaac_utils import  rotations as _rot
++with warnings.catch_warnings():
++    # isaac_utils uses @torch.jit.script (deprecated on py3.14+; its parser also trips on "\*" docstrings)
++    warnings.filterwarnings("ignore", message=".*torch.jit.script.*", category=FutureWarning)
++    warnings.filterwarnings("ignore", message=r'.*"\\\*" is an invalid escape sequence', category=SyntaxWarning)
++    from isaac_utils import  rotations as _rot
+ import onnxruntime as ort
++import openvino as ov
+ 
+ 
+ BASE_ONNX="policy/base_policy_trt.onnx"
+@@ -32,27 +39,27 @@
+ # Joint position bias for pd control and joint related observation computation(urdf order)
+ PD_BIAS_JOINT_POS = np.array([
+             -0.3120,  0.0000, 0.0000, 0.6690, -0.3630,  0.0000,
+-            -0.3120,  0.0000, 0.0000, 0.6690, -0.3630,  0.0000,  
+-            0.0000,  0.0000,  0.0000, 
+-            0.2000, 0.2000,  0.0000,  0.6000,  0.0000,  0.0000,  0.0000, 
++            -0.3120,  0.0000, 0.0000, 0.6690, -0.3630,  0.0000,
++            0.0000,  0.0000,  0.0000,
++            0.2000, 0.2000,  0.0000,  0.6000,  0.0000,  0.0000,  0.0000,
+             0.2000, -0.2000, 0.0000,  0.6000,  0.0000,  0.0000,  0.0000
+ ])
+ 
+ # Action scale for robot control(urdf order)
+-ACTION_SCALE=torch.tensor([[ 
++ACTION_SCALE=torch.tensor([[
+             0.3506614663788243, 0.3506614663788243, 0.5475464652142303, 0.3506614663788243, 0.30700411974635705, 0.30700411974635705,
+             0.3506614663788243, 0.3506614663788243, 0.5475464652142303, 0.3506614663788243, 0.30700411974635705, 0.30700411974635705,
+             0.5475464652142303, 0.30700411974635705, 0.30700411974635705,
+             0.43857731392336724, 0.43857731392336724, 0.43857731392336724, 0.43857731392336724, 0.43857731392336724, 0.07450087032950714, 0.07450087032950714,
+-            0.43857731392336724, 0.43857731392336724, 0.43857731392336724, 0.43857731392336724, 0.43857731392336724, 0.07450087032950714, 0.07450087032950714        
++            0.43857731392336724, 0.43857731392336724, 0.43857731392336724, 0.43857731392336724, 0.43857731392336724, 0.07450087032950714, 0.07450087032950714
+ ]])
+ 
+ # Pd control kp parameters(urdf order)
+ P_GAINS=np.array([
+-            99.0984, 99.0984, 40.1792, 99.0984, 28.5012, 28.5012, 
+-            99.0984, 99.0984, 40.1792, 99.0984, 28.5012, 28.5012, 
+-            40.1792, 28.5012, 28.5012, 
+-            14.2506, 14.2506, 14.2506, 14.2506, 14.2506, 16.7783, 16.7783, 
++            99.0984, 99.0984, 40.1792, 99.0984, 28.5012, 28.5012,
++            99.0984, 99.0984, 40.1792, 99.0984, 28.5012, 28.5012,
++            40.1792, 28.5012, 28.5012,
++            14.2506, 14.2506, 14.2506, 14.2506, 14.2506, 16.7783, 16.7783,
+             14.2506, 14.2506, 14.2506, 14.2506, 14.2506, 16.7783, 16.7783
+ 
+ 
+@@ -60,10 +67,10 @@
+ 
+ # Pd control kd parameters(urdf order)
+ D_GAINS=np.array([
+-            6.3088, 6.3088, 2.5579, 6.3088, 1.8144, 1.8144, 
+-            6.3088, 6.3088, 2.5579, 6.3088, 1.8144, 1.8144, 
+-            2.5579, 1.8144, 1.8144, 
+-            0.9072, 0.9072, 0.9072, 0.9072, 0.9072, 1.0681, 1.0681, 
++            6.3088, 6.3088, 2.5579, 6.3088, 1.8144, 1.8144,
++            6.3088, 6.3088, 2.5579, 6.3088, 1.8144, 1.8144,
++            2.5579, 1.8144, 1.8144,
++            0.9072, 0.9072, 0.9072, 0.9072, 0.9072, 1.0681, 1.0681,
+             0.9072, 0.9072, 0.9072, 0.9072, 0.9072, 1.0681, 1.0681
+ ])
+ 
+@@ -186,6 +193,46 @@
+             pass
+     return sess
+ 
++def fk_without_nonzero(model):
++    """Replace the NonZero/ScatterND/GatherND boolean-mask subgraph in fk_trt.onnx with static Select/Gather nodes."""
++    from openvino import opset13 as ops
++    node = {o.get_friendly_name(): o for o in model.get_ordered_ops()}
++    if not {"/Concat_11", "/Greater", "/Constant_48", "/ScatterND", "/Div", "/ArgMax", "/GatherND_1"} <= node.keys():
++        print("FK: NonZero patterns not found, using the exported graph as is")
++        return model
++    
++    sqrt = ops.sqrt(ops.maximum(node["/Concat_11"], ops.constant(np.float32(0))))
++    node["/ScatterND"].output(0).replace(ops.select(node["/Greater"], sqrt, node["/Constant_48"]).output(0))
++    node["/GatherND_1"].output(0).replace(ops.gather(node["/Div"], node["/ArgMax"], ops.constant(np.int64(1))).output(0))
++    model.validate_nodes_and_infer_types()
++
++    return model
++
++
++class OvPolicy:
++    """OpenVINO stand-in for the onnxruntime FK session (.run) and base/residual wrappers (__call__)."""
++
++    def __init__(self, core, path, device, precision, torch_device, cpu_threads=4, model=None):
++        config = {"INFERENCE_PRECISION_HINT": precision}
++        if cpu_threads > 0 and device.upper().startswith("CPU"):
++            config["INFERENCE_NUM_THREADS"] = str(cpu_threads)
++        print(f"Loading OpenVINO {path} on {device}/{precision}")
++        self.request = core.compile_model(path if model is None else model, device, config).create_infer_request()
++        self.device = torch_device
++
++    def run(self, _, feeds):
++        # Output tensors belong to the infer request and are overwritten by the next call.
++        return [out.copy() for out in self.request.infer(feeds).values()]
++
++    def __call__(self, obs):
++        f32 = lambda x: x.reshape(1, -1).cpu().numpy().astype(np.float32)
++        if isinstance(obs, dict):
++            feeds = {k: f32(obs[k]) for k in ("real_obs", "command_obs", "real_historical_obs_raw", "initial_noise")}
++        else:
++            feeds = {"obs": f32(obs)}
++        return torch.from_numpy(self.run(None, feeds)[0]).to(self.device)
++
++
+ def normalize_angle(angle):
+     """normalize angles to [-pi, pi]"""
+ 
+@@ -207,11 +254,15 @@
+     mujoco.mjv_initGeom(scene.geoms[scene.ngeom-1],
+                         mujoco.mjtGeom.mjGEOM_CAPSULE, np.zeros(3),
+                         np.zeros(3), np.zeros(9), rgba.astype(np.float32))
++    if hasattr(mujoco, "mjv_connector"):  # newer MuJoCo dropped mjv_makeConnector
++        mujoco.mjv_connector(scene.geoms[scene.ngeom-1], mujoco.mjtGeom.mjGEOM_CAPSULE, radius,
++                             np.asarray(point1, dtype=np.float64), np.asarray(point2, dtype=np.float64))
++        return
+     mujoco.mjv_makeConnector(scene.geoms[scene.ngeom-1],
+                             mujoco.mjtGeom.mjGEOM_CAPSULE, radius,
+                             point1[0], point1[1], point1[2],
+                             point2[0], point2[1], point2[2])
+-    
++
+ def get_euler_xyz(q):
+     qx, qy, qz, qw = 0, 1, 2, 3
+     # roll (x-axis rotation)
+@@ -238,33 +289,35 @@
+     else:
+         q12 = q10
+     return None, q12
++
++
+ class G1():
+     def __init__(self):
+         self.decimation=5
+         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+ 
+-        self.num_envs = 1 
++        self.num_envs = 1
+         self.num_observations = 161
+         self.num_actions = 29
+         self.obs_context_len=15
+-    
+-      
++
++
+         self.p_gains = P_GAINS
+         self.p_gains_tensor = torch.tensor(self.p_gains, dtype=torch.float32, device=self.device, requires_grad=False)
+         self.d_gains = D_GAINS
+         self.d_gains_tensor = torch.tensor(self.d_gains, dtype=torch.float32, device=self.device, requires_grad=False)
+-            
++
+         self.default_dof_pos_np = PD_BIAS_JOINT_POS
+ 
+         self.X1 = torch.tensor(X1_list, dtype=torch.float32, device=self.device)
+         self.X2 = torch.tensor(X2_list, dtype=torch.float32, device=self.device)
+         self.Y1 = torch.tensor(Y1_list, dtype=torch.float32, device=self.device)
+         self.Y2 = torch.tensor(Y2_list, dtype=torch.float32, device=self.device)
+-      
++
+         # dq=0 neighborhood threshold for envelope selection
+         self.v_eps = 1e-2
+         self.action_scale=ACTION_SCALE.to(self.device)
+-        
++
+         default_dof_pos = torch.tensor(self.default_dof_pos_np, dtype=torch.float, device=self.device, requires_grad=False)
+         self.default_dof_pos = default_dof_pos.unsqueeze(0)
+ 
+@@ -274,11 +327,14 @@
+         self.obs_tensor = torch.zeros(1, self.num_observations*self.obs_context_len, dtype=torch.float, device=self.device, requires_grad=False)
+ 
+         self.motion_times=torch.zeros((1),dtype=torch.float32, device=self.device)
+-        
+-    def init_mujoco_viewer(self, robot_xml):
++
++    def init_mujoco_viewer(self, robot_xml, headless=False):
+         self.mj_model = mujoco.MjModel.from_xml_path(robot_xml)
+         self.mj_data = mujoco.MjData(self.mj_model)
+         self.mj_model.opt.timestep =  0.02/self.decimation#0.005
++        self.viewer = None
++        if headless:
++            return
+         self.viewer = mujoco.viewer.launch_passive(self.mj_model, self.mj_data)
+ 
+         for _ in range(33):
+@@ -320,12 +376,16 @@
+         sub_dict['dof_vel']=torch.tensor(data['joint_vel'][i][None][:,perm]).to(device)
+         re.append(sub_dict)
+     return re
++
++
+ class DeployNode():
+ 
+-    def __init__(self):
++    def __init__(self, ov_placement=None, ov_cpu_threads=4, headless=False):
++        # ov_placement: {"fk"|"base"|"residual": (device, precision)} runs the graphs on OpenVINO; None => onnxruntime
++        self.ov_placement, self.ov_cpu_threads = ov_placement, ov_cpu_threads
+         self.quat_wxyz_r=np.zeros(4)
+         self.quat_wxyz_r[0]=1
+-        
++
+         self.quat_xyzw_r=np.zeros(4)
+         self.quat_xyzw_r[3]=1
+         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+@@ -340,7 +400,7 @@
+         self.config = OmegaConf.load("configs/config.yaml")
+         # init policy
+         self.init_policy()
+- 
++
+         clip_mode="envelope"
+         self.clip_mode = clip_mode
+ 
+@@ -357,23 +417,23 @@
+         self.obs_dict['residual_obs']=torch.zeros(1,183).to(self.device)
+         self.obs_dict['real_historical_obs_raw']=self.history_data[None]
+ 
+-          
++
+         self.motion_length_buf = torch.zeros(1, device=self.device, dtype=torch.long)
+         self.motion_res_buf = []
+ 
+         self.stidx=0
+-        self.motion_res_buf_bm=get_npz_motion(self.config["motion"]['motion_file_npz'],'cuda')
++        self.motion_res_buf_bm=get_npz_motion(self.config["motion"]['motion_file_npz'],self.device)
+         self._ref_motion_length = len(self.motion_res_buf_bm)
+-        self.motion_res_buf=self.motion_res_buf_bm[self.stidx:]  
++        self.motion_res_buf=self.motion_res_buf_bm[self.stidx:]
+         self.bm_anchor_id=9
+         self.cur_gt=None
+         self.init_motion_rot = self.motion_res_buf[0]["rg_rot_t"][0][0]
+         self.init_motion_rot = R.from_quat([self.init_motion_rot[0].item(), self.init_motion_rot[1].item(), self.init_motion_rot[2].item(), self.init_motion_rot[3].item()]).as_euler('xyz', degrees=False)
+-        
++
+         self.init_motion_yaw=0
+         self.initial_yaw=0
+ 
+-        self.env.init_mujoco_viewer(robot_xml=self.config["xml_path"])
++        self.env.init_mujoco_viewer(robot_xml=self.config["xml_path"], headless=headless)
+         # Initialize robot pose to reference motion first frame
+         motion_res_cur = self.motion_res_buf[0]
+         # Root position and rotation (xyzw) at first frame
+@@ -387,7 +447,7 @@
+         # Apply to MuJoCo qpos
+         self.rootpos_offset=root_pos[:]
+         self.rootpos_offset[2]=0
+-        self.env.mj_data.qpos[:3] =  root_pos 
++        self.env.mj_data.qpos[:3] =  root_pos
+         self.env.mj_data.qpos[:3] -=  self.rootpos_offset
+         self.env.mj_data.qpos[2]=0.79
+         self.env.mj_data.qpos[3:7] = root_rot_wxyz
+@@ -398,17 +458,18 @@
+         # Sync internal joint state
+         self.joint_pos = torch.from_numpy(self.env.mj_data.qpos[7:].copy()).to(self.device)
+ 
+-        tau = pd_control_friction(self.angles, 
+-                            self.env.mj_data.qpos[7:], 
+-                            self.env.p_gains, 
+-                            np.zeros(self.env.num_actions), 
+-                            self.env.mj_data.qvel[6:], 
++        tau = pd_control_friction(self.angles,
++                            self.env.mj_data.qpos[7:],
++                            self.env.p_gains,
++                            np.zeros(self.env.num_actions),
++                            self.env.mj_data.qvel[6:],
+                             self.env.d_gains)
+         self.env.mj_data.ctrl[:] = tau
+         mujoco.mj_step(self.env.mj_model, self.env.mj_data)
+-            
+-        self.env.viewer.sync()
+-    
++
++        if self.env.viewer is not None:
++            self.env.viewer.sync()
++
+         self.episode_length_buf = torch.zeros(1, device=self.device, dtype=torch.long)
+         self.motion_times=torch.zeros(1,device=self.device)
+         time.sleep(1)
+@@ -432,15 +493,15 @@
+             obs_base_euler_xyz = get_euler_xyz(quat_xyzw)[:, :].squeeze(0)
+             self.obs_base_euler_xyz = (obs_base_euler_xyz + (torch.rand_like(obs_base_euler_xyz)* 2. - 1.) * self.config.noise_scales.base_euler_xyz)* self.config.obs_scales.base_euler_xyz
+ 
+-            rpy = R.from_quat(quat_xyzw.cpu().numpy()) 
++            rpy = R.from_quat(quat_xyzw.cpu().numpy())
+             self.roll, self.pitch, self.yaw = rpy.as_euler('xyz', degrees=False)[0]
+             self.yaw = normalize_angle(self.yaw - self.initial_yaw)
+             rpy = R.from_euler('xyz', [self.roll, self.pitch, self.yaw], degrees=False)
+-          
++
+             self.quat_xyzw_r[:]=rpy.as_quat()[:]
+             self.quat_wxyz_r[:]=_rot.xyzw_to_wxyz(self.quat_xyzw_r)[:]
+             # motor data
+-            self.joint_pos = torch.from_numpy(self.env.mj_data.qpos[7:]).to(self.device)  
++            self.joint_pos = torch.from_numpy(self.env.mj_data.qpos[7:]).to(self.device)
+             self.joint_vel = torch.from_numpy(self.env.mj_data.qvel[6:]).to(self.device)
+             obs_joint_vel = self.joint_vel
+             self.obs_joint_vel = (obs_joint_vel + (torch.rand_like(obs_joint_vel)* 2. - 1.) * self.config.noise_scales.dof_vel)* self.config.obs_scales.dof_vel
+@@ -450,42 +511,54 @@
+ 
+         # prepare environment
+         self.env = G1()
++        if self.ov_placement:
++            core = ov.Core()
++            ov_model = lambda key, path, model=None: OvPolicy(core, path, *self.ov_placement[key], self.env.device,
++                                                              self.ov_cpu_threads, model)
+         # Optional FK ONNX (e.g. for arm anchor)
+         self.fk_quat_session = None
+         fk_quat_path = FK_QUAT_ONNX
+         if fk_quat_path is not None and os.path.isfile(fk_quat_path):
+             print(f"Loading FK quat ONNX from: {fk_quat_path}")
+-            self.fk_quat_session = _make_fk_onnx_session(fk_quat_path)
++            if self.ov_placement:
++                self.fk_quat_session = ov_model("fk", fk_quat_path, fk_without_nonzero(core.read_model(fk_quat_path)))
++            else:
++                self.fk_quat_session = _make_fk_onnx_session(fk_quat_path)
+ 
+         # Base policy priority: BASE_ONNX -> FM_RESULTS_DIR -> error
+         base_onnx = BASE_ONNX
+         if base_onnx is not None and os.path.isfile(base_onnx):
+             print(f"Loading ONNX base policy from: {base_onnx}")
+-            self.base_policy = OnnxBasePolicyWrapper(base_onnx, device=str(self.env.device))
+-            self._base_mode = 'onnx'
++            if self.ov_placement:
++                self.base_policy = ov_model("base", base_onnx)
++            else:
++                self.base_policy = OnnxBasePolicyWrapper(base_onnx, device=str(self.env.device))
+ 
+-            if os.environ.get("ONNX_DEBUG", "0") not in ("0", "false", "False"):
++            if not self.ov_placement and os.environ.get("ONNX_DEBUG", "0") not in ("0", "false", "False"):
+                 prov = getattr(self.base_policy, 'session').get_providers()
+                 print(f"[ONNX] Runtime session providers: {prov}")
+ 
+             # Optional residual ONNX (separate, summed at inference)
+             residual_onnx = RESIDUAL_ONNX
+-            
++
+             residual_gain = float(os.environ.get("RESIDUAL_GAIN", "1.0"))
+             use_tanh = os.environ.get("RESIDUAL_TANH", "0") not in ("0", "false", "False")
+             self.residual_gain = residual_gain
+             self.residual_use_tanh = use_tanh
+-            self.residual_policy = OnnxResidualPolicyWrapper(residual_onnx, device=str(self.env.device))
++            if self.ov_placement:
++                self.residual_policy = ov_model("residual", residual_onnx)
++            else:
++                self.residual_policy = OnnxResidualPolicyWrapper(residual_onnx, device=str(self.env.device))
+             # Maintain current step base action (env order) for residual input
+             self._last_base_action_env = torch.zeros(1, self.env.num_actions, device=self.env.device)
+             print(f"Loaded ONNX base + Residual(ONNX) policy: base={base_onnx}, residual={residual_onnx}")
+-                
+-        
++
++
+ 
+         self.angles = np.zeros(HW_DOF, dtype=np.float32)
+         self.angles_last = np.zeros(HW_DOF, dtype=np.float32)
+-    
+-    
++
++
+     def compute_observations(self):
+         """ Computes observations"""
+         motion_res_cur=self.motion_res_buf[self.episode_length_buf+1]
+@@ -510,7 +583,7 @@
+         prev_base_actions=self.prev_base_action
+ 
+         dof_pos_relative=dof_pos-self.env.default_dof_pos[0]
+-        
++
+         real_obs = torch.cat([
+                 dof_pos_relative,  # Use relative joint positions
+                 dof_vel,
+@@ -545,7 +618,7 @@
+             rot_wxyz = torch.from_numpy(rot_np).to(self.device)
+             cur_gr_anchor = rot_wxyz[:, [1, 2, 3, 0]]  # xyzw
+ 
+-          
++
+         self.cur_gr_anchor = cur_gr_anchor.clone()
+ 
+         _, motion_anchor_ori_b_quat = rot_subtract_frame_transforms(
+@@ -560,15 +633,15 @@
+         anchor_ori_6d = anchor_ori_6d.squeeze(0)  # [6]
+         command_obs = torch.cat([dof_command, anchor_ori_6d], dim=-1)
+         real_obs = real_obs.view(1, -1)
+-        
++
+         inv_perm=INV_PERM
+         if self.residual_policy is not None:
+-           
++
+             B=1
+ 
+             jpos =  dof_pos_relative[inv_perm]
+             jvel = dof_vel[inv_perm]
+-            base = base_ang_vel_local 
++            base = base_ang_vel_local
+             act  = prev_actions[inv_perm]
+             real_reordered = torch.cat([base, jpos, jvel, act], dim=-1)
+ 
+@@ -579,7 +652,7 @@
+             a_base_env = self._last_base_action_env.clone()
+             a_base_proto = a_base_env[0, inv_perm]
+             concat_obs = torch.cat([cmd_reordered, real_reordered, a_base_proto], dim=-1)
+-    
++
+             self.obs_dict['residual_obs'][:]= concat_obs[None,:]
+ 
+         self.obs_dict['real_obs'][:]=real_obs[:]
+@@ -603,41 +676,41 @@
+             _ = self.base_policy(torch.rand_like(self.env.obs_tensor).to(self.env.device))
+         except Exception:
+             pass
+-        
++
+         try:
+             _ = self.residual_policy(torch.rand_like(self.env.obs_tensor).to(self.env.device))
+         except Exception:
+             pass
+-        
++
+         while True:
+             loop_start_time = time.monotonic()
+-            if self.start_policy:        
++            if self.start_policy:
+                 self.lowlevel_state_mujoco()
+                 if self.start_policy:
+                     use_quat_yaw_diff=True
+                     if self.update_initial_yaw:
+                         if use_quat_yaw_diff==False:
+-                            self.initial_yaw = self.yaw.copy()-self.init_motion_yaw 
++                            self.initial_yaw = self.yaw.copy()-self.init_motion_yaw
+                             self.initial_torso_yaw = self.torso_yaw.copy()-self.init_motion_torso_yaw
+-                        
++
+                         else:
+                             diff_root_rot=((R.from_quat(self.init_motion_rot_quat.cpu().numpy()))*(R.from_quat(self.quat_xyzw_r).inv())).as_euler('xyz', degrees=False)
+                             self.initial_yaw=-diff_root_rot[2]
+-                        self.update_initial_yaw=False    
++                        self.update_initial_yaw=False
+                 self.compute_observations()
+                 self.episode_length_buf += 1
+-        
+-                a_base = self.base_policy(self.obs_dict) 
++
++                a_base = self.base_policy(self.obs_dict)
+                 self._last_base_action_env = a_base.detach().clone()
+                 self.obs_dict['residual_obs'][:,-29:]=self._last_base_action_env[:,INV_PERM]
+-                    
+-                
++
++
+                 a_res = self.residual_policy(self.obs_dict['residual_obs'].detach())
+-                perm = PERM 
++                perm = PERM
+                 if perm is not None:
+                         a_res = a_res[:, perm]
+                 raw_actions = a_base + float(getattr(self, "residual_gain", 0.0)) * a_res
+-                      
++
+                 if torch.any(torch.isnan(raw_actions)):
+                     assert False
+ 
+@@ -645,7 +718,7 @@
+                 self.prev_action = raw_actions.squeeze(0)
+                 self.prev_base_action = a_base.squeeze(0)
+                 whole_body_action = raw_actions.squeeze(0)
+-                
++
+                 actions_scaled = whole_body_action * self.env.action_scale + self.env.default_dof_pos
+                 if self.clip_mode == "envelope":
+                     # Envelope-based PD back-solve limits
+@@ -678,7 +751,7 @@
+                     _al = actions_low.view(-1)
+                     _ah = actions_high.view(-1)
+                     clipped_mask = (_as != torch.clip(_as, _al, _ah))
+-                    if clipped_mask.any(): 
++                    if clipped_mask.any():
+                         clipped_pos_mask = _as > _ah
+                         clipped_neg_mask = _as < _al
+                         try:
+@@ -703,13 +776,13 @@
+                             print("    dq     :", self.joint_vel.view(-1)[clipped_neg_mask].detach().cpu().numpy())
+                             print("    over   :", (_al - _as)[clipped_neg_mask].detach().cpu().numpy())
+                     angles = torch.clip(actions_scaled, actions_low, actions_high).view(-1)
+-                
++
+                 self.angles = angles.cpu().numpy()
+-                
++
+                 motion_res_cur=self.motion_res_buf[self.episode_length_buf]
+                 ref_body_pos_extend = motion_res_cur["rg_pos_t"][0]
+ 
+-                if VISUAL:
++                if VISUAL and self.env.viewer is not None:
+                     for i in range(ref_body_pos_extend.shape[0]):
+                         self.env.viewer.user_scn.geoms[i].pos = ref_body_pos_extend[i].cpu()-self.rootpos_offset
+                     if self.cur_gt is not None:
+@@ -720,22 +793,39 @@
+                 for i in range(self.env.decimation):
+                     if i == action_delay_decimation:
+                         self.angles_last = self.angles.copy()
+-                    self.env.viewer.sync()
+-                    tau = pd_control_friction(self.angles_last, 
+-                                    self.env.mj_data.qpos[7:], 
+-                                    self.env.p_gains, 
+-                                    np.zeros(self.env.num_actions), 
+-                                    self.env.mj_data.qvel[6:], 
++                    if self.env.viewer is not None:
++                        self.env.viewer.sync()
++                    tau = pd_control_friction(self.angles_last,
++                                    self.env.mj_data.qpos[7:],
++                                    self.env.p_gains,
++                                    np.zeros(self.env.num_actions),
++                                    self.env.mj_data.qvel[6:],
+                                     self.env.d_gains)
+                     self.env.mj_data.ctrl[:] = tau
+                     mujoco.mj_step(self.env.mj_model, self.env.mj_data)
+                 if self.episode_length_buf+1 >= self._ref_motion_length:
+-                    self.env.viewer.close()
++                    if self.env.viewer is not None:
++                        self.env.viewer.close()
++                        # close() only requests exit; exiting while the render thread is still drawing segfaults.
++                        while self.env.viewer._sim() is not None:
++                            time.sleep(0.01)
+                     break
+-                            
+-                sys.stdout.flush()                
++
++                sys.stdout.flush()
+ 
+ 
+ if __name__ == "__main__":
+-    dp_node = DeployNode()
++    p = argparse.ArgumentParser(description="OmniXtreme MuJoCo deploy: onnxruntime by default, OpenVINO with --ov")
++    p.add_argument("--ov", action="store_true", help="run the FK, base and residual graphs on OpenVINO")
++    for key, device in (("fk", "CPU"), ("base", "GPU"), ("residual", "CPU")):
++        p.add_argument(f"--{key}_device", default=device, help=f"OpenVINO device for the {key} graph")
++        p.add_argument(f"--{key}_precision", default="f16", choices=("f32", "f16"),
++                       help=f"OpenVINO INFERENCE_PRECISION_HINT for the {key} graph")
++    p.add_argument("--cpu_threads", type=int, default=4,
++                   help="INFERENCE_NUM_THREADS for graphs on the CPU")
++    p.add_argument("--headless", action="store_true", help="no MuJoCo viewer")
++    args = p.parse_args()
++    placement = {k: (getattr(args, f"{k}_device"), getattr(args, f"{k}_precision"))
++                 for k in ("fk", "base", "residual")} if args.ov else None
++    dp_node = DeployNode(placement, args.cpu_threads, args.headless)
+     dp_node.main_loop()

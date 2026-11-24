@@ -23,14 +23,17 @@ EXPECTED_NO_DEVICE = [
     Path("notebooks/openvino-tokenizers/openvino-tokenizers.ipynb"),  # cpu required for loading extensions
     Path("notebooks/explainable-ai-2-deep-dive/explainable-ai-2-deep-dive.ipynb"),  # device-agnostic
     Path("notebooks/physical-ai-robotics/physical-ai-robotics.ipynb"),  # reference notebook, no inference performed here
+    Path("notebooks/omnixtreme/omnixtreme.ipynb"),  # reference notebook, no device widget
 ]
 
 EXPECTED_NO_TELEMETRY = [
     Path("notebooks/physical-ai-robotics/physical-ai-robotics.ipynb"),  # reference notebook, contains no runnable code
+    Path("notebooks/omnixtreme/omnixtreme.ipynb"),  # reference notebook, no runnable code cells
 ]
 
 EXPECTED_NO_INSTALL = [
     Path("notebooks/physical-ai-robotics/physical-ai-robotics.ipynb"),  # reference notebook, nothing to install or run
+    Path("notebooks/omnixtreme/omnixtreme.ipynb"),  # reference notebook, nothing to install or run
 ]
 
 
