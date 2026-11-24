@@ -18,6 +18,7 @@ The tutorial consists of the following steps:
 - Explore optional INT8 and mixed INT8/FP16 weight compression
 - Compare transcripts, WER/CER and numerical outputs with PyTorch
 - Benchmark complete-generation latency
+- Optionally compare PyTorch XPU transcription, logits and latency
 - Run an interactive sample or local-WAV transcription demo
 
 ## Installation Instructions
@@ -32,6 +33,14 @@ are planning estimates, not measured peaks. The model weights occupy about 1.58 
 4.08 GB, respectively, in addition to the environment, converted IR and caches.
 Local WAV files longer than 60 seconds are rejected to bound full-context
 encoder memory use.
+
+For the optional PyTorch XPU comparison, run the setup and installation cells,
+install compatible XPU-enabled PyTorch and TorchAudio builds in the notebook's
+`.venv`, restart the kernel, and set `RUN_PYTORCH_XPU = True`.
+See the notebook for installation guidance.
+It skips when XPU is unavailable and does not change the default CPU reference
+or require XPU for OpenVINO GPU inference. The XPU model temporarily shares GPU
+memory with OpenVINO; available memory and runtime support are device-specific.
 
 **Experimental notebook:** the default run uses CPU and one English clip.
 GPU inference, compression and multilingual evaluation are optional. The notebook

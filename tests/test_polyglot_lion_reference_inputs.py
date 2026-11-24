@@ -67,6 +67,29 @@ class ReferenceInputTest(unittest.TestCase):
                     helper.prepare_inputs(RecordingProcessor(), path, max_duration_seconds=0.5)
                 normalize.assert_not_called()
 
+    def test_xpu_generation_is_synchronized_for_timing(self):
+        events = []
+        inputs = {"input_ids": SimpleNamespace(device=torch.device("xpu:0"), shape=(1, 1))}
+        output = SimpleNamespace(sequences=torch.tensor([[42, 151645]]))
+
+        def capture_generate(*args, **kwargs):
+            events.append("generate")
+            return output
+
+        with (
+            patch.object(helper, "generate", side_effect=capture_generate),
+            patch.object(torch.xpu, "synchronize", side_effect=lambda device: events.append(str(device))),
+        ):
+            result = helper.transcribe(object(), RecordingProcessor(), inputs, "pytorch")
+        self.assertEqual(events, ["xpu:0", "generate", "xpu:0"])
+        self.assertTrue(result["complete"])
+
+        for backend in ("pytorch", "openvino"):
+            with self.subTest(backend=backend):
+                with patch.object(helper, "generate", return_value=output), patch.object(torch.xpu, "synchronize") as synchronize:
+                    helper.transcribe(object(), RecordingProcessor(), {"input_ids": torch.tensor([[42]])}, backend)
+                synchronize.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

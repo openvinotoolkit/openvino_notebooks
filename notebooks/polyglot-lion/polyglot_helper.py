@@ -324,8 +324,13 @@ def generate(
 
 def transcribe(model: "torch.nn.Module | OVModelForSpeechSeq2Seq", processor: "ProcessorMixin", inputs: dict, backend: str, max_new_tokens: int = 512) -> dict:
     """Decode only newly generated tokens and record EOS completion."""
+    xpu_device = inputs["input_ids"].device if backend == "pytorch" and inputs["input_ids"].device.type == "xpu" else None
+    if xpu_device is not None:
+        torch.xpu.synchronize(xpu_device)
     start = time.perf_counter()
     output = generate(model, inputs=inputs, backend=backend, max_new_tokens=max_new_tokens)
+    if xpu_device is not None:
+        torch.xpu.synchronize(xpu_device)
     elapsed = time.perf_counter() - start
     sequences = output.sequences if hasattr(output, "sequences") else output
     ids = sequences[:, inputs["input_ids"].shape[1] :].cpu().tolist()[0]

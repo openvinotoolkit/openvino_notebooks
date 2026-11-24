@@ -142,6 +142,34 @@ class PolyglotWorkflowTest(unittest.TestCase):
                 exec(encoder_cell, context)
             self.assertEqual(len(calls), 2)
 
+    def test_optional_xpu_skip_and_cpu_restore_on_failure(self):
+        code = notebook_cell("xpu_available = False")
+        for enabled, available, failure in ((False, True, None), (True, False, None), (True, True, RuntimeError("detection"))):
+            with self.subTest(enabled=enabled, available=available, failure=failure):
+                xpu = SimpleNamespace(is_available=lambda: (_ for _ in ()).throw(failure) if failure else available)
+                context = {"RUN_PYTORCH_XPU": enabled, "torch": SimpleNamespace(xpu=xpu)}
+                exec(code, context)
+                self.assertFalse(context["xpu_available"])
+
+        moves = []
+        model = SimpleNamespace(
+            parameters=lambda: [SimpleNamespace(dtype="f32", is_floating_point=lambda: True)],
+            to=lambda device: moves.append(device),
+        )
+        xpu = SimpleNamespace(is_available=lambda: True, get_device_name=lambda device: "test GPU")
+        context = {
+            "RUN_PYTORCH_XPU": True,
+            "torch": SimpleNamespace(xpu=xpu, device=lambda value: value, float32="f32"),
+            "pt_model": model,
+            "prepared": [({}, 1.0)],
+            "logit_inputs": {},
+            "transcribe": lambda *args: (_ for _ in ()).throw(ValueError("inference failed")),
+            "processor": object(),
+            "MAX_NEW_TOKENS": 512,
+        }
+        with self.assertRaisesRegex(ValueError, "inference failed"):
+            exec(code, context)
+        self.assertEqual(moves, ["xpu:0", "cpu"])
 
 if __name__ == "__main__":
     unittest.main()
