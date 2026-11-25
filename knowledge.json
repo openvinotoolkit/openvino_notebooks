@@ -993,6 +993,37 @@
     "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
    ]
   },
+  "c94224041fbf": {
+   "attempts": [
+    {
+     "action": "No new ticket: open PR https://github.com/openvinotoolkit/openvino_notebooks/pull/3881 (sig f30731155e82) already pins wetext 0.2.1 in the same notebook; only the refused filename (ar/itn/verbalizer.fst) differs.",
+     "applied_learning": "Applied the lesson to alias wetext 403 variants to PR 3881 by URL path; the log shows the same wetext FilePath download from modelscope.cn.",
+     "confidence": "medium",
+     "date": "2026-11-25",
+     "dead_ends": "A second wetext pin would duplicate PR 3881; the ModelScope 403 itself is external and cannot be fixed in the notebook.",
+     "lesson": "Alias ModelScope wetext 403 signatures by the pengzhendong/wetext URL path, ignoring FilePath, to PR 3881 while it is open; revisit if the nightly still shows 403 after it merges.",
+     "next_step": "Review and merge PR 3881 (currently behind the base branch, may need a rebase), then re-check the next nightly on py3.11/3.12 Linux and Windows.",
+     "nightly_run_id": 45517907563,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45517907563",
+     "outcome": "none",
+     "prior_feedback": "Memory notes a46c3c663220 and c92015b5a395 recorded the same coverage by PR 3881; the PR is open, unreviewed and not validated by CI.",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45543591565",
+     "root_cause": "wetext 0.0.4 installed by CosyVoice requirements downloads FSTs from ModelScope, which answers 403; wetext 0.2.1 bundles the FSTs, which is the change in open PR 3881.",
+     "self_assessment": "Supported by the traceback (wetext repo download via modelscope 403) and the PR 3881 body; whether wetext 0.2.1 fixes later cells remains unverified."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "network",
+   "exception_type": "MaxRetryError",
+   "first_seen": "2026-11-25",
+   "headline": "MaxRetryError: None: Max retries exceeded with url: https://www.modelscope.cn/api/v1/models/pengzhendong/wetext/repo?Revision=master&FilePath=ar%2Fitn%2Fverbalizer.fst (Caused by HTTPError('403 Client Error: Forbidden for url: https://www.modelscope.cn/api/v1/models/pengzhendong/wetext/repo?Revisio\u2026",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-25",
+   "notebooks": [
+    "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb"
+   ]
+  },
   "db0467f22081": {
    "attempts": [
     {
@@ -1082,6 +1113,22 @@
   "f5a035f89961": {
    "attempts": [
     {
+     "action": "No new ticket: open issue https://github.com/openvinotoolkit/openvino_notebooks/issues/3879 covers the repo-level cause; the Request ID changes the signature each night.",
+     "applied_learning": "Applied the memory lesson to check issue 3879 first and not file a duplicate; the current log confirms the same repo and 401.",
+     "confidence": "high",
+     "date": "2026-11-25",
+     "dead_ends": "Editing skip lists, CI token plumbing or replacing the model source is out of scope; a notebook code change cannot grant gated access.",
+     "lesson": "Alias gated-repo 401 groups to the tracked issue by repository name rather than signature; applies while issue 3879 is open and the same repo is cited.",
+     "next_step": "Maintainers decide on issue 3879 (grant HF access with HF_TOKEN or skip the notebook); masking Request IDs in report normalization would stop new signatures.",
+     "nightly_run_id": 45517907563,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45517907563",
+     "outcome": "none",
+     "prior_feedback": "Memory notes from 2026-11-23 and 2026-11-24 reached the same none outcome; issue 3879 is still open and unreviewed, so nothing is validated.",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45543591565",
+     "root_cause": "snapshot_download of the gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 on all 10 configs because the CI runner has no access or token; same cause as open issue 3879.",
+     "self_assessment": "Supported by the log (401 GatedRepoError on all 10 pairs) and issue 3879 body; no code fix attempted and none appropriate. Collector alias coverage to 3879 is still missing."
+    },
+    {
      "action": "No new issue or PR: open issue https://github.com/openvinotoolkit/openvino_notebooks/issues/3879 already tracks it; per-signature duplicates 3912 and 3913 were closed.",
      "applied_learning": "Applied the memory lesson to check issue 3879 first instead of filing a duplicate.",
      "confidence": "high",
@@ -1102,10 +1149,10 @@
    "error_class": "other",
    "exception_type": "GatedRepoError",
    "first_seen": "2026-11-24",
-   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6b04e460-476fef5a5835e24e2a48bd4e;5985d60f-aa06-4b6d-8de7-5978eb8474d0) Cannot access gated repo for url https://huggingface.co/facebook/sam-3d-body-dinov3/resolve/11aaa346c7204874a1cbafe3d39a979080b2c55a/assets/mhr_model.pt. Access to model fac\u2026",
-   "investigations": 1,
+   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6b063c6d-4d3f2a494a9d5aba669f2934;8dbf4cf5-3311-4ac3-b56c-a405a4469c33) Cannot access gated repo for url https://huggingface.co/facebook/sam-3d-body-dinov3/resolve/11aaa346c7204874a1cbafe3d39a979080b2c55a/model.ckpt. Access to model facebook/sam\u2026",
+   "investigations": 2,
    "kind": "error",
-   "last_seen": "2026-11-24",
+   "last_seen": "2026-11-25",
    "notebooks": [
     "notebooks/sam-3d-body/sam-3d-body.ipynb"
    ]
