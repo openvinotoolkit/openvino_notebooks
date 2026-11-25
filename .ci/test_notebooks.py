@@ -1,6 +1,10 @@
 import ast
+import os
+import subprocess
+import sys
 from textwrap import dedent
 
+import nbformat
 import requests
 from pathlib import Path
 import pytest
@@ -112,6 +116,26 @@ def test_skip_ov_install_keeps_other_requirements(core):
         "import openvino as ov",
         'package_label = "openvino"',
     ]
+
+
+def test_patch_notebooks_keeps_unicode_with_cp1252_stdout(tmp_path):
+    source = 'print("\u65e7")'
+    target = 'print("\u65b0")'
+    cell = nbformat.v4.new_code_cell(source, metadata={"test_replace": {source: target}})
+    nbformat.write(nbformat.v4.new_notebook(cells=[cell]), tmp_path / "example.ipynb")
+
+    result = subprocess.run(
+        [sys.executable, str(Path(__file__).resolve().with_name("patch_notebooks.py")), ".", "-td", "cpu"],
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONIOENCODING": "cp1252"},
+        check=True,
+        capture_output=True,
+        encoding="cp1252",
+    )
+
+    assert "Processed example.ipynb:" in result.stdout
+    patched = nbformat.read(tmp_path / "test_example.ipynb", as_version=4)
+    assert patched.cells[0].source == "# Modified for testing\n" + target
 
 
 @pytest.mark.skip(reason="URL existence is tested in docker_treon")
