@@ -32,12 +32,10 @@
 
 .status-table {
   --table-border-color: var(--spark-color-theme-light-gray400);
-  --num-devices: 1;
-
   border: 1px solid var(--table-border-color);
   border-bottom: 0;
   display: grid;
-  grid-template-columns: auto repeat(calc(4 * var(--num-devices)), auto);
+  grid-template-columns: auto repeat(calc(var(--num-python-versions) * var(--num-devices)), auto);
   grid-template-rows: repeat(6, 1fr);
   grid-auto-flow: row;
 
@@ -74,12 +72,12 @@
 
 .cpu-device-header {
   grid-row: 1;
-  grid-column: 2 / 6;
+  grid-column: 2 / span var(--num-python-versions);
 }
 
 .gpu-device-header {
   grid-row: 1;
-  grid-column: 6 / 10;
+  grid-column: calc(2 + var(--num-python-versions)) / span var(--num-python-versions);
 }
 
 .device-header {
@@ -90,12 +88,12 @@
 
 .cpu-python-versions {
   grid-row: 2;
-  grid-column: 2 / 6;
+  grid-column: 2 / span var(--num-python-versions);
 }
 
 .gpu-python-versions {
   grid-row: 2;
-  grid-column: 6 / 10;
+  grid-column: calc(2 + var(--num-python-versions)) / span var(--num-python-versions);
 }
 
 .python-versions {
@@ -107,12 +105,12 @@
 
 .cpu-statuses {
   grid-row: 3 / 7;
-  grid-column: 2 / 6;
+  grid-column: 2 / span var(--num-python-versions);
 }
 
 .gpu-statuses {
   grid-row: 3 / 7;
-  grid-column: 6 / 10;
+  grid-column: calc(2 + var(--num-python-versions)) / span var(--num-python-versions);
 }
 
 .statuses {

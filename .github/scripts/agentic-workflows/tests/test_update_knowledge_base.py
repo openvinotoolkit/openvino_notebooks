@@ -137,16 +137,37 @@ def test_update_records_every_investigated_group_with_the_agents_notes(world):
         "action": "pin protobuf<5",
         "dead_ends": "none",
         "next_step": "watch the next nightly",
+        "prior_feedback": "",
+        "applied_learning": "",
+        "self_assessment": "",
+        "lesson": "",
     }
     other = stored["signatures"][SIG_B]["attempts"][0]
     assert other["outcome"] == "none" and other["confidence"] == "" and other["root_cause"] == "r" * 399 + "…"
 
 
-def test_update_without_notes_still_counts_the_investigation(world):
+def test_selected_but_uninvestigated_groups_are_not_counted(world):
     world.snapshot()
-    world.update()
-    attempt = world.stored()["signatures"][SIG_A]["attempts"][0]
-    assert attempt["outcome"] == "none" and attempt["root_cause"] == "" and world.warnings == []
+    assert world.update() == {"investigated": 0, "evicted": [], "signatures": None}
+    assert not (world.out / kb.KNOWLEDGE_FILE).exists()
+
+
+def test_note_saved_before_pr_submission_persists_learning_without_counting_later_groups(world):
+    world.snapshot()
+    world.note(
+        SIG_A,
+        outcome="pr",
+        prior_feedback="https://github.com/o/r/pull/42 is unreviewed",
+        applied_learning="compared proposed patches",
+        self_assessment="minimal check passed; end-to-end unknown",
+        lesson="different signatures can share one patch",
+    )
+    # No later note: the runtime can stop at create_pull_request.
+    assert world.update()["investigated"] == 1
+    stored = world.stored()["signatures"]
+    assert set(stored) == {SIG_A}
+    assert stored[SIG_A]["attempts"][0]["lesson"] == "different signatures can share one patch"
+    assert stored[SIG_A]["attempts"][0]["prior_feedback"].startswith("https://github.com/")
 
 
 def test_update_builds_on_the_baseline_and_keeps_other_signatures(world):
@@ -156,6 +177,7 @@ def test_update_builds_on_the_baseline_and_keeps_other_signatures(world):
     kb.record_group(baseline, group_json(1, SIG_A), kb.make_attempt(900, RUN_URL, REMEDIATOR_URL, "2026-01-01", {"outcome": "issue", "root_cause": "earlier"}))
     (world.memory / kb.KNOWLEDGE_FILE).write_text(kb.dump_knowledge(baseline), encoding="utf-8")
     world.snapshot()
+    world.note(SIG_A, outcome="none")
     world.update()
 
     stored = world.stored()
@@ -181,7 +203,7 @@ def test_update_ignores_everything_the_agent_changes_after_the_snapshot(world):
 
     world.update()
     stored = world.stored()
-    assert set(stored["signatures"]) == {SIG_A, SIG_B}
+    assert set(stored["signatures"]) == {SIG_A}
     assert [a["root_cause"] for a in stored["signatures"][SIG_A]["attempts"]] == ["honest note", "trusted"]
     assert any("dddddddddddd.json" in warning for warning in world.warnings)
     # The result goes to a separate directory; the agent-writable memory directory is never read or written by the update.
@@ -199,20 +221,21 @@ def test_update_does_nothing_when_no_group_was_selected(tmp_path):
 @pytest.mark.parametrize("content", ["{", "[]", json.dumps({"root_cause": "x" * ukb.MAX_NOTE_BYTES})])
 def test_malformed_notes_are_ignored_with_a_warning(world, content):
     world.snapshot()
+    world.note(SIG_B, outcome="issue", root_cause="valid investigation")
     (world.notes / f"{SIG_A}.json").write_text(content, encoding="utf-8")
     world.update()
     assert any(f"{SIG_A}.json" in warning for warning in world.warnings)
-    assert world.stored()["signatures"][SIG_A]["attempts"][0]["root_cause"] == ""
+    assert SIG_A not in world.stored()["signatures"]
 
 
 @pytest.mark.parametrize("name", ["notes.txt", "zzzzzzzzzzzz.json", "cccccccccccc.json", "AAAAAAAAAAAA.json", "../escape.json"])
 def test_notes_for_unexpected_names_or_unselected_signatures_are_ignored(world, name):
     world.snapshot()
     (world.notes / Path(name).name).write_text('{"root_cause": "planted"}', encoding="utf-8")
-    world.update()
+    result = world.update()
     assert any(Path(name).name in warning for warning in world.warnings)
-    assert set(world.stored()["signatures"]) == {SIG_A, SIG_B}
-    assert all(a["root_cause"] == "" for r in world.stored()["signatures"].values() for a in r["attempts"])
+    assert result["signatures"] is None
+    assert not (world.out / kb.KNOWLEDGE_FILE).exists()
 
 
 def test_a_directory_named_like_a_note_is_ignored(world):
@@ -236,6 +259,8 @@ def test_update_evicts_the_least_recently_seen_signatures_beyond_the_cap(world, 
         kb.record_group(baseline, group_json(1, f"{number:012x}"), kb.make_attempt(1, RUN_URL, REMEDIATOR_URL, f"2026-01-{number % 28 + 1:02d}", None))
     (world.memory / kb.KNOWLEDGE_FILE).write_text(kb.dump_knowledge(baseline), encoding="utf-8")
     world.snapshot()
+    world.note(SIG_A, outcome="issue")
+    world.note(SIG_B, outcome="issue")
     result = world.update()
     assert len(world.stored()["signatures"]) == kb.MAX_SIGNATURES and len(result["evicted"]) == 2
     assert {SIG_A, SIG_B} <= set(world.stored()["signatures"])
@@ -252,6 +277,7 @@ def test_update_evicts_the_least_recently_seen_signatures_beyond_the_cap(world, 
 def test_nightly_date_falls_back_to_the_creation_date_then_today(world, run, expected):
     write_json(world.digest / "run.json", run)
     world.snapshot()
+    world.note(SIG_A, outcome="issue")
     world.update()
     assert world.stored()["signatures"][SIG_A]["last_seen"] == expected
 
@@ -274,7 +300,7 @@ def test_cli_snapshot_then_update(world, capsys):
     assert cli(world, "snapshot") == 0
     world.note(SIG_A, outcome="issue", root_cause="from the cli")
     assert cli(world, "update") == 0
-    assert "Recorded 2 investigated signatures" in capsys.readouterr().out
+    assert "Recorded 1 investigated signatures" in capsys.readouterr().out
     assert world.stored()["signatures"][SIG_A]["attempts"][0]["root_cause"] == "from the cli"
 
 
