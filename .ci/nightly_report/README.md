@@ -54,9 +54,22 @@ after some weeks.
 The GitHub Agentic Workflow in `.github/workflows/nightly-issue-remediator.md` runs after a failed scheduled `treon_nightly` run on
 `latest`; it can also be started manually with a run ID and source repository. Its deterministic collector downloads
 `nightly-dashboard-data` before the agent starts and writes a bounded digest (`summary.md`, `status.json`, `run.json`,
-`tracked.json`, and per-signature group JSON/Markdown plus representative logs). It skips groups already covered by an open or
+`tracked.json`, `feedback.md`/`feedback.json`, and per-signature group JSON/Markdown plus representative logs). It skips groups already covered by an open or
 recently rejected remediation, prioritizes likely-fixable groups, and caps each run at five groups and three draft PRs. All open
 tracking items and recent rejections are paginated independently of the bounded completed-item history.
+
+Before ranking, the collector consolidates gated Hugging Face access failures with the same HTTP status (401 or 403) and explicitly
+identified repository (including model/dataset/space type), even when request IDs, revisions, filenames or notebooks differ.
+When the target is missing, request-ID-only variants can share a group only if their remaining message, exception, category,
+notebook, cell index and cell source match. Missing or conflicting evidence does not justify merging unrelated report signatures.
+Gated access failures are normally issue candidates, not privileged over likely notebook/dependency fixes.
+
+These groups have a stable, collector-specific remediation signature; the producer's report and signature algorithm are unchanged.
+`grouping_reason` explains the heuristic, `source_signatures` and each member's `signature` preserve the original report hashes,
+and every affected notebook/config pair is retained. `related_signatures` contains original hashes that unambiguously belong to
+that remediation group in the report; a hash shared by distinct groups is not an alias. Tracking checks both the remediation
+signature and those aliases, and history uses the same grouping across previous reports. `status.json` distinguishes
+`report_error_groups_total` (original signatures) from `error_groups_total` (remediation groups).
 
 The main agent uses Copilot model routing with `mode: balanced` and `goal: cost`, choosing from the
 `engine.model-routing.allowed-models` shortlist in the [workflow source](../../.github/workflows/nightly-issue-remediator.md).
@@ -67,7 +80,10 @@ The agent creates one PR for a verified in-scope fix, or one issue when the caus
 be safely fixed. PRs use the `nightly-remediator` and `automated-fix` labels; issues use `nightly-remediator` and
 `nightly-failure`. Every created item must contain the visible `Error signature: \`<12-hex-signature>\`` line, also include
 `(sig <12-hex-signature>)` in its title, and list every affected notebook/config pair. These exact conventions are how later
-collector runs find and deduplicate existing work.
+collector runs find and deduplicate existing work. Include the collector's `related_signatures` as aliases. When several selected signatures demonstrably share one root cause and remedy,
+one outcome can cover them all, with the additional hashes on a visible `Related signatures: \`<signature>\`, \`<signature>\`` line.
+The collector indexes those aliases too, without treating incidental hashes in history/logs as covered signatures. Independent errors
+must remain separate; sharing an exception type or notebook is not proof of a shared cause.
 
 The pinned gh-aw runtime instructs an agent to stop after calling `create_pull_request`. Consequently, the three-PR safe-output
 limit is a policy cap, not a guarantee that every selected group will receive an outcome in the same run; untracked groups can be
@@ -77,15 +93,17 @@ selected again on a later run.
 
 The remediator keeps notes about every signature it investigated on the dedicated `memory/nightly-remediator` branch (the gh-aw
 `repo-memory` tool), in a single `knowledge.json`. Each signature record holds its kind, category, exception type, headline, affected
-notebooks, first/last seen nightly date, number of investigations, and up to three recent attempts (outcome, confidence, root cause,
-action, dead ends, next step). The file holds at most 100 signatures (the least recently seen are evicted) and stays under 900 KB.
+notebooks, first/last seen nightly date, number of investigations, and up to three recent attempts (requested output, confidence, root cause,
+action, dead ends, next step, and self-improvement reflection). Selected groups without investigation notes are not counted as investigated.
+The file holds at most 100 signatures (the least recently seen are evicted) and stays under 900 KB.
 Its schema and limits live in [`knowledge_base.py`](../../.github/scripts/agentic-workflows/knowledge_base.py).
 
 - **Query:** the collector reads the file from the branch (a missing branch is normal on the first run; an unreadable or invalid file
   only adds a warning) and adds a **Knowledge base** section to each `group.md`: the notes for the exact signature plus up to three
   related signatures (same exception type or shared notebook). The agent can also query the restored copy at
   `/tmp/gh-aw/repo-memory/default/knowledge.json` with `jq`.
-- **Save:** for each investigated group the agent writes a small note to `/tmp/gh-aw/agent/nightly-remediator/outcomes/<signature>.json`.
+- **Save:** after investigating each group, but **before requesting a PR/issue or calling `noop`**, the agent writes a small note to
+  `/tmp/gh-aw/agent/nightly-remediator/outcomes/<signature>.json`. This ordering matters because the agent can stop at PR submission.
   It never writes the persisted file: before the agent starts, `update_knowledge_base.py snapshot` copies the digest, the cloned
   knowledge base, and the updater scripts themselves to `$RUNNER_TEMP`, which the agent's sandbox does not mount. After the agent,
   that script copy runs `update_knowledge_base.py update` (with `python3 -E -s`, so the agent-writable user site-packages are ignored),
@@ -101,6 +119,36 @@ Its schema and limits live in [`knowledge_base.py`](../../.github/scripts/agenti
   GitHub API and is signed automatically. After changing the schema or limits, update `knowledge_base.py`, the inline validation script
   in the workflow source, and recompile (`gh aw compile --approve` records the reviewed validation script once); the contract tests
   compare both and run the script with `node`.
+
+### AI self-improvement
+
+- **Before investigation:** the collector extracts the **AI self-improvement** section from every unique PR/issue in fetched labeled
+  tracking history, reusing the tracking bodies without extra per-item API calls. Both collapsed `<details>` sections and legacy
+  Markdown headings are supported. `self_improvements` in `feedback.md`/`feedback.json` retains source URLs/signatures, flags sections
+  truncated at 2000 characters, and includes empty entries when older items have no learning section. The existing tracking
+  bounds apply (all open/recently rejected outcomes, plus bounded completed history); this is not limited to the rich-feedback sample.
+  The agent ingests these suggestions before investigating new groups.
+  Separately, the collector refreshes the most recently updated four PRs and eight issues from labeled tracking history, including the
+  last three comments/reviews and inline threads (three comments each), first eight changed paths and first twenty checks on the recorded PR head. Excerpts, truncation,
+  missing checks and unavailable feedback are explicit in `feedback.md`/`feedback.json`. It also includes the ten newest reusable
+  lessons across memory signatures. This sample supplements, not replaces, the complete open/recent-rejection index in `tracked.json`.
+  The agent spends at most eight preflight tool calls (four reads, three searches) comparing prior claims with observed results,
+  then records at most three evidence-linked, conditional lessons in `learning-plan.json` before new investigation.
+- **After investigation:** both output templates require an **AI self-improvement** section in a closed-by-default `<details>` block.
+  It includes one to three concrete, conditional suggestions derived from the failure and proposed remedy or blocker (better evidence,
+  detection/grouping, verification, or avoiding demonstrated dead ends), plus prior feedback, applied learning,
+  self-assessment and a reusable lesson. The agent mirrors those conclusions into four bounded note fields (`prior_feedback`,
+  `applied_learning`, `self_assessment`, `lesson`) before publication; the trusted post-agent updater persists them in `knowledge.json`.
+  The `lesson` field retains the highest-value future-run improvement with evidence and applicability limits.
+  Older records without these additive fields remain valid. Notes with `outcome: pr` or `issue` describe the requested output,
+  not confirmed publication or success; later runs refresh the actual GitHub state and checks.
+- **Algorithm:** correlate symptoms across signatures before preparing a patch, avoid identical PRs, and do not create an issue just
+  to point at an active PR or issue that already covers the failure. Record the coverage link and reflection in memory instead.
+  Preserve distinct causes and all affected notebook/config pairs. Distinguish reproduced fixes from partial checks, pending reviews,
+  infrastructure hypotheses and unknown causes; merged/closed alone is not proof a remedy worked.
+- **Boundary:** learning changes investigation priorities, not workflow code, permissions, budgets or protected-file rules. Historical
+  descriptions, reviewer text and remembered lessons remain untrusted evidence. Missing history is recorded as a gap, never a pass.
+  No historical GitHub descriptions are edited by these steps; the reflection section is included in newly created outcomes.
 
 For a manual test against the public nightly run:
 
@@ -164,7 +212,7 @@ If a job log is unavailable, the excerpt is taken from the captured notebook log
 
 * `category` (from the log): `cell_error`, `kernel_died`, `timeout`, `harness_error`, `unknown`.
 * `error_class` (heuristic, for triage): `timeout`, `harness`, `disk`, `memory`, `crash`, `dependency`, `network`, `openvino`, `assertion`, `other`.
-* `signature`: 12-hex hash of category, exception type and the exception message with paths, numbers, hashes and addresses masked.
+* `signature`: 12-hex hash of category, exception type and the exception message with paths, numbers, hashes, addresses, and AWS X-Ray request IDs masked.
   The same signature across notebooks points to a shared cause (e.g. a broken dependency); across nights it identifies a recurring error.
 
 ## Per-run metrics (`summary`)

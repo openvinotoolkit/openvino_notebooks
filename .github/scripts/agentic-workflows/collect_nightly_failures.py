@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pre-agent step of the nightly issue remediator (no AI, stdlib + the `gh` CLI).
 
-Downloads the `nightly-dashboard-data` report of a `treon_nightly` run, groups the failures by error signature, drops groups that already
+Downloads the `nightly-dashboard-data` report of a `treon_nightly` run, groups evidence-equivalent failures for remediation, drops groups that already
 have an open (or recently rejected) remediation PR/issue, ranks the rest, downloads the raw logs of the most representative failures
 and writes a digest that the agent reads instead of calling GitHub itself.
 
@@ -13,6 +13,7 @@ Digest layout (`--out`):
   summary.md     entry point: run, ranked groups, already tracked and deferred groups
   run.json       run metadata from the report
   tracked.json   remediation PRs/issues found per error signature
+  feedback.md / feedback.json  learning sections from all fetched tracked outcomes, bounded rich feedback/head checks, memory lessons
   groups/NN-<signature>/group.md    evidence of one error group: where it starts, earlier knowledge base notes, affected notebooks, history, versions, excerpts
   groups/NN-<signature>/group.json  the same in machine-readable form
   groups/NN-<signature>/logs/       raw treon logs of representative failures (or job log extracts for infra groups)
@@ -37,6 +38,7 @@ from collector_github import check_schema, download_report, resolve_run
 from collector_analysis import build_groups, fetch_history, fetch_tracked, night_from_report, select_groups
 from collector_evidence import make_context
 from collector_knowledge import attach_knowledge, fetch_knowledge
+from collector_feedback import fetch_feedback, render_feedback
 from collector_render import build_digest, group_to_json, render_group, render_summary
 
 
@@ -108,6 +110,7 @@ def collect(args: argparse.Namespace, out: Path, warnings: List[str], now: Optio
             "run_url": ctx.run.get("url"),
             "failures_total": len(report.get("failures") or []),
             "error_groups_total": sum(1 for g in groups if g.kind == "error"),
+            "report_error_groups_total": len({f["signature"] for f in report.get("failures") or [] if f.get("signature")}),
             "infra_groups_total": sum(1 for g in groups if g.kind == "infra"),
             "infra_notebooks_not_run": sum(len(g.members) for g in groups if g.kind == "infra"),
             "groups_selected": 0,
@@ -132,6 +135,9 @@ def collect(args: argparse.Namespace, out: Path, warnings: List[str], now: Optio
         current = night_from_report(report)
         previous = fetch_history(args.source_repo, run, args.history_nights, workdir, warn)
         knowledge = fetch_knowledge(args.repo, warn)
+        feedback = fetch_feedback(args.repo, tracked, knowledge, warn)
+        write_json(out / "feedback.json", feedback)
+        (out / "feedback.md").write_text(render_feedback(feedback), encoding="utf-8")
         digests: List[GroupDigest] = []
         used_bytes = [0]
         for index, (group, decision) in enumerate(selected, start=1):
