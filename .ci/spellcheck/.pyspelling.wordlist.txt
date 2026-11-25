@@ -79,6 +79,7 @@ behaviour
 BEiT
 Belrose
 Benchmarking
+benchmarked
 benchmarking
 bernini
 bert
@@ -242,6 +243,7 @@ denormalization
 denormalized
 depainting
 deployable
+dequantized
 DepthAnything
 DepthAnythingV
 DEtection
@@ -672,6 +674,7 @@ minicpm
 MiniCPM
 MiniLM
 Ministral
+mINP
 mistralai
 MLLM
 MLLMs

@@ -28,7 +28,9 @@ Market-1501 SBS-R50 checkpoint on first run — and follows these steps:
 - Download the FastReID code and checkpoint and build the PyTorch model
 - Run the PyTorch model on public sample crops and use the embeddings for retrieval
 - Convert the model to OpenVINO FP32 and FP16 IR and verify it against PyTorch
-- Optimize the model to INT8 with NNCF post-training quantization
+- Optimize the model with NNCF: INT8 post-training quantization, and INT8 weight-only
+  quantization that needs no calibration data
+- Compare the retrieval accuracy (Rank-1/5/10, mAP, mINP) on a MOT17-derived benchmark
 - Compare the latency and throughput of all precisions with `benchmark_app`
 
 ## Installation Instructions
@@ -39,10 +41,12 @@ please refer to the [Installation Guide](https://github.com/openvinotoolkit/open
 The FastReID code, the sample crops (`tools/deploy/test_data`) and the checkpoint are downloaded automatically on
 first run; nothing from them is stored in this repository. The notebook is pinned to FastReID commit `c9bc3ce`.
 
-Market-1501 and MOT17 are **optional** and not redistributed here: set `REID_DATA` to a MOT17 `train` folder (rank-1 /
-mAP accuracy and INT8 calibration on real crops) or to a Market-1501 folder (INT8 calibration only). Without them,
-INT8 is calibrated on augmented copies of the sample crops, which lets the notebook run end to end but makes its INT8
-accuracy numbers not meaningful.
+Market-1501 and MOT17 are **optional** and not redistributed here: set `REID_DATA` to a MOT17 `train`
+folder to calibrate INT8 quantization on real person crops and to measure the retrieval accuracy
+(Rank-1/5/10, mAP, mINP) of all models on a benchmark built from the MOT17 ground truth. Without
+`REID_DATA`, INT8 is calibrated on augmented copies of the sample crops, which lets the notebook run
+end to end but makes its INT8 accuracy numbers not meaningful; the weight-only quantized models are
+unaffected, as they need no calibration data at all.
 
 ### Licenses
 
