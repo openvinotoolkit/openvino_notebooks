@@ -263,6 +263,18 @@ def test_download_file_accepts_gzip_response(tmp_path):
     assert not (tmp_path / "model.bin.part").exists()
 
 
+def test_download_file_uses_custom_user_agent(tmp_path):
+    response = MagicMock()
+    response.headers = {"Content-Length": "5"}
+    response.iter_content.return_value = iter([b"model"])
+
+    with patch("requests.get", return_value=response) as get, patch("tqdm.notebook.tqdm_notebook"):
+        path = download_file("https://example.com/model.bin", directory=tmp_path, show_progress=False, user_agent="test-client")
+
+    assert get.call_args.kwargs["headers"] == {"User-agent": "test-client"}
+    assert path.read_bytes() == b"model"
+
+
 @pytest.mark.parametrize(
     ("xml_url", "bin_url"),
     [
