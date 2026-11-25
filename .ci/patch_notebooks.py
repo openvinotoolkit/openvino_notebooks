@@ -217,7 +217,7 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
                             raise ValueError(f"Processing {notebookfile} failed: {source_value} does not exist in cell")
                         cell["source"] = cell["source"].replace(source_value, target_value)
                         cell["source"] = "# Modified for testing\n" + cell["source"]
-                        print(f"Processed {notebookfile}: {source_value} -> {target_value}")
+                        print(f"Processed {notebookfile}: {source_value!a} -> {target_value!a}")
             if test_device and not device_found:
                 print(f"No device replacement found for {notebookfile}")
             if not found:
