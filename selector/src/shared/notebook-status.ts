@@ -2,7 +2,7 @@ type ValidatedOS =  'ubuntu-22.04' | 'windows-2022';
 
 type ValidatedDevice = 'cpu' | 'gpu';
 
-export const VALIDATED_PYTHON_VERSIONS = ['3.10', '3.11', '3.12', '3.13'] as const;
+export const VALIDATED_PYTHON_VERSIONS = ['3.10', '3.11', '3.12', '3.13', '3.14'] as const;
 
 type ValidatedPythonVersion = (typeof VALIDATED_PYTHON_VERSIONS)[number];
 
@@ -20,7 +20,7 @@ export interface INotebookStatus {
   status: {
     [OS in ValidatedOS]: {
       [Device in ValidatedDevice]: {
-        [PythonVersion in ValidatedPythonVersion]: ValidationStatus | null;
+        [PythonVersion in ValidatedPythonVersion]?: ValidationStatus | null;
       };
     };
   };

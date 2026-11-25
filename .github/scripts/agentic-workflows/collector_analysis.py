@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import hashlib
+import json
+import re
 import zipfile
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
@@ -26,6 +28,14 @@ from collector_common import (
     Key,
 )
 from collector_github import check_schema, download_report, list_json, list_nightly_runs
+from collector_feedback import extract_self_improvement
+
+_REQUEST_ID_RE = re.compile(r"\bRequest ID:\s*[A-Za-z0-9][A-Za-z0-9;=_.:/+-]{0,255}(?=[)\s]|$)")
+_ACCESS_STATUS_RE = re.compile(r"\b(401|403) Client Error\b")
+_GATED_URL_RE = re.compile(
+    r"Cannot access gated repo for url\s+https://huggingface\.co/"
+    r"(?:(?:api/)?(models|datasets|spaces)/)?([A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*)/(?:resolve|revision)/"
+)
 
 
 def parse_ts(value: Optional[str]) -> Optional[datetime]:
@@ -49,17 +59,49 @@ def infra_signature(reason: str) -> str:
     return hashlib.sha1(f"infra|{reason}".encode("utf-8"), usedforsecurity=False).hexdigest()[:12]
 
 
+def is_gated_access_failure(exception_type: str, message: str) -> bool:
+    return exception_type.rsplit(".", 1)[-1] == "GatedRepoError" and _ACCESS_STATUS_RE.search(message) is not None
+
+
+def remediation_identity(failure: dict) -> Tuple[str, str]:
+    """Only override report grouping when there is evidence of a shared remediation, not just a shared exception type."""
+    message = failure.get("exception_message") or ""
+    exception_type = failure.get("exception_type") or ""
+    category = failure.get("category") or "unknown"
+    identity: list = []
+    reason = ""
+    if is_gated_access_failure(exception_type, message):
+        status = _ACCESS_STATUS_RE.search(message).group(1)
+        targets = {(kind or "models", repo) for kind, repo in _GATED_URL_RE.findall(message + "\n" + (failure.get("traceback_excerpt") or ""))}
+        if len(targets) == 1:
+            kind, repo = next(iter(targets))
+            identity = ["gated-access", category, status, kind, repo]
+            reason = f"Same gated Hugging Face {kind} repository {repo}, HTTP {status}; request IDs, revisions and filenames do not change access requirements."
+        elif targets:
+            return failure["signature"], ""
+    if not identity:
+        normalized = _REQUEST_ID_RE.sub("Request ID: <request-id>", message)
+        source = failure.get("cell_source_excerpt")
+        if normalized == message or not source or failure.get("cell_index") is None:
+            return failure["signature"], ""
+        identity = ["request-id", category, exception_type, normalized, failure["notebook"], failure["cell_index"], source]
+        reason = "Same exception and message after masking the Request ID, in the same notebook cell and source; configurations may differ."
+    payload = json.dumps(["nightly-remediation-v1", *identity], ensure_ascii=True)
+    return hashlib.sha1(payload.encode("utf-8"), usedforsecurity=False).hexdigest()[:12], reason
+
+
 def build_groups(report: dict) -> List[Group]:
-    """Failure groups keyed by signature, plus infra groups for notebooks that never ran because a job broke."""
+    """Conservative remediation groups retaining original report signatures, plus infra failures before tests."""
     canonical = {g.get("signature"): g for g in report.get("error_groups") or []}
     groups: Dict[str, Group] = {}
     for failure in report.get("failures") or []:
         signature, notebook, config_id = failure.get("signature"), failure.get("notebook"), failure.get("config_id")
         if not (signature and notebook and config_id):
             continue
+        signature, grouping_reason = remediation_identity(failure)
         group = groups.get(signature)
         if group is None:
-            header = canonical.get(signature) or failure
+            header = failure if grouping_reason else canonical.get(signature) or failure
             group = groups[signature] = Group(
                 signature=signature,
                 kind="error",
@@ -67,8 +109,16 @@ def build_groups(report: dict) -> List[Group]:
                 error_class=header.get("error_class") or failure.get("error_class") or "other",
                 exception_type=header.get("exception_type") or failure.get("exception_type") or "",
                 exception_message=header.get("exception_message") or failure.get("exception_message") or "",
+                grouping_reason=grouping_reason,
             )
         group.members.append(Member(notebook, config_id, failure.get("status") or "failed", to_int(failure.get("job_id")), failure=failure))
+
+    owners: Dict[str, set] = defaultdict(set)
+    for group in groups.values():
+        for signature in group.source_signatures:
+            owners[signature].add(group.signature)
+    for group in groups.values():
+        group.related_signatures = [s for s in group.source_signatures if s != group.signature and len(owners[s]) == 1]
 
     for result in report.get("results") or []:
         reason = result.get("not_run_reason") or ""
@@ -95,6 +145,18 @@ def extract_signature(*texts: Optional[str]) -> Optional[str]:
         if match:
             return match.group(1).lower()
     return None
+
+
+def extract_signatures(title: Optional[str], body: Optional[str]) -> List[str]:
+    """The primary signature plus explicitly declared aliases, never incidental hashes in history or logs."""
+    primary = extract_signature(title, body)
+    signatures = [primary] if primary else []
+    declarations = [line.removeprefix("Related signatures: ") for line in (body or "").splitlines() if line.startswith("Related signatures: ")]
+    if len(declarations) == 1:
+        aliases = declarations[0].strip().split(",")
+        if all(re.fullmatch(r"`?[0-9a-f]{12}`?", alias.strip()) for alias in aliases):
+            signatures.extend(alias.strip().strip("`") for alias in aliases)
+    return list(dict.fromkeys(signatures)) if primary else []
 
 
 def item_state(kind: str, raw: dict) -> str:
@@ -199,8 +261,8 @@ def fetch_tracked(repo: str, warn: Callable[[str], None], now: Optional[datetime
                     if key in seen:
                         continue
                     seen.add(key)
-                    signature = extract_signature(raw.get("title"), raw.get("body"))
-                    if signature:
+                    learning, learning_truncated = extract_self_improvement(raw.get("body") or "")
+                    for signature in extract_signatures(raw.get("title"), raw.get("body")):
                         tracked[signature].append(
                             TrackedItem(
                                 kind,
@@ -211,6 +273,9 @@ def fetch_tracked(repo: str, warn: Callable[[str], None], now: Optional[datetime
                                 signature,
                                 raw.get("createdAt", ""),
                                 raw.get("closedAt") or raw.get("mergedAt"),
+                                raw.get("updatedAt", ""),
+                                self_improvement=learning,
+                                self_improvement_truncated=learning_truncated,
                             )
                         )
                 # A recent rejection must have an updatedAt after the cutoff.
@@ -236,7 +301,7 @@ def decide_tracking(items: List[TrackedItem], now: datetime) -> TrackingDecision
 
 
 def is_pr_candidate(group: Group) -> bool:
-    return group.kind == "error" and group.error_class in PR_CANDIDATE_CLASSES
+    return group.kind == "error" and group.error_class in PR_CANDIDATE_CLASSES and not is_gated_access_failure(group.exception_type, group.exception_message)
 
 
 def select_groups(groups: List[Group], tracked: Dict[str, List[TrackedItem]], max_groups: int, max_prs: int, now: datetime):
@@ -250,7 +315,8 @@ def select_groups(groups: List[Group], tracked: Dict[str, List[TrackedItem]], ma
     fixable: List[Tuple[Group, TrackingDecision]] = []
     other: List[Tuple[Group, TrackingDecision]] = []
     for group in sorted(groups, key=rank_key):
-        decision = decide_tracking(tracked.get(group.signature, []), now)
+        items = {(item.kind, item.number): item for signature in [group.signature, *group.related_signatures] for item in tracked.get(signature, [])}
+        decision = decide_tracking(sorted(items.values(), key=lambda item: item.created_at, reverse=True), now)
         (skipped if decision.skip else fixable if is_pr_candidate(group) else other).append((group, decision))
     quota = min(len(fixable), max_prs, max_groups)
     chosen = fixable[:quota] + other[: max_groups - quota]

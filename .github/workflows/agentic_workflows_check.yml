@@ -31,7 +31,7 @@ jobs:
         uses: github/gh-aw/actions/setup-cli@0627fdbe4beb5f3b71aa569f8d97150b87f2111a # v1.0.1
         with:
           # Must equal the `gh aw version` that generated the committed .lock.yml files
-          version: v1.0.1
+          version: v1.2.2
 
       - name: Compile and verify agentic workflows
         env:

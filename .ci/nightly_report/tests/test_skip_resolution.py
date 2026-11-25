@@ -4,7 +4,7 @@ import pytest
 
 import validate_notebooks
 from nightly_report.constants import SkipReason
-from validate_notebooks import get_ignore_list_notebooks, get_ignored_notebooks_from_yaml, resolve_skip_reasons
+from validate_notebooks import get_ignore_list_notebooks, get_ignore_list_sources, get_ignored_notebooks_from_yaml, resolve_skip_reasons
 
 CI_DIR = Path(__file__).resolve().parents[2]
 
@@ -45,7 +45,9 @@ def skip_config(tmp_path) -> Path:
 @pytest.fixture
 def ignore_txt(tmp_path) -> Path:
     path = tmp_path / "ignore.txt"
-    path.write_text("notebooks/txt-ignored/txt-ignored.ipynb\n\n   \n  notebooks/both/both.ipynb  \n", encoding="utf-8")
+    path.write_text(
+        "# Missing dependency\nnotebooks/txt-ignored/txt-ignored.ipynb\n\n   \n  # Another reason\n  notebooks/both/both.ipynb  \n", encoding="utf-8"
+    )
     return path
 
 
@@ -91,6 +93,13 @@ def test_get_ignore_list_notebooks(ignore_txt):
         Path("notebooks/both/both.ipynb"),
         Path("notebooks/direct/direct.ipynb"),
     ]
+
+
+def test_get_ignore_list_sources_ignores_comments(ignore_txt, tmp_path):
+    assert get_ignore_list_sources([str(ignore_txt)], tmp_path / "notebooks") == {
+        "txt-ignored/txt-ignored.ipynb": "ignore.txt",
+        "both/both.ipynb": "ignore.txt",
+    }
 
 
 def test_resolve_skip_reasons_precedence(skip_config, ignore_txt):
