@@ -533,6 +533,7 @@ JuggernautXL
 Jupyter
 Jupyter's
 JupyterLab
+Kaggle
 kagglehub
 Kaiming
 Kalman
