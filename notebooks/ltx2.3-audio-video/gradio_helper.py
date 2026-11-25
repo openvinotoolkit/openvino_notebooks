@@ -9,6 +9,11 @@ from diffusers.pipelines.ltx2.utils import DEFAULT_NEGATIVE_PROMPT
 from diffusers.utils import encode_video
 from tqdm.auto import tqdm
 
+DEFAULT_PROMPTS = {
+    "text-to-video": "A cat stretches lazily on a sunny windowsill, purring softly, while birds chirp outside.",
+    "image-to-video": "Cars move along the road ahead. Engine sounds and tire noise are heard with light wind in the background.",
+}
+
 
 def get_guidance_config(guidance_scale: float = 3.0, audio_guidance_scale: float = 7.0, fast_mode: bool = False) -> dict:
     return {
@@ -143,7 +148,7 @@ def make_demo(pipe, generation_mode, use_genai=False, generation_args=None, stat
         gr.Markdown("# LTX-2.3 synchronized audio-video generation")
         prompt = gr.Textbox(
             label="Prompt",
-            value="A cat stretches lazily on a sunny windowsill, purring softly, while birds chirp outside.",
+            value=DEFAULT_PROMPTS[generation_mode],
             lines=4,
         )
         negative_prompt = gr.Textbox(label="Negative prompt", value=DEFAULT_NEGATIVE_PROMPT, lines=2)

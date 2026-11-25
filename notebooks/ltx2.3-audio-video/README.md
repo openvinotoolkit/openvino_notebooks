@@ -9,7 +9,7 @@ https://github.com/user-attachments/assets/0a297ba9-579d-4867-8e9d-b65eaead7ad1
 This tutorial shows how to export LTX-2.3 to OpenVINO Intermediate Representation with [Optimum Intel](https://huggingface.co/docs/optimum/intel/index), compress its weights with [NNCF](https://github.com/openvinotoolkit/nncf), and run one of two workflows:
 
 - **Text-to-audio-video** generates video and audio from a text prompt with [OpenVINO GenAI](https://github.com/openvinotoolkit/openvino.genai) `Text2VideoPipeline` or with the Optimum Intel pipeline.
-- **Image-to-audio-video** uses an initial image together with a text prompt and runs with the Optimum Intel pipeline.
+- **Image-to-audio-video** uses an initial image together with a text prompt and runs with the Optimum Intel pipeline. The default road image is paired with a traffic prompt; adapt the prompt to your image and desired sounds.
 
 A single **text-to-video** export is reused by both workflows. It identifies `LTX2Pipeline` for GenAI and also includes the VAE encoder for Optimum Intel image conditioning. The current exporter moves RoPE calculations outside the transformer and connectors; a new output directory avoids reusing earlier IRs.
 
