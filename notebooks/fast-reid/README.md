@@ -41,6 +41,11 @@ please refer to the [Installation Guide](https://github.com/openvinotoolkit/open
 The FastReID code, the sample crops (`tools/deploy/test_data`) and the checkpoint are downloaded automatically on
 first run; nothing from them is stored in this repository. The notebook is pinned to FastReID commit `c9bc3ce`.
 
+The model weights are **not redistributed** in this repository: the `market_sbs_R50.pth` checkpoint is fetched on
+first run from the official FastReID model zoo. The checkpoint was trained on the **Market-1501** dataset, and the
+optimization highlighted in the notebook is INT8 **weight-only** quantization (`nncf.compress_weights`), which needs
+no calibration dataset.
+
 Market-1501 and MOT17 are **optional** and not redistributed here: set `REID_DATA` to a MOT17 `train`
 folder to calibrate INT8 quantization on real person crops and to measure the retrieval accuracy
 (Rank-1/5/10, mAP, mINP) of all models on a benchmark built from the MOT17 ground truth. Without
