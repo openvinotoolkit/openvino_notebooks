@@ -130,7 +130,7 @@ jobs:
           cat test_notebooks.txt
 
       - name: Setup Python ${{ inputs.python }}
-        uses: openvinotoolkit/openvino/.github/actions/setup_python@3c203973be08baa7eea263d06dd2f006d6b607d8
+        uses: openvinotoolkit/openvino/.github/actions/setup_python@154c1eecbad6a481cae9a110cd28dbe6842f2322
         with:
           version: ${{ inputs.python }}
           pip-cache-path: ${{ env.PIP_CACHE_PATH }}
@@ -146,14 +146,11 @@ jobs:
           mv case_00030 notebooks/ct-segmentation-quantize/kits19/kits19_frames
           mv case_00001 notebooks/ct-segmentation-quantize/kits19/kits19_frames
 
-      - name: Prepare models for meter-reader and paddle-ocr-webcam
+      - name: Prepare models for meter-reader
         run: |
           mkdir -p notebooks/meter-reader/model
           curl -o notebooks/meter-reader/model/meter_det_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_det_model.tar.gz'
           curl -o notebooks/meter-reader/model/meter_seg_model.tar.gz 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/meter-reader/meter_seg_model.tar.gz'
-          mkdir -p notebooks/paddle-ocr-webcam/model
-          curl -o notebooks/paddle-ocr-webcam/model/ch_PP-OCRv3_det_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_det_infer.tar'
-          curl -o notebooks/paddle-ocr-webcam/model/ch_PP-OCRv3_rec_infer.tar 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/paddle-ocr/ch_PP-OCRv3_rec_infer.tar'
 
       - name: Install python dependencies
         shell: pwsh

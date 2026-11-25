@@ -1,0 +1,68 @@
+## Problem
+
+<One or two sentences: what fails in the nightly, for which notebooks, and since when (use the group's Trend/History).>
+
+## Error signature
+
+Error signature: `<12-hex-signature>`
+Nightly run: <nightly run URL>
+Related signatures: <comma-separated backtick-quoted covered signatures, or none>
+
+## Affected notebooks
+
+<Every (notebook, config) pair from the group's "Affected notebooks" table, not only the representative failure.>
+
+| Notebook | Configs | Status | Previous night |
+|---|---|---|---|
+| `notebooks/<dir>/<notebook>.ipynb` | `<config-id>`, `<config-id>` | <failed/not run> | <same error/passed/other failure/not run/n/a> |
+
+## Error type and where it starts
+
+- **Category / class:** <category> / <error class>
+- **Exception:** `<ExceptionType>: <short message>`
+- **Starts at:** `<notebook or helper path>`, cell <N> (`<first line of the failing code>`), first seen <date or run>
+- **Representative log:** <job or log link>
+
+```text
+<Shortest traceback excerpt that shows the origin of the error>
+```
+
+## Root cause
+
+<The causal chain from evidence to cause, citing the log excerpt, package/environment differences, history, or source lines that support it.>
+
+## Fix
+
+<What was changed and why it addresses the root cause. Name each changed file and summarize the change; mention notebook formatting or dependency conventions that were preserved.>
+
+## Verification and limits
+
+| Check | Result |
+|---|---|
+| `<command>` | <passed/failed/not run, with reason> |
+
+- Normal CI is not triggered automatically for PRs created by this workflow; maintainers must run the notebook checks before merging.
+- <Anything not verified, such as the notebook not being executed end to end, hardware-specific configs, or remaining uncertainty.>
+
+## History
+
+<Trend and per-night summary from the group's History table, previous remediation attempts or related issues/PRs, and OpenVINO versions observed failing or passing.>
+
+<details>
+<summary>AI self-improvement</summary>
+
+### Suggestions for future runs
+
+- **Future-run improvements:** <One to three concrete, conditional improvements derived from this failure and the proposed fix: which evidence to collect first, detection/grouping signal to use, check to add or prioritize, or ineffective approach to avoid. Cite supporting evidence and state when each suggestion applies and what remains unverified. These are proposals for later runs, not permission to change workflow safeguards.>
+
+### Before investigation
+
+- **Prior feedback:** <Source PR/issue URLs or memory runs, observed outcomes and uncertainty; or none available with reason.>
+- **Applied learning:** <The applicable lesson and how it changed this investigation, or why prior advice did not apply.>
+
+### After investigation
+
+- **Self-assessment:** <Evidence and check results supporting or contradicting the remedy, dead ends and validation gaps; do not equate PR creation with success.>
+- **Reusable lesson:** <The highest-value future-run improvement to retain in memory, with its applicability condition, supporting evidence and limitations.>
+
+</details>

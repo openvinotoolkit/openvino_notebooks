@@ -1,0 +1,178 @@
+# Python 3.14 skip list for nightly and pre-commit validation.
+
+# Python 3.14 nightly failures: https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44182247247
+
+# torch==2.7.1 has no Python 3.14 wheel.
+notebooks/aloha-act/aloha-act.ipynb
+
+# torch==2.8 has no Python 3.14 wheel.
+notebooks/detectron2-to-openvino/detectron2-to-openvino.ipynb
+
+# torch==2.8 has no Python 3.14 wheel.
+notebooks/llm-code-assistant/llm-code-assistant.ipynb
+
+# torch==2.8.0 has no Python 3.14 wheel.
+notebooks/llm-rag-langchain/llm-rag-langchain-eval.ipynb
+
+# torch==2.8 has no Python 3.14 wheel.
+notebooks/llm-rag-llamaindex/llm-rag-llamaindex.ipynb
+
+# torch==2.8.0 has no Python 3.14 wheel.
+notebooks/paddleocr_vl/paddleocr_vl.ipynb
+
+# torch>=2.1,<2.9 excludes versions with Python 3.14 wheels.
+notebooks/qwen-image/qwen-image.ipynb
+
+# torch==2.8.0 has no Python 3.14 wheel.
+notebooks/qwen3-tts/qwen3-tts.ipynb
+
+# torch==2.8.0 has no Python 3.14 wheel.
+notebooks/qwen3guard-stream/qwen3guard-stream.ipynb
+
+# torch>=2.8,<2.9 excludes versions with Python 3.14 wheels.
+notebooks/sensevoice-small/sensevoice-small.ipynb
+
+# torch==2.8 has no Python 3.14 wheel.
+notebooks/stable-diffusion-v3-torch-fx/stable-diffusion-v3-torch-fx.ipynb
+
+# torch>=2.1,<2.9 excludes versions with Python 3.14 wheels.
+notebooks/text-to-image-genai/text-to-image-genai.ipynb
+
+# torch==2.8 has no Python 3.14 wheel.
+notebooks/z-image-turbo/z-image-turbo.ipynb
+
+# Python 3.14 missing package failures: https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44498509273
+# Install-cell output was not retained; comments identify the missing import and relevant dependency constraints.
+
+# cv2 missing; the install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/3D-pose-estimation-webcam/3D-pose-estimation.ipynb
+
+# openvino missing; the install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/auto-device/auto-device.ipynb
+
+# cv2 missing; the install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/ct-segmentation-quantize/ct-segmentation-quantize-nncf.ipynb
+
+# huggingface_hub missing; the install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/darkir-image-restoration/darkir-image-restoration.ipynb
+
+# huggingface_hub missing; the install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/deepseek-r1/deepseek-r1.ipynb
+
+# diffusers missing during export; its install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/flex.2-image-generation/flex.2-image-generation.ipynb
+
+# huggingface_hub missing; the install requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/florence2/florence2.ipynb
+
+# diffusers missing during export; its install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/flux.1-image-generation/flux.1-image-generation.ipynb
+
+# huggingface_hub missing; the install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/freevc-voice-conversion/freevc-voice-conversion.ipynb
+
+# torch missing; the install requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/grounded-segment-anything/grounded-segment-anything.ipynb
+
+# openvino_genai missing; openvino-genai==2025.3 has no Python 3.14 wheel.
+notebooks/image-to-image-genai/image-to-image-genai.ipynb
+
+# diffusers missing during export; pydantic>=2,<2.11 needs pydantic-core without a Python 3.14 wheel.
+notebooks/inpainting-genai/inpainting-genai.ipynb
+
+# transformers missing; its install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/jina-clip/jina-clip.ipynb
+
+# openai missing; Qwen-Agent's GUI pins pydantic-core==2.23.4 without a Python 3.14 wheel.
+# The notebook also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/llm-agent-functioncall/llm-agent-functioncall-qwen.ipynb
+
+# open_clip missing; its install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/mobileclip-video-search/mobileclip-video-search.ipynb
+
+# open_clip missing during export; its install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/multimodal-rag/multimodal-rag-llamaindex.ipynb
+
+# paddle missing; paddlepaddle>=2.6.2,<=3.0.0 has no Python 3.14 wheel.
+notebooks/paddle-to-openvino/paddle-to-openvino-classification.ipynb
+
+# huggingface_hub missing; SAM2 does not declare it, and its Gradio constraint requires Pillow<11 without a Python 3.14 wheel.
+notebooks/sam2-image-segmentation/segment-anything-2-image.ipynb
+
+# docling_core missing; its install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/smoldocling/smoldocling.ipynb
+
+# num2words missing; its install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/smolvlm2/smolvlm2.ipynb
+
+# diffusers missing during export; its install also requests torch==2.8, which has no Python 3.14 wheel.
+notebooks/stable-diffusion-v3/stable-diffusion-v3.ipynb
+
+# datasets missing; surya-ocr==0.4.0 requires Pillow<11 and older tokenizers without Python 3.14 wheels.
+notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb
+
+# Python 3.14 NormalizedConfig failures: https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44498509273
+# Python 3.14 binds class-held functools.partial on instance access; fix: https://github.com/huggingface/optimum/pull/2496.
+
+# Optimum 2.2.0 export config raises TypeError: multiple values for 'allow_new'.
+notebooks/ernie-image/ernie-image.ipynb
+
+# Optimum 2.3.0 export config raises TypeError: multiple values for 'allow_new'.
+notebooks/flux.2-klein/flux.2-klein.ipynb
+
+# Optimum 2.3.0 export config raises TypeError: multiple values for 'allow_new'.
+notebooks/ministral-3/ministral-3.ipynb
+
+# Optimum 2.3.0 export config raises TypeError: multiple values for 'allow_new'.
+notebooks/qwen-image-2.1/qwen-image-2.1.ipynb
+
+# Optimum 2.2.0 ASR export config raises TypeError: multiple values for 'allow_new'.
+notebooks/qwen3-asr/qwen3-asr.ipynb
+
+# Optimum 2.3.0 export config raises TypeError: multiple values for 'allow_new'.
+notebooks/text-to-speech-genai/text-to-speech-genai.ipynb
+
+# Python 3.14 datasets pickler failures: https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44498509273
+# Datasets 3.6.0's Pickler._batch_setitems override lacks Python 3.14's new obj argument.
+# Upstream pickler fix: https://github.com/huggingface/datasets/pull/7817
+
+# Streaming VIDIT-Depth-ControlNet fails with the Pickler._batch_setitems signature mismatch.
+notebooks/depth-anything/depth-anything.ipynb
+
+# Loading GLUE MRPC fails with the Pickler._batch_setitems signature mismatch.
+notebooks/language-quantize-bert/language-quantize-bert.ipynb
+
+# Streaming Conceptual Captions fails with the Pickler._batch_setitems signature mismatch.
+notebooks/siglip-zero-shot-image-classification/siglip-zero-shot-image-classification.ipynb
+
+# Streaming FLEURS fails with the Pickler._batch_setitems signature mismatch.
+notebooks/whisper-asr-genai/whisper-asr-genai.ipynb
+
+# Python 3.14 failures in run 44715418820: https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/44715418820
+
+# Torch 2.8 and torchvision 0.23 have no Python 3.14 wheels; the failed install leaves optimum-cli unavailable.
+notebooks/hunyuan-translation/hunyuan-translation.ipynb
+
+# Torch 2.8 and torchvision 0.23 have no Python 3.14 wheels; the failed install leaves optimum-cli unavailable.
+notebooks/nuextract-structure-extraction/nuextract-structure-extraction.ipynb
+
+# Torch 2.8 and torchvision 0.23 have no Python 3.14 wheels; the failed install leaves optimum-cli unavailable.
+notebooks/stable-diffusion-text-to-image/stable-diffusion-text-to-image.ipynb
+
+# Python 3.14 cannot install pinned Torch 2.8; resolved Torch 2.15 moved ONNX symbols imported by Optimum.
+notebooks/glm4.1-v-thinking/glm4.1-v-thinking.ipynb
+
+# Python 3.14 cannot install pinned Torch 2.8; resolved Torch 2.15 moved ONNX symbols imported by Optimum.
+notebooks/minicpm-v-multimodal-chatbot/minicpm-v-multimodal-chatbot.ipynb
+
+# openai-whisper==20231117 metadata generation fails on Python 3.13+ with KeyError: '__version__'.
+notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb
+
+# transformers==4.46.1 selects tokenizers 0.20.3, which lacks Python 3.14 wheels and needs maturin unavailable with --no-build-isolation.
+notebooks/parler-tts-text-to-speech/parler-tts-text-to-speech.ipynb
+
+# The pinned openvino_contrib requirements install numba==0.62.1, which rejects Python 3.14.
+notebooks/3D-point-pillars/pointpillars.ipynb
+
+# Torch 2.8 has no Python 3.14 wheel, leaving Diffusers absent and Flux fill task detection unavailable.
+notebooks/flux-fill/flux-fill.ipynb

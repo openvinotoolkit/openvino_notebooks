@@ -73,7 +73,9 @@ def remove_ov_install(cell):
     lines = cell["source"].replace("pip_install(", "pip_install( ").split("\n")
     for line in lines:
         if "openvino" in line:
-            if "optimum-cli" in line or line.startswith("#") or "-openvino" in line:
+            # A %pip cell may also contain imports. Only package specs should be stripped.
+            stripped = line.lstrip()
+            if stripped.startswith(("import ", "from ")) or "optimum-cli" in line or line.startswith("#") or "-openvino" in line:
                 updated_lines.append(line)
                 continue
             updated_line_content = []
