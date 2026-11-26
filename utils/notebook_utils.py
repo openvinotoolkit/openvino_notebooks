@@ -24,6 +24,50 @@ _venv_site_dirs = []
 _parent_site_dirs = []
 _processed_pth_files = set()
 _venv_dll_directories = {}
+# Without long path support, Windows limits file paths to 259 characters. Packages install files with long relative
+# paths into `site-packages` (TensorFlow 2.19: 154 characters), so a deeply nested `.venv` makes their installation fail.
+_WINDOWS_MAX_PATH = 259
+_VENV_FILE_PATH_RESERVE = 190  # `\Lib\site-packages\` + the longest package file + margin
+_WINDOWS_SHORT_VENV_ROOT = "ov_venvs"
+
+
+def _windows_long_paths_enabled() -> bool:
+    """Return whether Windows long path support (`LongPathsEnabled` registry value) is on."""
+    import winreg
+
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\FileSystem") as key:
+            return winreg.QueryValueEx(key, "LongPathsEnabled")[0] == 1
+    except OSError:
+        return False
+
+
+def _fit_venv_dir_to_windows_path_limit(venv_dir: Path) -> Path:
+    """
+    Return `venv_dir`, or on Windows without long path support, a short directory for it if packages could exceed the path limit.
+
+    The short directory is `%LOCALAPPDATA%\\ov_venvs\\<hash of venv_dir>`, so each notebook keeps its own environment.
+    An existing environment in `venv_dir` is kept, so that its packages are not installed again.
+    """
+    import os
+
+    if (
+        os.name != "nt"
+        or len(str(venv_dir)) + _VENV_FILE_PATH_RESERVE <= _WINDOWS_MAX_PATH
+        or (venv_dir / "Scripts" / "python.exe").exists()
+        or _windows_long_paths_enabled()
+    ):
+        return venv_dir
+    import hashlib
+
+    short_root = Path(os.environ["LOCALAPPDATA"]) / _WINDOWS_SHORT_VENV_ROOT
+    short_dir = short_root / hashlib.sha256(os.path.normcase(str(venv_dir)).encode("utf-8")).hexdigest()[:12]
+    print(
+        f"The path {venv_dir} is too long for packages with deeply nested files, and Windows long path support is disabled. "
+        f"Using {short_dir} instead. To keep the environment next to the notebook, enable long paths: "
+        "https://learn.microsoft.com/windows/win32/fileio/maximum-file-path-limitation#enable-long-paths-in-windows-10-version-1607-and-later"
+    )
+    return short_dir
 
 
 def _add_venv_dll_directory(venv_dir: Path) -> str:
@@ -106,6 +150,7 @@ def setup_notebook_venv(notebook_name: Optional[str] = None, venv_root: PathLike
         venv_dir = (Path(venv_root) / notebook_name.removesuffix(".ipynb")).resolve()
     else:
         raise ValueError(f"Expected a notebook file name ending in .ipynb without directories, got: {notebook_name!r}")
+    venv_dir = _fit_venv_dir_to_windows_path_limit(venv_dir)
     bin_dir = venv_dir / ("Scripts" if os.name == "nt" else "bin")
     venv_python = bin_dir / ("python.exe" if os.name == "nt" else "python")
     if sys.executable == str(venv_python):
