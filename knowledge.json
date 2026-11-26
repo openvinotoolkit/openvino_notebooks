@@ -777,6 +777,38 @@
     "notebooks/qwen-image-2.1/qwen-image-2.1.ipynb"
    ]
   },
+  "914658e40a8d": {
+   "attempts": [
+    {
+     "action": "Filed one issue marked as a suspected GPU plugin/runtime or runner resource problem; no code change.",
+     "applied_learning": "Applied the GPU lesson: kept this signature separate from 3926 and 3919 (different notebooks and call sites) and asked for device, driver and concurrency details instead of changing a notebook.",
+     "confidence": "low",
+     "date": "2026-11-26",
+     "dead_ends": "A notebook code change is not supported: both failures occur inside the GPU plugin during model compile and the same packages passed previously; CPU success does not exercise the GPU path.",
+     "lesson": "For dGPU CL_OUT_OF_RESOURCES in multiple notebooks on the same job, collect driver version, GPU memory and concurrent notebooks before suspecting notebook code; unverified without GPU logs.",
+     "next_step": "Check whether the two notebooks ran concurrently on the same dGPU, reproduce on the dGPU host, and report to openvino with the GPU plugin log; compare with issue 3926.",
+     "nightly_run_id": 45728485912,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45728485912",
+     "outcome": "issue",
+     "prior_feedback": "Memory note for ff0173f79666 (issue 3926, open, low confidence) described the same CL_OUT_OF_RESOURCES on dGPU for another notebook; no maintainer feedback yet.",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45753767900",
+     "root_cause": "unknown: GPU plugin fails with CL_OUT_OF_RESOURCES (clEnqueueMemcpyINTEL) while compiling the LLM (minicpm-v-4.6 via optimum-intel) and creating VLMPipeline (vlm-chatbot) on the dGPU runner; both notebooks passed the previous night with the same OpenVINO nightly 2027.0.0.dev20261125.",
+     "self_assessment": "Supported: identical error in two unrelated notebooks on one dGPU job, passing previously. Unverified: whether memory pressure from concurrent jobs is the trigger; no GPU available to reproduce."
+    }
+   ],
+   "category": "cell_error",
+   "error_class": "openvino",
+   "exception_type": "RuntimeError",
+   "first_seen": "2026-11-26",
+   "headline": "RuntimeError: Exception from src/inference/src/cpp/core.cpp:117:",
+   "investigations": 1,
+   "kind": "error",
+   "last_seen": "2026-11-26",
+   "notebooks": [
+    "notebooks/minicpm-v-4.6/minicpm-v-4.6.ipynb",
+    "notebooks/vlm-chatbot/vlm-chatbot-generate-api.ipynb"
+   ]
+  },
   "946ce8bb354c": {
    "attempts": [
     {
@@ -966,6 +998,53 @@
     "notebooks/yolov26-optimization/yolov26-keypoint-detection.ipynb"
    ]
   },
+  "c568b13c5b64": {
+   "attempts": [
+    {
+     "action": "Filed one issue for the infrastructure/dependency failure affecting 17 not-run Windows notebooks; no code change.",
+     "applied_learning": "Applied the dependency-chain lesson: compared resolved versions with the failing import and with previous passing nights before concluding; no pin was proposed without the pip output.",
+     "confidence": "medium",
+     "date": "2026-11-26",
+     "dead_ends": "Linux dry-run resolution of .ci/dev-requirements.txt gives jupyter_server 2.21.1 and anyio 4.16.0, so the requirement files alone do not explain it; the job log API was blocked by an integrity policy; workflow edits are out of scope.",
+     "lesson": "When a pre-test step fails with an ImportError inside a tool, capture pip list of the runner Python in the report; applies to the Windows py3.12 job and is unverified without the install log.",
+     "next_step": "Inspect the Install python dependencies step log and pip list on the Windows py3.12 runner (persistent pip cache and system site-packages), then rerun the job or force a clean reinstall of jupyter_server/anyio.",
+     "nightly_run_id": 45728485912,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45728485912",
+     "outcome": "issue",
+     "prior_feedback": "none available: no earlier outcome for this signature and tracked history has empty self-improvement sections; related cosyvoice3-tts notes concern other failures.",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45753767900",
+     "root_cause": "On cpu-windows-2022-py3.12 the Test Jupyterlab step crashes because jupyter_server imports run_sync_in_worker_thread, which current anyio no longer provides; this indicates an old jupyter_server 1.x was installed or kept. Why pip kept it is unknown because the install step log was not available.",
+     "self_assessment": "Supported: the ImportError is a jupyter_server/anyio version mismatch before any notebook ran. Unverified: how the stale jupyter_server was selected on Windows; no Windows execution possible."
+    }
+   ],
+   "category": "infra",
+   "error_class": "job_failed_before_tests",
+   "exception_type": "",
+   "first_seen": "2026-11-26",
+   "headline": "job_failed_before_tests: Test Jupyterlab",
+   "investigations": 1,
+   "kind": "infra",
+   "last_seen": "2026-11-26",
+   "notebooks": [
+    "notebooks/cosyvoice3-tts/cosyvoice3-tts.ipynb",
+    "notebooks/darkir-image-restoration/darkir-image-restoration.ipynb",
+    "notebooks/depth-anything/depth-anything.ipynb",
+    "notebooks/detectron2-to-openvino/detectron2-to-openvino.ipynb",
+    "notebooks/ernie-image/ernie-image.ipynb",
+    "notebooks/flux.1-image-generation/flux.1-image-generation.ipynb",
+    "notebooks/grounded-segment-anything/grounded-segment-anything.ipynb",
+    "notebooks/image-classification-quantization/image-classification-quantization.ipynb",
+    "notebooks/inpainting-genai/inpainting-genai.ipynb",
+    "notebooks/llm-agent-rag-llamaindex/llm-agent-rag-llamaindex.ipynb",
+    "notebooks/ministral-3/ministral-3.ipynb",
+    "notebooks/openvoice2-and-melotts/openvoice2-and-melotts.ipynb",
+    "notebooks/surya-line-level-text-detection/surya-line-level-text-detection.ipynb",
+    "notebooks/text-to-image-genai/text-to-image-genai.ipynb",
+    "notebooks/text-to-speech-genai/text-to-speech-genai.ipynb",
+    "notebooks/vehicle-detection-and-recognition/vehicle-detection-and-recognition.ipynb",
+    "notebooks/vlm-chatbot/vlm-chatbot-generate-api.ipynb"
+   ]
+  },
   "c92015b5a395": {
    "attempts": [
     {
@@ -1113,6 +1192,22 @@
   "f5a035f89961": {
    "attempts": [
     {
+     "action": "No new ticket: open issue https://github.com/openvinotoolkit/openvino_notebooks/issues/3879 covers the repo-level cause; Request ID changes the signature each night.",
+     "applied_learning": "Applied the 2026-11-25 memory lesson: aliased by repository name to issue 3879 instead of filing a duplicate; the current log shows the same repo and 401.",
+     "confidence": "high",
+     "date": "2026-11-26",
+     "dead_ends": "Notebook code cannot grant gated access; replacing the model source, CI token plumbing or skip lists are out of scope.",
+     "lesson": "Alias gated-repo 401 groups to the tracked issue by repository name rather than by signature while issue 3879 is open; validity ends if the repo access is granted.",
+     "next_step": "Maintainers decide on issue 3879 (grant HF access via token or skip the notebook); masking Request IDs in report normalization would stop new signatures.",
+     "nightly_run_id": 45728485912,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45728485912",
+     "outcome": "none",
+     "prior_feedback": "Memory notes from 2026-11-24 and 2026-11-25 reached the same none outcome; issue 3879 is still open and unreviewed, so nothing is validated.",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45753767900",
+     "root_cause": "snapshot_download of gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 on all 9 configs because the CI runner has no access or token; same cause as open issue 3879.",
+     "self_assessment": "Supported by the log (401 GatedRepoError on the same repo) and tracked issue 3879; no fix attempted and none appropriate. Collector alias coverage to 3879 is still missing."
+    },
+    {
      "action": "No new ticket: open issue https://github.com/openvinotoolkit/openvino_notebooks/issues/3879 covers the repo-level cause; the Request ID changes the signature each night.",
      "applied_learning": "Applied the memory lesson to check issue 3879 first and not file a duplicate; the current log confirms the same repo and 401.",
      "confidence": "high",
@@ -1149,10 +1244,10 @@
    "error_class": "other",
    "exception_type": "GatedRepoError",
    "first_seen": "2026-11-24",
-   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6b063c6d-4d3f2a494a9d5aba669f2934;8dbf4cf5-3311-4ac3-b56c-a405a4469c33) Cannot access gated repo for url https://huggingface.co/facebook/sam-3d-body-dinov3/resolve/11aaa346c7204874a1cbafe3d39a979080b2c55a/model.ckpt. Access to model facebook/sam\u2026",
-   "investigations": 2,
+   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6b07869b-0c2ea2816aa0db017a6e63fe;e8bb188f-49f2-40e2-ac46-f8ae3e8dac36) Cannot access gated repo for url https://huggingface.co/facebook/sam-3d-body-dinov3/resolve/11aaa346c7204874a1cbafe3d39a979080b2c55a/model_config.yaml. Access to model faceb\u2026",
+   "investigations": 3,
    "kind": "error",
-   "last_seen": "2026-11-25",
+   "last_seen": "2026-11-26",
    "notebooks": [
     "notebooks/sam-3d-body/sam-3d-body.ipynb"
    ]
