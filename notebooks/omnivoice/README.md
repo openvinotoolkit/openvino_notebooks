@@ -75,9 +75,9 @@ KV-cache decoder.
 - `transformers >= 5.3` is required (OmniVoice uses
   `HiggsAudioV2TokenizerModel`, added in transformers 5.x).
 - The first run downloads ~3 GB of weights for OmniVoice and ~3 GB for Whisper.
-- INT8 weight compression halves the LLM size and gives a meaningful speedup
-  on CPU; audio fidelity is preserved because the convolutional codec stays in
-  FP16.
+- INT8 weight compression applies only to the LLM. The audio codec keeps FP16
+  weights on disk, but the audio decoder runs in FP32 on GPU and with `AUTO`
+  to avoid numerical overflow.
 
 ⚠️ **EXPERIMENTAL NOTEBOOK**
 

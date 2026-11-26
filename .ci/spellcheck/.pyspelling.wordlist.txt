@@ -44,6 +44,7 @@ ASPP
 ASR
 asr
 ASRModel
+ASRPipeline
 AST
 AST
 ASYM
@@ -106,7 +107,6 @@ BMP
 boolean
 builtins
 ByteDance
-CatVTON
 CausVid
 CentOS
 centric
@@ -140,6 +140,7 @@ CLIP's
 ClipBasedHeadEstimator
 CLS
 CMs
+CMVN
 cmu
 CNNs
 codebase
@@ -168,6 +169,7 @@ Conv
 conv
 ConvE
 conve
+Convai
 ConvNet
 ConvNets
 ConvNext
@@ -256,6 +258,8 @@ DETR
 Dettmers
 dev
 DFL
+DFlash
+DSpark
 dGPU
 dGPUs
 DialoGPT
@@ -316,6 +320,7 @@ editability
 EfficientNet
 EfficientSAM
 EfficientSAMs
+Eggbox
 embedder
 Embedder
 embeddings
@@ -370,6 +375,7 @@ Frontend
 frontend
 FSQ
 FunASR
+FunAudioLLM
 FX
 GAN
 Gante
@@ -377,6 +383,8 @@ Gaudi
 gaussian
 Gb
 gcc
+GDRN
+GDRNPP
 GEC
 GELAN
 GELU
@@ -406,6 +414,7 @@ gpu
 GPU's
 GPUs
 GQA
+GSM
 Gradio
 gradio
 grapheme
@@ -492,14 +501,17 @@ InternVL
 Interpolative
 interpretable
 intervaling
+intrinsics
 invertible
 io
 IoU
 ip
+IPEX
 IPs
 ipynb
 ir
 IRs
+ITN
 iteratively
 Javascript
 JAX
@@ -521,6 +533,7 @@ JuggernautXL
 Jupyter
 Jupyter's
 JupyterLab
+Kaggle
 kagglehub
 Kaiming
 Kalman
@@ -565,6 +578,8 @@ laion
 LangChain
 langchain
 LangChain's
+Laya
+laya
 Lasinger
 latents
 LaTeX
@@ -576,6 +591,7 @@ LDMs
 LDP
 learnable
 LetterBox
+letterboxed
 LeViT
 LFM
 lfm
@@ -589,6 +605,7 @@ lifecycles
 Lim
 LinearCameraEmbedder
 linearized
+Linemod
 Lippipeline
 Liu
 LLama
@@ -682,6 +699,8 @@ MLLMs
 MLP
 MLS
 MMB
+mmBERT
+ModernBERT
 MMDiT
 mms
 MMS
@@ -764,6 +783,7 @@ nonlinearity
 normalises
 Notus
 notus
+noul
 npoints
 npu
 NPU
@@ -781,6 +801,7 @@ NVLabs
 OASST
 OBB
 obb
+objectness
 ocr
 OCRBench
 OCRv
@@ -904,6 +925,7 @@ PLE
 PLR
 PNDM
 png
+PnP
 Pointilism
 pointillistic
 PointNet
@@ -986,6 +1008,7 @@ Radosavovic
 Raito
 Raj
 Ranftl
+RANSAC
 RASPP
 rasterised
 rasterises
@@ -1034,6 +1057,8 @@ riffusion
 Rinna
 rinna
 RLE
+RL
+RLCD
 RLHF
 RMBG
 RMS
@@ -1042,6 +1067,7 @@ RoBERTa
 roberta
 ROI
 roi
+ROIs
 rollout
 RoPE
 ROUGE
@@ -1082,6 +1108,9 @@ segmenter
 Segmind
 segmind
 selfattention
+SentencePiece
+SenseVoice
+SenseVoiceSmall
 serializable
 sft
 SGD
@@ -1113,6 +1142,7 @@ SongGen
 SOTA
 SoTA
 soundfile
+SoundFile
 Sovits
 Sparisty
 sparsified
@@ -1148,6 +1178,7 @@ StableDiffusionPipeline
 STAL
 stateful
 STFT
+STG
 streamable
 strided
 Struct
@@ -1160,6 +1191,7 @@ subdirectory
 submodels
 subgraph
 subgraphs
+subfolder
 sublicense
 subpackage
 subprocesses
@@ -1214,6 +1246,7 @@ Tongyi
 toolkits
 torchaudio
 TorchDynamo
+TorchAudio
 torchdynamo
 TorchFX
 TorchMetrics
@@ -1253,6 +1286,7 @@ UNet
 Unet
 UNets
 Unimodal
+Unsloth
 unsqueeze
 Uparrow
 uparrow
@@ -1262,8 +1296,10 @@ Upcroft
 updo
 upsample
 upsampled
+upsampler
 upsamples
 upsampling
+upstreamed
 Upscaled
 upscaled
 upscaler
@@ -1346,6 +1382,7 @@ WIKITQ
 Wofk
 WTQ
 wuerstchen
+WWB
 WuerstchenDiffNeXt
 Würstchen
 XAI
@@ -1361,6 +1398,7 @@ xvector
 xvectors
 xxl
 XYWH
+XYZ
 YAML
 YaRN
 Yiqin
@@ -1368,6 +1406,7 @@ YOLO
 YOLOE
 YOLOv
 yolov
+YOLOX
 Youri
 youri
 YouTube

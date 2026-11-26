@@ -117,3 +117,104 @@ def test_plan_file_failure_does_not_fail_split(tmp_path, notebooks_dir, monkeypa
     assert content.count("<<BATCH_EOF") == 2
     written = [line for line in content.splitlines() if line.endswith(".ipynb")]
     assert sorted(Path(line).as_posix() for line in written) == expected_paths(notebooks_dir)
+
+
+@pytest.mark.parametrize("count", [1, 2, 5, 7])
+def test_precommit_nonempty_matrix(count, tmp_path, notebooks_dir, monkeypatch, capsys):
+    selected = expected_paths(notebooks_dir)[:count]
+    output = tmp_path / "outputs"
+    monkeypatch.setenv("CHANGED_FILES", json.dumps(selected + selected))
+    monkeypatch.setenv("GITHUB_OUTPUT", str(output))
+    run_split(monkeypatch, capsys, "--precommit", "--notebooks_dir", notebooks_dir, "--num_batches", 5, "--seed", 42)
+    values = dict(line.split("=", 1) for line in output.read_text().splitlines())
+    matrix = json.loads(values["matrix"])
+    assert values["has_tests"] == "true"
+    assert len(matrix) == min(count, 5)
+    assert all(batch["test_list"] for batch in matrix)
+    assert sorted(path for batch in matrix for path in batch["test_list"].splitlines()) == selected
+
+
+@pytest.mark.parametrize(
+    "changed, expected",
+    [
+        (["requirements.txt"], NOTEBOOKS),
+        (["notebooks/b/helper.py"], ["b/b.ipynb", "b/b-second.ipynb"]),
+        (["notebooks/b/nested/helper.py"], ["b/b.ipynb", "b/b-second.ipynb"]),
+        (["README.md"], ["a/a.ipynb"]),
+        (["notebooks/deleted/deleted.ipynb"], ["a/a.ipynb"]),
+        (["notebooks/b/old-name.ipynb", "notebooks/b/b-second.ipynb"], ["b/b-second.ipynb"]),
+        (["notebooks/a/test_a.ipynb", "notebooks/b/.venv/helper.py", "notebooks/b/.ipynb_checkpoints/helper.py"], ["a/a.ipynb"]),
+    ],
+)
+def test_precommit_selection(changed, expected, tmp_path, notebooks_dir, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    fallback = tmp_path / "fallback.txt"
+    fallback.write_text("notebooks/a/a.ipynb\n", encoding="utf-8")
+    result = split_notebooks.select_precommit_notebooks(notebooks_dir, changed, fallback)
+    assert result == sorted(str(notebooks_dir / path) for path in expected)
+
+
+@pytest.mark.parametrize("content", ["", "notebooks/missing.ipynb\n"])
+def test_precommit_invalid_fallback(content, tmp_path, notebooks_dir, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    fallback = tmp_path / "fallback.txt"
+    fallback.write_text(content, encoding="utf-8")
+    with pytest.raises(ValueError, match="Fallback list"):
+        split_notebooks.select_precommit_notebooks(notebooks_dir, [], fallback)
+
+
+def test_precommit_path_with_spaces(tmp_path, notebooks_dir, monkeypatch, capsys):
+    path = notebooks_dir / "with spaces" / "a notebook.ipynb"
+    path.parent.mkdir()
+    path.write_text("{}", encoding="utf-8")
+    monkeypatch.setenv("CHANGED_FILES", json.dumps([str(path)]))
+    output = tmp_path / "outputs"
+    monkeypatch.setenv("GITHUB_OUTPUT", str(output))
+    run_split(monkeypatch, capsys, "--precommit", "--notebooks_dir", notebooks_dir, "--num_batches", 5)
+    matrix = json.loads(output.read_text().splitlines()[0].split("=", 1)[1])
+    assert matrix == [{"name": "batch_0", "test_list": str(path)}]
+
+
+@pytest.mark.parametrize("value", ["0", "-1"])
+def test_invalid_batch_count(value, monkeypatch, capsys):
+    with pytest.raises(SystemExit):
+        run_split(monkeypatch, capsys, "--num_batches", value)
+
+
+@pytest.mark.parametrize("value", ['{"path": "notebooks/a.ipynb"}', "[1]", "not json"])
+def test_precommit_invalid_changed_files(value, notebooks_dir, monkeypatch, capsys):
+    monkeypatch.setenv("CHANGED_FILES", value)
+    with pytest.raises(ValueError):
+        run_split(monkeypatch, capsys, "--precommit", "--notebooks_dir", notebooks_dir)
+
+
+def test_precommit_missing_fallback(tmp_path, notebooks_dir):
+    with pytest.raises(FileNotFoundError):
+        split_notebooks.select_precommit_notebooks(notebooks_dir, [], tmp_path / "missing.txt")
+
+
+def test_precommit_root_level_helper_selects_root_level_notebooks(tmp_path, notebooks_dir, monkeypatch):
+    notebook = notebooks_dir / "root-notebook.ipynb"
+    notebook.write_text("{}", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    fallback = tmp_path / "fallback.txt"
+    fallback.write_text("notebooks/a/a.ipynb\n", encoding="utf-8")
+
+    result = split_notebooks.select_precommit_notebooks(notebooks_dir, [str(notebooks_dir / "helper.py")], fallback)
+
+    assert result == [str(notebook)]
+
+
+def test_precommit_no_notebooks(tmp_path):
+    root = tmp_path / "notebooks"
+    root.mkdir()
+    with pytest.raises(ValueError, match="No notebooks"):
+        split_notebooks.select_precommit_notebooks(root, [str(tmp_path / "requirements.txt")], tmp_path / "fallback.txt")
+
+
+def test_collect_excludes_generated_notebooks(notebooks_dir):
+    for directory in (".venv", ".ipynb_checkpoints"):
+        path = notebooks_dir / "b" / directory / "generated.ipynb"
+        path.parent.mkdir()
+        path.write_text("{}", encoding="utf-8")
+    assert split_notebooks.collect_notebooks(notebooks_dir) == expected_paths(notebooks_dir)

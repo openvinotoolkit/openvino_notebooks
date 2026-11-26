@@ -15,6 +15,9 @@ from nightly_report.report_common import Warnings
 TEST_JOB_PREFIX = "build_treon"
 JOB_MATRIX_RE = re.compile(r"^(?P<prefix>[\w-]+)\s*\((?P<matrix>[^)]*)\)")
 MATRIX_EXPRESSION_RE = re.compile(r"\$\{\{\s*matrix\.([\w-]+)\s*\}\}")
+PYTHON_CONDITIONAL_IGNORE_RE = re.compile(
+    r"\$\{\{\s*matrix\.python\s*==\s*'(?P<version>\d+\.\d+)'\s*&&\s*'(?P<on_match>[^']+)'\s*\|\|\s*'(?P<otherwise>[^']*)'\s*\}\}"
+)
 PYTHON_RE = re.compile(r"\d+\.\d+")
 BATCH_RE = re.compile(r"batch_\d+")
 UNIX_REUSABLE_WORKFLOW = "job_unix.yml"
@@ -22,6 +25,8 @@ WINDOWS_REUSABLE_WORKFLOW = "job_windows.yml"
 GPU_DEVICE_TAGS = ("igpu", "dgpu", "gpu")  # most specific first
 # job_unix.yml adds this ignore list to the job's ones on GPU
 UNIX_GPU_IGNORE_LIST = ".ci/heavy_ubuntu_gpu.txt"
+# job_windows.yml adds this ignore list to the job's ones on Python 3.13
+WINDOWS_PY313_IGNORE_LIST = ".ci/win_py313_flaky.txt"
 
 
 def os_family(os_name: str) -> str:
@@ -154,7 +159,7 @@ def load_workflow(repo_root: Path, workflow_file: Optional[str], warnings: Warni
 
 def job_ignore_lists(specs: dict[str, Optional[dict]], job_key: Optional[str], device: str, os_name: str, python: str, default: Iterable[str]) -> list[str]:
     """Ignore lists passed to validate_notebooks.py by a test job: from its workflow definition (found by job id or by
-    config), else `default`."""
+    config), else `default`. Resolves the workflow's matrix.python conditional and rejects unsupported expressions."""
     specs = {key: spec for key, spec in specs.items() if spec}
     spec = specs.get(job_key or "")
     if spec is None:
@@ -168,7 +173,13 @@ def job_ignore_lists(specs: dict[str, Optional[dict]], job_key: Optional[str], d
         )
     if spec is None:
         return list(default)
-    ignore_lists = list(spec["ignore_list"])
+    ignore_list_input = " ".join(spec["ignore_list"])
+    resolved = PYTHON_CONDITIONAL_IGNORE_RE.sub(lambda match: match.group("on_match" if match.group("version") == python else "otherwise"), ignore_list_input)
+    if "${{" in resolved:
+        raise ValueError(f"Unsupported ignore_list expression: {ignore_list_input}")
+    ignore_lists = resolved.split()
     if spec["uses"].endswith(UNIX_REUSABLE_WORKFLOW) and validation_device(device) == "gpu" and os_family(os_name) == "linux":
         ignore_lists.append(UNIX_GPU_IGNORE_LIST)
+    if spec["uses"].endswith(WINDOWS_REUSABLE_WORKFLOW) and python == "3.13":
+        ignore_lists.append(WINDOWS_PY313_IGNORE_LIST)
     return ignore_lists
