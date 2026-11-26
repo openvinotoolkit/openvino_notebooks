@@ -1794,8 +1794,7 @@ def _compress_action_ir(xml: Path, archive_dir: Path | None, compress: bool, nnc
         )
         if exp_ignored is not None:  # explicit VIDEO_INT8_EXPECT escape hatch
             assert n_kept == exp_ignored, (
-                f"{xml.name}: VIDEO_INT8_EXPECT wants {exp_ignored} kept weight nodes, observed "
-                f"{n_kept} (derived {n_derived}: {derived})"
+                f"{xml.name}: VIDEO_INT8_EXPECT wants {exp_ignored} kept weight nodes, observed " f"{n_kept} (derived {n_derived}: {derived})"
             )
         print(f"[ov] {flag}: ignored weight nodes kept uncompressed: observed {n_kept} / derived {n_derived} {derived}", flush=True)
     assert 0.40 <= ratio <= 0.62, f"{xml.name}: bin {bin_before/1e6:.1f} -> {bin_after/1e6:.1f} MB " f"(ratio {ratio:.3f}) is not the expected ~0.50"
