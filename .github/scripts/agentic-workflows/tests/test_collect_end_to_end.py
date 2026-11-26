@@ -1,6 +1,6 @@
 import json
 import re
-import subprocess
+import subprocess  # nosec B404 - test helper runs git on tmp_path
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -25,6 +25,7 @@ from nightly_builders import (
     nightly_world,
     shell_command_allowed,
 )
+from test_collect_nightly_failures import gated_failure
 
 
 @pytest.fixture(autouse=True)
@@ -84,6 +85,8 @@ def test_collect_writes_complete_digest_and_github_outputs(tmp_path, monkeypatch
     assert "`protobuf` | `4.25.0` | `6.31.0`" in group
     assert "| `2026.1.0` | 2 | 0 | 0 |" in group
     assert (out / f"groups/01-{SIG_DEPENDENCY}/group.json").exists()
+    assert "Previous remediation feedback" in (out / "feedback.md").read_text()
+    assert json.loads((out / "feedback.json").read_text()) == {"items": [], "self_improvements": [], "lessons": [], "unavailable": []}
     assert (out / f"groups/01-{SIG_DEPENDENCY}/logs/a-a.ipynb__cpu-ubuntu-22.04-py3.11.log").exists()
 
     raw_log = (out / f"groups/01-{SIG_DEPENDENCY}/logs/a-a.ipynb__cpu-ubuntu-22.04-py3.11.log").read_text()
@@ -95,6 +98,39 @@ def test_collect_writes_complete_digest_and_github_outputs(tmp_path, monkeypatch
     assert not re.search(r"\d{4}-\d\d-\d\dT\d\d:\d\d:", infra_log)
     assert len(report["failures"]) == status["failures_total"]
     assert fake.count("--raw-field label=nightly-remediator") == 4
+
+
+def test_collect_consolidates_gated_access_without_losing_evidence_or_tracking(tmp_path, monkeypatch):
+    fake = FakeGh()
+    report = nightly_world(fake)
+    failures = [gated_failure(f"{i:012x}", config=f"cfg{i}") for i in range(12)]
+    report["failures"].extend(failures)
+    fake.add_night(report, 55, ENVIRONMENTS)
+    fake.add_fragment(77, report)
+    monkeypatch.setattr(github, "gh", fake)
+    monkeypatch.setattr(evidence, "gh", fake)
+    out = tmp_path / "digest"
+
+    assert cnf.main(["--repo", REPO, "--run-id", str(NIGHTLY_ID), "--out", str(out)]) == 0
+
+    status = json.loads((out / "status.json").read_text())
+    assert status["report_error_groups_total"] == 15
+    assert status["error_groups_total"] == 4
+    assert status["groups_selected"] == 5 and status["groups_deferred"] == 0
+    groups = [json.loads(p.read_text()) for p in (out / "groups").glob("*/group.json")]
+    gate = next(g for g in groups if g["exception_type"] == "GatedRepoError")
+    assert len(gate["members"]) == 12
+    assert gate["source_signatures"] == [f["signature"] for f in failures]
+    assert gate["related_signatures"] == gate["source_signatures"]
+    assert {m["signature"] for m in gate["members"]} == set(gate["source_signatures"])
+    declaration = "Related signatures: " + ", ".join(f"`{s}`" for s in gate["related_signatures"])
+    assert analysis.extract_signatures(f"Fix (sig {gate['signature']})", declaration) == [gate["signature"], *gate["related_signatures"]]
+    markdown = (out / f"groups/{gate['index']:02d}-{gate['signature']}/group.md").read_text()
+    assert gate["grouping_reason"] in markdown
+    assert all(f["signature"] in markdown for f in failures)
+    summary = (out / "summary.md").read_text()
+    assert "15 original report signatures consolidated into 4 remediation groups" in summary
+    assert summary.count("GatedRepoError") == 1
 
 
 def test_no_failures_is_successful_no_work_without_tracking_queries(tmp_path, monkeypatch):
@@ -365,7 +401,9 @@ def test_group_branches_created_from_the_recorded_base_are_independent(tmp_path)
     repo.mkdir()
 
     def git(*args):
-        return subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True, text=True).stdout.strip()
+        return subprocess.run(
+            ["git", "-C", str(repo), *args], check=True, capture_output=True, text=True
+        ).stdout.strip()  # nosec B603 B607 - hardcoded git CLI in test
 
     git("init", "-q")
     git("config", "user.name", "Test")
@@ -395,7 +433,16 @@ def test_group_branches_created_from_the_recorded_base_are_independent(tmp_path)
     [
         (
             "pr-template.md",
-            ["Problem", "Error signature", "Affected notebooks", "Error type and where it starts", "Root cause", "Fix", "Verification and limits", "History"],
+            [
+                "Problem",
+                "Error signature",
+                "Affected notebooks",
+                "Error type and where it starts",
+                "Root cause",
+                "Fix",
+                "Verification and limits",
+                "History",
+            ],
         ),
         (
             "issue-template.md",
@@ -425,3 +472,32 @@ def test_output_templates_are_imported_and_keep_tracking_contract(template, head
     assert "${{" not in body and "{{#" not in body
     filled = body.replace("<12-hex-signature>", SIG_DEPENDENCY)
     assert analysis.extract_signature(filled) == SIG_DEPENDENCY
+    assert "Related signatures: " in body
+    details = re.search(r"<details>\s*<summary>AI self-improvement</summary>(.*?)</details>", body, re.DOTALL)
+    assert details is not None, "the learning section must be collapsed by default, without an open attribute"
+    assert "**Future-run improvements:**" in details.group(1)
+    assert "### Before investigation" in body and "### After investigation" in body
+    for field in ("Prior feedback", "Applied learning", "Self-assessment", "Reusable lesson"):
+        assert f"**{field}:**" in body
+
+
+def test_shared_outcome_tracks_all_declared_aliases_but_not_incidental_signatures(monkeypatch):
+    fake = FakeGh()
+    item = tracked_item(42, SIG_DEPENDENCY)
+    item["body"] += f"\nRelated signatures: `{SIG_OTHER}`, `{SIG_INFRA}`\nHistory: sig {SIG_TIMEOUT}"
+    fake.prs = [item]
+    monkeypatch.setattr(github, "gh", fake)
+    tracked = analysis.fetch_tracked(REPO, lambda message: None)
+    assert set(tracked) == {SIG_DEPENDENCY, SIG_OTHER, SIG_INFRA}
+    assert {records[0].number for records in tracked.values()} == {42}
+    assert all(analysis.decide_tracking(records, datetime.now(timezone.utc)).skip for records in tracked.values())
+
+
+@pytest.mark.parametrize("aliases", ["none", f"`{SIG_OTHER}`, not-a-signature", f"`{SIG_OTHER}` " * 12])
+def test_invalid_alias_declarations_cannot_expand_tracking(aliases):
+    assert analysis.extract_signatures(f"Fix (sig {SIG_DEPENDENCY})", f"Related signatures: {aliases}") == [SIG_DEPENDENCY]
+
+
+def test_ambiguous_multiple_alias_declarations_cannot_expand_tracking():
+    body = f"Related signatures: `{SIG_OTHER}`\nRelated signatures: `{SIG_TIMEOUT}`"
+    assert analysis.extract_signatures(f"Fix (sig {SIG_DEPENDENCY})", body) == [SIG_DEPENDENCY]

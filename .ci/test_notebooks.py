@@ -1,7 +1,15 @@
+import ast
+import os
+import subprocess
+import sys
+from textwrap import dedent
+
+import nbformat
 import requests
 from pathlib import Path
 import pytest
 from scarf_pixel import check_scarf_tag
+from patch_notebooks import remove_ov_install
 
 import toml
 from pip._internal.req import parse_requirements
@@ -70,6 +78,64 @@ def test_requirements_binder():
     pip_requirements = get_parsed_requirements("requirements.txt")
     binder_requirements = get_parsed_requirements(".binder/requirements.txt")
     assert pip_requirements.issubset(binder_requirements), f"Binder requirements misses: {pip_requirements.difference(binder_requirements)}"
+
+
+def test_skip_ov_install_removes_openvino_only_helper_call():
+    cell = {"source": dedent("""\
+            pip_install("-q", "nncf")
+            pip_install(
+                "-qU",
+                "--pre",
+                "openvino",
+                "openvino-tokenizers",
+                "openvino-genai",
+                "--extra-index-url",
+                "https://storage.openvinotoolkit.org/simple/wheels/nightly",
+            )
+            """)}
+
+    remove_ov_install(cell)
+
+    assert ast.dump(ast.parse(cell["source"])) == ast.dump(ast.parse('pip_install("-q", "nncf")'))
+
+
+@pytest.mark.parametrize("core", ['"openvino"', "'openvino'", '"openvino[extras]>=2026.0"'])
+def test_skip_ov_install_keeps_other_requirements(core):
+    cell = {
+        "source": "%pip uninstall -y optimum openvino\n"
+        '%pip install -qU --pre "openvino-genai" '
+        f'{core} "openvino-tokenizers" "nncf" "optimum-intel[openvino]"\n'
+        'import openvino as ov\npackage_label = "openvino"'
+    }
+
+    remove_ov_install(cell)
+
+    assert [line for line in cell["source"].splitlines() if not line.startswith("#")] == [
+        "%pip uninstall -y optimum",
+        '%pip install -qU --pre "nncf" "optimum-intel[openvino]"',
+        "import openvino as ov",
+        'package_label = "openvino"',
+    ]
+
+
+def test_patch_notebooks_keeps_unicode_with_cp1252_stdout(tmp_path):
+    source = 'print("\u65e7")'
+    target = 'print("\u65b0")'
+    cell = nbformat.v4.new_code_cell(source, metadata={"test_replace": {source: target}})
+    nbformat.write(nbformat.v4.new_notebook(cells=[cell]), tmp_path / "example.ipynb")
+
+    result = subprocess.run(
+        [sys.executable, str(Path(__file__).resolve().with_name("patch_notebooks.py")), ".", "-td", "cpu"],
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONIOENCODING": "cp1252"},
+        check=True,
+        capture_output=True,
+        encoding="cp1252",
+    )
+
+    assert "Processed example.ipynb:" in result.stdout
+    patched = nbformat.read(tmp_path / "test_example.ipynb", as_version=4)
+    assert patched.cells[0].source == "# Modified for testing\n" + target
 
 
 @pytest.mark.skip(reason="URL existence is tested in docker_treon")

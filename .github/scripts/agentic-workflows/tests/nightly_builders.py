@@ -233,8 +233,23 @@ class FakeGh:
         if args[:2] == ["api", "graphql"]:
             fields = dict(args[index + 1].split("=", 1) for index, value in enumerate(args) if value == "--raw-field")
             assert f"{fields['owner']}/{fields['name']}" == REPO
-            assert fields["label"] == common.TRACKING_LABEL
             query = fields["query"]
+            if "number:$number" in query:
+                number = int(args[args.index("--field") + 1].split("=", 1)[1])
+                is_pr = "pullRequest(number:" in query
+                item = next(item for item in (self.prs if is_pr else self.issues) if item["number"] == number)
+                raw = {**item, "comments": {"nodes": []}}
+                if is_pr:
+                    raw.update(
+                        baseRefOid="base",
+                        headRefOid="head",
+                        files={"nodes": [], "pageInfo": {"hasNextPage": False}},
+                        reviews={"nodes": []},
+                        reviewThreads={"nodes": []},
+                        commits={"nodes": []},
+                    )
+                return json.dumps({"data": {"repository": {"pullRequest" if is_pr else "issue": raw}}}).encode()
+            assert fields["label"] == common.TRACKING_LABEL
             is_pr = "pullRequests(first:100" in query
             connection = "pullRequests" if is_pr else "issues"
             is_open = "states:[OPEN]" in query

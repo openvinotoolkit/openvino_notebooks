@@ -1,7 +1,7 @@
 """Unit tests of the nightly failure collector (pre-agent step of the nightly issue remediator); no network, no real `gh`."""
 
 import argparse
-import subprocess
+import subprocess  # nosec B404 - only used for TimeoutExpired/PIPE in mocks
 import types
 import zipfile
 from datetime import datetime, timedelta, timezone
@@ -60,7 +60,8 @@ def make_night(number, signatures=None, statuses=None):
 
 
 def make_args(**overrides):
-    values = dict(repo=REPO, source_repo=REPO, run_id="", max_groups=5, max_prs=3, history_nights=3, logs_per_group=3, out="/tmp/nightly/digest")
+    out = "/tmp/nightly/digest"  # nosec B108
+    values = dict(repo=REPO, source_repo=REPO, run_id="", max_groups=5, max_prs=3, history_nights=3, logs_per_group=3, out=out)
     values.update(overrides)
     return argparse.Namespace(**values)
 
@@ -285,6 +286,119 @@ def test_build_groups_prefers_the_group_header_of_the_report():
     (group,) = analysis.build_groups(report)
     assert (group.error_class, group.exception_message, group.exception_type) == ("dependency", "group message", "ValueError")
     assert group.headline == "ValueError: group message"
+
+
+def gated_failure(signature, config="cfg1", repo="org/model", status=401, notebook="a/a.ipynb", filename="config.json"):
+    message = f"{status} Client Error. (Request ID: Root=1-673c1a2b-{int(signature, 16):024x})"
+    failure = make_failure(notebook, config, signature, message=message, exception_type="GatedRepoError")
+    failure["traceback_excerpt"] = f"{message}\nCannot access gated repo for url https://huggingface.co/{repo}/resolve/main/{filename}."
+    return failure
+
+
+def test_gated_repo_groups_share_one_investigation_with_all_original_signatures():
+    first = gated_failure(SIG)
+    second = gated_failure("bbbbbbbbbbbb", "cfg2", notebook="b/b.ipynb", filename="model.safetensors")
+    groups = analysis.build_groups(make_report(failures=[first, second]))
+
+    assert len(groups) == 1
+    group = groups[0]
+    assert group.notebooks == ["a/a.ipynb", "b/b.ipynb"]
+    assert group.configs == ["cfg1", "cfg2"]
+    assert group.related_signatures == [SIG, "bbbbbbbbbbbb"]
+    assert group.grouping_reason
+    assert not analysis.is_pr_candidate(group)
+    (later,) = analysis.build_groups(make_report(failures=[gated_failure("cccccccccccc")]))
+    assert later.signature == group.signature
+    assert len(groups[0].members) == 2
+    assert first["signature"] == SIG
+
+
+def test_gated_repo_grouping_keeps_targets_and_statuses_distinct_even_with_one_report_signature():
+    failures = [
+        gated_failure(SIG),
+        gated_failure(SIG, "cfg2", repo="org/another-model"),
+        gated_failure(SIG, "cfg3", status=403),
+        gated_failure(SIG, "cfg4", repo="datasets/org/model"),
+    ]
+    groups = analysis.build_groups(make_report(failures=failures))
+
+    assert len(groups) == 4
+    assert len({g.signature for g in groups}) == 4
+    assert all(not g.related_signatures for g in groups), "an ambiguous report signature must not imply shared coverage"
+    assert all(len(g.members) == 1 for g in groups)
+    selected, skipped, _ = analysis.select_groups(groups, {SIG: [make_tracked(SIG)]}, 5, 3, NOW)
+    assert len(selected) == 4 and not skipped
+
+
+def test_request_id_only_variants_need_the_same_notebook_and_cell():
+    first = gated_failure(SIG)
+    first["traceback_excerpt"] = ""
+    second = {**first, "signature": "bbbbbbbbbbbb", "config_id": "cfg2", "exception_message": "401 Client Error. (Request ID: unrelated-request)"}
+    different_notebook = {**second, "signature": "cccccccccccc", "notebook": "b/b.ipynb"}
+    different_cell = {**second, "signature": "dddddddddddd", "cell_index": 4}
+    missing_cell = {**second, "signature": "eeeeeeeeeeee", "cell_source_excerpt": None}
+
+    groups = analysis.build_groups(make_report(failures=[first, second, different_notebook, different_cell, missing_cell]))
+
+    assert len(groups) == 4
+    merged = next(g for g in groups if len(g.members) == 2)
+    assert merged.related_signatures == [SIG, "bbbbbbbbbbbb"]
+    assert merged.notebooks == ["a/a.ipynb"]
+
+
+def test_same_exception_or_message_without_causal_evidence_does_not_merge_signatures():
+    first = make_failure("a/a.ipynb", "cfg1", SIG, exception_type="ValueError", message="boom")
+    second = {**first, "signature": "bbbbbbbbbbbb", "config_id": "cfg2"}
+    assert len(analysis.build_groups(make_report(failures=[first, second]))) == 2
+
+
+def test_request_id_grouping_preserves_the_rest_of_the_message():
+    first = make_failure("a/a.ipynb", "cfg1", SIG, message="Cannot download config.json (Request ID: abc-123)")
+    second = {**first, "signature": "bbbbbbbbbbbb", "config_id": "cfg2", "exception_message": "Cannot download config.json (Request ID: def-456)"}
+    different_file = {**second, "signature": "cccccccccccc", "exception_message": "Cannot download weights.bin (Request ID: ghi-789)"}
+
+    groups = analysis.build_groups(make_report(failures=[first, second, different_file]))
+
+    assert sorted(len(g.members) for g in groups) == [1, 2]
+
+
+def test_multiple_gated_targets_in_traceback_are_not_assumed_to_have_one_remedy():
+    first = gated_failure(SIG)
+    first["traceback_excerpt"] += "\n" + gated_failure(SIG, repo="org/another-model")["traceback_excerpt"]
+    second = {**first, "signature": "bbbbbbbbbbbb", "config_id": "cfg2"}
+
+    assert len(analysis.build_groups(make_report(failures=[first, second]))) == 2
+
+
+def test_gated_access_does_not_displace_likely_code_fixes():
+    gate = analysis.build_groups(make_report(failures=[gated_failure(f"{i:012x}", f"cfg{i}") for i in range(12)]))[0]
+    fixes = [make_group(f"f{i}", error_class="dependency") for i in range(3)]
+    selected, _, deferred = analysis.select_groups([gate, *fixes], {}, 3, 3, NOW)
+
+    assert signatures(selected) == ["f0", "f1", "f2"]
+    assert deferred == [gate]
+
+
+def test_grouped_source_signature_tracking_does_not_consume_a_slot():
+    failures = [gated_failure(SIG), gated_failure("bbbbbbbbbbbb", "cfg2"), make_failure("b/b.ipynb", "cfg1", "cccccccccccc", "dependency")]
+    groups = analysis.build_groups(make_report(failures=failures))
+    tracked = {SIG: [make_tracked(SIG)], "bbbbbbbbbbbb": [make_tracked("bbbbbbbbbbbb")]}
+
+    selected, skipped, deferred = analysis.select_groups(groups, tracked, 1, 1, NOW)
+
+    assert signatures(selected) == ["cccccccccccc"]
+    assert len(skipped) == 1 and len(skipped[0][0].members) == 2
+    assert skipped[0][1].previous == [], "one outcome indexed under several signatures must be deduplicated"
+    assert deferred == []
+
+
+def test_grouped_history_matches_previous_request_ids_and_counts_every_pair():
+    (group,) = analysis.build_groups(make_report(failures=[gated_failure(SIG), gated_failure("bbbbbbbbbbbb", "cfg2")]))
+    current = analysis.night_from_report(make_report(failures=[gated_failure(SIG), gated_failure("bbbbbbbbbbbb", "cfg2")]))
+    previous = analysis.night_from_report(make_report(failures=[gated_failure("cccccccccccc"), gated_failure("dddddddddddd", "cfg2")]))
+
+    assert [row["same_error"] for row in analysis.history_rows(group, current, [previous])] == [2, 2]
+    assert analysis.trend_label(group.signature, [previous]) == "recurring (all 2 nights)"
 
 
 def test_rank_key_prefers_more_notebooks_then_more_pairs():
@@ -806,10 +920,10 @@ def test_invalid_args_are_rejected(overrides):
 
 
 def test_parse_args_defaults_and_trimming():
-    args = cnf.parse_args(["--repo", "a/b", "--out", "/tmp/nightly/digest", "--run-id", " 42 "])
+    args = cnf.parse_args(["--repo", "a/b", "--out", "/tmp/nightly/digest", "--run-id", " 42 "])  # nosec B108 - test CLI arg only
     assert (args.source_repo, args.run_id, args.max_groups, args.max_prs, args.history_nights, args.logs_per_group) == ("a/b", "42", 5, 3, 3, 3)
     with pytest.raises(SystemExit):
-        cnf.parse_args(["--repo", "a/b", "--source-repo", "evil/repo", "--out", "/tmp/nightly/digest"])
+        cnf.parse_args(["--repo", "a/b", "--source-repo", "evil/repo", "--out", "/tmp/nightly/digest"])  # nosec B108 - test CLI arg only
 
 
 def test_prepare_out_dir_recreates_the_directory_and_refuses_risky_paths(tmp_path):
@@ -818,7 +932,7 @@ def test_prepare_out_dir_recreates_the_directory_and_refuses_risky_paths(tmp_pat
     (target / "stale.txt").write_text("old")
     assert cnf.prepare_out_dir(str(target)) == target.resolve()
     assert list(target.iterdir()) == []
-    for risky in ("/", "/tmp", str(Path.home()), str(Path.cwd())):
+    for risky in ("/", "/tmp", str(Path.home()), str(Path.cwd())):  # nosec B108 - testing rejection of /tmp
         with pytest.raises(SystemExit, match="refusing"):
             cnf.prepare_out_dir(risky)
 
