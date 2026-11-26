@@ -71,6 +71,7 @@ export const TASKS = /** @type {const} */ ({
     KNOWLEDGE_REPRESENTATION: 'Knowledge Representation',
     BYTES_CLASSIFICATION: 'Bytes Classification',
     ROBOT_MANIPULATION: 'Robot Manipulation',
+    ROBOT_NAVIGATION: 'Robot Navigation',
   },
 });
 
