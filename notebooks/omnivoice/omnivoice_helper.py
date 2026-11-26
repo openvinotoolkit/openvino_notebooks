@@ -730,7 +730,11 @@ class OVOmniVoice:
         ov_config = ov_config or {}
         compiled_llm = core.compile_model(self.model_dir / LLM_FILE, llm_device, ov_config)
         compiled_enc = core.compile_model(self.model_dir / ENCODER_FILE, audio_device, ov_config)
-        compiled_dec = core.compile_model(self.model_dir / DECODER_FILE, audio_device, ov_config)
+        decoder_config = ov_config
+        if audio_device.upper().startswith(("GPU", "AUTO")):
+            # AUTO can also select a GPU. The decoder's Snake activations can overflow in FP16.
+            decoder_config = {**ov_config, "INFERENCE_PRECISION_HINT": "f32"}
+        compiled_dec = core.compile_model(self.model_dir / DECODER_FILE, audio_device, decoder_config)
         self._ov_llm = _OVTorchLLM(compiled_llm, llm_device)
 
         # Build the lightweight stand-in. No nn.Module, no random weight init.
