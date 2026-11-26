@@ -154,6 +154,21 @@
     - os:
         - macos-13
         - windows-2022
+# Qwen3Guard multi-head NPUW support is still open: openvinotoolkit/openvino#39353.
+- notebook: notebooks/qwen3guard-stream/qwen3guard-stream.ipynb
+  skips:
+    - device:
+        - npu
+# NPU compilation cannot compute output bounds for SenseVoice's dynamic Unsqueeze.
+- notebook: notebooks/sensevoice-small/sensevoice-small.ipynb
+  skips:
+    - device:
+        - npu
+# Granite 4.0-1B currently targets CPU/GPU; its exact-checkpoint NPU path is unvalidated.
+- notebook: notebooks/granite-4.0/granite-4.0.ipynb
+  skips:
+    - device:
+        - npu
 - notebook: notebooks/hello-npu/hello-npu.ipynb
   skips:
     - device:
@@ -222,6 +237,12 @@
         - ubuntu-22.04
         - windows-2022
 - notebook: notebooks/ltx-video/ltx-video.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
+- notebook: notebooks/ltx2.3-audio-video/ltx2.3-audio-video.ipynb
   skips:
     - os:
         - macos-13
@@ -364,11 +385,6 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-- notebook: notebooks/catvton/catvton.ipynb
-  skips:
-    # PyTorch 2.8 does not provide wheels for Intel macOS runners.
-    - os:
-        - macos-13
 - notebook: notebooks/deepseek-ocr/deepseek-ocr.ipynb
   skips:
     - os:

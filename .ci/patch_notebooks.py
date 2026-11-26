@@ -71,9 +71,18 @@ def remove_ov_install(cell):
         return True
 
     lines = cell["source"].replace("pip_install(", "pip_install( ").split("\n")
+    in_pip_helper = False
+    in_pip_magic = False
     for line in lines:
+        stripped = line.strip()
+        in_pip_helper = in_pip_helper or stripped.startswith("pip_install(")
+        in_pip_magic = in_pip_magic or stripped.startswith(("%pip install ", "%pip uninstall "))
+        is_install = in_pip_helper or in_pip_magic
+        in_pip_helper = in_pip_helper and not stripped.endswith(")")
+        in_pip_magic = in_pip_magic and stripped.endswith("\\")
         if "openvino" in line:
-            if "optimum-cli" in line or line.startswith("#") or "-openvino" in line:
+            # A %pip cell may also contain imports. Only package specs should be stripped.
+            if stripped.startswith(("import ", "from ")) or "optimum-cli" in line or line.startswith("#") or "-openvino" in line:
                 updated_lines.append(line)
                 continue
             updated_line_content = []
@@ -100,7 +109,8 @@ def remove_ov_install(cell):
                     if part.endswith(")"):
                         updated_line_content.append(")")
                     continue
-                if "openvino>" in part or "openvino=" in part or "openvino" == part:
+                requirement = part.rstrip(",)").strip("\"'")
+                if is_install and re.match(r"^openvino(?:$|[<>=!~]|\[)", requirement):
                     if part.endswith(")"):
                         updated_line_content.append(")")
                     package_found = True
@@ -163,6 +173,7 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
 
     :param notebooks_dir: Directory that contains the notebook subdirectories.
                           For example: openvino_notebooks/notebooks
+    :param skip_ov_install: Strip explicit OpenVINO package install and uninstall requirements when CI supplies the packages.
     """
 
     nb_convert_config = Config()
@@ -206,7 +217,7 @@ def patch_notebooks(notebooks_dir, test_device="", skip_ov_install=False):
                             raise ValueError(f"Processing {notebookfile} failed: {source_value} does not exist in cell")
                         cell["source"] = cell["source"].replace(source_value, target_value)
                         cell["source"] = "# Modified for testing\n" + cell["source"]
-                        print(f"Processed {notebookfile}: {source_value} -> {target_value}")
+                        print(f"Processed {notebookfile}: {source_value!a} -> {target_value!a}")
             if test_device and not device_found:
                 print(f"No device replacement found for {notebookfile}")
             if not found:

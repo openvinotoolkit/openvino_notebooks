@@ -6,22 +6,26 @@
     <img width="80%" src="https://raw.githubusercontent.com/yoyowz/classification/master/images/paddleocr.gif">
 </p>
 
-PaddleOCR performs the Optical Character Recognition (OCR) function from a video, an image, or a scanned document. It is mainly composed of three parts: DB text detection, detection frame correction and [SVTR](https://arxiv.org/abs/2205.00159) text recognition. For more details, refer to the PaddleOCR [introduction](https://github.com/PaddlePaddle/PaddleOCR/blob/4b17511491adcfd0f3e2970895d06814d1ce56cc/doc/doc_en/PP-OCRv3_introduction_en.md).
+[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) is a multilingual Optical Character Recognition (OCR) toolkit built on the PaddlePaddle deep learning framework. [PP-OCRv6](https://github.com/PaddlePaddle/PaddleOCR/blob/main/docs/version3.x/algorithm/PP-OCRv6/PP-OCRv6.en.md) is its latest generation of OCR models. It consists of a DB text detection model and a multilingual CTC text recognition model with an SVTR neck, and comes in three tiers, tiny, small and medium, that trade accuracy for speed.
 
 ## Notebook Contents
 
-This notebook demonstrates live PaddleOCR inference with OpenVINO, using the ["Chinese and English ultra-lightweight PP-OCRv3 model（16.2M）"](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/doc/doc_en/ppocr_introduction_en.md#pp-ocrv3) from [PaddleOCR GitHub](https://github.com/PaddlePaddle/PaddleOCR) or [PaddleOCR Gitee](https://gitee.com/paddlepaddle/PaddleOCR), which includes upgraded text detector and recognizer to improve accuracy compared to its previous version, PP-OCRv2. Both text detection and recognition results are visualized in a window, and text recognition results include both recognized text and its corresponding confidence level. The notebook shows how to create the following pipeline:
+This notebook demonstrates live PaddleOCR inference with OpenVINO, using the official PP-OCRv6 ONNX models from Hugging Face, for example [`PaddlePaddle/PP-OCRv6_medium_det_onnx`](https://huggingface.co/PaddlePaddle/PP-OCRv6_medium_det_onnx) and [`PaddlePaddle/PP-OCRv6_medium_rec_onnx`](https://huggingface.co/PaddlePaddle/PP-OCRv6_medium_rec_onnx). OpenVINO reads the ONNX models directly, without a conversion step. The pipeline of the notebook is as follows:
 
 <p align="center" width="100%">
     <img width="80%" src="https://raw.githubusercontent.com/yoyowz/classification/master/images/pipeline.png">
 </p>
 
+The notebook contains the following steps:
+1. Select the inference device and the model tier (tiny, small or medium). The tier switches both the text detection and the text recognition model.
+2. Download the ONNX models and their `inference.yml` configuration files from fixed revisions of the Hugging Face repositories. The pre- and post-processing parameters and the character dictionary are read from `inference.yml`.
+3. Compile the models. CPU uses dynamic input shapes. GPU, NPU and AUTO use static input shapes: frames are letterboxed into a square text detection input, and text lines are recognized with a few fixed input widths.
+4. Run OCR on a frame of a test video and print the recognized text.
+5. Run live OCR on the test video or a webcam. Both text detection and recognition results are visualized, and text recognition results include both the recognized text and its confidence level.
 
-Final part of this notebook shows live inference results from a webcam. Additionally, you can also upload a video file.
 > **NOTE**: To use the webcam, you must run this Jupyter notebook on a computer with a webcam. If you run on a server, the webcam will not work. However, you can still do inference on a video in the final step.
 
-
-For more information about the other PaddleOCR pre-trained models, refer to the [PaddleOCR GitHub](https://github.com/PaddlePaddle/PaddleOCR) or [PaddleOCR Gitee](https://gitee.com/paddlepaddle/PaddleOCR).
+For more information about PP-OCRv6 and other PaddleOCR models, refer to the [PaddleOCR GitHub](https://github.com/PaddlePaddle/PaddleOCR) repository.
 
 ## Installation Instructions
 
