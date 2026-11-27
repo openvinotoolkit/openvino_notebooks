@@ -18,6 +18,7 @@ if (NUM_FRAMES - 1) % TEMPORAL_COMPRESSION:
 LATENT_FRAMES = (NUM_FRAMES - 1) // TEMPORAL_COMPRESSION + 1
 LATENT_SHAPE = (1, 48, LATENT_FRAMES, 16, 16)
 TEXT_INPUT_NAMES = ("input_ids", "text_cos", "text_sin")
+T2V_INPUT_NAMES = ("vision_latents", *TEXT_INPUT_NAMES, "text_mask", "gen_cos", "gen_sin")
 DENOISER_INPUT_NAMES = (
     "vision_latents",
     "timestep",
@@ -146,6 +147,20 @@ def make_scheduler(config: dict, steps: int):
     return scheduler
 
 
+def fold_unipc(config: dict, steps: int) -> tuple[list[float], list[list[float]]]:
+    """Express each UniPC update as a fixed linear combination of the initial latent and past velocities."""
+    scheduler = make_scheduler(config=config, steps=steps)
+    state = torch.zeros(1, 1, steps + 1, dtype=torch.float64)
+    state[..., 0] = 1
+    coefficients = []
+    for k, timestep in enumerate(scheduler.timesteps):
+        velocity = torch.zeros_like(state)
+        velocity[..., k + 1] = 1
+        state = scheduler.step(velocity, timestep, state, return_dict=False)[0]
+        coefficients.append(state.flatten().tolist())
+    return [float(t) for t in scheduler.timesteps], coefficients
+
+
 def run_denoising(step_fn, latent: np.ndarray, scheduler_config: dict, steps: int) -> np.ndarray:
     """
     Denoise a latent with UniPC.
@@ -250,6 +265,90 @@ class DenoiseStep(nn.Module):
         return unconditional + self.guidance_scale * (conditional - unconditional)
 
 
+class CFGDenoiser(nn.Module):
+    """All denoising steps with classifier-free guidance and scheduler updates baked into one graph."""
+
+    def __init__(self, transformer: nn.Module, timesteps: list[float], coefficients: list[list[float]], guidance_scale: float):
+        super().__init__()
+        self.tr = transformer
+        self.coefficients = coefficients
+        self.guidance_scale = guidance_scale
+        latent_t, latent_h, latent_w = LATENT_SHAPE[2:]
+        patch = transformer.config.latent_patch_size
+        self.shapes = [(latent_t, latent_h // patch, latent_w // patch)]
+        self.noisy = [torch.arange(latent_t)]
+        self.num_tokens = latent_t * (latent_h // patch) * (latent_w // patch)
+        embeddings = [
+            transformer.time_embedder(
+                transformer.time_proj(torch.tensor([t * transformer.config.timestep_scale]))
+            )
+            for t in timesteps
+        ]
+        self.register_buffer("time_embeddings", torch.cat(embeddings, 0), persistent=False)
+
+    def velocity(self, x, step, text_k, text_v, text_mask, gen_cos, gen_sin):
+        tr, n = self.tr, self.num_tokens
+        vision, original = tr._patchify_and_pack_latents([x])
+        tokens = tr.proj_in(vision) + self.time_embeddings[step : step + 1]
+        hidden = torch.cat([tokens, tokens], 0)
+        zeros = torch.zeros(1, 1, 1, n, dtype=text_mask.dtype)
+        masks = [torch.cat([text_mask[row : row + 1], zeros], -1) for row in range(2)]
+        for index, layer in enumerate(tr.layers):
+            attn = layer.self_attn
+            normed = layer.input_layernorm_moe_gen(hidden)
+            q = attn.norm_added_q(attn.add_q_proj(normed).view(-1, attn.num_attention_heads, attn.head_dim))
+            k = attn.norm_added_k(attn.add_k_proj(normed).view(-1, attn.num_key_value_heads, attn.head_dim))
+            v = attn.add_v_proj(normed).view(-1, attn.num_key_value_heads, attn.head_dim)
+            q = q * gen_cos + rotate_half(q) * gen_sin
+            k = k * gen_cos + rotate_half(k) * gen_sin
+            q, k, v = (t.transpose(0, 1).unsqueeze(0) for t in (q, k, v))
+            outputs = []
+            for row in range(2):
+                rows = slice(row * n, (row + 1) * n)
+                out = F.scaled_dot_product_attention(
+                    q[:, :, rows],
+                    torch.cat([text_k[index, row : row + 1], k[:, :, rows]], 2),
+                    torch.cat([text_v[index, row : row + 1], v[:, :, rows]], 2),
+                    attn_mask=masks[row],
+                    enable_gqa=True,
+                )
+                outputs.append(out[0].transpose(0, 1).reshape(n, -1))
+            hidden = hidden + attn.to_add_out(torch.cat(outputs, 0))
+            hidden = hidden + layer.mlp_moe_gen(layer.post_attention_layernorm_moe_gen(hidden))
+        projected = tr.proj_out(tr.norm_moe_gen(hidden))
+        conditional = tr._unpatchify_and_unpack_latents(projected[:n], self.shapes, self.noisy, original)[0]
+        unconditional = tr._unpatchify_and_unpack_latents(projected[n:], self.shapes, self.noisy, original)[0]
+        return unconditional + self.guidance_scale * (conditional - unconditional)
+
+    def forward(self, vision_latents, text_k, text_v, text_mask, gen_cos, gen_sin):
+        x, history = vision_latents, []
+        for step, row in enumerate(self.coefficients):
+            history.append(self.velocity(x, step, text_k, text_v, text_mask, gen_cos, gen_sin))
+            x = row[0] * vision_latents
+            for j, velocity in enumerate(history):
+                x = x + row[j + 1] * velocity
+        return x
+
+
+class Cosmos3EdgeT2V(nn.Module):
+    """Text tensors and initial noise -> final latent after all fixed denoising steps."""
+
+    def __init__(
+        self,
+        transformer: nn.Module,
+        timesteps: list[float],
+        coefficients: list[list[float]],
+        guidance_scale: float,
+    ):
+        super().__init__()
+        self.text = TextKV(transformer)
+        self.denoiser = CFGDenoiser(transformer, timesteps, coefficients, guidance_scale)
+
+    def forward(self, vision_latents, input_ids, text_cos, text_sin, text_mask, gen_cos, gen_sin):
+        text_k, text_v = self.text(input_ids, text_cos, text_sin)
+        return self.denoiser(vision_latents, text_k, text_v, text_mask, gen_cos, gen_sin)
+
+
 class VAEDecoder(nn.Module):
     """
     Latent -> video wrapper around the Wan VAE decoder.
@@ -338,6 +437,46 @@ def write_timestep_embedding_f32(source_path: str | Path, target_path: str | Pat
     return marked
 
 
+def write_fused_balanced_ir(source_path: str | Path, target_path: str | Path) -> tuple[int, int]:
+    """Mark the fused text tower and four timestep additions as precision-sensitive, sharing the source weights."""
+    import os
+    import shutil
+    import xml.etree.ElementTree as ET
+
+    time_adds = {
+        "__module.denoiser/aten::add/Add_2",
+        "__module.denoiser/aten::add/Add_126",
+        "__module.denoiser/aten::add/Add_251",
+        "__module.denoiser/aten::add/Add_377",
+    }
+    source_path, target_path = Path(source_path), Path(target_path)
+    tree = ET.parse(source_path)
+    marked_text = marked_time = 0
+    for layer in tree.getroot().find("layers"):
+        name = layer.get("name", "")
+        is_text_compute = name.startswith("__module.text/")
+        is_time_add = name in time_adds
+        if not (is_text_compute or is_time_add):
+            continue
+        rt_info = layer.find("rt_info")
+        if rt_info is None:
+            rt_info = ET.SubElement(layer, "rt_info")
+        if not any(attribute.get("name") == "precise" for attribute in rt_info.findall("attribute")):
+            ET.SubElement(rt_info, "attribute", {"name": "precise", "version": "0"})
+        marked_text += is_text_compute
+        marked_time += is_time_add
+    if marked_text == 0 or marked_time != len(time_adds):
+        raise RuntimeError(f"Unexpected fused precision-marker counts: text={marked_text}, timestep={marked_time}")
+    tree.write(target_path, encoding="utf-8", xml_declaration=True)
+    target_bin = target_path.with_suffix(".bin")
+    if not target_bin.exists():
+        try:
+            os.link(source_path.with_suffix(".bin"), target_bin)
+        except OSError:
+            shutil.copy2(source_path.with_suffix(".bin"), target_bin)
+    return marked_text, marked_time
+
+
 def use_nearest_upsampling(model: nn.Module) -> int:
     """Switch 'nearest-exact' upsampling to 'nearest', which is identical for the integer scale factors used here."""
     upsamples = [m for m in model.modules() if isinstance(m, nn.Upsample) and m.mode == "nearest-exact"]
@@ -395,6 +534,31 @@ def sdpa_to_rank4(model: ov.Model) -> int:
         attention = ops.scaled_dot_product_attention(query, key, value, *extra, causal=sdpa.get_attributes()["causal"])
         output = ops.reshape(attention, _const_i64([batch, groups, repeat, length, dim]), False)
         for target in list(sdpa.output(0).get_target_inputs()):
+            target.replace_source_output(output.output(0))
+        count += 1
+    return count
+
+
+def unshare_fc_weights(model: ov.Model, pattern: str = "mlp_moe_gen.down_proj") -> int:
+    """Give each reuse of a shared FC weight a byte-distinct, mathematically identical copy."""
+    count = 0
+    for op in model.get_ordered_ops():
+        name = op.get_friendly_name()
+        match = re.search(r"/MatMul_(\d+)$", name)
+        if op.get_type_name() != "MatMul" or pattern not in name or not match:
+            continue
+        reuse = int(match.group(1))
+        if reuse > 3:
+            raise ValueError("Only three byte-distinct variants (W^T, -W, -W^T) are available")
+        convert = op.input_value(1).get_node()
+        weight = convert.input_value(0).get_node().get_data()
+        transpose, negate = reuse in (1, 3), reuse in (2, 3)
+        variant = (weight.T if transpose else weight) * (-1 if negate else 1)
+        constant = ops.convert(ops.constant(np.ascontiguousarray(variant)), convert.get_output_element_type(0))
+        output = ops.matmul(op.input_value(0), constant, False, not transpose)
+        if negate:
+            output = ops.multiply(output, ops.constant(np.array(-1, np.float32)))
+        for target in list(op.output(0).get_target_inputs()):
             target.replace_source_output(output.output(0))
         count += 1
     return count
@@ -575,121 +739,15 @@ def dupup_shortcut(model):
     return count
 
 
-def fold_zero_pads(model):
-    """Fold constant zero Pads into the padding of the following Convolution.
-
-    The GPU plugin already does this for a plain f16 graph, but the INT8 decoder inserts a FakeQuantize
-    between the Pad and the Convolution, which blocks the plugin's own folding: without this pass the
-    quantized decoder runs 575 ms instead of 467 ms.
-    """
-    from openvino.passes import ConstantFolding, Manager
-
-    manager = Manager()
-    manager.register_pass(ConstantFolding())
-    manager.run_passes(model)
-    count = 0
-    for conv in model.get_ordered_ops():
-        pad = conv.input_value(0).get_node() if conv.get_type_name() == "Convolution" else None
-        if pad is None or pad.get_type_name() != "Pad" or pad.get_attributes().get("pad_mode") != "constant":
-            continue
-        if len(pad.output(0).get_target_inputs()) != 1 or conv.get_attributes()["auto_pad"] != "explicit":
-            continue
-        begin, end = _const(pad.input_value(1)), _const(pad.input_value(2))
-        value = _const(pad.input_value(3)) if pad.get_input_size() > 3 else np.zeros(1)
-        if begin is None or end is None or value is None or np.any(value):
-            continue
-        if np.any(begin[:2]) or np.any(end[:2]) or np.any(begin < 0) or np.any(end < 0):
-            continue
-        attrs = conv.get_attributes()
-        new = ops.convolution(
-            pad.input_value(0),
-            conv.input_value(1),
-            attrs["strides"],
-            [int(a + b) for a, b in zip(attrs["pads_begin"], begin[2:])],
-            [int(a + b) for a, b in zip(attrs["pads_end"], end[2:])],
-            attrs["dilations"],
-            "explicit",
-        )
-        new.set_friendly_name(conv.get_friendly_name())
-        for target in list(conv.output(0).get_target_inputs()):
-            target.replace_source_output(new.output(0))
-        count += 1
-    return count
-
-
 def optimize_vae_decoder(model: ov.Model) -> dict[str, int]:
     """Apply all decoder graph rewrites; the model must be an f16 graph exported from a half-precision VAE."""
     counts = {
         "RMSNorm": rmsnorm_f16(model),
         "5D upsampler": upsampler_5d(model),
         "DupUp3D": dupup_shortcut(model),
-        "zero Pad": fold_zero_pads(model),
     }
     model.validate_nodes_and_infer_types()
     return counts
-
-
-# Convs kept in f16 by the per-layer INT8 sensitivity sweep (PSNR vs FP32 reference).
-INT8_KEEP_F16 = (
-    r"post_quant_conv|decoder\.conv_(in|out)|upsampler|up_blocks\.0\.resnets\.[12]\.conv2"
-    r"|up_blocks\.1\.resnets\.[0-2]\.conv2|up_blocks\.2\.resnets\.1\.conv2|up_blocks\.3\.resnets\.[12]\.conv2"
-)
-
-
-def _conv_key(conv):
-    return re.sub(r"/aten::_convolution/Convolution(_\d+)?$", "", conv.get_friendly_name())
-
-
-def _fake_quantize(value, lo, hi, levels):
-    dtype = value.get_element_type().to_dtype()
-    lo, hi = ops.constant(np.asarray(lo, dtype=dtype)), ops.constant(np.asarray(hi, dtype=dtype))
-    return ops.fake_quantize(value, lo, hi, lo, hi, levels)
-
-
-def quantize_vae_decoder(
-    model_path: str | Path,
-    latent: np.ndarray,
-    device: str = "GPU",
-    keep_f16: str = INT8_KEEP_F16,
-) -> tuple[ov.Model, int]:
-    """Mixed INT8: symmetric per-tensor activations, per-channel weights; calibrated from one decoder run."""
-    core = ov.Core()
-    model = core.read_model(model_path)
-    convs = [o for o in model.get_ordered_ops() if o.get_type_name() == "Convolution"]
-    probes = []
-    for conv in convs:
-        act = conv.input_value(0)
-        axes = _const_i64(np.arange(len(act.get_shape())))
-        probes += [
-            ops.reduce_min(act, axes, False).output(0),
-            ops.reduce_max(act, axes, False).output(0),
-        ]
-    model.add_outputs(probes)
-    compiled = core.compile_model(model, device, {"INFERENCE_PRECISION_HINT": "f16"})
-    result = compiled([latent.astype(np.float16)])
-    values = [float(result[compiled.outputs[i + 1]]) for i in range(len(probes))]
-    del compiled, model
-    ranges = {}
-    for i, conv in enumerate(convs):
-        lo, hi = ranges.get(_conv_key(conv), (np.inf, -np.inf))
-        ranges[_conv_key(conv)] = (min(lo, values[2 * i]), max(hi, values[2 * i + 1]))
-
-    model = core.read_model(model_path)
-    quantized = 0
-    for conv in [o for o in model.get_ordered_ops() if o.get_type_name() == "Convolution"]:
-        key = _conv_key(conv)
-        weight_node = _skip_converts(conv.input_value(1)).get_node()
-        if re.search(keep_f16, key) or weight_node.get_type_name() != "Constant":
-            continue
-        # Symmetric i8 (zero point 0): oneDNN has no int8 Conv3D with activation zero points.
-        amax = max(abs(v) for v in ranges[key])
-        weight = np.array(weight_node.get_data()).astype(np.float32)
-        wmax = np.maximum(np.abs(weight).reshape(weight.shape[0], -1).max(axis=1), 1e-8).reshape([-1] + [1] * (weight.ndim - 1))
-        conv.input(0).replace_source_output(_fake_quantize(conv.input_value(0), -amax, amax * 127 / 128, 256).output(0))
-        conv.input(1).replace_source_output(_fake_quantize(conv.input_value(1), -wmax, wmax, 255).output(0))
-        quantized += 1
-    model.validate_nodes_and_infer_types()
-    return model, quantized
 
 
 def to_frames(video: np.ndarray) -> np.ndarray:
