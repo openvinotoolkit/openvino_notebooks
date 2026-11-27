@@ -139,6 +139,7 @@
 
 ## Convert
 
+- [Polyglot-Lion speech recognition with OpenVINO](./polyglot-lion/polyglot-lion.ipynb)
 - [YOLOv11 quantization with accuracy control using NNCF](./yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb)
 - [Classification with ConvNeXt and OpenVINO](./torchvision-zoo-to-openvino/convnext-classification.ipynb)
 - [Convert a Tensorflow Lite Model to OpenVINO™](./tflite-to-openvino/tflite-to-openvino.ipynb)
@@ -184,6 +185,7 @@
 
 ## Model Demos
 
+- [Polyglot-Lion speech recognition with OpenVINO](./polyglot-lion/polyglot-lion.ipynb)
 - [Video generation with ZeroScope and OpenVINO](./zeroscope-text2video/zeroscope-text2video.ipynb)
 - [Text-to-image generation with Z-Image-Turbo and OpenVINO](./z-image-turbo/z-image-turbo.ipynb)
 - [Convert and Optimize YOLO26 real-time object detection with OpenVINO™](./yolov26-optimization/yolov26-object-detection.ipynb)
@@ -330,6 +332,7 @@
 
 ## Optimize
 
+- [Polyglot-Lion speech recognition with OpenVINO](./polyglot-lion/polyglot-lion.ipynb)
 - [YOLOv11 quantization with accuracy control using NNCF](./yolov11-quantization-with-accuracy-control/yolov11-quantization-with-accuracy-control.ipynb)
 - [Quantize Speech Recognition Models with accuracy control using NNCF PTQ API](./speech-recognition-quantization/speech-recognition-quantization-wav2vec2.ipynb)
 - [SAM 3D Body with OpenVINO on Intel GPU](./sam-3d-body/sam-3d-body.ipynb)
