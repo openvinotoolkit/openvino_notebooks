@@ -39,13 +39,13 @@ Arcface
 argmax
 artstation
 arxiv
-asym
 ASPP
 ASR
 asr
 ASRModel
 AST
 AST
+asym
 ASYM
 async
 AsyncInferQueue
@@ -90,6 +90,7 @@ bfloat
 BGE
 bge
 BGR
+BiasCorrection
 Bicubic
 bicubic
 bilinear
@@ -102,11 +103,17 @@ BLEU
 blockwise
 BMP
 boolean
+bt
 builtins
 ByteDance
+bytetrack
+ByteTrack
+ByteTrack's
+BYTETracker
 CatVTON
 CausVid
 CentOS
+centred
 centric
 CER
 CFG
@@ -137,6 +144,7 @@ cli
 CLIP's
 ClipBasedHeadEstimator
 CLS
+cls
 CMs
 cmu
 CNNs
@@ -146,11 +154,12 @@ codebooks
 codec
 codecs
 Codecs
+CogViT
 CoLA
 Colab
 colormap
-CogViT
 CompVis
+concat
 conditionings
 config
 configs
@@ -194,6 +203,9 @@ CVAE
 CVF
 CVPR
 CWE
+cx
+cy
+cython
 DarkIR
 Databricks
 databricks
@@ -299,6 +311,7 @@ Downloader
 downloader
 downsample
 downsampled
+downsampler
 downscaling
 DPM
 DPO
@@ -308,6 +321,7 @@ DreamBooth
 DreamBooth Tsinghua
 Dreamshaper
 dropdown
+dropdowns
 DynamiCrafter
 EasyOCR
 ECCV
@@ -353,6 +367,7 @@ FireRedTTS
 FLAC
 flac
 FLD
+FLOPs
 floyd
 fn
 foley
@@ -362,6 +377,7 @@ formatter
 fp
 FP
 FPN
+FRCNN
 Freesound
 FreeVC
 freevc
@@ -418,14 +434,17 @@ Gundam
 Gutendex
 Hafner
 HalBench
+HallusionBench
 HandBrake
 hardcoded
+HarmonyOS
 HC
 heatmap
 HED
 HH
 HiFi
 HiFT
+HiggsAudio
 hoc
 Homebrew
 hotfix
@@ -445,6 +464,7 @@ ICIP
 ICPR
 identation
 IdentityNet
+IDF
 IEMOCAP
 iGPU
 iGPUs
@@ -494,6 +514,7 @@ IoU
 ip
 IPs
 ipynb
+ipywidgets
 ir
 IRs
 iteratively
@@ -516,6 +537,7 @@ Jupyter's
 JupyterLab
 kagglehub
 Kaiming
+Kaldi
 Kalman
 kbps
 KD
@@ -526,9 +548,9 @@ KerasHub
 keypoint
 keypoints
 Kimi
+Kimi
 KiTS
 KITTI
-Kimi
 klein
 KleinPipeline
 Kokoro
@@ -678,10 +700,10 @@ MMS
 MMVLM
 MobileCLIP
 MobileLLaMA
-MobileSAM
 mobilenet
 MobileNet
 MobileNetV
+MobileSAM
 mobilevlm
 MobileVLM
 ModelBest
@@ -696,6 +718,8 @@ MONAI's
 Monodepth
 monodepth
 MosaicPretrainedTransformer
+MOTA
+motmetrics
 mpnet
 mpt
 MPT
@@ -706,6 +730,7 @@ msi
 mT
 MTVQA
 MuJoCo
+mul
 multiarchitecture
 Multiclass
 multiclass
@@ -728,10 +753,12 @@ nanoLLaVA
 nar
 NAS
 natively
+nb
 NCE
 Nemo
 NEOX
 NER
+Nesnad
 NETP
 Netron
 NeurIPS
@@ -739,6 +766,7 @@ NeuSpell
 NeXT
 ng
 ngram
+nireq
 NLP
 nlp
 NMS
@@ -780,10 +808,11 @@ OmniGen's
 Omnimodal
 omnimodal
 OmniParser
+OmniVoice
+OmniVoice's
 OMZ
 oneAPI
 oneDNN
-OpenGVLab
 OneFormer
 oneformer
 ONNX
@@ -799,6 +828,7 @@ OpenCLIP's
 OpenCompass
 OpenCV
 OpenDataLab
+OpenGVLab
 openjourney
 OpenPose
 OpenShift
@@ -927,12 +957,12 @@ pretrain
 pretrained
 Pretraining
 pretraining
+prithivMLmods
 processings
 ProgLoss
 proj
 promptable
 prompthero
-prithivMLmods
 proto
 protobuf
 PRs
@@ -989,10 +1019,12 @@ ReciproCAM
 recognised
 redistributable
 RedPajama
+RefCOCO
 ReferenceNet
 RegNet
 RegNetY
 regressively
+ReID
 reidentification
 ReLU
 renderer
@@ -1055,9 +1087,9 @@ Schuster
 sCM
 sd
 SDEdit
+SDK
 SDXL
 sdxl
-SDK
 Segformer
 Segmentations
 segmentations
@@ -1078,6 +1110,7 @@ SigLIP
 SigLip
 siglip
 sigmoid
+SiLU
 SISR
 SL
 SlimOrca
@@ -1102,9 +1135,9 @@ Sparisty
 sparsified
 sparsify
 sparsity
-specialised
 spatio
 spatiotemporal
+specialised
 spectrogram
 spectrograms
 SpeechBrain
@@ -1141,10 +1174,10 @@ subchunk
 subchunks
 subdirectories
 subdirectory
-submodels
 subgraph
 subgraphs
 sublicense
+submodels
 subpackage
 subtask
 summarization
@@ -1203,6 +1236,7 @@ TorchMetrics
 TorchScript
 torchvision
 TorchVision
+tput
 transformative
 TRansformers
 TrigFlow
@@ -1319,6 +1353,7 @@ WebUI
 WER
 WhisperPipeline
 WHITEBOX
+Wikimedia
 wikipedia
 WIKISQL
 WikiTable
@@ -1335,6 +1370,7 @@ XCode
 XCodec
 Xeon
 xformers
+Xiaomi
 xl
 xml
 XPU
@@ -1351,6 +1387,7 @@ YOLO
 YOLOE
 YOLOv
 yolov
+YOLOX
 Youri
 youri
 YouTube
@@ -1362,14 +1399,3 @@ zeroscope
 zh
 Zhipu
 Zongyuan
-downsampler
-dropdowns
-FLOPs
-HallusionBench
-HarmonyOS
-HiggsAudio
-Kaldi
-OmniVoice
-OmniVoice's
-RefCOCO
-Xiaomi
