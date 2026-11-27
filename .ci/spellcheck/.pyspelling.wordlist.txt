@@ -95,6 +95,7 @@ BGR
 Bicubic
 bicubic
 bilinear
+bimanual
 biometrics
 BiT
 bitext
@@ -388,6 +389,7 @@ GDRNPP
 GEC
 GELAN
 GELU
+GEMM
 Gemma
 gemma
 genai
@@ -606,6 +608,7 @@ Lim
 LinearCameraEmbedder
 linearized
 Linemod
+LingBot
 Lippipeline
 Liu
 LLama
@@ -1063,8 +1066,10 @@ RLHF
 RMBG
 RMS
 RMSNorm
+Robbyant
 RoBERTa
 roberta
+RoboTwin
 ROI
 roi
 ROIs

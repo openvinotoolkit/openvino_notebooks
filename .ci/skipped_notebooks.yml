@@ -154,6 +154,12 @@
     - os:
         - macos-13
         - windows-2022
+- notebook: notebooks/lingbot-vla-v2/lingbot-vla-v2.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
 # Qwen3Guard multi-head NPUW support is still open: openvinotoolkit/openvino#39353.
 - notebook: notebooks/qwen3guard-stream/qwen3guard-stream.ipynb
   skips:
