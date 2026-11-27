@@ -278,12 +278,7 @@ class CFGDenoiser(nn.Module):
         self.shapes = [(latent_t, latent_h // patch, latent_w // patch)]
         self.noisy = [torch.arange(latent_t)]
         self.num_tokens = latent_t * (latent_h // patch) * (latent_w // patch)
-        embeddings = [
-            transformer.time_embedder(
-                transformer.time_proj(torch.tensor([t * transformer.config.timestep_scale]))
-            )
-            for t in timesteps
-        ]
+        embeddings = [transformer.time_embedder(transformer.time_proj(torch.tensor([t * transformer.config.timestep_scale]))) for t in timesteps]
         self.register_buffer("time_embeddings", torch.cat(embeddings, 0), persistent=False)
 
     def velocity(self, x, step, text_k, text_v, text_mask, gen_cos, gen_sin):
@@ -550,11 +545,16 @@ def unshare_fc_weights(model: ov.Model, pattern: str = "mlp_moe_gen.down_proj") 
         reuse = int(match.group(1))
         if reuse > 3:
             raise ValueError("Only three byte-distinct variants (W^T, -W, -W^T) are available")
-        convert = op.input_value(1).get_node()
-        weight = convert.input_value(0).get_node().get_data()
+        weight_value = op.input_value(1)
+        weight_node = weight_value.get_node()
+        if weight_node.get_type_name() == "Convert":
+            weight_node = weight_node.input_value(0).get_node()
+        if weight_node.get_type_name() != "Constant":
+            raise ValueError(f"Expected constant weights for {name}, got {weight_node.get_type_name()}")
+        weight = weight_node.get_data()
         transpose, negate = reuse in (1, 3), reuse in (2, 3)
         variant = (weight.T if transpose else weight) * (-1 if negate else 1)
-        constant = ops.convert(ops.constant(np.ascontiguousarray(variant)), convert.get_output_element_type(0))
+        constant = ops.convert(ops.constant(np.ascontiguousarray(variant)), weight_value.get_element_type())
         output = ops.matmul(op.input_value(0), constant, False, not transpose)
         if negate:
             output = ops.multiply(output, ops.constant(np.array(-1, np.float32)))
