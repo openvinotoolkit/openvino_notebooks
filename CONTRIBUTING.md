@@ -224,13 +224,18 @@ Here are some guidelines to follow:
 
  - Install the latest version of Gradio by running `pip install -q -U gradio`.
  - If you're using a `gradio.Interface` object in your demo, disable flagging by setting the `allow_flagging` keyword argument to `'never'`.
- - Launch the interface with `debug=True`. This mode blocks the main thread, identifies any possible inference errors and stops the running Gradio server when execution is interrupted. It is important to disable it when executing on CI to prevent main thread hanging. It is done by adding `test_replace` metadata key to the cell containing the line with `launch` method, and replacing this line with the same one but excluding `debug` argument. More detailed instructions can be found [here](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Notebooks-Development---CI-Test-Speedup).
- - Avoid setting `share=True` for the `launch` method of `gradio.Interface`. Enabling this option generates an unnecessary public link to your device, which can pose a security risk. Instead, if the interface window is not rendering in your case, consider temporarily setting the `server_name` and `server_port` parameters to the address where the server is located. This workaround is particularly useful when you are using remote Jupyter server. To assist other users, please leave a comment in your notebook explaining this solution. It will help them quickly resolve the issue if they encounter the same problem. The comment we recommend to use for this:
+ - Launch the interface with `debug=True`. This mode blocks the main thread, identifies any possible inference errors and stops the running Gradio server when execution is interrupted. It is important to disable it when executing on CI to prevent main thread hanging. It is done by adding `test_replace` metadata key to the cell containing the line with `launch` method, and replacing this line (both `launch` lines when the fallback below is used) with the same one but excluding `debug` argument. More detailed instructions can be found [here](https://github.com/openvinotoolkit/openvino_notebooks/wiki/Notebooks-Development---CI-Test-Speedup).
+ - Launch the demo locally first and do not set `share=True` on the first `launch` call: it generates a public link to your device, which can pose a security risk. If the local launch fails, the notebook may retry with `share=True` as a fallback; print the error before the retry and mention in the notebook text that the fallback creates a publicly accessible link. If the interface window is not rendering because you are using a remote Jupyter server, consider setting the `server_name` and `server_port` parameters to the address where the server is located. To assist other users, keep the comment explaining this solution. The recommended launch cell:
 
-```
+```python
 # if you are launching remotely, specify server_name and server_port
 # demo.launch(server_name='your server name', server_port='server port in int')
 # Read more in the docs: https://gradio.app/docs/
+try:
+    demo.launch(debug=True)
+except Exception as error:
+    print(f"Local Gradio launch failed: {error}. Retrying with a public share link.")
+    demo.launch(debug=True, share=True)
 ```
 
 - We use Gradio Blocks only when we need to create a complex interface. The Gradio Interface class provides an easy-to-use interface and saves development time, so we use it whenever possible. However, for more complex interfaces, Gradio Blocks gives us more flexibility and control.

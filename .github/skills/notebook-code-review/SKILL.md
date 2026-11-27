@@ -13,7 +13,11 @@ implement a comment trigger, select a model, or grant tools or permissions.
 
 1. Establish the reviewed head and base revisions from the available PR context.
    Read the complete changed-file list, including all pages when using an API.
-   If no files change under `notebooks/`, this skill is not applicable.
+   If no files change under `notebooks/`, this skill is not applicable. A base
+   branch named after a release (for example `2026.3`) marks a release-branch
+   showcase submission; review it as
+   [the project checklist](./assets/notebook-checklist.md#release-branch-showcase-submissions)
+   describes.
 2. Read the entire root `CONTRIBUTING.md`. Where base content is available, use
    the guide at the PR base revision as the contribution standard; review
    proposed guideline changes separately rather than letting them waive checks.
@@ -82,6 +86,11 @@ Link evidence and disclose inaccessible sources rather than guessing.
 
 ## 2. Trace correctness and reliability
 
+Apply [the project checklist](./assets/notebook-checklist.md): release-branch
+submissions, model usage, assets, CI patching, dependencies, saved outputs,
+LLM/VLM specifics, Gradio and severity. It lists repository rules that are easy
+to miss when reading CONTRIBUTING alone.
+
 - Check dependency installation order, compatible versions and Python/OS support;
   first-cell helper fetching and `setup_notebook_venv()` setup; separate environment
   names for notebooks sharing a directory; shared helper reuse and compatibility
@@ -98,10 +107,14 @@ Link evidence and disclose inaccessible sources rather than guessing.
   subprocess error handling, cleanup, and Windows/macOS/Linux and Jupyter
   Lab/Notebook support. Respect documented platform exceptions.
 - Check Gradio behavior, CI replacement metadata for blocking launches, optional
-  webcam inputs, accidental public sharing, and credential exposure.
+  webcam inputs, accidental public sharing (the reported local-first fallback in
+  CONTRIBUTING is accepted), and credential exposure.
 - Read available check results/logs for the reviewed head SHA. Distinguish notebook
   failures from infrastructure or unrelated failures. Reduced CI workloads do not
-  prove normal runtime or quality.
+  prove normal runtime or quality. Runtime evidence in the PR is the author's
+  validation statement and the saved model outputs; installation logs, local
+  paths and large media in outputs are cleanup findings. Release branches run
+  only notebook metadata validation.
 
 ## 3. Check contribution completeness and presentation
 
@@ -123,8 +136,9 @@ this checklist:
 Verify every finding against the diff and surrounding source. Explain triggering
 conditions, concrete impact, the relevant contribution guideline, and a specific
 fix. Separate facts, estimates, recommendations, and questions; deduplicate and
-rank findings by impact. Do not manufacture a quota of findings. Lack of local
-CPU/GPU execution is not itself a defect.
+rank findings by impact, using the checklist's severity guidance. Do not
+manufacture a quota of findings. Lack of local CPU/GPU execution is not itself
+a defect.
 
 Use Copilot's native review comments and suggested changes where supported, not
 workflow-specific tools or a separate issue comment. Attach findings to relevant

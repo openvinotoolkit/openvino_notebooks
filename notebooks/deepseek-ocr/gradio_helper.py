@@ -1,3 +1,4 @@
+import ast
 import gradio as gr
 import torch
 import os
@@ -71,7 +72,7 @@ def make_demo(model, tokenizer):
                 color_map[label] = (np.random.randint(50, 255), np.random.randint(50, 255), np.random.randint(50, 255))
 
             color = color_map[label]
-            coords = eval(ref[2])
+            coords = ast.literal_eval(ref[2])
             color_a = color + (60,)
 
             for box in coords:

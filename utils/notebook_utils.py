@@ -255,6 +255,8 @@ def download_file(
     filename: PathLike = None,
     directory: PathLike = None,
     show_progress: bool = True,
+    *,
+    user_agent: str = "Mozilla/5.0",
 ) -> PathLike:
     """
     Download a file from a url and save it to the local filesystem. The file is saved to the
@@ -267,6 +269,7 @@ def download_file(
     :param directory: Directory to save the file to. Will be created if it doesn't exist
                       If None the file will be saved to the current working directory
     :param show_progress: If True, show an TQDM ProgressBar
+    :param user_agent: HTTP User-Agent to send with the download request.
     :param silent: If True, do not print a message if the file already exists
     :param timeout: Number of seconds before cancelling the connection attempt
     :return: path to downloaded file
@@ -294,7 +297,7 @@ def download_file(
         Path(directory).mkdir(parents=True, exist_ok=True)
 
     try:
-        response = requests.get(url=url, headers={"User-agent": "Mozilla/5.0"}, stream=True, timeout=30)
+        response = requests.get(url=url, headers={"User-agent": user_agent}, stream=True, timeout=30)
         response.raise_for_status()
     except (
         requests.exceptions.HTTPError

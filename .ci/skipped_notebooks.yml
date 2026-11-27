@@ -242,6 +242,12 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
+- notebook: notebooks/ltx2.3-audio-video/ltx2.3-audio-video.ipynb
+  skips:
+    - os:
+        - macos-13
+        - ubuntu-22.04
+        - windows-2022
 - notebook: notebooks/paddle-to-openvino/paddle-to-openvino-classification.ipynb
   skips:
     - python:
@@ -499,14 +505,7 @@
         - macos-13
         - ubuntu-22.04
         - windows-2022
-# Gated HF checkpoint (requires token) and ~2.7 GB download; not executable in CI
-- notebook: notebooks/sam-3d-body/sam-3d-body.ipynb
-  skips:
-    - os:
-        - macos-13
-        - ubuntu-22.04
-        - windows-2022
-# Large model - 8 GB download and about 24 GB of host memory for conversion
+# Large model - 8 GB download and about 20 GB of host memory for conversion
 - notebook: notebooks/cosmos3-edge-text-to-video/cosmos3-edge-text-to-video.ipynb
   skips:
     - os:

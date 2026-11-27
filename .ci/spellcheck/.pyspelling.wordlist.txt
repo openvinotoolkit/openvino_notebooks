@@ -534,6 +534,7 @@ JuggernautXL
 Jupyter
 Jupyter's
 JupyterLab
+Kaggle
 kagglehub
 Kaiming
 Kalman
@@ -1181,6 +1182,7 @@ StableDiffusionPipeline
 STAL
 stateful
 STFT
+STG
 streamable
 strided
 Struct
@@ -1289,6 +1291,7 @@ Unet
 UNets
 Unimodal
 UniPC
+Unsloth
 unsqueeze
 Uparrow
 uparrow
@@ -1298,6 +1301,7 @@ Upcroft
 updo
 upsample
 upsampled
+upsampler
 upsamples
 upsampling
 upstreamed
@@ -1383,6 +1387,7 @@ WIKITQ
 Wofk
 WTQ
 wuerstchen
+WWB
 WuerstchenDiffNeXt
 Würstchen
 XAI
