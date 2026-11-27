@@ -39,10 +39,14 @@ please refer to the [Installation Guide](https://github.com/openvinotoolkit/open
 The ByteTrack source clone and the official checkpoint (`bytetrack_x_mot17.pth.tar`) are downloaded automatically on
 first run; set `BYTETRACK_WEIGHTS` to reuse a local copy.
 
-The sample video is downloaded at runtime from Wikimedia Commons:
-["Pro dog walker - Tokyo - 2024 Nov 1"](https://commons.wikimedia.org/wiki/File:Pro_dog_walker_-_Tokyo_-_2024_Nov_1.webm)
-by User:Nesnad, licensed **CC BY-SA 4.0**. The MOT17 dataset is **optional** and not redistributed here — provide the
-MOT17 FRCNN train sequences (set `MOT17_TRAIN`) to enable the MOTA / IDF1 accuracy sections; the video demo,
-quantization and benchmarks run without it. Tracking output videos are written to a local `results/video/` folder.
+## Licenses
+
+- ByteTrack source code and the `bytetrack_x_mot17.pth.tar` checkpoint: **Apache-2.0**, fetched from the
+  [ByteTrack repository](https://github.com/FoundationVision/ByteTrack) at runtime and not redistributed here.
+- Sample video ["Pro dog walker - Tokyo - 2024 Nov 1"](https://commons.wikimedia.org/wiki/File:Pro_dog_walker_-_Tokyo_-_2024_Nov_1.webm)
+  by User:Nesnad, Wikimedia Commons: **CC BY-SA 4.0**, downloaded at runtime.
+- MOT17 dataset (**optional**, user-supplied, not redistributed): **CC BY-NC-SA 3.0** — non-commercial use only.
+  Provide the MOT17 FRCNN train sequences (set `MOT17_TRAIN`) to enable the MOTA / IDF1 accuracy sections; the video
+  demo, quantization and benchmarks run without it. Tracking output videos are written to a local `results/video/` folder.
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=5b5a4db0-7875-4bfb-bdbd-01698b5b1a77&file=notebooks/byte-track/README.md" />
