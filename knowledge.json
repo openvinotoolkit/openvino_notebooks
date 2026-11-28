@@ -1223,6 +1223,22 @@
   "f5a035f89961": {
    "attempts": [
     {
+     "action": "No new ticket: open issue https://github.com/openvinotoolkit/openvino_notebooks/issues/3879 covers the repo-level cause; only the Request ID in the signature changes nightly.",
+     "applied_learning": "Applied the memory lesson to alias by repository name to issue 3879 instead of filing a duplicate; re-read issue 3879 and the current group.md show the same repo and 401.",
+     "confidence": "high",
+     "date": "2026-11-28",
+     "dead_ends": "Notebook code cannot grant gated access; token plumbing, skip lists and CI edits are out of scope; replacing the model source is unsupported by evidence.",
+     "lesson": "Alias gated-repo 401 groups to the tracked issue by repository name while issue 3879 is open; ends if access is granted or the notebook is skipped.",
+     "next_step": "Maintainers decide on issue 3879 (grant HF access via HF_TOKEN or skip the notebook); masking Request IDs in report normalization would stop new signatures each night.",
+     "nightly_run_id": 46087605180,
+     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/46087605180",
+     "outcome": "none",
+     "prior_feedback": "Memory notes 2026-11-24 to 2026-11-27 reached the same none outcome; issue 3879 is still open (last updated 2026-11-17) with no maintainer response, so nothing is validated.",
+     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/46107623793",
+     "root_cause": "snapshot_download of gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 on all 10 configs because the CI runner has no authorized token; same repo-level cause as open issue 3879.",
+     "self_assessment": "Supported by the 401 GatedRepoError on the same repo and the issue 3879 body. Issue 3879 was filed for the iGPU config only but the cause is repo-level; no fix attempted, collector alias coverage still missing."
+    },
+    {
      "action": "No new ticket: open issue https://github.com/openvinotoolkit/openvino_notebooks/issues/3879 covers the repo-level cause; only the Request ID in the signature changes each night.",
      "applied_learning": "Applied the memory lesson to alias by repository name to issue 3879 instead of filing a duplicate; re-read issue 3879 and the current log shows the same repo and 401.",
      "confidence": "high",
@@ -1253,32 +1269,16 @@
      "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45753767900",
      "root_cause": "snapshot_download of gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 on all 9 configs because the CI runner has no access or token; same cause as open issue 3879.",
      "self_assessment": "Supported by the log (401 GatedRepoError on the same repo) and tracked issue 3879; no fix attempted and none appropriate. Collector alias coverage to 3879 is still missing."
-    },
-    {
-     "action": "No new ticket: open issue https://github.com/openvinotoolkit/openvino_notebooks/issues/3879 covers the repo-level cause; the Request ID changes the signature each night.",
-     "applied_learning": "Applied the memory lesson to check issue 3879 first and not file a duplicate; the current log confirms the same repo and 401.",
-     "confidence": "high",
-     "date": "2026-11-25",
-     "dead_ends": "Editing skip lists, CI token plumbing or replacing the model source is out of scope; a notebook code change cannot grant gated access.",
-     "lesson": "Alias gated-repo 401 groups to the tracked issue by repository name rather than signature; applies while issue 3879 is open and the same repo is cited.",
-     "next_step": "Maintainers decide on issue 3879 (grant HF access with HF_TOKEN or skip the notebook); masking Request IDs in report normalization would stop new signatures.",
-     "nightly_run_id": 45517907563,
-     "nightly_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45517907563",
-     "outcome": "none",
-     "prior_feedback": "Memory notes from 2026-11-23 and 2026-11-24 reached the same none outcome; issue 3879 is still open and unreviewed, so nothing is validated.",
-     "remediator_run_url": "https://github.com/openvinotoolkit/openvino_notebooks/actions/runs/45543591565",
-     "root_cause": "snapshot_download of the gated Hugging Face repo facebook/sam-3d-body-dinov3 returns 401 on all 10 configs because the CI runner has no access or token; same cause as open issue 3879.",
-     "self_assessment": "Supported by the log (401 GatedRepoError on all 10 pairs) and issue 3879 body; no code fix attempted and none appropriate. Collector alias coverage to 3879 is still missing."
     }
    ],
    "category": "cell_error",
    "error_class": "other",
    "exception_type": "GatedRepoError",
    "first_seen": "2026-11-24",
-   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6b08dfa0-0219f2a53ca3d1b35cf2bf1e;58999443-2733-405c-a5ad-c9650e5536e4) Cannot access gated repo for url https://huggingface.co/facebook/sam-3d-body-dinov3/resolve/11aaa346c7204874a1cbafe3d39a979080b2c55a/assets/mhr_model.pt. Access to model fac\u2026",
-   "investigations": 4,
+   "headline": "GatedRepoError: 401 Client Error. (Request ID: Root=1-6b0a2bc9-5c4b5cd40ba4c00356cf7e87;47156573-afbd-41a4-9358-5725ba8614e7) Cannot access gated repo for url https://huggingface.co/facebook/sam-3d-body-dinov3/resolve/11aaa346c7204874a1cbafe3d39a979080b2c55a/model.ckpt. Access to model facebook/sam\u2026",
+   "investigations": 5,
    "kind": "error",
-   "last_seen": "2026-11-27",
+   "last_seen": "2026-11-28",
    "notebooks": [
     "notebooks/sam-3d-body/sam-3d-body.ipynb"
    ]
